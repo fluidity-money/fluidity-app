@@ -1,0 +1,59 @@
+{
+  "name": "frontend-ido",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fullpage/react-fullpage": "^0.1.19",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "process": "^0.11.10",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router": "^6.1.1",
+    "react-router-dom": "^6.1.1",
+    "react-router-hash-link": "^2.4.3",
+    "styled-components": "^5.3.1",
+    "web-vitals": "^1.1.2"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "scripts": {
+    "start": "make watch",
+    "build": "make build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.9.4",
+    "@types/react": "^17.0.22",
+    "@types/react-dom": "^17.0.9",
+    "@types/react-router-hash-link": "^2.4.4",
+    "@types/styled-components": "^5.1.14",
+    "css-loader": "^6.4.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-config-react-app": "^7.0.0",
+    "html-webpack-plugin": "^5.3.2",
+    "react-scripts": "^5.0.0",
+    "style-loader": "^3.3.0",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.4.4",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
+}

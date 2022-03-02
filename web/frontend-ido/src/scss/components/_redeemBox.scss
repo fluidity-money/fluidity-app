@@ -1,0 +1,102 @@
+.redeem-container {
+  height: 35rem;
+  width: 40rem;
+  background: #031225;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin: 6rem;
+  border-radius: 1em;
+  box-shadow: border-box;
+  flex-direction: column;
+  box-shadow: -2px 2px 10px black;
+
+  @media (max-height: 950px) {
+     height: auto;
+  }
+
+  @media (max-width: 580px) {
+    width: 100%;
+    margin: 1em;
+  }
+}
+
+.redeem {
+  color: white; 
+
+  &.header {
+    font-family: Manrope, sans-serif;
+    font-weight: bold;
+    font-size: 1.5rem;
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+
+  &.amount-large {
+    
+    font-family: Raleway, sans-serif;
+    font-weight: 300;
+    font-size: 3rem;
+    padding-top: 1em;
+    padding-bottom: 1em;
+
+    @media (max-height: 800px), (max-width: 1176px) {
+      padding: 0;
+    }
+  }
+
+  &.input {
+    background: #091E38;
+    border-radius: 0;
+    padding: 1.5em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+
+  &.button {
+    background: linear-gradient(to left, #5C00F7, #20076F, #3B04A800);
+    font-family: Raleway, sans-serif;
+    font-weight: bold;
+    font-variant: normal;
+    font-size: 1.5rem;
+
+    width: 80%;
+    padding: 1em;
+    border-radius: 1em;
+    margin-bottom: 0.5em;
+  }
+
+  &.part {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 1em;
+
+    & > .left {
+      font-family: Raleway, sans-serif;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: #ACACAC;
+    }
+
+    & > .right {
+      font-family: Poppins, sans-serif;
+      color: white;
+
+      &.flex {
+        gap: 0.5em;
+      }
+
+      & > .icon {
+        height: 21px;
+        width: 21px;
+      }
+    }
+  }
+
+  &.bottom-text {
+    font-family: Raleway, sans-serif;
+    color: #ACACAC;
+  }
+}

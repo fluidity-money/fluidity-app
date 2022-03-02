@@ -1,0 +1,11 @@
+
+FROM fluidity/worker
+
+WORKDIR /usr/src/fluidity-worker-base
+
+RUN make clients
+
+ENTRYPOINT [ \
+	"wait-for-amqp", \
+	"./start.sh" \
+]

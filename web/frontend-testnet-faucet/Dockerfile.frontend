@@ -1,0 +1,28 @@
+
+FROM node:16 as build
+
+ARG REACT_APP_FLU_API_URI
+
+ENV REPO ethereum-testnet-faucet
+
+ENV WORKDIR /usr/src/${REPO}
+
+WORKDIR $WORKDIR
+
+COPY package.json package-lock.json ./
+
+RUN npm i
+
+COPY . ./
+
+RUN make frontend
+
+FROM nginx:stable-alpine
+
+COPY --from=build \
+	/usr/src/ethereum-testnet-faucet/dist \
+	/usr/share/nginx/html
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]

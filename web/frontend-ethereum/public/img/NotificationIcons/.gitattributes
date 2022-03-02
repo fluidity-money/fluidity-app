@@ -1,0 +1,2 @@
+notifications-filled-icon.svg filter=lfs diff=lfs merge=lfs -text
+notifications-off-icon.svg filter=lfs diff=lfs merge=lfs -text

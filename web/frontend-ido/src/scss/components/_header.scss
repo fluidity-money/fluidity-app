@@ -1,0 +1,23 @@
+.header {
+  font-weight: bold;
+  font-size: 2.5rem;
+
+  &.fluidity-ido {
+    font-family: 'Poppins Light', sans-serif;
+    font-weight: normal;
+    position: relative;
+
+    // https://stackoverflow.com/questions/44147872/linear-gradient-underline-for-hyperlink
+    &::after {
+      content:'';
+      width: 2.25em;
+      position: absolute;
+      display: inline;
+      left: 0.5em;
+      border-radius: 2px;
+      bottom: 6px;
+      height: 3px;
+      background: linear-gradient(to right, #1881FE, #5BFEF3);
+    }
+  }
+}

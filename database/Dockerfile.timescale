@@ -1,0 +1,16 @@
+
+FROM timescale/timescaledb:latest-pg12
+
+ENV REPO /usr/src/fluidity-migrations-timescale
+
+RUN apk add make
+
+RUN mkdir ${REPO}
+
+WORKDIR ${REPO}
+
+COPY . ${REPO}
+
+RUN make timescale
+
+RUN cp build/timescale/*.sql /docker-entrypoint-initdb.d/

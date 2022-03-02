@@ -1,0 +1,38 @@
+$title-height: 5rem;
+$title-padding-top: 1em;
+
+.title-container {
+  height: $title-height;
+  position: relative;
+  position: fixed;
+  display: flex;
+  width: auto;
+  justify-content: space-between;
+  box-sizing: border-box;
+  margin-left: 3em;
+  margin-right: 3em;
+  padding-top: $title-padding-top;
+
+  @media (max-width: 830px) {
+    justify-content: center;
+    // display: none; //TODO sticky scrolling header?
+  }
+  
+  // @media (max-height: ) {
+  //   display: none;
+  // }
+
+  // display: none;
+}
+
+.title-button-container {
+  .button {
+    padding-left: 1.5rem;
+    .text {
+      font-size: 1.5rem;
+    }
+  }
+  @media (max-width: 830px) {
+    display: none;
+  }
+}

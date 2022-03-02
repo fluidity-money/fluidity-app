@@ -1,0 +1,26 @@
+.button {
+  background: unset;
+  border: unset;
+  font-variant: all-petite-caps;
+  font-size: 2rem;
+
+  :hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(0, 255, 255, 1);
+    animation: button-underline 0.5s; 
+
+    cursor: pointer;
+  }
+}
+
+@keyframes button-underline {
+  0% {
+    text-decoration-color: rgba(0, 255, 255, 0);
+  };
+
+  100% {
+    text-decoration-color: rgba(0, 255, 255, 1);
+  };
+}

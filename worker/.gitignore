@@ -1,0 +1,8 @@
+
+build
+*.swp
+docker-base
+docker-client
+docker-server
+
+node_modules/

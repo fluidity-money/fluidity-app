@@ -1,0 +1,16 @@
+
+FROM postgres:14.0-alpine
+
+ENV REPO /usr/src/fluidity-migrations-postgres
+
+RUN apk add make
+
+RUN mkdir ${REPO}
+
+WORKDIR ${REPO}
+
+COPY . ${REPO}
+
+RUN make postgres
+
+RUN cp build/postgres/*.sql /docker-entrypoint-initdb.d/
