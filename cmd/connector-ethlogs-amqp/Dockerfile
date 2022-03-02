@@ -1,15 +1,7 @@
 
-FROM fluidity/go-docker:latest
+FROM fluidity-money/build-container:latest
 
-ENV REPO connector-ethlogs-amqp
-
-ENV DIR /usr/src/${REPO}
-
-COPY . ${DIR}
-
-WORKDIR ${DIR}
-
-RUN rewrite-go-mod.sh go.mod
+WORKDIR /usr/local/src/fluidity/cmd/connector-ethlogs-amqp
 
 RUN make
 

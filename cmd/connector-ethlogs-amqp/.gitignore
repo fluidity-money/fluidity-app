@@ -1,4 +1,4 @@
-connector-ethlogs-amqp
-docker
-test
 lint
+test
+docker
+connector-ethlogs-amqp

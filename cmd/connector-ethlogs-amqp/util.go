@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"math/big"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
-	"math/big"
 )
 
 func redisGetLastBlock() uint64 {
