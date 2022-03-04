@@ -1,13 +1,7 @@
 
-FROM fluidity/go-docker:latest
+FROM fluidity-money/build-container:latest
 
-ENV REPO microservice-solana-faucet-send-amounts
-
-ENV DIR /usr/src/${REPO}
-
-COPY . ${DIR}
-
-WORKDIR ${DIR}
+WORKDIR /usr/local/src/fluidity/cmd/microservice-solana-faucet-send-amounts
 
 RUN make
 
