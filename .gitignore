@@ -7,3 +7,5 @@ cmd/*/lint
 cmd/*/*.o
 
 database/build
+
+web/*/dist
