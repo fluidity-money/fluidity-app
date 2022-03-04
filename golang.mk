@@ -5,8 +5,8 @@ include ../../build.mk
 
 GO_FILES := $(shell ls -1 *.go)
 
-${REPO}: ${GO_FILES}
-	@${GO_BUILD} -o ${REPO}
+${REPO}.o: ${GO_FILES}
+	@${GO_BUILD} -o ${REPO}.o
 
 lint: ${GO_FILES}
 	@${GO_FMT}
@@ -26,4 +26,4 @@ watch:
 	@ls -1 ${GO_FILES} | entr -ns 'clear && make build'
 
 clean:
-	@rm -f ${REPO} lint test docker
+	@rm -f "${REPO}.o" lint test docker

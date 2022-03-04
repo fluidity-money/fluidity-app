@@ -1,13 +1,7 @@
 
-FROM fluidity/go-docker:latest
+FROM fluidity-money/build-container:latest
 
-ENV REPO microservice-ethereum-faucet-send-amounts
-
-ENV DIR /usr/src/${REPO}
-
-COPY . ${DIR}
-
-WORKDIR ${DIR}
+WORKDIR /usr/local/src/fluidity/cmd/microservice-ethereum-faucet-send-amounts
 
 RUN make
 
