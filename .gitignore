@@ -1,1 +1,7 @@
-.dockerignore
+
+docker
+
+cmd/*/test
+cmd/*/docker
+cmd/*/lint
+cmd/*/*.o
