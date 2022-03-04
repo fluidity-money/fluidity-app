@@ -6,21 +6,22 @@ import (
 	"math"
 	"crypto/sha256"
 	"math/rand"
+
+	ethCommon "github.com/ethereum/go-ethereum/common"
+
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 const UniquePhraseLength = 32
 
-var (
-	addressFilterEthereumCompiled = regexp.MustCompile("^0x[0-9A-Za-z]{40}$")
-	addressFilterSolanaCompiled = regexp.MustCompile("^[0-9A-Za-z]{43,44}$")
-)
+var addressFilterCompiled = regexp.MustCompile("^0x[0-9A-Za-z]{40}$")
 
-func filterAddressEthereum(address string) bool {
-	return addressFilterEthereumCompiled.MatchString(address)
+func filterAddress(address string) bool {
+	return addressFilterCompiled.Match([]byte(address))
 }
 
-func filterAddressSolana(address string) bool {
-	return addressFilterSolanaCompiled.MatchString(address)
+func hexToAddress(str string) ethCommon.Address {
+	return ethCommon.HexToAddress(str)
 }
 
 func floatAsInt64(x float64) int64 {
@@ -29,7 +30,7 @@ func floatAsInt64(x float64) int64 {
 	return int64(float)
 }
 
-func generateUniqueAddressAndNonce(currentAddress string) (string, int) {
+func generateUniqueAddressAndNonce(currentAddress ethereum.Address) (string, int) {
 
 	nonce := rand.Intn(math.MaxInt)
 

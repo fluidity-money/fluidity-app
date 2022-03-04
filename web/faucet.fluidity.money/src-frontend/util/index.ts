@@ -92,7 +92,7 @@ export const handleResponseError = async (
 
   switch (response.response_message) {
     case 'Bad address!':
-      addError(`${address} is an invalid address!`);
+      addError(`${address} is an invalid Ethereum address!`);
       return false;
 
     case 'Bad network!':
@@ -108,7 +108,7 @@ export const handleUniquePhraseRequest = async (
   address: string,
   addError: (error: string) => void,
   addNotification: (error: string) => void,
-  addTwitterNotification: (notification: string) => void,
+  addTwitterNotification: (notificatiou: string) => void,
 ): Promise<boolean> => {
   try {
 

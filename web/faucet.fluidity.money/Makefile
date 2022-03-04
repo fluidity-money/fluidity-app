@@ -54,7 +54,7 @@ ${FRONTEND_DIST_MISC_ARTIFACT}: ${FRONTEND_PUBLIC_MISC_FILES}
 ${FRONTEND_DIST_DOCKER}: Dockerfile.frontend ${FRONTEND_SRC_FILES}
 	@${DOCKER_BUILD} \
 		--build-arg \
-			REACT_APP_FLU_API_URI=$${REACT_APP_FLU_API_URI:-http://localhost} \
+			REACT_APP_FLU_API_URI=localhost \
 		-f Dockerfile.frontend -t fluidity/${REPO}-frontend .
 	@touch ${FRONTEND_DIST_DOCKER}
 

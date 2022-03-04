@@ -1,6 +1,6 @@
 package main
 
-import "github.com/fluidity-money/microservice-lib/web"
+import "github.com/fluidity-money/fluidity-app/lib/web"
 
 func main() {
 	web.JsonEndpoint("/api/request-unique-phrase", HandleUniquePhrase)

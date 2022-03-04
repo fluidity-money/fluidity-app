@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/fluidity-money/microservice-lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 func MakeNotFoundErrorHandler() func(http.ResponseWriter, *http.Request) {

@@ -2,15 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/fluidity-money/microservice-lib/databases/postgres/faucet"
-	"github.com/fluidity-money/microservice-lib/log"
-	"github.com/fluidity-money/microservice-lib/types/ethereum"
-	"github.com/fluidity-money/microservice-lib/types/network"
-	"github.com/fluidity-money/microservice-lib/web"
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/faucet"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/web"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
 type (
@@ -66,12 +65,13 @@ func HandleUniquePhrase(w http.ResponseWriter, r *http.Request) interface{} {
 
 	var (
 		network_ = faucetRequest.Network
-		address  = faucetRequest.Address
+		address = faucetRequest.Address
 	)
+
+	address = strings.ToLower(address)
 
 	switch network_ {
 	case string(network.NetworkEthereum):
-	case string(network.NetworkSolana):
 
 	default:
 		log.App(func(k *log.Log) {
@@ -85,35 +85,16 @@ func HandleUniquePhrase(w http.ResponseWriter, r *http.Request) interface{} {
 		return uniquePhraseError("Bad network!")
 	}
 
-	networkUsed := network.BlockchainNetwork(network_)
+	if !filterAddress(address) {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"User at ip address %#v specified a bad address! Was %#v!",
+				ipAddress,
+				address,
+			)
+		})
 
-	switch networkUsed {
-
-	case network.NetworkEthereum:
-		if !filterAddressEthereum(address) {
-			log.App(func(k *log.Log) {
-				k.Format(
-					"User at ip address %#v specified a bad Ethereum address! Was %#v!",
-					ipAddress,
-					address,
-				)
-			})
-
-			return uniquePhraseError("Bad address!")
-		}
-
-	case network.NetworkSolana:
-		if !filterAddressSolana(address) {
-			log.App(func(k *log.Log) {
-				k.Format(
-					"User at ip address %#v specified a bad Solana address! Was %#v!",
-					ipAddress,
-					address,
-				)
-			})
-
-			return uniquePhraseError("Bad address!")
-		}
+		return uniquePhraseError("Bad address!")
 	}
 
 	// see if the user has asked for the phrase before using their address
@@ -128,38 +109,16 @@ func HandleUniquePhrase(w http.ResponseWriter, r *http.Request) interface{} {
 		}
 	}
 
-	var adjustedAddress string
+	ethereumAddress := ethereum.AddressFromString(address)
 
-	switch networkUsed {
-
-	case network.NetworkEthereum:
-		adjustedAddress = string(ethereum.AddressFromString(address))
-
-	case network.NetworkSolana:
-		adjustedAddress = address
-
-	default:
-		panic(fmt.Sprintf("Address was not Solana or Ethereum! Was %#v!", networkUsed))
-	}
-
-	uniqueAddress, _ := generateUniqueAddressAndNonce(adjustedAddress)
+	uniqueAddress, _ := generateUniqueAddressAndNonce(ethereumAddress)
 
 	faucetUser := faucet.FaucetUser{
-		Address:       adjustedAddress,
+		Address:       address,
 		UniqueAddress: uniqueAddress,
 		IpAddress:     ipAddress,
-		Network:       networkUsed,
+		Network:       network.NetworkEthereum,
 	}
-
-	log.Debug(func(k *log.Log) {
-		var buf strings.Builder
-
-		if err := json.NewEncoder(&buf).Encode(faucetUser); err != nil {
-			panic(err)
-		}
-
-		k.Format("JSON blob being inserted and sent is %v", buf.String())
-	})
 
 	faucet.InsertFaucetUser(faucetUser)
 

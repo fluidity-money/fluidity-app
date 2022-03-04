@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fluidity-money/microservice-lib/databases/postgres/website"
-	"github.com/fluidity-money/microservice-lib/log"
-	"github.com/fluidity-money/microservice-lib/log/slack"
-	"github.com/fluidity-money/microservice-lib/web"
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/website"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log/slack"
+	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
 type (

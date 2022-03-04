@@ -7,6 +7,8 @@ import {RowCentered} from "./components/Row";
 import LetsTalk from "./pages/LetsTalk";
 import RequestFaucet from "./pages/RequestFaucet";
 
+
+
 const navbarItems : [string, string][] = [
   [ "Home", "https://fluidity.money" ],
   [ "About", "https://fluidity.money/#about" ],
@@ -16,12 +18,9 @@ const navbarItems : [string, string][] = [
 ];
 
 // [[display name, value to use in request], ...]
-const networkInputOptions :
-  Record<string, [fullName: string, defaultAddress: string, tokenName: string]> =
-{
-  "ethereum": [ "Ethereum Ropsten", "0x0000000000000000000000000000", "fUSDT" ],
-  "solana": [ "Solana Devnet", "5qUccmFqGdFcTQprrVeRdCGy9sGB2TzTKv2KKMStG9kG", "fUSDC" ]
-};
+const networkInputOptions : [name: string, value: string][] = [
+  [ "Ethereum Ropsten", "ethereum" ]
+];
 
 const App = () =>
   <NotificationContainer>

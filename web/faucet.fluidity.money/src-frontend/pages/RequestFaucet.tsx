@@ -14,7 +14,7 @@ import {
 } from "../components/Buttons";
 
 type RequestFaucet = {
-  networkInputOptions: Record<string, [fullName: string, defaultAddress: string, tokenName: string]>,
+  networkInputOptions: [name: string, value: string][],
 };
 
 const ContactEmail = () => {
@@ -30,12 +30,7 @@ const ContactEmail = () => {
 const RequestFaucet =
   ({ networkInputOptions }: RequestFaucet) => {
 
-    const [chosenNetworkName, setChosenNetworkName] = useState("solana");
-
-    const chosenNetwork = networkInputOptions[chosenNetworkName];
-
-    const [networkFullName, networkDefaultAddress, airdropTokenName] = chosenNetwork;
-
+    const [networkAddress, setNetworkAddress] = useState(networkInputOptions[0][1]);
     const [account, setAccount] = useState("");
     const [twitterText, setTwitterText] = useState("");
 
@@ -44,7 +39,7 @@ const RequestFaucet =
     const addTwitterNotification = (phrase: string) => {
       if (!twitterText) {
         setTwitterText(phrase);
-        window.open(formatTweet(phrase, chosenNetworkName));
+        window.open(formatTweet(phrase));
         return;
       }
     };
@@ -54,11 +49,9 @@ const RequestFaucet =
       addNotification("Copied to clipboard!");
     };
 
-    let tweetAtMessage =
-      "Follow the process below to tweet and receive your Fluid Assets! Shortly after tweeting, your funds will be sent to you automatically.";
+    let tweetAtMessage = "Follow the process below to tweet and receive your Fluid Assets! Shortly after tweeting, your funds will be sent to you automatically.";
 
-    if (twitterText)
-      tweetAtMessage = "You will be given a unique ID and the ability to request funds from the faucet once every 24 hours.";
+    if (twitterText) tweetAtMessage = "You will be given a unique ID and the ability to request funds from the faucet once every 24 hours.";
 
     return (
       <Container>
@@ -70,7 +63,7 @@ const RequestFaucet =
           <SubtitleContainer>
             <Subtitle>
               Tweet a unique code provided here at @fluiditymoney with
-              #fluiditymoney to get free {airdropTokenName} on {networkFullName}!
+              #fluiditymoney to get free fUSDT on Ropsten!
             </Subtitle>
           </SubtitleContainer>
         </InformationContainer>
@@ -84,13 +77,12 @@ const RequestFaucet =
               <InputsRow>
                 <NetworkInput
                   options={networkInputOptions}
-                  value={chosenNetworkName}
-                  onChange={e => setChosenNetworkName(e.target.value)}
+                  value={networkAddress}
+                  onChange={e => setNetworkAddress(e.target.value)}
                 />
                 <TestnetAccountAddressInput
                   value={account}
                   onChange={e => setAccount(e.target.value)}
-                  defaultAddress={networkDefaultAddress}
                 />
               </InputsRow>
 
@@ -98,14 +90,7 @@ const RequestFaucet =
                 <RowOnDesktop>
                   <SendRequestButton
                     type="button"
-                    onClick={() =>
-                      handleUniquePhraseRequest(
-                        chosenNetworkName,
-                        account,
-                        addError,
-                        addNotification,
-                        addTwitterNotification)
-                      }
+                    onClick={() => handleUniquePhraseRequest(networkAddress, account, addError, addNotification, addTwitterNotification)}
                   >
                     {twitterText ? "Request Funds" : "Request Code"}
                   </SendRequestButton>
@@ -246,6 +231,21 @@ const TweetAtSubtitle = styled(Subtitle) <{ highlight?: boolean }>`
   ${({ highlight }) => highlight && `
     color: green;
   `}
+`;
+
+const FaucetInstructionSubtitle = styled(Subtitle)`
+  text-decoration: underline;
+  padding-bottom: 0
+`;
+
+const FaucetInstructionsList = styled.ol`
+  > li {
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    color: white;
+    font-weight: 500;
+    margin: 0;
+  }
 `;
 
 export default RequestFaucet;

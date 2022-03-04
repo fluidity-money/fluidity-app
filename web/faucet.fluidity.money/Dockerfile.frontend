@@ -1,6 +1,7 @@
 
 FROM node:16 as build
 
+ARG PAT_STRING
 ARG REACT_APP_FLU_API_URI
 
 ENV REPO ethereum-testnet-faucet
