@@ -22,5 +22,8 @@ docker: ${GO_FILES} Dockerfile Makefile
 
 build: ${REPO}
 
+watch:
+	@ls -1 ${GO_FILES} | entr -ns 'clear && make build'
+
 clean:
 	@rm -f ${REPO} lint test docker

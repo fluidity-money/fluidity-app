@@ -3,6 +3,7 @@ module github.com/fluidity-money/fluidity-app
 go 1.17
 
 require (
+	github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d
 	github.com/ethereum/go-ethereum v1.10.16
 	github.com/fluidity-money/api.fluidity.money v0.0.0-20220124101225-900f729ff1cc
 	github.com/gagliardetto/solana-go v1.3.0

@@ -1,7 +1,7 @@
 
 ORG_ROOT := fluidity
 
-.PHONY: build
+.PHONY: build watch clean
 
 GO_BUILD := go build
 GO_TEST := go test -cover
