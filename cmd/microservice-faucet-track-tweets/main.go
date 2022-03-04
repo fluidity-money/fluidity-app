@@ -65,7 +65,7 @@ var (
 func main() {
 
 	var (
-		filteredHashtags_     = util.GetEnvOrFatal(EnvFilteredHashtags)
+		filteredHashtags_ = util.GetEnvOrFatal(EnvFilteredHashtags)
 	)
 
 	filteredHashtags := strings.Split(filteredHashtags_, ",")
@@ -131,7 +131,7 @@ func main() {
 			tokenChosen_ = tweetContainsTokenHashtag(tweet)
 
 			// tokenNameOk to determine if the token and network line up
-			tokenNameOk  = false
+			tokenNameOk = false
 		)
 
 		switch tokenChosen_ {
@@ -154,7 +154,7 @@ func main() {
 		if !tokenNameOk {
 			log.App(func(k *log.Log) {
 				k.Message = "Token chosen not (fUSDC|fUSDT|fDAI)! Was"
-				k.Payload =tokenChosen_
+				k.Payload = tokenChosen_
 			})
 
 			return
@@ -175,9 +175,9 @@ func main() {
 		// perform the decimal conversion for this token
 		// amountSent * 10 ** decimals
 		var (
-			decimalsBig    = big.NewInt(decimals)
-			amountSent_    = &amountSent.Int
-			tenBig         = big.NewInt(10)
+			decimalsBig = big.NewInt(decimals)
+			amountSent_ = &amountSent.Int
+			tenBig      = big.NewInt(10)
 		)
 
 		multiplier := tenBig.Exp(tenBig, decimalsBig, nil)
@@ -257,16 +257,16 @@ func main() {
 		// prevent people attempting to abuse race conditions by using redis as a
 		// quick store to check if they should be paid out
 
-		notSetBefore := state.SetNxTimed(uniqueAddress + tokenChosen_, true, StateKeyExpiry)
+		notSetBefore := state.SetNxTimed(uniqueAddress+tokenChosen_, true, StateKeyExpiry)
 
 		if !notSetBefore {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"NX set to prevent abuse has activated for unique address %#v and token %#v tweeted by %#v!",
-						uniqueAddress,
-						tokenChosen,
-						twitterUsername,
-					)
+			log.App(func(k *log.Log) {
+				k.Format(
+					"NX set to prevent abuse has activated for unique address %#v and token %#v tweeted by %#v!",
+					uniqueAddress,
+					tokenChosen,
+					twitterUsername,
+				)
 			})
 
 			return
