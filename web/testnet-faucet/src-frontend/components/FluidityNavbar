@@ -1,0 +1,30 @@
+
+type navbar = {
+  leftChildren: JSX.Element[],
+  rightChildren: JSX.Element[]
+};
+
+const Navbar = ({ children } : container) =>
+  <div style={styles.navbar}>
+    <div class={styles.navbarLeft}>
+
+    </div>
+
+    <div class={styles.navbarRight}
+
+    </div>
+  </div>;
+
+const styles : Record<string, React.CSSProperties> = {
+  navbar: {
+
+  },
+
+  navbarLeft: {
+
+  },
+
+  navbarRight: {
+
+  }
+};

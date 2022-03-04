@@ -1,0 +1,251 @@
+import { useState, useContext } from "react";
+import styled from "styled-components";
+import { Title, Subtitle } from "../components/Titles";
+import { RowOnDesktop } from "../components/Row";
+import NetworkInput from "../components/NetworkInput";
+import Highlight from "../components/Highlight";
+import TestnetAccountAddressInput from "../components/TestnetAccountAddressInput";
+import { notificationContext } from "../components/Notifications/notificationContext";
+import { formatTweet } from "../util/tweet";
+import { handleUniquePhraseRequest } from "../util";
+
+import {
+  SendRequestButton
+} from "../components/Buttons";
+
+type RequestFaucet = {
+  networkInputOptions: Record<string, [fullName: string, defaultAddress: string, tokenName: string]>,
+};
+
+const ContactEmail = () => {
+  const email = "contact@fluidity.money";
+
+  return (
+    <FaucetHighlightEmail href={`mailto:${email}`}>
+      {email}
+    </FaucetHighlightEmail>
+  );
+};
+
+const RequestFaucet =
+  ({ networkInputOptions }: RequestFaucet) => {
+
+    const [chosenNetworkName, setChosenNetworkName] = useState("solana");
+
+    const chosenNetwork = networkInputOptions[chosenNetworkName];
+
+    const [networkFullName, networkDefaultAddress, airdropTokenName] = chosenNetwork;
+
+    const [account, setAccount] = useState("");
+    const [twitterText, setTwitterText] = useState("");
+
+    const { addError, addNotification } = useContext(notificationContext);
+
+    const addTwitterNotification = (phrase: string) => {
+      if (!twitterText) {
+        setTwitterText(phrase);
+        window.open(formatTweet(phrase, chosenNetworkName));
+        return;
+      }
+    };
+
+    const copyToClipboard = (text: string) => {
+      navigator.clipboard.writeText(text);
+      addNotification("Copied to clipboard!");
+    };
+
+    let tweetAtMessage =
+      "Follow the process below to tweet and receive your Fluid Assets! Shortly after tweeting, your funds will be sent to you automatically.";
+
+    if (twitterText)
+      tweetAtMessage = "You will be given a unique ID and the ability to request funds from the faucet once every 24 hours.";
+
+    return (
+      <Container>
+        <InformationContainer>
+          <Title>Request Testnet fUSDT!</Title>
+          <FaucetLineContainer>
+            <FaucetLine />
+          </FaucetLineContainer>
+          <SubtitleContainer>
+            <Subtitle>
+              Tweet a unique code provided here at @fluiditymoney with
+              #fluiditymoney to get free {airdropTokenName} on {networkFullName}!
+            </Subtitle>
+          </SubtitleContainer>
+        </InformationContainer>
+
+        <TweetAtContainer>
+          <form>
+            <TweetAtRows>
+              <TweetAtSubtitle highlight={!!twitterText}>
+                { tweetAtMessage }
+              </TweetAtSubtitle>
+              <InputsRow>
+                <NetworkInput
+                  options={networkInputOptions}
+                  value={chosenNetworkName}
+                  onChange={e => setChosenNetworkName(e.target.value)}
+                />
+                <TestnetAccountAddressInput
+                  value={account}
+                  onChange={e => setAccount(e.target.value)}
+                  defaultAddress={networkDefaultAddress}
+                />
+              </InputsRow>
+
+              <SendRequestContainer>
+                <RowOnDesktop>
+                  <SendRequestButton
+                    type="button"
+                    onClick={() =>
+                      handleUniquePhraseRequest(
+                        chosenNetworkName,
+                        account,
+                        addError,
+                        addNotification,
+                        addTwitterNotification)
+                      }
+                  >
+                    {twitterText ? "Request Funds" : "Request Code"}
+                  </SendRequestButton>
+
+                  <PhraseContainer
+                    enabled={!!twitterText}
+                    onClick={() => twitterText && copyToClipboard(twitterText)}
+                  >
+                    {twitterText &&
+                      <>
+                        Your unique ID: <PhraseText >{twitterText}</PhraseText>
+                      </>
+                    }
+                  </PhraseContainer>
+                </RowOnDesktop>
+              </SendRequestContainer>
+
+              <EmailUsAtContainer>
+                <EmailUsSubtitle>
+                  Email us at <ContactEmail /> if there is an issue here, thanks!
+                </EmailUsSubtitle>
+              </EmailUsAtContainer>
+            </TweetAtRows>
+          </form>
+        </TweetAtContainer>
+      </Container >
+    )
+  };
+
+const Container = styled.div`
+  padding-top: 60px;
+
+  @media not screen and (max-width: 768px) {
+    padding-left: 180px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+`;
+
+const InformationContainer = styled.div`
+  max-width: 600px;
+  padding-bottom: 40px;
+  padding-right: 20px;
+`;
+
+const TweetAtRows = styled.div`
+  @media not screen and (max-width: 768px)
+    > :not(:last-child) {
+      padding-left: 20px;
+      pading-top: 40px;
+    }
+  }
+`;
+
+const TweetAtContainer = styled.div`
+  background: rgba(36, 44, 48, 0.7);
+  max-width: 1200px;
+
+  @media not screen and (max-width: 768px) {
+    padding: 40px;
+    padding-right: 120px;
+    padding-bottom: 20px;
+  }
+`;
+
+const ClickToTweetContainer = styled.div`
+  padding-left: 10px;
+  padding-right: 10px;
+`;
+
+const SendRequestContainer = styled.div`
+  padding-top: 30px;
+`;
+
+const InputsRow = styled(RowOnDesktop)`
+  @media not screen and (max-width: 768px) {
+    > :nth-child(2) {
+      padding-left: 40px;
+      width: 100%;
+    }
+  }
+`;
+
+const EmailUsAtContainer = styled.div`
+  padding-top: 40px;
+`;
+
+const FaucetLineContainer = styled.div`
+  @media not screen and (max-width: 768px) {
+    padding-top: 5px;
+    padding-bottom: 30px;
+    padding-left: 90px;
+  }
+`;
+
+const FaucetLine = styled.div`
+  background: linear-gradient(79.44deg, #1881FE 36.64%, #5BFEF3 70.33%);
+  width: 300px;
+  height: 3px;
+  border-radius: 30px;
+`;
+
+const SubtitleContainer = styled.div`
+  @media (max-width: 768px) {
+    padding-top: 30px;
+  }
+`;
+
+const FaucetHighlightEmail = styled(Highlight)`
+
+`;
+
+const EmailUsSubtitle = styled(Subtitle)`
+  font-size: 16px;
+`;
+
+const PhraseText = styled.span``;
+
+const PhraseContainer = styled(Subtitle) <{ enabled?: boolean }>`
+  ${({ enabled }) => enabled && `
+    flex: 1;
+    padding: 0;
+    text-align: center;
+
+    :hover {
+      ${PhraseText} {
+        text-decoration: underline;
+      }
+      cursor: pointer;
+    }`
+  }
+`;
+
+const TweetAtSubtitle = styled(Subtitle) <{ highlight?: boolean }>`
+  transition: color 0.1s;
+  ${({ highlight }) => highlight && `
+    color: green;
+  `}
+`;
+
+export default RequestFaucet;
