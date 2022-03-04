@@ -36,7 +36,31 @@ const fluidityContractAbiString = `[
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
-    }
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
 ]`
 
 var fluidityContractAbi ethAbi.ABI
@@ -124,6 +148,35 @@ func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address,
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to transact the reward function on Fluidity's contract! %v",
+			err,
+		)
+	}
+
+	return transaction, nil
+}
+
+// TransactTransfer using the transfer function in the contract, send
+// to the address with the amount given
+func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipientAddress ethCommon.Address, amount *big.Int, transactionOptions *ethAbiBind.TransactOpts) (*ethTypes.Transaction, error) {
+
+	boundContract := ethAbiBind.NewBoundContract(
+		fluidityContractAddress,
+		fluidityContractAbi,
+		client,
+		client,
+		client,
+	)
+
+	transaction, err := boundContract.Transact(
+		transactionOptions,
+		"transfer",
+		recipientAddress,
+		amount,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to transact the transfer function on Fluidity's contract! %v",
 			err,
 		)
 	}
