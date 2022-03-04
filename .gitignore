@@ -5,3 +5,5 @@ cmd/*/test
 cmd/*/docker
 cmd/*/lint
 cmd/*/*.o
+
+database/build
