@@ -1,0 +1,45 @@
+.toolbar {
+  height: 2.8rem;
+  width: auto;
+  background-color: rgba(0, 0, 0, 0.199);
+  align-self: flex-start;
+  grid-column: 1/-1;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.toolbar-container-enabled {
+  display: grid;
+  grid-template-columns: 1fr 1fr minmax(25rem, 25rem);
+  grid-gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.toolbar-container-disabled {
+  display: grid;
+  grid-template-columns: 1fr 1fr minmax(8rem, 12rem);
+  grid-gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.toolbar-container-mobile {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2rem;
+  grid-gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.toolbar-items {
+  height: 2.8rem;
+  display: grid;
+  grid-template-columns: 3rem 1rem repeat(3, minmax(10rem, 10rem));
+  grid-gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}

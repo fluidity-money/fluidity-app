@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# remove the compact-format argument, which does nothing but is an error
+newargs=()
+
+for arg in $@; do
+    newargs+=("$(echo "$arg" | sed -r -e 's/,?compact-format//g')")
+done
+
+./solc-v0.8.11 "${newargs[@]}"

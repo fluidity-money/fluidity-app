@@ -1,0 +1,26 @@
+[
+  {
+    "symbol": "USDT",
+    "address": "0x110a13FC3efE6A245B50102D2d79B3E76125Ae83"
+  },
+  {
+    "symbol": "USDC",
+    "address": "0x110a13FC3efE6A245B50102D2d79B3E76125Ae83"
+  },
+  {
+    "symbol": "DAI",
+    "address": "0x110a13FC3efE6A245B50102D2d79B3E76125Ae83"
+  },
+  {
+    "symbol": "fUSDT",
+    "address": "0x26fc224b37952bd12c792425f242e0b0a55453a6"
+  },
+  {
+    "symbol": "fUSDC",
+    "address": "0x26fc224b37952bd12c792425f242e0b0a55453a6"
+  },
+  {
+    "symbol": "fDAI",
+    "address": "0x26fc224b37952bd12c792425f242e0b0a55453a6"
+  }
+]
