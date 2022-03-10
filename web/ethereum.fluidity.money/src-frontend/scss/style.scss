@@ -1,0 +1,117 @@
+// main scss file
+// ### imports ###
+// core
+@import "core/config";
+@import "core/utilities";
+@import "core/breakpoints";
+@import "core/animations";
+// components
+@import "components/toolbar";
+@import "components/button";
+@import "components/dashboard";
+@import "components/swap";
+@import "components/header";
+@import "components/modal";
+@import "components/icons";
+@import "components/rewardPool";
+@import "components/input";
+@import "components/appbody";
+@import "components/charts";
+@import "components/wallet";
+@import "components/walletSend";
+@import "components/walletHistory";
+@import "components/toolbarMobile";
+@import "components/loadingstatusmodal";
+@import "components/routeNotFound";
+@import "components/unsupported";
+@import "components/notificationAlert";
+@import "components/confetti";
+@import "components/error";
+// mobile
+@import "core/mobile";
+
+html {
+  // Root font size
+  font-size: 16px;
+}
+
+// global tag properties
+body {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+// general class properties
+.app-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 4rem 1fr 6rem;
+  grid-gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.gradient-background {
+  top:0px;
+  left:0px;
+  width: 100%;
+  height: 100%;
+  background: url('img/AppBackground.svg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+// Fluidity logo
+.fluidity-text {
+  font-family: 'GingerPro';
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 400;
+  text-align: center;
+
+  color: #fff;
+  @include for-tablet-portrait-up {
+    font-size: 3rem;
+  }
+  cursor: pointer;
+}
+
+.fluidity {
+  position: relative;
+  column-gap: 1em;
+  bottom: 1rem;
+  right: 20px;
+  align-self: flex-end;
+  grid-column: 2/-1;
+  margin-left: auto;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.border {
+  border: 0.5px solid white;
+}
+
+@font-face {
+  font-family: "GingerPro";
+  src: url("/fonts/F37GingerPro-Demi.woff");
+}

@@ -8,6 +8,12 @@ RUN apt-get update && apt-get install -y \
 	protobuf-compiler \
 	postgresql-client
 
-COPY . /usr/local/src/fluidity
+ENV FLUID_DIR /usr/local/src/fluidity
+
+COPY . ${FLUID_DIR}
+
+WORKDIR ${FLUID_DIR}/scripts
+
+RUN make install
 
 RUN rm -rf /go/pkg/mod/cache/

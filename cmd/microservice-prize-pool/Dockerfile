@@ -7,5 +7,5 @@ RUN make
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./${REPO}" \
+	"./microservice-prize-pool.o" \
 ]

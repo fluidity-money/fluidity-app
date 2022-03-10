@@ -1,0 +1,80 @@
+# fluidity.money
+# This action uses node to build a static website, publish it to an S3 bucket and invalidate its Cloudfront distribution
+name: "🛠 + 🚀 Frontend Build & Publish"
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - "ropsten-*"
+
+env:
+  SLACK_INCOMING_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK }}
+  SLACK_ICON: "https://github.com/fluidity-money.png?size=48"
+  SLACK_USERNAME: "CodeBot"
+  REACT_APP_API_URL: https://ropsten.beta.fluidity.money/api
+  REACT_APP_WALLET_CONNECT_GETH_URI: wss://ropsten.infura.io/ws/v3/d1ac3dc1af2649908a69582ffa1a424d
+  REACT_APP_WEBSOCKET: "wss://ropsten.beta.fluidity.money/api/updates"
+  REACT_APP_ETHEREUM_CONTRACT_ADDR: "0x26FC224B37952Bd12C792425F242E0B0a55453a6"
+  REACT_APP_CHAIN_ID: 3
+  REACT_APP_ETHEREUM_USDT_ADDR: "0x110a13FC3efE6A245B50102D2d79B3E76125Ae83"
+
+
+jobs:
+  publish:
+    name: "🛠 Build & Publish Frontend"
+    runs-on: ubuntu-latest
+    if: contains(toJson(github.event.commits), '[skip-ci]') == false && contains(toJson(github.event.commits), '[skip ci]') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[ci-skip]') == false
+    steps:
+      - name: Slack Notification # https://github.com/bryannice/gitactions-slack-notification/blob/master/deployment/git-actions/template_slack_notification.yml
+        uses: bryannice/gitactions-slack-notification@2.0.0
+        env:
+          SLACK_TITLE: "🛠 ${{ github.repository }} is building & publishing frontend"
+          SLACK_MESSAGE: "👷‍♂️ Commit: ${{ github.sha }}/${{ steps.get_version.outputs.VERSION }} on ${{ github.ref }} from ${{ github.repository }}"
+          SLACK_COLOR: "#BE90D4"
+
+      - name: Fetch repository
+        uses: actions/checkout@master
+        with:
+          token: ${{ secrets.PAT }}
+          lfs: true
+          submodules: true
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - run: sudo sh -c 'apt-get update && apt-get install -y make python3-pip' # INSTALL BUILD DEPENDENCIES HERE
+      - run: pip3 install awscli
+      - run: aws configure set aws_access_key_id ${{ secrets.ACCESS_KEY_ID }}
+      - run: aws configure set aws_secret_access_key ${{ secrets.ACCESS_KEY }} 
+      - run: aws configure set region ap-southeast-2
+
+ 
+
+      #- run: npm install react-scripts 
+      - run: npm install 
+      - run: make build
+      - run: aws s3 sync s3://ropsten-beta-fluidity-money/ s3://fluidity-devops/ropsten-beta-fluidity-money/
+      - run: aws s3 sync --acl public-read build/ s3://ropsten-beta-fluidity-money/
+      #- run: aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths $(aws s3 ls s3://YOUR_BUCKET_NAME | awk '{print $4}' | egrep -v '(.gitattributes|artifact-misc|$^)' | awk '{printf "/%s ",$0;next;}1') 
+
+      - name: Slack Build Result Notification
+        uses: bryannice/gitactions-slack-notification@2.0.0
+        env:
+          SLACK_TITLE: "✅ ${{ github.repository }}"
+          SLACK_MESSAGE: "🚀 https://ropsten.beta.fluidity.money has been updated & deployed!"
+          SLACK_COLOR: "#006442"
+
+  failure:
+    name: "❌ Slack Build Failure Notification"
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.publish.result=='failure' }}
+    needs: publish
+    steps:
+      - name: Slack build failure notification
+        uses: bryannice/gitactions-slack-notification@2.0.0
+        env:
+          SLACK_TITLE: "❌ ${{ github.repository }} failed to build & publish"
+          SLACK_MESSAGE: "😭 ${{ github.repository }} failed to build & publish"

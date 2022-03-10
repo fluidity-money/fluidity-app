@@ -1,0 +1,55 @@
+// scss file for any global animations
+@keyframes move {
+    0% {
+        transform: translatex(25%);
+    }
+    50% {
+        transform: translatex(25%);
+    }
+    100% {
+        transform: translatex(-25%);
+    }
+}
+
+@keyframes FloatAway {
+    0% {
+        opacity: 0;
+        transform: translatey(0%);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translate(20%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(10%);
+    }
+}
+
+// Transaction confirm tick animation
+@keyframes stroke {
+    100% {
+      stroke-dashoffset: 0;
+    }
+}
+
+@keyframes scale {
+    0%, 100% {
+      transform: none;
+    }
+    50% {
+      transform: scale3d(1.1, 1.1, 1);
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: right center;
+    }
+
+    100% {
+        background-position: left center;
+    }
+}

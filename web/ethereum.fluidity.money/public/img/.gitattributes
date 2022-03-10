@@ -1,0 +1,17 @@
+BackgroundGradient.png filter=lfs diff=lfs merge=lfs -text
+dropdown_arrow.svg filter=lfs diff=lfs merge=lfs -text
+ethereumIcon.svg filter=lfs diff=lfs merge=lfs -text
+solanaIcon.svg filter=lfs diff=lfs merge=lfs -text
+swap_arrow.svg filter=lfs diff=lfs merge=lfs -text
+x.svg filter=lfs diff=lfs merge=lfs -text
+cogwheels.svg filter=lfs diff=lfs merge=lfs -text
+compoundIcon.svg filter=lfs diff=lfs merge=lfs -text
+fluiditylogo.svg filter=lfs diff=lfs merge=lfs -text
+AppBackground.svg filter=lfs diff=lfs merge=lfs -text
+TokenIcons filter=lfs diff=lfs merge=lfs -text
+WalletConnectIcons filter=lfs diff=lfs merge=lfs -text
+WalletIcons filter=lfs diff=lfs merge=lfs -text
+discord_icon.svg filter=lfs diff=lfs merge=lfs -text
+telegram_icon.svg filter=lfs diff=lfs merge=lfs -text
+twitter_icon.svg filter=lfs diff=lfs merge=lfs -text
+NotificationIcons filter=lfs diff=lfs merge=lfs -text

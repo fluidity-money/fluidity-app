@@ -1,0 +1,170 @@
+.nav-menu {
+    display: grid;
+    grid-template-rows: 3rem auto;
+    //width: 100%;
+    height: auto;
+    position: absolute;
+    top: 4rem;
+    right: -100%;
+    opacity: 0;
+    transition: all 0.2s ease-in-out;
+    text-align: center;
+    align-items: center;
+    background: rgba(10, 26, 32, 0.95);
+    z-index: 1;
+    border: 1px solid #979797;
+    box-sizing: border-box;
+    border-radius: 10px 0px 0px 10px;
+    width: auto;
+    padding-bottom: 0.5rem;
+}
+  
+.nav-menu.active {
+    right: 0;
+    opacity: 1;
+} 
+  
+.menu-icon {
+  display: block;
+  position: absolute;
+  top: 14px;
+  right: 13px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  background: -webkit-linear-gradient(45deg, #16899b 0%, #02f5a3 100%);
+  background-clip: border-box;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+}
+  
+  // .btn-dropdown{
+  //   //margin-top: 20px;
+  // }
+  
+  .bar-dropdown{
+    //margin-top: 20px;
+    width: 70vmin;
+    height: 2px;
+    border: 2px solid;
+    background: linear-gradient(90deg, #16749B 0%, #02F5A3 100%);
+    @include for-phone-only {
+      width: 60vmin;
+    }
+    @include for-tablet-portrait-up {
+      width: 40vmin;
+    }
+  }
+  
+  .title-dropdown{
+    //margin-top: 20px;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 34px;
+    background: linear-gradient(90deg, #16749B 0%, #02F5A3 50%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .btn-toolbar{
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    color: #fff;
+    padding: 0.5rem 0;
+    background: $primary-color;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+  }
+
+/* Nav Icon */
+// Credit: https://codepen.io/designcouch/pen/Atyop
+#nav-icon-bar {
+    width: 45px;
+    height: 40px;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: .2s ease-in-out;
+    -moz-transition: .2s ease-in-out;
+    -o-transition: .2s ease-in-out;
+    transition: .2s ease-in-out;
+    cursor: pointer;
+  }
+
+  #nav-icon-bar span {
+    display: block;
+    position: absolute;
+    height: 5px;
+    width: 100%;
+    background: -webkit-linear-gradient(45deg, #16899b 0%, #02f5a3 100%);;
+    border-radius: 9px;
+    opacity: 1;
+    left: 0;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: .2s ease-in-out;
+    -moz-transition: .2s ease-in-out;
+    -o-transition: .2s ease-in-out;
+    transition: .2s ease-in-out;
+  }
+
+#nav-icon-bar span:nth-child(1) {
+  top: 0px;
+  -webkit-transform-origin: left center;
+  -moz-transform-origin: left center;
+  -o-transform-origin: left center;
+  transform-origin: left center;
+}
+
+#nav-icon-bar span:nth-child(2) {
+  top: 14px;
+  -webkit-transform-origin: left center;
+  -moz-transform-origin: left center;
+  -o-transform-origin: left center;
+  transform-origin: left center;
+}
+
+#nav-icon-bar span:nth-child(3) {
+  top: 27.5px;
+  -webkit-transform-origin: left center;
+  -moz-transform-origin: left center;
+  -o-transform-origin: left center;
+  transform-origin: left center;
+}
+
+#nav-icon-bar.open span:nth-child(1) {
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  top: -3px;
+  left: 8px;
+}
+
+#nav-icon-bar.open span:nth-child(2) {
+  width: 0%;
+  opacity: 0;
+}
+
+#nav-icon-bar.open span:nth-child(3) {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  top: 30px;
+  left: 8px;
+}

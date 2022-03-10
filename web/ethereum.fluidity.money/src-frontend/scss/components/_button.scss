@@ -1,0 +1,240 @@
+.button {
+  border: 0px;
+  cursor: pointer;
+  border-radius: 20px;
+  box-sizing: border-box;
+  width: 100%;
+
+  display: inline-block;
+  transition: 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &-defaultPadding {
+    padding: 0.25rem 2rem;
+  }
+  &-toolbarBtnPadding {
+    padding: 0.4rem 1rem;
+  }
+  &-smallPadding {
+    padding: 0.25rem 1rem;
+  }
+}
+
+.button-text {
+  width: 100%;
+  display:inline-block;
+  display: flex;
+  background: -webkit-linear-gradient(45deg, #16899b 0%, #02f5a3 100%);
+  justify-content: center;
+      background-clip: border-box;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+}
+
+.submenu-button {
+  border-radius: 0;
+  border-bottom: 2px solid rgba(255, 255, 255, 0);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.time-selector-button {
+  border-bottom: 2px solid rgba(255, 255, 255, 0);
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+
+  font-size: 0.8rem;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0em;
+  background: white;
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// .selected {
+//   border: 1px solid #fff;
+// }
+
+.subSelected {
+  border-bottom: 2px solid #fff;
+}
+
+.timeSelected {
+  background: $primary-color;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-style: solid;
+  border-bottom-width: 2px;
+  border-image: $primary-color;
+  border-image-slice: 1;
+}
+
+// Button themes
+.primary-button {
+  background: $primary-color;
+  border-radius: 10px;
+  height: 100%;
+
+  font-family: Inter, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  text-align: center;
+  color: #ffffff;
+  font-size: 1rem;
+  // animation: gradientShift 1s infinite;
+}
+
+.wallet-button {
+  background-color: $background-notasdark;
+  font-family: "Inter", Geneva, Tahoma, sans-serif;
+  //font-weight: 700;
+  color: #ffffff;
+  height: 5rem;
+  width: 100%;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgb(51, 51, 51);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  font-family: Inter;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.wallet-button.active {
+  background: #061216;
+}
+
+.token-button {
+  background-color: $background-notasdark;
+  font-family: "Inter", Geneva, Tahoma, sans-serif;
+  color: #ffffff;
+  height: 4.5rem;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgb(51, 51, 51);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0rem 4rem;
+
+  font-family: Inter;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1.4rem;
+  text-align: center;
+
+  @include for-below-400 {
+    padding: 0rem 2rem;
+  }
+}
+
+.mobile-address-btn {
+  align-self: flex-end;
+}
+
+
+
+.selected {
+  border: none;
+  width: auto;
+  display: inline-block;
+  border-radius: 99px;
+  color: $primary-color;
+  position: relative;
+  z-index: 1;
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  font-weight: 400;
+  
+  font-family: "Open Sans", Arial, Serif, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  background: $primary-color;
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+
+  -webkit-text-fill-color: #0fcba0;
+  -moz-text-fill-color: #0fcba0;
+}
+
+.selected:before, 
+.selected:after {
+  content: ' ';
+  position: absolute;
+  border-radius: 99px;
+}
+
+.selected:before {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: -2;
+  background: #0fcba0;
+  background: $primary-color;
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#503b9a', endColorstr='#269cc1',GradientType=1 );
+}
+
+.selected:after {
+  top: 2px; 
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  background-color: #0d222a;
+  z-index: -1;
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+
+// .selected:hover:after {
+//   opacity: 0;
+// }
+
+// .selected:hover {
+//   -webkit-text-fill-color: #0d222a;
+//   -moz-text-fill-color: #0d222a;
+//   transition: all 0.5s ease-in-out;
+// }
+
+.enabled-button {
+  margin-right: 10px;
+  width: 100%;
+}
+
+.max-button {
+  width: auto;
+  background: $primary-color;
+  color: white;
+  font-family: Inter, sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  text-transform: uppercase;
+  -webkit-text-fill-color: white;
+  -moz-text-fill-color: white;
+  border-radius: 10px;
+
+  &.swap-box {
+  }
+}

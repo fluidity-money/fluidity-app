@@ -32,7 +32,7 @@ type (
 	// InstructionTransfer used when making transfers of the token
 	InstructionTransfer struct {
 		Variant uint8
-		Amount uint64
+		Amount  uint64
 	}
 )
 
@@ -107,8 +107,8 @@ func SendTransfer(solanaClient *solanaRpc.Client, tokenProgramAddressPublicKey, 
 	}
 
 	data := InstructionTransfer{
-		Variant:    VariantSendAmount,
-		Amount: amount,
+		Variant: VariantSendAmount,
+		Amount:  amount,
 	}
 
 	dataSerialised, err := borsh.Serialize(data)
