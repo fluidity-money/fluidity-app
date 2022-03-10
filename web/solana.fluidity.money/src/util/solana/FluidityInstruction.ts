@@ -1,12 +1,14 @@
-import {Enum as SolanaEnum, SOLANA_SCHEMA} from '@solana/web3.js';
+import {Enum as SolanaEnum, SOLANA_SCHEMA, PublicKey} from '@solana/web3.js';
 import {TokenAmount} from "@saberhq/token-utils";
 import BN from 'bn.js';
 import {BinaryWriter} from 'borsh';
 import {SupportedTokens} from 'components/types';
+import {FLUID_PROGRAM_ID} from './constants';
 
-type FluidityInstructionCtor = {TokenSymbol: SupportedTokens} & ({Wrap: TokenAmount, Unwrap?: null} | {Wrap?: null, Unwrap: TokenAmount});
+type FluidityInstructionCtor = {TokenSymbol: SupportedTokens, bumpSeed: number} & ({Wrap: TokenAmount, Unwrap?: null} | {Wrap?: null, Unwrap: TokenAmount});
 
 //Implements the Rust enum for wrapping and unwrapping a fluid asset
+//Does not support decoding (encoding is done manually to support tuple enum)
 export class FluidityInstruction extends SolanaEnum {
   //we are targeting ES5, so opting for typescript's `private` keyword instead of using #updated
   private static updated = false;
@@ -16,9 +18,9 @@ export class FluidityInstruction extends SolanaEnum {
         //update the schema once, so that we can serialise with borsh
         SOLANA_SCHEMA.set(FluidityInstruction, {
             kind: 'enum', 
-            // fields:'struct', 
             field:'enum', 
             values: [
+              // amount, seed, bump 
               ['Wrap', ['u64', 'String', 'u8']],
               ['Unwrap', ['u64', 'String', 'u8']],
               ['Payout', 'u64'],
@@ -29,14 +31,46 @@ export class FluidityInstruction extends SolanaEnum {
     }
 
     const field = amount.Wrap ? "Wrap" : "Unwrap";
+
     // if serialising then deserialising, TokenAmount is converted to a BN, so support both
     // convert both to a BN
     // we pass it the amount, token-specific mint seed, and the predetermined bump seed
     if (typeof amount[field]?.toU64 === 'function') {
-      super({[field]: [amount[field]?.toU64(), amount.TokenSymbol, 251]})
+      super({
+        [field]:
+          [
+            amount[field]?.toU64(),
+            amount.TokenSymbol,
+            amount.bumpSeed,
+          ]
+      })
     } else {
-      super({[field]: [amount[field], amount.TokenSymbol, 251]})
+      super({
+        [field]:
+          [
+            amount[field],
+            amount.TokenSymbol,
+            amount.bumpSeed,
+          ]
+      })
     }
+  }
+
+  /**
+   * Fetch the obligation account bump seed, to pass to a wrap/unwrap instruction
+   * @param TokenSymbol the string symbol to search for
+   * @returns the bump seed as a number
+   */
+  static async getBumpSeed(TokenSymbol: SupportedTokens): Promise<number> {
+    const seedString = `FLU:${TokenSymbol}_OBLIGATION`;
+    const seedBuffer = Buffer.from(seedString, 'utf8');
+
+    const [_, bump] = await PublicKey.findProgramAddress(
+      [seedBuffer],
+      new PublicKey(FLUID_PROGRAM_ID)
+    );
+
+    return bump;
   }
   
   /**
