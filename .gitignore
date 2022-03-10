@@ -9,3 +9,6 @@ cmd/*/*.o
 database/build
 
 web/*/dist
+
+contracts/ethereum/node_modules
+contracts/ethereum/docker*

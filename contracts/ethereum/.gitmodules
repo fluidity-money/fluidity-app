@@ -1,0 +1,3 @@
+[submodule "contracts/proveth"]
+	path = contracts/proveth
+	url = https://github.com/spi-dot-dev/proveth

@@ -1,0 +1,79 @@
+.send-container {
+  color: black;
+  background-color: $container-colour;
+  border: 1px solid #83AAA7;
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: 1fr;
+  grid-column: 2/5;
+  border-radius: 1rem;
+  height: 100%;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  max-width: 60rem;
+  justify-self: center;
+}
+
+.send-warning {
+  justify-self: center;
+  margin: 0;
+  font-weight: 600;
+  font-size: smaller;
+  text-align: center;
+  @include for-tablet-portrait-up {
+    font-size: medium;
+  }
+}
+
+.send-input-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1rem;
+  grid-row-gap: 1rem;
+  @include for-tablet-landscape-up {
+    grid-template-columns: 1fr 1fr minmax(5rem, 7rem);
+    grid-row-gap: 0.3rem;
+  }
+}
+
+.address-input {
+  width: 100%;
+  //grid-column: 1/2;
+}
+
+.send-button {
+  width: 100%;
+  max-width: 20rem;
+  justify-self: center;
+  height: 3rem;
+  align-self: center;
+  box-sizing: border-box;
+  background: $primary-color;
+  color: white;
+  font-size: 1rem;
+}
+
+.send-field {
+  background-color: $container-colour-lighter;
+  border: 1px solid #383C45;
+  border-radius: 10px;
+  padding: 0.5rem;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.amount-avail {
+  grid-row: 3;
+  background: $primary-color;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  justify-self: left;
+  margin: 0;
+  font-weight: 500;
+  font-size: 0.8rem;
+  margin-top: -0.5rem;
+  margin-bottom: -0.5rem;
+  @include for-tablet-landscape-up {
+    grid-column: 2/-1;
+  }
+}

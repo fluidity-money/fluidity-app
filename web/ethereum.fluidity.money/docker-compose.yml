@@ -1,0 +1,16 @@
+---
+
+version: "2"
+
+services:
+  webwallet:
+    image: fluidity/webwallet:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - "hardhat"
+
+  hardhat:
+    image: fluidity/eth-contracts:latest
+    ports:
+      - "8545:8545"

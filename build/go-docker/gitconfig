@@ -1,6 +1,0 @@
-
-[url "file:///usr/local/src/"]
-	insteadOf = git@github.com:fluidity-money/
-
-[url "file:///usr/local/src/"]
-	insteadOf = https://github.com/fluidity-money/
