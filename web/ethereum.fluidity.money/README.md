@@ -28,7 +28,3 @@ This codebase contains a React webapp for interacting with Fluidity.
 ## Watching
 
 	make watch
-
-## Deployment
-
-[Read more about it here](Deployment.md)

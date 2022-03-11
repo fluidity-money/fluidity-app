@@ -8,5 +8,6 @@ GO_TEST := go test -cover
 GO_FMT := go fmt
 
 DOCKER_BUILD := docker build
+DOCKER_COMPOSE := docker-compose
 
 MAKEFLAGS += --no-print-directory
