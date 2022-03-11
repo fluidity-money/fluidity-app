@@ -2,7 +2,21 @@
   "dataAccounts": [
     {
       "asset": "USDC",
-      "address": "7ZaehFMj49vvLQbRpWhfv1evF1c8jMcuLkXy4YFAfb52"
+      "address": "DDuNyoNKZMM2fSanMKUjwhtwkY5Jcg85sMoR98fsYKjU"
+    },
+    {
+      "asset": "USDT",
+      "address": "2PjRnkPxcpCZpokn45B23GLEYiwJnWgcfjXNQZ1E55ze"
+    }
+  ],
+  "obligationInfo": [
+    {
+      "asset": "USDC",
+      "address": "AzC4PyevxfhrRcY4x7Xm94PQyf9nfjcheLsSiE53Rcy"
+    },
+    {
+      "asset": "USDT",
+      "address": "EHxPXaojrnNGmUDBqz8fCbcdgYswn9MpNHtKMR6WkY7z"
     }
   ]
 }

@@ -39,6 +39,22 @@ export class FluidityInstruction extends SolanaEnum {
     }
   }
   
+  /**
+   * Fetch the obligation-derived PDA account
+   * @param TokenSymbol the string symbol to search for
+   * @returns the account 
+   */
+  static async getProgramAddress(TokenSymbol: SupportedTokens): Promise<PublicKey> {
+    const seedString = `FLU:${TokenSymbol}_OBLIGATION`;
+    const seedBuffer = Buffer.from(seedString, 'utf8');
+
+    const [address] = await PublicKey.findProgramAddress(
+      [seedBuffer],
+      new PublicKey(FLUID_PROGRAM_ID)
+    );
+
+    return address;
+  }
   // overwrite the encode method, since the inbuilt borsh serialisation doesn't seem to support
   // tuple enums (i.e. Wrap(u64, string, u8)). Instead, just overwrite them manually since we only
   // support two instructions.
