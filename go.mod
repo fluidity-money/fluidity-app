@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d
 	github.com/ethereum/go-ethereum v1.10.16
-	github.com/fluidity-money/api.fluidity.money v0.0.0-20220124101225-900f729ff1cc
 	github.com/gagliardetto/solana-go v1.3.0
 	github.com/getsentry/sentry-go v0.12.0
 	github.com/go-redis/redis/v8 v8.11.4
@@ -15,6 +14,8 @@ require (
 	github.com/near/borsh-go v0.3.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.0
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
 require (
@@ -31,7 +32,6 @@ require (
 	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/color v1.9.0 // indirect
-	github.com/fluidity-money/microservice-lib v0.0.0-20220124090028-c63f3264a163 // indirect
 	github.com/gagliardetto/binary v0.6.1 // indirect
 	github.com/gagliardetto/treeout v0.1.4 // indirect
 	github.com/go-ole/go-ole v1.2.1 // indirect
@@ -50,6 +50,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mostynb/zstdpool-freelist v0.0.0-20201229113212-927304c0c3b1 // indirect
 	github.com/mr-tron/base58 v1.2.0 // indirect
+	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rjeczalik/notify v0.9.1 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect
@@ -64,7 +65,6 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac // indirect
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
