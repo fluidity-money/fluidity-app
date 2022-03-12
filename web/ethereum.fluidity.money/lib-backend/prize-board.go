@@ -7,11 +7,5 @@ import (
 )
 
 func HandlePrizeBoard(w http.ResponseWriter, r *http.Request) interface{} {
-	winnerList := winners.GetLatestWinners(NetworkSolana, 10)
-	for i := range winnerList {
-		winner := &winnerList[i]
-		winner.WinnerAddress = winner.SolanaWinnerOwnerAddress
-	}
-
-	return winnerList
+	return winners.GetLatestWinners(NetworkEthereum, 10)
 }

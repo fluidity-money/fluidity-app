@@ -13,8 +13,8 @@ import (
 const maxRequest = 20
 
 type RequestMyHistory struct {
-	Address   string   `json:"address"`
-	Count     int      `json:"count"`
+	Address string `json:"address"`
+	Count   int    `json:"count"`
 }
 
 func HandleMyHistory(w http.ResponseWriter, r *http.Request) interface{} {
@@ -39,8 +39,8 @@ func HandleMyHistory(w http.ResponseWriter, r *http.Request) interface{} {
 	}
 
 	var (
-		address     = request.Address
-		count       = request.Count
+		address = request.Address
+		count   = request.Count
 	)
 
 	// if the count for the user's larger than the max request limit or negative,
@@ -50,18 +50,9 @@ func HandleMyHistory(w http.ResponseWriter, r *http.Request) interface{} {
 		count = maxRequest
 	}
 
-	// find user actions
-	userActions := user_actions.GetUserActionsWithSenderAddressOrRecipientOwnerAddress(
-		NetworkSolana,
+	return user_actions.GetUserActionsWithSenderAddressOrRecipientAddress(
+		NetworkEthereum,
 		address,
 		count,
 	)
-
-	for i := range userActions {
-		action := &userActions[i]
-		action.SenderAddress = action.SolanaSenderOwnerAddress
-		action.RecipientAddress = action.SolanaRecipientOwnerAddress
-	}
-
-	return userActions
 }

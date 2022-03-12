@@ -3,13 +3,16 @@ version: "3"
 
 services:
   rabbitmq:
-    image: rabbitmq
+    image: rabbitmq:3.9.13-management
     logging:
       driver: none
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     env_file: ./docker-compose-envs
 
   redis:
-    image: redis
+    image: redis:7.0-rc2
     logging:
       driver: none
     env_file: ./docker-compose-envs
@@ -18,10 +21,14 @@ services:
     build:
       context: ../database
       dockerfile: Dockerfile.postgres
+    ports:
+      - "5432:5432"
     env_file: ./docker-compose-envs
 
   timescale:
     build:
       context: ../database
       dockerfile: Dockerfile.timescale
+    ports:
+      - "5433:5432"
     env_file: ./docker-compose-envs

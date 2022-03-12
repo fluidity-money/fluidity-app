@@ -96,17 +96,6 @@ services:
       - rabbitmq
       - timescale
 
-  microservice-amqp-logger:
-    build:
-      context: ../cmd/microservice-amqp-logger
-    env_file: ./docker-compose-envs
-    environment:
-      FLU_WORKER_ID: microservice-amqp-logger
-      FLU_AMQP_TOPIC_CONSUME: "*"
-    tty: true
-    depends_on:
-      - rabbitmq
-
   contracts-ethereum:
     build:
       context: ../contracts/ethereum

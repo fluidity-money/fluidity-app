@@ -1,4 +1,4 @@
-package api_fluidity_money
+package main
 
 import (
 	"github.com/fluidity-money/fluidity-app/lib/types/prize-pool"
