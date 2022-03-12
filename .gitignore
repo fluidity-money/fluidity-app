@@ -1,5 +1,6 @@
 
 docker
+docker-*
 
 cmd/*/test
 cmd/*/docker
@@ -8,7 +9,11 @@ cmd/*/*.o
 
 database/build
 
-web/*/dist
+web/*/dist*
+web/*/node_modules
+web/*/build*
 
 contracts/ethereum/node_modules
 contracts/ethereum/docker*
+
+automation/*

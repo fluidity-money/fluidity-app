@@ -60,7 +60,7 @@ const fluidityContractAbiString = `[
       ],
       "stateMutability": "nonpayable",
       "type": "function"
-    },
+    }
 ]`
 
 var fluidityContractAbi ethAbi.ABI

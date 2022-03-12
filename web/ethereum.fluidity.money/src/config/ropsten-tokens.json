@@ -1,0 +1,44 @@
+[
+  {
+    "symbol": "USDT",
+    "address": "0x110a13fc3efe6a245b50102d2d79b3e76125ae83",
+    "colour": "rgb(36,163,124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "decimals": 6
+  },
+  {
+    "symbol": "USDC",
+    "address": "0x07865c6e87b9f70255377e024ace6630c1eaa37f",
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "decimals": 6
+  },
+  {
+    "symbol": "DAI",
+    "address": "0x31F42841c2db5173425b5223809CF3A38FEde360",
+    "colour": "#fdc134",
+    "image": "img/TokenIcons/daiIcon.svg",
+    "decimals": 18
+  },
+  {
+    "symbol": "fUSDT",
+    "address": "0x26fc224b37952bd12c792425f242e0b0a55453a6",
+    "colour": "#rgb(36, 163, 124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "decimals": 6
+  },
+  {
+    "symbol": "fUSDC",
+    "address": "0x2835Bed5dB82f84180eCBC7dE7C1944E154b1035",
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "decimals": 6
+  },
+  {
+    "symbol": "fDAI",
+    "address": "0x5BA8d8e005aDe3A8333CF85c3bf2A0869d606569",
+    "colour": "#fdc134",
+    "image": "img/TokenIcons/daiIcon.svg",
+    "decimals": 18
+  }
+]
