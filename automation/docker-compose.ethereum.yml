@@ -8,6 +8,8 @@ services:
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: connector-ethereum-logs-amqp
+      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
+      FLU_ETHEREUM_START_BLOCK: ${FLU_ETHEREUM_START_BLOCK}
     depends_on:
       - rabbitmq
       - contracts-ethereum
@@ -18,6 +20,7 @@ services:
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: connector-ethereum-blocks-amqp
+      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
     depends_on:
       - rabbitmq
       - contracts-ethereum
@@ -25,33 +28,36 @@ services:
   microservice-user-actions-usdc:
     build:
       context: ../cmd/microservice-user-actions
-    env_file:
-      - ./docker-compose-envs
-      - ./docker-compose-envs-usdc
+    env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-user-actions
+      FLU_WORKER_ID: microservice-user-actions-usdc
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_USDC}
+      FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
+      FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
     depends_on:
       - rabbitmq
 
   microservice-user-actions-usdt:
     build:
       context: ../cmd/microservice-user-actions
-    env_file:
-      - ./docker-compose-envs
-      - ./docker-compose-envs-usdt
+    env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-user-actions
+      FLU_WORKER_ID: microservice-user-actions-usdt
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_USDT}
+      FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
+      FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
     depends_on:
       - rabbitmq
 
   microservice-user-actions-dai:
     build:
       context: ../cmd/microservice-user-actions
-    env_file:
-      - ./docker-compose-envs
-      - ./docker-compose-envs-dai
+    env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-user-actions
+      FLU_WORKER_ID: microservice-user-actions-dai
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_DAI}
+      FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_DAI}
+      FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
     depends_on:
       - rabbitmq
 
@@ -61,6 +67,9 @@ services:
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: microservice-prize-pool
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_TOKENS_LIST: ${FLU_ETHEREUM_TOKENS_LIST}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
     restart: unless-stopped
     depends_on:
       - rabbitmq
@@ -72,6 +81,7 @@ services:
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: connector-prize-pool-postgres
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
     depends_on:
       - rabbitmq
       - postgres
@@ -100,6 +110,7 @@ services:
   contracts-ethereum:
     build:
       context: ../contracts/ethereum
-    env_file: ./docker-compose-envs
+    environment:
+      FLU_ETHEREUM_ORACLE_ADDRESS: ${FLU_ETHEREUM_ORACLE_ADDRESS}
     ports:
       - "8545:8545"
