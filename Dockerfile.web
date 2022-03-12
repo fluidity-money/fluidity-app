@@ -3,7 +3,8 @@ FROM fluidity/build-container:latest
 
 RUN curl -sL https://deb.nodesource.com/setup_16.x | sh -
 
-RUN apt-get install -y nodejs nginx
+RUN apt-get update && \
+	apt-get install -y nodejs nginx
 
 WORKDIR /usr/local/src/fluidity
 

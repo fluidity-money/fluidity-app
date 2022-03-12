@@ -1,0 +1,92 @@
+.toolbar {
+  height: 2.8rem;
+  width: auto;
+  background-color: rgba(0, 0, 0, 0.199);
+  align-self: flex-start;
+  grid-column: 1/-1;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toolbar-container-enabled {
+  display: grid;
+  grid-template-columns: 1fr 1fr minmax(25rem, 27rem);
+  grid-gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.toolbar-container-disabled {
+  display: grid;
+  grid-template-columns: 1fr 1fr minmax(8rem, 12rem);
+  grid-gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.toolbar-container-mobile {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2rem;
+  grid-gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.toolbar-items {
+  height: 2.8rem;
+  display: grid;
+  grid-template-columns: 3rem 1rem repeat(3, minmax(10rem, 10rem));
+  grid-gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.select-blockchain {
+  padding-left: 10px;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  img {
+    flex-shrink: 0;
+    min-width: 100%;
+    min-height: 100%;
+  }
+}
+
+.change-network-message {
+  position: absolute;
+  background-color: rgb(231, 154, 149);
+  font-family: "Manrope";
+  width: 100%;
+  text-align: center;
+  padding: 5px;
+  top: 60px;
+  font-size: 0.4rem;
+
+  @include for-tablet-portrait-up {
+    font-size: 0.5rem;
+  }
+
+  @include for-tablet-landscape-up {
+    font-size: 0.7rem;
+  }
+
+  @include for-desktop-up {
+    font-size: 1rem;
+  }
+}
+
+.change-network-link {
+  text-decoration: underline;
+}

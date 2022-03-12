@@ -4,8 +4,8 @@ include ../../build.mk
 NPX_REACTSCRIPTS := npx react-scripts
 NPX_SASS := npx sass
 
-FRONTEND_SRC_DIR := src-frontend
-BACKEND_SRC_DIR := src-backend
+FRONTEND_SRC_DIR := src
+BACKEND_SRC_DIR := cmd
 
 FRONTEND_SRC_TS_DIR := ${FRONTEND_SRC_DIR}
 FRONTEND_SRC_SASS_DIR := ${FRONTEND_SRC_DIR}/scss
@@ -24,7 +24,7 @@ FRONTEND_TSCONFIG_JSON := tsconfig.json
 
 FRONTEND_ASSET_MANIFEST_JSON := asset-manifest.json
 
-FRONTEND_BUILD_JS := ${FRONTEND_BUILD_DIR}/index.js
+FRONTEND_BUILD_ASSET_MANIFEST := ${FRONTEND_BUILD_DIR}/asset-manifest.json
 FRONTEND_BUILD_CSS := ${FRONTEND_BUILD_DIR}/index.css
 
 FRONTEND_BUILD := build-frontend
@@ -40,12 +40,14 @@ BACKEND_BUILD := ${REPO}.o
 	css \
 	js \
 	build \
+	frontend \
+	backend \
 	test \
 	watch-css \
 	watch-js \
 	watch
 
-js: ${FRONTEND_BUILD_JS}
+js: ${FRONTEND_BUILD_ASSET_MANIFEST}
 
 css: ${FRONTEND_BUILD_CSS}
 

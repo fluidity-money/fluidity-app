@@ -15,7 +15,7 @@ This codebase contains a React webapp for interacting with Fluidity.
 | `REACT_APP_WALLET_CONNECT_GETH_URI` | Websocket address used to connect to Geth with.                                   |
 | `REACT_APP_WEBSOCKET`               | Websocket address used to connect to the backend.                                 |
 | `FLU_PUBLIC_URL`                    | URL for where this webapp will be hosted (http://localhost:3000 ie)               |
-| `REACT_APP_TOKEN_CONFIG_FILE`       | Name of the JSON file containing a list of supported token symbols and addresses. |
+| `REACT_APP_CHAIN_ID` | ID of the chain to connect to (3 for Ropsten, 31337 for local network) - also configures tokens to use. |
 
 ## Building
 
@@ -28,3 +28,7 @@ This codebase contains a React webapp for interacting with Fluidity.
 ## Watching
 
 	make watch
+
+## Deployment
+
+[Read more about it here](Deployment.md)

@@ -5,6 +5,7 @@ ARG REACT_APP_API_URL
 ARG REACT_APP_WALLET_CONNECT_GETH_URI
 ARG REACT_APP_WEBSOCKET
 ARG REACT_APP_CHAIN_ID
+ARG REACT_APP_TOKEN_CONFIG_FILE
 
 WORKDIR /usr/local/src/fluidity/web/ethereum.fluidity.money
 
@@ -18,13 +19,11 @@ RUN npm i
 
 COPY . ./
 
-RUN ls -l1
-
-RUN pwd
-
 RUN make frontend
 
-RUN cp -r build /usr/share/nginx/html
+RUN rm -r /var/www/html
+
+RUN cp -r build /var/www/html
 
 EXPOSE 3000
 
