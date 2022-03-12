@@ -1,0 +1,105 @@
+---
+version: "3"
+
+services:
+  connector-ethereum-logs-amqp:
+    build:
+      context: ../cmd/connector-ethereum-logs-amqp
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-ethereum-logs-amqp
+    depends_on:
+      - rabbitmq
+      - contracts-ethereum
+
+  connector-ethereum-blocks-amqp:
+    build:
+      context: ../cmd/connector-ethereum-blocks-amqp
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-ethereum-blocks-amqp
+    depends_on:
+      - rabbitmq
+      - contracts-ethereum
+
+  microservice-user-actions-usdc:
+    build:
+      context: ../cmd/microservice-user-actions
+    env_file:
+      - ./docker-compose-envs
+      - ./docker-compose-envs-usdc
+    environment:
+      FLU_WORKER_ID: microservice-user-actions
+    depends_on:
+      - rabbitmq
+
+  microservice-user-actions-usdt:
+    build:
+      context: ../cmd/microservice-user-actions
+    env_file:
+      - ./docker-compose-envs
+      - ./docker-compose-envs-usdt
+    environment:
+      FLU_WORKER_ID: microservice-user-actions
+    depends_on:
+      - rabbitmq
+
+  microservice-user-actions-dai:
+    build:
+      context: ../cmd/microservice-user-actions
+    env_file:
+      - ./docker-compose-envs
+      - ./docker-compose-envs-dai
+    environment:
+      FLU_WORKER_ID: microservice-user-actions
+    depends_on:
+      - rabbitmq
+
+  microservice-prize-pool:
+    build:
+      context: ../cmd/microservice-prize-pool
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: microservice-prize-pool
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+      - contracts-ethereum
+
+  connector-prize-pool-postgres:
+    build:
+      context: ../cmd/connector-prize-pool-postgres
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-prize-pool-postgres
+    depends_on:
+      - rabbitmq
+      - postgres
+
+  connector-user-actions-timescale:
+    build:
+      context: ../cmd/connector-user-actions-timescale
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-user-actions-timescale
+    depends_on:
+      - rabbitmq
+      - timescale
+
+  microservice-amqp-logger:
+    build:
+      context: ../cmd/microservice-amqp-logger
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: microservice-amqp-logger
+      FLU_AMQP_TOPIC_CONSUME: "*"
+    tty: true
+    depends_on:
+      - rabbitmq
+
+  contracts-ethereum:
+    build:
+      context: ../contracts/ethereum
+    env_file: ./docker-compose-envs
+    ports:
+      - "8545:8545"

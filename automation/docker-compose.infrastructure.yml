@@ -1,0 +1,26 @@
+---
+version: "3"
+
+services:
+  rabbitmq:
+    image: rabbitmq
+    env_file: ./docker-compose-envs
+    logging:
+      driver: none
+
+  redis:
+    image: redis
+    logging:
+      driver: none
+
+  postgres:
+    build:
+      context: ../database
+      dockerfile: Dockerfile.postgres
+    env_file: ./docker-compose-envs
+
+  timescale:
+    build:
+      context: ../database
+      dockerfile: Dockerfile.timescale
+    env_file: ./docker-compose-envs

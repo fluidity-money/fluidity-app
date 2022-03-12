@@ -1,7 +1,7 @@
 
 docker
 docker-*
-!docker-compose.sh
+!docker-compose*
 
 cmd/*/test
 cmd/*/docker

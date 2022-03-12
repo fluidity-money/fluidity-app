@@ -1,0 +1,15 @@
+---
+version: "3"
+
+services:
+  microservice-faucet-track-tweets:
+    build:
+      context: ../cmd/microservice-faucet-track-tweets
+
+  microservice-ethereum-faucet-send-amounts:
+    build:
+      context: ../cmd/microservice-ethereum-faucet-send-amounts
+    env_file: ./docker-compose-envs
+    depends_on:
+      - rabbitmq
+      - contracts-ethereum
