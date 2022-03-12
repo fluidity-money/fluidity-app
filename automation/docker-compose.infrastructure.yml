@@ -21,14 +21,14 @@ services:
     build:
       context: ../database
       dockerfile: Dockerfile.postgres
-    ports:
-      - "5432:5432"
     env_file: ./docker-compose-envs
+    ports:
+      - 127.0.0.1:5432:5432
 
   timescale:
     build:
       context: ../database
       dockerfile: Dockerfile.timescale
-    ports:
-      - "5433:5432"
     env_file: ./docker-compose-envs
+    ports:
+      - 127.0.0.1:5433:5432
