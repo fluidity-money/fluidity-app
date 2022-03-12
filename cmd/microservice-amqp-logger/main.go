@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 // EnvTopicSubscribe to use to get messages to print

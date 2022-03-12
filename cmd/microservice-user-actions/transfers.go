@@ -3,10 +3,10 @@ package main
 import (
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-user-actions/lib"
 )
@@ -25,8 +25,8 @@ func handleTransfer(transactionHash ethereum.Hash, logTopics []ethereum.Hash, da
 	}
 
 	var (
-		fromAddressPadded   = string(logTopics[0])
-		toAddressPadded     = string(logTopics[1])
+		fromAddressPadded = string(logTopics[0])
+		toAddressPadded   = string(logTopics[1])
 	)
 
 	transfer, err := microservice_user_actions.DecodeTransfer(

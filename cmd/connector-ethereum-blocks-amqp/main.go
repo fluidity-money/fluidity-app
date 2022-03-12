@@ -5,8 +5,8 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-blocks-amqp/lib/geth"
 
-	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"golang.org/x/sync/errgroup"
