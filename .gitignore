@@ -16,5 +16,3 @@ web/*/build*
 
 contracts/ethereum/node_modules
 contracts/ethereum/docker*
-
-automation/*
