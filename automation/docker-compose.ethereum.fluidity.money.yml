@@ -7,12 +7,12 @@ services:
       context: ../web/ethereum.fluidity.money
       dockerfile: Dockerfile.frontend
       args:
-        REACT_APP_API_URL: http://localhost:8081
-        REACT_APP_WALLET_CONNECT_GETH_URI: http://contracts-ethereum:8545
-        REACT_APP_WEBSOCKET: ws://localhost:8081/updates
-        REACT_APP_CHAIN_ID: 31337
-        REACT_APP_WALLET_CONNECT_GETH_URI: ws://contracts-ethereum:8545
-        REACT_APP_TOKEN_CONFIG_FILE: testing-tokens.json
+        REACT_APP_API_URL: ${FLU_FRONTEND_API_URL}
+        REACT_APP_WALLET_CONNECT_GETH_URI: ${FLU_FRONTEND_GETH_URL}
+        REACT_APP_WEBSOCKET: ${FLU_FRONTEND_WS_URL}
+        REACT_APP_CHAIN_ID: ${FLU_FRONTEND_CHAIN_ID}
+        REACT_APP_WALLET_CONNECT_GETH_URI: ${FLU_FRONTEND_GETH_URL}
+        REACT_APP_TOKEN_CONFIG_FILE: ${FLU_FRONTEND_TOKEN_FILE}
     ports:
       - 8080:80
 
