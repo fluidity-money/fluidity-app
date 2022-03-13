@@ -1,0 +1,9 @@
+
+build
+*.swp
+coverage.out
+docker-base
+docker-client
+docker-server
+
+node_modules/

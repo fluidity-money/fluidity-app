@@ -1,14 +1,11 @@
 
-FROM node:16 as build
+FROM fluidity/web-container:latest
 
-ARG PAT_STRING
-ARG REACT_APP_FLU_API_URI
+WORKDIR /usr/local/src/fluidity/web/faucet.fluidity.money
 
-ENV REPO ethereum-testnet-faucet
+ENV PRODUCTION ${PRODUCTION}
 
-ENV WORKDIR /usr/src/${REPO}
-
-WORKDIR $WORKDIR
+ENV PATH /app/node_modules.bin:$PATH
 
 COPY package.json package-lock.json ./
 
@@ -16,13 +13,13 @@ RUN npm i
 
 COPY . ./
 
+ARG REACT_APP_FLU_API_URI
+
 RUN make frontend
 
-FROM nginx:stable-alpine
+RUN rm -r /var/www/html
 
-COPY --from=build \
-	/usr/src/ethereum-testnet-faucet/dist \
-	/usr/share/nginx/html
+RUN cp -r build /var/www/html
 
 EXPOSE 3000
 

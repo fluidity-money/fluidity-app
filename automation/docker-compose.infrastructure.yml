@@ -4,18 +4,18 @@ version: "3"
 services:
   rabbitmq:
     image: rabbitmq:3.9.13-management
+    env_file: ./docker-compose-envs
     logging:
       driver: none
     ports:
       - "5672:5672"
       - "15672:15672"
-    env_file: ./docker-compose-envs
 
   redis:
     image: redis:7.0-rc2
+    env_file: ./docker-compose-envs
     logging:
       driver: none
-    env_file: ./docker-compose-envs
 
   postgres:
     build:

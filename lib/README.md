@@ -29,8 +29,31 @@ be open sourced.
 	make build
 
 ## Testing
+	
+Testing utilises the standard `testing` package as well as `testify` for assertions.
 
 	make test
+
+To display overall test coverage:
+
+	make test-coverage
+
+Directories that do not contain any statements are intentionally excluded from testing:
+
+	types/beta
+	types/faucet
+	types/ido
+	types/network
+	types/past-winnings
+	types/prize-pool
+	types/ethereum/erc20
+	types/solana
+	types/twitter
+	types/user-updates
+	types/website
+	types/winners
+	types/worker
+	fluidity-app/lib (top level consts file)
 
 ## Building a Docker image
 

@@ -2,104 +2,55 @@
 version: "3"
 
 services:
-  connector-ethereum-logs-amqp:
+  microservice-ethereum-user-actions-usdc:
     build:
-      context: ../cmd/connector-ethereum-logs-amqp
+      context: ../cmd/microservice-ethereum-user-actions
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: connector-ethereum-logs-amqp
-      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
-      FLU_ETHEREUM_START_BLOCK: ${FLU_ETHEREUM_START_BLOCK}
-    depends_on:
-      - rabbitmq
-      - contracts-ethereum
-
-  connector-ethereum-blocks-amqp:
-    build:
-      context: ../cmd/connector-ethereum-blocks-amqp
-    env_file: ./docker-compose-envs
-    environment:
-      FLU_WORKER_ID: connector-ethereum-blocks-amqp
-      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
-    depends_on:
-      - rabbitmq
-      - contracts-ethereum
-
-  microservice-user-actions-usdc:
-    build:
-      context: ../cmd/microservice-user-actions
-    env_file: ./docker-compose-envs
-    environment:
-      FLU_WORKER_ID: microservice-user-actions-usdc
+      FLU_WORKER_ID: microservice-ethereum-user-actions-usdc
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_USDC}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
     depends_on:
       - rabbitmq
 
-  microservice-user-actions-usdt:
+  microservice-ethereum-user-actions-usdt:
     build:
-      context: ../cmd/microservice-user-actions
+      context: ../cmd/microservice-ethereum-user-actions
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-user-actions-usdt
+      FLU_WORKER_ID: microservice-ethereum-user-actions-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_USDT}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
     depends_on:
       - rabbitmq
 
-  microservice-user-actions-dai:
+  microservice-ethereum-user-actions-dai:
     build:
-      context: ../cmd/microservice-user-actions
+      context: ../cmd/microservice-ethereum-user-actions
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-user-actions-dai
+      FLU_WORKER_ID: microservice-ethereum-user-actions-dai
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_DAI}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_DAI}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
     depends_on:
       - rabbitmq
 
-  microservice-prize-pool:
+  microservice-ethereum-prize-pool:
     build:
-      context: ../cmd/microservice-prize-pool
+      context: ../cmd/microservice-ethereum-prize-pool
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-prize-pool
+      FLU_WORKER_ID: microservice-ethereum-prize-pool
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
       FLU_ETHEREUM_TOKENS_LIST: ${FLU_ETHEREUM_TOKENS_LIST}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
     restart: unless-stopped
     depends_on:
       - rabbitmq
-      - contracts-ethereum
-
-  connector-prize-pool-postgres:
-    build:
-      context: ../cmd/connector-prize-pool-postgres
-    env_file: ./docker-compose-envs
-    environment:
-      FLU_WORKER_ID: connector-prize-pool-postgres
-      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
-    depends_on:
-      - rabbitmq
-      - postgres
-
-  connector-user-actions-timescale:
-    build:
-      context: ../cmd/connector-user-actions-timescale
-    env_file: ./docker-compose-envs
-    environment:
-      FLU_WORKER_ID: connector-user-actions-timescale
-    depends_on:
-      - rabbitmq
-      - timescale
-
-  contracts-ethereum:
-    build:
-      context: ../contracts/ethereum
-    environment:
-      FLU_ETHEREUM_ORACLE_ADDRESS: ${FLU_ETHEREUM_ORACLE_ADDRESS}
-    ports:
-      - 127.0.0.1:8545:8545

@@ -1,0 +1,44 @@
+---
+version: "3"
+
+services:
+  microservice-solana-transactions:
+    build:
+      context: ../cmd/microservice-solana-transactions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: microservice-solana-transactions
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+    depends_on:
+      - rabbitmq
+
+  microservice-solana-user-actions:
+    build:
+      context: ../cmd/microservice-solana-user-actions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: microservice-solana-user-actions
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
+      FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY}
+      FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY}
+
+  microservice-solana-prize-pool:
+    build:
+      context: ../cmd/microservice-solana-prize-pool
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: microservice-solana-prize-pool
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+      FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
+      FLU_SOLANA_PRIZE_POOL_UPDATE_TIME: ${FLU_SOLANA_PRIZE_POOL_UPDATE_TIME}
+      FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY}
+      FLU_SOLANA_TVL_DATA_PUBKEY: ${FLU_SOLANA_TVL_DATA_PUBKEY}
+      FLU_SOLANA_SOLEND_PROGRAM_ID: ${FLU_SOLANA_SOLEND_PROGRAM_ID}
+      FLU_SOLANA_OBLIGATION_PUBKEY: ${FLU_SOLANA_OBLIGATION_PUBKEY}
+      FLU_SOLANA_RESERVE_PUBKEY: ${FLU_SOLANA_RESERVE_PUBKEY}
+      FLU_SOLANA_PYTH_PUBKEY: ${FLU_SOLANA_PYTH_PUBKEY}
+      FLU_SOLANA_SWITCHBOARD_PUBKEY: ${FLU_SOLANA_SWITCHBOARD_PUBKEY}
+      FLU_SOLANA_TVL_PAYER_PRIKEY: ${FLU_SOLANA_TVL_PAYER_PRIKEY}

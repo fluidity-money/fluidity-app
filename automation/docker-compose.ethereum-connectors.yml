@@ -1,0 +1,37 @@
+---
+version: "3"
+
+services:
+  connector-ethereum-logs-amqp:
+    build:
+      context: ../cmd/connector-ethereum-logs-amqp
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-ethereum-logs-amqp
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
+      FLU_ETHEREUM_START_BLOCK: ${FLU_ETHEREUM_START_BLOCK}
+    depends_on:
+      - rabbitmq
+
+  connector-ethereum-blocks-amqp:
+    build:
+      context: ../cmd/connector-ethereum-blocks-amqp
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-ethereum-blocks-amqp
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
+    depends_on:
+      - rabbitmq
+  connector-prize-pool-postgres:
+    build:
+      context: ../cmd/connector-prize-pool-postgres
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-prize-pool-postgres
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+    depends_on:
+      - rabbitmq
+      - postgres

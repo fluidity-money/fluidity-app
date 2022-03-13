@@ -1,0 +1,14 @@
+---
+version: "3"
+
+services:
+  connector-user-actions-timescale:
+    build:
+      context: ../cmd/connector-user-actions-timescale
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-user-actions-timescale
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+    depends_on:
+      - rabbitmq
+      - timescale

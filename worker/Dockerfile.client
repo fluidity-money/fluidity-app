@@ -1,0 +1,8 @@
+
+FROM fluidity/build-container:latest
+
+WORKDIR /usr/local/src/fluidity/worker
+
+RUN make clients
+
+ENTRYPOINT [ "wait-for-amqp", "./start.sh" ]

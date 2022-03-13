@@ -1,0 +1,44 @@
+---
+version: "3"
+
+services:
+  microservice-faucet-track-tweets:
+    build:
+      context: ../cmd/microservice-faucet-track-tweets
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: microservice-faucet-track-tweets
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+
+  microservice-ethereum-faucet-send-amounts:
+    build:
+      context: ../cmd/microservice-ethereum-faucet-send-amounts
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: microservice-ethereum-faucet-send-amounts
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+    depends_on:
+      - rabbitmq
+      - contracts-ethereum
+
+  faucet.fluidity.money-frontend:
+    build:
+      context: ../web/faucet.fluidity.money
+      dockerfile: Dockerfile.frontend
+      args:
+        REACT_APP_FLU_API_URI: ${FLU_FAUCET_FRONTEND_API_URL}
+    ports:
+      - "127.0.0.1:8082:80"
+
+  faucet.fluidity.money-backend:
+    build:
+      context: ../web/faucet.fluidity.money
+      dockerfile: Dockerfile.backend
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: faucet.fluidity.money-backend
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+    ports:
+      - "127.0.0.1:8083:80"
+    depends_on:
+      - rabbitmq

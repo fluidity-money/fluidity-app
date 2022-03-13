@@ -1,0 +1,11 @@
+---
+version: "3"
+
+services:
+  contracts-ethereum:
+    build:
+      context: ../contracts/ethereum
+    environment:
+      FLU_ETHEREUM_ORACLE_ADDRESS: ${FLU_ETHEREUM_ORACLE_ADDRESS}
+    ports:
+      - 127.0.0.1:8545:8545

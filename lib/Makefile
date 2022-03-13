@@ -9,6 +9,6 @@ DIRS := $(shell \
 
 build: ${DIRS}
 	@echo ${DIRS} \
-		| xargs -d' ' -I '{}' sh -xc 'cd $$(readlink -f {}); ${GO_BUILD}'
+		| xargs -d' ' -I '{}' sh -c 'cd $$(readlink -f {}); ${GO_BUILD}'
 
 	@touch build
