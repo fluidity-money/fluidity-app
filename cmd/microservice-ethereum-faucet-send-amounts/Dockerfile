@@ -7,6 +7,5 @@ RUN make
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"wait-for-ws", \
 	"./microservice-ethereum-faucet-send-amounts.o" \
 ]
