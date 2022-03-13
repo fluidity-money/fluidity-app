@@ -1,0 +1,53 @@
+// scss file for variables and properties (e.g. $primary-color, color classes etc.)
+$background-gradient: -webkit-linear-gradient(45deg, #050D12 -0.52%, #0D252D 31.94%, #1A3E53 100%);
+// $primary-color: -webkit-linear-gradient(45deg, #16899b 0%, #02f5a3 100%);
+$primary-color: -webkit-linear-gradient(45deg, #C388D7 30%, #06DCE6 100%);
+// #14F195
+// #9945FF
+// #b45be1
+// $secondary-color: -webkit-linear-gradient(45deg, #5259ff 0%, #02e6f5 100%);
+$secondary-color: -webkit-linear-gradient(45deg, #b45be1 0%, #80ECFF 100%);
+$prize-color: #12ECAB;
+$graph-color: -webkit-linear-gradient(180deg, #0ACAA0 0%, rgba(10, 202, 160, 0) 100%);
+$currency-color: -webkit-linear-gradient(45deg, #ffffff 0%, #02e6f5 100%);
+$border-color: #184437;
+$border-color: #06DCE6;
+$border-color: #7daaa6;
+$border-color: #d12afa;
+$background-dark: #1A1C1F;
+$background-notasdark: #212429;
+$background-transparent: #0202024d;
+// $container-colour: hsl(213, 74%, 8%);
+$container-colour: #151515;
+$container-colour-lighter: hsl(213, 74%, 9%);
+
+
+$border-gradient: -webkit-linear-gradient(0deg, #d897ee 6.822%, #ca9def 16.962%, #a4aef2 36.172%, #66c9f7 62.514%, #13effe 94.686%, #04f5ff 100%);
+
+// https://stackoverflow.com/a/51496341
+@mixin border-gradient($border-radius: 17px, $padding: 2px) {
+  &:before {
+    content:"";
+
+    position:absolute;
+    pointer-events: none;
+
+    top:    -$padding;
+    left:   -$padding;
+    right:  -$padding;
+    bottom: -$padding;
+    padding: $padding;
+
+    border-radius: $border-radius;
+    background: $border-gradient;
+
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
