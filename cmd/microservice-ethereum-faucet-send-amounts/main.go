@@ -20,7 +20,7 @@ import (
 
 const (
 	// EnvTokensList to relate the received token names to a contract address
-	// of the form ADDR1:TOKEN1,ADDR2:TOKEN2,...
+	// of the form ADDR1:TOKEN1:DECIMALS2,ADDR2:TOKEN2:DECIMALS2,...
 	EnvTokensList = "FLU_ETHEREUM_TOKENS_LIST"
 
 	// EnvEthereumHttpUrl to use to connect to Geth to send amounts
@@ -77,10 +77,10 @@ func main() {
 
 		tokenSeparated := strings.Split(token_, ":")
 
-		if len(tokenSeparated) != 2 {
+		if len(tokenSeparated) != 3 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
-					"Failed to separate %#v into a valid token - expected format ADDRESS:TOKEN",
+					"Failed to separate %#v, expected format ADDRESS:TOKEN:DECIMALS",
 					token_,
 				)
 			})
