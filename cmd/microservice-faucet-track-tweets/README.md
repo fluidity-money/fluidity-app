@@ -7,16 +7,14 @@ faucet payout.
 
 ## Environment variables
 
-|              Name             |                                 Description
-|-------------------------------|------------------------------------------------------------------------------|
-| `FLU_WORKER_ID`               | Worker ID used to identify the application in logging and to the AMQP queue. |
-| `FLU_DEBUG`                   | Toggle debug messages produced by any application using the debug logger.    |
-| `FLU_AMQP_QUEUE_ADDR`         | AMQP queue address connected to to receive and send messages down.           |
-| `FLU_POSTGRES_URI`            | Database URI to use when connecting to the Postgres database.                |
-| `FLU_TWITTER_HASHTAGS`        | Hashtags separated with a comma to filter for.                               |
-| `FLU_TWITTER_CONSUMER_KEY`    | Api key to use when sending reply tweets to Twitter.                         |
-| `FLU_TWITTER_CONSUMER_SECRET` | Api secret to use when sending reply tweets to Twitter.                      |
-| `FLU_SLACK_WEBHOOK`           | Slack webhook to use when the Slack Notify function is used.                 |
+|          Name          |                                 Description
+|------------------------|------------------------------------------------------------------------------|
+| `FLU_WORKER_ID`        | Worker ID used to identify the application in logging and to the AMQP queue. |
+| `FLU_DEBUG`            | Toggle debug messages produced by any application using the debug logger.    |
+| `FLU_AMQP_QUEUE_ADDR`  | AMQP queue address connected to to receive and send messages down.           |
+| `FLU_POSTGRES_URI`     | Database URI to use when connecting to the Postgres database.                |
+| `FLU_TWITTER_HASHTAGS` | Hashtags separated with a comma to filter for.                               |
+| `FLU_SLACK_WEBHOOK`    | Slack webhook to use when the Slack Notify function is used.                 |
 
 ## Building
 

@@ -5,4 +5,7 @@ WORKDIR /usr/local/src/fluidity/cmd/microservice-faucet-track-tweets
 
 RUN make
 
-ENTRYPOINT [ "./microservice-faucet-track-tweets.o" ]
+ENTRYPOINT [ \
+	"wait-for-amqp", \
+	"./microservice-faucet-track-tweets.o" \
+]

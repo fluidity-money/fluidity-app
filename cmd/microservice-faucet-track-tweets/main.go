@@ -23,14 +23,6 @@ const (
 	// EnvFilteredHashtags to consume with this service
 	EnvFilteredHashtags = "FLU_TWITTER_HASHTAGS"
 
-	// EnvTwitterConsumerKey to use when sending reply tweets to faucet
-	// requests
-	EnvTwitterConsumerKey = "FLU_TWITTER_CONSUMER_KEY"
-
-	// EnvTwitterConsumerSecret to use when sending reply tweets to faucet
-	// requests
-	EnvTwitterConsumerSecret = "FLU_TWITTER_CONSUMER_SECRET"
-
 	// StateKeyExpiry to prevent people from abusing timing attacks to exploit
 	// the faucet
 	StateKeyExpiry = 30 * time.Second

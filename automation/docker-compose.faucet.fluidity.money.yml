@@ -9,6 +9,10 @@ services:
     environment:
       FLU_WORKER_ID: microservice-faucet-track-tweets
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK}
+    depends_on:
+      - rabbitmq
+      - postgres
 
   microservice-ethereum-faucet-send-amounts:
     build:
