@@ -88,7 +88,9 @@ func main() {
 
 		contractAddress := ethCommon.HexToAddress(tokenSeparated[0])
 
-		tokenName, err := faucetTypes.TokenFromString(tokenSeparated[1])
+		baseTokenName := tokenSeparated[1]
+
+		tokenName, err := faucetTypes.TokenFromString("f"+baseTokenName)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
