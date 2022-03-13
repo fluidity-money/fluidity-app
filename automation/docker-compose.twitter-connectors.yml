@@ -1,0 +1,15 @@
+---
+version: "3"
+
+services:
+  connector-twitter-amqp:
+    build:
+      context: ../cmd/connector-twitter-amqp
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-twitter-amqp
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_TWITTER_BEARER_TOKEN: ${FLU_TWITTER_BEARER_TOKEN}
+      FLU_TWITTER_HASHTAGS: ${FLU_TWITTER_HASHTAGS}
+    depends_on:
+      - rabbitmq

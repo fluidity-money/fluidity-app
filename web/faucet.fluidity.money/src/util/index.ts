@@ -4,7 +4,7 @@ import axios, { AxiosError } from "axios";
 const baseURL = process.env.REACT_APP_FLU_API_URI;
 
 if (!baseURL)
-  throw new Error(`Base url not found!`)
+  throw new Error("REACT_APP_FLU_API_URI not set!");
 
 const axiosInstance = axios.create({
   baseURL,
@@ -62,7 +62,7 @@ export type SupportedNetworks = "ethereum" | "solana";
 export type SupportedTokens<T extends SupportedNetworks | "all" = "all"> =
   T extends "ethereum" ?
     SupportedTokensEthereum :
-  T extends "solana" ? 
+  T extends "solana" ?
     SupportedTokensSolana :
     SupportedTokensEthereum | SupportedTokensSolana;
 
