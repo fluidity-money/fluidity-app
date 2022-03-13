@@ -5,4 +5,8 @@ WORKDIR /usr/local/src/fluidity/cmd/microservice-ethereum-faucet-send-amounts
 
 RUN make
 
-ENTRYPOINT [ "./microservice-ethereum-faucet-send-amounts.o" ]
+ENTRYPOINT [ \
+	"wait-for-amqp", \
+	"wait-for-ws", \
+	"./microservice-ethereum-faucet-send-amounts.o"
+]
