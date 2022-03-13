@@ -38,6 +38,7 @@ services:
     environment:
       FLU_WORKER_ID: faucet.fluidity.money-backend
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK}
     ports:
       - "127.0.0.1:8083:80"
     depends_on:
