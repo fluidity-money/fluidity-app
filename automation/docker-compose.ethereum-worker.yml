@@ -1,0 +1,102 @@
+---
+version: "3"
+
+services:
+  worker-ethereum-server-usdt:
+    build:
+      context: ../worker
+      dockerfile: Dockerfile.server
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: worker-ethereum-server-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_TOKEN_BACKEND: compound
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+    depends_on:
+      - rabbitmq
+
+  worker-ethereum-server-usdc:
+    build:
+      context: ../worker
+      dockerfile: Dockerfile.server
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: worker-ethereum-server-usdc
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_TOKEN_BACKEND: compound
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+    depends_on:
+      - rabbitmq
+
+  worker-ethereum-server-dai:
+    build:
+      context: ../worker
+      dockerfile: Dockerfile.server
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: worker-ethereum-server-dai
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_TOKEN_BACKEND: compound
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+    depends_on:
+      - rabbitmq
+
+  worker-ethereum-client-dai:
+    build:
+      context: ../worker
+      dockerfile: Dockerfile.client
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: worker-ethereum-server-dai
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_DAI}
+      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_DAI}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_DAI}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+    depends_on:
+      - rabbitmq
+
+  worker-ethereum-client-usdc:
+    build:
+      context: ../worker
+      dockerfile: Dockerfile.client
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: worker-ethereum-server-usdc
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDC}
+      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDC}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDC}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+    depends_on:
+      - rabbitmq
+
+  worker-ethereum-client-usdt:
+    build:
+      context: ../worker
+      dockerfile: Dockerfile.client
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: worker-ethereum-server-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDT}
+      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDT}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDT}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+    depends_on:
+      - rabbitmq
