@@ -7,5 +7,5 @@ RUN make
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-twitter-fluidity-hashtag-amqp.o" \
+	"./connector-twitter-hashtag-amqp.o" \
 ]
