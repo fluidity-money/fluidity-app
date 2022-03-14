@@ -7,6 +7,8 @@ queue_name="$2"
 
 [ -z "$queue_name" ] && exit 1
 
+export FLU_AMQP_QUEUE_ADDR="amqp://fluidity:fluidity@127.0.0.1"
+
 export \
 	FLU_AMQP_TOPIC_CONSUME="$queue_name" \
 	FLU_WORKER_ID="$worker_id"
