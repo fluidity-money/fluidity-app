@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- add Ethereum logs and topics as separate tables
 
@@ -21,3 +22,7 @@ CREATE TABLE ethereum_logs (
 	topic_3 VARCHAR,
 	topic_4 VARCHAR
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS ethereum_logs;

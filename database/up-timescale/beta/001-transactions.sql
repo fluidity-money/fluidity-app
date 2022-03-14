@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- transaction that we track for the second stage of the beta in its
 -- unique format
@@ -10,3 +11,7 @@ CREATE TABLE beta_transactions (
 	contract_call BOOLEAN NOT NULL,
 	was_winning BOOLEAN NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS beta_transactions;

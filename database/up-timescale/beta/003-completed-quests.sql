@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- completed beta quests, a write-only log of the quests that users have
 -- finished
@@ -13,3 +14,7 @@ CREATE TABLE beta_completed_quests (
 
 	time TIMESTAMP NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE beta_completed_quests;

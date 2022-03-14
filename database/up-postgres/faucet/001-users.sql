@@ -1,3 +1,4 @@
+-- migrate:up
 
 CREATE TABLE faucet_users (
 
@@ -11,3 +12,7 @@ CREATE TABLE faucet_users (
 
 	last_used TIMESTAMP
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS faucet_users;

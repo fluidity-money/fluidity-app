@@ -1,3 +1,4 @@
+-- migrate:up
 
 CREATE TABLE ethereum_erc20_transfers (
 	contract_address VARCHAR NOT NULL,
@@ -7,3 +8,7 @@ CREATE TABLE ethereum_erc20_transfers (
 	picked_up TIMESTAMP NOT NULL,
 	transaction_hash VARCHAR NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS ethereum_erc20_transfers;

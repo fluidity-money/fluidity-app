@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- questions received by faucet.fluidity.money
 
@@ -16,3 +17,7 @@ CREATE TABLE website_questions (
 
 	question CHAR(500) NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS website_questions;

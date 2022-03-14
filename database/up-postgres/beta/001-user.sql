@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- users participating in the second stage of our beta
 
@@ -39,3 +40,7 @@ CREATE TABLE beta_user (
 	daily_streak INTEGER NOT NULL,
 	faucet_timestamp TIMESTAMP NOT NULL
 );
+
+-- migrate:down
+DROP TABLE IF EXISTS beta_user;
+

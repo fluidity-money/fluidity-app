@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- win log contains information from the rng microservice
 
@@ -6,3 +7,7 @@ CREATE TABLE beta_win_logs (
     transaction_index DECIMAL NOT NULL,
     win_amount uint256 NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS beta_win_logs;

@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- add support for taking signups
 
@@ -12,3 +13,7 @@ CREATE TABLE website_subscriptions (
 
 	source website_source NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS website_subscriptions;

@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- winners that were paid out in the past,
 
@@ -12,3 +13,7 @@ CREATE TABLE winners (
 
 	created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS winners;

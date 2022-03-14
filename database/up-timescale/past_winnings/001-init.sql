@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- high level representation of past winners aggregated per day per month
 
@@ -6,3 +7,7 @@ CREATE TABLE past_winnings (
 	amount_of_winners uint256 NOT NULL,
 	winning_amount uint256 NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS past_winnings;

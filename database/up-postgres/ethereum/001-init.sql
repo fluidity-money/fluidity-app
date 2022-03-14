@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- init creates codependent generic tables without any of the size
 -- considerations
@@ -71,3 +72,11 @@ CREATE TABLE ethereum_transactions (
 	type INTEGER NOT NULL,
 	value uint256 NOT NULL
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS ethereum_block_headers;
+
+DROP TABLE IF EXISTS ethereum_blocks;
+
+DROP TABLE IF EXISTS ethereum_transactions;

@@ -1,3 +1,4 @@
+-- migrate:up
 
 -- user_actions is a high level representation of the user's actions
 -- (swapping, sending) in the same table.
@@ -31,3 +32,7 @@ CREATE TABLE user_actions (
 	-- the worker!
 	time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- migrate:down
+
+DROP TABLE IF EXISTS user_actions;
