@@ -1,7 +1,7 @@
 
 FROM fluidity/build-container:latest
 
-WORKDIR /usr/local/src/connector-twitter-hashtag-amqp
+WORKDIR /usr/local/src/fluidity/cmd/connector-twitter-hashtag-amqp
 
 RUN make
 
