@@ -6,8 +6,8 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -128,7 +128,7 @@ func main() {
 
 	// we don't actually care about the block state!
 
-	ethereum.Blocks(func(_ ethereum.Block) {
+	worker.BlockLogs(func(_ worker.BlockLog) {
 
 		var amount float64
 
@@ -136,7 +136,7 @@ func main() {
 			workChan <- tokenDetail
 		}
 
-		for _ = range tokenDetails {
+		for range tokenDetails {
 			tokenDetails := <-doneChan
 
 			amount += tokenDetails.amount
