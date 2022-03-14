@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -9,8 +11,6 @@ import (
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -20,7 +20,7 @@ import (
 
 const (
 	// EnvTokensList to relate the received token names to a contract address
-	// of the form ADDR1:TOKEN1:DECIMALS2,ADDR2:TOKEN2:DECIMALS2,...
+	// of the form ADDR1:TOKEN1:DECIMALS1,ADDR2:TOKEN2:DECIMALS2,...
 	EnvTokensList = "FLU_ETHEREUM_TOKENS_LIST"
 
 	// EnvEthereumHttpUrl to use to connect to Geth to send amounts
@@ -31,6 +31,13 @@ const (
 
 	// NullAddress to filter for to prevent it from blocking the thing
 	NullAddress = "0x0000000000000000000000000000000000000000"
+
+	// EnvGasLimit to use to manually set the gas limit on chains with bad
+	// behaviour. Should be set to 8 million for Ropsten.
+	EnvGasLimit = `FLU_ETHEREUM_GAS_LIMIT`
+
+	// EnvUseHardhatFix instead of trying to guess the gas or set it manually
+	EnvUseHardhatFix = `FLU_ETHEREUM_HARDHAT_FIX`
 )
 
 func main() {
@@ -40,7 +47,30 @@ func main() {
 		ethereumHttpAddress = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 
 		tokenAddresses = make(map[faucetTypes.FaucetSupportedToken]ethCommon.Address)
+
+		useHardhatFix bool
+		gasLimit      uint64 = 0
 	)
+
+	if os.Getenv(EnvUseHardhatFix) == "true" {
+		useHardhatFix = true
+
+		log.Debug(func(k *log.Log) {
+			k.Message = "Using the hardhat gas fix!"
+		})
+	}
+
+	if gasLimit_ := os.Getenv(EnvGasLimit); gasLimit_ != "" {
+		var err error
+		gasLimit, err = strconv.ParseUint(gasLimit_, 10, 64)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to parse hardcoded gas limit!"
+				k.Payload = err
+			})
+		}
+	}
 
 	privateKey, err := ethCrypto.HexToECDSA(privateKey_)
 
@@ -144,19 +174,21 @@ func main() {
 			})
 		}
 
-		transaction, err := fluidity.TransactTransfer(
+		transaction, err := callTransferFunction(
 			ethClient,
 			tokenAddress,
 			ethAddress,
 			&amount.Int,
 			transferOpts,
+			useHardhatFix,
+			gasLimit,
 		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to transfer an amount to %#v!",
-					address,
+					ethAddress.String(),
 				)
 
 				k.Payload = err
