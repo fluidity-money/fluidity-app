@@ -9,10 +9,9 @@ services:
     environment:
       FLU_WORKER_ID: connector-ethereum-logs-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
       FLU_ETHEREUM_START_BLOCK: ${FLU_ETHEREUM_START_BLOCK}
-    depends_on:
-      - rabbitmq
 
   connector-ethereum-blocks-amqp:
     build:
@@ -21,9 +20,10 @@ services:
     environment:
       FLU_WORKER_ID: connector-ethereum-blocks-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
-    depends_on:
-      - rabbitmq
+
   connector-prize-pool-postgres:
     build:
       context: ../cmd/connector-prize-pool-postgres
@@ -31,7 +31,7 @@ services:
     environment:
       FLU_WORKER_ID: connector-prize-pool-postgres
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
     depends_on:
-      - rabbitmq
       - postgres

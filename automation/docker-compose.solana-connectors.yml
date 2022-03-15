@@ -9,11 +9,11 @@ services:
     environment:
       FLU_WORKER_ID: connector-solana-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_STARTING_SLOT: ${FLU_SOLANA_STARTING_SLOT}
-    depends_on:
-      - rabbitmq
 
   connector-solana-tvl-amqp:
     build:
@@ -22,6 +22,7 @@ services:
     environment:
       FLU_WORKER_ID: connector-solana-tvl-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
