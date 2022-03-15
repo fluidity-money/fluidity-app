@@ -9,6 +9,7 @@ services:
     environment:
       FLU_WORKER_ID: microservice-solana-transactions
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
 
   microservice-solana-user-actions:
@@ -18,6 +19,7 @@ services:
     environment:
       FLU_WORKER_ID: microservice-solana-user-actions
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
       FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY}
       FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY}
@@ -29,6 +31,7 @@ services:
     environment:
       FLU_WORKER_ID: microservice-solana-prize-pool
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
       FLU_SOLANA_PRIZE_POOL_UPDATE_TIME: ${FLU_SOLANA_PRIZE_POOL_UPDATE_TIME}
