@@ -1,6 +1,6 @@
 #!/bin/sh
 
-AUTOMATION_DIR=automation
+automation_dir=automation
 
 warn() {
 	>&2 echo $@
@@ -68,11 +68,11 @@ export \
 	FLU_FAUCET_FRONTEND_API_URL=http://localhost:8083
 
 docker-compose \
-	-f "$AUTOMATION_DIR/docker-compose.infrastructure.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.database-connectors.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.ethereum.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.ethereum.fluidity.money.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.ethereum-contracts.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.ethereum-connectors.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.faucet.fluidity.money.yml" \
+	-f "$automation_dir/docker-compose.infrastructure.yml" \
+	-f "$automation_dir/docker-compose.database-connectors.yml" \
+	-f "$automation_dir/docker-compose.ethereum.yml" \
+	-f "$automation_dir/docker-compose.ethereum.fluidity.money.yml" \
+	-f "$automation_dir/docker-compose.ethereum-contracts.yml" \
+	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
+	-f "$automation_dir/docker-compose.faucet.fluidity.money.yml" \
 	$@
