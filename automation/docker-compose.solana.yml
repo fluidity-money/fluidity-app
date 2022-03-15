@@ -11,6 +11,9 @@ services:
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+    deploy:
+      mode: replicated
+      replicas: 16
 
   microservice-solana-user-actions:
     build:
@@ -23,6 +26,9 @@ services:
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
       FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY}
       FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY}
+    deploy:
+      mode: replicated
+      replicas: 16
 
   microservice-solana-prize-pool:
     build:
