@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 const (
@@ -19,14 +17,11 @@ const (
 )
 
 // Returns URL to query RMQ Managment API for queues
-func getManagementUrlFromAddr(address, username, password string) string {
+func getManagementUrlFromAddr(address string) (string, error) {
 	queueManagementUri_, err := url.Parse(address)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format("Could not parse URL (%v)", address)
-			k.Payload = err
-		})
+		return "", err
 	}
 
 	queueManagementUri_.Scheme = RmqManagementScheme
@@ -37,26 +32,24 @@ func getManagementUrlFromAddr(address, username, password string) string {
 
 	queueManagementUri_.Host += fmt.Sprintf(":%v", RmqManagementPort)
 
-	rmqUserInfo := url.UserPassword(username, password)
-	queueManagementUri_.User = rmqUserInfo
-
 	queueManagementUri_.Path = "api/queues"
 
 	queueManagementUri := queueManagementUri_.String()
 
-	return queueManagementUri
+	return queueManagementUri, nil
 }
 
 // Returns array of queue structs from RMQ
-func GetRmqQueues(rmqAddress, rmqUsername, rmqPassword string) RmqQueuesResponse {
-	queueManagementUri := getManagementUrlFromAddr(rmqAddress, rmqUsername, rmqPassword)
+func GetRmqQueues(rmqAddress string) (RmqQueuesResponse, error) {
+	queueManagementUri, err := getManagementUrlFromAddr(rmqAddress)
+
+	if err != nil {
+		return nil, err
+	}
 
 	res, err := http.Get(queueManagementUri)
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format("Could not GET url (%v)", queueManagementUri)
-			k.Payload = err
-		})
+		return nil, err
 	}
 
 	defer res.Body.Close()
@@ -65,11 +58,8 @@ func GetRmqQueues(rmqAddress, rmqUsername, rmqPassword string) RmqQueuesResponse
 
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format("Could not deserialize response body (%v)", res.Body)
-			k.Payload = err
-		})
+		return nil, err
 	}
 
-	return response
+	return response, nil
 }
