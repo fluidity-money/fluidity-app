@@ -1,0 +1,34 @@
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SLACK_WEBHOOK_FAUCET_TWEET\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_TWITTER_HASHTAGS\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_ETHEREUM_FAUCET_PRIVATE_KEY\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SLACK_WEBHOOK_FAUCET_AMOUNT_SENT\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SENTRY_URL\" variable is not set. Defaulting to a blank string."
+time="2022-03-15T23:01:01-04:00" level=warning msg="The \"FLU_SLACK_WEBHOOK_FAUCET_BACKEND\" variable is not set. Defaulting to a blank string."
+Sending build context to Docker daemon     820B
+Step 1/4 : FROM fluidity/build-container:latest
+ ---> 97a3b691ecaa
+Step 2/4 : WORKDIR /usr/local/src/fluidity/cmd/connector-common-prize-pool-postgres
+ ---> Running in 5a651c18fb00
+Removing intermediate container 5a651c18fb00
+ ---> fecb04aab5c2
+Step 3/4 : RUN make
+ ---> Running in 10e9e78a47c8
+[91mgo: downloading github.com/getsentry/sentry-go v0.12.0
+[0mtime="2022-03-15T23:01:03-04:00" level=error msg="Can't add file /home/elle/fluidity-app/web/ethereum.fluidity.money/package-lock.json to tar: io: read/write on closed pipe"
+time="2022-03-15T23:01:03-04:00" level=error msg="Can't close tar writer: io: read/write on closed pipe"
+time="2022-03-15T23:01:03-04:00" level=error msg="Can't add file /home/elle/fluidity-app/contracts/ethereum/artifacts/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol/ERC20Upgradeable.json to tar: io: read/write on closed pipe"
+time="2022-03-15T23:01:03-04:00" level=error msg="Can't close tar writer: io: read/write on closed pipe"
+time="2022-03-15T23:01:03-04:00" level=error msg="Can't add file /home/elle/fluidity-app/web/faucet.fluidity.money/package-lock.json to tar: io: read/write on closed pipe"
+time="2022-03-15T23:01:03-04:00" level=error msg="Can't close tar writer: io: read/write on closed pipe"
+canceled
