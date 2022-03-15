@@ -2,22 +2,6 @@
 
 automation_dir=automation
 
-warn() {
-	>&2 echo $@
-}
-
-if [ -z "$FLU_ETHEREUM_WORKER_PRIVATE_KEY_DAI" ]; then
-	warn "FLU_ETHEREUM_WORKER_PRIVATE_KEY_DAI not set!"
-fi
-
-if [ -z "$FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDC" ]; then
-	warn "FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDC not set!"
-fi
-
-if [ -z "$FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDT" ]; then
-	warn "FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDT not set!"
-fi
-
 flu_ethereum_worker_hardhat_gas_limit=8000000
 
 export FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq

@@ -1,0 +1,15 @@
+---
+version: "3"
+
+services:
+  microservice-rabbitmq-backlog-checker:
+    build:
+      context: ../cmd/microservice-rabbitmq-backlog-checker
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_WORKER_ID}
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_AMQP_USER: ${FLU_AMQP_USER}
+      FLU_AMQP_USER_PASS: ${FLU_AMQP_USER_PASS}
+      FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK_QUEUE_OVERLOADED}

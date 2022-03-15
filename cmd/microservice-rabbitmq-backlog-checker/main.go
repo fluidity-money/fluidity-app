@@ -10,10 +10,10 @@ import (
 
 const (
 	// EnvMaxReadyCount is the maximum number of readies acceptable before alerting
-	EnvMaxReadyCount = `FLU_MAX_READY`
+	EnvMaxReadyCount = `FLU_RABBIT_MAX_READY`
 
 	// EnvMaxUnackedCount is the maximum number of unacked messages acceptable before alerting
-	EnvMaxUnackedCount = `FLU_MAX_UNACKED`
+	EnvMaxUnackedCount = `FLU_RABBIT_MAX_UNACKED`
 
 	// EnvAmqpQueueAddr is the address of the queue
 	EnvAmqpQueueAddr = `FLU_AMQP_QUEUE_ADDR`

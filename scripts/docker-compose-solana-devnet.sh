@@ -2,14 +2,6 @@
 
 automation_dir=automation
 
-warn() {
-	>&2 echo $@
-}
-
-[ -z "$FLU_SOLANA_WS_URL" ] && warn "FLU_SOLANA_WS_URL not set!"
-[ -z "$FLU_SOLANA_RPC_URL" ] && warn "FLU_SOLANA_RPC_URL not set!"
-[ -z "$FLU_SOLANA_TVL_PAYER_PRIKEY" ] && warn "FLU_SOLANA_TVL_PAYER_PRIKEY not set!"
-
 export FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq
 
 export \
