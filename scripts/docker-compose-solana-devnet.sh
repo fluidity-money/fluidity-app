@@ -1,6 +1,6 @@
 #!/bin/sh
 
-AUTOMATION_DIR=automation
+automation_dir=automation
 
 warn() {
 	>&2 echo $@
@@ -9,6 +9,8 @@ warn() {
 [ -z "$FLU_SOLANA_WS_URL" ] && warn "FLU_SOLANA_WS_URL not set!"
 [ -z "$FLU_SOLANA_RPC_URL" ] && warn "FLU_SOLANA_RPC_URL not set!"
 [ -z "$FLU_SOLANA_TVL_PAYER_PRIKEY" ] && warn "FLU_SOLANA_TVL_PAYER_PRIKEY not set!"
+
+export FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq
 
 export \
 	FLU_SOLANA_PROGRAM_ID=GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU \
@@ -25,8 +27,9 @@ export \
 	FLU_SOLANA_TVL_SOLEND_PUBKEY=ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx
 
 docker-compose \
-	-f "$AUTOMATION_DIR/docker-compose.infrastructure.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.database-connectors.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.solana.yml" \
-	-f "$AUTOMATION_DIR/docker-compose.solana-connectors.yml" \
+	-f "$automation_dir/docker-compose.rabbitmq.yml" \
+	-f "$automation_dir/docker-compose.infrastructure.yml" \
+	-f "$automation_dir/docker-compose.database-connectors.yml" \
+	-f "$automation_dir/docker-compose.solana.yml" \
+	-f "$automation_dir/docker-compose.solana-connectors.yml" \
 	$@

@@ -1,6 +1,5 @@
 
 FLU_DEBUG=true
-FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq
 FLU_REDIS_ADDR=redis:6379
 FLU_TIMESCALE_URI=postgres://fluidity:fluidity@timescale?sslmode=disable
 FLU_POSTGRES_URI=postgres://fluidity:fluidity@postgres?sslmode=disable
