@@ -9,10 +9,10 @@ services:
     environment:
       FLU_WORKER_ID: microservice-faucet-track-tweets
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK}
       FLU_TWITTER_HASHTAGS: ${FLU_TWITTER_HASHTAGS}
     depends_on:
-      - rabbitmq
       - postgres
 
   microservice-ethereum-faucet-send-amounts:
@@ -22,13 +22,13 @@ services:
     environment:
       FLU_WORKER_ID: microservice-ethereum-faucet-send-amounts
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK}
       FLU_ETHEREUM_TOKENS_LIST: ${FLU_ETHEREUM_TOKENS_LIST}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_FAUCET_PRIVATE_KEY: ${FLU_ETHEREUM_FAUCET_PRIVATE_KEY}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_HARDHAT_FIX}
     depends_on:
-      - rabbitmq
       - contracts-ethereum
 
   faucet.fluidity.money-frontend:
@@ -48,8 +48,7 @@ services:
     environment:
       FLU_WORKER_ID: faucet.fluidity.money-backend
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK}
     ports:
       - "127.0.0.1:8083:80"
-    depends_on:
-      - rabbitmq
