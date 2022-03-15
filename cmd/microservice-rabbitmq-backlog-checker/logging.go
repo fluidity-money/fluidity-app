@@ -1,7 +1,7 @@
 package main
 
 import (
-	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-amqp-backlog-checker/lib"
+	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-rabbitmq-backlog-checker/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log/slack"
 )
 

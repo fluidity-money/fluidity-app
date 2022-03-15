@@ -3,7 +3,7 @@ package main
 import (
 	"strconv"
 
-	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-amqp-backlog-checker/lib"
+	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-rabbitmq-backlog-checker/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
