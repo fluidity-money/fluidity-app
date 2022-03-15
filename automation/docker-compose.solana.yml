@@ -10,8 +10,6 @@ services:
       FLU_WORKER_ID: microservice-solana-transactions
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
-    depends_on:
-      - rabbitmq
 
   microservice-solana-user-actions:
     build:
