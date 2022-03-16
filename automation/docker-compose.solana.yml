@@ -13,7 +13,7 @@ services:
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
     deploy:
       mode: replicated
-      replicas: 100
+      replicas: 50
     restart: unless-stopped
 
   microservice-solana-user-actions:
@@ -29,7 +29,7 @@ services:
       FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY}
     deploy:
       mode: replicated
-      replicas: 100
+      replicas: 50
     restart: unless-stopped
 
   microservice-solana-prize-pool:
