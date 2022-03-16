@@ -2,11 +2,9 @@
 version: "3"
 
 services:
-  worker-solana-server:
-    command: solana-server
+  microservice-solana-worker:
     build:
-      context: ../worker
-      dockerfile: Dockerfile.server
+      context: ../cmd/microservice-solana-worker
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-solana-server

@@ -2,13 +2,12 @@
 version: "3"
 
 services:
-  worker-ethereum-server-usdt:
-    command: ethereum-server
+  microservice-ethereum-worker-server-usdt:
     build:
       context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-ethereum-server-usdt
+      FLU_WORKER_ID: microservice-ethereum-worker-server-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
@@ -17,13 +16,12 @@ services:
       FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
 
-  worker-ethereum-server-usdc:
-    command: ethereum-server
+  microservice-ethereum-worker-server-usdc:
     build:
       context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-ethereum-server-usdc
+      FLU_WORKER_ID: microservice-ethereum-worker-server-usdc
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
@@ -32,13 +30,13 @@ services:
       FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
 
-  worker-ethereum-server-dai:
+  microservice-ethereum-worker-server-dai:
     command: ethereum-server
     build:
       context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-ethereum-server-dai
+      FLU_WORKER_ID: microservice-ethereum-worker-server-dai
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
@@ -47,13 +45,13 @@ services:
       FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
 
-  worker-ethereum-client-dai:
+  microservice-ethereum-worker-client-dai:
     command: ethereum-client
     build:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-ethereum-server-dai
+      FLU_WORKER_ID: microservice-ethereum-worker-server-dai
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
@@ -63,13 +61,13 @@ services:
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_DAI}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
 
-  worker-ethereum-client-usdc:
+  microservice-ethereum-worker-client-usdc:
     command: ethereum-client
     build:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-ethereum-server-usdc
+      FLU_WORKER_ID: microservice-ethereum-worker-server-usdc
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
@@ -79,13 +77,13 @@ services:
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDC}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
 
-  worker-ethereum-client-usdt:
+  microservice-ethereum-worker-client-usdt:
     command: ethereum-client
     build:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-ethereum-server-usdt
+      FLU_WORKER_ID: microservice-ethereum-worker-server-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
