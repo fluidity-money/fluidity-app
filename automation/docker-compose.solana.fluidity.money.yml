@@ -22,3 +22,5 @@ services:
       FLU_WORKER_ID: solana.fluidity.money-backend
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+    ports:
+      - 127.0.0.1:8085:80
