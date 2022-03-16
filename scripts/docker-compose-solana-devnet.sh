@@ -5,6 +5,10 @@ automation_dir=automation
 export FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq
 
 export \
+	FLU_SOLANA_FRONTEND_API_URL=http://localhost:8083 \
+	FLU_SOLANA_FRONTEND_WS_URL=ws://localhost:8083/updates
+
+export \
 	FLU_SOLANA_PROGRAM_ID=GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU \
 	FLU_SOLANA_FLUID_MINT_PUBKEY=2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa \
 	FLU_SOLANA_PDA_PUBKEY=89B3rmx8nL7Zc2t6AhFEbC7g2bkzBZTGGdWEibLe3jBW \
@@ -24,4 +28,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.yml" \
 	-f "$automation_dir/docker-compose.solana-connectors.yml" \
+	-f "$automation_dir/docker-compose.solana.fluidity.money.yml" \
 	$@

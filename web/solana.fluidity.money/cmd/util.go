@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"fmt"
 
-	"github.com/fluidity-money/microservice-lib/web"
-	"github.com/fluidity-money/microservice-lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/web"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 func makeHealthcheckHandler() func(http.ResponseWriter, *http.Request) {
