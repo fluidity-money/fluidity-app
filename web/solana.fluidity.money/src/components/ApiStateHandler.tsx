@@ -136,7 +136,9 @@ const ApiStateHandler = ({ state }: { state: ApiState }) => {
       }
 
       else if (walletAddress === user_action.sender_address) {
-        user_action.type = "send";
+      // if there's no recipient, it's a swap so don't change
+        if (user_action.recipient_address)
+          user_action.type = "send";
         user_action.sender_address = wallet.publicKey.toBase58();
 
         setUserActions(userActions => [user_action, ...userActions]);
