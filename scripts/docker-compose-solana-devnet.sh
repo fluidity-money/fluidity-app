@@ -22,6 +22,8 @@ export \
 	FLU_SOLANA_STARTING_SLOT=latest \
 	FLU_SOLANA_TVL_SOLEND_PUBKEY=ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx
 
+export FLU_SOLANA_DEBUG_FAKE_PAYOUTS=true
+
 docker-compose \
 	-f "$automation_dir/docker-compose.rabbitmq.yml" \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
@@ -30,4 +32,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.solana-transactions-user-actions.yml" \
 	-f "$automation_dir/docker-compose.solana-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.fluidity.money.yml" \
+	-f "$automation_dir/docker-compose.solana-worker.yml" \
 	$@
