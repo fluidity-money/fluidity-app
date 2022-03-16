@@ -13,4 +13,4 @@ export \
 	FLU_AMQP_TOPIC_CONSUME="$queue_name" \
 	FLU_WORKER_ID="$worker_id"
 
-./microservice-amqp-logger.o
+./microservice-common-amqp-logger.o
