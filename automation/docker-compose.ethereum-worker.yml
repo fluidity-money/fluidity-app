@@ -3,6 +3,7 @@ version: "3"
 
 services:
   worker-ethereum-server-usdt:
+    command: ethereum-server
     build:
       context: ../worker
       dockerfile: Dockerfile.server
@@ -10,6 +11,7 @@ services:
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_TOKEN_BACKEND: compound
@@ -19,6 +21,7 @@ services:
       - rabbitmq
 
   worker-ethereum-server-usdc:
+    command: ethereum-server
     build:
       context: ../worker
       dockerfile: Dockerfile.server
@@ -26,6 +29,7 @@ services:
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdc
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_TOKEN_BACKEND: compound
@@ -35,6 +39,7 @@ services:
       - rabbitmq
 
   worker-ethereum-server-dai:
+    command: ethereum-server
     build:
       context: ../worker
       dockerfile: Dockerfile.server
@@ -42,6 +47,7 @@ services:
     environment:
       FLU_WORKER_ID: worker-ethereum-server-dai
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_TOKEN_BACKEND: compound
@@ -51,6 +57,7 @@ services:
       - rabbitmq
 
   worker-ethereum-client-dai:
+    command: ethereum-client
     build:
       context: ../worker
       dockerfile: Dockerfile.client
@@ -58,6 +65,7 @@ services:
     environment:
       FLU_WORKER_ID: worker-ethereum-server-dai
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_DAI}
@@ -68,6 +76,7 @@ services:
       - rabbitmq
 
   worker-ethereum-client-usdc:
+    command: ethereum-client
     build:
       context: ../worker
       dockerfile: Dockerfile.client
@@ -75,6 +84,7 @@ services:
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdc
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDC}
@@ -85,6 +95,7 @@ services:
       - rabbitmq
 
   worker-ethereum-client-usdt:
+    command: ethereum-client
     build:
       context: ../worker
       dockerfile: Dockerfile.client
@@ -92,6 +103,7 @@ services:
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDT}
