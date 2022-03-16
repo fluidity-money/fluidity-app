@@ -23,7 +23,7 @@ services:
       dockerfile: Dockerfile.backend
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ethereum.fluidity.money-backend
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-ethereum.fluidity.money-backend
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
     ports:
