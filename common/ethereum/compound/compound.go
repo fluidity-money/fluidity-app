@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/worker/lib/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
