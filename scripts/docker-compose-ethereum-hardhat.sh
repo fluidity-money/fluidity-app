@@ -4,7 +4,9 @@ automation_dir=automation
 
 flu_ethereum_worker_hardhat_gas_limit=8000000
 
-export FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq
+export \
+	FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq \
+	FLU_UNIVERSE=testing
 
 export \
 	FLU_ETHEREUM_WS_URL=ws://contracts-ethereum:8545 \

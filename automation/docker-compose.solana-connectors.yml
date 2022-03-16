@@ -7,7 +7,7 @@ services:
       context: ../cmd/connector-solana-amqp
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: connector-solana-amqp
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
@@ -21,7 +21,7 @@ services:
       context: ../cmd/connector-solana-tvl-amqp
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: connector-solana-tvl-amqp
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-tvl-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}

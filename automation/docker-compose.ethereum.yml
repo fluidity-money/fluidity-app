@@ -7,7 +7,7 @@ services:
       context: ../cmd/microservice-ethereum-user-actions
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-ethereum-user-actions-usdc
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-user-actions-usdc
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
@@ -19,7 +19,7 @@ services:
       context: ../cmd/microservice-ethereum-user-actions
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-ethereum-user-actions-usdt
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-user-actions-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
@@ -31,7 +31,7 @@ services:
       context: ../cmd/microservice-ethereum-user-actions
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-ethereum-user-actions-dai
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-user-actions-dai
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
@@ -43,7 +43,7 @@ services:
       context: ../cmd/microservice-ethereum-prize-pool
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-ethereum-prize-pool
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-prize-pool
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}

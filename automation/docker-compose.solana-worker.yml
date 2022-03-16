@@ -7,7 +7,7 @@ services:
       context: ../cmd/microservice-solana-worker
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-solana-server
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-worker-solana-server
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}

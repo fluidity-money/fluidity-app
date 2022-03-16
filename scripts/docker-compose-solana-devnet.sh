@@ -2,7 +2,9 @@
 
 automation_dir=automation
 
-export FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq
+export \
+	FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq \
+	FLU_UNIVERSE=testing
 
 export \
 	FLU_SOLANA_FRONTEND_API_URL=http://localhost:8084 \
