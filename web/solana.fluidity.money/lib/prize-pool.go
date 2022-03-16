@@ -3,7 +3,7 @@ package api_fluidity_money
 import (
 	"net/http"
 
-	"github.com/fluidity-money/microservice-lib/databases/postgres/prize-pool"
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/prize-pool"
 )
 
 

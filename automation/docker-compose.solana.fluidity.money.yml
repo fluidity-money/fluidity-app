@@ -1,0 +1,24 @@
+---
+version: "3"
+
+services:
+  solana.fluidity.money-frontend:
+    build:
+      context: ../web/solana.fluidity.money
+      dockerfile: Dockerfile.frontend
+      args:
+        REACT_APP_API_URL: ${FLU_SOLANA_FRONTEND_API_URL}
+        REACT_APP_WEBSOCKET: ${FLU_SOLANA_FRONTEND_WS_URL}
+        REACT_APP_SENTRY_DSN: ${FLU_SENTRY_URL}
+    ports:
+      - 127.0.0.1:8083:80
+
+  solana.fluidity.money-backend:
+    build:
+      context: ../web/solana.fluidity.money
+      dockerfile: Dockerfile.backend
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: solana.fluidity.money-backend
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
