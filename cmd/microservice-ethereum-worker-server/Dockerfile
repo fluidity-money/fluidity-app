@@ -7,5 +7,5 @@ RUN make
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-ethereum-worker-server.o"
+	"./microservice-ethereum-worker-server.o" \
 ]
