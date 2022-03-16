@@ -28,8 +28,6 @@ services:
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_FAUCET_PRIVATE_KEY: ${FLU_ETHEREUM_FAUCET_PRIVATE_KEY}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_HARDHAT_FIX}
-    depends_on:
-      - contracts-ethereum
 
   faucet.fluidity.money-frontend:
     build:
