@@ -5,8 +5,7 @@ services:
   worker-ethereum-server-usdt:
     command: ethereum-server
     build:
-      context: ../worker
-      dockerfile: Dockerfile.server
+      context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdt
@@ -21,8 +20,7 @@ services:
   worker-ethereum-server-usdc:
     command: ethereum-server
     build:
-      context: ../worker
-      dockerfile: Dockerfile.server
+      context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdc
@@ -37,8 +35,7 @@ services:
   worker-ethereum-server-dai:
     command: ethereum-server
     build:
-      context: ../worker
-      dockerfile: Dockerfile.server
+      context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-ethereum-server-dai
@@ -53,8 +50,7 @@ services:
   worker-ethereum-client-dai:
     command: ethereum-client
     build:
-      context: ../worker
-      dockerfile: Dockerfile.client
+      context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-ethereum-server-dai
@@ -70,8 +66,7 @@ services:
   worker-ethereum-client-usdc:
     command: ethereum-client
     build:
-      context: ../worker
-      dockerfile: Dockerfile.client
+      context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdc
@@ -87,8 +82,7 @@ services:
   worker-ethereum-client-usdt:
     command: ethereum-client
     build:
-      context: ../worker
-      dockerfile: Dockerfile.client
+      context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-ethereum-server-usdt

@@ -1,15 +1,10 @@
 package ethereum
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
-	logging "github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 var transferLogTopic = strings.ToLower(
@@ -22,45 +17,31 @@ type Transfer struct {
 	Transaction ethereum.Transaction
 }
 
-func transactionGetTransfers(client *ethclient.Client, fluidContractAddress ethereum.Address, transaction ethereum.Transaction) ([]Transfer, error) {
+// Get transfer receipts
+func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethereum.Address) ([]Transfer, error) {
+	blockTransactions := make(map[ethereum.Hash]ethereum.Transaction)
 
-	transactionHashString := transaction.Hash.String()
-
-	transactionHash := ethCommon.HexToHash(transactionHashString)
-
-	transactionReceipt, err := client.TransactionReceipt(
-		context.Background(),
-		transactionHash,
-	)
-
-	if err != nil {
-		logging.App(func(k *logging.Log) {
-			k.Format(
-				"Failed to get the transaction receipt for transaction hash %#v! Returning nothing!",
-				transactionHashString,
-			)
-
-			k.Payload = err
-		})
-
-		return nil, nil
+	for _, transaction := range transactions {
+		blockTransactions[transaction.Hash] = transaction
 	}
 
 	transfers := make([]Transfer, 0)
+	failedTransactions := make([]ethereum.Hash, 0)
 
-	for _, log := range transactionReceipt.Logs {
+	for _, log := range logs {
+		transactionHash := log.TxHash
 
 		var (
-			transferContractAddress_ = log.Address.Hex()
+			transferContractAddress_ = log.Address.String()
 			topics                   = log.Topics
 		)
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
 
 		if transferContractAddress != string(fluidContractAddress) {
-			debug(
+			Debug(
 				"For transaction hash %#v, contract was %#v, not %#v!",
-				transactionHashString,
+				transactionHash,
 				transferContractAddress,
 				fluidContractAddress,
 			)
@@ -68,12 +49,12 @@ func transactionGetTransfers(client *ethclient.Client, fluidContractAddress ethe
 			continue
 		}
 
-		firstTopic := strings.ToLower(topics[0].Hex())
+		firstTopic := strings.ToLower(topics[0].String())
 
 		if firstTopic != transferLogTopic {
-			debug(
+			Debug(
 				"For transaction hash %#v, first topic %#v != transfer log topic %#v!",
-				transactionHashString,
+				transactionHash,
 				firstTopic,
 				transferLogTopic,
 			)
@@ -82,57 +63,52 @@ func transactionGetTransfers(client *ethclient.Client, fluidContractAddress ethe
 		}
 
 		if len(topics) != 3 {
-			debug(
+			Debug(
 				"Number of topics for transaction hash %#v, topic content %#v length != 3!",
-				transactionHashString,
+				transactionHash,
 				topics,
 			)
 
 			continue
 		}
 
+		// Remove padding 0x from addresses
 		var (
-			fromAddress_ = topics[1].Hex()[26:]
-			toAddress_   = topics[2].Hex()[26:]
+			fromAddress_ = topics[1].String()[26:]
+			toAddress_   = topics[2].String()[26:]
 		)
 
 		fromAddress := ethereum.AddressFromString(fromAddress_)
 
 		toAddress := ethereum.AddressFromString(toAddress_)
 
+		logTransaction, found := blockTransactions[log.TxHash]
+
+		if !found {
+			failedTransactions = append(failedTransactions, log.TxHash)
+		}
+
 		transfer := Transfer{
 			FromAddress: fromAddress,
 			ToAddress:   toAddress,
-			Transaction: transaction,
+			Transaction: logTransaction,
 		}
 
 		transfers = append(transfers, transfer)
 	}
 
-	return transfers, nil
-}
+	err := error(nil)
 
-// GetUserActions by taking the logs from each transaction
-func GetTransfers(client *ethclient.Client, contractAddress ethereum.Address, transactions ...ethereum.Transaction) ([]Transfer, error) {
-
-	transfers := make([]Transfer, 0)
-
-	for _, transaction := range transactions {
-
-		transfers_, err := transactionGetTransfers(client, contractAddress, transaction)
-
-		if err != nil {
-			return nil, fmt.Errorf(
-				"failed to get the logs for transaction hash %#v! %v",
-				transaction.Hash,
-				err,
-			)
-		}
-
-		transfers = append(transfers, transfers_...)
+	if len(failedTransactions) > 0 {
+		err = fmt.Errorf(
+			"Block %v had %v unreferenced txs: %v",
+			blockHash,
+			len(failedTransactions),
+			failedTransactions,
+		)
 	}
 
-	return transfers, nil
+	return transfers, err
 }
 
 // GetTransferRecipient of the transfer function, returning nil if the

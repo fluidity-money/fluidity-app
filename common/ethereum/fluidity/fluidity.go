@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
-
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 const fluidityContractAbiString = `[
@@ -34,30 +34,6 @@ const fluidityContractAbiString = `[
       ],
       "name": "reward",
       "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "transfer",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
       "stateMutability": "nonpayable",
       "type": "function"
     }
@@ -95,7 +71,7 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 		)
 	}
 
-	amountRat, err := coerceBoundContractResultsToRat(results)
+	amountRat, err := ethereum.CoerceBoundContractResultsToRat(results)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -109,22 +85,27 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 
 func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement worker.Announcement) (*ethTypes.Transaction, error) {
 	var (
-		hashString    = announcement.TransactionHash.String()
-		fromString    = announcement.FromAddress.String()
-		toString      = announcement.ToAddress.String()
-		balls         = announcement.SourceRandom
+		hashString = announcement.TransactionHash.String()
+		fromString = announcement.FromAddress.String()
+		toString = announcement.ToAddress.String()
+		ballsUint = announcement.SourceRandom
 		payoutsBigInt = announcement.SourcePayouts
 	)
 
 	var (
-		hash    = ethCommon.HexToHash(hashString)
-		from    = ethCommon.HexToAddress(fromString)
-		to      = ethCommon.HexToAddress(toString)
+		hash = ethCommon.HexToHash(hashString)
+		from = ethCommon.HexToAddress(fromString)
+		to = ethCommon.HexToAddress(toString)
+		balls   []*big.Int
 		payouts []*big.Int
 	)
-
 	for _, p := range payoutsBigInt {
 		payouts = append(payouts, &p.Int)
+	}
+
+	for _, ball := range ballsUint {
+		ballBigInt := big.NewInt(int64(ball))
+		balls = append(balls, ballBigInt)
 	}
 
 	boundContract := ethAbiBind.NewBoundContract(
