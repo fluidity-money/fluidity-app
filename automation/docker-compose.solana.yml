@@ -23,6 +23,8 @@ services:
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
       FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY_USDC}
       FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY_USDC}
+    depends_on:
+      - rabbitmq
 
   microservice-solana-prize-pool-usdc:
     build:
