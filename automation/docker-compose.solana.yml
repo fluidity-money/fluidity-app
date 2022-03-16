@@ -2,7 +2,7 @@
 version: "3"
 
 services:
-  microservice-solana-prize-pool:
+  microservice-solana-prize-pool-usdc:
     build:
       context: ../cmd/microservice-solana-prize-pool
     env_file: ./docker-compose-envs
