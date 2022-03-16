@@ -30,4 +30,6 @@ COPY common ${FLUID_DIR}/common
 COPY lib ${FLUID_DIR}/lib
 COPY cmd ${FLUID_DIR}/cmd
 
+COPY worker ${FLUID_DIR}/worker
+
 RUN rm -rf /go/pkg/mod/cache/
