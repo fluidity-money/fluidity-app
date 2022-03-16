@@ -27,6 +27,7 @@ docker-compose \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.yml" \
+	-f "$automation_dir/docker-compose.solana-transactions-user-actions.yml" \
 	-f "$automation_dir/docker-compose.solana-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.fluidity.money.yml" \
 	$@

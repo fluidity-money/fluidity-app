@@ -2,36 +2,6 @@
 version: "3"
 
 services:
-  microservice-solana-transactions:
-    build:
-      context: ../cmd/microservice-solana-transactions
-    env_file: ./docker-compose-envs
-    environment:
-      FLU_WORKER_ID: microservice-solana-transactions
-      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
-      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
-    deploy:
-      mode: replicated
-      replicas: 50
-    restart: unless-stopped
-
-  microservice-solana-user-actions:
-    build:
-      context: ../cmd/microservice-solana-user-actions
-    env_file: ./docker-compose-envs
-    environment:
-      FLU_WORKER_ID: microservice-solana-user-actions
-      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
-      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
-      FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY}
-      FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY}
-    deploy:
-      mode: replicated
-      replicas: 50
-    restart: unless-stopped
-
   microservice-solana-prize-pool:
     build:
       context: ../cmd/microservice-solana-prize-pool
