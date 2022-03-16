@@ -135,3 +135,32 @@ func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address,
 
 	return transaction, nil
 }
+
+// TransactTransfer using the transfer function in the contract, send
+// to the address with the amount given
+func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipientAddress ethCommon.Address, amount *big.Int, transactionOptions *ethAbiBind.TransactOpts) (*ethTypes.Transaction, error) {
+
+	boundContract := ethAbiBind.NewBoundContract(
+		fluidityContractAddress,
+		fluidityContractAbi,
+		client,
+		client,
+		client,
+	)
+
+	transaction, err := boundContract.Transact(
+		transactionOptions,
+		"transfer",
+		recipientAddress,
+		amount,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to transact the transfer function on Fluidity's contract! %v",
+			err,
+		)
+	}
+
+	return transaction, nil
+}
