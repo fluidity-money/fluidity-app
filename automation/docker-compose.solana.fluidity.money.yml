@@ -1,0 +1,27 @@
+---
+version: "3"
+
+services:
+  solana.fluidity.money-frontend:
+    build:
+      context: ../web/solana.fluidity.money
+      dockerfile: Dockerfile.frontend
+      args:
+        REACT_APP_API_URL: ${FLU_SOLANA_FRONTEND_API_URL}
+        REACT_APP_WALLET_CONNECT_GETH_URI: ${FLU_SOLANA_FRONTEND_GETH_URL}
+        REACT_APP_WEBSOCKET: ${FLU_SOLANA_FRONTEND_WS_URL}
+        REACT_APP_CHAIN_ID: ${FLU_SOLANA_FRONTEND_CHAIN_ID}
+        REACT_APP_TOKEN_CONFIG_FILE: ${FLU_SOLANA_FRONTEND_TOKEN_FILE}
+    ports:
+      - 127.0.0.1:8080:80
+
+  solana.fluidity.money-backend:
+    build:
+      context: ../web/solana.fluidity.money
+      dockerfile: Dockerfile.backend
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: solana.fluidity.money-backend
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+    ports:
+      - 127.0.0.1:8081:80

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fluidity-money/microservice-lib/databases/timescale/user-actions"
-	"github.com/fluidity-money/microservice-lib/log"
-	"github.com/fluidity-money/microservice-lib/web"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
 // maxRequest to use when getting user's user action history

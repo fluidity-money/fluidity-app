@@ -4,7 +4,7 @@ package api_fluidity_money
 // get the size of the prize pool, the historical data of the past winnings
 // and the prize board.
 
-import "github.com/fluidity-money/microservice-lib/types/network"
+import "github.com/fluidity-money/fluidity-app/lib/types/network"
 
 // NetworkSolana to use when looking up data from the database and
 // filtering queue messages
