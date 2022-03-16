@@ -11,7 +11,7 @@ services:
         REACT_APP_WEBSOCKET: ${FLU_SOLANA_FRONTEND_WS_URL}
         REACT_APP_SENTRY_DSN: ${FLU_SENTRY_URL}
     ports:
-      - 127.0.0.1:8083:80
+      - 127.0.0.1:8084:80
 
   solana.fluidity.money-backend:
     build:
