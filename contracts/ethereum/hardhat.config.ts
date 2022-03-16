@@ -8,20 +8,12 @@ const readFile = promisify(readFileCB);
 
 import {
   AAVE_POOL_PROVIDER_ADDR,
-  USDT_ADDR,
-  CUSDT_ADDR,
-  USDT_HOLDER,
-  USDC_ADDR,
-  CUSDC_ADDR,
-  USDC_HOLDER,
-  DAI_ADDR,
-  CDAI_ADDR,
-  TUSD_ADDR,
-  CTUSD_ADDR,
-  TUSD_HOLDER,
-  DAI_HOLDER } from './test-constants';
 
-import {HttpNetworkConfig} from "hardhat/types";
+  USDT_ADDR, USDC_ADDR, DAI_ADDR, TUSD_ADDR, FEI_ADDR,
+  CUSDT_ADDR, CUSDC_ADDR, CDAI_ADDR, CTUSD_ADDR, AFEI_ADDR,
+  USDT_HOLDER, USDC_HOLDER, DAI_HOLDER, TUSD_HOLDER, FEI_HOLDER,
+} from './test-constants';
+
 import { ethers } from "ethers";
 
 type Token = {decimals: number, name: string, symbol: string, address: string, owner: string} & ({backend: 'compound', compoundAddress: string} | {backend: 'aave', aaveAddress: string})
@@ -30,6 +22,7 @@ const TokenList: {[name: string]: Token} = {
     "usdc": {backend: 'compound', compoundAddress: CUSDC_ADDR, decimals: 6, name: "Fluid USDc", symbol: "fUSDc", address: USDC_ADDR, owner: USDC_HOLDER},
     "dai": {backend: 'compound', compoundAddress: CDAI_ADDR, decimals: 18, name: "Fluid DAI", symbol: "fDAI", address: DAI_ADDR, owner: DAI_HOLDER},
     "tusd": {backend: 'compound', compoundAddress: CTUSD_ADDR, decimals: 18, name: "Fluid tUSD", symbol: "ftUSD", address: TUSD_ADDR, owner: TUSD_HOLDER},
+    "fei": {backend: 'aave', aaveAddress: AFEI_ADDR, decimals: 18, name: "Fluid Fei", symbol: "fFei", address: FEI_ADDR, owner: FEI_HOLDER},
 };
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
