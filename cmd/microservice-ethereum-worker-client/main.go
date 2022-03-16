@@ -10,8 +10,8 @@ import (
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/fluidity-money/fluidity-app/worker/lib/ethereum"
-	"github.com/fluidity-money/fluidity-app/worker/lib/probability"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
