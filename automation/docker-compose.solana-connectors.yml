@@ -14,6 +14,7 @@ services:
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_STARTING_SLOT: ${FLU_SOLANA_STARTING_SLOT}
+    restart: unless-stopped
 
   connector-solana-tvl-amqp:
     build:
