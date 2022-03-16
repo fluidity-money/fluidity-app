@@ -12,9 +12,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/fluidity-money/fluidity-app/worker/lib/probability"
-	"github.com/fluidity-money/fluidity-app/worker/lib/solana/fluidity"
-	"github.com/fluidity-money/fluidity-app/worker/lib/solana/solend"
+	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 
 	prizePool "github.com/fluidity-money/fluidity-app/cmd/microservice-solana-prize-pool/lib/solana"
 
