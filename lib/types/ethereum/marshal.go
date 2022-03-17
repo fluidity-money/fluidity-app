@@ -12,14 +12,6 @@ func (blockHeader BlockHeader) MarshalBinary() ([]byte, error) {
 	return marshalJson(blockHeader)
 }
 
-func (blockBody BlockBody) MarshalBinary() ([]byte, error) {
-	return marshalJson(blockBody)
-}
-
-func (block Block) MarshalBinary() ([]byte, error) {
-	return marshalJson(block)
-}
-
 func (transaction Transaction) MarshalBinary() ([]byte, error) {
 	return marshalJson(transaction)
 }
