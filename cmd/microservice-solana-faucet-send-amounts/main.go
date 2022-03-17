@@ -146,8 +146,6 @@ func main() {
 
 		signature, err := fluidity.SendTransfer(
 			solanaClient,
-			TokenProgramAddressPubkey,
-			TokenAssociatedProgramAddressPubkey,
 			senderAddress,
 			recipientAddress,
 			tokenAddress,
