@@ -7,7 +7,7 @@ services:
       context: ../cmd/microservice-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages-testing
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_TESTING}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_TESTING}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_TESTING}
@@ -21,7 +21,7 @@ services:
       context: ../cmd/microservice-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages-production
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_PRODUCTION}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_PRODUCTION}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_PRODUCTION}
