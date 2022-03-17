@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	lib "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-transfers-amqp/lib"
 	ethConvert "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-transfers-amqp/lib/ethereum"
@@ -139,6 +140,10 @@ func main() {
 							k.Payload = err
 						})
 					}
+
+					time.Sleep(time.Second)
+
+					block, err = gethClient.BlockByHash(context.Background(), blockHash)
 				}
 
 				newTransactions, err := ethConvert.ConvertTransactions(blockHash.Hex(), block.Transactions())
