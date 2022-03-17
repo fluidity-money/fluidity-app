@@ -72,11 +72,12 @@ func main() {
 			)
 
 		})
-		if queue.MessagesReady > maxReadyCount {
+
+		if messagesReady > maxReadyCount {
 			reportToSlack(queue, "Ready", messagesReady, maxReadyCount)
 		}
 
-		if queue.MessagesUnacked > maxUnackedCount {
+		if messagesUnacked > maxUnackedCount {
 			reportToSlack(queue, "Unacked", messagesUnacked, maxUnackedCount)
 		}
 	}
