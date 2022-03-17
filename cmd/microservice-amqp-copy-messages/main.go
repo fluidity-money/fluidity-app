@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -13,24 +14,28 @@ import (
 const AmqpExchangeType = "topic"
 
 const (
-	EnvAmqpCopyFromExchange = "ENV_AMQP_COPY_FROM_EXCHANGE"
+	EnvAmqpCopyFromExchange = "FLU_AMQP_COPY_FROM_EXCHANGE"
 
-	EnvAmqpCopyFromUri = "ENV_AMQP_COPY_FROM_URI"
+	EnvAmqpCopyFromUri = "FLU_AMQP_COPY_FROM_URI"
 
-	EnvAmqpCopyFromTopicName = "ENV_AMQP_COPY_FROM_TOPIC_NAME"
+	EnvAmqpCopyFromTopicName = "FLU_AMQP_COPY_FROM_TOPIC_NAME"
 
-	EnvAmqpCopyToExchange = "ENV_AMQP_COPY_TO_EXCHANGE"
+	EnvAmqpCopyToExchange = "FLU_AMQP_COPY_TO_EXCHANGE"
 
-	EnvAmqpCopyToUri = "ENV_AMQP_COPY_TO_URI"
+	EnvAmqpCopyToUri = "FLU_AMQP_COPY_TO_URI"
 
-	EnvAmqpCopyToTopicName = "ENV_AMQP_COPY_TO_TOPIC_NAME"
+	EnvAmqpCopyToTopicName = "FLU_AMQP_COPY_TO_TOPIC_NAME"
 )
 
-func configureReturnChannel(client *amqp.Connection, queueName, topicName, exchangeName string) (*amqp.Channel, error) {
+func generateQueueName(workerId, topicName string) string {
+	return fmt.Sprintf("%s.%s", workerId, topicName)
+}
+
+func configureChannel(client *amqp.Connection, workerId, topicName, exchangeName string) (*amqp.Channel, string, error) {
 	channel, err := client.Channel()
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return nil, "", fmt.Errorf(
 			"failed to get a channel from the AMQP connection! %v",
 			err,
 		)
@@ -47,13 +52,15 @@ func configureReturnChannel(client *amqp.Connection, queueName, topicName, excha
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return nil, "", fmt.Errorf(
 			"failed to declare an exchange with the name given! %v",
 			err,
 		)
 	}
 
-	_, err = channel.TopicDeclare(
+	queueName := generateQueueName(workerId, topicName)
+
+	_, err = channel.QueueDeclare(
 		queueName,
 		true,  // durable
 		false, // autoDelete
@@ -63,14 +70,14 @@ func configureReturnChannel(client *amqp.Connection, queueName, topicName, excha
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return nil, "", fmt.Errorf(
 			"failed to declare a queue with queue name %#v! %v",
 			queueName,
 			err,
 		)
 	}
 
-	err = channel.TopicBind(
+	err = channel.QueueBind(
 		queueName,
 		topicName,
 		exchangeName,
@@ -79,7 +86,7 @@ func configureReturnChannel(client *amqp.Connection, queueName, topicName, excha
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return nil, "", fmt.Errorf(
 			"failed to bind to a queue with name %#v, topic %#v! %v",
 			queueName,
 			topicName,
@@ -87,7 +94,7 @@ func configureReturnChannel(client *amqp.Connection, queueName, topicName, excha
 		)
 	}
 
-	return channel, nil
+	return channel, queueName, nil
 }
 
 func main() {
@@ -99,6 +106,8 @@ func main() {
 		amqpCopyToExchange  = util.GetEnvOrFatal(EnvAmqpCopyToExchange)
 		amqpCopyToUri       = util.GetEnvOrFatal(EnvAmqpCopyToUri)
 		amqpCopyToTopicName = util.GetEnvOrFatal(EnvAmqpCopyToTopicName)
+
+		workerId = util.GetWorkerId()
 	)
 
 	clientFrom, err := amqp.Dial(amqpCopyFromUri)
@@ -110,6 +119,8 @@ func main() {
 		})
 	}
 
+	defer clientFrom.Close()
+
 	clientTo, err := amqp.Dial(amqpCopyToUri)
 
 	if err != nil {
@@ -119,4 +130,91 @@ func main() {
 		})
 	}
 
+	defer clientTo.Close()
+
+	channelFrom, queueFromName, err := configureChannel(
+		clientTo,
+		workerId,
+		amqpCopyFromTopicName,
+		amqpCopyFromExchange,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to configure the channel for the from source!"
+			k.Payload = err
+		})
+	}
+
+	channelTo, _, err := configureChannel(
+		clientFrom,
+		workerId,
+		amqpCopyToTopicName,
+		amqpCopyFromExchange,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to configure the channel for the to source!"
+			k.Payload = err
+		})
+	}
+
+	messages, err := channelFrom.Consume(
+		queueFromName,
+		workerId,
+		false, // autoAck
+		false, // exclusive
+		false, // noLocal
+		false, // noWait
+		nil,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to consume from the channel from!"
+			k.Payload = err
+		})
+	}
+
+	for message := range messages {
+		deliveryTag := message.DeliveryTag
+
+		publishing := amqp.Publishing{
+			DeliveryMode: amqp.Persistent,
+			Timestamp:    time.Now(),
+			ContentType:  "application/json",
+			Body:         message.Body,
+		}
+
+		err := channelTo.Publish(
+			amqpCopyToExchange,
+			amqpCopyToTopicName,
+			true,  // mandatory
+			false, // immediate
+			publishing,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to publish a message to %#v!",
+					amqpCopyToUri,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		if err := channelFrom.Ack(deliveryTag, false); err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to ack a message to %#v!",
+					amqpCopyToUri,
+				)
+
+				k.Payload = err
+			})
+		}
+	}
 }
