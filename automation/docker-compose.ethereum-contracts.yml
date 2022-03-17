@@ -9,3 +9,4 @@ services:
       FLU_ETHEREUM_ORACLE_ADDRESS: ${FLU_ETHEREUM_ORACLE_ADDRESS}
     ports:
       - 127.0.0.1:8545:8545
+    restart: unless-stopped

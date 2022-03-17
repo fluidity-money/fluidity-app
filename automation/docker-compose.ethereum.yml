@@ -13,6 +13,7 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
+    restart: unless-stopped
 
   microservice-ethereum-user-actions-usdt:
     build:
@@ -25,6 +26,7 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
+    restart: unless-stopped
 
   microservice-ethereum-user-actions-dai:
     build:
@@ -37,6 +39,7 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_DAI}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
+    restart: unless-stopped
 
   microservice-ethereum-prize-pool:
     build:

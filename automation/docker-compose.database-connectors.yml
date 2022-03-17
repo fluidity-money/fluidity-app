@@ -12,6 +12,7 @@ services:
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
     depends_on:
       - timescale
+    restart: unless-stopped
 
   connector-common-prize-pool-postgres:
     build:
@@ -24,3 +25,4 @@ services:
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
     depends_on:
       - postgres
+    restart: unless-stopped

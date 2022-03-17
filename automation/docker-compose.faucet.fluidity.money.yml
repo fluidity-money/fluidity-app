@@ -14,6 +14,7 @@ services:
       FLU_TWITTER_HASHTAGS: ${FLU_TWITTER_HASHTAGS}
     depends_on:
       - postgres
+    restart: unless-stopped
 
   microservice-ethereum-faucet-send-amounts:
     build:
@@ -28,6 +29,7 @@ services:
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
       FLU_ETHEREUM_FAUCET_PRIVATE_KEY: ${FLU_ETHEREUM_FAUCET_PRIVATE_KEY}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_HARDHAT_FIX}
+    restart: unless-stopped
 
   microservice-solana-faucet-send-amounts:
     build:
@@ -40,6 +42,7 @@ services:
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
       FLU_SOLANA_FAUCET_PRIVATE_KEY: ${FLU_SOLANA_FAUCET_PRIVATE_KEY}
+    restart: unless-stopped
 
   faucet.fluidity.money-frontend:
     build:
@@ -62,3 +65,4 @@ services:
       FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK_FAUCET_BACKEND}
     ports:
       - "127.0.0.1:8083:80"
+    restart: unless-stopped

@@ -18,6 +18,7 @@ services:
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
       FLU_ETHEREUM_CTOKEN_ADDR: ${FLU_ETHEREUM_CTOKEN_ADDR_USDT}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+    restart: unless-stopped
 
   microservice-ethereum-worker-server-usdc:
     build:
@@ -35,6 +36,7 @@ services:
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
       FLU_ETHEREUM_CTOKEN_ADDR: ${FLU_ETHEREUM_CTOKEN_ADDR_USDC}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+    restart: unless-stopped
 
   microservice-ethereum-worker-server-dai:
     command: ethereum-server
@@ -53,6 +55,7 @@ services:
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
       FLU_ETHEREUM_CTOKEN_ADDR: ${FLU_ETHEREUM_CTOKEN_ADDR_DAI}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+    restart: unless-stopped
 
   microservice-ethereum-worker-client-dai:
     command: ethereum-client
@@ -69,6 +72,7 @@ services:
       FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_DAI}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_DAI}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+    restart: unless-stopped
 
   microservice-ethereum-worker-client-usdc:
     command: ethereum-client
@@ -85,6 +89,7 @@ services:
       FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDC}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDC}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+    restart: unless-stopped
 
   microservice-ethereum-worker-client-usdt:
     command: ethereum-client
@@ -101,3 +106,4 @@ services:
       FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDT}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDT}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+    restart: unless-stopped

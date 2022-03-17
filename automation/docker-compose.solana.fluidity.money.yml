@@ -12,6 +12,7 @@ services:
         REACT_APP_SENTRY_DSN: ${FLU_SENTRY_URL}
     ports:
       - 127.0.0.1:8084:80
+    restart: unless-stopped
 
   solana.fluidity.money-backend:
     build:
@@ -24,3 +25,4 @@ services:
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
     ports:
       - 127.0.0.1:8085:80
+    restart: unless-stopped

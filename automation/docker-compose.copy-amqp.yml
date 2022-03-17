@@ -14,6 +14,7 @@ services:
       FLU_AMQP_COPY_TO_EXCHANGE: ${FLU_AMQP_COPY_TO_EXCHANGE_TESTING}
       FLU_AMQP_COPY_TO_TOPIC_NAME: ${FLU_AMQP_COPY_TO_TOPIC_NAME_TESTING}
       FLU_AMQP_COPY_TO_URI: ${FLU_AMQP_COPY_TO_URI_TESTING}
+    restart: unless-stopped
 
   microservice-amqp-copy-messages-production:
     build:
@@ -27,3 +28,4 @@ services:
       FLU_AMQP_COPY_TO_EXCHANGE: ${FLU_AMQP_COPY_TO_EXCHANGE_PRODUCTION}
       FLU_AMQP_COPY_TO_TOPIC_NAME: ${FLU_AMQP_COPY_TO_TOPIC_NAME_PRODUCTION}
       FLU_AMQP_COPY_TO_URI: ${FLU_AMQP_COPY_TO_URI_PRODUCTION}
+    restart: unless-stopped
