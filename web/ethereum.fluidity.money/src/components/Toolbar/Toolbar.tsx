@@ -1,4 +1,3 @@
-import Button from "components/Button";
 import React from "react";
 import { useEffect } from "react";
 
@@ -7,15 +6,15 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
   const [chainId, setChainId] = React.useState<string>();
 
   const checkNetworkOnLoad = async () => {
-    const chainId = await (window as any).ethereum.request({
+    const chain = await (window as any).ethereum.request({
       method: "eth_chainId",
     });
-    if (chainId !== `0x${process.env.REACT_APP_CHAIN_ID}`) {
+    if (`${chain}` !== `0x${process.env.REACT_APP_CHAIN_ID}`) {
       setDesiredNetwork(false);
-      setChainId(chainId.substring(2));
+      setChainId(chain.substring(2));
     } else {
       setDesiredNetwork(true);
-      setChainId(chainId.substring(2));
+      setChainId(chain.substring(2));
     }
   };
 
@@ -23,7 +22,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
     if ((window as any).ethereum) {
       (window as any).ethereum.on("chainChanged", () => {
         if (
-          (window as any).ethereum.chainId !==
+          `${(window as any).ethereum.chainId}` !==
           `0x${process.env.REACT_APP_CHAIN_ID}`
         ) {
           setDesiredNetwork(false);
@@ -65,14 +64,6 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
               {` change network in wallet`}
             </a>
             {` or   `}
-            {/* <Button
-            label={"Change Network"}
-            theme="primary-text"
-            texttheme="header-text"
-            goto={() => (window.location.href = "https://chainlist.org/")}
-            priviledge={0}
-            selected={true}
-          /> */}
           </div>
           <a
             className="change-network-link"
