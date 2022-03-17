@@ -4,8 +4,9 @@ package ethereum
 // state
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"strings"
+
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 // Some of the less complicated types that shadow the definition provided
@@ -37,20 +38,6 @@ type (
 		BaseFee         misc.BigInt `json:"base_fee"`
 	}
 
-	// BlockBody contains the block fields that aren't included in the header
-	BlockBody struct {
-		Uncles       []BlockHeader `json:"uncles"`
-		Transactions []Transaction `json:"transactions"`
-	}
-
-	// Block submitted on-chain on Ethereum, may be forked
-	Block struct {
-		Header BlockHeader `json:"block_header"`
-		Body   BlockBody   `json:"block_body"`
-		Hash   Hash        `json:"block_hash"`
-		Number uint64      `json:"block_number"`
-	}
-
 	// Transaction made on Ethereum, may be forked
 	Transaction struct {
 		BlockHash Hash        `json:"block_hash"`
@@ -69,7 +56,7 @@ type (
 		Value     misc.BigInt `json:"value"`
 
 		// Receipt is a transaction receipt collected optionally!
-		Receipt   *Receipt    `json:"receipt"`
+		Receipt *Receipt `json:"receipt"`
 	}
 
 	// Log represents a contract event log that we have confirmed isn't removed

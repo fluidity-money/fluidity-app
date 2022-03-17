@@ -12,7 +12,9 @@ import (
 
 type MarshalTestSuite struct {
 	suite.Suite
-	block Block
+	testHeader  BlockHeader
+	testTx      Transaction
+	testReceipt Receipt
 }
 
 func (suite *MarshalTestSuite) SetupTest() {
@@ -80,15 +82,9 @@ func (suite *MarshalTestSuite) SetupTest() {
 		Receipt:   &testReceipt,
 	}
 
-	suite.block = Block{
-		Header: testHeader,
-		Body: BlockBody{
-			Uncles:       []BlockHeader{testHeader},
-			Transactions: []Transaction{testTx},
-		},
-		Hash:   HashFromString("blockhash"),
-		Number: 123,
-	}
+	suite.testHeader = testHeader
+	suite.testTx = testTx
+	suite.testReceipt = testReceipt
 }
 
 func TestBlobTestSuite(t *testing.T) {
@@ -98,7 +94,7 @@ func TestBlobTestSuite(t *testing.T) {
 func (suite *MarshalTestSuite) TestMarshal() {
 
 	suite.T().Run("TestMarshalHeader", func(t *testing.T) {
-		header := suite.block.Header
+		header := suite.testHeader
 
 		bin, err := header.MarshalBinary()
 		require.NoError(t, err)
@@ -109,32 +105,8 @@ func (suite *MarshalTestSuite) TestMarshal() {
 		assert.Equal(t, header, newHeader)
 	})
 
-	suite.T().Run("TestMarshalBlockBody", func(t *testing.T) {
-		body := suite.block.Body
-
-		bin, err := body.MarshalBinary()
-		require.NoError(t, err)
-
-		var newBody BlockBody
-		json.Unmarshal(bin, &newBody)
-
-		assert.Equal(t, body, newBody)
-	})
-
-	suite.T().Run("TestMarshalBlock", func(t *testing.T) {
-		block := suite.block
-
-		bin, err := block.MarshalBinary()
-		require.NoError(t, err)
-
-		var newBlock Block
-		json.Unmarshal(bin, &newBlock)
-
-		assert.Equal(t, block, newBlock)
-	})
-
 	suite.T().Run("TestMarshalTransaction", func(t *testing.T) {
-		txn := suite.block.Body.Transactions[0]
+		txn := suite.testTx
 
 		bin, err := txn.MarshalBinary()
 		require.NoError(t, err)
@@ -146,7 +118,7 @@ func (suite *MarshalTestSuite) TestMarshal() {
 	})
 
 	suite.T().Run("TestMarshalLog", func(t *testing.T) {
-		log := suite.block.Body.Transactions[0].Receipt.Logs[0]
+		log := suite.testReceipt.Logs[0]
 
 		bin, err := log.MarshalBinary()
 		require.NoError(t, err)
@@ -158,7 +130,7 @@ func (suite *MarshalTestSuite) TestMarshal() {
 	})
 
 	suite.T().Run("TestMarshalReceipt", func(t *testing.T) {
-		receipt := *suite.block.Body.Transactions[0].Receipt
+		receipt := suite.testReceipt
 
 		bin, err := receipt.MarshalBinary()
 		require.NoError(t, err)
