@@ -7,7 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
-var transferLogTopic = strings.ToLower(
+var TransferLogTopic = strings.ToLower(
 	"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
 )
 
@@ -56,7 +56,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 				"For transaction hash %#v, first topic %#v != transfer log topic %#v!",
 				transactionHash,
 				firstTopic,
-				transferLogTopic,
+				TransferLogTopic,
 			)
 
 			continue
@@ -117,6 +117,8 @@ func GetTransferRecipient(transaction ethereum.Transaction) (ethereum.Address, e
 	return ethereum.AddressFromString("0x0000000000000000000000000000000000000000"), nil
 }
 
+// IsTransferLogTopic returns whether given string matches signature of
+// the fluid transfer ABI
 func IsTransferLogTopic(topic string) bool {
-	return topic == transferLogTopic
+	return topic == TransferLogTopic
 }
