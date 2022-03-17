@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	libEthereum "github.com/fluidity-money/fluidity-app/worker/lib/ethereum"
-	"github.com/fluidity-money/fluidity-app/worker/lib/ethereum/fluidity"
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
