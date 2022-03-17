@@ -75,10 +75,6 @@ const (
 	// SolanaBlockTime assumed by the ATX calculation
 	SolanaBlockTime uint64 = 1
 
-	// PayoutVariant is the variant number of the instruction that's called to
-	// trigger a reward payout
-	PayoutVariant uint8 = 2
-
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
@@ -379,8 +375,8 @@ func main() {
 				solanaAccountPayer,
 			}
 
-			payoutInstruction := fluidity.PayoutInstruction{
-				PayoutVariant,
+			payoutInstruction := fluidity.InstructionPayout{
+				fluidity.VariantPayout,
 				winningAmount,
 				TokenName,
 				BumpSeed,
