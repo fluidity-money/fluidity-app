@@ -1,0 +1,15 @@
+---
+version: "3"
+
+services:
+  microservice-amqp-copy-messages:
+    build:
+      context: ../cmd/microservice-amqp-copy-messages
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages
+      FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE}
+      FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME}
+      FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI}
+      FLU_AMQP_COPY_TO_EXCHANGE: ${FLU_AMQP_COPY_TO_EXCHANGE}
+      FLU_AMQP_COPY_TO_TOPIC_NAME: ${FLU_AMQP_COPY_TO_TOPIC_NAME}
+      FLU_AMQP_COPY_TO_URI: ${FLU_AMQP_COPY_TO_URI}
