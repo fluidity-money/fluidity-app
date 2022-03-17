@@ -1,4 +1,4 @@
-connector-block-fluid-transactions
+connector-ethereum-block-fluid-txns
 docker
 test
 lint
