@@ -1,14 +1,13 @@
 
-FROM fluidity/go-docker:latest
+FROM fluidity/build-container:latest
 
-ENV REPO connector-block-fluid-transactions
-
-ENV DIR /usr/src/${REPO}
-
-COPY . ${DIR}
-
-WORKDIR ${DIR}
+WORKDIR /usr/local/src/fluidity/cmd/connector-ethereum-block-fluid-txns
 
 RUN make
 
-ENTRYPOINT [ "./connector-block-fluid-transactions" ]
+ENTRYPOINT [ \
+    "wait-for-ws", \
+    "wait-for-amqp", \
+    "./connector-block-fluid-transactions.o" \
+]
+
