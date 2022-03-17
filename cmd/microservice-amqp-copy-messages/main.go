@@ -139,7 +139,7 @@ func main() {
 	defer clientTo.Close()
 
 	channelFrom, queueFromName, err := configureChannel(
-		clientTo,
+		clientFrom,
 		workerId,
 		amqpCopyFromTopicName,
 		amqpCopyFromExchange,
@@ -153,10 +153,10 @@ func main() {
 	}
 
 	channelTo, _, err := configureChannel(
-		clientFrom,
+		clientTo,
 		workerId,
 		amqpCopyToTopicName,
-		amqpCopyFromExchange,
+		amqpCopyToExchange,
 	)
 
 	if err != nil {
