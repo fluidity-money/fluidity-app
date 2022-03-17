@@ -52,7 +52,11 @@ func main() {
 		}
 
 		if debugEnabled {
-			log.Print(err)
+			log.Printf(
+				"Failed to connect to %#v! %v",
+				wsAddress,
+				err,
+			)
 		}
 	}
 
