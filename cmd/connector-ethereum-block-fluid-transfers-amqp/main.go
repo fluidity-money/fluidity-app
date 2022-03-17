@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"net/http"
 
-	lib "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-txns/lib"
-	ethConvert "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-txns/lib/ethereum"
+	lib "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-transfers-amqp/lib"
+	ethConvert "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-transfers-amqp/lib/ethereum"
 
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -119,13 +119,17 @@ func main() {
 			}
 
 			if !header.Bloom.Test(transferLogTopic) {
+
 				log.Debug(func(k *log.Log) {
 					k.Format("Block %v did NOT contain transfer ABI topic", blockHash)
 				})
+
 			} else {
+
 				log.Debug(func(k *log.Log) {
 					k.Format("Block %v contains transfer ABI topic", blockHash)
 				})
+
 				block, err := gethClient.BlockByHash(context.Background(), blockHash)
 
 				for tries := 0; err != nil; tries++ {
@@ -150,6 +154,7 @@ func main() {
 
 				// Block contains log with ABI hash in its topics
 				// Guaranteed to be signature - Order dependent
+
 				logsParams := lib.LogParams{
 					BlockHash: blockHash.Hex(),
 					Topics:    []string{common.TransferLogTopic},

@@ -13,13 +13,14 @@ services:
       FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
       FLU_ETHEREUM_START_BLOCK: ${FLU_ETHEREUM_START_BLOCK}
 
-  connector-ethereum-blocks-amqp:
+  connector-ethereum-block-fluid-transfers-amqp:
     build:
-      context: ../cmd/connector-ethereum-blocks-amqp
+      context: ../cmd/connector-ethereum-block-fluid-transfers-amqp
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-ethereum-blocks-amqp
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-ethereum-block-fluid-transfers-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
