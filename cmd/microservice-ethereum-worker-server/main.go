@@ -113,8 +113,13 @@ var AtxBufferSize = roundUp(SecondsInOneYear / DefaultSecondsSinceLastBlock)
 
 func main() {
 	var (
-		contractAddress_            = util.GetEnvOrFatal(EnvContractAddress)
-		tokenBackend                = util.GetEnvOrFatal(EnvTokenBackend)
+		contractAddress_         = util.GetEnvOrFatal(EnvContractAddress)
+		tokenBackend             = util.GetEnvOrFatal(EnvTokenBackend)
+		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
+		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
+		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
+		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+
 		cTokenAddress_              = os.Getenv(EnvCTokenAddress)
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
 		aTokenAddress_              = os.Getenv(EnvATokenAddress)
@@ -122,10 +127,6 @@ func main() {
 		ethTokenAddress_            = os.Getenv(EnvEthTokenAddress)
 		underlyingTokenAddress_     = os.Getenv(EnvUnderlyingTokenAddress)
 		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
-		ethereumUrl                 = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		tokenName                   = util.GetEnvOrFatal(EnvUnderlyingTokenName)
-		underlyingTokenDecimals_    = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
-		publishAmqpQueueName        = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 	)
 
 	rand.Seed(time.Now().Unix())
