@@ -59,9 +59,5 @@ func main() {
 		})
 	}()
 
-	healthcheckHandler := makeHealthcheckHandler()
-
-	web.Endpoint("/healthcheck", healthcheckHandler)
-
 	web.Listen()
 }
