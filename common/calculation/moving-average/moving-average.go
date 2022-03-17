@@ -1,6 +1,6 @@
 package moving_average
 
-// use redis with the state package in lib to store a ring
+// use redis with the state package in fluidity-app/lib to store a ring
 // buffer and recalculate moving averages on the fly
 
 import (
@@ -31,6 +31,12 @@ func CalculateMovingAverage(key string) (*int, error) {
 		state.Rpop(key)
 	}
 
+	// avoid dividing by zero if no bytes are stored
+	if valuesBytesLen == 0 {
+		zero := 0
+		return &zero, nil
+	}
+
 	var average int
 
 	for _, valueBytes := range valuesBytes {
@@ -41,7 +47,7 @@ func CalculateMovingAverage(key string) (*int, error) {
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"failed to convert %#v to an int for a aveage conversion from Redis! %v",
+				"failed to convert %#v to an int for an average conversion from Redis! %v",
 				value,
 				err,
 			)
@@ -65,6 +71,12 @@ func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 
 	if valuesBytesLen > BufferSize {
 		state.Rpop(key)
+	}
+
+	// avoid dividing by zero if no bytes are stored
+	if valuesBytesLen == 0 {
+		zero := big.NewRat(0, 1)
+		return zero, nil
 	}
 
 	average := new(big.Rat)

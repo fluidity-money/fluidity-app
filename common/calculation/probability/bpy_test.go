@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
-
 	"github.com/stretchr/testify/assert"
 )
 

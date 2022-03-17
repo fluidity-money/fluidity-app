@@ -2,11 +2,11 @@
 version: "3"
 
 services:
-  connector-tvl-timescale:
-    build: ../cmd/connector-tvl-timescale
+  connector-common-tvl-timescale:
+    build: ../cmd/connector-common-tvl-timescale
   env_file: ./docker-compose-envs
   environment:
-    FLU_WORKER_ID: connector-tvl-timescale
+    FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-common-tvl-timescale
     FLU_SENTRY_URL: ${FLU_SENTRY_URL}
     FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
   depends_on:

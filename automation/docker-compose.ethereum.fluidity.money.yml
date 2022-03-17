@@ -13,6 +13,7 @@ services:
         REACT_APP_CHAIN_ID: ${FLU_ETHEREUM_FRONTEND_CHAIN_ID}
         REACT_APP_WALLET_CONNECT_GETH_URI: ${FLU_ETHEREUM_FRONTEND_GETH_URL}
         REACT_APP_TOKEN_CONFIG_FILE: ${FLU_ETHEREUM_FRONTEND_TOKEN_FILE}
+        REACT_APP_SENTRY_DSN: ${FLU_SENTRY_URL}
     ports:
       - 127.0.0.1:8080:80
 
@@ -22,7 +23,7 @@ services:
       dockerfile: Dockerfile.backend
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ethereum.fluidity.money-backend
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-ethereum.fluidity.money-backend
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
     ports:

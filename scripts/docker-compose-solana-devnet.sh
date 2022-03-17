@@ -2,7 +2,13 @@
 
 automation_dir=automation
 
-export FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq
+export \
+	FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq \
+	FLU_UNIVERSE=testing
+
+export \
+	FLU_SOLANA_FRONTEND_API_URL=http://localhost:8084 \
+	FLU_SOLANA_FRONTEND_WS_URL=ws://localhost:8084/updates
 
 export \
 	FLU_SOLANA_PROGRAM_ID=GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU \
@@ -18,10 +24,15 @@ export \
 	FLU_SOLANA_STARTING_SLOT=latest \
 	FLU_SOLANA_TVL_SOLEND_PUBKEY=ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx
 
+export FLU_SOLANA_DEBUG_FAKE_PAYOUTS=true
+
 docker-compose \
 	-f "$automation_dir/docker-compose.rabbitmq.yml" \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.yml" \
+	-f "$automation_dir/docker-compose.solana-transactions-user-actions.yml" \
 	-f "$automation_dir/docker-compose.solana-connectors.yml" \
+	-f "$automation_dir/docker-compose.solana.fluidity.money.yml" \
+	-f "$automation_dir/docker-compose.solana-worker.yml" \
 	$@

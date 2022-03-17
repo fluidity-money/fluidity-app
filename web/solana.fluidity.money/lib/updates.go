@@ -1,9 +1,9 @@
 package api_fluidity_money
 
 import (
-	"github.com/fluidity-money/microservice-lib/types/prize-pool"
-	"github.com/fluidity-money/microservice-lib/types/user-actions"
-	"github.com/fluidity-money/microservice-lib/types/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/prize-pool"
+	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
 // Update is relayed over websocket when an update event happens

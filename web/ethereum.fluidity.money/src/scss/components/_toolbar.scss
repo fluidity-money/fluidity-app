@@ -70,23 +70,56 @@
   font-family: "Manrope";
   width: 100%;
   text-align: center;
-  padding: 5px;
-  top: 60px;
-  font-size: 0.4rem;
-
-  @include for-tablet-portrait-up {
-    font-size: 0.5rem;
-  }
+  padding: 8px;
+  top: 55px;
+  font-size: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   @include for-tablet-landscape-up {
-    font-size: 0.7rem;
+    flex-direction: row;
   }
 
   @include for-desktop-up {
     font-size: 1rem;
+    flex-direction: row;
   }
 }
 
-.change-network-link {
+.learn-change-network-link {
   text-decoration: underline;
+}
+
+.change-network-link {
+  text-decoration: none;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  padding: 0.1rem 0.4rem 0.1rem 0.4rem;
+  border-radius: 6px;
+  width: 15%;
+  &:hover {
+    text-decoration: none;
+    opacity: 0.9;
+  }
+  @include for-tablet-portrait-up {
+    width: 15%;
+  }
+
+  @include for-tablet-landscape-up {
+    width: auto;
+    margin-left: 0.2rem;
+  }
+
+  @include for-desktop-up {
+    width: auto;
+    margin-left: 0.5rem;
+  }
+
+  @include for-below-550 {
+    width: 95%;
+    margin-top: 4px;
+  }
 }

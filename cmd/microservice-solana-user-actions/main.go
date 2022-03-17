@@ -41,7 +41,7 @@ func main() {
 		for _, transaction := range transactions {
 			if err := transaction.Result.Meta.Err; err != nil {
 				log.Debug(func(k *log.Log) {
-					k.Message = "Skipping failed tranaction!"
+					k.Message = "Skipping failed transaction!"
 					k.Payload = err
 				})
 

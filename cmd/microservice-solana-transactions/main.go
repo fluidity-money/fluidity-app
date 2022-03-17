@@ -27,7 +27,7 @@ func main() {
 		}
 
 		log.Debug(func (k *log.Log) {
-			k.Format("Fetched block %d, tranactions %d", slot.Slot, len(block.Transactions))
+			k.Format("Fetched block %d, transactions %d", slot.Slot, len(block.Transactions))
 		})
 
 		parsedTransactions := make([]solanaQueue.Transaction, len(block.Transactions))

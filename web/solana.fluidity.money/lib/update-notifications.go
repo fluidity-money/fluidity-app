@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/url"
 
-	"github.com/fluidity-money/microservice-lib/log"
-	"github.com/fluidity-money/microservice-lib/web/websocket"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
 )
 
 // HandleUpdateNotifications sends update notifications to every subscribed
