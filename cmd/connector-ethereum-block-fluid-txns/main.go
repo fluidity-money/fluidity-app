@@ -14,7 +14,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	workerQueue "github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	worker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -113,7 +112,7 @@ func main() {
 			})
 
 			amqpBlock := worker.BlockLog{
-				BlockHash:    ethereum.HashFromString(blockHash.Hex()),
+				BlockHash:    types.HashFromString(blockHash.Hex()),
 				BlockBaseFee: newHeader.BaseFee,
 				BlockTime:    newHeader.Time,
 				BlockNumber:  blockNumber,
