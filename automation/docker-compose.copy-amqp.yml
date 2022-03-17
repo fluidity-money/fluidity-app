@@ -5,6 +5,7 @@ services:
   microservice-amqp-copy-messages:
     build:
       context: ../cmd/microservice-amqp-copy-messages
+    env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE}
