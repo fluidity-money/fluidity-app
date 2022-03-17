@@ -9,7 +9,7 @@ import (
 
 func HandlePrizePool(w http.ResponseWriter, r *http.Request) interface{} {
 
-	prizePool := prize_pool.GetPrizePool(NetworkSolana)
+	prizePool := prize_pool.GetPrizePool(NetworkEthereum)
 
 	if prizePool == nil {
 		prizePool = new(prize_pool.PrizePool)

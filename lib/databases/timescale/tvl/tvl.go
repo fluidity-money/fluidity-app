@@ -115,7 +115,7 @@ func GetDailyAverageTvl(network network.BlockchainNetwork, days int64) *big.Rat 
 		if success != true {
 			log.Debug(func (k *log.Log) {
 				k.Context = Context
-			    k.Format("Failed to read daily average %d as a rational number!", averageString)
+			    k.Format("Failed to read daily average %v as a rational number!", averageString)
 			})
 		}
 

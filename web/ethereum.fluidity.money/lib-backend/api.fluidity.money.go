@@ -6,6 +6,6 @@ package api_fluidity_money
 
 import "github.com/fluidity-money/fluidity-app/lib/types/network"
 
-// NetworkSolana to use when looking up data from the database and
+// NetworkEthereum to use when looking up data from the database and
 // filtering queue messages
-const NetworkSolana = network.NetworkSolana
+const NetworkEthereum = network.NetworkEthereum

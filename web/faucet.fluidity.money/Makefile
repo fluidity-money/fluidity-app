@@ -1,78 +1,79 @@
 
-include config.mk
+REPO := faucet.fluidity.money
 
-include frontend-config.mk
-include backend-config.mk
+FRONTEND_SRC_DIR := src
+BACKEND_SRC_DIR := cmd
 
-build: backend frontend
+FRONTEND_SRC_TS_DIR := ${FRONTEND_SRC_DIR}
+FRONTEND_SRC_SASS_DIR := ${FRONTEND_SRC_DIR}/scss
 
-backend: ${REPO}
+FRONTEND_SRC_TS := \
+	$(shell find ${FRONTEND_SRC_TS_DIR} -name '*ts*')
 
-javascript: ${FRONTEND_DIST_JS}
-html: ${FRONTEND_DIST_HTML}
-misc: ${FRONTEND_DIST_MISC_ARTIFACT}
+FRONTEND_SRC := ${FRONTEND_SRC_TS}
 
-frontend: \
-	javascript \
-	html \
-	misc
+FRONTEND_BUILD_DIR := build
 
-docker: frontend-docker backend-docker
+FRONTEND_BUILD_INDEX_JS := ${FRONTEND_BUILD_DIR}/index.js
+FRONTEND_BUILD_INDEX_HTML := ${FRONTEND_BUILD_DIR}/index.html
 
-frontend-docker: ${FRONTEND_DIST_DOCKER}
+include ../../web.mk
 
-.PHONY: \
-	clean \
-	docker \
-	backend \
-	javascript \
-	html \
-	misc \
-	frontend \
-	run-frontend-docker \
-	run-backend-docker \
-	run
+FRONTEND_IMAGES_DIR := ${FRONTEND_PUBLIC_DIR}/images
 
-${REPO}: ${BACKEND_SRC_FILES}
-	@cd ${BACKEND_SRC_DIR} && ${GO_BUILD} -o ../${REPO}
+FRONTEND_IMAGES := \
+	$(shell find ${FRONTEND_IMAGES_DIR} \
+		-name '*.png' \
+		-or -name '*.svg')
 
-${FRONTEND_DIST_JS}: ${FRONTEND_SRC_FILES} ${FRONTEND_PUBLIC_FILES}
-	@${WEBPACK} --mode production
+FRONTEND_PUBLIC_INDEX_HTML := ${FRONTEND_PUBLIC_DIR}/index.html
+FRONTEND_PUBLIC_MANIFEST := ${FRONTEND_PUBLIC_DIR}/manifest.json
 
-${FRONTEND_DIST_HTML}: ${FRONTEND_PUBLIC_HTML}
-	@cp ${FRONTEND_PUBLIC_HTML} ${FRONTEND_DIST_HTML}
+FRONTEND_BUILD_IMAGES := build-images
 
-${FRONTEND_DIST_MISC_ARTIFACT}: ${FRONTEND_PUBLIC_MISC_FILES}
-	@find ${FRONTEND_PUBLIC_DIR} \
-		-maxdepth 1 \
-		! -name index.html \
-		! -path ${FRONTEND_PUBLIC_DIR} \
-		-exec cp -r {} ${FRONTEND_DIST_DIR} \;
+${FRONTEND_BUILD_INDEX_HTML}: ${FRONTEND_PUBLIC_INDEX_HTML}
+	@cp ${FRONTEND_PUBLIC_INDEX_HTML} ${FRONTEND_BUILD_INDEX_HTML}
 
-	@touch ${FRONTEND_DIST_MISC_ARTIFACT}
+FRONTEND_BUILD_MANIFEST := ${FRONTEND_BUILD_DIR}/manifest.json
+FRONTEND_BUILD_CSS := ${FRONTEND_BUILD_DIR}/index.css
 
-${FRONTEND_DIST_DOCKER}: Dockerfile.frontend ${FRONTEND_SRC_FILES}
+${FRONTEND_BUILD_IMAGES}: ${FRONTEND_IMAGES}
+	@mkdir -p ${FRONTEND_BUILD_DIR}/images
+	@cp -r ${FRONTEND_IMAGES_DIR} ${FRONTEND_BUILD_DIR}
+	@touch ${FRONTEND_BUILD_IMAGES}
+
+${FRONTEND_BUILD_MANIFEST}: ${FRONTEND_PUBLIC_MANIFEST}
+	@cp ${FRONTEND_PUBLIC_MANIFEST} ${FRONTEND_BUILD_MANIFEST}
+
+${FRONTEND_BUILD_CSS}: ${FRONTEND_PUBLIC_CSS}
+	@cp ${FRONTEND_PUBLIC_CSS} ${FRONTEND_BUILD_CSS}
+
+FRONTEND_BUILD_MISC_FILES := \
+	${FRONTEND_BUILD_IMAGES} \
+	${FRONTEND_BUILD_INDEX_HTML} \
+	${FRONTEND_BUILD_MANIFEST} \
+	${FRONTEND_BUILD_CSS}
+
+all: frontend backend
+
+js: ${FRONTEND_BUILD_INDEX_JS}
+
+assets: ${FRONTEND_BUILD_MISC_FILES}
+
+${FRONTEND_BUILD_INDEX_JS}: ${FRONTEND_SRC_TS} ${FRONTEND_TSCONFIG_JSON}
+	@${NPX_WEBPACK} build
+
+${FRONTEND_BUILD}: js assets
+	@touch ${FRONTEND_BUILD}
+
+docker-frontend: ${FRONTEND_SRC}
 	@${DOCKER_BUILD} \
-		--build-arg \
-			REACT_APP_FLU_API_URI=localhost \
-		-f Dockerfile.frontend -t fluidity/${REPO}-frontend .
-	@touch ${FRONTEND_DIST_DOCKER}
+		--build-arg=REACT_APP_FLU_API_URI="${REACT_APP_FLU_API_URI}" \
+		-t "${ORG_ROOT}/${REPO}-frontend" \
+		-f Dockerfile.frontend \
+		.
 
-${BACKEND_DOCKER_ARTIFACT}: Dockerfile.backend ${BACKEND_SRC_FILES}
-	@${DOCKER_BUILD} -f Dockerfile.backend -t fluidity/${REPO}-backend .
-	@touch ${BACKEND_DOCKER_ARTIFACT}
+	@touch docker-frontend
 
-run-frontend-docker: ${FRONTEND_DIST_DOCKER}
-	@${DOCKER_RUN} -p 3000:80 fluidity/${REPO}-frontend
-
-run-backend-docker: ${BACKEND_DOCKER_ARTIFACT}
-	@${DOCKER_RUN} -p 8080:80 fluidity/${REPO}-backend
-
-run: ${FRONTEND_DIST_DOCKER} ${BACKEND_DOCKER_ARTIFACT}
-	@${DOCKER_COMPOSE} up
-
-clean:
-	@rm -rf \
-		${FRONTEND_DIST_DIR}/* \
-		${REPO} \
-		${BACKEND_DOCKER_ARTIFACT}
+watch:
+	@${NPX_WEBPACK} watch

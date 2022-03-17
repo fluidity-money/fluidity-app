@@ -7,5 +7,5 @@ import (
 )
 
 func HandlePastWinnings(w http.ResponseWriter, r *http.Request) interface{} {
-	return past_winnings.GetPastWinnings(NetworkSolana, 30)
+	return past_winnings.GetPastWinnings(NetworkEthereum, 30)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
@@ -97,7 +98,7 @@ func GetBalanceOfUnderlying(client *ethclient.Client, cTokenAddress, contractAdd
 		)
 	}
 
-	amountRat, err := coerceBoundContractResultsToRat(results)
+	amountRat, err := ethereum.CoerceBoundContractResultsToRat(results)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -141,7 +142,7 @@ func GetTokenApy(client *ethclient.Client, cTokenAddress ethCommon.Address, bloc
 		)
 	}
 
-	supplyRatePerBlockRat, err := coerceBoundContractResultsToRat(results)
+	supplyRatePerBlockRat, err := ethereum.CoerceBoundContractResultsToRat(results)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -167,7 +168,7 @@ func GetTokenApy(client *ethclient.Client, cTokenAddress ethCommon.Address, bloc
 
 	powLeftSide := new(big.Rat).Add(supplyRatePerBlockMulBlocksPerDay, oneRat)
 
-	powLeftSideDaysPerYear := bigPow(powLeftSide, daysPerYear)
+	powLeftSideDaysPerYear := ethereum.BigPow(powLeftSide, daysPerYear)
 
 	powLeftSideDaysPerYearMinOne := new(big.Rat).Sub(powLeftSideDaysPerYear, oneRat)
 

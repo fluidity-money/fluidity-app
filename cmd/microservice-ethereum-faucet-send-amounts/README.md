@@ -15,6 +15,7 @@ response to messages over the wire.
 | `FLU_ETHEREUM_TOKENS_LIST`        | List of tokens to track, of the form `ADDR1:fTOKEN1,ADDR2:fTOKEN2,...`       |
 | `FLU_ETHEREUM_HTTP_URL`           | Address to use to connect to Geth to query the state of the balance with.    |
 | `FLU_ETHEREUM_FAUCET_PRIVATE_KEY` | Private key to sign requests to send amounts with.                           |
+| `FLU_ETHEREUM_HARDHAT_FIX`        | Set to `true` to use a fix that supports using Hardhat.                      |
 
 ## Building
 

@@ -7,9 +7,15 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const TopicAnnouncements = "worker.announcements"
+const (
+	TopicAnnouncements = "worker.announcements"
+	TopicBlockLogs     = "worker.blocks"
+)
 
-type Announcement = worker.Announcement
+type (
+	Announcement = worker.Announcement
+	BlockLog     = worker.BlockLog
+)
 
 func Announcements(f func(Announcement)) {
 	queue.GetMessages(TopicAnnouncements, func(message queue.Message) {
@@ -19,5 +25,15 @@ func Announcements(f func(Announcement)) {
 		message.Decode(&announcement)
 
 		f(announcement)
+	})
+}
+
+func BlockLogs(f func(BlockLog)) {
+	queue.GetMessages(TopicBlockLogs, func(message queue.Message) {
+		var blockLog BlockLog
+
+		message.Decode(&blockLog)
+
+		f(blockLog)
 	})
 }

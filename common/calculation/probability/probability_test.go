@@ -8,7 +8,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -106,47 +105,18 @@ func TestPayout(t *testing.T) {
 		blockTime  = uint64(0)
 	)
 
-	result := payout(
-		atx,
-		apy,
-		g,
-		rewardPool,
-		m,
-		n,
-		b,
-		blockTime,
-		breadcrumb.NewBreadcrumb(),
-	)
-
-	// should be accurate to 2 decimal places, so trim then remove the last to
-	// avoid rounding
-
+	result := payout(atx, apy, g, rewardPool, m, n, b, blockTime, breadcrumb.NewBreadcrumb())
+	// should be accurate to 2 decimal places, so trim then remove the last to avoid rounding
 	rf := result.FloatString(3)
-
 	trimmedResult := rf[:len(rf)-1]
-
 	expected := "7.12"
-
 	assert.Equal(t, expected, trimmedResult)
 
 	// set low gas for mu > g case
-
 	g = big.NewRat(1, 100)
-
 	expectedRat := big.NewRat(71344570743089, 959979214533768)
 
-	result = payout(
-		atx,
-		apy,
-		g,
-		rewardPool,
-		m,
-		n,
-		b,
-		blockTime,
-		breadcrumb.NewBreadcrumb(),
-	)
-
+	result = payout(atx, apy, g, rewardPool, m, n, b, blockTime, breadcrumb.NewBreadcrumb())
 	assert.Equal(t, expectedRat, result)
 }
 
@@ -165,13 +135,11 @@ func TestWinningChances(t *testing.T) {
 		expectedPayouts = []*misc.BigInt{}
 	)
 
-	var (
-		a = misc.igIntFromInt64(12)
-		b = misc.BigIntFromInt64(89)
-		c = misc.BigIntFromInt64(1758)
-		d = misc.BigIntFromInt64(105485)
-		e = misc.BigIntFromInt64(32172940)
-	)
+	a := misc.BigIntFromInt64(12)
+	b := misc.BigIntFromInt64(89)
+	c := misc.BigIntFromInt64(1758)
+	d := misc.BigIntFromInt64(105485)
+	e := misc.BigIntFromInt64(32172940)
 
 	expectedPayouts = append(expectedPayouts, &a)
 	expectedPayouts = append(expectedPayouts, &b)
@@ -179,16 +147,7 @@ func TestWinningChances(t *testing.T) {
 	expectedPayouts = append(expectedPayouts, &d)
 	expectedPayouts = append(expectedPayouts, &e)
 
-	n, payouts := WinningChances(
-		gasFee,
-		atx,
-		bpyStakedUsd,
-		rewardPool,
-		decimalPlacesRat,
-		averageTransfersInBlock,
-		blockTimeInSeconds,
-		crumb,
-	)
+	n, payouts := WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat, averageTransfersInBlock, blockTimeInSeconds, crumb)
 
 	assert.Equal(t, expectedN, n)
 	assert.Equal(t, expectedPayouts, payouts)

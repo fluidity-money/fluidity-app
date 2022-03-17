@@ -1,0 +1,4 @@
+*.svg filter=lfs diff=lfs merge=lfs -text
+coinbase.png filter=lfs diff=lfs merge=lfs -text
+metamask.png filter=lfs diff=lfs merge=lfs -text
+walletconnect.png filter=lfs diff=lfs merge=lfs -text

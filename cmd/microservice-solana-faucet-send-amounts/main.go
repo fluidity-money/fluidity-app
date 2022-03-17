@@ -1,15 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"io"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/lib/queue"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 
@@ -22,17 +22,17 @@ const (
 	EnvSolanaRpcUrl = "FLU_SOLANA_RPC_URL"
 
 	// EnvSolanaTokenAddress to use as the underlying token when sending
-	EnvSolanaTokenAddress = "FLU_SOLANA_TOKEN_ADDRESS"
+	EnvSolanaTokenAddress = "FLU_SOLANA_PROGRAM_ID"
 
 	// EnvSolanaPrivateKey to use when signing transactions on Solana
 	EnvSolanaPrivateKey = "FLU_SOLANA_FAUCET_PRIVATE_KEY"
 )
 
 const (
-	// TokenProgramAddress
+	// TokenProgramAddress to use as the SPL token
 	TokenProgramAddress = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 
-	// TokenAssociatedProgramAddress
+	// TokenAssociatedProgramAddress used to create accounts
 	TokenAssociatedProgramAddress = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
 )
 
@@ -146,8 +146,6 @@ func main() {
 
 		signature, err := fluidity.SendTransfer(
 			solanaClient,
-			TokenProgramAddressPubkey,
-			TokenAssociatedProgramAddressPubkey,
 			senderAddress,
 			recipientAddress,
 			tokenAddress,

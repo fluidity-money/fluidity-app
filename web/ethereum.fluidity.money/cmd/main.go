@@ -1,18 +1,18 @@
 package main
 
 import (
+	"github.com/fluidity-money/fluidity-app/web/ethereum.fluidity.money/lib-backend"
+
 	"github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
-
-	"github.com/fluidity-money/fluidity-app/web/ethereum.fluidity.money/lib-backend"
 )
 
 func main() {
 
-	updateMessagesSolana := make(chan api_fluidity_money.Update)
+	updateMessagesEthereum := make(chan interface{})
 
 	web.JsonEndpoint("/prize-pool", api_fluidity_money.HandlePrizePool)
 
@@ -22,47 +22,35 @@ func main() {
 
 	web.JsonEndpoint("/my-history", api_fluidity_money.HandleMyHistory)
 
-	updateNotificationsHandlerSolana := api_fluidity_money.HandleUpdateNotifications(
-		updateMessagesSolana,
+	updateNotificationsHandlerEthereum := api_fluidity_money.HandleUpdateNotifications(
+		updateMessagesEthereum,
 	)
 
-	websocket.Endpoint("/updates", updateNotificationsHandlerSolana)
+	websocket.Endpoint("/updates", updateNotificationsHandlerEthereum)
 
 	go func() {
-		winners.WinnersSolana(func(winner winners.Winner) {
-			winner.WinnerAddress = winner.SolanaWinnerOwnerAddress
-
-			updateMessagesSolana <- api_fluidity_money.Update{
+		winners.WinnersEthereum(func(winner winners.Winner) {
+			updateMessagesEthereum <- Update{
 				Winner: &winner,
 			}
 		})
 	}()
 
 	go func() {
-		user_actions.BufferedUserActionsSolana(func(bufferedUserAction user_actions.BufferedUserAction) {
-			for _, userAction := range bufferedUserAction.UserActions {
-
-				userAction.SenderAddress = userAction.SolanaSenderOwnerAddress
-				userAction.RecipientAddress = userAction.SolanaRecipientOwnerAddress
-
-				updateMessagesSolana <- api_fluidity_money.Update{
-					UserAction: &userAction,
-				}
+		user_actions.UserActionsEthereum(func(userAction user_actions.UserAction) {
+			updateMessagesEthereum <- Update{
+				UserAction: &userAction,
 			}
 		})
 	}()
 
 	go func() {
-		prize_pool.PrizePoolUpdatesSolana(func(prizePool prize_pool.PrizePool) {
-			updateMessagesSolana <- api_fluidity_money.Update{
+		prize_pool.PrizePoolUpdatesEthereum(func(prizePool prize_pool.PrizePool) {
+			updateMessagesEthereum <- Update{
 				PrizePool: &prizePool,
 			}
 		})
 	}()
-
-	healthcheckHandler := makeHealthcheckHandler()
-
-	web.Endpoint("/healthcheck", healthcheckHandler)
 
 	web.Listen()
 }

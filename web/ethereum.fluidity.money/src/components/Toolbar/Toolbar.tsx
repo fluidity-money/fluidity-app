@@ -6,22 +6,25 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
   const [chainId, setChainId] = React.useState<string>();
 
   const checkNetworkOnLoad = async () => {
-    const chainId = await (window as any).ethereum.request({
+    const chain = await (window as any).ethereum.request({
       method: "eth_chainId",
     });
-    if (chainId !== "0x3") {
+    if (`${chain}` !== `0x${process.env.REACT_APP_CHAIN_ID}`) {
       setDesiredNetwork(false);
-      setChainId(chainId.substring(2));
+      setChainId(chain.substring(2));
     } else {
       setDesiredNetwork(true);
-      setChainId(chainId.substring(2));
+      setChainId(chain.substring(2));
     }
   };
 
   const updateOnNetworkChange = () => {
     if ((window as any).ethereum) {
       (window as any).ethereum.on("chainChanged", () => {
-        if ((window as any).ethereum.chainId !== "0x3") {
+        if (
+          `${(window as any).ethereum.chainId}` !==
+          `0x${process.env.REACT_APP_CHAIN_ID}`
+        ) {
           setDesiredNetwork(false);
           setChainId((window as any).ethereum.chainId.substring(2));
         } else {
@@ -42,15 +45,34 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
       {children}
       {desiredNetwork === false ? (
         <div className="change-network-message">
-          App network (Ethereum Ropsten) doesn't match to network selected in
-          wallet (network with id: {chainId}). Learn how to change{" "}
+          <div>
+            App network (
+            {process.env.REACT_APP_CHAIN_ID === `3`
+              ? `Ethereum Ropsten`
+              : process.env.REACT_APP_CHAIN_ID === `1`
+              ? `Ethereum Mainnet`
+              : `Ethereum`}
+            )
+            {` doesn't match to network selected in wallet (network with id:
+          ${chainId}). Learn how to`}
+            <a
+              className="learn-change-network-link"
+              href="https://metamask.zendesk.com/hc/en-us/articles/4404424659995"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {` change network in wallet`}
+            </a>
+            {` or   `}
+          </div>
           <a
             className="change-network-link"
-            href="https://metamask.zendesk.com/hc/en-us/articles/4404424659995"
+            href="https://chainlist.org/"
+            target="_blank"
+            rel="noreferrer"
           >
-            network in wallet
-          </a>{" "}
-          or change network.
+            change network
+          </a>
         </div>
       ) : (
         <></>
