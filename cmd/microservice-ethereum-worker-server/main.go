@@ -82,7 +82,7 @@ const (
 	EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
 
 	// EnvAaveAddressProviderAddress to find aave related addresses
-	EnvAaveAddressProviderAddress = `FLU_ETHEREUM_AAVE_ADDRESS_PRODIVER_ADDR`
+	EnvAaveAddressProviderAddress = `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR`
 
 	// EnvATokenAddress to use to get the AToken
 	EnvATokenAddress = `FLU_ETHEREUM_ATOKEN_ADDR`
