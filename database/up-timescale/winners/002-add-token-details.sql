@@ -25,3 +25,4 @@ COMMIT;
 ALTER TABLE winners
     DROP COLUMN IF EXISTS token_short_name,
     DROP COLUMN IF EXISTS token_decimals;
+

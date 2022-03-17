@@ -6,3 +6,4 @@ ALTER TABLE winners
 -- migrate:down
 ALTER TABLE winners
 	DROP COLUMN IF EXISTS solana_winning_owner_address;
+

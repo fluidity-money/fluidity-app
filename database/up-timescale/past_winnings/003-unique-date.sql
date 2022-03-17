@@ -10,3 +10,4 @@ ALTER TABLE past_winnings
 
 ALTER TABLE past_winnings
     DROP CONSTRAINT IF EXISTS winning_date_unique;
+

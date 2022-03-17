@@ -16,3 +16,4 @@ ALTER TABLE beta_user
     DROP COLUMN IF EXISTS daily_quest_4_completed,
     DROP COLUMN IF EXISTS daily_quest_5_completed,
     DROP COLUMN IF EXISTS daily_quest_6_completed;
+

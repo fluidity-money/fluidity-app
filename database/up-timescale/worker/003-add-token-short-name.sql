@@ -7,3 +7,4 @@ ALTER TABLE worker_buffered_atx
 
 ALTER TABLE worker_buffered_atx
 	DROP COLUMN IF EXISTS token_short_name;
+

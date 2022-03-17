@@ -26,3 +26,4 @@ CREATE TABLE ethereum_logs (
 -- migrate:down
 
 DROP TABLE IF EXISTS ethereum_logs;
+

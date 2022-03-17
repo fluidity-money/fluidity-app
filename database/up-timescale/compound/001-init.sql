@@ -28,3 +28,4 @@ DROP TABLE IF EXISTS
 
 DROP TABLE IF EXISTS
     compound_ctoken_accrue_interest;
+

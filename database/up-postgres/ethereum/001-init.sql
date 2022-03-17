@@ -80,3 +80,4 @@ DROP TABLE IF EXISTS ethereum_block_headers;
 DROP TABLE IF EXISTS ethereum_blocks;
 
 DROP TABLE IF EXISTS ethereum_transactions;
+

@@ -18,3 +18,4 @@ CREATE TABLE beta_completed_quests (
 -- migrate:down
 
 DROP TABLE beta_completed_quests;
+

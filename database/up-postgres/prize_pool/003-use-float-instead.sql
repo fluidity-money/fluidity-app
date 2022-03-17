@@ -12,3 +12,4 @@ ALTER TABLE prize_pool ALTER COLUMN amount TYPE FLOAT;
 COMMIT;
 
 -- migrate:down
+

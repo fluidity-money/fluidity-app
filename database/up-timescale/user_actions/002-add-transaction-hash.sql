@@ -7,3 +7,4 @@ ALTER TABLE user_actions
 
 ALTER TABLE user_actions
     DROP COLUMN IF EXISTS transaction_hash;
+

@@ -11,3 +11,4 @@ CREATE TABLE beta_win_logs (
 -- migrate:down
 
 DROP TABLE IF EXISTS beta_win_logs;
+

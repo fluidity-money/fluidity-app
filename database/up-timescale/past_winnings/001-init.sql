@@ -11,3 +11,4 @@ CREATE TABLE past_winnings (
 -- migrate:down
 
 DROP TABLE IF EXISTS past_winnings;
+

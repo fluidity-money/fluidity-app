@@ -15,3 +15,4 @@ CREATE TABLE beta_winning_transactions (
 -- migrate:down
 
 DROP TABLE IF EXISTS beta_winnings_transactions;
+

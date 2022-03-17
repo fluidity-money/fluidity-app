@@ -15,3 +15,4 @@ ALTER TABLE prize_pool
 
 ALTER TABLE prize_pool
     DROP COLUMN IF EXISTS contract_address;
+

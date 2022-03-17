@@ -8,3 +8,4 @@ CREATE TABLE worker_buffered_atx (
 -- migrate:down
 
 DROP TABLE IF EXISTS worker_buffered_atx;
+

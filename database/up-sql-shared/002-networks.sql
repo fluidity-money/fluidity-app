@@ -10,3 +10,4 @@ CREATE TYPE network_blockchain AS ENUM (
 -- migrate:down
 
 DROP TYPE IF EXISTS network_blockchain;
+

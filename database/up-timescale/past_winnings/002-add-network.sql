@@ -9,3 +9,4 @@ ALTER TABLE past_winnings
 
 ALTER TABLE past_winnings
     DROP COLUMN IF EXISTS network;
+

@@ -9,3 +9,4 @@ ALTER TABLE user_actions
 ALTER TABLE user_actions
     DROP COLUMN IF EXISTS solana_sender_owner_address,
     DROP COLUMN IF EXISTS solana_recipient_owner_address;
+

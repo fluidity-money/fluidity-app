@@ -10,3 +10,4 @@ CREATE TABLE prize_pool (
 -- migrate:down
 
 DROP TABLE IF EXISTS prize_pool;
+

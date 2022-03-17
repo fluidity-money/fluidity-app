@@ -13,3 +13,4 @@ COMMIT;
 
 ALTER TABLE faucet_users 
     DROP COLUMN IF EXISTS token_name;
+

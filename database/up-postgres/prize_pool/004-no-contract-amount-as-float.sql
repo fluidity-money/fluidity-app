@@ -5,3 +5,4 @@
 ALTER TABLE prize_pool DROP COLUMN contract_address;
 
 -- migrate:down
+

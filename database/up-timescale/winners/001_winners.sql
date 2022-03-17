@@ -17,3 +17,4 @@ CREATE TABLE winners (
 -- migrate:down
 
 DROP TABLE IF EXISTS winners;
+

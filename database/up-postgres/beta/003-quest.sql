@@ -13,3 +13,4 @@ CREATE TABLE quests (
 
 -- migrate:down
 DROP TABLE IF EXISTS quests;
+

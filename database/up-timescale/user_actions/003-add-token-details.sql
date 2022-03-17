@@ -24,3 +24,4 @@ COMMIT;
 ALTER TABLE user_actions
     DROP COLUMN IF EXISTS token_short_name,
     DROP COLUMN IF EXISTS token_decimals;
+

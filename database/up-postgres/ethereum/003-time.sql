@@ -30,3 +30,4 @@ ALTER TABLE ethereum_logs
 
 ALTER TABLE ethereum_transactions
     DROP COLUMN IF EXISTS created_timestamp;
+
