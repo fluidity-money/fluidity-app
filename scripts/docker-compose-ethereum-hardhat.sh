@@ -4,6 +4,8 @@ automation_dir=automation
 
 flu_ethereum_worker_hardhat_gas_limit=8000000
 
+worker_private_key="2de6137a159eabaeef895e884b1f9e2a9af2c0c50a1f5495b8d72086ac26f0a4"
+
 export \
 	FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq \
 	FLU_UNIVERSE=testing
@@ -15,6 +17,11 @@ export \
 	FLU_ETHEREUM_START_BLOCK=latest \
 	FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR=0x6d2299c48a8dd07a872fdd0f8233924872ad1071 \
 	FLU_ETHEREUM_HARDHAT_FIX=true
+
+export \
+	FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDT="${worker_private_key}" \
+	FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDC="${worker_private_key}" \
+	FLU_ETHEREUM_WORKER_PRIVATE_KEY_DAI="${worker_private_key}"
 
 export \
 	FLU_ETHEREUM_CONTRACT_ADDR_FDAI=0xddd63f96e78dced5b6ef17ee285f2cdbdf8972ab \
@@ -54,7 +61,8 @@ export \
 	FLU_ETHEREUM_FRONTEND_GETH_URL=http://localhost:8545
 
 export \
-	FLU_FAUCET_FRONTEND_API_URL=http://localhost:8083
+	FLU_FAUCET_FRONTEND_API_URL=http://localhost:8083 \
+	FLU_ETHEREUM_FAUCET_PRIVATE_KEY="$worker_private_key"
 
 docker-compose \
 	-f "$automation_dir/docker-compose.rabbitmq.yml" \
@@ -65,4 +73,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.ethereum-contracts.yml" \
 	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
 	-f "$automation_dir/docker-compose.faucet.fluidity.money.yml" \
+	-f "$automation_dir/docker-compose.ethereum-worker.yml" \
 	$@
