@@ -12,17 +12,12 @@ const (
 	// EnvMaxReadyCount is the maximum number of readies acceptable before alerting
 	EnvMaxReadyCount = `FLU_RABBIT_MAX_READY`
 
-	// EnvMaxUnackedCount is the maximum number of unacked messages acceptable before alerting
+	// EnvMaxUnackedCount is the maximum number of unacked messages acceptable before
+	// alerting
 	EnvMaxUnackedCount = `FLU_RABBIT_MAX_UNACKED`
 
 	// EnvAmqpQueueAddr is the address of the queue
 	EnvAmqpQueueAddr = `FLU_AMQP_QUEUE_ADDR`
-
-	// EnvRmqUser is a user of the RabbitMQ management API
-	EnvRmqUser = `FLU_AMQP_USER`
-
-	// EnvRmqUserPass is the EnvRmqUser user's password
-	EnvRmqUserPass = `FLU_AMQP_USER_PASS`
 )
 
 func main() {
@@ -30,8 +25,6 @@ func main() {
 		maxReadyCount_   = util.GetEnvOrFatal(EnvMaxReadyCount)
 		maxUnackedCount_ = util.GetEnvOrFatal(EnvMaxUnackedCount)
 		queueAddress     = util.GetEnvOrFatal(EnvAmqpQueueAddr)
-		rmqUsername      = util.GetEnvOrFatal(EnvRmqUser)
-		rmqPassword      = util.GetEnvOrFatal(EnvRmqUserPass)
 	)
 
 	maxReadyCount, err := strconv.ParseUint(maxReadyCount_, 10, 32)
@@ -52,15 +45,40 @@ func main() {
 		})
 	}
 
-	queues := lib.GetRmqQueues(queueAddress, rmqUsername, rmqPassword)
+	queues, err := lib.GetRmqQueues(queueAddress)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format("Could not retrieve queues from RMQ Management (%v)!", queueAddress)
+			k.Payload = err
+		})
+	}
 
 	for _, queue := range queues {
-		if queue.MessagesReady > maxReadyCount {
-			reportToSlack(queue, "Ready", queue.MessagesReady, maxReadyCount)
+		var (
+			name            = queue.Name
+			messagesReady   = queue.MessagesReady
+			messagesUnacked = queue.MessagesUnacked
+		)
+
+		log.Debug(func(k *log.Log) {
+			k.Format(
+				"Queue: %v has %v/%v Ready messages, and %v/%v Unacked messages",
+				name,
+				messagesReady,
+				maxReadyCount,
+				messagesUnacked,
+				maxUnackedCount,
+			)
+
+		})
+
+		if messagesReady > maxReadyCount {
+			reportToSlack(queue, "Ready", messagesReady, maxReadyCount)
 		}
 
-		if queue.MessagedUnacked > maxUnackedCount {
-			reportToSlack(queue, "Unacked", queue.MessagedUnacked, maxUnackedCount)
+		if messagesUnacked > maxUnackedCount {
+			reportToSlack(queue, "Unacked", messagesUnacked, maxUnackedCount)
 		}
 	}
 

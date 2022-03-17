@@ -7,7 +7,7 @@ type (
 		State           string `json:"state"`
 		Vhost           string `json:"vhost"`
 		MessagesReady   uint64 `json:"messages_ready"`
-		MessagedUnacked uint64 `json:"messages_unacknowledged"`
+		MessagesUnacked uint64 `json:"messages_unacknowledged"`
 	}
 
 	RmqQueuesResponse []RmqQueue
