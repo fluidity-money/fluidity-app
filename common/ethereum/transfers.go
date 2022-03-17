@@ -51,7 +51,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 		firstTopic := strings.ToLower(topics[0].String())
 
-		if firstTopic != transferLogTopic {
+		if !IsTransferLogTopic(firstTopic) {
 			Debug(
 				"For transaction hash %#v, first topic %#v != transfer log topic %#v!",
 				transactionHash,
@@ -115,4 +115,8 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 // null address was being sent to
 func GetTransferRecipient(transaction ethereum.Transaction) (ethereum.Address, error) {
 	return ethereum.AddressFromString("0x0000000000000000000000000000000000000000"), nil
+}
+
+func IsTransferLogTopic(topic string) bool {
+	return topic == transferLogTopic
 }
