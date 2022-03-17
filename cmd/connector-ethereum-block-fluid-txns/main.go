@@ -11,6 +11,7 @@ import (
 	lib "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-txns/lib"
 	ethConvert "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-fluid-txns/lib/ethereum"
 
+	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	workerQueue "github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -25,9 +26,6 @@ import (
 
 // EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 const (
-	// TransferLogTopicAddr to use to filter for transfer signatures
-	TransferLogTopicAddr = `0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef`
-
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 	EnvEthereumWsUrl = `FLU_ETHEREUM_WS_URL`
 
@@ -56,7 +54,7 @@ func main() {
 		gethHttpApi      = util.GetEnvOrFatal(EnvGethHttpUrl)
 	)
 
-	transferLogTopic, err := convertAddressToBytes(TransferLogTopicAddr)
+	transferLogTopic, err := convertAddressToBytes(common.TransferLogTopic)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -154,7 +152,7 @@ func main() {
 				// Guaranteed to be signature - Order dependent
 				logsParams := lib.LogParams{
 					BlockHash: blockHash.Hex(),
-					Topics:    []string{TransferLogTopicAddr},
+					Topics:    []string{common.TransferLogTopic},
 				}
 
 				logsBody_, err := json.Marshal(lib.LogBody{
