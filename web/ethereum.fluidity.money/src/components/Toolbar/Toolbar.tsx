@@ -1,3 +1,4 @@
+import Button from "components/Button";
 import React from "react";
 import { useEffect } from "react";
 
@@ -45,7 +46,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
       {children}
       {desiredNetwork === false ? (
         <div className="change-network-message">
-          <div>
+          <div className="change-network-text">
             App network (
             {process.env.REACT_APP_CHAIN_ID === `3`
               ? `Ethereum Ropsten`
@@ -65,14 +66,20 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
             </a>
             {` or   `}
           </div>
-          <a
+          {/* <a
             className="change-network-link"
             href="https://chainlist.org/"
             target="_blank"
             rel="noreferrer"
           >
             change network
-          </a>
+          </a> */}
+          {/* <div className="change-network-button"> */}
+          <div className="button-container">
+            <button className="change-network-button">Change Network</button>
+          </div>
+
+          {/* </div> */}
         </div>
       ) : (
         <></>
