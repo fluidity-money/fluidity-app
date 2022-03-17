@@ -8,16 +8,16 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 
-	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/compound"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 	"github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/compound"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -131,24 +131,26 @@ func main() {
 	rand.Seed(time.Now().Unix())
 
 	var (
-		ethContractAddress ethCommon.Address
-		ethCTokenAddress ethCommon.Address
+		ethContractAddress            ethCommon.Address
+		ethCTokenAddress              ethCommon.Address
 		ethUniswapAnchoredViewAddress ethCommon.Address
-		ethATokenAddress ethCommon.Address
-		ethUsdTokenAddress ethCommon.Address
-		ethEthTokenAddress ethCommon.Address
-		ethUnderlyingTokenAddress ethCommon.Address
+		ethATokenAddress              ethCommon.Address
+		ethUsdTokenAddress            ethCommon.Address
+		ethEthTokenAddress            ethCommon.Address
+		ethUnderlyingTokenAddress     ethCommon.Address
 		ethAaveAddressProviderAddress ethCommon.Address
 	)
 
-	if tokenBackend == BackendCompound {
+	switch tokenBackend {
+	case BackendCompound:
+
 		var (
 			cTokenAddress              = ethereum.AddressFromString(cTokenAddress_)
 			uniswapAnchoredViewAddress = ethereum.AddressFromString(uniswapAnchoredViewAddress_)
 		)
 
 		if cTokenAddress == "" || uniswapAnchoredViewAddress == "" {
-			log.Fatal(func (k *log.Log) {
+			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"%s set to compound, but missing %s or %s!",
 					EnvTokenBackend,
@@ -160,19 +162,30 @@ func main() {
 
 		ethCTokenAddress = hexToAddress(cTokenAddress)
 		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
-	} else if tokenBackend == BackendAave {
+
+	case BackendAave:
+
 		var (
-			aTokenAddress = ethereum.AddressFromString(aTokenAddress_)
+			aTokenAddress              = ethereum.AddressFromString(aTokenAddress_)
 			aaveAddressProviderAddress = ethereum.AddressFromString(aaveAddressProviderAddress_)
-			usdTokenAddress = ethereum.AddressFromString(usdTokenAddress_)
-			ethTokenAddress = ethereum.AddressFromString(ethTokenAddress_)
-			underlyingTokenAddress = ethereum.AddressFromString(underlyingTokenAddress_)
+			usdTokenAddress            = ethereum.AddressFromString(usdTokenAddress_)
+			ethTokenAddress            = ethereum.AddressFromString(ethTokenAddress_)
+			underlyingTokenAddress     = ethereum.AddressFromString(underlyingTokenAddress_)
 		)
 
-		if aTokenAddress == "" || aaveAddressProviderAddress == "" || usdTokenAddress == "" || ethTokenAddress == "" || underlyingTokenAddress_ == "" {
-			log.Fatal(func (k *log.Log) {
+		ethereumAddressesEmpty := anyEthereumAddressesEmpty(
+			aTokenAddress,
+			aaveAddressProviderAddress,
+			usdTokenAddress,
+			ethTokenAddress,
+		)
+
+		stringsEmpty := anyStringsEmpty(underlyingTokenAddress_)
+
+		if ethereumAddressesEmpty || stringsEmpty {
+			log.Fatal(func(k *log.Log) {
 				k.Format(
-					"%s set to aave, but missing %s or %s!",
+					"%s set to aave, but missing arguments!",
 					BackendAave,
 					EnvATokenAddress,
 					EnvAaveAddressProviderAddress,
@@ -185,7 +198,9 @@ func main() {
 		ethUsdTokenAddress = hexToAddress(usdTokenAddress)
 		ethUnderlyingTokenAddress = hexToAddress(underlyingTokenAddress)
 		ethEthTokenAddress = hexToAddress(ethTokenAddress)
-	} else {
+
+	default:
+
 		log.Fatal(func(k *log.Log) {
 			k.Format(
 				"%s should be `aave` or `compound`, got %s",
@@ -338,13 +353,16 @@ func main() {
 		}
 
 		var ethPriceUsd *big.Rat
-		if tokenBackend == BackendCompound {
+
+		switch tokenBackend {
+		case BackendCompound:
 			ethPriceUsd, err = uniswap_anchored_view.GetPrice(
 				gethClient,
 				ethUniswapAnchoredViewAddress,
 				"ETH",
 			)
-		} else if tokenBackend == BackendAave {
+
+		case BackendAave:
 			ethPriceUsd, err = aave.GetPrice(
 				gethClient,
 				ethAaveAddressProviderAddress,
@@ -435,7 +453,7 @@ func main() {
 			)
 
 			if err != nil {
-				log.Fatal(func (k *log.Log) {
+				log.Fatal(func(k *log.Log) {
 					k.Format(
 						"Failed to get the token price in USDT from aave! Underlying token address %v",
 						ethUnderlyingTokenAddress,

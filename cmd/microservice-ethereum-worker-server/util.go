@@ -134,3 +134,23 @@ func exponentiate(x int) *big.Rat {
 func roundUp(x float64) uint64 {
 	return uint64(math.Ceil(x))
 }
+
+func anyEthereumAddressesEmpty(addresses ...ethereum.Address) bool {
+	for _, s := range addresses {
+		if s == ethereum.Address("") {
+			return true
+		}
+	}
+
+	return false
+}
+
+func anyStringsEmpty(strings ...string) bool {
+	for _, s := range strings {
+		if s == "" {
+			return true
+		}
+	}
+
+	return false
+}
