@@ -1,6 +1,6 @@
 package connector_block_fluid_transactions
 
-import types "github.com/fluidity-money/microservice-lib/types/ethereum"
+import types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 
 type LogBody struct {
 	JsonRpc string      `json:"jsonrpc"`

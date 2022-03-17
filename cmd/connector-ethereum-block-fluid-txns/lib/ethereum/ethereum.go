@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"math/big"
 
+	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
-	types "github.com/fluidity-money/microservice-lib/types/ethereum"
-	"github.com/fluidity-money/microservice-lib/types/misc"
 )
 
 // emptyAddress to use when a transaction doesn't have a recipient
