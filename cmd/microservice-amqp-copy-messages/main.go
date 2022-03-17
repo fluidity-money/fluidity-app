@@ -152,7 +152,7 @@ func main() {
 		})
 	}
 
-	channelTo, _, err := configureChannel(
+	channelTo, queueToName, err := configureChannel(
 		clientTo,
 		workerId,
 		amqpCopyToTopicName,
@@ -165,6 +165,19 @@ func main() {
 			k.Payload = err
 		})
 	}
+
+	debug(
+		`Bound %s to %s at exchange %s!
+Bound %s to %s at exchange %s!
+Sending to %s`,
+		queueFromName,
+		amqpCopyFromTopicName,
+		amqpCopyFromExchange,
+		queueToName,
+		amqpCopyToTopicName,
+		amqpCopyToExchange,
+		queueToName,
+	)
 
 	messages, err := channelFrom.Consume(
 		queueFromName,
