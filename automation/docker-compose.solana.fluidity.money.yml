@@ -25,3 +25,7 @@ services:
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
     ports:
       - 127.0.0.1:8081:80
+    depends_on:
+      - timescale
+      - rabbitmq
+      
