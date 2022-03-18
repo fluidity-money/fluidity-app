@@ -26,7 +26,6 @@ import (
 	ethRpc "github.com/ethereum/go-ethereum/rpc"
 )
 
-// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 const (
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 	EnvEthereumWsUrl = `FLU_ETHEREUM_WS_URL`
