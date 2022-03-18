@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 var TransferLogTopic = strings.ToLower(
@@ -18,7 +19,7 @@ type Transfer struct {
 }
 
 // Get transfer receipts
-func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethereum.Address) ([]Transfer, error) {
+func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockNumber misc.BigInt, fluidContractAddress ethereum.Address) ([]Transfer, error) {
 	blockTransactions := make(map[ethereum.Hash]ethereum.Transaction)
 
 	for _, transaction := range transactions {
@@ -101,8 +102,8 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 	if len(failedTransactions) > 0 {
 		err = fmt.Errorf(
-			"Block %v had %v unreferenced txs: %v",
-			blockHash,
+			"Block at offset %v had %v unreferenced txs: %v",
+			blockNumber,
 			len(failedTransactions),
 			failedTransactions,
 		)

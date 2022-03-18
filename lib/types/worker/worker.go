@@ -20,11 +20,10 @@ type (
 	}
 
 	BlockLog struct {
-		BlockHash    ethereum.Hash          `json:"blockHash"`
 		BlockBaseFee misc.BigInt            `json:"blockBaseFee"`
 		BlockTime    uint64                 `json:"blockTime"`
 		Logs         []ethereum.Log         `json:"logs"`
 		Transactions []ethereum.Transaction `json:"transactions"`
-		BlockNumber  uint64                 `json:"blockNumber"`
+		BlockNumber  misc.BigInt            `json:"blockNumber"`
 	}
 )

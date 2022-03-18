@@ -11,13 +11,13 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
+	moving_average "github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/compound"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
+	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -256,7 +256,6 @@ func main() {
 		defer breadcrumb.SendAndClear(crumb)
 
 		var (
-			blockHash    = blockLog.BlockHash
 			blockBaseFee = blockLog.BlockBaseFee
 			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
@@ -269,7 +268,7 @@ func main() {
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
-		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockHash, contractAddress)
+		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockNumber, contractAddress)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -281,7 +280,7 @@ func main() {
 		transfersInBlock := len(fluidTransfers)
 
 		averageTransfersInBlock := addAndComputeAverageAtx(
-			blockNumber,
+			blockNumber.Uint64(),
 			tokenName,
 			transfersInBlock,
 		)
@@ -289,8 +288,8 @@ func main() {
 		if len(fluidTransfers) == 0 {
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Couldn't find any Fluid transfers in the block, hash %#v!",
-					blockHash,
+					"Couldn't find any Fluid transfers in the block, offset %#v!",
+					blockNumber,
 				)
 			})
 

@@ -95,6 +95,9 @@ func main() {
 
 		} else {
 
+			// Block contains log with ABI hash in its topics
+			// Guaranteed to be signature - Order dependent
+
 			log.Debug(func(k *log.Log) {
 				k.Format("Block at offset %v contains transfer ABI topic", blockNumber)
 			})
@@ -112,9 +115,7 @@ func main() {
 				block, err = gethClient.BlockByNumber(context.Background(), &blockNumber.Int)
 			}
 
-			var (
-				blockHash = block.Hash()
-			)
+			var blockHash = block.Hash()
 
 			newTransactions, err := ethConvert.ConvertTransactions(blockHash.Hex(), block.Transactions())
 
@@ -126,9 +127,6 @@ func main() {
 			}
 
 			amqpBlock.Transactions = append(amqpBlock.Transactions, newTransactions...)
-
-			// Block contains log with ABI hash in its topics
-			// Guaranteed to be signature - Order dependent
 
 			logsParams := lib.LogParams{
 				BlockHash: blockHash.Hex(),
