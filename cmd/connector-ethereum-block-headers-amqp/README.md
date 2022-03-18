@@ -1,8 +1,7 @@
 
-# Connector Block Fluid Transactions to AMQP
+# Connector Block Headers to AMQP
 
-Subscribes to NewHeads and queries for blocks with logs included. Sends
-Logs, and blocks down AMQP.
+Subscribes to NewHeads and sends headers down AMQP.
 
 ## Environment variables
 
