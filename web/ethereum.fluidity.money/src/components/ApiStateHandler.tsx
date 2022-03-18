@@ -142,11 +142,14 @@ const ApiStateHandler = ({ state }: { state: ApiState }) => {
         setUserActions((userActions) => [user_action, ...userActions]);
       }
 
-      if (
+      else if (
         wallet.account?.toLowerCase() ===
         user_action.sender_address.toLowerCase()
       ) {
-        user_action.type = "send";
+        // if there's no recipient, it's a swap so don't change
+        if (user_action.recipient_address)
+          user_action.type = "send";
+
         setUserActions((userActions) => [user_action, ...userActions]);
       }
     }
