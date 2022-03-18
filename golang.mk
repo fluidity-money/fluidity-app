@@ -6,7 +6,7 @@ include ../../build.mk
 GO_FILES := $(shell ls -1 *.go)
 
 ${REPO}.o: ${GO_FILES}
-	@${GO_BUILD} -o ${REPO}.o
+	@${GO_BUILD} ${GO_BUILD_EXTRA_ARGS} -o ${REPO}.o
 
 lint: ${GO_FILES}
 	@${GO_FMT}

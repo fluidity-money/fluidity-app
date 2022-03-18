@@ -24,6 +24,9 @@ export \
 	FLU_SOLANA_STARTING_SLOT=latest \
 	FLU_SOLANA_TVL_SOLEND_PUBKEY=ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx
 
+export \
+	FLU_SOLANA_SABER_RPC_URL=https://saberqltest.aleph.cloud
+
 export FLU_SOLANA_DEBUG_FAKE_PAYOUTS=true
 
 docker-compose \

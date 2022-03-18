@@ -81,9 +81,6 @@ const (
 	// UsdcDecimalPlaces to use when normalising any values from USDC
 	UsdcDecimalPlaces = 1e6
 
-	// LamportDecimalPlaces to be mindful of when tracking fees paid
-	LamportDecimalPlaces = 1e9
-
 	// TokenName that's wrapped by the codebase
 	TokenName = "USDC"
 
@@ -115,9 +112,6 @@ func main() {
 		decimalPlacesRat       = big.NewRat(UsdcDecimalPlaces, 1)
 		usdcDecimalPlacesRat   = big.NewRat(UsdcDecimalPlaces, 1)
 	)
-
-	solanaTransactionFeeNormalised := new(big.Rat)
-	LamportDecimalPlacesRat := new(big.Rat).SetUint64(LamportDecimalPlaces)
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
@@ -224,15 +218,10 @@ func main() {
 
 			defer breadcrumb.SendAndClear(crumb)
 
-			solanaTransactionFeeNormalised = userAction.AdjustedFee
-
-			solanaTransactionFeeNormalised.Quo(
-				solanaTransactionFeeNormalised,
-				LamportDecimalPlacesRat,
-			)
+			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
 			randomN, randomPayouts := probability.WinningChances(
-				solanaTransactionFeeNormalised,
+				solanaTransactionFeesNormalised,
 				atx,
 				bpyStakedUsd,
 				sizeOfThePool,
