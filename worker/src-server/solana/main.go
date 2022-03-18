@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 	"os"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
@@ -14,7 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/worker/lib/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/worker/lib/solana/solend"
 
-	prizePool "github.com/fluidity-money/microservice-solana-prize-pool/lib/solana"
+	prizePool "github.com/fluidity-money/fluidity-app/cmd/microservice-solana-prize-pool/lib/solana"
 
 	solana "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -62,13 +64,15 @@ const (
 	// this must be the payout authority of the contract
 	EnvPayerPrikey = `FLU_SOLANA_PAYER_PRIKEY`
 
-	// EnvPDAPubkey is the public key of the program derived account of the
-	// fluidity contract
-	EnvPDAPubkey = `FLU_SOLANA_PDA_PUBKEY`
-
 	// EnvDebugFakePayouts is a boolean that if true, logs payout instead of
 	// submitting them to solana
 	EnvDebugFakePayouts = `FLU_DEBUG_FAKE_PAYOUTS`
+
+	// EnvTokenDecimals is the number of decimals the token uses
+	EnvTokenDecimals = `FLU_SOLANA_TOKEN_DECIMALS`
+
+	// EnvTokenName is the same of the token being wrapped
+	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
 )
 
 const (
@@ -82,17 +86,8 @@ const (
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
-	// UsdcDecimalPlaces to use when normalising any values from USDC
-	UsdcDecimalPlaces = 1e6
-
 	// LamportDecimalPlaces to be mindful of when tracking fees paid
 	LamportDecimalPlaces = 1e9
-
-	// TokenName that's wrapped by the codebase
-	TokenName = "USDC"
-
-	// BumpSeed to signing the contract calls within the contract with the PDA
-	BumpSeed = 251
 )
 
 func main() {
@@ -109,15 +104,42 @@ func main() {
 		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
 		payerPrikey       = util.GetEnvOrFatal(EnvPayerPrikey)
-		PDAPubkey         = pubkeyFromEnv(EnvPDAPubkey)
 		splPubkey         = solana.MustPublicKeyFromBase58(SplProgramId)
+		decimalPlaces_    = util.GetEnvOrFatal(EnvTokenDecimals)
+		tokenName         = util.GetEnvOrFatal(EnvTokenName)
 
-		debugFakePayouts   = os.Getenv(EnvDebugFakePayouts) == "true"
+		debugFakePayouts  = os.Getenv(EnvDebugFakePayouts) == "true"
+		obligationString  = fmt.Sprintf("FLU:%s_OBLIGATION", tokenName)
+		obligationBytes_  = []byte(obligationString)
+		obligationBytes   = [][]byte{obligationBytes_}
 	)
 
+	PDAPubkey, BumpSeed, err := solana.FindProgramAddress(obligationBytes, fluidityPubkey) 
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to derive the PDA account and bump seed! %v",
+				err,
+			)
+		})
+	}
+	
+	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to convert the decimals from %v! Was %#v!",
+				decimalPlaces_,
+				decimalPlaces,
+			)
+		})
+	}
+
 	var (
-		decimalPlacesRat       = big.NewRat(UsdcDecimalPlaces, 1)
-		usdcDecimalPlacesRat   = big.NewRat(UsdcDecimalPlaces, 1)
+		decimalPlacesRat       = big.NewRat(int64(decimalPlaces), 1)
+		usdcDecimalPlacesRat   = big.NewRat(int64(decimalPlaces), 1)
 	)
 
 	solanaTransactionFeeNormalised := new(big.Rat)
@@ -161,8 +183,11 @@ func main() {
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get USDC apy on Solana!"
-				k.Payload = err
+				k.Format(
+					"Failed to get %v apy on Solana! %v",
+					tokenName,
+					err,
+				)
 			})
 		}
 
@@ -382,7 +407,7 @@ func main() {
 			payoutInstruction := fluidity.PayoutInstruction{
 				PayoutVariant,
 				winningAmount,
-				TokenName,
+				tokenName,
 				BumpSeed,
 			}
 

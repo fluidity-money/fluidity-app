@@ -38,6 +38,9 @@ export \
 	FLU_SOLANA_TOKEN_SHORT_NAME_USDT=USDT \
 	FLU_SOLANA_TOKEN_DECIMALS_USDT=6
 
+export \
+	FLU_DEBUG_FAKE_PAYOUTS=true
+
 docker-compose \
 	-f "$AUTOMATION_DIR/docker-compose.infrastructure.yml" \
 	-f "$AUTOMATION_DIR/docker-compose.database-connectors.yml" \
