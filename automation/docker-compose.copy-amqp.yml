@@ -2,12 +2,12 @@
 version: "3"
 
 services:
-  microservice-amqp-copy-messages-testing:
+  microservice-common-amqp-copy-messages-testing:
     build:
-      context: ../cmd/microservice-amqp-copy-messages
+      context: ../cmd/microservice-common-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages-testing
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-testing
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_TESTING}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_TESTING}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_TESTING}
@@ -16,12 +16,12 @@ services:
       FLU_AMQP_COPY_TO_URI: ${FLU_AMQP_COPY_TO_URI_TESTING}
     restart: unless-stopped
 
-  microservice-amqp-copy-messages-production:
+  microservice-common-amqp-copy-messages-production:
     build:
-      context: ../cmd/microservice-amqp-copy-messages
+      context: ../cmd/microservice-common-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-amqp-copy-messages-production
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-production
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_PRODUCTION}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_PRODUCTION}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_PRODUCTION}
