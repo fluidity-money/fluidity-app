@@ -52,6 +52,6 @@ func GetComputeUsed(txn types.TransactionResult) *big.Rat {
 	}
 
 	computeUsed.SetFrac64(used, budget)
-	
+
 	return computeUsed
 }
