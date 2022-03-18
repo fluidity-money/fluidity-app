@@ -19,12 +19,6 @@ import (
 const (
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 	EnvEthereumWsUrl = `FLU_ETHEREUM_WS_URL`
-
-	// EnvEthereumContractAddress to use when monitoring for transfers
-	EnvEthereumContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
-
-	// EnvGethHttpUrl to use when connecting to a node
-	EnvGethHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 )
 
 func main() {
