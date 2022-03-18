@@ -75,9 +75,9 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
             change network
           </a> */}
           {/* <div className="change-network-button"> */}
-          <div className="button-container">
-            <button className="change-network-button">Change Network</button>
-          </div>
+          {/* <div className="button-container"> */}
+          <button className="change-network-button">Change Network</button>
+          {/* </div> */}
 
           {/* </div> */}
         </div>
