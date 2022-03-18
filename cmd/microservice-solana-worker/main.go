@@ -112,6 +112,7 @@ func main() {
 		decimalPlacesRat       = big.NewRat(UsdcDecimalPlaces, 1)
 		usdcDecimalPlacesRat   = big.NewRat(UsdcDecimalPlaces, 1)
 	)
+
 	solanaClient := solanaRpc.New(rpcUrl)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)

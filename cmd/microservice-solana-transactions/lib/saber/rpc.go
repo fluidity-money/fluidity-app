@@ -8,21 +8,22 @@ import (
 	"net/http"
 )
 
-const saberRPC string = "https://saberqltest.aleph.cloud"
-
 type (
 	responseData struct {
 		Data tokenData `json:"data"`
 	}
+
 	tokenData struct {
 		Pools []pool `json:"pools"`
 	}
+
 	pool struct {
 		AmmId string    `json:"ammId"`
 		Name  string    `json:"name"`
 		Coin  coin      `json:"coin"`
 		Stats poolStats `json:"stats"`
 	}
+
 	coin struct {
 		ChainId  int    `json:"chainId"`
 		Address  string `json:"address"`
@@ -31,17 +32,19 @@ type (
 		Symbol   string `json:"symbol"`
 		LogoURI  string `json:"logoURI"`
 	}
+
 	poolStats struct {
 		Price float64 `json:"price"`
 	}
 )
 
-func GetSaberPriceAndDecimals(pubKey string) (*big.Rat, int, error) {
+func GetSaberPriceAndDecimals(saberRpcUrl, pubKey string) (*big.Rat, int, error) {
 	request := map[string]interface{}{
 		"query": "query AllPoolStats {pools {ammId name coin{chainId address name decimals symbol logoURI} stats {price}}}",
 	}
 
 	requestBuf := new(bytes.Buffer)
+
 	encoder := json.NewEncoder(requestBuf)
 
 	err := encoder.Encode(request)
@@ -51,7 +54,7 @@ func GetSaberPriceAndDecimals(pubKey string) (*big.Rat, int, error) {
 	}
 
 	r, err := http.Post(
-		saberRPC,
+		saberRpcUrl,
 		"application/json",
 		requestBuf,
 	)
@@ -71,12 +74,17 @@ func GetSaberPriceAndDecimals(pubKey string) (*big.Rat, int, error) {
 	}
 
 	for _, pool := range responseData.Data.Pools {
-		if pool.Coin.Address == pubKey {
-			pricef := pool.Stats.Price
-			decimals := pool.Coin.Decimals
-			priceRat := new(big.Rat).SetFloat64(pricef)
-			return priceRat, decimals, nil
+		if pool.Coin.Address != pubKey {
+			continue
 		}
+
+		pricef := pool.Stats.Price
+
+		decimals := pool.Coin.Decimals
+
+		priceRat := new(big.Rat).SetFloat64(pricef)
+
+		return priceRat, decimals, nil
 	}
 
 	return nil, 0, fmt.Errorf("Failed to find token in Saber list")
