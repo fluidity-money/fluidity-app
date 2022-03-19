@@ -8,56 +8,53 @@ find_sql_folders() {
     path="$1"
 
     find "$path" -type f -name "*.sql" -exec dirname {} \; \
-        | uniq
-        | sort -r
+        | uniq 
 }
 
 find_sqls() {
-    path = "$1"
+    path="$1"
 
-    find "$path" -type f -name "*.sql"
+    find "$path" -maxdepth 1 -type f -name "*.sql"
 }
 
-order_
 
-    #local OPTIND migration_dirs out_file
+#local OPTIND migration_dirs out_file
 
-    while getopts 'd:o:' flag; do
-      case "${flag}" in
-          d) migration_dirs="${migration_dirs} ${OPTARG}" ;;
-          o) out_dir="${OPTARG}" ;;
-          *) print_usage
-             exit 1 ;;
-      esac
-    done
+while getopts 'd:o:' flag; do
+    case "${flag}" in
+        d) migration_dirs="${migration_dirs} ${OPTARG}" ;;
+        o) out_dir="${OPTARG}" ;;
+        *) print_usage
+            return 1 ;;
+    esac
+done
 
-    [ -z "$migration_dirs" ] && return 1
-    [ -z "$out_dir" ] && return 1
+[ -z "$migration_dirs" ] && print_usage && return 1
+[ -z "$out_dir" ] && print_usage && return 1
 
-    # Get total number of all sql files across migration_dirs
+# Get total number of all sql files across migration_dirs
 
-    migration_dir_index=0
-    for migration_dir in $migration_dirs; do
-        sql_folders="$sql_folders $(find_sql_folders $migration_dir)"
+for migration_dir in $migration_dirs; do
+    sql_folders="$sql_folders $(find_sql_folders $migration_dir)"
 
-        for sql_folder in $sql_folders; do
-            hash=hash
+    for sql_folder in $sql_folders; do
+
+        # Split by '/' - Only works on Unix
+        sub_dirs=$(echo $sql_folder | tr '/' ' ')
+
+        padding=""
+
+        for sub_dir in $sub_dirs; do
+            padding="$padding$(echo $sub_dir | grep -o '^[0-9]*')"
+        done
+
+        sql_files=$(find_sqls $sql_folder)
+
+        for sql_file in $sql_files; do
+            file_name=$(basename $sql_file)
+
+            cp "$sql_file" "$out_dir/$padding$file_name"
         done
     done
-
-    num_migration_dirs=$(echo $sql_files | wc -w)
-
-    num_sql_folders=$()
-
-    counter=0
-    for sql_path in $sql_files; do
-        file_name=$(basename $sql_path)
-        echo $file_name
-        prefix=$(printf "%0"$padding"d" $counter)
-        echo $prefix
-        cp $sql_path "$out_dir/$prefix-$file_name"
-
-        counter=$((counter+1))
-        echo $counter
-    done
+done
 

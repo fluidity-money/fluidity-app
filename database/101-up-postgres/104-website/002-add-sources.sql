@@ -10,8 +10,8 @@ ALTER TABLE website_questions
 
 -- migrate:down
 
-DROP TYPE IF EXISTS website_source;
-
 ALTER TABLE website_questions 
     DROP COLUMN IF EXISTS source;
+
+DROP TYPE IF EXISTS website_source;
 

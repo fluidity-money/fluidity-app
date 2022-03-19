@@ -11,6 +11,6 @@ WORKDIR ${REPO}
 
 COPY . ${REPO}
 
-RUN make timescale
+RUN make up-timescale
 
-RUN cp build/timescale/*.sql /docker-entrypoint-initdb.d/
+COPY init-timescale-db.sh /docker-entrypoint-initdb.d/init-sqls.sh

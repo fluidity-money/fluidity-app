@@ -3,8 +3,6 @@
 -- start tracking token details in the user actions, set the existing rows
 -- to 6 due to them being USDT with a transaction
 
-BEGIN;
-
 ALTER TABLE user_actions ADD token_short_name VARCHAR;
 
 ALTER TABLE user_actions ADD token_decimals INT;
@@ -16,8 +14,6 @@ UPDATE user_actions SET token_decimals = 6;
 ALTER TABLE user_actions ALTER COLUMN token_short_name SET NOT NULL;
 
 ALTER TABLE user_actions ALTER COLUMN token_decimals SET NOT NULL;
-
-COMMIT;
 
 -- migrate:down
 

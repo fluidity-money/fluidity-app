@@ -11,6 +11,7 @@ WORKDIR ${REPO}
 
 COPY . ${REPO}
 
-RUN make postgres
+RUN make up-postgres
 
-RUN cp build/postgres/*.sql /docker-entrypoint-initdb.d/
+COPY init-postgres-db.sh /docker-entrypoint-initdb.d/init-sqls.sh
+

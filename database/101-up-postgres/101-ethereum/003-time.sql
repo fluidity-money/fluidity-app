@@ -22,7 +22,7 @@ ALTER TABLE ethereum_transactions ADD
 ALTER TABLE ethereum_block_headers
     DROP COLUMN IF EXISTS created_timestamp;
 
-ALTER TABLE ethereum_block
+ALTER TABLE ethereum_blocks
     DROP COLUMN IF EXISTS created_timestamp;
 
 ALTER TABLE ethereum_logs
