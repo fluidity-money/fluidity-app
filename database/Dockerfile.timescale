@@ -5,12 +5,18 @@ ENV REPO /usr/src/fluidity-migrations-timescale
 
 RUN apk add make
 
+RUN apk add curl
+
 RUN mkdir ${REPO}
 
 WORKDIR ${REPO}
 
 COPY . ${REPO}
 
-RUN make up-timescale
+RUN curl -fsSL -o ${REPO}/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+
+RUN chmod +x ${REPO}/dbmate
+
+RUN make timescale
 
 COPY init-timescale-db.sh /docker-entrypoint-initdb.d/init-sqls.sh
