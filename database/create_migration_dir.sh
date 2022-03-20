@@ -33,9 +33,10 @@ main() {
     [ -z "$migration_dirs" ] && print_usage && return 1
     [ -z "$out_dir" ] && print_usage && return 1
 
-    # Get total number of all sql files across migration_dirs
-
+    # migration_dirs is the starting folder paths to find SQL files from
     for migration_dir in $migration_dirs; do
+
+        # sql_folders is all the unique folder paths containing SQL script
         sql_folders="$sql_folders $(find_sql_folders $migration_dir)"
 
         for sql_folder in $sql_folders; do
@@ -43,6 +44,8 @@ main() {
             # Split by '/' - Only works on Unix
             sub_dirs=$(echo $sql_folder | tr '/' ' ')
 
+            # padding is all the starting numbers of each directory
+            # in the path
             padding=""
 
             for sub_dir in $sub_dirs; do
@@ -51,6 +54,7 @@ main() {
 
             sql_files=$(find_sqls $sql_folder)
 
+            # Move original SQL script to out location prefixed with padding
             for sql_file in $sql_files; do
                 file_name=$(basename $sql_file)
 
