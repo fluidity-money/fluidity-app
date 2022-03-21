@@ -24,7 +24,19 @@ const networkInputOptions =
 } as const;
 
 const App = () =>
-  <h1 style={{ color: "white" }}>Hey guys, sorry weve had a bit of downtime over the weekend and are moving to resolve this!</h1>;
+  <NotificationContainer>
+    <Container>
+      <section id="#navbar">
+        <Navbar items={ navbarItems } />
+      </section>
+
+      <Container>
+        <section id="#request-faucet">
+
+        </section>
+      </Container>
+    </Container>;
+  </NotificationContainer>
 
 const Container = styled.div`
 
