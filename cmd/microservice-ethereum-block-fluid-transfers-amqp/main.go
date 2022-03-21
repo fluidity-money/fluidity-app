@@ -89,7 +89,7 @@ func main() {
 		if !blockBloom.Test(transferLogTopic) {
 
 			log.Debug(func(k *log.Log) {
-				k.Format("Block at offset %v did NOT contain transfer ABI topic", blockNumber)
+				k.Format("Block at offset %v did NOT contain transfer ABI topic", blockNumber.Uint64())
 			})
 
 		} else {
@@ -98,7 +98,7 @@ func main() {
 			// Guaranteed to be signature - Order dependent
 
 			log.Debug(func(k *log.Log) {
-				k.Format("Block at offset %v contains transfer ABI topic", blockNumber)
+				k.Format("Block at offset %v contains transfer ABI topic", blockNumber.Uint64())
 			})
 
 			block, err := gethClient.BlockByNumber(context.Background(), &blockNumber.Int)
@@ -106,7 +106,7 @@ func main() {
 			for tries := 0; err != nil; tries++ {
 				if tries >= 10 {
 					log.Fatal(func(k *log.Log) {
-						k.Format("Could not get block at offset: %v", blockNumber)
+						k.Format("Could not get block at offset: %v", blockNumber.Uint64())
 						k.Payload = err
 					})
 				}
@@ -120,7 +120,7 @@ func main() {
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Format("Could not convert transactions from block %v (offset: %v)", blockHash, blockNumber)
+					k.Format("Could not convert transactions from block %v (offset: %v)", blockHash, blockNumber.Uint64())
 					k.Payload = err
 				})
 			}

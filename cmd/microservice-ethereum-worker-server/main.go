@@ -289,7 +289,7 @@ func main() {
 			log.Debug(func(k *log.Log) {
 				k.Format(
 					"Couldn't find any Fluid transfers in the block, offset %#v!",
-					blockNumber,
+					blockNumber.Uint64(),
 				)
 			})
 

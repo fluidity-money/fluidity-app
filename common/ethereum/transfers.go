@@ -103,7 +103,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 	if len(failedTransactions) > 0 {
 		err = fmt.Errorf(
 			"Block at offset %v had %v unreferenced txs: %v",
-			blockNumber,
+			blockNumber.Uint64(),
 			len(failedTransactions),
 			failedTransactions,
 		)
