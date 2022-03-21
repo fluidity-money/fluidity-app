@@ -68,14 +68,8 @@ const (
 )
 
 const (
-	// SolanaBlockTime assumed by the ATX calculation
-	SolanaBlockTime uint64 = 1
-
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
-	// UsdcDecimalPlaces to use when normalising any values from USDC
-	UsdcDecimalPlaces = 1e6
 
 	// TokenName that's wrapped by the codebase
 	TokenName = "USDC"

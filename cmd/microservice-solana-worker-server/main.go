@@ -68,12 +68,6 @@ const (
 
 	// UsdcDecimalPlaces to use when normalising any values from USDC
 	UsdcDecimalPlaces = 1e6
-
-	// TokenName that's wrapped by the codebase
-	TokenName = "USDC"
-
-	// BumpSeed to signing the contract calls within the contract with the PDA
-	BumpSeed = 251
 )
 
 func main() {
