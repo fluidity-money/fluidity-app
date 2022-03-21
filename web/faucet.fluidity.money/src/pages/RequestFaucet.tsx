@@ -31,7 +31,7 @@ const ContactEmail = () => {
 const RequestFaucet =
   ({ networkInputOptions }: RequestFaucet) => {
 
-    const [chosenNetworkName, setChosenNetworkName] = useState<SupportedNetworks>("solana");
+    const [chosenNetworkName, setChosenNetworkName] = useState<SupportedNetworks>("ethereum");
 
     const chosenNetwork = networkInputOptions[chosenNetworkName];
 
@@ -39,7 +39,7 @@ const RequestFaucet =
     const [airdropTokenName, setAirdropTokenName] = useState<typeof airdropTokenList[number]>(airdropTokenList[0])
 
     useEffect(() => {
-      // set to first when changing networks 
+      // set to first when changing networks
       setAirdropTokenName(airdropTokenList[0]);
     }, [airdropTokenList])
 
