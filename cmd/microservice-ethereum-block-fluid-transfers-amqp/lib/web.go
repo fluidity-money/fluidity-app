@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
@@ -26,10 +25,10 @@ func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
 	})
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not marshal Geth provider eth_getLogs body"
-			k.Payload = err
-		})
+		return nil, fmt.Errorf(
+			"Could not marshal Geth provider eth_getLogs body: %v",
+			err,
+		)
 	}
 
 	logsReqBody := bytes.NewBuffer(logsReqBody_)
@@ -37,10 +36,10 @@ func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
 	resp, err := http.Post(gethHttpApi, "application/json", logsReqBody)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not POST to Geth provider"
-			k.Payload = err
-		})
+		return nil, fmt.Errorf(
+			"Could not POST to Geth provider: %v",
+			err,
+		)
 	}
 
 	defer resp.Body.Close()
@@ -50,10 +49,10 @@ func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
 	err = json.NewDecoder(resp.Body).Decode(&logsResponse)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not unmarshal response body"
-			k.Payload = err
-		})
+		return nil, fmt.Errorf(
+			"Could not unmarshal response body: %v",
+			err,
+		)
 	}
 
 	return logsResponse.Result, nil
@@ -73,10 +72,10 @@ func GetBlockFromNumber(gethHttpApi string, blockNumber misc.BigInt) (Block, err
 	})
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not marshal Geth provider eth_getBlockByNumber body"
-			k.Payload = err
-		})
+		return Block{}, fmt.Errorf(
+			"Could not marshal Geth provider eth_getBlockByNumber body: %v",
+			err,
+		)
 	}
 
 	blocksReqBody := bytes.NewBuffer(blocksReqBody_)
@@ -84,10 +83,10 @@ func GetBlockFromNumber(gethHttpApi string, blockNumber misc.BigInt) (Block, err
 	resp, err := http.Post(gethHttpApi, "application/json", blocksReqBody)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not POST to Geth provider"
-			k.Payload = err
-		})
+		return Block{}, fmt.Errorf(
+			"Could not POST to Geth provider: %v",
+			err,
+		)
 	}
 
 	defer resp.Body.Close()
@@ -97,10 +96,10 @@ func GetBlockFromNumber(gethHttpApi string, blockNumber misc.BigInt) (Block, err
 	err = json.NewDecoder(resp.Body).Decode(&blocksResponse)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not unmarshal response body"
-			k.Payload = err
-		})
+		return Block{}, fmt.Errorf(
+			"Could not unmarshal response body: %v",
+			err,
+		)
 	}
 
 	return blocksResponse.Result, nil

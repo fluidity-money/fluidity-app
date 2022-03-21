@@ -15,16 +15,13 @@ import (
 	ethRpc "github.com/ethereum/go-ethereum/rpc"
 )
 
-// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 const (
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 	EnvEthereumWsUrl = `FLU_ETHEREUM_WS_URL`
 )
 
 func main() {
-	var (
-		gethWebsocketUrl = util.GetEnvOrFatal(EnvEthereumWsUrl)
-	)
+	var gethWebsocketUrl = util.GetEnvOrFatal(EnvEthereumWsUrl)
 
 	rpcClient, err := ethRpc.Dial(gethWebsocketUrl)
 
@@ -65,7 +62,7 @@ func main() {
 			newHeader := ethConvert.ConvertHeader(header)
 
 			log.Debug(func(k *log.Log) {
-				k.Format("Sending Header at offset: %v", newHeader.Number)
+				k.Format("Sending Header at offset: %v", newHeader.Number.String())
 			})
 
 			queue.SendMessage(ethQueue.TopicBlockHeaders, newHeader)
