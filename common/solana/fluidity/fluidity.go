@@ -18,6 +18,24 @@ const (
 	VariantTransfer = 3
 )
 
+const (
+	// TokenProgramAddress to use as the SPL token
+	TokenProgramAddress = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+
+	// TokenAssociatedProgramAddress used to create accounts
+	TokenAssociatedProgramAddress = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+)
+
+var (
+	// TokenProgramAddressPubkey
+	TokenProgramAddressPubkey = solana.MustPublicKeyFromBase58(TokenProgramAddress)
+
+	// TokenAssociatedProgramAddressPubkey
+	TokenAssociatedProgramAddressPubkey = solana.MustPublicKeyFromBase58(
+		TokenAssociatedProgramAddress,
+	)
+)
+
 type (
 	// InstructionPayout that should be serialised using Borsh to call the
 	// contract to payout a winner
@@ -37,7 +55,7 @@ type (
 
 // SendTransfer using the token address given, the sender address, returning
 // the signature or an error
-func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddress, tokenAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey, tokenProgramAddressPubkey, tokenAssociatedProgramAddressPubkey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
+func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddress, tokenAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
 
 	var (
 		senderAccountMeta = solana.NewAccountMeta(senderAddress, true, false)
@@ -47,13 +65,13 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 
 	programAddressInput := [][]byte{
 		recipientAddress[:],
-		tokenProgramAddressPubkey[:],
+		TokenProgramAddressPubkey[:],
 		tokenAddress[:],
 	}
 
 	ataRecipientPublicKey, _, err := solana.FindProgramAddress(
 		programAddressInput,
-		tokenAssociatedProgramAddressPubkey,
+		TokenAssociatedProgramAddressPubkey,
 	)
 
 	if err != nil {
@@ -76,12 +94,12 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 			solana.NewAccountMeta(recipientAddress, true, false),
 			tokenAddressMeta,
 			solana.NewAccountMeta(solana.SystemProgramID, false, false),
-			solana.NewAccountMeta(tokenProgramAddressPubkey, false, false),
+			solana.NewAccountMeta(TokenProgramAddressPubkey, false, false),
 			solana.NewAccountMeta(solana.SysVarRentPubkey, false, false),
 		}
 
 		createAccountInstruction := solana.NewInstruction(
-			tokenAssociatedProgramAddressPubkey,
+			TokenAssociatedProgramAddressPubkey,
 			createAccountSlice,
 			[]byte{},
 		)
@@ -111,7 +129,7 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 	}
 
 	transferInstruction := solana.NewInstruction(
-		tokenProgramAddressPubkey,
+		TokenProgramAddressPubkey,
 		accountMetaSlice,
 		dataSerialised,
 	)
