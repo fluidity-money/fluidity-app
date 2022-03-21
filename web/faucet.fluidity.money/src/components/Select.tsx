@@ -7,17 +7,19 @@ export const Select = styled.select`
   border-radius: 43px;
   font-weight: 300;
   font-size: 17px;
-  padding: 8px 12px;
+  padding: 8px 40px 8px 12px;
   border-style: solid;
   border-color: transparent;
   box-sizing: border-box;
+  border: none;
+  width: 96%;
+`;
 
-  :focus {
+/*:focus {
     border-style: solid;
     border-color: inherit;
   }
-  
+
   border-radius: 0;
-  border: 1px solid #FFFFFF;
-  color: white;
-`;
+  border: 1px solid #ffffff;
+  color: white;*/
