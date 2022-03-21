@@ -28,24 +28,6 @@ const (
 	EnvSolanaPrivateKey = "FLU_SOLANA_FAUCET_PRIVATE_KEY"
 )
 
-const (
-	// TokenProgramAddress to use as the SPL token
-	TokenProgramAddress = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-
-	// TokenAssociatedProgramAddress used to create accounts
-	TokenAssociatedProgramAddress = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-)
-
-var (
-	// TokenProgramAddressPubkey
-	TokenProgramAddressPubkey = solana.MustPublicKeyFromBase58(TokenProgramAddress)
-
-	// TokenAssociatedProgramAddressPubkey
-	TokenAssociatedProgramAddressPubkey = solana.MustPublicKeyFromBase58(
-		TokenAssociatedProgramAddress,
-	)
-)
-
 func main() {
 	var (
 		solanaRpcUrl  = util.GetEnvOrFatal(EnvSolanaRpcUrl)
@@ -152,8 +134,6 @@ func main() {
 			amountInt64,
 			*blockHash,
 			publicKey,
-			TokenProgramAddressPubkey,
-			TokenAssociatedProgramAddressPubkey,
 			privateKey,
 		)
 
