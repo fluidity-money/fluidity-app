@@ -59,8 +59,8 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 
 	var (
 		senderAccountMeta = solana.NewAccountMeta(senderAddress, true, false)
-		signerAccountMeta = solana.NewAccountMeta(publicKey, true, true)
-		tokenAddressMeta  = solana.NewAccountMeta(tokenAddress, true, false)
+		signerAccountMeta = solana.NewAccountMeta(publicKey, false, true)
+		tokenAddressMeta  = solana.NewAccountMeta(tokenAddress, false, false)
 	)
 
 	programAddressInput := [][]byte{
