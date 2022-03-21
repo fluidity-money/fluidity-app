@@ -11,12 +11,12 @@ import (
 
 type (
 	Block struct {
-		Blockhash string `json:"blockhash"`
+		Blockhash    string                    `json:"blockhash"`
 		Transactions []types.TransactionResult `json:"transactions"`
 	}
 	rpcBlock struct {
-		Result Block `json:"result"`
-		Error map[string]interface{} `json:"error"`
+		Result Block                  `json:"result"`
+		Error  map[string]interface{} `json:"error"`
 	}
 )
 
@@ -26,13 +26,13 @@ func GetBlock(rpcUrl string, slot uint64) (Block, error) {
 		"jsonrpc": "2.0",
 		"id":      1,
 		"method":  "getBlock",
-		"params": []interface{} {
+		"params": []interface{}{
 			slot,
-			map[string]interface{} {
-				"encoding": "json",
+			map[string]interface{}{
+				"encoding":           "json",
 				"transactionDetails": "full",
-				"rewards": false,
-				"commitment": "confirmed",
+				"rewards":            false,
+				"commitment":         "confirmed",
 			},
 		},
 	}
