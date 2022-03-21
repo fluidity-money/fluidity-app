@@ -8,7 +8,7 @@ services:
       context: ../cmd/microservice-solana-worker
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-solana-server-usdc
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-worker-solana-server-usdc
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
@@ -23,6 +23,8 @@ services:
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDC}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDC}
+      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
+    restart: unless-stopped
     depends_on:
       - rabbitmq
 
@@ -32,7 +34,7 @@ services:
       context: ../cmd/microservice-solana-worker
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: worker-solana-server-usdt
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-worker-solana-server-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
@@ -47,5 +49,8 @@ services:
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDT}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDT}
+      FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
+    restart: unless-stopped
     depends_on:
       - rabbitmq
