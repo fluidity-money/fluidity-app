@@ -32,16 +32,17 @@ func getManagementUrlFromAddr(address string) (string, error) {
 
 	queueManagementUri_.Host += fmt.Sprintf(":%v", RmqManagementPort)
 
-	queueManagementUri_.Path = "api/queues"
-
 	queueManagementUri := queueManagementUri_.String()
 
 	return queueManagementUri, nil
 }
 
 // Returns array of queue structs from RMQ
-func GetRmqQueues(rmqAddress string) (RmqQueuesResponse, error) {
+func GetRmqQueues(rmqAddress, vhost string) (RmqQueuesResponse, error) {
 	queueManagementUri, err := getManagementUrlFromAddr(rmqAddress)
+
+	queueManagementUri += fmt.Sprintf("/%s/%s/%s", "api", "queues", url.PathEscape(vhost))
+	fmt.Println(queueManagementUri)
 
 	if err != nil {
 		return nil, err
@@ -54,7 +55,33 @@ func GetRmqQueues(rmqAddress string) (RmqQueuesResponse, error) {
 
 	defer res.Body.Close()
 
-	response := make(RmqQueuesResponse, 0)
+	var response RmqQueuesResponse
+
+	err = json.NewDecoder(res.Body).Decode(&response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// Returns array of queue structs from RMQ
+func GetVhosts(rmqAddress string) (VhostsResponse, error) {
+	queueManagementUri, err := getManagementUrlFromAddr(rmqAddress)
+	queueManagementUri += fmt.Sprintf("/%s/%s", "api", "vhosts")
+
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := http.Get(queueManagementUri)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	var response VhostsResponse
 
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
