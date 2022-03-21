@@ -30,7 +30,7 @@ const go: AddEthereumChainParameter = {
     symbol: "GO",
     decimals: 18,
   },
-  rpcUrls: [`https://mainnet.anyswap.exchange`],
+  rpcUrls: [`https://testnet-rpc.gochain.io`],
   blockExplorerUrls: [
     "https://testnet-explorer.gochain.io",
     "https://fsn.dev/api",
