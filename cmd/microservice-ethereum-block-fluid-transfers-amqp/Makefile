@@ -1,4 +1,4 @@
 
-REPO := microservice-ethereum-block-fluid-transactions-amqp
+REPO := microservice-ethereum-block-fluid-transfers-amqp
 
 include ../../golang.mk

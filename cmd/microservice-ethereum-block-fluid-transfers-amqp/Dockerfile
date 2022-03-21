@@ -8,5 +8,5 @@ RUN make
 ENTRYPOINT [ \
     "wait-for-ws", \
     "wait-for-amqp", \
-    "./microservice-ethereum-block-fluid-transactions-amqp.o" \
+    "./microservice-ethereum-block-fluid-transfers-amqp.o" \
 ]
