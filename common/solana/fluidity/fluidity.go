@@ -1,8 +1,8 @@
 package fluidity
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 
 	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -37,25 +37,71 @@ type (
 
 // SendTransfer using the token address given, the sender address, returning
 // the signature or an error
-func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddress, tokenAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
+func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddress, tokenAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey, tokenProgramAddressPubkey, tokenAssociatedProgramAddressPubkey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
+
 	var (
-		senderAccountMeta    = solana.NewAccountMeta(senderAddress, false, true)
-		recipientAddressMeta = solana.NewAccountMeta(recipientAddress, true, false)
-		tokenAddressMeta     = solana.NewAccountMeta(tokenAddress, true, false)
+		senderAccountMeta = solana.NewAccountMeta(senderAddress, true, false)
+		signerAccountMeta = solana.NewAccountMeta(publicKey, true, true)
+		tokenAddressMeta  = solana.NewAccountMeta(tokenAddress, true, false)
 	)
+
+	programAddressInput := [][]byte{
+		recipientAddress[:],
+		tokenProgramAddressPubkey[:],
+		tokenAddress[:],
+	}
+
+	ataRecipientPublicKey, _, err := solana.FindProgramAddress(
+		programAddressInput,
+		tokenAssociatedProgramAddressPubkey,
+	)
+
+	if err != nil {
+		return "", fmt.Errorf(
+			"unable to derive the user's ATA key! %v",
+			err,
+		)
+	}
+
+	recipientAccountMeta := solana.NewAccountMeta(ataRecipientPublicKey, true, false)
+
+	_, err = solanaClient.GetAccountInfo(context.Background(), ataRecipientPublicKey)
+
+	var instructions []solana.Instruction
+
+	if err != nil {
+		createAccountSlice := solana.AccountMetaSlice{
+			signerAccountMeta,
+			recipientAccountMeta,
+			solana.NewAccountMeta(recipientAddress, true, false),
+			tokenAddressMeta,
+			solana.NewAccountMeta(solana.SystemProgramID, false, false),
+			solana.NewAccountMeta(tokenProgramAddressPubkey, false, false),
+			solana.NewAccountMeta(solana.SysVarRentPubkey, false, false),
+		}
+
+		createAccountInstruction := solana.NewInstruction(
+			tokenAssociatedProgramAddressPubkey,
+			createAccountSlice,
+			[]byte{},
+		)
+
+		instructions = append(instructions, createAccountInstruction)
+	}
 
 	accountMetaSlice := solana.AccountMetaSlice{
 		senderAccountMeta,
-		recipientAddressMeta,
+		recipientAccountMeta,
+		signerAccountMeta,
 		tokenAddressMeta,
 	}
 
-	transferData := InstructionTransfer{
+	data := InstructionTransfer{
 		Variant: VariantTransfer,
 		Amount:  amount,
 	}
 
-	dataSerialised, err := borsh.Serialize(transferData)
+	dataSerialised, err := borsh.Serialize(data)
 
 	if err != nil {
 		return "", fmt.Errorf(
@@ -64,13 +110,13 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 		)
 	}
 
-	instruction := solana.NewInstruction(
-		tokenAddress,
+	transferInstruction := solana.NewInstruction(
+		tokenProgramAddressPubkey,
 		accountMetaSlice,
 		dataSerialised,
 	)
 
-	instructions := []solana.Instruction{instruction}
+	instructions = append(instructions, transferInstruction)
 
 	transaction, err := solana.NewTransaction(instructions, recentBlockHash)
 

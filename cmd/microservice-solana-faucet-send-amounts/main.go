@@ -152,6 +152,8 @@ func main() {
 			amountInt64,
 			*blockHash,
 			publicKey,
+			TokenProgramAddressPubkey,
+			TokenAssociatedProgramAddressPubkey,
 			privateKey,
 		)
 
