@@ -15,7 +15,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/fluidity-money/fluidity-app/cmd/microservice-common-track-winners/lib"
+	"github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-track-winners/lib"
 )
 
 const (
