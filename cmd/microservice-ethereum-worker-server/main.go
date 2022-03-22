@@ -252,7 +252,7 @@ func main() {
 
 	crumb := breadcrumb.NewBreadcrumb()
 
-	worker.BlockLogs(func(blockLog worker.EthereumBlockLog) {
+	worker.EthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
 		defer breadcrumb.SendAndClear(crumb)
 
 		var (
