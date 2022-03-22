@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
 	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-common-rabbitmq-backlog-checker/lib"
@@ -56,7 +55,6 @@ func main() {
 	}
 
 	for _, vhost := range vhosts {
-		fmt.Println(vhost)
 		queues, err := lib.GetRmqQueues(queueAddress, vhost.Name)
 
 		if err != nil {

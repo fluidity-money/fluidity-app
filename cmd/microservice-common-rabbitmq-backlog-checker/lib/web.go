@@ -42,7 +42,6 @@ func GetRmqQueues(rmqAddress, vhost string) (RmqQueuesResponse, error) {
 	queueManagementUri, err := getManagementUrlFromAddr(rmqAddress)
 
 	queueManagementUri += fmt.Sprintf("/%s/%s/%s", "api", "queues", url.PathEscape(vhost))
-	fmt.Println(queueManagementUri)
 
 	if err != nil {
 		return nil, err
