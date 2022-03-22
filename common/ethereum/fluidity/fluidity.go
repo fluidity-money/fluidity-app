@@ -93,7 +93,7 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement worker.Announcement) (*ethTypes.Transaction, error) {
+func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement worker.EthereumAnnouncement) (*ethTypes.Transaction, error) {
 	var (
 		hashString = announcement.TransactionHash.String()
 		fromString = announcement.FromAddress.String()

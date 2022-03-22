@@ -114,7 +114,7 @@ func main() {
 
 		defer breadcrumb.SendAndClear(crumb)
 
-		var announcement worker.Announcement
+		var announcement worker.EthereumAnnouncement
 
 		message.Decode(&announcement)
 

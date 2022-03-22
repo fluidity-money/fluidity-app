@@ -17,7 +17,7 @@ import (
 // callRewardArguments provided to callRewardFunction
 type callRewardArguments struct {
 	transactionOptions       *ethAbiBind.TransactOpts
-	containerAnnouncement    worker.Announcement
+	containerAnnouncement    worker.EthereumAnnouncement
 	contractAddress          ethCommon.Address
 	client                   *ethclient.Client
 	useHardhatFix            bool

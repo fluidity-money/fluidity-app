@@ -13,14 +13,14 @@ const (
 )
 
 type (
-	Announcement = worker.Announcement
-	BlockLog     = worker.BlockLog
+	EthereumAnnouncement = worker.EthereumAnnouncement
+	EthereumBlockLog     = worker.EthereumBlockLog
 )
 
-func Announcements(f func(Announcement)) {
+func Announcements(f func(EthereumAnnouncement)) {
 	queue.GetMessages(TopicAnnouncements, func(message queue.Message) {
 
-		var announcement Announcement
+		var announcement EthereumAnnouncement
 
 		message.Decode(&announcement)
 
@@ -28,9 +28,9 @@ func Announcements(f func(Announcement)) {
 	})
 }
 
-func BlockLogs(f func(BlockLog)) {
+func BlockLogs(f func(EthereumBlockLog)) {
 	queue.GetMessages(TopicBlockLogs, func(message queue.Message) {
-		var blockLog BlockLog
+		var blockLog EthereumBlockLog
 
 		message.Decode(&blockLog)
 

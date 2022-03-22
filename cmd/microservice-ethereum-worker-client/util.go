@@ -9,11 +9,11 @@ import (
 	ethRlp "github.com/ethereum/go-ethereum/rlp"
 )
 
-func decodeAnnouncementRlp(announcementRlp misc.Blob) (*worker.Announcement, error) {
+func decodeAnnouncementRlp(announcementRlp misc.Blob) (*worker.EthereumAnnouncement, error) {
 
 	announcementRlpBytes := []byte(announcementRlp)
 
-	var announcement worker.Announcement
+	var announcement worker.EthereumAnnouncement
 
 	err := ethRlp.DecodeBytes(announcementRlpBytes, &announcement)
 
