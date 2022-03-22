@@ -11,6 +11,7 @@ services:
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+      FLU_SOLANA_SABER_RPC_URL: ${FLU_SOLANA_SABER_RPC_URL}
     deploy:
       mode: replicated
       replicas: 50
