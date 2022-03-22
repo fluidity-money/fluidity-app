@@ -5,8 +5,7 @@ services:
   worker-solana-server-usdc:
     command: solana-server
     build:
-      context: ../worker
-      dockerfile: Dockerfile.server
+      context: ../cmd/microservice-solana-worker
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-solana-server-usdc
@@ -30,8 +29,7 @@ services:
   worker-solana-server-usdt:
     command: solana-server
     build:
-      context: ../worker
-      dockerfile: Dockerfile.server
+      context: ../cmd/microservice-solana-worker
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: worker-solana-server-usdt
