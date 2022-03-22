@@ -15,7 +15,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -108,11 +107,7 @@ func main() {
 		})
 	}
 
-	crumb := breadcrumb.NewBreadcrumb()
-
 	queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
-
-		defer breadcrumb.SendAndClear(crumb)
 
 		var announcement worker.EthereumAnnouncement
 

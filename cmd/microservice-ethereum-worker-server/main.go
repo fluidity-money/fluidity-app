@@ -21,7 +21,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -250,11 +249,7 @@ func main() {
 		})
 	}
 
-	crumb := breadcrumb.NewBreadcrumb()
-
 	worker.EthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
-		defer breadcrumb.SendAndClear(crumb)
-
 		var (
 			blockHash    = blockLog.BlockHash
 			blockBaseFee = blockLog.BlockBaseFee
@@ -296,10 +291,6 @@ func main() {
 
 			return
 		}
-
-		crumb.Set(func(k *breadcrumb.Breadcrumb) {
-			crumb.One("transfers in block", transfersInBlock)
-		})
 
 		debug(
 			"Average transfers in block: %#v! Transfers in block: %#v!",

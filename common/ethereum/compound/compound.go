@@ -6,7 +6,7 @@ import (
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -112,7 +112,7 @@ func GetBalanceOfUnderlying(client *ethclient.Client, cTokenAddress, contractAdd
 
 // GetTokenApy, following the algorithm described in Compound's
 // documentation
-func GetTokenApy(client *ethclient.Client, cTokenAddress ethCommon.Address, blocksPerDay uint64, crumb *breadcrumb.Breadcrumb) (*big.Rat, error) {
+func GetTokenApy(client *ethclient.Client, cTokenAddress ethCommon.Address, blocksPerDay uint64, emission *worker.Emission) (*big.Rat, error) {
 
 	boundContract := ethBind.NewBoundContract(
 		cTokenAddress,
@@ -174,16 +174,12 @@ func GetTokenApy(client *ethclient.Client, cTokenAddress ethCommon.Address, bloc
 
 	supplyApy := new(big.Rat).Mul(powLeftSideDaysPerYearMinOne, big.NewRat(100, 1))
 
-	crumb.Set(func(k *breadcrumb.Breadcrumb) {
-		k.Many(map[string]interface{}{
-			"blocks per day":                           blocksPerDay,
-			"supply rate per block div eth mantissa":   supplyRatePerBlockDivEthMantissa.FloatString(10),
-			"supply rate per block mul blocks per day": supplyRatePerBlockMulBlocksPerDay.FloatString(10),
-			"pow left side":                            powLeftSide.FloatString(10),
-			"pow left side days per year":              powLeftSideDaysPerYear.FloatString(10),
-			"supply apy":                               supplyApy.FloatString(10),
-		})
-	})
+	emission.CompoundGetTokenApy.BlocksPerDay = blocksPerDay
+	emission.CompoundGetTokenApy.SupplyRatePerBlockDivEthMantissa = supplyRatePerBlockDivEthMantissa.FloatString(10)
+	emisison.CompoundGetTokenApy.SupplyRatePerBlockMulBlocksPerDay = supplyRatePerBlockMulBlocksPerDay.FloatString(10)
+	emission.CompoundGetTokenApy.PowLeftSide = powLeftSide.FloatString(10)
+	emission.CompoundGetTokenApy.PowLeftSideDaysPerYear = powLeftSideDaysPerYear.FloatString(10)
+	emission.CompoundGetTokenApy.SupplyApy = supplyApy.FloatString(10)
 
 	return supplyApy, nil
 }

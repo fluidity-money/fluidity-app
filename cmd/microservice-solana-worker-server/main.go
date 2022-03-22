@@ -5,7 +5,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -103,8 +102,6 @@ func main() {
 		})
 	}
 
-	crumb := breadcrumb.NewBreadcrumb()
-
 	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
 
 		var (
@@ -121,12 +118,6 @@ func main() {
 		atx := probability.CalculateAtx(SolanaBlockTime, fluidTransfers)
 
 		apy, err := solend.GetUsdApy(solanaClient, reservePubkey)
-
-		crumb.Set(func(k *breadcrumb.Breadcrumb) {
-			k.Many(map[string]interface{}{
-				"solend supply apy": apy.FloatString(10),
-			})
-		})
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -195,8 +186,6 @@ func main() {
 			if userAction.Type != "send" {
 				return
 			}
-
-			defer breadcrumb.SendAndClear(crumb)
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
