@@ -4,7 +4,7 @@ version: "3"
 services:
   microservice-solana-worker-server:
     build:
-      context: ../cmd/microservice-solana-worker
+      context: ../cmd/microservice-solana-worker-server
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-worker-solana-server
@@ -26,7 +26,7 @@ services:
 
   microservice-solana-worker-client:
     build:
-      context: ../cmd/microservice-solana-worker
+      context: ../cmd/microservice-solana-worker-client
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-worker-solana-server
