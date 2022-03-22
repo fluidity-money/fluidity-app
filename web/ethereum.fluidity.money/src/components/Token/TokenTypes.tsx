@@ -1,5 +1,4 @@
-
-import {TokenKind} from "components/types";
+import { TokenKind } from "components/types";
 
 // Image imports
 const usdc = "img/TokenIcons/usdcIcon.svg";
@@ -12,7 +11,7 @@ export const extOptions: TokenKind[] = [
   {
     type: "USDT",
     src: usdt,
-    colour: "rgb(36,163,124)"
+    colour: "rgb(36,163,124)",
   },
   {
     type: "USDC",
@@ -24,11 +23,11 @@ export const extOptions: TokenKind[] = [
     src: dai,
     colour: "#fdc134",
   },
-  {
-    type: "TUSD",
-    src: tusd,
-    colour: "#2433b8",
-  }
+  // {
+  //   type: "TUSD",
+  //   src: tusd,
+  //   colour: "#2433b8",
+  // }
 ];
 
 // Internal token options
@@ -36,7 +35,7 @@ export const intOptions: TokenKind[] = [
   {
     type: "fUSDT",
     src: usdt,
-    colour: "rgb(36,163,124)"
+    colour: "rgb(36,163,124)",
   },
   {
     type: "fUSDC",
@@ -48,9 +47,9 @@ export const intOptions: TokenKind[] = [
     src: dai,
     colour: "#fdc134",
   },
-  {
-    type: "fTUSD",
-    src: tusd,
-    colour: "#2433b8",
-  }
+  // {
+  //   type: "fTUSD",
+  //   src: tusd,
+  //   colour: "#2433b8",
+  // }
 ];
