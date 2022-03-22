@@ -2,20 +2,18 @@ import { useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import { Title, Subtitle } from "../components/Titles";
 import { RowOnDesktop } from "../components/Row";
-import NetworkInput, {CurrencyInput} from "../components/NetworkInput";
+import NetworkInput, { CurrencyInput } from "../components/NetworkInput";
 import Highlight from "../components/Highlight";
 import TestnetAccountAddressInput from "../components/TestnetAccountAddressInput";
 import { notificationContext } from "../components/Notifications/notificationContext";
 import { formatTweet } from "../util/tweet";
 import { handleUniquePhraseRequest, SupportedNetworks } from "../util";
 
-import {
-  SendRequestButton
-} from "../components/Buttons";
-import {NetworkInputOptions} from "../App";
+import { SendRequestButton } from "../components/Buttons";
+import { NetworkInputOptions } from "../App";
 
 type RequestFaucet = {
-  networkInputOptions: NetworkInputOptions
+  networkInputOptions: NetworkInputOptions;
 };
 
 const ContactEmail = () => {
@@ -28,127 +26,136 @@ const ContactEmail = () => {
   );
 };
 
-const RequestFaucet =
-  ({ networkInputOptions }: RequestFaucet) => {
+const RequestFaucet = ({ networkInputOptions }: RequestFaucet) => {
+  const [chosenNetworkName, setChosenNetworkName] =
+    useState<SupportedNetworks>("ethereum");
 
-    const [chosenNetworkName, setChosenNetworkName] = useState<SupportedNetworks>("ethereum");
+  const chosenNetwork = networkInputOptions[chosenNetworkName];
 
-    const chosenNetwork = networkInputOptions[chosenNetworkName];
+  const [networkFullName, networkDefaultAddress, airdropTokenList] =
+    chosenNetwork;
+  const [airdropTokenName, setAirdropTokenName] = useState<
+    typeof airdropTokenList[number]
+  >(airdropTokenList[0]);
 
-    const [networkFullName, networkDefaultAddress, airdropTokenList] = chosenNetwork;
-    const [airdropTokenName, setAirdropTokenName] = useState<typeof airdropTokenList[number]>(airdropTokenList[0])
+  useEffect(() => {
+    // set to first when changing networks
+    setAirdropTokenName(airdropTokenList[0]);
+  }, [airdropTokenList]);
 
-    useEffect(() => {
-      // set to first when changing networks
-      setAirdropTokenName(airdropTokenList[0]);
-    }, [airdropTokenList])
+  const [account, setAccount] = useState("");
+  const [twitterText, setTwitterText] = useState("");
 
-    const [account, setAccount] = useState("");
-    const [twitterText, setTwitterText] = useState("");
+  const { addError, addNotification } = useContext(notificationContext);
 
-    const { addError, addNotification } = useContext(notificationContext);
+  const addTwitterNotification = (phrase: string) => {
+    if (!twitterText) {
+      setTwitterText(phrase);
+      window.open(formatTweet(phrase, chosenNetworkName, airdropTokenName));
+      return;
+    }
+  };
 
-    const addTwitterNotification = (phrase: string) => {
-      if (!twitterText) {
-        setTwitterText(phrase);
-        window.open(formatTweet(phrase, chosenNetworkName, airdropTokenName));
-        return;
-      }
-    };
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    addNotification("Copied to clipboard!");
+  };
 
-    const copyToClipboard = (text: string) => {
-      navigator.clipboard.writeText(text);
-      addNotification("Copied to clipboard!");
-    };
+  let tweetAtMessage =
+    "Follow the process below to tweet and receive your Fluid Assets! Shortly after tweeting, your funds will be sent to you automatically.";
 
-    let tweetAtMessage =
-      "Follow the process below to tweet and receive your Fluid Assets! Shortly after tweeting, your funds will be sent to you automatically.";
+  if (twitterText)
+    tweetAtMessage =
+      "You will be given a unique ID and the ability to request funds from the faucet once every 24 hours, per token.";
 
-    if (twitterText)
-      tweetAtMessage = "You will be given a unique ID and the ability to request funds from the faucet once every 24 hours, per token.";
+  return (
+    <Container>
+      <InformationContainer>
+        <Title>Request Testnet {airdropTokenName}!</Title>
+        <FaucetLineContainer>
+          <FaucetLine />
+        </FaucetLineContainer>
+        <SubtitleContainer>
+          <Subtitle>
+            Tweet a unique code provided here at @fluiditymoney with
+            #fluiditymoney to get free {airdropTokenName} on {networkFullName}!
+          </Subtitle>
+        </SubtitleContainer>
+      </InformationContainer>
 
-    return (
-      <Container>
-        <InformationContainer>
-          <Title>Request Testnet {airdropTokenName}!</Title>
-          <FaucetLineContainer>
-            <FaucetLine />
-          </FaucetLineContainer>
-          <SubtitleContainer>
-            <Subtitle>
-              Tweet a unique code provided here at @fluiditymoney with
-              #fluiditymoney to get free {airdropTokenName} on {networkFullName}!
-            </Subtitle>
-          </SubtitleContainer>
-        </InformationContainer>
-
-        <TweetAtContainer>
-          <form>
-            <TweetAtRows>
-              <TweetAtSubtitle highlight={!!twitterText}>
-                { tweetAtMessage }
-              </TweetAtSubtitle>
-              <InputsRow>
-                <NetworkInput
-                  options={networkInputOptions}
-                  value={chosenNetworkName}
-                  onChange={e => setChosenNetworkName(e.target.value as SupportedNetworks)}
-                />
-                <TestnetAccountAddressInput
-                  value={account}
-                  onChange={e => setAccount(e.target.value)}
-                  defaultAddress={networkDefaultAddress}
-                />
-              </InputsRow>
-              <InputsRow>
-                <CurrencyInput
-                  options={airdropTokenList}
-                  value={airdropTokenName}
-                  onChange={e => setAirdropTokenName(e.target.value as typeof airdropTokenList[number])}
-                >
+      <TweetAtContainer>
+        <form>
+          <TweetAtRows>
+            <TweetAtSubtitle highlight={!!twitterText}>
+              {tweetAtMessage}
+            </TweetAtSubtitle>
+            <InputsRow>
+              <NetworkInput
+                options={networkInputOptions}
+                value={chosenNetworkName}
+                onChange={(e) =>
+                  setChosenNetworkName(e.target.value as SupportedNetworks)
+                }
+              />
+              <TestnetAccountAddressInput
+                value={account}
+                onChange={(e) => setAccount(e.target.value)}
+                defaultAddress={networkDefaultAddress}
+              />
+            </InputsRow>
+            <InputsRow>
+              <CurrencyInput
+                options={airdropTokenList}
+                value={airdropTokenName}
+                onChange={(e) =>
+                  setAirdropTokenName(
+                    e.target.value as typeof airdropTokenList[number]
+                  )
+                }
+              >
                 <PhraseContainer
                   enabled={!!twitterText}
                   onClick={() => twitterText && copyToClipboard(twitterText)}
                 >
-                  {twitterText &&
+                  {twitterText && (
                     <>
-                      Your unique ID: <PhraseText >{twitterText}</PhraseText>
+                      Your unique ID: <PhraseText>{twitterText}</PhraseText>
                     </>
-                    }
-                  </PhraseContainer>
-                </CurrencyInput>
-              </InputsRow>
-              <SendRequestContainer>
-                <RowOnDesktop>
-                  <SendRequestButton
-                    type="button"
-                    onClick={() =>
-                      handleUniquePhraseRequest(
-                        chosenNetworkName,
-                        account,
-                        airdropTokenName,
-                        addError,
-                        addNotification,
-                        addTwitterNotification)
-                      }
-                  >
-                    {twitterText ? "Request Funds" : "Request Code"}
-                  </SendRequestButton>
+                  )}
+                </PhraseContainer>
+              </CurrencyInput>
+            </InputsRow>
+            <SendRequestContainer>
+              <RowOnDesktop>
+                <SendRequestButton
+                  type="button"
+                  onClick={() =>
+                    handleUniquePhraseRequest(
+                      chosenNetworkName,
+                      account,
+                      airdropTokenName,
+                      addError,
+                      addNotification,
+                      addTwitterNotification
+                    )
+                  }
+                >
+                  {twitterText ? "Request Funds" : "Request Code"}
+                </SendRequestButton>
+              </RowOnDesktop>
+            </SendRequestContainer>
 
-                </RowOnDesktop>
-              </SendRequestContainer>
-
-              <EmailUsAtContainer>
-                <EmailUsSubtitle>
-                  Email us at <ContactEmail /> if there is an issue here, thanks!
-                </EmailUsSubtitle>
-              </EmailUsAtContainer>
-            </TweetAtRows>
-          </form>
-        </TweetAtContainer>
-      </Container >
-    )
-  };
+            <EmailUsAtContainer>
+              <EmailUsSubtitle>
+                Email us at <ContactEmail /> if there is an issue here, thanks!
+              </EmailUsSubtitle>
+            </EmailUsAtContainer>
+          </TweetAtRows>
+        </form>
+      </TweetAtContainer>
+    </Container>
+  );
+};
 
 const Container = styled.div`
   padding-top: 60px;
@@ -163,7 +170,7 @@ const Container = styled.div`
 `;
 
 const InformationContainer = styled.div`
-  max-width: 600px;
+  max-width: 710px;
   padding-bottom: 40px;
   padding-right: 20px;
 `;
@@ -219,7 +226,7 @@ const FaucetLineContainer = styled.div`
 `;
 
 const FaucetLine = styled.div`
-  background: linear-gradient(79.44deg, #1881FE 36.64%, #5BFEF3 70.33%);
+  background: linear-gradient(79.44deg, #1881fe 36.64%, #5bfef3 70.33%);
   width: 300px;
   height: 3px;
   border-radius: 30px;
@@ -231,9 +238,7 @@ const SubtitleContainer = styled.div`
   }
 `;
 
-const FaucetHighlightEmail = styled(Highlight)`
-
-`;
+const FaucetHighlightEmail = styled(Highlight)``;
 
 const EmailUsSubtitle = styled(Subtitle)`
   font-size: 16px;
@@ -241,8 +246,10 @@ const EmailUsSubtitle = styled(Subtitle)`
 
 const PhraseText = styled.span``;
 
-const PhraseContainer = styled(Subtitle) <{ enabled?: boolean }>`
-  ${({ enabled }) => enabled && `
+const PhraseContainer = styled(Subtitle)<{ enabled?: boolean }>`
+  ${({ enabled }) =>
+    enabled &&
+    `
     flex: 1;
     padding: 0;
     text-align: center;
@@ -253,13 +260,14 @@ const PhraseContainer = styled(Subtitle) <{ enabled?: boolean }>`
         text-decoration: underline;
       }
       cursor: pointer;
-    }`
-  }
+    }`}
 `;
 
-const TweetAtSubtitle = styled(Subtitle) <{ highlight?: boolean }>`
+const TweetAtSubtitle = styled(Subtitle)<{ highlight?: boolean }>`
   transition: color 0.1s;
-  ${({ highlight }) => highlight && `
+  ${({ highlight }) =>
+    highlight &&
+    `
     color: green;
   `}
 `;
