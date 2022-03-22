@@ -231,6 +231,13 @@ func main() {
 			)
 
 			if matchedBalls <= 0 {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Transaction hash %s contains no winning balls!",
+						userActionTransactionHash,
+					)
+				})
+
 				return
 			}
 
@@ -251,6 +258,14 @@ func main() {
 				k.Format(
 					"Found winning transaction %v winning %v tokens!",
 					userAction,
+					winningAmount,
+				)
+			})
+
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Transaction hash %s won %v!",
+					userActionTransactionHash,
 					winningAmount,
 				)
 			})
