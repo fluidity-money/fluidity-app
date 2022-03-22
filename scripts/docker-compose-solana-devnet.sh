@@ -25,7 +25,9 @@ export \
 	FLU_SOLANA_TVL_SOLEND_PUBKEY=ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx
 
 export \
-	FLU_SOLANA_SABER_RPC_URL=https://saberqltest.aleph.cloud
+	FLU_SOLANA_SABER_RPC_URL=https://saberqltest.aleph.cloud \
+	FLU_SOLANA_SABER_SWAP_PROGRAM_ID=Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1 \
+	FLU_SOLANA_SOL_PYTH_PUBKEY=5SSkXsEKQepHHAewytPVwdej4epN1nxgLVM84L4KXgy7
 
 export FLU_SOLANA_DEBUG_FAKE_PAYOUTS=true
 
