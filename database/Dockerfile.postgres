@@ -13,9 +13,9 @@ WORKDIR ${REPO}
 
 COPY . ${REPO}
 
-RUN curl -fsSL -o ${REPO}/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+RUN curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
 
-RUN chmod +x ${REPO}/dbmate
+RUN chmod +x /usr/local/bin/dbmate
 
 RUN make postgres
 
