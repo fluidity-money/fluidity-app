@@ -166,7 +166,7 @@ func main() {
 		)
 
 		for _, userAction := range userActions {
-			if userAction.Type == "send" {
+			if userAction.Type == "send" && userAction.TokenDetails.TokenShortName == tokenName {
 				fluidTransfers++
 			}
 		}
@@ -245,9 +245,9 @@ func main() {
 		var recentBlockHash solana.Hash
 
 		for _, userAction := range userActions {
-			// skip if it's not a send
+			// skip if it's not a send, or the wrong token
 
-			if userAction.Type != "send" {
+			if userAction.Type != "send" || userAction.TokenDetails.TokenShortName != tokenName {
 				return
 			}
 

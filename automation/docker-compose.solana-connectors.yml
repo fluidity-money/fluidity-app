@@ -36,3 +36,14 @@ services:
       FLU_SOLANA_SOLEND_PROGRAM_ID: ${FLU_SOLANA_SOLEND_PROGRAM_ID}
     depends_on:
       - rabbitmq
+
+  connector-prize-pool-postgres:
+    build:
+      context: ../cmd/connector-prize-pool-postgres
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: connector-prize-pool-postgres
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+    depends_on:
+      - rabbitmq
+      - postgres
