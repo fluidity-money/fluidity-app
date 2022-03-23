@@ -27,12 +27,24 @@ services:
       - postgres
     restart: unless-stopped
 
-  connector-common-winners-timescale:
+  connector-common-winners-timescale-ethereum:
     build:
       context: ../cmd/connector-common-winners-timescale
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-common-prize-pool-postgres
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-common-prize-pool-postgres-ethereum
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  connector-common-winners-timescale-solana:
+    build:
+      context: ../cmd/connector-common-winners-timescale
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-common-prize-pool-postgres-solana
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
     depends_on:
