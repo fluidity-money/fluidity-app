@@ -28,7 +28,7 @@ const ContactEmail = () => {
 
 const RequestFaucet = ({ networkInputOptions }: RequestFaucet) => {
   const [chosenNetworkName, setChosenNetworkName] =
-    useState<SupportedNetworks>("ethereum");
+    useState<SupportedNetworks>("solana");
 
   const chosenNetwork = networkInputOptions[chosenNetworkName];
 
