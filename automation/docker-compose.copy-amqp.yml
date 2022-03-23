@@ -44,12 +44,12 @@ services:
       FLU_AMQP_COPY_TO_URI: ${FLU_AMQP_COPY_TO_URI_WINNERS_TESTING}
     restart: unless-stopped
 
-  microservice-common-amqp-copy-messages-winnesr-production:
+  microservice-common-amqp-copy-messages-winners-production:
     build:
       context: ../cmd/microservice-common-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-winnesr-production
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-winners-production
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_WINNERS_PRODUCTION}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_WINNERS_PRODUCTION}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_WINNERS_PRODUCTION}
