@@ -184,7 +184,7 @@ func main() {
 			)
 
 			if userAction.Type != "send" {
-				return
+				continue
 			}
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
@@ -227,7 +227,7 @@ func main() {
 					)
 				})
 
-				return
+				continue
 			}
 
 			winningAmountBigInt := randomPayouts[matchedBalls-1]
@@ -262,7 +262,7 @@ func main() {
 			// don't bother paying out if the unlucky winner won nothing
 
 			if winningAmount <= 0 {
-				return
+				continue
 			}
 
 			// send a message to the client that will kick off the payment of the

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 
 	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-common-rabbitmq-backlog-checker/lib"
