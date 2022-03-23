@@ -126,7 +126,21 @@ func main() {
 			senderAddress          = winnerAnnouncement.SenderAddress
 			recipientAddress       = winnerAnnouncement.RecipientAddress
 			winningAmount          = winnerAnnouncement.WinningAmount
+			messageTokenName       = winnerAnnouncement.TokenName
+			messageFluidMintPubkey = winnerAnnouncement.FluidMintPubkey
 		)
+
+		if TokenName != messageTokenName || fluidMintPubkey.String() != messageFluidMintPubkey {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Got winning message for the wrong token %v or mint %v! Skipping!",
+					messageTokenName,
+					messageFluidMintPubkey,
+				)
+			})
+			return
+		}
+
 
 		log.App(func(k *log.Log) {
 			k.Format(

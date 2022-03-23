@@ -290,6 +290,8 @@ func main() {
 				SenderAddress:          userActionSenderAddress,
 				RecipientAddress:       userActionRecipientAddress,
 				WinningAmount:          winningAmount,
+				TokenName:              tokenName,
+				FluidMintPubkey:        fluidMintPubkey.String(),
 			}
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
