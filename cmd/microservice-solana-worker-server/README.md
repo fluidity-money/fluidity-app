@@ -1,11 +1,11 @@
 
-# Fluidity Solana Worker
+# Fluidity Solana Worker Server
 
 This codebase contains the offchain worker implementation for Fluidity's
 Solana deployment.
 
 It takes transactions from Solana, scans for winning transactions, and
-calls the contract when a winner is seen.
+sends a message to the client with the winner randomness!
 
 ## Environment variables
 

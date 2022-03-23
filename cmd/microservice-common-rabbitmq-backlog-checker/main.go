@@ -56,7 +56,6 @@ func main() {
 	}
 
 	for _, vhost := range vhosts {
-		fmt.Println(vhost)
 		queues, err := lib.GetRmqQueues(queueAddress, vhost.Name)
 
 		if err != nil {

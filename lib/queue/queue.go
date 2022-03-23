@@ -180,3 +180,9 @@ func SendMessageBytes(topic string, content []byte) {
 
 	debug("Sending goroutine has received the request!")
 }
+
+// Finish up, by clearing the buffer
+func Finish() {
+	amqpDetails := <-chanAmqpDetails
+	amqpDetails.channel.Close()
+}

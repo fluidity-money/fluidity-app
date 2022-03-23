@@ -1,4 +1,3 @@
-
 import styled from "styled-components";
 
 import { Subtitle } from "./Titles";
@@ -14,19 +13,18 @@ export const Input = styled.input`
   border-style: solid;
   border-color: transparent;
   box-sizing: border-box;
-
-  :focus {
+`;
+/*:focus {
     border-style: solid;
     border-color: inherit;
-  }
-`;
+  }*/
 
 export const InputTweetAt = styled(Input)`
   border-radius: 0;
-  border: 1px solid #FFFFFF;
+  border: 1px solid #ffffff;
   color: white;
 `;
 
 export const InputSubtitle = styled(Subtitle)`
-  padding-bottom: 4px;
+  padding: 24px 4px 4px 4px;
 `;

@@ -55,18 +55,18 @@ type (
 
 // SendTransfer using the token address given, the sender address, returning
 // the signature or an error
-func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddress, tokenAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
+func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddress, tokenMintAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
 
 	var (
 		senderAccountMeta = solana.NewAccountMeta(senderAddress, true, false)
-		signerAccountMeta = solana.NewAccountMeta(publicKey, false, true)
-		tokenAddressMeta  = solana.NewAccountMeta(tokenAddress, false, false)
+		signerAccountMeta = solana.NewAccountMeta(publicKey, true, true)
+		tokenMintMeta  = solana.NewAccountMeta(tokenMintAddress, true, false)
 	)
 
 	programAddressInput := [][]byte{
 		recipientAddress[:],
 		TokenProgramAddressPubkey[:],
-		tokenAddress[:],
+		tokenMintAddress[:],
 	}
 
 	ataRecipientPublicKey, _, err := solana.FindProgramAddress(
@@ -91,8 +91,8 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 		createAccountSlice := solana.AccountMetaSlice{
 			signerAccountMeta,
 			recipientAccountMeta,
-			solana.NewAccountMeta(recipientAddress, true, false),
-			tokenAddressMeta,
+			solana.NewAccountMeta(recipientAddress, false, false),
+			tokenMintMeta,
 			solana.NewAccountMeta(solana.SystemProgramID, false, false),
 			solana.NewAccountMeta(TokenProgramAddressPubkey, false, false),
 			solana.NewAccountMeta(solana.SysVarRentPubkey, false, false),
@@ -111,7 +111,6 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 		senderAccountMeta,
 		recipientAccountMeta,
 		signerAccountMeta,
-		tokenAddressMeta,
 	}
 
 	data := InstructionTransfer{

@@ -128,7 +128,7 @@ func main() {
 
 	// we don't actually care about the block state!
 
-	worker.BlockLogs(func(_ worker.BlockLog) {
+	worker.EthereumBlockLogs(func(_ worker.EthereumBlockLog) {
 
 		var amount float64
 

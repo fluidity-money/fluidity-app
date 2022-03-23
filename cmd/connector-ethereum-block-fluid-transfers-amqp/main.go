@@ -105,7 +105,7 @@ func main() {
 				k.Format("Found block %s", blockHash)
 			})
 
-			amqpBlock := worker.BlockLog{
+			amqpBlock := worker.EthereumBlockLog{
 				BlockHash:    types.HashFromString(blockHash.Hex()),
 				BlockBaseFee: newHeader.BaseFee,
 				BlockTime:    newHeader.Time,
@@ -197,7 +197,7 @@ func main() {
 				amqpBlock.Logs = append(amqpBlock.Logs, logsResponse.Result...)
 			}
 
-			queue.SendMessage(workerQueue.TopicBlockLogs, amqpBlock)
+			queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
 		}
 
 	}

@@ -1,9 +1,26 @@
 import React from "react";
 import { useEffect } from "react";
 
+// switchEthereumChain for Ropsten and Mainnet
+const changeNetwork = async () => {
+  try {
+    if (!(window as any).ethereum) throw new Error("No crypto wallet found");
+    await (window as any).ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: `0x${process.env.REACT_APP_CHAIN_ID}` }],
+    });
+  } catch (err) {
+    throw err;
+  }
+};
+
 const Toolbar = ({ children }: { children: JSX.Element }) => {
   const [desiredNetwork, setDesiredNetwork] = React.useState(true);
   const [chainId, setChainId] = React.useState<string>();
+
+  const handleNetworkSwitch = async () => {
+    await changeNetwork();
+  };
 
   const checkNetworkOnLoad = async () => {
     const chain = await (window as any).ethereum.request({
@@ -45,7 +62,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
       {children}
       {desiredNetwork === false ? (
         <div className="change-network-message">
-          <div>
+          <div className="change-network-text">
             App network (
             {process.env.REACT_APP_CHAIN_ID === `3`
               ? `Ethereum Ropsten`
@@ -65,14 +82,12 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
             </a>
             {` or   `}
           </div>
-          <a
-            className="change-network-link"
-            href="https://chainlist.org/"
-            target="_blank"
-            rel="noreferrer"
+          <button
+            className="change-network-button"
+            onClick={() => handleNetworkSwitch()}
           >
-            change network
-          </a>
+            Change Network
+          </button>
         </div>
       ) : (
         <></>
