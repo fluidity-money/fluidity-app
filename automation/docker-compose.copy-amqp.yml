@@ -7,7 +7,7 @@ services:
       context: ../cmd/microservice-common-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-testing
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-user-actions-testing
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_USER_ACTIONS_TESTING}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_USER_ACTIONS_TESTING}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_USER_ACTIONS_TESTING}
@@ -21,7 +21,7 @@ services:
       context: ../cmd/microservice-common-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-production
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-user-actions-production
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_USER_ACTIONS_PRODUCTION}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_USER_ACTIONS_PRODUCTION}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_USER_ACTIONS_PRODUCTION}
@@ -35,7 +35,7 @@ services:
       context: ../cmd/microservice-common-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-testing
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-winners-testing
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_WINNERS_TESTING}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_WINNERS_TESTING}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_WINNERS_TESTING}
@@ -49,7 +49,7 @@ services:
       context: ../cmd/microservice-common-amqp-copy-messages
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-production
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-amqp-copy-messages-winnesr-production
       FLU_AMQP_COPY_FROM_EXCHANGE: ${FLU_AMQP_COPY_FROM_EXCHANGE_WINNERS_PRODUCTION}
       FLU_AMQP_COPY_FROM_TOPIC_NAME: ${FLU_AMQP_COPY_FROM_TOPIC_NAME_WINNERS_PRODUCTION}
       FLU_AMQP_COPY_FROM_URI: ${FLU_AMQP_COPY_FROM_URI_WINNERS_PRODUCTION}
