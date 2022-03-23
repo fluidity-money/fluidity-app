@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
@@ -59,23 +60,16 @@ const (
 	// submitting them to solana
 	EnvDebugFakePayouts = `FLU_DEBUG_FAKE_PAYOUTS`
 
-	// EnvPDAPubkey is the public key of the program derived account of the
-	// fluidity contract
-	EnvPDAPubkey = `FLU_SOLANA_PDA_PUBKEY`
-
 	// EnvSolPythPubkey is the public key of the pyth price account for SOL
 	EnvSolPythPubkey = `FLU_SOLANA_SOL_PYTH_PUBKEY`
+
+	// EnvTokenName is the same of the token being wrapped
+	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
 )
 
 const (
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
-	// TokenName that's wrapped by the codebase
-	TokenName = "USDC"
-
-	// BumpSeed to signing the contract calls within the contract with the PDA
-	BumpSeed = 251
 )
 
 func main() {
@@ -89,11 +83,25 @@ func main() {
 		obligationPubkey  = pubkeyFromEnv(EnvObligationPubkey)
 		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
 
-		PDAPubkey = pubkeyFromEnv(EnvPDAPubkey)
+		TokenName         = util.GetEnvOrFatal(EnvTokenName)
 
-		debugFakePayouts = os.Getenv(EnvDebugFakePayouts) == "true"
+		debugFakePayouts  = os.Getenv(EnvDebugFakePayouts) == "true"
+		obligationString  = fmt.Sprintf("FLU:%s_OBLIGATION", TokenName)
+		obligationBytes_  = []byte(obligationString)
+		obligationBytes   = [][]byte{obligationBytes_}
 	)
 
+	PDAPubkey, BumpSeed, err := solana.FindProgramAddress(obligationBytes, fluidityPubkey) 
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to derive the PDA account and bump seed! %v",
+				err,
+			)
+		})
+	}
+	
 	solanaClient := solanaRpc.New(rpcUrl)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
@@ -118,7 +126,21 @@ func main() {
 			senderAddress          = winnerAnnouncement.SenderAddress
 			recipientAddress       = winnerAnnouncement.RecipientAddress
 			winningAmount          = winnerAnnouncement.WinningAmount
+			messageTokenName       = winnerAnnouncement.TokenName
+			messageFluidMintPubkey = winnerAnnouncement.FluidMintPubkey
 		)
+
+		if TokenName != messageTokenName || fluidMintPubkey.String() != messageFluidMintPubkey {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Got winning message for the wrong token %v or mint %v! Skipping!",
+					messageTokenName,
+					messageFluidMintPubkey,
+				)
+			})
+			return
+		}
+
 
 		log.App(func(k *log.Log) {
 			k.Format(

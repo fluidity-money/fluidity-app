@@ -17,14 +17,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-user-actions/lib/abi"
 )
 
-const (
-	// UsdcName to use to track the token's name in a send/swap
-	UsdcName = "USDC"
-
-	// UsdcDecimals to use to track the token's decimals
-	UsdcDecimals = 6
-)
-
 var (
 	// Winner1Split, 8 that's used to fix the sender amount portion
 	Winner1Split = big.NewInt(8)
@@ -57,7 +49,7 @@ func tokenIsMintEvent(senderAddress, recipientAddress, fluidityTokenMintAddress,
 	return false
 }
 
-func processFluidityTransaction(transactionHash string, instruction solana.TransactionInstruction, accounts, fluidityOwners []string) (winner1 *winners.Winner, winner2 *winners.Winner, swapWrap *user_actions.UserAction, swapUnwrap *user_actions.UserAction, err error) {
+func processFluidityTransaction(transactionHash string, instruction solana.TransactionInstruction, accounts, fluidityOwners []string, tokenDetails token_details.TokenDetails) (winner1 *winners.Winner, winner2 *winners.Winner, swapWrap *user_actions.UserAction, swapUnwrap *user_actions.UserAction, err error) {
 
 	fluidityTransaction, err := abi.DecodeFluidityInstruction(instruction.Data)
 
@@ -77,54 +69,64 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 			winnerBIndex = instruction.Accounts[6]
 		)
 
-		transactionPayoutValue := fluidityTransaction.Payout.Value
+		// payout for different token
+		if fluidityOwners[winnerAIndex] == "" {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Got a winning payout, but token mint was wrong! %v",
+					transactionHash,
+				)
+			})
+		// got a payout
+		} else {
+			transactionPayoutValue := fluidityTransaction.Payout.Value
 
-		winner_ := winners.Winner{
-			Network:         network.NetworkSolana,
-			TransactionHash: transactionHash,
-			AwardedTime:     currentTime,
-			TokenDetails: token_details.TokenDetails{
-				TokenShortName: UsdcName,
-				TokenDecimals:  UsdcDecimals,
-			},
+			winner_ := winners.Winner{
+				Network:         network.NetworkSolana,
+				TransactionHash: transactionHash,
+				AwardedTime:     currentTime,
+				TokenDetails: tokenDetails,
+			}
+
+			winningAmount := new(big.Int).SetUint64(transactionPayoutValue)
+
+			var (
+				winner1_ = winner_
+				winner2_ = winner_
+			)
+
+			winningAmount1 := new(big.Int).Mul(winningAmount, Winner1Split)
+
+			winningAmount1.Quo(winningAmount1, winner10Split)
+
+			winningAmount2 := new(big.Int).Mul(winningAmount, Winner2Split)
+
+			winningAmount2.Quo(winningAmount2, winner10Split)
+
+			winner1_.WinnerAddress = accounts[winnerAIndex]
+			winner1_.SolanaWinnerOwnerAddress = fluidityOwners[winnerAIndex]
+
+			winner1_.WinningAmount = misc.NewBigInt(*winningAmount1)
+
+			winner2_.WinnerAddress = accounts[winnerBIndex]
+			winner2_.SolanaWinnerOwnerAddress = fluidityOwners[winnerBIndex]
+
+			winner2_.WinningAmount = misc.NewBigInt(*winningAmount2)
+
+			winner1 = &winner1_
+			winner2 = &winner2_
 		}
-
-		winningAmount := new(big.Int).SetUint64(transactionPayoutValue)
-
-		var (
-			winner1_ = winner_
-			winner2_ = winner_
-		)
-
-		winningAmount1 := new(big.Int).Mul(winningAmount, Winner1Split)
-
-		winningAmount1.Quo(winningAmount1, winner10Split)
-
-		winningAmount2 := new(big.Int).Mul(winningAmount, Winner2Split)
-
-		winningAmount2.Quo(winningAmount2, winner10Split)
-
-		winner1_.WinnerAddress = accounts[winnerAIndex]
-		winner1_.SolanaWinnerOwnerAddress = fluidityOwners[winnerAIndex]
-
-		winner1_.WinningAmount = misc.NewBigInt(*winningAmount1)
-
-		winner2_.WinnerAddress = accounts[winnerBIndex]
-		winner2_.SolanaWinnerOwnerAddress = fluidityOwners[winnerBIndex]
-
-		winner2_.WinningAmount = misc.NewBigInt(*winningAmount2)
-
-		winner1 = &winner1_
-		winner2 = &winner2_
 	}
 
 	if fluidityTransaction.Wrap != nil {
 		var (
 			accountIndex       = instruction.Accounts[5]
-			swapAmount         = misc.BigIntFromUint64(fluidityTransaction.Wrap.Value)
 			senderAddress      = accounts[accountIndex]
 			senderOwnerAddress = fluidityOwners[5]
+			swapAmount_        = fluidityTransaction.Wrap.Value
 		)
+
+		swapAmount := misc.BigIntFromUint64(swapAmount_)
 
 		if senderAddress != senderOwnerAddress {
 			log.App(func(k *log.Log) {
@@ -142,8 +144,8 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 			transactionHash,
 			swapAmount,
 			true,
-			UsdcName,
-			UsdcDecimals,
+			tokenDetails.TokenShortName,
+			tokenDetails.TokenDecimals,
 		)
 
 		swapWrap_.SolanaSenderOwnerAddress = senderOwnerAddress
@@ -177,8 +179,8 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 			transactionHash,
 			swapAmount,
 			false,
-			UsdcName,
-			UsdcDecimals,
+			tokenDetails.TokenShortName,
+			tokenDetails.TokenDecimals,
 		)
 
 		swapUnwrap_.SolanaSenderOwnerAddress = senderOwnerAddress
@@ -191,7 +193,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 
 // processSplTransaction, returning possibly two transfers depending on
 // what's contained within the spl transaction
-func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
+func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string, tokenDetails token_details.TokenDetails) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
 	splTransaction, err := abi.DecodeSplInstruction(instruction.Data)
 
 	if errors.Is(err, abi.UnknownInstructionError) {
@@ -248,8 +250,8 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 					recipientAddress,
 					transactionHash,
 					transferAmount,
-					UsdcName,
-					UsdcDecimals,
+					tokenDetails.TokenShortName,
+					tokenDetails.TokenDecimals,
 				)
 
 				transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
@@ -298,8 +300,8 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 					recipientAddress,
 					transactionHash,
 					transferAmount,
-					UsdcName,
-					UsdcDecimals,
+					tokenDetails.TokenShortName,
+					tokenDetails.TokenDecimals,
 				)
 
 				transfer_.SolanaSenderOwnerAddress = senderOwnerAddress

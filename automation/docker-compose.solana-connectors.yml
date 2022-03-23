@@ -15,6 +15,9 @@ services:
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_STARTING_SLOT: ${FLU_SOLANA_STARTING_SLOT}
     restart: unless-stopped
+    depends_on:
+      - rabbitmq
+      - redis
 
   connector-solana-tvl-amqp:
     build:
@@ -35,3 +38,5 @@ services:
       FLU_SOLANA_SWITCHBOARD_PUBKEY: ${FLU_SOLANA_SWITCHBOARD_PUBKEY}
       FLU_SOLANA_TVL_PAYER_PRIKEY: ${FLU_SOLANA_TVL_PAYER_PRIKEY}
       FLU_SOLANA_SOLEND_PROGRAM_ID: ${FLU_SOLANA_SOLEND_PROGRAM_ID}
+    depends_on:
+      - rabbitmq

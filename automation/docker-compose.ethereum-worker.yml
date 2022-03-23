@@ -39,7 +39,6 @@ services:
     restart: unless-stopped
 
   microservice-ethereum-worker-server-dai:
-    command: ethereum-server
     build:
       context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
@@ -58,7 +57,6 @@ services:
     restart: unless-stopped
 
   microservice-ethereum-worker-client-dai:
-    command: ethereum-client
     build:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
@@ -92,7 +90,6 @@ services:
     restart: unless-stopped
 
   microservice-ethereum-worker-client-usdt:
-    command: ethereum-client
     build:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs

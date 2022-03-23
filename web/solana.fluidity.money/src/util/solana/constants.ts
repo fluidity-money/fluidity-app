@@ -1,27 +1,19 @@
 import {FluidSupportedTokens, SupportedTokens} from "components/types";
 
-//TODO should probably be sourced from env vars to allow flexibility between dev and prod
-
 //the same program is used for every token
-export const FLUID_PROGRAM_ID = "GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU";
-//the same pda account is used for every token
+const FLUID_PROGRAM_ID_ = process.env.REACT_APP_FLUID_PROGRAM_ID;
+if (!FLUID_PROGRAM_ID_)
+  throw new Error("FLUID_PROGRAM_ID unset!");
 
-/*
- * for each SPL token, we need
- *   - the token mint address
- *   - the ATA for the fluid program's PDA (for that token)
- */
+export const FLUID_PROGRAM_ID = FLUID_PROGRAM_ID_;
+
 export type BaseToken = {
   name: string,
   symbol: SupportedTokens | "Select Token" | "Select FLUID"
   mintAddress: string,
   decimals?: number,
-  pda: string,
 }
 
-/* for each Fluid token, we need the token mint address
- * fluid tokens don't require an ATA, since custody is never held
- */
 export type FluidToken = {
   name: string,
   symbol: FluidSupportedTokens,
@@ -35,14 +27,25 @@ export const tokenList: SolTokenList = [
   {
     name: "USD Coin",
     symbol: "USDC",
-    mintAddress: "zVzi5VAf4qMEwzv7NXECVx5v2pQ7xnqVVjCXZwS9XzA",
+    mintAddress: process.env.REACT_APP_BASE_MINT_USDC || "",
     decimals: 6,
-    pda: "89B3rmx8nL7Zc2t6AhFEbC7g2bkzBZTGGdWEibLe3jBW"
   },
   {
     name: "Fluid USDC",
     symbol: "fUSDC",
+    mintAddress: process.env.REACT_APP_FLU_MINT_USDC || "",
     decimals: 6,
-    mintAddress: "2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa",
+  },
+  {
+    name: "Tether USD",
+    symbol: "USDT",
+    mintAddress: process.env.REACT_APP_BASE_MINT_USDT || "",
+    decimals: 6,
+  },
+  {
+    name: "Fluid USDT",
+    symbol: "fUSDT",
+    mintAddress: process.env.REACT_APP_FLU_MINT_USDT || "",
+    decimals: 6,
   },
 ]

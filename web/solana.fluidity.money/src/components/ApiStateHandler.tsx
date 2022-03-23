@@ -60,7 +60,7 @@ const ApiStateHandler = ({ state }: { state: ApiState }) => {
 
       console.warn({"user_action": userAction, "wallet": wallet?.publicKey});
 
-      if (walletAddress === userAction.sender_address) {
+      if (wallet?.publicKey && wallet.publicKey.toBase58() === userAction.recipient_address) {
         userAction.type = "received";
       }
 

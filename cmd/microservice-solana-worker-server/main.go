@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/big"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -54,6 +55,12 @@ const (
 	// this must be the payout authority of the contract
 	EnvPayerPrikey = `FLU_SOLANA_PAYER_PRIKEY`
 
+	// EnvTokenDecimals is the number of decimals the token uses
+	EnvTokenDecimals = `FLU_SOLANA_TOKEN_DECIMALS`
+
+	// EnvTokenName is the same of the token being wrapped
+	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
+
 	// EnvTopicWinnerQueue to use when transmitting to a client the topic of
 	// a winner
 	EnvTopicWinnerQueue = `FLU_SOLANA_WINNER_QUEUE_NAME`
@@ -65,9 +72,6 @@ const (
 
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
-	// UsdcDecimalPlaces to use when normalising any values from USDC
-	UsdcDecimalPlaces = 1e6
 )
 
 func main() {
@@ -85,11 +89,25 @@ func main() {
 		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
 		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
+		decimalPlaces_    = util.GetEnvOrFatal(EnvTokenDecimals)
+		tokenName         = util.GetEnvOrFatal(EnvTokenName)
 	)
 
+	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to convert the decimals from %v! Was %#v!",
+				decimalPlaces_,
+				decimalPlaces,
+			)
+		})
+	}
+
 	var (
-		decimalPlacesRat     = big.NewRat(UsdcDecimalPlaces, 1)
-		usdcDecimalPlacesRat = big.NewRat(UsdcDecimalPlaces, 1)
+		decimalPlacesRat       = big.NewRat(int64(decimalPlaces), 1)
+		usdcDecimalPlacesRat   = big.NewRat(int64(decimalPlaces), 1)
 	)
 
 	solanaClient := solanaRpc.New(rpcUrl)
@@ -113,7 +131,7 @@ func main() {
 		)
 
 		for _, userAction := range userActions {
-			if userAction.Type == "send" {
+			if userAction.Type == "send" && userAction.TokenDetails.TokenShortName == tokenName {
 				fluidTransfers++
 			}
 		}
@@ -130,8 +148,11 @@ func main() {
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get USDC apy on Solana!"
-				k.Payload = err
+				k.Format(
+					"Failed to get %v apy on Solana! %v",
+					tokenName,
+					err,
+				)
 			})
 		}
 
@@ -184,15 +205,14 @@ func main() {
 
 		for _, userAction := range userActions {
 
-			// skip if it's not a send
-
+			// skip if it's not a send, or the wrong token
 			var (
 				userActionTransactionHash  = userAction.TransactionHash
 				userActionSenderAddress    = userAction.SenderAddress
 				userActionRecipientAddress = userAction.RecipientAddress
 			)
 
-			if userAction.Type != "send" {
+			if userAction.Type != "send" || userAction.TokenDetails.TokenShortName != tokenName {
 				continue
 			}
 
@@ -284,6 +304,8 @@ func main() {
 				SenderAddress:          userActionSenderAddress,
 				RecipientAddress:       userActionRecipientAddress,
 				WinningAmount:          winningAmount,
+				TokenName:              tokenName,
+				FluidMintPubkey:        fluidMintPubkey.String(),
 			}
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)

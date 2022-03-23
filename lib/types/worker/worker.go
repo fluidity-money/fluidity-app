@@ -31,5 +31,7 @@ type (
 		SenderAddress          string `json:"sender_address"`
 		RecipientAddress       string `json:"receiver_address"`
 		WinningAmount          uint64 `json:"winning_amount"`
+		TokenName              string `json:"token_name"`
+		FluidMintPubkey        string `json:"fluid_mint_pubkey"`
 	}
 )
