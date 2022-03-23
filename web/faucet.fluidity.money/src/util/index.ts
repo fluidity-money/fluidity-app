@@ -69,8 +69,6 @@ export type SupportedTokens<T extends SupportedNetworks | "all" = "all"> =
     SupportedTokensSolana :
     SupportedTokensEthereum | SupportedTokensSolana;
 
-export type SupportedTokens = SupportedTokensEthereum;
-
 type submitUniquePhraseRequest = {
   network: string,
   address: string,
