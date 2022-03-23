@@ -45,7 +45,7 @@ type (
 		} `json:"calculate_bpy"`
 
 		AaveGetTokenApy struct {
-			DepositApy       string `json:"deposit_apy"`
+			DepositApr       string `json:"deposit_apr"`
 			APRPerDay        string `json:"apr_per_day"`
 			OnePlusAprPerDay string `json:"one_plus_apr_per_day"`
 			CompoundedApr    string `json:"compounded_apr"`
