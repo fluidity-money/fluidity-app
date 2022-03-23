@@ -3,9 +3,13 @@ FROM postgres:14.0-alpine
 
 ENV REPO /usr/src/fluidity-migrations-postgres
 
-RUN apk add make
+RUN apk add make curl
 
-RUN apk add curl
+RUN curl -fsSLo \
+	/usr/local/bin/dbmate \
+	https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+
+RUN chmod +x /usr/local/bin/dbmate
 
 RUN mkdir ${REPO}
 
@@ -13,11 +17,6 @@ WORKDIR ${REPO}
 
 COPY . ${REPO}
 
-RUN curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
-
-RUN chmod +x /usr/local/bin/dbmate
-
 RUN make postgres
 
 COPY init-postgres-db.sh /docker-entrypoint-initdb.d/init-sqls.sh
-

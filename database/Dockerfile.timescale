@@ -3,19 +3,19 @@ FROM timescale/timescaledb:latest-pg12
 
 ENV REPO /usr/src/fluidity-migrations-timescale
 
-RUN apk add make
+RUN apk add make curl
 
-RUN apk add curl
+RUN curl -fsSLo \
+	/usr/local/bin/dbmate \
+	https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+
+RUN chmod +x /usr/local/bin/dbmate
 
 RUN mkdir ${REPO}
 
 WORKDIR ${REPO}
 
 COPY . ${REPO}
-
-RUN curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
-
-RUN chmod +x /usr/local/bin/dbmate
 
 RUN make timescale
 
