@@ -45,7 +45,7 @@ var (
 	DefaultAmountBigEthereum = big.NewInt(10)
 
 	// DefaultAmountBigSolana to use to send to Solana to pay USDC
-	DefaultAmountBigSolana = big.NewInt(100_000_000)
+	DefaultAmountBigSolana = big.NewInt(1000)
 
 	// DefaultAmountEthereum to use to track uses of the faucet
 	DefaultAmountEthereum = misc.NewBigInt(*DefaultAmountBigEthereum)
