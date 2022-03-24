@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -24,6 +26,9 @@ const (
 
 	// EnvSolanaSenderPdaAddress to use to send faucet funds from
 	EnvSolanaSenderPdaAddress = "FLU_SOLANA_FAUCET_SENDER_ADDR"
+
+	// EnvSolanaDebugFakePayouts to prevent sending amounts when set to true
+	EnvSolanaDebugFakePayouts = "FLU_SOLANA_DEBUG_FAKE_PAYOUTS"
 )
 
 func main() {
@@ -32,6 +37,8 @@ func main() {
 		tokenAddress_  = util.GetEnvOrFatal(EnvSolanaTokenAddress)
 		privateKey_    = util.GetEnvOrFatal(EnvSolanaPrivateKey)
 		senderAddress_ = util.GetEnvOrFatal(EnvSolanaSenderPdaAddress)
+
+		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
@@ -90,6 +97,18 @@ func main() {
 		}
 
 		amountInt64 := amount.Uint64()
+
+		if testingEnabled {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Would've sent %v to %v, but in testing mode!",
+					recipientAddress,
+					amountInt64,
+				)
+			})
+
+			return
+		}
 
 		signature, err := fluidity.SendTransfer(
 			solanaClient,
