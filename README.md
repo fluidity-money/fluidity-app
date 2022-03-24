@@ -30,3 +30,9 @@
 |   |-- Web
 |-- worker
     |-- Build folder for worker
+
+## Create a new service
+
+To create a new service in `/cmd` utilising the default build setup:
+
+    ./create-service.sh <name>
