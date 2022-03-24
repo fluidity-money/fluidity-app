@@ -221,45 +221,46 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 			toIndex   = instruction.Accounts[1]
 		)
 
-		// is a fluidity transfer:
 
-		if fluidityOwners[fromIndex] != "" {
+		// is not a fluidity transfer
+		if fluidityOwners[fromIndex] == "" { 
+			return nil, nil, nil
+		}
 
-			var (
-				transferAmount_       = splTransaction.Transfer.Amount
-				senderAddress         = accounts[fromIndex]
-				senderOwnerAddress    = fluidityOwners[fromIndex]
-				recipientAddress      = accounts[toIndex]
-				recipientOwnerAddress = fluidityOwners[toIndex]
-			)
+		var (
+			transferAmount_       = splTransaction.Transfer.Amount
+			senderAddress         = accounts[fromIndex]
+			senderOwnerAddress    = fluidityOwners[fromIndex]
+			recipientAddress      = accounts[toIndex]
+			recipientOwnerAddress = fluidityOwners[toIndex]
+		)
 
-			tokenIsMintEvent := tokenIsMintEvent(
+		tokenIsMintEvent := tokenIsMintEvent(
+			senderAddress,
+			recipientAddress,
+			fluidityTokenMintAddress,
+			fluidityPdaPubkey,
+		)
+
+		if !tokenIsMintEvent {
+
+			transferAmount := misc.BigIntFromUint64(transferAmount_)
+
+			transfer_ := user_actions.NewSend(
+				network.NetworkSolana,
 				senderAddress,
 				recipientAddress,
-				fluidityTokenMintAddress,
-				fluidityPdaPubkey,
+				transactionHash,
+				transferAmount,
+				tokenDetails.TokenShortName,
+				tokenDetails.TokenDecimals,
 			)
 
-			if !tokenIsMintEvent {
+			transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
+			transfer_.SolanaRecipientOwnerAddress = recipientOwnerAddress
+			transfer_.AdjustedFee = adjustedFee
 
-				transferAmount := misc.BigIntFromUint64(transferAmount_)
-
-				transfer_ := user_actions.NewSend(
-					network.NetworkSolana,
-					senderAddress,
-					recipientAddress,
-					transactionHash,
-					transferAmount,
-					tokenDetails.TokenShortName,
-					tokenDetails.TokenDecimals,
-				)
-
-				transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
-				transfer_.SolanaRecipientOwnerAddress = recipientOwnerAddress
-				transfer_.AdjustedFee = adjustedFee
-
-				transfer1 = &transfer_
-			}
+			transfer1 = &transfer_
 		}
 	}
 
@@ -271,46 +272,45 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 			toIndex    = instruction.Accounts[2]
 		)
 
-		// is a fluidity transfer:
+		// is not a fluidity transfer
+		if accounts[tokenIndex] != fluidityTokenMintAddress {
+			return nil, nil, nil 
+		}
 
-		if accounts[tokenIndex] == fluidityTokenMintAddress {
+		var (
+			senderAddress         = accounts[fromIndex]
+			senderOwnerAddress    = fluidityOwners[fromIndex]
+			recipientAddress      = accounts[toIndex]
+			recipientOwnerAddress = fluidityOwners[toIndex]
+			transferAmount_       = splTransaction.TransferChecked.Amount
+		)
 
-			var (
-				senderAddress         = accounts[fromIndex]
-				senderOwnerAddress    = fluidityOwners[fromIndex]
-				recipientAddress      = accounts[toIndex]
-				recipientOwnerAddress = fluidityOwners[toIndex]
-				transferAmount_       = splTransaction.TransferChecked.Amount
-			)
+		transferAmount := misc.BigIntFromUint64(transferAmount_)
 
-			transferAmount := misc.BigIntFromUint64(transferAmount_)
+		tokenIsMintEvent := tokenIsMintEvent(
+			senderAddress,
+			recipientAddress,
+			fluidityTokenMintAddress,
+			fluidityPdaPubkey,
+		)
 
-			tokenIsMintEvent := tokenIsMintEvent(
+		if !tokenIsMintEvent {
+
+			transfer_ := user_actions.NewSend(
+				network.NetworkSolana,
 				senderAddress,
 				recipientAddress,
-				fluidityTokenMintAddress,
-				fluidityPdaPubkey,
+				transactionHash,
+				transferAmount,
+				tokenDetails.TokenShortName,
+				tokenDetails.TokenDecimals,
 			)
 
-			if !tokenIsMintEvent {
+			transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
+			transfer_.SolanaRecipientOwnerAddress = recipientOwnerAddress
+			transfer_.AdjustedFee = adjustedFee
 
-				transfer_ := user_actions.NewSend(
-					network.NetworkSolana,
-					senderAddress,
-					recipientAddress,
-					transactionHash,
-					transferAmount,
-					tokenDetails.TokenShortName,
-					tokenDetails.TokenDecimals,
-				)
-
-				transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
-				transfer_.SolanaRecipientOwnerAddress = recipientOwnerAddress
-				transfer_.AdjustedFee = adjustedFee
-
-				transfer2 = &transfer_
-
-			}
+			transfer2 = &transfer_
 		}
 	}
 
