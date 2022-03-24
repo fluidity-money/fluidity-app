@@ -6,6 +6,14 @@ import (
 )
 
 func addAndComputeAverageAtx(blockNumber uint64, tokenShortName string, transfers int) int {
+
 	worker.InsertTransactionCount(blockNumber, tokenShortName, transfers, network.NetworkEthereum)
-	return worker.GetAverageAtx(blockNumber - AtxBufferSize, tokenShortName, network.NetworkEthereum)
+
+	var blockNumber_ uint64 = 0
+
+ 	if blockNumber > AtxBufferSize {
+		blockNumber_ = blockNumber - AtxBufferSize
+	}
+
+	return worker.GetAverageAtx(blockNumber_, tokenShortName, network.NetworkEthereum)
 }
