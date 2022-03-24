@@ -12,6 +12,7 @@ import (
 	"github.com/near/borsh-go"
 )
 
+// Byte offset at which the TokenAmount struct we're interested in starts
 const TokenAmountStartByte = 113
 
 type TokenAmount struct {
@@ -35,6 +36,14 @@ func GetSaberFees(saberRpcUrl string, transaction types.TransactionResult, saber
 	for i, logStrings := range logs {
 
 		if !strings.HasPrefix(logStrings, searchString) {
+			continue
+		}
+
+		// we need i-1 and i+2
+		if i < 1 {
+			continue
+		}
+		if len(logs) < i+3 {
 			continue
 		}
 
@@ -84,6 +93,11 @@ func GetSaberFees(saberRpcUrl string, transaction types.TransactionResult, saber
 				err,
 			)
 
+			continue
+		}
+
+		// 32 bytes for public key, and 8 for uint64
+		if len(routerBytes) < (TokenAmountStartByte + 40){
 			continue
 		}
 
