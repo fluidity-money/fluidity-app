@@ -589,7 +589,7 @@ func main() {
 				SourcePayouts:   randomPayouts,
 			}
 
-			// Fill in emission.NativeIsWinning
+			// Fill in emission.NaiveIsWinning
 
 			probability.NaiveIsWinning(announcement.SourceRandom, crumb)
 

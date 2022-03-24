@@ -38,9 +38,9 @@ type (
 
 		// WinningChances not included
 
-		NativeIsWinning struct {
+		NaiveIsWinning struct {
 			TestingBalls []uint32 `json:"testing_balls"`
-		} `json:"native_is_winning"`
+		} `json:"naive_is_winning"`
 
 		CalculateBpy struct {
 			BlockTimeInSeconds                          uint64  `json:"block_time_in_seconds"`

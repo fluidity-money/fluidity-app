@@ -22,7 +22,7 @@ CREATE TABLE worker_emissions (
 	calculate_n_n BIGINT,
 
 	-- probability NaiveIsWinning
-	native_is_winning_testing_balls BIGINT[],
+	naive_is_winning_testing_balls BIGINT[],
 
 	-- probability CalculateBpy
 	calculate_bpy_block_time_in_seconds BIGINT,

@@ -183,7 +183,7 @@ func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat *big
 // NaiveIsWinning examines the random numbers we drew and determines if we won
 func NaiveIsWinning(balls []uint32, emission *worker.Emission) int {
 
-	emission.NativeIsWinning.TestingBalls = balls
+	emission.NaiveIsWinning.TestingBalls = balls
 
 	matchedBalls := 0
 

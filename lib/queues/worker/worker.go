@@ -44,7 +44,7 @@ func EthereumBlockLogs(f func(EthereumBlockLog)) {
 	})
 }
 
-func Emisisons(f func(Emission)) {
+func Emissions(f func(Emission)) {
 	queue.GetMessages(TopicEmissions, func(message queue.Message) {
 		var emission Emission
 
