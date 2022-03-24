@@ -159,6 +159,15 @@ func main() {
 		})
 	}
 
+	channelTo, err := client.Channel()
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to configure the channel for the to source!"
+			k.Payload = err
+		})
+	}
+
 	debug(
 		`Bound %s to %s at exchange %s!
 Sending to %s`,
@@ -201,7 +210,7 @@ Sending to %s`,
 			string(message.Body),
 		)
 
-		err := channelFrom.Publish(
+		err := channelTo.Publish(
 			amqpCopyToExchange,
 			amqpCopyToTopicName,
 			true,  // mandatory
