@@ -159,31 +159,13 @@ func main() {
 		})
 	}
 
-	channelTo, queueToName, err := configureChannel(
-		clientTo,
-		workerId,
-		amqpCopyToTopicName,
-		amqpCopyToExchange,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to configure the channel for the to source!"
-			k.Payload = err
-		})
-	}
-
 	debug(
 		`Bound %s to %s at exchange %s!
-Bound %s to %s at exchange %s!
 Sending to %s`,
 		queueFromName,
 		amqpCopyFromTopicName,
 		amqpCopyFromExchange,
-		queueToName,
 		amqpCopyToTopicName,
-		amqpCopyToExchange,
-		queueToName,
 	)
 
 	messages, err := channelFrom.Consume(
@@ -219,7 +201,7 @@ Sending to %s`,
 			string(message.Body),
 		)
 
-		err := channelTo.Publish(
+		err := channelFrom.Publish(
 			amqpCopyToExchange,
 			amqpCopyToTopicName,
 			true,  // mandatory
