@@ -589,6 +589,10 @@ func main() {
 				SourcePayouts:   randomPayouts,
 			}
 
+			// Fill in emission.NativeIsWinning
+
+			probability.NaiveIsWinning(announcement.SourceRandom, crumb)
+
 			log.Debug(func(k *log.Log) {
 				k.Format("Source payouts: %v", randomSource)
 			})
@@ -601,6 +605,8 @@ func main() {
 			}
 
 			queue.SendMessage(publishAmqpQueueName, announcement)
+
+			queue.SendMessage(worker.TopicEmissions, crumb)
 		}
 	})
 }
