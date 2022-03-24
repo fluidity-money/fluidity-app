@@ -1,7 +1,9 @@
 #!/bin/sh
 
+write_err(){ echo $@ >&2; }
+
 if [ $# -eq 0 ]; then
-  echo "Provide a name for the new service!"
+  write_err "Provide a name for the new service!"
   exit 1
 fi
 
@@ -10,14 +12,15 @@ cd cmd
 REPO=$1
 
 if [ -d "$REPO" ]; then
-  echo "Directory $REPO already exists - Not going to overwrite!"
+  write_err "Directory $REPO already exists - Not going to overwrite!"
   exit 1
 fi
 
 mkdir $REPO
 cd $REPO
 
-echo "
+cat > README.md << EOF
+
 # $REPO
 
 enter README description here!
@@ -40,9 +43,9 @@ enter README description here!
 ## Docker
 
     make docker
-" > README.md
+EOF
 
-echo "
+cat > Dockerfile << EOF
 FROM fluidity/build-container:latest
 
 WORKDIR /usr/local/src/fluidity/cmd/$REPO
@@ -53,24 +56,29 @@ ENTRYPOINT [ \\
     "wait-for-ws", \\
     "wait-for-amqp", \\
     "./$REPO.o" \\
-]" > Dockerfile
+]
+EOF
 
-echo "
+cat > Makefile << EOF
+
 REPO := $REPO
 
-include ../../golang.mk" > Makefile
+include ../../golang.mk
+EOF
 
-echo "package main
+cat > main.go << EOF
+package main
 
 import (
-    \"github.com/fluidity-money/fluidity-app/lib/log\"
+    "github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 func main() {
     log.App(func(k *log.Log) {
-        k.Context = \"$REPO\"
-        k.Message = \"Hello world!\"
+        k.Context = "$REPO"
+        k.Message = "Hello world!"
     }) 
-}" > main.go
+}
+EOF
 
-echo "Done!"
+write_err "Done!"
