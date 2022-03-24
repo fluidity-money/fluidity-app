@@ -1,65 +1,73 @@
 package worker
 
 import (
+	"github.com/fluidity-money//fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 type (
-	// Emissions contains information on the modelling information that led
+	// Emission contains information on the modelling information that led
 	// up to the rewarding of the user
-	Emissions struct {
+	Emission struct {
+		Network      string                     `json:"network"`
+		TokenDetails token_details.TokenDetails `json:"token_details"`
+
 		Payout struct {
-			P                             string `json:"p"`
-			A                             string `json:"a"`
-			M                             string `json:"m"`
-			G                             string `json:"g"`
-			B                             string `json:"b"`
-			Delta                         string `json:"delta"`
-			ApyPlusDelta                  string `json:"apy+delta"`
-			Atx                           string `json:"atx"`
-			Apy                           string `json:"apy"`
-			BpyForStakedUsdInsideFunction string `json:"bpy_for_staked_usd_inside_payout_function"`
-			BlockTime                     string `json:"block_time"`
-			RewardPool                    string `json:"reward_pool"`
+			P               interface{} `json:"p"`
+			A               interface{} `json:"a"`
+			M               interface{} `json:"m"`
+			G               interface{} `json:"g"`
+			B               interface{} `json:"b"`
+			Delta           interface{} `json:"delta"`
+			ApyPlusDelta    interface{} `json:"apy+delta"`
+			Atx             interface{} `json:"atx"`
+			Apy             interface{} `json:"apy"`
+			BpyForStakedUsd interface{} `json:"bpy_for_staked_usd"`
+			BlockTime       interface{} `json:"block_time"`
+			RewardPool      interface{} `json:"reward_pool"`
 		} `json:"payout"`
 
 		// calculate n function
 		CalculateN struct {
-			ProbabilityM string `json:"probability_m"`
-			Factorial    string `json:"factorial"`
-			Atx          string `json:"atx"`
-			N            string `json:"n"`
+			ProbabilityM interface{} `json:"probability_m"`
+			Factorial    interface{} `json:"factorial"`
+			Atx          interface{} `json:"atx"`
+			N            interface{} `json:"n"`
 		} `json:"calculate_n"`
 
 		// WinningChances not included
 
 		NativeIsWinning struct {
-			TestingBalls string `json:"testing_balls"`
+			TestingBalls interface{} `json:"testing_balls"`
 		} `json:"native_is_winning"`
 
 		CalculateBpy struct {
-			BlockTimeInSeconds                          string `json:"block_time_in_seconds"`
-			CompSupplyApy                               string `json:"comp_supply_apy"`
-			BlockTimeInSecondsMultipliedByCompSupplyApy string `json:"block_time_in_seconds_multiplied_by_comp_supply_apy"`
+			BlockTimeInSeconds                          interface{} `json:"block_time_in_seconds"`
+			CompSupplyApy                               interface{} `json:"comp_supply_apy"`
+			BlockTimeInSecondsMultipliedByCompSupplyApy interface{} `json:"block_time_in_seconds_multiplied_by_comp_supply_apy"`
 		} `json:"calculate_bpy"`
 
 		AaveGetTokenApy struct {
-			DepositApr       string `json:"deposit_apr"`
-			APRPerDay        string `json:"apr_per_day"`
-			OnePlusAprPerDay string `json:"one_plus_apr_per_day"`
-			CompoundedApr    string `json:"compounded_apr"`
-			DepositApy       string `json:"deposit_apy"`
+			DepositApr       interface{} `json:"deposit_apr"`
+			APRPerDay        interface{} `json:"apr_per_day"`
+			OnePlusAprPerDay interface{} `json:"one_plus_apr_per_day"`
+			CompoundedApr    interface{} `json:"compounded_apr"`
+			DepositApy       interface{} `json:"deposit_apy"`
 		} `json:"aave_get_token_apy"`
 
 		CompoundGetTokenApy struct {
-			BlocksPerDay                      string `json:"blocks_per_day"`
-			SupplyRatePerBlockDivEthMantissa  string `json::"supply_rate_per_block_div_eth_mantissa"`
-			SupplyRatePerBlockMulBlocksPerDay string `json:"supply_rate_per_block_mul_blocks_per_day"`
-			PowLeftSide                       string `json:"pow_left_side"`
-			PowLeftSideDaysPerYear            string `json:"pow_left_side_days_per_year"`
-			SupplyApy                         string `json:"supply_apy"`
+			BlocksPerDay                      interface{} `json:"blocks_per_day"`
+			SupplyRatePerBlockDivEthMantissa  interface{} `json::"supply_rate_per_block_div_eth_mantissa"`
+			SupplyRatePerBlockMulBlocksPerDay interface{} `json:"supply_rate_per_block_mul_blocks_per_day"`
+			PowLeftSide                       interface{} `json:"pow_left_side"`
+			PowLeftSideDaysPerYear            interface{} `json:"pow_left_side_days_per_year"`
+			SupplyApy                         interface{} `json:"supply_apy"`
 		} `json:"compound_get_token_apy"`
+
+		WinningChances struct {
+			AtxAtEnd interface{} `json:"atx_at_end"`
+		} `json:"winning_chances"`
 	}
 
 	// EthereumAnnouncement contains the data to call the reward function of
@@ -70,7 +78,7 @@ type (
 		ToAddress       ethereum.Address `json:"to_address"`
 		SourceRandom    []uint32         `json:"random_source"`
 		SourcePayouts   []*misc.BigInt   `json:"random_payouts"`
-		Emissions       Emissions        `json:"emissions"`
+		Emissions       Emission         `json:"emissions"`
 	}
 
 	EthereumBlockLog struct {
@@ -84,10 +92,22 @@ type (
 
 	// SolanaWinnerAnnouncement to use to report a winner and its randomness
 	SolanaWinnerAnnouncement struct {
-		WinningTransactionHash string    `json:"transaction_winning"`
-		SenderAddress          string    `json:"sender_address"`
-		RecipientAddress       string    `json:"receiver_address"`
-		WinningAmount          uint64    `json:"winning_amount"`
-		Emissions              Emissions `json:"emissions"`
+		WinningTransactionHash string   `json:"transaction_winning"`
+		SenderAddress          string   `json:"sender_address"`
+		RecipientAddress       string   `json:"receiver_address"`
+		WinningAmount          uint64   `json:"winning_amount"`
+		Emissions              Emission `json:"emissions"`
 	}
 )
+
+func NewEthereumEmission() *Emission {
+	emission := new(Emission)
+	emission.Network = "ethereum"
+	return emission
+}
+
+func NewSolanaEmission() *Emission {
+	emission := new(Emission)
+	emission.Network = "solana"
+	return emission
+}

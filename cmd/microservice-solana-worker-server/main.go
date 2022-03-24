@@ -6,7 +6,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
@@ -107,6 +107,7 @@ func main() {
 		var (
 			userActions    = bufferedUserActions.UserActions
 			fluidTransfers = 0
+			emission       = worker.NewSolanaEmission()
 		)
 
 		for _, userAction := range userActions {
@@ -126,7 +127,7 @@ func main() {
 			})
 		}
 
-		bpy := probability.CalculateBpy(SolanaBlockTime, apy, crumb)
+		bpy := probability.CalculateBpy(SolanaBlockTime, apy, emission)
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 
@@ -197,7 +198,7 @@ func main() {
 				decimalPlacesRat,
 				fluidTransfers,
 				SolanaBlockTime,
-				crumb,
+				emission,
 			)
 
 			randomIntegers := generateRandomIntegers(
@@ -216,7 +217,7 @@ func main() {
 
 			matchedBalls := probability.NaiveIsWinning(
 				randomSource,
-				crumb,
+				emission,
 			)
 
 			if matchedBalls <= 0 {
@@ -276,6 +277,8 @@ func main() {
 			}
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
+
+			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

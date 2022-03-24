@@ -1,7 +1,6 @@
 package probability
 
 import (
-	"fmt"
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
@@ -81,7 +80,7 @@ func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, e
 	emission.Payout.ApyPlusDelta = apyPlusDelta.FloatString(10)
 	emission.Payout.Atx = atx.FloatString(10)
 	emission.Payout.Apy = apy.FloatString(10)
-	emission.Payout.BpyForStakedUsdInsidePayoutFunction = apy.FloatString(10)
+	emission.Payout.BpyForStakedUsd = apy.FloatString(10)
 	emission.Payout.BlockTime = blockTime
 	emission.Payout.RewardPool = rewardPool.FloatString(10)
 
@@ -134,7 +133,7 @@ func calculateN(m int64, g, atx *big.Rat, emission *worker.Emission) int64 {
 	n = n - 1
 
 	emission.CalculateN.Atx = atx.FloatString(10)
-	emission.CalculateN.NAfterCalculateN = n
+	emission.CalculateN.N = n
 
 	return n
 }
@@ -171,8 +170,6 @@ func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat *big
 		payout.Mul(payout, decimalPlacesRat)
 
 		leftSide := new(big.Int).Quo(payout.Num(), payout.Denom())
-
-		changed := new(big.Rat).Quo(payout, decimalPlacesRat)
 
 		payoutBigInt := misc.NewBigInt(*leftSide)
 		payouts = append(payouts, &payoutBigInt)
