@@ -83,15 +83,21 @@ func main() {
 		obligationPubkey  = pubkeyFromEnv(EnvObligationPubkey)
 		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
 
-		TokenName         = util.GetEnvOrFatal(EnvTokenName)
+		tokenName         = util.GetEnvOrFatal(EnvTokenName)
 
 		debugFakePayouts  = os.Getenv(EnvDebugFakePayouts) == "true"
-		obligationString  = fmt.Sprintf("FLU:%s_OBLIGATION", TokenName)
+	)
+
+	var (
+		obligationString  = fmt.Sprintf("FLU:%s_OBLIGATION", tokenName)
 		obligationBytes_  = []byte(obligationString)
 		obligationBytes   = [][]byte{obligationBytes_}
 	)
 
-	PDAPubkey, BumpSeed, err := solana.FindProgramAddress(obligationBytes, fluidityPubkey) 
+	pdaPubkey, bumpSeed, err := solana.FindProgramAddress(
+		obligationBytes,
+		fluidityPubkey,
+	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -101,7 +107,7 @@ func main() {
 			)
 		})
 	}
-	
+
 	solanaClient := solanaRpc.New(rpcUrl)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
@@ -130,17 +136,27 @@ func main() {
 			messageFluidMintPubkey = winnerAnnouncement.FluidMintPubkey
 		)
 
-		if TokenName != messageTokenName || fluidMintPubkey.String() != messageFluidMintPubkey {
+		if tokenName != messageTokenName {
 			log.App(func(k *log.Log) {
 				k.Format(
-					"Got winning message for the wrong token %v or mint %v! Skipping!",
+					"Got winning message for the wrong token %v! Skipping!",
 					messageTokenName,
-					messageFluidMintPubkey,
 				)
 			})
+
 			return
 		}
 
+		if fluidMintPubkey.String() != messageFluidMintPubkey {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Got winning message for the wrong mint %v! Skipping!",
+					messageFluidMintPubkey,
+				)
+			})
+
+			return
+		}
 
 		log.App(func(k *log.Log) {
 			k.Format(
@@ -190,7 +206,7 @@ func main() {
 
 			// solanaAccountPDA is used as an authority to sign off on minting
 			// by the payout function
-			solanaAccountPDA = solana.NewAccountMeta(PDAPubkey, false, false)
+			solanaAccountPDA = solana.NewAccountMeta(pdaPubkey, false, false)
 
 			// solanaAccountObligation to use to track the amount of Solend
 			// obligations that Fluidity owns to pass the account to do a calculation for
@@ -238,8 +254,8 @@ func main() {
 		payoutInstruction := fluidity.InstructionPayout{
 			fluidity.VariantPayout,
 			winningAmount,
-			TokenName,
-			BumpSeed,
+			tokenName,
+			bumpSeed,
 		}
 
 		// if flag is set, print debug information and don't actually send payout
@@ -251,7 +267,7 @@ func main() {
 and instruction data %+v`,
 					splPubkey,
 					fluidMintPubkey,
-					PDAPubkey,
+					pdaPubkey,
 					obligationPubkey,
 					reservePubkey,
 					aPubkey,

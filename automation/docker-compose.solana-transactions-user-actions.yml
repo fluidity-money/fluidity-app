@@ -35,15 +35,13 @@ services:
       mode: replicated
       replicas: 50
     restart: unless-stopped
-    depends_on:
-      - rabbitmq
 
   microservice-solana-user-actions-usdt:
     build:
       context: ../cmd/microservice-solana-user-actions
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: microservice-solana-user-actions-usdt
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-user-actions-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
       FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY_USDT}
@@ -54,6 +52,3 @@ services:
       mode: replicated
       replicas: 50
     restart: unless-stopped
-    depends_on:
-      - rabbitmq
-

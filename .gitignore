@@ -16,8 +16,6 @@ web/*/build*
 web/*/build-*
 web/*/*.o
 
-worker/*/*.o
-
 contracts/ethereum/node_modules
 contracts/ethereum/docker*
 

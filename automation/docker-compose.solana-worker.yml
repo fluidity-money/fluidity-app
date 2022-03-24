@@ -24,8 +24,6 @@ services:
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDC}
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
     restart: unless-stopped
-    depends_on:
-      - rabbitmq
 
   microservice-solana-worker-server-usdt:
     build:
@@ -50,8 +48,6 @@ services:
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
     restart: unless-stopped
-    depends_on:
-      - rabbitmq
 
   microservice-solana-worker-client-usdc:
     build:
@@ -75,8 +71,6 @@ services:
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDC}
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
     restart: unless-stopped
-    depends_on:
-      - rabbitmq
 
   microservice-solana-worker-client-usdt:
     build:
@@ -100,5 +94,3 @@ services:
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDT}
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
     restart: unless-stopped
-    depends_on:
-      - rabbitmq

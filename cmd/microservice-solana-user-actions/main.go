@@ -8,7 +8,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -23,10 +23,10 @@ const (
 	EnvFluidityPdaPubkey = `FLU_SOLANA_PDA_PUBKEY`
 
 	// EnvTokenShortName is the abbreviation of the non-fluid token name
-	EnvTokenShortName    = `FLU_SOLANA_TOKEN_SHORT_NAME`
+	EnvTokenShortName = `FLU_SOLANA_TOKEN_SHORT_NAME`
 
 	// EnvTokenDecimals is the number of decimals the token uses
-	EnvTokenDecimals     = `FLU_SOLANA_TOKEN_DECIMALS`
+	EnvTokenDecimals = `FLU_SOLANA_TOKEN_DECIMALS`
 )
 
 // SplProgramId is the program id of the SPL token program
@@ -48,7 +48,7 @@ func main() {
 			k.Format(
 				"Failed to parse token decimals from env! Got %v but expected an int!",
 				tokenDecimals,
-			) 
+			)
 		})
 	}
 

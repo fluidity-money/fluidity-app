@@ -80,6 +80,8 @@ func main() {
 		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
+		decimalPlaces_   = util.GetEnvOrFatal(EnvTokenDecimals)
+		tokenName        = util.GetEnvOrFatal(EnvTokenName)
 
 		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
 		fluidMintPubkey   = pubkeyFromEnv(EnvFluidityMintPubkey)
@@ -89,8 +91,6 @@ func main() {
 		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
 		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
-		decimalPlaces_    = util.GetEnvOrFatal(EnvTokenDecimals)
-		tokenName         = util.GetEnvOrFatal(EnvTokenName)
 	)
 
 	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
@@ -106,8 +106,8 @@ func main() {
 	}
 
 	var (
-		decimalPlacesRat       = big.NewRat(int64(decimalPlaces), 1)
-		usdcDecimalPlacesRat   = big.NewRat(int64(decimalPlaces), 1)
+		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
+		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
 	)
 
 	solanaClient := solanaRpc.New(rpcUrl)
@@ -131,7 +131,10 @@ func main() {
 		)
 
 		for _, userAction := range userActions {
-			if userAction.Type == "send" && userAction.TokenDetails.TokenShortName == tokenName {
+
+			isSameToken := userAction.TokenDetails.TokenShortName == tokenName
+
+			if userAction.Type == "send" && isSameToken {
 				fluidTransfers++
 			}
 		}
@@ -206,13 +209,18 @@ func main() {
 		for _, userAction := range userActions {
 
 			// skip if it's not a send, or the wrong token
+
 			var (
 				userActionTransactionHash  = userAction.TransactionHash
 				userActionSenderAddress    = userAction.SenderAddress
 				userActionRecipientAddress = userAction.RecipientAddress
 			)
 
-			if userAction.Type != "send" || userAction.TokenDetails.TokenShortName != tokenName {
+			if userAction.Type != "send" {
+				continue
+			}
+
+			if userAction.TokenDetails.TokenShortName != tokenName {
 				continue
 			}
 
