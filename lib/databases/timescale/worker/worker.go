@@ -19,7 +19,7 @@ const (
 
 // GetAverageAtx, rounding up the average, taking the returned float64 and
 // casting it to an integer
-func GetAverageAtx(blockFrom uint64, tokenShortName string, network network.BlockchainNetwork) int {
+func GetAverageAtx(blockFrom int64, tokenShortName string, network network.BlockchainNetwork) int {
 
 	timescaleClient := timescale.Client()
 
