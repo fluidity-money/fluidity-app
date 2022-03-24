@@ -6,13 +6,13 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
-	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
+	prize_pool "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
+	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 )
@@ -128,7 +128,7 @@ func main() {
 
 	// we don't actually care about the block state!
 
-	worker.EthereumBlockLogs(func(_ worker.EthereumBlockLog) {
+	ethereum.BlockHeaders(func(_ ethereum.BlockHeader) {
 
 		var amount float64
 

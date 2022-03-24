@@ -25,6 +25,7 @@
 |-- lib
 |   |-- Common library functions
 |-- scripts
+|   |-- docker-compose-all.sh   - Builds everything in docker container
 |   |-- Testing scripts
 |-- web
 |   |-- Web

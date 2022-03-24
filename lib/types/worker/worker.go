@@ -17,12 +17,12 @@ type (
 	}
 
 	EthereumBlockLog struct {
-		BlockHash    ethereum.Hash          `json:"blockHash"`
-		BlockBaseFee misc.BigInt            `json:"blockBaseFee"`
-		BlockTime    uint64                 `json:"blockTime"`
+		BlockHash    ethereum.Hash          `json:"block_hash"`
+		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
+		BlockTime    uint64                 `json:"block_time"`
 		Logs         []ethereum.Log         `json:"logs"`
 		Transactions []ethereum.Transaction `json:"transactions"`
-		BlockNumber  uint64                 `json:"blockNumber"`
+		BlockNumber  misc.BigInt            `json:"block_number"`
 	}
 
 	// SolanaWinnerAnnouncement to use to report a winner and its randomness
