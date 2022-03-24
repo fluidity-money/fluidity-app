@@ -22,7 +22,7 @@ services:
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDC}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDC}
-      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
+      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdc.winners
     restart: unless-stopped
 
   microservice-solana-worker-server-usdt:
@@ -46,7 +46,7 @@ services:
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDT}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDT}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
-      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
+      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdt.winners
     restart: unless-stopped
 
   microservice-solana-worker-client-usdc:
@@ -69,7 +69,7 @@ services:
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDC}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDC}
-      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
+      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdc.winners
     restart: unless-stopped
 
   microservice-solana-worker-client-usdt:
@@ -92,5 +92,5 @@ services:
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDT}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDT}
-      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.winners
+      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdt.winners
     restart: unless-stopped
