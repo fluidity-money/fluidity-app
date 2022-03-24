@@ -77,45 +77,45 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 					transactionHash,
 				)
 			})
-		// got a payout
-		} else {
-			transactionPayoutValue := fluidityTransaction.Payout.Value
-
-			winner_ := winners.Winner{
-				Network:         network.NetworkSolana,
-				TransactionHash: transactionHash,
-				AwardedTime:     currentTime,
-				TokenDetails: tokenDetails,
-			}
-
-			winningAmount := new(big.Int).SetUint64(transactionPayoutValue)
-
-			var (
-				winner1_ = winner_
-				winner2_ = winner_
-			)
-
-			winningAmount1 := new(big.Int).Mul(winningAmount, Winner1Split)
-
-			winningAmount1.Quo(winningAmount1, winner10Split)
-
-			winningAmount2 := new(big.Int).Mul(winningAmount, Winner2Split)
-
-			winningAmount2.Quo(winningAmount2, winner10Split)
-
-			winner1_.WinnerAddress = accounts[winnerAIndex]
-			winner1_.SolanaWinnerOwnerAddress = fluidityOwners[winnerAIndex]
-
-			winner1_.WinningAmount = misc.NewBigInt(*winningAmount1)
-
-			winner2_.WinnerAddress = accounts[winnerBIndex]
-			winner2_.SolanaWinnerOwnerAddress = fluidityOwners[winnerBIndex]
-
-			winner2_.WinningAmount = misc.NewBigInt(*winningAmount2)
-
-			winner1 = &winner1_
-			winner2 = &winner2_
+			return nil, nil, nil, nil, nil	
 		}
+
+		transactionPayoutValue := fluidityTransaction.Payout.Value
+
+		winner_ := winners.Winner{
+			Network:         network.NetworkSolana,
+			TransactionHash: transactionHash,
+			AwardedTime:     currentTime,
+			TokenDetails: tokenDetails,
+		}
+
+		winningAmount := new(big.Int).SetUint64(transactionPayoutValue)
+
+		var (
+			winner1_ = winner_
+			winner2_ = winner_
+		)
+
+		winningAmount1 := new(big.Int).Mul(winningAmount, Winner1Split)
+
+		winningAmount1.Quo(winningAmount1, winner10Split)
+
+		winningAmount2 := new(big.Int).Mul(winningAmount, Winner2Split)
+
+		winningAmount2.Quo(winningAmount2, winner10Split)
+
+		winner1_.WinnerAddress = accounts[winnerAIndex]
+		winner1_.SolanaWinnerOwnerAddress = fluidityOwners[winnerAIndex]
+
+		winner1_.WinningAmount = misc.NewBigInt(*winningAmount1)
+
+		winner2_.WinnerAddress = accounts[winnerBIndex]
+		winner2_.SolanaWinnerOwnerAddress = fluidityOwners[winnerBIndex]
+
+		winner2_.WinningAmount = misc.NewBigInt(*winningAmount2)
+
+		winner1 = &winner1_
+		winner2 = &winner2_
 	}
 
 	if fluidityTransaction.Wrap != nil {
