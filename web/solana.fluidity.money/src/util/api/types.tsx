@@ -27,7 +27,7 @@ export type Routes = {
   // Dashboard Reward Pool API Route
   "/prize-pool": {
     contract_address: string,
-    amount: string | number,
+    amount: string,
     last_updated: string
   },
 

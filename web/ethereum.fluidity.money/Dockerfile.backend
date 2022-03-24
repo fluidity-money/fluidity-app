@@ -7,5 +7,6 @@ RUN make backend
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
+	"wait-for-database.sh", \
 	"./ethereum.fluidity.money.o" \
 ]
