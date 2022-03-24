@@ -159,7 +159,7 @@ func main() {
 		})
 	}
 
-	channelTo, err := client.Channel()
+	channelTo, err := clientTo.Channel()
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
