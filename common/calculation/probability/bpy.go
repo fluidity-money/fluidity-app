@@ -12,8 +12,8 @@ func CalculateBpy(blockTimeInSeconds uint64, compSupplyApy *big.Rat, emission *w
 	multiplied := blockTimeInSeconds_.Mul(blockTimeInSeconds_, compSupplyApy)
 
 	emission.CalculateBpy.BlockTimeInSeconds = blockTimeInSeconds
-	emission.CalculateBpy.CompSupplyApy = compSupplyApy.FloatString(10)
-	emission.CalculateBpy.BlockTimeInSecondsMultipliedByCompSupplyApy = multiplied.FloatString(10)
+	emission.CalculateBpy.CompSupplyApy, _ = compSupplyApy.Float64()
+	emission.CalculateBpy.BlockTimeInSecondsMultipliedByCompSupplyApy, _ = multiplied.Float64()
 
 	bpy := multiplied.Quo(multiplied, big.NewRat(31536000, 1))
 

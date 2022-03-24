@@ -175,11 +175,11 @@ func GetTokenApy(client *ethclient.Client, cTokenAddress ethCommon.Address, bloc
 	supplyApy := new(big.Rat).Mul(powLeftSideDaysPerYearMinOne, big.NewRat(100, 1))
 
 	emission.CompoundGetTokenApy.BlocksPerDay = blocksPerDay
-	emission.CompoundGetTokenApy.SupplyRatePerBlockDivEthMantissa = supplyRatePerBlockDivEthMantissa.FloatString(10)
-	emisison.CompoundGetTokenApy.SupplyRatePerBlockMulBlocksPerDay = supplyRatePerBlockMulBlocksPerDay.FloatString(10)
-	emission.CompoundGetTokenApy.PowLeftSide = powLeftSide.FloatString(10)
-	emission.CompoundGetTokenApy.PowLeftSideDaysPerYear = powLeftSideDaysPerYear.FloatString(10)
-	emission.CompoundGetTokenApy.SupplyApy = supplyApy.FloatString(10)
+	emission.CompoundGetTokenApy.SupplyRatePerBlockDivEthMantissa, _ = supplyRatePerBlockDivEthMantissa.Float64()
+	emission.CompoundGetTokenApy.SupplyRatePerBlockMulBlocksPerDay, _ = supplyRatePerBlockMulBlocksPerDay.Float64()
+	emission.CompoundGetTokenApy.PowLeftSide, _ = powLeftSide.Float64()
+	emission.CompoundGetTokenApy.PowLeftSideDaysPerYear, _ = powLeftSideDaysPerYear.Float64()
+	emission.CompoundGetTokenApy.SupplyApy, _ = supplyApy.Float64()
 
 	return supplyApy, nil
 }

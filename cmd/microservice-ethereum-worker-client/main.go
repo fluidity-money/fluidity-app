@@ -10,8 +10,8 @@ import (
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -119,6 +119,7 @@ func main() {
 			toAddress                   = announcement.ToAddress
 			sourceRandom                = announcement.SourceRandom
 			sourcePayouts               = announcement.SourcePayouts
+			crumb                       = announcement.Emissions
 		)
 
 		if err != nil {
@@ -130,7 +131,7 @@ func main() {
 
 		// check win status
 
-		winningBalls := probability.NaiveIsWinning(sourceRandom, crumb)
+		winningBalls := probability.NaiveIsWinning(sourceRandom, &crumb)
 
 		if winningBalls == 0 {
 			log.App(func(k *log.Log) {
