@@ -111,7 +111,7 @@ func GetSaberFees(saberRpcUrl string, transaction types.TransactionResult, saber
 		)
 
 		if err != nil {
-			return nil, logErrors, fmt.Errorf(
+			return feesPaid, logErrors, fmt.Errorf(
 				"failed to get the saber price and its decimals! %v",
 				err,
 			)
