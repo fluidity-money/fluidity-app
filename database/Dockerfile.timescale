@@ -3,7 +3,13 @@ FROM timescale/timescaledb:latest-pg12
 
 ENV REPO /usr/src/fluidity-migrations-timescale
 
-RUN apk add make
+RUN apk add make curl
+
+RUN curl -fsSLo \
+	/usr/local/bin/dbmate \
+	https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+
+RUN chmod +x /usr/local/bin/dbmate
 
 RUN mkdir ${REPO}
 
@@ -13,4 +19,4 @@ COPY . ${REPO}
 
 RUN make timescale
 
-RUN cp build/timescale/*.sql /docker-entrypoint-initdb.d/
+COPY init-timescale-db.sh /docker-entrypoint-initdb.d/init-sqls.sh

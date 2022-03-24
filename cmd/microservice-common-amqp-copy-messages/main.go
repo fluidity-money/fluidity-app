@@ -159,12 +159,7 @@ func main() {
 		})
 	}
 
-	channelTo, queueToName, err := configureChannel(
-		clientTo,
-		workerId,
-		amqpCopyToTopicName,
-		amqpCopyToExchange,
-	)
+	channelTo, err := clientTo.Channel()
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -175,15 +170,11 @@ func main() {
 
 	debug(
 		`Bound %s to %s at exchange %s!
-Bound %s to %s at exchange %s!
 Sending to %s`,
 		queueFromName,
 		amqpCopyFromTopicName,
 		amqpCopyFromExchange,
-		queueToName,
 		amqpCopyToTopicName,
-		amqpCopyToExchange,
-		queueToName,
 	)
 
 	messages, err := channelFrom.Consume(
