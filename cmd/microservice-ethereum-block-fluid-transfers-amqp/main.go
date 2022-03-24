@@ -78,21 +78,24 @@ func main() {
 
 		// Block contains log with ABI hash in its topics
 		// Guaranteed to be signature - Order dependent
+
 		log.Debug(func(k *log.Log) {
 			k.Format("Block %v contains transfer ABI topic", blockHash.String())
 		})
 
 		block, err := lib.GetBlockFromHash(gethHttpApi, blockHash.String())
 
-		for tries := 0; err != nil; tries++ {
-			if tries >= 10 {
-				log.Fatal(func(k *log.Log) {
-					k.Format("Could not get block: %v (after %v tries)", blockHash, tries)
-					k.Payload = err
-				})
-			}
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to get a block using its hash!"
+				k.Payload = err
+			})
+		}
 
-			block, err = lib.GetBlockFromHash(gethHttpApi, blockHash.String())
+		if block == nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format("Block with hash %v was empty!", blockHash.String())
+			})
 		}
 
 		newTransactions, err := ethConvert.ConvertTransactions(blockHash.String(), block.Transactions)

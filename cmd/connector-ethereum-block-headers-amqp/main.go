@@ -15,13 +15,11 @@ import (
 	ethRpc "github.com/ethereum/go-ethereum/rpc"
 )
 
-const (
-	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
-	EnvEthereumWsUrl = `FLU_ETHEREUM_WS_URL`
-)
+// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
+const EnvEthereumWsUrl = `FLU_ETHEREUM_WS_URL`
 
 func main() {
-	var gethWebsocketUrl = util.GetEnvOrFatal(EnvEthereumWsUrl)
+	gethWebsocketUrl := util.GetEnvOrFatal(EnvEthereumWsUrl)
 
 	rpcClient, err := ethRpc.Dial(gethWebsocketUrl)
 

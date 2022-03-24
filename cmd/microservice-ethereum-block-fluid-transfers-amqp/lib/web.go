@@ -57,7 +57,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
 	return logsResponse.Result, nil
 }
 
-func GetBlockFromHash(gethHttpApi, blockHash string) (Block, error) {
+func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 	blocksReqParams := BlockParams{
 		blockHash,
 		true,
@@ -71,7 +71,7 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (Block, error) {
 	})
 
 	if err != nil {
-		return Block{}, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"Could not marshal Geth provider eth_getBlockByNumber body: %v",
 			err,
 		)
@@ -82,7 +82,7 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (Block, error) {
 	resp, err := http.Post(gethHttpApi, "application/json", blocksReqBody)
 
 	if err != nil {
-		return Block{}, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"Could not POST to Geth provider: %v",
 			err,
 		)
@@ -95,11 +95,13 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (Block, error) {
 	err = json.NewDecoder(resp.Body).Decode(&blocksResponse)
 
 	if err != nil {
-		return Block{}, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"Could not unmarshal response body: %v",
 			err,
 		)
 	}
 
-	return blocksResponse.Result, nil
+	blockResponseResult := blocksResponse.Result
+
+	return &blockResponseResult, nil
 }
