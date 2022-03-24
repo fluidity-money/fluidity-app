@@ -19,11 +19,14 @@ type (
 		SourcePayouts   []*misc.BigInt   `json:"random_payouts"`
 	}
 
+	// BlockLog contains a block's transactions, and all logs
+	// associated with a transfer
 	BlockLog struct {
-		BlockBaseFee misc.BigInt            `json:"blockBaseFee"`
-		BlockTime    uint64                 `json:"blockTime"`
+		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
+		BlockTime    uint64                 `json:"block_time"`
 		Logs         []ethereum.Log         `json:"logs"`
 		Transactions []ethereum.Transaction `json:"transactions"`
-		BlockNumber  misc.BigInt            `json:"blockNumber"`
+		BlockNumber  misc.BigInt            `json:"block_number"`
+		BlockHash    ethereum.Hash          `json:"block_hash"`
 	}
 )

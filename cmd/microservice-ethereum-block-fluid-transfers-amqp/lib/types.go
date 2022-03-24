@@ -27,6 +27,8 @@ type LogsResponse struct {
 	Result  []types.Log `json:"result"`
 }
 
+// Block is eth_getBlockByHash's result. Does not match
+// ethereum's internal Block structure
 type Block struct {
 	Difficulty       string                `json:"difficulty"`
 	ExtraData        string                `json:"extraData"`

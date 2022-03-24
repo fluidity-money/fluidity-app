@@ -260,6 +260,7 @@ func main() {
 			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
 			blockNumber  = blockLog.BlockNumber
+			blockHash    = blockLog.BlockHash
 		)
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)
@@ -268,7 +269,7 @@ func main() {
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
-		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockNumber, contractAddress)
+		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockHash, contractAddress)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -288,8 +289,8 @@ func main() {
 		if len(fluidTransfers) == 0 {
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Couldn't find any Fluid transfers in the block, offset %#v!",
-					blockNumber.Uint64(),
+					"Couldn't find any Fluid transfers in the block %v!",
+					blockHash,
 				)
 			})
 

@@ -51,11 +51,13 @@ func main() {
 
 	ethQueue.BlockHeaders(func(header ethereum.BlockHeader) {
 		var (
+			blockHash   = header.BlockHash
 			blockNumber = header.Number
 			blockBloom  = ethTypes.BytesToBloom(header.Bloom)
 		)
 
 		amqpBlock := worker.BlockLog{
+			BlockHash:    blockHash,
 			BlockBaseFee: header.BaseFee,
 			BlockTime:    header.Time,
 			BlockNumber:  blockNumber,
@@ -66,42 +68,38 @@ func main() {
 		if !blockBloom.Test(transferLogTopic) {
 
 			log.Debug(func(k *log.Log) {
-				k.Format("Block at offset %v did NOT contain transfer ABI topic", blockNumber.String())
+				k.Format("Block %v did NOT contain transfer ABI topic", blockHash)
 			})
 
 			queue.SendMessage(workerQueue.TopicBlockLogs, amqpBlock)
 
 			return
-
 		}
 
 		// Block contains log with ABI hash in its topics
 		// Guaranteed to be signature - Order dependent
-
 		log.Debug(func(k *log.Log) {
-			k.Format("Block at offset %v contains transfer ABI topic", blockNumber.String())
+			k.Format("Block %v contains transfer ABI topic", blockHash.String())
 		})
 
-		block, err := lib.GetBlockFromNumber(gethHttpApi, blockNumber)
+		block, err := lib.GetBlockFromHash(gethHttpApi, blockHash.String())
 
 		for tries := 0; err != nil; tries++ {
 			if tries >= 10 {
 				log.Fatal(func(k *log.Log) {
-					k.Format("Could not get block at offset: %v", blockNumber.String())
+					k.Format("Could not get block: %v (after %v tries)", blockHash, tries)
 					k.Payload = err
 				})
 			}
 
-			block, err = lib.GetBlockFromNumber(gethHttpApi, blockNumber)
+			block, err = lib.GetBlockFromHash(gethHttpApi, blockHash.String())
 		}
-
-		var blockHash = block.Hash
 
 		newTransactions, err := ethConvert.ConvertTransactions(blockHash.String(), block.Transactions)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format("Could not convert transactions from block at offset: %v", blockNumber.Uint64())
+				k.Format("Could not convert transactions from block: %v", blockHash)
 				k.Payload = err
 			})
 		}
@@ -113,7 +111,7 @@ func main() {
 		for tries := 0; err != nil; tries++ {
 			if tries >= 10 {
 				log.Fatal(func(k *log.Log) {
-					k.Format("Could not get logs from block at offset: %v", blockNumber.Uint64())
+					k.Format("Could not get logs from block: %v", blockHash)
 					k.Payload = err
 				})
 			}
@@ -124,6 +122,7 @@ func main() {
 		amqpBlock.Logs = append(amqpBlock.Logs, newFluidLogs...)
 
 		queue.SendMessage(workerQueue.TopicBlockLogs, amqpBlock)
+
 	})
 
 }

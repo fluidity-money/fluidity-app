@@ -30,6 +30,7 @@ func ConvertHeader(oldHeader *ethTypes.Header) types.BlockHeader {
 	receiptHash := oldHeader.ReceiptHash.Hex()
 
 	return types.BlockHeader{
+		BlockHash:       types.HashFromString(oldHeader.Hash().Hex()),
 		ParentHash:      types.HashFromString(oldHeader.ParentHash.Hex()),
 		UncleHash:       types.HashFromString(oldHeader.UncleHash.Hex()),
 		Coinbase:        types.AddressFromString(oldHeader.Coinbase.Hex()),

@@ -20,6 +20,7 @@ type (
 type (
 	// BlockHeader contained within a block on Ethereum, may be forked
 	BlockHeader struct {
+		BlockHash       Hash        `json:"block_hash"`
 		ParentHash      Hash        `json:"parent_hash"`
 		UncleHash       Hash        `json:"uncle_hash"`
 		Coinbase        Address     `json:"coinbase"`

@@ -8,7 +8,6 @@ import (
 
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
@@ -58,14 +57,14 @@ func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
 	return logsResponse.Result, nil
 }
 
-func GetBlockFromNumber(gethHttpApi string, blockNumber misc.BigInt) (Block, error) {
+func GetBlockFromHash(gethHttpApi, blockHash string) (Block, error) {
 	blocksReqParams := BlockParams{
-		fmt.Sprintf("0x%x", blockNumber.Uint64()),
+		blockHash,
 		true,
 	}
 
 	blocksReqBody_, err := json.Marshal(GethBody{
-		Method:  "eth_getBlockByNumber",
+		Method:  "eth_getBlockByHash",
 		JsonRpc: "2.0",
 		Id:      "1",
 		Params:  blocksReqParams,

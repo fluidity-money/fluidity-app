@@ -62,7 +62,7 @@ func main() {
 			newHeader := ethConvert.ConvertHeader(header)
 
 			log.Debug(func(k *log.Log) {
-				k.Format("Sending Header at offset: %v", newHeader.Number.String())
+				k.Format("Sending Block Header: %v", newHeader.BlockHash)
 			})
 
 			queue.SendMessage(ethQueue.TopicBlockHeaders, newHeader)
