@@ -66,58 +66,63 @@ func GetUniqueAddress(address string) string {
 
 // InsertFaucetUser, not including the last used field
 func InsertFaucetUser(faucetUser FaucetUser) {
-	postgresClient := postgres.Client()
+	// insert a copy for each token we support
+	// TODO this is a hack - would be better to have an enumerable list 
+	// of supported tokens that isn't hardcoded here
+	tokens := []string{string(faucet.TokenfDAI), string(faucet.TokenfUSDC), string(faucet.TokenfUSDT)}
+	for _, tokenName := range tokens {
+		postgresClient := postgres.Client()
 
-	statementText := fmt.Sprintf(
-		`INSERT INTO %s (
-			address,
-			unique_address,
-			ip_address,
-			network,
-			token_name
-		)
-
-		VALUES (
-			$1,
-			$2,
-			$3,
-			$4,
-			$5
-		);`,
-
-		TableUsers,
-	)
-
-	var (
-		address       = faucetUser.Address
-		uniqueAddress = faucetUser.UniqueAddress
-		ipAddress     = faucetUser.IpAddress
-		network       = faucetUser.Network
-		tokenName     = faucetUser.TokenName
-	)
-
-	_, err := postgresClient.Exec(
-		statementText,
-		address,
-		uniqueAddress,
-		ipAddress,
-		network,
-		tokenName,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to insert into the faucet database address %#v, unique address %#v and ip %#v",
+		statementText := fmt.Sprintf(
+			`INSERT INTO %s (
 				address,
-				uniqueAddress,
-				ipAddress,
+				unique_address,
+				ip_address,
+				network,
+				token_name
 			)
 
-			k.Payload = err
-		})
+			VALUES (
+				$1,
+				$2,
+				$3,
+				$4,
+				$5
+			);`,
+
+			TableUsers,
+		)
+
+		var (
+			address       = faucetUser.Address
+			uniqueAddress = faucetUser.UniqueAddress
+			ipAddress     = faucetUser.IpAddress
+			network       = faucetUser.Network
+		)
+
+		_, err := postgresClient.Exec(
+			statementText,
+			address,
+			uniqueAddress,
+			ipAddress,
+			network,
+			tokenName,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Failed to insert into the faucet database address %#v, unique address %#v and ip %#v",
+					address,
+					uniqueAddress,
+					ipAddress,
+				)
+
+				k.Payload = err
+			})
+		}
 	}
 }
 

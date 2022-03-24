@@ -57,8 +57,11 @@ export const submitQuestionRequest =
   };
 
 type SupportedTokensEthereum = "fUSDT" | "fUSDC" | "fDAI";
+
 type SupportedTokensSolana = "fUSDC";
+
 export type SupportedNetworks = "ethereum" | "solana";
+
 export type SupportedTokens<T extends SupportedNetworks | "all" = "all"> =
   T extends "ethereum" ?
     SupportedTokensEthereum :

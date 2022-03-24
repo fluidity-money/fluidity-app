@@ -252,7 +252,7 @@ func main() {
 
 	crumb := breadcrumb.NewBreadcrumb()
 
-	worker.BlockLogs(func(blockLog worker.BlockLog) {
+	worker.EthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
 		defer breadcrumb.SendAndClear(crumb)
 
 		var (
@@ -588,7 +588,7 @@ func main() {
 				randomSource = append(randomSource, uint32(i))
 			}
 
-			announcement := worker.Announcement{
+			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
 				FromAddress:     senderAddress,
 				ToAddress:       recipientAddress,

@@ -1,5 +1,5 @@
 
-FROM golang:buster
+FROM golang:1.17-buster
 
 RUN apt-get update && apt-get install -y \
 	openssl \

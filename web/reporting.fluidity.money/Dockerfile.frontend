@@ -1,0 +1,26 @@
+
+FROM fluidity/web-container:latest
+
+WORKDIR /usr/local/src/fluidity/web/reporting.fluidity.money
+
+ENV PRODUCTION ${PRODUCTION}
+
+ENV PATH /app/node_modules.bin:$PATH
+
+COPY package.json package-lock.json ./
+
+RUN npm i
+
+COPY . ./
+
+ARG REACT_APP_FLU_API_URI
+
+RUN make frontend
+
+RUN rm -r /var/www/html
+
+RUN cp -r build /var/www/html
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -45,41 +45,52 @@ func main() {
 		})
 	}
 
-	queues, err := lib.GetRmqQueues(queueAddress)
+	vhosts, err := lib.GetVhosts(queueAddress)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Format("Could not retrieve queues from RMQ Management (%v)!", queueAddress)
+			k.Format("Could not retrieve Vhosts from RMQ Management (%v)!", queueAddress)
 			k.Payload = err
 		})
 	}
 
-	for _, queue := range queues {
-		var (
-			name            = queue.Name
-			messagesReady   = queue.MessagesReady
-			messagesUnacked = queue.MessagesUnacked
-		)
+	for _, vhost := range vhosts {
+		queues, err := lib.GetRmqQueues(queueAddress, vhost.Name)
 
-		log.Debug(func(k *log.Log) {
-			k.Format(
-				"Queue: %v has %v/%v Ready messages, and %v/%v Unacked messages",
-				name,
-				messagesReady,
-				maxReadyCount,
-				messagesUnacked,
-				maxUnackedCount,
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format("Could not retrieve queues from RMQ Management (%v)!", queueAddress)
+				k.Payload = err
+			})
+		}
+
+		for _, queue := range queues {
+			var (
+				name            = queue.Name
+				messagesReady   = queue.MessagesReady
+				messagesUnacked = queue.MessagesUnacked
 			)
 
-		})
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Queue: %v has %v/%v Ready messages, and %v/%v Unacked messages",
+					name,
+					messagesReady,
+					maxReadyCount,
+					messagesUnacked,
+					maxUnackedCount,
+				)
 
-		if messagesReady > maxReadyCount {
-			reportToSlack(queue, "Ready", messagesReady, maxReadyCount)
+			})
+
+			if messagesReady > maxReadyCount {
+				reportToSlack(queue, "Ready", messagesReady, maxReadyCount)
+			}
+
+			if messagesUnacked > maxUnackedCount {
+				reportToSlack(queue, "Unacked", messagesUnacked, maxUnackedCount)
+			}
 		}
 
-		if messagesUnacked > maxUnackedCount {
-			reportToSlack(queue, "Unacked", messagesUnacked, maxUnackedCount)
-		}
 	}
-
 }

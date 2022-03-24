@@ -14,16 +14,23 @@ import (
 const AmqpExchangeType = "topic"
 
 const (
+	// EnvAmqpCopyFromExchange name to use when copying messages off the
+	// source AMQP
 	EnvAmqpCopyFromExchange = "FLU_AMQP_COPY_FROM_EXCHANGE"
 
+	// EnvAmqpCopyFromUri to connect to to get messages off the queue from
 	EnvAmqpCopyFromUri = "FLU_AMQP_COPY_FROM_URI"
 
+	// EnvAmqpCopyFromTopicName to use to get the topic for the
 	EnvAmqpCopyFromTopicName = "FLU_AMQP_COPY_FROM_TOPIC_NAME"
 
+	// EnvAmqpCopyToExchange to use as an exchange to send messages to
 	EnvAmqpCopyToExchange = "FLU_AMQP_COPY_TO_EXCHANGE"
 
+	// EnvAmqpCopyToUri to connect to and send messages down
 	EnvAmqpCopyToUri = "FLU_AMQP_COPY_TO_URI"
 
+	// EnvAmqpCopyToTopicName to publish messages to
 	EnvAmqpCopyToTopicName = "FLU_AMQP_COPY_TO_TOPIC_NAME"
 )
 
@@ -152,31 +159,13 @@ func main() {
 		})
 	}
 
-	channelTo, queueToName, err := configureChannel(
-		clientTo,
-		workerId,
-		amqpCopyToTopicName,
-		amqpCopyToExchange,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to configure the channel for the to source!"
-			k.Payload = err
-		})
-	}
-
 	debug(
 		`Bound %s to %s at exchange %s!
-Bound %s to %s at exchange %s!
 Sending to %s`,
 		queueFromName,
 		amqpCopyFromTopicName,
 		amqpCopyFromExchange,
-		queueToName,
 		amqpCopyToTopicName,
-		amqpCopyToExchange,
-		queueToName,
 	)
 
 	messages, err := channelFrom.Consume(
@@ -212,7 +201,7 @@ Sending to %s`,
 			string(message.Body),
 		)
 
-		err := channelTo.Publish(
+		err := channelFrom.Publish(
 			amqpCopyToExchange,
 			amqpCopyToTopicName,
 			true,  // mandatory

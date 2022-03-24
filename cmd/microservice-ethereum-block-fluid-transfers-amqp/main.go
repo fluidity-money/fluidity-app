@@ -56,7 +56,7 @@ func main() {
 			blockBloom  = ethTypes.BytesToBloom(header.Bloom)
 		)
 
-		amqpBlock := worker.BlockLog{
+		amqpBlock := worker.EthereumBlockLog{
 			BlockHash:    blockHash,
 			BlockBaseFee: header.BaseFee,
 			BlockTime:    header.Time,
@@ -71,7 +71,7 @@ func main() {
 				k.Format("Block %v did NOT contain transfer ABI topic", blockHash)
 			})
 
-			queue.SendMessage(workerQueue.TopicBlockLogs, amqpBlock)
+			queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
 
 			return
 		}
@@ -121,7 +121,7 @@ func main() {
 
 		amqpBlock.Logs = append(amqpBlock.Logs, newFluidLogs...)
 
-		queue.SendMessage(workerQueue.TopicBlockLogs, amqpBlock)
+		queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
 
 	})
 

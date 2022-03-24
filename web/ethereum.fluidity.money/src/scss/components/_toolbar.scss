@@ -69,14 +69,18 @@
   background-color: rgb(231, 154, 149);
   font-family: "Manrope";
   width: 100%;
-  text-align: center;
+  text-align: left;
   padding: 8px;
   top: 55px;
-  font-size: 0.7rem;
+  font-size: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  @include for-tablet-portrait-up {
+    flex-direction: row;
+  }
 
   @include for-tablet-landscape-up {
     flex-direction: row;
@@ -92,34 +96,58 @@
   text-decoration: underline;
 }
 
-.change-network-link {
-  text-decoration: none;
+.change-network-text {
+  // flex: 3;
+  margin: 0px 10px 10px 40px;
+  line-height: 25px;
+  @include for-desktop-up {
+    margin: 0px 10px 10px 10px;
+  }
+}
+
+// .button-container {
+//   flex: 1;
+// }
+
+.change-network-button {
+  // flex-shrink: 1;
+  white-space: nowrap;
+  cursor: pointer;
   background-color: white;
+  border: 0;
   color: black;
+  font-family: "Raleway";
   font-weight: bold;
-  padding: 0.1rem 0.4rem 0.1rem 0.4rem;
-  border-radius: 6px;
-  width: 15%;
+  padding: 0.8rem;
+  border-radius: 10px;
+  width: 85%;
+  margin: 10px 10px 10px 10px;
   &:hover {
-    text-decoration: none;
+    // text-decoration: none;
     opacity: 0.9;
   }
   @include for-tablet-portrait-up {
-    width: 15%;
+    width: 120px;
+    padding: 0.4rem;
+    margin: 10px 50px 10px 40px;
   }
 
   @include for-tablet-landscape-up {
-    width: auto;
-    margin-left: 0.2rem;
+    width: 120px;
+    padding: 0.3rem;
+    margin: 10px 50px 10px 40px;
   }
 
   @include for-desktop-up {
-    width: auto;
-    margin-left: 0.5rem;
+    width: 120px;
+    padding: 0.3rem;
+    margin: 0px 10px 10px 0px;
+    // margin-left: 0.5rem;
   }
 
   @include for-below-550 {
-    width: 95%;
+    width: 85%;
     margin-top: 4px;
+    padding: 0.8rem;
   }
 }

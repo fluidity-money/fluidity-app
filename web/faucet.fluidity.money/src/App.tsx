@@ -32,13 +32,13 @@ const App = () =>
 
       <Container>
         <section id="#request-faucet">
-          <RequestFaucet
-            networkInputOptions={ networkInputOptions }
-          />
-        </section>
+           <RequestFaucet
+             networkInputOptions={ networkInputOptions }
+           />
+         </section>
 
-        <section id="#lets-talk">
-          <RowCentered><LetsTalk/></RowCentered>
+         <section id="#lets talk">
+           <RowCentered><LetsTalk/></RowCentered>
         </section>
       </Container>
     </Container>;

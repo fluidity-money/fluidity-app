@@ -8,19 +8,19 @@ import (
 )
 
 const (
-	TopicAnnouncements = "worker.announcements"
-	TopicBlockLogs     = "worker.blocks"
+	TopicEthereumAnnouncements = "worker.ethereum.announcements"
+	TopicEthereumBlockLogs     = "worker.ethereum.blocks"
 )
 
 type (
-	Announcement = worker.Announcement
-	BlockLog     = worker.BlockLog
+	EthereumAnnouncement = worker.EthereumAnnouncement
+	EthereumBlockLog     = worker.EthereumBlockLog
 )
 
-func Announcements(f func(Announcement)) {
-	queue.GetMessages(TopicAnnouncements, func(message queue.Message) {
+func Announcements(f func(EthereumAnnouncement)) {
+	queue.GetMessages(TopicEthereumAnnouncements, func(message queue.Message) {
 
-		var announcement Announcement
+		var announcement EthereumAnnouncement
 
 		message.Decode(&announcement)
 
@@ -28,9 +28,9 @@ func Announcements(f func(Announcement)) {
 	})
 }
 
-func BlockLogs(f func(BlockLog)) {
-	queue.GetMessages(TopicBlockLogs, func(message queue.Message) {
-		var blockLog BlockLog
+func EthereumBlockLogs(f func(EthereumBlockLog)) {
+	queue.GetMessages(TopicEthereumBlockLogs, func(message queue.Message) {
+		var blockLog EthereumBlockLog
 
 		message.Decode(&blockLog)
 
