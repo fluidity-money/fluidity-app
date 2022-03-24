@@ -71,18 +71,18 @@ func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, e
 
 	p := probability(m, n, b)
 
-	emission.Payout.P = p.FloatString(10)
-	emission.Payout.A = a.FloatString(10)
+	emission.Payout.P, _ = p.Float64()
+	emission.Payout.A, _ = a.Float64()
 	emission.Payout.M = m
-	emission.Payout.G = g.FloatString(10)
+	emission.Payout.G, _ = g.Float64()
 	emission.Payout.B = b
-	emission.Payout.Delta = delta.FloatString(10)
-	emission.Payout.ApyPlusDelta = apyPlusDelta.FloatString(10)
-	emission.Payout.Atx = atx.FloatString(10)
-	emission.Payout.Apy = apy.FloatString(10)
-	emission.Payout.BpyForStakedUsd = apy.FloatString(10)
+	emission.Payout.Delta, _ = delta.Float64()
+	emission.Payout.ApyPlusDelta, _ = apyPlusDelta.Float64()
+	emission.Payout.Atx, _ = atx.Float64()
+	emission.Payout.Apy, _ = apy.Float64()
+	emission.Payout.BpyForStakedUsd, _ = apy.Float64()
 	emission.Payout.BlockTime = blockTime
-	emission.Payout.RewardPool = rewardPool.FloatString(10)
+	emission.Payout.RewardPool, _ = rewardPool.Float64()
 
 	// a / p
 	aDivP := new(big.Rat).Mul(
@@ -106,8 +106,8 @@ func calculateN(m int64, g, atx *big.Rat, emission *worker.Emission) int64 {
 
 	probabilityM := new(big.Rat).Mul(atx, factorial)
 
-	emission.CalculateN.ProbabilityM = probabilityM.FloatString(10)
-	emission.CalculateN.Factorial = atx.FloatString(10)
+	emission.CalculateN.ProbabilityM, _ = probabilityM.Float64()
+	emission.CalculateN.Factorial, _ = atx.Float64()
 
 	p := new(big.Rat).Mul(
 		big.NewRat(1, 4), // 1/4
@@ -132,7 +132,7 @@ func calculateN(m int64, g, atx *big.Rat, emission *worker.Emission) int64 {
 
 	n = n - 1
 
-	emission.CalculateN.Atx = atx.FloatString(10)
+	emission.CalculateN.Atx, _ = atx.Float64()
 	emission.CalculateN.N = n
 
 	return n
@@ -175,7 +175,7 @@ func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat *big
 		payouts = append(payouts, &payoutBigInt)
 	}
 
-	emission.WinningChances.AtxAtEnd = atx.FloatString(10)
+	emission.WinningChances.AtxAtEnd, _ = atx.Float64()
 
 	return uint(n), payouts
 }

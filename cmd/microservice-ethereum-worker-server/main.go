@@ -11,13 +11,13 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
+	moving_average "github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/compound"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
+	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -263,6 +263,8 @@ func main() {
 		var secondsSinceLastBlock uint64 = DefaultSecondsSinceLastBlock
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
+
+		crumb := worker.NewEthereumEmission()
 
 		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockHash, contractAddress)
 

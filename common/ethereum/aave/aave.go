@@ -365,11 +365,11 @@ func GetTokenApy(client *ethclient.Client, addressProvider, underlying ethCommon
 
 	depositApy := new(big.Rat).Sub(compoundedApr, one)
 
-	emission.AaveGetTokenApy.DepositAPR = depositAPR.FloatString(10)
-	emission.AaveGetTokenApy.APRPerDay = aprPerDay.FloatString(10)
-	emission.AaveGetTokenApy.OnePlusAprPerDay = onePlusAprPerDay.FloatString(10)
-	emission.AaveGetTokenApy.CompoundedApr = compoundedApr.FloatString(10)
-	emission.AaveGetTokenApy.DepositApy = depositApy.FloatString(10)
+	emission.AaveGetTokenApy.DepositApr, _ = depositAPR.Float64()
+	emission.AaveGetTokenApy.APRPerDay, _ = aprPerDay.Float64()
+	emission.AaveGetTokenApy.OnePlusAprPerDay, _ = onePlusAprPerDay.Float64()
+	emission.AaveGetTokenApy.CompoundedApr, _ = compoundedApr.Float64()
+	emission.AaveGetTokenApy.DepositApy, _ = depositApy.Float64()
 
 	return depositApy, nil
 }

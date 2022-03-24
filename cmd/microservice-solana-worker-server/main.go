@@ -5,8 +5,9 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
@@ -107,7 +108,7 @@ func main() {
 		var (
 			userActions    = bufferedUserActions.UserActions
 			fluidTransfers = 0
-			emission       = worker.NewSolanaEmission()
+			emission       = workerTypes.NewSolanaEmission()
 		)
 
 		for _, userAction := range userActions {

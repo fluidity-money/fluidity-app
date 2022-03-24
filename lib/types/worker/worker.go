@@ -1,9 +1,9 @@
 package worker
 
 import (
-	"github.com/fluidity-money//fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
 type (
@@ -14,59 +14,59 @@ type (
 		TokenDetails token_details.TokenDetails `json:"token_details"`
 
 		Payout struct {
-			P               interface{} `json:"p"`
-			A               interface{} `json:"a"`
-			M               interface{} `json:"m"`
-			G               interface{} `json:"g"`
-			B               interface{} `json:"b"`
-			Delta           interface{} `json:"delta"`
-			ApyPlusDelta    interface{} `json:"apy+delta"`
-			Atx             interface{} `json:"atx"`
-			Apy             interface{} `json:"apy"`
-			BpyForStakedUsd interface{} `json:"bpy_for_staked_usd"`
-			BlockTime       interface{} `json:"block_time"`
-			RewardPool      interface{} `json:"reward_pool"`
+			P               float64 `json:"p"` // Payout
+			A               float64 `json:"a"`
+			M               int64   `json:"m"` // Winning classes / divisions
+			G               float64 `json:"g"` // Gas fee
+			B               int64   `json:"b"` // Balls in a single ticket
+			Delta           float64 `json:"delta"`
+			ApyPlusDelta    float64 `json:"apy+delta"`
+			Atx             float64 `json:"atx"`                // Annual number fluid transactions
+			Apy             float64 `json:"apy"`                // Annual percentage yield
+			BpyForStakedUsd float64 `json:"bpy_for_staked_usd"` // Yield for USD
+			BlockTime       uint64  `json:"block_time"`         // Block time
+			RewardPool      float64 `json:"reward_pool"`
 		} `json:"payout"`
 
 		// calculate n function
 		CalculateN struct {
-			ProbabilityM interface{} `json:"probability_m"`
-			Factorial    interface{} `json:"factorial"`
-			Atx          interface{} `json:"atx"`
-			N            interface{} `json:"n"`
+			ProbabilityM float64 `json:"probability_m"`
+			Factorial    float64 `json:"factorial"`
+			Atx          float64 `json:"atx"`
+			N            int64   `json:"n"`
 		} `json:"calculate_n"`
 
 		// WinningChances not included
 
 		NativeIsWinning struct {
-			TestingBalls interface{} `json:"testing_balls"`
+			TestingBalls []uint32 `json:"testing_balls"`
 		} `json:"native_is_winning"`
 
 		CalculateBpy struct {
-			BlockTimeInSeconds                          interface{} `json:"block_time_in_seconds"`
-			CompSupplyApy                               interface{} `json:"comp_supply_apy"`
-			BlockTimeInSecondsMultipliedByCompSupplyApy interface{} `json:"block_time_in_seconds_multiplied_by_comp_supply_apy"`
+			BlockTimeInSeconds                          uint64  `json:"block_time_in_seconds"`
+			CompSupplyApy                               float64 `json:"comp_supply_apy"`
+			BlockTimeInSecondsMultipliedByCompSupplyApy float64 `json:"block_time_in_seconds_multiplied_by_comp_supply_apy"`
 		} `json:"calculate_bpy"`
 
 		AaveGetTokenApy struct {
-			DepositApr       interface{} `json:"deposit_apr"`
-			APRPerDay        interface{} `json:"apr_per_day"`
-			OnePlusAprPerDay interface{} `json:"one_plus_apr_per_day"`
-			CompoundedApr    interface{} `json:"compounded_apr"`
-			DepositApy       interface{} `json:"deposit_apy"`
+			DepositApr       float64 `json:"deposit_apr"`
+			APRPerDay        float64 `json:"apr_per_day"`
+			OnePlusAprPerDay float64 `json:"one_plus_apr_per_day"`
+			CompoundedApr    float64 `json:"compounded_apr"`
+			DepositApy       float64 `json:"deposit_apy"`
 		} `json:"aave_get_token_apy"`
 
 		CompoundGetTokenApy struct {
-			BlocksPerDay                      interface{} `json:"blocks_per_day"`
-			SupplyRatePerBlockDivEthMantissa  interface{} `json::"supply_rate_per_block_div_eth_mantissa"`
-			SupplyRatePerBlockMulBlocksPerDay interface{} `json:"supply_rate_per_block_mul_blocks_per_day"`
-			PowLeftSide                       interface{} `json:"pow_left_side"`
-			PowLeftSideDaysPerYear            interface{} `json:"pow_left_side_days_per_year"`
-			SupplyApy                         interface{} `json:"supply_apy"`
+			BlocksPerDay                      uint64  `json:"blocks_per_day"`
+			SupplyRatePerBlockDivEthMantissa  float64 `json:"supply_rate_per_block_div_eth_mantissa"`
+			SupplyRatePerBlockMulBlocksPerDay float64 `json:"supply_rate_per_block_mul_blocks_per_day"`
+			PowLeftSide                       float64 `json:"pow_left_side"`
+			PowLeftSideDaysPerYear            float64 `json:"pow_left_side_days_per_year"`
+			SupplyApy                         float64 `json:"supply_apy"`
 		} `json:"compound_get_token_apy"`
 
 		WinningChances struct {
-			AtxAtEnd interface{} `json:"atx_at_end"`
+			AtxAtEnd float64 `json:"atx_at_end"`
 		} `json:"winning_chances"`
 	}
 
