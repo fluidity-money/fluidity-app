@@ -22,6 +22,7 @@ services:
       FLU_SOLANA_PYTH_PUBKEY: ${FLU_SOLANA_PYTH_PUBKEY_USDC}
       FLU_SOLANA_SWITCHBOARD_PUBKEY: ${FLU_SOLANA_SWITCHBOARD_PUBKEY_USDC}
       FLU_SOLANA_TVL_PAYER_PRIKEY: ${FLU_SOLANA_TVL_PAYER_PRIKEY}
+    restart: unless-stopped
 
   microservice-solana-prize-pool-usdt:
     build:
