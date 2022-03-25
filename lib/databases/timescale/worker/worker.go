@@ -127,14 +127,44 @@ func InsertEmissions(emission Emission) {
 
 	_, err := timescaleClient.Exec(
 		statementText,
-		winner.Network,
-		winner.TransactionHash,
-		winner.WinnerAddress,
-		winner.SolanaWinnerOwnerAddress,
-		winner.WinningAmount,
-		winner.AwardedTime,
-		tokenShortName,
-		tokenDecimals,
+		payout.P,
+		payout.A,
+		payout.M,
+		payout.G,
+		payout.B,
+		payout.Delta,
+		payout.ApyPlusDelta,
+		payout.Atx,
+		payout.Apy,
+		payout.BpyForStakedUsd,
+		payout.BlockTime,
+		payout.RewardPool,
+
+		calculateN.ProbabilityM,
+		calculateN.Factorial,
+		calculateN.Atx,
+		calculateN.N,
+
+		naiveIsWinning.TestingBalls,
+
+		calculateBpy.BlockTimeInSeconds,
+		calculateBpy.CompSupplyApy,
+		calculateBpy.BlockTimeInSecondsMultipliedByCompSupplyApy,
+
+		aaveGetTokenApy.DepositApr,
+		aaveGetTokenApy.APRPerDay,
+		aaveGetTokenApy.OnePlusAprPerDay,
+		aaveGetTokenApy.CompoundedApr,
+		aaveGetTokenApy.DepositApy,
+
+		compoundGetTokenApy.BlocksPerDay,
+		compoundGetTokenApy.SupplyRatePerBlockDivEthMantissa,
+		compoundGetTokenApy.SupplyRatePerBlockMulBlocksPerDay,
+		compoundGetTokenApy.PowLeftSide,
+		compoundGetTokenApy.PowLeftSideDaysPerYear,
+		compoundGetTokenApy.SupplyApy,
+
+		winningChances.AtxAtEnd,
 	)
 
 	if err != nil {
