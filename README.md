@@ -3,6 +3,7 @@
 
 ## Folder Structure
 
+```
 .
 | build.mk - Build aliases
 | Dockerfile - Dockerise micro-services
@@ -31,6 +32,7 @@
 |   |-- Web
 |-- worker
     |-- Build folder for worker
+```
 
 ## Create a new service
 
