@@ -3,7 +3,7 @@ import {FluidSupportedTokens, SupportedTokens} from "components/types";
 //the same program is used for every token
 const FLUID_PROGRAM_ID_ = process.env.REACT_APP_FLUID_PROGRAM_ID;
 if (!FLUID_PROGRAM_ID_)
-  throw new Error("FLUID_PROGRAM_ID unset!");
+  throw new Error("REACT_APP_FLUID_PROGRAM_ID unset!");
 
 export const FLUID_PROGRAM_ID = FLUID_PROGRAM_ID_;
 
