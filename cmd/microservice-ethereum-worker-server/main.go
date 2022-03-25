@@ -23,6 +23,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -265,6 +266,9 @@ func main() {
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
 		crumb := worker.NewEthereumEmission()
+
+		crumb.Network = "ethereum"
+		crumb.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
 		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockHash, contractAddress)
 
@@ -603,6 +607,10 @@ func main() {
 					k.Payload = err
 				})
 			}
+
+			crumb.TransactionHash = transactionHash.String()
+			crumb.RecipientAddress = recipientAddress.String()
+			crumb.SenderAddress = senderAddress.String()
 
 			queue.SendMessage(publishAmqpQueueName, announcement)
 

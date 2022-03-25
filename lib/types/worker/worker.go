@@ -10,8 +10,11 @@ type (
 	// Emission contains information on the modelling information that led
 	// up to the rewarding of the user
 	Emission struct {
-		Network      string                     `json:"network"`
-		TokenDetails token_details.TokenDetails `json:"token_details"`
+		Network          string                     `json:"network"`
+		TokenDetails     token_details.TokenDetails `json:"token_details"`
+		TransactionHash  string                     `json:"transaction_hash"`
+		RecipientAddress string                     `json:"recipient_address"`
+		SenderAddress    string                     `json:"sender_address"`
 
 		Payout struct {
 			P               float64 `json:"p"` // Payout

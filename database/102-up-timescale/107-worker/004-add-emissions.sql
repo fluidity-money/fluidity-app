@@ -1,6 +1,14 @@
 -- migrate:up
 
 CREATE TABLE worker_emissions (
+    -- transaction info
+	transaction_hash VARCHAR NOT NULL,
+	recipient_address VARCHAR NOT NULL,
+	sender_address VARCHAR NOT NULL,
+    network network_blockchain,
+    token_short_name VARCHAR NOT NULL,
+    token_decimals SMALLINT,
+
 	-- payout
 	payout_p DOUBLE PRECISION,
 	payout_a DOUBLE PRECISION,

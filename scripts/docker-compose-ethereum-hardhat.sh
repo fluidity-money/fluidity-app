@@ -1,6 +1,6 @@
 #!/bin/sh
 
-automation_dir=automation
+automation_dir="$(dirname "$0")/../automation"
 
 flu_ethereum_worker_hardhat_gas_limit=8000000
 

@@ -7,6 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -110,6 +111,9 @@ func main() {
 			fluidTransfers = 0
 			emission       = workerTypes.NewSolanaEmission()
 		)
+
+		emission.Network = "solana"
+		emission.TokenDetails = token_details.New("USDC", 6) // USDC uses 1e6 places
 
 		for _, userAction := range userActions {
 			if userAction.Type == "send" {
@@ -276,6 +280,10 @@ func main() {
 				RecipientAddress:       userActionRecipientAddress,
 				WinningAmount:          winningAmount,
 			}
+
+			emission.TransactionHash = userActionTransactionHash
+			emission.RecipientAddress = userActionRecipientAddress
+			emission.SenderAddress = userActionSenderAddress
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
 

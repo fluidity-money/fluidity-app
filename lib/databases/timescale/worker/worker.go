@@ -29,6 +29,9 @@ func InsertEmissions(emission Emission) {
 	var (
 		network             = emission.Network
 		tokenDetails        = emission.TokenDetails
+		transactionHash     = emission.TransactionHash
+		recipientAddress    = emission.RecipientAddress
+		senderAddress       = emission.SenderAddress
 		payout              = emission.Payout
 		calculateN          = emission.CalculateN
 		naiveIsWinning      = emission.NaiveIsWinning
@@ -40,6 +43,12 @@ func InsertEmissions(emission Emission) {
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
+			transaction_hash,
+			recipient_address,
+			sender_address,
+			token_short_name,
+			token_decimals,
+
 			payout_p,
 			payout_a,
 			payout_m,
@@ -87,27 +96,27 @@ func InsertEmissions(emission Emission) {
 			$4
 			$5
 			$6
+
 			$7
 			$8
 			$9
 			$10
 			$11
 			$12
-
 			$13
 			$14
 			$15
 			$16
-
 			$17
-
 			$18
+
 			$19
 			$20
-
 			$21
 			$22
+
 			$23
+
 			$24
 			$25
 			$26
@@ -117,9 +126,15 @@ func InsertEmissions(emission Emission) {
 			$29
 			$30
 			$31
-			$32
 
+			$32
 			$33
+			$34
+			$35
+			$36
+			$37
+
+			$38
 		);`,
 
 		TableEmissions,
@@ -127,6 +142,14 @@ func InsertEmissions(emission Emission) {
 
 	_, err := timescaleClient.Exec(
 		statementText,
+
+		transactionHash,
+		recipientAddress,
+		senderAddress,
+		network,
+		tokenDetails.TokenShortName,
+		tokenDetails.TokenDecimals,
+
 		payout.P,
 		payout.A,
 		payout.M,

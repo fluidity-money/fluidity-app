@@ -10,3 +10,4 @@ ENTRYPOINT [ \
 	"wait-for-database.sh", \
 	"./connector-common-emissions-timescale.o" \
 ]
+
