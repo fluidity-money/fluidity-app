@@ -26,7 +26,7 @@ INSERT INTO past_winnings VALUES (
 	'solana'
 );
 
-INSERT INTO worker_emissions (
+INSERT INTO worker_emissions VALUES (
     -- transaction info
     '0x00000000000000000000000000000000',
     '0x00000000000000000000000000000001',
@@ -56,12 +56,12 @@ INSERT INTO worker_emissions (
     35414,
 
 	-- probability NaiveIsWinning
-    {
+    '{
         1000,
         1001,
         1002,
         1003
-    },
+    }',
 
 	-- probability CalculateBpy
     123456789,
@@ -85,4 +85,4 @@ INSERT INTO worker_emissions (
 
 	-- WinningChances
     0.0013
-)
+);
