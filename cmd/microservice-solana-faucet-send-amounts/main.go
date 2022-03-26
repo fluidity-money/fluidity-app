@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
+	"os"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -26,13 +23,22 @@ const (
 
 	// EnvSolanaPrivateKey to use when signing transactions on Solana
 	EnvSolanaPrivateKey = "FLU_SOLANA_FAUCET_PRIVATE_KEY"
+
+	// EnvSolanaSenderPdaAddress to use to send faucet funds from
+	EnvSolanaSenderPdaAddress = "FLU_SOLANA_FAUCET_SENDER_ADDR"
+
+	// EnvSolanaDebugFakePayouts to prevent sending amounts when set to true
+	EnvSolanaDebugFakePayouts = "FLU_SOLANA_DEBUG_FAKE_PAYOUTS"
 )
 
 func main() {
 	var (
-		solanaRpcUrl  = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		tokenAddress_ = util.GetEnvOrFatal(EnvSolanaTokenAddress)
-		privateKey_   = util.GetEnvOrFatal(EnvSolanaPrivateKey)
+		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		tokenAddress_  = util.GetEnvOrFatal(EnvSolanaTokenAddress)
+		privateKey_    = util.GetEnvOrFatal(EnvSolanaPrivateKey)
+		senderAddress_ = util.GetEnvOrFatal(EnvSolanaSenderPdaAddress)
+
+		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
@@ -49,45 +55,11 @@ func main() {
 	var (
 		privateKey = payer.PrivateKey
 		publicKey  = payer.PublicKey()
+		senderAddress = solana.MustPublicKeyFromBase58(senderAddress_)
+		tokenAddress = solana.MustPublicKeyFromBase58(tokenAddress_)
 	)
 
-	// HARDCODED!
-
-	senderAddress := solana.MustPublicKeyFromBase58("9nQXJm1rupcbgaPgX9xxPToszoV6bBAjWxG4cK89Bdap")
-
-	tokenAddress, err := solana.PublicKeyFromBase58(tokenAddress_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Failed to read the token address %#v from the string!",
-				tokenAddress,
-			)
-
-			k.Payload = err
-		})
-	}
-
-	queue.GetMessages(faucet.TopicFaucetRequest, func(message queue.Message) {
-
-		var buf bytes.Buffer
-
-		if _, err := io.Copy(&buf, message.Content); err != nil {
-			panic(err)
-		}
-
-		buf2 := buf
-
-		log.App(func(k *log.Log) {
-			k.Format("Message off the queue is %v", string(buf.Bytes()))
-		})
-
-		var faucetRequest faucet.FaucetRequest
-
-		if err := json.NewDecoder(&buf2).Decode(&faucetRequest); err != nil {
-			panic(err)
-		}
-
+	faucet.FaucetRequests(func (faucetRequest faucet.FaucetRequest) {
 		var (
 			address_ = faucetRequest.Address
 			amount   = faucetRequest.Amount
@@ -125,6 +97,18 @@ func main() {
 		}
 
 		amountInt64 := amount.Uint64()
+
+		if testingEnabled {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Would've sent %v to %v, but in testing mode!",
+					recipientAddress,
+					amountInt64,
+				)
+			})
+
+			return
+		}
 
 		signature, err := fluidity.SendTransfer(
 			solanaClient,

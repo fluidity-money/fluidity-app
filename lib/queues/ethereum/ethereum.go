@@ -9,6 +9,9 @@ import "github.com/fluidity-money/fluidity-app/lib/queue"
 const (
 	// TopicLogs follow to get every contract log that's confirmed
 	TopicLogs = "ethereum.log"
+
+	// TopicBlockHeaders follow to get every block header seen
+	TopicBlockHeaders = "ethereum.block.header"
 )
 
 func Logs(f func(Log)) {
@@ -18,5 +21,15 @@ func Logs(f func(Log)) {
 		message.Decode(&log)
 
 		f(log)
+	})
+}
+
+func BlockHeaders(f func(BlockHeader)) {
+	queue.GetMessages(TopicBlockHeaders, func(message queue.Message) {
+		var header BlockHeader
+
+		message.Decode(&header)
+
+		f(header)
 	})
 }

@@ -119,7 +119,7 @@ func main() {
 			toAddress                   = announcement.ToAddress
 			sourceRandom                = announcement.SourceRandom
 			sourcePayouts               = announcement.SourcePayouts
-			crumb                       = announcement.Emissions
+			emission                    = announcement.Emissions
 		)
 
 		if err != nil {
@@ -131,7 +131,7 @@ func main() {
 
 		// check win status
 
-		winningBalls := probability.NaiveIsWinning(sourceRandom, &crumb)
+		winningBalls := probability.NaiveIsWinning(sourceRandom, &emission)
 
 		if winningBalls == 0 {
 			log.App(func(k *log.Log) {

@@ -10,14 +10,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
-const (
-	// UsdcDecimals to use in lieu of loading this via an environment variable
-	UsdcDecimals = 6
-
-	// UsdcName to use to refer to the token
-	UsdcName = "USDC"
-)
-
 func SendSwap(val uint64, hash string, by string, in bool) {
 	swap := userAction.NewSwap(
 		network.NetworkSolana,

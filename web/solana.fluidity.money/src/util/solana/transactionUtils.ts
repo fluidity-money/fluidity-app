@@ -7,8 +7,8 @@ import {AccountMeta} from '@solana/web3.js';
 //https://github.com/solendprotocol/common/blob/master/src/devnet.json
 //provides the accounts required for Solend interaction
 import solendAddress from 'util/solendAddress.json';
-//const accounts that we require
-import accounts from 'util/accounts.json';
+import {FluidityInstruction} from "./FluidityInstruction";
+import {SupportedTokens} from "components/types";
 
 // return the array of keys required to either wrap or unwrap fluid tokens
 export const getFluidInstructionKeys = async (
@@ -23,14 +23,16 @@ export const getFluidInstructionKeys = async (
     return null;
 
   //pda token ata
-  //cast to base token to access property, since we account for the null case anyway
-  const pdaAccount = (tokenList.find(a => a.name === token.name) as BaseToken)?.pda
-  if (!pdaAccount)
-    return null 
+  const pdaAccount = await FluidityInstruction.getProgramAddress(token.symbol as SupportedTokens);
 
   //find the pre-existing data account for this token
-  const dataAccount = accounts.dataAccounts.find(({asset}) => asset === token.symbol)
+  const dataAccount = process.env[`REACT_APP_FLU_DATA_ACCOUNT_${token.symbol}`];
   if (!dataAccount)
+    return null;
+
+  //find the pre-existing obligation account for this token
+  const obligationInfo = process.env[`REACT_APP_FLU_OBLIGATION_${token.symbol}`];
+  if (!obligationInfo)
     return null;
 
   //find the solend asset and reserve
@@ -51,7 +53,6 @@ export const getFluidInstructionKeys = async (
   const lendingMarketInfo = market.address;
   const lendingMarketAuthorityInfo = market.authorityAddress;
   const destinationCollateralInfo = reserve.collateralSupplyAddress;
-  const obligationInfo = "HbmfhzwMF71jWxfKoD7sjCLrsVhvt2zEEux8t8oWqFAH";
   const pythPriceInfo = solendAsset.priceAddress;
   const switchboardFeedInfo = solendAsset.switchboardFeedAddress;
   const clock = "SysvarC1ock11111111111111111111111111111111";
@@ -64,7 +65,7 @@ export const getFluidInstructionKeys = async (
   return [
     {
       //data account
-      pubkey: new PublicKey(dataAccount.address),
+      pubkey: new PublicKey(dataAccount),
       isSigner: false,
       isWritable: false,
     },

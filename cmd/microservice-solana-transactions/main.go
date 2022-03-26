@@ -96,7 +96,7 @@ func main() {
 			)
 
 			if err != nil {
-				log.Fatal(func(k *log.Log) {
+				log.App(func(k *log.Log) {
 					k.Message = "Destructured a log containing a Saber transfer, but failed to make a lookup!"
 					k.Payload = err
 				})

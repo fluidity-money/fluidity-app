@@ -1,5 +1,5 @@
 import {UseSolana} from "@saberhq/use-solana";
-import {Transaction as SolanaTxn, TransactionInstruction, PublicKey, sendAndConfirmRawTransaction, SendTransactionError} from '@solana/web3.js';
+import {Transaction as SolanaTxn, TransactionInstruction, PublicKey, sendAndConfirmRawTransaction, SendTransactionError, SystemProgram} from '@solana/web3.js';
 import {getATAAddress, getOrCreateATA, Token} from '@saberhq/token-utils';
 import * as splToken from '@solana/spl-token';
 import {TOKEN_PROGRAM_ID} from '@solana/spl-token';
@@ -72,9 +72,13 @@ export const wrapSpl = async(
   fluidToken: Token,
   amount: TokenAmount
 ) => {
+  const TokenSymbol = amount.token.symbol as SupportedTokens;
+  const bumpSeed = await FluidityInstruction.getBumpSeed(TokenSymbol);
+
   return await wrapOrUnwrapSpl(sol, amount.token, fluidToken, new FluidityInstruction({
     Wrap: amount,
-    TokenSymbol: amount.token.symbol as SupportedTokens
+    TokenSymbol,
+    bumpSeed,
   }));
 }
 
@@ -83,9 +87,13 @@ export const unwrapSpl = async(
   fluidToken: Token,
   amount: TokenAmount
 ) => {
+  const TokenSymbol = amount.token.symbol as SupportedTokens;
+  const bumpSeed = await FluidityInstruction.getBumpSeed(TokenSymbol);
+
   return await wrapOrUnwrapSpl(sol, amount.token, fluidToken, new FluidityInstruction({
     Unwrap: amount,
-    TokenSymbol: amount.token.symbol as SupportedTokens
+    TokenSymbol,
+    bumpSeed,
   }));
 }
 

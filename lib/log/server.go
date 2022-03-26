@@ -33,6 +33,7 @@ type log struct {
 var (
 	loggingServer               = make(chan *log)
 	loggingAreWeDebuggingServer = make(chan bool)
+	shutdownChan                = make(chan func())
 
 	loggingStream = os.Stderr
 )
@@ -65,6 +66,8 @@ func printLoggingMessage(stream io.WriteCloser, time time.Time, workerId, level,
 }
 
 func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUrl, environment string) {
+	// shutdownCallbacks to shut down other registered services when a service exits fatally
+	shutdownCallbacks := make([]func(), 0)	
 
 	if err := sentryInit(sentryUrl, environment); err != nil {
 		fmt.Fprintf(
@@ -79,6 +82,9 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 	for {
 		select {
 		case loggingAreWeDebuggingServer <- debugEnabled:
+
+		case shutdownFunc := <-shutdownChan:
+			shutdownCallbacks = append(shutdownCallbacks, shutdownFunc)
 
 		case log := <-loggingServer:
 			var (
@@ -125,6 +131,9 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 			}
 
 			if shouldExit {
+				for _, shutdown := range shutdownCallbacks{
+					shutdown()
+				}
 				processExit()
 			}
 
@@ -148,4 +157,9 @@ func logCooking(level int, k func(k *Log)) {
 	log := new(Log)
 	k(log)
 	logMessage(level, log.Context, log.Message, log.Payload)
+}
+
+// RegisterShutdown to register a callback to occur when a process exits fatally
+func RegisterShutdown(callback func ()) {
+	shutdownChan <- callback
 }
