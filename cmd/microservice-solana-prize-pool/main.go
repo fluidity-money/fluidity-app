@@ -3,11 +3,11 @@ package main
 import (
 	"time"
 
+	prizePool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	prize_pool "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	solLib "github.com/fluidity-money/fluidity-app/cmd/microservice-solana-prize-pool/lib/solana"
 
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	solana "github.com/gagliardetto/solana-go"
@@ -60,7 +60,7 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 }
 
 func updatePrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) {
-	tvl := solLib.GetTvl(
+	tvl := prizePool.GetTvl(
 		solanaRpcUrl,
 		fluidityPubkey,
 		tvlDataPubkey,
@@ -72,7 +72,7 @@ func updatePrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDa
 		payer,
 	)
 
-	mintSupply := solLib.GetMintSupply(
+	mintSupply := prizePool.GetMintSupply(
 		solanaRpcUrl,
 		fluidMintPubkey,
 	)
