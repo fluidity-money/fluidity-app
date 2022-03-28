@@ -36,6 +36,7 @@ INSERT INTO worker_emissions VALUES (
     10,
 
 	-- payout
+    0.654,
     10.11,
     0.2152641878669276,
     7,

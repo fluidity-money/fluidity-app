@@ -17,7 +17,8 @@ type (
 		SenderAddress    string                     `json:"sender_address"`
 
 		Payout struct {
-			P               float64 `json:"p"` // Payout
+			Winnings        float64 `json:"winnings"` // Winnings
+			P               float64 `json:"p"`        // Probability
 			A               float64 `json:"a"`
 			M               int64   `json:"m"` // Winning classes / divisions
 			G               float64 `json:"g"` // Gas fee

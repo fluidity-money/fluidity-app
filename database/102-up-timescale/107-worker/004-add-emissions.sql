@@ -10,6 +10,7 @@ CREATE TABLE worker_emissions (
     token_decimals SMALLINT,
 
 	-- payout
+    payout_winnings DOUBLE PRECISION,
 	payout_p DOUBLE PRECISION,
 	payout_a DOUBLE PRECISION,
 	payout_m BIGINT,

@@ -71,6 +71,13 @@ func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, e
 
 	p := probability(m, n, b)
 
+	// a / p
+	aDivP := new(big.Rat).Mul(
+		a,
+		p.Inv(p),
+	)
+
+	emission.Winnings, _ = aDivP.Float64()
 	emission.Payout.P, _ = p.Float64()
 	emission.Payout.A, _ = a.Float64()
 	emission.Payout.M = m
@@ -83,12 +90,6 @@ func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, e
 	emission.Payout.BpyForStakedUsd, _ = apy.Float64()
 	emission.Payout.BlockTime = blockTime
 	emission.Payout.RewardPool, _ = rewardPool.Float64()
-
-	// a / p
-	aDivP := new(big.Rat).Mul(
-		a,
-		p.Inv(p),
-	)
 
 	return aDivP
 }
