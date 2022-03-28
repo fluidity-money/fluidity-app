@@ -77,7 +77,7 @@ func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, e
 		p.Inv(p),
 	)
 
-	emission.Winnings, _ = aDivP.Float64()
+	emission.Payout.Winnings, _ = aDivP.Float64()
 	emission.Payout.P, _ = p.Float64()
 	emission.Payout.A, _ = a.Float64()
 	emission.Payout.M = m
