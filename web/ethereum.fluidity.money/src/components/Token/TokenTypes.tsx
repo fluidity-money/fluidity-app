@@ -23,6 +23,11 @@ export const extOptions: TokenKind[] = [
     src: dai,
     colour: "#fdc134",
   },
+  {
+    type: "Fei",
+    src: dai,
+    colour: "#677539",
+  },
   // {
   //   type: "TUSD",
   //   src: tusd,
@@ -46,6 +51,11 @@ export const intOptions: TokenKind[] = [
     type: "fDAI",
     src: dai,
     colour: "#fdc134",
+  },
+  {
+    type: "fFei",
+    src: dai,
+    colour: "#677539",
   },
   // {
   //   type: "fTUSD",
