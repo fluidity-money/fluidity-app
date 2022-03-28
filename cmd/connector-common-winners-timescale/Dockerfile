@@ -3,6 +3,8 @@ FROM fluidity/build-container:latest
 
 WORKDIR /usr/local/src/fluidity/cmd/connector-common-winners-timescale
 
+COPY . .
+
 RUN make
 
 ENTRYPOINT [ \
