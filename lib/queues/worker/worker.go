@@ -10,14 +10,20 @@ import (
 const (
 	TopicEthereumAnnouncements = "worker.ethereum.announcements"
 	TopicEthereumBlockLogs     = "worker.ethereum.blocks"
+
+	TopicEmissions = "worker.emissions"
 )
 
 type (
 	EthereumAnnouncement = worker.EthereumAnnouncement
 	EthereumBlockLog     = worker.EthereumBlockLog
+
+	SolanaWinnerAnnouncement = worker.SolanaWinnerAnnouncement
+
+	Emission = worker.Emission
 )
 
-func Announcements(f func(EthereumAnnouncement)) {
+func EthereumAnnouncements(f func(EthereumAnnouncement)) {
 	queue.GetMessages(TopicEthereumAnnouncements, func(message queue.Message) {
 
 		var announcement EthereumAnnouncement
@@ -36,4 +42,22 @@ func EthereumBlockLogs(f func(EthereumBlockLog)) {
 
 		f(blockLog)
 	})
+}
+
+func Emissions(f func(Emission)) {
+	queue.GetMessages(TopicEmissions, func(message queue.Message) {
+		var emission Emission
+
+		message.Decode(&emission)
+
+		f(emission)
+	})
+}
+
+func NewEthereumEmission() *Emission {
+	return worker.NewEthereumEmission()
+}
+
+func NewSolanaEmisison() *Emission {
+	return worker.NewSolanaEmission()
 }

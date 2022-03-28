@@ -1,6 +1,6 @@
 #!/bin/sh
 
-automation_dir=automation
+automation_dir="$(dirname "$0")/../automation"
 
 flu_ethereum_worker_hardhat_gas_limit=8000000
 
@@ -77,4 +77,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
 	-f "$automation_dir/docker-compose.faucet.fluidity.money.yml" \
 	-f "$automation_dir/docker-compose.ethereum-worker.yml" \
+	-f "$automation_dir/docker-compose.volumes.yml" \
 	$@

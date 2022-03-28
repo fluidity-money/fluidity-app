@@ -1,6 +1,6 @@
 #!/bin/sh
 
-automation_dir=automation
+automation_dir="$(dirname "$0")/../automation"
 
 export \
 	FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq \
@@ -61,4 +61,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.solana-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.fluidity.money.yml" \
 	-f "$automation_dir/docker-compose.solana-worker.yml" \
+	-f "$automation_dir/docker-compose.volumes.yml" \
 	$@
