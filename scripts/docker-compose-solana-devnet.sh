@@ -58,4 +58,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.solana-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.fluidity.money.yml" \
 	-f "$automation_dir/docker-compose.solana-worker.yml" \
+	-f "$automation_dir/docker-compose.volumes.yml" \
 	$@

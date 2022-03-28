@@ -50,4 +50,3 @@ services:
     depends_on:
       - timescale
     restart: unless-stopped
-
