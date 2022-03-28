@@ -22,6 +22,15 @@ Tracks the current state of the prize pool by querying the state of the contract
 | `FLU_SOLANA_SWITCHBOARD_PUBKEY`     | Public key of the solend switchboard account.                                |
 | `FLU_SOLANA_TVL_PAYER_PRIKEY`       | Private key with some sol, won't be spent from.                              |
 
+## Tokens list
+
+Tokens should be passed to this program like the following:
+
+	<fluid mint>:<obligation>:<reserve>:<pyth>:<switchboard>:<decimals>
+
+To support multiple tokens, you would separate this block using a comma
+(,).
+
 ## Building
 
 	make build

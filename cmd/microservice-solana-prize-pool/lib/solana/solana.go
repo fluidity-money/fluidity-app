@@ -3,8 +3,10 @@ package solana
 import (
 	"context"
 	"encoding/base64"
+	"math/big"
 	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/rpc"
@@ -74,6 +76,12 @@ func GetMintSupply(rpcUrl string, account solana.PublicKey) uint64 {
 	}
 
 	return amount
+}
+
+// GetPrice wraps fetching the current price of a token
+func GetPrice(rpcUrl string, account solana.PublicKey) (*big.Rat, error) {
+	client := rpc.New(rpcUrl)
+	return pyth.GetPrice(client, account)
 }
 
 // GetTvl retrieves the current total value locked from chain using a simulated transaction
