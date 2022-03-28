@@ -6,9 +6,10 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
-	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
@@ -121,14 +122,16 @@ func main() {
 		})
 	}
 
-	crumb := breadcrumb.NewBreadcrumb()
-
 	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
 
 		var (
 			userActions    = bufferedUserActions.UserActions
 			fluidTransfers = 0
+			emission       = workerTypes.NewSolanaEmission()
 		)
+
+		emission.Network = "solana"
+		emission.TokenDetails = token_details.New(tokenName, decimalPlaces) // USDC uses 1e6 places
 
 		for _, userAction := range userActions {
 
@@ -143,12 +146,6 @@ func main() {
 
 		apy, err := solend.GetUsdApy(solanaClient, reservePubkey)
 
-		crumb.Set(func(k *breadcrumb.Breadcrumb) {
-			k.Many(map[string]interface{}{
-				"solend supply apy": apy.FloatString(10),
-			})
-		})
-
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
@@ -159,7 +156,7 @@ func main() {
 			})
 		}
 
-		bpy := probability.CalculateBpy(SolanaBlockTime, apy, crumb)
+		bpy := probability.CalculateBpy(SolanaBlockTime, apy, emission)
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 
@@ -224,8 +221,6 @@ func main() {
 				continue
 			}
 
-			defer breadcrumb.SendAndClear(crumb)
-
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
 			randomN, randomPayouts := probability.WinningChances(
@@ -236,7 +231,7 @@ func main() {
 				decimalPlacesRat,
 				fluidTransfers,
 				SolanaBlockTime,
-				crumb,
+				emission,
 			)
 
 			randomIntegers := generateRandomIntegers(
@@ -255,7 +250,7 @@ func main() {
 
 			matchedBalls := probability.NaiveIsWinning(
 				randomSource,
-				crumb,
+				emission,
 			)
 
 			if matchedBalls <= 0 {
@@ -316,7 +311,13 @@ func main() {
 				FluidMintPubkey:        fluidMintPubkey.String(),
 			}
 
+			emission.TransactionHash = userActionTransactionHash
+			emission.RecipientAddress = userActionRecipientAddress
+			emission.SenderAddress = userActionSenderAddress
+
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
+
+			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

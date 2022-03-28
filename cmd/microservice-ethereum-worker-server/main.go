@@ -21,9 +21,9 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -250,11 +250,7 @@ func main() {
 		})
 	}
 
-	crumb := breadcrumb.NewBreadcrumb()
-
 	worker.EthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
-		defer breadcrumb.SendAndClear(crumb)
-
 		var (
 			blockBaseFee = blockLog.BlockBaseFee
 			logs         = blockLog.Logs
@@ -268,6 +264,11 @@ func main() {
 		var secondsSinceLastBlock uint64 = DefaultSecondsSinceLastBlock
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
+
+		emission := worker.NewEthereumEmission()
+
+		emission.Network = "ethereum"
+		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
 		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockHash, contractAddress)
 
@@ -296,10 +297,6 @@ func main() {
 
 			return
 		}
-
-		crumb.Set(func(k *breadcrumb.Breadcrumb) {
-			crumb.One("transfers in block", transfersInBlock)
-		})
 
 		debug(
 			"Average transfers in block: %#v! Transfers in block: %#v!",
@@ -390,7 +387,7 @@ func main() {
 				gethClient,
 				ethCTokenAddress,
 				CompoundBlocksPerDay,
-				crumb,
+				emission,
 			)
 
 			if err != nil {
@@ -407,7 +404,7 @@ func main() {
 				gethClient,
 				ethAaveAddressProviderAddress,
 				ethUnderlyingTokenAddress,
-				crumb,
+				emission,
 			)
 
 			if err != nil {
@@ -486,7 +483,7 @@ func main() {
 
 		currentApyInUsdt.Quo(currentApyInUsdt, underlyingTokenDecimalsRat)
 
-		bpy := probability.CalculateBpy(secondsSinceLastBlock, currentApyInUsdt, crumb)
+		bpy := probability.CalculateBpy(secondsSinceLastBlock, currentApyInUsdt, emission)
 
 		balanceOfUnderlying, err := compound.GetBalanceOfUnderlying(
 			gethClient,
@@ -575,7 +572,7 @@ func main() {
 				underlyingTokenDecimalsRat,
 				btx,
 				secondsSinceLastBlock,
-				crumb,
+				emission,
 			)
 
 			res := generateRandomIntegers(probability.WinningClasses, 1, int(randomN))
@@ -596,6 +593,10 @@ func main() {
 				SourcePayouts:   randomPayouts,
 			}
 
+			// Fill in emission.NaiveIsWinning
+
+			probability.NaiveIsWinning(announcement.SourceRandom, emission)
+
 			log.Debug(func(k *log.Log) {
 				k.Format("Source payouts: %v", randomSource)
 			})
@@ -607,7 +608,13 @@ func main() {
 				})
 			}
 
+			emission.TransactionHash = transactionHash.String()
+			emission.RecipientAddress = recipientAddress.String()
+			emission.SenderAddress = senderAddress.String()
+
 			queue.SendMessage(publishAmqpQueueName, announcement)
+
+			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

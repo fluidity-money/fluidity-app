@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-automation_dir=automation
+automation_dir="$(dirname "$0")/../automation"
 
 export \
 	FLU_ETHEREUM_FRONTEND_API_URL=http://localhost:8081 \

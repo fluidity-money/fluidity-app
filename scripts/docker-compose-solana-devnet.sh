@@ -1,7 +1,7 @@
 #!/bin/sh
-​
-automation_dir=automation
-​
+
+automation_dir="$(dirname "$0")/../automation"
+
 export \
 	FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq \
 	FLU_UNIVERSE=testing
