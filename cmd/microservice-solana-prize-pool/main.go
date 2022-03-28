@@ -10,6 +10,7 @@ import (
 	prize_pool "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 
+
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	solana "github.com/gagliardetto/solana-go"
 )
@@ -79,12 +80,11 @@ func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataP
 			)
 		})
 	}
-
-	// TODO does this need to be price lookup-ed a la uniswap anchored view
+	
 	prizePool := int64(tvl - mintSupply)
 
 	log.Debug(func(k *log.Log) {
-		k.Format("Got TVL %d, supply %d, prize pool %d, for pubkey %v", tvl, mintSupply, prizePool, fluidMintPubkey.String())
+		k.Format("Got TVL %d, supply %d, unscaled prize pool %d, for pubkey %v", tvl, mintSupply, prizePool, fluidMintPubkey.String())
 	})
 
 	// return the whole amount in the unit of that token
@@ -155,8 +155,33 @@ func main() {
 					payer,
 				)
 
+				// get the token price from Pyth
+				tokenPrice, err := solLib.GetPrice(solanaRpcUrl, pythPubkey)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to get token price for token with mint %v: %v",
+							fluidMintPubkey,
+							err,
+						)
+					})
+				}
+
 				// adjust for decimals
 				prizePoolAdjusted := prizePool.Quo(prizePool, decimalsRat)
+
+				// multiply the token price with the exchange rate to get it in USD...
+				prizePoolAdjusted.Mul(prizePoolAdjusted, tokenPrice)
+
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Prize pool: %v, token price: %v",
+						prizePoolAdjusted.FloatString(10),
+						tokenPrice.FloatString(10),
+					)
+				})
+
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
 				tokenDetailsComplete := TokenDetails{
