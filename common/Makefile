@@ -1,16 +1,16 @@
 
 include ../build.mk
 
-all: build-lib
+all: build-common
 
 FILES := $(shell find . -name '*.go')
 
-build-lib: ${FILES}
+build-common: ${FILES}
 	@echo ${FILES} \
 		| xargs -d' ' -I '{}' dirname {} \
 		| uniq -u \
 		| xargs -I '{}' sh -c 'cd {} && ${GO_BUILD}'
 
-	@touch build-lib
+	@touch build-common
 
-build: build-lib
+build: build-common

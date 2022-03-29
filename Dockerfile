@@ -10,24 +10,31 @@ RUN apt-get update && apt-get install -y \
 
 ENV FLUID_DIR /usr/local/src/fluidity
 
-COPY go.mod ${FLUID_DIR}/go.mod
-COPY go.sum ${FLUID_DIR}/go.sum
+WORKDIR ${FLUID_DIR}
 
-COPY scripts ${FLUID_DIR}/scripts
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
+COPY scripts scripts
 
 WORKDIR ${FLUID_DIR}/scripts
 
 RUN make install
 
-COPY build.mk ${FLUID_DIR}/build.mk
-COPY golang.mk ${FLUID_DIR}/golang.mk
+WORKDIR ${FLUID_DIR}
 
-COPY contracts ${FLUID_DIR}/contracts
+COPY build.mk .
+COPY golang.mk .
 
-COPY database ${FLUID_DIR}/database
+COPY contracts contracts
 
-COPY common ${FLUID_DIR}/common
-COPY lib ${FLUID_DIR}/lib
-COPY cmd ${FLUID_DIR}/cmd
+COPY database database
 
-RUN rm -rf /go/pkg/mod/cache/
+COPY common common
+COPY lib lib
+
+COPY Makefile .
+
+RUN make build
