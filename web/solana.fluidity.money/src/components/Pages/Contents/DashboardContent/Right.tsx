@@ -62,7 +62,9 @@ const Right = ({ pastWinnings }: right) => {
     <div className="reward-box-body">
       <div className="pool-title-container">
         <p className="title__right__winning">Past winnings</p>
-        <p className="title__right__number">${totalWinningAmount}</p>
+        <p className="title__right__number">
+          ${Number(totalWinningAmount).toLocaleString()}
+        </p>
       </div>
 
       <div className="bar-chart-container">

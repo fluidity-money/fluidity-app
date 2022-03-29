@@ -19,7 +19,7 @@ const Left = ({ prizePool }: left) => {
         $
         {prizePool.amount &&
           parseFloat(prizePool.amount).toLocaleString("en", {
-            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           })}
       </h1>
       <div className="btn-component">
