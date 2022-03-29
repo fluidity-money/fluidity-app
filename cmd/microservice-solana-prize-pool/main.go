@@ -4,15 +4,16 @@ import (
 	"math/big"
 	"time"
 
-	solLib "github.com/fluidity-money/fluidity-app/cmd/microservice-solana-prize-pool/lib/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	prize_pool "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
+	prize_pool_queue "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-
-
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	solana "github.com/gagliardetto/solana-go"
+
+	"github.com/gagliardetto/solana-go"
+	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -54,7 +55,7 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 }
 
 func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) *big.Rat {
-	tvl := solLib.GetTvl(
+	tvl := prize_pool.GetTvl(
 		solanaRpcUrl,
 		fluidityPubkey,
 		tvlDataPubkey,
@@ -66,7 +67,7 @@ func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataP
 		payer,
 	)
 
-	mintSupply := solLib.GetMintSupply(
+	mintSupply := prize_pool.GetMintSupply(
 		solanaRpcUrl,
 		fluidMintPubkey,
 	)
@@ -80,7 +81,7 @@ func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataP
 			)
 		})
 	}
-	
+
 	prizePool := int64(tvl - mintSupply)
 
 	log.Debug(func(k *log.Log) {
@@ -88,22 +89,24 @@ func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataP
 	})
 
 	// return the whole amount in the unit of that token
-	return big.NewRat(prizePool, 1) 
+	return big.NewRat(prizePool, 1)
 }
 
 func main() {
 	var (
-		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
-		tvlDataPubkey     = pubkeyFromEnv(EnvTvlDataPubkey)
-		solendPubkey      = pubkeyFromEnv(EnvSolendPubkey)
-		payerPrikey       = util.GetEnvOrFatal(EnvPayerPrikey)
-		solanaRpcUrl      = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		updateInterval    = util.GetEnvOrFatal(EnvUpdateInterval)
-		tokensList_       = util.GetEnvOrFatal(EnvTokensList)
+		fluidityPubkey = pubkeyFromEnv(EnvFluidityPubkey)
+		tvlDataPubkey  = pubkeyFromEnv(EnvTvlDataPubkey)
+		solendPubkey   = pubkeyFromEnv(EnvSolendPubkey)
+		payerPrikey    = util.GetEnvOrFatal(EnvPayerPrikey)
+		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		updateInterval = util.GetEnvOrFatal(EnvUpdateInterval)
+		tokensList_    = util.GetEnvOrFatal(EnvTokensList)
 	)
 
 	// tokensList will Fatal if bad input
 	tokenDetails := getTokensList(tokensList_)
+
+	rpcClient := solanaRpc.New(solanaRpcUrl)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 
@@ -118,10 +121,10 @@ func main() {
 	interval, err := time.ParseDuration(updateInterval)
 
 	if err != nil {
-	    log.Fatal(func (k *log.Log) {
-	        k.Message = "Failed to read update interval!"
-	        k.Payload = err
-	    })
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to read update interval!"
+			k.Payload = err
+		})
 	}
 
 	var (
@@ -156,7 +159,7 @@ func main() {
 				)
 
 				// get the token price from Pyth
-				tokenPrice, err := solLib.GetPrice(solanaRpcUrl, pythPubkey)
+				tokenPrice, err := pyth.GetPrice(rpcClient, pythPubkey)
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -185,11 +188,11 @@ func main() {
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
 				tokenDetailsComplete := TokenDetails{
-					fluidMintPubkey:   fluidMintPubkey, 
+					fluidMintPubkey:   fluidMintPubkey,
 					obligationPubkey:  obligationPubkey,
-					reservePubkey:     reservePubkey,	
-					pythPubkey:        pythPubkey,			
-					switchboardPubkey: switchboardPubkey,			
+					reservePubkey:     reservePubkey,
+					pythPubkey:        pythPubkey,
+					switchboardPubkey: switchboardPubkey,
 					tokenDecimals:     decimalsRat,
 					amount:            prizePoolFloat,
 				}
@@ -197,13 +200,13 @@ func main() {
 				doneChan <- tokenDetailsComplete
 			}
 		}()
-	}	
+	}
 
 	timer := time.NewTicker(interval)
 
 	for {
 		select {
-		case <- timer.C:
+		case <-timer.C:
 			var amount float64
 			// fetch amount for each token
 			for _, tokenDetail := range tokenDetails {
@@ -212,22 +215,22 @@ func main() {
 
 			// aggregate results
 			for range tokenDetails {
-				tokenDetails := <- doneChan
+				tokenDetails := <-doneChan
 				amount += tokenDetails.amount
 			}
 
-			prizePool := prize_pool.PrizePool{
+			prizePool := prize_pool_queue.PrizePool{
 				Network:     string(network.NetworkSolana),
 				Amount:      amount,
 				LastUpdated: time.Now(),
 			}
-			
+
 			log.Debug(func(k *log.Log) {
 				k.Format("Publishing aggregated prize pool: %v", amount)
 			})
 
 			queue.SendMessage(
-				prize_pool.TopicPrizePoolSolana,
+				prize_pool_queue.TopicPrizePoolSolana,
 				prizePool,
 			)
 		}
