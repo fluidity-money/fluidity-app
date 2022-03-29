@@ -106,7 +106,7 @@ func main() {
 					k.Format(
 						"Prize pool: %v, token price: %v",
 						prizePoolAdjusted.FloatString(10),
-						tokenDecimals.FloatString(10),
+						tokenPrice.FloatString(10),
 					)
 				})
 
