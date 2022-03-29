@@ -14,8 +14,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/solana/solend"
-
-	prizePool "github.com/fluidity-money/fluidity-app/cmd/microservice-solana-prize-pool/lib/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 
 	solana "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"

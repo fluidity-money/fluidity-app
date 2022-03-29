@@ -1,4 +1,4 @@
-package solana
+package prize_pool
 
 import (
 	"context"
