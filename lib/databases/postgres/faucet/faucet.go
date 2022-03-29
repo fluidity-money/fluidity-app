@@ -69,7 +69,13 @@ func InsertFaucetUser(faucetUser FaucetUser) {
 	// insert a copy for each token we support
 	// TODO this is a hack - would be better to have an enumerable list 
 	// of supported tokens that isn't hardcoded here
-	tokens := []string{string(faucet.TokenfDAI), string(faucet.TokenfUSDC), string(faucet.TokenfUSDT)}
+	var tokens []string
+	if faucetUser.Network == network.NetworkEthereum {
+		tokens = []string{string(faucet.TokenfDAI), string(faucet.TokenfUSDC), string(faucet.TokenfUSDT)}
+	} else {
+		tokens = []string{string(faucet.TokenfUSDC), string(faucet.TokenfUSDT)}
+	}
+
 	for _, tokenName := range tokens {
 		postgresClient := postgres.Client()
 

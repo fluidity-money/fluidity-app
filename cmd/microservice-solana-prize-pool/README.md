@@ -26,7 +26,7 @@ Tracks the current state of the prize pool by querying the state of the contract
 
 Tokens should be passed to this program like the following:
 
-	<fluid mint>:<obligation>:<reserve>:<pyth>:<switchboard>:<decimals>
+	<fluid mint>:<token name>:<decimals>:<obligation>:<reserve>:<pyth>:<switchboard>
 
 To support multiple tokens, you would separate this block using a comma
 (,).

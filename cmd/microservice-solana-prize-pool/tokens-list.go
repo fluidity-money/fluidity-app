@@ -36,7 +36,7 @@ func getTokensList(tokensList_ string) []TokenDetails {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) != 6 {
+		if len(tokenDetails_) != 7 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",
@@ -47,11 +47,12 @@ func getTokensList(tokensList_ string) []TokenDetails {
 
 		var (
 			fluidMint_   = trimWhitespace(tokenDetails_[0])
-			obligation_  = trimWhitespace(tokenDetails_[1])
-			reserve_     = trimWhitespace(tokenDetails_[2])
-			pyth_        = trimWhitespace(tokenDetails_[3])
-			switchboard_ = trimWhitespace(tokenDetails_[4])
-			decimals_    = trimWhitespace(tokenDetails_[5])
+			//tokenDetails_[1] = tokenName
+			decimals_    = trimWhitespace(tokenDetails_[2])
+			obligation_  = trimWhitespace(tokenDetails_[3])
+			reserve_     = trimWhitespace(tokenDetails_[4])
+			pyth_        = trimWhitespace(tokenDetails_[5])
+			switchboard_ = trimWhitespace(tokenDetails_[6])
 		)
 
 		fluidMint   := solana.MustPublicKeyFromBase58(fluidMint_)
