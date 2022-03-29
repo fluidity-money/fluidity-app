@@ -164,10 +164,8 @@ func HandleUniquePhrase(w http.ResponseWriter, r *http.Request) interface{} {
 		break
 
 	case faucetTypes.TokenfUSDT:
-		if networkUsed == network.NetworkEthereum {
-			tokenNameOk = true
+		tokenNameOk = true
 			break		
-		}
 
 	default:
 		break
