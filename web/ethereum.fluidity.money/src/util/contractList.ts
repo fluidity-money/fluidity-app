@@ -12,7 +12,7 @@ type Token = {
   decimals: number,
 };
 
-export type SupportedContracts = "USDT" | "USDC" | "DAI" | "TUSD";
+export type SupportedContracts = "USDT" | "USDC" | "DAI" | "TUSD" | "Fei";
 export type SupportedFluidContracts = SupportedContracts | `f${SupportedContracts}`;
 
 export type SupportedNetworks = "ETH";

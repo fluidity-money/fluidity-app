@@ -7,30 +7,36 @@ import { readFile as readFileCB } from 'fs';
 const readFile = promisify(readFileCB);
 
 import {
-  USDT_ADDR,
-  CUSDT_ADDR,
-  USDT_HOLDER,
-  USDC_ADDR,
-  CUSDC_ADDR,
-  USDC_HOLDER,
-  DAI_ADDR,
-  CDAI_ADDR,
-  TUSD_ADDR,
-  CTUSD_ADDR,
-  TUSD_HOLDER,
-  DAI_HOLDER } from './test-constants';
+  AAVE_POOL_PROVIDER_ADDR,
 
-import {HttpNetworkConfig} from "hardhat/types";
+  USDT_ADDR, USDC_ADDR, DAI_ADDR, TUSD_ADDR, FEI_ADDR,
+  CUSDT_ADDR, CUSDC_ADDR, CDAI_ADDR, CTUSD_ADDR, AFEI_ADDR,
+  USDT_HOLDER, USDC_HOLDER, DAI_HOLDER, TUSD_HOLDER, FEI_HOLDER,
+} from './test-constants';
+
 import { ethers } from "ethers";
+
+type Token = {decimals: number, name: string, symbol: string, address: string, owner: string} & ({backend: 'compound', compoundAddress: string} | {backend: 'aave', aaveAddress: string})
+const TokenList: {[name: string]: Token} = {
+    "usdt": {backend: 'compound', compoundAddress: CUSDT_ADDR, decimals: 6, name: "Fluid USDt", symbol: "fUSDt", address: USDT_ADDR, owner: USDT_HOLDER},
+    "usdc": {backend: 'compound', compoundAddress: CUSDC_ADDR, decimals: 6, name: "Fluid USDc", symbol: "fUSDc", address: USDC_ADDR, owner: USDC_HOLDER},
+    "dai": {backend: 'compound', compoundAddress: CDAI_ADDR, decimals: 18, name: "Fluid DAI", symbol: "fDAI", address: DAI_ADDR, owner: DAI_HOLDER},
+    "tusd": {backend: 'compound', compoundAddress: CTUSD_ADDR, decimals: 18, name: "Fluid tUSD", symbol: "ftUSD", address: TUSD_ADDR, owner: TUSD_HOLDER},
+    "fei": {backend: 'aave', aaveAddress: AFEI_ADDR, decimals: 18, name: "Fluid Fei", symbol: "fFei", address: FEI_ADDR, owner: FEI_HOLDER},
+};
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 const oracleAddress = process.env[oracleKey];
 
-let shouldDeploy = false;
-task("deploy-forknet", "Starts a node on forked mainnet with the contracts initialized", async (_taskArgs, hre) => {
-  shouldDeploy = true;
-  await hre.run("node", {...{network: 'hardhat'}});
-});
+let shouldDeploy: (keyof typeof TokenList)[] = [];
+task("deploy-forknet", "Starts a node on forked mainnet with the contracts initialized")
+  .addOptionalParam("tokens", "the tokens to deploy")
+  .setAction(async (args, hre) => {
+    shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
+    for (const t of shouldDeploy) if (!TokenList.hasOwnProperty(t)) throw new Error(`unknown token ${t} - valid tokens are ${Object.keys(TokenList).join(',')}`);
+
+    await hre.run("node", {...{network: 'hardhat'}});
+  });
 
 
 if (oracleAddress == "") {
@@ -44,26 +50,31 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
     await hre.run("forknet:take-usdt");
 
-    const factory = await hre.ethers.getContractFactory("TokenCompound");
+    const factoryCompound = await hre.ethers.getContractFactory("TokenCompound");
+    const factoryAave = await hre.ethers.getContractFactory("TokenAave");
 
-    const deployTokens = async (tokens: {compoundAddress: string, decimals: number, name: string, symbol: string, oracle: string}[]) => {
+    const deployTokens = async <T extends keyof typeof TokenList>(tokenNames: T[]) => {
+      const tokens = tokenNames.map(t => TokenList[t])
+
       for (const token of tokens) {
         console.log(`deploying ${token.name}`);
-        const deployedToken = await hre.upgrades.deployProxy(
-          factory,
-          [token.compoundAddress, token.decimals, token.name, token.symbol, token.oracle],
-        );
+        const deployedToken =
+          token.backend === 'compound' ? await hre.upgrades.deployProxy(
+            factoryCompound,
+            [token.compoundAddress, token.decimals, token.name, token.symbol, oracleAddress],
+          ) :
+          token.backend === 'aave' ? await hre.upgrades.deployProxy(
+            factoryAave,
+            [token.aaveAddress, AAVE_POOL_PROVIDER_ADDR, token.decimals, token.name, token.symbol, oracleAddress],
+          ) :
+          assertNever(token);
+
         await deployedToken.deployed();
         console.log(`deployed ${token.name} to ${deployedToken.address}`);
       }
     };
 
-    await deployTokens([
-      {compoundAddress: CUSDT_ADDR, decimals: 6, name: "Fluid USDt", symbol: "fUSDt", oracle: oracleAddress},
-      {compoundAddress: CUSDC_ADDR, decimals: 6, name: "Fluid USDc", symbol: "fUSDc", oracle: oracleAddress},
-      {compoundAddress: CDAI_ADDR, decimals: 18, name: "Fluid DAI", symbol: "fDAI", oracle: oracleAddress},
-      {compoundAddress: CTUSD_ADDR, decimals: 18, name: "Fluid tUSD", symbol: "ftUSD", oracle: oracleAddress},
-    ]);
+    await deployTokens(shouldDeploy);
   }
 });
 
@@ -77,7 +88,9 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
 
   const accounts = (await hre.ethers.getSigners()).slice(0,10);
 
-  const takeERC20 = async (tokens: {name: string, owner: string, address: string}[]) => {
+  const takeERC20 = async <T extends keyof typeof TokenList>(tokenNames: T[]) => {
+    const tokens = tokenNames.map(t => TokenList[t]);
+
     for (const token of tokens) {
       console.log(`taking ${token.name}`)
       await hre.network.provider.request({
@@ -110,14 +123,10 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
     }
   };
 
-  await takeERC20([
-    { name: "USDt", address: USDT_ADDR, owner: USDT_HOLDER },
-    { name: "USDc", address: USDC_ADDR, owner: USDC_HOLDER },
-    { name: "DAI", address: DAI_ADDR, owner: DAI_HOLDER },
-    { name: "tUSD", address: TUSD_ADDR, owner: TUSD_HOLDER },
-  ]);
+  await takeERC20(shouldDeploy);
 });
 
+function assertNever(_: never): never { throw new Error(`assertNever called: ${arguments}`); }
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
