@@ -21,6 +21,13 @@
     "decimals": 18
   },
   {
+    "symbol": "Fei",
+    "address": "0x956F47F50A910163D8BF957Cf5846D573E7f87CA",
+    "colour": "#fdc134",
+    "image": "img/TokenIcons/daiIcon.svg",
+    "decimals": 18
+  },
+  {
     "symbol": "TUSD",
     "address": "0x0000000000085d4780B73119b644AE5ecd22b376",
     "colour": "#2433b8",
