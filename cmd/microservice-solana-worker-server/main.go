@@ -72,6 +72,9 @@ const (
 
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
+
+	// The compute used by an spl-token tranfer
+	SplTranferCompute = 2721
 )
 
 func main() {
@@ -108,6 +111,10 @@ func main() {
 	var (
 		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
 		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
+
+		// Amount to multiply the adjusted fee by such that a basic spl-token transfer
+		// corresponds to the basic solana fee. (200000 = default Solana compute budget)
+		invSolanaSplTransferComputeRat = big.NewRat(200000, SplTranferCompute)
 	)
 
 	solanaClient := solanaRpc.New(rpcUrl)
@@ -221,6 +228,7 @@ func main() {
 			}
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
+			solanaTransactionFeesNormalised.Mul(solanaTransactionFeesNormalised, invSolanaSplTransferComputeRat)
 
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
