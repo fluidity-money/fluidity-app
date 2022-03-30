@@ -26,7 +26,9 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
     const chain = await (window as any).ethereum.request({
       method: "eth_chainId",
     });
-    if (`${chain}` !== `0x${process.env.REACT_APP_CHAIN_ID}`) {
+    // chain is a string containing hex
+    // CHAIN_ID is a string containing base 10
+    if (`${String(Number(chain))}` !== `${String(Number(process.env.REACT_APP_CHAIN_ID))}`) {
       setDesiredNetwork(false);
       setChainId(chain.substring(2));
     } else {
