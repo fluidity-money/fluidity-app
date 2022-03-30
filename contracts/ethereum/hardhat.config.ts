@@ -120,48 +120,51 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   const factoryCompound = await hre.ethers.getContractFactory("TokenCompound");
   const factoryAave = await hre.ethers.getContractFactory("TokenAave");
 
-  const deployTokens =
-    async <T extends keyof typeof TokenList>(tokenNames: T[]) => {
-      const tokens = tokenNames.map(t => TokenList[t])
+  const deployTokens = async <T extends keyof typeof TokenList>(tokenNames: T[]) => {
+    const tokens = tokenNames.map(t => TokenList[t])
 
-      for (const token of tokens) {
-        console.log(`deploying ${token.name}`);
+    for (const token of tokens) {
+      console.log(`deploying ${token.name}`);
 
-        var deployedToken: any;
+      var deployedToken: ethers.Contract;
 
-        switch (token.backend) {
-          case 'compound':
-            deployedToken = await hre.upgrades.deployProxy(
-              factoryCompound,
-              [
-                token.compoundAddress,
-                token.decimals,
-                token.name,
-                token.symbol,
-                oracleAddress
-              ]
-            );
+      switch (token.backend) {
+        case 'compound':
+          deployedToken = await hre.upgrades.deployProxy(
+            factoryCompound,
+            [
+              token.compoundAddress,
+              token.decimals,
+              token.name,
+              token.symbol,
+              oracleAddress
+            ]
+          );
 
-            break;
+          break;
 
-          case 'aave':
-            deployedToken = await hre.upgrades.deployProxy(
-              factoryAave,
-              [
-                token.aaveAddress,
-                AAVE_POOL_PROVIDER_ADDR,
-                token.decimals, token.name, token.symbol, oracleAddress
-              ]
-            );
+        case 'aave':
+          deployedToken = await hre.upgrades.deployProxy(
+            factoryAave,
+            [
+              token.aaveAddress,
+              AAVE_POOL_PROVIDER_ADDR,
+              token.decimals, token.name, token.symbol, oracleAddress
+            ]
+          );
 
-            break;
-        }
+          break;
 
-        await deployedToken.deployed();
+        default:
+          assertNever(token);
 
-        console.log(`deployed ${token.name} to ${deployedToken.address}`);
       }
-    };
+
+      await deployedToken.deployed();
+
+      console.log(`deployed ${token.name} to ${deployedToken.address}`);
+    }
+  };
 
   await deployTokens(shouldDeploy);
 });
@@ -229,6 +232,8 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
   await takeERC20(shouldDeploy);
 });
 
+// statically ensure an object can't exist (ie, all enum varients are handled)
+function assertNever(_: never): never { throw new Error(`assertNever called: ${arguments}`); }
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
