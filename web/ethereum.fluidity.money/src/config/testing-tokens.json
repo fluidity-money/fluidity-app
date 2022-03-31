@@ -35,13 +35,6 @@
     "decimals": 18
   },
   {
-    "symbol": "Fei",
-    "address": "0x956F47F50A910163D8BF957Cf5846D573E7f87CA",
-    "colour": "#6433b8ff",
-    "image": "img/TokenIcons/feiIcon.svg",
-    "decimals": 18
-  },
-  {
     "symbol": "fUSDT",
     "address": "0x9391202B846ee3f574e59E4AD58ef6140E9ba4F6",
     "colour": "rgb(36,163,124)",
