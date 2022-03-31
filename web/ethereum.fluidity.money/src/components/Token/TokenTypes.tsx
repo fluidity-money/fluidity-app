@@ -3,8 +3,9 @@ import { TokenKind } from "components/types";
 // Image imports
 const usdc = "img/TokenIcons/usdcIcon.svg";
 const usdt = "img/TokenIcons/usdtIcon.svg";
-const dai = "img/TokenIcons/daiIcon.svg";
+const dai  = "img/TokenIcons/daiIcon.svg";
 const tusd = "img/TokenIcons/tusdIcon.svg";
+const fei  = "img/TokenIcons/feiIcon.svg";
 
 // External token options
 export const extOptions: TokenKind[] = [
@@ -25,7 +26,7 @@ export const extOptions: TokenKind[] = [
   },
   {
     type: "Fei",
-    src: dai,
+    src: fei,
     colour: "#677539",
   },
   // {
@@ -54,7 +55,7 @@ export const intOptions: TokenKind[] = [
   },
   {
     type: "fFei",
-    src: dai,
+    src: fei,
     colour: "#677539",
   },
   // {
