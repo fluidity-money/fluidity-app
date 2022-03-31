@@ -136,9 +136,7 @@ func main() {
 			tokenNameOk = true
 
 		case string(faucetTypes.TokenfUSDT):
-			if networkChosen == network.NetworkEthereum {
-				tokenNameOk = true
-			}
+			tokenNameOk = true
 
 		default:
 		}

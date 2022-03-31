@@ -60,12 +60,12 @@ export \
 	FLU_ETHEREUM_HARDHAT_FIX_USDT="$FLU_ETHEREUM_HARDHAT_FIX"
 
 export \
-	FLU_ETHEREUM_CONTRACT_ADDR_FFEI=0x6087BE9225a6c813c87DA81Da983F0fb25599A39 \
-	FLU_ETHEREUM_TOKEN_ADDR_FEI=0x956F47F50A910163D8BF957Cf5846D573E7f87CA \
+	FLU_ETHEREUM_CONTRACT_ADDR_FFEI=0x6087be9225a6c813c87da81da983f0fb25599a39 \
+	FLU_ETHEREUM_TOKEN_ADDR_FEI=0x956f47f50a910163d8bf957cf5846d573e7f87ca \
 	FLU_ETHEREUM_TOKEN_NAME_FFEI=fFei \
 	FLU_ETHEREUM_TOKEN_NAME_FEI=Fei \
 	FLU_ETHEREUM_TOKEN_DECIMALS_FEI=18 \
-	FLU_ETHEREUM_ATOKEN_ADDR_FEI=0x683923dB55Fead99A79Fa01A27EeC3cB19679cC3 \
+	FLU_ETHEREUM_ATOKEN_ADDR_FEI=0x683923db55fead99a79fa01a27eec3cb19679cc3 \
 	FLU_ETHEREUM_WORKER_GAS_LIMIT_FEI="$flu_ethereum_worker_hardhat_gas_limit" \
 	FLU_ETHEREUM_HARDHAT_FIX_FEI="$FLU_ETHEREUM_HARDHAT_FIX"
 
@@ -86,6 +86,7 @@ export \
 docker-compose \
 	-f "$automation_dir/docker-compose.rabbitmq.yml" \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
+	-f "$automation_dir/docker-compose.volumes.yml" \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.ethereum.yml" \
 	-f "$automation_dir/docker-compose.ethereum.fluidity.money.yml" \

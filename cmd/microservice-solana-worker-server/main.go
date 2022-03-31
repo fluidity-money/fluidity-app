@@ -16,7 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 
-	solana "github.com/gagliardetto/solana-go"
+	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
@@ -72,6 +72,9 @@ const (
 
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
+
+	// The compute used by an spl-token tranfer
+	SplTranferCompute = 2721
 )
 
 func main() {
@@ -108,6 +111,10 @@ func main() {
 	var (
 		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
 		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
+
+		// Amount to multiply the adjusted fee by such that a basic spl-token transfer
+		// corresponds to the basic solana fee. (200000 = default Solana compute budget)
+		invSolanaSplTransferComputeRat = big.NewRat(200000, SplTranferCompute)
 	)
 
 	solanaClient := solanaRpc.New(rpcUrl)
@@ -159,7 +166,7 @@ func main() {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 
-		mintSupply := prizePool.GetMintSupply(rpcUrl, fluidMintPubkey)
+		mintSupply := prize_pool.GetMintSupply(rpcUrl, fluidMintPubkey)
 
 		// normalise the amount to be consistent with USDC as a floating point
 
@@ -169,7 +176,7 @@ func main() {
 
 		// get the value of all fluidity obligations
 
-		tvl := prizePool.GetTvl(
+		tvl := prize_pool.GetTvl(
 			rpcUrl,
 			fluidityPubkey,
 			tvlDataPubkey,
@@ -221,6 +228,7 @@ func main() {
 			}
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
+			solanaTransactionFeesNormalised.Mul(solanaTransactionFeesNormalised, invSolanaSplTransferComputeRat)
 
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,

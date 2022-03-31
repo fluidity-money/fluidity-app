@@ -15,6 +15,8 @@ WORKDIR ${FLUID_DIR}
 COPY go.mod .
 COPY go.sum .
 
+RUN go mod download
+
 COPY scripts scripts
 
 WORKDIR ${FLUID_DIR}/scripts
