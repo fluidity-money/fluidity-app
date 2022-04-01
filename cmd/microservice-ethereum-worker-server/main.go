@@ -270,7 +270,12 @@ func main() {
 		emission.Network = "ethereum"
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
-		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockHash, contractAddress)
+		fluidTransfers, err := libEthereum.GetTransfers(
+			logs,
+			transactions,
+			blockHash,
+			contractAddress,
+		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

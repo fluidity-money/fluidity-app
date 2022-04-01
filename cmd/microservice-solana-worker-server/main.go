@@ -114,6 +114,7 @@ func main() {
 
 		// Amount to multiply the adjusted fee by such that a basic spl-token transfer
 		// corresponds to the basic solana fee. (200000 = default Solana compute budget)
+
 		invSolanaSplTransferComputeRat = big.NewRat(200000, SplTranferCompute)
 	)
 
@@ -137,7 +138,10 @@ func main() {
 		)
 
 		emission.Network = "solana"
-		emission.TokenDetails = token_details.New(tokenName, decimalPlaces) // USDC uses 1e6 places
+
+		// USDC uses 1e6 places
+
+		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
 
 		for _, userAction := range userActions {
 
@@ -228,7 +232,11 @@ func main() {
 			}
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
-			solanaTransactionFeesNormalised.Mul(solanaTransactionFeesNormalised, invSolanaSplTransferComputeRat)
+
+			solanaTransactionFeesNormalised.Mul(
+				solanaTransactionFeesNormalised,
+				invSolanaSplTransferComputeRat,
+			)
 
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
