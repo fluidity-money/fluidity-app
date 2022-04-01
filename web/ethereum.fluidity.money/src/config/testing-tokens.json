@@ -28,6 +28,13 @@
     "decimals": 18
   },
   {
+    "symbol": "FRAX",
+    "address": "0x853d955acef822db058eb8505911ed77f175b99e",
+    "colour": "#fdc134",
+    "image": "img/TokenIcons/fraxIcon.svg",
+    "decimals": 18
+  },
+  {
     "symbol": "TUSD",
     "address": "0x0000000000085d4780B73119b644AE5ecd22b376",
     "colour": "#2433b8",
@@ -67,6 +74,13 @@
     "address": "0x6087BE9225a6c813c87DA81Da983F0fb25599A39",
     "colour": "#6433b8ff",
     "image": "img/TokenIcons/feiIcon.svg",
+    "decimals": 18
+  },
+  {
+    "symbol": "fFRAX",
+    "address": "0x7Bb73Aa3cE7f88bdF31ac3d7799cB3E736cBce6b",
+    "colour": "#fdc134",
+    "image": "img/TokenIcons/fraxIcon.svg",
     "decimals": 18
   }
 ]

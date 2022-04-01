@@ -11,7 +11,10 @@ import {
 
   USDT_ADDR, USDC_ADDR, DAI_ADDR, TUSD_ADDR, FEI_ADDR,
   CUSDT_ADDR, CUSDC_ADDR, CDAI_ADDR, CTUSD_ADDR, AFEI_ADDR,
+  FRAX_ADDR, AFRAX_ADDR,
+
   USDT_HOLDER, USDC_HOLDER, DAI_HOLDER, TUSD_HOLDER, FEI_HOLDER,
+  FRAX_HOLDER
 } from './test-constants';
 
 import { ethers } from "ethers";
@@ -90,6 +93,15 @@ const TokenList: { [name: string]: Token } = {
     address: FEI_ADDR,
     owner: FEI_HOLDER
   },
+  "frax": {
+    backend: 'aave',
+    aaveAddress: AFRAX_ADDR,
+    decimals: 18,
+    name: "Fluid Frax",
+    symbol: "fFRAX",
+    address: FRAX_ADDR,
+    owner: FRAX_HOLDER
+  }
 };
 
 let shouldDeploy: (keyof typeof TokenList)[] = [];
