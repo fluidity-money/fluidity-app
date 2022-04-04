@@ -23,17 +23,23 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
   };
 
   const checkNetworkOnLoad = async () => {
-    const chain = await (window as any).ethereum.request({
-      method: "eth_chainId",
-    });
-    // chain is a string containing hex
-    // CHAIN_ID is a string containing base 10
-    if (`${String(Number(chain))}` !== `${String(Number(process.env.REACT_APP_CHAIN_ID))}`) {
-      setDesiredNetwork(false);
-      setChainId(chain.substring(2));
-    } else {
-      setDesiredNetwork(true);
-      setChainId(chain.substring(2));
+    // if metamask browser is present, check the network
+    if ((window as any).ethereum) {
+      const chain = await (window as any).ethereum.request({
+        method: "eth_chainId",
+      });
+      // chain is a string containing hex
+      // CHAIN_ID is a string containing base 10
+      if (
+        `${String(Number(chain))}` !==
+        `${String(Number(process.env.REACT_APP_CHAIN_ID))}`
+      ) {
+        setDesiredNetwork(false);
+        setChainId(chain.substring(2));
+      } else {
+        setDesiredNetwork(true);
+        setChainId(chain.substring(2));
+      }
     }
   };
 
@@ -70,6 +76,8 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
               ? `Ethereum Ropsten`
               : process.env.REACT_APP_CHAIN_ID === `1`
               ? `Ethereum Mainnet`
+              : process.env.REACT_APP_CHAIN_ID === `2a`
+              ? `Ethereum Kovan`
               : `Ethereum`}
             )
             {` doesn't match to network selected in wallet (network with id:
