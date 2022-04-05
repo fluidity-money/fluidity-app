@@ -138,7 +138,7 @@ const SwapBox = () => {
 
     // update tokens
     setSelectedToken(input);
-    const ext = data.slice(3, 6) as TokenKind[];
+    const ext = data.slice(data.length / 2, data.length) as TokenKind[];
     setSelectedFluidToken(ext[index].symbol);
     return;
   };
@@ -155,7 +155,7 @@ const SwapBox = () => {
 
     // update tokens
     setSelectedFluidToken(input);
-    const int = data.slice(0, 3) as TokenKind[];
+    const int = data.slice(0, data.length / 2) as TokenKind[];
     setSelectedToken(int[index].symbol);
     return;
   };
