@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/big"
 	"math/rand"
 	"os"
@@ -35,12 +34,6 @@ const (
 	// BackendAave to use as the environment variable when the token
 	// is aave based
 	BackendAave = "aave"
-
-	// KeyServerBlockTime to use when recording block times!
-	KeyServerBlockTime = "ethereum.server.block.time"
-
-	// KeyMovingAverageApy to use as the base when calculating the APY using Redis
-	KeyMovingAverageApyBase = "ethereum.server.apy.moving-average"
 
 	// CompoundBlocksPerDay to use when calculating Compound's APY
 	// (set to 13.5 seconds per block)
@@ -106,6 +99,9 @@ const (
 	// EnvPublishAmqpQueue name to use when sending server-tracked transfers
 	// to the client
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
+
+	// EnvMovingAverageRedisKey to track the APY moving average with
+	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
 )
 
 // AtxBufferSize to go back in time to count the average using the database
@@ -119,6 +115,7 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		keyMovingAverageApy      = util.GetEnvOrFatal(EnvMovingAverageRedisKey)
 
 		cTokenAddress_              = os.Getenv(EnvCTokenAddress)
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
@@ -217,12 +214,6 @@ func main() {
 	var (
 		currentAtxTransactionMarginRat = new(big.Rat).SetInt64(CurrentAtxTransactionMargin)
 		secondsInOneYearRat            = new(big.Rat).SetInt64(SecondsInOneYear)
-	)
-
-	keyMovingAverageApy := fmt.Sprintf(
-		"%v.%v",
-		KeyMovingAverageApyBase,
-		tokenName,
 	)
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
