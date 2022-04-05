@@ -126,7 +126,7 @@ const SwapBox = () => {
     return;
   };
 
-  const setterToken = (input: TokenKind["symbol"], index: number) => {
+  const setterToken = (input: TokenKind["symbol"]) => {
     // update decimals
     if (input !== "Select Token" && input !== "Select FLUID") {
       const { decimals } = contractList["ETH"]?.[input] || {};
@@ -145,7 +145,7 @@ const SwapBox = () => {
     return;
   };
 
-  const setterFluidToken = (input: TokenKind["symbol"], index: number) => {
+  const setterFluidToken = (input: TokenKind["symbol"]) => {
     // update decimals
     if (input !== "Select Token" && input !== "Select FLUID") {
       const { decimals } = contractList["ETH"]?.[input] || {};

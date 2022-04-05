@@ -6,13 +6,10 @@ import Routes from "util/api/types";
 export interface SwapModalStatus {
   toggleTo: [boolean, () => void]; // State modal toggle for 'To' swap value
   toggleFrom: [boolean, () => void]; // State modal toggle for 'From' swap value
-  selectedToken: [
-    TokenKind["symbol"],
-    (input: TokenKind["symbol"], index: number) => void
-  ]; // Selected standard token
+  selectedToken: [TokenKind["symbol"], (input: TokenKind["symbol"]) => void]; // Selected standard token
   selectedFluidToken: [
     TokenKind["symbol"],
-    (input: TokenKind["symbol"], index: number) => void
+    (input: TokenKind["symbol"]) => void
   ]; // Selected fluid token
 }
 

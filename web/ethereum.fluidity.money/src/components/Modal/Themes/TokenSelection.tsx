@@ -3,6 +3,7 @@ import GenericModal from "components/Modal";
 import { modalToggle } from "components/context";
 import Button from "components/Button";
 import { TokenKind, TokenList } from "components/types";
+import { Value } from "sass";
 
 const TokenSelection = ({
   tokenList,
@@ -16,18 +17,14 @@ const TokenSelection = ({
   const setterToken = useContext(modalToggle).selectedToken[1];
   const setterFluidToken = useContext(modalToggle).selectedFluidToken[1];
 
-  const setToken = (
-    type: string,
-    value: TokenKind["symbol"],
-    index: number
-  ) => {
+  const setToken = (type: string, value: TokenKind["symbol"]) => {
     switch (type) {
       case "token":
-        setterToken(value, index);
+        setterToken(value);
         togglerTo();
         return;
       case "fluid":
-        setterFluidToken(value, index);
+        setterFluidToken(value);
         togglerFrom();
         return;
       default:
@@ -51,7 +48,7 @@ const TokenSelection = ({
             alt={token.image}
           />
         }
-        goto={() => setToken(type, token.symbol, index)}
+        goto={() => setToken(type, token.symbol)}
       />
     );
   });
