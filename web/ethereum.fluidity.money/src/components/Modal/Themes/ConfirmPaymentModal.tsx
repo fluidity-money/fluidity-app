@@ -41,15 +41,15 @@ const ConfirmPaymentModal = ({
   // Assigns the correct json file based on ChainId
   const data =
     process.env.REACT_APP_CHAIN_ID === "3"
-      ? ropsten
+      ? (ropsten as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "31137"
-      ? testing
+      ? (testing as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "2a"
-      ? kovan
-      : ropsten;
+      ? (kovan as TokenKind[])
+      : (ropsten as TokenKind[]);
 
-  const ext = data.slice(0, data.length / 2) as TokenKind[];
-  const int = data.slice(data.length / 2, data.length) as TokenKind[];
+  const ext = data.slice(0, data.length / 2);
+  const int = data.slice(data.length / 2, data.length);
 
   // From token
   let From = defaultVar;

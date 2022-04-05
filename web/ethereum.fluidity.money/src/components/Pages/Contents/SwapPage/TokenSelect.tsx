@@ -20,18 +20,16 @@ const TokenSelect = ({
   // Assigns the correct json file based on ChainId
   const data =
     process.env.REACT_APP_CHAIN_ID === "3"
-      ? ropsten
+      ? (ropsten as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "31137"
-      ? testing
+      ? (testing as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "2a"
-      ? kovan
-      : ropsten;
+      ? (kovan as TokenKind[])
+      : (ropsten as TokenKind[]);
 
-  const [extTokens, setExtTokens] = useState(
-    data.slice(0, data.length / 2) as TokenKind[]
-  );
+  const [extTokens, setExtTokens] = useState(data.slice(0, data.length / 2));
   const [intTokens, setIntTokens] = useState(
-    data.slice(data.length / 2, data.length) as TokenKind[]
+    data.slice(data.length / 2, data.length)
   );
 
   switch (type) {

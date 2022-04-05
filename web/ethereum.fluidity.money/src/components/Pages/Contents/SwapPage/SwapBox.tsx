@@ -54,12 +54,12 @@ const SwapBox = () => {
   // Assigns the correct json file based on ChainId
   const data =
     process.env.REACT_APP_CHAIN_ID === "3"
-      ? ropsten
+      ? (ropsten as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "31137"
-      ? testing
+      ? (testing as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "2a"
-      ? kovan
-      : ropsten;
+      ? (kovan as TokenKind[])
+      : (ropsten as TokenKind[]);
 
   // catches user amount input to ensure it's valid
   const amountValueChanger = (input: string) => {
@@ -138,8 +138,10 @@ const SwapBox = () => {
 
     // update tokens
     setSelectedToken(input);
-    const ext = data.slice(data.length / 2, data.length) as TokenKind[];
-    setSelectedFluidToken(ext[index].symbol);
+    // filters to find fluid equivalent and assigns
+    setSelectedFluidToken(
+      data.filter((x) => x.symbol === `f${input}`)[0].symbol
+    );
     return;
   };
 
@@ -155,8 +157,10 @@ const SwapBox = () => {
 
     // update tokens
     setSelectedFluidToken(input);
-    const int = data.slice(0, data.length / 2) as TokenKind[];
-    setSelectedToken(int[index].symbol);
+    // filters to find non fluid equivalent and assigns
+    setSelectedToken(
+      data.filter((x) => x.symbol === `${input.substring(1)}`)[0].symbol
+    );
     return;
   };
 
