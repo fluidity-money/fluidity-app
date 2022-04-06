@@ -39,6 +39,9 @@ switch (chainId) {
   case "3":
     tokens = require("config/ropsten-tokens.json");
     break;
+  case "2a":
+    tokens = require("config/kovan-tokens.json");
+    break;
   default:
     throw new Error(`${chainId} is not a supported chain ID!`);
 }
