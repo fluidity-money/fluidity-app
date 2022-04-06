@@ -13,7 +13,9 @@ import {
 } from "components/context";
 import makeContractSwap from "util/makeContractSwap";
 import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
-import { extOptions, intOptions } from "components/Token/TokenTypes";
+import ropsten from "../../../../config/ropsten-tokens.json";
+import testing from "../../../../config/testing-tokens.json";
+import kovan from "../../../../config/testing-tokens.json";
 import { TokenKind } from "components/types";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider, TransactionReceipt } from "ethers/providers";
@@ -49,6 +51,16 @@ const SwapBox = () => {
   // userActions context to update balance when potentially sending/receiving
   const userActions = useContext(userActionContext);
 
+  // Assigns the correct json file based on ChainId
+  const data =
+    process.env.REACT_APP_CHAIN_ID === "3"
+      ? (ropsten as TokenKind[])
+      : process.env.REACT_APP_CHAIN_ID === "31137"
+      ? (testing as TokenKind[])
+      : process.env.REACT_APP_CHAIN_ID === "2a"
+      ? (kovan as TokenKind[])
+      : (ropsten as TokenKind[]);
+
   // catches user amount input to ensure it's valid
   const amountValueChanger = (input: string) => {
     try {
@@ -74,10 +86,10 @@ const SwapBox = () => {
   const [toggleFrom, setToggleFrom] = useState<boolean>(false);
 
   const [selectedToken, setSelectedToken] =
-    useState<TokenKind["type"]>("Select Token");
+    useState<TokenKind["symbol"]>("Select Token");
 
   const [selectedFluidToken, setSelectedFluidToken] =
-    useState<TokenKind["type"]>("Select FLUID");
+    useState<TokenKind["symbol"]>("Select FLUID");
 
   const [decimals, setDecimals] = useState(0); // number of decimal places for current token
 
@@ -114,7 +126,7 @@ const SwapBox = () => {
     return;
   };
 
-  const setterToken = (input: TokenKind["type"], index: number) => {
+  const setterToken = (input: TokenKind["symbol"]) => {
     // update decimals
     if (input !== "Select Token" && input !== "Select FLUID") {
       const { decimals } = contractList["ETH"]?.[input] || {};
@@ -126,11 +138,14 @@ const SwapBox = () => {
 
     // update tokens
     setSelectedToken(input);
-    setSelectedFluidToken(intOptions[index].type);
+    // filters to find fluid equivalent and assigns
+    setSelectedFluidToken(
+      data.filter((x) => x.symbol === `f${input}`)[0].symbol
+    );
     return;
   };
 
-  const setterFluidToken = (input: TokenKind["type"], index: number) => {
+  const setterFluidToken = (input: TokenKind["symbol"]) => {
     // update decimals
     if (input !== "Select Token" && input !== "Select FLUID") {
       const { decimals } = contractList["ETH"]?.[input] || {};
@@ -142,7 +157,10 @@ const SwapBox = () => {
 
     // update tokens
     setSelectedFluidToken(input);
-    setSelectedToken(extOptions[index].type);
+    // filters to find non fluid equivalent and assigns
+    setSelectedToken(
+      data.filter((x) => x.symbol === `${input.substring(1)}`)[0].symbol
+    );
     return;
   };
 
@@ -217,7 +235,7 @@ const SwapBox = () => {
     if (invert) isNonFluid = !isNonFluid;
 
     return (
-      <div className='amount-avail secondary-text'>
+      <div className="amount-avail secondary-text">
         {walletStatus === "connected" ? (
           isNonFluid ? (
             selectedToken !== "Select Token" ? (
@@ -235,29 +253,29 @@ const SwapBox = () => {
 
   return (
     <modalToggle.Provider value={modalContext}>
-      <div className='swap-box-container flex column'>
-        <div className='swap-form flex column flex-space-between'>
+      <div className="swap-box-container flex column">
+        <div className="swap-form flex column flex-space-between">
           <FormSection
             defaultMargin={false}
-            cname='flex row flex-space-between swap-box-header'
+            cname="flex row flex-space-between swap-box-header"
           >
-            <Header type='left primary' size='medium'>
+            <Header type="left primary" size="medium">
               Convert
             </Header>
           </FormSection>
-          <FormSection cname='swap-field'>
-            <div className='flex column'>
-              <Header type='swap-box-subheader left primary' size='medium'>
+          <FormSection cname="swap-field">
+            <div className="flex column">
+              <Header type="swap-box-subheader left primary" size="medium">
                 From
               </Header>
-              <div className='flex flex-space-between'>
+              <div className="flex flex-space-between">
                 <Input
-                  type='text'
-                  theme='input-swap-box'
+                  type="text"
+                  theme="input-swap-box"
                   toggle={true}
                   output={amountValueChanger}
                   value={amount}
-                  pholder='0.0'
+                  pholder="0.0"
                   disabled={
                     selectedToken === "Select Token" &&
                     selectedFluidToken === "Select FLUID"
@@ -265,14 +283,14 @@ const SwapBox = () => {
                 />
               </div>
             </div>
-            <div className='swap-field-right'>
+            <div className="swap-field-right">
               <TokenSelect
                 type={swap === true ? "token" : "fluid"}
                 toggle={swap === true ? togglerTo : togglerFrom}
               />
               <div
                 onClick={setMaxAmount}
-                className='flex row balance-container'
+                className="flex row balance-container"
               >
                 {(selectedToken !== "Select Token" ||
                   selectedFluidToken !== "Select FLUID") &&
@@ -282,34 +300,34 @@ const SwapBox = () => {
                       <Button
                         theme={"max-button"}
                         goto={setMaxAmount}
-                        label='max'
+                        label="max"
                       />
                     </>
                   )}
               </div>
             </div>
           </FormSection>
-          <FormSection cname='flex flex-center'>
-            <Icon src='i-swap-arrow' trigger={switchSwap} />
+          <FormSection cname="flex flex-center">
+            <Icon src="i-swap-arrow" trigger={switchSwap} />
           </FormSection>
-          <FormSection cname='swap-field'>
-            <div className='flex column'>
-              <Header type='swap-box-subheader left primary' size='medium'>
+          <FormSection cname="swap-field">
+            <div className="flex column">
+              <Header type="swap-box-subheader left primary" size="medium">
                 To
               </Header>
-              <div className='flex flex-space-between'>
+              <div className="flex flex-space-between">
                 <Input
-                  type='text'
-                  theme='input-swap-box'
+                  type="text"
+                  theme="input-swap-box"
                   toggle={true}
                   output={() => {}}
                   value={amount}
-                  pholder='0.0'
+                  pholder="0.0"
                   disabled={true}
                 />
               </div>
             </div>
-            <div className='swap-field-right'>
+            <div className="swap-field-right">
               <TokenSelect
                 type={swap === true ? "fluid" : "token"}
                 toggle={swap === true ? togglerFrom : togglerTo}
@@ -319,7 +337,7 @@ const SwapBox = () => {
           </FormSection>
           <FormSection>
             <Button
-              className='raleway'
+              className="raleway"
               label={`${
                 wallet.status == "connected"
                   ? swap
@@ -331,7 +349,7 @@ const SwapBox = () => {
                 wallet.status == "connected" ? switchPayment() : switchWallet();
               }}
               theme={"primary-button"}
-              padding='py-1'
+              padding="py-1"
               disabled={
                 (isNonZero(amount, decimals) &&
                   selectedToken !== "Select Token" &&
@@ -345,8 +363,8 @@ const SwapBox = () => {
             <ConnectWalletModal
               enable={walletSelectionModal}
               toggle={() => switchWallet()}
-              height='auto'
-              width='22.5rem'
+              height="auto"
+              width="22.5rem"
             />
             {/* For Transaction Confirmation */}
             <ConfirmPaymentModal
@@ -361,7 +379,7 @@ const SwapBox = () => {
               enable={successTransactionModal}
               toggle={() => setSuccessTransactionModal(false)}
               message={
-                <div className='primary-text'>Transaction Successful</div>
+                <div className="primary-text">Transaction Successful</div>
               }
             />
           </FormSection>
