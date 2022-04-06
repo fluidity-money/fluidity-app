@@ -34,13 +34,15 @@ const TokenSelect = ({
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
 
-  const [tokens, setTokens] = useState(data);
-  const [fluidTokens, setFluidTokens] = useState(data);
-
-  const [extTokens, setExtTokens] = useState(data.slice(0, data.length / 2));
-  const [intTokens, setIntTokens] = useState(
+  const [tokens, setTokens] = useState(data.slice(0, data.length / 2));
+  const [fluidTokens, setFluidTokens] = useState(
     data.slice(data.length / 2, data.length)
   );
+
+  // const [extTokens, setExtTokens] = useState(data.slice(0, data.length / 2));
+  // const [intTokens, setIntTokens] = useState(
+  //   data.slice(data.length / 2, data.length)
+  // );
 
   useEffect(() => {
     wallet.status === "connected" && getAmount("USDT", 6, setTokens);
