@@ -56,7 +56,7 @@ const TokenSelection = ({
     }
   };
 
-  const renderedTokenSet = tokenList.map((token, index) => {
+  const renderedTokenSet = tokenListState.map((token, index) => {
     return (
       <div className="token-list-item">
         <Button
