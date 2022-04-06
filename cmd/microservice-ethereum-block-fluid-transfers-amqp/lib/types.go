@@ -15,7 +15,6 @@ type (
 	}
 
 	LogParams [1]struct {
-		Address   string   `json:"address"`
 		BlockHash string   `json:"blockHash"`
 		Topics    []string `json:"topics"`
 	}
