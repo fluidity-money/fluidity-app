@@ -581,12 +581,18 @@ func main() {
 				randomSource = append(randomSource, uint32(i))
 			}
 
+			tokenDetails := token_details.TokenDetails{
+				TokenShortName: tokenName,
+				TokenDecimals:  underlyingTokenDecimals,
+			}	
+
 			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
 				FromAddress:     senderAddress,
 				ToAddress:       recipientAddress,
 				SourceRandom:    randomSource,
 				SourcePayouts:   randomPayouts,
+				TokenDetails:    tokenDetails,
 			}
 
 			// Fill in emission.NaiveIsWinning

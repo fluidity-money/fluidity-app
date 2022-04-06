@@ -77,12 +77,13 @@ type (
 	// EthereumAnnouncement contains the data to call the reward function of
 	// the contract with
 	EthereumAnnouncement struct {
-		TransactionHash ethereum.Hash    `json:"transaction_hash"`
-		FromAddress     ethereum.Address `json:"from_address"`
-		ToAddress       ethereum.Address `json:"to_address"`
-		SourceRandom    []uint32         `json:"random_source"`
-		SourcePayouts   []*misc.BigInt   `json:"random_payouts"`
-		Emissions       Emission         `json:"emissions"`
+		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		FromAddress     ethereum.Address           `json:"from_address"`
+		ToAddress       ethereum.Address           `json:"to_address"`
+		SourceRandom    []uint32                   `json:"random_source"`
+		SourcePayouts   []*misc.BigInt             `json:"random_payouts"`
+		TokenDetails    token_details.TokenDetails `json:"token_details"`
+		Emissions       Emission                   `json:"emissions"`
 	}
 
 	EthereumBlockLog struct {

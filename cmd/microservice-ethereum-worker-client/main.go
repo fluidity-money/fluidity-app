@@ -120,6 +120,9 @@ func main() {
 			sourceRandom                = announcement.SourceRandom
 			sourcePayouts               = announcement.SourcePayouts
 			emission                    = announcement.Emissions
+
+			tokenDetails                = announcement.TokenDetails
+			tokenDecimals               = int64(tokenDetails.TokenDecimals)
 		)
 
 		if err != nil {
@@ -146,9 +149,10 @@ func main() {
 			return
 		}
 
+
 		winningAmount := sourcePayouts[winningBalls-1]
 
-		if winningAmount.Cmp(big.NewInt(1e6)) < 0 {
+		if winningAmount.Cmp(big.NewInt(tokenDecimals)) < 0 {
 			log.App(func(k *log.Log) {
 				k.Format(
 					"From %#v to %#v with transaction hash %#v didn't win more than 1 USD! Won %#v",

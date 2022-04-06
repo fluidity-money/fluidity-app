@@ -1,26 +1,28 @@
 type Contract = {
-    addr: string,
-    abi: any, //TODO typing ABI/methods (typechain?)
-    decimals: number,
+  addr: string;
+  abi: any; //TODO typing ABI/methods (typechain?)
+  decimals: number;
 };
 
 type Token = {
-  symbol: SupportedContracts
-  address: string,
-  colour: string,
-  image: string,
-  decimals: number,
+  symbol: SupportedContracts;
+  address: string;
+  colour: string;
+  image: string;
+  decimals: number;
 };
 
 export type SupportedContracts = "USDT" | "USDC" | "DAI" | "TUSD" | "Fei";
-export type SupportedFluidContracts = SupportedContracts | `f${SupportedContracts}`;
+export type SupportedFluidContracts =
+  | SupportedContracts
+  | `f${SupportedContracts}`;
 
 export type SupportedNetworks = "ETH";
 
 type SwapContractList = {
-    [k in SupportedNetworks]?: {
-        [k in SupportedFluidContracts]?: Contract
-    }
+  [k in SupportedNetworks]?: {
+    [k in SupportedFluidContracts]?: Contract;
+  };
 };
 
 const chainId = process.env.REACT_APP_CHAIN_ID;
@@ -32,10 +34,10 @@ let tokens: Array<Token> = [];
 
 switch (chainId) {
   case "31337":
-    tokens = require('config/testing-tokens.json');
+    tokens = require("config/testing-tokens.json");
     break;
   case "3":
-    tokens = require('config/ropsten-tokens.json');
+    tokens = require("config/ropsten-tokens.json");
     break;
   default:
     throw new Error(`${chainId} is not a supported chain ID!`);
@@ -48,7 +50,7 @@ const ERC20_ABI = [
   "function allowance(address owner, address spender) external view returns (uint256)",
   "function transfer(address recipient, uint256 amount) public returns (bool)",
   "event Transfer(address indexed from, address indexed to, uint256 val)",
-]
+];
 
 const FLUID_TOKEN_ABI = [
   "function erc20In(uint amount) public returns (bool success)",
@@ -56,19 +58,20 @@ const FLUID_TOKEN_ABI = [
   "function balanceOf(address account) public view returns (uint256)",
   "function transfer(address recipient, uint256 amount) public returns (bool)",
   "event Transfer(address indexed from, address indexed to, uint256 val)",
-]
+];
 
 const contractList: SwapContractList = {
-  ETH: tokens.reduce((previous, {symbol, address, decimals}) => ({
-    ...previous,
-    [symbol]: {
-      addr: address,
-      decimals,
-      abi: symbol.startsWith('f') ?
-        FLUID_TOKEN_ABI :
-        ERC20_ABI
-    }
-  }), {}) //reduce on empty object to apply properly on first value
+  ETH: tokens.reduce(
+    (previous, { symbol, address, decimals }) => ({
+      ...previous,
+      [symbol]: {
+        addr: address,
+        decimals,
+        abi: symbol?.startsWith("f") ? FLUID_TOKEN_ABI : ERC20_ABI,
+      },
+    }),
+    {}
+  ), //reduce on empty object to apply properly on first value
 };
 
 export default contractList;
