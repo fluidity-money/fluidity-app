@@ -21,13 +21,13 @@ const PinnedToken = ({
       >
         <img className="pinned-logo" src={token.image} alt="token" />
 
-        <div className="pinned-symbol">{token.image}</div>
+        <div className="pinned-symbol">{token.symbol}</div>
       </div>
       <div className="remove-pin">
         <img
           src="img/close-button.svg"
           alt="x"
-          onClick={() => changePinned(token.image)}
+          onClick={() => changePinned(token.symbol)}
         />
       </div>
     </div>

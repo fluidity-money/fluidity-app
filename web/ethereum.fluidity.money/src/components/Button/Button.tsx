@@ -45,7 +45,6 @@ const Button = ({
         ${fontSize ?? ""}
         ${theme}
         ${selected === true ? "selected" : ""}
-        ${className ?? ""}
         ${className}
         ${subSelected === true ? "subSelected" : ""}
         ${timeSelected === true ? "timeSelected" : ""}
@@ -55,7 +54,6 @@ const Button = ({
         onClick={goto}
       >
         {icon}
-        <div className={`${texttheme ?? ""}`}>{label}</div>
         {theme === "select-token-button" ? (
           <>
             <div className="token-list-item-info">
