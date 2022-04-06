@@ -1,16 +1,22 @@
 [
   {
     "symbol": "Frax",
+    "name": "Frax",
     "address": "0x88128f0c48a2F6181b6Be1759Fc6724b8e314CAe",
     "colour": "",
     "image": "",
-    "decimals": 18
+    "decimals": 18,
+    "amount": "0.0",
+    "pinned": true
   },
   {
     "symbol": "fFrax",
+    "name": "FLUID Frax",
     "address": "",
     "colour": "",
     "image": "",
-    "decimals": 18
+    "decimals": 18,
+    "amount": "0.0",
+    "pinned": true
   }
 ]
