@@ -10,7 +10,6 @@ type LogBody struct {
 }
 
 type LogParams struct {
-	Address   string   `json:"address"`
 	BlockHash string   `json:"blockHash"`
 	Topics    []string `json:"topics"`
 }

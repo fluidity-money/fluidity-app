@@ -3,10 +3,10 @@ package misc
 // big_int contains exceedingly large numbers, wrapping big.Int
 
 import (
-	"math/big"
-	"fmt"
-	"encoding/json"
 	sqlDriver "database/sql/driver"
+	"encoding/json"
+	"fmt"
+	"math/big"
 )
 
 // BigInt contains big.Int and has some extra functions to support storage
@@ -18,13 +18,28 @@ type BigInt struct {
 func BigIntFromString(s string) (*BigInt, error) {
 	var int BigInt
 
-    if _, success := int.SetString(s, 10); !success {
-    	return nil, fmt.Errorf(
-    		"Failed to set the bigint! Bad number!",
-    	)
-    }
+	if _, success := int.SetString(s, 10); !success {
+		return nil, fmt.Errorf(
+			"Failed to set the bigint! Bad string number!",
+		)
+	}
 
-    return &int, nil
+	return &int, nil
+}
+
+func BigIntFromHex(hex string) (*BigInt, error) {
+	var (
+		int    BigInt
+		hexStr = hex[2:]
+	)
+
+	if _, success := int.SetString(hexStr, 16); !success {
+		return nil, fmt.Errorf(
+			"Failed to set the bigint! Bad hex number!",
+		)
+	}
+
+	return &int, nil
 }
 
 func BigIntFromInt64(x int64) BigInt {
@@ -50,27 +65,43 @@ func NewBigInt(x big.Int) BigInt {
 func (i *BigInt) UnmarshalJSON(b []byte) error {
 	var str string
 
-    if err := json.Unmarshal(b, &str); err != nil {
-        return fmt.Errorf(
-        	"Failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
-        	b,
-        	err,
-        )
-    }
+	if err := json.Unmarshal(b, &str); err != nil {
+		return fmt.Errorf(
+			"Failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
+			b,
+			err,
+		)
+	}
 
-    int, err := BigIntFromString(str)
+	if has0xPrefix(str) {
+		int, err := BigIntFromHex(str)
 
-    if err != nil {
-    	return fmt.Errorf(
-    		"Failed to unharsmal a BigInt of %v! %v",
-    		str,
-    		err,
-    	)
-    }
+		if err != nil {
+			return fmt.Errorf(
+				"Failed to unharsmal a BigInt of %v! %v",
+				str,
+				err,
+			)
+		}
 
-    *i = *int
+		*i = *int
 
-    return nil
+		return nil
+	}
+
+	int, err := BigIntFromString(str)
+
+	if err != nil {
+		return fmt.Errorf(
+			"Failed to unharsmal a BigInt of %v! %v",
+			str,
+			err,
+		)
+	}
+
+	*i = *int
+
+	return nil
 }
 
 func (i BigInt) MarshalJSON() ([]byte, error) {
