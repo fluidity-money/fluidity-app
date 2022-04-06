@@ -56,7 +56,7 @@ const TokenSelection = ({
     }
   };
 
-  const renderedTokenSet = tokenList.map((token, index) => {
+  const renderedTokenSet = tokenListState.map((token, index) => {
     return (
       <div className="token-list-item">
         <Button
@@ -103,7 +103,7 @@ const TokenSelection = ({
           tokenList={tokenList}
         />
         <div className="pinned-tokens">
-          {tokenListState
+          {tokenList
             .sort(function (x: { pinned: boolean }, y: { pinned: boolean }) {
               return x.pinned === y.pinned ? 0 : x.pinned ? -1 : 1;
             })
