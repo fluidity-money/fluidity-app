@@ -45,7 +45,6 @@ const TokenSearch = ({
           filterTokens(text.currentTarget.value);
         }}
         onKeyDown={(text: any) => {
-          //REMOVE ANY ================================================
           if (text.keyCode === 8) {
             resetLists();
           }
@@ -59,7 +58,7 @@ const TokenSearch = ({
           alt="search"
           onClick={() => {
             setSearchInput("");
-            setTokenListState(tokenList);
+            resetLists();
           }}
         />
       ) : (

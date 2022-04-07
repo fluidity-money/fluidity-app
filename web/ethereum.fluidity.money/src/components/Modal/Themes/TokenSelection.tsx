@@ -9,47 +9,23 @@ import PinnedToken from "./PinnedToken";
 
 const TokenSelection = ({
   tokenList,
+  pinnedList,
   setTokenList,
-  pinnedTokenList,
   type,
   changePinned,
-  changeOtherPinned,
   resetLists,
-  update,
 }: {
   tokenList: TokenList["kind"];
+  pinnedList: TokenList["kind"];
   setTokenList: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
-  pinnedTokenList: TokenList["kind"];
   type: string;
   changePinned: (token: string) => void;
-  changeOtherPinned: (token: TokenKind) => void;
   resetLists: () => void;
-  update: () => void;
 }) => {
   const [toggleFrom, togglerFrom] = useContext(modalToggle).toggleFrom;
   const [toggleTo, togglerTo] = useContext(modalToggle).toggleTo;
   const setterToken = useContext(modalToggle).selectedToken[1];
   const setterFluidToken = useContext(modalToggle).selectedFluidToken[1];
-  const [tokenListState, setTokenListState] = useState<TokenList["kind"]>([]);
-
-  useEffect(() => {
-    // setForButtons(type);
-    // resetLists();
-    console.log(pinnedTokenList);
-  }, [type]);
-
-  // const setForButtons = (type: string) => {
-  //   switch (type) {
-  //     case "token":
-  //       setTokenList(tokenList);
-  //       return;
-  //     case "fluid":
-  //       setTokenList(tokenList);
-  //       return;
-  //     default:
-  //       console.log("err");
-  //   }
-  // };
 
   const setToken = (type: string, value: TokenKind["symbol"]) => {
     switch (type) {
@@ -93,7 +69,6 @@ const TokenSelection = ({
           className="pin-icon"
           onClick={() => {
             changePinned(token.symbol);
-            changeOtherPinned(token);
           }}
           src={token?.pinned ? "img/pinnedIcon.svg" : "img/pinIcon.svg"}
           alt="pin"
@@ -117,7 +92,7 @@ const TokenSelection = ({
           resetLists={resetLists}
         />
         <div className="pinned-tokens">
-          {pinnedTokenList
+          {pinnedList
             // .sort(function (x: { pinned: boolean }, y: { pinned: boolean }) {
             //   return x.pinned === y.pinned ? 0 : x.pinned ? -1 : 1;
             // })
@@ -128,7 +103,6 @@ const TokenSelection = ({
                     key={index}
                     token={token}
                     changePinned={changePinned}
-                    changeOtherPinned={changeOtherPinned}
                     setTokenHandler={() => {
                       setToken(type, token.symbol);
                       resetLists();

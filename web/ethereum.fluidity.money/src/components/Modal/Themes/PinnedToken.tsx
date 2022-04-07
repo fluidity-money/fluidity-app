@@ -3,14 +3,12 @@ import { TokenKind } from "components/types";
 interface PinnedTokenProps {
   token: TokenKind;
   changePinned: (token: string) => void;
-  changeOtherPinned: (token: TokenKind) => void;
   setTokenHandler: () => void;
 }
 
 const PinnedToken = ({
   token,
   changePinned,
-  changeOtherPinned,
   setTokenHandler,
 }: PinnedTokenProps) => {
   return (
@@ -31,7 +29,6 @@ const PinnedToken = ({
           alt="x"
           onClick={() => {
             changePinned(token.symbol);
-            changeOtherPinned(token);
           }}
         />
       </div>
