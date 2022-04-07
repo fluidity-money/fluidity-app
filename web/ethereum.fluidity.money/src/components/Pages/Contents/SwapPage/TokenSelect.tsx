@@ -45,12 +45,7 @@ const TokenSelect = ({
   // );
 
   useEffect(() => {
-    wallet.status === "connected" && getAmount("USDT", 6, setTokens);
-    getAmount("USDC", 18, setTokens);
-    getAmount("DAI", 18, setTokens);
-    getAmount("fUSDT", 6, setFluidTokens);
-    getAmount("fUSDC", 18, setFluidTokens);
-    getAmount("fDAI", 18, setFluidTokens);
+    wallet.status === "connected" && getAmounts();
     wallet.status !== "connected" && resetAmounts();
   }, [toggle]);
 
@@ -63,23 +58,61 @@ const TokenSelect = ({
     );
   };
 
-  const getAmount = (
-    token: string,
-    decimals: number,
-    setAmount: React.Dispatch<React.SetStateAction<TokenList["kind"]>>
-  ) => {
+  // const getAmount = (
+  //   token: string,
+  //   decimals: number,
+  //   setAmount: React.Dispatch<React.SetStateAction<TokenList["kind"]>>
+  // ) => {
+  //   signer &&
+  //     getBalanceOfERC20(
+  //       token as SupportedFluidContracts,
+  //       signer,
+  //       decimals
+  //     ).then((r) =>
+  //       setAmount((previousState) =>
+  //         [...previousState]?.map((item) =>
+  //           item.symbol === token ? Object.assign(item, { amount: r }) : item
+  //         )
+  //       )
+  //     );
+  // };
+
+  const getAmounts = () => {
     signer &&
-      getBalanceOfERC20(
-        token as SupportedFluidContracts,
-        signer,
-        decimals
-      ).then((r) =>
-        setAmount((previousState) =>
-          [...previousState]?.map((item) =>
-            item.symbol === token ? Object.assign(item, { amount: r }) : item
-          )
+      data.forEach((token) =>
+        getBalanceOfERC20(
+          token.symbol as SupportedFluidContracts,
+          signer,
+          token.decimals
+        ).then((r) =>
+          token.name.indexOf("FLUID") === -1
+            ? setAmounts(token, "non fluid", r)
+            : setAmounts(token, "fluid", r)
         )
       );
+  };
+
+  const setAmounts = (token: TokenKind, type: string, r: string) => {
+    switch (type) {
+      case "non fluid":
+        setTokens((previousState) =>
+          [...previousState]?.map((item) =>
+            item.symbol === token.symbol
+              ? Object.assign(item, { amount: r })
+              : item
+          )
+        );
+        break;
+      case "fluid":
+        setFluidTokens((previousState) =>
+          [...previousState]?.map((item) =>
+            item.symbol === token.symbol
+              ? Object.assign(item, { amount: r })
+              : item
+          )
+        );
+        break;
+    }
   };
 
   const changePinned = (token: string) => {
@@ -117,8 +150,8 @@ const TokenSelect = ({
   };
 
   const resetLists = () => {
-    setTokens(data);
-    setFluidTokens(data);
+    setTokens(data.slice(0, data.length / 2));
+    setFluidTokens(data.slice(data.length / 2, data.length));
   };
 
   switch (type) {
@@ -134,7 +167,7 @@ const TokenSelect = ({
             }`}
           />
           <TokenSelection
-            tokenList={data.slice(0, data.length / 2)}
+            tokenList={tokens}
             type={type}
             changePinned={changePinned}
             resetLists={resetLists}
@@ -153,7 +186,7 @@ const TokenSelect = ({
             }`}
           />
           <TokenSelection
-            tokenList={data.slice(data.length / 2, data.length)}
+            tokenList={fluidTokens}
             type={type}
             changePinned={changePinnedFluid}
             resetLists={resetLists}
