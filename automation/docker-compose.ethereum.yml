@@ -67,6 +67,18 @@ services:
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
     restart: unless-stopped
 
+  microservice-ethereum-block-fluid-transfers-amqp:
+    build:
+      context: ../cmd/microservice-ethereum-block-fluid-transfers-amqp
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-block-fluid-transfers-amqp
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+    restart: unless-stopped
+
   microservice-ethereum-track-winners-usdc:
     build:
       context: ../cmd/microservice-ethereum-track-winners
