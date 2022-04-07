@@ -15,14 +15,14 @@ export \
 export \
 	FLU_ETHEREUM_FRONTEND_API_URL=https://kovan.beta.fluidity.money:8081 \
 	FLU_ETHEREUM_FRONTEND_WS_URL=wss://kovan.beta.fluidity.money:8081/updates \
-	FLU_ETHEREUM_FRONTEND_CHAIN_ID=3 \
+	FLU_ETHEREUM_FRONTEND_CHAIN_ID=42 \
 	FLU_ETHEREUM_FRONTEND_TOKEN_FILE=kovan-tokens.json \
 	FLU_ETHEREUM_FRONTEND_GETH_URL="$FLU_ETHEREUM_FRONTEND_GETH_URL"
 
 export \
 	FLU_ETHEREUM_WS_URL="$FLU_ETHEREUM_WS_URL" \
 	FLU_ETHEREUM_HTTP_URL= \
-	FLU_ETHEREUM_ORACLE_ADDRESS=0x50ab74ed0dac2f82924d6e748ce22ebee339184c \
+	FLU_ETHEREUM_ORACLE_ADDRESS=0x16243084bE83bdA3609998e79DD506AB2EF54628 \
 	FLU_ETHEREUM_START_BLOCK=latest \
 	FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR=0xbef4e076a995c784be6094a432b9ca99b7431a3f
 
@@ -53,5 +53,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.ethereum.yml" \
 	-f "$automation_dir/docker-compose.ethereum.fluidity.money.yml" \
 	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
-	-f "$automation_dir/docker-compose.ethereum-worker.yml" \
+	-f "$automation_dir/docker-compose.ethereum-worker-kovan.yml" \
 	$@

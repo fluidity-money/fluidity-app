@@ -1,13 +1,13 @@
 [
   {
-    "symbol": "Frax",
-    "address": "0x88128f0c48a2F6181b6Be1759Fc6724b8e314CAe",
+    "symbol": "Fei",
+    "address": "0x4e9d5268579ae76f390f232aea29f016bd009aab",
     "colour": "",
     "image": "",
     "decimals": 18
   },
   {
-    "symbol": "fFrax",
+    "symbol": "fFei",
     "address": "",
     "colour": "",
     "image": "",
