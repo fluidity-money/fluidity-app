@@ -6,7 +6,6 @@ package misc
 import (
 	sqlDriver "database/sql/driver"
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 )
@@ -27,19 +26,7 @@ func (blob *Blob) UnmarshalJSON(b []byte) (err error) {
 	}
 
 	if has0xPrefix(str) {
-		hexStr := str[2:]
-
-		*blob, err = hex.DecodeString(hexStr)
-
-		if err != nil {
-			return fmt.Errorf(
-				"Failed to decode a blob string of %v to hex! %v",
-				str,
-				err,
-			)
-		}
-
-		return
+		str = str[2:]
 	}
 
 	*blob, err = base64.StdEncoding.DecodeString(str)
