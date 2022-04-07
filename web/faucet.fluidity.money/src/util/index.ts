@@ -58,7 +58,7 @@ export const submitQuestionRequest =
 
 type SupportedTokensEthereum = "fUSDT" | "fUSDC" | "fDAI";
 
-type SupportedTokensSolana = "fUSDC";
+type SupportedTokensSolana = "fUSDC" | "fUSDT";
 
 export type SupportedNetworks = "ethereum" | "solana";
 

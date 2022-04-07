@@ -2,20 +2,21 @@ package main
 
 import (
 	"math/big"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
-	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/solana/solend"
+	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 
-	prizePool "github.com/fluidity-money/fluidity-app/cmd/microservice-solana-prize-pool/lib/solana"
-
-	solana "github.com/gagliardetto/solana-go"
+	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
@@ -54,6 +55,12 @@ const (
 	// this must be the payout authority of the contract
 	EnvPayerPrikey = `FLU_SOLANA_PAYER_PRIKEY`
 
+	// EnvTokenDecimals is the number of decimals the token uses
+	EnvTokenDecimals = `FLU_SOLANA_TOKEN_DECIMALS`
+
+	// EnvTokenName is the same of the token being wrapped
+	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
+
 	// EnvTopicWinnerQueue to use when transmitting to a client the topic of
 	// a winner
 	EnvTopicWinnerQueue = `FLU_SOLANA_WINNER_QUEUE_NAME`
@@ -66,8 +73,8 @@ const (
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
-	// UsdcDecimalPlaces to use when normalising any values from USDC
-	UsdcDecimalPlaces = 1e6
+	// The compute used by an spl-token tranfer
+	SplTranferCompute = 2721
 )
 
 func main() {
@@ -76,6 +83,8 @@ func main() {
 		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
+		decimalPlaces_   = util.GetEnvOrFatal(EnvTokenDecimals)
+		tokenName        = util.GetEnvOrFatal(EnvTokenName)
 
 		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
 		fluidMintPubkey   = pubkeyFromEnv(EnvFluidityMintPubkey)
@@ -87,9 +96,26 @@ func main() {
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
 	)
 
+	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to convert the decimals from %v! Was %#v!",
+				decimalPlaces_,
+				decimalPlaces,
+			)
+		})
+	}
+
 	var (
-		decimalPlacesRat     = big.NewRat(UsdcDecimalPlaces, 1)
-		usdcDecimalPlacesRat = big.NewRat(UsdcDecimalPlaces, 1)
+		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
+		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
+
+		// Amount to multiply the adjusted fee by such that a basic spl-token transfer
+		// corresponds to the basic solana fee. (200000 = default Solana compute budget)
+
+		invSolanaSplTransferComputeRat = big.NewRat(200000, SplTranferCompute)
 	)
 
 	solanaClient := solanaRpc.New(rpcUrl)
@@ -103,17 +129,25 @@ func main() {
 		})
 	}
 
-	crumb := breadcrumb.NewBreadcrumb()
-
 	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
 
 		var (
 			userActions    = bufferedUserActions.UserActions
 			fluidTransfers = 0
+			emission       = workerTypes.NewSolanaEmission()
 		)
 
+		emission.Network = "solana"
+
+		// USDC uses 1e6 places
+
+		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
+
 		for _, userAction := range userActions {
-			if userAction.Type == "send" {
+
+			isSameToken := userAction.TokenDetails.TokenShortName == tokenName
+
+			if userAction.Type == "send" && isSameToken {
 				fluidTransfers++
 			}
 		}
@@ -122,24 +156,21 @@ func main() {
 
 		apy, err := solend.GetUsdApy(solanaClient, reservePubkey)
 
-		crumb.Set(func(k *breadcrumb.Breadcrumb) {
-			k.Many(map[string]interface{}{
-				"solend supply apy": apy.FloatString(10),
-			})
-		})
-
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get USDC apy on Solana!"
-				k.Payload = err
+				k.Format(
+					"Failed to get %v apy on Solana! %v",
+					tokenName,
+					err,
+				)
 			})
 		}
 
-		bpy := probability.CalculateBpy(SolanaBlockTime, apy, crumb)
+		bpy := probability.CalculateBpy(SolanaBlockTime, apy, emission)
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 
-		mintSupply := prizePool.GetMintSupply(rpcUrl, fluidMintPubkey)
+		mintSupply := prize_pool.GetMintSupply(rpcUrl, fluidMintPubkey)
 
 		// normalise the amount to be consistent with USDC as a floating point
 
@@ -149,7 +180,7 @@ func main() {
 
 		// get the value of all fluidity obligations
 
-		tvl := prizePool.GetTvl(
+		tvl := prize_pool.GetTvl(
 			rpcUrl,
 			fluidityPubkey,
 			tvlDataPubkey,
@@ -184,7 +215,7 @@ func main() {
 
 		for _, userAction := range userActions {
 
-			// skip if it's not a send
+			// skip if it's not a send, or the wrong token
 
 			var (
 				userActionTransactionHash  = userAction.TransactionHash
@@ -196,9 +227,16 @@ func main() {
 				continue
 			}
 
-			defer breadcrumb.SendAndClear(crumb)
+			if userAction.TokenDetails.TokenShortName != tokenName {
+				continue
+			}
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
+
+			solanaTransactionFeesNormalised.Mul(
+				solanaTransactionFeesNormalised,
+				invSolanaSplTransferComputeRat,
+			)
 
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
@@ -208,7 +246,7 @@ func main() {
 				decimalPlacesRat,
 				fluidTransfers,
 				SolanaBlockTime,
-				crumb,
+				emission,
 			)
 
 			randomIntegers := generateRandomIntegers(
@@ -227,7 +265,7 @@ func main() {
 
 			matchedBalls := probability.NaiveIsWinning(
 				randomSource,
-				crumb,
+				emission,
 			)
 
 			if matchedBalls <= 0 {
@@ -284,9 +322,17 @@ func main() {
 				SenderAddress:          userActionSenderAddress,
 				RecipientAddress:       userActionRecipientAddress,
 				WinningAmount:          winningAmount,
+				TokenName:              tokenName,
+				FluidMintPubkey:        fluidMintPubkey.String(),
 			}
 
+			emission.TransactionHash = userActionTransactionHash
+			emission.RecipientAddress = userActionRecipientAddress
+			emission.SenderAddress = userActionSenderAddress
+
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
+
+			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

@@ -3,6 +3,7 @@
 
 ## Folder Structure
 
+```
 .
 | build.mk - Build aliases
 | Dockerfile - Dockerise micro-services
@@ -25,8 +26,16 @@
 |-- lib
 |   |-- Common library functions
 |-- scripts
+|   |-- docker-compose-all.sh   - Builds everything in docker container
 |   |-- Testing scripts
 |-- web
 |   |-- Web
 |-- worker
     |-- Build folder for worker
+```
+
+## Create a new service
+
+To create a new service in `/cmd` utilising the default build setup:
+
+    ./create-service.sh <name>

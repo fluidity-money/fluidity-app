@@ -11,19 +11,19 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
+	moving_average "github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/compound"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
+	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/breadcrumb"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -250,17 +250,13 @@ func main() {
 		})
 	}
 
-	crumb := breadcrumb.NewBreadcrumb()
-
 	worker.EthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
-		defer breadcrumb.SendAndClear(crumb)
-
 		var (
-			blockHash    = blockLog.BlockHash
 			blockBaseFee = blockLog.BlockBaseFee
 			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
 			blockNumber  = blockLog.BlockNumber
+			blockHash    = blockLog.BlockHash
 		)
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)
@@ -269,7 +265,17 @@ func main() {
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
-		fluidTransfers, err := libEthereum.GetTransfers(logs, transactions, blockHash, contractAddress)
+		emission := worker.NewEthereumEmission()
+
+		emission.Network = "ethereum"
+		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
+
+		fluidTransfers, err := libEthereum.GetTransfers(
+			logs,
+			transactions,
+			blockHash,
+			contractAddress,
+		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -281,7 +287,7 @@ func main() {
 		transfersInBlock := len(fluidTransfers)
 
 		averageTransfersInBlock := addAndComputeAverageAtx(
-			blockNumber,
+			blockNumber.Uint64(),
 			tokenName,
 			transfersInBlock,
 		)
@@ -289,17 +295,13 @@ func main() {
 		if len(fluidTransfers) == 0 {
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Couldn't find any Fluid transfers in the block, hash %#v!",
+					"Couldn't find any Fluid transfers in the block %v!",
 					blockHash,
 				)
 			})
 
 			return
 		}
-
-		crumb.Set(func(k *breadcrumb.Breadcrumb) {
-			crumb.One("transfers in block", transfersInBlock)
-		})
 
 		debug(
 			"Average transfers in block: %#v! Transfers in block: %#v!",
@@ -390,7 +392,7 @@ func main() {
 				gethClient,
 				ethCTokenAddress,
 				CompoundBlocksPerDay,
-				crumb,
+				emission,
 			)
 
 			if err != nil {
@@ -407,7 +409,7 @@ func main() {
 				gethClient,
 				ethAaveAddressProviderAddress,
 				ethUnderlyingTokenAddress,
-				crumb,
+				emission,
 			)
 
 			if err != nil {
@@ -486,7 +488,7 @@ func main() {
 
 		currentApyInUsdt.Quo(currentApyInUsdt, underlyingTokenDecimalsRat)
 
-		bpy := probability.CalculateBpy(secondsSinceLastBlock, currentApyInUsdt, crumb)
+		bpy := probability.CalculateBpy(secondsSinceLastBlock, currentApyInUsdt, emission)
 
 		balanceOfUnderlying, err := compound.GetBalanceOfUnderlying(
 			gethClient,
@@ -575,7 +577,7 @@ func main() {
 				underlyingTokenDecimalsRat,
 				btx,
 				secondsSinceLastBlock,
-				crumb,
+				emission,
 			)
 
 			res := generateRandomIntegers(probability.WinningClasses, 1, int(randomN))
@@ -588,13 +590,23 @@ func main() {
 				randomSource = append(randomSource, uint32(i))
 			}
 
+			tokenDetails := token_details.TokenDetails{
+				TokenShortName: tokenName,
+				TokenDecimals:  underlyingTokenDecimals,
+			}	
+
 			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
 				FromAddress:     senderAddress,
 				ToAddress:       recipientAddress,
 				SourceRandom:    randomSource,
 				SourcePayouts:   randomPayouts,
+				TokenDetails:    tokenDetails,
 			}
+
+			// Fill in emission.NaiveIsWinning
+
+			probability.NaiveIsWinning(announcement.SourceRandom, emission)
 
 			log.Debug(func(k *log.Log) {
 				k.Format("Source payouts: %v", randomSource)
@@ -607,7 +619,13 @@ func main() {
 				})
 			}
 
+			emission.TransactionHash = transactionHash.String()
+			emission.RecipientAddress = recipientAddress.String()
+			emission.SenderAddress = senderAddress.String()
+
 			queue.SendMessage(publishAmqpQueueName, announcement)
+
+			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

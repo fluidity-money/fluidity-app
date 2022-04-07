@@ -46,7 +46,7 @@ run-docker: ${FILES} docker
 
 watch-js:
 	echo "@import "$${FLU_PUBLIC_URL:-http://localhost:3000}/index.css";" \
-		>${SRC_DIR}/stub.css
+		>${FRONTEND_SRC_DIR}/stub.css
 
 	@env REACT_APP_WEBSOCKET=$${REACT_APP_WEBSOCKET:-ws://localhost:8080/updates} \
 		REACT_APP_WALLET_CONNECT_GETH_URI=$${REACT_APP_WALLET_CONNECT_GETH_URI:-ws://localhost:8545} \

@@ -1,0 +1,16 @@
+[
+  {
+    "symbol": "Frax",
+    "address": "0x88128f0c48a2F6181b6Be1759Fc6724b8e314CAe",
+    "colour": "",
+    "image": "",
+    "decimals": 18
+  },
+  {
+    "symbol": "fFrax",
+    "address": "",
+    "colour": "",
+    "image": "",
+    "decimals": 18
+  }
+]

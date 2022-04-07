@@ -30,7 +30,6 @@ const (
 	ChannelFaucetTweets         = "#faucet-tweets"
 	ChannelProductionFailures   = "#production-failures"
 	ChannelTopWinners           = "#top-winners"
-	ChannelModellingBreadcrumbs = "#modelling-breadcrumbs"
 	ChannelPayroll              = "#payroll"
 )
 

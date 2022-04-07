@@ -1,20 +1,13 @@
 package queue
 
 import (
+	"math/big"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
-)
-
-const (
-	// UsdcDecimals to use in lieu of loading this via an environment variable
-	UsdcDecimals = 6
-
-	// UsdcName to use to refer to the token
-	UsdcName = "USDC"
 )
 
 func SendSwap(val uint64, hash string, by string, in bool) {
@@ -31,7 +24,7 @@ func SendSwap(val uint64, hash string, by string, in bool) {
 	return swap
 }
 
-func NewTransfer(amount uint64, hash, adjustedFee *big.Rat, from, to, mintAuthority, pda string) *user_actions.UserAction {
+func NewTransfer(amount uint64, hash string, adjustedFee *big.Rat, from, to, mintAuthority, pda string) *user_actions.UserAction {
 
 	// token being minted or burnt - ignore
 

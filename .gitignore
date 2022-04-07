@@ -3,6 +3,10 @@ docker
 docker-*
 !docker-compose*
 
+lib/build-lib
+
+common/build-common
+
 cmd/*/test
 cmd/*/docker
 cmd/*/lint

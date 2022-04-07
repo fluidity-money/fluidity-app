@@ -7,20 +7,8 @@ type left = {
   prizePool: Routes["/prize-pool"];
 };
 
-const toDecimals = (amount: string | number, decimals: number) => {
-  if (!amount) return amount;
-
-  // number
-  if (typeof amount === "number") return amount.toFixed(decimals);
-
-  // string
-  const [pre, post] = amount.split(".");
-  return post ? pre + "." + post.slice(0, decimals) : pre;
-};
-
 const Left = ({ prizePool }: left) => {
   const history = useHistory();
-  const prizePoolAmount = toDecimals(prizePool.amount, 2);
 
   return (
     <div className="reward-pool-total-container">
@@ -29,9 +17,9 @@ const Left = ({ prizePool }: left) => {
       </Header>
       <h1 className="reward">
         $
-        {prizePoolAmount &&
-          prizePoolAmount.toLocaleString("en", {
-            minimumFractionDigits: 2,
+        {prizePool.amount &&
+          parseFloat(prizePool.amount).toLocaleString("en", {
+            maximumFractionDigits: 2,
           })}
       </h1>
       <div className="btn-component">

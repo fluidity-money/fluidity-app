@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
+	"os"
+	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
+	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -18,21 +17,33 @@ import (
 )
 
 const (
+	// EnvTokensList to relate the received token names to a contract address
+	// of the form ADDR1:TOKEN1:DECIMALS1:...,ADDR2:TOKEN2:DECIMALS2...,...
+	EnvTokensList = "FLU_SOLANA_TOKENS_LIST"
+
 	// EnvSolanaRpcUrl to use to connect to a Solana node
 	EnvSolanaRpcUrl = "FLU_SOLANA_RPC_URL"
 
-	// EnvSolanaTokenAddress to use as the underlying token when sending
-	EnvSolanaTokenAddress = "FLU_SOLANA_PROGRAM_ID"
-
 	// EnvSolanaPrivateKey to use when signing transactions on Solana
 	EnvSolanaPrivateKey = "FLU_SOLANA_FAUCET_PRIVATE_KEY"
+
+	// EnvSolanaSenderPdaAddress to use to send faucet funds from
+	EnvSolanaSenderPdaAddress = "FLU_SOLANA_FAUCET_SENDER_ADDR"
+
+	// EnvSolanaDebugFakePayouts to prevent sending amounts when set to true
+	EnvSolanaDebugFakePayouts = "FLU_SOLANA_DEBUG_FAKE_PAYOUTS"
 )
 
 func main() {
 	var (
-		solanaRpcUrl  = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		tokenAddress_ = util.GetEnvOrFatal(EnvSolanaTokenAddress)
-		privateKey_   = util.GetEnvOrFatal(EnvSolanaPrivateKey)
+		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		tokenList_     = util.GetEnvOrFatal(EnvTokensList)
+		privateKey_    = util.GetEnvOrFatal(EnvSolanaPrivateKey)
+		senderAddress_ = util.GetEnvOrFatal(EnvSolanaSenderPdaAddress)
+
+		tokenAddresses = make(map[faucetTypes.FaucetSupportedToken]solana.PublicKey)
+
+		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
@@ -49,49 +60,62 @@ func main() {
 	var (
 		privateKey = payer.PrivateKey
 		publicKey  = payer.PublicKey()
+		senderAddress = solana.MustPublicKeyFromBase58(senderAddress_)
 	)
 
-	// HARDCODED!
+	// populate map of token sessions for each token we're tracking
 
-	senderAddress := solana.MustPublicKeyFromBase58("9nQXJm1rupcbgaPgX9xxPToszoV6bBAjWxG4cK89Bdap")
+	tokenList := strings.Split(tokenList_, ",")
 
-	tokenAddress, err := solana.PublicKeyFromBase58(tokenAddress_)
+	for _, token_ := range tokenList {
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Failed to read the token address %#v from the string!",
-				tokenAddress,
-			)
+		tokenSeparated := strings.Split(token_, ":")
 
-			k.Payload = err
-		})
+		// either have the two used fields, or the form including Solend keys, etc.
+		if len(tokenSeparated) < 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to separate %#v, expected format ADDRESS:TOKEN:...",
+					token_,
+				)
+			})
+		}
+
+		mintPubkey, err := solana.PublicKeyFromBase58(tokenSeparated[0])
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to convert address %#v to a public key! %v",
+					tokenSeparated[0],
+					err,
+				)
+			})
+		}
+
+		baseTokenName := tokenSeparated[1]
+
+		tokenName, err := faucetTypes.TokenFromString("f"+baseTokenName)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to convert token %#v to a supported token! %v",
+					tokenSeparated[1],
+					err,
+				)
+			})
+		}
+
+		tokenAddresses[tokenName] = mintPubkey
 	}
-
-	queue.GetMessages(faucet.TopicFaucetRequest, func(message queue.Message) {
-
-		var buf bytes.Buffer
-
-		if _, err := io.Copy(&buf, message.Content); err != nil {
-			panic(err)
-		}
-
-		buf2 := buf
-
-		log.App(func(k *log.Log) {
-			k.Format("Message off the queue is %v", string(buf.Bytes()))
-		})
-
-		var faucetRequest faucet.FaucetRequest
-
-		if err := json.NewDecoder(&buf2).Decode(&faucetRequest); err != nil {
-			panic(err)
-		}
-
+	
+	faucet.FaucetRequests(func (faucetRequest faucet.FaucetRequest) {
 		var (
-			address_ = faucetRequest.Address
-			amount   = faucetRequest.Amount
-			network_ = faucetRequest.Network
+			address_  = faucetRequest.Address
+			amount    = faucetRequest.Amount
+			network_  = faucetRequest.Network
+			tokenName = faucetRequest.TokenName
 		)
 
 		if network_ != network.NetworkSolana {
@@ -99,6 +123,12 @@ func main() {
 		}
 
 		if address_ == "" {
+			return
+		}
+
+		// check for invalid token name
+
+		if _, err := tokenName.TokenDecimals(); err != nil {
 			return
 		}
 
@@ -126,11 +156,26 @@ func main() {
 
 		amountInt64 := amount.Uint64()
 
+		if testingEnabled {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Would've sent %v %v to %v, but in testing mode!",
+					amountInt64,
+					tokenName,
+					recipientAddress,
+				)
+			})
+
+			return
+		}
+
+		fluidMintAddress := tokenAddresses[tokenName]
+
 		signature, err := fluidity.SendTransfer(
 			solanaClient,
 			senderAddress,
 			recipientAddress,
-			tokenAddress,
+			fluidMintAddress,
 			amountInt64,
 			*blockHash,
 			publicKey,

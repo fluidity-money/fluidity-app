@@ -69,22 +69,74 @@
 
 .reward-info-table {
   width: 100%;
-  table-layout: fixed;
+  display: flex;
+  justify-content: space-evenly;
 }
 
-.reward-info-table-body {
-  padding-top: 20px;
+.reward-info-table-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: justify;
+  flex-wrap: nowrap;
 }
 
-.reward-info-table td {
-  -webkit-background-clip: unset;
-  -moz-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  -moz-text-fill-color: unset;
+.reward-info-table-header {
+  font-size: 1.5rem;
+  padding: 0.1rem;
+  color: white;
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0em;
+  // @include for-below-550 {
+  //   font-size: small;
+  // }
+}
+
+.reward-info-table-content {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0em;
   color: white;
 
-  background: unset;
+  @include for-phone-only {
+    font-size: x-small;
+  }
+  // @include for-below-550 {
+  //   font-size: xx-small;
+  // }
+}
+
+.winner-address {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0em;
+  color: white;
   text-align: center;
+  &:hover {
+    text-decoration: underline;
+  }
+  @include for-phone-only {
+    font-size: x-small;
+  }
+  // @include for-below-550 {
+  //   font-size: xx-small;
+  // }
+}
+
+.reward-info-table-column-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .swap-box-header {

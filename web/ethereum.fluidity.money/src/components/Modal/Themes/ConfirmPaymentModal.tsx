@@ -4,9 +4,11 @@ import Header from "components/Header";
 import Icon from "components/Icon";
 import FormSection from "components/Styling/FormSection";
 import Token from "components/Token";
-import { intOptions, extOptions } from "components/Token/TokenTypes";
+import ropsten from "../../../config/ropsten-tokens.json";
+import testing from "../../../config/testing-tokens.json";
+import kovan from "../../../config/kovan-tokens.json";
 import { modalToggle } from "components/context";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TokenKind, Token as TokenType } from "components/types";
 import { SupportedContracts } from "util/contractList";
 
@@ -29,51 +31,67 @@ const ConfirmPaymentModal = ({
 
   // Functions to work out selected to and from option from context and get the respective external/internal token information
   const defaultVar: TokenKind = {
-    type: "" as TokenType,
-    src: "",
-    colour: ""
+    symbol: "" as TokenType,
+    image: "",
+    colour: "",
+    address: "",
+    decimals: 0,
   };
+
+  // Assigns the correct json file based on ChainId
+  const data =
+    process.env.REACT_APP_CHAIN_ID === "3"
+      ? (ropsten as TokenKind[])
+      : process.env.REACT_APP_CHAIN_ID === "31337"
+      ? (testing as TokenKind[])
+      : process.env.REACT_APP_CHAIN_ID === "2a"
+      ? (kovan as TokenKind[])
+      : (ropsten as TokenKind[]);
+
+  const ext = data.slice(0, data.length / 2);
+  const int = data.slice(data.length / 2, data.length);
 
   // From token
   let From = defaultVar;
   type === "token"
-    ? extOptions.map((option) => {
-      if (option.type === selectedToken[0]) {
-        From = option;
-      }
-      return {};
-    })
-    : intOptions.map((option) => {
-      if (option.type === selectedFluidToken[0]) {
-        From = option;
-      }
-      return {};
-    });
+    ? ext.map((option) => {
+        if (option.symbol === selectedToken[0]) {
+          From = option;
+        }
+        return {};
+      })
+    : int.map((option) => {
+        if (option.symbol === selectedFluidToken[0]) {
+          From = option;
+        }
+        return {};
+      });
 
   // To
   let To = defaultVar;
   type === "token"
-    ? intOptions.map((option) => {
-      if (option.type === selectedFluidToken[0]) {
-        //  Token info found and returned
-        To = option;
-      }
-      return {};
-    })
-    : extOptions.map((option) => {
-      if (option.type === selectedToken[0]) {
-        //  Token info found and returned
-        To = option;
-      }
-      return {};
-    });
+    ? int.map((option) => {
+        if (option.symbol === selectedFluidToken[0]) {
+          //  Token info found and returned
+          To = option;
+        }
+        return {};
+      })
+    : ext.map((option) => {
+        if (option.symbol === selectedToken[0]) {
+          //  Token info found and returned
+          To = option;
+        }
+        return {};
+      });
 
   // Abbreviation of long string with "..."
   const stringAbbreviation = (value: string, limit: number) => {
     if (value.length >= limit) {
       return value.substr(0, limit) + "...";
-    } return value;
-  }
+    }
+    return value;
+  };
 
   return (
     <GenericModal enable={enable} toggle={toggle} height="auto" width="24rem">
@@ -94,7 +112,8 @@ const ConfirmPaymentModal = ({
             From
           </Header>
           <div className="payment-text flex flex-space-between">
-            <Token token={From} cname="payment-token" /> {stringAbbreviation(amount, 15)}
+            <Token token={From} cname="payment-token" />{" "}
+            {stringAbbreviation(amount, 15)}
           </div>
         </FormSection>
         <FormSection cname="payment-arrow" defaultMargin={false}>
@@ -108,14 +127,21 @@ const ConfirmPaymentModal = ({
             To
           </Header>
           <div className="payment-text flex flex-space-between">
-            <Token token={To} cname="payment-token" /> {stringAbbreviation(amount.toString(), 15)}
+            <Token token={To} cname="payment-token" />{" "}
+            {stringAbbreviation(amount.toString(), 15)}
           </div>
         </FormSection>
         <FormSection cname="payment-modal-form">
           <div className="payment-text flex flex-space-between">
             <div>Swap:</div>
             <div>
-              {stringAbbreviation(amount.toString(), 6) + " " + From.type + " = " + stringAbbreviation(amount.toString(), 6) + " " + To.type}
+              {stringAbbreviation(amount.toString(), 6) +
+                " " +
+                From.symbol +
+                " = " +
+                stringAbbreviation(amount.toString(), 6) +
+                " " +
+                To.symbol}
             </div>
           </div>
         </FormSection>

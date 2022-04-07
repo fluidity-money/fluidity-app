@@ -12,7 +12,7 @@ winning transactions, and calls the reward contract when a winner is seen.
 |               Name                |                                  Description                                  |
 |-----------------------------------|-------------------------------------------------------------------------------|
 | `FLU_WORKER_ID`                   | Worker ID used to identify the application in logging and to the AMQP queue.  |
-| `FLU_REDIS_ADDR`                  | Someone might actually have to explain this to me (breadcrumb?)               |
+| `FLU_REDIS_ADDR`                  | Redis Address pointing to Redis for state logging               				|
 | `FLU_DEBUG`                       | Toggle debug messages produced by any application using the debug logger.     |
 | `FLU_AMQP_QUEUE_ADDR`             | AMQP queue address connected to to receive and send messages down.            |
 | `FLU_ETHEREUM_HTTP_URL`           | URL to use to chat to an Ethereum RPC node.                                   |
