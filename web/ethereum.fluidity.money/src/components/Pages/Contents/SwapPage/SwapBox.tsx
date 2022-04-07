@@ -15,7 +15,7 @@ import makeContractSwap from "util/makeContractSwap";
 import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
-import kovan from "../../../../config/testing-tokens.json";
+import kovan from "../../../../config/kovan-tokens.json";
 import { TokenKind } from "components/types";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider, TransactionReceipt } from "ethers/providers";
@@ -55,7 +55,7 @@ const SwapBox = () => {
   const data =
     process.env.REACT_APP_CHAIN_ID === "3"
       ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31137"
+      : process.env.REACT_APP_CHAIN_ID === "31337"
       ? (testing as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "2a"
       ? (kovan as TokenKind[])

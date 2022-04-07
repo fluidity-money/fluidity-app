@@ -1,11 +1,11 @@
 import TokenSelection from "components/Modal/Themes/TokenSelection";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { modalToggle } from "components/context";
 import Icon from "components/Icon";
 import { TokenKind } from "components/types";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
-import kovan from "../../../../config/testing-tokens.json";
+import kovan from "../../../../config/kovan-tokens.json";
 
 const TokenSelect = ({
   type,
@@ -21,7 +21,7 @@ const TokenSelect = ({
   const data =
     process.env.REACT_APP_CHAIN_ID === "3"
       ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31137"
+      : process.env.REACT_APP_CHAIN_ID === "31337"
       ? (testing as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "2a"
       ? (kovan as TokenKind[])
