@@ -36,3 +36,38 @@ services:
       FLU_AURORA_HARDHAT_FIX: ${FLU_AURORA_WORKER_HARDHAT_FIX_USDT}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdt
     restart: unless-stopped
+
+  microservice-aurora-worker-server-usdc:
+    build:
+      context: ../cmd/microservice-ethereum-worker-server
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-worker-server-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_AURORA_CONTRACT_ADDR: ${FLU_AURORA_CONTRACT_ADDR_FUSDC}
+      FLU_AURORA_HTTP_URL: ${FLU_AURORA_HTTP_URL}
+      FLU_AURORA_TOKEN_BACKEND: compound
+      FLU_AURORA_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_AURORA_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_AURORA_UNDERLYING_TOKEN_NAME: ${FLU_AURORA_TOKEN_NAME_USDC}
+      FLU_AURORA_UNDERLYING_TOKEN_DECIMALS: ${FLU_AURORA_TOKEN_DECIMALS_USDC}
+      FLU_AURORA_CTOKEN_ADDR: ${FLU_AURORA_CTOKEN_ADDR_USDC}
+      FLU_AURORA_AMQP_QUEUE_NAME: aurora.worker.usdt
+      FLU_AURORA_REDIS_APY_MOVING_AVERAGE_KEY: aurora.worker.usdt.apy.moving-average
+    restart: unless-stopped
+
+  microservice-ethereum-worker-client-aurora-usdt:
+    build:
+      context: ../cmd/microservice-ethereum-worker-client
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-worker-server-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_AURORA_CONTRACT_ADDR: ${FLU_AURORA_CONTRACT_ADDR_FUSDC}
+      FLU_AURORA_HTTP_URL: ${FLU_AURORA_HTTP_URL}
+      FLU_AURORA_WORKER_PRIVATE_KEY: ${FLU_AURORA_WORKER_PRIVATE_KEY_USDC}
+      FLU_AURORA_GAS_LIMIT: ${FLU_AURORA_WORKER_GAS_LIMIT_USDC}
+      FLU_AURORA_HARDHAT_FIX: ${FLU_AURORA_WORKER_HARDHAT_FIX_USDC}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdt
+    restart: unless-stopped
