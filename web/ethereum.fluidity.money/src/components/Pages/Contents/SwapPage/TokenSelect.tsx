@@ -34,18 +34,18 @@ const TokenSelect = ({
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
 
-  const [tokens, setTokens] = useState(
-    JSON.parse(JSON.stringify(data.slice(0, data.length / 2)))
-  );
+  const [tokens, setTokens] = useState(data.slice(0, data.length / 2));
+
   const [fluidTokens, setFluidTokens] = useState(
-    JSON.parse(JSON.stringify(data.slice(data.length / 2, data.length)))
+    data.slice(data.length / 2, data.length)
   );
 
   const [pinnedTokens, setPinnedTokens] = useState(
-    JSON.parse(JSON.stringify(data.slice(0, data.length / 2)))
+    data.slice(0, data.length / 2)
   );
+
   const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
-    JSON.parse(JSON.stringify(data.slice(data.length / 2, data.length)))
+    data.slice(data.length / 2, data.length)
   );
 
   useEffect(() => {
