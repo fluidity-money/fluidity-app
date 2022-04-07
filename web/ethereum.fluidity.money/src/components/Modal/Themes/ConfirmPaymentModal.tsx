@@ -6,9 +6,9 @@ import FormSection from "components/Styling/FormSection";
 import Token from "components/Token";
 import ropsten from "../../../config/ropsten-tokens.json";
 import testing from "../../../config/testing-tokens.json";
-import kovan from "../../../config/testing-tokens.json";
+import kovan from "../../../config/kovan-tokens.json";
 import { modalToggle } from "components/context";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TokenKind, Token as TokenType } from "components/types";
 import { SupportedContracts } from "util/contractList";
 
@@ -42,7 +42,7 @@ const ConfirmPaymentModal = ({
   const data =
     process.env.REACT_APP_CHAIN_ID === "3"
       ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31137"
+      : process.env.REACT_APP_CHAIN_ID === "31337"
       ? (testing as TokenKind[])
       : process.env.REACT_APP_CHAIN_ID === "2a"
       ? (kovan as TokenKind[])
