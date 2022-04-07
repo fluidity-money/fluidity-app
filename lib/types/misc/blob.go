@@ -4,8 +4,8 @@ package misc
 // on the wire and into the database
 
 import (
-	"encoding/base64"
 	sqlDriver "database/sql/driver"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 )
@@ -23,6 +23,10 @@ func (blob *Blob) UnmarshalJSON(b []byte) (err error) {
 			b,
 			err,
 		)
+	}
+
+	if has0xPrefix(str) {
+		str = str[2:]
 	}
 
 	*blob, err = base64.StdEncoding.DecodeString(str)
@@ -66,15 +70,15 @@ func (blob *Blob) Scan(v interface{}) error {
 	case string:
 		var err error
 
-	 	*blob, err = base64.StdEncoding.DecodeString(v.(string))
+		*blob, err = base64.StdEncoding.DecodeString(v.(string))
 
-	 	if err != nil {
-	 		return fmt.Errorf(
-	 			"Failed to decode a string of %v as base64! %v",
-	 			v.(string),
-	 			err,
-	 		)
-	 	}
+		if err != nil {
+			return fmt.Errorf(
+				"Failed to decode a string of %v as base64! %v",
+				v.(string),
+				err,
+			)
+		}
 
 	default:
 		return fmt.Errorf(
