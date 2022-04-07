@@ -75,6 +75,10 @@ func init() {
 		ExchangeType,
 	)
 
+	log.RegisterShutdown(func() {
+		_ = channel.Close()
+	})
+
 	go func() {
 		for {
 			chanAmqpDetails <- amqpDetails{

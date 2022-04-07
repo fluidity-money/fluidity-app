@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
 )
 
 const aaveLendingPoolAddressProviderAbiString = `[
@@ -305,7 +306,7 @@ func GetPrice(client *ethclient.Client, addressProvider ethCommon.Address, token
 	return assetPriceUsd, nil
 }
 
-func GetTokenApy(client *ethclient.Client, addressProvider, underlying ethCommon.Address, crumb *breadcrumb.Breadcrumb) (*big.Rat, error) {
+func GetTokenApy(client *ethclient.Client, addressProvider, underlying ethCommon.Address, emission *worker.Emission) (*big.Rat, error) {
 	lendingPool, err := getAaveAddress(client, addressProvider, "getLendingPool")
 
 	if err != nil {
@@ -339,12 +340,17 @@ func GetTokenApy(client *ethclient.Client, addressProvider, underlying ethCommon
 	liquidityRate := new(big.Rat).SetInt(liquidityRateResult)
 
 	// aave returns things scaled by rays, which are 10**27
+
 	aaveMantissaInt := new(big.Int).Exp(big.NewInt(10), big.NewInt(27), nil)
+
 	aaveMantissa := new(big.Rat).SetInt(aaveMantissaInt)
 
-	// the aave docs say to use seconds per year for this, which with our bigpow implementation
-	// takes too long and doesn't give us meaningfully more precision
+	// the aave docs say to use seconds per year for this, which with our
+	// bigpow implementation takes too long and doesn't give us meaningfully
+	// more precision
+
 	var compoundingIntervalInt int64 = 365
+
 	compoundingInterval := big.NewRat(compoundingIntervalInt, 1)
 
 	one := big.NewRat(1, 1)
@@ -359,16 +365,11 @@ func GetTokenApy(client *ethclient.Client, addressProvider, underlying ethCommon
 
 	depositApy := new(big.Rat).Sub(compoundedApr, one)
 
-	crumb.Set(func (k *breadcrumb.Breadcrumb) {
-		k.Many(map[string]interface{}{
-			"deposit APR": depositAPR.FloatString(10),
-			"APR per day": aprPerDay.FloatString(10),
-			"one plus APR per day": onePlusAprPerDay.FloatString(10),
-			"componded APR": compoundedApr.FloatString(10),
-			"deposit APY": depositApy.FloatString(10),
-		})
-	})
+	emission.AaveGetTokenApy.DepositApr, _ = depositAPR.Float64()
+	emission.AaveGetTokenApy.APRPerDay, _ = aprPerDay.Float64()
+	emission.AaveGetTokenApy.OnePlusAprPerDay, _ = onePlusAprPerDay.Float64()
+	emission.AaveGetTokenApy.CompoundedApr, _ = compoundedApr.Float64()
+	emission.AaveGetTokenApy.DepositApy, _ = depositApy.Float64()
 
 	return depositApy, nil
 }
-

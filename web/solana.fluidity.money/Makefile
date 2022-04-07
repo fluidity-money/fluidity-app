@@ -46,3 +46,14 @@ run-docker: ${FILES} docker
 
 watch-css:
 	@${NPX_SASS} --watch ${FRONTEND_SRC_SASS} ${FRONTEND_PUBLIC_CSS}
+
+watch-js:
+	echo '@import "http://localhost:3000/index.css";' \
+		>${FRONTEND_SRC_DIR}/stub.css
+
+	@env REACT_APP_WEBSOCKET=$${REACT_APP_WEBSOCKET:-ws://localhost:8081/updates} \
+		REACT_APP_API_URL=$${REACT_APP_API_URL:-http://localhost:8081} \
+		${NPX_REACTSCRIPTS} start
+
+watch:
+	@${MAKE} -j2 watch-css watch-js

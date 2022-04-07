@@ -5,4 +5,7 @@ package ethereum
 
 import "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 
-type Log = ethereum.Log
+type (
+	Log         = ethereum.Log
+	BlockHeader = ethereum.BlockHeader
+)

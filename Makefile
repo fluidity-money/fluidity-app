@@ -7,11 +7,19 @@ AUTOMATION_DIR := automation
 
 all: docker docker-web
 
+build:
+	@cd lib && ${MAKE} build-lib
+	@cd common && ${MAKE} build-common
+
 docker:
-	@${DOCKER_BUILD} -t ${ORG_ROOT}/build-container .
+	${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/build-container \
+		.
 
 docker-web: docker
 	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/web-container \
 		-f Dockerfile.web \
 		.

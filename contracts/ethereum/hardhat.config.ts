@@ -7,79 +7,189 @@ import { readFile as readFileCB } from 'fs';
 const readFile = promisify(readFileCB);
 
 import {
-  USDT_ADDR,
-  CUSDT_ADDR,
-  USDT_HOLDER,
-  USDC_ADDR,
-  CUSDC_ADDR,
-  USDC_HOLDER,
-  DAI_ADDR,
-  CDAI_ADDR,
-  TUSD_ADDR,
-  CTUSD_ADDR,
-  TUSD_HOLDER,
-  DAI_HOLDER } from './test-constants';
+  AAVE_POOL_PROVIDER_ADDR,
 
-import {HttpNetworkConfig} from "hardhat/types";
+  USDT_ADDR, USDC_ADDR, DAI_ADDR, TUSD_ADDR, FEI_ADDR,
+  CUSDT_ADDR, CUSDC_ADDR, CDAI_ADDR, CTUSD_ADDR, AFEI_ADDR,
+  USDT_HOLDER, USDC_HOLDER, DAI_HOLDER, TUSD_HOLDER, FEI_HOLDER,
+} from './test-constants';
+
 import { ethers } from "ethers";
 
+const IERC20UpgradeablePath =
+  './artifacts/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol/IERC20Upgradeable.json';
+
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
+
 const oracleAddress = process.env[oracleKey];
-
-let shouldDeploy = false;
-task("deploy-forknet", "Starts a node on forked mainnet with the contracts initialized", async (_taskArgs, hre) => {
-  shouldDeploy = true;
-  await hre.run("node", {...{network: 'hardhat'}});
-});
-
 
 if (oracleAddress == "") {
   console.error("FLU_ETHEREUM_ORACLE_ADDRESS is not set!");
   process.exit(1);
 };
 
-subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
-  if (shouldDeploy) {
-    if (!oracleAddress) throw new Error(`Set env variable ${oracleKey} to an 0x123 encoded public key.`);
+type Token = {
+  decimals: number,
+  name: string,
+  symbol: string,
+  address: string,
+  owner: string
+} & (
+    {
+      backend: 'compound',
+      compoundAddress: string
+    } | {
+      backend: 'aave',
+      aaveAddress: string
+    }
+  );
 
-    await hre.run("forknet:take-usdt");
+const TokenList: { [name: string]: Token } = {
+  "usdt": {
+    backend: 'compound',
+    compoundAddress: CUSDT_ADDR,
+    decimals: 6,
+    name: "Fluid USDt",
+    symbol: "fUSDt",
+    address: USDT_ADDR,
+    owner: USDT_HOLDER
+  },
+  "usdc": {
+    backend: 'compound',
+    compoundAddress: CUSDC_ADDR,
+    decimals: 6,
+    name: "Fluid USDc",
+    symbol: "fUSDc",
+    address: USDC_ADDR,
+    owner: USDC_HOLDER
+  },
+  "dai": {
+    backend: 'compound',
+    compoundAddress: CDAI_ADDR,
+    decimals: 18,
+    name: "Fluid DAI",
+    symbol: "fDAI",
+    address: DAI_ADDR,
+    owner: DAI_HOLDER
+  },
+  "tusd": {
+    backend: 'compound',
+    compoundAddress: CTUSD_ADDR,
+    decimals: 18,
+    name: "Fluid tUSD",
+    symbol: "ftUSD",
+    address: TUSD_ADDR,
+    owner: TUSD_HOLDER
+  },
+  "fei": {
+    backend: 'aave',
+    aaveAddress: AFEI_ADDR,
+    decimals: 18,
+    name: "Fluid Fei",
+    symbol: "fFei",
+    address: FEI_ADDR,
+    owner: FEI_HOLDER
+  },
+};
 
-    const factory = await hre.ethers.getContractFactory("TokenCompound");
+let shouldDeploy: (keyof typeof TokenList)[] = [];
 
-    const deployTokens = async (tokens: {compoundAddress: string, decimals: number, name: string, symbol: string, oracle: string}[]) => {
-      for (const token of tokens) {
-        console.log(`deploying ${token.name}`);
-        const deployedToken = await hre.upgrades.deployProxy(
-          factory,
-          [token.compoundAddress, token.decimals, token.name, token.symbol, token.oracle],
-        );
-        await deployedToken.deployed();
-        console.log(`deployed ${token.name} to ${deployedToken.address}`);
+task("deploy-forknet", "Starts a node on forked mainnet with the contracts initialized")
+  .addOptionalParam("tokens", "the tokens to deploy")
+  .setAction(async (args, hre) => {
+    shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
+
+    for (const t of shouldDeploy)
+      if (!TokenList.hasOwnProperty(t)) {
+        const validTokens = Object.keys(TokenList).join(',');
+        throw new Error(`unknown token ${t} - valid tokens are ${validTokens}`);
       }
-    };
 
-    await deployTokens([
-      {compoundAddress: CUSDT_ADDR, decimals: 6, name: "Fluid USDt", symbol: "fUSDt", oracle: oracleAddress},
-      {compoundAddress: CUSDC_ADDR, decimals: 6, name: "Fluid USDc", symbol: "fUSDc", oracle: oracleAddress},
-      {compoundAddress: CDAI_ADDR, decimals: 18, name: "Fluid DAI", symbol: "fDAI", oracle: oracleAddress},
-      {compoundAddress: CTUSD_ADDR, decimals: 18, name: "Fluid tUSD", symbol: "ftUSD", oracle: oracleAddress},
-    ]);
-  }
+    await hre.run("node", { ...{ network: 'hardhat' } });
+  });
+
+subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
+  if (!shouldDeploy) return;
+
+  if (!oracleAddress)
+    throw new Error(
+      `Set env variable ${oracleKey} to an 0x123 encoded public key.`);
+
+  await hre.run("forknet:take-usdt");
+
+  const factoryCompound = await hre.ethers.getContractFactory("TokenCompound");
+  const factoryAave = await hre.ethers.getContractFactory("TokenAave");
+
+  const deployTokens = async <T extends keyof typeof TokenList>(tokenNames: T[]) => {
+    const tokens = tokenNames.map(t => TokenList[t])
+
+    for (const token of tokens) {
+      console.log(`deploying ${token.name}`);
+
+      var deployedToken: ethers.Contract;
+
+      switch (token.backend) {
+        case 'compound':
+          deployedToken = await hre.upgrades.deployProxy(
+            factoryCompound,
+            [
+              token.compoundAddress,
+              token.decimals,
+              token.name,
+              token.symbol,
+              oracleAddress
+            ]
+          );
+
+          break;
+
+        case 'aave':
+          deployedToken = await hre.upgrades.deployProxy(
+            factoryAave,
+            [
+              token.aaveAddress,
+              AAVE_POOL_PROVIDER_ADDR,
+              token.decimals, token.name, token.symbol, oracleAddress
+            ]
+          );
+
+          break;
+
+        default:
+          assertNever(token);
+
+      }
+
+      await deployedToken.deployed();
+
+      console.log(`deployed ${token.name} to ${deployedToken.address}`);
+    }
+  };
+
+  await deployTokens(shouldDeploy);
 });
 
 subtask("forknet:take-usdt", async (_taskArgs, hre) => {
-  const IERC20 = await readFile('./artifacts/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol/IERC20Upgradeable.json')
-    .then(res => JSON.parse('' + res))
-    .catch(e => {
-      if (e.code === "ENOENT") throw new Error(`Contract artifacts not found - have you run \`npx hardhat compile\`?`);
-      throw e;
-    });
+  const IERC20 =
+    await readFile(IERC20UpgradeablePath)
+      .then(res => JSON.parse('' + res))
+      .catch(e => {
+        if (e.code === "ENOENT")
+          throw new Error(
+            `Contract artifacts not found - have you run \`npx hardhat compile\`?`);
 
-  const accounts = (await hre.ethers.getSigners()).slice(0,10);
+        throw e;
+      });
 
-  const takeERC20 = async (tokens: {name: string, owner: string, address: string}[]) => {
+  const accounts = (await hre.ethers.getSigners()).slice(0, 10);
+
+  const takeERC20 = async <T extends keyof typeof TokenList>(tokenNames: T[]) => {
+    const tokens = tokenNames.map(t => TokenList[t]);
+
     for (const token of tokens) {
-      console.log(`taking ${token.name}`)
+
+      console.log(`taking ${token.name}`);
+
       await hre.network.provider.request({
         method: "hardhat_impersonateAccount",
         params: [token.owner],
@@ -91,14 +201,23 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
         await hre.ethers.getSigner(token.owner),
       );
 
-      const initialUsdtBalance: ethers.BigNumber = await impersonatedToken.balanceOf(token.owner);
-      console.log(`token holder for ${token.name} has balance ${initialUsdtBalance.toString()}`)
+      const initialUsdtBalance: ethers.BigNumber =
+        await impersonatedToken.balanceOf(token.owner);
+
+      const initialUsdtBalanceString = initialUsdtBalance.toString();
+
+      console.log(
+        `token holder for ${token.name} has balance ${initialUsdtBalanceString}`);
+
       const amount = initialUsdtBalance.div(accounts.length);
 
       const promises = accounts.map(async address => {
         await impersonatedToken.transfer(address.address, amount);
-        if (!(await impersonatedToken.balanceOf(address.address)).eq(amount)) throw new Error(`failed to take token ${token.name} ${token.address}`);
-      })
+
+        if (!(await impersonatedToken.balanceOf(address.address)).eq(amount))
+          throw new Error(`failed to take token ${token.name} ${token.address}`);
+      });
+
       await Promise.all(promises);
 
       await hre.network.provider.request({
@@ -110,14 +229,11 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
     }
   };
 
-  await takeERC20([
-    { name: "USDt", address: USDT_ADDR, owner: USDT_HOLDER },
-    { name: "USDc", address: USDC_ADDR, owner: USDC_HOLDER },
-    { name: "DAI", address: DAI_ADDR, owner: DAI_HOLDER },
-    { name: "tUSD", address: TUSD_ADDR, owner: TUSD_HOLDER },
-  ]);
+  await takeERC20(shouldDeploy);
 });
 
+// statically ensure an object can't exist (ie, all enum varients are handled)
+function assertNever(_: never): never { throw new Error(`assertNever called: ${arguments}`); }
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -135,11 +251,6 @@ module.exports = {
       accounts: {
         mnemonic: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump",
       },
-      //mining: {
-        //cauto: false,
-        //interval: 0,
-      //},
-      //loggingEnabled: true,
       forking: {
         url: "https://eth-mainnet.alchemyapi.io/v2/JfzgyHq6sTI5Zup6pgi13HSfc3vTlXbA",
         blockNumber: 14098095,

@@ -1,11 +1,14 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -18,6 +21,12 @@ const (
 
 	// EnvFluidityPdaPubkey is the public key of the fluidity derived account
 	EnvFluidityPdaPubkey = `FLU_SOLANA_PDA_PUBKEY`
+
+	// EnvTokenShortName is the abbreviation of the non-fluid token name
+	EnvTokenShortName = `FLU_SOLANA_TOKEN_SHORT_NAME`
+
+	// EnvTokenDecimals is the number of decimals the token uses
+	EnvTokenDecimals = `FLU_SOLANA_TOKEN_DECIMALS`
 )
 
 // SplProgramId is the program id of the SPL token program
@@ -28,7 +37,22 @@ func main() {
 		fluidityProgramId = util.GetEnvOrFatal(EnvFluidityProgramId)
 		fluidityTokenMint = util.GetEnvOrFatal(EnvFluidityTokenMint)
 		fluidityPdaPubkey = util.GetEnvOrFatal(EnvFluidityPdaPubkey)
+		tokenShortName    = util.GetEnvOrFatal(EnvTokenShortName)
+		tokenDecimals_    = util.GetEnvOrFatal(EnvTokenDecimals)
 	)
+
+	tokenDecimals, err := strconv.Atoi(tokenDecimals_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to parse token decimals from env! Got %v but expected an int!",
+				tokenDecimals,
+			)
+		})
+	}
+
+	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
 
 	solana.BufferedTransactions(func(bufferedTransaction solana.BufferedTransaction) {
 		var (
@@ -100,6 +124,7 @@ func main() {
 						instruction,
 						accountKeys,
 						fluidityOwners,
+						tokenDetails,
 					)
 
 				case SplProgramId:
@@ -111,6 +136,7 @@ func main() {
 						fluidityOwners,
 						fluidityTokenMint,
 						fluidityPdaPubkey,
+						tokenDetails,
 					)
 				}
 

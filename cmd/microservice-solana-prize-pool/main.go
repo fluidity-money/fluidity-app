@@ -1,16 +1,19 @@
 package main
 
 import (
+	"math/big"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	prize_pool "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
+	prize_pool_queue "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	solLib "github.com/fluidity-money/fluidity-app/cmd/microservice-solana-prize-pool/lib/solana"
-
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	solana "github.com/gagliardetto/solana-go"
+
+	"github.com/gagliardetto/solana-go"
+	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -23,30 +26,22 @@ const (
 	// EnvFluidityPubkey is the program id of the fluidity program
 	EnvFluidityPubkey = `FLU_SOLANA_PROGRAM_ID`
 
-	// EnvFluidityMintPubkey is the public key of the fluid token mint
-	EnvFluidityMintPubkey = `FLU_SOLANA_FLUID_MINT_PUBKEY`
-
 	// EnvTvlDataPubkey is the public key of an initialized account for storing TVL data
 	EnvTvlDataPubkey = `FLU_SOLANA_TVL_DATA_PUBKEY`
 
 	// EnvSolendPubkey is the program id of the solend program
 	EnvSolendPubkey = `FLU_SOLANA_SOLEND_PROGRAM_ID`
 
-	// EnvObligationPubkey is the public key of the solend pool obligation account
-	EnvObligationPubkey = `FLU_SOLANA_OBLIGATION_PUBKEY`
-
-	// EnvReservePubkey is the public key of the solend pool reserve account
-	EnvReservePubkey = `FLU_SOLANA_RESERVE_PUBKEY`
-
-	// EnvPythPubkey is the public key of the solend pool pyth account
-	EnvPythPubkey = `FLU_SOLANA_PYTH_PUBKEY`
-
-	// EnvSwitchboardPubkey is the public key of the solend pool switchboard account
-	EnvSwitchboardPubkey = `FLU_SOLANA_SWITCHBOARD_PUBKEY`
-
 	// EnvPayerPrikey is a private key of an account that holds solana funds
 	// this program doesn't alter onchain state, and thus won't actually spend anything
 	EnvPayerPrikey = `FLU_SOLANA_TVL_PAYER_PRIKEY`
+
+	// EnvTokensList to use to identify Fluidity f token addresses, their name,
+	// their decimal places, and their associated Solend keys
+	EnvTokensList = `FLU_SOLANA_TOKENS_LIST`
+
+	// WorkerPoolAmount to have running as goroutines to send work to
+	WorkerPoolAmount = 30
 )
 
 // pubkeyFromEnv gets and decodes a solana public key from an environment variable,
@@ -59,8 +54,8 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 	return pubkey
 }
 
-func updatePrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) {
-	tvl := solLib.GetTvl(
+func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) *big.Rat {
+	tvl := prize_pool.GetTvl(
 		solanaRpcUrl,
 		fluidityPubkey,
 		tvlDataPubkey,
@@ -72,7 +67,7 @@ func updatePrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDa
 		payer,
 	)
 
-	mintSupply := solLib.GetMintSupply(
+	mintSupply := prize_pool.GetMintSupply(
 		solanaRpcUrl,
 		fluidMintPubkey,
 	)
@@ -87,35 +82,31 @@ func updatePrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDa
 		})
 	}
 
-	prizePool := float64(tvl - mintSupply) / 1e6
+	prizePool := int64(tvl - mintSupply)
 
 	log.Debug(func(k *log.Log) {
-		k.Format("Got TVL %d, supply %d, prize pool %d", tvl, mintSupply, prizePool)
+		k.Format("Got TVL %d, supply %d, unscaled prize pool %d, for pubkey %v", tvl, mintSupply, prizePool, fluidMintPubkey.String())
 	})
 
-	prizePoolUpdate := prize_pool.PrizePool{
-		Network:         string(network.NetworkSolana),
-		Amount:          prizePool,
-		LastUpdated:     time.Now(),
-	}
-
-	queue.SendMessage(prize_pool.TopicPrizePoolSolana, prizePoolUpdate)
+	// return the whole amount in the unit of that token
+	return big.NewRat(prizePool, 1)
 }
 
 func main() {
 	var (
-		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
-		fluidMintPubkey   = pubkeyFromEnv(EnvFluidityMintPubkey)
-		tvlDataPubkey     = pubkeyFromEnv(EnvTvlDataPubkey)
-		solendPubkey      = pubkeyFromEnv(EnvSolendPubkey)
-		obligationPubkey  = pubkeyFromEnv(EnvObligationPubkey)
-		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
-		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
-		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
-		payerPrikey       = util.GetEnvOrFatal(EnvPayerPrikey)
-		solanaRpcUrl      = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		updateInterval    = util.GetEnvOrFatal(EnvUpdateInterval)
+		fluidityPubkey = pubkeyFromEnv(EnvFluidityPubkey)
+		tvlDataPubkey  = pubkeyFromEnv(EnvTvlDataPubkey)
+		solendPubkey   = pubkeyFromEnv(EnvSolendPubkey)
+		payerPrikey    = util.GetEnvOrFatal(EnvPayerPrikey)
+		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		updateInterval = util.GetEnvOrFatal(EnvUpdateInterval)
+		tokensList_    = util.GetEnvOrFatal(EnvTokensList)
 	)
+
+	// tokensList will Fatal if bad input
+	tokenDetails := getTokensList(tokensList_)
+
+	rpcClient := solanaRpc.New(solanaRpcUrl)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 
@@ -130,28 +121,117 @@ func main() {
 	interval, err := time.ParseDuration(updateInterval)
 
 	if err != nil {
-	    log.Fatal(func (k *log.Log) {
-	        k.Message = "Failed to read update interval!"
-	        k.Payload = err
-	    })
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to read update interval!"
+			k.Payload = err
+		})
+	}
+
+	var (
+		workChan = make(chan TokenDetails, 0)
+		doneChan = make(chan TokenDetails, 0)
+	)
+
+	for i := 0; i < WorkerPoolAmount; i++ {
+		go func() {
+			for work := range workChan {
+
+				var (
+					fluidMintPubkey   = work.fluidMintPubkey
+					obligationPubkey  = work.obligationPubkey
+					reservePubkey     = work.reservePubkey
+					pythPubkey        = work.pythPubkey
+					switchboardPubkey = work.switchboardPubkey
+					decimalsRat       = work.tokenDecimals
+				)
+
+				prizePool := getPrizePool(
+					solanaRpcUrl,
+					fluidityPubkey,
+					fluidMintPubkey,
+					tvlDataPubkey,
+					solendPubkey,
+					obligationPubkey,
+					reservePubkey,
+					pythPubkey,
+					switchboardPubkey,
+					payer,
+				)
+
+				// get the token price from Pyth
+				tokenPrice, err := pyth.GetPrice(rpcClient, pythPubkey)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to get token price for token with mint %v: %v",
+							fluidMintPubkey,
+							err,
+						)
+					})
+				}
+
+				// adjust for decimals
+				prizePoolAdjusted := prizePool.Quo(prizePool, decimalsRat)
+
+				// multiply the token price with the exchange rate to get it in USD...
+				prizePoolAdjusted.Mul(prizePoolAdjusted, tokenPrice)
+
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Prize pool: %v, token price: %v",
+						prizePoolAdjusted.FloatString(10),
+						tokenPrice.FloatString(10),
+					)
+				})
+
+				prizePoolFloat, _ := prizePoolAdjusted.Float64()
+
+				tokenDetailsComplete := TokenDetails{
+					fluidMintPubkey:   fluidMintPubkey,
+					obligationPubkey:  obligationPubkey,
+					reservePubkey:     reservePubkey,
+					pythPubkey:        pythPubkey,
+					switchboardPubkey: switchboardPubkey,
+					tokenDecimals:     decimalsRat,
+					amount:            prizePoolFloat,
+				}
+
+				doneChan <- tokenDetailsComplete
+			}
+		}()
 	}
 
 	timer := time.NewTicker(interval)
 
 	for {
 		select {
-		case <- timer.C:
-			updatePrizePool(
-				solanaRpcUrl,
-				fluidityPubkey,
-				fluidMintPubkey,
-				tvlDataPubkey,
-				solendPubkey,
-				obligationPubkey,
-				reservePubkey,
-				pythPubkey,
-				switchboardPubkey,
-				payer,
+		case <-timer.C:
+			var amount float64
+			// fetch amount for each token
+			for _, tokenDetail := range tokenDetails {
+				workChan <- tokenDetail
+			}
+
+			// aggregate results
+			for range tokenDetails {
+				tokenDetails := <-doneChan
+				amount += tokenDetails.amount
+			}
+
+			prizePool := prize_pool_queue.PrizePool{
+				Network:     string(network.NetworkSolana),
+				Amount:      amount,
+				LastUpdated: time.Now(),
+			}
+
+			log.Debug(func(k *log.Log) {
+				k.Format("Publishing aggregated prize pool: %v", amount)
+			})
+
+			queue.SendMessage(
+				prize_pool_queue.TopicPrizePoolSolana,
+				prizePool,
 			)
 		}
 	}

@@ -1,11 +1,10 @@
 package probability
 
 import (
-	"fmt"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 const (
@@ -42,7 +41,7 @@ func probability(m, n, b int64) *big.Rat {
 }
 
 // A / p(b)
-func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, crumb *breadcrumb.Breadcrumb) *big.Rat {
+func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, emission *worker.Emission) *big.Rat {
 
 	blockTimeRat := new(big.Rat).SetUint64(blockTime)
 
@@ -72,33 +71,30 @@ func payout(atx, apy, g, rewardPool *big.Rat, m, n, b int64, blockTime uint64, c
 
 	p := probability(m, n, b)
 
-	crumb.Set(func(k *breadcrumb.Breadcrumb) {
-		k.Many(map[string]interface{}{
-			"p":           p.FloatString(10),
-			"a":           a.FloatString(10),
-			"m":           m,
-			"g":           g.FloatString(10),
-			"b":           b,
-			"delta":       delta.FloatString(10),
-			"apy + delta": apyPlusDelta.FloatString(10),
-			"atx":         atx.FloatString(10),
-			"apy":         apy.FloatString(10),
-			"bpy for staked usd inside payout function": apy.FloatString(10),
-			"block time":  blockTime,
-			"reward pool": rewardPool.FloatString(10),
-		})
-	})
-
 	// a / p
 	aDivP := new(big.Rat).Mul(
 		a,
 		p.Inv(p),
 	)
 
+	emission.Payout.Winnings, _ = aDivP.Float64()
+	emission.Payout.P, _ = p.Float64()
+	emission.Payout.A, _ = a.Float64()
+	emission.Payout.M = m
+	emission.Payout.G, _ = g.Float64()
+	emission.Payout.B = b
+	emission.Payout.Delta, _ = delta.Float64()
+	emission.Payout.ApyPlusDelta, _ = apyPlusDelta.Float64()
+	emission.Payout.Atx, _ = atx.Float64()
+	emission.Payout.Apy, _ = apy.Float64()
+	emission.Payout.BpyForStakedUsd, _ = apy.Float64()
+	emission.Payout.BlockTime = blockTime
+	emission.Payout.RewardPool, _ = rewardPool.Float64()
+
 	return aDivP
 }
 
-func calculateN(m int64, g, atx *big.Rat, crumb *breadcrumb.Breadcrumb) int64 {
+func calculateN(m int64, g, atx *big.Rat, emission *worker.Emission) int64 {
 	n := int64(m + 1)
 
 	var (
@@ -111,12 +107,8 @@ func calculateN(m int64, g, atx *big.Rat, crumb *breadcrumb.Breadcrumb) int64 {
 
 	probabilityM := new(big.Rat).Mul(atx, factorial)
 
-	crumb.Set(func(k *breadcrumb.Breadcrumb) {
-		k.Many(map[string]interface{}{
-			"calculateN->probabilityM": probabilityM.FloatString(10),
-			"calculateN->factorial":    atx.FloatString(10),
-		})
-	})
+	emission.CalculateN.ProbabilityM, _ = probabilityM.Float64()
+	emission.CalculateN.Factorial, _ = atx.Float64()
 
 	p := new(big.Rat).Mul(
 		big.NewRat(1, 4), // 1/4
@@ -141,25 +133,21 @@ func calculateN(m int64, g, atx *big.Rat, crumb *breadcrumb.Breadcrumb) int64 {
 
 	n = n - 1
 
-	crumb.Set(func(k *breadcrumb.Breadcrumb) {
-		k.Many(map[string]interface{}{
-			"calculate N atx":    atx.FloatString(10),
-			"n after calculateN": n,
-		})
-	})
+	emission.CalculateN.Atx, _ = atx.Float64()
+	emission.CalculateN.N = n
 
 	return n
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat *big.Rat, averageTransfersInBlock int, blockTimeInSeconds uint64, crumb *breadcrumb.Breadcrumb) (uint, []*misc.BigInt) {
+func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat *big.Rat, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (uint, []*misc.BigInt) {
 
 	var (
 		averageTransfersInBlock_ = intToRat(averageTransfersInBlock)
 		winningClasses           = int64(WinningClasses)
 	)
 
-	n := calculateN(winningClasses, gasFee, atx, crumb)
+	n := calculateN(winningClasses, gasFee, atx, emission)
 
 	payouts := make([]*misc.BigInt, 0)
 
@@ -174,7 +162,7 @@ func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat *big
 			n,
 			i,
 			blockTimeInSeconds,
-			crumb,
+			emission,
 		)
 
 		// this is the payout that a user would receive! due to the way that
@@ -184,42 +172,19 @@ func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat *big
 
 		leftSide := new(big.Int).Quo(payout.Num(), payout.Denom())
 
-		changed := new(big.Rat).Quo(payout, decimalPlacesRat)
-
-		crumb.Set(func(k *breadcrumb.Breadcrumb) {
-			payoutKey := fmt.Sprintf("payout number %v", i)
-
-			payoutMessage := fmt.Sprintf(
-				"payout %v = %v : %v",
-				i,
-				payout.FloatString(10),
-				leftSide.String(),
-			)
-
-			changedKey := fmt.Sprintf("payout adjusted to appear normal %v", i)
-
-			k.One(payoutKey, payoutMessage)
-
-			k.One(changedKey, changed.FloatString(10))
-		})
-
 		payoutBigInt := misc.NewBigInt(*leftSide)
 		payouts = append(payouts, &payoutBigInt)
 	}
 
-	crumb.Set(func(k *breadcrumb.Breadcrumb) {
-		k.One("atx at end", atx.FloatString(10))
-	})
+	emission.WinningChances.AtxAtEnd, _ = atx.Float64()
 
 	return uint(n), payouts
 }
 
 // NaiveIsWinning examines the random numbers we drew and determines if we won
-func NaiveIsWinning(balls []uint32, crumb *breadcrumb.Breadcrumb) int {
+func NaiveIsWinning(balls []uint32, emission *worker.Emission) int {
 
-	crumb.Set(func(k *breadcrumb.Breadcrumb) {
-		k.One("testing balls", balls)
-	})
+	emission.NaiveIsWinning.TestingBalls = balls
 
 	matchedBalls := 0
 
