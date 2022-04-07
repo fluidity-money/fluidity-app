@@ -4,14 +4,19 @@ import React from "react";
 interface TokenSearchProps {
   setTokenListState: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
   tokenList: TokenList["kind"];
+  resetLists: () => void;
 }
 
-const TokenSearch = ({ setTokenListState, tokenList }: TokenSearchProps) => {
+const TokenSearch = ({
+  setTokenListState,
+  tokenList,
+  resetLists,
+}: TokenSearchProps) => {
   const [searchInput, setSearchInput] = React.useState<string>("");
 
   const filterTokens = (text: string) => {
     // if text is empty full array
-    if (text === "") setTokenListState(tokenList);
+    if (text === "") resetLists();
     // if token match filter
     // if no match empty array
     else {
@@ -38,6 +43,12 @@ const TokenSearch = ({ setTokenListState, tokenList }: TokenSearchProps) => {
         onChange={(text: React.FormEvent<HTMLInputElement>) => {
           setSearchInput(text.currentTarget.value);
           filterTokens(text.currentTarget.value);
+        }}
+        onKeyDown={(text: any) => {
+          //REMOVE ANY ================================================
+          if (text.keyCode === 8) {
+            resetLists();
+          }
         }}
         value={searchInput}
       />

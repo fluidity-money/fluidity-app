@@ -9,14 +9,22 @@ import PinnedToken from "./PinnedToken";
 
 const TokenSelection = ({
   tokenList,
+  setTokenList,
+  pinnedTokenList,
   type,
   changePinned,
+  changeOtherPinned,
   resetLists,
+  update,
 }: {
   tokenList: TokenList["kind"];
+  setTokenList: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
+  pinnedTokenList: TokenList["kind"];
   type: string;
   changePinned: (token: string) => void;
+  changeOtherPinned: (token: TokenKind) => void;
   resetLists: () => void;
+  update: () => void;
 }) => {
   const [toggleFrom, togglerFrom] = useContext(modalToggle).toggleFrom;
   const [toggleTo, togglerTo] = useContext(modalToggle).toggleTo;
@@ -25,21 +33,23 @@ const TokenSelection = ({
   const [tokenListState, setTokenListState] = useState<TokenList["kind"]>([]);
 
   useEffect(() => {
-    setForButtons(type);
+    // setForButtons(type);
+    // resetLists();
+    console.log(pinnedTokenList);
   }, [type]);
 
-  const setForButtons = (type: string) => {
-    switch (type) {
-      case "token":
-        setTokenListState(tokenList);
-        return;
-      case "fluid":
-        setTokenListState(tokenList);
-        return;
-      default:
-        console.log("err");
-    }
-  };
+  // const setForButtons = (type: string) => {
+  //   switch (type) {
+  //     case "token":
+  //       setTokenList(tokenList);
+  //       return;
+  //     case "fluid":
+  //       setTokenList(tokenList);
+  //       return;
+  //     default:
+  //       console.log("err");
+  //   }
+  // };
 
   const setToken = (type: string, value: TokenKind["symbol"]) => {
     switch (type) {
@@ -56,7 +66,7 @@ const TokenSelection = ({
     }
   };
 
-  const renderedTokenSet = tokenListState.map((token, index) => {
+  const renderedTokenSet = tokenList.map((token, index) => {
     return (
       <div className="token-list-item">
         <Button
@@ -76,12 +86,15 @@ const TokenSelection = ({
           goto={() => {
             setToken(type, token.symbol);
             resetLists();
-            setForButtons(type);
+            // setForButtons(type);
           }}
         />
         <img
           className="pin-icon"
-          onClick={() => changePinned(token.symbol)}
+          onClick={() => {
+            changePinned(token.symbol);
+            changeOtherPinned(token);
+          }}
           src={token?.pinned ? "img/pinnedIcon.svg" : "img/pinIcon.svg"}
           alt="pin"
         />
@@ -99,14 +112,15 @@ const TokenSelection = ({
       <div className="connect-modal-body">
         <h2 className="primary-text">Select a Token</h2>
         <TokenSearch
-          setTokenListState={setTokenListState}
+          setTokenListState={setTokenList}
           tokenList={tokenList}
+          resetLists={resetLists}
         />
         <div className="pinned-tokens">
-          {tokenList
-            .sort(function (x: { pinned: boolean }, y: { pinned: boolean }) {
-              return x.pinned === y.pinned ? 0 : x.pinned ? -1 : 1;
-            })
+          {pinnedTokenList
+            // .sort(function (x: { pinned: boolean }, y: { pinned: boolean }) {
+            //   return x.pinned === y.pinned ? 0 : x.pinned ? -1 : 1;
+            // })
             .map(
               (token: TokenKind, index: number) =>
                 token.pinned && (
@@ -114,10 +128,11 @@ const TokenSelection = ({
                     key={index}
                     token={token}
                     changePinned={changePinned}
+                    changeOtherPinned={changeOtherPinned}
                     setTokenHandler={() => {
                       setToken(type, token.symbol);
                       resetLists();
-                      setForButtons(type);
+                      // setForButtons(type);
                     }}
                   />
                 )
@@ -130,7 +145,7 @@ const TokenSelection = ({
           }}
         />
         <div className="connect-modal-form token-list">
-          {tokenListState.length ? (
+          {tokenList.length ? (
             renderedTokenSet
           ) : (
             <>
