@@ -19,7 +19,7 @@ const navbarItems : [string, string][] = [
 export type NetworkInputOptions = typeof networkInputOptions
 const networkInputOptions =
 {
-  "ethereum": [ "Ethereum Ropsten", "0x0000000000000000000000000000", ["fUSDT", "fUSDC", "fDAI"] ],
+  "ethereum": [ "Ethereum Ropsten", "0x0000000000000000000000000000", ["fUSDC", "fDAI"] ],
   "solana": [ "Solana Devnet", "5qUccmFqGdFcTQprrVeRdCGy9sGB2TzTKv2KKMStG9kG", ["fUSDC", "fUSDT"] ]
 } as const;
 
