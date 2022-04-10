@@ -14,18 +14,32 @@ const TokenSelection = ({
   type,
   changePinned,
   resetLists,
+  sortPinned,
 }: {
   tokenList: TokenList["kind"];
   pinnedList: TokenList["kind"];
   setTokenList: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
   type: string;
-  changePinned: (token: string) => void;
+  changePinned: (token: TokenKind) => void;
   resetLists: () => void;
+  sortPinned: (token: TokenKind) => void;
 }) => {
   const [toggleFrom, togglerFrom] = useContext(modalToggle).toggleFrom;
   const [toggleTo, togglerTo] = useContext(modalToggle).toggleTo;
   const setterToken = useContext(modalToggle).selectedToken[1];
   const setterFluidToken = useContext(modalToggle).selectedFluidToken[1];
+
+  function useForceUpdate() {
+    const [value, setValue] = useState(0); // integer state
+    return () => setValue((value) => value + 1); // update the state to force render
+  }
+
+  const forceUpdate = useForceUpdate();
+
+  // useEffect(() => {
+  //   forceUpdate();
+  //   console.log("rerendered");
+  // }, [tokenList]);
 
   const setToken = (type: string, value: TokenKind["symbol"]) => {
     switch (type) {
@@ -68,7 +82,8 @@ const TokenSelection = ({
         <img
           className="pin-icon"
           onClick={() => {
-            changePinned(token.symbol);
+            changePinned(token);
+            sortPinned(token);
           }}
           src={token?.pinned ? "img/pinnedIcon.svg" : "img/pinIcon.svg"}
           alt="pin"
@@ -103,6 +118,7 @@ const TokenSelection = ({
                     key={index}
                     token={token}
                     changePinned={changePinned}
+                    sortPinned={sortPinned}
                     setTokenHandler={() => {
                       setToken(type, token.symbol);
                       resetLists();

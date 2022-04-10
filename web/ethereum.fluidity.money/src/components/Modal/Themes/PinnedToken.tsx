@@ -2,13 +2,15 @@ import { TokenKind } from "components/types";
 
 interface PinnedTokenProps {
   token: TokenKind;
-  changePinned: (token: string) => void;
+  changePinned: (token: TokenKind) => void;
+  sortPinned: (toke: TokenKind) => void;
   setTokenHandler: () => void;
 }
 
 const PinnedToken = ({
   token,
   changePinned,
+  sortPinned,
   setTokenHandler,
 }: PinnedTokenProps) => {
   return (
@@ -28,7 +30,8 @@ const PinnedToken = ({
           src="img/close-button.svg"
           alt="x"
           onClick={() => {
-            changePinned(token.symbol);
+            changePinned(token);
+            sortPinned(token);
           }}
         />
       </div>

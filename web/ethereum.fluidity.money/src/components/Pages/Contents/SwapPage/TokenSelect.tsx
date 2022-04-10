@@ -15,9 +15,17 @@ import { SupportedFluidContracts } from "util/contractList";
 const TokenSelect = ({
   type,
   toggle,
+  pinnedTokens,
+  pinnedFluidTokens,
+  sortPinned,
+  sortPinnedFluid,
 }: {
   type: string;
   toggle?: () => void;
+  pinnedTokens?: TokenList["kind"];
+  pinnedFluidTokens?: TokenList["kind"];
+  sortPinned?: (token: TokenKind) => void;
+  sortPinnedFluid?: (token: TokenKind) => void;
 }) => {
   const [selectedToken] = useContext(modalToggle).selectedToken;
   const [selectedFluidToken] = useContext(modalToggle).selectedFluidToken;
@@ -40,13 +48,60 @@ const TokenSelect = ({
     data.slice(data.length / 2, data.length)
   );
 
-  const [pinnedTokens, setPinnedTokens] = useState(
-    data.slice(0, data.length / 2)
-  );
+  // const [pinnedTokens, setPinnedTokens] = useState(
+  //   data.slice(0, data.length / 2)
+  // );
 
-  const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
-    data.slice(data.length / 2, data.length)
-  );
+  // const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
+  //   data.slice(data.length / 2, data.length)
+  // );
+
+  // const sortPinned = (token: TokenKind) => {
+  //   setPinnedTokens(
+  //     pinnedTokens.sort((y, x) => {
+  //       return x.symbol === token.symbol
+  //         ? -1
+  //         : y.symbol === token.symbol
+  //         ? 1
+  //         : 0;
+  //     })
+  //   );
+  //   setPinnedFluidTokens(
+  //     pinnedFluidTokens.sort((y, x) => {
+  //       console.log(x.symbol, `f${token.symbol}`);
+  //       return x.symbol === `f${token.symbol}`
+  //         ? -1
+  //         : y.symbol === `f${token.symbol}`
+  //         ? 1
+  //         : 0;
+  //     })
+  //   );
+  //   console.log("PT", pinnedTokens);
+  //   console.log("PFT", pinnedFluidTokens);
+  // };
+
+  // const sortPinnedFluid = (token: TokenKind) => {
+  //   setPinnedFluidTokens(
+  //     pinnedFluidTokens.sort((y, x) => {
+  //       return x.symbol === token.symbol
+  //         ? -1
+  //         : y.symbol === token.symbol
+  //         ? 1
+  //         : 0;
+  //     })
+  //   );
+  //   setPinnedTokens(
+  //     pinnedTokens.sort((y, x) => {
+  //       return x.symbol === token.symbol.substring(1)
+  //         ? -1
+  //         : y.symbol === token.symbol.substring(1)
+  //         ? 1
+  //         : 0;
+  //     })
+  //   );
+  //   console.log("PT", pinnedTokens);
+  //   console.log("PFT", pinnedFluidTokens);
+  // };
 
   useEffect(() => {
     wallet.status === "connected" && getAmounts();
@@ -104,34 +159,36 @@ const TokenSelect = ({
     }
   };
 
-  const changePinned = (token: string) => {
+  const changePinned = (token: TokenKind) => {
     setTokens((previousState: TokenList["kind"]) =>
       [...previousState]?.map((item) =>
-        item.symbol === token
+        item.symbol === token.symbol
           ? Object.assign(item, { pinned: !item.pinned })
           : item
       )
     );
     setFluidTokens((previousState: TokenList["kind"]) =>
       [...previousState]?.map((item) =>
-        item.symbol === `f${token}`
+        item.symbol === `f${token.symbol}`
           ? Object.assign(item, { pinned: !item.pinned })
           : item
       )
     );
+    // setPinnedTokens((pinnedTokens) => [...pinnedTokens, token]);
+    // setPinnedFluidTokens((pinnedFluidTokens) => [...pinnedFluidTokens, token]);
   };
 
-  const changePinnedFluid = (token: string) => {
+  const changePinnedFluid = (token: TokenKind) => {
     setTokens((previousState: TokenList["kind"]) =>
       [...previousState]?.map((item) =>
-        item.symbol === token.substring(1)
+        item.symbol === token.symbol.substring(1)
           ? Object.assign(item, { pinned: !item.pinned })
           : item
       )
     );
     setFluidTokens((previousState: TokenList["kind"]) =>
       [...previousState]?.map((item) =>
-        item.symbol === token
+        item.symbol === token.symbol
           ? Object.assign(item, { pinned: !item.pinned })
           : item
       )
@@ -157,11 +214,12 @@ const TokenSelect = ({
           />
           <TokenSelection
             tokenList={tokens}
-            pinnedList={pinnedTokens}
+            pinnedList={pinnedTokens ? pinnedTokens : []}
             setTokenList={setTokens}
             type={type}
             changePinned={changePinned}
             resetLists={resetLists}
+            sortPinned={sortPinned ? sortPinned : () => {}}
           />
         </div>
       );
@@ -178,11 +236,12 @@ const TokenSelect = ({
           />
           <TokenSelection
             tokenList={fluidTokens}
-            pinnedList={pinnedFluidTokens}
+            pinnedList={pinnedFluidTokens ? pinnedFluidTokens : []}
             setTokenList={setFluidTokens}
             type={type}
             changePinned={changePinnedFluid}
             resetLists={resetLists}
+            sortPinned={sortPinnedFluid ? sortPinnedFluid : () => {}}
           />
         </div>
       );
