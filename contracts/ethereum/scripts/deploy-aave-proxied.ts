@@ -11,110 +11,66 @@ const readQuestion = (prompt: string) =>
   new Promise<string>(resolve => rlInterface.question(prompt, resolve));
 
 const ENV_ORACLE = `FLU_ETHEREUM_ORACLE_ADDRESS`;
+const ENV_AAVE_ATOKEN_ADDRESS = `FLU_ETHEREUM_AAVE_ATOKEN_ADDRESS`;
+const ENV_AAVE_ADDRESS_PROVIDER_ADDRESS = `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDRESS`;
+const ENV_AAVE_DECIMALS = `FLU_ETHEREUM_AAVE_DECIMALS`;
+const ENV_UNDERLYING_TOKEN_NAME = `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`;
+const ENV_UNDERLYING_SYMBOL = `FLU_ETHEREUM_UNDERLYING_SYMBOL`;
 
-const oracleAddress = process.env[ENV_ORACLE]!;
+const errorIfMissing(envName: string): string => {
+  const env = process.env[envName]!;
 
-if (!oracleAddress) {
-  console.error("FLU_ETHEREUM_ORACLE_ADDRESS not set!");
-  process.exit(1);
-}
-
-const erc20Abi = [
-  'function name() returns (string)',
-  'function symbol() returns (string)',
-  'function decimals() returns (uint8)',
-];
-
-const compoundAbi = [
-  ...erc20Abi,
-  'function underlying() returns (address)',
-];
-
-export const automaticDeploy = async (
-  cSymbol: string,
-) => {
-  const symbol = `f${cSymbol}`;
-  const longName = `Fluid ${cSymbol}`;
-
-  const compoundPath = `./scripts/compound/${hre.network.name}.json`;
-  const compoundFile = await readFile(compoundPath)
-    .then(res => JSON.parse('' + res))
-    .catch(e => {
-      if (e.code === `ENOENT`) {
-        console.error(`could not find file '${compoundPath}'`);
-        process.exit(1);
-      }
-      throw e;
-    });
-
-  const compoundAddress = compoundFile['Contracts'][`c${cSymbol}`] as string;
-
-  if (!compoundAddress) {
-    console.error(`could not find token c${cSymbol}`);
+  if (env == "") {
+    console.error(`${envName} not set!`);
     process.exit(1);
   }
 
-  if (!compoundFile['Contracts'][cSymbol])
-    console.warn(`underlying token ${cSymbol} doesn't exist in the compound file...`);
+  return env;
+}:
 
-  await deployToken(symbol, longName, compoundAddress);
-};
+const oracleAddress = errorIfMissing(ENV_ORACLE);
+const aaveAtokenAddress = errorIfMissing(ENV_AAVE_ATOKEN_ADDRESS);
+const aaveAddressProviderAddress = errorIfMissing(ENV_AAVE_ADDRESS_PROVIDER_ADDRESS);
+const aaveDecimals = errorIfMissing(ENV_AAVE_DECIMALS);
+const underlyingTokenName = errorIfMissing(ENV_UNDERLYING_TOKEN_NAME);
+const underlyingSymbol = errorIfMissing(ENV_UNDERLYING_SYMBOL);
 
 export const deployToken = async (
   symbol: string,
   longName: string,
-  compoundAddress: string,
+  decimals: number,
+  aaveAtokenAddress: string,
+  aaveAddressProviderAddress: string
 ) => {
   const [signer] = await ethers.getSigners();
-  const Token = await ethers.getContractFactory("TokenCompound");
-
-  const compoundTokenERC20 = new hre.ethers.Contract(
-    compoundAddress,
-    compoundAbi,
-    signer,
-  );
-  const compoundName = await compoundTokenERC20.callStatic.name();
-  const compoundSymbol = await compoundTokenERC20.callStatic.symbol();
-
-  let underlying;
-  try {
-    underlying = await compoundTokenERC20.callStatic.underlying();
-  } catch {
-    console.error(`failed to get the underlying token!`);
-    console.error(`this usually means the token you passed isn't a compound token`);
-    console.error(`(you passed ${compoundAddress}, which is ${compoundName} (${compoundSymbol}))`);
-    process.exit(1);
-  }
-
-  const underlyingERC20 = new hre.ethers.Contract(
-    underlying,
-    erc20Abi,
-    signer,
-  );
-  const underlyingName = await underlyingERC20.callStatic.name();
-  const underlyingSymbol = await underlyingERC20.callStatic.symbol();
-  const underlyingDecimals = await underlyingERC20.callStatic.decimals();
-
-  console.warn(`deploying ${longName} (${symbol})`);
-  console.warn(`for compound token ${compoundName} (${compoundSymbol})`);
-  console.warn(`with underlying token ${underlyingName} (${underlyingSymbol})`);
-
-  const continueResponse = await readQuestion("continue? [y/n] ");
-  if (continueResponse.toLowerCase() != 'y') {
-    process.exit(0);
-  }
+  const Token = await ethers.getContractFactory("TokenAave");
 
   const token = await upgrades.deployProxy(
     Token,
-    [compoundAddress, underlyingDecimals, longName, symbol, oracleAddress],
+    [
+      aaveATtokenAddress,
+      aaveAddressProviderAddress,
+      decimals,
+      longName,
+      symbol,
+      oracleAddress
+    ]
   );
 
   await token.deployed();
+
   console.warn(`Token for ${symbol} deployed at ${token.address}`);
 };
 
 const main = async () =>
-  automaticDeploy(process.env.FLU_UNDERLYING_TOKEN_SYMBOL!);
+  deployToken(
+    aaveAtokenAddress,
+    aaveAddressProviderAddress,
+    aaveDecimals,
+    underlyingTokenName,
+    underlyingSymbol,
+    oracleAddress
+  );
 
 main()
   .then(() => process.exit(0))

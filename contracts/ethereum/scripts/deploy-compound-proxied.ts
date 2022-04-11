@@ -110,6 +110,7 @@ export const deployToken = async (
   );
 
   await token.deployed();
+
   console.warn(`Token for ${symbol} deployed at ${token.address}`);
 };
 
