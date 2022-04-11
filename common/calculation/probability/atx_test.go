@@ -8,10 +8,20 @@ import (
 )
 
 func TestCalculateAtx(t *testing.T) {
-	// zero case
+	// zero cases
 	result := CalculateAtx(10, 0)
 
 	expectedZero := big.NewRat(0, 1)
+	assert.Equal(t, 0, result.Cmp(expectedZero))
+
+	result = CalculateAtx(0, 0)
+	assert.Equal(t, 0, result.Cmp(expectedZero))
+
+	result = CalculateAtx(0, 2)
+	assert.Equal(t, 0, result.Cmp(expectedZero))
+
+	// negative
+	result = CalculateAtx(1, -1)
 	assert.Equal(t, 0, result.Cmp(expectedZero))
 
 	// blocks per year * no of transfers in a block
