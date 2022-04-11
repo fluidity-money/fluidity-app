@@ -11,12 +11,12 @@ const readFile = promisify(readFileCB);
 async function main() {
   const promises: Promise<void>[] = [];
   (await ethers.getSigners())
-    .forEach(signer => promises.push(makeTxn(signer)))
+    .forEach(signer => promises.push(makeTxn(signer).catch(console.log)))
   return Promise.allSettled(promises);
 }
 async function makeTxn(testAccount: SignerWithAddress) {
   const IERC20 = await readFile('./artifacts/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol/IERC20Upgradeable.json').then(res => JSON.parse('' + res)).catch(e => console.log(e));
-    const token = (await ethers.getContractFactory("TokenCompound"))
+    const token = (await ethers.getContractFactory("Token"))
       .attach(USUAL_FUSDT_ADDR)
       .connect(testAccount);
     const impersonatedUsdt = new ethers.Contract(

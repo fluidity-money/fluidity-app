@@ -119,8 +119,13 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
   await hre.run("forknet:take-usdt");
 
-  const factoryCompound = await hre.ethers.getContractFactory("TokenCompound");
-  const factoryAave = await hre.ethers.getContractFactory("TokenAave");
+  const tokenFactory = await hre.ethers.getContractFactory("Token");
+  const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
+  const aaveFactory = await hre.ethers.getContractFactory("AaveLiquidityProvider");
+
+  const tokenBeacon = await hre.upgrades.deployBeacon(tokenFactory);
+  const compoundBeacon = await hre.upgrades.deployBeacon(compoundFactory);
+  const aaveBeacon = await hre.upgrades.deployBeacon(aaveFactory);
 
   const deployTokens = async <T extends keyof typeof TokenList>(tokenNames: T[]) => {
     const tokens = tokenNames.map(t => TokenList[t])
@@ -128,31 +133,27 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     for (const token of tokens) {
       console.log(`deploying ${token.name}`);
 
-      var deployedToken: ethers.Contract;
+      var deployedPool: ethers.Contract
+      const deployedToken = await hre.upgrades.deployBeaconProxy(
+        tokenBeacon,
+        tokenFactory,
+      );
 
       switch (token.backend) {
         case 'compound':
-          deployedToken = await hre.upgrades.deployProxy(
-            factoryCompound,
-            [
-              token.compoundAddress,
-              token.decimals,
-              token.name,
-              token.symbol,
-              oracleAddress
-            ]
+          deployedPool = await hre.upgrades.deployBeaconProxy(
+            compoundBeacon,
+            compoundFactory,
+            [token.compoundAddress, deployedToken.address],
           );
 
           break;
 
         case 'aave':
-          deployedToken = await hre.upgrades.deployProxy(
-            factoryAave,
-            [
-              token.aaveAddress,
-              AAVE_POOL_PROVIDER_ADDR,
-              token.decimals, token.name, token.symbol, oracleAddress
-            ]
+          deployedPool = await hre.upgrades.deployBeaconProxy(
+            aaveBeacon,
+            aaveFactory,
+            [AAVE_POOL_PROVIDER_ADDR, token.aaveAddress, deployedToken.address],
           );
 
           break;
@@ -162,7 +163,15 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
       }
 
+      await deployedPool.deployed();
       await deployedToken.deployed();
+      await deployedToken.functions.__TokenBase_init(
+        deployedPool.address,
+        token.decimals,
+        token.name,
+        token.symbol,
+        oracleAddress,
+      );
 
       console.log(`deployed ${token.name} to ${deployedToken.address}`);
     }

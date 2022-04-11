@@ -7,7 +7,7 @@ import {USUAL_FUSDT_ADDR} from '../test-constants';
 async function main() {
   const [from, to] = (await ethers.getSigners())
 
-  const token = (await ethers.getContractFactory("TokenCompound"))
+  const token = (await ethers.getContractFactory("Token"))
     .attach(USUAL_FUSDT_ADDR)
     .connect(from);
 

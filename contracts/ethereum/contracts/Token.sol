@@ -6,8 +6,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "./LiquidityProvider.sol";
 
-abstract contract TokenBase is Initializable, ERC20Upgradeable {
+contract Token is Initializable, ERC20Upgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
 
@@ -15,10 +16,9 @@ abstract contract TokenBase is Initializable, ERC20Upgradeable {
     event MintFluid(address indexed addr, uint indexed amount);
     event BurnFluid(address indexed addr, uint indexed amount);
 
-    address rngOracle_;
+    LiquidityProvider pool_;
 
-    //CErc20Interface compoundToken_;
-    IERC20Upgradeable underlying_;
+    address rngOracle_;
 
     uint8 decimals_;
 
@@ -29,23 +29,20 @@ abstract contract TokenBase is Initializable, ERC20Upgradeable {
     // we pass in the metadata explicitly instead of sourcing from the underlying
     // token because some underlying tokens don't implement these methods
     function __TokenBase_init(
-        address _underlying,
+        address _liquidityProvider,
         uint8 _decimals,
         string memory _name,
         string memory _symbol,
         address _oracle
-    ) public onlyInitializing {
+    ) public initializer {
         __ERC20_init_unchained(_name, _symbol);
 
         rngOracle_ = _oracle;
 
-        //compoundToken_ = CErc20Interface(_compound);
-        //underlying_ = IERC20Upgradeable(compoundToken_.underlying());
-        underlying_ = IERC20Upgradeable(_underlying);
+        pool_ = LiquidityProvider(_liquidityProvider);
 
         // sanity check
-        underlying_.totalSupply();
-        //underlying_.safeApprove(address(compoundToken_), type(uint).max);
+        pool_.underlying_().totalSupply();
 
         decimals_ = _decimals;
     }
@@ -58,16 +55,17 @@ abstract contract TokenBase is Initializable, ERC20Upgradeable {
     // requires you to have `approve`d the tokens on the erc20 first
     function erc20In(uint amount) public returns (uint) {
         // take underlying tokens from the user
-        uint originalBalance = underlying_.balanceOf(address(this));
-        underlying_.safeTransferFrom(msg.sender, address(this), amount);
-        uint finalBalance = underlying_.balanceOf(address(this));
+        uint originalBalance = pool_.underlying_().balanceOf(address(this));
+        pool_.underlying_().safeTransferFrom(msg.sender, address(this), amount);
+        uint finalBalance = pool_.underlying_().balanceOf(address(this));
 
         // ensure we haven't overflowed
         require(finalBalance > originalBalance, "erc20in overflow");
         uint realAmount = finalBalance - originalBalance;
 
         // add the tokens to our compound pool
-        addToPool(realAmount);
+        pool_.underlying_().safeTransfer(address(pool_), realAmount);
+        pool_.addToPool(realAmount);
 
         // give the user fluid tokens
         _mint(msg.sender, realAmount);
@@ -81,14 +79,17 @@ abstract contract TokenBase is Initializable, ERC20Upgradeable {
         _burn(msg.sender, amount);
 
         // give them erc20
-        takeFromPool(amount);
+        pool_.takeFromPool(amount);
+        pool_.underlying_().safeTransfer(msg.sender, amount);
         emit BurnFluid(msg.sender, amount);
-        underlying_.safeTransfer(msg.sender, amount);
     }
 
-    function addToPool(uint amount) internal virtual;
-    function takeFromPool(uint amount) internal virtual;
-    function rewardPoolAmount() public virtual returns (uint);
+    function rewardPoolAmount() public returns (uint) {
+        uint totalAmount = pool_.totalPoolAmount();
+        uint totalFluid = totalSupply();
+        require(totalAmount >= totalFluid, "balance is less than total supply");
+        return totalAmount - totalFluid;
+    }
 
     function rewardFromPool(address to, uint amount) internal {
         // mint some fluid tokens from the interest we've accrued
