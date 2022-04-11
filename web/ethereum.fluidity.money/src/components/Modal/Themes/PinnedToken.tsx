@@ -3,7 +3,7 @@ import { TokenKind } from "components/types";
 interface PinnedTokenProps {
   token: TokenKind;
   changePinned: (token: TokenKind) => void;
-  sortPinned: (toke: TokenKind) => void;
+  sortPinned: ((token: TokenKind) => void) | undefined;
   setTokenHandler: () => void;
 }
 
@@ -31,7 +31,7 @@ const PinnedToken = ({
           alt="x"
           onClick={() => {
             changePinned(token);
-            sortPinned(token);
+            sortPinned && sortPinned(token);
           }}
         />
       </div>

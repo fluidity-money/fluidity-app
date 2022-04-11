@@ -59,10 +59,14 @@ const Button = ({
             <div className="token-list-item-info">
               <div className="token-list-item-names">
                 <div className={`${texttheme ?? ""}`}>{token?.name}</div>
-                <div className="label">{label}</div>
+                <div className="label">
+                  {token?.amount === "0.0"
+                    ? `${label}`
+                    : `${token?.amount} ${label}`}
+                </div>
               </div>
               <div className={`${texttheme ?? ""}`}>
-                {token ? token?.amount : "0"}
+                {token ? `$${Number(token?.amount).toFixed(2)}` : "0"}
               </div>
             </div>
           </>

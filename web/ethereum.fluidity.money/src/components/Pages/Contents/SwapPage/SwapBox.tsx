@@ -81,7 +81,6 @@ const SwapBox = () => {
     );
     setPinnedFluidTokens(
       pinnedFluidTokens.sort((y, x) => {
-        console.log(x.symbol, `f${token.symbol}`);
         return x.symbol === `f${token.symbol}`
           ? -1
           : y.symbol === `f${token.symbol}`
@@ -89,8 +88,6 @@ const SwapBox = () => {
           : 0;
       })
     );
-    console.log("PT", pinnedTokens);
-    console.log("PFT", pinnedFluidTokens);
   };
 
   const sortPinnedFluid = (token: TokenKind) => {
@@ -112,8 +109,6 @@ const SwapBox = () => {
           : 0;
       })
     );
-    console.log("PT", pinnedTokens);
-    console.log("PFT", pinnedFluidTokens);
   };
 
   // catches user amount input to ensure it's valid

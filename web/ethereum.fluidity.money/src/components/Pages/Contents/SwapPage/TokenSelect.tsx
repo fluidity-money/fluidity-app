@@ -48,61 +48,6 @@ const TokenSelect = ({
     data.slice(data.length / 2, data.length)
   );
 
-  // const [pinnedTokens, setPinnedTokens] = useState(
-  //   data.slice(0, data.length / 2)
-  // );
-
-  // const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
-  //   data.slice(data.length / 2, data.length)
-  // );
-
-  // const sortPinned = (token: TokenKind) => {
-  //   setPinnedTokens(
-  //     pinnedTokens.sort((y, x) => {
-  //       return x.symbol === token.symbol
-  //         ? -1
-  //         : y.symbol === token.symbol
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  //   setPinnedFluidTokens(
-  //     pinnedFluidTokens.sort((y, x) => {
-  //       console.log(x.symbol, `f${token.symbol}`);
-  //       return x.symbol === `f${token.symbol}`
-  //         ? -1
-  //         : y.symbol === `f${token.symbol}`
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  //   console.log("PT", pinnedTokens);
-  //   console.log("PFT", pinnedFluidTokens);
-  // };
-
-  // const sortPinnedFluid = (token: TokenKind) => {
-  //   setPinnedFluidTokens(
-  //     pinnedFluidTokens.sort((y, x) => {
-  //       return x.symbol === token.symbol
-  //         ? -1
-  //         : y.symbol === token.symbol
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  //   setPinnedTokens(
-  //     pinnedTokens.sort((y, x) => {
-  //       return x.symbol === token.symbol.substring(1)
-  //         ? -1
-  //         : y.symbol === token.symbol.substring(1)
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  //   console.log("PT", pinnedTokens);
-  //   console.log("PFT", pinnedFluidTokens);
-  // };
-
   useEffect(() => {
     wallet.status === "connected" && getAmounts();
     wallet.status !== "connected" && resetAmounts();
@@ -174,8 +119,6 @@ const TokenSelect = ({
           : item
       )
     );
-    // setPinnedTokens((pinnedTokens) => [...pinnedTokens, token]);
-    // setPinnedFluidTokens((pinnedFluidTokens) => [...pinnedFluidTokens, token]);
   };
 
   const changePinnedFluid = (token: TokenKind) => {
@@ -214,12 +157,12 @@ const TokenSelect = ({
           />
           <TokenSelection
             tokenList={tokens}
-            pinnedList={pinnedTokens ? pinnedTokens : []}
+            pinnedList={pinnedTokens}
             setTokenList={setTokens}
             type={type}
             changePinned={changePinned}
             resetLists={resetLists}
-            sortPinned={sortPinned ? sortPinned : () => {}}
+            sortPinned={sortPinned}
           />
         </div>
       );
@@ -236,12 +179,12 @@ const TokenSelect = ({
           />
           <TokenSelection
             tokenList={fluidTokens}
-            pinnedList={pinnedFluidTokens ? pinnedFluidTokens : []}
+            pinnedList={pinnedFluidTokens}
             setTokenList={setFluidTokens}
             type={type}
             changePinned={changePinnedFluid}
             resetLists={resetLists}
-            sortPinned={sortPinnedFluid ? sortPinnedFluid : () => {}}
+            sortPinned={sortPinnedFluid}
           />
         </div>
       );

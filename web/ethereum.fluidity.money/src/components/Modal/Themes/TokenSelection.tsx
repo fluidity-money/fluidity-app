@@ -17,29 +17,17 @@ const TokenSelection = ({
   sortPinned,
 }: {
   tokenList: TokenList["kind"];
-  pinnedList: TokenList["kind"];
+  pinnedList: TokenList["kind"] | undefined;
   setTokenList: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
   type: string;
   changePinned: (token: TokenKind) => void;
   resetLists: () => void;
-  sortPinned: (token: TokenKind) => void;
+  sortPinned: ((token: TokenKind) => void) | undefined;
 }) => {
   const [toggleFrom, togglerFrom] = useContext(modalToggle).toggleFrom;
   const [toggleTo, togglerTo] = useContext(modalToggle).toggleTo;
   const setterToken = useContext(modalToggle).selectedToken[1];
   const setterFluidToken = useContext(modalToggle).selectedFluidToken[1];
-
-  function useForceUpdate() {
-    const [value, setValue] = useState(0); // integer state
-    return () => setValue((value) => value + 1); // update the state to force render
-  }
-
-  const forceUpdate = useForceUpdate();
-
-  // useEffect(() => {
-  //   forceUpdate();
-  //   console.log("rerendered");
-  // }, [tokenList]);
 
   const setToken = (type: string, value: TokenKind["symbol"]) => {
     switch (type) {
@@ -58,7 +46,7 @@ const TokenSelection = ({
 
   const renderedTokenSet = tokenList.map((token, index) => {
     return (
-      <div className="token-list-item">
+      <div className="token-list-item" key={`${index}${token}`}>
         <Button
           key={index}
           label={token.symbol}
@@ -76,14 +64,13 @@ const TokenSelection = ({
           goto={() => {
             setToken(type, token.symbol);
             resetLists();
-            // setForButtons(type);
           }}
         />
         <img
           className="pin-icon"
           onClick={() => {
             changePinned(token);
-            sortPinned(token);
+            sortPinned && sortPinned(token);
           }}
           src={token?.pinned ? "img/pinnedIcon.svg" : "img/pinIcon.svg"}
           alt="pin"
@@ -107,11 +94,8 @@ const TokenSelection = ({
           resetLists={resetLists}
         />
         <div className="pinned-tokens">
-          {pinnedList
-            // .sort(function (x: { pinned: boolean }, y: { pinned: boolean }) {
-            //   return x.pinned === y.pinned ? 0 : x.pinned ? -1 : 1;
-            // })
-            .map(
+          {pinnedList &&
+            pinnedList.map(
               (token: TokenKind, index: number) =>
                 token.pinned && (
                   <PinnedToken
@@ -122,7 +106,6 @@ const TokenSelection = ({
                     setTokenHandler={() => {
                       setToken(type, token.symbol);
                       resetLists();
-                      // setForButtons(type);
                     }}
                   />
                 )
