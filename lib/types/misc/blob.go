@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"strings"
 )
 
 // Blob is the internal representation of a byte array that's encoded as
