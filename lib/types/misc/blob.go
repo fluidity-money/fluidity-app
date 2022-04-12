@@ -25,10 +25,6 @@ func (blob *Blob) UnmarshalJSON(b []byte) (err error) {
 		)
 	}
 
-	if has0xPrefix(str) {
-		str = str[2:]
-	}
-
 	*blob, err = base64.StdEncoding.DecodeString(str)
 
 	if err != nil {
