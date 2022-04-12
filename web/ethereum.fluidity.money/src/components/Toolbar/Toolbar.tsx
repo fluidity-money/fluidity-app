@@ -1,5 +1,6 @@
 import React from "react";
 import { useEffect } from "react";
+import ChainId, {chainIdFromEnv, toChainId} from "util/chainId";
 
 // switchEthereumChain for Ropsten and Mainnet
 const changeNetwork = async () => {
@@ -16,7 +17,7 @@ const changeNetwork = async () => {
 
 const Toolbar = ({ children }: { children: JSX.Element }) => {
   const [desiredNetwork, setDesiredNetwork] = React.useState(true);
-  const [chainId, setChainId] = React.useState<string>();
+  const [chainId, setChainId] = React.useState<ChainId>(0);
 
   const handleNetworkSwitch = async () => {
     await changeNetwork();
@@ -28,34 +29,22 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
       const chain = await (window as any).ethereum.request({
         method: "eth_chainId",
       });
-      // chain is a string containing hex
-      // CHAIN_ID is a string containing base 10
-      if (
-        `${String(Number(chain))}` !==
-        `${String(Number(process.env.REACT_APP_CHAIN_ID))}`
-      ) {
-        setDesiredNetwork(false);
-        setChainId(chain.substring(2));
-      } else {
-        setDesiredNetwork(true);
-        setChainId(chain.substring(2));
-      }
+      const browserChain = toChainId(chain);
+      const envChain = chainIdFromEnv();
+
+      browserChain && setChainId(envChain);
+      setDesiredNetwork(browserChain === envChain);
     }
   };
 
   const updateOnNetworkChange = () => {
     if ((window as any).ethereum) {
       (window as any).ethereum.on("chainChanged", () => {
-        if (
-          `${(window as any).ethereum.chainId}` !==
-          `0x${process.env.REACT_APP_CHAIN_ID}`
-        ) {
-          setDesiredNetwork(false);
-          setChainId((window as any).ethereum.chainId.substring(2));
-        } else {
-          setDesiredNetwork(true);
-          setChainId((window as any).ethereum.chainId.substring(2));
-        }
+      const browserChain = toChainId((window as any)?.ethereum.chainId);
+      const envChain = chainIdFromEnv();
+
+      browserChain && setChainId(envChain);
+      setDesiredNetwork(browserChain === envChain);
       });
     }
   };
@@ -72,11 +61,11 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
         <div className="change-network-message">
           <div className="change-network-text">
             App network (
-            {process.env.REACT_APP_CHAIN_ID === `3`
+            {chainId === ChainId.Ropsten
               ? `Ethereum Ropsten`
-              : process.env.REACT_APP_CHAIN_ID === `1`
+              : chainId === ChainId.Mainnet
               ? `Ethereum Mainnet`
-              : process.env.REACT_APP_CHAIN_ID === `2a`
+              : chainId === ChainId.Kovan
               ? `Ethereum Kovan`
               : `Ethereum`}
             )

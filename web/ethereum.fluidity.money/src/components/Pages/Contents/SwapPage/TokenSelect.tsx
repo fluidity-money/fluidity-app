@@ -6,6 +6,7 @@ import { TokenKind } from "components/types";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
+import ChainId, {chainIdFromEnv} from "util/chainId";
 
 const TokenSelect = ({
   type,
@@ -18,12 +19,13 @@ const TokenSelect = ({
   const [selectedFluidToken] = useContext(modalToggle).selectedFluidToken;
 
   // Assigns the correct json file based on ChainId
+  const chainId = chainIdFromEnv();
   const data =
-    process.env.REACT_APP_CHAIN_ID === "3"
-      ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31337"
-      ? (testing as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "2a"
+    chainId === ChainId.Ropsten ?
+      (ropsten as TokenKind[]) :
+    chainId === ChainId.Hardhat ?
+      (testing as TokenKind[]) :
+    chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
 
