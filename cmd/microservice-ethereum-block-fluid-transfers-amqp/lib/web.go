@@ -63,10 +63,11 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 		var (
 			logBlockNumber   = log.BlockNumber
 			logIndex         = log.Index
-			transactionIndex = log.TxIndex
+			logTxIndex       = log.TxIndex
 			logData          = log.Data
 			blockHash        = log.BlockHash
 			address          = log.Address
+			txHash           = log.TxHash
 		)
 
 		blockNumber, err := bigIntFromPossiblyHex(logBlockNumber)
@@ -84,7 +85,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 		if err != nil {
 			return nil, fmt.Errorf(
 				"failed to convert an outside index (%#v) to a bigint: %v",
-				index,
+				logIndex,
 				err,
 			)
 		}
@@ -97,12 +98,12 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			topics[i] = types.Hash(topic)
 		}
 
-		txIndex, err := misc.BigIntFromString(transactionIndex)
+		txIndex, err := misc.BigIntFromString(logTxIndex)
 
 		if err != nil {
 			return nil, fmt.Errorf(
 				"failed to convert the transaction index (%#v) to a bigint: %v",
-				transactionIndex,
+				logTxIndex,
 				err,
 			)
 		}
@@ -114,7 +115,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			Topics:      topics,
 			Data:        data,
 			BlockNumber: *blockNumber,
-			TxHash:      types.Hash(transactionIndex),
+			TxHash:      types.Hash(txHash),
 			TxIndex:     *txIndex,
 			BlockHash:   types.Hash(blockHash),
 			Index:       *index,
