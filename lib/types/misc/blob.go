@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // Blob is the internal representation of a byte array that's encoded as
@@ -28,6 +29,10 @@ func (blob *Blob) UnmarshalJSON(b []byte) (err error) {
 	if has0xPrefix(str) {
 		str = str[2:]
 	}
+
+	padding := len(str) % 4
+
+	str += strings.Repeat("0", padding)
 
 	*blob, err = base64.StdEncoding.DecodeString(str)
 
