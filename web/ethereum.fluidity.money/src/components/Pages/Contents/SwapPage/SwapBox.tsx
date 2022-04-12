@@ -61,6 +61,56 @@ const SwapBox = () => {
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
 
+  const [pinnedTokens, setPinnedTokens] = useState(
+    data.slice(0, data.length / 2)
+  );
+
+  const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
+    data.slice(data.length / 2, data.length)
+  );
+
+  const sortPinned = (token: TokenKind) => {
+    setPinnedTokens(
+      pinnedTokens.sort((y, x) => {
+        return x.symbol === token.symbol
+          ? -1
+          : y.symbol === token.symbol
+          ? 1
+          : 0;
+      })
+    );
+    setPinnedFluidTokens(
+      pinnedFluidTokens.sort((y, x) => {
+        return x.symbol === `f${token.symbol}`
+          ? -1
+          : y.symbol === `f${token.symbol}`
+          ? 1
+          : 0;
+      })
+    );
+  };
+
+  const sortPinnedFluid = (token: TokenKind) => {
+    setPinnedFluidTokens(
+      pinnedFluidTokens.sort((y, x) => {
+        return x.symbol === token.symbol
+          ? -1
+          : y.symbol === token.symbol
+          ? 1
+          : 0;
+      })
+    );
+    setPinnedTokens(
+      pinnedTokens.sort((y, x) => {
+        return x.symbol === token.symbol.substring(1)
+          ? -1
+          : y.symbol === token.symbol.substring(1)
+          ? 1
+          : 0;
+      })
+    );
+  };
+
   // catches user amount input to ensure it's valid
   const amountValueChanger = (input: string) => {
     try {
@@ -287,6 +337,10 @@ const SwapBox = () => {
               <TokenSelect
                 type={swap === true ? "token" : "fluid"}
                 toggle={swap === true ? togglerTo : togglerFrom}
+                pinnedTokens={pinnedTokens}
+                pinnedFluidTokens={pinnedFluidTokens}
+                sortPinned={sortPinned}
+                sortPinnedFluid={sortPinnedFluid}
               />
               <div
                 onClick={setMaxAmount}
@@ -331,6 +385,10 @@ const SwapBox = () => {
               <TokenSelect
                 type={swap === true ? "fluid" : "token"}
                 toggle={swap === true ? togglerFrom : togglerTo}
+                pinnedTokens={pinnedTokens}
+                pinnedFluidTokens={pinnedFluidTokens}
+                sortPinned={sortPinned}
+                sortPinnedFluid={sortPinnedFluid}
               />
               {wallet.status === "connected" && <AmountAvailable invert />}
             </div>

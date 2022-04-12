@@ -248,3 +248,36 @@
   text-transform: uppercase;
   font-size: 9.5px;
 }
+
+.select-token-button {
+  background-color: #051323;
+  color: #ffffff;
+  height: 3rem;
+  width: 100%;
+  border-radius: 10px;
+  border-style: solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 0;
+  &:hover {
+    background-color: #212429;
+  }
+}
+
+.token-list-item-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.token-list-item-names {
+  display: flex;
+  flex-direction: column;
+}

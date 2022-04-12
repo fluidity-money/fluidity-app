@@ -74,7 +74,7 @@
 }
 
 // ### Wallet icons ###
-.i-{
+.i- {
   &ETH,
   &fETH {
     background: url("/img/TokenIcons/ethereumIcon.svg");
@@ -184,7 +184,7 @@
   stroke-miterlimit: 10;
   margin: 10% auto;
   box-shadow: inset 0px 0px 0px #0eb88e;
-  animation: fill .4s ease-in-out;
+  animation: fill 0.4s ease-in-out;
 
   &-notification-circle {
     stroke-width: 0;
@@ -248,4 +248,19 @@
   @extend .notification-off;
   background: url("/img/NotificationIcons/notifications-off-icon.svg"), red;
   background-size: cover;
+}
+
+.clear-search-icon {
+  position: absolute;
+  cursor: pointer;
+  width: 8px;
+  right: 30px;
+  &:hover {
+    opacity: 0.6;
+  }
+}
+
+.not-found-icon {
+  width: 150px;
+  align-self: center;
 }

@@ -1,16 +1,28 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import GenericModal from "components/Modal";
 import { modalToggle } from "components/context";
 import Button from "components/Button";
 import { TokenKind, TokenList } from "components/types";
 import { Value } from "sass";
+import TokenSearch from "./TokenSearch";
+import PinnedToken from "./PinnedToken";
 
 const TokenSelection = ({
   tokenList,
+  pinnedList,
+  setTokenList,
   type,
+  changePinned,
+  resetLists,
+  sortPinned,
 }: {
   tokenList: TokenList["kind"];
+  pinnedList: TokenList["kind"] | undefined;
+  setTokenList: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
   type: string;
+  changePinned: (token: TokenKind) => void;
+  resetLists: () => void;
+  sortPinned: ((token: TokenKind) => void) | undefined;
 }) => {
   const [toggleFrom, togglerFrom] = useContext(modalToggle).toggleFrom;
   const [toggleTo, togglerTo] = useContext(modalToggle).toggleTo;
@@ -34,22 +46,36 @@ const TokenSelection = ({
 
   const renderedTokenSet = tokenList.map((token, index) => {
     return (
-      <Button
-        key={index}
-        label={token.symbol}
-        theme="token-button"
-        texttheme="wallet-text"
-        fontSize="font-large"
-        icon={
-          // nosemgrep: typescript.react.security.audit.react-http-leak.react-http-leak
-          <img
-            src={`${token.image}`}
-            className="wallet-icon"
-            alt={token.image}
-          />
-        }
-        goto={() => setToken(type, token.symbol)}
-      />
+      <div className="token-list-item" key={`${index}${token}`}>
+        <Button
+          key={index}
+          label={token.symbol}
+          token={token}
+          theme="select-token-button"
+          texttheme="select-token-text"
+          fontSize="font-large"
+          icon={
+            <img
+              src={`${token.image}`}
+              className="token-list-icon"
+              alt={token.symbol}
+            />
+          }
+          goto={() => {
+            setToken(type, token.symbol);
+            resetLists();
+          }}
+        />
+        <img
+          className="pin-icon"
+          onClick={() => {
+            changePinned(token);
+            sortPinned && sortPinned(token);
+          }}
+          src={token?.pinned ? "img/pinnedIcon.svg" : "img/pinIcon.svg"}
+          alt="pin"
+        />
+      </div>
     );
   });
 
@@ -61,8 +87,50 @@ const TokenSelection = ({
       // width="20rem"
     >
       <div className="connect-modal-body">
-        <h2 className="primary-text">Select Your Token</h2>
-        <div className="connect-modal-form">{renderedTokenSet}</div>
+        <h2 className="primary-text">Select a Token</h2>
+        <TokenSearch
+          setTokenListState={setTokenList}
+          tokenList={tokenList}
+          resetLists={resetLists}
+        />
+        <div className="pinned-tokens">
+          {pinnedList &&
+            pinnedList.map(
+              (token: TokenKind, index: number) =>
+                token.pinned && (
+                  <PinnedToken
+                    key={index}
+                    token={token}
+                    changePinned={changePinned}
+                    sortPinned={sortPinned}
+                    setTokenHandler={() => {
+                      setToken(type, token.symbol);
+                      resetLists();
+                    }}
+                  />
+                )
+            )}
+        </div>
+        <hr
+          style={{
+            backgroundColor: "white",
+            width: "90%",
+          }}
+        />
+        <div className="connect-modal-form token-list">
+          {tokenList.length ? (
+            renderedTokenSet
+          ) : (
+            <>
+              <img
+                src="https://app.1inch.io/assets/images/simple/empty-list-light-theme-x2.png"
+                alt="nothing found"
+                className="not-found-icon"
+              />
+              <div className="not-found-text">Nothing Found</div>
+            </>
+          )}
+        </div>
       </div>
     </GenericModal>
   );
