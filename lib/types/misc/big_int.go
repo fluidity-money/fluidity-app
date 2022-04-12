@@ -15,33 +15,6 @@ type BigInt struct {
 	big.Int
 }
 
-func BigIntFromString(s string) (*BigInt, error) {
-	var int BigInt
-
-	if _, success := int.SetString(s, 10); !success {
-		return nil, fmt.Errorf(
-			"Failed to set the bigint! Bad string number!",
-		)
-	}
-
-	return &int, nil
-}
-
-func BigIntFromHex(hex string) (*BigInt, error) {
-	var (
-		int    BigInt
-		hexStr = hex[2:]
-	)
-
-	if _, success := int.SetString(hexStr, 16); !success {
-		return nil, fmt.Errorf(
-			"Failed to set the bigint! Bad hex number!",
-		)
-	}
-
-	return &int, nil
-}
-
 func BigIntFromInt64(x int64) BigInt {
 	var int BigInt
 

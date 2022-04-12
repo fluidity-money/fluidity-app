@@ -98,7 +98,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			topics[i] = types.Hash(topic)
 		}
 
-		txIndex, err := misc.BigIntFromString(logTxIndex)
+		txIndex, err := bigIntFromPossiblyHex(logTxIndex)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -141,7 +141,7 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Could not marshal Geth provider eth_getBlockByNumber body: %v",
+			"could not marshal Geth provider eth_getBlockByNumber body: %v",
 			err,
 		)
 	}
