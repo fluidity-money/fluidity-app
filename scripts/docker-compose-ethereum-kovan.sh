@@ -6,7 +6,7 @@ flu_ethereum_worker_hardhat_gas_limit=8000000
 
 export \
 	FLU_AMQP_QUEUE_ADDR="$FLU_AMQP_QUEUE_ADDR" \
-	FLU_UNIVERSE=production-ethereum-ropsten
+	FLU_UNIVERSE=production-ethereum-kovan
 
 export \
 	FLU_SENTRY_URL="$FLU_SENTRY_URL" \
@@ -48,6 +48,7 @@ export \
 	FLU_ETHEREUM_WORKER_HARDHAT_FIX_DAI=false
 
 docker-compose \
+	-f "$automation_dir/docker-compose.volumes.yml" \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.ethereum.yml" \

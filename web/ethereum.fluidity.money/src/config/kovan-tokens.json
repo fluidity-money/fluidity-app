@@ -1,16 +1,17 @@
 [
+
   {
-    "symbol": "Fei",
-    "address": "0x4e9d5268579ae76f390f232aea29f016bd009aab",
-    "colour": "",
-    "image": "",
+    "symbol": "TUSD",
+    "address": "0x016750AC630F711882812f24Dba6c95b9D35856d",
+    "colour": "#2433b8",
+    "image": "img/TokenIcons/tusdIcon.svg",
     "decimals": 18
   },
   {
-    "symbol": "fFei",
+    "symbol": "fTUSD",
     "address": "",
-    "colour": "",
-    "image": "",
+    "colour": "#2433b8",
+    "image": "img/TokenIcons/tusdIcon.svg",
     "decimals": 18
   }
 ]
