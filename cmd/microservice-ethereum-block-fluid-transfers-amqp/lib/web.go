@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error) {
@@ -60,20 +60,31 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 	logs = make([]types.Log, len(logsResponseLogs))
 
 	for i, log := range logsResponseLogs {
-		blockNumber, err := bigIntFromPossiblyHex(log.BlockNumber)
+		var (
+			logBlockNumber   = log.BlockNumber
+			logIndex         = log.Index
+			transactionIndex = log.TxIndex
+			logData          = log.Data
+			blockHash        = log.BlockHash
+			address          = log.Address
+		)
+
+		blockNumber, err := bigIntFromPossiblyHex(logBlockNumber)
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"failed to convert an outside Ethereum blockNumber to a bigint: %v",
+				"failed to convert an outside Ethereum blockNumber (%#v) to a bigint: %v",
+				blockNumber,
 				err,
 			)
 		}
 
-		index, err := bigIntFromPossiblyHex(log.Index)
+		index, err := bigIntFromPossiblyHex(logIndex)
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"failed to convert an outside index to a bigint: %v",
+				"failed to convert an outside index (%#v) to a bigint: %v",
+				index,
 				err,
 			)
 		}
@@ -86,25 +97,26 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			topics[i] = types.Hash(topic)
 		}
 
-		txIndex, err := misc.BigIntFromString(log.TxIndex)
+		txIndex, err := misc.BigIntFromString(transactionIndex)
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"failed to convert the transaction index to a bigint: %v",
+				"failed to convert the transaction index (%#v) to a bigint: %v",
+				transactionIndex,
 				err,
 			)
 		}
 
-		data := misc.Blob([]byte(log.Data))
+		data := misc.Blob([]byte(logData))
 
 		logs[i] = types.Log{
-			Address:     types.Address(log.Address),
+			Address:     types.Address(address),
 			Topics:      topics,
 			Data:        data,
 			BlockNumber: *blockNumber,
-			TxHash:      types.Hash(log.TxHash),
+			TxHash:      types.Hash(transactionIndex),
 			TxIndex:     *txIndex,
-			BlockHash:   types.Hash(log.BlockHash),
+			BlockHash:   types.Hash(blockHash),
 			Index:       *index,
 			Removed:     log.Removed,
 		}
