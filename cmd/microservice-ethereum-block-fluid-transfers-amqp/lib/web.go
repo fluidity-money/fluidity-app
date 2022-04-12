@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
-func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
+func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error) {
 	logsReqParams := LogParams{{
 		BlockHash: blockHash,
 		Topics:    []string{common.TransferLogTopic},
@@ -54,7 +55,62 @@ func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
 		)
 	}
 
-	return logsResponse.Result, nil
+	logsResponseLogs := logsResponse.Result
+
+	logs = make([]types.Log, len(logsResponseLogs))
+
+	for i, log := range logsResponseLogs {
+		blockNumber, err := bigIntFromPossiblyHex(log.BlockNumber)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert an outside Ethereum blockNumber to a bigint: %v",
+				err,
+			)
+		}
+
+		index, err := bigIntFromPossiblyHex(log.Index)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert an outside index to a bigint: %v",
+				err,
+			)
+		}
+
+		logTopics := log.Topics
+
+		topics := make([]types.Hash, len(logTopics))
+
+		for i, topic := range logTopics {
+			topics[i] = types.Hash(topic)
+		}
+
+		txIndex, err := misc.BigIntFromString(log.TxIndex)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert the transaction index to a bigint: %v",
+				err,
+			)
+		}
+
+		data := misc.Blob([]byte(log.Data))
+
+		logs[i] = types.Log{
+			Address:     types.Address(log.Address),
+			Topics:      topics,
+			Data:        data,
+			BlockNumber: *blockNumber,
+			TxHash:      types.Hash(log.TxHash),
+			TxIndex:     *txIndex,
+			BlockHash:   types.Hash(log.BlockHash),
+			Index:       *index,
+			Removed:     log.Removed,
+		}
+	}
+
+	return logs, nil
 }
 
 func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
@@ -96,7 +152,7 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Could not unmarshal response body: %v",
+			"could not unmarshal response body: %v",
 			err,
 		)
 	}

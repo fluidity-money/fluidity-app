@@ -21,10 +21,22 @@ type (
 
 	BlockParams [2]interface{}
 
+	Log struct {
+		Address     string      `json:"address"`
+		Topics      []string    `json:"topics"`
+		Data        string      `json:"data"`
+		BlockNumber string `json:"blockNumber"`
+		TxHash      string      `json:"transactionHash"`
+		TxIndex     string      `json:"transactionIndex"`
+		BlockHash   string      `json:"blockHash"`
+		Index       string `json:"index"`
+		Removed     bool        `json:"removed"`
+	}
+
 	LogsResponse struct {
-		JsonRpc string      `json:"jsonrpc"`
-		Id      string      `json:"id"`
-		Result  []types.Log `json:"result"`
+		JsonRpc string `json:"jsonrpc"`
+		Id      string `json:"id"`
+		Result  []Log  `json:"result"`
 	}
 
 	// Block is eth_getBlockByHash's result. Does not match
