@@ -27,21 +27,6 @@ func BigIntFromString(s string) (*BigInt, error) {
 	return &int, nil
 }
 
-func BigIntFromHex(hex string) (*BigInt, error) {
-	var (
-		int    BigInt
-		hexStr = hex[2:]
-	)
-
-	if _, success := int.SetString(hexStr, 16); !success {
-		return nil, fmt.Errorf(
-			"Failed to set the bigint! Bad hex number!",
-		)
-	}
-
-	return &int, nil
-}
-
 func BigIntFromInt64(x int64) BigInt {
 	var int BigInt
 
@@ -67,33 +52,17 @@ func (i *BigInt) UnmarshalJSON(b []byte) error {
 
 	if err := json.Unmarshal(b, &str); err != nil {
 		return fmt.Errorf(
-			"Failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
+			"failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
 			b,
 			err,
 		)
-	}
-
-	if has0xPrefix(str) {
-		int, err := BigIntFromHex(str)
-
-		if err != nil {
-			return fmt.Errorf(
-				"Failed to unharsmal a BigInt of %v! %v",
-				str,
-				err,
-			)
-		}
-
-		*i = *int
-
-		return nil
 	}
 
 	int, err := BigIntFromString(str)
 
 	if err != nil {
 		return fmt.Errorf(
-			"Failed to unharsmal a BigInt of %v! %v",
+			"failed to unharsmal a BigInt of %v! %v",
 			str,
 			err,
 		)

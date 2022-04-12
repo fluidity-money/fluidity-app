@@ -8,9 +8,10 @@ import (
 
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
-func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
+func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error) {
 	logsReqParams := LogParams{{
 		BlockHash: blockHash,
 		Topics:    []string{common.TransferLogTopic},
@@ -54,7 +55,75 @@ func GetLogsFromHash(gethHttpApi, blockHash string) ([]types.Log, error) {
 		)
 	}
 
-	return logsResponse.Result, nil
+	logsResponseLogs := logsResponse.Result
+
+	logs = make([]types.Log, len(logsResponseLogs))
+
+	for i, log := range logsResponseLogs {
+		var (
+			logBlockNumber   = log.BlockNumber
+			logIndex         = log.Index
+			logTxIndex       = log.TxIndex
+			logData          = log.Data
+			blockHash        = log.BlockHash
+			address          = log.Address
+			txHash           = log.TxHash
+		)
+
+		blockNumber, err := bigIntFromPossiblyHex(logBlockNumber)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert an outside Ethereum blockNumber (%#v) to a bigint: %v",
+				blockNumber,
+				err,
+			)
+		}
+
+		index, err := bigIntFromPossiblyHex(logIndex)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert an outside index (%#v) to a bigint: %v",
+				logIndex,
+				err,
+			)
+		}
+
+		logTopics := log.Topics
+
+		topics := make([]types.Hash, len(logTopics))
+
+		for i, topic := range logTopics {
+			topics[i] = types.Hash(topic)
+		}
+
+		txIndex, err := bigIntFromPossiblyHex(logTxIndex)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert the transaction index (%#v) to a bigint: %v",
+				logTxIndex,
+				err,
+			)
+		}
+
+		data := misc.Blob([]byte(logData))
+
+		logs[i] = types.Log{
+			Address:     types.Address(address),
+			Topics:      topics,
+			Data:        data,
+			BlockNumber: *blockNumber,
+			TxHash:      types.Hash(txHash),
+			TxIndex:     *txIndex,
+			BlockHash:   types.Hash(blockHash),
+			Index:       *index,
+			Removed:     log.Removed,
+		}
+	}
+
+	return logs, nil
 }
 
 func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
@@ -72,7 +141,7 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Could not marshal Geth provider eth_getBlockByNumber body: %v",
+			"could not marshal Geth provider eth_getBlockByNumber body: %v",
 			err,
 		)
 	}
@@ -96,7 +165,7 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Could not unmarshal response body: %v",
+			"could not unmarshal response body: %v",
 			err,
 		)
 	}
