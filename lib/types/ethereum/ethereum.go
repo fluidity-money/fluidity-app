@@ -72,19 +72,19 @@ type (
 		Data misc.Blob `json:"data"`
 
 		// block in which the transaction was included
-		BlockNumber misc.BigInt `json:"blockNumber"`
+		BlockNumber misc.BigInt `json:"block_number"`
 
 		// hash of the transaction
-		TxHash Hash `json:"transactionHash"`
+		TxHash Hash `json:"transaction_hash"`
 
 		// index of the transaction in the block
-		TxIndex misc.BigInt `json:"transactionIndex"`
+		TxIndex misc.BigInt `json:"transaction_index"`
 
 		// hash of the block in which the transaction was included
-		BlockHash Hash `json:"blockHash"`
+		BlockHash Hash `json:"block_hash"`
 
 		// index of the log in the block
-		Index misc.BigInt `json:"logIndex"`
+		Index misc.BigInt `json:"log_index"`
 
 		// whether the log was removed due to a chain reorganisation!
 		Removed bool `json:"removed"`

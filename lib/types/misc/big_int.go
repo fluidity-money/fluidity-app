@@ -67,7 +67,7 @@ func (i *BigInt) UnmarshalJSON(b []byte) error {
 
 	if err := json.Unmarshal(b, &str); err != nil {
 		return fmt.Errorf(
-			"Failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
+			"failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
 			b,
 			err,
 		)
@@ -77,7 +77,7 @@ func (i *BigInt) UnmarshalJSON(b []byte) error {
 
 	if err != nil {
 		return fmt.Errorf(
-			"Failed to unharsmal a BigInt of %v! %v",
+			"failed to unharsmal a BigInt of %v! %v",
 			str,
 			err,
 		)
