@@ -26,10 +26,6 @@ func (blob *Blob) UnmarshalJSON(b []byte) (err error) {
 		)
 	}
 
-	if has0xPrefix(str) {
-		str = str[2:]
-	}
-
 	// Padding 0's needed to make len(str) a multiple of 4
 	padding := 4 - len(str)%4
 

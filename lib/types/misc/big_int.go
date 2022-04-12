@@ -73,22 +73,6 @@ func (i *BigInt) UnmarshalJSON(b []byte) error {
 		)
 	}
 
-	if has0xPrefix(str) {
-		int, err := BigIntFromHex(str)
-
-		if err != nil {
-			return fmt.Errorf(
-				"Failed to unharsmal a BigInt of %v! %v",
-				str,
-				err,
-			)
-		}
-
-		*i = *int
-
-		return nil
-	}
-
 	int, err := BigIntFromString(str)
 
 	if err != nil {
