@@ -111,21 +111,15 @@ func main() {
 
 		newFluidLogs, err := lib.GetLogsFromHash(gethHttpApi, blockHash.String())
 
-		for tries := 0; err != nil; tries++ {
-			if tries >= 10 {
-				log.Fatal(func(k *log.Log) {
-					k.Format("Could not get logs from block: %v", blockHash)
-					k.Payload = err
-				})
-			}
-
-			newFluidLogs, err = lib.GetLogsFromHash(gethHttpApi, blockHash.String())
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format("Could not get logs from block: %v", blockHash)
+				k.Payload = err
+			})
 		}
 
 		amqpBlock.Logs = append(amqpBlock.Logs, newFluidLogs...)
 
 		queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
-
 	})
-
 }
