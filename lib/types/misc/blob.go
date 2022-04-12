@@ -30,7 +30,8 @@ func (blob *Blob) UnmarshalJSON(b []byte) (err error) {
 		str = str[2:]
 	}
 
-	padding := len(str) % 4
+	// Padding 0's needed to make len(str) a multiple of 4
+	padding := 4 - len(str)%4
 
 	str += strings.Repeat("0", padding)
 
