@@ -123,7 +123,7 @@ const TokenSelection = ({
           ) : (
             <>
               <img
-                src="https://app.1inch.io/assets/images/simple/empty-list-light-theme-x2.png"
+                src="img/searchNotFound.svg"
                 alt="nothing found"
                 className="not-found-icon"
               />

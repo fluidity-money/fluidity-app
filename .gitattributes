@@ -4,3 +4,4 @@
 /web/ethereum.fluidity.money/public/img/pinIcon.svg filter=lfs diff=lfs merge=lfs -text
 /web/ethereum.fluidity.money/public/img/pinnedIcon.svg filter=lfs diff=lfs merge=lfs -text
 /web/ethereum.fluidity.money/public/img/searchIcon.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/searchNotFound.svg filter=lfs diff=lfs merge=lfs -text
