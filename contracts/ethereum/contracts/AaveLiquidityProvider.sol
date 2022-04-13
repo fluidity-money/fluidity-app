@@ -3,14 +3,14 @@ pragma abicoder v1;
 
 import "./aave/ATokenInterfaces.sol";
 import "./LiquidityProvider.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "./openzeppelin/SafeERC20.sol";
 
 contract AaveLiquidityProvider is LiquidityProvider {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
+    using SafeERC20 for IERC20;
 
     bool private initialized_;
     address public owner_;
-    IERC20Upgradeable public underlying_;
+    IERC20 public underlying_;
 
     LendingPoolAddressesProviderInterface public lendingPoolAddresses_;
     ATokenInterface public aToken_;
@@ -27,7 +27,7 @@ contract AaveLiquidityProvider is LiquidityProvider {
         lendingPoolAddresses_ = LendingPoolAddressesProviderInterface(addressProvider);
         aToken_ = ATokenInterface(aToken);
 
-        underlying_ = IERC20Upgradeable(aToken_.UNDERLYING_ASSET_ADDRESS());
+        underlying_ = IERC20(aToken_.UNDERLYING_ASSET_ADDRESS());
     }
 
     function addToPool(uint amount) external {

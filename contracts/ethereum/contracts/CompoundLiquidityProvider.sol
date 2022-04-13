@@ -3,14 +3,14 @@ pragma abicoder v1;
 
 import "./compound/CTokenInterfaces.sol";
 import "./LiquidityProvider.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "./openzeppelin/SafeERC20.sol";
 
 contract CompoundLiquidityProvider is LiquidityProvider {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
+    using SafeERC20 for IERC20;
 
     bool private initialized_;
     address public owner_;
-    IERC20Upgradeable public underlying_;
+    IERC20 public underlying_;
 
     CErc20Interface public compoundToken_;
 
@@ -24,7 +24,7 @@ contract CompoundLiquidityProvider is LiquidityProvider {
 
         compoundToken_ = CErc20Interface(compoundToken);
 
-        underlying_ = IERC20Upgradeable(compoundToken_.underlying());
+        underlying_ = IERC20(compoundToken_.underlying());
         underlying_.safeApprove(address(compoundToken_), type(uint).max);
     }
 

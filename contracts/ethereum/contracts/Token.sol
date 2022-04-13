@@ -1,16 +1,16 @@
 pragma solidity ^0.8.11;
 pragma abicoder v1;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "./openzeppelin/IERC20.sol";
+import "./openzeppelin/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "./openzeppelin/Address.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./LiquidityProvider.sol";
 
 contract Token is Initializable, ERC20Upgradeable {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
-    using AddressUpgradeable for address;
+    using SafeERC20 for IERC20;
+    using Address for address;
 
     event Reward(address indexed addr, uint indexed amount);
     event MintFluid(address indexed addr, uint indexed amount);
