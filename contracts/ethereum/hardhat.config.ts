@@ -111,7 +111,7 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
   });
 
 subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
-  if (!shouldDeploy) return;
+  if (!shouldDeploy.length) return;
 
   if (!oracleAddress)
     throw new Error(

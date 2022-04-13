@@ -2,26 +2,6 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0xaE950EEcB370371faa8BAf150f1acBF804051a5f",
-      "txHash": "0x644943e8c1cb5945653790b93456ee000a7c71d0ab47e0e6d45d6c015b223672",
-      "kind": "beacon"
-    },
-    {
-      "address": "0x6087BE9225a6c813c87DA81Da983F0fb25599A39",
-      "txHash": "0x5c296b082ba819d4d08dd42f116f564fcb1e88d45f108a0875f6678a88a20992",
-      "kind": "beacon"
-    },
-    {
-      "address": "0x0094D1019251793dB2100026736ee267946B5FA4",
-      "txHash": "0x71679a0ae26fc77075c4f78cb2a3ce2ae2ba0ee03b89b967ad7af0dde434e9c2",
-      "kind": "beacon"
-    },
-    {
-      "address": "0xBe30BE405881a4D2d49235B30a139bce30944680",
-      "txHash": "0x7a4f22a76b22b57acb4165570c87f93208bb0f9097f51fdaaa24a9d5920cd96e",
-      "kind": "beacon"
-    },
-    {
       "address": "0xA5F816E2dE025A1bb419eD59652Fa03F249369A9",
       "txHash": "0xb7e0236e13bc7103892ffbe356910fbef9c43f5384076aceef54e0cd958a54e9",
       "kind": "beacon"
@@ -50,70 +30,37 @@
       "address": "0x238b2c461584C83bEe7CBd54A05efFa03Ba11D0E",
       "txHash": "0xb6a1d80c3ba55a896472773665946df86a38dcea6d1d55d2ffcb23c04ced7dc9",
       "kind": "beacon"
+    },
+    {
+      "address": "0xaE950EEcB370371faa8BAf150f1acBF804051a5f",
+      "txHash": "0xc8202e2fdbc697c88cdf0c15c4361d99ffbeddc6e6f8b6ce2554ee26aa348d0e",
+      "kind": "beacon"
+    },
+    {
+      "address": "0x6087BE9225a6c813c87DA81Da983F0fb25599A39",
+      "txHash": "0x990c0b08053aedb54eb8478a535690bc3633b5a27ec88c56f1e9f7e1081d6a64",
+      "kind": "beacon"
+    },
+    {
+      "address": "0x7Bb73Aa3cE7f88bdF31ac3d7799cB3E736cBce6b",
+      "txHash": "0x5ace829148b4a4b02b6cf3f295a4649d35814edb2fdfddbf78d151102a224751",
+      "kind": "beacon"
+    },
+    {
+      "address": "0x0094D1019251793dB2100026736ee267946B5FA4",
+      "txHash": "0xc31368a06a925547bf2a0c1efba4ac8abce463a154a264e4c97fe931b8982579",
+      "kind": "beacon"
+    },
+    {
+      "address": "0xBe30BE405881a4D2d49235B30a139bce30944680",
+      "txHash": "0xe5aadbe5f71eb216c58a61d6fa699504577146a091ba20bac2c9e729f76a1777",
+      "kind": "beacon"
     }
   ],
   "impls": {
-    "bc94906ee9816e006945e6b460bb0ffb148a3cd6fd8491d8e225316b7a56fe89": {
-      "address": "0x9391202B846ee3f574e59E4AD58ef6140E9ba4F6",
-      "txHash": "0x96433d1991b232dcc8e00e593f3add6c45138d01579fef7cbe37415ccc049615",
-      "layout": {
-        "storage": [
-          {
-            "label": "initialized_",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "CompoundLiquidityProvider",
-            "src": "contracts/CompoundLiquidityProvider.sol:11"
-          },
-          {
-            "label": "owner_",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_address",
-            "contract": "CompoundLiquidityProvider",
-            "src": "contracts/CompoundLiquidityProvider.sol:12"
-          },
-          {
-            "label": "underlying_",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_contract(IERC20Upgradeable)764",
-            "contract": "CompoundLiquidityProvider",
-            "src": "contracts/CompoundLiquidityProvider.sol:13"
-          },
-          {
-            "label": "compoundToken_",
-            "offset": 0,
-            "slot": "2",
-            "type": "t_contract(CErc20Interface)3537",
-            "contract": "CompoundLiquidityProvider",
-            "src": "contracts/CompoundLiquidityProvider.sol:15"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_contract(CErc20Interface)3537": {
-            "label": "contract CErc20Interface",
-            "numberOfBytes": "20"
-          },
-          "t_contract(IERC20Upgradeable)764": {
-            "label": "contract IERC20Upgradeable",
-            "numberOfBytes": "20"
-          }
-        }
-      }
-    },
     "cde67384a00d2b573c73b1f06eeebd7eef94197fa178923321bb912c15add563": {
-      "address": "0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab",
-      "txHash": "0xbe6fc23536ace4bd1b0aa80cc7bbf889283bf0f08adb83da70e1faa13c28d531",
+      "address": "0x9391202B846ee3f574e59E4AD58ef6140E9ba4F6",
+      "txHash": "0x666e981659ea501b380929e5d31e94c8dcb53a1f3543b4d0795362753e41f8e2",
       "layout": {
         "storage": [
           {
@@ -144,7 +91,7 @@
             "label": "lendingPoolAddresses_",
             "offset": 0,
             "slot": "2",
-            "type": "t_contract(LendingPoolAddressesProviderInterface)3312",
+            "type": "t_contract(LendingPoolAddressesProviderInterface)2078",
             "contract": "AaveLiquidityProvider",
             "src": "contracts/AaveLiquidityProvider.sol:15"
           },
@@ -152,7 +99,7 @@
             "label": "aToken_",
             "offset": 0,
             "slot": "3",
-            "type": "t_contract(ATokenInterface)3327",
+            "type": "t_contract(ATokenInterface)2093",
             "contract": "AaveLiquidityProvider",
             "src": "contracts/AaveLiquidityProvider.sol:16"
           }
@@ -166,7 +113,7 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(ATokenInterface)3327": {
+          "t_contract(ATokenInterface)2093": {
             "label": "contract ATokenInterface",
             "numberOfBytes": "20"
           },
@@ -174,7 +121,7 @@
             "label": "contract IERC20Upgradeable",
             "numberOfBytes": "20"
           },
-          "t_contract(LendingPoolAddressesProviderInterface)3312": {
+          "t_contract(LendingPoolAddressesProviderInterface)2078": {
             "label": "contract LendingPoolAddressesProviderInterface",
             "numberOfBytes": "20"
           }
@@ -183,7 +130,7 @@
     },
     "58970a32056e6eecf4cafd8f498ea6e7d36d72a6ae5b73f23cea56ecf8940720": {
       "address": "0xf1721FCF509c975c3eC0f474aEB58EFcbf80e4D6",
-      "txHash": "0x60045459b2f62aa102d30103d3193cbda4962481796aad17bfb08898a2a3d798",
+      "txHash": "0xb31178640fb263dd963a0af118b4aff1575891b38a3fcd05a0396949968b6974",
       "layout": {
         "storage": [
           {
@@ -262,7 +209,7 @@
             "label": "pool_",
             "offset": 0,
             "slot": "101",
-            "type": "t_contract(LiquidityProvider)2893",
+            "type": "t_contract(LiquidityProvider)1659",
             "contract": "Token",
             "src": "contracts/Token.sol:19"
           },
@@ -312,7 +259,7 @@
             "label": "bytes32",
             "numberOfBytes": "32"
           },
-          "t_contract(LiquidityProvider)2893": {
+          "t_contract(LiquidityProvider)1659": {
             "label": "contract LiquidityProvider",
             "numberOfBytes": "20"
           },
@@ -339,6 +286,64 @@
           "t_uint8": {
             "label": "uint8",
             "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "bc94906ee9816e006945e6b460bb0ffb148a3cd6fd8491d8e225316b7a56fe89": {
+      "address": "0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab",
+      "txHash": "0xf0e94917960a2b40d61c093abcd9803f8b4e7e701403755a9dac2d3c093327b5",
+      "layout": {
+        "storage": [
+          {
+            "label": "initialized_",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "CompoundLiquidityProvider",
+            "src": "contracts/CompoundLiquidityProvider.sol:11"
+          },
+          {
+            "label": "owner_",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "CompoundLiquidityProvider",
+            "src": "contracts/CompoundLiquidityProvider.sol:12"
+          },
+          {
+            "label": "underlying_",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IERC20Upgradeable)764",
+            "contract": "CompoundLiquidityProvider",
+            "src": "contracts/CompoundLiquidityProvider.sol:13"
+          },
+          {
+            "label": "compoundToken_",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(CErc20Interface)2303",
+            "contract": "CompoundLiquidityProvider",
+            "src": "contracts/CompoundLiquidityProvider.sol:15"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(CErc20Interface)2303": {
+            "label": "contract CErc20Interface",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IERC20Upgradeable)764": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
           }
         }
       }
