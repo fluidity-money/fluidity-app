@@ -98,10 +98,17 @@ contract Token is IERC20 {
         return totalAmount - totalFluid;
     }
 
-    function rewardFromPool(address to, uint amount) internal {
+    function rewardFromPool(address from, address to, uint amount) internal {
         // mint some fluid tokens from the interest we've accrued
-        _mint(to, amount);
-        emit Reward(to, amount);
+        // 20%
+        uint256 toAmount = amount / 5;
+        // 80%
+        uint256 fromAmount = amount - toAmount;
+
+        emit Reward(from, fromAmount);
+        emit Reward(to, toAmount);
+
+        _mintDouble(from, fromAmount, to, toAmount);
     }
 
     function reward(
@@ -124,10 +131,7 @@ contract Token is IERC20 {
 
         // now pay out the user
         pastRewards_[txHash] = 1;
-        // 80%
-        rewardFromPool(from, winAmount / 5 * 4);
-        // 20%
-        rewardFromPool(to, winAmount / 5 * 1);
+        rewardFromPool(from, to, winAmount / 5 * 4);
     }
 
     // returns the amount that the user won (can be 0), reverts on invalid rng
@@ -215,6 +219,19 @@ contract Token is IERC20 {
         totalSupply_ += amount;
         balances_[account] += amount;
         emit Transfer(address(0), account, amount);
+    }
+
+    // mint to two addresses, only writing to totalSupply once
+    function _mintDouble(address account1, uint256 amount1, address account2, uint256 amount2) internal virtual {
+        require(account1 != address(0), "ERC20: mint to the zero address");
+        require(account2 != address(0), "ERC20: mint to the zero address");
+
+        totalSupply_ += amount1 + amount2;
+        balances_[account1] += amount1;
+        emit Transfer(address(0), account1, amount1);
+
+        balances_[account2] += amount2;
+        emit Transfer(address(0), account2, amount2);
     }
 
     function _burn(address account, uint256 amount) internal virtual {
