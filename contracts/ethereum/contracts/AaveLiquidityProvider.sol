@@ -44,6 +44,7 @@ contract AaveLiquidityProvider is LiquidityProvider {
 
         uint realAmount = lendingPool.withdraw(address(underlying_), amount, address(this));
         require(amount == realAmount, "amount aave withdrew was different to requested");
+        underlying_.safeTransfer(msg.sender, realAmount);
     }
 
     function totalPoolAmount() external view returns (uint) {
