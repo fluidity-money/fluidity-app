@@ -6,7 +6,7 @@ enum ChainId {
 }
 
 /**
- * @param id - Hex or numeric representation, as a number or string
+ * @param id_ - Hex or numeric representation, as a number or string
  * @returns chainId as an enum
  * @example <caption>Using Kovan</caption>
  * "0x2a"        => ChainId.Kovan

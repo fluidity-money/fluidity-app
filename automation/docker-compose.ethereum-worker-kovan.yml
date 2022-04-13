@@ -2,37 +2,142 @@
 version: "3"
 
 services:
-  microservice-ethereum-worker-server-fei:
+  microservice-ethereum-worker-server-tusd:
     build:
       context: ../cmd/microservice-ethereum-worker-server
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-server-fei
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-server-tusd
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FFEI}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FTUSD}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
-      FLU_ETHEREUM_TOKEN_BACKEND: compound
+      FLU_ETHEREUM_TOKEN_BACKEND: aave
       FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
-      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_FEI}
-      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_FEI}
-      FLU_ETHEREUM_CTOKEN_ADDR: ${FLU_ETHEREUM_CTOKEN_ADDR_FEI}
-      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.fei
-      FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.fei.apy.moving-average
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_TUSD}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_TUSD}
+      FLU_ETHEREUM_ATOKEN_ADDR: ${FLU_ETHEREUM_ATOKEN_ADDR_TUSD}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.tusd
+      FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.tusd.apy.moving-average
     restart: unless-stopped
 
-  microservice-ethereum-worker-client-fei:
+  microservice-ethereum-worker-client-tusd:
     build:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-client-fei
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-client-tusd
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FFEI}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FTUSD}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
-      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_FEI}
-      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_FEI}
-      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_FEI}
-      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.fei
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_TUSD}
+      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_TUSD}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_TUSD}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.tusd
+    restart: unless-stopped
+
+  microservice-ethereum-worker-server-dai:
+    build:
+      context: ../cmd/microservice-ethereum-worker-server
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-server-dai
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_TOKEN_BACKEND: aave
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_DAI}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
+      FLU_ETHEREUM_ATOKEN_ADDR: ${FLU_ETHEREUM_ATOKEN_ADDR_DAI}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+      FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.dai.apy.moving-average
+    restart: unless-stopped
+
+  microservice-ethereum-worker-client-dai:
+    build:
+      context: ../cmd/microservice-ethereum-worker-client
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-client-dai
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_DAI}
+      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_DAI}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_DAI}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+    restart: unless-stopped
+
+  microservice-ethereum-worker-server-usdt:
+    build:
+      context: ../cmd/microservice-ethereum-worker-server
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-server-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_TOKEN_BACKEND: aave
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
+      FLU_ETHEREUM_ATOKEN_ADDR: ${FLU_ETHEREUM_ATOKEN_ADDR_USDT}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+      FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.usdt.apy.moving-average
+    restart: unless-stopped
+
+  microservice-ethereum-worker-client-usdt:
+    build:
+      context: ../cmd/microservice-ethereum-worker-client
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-client-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDT}
+      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDT}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDT}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+    restart: unless-stopped
+
+  microservice-ethereum-worker-server-usdc:
+    build:
+      context: ../cmd/microservice-ethereum-worker-server
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-server-usdc
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_TOKEN_BACKEND: aave
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
+      FLU_ETHEREUM_ATOKEN_ADDR: ${FLU_ETHEREUM_ATOKEN_ADDR_USDC}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+      FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.usdc.apy.moving-average
+    restart: unless-stopped
+
+  microservice-ethereum-worker-client-usdc:
+    build:
+      context: ../cmd/microservice-ethereum-worker-client
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-client-usdc
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDC}
+      FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDC}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDC}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
     restart: unless-stopped
