@@ -2,65 +2,60 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x7Bb73Aa3cE7f88bdF31ac3d7799cB3E736cBce6b",
-      "txHash": "0x5ace829148b4a4b02b6cf3f295a4649d35814edb2fdfddbf78d151102a224751",
-      "kind": "beacon"
-    },
-    {
       "address": "0xaE950EEcB370371faa8BAf150f1acBF804051a5f",
-      "txHash": "0x6ac5b1df3c691d0ea3ffd60f48360f8c129479ec3319b21bb6dca94f91aaca6d",
+      "txHash": "0xa0650d27bf9c48fb0a438cf4052b496ade51b9bf93ced29d76fc9a53bd7a66ad",
       "kind": "beacon"
     },
     {
       "address": "0x6087BE9225a6c813c87DA81Da983F0fb25599A39",
-      "txHash": "0x86706626c280c7b2aea8337185def0d8eb963fde6fec7f25098255e06d44fff9",
+      "txHash": "0xd2fe545c71e829f714b41df856e29082376aedc6dbeded92f0d028cb54feed19",
       "kind": "beacon"
     },
     {
       "address": "0x0094D1019251793dB2100026736ee267946B5FA4",
-      "txHash": "0xb44bea5bbdcbd7a9ebc244a436fc14f58e7302a3b55352335284921df2703d80",
+      "txHash": "0x52a309892b52adeab013c128fb087317b9d6091d7cb206c86a9f27728a618224",
       "kind": "beacon"
     },
     {
       "address": "0xBe30BE405881a4D2d49235B30a139bce30944680",
-      "txHash": "0x59465dabd7dc2d85c05e39ebf073785a841417808e31db3ac8b887da87d14cf3",
+      "txHash": "0xd2f510e1069ea0f044a794e15917506b5996482a4b26cd22ca558c353811985d",
       "kind": "beacon"
     },
     {
       "address": "0xA5F816E2dE025A1bb419eD59652Fa03F249369A9",
-      "txHash": "0x5fa87e26c1088bb27ab33bad3ab4dcc4eb3b84829dffb284ec42c040e163c85b",
+      "txHash": "0x4df1e07fda664bc370971aeb7727656e1b3983f798746f14fa10571f27c4b78d",
       "kind": "beacon"
     },
     {
       "address": "0x238B34083055c3605d80574e04F7d68A3342de39",
-      "txHash": "0x0eb11dce9708d9d4b4b6aef03defba121617e31bc7b7d1a545653690a03a25c4",
+      "txHash": "0xbcddb110f06a022a0d6b24b78fe864a0734d775baf1bd71e408a1d7bf6c1fcff",
       "kind": "beacon"
     },
     {
       "address": "0xD3a3C51BD460aCE0E83506CD1191Cf77F5eC3415",
-      "txHash": "0x5a2857e7366db268229a7f465dce397650e9797793b9d0f306fbfd5dc493268f",
+      "txHash": "0xeb96740355746cd20ebe915247f73c2d919e4e7b34d121747dc7083d10ddd902",
       "kind": "beacon"
     },
     {
       "address": "0xcCb4755f8c284f0680694B7d9748DeFd325DFd22",
-      "txHash": "0x58ee20cc9aaeea728d78d2efc46c0826af487af43728abf1c8359a3e78e45829",
+      "txHash": "0x9067afc421477e58fce1f9ece33dad72ce13ecbad2231885720bed4c5729a93c",
       "kind": "beacon"
     },
     {
       "address": "0xF24B32ec321e99053809f52aEbF680F70FE0dc53",
-      "txHash": "0xc680976bdcb066739c8174c80a6b7efd769417fb7ddddf711c5d6d794004be26",
+      "txHash": "0x8de3ede460d36c1a45180aacbc371c91960716f3aa4ffaab12a3dd7c28f51dec",
       "kind": "beacon"
     },
     {
       "address": "0x238b2c461584C83bEe7CBd54A05efFa03Ba11D0E",
-      "txHash": "0x834a8bcd5ee924890739f9d9e7e7ae69d97c60c98d552c58438fcd241a4a1f6a",
+      "txHash": "0x20ab22b29d6da3b2d51a8bb6ad9d909995a8dec295af12abe4fb860e7e491cba",
       "kind": "beacon"
     }
   ],
   "impls": {
     "bc94906ee9816e006945e6b460bb0ffb148a3cd6fd8491d8e225316b7a56fe89": {
       "address": "0x9391202B846ee3f574e59E4AD58ef6140E9ba4F6",
-      "txHash": "0x0a04c1c906092b53e3107f48cb8d356409e3c89f346a37fd7d5f4f833dd9ddd6",
+      "txHash": "0x411942a51f26c1b3d8deaf94d85464542a28c8ccab946a5b8e13d135828a93d6",
       "layout": {
         "storage": [
           {
@@ -116,147 +111,9 @@
         }
       }
     },
-    "762ba889964ba101c846f6a57149c1b7dc6b2544da364053f0367f7b76f6bbae": {
-      "address": "0xf1721FCF509c975c3eC0f474aEB58EFcbf80e4D6",
-      "txHash": "0xb96d952dc2b81df1494822ccbbade3a3b39dc9627b40fd0501e15cea0476e78e",
-      "layout": {
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
-          },
-          {
-            "label": "balances_",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "Token",
-            "src": "contracts/Token.sol:18"
-          },
-          {
-            "label": "allowances_",
-            "offset": 0,
-            "slot": "2",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-            "contract": "Token",
-            "src": "contracts/Token.sol:19"
-          },
-          {
-            "label": "decimals_",
-            "offset": 0,
-            "slot": "3",
-            "type": "t_uint8",
-            "contract": "Token",
-            "src": "contracts/Token.sol:20"
-          },
-          {
-            "label": "totalSupply_",
-            "offset": 0,
-            "slot": "4",
-            "type": "t_uint256",
-            "contract": "Token",
-            "src": "contracts/Token.sol:21"
-          },
-          {
-            "label": "name_",
-            "offset": 0,
-            "slot": "5",
-            "type": "t_string_storage",
-            "contract": "Token",
-            "src": "contracts/Token.sol:22"
-          },
-          {
-            "label": "symbol_",
-            "offset": 0,
-            "slot": "6",
-            "type": "t_string_storage",
-            "contract": "Token",
-            "src": "contracts/Token.sol:23"
-          },
-          {
-            "label": "pool_",
-            "offset": 0,
-            "slot": "7",
-            "type": "t_contract(LiquidityProvider)677",
-            "contract": "Token",
-            "src": "contracts/Token.sol:25"
-          },
-          {
-            "label": "rngOracle_",
-            "offset": 0,
-            "slot": "8",
-            "type": "t_address",
-            "contract": "Token",
-            "src": "contracts/Token.sol:27"
-          },
-          {
-            "label": "pastRewards_",
-            "offset": 0,
-            "slot": "9",
-            "type": "t_mapping(t_bytes32,t_uint256)",
-            "contract": "Token",
-            "src": "contracts/Token.sol:31"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_bytes32": {
-            "label": "bytes32",
-            "numberOfBytes": "32"
-          },
-          "t_contract(LiquidityProvider)677": {
-            "label": "contract LiquidityProvider",
-            "numberOfBytes": "20"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(address => mapping(address => uint256))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_bytes32,t_uint256)": {
-            "label": "mapping(bytes32 => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_string_storage": {
-            "label": "string",
-            "numberOfBytes": "32"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
     "cde67384a00d2b573c73b1f06eeebd7eef94197fa178923321bb912c15add563": {
       "address": "0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab",
-      "txHash": "0xb7b1f38c7c2a1f7ca6461a2c979439805513419db19432a636a3fe776272e91f",
+      "txHash": "0x4ec0b6712138ff469867d4ad0115bc14c82962a6c1778bb33ac550889f72187e",
       "layout": {
         "storage": [
           {
@@ -320,6 +177,136 @@
           "t_contract(LendingPoolAddressesProviderInterface)1534": {
             "label": "contract LendingPoolAddressesProviderInterface",
             "numberOfBytes": "20"
+          }
+        }
+      }
+    },
+    "2aa8517802b348f80986fe307fc0f14911a8eb713c1b4126310fa6bdce9bfaed": {
+      "address": "0xf1721FCF509c975c3eC0f474aEB58EFcbf80e4D6",
+      "txHash": "0x10b70553aa4c9a6c5d440f00db69a3b1ee628c43d4353588519851ce4164cf51",
+      "layout": {
+        "storage": [
+          {
+            "label": "balances_",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Token",
+            "src": "contracts/Token.sol:17"
+          },
+          {
+            "label": "allowances_",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "Token",
+            "src": "contracts/Token.sol:18"
+          },
+          {
+            "label": "decimals_",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint8",
+            "contract": "Token",
+            "src": "contracts/Token.sol:19"
+          },
+          {
+            "label": "totalSupply_",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "Token",
+            "src": "contracts/Token.sol:20"
+          },
+          {
+            "label": "name_",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_string_storage",
+            "contract": "Token",
+            "src": "contracts/Token.sol:21"
+          },
+          {
+            "label": "symbol_",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_string_storage",
+            "contract": "Token",
+            "src": "contracts/Token.sol:22"
+          },
+          {
+            "label": "initialized_",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_bool",
+            "contract": "Token",
+            "src": "contracts/Token.sol:24"
+          },
+          {
+            "label": "pool_",
+            "offset": 1,
+            "slot": "6",
+            "type": "t_contract(LiquidityProvider)30",
+            "contract": "Token",
+            "src": "contracts/Token.sol:26"
+          },
+          {
+            "label": "rngOracle_",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_address",
+            "contract": "Token",
+            "src": "contracts/Token.sol:28"
+          },
+          {
+            "label": "pastRewards_",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_bytes32,t_uint256)",
+            "contract": "Token",
+            "src": "contracts/Token.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(LiquidityProvider)30": {
+            "label": "contract LiquidityProvider",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
           }
         }
       }

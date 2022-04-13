@@ -165,7 +165,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
       await deployedPool.deployed();
       await deployedToken.deployed();
-      await deployedToken.functions.__TokenBase_init(
+      await deployedToken.functions.init(
         deployedPool.address,
         token.decimals,
         token.name,

@@ -4,10 +4,9 @@ pragma abicoder v1;
 import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./LiquidityProvider.sol";
 
-contract Token is Initializable, IERC20 {
+contract Token is IERC20 {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -22,6 +21,8 @@ contract Token is Initializable, IERC20 {
     string private name_;
     string private symbol_;
 
+    bool initialized_;
+
     LiquidityProvider pool_;
 
     address rngOracle_;
@@ -32,13 +33,16 @@ contract Token is Initializable, IERC20 {
 
     // we pass in the metadata explicitly instead of sourcing from the underlying
     // token because some underlying tokens don't implement these methods
-    function __TokenBase_init(
+    function init(
         address _liquidityProvider,
         uint8 _decimals,
         string memory _name,
         string memory _symbol,
         address _oracle
-    ) public initializer {
+    ) public {
+        require(!initialized_, "contract is already initialized");
+        initialized_ = true;
+
         rngOracle_ = _oracle;
 
         pool_ = LiquidityProvider(_liquidityProvider);
