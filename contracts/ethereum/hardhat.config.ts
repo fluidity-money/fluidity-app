@@ -16,8 +16,8 @@ import {
 
 import { ethers } from "ethers";
 
-const IERC20UpgradeablePath =
-  './artifacts/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol/IERC20Upgradeable.json';
+const IERC20Path =
+  './artifacts/contracts/openzeppelin/IERC20.sol/IERC20.json';
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
@@ -182,7 +182,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
 subtask("forknet:take-usdt", async (_taskArgs, hre) => {
   const IERC20 =
-    await readFile(IERC20UpgradeablePath)
+    await readFile(IERC20Path)
       .then(res => JSON.parse('' + res))
       .catch(e => {
         if (e.code === "ENOENT")
