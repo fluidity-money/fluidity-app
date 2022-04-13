@@ -171,9 +171,9 @@ library Address {
      *
      * _Available since v3.4._
      */
-    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
-    }
+//    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+//        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+//    }
 
     /**
      * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
@@ -181,16 +181,16 @@ library Address {
      *
      * _Available since v3.4._
      */
-    function functionDelegateCall(
-        address target,
-        bytes memory data,
-        string memory errorMessage
-    ) internal returns (bytes memory) {
-        require(isContract(target), "Address: delegate call to non-contract");
+//    function functionDelegateCall(
+//        address target,
+//        bytes memory data,
+//        string memory errorMessage
+//    ) internal returns (bytes memory) {
+//        require(isContract(target), "Address: delegate call to non-contract");
 
-        (bool success, bytes memory returndata) = target.delegatecall(data);
-        return verifyCallResult(success, returndata, errorMessage);
-    }
+//        (bool success, bytes memory returndata) = target.delegatecall(data);
+//        return verifyCallResult(success, returndata, errorMessage);
+//    }
 
     /**
      * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the

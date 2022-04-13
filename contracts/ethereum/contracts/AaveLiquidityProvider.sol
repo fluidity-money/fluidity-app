@@ -46,7 +46,7 @@ contract AaveLiquidityProvider is LiquidityProvider {
         require(amount == realAmount, "amount aave withdrew was different to requested");
     }
 
-    function totalPoolAmount() external returns (uint) {
+    function totalPoolAmount() external view returns (uint) {
         return aToken_.balanceOf(address(this));
     }
 }

@@ -3,12 +3,11 @@ pragma abicoder v1;
 
 import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "./openzeppelin/Address.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./LiquidityProvider.sol";
 
-contract Token is Initializable, ERC20Upgradeable {
+contract Token is Initializable, IERC20 {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -16,11 +15,16 @@ contract Token is Initializable, ERC20Upgradeable {
     event MintFluid(address indexed addr, uint indexed amount);
     event BurnFluid(address indexed addr, uint indexed amount);
 
+    mapping(address => uint256) private balances_;
+    mapping(address => mapping(address => uint256)) private allowances_;
+    uint8 private decimals_;
+    uint256 private totalSupply_;
+    string private name_;
+    string private symbol_;
+
     LiquidityProvider pool_;
 
     address rngOracle_;
-
-    uint8 decimals_;
 
     // operating at word size here saves a little bit of gas
     // txhash => 1
@@ -35,8 +39,6 @@ contract Token is Initializable, ERC20Upgradeable {
         string memory _symbol,
         address _oracle
     ) public initializer {
-        __ERC20_init_unchained(_name, _symbol);
-
         rngOracle_ = _oracle;
 
         pool_ = LiquidityProvider(_liquidityProvider);
@@ -45,9 +47,10 @@ contract Token is Initializable, ERC20Upgradeable {
         pool_.underlying_().totalSupply();
 
         decimals_ = _decimals;
+        name_ = _name;
+        symbol_ = _symbol;
     }
 
-    function decimals() public view override returns (uint8) { return decimals_; }
     function oracle() public view returns (address) { return rngOracle_; }
     // name and symbol provided by ERC20 parent
 
@@ -104,7 +107,7 @@ contract Token is Initializable, ERC20Upgradeable {
         uint[] calldata balls,
         uint[] calldata payouts
     ) public {
-        require(_msgSender() == rngOracle_, "only the oracle account can use this");
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         // ensure the tx hasn't already been redeemed
         require(pastRewards_[txHash] == 0, "reward already given for this tx");
@@ -138,4 +141,115 @@ contract Token is Initializable, ERC20Upgradeable {
 
         return payouts[winningBalls - 1];
     }
+
+    // erc20 spec
+    function name() public view returns (string memory) { return name_; }
+    function symbol() public view returns (string memory) { return symbol_; }
+    function decimals() public view returns (uint8) { return decimals_; }
+    function totalSupply() public view returns (uint256) { return totalSupply_; }
+    function balanceOf(address account) public view returns (uint256) {
+       return balances_[account];
+    }
+
+    function transfer(address to, uint256 amount) public returns (bool) {
+        _transfer(msg.sender, to, amount);
+        return true;
+    }
+    function allowance(address owner, address spender) public view returns (uint256) {
+        return allowances_[owner][spender];
+    }
+    function approve(address spender, uint256 amount) public returns (bool) {
+        _approve(msg.sender, spender, amount);
+        return true;
+    }
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) public returns (bool) {
+        _spendAllowance(from, msg.sender, amount);
+        _transfer(from, to, amount);
+        return true;
+    }
+
+    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+        _approve(msg.sender, spender, allowances_[msg.sender][spender] + addedValue);
+        return true;
+    }
+
+    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+        uint256 currentAllowance = allowances_[msg.sender][spender];
+        require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
+        unchecked {
+            _approve(msg.sender, spender, currentAllowance - subtractedValue);
+        }
+
+        return true;
+    }
+
+    function _transfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
+        require(from != address(0), "ERC20: transfer from the zero address");
+        require(to != address(0), "ERC20: transfer to the zero address");
+
+        uint256 fromBalance = balances_[from];
+        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+        unchecked {
+            balances_[from] = fromBalance - amount;
+        }
+        balances_[to] += amount;
+
+        emit Transfer(from, to, amount);
+    }
+
+    function _mint(address account, uint256 amount) internal virtual {
+        require(account != address(0), "ERC20: mint to the zero address");
+
+        totalSupply_ += amount;
+        balances_[account] += amount;
+        emit Transfer(address(0), account, amount);
+    }
+
+    function _burn(address account, uint256 amount) internal virtual {
+        require(account != address(0), "ERC20: burn from the zero address");
+
+        uint256 accountBalance = balances_[account];
+        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+        unchecked {
+            balances_[account] = accountBalance - amount;
+        }
+        totalSupply_ -= amount;
+
+        emit Transfer(account, address(0), amount);
+    }
+
+    function _approve(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal virtual {
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
+
+        allowances_[owner][spender] = amount;
+        emit Approval(owner, spender, amount);
+    }
+
+    function _spendAllowance(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal virtual {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
+        }
+    }
+
 }
