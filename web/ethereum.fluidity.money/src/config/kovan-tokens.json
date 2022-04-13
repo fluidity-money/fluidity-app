@@ -36,7 +36,7 @@
   },
   {
     "symbol": "fDAI",
-    "address": "",
+    "address": "0xA4c2826Df07f0a37B125D5815B12Ff2f529a66e9",
     "colour": "#fdc134",
     "image": "img/TokenIcons/daiIcon.svg",
     "decimals": 18
