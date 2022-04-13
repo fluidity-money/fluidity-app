@@ -1,4 +1,3 @@
-
 import styled from "styled-components";
 
 export const Title = styled.h1`
@@ -12,7 +11,7 @@ export const Subtitle = styled.h2`
   font-size: 18px;
   font-family: "Poppins", sans-serif;
   color: white;
-  padding-bottom: 20px;
+  padding: 10px;
   font-weight: 500;
   margin: 0;
 `;
