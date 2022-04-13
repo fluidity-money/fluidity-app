@@ -54,13 +54,13 @@ const LetsTalk = () => {
               <LetsTalkInput
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="Email"
               />
             </RowOnDesktop>
             <MessageContainer>
               <LetsTalkText
                 value={message}
-                placeholder="Write your message..."
+                placeholder="Message"
                 onChange={(e) => setMessage(e.target.value)}
               />
             </MessageContainer>
