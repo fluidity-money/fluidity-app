@@ -1,5 +1,4 @@
 import hre from 'hardhat';
-import "@nomiclabs/hardhat-waffle";
 
 async function main() {
   await hre.network.provider.send("evm_mine");

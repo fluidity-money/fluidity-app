@@ -68,7 +68,7 @@ const main = async () => {
     console.log(`initialising token with oracle ${oracle} decimals ${decimals} symbol ${symbol} name ${name}`);
 
     await token.deployed();
-    await token.functions.__TokenBase_init(
+    await token.functions.init(
         pool.address,
         decimals,
         name,
