@@ -18,5 +18,16 @@ services:
       FLU_SOLANA_TVL_PAYER_PRIKEY: ${FLU_SOLANA_TVL_PAYER_PRIKEY}
       FLU_SOLANA_TVL_DATA_PUBKEY: ${FLU_SOLANA_TVL_DATA_PUBKEY}
       FLU_SOLANA_SOLEND_PROGRAM_ID: ${FLU_SOLANA_SOLEND_PROGRAM_ID}
-    restart: 
+    restart:
       unless-stopped
+
+  microservice-common-count-wins-solana:
+    build:
+      context: ../cmd/microservice-common-count-wins
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-count-wins-solana
+      FLU_SOLANA_TOKENS_LIST: ${FLU_SOLANA_TOKENS_LIST}
+    depends_on:
+      - postgres
+      - timescale
