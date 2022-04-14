@@ -183,10 +183,15 @@ func main() {
 		if ethereumAddressesEmpty || stringsEmpty {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
-					"%s set to aave, but missing arguments!",
+					"Backend set to aave, but missing arguments!",
 					BackendAave,
 					EnvATokenAddress,
 					EnvAaveAddressProviderAddress,
+					EnvUnderlyingTokenAddress,
+					underlyingTokenAddress_,
+					EnvUnderlyingTokenDecimals,
+					underlyingTokenDecimals_,
+					EnvUnderlyingTokenName,
 				)
 			})
 		}
