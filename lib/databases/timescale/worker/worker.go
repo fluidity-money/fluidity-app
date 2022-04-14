@@ -3,6 +3,8 @@ package worker
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
@@ -41,11 +43,24 @@ func InsertEmissions(emission Emission) {
 		winningChances      = emission.WinningChances
 	)
 
+	var testingBallsString strings.Builder
+
+	for i, ball := range naiveIsWinning.TestingBalls {
+		ballString := strconv.FormatUint(uint64(ball), 10)
+
+		if i > 0 {
+			_, _ = testingBallsString.WriteRune(',')
+		}
+
+		_, _ = testingBallsString.WriteString(ballString)
+	}
+
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
 			transaction_hash,
 			recipient_address,
 			sender_address,
+			network,
 			token_short_name,
 			token_decimals,
 
@@ -87,7 +102,7 @@ func InsertEmissions(emission Emission) {
 			compound_get_token_apy_pow_left_side_days_per_year,
 			compound_get_token_apy_supply_apy,
 
-			winning_chances,
+			winning_chances
 		)
 
 		VALUES (
@@ -100,7 +115,7 @@ func InsertEmissions(emission Emission) {
 
 			$7,
 			$8,
-			$9
+			$9,
 			$10,
 			$11,
 			$12,
@@ -171,7 +186,7 @@ func InsertEmissions(emission Emission) {
 		calculateN.Atx,
 		calculateN.N,
 
-		naiveIsWinning.TestingBalls,
+		testingBallsString.String(),
 
 		calculateBpy.BlockTimeInSeconds,
 		calculateBpy.CompSupplyApy,
