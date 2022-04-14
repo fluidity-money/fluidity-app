@@ -11,6 +11,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/saber"
+	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/orca"
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
 
 	solanaLibrary "github.com/gagliardetto/solana-go"
@@ -27,6 +28,9 @@ const (
 	// EnvSaberRpcUrl to use when making lookups to their infrastructure
 	EnvSaberRpcUrl = `FLU_SOLANA_SABER_RPC_URL`
 
+	// EnvOrcaProgramid is the program ID of the orca swap program
+	EnvOrcaProgramId = `FLU_SOLANA_SABER_SWAP_PROGRAM_ID`
+
 	// EnvSolPythPubkey is the public key of the Pyth price account for SOL
 	EnvSolPythPubkey = `FLU_SOLANA_SOL_PYTH_PUBKEY`
 )
@@ -41,6 +45,7 @@ func main() {
 		solanaRpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		saberRpcUrl         = util.GetEnvOrFatal(EnvSaberRpcUrl)
 		saberSwapProgramId  = util.GetEnvOrFatal(EnvSaberSwapProgramId)
+		orcaProgramId       = util.GetEnvOrFatal(EnvOrcaProgramId)
 		solPythPubkeyString = util.GetEnvOrFatal(EnvSolPythPubkey)
 	)
 
@@ -103,6 +108,21 @@ func main() {
 			}
 
 			adjustedFee.Add(adjustedFee, saberFee)
+
+			orcaFee, err := orca.GetOrcaFee(
+				solanaClient,
+				transaction,
+				orcaProgramId,
+			)
+
+			if err != nil {
+				log.App(func(k *log.Log) {
+					k.Message = "Error ocurred checking for Orca fees!"
+					k.Payload = err
+				})
+			}
+
+			adjustedFee.Add(adjustedFee, orcaFee)
 
 			parsedTransactions[i] = solanaQueue.Transaction{
 				Signature:   transaction.Transaction.Signatures[0],
