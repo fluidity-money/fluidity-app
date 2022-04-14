@@ -54,13 +54,13 @@ const LetsTalk = () => {
               <LetsTalkInput
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="Email"
               />
             </RowOnDesktop>
             <MessageContainer>
               <LetsTalkText
                 value={message}
-                placeholder="Write your message..."
+                placeholder="Message"
                 onChange={(e) => setMessage(e.target.value)}
               />
             </MessageContainer>
@@ -126,7 +126,7 @@ const LetsTalkInputContainer = styled.div`
 
 const LetsTalkInput = styled(Input)`
   font-size: 16px;
-  padding-left: 10px;
+  padding: 15px 25px 15px 25px;
   width: 47%;
 
   @media (max-width: 768px) {
@@ -150,7 +150,7 @@ const LetsTalkText = styled.textarea`
   color: white;
   background: #333333;
   border-radius: 20px;
-  padding: 20px;
+  padding: 25px;
   box-sizing: border-box;
   border-style: solid;
   border-color: transparent;
