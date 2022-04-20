@@ -98,6 +98,12 @@ func main() {
 			})
 		}
 
+		if block.Hash.String() != blockHash.String() {
+			log.Fatal(func(k *log.Log) {
+				k.Format("Block with hash %v fetched different hash!", blockHash.String(), block.Hash.String())
+			})
+		}
+
 		newTransactions, err := ethConvert.ConvertTransactions(blockHash.String(), block.Transactions)
 
 		if err != nil {
@@ -107,6 +113,8 @@ func main() {
 			})
 		}
 
+		amqpBlock.Transactions = append(amqpBlock.Transactions, newTransactions...)
+
 		newFluidLogs, err := lib.GetLogsFromHash(gethHttpApi, blockHash.String())
 
 		if err != nil {
@@ -115,22 +123,6 @@ func main() {
 				k.Payload = err
 			})
 		}
-
-		if len(newTransactions) < len(newFluidLogs) {
-			err = fmt.Errorf(
-				"Retrieved %v Logs: %v, Retrieved %v Transactions",
-				len(newFluidLogs),
-				newFluidLogs,
-				len(newTransactions),
-			)
-
-			log.Fatal(func(k *log.Log) {
-				k.Format("Block with hash %v contained more fluid logs than transactions!", blockHash.String())
-				k.Payload = err
-			})
-		}
-
-		amqpBlock.Transactions = append(amqpBlock.Transactions, newTransactions...)
 
 		amqpBlock.Logs = append(amqpBlock.Logs, newFluidLogs...)
 
