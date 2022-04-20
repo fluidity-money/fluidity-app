@@ -96,7 +96,7 @@ type (
 
 	TransactionMeta struct {
 		// TODO solana doesn't doccument what this type actually is
-		Err               map[string]interface{}    `json:"err"`
+		Err               interface{}               `json:"err"`
 		Fee               uint64                    `json:"fee"`
 		PreTokenBalances  []TransactionTokenBalance `json:"preTokenBalances"`
 		PostTokenBalances []TransactionTokenBalance `json:"postTokenBalances"`
