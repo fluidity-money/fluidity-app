@@ -130,3 +130,14 @@ services:
       FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_FEI}
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_FEI}
     restart: unless-stopped
+
+  microservice-common-count-wins-ethereum:
+    build:
+      context: ../cmd/microservice-common-count-wins
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-count-wins-ethereum
+      FLU_ETHEREUM_TOKENS_LIST: ${FLU_ETHEREUM_TOKENS_LIST}
+    depends_on:
+      - postgres
+      - timescale
