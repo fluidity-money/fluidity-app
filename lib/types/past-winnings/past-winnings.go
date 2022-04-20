@@ -14,4 +14,5 @@ type PastWinnings struct {
 	WinningDate     time.Time                 `json:"winning_date"`
 	AmountOfWinners uint64                    `json:"amount_of_winners"`
 	WinningAmount   misc.BigInt               `json:"winning_amount"`
+	TokenName       string                    `json:"token_name"`
 }
