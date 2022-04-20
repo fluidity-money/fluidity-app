@@ -41,6 +41,19 @@ services:
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
     restart: unless-stopped
 
+  microservice-ethereum-user-actions-tusd:
+    build:
+      context: ../cmd/microservice-ethereum-user-actions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-user-actions-tusd
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FTUSD}
+      FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_TUSD}
+      FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_TUSD}
+    restart: unless-stopped
+
   microservice-ethereum-prize-pool:
     build:
       context: ../cmd/microservice-ethereum-prize-pool
@@ -103,4 +116,17 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
       FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_DAI}
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
+    restart: unless-stopped
+
+  microservice-ethereum-track-winners-tusd:
+    build:
+      context: ../cmd/microservice-ethereum-track-winners
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-track-winners-tusd
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FTUSD}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_TUSD}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_TUSD}
     restart: unless-stopped

@@ -486,21 +486,43 @@ func main() {
 
 		bpy := probability.CalculateBpy(secondsSinceLastBlock, currentApyInUsdt, emission)
 
-		balanceOfUnderlying, err := compound.GetBalanceOfUnderlying(
-			gethClient,
-			ethCTokenAddress,
-			ethContractAddress,
-		)
+		var balanceOfUnderlying *big.Rat
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get the prize pool in the Fluidity contract! Address %#v!",
-					contractAddress,
-				)
+		if tokenBackend == BackendCompound {
+			balanceOfUnderlying, err = compound.GetBalanceOfUnderlying(
+				gethClient,
+				ethCTokenAddress,
+				ethContractAddress,
+			)
 
-				k.Payload = err
-			})
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the underlying compound balance in the Fluidity contract! Address %#v!",
+						contractAddress,
+					)
+
+					k.Payload = err
+				})
+			}
+
+		} else if tokenBackend == BackendAave {
+			balanceOfUnderlying, err = aave.GetBalanceOf(
+				gethClient,
+				ethATokenAddress,
+				ethContractAddress,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the underlying aave balance in the Fluidity contract! Address %#v!",
+						contractAddress,
+					)
+
+					k.Payload = err
+				})
+			}
 		}
 
 		sizeOfThePool, err := fluidity.GetRewardPool(
