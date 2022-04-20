@@ -173,3 +173,25 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 
 	return signatureString, nil
 }
+
+// Hardcoded fluid->base token pairs
+func GetBaseToken(token string) (string, error) {
+	fluidTokens := map[string]string{
+		"2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa": "zVzi5VAf4qMEwzv7NXECVx5v2pQ7xnqVVjCXZwS9XzA",
+		"97JpYk6S7i9ydzjNwb92DQEfsA1KUUWSwnWGaGDFe6bk": "Bp2nLuamFZndE7gztA1iPsNVhdJeg9xfKdq7KmvjpGoP",
+	}
+	baseToken := fluidTokens[token]
+	if baseToken == "" {
+		return "", fmt.Errorf("Token not found!")
+	}
+
+	return baseToken, nil
+}
+
+func IsFluidToken(token string) (bool) {
+	_, err := GetBaseToken(token)
+	if err != nil {
+		return true
+	}
+	return false
+}

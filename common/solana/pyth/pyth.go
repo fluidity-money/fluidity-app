@@ -144,3 +144,24 @@ func GetPrice(solanaClient *rpc.Client, pricePubkey solana.PublicKey) (*big.Rat,
 
 	return priceRat, nil
 }
+
+func GetPriceByToken(solanaClient *rpc.Client,  token string) (*big.Rat, error){
+	PythPrices := map[string]string{
+		"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD",
+		"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": "3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL",
+	}
+
+	pythPricePubkeyString := PythPrices[token]
+
+	if pythPricePubkeyString == "" {
+		return nil, fmt.Errorf(
+			"Token not found in Pyth price pubkey map!",
+		)
+	}
+
+	pythPricePubkey := solana.MustPublicKeyFromBase58(pythPricePubkeyString)
+
+	pythPrice, err := GetPrice(solanaClient, pythPricePubkey)
+
+	return pythPrice, err
+}

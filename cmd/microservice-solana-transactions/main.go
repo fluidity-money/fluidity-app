@@ -29,7 +29,7 @@ const (
 	EnvSaberRpcUrl = `FLU_SOLANA_SABER_RPC_URL`
 
 	// EnvOrcaProgramid is the program ID of the orca swap program
-	EnvOrcaProgramId = `FLU_SOLANA_SABER_SWAP_PROGRAM_ID`
+	EnvOrcaProgramId = `FLU_SOLANA_ORCA_PROGRAM_ID`
 
 	// EnvSolPythPubkey is the public key of the Pyth price account for SOL
 	EnvSolPythPubkey = `FLU_SOLANA_SOL_PYTH_PUBKEY`
