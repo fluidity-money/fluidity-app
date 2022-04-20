@@ -27,7 +27,8 @@ func GetPastWinnings(network network.BlockchainNetwork, amount int) (pastWinning
 		SELECT
 			winning_date,
 			amount_of_winners,
-			winning_amount
+			winning_amount,
+			token_name
 
 		FROM %s
 		WHERE network = $1
@@ -59,6 +60,7 @@ func GetPastWinnings(network network.BlockchainNetwork, amount int) (pastWinning
 			&pastWinning.WinningDate,
 			&pastWinning.AmountOfWinners,
 			&pastWinning.WinningAmount,
+			&pastWinning.TokenName,
 		)
 
 		if err != nil {
@@ -83,14 +85,16 @@ func InsertPastWinnings(pastWinnings PastWinnings) {
 			network,
 			winning_date,
 			amount_of_winners,
-			winning_amount
+			winning_amount,
+			token_name
 		)
 
 		VALUES (
 			$1,
 			$2,
 			$3,
-			$4
+			$4,
+			$5
 		);
 		`,
 
@@ -103,6 +107,7 @@ func InsertPastWinnings(pastWinnings PastWinnings) {
 		pastWinnings.WinningDate,
 		pastWinnings.AmountOfWinners,
 		pastWinnings.WinningAmount,
+		pastWinnings.TokenName,
 	)
 
 	if err != nil {
