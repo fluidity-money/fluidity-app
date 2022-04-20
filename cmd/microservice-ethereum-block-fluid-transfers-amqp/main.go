@@ -30,7 +30,7 @@ func convertAddressToBytes(address string) ([]byte, error) {
 	hexValues := address[2:]
 
 	if prefix != "0x" {
-		err := fmt.Errorf("Address does not start with 0x (%v)", address)
+		err := fmt.Errorf("address does not start with 0x (%v)", address)
 		return []byte{}, err
 	}
 
@@ -44,7 +44,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not parse Hex TransferLogTopicAddr!"
+			k.Message = "could not parse Hex TransferLogTopicAddr!"
 			k.Payload = err
 		})
 	}
@@ -87,20 +87,20 @@ func main() {
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get a block using its hash!"
+				k.Message = "failed to get a block using its hash!"
 				k.Payload = err
 			})
 		}
 
 		if block == nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format("Block with hash %v was empty!", blockHash.String())
+				k.Format("block with hash %v was empty!", blockHash.String())
 			})
 		}
 
 		if block.Hash.String() != blockHash.String() {
 			log.Fatal(func(k *log.Log) {
-				k.Format("Block with hash %v fetched different hash!", blockHash.String(), block.Hash.String())
+				k.Format("block with hash %v fetched different hash!", blockHash.String(), block.Hash.String())
 			})
 		}
 
@@ -108,7 +108,7 @@ func main() {
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format("Could not convert transactions from block: %v", blockHash)
+				k.Format("could not convert transactions from block: %v", blockHash)
 				k.Payload = err
 			})
 		}
@@ -119,7 +119,7 @@ func main() {
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format("Could not get logs from block: %v", blockHash)
+				k.Format("could not get logs from block: %v", blockHash)
 				k.Payload = err
 			})
 		}
