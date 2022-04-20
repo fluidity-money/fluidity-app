@@ -95,8 +95,7 @@ func InsertPastWinnings(pastWinnings PastWinnings) {
 			$1,
 			$2,
 			$3,
-			$4,
-			$5
+			$4
 		);
 		`,
 
