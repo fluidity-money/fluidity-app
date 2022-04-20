@@ -111,11 +111,6 @@ func main() {
 	var (
 		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
 		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
-
-		// Amount to multiply the adjusted fee by such that a basic spl-token transfer
-		// corresponds to the basic solana fee. (200000 = default Solana compute budget)
-
-		invSolanaSplTransferComputeRat = big.NewRat(200000, SplTranferCompute)
 	)
 
 	solanaClient := solanaRpc.New(rpcUrl)
@@ -138,8 +133,6 @@ func main() {
 		)
 
 		emission.Network = "solana"
-
-		// USDC uses 1e6 places
 
 		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
 
@@ -232,11 +225,6 @@ func main() {
 			}
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
-
-			solanaTransactionFeesNormalised.Mul(
-				solanaTransactionFeesNormalised,
-				invSolanaSplTransferComputeRat,
-			)
 
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
