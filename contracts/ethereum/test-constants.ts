@@ -1,6 +1,8 @@
 // constants used for tests / forknet
 // all of these are for mainnet
 
+import { Token } from "./script-utils";
+
 export const AAVE_POOL_PROVIDER_ADDR = '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5';
 
 export const USDT_ADDR = '0xdac17f958d2ee523a2206206994597c13d831ec7';
@@ -29,3 +31,51 @@ export const USUAL_FUSDC_ADDR = '0x0094D1019251793dB2100026736ee267946B5FA4';
 export const USUAL_FDAI_ADDR = '0xA5F816E2dE025A1bb419eD59652Fa03F249369A9';
 export const USUAL_FTUSD_ADDR = '0xD3a3C51BD460aCE0E83506CD1191Cf77F5eC3415';
 export const USUAL_FFEI_ADDR = '0xF24B32ec321e99053809f52aEbF680F70FE0dc53';
+
+export const TokenList: { [name: string]: Token } = {
+  "usdt": {
+    backend: 'compound',
+    compoundAddress: CUSDT_ADDR,
+    decimals: 6,
+    name: "Fluid USDt",
+    symbol: "fUSDt",
+    address: USDT_ADDR,
+    owner: USDT_HOLDER
+  },
+  "usdc": {
+    backend: 'compound',
+    compoundAddress: CUSDC_ADDR,
+    decimals: 6,
+    name: "Fluid USDc",
+    symbol: "fUSDc",
+    address: USDC_ADDR,
+    owner: USDC_HOLDER
+  },
+  "dai": {
+    backend: 'compound',
+    compoundAddress: CDAI_ADDR,
+    decimals: 18,
+    name: "Fluid DAI",
+    symbol: "fDAI",
+    address: DAI_ADDR,
+    owner: DAI_HOLDER
+  },
+  "tusd": {
+    backend: 'compound',
+    compoundAddress: CTUSD_ADDR,
+    decimals: 18,
+    name: "Fluid tUSD",
+    symbol: "ftUSD",
+    address: TUSD_ADDR,
+    owner: TUSD_HOLDER
+  },
+  "fei": {
+    backend: 'aave',
+    aaveAddress: AFEI_ADDR,
+    decimals: 18,
+    name: "Fluid Fei",
+    symbol: "fFei",
+    address: FEI_ADDR,
+    owner: FEI_HOLDER
+  },
+};
