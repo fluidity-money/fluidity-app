@@ -12,6 +12,7 @@ const navbarItems: [string, string][] = [
   ["Contact", "https://fluidity.money/#lets-talk"],
   ["Blog", "https://blog.fluidity.money"],
   ["Whitepapers", "https://fluidity.money/#whitepapers"],
+  ["Docs", "https://docs.fluidity.money/"],
 ];
 
 // {[k: network]: [display name, value to use in request, [supported tokens]]}
