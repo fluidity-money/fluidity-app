@@ -35,7 +35,7 @@ func GetPastWinnings(network network.BlockchainNetwork, amount int) (pastWinning
 				WHERE network = $1
 				ORDER BY winning_date DESC
 				LIMIT $2
-			)
+			) AS t
 
 		ORDER BY winning_date ASC;
 		`,
