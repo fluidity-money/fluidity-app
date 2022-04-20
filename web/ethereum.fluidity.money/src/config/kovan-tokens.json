@@ -29,7 +29,7 @@
   },
   {
     "symbol": "fTUSD",
-    "address": "",
+    "address": "0xcD20E20e5b873ecc92d284515C6254F386c7C57B",
     "colour": "#2433b8",
     "image": "img/TokenIcons/tusdIcon.svg",
     "decimals": 18
