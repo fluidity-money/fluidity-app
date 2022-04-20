@@ -10,7 +10,7 @@ func tokensListToMap(list string) (map[string]*big.Int, error) {
 	tokens := make(map[string]*big.Int, 0)
 
 	for _, tokenInfo := range strings.Split(list, ",") {
-		tokenSplit := strings.Split(tokenInfo, ",")
+		tokenSplit := strings.Split(tokenInfo, ":")
 
 		var (
 			_              = tokenSplit[0]

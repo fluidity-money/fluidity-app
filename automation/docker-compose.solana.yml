@@ -10,7 +10,6 @@ services:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-prize-pool
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
       FLU_SOLANA_TOKENS_LIST: ${FLU_SOLANA_TOKENS_LIST}
@@ -27,7 +26,9 @@ services:
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-count-wins-solana
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_TOKENS_LIST: ${FLU_SOLANA_TOKENS_LIST}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
     depends_on:
       - postgres
       - timescale
