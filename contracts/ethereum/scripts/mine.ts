@@ -1,3 +1,6 @@
+// forcibly mine a block on hardhat - this is
+// sometimes useful to get external things to update
+
 import hre from 'hardhat';
 
 async function main() {

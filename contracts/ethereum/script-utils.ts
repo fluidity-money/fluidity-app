@@ -24,8 +24,17 @@ export type Token = {
 
 export const mustEnv = (env: string): string => {
     const e = process.env[env];
-    if (e == undefined) {
+    if (e === undefined) {
         throw new Error(`Env ${env} not set!`);
+    }
+    return e;
+};
+
+export const optionalEnv = (env: string, fallback: string): string => {
+    let e = process.env[env];
+    if (e === undefined) {
+      console.log(`Optional env ${env} not set - defaulting to '${fallback}`);
+      e = fallback;
     }
     return e;
 };
