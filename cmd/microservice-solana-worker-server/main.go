@@ -108,10 +108,13 @@ func main() {
 		})
 	}
 
-	var (
-		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
-		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
-	)
+	decimalPlacesRat := big.NewRat(1, 1)
+
+	// raise decimal places to 10^n
+	tenRat := big.NewRat(10, 1)
+	for i := 0; i < decimalPlaces; i++ {
+		decimalPlacesRat.Mul(decimalPlacesRat, tenRat)
+	}
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
@@ -163,17 +166,26 @@ func main() {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 
-		mintSupply := prize_pool.GetMintSupply(rpcUrl, fluidMintPubkey)
+		mintSupply, err := prize_pool.GetMintSupply(rpcUrl, fluidMintPubkey)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get the mint supply! %v",
+					err,
+				)
+			})
+		}
 
 		// normalise the amount to be consistent with USDC as a floating point
 
 		entireAmountOwned := new(big.Rat).SetUint64(mintSupply)
 
-		entireAmountOwned.Quo(entireAmountOwned, usdcDecimalPlacesRat)
+		entireAmountOwned.Quo(entireAmountOwned, decimalPlacesRat)
 
 		// get the value of all fluidity obligations
 
-		tvl := prize_pool.GetTvl(
+		tvl, err := prize_pool.GetTvl(
 			rpcUrl,
 			fluidityPubkey,
 			tvlDataPubkey,
@@ -184,6 +196,15 @@ func main() {
 			switchboardPubkey,
 			payer,
 		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failedto get the TVL! %v",
+					err,
+				)
+			})
+		}
 
 		// get the size of the pool: obligation value minus deposited value then
 		// divide by 10e6 to get the actual number in
@@ -199,7 +220,7 @@ func main() {
 
 		sizeOfThePool := new(big.Rat).SetUint64(unscaledPool)
 
-		sizeOfThePool.Quo(sizeOfThePool, usdcDecimalPlacesRat)
+		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
 
 		bpyStakedUsd := probability.CalculateBpyStakedUnderlyingAsset(
 			bpy,

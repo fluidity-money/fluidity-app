@@ -55,7 +55,7 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 }
 
 func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) *big.Rat {
-	tvl := prize_pool.GetTvl(
+	tvl, err := prize_pool.GetTvl(
 		solanaRpcUrl,
 		fluidityPubkey,
 		tvlDataPubkey,
@@ -67,10 +67,28 @@ func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataP
 		payer,
 	)
 
-	mintSupply := prize_pool.GetMintSupply(
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to get TVL! %v",
+				err,
+			)
+		})
+	}
+
+	mintSupply, err := prize_pool.GetMintSupply(
 		solanaRpcUrl,
 		fluidMintPubkey,
 	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to get mint supply! %v",
+				err,
+			)
+		})
+	}
 
 	if mintSupply > tvl {
 		log.Fatal(func(k *log.Log) {
