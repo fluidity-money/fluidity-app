@@ -1,25 +1,8 @@
 import hre from 'hardhat'
 import { mustEnv } from '../script-utils';
-import type { ethers } from 'ethers';
 
 const ENV_TOKEN_BACKEND = `FLU_ETHEREUM_TOKEN_BACKEND`;
 const ENV_LIQUIDITY_TOKEN_ADDRESS = `FLU_ETHEREUM_LIQUIDITY_TOKEN_ADDRESS`;
-
-const cTokenAbi = [
-    'function underlying() returns (address)',
-];
-const aTokenAbi = [
-    'function UNDERLYING_ASSET_ADDRESS() returns (address)',
-    'function POOL() returns (address)',
-];
-const aLendingPoolAbi = [
-    'function getAddressesProvider() returns (address)',
-];
-const erc20Abi = [
-  'function name() returns (string)',
-  'function symbol() returns (string)',
-  'function decimals() returns (uint8)',
-];
 
 const main = async () => {
     const [signer] = await hre.ethers.getSigners();
@@ -30,16 +13,16 @@ const main = async () => {
     let liquidityToken;
 
     if (backend === 'compound') {
-        liquidityToken = new hre.ethers.Contract(
+        liquidityToken = await hre.ethers.getContractAt(
             liquidityTokenAddress,
-            cTokenAbi,
+            "CERC20Interface",
             signer,
         );
         underlyingAddress = await liquidityToken.callStatic.underlying();
     } else if (backend === 'aave') {
-        liquidityToken = new hre.ethers.Contract(
+        liquidityToken = await hre.ethers.getContractAt(
             liquidityTokenAddress,
-            aTokenAbi,
+            "ATokenInterface",
             signer,
         );
         underlyingAddress = await liquidityToken.callStatic.UNDERLYING_ASSET_ADDRESS();
@@ -47,9 +30,9 @@ const main = async () => {
         throw new Error(`Invalid token backend: ${backend} - should be 'compound' or 'aave'`);
     }
 
-    const underlying = new hre.ethers.Contract(
+    const underlying = await hre.ethers.getContractAt(
         underlyingAddress,
-        erc20Abi,
+        "IERC20",
         signer,
     );
 
@@ -62,9 +45,9 @@ const main = async () => {
         console.log(`FLU_ETHEREUM_AAVE_ATOKEN_ADDRESS=${liquidityTokenAddress}`);
 
         const lendingPoolAddress = await liquidityToken.callStatic.POOL();
-        const lendingPool = new hre.ethers.Contract(
+        const lendingPool = await hre.ethers.getContractAt(
             lendingPoolAddress,
-            aLendingPoolAbi,
+            "LendingPoolAddressesProviderInterface",
             signer,
         );
         const addressesProviderAddress = await lendingPool.callStatic.getAddressesProvider();
