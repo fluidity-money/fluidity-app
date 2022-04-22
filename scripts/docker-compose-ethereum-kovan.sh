@@ -90,5 +90,6 @@ docker-compose \
 	-f "$automation_dir/docker-compose.ethereum.yml" \
 	-f "$automation_dir/docker-compose.ethereum.fluidity.money.yml" \
 	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
+	-f "$automation_dir/docker-compose.ethereum-kovan.yml" \
 	-f "$automation_dir/docker-compose.ethereum-worker-kovan.yml" \
 	$@
