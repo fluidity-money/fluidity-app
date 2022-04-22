@@ -24,7 +24,8 @@ func getNonce(client *ethclient.Client, from ethCommon.Address) (*big.Int, error
 		if err != nil {
 		    return nil, fmt.Errorf(
 				"failed to fetch an account's pending nonce! %w",
-				err,)
+				err,
+			)
 		}
 
 
