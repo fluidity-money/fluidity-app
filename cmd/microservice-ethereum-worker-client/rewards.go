@@ -68,6 +68,17 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 		}
 	}
 
+	nonce, err := getNonce(client, transactionOptions.From)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to update transaction nonce! %v",
+			err,
+		)
+	}
+
+	transactionOptions.Nonce = nonce
+
 	transaction, err := fluidity.TransactReward(
 		client,
 		contractAddress,
