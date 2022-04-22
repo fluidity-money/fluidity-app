@@ -1,4 +1,3 @@
-
 import styled from "styled-components";
 
 export const RowOnDesktop = styled.div`
@@ -16,4 +15,14 @@ export const RowCentered = styled(RowOnDesktop)`
 
 export const RowSpaceAround = styled(RowOnDesktop)`
   justify-content: space-around;
+  @media (max-width: 768px) {
+    align-items: center;
+  }
+`;
+
+export const RowOnInput = styled(RowOnDesktop)`
+  justify-content: space-between;
+  @media (max-width: 768px) {
+    align-items: center;
+  }
 `;

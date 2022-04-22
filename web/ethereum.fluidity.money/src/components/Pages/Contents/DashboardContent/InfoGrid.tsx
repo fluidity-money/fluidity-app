@@ -17,8 +17,11 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
           Amount
         </div>
         <div className="reward-info-table-column-container">
-          {prizeBoard.map(({ winning_amount, token_details }) => (
-            <div className="reward-info-table-content" key={winning_amount}>
+          {prizeBoard.map(({ winning_amount, token_details }, i) => (
+            <div
+              className="reward-info-table-content"
+              key={winning_amount + String(i)}
+            >
               $
               {formatAmount(winning_amount, token_details.token_decimals)
                 .substring(0, 8)
@@ -57,8 +60,11 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
           Date
         </div>
         <div className="reward-info-table-column-container">
-          {prizeBoard.map(({ awarded_time }) => (
-            <div className="reward-info-table-content" key={awarded_time}>
+          {prizeBoard.map(({ awarded_time }, i) => (
+            <div
+              className="reward-info-table-content"
+              key={String(i) + awarded_time}
+            >
               {new Date(awarded_time)
                 .toLocaleString()
                 .split("")

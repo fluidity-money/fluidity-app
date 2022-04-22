@@ -18,7 +18,7 @@
     "address": "0x13512979ADE267AB5100878E2e0f485B568328a4",
     "colour": "rgb(36,163,124)",
     "image": "img/TokenIcons/usdtIcon.svg",
-    "decimals": 6 
+    "decimals": 6
   },
   {
     "symbol": "USDC",

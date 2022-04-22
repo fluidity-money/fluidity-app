@@ -15,6 +15,18 @@ type BigInt struct {
 	big.Int
 }
 
+func BigIntFromString(s string) (*BigInt, error) {
+	var int BigInt
+
+	if _, success := int.SetString(s, 10); !success {
+		return nil, fmt.Errorf(
+			"Failed to set the bigint! Bad string number!",
+		)
+	}
+
+	return &int, nil
+}
+
 func BigIntFromInt64(x int64) BigInt {
 	var int BigInt
 
@@ -44,22 +56,6 @@ func (i *BigInt) UnmarshalJSON(b []byte) error {
 			b,
 			err,
 		)
-	}
-
-	if has0xPrefix(str) {
-		int, err := BigIntFromHex(str)
-
-		if err != nil {
-			return fmt.Errorf(
-				"Failed to unharsmal a BigInt of %v! %v",
-				str,
-				err,
-			)
-		}
-
-		*i = *int
-
-		return nil
 	}
 
 	int, err := BigIntFromString(str)

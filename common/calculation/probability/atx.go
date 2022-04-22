@@ -2,13 +2,16 @@ package probability
 
 // atx calculates the ATX that we see in the current TRF version
 
-import "math/big"
+import (
+	"math/big"
+)
 
 // CalculateAtx using the duration since the last block and the number of
 // fluid transfers
 func CalculateAtx(secondsSinceLastBlock uint64, fluidTransfers int) *big.Rat {
 
-	if fluidTransfers == 0 {
+	// set to zero if negative, or either value is zero
+	if fluidTransfers <= 0 || secondsSinceLastBlock == 0 {
 		// zero type here is zero
 		return new(big.Rat)
 	}

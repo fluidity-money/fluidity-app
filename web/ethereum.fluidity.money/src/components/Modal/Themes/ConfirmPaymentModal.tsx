@@ -33,10 +33,13 @@ const ConfirmPaymentModal = ({
   // Functions to work out selected to and from option from context and get the respective external/internal token information
   const defaultVar: TokenKind = {
     symbol: "" as TokenType,
+    name: "",
     image: "",
     colour: "",
     address: "",
     decimals: 0,
+    amount: "",
+    pinned: false,
   };
 
   // Assigns the correct json file based on ChainId
