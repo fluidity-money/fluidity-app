@@ -8,9 +8,9 @@ import (
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
-	"github.com/fluidity-money/fluidity-app/lib/log"
+
 	"github.com/gagliardetto/solana-go"
-	"github.com/gagliardetto/solana-go/rpc"
+	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
 )
 
@@ -28,14 +28,16 @@ type tvlDataAccount struct {
 type (
 	simulateTransactionResponse struct {
 		Value   simulateTransactionValue `json:"value"`
-		Context rpc.Context              `json:"context"`
+		Context solanaRpc.Context              `json:"context"`
 	}
+
 	simulateTransactionValue struct {
 		TransactionError interface{}                  `json:"err"`
 		Logs             []string                     `json:"logs"`
 		Accounts         []simulateTransactionAccount `json:"accounts"`
 		UnitsConsumed    uint64                       `json:"unitsConsumed"`
 	}
+
 	simulateTransactionAccount struct {
 		Lamports   uint64   `json:"lamports"`
 		Owner      string   `json:"owner"`
@@ -46,18 +48,16 @@ type (
 )
 
 // GetMintSupply fetches the supply of a token via its mint address
-func GetMintSupply(rpcUrl string, account solana.PublicKey) (uint64, error) {
-	client := rpc.New(rpcUrl)
-
+func GetMintSupply(client *solanaRpc.Client, account solana.PublicKey) (uint64, error) {
 	res, err := client.GetTokenSupply(
 		context.Background(),
 		account,
-		rpc.CommitmentFinalized,
+		solanaRpc.CommitmentFinalized,
 	)
 
 	if err != nil {
 		return 0, fmt.Errorf(
-			"Failed to get fluid token supply! %v",
+			"failed to get fluid token supply! %v",
 			err,
 		)
 	}
@@ -68,7 +68,7 @@ func GetMintSupply(rpcUrl string, account solana.PublicKey) (uint64, error) {
 
 	if err != nil {
 		return 0, fmt.Errorf(
-			"Failed to parse token supply amount '%s': %v!",
+			"failed to parse token supply amount '%s': %v!",
 			amountString,
 			err,
 		)
@@ -78,14 +78,24 @@ func GetMintSupply(rpcUrl string, account solana.PublicKey) (uint64, error) {
 }
 
 // GetPrice wraps fetching the current price of a token
-func GetPrice(rpcUrl string, account solana.PublicKey) (*big.Rat, error) {
-	client := rpc.New(rpcUrl)
-	return pyth.GetPrice(client, account)
+func GetPrice(client *solanaRpc.Client, account solana.PublicKey) (*big.Rat, error) {
+	price, err := pyth.GetPrice(client, account)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to get the price using pyth: %v",
+			err,
+		)
+	}
+
+	return price, nil
 }
 
-// GetTvl retrieves the current total value locked from chain using a simulated transaction
-func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) (uint64, error) {
-	params := getTvlTransactionParams(
+// GetTvl retrieves the current total value locked from chain using a
+// simulated transaction
+func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) (uint64, error) {
+
+	params, err := getTvlTransactionParams(
 		fluidityPubkey,
 		tvlDataPubkey,
 		solendPubkey,
@@ -96,13 +106,19 @@ func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligati
 		payer,
 	)
 
-	client := rpc.New(rpcUrl)
+	if err != nil {
+		return 0, fmt.Errorf(
+			"failed to get the tvl transaction params: %v",
+			err,
+		)
+	}
 
 	response := new(simulateTransactionResponse)
 
 	// solana-go has the response type wrong, so we manually call the method
 	// and decode into our own response type
-	err := client.RPCCallForInto(
+
+	err = client.RPCCallForInto(
 		context.Background(),
 		response,
 		"simulateTransaction",
@@ -120,7 +136,7 @@ func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligati
 
 	if err := value.TransactionError; err != nil {
 		return 0, fmt.Errorf(
-			"Solana error simulating logtvl transaction! %v",
+			"solana error simulating logtvl transaction! %v",
 			err,
 		)
 	}
@@ -148,11 +164,11 @@ func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
 
 	if err != nil {
 		return fmt.Errorf(
-			"Failed to decode tvl data! %v",
+			"failed to decode tvl data! %v",
 			err,
 		)
 	}
-	
+
 	return nil
 }
 

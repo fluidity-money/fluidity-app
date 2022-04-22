@@ -13,8 +13,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 
 	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -108,13 +108,7 @@ func main() {
 		})
 	}
 
-	decimalPlacesRat := big.NewRat(1, 1)
-
-	// raise decimal places to 10^n
-	tenRat := big.NewRat(10, 1)
-	for i := 0; i < decimalPlaces; i++ {
-		decimalPlacesRat.Mul(decimalPlacesRat, tenRat)
-	}
+	decimalPlacesRat := raiseDecimalPlaces(decimalPlaces)
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
@@ -134,6 +128,10 @@ func main() {
 			fluidTransfers = 0
 			emission       = workerTypes.NewSolanaEmission()
 		)
+
+		// emissions in this loop should only contain information relevant to the
+		// entire slot set here so that if any point the loop for the transfers
+		// shorts that it'll send out with information relevant to that transfer
 
 		emission.Network = "solana"
 
@@ -166,7 +164,7 @@ func main() {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 
-		mintSupply, err := prize_pool.GetMintSupply(rpcUrl, fluidMintPubkey)
+		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -186,7 +184,7 @@ func main() {
 		// get the value of all fluidity obligations
 
 		tvl, err := prize_pool.GetTvl(
-			rpcUrl,
+			solanaClient,
 			fluidityPubkey,
 			tvlDataPubkey,
 			solendPubkey,
@@ -244,6 +242,14 @@ func main() {
 			if userAction.TokenDetails.TokenShortName != tokenName {
 				continue
 			}
+
+			// send emissions out that can be actioned on when the loop ends
+
+			emission.TransactionHash = userActionTransactionHash
+			emission.RecipientAddress = userActionRecipientAddress
+			emission.SenderAddress = userActionSenderAddress
+
+			defer queue.SendMessage(worker.TopicEmissions, emission)
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
@@ -335,13 +341,7 @@ func main() {
 				FluidMintPubkey:        fluidMintPubkey.String(),
 			}
 
-			emission.TransactionHash = userActionTransactionHash
-			emission.RecipientAddress = userActionRecipientAddress
-			emission.SenderAddress = userActionSenderAddress
-
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
-
-			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }
