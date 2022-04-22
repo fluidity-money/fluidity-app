@@ -6,7 +6,9 @@ import { readFile as readFileCb } from 'fs';
 const readFile = promisify(readFileCb);
 
 const rlInterface = readline.createInterface(process.stdin, process.stdout);
-const readQuestion = (prompt: string) => new Promise<string>(resolve => rlInterface.question(prompt, resolve));
+
+const readQuestion = (prompt: string) =>
+  new Promise<string>(resolve => rlInterface.question(prompt, resolve));
 
 const ENV_ORACLE = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
@@ -39,19 +41,21 @@ export const automaticDeploy = async (
     .then(res => JSON.parse('' + res))
     .catch(e => {
       if (e.code === `ENOENT`) {
-        console.log(`could not find file '${compoundPath}'`);
+        console.error(`could not find file '${compoundPath}'`);
         process.exit(1);
       }
       throw e;
     });
 
   const compoundAddress = compoundFile['Contracts'][`c${cSymbol}`] as string;
+
   if (!compoundAddress) {
-    console.log(`could not find token c${cSymbol}`);
+    console.error(`could not find token c${cSymbol}`);
     process.exit(1);
   }
 
-  if (!compoundFile['Contracts'][cSymbol]) console.log(`underlying token ${cSymbol} doesn't exist in the compound file...`);
+  if (!compoundFile['Contracts'][cSymbol])
+    console.warn(`underlying token ${cSymbol} doesn't exist in the compound file...`);
 
   await deployToken(symbol, longName, compoundAddress);
 };
@@ -76,9 +80,9 @@ export const deployToken = async (
   try {
     underlying = await compoundTokenERC20.callStatic.underlying();
   } catch {
-    console.log(`failed to get the underlying token!`);
-    console.log(`this usually means the token you passed isn't a compound token`);
-    console.log(`(you passed ${compoundAddress}, which is ${compoundName} (${compoundSymbol}))`);
+    console.error(`failed to get the underlying token!`);
+    console.error(`this usually means the token you passed isn't a compound token`);
+    console.error(`(you passed ${compoundAddress}, which is ${compoundName} (${compoundSymbol}))`);
     process.exit(1);
   }
 
@@ -91,9 +95,9 @@ export const deployToken = async (
   const underlyingSymbol = await underlyingERC20.callStatic.symbol();
   const underlyingDecimals = await underlyingERC20.callStatic.decimals();
 
-  console.log(`deploying ${longName} (${symbol})`);
-  console.log(`for compound token ${compoundName} (${compoundSymbol})`);
-  console.log(`with underlying token ${underlyingName} (${underlyingSymbol})`);
+  console.warn(`deploying ${longName} (${symbol})`);
+  console.warn(`for compound token ${compoundName} (${compoundSymbol})`);
+  console.warn(`with underlying token ${underlyingName} (${underlyingSymbol})`);
 
   const continueResponse = await readQuestion("continue? [y/n] ");
   if (continueResponse.toLowerCase() != 'y') {
@@ -106,6 +110,7 @@ export const deployToken = async (
   );
 
   await token.deployed();
+
   console.warn(`Token for ${symbol} deployed at ${token.address}`);
 };
 

@@ -9,6 +9,7 @@ import kovan from "../config/kovan-tokens.json";
 import { TokenKind } from "components/types";
 import { Signer } from "ethers";
 import { parseUnits } from "ethers/utils";
+import ChainId, {chainIdFromEnv} from "./chainId";
 
 export interface walletDataType {
   type: string;
@@ -18,12 +19,13 @@ export interface walletDataType {
 
 // Assigns the correct json file based on ChainId
 const getWalletERC20Status = async (signer: Signer) => {
+  const chainId = chainIdFromEnv();
   const data =
-    process.env.REACT_APP_CHAIN_ID === "3"
-      ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31337"
-      ? (testing as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "2a"
+    chainId === ChainId.Ropsten ?
+      (ropsten as TokenKind[]) :
+    chainId === ChainId.Hardhat ?
+      (testing as TokenKind[]) :
+    chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
 

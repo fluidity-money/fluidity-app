@@ -73,7 +73,8 @@ func main() {
 
 		// first, we're going to make the string lowercase
 
-		logAddress = strings.ToLower(logAddress)
+		logAddress    = strings.ToLower(logAddress)
+		filterAddress = strings.ToLower(filterAddress)
 
 		logging.Debug(func(k *logging.Log) {
 			k.Format(

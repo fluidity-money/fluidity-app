@@ -23,10 +23,12 @@ const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
 const oracleAddress = process.env[oracleKey];
 
-if (oracleAddress == "") {
-  console.error("FLU_ETHEREUM_ORACLE_ADDRESS is not set!");
+const errorQuitNotSet = (environmentVariable: string) => {
+  console.error(`${environmentVariable} not set!`);
   process.exit(1);
 };
+
+if (oracleAddress == "") errorQuitNotSet(oracleKey);
 
 type Token = {
   decimals: number,
@@ -257,9 +259,13 @@ module.exports = {
       },
     },
     ropsten: {
-      accounts: ['60a8a6cf18ecf8978f1b87863adb3db802d1033419594215a741a32f90051f63'],
-      url: "https://ropsten.infura.io/v3/d1ac3dc1af2649908a69582ffa1a424d",
+      accounts: [process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY],
+      url: process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_URL,
       gas: 9000000
     },
+    kovan: {
+      accounts: [process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY],
+      url: process.env.FLU_ETHEREUM_DEPLOY_KOVAN_URL
+    }
   }
 };
