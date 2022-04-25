@@ -6,9 +6,8 @@ import (
 	"math/big"
 	"fmt"
 
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
-	//"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 
 	"github.com/btcsuite/btcutil/base58"
@@ -63,10 +62,10 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 			resp, err := solanaClient.GetAccountInfo(context.Background(), swapAccountPubkey)
 
 			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to get Orca swap data account!"
-					k.Payload = err
-				})
+				return nil, fmt.Errorf(
+					"Failed to get Orca swap data account! %v",
+					err,
+				)
 			}
 
 			var feeData ConstantProductCurveFeeData
@@ -96,10 +95,22 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 			}
 
 			// check if the transaction involves a fluid token
-			/*
 			if !fluidity.IsFluidToken(mintA.String()) && !fluidity.IsFluidToken(mintB.String()) {
 				continue
-			}*/
+			}
+
+			// if the first mint is a fluid token, use its non-fluid counterpart
+			if fluidity.IsFluidToken(mintA.String()) {
+				newMint, err := fluidity.GetBaseToken(mintA.String())
+				if err != nil {
+					return nil, fmt.Errorf(
+						"Failed to convert fluid token to base token! %v",
+						err,
+					)
+				}
+
+				mintA = solana.MustPublicKeyFromBase58(newMint)
+			}
 
 			price, _ := pyth.GetPriceByToken(solanaClient, mintA.String())
 
@@ -110,10 +121,10 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 			resp, err = solanaClient.GetAccountInfo(context.Background(), mintA)
 
 			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to get Orca user source spl-token mint"
-					k.Payload = err
-				})
+				return nil, fmt.Errorf(
+					"Failed to get Orca user source spl-token mint! %v",
+					err,
+				)
 			}
 
 			data = resp.Value.Data.GetBinary()
@@ -139,9 +150,6 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 			// remove fees
 			fee = fee.Add(fee, amount.Mul(amount, tradeFee))
 			fee = fee.Add(fee, amount.Mul(amount, ownerTradeFee))
-
-			fmt.Println(transaction.Transaction.Signatures)
-			fmt.Println("fee", fee)
 
 			return fee, nil
 		}
