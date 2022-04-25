@@ -9,10 +9,10 @@ import RequestFaucet from "./pages/RequestFaucet";
 const navbarItems: [string, string][] = [
   ["Home", "https://fluidity.money"],
   ["About", "https://fluidity.money/#about"],
+  ["Docs", "https://docs.fluidity.money/"],
   ["Contact", "https://fluidity.money/#lets-talk"],
   ["Blog", "https://blog.fluidity.money"],
   ["Whitepapers", "https://fluidity.money/#whitepapers"],
-  ["Docs", "https://docs.fluidity.money/"],
 ];
 
 // {[k: network]: [display name, value to use in request, [supported tokens]]}
