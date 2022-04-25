@@ -161,7 +161,7 @@ const Container = styled.div`
   padding-top: 60px;
 
   @media not screen and (max-width: 768px) {
-    padding-left: 180px;
+    padding-left: 80px;
   }
 
   @media (max-width: 768px) {

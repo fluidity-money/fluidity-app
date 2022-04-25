@@ -50,7 +50,6 @@ const App = () => (
       </Container>
       <Footer />
     </Container>
-    ;
   </NotificationContainer>
 );
 
