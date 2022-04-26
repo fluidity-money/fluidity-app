@@ -42,9 +42,6 @@ const (
 	// ethereumNullAddress to filter for not including in either side of a
 	// transfer to prevent burning and minting
 	ethereumNullAddress = "0000000000000000000000000000000000000000"
-
-	// RedisNonceKey to set the ethereum transaction nonce from
-	RedisNonceKey = `ethereum.worker-nonce`
 )
 
 func main() {

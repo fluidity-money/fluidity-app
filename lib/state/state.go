@@ -199,10 +199,6 @@ func SetNxTimed(key string, content interface{}, expiry time.Duration) (didSet b
 	return result
 }
 
-func SetNX(key string, content interface{}) (didSet bool) {
-	return SetNxTimed(key, content, time.Duration(0))
-}
-
 // Delete zero or more key-value pairs
 func Del(keys ...string) {
 	redisClient := client()
@@ -308,56 +304,6 @@ func GetSet(key string, content interface{}) []byte {
 	}
 
 	return []byte(bytesContent)
-}
-
-func Exists(keys ...string) int64 {
-	redisClient := client()
-
-	debug("checking if keys exist: %v", keys)
-
-	intCmd := redisClient.Exists(context.Background(), keys...)
-
-	result, err := intCmd.Result()
-
-	if err != nil {
-		log.Fatal(func (k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to count keys %v!",
-				keys,
-			)
-
-			k.Payload = err
-		})
-	}
-
-	return result
-}
-
-func Incr(key string) int64 {
-	redisClient := client()
-
-	debug("about to increment key %s", key)
-
-	intCmd := redisClient.Incr(context.Background(), key)
-
-	result, err := intCmd.Result()
-
-	if err != nil {
-		log.Fatal(func (k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to incr key %s!",
-				key,
-			)
-
-			k.Payload = err
-		})
-	}
-
-	return result
 }
 
 // Rpush a value into a key, returning the new length.
