@@ -42,7 +42,7 @@ mod test {
 
     #[test]
     fn test_scale_wad() {
-            assert_eq!(checked_pow(10u64, SCALE).unwrap(), WAD);
+        assert_eq!(checked_pow(10u64, SCALE).unwrap(), WAD);
     }
 
     #[test]
