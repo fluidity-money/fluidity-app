@@ -56,6 +56,13 @@ contract Token is IERC20 {
     }
 
     function oracle() public view returns (address) { return rngOracle_; }
+
+    function updateOracle(address newOracle) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        rngOracle_ = newOracle;
+    }
+
     // name and symbol provided by ERC20 parent
 
     // takes `amount` underlying tokens, gives you fluid tokens
