@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect } from "react";
-import ChainId, {chainIdFromEnv, toChainId} from "util/chainId";
+import ChainId, { chainIdFromEnv, toChainId } from "util/chainId";
 
 // switchEthereumChain for Ropsten and Mainnet
 const changeNetwork = async () => {
@@ -10,8 +10,21 @@ const changeNetwork = async () => {
       method: "wallet_switchEthereumChain",
       params: [{ chainId: `0x${process.env.REACT_APP_CHAIN_ID}` }],
     });
-  } catch (err) {
-    throw err;
+  } catch (err: any) {
+    if (err.code === 4902) {
+      try {
+        await (window as any).ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: `0x${process.env.REACT_APP_CHAIN_ID}`,
+            },
+          ],
+        });
+      } catch (err) {
+        throw err;
+      }
+    }
   }
 };
 
@@ -40,11 +53,11 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
   const updateOnNetworkChange = () => {
     if ((window as any).ethereum) {
       (window as any).ethereum.on("chainChanged", () => {
-      const browserChain = toChainId((window as any)?.ethereum.chainId);
-      const envChain = chainIdFromEnv();
+        const browserChain = toChainId((window as any)?.ethereum.chainId);
+        const envChain = chainIdFromEnv();
 
-      browserChain && setChainId(envChain);
-      setDesiredNetwork(browserChain === envChain);
+        browserChain && setChainId(envChain);
+        setDesiredNetwork(browserChain === envChain);
       });
     }
   };
