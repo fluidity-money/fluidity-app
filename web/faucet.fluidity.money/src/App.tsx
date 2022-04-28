@@ -26,8 +26,9 @@ const networkInputOptions = {
   solana: [
     "Solana Devnet",
     "5qUccmFqGdFcTQprrVeRdCGy9sGB2TzTKv2KKMStG9kG",
-    ["fUSDC", "fUSDT"],
+    ["fUSDC"],
   ],
+
 } as const;
 
 const App = () => (
