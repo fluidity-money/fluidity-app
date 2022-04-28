@@ -40,7 +40,7 @@ const SelectContainer = styled.div`
 const InputContainer = styled.div`
   border: solid 1px white;
   background-color: #333333;
-  width: 280px;
+  width: 295px;
   :focus {
     border-style: solid;
     border-color: inherit;

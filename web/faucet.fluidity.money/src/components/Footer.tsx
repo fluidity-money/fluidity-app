@@ -1,4 +1,3 @@
-
 import styled from "styled-components";
 
 import { RowOnDesktop, RowSpaceAround } from "./Row";
@@ -6,26 +5,41 @@ import { Subtitle } from "./Titles";
 import Highlight from "./Highlight";
 import SocialIcon from "./SocialIcon";
 
-type Footer = {
-  socialIcons : [string, string][],
-  footerNavigationLinks : [string, string][]
-};
+type socialIcons = [string, string][];
+type footerNavigationLinks = [string, string][];
 
-const makeSocialIcons = (icons : [string, string][]) =>
-  icons.map(([href, url] : [string, string]) =>
+const navLinks: socialIcons = [
+  ["Home", "https://fluidity.money/#home"],
+  ["About", "https://fluidity.money/#about"],
+  ["Docs", "https://docs.fluidity.money/"],
+  ["Blog", "https://fluidity.money/#blog"],
+  ["Whitepapers", "https://fluidity.money/#whitepapers"],
+];
+
+const socialLinks: footerNavigationLinks = [
+  ["https://twitter.com/fluiditymoney", "/images/twitter.svg"],
+  ["https://discord.gg/CNvpJk4HpC", "/images/discord.svg"],
+  ["https://www.linkedin.com/company/fluidity-money/", "/images/linkedin.svg"],
+  ["https://t.me/fluiditymoney", "/images/telegram.svg"],
+];
+
+const makeSocialIcons = (icons: [string, string][]) =>
+  icons.map(([href, url]: [string, string]) => (
     <SocialIconContainer>
-      <SocialIcon href={ href } src={ url } />
-    </SocialIconContainer>);
+      <SocialIcon href={href} src={url} />
+    </SocialIconContainer>
+  ));
 
-const makeFooterGrid = (footerLinks : [string, string][]) =>
-  footerLinks.map(([name, link]) =>
-    <Highlight href={ link }>
-      <SmallTitle>{ name }</SmallTitle>
-    </Highlight>);
+const makeFooterGrid = (footerLinks: [string, string][]) =>
+  footerLinks.map(([name, link]) => (
+    <Highlight href={link}>
+      <SmallTitle>{name}</SmallTitle>
+    </Highlight>
+  ));
 
 const FluidityLogo = () => <Logo src="/images/fluidity-logo.svg" />;
 
-const Footer = ({ socialIcons, footerNavigationLinks }: Footer) =>
+const Footer = () => (
   <FooterContainer>
     <RowSpaceAround>
       <FooterItem>
@@ -38,30 +52,30 @@ const Footer = ({ socialIcons, footerNavigationLinks }: Footer) =>
       </FooterItem>
 
       <FooterItem>
-        <SocialIcons>
-          { makeSocialIcons(socialIcons) }
-        </SocialIcons>
+        <SocialIcons>{makeSocialIcons(socialLinks)}</SocialIcons>
         <SmallTitle>© 2021 Fluidity All Rights Reserved</SmallTitle>
       </FooterItem>
 
       <FooterItem>
-        <FooterGrid>
-          { makeFooterGrid(footerNavigationLinks) }
-        </FooterGrid>
+        <FooterGrid>{makeFooterGrid(navLinks)}</FooterGrid>
       </FooterItem>
     </RowSpaceAround>
-  </FooterContainer>;
+  </FooterContainer>
+);
 
 const FooterContainer = styled.div`
-  background: #1A1A1A;
+  background: rgba(29, 29, 29, 0.7);
   width: 100%;
   position: absolute;
+  padding-top: 20px;
+  padding-bottom: 20px;
 `;
 
 const Logo = styled.img`
-  @media (max-width: 768px) {
-    width: 200px;
+  @media (max-width: 140px) {
+    width: 140px;
   }
+  width: 140px;
 `;
 
 const SocialIconContainer = styled.div`
@@ -88,18 +102,27 @@ const SocialIcons = styled(RowOnDesktop)`
 `;
 
 const SmallTitle = styled(Subtitle)`
-  font-size: 16px;
-  color: #FFFFFF
+  font-size: 12px;
+  color: #ffffff;
 `;
 
 const FooterItem = styled.div`
   margin-top: auto;
   margin-bottom: auto;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const FooterGrid = styled.div`
   display: grid;
   grid-template-columns: 100px 100px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 100px 100px 100px;
+    text-align: center;
+  }
 `;
 
 export default Footer;

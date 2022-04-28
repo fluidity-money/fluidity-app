@@ -1,16 +1,58 @@
 [
   {
-    "symbol": "Frax",
-    "address": "0x88128f0c48a2F6181b6Be1759Fc6724b8e314CAe",
-    "colour": "",
-    "image": "",
+    "symbol": "TUSD",
+    "address": "0x016750AC630F711882812f24Dba6c95b9D35856d",
+    "colour": "#2433b8",
+    "image": "img/TokenIcons/tusdIcon.svg",
     "decimals": 18
   },
   {
-    "symbol": "fFrax",
-    "address": "",
-    "colour": "",
-    "image": "",
+    "symbol": "DAI",
+    "address": "0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD",
+    "colour": "#fdc134",
+    "image": "img/TokenIcons/daiIcon.svg",
     "decimals": 18
+  },
+  {
+    "symbol": "USDT",
+    "address": "0x13512979ADE267AB5100878E2e0f485B568328a4",
+    "colour": "rgb(36,163,124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "decimals": 6
+  },
+  {
+    "symbol": "USDC",
+    "address": "0xe22da380ee6B445bb8273C81944ADEB6E8450422",
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "decimals": 6
+  },
+  {
+    "symbol": "fTUSD",
+    "address": "0xcD20E20e5b873ecc92d284515C6254F386c7C57B",
+    "colour": "#2433b8",
+    "image": "img/TokenIcons/tusdIcon.svg",
+    "decimals": 18
+  },
+  {
+    "symbol": "fDAI",
+    "address": "0xA4c2826Df07f0a37B125D5815B12Ff2f529a66e9",
+    "colour": "#fdc134",
+    "image": "img/TokenIcons/daiIcon.svg",
+    "decimals": 18
+  },
+  {
+    "symbol": "fUSDT",
+    "address": "0x47eD7c59A487dd907de2986e0F95F8CC4Dc8CCf6",
+    "colour": "rgb(36,163,124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "decimals": 6
+  },
+  {
+    "symbol": "fUSDC",
+    "address": "0x2f2204738CC4dCf1ec2d88369AB5B7e16a7C7035",
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "decimals": 6
   }
 ]

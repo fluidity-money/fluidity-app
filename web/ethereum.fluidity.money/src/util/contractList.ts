@@ -1,3 +1,5 @@
+import ChainId, {chainIdFromEnv} from "./chainId";
+
 type Contract = {
   addr: string;
   abi: any; //TODO typing ABI/methods (typechain?)
@@ -25,21 +27,17 @@ type SwapContractList = {
   };
 };
 
-const chainId = process.env.REACT_APP_CHAIN_ID;
-if (!chainId) {
-  throw new Error("REACT_APP_CHAIN_ID not set!");
-}
-
+const chainId = chainIdFromEnv();
 let tokens: Array<Token> = [];
 
 switch (chainId) {
-  case "31337":
+  case ChainId.Hardhat:
     tokens = require("config/testing-tokens.json");
     break;
-  case "3":
+  case ChainId.Ropsten:
     tokens = require("config/ropsten-tokens.json");
     break;
-  case "2a":
+  case ChainId.Kovan:
     tokens = require("config/kovan-tokens.json");
     break;
   default:

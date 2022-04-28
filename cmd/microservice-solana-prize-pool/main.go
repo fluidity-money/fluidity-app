@@ -54,9 +54,9 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 	return pubkey
 }
 
-func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) *big.Rat {
-	tvl := prize_pool.GetTvl(
-		solanaRpcUrl,
+func getPrizePool(solanaClient *solanaRpc.Client, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) *big.Rat {
+	tvl, err := prize_pool.GetTvl(
+		solanaClient,
 		fluidityPubkey,
 		tvlDataPubkey,
 		solendPubkey,
@@ -67,10 +67,28 @@ func getPrizePool(solanaRpcUrl string, fluidityPubkey, fluidMintPubkey, tvlDataP
 		payer,
 	)
 
-	mintSupply := prize_pool.GetMintSupply(
-		solanaRpcUrl,
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to get TVL! %v",
+				err,
+			)
+		})
+	}
+
+	mintSupply, err := prize_pool.GetMintSupply(
+		solanaClient,
 		fluidMintPubkey,
 	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to get mint supply! %v",
+				err,
+			)
+		})
+	}
 
 	if mintSupply > tvl {
 		log.Fatal(func(k *log.Log) {
@@ -146,7 +164,7 @@ func main() {
 				)
 
 				prizePool := getPrizePool(
-					solanaRpcUrl,
+					rpcClient,
 					fluidityPubkey,
 					fluidMintPubkey,
 					tvlDataPubkey,

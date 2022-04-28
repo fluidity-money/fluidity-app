@@ -13,8 +13,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 
 	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -108,10 +108,7 @@ func main() {
 		})
 	}
 
-	var (
-		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
-		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
-	)
+	decimalPlacesRat := raiseDecimalPlaces(decimalPlaces)
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
@@ -132,8 +129,11 @@ func main() {
 			emission       = workerTypes.NewSolanaEmission()
 		)
 
-		emission.Network = "solana"
+		// emissions in this loop should only contain information relevant to the
+		// entire slot set here so that if any point the loop for the transfers
+		// shorts that it'll send out with information relevant to that transfer
 
+		emission.Network = "solana"
 		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
 
 		for _, userAction := range userActions {
@@ -163,18 +163,27 @@ func main() {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 
-		mintSupply := prize_pool.GetMintSupply(rpcUrl, fluidMintPubkey)
+		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get the mint supply! %v",
+					err,
+				)
+			})
+		}
 
 		// normalise the amount to be consistent with USDC as a floating point
 
 		entireAmountOwned := new(big.Rat).SetUint64(mintSupply)
 
-		entireAmountOwned.Quo(entireAmountOwned, usdcDecimalPlacesRat)
+		entireAmountOwned.Quo(entireAmountOwned, decimalPlacesRat)
 
 		// get the value of all fluidity obligations
 
-		tvl := prize_pool.GetTvl(
-			rpcUrl,
+		tvl, err := prize_pool.GetTvl(
+			solanaClient,
 			fluidityPubkey,
 			tvlDataPubkey,
 			solendPubkey,
@@ -184,6 +193,15 @@ func main() {
 			switchboardPubkey,
 			payer,
 		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failedto get the TVL! %v",
+					err,
+				)
+			})
+		}
 
 		// get the size of the pool: obligation value minus deposited value then
 		// divide by 10e6 to get the actual number in
@@ -199,7 +217,7 @@ func main() {
 
 		sizeOfThePool := new(big.Rat).SetUint64(unscaledPool)
 
-		sizeOfThePool.Quo(sizeOfThePool, usdcDecimalPlacesRat)
+		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
 
 		bpyStakedUsd := probability.CalculateBpyStakedUnderlyingAsset(
 			bpy,
@@ -223,6 +241,15 @@ func main() {
 			if userAction.TokenDetails.TokenShortName != tokenName {
 				continue
 			}
+
+			// send emissions out that can be actioned on when the loop ends
+
+
+			emission.TransactionHash = userActionTransactionHash
+			emission.RecipientAddress = userActionRecipientAddress
+			emission.SenderAddress = userActionSenderAddress
+
+			defer queue.SendMessage(worker.TopicEmissions, emission)
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
@@ -314,13 +341,7 @@ func main() {
 				FluidMintPubkey:        fluidMintPubkey.String(),
 			}
 
-			emission.TransactionHash = userActionTransactionHash
-			emission.RecipientAddress = userActionRecipientAddress
-			emission.SenderAddress = userActionSenderAddress
-
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
-
-			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

@@ -23,15 +23,10 @@ import ApiStateHandler, { ApiState } from "components/ApiStateHandler";
 import { root_websocket } from "util/api";
 import { userActionContext } from "components/context";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
+import {chainIdFromEnv} from "util/chainId";
 
 const App = () => {
-  const chainId_ = process.env.REACT_APP_CHAIN_ID;
-
-  if (!chainId_) {
-    throw new Error("REACT_APP_CHAIN_ID not set!");
-  }
-
-  const chainId = Number(chainId_);
+  const chainId = chainIdFromEnv();
 
   const providerOptions: Connectors = {
     injected: new InjectedConnector({ supportedChainIds: [chainId] }),

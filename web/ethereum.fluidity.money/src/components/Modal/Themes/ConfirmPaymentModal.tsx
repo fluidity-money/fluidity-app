@@ -11,6 +11,7 @@ import { modalToggle } from "components/context";
 import { useContext, useEffect, useState } from "react";
 import { TokenKind, Token as TokenType } from "components/types";
 import { SupportedContracts } from "util/contractList";
+import ChainId, {chainIdFromEnv} from "util/chainId";
 
 const ConfirmPaymentModal = ({
   enable,
@@ -32,19 +33,23 @@ const ConfirmPaymentModal = ({
   // Functions to work out selected to and from option from context and get the respective external/internal token information
   const defaultVar: TokenKind = {
     symbol: "" as TokenType,
+    name: "",
     image: "",
     colour: "",
     address: "",
     decimals: 0,
+    amount: "",
+    pinned: false,
   };
 
   // Assigns the correct json file based on ChainId
+  const chainId = chainIdFromEnv();
   const data =
-    process.env.REACT_APP_CHAIN_ID === "3"
-      ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31337"
-      ? (testing as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "2a"
+    chainId === ChainId.Ropsten ?
+      (ropsten as TokenKind[]) :
+    chainId === ChainId.Hardhat ?
+      (testing as TokenKind[]) :
+    chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
 
