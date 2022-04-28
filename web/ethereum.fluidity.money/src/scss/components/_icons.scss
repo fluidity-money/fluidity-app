@@ -253,10 +253,15 @@
 .clear-search-icon {
   position: absolute;
   cursor: pointer;
-  width: 8px;
-  right: 30px;
+  width: 10px;
+  right: 35px;
+  top: 87px;
+  opacity: 0.6;
+  padding: 6px;
+  border-radius: 0.2rem;
   &:hover {
-    opacity: 0.6;
+    opacity: 1;
+    background-color: #0f2339;
   }
 }
 
