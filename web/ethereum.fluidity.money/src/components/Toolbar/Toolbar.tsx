@@ -35,7 +35,6 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
         method: "eth_chainId",
       });
       const browserChain = toChainId(chain);
-      // setBrowserChainId(browserChain);
       const envChain = chainIdFromEnv();
 
       browserChain && setChainId(envChain);
@@ -50,6 +49,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
         const envChain = chainIdFromEnv();
 
         browserChain && setChainId(envChain);
+        // updates popup to switched chain
         setBrowserChainId(browserChain);
         setDesiredNetwork(browserChain === envChain);
       });
