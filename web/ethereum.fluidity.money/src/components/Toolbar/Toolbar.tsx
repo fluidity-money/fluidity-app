@@ -39,6 +39,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
 
       browserChain && setChainId(envChain);
       setDesiredNetwork(browserChain === envChain);
+      if (browserChain !== envChain) handleNetworkSwitch();
     }
   };
 
@@ -60,7 +61,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
     checkNetworkOnLoad();
     updateOnNetworkChange();
   }, []);
-
+  console.log(browserChainId);
   return (
     <div className="toolbar p-0_5">
       {children}
@@ -76,19 +77,18 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
               ? `Ethereum Kovan`
               : `Ethereum`}
             )
-            {` doesn't match to network selected in wallet
-            ${
-              browserChainId === null
-                ? ""
-                : ` (network with id:${browserChainId})`
-            }. Learn how to`}
+            {` doesn't match to network selected in wallet${
+              browserChainId === undefined || null
+                ? "."
+                : ` (network with id: ${browserChainId}).`
+            } Learn how to `}
             <a
               className="learn-change-network-link"
               href="https://metamask.zendesk.com/hc/en-us/articles/4404424659995"
               target="_blank"
               rel="noreferrer"
             >
-              {` change network in wallet`}
+              {`change network in wallet`}
             </a>
             {` or   `}
           </div>
