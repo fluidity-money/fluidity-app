@@ -20,7 +20,10 @@ over the shared bus.
 
 Tokens should be passed to this program like the following:
 
-	<contract address>:<underlying token name>:<number of decimal places>
+	<contract address>:<underlying token name>:<number of decimal places>:<optional underlying token address>
+
+The final parameter is required on AAVE-based platforms for price lookup.
+
 
 So for example, with the contract on Ropsten, it would look like the
 following:

@@ -14,10 +14,13 @@ import (
 // TokenDetails containing information about tokens that we unpacked using
 // the environment variables
 type TokenDetails struct {
-	address       ethCommon.Address
+	fluidAddress  ethCommon.Address
 	tokenName     string
 	tokenDecimals *big.Rat
 	amount        float64
+	// address is the optional parameter for the underlying token address
+	// (required for AAVE lookup)
+	address       ethCommon.Address
 }
 
 func trimWhitespace(s string) string {
@@ -34,7 +37,7 @@ func getTokensList(tokensList_ string) []TokenDetails {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) != 3 {
+		if len(tokenDetails_) != 3 && len(tokenDetails_) != 4 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",
@@ -44,12 +47,20 @@ func getTokensList(tokensList_ string) []TokenDetails {
 		}
 
 		var (
-			address_  = trimWhitespace(tokenDetails_[0])
-			tokenName = trimWhitespace(tokenDetails_[1])
-			decimals_ = trimWhitespace(tokenDetails_[2])
+			fluidAddress_  = trimWhitespace(tokenDetails_[0])
+			tokenName      = trimWhitespace(tokenDetails_[1])
+			decimals_      = trimWhitespace(tokenDetails_[2])
+
+			address ethCommon.Address
 		)
 
-		address := ethCommon.HexToAddress(address_)
+		// we have the optional address parameter
+		if len(tokenDetails_) == 4 {
+			address_ := trimWhitespace(tokenDetails_[3])
+			address  =  ethCommon.HexToAddress(address_)
+		}
+
+		fluidAddress := ethCommon.HexToAddress(fluidAddress_)
 
 		decimals, err := strconv.Atoi(decimals_)
 
@@ -69,9 +80,10 @@ func getTokensList(tokensList_ string) []TokenDetails {
 		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 		tokenDetail := TokenDetails{
-			address:       address,
+			fluidAddress:  fluidAddress,
 			tokenName:     tokenName,
 			tokenDecimals: decimalsRat,
+			address:       address,
 		}
 
 		tokenDetails[i] = tokenDetail

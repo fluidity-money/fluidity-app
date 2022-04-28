@@ -61,20 +61,32 @@ func main() {
 
 				var (
 					address       = work.address
+					fluidAddress  = work.fluidAddress
 					tokenName     = work.tokenName
 					tokenDecimals = work.tokenDecimals
 				)
 
-				tokenPrice, err := uniswap_anchored_view.GetPrice(
-					gethClient,
-					uniswapAnchoredViewAddressEth,
-					tokenName,
-				)
+				switch tokenBackend {
+				case BackendCompound:
+					tokenPrice, err = uniswap_anchored_view.GetPrice(
+						gethClient,
+						uniswapAnchoredViewAddressEth,
+						tokenName,
+					)
+
+				case BackendAave:
+					tokenPrice, err = aave.GetPrice(
+						gethClient,
+						AaveAddressProviderAddressEth,
+						address,
+						UsdTokenAddressEth,
+					)
+				}
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
 						k.Format(
-							"Failed to get the current exchange rate for %#v at %#v!",
+							"Failed to get the current exchange rate for %#v with address %#v at %#v!",
 							tokenName,
 							uniswapAnchoredViewAddress,
 						)
@@ -85,7 +97,7 @@ func main() {
 
 				tokenPrice.Quo(tokenPrice, tokenDecimals)
 
-				prizePool, err := fluidity.GetRewardPool(gethClient, address)
+				prizePool, err := fluidity.GetRewardPool(gethClient, fluidAddress)
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -115,10 +127,11 @@ func main() {
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
 				tokenDetailsComplete := TokenDetails{
-					address:       address,
+					fluidAddress:  fluidAddress,
 					tokenName:     tokenName,
 					tokenDecimals: tokenDecimals,
 					amount:        prizePoolFloat,
+					address:       address,
 				}
 
 				doneChan <- tokenDetailsComplete
