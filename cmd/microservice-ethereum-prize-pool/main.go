@@ -2,6 +2,8 @@ package main
 
 import (
 	"math"
+	"math/big"
+	"os"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -11,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
@@ -18,8 +21,22 @@ import (
 )
 
 const (
+	// BackendCompound to use as the environment variable when the token
+	// is compound based
+	BackendCompound = "compound"
+
+	// BackendAave to use as the environment variable when the token
+	// is aave based
+	BackendAave = "aave"
+)
+
+const (
 	// EnvEthereumHttpAddress to connect to to access Geth
 	EnvEthereumHttpAddress = `FLU_ETHEREUM_HTTP_URL`
+
+	// EnvTokenBackend is `compound` if the token is compound based,
+	// or `aave` if aave based
+	EnvTokenBackend = `FLU_ETHEREUM_TOKEN_BACKEND`
 
 	// EnvTokensList to use to identify Fluidity f token addresses, their name
 	// and their decimal places
@@ -29,18 +46,40 @@ const (
 	// get the price the token when making the prize pool
 	EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
 
+	// EnvAaveAddressProviderAddress to find aave related addresses
+	EnvAaveAddressProviderAddress = `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR`
+
+	// EnvUsdTokenAddress to use to get the price of eth from aave
+	EnvUsdTokenAddress = `FLU_ETHEREUM_USD_TOKEN_ADDR`
+
 	// WorkerPoolAmount to have running as goroutines to send work to
 	WorkerPoolAmount = 30
 )
 
 func main() {
 	var (
-		gethAddress                = util.GetEnvOrFatal(EnvEthereumHttpAddress)
-		tokensList_                = util.GetEnvOrFatal(EnvTokensList)
-		uniswapAnchoredViewAddress = util.GetEnvOrFatal(EnvUniswapAnchoredViewAddress)
+		gethAddress                 = util.GetEnvOrFatal(EnvEthereumHttpAddress)
+		tokensList_                 = util.GetEnvOrFatal(EnvTokensList)
+		tokenBackend                = util.GetEnvOrFatal(EnvTokenBackend)
+		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
+		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
+		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
 	)
 
-	uniswapAnchoredViewAddressEth := ethCommon.HexToAddress(uniswapAnchoredViewAddress)
+	var (
+		uniswapAnchoredViewAddressEth ethCommon.Address
+		AaveAddressProviderAddressEth ethCommon.Address
+		UsdTokenAddressEth            ethCommon.Address
+	)
+
+	switch tokenBackend {
+	case BackendCompound:
+		uniswapAnchoredViewAddressEth = ethCommon.HexToAddress(uniswapAnchoredViewAddress_)
+
+	case BackendAave:
+		AaveAddressProviderAddressEth = ethCommon.HexToAddress(aaveAddressProviderAddress_)
+		UsdTokenAddressEth            = ethCommon.HexToAddress(usdTokenAddress_)
+	}
 
 	// getGethConnection, causing Fatal to trigger if we don't succeed.
 
@@ -64,6 +103,9 @@ func main() {
 					fluidAddress  = work.fluidAddress
 					tokenName     = work.tokenName
 					tokenDecimals = work.tokenDecimals
+
+					tokenPrice      *big.Rat
+					err             error
 				)
 
 				switch tokenBackend {
@@ -88,7 +130,8 @@ func main() {
 						k.Format(
 							"Failed to get the current exchange rate for %#v with address %#v at %#v!",
 							tokenName,
-							uniswapAnchoredViewAddress,
+							uniswapAnchoredViewAddressEth,
+							AaveAddressProviderAddressEth,
 						)
 
 						k.Payload = err
@@ -126,7 +169,7 @@ func main() {
 
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
-				tokenDetailsComplete := TokenDetails{
+				tokenDetailsComplete := util.TokenDetailsEthereum{
 					fluidAddress:  fluidAddress,
 					tokenName:     tokenName,
 					tokenDecimals: tokenDecimals,
