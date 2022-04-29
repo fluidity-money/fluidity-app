@@ -10,7 +10,7 @@ export \
 	FLU_SOLANA_TVL_DATA_PUBKEY=B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP \
 	FLU_SOLANA_SOLEND_PROGRAM_ID= \
 	FLU_SOLANA_STARTING_SLOT=latest \
-	FLU_SOLANA_TVL_SOLEND_PUBKEY=
+	FLU_SOLANA_TVL_SOLEND_PUBKEY=So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo
 
 export \
 	FLU_SOLANA_SABER_RPC_URL=https://saberqltest.aleph.cloud \
@@ -47,7 +47,6 @@ export \
 export FLU_SOLANA_DEBUG_FAKE_PAYOUTS=false
 
 docker-compose \
-	-f "$automation_dir/docker-compose.rabbitmq.yml" \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.yml" \
