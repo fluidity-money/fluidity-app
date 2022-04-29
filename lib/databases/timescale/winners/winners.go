@@ -172,7 +172,7 @@ func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, toke
 		FROM %s
 		WHERE
 			network = $1
-			AND token_name = $2
+			AND token_short_name = $2
 			AND awarded_time
 				BETWEEN $3
 				AND $3 + INTERVAL '24 HOURS'

@@ -1,8 +1,10 @@
 enum ChainId {
   Mainnet = 1,
   Ropsten = 3,
-  Kovan   = 42,
+  Kovan = 42,
   Hardhat = 31337,
+  Rinkeby = 4,
+  Goerli = 5,
 }
 
 /**
@@ -17,8 +19,8 @@ enum ChainId {
  **/
 export const toChainId = (id_?: string | number): ChainId | null => {
   const indexed: any = ChainId[Number(id_) as any];
-  return ChainId[indexed] as any as ChainId ?? null
-}
+  return (ChainId[indexed] as any as ChainId) ?? null;
+};
 
 /**
  * @returns ChainId from the environment variable REACT_APP_CHAIN_ID,
@@ -33,6 +35,6 @@ export const chainIdFromEnv = (): ChainId => {
   }
 
   return chainId;
-}
+};
 
 export default ChainId;

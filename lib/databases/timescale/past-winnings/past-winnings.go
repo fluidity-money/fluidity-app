@@ -24,15 +24,20 @@ func GetPastWinnings(network network.BlockchainNetwork, amount int) (pastWinning
 	databaseClient := timescale.Client()
 
 	statementText := fmt.Sprintf(`
-		SELECT
-			winning_date,
-			amount_of_winners,
-			winning_amount
+		SELECT *
+			FROM (
+				SELECT
+					winning_date,
+					amount_of_winners,
+					winning_amount
 
-		FROM %s
-		WHERE network = $1
-		ORDER BY winning_date
-		LIMIT $2
+				FROM %s
+				WHERE network = $1
+				ORDER BY winning_date DESC
+				LIMIT $2
+			) AS t
+
+		ORDER BY winning_date ASC;
 		`,
 
 		TablePastWinnings,

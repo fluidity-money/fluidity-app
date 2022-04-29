@@ -134,7 +134,6 @@ func main() {
 		// shorts that it'll send out with information relevant to that transfer
 
 		emission.Network = "solana"
-
 		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
 
 		for _, userAction := range userActions {
@@ -244,6 +243,7 @@ func main() {
 			}
 
 			// send emissions out that can be actioned on when the loop ends
+
 
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
