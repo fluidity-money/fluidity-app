@@ -2412,6 +2412,7 @@ name = "solana-fluidity"
 version = "0.1.0"
 dependencies = [
  "arrayref",
+ "base64 0.13.0",
  "borsh",
  "num-derive",
  "num-traits",

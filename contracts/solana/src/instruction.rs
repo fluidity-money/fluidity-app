@@ -17,7 +17,7 @@ pub enum FluidityInstruction {
     LogTVL,
     InitData(String, u64, u64, u8),
     // move from prize pool to account
-    MoveFromPrizePool(u64, String, u8),
+    MoveFromPrizePool(String, u8),
 }
 
 // solend instructions

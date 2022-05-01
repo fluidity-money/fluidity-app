@@ -1,21 +1,15 @@
 // A program that implements transaction storing and payouts for Fluidity Money
 
 #[cfg(all(target_arch = "bpf", not(feature = "exclude_entrypoint")))]
-use solana_program::{entrypoint, declare_id};
+use solana_program::{declare_id, entrypoint};
 
-use {
-    solana_program::{
-        account_info::AccountInfo,
-        entrypoint::ProgramResult,
-        pubkey::Pubkey,
-    },
-};
+use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, pubkey::Pubkey};
 
-pub mod instruction;
-pub mod processor;
-mod state;
-mod math;
 mod error;
+pub mod instruction;
+pub mod math;
+pub mod processor;
+pub mod state;
 
 // declare the pubkey of the program
 #[cfg(all(target_arch = "bpf", not(feature = "exclude_entrypoint")))]

@@ -1,0 +1,14 @@
+{
+  "name": "microservice-solana-tribeca-create-proposal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "blah.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "base-58": "^0.0.1"
+  }
+}

@@ -18,15 +18,15 @@ use {
         program_error::ProgramError,
         program_pack::{IsInitialized, Pack},
         pubkey::Pubkey,
-        system_instruction,
-        system_program,
+        system_instruction, system_program,
     },
     spl_token,
     std::{convert::TryFrom, str::FromStr},
 };
 
 // the public key of the authority for payouts and initialisation
-const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
+// const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
+const AUTHORITY: &str = "J6e6KqD71AK4kkfz4A8EncxyZAFvoKMsimE4R8v4tmYj";
 
 // the public key of the solend program
 const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
@@ -527,12 +527,7 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
 
 // Moves amount funds from prize pool to another account
 // Will fail if funds exceed total prize pool - must be run by authority
-fn move_from_prize_pool(
-    accounts: &[AccountInfo],
-    amount: u64,
-    seed: String,
-    bump: u8,
-) -> ProgramResult {
+fn move_from_prize_pool(accounts: &[AccountInfo], seed: String, bump: u8) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
     let token_program = next_account_info(accounts_iter)?;
@@ -568,14 +563,9 @@ fn move_from_prize_pool(
     // get available prize pool
     let available_prize_pool = deposited_value - deposited_tokens;
 
-    // set new amount
-    if amount > available_prize_pool {
-        panic!("Amount exceeds available prize pool!");
-    };
-
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
-    // mint fluid tokens to both receivers
+    // mint fluid tokens to payout account
 
     invoke_signed(
         &spl_token::instruction::mint_to(
@@ -584,7 +574,7 @@ fn move_from_prize_pool(
             &payout_account.key,
             &pda_account.key,
             &[&pda_account.key],
-            amount,
+            10,
         )
         .unwrap(),
         &[
@@ -855,8 +845,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         FluidityInstruction::InitData(seed, lamports, space, bump) => {
             init_data(&accounts, program_id, seed, lamports, space, bump)
         }
-        FluidityInstruction::MoveFromPrizePool(amount, seed, bump) => {
-            move_from_prize_pool(&accounts, amount, seed, bump)
+        FluidityInstruction::MoveFromPrizePool(seed, bump) => {
+            move_from_prize_pool(&accounts, seed, bump)
         }
     }
 }

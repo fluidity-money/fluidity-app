@@ -16,6 +16,9 @@ const (
 
 	// VariantTransfer used when transferring an amount to a user
 	VariantTransfer = 3
+
+	// VariantDrain used when draining payout acc
+	VariantDrain = 6
 )
 
 const (
@@ -51,6 +54,13 @@ type (
 		Variant uint8
 		Amount  uint64
 	}
+
+	// InstructionDrain
+	InstructionDrain struct {
+		Variant   uint8
+		TokenName string
+		BumpSeed  uint8
+	}
 )
 
 // SendTransfer using the token address given, the sender address, returning
@@ -60,7 +70,7 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 	var (
 		senderAccountMeta = solana.NewAccountMeta(senderAddress, true, false)
 		signerAccountMeta = solana.NewAccountMeta(publicKey, true, true)
-		tokenMintMeta  = solana.NewAccountMeta(tokenMintAddress, true, false)
+		tokenMintMeta     = solana.NewAccountMeta(tokenMintAddress, true, false)
 	)
 
 	programAddressInput := [][]byte{
