@@ -72,6 +72,7 @@ export \
 	FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDT=false
 
 docker-compose \
+	-f "$automation_dir/docker-compose.volumes.yml" \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.ethereum.yml" \
