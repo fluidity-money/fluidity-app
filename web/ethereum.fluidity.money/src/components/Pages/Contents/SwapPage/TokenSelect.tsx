@@ -6,7 +6,7 @@ import { TokenKind } from "components/types";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
-import ChainId, {chainIdFromEnv} from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 import { useSigner } from "util/hooks";
 import { getBalanceOfERC20 } from "util/contractUtils";
 import { TokenList } from "components/types";
@@ -36,11 +36,11 @@ const TokenSelect = ({
   // Assigns the correct json file based on ChainId
   const chainId = chainIdFromEnv();
   const data =
-    chainId === ChainId.Ropsten ?
-      (ropsten as TokenKind[]) :
-    chainId === ChainId.Hardhat ?
-      (testing as TokenKind[]) :
-    chainId === ChainId.Kovan
+    chainId === ChainId.Ropsten
+      ? (ropsten as TokenKind[])
+      : chainId === ChainId.Hardhat
+      ? (testing as TokenKind[])
+      : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
 
@@ -106,38 +106,52 @@ const TokenSelect = ({
     }
   };
 
+  // changes token and fluid pair token from pinned to unpinned if less than 8 pinned
   const changePinned = (token: TokenKind) => {
-    setTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === token.symbol
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
-    );
-    setFluidTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === `f${token.symbol}`
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
-    );
+    // size and filter to determine if 8 are pinned already and the current selected can be pinned/unpinned
+    const size = tokens.filter(
+      (selectedToken) => selectedToken.pinned === true
+    ).length;
+    if (size < 8 || (size === 8 && token.pinned === true)) {
+      setTokens((previousState: TokenList["kind"]) =>
+        [...previousState]?.map((item) =>
+          item.symbol === token.symbol
+            ? Object.assign(item, { pinned: !item.pinned })
+            : item
+        )
+      );
+      setFluidTokens((previousState: TokenList["kind"]) =>
+        [...previousState]?.map((item) =>
+          item.symbol === `f${token.symbol}`
+            ? Object.assign(item, { pinned: !item.pinned })
+            : item
+        )
+      );
+    }
   };
 
+  // changes fluid token and regulat token from pinned to unpinned if less than 8 pinned
   const changePinnedFluid = (token: TokenKind) => {
-    setTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === token.symbol.substring(1)
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
-    );
-    setFluidTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === token.symbol
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
-    );
+    // size and filter to determine if 8 are pinned already and the current selected can be pinned/unpinned
+    const size = fluidTokens.filter(
+      (selectedToken) => selectedToken.pinned === true
+    ).length;
+    if (size < 8 || (size === 8 && token.pinned === true)) {
+      setTokens((previousState: TokenList["kind"]) =>
+        [...previousState]?.map((item) =>
+          item.symbol === token.symbol.substring(1)
+            ? Object.assign(item, { pinned: !item.pinned })
+            : item
+        )
+      );
+      setFluidTokens((previousState: TokenList["kind"]) =>
+        [...previousState]?.map((item) =>
+          item.symbol === token.symbol
+            ? Object.assign(item, { pinned: !item.pinned })
+            : item
+        )
+      );
+    }
   };
 
   const resetLists = () => {
