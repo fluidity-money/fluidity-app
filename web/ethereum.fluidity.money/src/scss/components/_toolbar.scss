@@ -13,7 +13,7 @@
 
 .toolbar-container-enabled {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(25rem, 27rem);
+  grid-template-columns: 1fr 1fr minmax(25rem, 31rem);
   grid-gap: 1rem;
   align-items: center;
   justify-content: center;
@@ -47,21 +47,40 @@
   width: 100%;
 }
 
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  width: auto;
+}
+
 .select-blockchain {
-  padding-left: 10px;
-  height: 40px;
-  width: 40px;
+  padding: 0 15px 0 10px;
+  margin-left: 10px;
+  height: 32px;
+  width: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: solid #02f5a3 1px;
+  border-radius: 10px;
+  background-color: #0d222a;
 
   cursor: pointer;
 
+  &:hover {
+    opacity: 0.7;
+  }
+
   img {
     flex-shrink: 0;
-    min-width: 100%;
-    min-height: 100%;
+    min-width: 20px;
+    min-height: 20px;
+    padding-right: 6px;
   }
+}
+
+.chain-name {
+  margin-right: 5px;
 }
 
 .change-network-message {
