@@ -35,6 +35,8 @@ func calculateAndStoreTotalWinners(network network.BlockchainNetwork, tokens map
 
 		cumulativeWinnersCount += winners
 
+		// divide amount by 10^(decimals)
+		tokenDecimals.Exp(big.NewInt(10), tokenDecimals, nil)
 		winningAmountInt := new(big.Int).Div(&winningAmount_.Int, tokenDecimals)
 
 		cumulativeWinningAmount.Add(cumulativeWinningAmount, winningAmountInt)
