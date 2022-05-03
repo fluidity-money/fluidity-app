@@ -33,9 +33,9 @@ const (
 )
 
 type faucetTokenDetails struct {
-	mintPubkey solana.PublicKey;
-	pdaPubkey solana.PublicKey;
-	signerWallet *solana.Wallet;
+	mintPubkey solana.PublicKey
+	pdaPubkey solana.PublicKey
+	signerWallet *solana.Wallet
 }
 
 func main() {
@@ -44,7 +44,7 @@ func main() {
 		tokenList_     = util.GetEnvOrFatal(EnvTokensList)
 		accountDetailsList_ = util.GetEnvOrFatal(EnvSolanaAccountDetails)
 
-		tokenAddresses = make(map[faucetTypes.FaucetSupportedToken]faucetTokenDetails)
+		tokenDetails = make(map[faucetTypes.FaucetSupportedToken]faucetTokenDetails)
 
 		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
@@ -85,10 +85,10 @@ func main() {
 			})
 		}
 
-		var tokenDetails faucetTokenDetails
-		tokenDetails.mintPubkey = mintPubkey
+		var details faucetTokenDetails
+		details.mintPubkey = mintPubkey
 
-		tokenAddresses[tokenName] = tokenDetails
+		tokenDetails[tokenName] = details
 	}
 
 	accountDetailsList := strings.Split(accountDetailsList_, ",")
@@ -134,7 +134,7 @@ func main() {
 		    })
 		}
 
-		details, ok := tokenAddresses[tokenName]
+		details, ok := tokenDetails[tokenName]
 
 		if !ok {
 			log.Fatal(func (k *log.Log) {
@@ -148,7 +148,7 @@ func main() {
 		details.pdaPubkey = pdaPubkey
 		details.signerWallet = wallet
 
-		tokenAddresses[tokenName] = details
+		tokenDetails[tokenName] = details
 	}
 
 	faucet.FaucetRequests(func (faucetRequest faucet.FaucetRequest) {
@@ -210,13 +210,13 @@ func main() {
 			return
 		}
 
-		fluidMintAddress := tokenAddresses[tokenName]
+		token := tokenDetails[tokenName]
 
 		var (
-			senderAddress = fluidMintAddress.signerWallet.PublicKey()
-			senderPrivateKey = fluidMintAddress.signerWallet.PrivateKey
-			senderPdaAddress = fluidMintAddress.pdaPubkey
-			mintAddress = fluidMintAddress.mintPubkey
+			senderAddress = token.signerWallet.PublicKey()
+			senderPrivateKey = token.signerWallet.PrivateKey
+			senderPdaAddress = token.pdaPubkey
+			mintAddress = token.mintPubkey
 		)
 
 		signature, err := fluidity.SendTransfer(
