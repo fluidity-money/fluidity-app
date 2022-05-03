@@ -62,11 +62,21 @@ const Button = ({
                 <div className="label">
                   {token?.amount === "0.0"
                     ? `${label}`
-                    : `${token?.amount} ${label}`}
+                    : `${Number(token?.amount).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 6,
+                      })} ${label}`}
                 </div>
               </div>
               <div className={`${texttheme ?? ""}`}>
-                {token ? `$${Number(token?.amount).toFixed(2)}` : "0"}
+                {token
+                  ? `${Number(token?.amount).toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 6,
+                    })}`
+                  : "0"}
               </div>
             </div>
           </>
