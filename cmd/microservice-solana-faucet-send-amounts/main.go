@@ -24,44 +24,32 @@ const (
 	// EnvSolanaRpcUrl to use to connect to a Solana node
 	EnvSolanaRpcUrl = "FLU_SOLANA_RPC_URL"
 
-	// EnvSolanaPrivateKey to use when signing transactions on Solana
-	EnvSolanaPrivateKey = "FLU_SOLANA_FAUCET_PRIVATE_KEY"
-
-	// EnvSolanaSenderPdaAddress to use to send faucet funds from
-	EnvSolanaSenderPdaAddress = "FLU_SOLANA_FAUCET_SENDER_ADDR"
+	// EnvSolanaAccountDetails to find token PDAs and associated owner private keys
+	// of the form PDA1:TOKEN1:PRIKEY1,PDA2:TOKEN2:PRIKEY2,...
+	EnvSolanaAccountDetails = "FLU_SOLANA_FAUCET_ACCOUNT_DETAILS"
 
 	// EnvSolanaDebugFakePayouts to prevent sending amounts when set to true
 	EnvSolanaDebugFakePayouts = "FLU_SOLANA_DEBUG_FAKE_PAYOUTS"
 )
 
+type faucetTokenDetails struct {
+	mintPubkey solana.PublicKey;
+	pdaPubkey solana.PublicKey;
+	signerWallet *solana.Wallet;
+}
+
 func main() {
 	var (
 		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		tokenList_     = util.GetEnvOrFatal(EnvTokensList)
-		privateKey_    = util.GetEnvOrFatal(EnvSolanaPrivateKey)
-		senderAddress_ = util.GetEnvOrFatal(EnvSolanaSenderPdaAddress)
+		accountDetailsList_ = util.GetEnvOrFatal(EnvSolanaAccountDetails)
 
-		tokenAddresses = make(map[faucetTypes.FaucetSupportedToken]solana.PublicKey)
+		tokenAddresses = make(map[faucetTypes.FaucetSupportedToken]faucetTokenDetails)
 
 		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
-
-	payer, err := solana.WalletFromPrivateKeyBase58(privateKey_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to decode payer private key!"
-			k.Payload = err
-		})
-	}
-
-	var (
-		privateKey = payer.PrivateKey
-		publicKey  = payer.PublicKey()
-		senderAddress = solana.MustPublicKeyFromBase58(senderAddress_)
-	)
 
 	// populate map of token sessions for each token we're tracking
 
@@ -81,17 +69,7 @@ func main() {
 			})
 		}
 
-		mintPubkey, err := solana.PublicKeyFromBase58(tokenSeparated[0])
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to convert address %#v to a public key! %v",
-					tokenSeparated[0],
-					err,
-				)
-			})
-		}
+		mintPubkey := solana.MustPublicKeyFromBase58(tokenSeparated[0])
 
 		baseTokenName := tokenSeparated[1]
 
@@ -101,15 +79,78 @@ func main() {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to convert token %#v to a supported token! %v",
-					tokenSeparated[1],
+					baseTokenName,
 					err,
 				)
 			})
 		}
 
-		tokenAddresses[tokenName] = mintPubkey
+		var tokenDetails faucetTokenDetails
+		tokenDetails.mintPubkey = mintPubkey
+
+		tokenAddresses[tokenName] = tokenDetails
 	}
-	
+
+	accountDetailsList := strings.Split(accountDetailsList_, ",")
+
+	for _, account_ := range accountDetailsList {
+		accountSeparated := strings.Split(account_, ":")
+
+		if len(accountSeparated) != 3 {
+			log.Fatal(func (k *log.Log) {
+			    k.Format(
+					"Invalid account details! Expected the form PDA:NAME:PRIKEY, got %s!",
+					accountSeparated,
+				)
+			})
+		}
+
+		pdaPubkey := solana.MustPublicKeyFromBase58(accountSeparated[0])
+
+		baseTokenName := accountSeparated[1]
+
+		tokenName, err := faucetTypes.TokenFromString("f" + baseTokenName)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to convert token %#v to a supported token! %v",
+					baseTokenName,
+					err,
+				)
+			})
+		}
+
+		wallet, err := solana.WalletFromPrivateKeyBase58(accountSeparated[2])
+
+		if err != nil {
+		    log.Fatal(func (k *log.Log) {
+		        k.Format(
+					"Failed to create a wallet for %s!",
+					tokenName,
+				)
+
+		        k.Payload = err
+		    })
+		}
+
+		details, ok := tokenAddresses[tokenName]
+
+		if !ok {
+			log.Fatal(func (k *log.Log) {
+			    k.Format(
+					"Token %s has account details but not token details!",
+					tokenName,
+				)
+			})
+		}
+
+		details.pdaPubkey = pdaPubkey
+		details.signerWallet = wallet
+
+		tokenAddresses[tokenName] = details
+	}
+
 	faucet.FaucetRequests(func (faucetRequest faucet.FaucetRequest) {
 		var (
 			address_  = faucetRequest.Address
@@ -171,15 +212,22 @@ func main() {
 
 		fluidMintAddress := tokenAddresses[tokenName]
 
+		var (
+			senderAddress = fluidMintAddress.signerWallet.PublicKey()
+			senderPrivateKey = fluidMintAddress.signerWallet.PrivateKey
+			senderPdaAddress = fluidMintAddress.pdaPubkey
+			mintAddress = fluidMintAddress.mintPubkey
+		)
+
 		signature, err := fluidity.SendTransfer(
 			solanaClient,
-			senderAddress,
+			senderPdaAddress,
 			recipientAddress,
-			fluidMintAddress,
+			mintAddress,
 			amountInt64,
 			*blockHash,
-			publicKey,
-			privateKey,
+			senderAddress,
+			senderPrivateKey,
 		)
 
 		if err != nil {
