@@ -104,7 +104,7 @@
   background-color: transparent;
   //font-weight: 700;
   color: #b6d1db;
-  height: 5rem;
+  // height: 5rem;
   width: 100%;
   border-radius: 10px;
   border-style: solid;
@@ -280,4 +280,24 @@
 .token-list-item-names {
   display: flex;
   flex-direction: column;
+}
+
+.network-options {
+  display: flex;
+  padding: 2px 10px 2px 10px;
+  background-color: transparent;
+  border: solid #333333 1px;
+  border-radius: 10px;
+  width: 300px;
+  cursor: pointer;
+  transition: all 0.4s linear;
+
+  &:hover {
+    background-color: rgba(56, 60, 69, 0.5);
+  }
+}
+
+.network-icon {
+  margin-right: 10px;
+  width: 20px;
 }
