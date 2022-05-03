@@ -9,6 +9,7 @@ import RequestFaucet from "./pages/RequestFaucet";
 const navbarItems: [string, string][] = [
   ["Home", "https://fluidity.money"],
   ["About", "https://fluidity.money/#about"],
+  ["Docs", "https://docs.fluidity.money/"],
   ["Contact", "https://fluidity.money/#lets-talk"],
   ["Blog", "https://blog.fluidity.money"],
   ["Whitepapers", "https://fluidity.money/#whitepapers"],
@@ -25,8 +26,9 @@ const networkInputOptions = {
   solana: [
     "Solana Devnet",
     "5qUccmFqGdFcTQprrVeRdCGy9sGB2TzTKv2KKMStG9kG",
-    ["fUSDC", "fUSDT"],
+    ["fUSDC"],
   ],
+
 } as const;
 
 const App = () => (
@@ -49,7 +51,6 @@ const App = () => (
       </Container>
       <Footer />
     </Container>
-    ;
   </NotificationContainer>
 );
 

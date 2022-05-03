@@ -39,7 +39,7 @@ const TokenSearch = ({
       <input
         type="text"
         autoFocus
-        placeholder="Search by name paste address"
+        placeholder="Search by name or paste address"
         onChange={(text: React.FormEvent<HTMLInputElement>) => {
           setSearchInput(text.currentTarget.value);
           filterTokens(text.currentTarget.value);

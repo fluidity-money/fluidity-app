@@ -3,13 +3,14 @@ package prize_pool
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"math/big"
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
-	"github.com/fluidity-money/fluidity-app/lib/log"
+
 	"github.com/gagliardetto/solana-go"
-	"github.com/gagliardetto/solana-go/rpc"
+	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
 )
 
@@ -27,14 +28,16 @@ type tvlDataAccount struct {
 type (
 	simulateTransactionResponse struct {
 		Value   simulateTransactionValue `json:"value"`
-		Context rpc.Context              `json:"context"`
+		Context solanaRpc.Context              `json:"context"`
 	}
+
 	simulateTransactionValue struct {
 		TransactionError interface{}                  `json:"err"`
 		Logs             []string                     `json:"logs"`
 		Accounts         []simulateTransactionAccount `json:"accounts"`
 		UnitsConsumed    uint64                       `json:"unitsConsumed"`
 	}
+
 	simulateTransactionAccount struct {
 		Lamports   uint64   `json:"lamports"`
 		Owner      string   `json:"owner"`
@@ -45,20 +48,18 @@ type (
 )
 
 // GetMintSupply fetches the supply of a token via its mint address
-func GetMintSupply(rpcUrl string, account solana.PublicKey) uint64 {
-	client := rpc.New(rpcUrl)
-
+func GetMintSupply(client *solanaRpc.Client, account solana.PublicKey) (uint64, error) {
 	res, err := client.GetTokenSupply(
 		context.Background(),
 		account,
-		rpc.CommitmentFinalized,
+		solanaRpc.CommitmentFinalized,
 	)
 
 	if err != nil {
-	    log.Fatal(func (k *log.Log) {
-	        k.Message = "Failed to get fluid token supply!"
-	        k.Payload = err
-	    })
+		return 0, fmt.Errorf(
+			"failed to get fluid token supply! %v",
+			err,
+		)
 	}
 
 	amountString := res.Value.Amount
@@ -66,27 +67,35 @@ func GetMintSupply(rpcUrl string, account solana.PublicKey) uint64 {
 	amount, err := strconv.ParseUint(amountString, 10, 64)
 
 	if err != nil {
-	    log.Fatal(func (k *log.Log) {
-			k.Format(
-				"Failed to parse token supply amount '%s': %w!",
-				amountString,
-				err,
-			)
-	    })
+		return 0, fmt.Errorf(
+			"failed to parse token supply amount '%s': %v!",
+			amountString,
+			err,
+		)
 	}
 
-	return amount
+	return amount, nil
 }
 
 // GetPrice wraps fetching the current price of a token
-func GetPrice(rpcUrl string, account solana.PublicKey) (*big.Rat, error) {
-	client := rpc.New(rpcUrl)
-	return pyth.GetPrice(client, account)
+func GetPrice(client *solanaRpc.Client, account solana.PublicKey) (*big.Rat, error) {
+	price, err := pyth.GetPrice(client, account)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to get the price using pyth: %v",
+			err,
+		)
+	}
+
+	return price, nil
 }
 
-// GetTvl retrieves the current total value locked from chain using a simulated transaction
-func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) uint64 {
-	params := getTvlTransactionParams(
+// GetTvl retrieves the current total value locked from chain using a
+// simulated transaction
+func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) (uint64, error) {
+
+	params, err := getTvlTransactionParams(
 		fluidityPubkey,
 		tvlDataPubkey,
 		solendPubkey,
@@ -97,13 +106,19 @@ func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligati
 		payer,
 	)
 
-	client := rpc.New(rpcUrl)
+	if err != nil {
+		return 0, fmt.Errorf(
+			"failed to get the tvl transaction params: %v",
+			err,
+		)
+	}
 
 	response := new(simulateTransactionResponse)
 
 	// solana-go has the response type wrong, so we manually call the method
 	// and decode into our own response type
-	err := client.RPCCallForInto(
+
+	err = client.RPCCallForInto(
 		context.Background(),
 		response,
 		"simulateTransaction",
@@ -111,51 +126,53 @@ func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligati
 	)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to simulate logtvl transaction!"
-			k.Payload = err
-		})
+		return 0, fmt.Errorf(
+			"Failed to simulate logtvl transaction! %v",
+			err,
+		)
 	}
 
 	value := response.Value
 
 	if err := value.TransactionError; err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Solana error simulating logtvl transaction!"
-			k.Payload = err
-		})
+		return 0, fmt.Errorf(
+			"solana error simulating logtvl transaction! %v",
+			err,
+		)
 	}
 
 	tvlAccount := new(tvlDataAccount)
 
 	decodeAccountData(value.Accounts[0], tvlAccount)
 
-	return tvlAccount.Tvl
+	return tvlAccount.Tvl, nil
 }
 
-func decodeAccountData(data simulateTransactionAccount, out interface{}) {
+func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
 	dataBase64 := data.Data[0]
 
 	dataBinary, err := base64.StdEncoding.DecodeString(dataBase64)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to decode account data from base64!"
-			k.Payload = err
-		})
+		return fmt.Errorf(
+			"Failed to decode account data from base64! %v",
+			err,
+		)
 	}
 
 	err = borsh.Deserialize(out, dataBinary)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to decode tvl data!"
-			k.Payload = err
-		})
+		return fmt.Errorf(
+			"failed to decode tvl data! %v",
+			err,
+		)
 	}
+
+	return nil
 }
 
-func getTvlTransactionParams(fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payerAccount *solana.Wallet) []interface{} {
+func getTvlTransactionParams(fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payerAccount *solana.Wallet) ([]interface{}, error) {
 	accounts := solana.AccountMetaSlice{
 		solana.NewAccountMeta(tvlDataPubkey, true, false),
 		solana.NewAccountMeta(payerAccount.PublicKey(), false, false),
@@ -182,10 +199,10 @@ func getTvlTransactionParams(fluidityPubkey, tvlDataPubkey, solendPubkey, obliga
 	)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to create logtvl transaction!"
-			k.Payload = err
-		})
+		return nil, fmt.Errorf(
+			"Failed to create logtvl transaction! %v",
+			err,
+		)
 	}
 
 	_, err = transaction.Sign(func(pk solana.PublicKey) *solana.PrivateKey {
@@ -197,19 +214,19 @@ func getTvlTransactionParams(fluidityPubkey, tvlDataPubkey, solendPubkey, obliga
 	})
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to sign transaction!"
-			k.Payload = err
-		})
+		return nil, fmt.Errorf(
+			"Failed to sign transaction! %v",
+			err,
+		)
 	}
 
 	transactionBinary, err := transaction.MarshalBinary()
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to marshal transaction!"
-			k.Payload = err
-		})
+		return nil, fmt.Errorf(
+			"Failed to marshal transaction! %v",
+			err,
+		)
 	}
 
 	transactionBase64 := base64.StdEncoding.EncodeToString(transactionBinary)
@@ -232,5 +249,5 @@ func getTvlTransactionParams(fluidityPubkey, tvlDataPubkey, solendPubkey, obliga
 		opts,
 	}
 
-	return params
+	return params, nil
 }

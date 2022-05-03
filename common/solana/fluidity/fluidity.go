@@ -65,11 +65,11 @@ type (
 
 // SendTransfer using the token address given, the sender address, returning
 // the signature or an error
-func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddress, tokenMintAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
+func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAddress, tokenMintAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, ownerPublicKey solana.PublicKey, ownerPrivateKey solana.PrivateKey) (string, error) {
 
 	var (
-		senderAccountMeta = solana.NewAccountMeta(senderAddress, true, false)
-		signerAccountMeta = solana.NewAccountMeta(publicKey, true, true)
+		senderAccountMeta = solana.NewAccountMeta(senderPdaAddress, true, false)
+		signerAccountMeta = solana.NewAccountMeta(ownerPublicKey, true, true)
 		tokenMintMeta     = solana.NewAccountMeta(tokenMintAddress, true, false)
 	)
 
@@ -156,8 +156,8 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderAddress, recipientAddres
 
 	_, err = transaction.Sign(func(publicKey_ solana.PublicKey) *solana.PrivateKey {
 
-		if publicKey.Equals(publicKey_) {
-			return &privateKey
+		if ownerPublicKey.Equals(publicKey_) {
+			return &ownerPrivateKey
 		}
 
 		return nil

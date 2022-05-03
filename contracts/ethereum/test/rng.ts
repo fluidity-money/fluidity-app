@@ -1,16 +1,14 @@
 
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import * as ethers from 'ethers';
+import * as hre from 'hardhat';
 import type { BigNumber } from "ethers"
-import { CUSDT_ADDR } from "../test-constants";
+import { fusdt_addr, oracle } from "./setup";
 
 describe("token rng", async function () {
-  let token: InstanceType<typeof ethers.Contract>;
+  let token: ethers.Contract;
   before(async function () {
-    const Token = await ethers.getContractFactory("TokenCompound");
-    token = await Token.deploy();
-    await token.deployed();
-    await token.initialize(CUSDT_ADDR, 6, "Fluid USDt", "fUDSt", "0x0000000000000000000000000000000000000000");
+    token = await hre.ethers.getContractAt("Token", fusdt_addr, oracle);
   });
 
   it("should return correct payouts", async function () {
@@ -36,7 +34,7 @@ describe("token rng", async function () {
 
     // 3 balls match
     inputBalls[2] = "0x03";
-  
+
     const amount2: BigNumber = await token.rewardAmount(inputBalls, inputPayouts);
     expect(amount2.toHexString()).to.equal(inputPayouts[2]);
   });

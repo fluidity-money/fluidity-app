@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/big"
 	"math/rand"
 
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -26,4 +27,17 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 	pubkey := solana.MustPublicKeyFromBase58(pubkeyString)
 
 	return pubkey
+}
+
+func raiseDecimalPlaces(places int) *big.Rat {
+	var (
+		decimalPlacesRat = big.NewRat(1, 1)
+		tenRat           = big.NewRat(10, 1)
+	)
+
+	for i := 0; i < places; i++ {
+		decimalPlacesRat.Mul(decimalPlacesRat, tenRat)
+	}
+
+	return decimalPlacesRat
 }

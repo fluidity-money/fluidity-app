@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { RowOnDesktop, RowCentered } from "../components/Row";
+import { RowOnInput, RowCentered } from "../components/Row";
 import { Title, Subtitle } from "../components/Titles";
 import { Input } from "../components/Input";
 import { SubmitButton } from "../components/Buttons";
@@ -45,7 +45,7 @@ const LetsTalk = () => {
 
         <InputsContainer>
           <InputContainer>
-            <RowOnDesktop>
+            <RowOnInput>
               <LetsTalkInput
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -56,7 +56,7 @@ const LetsTalk = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
               />
-            </RowOnDesktop>
+            </RowOnInput>
             <MessageContainer>
               <LetsTalkText
                 value={message}
@@ -128,19 +128,9 @@ const LetsTalkInput = styled(Input)`
   font-size: 16px;
   padding: 15px 25px 15px 25px;
   width: 47%;
-
   @media (max-width: 768px) {
-    padding-left: 0;
-  }
-
-  @media not screen and (max-width: 768px) {
-    :nth-child(1) {
-      margin-right: 20px;
-    }
-
-    :nth-child(2) {
-      margin-left: 20px;
-    }
+    margin: 10px;
+    width: 100%;
   }
 `;
 
@@ -161,6 +151,9 @@ const LetsTalkText = styled.textarea`
 
 const SubmitContainer = styled.div`
   padding: 30px;
+  @media (max-width: 768px) {
+    align-self: center;
+  }
 `;
 
 export default LetsTalk;
