@@ -54,6 +54,7 @@ const SelectBlockchainModal = ({
             key={index}
             theme={`wallet-button`}
             texttheme="wallet-text"
+            visible={visible}
             icon={
               // nosemgrep: typescript.react.security.audit.react-http-leak.react-http-leak
               <img src={icon} className={`wallet-icon`} alt={blockchain} />
@@ -95,7 +96,7 @@ const SelectBlockchainModal = ({
       height={height}
       width={width}
     >
-      <div className="connect-modal-body">
+      <div className="connect-modal-body--networks">
         <h2 className="primary-text">Select a Blockchain</h2>
         <div className="connect-modal-form">{renderedOptions}</div>
       </div>

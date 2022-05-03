@@ -17,6 +17,7 @@ interface ButtonProps {
   fontSize?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
+  visible?: boolean;
 }
 
 const Button = ({
@@ -35,6 +36,7 @@ const Button = ({
   fontSize,
   icon,
   disabled,
+  visible,
 }: ButtonProps) => {
   if (auth || priviledge === 0 || priviledge === undefined) {
     return (
@@ -72,6 +74,13 @@ const Button = ({
           </>
         ) : (
           <div className={`${texttheme ?? ""}`}>{label}</div>
+        )}
+        {visible === true ? (
+          <img src={"img/chevronDown.svg"} className="chevron" alt="" />
+        ) : visible === false ? (
+          <img src={"img/chevronUp.svg"} className="chevron" alt="" />
+        ) : (
+          <></>
         )}
       </button>
     );
