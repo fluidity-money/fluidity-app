@@ -16,9 +16,9 @@ use {
         log::sol_log_compute_units,
         msg,
         program::{invoke, invoke_signed},
-        program_error::ProgramError, 
+        program_error::ProgramError,
         pubkey::Pubkey,
-        system_instruction, 
+        system_instruction,
         system_program,
         program_pack::{IsInitialized, Pack},
     },
@@ -26,10 +26,10 @@ use {
 };
 
 // the public key of the authority for payouts and initialisation
-const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
+const AUTHORITY: &str = "B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP";
 
 // the public key of the solend program
-const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
+const SOLEND: &str = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]
