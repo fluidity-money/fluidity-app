@@ -17,6 +17,7 @@ interface ButtonProps {
   fontSize?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
+  visible?: boolean;
 }
 
 const Button = ({
@@ -35,6 +36,7 @@ const Button = ({
   fontSize,
   icon,
   disabled,
+  visible,
 }: ButtonProps) => {
   if (auth || priviledge === 0 || priviledge === undefined) {
     return (
@@ -62,16 +64,33 @@ const Button = ({
                 <div className="label">
                   {token?.amount === "0.0"
                     ? `${label}`
-                    : `${token?.amount} ${label}`}
+                    : `${Number(token?.amount).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 6,
+                      })} ${label}`}
                 </div>
               </div>
               <div className={`${texttheme ?? ""}`}>
-                {token ? `$${Number(token?.amount).toFixed(2)}` : "0"}
+                {token
+                  ? `${Number(token?.amount).toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 6,
+                    })}`
+                  : "0"}
               </div>
             </div>
           </>
         ) : (
           <div className={`${texttheme ?? ""}`}>{label}</div>
+        )}
+        {visible === true ? (
+          <img src={"img/chevronDown.svg"} className="chevron" alt="" />
+        ) : visible === false ? (
+          <img src={"img/chevronUp.svg"} className="chevron" alt="" />
+        ) : (
+          <></>
         )}
       </button>
     );

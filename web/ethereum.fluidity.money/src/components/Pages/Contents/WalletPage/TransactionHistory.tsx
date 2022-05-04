@@ -59,42 +59,42 @@ const TransactionHistory = ({ myHistory }: transactionHistory) => {
     });
 
   return (
-    <div className='transaction-history'>
-      <table className='history-table'>
+    <div className="transaction-history">
+      <table className="history-table">
         <tbody>
           <tr>
             {tableItems.map((tableItems, index) => (
-              <th key={index} className='primary-text'>
+              <th key={index} className="primary-text">
                 {tableItems}
               </th>
             ))}
           </tr>
           {history.map((row, index) => (
             <tr key={index}>
-              <td className='fixed-content'>{row[0]}</td>
+              <td className="fixed-content">{row[0]}</td>
 
               {row.slice(1, 4).map((value, index) => (
                 <td key={index}>{value}</td>
               ))}
 
-              <td className='fixed-content'>
+              <td className="fixed-content">
                 {row[4] ? (
                   <a
-                    target='_blank'
+                    target="_blank"
                     href={etherscanAddress(row[4])}
-                    rel='noreferrer'
+                    rel="noreferrer"
                   >
                     {trimAddress(row[4])}
                   </a>
                 ) : null}
               </td>
 
-              <td className='fixed-content'>
+              <td className="fixed-content">
                 {row[5] ? (
                   <a
-                    target='_blank'
+                    target="_blank"
                     href={etherscanTransaction(row[5])}
-                    rel='noreferrer'
+                    rel="noreferrer"
                   >
                     {trimAddress(row[5])}
                   </a>
