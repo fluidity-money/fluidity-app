@@ -182,7 +182,6 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                     ? "Mainnet"
                     : "Ethereum"}
                 </div>
-                <i className="i-wallet-arrow"></i>
               </div>
             </div>
             <SelectBlockchainModal
