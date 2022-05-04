@@ -97,7 +97,7 @@
   &--toolbar {
     @extend .primary-button;
     @include for-smallest-toolbar {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
   }
 }

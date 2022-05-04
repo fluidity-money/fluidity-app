@@ -19,7 +19,7 @@
   justify-content: center;
   width: 100%;
   @include for-med-toolbar {
-    grid-gap: 0rem;
+    grid-gap: 0.5rem;
     grid-template-columns: 33rem 0rem 29rem 0rem;
   }
   @include for-small-toolbar {
@@ -57,7 +57,7 @@
   height: 2.8rem;
   display: grid;
   grid-template-columns: 3rem 1rem repeat(3, minmax(10rem, 10rem));
-  grid-gap: 0.5rem;
+  // grid-gap: 0.5rem;
   align-items: center;
   width: 100%;
 
