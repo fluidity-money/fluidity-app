@@ -13,8 +13,7 @@ import {
   enableNotifications,
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
-import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
-import { chainIdFromEnv } from "util/chainId";
+import NetworkButton from "components/Button/NetworkButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -24,7 +23,6 @@ interface selected {
 export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   const history = useHistory();
   const [toggle, setToggle] = useState(false); // State to toggle connect wallet modal status
-  const [blockchainToggle, setBlockchainToggle] = useState(false);
   const wallet = useWallet<JsonRpcProvider>();
   // maintain a separate setter to not spam reconnect on invalid load state
   const [active, setActive] = useState(wallet.status === "connected");
@@ -32,10 +30,6 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
 
   const modalToggle = () => {
     setToggle(!toggle);
-  };
-
-  const blockchainModalToggle = () => {
-    setBlockchainToggle(!blockchainToggle);
   };
 
   const [notificationStatus, setNotificationStatus] = useState(false);
@@ -168,27 +162,9 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                   padding="p-0_5"
                 />
               )}
-              <div
-                className="select-blockchain"
-                onClick={() => setBlockchainToggle(true)}
-              >
-                <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
-                <div className="chain-name primary-text">
-                  {chainIdFromEnv() === 3
-                    ? "Ropsten"
-                    : chainIdFromEnv() === 42
-                    ? "Kovan"
-                    : chainIdFromEnv() === 1
-                    ? "Mainnet"
-                    : "Ethereum"}
-                </div>
-              </div>
+              <NetworkButton />
             </div>
-            <SelectBlockchainModal
-              enable={blockchainToggle}
-              toggle={blockchainModalToggle}
-              height="auto"
-            />
+
             {active ? (
               <WalletConnectedModal
                 enable={toggle}

@@ -6,8 +6,7 @@ import ConnectWalletModal from "components/Modal/Themes/ConnectWalletModal";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
-import { chainIdFromEnv } from "util/chainId";
-import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
+import NetworkButton from "components/Button/NetworkButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -30,10 +29,6 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
   const [click, setClick] = useState(false);
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
-  const [blockchainToggle, setBlockchainToggle] = useState(false);
-  const blockchainModalToggle = () => {
-    setBlockchainToggle(!blockchainToggle);
-  };
 
   const modalToggle = () => {
     setToggle(!toggle);
@@ -42,29 +37,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
   return (
     <div className="toolbar-container-mobile flex-space-between">
       <Icon src="i-fluidity-medium" />
-      <div
-        className="select-blockchain"
-        onClick={() => setBlockchainToggle(true)}
-      >
-        <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
-        <div className="chain-name primary-text">
-          {chainIdFromEnv() === 3
-            ? "Ropsten"
-            : chainIdFromEnv() === 42
-            ? "Kovan"
-            : chainIdFromEnv() === 1
-            ? "Mainnet"
-            : "Ethereum"}
-        </div>
-      </div>
-      <div>
-        <SelectBlockchainModal
-          enable={blockchainToggle}
-          toggle={blockchainModalToggle}
-          height="auto"
-        />
-      </div>
-
+      <NetworkButton />
       <div className="flex column align w-50">
         <div className="menu-icon">
           <div
