@@ -18,6 +18,17 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  @include for-med-toolbar {
+    grid-gap: 0rem;
+    grid-template-columns: 33rem 0rem 29rem 0rem;
+  }
+  @include for-small-toolbar {
+    grid-template-columns: 29rem 0rem 29rem 0rem;
+  }
+  @include for-smallest-toolbar {
+    grid-template-columns: 27rem 1rem 25rem 0rem;
+    grid-gap: 0.5rem;
+  }
 }
 
 .toolbar-container-disabled {
@@ -45,12 +56,17 @@
   grid-gap: 0.5rem;
   align-items: center;
   width: 100%;
+
+  @include for-med-toolbar {
+    grid-template-columns: 1rem 1rem repeat(3, minmax(8rem, 10rem));
+  }
 }
 
 .button-container {
   display: flex;
   justify-content: space-between;
   width: auto;
+  align-items: center;
 }
 
 .select-blockchain {
