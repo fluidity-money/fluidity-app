@@ -94,6 +94,12 @@
   color: #ffffff;
   font-size: 1rem;
   // animation: gradientShift 1s infinite;
+  &--toolbar {
+    @extend .primary-button;
+    @include for-smallest-toolbar {
+      font-size: 0.9rem;
+    }
+  }
 }
 
 .raleway {

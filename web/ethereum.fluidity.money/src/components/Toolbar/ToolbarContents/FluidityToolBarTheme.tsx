@@ -131,7 +131,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
                     label="Enable Notifications"
-                    theme={"primary-button mx-1-r"}
+                    theme={"primary-button--toolbar mx-1-r"}
                     goto={checkNotifications}
                     padding="p-0_5"
                   />
@@ -155,7 +155,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               ) : (
                 <Button
                   label={"Connect Wallet"}
-                  theme={"primary-button"}
+                  theme={"primary-button--toolbar"}
                   goto={() => {
                     setToggle(true);
                   }}

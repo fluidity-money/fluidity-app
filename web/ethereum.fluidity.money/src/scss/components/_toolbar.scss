@@ -87,8 +87,8 @@
 
   cursor: pointer;
 
-  @include for-below-470 {
-    width: 70px;
+  @include for-smallest-toolbar {
+    font-size: 0.9rem;
   }
 
   &:hover {
