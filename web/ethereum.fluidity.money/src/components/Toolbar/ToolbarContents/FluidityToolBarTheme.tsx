@@ -14,6 +14,7 @@ import {
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
 import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
+import { chainIdFromEnv } from "util/chainId";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -125,7 +126,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
             </div>
             <div></div>
-            <div className="flex row flex-space-between width-auto align">
+            <div className="button-container">
               {/* <div className="primary-button p-0_5" onClick={() => enableNotifications()}> */}
               {/* <Icon
           src={updateNotificationStatus()}
@@ -171,7 +172,17 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 className="select-blockchain"
                 onClick={() => setBlockchainToggle(true)}
               >
-                <img src="/img/TokenIcons/ethereumIcon.svg" alt="sol icon" />
+                <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
+                <div className="chain-name primary-text">
+                  {chainIdFromEnv() === 3
+                    ? "Ropsten"
+                    : chainIdFromEnv() === 42
+                    ? "Kovan"
+                    : chainIdFromEnv() === 1
+                    ? "Mainnet"
+                    : "Ethereum"}
+                </div>
+                <i className="i-wallet-arrow"></i>
               </div>
             </div>
             <SelectBlockchainModal
