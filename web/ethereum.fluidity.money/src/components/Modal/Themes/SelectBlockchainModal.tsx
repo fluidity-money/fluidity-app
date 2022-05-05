@@ -52,7 +52,7 @@ const SelectBlockchainModal = ({
           <Button
             label={blockchain}
             key={index}
-            theme={`wallet-button`}
+            theme={`select-button`}
             texttheme="wallet-text"
             visible={visible}
             icon={
@@ -74,7 +74,7 @@ const SelectBlockchainModal = ({
           {visible === true &&
             networks.map((network) => (
               <div
-                className="network-options"
+                className={"network-options"}
                 onClick={() => {
                   // eslint-disable-next-line no-restricted-globals
                   location.href = network.address;
