@@ -22,6 +22,8 @@ func main() {
 
 	web.JsonEndpoint("/my-history", api_fluidity_money.HandleMyHistory)
 
+	web.Endpoint("/winning-chances", api_fluidity_money.HandleWinningChances)
+
 	updateNotificationsHandlerEthereum := api_fluidity_money.HandleUpdateNotifications(
 		updateMessagesEthereum,
 	)
