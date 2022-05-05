@@ -72,9 +72,10 @@ const SelectBlockchainModal = ({
             // disabled={isConnected}
           />
           {visible === true &&
-            networks.map((network) => (
+            networks.map((network, idx) => (
               <div
                 className={"network-options"}
+                key={`${network} ${idx}`}
                 onClick={() => {
                   // eslint-disable-next-line no-restricted-globals
                   location.href = network.address;
