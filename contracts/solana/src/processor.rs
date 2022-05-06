@@ -25,8 +25,7 @@ use {
 };
 
 // the public key of the authority for payouts and initialisation
-// const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
-const AUTHORITY: &str = "J6e6KqD71AK4kkfz4A8EncxyZAFvoKMsimE4R8v4tmYj";
+const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
 
 // the public key of the solend program
 const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
