@@ -2,6 +2,8 @@ package main
 
 import (
 	"math"
+	"math/big"
+	"os"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -11,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
@@ -18,8 +21,22 @@ import (
 )
 
 const (
+	// BackendCompound to use as the environment variable when the token
+	// is compound based
+	BackendCompound = "compound"
+
+	// BackendAave to use as the environment variable when the token
+	// is aave based
+	BackendAave = "aave"
+)
+
+const (
 	// EnvEthereumHttpAddress to connect to to access Geth
 	EnvEthereumHttpAddress = `FLU_ETHEREUM_HTTP_URL`
+
+	// EnvTokenBackend is `compound` if all tokens are compound based,
+	// `aave` if aave based, or empty if token-dependent (specified in tokensList)
+	EnvTokenBackend = `FLU_ETHEREUM_TOKEN_BACKEND`
 
 	// EnvTokensList to use to identify Fluidity f token addresses, their name
 	// and their decimal places
@@ -29,30 +46,75 @@ const (
 	// get the price the token when making the prize pool
 	EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
 
+	// EnvAaveAddressProviderAddress to find aave related addresses
+	EnvAaveAddressProviderAddress = `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR`
+
+	// EnvUsdTokenAddress to use to get the price of eth from aave
+	EnvUsdTokenAddress = `FLU_ETHEREUM_USD_TOKEN_ADDR`
+
 	// WorkerPoolAmount to have running as goroutines to send work to
 	WorkerPoolAmount = 30
 )
 
 func main() {
 	var (
-		gethAddress                = util.GetEnvOrFatal(EnvEthereumHttpAddress)
-		tokensList_                = util.GetEnvOrFatal(EnvTokensList)
-		uniswapAnchoredViewAddress = util.GetEnvOrFatal(EnvUniswapAnchoredViewAddress)
+		gethAddress                 = util.GetEnvOrFatal(EnvEthereumHttpAddress)
+		tokensList_                 = util.GetEnvOrFatal(EnvTokensList)
+		tokenBackend                = os.Getenv(EnvTokenBackend)
+		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
+		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
+		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
 	)
 
-	uniswapAnchoredViewAddressEth := ethCommon.HexToAddress(uniswapAnchoredViewAddress)
+	var (
+		uniswapAnchoredViewAddressEth ethCommon.Address
+		AaveAddressProviderAddressEth ethCommon.Address
+		UsdTokenAddressEth            ethCommon.Address
+
+		isCompound = false
+		isAave     = false
+	)
 
 	// getGethConnection, causing Fatal to trigger if we don't succeed.
-
 	gethClient := getGethClient(gethAddress)
 
 	// tokensList will Fatal if bad input
+	tokenDetails := util.GetTokensListEthereum(tokensList_)
 
-	tokenDetails := getTokensList(tokensList_)
+	// set required addresses based on backend(s) in use
+	switch tokenBackend {
+	case BackendCompound:
+		isCompound = true
+	case BackendAave:
+		isAave = true
+	default:
+	}
+
+	for i, token := range tokenDetails {
+		// we are using only `tokenBackend`
+		if tokenBackend == "" {
+			tokenDetails[i].Backend = tokenBackend
+		// we are using compound for this token
+		} else if token.Backend == BackendCompound {
+			isCompound = true
+		// we are using aave for this token
+		} else if token.Backend == BackendAave {
+			isAave = true
+		}
+	}
+
+	if isCompound {
+		uniswapAnchoredViewAddressEth = ethCommon.HexToAddress(uniswapAnchoredViewAddress_)
+	}
+	
+	if isAave {
+		AaveAddressProviderAddressEth = ethCommon.HexToAddress(aaveAddressProviderAddress_)
+		UsdTokenAddressEth            = ethCommon.HexToAddress(usdTokenAddress_)
+	}
 
 	var (
-		workChan = make(chan TokenDetails, 0)
-		doneChan = make(chan TokenDetails, 0)
+		workChan = make(chan util.TokenDetailsEthereum, 0)
+		doneChan = make(chan util.TokenDetailsEthereum, 0)
 	)
 
 	for i := 0; i < WorkerPoolAmount; i++ {
@@ -60,23 +122,40 @@ func main() {
 			for work := range workChan {
 
 				var (
-					address       = work.address
-					tokenName     = work.tokenName
-					tokenDecimals = work.tokenDecimals
+					address       = work.Address
+					fluidAddress  = work.FluidAddress
+					tokenName     = work.TokenName
+					tokenDecimals = work.TokenDecimals
+					tokenBackend  = work.Backend
+
+					tokenPrice      *big.Rat
+					err             error
 				)
 
-				tokenPrice, err := uniswap_anchored_view.GetPrice(
-					gethClient,
-					uniswapAnchoredViewAddressEth,
-					tokenName,
-				)
+				switch tokenBackend {
+				case BackendCompound:
+					tokenPrice, err = uniswap_anchored_view.GetPrice(
+						gethClient,
+						uniswapAnchoredViewAddressEth,
+						tokenName,
+					)
+
+				case BackendAave:
+					tokenPrice, err = aave.GetPrice(
+						gethClient,
+						AaveAddressProviderAddressEth,
+						address,
+						UsdTokenAddressEth,
+					)
+				}
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
 						k.Format(
-							"Failed to get the current exchange rate for %#v at %#v!",
+							"Failed to get the current exchange rate for %#v with address %#v at %#v!",
 							tokenName,
-							uniswapAnchoredViewAddress,
+							uniswapAnchoredViewAddressEth,
+							AaveAddressProviderAddressEth,
 						)
 
 						k.Payload = err
@@ -85,7 +164,7 @@ func main() {
 
 				tokenPrice.Quo(tokenPrice, tokenDecimals)
 
-				prizePool, err := fluidity.GetRewardPool(gethClient, address)
+				prizePool, err := fluidity.GetRewardPool(gethClient, fluidAddress)
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -114,11 +193,12 @@ func main() {
 
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
-				tokenDetailsComplete := TokenDetails{
-					address:       address,
-					tokenName:     tokenName,
-					tokenDecimals: tokenDecimals,
-					amount:        prizePoolFloat,
+				tokenDetailsComplete := util.TokenDetailsEthereum{
+					FluidAddress:  fluidAddress,
+					TokenName:     tokenName,
+					TokenDecimals: tokenDecimals,
+					Amount:        prizePoolFloat,
+					Address:       address,
 				}
 
 				doneChan <- tokenDetailsComplete
@@ -139,7 +219,7 @@ func main() {
 		for range tokenDetails {
 			tokenDetails := <-doneChan
 
-			amount += tokenDetails.amount
+			amount += tokenDetails.Amount
 		}
 
 		amount = math.Ceil(amount)
