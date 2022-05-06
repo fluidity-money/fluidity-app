@@ -3,9 +3,9 @@ import DoughnutGraph from "components/Charts/DoughnutChart";
 import { useMemo, useState } from "react";
 import { useEffect } from "react";
 import getWalletERC20Status from "util/getWalletERC20Status";
-import { walletDataType } from "util/getWalletERC20Status"
-import { useSigner } from 'util/hooks';
-import _ from 'lodash';
+import { walletDataType } from "util/getWalletERC20Status";
+import { useSigner } from "util/hooks";
+import _ from "lodash";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -18,11 +18,11 @@ const CurrencyBreakdown = () => {
   // Renders out Wallet Token Data if signer connected
   useEffect(() => {
     if (signer)
-      getWalletERC20Status(signer).then(status => setWalletData(status));
+      getWalletERC20Status(signer).then((status) => setWalletData(status));
     else {
       // Render no wallet data case here
     }
-  }, [signer?.provider])
+  }, [signer?.provider]);
 
   useEffect(() => {
     if (walletData.length == 0) {
@@ -30,9 +30,9 @@ const CurrencyBreakdown = () => {
     }
 
     // Distribute walletData for graph render
-    setWalletTypes(_.map(walletData, 'type'));
-    setWalletAmounts(_.map(walletData, 'amount'));
-    setColours(_.map(walletData, 'colour'));
+    setWalletTypes(_.map(walletData, "type"));
+    setWalletAmounts(_.map(walletData, "amount"));
+    setColours(_.map(walletData, "colour"));
   }, [walletData]);
 
   const renderedCurrencyList = walletData.map((token, index) => {
@@ -42,33 +42,38 @@ const CurrencyBreakdown = () => {
       <CurrencyListing
         currency={currencyType}
         amount={token.amount}
-        key={token.type + index} />
+        key={token.type + index}
+      />
     );
-  })
+  });
 
-  const Donut = useMemo(() =>
-    <DoughnutGraph
-      data={walletAmounts.length !== 0 ? walletAmounts : ["0"]}
-      labels={walletTypes.length !== 0 ? walletTypes : ["N/A"]}
-      colours={colours.length !== 0 ? colours : ["rgb(0,0,0)"]}
-    />
+  const Donut = useMemo(
+    () => (
+      <DoughnutGraph
+        data={walletAmounts.length !== 0 ? walletAmounts : ["0"]}
+        labels={walletTypes.length !== 0 ? walletTypes : ["N/A"]}
+        colours={colours.length !== 0 ? colours : ["rgb(0,0,0)"]}
+      />
+    ),
 
-    , [walletAmounts, walletTypes, colours]);
+    [walletAmounts, walletTypes, colours]
+  );
 
   // Checks to see if the user's wallet is empty
-  return ( // (walletData.length !== 0) ? (
+  return (
     <div className="currency-breakdown">
-      <div className="portfolio-graph-title primary-text">
-        Account Overview
-      </div>
-      <div className="doughnut-container">
-        { Donut }
-      </div>
-      <div className="currency-list">
-        { renderedCurrencyList }
-      </div>
+      <div className="portfolio-graph-title primary-text">Account Overview</div>
+
+      <div className="doughnut-container">{Donut}</div>
+
+      <div className="currency-list">{renderedCurrencyList}</div>
+      {walletData.length === 0 ? (
+        <div className="primary-text">Your wallet is empty</div>
+      ) : (
+        <></>
+      )}
     </div>
-  )
+  );
 };
 
 export default CurrencyBreakdown;
