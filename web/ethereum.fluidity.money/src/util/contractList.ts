@@ -31,6 +31,9 @@ const chainId = chainIdFromEnv();
 let tokens: Array<Token> = [];
 
 switch (chainId) {
+  case ChainId.Mainnet:
+    tokens = require("config/mainnet-tokens.json");
+    break;
   case ChainId.Hardhat:
     tokens = require("config/testing-tokens.json");
     break;
