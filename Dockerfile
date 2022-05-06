@@ -27,6 +27,7 @@ WORKDIR ${FLUID_DIR}
 
 COPY build.mk .
 COPY golang.mk .
+COPY node.mk .
 
 COPY contracts contracts
 

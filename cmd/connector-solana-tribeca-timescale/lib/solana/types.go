@@ -51,7 +51,10 @@ type (
 	}
 
 	TribecaProgramData struct {
-		Crunchy uint64
-		Smooth  uint64
+		Authority string
+		Delta     uint8
+		M         uint8
+		FreqDiv   uint8
+		Bump      uint8
 	}
 )
