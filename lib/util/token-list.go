@@ -41,6 +41,7 @@ type TokenDetailsEthereum struct {
 	// address is the optional parameter for the underlying token address
 	// (required for AAVE lookup)
 	Address       ethCommon.Address
+	Backend       string
 }
 
 func trimWhitespace(s string) string {
@@ -140,12 +141,18 @@ func GetTokensListEthereum(tokensList_ string) []TokenDetailsEthereum {
 			decimals_      = trimWhitespace(tokenDetails_[2])
 
 			address ethCommon.Address
+			backend string
 		)
 
 		// we have the optional address parameter
-		if len(tokenDetails_) == 4 {
+		if len(tokenDetails_) >= 4 {
 			address_ := trimWhitespace(tokenDetails_[3])
 			address  =  ethCommon.HexToAddress(address_)
+		}
+
+		// we have the optional backend paramter
+		if len(tokenDetails_) == 5 {
+			backend = trimWhitespace(tokenDetails_[4]) 
 		}
 
 		fluidAddress := ethCommon.HexToAddress(fluidAddress_)
@@ -172,6 +179,7 @@ func GetTokensListEthereum(tokensList_ string) []TokenDetailsEthereum {
 			TokenName:     tokenName,
 			TokenDecimals: decimalsRat,
 			Address:       address,
+			Backend:       backend,
 		}
 
 		tokenDetails[i] = tokenDetail
