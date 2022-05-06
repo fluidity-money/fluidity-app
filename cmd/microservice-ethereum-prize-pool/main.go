@@ -87,11 +87,11 @@ func main() {
 
 	// tokensList will Fatal if bad input
 
-	tokenDetails := getTokensList(tokensList_)
+	tokenDetails := util.GetTokensListEthereum(tokensList_)
 
 	var (
-		workChan = make(chan TokenDetails, 0)
-		doneChan = make(chan TokenDetails, 0)
+		workChan = make(chan util.TokenDetailsEthereum, 0)
+		doneChan = make(chan util.TokenDetailsEthereum, 0)
 	)
 
 	for i := 0; i < WorkerPoolAmount; i++ {
@@ -99,10 +99,10 @@ func main() {
 			for work := range workChan {
 
 				var (
-					address       = work.address
-					fluidAddress  = work.fluidAddress
-					tokenName     = work.tokenName
-					tokenDecimals = work.tokenDecimals
+					address       = work.Address
+					fluidAddress  = work.FluidAddress
+					tokenName     = work.TokenName
+					tokenDecimals = work.TokenDecimals
 
 					tokenPrice      *big.Rat
 					err             error
@@ -170,11 +170,11 @@ func main() {
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
 				tokenDetailsComplete := util.TokenDetailsEthereum{
-					fluidAddress:  fluidAddress,
-					tokenName:     tokenName,
-					tokenDecimals: tokenDecimals,
-					amount:        prizePoolFloat,
-					address:       address,
+					FluidAddress:  fluidAddress,
+					TokenName:     tokenName,
+					TokenDecimals: tokenDecimals,
+					Amount:        prizePoolFloat,
+					Address:       address,
 				}
 
 				doneChan <- tokenDetailsComplete
@@ -195,7 +195,7 @@ func main() {
 		for range tokenDetails {
 			tokenDetails := <-doneChan
 
-			amount += tokenDetails.amount
+			amount += tokenDetails.Amount
 		}
 
 		amount = math.Ceil(amount)
