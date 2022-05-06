@@ -71,9 +71,11 @@ func main() {
 			}
 
 			calculateNArgsInternal := types.TribecaProgramData{
-				Crunchy: calculateNArgs.Crunchy,
-				Smooth:  calculateNArgs.Smooth,
-				Network: "solana",
+				Delta:   calculateNArgs.Delta,
+				M:       calculateNArgs.M,
+				FreqDiv: calculateNArgs.FreqDiv,
+				Network: "devnet",
+				Chain:   "solana",
 			}
 
 			database.InsertNArgs(calculateNArgsInternal)

@@ -19,19 +19,31 @@ const (
 type TribecaProgramData = solana.TribecaProgramData
 
 func InsertNArgs(calculateNArgs TribecaProgramData) {
+	var (
+		chain   = calculateNArgs.Chain
+		network = calculateNArgs.Network
+		delta   = calculateNArgs.Delta
+		m       = calculateNArgs.M
+		freqDiv = calculateNArgs.FreqDiv
+	)
+
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
-			crunchy,
-			smooth,
-			network
+			chain,
+			network,
+			delta,
+			m,
+			freq_div
 		)
 
 		VALUES (
 			$1,
 			$2,
-			$3
+			$3,
+			$4,
+			$5
 		)`,
 
 		TableCalculateN,
@@ -39,9 +51,11 @@ func InsertNArgs(calculateNArgs TribecaProgramData) {
 
 	_, err := timescaleClient.Exec(
 		statementText,
-		calculateNArgs.Crunchy,
-		calculateNArgs.Smooth,
-		calculateNArgs.Network,
+		chain,
+		network,
+		delta,
+		m,
+		freqDiv,
 	)
 
 	if err != nil {
@@ -53,19 +67,25 @@ func InsertNArgs(calculateNArgs TribecaProgramData) {
 	}
 }
 
-func GetLatestCalculatenArgs() TribecaProgramData {
+func GetLatestCalculatenArgs(chain, network string) TribecaProgramData {
 	timescaleClient := timescale.Client()
 
 	// fetch the daily average for each day we have data for
 	statementText := fmt.Sprintf(
 		`SELECT
-			crunchy,
-			smooth
+			chain,
+			network,
+			delta,
+			m,
+			freq_div
 		FROM %s
+		WHERE chain = %s AND network = %s
 		ORDER BY time DESC
 		LIMIT 1`,
 
 		TableCalculateN,
+		chain,
+		network,
 	)
 
 	rowsCalculateNArgs, err := timescaleClient.Query(statementText)
@@ -80,36 +100,27 @@ func GetLatestCalculatenArgs() TribecaProgramData {
 
 	defer rowsCalculateNArgs.Close()
 
-	calculateNArgs := make([]TribecaProgramData, 0)
+	var calculateNArgs TribecaProgramData
 
-	for rowsCalculateNArgs.Next() {
-		var data TribecaProgramData
+	rowsCalculateNArgs.Next()
 
-		err = rowsCalculateNArgs.Scan(
-			&data.Crunchy,
-			&data.Smooth,
-		)
+	err = rowsCalculateNArgs.Scan(
+		&calculateNArgs.Chain,
+		&calculateNArgs.Network,
+		&calculateNArgs.Delta,
+		&calculateNArgs.M,
+		&calculateNArgs.FreqDiv,
+	)
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "Failed to scan past calculateN args!"
-				k.Payload = err
-			})
-		}
-
-		calculateNArgs = append(calculateNArgs, data)
-
-	}
-	fmt.Println(calculateNArgs)
-
-	if len(calculateNArgs) != 1 {
+	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-			k.Format("Timescale query for calculateN args returned %v entries!", len(calculateNArgs))
+			k.Message = "Failed to scan past calculateN args!"
 			k.Payload = err
 		})
 	}
 
-	return calculateNArgs[0]
+	fmt.Println(calculateNArgs)
+
+	return calculateNArgs
 }

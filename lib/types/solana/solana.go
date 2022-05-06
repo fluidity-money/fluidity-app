@@ -140,7 +140,10 @@ type Slot struct {
 }
 
 type TribecaProgramData struct {
-	Crunchy uint64
-	Smooth  uint64
+	Chain   string
 	Network string
+
+	Delta   uint8
+	M       uint8
+	FreqDiv uint8
 }
