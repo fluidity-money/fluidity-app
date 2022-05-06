@@ -137,6 +137,7 @@ export \
 
 docker-compose \
 	-f "$automation_dir/docker-compose.infrastructure.yml" \
+	-f "$automation_dir/docker-compose.volumes.yml" \
 	-f "$automation_dir/docker-compose.database-connectors.yml" \
 	-f "$automation_dir/docker-compose.ethereum.yml" \
 	-f "$automation_dir/docker-compose.ethereum.fluidity.money.yml" \
