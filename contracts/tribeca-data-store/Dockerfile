@@ -1,40 +1,35 @@
 
-FROM node:lts-buster-slim
+FROM rust:latest AS base
 
-RUN apt-get update && apt-get install -y \
-    openssl \
-    ca-certificates \
-    make \
-    npm 
+RUN sh -c "$(curl -sSfL https://release.solana.com/v1.9.5/install)"
 
-ENV FLUID_DIR /usr/local/src/fluidity
+RUN sh -c "$(cargo install --git https://github.com/project-serum/anchor --tag v0.24.2 anchor-cli --locked)"
 
-WORKDIR ${FLUID_DIR}
+RUN sh -c "$(sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y pkg-config build-essential libudev-dev)"
 
-COPY package.json .
-COPY package-lock.json .
-COPY yarn.lock .
+ENV PATH="/root/.local/share/solana/install/active_release/bin:$PATH"
 
-COPY tsconfig.json .
+WORKDIR /usr/local/src/fluidity-tribeca-data-store
 
-RUN npm install
-
-#RUN npm install -g npx
-#RUN npm install -g ts-node
-
-COPY tribeca tribeca
-
-COPY goki goki
-
+# only rebuild on source file change
+COPY src src
 COPY scripts scripts
+COPY Anchor.toml ./
+COPY Cargo.toml ./
+COPY Cargo.lock ./
 
-COPY target target
+RUN ["anchor", "build"]
 
-COPY ETeo.json .
+COPY . ./
 
-COPY blah.ts .
+FROM base AS test-validator
 
-RUN ls
+RUN solana-keygen new \
+    --silent \
+    --no-bip39-passphrase
 
-ENTRYPOINT npx ts-node --compilerOptions '{"resolveJsonModule":true}' scripts/queue-proposal.ts
+WORKDIR /usr/local/src/fluidity-tribeca-data-store
 
+RUN ./scripts/deploy-validator.sh
+
+ENTRYPOINT ["solana-test-validator"]
