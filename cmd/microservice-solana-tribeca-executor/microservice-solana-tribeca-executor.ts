@@ -5,6 +5,8 @@ import type { Idl } from "@project-serum/anchor";
 import { Connection } from "@solana/web3.js";
 import { BorshEventCoder, Wallet, web3 } from "@project-serum/anchor";
 import { PublicKey, SolanaProvider } from "@saberhq/solana-contrib";
+/// <reference path="./typings/base58-js" />
+import { base58_to_binary } from "base58-js";
 
 import {
   getProposalState,
@@ -12,28 +14,47 @@ import {
   LockerWrapper,
   ProposalState,
   TribecaSDK,
-} from "tribeca";
-import { GokiSDK } from "../goki/src";
+} from "tribeca/dist/cjs";
+import { GokiSDK } from "goki/dist/cjs";
 
-import governIdl from "../tribeca/idl/govern.json";
+import governIdl from "./idl/govern.json";
 
-// SECRET_KEY is the private key file responsible for paying and signing
+// SECRET_KEY is the base58 encoded key responsible for paying and signing
 //  tribeca/goki transactions
-const SECRET_KEY = process.env.SECRET_KEY;
+const SECRET_KEY = process.env.SECRET_KEY as string;
 
 if (!SECRET_KEY) {
-  throw new Error("secretKey not provided");
+  throw new Error("SECRET_KEY not provided");
+}
+
+// FLU_TRIBECA_DATA_STORE_SECRET_KEY is the base58 encoded key responsible for paying and signing
+//  tribeca-data-store transactions
+const TRIBECA_SECRET_KEY = process.env
+  .FLU_TRIBECA_DATA_STORE_SECRET_KEY as string;
+
+if (!TRIBECA_SECRET_KEY) {
+  throw new Error("FLU_TRIBECA_DATA_STORE_SECRET_KEY not provided");
+}
+
+// FLU_SOLANA_PAYER is the base58 encoded key responsible for paying and signing
+//  fluidity solana transactions
+const FLU_SOLANA_PAYER = process.env.FLU_SOLANA_PAYER as string;
+
+if (!FLU_SOLANA_PAYER) {
+  throw new Error("FLU_SOLANA_PAYER not provided");
 }
 
 // TRIBECA_GOVERNOR_PUBKEY is the base58 public key of active governor
-const FLU_TRIBECA_GOVERNOR_PUBKEY = process.env.FLU_TRIBECA_GOVERNOR_PUBKEY;
+const FLU_TRIBECA_GOVERNOR_PUBKEY = process.env
+  .FLU_TRIBECA_GOVERNOR_PUBKEY as string;
 
 if (!FLU_TRIBECA_GOVERNOR_PUBKEY) {
   throw new Error("FLU_TRIBECA_GOVERNOR_PUBKEY not provided");
 }
 
 // TRIBECA_LOCKER_PUBKEY is the base58 public key of active locker
-const FLU_TRIBECA_LOCKER_PUBKEY = process.env.FLU_TRIBECA_LOCKER_PUBKEY;
+const FLU_TRIBECA_LOCKER_PUBKEY = process.env
+  .FLU_TRIBECA_LOCKER_PUBKEY as string;
 
 if (!FLU_TRIBECA_LOCKER_PUBKEY) {
   throw new Error("FLU_TRIBECA_LOCKER_PUBKEY not provided");
@@ -74,7 +95,15 @@ enum GovernorLogs {
 const sleep = async (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-const payerKeypair = web3.Keypair.fromSecretKey(Uint8Array.from(SECRET_KEY));
+const payerKeypair = web3.Keypair.fromSecretKey(base58_to_binary(SECRET_KEY));
+
+const tribecaDataStorePayer = web3.Keypair.fromSecretKey(
+  base58_to_binary(TRIBECA_SECRET_KEY),
+);
+
+const fluSolanaPayer = web3.Keypair.fromSecretKey(
+  base58_to_binary(FLU_SOLANA_PAYER),
+);
 
 const governorPubkey = new PublicKey(FLU_TRIBECA_GOVERNOR_PUBKEY);
 const lockerPubkey = new PublicKey(FLU_TRIBECA_LOCKER_PUBKEY);
@@ -116,10 +145,9 @@ const provider = SolanaProvider.init({
     governorData.params;
 
   console.log(payerKeypair.publicKey);
-  console.log(execCouncil.data.owners);
 
-  const payerExecCouncilIndex = execCouncil.data.owners.findIndex(
-    (key) => key.toString() === payerKeypair.publicKey.toString(),
+  const payerExecCouncilIndex = execCouncil.data!.owners.findIndex(
+    (key: PublicKey) => key.toString() === payerKeypair.publicKey.toString(),
   );
 
   if (payerExecCouncilIndex === -1) {
@@ -173,7 +201,9 @@ const provider = SolanaProvider.init({
             throw new Error(`Could not decode createProposal event ${event}`);
           }
 
-          const { proposal } = createProposalEvent.data;
+          const { proposal } = createProposalEvent.data as {
+            proposal: PublicKey;
+          };
 
           // wait for delay after proposal creation to activate
           await votingDelayPromise;
@@ -211,7 +241,9 @@ const provider = SolanaProvider.init({
             throw new Error(`Could not decode activateProposal event ${event}`);
           }
 
-          const { proposal } = activateProposalEvent.data;
+          const { proposal } = activateProposalEvent.data as {
+            proposal: PublicKey;
+          };
 
           // Wait for voting period
           await votingPeriodPromise;
@@ -250,7 +282,9 @@ const provider = SolanaProvider.init({
             throw new Error(`Could not decode queueProposal event: ${event}`);
           }
 
-          const { transaction } = queueProposalEvent.data;
+          const { transaction } = queueProposalEvent.data as {
+            transaction: PublicKey;
+          };
 
           // approveTx is the transaction run by the smart wallet
           const approveTx = smartWallet.approveTransaction(
@@ -258,11 +292,13 @@ const provider = SolanaProvider.init({
             execCouncilSigner,
           );
 
+          await sleep(5000);
+
           // invokeApproveTx is the transaction to run approveTx via a PDA
           // from the executive council
           const invokeApproveTx = await execCouncil.ownerInvokeInstructionV2({
             instruction: approveTx.instructions[0],
-            index: 0,
+            index: payerExecCouncilIndex,
           });
 
           invokeApproveTx.addSigners(payerKeypair);
@@ -285,12 +321,14 @@ const provider = SolanaProvider.init({
 
           const invokeExecuteTx = await execCouncil.ownerInvokeInstructionV2({
             instruction: executeTx.instructions[0],
-            index: 0,
+            index: payerExecCouncilIndex,
           });
 
           invokeExecuteTx.addSigners(payerKeypair);
+          invokeExecuteTx.addSigners(tribecaDataStorePayer);
+          invokeExecuteTx.addSigners(fluSolanaPayer);
 
-          invokeExecuteTx.send();
+          await invokeExecuteTx.send();
 
           console.log("Executed Transaction! ");
 

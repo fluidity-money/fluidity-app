@@ -1,34 +1,16 @@
 require("dotenv").config();
 
-import type { Idl } from "@project-serum/anchor";
-
 import { Connection } from "@solana/web3.js";
-import {
-  Program,
-  Provider as Web3Provider,
-  Wallet,
-  web3,
-} from "@project-serum/anchor";
+import { Wallet, web3 } from "@project-serum/anchor";
 import { PublicKey, SolanaProvider } from "@saberhq/solana-contrib";
+import { base58_to_binary } from "base58-js";
 
-import { GovernorWrapper, TribecaSDK } from "tribeca";
-
-const SECRET_KEY = process.env.SECRET_KEY;
-
-if (!SECRET_KEY) {
-  throw new Error("SECRET_KEY not provided");
-}
+import { GovernorWrapper, TribecaSDK } from "tribeca/dist/cjs";
 
 const FLU_TRIBECA_GOVERNOR_PUBKEY = process.env.FLU_TRIBECA_GOVERNOR_PUBKEY;
 
 if (!FLU_TRIBECA_GOVERNOR_PUBKEY) {
   throw new Error("FLU_TRIBECA_GOVERNOR_PUBKEY not provided");
-}
-
-const PROGRAM_ID = process.env.FLU_TRIBECA_DATA_STORE;
-
-if (!PROGRAM_ID) {
-  throw new Error("PROGRAM_ID not provided");
 }
 
 const FLU_SOLANA_RPC_URL = process.env.FLU_SOLANA_RPC_URL;
@@ -54,38 +36,40 @@ const FLU_INSTRUCTION = process.env.FLU_INSTRUCTION;
 if (!FLU_INSTRUCTION) {
   throw new Error("FLU_INSTRUCTION not provided");
 }
-// initialize keys
-const payerKeypair = web3.Keypair.fromSecretKey(Uint8Array.from(SECRET_KEY));
-
-console.log(payerKeypair.publicKey.toString());
-console.log(payerKeypair.secretKey.toString());
 
 const governorPubkey = new PublicKey(FLU_TRIBECA_GOVERNOR_PUBKEY);
 
-// initialize solana providers
-const connection = new Connection(FLU_SOLANA_RPC_URL, "processed");
-
-const wallet = new Wallet(payerKeypair);
-
-// load tribeca program
-const tribecaProvider = SolanaProvider.init({
-  connection,
-  wallet,
-});
-
-const tribecaSdk = TribecaSDK.load({ provider: tribecaProvider });
-
 const createProposalWithInstruction = async (
   instruction: web3.TransactionInstruction,
+  signers: web3.Keypair[] = [],
 ) => {
+  if (!signers.length) {
+    throw new Error("No signers found");
+  }
+
+  console.log(`Defaulting proposer to first signer! ${signers[0].publicKey}`);
+
+  // initialize solana providers
+  const connection = new Connection(FLU_SOLANA_RPC_URL, "processed");
+
+  const wallet = new Wallet(signers[0]);
+
+  // load tribeca program
+  const tribecaProvider = SolanaProvider.init({
+    connection,
+    wallet,
+  });
+
+  const tribecaSdk = TribecaSDK.load({ provider: tribecaProvider });
+
   const governor = new GovernorWrapper(tribecaSdk, governorPubkey);
 
   const { proposal, tx } = await governor.createProposal({
-    proposer: payerKeypair.publicKey,
+    proposer: signers[0].publicKey,
     instructions: [instruction],
   });
 
-  tx.addSigners(payerKeypair);
+  tx.addSigners(...signers);
 
   await tx.confirm();
 
@@ -95,7 +79,7 @@ const createProposalWithInstruction = async (
     descriptionLink: FLU_TRIBECA_PROPOSAL_DESC,
   });
 
-  txEnv.addSigners(payerKeypair);
+  txEnv.addSigners(...signers);
 
   txEnv.send();
 };
@@ -106,8 +90,8 @@ const createProposalWithInstruction = async (
       const { drainInstructionHandler } = await require(
         "./create-flu-solana-instruction",
       );
-      const instruction = await drainInstructionHandler();
-      await createProposalWithInstruction(instruction);
+      const { instruction, signers } = await drainInstructionHandler();
+      await createProposalWithInstruction(instruction, signers);
       return;
     }
 
@@ -115,7 +99,8 @@ const createProposalWithInstruction = async (
       const { initializeHandler } = await require(
         "./create-tribeca-data-store-instruction",
       );
-      const instruction = await initializeHandler();
+      const { instruction, signers } = await initializeHandler();
+      await createProposalWithInstruction(instruction, signers);
       return;
     }
 
@@ -123,8 +108,8 @@ const createProposalWithInstruction = async (
       const { changeDeltaHandler } = await require(
         "./create-tribeca-data-store-instruction",
       );
-      const instruction = await changeDeltaHandler();
-      await createProposalWithInstruction(instruction);
+      const { instruction, signers } = await changeDeltaHandler();
+      await createProposalWithInstruction(instruction, signers);
       return;
     }
 
@@ -132,8 +117,8 @@ const createProposalWithInstruction = async (
       const { changePayoutFrequencyHandler } = await require(
         "./create-tribeca-data-store-instruction",
       );
-      const instruction = await changePayoutFrequencyHandler();
-      await createProposalWithInstruction(instruction);
+      const { instruction, signers } = await changePayoutFrequencyHandler();
+      await createProposalWithInstruction(instruction, signers);
       return;
     }
 
@@ -141,8 +126,8 @@ const createProposalWithInstruction = async (
       const { changeNumRewardTiersHandler } = await require(
         "./create-tribeca-data-store-instruction",
       );
-      const instruction = await changeNumRewardTiersHandler();
-      await createProposalWithInstruction(instruction);
+      const { instruction, signers } = await changeNumRewardTiersHandler();
+      await createProposalWithInstruction(instruction, signers);
       return;
     }
 

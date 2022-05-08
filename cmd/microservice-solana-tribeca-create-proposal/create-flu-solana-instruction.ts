@@ -4,20 +4,21 @@ import { Connection } from "@solana/web3.js";
 import { Provider as Web3Provider, Wallet, web3 } from "@project-serum/anchor";
 import { PublicKey } from "@saberhq/solana-contrib";
 import { serialize } from "borsh";
+import { base58_to_binary } from "base58-js";
 
-const SECRET_KEY = require(process.env.FLU_SOLANA_PAYER);
+const SECRET_KEY = process.env.FLU_SOLANA_PAYER as string;
 
 if (!SECRET_KEY) {
   throw new Error("SECRET_KEY not provided");
 }
 
-const FLU_SOLANA_PROGRAM_ID = process.env.FLU_SOLANA_PROGRAM_ID;
+const FLU_SOLANA_PROGRAM_ID = process.env.FLU_SOLANA_PROGRAM_ID as string;
 
 if (!FLU_SOLANA_PROGRAM_ID) {
   throw new Error("PROGRAM_ID not provided");
 }
 
-const FLU_SOLANA_RPC_URL = process.env.FLU_SOLANA_RPC_URL;
+const FLU_SOLANA_RPC_URL = process.env.FLU_SOLANA_RPC_URL as string;
 
 if (!FLU_SOLANA_RPC_URL) {
   throw new Error("SOLANA_RPC not provided");
@@ -25,38 +26,42 @@ if (!FLU_SOLANA_RPC_URL) {
 
 const SPL_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 
-const FLU_SOLANA_FLUID_MINT_PUBKEY = process.env.FLU_SOLANA_FLUID_MINT_PUBKEY;
+const FLU_SOLANA_FLUID_MINT_PUBKEY = process.env
+  .FLU_SOLANA_FLUID_MINT_PUBKEY as string;
 
 if (!FLU_SOLANA_FLUID_MINT_PUBKEY) {
   throw new Error("FLU_SOLANA_FLUID_MINT_PUBKEY not provided");
 }
 
-const FLU_SOLANA_TOKEN_NAME = process.env.FLU_SOLANA_TOKEN_NAME;
+const FLU_SOLANA_TOKEN_NAME = process.env.FLU_SOLANA_TOKEN_NAME as string;
 
 if (!FLU_SOLANA_TOKEN_NAME) {
   throw new Error("FLU_SOLANA_TOKEN_NAME not provided");
 }
 
-const FLU_SOLANA_OBLIGATION_PUBKEY = process.env.FLU_SOLANA_OBLIGATION_PUBKEY;
+const FLU_SOLANA_OBLIGATION_PUBKEY = process.env
+  .FLU_SOLANA_OBLIGATION_PUBKEY as string;
 
 if (!FLU_SOLANA_OBLIGATION_PUBKEY) {
   throw new Error("FLU_SOLANA_OBLIGATION_PUBKEY not provided");
 }
 
-const FLU_SOLANA_RESERVE_PUBKEY = process.env.FLU_SOLANA_RESERVE_PUBKEY;
+const FLU_SOLANA_RESERVE_PUBKEY = process.env
+  .FLU_SOLANA_RESERVE_PUBKEY as string;
 
 if (!FLU_SOLANA_RPC_URL) {
   throw new Error("FLU_SOLANA_RESERVE_PUBKEY not provided");
 }
 
-const FLU_SOLANA_RECEIVER_PUBKEY = process.env.FLU_SOLANA_RECEIVER_PUBKEY;
+const FLU_SOLANA_RECEIVER_PUBKEY = process.env
+  .FLU_SOLANA_RECEIVER_PUBKEY as string;
 
 if (!FLU_SOLANA_RPC_URL) {
   throw new Error("FLU_SOLANA_RECEIVER_PUBKEY not provided");
 }
 
 // initialize keys
-const payerKeypair = web3.Keypair.fromSecretKey(Uint8Array.from(SECRET_KEY));
+const payerKeypair = web3.Keypair.fromSecretKey(base58_to_binary(SECRET_KEY));
 
 module.exports.drainInstructionHandler = async () => {
   const [solanaAccountPda, solanaAccountPdaBump] = await PublicKey
