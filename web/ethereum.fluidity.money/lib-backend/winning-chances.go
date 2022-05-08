@@ -69,46 +69,43 @@ var queryType = graphql.NewObject(
 
 					var output Result
 
-					requestOk := p.Args["gasFee"] != nil && p.Args["atx"] != nil &&
-					p.Args["bpyStakedUsd"] != nil && p.Args["sizeOfThePool"] != nil &&
-					p.Args["underlyingTokenDecimalsRat"] != nil && p.Args["averageTransfersInBlock"] != nil &&
-					p.Args["secondsSinceLastBlock"] != nil && p.Args["tokenName"] != nil
-					
-					if requestOk {
-						var (
-							gasFee                           = new(big.Rat).SetFloat64(p.Args["gasFee"].(float64))
-							atx                              = new(big.Rat).SetFloat64(p.Args["atx"].(float64))
-							bpyStakedUsd                     = new(big.Rat).SetFloat64(p.Args["bpyStakedUsd"].(float64))
-							sizeOfThePool                    = new(big.Rat).SetUint64(uint64(p.Args["sizeOfThePool"].(int)))
-							underlyingTokenDecimalsRat       = new(big.Rat).SetUint64(uint64(p.Args["underlyingTokenDecimalsRat"].(int)))
-							averageTransfersInBlock          = p.Args["averageTransfersInBlock"].(int)
-							secondsSinceLastBlock            = p.Args["secondsSinceLastBlock"].(int)
-							tokenName                        = p.Args["tokenName"].(string)
-						)
-						
-						emission := worker.NewEthereumEmission()
-						emission.Network = "ethereum"
-						emission.TokenDetails = token_details.New(tokenName, p.Args["underlyingTokenDecimalsRat"].(int))
-	
-						randomN, randomPayouts := probability.WinningChances(
-							gasFee,
-							atx,
-							bpyStakedUsd,
-							sizeOfThePool,
-							underlyingTokenDecimalsRat,
-							averageTransfersInBlock,
-							uint64(secondsSinceLastBlock),
-							emission,
-						)
-
-						output.N = randomN;
-						for _, value := range randomPayouts {
-							output.Payouts = append(output.Payouts, value.Int64())
-						}
-	
-						return output, nil
+					size := len(p.Args)
+					if size < 8 {
+						return output, errors.New("Bad request, missing payload value")
 					}
-					return output, errors.New("Bad request, missing payload value")
+					
+					var (
+						gasFee                           = new(big.Rat).SetFloat64(p.Args["gasFee"].(float64))
+						atx                              = new(big.Rat).SetFloat64(p.Args["atx"].(float64))
+						bpyStakedUsd                     = new(big.Rat).SetFloat64(p.Args["bpyStakedUsd"].(float64))
+						sizeOfThePool                    = new(big.Rat).SetUint64(uint64(p.Args["sizeOfThePool"].(int)))
+						underlyingTokenDecimalsRat       = new(big.Rat).SetUint64(uint64(p.Args["underlyingTokenDecimalsRat"].(int)))
+						averageTransfersInBlock          = p.Args["averageTransfersInBlock"].(int)
+						secondsSinceLastBlock            = p.Args["secondsSinceLastBlock"].(int)
+						tokenName                        = p.Args["tokenName"].(string)
+					)
+					
+					emission := worker.NewEthereumEmission()
+					emission.Network = "ethereum"
+					emission.TokenDetails = token_details.New(tokenName, p.Args["underlyingTokenDecimalsRat"].(int))
+
+					randomN, randomPayouts := probability.WinningChances(
+						gasFee,
+						atx,
+						bpyStakedUsd,
+						sizeOfThePool,
+						underlyingTokenDecimalsRat,
+						averageTransfersInBlock,
+						uint64(secondsSinceLastBlock),
+						emission,
+					)
+
+					output.N = randomN;
+					for _, value := range randomPayouts {
+						output.Payouts = append(output.Payouts, value.Int64())
+					}
+
+					return output, nil
 				},
 			},
 		},
