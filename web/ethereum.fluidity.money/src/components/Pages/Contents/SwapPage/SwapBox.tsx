@@ -9,7 +9,6 @@ import { useSigner } from "util/hooks";
 import {
   modalToggle,
   SwapModalStatus,
-  tokenListContext,
   userActionContext,
 } from "components/context";
 import makeContractSwap from "util/makeContractSwap";
@@ -63,63 +62,6 @@ const SwapBox = () => {
       : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
       : (ropsten as TokenKind[]);
-
-  // const [pinnedTokens, setPinnedTokens] = useState(
-  //   data.slice(0, data.length / 2)
-  // );
-
-  // const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
-  //   data.slice(data.length / 2, data.length)
-  // );
-
-  // const pinnedTokens: TokenKind[] = useContext(tokenListContext).pinnedTokens;
-  // const setPinnedTokens = useContext(tokenListContext).setPinnedTokens;
-  // const pinnedFluidTokens: TokenKind[] =
-  //   useContext(tokenListContext).pinnedFluidTokens;
-  // const setPinnedFluidTokens =
-  //   useContext(tokenListContext).setPinnedFluidTokens;
-
-  // const sortPinned = (token: TokenKind) => {
-  //   setPinnedTokens(
-  //     pinnedTokens.sort((y, x) => {
-  //       return x.symbol === token.symbol
-  //         ? -1
-  //         : y.symbol === token.symbol
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  //   setPinnedFluidTokens(
-  //     pinnedFluidTokens.sort((y, x) => {
-  //       return x.symbol === `f${token.symbol}`
-  //         ? -1
-  //         : y.symbol === `f${token.symbol}`
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  // };
-
-  // const sortPinnedFluid = (token: TokenKind) => {
-  //   setPinnedFluidTokens(
-  //     pinnedFluidTokens.sort((y, x) => {
-  //       return x.symbol === token.symbol
-  //         ? -1
-  //         : y.symbol === token.symbol
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  //   setPinnedTokens(
-  //     pinnedTokens.sort((y, x) => {
-  //       return x.symbol === token.symbol.substring(1)
-  //         ? -1
-  //         : y.symbol === token.symbol.substring(1)
-  //         ? 1
-  //         : 0;
-  //     })
-  //   );
-  // };
 
   // catches user amount input to ensure it's valid
   const amountValueChanger = (input: string) => {
