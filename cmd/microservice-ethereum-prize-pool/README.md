@@ -7,17 +7,16 @@ over the shared bus.
 
 ## Environment variables
 
-|                    Name                   |                                          Description
-|-------------------------------------------|----------------------------------------------------------------------------------------------|
-| `FLU_WORKER_ID`                           | Worker ID used to identify the application in logging and to the AMQP queue.                 |
-| `FLU_DEBUG`                               | Toggle debug messages produced by any application using the debug logger.                    |
-| `FLU_AMQP_QUEUE_ADDR`                     | AMQP queue address connected to to receive and send messages down.                           |
-| `FLU_ETHEREUM_HTTP_URL`                   | Address to use to connect to Geth to query the state of the balance with.                    |
-| `FLU_ETHEREUM_TOKENS_LIST`                | Tokens list to filter for and to select when sending down the message bus.                   |
-| `FLU_ETHEREUM_TOKEN_BACKEND`              | Backend that fluid tokens are deployed to (`aave`, `compound`, or empty for token-specific). |
-| `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR` | Contract address of the Uniswap anchored view to use as a price oracle - Compound only.      |
-| `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR` | AAVE contract to look up token prices - AAVE only.                                           |
-| `FLU_ETHEREUM_USD_TOKEN_ADDR`             | USDT address to look up the price of USD for price scaling - AAVE only.                      |
+|                    Name                   |                                      Description
+|-------------------------------------------|-----------------------------------------------------------------------------------------|
+| `FLU_WORKER_ID`                           | Worker ID used to identify the application in logging and to the AMQP queue.            |
+| `FLU_DEBUG`                               | Toggle debug messages produced by any application using the debug logger.               |
+| `FLU_AMQP_QUEUE_ADDR`                     | AMQP queue address connected to to receive and send messages down.                      |
+| `FLU_ETHEREUM_HTTP_URL`                   | Address to use to connect to Geth to query the state of the balance with.               |
+| `FLU_ETHEREUM_TOKENS_LIST`                | Tokens list to filter for and to select when sending down the message bus.              |
+| `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR` | Contract address of the Uniswap anchored view to use as a price oracle - Compound only. |
+| `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR` | AAVE contract to look up token prices - AAVE only.                                      |
+| `FLU_ETHEREUM_USD_TOKEN_ADDR`             | USDT address to look up the price of USD for price scaling - AAVE only.                 |
 
 ## Tokens list
 
