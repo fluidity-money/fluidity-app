@@ -9,7 +9,7 @@ RUN ["npm", "install", "sol-merger"]
 
 COPY . /usr/app
 
-RUN ["npx", "sol-merger", "contracts/TokenCompound.sol"]
+RUN ["npx", "sol-merger", "contracts/Token.sol"]
 
 # sol-merger leaves multiple SPDX license IDs in the resulting file, which is a compile error
 RUN ["sed", "-i", "-e", "/SPDX/d", "-e", "1 i //SPDX-License-Identifier: UNLICENSED", "contracts/Token_merged.sol"]
