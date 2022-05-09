@@ -289,10 +289,6 @@ const SwapBox = () => {
               <TokenSelect
                 type={swap === true ? "token" : "fluid"}
                 toggle={swap === true ? togglerTo : togglerFrom}
-                // pinnedTokens={pinnedTokens}
-                // pinnedFluidTokens={pinnedFluidTokens}
-                // sortPinned={sortPinned}
-                // sortPinnedFluid={sortPinnedFluid}
               />
               <div
                 onClick={setMaxAmount}
@@ -337,10 +333,6 @@ const SwapBox = () => {
               <TokenSelect
                 type={swap === true ? "fluid" : "token"}
                 toggle={swap === true ? togglerFrom : togglerTo}
-                // pinnedTokens={pinnedTokens}
-                // pinnedFluidTokens={pinnedFluidTokens}
-                // sortPinned={sortPinned}
-                // sortPinnedFluid={sortPinnedFluid}
               />
               {wallet.status === "connected" && <AmountAvailable invert />}
             </div>
