@@ -76,29 +76,35 @@ func main() {
 	)
 
 	// getGethConnection, causing Fatal to trigger if we don't succeed.
+
 	gethClient := getGethClient(gethAddress)
 
 	// tokensList will Fatal if bad input
+
 	tokenDetails := util.GetTokensListEthereum(tokensList_)
 
 	// set required addresses based on backend(s) in use
+
 	switch tokenBackend {
 	case BackendCompound:
 		isCompound = true
+
 	case BackendAave:
 		isAave = true
+
 	default:
 	}
 
 	for i, token := range tokenDetails {
-		// we are using only `tokenBackend`
-		if tokenBackend == "" {
+
+		switch token.Backend {
+		case "":
 			tokenDetails[i].Backend = tokenBackend
-		// we are using compound for this token
-		} else if token.Backend == BackendCompound {
+
+		case BackendCompound:
 			isCompound = true
-		// we are using aave for this token
-		} else if token.Backend == BackendAave {
+
+		case BackendAave:
 			isAave = true
 		}
 	}
@@ -106,10 +112,10 @@ func main() {
 	if isCompound {
 		uniswapAnchoredViewAddressEth = ethCommon.HexToAddress(uniswapAnchoredViewAddress_)
 	}
-	
+
 	if isAave {
 		AaveAddressProviderAddressEth = ethCommon.HexToAddress(aaveAddressProviderAddress_)
-		UsdTokenAddressEth            = ethCommon.HexToAddress(usdTokenAddress_)
+		UsdTokenAddressEth = ethCommon.HexToAddress(usdTokenAddress_)
 	}
 
 	var (
@@ -128,8 +134,8 @@ func main() {
 					tokenDecimals = work.TokenDecimals
 					tokenBackend  = work.Backend
 
-					tokenPrice      *big.Rat
-					err             error
+					tokenPrice *big.Rat
+					err        error
 				)
 
 				switch tokenBackend {
