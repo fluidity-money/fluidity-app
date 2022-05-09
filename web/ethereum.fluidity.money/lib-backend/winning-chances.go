@@ -1,13 +1,12 @@
 package api_fluidity_money
 
 import (
-	"encoding/json"
-	"fmt"
-	"math/big"
 	"net/http"
 	"errors"
 
 	"github.com/graphql-go/graphql"
+	"github.com/fluidity-money/fluidity-app/lib/web"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
@@ -75,11 +74,11 @@ var queryType = graphql.NewObject(
 					}
 					
 					var (
-						gasFee                           = new(big.Rat).SetFloat64(p.Args["gasFee"].(float64))
-						atx                              = new(big.Rat).SetFloat64(p.Args["atx"].(float64))
-						bpyStakedUsd                     = new(big.Rat).SetFloat64(p.Args["bpyStakedUsd"].(float64))
-						sizeOfThePool                    = new(big.Rat).SetUint64(uint64(p.Args["sizeOfThePool"].(int)))
-						underlyingTokenDecimalsRat       = new(big.Rat).SetUint64(uint64(p.Args["underlyingTokenDecimalsRat"].(int)))
+						gasFee                           = convertFloat64toBigrat(p.Args["gasFee"].(float64))
+						atx                              = convertFloat64toBigrat(p.Args["atx"].(float64))
+						bpyStakedUsd                     = convertFloat64toBigrat(p.Args["bpyStakedUsd"].(float64))
+						sizeOfThePool                    = convertUint64toBigrat(uint64(p.Args["sizeOfThePool"].(int)))
+						underlyingTokenDecimalsRat       = convertUint64toBigrat(uint64(p.Args["underlyingTokenDecimalsRat"].(int)))
 						averageTransfersInBlock          = p.Args["averageTransfersInBlock"].(int)
 						secondsSinceLastBlock            = p.Args["secondsSinceLastBlock"].(int)
 						tokenName                        = p.Args["tokenName"].(string)
@@ -126,23 +125,20 @@ func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 	return result
 }
 
-func HandleWinningChances(w http.ResponseWriter, r *http.Request) {
+func HandleWinningChances(w http.ResponseWriter, r *http.Request) interface{} {
+	ipAddress := web.GetIpAddress(r)
 	result := executeQuery(r.URL.Query().Get("query"), schema)
 
-	//Error check from GraphQL request
 	if len(result.Errors) > 0 {
-		fmt.Errorf(
-			"Request error %v",
-			result.Errors,
-		)
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Failed to execute a GraphQL request from ip address %#v, due to  %s",
+				ipAddress,
+				result.Errors,
+			)
+		})
+		w.WriteHeader(http.StatusBadRequest)
 	}
-
-	//Error check from results received
-	err := json.NewEncoder(w).Encode(result)
-	if err != nil {
-		fmt.Errorf(
-			"Failed to encode result data %v",
-			err,
-		)
-	}
+	
+	return result
 }
