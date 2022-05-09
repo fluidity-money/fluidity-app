@@ -1,14 +1,14 @@
 package ethereum
 
 import (
+	"context"
 	"fmt"
 	"math/big"
-	"context"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
-	ethClient "github.com/ethereum/go-ethereum/ethclient"
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	ethClient "github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
@@ -56,7 +56,7 @@ func CoerceBoundContractResultsToRat(results []interface{}) (*big.Rat, error) {
 }
 
 func CoerceBoundContractResultsToAddress(results []interface{}) (ethCommon.Address, error) {
-	var	result ethCommon.Address
+	var result ethCommon.Address
 
 	if resultsLen := len(results); resultsLen != 1 {
 		return result, fmt.Errorf(

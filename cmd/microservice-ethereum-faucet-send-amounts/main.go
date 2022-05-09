@@ -10,6 +10,7 @@ import (
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -99,10 +100,13 @@ func main() {
 	}
 
 	// populate map of token sessions for each token we're tracking
-	tokensList_ := util.GetTokensListEthereum(ethereumTokensList_)
+
+	tokensList_ := ethereum.GetTokensListEthereum(ethereumTokensList_)
 
 	for _, details := range tokensList_ {
+
 		tokenName_     := details.TokenName
+
 		tokenName, err := faucetTypes.TokenFromString("f"+tokenName_)
 
 		if err != nil {
@@ -114,7 +118,7 @@ func main() {
 				)
 			})
 		}
-		
+
 		tokenAddresses[tokenName] = details.FluidAddress
 	}
 

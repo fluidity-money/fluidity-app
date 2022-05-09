@@ -33,7 +33,7 @@ func calculateAndStoreTotalWinners(network network.BlockchainNetwork, tokens []u
 			tokenDecimals_ = tokenDetails.TokenDecimals
 			tokenDecimals  = new(big.Int).Set(tokenDecimals_.Num())
 		)
-		
+
 		winners, winningAmount_ := winners.CountWinnersForDateAndWinningAmount(
 			network,
 			tokenName,
@@ -61,12 +61,12 @@ func calculateAndStoreTotalWinners(network network.BlockchainNetwork, tokens []u
 
 func main() {
 	var (
+		ethereumTokensList = util.GetTokensListBase(ethereumTokensList_)
+		solanaTokensList   = util.GetTokensListBase(solanaTokensList_)
+
 		ethereumTokensList_ = os.Getenv(EnvEthereumTokensList)
 		solanaTokensList_   = os.Getenv(EnvSolanaTokensList)
 	)
-
-	ethereumTokensList := util.GetTokensListBase(ethereumTokensList_)
-	solanaTokensList   := util.GetTokensListBase(solanaTokensList_)
 
 	today := time.Now()
 
