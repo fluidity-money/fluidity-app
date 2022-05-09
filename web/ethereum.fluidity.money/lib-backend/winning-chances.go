@@ -5,8 +5,6 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
-	"github.com/fluidity-money/fluidity-app/lib/web"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
@@ -67,23 +65,48 @@ var queryType = graphql.NewObject(
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
 					var output Result
+					err := errors.New("Bad request, missing payload value")
 
-					size := len(p.Args)
-					if size < 8 {
-						return output, errors.New("Bad request, missing payload value")
+					gasFee, ok  := validArgFloat64toBigrat(p.Args, "gasFee")
+					if ok == false {
+						return nil, err
 					}
-					
-					var (
-						gasFee                           = convertFloat64toBigrat(p.Args["gasFee"].(float64))
-						atx                              = convertFloat64toBigrat(p.Args["atx"].(float64))
-						bpyStakedUsd                     = convertFloat64toBigrat(p.Args["bpyStakedUsd"].(float64))
-						sizeOfThePool                    = convertUint64toBigrat(uint64(p.Args["sizeOfThePool"].(int)))
-						underlyingTokenDecimalsRat       = convertUint64toBigrat(uint64(p.Args["underlyingTokenDecimalsRat"].(int)))
-						averageTransfersInBlock          = p.Args["averageTransfersInBlock"].(int)
-						secondsSinceLastBlock            = p.Args["secondsSinceLastBlock"].(int)
-						tokenName                        = p.Args["tokenName"].(string)
-					)
-					
+
+					atx, ok := validArgFloat64toBigrat(p.Args, "atx")
+					if ok == false {
+						return nil, err
+					}
+
+					bpyStakedUsd, ok :=   validArgFloat64toBigrat(p.Args, "bpyStakedUsd")
+					if ok == false {
+						return nil, err
+					}
+
+					sizeOfThePool, ok := validArgInt64toUInt64Bigrat(p.Args, "sizeOfThePool")
+					if ok == false {
+						return nil, err
+					}
+
+					underlyingTokenDecimalsRat, ok := validArgInt64toUInt64Bigrat(p.Args, "underlyingTokenDecimalsRat")
+					if ok == false {
+						return nil, err
+					}
+
+					averageTransfersInBlock, ok := validArgInt(p.Args, "averageTransfersInBlock")
+					if ok == false {
+						return nil, err
+					}
+
+					secondsSinceLastBlock, ok :=   validArgInt(p.Args, "secondsSinceLastBlock")
+					if ok == false {
+						return nil, err
+					}
+
+					tokenName, ok := validArgString(p.Args, "tokenName")
+					if ok == false {
+						return nil, err
+					}	
+
 					emission := worker.NewEthereumEmission()
 					emission.Network = "ethereum"
 					emission.TokenDetails = token_details.New(tokenName, p.Args["underlyingTokenDecimalsRat"].(int))
@@ -126,18 +149,11 @@ func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 }
 
 func HandleWinningChances(w http.ResponseWriter, r *http.Request) interface{} {
-	ipAddress := web.GetIpAddress(r)
 	result := executeQuery(r.URL.Query().Get("query"), schema)
 
 	if len(result.Errors) > 0 {
-		log.App(func(k *log.Log) {
-			k.Format(
-				"Failed to execute a GraphQL request from ip address %#v, due to  %s",
-				ipAddress,
-				result.Errors,
-			)
-		})
-		w.WriteHeader(http.StatusBadRequest)
+		graphQLErrorLogHandler(w, r, result.Errors)
+		return nil
 	}
 	
 	return result
