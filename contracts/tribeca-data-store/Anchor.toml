@@ -6,6 +6,9 @@ seeds = false
 [programs.localnet]
 tribeca_data_store = "HdSHLoG6gbQ7tkMvB87QraPpdxF9bnfNobbjnZxKviRS"
 
+[programs.devnet]
+tribeca_data_store = "HdSHLoG6gbQ7tkMvB87QraPpdxF9bnfNobbjnZxKviRS"
+
 [registry]
 url = "https://anchor.projectserum.com"
 
