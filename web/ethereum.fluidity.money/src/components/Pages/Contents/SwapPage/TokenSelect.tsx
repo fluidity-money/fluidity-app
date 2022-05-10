@@ -40,10 +40,10 @@ const TokenSelect = ({
       : (ropsten as TokenKind[]);
 
   // accesses tokens from context
-  const pokens: TokenKind[] = useContext(tokenListContext).tokens;
-  const setPokens = useContext(tokenListContext).setTokens;
-  const fluidPokens: TokenKind[] = useContext(tokenListContext).fluidTokens;
-  const setFluidPokens = useContext(tokenListContext).setFluidTokens;
+  const tokens: TokenKind[] = useContext(tokenListContext).tokens;
+  const setTokens = useContext(tokenListContext).setTokens;
+  const fluidTokens: TokenKind[] = useContext(tokenListContext).fluidTokens;
+  const setFluidTokens = useContext(tokenListContext).setFluidTokens;
   // accesses pinned tokens from context
   const pinnedTokens: TokenKind[] = useContext(tokenListContext).pinnedTokens;
   const setPinnedTokens = useContext(tokenListContext).setPinnedTokens;
@@ -116,7 +116,7 @@ const TokenSelect = ({
   const setAmounts = (token: TokenKind, type: string, r: string) => {
     switch (type) {
       case "non fluid":
-        setPokens((previousState: TokenList["kind"]) =>
+        setTokens((previousState: TokenList["kind"]) =>
           [...previousState]?.map((item) =>
             item.symbol === token.symbol
               ? Object.assign(item, { amount: r })
@@ -125,7 +125,7 @@ const TokenSelect = ({
         );
         break;
       case "fluid":
-        setFluidPokens((previousState: TokenList["kind"]) =>
+        setFluidTokens((previousState: TokenList["kind"]) =>
           [...previousState]?.map((item) =>
             item.symbol === token.symbol
               ? Object.assign(item, { amount: r })
@@ -139,7 +139,7 @@ const TokenSelect = ({
   // changes token and fluid pair token from pinned to unpinned if less than 8 pinned
   const changePinned = (token: TokenKind) => {
     // size and filter to determine if 8 are pinned already and the current selected can be pinned/unpinned
-    const size = pokens.filter(
+    const size = tokens.filter(
       (selectedToken) => selectedToken.pinned === true
     ).length;
     if (size < 8 || (size === 8 && token.pinned === true)) {
@@ -157,14 +157,14 @@ const TokenSelect = ({
             : item
         )
       );
-      setPokens((previousState: TokenList["kind"]) =>
+      setTokens((previousState: TokenList["kind"]) =>
         [...previousState]?.map((item) =>
           item.symbol === token.symbol
             ? Object.assign(item, { pinned: !item.pinned })
             : item
         )
       );
-      setFluidPokens((previousState: TokenList["kind"]) =>
+      setFluidTokens((previousState: TokenList["kind"]) =>
         [...previousState]?.map((item) =>
           item.symbol === `f${token.symbol}`
             ? Object.assign(item, { pinned: !item.pinned })
@@ -177,7 +177,7 @@ const TokenSelect = ({
   // changes fluid token and regulat token from pinned to unpinned if less than 8 pinned
   const changePinnedFluid = (token: TokenKind) => {
     // size and filter to determine if 8 are pinned already and the current selected can be pinned/unpinned
-    const size = fluidPokens.filter(
+    const size = fluidTokens.filter(
       (selectedToken) => selectedToken.pinned === true
     ).length;
     if (size < 8 || (size === 8 && token.pinned === true)) {
@@ -195,14 +195,14 @@ const TokenSelect = ({
             : item
         )
       );
-      setPokens((previousState: TokenList["kind"]) =>
+      setTokens((previousState: TokenList["kind"]) =>
         [...previousState]?.map((item) =>
           item.symbol === token.symbol.substring(1)
             ? Object.assign(item, { pinned: !item.pinned })
             : item
         )
       );
-      setFluidPokens((previousState: TokenList["kind"]) =>
+      setFluidTokens((previousState: TokenList["kind"]) =>
         [...previousState]?.map((item) =>
           item.symbol === token.symbol
             ? Object.assign(item, { pinned: !item.pinned })
@@ -214,8 +214,8 @@ const TokenSelect = ({
 
   // resets token lists matching pinned list
   const resetLists = () => {
-    setPokens(JSON.parse(JSON.stringify(pinnedTokens)));
-    setFluidPokens(JSON.parse(JSON.stringify(pinnedFluidTokens)));
+    setTokens(JSON.parse(JSON.stringify(pinnedTokens)));
+    setFluidTokens(JSON.parse(JSON.stringify(pinnedFluidTokens)));
     getAmounts();
   };
 
@@ -239,9 +239,9 @@ const TokenSelect = ({
             }`}
           />
           <TokenSelection
-            tokenList={pokens}
+            tokenList={tokens}
             pinnedList={pinnedTokens}
-            setTokenList={setPokens}
+            setTokenList={setTokens}
             type={type}
             changePinned={changePinned}
             resetLists={resetLists}
@@ -268,9 +268,9 @@ const TokenSelect = ({
             }`}
           />
           <TokenSelection
-            tokenList={fluidPokens}
+            tokenList={fluidTokens}
             pinnedList={pinnedFluidTokens}
-            setTokenList={setFluidPokens}
+            setTokenList={setFluidTokens}
             type={type}
             changePinned={changePinnedFluid}
             resetLists={resetLists}

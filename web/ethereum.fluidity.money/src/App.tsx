@@ -91,9 +91,9 @@ const App = () => {
   );
 
   // tokens for fluid and non-fluid in token select modal
-  const [pokens, setPokens] = useState([...data].slice(0, data.length / 2));
+  const [tokens, setTokens] = useState([...data].slice(0, data.length / 2));
 
-  const [fluidPokens, setFluidPokens] = useState(
+  const [fluidTokens, setFluidTokens] = useState(
     [...data].slice(data.length / 2, data.length)
   );
 
@@ -104,9 +104,9 @@ const App = () => {
     const pinnedFluidData = window.localStorage.getItem("pinned-fluid");
     if (pinnedFluidData) setPinnedFluidTokens(JSON.parse(pinnedFluidData));
     const tokenData = window.localStorage.getItem("tokens");
-    if (tokenData) setPokens(JSON.parse(tokenData));
+    if (tokenData) setTokens(JSON.parse(tokenData));
     const fluidTokenData = window.localStorage.getItem("fluid-tokens");
-    if (fluidTokenData) setFluidPokens(JSON.parse(fluidTokenData));
+    if (fluidTokenData) setFluidTokens(JSON.parse(fluidTokenData));
   }, []);
   // updates persisted token data when changes occur for token select modal
   useEffect(() => {
@@ -115,9 +115,9 @@ const App = () => {
       "pinned-fluid",
       JSON.stringify(pinnedFluidTokens)
     );
-    window.localStorage.setItem("tokens", JSON.stringify(pokens));
-    window.localStorage.setItem("fluid-tokens", JSON.stringify(fluidPokens));
-  }, [pinnedTokens, pinnedFluidTokens, pokens, fluidPokens]);
+    window.localStorage.setItem("tokens", JSON.stringify(tokens));
+    window.localStorage.setItem("fluid-tokens", JSON.stringify(fluidTokens));
+  }, [pinnedTokens, pinnedFluidTokens, tokens, fluidTokens]);
 
   /* browser detection. if user isn't using firefox or chromium based browser
   then render a message telling them to change browser, else render the app */
@@ -145,10 +145,10 @@ const App = () => {
     setPinnedTokens: setPinnedTokens,
     pinnedFluidTokens: pinnedFluidTokens,
     setPinnedFluidTokens: setPinnedFluidTokens,
-    tokens: pokens,
-    setTokens: setPokens,
-    fluidTokens: fluidPokens,
-    setFluidTokens: setFluidPokens,
+    tokens: tokens,
+    setTokens: setTokens,
+    fluidTokens: fluidTokens,
+    setFluidTokens: setFluidTokens,
   };
 
   return (
