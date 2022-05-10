@@ -1,5 +1,5 @@
 import React from "react";
-import { TokenKind } from "components/types";
+import { TokenKind, TokenList } from "components/types";
 import Routes from "util/api/types";
 
 // Context for swap page modal toggle
@@ -22,12 +22,16 @@ export const modalToggle = React.createContext<SwapModalStatus>({
 
 export const userActionContext = React.createContext<Routes["/my-history"]>([]);
 
-// interface for pinned token list context
+// interface for token select tokens context
 export interface TokenListContext {
-  pinnedTokens: any;
-  pinnedFluidTokens: any;
-  setPinnedTokens: any;
-  setPinnedFluidTokens: any;
+  pinnedTokens: TokenKind[];
+  setPinnedTokens: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
+  pinnedFluidTokens: TokenKind[];
+  setPinnedFluidTokens: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
+  tokens: TokenKind[];
+  setTokens: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
+  fluidTokens: TokenKind[];
+  setFluidTokens: React.Dispatch<React.SetStateAction<TokenList["kind"]>>;
 }
 
 export const tokenListContext = React.createContext<TokenListContext>({
@@ -35,4 +39,8 @@ export const tokenListContext = React.createContext<TokenListContext>({
   pinnedFluidTokens: [],
   setPinnedTokens: () => {},
   setPinnedFluidTokens: () => {},
+  tokens: [],
+  setTokens: () => {},
+  fluidTokens: [],
+  setFluidTokens: () => {},
 });
