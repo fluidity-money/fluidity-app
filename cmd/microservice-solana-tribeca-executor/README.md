@@ -1,15 +1,14 @@
-# Tribeca-data-store
+# microservice-solana-tribeca-executor
 
-Holds:
-- Contract changing TRF values for Solana worker
-- Listeners to Tribeca
-- Tribeca proposal creator
+Subscribes to emitted events from Tribeca, and funnels proposals through its lifecycle
 
 ## Tribeca Listener Environment Variables
 
 |            Name                  |                                 Description
 |----------------------------------|---------------------------------------------------------------------------|
-| `SECRET_KEY`                     | Payer secret key as B64. Should be a member of Tribeca executive council  |
+| `SECRET_KEY`                     | Payer secret key as B58. Should be a member of Tribeca executive council  |
+| `TRIBECA_DATA_STORE_SECRET_KEY`  | Tribeca Data Store Authority secret key as B58                            |
+| `FLU_SOLANA_PAYER`               | Fluidity Solana Authority secret key as B58                               |
 | `FLU_TRIBECA_GOVERNOR_PUBKEY`    | Pubkey of Tribeca governor                                                |
 | `FLU_TRIBECA_LOCKER_PUBKEY`      | Pubkey of Tribeca locker                                                  |
 | `FLU_TRIBECA_SMART_WALLET_PUBKEY`| Pubkey of Tribeca smart wallet                                            |
@@ -18,4 +17,7 @@ Holds:
 
 ## Building Tribeca listener
 `make docker`
+
+## Running Tribeca listener
+`npx ts-node microservice-solana-tribeca-executor.ts`
 

@@ -1,4 +1,4 @@
 
-REPO := microservice-solana-tribeca-create-proposal
+REPO := microservice-solana-tribeca-executor
 
 include ../../node.mk

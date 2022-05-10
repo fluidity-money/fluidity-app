@@ -1,5 +1,7 @@
 package solana
 
+import solana "github.com/gagliardetto/solana-go"
+
 type (
 	SolRpcBody struct {
 		JsonRpc string      `json:"jsonrpc"`
@@ -51,7 +53,7 @@ type (
 	}
 
 	TribecaProgramData struct {
-		Authority string
+		Authority solana.PublicKey
 		Delta     uint8
 		M         uint8
 		FreqDiv   uint8

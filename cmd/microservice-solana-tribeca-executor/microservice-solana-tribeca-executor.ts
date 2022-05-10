@@ -14,10 +14,9 @@ import {
   LockerWrapper,
   ProposalState,
   TribecaSDK,
-} from "tribeca/dist/cjs";
-import { GokiSDK } from "goki/dist/cjs";
-
-import governIdl from "./idl/govern.json";
+} from "@tribecahq/tribeca-sdk/dist/cjs";
+import { GokiSDK } from "@gokiprotocol/client/dist/cjs";
+import { GovernJSON } from "@tribecahq/tribeca-sdk/dist/cjs/idls/govern";
 
 // SECRET_KEY is the base58 encoded key responsible for paying and signing
 //  tribeca/goki transactions
@@ -134,7 +133,7 @@ const provider = SolanaProvider.init({
   const execCouncil = await gokiSdk.loadSmartWallet(execCouncilPubkey);
 
   // governorEventDecoder parses emitted governor events
-  const governorEventDecoder = new BorshEventCoder(governIdl as Idl);
+  const governorEventDecoder = new BorshEventCoder(GovernJSON);
 
   const governorData = await governor.data();
 
@@ -143,8 +142,6 @@ const provider = SolanaProvider.init({
   // timelockDelaySeconds is the period to wait to execute an approved proposal
   const { votingDelay, votingPeriod, timelockDelaySeconds } =
     governorData.params;
-
-  console.log(payerKeypair.publicKey);
 
   const payerExecCouncilIndex = execCouncil.data!.owners.findIndex(
     (key: PublicKey) => key.toString() === payerKeypair.publicKey.toString(),

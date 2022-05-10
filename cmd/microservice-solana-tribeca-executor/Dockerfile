@@ -5,9 +5,6 @@ WORKDIR /usr/local/src/fluidity/cmd/microservice-solana-tribeca-executor
 
 COPY . .
 
-RUN apt install -y \
-    npm 
-
 RUN make build
 
-ENTRYPOINT [ "npx", "ts-node", "-O", "'{\"resolveJsonModule\":true}'", "microservice-solana-tribeca-executor.ts" ]
+ENTRYPOINT [ "npx", "ts-node", "microservice-solana-tribeca-executor.ts" ]

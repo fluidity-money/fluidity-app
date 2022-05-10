@@ -3,7 +3,6 @@ require("dotenv").config();
 import { Connection } from "@solana/web3.js";
 import { Wallet, web3 } from "@project-serum/anchor";
 import { PublicKey, SolanaProvider } from "@saberhq/solana-contrib";
-import { base58_to_binary } from "base58-js";
 
 import { GovernorWrapper, TribecaSDK } from "tribeca/dist/cjs";
 

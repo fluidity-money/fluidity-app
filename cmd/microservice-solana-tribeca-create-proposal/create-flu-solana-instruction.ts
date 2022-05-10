@@ -1,7 +1,4 @@
-import { BorshCoder, Idl } from "@project-serum/anchor";
-
-import { Connection } from "@solana/web3.js";
-import { Provider as Web3Provider, Wallet, web3 } from "@project-serum/anchor";
+import { web3 } from "@project-serum/anchor";
 import { PublicKey } from "@saberhq/solana-contrib";
 import { serialize } from "borsh";
 import { base58_to_binary } from "base58-js";
