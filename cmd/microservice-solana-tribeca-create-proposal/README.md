@@ -29,6 +29,7 @@ Serializes and submits transactions to Tribeca governor
 | `FLU_SOLANA_OBLIGATION_PUBKEY`   | Pubkey of Fluidity Token Obligation                               |
 | `FLU_SOLANA_RESERVE_PUBKEY`      | Pubkey of Fluidity Token Reserve                                  |
 | `FLU_SOLANA_RECEIVER_PUBKEY`     | Pubkey of receiver from drain instruction                         |
+| `FLU_SOLANA_PAYOUT_AMOUNT`       | Amount to send receiver from drain instruction                    |
 
 ## ADDITIONAL Tribeca Data Store Instruction Environment Variables
 

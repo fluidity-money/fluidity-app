@@ -1,6 +1,7 @@
 import { web3 } from "@project-serum/anchor";
 import { PublicKey } from "@saberhq/solana-contrib";
 import { serialize } from "borsh";
+import BN from "bn.js";
 import { base58_to_binary } from "base58-js";
 
 const SECRET_KEY = process.env.FLU_SOLANA_PAYER as string;
@@ -55,6 +56,19 @@ const FLU_SOLANA_RECEIVER_PUBKEY = process.env
 
 if (!FLU_SOLANA_RPC_URL) {
   throw new Error("FLU_SOLANA_RECEIVER_PUBKEY not provided");
+}
+
+const FLU_SOLANA_PAYOUT_AMOUNT_ = process.env
+  .FLU_SOLANA_PAYOUT_AMOUNT as string;
+
+if (!FLU_SOLANA_PAYOUT_AMOUNT_) {
+  throw new Error("FLU_SOLANA_PAYOUT_AMOUNT not provided");
+}
+
+const FLU_SOLANA_PAYOUT_AMOUNT = new BN(FLU_SOLANA_PAYOUT_AMOUNT_);
+
+if (!FLU_SOLANA_PAYOUT_AMOUNT) {
+  throw new Error("Invalid FLU_SOLANA_PAYOUT_AMOUNT");
 }
 
 // initialize keys
@@ -124,17 +138,20 @@ module.exports.drainInstructionHandler = async () => {
 
   class DrainInstruction {
     variant: number;
+    payoutAmount: BN;
     tokenName: string;
     bump: number;
 
     constructor(
-      { variant, tokenName, bump }: {
+      { variant, payoutAmount, tokenName, bump }: {
         variant: number;
+        payoutAmount: BN;
         tokenName: string;
         bump: number;
       },
     ) {
       this.variant = variant;
+      this.payoutAmount = payoutAmount;
       this.tokenName = tokenName;
       this.bump = bump;
     }
@@ -142,6 +159,7 @@ module.exports.drainInstructionHandler = async () => {
 
   const drainInstruction = new DrainInstruction({
     variant: 6,
+    payoutAmount: FLU_SOLANA_PAYOUT_AMOUNT,
     tokenName: FLU_SOLANA_TOKEN_NAME,
     bump: solanaAccountPdaBump,
   });
@@ -150,6 +168,7 @@ module.exports.drainInstructionHandler = async () => {
     kind: "struct",
     fields: [
       ["variant", "u8"],
+      ["payout_amt", "u64"],
       ["tokenName", "string"],
       ["bump", "u8"],
     ],

@@ -526,7 +526,7 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
 
 // Moves amount funds from prize pool to another account
 // Will fail if funds exceed total prize pool - must be run by authority
-fn move_from_prize_pool(accounts: &[AccountInfo], seed: String, bump: u8) -> ProgramResult {
+fn move_from_prize_pool(accounts: &[AccountInfo], payout_amt: u64, seed: String, bump: u8) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
     let token_program = next_account_info(accounts_iter)?;
@@ -562,6 +562,10 @@ fn move_from_prize_pool(accounts: &[AccountInfo], seed: String, bump: u8) -> Pro
     // get available prize pool
     let available_prize_pool = deposited_value - deposited_tokens;
 
+    if available_prize_pool < payout_amt {
+        panic!("not enought funds in prize pool!");
+    }
+
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
     // mint fluid tokens to payout account
@@ -573,7 +577,7 @@ fn move_from_prize_pool(accounts: &[AccountInfo], seed: String, bump: u8) -> Pro
             &payout_account.key,
             &pda_account.key,
             &[&pda_account.key],
-            10,
+            payout_amt,
         )
         .unwrap(),
         &[
@@ -844,8 +848,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         FluidityInstruction::InitData(seed, lamports, space, bump) => {
             init_data(&accounts, program_id, seed, lamports, space, bump)
         }
-        FluidityInstruction::MoveFromPrizePool(seed, bump) => {
-            move_from_prize_pool(&accounts, seed, bump)
+        FluidityInstruction::MoveFromPrizePool(payout_amt, seed, bump) => {
+            move_from_prize_pool(&accounts, payout_amt, seed, bump)
         }
     }
 }
