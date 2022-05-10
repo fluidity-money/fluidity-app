@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/graphql-go/graphql/gqlerrors"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
@@ -21,36 +22,40 @@ func returnForbidden(w http.ResponseWriter) interface{} {
 }
 
 func validArgFloat64toBigrat(args map[string]interface{}, key string) (*big.Rat, bool) {
-	if val, ok := args[key]; ok {
-		return new(big.Rat).SetFloat64(val.(float64)), true
+	val, ok := args[key]
+	if !ok {
+		return nil, false
 	}
 
-	return nil, false
+	return new(big.Rat).SetFloat64(val.(float64)), true
 }
 
 func validArgInt64toUInt64Bigrat(args map[string]interface{}, key string) (*big.Rat, bool) {
-	if val, ok := args[key]; ok && val.(int) > -1 {
-		val := uint64(val.(int))
-		return new(big.Rat).SetUint64(val), true
+	val, ok := args[key]
+	if !ok && val.(int) < 0 {
+		return nil, false
 	}
 
-    return nil, false
+	uVal := uint64(val.(int))
+    return new(big.Rat).SetUint64(uVal), true
 }
 
 func validArgInt(args map[string]interface{}, key string) (int, bool) {
-	if val, ok := args[key]; ok {
-		return val.(int), true
+	val, ok := args[key]
+	if !ok {
+		return 0, false
 	}
 
-    return 0, false
+	return val.(int), true
 }
 
 func validArgString(args map[string]interface{}, key string) (string, bool) {
-	if val, ok := args[key]; ok {
-		return val.(string), true
+	val, ok := args[key]
+	if !ok {
+		return "", false
 	}
 
-    return "", false
+    return val.(string), true
 }
 
 func graphQLErrorLogHandler(w http.ResponseWriter, r *http.Request, msg []gqlerrors.FormattedError) {
@@ -63,6 +68,6 @@ func graphQLErrorLogHandler(w http.ResponseWriter, r *http.Request, msg []gqlerr
 			msg,
 		)
 	})
-	
+
 	w.WriteHeader(http.StatusBadRequest)
 }
