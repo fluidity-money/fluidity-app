@@ -134,8 +134,6 @@ module.exports.drainInstructionHandler = async () => {
     },
   ];
 
-  accounts.forEach((e) => console.log(e.pubkey.toString()));
-
   class DrainInstruction {
     variant: number;
     payoutAmount: BN;
@@ -179,13 +177,11 @@ module.exports.drainInstructionHandler = async () => {
     drainInstruction,
   );
 
-  console.log(drainInstructionData);
-
   const instruction = new web3.TransactionInstruction({
     programId: new PublicKey(FLU_SOLANA_PROGRAM_ID),
     keys: accounts,
     data: Buffer.from(drainInstructionData),
   });
 
-  return instruction;
+  return { instruction, signers: [payerKeypair] };
 };
