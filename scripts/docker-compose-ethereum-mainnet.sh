@@ -1,4 +1,4 @@
-#!/bin/sh -eu nounset
+#!/bin/sh
 
 automation_dir=automation
 
