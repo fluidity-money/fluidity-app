@@ -121,7 +121,7 @@ export const changePayoutFrequencyHandler = async () => {
 
   console.log(program.instruction);
 
-  const instruction = program.instruction.changeDelta(
+  const instruction = program.instruction.changePayoutFrequency(
     calculateNArgsBump,
     newFreq,
     {
@@ -150,7 +150,7 @@ export const changeNumRewardTiersHandler = async () => {
 
   console.log(program.instruction);
 
-  const instruction = program.instruction.changeDelta(
+  const instruction = program.instruction.changeNumRewardTiers(
     calculateNArgsBump,
     newRewardTiers,
     {
