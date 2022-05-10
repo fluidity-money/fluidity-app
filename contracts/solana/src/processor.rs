@@ -18,17 +18,18 @@ use {
         program_error::ProgramError,
         program_pack::{IsInitialized, Pack},
         pubkey::Pubkey,
-        system_instruction, system_program,
+        pubkey::Pubkey,
+        system_instruction, system_instruction, system_program, system_program,
     },
     spl_token,
     std::{convert::TryFrom, str::FromStr},
 };
 
 // the public key of the authority for payouts and initialisation
-const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
+const AUTHORITY: &str = "B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP";
 
 // the public key of the solend program
-const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
+const SOLEND: &str = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]

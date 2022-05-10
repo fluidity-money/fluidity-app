@@ -66,6 +66,10 @@
   flex-direction: column;
   text-align: center;
   box-sizing: border-box;
+  &--networks {
+    @extend .connect-modal-body;
+    height: 330px;
+  }
 }
 
 .connect-modal-form {

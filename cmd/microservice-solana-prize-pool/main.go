@@ -122,7 +122,7 @@ func main() {
 	)
 
 	// tokensList will Fatal if bad input
-	tokenDetails := getTokensList(tokensList_)
+	tokenDetails := util.GetTokensListSolana(tokensList_)
 
 	rpcClient := solanaRpc.New(solanaRpcUrl)
 
@@ -146,8 +146,8 @@ func main() {
 	}
 
 	var (
-		workChan = make(chan TokenDetails, 0)
-		doneChan = make(chan TokenDetails, 0)
+		workChan = make(chan util.TokenDetailsSolana, 0)
+		doneChan = make(chan util.TokenDetailsSolana, 0)
 	)
 
 	for i := 0; i < WorkerPoolAmount; i++ {
@@ -155,12 +155,12 @@ func main() {
 			for work := range workChan {
 
 				var (
-					fluidMintPubkey   = work.fluidMintPubkey
-					obligationPubkey  = work.obligationPubkey
-					reservePubkey     = work.reservePubkey
-					pythPubkey        = work.pythPubkey
-					switchboardPubkey = work.switchboardPubkey
-					decimalsRat       = work.tokenDecimals
+					fluidMintPubkey   = work.FluidMintPubkey
+					obligationPubkey  = work.ObligationPubkey
+					reservePubkey     = work.ReservePubkey
+					pythPubkey        = work.PythPubkey
+					switchboardPubkey = work.SwitchboardPubkey
+					decimalsRat       = work.TokenDecimals
 				)
 
 				prizePool := getPrizePool(
@@ -205,14 +205,14 @@ func main() {
 
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
-				tokenDetailsComplete := TokenDetails{
-					fluidMintPubkey:   fluidMintPubkey,
-					obligationPubkey:  obligationPubkey,
-					reservePubkey:     reservePubkey,
-					pythPubkey:        pythPubkey,
-					switchboardPubkey: switchboardPubkey,
-					tokenDecimals:     decimalsRat,
-					amount:            prizePoolFloat,
+				tokenDetailsComplete := util.TokenDetailsSolana{
+					FluidMintPubkey:   fluidMintPubkey,
+					ObligationPubkey:  obligationPubkey,
+					ReservePubkey:     reservePubkey,
+					PythPubkey:        pythPubkey,
+					SwitchboardPubkey: switchboardPubkey,
+					TokenDecimals:     decimalsRat,
+					Amount:            prizePoolFloat,
 				}
 
 				doneChan <- tokenDetailsComplete
@@ -234,7 +234,7 @@ func main() {
 			// aggregate results
 			for range tokenDetails {
 				tokenDetails := <-doneChan
-				amount += tokenDetails.amount
+				amount += tokenDetails.Amount
 			}
 
 			prizePool := prize_pool_queue.PrizePool{

@@ -13,7 +13,7 @@ import {
   enableNotifications,
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
-import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
+import NetworkButton from "components/Button/NetworkButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -23,7 +23,6 @@ interface selected {
 export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   const history = useHistory();
   const [toggle, setToggle] = useState(false); // State to toggle connect wallet modal status
-  const [blockchainToggle, setBlockchainToggle] = useState(false);
   const wallet = useWallet<JsonRpcProvider>();
   // maintain a separate setter to not spam reconnect on invalid load state
   const [active, setActive] = useState(wallet.status === "connected");
@@ -31,10 +30,6 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
 
   const modalToggle = () => {
     setToggle(!toggle);
-  };
-
-  const blockchainModalToggle = () => {
-    setBlockchainToggle(!blockchainToggle);
   };
 
   const [notificationStatus, setNotificationStatus] = useState(false);
@@ -125,7 +120,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
             </div>
             <div></div>
-            <div className="flex row flex-space-between width-auto align">
+            <div className="button-container">
               {/* <div className="primary-button p-0_5" onClick={() => enableNotifications()}> */}
               {/* <Icon
           src={updateNotificationStatus()}
@@ -136,7 +131,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
                     label="Enable Notifications"
-                    theme={"primary-button mx-1-r"}
+                    theme={"primary-button--toolbar mx-1-r"}
                     goto={checkNotifications}
                     padding="p-0_5"
                   />
@@ -160,25 +155,16 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               ) : (
                 <Button
                   label={"Connect Wallet"}
-                  theme={"primary-button"}
+                  theme={"primary-button--toolbar"}
                   goto={() => {
                     setToggle(true);
                   }}
                   padding="p-0_5"
                 />
               )}
-              <div
-                className="select-blockchain"
-                onClick={() => setBlockchainToggle(true)}
-              >
-                <img src="/img/TokenIcons/ethereumIcon.svg" alt="sol icon" />
-              </div>
+              <NetworkButton />
             </div>
-            <SelectBlockchainModal
-              enable={blockchainToggle}
-              toggle={blockchainModalToggle}
-              height="auto"
-            />
+
             {active ? (
               <WalletConnectedModal
                 enable={toggle}

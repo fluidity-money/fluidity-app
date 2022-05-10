@@ -94,17 +94,23 @@
   color: #ffffff;
   font-size: 1rem;
   // animation: gradientShift 1s infinite;
+  &--toolbar {
+    @extend .primary-button;
+    @include for-smallest-toolbar {
+      font-size: 0.8rem;
+    }
+  }
 }
 
 .raleway {
   font-family: Raleway, sans-serif;
 }
 
-.wallet-button {
+.select-button {
   background-color: transparent;
   //font-weight: 700;
   color: #b6d1db;
-  height: 5rem;
+  // height: 5rem;
   width: 100%;
   border-radius: 10px;
   border-style: solid;
@@ -120,6 +126,11 @@
   font-weight: bold;
   font-size: 1.2rem;
   text-align: center;
+
+  &--wallet {
+    @extend .select-button;
+    height: 5rem;
+  }
 
   &:hover {
     background-color: rgba(56, 60, 69, 0.5);
@@ -280,4 +291,24 @@
 .token-list-item-names {
   display: flex;
   flex-direction: column;
+}
+
+.network-options {
+  display: flex;
+  padding: 2px 10px 2px 10px;
+  background-color: transparent;
+  border: solid #333333 1px;
+  border-radius: 10px;
+  width: 300px;
+  cursor: pointer;
+  transition: all 0.4s linear;
+
+  &:hover {
+    background-color: rgba(56, 60, 69, 0.5);
+  }
+}
+
+.network-icon {
+  margin-right: 10px;
+  width: 20px;
 }

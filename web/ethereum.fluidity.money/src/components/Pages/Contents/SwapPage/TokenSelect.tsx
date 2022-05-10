@@ -1,11 +1,12 @@
 import TokenSelection from "components/Modal/Themes/TokenSelection";
 import { useContext, useEffect, useState } from "react";
-import { modalToggle } from "components/context";
+import { modalToggle, tokenListContext } from "components/context";
 import Icon from "components/Icon";
 import { TokenKind } from "components/types";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
+import mainnet from "../../../../config/mainnet-tokens.json";
 import ChainId, { chainIdFromEnv } from "util/chainId";
 import { useSigner } from "util/hooks";
 import { getBalanceOfERC20 } from "util/contractUtils";
@@ -16,17 +17,9 @@ import { SupportedFluidContracts } from "util/contractList";
 const TokenSelect = ({
   type,
   toggle,
-  pinnedTokens,
-  pinnedFluidTokens,
-  sortPinned,
-  sortPinnedFluid,
 }: {
   type: string;
   toggle?: () => void;
-  pinnedTokens?: TokenList["kind"];
-  pinnedFluidTokens?: TokenList["kind"];
-  sortPinned?: (token: TokenKind) => void;
-  sortPinnedFluid?: (token: TokenKind) => void;
 }) => {
   const [selectedToken] = useContext(modalToggle).selectedToken;
   const [selectedFluidToken] = useContext(modalToggle).selectedFluidToken;
@@ -42,13 +35,66 @@ const TokenSelect = ({
       ? (testing as TokenKind[])
       : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
-      : (ropsten as TokenKind[]);
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
+      : (ropsten as TokenKind[])
 
   const [tokens, setTokens] = useState(data.slice(0, data.length / 2));
 
   const [fluidTokens, setFluidTokens] = useState(
     data.slice(data.length / 2, data.length)
   );
+
+  const pinnedTokens: TokenKind[] = useContext(tokenListContext).pinnedTokens;
+  const setPinnedTokens = useContext(tokenListContext).setPinnedTokens;
+  const pinnedFluidTokens: TokenKind[] =
+    useContext(tokenListContext).pinnedFluidTokens;
+  const setPinnedFluidTokens =
+    useContext(tokenListContext).setPinnedFluidTokens;
+
+  // sorts pinned tokens in order when added
+  const sortPinned = (token: TokenKind) => {
+    setPinnedTokens(
+      pinnedTokens.sort((y, x) => {
+        return x.symbol === token.symbol
+          ? -1
+          : y.symbol === token.symbol
+          ? 1
+          : 0;
+      })
+    );
+    setPinnedFluidTokens(
+      pinnedFluidTokens.sort((y, x) => {
+        return x.symbol === `f${token.symbol}`
+          ? -1
+          : y.symbol === `f${token.symbol}`
+          ? 1
+          : 0;
+      })
+    );
+  };
+
+  // sorts pinned fluid when added
+  const sortPinnedFluid = (token: TokenKind) => {
+    setPinnedFluidTokens(
+      pinnedFluidTokens.sort((y, x) => {
+        return x.symbol === token.symbol
+          ? -1
+          : y.symbol === token.symbol
+          ? 1
+          : 0;
+      })
+    );
+    setPinnedTokens(
+      pinnedTokens.sort((y, x) => {
+        return x.symbol === token.symbol.substring(1)
+          ? -1
+          : y.symbol === token.symbol.substring(1)
+          ? 1
+          : 0;
+      })
+    );
+  };
 
   useEffect(() => {
     wallet.status === "connected" && getAmounts();

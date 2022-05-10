@@ -58,7 +58,7 @@ const ConnectWalletModal = ({
         <Button
           label={name}
           key={name + index}
-          theme={`wallet-button ${(isConnected ?? "") && "active"}`}
+          theme={`select-button--wallet ${(isConnected ?? "") && "active"}`}
           texttheme="wallet-text"
           //fontSize="font-large"
           icon={

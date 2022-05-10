@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
@@ -100,39 +99,23 @@ func main() {
 	}
 
 	// populate map of token sessions for each token we're tracking
+	tokensList_ := util.GetTokensListEthereum(ethereumTokensList_)
 
-	ethereumTokensList := strings.Split(ethereumTokensList_, ",")
-
-	for _, token_ := range ethereumTokensList {
-
-		tokenSeparated := strings.Split(token_, ":")
-
-		if len(tokenSeparated) != 3 {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to separate %#v, expected format ADDRESS:TOKEN:DECIMALS",
-					token_,
-				)
-			})
-		}
-
-		contractAddress := ethCommon.HexToAddress(tokenSeparated[0])
-
-		baseTokenName := tokenSeparated[1]
-
-		tokenName, err := faucetTypes.TokenFromString("f"+baseTokenName)
+	for _, details := range tokensList_ {
+		tokenName_     := details.TokenName
+		tokenName, err := faucetTypes.TokenFromString("f"+tokenName_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to convert token %#v to a supported token! %v",
-					tokenSeparated[1],
+					tokenName_,
 					err,
 				)
 			})
 		}
-
-		tokenAddresses[tokenName] = contractAddress
+		
+		tokenAddresses[tokenName] = details.FluidAddress
 	}
 
 	faucet.FaucetRequests(func(faucetRequest faucet.FaucetRequest) {
@@ -152,7 +135,6 @@ func main() {
 		}
 
 		// check for invalid token name
-
 		if _, err := tokenName.TokenDecimals(); err != nil {
 			return
 		}
