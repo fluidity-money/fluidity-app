@@ -94,13 +94,19 @@
   color: #ffffff;
   font-size: 1rem;
   // animation: gradientShift 1s infinite;
+  &--toolbar {
+    @extend .primary-button;
+    @include for-smallest-toolbar {
+      font-size: 0.8rem;
+    }
+  }
 }
 
 .raleway {
   font-family: Raleway, sans-serif;
 }
 
-.wallet-button {
+.select-button {
   background-color: transparent;
   //font-weight: 700;
   color: #b6d1db;
@@ -120,6 +126,11 @@
   font-weight: bold;
   font-size: 1.2rem;
   text-align: center;
+
+  &--wallet {
+    @extend .select-button;
+    height: 5rem;
+  }
 
   &:hover {
     background-color: rgba(56, 60, 69, 0.5);

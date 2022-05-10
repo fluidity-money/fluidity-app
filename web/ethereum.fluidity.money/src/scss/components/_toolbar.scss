@@ -13,16 +13,27 @@
 
 .toolbar-container-enabled {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(25rem, 31rem);
+  grid-template-columns: 1fr 1fr minmax(29rem, 31rem);
   grid-gap: 1rem;
   align-items: center;
   justify-content: center;
   width: 100%;
+  @include for-med-toolbar {
+    grid-gap: 0.5rem;
+    grid-template-columns: 33rem 0rem 29rem 0rem;
+  }
+  @include for-small-toolbar {
+    grid-template-columns: 29rem 0rem 29rem 0rem;
+  }
+  @include for-smallest-toolbar {
+    grid-template-columns: 27rem 1rem 25rem 0rem;
+    grid-gap: 0.5rem;
+  }
 }
 
 .toolbar-container-disabled {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(8rem, 12rem);
+  grid-template-columns: 1fr 1fr minmax(8rem, 18rem);
   grid-gap: 1rem;
   align-items: center;
   justify-content: center;
@@ -31,30 +42,39 @@
 
 .toolbar-container-mobile {
   display: grid;
-  grid-template-columns: 1fr 1fr 2rem;
-  grid-gap: 1rem;
+  grid-template-columns: 1fr 3fr 4rem 8fr 3rem;
+  // grid-gap: 1rem;
   align-items: center;
   justify-content: center;
   width: 100%;
+
+  @include for-below-470 {
+    grid-template-columns: 1fr 3fr 2rem 8fr 4rem;
+  }
 }
 
 .toolbar-items {
   height: 2.8rem;
   display: grid;
   grid-template-columns: 3rem 1rem repeat(3, minmax(10rem, 10rem));
-  grid-gap: 0.5rem;
   align-items: center;
   width: 100%;
+
+  @include for-med-toolbar {
+    grid-template-columns: 1rem 1rem repeat(3, minmax(8rem, 10rem));
+    grid-gap: 0.5rem;
+  }
 }
 
 .button-container {
   display: flex;
   justify-content: space-between;
   width: auto;
+  align-items: center;
 }
 
 .select-blockchain {
-  padding: 0 15px 0 10px;
+  padding: 0 5px 0 10px;
   margin-left: 10px;
   height: 32px;
   width: 110px;
@@ -66,6 +86,10 @@
   background-color: #0d222a;
 
   cursor: pointer;
+
+  @include for-smallest-toolbar {
+    font-size: 0.9rem;
+  }
 
   &:hover {
     opacity: 0.7;
@@ -81,6 +105,9 @@
 
 .chain-name {
   margin-right: 5px;
+  @include for-below-470 {
+    font-size: 0.8rem;
+  }
 }
 
 .change-network-message {

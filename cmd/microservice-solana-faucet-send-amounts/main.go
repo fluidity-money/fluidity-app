@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
@@ -38,13 +37,15 @@ type faucetTokenDetails struct {
 	signerWallet *solana.Wallet
 }
 
+type tokenMap map[faucetTypes.FaucetSupportedToken]faucetTokenDetails
+
 func main() {
 	var (
-		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		tokenList_     = util.GetEnvOrFatal(EnvTokensList)
+		solanaRpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaTokenList_    = util.GetEnvOrFatal(EnvTokensList)
 		accountDetailsList_ = util.GetEnvOrFatal(EnvSolanaAccountDetails)
 
-		tokenDetails = make(map[faucetTypes.FaucetSupportedToken]faucetTokenDetails)
+		tokenDetails = make(tokenMap)
 
 		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
@@ -52,34 +53,22 @@ func main() {
 	solanaClient := solanaRpc.New(solanaRpcUrl)
 
 	// populate map of token sessions for each token we're tracking
+	tokenList_ := util.GetTokensListSolana(solanaTokenList_)
 
-	tokenList := strings.Split(tokenList_, ",")
+	for _, details := range tokenList_ {
+		
+		var (
+			mintPubkey = details.FluidMintPubkey
+			tokenName_ = details.TokenName
+		)
 
-	for _, token_ := range tokenList {
-
-		tokenSeparated := strings.Split(token_, ":")
-
-		// either have the two used fields, or the form including Solend keys, etc.
-		if len(tokenSeparated) < 2 {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to separate %#v, expected format ADDRESS:TOKEN:...",
-					token_,
-				)
-			})
-		}
-
-		mintPubkey := solana.MustPublicKeyFromBase58(tokenSeparated[0])
-
-		baseTokenName := tokenSeparated[1]
-
-		tokenName, err := faucetTypes.TokenFromString("f"+baseTokenName)
+		tokenName, err := faucetTypes.TokenFromString("f"+tokenName_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to convert token %#v to a supported token! %v",
-					baseTokenName,
+					tokenName_,
 					err,
 				)
 			})
@@ -91,65 +80,7 @@ func main() {
 		tokenDetails[tokenName] = details
 	}
 
-	accountDetailsList := strings.Split(accountDetailsList_, ",")
-
-	for _, account_ := range accountDetailsList {
-		accountSeparated := strings.Split(account_, ":")
-
-		if len(accountSeparated) != 3 {
-			log.Fatal(func (k *log.Log) {
-			    k.Format(
-					"Invalid account details! Expected the form PDA:NAME:PRIKEY, got %s!",
-					accountSeparated,
-				)
-			})
-		}
-
-		pdaPubkey := solana.MustPublicKeyFromBase58(accountSeparated[0])
-
-		baseTokenName := accountSeparated[1]
-
-		tokenName, err := faucetTypes.TokenFromString("f" + baseTokenName)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to convert token %#v to a supported token! %v",
-					baseTokenName,
-					err,
-				)
-			})
-		}
-
-		wallet, err := solana.WalletFromPrivateKeyBase58(accountSeparated[2])
-
-		if err != nil {
-		    log.Fatal(func (k *log.Log) {
-		        k.Format(
-					"Failed to create a wallet for %s!",
-					tokenName,
-				)
-
-		        k.Payload = err
-		    })
-		}
-
-		details, ok := tokenDetails[tokenName]
-
-		if !ok {
-			log.Fatal(func (k *log.Log) {
-			    k.Format(
-					"Token %s has account details but not token details!",
-					tokenName,
-				)
-			})
-		}
-
-		details.pdaPubkey = pdaPubkey
-		details.signerWallet = wallet
-
-		tokenDetails[tokenName] = details
-	}
+	tokenDetails.addAccountDetails(accountDetailsList_)
 
 	faucet.FaucetRequests(func (faucetRequest faucet.FaucetRequest) {
 		var (
@@ -168,7 +99,6 @@ func main() {
 		}
 
 		// check for invalid token name
-
 		if _, err := tokenName.TokenDecimals(); err != nil {
 			return
 		}

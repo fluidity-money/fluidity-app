@@ -21,3 +21,18 @@ export const modalToggle = React.createContext<SwapModalStatus>({
 });
 
 export const userActionContext = React.createContext<Routes["/my-history"]>([]);
+
+// interface for pinned token list context
+export interface TokenListContext {
+  pinnedTokens: any;
+  pinnedFluidTokens: any;
+  setPinnedTokens: any;
+  setPinnedFluidTokens: any;
+}
+
+export const tokenListContext = React.createContext<TokenListContext>({
+  pinnedTokens: [],
+  pinnedFluidTokens: [],
+  setPinnedTokens: () => {},
+  setPinnedFluidTokens: () => {},
+});

@@ -1,6 +1,6 @@
 import Button from "components/Button";
 import GenericModal from "components/Modal/GenericModal";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface Blockchain {
   blockchain: string;
@@ -45,6 +45,13 @@ const SelectBlockchainModal = ({
     },
   ];
   const [options, setOptions] = React.useState(networkOptions);
+  useEffect(() => {
+    const data = window.localStorage.getItem("networks-open");
+    if (data) setOptions(JSON.parse(data));
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem("networks-open", JSON.stringify(options));
+  }, [options]);
   const renderedOptions = options.map(
     ({ blockchain, icon, networks, visible }, index) => {
       return (
@@ -52,7 +59,7 @@ const SelectBlockchainModal = ({
           <Button
             label={blockchain}
             key={index}
-            theme={`wallet-button`}
+            theme={`select-button`}
             texttheme="wallet-text"
             visible={visible}
             icon={
@@ -72,9 +79,10 @@ const SelectBlockchainModal = ({
             // disabled={isConnected}
           />
           {visible === true &&
-            networks.map((network) => (
+            networks.map((network, idx) => (
               <div
-                className="network-options"
+                className={"network-options"}
+                key={`${network} ${idx}`}
                 onClick={() => {
                   // eslint-disable-next-line no-restricted-globals
                   location.href = network.address;

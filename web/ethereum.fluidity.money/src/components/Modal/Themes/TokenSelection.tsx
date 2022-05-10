@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import GenericModal from "components/Modal";
 import { modalToggle } from "components/context";
 import Button from "components/Button";
 import { TokenKind, TokenList } from "components/types";
-import { Value } from "sass";
 import TokenSearch from "./TokenSearch";
 import PinnedToken from "./PinnedToken";
 
