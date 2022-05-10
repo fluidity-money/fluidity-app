@@ -62,7 +62,7 @@ const TokenSelection = ({
           }
           goto={() => {
             setToken(type, token.symbol);
-            resetLists();
+            // resetLists();
           }}
         />
         <img
@@ -83,14 +83,13 @@ const TokenSelection = ({
       enable={type === "token" ? toggleTo : toggleFrom}
       toggle={type === "token" ? togglerTo : togglerFrom}
       height="auto"
-      // width="20rem"
     >
       <div className="connect-modal-body">
         <h2 className="primary-text">Select a Token</h2>
         <TokenSearch
           setTokenListState={setTokenList}
-          tokenList={tokenList}
           resetLists={resetLists}
+          tokenList={tokenList}
         />
         <div className="pinned-tokens">
           {pinnedList &&
