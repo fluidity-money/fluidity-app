@@ -1,6 +1,7 @@
 package api_fluidity_money
 
 import (
+	"fmt"
 	"net/http"
 	"errors"
 
@@ -11,7 +12,7 @@ import (
 )
 
 type Result struct {
-	N          uint  `json:"n"`
+	N          string  `json:"n"`
 	Payouts    []int64   `json:"payouts"`
 }
 
@@ -68,42 +69,42 @@ var queryType = graphql.NewObject(
 					err := errors.New("Bad request, missing payload value")
 
 					gasFee, ok  := validArgFloat64toBigrat(p.Args, "gasFee")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}
 
 					atx, ok := validArgFloat64toBigrat(p.Args, "atx")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}
 
 					bpyStakedUsd, ok :=   validArgFloat64toBigrat(p.Args, "bpyStakedUsd")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}
 
 					sizeOfThePool, ok := validArgInt64toUInt64Bigrat(p.Args, "sizeOfThePool")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}
 
 					underlyingTokenDecimalsRat, ok := validArgInt64toUInt64Bigrat(p.Args, "underlyingTokenDecimalsRat")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}
 
 					averageTransfersInBlock, ok := validArgInt(p.Args, "averageTransfersInBlock")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}
 
 					secondsSinceLastBlock, ok :=   validArgInt(p.Args, "secondsSinceLastBlock")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}
 
 					tokenName, ok := validArgString(p.Args, "tokenName")
-					if ok == false {
+					if !ok {
 						return nil, err
 					}	
 
@@ -122,7 +123,7 @@ var queryType = graphql.NewObject(
 						emission,
 					)
 
-					output.N = randomN;
+					output.N = fmt.Sprintf("%v", randomN);
 					for _, value := range randomPayouts {
 						output.Payouts = append(output.Payouts, value.Int64())
 					}
