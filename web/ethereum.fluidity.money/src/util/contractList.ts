@@ -40,6 +40,9 @@ switch (chainId) {
   case ChainId.Kovan:
     tokens = require("config/kovan-tokens.json");
     break;
+  case ChainId.AuroraMainnet:
+    tokens = require("config/aurora-mainnet-tokens.json");
+    break;
   default:
     throw new Error(`${chainId} is not a supported chain ID!`);
 }

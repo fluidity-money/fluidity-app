@@ -84,6 +84,10 @@ module.exports = {
     kovan: {
       accounts: [process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY],
       url: process.env.FLU_ETHEREUM_DEPLOY_KOVAN_URL
+    },
+    aurora: {
+      accounts: [process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY],
+      url: process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_URL,
     }
   }
 };

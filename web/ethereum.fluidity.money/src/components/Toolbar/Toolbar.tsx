@@ -75,6 +75,8 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
               ? `Ethereum Mainnet`
               : chainId === ChainId.Kovan
               ? `Ethereum Kovan`
+              : chainId === ChainId.AuroraMainnet
+              ? `Aurora Mainnet`
               : `Ethereum`}
             )
             {` doesn't match to network selected in wallet${

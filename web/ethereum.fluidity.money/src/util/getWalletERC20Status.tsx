@@ -6,6 +6,7 @@ import contractList, {
 import ropsten from "../config/ropsten-tokens.json";
 import testing from "../config/testing-tokens.json";
 import kovan from "../config/kovan-tokens.json";
+import aurora from "../config/aurora-mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { Signer } from "ethers";
 import { parseUnits } from "ethers/utils";
@@ -25,9 +26,11 @@ const getWalletERC20Status = async (signer: Signer) => {
       (ropsten as TokenKind[]) :
     chainId === ChainId.Hardhat ?
       (testing as TokenKind[]) :
-    chainId === ChainId.Kovan
-      ? (kovan as TokenKind[])
-      : (ropsten as TokenKind[]);
+    chainId === ChainId.Kovan ?
+      (kovan as TokenKind[]) :
+    chainId === ChainId.AuroraMainnet ?
+      (aurora as TokenKind[]) :
+      (ropsten as TokenKind[]);
 
   // If signer is defined (someone is logged in), nothing happens.
   // Else if signer is undefined/null, it returns a blank array since no wallet means no information

@@ -6,6 +6,7 @@ import { TokenKind } from "components/types";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
+import aurora from "../../../../config/aurora-mainnet-tokens.json";
 import ChainId, { chainIdFromEnv } from "util/chainId";
 import { useSigner } from "util/hooks";
 import { getBalanceOfERC20 } from "util/contractUtils";
@@ -42,6 +43,8 @@ const TokenSelect = ({
       ? (testing as TokenKind[])
       : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (aurora as TokenKind[])
       : (ropsten as TokenKind[]);
 
   const [tokens, setTokens] = useState(data.slice(0, data.length / 2));

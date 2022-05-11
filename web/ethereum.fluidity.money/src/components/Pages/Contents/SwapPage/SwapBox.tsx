@@ -16,6 +16,7 @@ import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
+import aurora from "../../../../config/aurora-mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider, TransactionReceipt } from "ethers/providers";
@@ -59,9 +60,11 @@ const SwapBox = () => {
       (ropsten as TokenKind[]) :
     chainId === ChainId.Hardhat ?
       (testing as TokenKind[]) :
-    chainId === ChainId.Kovan
-      ? (kovan as TokenKind[])
-      : (ropsten as TokenKind[]);
+    chainId === ChainId.Kovan ?
+      (kovan as TokenKind[]) :
+    chainId === ChainId.AuroraMainnet ?
+      (aurora as TokenKind[]) :
+      (ropsten as TokenKind[]);
 
   const [pinnedTokens, setPinnedTokens] = useState(
     data.slice(0, data.length / 2)
