@@ -49,7 +49,7 @@
   width: 100%;
 
   @include for-below-470 {
-    grid-template-columns: 1fr 3fr 2rem 8fr 4rem;
+    grid-template-columns: 2fr 3fr 2rem 8fr 4rem;
   }
 }
 
@@ -89,6 +89,11 @@
 
   @include for-smallest-toolbar {
     font-size: 0.9rem;
+  }
+
+  @include for-below-470 {
+    width: 75px;
+    padding: 0;
   }
 
   &:hover {
