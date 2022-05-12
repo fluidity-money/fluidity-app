@@ -53,7 +53,7 @@ const TokenSearch = ({
       />
       {searchInput.length ? (
         <img
-          className="clear-search-icon"
+          className="clear-icon"
           src="img/x.svg"
           alt="search"
           onClick={() => {
