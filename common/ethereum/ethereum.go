@@ -94,4 +94,3 @@ func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *et
 
 	return nil
 }
-

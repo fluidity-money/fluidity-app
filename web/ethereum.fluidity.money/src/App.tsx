@@ -7,7 +7,7 @@ import WalletHistory from "./components/Pages/WalletHistory";
 import { Connectors, UseWalletProvider } from "use-wallet";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import AppUpdater from "./components/Updaters/AppUpdater";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RouteNotFound from "components/Pages/RouteNotFound";
 import ProtectedRoute from "components/Routes/ProtectedRoute";
 import { isChrome, isFirefox, isEdge, isChromium } from "react-device-detect";
@@ -20,7 +20,11 @@ import useWebSocket from "react-use-websocket";
 import NotificationContainer from "components/Notifications/NotificationContainer";
 import ApiStateHandler, { ApiState } from "components/ApiStateHandler";
 import { root_websocket } from "util/api";
-import { tokenListContext, userActionContext } from "components/context";
+import {
+  TokenListContext,
+  tokenListContext,
+  userActionContext,
+} from "components/context";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
 import ChainId, { chainIdFromEnv } from "util/chainId";
 import { TokenKind } from "components/types";
@@ -79,12 +83,41 @@ const App = () => {
 
   // pinned tokens for fluid and non-fluid in token select modal
   const [pinnedTokens, setPinnedTokens] = useState(
-    data.slice(0, data.length / 2)
+    [...data].slice(0, data.length / 2)
   );
 
   const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
-    data.slice(data.length / 2, data.length)
+    [...data].slice(data.length / 2, data.length)
   );
+
+  // tokens for fluid and non-fluid in token select modal
+  const [tokens, setTokens] = useState([...data].slice(0, data.length / 2));
+
+  const [fluidTokens, setFluidTokens] = useState(
+    [...data].slice(data.length / 2, data.length)
+  );
+
+  // persists tokens data in token select modal
+  useEffect(() => {
+    const pinnedData = window.localStorage.getItem("pinned");
+    if (pinnedData) setPinnedTokens(JSON.parse(pinnedData));
+    const pinnedFluidData = window.localStorage.getItem("pinned-fluid");
+    if (pinnedFluidData) setPinnedFluidTokens(JSON.parse(pinnedFluidData));
+    const tokenData = window.localStorage.getItem("tokens");
+    if (tokenData) setTokens(JSON.parse(tokenData));
+    const fluidTokenData = window.localStorage.getItem("fluid-tokens");
+    if (fluidTokenData) setFluidTokens(JSON.parse(fluidTokenData));
+  }, []);
+  // updates persisted token data when changes occur for token select modal
+  useEffect(() => {
+    window.localStorage.setItem("pinned", JSON.stringify(pinnedTokens));
+    window.localStorage.setItem(
+      "pinned-fluid",
+      JSON.stringify(pinnedFluidTokens)
+    );
+    window.localStorage.setItem("tokens", JSON.stringify(tokens));
+    window.localStorage.setItem("fluid-tokens", JSON.stringify(fluidTokens));
+  }, [pinnedTokens, pinnedFluidTokens, tokens, fluidTokens]);
 
   /* browser detection. if user isn't using firefox or chromium based browser
   then render a message telling them to change browser, else render the app */
@@ -106,12 +139,16 @@ const App = () => {
     lastJsonMessage,
   };
 
-  const tokenListInfo = {
+  // token info for context for token select modal
+  const tokenListInfo: TokenListContext = {
     pinnedTokens: pinnedTokens,
-    pinnedFluidTokens: pinnedFluidTokens,
-
     setPinnedTokens: setPinnedTokens,
+    pinnedFluidTokens: pinnedFluidTokens,
     setPinnedFluidTokens: setPinnedFluidTokens,
+    tokens: tokens,
+    setTokens: setTokens,
+    fluidTokens: fluidTokens,
+    setFluidTokens: setFluidTokens,
   };
 
   return (

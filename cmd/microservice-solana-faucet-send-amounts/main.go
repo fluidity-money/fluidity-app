@@ -8,10 +8,11 @@ import (
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 
-	"github.com/gagliardetto/solana-go"
+	solanaGo "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
@@ -32,9 +33,9 @@ const (
 )
 
 type faucetTokenDetails struct {
-	mintPubkey solana.PublicKey
-	pdaPubkey solana.PublicKey
-	signerWallet *solana.Wallet
+	mintPubkey   solanaGo.PublicKey
+	pdaPubkey    solanaGo.PublicKey
+	signerWallet *solanaGo.Wallet
 }
 
 type tokenMap map[faucetTypes.FaucetSupportedToken]faucetTokenDetails
@@ -53,16 +54,17 @@ func main() {
 	solanaClient := solanaRpc.New(solanaRpcUrl)
 
 	// populate map of token sessions for each token we're tracking
-	tokenList_ := util.GetTokensListSolana(solanaTokenList_)
+
+	tokenList_ := solana.GetTokensListSolana(solanaTokenList_)
 
 	for _, details := range tokenList_ {
-		
+
 		var (
 			mintPubkey = details.FluidMintPubkey
 			tokenName_ = details.TokenName
 		)
 
-		tokenName, err := faucetTypes.TokenFromString("f"+tokenName_)
+		tokenName, err := faucetTypes.TokenFromString("f" + tokenName_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -82,7 +84,7 @@ func main() {
 
 	tokenDetails.addAccountDetails(accountDetailsList_)
 
-	faucet.FaucetRequests(func (faucetRequest faucet.FaucetRequest) {
+	faucet.FaucetRequests(func(faucetRequest faucet.FaucetRequest) {
 		var (
 			address_  = faucetRequest.Address
 			amount    = faucetRequest.Amount
@@ -103,7 +105,7 @@ func main() {
 			return
 		}
 
-		recipientAddress, err := solana.PublicKeyFromBase58(address_)
+		recipientAddress, err := solanaGo.PublicKeyFromBase58(address_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -143,10 +145,10 @@ func main() {
 		token := tokenDetails[tokenName]
 
 		var (
-			senderAddress = token.signerWallet.PublicKey()
+			senderAddress    = token.signerWallet.PublicKey()
 			senderPrivateKey = token.signerWallet.PrivateKey
 			senderPdaAddress = token.pdaPubkey
-			mintAddress = token.mintPubkey
+			mintAddress      = token.mintPubkey
 		)
 
 		signature, err := fluidity.SendTransfer(
