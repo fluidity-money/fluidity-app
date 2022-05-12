@@ -10,12 +10,12 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-redsync/redsync/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/graphql-go/graphql v0.8.0
 	github.com/lib/pq v1.10.4
 	github.com/near/borsh-go v0.3.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
 require (
@@ -38,7 +38,6 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/google/uuid v1.1.5 // indirect
-	github.com/graphql-go/graphql v0.8.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
@@ -72,4 +71,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
-replace github.com/etherum/go-ethereum => github.com/fluidity-money/go-ethereum master
+replace github.com/etherum/go-ethereum => github.com/fluidity-money/go-ethereum v1.10.18-0.20220509234010-89e6988df1fc
