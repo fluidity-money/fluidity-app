@@ -24,7 +24,9 @@ Tokens should be passed to this program like the following:
 
 	<contract address>:<underlying token name>:<number of decimal places>:<optional underlying token address>:<optional token backend>
 
-The fourth paramter is required on AAVE-based platforms for price lookup.
+The fourth parameter is required on AAVE-based platforms for price lookup.
+
+The final parameter is required for deployments utilising both Compound and AAVE backed tokens.
 
 The final paramter is required for deployments utilising both Compound
 and AAVE backed tokens.

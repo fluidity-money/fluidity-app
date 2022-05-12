@@ -38,7 +38,7 @@ const TokenSearch = ({
       <img className="search-icon" src="img/searchIcon.svg" alt="search" />
       <input
         type="text"
-        autoFocus
+        // autoFocus
         placeholder="Search by name or paste address"
         onChange={(text: React.FormEvent<HTMLInputElement>) => {
           setSearchInput(text.currentTarget.value);

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="26.25"
+   height="25"
+   version="1.1"
+   id="svg896"
+   sodipodi:docname="terraIcon.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview898"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="16"
+     inkscape:cx="4.5625"
+     inkscape:cy="1.90625"
+     inkscape:window-width="2560"
+     inkscape:window-height="1440"
+     inkscape:window-x="1080"
+     inkscape:window-y="365"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g894" />
+  <defs
+     id="defs879">
+    <path
+       id="a"
+       d="M 0,0 H 8.197 V 16.393 H 0 Z" />
+  </defs>
+  <g
+     fill="none"
+     fill-rule="evenodd"
+     id="g894">
+    <path
+       d="m 11.589,19.99 c 0.696,2.655 3.194,4.681 4.455,4.598 0.044,-0.003 4.785,-0.914 7.38,-5.384 2.02,-3.478 1.332,-6.836 -1.415,-6.909 -0.988,0.074 -11.747,2.637 -10.42,7.696 M 13.975,0 C 12.186,0 10.488,0.384 8.952,1.069 8.6832491,1.1816419 8.4214515,1.3102032 8.168,1.454 7.994,1.547 7.82,1.639 7.652,1.739 l 0.04,0.013 c -0.509,0.353 -0.947,0.764 -1.306,1.24 -3.553,4.704 8.355,8.123 14.721,8.135 2.93,2.107 3.752,-5.934 0.89,-8.166 C 19.764095,1.0448052 16.917385,-0.00594381 13.975,0 Z"
+       fill="#0e3ca5"
+       id="path881"
+       sodipodi:nodetypes="cccccccccccccc" />
+    <path
+       d="M 9.5,2.758 C 7.89,5.123 2.526,6.79 1.644,6.53 L 1.64,6.52 1.75,6.307 A 12.716,12.716 0 0 1 5.574,1.945 C 5.904,1.708 6.246,1.487 6.599,1.281 7.348,0.856 8.118,0.83 8.371,0.82 10.759,0.864 9.512,2.739 9.499,2.758"
+       fill="#5493f7"
+       id="path883" />
+    <g
+       transform="translate(0,8.197)"
+       id="g890">
+      <mask
+         id="b"
+         fill="#ffffff">
+        <use
+           xlink:href="#a"
+           id="use885"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%" />
+      </mask>
+      <path
+         d="m 8.149,12.284 c 0.12,0.777 -0.003,3.848 -0.165,4.107 -0.138,0.008 -0.428,0.026 -1.265,-0.438 A 13.33,13.33 0 0 1 2.568,12.297 13.087,13.087 0 0 1 0.678,8.693 12.92,12.92 0 0 1 0,4.543 12.909,12.909 0 0 1 0.818,0 H 0.82 c 0.96,1.259 2.07,2.398 3.013,3.67 0.899,1.21 2.135,3.183 2.386,3.605 1.562,2.617 1.811,4.232 1.93,5.009"
+         fill="#5493f7"
+         mask="url(#b)"
+         id="path888" />
+    </g>
+    <path
+       d="m 26.23,12.885 c 0,1.679 -0.32,3.284 -0.899,4.756 -1.52,1.64 -11.772,-2.396 -11.873,-2.44 C 12.056,14.585 7.788,12.709 7.403,9.763 6.849,5.525 15.421,2.571 19.188,2.459 c 0.451,0.005 1.826,0.021 2.627,0.675 a 12.937,12.937 0 0 1 4.415,9.75 m -8.965,10.484 c 0.613,-2.17 5.973,-4.394 7.156,-4.514 0.146,-0.015 0.208,0.088 0.144,0.206 -1.234,2.244 -3.061,4.092 -5.272,5.29 -1.118,0.542 -2.348,0.147 -2.028,-0.982 z"
+       fill="#5493f7"
+       id="path892" />
+  </g>
+</svg>
