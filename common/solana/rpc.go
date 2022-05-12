@@ -3,7 +3,6 @@ package solana
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -153,10 +152,9 @@ func SubscribeProgram(url, programId string, messageChan chan ProgramNotificatio
 					return
 				}
 
-				// wait for the socket to close or timeout
+				// wait for the socket to close
 				select {
 				case <-socketClosedChan:
-				case <-time.After(time.Second):
 				}
 
 				return

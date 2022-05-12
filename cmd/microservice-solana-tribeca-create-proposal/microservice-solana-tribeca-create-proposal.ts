@@ -1,10 +1,34 @@
-require("dotenv").config();
+import * as Sentry from '@sentry/node';
+import "@sentry/tracing";
 
 import { Connection } from "@solana/web3.js";
 import { Wallet, web3 } from "@project-serum/anchor";
 import { PublicKey, SolanaProvider } from "@saberhq/solana-contrib";
 
 import { GovernorWrapper, TribecaSDK } from "tribeca/dist/cjs";
+
+const	FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
+
+if (!FLU_SENTRY_URL) {
+  throw new Error("FLU_SENTRY_URL not provided");
+};
+
+Sentry.init({
+  dsn: FLU_SENTRY_URL,
+});
+
+const	WORKER_ID = process.env.FLU_WORKER_ID as string;
+
+if (!WORKER_ID) {
+  throw new Error("WORKER_ID not provided");
+};
+
+Sentry.configureScope(scope => {
+  scope.setTag('worker-id', WORKER_ID);
+})
+
+// Wrap in Sentry
+try {
 
 const FLU_TRIBECA_GOVERNOR_PUBKEY = process.env.FLU_TRIBECA_GOVERNOR_PUBKEY;
 
@@ -134,3 +158,7 @@ const createProposalWithInstruction = async (
       throw new Error("Could not parse FLU_INSTRUCTION");
   }
 })();
+
+} catch (e) {
+  Sentry.captureException(e);
+}

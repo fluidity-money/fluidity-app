@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@project-serum/anchor": "^0.23.0",
+    "@sentry/node": "^6.19.7",
+    "@sentry/tracing": "^6.19.7",
     "base58-js": "^1.0.0",
     "borsh": "^0.7.0",
     "tribeca": "git://github.com/TribecaHQ/tribeca.git#dbc51ea8660541466e335ade8f94d065063e7f9d"
