@@ -11,8 +11,9 @@ import (
 	prize_pool_queue "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 
-	"github.com/gagliardetto/solana-go"
+	solanaGo "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
@@ -46,15 +47,15 @@ const (
 
 // pubkeyFromEnv gets and decodes a solana public key from an environment variable,
 // panicking if the env doesn't exist or isn't a valid key
-func pubkeyFromEnv(env string) solana.PublicKey {
+func pubkeyFromEnv(env string) solanaGo.PublicKey {
 	pubkeyString := util.GetEnvOrFatal(env)
 
-	pubkey := solana.MustPublicKeyFromBase58(pubkeyString)
+	pubkey := solanaGo.MustPublicKeyFromBase58(pubkeyString)
 
 	return pubkey
 }
 
-func getPrizePool(solanaClient *solanaRpc.Client, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) *big.Rat {
+func getPrizePool(solanaClient *solanaRpc.Client, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solanaGo.PublicKey, payer *solanaGo.Wallet) *big.Rat {
 	tvl, err := prize_pool.GetTvl(
 		solanaClient,
 		fluidityPubkey,
@@ -115,6 +116,7 @@ func main() {
 		fluidityPubkey = pubkeyFromEnv(EnvFluidityPubkey)
 		tvlDataPubkey  = pubkeyFromEnv(EnvTvlDataPubkey)
 		solendPubkey   = pubkeyFromEnv(EnvSolendPubkey)
+
 		payerPrikey    = util.GetEnvOrFatal(EnvPayerPrikey)
 		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		updateInterval = util.GetEnvOrFatal(EnvUpdateInterval)
@@ -122,11 +124,12 @@ func main() {
 	)
 
 	// tokensList will Fatal if bad input
-	tokenDetails := util.GetTokensListSolana(tokensList_)
+
+	tokenDetails := solana.GetTokensListSolana(tokensList_)
 
 	rpcClient := solanaRpc.New(solanaRpcUrl)
 
-	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
+	payer, err := solanaGo.WalletFromPrivateKeyBase58(payerPrikey)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -146,8 +149,8 @@ func main() {
 	}
 
 	var (
-		workChan = make(chan util.TokenDetailsSolana, 0)
-		doneChan = make(chan util.TokenDetailsSolana, 0)
+		workChan = make(chan solana.TokenDetailsSolana, 0)
+		doneChan = make(chan solana.TokenDetailsSolana, 0)
 	)
 
 	for i := 0; i < WorkerPoolAmount; i++ {
@@ -205,7 +208,7 @@ func main() {
 
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
-				tokenDetailsComplete := util.TokenDetailsSolana{
+				tokenDetailsComplete := solana.TokenDetailsSolana{
 					FluidMintPubkey:   fluidMintPubkey,
 					ObligationPubkey:  obligationPubkey,
 					ReservePubkey:     reservePubkey,

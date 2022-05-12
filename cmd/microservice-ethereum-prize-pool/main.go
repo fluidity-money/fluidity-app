@@ -8,7 +8,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
+	ethereumQueue "github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	prize_pool "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 )
@@ -60,7 +61,6 @@ func main() {
 	var (
 		gethAddress                 = util.GetEnvOrFatal(EnvEthereumHttpAddress)
 		tokensList_                 = util.GetEnvOrFatal(EnvTokensList)
-		tokenBackend                = os.Getenv(EnvTokenBackend)
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
 		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
 		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
@@ -68,8 +68,8 @@ func main() {
 
 	var (
 		uniswapAnchoredViewAddressEth ethCommon.Address
-		AaveAddressProviderAddressEth ethCommon.Address
-		UsdTokenAddressEth            ethCommon.Address
+		aaveAddressProviderAddressEth ethCommon.Address
+		usdTokenAddressEth            ethCommon.Address
 
 		isCompound = false
 		isAave     = false
@@ -81,25 +81,20 @@ func main() {
 
 	// tokensList will Fatal if bad input
 
-	tokenDetails := util.GetTokensListEthereum(tokensList_)
-
-	// set required addresses based on backend(s) in use
-
-	switch tokenBackend {
-	case BackendCompound:
-		isCompound = true
-
-	case BackendAave:
-		isAave = true
-
-	default:
-	}
+	tokenDetails := ethereum.GetTokensListEthereum(tokensList_)
 
 	for i, token := range tokenDetails {
 
-		switch token.Backend {
+		switch backend := token.Backend; backend {
+
 		case "":
-			tokenDetails[i].Backend = tokenBackend
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Token backend for option %v at position %d was empty!",
+					backend,
+					i,
+				)
+			})
 
 		case BackendCompound:
 			isCompound = true
@@ -114,13 +109,13 @@ func main() {
 	}
 
 	if isAave {
-		AaveAddressProviderAddressEth = ethCommon.HexToAddress(aaveAddressProviderAddress_)
-		UsdTokenAddressEth = ethCommon.HexToAddress(usdTokenAddress_)
+		aaveAddressProviderAddressEth = ethCommon.HexToAddress(aaveAddressProviderAddress_)
+		usdTokenAddressEth = ethCommon.HexToAddress(usdTokenAddress_)
 	}
 
 	var (
-		workChan = make(chan util.TokenDetailsEthereum, 0)
-		doneChan = make(chan util.TokenDetailsEthereum, 0)
+		workChan = make(chan ethereum.TokenDetailsEthereum, 0)
+		doneChan = make(chan ethereum.TokenDetailsEthereum, 0)
 	)
 
 	for i := 0; i < WorkerPoolAmount; i++ {
@@ -149,9 +144,9 @@ func main() {
 				case BackendAave:
 					tokenPrice, err = aave.GetPrice(
 						gethClient,
-						AaveAddressProviderAddressEth,
+						aaveAddressProviderAddressEth,
 						address,
-						UsdTokenAddressEth,
+						usdTokenAddressEth,
 					)
 				}
 
@@ -161,7 +156,7 @@ func main() {
 							"Failed to get the current exchange rate for %#v with address %#v at %#v!",
 							tokenName,
 							uniswapAnchoredViewAddressEth,
-							AaveAddressProviderAddressEth,
+							aaveAddressProviderAddressEth,
 						)
 
 						k.Payload = err
@@ -199,7 +194,7 @@ func main() {
 
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 
-				tokenDetailsComplete := util.TokenDetailsEthereum{
+				tokenDetailsComplete := ethereum.TokenDetailsEthereum{
 					FluidAddress:  fluidAddress,
 					TokenName:     tokenName,
 					TokenDecimals: tokenDecimals,
@@ -214,7 +209,7 @@ func main() {
 
 	// we don't actually care about the block state!
 
-	ethereum.BlockHeaders(func(_ ethereum.BlockHeader) {
+	ethereumQueue.BlockHeaders(func(_ ethereumQueue.BlockHeader) {
 
 		var amount float64
 
