@@ -16,6 +16,7 @@ pub struct CreateCalculateNArgs<'info> {
         ],
         bump,
         payer = payer,
+        // Add 10 bytes for pointer - Anchor doesn't like 4 bytes
         space = 10 + std::mem::size_of::<CalculateNArgs>(),
     )]
     pub calculaten_args: Account<'info, CalculateNArgs>,

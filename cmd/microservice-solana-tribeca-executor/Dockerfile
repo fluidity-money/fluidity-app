@@ -7,4 +7,4 @@ COPY . .
 
 RUN make build
 
-ENTRYPOINT [ "npx", "ts-node", "microservice-solana-tribeca-executor.ts" ]
+ENTRYPOINT [ "./start.sh" ]

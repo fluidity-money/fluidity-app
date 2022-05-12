@@ -96,7 +96,6 @@ func main() {
 				k.Message = "Error from the Solana websocket!"
 				k.Payload = err
 			})
-			return
 		}
 	}
 

@@ -10,6 +10,7 @@ pub mod instruction;
 mod math;
 pub mod processor;
 mod state;
+pub mod utils;
 
 // declare the pubkey of the program
 #[cfg(all(target_arch = "bpf", not(feature = "exclude_entrypoint")))]

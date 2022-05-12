@@ -4,6 +4,7 @@ use crate::{
     instruction::*,
     math::*,
     state::{Obligation, Reserve},
+    utils::*,
 };
 
 use {
@@ -437,24 +438,10 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
 
     // scale/clamp amount to be AT MOST 80% of the prize pool
 
-    // get obligation and reserve structs
-    let obligation = Obligation::unpack(&obligation_info.data.borrow())?;
-    let reserve = Reserve::unpack(&reserve_info.data.borrow())?;
-    // get value of obligations
-    let deposited_amount = obligation.deposits[0].deposited_amount;
-    let deposited_value = reserve
-        .collateral_exchange_rate()?
-        .collateral_to_liquidity(deposited_amount)
-        .unwrap();
-    // normalise
-    // get fluidity mint object
-    let fluid_mint = spl_token::state::Mint::unpack(&fluidity_mint.data.borrow())?;
-    let decimals = fluid_mint.decimals as u32;
+    let total_prize_pool = get_available_prize_pool(obligation_info, reserve_info, fluidity_mint);
 
-    // get amount of usdc deposited (has 6 decimals)
-    let deposited_tokens = fluid_mint.supply;
     // get available prize pool (80% of pool)
-    let available_prize_pool = (deposited_value - deposited_tokens)
+    let available_prize_pool = total_prize_pool
         .checked_mul(8)
         .unwrap()
         .checked_div(10)
@@ -526,7 +513,12 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
 
 // Moves amount funds from prize pool to another account
 // Will fail if funds exceed total prize pool - must be run by authority
-fn move_from_prize_pool(accounts: &[AccountInfo], payout_amt: u64, seed: String, bump: u8) -> ProgramResult {
+fn move_from_prize_pool(
+    accounts: &[AccountInfo],
+    payout_amt: u64,
+    seed: String,
+    bump: u8,
+) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
     let token_program = next_account_info(accounts_iter)?;
@@ -543,24 +535,8 @@ fn move_from_prize_pool(accounts: &[AccountInfo], payout_amt: u64, seed: String,
     }
 
     // Fail if amount exceeds prize pool
-
-    // get obligation and reserve structs
-    let obligation = Obligation::unpack(&obligation_info.data.borrow())?;
-    let reserve = Reserve::unpack(&reserve_info.data.borrow())?;
-    // get value of obligations
-    let deposited_amount = obligation.deposits[0].deposited_amount;
-    let deposited_value = reserve
-        .collateral_exchange_rate()?
-        .collateral_to_liquidity(deposited_amount)
-        .unwrap();
-    // normalise
-    // get fluidity mint object
-    let fluid_mint = spl_token::state::Mint::unpack(&fluidity_mint.data.borrow())?;
-
-    // get amount of usdc deposited (has 6 decimals)
-    let deposited_tokens = fluid_mint.supply;
-    // get available prize pool
-    let available_prize_pool = deposited_value - deposited_tokens;
+    let available_prize_pool =
+        get_available_prize_pool(obligation_info, reserve_info, fluidity_mint);
 
     if available_prize_pool < payout_amt {
         panic!("not enought funds in prize pool!");
