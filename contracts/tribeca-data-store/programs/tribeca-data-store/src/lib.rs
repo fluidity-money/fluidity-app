@@ -3,8 +3,10 @@ use vipers::prelude::*;
 
 mod instructions;
 mod state;
+mod constants;
 
 pub use state::*;
+pub use constants::*;
 
 use instructions::*;
 

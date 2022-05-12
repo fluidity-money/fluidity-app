@@ -1,7 +1,3 @@
-require("dotenv").config();
-
-import type { Idl } from "@project-serum/anchor";
-
 import { Connection } from "@solana/web3.js";
 import { BorshEventCoder, Wallet, web3 } from "@project-serum/anchor";
 import { PublicKey, SolanaProvider } from "@saberhq/solana-contrib";
@@ -18,12 +14,13 @@ import {
 import { GokiSDK } from "@gokiprotocol/client/dist/cjs";
 import { GovernJSON } from "@tribecahq/tribeca-sdk/dist/cjs/idls/govern";
 
-// SECRET_KEY is the base58 encoded key responsible for paying and signing
+// EXECUTOR_SECRET_KEY is the base58 encoded key responsible for paying and signing
 //  tribeca/goki transactions
-const SECRET_KEY = process.env.SECRET_KEY as string;
+const EXECUTOR_SECRET_KEY = process.env
+  .FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY as string;
 
-if (!SECRET_KEY) {
-  throw new Error("SECRET_KEY not provided");
+if (!EXECUTOR_SECRET_KEY) {
+  throw new Error("FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY not provided");
 }
 
 // FLU_TRIBECA_DATA_STORE_SECRET_KEY is the base58 encoded key responsible for paying and signing
@@ -94,7 +91,9 @@ enum GovernorLogs {
 const sleep = async (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-const payerKeypair = web3.Keypair.fromSecretKey(base58_to_binary(SECRET_KEY));
+const payerKeypair = web3.Keypair.fromSecretKey(
+  base58_to_binary(EXECUTOR_SECRET_KEY),
+);
 
 const tribecaDataStorePayer = web3.Keypair.fromSecretKey(
   base58_to_binary(TRIBECA_SECRET_KEY),

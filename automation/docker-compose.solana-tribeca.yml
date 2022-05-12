@@ -8,7 +8,7 @@ services:
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-tribeca-executor
-      SECRET_KEY: ${SECRET_KEY}
+      FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY: ${FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_TRIBECA_DATA_STORE_SECRET_KEY: ${FLU_TRIBECA_DATA_STORE_SECRET_KEY}
       FLU_SOLANA_PAYER: ${FLU_SOLANA_PAYER}

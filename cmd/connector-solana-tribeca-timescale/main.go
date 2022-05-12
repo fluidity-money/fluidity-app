@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/fluidity-money/fluidity-app/cmd/connector-solana-tribeca-timescale/lib/solana"
+	"encoding/base64"
 
+	borsh "github.com/near/borsh-go"
+
+	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/tribeca"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	"encoding/base64"
-
-	borsh "github.com/near/borsh-go"
 )
 
 const (
@@ -18,19 +18,24 @@ const (
 	EnvSolanaWsUrl = `FLU_SOLANA_WS_URL`
 
 	// EnvFluidityPubkey is the program id of the fluidity program
-	EnvTribecaPubkey = `FLU_TRIBECA_PROGRAM_ID`
+	EnvTribecaDataStorePubkey = `FLU_TRIBECA_DATA_STORE_PUBKEY`
 )
 
 func main() {
 	var (
-		tribecaPubkey = util.GetEnvOrFatal(EnvTribecaPubkey)
-		solanaWsUrl   = util.GetEnvOrFatal(EnvSolanaWsUrl)
+		tribecaDataStorePubkey = util.GetEnvOrFatal(EnvTribecaDataStorePubkey)
+		solanaWsUrl            = util.GetEnvOrFatal(EnvSolanaWsUrl)
 
 		programNotificationChan = make(chan solana.ProgramNotification)
 		errChan                 = make(chan error)
 	)
 
-	solanaSubscription, err := solana.SubscribeProgram(solanaWsUrl, tribecaPubkey, programNotificationChan, errChan)
+	solanaSubscription, err := solana.SubscribeProgram(
+		solanaWsUrl,
+		tribecaDataStorePubkey,
+		programNotificationChan,
+		errChan,
+	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -48,7 +53,7 @@ func main() {
 				k.Message = "Tribeca updated CalculateN Args!"
 			})
 
-			var calculateNArgs solana.TribecaProgramData
+			var calculateNArgs tribeca.TribecaProgramData
 
 			dataBase64 := programNotification.Value.Account.Data[0]
 
@@ -70,10 +75,16 @@ func main() {
 				})
 			}
 
+			var (
+				Delta   = calculateNArgs.Delta
+				M       = calculateNArgs.M
+				FreqDiv = calculateNArgs.FreqDiv
+			)
+
 			calculateNArgsInternal := types.TribecaProgramData{
-				Delta:   calculateNArgs.Delta,
-				M:       calculateNArgs.M,
-				FreqDiv: calculateNArgs.FreqDiv,
+				Delta:   Delta,
+				M:       M,
+				FreqDiv: FreqDiv,
 				Network: "devnet",
 				Chain:   "solana",
 			}

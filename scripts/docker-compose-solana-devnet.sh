@@ -48,6 +48,20 @@ export \
 	FLU_SOLANA_TOKEN_DECIMALS_USDT=6
 
 export \
+    FLU_SOLANA_RPC_URL=http://api.devnet.solana.com \
+    FLU_SOLANA_WS_URL=ws://api.devnet.solana.com \
+    FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq  \
+    FLU_UNIVERSE=testing \
+    FLU_TRIBECA_GOVERNOR_PUBKEY=5eEt6mrrP5EpKvmrUHkuahrY255vmCd4zZPvvpv2k8BD \
+    FLU_TRIBECA_LOCKER_PUBKEY=6MEu1f6SvM4mTo5TTGD7ksqqU1FFuxA4z44ojQDngJtK \
+    FLU_TRIBECA_SMART_WALLET_PUBKEY=Fjq8tufmjEdkwsiE2WTthNYmHPHDXPqzqfCScQr899wh \
+    FLU_TRIBECA_EXEC_COUNCIL_PUBKEY=HCxVJh5f9FgeeRz198GTkq59JVgSXucJ6WwZUeQ2ut8p \
+    FLU_TRIBECA_PROGRAM_ID=2gbXEmTJy5ykGMAbavqcCwGfpwfHFa2x6GCA9NdPmv91 \
+    FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY=J91qv3zfxQcLVarAS618HumWt3vNC3Xjd9CshTnGfbN8JMgU2i8G1CdXECozY3yZuFFHBPxhnQjEjfD4c3QZNQ1 \
+    FLU_SOLANA_PAYER=J91qv3zfxQcLVarAS618HumWt3vNC3Xjd9CshTnGfbN8JMgU2i8G1CdXECozY3yZuFFHBPxhnQjEjfD4c3QZNQ1 \
+    FLU_TRIBECA_DATA_STORE_SECRET_KEY=2HstSHbZbN1MNWZ5HTAFysfp1jjCFE4T4nZGjfKeh7GMsBFkUs9Ffmg8Zzq8eHEPxA8D6hbrhKZ8BJffRtbrEiVu
+
+export \
         FLU_SOLANA_TOKENS_LIST=$FLU_SOLANA_FLUID_MINT_PUBKEY_USDC:$FLU_SOLANA_TOKEN_SHORT_NAME_USDC:$FLU_SOLANA_TOKEN_DECIMALS_USDC:$FLU_SOLANA_OBLIGATION_PUBKEY_USDC:$FLU_SOLANA_RESERVE_PUBKEY_USDC:$FLU_SOLANA_PYTH_PUBKEY_USDC:$FLU_SOLANA_SWITCHBOARD_PUBKEY_USDC,$FLU_SOLANA_FLUID_MINT_PUBKEY_USDT:$FLU_SOLANA_TOKEN_SHORT_NAME_USDT:$FLU_SOLANA_TOKEN_DECIMALS_USDT:$FLU_SOLANA_OBLIGATION_PUBKEY_USDT:$FLU_SOLANA_RESERVE_PUBKEY_USDT:$FLU_SOLANA_PYTH_PUBKEY_USDT:$FLU_SOLANA_SWITCHBOARD_PUBKEY_USDT
 
 export FLU_SOLANA_DEBUG_FAKE_PAYOUTS=true
@@ -60,6 +74,7 @@ docker-compose \
 	-f "$automation_dir/docker-compose.solana-transactions-user-actions.yml" \
 	-f "$automation_dir/docker-compose.solana-connectors.yml" \
 	-f "$automation_dir/docker-compose.solana.fluidity.money.yml" \
+	-f "$automation_dir/docker-compose.solana-tribeca.yml" \
 	-f "$automation_dir/docker-compose.solana-worker.yml" \
 	-f "$automation_dir/docker-compose.volumes.yml" \
 	$@

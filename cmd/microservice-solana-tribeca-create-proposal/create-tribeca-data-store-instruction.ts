@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import type { Idl } from "@project-serum/anchor";
 
 import { Connection } from "@solana/web3.js";
@@ -57,9 +55,7 @@ export const initializeHandler = async () => {
   const [calculateNArgsPda, calculateNArgsBump] = await PublicKey
     .findProgramAddress([Buffer.from("calculateNArgs")], program.programId);
 
-  console.log(calculateNArgsPda.toString());
-
-  console.log(program.instruction);
+  console.log(`Initializing data store acc at ${calculateNArgsPda.toString()}`);
 
   const instruction = program.instruction.initialize(
     calculateNArgsBump,
@@ -87,9 +83,7 @@ export const changeDeltaHandler = async () => {
   const [calculateNArgsPda, calculateNArgsBump] = await PublicKey
     .findProgramAddress([Buffer.from("calculateNArgs")], program.programId);
 
-  console.log(calculateNArgsPda.toString());
-
-  console.log(program.instruction);
+  console.log(`Changing ${calculateNArgsPda.toString()} Delta to ${newDelta}`);
 
   const instruction = program.instruction.changeDelta(
     calculateNArgsBump,
@@ -117,9 +111,9 @@ export const changePayoutFrequencyHandler = async () => {
   const [calculateNArgsPda, calculateNArgsBump] = await PublicKey
     .findProgramAddress([Buffer.from("calculateNArgs")], program.programId);
 
-  console.log(calculateNArgsPda.toString());
-
-  console.log(program.instruction);
+  console.log(
+    `Changing ${calculateNArgsPda.toString()} RewardFrequency to ${newFreq}`,
+  );
 
   const instruction = program.instruction.changePayoutFrequency(
     calculateNArgsBump,
@@ -146,9 +140,9 @@ export const changeNumRewardTiersHandler = async () => {
   const [calculateNArgsPda, calculateNArgsBump] = await PublicKey
     .findProgramAddress([Buffer.from("calculateNArgs")], program.programId);
 
-  console.log(calculateNArgsPda.toString());
-
-  console.log(program.instruction);
+  console.log(
+    `Changing ${calculateNArgsPda.toString()} RewardTiers to ${newRewardTiers}`,
+  );
 
   const instruction = program.instruction.changeNumRewardTiers(
     calculateNArgsBump,

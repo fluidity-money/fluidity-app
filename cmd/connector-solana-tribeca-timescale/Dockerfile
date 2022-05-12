@@ -8,7 +8,7 @@ COPY . .
 RUN make
 
 ENTRYPOINT [ \
-	"wait-for-amqp", \
+    "wait-for-amqp", \
     "wait-for-database.sh", \
-	"./connector-solana-tribeca-timescale.o" \
+    "./connector-solana-tribeca-timescale.o" \
 ]

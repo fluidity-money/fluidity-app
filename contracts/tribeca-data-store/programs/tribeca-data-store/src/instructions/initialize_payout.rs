@@ -4,10 +4,6 @@ use std::str::FromStr;
 
 use crate::*;
 
-// Authority is the only account allowed to
-// initialize CalculateNArgs
-const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
-
 /// accounts for [fluidity_dao::create_calculaten_args].
 #[derive(Accounts)]
 #[instruction(bump: u8)]

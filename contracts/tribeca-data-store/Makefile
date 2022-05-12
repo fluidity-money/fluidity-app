@@ -1,5 +1,5 @@
 
-REPO := fluidity-tribeca-data-store
+REPO := fluidity-solana-tribeca-data-store
 
 ANCHOR_BUILD := anchor build
 

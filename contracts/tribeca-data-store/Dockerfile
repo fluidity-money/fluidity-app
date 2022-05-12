@@ -9,8 +9,6 @@ RUN sh -c "$(sudo apt-get update && sudo apt-get upgrade && sudo apt-get install
 
 ENV PATH="/root/.local/share/solana/install/active_release/bin:$PATH"
 
-WORKDIR /usr/local/src/fluidity-tribeca-data-store
-
 # only rebuild on source file change
 COPY src src
 COPY scripts scripts

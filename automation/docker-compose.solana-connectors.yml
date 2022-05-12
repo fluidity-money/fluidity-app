@@ -10,7 +10,6 @@ services:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_STARTING_SLOT: ${FLU_SOLANA_STARTING_SLOT}
@@ -18,7 +17,7 @@ services:
     depends_on:
       - redis
 
-    connector-solana-tribeca-timescale:
+  connector-solana-tribeca-timescale:
     build:
       context: ../cmd/connector-solana-tribeca-timescale
     env_file: ./docker-compose-envs

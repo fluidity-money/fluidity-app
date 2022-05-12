@@ -55,9 +55,10 @@ type (
 		Amount  uint64
 	}
 
-	// InstructionDrain
+	// InstructionDrain used to send payout funds to a receiver
 	InstructionDrain struct {
 		Variant   uint8
+		Amount    uint64
 		TokenName string
 		BumpSeed  uint8
 	}

@@ -11,5 +11,5 @@ COPY . .
 RUN make
 
 ENTRYPOINT [ \
-	"npx ts-node -O '{\"resolveJsonModule": true}' microservice-solana-tribeca-create-proposal.ts" \
+	"./start.sh" \
 ]

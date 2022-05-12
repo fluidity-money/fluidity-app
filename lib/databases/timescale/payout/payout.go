@@ -88,23 +88,11 @@ func GetLatestCalculatenArgs(chain, network string) TribecaProgramData {
 		network,
 	)
 
-	rowsCalculateNArgs, err := timescaleClient.Query(statementText)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Failed to get latest calculateN args!"
-			k.Payload = err
-		})
-	}
-
-	defer rowsCalculateNArgs.Close()
+	rowsCalculateNArgs := timescaleClient.QueryRow(statementText)
 
 	var calculateNArgs TribecaProgramData
 
-	rowsCalculateNArgs.Next()
-
-	err = rowsCalculateNArgs.Scan(
+	err := rowsCalculateNArgs.Scan(
 		&calculateNArgs.Chain,
 		&calculateNArgs.Network,
 		&calculateNArgs.Delta,
@@ -119,8 +107,6 @@ func GetLatestCalculatenArgs(chain, network string) TribecaProgramData {
 			k.Payload = err
 		})
 	}
-
-	fmt.Println(calculateNArgs)
 
 	return calculateNArgs
 }

@@ -6,7 +6,7 @@ include ../../build.mk
 TS_FILES := $(shell ls -1 *.ts)
 
 ${REPO}: ${TS_FILES} package.json
-	@npm install
+	@${NPM_INSTALL}
 
 docker: ${TS_FILES} Dockerfile Makefile
 	@${DOCKER_BUILD} -t "${ORG_ROOT}/${REPO}" .
