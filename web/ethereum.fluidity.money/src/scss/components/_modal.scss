@@ -414,6 +414,8 @@
   background-color: transparent;
   border: solid 2px #333333;
   border-radius: 10px;
+  margin-left: 3px;
+  margin-right: 3px;
   &--closed {
     @extend .blockchain-container;
     background-color: transparent;
@@ -424,5 +426,5 @@
   background-color: #333333;
   height: 1px;
   border: none;
-  width: 95%;
+  width: 81%;
 }
