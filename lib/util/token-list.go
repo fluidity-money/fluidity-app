@@ -39,7 +39,7 @@ type TokenDetailsEthereum struct {
 	TokenDecimals *big.Rat
 	Amount        float64
 	// address is the optional parameter for the underlying token address
-	// (required for AAVE lookup)
+	// (required for AAVE lookup) OR the flux oracle address (for Aurora)
 	Address       ethCommon.Address
 	Backend       string
 }

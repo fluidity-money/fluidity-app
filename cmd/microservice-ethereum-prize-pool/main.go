@@ -13,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
+	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
@@ -28,6 +29,10 @@ const (
 	// BackendAave to use as the environment variable when the token
 	// is aave based
 	BackendAave = "aave"
+
+	// BackendAurora to use as the environment variable for Aurora 
+	// to use Flux as a price oracle
+	BackendAurora = "aurora"
 )
 
 const (
@@ -146,6 +151,17 @@ func main() {
 						AaveAddressProviderAddressEth,
 						address,
 						UsdTokenAddressEth,
+					)
+				case BackendAurora:
+					tokenPrice, err = flux.GetPrice(
+						gethClient,
+						address,
+					)
+
+					// flux has a different number of decimal places
+					tokenDecimals, err = flux.GetDecimals(
+						gethClient,
+						address,
 					)
 				}
 
