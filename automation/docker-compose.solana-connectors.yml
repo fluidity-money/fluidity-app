@@ -10,10 +10,23 @@ services:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_STARTING_SLOT: ${FLU_SOLANA_STARTING_SLOT}
     restart: unless-stopped
     depends_on:
       - redis
+
+  connector-solana-tribeca-timescale:
+    build:
+      context: ../cmd/connector-solana-tribeca-timescale
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-tribeca-executor
+      FLU_TRIBECA_PROGRAM_ID: ${FLU_TRIBECA_PROGRAM_ID}
+      FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+    restart: unless-stopped
+    depends_on:
+      - timescale
+
