@@ -6,7 +6,7 @@ package solana
 import (
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
 type (
@@ -137,4 +137,13 @@ type (
 // Slot is the type that logs the current slot as sent by the solana RPC
 type Slot struct {
 	Slot uint64 `json:"slot"`
+}
+
+type TribecaProgramData struct {
+	Chain   string
+	Network string
+
+	Delta   uint8
+	M       uint8
+	FreqDiv uint8
 }

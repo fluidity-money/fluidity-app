@@ -31,6 +31,9 @@ const chainId = chainIdFromEnv();
 let tokens: Array<Token> = [];
 
 switch (chainId) {
+  case ChainId.Mainnet:
+    tokens = require("config/mainnet-tokens.json");
+    break;
   case ChainId.Hardhat:
     tokens = require("config/testing-tokens.json");
     break;
@@ -39,6 +42,9 @@ switch (chainId) {
     break;
   case ChainId.Kovan:
     tokens = require("config/kovan-tokens.json");
+    break;
+  case ChainId.AuroraMainnet:
+    tokens = require("config/aurora-mainnet-tokens.json");
     break;
   default:
     throw new Error(`${chainId} is not a supported chain ID!`);

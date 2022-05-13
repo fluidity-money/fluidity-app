@@ -61,7 +61,6 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
     checkNetworkOnLoad();
     updateOnNetworkChange();
   }, []);
-  console.log(browserChainId);
   return (
     <div className="toolbar p-0_5">
       {children}
@@ -75,6 +74,8 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
               ? `Ethereum Mainnet`
               : chainId === ChainId.Kovan
               ? `Ethereum Kovan`
+              : chainId === ChainId.AuroraMainnet
+              ? `Aurora Mainnet`
               : `Ethereum`}
             )
             {` doesn't match to network selected in wallet${

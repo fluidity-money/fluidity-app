@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -110,10 +111,13 @@ func TestPayout(t *testing.T) {
 	rf := result.FloatString(3)
 	trimmedResult := rf[:len(rf)-1]
 	expected := "7.12"
+
 	assert.Equal(t, expected, trimmedResult)
 
 	// set low gas for mu > g case
+
 	g = big.NewRat(1, 100)
+
 	expectedRat := big.NewRat(71344570743089, 959979214533768)
 
 	result = payout(atx, apy, g, rewardPool, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))

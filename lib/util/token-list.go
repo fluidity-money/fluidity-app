@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"math"
@@ -6,35 +6,33 @@ import (
 	"strconv"
 	"strings"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
-// TokenDetails containing information about tokens that we unpacked using
-// the environment variables
-type TokenDetails struct {
-	address       ethCommon.Address
-	tokenName     string
-	tokenDecimals *big.Rat
-	amount        float64
+// TokenDetailsBase for the minimum token information, used currently by
+// microservice-common-count-wins
+type TokenDetailsBase struct {
+	TokenDecimals *big.Rat
+	TokenName     string
 }
 
 func trimWhitespace(s string) string {
 	return strings.Trim(s, " \n\t")
 }
 
-func getTokensList(tokensList_ string) []TokenDetails {
+// GetTokensListBase starting with the address, token name and decimals
+func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
+	// addr, name, decimals
 
 	tokensList := strings.Split(tokensList_, ",")
 
-	tokenDetails := make([]TokenDetails, len(tokensList))
+	tokenDetails := make([]TokenDetailsBase, len(tokensList))
 
 	for i, tokenInfo_ := range tokensList {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) != 3 {
+		if len(tokenDetails_) < 2 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",
@@ -44,12 +42,10 @@ func getTokensList(tokensList_ string) []TokenDetails {
 		}
 
 		var (
-			address_  = trimWhitespace(tokenDetails_[0])
+			_         = trimWhitespace(tokenDetails_[0])
 			tokenName = trimWhitespace(tokenDetails_[1])
 			decimals_ = trimWhitespace(tokenDetails_[2])
 		)
-
-		address := ethCommon.HexToAddress(address_)
 
 		decimals, err := strconv.Atoi(decimals_)
 
@@ -68,10 +64,9 @@ func getTokensList(tokensList_ string) []TokenDetails {
 
 		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
-		tokenDetail := TokenDetails{
-			address:       address,
-			tokenName:     tokenName,
-			tokenDecimals: decimalsRat,
+		tokenDetail := TokenDetailsBase{
+			TokenName:     tokenName,
+			TokenDecimals: decimalsRat,
 		}
 
 		tokenDetails[i] = tokenDetail

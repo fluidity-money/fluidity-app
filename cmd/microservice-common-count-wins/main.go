@@ -2,14 +2,14 @@ package main
 
 import (
 	"math/big"
-	"time"
 	"os"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/past-winnings"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -20,13 +20,20 @@ const (
 	EnvSolanaTokensList = `FLU_SOLANA_TOKENS_LIST`
 )
 
-func calculateAndStoreTotalWinners(network network.BlockchainNetwork, tokens map[string]*big.Int, date time.Time) {
+func calculateAndStoreTotalWinners(network network.BlockchainNetwork, tokens []util.TokenDetailsBase, date time.Time) {
 	var (
 		cumulativeWinnersCount  uint64 = 0
 		cumulativeWinningAmount        = new(big.Int)
 	)
 
-	for tokenName, tokenDecimals := range tokens {
+	for _, tokenDetails := range tokens {
+
+		var (
+			tokenName      = tokenDetails.TokenName
+			tokenDecimals_ = tokenDetails.TokenDecimals
+			tokenDecimals  = new(big.Int).Set(tokenDecimals_.Num())
+		)
+
 		winners, winningAmount_ := winners.CountWinnersForDateAndWinningAmount(
 			network,
 			tokenName,
@@ -35,8 +42,6 @@ func calculateAndStoreTotalWinners(network network.BlockchainNetwork, tokens map
 
 		cumulativeWinnersCount += winners
 
-		// divide amount by 10^(decimals)
-		tokenDecimals.Exp(big.NewInt(10), tokenDecimals, nil)
 		winningAmountInt := new(big.Int).Div(&winningAmount_.Int, tokenDecimals)
 
 		cumulativeWinningAmount.Add(cumulativeWinningAmount, winningAmountInt)
@@ -60,23 +65,10 @@ func main() {
 		solanaTokensList_   = os.Getenv(EnvSolanaTokensList)
 	)
 
-	ethereumTokensList, err := tokensListToMap(ethereumTokensList_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to convert the Ethereum tokens to a map!"
-			k.Payload = err
-		})
-	}
-
-	solanaTokensList, err := tokensListToMap(solanaTokensList_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to convert the solana tokens to a map!"
-			k.Payload = err
-		})
-	}
+	var (
+		ethereumTokensList = util.GetTokensListBase(ethereumTokensList_)
+		solanaTokensList   = util.GetTokensListBase(solanaTokensList_)
+	)
 
 	today := time.Now()
 

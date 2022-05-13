@@ -5,6 +5,7 @@ enum ChainId {
   Hardhat = 31337,
   Rinkeby = 4,
   Goerli = 5,
+  AuroraMainnet = 1313161554,
 }
 
 /**

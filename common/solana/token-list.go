@@ -1,4 +1,4 @@
-package main
+package solana
 
 import (
 	"math"
@@ -7,30 +7,32 @@ import (
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+
 	"github.com/gagliardetto/solana-go"
 )
 
-// TokenDetails containing information about tokens that we unpacked using
+// TokenDetailsSolana containing information about tokens that we unpacked using
 // the environment variables
-type TokenDetails struct {
-	fluidMintPubkey   solana.PublicKey 
-	obligationPubkey  solana.PublicKey 
-	reservePubkey     solana.PublicKey 
-	pythPubkey        solana.PublicKey 
-	switchboardPubkey solana.PublicKey
-	tokenDecimals     *big.Rat
-	amount            float64
+type TokenDetailsSolana struct {
+	FluidMintPubkey   solana.PublicKey
+	ObligationPubkey  solana.PublicKey
+	ReservePubkey     solana.PublicKey
+	PythPubkey        solana.PublicKey
+	SwitchboardPubkey solana.PublicKey
+	TokenDecimals     *big.Rat
+	TokenName         string
+	Amount            float64
 }
 
 func trimWhitespace(s string) string {
 	return strings.Trim(s, " \n\t")
 }
 
-func getTokensList(tokensList_ string) []TokenDetails {
-
+// GetTokensListSolana to parse a string list into separated token information
+func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 	tokensList := strings.Split(tokensList_, ",")
 
-	tokenDetails := make([]TokenDetails, len(tokensList))
+	tokenDetails := make([]TokenDetailsSolana, len(tokensList))
 
 	for i, tokenInfo_ := range tokensList {
 
@@ -47,19 +49,19 @@ func getTokensList(tokensList_ string) []TokenDetails {
 
 		var (
 			fluidMint_   = trimWhitespace(tokenDetails_[0])
-			//tokenDetails_[1] = tokenName
+			_            = trimWhitespace(tokenDetails_[1])
 			decimals_    = trimWhitespace(tokenDetails_[2])
 			obligation_  = trimWhitespace(tokenDetails_[3])
 			reserve_     = trimWhitespace(tokenDetails_[4])
 			pyth_        = trimWhitespace(tokenDetails_[5])
 			switchboard_ = trimWhitespace(tokenDetails_[6])
-		)
 
-		fluidMint   := solana.MustPublicKeyFromBase58(fluidMint_)
-		obligation  := solana.MustPublicKeyFromBase58(obligation_)
-		reserve     := solana.MustPublicKeyFromBase58(reserve_)
-		pyth        := solana.MustPublicKeyFromBase58(pyth_)
-		switchboard := solana.MustPublicKeyFromBase58(switchboard_)
+			fluidMint   = solana.MustPublicKeyFromBase58(fluidMint_)
+			obligation  = solana.MustPublicKeyFromBase58(obligation_)
+			reserve     = solana.MustPublicKeyFromBase58(reserve_)
+			pyth        = solana.MustPublicKeyFromBase58(pyth_)
+			switchboard = solana.MustPublicKeyFromBase58(switchboard_)
+		)
 
 		decimals, err := strconv.Atoi(decimals_)
 
@@ -78,18 +80,17 @@ func getTokensList(tokensList_ string) []TokenDetails {
 
 		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
-		tokenDetail := TokenDetails{
-			fluidMintPubkey:   fluidMint, 
-			obligationPubkey:  obligation,
-			reservePubkey:     reserve,	
-			pythPubkey:        pyth,    			
-			switchboardPubkey: switchboard,			
-			tokenDecimals:     decimalsRat,
+		tokenDetail := TokenDetailsSolana{
+			FluidMintPubkey:   fluidMint,
+			ObligationPubkey:  obligation,
+			ReservePubkey:     reserve,
+			PythPubkey:        pyth,
+			SwitchboardPubkey: switchboard,
+			TokenDecimals:     decimalsRat,
 		}
 
 		tokenDetails[i] = tokenDetail
 	}
 
 	return tokenDetails
-
 }
