@@ -16,6 +16,8 @@ import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
+import mainnet from "../../../../config/mainnet-tokens.json";
+import aurora from "../../../../config/aurora-mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider, TransactionReceipt } from "ethers/providers";
@@ -61,6 +63,10 @@ const SwapBox = () => {
       ? (testing as TokenKind[])
       : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
+      : chainId === ChainId.AuroraMainnet
+      ? (aurora as TokenKind[])
       : (ropsten as TokenKind[]);
 
   // catches user amount input to ensure it's valid

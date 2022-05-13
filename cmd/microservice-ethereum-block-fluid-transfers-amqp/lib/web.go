@@ -61,13 +61,13 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 
 	for i, log := range logsResponseLogs {
 		var (
-			logBlockNumber   = log.BlockNumber
-			logIndex         = log.Index
-			logTxIndex       = log.TxIndex
-			logData          = log.Data
-			blockHash        = log.BlockHash
-			address          = log.Address
-			txHash           = log.TxHash
+			logBlockNumber = log.BlockNumber
+			logIndex       = log.Index
+			logTxIndex     = log.TxIndex
+			logData        = log.Data
+			blockHash      = log.BlockHash
+			address        = log.Address
+			txHash         = log.TxHash
 		)
 
 		blockNumber, err := bigIntFromPossiblyHex(logBlockNumber)
