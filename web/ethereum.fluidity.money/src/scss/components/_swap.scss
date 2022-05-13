@@ -51,6 +51,39 @@
   }
 }
 
+.swap-box-container-aurora {
+  width: stretch;
+  max-width: 25rem;
+  position: relative;
+
+  // gradient outlines/background svg
+  &:before {
+    pointer-events: none;
+    background: url("/img/Aurora/AuroraSwapBox.svg");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    position: absolute;
+
+    // copy svg offset dimensions
+    left: -54px;
+    top: -47px;
+    width: 511px;
+    height: 481px;
+    content: " ";
+    z-index: -1;
+  }
+
+  border-radius: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 0;
+  grid-column: 1/-1;
+  @include for-tablet-landscape-up {
+    grid-column: 2/-1;
+    margin-left: 3rem;
+  }
+}
+
 .swap-form {
   margin: 1.5em;
 }

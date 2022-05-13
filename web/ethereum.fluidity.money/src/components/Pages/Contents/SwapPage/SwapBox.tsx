@@ -261,7 +261,13 @@ const SwapBox = () => {
 
   return (
     <modalToggle.Provider value={modalContext}>
-      <div className="swap-box-container flex column">
+      <div
+        className={
+          chainIdFromEnv() === 1313161554
+            ? "swap-box-container-aurora flex column"
+            : "swap-box-container flex column"
+        }
+      >
         <div className="swap-form flex column flex-space-between">
           <FormSection
             defaultMargin={false}
