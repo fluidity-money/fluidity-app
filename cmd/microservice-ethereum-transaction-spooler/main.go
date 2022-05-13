@@ -59,9 +59,9 @@ func main() {
     )
 
     queue.GetMessages(rewardsQueue, func (message queue.Message) {
-		var announcement worker.EthereumWinnerAnnouncement
+        var announcement worker.EthereumWinnerAnnouncement
 
-		message.Decode(&announcement)
+        message.Decode(&announcement)
 
         spooler.InsertPendingWinner(announcement)
 
@@ -78,6 +78,8 @@ func main() {
 
         if scaledWinAmount.Int64() >= instantRewardTreshhold {
             sendRewards(batchedRewardsQueue, tokenDetails)
+
+            return
         }
 
         totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
@@ -86,6 +88,8 @@ func main() {
 
         if scaledTotalRewards.Int64() >= totalRewardTreshhold {
             sendRewards(batchedRewardsQueue, tokenDetails)
+
+            return
         }
     })
 }
