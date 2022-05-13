@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import GenericModal from "components/Modal";
 import { modalToggle } from "components/context";
 import Button from "components/Button";
 import { TokenKind, TokenList } from "components/types";
-import { Value } from "sass";
 import TokenSearch from "./TokenSearch";
 import PinnedToken from "./PinnedToken";
 
@@ -63,7 +62,7 @@ const TokenSelection = ({
           }
           goto={() => {
             setToken(type, token.symbol);
-            resetLists();
+            // resetLists();
           }}
         />
         <img
@@ -84,14 +83,13 @@ const TokenSelection = ({
       enable={type === "token" ? toggleTo : toggleFrom}
       toggle={type === "token" ? togglerTo : togglerFrom}
       height="auto"
-      // width="20rem"
     >
       <div className="connect-modal-body">
         <h2 className="primary-text">Select a Token</h2>
         <TokenSearch
           setTokenListState={setTokenList}
-          tokenList={tokenList}
           resetLists={resetLists}
+          tokenList={tokenList}
         />
         <div className="pinned-tokens">
           {pinnedList &&

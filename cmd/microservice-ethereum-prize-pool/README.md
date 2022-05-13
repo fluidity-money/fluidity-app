@@ -28,6 +28,10 @@ Tokens should be passed to this program like the following:
 The fourth paramter is required on AAVE-based Ethereum platforms and Aurora for price lookup.
 The final paramter is required for deployments utilising both Compound and AAVE backed tokens.
 
+The final parameter is required for deployments utilising both Compound and AAVE backed tokens.
+
+The final paramter is required for deployments utilising both Compound
+and AAVE backed tokens.
 
 So for example, with the contract on Ropsten, it would look like the
 following:
