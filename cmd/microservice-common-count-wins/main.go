@@ -63,6 +63,9 @@ func main() {
 	var (
 		ethereumTokensList_ = os.Getenv(EnvEthereumTokensList)
 		solanaTokensList_   = os.Getenv(EnvSolanaTokensList)
+
+		ethereumTokensList = util.GetTokensListBase(ethereumTokensList_)
+		solanaTokensList   = util.GetTokensListBase(solanaTokensList_)
 	)
 
 	var (
