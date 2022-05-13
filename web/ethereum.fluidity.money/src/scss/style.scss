@@ -82,6 +82,12 @@ a {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+
+  @extend .gradient-background;
+  &--aurora {
+    background: url("img/Aurora/AuroraBackground.svg");
+    background-size: 100%;
+  }
 }
 
 // Fluidity logo
