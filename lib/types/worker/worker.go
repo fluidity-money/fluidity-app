@@ -86,6 +86,14 @@ type (
 		Emissions       Emission                   `json:"emissions"`
 	}
 
+	EthereumWinnerAnnouncement struct {
+		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		FromAddress     string                     `json:"from_address"`
+		ToAddress       string                     `json:"to_address"`
+		WinAmount       *misc.BigInt               `json:"win_amount"`
+		TokenDetails    token_details.TokenDetails `json:"token_details"`
+	}
+
 	EthereumBlockLog struct {
 		BlockHash    ethereum.Hash          `json:"block_hash"`
 		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
