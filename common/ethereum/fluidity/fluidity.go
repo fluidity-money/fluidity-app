@@ -37,6 +37,25 @@ const fluidityContractAbiString = `[
       "stateMutability": "nonpayable",
       "type": "function"
     },
+    {
+      "inputs": [
+        {
+          "components": [
+            { "internalType": "address", "name": "from_address", "type": "address" },
+            { "internalType": "address", "name": "to_address", "type": "address" },
+            { "internalType": "uint256", "name": "win_amount", "type": "uint256" },
+            { "internalType": "bytes32", "name": "transaction_hash", "type": "bytes32" }
+          ],
+          "internalType": "struct Winner[]",
+          "name": "rewards",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "batchReward",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
 	{
       "inputs": [
         { "internalType": "address", "name": "to", "type": "address" },
@@ -93,31 +112,7 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement worker.EthereumAnnouncement) (*ethTypes.Transaction, error) {
-	var (
-		hashString = announcement.TransactionHash.String()
-		fromString = announcement.FromAddress.String()
-		toString = announcement.ToAddress.String()
-		ballsUint = announcement.SourceRandom
-		payoutsBigInt = announcement.SourcePayouts
-	)
-
-	var (
-		hash = ethCommon.HexToHash(hashString)
-		from = ethCommon.HexToAddress(fromString)
-		to = ethCommon.HexToAddress(toString)
-		balls   []*big.Int
-		payouts []*big.Int
-	)
-	for _, p := range payoutsBigInt {
-		payouts = append(payouts, &p.Int)
-	}
-
-	for _, ball := range ballsUint {
-		ballBigInt := big.NewInt(int64(ball))
-		balls = append(balls, ballBigInt)
-	}
-
+func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []worker.EthereumWinnerAnnouncement) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
 		fluidityContractAbi,
@@ -128,12 +123,8 @@ func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address,
 
 	transaction, err := boundContract.Transact(
 		transactionOptions,
-		"reward",
-		hash,
-		from,
-		to,
-		balls,
-		payouts,
+		"batchReward",
+		announcement,
 	)
 
 	if err != nil {
