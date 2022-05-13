@@ -1,0 +1,42 @@
+[
+  {
+    "symbol": "USDT",
+    "name": "USD Tether",
+    "address": "0x4988a896b1227218e4a686fde5eabdcabd91571f",
+    "colour": "rgb(36,163,124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "decimals": 6,
+    "amount": "0.0",
+    "pinned": true
+  },
+  {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "address": "0xb12bfca5a55806aaf64e99521918a4bf0fc40802",
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "decimals": 6,
+    "amount": "0.0",
+    "pinned": true
+  },
+  {
+    "symbol": "fUSDT",
+    "name": "FLUID USD Tether",
+    "address": "",
+    "colour": "#rgb(36, 163, 124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "decimals": 6,
+    "amount": "0.0",
+    "pinned": true
+  },
+  {
+    "symbol": "fUSDC",
+    "name": "FLUID USD Coin",
+    "address": "",
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "decimals": 6,
+    "amount": "0.0",
+    "pinned": true
+  }
+]
