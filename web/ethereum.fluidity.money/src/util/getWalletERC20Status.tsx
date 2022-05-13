@@ -7,6 +7,7 @@ import ropsten from "../config/ropsten-tokens.json";
 import testing from "../config/testing-tokens.json";
 import kovan from "../config/kovan-tokens.json";
 import aurora from "../config/aurora-mainnet-tokens.json";
+import mainnet from "../config/mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { Signer } from "ethers";
 import { parseUnits } from "ethers/utils";
@@ -30,6 +31,8 @@ const getWalletERC20Status = async (signer: Signer) => {
       (kovan as TokenKind[]) :
     chainId === ChainId.AuroraMainnet ?
       (aurora as TokenKind[]) :
+    chainId === ChainId.Mainnet ?
+      (mainnet as TokenKind[]) :
       (ropsten as TokenKind[]);
 
   // If signer is defined (someone is logged in), nothing happens.
