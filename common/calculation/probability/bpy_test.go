@@ -4,7 +4,6 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/fluidity-money/fluidity-app/lib/log/breadcrumb"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,12 +11,11 @@ func TestCalculateBpy(t *testing.T) {
 	var (
 		blockTime     = 15
 		compSupplyApy = big.NewRat(100, 10)
-		c             = breadcrumb.NewBreadcrumb()
 		// (15 * 10) / 31536000 = 0.00005 = 1/210240
 		expected = big.NewRat(1, 210240)
 	)
 
-	result := CalculateBpy(uint64(blockTime), compSupplyApy, c)
+	result := CalculateBpy(uint64(blockTime), compSupplyApy)
 	assert.Equal(t, expected, result)
 }
 

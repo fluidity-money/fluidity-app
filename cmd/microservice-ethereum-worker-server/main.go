@@ -10,6 +10,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
+	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	moving_average "github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
@@ -35,6 +36,10 @@ const (
 	// is aave based
 	BackendAave = "aave"
 
+	// BackendAurora to use as the environment variable for Aurora 
+	// to use Flux as a price oracle
+	BackendAurora = "aurora"
+
 	// CompoundBlocksPerDay to use when calculating Compound's APY
 	// (set to 13.5 seconds per block)
 	CompoundBlocksPerDay = 6570
@@ -46,15 +51,15 @@ const (
 	// transfer condition
 	CurrentAtxTransactionMargin = 0
 
-	// EthereumDecimalPlaces to use when normalising Eth to USDT
-	EthereumDecimalPlaces = 1e6
-
 	// DefaultTransfersInBlock to use when the average transfers in the block
 	// are below 0
 	DefaultTransfersInBlock = 0
 
 	// SecondsInOneYear to use for ATX calculation
 	SecondsInOneYear = 365 * 24 * 60 * 60
+
+	// UsdtDecimals to normalise values to
+	UsdtDecimals = 1e6
 )
 
 const (
@@ -96,6 +101,16 @@ const (
 	// when converting to USDT
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
+	// EnvEthereumDecimalPlaces to use when normalising Eth to USDT
+	EnvEthereumDecimalPlaces = `FLU_ETHEREUM_ETH_DECIMAL_PLACES`
+
+	// EnvAuroraEthFluxAddress for fetching the price of Eth from a Flux oracle
+	EnvAuroraEthFluxAddress = `FLU_AURORA_ETH_FLUX_ADDRESS`
+
+	// EnvAuroraTokenFluxAddress for fetching the price of the underlying token
+	// from a Flux oracle
+	EnvAuroraTokenFluxAddress = `FLU_AURORA_TOKEN_FLUX_ADDRESS`
+
 	// EnvPublishAmqpQueue name to use when sending server-tracked transfers
 	// to the client
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
@@ -124,10 +139,37 @@ func main() {
 		ethTokenAddress_            = os.Getenv(EnvEthTokenAddress)
 		underlyingTokenAddress_     = os.Getenv(EnvUnderlyingTokenAddress)
 		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
+
+		ethereumDecimalPlaces_      = os.Getenv(EnvEthereumDecimalPlaces)
+		ethFluxAddress_             = os.Getenv(EnvAuroraTokenFluxAddress)
+		tokenFluxAddress_           = os.Getenv(EnvAuroraTokenFluxAddress)
+
+		// EthereumDecimalPlaces to use when normalising Eth to USDT
+		EthereumDecimalPlaces *big.Rat
 	)
 
 	rand.Seed(time.Now().Unix())
+	
+	if ethereumDecimalPlaces_ == "" {
+		// default to 6 decimal places
+		EthereumDecimalPlaces = big.NewRat(1e6, 1)
+	} else {
+		// otherwise set to 10^decimals
+		decimals_, err := strconv.Atoi(ethereumDecimalPlaces_)
 
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to parse %v as decimals!",
+					ethereumDecimalPlaces_,
+				)
+				k.Payload = err
+			})
+		}
+
+		EthereumDecimalPlaces = exponentiate(decimals_)
+	}
+	
 	var (
 		ethContractAddress            ethCommon.Address
 		ethCTokenAddress              ethCommon.Address
@@ -137,6 +179,9 @@ func main() {
 		ethEthTokenAddress            ethCommon.Address
 		ethUnderlyingTokenAddress     ethCommon.Address
 		ethAaveAddressProviderAddress ethCommon.Address
+
+		auroraEthFluxAddress          ethCommon.Address
+		auroraTokenFluxAddress        ethCommon.Address
 	)
 
 	switch tokenBackend {
@@ -202,11 +247,34 @@ func main() {
 		ethUnderlyingTokenAddress = hexToAddress(underlyingTokenAddress)
 		ethEthTokenAddress = hexToAddress(ethTokenAddress)
 
+	case BackendAurora:
+		var (
+			cTokenAddress    = ethereum.AddressFromString(cTokenAddress_)
+			ethFluxAddress   = ethereum.AddressFromString(ethFluxAddress_)
+			tokenFluxAddress = ethereum.AddressFromString(tokenFluxAddress_)
+		)
+
+		if cTokenAddress == "" || ethFluxAddress == "" || tokenFluxAddress == "" {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"%s set to aurora, but missing %s, %s, or %s!",
+					EnvTokenBackend,
+					EnvCTokenAddress,
+					EnvAuroraEthFluxAddress,
+					EnvAuroraTokenFluxAddress,
+				)
+			})
+		}
+
+		ethCTokenAddress       = hexToAddress(cTokenAddress)
+		auroraEthFluxAddress   = hexToAddress(ethFluxAddress)
+		auroraTokenFluxAddress = hexToAddress(tokenFluxAddress)
+
 	default:
 
 		log.Fatal(func(k *log.Log) {
 			k.Format(
-				"%s should be `aave` or `compound`, got %s",
+				"%s should be `aave`, `compound`, or `aurora`, got %s",
 				EnvTokenBackend,
 				tokenBackend,
 			)
@@ -368,6 +436,12 @@ func main() {
 				ethEthTokenAddress,
 				ethUsdTokenAddress,
 			)
+
+		case BackendAurora:
+			ethPriceUsd, err = flux.GetPrice(
+				gethClient,
+				auroraEthFluxAddress,	
+			)
 		}
 
 		if err != nil {
@@ -379,11 +453,11 @@ func main() {
 
 		// normalise the ethereum price!
 
-		ethPriceUsd.Quo(ethPriceUsd, big.NewRat(EthereumDecimalPlaces, 1))
+		ethPriceUsd.Quo(ethPriceUsd, EthereumDecimalPlaces)
 
 		var tokenApy *big.Rat
 
-		if tokenBackend == BackendCompound {
+		if tokenBackend == BackendCompound || tokenBackend == BackendAurora {
 			tokenApy, err = compound.GetTokenApy(
 				gethClient,
 				ethCTokenAddress,
@@ -460,6 +534,30 @@ func main() {
 					k.Payload = err
 				})
 			}
+		} else if tokenBackend == BackendAurora {
+			tokenPriceInUsdt, err = flux.GetPrice(
+				gethClient,
+				auroraTokenFluxAddress,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the token price in USDT! Flux Oracle Address address %#v",
+						auroraTokenFluxAddress,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			// normalise the token price!
+			// tokenPrice / 10^(fluxDecimals-usdtDecimals)
+			UsdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
+
+			decimalDifference := new(big.Rat).Quo(EthereumDecimalPlaces, UsdtDecimalsRat)
+
+			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
 		}
 
 		// if the token apy is below the average, then we take the current apy
@@ -488,7 +586,7 @@ func main() {
 
 		var balanceOfUnderlying *big.Rat
 
-		if tokenBackend == BackendCompound {
+		if tokenBackend == BackendCompound || tokenBackend == BackendAurora {
 			balanceOfUnderlying, err = compound.GetBalanceOfUnderlying(
 				gethClient,
 				ethCTokenAddress,

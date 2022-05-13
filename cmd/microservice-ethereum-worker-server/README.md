@@ -28,6 +28,9 @@ client.
 | `FLU_ETHEREUM_UNDERLYING_TOKEN_ADDR`        | Underlying token address to use to get the APY of a token from AAVE.          |
 | `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`        | Underlying token name to use to get the APY and to communicate to the worker. |
 | `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`    | Underlying token decimals in place (18 for DAI, 6 for USDT and USDC, etc).    |
+| `FLU_AURORA_ETH_FLUX_ADDRESS`               | Flux oracle address for looking up the price of Eth on Aurora.                |
+| `FLU_AURORA_TOKEN_FLUX_ADDRESS`             | Flux oracle address for looking up the price of the current token on Aurora.  |
+| `FLU_ETHEREUM_ETH_DECIMAL_PLACES`           | Token decimals returned for the value of Eth by Flux oracles (usu. 8).        |
 | `FLU_ETHEREUM_AMQP_QUEUE_NAME`              | Queue name to send messages down from the worker server to the client.        |
 | `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY` | Moving average key to use to track the APY with using Redis.                  |
 

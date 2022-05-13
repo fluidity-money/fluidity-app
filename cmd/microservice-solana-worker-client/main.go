@@ -78,20 +78,20 @@ func main() {
 		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 
-		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
-		fluidMintPubkey   = pubkeyFromEnv(EnvFluidityMintPubkey)
-		obligationPubkey  = pubkeyFromEnv(EnvObligationPubkey)
-		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
+		fluidityPubkey   = pubkeyFromEnv(EnvFluidityPubkey)
+		fluidMintPubkey  = pubkeyFromEnv(EnvFluidityMintPubkey)
+		obligationPubkey = pubkeyFromEnv(EnvObligationPubkey)
+		reservePubkey    = pubkeyFromEnv(EnvReservePubkey)
 
-		tokenName         = util.GetEnvOrFatal(EnvTokenName)
+		tokenName = util.GetEnvOrFatal(EnvTokenName)
 
-		debugFakePayouts  = os.Getenv(EnvDebugFakePayouts) == "true"
+		debugFakePayouts = os.Getenv(EnvDebugFakePayouts) == "true"
 	)
 
 	var (
-		obligationString  = fmt.Sprintf("FLU:%s_OBLIGATION", tokenName)
-		obligationBytes_  = []byte(obligationString)
-		obligationBytes   = [][]byte{obligationBytes_}
+		obligationString = fmt.Sprintf("FLU:%s_OBLIGATION", tokenName)
+		obligationBytes_ = []byte(obligationString)
+		obligationBytes  = [][]byte{obligationBytes_}
 	)
 
 	pdaPubkey, bumpSeed, err := solana.FindProgramAddress(

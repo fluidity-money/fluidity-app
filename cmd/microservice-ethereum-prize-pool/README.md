@@ -22,9 +22,10 @@ over the shared bus.
 
 Tokens should be passed to this program like the following:
 
-	<contract address>:<underlying token name>:<number of decimal places>:<optional underlying token address>:<optional token backend>
+	<contract address>:<underlying token name>:<number of decimal places>:<optional underlying token address | optional flux oracle address>:<optional token backend>
 
-The fourth parameter is required on AAVE-based platforms for price lookup.
+The fourth paramter is required on AAVE-based Ethereum platforms and Aurora for price lookup.
+The final paramter is required for deployments utilising both Compound and AAVE backed tokens.
 
 The final parameter is required for deployments utilising both Compound and AAVE backed tokens.
 
