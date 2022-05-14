@@ -65,10 +65,15 @@ func main() {
 		solanaTokensList_   = os.Getenv(EnvSolanaTokensList)
 	)
 
-	var (
+	var ethereumTokensList, solanaTokensList []util.TokenDetailsBase
+
+	if ethereumTokensList_ != "" {
 		ethereumTokensList = util.GetTokensListBase(ethereumTokensList_)
+	}
+
+	if solanaTokensList_ != "" {
 		solanaTokensList   = util.GetTokensListBase(solanaTokensList_)
-	)
+	}
 
 	today := time.Now()
 
