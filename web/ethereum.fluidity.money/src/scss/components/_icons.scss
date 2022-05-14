@@ -259,7 +259,7 @@
   background-size: cover;
 }
 
-.clear-search-icon {
+.clear-icon {
   position: absolute;
   cursor: pointer;
   width: 10px;
@@ -271,6 +271,13 @@
   &:hover {
     opacity: 1;
     background-color: #0f2339;
+  }
+  &--modal {
+    @extend .clear-icon;
+    width: 15px;
+    right: 15px;
+    top: 15px;
+    border-radius: 0.45rem;
   }
 }
 
