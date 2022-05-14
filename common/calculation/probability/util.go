@@ -4,6 +4,9 @@ import (
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 func intToRat(x int) *big.Rat {
@@ -28,4 +31,11 @@ func debug(format string, arguments ...interface{}) {
 	log.Debug(func(k *log.Log) {
 		k.Format(format, arguments...)
 	})
+}
+
+func getTestEmission(network string, token string, decimal uint) *worker.Emission {
+	emission := worker.NewEthereumEmission()
+	emission.Network = network
+	emission.TokenDetails = token_details.New(token, int(decimal))
+	return emission
 }

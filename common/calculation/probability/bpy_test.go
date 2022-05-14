@@ -11,11 +11,12 @@ func TestCalculateBpy(t *testing.T) {
 	var (
 		blockTime     = 15
 		compSupplyApy = big.NewRat(100, 10)
+		c             = getTestEmission("ethereum", "usdt", 6)
 		// (15 * 10) / 31536000 = 0.00005 = 1/210240
 		expected = big.NewRat(1, 210240)
 	)
 
-	result := CalculateBpy(uint64(blockTime), compSupplyApy)
+	result := CalculateBpy(uint64(blockTime), compSupplyApy, c)
 	assert.Equal(t, expected, result)
 }
 

@@ -38,17 +38,18 @@ func TestFactorial(t *testing.T) {
 }
 
 func TestNaiveIsWinning(t *testing.T) {
+	emission := getTestEmission("ethereum", "usdt", 6)
 	// number of balls <= len(balls)
-	result := NaiveIsWinning([]uint32{5, 3, 1})
+	result := NaiveIsWinning([]uint32{5, 3, 1}, emission)
 	assert.Equal(t, 2, result)
 
-	result = NaiveIsWinning([]uint32{5, 8, 11})
+	result = NaiveIsWinning([]uint32{5, 8, 11}, emission)
 	assert.Equal(t, 0, result)
 
-	result = NaiveIsWinning([]uint32{5, 8, 6, 2})
+	result = NaiveIsWinning([]uint32{5, 8, 6, 2}, emission)
 	assert.Equal(t, 1, result)
 
-	result = NaiveIsWinning([]uint32{5, 4, 3, 2, 1})
+	result = NaiveIsWinning([]uint32{5, 4, 3, 2, 1}, emission)
 	assert.Equal(t, 5, result)
 }
 
@@ -81,14 +82,14 @@ func TestCalculateN(t *testing.T) {
 		t,
 		"infinite loop",
 		func() {
-			calculateN(m, g, atx)
+			calculateN(m, g, atx, getTestEmission("ethereum", "usdt", 6))
 		},
 	)
 
 	g = big.NewRat(3, 1)
 	atx = big.NewRat(4728, 1)
 
-	result := calculateN(m, g, atx)
+	result := calculateN(m, g, atx, getTestEmission("ethereum", "usdt", 6))
 	assert.EqualValues(t, 12, result)
 }
 
@@ -105,11 +106,8 @@ func TestPayout(t *testing.T) {
 		blockTime  = uint64(0)
 	)
 
-	result := payout(atx, apy, g, rewardPool, m, n, b, blockTime)
-
-	// should be accurate to 2 decimal places, so trim then remove the last to
-	// avoid rounding
-
+	result := payout(atx, apy, g, rewardPool, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))
+	// should be accurate to 2 decimal places, so trim then remove the last to avoid rounding
 	rf := result.FloatString(3)
 	trimmedResult := rf[:len(rf)-1]
 	expected := "7.12"
@@ -122,8 +120,7 @@ func TestPayout(t *testing.T) {
 
 	expectedRat := big.NewRat(71344570743089, 959979214533768)
 
-	result = payout(atx, apy, g, rewardPool, m, n, b, blockTime)
-
+	result = payout(atx, apy, g, rewardPool, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))
 	assert.Equal(t, expectedRat, result)
 }
 
@@ -136,6 +133,7 @@ func TestWinningChances(t *testing.T) {
 		decimalPlacesRat        = big.NewRat(6, 1)
 		averageTransfersInBlock = 13
 		blockTimeInSeconds      = uint64(15)
+		crumb                   = getTestEmission("ethereum", "usdt", 6)
 
 		expectedN       = uint(66)
 		expectedPayouts = []*misc.BigInt{}
