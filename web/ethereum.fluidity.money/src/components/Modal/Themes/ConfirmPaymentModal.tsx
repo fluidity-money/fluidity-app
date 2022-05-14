@@ -10,10 +10,10 @@ import kovan from "../../../config/kovan-tokens.json";
 import aurora from "../../../config/aurora-mainnet-tokens.json";
 import mainnet from "../../../config/mainnet-tokens.json";
 import { modalToggle } from "components/context";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { TokenKind, Token as TokenType } from "components/types";
 import { SupportedContracts } from "util/contractList";
-import ChainId, {chainIdFromEnv} from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const ConfirmPaymentModal = ({
   enable,
@@ -47,16 +47,16 @@ const ConfirmPaymentModal = ({
   // Assigns the correct json file based on ChainId
   const chainId = chainIdFromEnv();
   const data =
-    chainId === ChainId.Ropsten ?
-      (ropsten as TokenKind[]) :
-    chainId === ChainId.Hardhat ?
-      (testing as TokenKind[]) :
-    chainId === ChainId.Kovan ?
-      (kovan as TokenKind[]) :
-    chainId === ChainId.AuroraMainnet ?
-      (aurora as TokenKind[]) :
-    chainId === ChainId.Mainnet ?
-      (mainnet as TokenKind[])
+    chainId === ChainId.Ropsten
+      ? (ropsten as TokenKind[])
+      : chainId === ChainId.Hardhat
+      ? (testing as TokenKind[])
+      : chainId === ChainId.Kovan
+      ? (kovan as TokenKind[])
+      : chainId === ChainId.AuroraMainnet
+      ? (aurora as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
       : (ropsten as TokenKind[]);
 
   const ext = data.slice(0, data.length / 2);

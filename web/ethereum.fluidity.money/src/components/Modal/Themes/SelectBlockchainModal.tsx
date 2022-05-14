@@ -33,6 +33,7 @@ const SelectBlockchainModal = ({
       networks: [
         { name: "Ropsten", address: "https://ropsten.beta.fluidity.money/" },
         { name: "Kovan", address: "https://kovan.beta.fluidity.money/" },
+        { name: "Aurora", address: "https://aurora.beta.fluidity.money/" },
       ],
     },
     {

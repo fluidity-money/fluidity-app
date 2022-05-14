@@ -31,6 +31,8 @@ import { TokenKind } from "components/types";
 import ropsten from "./config/ropsten-tokens.json";
 import testing from "./config/testing-tokens.json";
 import kovan from "./config/kovan-tokens.json";
+import aurora from "./config/aurora-mainnet-tokens.json";
+import mainnet from "./config/mainnet-tokens.json";
 
 const App = () => {
   const chainId = chainIdFromEnv();
@@ -79,6 +81,10 @@ const App = () => {
       ? (testing as TokenKind[])
       : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
+      : chainId === ChainId.AuroraMainnet
+      ? (aurora as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
       : (ropsten as TokenKind[]);
 
   // pinned tokens for fluid and non-fluid in token select modal

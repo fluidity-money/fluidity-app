@@ -21,6 +21,8 @@ const NetworkButton = () => {
             ? "Kovan"
             : chainIdFromEnv() === 1
             ? "Mainnet"
+            : chainIdFromEnv() === 1313161554
+            ? "Aurora"
             : "Ethereum"}
         </div>
       </div>
