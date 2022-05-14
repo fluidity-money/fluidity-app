@@ -79,6 +79,48 @@
   align-content: center;
   overflow-y: auto;
 
+  &:hover {
+    overflow-y: scroll;
+    &::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
+      border: 2px solid #051323;
+    }
+    &::-webkit-scrollbar-track {
+      background: #051323;
+      border-radius: 10px;
+    }
+  }
+
+  /* width */
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-track:hover {
+    background: #555;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    background: transparent;
+    border: 2px solid #051323;
+    border-radius: 10px;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.844);
+    border: none;
+  }
+
   margin: 0 1rem 1rem 1rem;
 
   & > * {
@@ -317,6 +359,7 @@
   display: flex;
   flex-wrap: wrap;
   margin: 0.75rem 0.75rem 0;
+  justify-content: center;
 }
 
 .pinned {
@@ -346,6 +389,9 @@
         opacity: 0.7;
       }
     }
+  }
+  @include for-below-470 {
+    margin: 3px;
   }
 }
 
@@ -393,7 +439,7 @@
 .token-list-item {
   display: flex;
   cursor: pointer;
-  padding-right: 1rem;
+  padding-right: 0.2rem;
 }
 
 .not-found-text {
@@ -403,5 +449,24 @@
 
 .token-list {
   height: 12rem;
-  margin: 0 0.1rem 1rem 1rem;
+  margin: 0 0.25rem 1rem 1rem;
+}
+
+.blockchain-container {
+  background-color: transparent;
+  border: solid 2px #333333;
+  border-radius: 10px;
+  margin-left: 3px;
+  margin-right: 3px;
+  &--closed {
+    @extend .blockchain-container;
+    background-color: transparent;
+  }
+}
+
+.line {
+  background-color: #333333;
+  height: 1px;
+  border: none;
+  width: 81%;
 }

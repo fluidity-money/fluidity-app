@@ -55,7 +55,13 @@ const SelectBlockchainModal = ({
   const renderedOptions = options.map(
     ({ blockchain, icon, networks, visible }, index) => {
       return (
-        <>
+        <div
+          className={
+            visible === true
+              ? "blockchain-container"
+              : "blockchain-container--closed"
+          }
+        >
           <Button
             label={blockchain}
             key={index}
@@ -78,6 +84,7 @@ const SelectBlockchainModal = ({
 
             // disabled={isConnected}
           />
+          {visible === true && <hr className="line" />}
           {visible === true &&
             networks.map((network, idx) => (
               <div
@@ -92,7 +99,7 @@ const SelectBlockchainModal = ({
                 <div className="primary-text">{network.name}</div>
               </div>
             ))}
-        </>
+        </div>
       );
     }
   );
