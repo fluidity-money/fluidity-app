@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -13,7 +14,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 
 	"github.com/gagliardetto/solana-go"
@@ -67,6 +68,12 @@ const (
 )
 
 const (
+	// Chain for filtering TRF var in Timescale
+	TrfChain = `solana`
+
+	// Network for filtering TRF var in Timescale
+	TrfNetwork = `devnet`
+
 	// SolanaBlockTime assumed by the ATX calculation
 	SolanaBlockTime uint64 = 1
 
@@ -244,12 +251,26 @@ func main() {
 
 			// send emissions out that can be actioned on when the loop ends
 
-
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
 
 			defer queue.SendMessage(worker.TopicEmissions, emission)
+
+			tribecaDataStoreTrfVars := payout.GetLatestCalculatenArgs(TrfChain, TrfNetwork)
+
+			var (
+				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
+				payoutFreqNum    = tribecaDataStoreTrfVars.PayoutFreqNum
+				payoutFreqDenom  = tribecaDataStoreTrfVars.PayoutFreqDenom
+				deltaWeightNum   = tribecaDataStoreTrfVars.DeltaWeightNum
+				deltaWeightDenom = tribecaDataStoreTrfVars.DeltaWeightDenom
+			)
+
+			var (
+				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
+				deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
+			)
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
@@ -259,6 +280,9 @@ func main() {
 				bpyStakedUsd,
 				sizeOfThePool,
 				decimalPlacesRat,
+				payoutFreq,
+				deltaWeight,
+				winningClasses,
 				fluidTransfers,
 				SolanaBlockTime,
 				emission,

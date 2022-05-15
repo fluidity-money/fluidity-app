@@ -20,11 +20,13 @@ type TribecaProgramData = solana.TribecaProgramData
 
 func InsertNArgs(calculateNArgs TribecaProgramData) {
 	var (
-		chain   = calculateNArgs.Chain
-		network = calculateNArgs.Network
-		delta   = calculateNArgs.Delta
-		m       = calculateNArgs.M
-		freqDiv = calculateNArgs.FreqDiv
+		chain            = calculateNArgs.Chain
+		network          = calculateNArgs.Network
+		payoutFreqNum    = calculateNArgs.PayoutFreqNum
+		payoutFreqDenom  = calculateNArgs.PayoutFreqDenom
+		deltaWeightNum   = calculateNArgs.DeltaWeightNum
+		deltaWeightDenom = calculateNArgs.DeltaWeightDenom
+		winningClasses   = calculateNArgs.WinningClasses
 	)
 
 	timescaleClient := timescale.Client()
@@ -33,9 +35,11 @@ func InsertNArgs(calculateNArgs TribecaProgramData) {
 		`INSERT INTO %s (
 			chain,
 			network,
-			delta,
-			m,
-			freq_div
+			payout_freq_num,
+			payout_freq_denom,
+			delta_weight_num,
+			delta_weight_denom,
+			winning_classes,
 		)
 
 		VALUES (
@@ -43,7 +47,9 @@ func InsertNArgs(calculateNArgs TribecaProgramData) {
 			$2,
 			$3,
 			$4,
-			$5
+			$5,
+			$6,
+			$7
 		)`,
 
 		TableCalculateN,
@@ -53,9 +59,11 @@ func InsertNArgs(calculateNArgs TribecaProgramData) {
 		statementText,
 		chain,
 		network,
-		delta,
-		m,
-		freqDiv,
+		payoutFreqNum,
+		payoutFreqDenom,
+		deltaWeightNum,
+		deltaWeightDenom,
+		winningClasses,
 	)
 
 	if err != nil {
@@ -75,9 +83,11 @@ func GetLatestCalculatenArgs(chain, network string) TribecaProgramData {
 		`SELECT
 			chain,
 			network,
-			delta,
-			m,
-			freq_div
+			payout_freq_num,
+			payout_freq_denom,
+			delta_weight_num,
+			delta_weight_denom,
+			winning_classes
 		FROM %s
 		WHERE chain = %s AND network = %s
 		ORDER BY time DESC
@@ -95,9 +105,11 @@ func GetLatestCalculatenArgs(chain, network string) TribecaProgramData {
 	err := rowsCalculateNArgs.Scan(
 		&calculateNArgs.Chain,
 		&calculateNArgs.Network,
-		&calculateNArgs.Delta,
-		&calculateNArgs.M,
-		&calculateNArgs.FreqDiv,
+		&calculateNArgs.PayoutFreqNum,
+		&calculateNArgs.PayoutFreqDenom,
+		&calculateNArgs.DeltaWeightNum,
+		&calculateNArgs.DeltaWeightDenom,
+		&calculateNArgs.WinningClasses,
 	)
 
 	if err != nil {

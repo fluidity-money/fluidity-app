@@ -593,12 +593,15 @@ func main() {
 				bpyStakedUsd,
 				sizeOfThePool,
 				underlyingTokenDecimalsRat,
+				fluidity.PayoutFreq,
+				fluidity.DeltaWeight,
+				fluidity.WinningClasses,
 				btx,
 				secondsSinceLastBlock,
 				emission,
 			)
 
-			res := generateRandomIntegers(probability.WinningClasses, 1, int(randomN))
+			res := generateRandomIntegers(fluidity.WinningClasses, 1, int(randomN))
 
 			// create announcement and container
 
@@ -611,7 +614,7 @@ func main() {
 			tokenDetails := token_details.TokenDetails{
 				TokenShortName: tokenName,
 				TokenDecimals:  underlyingTokenDecimals,
-			}	
+			}
 
 			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
