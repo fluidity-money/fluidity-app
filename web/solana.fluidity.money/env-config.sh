@@ -1,6 +1,8 @@
 export \
 	REACT_APP_API_URL=https://app.solana.beta.fluidity.money:8081 \
-	REACT_APP_WEBSOCKET=wss://app.solana.beta.fluidity.money:8081/updates \
+	REACT_APP_WEBSOCKET=wss://app.solana.beta.fluidity.money:8081/updates	
+        
+export \
 	REACT_APP_FLUID_PROGRAM_ID=HXCKzsLf5ohVEYo5shk7MjhbqeUemwikBj4667aPhmK9 \
 	REACT_APP_FLU_MINT_USDC=5jsh1taLrqNgiV3UN8diDxZAXRC7T4iALfNWwThBksoj \
         REACT_APP_FLU_OBLIGATION_USDC=AzC4PyevxfhrRcY4x7Xm94PQyf9nfjcheLsSiE53Rcy \
