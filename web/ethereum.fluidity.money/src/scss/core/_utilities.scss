@@ -161,6 +161,11 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
 
   -webkit-text-fill-color: transparent;
   -moz-text-fill-color: transparent;
+
+  &--aurora {
+    @extend .primary-text;
+    background: $aurora;
+  }
 }
 
 .primary-text-btn {
