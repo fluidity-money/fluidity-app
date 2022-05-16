@@ -10,13 +10,6 @@ import (
 )
 
 const (
-	// EnvContractAddress is the contract to call when a winner's been found!
-	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
-	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
-
-	// EnvPrivateKey is the hex-encoded private key used to sign calls to the reward function
-	EnvPrivateKey = `FLU_ETHEREUM_WORKER_PRIVATE_KEY`
-
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
 
