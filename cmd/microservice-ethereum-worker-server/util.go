@@ -154,3 +154,19 @@ func anyStringsEmpty(strings ...string) bool {
 
 	return false
 }
+
+// mustEthereumAddressFromString to convert a string to an ethereum address,
+// or fatal if it's invalid
+func mustEthereumAddressFromString(addressString string) ethereum.Address {
+	address := ethereum.AddressFromString(addressString)
+	if address == "" {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to convert %v to an ethereum address!",
+				addressString,
+			)
+		})
+	}
+
+	return address
+}
