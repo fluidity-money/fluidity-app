@@ -45,7 +45,7 @@ export const getFluidInstructionKeys = async (
   if (!obligationInfo) return null;
 
   //find the solend asset and reserve
-  const market = solendAddress.markets.find(({ name }) => name === "main");
+  const market = [...solendAddress.markets].find(({ name }) => name === "main");
   if (!market) return null;
 
   const reserve = market.reserves.find(({ asset }) => asset === token.symbol);
