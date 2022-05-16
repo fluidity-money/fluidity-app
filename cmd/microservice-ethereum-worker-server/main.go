@@ -457,7 +457,10 @@ func main() {
 
 		var tokenApy *big.Rat
 
-		if tokenBackend == BackendCompound || tokenBackend == BackendAurora {
+		switch tokenBackend {
+		case BackendAurora:
+			fallthrough
+		case BackendCompound:
 			tokenApy, err = compound.GetTokenApy(
 				gethClient,
 				ethCTokenAddress,
@@ -474,7 +477,7 @@ func main() {
 					)
 				})
 			}
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			tokenApy, err = aave.GetTokenApy(
 				gethClient,
 				ethAaveAddressProviderAddress,
@@ -499,7 +502,9 @@ func main() {
 		)
 
 		var tokenPriceInUsdt *big.Rat
-		if tokenBackend == BackendCompound {
+
+		switch tokenBackend {
+		case BackendCompound:
 			tokenPriceInUsdt, err = uniswap_anchored_view.GetPrice(
 				gethClient,
 				ethUniswapAnchoredViewAddress,
@@ -517,7 +522,7 @@ func main() {
 					k.Payload = err
 				})
 			}
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			tokenPriceInUsdt, err = aave.GetPrice(
 				gethClient,
 				ethAaveAddressProviderAddress,
@@ -534,7 +539,7 @@ func main() {
 					k.Payload = err
 				})
 			}
-		} else if tokenBackend == BackendAurora {
+		case BackendAurora:
 			tokenPriceInUsdt, err = flux.GetPrice(
 				gethClient,
 				auroraTokenFluxAddress,
@@ -586,7 +591,10 @@ func main() {
 
 		var balanceOfUnderlying *big.Rat
 
-		if tokenBackend == BackendCompound || tokenBackend == BackendAurora {
+		switch tokenBackend {
+		case BackendAurora:
+			fallthrough
+		case BackendCompound:
 			balanceOfUnderlying, err = compound.GetBalanceOfUnderlying(
 				gethClient,
 				ethCTokenAddress,
@@ -604,7 +612,7 @@ func main() {
 				})
 			}
 
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			balanceOfUnderlying, err = aave.GetBalanceOf(
 				gethClient,
 				ethATokenAddress,
