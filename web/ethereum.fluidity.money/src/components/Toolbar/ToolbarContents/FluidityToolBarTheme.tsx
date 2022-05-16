@@ -14,6 +14,7 @@ import {
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
 import NetworkButton from "components/Button/NetworkButton";
+import { chainIdFromEnv } from "util/chainId";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -131,7 +132,11 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
                     label="Enable Notifications"
-                    theme={"primary-button--toolbar mx-1-r"}
+                    theme={
+                      chainIdFromEnv() === 1313161554
+                        ? "primary-button-aurora--toolbar mx-1-r"
+                        : "primary-button--toolbar mx-1-r"
+                    }
                     goto={checkNotifications}
                     padding="p-0_5"
                   />
@@ -155,7 +160,11 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               ) : (
                 <Button
                   label={"Connect Wallet"}
-                  theme={"primary-button--toolbar"}
+                  theme={
+                    chainIdFromEnv() === 1313161554
+                      ? "primary-button-aurora--toolbar"
+                      : "primary-button--toolbar"
+                  }
                   goto={() => {
                     setToggle(true);
                   }}

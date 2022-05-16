@@ -362,7 +362,11 @@ const SwapBox = () => {
               goto={() => {
                 wallet.status == "connected" ? switchPayment() : switchWallet();
               }}
-              theme={"primary-button"}
+              theme={
+                chainIdFromEnv() === 1313161554
+                  ? "primary-button-aurora"
+                  : "primary-button"
+              }
               padding="py-1"
               disabled={
                 (isNonZero(amount, decimals) &&

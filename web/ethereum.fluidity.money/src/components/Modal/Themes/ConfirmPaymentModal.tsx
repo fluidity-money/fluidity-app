@@ -159,7 +159,11 @@ const ConfirmPaymentModal = ({
         <Button
           label="Confirm"
           goto={confirmTrigger}
-          theme={"payment-button primary-button"}
+          theme={
+            chainIdFromEnv() === 1313161554
+              ? "payment-button primary-button-aurora"
+              : "payment-button primary-button"
+          }
         />
       </div>
     </GenericModal>

@@ -2,6 +2,7 @@ import Button from "components/Button";
 import Header from "components/Header";
 import { useHistory } from "react-router-dom";
 import Routes from "util/api/types";
+import { chainIdFromEnv } from "util/chainId";
 
 type left = {
   rewardPool: Routes["/prize-pool"];
@@ -30,7 +31,11 @@ const Left = ({ rewardPool }: left) => {
           goto={() => {
             history.push("/");
           }}
-          theme={"primary-button"}
+          theme={
+            chainIdFromEnv() === 1313161554
+              ? "primary-button-aurora"
+              : "primary-button"
+          }
           className="reward-pool-button"
         />
       </div>
