@@ -88,8 +88,8 @@ type (
 
 	EthereumWinnerAnnouncement struct {
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
-		FromAddress     string                     `json:"from_address"`
-		ToAddress       string                     `json:"to_address"`
+		FromAddress     ethereum.Address           `json:"from_address"`
+		ToAddress       ethereum.Address           `json:"to_address"`
 		WinAmount       *misc.BigInt               `json:"win_amount"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
 	}

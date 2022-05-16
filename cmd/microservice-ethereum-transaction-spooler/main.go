@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	// EnvRewardsAmqpQueueName is the queue to post winners down
-	EnvRewardsAmqpQueueName = `FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME`
+    // EnvRewardsAmqpQueueName is the queue to post winners down
+    EnvRewardsAmqpQueueName = `FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME`
 
     // EnvPublishAmqpQueueName is the queue to post batched winners down
     EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
@@ -76,20 +76,50 @@ func main() {
 
         scaledWinAmount := new(misc.BigInt).Div(&winAmount.Int, tokenDecimalsNum)
 
+        log.Debug(func (k *log.Log) {
+            k.Format(
+                "Reward value is $%s, instant send threshhold is $%d.",
+                scaledWinAmount.String(),
+                instantRewardTreshhold,
+            )
+        })
+
         if scaledWinAmount.Int64() >= instantRewardTreshhold {
+            log.Debug(func (k *log.Log) {
+                k.Message = "Transaction won more than instant send thresshold, sending instantly!"
+            })
             sendRewards(batchedRewardsQueue, tokenDetails)
 
             return
         }
+
+        log.Debug(func (k *log.Log) {
+            k.Message = "Transaction won less than instant send thresshold, not sending yet!"
+        })
 
         totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
 
         scaledTotalRewards := new(big.Int).Div(totalRewards, tokenDecimalsNum)
 
+        log.Debug(func (k *log.Log) {
+            k.Format(
+                "Total pending rewards are $%s, threshhold is $%d.",
+                scaledTotalRewards.String(),
+                totalRewardTreshhold,
+            )
+        })
+
         if scaledTotalRewards.Int64() >= totalRewardTreshhold {
+            log.Debug(func (k *log.Log) {
+                k.Message = "Total pending rewards are greater than thresshold, sending!"
+            })
             sendRewards(batchedRewardsQueue, tokenDetails)
 
             return
         }
+
+        log.Debug(func (k *log.Log) {
+            k.Message = "Total pending rewards are less than threshhold, not sending yet!"
+        })
     })
 }

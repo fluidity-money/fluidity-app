@@ -49,6 +49,7 @@ func main() {
 			sourceRandom                = announcement.SourceRandom
 			sourcePayouts               = announcement.SourcePayouts
 			emission                    = announcement.Emissions
+			tokenDetails                = announcement.TokenDetails
 		)
 
 		if err != nil {
@@ -113,9 +114,10 @@ func main() {
 
 		winAnnouncement := worker.EthereumWinnerAnnouncement {
 			TransactionHash: announcementTransactionHash,
-			FromAddress: fromAddress.String(),
-			ToAddress: toAddress.String(),
+			FromAddress: fromAddress,
+			ToAddress: toAddress,
 			WinAmount: winningAmount,
+			TokenDetails: tokenDetails,
 		}
 
 		queue.SendMessage(rewardsAmqpQueueName, winAnnouncement)
