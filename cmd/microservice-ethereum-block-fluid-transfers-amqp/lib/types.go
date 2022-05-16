@@ -1,6 +1,8 @@
 package microservice_ethereum_block_fluid_transfers_amqp
 
 import (
+	"encoding/json"
+
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -65,8 +67,9 @@ type (
 	}
 
 	BlocksResponse struct {
-		JsonRpc string `json:"jsonrpc"`
-		Id      string `json:"id"`
-		Result  Block  `json:"result"`
+		JsonRpc string           `json:"jsonrpc"`
+		Id      string           `json:"id"`
+		// this can be Block or null
+		Result  json.RawMessage  `json:"result"`
 	}
 )
