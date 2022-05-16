@@ -35,10 +35,6 @@ const (
 
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
-
-	// ethereumNullAddress to filter for not including in either side of a
-	// transfer to prevent burning and minting
-	ethereumNullAddress = "0000000000000000000000000000000000000000"
 )
 
 func main() {

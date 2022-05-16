@@ -20,8 +20,12 @@ const (
     // EnvPublishAmqpQueueName is the queue to post batched winners down
     EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
+    // EnvInstantRewardThreshhold is the amount (in dollars) above which a
+    // reward should be sent instantly
     EnvInstantRewardThreshhold = `FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHHOLD`
 
+    // EnvInstantRewardThreshhold is the amount (in dollars) above which
+    // rewards should be sent if the total pending amount of rewards is greater
     EnvTotalRewardThreshhold = `FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHHOLD`
 )
 
