@@ -70,6 +70,13 @@ const fluidityContractAbiString = `[
 
 var fluidityContractAbi ethAbi.ABI
 
+type RewardArg struct {
+	FromAddress ethCommon.Address
+	ToAddress ethCommon.Address
+	WinAmount *big.Int
+	TransactionHash ethCommon.Hash
+}
+
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
@@ -121,10 +128,35 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		client,
 	)
 
+	rewards := make([]RewardArg, len(announcement))
+
+	for i, reward := range announcement {
+		var (
+			hashString = reward.TransactionHash.String()
+			fromString = reward.FromAddress.String()
+			toString = reward.ToAddress.String()
+			amountInt = reward.WinAmount
+
+			hash = ethCommon.HexToHash(hashString)
+			from = ethCommon.HexToAddress(fromString)
+			to = ethCommon.HexToAddress(toString)
+			amount = &amountInt.Int
+		)
+
+		rewardArg := RewardArg {
+			TransactionHash: hash,
+			FromAddress: from,
+			ToAddress: to,
+			WinAmount: amount,
+		}
+
+		rewards[i] = rewardArg
+	}
+
 	transaction, err := boundContract.Transact(
 		transactionOptions,
 		"batchReward",
-		announcement,
+		rewards,
 	)
 
 	if err != nil {

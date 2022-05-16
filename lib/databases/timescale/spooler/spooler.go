@@ -129,14 +129,14 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 		`UPDATE %s
 			SET reward_sent = true
 		WHERE
-			reward_send = false
+			reward_sent = false
 			AND token_short_name = $1
 		RETURNING
 			transaction_hash,
 			sender_address,
 			recipient_address,
 			win_amount
-		);`,
+		;`,
 
 		TablePendingWinners,
 	)
