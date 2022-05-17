@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 
+	goSolana "github.com/gagliardetto/solana-go"
 	borsh "github.com/near/borsh-go"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
@@ -17,29 +18,49 @@ const (
 	// EnvSolanaWsUrl is the RPC url of the solana node to connect to
 	EnvSolanaWsUrl = `FLU_SOLANA_WS_URL`
 
-	// EnvFluidityPubkey is the program id of the fluidity program
+	// EnvFluidityPubkey is the program id of the tribeca data store account
 	EnvTribecaDataStorePubkey = `FLU_TRIBECA_DATA_STORE_PUBKEY`
 )
 
 func main() {
 	var (
-		tribecaDataStorePubkey = util.GetEnvOrFatal(EnvTribecaDataStorePubkey)
-		solanaWsUrl            = util.GetEnvOrFatal(EnvSolanaWsUrl)
+		tribecaDataStorePubkey_ = util.GetEnvOrFatal(EnvTribecaDataStorePubkey)
+		solanaWsUrl             = util.GetEnvOrFatal(EnvSolanaWsUrl)
 
-		programNotificationChan = make(chan solana.ProgramNotification)
+		accountNotificationChan = make(chan solana.AccountNotification)
 		errChan                 = make(chan error)
 	)
 
-	solanaSubscription, err := solana.SubscribeProgram(
-		solanaWsUrl,
+	tribecaDataStorePubkey := goSolana.MustPublicKeyFromBase58(tribecaDataStorePubkey_)
+
+	var (
+		tribecaDataStoreString = "calculateNArgs"
+		tribecaDataStoreBytes_ = []byte(tribecaDataStoreString)
+		tribecaDataStoreBytes  = [][]byte{tribecaDataStoreBytes_}
+	)
+
+	tribecaDataStorePda, _, err := goSolana.FindProgramAddress(
+		tribecaDataStoreBytes,
 		tribecaDataStorePubkey,
-		programNotificationChan,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "failed to derive tribeca data store pda!"
+			k.Payload = err
+		})
+	}
+
+	solanaSubscription, err := solana.SubscribeAccount(
+		solanaWsUrl,
+		tribecaDataStorePda.String(),
+		accountNotificationChan,
 		errChan,
 	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to subscribe to solana events!"
+			k.Message = "failed to subscribe to solana events!"
 			k.Payload = err
 		})
 	}
@@ -48,20 +69,20 @@ func main() {
 
 	for {
 		select {
-		case programNotification := <-programNotificationChan:
+		case accountNotification := <-accountNotificationChan:
 			log.Debug(func(k *log.Log) {
 				k.Message = "Tribeca updated CalculateN Args!"
 			})
 
 			var calculateNArgs tribeca.TribecaProgramData
 
-			dataBase64 := programNotification.Value.Account.Data[0]
+			dataBase64 := accountNotification.Value.Data[0]
 
 			dataBinary, err := base64.StdEncoding.DecodeString(dataBase64)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to decode account data from base64!"
+					k.Message = "failed to decode account data from base64!"
 					k.Payload = err
 				})
 			}
@@ -70,30 +91,34 @@ func main() {
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to decode data account!"
+					k.Message = "failed to decode data account!"
 					k.Payload = err
 				})
 			}
 
 			var (
-				Delta   = calculateNArgs.Delta
-				M       = calculateNArgs.M
-				FreqDiv = calculateNArgs.FreqDiv
+				deltaWeightNum   = calculateNArgs.DeltaWeightNum
+				deltaWeightDenom = calculateNArgs.DeltaWeightDenom
+				winningClasses   = calculateNArgs.WinningClasses
+				payoutFreqNum    = calculateNArgs.PayoutFreqNum
+				payoutFreqDenom  = calculateNArgs.PayoutFreqDenom
 			)
 
 			calculateNArgsInternal := types.TribecaProgramData{
-				Delta:   Delta,
-				M:       M,
-				FreqDiv: FreqDiv,
-				Network: "devnet",
-				Chain:   "solana",
+				Chain:            "solana",
+				Network:          "devnet",
+				PayoutFreqNum:    int64(payoutFreqNum),
+				PayoutFreqDenom:  int64(payoutFreqDenom),
+				DeltaWeightNum:   int64(deltaWeightNum),
+				DeltaWeightDenom: int64(deltaWeightDenom),
+				WinningClasses:   int(winningClasses),
 			}
 
 			database.InsertNArgs(calculateNArgsInternal)
 
 		case err := <-errChan:
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Error from the Solana websocket!"
+				k.Message = "error from the Solana websocket!"
 				k.Payload = err
 			})
 		}

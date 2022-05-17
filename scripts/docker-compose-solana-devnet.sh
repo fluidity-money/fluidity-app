@@ -48,8 +48,8 @@ export \
 	FLU_SOLANA_TOKEN_DECIMALS_USDT=6
 
 export \
-    FLU_SOLANA_RPC_URL=http://api.devnet.solana.com \
-    FLU_SOLANA_WS_URL=ws://api.devnet.solana.com \
+    FLU_SOLANA_RPC_URL=https://late-icy-dew.solana-devnet.quiknode.pro \
+    FLU_SOLANA_WS_URL=wss://late-icy-dew.solana-devnet.quiknode.pro \
     FLU_AMQP_QUEUE_ADDR=amqp://fluidity:fluidity@rabbitmq  \
     FLU_UNIVERSE=testing \
     FLU_TRIBECA_GOVERNOR_PUBKEY=5eEt6mrrP5EpKvmrUHkuahrY255vmCd4zZPvvpv2k8BD \

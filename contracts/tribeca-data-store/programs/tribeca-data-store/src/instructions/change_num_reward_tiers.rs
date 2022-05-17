@@ -13,10 +13,14 @@ pub struct ChangeNumRewardTiers<'info> {
     pub authority: Signer<'info>,
 }
 
-pub fn handler(ctx: Context<ChangeNumRewardTiers>, m: u8) -> Result<()> {
+pub fn handler(ctx: Context<ChangeNumRewardTiers>, winning_classes: u8) -> Result<()> {
+    if winning_classes == 0 {
+        panic!("cannot have 0 winning_classes")
+    }
+
     let calculaten_args = &mut ctx.accounts.calculaten_args;
 
-    calculaten_args.m = m;
+    calculaten_args.winning_classes = winning_classes;
 
     Ok(())
 }

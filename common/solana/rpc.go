@@ -15,9 +15,9 @@ type (
 		Id      string      `json:"id"`
 	}
 
-	ProgramSubscribeParams [2]interface{}
+	AccountSubscribeParams [2]interface{}
 
-	ProgramSubscribeParamsFilters struct {
+	AccountSubscribeParamsFilters struct {
 		Encoding   string `json:"encoding"`
 		Commitment string `json:"commitment"`
 	}
@@ -32,28 +32,25 @@ type (
 		} `json:"error"`
 	}
 
-	ProgramSubscribeResponse struct {
+	AccountSubscribeResponse struct {
 		Jsonrpc string `json:"jsonrpc"`
 		Method  string `json:"method"`
 		Params  struct {
-			Result       ProgramNotification `json:"result"`
+			Result       AccountNotification `json:"result"`
 			Subscription int                 `json:"subscription"`
 		} `json:"params"`
 	}
 
-	ProgramNotification struct {
+	AccountNotification struct {
 		Context struct {
 			Slot int `json:"slot"`
 		} `json:"context"`
 		Value struct {
-			Pubkey  string `json:"pubkey"`
-			Account struct {
-				Lamports   int       `json:"lamports"`
-				Data       [2]string `json:"data"`
-				Owner      string    `json:"owner"`
-				Executable bool      `json:"executable"`
-				RentEpoch  int       `json:"rentEpoch"`
-			} `json:"account"`
+			Data       [2]string `json:"data"`
+			Executable bool      `json:"executable"`
+			Lamports   int       `json:"lamports"`
+			Owner      string    `json:"owner"`
+			RentEpoch  int       `json:"rentEpoch"`
 		} `json:"value"`
 	}
 )
@@ -62,8 +59,8 @@ type Subscription struct {
 	requestCloseChan chan struct{}
 }
 
-// SubscribeProgram subscribes to changes to acounts owned by a program
-func SubscribeProgram(url, programId string, messageChan chan ProgramNotification, errChan chan error) (*Subscription, error) {
+// SubscribeAccount subscribes to changes to acounts
+func SubscribeAccount(url, programId string, messageChan chan AccountNotification, errChan chan error) (*Subscription, error) {
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 
 	if err != nil {
@@ -83,23 +80,23 @@ func SubscribeProgram(url, programId string, messageChan chan ProgramNotificatio
 
 		defer conn.Close()
 
-		programSubscriptionParams := ProgramSubscribeParams{
+		accountSubscriptionParams := AccountSubscribeParams{
 			programId,
-			ProgramSubscribeParamsFilters{
+			AccountSubscribeParamsFilters{
 				Encoding:   "base64",
 				Commitment: "finalized",
 			},
 		}
 
-		programSubscriptionBody := SolanaRpcBody{
+		accountSubscriptionBody := SolanaRpcBody{
 			JsonRpc: "2.0",
 			Id:      "1",
-			Method:  "programSubscribe",
-			Params:  programSubscriptionParams,
+			Method:  "accountSubscribe",
+			Params:  accountSubscriptionParams,
 		}
 
 		// subscribe to the events
-		_, err := subscribe(programSubscriptionBody, conn)
+		_, err := subscribe(accountSubscriptionBody, conn)
 
 		if err != nil {
 			errChan <- fmt.Errorf("Failed to subscribe to solana data acc: %w", err)
@@ -128,7 +125,7 @@ func SubscribeProgram(url, programId string, messageChan chan ProgramNotificatio
 
 				// decode the message
 
-				var res ProgramSubscribeResponse
+				var res AccountSubscribeResponse
 
 				if err := json.Unmarshal(m, &res); err != nil {
 					errChan <- fmt.Errorf("Error parsing a solana websocket message: %w", err)

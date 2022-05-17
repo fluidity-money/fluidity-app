@@ -35,6 +35,13 @@ pub fn handler(ctx: Context<CreateCalculateNArgs>, bump: u8) -> Result<()> {
     calculaten_args.bump = bump;
     calculaten_args.authority = ctx.accounts.payer.key();
 
+    calculaten_args.winning_classes = 5;
+    calculaten_args.delta_weight_num = 31536000;
+    calculaten_args.delta_weight_denom = 1;
+
+    calculaten_args.payout_freq_num = 1;
+    calculaten_args.payout_freq_denom = 4;
+
     Ok(())
 }
 

@@ -13,10 +13,23 @@ pub struct ChangeDelta<'info> {
     pub authority: Signer<'info>,
 }
 
-pub fn handler(ctx: Context<ChangeDelta>, delta: u8) -> Result<()> {
+pub fn handler(
+    ctx: Context<ChangeDelta>,
+    delta_weight_num: u32,
+    delta_weight_denom: u32,
+) -> Result<()> {
+    if delta_weight_num == 0 {
+        panic!("cannot have delta weight of 0")
+    }
+
+    if delta_weight_denom == 0 {
+        panic!("divide by zero error")
+    }
+
     let calculaten_args = &mut ctx.accounts.calculaten_args;
 
-    calculaten_args.delta = delta;
+    calculaten_args.delta_weight_num = delta_weight_num;
+    calculaten_args.delta_weight_denom = delta_weight_denom;
 
     Ok(())
 }

@@ -39,9 +39,8 @@ func InsertNArgs(calculateNArgs TribecaProgramData) {
 			payout_freq_denom,
 			delta_weight_num,
 			delta_weight_denom,
-			winning_classes,
+			winning_classes
 		)
-
 		VALUES (
 			$1,
 			$2,
@@ -89,7 +88,7 @@ func GetLatestCalculatenArgs(chain, network string) TribecaProgramData {
 			delta_weight_denom,
 			winning_classes
 		FROM %s
-		WHERE chain = %s AND network = %s
+		WHERE chain = '%s' AND network = '%s'
 		ORDER BY time DESC
 		LIMIT 1`,
 

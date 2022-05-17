@@ -13,10 +13,27 @@ pub struct ChangePayoutFreq<'info> {
     pub authority: Signer<'info>,
 }
 
-pub fn handler(ctx: Context<ChangePayoutFreq>, freq_div: u8) -> Result<()> {
+pub fn handler(
+    ctx: Context<ChangePayoutFreq>,
+    payout_freq_num: u32,
+    payout_freq_denom: u32,
+) -> Result<()> {
+    if payout_freq_num == 0 {
+        panic!("cannot have payout frequency of 0")
+    }
+
+    if payout_freq_denom == 0 {
+        panic!("divide by zero error")
+    }
+
+    if payout_freq_num >= payout_freq_denom {
+        panic!("Cannot have ratio >= 1")
+    }
+
     let calculaten_args = &mut ctx.accounts.calculaten_args;
 
-    calculaten_args.freq_div = freq_div;
+    calculaten_args.payout_freq_num = payout_freq_num;
+    calculaten_args.payout_freq_denom = payout_freq_denom;
 
     Ok(())
 }

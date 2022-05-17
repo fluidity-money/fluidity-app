@@ -25,7 +25,6 @@ func factorial(n int64) *big.Rat {
 }
 
 func probability(m, n, b int64) *big.Rat {
-
 	mulLeftSide := new(big.Int).Binomial(m, b)
 
 	mulRightSide := new(big.Int).Binomial(n-m, m-b)
@@ -40,13 +39,14 @@ func probability(m, n, b int64) *big.Rat {
 }
 
 // A / p(b)
-func payout(atx, apy, g, delta uint8, rewardPool, deltaWeight *big.Rat, delta uint8, m, n, b int64, blockTime uint64, emission *worker.Emission) *big.Rat {
+func payout(atx, apy, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b int64, blockTime uint64, emission *worker.Emission) *big.Rat {
+	m := int64(winningClasses)
 
 	blockTimeRat := new(big.Rat).SetUint64(blockTime)
 
-	delta_ := new(big.Rat).Mul(blockTimeRat, rewardPool)
+	delta := new(big.Rat).Mul(blockTimeRat, rewardPool)
 
-	delta.Quo(delta, big.NewRat(deltaWeight, 1))
+	delta.Quo(delta, deltaWeight)
 
 	gTimesAtx := new(big.Rat).Mul(g, atx)
 
@@ -93,8 +93,11 @@ func payout(atx, apy, g, delta uint8, rewardPool, deltaWeight *big.Rat, delta ui
 	return aDivP
 }
 
-func calculateN(m int64, g, atx, payoutFrequency *big.Rat, emission *worker.Emission) int64 {
-	n := int64(m + 1)
+func calculateN(winningClasses int, g, atx, payoutFreq *big.Rat, emission *worker.Emission) int64 {
+	var (
+		m = int64(winningClasses)
+		n = int64(winningClasses + 1)
+	)
 
 	var (
 		factorialN  = factorial(n)
@@ -150,7 +153,7 @@ func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat, pay
 
 	payouts := make([]*misc.BigInt, 0)
 
-	for i := int64(1); i < winningClasses+1; i++ {
+	for i := int64(1); i < int64(winningClasses+1); i++ {
 
 		payout := payout(
 			averageTransfersInBlock_,

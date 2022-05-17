@@ -8,10 +8,10 @@ CREATE TABLE calculaten_args (
     chain network_blockchain NOT NULL,
     network VARCHAR NOT NULL,
 
-    payout_freq_num INT NOT NULL,
-    payout_freq_denom INT NOT NULL,
-    delta_weight_num INT NOT NULL,
-    delta_weight_denom INT NOT NULL,
+    payout_freq_num BIGINT NOT NULL,
+    payout_freq_denom BIGINT NOT NULL,
+    delta_weight_num BIGINT NOT NULL,
+    delta_weight_denom BIGINT NOT NULL,
     winning_classes INT NOT NULL,
 
     -- time this tvl was recorded

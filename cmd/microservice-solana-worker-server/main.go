@@ -289,7 +289,7 @@ func main() {
 			)
 
 			randomIntegers := generateRandomIntegers(
-				probability.WinningClasses,
+				winningClasses,
 				1,
 				int(randomN),
 			)

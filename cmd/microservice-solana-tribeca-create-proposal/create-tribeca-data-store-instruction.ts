@@ -72,22 +72,39 @@ export const initializeHandler = async () => {
 };
 
 export const changeDeltaHandler = async () => {
-  const newDelta_ = process.env.FLU_TRIBECA_DATA_STORE_DELTA;
+  const newDeltaNum_ = process.env.FLU_TRIBECA_DATA_STORE_DELTA_NUM;
 
-  if (!newDelta_) {
-    throw new Error("FLU_TRIBECA_DATA_STORE_DELTA not provided");
+  if (!newDeltaNum_) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_DELTA_NUM not provided");
   }
 
-  const newDelta = parseInt(newDelta_);
+  const newDeltaDenom_ = process.env.FLU_TRIBECA_DATA_STORE_DELTA_DENOM;
+
+  if (!newDeltaDenom_) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_DELTA_DENOM not provided");
+  }
+
+  const newDeltaNum = parseInt(newDeltaNum_);
+
+  if (isNaN(newDeltaNum)) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_DELTA_NUM is NaN");
+  }
+
+  const newDeltaDenom = parseInt(newDeltaDenom_);
+
+  if (isNaN(newDeltaDenom)) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_DELTA_DENOM is NaN");
+  }
 
   const [calculateNArgsPda, calculateNArgsBump] = await PublicKey
     .findProgramAddress([Buffer.from("calculateNArgs")], program.programId);
 
-  console.log(`Changing ${calculateNArgsPda.toString()} Delta to ${newDelta}`);
+  console.log(`Changing ${calculateNArgsPda.toString()} Delta to ${newDeltaNum}/${newDeltaDenom}`);
 
   const instruction = program.instruction.changeDelta(
     calculateNArgsBump,
-    newDelta,
+    newDeltaNum,
+    newDeltaDenom,
     {
       accounts: {
         calculatenArgs: calculateNArgsPda,
@@ -100,24 +117,41 @@ export const changeDeltaHandler = async () => {
 };
 
 export const changePayoutFrequencyHandler = async () => {
-  const newFreq_ = process.env.FLU_TRIBECA_DATA_STORE_FREQ;
+  const newFreqNum_ = process.env.FLU_TRIBECA_DATA_STORE_FREQ_NUM;
 
-  if (!newFreq_) {
-    throw new Error("FLU_TRIBECA_DATA_STORE_FREQ not provided");
+  if (!newFreqNum_) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_FREQ_NUM not provided");
   }
 
-  const newFreq = parseInt(newFreq_);
+  const newFreqDenom_ = process.env.FLU_TRIBECA_DATA_STORE_FREQ_DENOM;
+
+  if (!newFreqDenom_) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_FREQ_DENOM not provided");
+  }
+
+  const newFreqNum = parseInt(newFreqNum_);
+
+  if (isNaN(newFreqNum)) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_FREQ_NUM is NaN");
+  }
+
+  const newFreqDenom = parseInt(newFreqDenom_);
+
+  if (isNaN(newFreqDenom)) {
+    throw new Error("FLU_TRIBECA_DATA_STORE_FREQ_DENOM is NaN");
+  }
 
   const [calculateNArgsPda, calculateNArgsBump] = await PublicKey
     .findProgramAddress([Buffer.from("calculateNArgs")], program.programId);
 
   console.log(
-    `Changing ${calculateNArgsPda.toString()} RewardFrequency to ${newFreq}`,
+    `Changing ${calculateNArgsPda.toString()} RewardFrequency to ${newFreqNum}/${newFreqDenom}`,
   );
 
   const instruction = program.instruction.changePayoutFrequency(
     calculateNArgsBump,
-    newFreq,
+    newFreqNum,
+    newFreqDenom,
     {
       accounts: {
         calculatenArgs: calculateNArgsPda,
