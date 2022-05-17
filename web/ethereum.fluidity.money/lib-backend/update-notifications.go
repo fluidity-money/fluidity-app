@@ -32,11 +32,11 @@ func HandleUpdateNotifications(updates chan interface{}) func(string, url.Values
 				replies <- winningMessage
 
 			case _ = <-shutdown:
-				log.DebugFormat("Shutting down IP %#v!", ipAddress)
+				log.Debugf("Shutting down IP %#v!", ipAddress)
 
 				broadcast.Unsubscribe(cookie)
 
-				log.DebugFormat(
+				log.Debugf(
 					"Done indicating to the broadcast server of the shutdown! %#v",
 					ipAddress,
 				)

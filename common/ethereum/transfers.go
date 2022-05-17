@@ -40,7 +40,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 		transferContractAddress := strings.ToLower(transferContractAddress_)
 
 		if transferContractAddress != string(fluidContractAddress) {
-			log.DebugFormat(
+			log.Debugf(
 				"For transaction hash %#v, contract was %#v, not %#v!",
 				transactionHash,
 				transferContractAddress,
@@ -53,7 +53,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 		firstTopic := strings.ToLower(topics[0].String())
 
 		if !IsTransferLogTopic(firstTopic) {
-			log.DebugFormat(
+			log.Debugf(
 				"For transaction hash %#v, first topic %#v != transfer log topic %#v!",
 				transactionHash,
 				firstTopic,
@@ -64,7 +64,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 		}
 
 		if len(topics) != 3 {
-			log.DebugFormat(
+			log.Debugf(
 				"Number of topics for transaction hash %#v, topic content %#v length != 3!",
 				transactionHash,
 				topics,

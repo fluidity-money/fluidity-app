@@ -32,7 +32,7 @@ func Debug(k func(k *Log)) {
 	logCooking(loggingLevelDebug, k)
 }
 
-func DebugFormat(message string, format ...interface{}) {
+func Debugf(message string, format ...interface{}) {
 	Debug(func(k *Log) {
 		k.Format(message, format...)
 	})

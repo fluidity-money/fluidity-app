@@ -162,7 +162,7 @@ func main() {
 		})
 	}
 
-	log.DebugFormat(
+	log.Debugf(
 		`Bound %s to %s at exchange %s!
 Sending to %s`,
 		queueFromName,
@@ -198,7 +198,7 @@ Sending to %s`,
 			Body:         message.Body,
 		}
 
-		log.DebugFormat(
+		log.Debugf(
 			"Publishing to %#v with content %s!",
 			amqpCopyToTopicName,
 			string(message.Body),

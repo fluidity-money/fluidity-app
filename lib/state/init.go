@@ -25,7 +25,7 @@ func init() {
 
 	_redisClient = redis.NewClient(&redisOptions)
 
-	log.DebugFormat(
+	log.Debugf(
 		"Connecting to the Redis server!",
 	)
 
@@ -39,7 +39,7 @@ func init() {
 		})
 	}
 
-	log.DebugFormat(
+	log.Debugf(
 		"Connected to the Redis server!",
 	)
 

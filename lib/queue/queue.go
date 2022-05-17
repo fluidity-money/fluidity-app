@@ -44,7 +44,7 @@ func (message Message) Decode(decoded interface{}) {
 		})
 	}
 
-	log.DebugFormat("Successfully decoded a message from JSON!")
+	log.Debugf("Successfully decoded a message from JSON!")
 }
 
 // GetMessages from the AMQP server, calling the function each time a
@@ -111,7 +111,7 @@ func GetMessages(topic string, f func(message Message)) {
 			Content: bodyBuf,
 		})
 
-		log.DebugFormat(
+		log.Debugf(
 			"Asking the server to ack the receipt of %v!",
 			deliveryTag,
 		)
@@ -129,7 +129,7 @@ func GetMessages(topic string, f func(message Message)) {
 			})
 		}
 
-		log.DebugFormat(
+		log.Debugf(
 			"Server acked the reply for %v!",
 			deliveryTag,
 		)
@@ -152,7 +152,7 @@ func SendMessage(topic string, content interface{}) {
 
 // SendMessageBytes down a topic, with bytes as content
 func SendMessageBytes(topic string, content []byte) {
-	log.DebugFormat("Starting to send a publish request to the sending goroutine.")
+	log.Debugf("Starting to send a publish request to the sending goroutine.")
 
 	amqpDetails := <-chanAmqpDetails
 
@@ -178,7 +178,7 @@ func SendMessageBytes(topic string, content []byte) {
 		})
 	}
 
-	log.DebugFormat("Sending goroutine has received the request!")
+	log.Debugf("Sending goroutine has received the request!")
 }
 
 // Finish up, by clearing the buffer

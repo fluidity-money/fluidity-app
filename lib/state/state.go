@@ -154,7 +154,7 @@ func Set(key string, content interface{}) {
 
 	contentBytes := serialiseToBytes(content)
 
-	log.DebugFormat(
+	log.Debugf(
 		"About to set this state to key %s: %v",
 		key,
 		contentBytes,
@@ -177,7 +177,7 @@ func SetNxTimed(key string, content interface{}, expiry time.Duration) (didSet b
 
 	contentBytes := serialiseToBytes(content)
 
-	log.DebugFormat(
+	log.Debugf(
 		"About to set this state to key %s with expiry %v: %v",
 		key,
 		expiry,
@@ -203,7 +203,7 @@ func SetNxTimed(key string, content interface{}, expiry time.Duration) (didSet b
 func Del(keys ...string) {
 	redisClient := client()
 
-	log.DebugFormat(
+	log.Debugf(
 		"About to delete the key/s %s",
 		keys,
 	)
@@ -226,7 +226,7 @@ func SetTimed(key string, seconds uint64, content interface{}) {
 
 	contentBytes := serialiseToBytes(content)
 
-	log.DebugFormat(
+	log.Debugf(
 		"Setting a timed length for the key %v value %#v to expire in %v seconds!",
 		key,
 		string(contentBytes),
@@ -280,7 +280,7 @@ func GetSet(key string, content interface{}) []byte {
 
 	contentBytes := serialiseToBytes(content)
 
-	log.DebugFormat(
+	log.Debugf(
 		"About to set this state to key %s: %v",
 		key,
 		contentBytes,

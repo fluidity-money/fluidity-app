@@ -98,7 +98,7 @@ func paginateLogs(client *ethclient.Client, fromBlockHeight uint64, chanLogs cha
 		// ignore outliers like this
 
 		if blockNumber := ethLog.BlockNumber; blockNumber < fromBlockHeight {
-			log.DebugFormat(
+			log.Debugf(
 				"Block below the current pagination item of %v was found, ignoring!",
 				blockNumber,
 			)
@@ -248,7 +248,7 @@ func main() {
 	var lastBlockSeen uint64 = 0
 
 	for {
-		log.DebugFormat("Waiting for new messages from Geth!")
+		log.Debugf("Waiting for new messages from Geth!")
 
 		select {
 		case gethLog := <-chanGethLogs:
@@ -258,13 +258,13 @@ func main() {
 				isRemoved   = gethLog.Removed
 			)
 
-			log.DebugFormat(
+			log.Debugf(
 				"Received a log at block number %v!",
 				blockNumber,
 			)
 
 			if isRemoved {
-				log.DebugFormat(
+				log.Debugf(
 					"Log at block number %#v was removed!",
 					blockNumber,
 				)

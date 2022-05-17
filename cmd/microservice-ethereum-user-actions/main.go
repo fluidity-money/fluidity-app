@@ -62,7 +62,7 @@ func main() {
 			logAddress      = ethLog.Address
 		)
 
-		log.DebugFormat(
+		log.Debugf(
 			"The log address is %v, expecting %v!",
 			logAddress,
 			filterAddress,
@@ -97,7 +97,7 @@ func main() {
 		)
 
 		if err != nil {
-			log.DebugFormat(
+			log.Debugf(
 				"Didn't decode an event signature on the wire. %v",
 				err,
 			)
@@ -108,7 +108,7 @@ func main() {
 		switch eventClassification {
 
 		case microservice_user_actions.EventTransfer:
-			log.DebugFormat(
+			log.Debugf(
 				"Handling a transfer event, topic head is %#s",
 				topicHead,
 			)
@@ -123,7 +123,7 @@ func main() {
 			)
 
 		case microservice_user_actions.EventMintFluid:
-			log.DebugFormat(
+			log.Debugf(
 				"Handling a minting event, topic head %#v!",
 				topicHead,
 			)
@@ -137,7 +137,7 @@ func main() {
 			)
 
 		case microservice_user_actions.EventBurnFluid:
-			log.DebugFormat(
+			log.Debugf(
 				"Handling a burning event, topic head %#v!",
 				topicHead,
 			)

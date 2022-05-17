@@ -58,7 +58,7 @@ func Endpoint(endpoint, headerName, cookieBaseName string, handler HttpFunctionS
 		setCorsHeaders(w)
 
 		if r.Method == http.MethodOptions {
-			log.DebugFormat(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -132,7 +132,7 @@ func Endpoint(endpoint, headerName, cookieBaseName string, handler HttpFunctionS
 			return
 		}
 
-		log.DebugFormat(
+		log.Debugf(
 			"Cookie name %v, IP %v is being updated with a new value of %v!",
 			cookieName,
 			ipAddress,
@@ -142,7 +142,7 @@ func Endpoint(endpoint, headerName, cookieBaseName string, handler HttpFunctionS
 		updated := state.SetTimedIfSet(cookieName, newCookieValue)
 
 		if !updated {
-			log.DebugFormat(
+			log.Debugf(
 				"Cookie name %v, IP %v was not updated in the end, key expired.",
 				cookieName,
 				ipAddress,
@@ -162,14 +162,14 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 
 		setCorsHeaders(w)
 
-		log.DebugFormat(
+		log.Debugf(
 			"Handling an endpoint login at %v with IP address %v!",
 			endpoint,
 			ipAddress,
 		)
 
 		if r.Method == http.MethodOptions {
-			log.DebugFormat(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -198,14 +198,14 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 			return
 		}
 
-		log.DebugFormat(
+		log.Debugf(
 			"Handler serving endpoint %v with IP %v returned!",
 			endpoint,
 			ipAddress,
 		)
 
 		if newState == nil {
-			log.DebugFormat(
+			log.Debugf(
 				"Handled a login at endpoint %v from IP %v, but the new state is empty!",
 				endpoint,
 				ipAddress,
@@ -222,7 +222,7 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 			newCookie,
 		)
 
-		log.DebugFormat(
+		log.Debugf(
 			"Generated a new cookie for %v serving IP %v, %v. Value %v!",
 			endpoint,
 			ipAddress,
@@ -232,7 +232,7 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 
 		state.SetTimed(newCookieName, cacheTime, newState)
 
-		log.DebugFormat(
+		log.Debugf(
 			"Set a new timed state for endpoint %v IP %v cookie %v!",
 			endpoint,
 			ipAddress,
