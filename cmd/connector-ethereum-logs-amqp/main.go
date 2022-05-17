@@ -14,6 +14,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	queueEth "github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
+	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -271,7 +272,7 @@ func main() {
 				continue
 			}
 
-			convertedLog := convertGethLog(gethLog)
+			convertedLog := commonEth.ConvertGethLog(gethLog)
 
 			if lastBlockSeen < blockNumber {
 				writeLastBlock(blockNumber)
