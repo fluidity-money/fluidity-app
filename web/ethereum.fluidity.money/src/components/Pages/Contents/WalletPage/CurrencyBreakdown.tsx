@@ -60,19 +60,20 @@ const CurrencyBreakdown = () => {
     [walletAmounts, walletTypes, colours]
   );
 
-  const text =
-    chainIdFromEnv() === 1313161554 ? "primary-text--aurora" : "primary-text";
+  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
 
   // Checks to see if the user's wallet is empty
   return (
     <div className="currency-breakdown">
-      <div className={`portfolio-graph-title ${text}`}>Account Overview</div>
+      <div className={`portfolio-graph-title primary-text${aurora}`}>
+        Account Overview
+      </div>
 
       <div className="doughnut-container">{Donut}</div>
 
       <div className="currency-list">{renderedCurrencyList}</div>
       {walletData.length === 0 ? (
-        <div className={`${text}`}>Your wallet is empty</div>
+        <div className={`primary-text${aurora}`}>Your wallet is empty</div>
       ) : (
         <></>
       )}

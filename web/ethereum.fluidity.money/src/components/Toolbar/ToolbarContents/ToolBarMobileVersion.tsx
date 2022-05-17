@@ -35,8 +35,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
     setToggle(!toggle);
   };
 
-  const text =
-    chainIdFromEnv() === 1313161554 ? "primary-text--aurora" : "primary-text";
+  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
 
   return (
     <div className="toolbar-container-mobile flex-space-between">
@@ -61,7 +60,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
           >
             <Button
               label={address}
-              theme={`${text} header-text`}
+              theme={`primary-text${aurora} header-text`}
               goto={() => {}}
               padding="p-0_5"
             />
@@ -79,7 +78,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
           <div className="flex row align" onClick={() => setToggle(true)}>
             <Button
               label={"Connect Wallet"}
-              theme={`${text} header-text`}
+              theme={`primary-text${aurora} header-text`}
               goto={() => {}}
               padding="p-0_5"
             />
@@ -90,7 +89,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
         <div className="btn-toolbar" onClick={closeMobileMenu}>
           <Button
             label="Dashboard"
-            theme={text}
+            theme={`primary-text${aurora}`}
             goto={() => history.push("/dashboard")}
             selected={selected.options[0]}
             auth={active}
@@ -100,7 +99,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
         <div className="btn-toolbar" onClick={closeMobileMenu}>
           <Button
             label="Swap"
-            theme={text}
+            theme={`primary-text${aurora}`}
             fontSize="large"
             goto={() => history.push("/")}
             selected={selected.options[1]}
@@ -112,7 +111,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
         <div className="btn-toolbar" onClick={closeMobileMenu}>
           <Button
             label="Wallet"
-            theme={text}
+            theme={`primary-text${aurora}`}
             goto={() => history.push("/wallet")}
             selected={selected.options[2]}
             auth={active}
