@@ -13,8 +13,8 @@ export \
 	FLU_SLACK_WEBHOOK="$FLU_SLACK_WEBHOOK"
 
 export \
-	FLU_ETHEREUM_FRONTEND_API_URL=https://app.fluidity.money:8081 \
-	FLU_ETHEREUM_FRONTEND_WS_URL=wss://app.fluidity.money:8081/updates \
+	FLU_ETHEREUM_FRONTEND_API_URL=https://app.ethereum.fluidity.money:8081 \
+	FLU_ETHEREUM_FRONTEND_WS_URL=wss://app.ethereum.fluidity.money:8081/updates \
 	FLU_ETHEREUM_FRONTEND_CHAIN_ID=1 \
 	FLU_ETHEREUM_FRONTEND_TOKEN_FILE=mainnet-tokens.json \
 	FLU_ETHEREUM_FRONTEND_GETH_URL="$FLU_ETHEREUM_FRONTEND_GETH_URL"
