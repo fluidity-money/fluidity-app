@@ -1,19 +1,26 @@
 import React from "react";
 import Header from "components/Header";
+import { chainIdFromEnv } from "util/chainId";
 
 const SwapText = () => {
   return (
-    <div className='flex column flex-space-evenly swap-text-container'>
-      <Header className='swap-text-header' type='primary'>
+    <div className="flex column flex-space-evenly swap-text-container">
+      <Header className="swap-text-header" type="primary">
         Turn your stable
       </Header>
-      <Header className='swap-text-header' type='primary'>
+      <Header className="swap-text-header" type="primary">
         coins into
       </Header>
-      <Header className='swap-text-header' type='primary'>
+      <Header className="swap-text-header" type="primary">
         $FLUID
       </Header>
-      <div className='secondary-text swap-text-secondary my-2-t'>
+      <div
+        className={
+          chainIdFromEnv() === 1313161554
+            ? "secondary-text--aurora swap-text-secondary my-2-t"
+            : "secondary-text swap-text-secondary my-2-t"
+        }
+      >
         Fluid dollars reward the sender and receiver just for using them
       </div>
     </div>

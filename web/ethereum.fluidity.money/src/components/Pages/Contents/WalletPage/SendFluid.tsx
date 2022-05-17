@@ -196,13 +196,12 @@ const SendFluid = () => {
     selectedFluidToken: [selectedFluidToken, setterFluidToken],
   };
 
-  const text =
-    chainIdFromEnv() === 1313161554 ? "primary-text--aurora" : "primary-text";
+  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
 
   return (
     <modalToggle.Provider value={modalContext}>
       <div className="send-container">
-        <h3 className={`${text} send-warning`}>
+        <h3 className={`primary-text${aurora} send-warning`}>
           Note: not all wallets accept Fluid dollars
         </h3>
         <div className="send-input-container">
@@ -238,11 +237,7 @@ const SendFluid = () => {
           <Button
             label="Send"
             goto={sendForm}
-            className={
-              chainIdFromEnv() === 1313161554
-                ? "send-button--aurora"
-                : "send-button"
-            }
+            className={`send-button${aurora}`}
             disabled={
               !isNonZero(to, decimals) ||
               !address ||
@@ -252,7 +247,7 @@ const SendFluid = () => {
             }
           />
           <p
-            className="amount-avail secondary-text"
+            className={`amount-avail secondary-text${aurora}`}
             onClick={() => setToWrapper(balance)}
           >
             {walletStatus === "connected" ? (
@@ -276,7 +271,11 @@ const SendFluid = () => {
         <TransactionConfirmationModal
           enable={successTransactionModal}
           toggle={() => setSuccessTransactionModal(false)}
-          message={<div className="primary-text">Transaction Successful</div>}
+          message={
+            <div className={`primary-text${aurora}`}>
+              Transaction Successful
+            </div>
+          }
         />
       </div>
     </modalToggle.Provider>

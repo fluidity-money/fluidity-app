@@ -53,6 +53,7 @@
   color: white;
   font-size: 1rem;
   &--aurora {
+    @extend .send-button;
     background: $aurora;
     color: black;
   }

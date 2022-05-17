@@ -119,6 +119,11 @@
   @include for-below-550 {
     font-size: xx-small;
   }
+
+  &--aurora {
+    @extend .reward-info-table-content;
+    color: white;
+  }
 }
 
 .winner-address {
@@ -136,6 +141,11 @@
   }
   @include for-below-550 {
     font-size: xx-small;
+  }
+
+  &--aurora {
+    @extend .winner-address;
+    color: white;
   }
 }
 

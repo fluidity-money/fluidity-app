@@ -243,7 +243,13 @@ const SwapBox = () => {
     if (invert) isNonFluid = !isNonFluid;
 
     return (
-      <div className="amount-avail secondary-text">
+      <div
+        className={
+          chainIdFromEnv() === 1313161554
+            ? "amount-avail secondary-text--aurora"
+            : "amount-avail secondary-text"
+        }
+      >
         {walletStatus === "connected" ? (
           isNonFluid ? (
             selectedToken !== "Select Token" ? (

@@ -157,6 +157,8 @@ const App = () => {
     setFluidTokens: setFluidTokens,
   };
 
+  const auroraStyle = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+
   return (
     // React router provider
     <Router>
@@ -238,19 +240,16 @@ const App = () => {
                   message={[
                     <div key={"TCM1"}>
                       🎉🎉
-                      <span
-                        className={
-                          chainIdFromEnv() === 1313161554
-                            ? "primary-text--aurora"
-                            : "primary-text"
-                        }
-                      >
+                      <span className={`primary-text${auroraStyle}`}>
                         {" "}
                         CONGRATS{" "}
                       </span>
                       🎉🎉
                     </div>,
-                    <div key={"TCM2"} className="secondary-text">
+                    <div
+                      key={"TCM2"}
+                      className={`secondary-text${auroraStyle}`}
+                    >
                       {notificationMessage}
                     </div>,
                   ]}
