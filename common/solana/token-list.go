@@ -38,7 +38,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) != 7 {
+		if len(tokenDetails_) < 7 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",

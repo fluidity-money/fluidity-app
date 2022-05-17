@@ -41,7 +41,7 @@ func GetTokensListEthereum(tokensList_ string) []TokenDetailsEthereum {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) != 3 && len(tokenDetails_) != 4 {
+		if len(tokenDetails_) < 3 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",
