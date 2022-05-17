@@ -172,5 +172,23 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 
 	blockResponseResult := blocksResponse.Result
 
-	return &blockResponseResult, nil
+	if string(blockResponseResult) == "null" {
+		return nil, fmt.Errorf(
+			"geth return null for block %v, block doesn't exist! possible geth desync?!",
+			blockHash,
+		)
+	}
+
+	var block Block
+
+	err = json.Unmarshal(blockResponseResult, &block)
+
+	if err != nil {
+	    return nil, fmt.Errorf(
+			"could not unmarshal block resonse: %v",
+			err,
+	    )
+	}
+
+	return &block, nil
 }

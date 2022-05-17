@@ -53,6 +53,7 @@ watch-js:
 
 	@env REACT_APP_WEBSOCKET=$${REACT_APP_WEBSOCKET:-ws://localhost:8081/updates} \
 		REACT_APP_API_URL=$${REACT_APP_API_URL:-http://localhost:8081} \
+		REACT_APP_SOL_NETWORK=$${REACT_APP_SOL_NETWORK:-devnet} \
 		${NPX_REACTSCRIPTS} start
 
 watch:
