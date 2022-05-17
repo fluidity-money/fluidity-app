@@ -1,4 +1,4 @@
-#!/bin/sh -eu nounset
+#!/bin/sh -e
 
 export \
 	FLU_AMQP_QUEUE_ADDR="$FLU_AMQP_QUEUE_ADDR" \
