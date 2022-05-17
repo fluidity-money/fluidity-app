@@ -63,7 +63,7 @@ const SelectBlockchainModal = ({
             label={blockchain}
             key={index}
             theme={`select-button`}
-            texttheme="wallet-text"
+            texttheme={`wallet-text${aurora}`}
             visible={visible}
             icon={
               // nosemgrep: typescript.react.security.audit.react-http-leak.react-http-leak
