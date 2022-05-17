@@ -7,10 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDebug(t *testing.T) {
-	debug("format string %v", 123)
-}
-
 func TestBigPowInt32(t *testing.T) {
 	// 5 ^ 3 = 125
 	expected := big.NewRat(125, 1)

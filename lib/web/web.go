@@ -50,14 +50,14 @@ func AuthenticatedEndpoint(endpoint, headerName string, validateFunc func(string
 
 		setCorsHeaders(w)
 
-		debug(
+		log.DebugFormat(
 			"Received request from %s to authenticated endpoint %s.",
 			ipAddress,
 			endpoint,
 		)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.DebugFormat(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -99,14 +99,14 @@ func Endpoint(endpoint string, handler HttpFunction) {
 
 		setCorsHeaders(w)
 
-		debug(
+		log.DebugFormat(
 			"Received request from IP %v to %v!",
 			ipAddress,
 			endpoint,
 		)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.DebugFormat(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,

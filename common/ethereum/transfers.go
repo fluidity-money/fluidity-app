@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
@@ -28,18 +29,18 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 	transfers := make([]Transfer, 0)
 	failedTransactions := make([]ethereum.Hash, 0)
 
-	for _, log := range logs {
-		transactionHash := log.TxHash
+	for _, transferLog := range logs {
+		transactionHash := transferLog.TxHash
 
 		var (
-			transferContractAddress_ = log.Address.String()
-			topics                   = log.Topics
+			transferContractAddress_ = transferLog.Address.String()
+			topics                   = transferLog.Topics
 		)
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
 
 		if transferContractAddress != string(fluidContractAddress) {
-			Debug(
+			log.DebugFormat(
 				"For transaction hash %#v, contract was %#v, not %#v!",
 				transactionHash,
 				transferContractAddress,
@@ -52,7 +53,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 		firstTopic := strings.ToLower(topics[0].String())
 
 		if !IsTransferLogTopic(firstTopic) {
-			Debug(
+			log.DebugFormat(
 				"For transaction hash %#v, first topic %#v != transfer log topic %#v!",
 				transactionHash,
 				firstTopic,
@@ -63,7 +64,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 		}
 
 		if len(topics) != 3 {
-			Debug(
+			log.DebugFormat(
 				"Number of topics for transaction hash %#v, topic content %#v length != 3!",
 				transactionHash,
 				topics,
@@ -82,10 +83,10 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 		toAddress := ethereum.AddressFromString(toAddress_)
 
-		logTransaction, found := blockTransactions[log.TxHash]
+		logTransaction, found := blockTransactions[transferLog.TxHash]
 
 		if !found {
-			failedTransactions = append(failedTransactions, log.TxHash)
+			failedTransactions = append(failedTransactions, transferLog.TxHash)
 		}
 
 		transfer := Transfer{

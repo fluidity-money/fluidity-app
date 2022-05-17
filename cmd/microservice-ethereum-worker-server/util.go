@@ -46,12 +46,6 @@ func bigFloatFromInt(x *big.Int) *big.Float {
 	return float.SetInt(x)
 }
 
-func debug(format string, arguments ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(format, arguments...)
-	})
-}
-
 // getLastBlockTime by asking Redis for it
 func getLastBlockTimestamp() int64 {
 	blockTime_ := state.Get("block.time")

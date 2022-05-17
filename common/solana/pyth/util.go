@@ -1,16 +1,6 @@
 package pyth
 
-import (
-	"math/big"
-
-	"github.com/fluidity-money/fluidity-app/lib/log"
-)
-
-func debug(format string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(format, content...)
-	})
-}
+import "math/big"
 
 func bigPowInt32(left *big.Rat, count int32) *big.Rat {
 

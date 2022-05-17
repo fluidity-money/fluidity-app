@@ -306,7 +306,7 @@ func main() {
 		)
 
 		if len(fluidTransfers) == 0 {
-			debug(
+			log.DebugFormat(
 				"Couldn't find any Fluid transfers in the block %v!",
 				blockHash,
 			)
@@ -314,14 +314,14 @@ func main() {
 			return
 		}
 
-		debug(
+		log.DebugFormat(
 			"Average transfers in block: %#v! Transfers in block: %#v!",
 			averageTransfersInBlock,
 			transfersInBlock,
 		)
 
 		if averageTransfersInBlock < DefaultTransfersInBlock {
-			debug(
+			log.DebugFormat(
 				"Average transfers in block < default transfers in block (25)!",
 			)
 

@@ -9,14 +9,7 @@ import (
 	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethClient "github.com/ethereum/go-ethereum/ethclient"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 )
-
-func Debug(format string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(format, content...)
-	})
-}
 
 func BigIntFromUint64(x uint64) (int *big.Int) {
 	int = new(big.Int)
