@@ -397,7 +397,15 @@ const SwapBox = () => {
               enable={successTransactionModal}
               toggle={() => setSuccessTransactionModal(false)}
               message={
-                <div className="primary-text">Transaction Successful</div>
+                <div
+                  className={
+                    chainIdFromEnv() === 1313161554
+                      ? "primary-text-aurora"
+                      : "primary-text"
+                  }
+                >
+                  Transaction Successful
+                </div>
               }
             />
           </FormSection>

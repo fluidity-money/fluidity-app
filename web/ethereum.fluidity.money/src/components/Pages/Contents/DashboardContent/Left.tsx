@@ -16,7 +16,9 @@ const Left = ({ rewardPool }: left) => {
       <Header type="primary" className="reward-pool-header">
         Reward Pool
       </Header>
-      <h1 className="prize">
+      <h1
+        className={chainIdFromEnv() === 1313161554 ? "prize--aurora" : "prize"}
+      >
         {rewardPool.amount &&
           parseFloat(rewardPool.amount).toLocaleString("en-US", {
             style: "currency",

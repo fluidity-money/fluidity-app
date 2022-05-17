@@ -6,6 +6,7 @@ import getWalletERC20Status from "util/getWalletERC20Status";
 import { walletDataType } from "util/getWalletERC20Status";
 import { useSigner } from "util/hooks";
 import _ from "lodash";
+import { chainIdFromEnv } from "util/chainId";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -59,16 +60,19 @@ const CurrencyBreakdown = () => {
     [walletAmounts, walletTypes, colours]
   );
 
+  const text =
+    chainIdFromEnv() === 1313161554 ? "primary-text--aurora" : "primary-text";
+
   // Checks to see if the user's wallet is empty
   return (
     <div className="currency-breakdown">
-      <div className="portfolio-graph-title primary-text">Account Overview</div>
+      <div className={`portfolio-graph-title ${text}`}>Account Overview</div>
 
       <div className="doughnut-container">{Donut}</div>
 
       <div className="currency-list">{renderedCurrencyList}</div>
       {walletData.length === 0 ? (
-        <div className="primary-text">Your wallet is empty</div>
+        <div className={`${text}`}>Your wallet is empty</div>
       ) : (
         <></>
       )}

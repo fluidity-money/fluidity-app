@@ -10,11 +10,21 @@ const NetworkButton = () => {
   return (
     <>
       <div
-        className="select-blockchain"
+        className={
+          chainIdFromEnv() === 1313161554
+            ? "select-blockchain--aurora"
+            : "select-blockchain"
+        }
         onClick={() => setBlockchainToggle(true)}
       >
         <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
-        <div className="chain-name primary-text">
+        <div
+          className={
+            chainIdFromEnv() === 1313161554
+              ? "chain-name primary-text--aurora"
+              : "chain-name primary-text"
+          }
+        >
           {chainIdFromEnv() === 3
             ? "Ropsten"
             : chainIdFromEnv() === 42

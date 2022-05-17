@@ -164,7 +164,13 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
 
   &--aurora {
     @extend .primary-text;
-    background: $aurora;
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
   }
 }
 

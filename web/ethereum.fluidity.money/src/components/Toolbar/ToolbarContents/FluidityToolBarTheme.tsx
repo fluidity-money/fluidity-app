@@ -74,6 +74,9 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
     setActive((_active) => wallet.status === "connected");
   }, [wallet.status]);
 
+  const text =
+    chainIdFromEnv() === 1313161554 ? "primary-text--aurora" : "primary-text";
+
   return (
     <Media queries={{ small: { maxWidth: 890 } }}>
       {(matched) =>
@@ -91,7 +94,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               <div></div>
               <Button
                 label="Dashboard"
-                theme="primary-text"
+                theme={text}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/dashboard")}
@@ -101,7 +104,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Swap"
-                theme="primary-text"
+                theme={text}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/")}
@@ -111,7 +114,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Wallet"
-                theme="primary-text"
+                theme={text}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/wallet")}
@@ -149,7 +152,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 >
                   <Button
                     label={address}
-                    theme={"primary-text header-text"}
+                    theme={`${text} header-text`}
                     goto={() => {
                       setToggle(true);
                     }}

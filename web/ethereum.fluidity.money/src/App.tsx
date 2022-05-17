@@ -238,7 +238,16 @@ const App = () => {
                   message={[
                     <div key={"TCM1"}>
                       🎉🎉
-                      <span className="primary-text"> CONGRATS </span>
+                      <span
+                        className={
+                          chainIdFromEnv() === 1313161554
+                            ? "primary-text--aurora"
+                            : "primary-text"
+                        }
+                      >
+                        {" "}
+                        CONGRATS{" "}
+                      </span>
                       🎉🎉
                     </div>,
                     <div key={"TCM2"} className="secondary-text">

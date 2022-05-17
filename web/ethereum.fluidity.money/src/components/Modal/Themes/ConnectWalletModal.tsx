@@ -2,6 +2,7 @@ import Button from "components/Button";
 import { Connectors, useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import GenericModal from "components/Modal/GenericModal";
+import { chainIdFromEnv } from "util/chainId";
 
 const metamask = "/img/WalletIcons/metamask.png";
 const walletconnect = "/img/WalletIcons/walletconnect.png";
@@ -85,7 +86,13 @@ const ConnectWalletModal = ({
       width={width}
     >
       <div className="connect-modal-body">
-        <h2 className="primary-text">
+        <h2
+          className={
+            chainIdFromEnv() === 1313161554
+              ? "primary-text--aurora"
+              : "primary-text"
+          }
+        >
           {wallet.status === "connected"
             ? "Wallet Connected"
             : "Connect to Wallet"}
