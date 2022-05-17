@@ -7,24 +7,15 @@ const NetworkButton = () => {
   const blockchainModalToggle = () => {
     setBlockchainToggle(!blockchainToggle);
   };
+  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
   return (
     <>
       <div
-        className={
-          chainIdFromEnv() === 1313161554
-            ? "select-blockchain--aurora"
-            : "select-blockchain"
-        }
+        className={`select-blockchain${aurora}`}
         onClick={() => setBlockchainToggle(true)}
       >
         <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
-        <div
-          className={
-            chainIdFromEnv() === 1313161554
-              ? "chain-name primary-text--aurora"
-              : "chain-name primary-text"
-          }
-        >
+        <div className={`chain-name primary-text${aurora}`}>
           {chainIdFromEnv() === 3
             ? "Ropsten"
             : chainIdFromEnv() === 42

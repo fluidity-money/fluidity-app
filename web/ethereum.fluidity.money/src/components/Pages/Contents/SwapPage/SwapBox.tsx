@@ -238,18 +238,13 @@ const SwapBox = () => {
       setAmount(currentBalance);
   }, [swap]);
 
+  const auroraStyle = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+
   const AmountAvailable = ({ invert = false }: { invert?: boolean }) => {
     let isNonFluid = swap;
     if (invert) isNonFluid = !isNonFluid;
-
     return (
-      <div
-        className={
-          chainIdFromEnv() === 1313161554
-            ? "amount-avail secondary-text--aurora"
-            : "amount-avail secondary-text"
-        }
-      >
+      <div className={`amount-avail secondary-text${auroraStyle}`}>
         {walletStatus === "connected" ? (
           isNonFluid ? (
             selectedToken !== "Select Token" ? (
@@ -403,13 +398,7 @@ const SwapBox = () => {
               enable={successTransactionModal}
               toggle={() => setSuccessTransactionModal(false)}
               message={
-                <div
-                  className={
-                    chainIdFromEnv() === 1313161554
-                      ? "primary-text-aurora"
-                      : "primary-text"
-                  }
-                >
+                <div className={`primary-text${auroraStyle}`}>
                   Transaction Successful
                 </div>
               }
