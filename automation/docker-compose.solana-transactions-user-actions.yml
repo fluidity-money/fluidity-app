@@ -54,3 +54,39 @@ services:
       mode: replicated
       replicas: 50
     restart: unless-stopped
+
+  microservice-solana-user-actions-uxd:
+    build:
+      context: ../cmd/microservice-solana-user-actions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-user-actions-uxd
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
+      FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY_UXD}
+      FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY_UXD}
+      FLU_SOLANA_TOKEN_SHORT_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_UXD}
+      FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_UXD}
+    deploy:
+      mode: replicated
+      replicas: 50
+    restart: unless-stopped
+
+  microservice-solana-user-actions-ust:
+    build:
+      context: ../cmd/microservice-solana-user-actions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-user-actions-ust
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
+      FLU_SOLANA_FLUID_MINT_PUBKEY: ${FLU_SOLANA_FLUID_MINT_PUBKEY_UST}
+      FLU_SOLANA_PDA_PUBKEY: ${FLU_SOLANA_PDA_PUBKEY_UST}
+      FLU_SOLANA_TOKEN_SHORT_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_UST}
+      FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_UST}
+    deploy:
+      mode: replicated
+      replicas: 50
+    restart: unless-stopped

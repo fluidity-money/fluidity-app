@@ -1,4 +1,4 @@
-export type SupportedTokens = "SOL" | "COMP" | "USDC" | "USDT" | "DAI";
+export type SupportedTokens = "USDC" | "USDT" | "DAI" | "UXD" | "UST";
 export type FluidSupportedTokens = `f${SupportedTokens}`
 export type Token = SupportedTokens | FluidSupportedTokens
 
