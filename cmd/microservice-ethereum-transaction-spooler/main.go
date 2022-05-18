@@ -2,13 +2,11 @@ package main
 
 import (
 	"math/big"
-	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
-	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -29,31 +27,6 @@ const (
     EnvTotalRewardThreshhold = `FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHHOLD`
 )
 
-func intFromEnvOrFatal(env string) int64 {
-    resString := util.GetEnvOrFatal(env)
-
-    res, err := strconv.Atoi(resString)
-
-    if err != nil {
-        log.Fatal(func (k *log.Log) {
-            k.Format(
-                "Failed to parse %s as an int reading env %s!",
-                resString,
-                env,
-            )
-            k.Payload = err
-        })
-    }
-
-    return int64(res)
-}
-
-func sendRewards(queueName string, token token_details.TokenDetails) {
-    transactions := spooler.GetAndRemoveRewardsForToken(token)
-
-    queue.SendMessage(queueName, transactions)
-}
-
 func main() {
     var (
         rewardsQueue = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
@@ -67,6 +40,7 @@ func main() {
 
         message.Decode(&announcement)
 
+        // write the winner into the database
         spooler.InsertPendingWinner(announcement)
 
         var (
@@ -75,8 +49,7 @@ func main() {
             tokenDecimals = tokenDetails.TokenDecimals
         )
 
-
-        tokenDecimalsNum := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(tokenDecimals)), nil)
+        tokenDecimalsNum := bigExp10(int64(tokenDecimals))
 
         scaledWinAmount := new(misc.BigInt).Div(&winAmount.Int, tokenDecimalsNum)
 
@@ -86,19 +59,6 @@ func main() {
                 scaledWinAmount.String(),
                 instantRewardTreshhold,
             )
-        })
-
-        if scaledWinAmount.Int64() >= instantRewardTreshhold {
-            log.Debug(func (k *log.Log) {
-                k.Message = "Transaction won more than instant send thresshold, sending instantly!"
-            })
-            sendRewards(batchedRewardsQueue, tokenDetails)
-
-            return
-        }
-
-        log.Debug(func (k *log.Log) {
-            k.Message = "Transaction won less than instant send thresshold, not sending yet!"
         })
 
         totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
@@ -113,7 +73,17 @@ func main() {
             )
         })
 
-        if scaledTotalRewards.Int64() >= totalRewardTreshhold {
+        switch true {
+
+        case scaledWinAmount.Int64() >= instantRewardTreshhold:
+            log.Debug(func (k *log.Log) {
+                k.Message = "Transaction won more than instant send thresshold, sending instantly!"
+            })
+            sendRewards(batchedRewardsQueue, tokenDetails)
+
+            return
+
+        case scaledTotalRewards.Int64() >= totalRewardTreshhold:
             log.Debug(func (k *log.Log) {
                 k.Message = "Total pending rewards are greater than thresshold, sending!"
             })
@@ -121,9 +91,5 @@ func main() {
 
             return
         }
-
-        log.Debug(func (k *log.Log) {
-            k.Message = "Total pending rewards are less than threshhold, not sending yet!"
-        })
     })
 }
