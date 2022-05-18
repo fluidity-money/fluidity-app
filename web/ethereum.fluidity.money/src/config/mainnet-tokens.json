@@ -52,7 +52,7 @@
   {
     "symbol": "FRAX",
     "name": "FRAX",
-    "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e ",
+    "address": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
     "colour": "#000000",
     "image": "img/TokenIcons/fraxIcon.svg",
     "decimals": 18,
@@ -62,7 +62,7 @@
   {
     "symbol": "UST",
     "name": "Terra USD",
-    "address": "0xa693B19d2931d498c5B318dF961919BB4aee87a5 ",
+    "address": "0xa693B19d2931d498c5B318dF961919BB4aee87a5",
     "colour": "#0C3595",
     "image": "img/TokenIcons/ustIcon.svg",
     "decimals": 6,
