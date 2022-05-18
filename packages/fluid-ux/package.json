@@ -1,0 +1,30 @@
+{
+  "name": "fluid-ux",
+  "version": "0.1.0",
+  "description": "Reusable components for the Fluidity ecosystem",
+  "repository": "https://github.com/fluidity-money/fluidity-app/",
+  "author": "Fluidity",
+  "license": "MIT",
+  "private": false,
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "@parcel/packager-ts": "2.5.0",
+    "@parcel/transformer-sass": "2.5.0",
+    "@parcel/transformer-typescript-types": "2.5.0",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.4",
+    "parcel": "^2.5.0",
+    "typescript": ">=3.0.0"
+  },
+  "dependencies": {
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
+  }
+}
