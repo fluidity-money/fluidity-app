@@ -77,7 +77,7 @@ func main() {
 
 		case scaledWinAmount.Int64() >= instantRewardThreshold:
 			log.Debug(func(k *log.Log) {
-				k.Message = "Transaction won more than instant send thresshold, sending instantly!"
+				k.Message = "Transaction won more than instant send threshold, sending instantly!"
 			})
 			sendRewards(batchedRewardsQueue, tokenDetails)
 
@@ -85,7 +85,7 @@ func main() {
 
 		case scaledTotalRewards.Int64() >= totalRewardThreshold:
 			log.Debug(func(k *log.Log) {
-				k.Message = "Total pending rewards are greater than thresshold, sending!"
+				k.Message = "Total pending rewards are greater than threshold, sending!"
 			})
 			sendRewards(batchedRewardsQueue, tokenDetails)
 
