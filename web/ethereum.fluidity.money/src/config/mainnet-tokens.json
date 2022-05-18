@@ -72,7 +72,7 @@
   {
     "symbol": "fUSDT",
     "name": "FLUID USD Tether",
-    "address": "",
+    "address": "0x777B135370b35737655a3BA7ca85bD0F08502313",
     "colour": "#rgb(36, 163, 124)",
     "image": "img/TokenIcons/usdtIcon.svg",
     "decimals": 6,
@@ -82,7 +82,7 @@
   {
     "symbol": "fUSDC",
     "name": "FLUID USD Coin",
-    "address": "",
+    "address": "0x815451bbD6C49e43fB1b614bf405E2A69A95D3Fc",
     "colour": "#2775c9",
     "image": "img/TokenIcons/usdcIcon.svg",
     "decimals": 6,
@@ -92,7 +92,7 @@
   {
     "symbol": "fDAI",
     "name": "FLUID Dai",
-    "address": "",
+    "address": "0xF7449745797B4A5932055aECF5c80AE504Bc1495",
     "colour": "#fdc134",
     "image": "img/TokenIcons/daiIcon.svg",
     "decimals": 18,
@@ -102,7 +102,7 @@
   {
     "symbol": "fTUSD",
     "name": "FLUID True USD",
-    "address": "",
+    "address": "0xA49BB086ca9Fa2DFbb9feE1b2033112485b743D4",
     "colour": "#2433b8",
     "image": "img/TokenIcons/tusdIcon.svg",
     "decimals": 18,
@@ -112,7 +112,7 @@
   {
     "symbol": "fFEI",
     "name": "FLUID FEI",
-    "address": "",
+    "address": "0x3cd03e4016d3DD590AFD524daBede7609EC357CA",
     "colour": "#1E8561",
     "image": "img/TokenIcons/feiIcon.svg",
     "decimals": 18,
@@ -122,7 +122,7 @@
   {
     "symbol": "fFRAX",
     "name": "FLUID FRAX",
-    "address": "",
+    "address": "0xeDfE9eD77162e7EA830FC4aE8a892b7E4b8D4940",
     "colour": "#000000",
     "image": "img/TokenIcons/fraxIcon.svg",
     "decimals": 18,
