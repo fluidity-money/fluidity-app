@@ -31,8 +31,8 @@ func main() {
 	var (
 		rewardsQueue           = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 		batchedRewardsQueue    = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-		instantRewardTreshhold = intFromEnvOrFatal(EnvInstantRewardThreshhold)
-		totalRewardTreshhold   = intFromEnvOrFatal(EnvTotalRewardThreshhold)
+		instantRewardThreshold = intFromEnvOrFatal(EnvInstantRewardThreshhold)
+		totalRewardThreshold   = intFromEnvOrFatal(EnvTotalRewardThreshhold)
 	)
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
@@ -57,7 +57,7 @@ func main() {
 			k.Format(
 				"Reward value is $%s, instant send threshhold is $%d.",
 				scaledWinAmount.String(),
-				instantRewardTreshhold,
+				instantRewardThreshold,
 			)
 		})
 
@@ -69,13 +69,13 @@ func main() {
 			k.Format(
 				"Total pending rewards are $%s, threshhold is $%d.",
 				scaledTotalRewards.String(),
-				totalRewardTreshhold,
+				totalRewardThreshold,
 			)
 		})
 
 		switch true {
 
-		case scaledWinAmount.Int64() >= instantRewardTreshhold:
+		case scaledWinAmount.Int64() >= instantRewardThreshold:
 			log.Debug(func(k *log.Log) {
 				k.Message = "Transaction won more than instant send thresshold, sending instantly!"
 			})
@@ -83,7 +83,7 @@ func main() {
 
 			return
 
-		case scaledTotalRewards.Int64() >= totalRewardTreshhold:
+		case scaledTotalRewards.Int64() >= totalRewardThreshold:
 			log.Debug(func(k *log.Log) {
 				k.Message = "Total pending rewards are greater than thresshold, sending!"
 			})
