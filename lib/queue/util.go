@@ -3,7 +3,6 @@ package queue
 import (
 	"fmt"
 
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -22,11 +21,4 @@ func generateRandomConsumerId(workerId string) string {
 	)
 
 	return consumerId
-}
-
-func debug(message string, arguments ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Context = Context
-		k.Format(message, arguments...)
-	})
 }

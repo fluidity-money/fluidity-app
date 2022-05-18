@@ -43,9 +43,3 @@ func newBig(x uint64) *big.Int {
 func writeLastBlock(lastBlock uint64) {
 	state.Set(RedisBlockKey, lastBlock)
 }
-
-func debug(message string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(message, content...)
-	})
-}

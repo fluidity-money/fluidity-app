@@ -36,7 +36,7 @@ const (
 	// is aave based
 	BackendAave = "aave"
 
-	// BackendAurora to use as the environment variable for Aurora 
+	// BackendAurora to use as the environment variable for Aurora
 	// to use Flux as a price oracle
 	BackendAurora = "aurora"
 
@@ -140,16 +140,16 @@ func main() {
 		underlyingTokenAddress_     = os.Getenv(EnvUnderlyingTokenAddress)
 		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
 
-		ethereumDecimalPlaces_      = os.Getenv(EnvEthereumDecimalPlaces)
-		ethFluxAddress_             = os.Getenv(EnvAuroraTokenFluxAddress)
-		tokenFluxAddress_           = os.Getenv(EnvAuroraTokenFluxAddress)
+		ethereumDecimalPlaces_ = os.Getenv(EnvEthereumDecimalPlaces)
+		ethFluxAddress_        = os.Getenv(EnvAuroraTokenFluxAddress)
+		tokenFluxAddress_      = os.Getenv(EnvAuroraTokenFluxAddress)
 
 		// EthereumDecimalPlaces to use when normalising Eth to USDT
 		EthereumDecimalPlaces *big.Rat
 	)
 
 	rand.Seed(time.Now().Unix())
-	
+
 	if ethereumDecimalPlaces_ == "" {
 		// default to 6 decimal places
 		EthereumDecimalPlaces = big.NewRat(1e6, 1)
@@ -169,7 +169,7 @@ func main() {
 
 		EthereumDecimalPlaces = exponentiate(decimals_)
 	}
-	
+
 	var (
 		ethContractAddress            ethCommon.Address
 		ethCTokenAddress              ethCommon.Address
@@ -180,66 +180,28 @@ func main() {
 		ethUnderlyingTokenAddress     ethCommon.Address
 		ethAaveAddressProviderAddress ethCommon.Address
 
-		auroraEthFluxAddress          ethCommon.Address
-		auroraTokenFluxAddress        ethCommon.Address
+		auroraEthFluxAddress   ethCommon.Address
+		auroraTokenFluxAddress ethCommon.Address
 	)
 
 	switch tokenBackend {
 	case BackendCompound:
-
 		var (
-			cTokenAddress              = ethereum.AddressFromString(cTokenAddress_)
-			uniswapAnchoredViewAddress = ethereum.AddressFromString(uniswapAnchoredViewAddress_)
+			cTokenAddress              = mustEthereumAddressFromString(cTokenAddress_)
+			uniswapAnchoredViewAddress = mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
 		)
-
-		if cTokenAddress == "" || uniswapAnchoredViewAddress == "" {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"%s set to compound, but missing %s or %s!",
-					EnvTokenBackend,
-					EnvCTokenAddress,
-					EnvUniswapAnchoredViewAddress,
-				)
-			})
-		}
 
 		ethCTokenAddress = hexToAddress(cTokenAddress)
 		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
 
 	case BackendAave:
-
 		var (
-			aTokenAddress              = ethereum.AddressFromString(aTokenAddress_)
-			aaveAddressProviderAddress = ethereum.AddressFromString(aaveAddressProviderAddress_)
-			usdTokenAddress            = ethereum.AddressFromString(usdTokenAddress_)
-			ethTokenAddress            = ethereum.AddressFromString(ethTokenAddress_)
-			underlyingTokenAddress     = ethereum.AddressFromString(underlyingTokenAddress_)
+			aTokenAddress              = mustEthereumAddressFromString(aTokenAddress_)
+			aaveAddressProviderAddress = mustEthereumAddressFromString(aaveAddressProviderAddress_)
+			usdTokenAddress            = mustEthereumAddressFromString(usdTokenAddress_)
+			ethTokenAddress            = mustEthereumAddressFromString(ethTokenAddress_)
+			underlyingTokenAddress     = mustEthereumAddressFromString(underlyingTokenAddress_)
 		)
-
-		ethereumAddressesEmpty := anyEthereumAddressesEmpty(
-			aTokenAddress,
-			aaveAddressProviderAddress,
-			usdTokenAddress,
-			ethTokenAddress,
-		)
-
-		stringsEmpty := anyStringsEmpty(underlyingTokenAddress_)
-
-		if ethereumAddressesEmpty || stringsEmpty {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Backend set to aave, but missing arguments!",
-					BackendAave,
-					EnvATokenAddress,
-					EnvAaveAddressProviderAddress,
-					EnvUnderlyingTokenAddress,
-					underlyingTokenAddress_,
-					EnvUnderlyingTokenDecimals,
-					underlyingTokenDecimals_,
-					EnvUnderlyingTokenName,
-				)
-			})
-		}
 
 		ethATokenAddress = hexToAddress(aTokenAddress)
 		ethAaveAddressProviderAddress = hexToAddress(aaveAddressProviderAddress)
@@ -249,29 +211,16 @@ func main() {
 
 	case BackendAurora:
 		var (
-			cTokenAddress    = ethereum.AddressFromString(cTokenAddress_)
-			ethFluxAddress   = ethereum.AddressFromString(ethFluxAddress_)
-			tokenFluxAddress = ethereum.AddressFromString(tokenFluxAddress_)
+			cTokenAddress    = mustEthereumAddressFromString(cTokenAddress_)
+			ethFluxAddress   = mustEthereumAddressFromString(ethFluxAddress_)
+			tokenFluxAddress = mustEthereumAddressFromString(tokenFluxAddress_)
 		)
 
-		if cTokenAddress == "" || ethFluxAddress == "" || tokenFluxAddress == "" {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"%s set to aurora, but missing %s, %s, or %s!",
-					EnvTokenBackend,
-					EnvCTokenAddress,
-					EnvAuroraEthFluxAddress,
-					EnvAuroraTokenFluxAddress,
-				)
-			})
-		}
-
-		ethCTokenAddress       = hexToAddress(cTokenAddress)
-		auroraEthFluxAddress   = hexToAddress(ethFluxAddress)
+		ethCTokenAddress = hexToAddress(cTokenAddress)
+		auroraEthFluxAddress = hexToAddress(ethFluxAddress)
 		auroraTokenFluxAddress = hexToAddress(tokenFluxAddress)
 
 	default:
-
 		log.Fatal(func(k *log.Log) {
 			k.Format(
 				"%s should be `aave`, `compound`, or `aurora`, got %s",
@@ -357,24 +306,22 @@ func main() {
 		)
 
 		if len(fluidTransfers) == 0 {
-			log.Debug(func(k *log.Log) {
-				k.Format(
-					"Couldn't find any Fluid transfers in the block %v!",
-					blockHash,
-				)
-			})
+			log.Debugf(
+				"Couldn't find any Fluid transfers in the block %v!",
+				blockHash,
+			)
 
 			return
 		}
 
-		debug(
+		log.Debugf(
 			"Average transfers in block: %#v! Transfers in block: %#v!",
 			averageTransfersInBlock,
 			transfersInBlock,
 		)
 
 		if averageTransfersInBlock < DefaultTransfersInBlock {
-			debug(
+			log.Debugf(
 				"Average transfers in block < default transfers in block (25)!",
 			)
 
@@ -440,7 +387,7 @@ func main() {
 		case BackendAurora:
 			ethPriceUsd, err = flux.GetPrice(
 				gethClient,
-				auroraEthFluxAddress,	
+				auroraEthFluxAddress,
 			)
 		}
 
@@ -457,7 +404,11 @@ func main() {
 
 		var tokenApy *big.Rat
 
-		if tokenBackend == BackendCompound || tokenBackend == BackendAurora {
+		switch tokenBackend {
+		case BackendAurora:
+			fallthrough
+
+		case BackendCompound:
 			tokenApy, err = compound.GetTokenApy(
 				gethClient,
 				ethCTokenAddress,
@@ -474,7 +425,7 @@ func main() {
 					)
 				})
 			}
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			tokenApy, err = aave.GetTokenApy(
 				gethClient,
 				ethAaveAddressProviderAddress,
@@ -499,7 +450,9 @@ func main() {
 		)
 
 		var tokenPriceInUsdt *big.Rat
-		if tokenBackend == BackendCompound {
+
+		switch tokenBackend {
+		case BackendCompound:
 			tokenPriceInUsdt, err = uniswap_anchored_view.GetPrice(
 				gethClient,
 				ethUniswapAnchoredViewAddress,
@@ -517,7 +470,7 @@ func main() {
 					k.Payload = err
 				})
 			}
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			tokenPriceInUsdt, err = aave.GetPrice(
 				gethClient,
 				ethAaveAddressProviderAddress,
@@ -534,7 +487,7 @@ func main() {
 					k.Payload = err
 				})
 			}
-		} else if tokenBackend == BackendAurora {
+		case BackendAurora:
 			tokenPriceInUsdt, err = flux.GetPrice(
 				gethClient,
 				auroraTokenFluxAddress,
@@ -586,7 +539,11 @@ func main() {
 
 		var balanceOfUnderlying *big.Rat
 
-		if tokenBackend == BackendCompound || tokenBackend == BackendAurora {
+		switch tokenBackend {
+		case BackendAurora:
+			fallthrough
+
+		case BackendCompound:
 			balanceOfUnderlying, err = compound.GetBalanceOfUnderlying(
 				gethClient,
 				ethCTokenAddress,
@@ -604,7 +561,7 @@ func main() {
 				})
 			}
 
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			balanceOfUnderlying, err = aave.GetBalanceOf(
 				gethClient,
 				ethATokenAddress,
@@ -700,16 +657,16 @@ func main() {
 
 			// create announcement and container
 
-			randomSource := make([]uint32, 0)
+			randomSource := make([]uint32, len(res))
 
-			for _, i := range res {
-				randomSource = append(randomSource, uint32(i))
+			for i, value := range res {
+				randomSource[i] = uint32(value)
 			}
 
 			tokenDetails := token_details.TokenDetails{
 				TokenShortName: tokenName,
 				TokenDecimals:  underlyingTokenDecimals,
-			}	
+			}
 
 			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
@@ -727,13 +684,6 @@ func main() {
 			log.Debug(func(k *log.Log) {
 				k.Format("Source payouts: %v", randomSource)
 			})
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to make container for announcement!"
-					k.Payload = err
-				})
-			}
 
 			emission.TransactionHash = transactionHash.String()
 			emission.RecipientAddress = recipientAddress.String()

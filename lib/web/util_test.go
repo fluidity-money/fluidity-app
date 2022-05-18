@@ -26,11 +26,6 @@ func (w W) WriteHeader(statusCode int) {
 	w.response.StatusCode = statusCode
 }
 
-// for coverage - log.Debug is tested in package `log`
-func TestDebug(t *testing.T) {
-	debug("Test Debug Message %v", 123456)
-}
-
 func TestSetCorsHeaders(t *testing.T) {
 
 	w := W{
