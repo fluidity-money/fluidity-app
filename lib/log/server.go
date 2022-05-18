@@ -40,20 +40,12 @@ var (
 )
 
 func backoff() {
-	duration, err := time.ParseDuration(fmt.Sprintf("%vs", (2 + rand.Intn(58))))
-	if err != nil {
-		fmt.Fprintf(
-			os.Stderr,
-			"We couldn't generate a random backoff duration! %v\n",
-			err,
-		)
-		duration = time.Duration(0)
-	}
-	fmt.Fprintf(
-		os.Stderr,
+	duration := time.Duration(2+rand.Intn(58)) * time.Second
+	message := fmt.Sprintf(
 		"Sleeping for %v seconds...\n",
 		duration.Seconds(),
 	)
+	logMessage(loggingLevelApp, "CrashScheduler", message, "")
 	time.Sleep(duration)
 }
 
