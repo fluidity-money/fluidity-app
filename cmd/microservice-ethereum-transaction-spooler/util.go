@@ -13,41 +13,40 @@ import (
 
 // read an int64 that must exist from the environment
 func intFromEnvOrFatal(env string) int64 {
-    resString := util.GetEnvOrFatal(env)
+	resString := util.GetEnvOrFatal(env)
 
-    res, err := strconv.Atoi(resString)
+	res, err := strconv.Atoi(resString)
 
-    if err != nil {
-        log.Fatal(func (k *log.Log) {
-            k.Format(
-                "Failed to parse %s as an int reading env %s!",
-                resString,
-                env,
-            )
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to parse %s as an int reading env %s!",
+				resString,
+				env,
+			)
+			k.Payload = err
+		})
+	}
 
-    return int64(res)
+	return int64(res)
 }
 
 // calculates 10^x as a bigint (for token decimals)
 func bigExp10(val int64) *big.Int {
-    res := new(big.Int)
+	res := new(big.Int)
 
-    ten := big.NewInt(10)
+	ten := big.NewInt(10)
 
-    exp := big.NewInt(val)
+	exp := big.NewInt(val)
 
-    res.Exp(ten, exp, nil)
+	res.Exp(ten, exp, nil)
 
-    return res
+	return res
 }
 
 // flushes the reward queue and sends the batched reward
 func sendRewards(queueName string, token token_details.TokenDetails) {
-    transactions := spooler.GetAndRemoveRewardsForToken(token)
+	transactions := spooler.GetAndRemoveRewardsForToken(token)
 
-    queue.SendMessage(queueName, transactions)
+	queue.SendMessage(queueName, transactions)
 }
-
