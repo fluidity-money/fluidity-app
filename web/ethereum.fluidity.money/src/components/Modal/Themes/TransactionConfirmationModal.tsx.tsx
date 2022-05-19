@@ -3,7 +3,7 @@ import { userActionContext } from "components/context";
 import GenericModal from "components/Modal/GenericModal";
 import { useContext } from "react";
 import { WebsocketUserAction } from "util/api/types";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 import { etherscanTransaction } from "util/etherscan";
 
 const TransactionConfirmationModal = ({
@@ -50,7 +50,7 @@ const TransactionConfirmationModal = ({
           href={
             userActions.length
               ? etherscanTransaction(userActions[0].transaction_hash)
-              : "https://ropsten.etherscan.io/"
+              : "https://etherscan.io"
           }
           rel="noreferrer"
         >
@@ -60,7 +60,7 @@ const TransactionConfirmationModal = ({
 
         <Button
           theme={
-            chainIdFromEnv() === 1313161554
+            chainIdFromEnv() === ChainId.AuroraMainnet
               ? "primary-button-aurora"
               : "primary-button"
           }

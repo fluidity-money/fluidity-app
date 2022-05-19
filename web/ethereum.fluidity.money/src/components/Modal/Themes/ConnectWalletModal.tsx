@@ -2,7 +2,7 @@ import Button from "components/Button";
 import { Connectors, useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import GenericModal from "components/Modal/GenericModal";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const metamask = "/img/WalletIcons/metamask.png";
 const walletconnect = "/img/WalletIcons/walletconnect.png";
@@ -32,7 +32,7 @@ const ConnectWalletModal = ({
     toggle();
   };
 
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   type Options = {
     name: string;

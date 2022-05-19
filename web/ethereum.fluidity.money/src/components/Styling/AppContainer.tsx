@@ -1,5 +1,5 @@
 import Icon from "components/Icon";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const AppContainer = ({
   children,
@@ -9,7 +9,7 @@ const AppContainer = ({
   return (
     <div
       className={
-        chainIdFromEnv() === 1313161554
+        chainIdFromEnv() === ChainId.AuroraMainnet
           ? "app-container gradient-background--aurora"
           : "app-container gradient-background"
       }

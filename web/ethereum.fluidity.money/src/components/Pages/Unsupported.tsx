@@ -3,9 +3,9 @@ import AppBody from "components/Styling/AppBody";
 import Icon from "../Icon";
 import Button from "components/Button";
 import { useHistory } from "react-router-dom";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
-const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
 const Unsupported = () => {
   const history = useHistory();
@@ -25,7 +25,7 @@ const Unsupported = () => {
         <Button
           label="Return to fluidity.money"
           theme={
-            chainIdFromEnv() === 1313161554
+            chainIdFromEnv() === ChainId.AuroraMainnet
               ? "primary-button-aurora"
               : "primary-button"
           }

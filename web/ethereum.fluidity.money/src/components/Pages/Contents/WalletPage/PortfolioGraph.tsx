@@ -1,9 +1,9 @@
 import WalletChart from "components/Charts/WalletChart";
 import TimeSelector from "components/Charts/TimeSelector";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const PortfolioGraph = () => {
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   return (
     <div className="portfolio-graph">

@@ -1,6 +1,6 @@
 import { TokenKind } from "components/types";
 import React from "react";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 interface ButtonProps {
   label: string;
@@ -39,7 +39,7 @@ const Button = ({
   disabled,
   visible,
 }: ButtonProps) => {
-  const aurora = chainIdFromEnv() === 1313161554 ? "-aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "-aurora" : "";
   if (auth || priviledge === 0 || priviledge === undefined) {
     return (
       <button

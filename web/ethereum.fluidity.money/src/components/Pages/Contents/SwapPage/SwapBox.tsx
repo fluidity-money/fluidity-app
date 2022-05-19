@@ -238,7 +238,8 @@ const SwapBox = () => {
       setAmount(currentBalance);
   }, [swap]);
 
-  const auroraStyle = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const auroraStyle =
+    chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   const AmountAvailable = ({ invert = false }: { invert?: boolean }) => {
     let isNonFluid = swap;
@@ -264,7 +265,7 @@ const SwapBox = () => {
     <modalToggle.Provider value={modalContext}>
       <div
         className={
-          chainIdFromEnv() === 1313161554
+          chainIdFromEnv() === ChainId.AuroraMainnet
             ? "swap-box-container-aurora flex column"
             : "swap-box-container flex column"
         }
@@ -364,7 +365,7 @@ const SwapBox = () => {
                 wallet.status == "connected" ? switchPayment() : switchWallet();
               }}
               theme={
-                chainIdFromEnv() === 1313161554
+                chainIdFromEnv() === ChainId.AuroraMainnet
                   ? "primary-button-aurora"
                   : "primary-button"
               }

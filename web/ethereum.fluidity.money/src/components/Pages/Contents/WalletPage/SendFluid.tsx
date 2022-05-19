@@ -20,7 +20,7 @@ import { decimalTrim } from "util/decimalTrim";
 import { notificationContext } from "components/Notifications/notificationContext";
 import { isNonZero, trimAmount } from "util/amounts";
 import { handleContractErrors } from "util/makeContractSwap";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const SendFluid = () => {
   const [to, setTo] = useState<string>("0.0"); // records amount
@@ -196,7 +196,7 @@ const SendFluid = () => {
     selectedFluidToken: [selectedFluidToken, setterFluidToken],
   };
 
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   return (
     <modalToggle.Provider value={modalContext}>

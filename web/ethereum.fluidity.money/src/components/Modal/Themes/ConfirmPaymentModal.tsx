@@ -160,7 +160,7 @@ const ConfirmPaymentModal = ({
           label="Confirm"
           goto={confirmTrigger}
           theme={
-            chainIdFromEnv() === 1313161554
+            chainIdFromEnv() === ChainId.AuroraMainnet
               ? "payment-button primary-button-aurora"
               : "payment-button primary-button"
           }

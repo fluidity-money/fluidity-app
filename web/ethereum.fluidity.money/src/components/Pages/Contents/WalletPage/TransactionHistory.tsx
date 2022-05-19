@@ -3,7 +3,7 @@ import { trimAddress } from "util/addresses";
 import { formatAmount } from "util/amounts";
 import dateFormatter from "util/dateFormatter";
 import { etherscanAddress, etherscanTransaction } from "util/etherscan";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const tableItems = [
   "Date",
@@ -68,7 +68,7 @@ const TransactionHistory = ({ myHistory }: transactionHistory) => {
               <th
                 key={index}
                 className={
-                  chainIdFromEnv() === 1313161554
+                  chainIdFromEnv() === ChainId.AuroraMainnet
                     ? "primary-text--aurora"
                     : "primary-text"
                 }

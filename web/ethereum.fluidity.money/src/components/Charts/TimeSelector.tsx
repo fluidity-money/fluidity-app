@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Button from "components/Button";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const TimeSelector = () => {
   const [btnSelect, setBtnSelect] = useState([
@@ -26,7 +26,7 @@ const TimeSelector = () => {
         <Button
           label={buttonLabels}
           theme={
-            chainIdFromEnv() === 1313161554
+            chainIdFromEnv() === ChainId.AuroraMainnet
               ? "primary-text--aurora"
               : "primary-text"
           }

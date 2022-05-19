@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import GenericModal from "components/Modal/GenericModal";
 import React, { useEffect } from "react";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 interface Blockchain {
   blockchain: string;
@@ -26,7 +26,7 @@ const SelectBlockchainModal = ({
   enable: boolean;
   toggle: Function;
 }) => {
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
   const networkOptions: Blockchain[] = [
     {
       blockchain: "Ethereum",
@@ -35,7 +35,7 @@ const SelectBlockchainModal = ({
       networks: [
         { name: "Ropsten", address: "https://ropsten.beta.fluidity.money/" },
         { name: "Kovan", address: "https://kovan.beta.fluidity.money/" },
-        { name: "Aurora", address: "https://aurora.beta.fluidity.money/" },
+        { name: "Aurora", address: "https://app.aurora.fluidity.money/" },
       ],
     },
     {

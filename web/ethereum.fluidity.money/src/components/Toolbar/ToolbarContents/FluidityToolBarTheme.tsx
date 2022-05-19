@@ -14,7 +14,7 @@ import {
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
 import NetworkButton from "components/Button/NetworkButton";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -74,7 +74,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
     setActive((_active) => wallet.status === "connected");
   }, [wallet.status]);
 
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   return (
     <Media queries={{ small: { maxWidth: 890 } }}>
@@ -135,7 +135,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                   <Button
                     label="Enable Notifications"
                     theme={
-                      chainIdFromEnv() === 1313161554
+                      chainIdFromEnv() === ChainId.AuroraMainnet
                         ? "primary-button-aurora--toolbar mx-1-r"
                         : "primary-button--toolbar mx-1-r"
                     }
@@ -163,7 +163,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <Button
                   label={"Connect Wallet"}
                   theme={
-                    chainIdFromEnv() === 1313161554
+                    chainIdFromEnv() === ChainId.AuroraMainnet
                       ? "primary-button-aurora--toolbar"
                       : "primary-button--toolbar"
                   }

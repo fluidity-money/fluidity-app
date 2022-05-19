@@ -2,7 +2,7 @@ import Button from "components/Button";
 import Header from "components/Header";
 import { useHistory } from "react-router-dom";
 import Routes from "util/api/types";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 type left = {
   rewardPool: Routes["/prize-pool"];
@@ -17,7 +17,9 @@ const Left = ({ rewardPool }: left) => {
         Reward Pool
       </Header>
       <h1
-        className={chainIdFromEnv() === 1313161554 ? "prize--aurora" : "prize"}
+        className={
+          chainIdFromEnv() === ChainId.AuroraMainnet ? "prize--aurora" : "prize"
+        }
       >
         {rewardPool.amount &&
           parseFloat(rewardPool.amount).toLocaleString("en-US", {
@@ -34,7 +36,7 @@ const Left = ({ rewardPool }: left) => {
             history.push("/");
           }}
           theme={
-            chainIdFromEnv() === 1313161554
+            chainIdFromEnv() === ChainId.AuroraMainnet
               ? "primary-button-aurora"
               : "primary-button"
           }

@@ -1,5 +1,5 @@
 import React from "react";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const Header = ({
   children,
@@ -16,7 +16,7 @@ const Header = ({
   style?: React.CSSProperties;
   className?: string;
 }) => {
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
   return (
     <div
       className={`header ${type}-text${aurora} text-${

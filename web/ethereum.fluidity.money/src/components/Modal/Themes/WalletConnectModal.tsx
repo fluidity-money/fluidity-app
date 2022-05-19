@@ -8,7 +8,7 @@ import { JsonRpcProvider } from "ethers/providers";
 import { useState } from "react";
 import ConnectWalletModal from "components/Modal/Themes/ConnectWalletModal";
 import { useHistory } from "react-router-dom";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const WalletConnectedModal = ({
   enable,
@@ -115,7 +115,7 @@ const WalletConnectedModal = ({
               >
                 <div
                   className={
-                    chainIdFromEnv() === 1313161554
+                    chainIdFromEnv() === ChainId.AuroraMainnet
                       ? "swap-box-subheader primary-text--aurora"
                       : "swap-box-subheader primary-text"
                   }

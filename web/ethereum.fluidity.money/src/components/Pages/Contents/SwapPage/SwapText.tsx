@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "components/Header";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const SwapText = () => {
   return (
@@ -16,7 +16,7 @@ const SwapText = () => {
       </Header>
       <div
         className={
-          chainIdFromEnv() === 1313161554
+          chainIdFromEnv() === ChainId.AuroraMainnet
             ? "secondary-text--aurora swap-text-secondary my-2-t"
             : "secondary-text swap-text-secondary my-2-t"
         }

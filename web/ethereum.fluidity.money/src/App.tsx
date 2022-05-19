@@ -157,7 +157,8 @@ const App = () => {
     setFluidTokens: setFluidTokens,
   };
 
-  const auroraStyle = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const auroraStyle =
+    chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   return (
     // React router provider

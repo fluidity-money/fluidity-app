@@ -6,7 +6,7 @@ import getWalletERC20Status from "util/getWalletERC20Status";
 import { walletDataType } from "util/getWalletERC20Status";
 import { useSigner } from "util/hooks";
 import _ from "lodash";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -60,7 +60,7 @@ const CurrencyBreakdown = () => {
     [walletAmounts, walletTypes, colours]
   );
 
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   // Checks to see if the user's wallet is empty
   return (

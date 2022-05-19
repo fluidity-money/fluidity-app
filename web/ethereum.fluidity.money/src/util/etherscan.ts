@@ -1,8 +1,9 @@
-import { chainIdFromEnv } from "./chainId";
+import ChainId, { chainIdFromEnv } from "./chainId";
 
 const rootRopstenAddress = "https://ropsten.etherscan.io";
 const rootKovanAddress = "https://kovan.etherscan.io";
 const rootAddress = "https://etherscan.io";
+const rootAuroraAddress = "https://aurorascan.dev/";
 
 export const etherscanAddressRopsten = (address: string) =>
   `${rootRopstenAddress}/address/${address}`;
@@ -22,14 +23,22 @@ export const etherscanAddressMainnet = (address: string) =>
 export const etherscanTransactionMainnet = (transaction: string) =>
   `${rootAddress}/tx/${transaction}`;
 
+export const etherscanAddressAurora = (address: string) =>
+  `${rootAuroraAddress}/address/${address}`;
+
+export const etherscanTransactionAurora = (transaction: string) =>
+  `${rootAuroraAddress}/tx/${transaction}`;
+
 export const etherscanAddress = (address: string) => {
   let link = "";
-  chainIdFromEnv() === 1
+  chainIdFromEnv() === ChainId.Mainnet
     ? (link = etherscanAddressMainnet(address))
-    : chainIdFromEnv() === 3
+    : chainIdFromEnv() === ChainId.Ropsten
     ? (link = etherscanAddressRopsten(address))
-    : chainIdFromEnv() === 42
+    : chainIdFromEnv() === ChainId.Kovan
     ? (link = etherscanAddressKovan(address))
+    : chainIdFromEnv() === ChainId.AuroraMainnet
+    ? (link = etherscanAddressAurora(address))
     : (link = rootAddress);
   return link;
 };

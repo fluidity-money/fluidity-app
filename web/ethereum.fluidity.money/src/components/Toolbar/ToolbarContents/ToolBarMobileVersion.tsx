@@ -7,7 +7,7 @@ import { useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
 import NetworkButton from "components/Button/NetworkButton";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -35,7 +35,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
     setToggle(!toggle);
   };
 
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   return (
     <div className="toolbar-container-mobile flex-space-between">

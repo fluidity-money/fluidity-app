@@ -2,7 +2,7 @@ import Routes from "util/api/types";
 import { trimAddress } from "util/addresses";
 import { formatAmount } from "util/amounts";
 import { etherscanAddress } from "util/etherscan";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 type infoGrid = {
   prizeBoard: Routes["/prize-board"];
@@ -11,7 +11,7 @@ type infoGrid = {
 //date formatter removed
 
 const InfoGrid = ({ prizeBoard }: infoGrid) => {
-  const aurora = chainIdFromEnv() === 1313161554 ? "--aurora" : "";
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
   return (
     <div className="reward-info-table">
