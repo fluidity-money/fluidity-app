@@ -20,6 +20,7 @@ import { decimalTrim } from "util/decimalTrim";
 import { notificationContext } from "components/Notifications/notificationContext";
 import { isNonZero, trimAmount } from "util/amounts";
 import { handleContractErrors } from "util/makeContractSwap";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const SendFluid = () => {
   const [to, setTo] = useState<string>("0.0"); // records amount
@@ -195,10 +196,12 @@ const SendFluid = () => {
     selectedFluidToken: [selectedFluidToken, setterFluidToken],
   };
 
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
+
   return (
     <modalToggle.Provider value={modalContext}>
       <div className="send-container">
-        <h3 className="primary-text send-warning">
+        <h3 className={`primary-text${aurora} send-warning`}>
           Note: not all wallets accept Fluid dollars
         </h3>
         <div className="send-input-container">
@@ -234,7 +237,7 @@ const SendFluid = () => {
           <Button
             label="Send"
             goto={sendForm}
-            className="send-button"
+            className={`send-button${aurora}`}
             disabled={
               !isNonZero(to, decimals) ||
               !address ||
@@ -244,7 +247,7 @@ const SendFluid = () => {
             }
           />
           <p
-            className="amount-avail secondary-text"
+            className={`amount-avail secondary-text${aurora}`}
             onClick={() => setToWrapper(balance)}
           >
             {walletStatus === "connected" ? (
@@ -268,7 +271,11 @@ const SendFluid = () => {
         <TransactionConfirmationModal
           enable={successTransactionModal}
           toggle={() => setSuccessTransactionModal(false)}
-          message={<div className="primary-text">Transaction Successful</div>}
+          message={
+            <div className={`primary-text${aurora}`}>
+              Transaction Successful
+            </div>
+          }
         />
       </div>
     </modalToggle.Provider>

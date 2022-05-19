@@ -1,26 +1,29 @@
 import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
 import { useState } from "react";
-import { chainIdFromEnv } from "util/chainId";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const NetworkButton = () => {
   const [blockchainToggle, setBlockchainToggle] = useState(false);
   const blockchainModalToggle = () => {
     setBlockchainToggle(!blockchainToggle);
   };
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
   return (
     <>
       <div
-        className="select-blockchain"
+        className={`select-blockchain${aurora}`}
         onClick={() => setBlockchainToggle(true)}
       >
         <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
-        <div className="chain-name primary-text">
-          {chainIdFromEnv() === 3
+        <div className={`chain-name primary-text${aurora}`}>
+          {chainIdFromEnv() === ChainId.Ropsten
             ? "Ropsten"
-            : chainIdFromEnv() === 42
+            : chainIdFromEnv() === ChainId.Kovan
             ? "Kovan"
-            : chainIdFromEnv() === 1
+            : chainIdFromEnv() === ChainId.Mainnet
             ? "Mainnet"
+            : chainIdFromEnv() === ChainId.AuroraMainnet
+            ? "Aurora"
             : "Ethereum"}
         </div>
       </div>

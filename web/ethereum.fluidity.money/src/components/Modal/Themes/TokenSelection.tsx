@@ -5,6 +5,7 @@ import Button from "components/Button";
 import { TokenKind, TokenList } from "components/types";
 import TokenSearch from "./TokenSearch";
 import PinnedToken from "./PinnedToken";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const TokenSelection = ({
   tokenList,
@@ -85,7 +86,15 @@ const TokenSelection = ({
       height="auto"
     >
       <div className="connect-modal-body">
-        <h2 className="primary-text">Select a Token</h2>
+        <h2
+          className={
+            chainIdFromEnv() === ChainId.AuroraMainnet
+              ? "primary-text--aurora"
+              : "primary-text"
+          }
+        >
+          Select a Token
+        </h2>
         <TokenSearch
           setTokenListState={setTokenList}
           resetLists={resetLists}

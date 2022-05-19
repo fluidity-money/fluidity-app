@@ -3,43 +3,50 @@ import AppBody from "components/Styling/AppBody";
 import Icon from "../Icon";
 import Button from "components/Button";
 import { useHistory } from "react-router-dom";
+import ChainId, { chainIdFromEnv } from "util/chainId";
+
+const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
 const Unsupported = () => {
   const history = useHistory();
   return (
-    <div className='unsupported-container gradient-background'>
-      <div className='unsupported-content'>
-        <div className='f-logo-container'>
-          <Icon src='i-fluidity-large f-logo-icon' />
-          <div className='fluidity-text f-logo-text'>Fluidity.</div>
+    <div className="unsupported-container gradient-background">
+      <div className="unsupported-content">
+        <div className="f-logo-container">
+          <Icon src="i-fluidity-large f-logo-icon" />
+          <div className="fluidity-text f-logo-text">Fluidity.</div>
         </div>
-        <div className='primary-text warning-text-heading'>
+        <div className={`primary-text${aurora} warning-text-heading`}>
           Sorry, this app is not supported on your browser
         </div>
-        <div className='secondary-text warning-text'>
+        <div className={`secondary-text${aurora} warning-text`}>
           Please use Firefox, Brave, Chrome, or Edge
         </div>
         <Button
-          label='Return to fluidity.money'
-          theme={"primary-button"}
-          className='return-btn'
+          label="Return to fluidity.money"
+          theme={
+            chainIdFromEnv() === ChainId.AuroraMainnet
+              ? "primary-button-aurora"
+              : "primary-button"
+          }
+          className="return-btn"
           goto={() => (window.location.href = "https://fluidity.money")}
         />
-        <div className='social-container'>
+        <div className="social-container">
           <Icon
-            src='i-twitter'
+            src="i-twitter"
             trigger={() =>
               (window.location.href = "https://twitter.com/fluiditymoney")
             }
           />
           <Icon
-            src='i-discord'
+            src="i-discord"
             trigger={() =>
               (window.location.href = "https://discord.gg/CNvpJk4HpC")
             }
           />
           <Icon
-            src='i-telegram'
+            src="i-telegram"
             trigger={() =>
               (window.location.href = "https://t.me/fluiditymoney")
             }

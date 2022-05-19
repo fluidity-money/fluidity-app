@@ -161,6 +161,17 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
 
   -webkit-text-fill-color: transparent;
   -moz-text-fill-color: transparent;
+
+  &--aurora {
+    @extend .primary-text;
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+  }
 }
 
 .primary-text-btn {
@@ -190,6 +201,14 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
 
   -webkit-text-fill-color: transparent;
   -moz-text-fill-color: transparent;
+
+  &--aurora {
+    @extend .secondary-text;
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+  }
 }
 
 .white-primary-text {

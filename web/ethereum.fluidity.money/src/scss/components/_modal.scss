@@ -206,6 +206,12 @@
   @include for-below-400 {
     font-size: 1.4rem;
   }
+  &--aurora {
+    @extend.wallet-text;
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
 }
 
 .select-token-text {

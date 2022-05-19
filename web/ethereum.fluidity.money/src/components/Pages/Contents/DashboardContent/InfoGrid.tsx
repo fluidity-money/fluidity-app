@@ -2,6 +2,7 @@ import Routes from "util/api/types";
 import { trimAddress } from "util/addresses";
 import { formatAmount } from "util/amounts";
 import { etherscanAddress } from "util/etherscan";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 type infoGrid = {
   prizeBoard: Routes["/prize-board"];
@@ -10,16 +11,20 @@ type infoGrid = {
 //date formatter removed
 
 const InfoGrid = ({ prizeBoard }: infoGrid) => {
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
+
   return (
     <div className="reward-info-table">
       <div className="reward-info-table-column">
-        <div className="reward-info-table-header secondary-text header">
+        <div
+          className={`reward-info-table-header secondary-text${aurora} header`}
+        >
           Amount
         </div>
         <div className="reward-info-table-column-container">
           {prizeBoard.map(({ winning_amount, token_details }, i) => (
             <div
-              className="reward-info-table-content"
+              className={`reward-info-table-content${aurora}`}
               key={winning_amount + String(i)}
             >
               $
@@ -38,13 +43,15 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
         </div>
       </div>
       <div className="reward-info-table-column">
-        <div className="reward-info-table-header secondary-text header">
+        <div
+          className={`reward-info-table-header secondary-text${aurora} header`}
+        >
           Winner
         </div>
         <div className="reward-info-table-column-container">
           {prizeBoard.map(({ winner_address }, index) => (
             <a
-              className="winner-address"
+              className={`winner-address${aurora}`}
               key={index}
               target="_blank"
               href={etherscanAddress(winner_address)}
@@ -56,13 +63,15 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
         </div>
       </div>
       <div className="reward-info-table-column">
-        <div className="reward-info-table-header header secondary-text">
+        <div
+          className={`reward-info-table-header header secondary-text${aurora}`}
+        >
           Date
         </div>
         <div className="reward-info-table-column-container">
           {prizeBoard.map(({ awarded_time }, i) => (
             <div
-              className="reward-info-table-content"
+              className={`reward-info-table-content${aurora}`}
               key={String(i) + awarded_time}
             >
               {new Date(awarded_time)
