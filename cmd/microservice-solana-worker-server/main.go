@@ -25,6 +25,9 @@ const (
 	// EnvSolanaRpcUrl is the RPC url of the solana node to connect to
 	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
 
+	// EnvSolanaNetwork is the network of the trf data store account
+	EnvSolanaNetwork = `FLU_SOLANA_NETWORK`
+
 	// EnvFluidityPubkey is the program id of the fluidity program
 	EnvFluidityPubkey = `FLU_SOLANA_PROGRAM_ID`
 
@@ -71,9 +74,6 @@ const (
 	// Chain for filtering TRF var in Timescale
 	TrfChain = `solana`
 
-	// Network for filtering TRF var in Timescale
-	TrfNetwork = `devnet`
-
 	// SolanaBlockTime assumed by the ATX calculation
 	SolanaBlockTime uint64 = 1
 
@@ -88,6 +88,7 @@ func main() {
 
 	var (
 		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaNetwork    = util.GetEnvOrFatal(EnvSolanaNetwork)
 		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 		decimalPlaces_   = util.GetEnvOrFatal(EnvTokenDecimals)
@@ -257,7 +258,7 @@ func main() {
 
 			defer queue.SendMessage(worker.TopicEmissions, emission)
 
-			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, TrfNetwork)
+			tribecaDataStoreTrfVars := payout.GetLatestCalculatenArgs(TrfChain, solanaNetwork)
 
 			var (
 				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
