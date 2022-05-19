@@ -16,7 +16,7 @@ func addAndComputeAverageAtx(blockNumber uint64, tokenShortName string, transfer
 
 	var blockNumber_ uint64 = 0
 
- 	if blockNumber > AtxBufferSize {
+	if blockNumber > AtxBufferSize {
 		blockNumber_ = blockNumber - AtxBufferSize
 	}
 

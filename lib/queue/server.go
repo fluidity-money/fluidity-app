@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/streadway/amqp"
 )
 
@@ -33,7 +34,7 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		)
 	}
 
-	debug(
+	log.Debugf(
 		"Binding a new queue with name %v and routing key %v on exchange %v!",
 		queueName,
 		topic,
@@ -57,7 +58,7 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		)
 	}
 
-	debug("Bound a queue %#v serving %v!", queueName, topic)
+	log.Debugf("Bound a queue %#v serving %v!", queueName, topic)
 
 	messageChan, err := channel.Consume(
 		queueName,
@@ -90,7 +91,7 @@ func queuePublish(topic, exchangeName string, content []byte, channel *amqp.Chan
 		Body:         content,
 	}
 
-	debug(
+	log.Debugf(
 		"channel.Publish a message to %#v topic %#v!",
 		exchangeName,
 		topic,

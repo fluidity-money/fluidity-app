@@ -21,7 +21,3 @@ func TestIntRatConversion(t *testing.T) {
 	rUint64ToRat := xUint64ToRat.Num().Int64()
 	assert.EqualValues(t, x, rUint64ToRat)
 }
-
-func TestDebug(t *testing.T) {
-	debug("format string %v", 123)
-}

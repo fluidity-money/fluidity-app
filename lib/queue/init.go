@@ -69,7 +69,7 @@ func init() {
 		})
 	}
 
-	debug(
+	log.Debugf(
 		"Declared a queue with name %#v type %#v!",
 		ExchangeName,
 		ExchangeType,

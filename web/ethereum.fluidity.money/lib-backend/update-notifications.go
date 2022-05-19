@@ -3,6 +3,7 @@ package api_fluidity_money
 import (
 	"net/url"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
 )
 
@@ -31,11 +32,11 @@ func HandleUpdateNotifications(updates chan interface{}) func(string, url.Values
 				replies <- winningMessage
 
 			case _ = <-shutdown:
-				debug("Shutting down IP %#v!", ipAddress)
+				log.Debugf("Shutting down IP %#v!", ipAddress)
 
 				broadcast.Unsubscribe(cookie)
 
-				debug(
+				log.Debugf(
 					"Done indicating to the broadcast server of the shutdown! %#v",
 					ipAddress,
 				)

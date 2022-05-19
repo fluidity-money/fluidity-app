@@ -10,13 +10,6 @@ import (
 	"net/http"
 )
 
-func debug(message string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Context = Context
-		k.Format(message, content...)
-	})
-}
-
 func returnAccessDenied(w http.ResponseWriter) {
 	w.WriteHeader(HeaderAccessDenied)
 }

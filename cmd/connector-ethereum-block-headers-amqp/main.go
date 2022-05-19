@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 
-	ethConvert "github.com/fluidity-money/fluidity-app/cmd/connector-ethereum-block-headers-amqp/lib/ethereum"
-
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	ethQueue "github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
+	ethCommon "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -57,7 +56,7 @@ func main() {
 			})
 
 		case header := <-headers:
-			newHeader := ethConvert.ConvertHeader(header)
+			newHeader := ethCommon.ConvertHeader(header)
 
 			log.Debug(func(k *log.Log) {
 				k.Format("Sending Block Header: %v", newHeader.BlockHash)
