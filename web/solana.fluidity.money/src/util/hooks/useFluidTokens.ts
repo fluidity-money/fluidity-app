@@ -26,18 +26,13 @@ const useFluidTokens = () => {
     const updatedList: FluidTokens = tokenList.reduce(
       (allTokens, { symbol, mintAddress, name, decimals }) => ({
         ...allTokens,
-        [symbol]:
-          symbol === "SOL"
-            ? SOL[network]
-            : new Token({
-                chainId: NETWORK_TO_CHAIN_ID[network],
-                // chainId: networkToChainId('localnet'),
-
-                address: mintAddress,
-                name: name,
-                symbol: symbol,
-                decimals: decimals || 9,
-              }),
+        [symbol]: new Token({
+          chainId: NETWORK_TO_CHAIN_ID[network],
+          address: mintAddress,
+          name: name,
+          symbol: symbol,
+          decimals: decimals || 9,
+        }),
       }),
       {} as FluidTokens
     );
