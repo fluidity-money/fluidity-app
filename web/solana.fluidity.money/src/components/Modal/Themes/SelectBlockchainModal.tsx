@@ -22,12 +22,27 @@ const SelectBlockchainModal = ({
     {
       network: "Solana",
       icon: "/img/TokenIcons/solanaIcon.svg",
+      address: "https://app.solana.fluidity.money/",
+    },
+    {
+      network: "Solana Devnet",
+      icon: "/img/TokenIcons/solanaIcon.svg",
       address: "https://app.solana.beta.fluidity.money/",
     },
     {
-      network: "Ethereum",
+      network: "Ethereum Ropsten",
       icon: "/img/TokenIcons/ethereumIcon.svg",
       address: "https://ropsten.beta.fluidity.money/",
+    },
+    {
+      network: "Ethereum Kovan",
+      icon: "/img/TokenIcons/ethereumIcon.svg",
+      address: "https://kovan.beta.fluidity.money/",
+    },
+    {
+      network: "Ethereum Aurora",
+      icon: "/img/TokenIcons/ethereumIcon.svg",
+      address: "https://app.aurora.fluidity.money/",
     },
   ];
   const renderedOptions = options.map(({ network, icon, address }, index) => {
