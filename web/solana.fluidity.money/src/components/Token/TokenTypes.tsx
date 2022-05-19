@@ -7,6 +7,8 @@ const usdc = "img/TokenIcons/usdcIcon.svg";
 const usdt = "img/TokenIcons/usdtIcon.svg";
 const dai = "img/TokenIcons/daiIcon.svg";
 const sol = "img/TokenIcons/solanaIcon.svg";
+const uxd = "img/TokenIcons/uxdIcon.svg"
+const ust = "img/TokenIcons/ustIcon.svg"
 
 // External token options
 export const extOptions: TokenKind[] = [
@@ -20,6 +22,17 @@ export const extOptions: TokenKind[] = [
     src: usdt,
     colour: "rgb(36,163,124)"
   },
+  {
+    type: "UXD",
+    src: uxd,
+    colour: "#000000"
+  },
+  {
+    type: "UST",
+    src: ust,
+    colour: "#0C3595"
+  },
+  
   // {
   //   type: "DAI",
   //   src: dai,
@@ -43,6 +56,16 @@ export const intOptions: TokenKind[] = [
     type: "fUSDT",
     src: usdt,
     colour: "rgb(36,163,124)"
+  },
+  {
+    type: "fUXD",
+    src: uxd,
+    colour: "#000000"
+  },
+  {
+    type: "fUST",
+    src: ust,
+    colour: "#0C3595"
   },
   // {
   //   type: "fDAI",
