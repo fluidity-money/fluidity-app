@@ -28,6 +28,7 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 		tokenDetails = winner.TokenDetails
 
 		tokenShortName = tokenDetails.TokenShortName
+		tokenDecimals = tokenDetails.TokenDecimals
 		hash = winner.TransactionHash
 		senderAddress = winner.FromAddress
 		recipientAddress = winner.ToAddress
@@ -37,6 +38,7 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
 			token_short_name,
+			token_decimals,
 			transaction_hash,
 			sender_address,
 			recipient_address,
@@ -48,7 +50,8 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 			$2,
 			$3,
 			$4,
-			$5
+			$5,
+			$6
 		);`,
 
 		TablePendingWinners,
@@ -57,6 +60,7 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 	_, err := timescaleClient.Exec(
 		statementText,
 		tokenShortName,
+		tokenDecimals,
 		hash,
 		senderAddress,
 		recipientAddress,
@@ -132,6 +136,8 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 			reward_sent = false
 			AND token_short_name = $1
 		RETURNING
+			token_short_name,
+			token_decimals,
 			transaction_hash,
 			sender_address,
 			recipient_address,
@@ -167,9 +173,10 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 		var (
 			winner worker.EthereumWinnerAnnouncement
 		)
-		winner.TokenDetails = token
 
 		err := rows.Scan(
+			&winner.TokenDetails.TokenShortName,
+			&winner.TokenDetails.TokenDecimals,
 			&winner.TransactionHash,
 			&winner.FromAddress,
 			&winner.ToAddress,
