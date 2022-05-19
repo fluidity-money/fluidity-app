@@ -77,10 +77,10 @@
   flex-direction: column;
   text-align: center;
   align-content: center;
-  overflow-y: auto;
+  overflow-y: overlay;
 
   &:hover {
-    overflow-y: scroll;
+    overflow-y: overlay;
     &::-webkit-scrollbar-thumb {
       background: #555;
       border-radius: 10px;
@@ -456,8 +456,8 @@
   background-color: transparent;
   border: solid 2px #333333;
   border-radius: 10px;
-  margin-left: 3px;
-  margin-right: 3px;
+  margin-left: 15px;
+  margin-right: 15px;
   &--closed {
     @extend .blockchain-container;
     background-color: transparent;

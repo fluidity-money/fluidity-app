@@ -10,7 +10,7 @@ const changeNetwork = async () => {
       method: "wallet_switchEthereumChain",
       params: [
         {
-          chainId: chainIdFromEnv() === 42 ? `0x2a` : `0x${chainIdFromEnv()}`,
+          chainId: `0x${chainIdFromEnv().toString(16)}`,
         },
       ],
     });
