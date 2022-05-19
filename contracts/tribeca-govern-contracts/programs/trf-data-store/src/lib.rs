@@ -10,15 +10,15 @@ pub use state::*;
 
 use instructions::*;
 
-declare_id!("HdSHLoG6gbQ7tkMvB87QraPpdxF9bnfNobbjnZxKviRS");
+declare_id!("3bSnCHQdUN2sGDWRfvYMVoNxF39MceMeo3u2kgZ1nQsW");
 
 #[program]
-pub mod tribeca_data_store {
+pub mod trf_data_store {
     use super::*;
 
     #[access_control(ctx.accounts.validate())]
-    pub fn initialize(ctx: Context<CreateCalculateNArgs>, bump: u8) -> Result<()> {
-        initialize_payout::handler(ctx, bump)
+    pub fn initialize(ctx: Context<CreateTrfVars>, bump: u8) -> Result<()> {
+        initialize_trf_vars::handler(ctx, bump)
     }
 
     #[access_control(ctx.accounts.validate())]

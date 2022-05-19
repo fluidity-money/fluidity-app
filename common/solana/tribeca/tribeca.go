@@ -3,7 +3,7 @@ package tribeca
 import solana "github.com/gagliardetto/solana-go"
 
 type (
-	TribecaProgramData struct {
+	TrfDataStoreProgramData struct {
 		Authority        solana.PublicKey `json:"authority"`
 		Bump             uint8            `json:"bump"`
 		PayoutFreqNum    uint32           `json:"payout_freq_num"`

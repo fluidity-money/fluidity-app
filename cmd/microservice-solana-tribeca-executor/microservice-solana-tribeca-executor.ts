@@ -17,7 +17,7 @@ import {
 import { GokiSDK } from "@gokiprotocol/client/dist/cjs";
 import { GovernJSON } from "@tribecahq/tribeca-sdk/dist/cjs/idls/govern";
 
-const	FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
+const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
 
 if (!FLU_SENTRY_URL) {
   throw new Error("FLU_SENTRY_URL not provided");
@@ -27,7 +27,7 @@ Sentry.init({
   dsn: FLU_SENTRY_URL,
 });
 
-const	WORKER_ID = process.env.FLU_WORKER_ID as string;
+const WORKER_ID = process.env.FLU_WORKER_ID as string;
 
 if (!WORKER_ID) {
   throw new Error("WORKER_ID not provided");
@@ -49,13 +49,13 @@ if (!EXECUTOR_SECRET_KEY) {
   throw new Error("FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY not provided");
 }
 
-// FLU_TRIBECA_DATA_STORE_SECRET_KEY is the base58 encoded key responsible for paying and signing
-//  tribeca-data-store transactions
-const TRIBECA_SECRET_KEY = process.env
-  .FLU_TRIBECA_DATA_STORE_SECRET_KEY as string;
+// FLU_TRF_DATA_STORE_SECRET_KEY is the base58 encoded key responsible for paying and signing
+//  trf-data-store transactions
+const TRF_SECRET_KEY = process.env
+  .FLU_TRF_DATA_STORE_SECRET_KEY as string;
 
-if (!TRIBECA_SECRET_KEY) {
-  throw new Error("FLU_TRIBECA_DATA_STORE_SECRET_KEY not provided");
+if (!TRF_SECRET_KEY) {
+  throw new Error("FLU_TRF_DATA_STORE_SECRET_KEY not provided");
 }
 
 // FLU_SOLANA_PAYER is the base58 encoded key responsible for paying and signing
@@ -121,8 +121,8 @@ const payerKeypair = web3.Keypair.fromSecretKey(
   base58_to_binary(EXECUTOR_SECRET_KEY),
 );
 
-const tribecaDataStorePayer = web3.Keypair.fromSecretKey(
-  base58_to_binary(TRIBECA_SECRET_KEY),
+const trfDataStorePayer = web3.Keypair.fromSecretKey(
+  base58_to_binary(TRF_SECRET_KEY),
 );
 
 const fluSolanaPayer = web3.Keypair.fromSecretKey(
@@ -250,7 +250,7 @@ const provider = SolanaProvider.init({
           }
 
           const votingPeriodPromise = sleep(
-            votingPeriod.toNumber() * 1000 + 5000,
+            (votingPeriod.toNumber() * 1000) + 1000,
           );
 
           const event = logs[4].split(": ")[1];
@@ -347,7 +347,7 @@ const provider = SolanaProvider.init({
           });
 
           invokeExecuteTx.addSigners(payerKeypair);
-          invokeExecuteTx.addSigners(tribecaDataStorePayer);
+          invokeExecuteTx.addSigners(trfDataStorePayer);
           invokeExecuteTx.addSigners(fluSolanaPayer);
 
           await invokeExecuteTx.send();

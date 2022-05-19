@@ -1,12 +1,13 @@
 [package]
-name = "tribeca-data-store"
-version = "0.1.0"
-description = "Created with Anchor"
-edition = "2018"
+name = "trf-data-store"
+version = "0.1.1"
+description = "Handles storage of TRF variabes for Fluidity Solana workers"
+authors = ["Fluidity Money"]
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "tribeca_data_store"
+name = "trf_data_store"
 
 [features]
 no-entrypoint = []
