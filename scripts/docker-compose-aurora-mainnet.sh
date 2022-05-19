@@ -13,8 +13,8 @@ export \
 	FLU_SLACK_WEBHOOK="$FLU_SLACK_WEBHOOK"
 
 export \
-	FLU_ETHEREUM_FRONTEND_API_URL=https://aurora.beta.fluidity.money:8081 \
-	FLU_ETHEREUM_FRONTEND_WS_URL=wss://aurora.beta.fluidity.money:8081/updates \
+	FLU_ETHEREUM_FRONTEND_API_URL=https://aurora.app.fluidity.money:8081 \
+	FLU_ETHEREUM_FRONTEND_WS_URL=wss://aurora.app.fluidity.money:8081/updates \
 	FLU_ETHEREUM_FRONTEND_CHAIN_ID=1313161554 \
 	FLU_ETHEREUM_FRONTEND_TOKEN_FILE=aurora-mainnet-tokens.json \
 	FLU_ETHEREUM_FRONTEND_GETH_URL="$FLU_ETHEREUM_FRONTEND_GETH_URL"
