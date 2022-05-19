@@ -3,6 +3,7 @@
 
 CREATE TABLE ethereum_pending_winners (
     token_short_name VARCHAR NOT NULL,
+    token_decimals INT NOT NULL,
     transaction_hash VARCHAR NOT NULL,
     sender_address VARCHAR NOT NULL,
     recipient_address VARCHAR NOT NULL,
