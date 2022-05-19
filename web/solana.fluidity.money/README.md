@@ -21,6 +21,14 @@ This codebase contains a Solana-compatible React webapp.
 | `REACT_APP_FLU_OBLIGATION_USDT`     | Public key of the solend USDT obligation account.                                 |
 | `REACT_APP_FLU_DATA_ACCOUNT_USDT`   | Public key of the solend USDT data account.                                       |
 | `REACT_APP_BASE_MINT_USDT`          | Public key of the solend USDT base mint account.                                  |
+| `REACT_APP_FLU_MINT_UST`            | Public key of the solend UST mint account.                                        |
+| `REACT_APP_FLU_OBLIGATION_UST`      | Public key of the solend UST obligation account.                                  |
+| `REACT_APP_FLU_DATA_ACCOUNT_UST`    | Public key of the solend UST data account.                                        |
+| `REACT_APP_BASE_MINT_UST`           | Public key of the solend UST base mint account.                                   |
+| `REACT_APP_FLU_MINT_UXD`            | Public key of the solend UXD mint account.                                        |
+| `REACT_APP_FLU_OBLIGATION_UXD`      | Public key of the solend UXD obligation account.                                  |
+| `REACT_APP_FLU_DATA_ACCOUNT_UXD`    | Public key of the solend UXD data account.                                        |
+| `REACT_APP_BASE_MINT_UXD`           | Public key of the solend UXD base mint account.                                   |
 
 ## Building
 
