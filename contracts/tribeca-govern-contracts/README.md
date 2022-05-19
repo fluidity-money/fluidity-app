@@ -1,7 +1,10 @@
 
-# tribeca-data-store
+# tribeca-govern-contracts
 
-Contract storing TRF variables, called by Fluidity Solana workers
+Contracts governed by Fluidity Tribeca governance
+
+- Trf Data Store
+    Holds TRF variables onchain for Fluidity Solana workers to pick up
 
 ## Building
 

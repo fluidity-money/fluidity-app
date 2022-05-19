@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/payout"
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -257,7 +257,7 @@ func main() {
 
 			defer queue.SendMessage(worker.TopicEmissions, emission)
 
-			tribecaDataStoreTrfVars := payout.GetLatestCalculatenArgs(TrfChain, TrfNetwork)
+			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, TrfNetwork)
 
 			var (
 				winningClasses   = tribecaDataStoreTrfVars.WinningClasses

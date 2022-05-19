@@ -6,8 +6,8 @@ Subscribes to emitted events from Tribeca, and funnels proposals through its lif
 
 |            Name                  |                                 Description
 |----------------------------------|---------------------------------------------------------------------------|
-| `SECRET_KEY`                     | Payer secret key as B58. Should be a member of Tribeca executive council  |
-| `TRIBECA_DATA_STORE_SECRET_KEY`  | Tribeca Data Store Authority secret key as B58                            |
+| `FLU_SOLANA_TRIBECA_SECRET_KEY`  | Payer secret key as B58. Should be a member of Tribeca executive council  |
+| `FLU_TRF_DATA_STORE_SECRET_KEY`  | Trf Data Store Authority secret key as B58                                |
 | `FLU_SOLANA_PAYER`               | Fluidity Solana Authority secret key as B58                               |
 | `FLU_TRIBECA_GOVERNOR_PUBKEY`    | Pubkey of Tribeca governor                                                |
 | `FLU_TRIBECA_LOCKER_PUBKEY`      | Pubkey of Tribeca locker                                                  |

@@ -35,7 +35,8 @@ Serializes and submits transactions to Tribeca governor
 
 |            Name                       |                                 Description
 |---------------------------------------|--------------------------------------------------------------|
-| `FLU_TRIBECA_DATA_STORE_PUBKEY`       | Pubkey of Tribeca data store contract                        |
+| `FLU_TRF_DATA_STORE_PROGRAM_ID`       | Pubkey of Trf data store program                             |
+| `FLU_TRF_DATA_STORE_SECRET_KEY`       | Authority of Trf data store contract                         |
 | `FLU_TRIBECA_DATA_STORE_DELTA_NUM`    | New TRF delta weight numerator                               |
 | `FLU_TRIBECA_DATA_STORE_DELTA_DENOM`  | New TRF delta weight denominator                             |
 | `FLU_TRIBECA_DATA_STORE_FREQ_NUM`     | New TRF payout frequency numerator                           |

@@ -8,9 +8,9 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/tribeca"
-	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/payout"
+	database "github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
+	types "github.com/fluidity-money/fluidity-app/lib/types/payout"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -18,42 +18,46 @@ const (
 	// EnvSolanaWsUrl is the RPC url of the solana node to connect to
 	EnvSolanaWsUrl = `FLU_SOLANA_WS_URL`
 
-	// EnvFluidityPubkey is the program id of the tribeca data store account
-	EnvTribecaDataStorePubkey = `FLU_TRIBECA_DATA_STORE_PUBKEY`
+	// EnvSolanaNetwork is the network the TRF variables affect
+	EnvSolanaNetwork = `FLU_SOLAN_NETWORK`
+
+	// EnvFluidityPubkey is the program id of the trf data store account
+	EnvTrfDataStoreProgramId = `FLU_TRF_DATA_STORE_PROGRAM_ID`
 )
 
 func main() {
 	var (
-		tribecaDataStorePubkey_ = util.GetEnvOrFatal(EnvTribecaDataStorePubkey)
-		solanaWsUrl             = util.GetEnvOrFatal(EnvSolanaWsUrl)
+		trfDataStoreProgramId = util.GetEnvOrFatal(EnvTrfDataStoreProgramId)
+		solanaWsUrl           = util.GetEnvOrFatal(EnvSolanaWsUrl)
+		solanaNetwork         = util.GetEnvOrFatal(EnvSolanaNetwork)
 
 		accountNotificationChan = make(chan solana.AccountNotification)
 		errChan                 = make(chan error)
 	)
 
-	tribecaDataStorePubkey := goSolana.MustPublicKeyFromBase58(tribecaDataStorePubkey_)
+	trfDataStorePubkey := goSolana.MustPublicKeyFromBase58(trfDataStoreProgramId)
 
 	var (
-		tribecaDataStoreString = "calculateNArgs"
-		tribecaDataStoreBytes_ = []byte(tribecaDataStoreString)
-		tribecaDataStoreBytes  = [][]byte{tribecaDataStoreBytes_}
+		trfDataStoreString = "trfDataStore"
+		trfDataStoreBytes_ = []byte(trfDataStoreString)
+		trfDataStoreBytes  = [][]byte{trfDataStoreBytes_}
 	)
 
-	tribecaDataStorePda, _, err := goSolana.FindProgramAddress(
-		tribecaDataStoreBytes,
-		tribecaDataStorePubkey,
+	trfDataStorePda, _, err := goSolana.FindProgramAddress(
+		trfDataStoreBytes,
+		trfDataStorePubkey,
 	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "failed to derive tribeca data store pda!"
+			k.Message = "failed to derive trf-data-store pda!"
 			k.Payload = err
 		})
 	}
 
 	solanaSubscription, err := solana.SubscribeAccount(
 		solanaWsUrl,
-		tribecaDataStorePda.String(),
+		trfDataStorePda.String(),
 		accountNotificationChan,
 		errChan,
 	)
@@ -71,14 +75,14 @@ func main() {
 		select {
 		case accountNotification := <-accountNotificationChan:
 			log.Debug(func(k *log.Log) {
-				k.Message = "Tribeca updated CalculateN Args!"
+				k.Message = "Tribeca updated TRF vars!"
 			})
 
-			var calculateNArgs tribeca.TribecaProgramData
+			var trfDataStoreData tribeca.TrfDataStoreProgramData
 
-			dataBase64 := accountNotification.Value.Data[0]
+			trfDataStoreDataBase64 := accountNotification.Value.Data[0]
 
-			dataBinary, err := base64.StdEncoding.DecodeString(dataBase64)
+			trfDataStoreDataBinary, err := base64.StdEncoding.DecodeString(trfDataStoreDataBase64)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -87,7 +91,7 @@ func main() {
 				})
 			}
 
-			err = borsh.Deserialize(&calculateNArgs, dataBinary[8:])
+			err = borsh.Deserialize(&trfDataStoreData, trfDataStoreDataBinary[8:])
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -97,16 +101,16 @@ func main() {
 			}
 
 			var (
-				deltaWeightNum   = calculateNArgs.DeltaWeightNum
-				deltaWeightDenom = calculateNArgs.DeltaWeightDenom
-				winningClasses   = calculateNArgs.WinningClasses
-				payoutFreqNum    = calculateNArgs.PayoutFreqNum
-				payoutFreqDenom  = calculateNArgs.PayoutFreqDenom
+				deltaWeightNum   = trfDataStoreData.DeltaWeightNum
+				deltaWeightDenom = trfDataStoreData.DeltaWeightDenom
+				winningClasses   = trfDataStoreData.WinningClasses
+				payoutFreqNum    = trfDataStoreData.PayoutFreqNum
+				payoutFreqDenom  = trfDataStoreData.PayoutFreqDenom
 			)
 
-			calculateNArgsInternal := types.TribecaProgramData{
+			trfVars := types.TrfVars{
 				Chain:            "solana",
-				Network:          "devnet",
+				Network:          solanaNetwork,
 				PayoutFreqNum:    int64(payoutFreqNum),
 				PayoutFreqDenom:  int64(payoutFreqDenom),
 				DeltaWeightNum:   int64(deltaWeightNum),
@@ -114,7 +118,7 @@ func main() {
 				WinningClasses:   int(winningClasses),
 			}
 
-			database.InsertNArgs(calculateNArgsInternal)
+			database.InsertTrfVars(trfVars)
 
 		case err := <-errChan:
 			log.Fatal(func(k *log.Log) {

@@ -3,7 +3,7 @@
 -- reusable datatypes across the postgres/timescale relations
 -- since the backend's the same.
 
-CREATE TABLE calculaten_args (
+CREATE TABLE trf_vars (
     -- network args belongs to
     chain network_blockchain NOT NULL,
     network VARCHAR NOT NULL,
@@ -13,13 +13,11 @@ CREATE TABLE calculaten_args (
     delta_weight_num BIGINT NOT NULL,
     delta_weight_denom BIGINT NOT NULL,
     winning_classes INT NOT NULL,
-
-    -- time this tvl was recorded
-    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    primary key(chain, network)
 );
 
 -- migrate:down
 
-DROP TABLE IF EXISTS calculaten_args;
+DROP TABLE trf_vars;
 
 

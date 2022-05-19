@@ -1,4 +1,4 @@
-//! change payout delta in [CalculateNArgs].
+//! change payout delta_weight in [TrfVars].
 
 use crate::*;
 
@@ -7,7 +7,7 @@ use crate::*;
 pub struct ChangeDelta<'info> {
     #[account(mut)]
     /// CalculateNArgs determines behaviour of worker
-    pub calculaten_args: Account<'info, CalculateNArgs>,
+    pub trf_vars: Account<'info, TrfVars>,
 
     /// The authority
     pub authority: Signer<'info>,
@@ -26,17 +26,17 @@ pub fn handler(
         panic!("divide by zero error")
     }
 
-    let calculaten_args = &mut ctx.accounts.calculaten_args;
+    let trf_vars = &mut ctx.accounts.trf_vars;
 
-    calculaten_args.delta_weight_num = delta_weight_num;
-    calculaten_args.delta_weight_denom = delta_weight_denom;
+    trf_vars.delta_weight_num = delta_weight_num;
+    trf_vars.delta_weight_denom = delta_weight_denom;
 
     Ok(())
 }
 
 impl<'info> Validate<'info> for ChangeDelta<'info> {
     fn validate(&self) -> Result<()> {
-        assert_keys_eq!(self.calculaten_args.authority, self.authority);
+        assert_keys_eq!(self.trf_vars.authority, self.authority);
 
         Ok(())
     }

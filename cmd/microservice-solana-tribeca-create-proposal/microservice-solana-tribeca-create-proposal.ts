@@ -7,7 +7,7 @@ import { PublicKey, SolanaProvider } from "@saberhq/solana-contrib";
 
 import { GovernorWrapper, TribecaSDK } from "tribeca/dist/cjs";
 
-const	FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
+const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
 
 if (!FLU_SENTRY_URL) {
   throw new Error("FLU_SENTRY_URL not provided");
@@ -17,7 +17,7 @@ Sentry.init({
   dsn: FLU_SENTRY_URL,
 });
 
-const	WORKER_ID = process.env.FLU_WORKER_ID as string;
+const WORKER_ID = process.env.FLU_WORKER_ID as string;
 
 if (!WORKER_ID) {
   throw new Error("WORKER_ID not provided");
@@ -120,7 +120,7 @@ const createProposalWithInstruction = async (
 
     case "INITIALIZE_DATA_STORE": {
       const { initializeHandler } = await require(
-        "./create-tribeca-data-store-instruction",
+        "./create-trf-data-store-instruction",
       );
       const { instruction, signers } = await initializeHandler();
       await createProposalWithInstruction(instruction, signers);
@@ -129,7 +129,7 @@ const createProposalWithInstruction = async (
 
     case "CHANGE_DELTA": {
       const { changeDeltaHandler } = await require(
-        "./create-tribeca-data-store-instruction",
+        "./create-trf-data-store-instruction",
       );
       const { instruction, signers } = await changeDeltaHandler();
       await createProposalWithInstruction(instruction, signers);
@@ -138,7 +138,7 @@ const createProposalWithInstruction = async (
 
     case "CHANGE_PAYOUT_FREQ": {
       const { changePayoutFrequencyHandler } = await require(
-        "./create-tribeca-data-store-instruction",
+        "./create-trf-data-store-instruction",
       );
       const { instruction, signers } = await changePayoutFrequencyHandler();
       await createProposalWithInstruction(instruction, signers);
@@ -147,7 +147,7 @@ const createProposalWithInstruction = async (
 
     case "CHANGE_NUM_REWARD_TIERS": {
       const { changeNumRewardTiersHandler } = await require(
-        "./create-tribeca-data-store-instruction",
+        "./create-trf-data-store-instruction",
       );
       const { instruction, signers } = await changeNumRewardTiersHandler();
       await createProposalWithInstruction(instruction, signers);

@@ -1,7 +1,7 @@
 
-# connector-solana-tribeca-timescale
+# connector-solana-trf-data-postgres
 
-connector-solana-tribeca-timescale listens to updates to data accounts owned by a program, and inserts updates into Timescale
+connector-solana-trf-data-postgres listens to updates to the TRF data account, and inserts updates into Postgres
 
 ## Environment variables
 
@@ -11,7 +11,7 @@ connector-solana-tribeca-timescale listens to updates to data accounts owned by 
 | `FLU_DEBUG`                     | Toggle debug messages produced by any application using the debug logger.    |
 | `FLU_TIMESCALE_URI`             | Database URI to use when connecting to the Timescale database.               |
 | `FLU_SOLANA_WS_URL`             | Solana node WS address.                                                      |
-| `FLU_TRIBECA_PROGRAM_ID`	      | Program ID of the program Tribeca controls.                                  |
+| `FLU_TRF_DATA_STORE_PROGRAM_ID` | Public key of the TRF data store program.                                    |
 
 ## Building
 

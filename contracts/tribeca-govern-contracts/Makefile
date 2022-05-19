@@ -1,5 +1,5 @@
 
-REPO := fluidity-solana-tribeca-data-store
+REPO := fluidity-solana-tribeca-govern-contracts
 
 ANCHOR_BUILD := anchor build
 
@@ -7,20 +7,16 @@ ANCHOR_TEST := anchor test
 
 ANCHOR_DEPLOY := anchor deploy
 
-OUT_BPF := target/deploy/tribeca_data_store.so
-
 SRC_FILES := $(shell find programs Anchor.toml Cargo.*)
 
 .PHONY: build clean test
 
 all: build
 
-build: ${OUT_BPF}
-
 deploy:
 	@${ANCHOR_DEPLOY}
 
-${OUT_BPF}: ${SRC_FILES}
+build: ${SRC_FILES}
 	@${ANCHOR_BUILD}
 
 docker: ${SRC_FILES} Dockerfile
