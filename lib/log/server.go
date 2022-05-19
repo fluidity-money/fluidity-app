@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"time"
 )
@@ -38,8 +39,19 @@ var (
 	loggingStream = os.Stderr
 )
 
+func backoff() {
+	duration := time.Duration(2+rand.Intn(58)) * time.Second
+	message := fmt.Sprintf(
+		"Sleeping for %v seconds...\n",
+		duration.Seconds(),
+	)
+	logMessage(loggingLevelApp, "CrashScheduler", message, "")
+	time.Sleep(duration)
+}
+
 func processExit() {
 	sentryExit()
+	backoff()
 	os.Exit(1)
 }
 
@@ -67,7 +79,7 @@ func printLoggingMessage(stream io.WriteCloser, time time.Time, workerId, level,
 
 func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUrl, environment string) {
 	// shutdownCallbacks to shut down other registered services when a service exits fatally
-	shutdownCallbacks := make([]func(), 0)	
+	shutdownCallbacks := make([]func(), 0)
 
 	if err := sentryInit(sentryUrl, environment); err != nil {
 		fmt.Fprintf(
@@ -75,7 +87,6 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 			"Failed to initialise Sentry! %v\n",
 			err,
 		)
-
 		processExit()
 	}
 
@@ -131,7 +142,7 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 			}
 
 			if shouldExit {
-				for _, shutdown := range shutdownCallbacks{
+				for _, shutdown := range shutdownCallbacks {
 					shutdown()
 				}
 				processExit()
@@ -160,6 +171,6 @@ func logCooking(level int, k func(k *Log)) {
 }
 
 // RegisterShutdown to register a callback to occur when a process exits fatally
-func RegisterShutdown(callback func ()) {
+func RegisterShutdown(callback func()) {
 	shutdownChan <- callback
 }
