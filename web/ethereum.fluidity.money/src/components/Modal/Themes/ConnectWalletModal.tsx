@@ -2,6 +2,7 @@ import Button from "components/Button";
 import { Connectors, useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import GenericModal from "components/Modal/GenericModal";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const metamask = "/img/WalletIcons/metamask.png";
 const walletconnect = "/img/WalletIcons/walletconnect.png";
@@ -31,6 +32,8 @@ const ConnectWalletModal = ({
     toggle();
   };
 
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
+
   type Options = {
     name: string;
     src: string; //png
@@ -59,7 +62,7 @@ const ConnectWalletModal = ({
           label={name}
           key={name + index}
           theme={`select-button--wallet ${(isConnected ?? "") && "active"}`}
-          texttheme="wallet-text"
+          texttheme={`wallet-text${aurora}`}
           //fontSize="font-large"
           icon={
             // nosemgrep: typescript.react.security.audit.react-http-leak.react-http-leak
@@ -85,7 +88,7 @@ const ConnectWalletModal = ({
       width={width}
     >
       <div className="connect-modal-body">
-        <h2 className="primary-text">
+        <h2 className={`primary-text${aurora}`}>
           {wallet.status === "connected"
             ? "Wallet Connected"
             : "Connect to Wallet"}

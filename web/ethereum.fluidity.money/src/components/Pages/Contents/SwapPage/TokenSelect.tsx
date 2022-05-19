@@ -42,6 +42,7 @@ const TokenSelect = ({
       ? (mainnet as TokenKind[])
       : (ropsten as TokenKind[]);
 
+  const style = chainId === ChainId.AuroraMainnet ? "--aurora" : "";
   // accesses tokens from context
   const tokens: TokenKind[] = useContext(tokenListContext).tokens;
   const setTokens = useContext(tokenListContext).setTokens;
@@ -226,7 +227,7 @@ const TokenSelect = ({
     case "token":
       return (
         <div
-          className="token-selection-container flex align"
+          className={`token-selection-container${style} flex align`}
           onClick={() => {
             toggle();
             resetLists();
@@ -255,7 +256,7 @@ const TokenSelect = ({
     case "fluid":
       return (
         <div
-          className="token-selection-container flex align"
+          className={`token-selection-container${style} flex align`}
           onClick={() => {
             toggle();
             resetLists();

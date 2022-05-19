@@ -1,5 +1,6 @@
 import { TokenKind } from "components/types";
 import React from "react";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 interface ButtonProps {
   label: string;
@@ -38,6 +39,7 @@ const Button = ({
   disabled,
   visible,
 }: ButtonProps) => {
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "-aurora" : "";
   if (auth || priviledge === 0 || priviledge === undefined) {
     return (
       <button
@@ -46,7 +48,7 @@ const Button = ({
         button
         ${fontSize ?? ""}
         ${theme}
-        ${selected === true ? "selected" : ""}
+        ${selected === true ? `selected${aurora}` : ""}
         ${className}
         ${subSelected === true ? "subSelected" : ""}
         ${timeSelected === true ? "timeSelected" : ""}

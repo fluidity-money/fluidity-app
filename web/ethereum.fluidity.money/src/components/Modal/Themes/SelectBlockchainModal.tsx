@@ -1,6 +1,7 @@
 import Button from "components/Button";
 import GenericModal from "components/Modal/GenericModal";
 import React, { useEffect } from "react";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 interface Blockchain {
   blockchain: string;
@@ -25,6 +26,7 @@ const SelectBlockchainModal = ({
   enable: boolean;
   toggle: Function;
 }) => {
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
   const networkOptions: Blockchain[] = [
     {
       blockchain: "Ethereum",
@@ -33,6 +35,7 @@ const SelectBlockchainModal = ({
       networks: [
         { name: "Ropsten", address: "https://ropsten.beta.fluidity.money/" },
         { name: "Kovan", address: "https://kovan.beta.fluidity.money/" },
+        { name: "Aurora", address: "https://app.aurora.fluidity.money/" },
       ],
     },
     {
@@ -66,7 +69,7 @@ const SelectBlockchainModal = ({
             label={blockchain}
             key={index}
             theme={`select-button`}
-            texttheme="wallet-text"
+            texttheme={`wallet-text${aurora}`}
             visible={visible}
             icon={
               // nosemgrep: typescript.react.security.audit.react-http-leak.react-http-leak
@@ -96,7 +99,7 @@ const SelectBlockchainModal = ({
                 }}
               >
                 <img src={icon} className={`network-icon`} alt={blockchain} />
-                <div className="primary-text">{network.name}</div>
+                <div className={`primary-text${aurora}`}>{network.name}</div>
               </div>
             ))}
         </div>
@@ -112,7 +115,7 @@ const SelectBlockchainModal = ({
       width={width}
     >
       <div className="connect-modal-body--networks">
-        <h2 className="primary-text">Select a Blockchain</h2>
+        <h2 className={`primary-text${aurora}`}>Select a Blockchain</h2>
         <div className="connect-modal-form">{renderedOptions}</div>
       </div>
     </GenericModal>

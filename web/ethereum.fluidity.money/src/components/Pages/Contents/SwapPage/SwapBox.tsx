@@ -238,12 +238,14 @@ const SwapBox = () => {
       setAmount(currentBalance);
   }, [swap]);
 
+  const auroraStyle =
+    chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
+
   const AmountAvailable = ({ invert = false }: { invert?: boolean }) => {
     let isNonFluid = swap;
     if (invert) isNonFluid = !isNonFluid;
-
     return (
-      <div className="amount-avail secondary-text">
+      <div className={`amount-avail secondary-text${auroraStyle}`}>
         {walletStatus === "connected" ? (
           isNonFluid ? (
             selectedToken !== "Select Token" ? (
@@ -261,7 +263,13 @@ const SwapBox = () => {
 
   return (
     <modalToggle.Provider value={modalContext}>
-      <div className="swap-box-container flex column">
+      <div
+        className={
+          chainIdFromEnv() === ChainId.AuroraMainnet
+            ? "swap-box-container-aurora flex column"
+            : "swap-box-container flex column"
+        }
+      >
         <div className="swap-form flex column flex-space-between">
           <FormSection
             defaultMargin={false}
@@ -356,7 +364,11 @@ const SwapBox = () => {
               goto={() => {
                 wallet.status == "connected" ? switchPayment() : switchWallet();
               }}
-              theme={"primary-button"}
+              theme={
+                chainIdFromEnv() === ChainId.AuroraMainnet
+                  ? "primary-button-aurora"
+                  : "primary-button"
+              }
               padding="py-1"
               disabled={
                 (isNonZero(amount, decimals) &&
@@ -387,7 +399,9 @@ const SwapBox = () => {
               enable={successTransactionModal}
               toggle={() => setSuccessTransactionModal(false)}
               message={
-                <div className="primary-text">Transaction Successful</div>
+                <div className={`primary-text${auroraStyle}`}>
+                  Transaction Successful
+                </div>
               }
             />
           </FormSection>

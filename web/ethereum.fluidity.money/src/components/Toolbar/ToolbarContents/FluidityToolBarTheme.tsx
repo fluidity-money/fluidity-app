@@ -14,6 +14,7 @@ import {
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
 import NetworkButton from "components/Button/NetworkButton";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -73,6 +74,8 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
     setActive((_active) => wallet.status === "connected");
   }, [wallet.status]);
 
+  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
+
   return (
     <Media queries={{ small: { maxWidth: 890 } }}>
       {(matched) =>
@@ -90,7 +93,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               <div></div>
               <Button
                 label="Dashboard"
-                theme="primary-text"
+                theme={`primary-text${aurora}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/dashboard")}
@@ -100,7 +103,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Swap"
-                theme="primary-text"
+                theme={`primary-text${aurora}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/")}
@@ -110,7 +113,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Wallet"
-                theme="primary-text"
+                theme={`primary-text${aurora}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/wallet")}
@@ -131,7 +134,11 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
                     label="Enable Notifications"
-                    theme={"primary-button--toolbar mx-1-r"}
+                    theme={
+                      chainIdFromEnv() === ChainId.AuroraMainnet
+                        ? "primary-button-aurora--toolbar mx-1-r"
+                        : "primary-button--toolbar mx-1-r"
+                    }
                     goto={checkNotifications}
                     padding="p-0_5"
                   />
@@ -144,7 +151,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 >
                   <Button
                     label={address}
-                    theme={"primary-text header-text"}
+                    theme={`primary-text${aurora} header-text`}
                     goto={() => {
                       setToggle(true);
                     }}
@@ -155,7 +162,11 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               ) : (
                 <Button
                   label={"Connect Wallet"}
-                  theme={"primary-button--toolbar"}
+                  theme={
+                    chainIdFromEnv() === ChainId.AuroraMainnet
+                      ? "primary-button-aurora--toolbar"
+                      : "primary-button--toolbar"
+                  }
                   goto={() => {
                     setToggle(true);
                   }}

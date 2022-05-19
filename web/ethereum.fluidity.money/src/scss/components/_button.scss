@@ -102,6 +102,26 @@
   }
 }
 
+.primary-button-aurora {
+  background: $aurora;
+  border-radius: 10px;
+  height: 100%;
+
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 600;
+  text-align: center;
+  color: black;
+  font-size: 1rem;
+  // animation: gradientShift 1s infinite;
+  &--toolbar {
+    @extend .primary-button-aurora;
+    @include for-smallest-toolbar {
+      font-size: 0.8rem;
+    }
+  }
+}
+
 .raleway {
   font-family: Raleway, sans-serif;
 }
@@ -226,6 +246,60 @@
   left: 2px;
   right: 2px;
   background-color: #0d222a;
+  z-index: -1;
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+
+.selected-aurora {
+  border: none;
+  width: auto;
+  display: inline-block;
+  border-radius: 99px;
+  color: $aurora-border;
+  position: relative;
+  z-index: 1;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: 400;
+
+  font-family: "Open Sans", Arial, Serif, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  background: $aurora-border;
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+
+  -webkit-text-fill-color: white;
+  -moz-text-fill-color: white;
+}
+
+.selected-aurora:before,
+.selected-aurora:after {
+  content: " ";
+  position: absolute;
+  border-radius: 17px;
+}
+
+.selected-aurora:before {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: -2;
+  background: $aurora-border;
+  background: $aurora-border;
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#503b9a', endColorstr='#269cc1',GradientType=1 );
+}
+
+.selected-aurora:after {
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  background-color: #1a1a1b;
   z-index: -1;
   opacity: 1;
   transition: all 0.3s ease-in-out;
