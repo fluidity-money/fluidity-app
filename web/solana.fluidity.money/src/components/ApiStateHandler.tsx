@@ -5,7 +5,6 @@ import useWebSocket from "react-use-websocket";
 import {QueryParams} from "react-use-websocket/dist/lib/types";
 import { apiPOST, apiPOSTBody, root_websocket } from "util/api";
 import Routes, { WebsocketUserAction, WebsocketMessage } from "util/api/types";
-import useFluidTokens from "util/hooks/useFluidTokens";
 import {amountToDecimalString} from "util/numbers";
 import { notificationContext } from "./Notifications/notificationContext";
 

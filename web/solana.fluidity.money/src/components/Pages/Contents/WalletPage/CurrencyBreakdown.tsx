@@ -15,12 +15,12 @@ const CurrencyBreakdown = () => {
   const [walletTypes, setWalletTypes] = useState<string[]>([]);
   const [walletAmounts, setWalletAmounts] = useState<string[]>([]);
   const sol = useSolana();
-  const tokens = useFluidToken();
+  const {tokens, fluidTokensList, nonFluidTokensList} = useFluidToken();
 
   // Renders out Wallet Token Data if signer connected
   useEffect(() => {
     if (sol.connected && tokens) 
-      getWalletSPLStatus(sol, tokens).then(status => setWalletData(status));
+      getWalletSPLStatus(sol, tokens, fluidTokensList, nonFluidTokensList).then(status => setWalletData(status));
     else {
       // Render no wallet data case here
     }
