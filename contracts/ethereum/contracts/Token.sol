@@ -166,6 +166,39 @@ contract Token is IERC20 {
         }
     }
 
+    function manualReward(
+        bytes32 txHash,
+        address from,
+        address to,
+        uint256 winAmount,
+        bytes memory sig
+    ) external {
+        require(sig.length == 65, "invalid rng format (length)");
+        // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
+        //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
+        bytes32 hash = keccak256(abi.encode(txHash, from, to , winAmount));
+
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        assembly {
+            r := mload(add(sig, 0x20))
+            s := mload(add(sig, 0x40))
+            v := byte(0, mload(add(sig, 0x60)))
+        }
+        if (v < 27) v += 27;
+
+        require(ecrecover(hash, v, r, s) == rngOracle_, "invalid rng signature");
+
+        // now reward the user
+        require(pastRewards_[txHash] == 0, "reward already given for this tx");
+        pastRewards_[txHash] = 1;
+
+        require(rewardPoolAmount() >= winAmount, "reward pool empty");
+
+        rewardFromPool(from, to, winAmount);
+    }
+
     // returns the amount that the user won (can be 0), reverts on invalid rng
     function rewardAmount(
         uint[] calldata balls,

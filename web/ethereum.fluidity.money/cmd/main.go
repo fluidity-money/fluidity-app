@@ -10,7 +10,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
 )
 
+const (
+	EnvWorkerPrivateKey = `FLU_ETHEREUM_WORKER_PRIVATE_KEY`
+)
+
 func main() {
+	keys := mustParseKeyListFromEnv(EnvWorkerPrivateKey)
 
 	updateMessagesEthereum := make(chan interface{})
 
@@ -23,6 +28,12 @@ func main() {
 	web.JsonEndpoint("/my-history", api_fluidity_money.HandleMyHistory)
 
 	web.JsonEndpoint("/winning-chances", api_fluidity_money.HandleWinningChances)
+
+	web.JsonEndpoint("/pending-rewards", api_fluidity_money.HandlePendingRewards)
+
+	manualRewardHandler := api_fluidity_money.GetManualRewardHandler(keys)
+
+	web.JsonEndpoint("/manual-reward", manualRewardHandler)
 
 	updateNotificationsHandlerEthereum := api_fluidity_money.HandleUpdateNotifications(
 		updateMessagesEthereum,
