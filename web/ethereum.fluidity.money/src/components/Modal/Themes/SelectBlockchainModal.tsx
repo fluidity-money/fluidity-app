@@ -43,6 +43,7 @@ const SelectBlockchainModal = ({
       icon: "/img/TokenIcons/solanaIcon.svg",
       visible: true,
       networks: [
+        { name: "Mainnet", address: "https://app.solana.fluidity.money/" },
         { name: "Devnet", address: "https://app.solana.beta.fluidity.money/" },
       ],
     },
