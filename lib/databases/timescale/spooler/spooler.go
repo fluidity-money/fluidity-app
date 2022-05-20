@@ -221,8 +221,8 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumWinnerAnnounce
 		FROM %s
 		WHERE
 			reward_sent = false
-			AND (to_address = $1
-				 OR from_address = $1)
+			AND (sender_address = $1
+				 OR recipient_address = $1)
 		`,
 
 		TablePendingWinners,

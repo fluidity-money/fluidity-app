@@ -78,10 +78,10 @@ var ManualRewardArguments = ethAbi.Arguments{
 }
 
 type RewardArg struct {
-	FromAddress ethCommon.Address
-	ToAddress ethCommon.Address
-	WinAmount *big.Int
-	TransactionHash ethCommon.Hash
+	FromAddress     ethCommon.Address `json:"from"`
+	ToAddress       ethCommon.Address `json:"to"`
+	WinAmount       *big.Int          `json:"amount"`
+	TransactionHash ethCommon.Hash    `json:"transaction_hash"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
