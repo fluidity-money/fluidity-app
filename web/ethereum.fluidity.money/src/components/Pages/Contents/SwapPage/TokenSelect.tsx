@@ -1,5 +1,5 @@
 import TokenSelection from "components/Modal/Themes/TokenSelection";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext } from "react";
 import { modalToggle, tokenListContext } from "components/context";
 import Icon from "components/Icon";
 import { TokenKind } from "components/types";
@@ -14,6 +14,7 @@ import { getBalanceOfERC20 } from "util/contractUtils";
 import { TokenList } from "components/types";
 import { useWallet } from "use-wallet";
 import { SupportedFluidContracts } from "util/contractList";
+import { theme } from "util/appTheme";
 
 const TokenSelect = ({
   type,
@@ -42,7 +43,6 @@ const TokenSelect = ({
       ? (mainnet as TokenKind[])
       : (ropsten as TokenKind[]);
 
-  const style = chainId === ChainId.AuroraMainnet ? "--aurora" : "";
   // accesses tokens from context
   const tokens: TokenKind[] = useContext(tokenListContext).tokens;
   const setTokens = useContext(tokenListContext).setTokens;
@@ -227,7 +227,7 @@ const TokenSelect = ({
     case "token":
       return (
         <div
-          className={`token-selection-container${style} flex align`}
+          className={`token-selection-container${theme} flex align`}
           onClick={() => {
             toggle();
             resetLists();
@@ -256,7 +256,7 @@ const TokenSelect = ({
     case "fluid":
       return (
         <div
-          className={`token-selection-container${style} flex align`}
+          className={`token-selection-container${theme} flex align`}
           onClick={() => {
             toggle();
             resetLists();

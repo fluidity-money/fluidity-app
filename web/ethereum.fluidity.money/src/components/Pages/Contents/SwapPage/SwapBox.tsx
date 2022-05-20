@@ -33,6 +33,7 @@ import { parseUnits } from "ethers/utils";
 import { decimalTrim } from "util/decimalTrim";
 import { isNonZero, shortBalance, trimAmount } from "util/amounts";
 import ChainId, { chainIdFromEnv } from "util/chainId";
+import { theme } from "util/appTheme";
 
 const SwapBox = () => {
   const signer = useSigner();
@@ -238,14 +239,11 @@ const SwapBox = () => {
       setAmount(currentBalance);
   }, [swap]);
 
-  const auroraStyle =
-    chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
-
   const AmountAvailable = ({ invert = false }: { invert?: boolean }) => {
     let isNonFluid = swap;
     if (invert) isNonFluid = !isNonFluid;
     return (
-      <div className={`amount-avail secondary-text${auroraStyle}`}>
+      <div className={`amount-avail secondary-text${theme}`}>
         {walletStatus === "connected" ? (
           isNonFluid ? (
             selectedToken !== "Select Token" ? (
@@ -399,7 +397,7 @@ const SwapBox = () => {
               enable={successTransactionModal}
               toggle={() => setSuccessTransactionModal(false)}
               message={
-                <div className={`primary-text${auroraStyle}`}>
+                <div className={`primary-text${theme}`}>
                   Transaction Successful
                 </div>
               }

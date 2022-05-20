@@ -4,8 +4,7 @@ import Icon from "../Icon";
 import Button from "components/Button";
 import { useHistory } from "react-router-dom";
 import ChainId, { chainIdFromEnv } from "util/chainId";
-
-const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
+import { theme } from "util/appTheme";
 
 const Unsupported = () => {
   const history = useHistory();
@@ -16,10 +15,10 @@ const Unsupported = () => {
           <Icon src="i-fluidity-large f-logo-icon" />
           <div className="fluidity-text f-logo-text">Fluidity.</div>
         </div>
-        <div className={`primary-text${aurora} warning-text-heading`}>
+        <div className={`primary-text${theme} warning-text-heading`}>
           Sorry, this app is not supported on your browser
         </div>
-        <div className={`secondary-text${aurora} warning-text`}>
+        <div className={`secondary-text${theme} warning-text`}>
           Please use Firefox, Brave, Chrome, or Edge
         </div>
         <Button

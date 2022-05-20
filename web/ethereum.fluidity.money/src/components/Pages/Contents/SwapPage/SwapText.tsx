@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "components/Header";
-import ChainId, { chainIdFromEnv } from "util/chainId";
+import { theme } from "util/appTheme";
 
 const SwapText = () => {
   return (
@@ -14,13 +14,7 @@ const SwapText = () => {
       <Header className="swap-text-header" type="primary">
         $FLUID
       </Header>
-      <div
-        className={
-          chainIdFromEnv() === ChainId.AuroraMainnet
-            ? "secondary-text--aurora swap-text-secondary my-2-t"
-            : "secondary-text swap-text-secondary my-2-t"
-        }
-      >
+      <div className={`secondary-text${theme} swap-text-secondary my-2-t`}>
         Fluid dollars reward the sender and receiver just for using them
       </div>
     </div>

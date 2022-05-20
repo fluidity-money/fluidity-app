@@ -33,6 +33,7 @@ import testing from "./config/testing-tokens.json";
 import kovan from "./config/kovan-tokens.json";
 import aurora from "./config/aurora-mainnet-tokens.json";
 import mainnet from "./config/mainnet-tokens.json";
+import { theme } from "util/appTheme";
 
 const App = () => {
   const chainId = chainIdFromEnv();
@@ -157,9 +158,6 @@ const App = () => {
     setFluidTokens: setFluidTokens,
   };
 
-  const auroraStyle =
-    chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
-
   return (
     // React router provider
     <Router>
@@ -241,16 +239,10 @@ const App = () => {
                   message={[
                     <div key={"TCM1"}>
                       🎉🎉
-                      <span className={`primary-text${auroraStyle}`}>
-                        {" "}
-                        CONGRATS{" "}
-                      </span>
+                      <span className={`primary-text${theme}`}> CONGRATS </span>
                       🎉🎉
                     </div>,
-                    <div
-                      key={"TCM2"}
-                      className={`secondary-text${auroraStyle}`}
-                    >
+                    <div key={"TCM2"} className={`secondary-text${theme}`}>
                       {notificationMessage}
                     </div>,
                   ]}

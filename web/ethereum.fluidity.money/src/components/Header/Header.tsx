@@ -1,5 +1,5 @@
 import React from "react";
-import ChainId, { chainIdFromEnv } from "util/chainId";
+import { theme } from "util/appTheme";
 
 const Header = ({
   children,
@@ -16,10 +16,9 @@ const Header = ({
   style?: React.CSSProperties;
   className?: string;
 }) => {
-  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
   return (
     <div
-      className={`header ${type}-text${aurora} text-${
+      className={`header ${type}-text${theme} text-${
         align === undefined ? "left" : align
       } font-${size === undefined ? "1rem" : size} ${className ?? ""}`}
       style={style}
