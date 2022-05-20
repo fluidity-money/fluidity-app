@@ -7,7 +7,6 @@ import Input from "components/Input";
 import TokenSelect from "components/Pages/Contents/SwapPage/TokenSelect";
 import { modalToggle, SwapModalStatus, LoadingStatusToggle, userActionContext } from "components/context";
 import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
-import { extOptions, intOptions } from "components/Token/TokenTypes";
 import {TokenKind} from "components/types";
 import { ConnectWalletModal } from "components/Modal";
 import TransactionConfirmationModal from "components/Modal/Themes/TransactionConfirmationModal.tsx";
@@ -31,7 +30,7 @@ const SwapBox = () => {
   const [balance, setBalance] = useState("0");  // state to track status of selected fluid amount in wallet
   const [fbalance, setfBalance] = useState("0");  // state to track amount of selected standard token in wallet
 
-  const tokens = useFluidTokens();
+  const {tokens} = useFluidTokens();
   const sol = useSolana();
   const {addError} = useContext(notificationContext);
   
@@ -50,15 +49,15 @@ const SwapBox = () => {
   const [toggleTo, setToggleTo] = useState<boolean>(false);
   const [toggleFrom, setToggleFrom] = useState<boolean>(false);
   const [selectedToken, setSelectedToken] =
-    useState<TokenKind["type"]>("Select Token");
+    useState<TokenKind["symbol"]>("Select Token");
   const [selectedFluidToken, setSelectedFluidToken] =
-    useState<TokenKind["type"]>("Select FLUID");
+    useState<TokenKind["symbol"]>("Select FLUID");
 
   //would be more performant to memoise balances, but this would make it overly complex to update them
   //so instead just fetch every time
   useEffect(() => {
-    const fluidToken = tokens?.[selectedFluidToken];
-    const token = tokens?.[selectedToken];
+    const fluidToken = tokens?.[selectedFluidToken].token;
+    const token = tokens?.[selectedToken].token;
     // Balance of Fluid
     fluidToken && sol.publicKey && getBalanceOfSPL(
       fluidToken,
@@ -79,7 +78,7 @@ const SwapBox = () => {
     if (!tokens)
       return;
 
-    const currentToken = tokens[swap ? selectedToken : selectedFluidToken];
+    const currentToken = tokens[swap ? selectedToken : selectedFluidToken].token;
     const currentBalance = swap ? balance : fbalance;
 
     // swapping but no token selected
@@ -119,15 +118,17 @@ const SwapBox = () => {
     return;
   };
 
-  const setterToken = (input: TokenKind["type"], index: number) => {
+  const setterToken = (input: TokenKind["symbol"]) => {
     setSelectedToken(input);
-    setSelectedFluidToken(intOptions[index].type);
+    // 'f<token>'
+    setSelectedFluidToken("f" + input as TokenKind["symbol"]);
     return;
   };
 
-  const setterFluidToken = (input: TokenKind["type"], index: number) => {
+  const setterFluidToken = (input: TokenKind["symbol"]) => {
     setSelectedFluidToken(input);
-    setSelectedToken(extOptions[index].type);
+    // remove 'f'
+    setSelectedToken(input.substring(1) as TokenKind["symbol"]);
     return;
   };
 
@@ -147,14 +148,14 @@ const SwapBox = () => {
       return;
 
     const _balance = swap ? balance : fbalance;
-    const balanceString = new TokenAmount(tokens[currentToken], _balance).toExact();
-    tokenValueInputHandler(balanceString, setAmount, setAmountRaw, tokens[currentToken])
+    const balanceString = new TokenAmount(tokens[currentToken].token, _balance).toExact();
+    tokenValueInputHandler(balanceString, setAmount, setAmountRaw, tokens[currentToken].token)
   }
 
   // Function to trigger transaction on confirm
   const initialiseTransaction = async () => {
-    const token = tokens?.[selectedToken];
-    const fluidToken = tokens?.[selectedFluidToken];
+    const token = tokens?.[selectedToken].token;
+    const fluidToken = tokens?.[selectedFluidToken].token;
     if (!token || !fluidToken || !amountRaw) return;
 
     const checkBalance = new BN(swap ? balance : fbalance);
@@ -199,9 +200,9 @@ const SwapBox = () => {
       {
         isNonFluid
           ? selectedToken === "Select Token" ? null :
-            `Balance: ${tokens ? new TokenAmount(tokens[selectedToken], balance).toExact() : "0"}`
+            `Balance: ${tokens ? new TokenAmount(tokens[selectedToken].token, balance).toExact() : "0"}`
           : selectedFluidToken === "Select FLUID" ? null :
-            `Balance: ${tokens ? new TokenAmount(tokens[selectedFluidToken], fbalance).toExact() : "0"}`
+            `Balance: ${tokens ? new TokenAmount(tokens[selectedFluidToken].token, fbalance).toExact() : "0"}`
       }
     </div>
   }
@@ -228,7 +229,7 @@ const SwapBox = () => {
                   type="text"
                   theme="input-swap-box"
                   toggle={true}
-                  output={out => tokenValueInputHandler(out, setAmount, setAmountRaw, tokens?.[selectedToken] ?? null)}
+                  output={out => tokenValueInputHandler(out, setAmount, setAmountRaw, tokens?.[selectedToken].token ?? null)}
                   pholder="0.0"
                   value={amount}
                   disabled={selectedToken === "Select Token" && selectedFluidToken === "Select FLUID"}
@@ -292,7 +293,7 @@ const SwapBox = () => {
                 selectedToken === "Select Token" ||
                 selectedFluidToken === "Select FLUID" ||
                 //amount is <= 0
-                !(tokens && new TokenAmount(tokens[selectedToken], amountRaw).greaterThan(0))
+                !(tokens && new TokenAmount(tokens[selectedToken].token, amountRaw).greaterThan(0))
               }
             />
             {/* For Connecting to a Wallet */}

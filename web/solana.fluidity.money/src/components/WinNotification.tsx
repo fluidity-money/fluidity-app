@@ -9,7 +9,7 @@ import {FluidToken, FLUID_PROGRAM_ID, tokenList} from 'util/solana/constants';
 const WinNotification = ({addWinNotification}: {addWinNotification: (message: string) => void, }) => {
     const sol = useSolana();
     const {connection, publicKey} = sol
-    const fluidTokens = useFluidToken();
+    const {tokens: fluidTokens} = useFluidToken();
 
     useEffect(() => {
         if (!publicKey || !fluidTokens)
@@ -65,7 +65,7 @@ const WinNotification = ({addWinNotification}: {addWinNotification: (message: st
 
                 //get the Token object that we've just traded
                 const fluidToken = tokenList.find(token => token.mintAddress === balance.mint) as FluidToken;
-                const token = fluidTokens[fluidToken.symbol]
+                const {token} = fluidTokens[fluidToken.symbol]
                 
                 //find where ATA matches user and get their balance
                 const ata = await getATAAddress({mint: new PublicKey(balance.mint), owner: publicKey});

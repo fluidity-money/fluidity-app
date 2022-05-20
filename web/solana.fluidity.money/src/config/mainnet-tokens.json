@@ -1,0 +1,66 @@
+[
+    {
+        "symbol": "USDT",
+        "name": "USD Tether",
+        "mintAddress": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "decimals": 6,
+        "colour": "rgb(36, 163, 124)",
+        "image": "img/TokenIcons/usdtIcon.svg"
+    },
+    {
+        "symbol": "fUSDT",
+        "name": "Fluid USDT",
+        "mintAddress": "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8",
+        "decimals": 6,
+        "colour": "rgb(36, 163, 124)",
+        "image": "img/TokenIcons/usdtIcon.svg"
+    },
+    {
+        "symbol": "USDC",
+        "name": "USD Coin",
+        "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "decimals": 6,
+        "colour": "#2775c9",
+        "image": "img/TokenIcons/usdcIcon.svg"
+    },
+    {
+        "symbol": "fUSDC",
+        "name": "Fluid USDC",
+        "mintAddress": "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv",
+        "decimals": 6,
+        "colour": "#2775c9",
+        "image": "img/TokenIcons/usdcIcon.svg"
+    },
+    {
+        "symbol": "UXD",
+        "name": "UXD",
+        "mintAddress": "Dx8dUQ8p8zbQwv7jvXqaEdYWcK7AroNifHbcAC7YYRjg",
+        "decimals": 6,
+        "colour": "#000000",
+        "image": "img/TokenIcons/uxdIcon.svg"
+    },
+    {
+        "symbol": "fUXD",
+        "name": "Fluid UXD",
+        "mintAddress": "7Taua7k6kX2UTD1joXTsyQ8jodAzUEjmxXfCn5zvU55m",
+        "decimals": 6,
+        "colour": "#000000",
+        "image": "img/TokenIcons/uxdIcon.svg"
+    },
+    {
+        "symbol": "UST",
+        "name": "UST",
+        "mintAddress": "9vMJfxuKxXBoEa7rM12mYLMwTacLMLDJqHozw96WQL8i",
+        "decimals": 6,
+        "colour": "#0C3595",
+        "image": "img/TokenIcons/ustIcon.svg"
+    },
+    {
+        "symbol": "fUST",
+        "name": "Fluid UST",
+        "mintAddress": "9Zd8kMxo6d9pMyhuxuZYTZMu8uiHSoZwX4A1vLBK9bpT",
+        "decimals": 6,
+        "colour": "#0C3595",
+        "image": "img/TokenIcons/ustIcon.svg"
+    }
+]

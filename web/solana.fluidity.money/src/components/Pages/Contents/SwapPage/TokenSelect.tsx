@@ -1,8 +1,8 @@
 import TokenSelection from 'components/Modal/Themes/TokenSelection';
-import { useContext } from 'react';
+import { useContext} from 'react';
 import { modalToggle } from "components/context";
 import Icon from "components/Icon";
-import { intOptions, extOptions } from "components/Token/TokenTypes";
+import {useFluidToken} from 'util/hooks';
 
 const TokenSelect = ({
   type,
@@ -13,6 +13,8 @@ const TokenSelect = ({
 }) => {
   const [selectedToken] = useContext(modalToggle).selectedToken;
   const [selectedFluidToken] = useContext(modalToggle).selectedFluidToken;
+
+  const {fluidTokensList, nonFluidTokensList}= useFluidToken();
 
   switch (type) {
     case "token":
@@ -28,7 +30,7 @@ const TokenSelect = ({
                 : `icon i-${selectedToken}`
               }`}
           />
-          <TokenSelection tokenList={extOptions} type={type} />
+          <TokenSelection tokenList={nonFluidTokensList} type={type} />
         </div>
       );
     case "fluid":
@@ -44,7 +46,7 @@ const TokenSelect = ({
                 : `icon i-${selectedFluidToken}`
               }`}
           />
-          <TokenSelection tokenList={intOptions} type={type} />
+          <TokenSelection tokenList={fluidTokensList} type={type} />
         </div>
       );
     default:

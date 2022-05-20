@@ -4,9 +4,14 @@ export type Token = SupportedTokens | FluidSupportedTokens
 
 //for selector component
 export type TokenKind = {
-    type: Token | "Select Token" | "Select FLUID"
-    src: string;
-    colour: string;
+  symbol: Token | "Select Token" | "Select FLUID";
+  name: string;
+  image: string;
+  colour: string;
+  mintAddress: string;
+  decimals: number;
+  //amount: string;
+  //pinned: boolean;
 };
 
 export interface TokenList {
