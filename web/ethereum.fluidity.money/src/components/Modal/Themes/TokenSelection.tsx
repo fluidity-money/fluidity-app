@@ -5,7 +5,7 @@ import Button from "components/Button";
 import { TokenKind, TokenList } from "components/types";
 import TokenSearch from "./TokenSearch";
 import PinnedToken from "./PinnedToken";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const TokenSelection = ({
   tokenList,
@@ -86,7 +86,7 @@ const TokenSelection = ({
       height="auto"
     >
       <div className="connect-modal-body">
-        <h2 className={`primary-text${theme}`}>Select a Token</h2>
+        <h2 className={`primary-text${appTheme}`}>Select a Token</h2>
         <TokenSearch
           setTokenListState={setTokenList}
           resetLists={resetLists}

@@ -3,7 +3,7 @@ import { userActionContext } from "components/context";
 import GenericModal from "components/Modal/GenericModal";
 import { useContext } from "react";
 import { WebsocketUserAction } from "util/api/types";
-import ChainId, { chainIdFromEnv } from "util/chainId";
+import { appTheme } from "util/appTheme";
 import { etherscanTransaction } from "util/etherscan";
 
 const TransactionConfirmationModal = ({
@@ -59,11 +59,7 @@ const TransactionConfirmationModal = ({
         <h2 className="text-center">{message}</h2>
 
         <Button
-          theme={
-            chainIdFromEnv() === ChainId.AuroraMainnet
-              ? "primary-button-aurora"
-              : "primary-button"
-          }
+          theme={`primary-button${appTheme}`}
           padding="py-1"
           label={"Dismiss"}
           goto={toggle}

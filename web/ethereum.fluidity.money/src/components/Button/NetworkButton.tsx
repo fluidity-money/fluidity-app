@@ -1,6 +1,6 @@
 import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
 import { useState } from "react";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 import ChainId, { chainIdFromEnv } from "util/chainId";
 
 const NetworkButton = () => {
@@ -12,11 +12,11 @@ const NetworkButton = () => {
   return (
     <>
       <div
-        className={`select-blockchain${theme}`}
+        className={`select-blockchain${appTheme}`}
         onClick={() => setBlockchainToggle(true)}
       >
         <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
-        <div className={`chain-name primary-text${theme}`}>
+        <div className={`chain-name primary-text${appTheme}`}>
           {chainIdFromEnv() === ChainId.Ropsten
             ? "Ropsten"
             : chainIdFromEnv() === ChainId.Kovan

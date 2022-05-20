@@ -14,7 +14,7 @@ import { getBalanceOfERC20 } from "util/contractUtils";
 import { TokenList } from "components/types";
 import { useWallet } from "use-wallet";
 import { SupportedFluidContracts } from "util/contractList";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const TokenSelect = ({
   type,
@@ -227,7 +227,7 @@ const TokenSelect = ({
     case "token":
       return (
         <div
-          className={`token-selection-container${theme} flex align`}
+          className={`token-selection-container${appTheme} flex align`}
           onClick={() => {
             toggle();
             resetLists();
@@ -256,7 +256,7 @@ const TokenSelect = ({
     case "fluid":
       return (
         <div
-          className={`token-selection-container${theme} flex align`}
+          className={`token-selection-container${appTheme} flex align`}
           onClick={() => {
             toggle();
             resetLists();

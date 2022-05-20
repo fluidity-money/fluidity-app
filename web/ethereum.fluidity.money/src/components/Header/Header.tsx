@@ -1,5 +1,5 @@
 import React from "react";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const Header = ({
   children,
@@ -18,7 +18,7 @@ const Header = ({
 }) => {
   return (
     <div
-      className={`header ${type}-text${theme} text-${
+      className={`header ${type}-text${appTheme} text-${
         align === undefined ? "left" : align
       } font-${size === undefined ? "1rem" : size} ${className ?? ""}`}
       style={style}

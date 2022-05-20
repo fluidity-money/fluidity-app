@@ -3,8 +3,7 @@ import AppBody from "components/Styling/AppBody";
 import Icon from "../Icon";
 import Button from "components/Button";
 import { useHistory } from "react-router-dom";
-import ChainId, { chainIdFromEnv } from "util/chainId";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const Unsupported = () => {
   const history = useHistory();
@@ -15,19 +14,15 @@ const Unsupported = () => {
           <Icon src="i-fluidity-large f-logo-icon" />
           <div className="fluidity-text f-logo-text">Fluidity.</div>
         </div>
-        <div className={`primary-text${theme} warning-text-heading`}>
+        <div className={`primary-text${appTheme} warning-text-heading`}>
           Sorry, this app is not supported on your browser
         </div>
-        <div className={`secondary-text${theme} warning-text`}>
+        <div className={`secondary-text${appTheme} warning-text`}>
           Please use Firefox, Brave, Chrome, or Edge
         </div>
         <Button
           label="Return to fluidity.money"
-          theme={
-            chainIdFromEnv() === ChainId.AuroraMainnet
-              ? "primary-button-aurora"
-              : "primary-button"
-          }
+          theme={`primary-button${appTheme}`}
           className="return-btn"
           goto={() => (window.location.href = "https://fluidity.money")}
         />

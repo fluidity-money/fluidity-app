@@ -6,7 +6,7 @@ import getWalletERC20Status from "util/getWalletERC20Status";
 import { walletDataType } from "util/getWalletERC20Status";
 import { useSigner } from "util/hooks";
 import _ from "lodash";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -63,7 +63,7 @@ const CurrencyBreakdown = () => {
   // Checks to see if the user's wallet is empty
   return (
     <div className="currency-breakdown">
-      <div className={`portfolio-graph-title primary-text${theme}`}>
+      <div className={`portfolio-graph-title primary-text${appTheme}`}>
         Account Overview
       </div>
 
@@ -71,7 +71,7 @@ const CurrencyBreakdown = () => {
 
       <div className="currency-list">{renderedCurrencyList}</div>
       {walletData.length === 0 ? (
-        <div className={`primary-text${theme}`}>Your wallet is empty</div>
+        <div className={`primary-text${appTheme}`}>Your wallet is empty</div>
       ) : (
         <></>
       )}

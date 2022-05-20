@@ -2,7 +2,7 @@ import Button from "components/Button";
 import { Connectors, useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import GenericModal from "components/Modal/GenericModal";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const metamask = "/img/WalletIcons/metamask.png";
 const walletconnect = "/img/WalletIcons/walletconnect.png";
@@ -60,7 +60,7 @@ const ConnectWalletModal = ({
           label={name}
           key={name + index}
           theme={`select-button--wallet ${(isConnected ?? "") && "active"}`}
-          texttheme={`wallet-text${theme}`}
+          texttheme={`wallet-text${appTheme}`}
           //fontSize="font-large"
           icon={
             // nosemgrep: typescript.react.security.audit.react-http-leak.react-http-leak
@@ -86,7 +86,7 @@ const ConnectWalletModal = ({
       width={width}
     >
       <div className="connect-modal-body">
-        <h2 className={`primary-text${theme}`}>
+        <h2 className={`primary-text${appTheme}`}>
           {wallet.status === "connected"
             ? "Wallet Connected"
             : "Connect to Wallet"}

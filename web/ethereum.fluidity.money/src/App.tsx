@@ -33,7 +33,7 @@ import testing from "./config/testing-tokens.json";
 import kovan from "./config/kovan-tokens.json";
 import aurora from "./config/aurora-mainnet-tokens.json";
 import mainnet from "./config/mainnet-tokens.json";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const App = () => {
   const chainId = chainIdFromEnv();
@@ -239,10 +239,13 @@ const App = () => {
                   message={[
                     <div key={"TCM1"}>
                       🎉🎉
-                      <span className={`primary-text${theme}`}> CONGRATS </span>
+                      <span className={`primary-text${appTheme}`}>
+                        {" "}
+                        CONGRATS{" "}
+                      </span>
                       🎉🎉
                     </div>,
-                    <div key={"TCM2"} className={`secondary-text${theme}`}>
+                    <div key={"TCM2"} className={`secondary-text${appTheme}`}>
                       {notificationMessage}
                     </div>,
                   ]}

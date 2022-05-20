@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "components/Header";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const SwapText = () => {
   return (
@@ -14,7 +14,7 @@ const SwapText = () => {
       <Header className="swap-text-header" type="primary">
         $FLUID
       </Header>
-      <div className={`secondary-text${theme} swap-text-secondary my-2-t`}>
+      <div className={`secondary-text${appTheme} swap-text-secondary my-2-t`}>
         Fluid dollars reward the sender and receiver just for using them
       </div>
     </div>

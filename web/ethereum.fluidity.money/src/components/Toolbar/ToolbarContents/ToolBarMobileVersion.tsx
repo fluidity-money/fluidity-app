@@ -7,7 +7,7 @@ import { useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
 import NetworkButton from "components/Button/NetworkButton";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -58,7 +58,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
           >
             <Button
               label={address}
-              theme={`primary-text${theme} header-text`}
+              theme={`primary-text${appTheme} header-text`}
               goto={() => {}}
               padding="p-0_5"
             />
@@ -76,7 +76,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
           <div className="flex row align" onClick={() => setToggle(true)}>
             <Button
               label={"Connect Wallet"}
-              theme={`primary-text${theme} header-text`}
+              theme={`primary-text${appTheme} header-text`}
               goto={() => {}}
               padding="p-0_5"
             />
@@ -87,7 +87,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
         <div className="btn-toolbar" onClick={closeMobileMenu}>
           <Button
             label="Dashboard"
-            theme={`primary-text${theme}`}
+            theme={`primary-text${appTheme}`}
             goto={() => history.push("/dashboard")}
             selected={selected.options[0]}
             auth={active}
@@ -97,7 +97,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
         <div className="btn-toolbar" onClick={closeMobileMenu}>
           <Button
             label="Swap"
-            theme={`primary-text${theme}`}
+            theme={`primary-text${appTheme}`}
             fontSize="large"
             goto={() => history.push("/")}
             selected={selected.options[1]}
@@ -109,7 +109,7 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
         <div className="btn-toolbar" onClick={closeMobileMenu}>
           <Button
             label="Wallet"
-            theme={`primary-text${theme}`}
+            theme={`primary-text${appTheme}`}
             goto={() => history.push("/wallet")}
             selected={selected.options[2]}
             auth={active}

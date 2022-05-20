@@ -20,7 +20,7 @@ import { decimalTrim } from "util/decimalTrim";
 import { notificationContext } from "components/Notifications/notificationContext";
 import { isNonZero, trimAmount } from "util/amounts";
 import { handleContractErrors } from "util/makeContractSwap";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const SendFluid = () => {
   const [to, setTo] = useState<string>("0.0"); // records amount
@@ -199,7 +199,7 @@ const SendFluid = () => {
   return (
     <modalToggle.Provider value={modalContext}>
       <div className="send-container">
-        <h3 className={`primary-text${theme} send-warning`}>
+        <h3 className={`primary-text${appTheme} send-warning`}>
           Note: not all wallets accept Fluid dollars
         </h3>
         <div className="send-input-container">
@@ -235,7 +235,7 @@ const SendFluid = () => {
           <Button
             label="Send"
             goto={sendForm}
-            className={`send-button${theme}`}
+            className={`send-button${appTheme}`}
             disabled={
               !isNonZero(to, decimals) ||
               !address ||
@@ -245,7 +245,7 @@ const SendFluid = () => {
             }
           />
           <p
-            className={`amount-avail secondary-text${theme}`}
+            className={`amount-avail secondary-text${appTheme}`}
             onClick={() => setToWrapper(balance)}
           >
             {walletStatus === "connected" ? (
@@ -270,7 +270,9 @@ const SendFluid = () => {
           enable={successTransactionModal}
           toggle={() => setSuccessTransactionModal(false)}
           message={
-            <div className={`primary-text${theme}`}>Transaction Successful</div>
+            <div className={`primary-text${appTheme}`}>
+              Transaction Successful
+            </div>
           }
         />
       </div>

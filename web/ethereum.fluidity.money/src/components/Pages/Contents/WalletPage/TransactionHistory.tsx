@@ -3,7 +3,7 @@ import { trimAddress } from "util/addresses";
 import { formatAmount } from "util/amounts";
 import dateFormatter from "util/dateFormatter";
 import { etherscanAddress, etherscanTransaction } from "util/etherscan";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const tableItems = [
   "Date",
@@ -65,7 +65,7 @@ const TransactionHistory = ({ myHistory }: transactionHistory) => {
         <tbody>
           <tr>
             {tableItems.map((tableItems, index) => (
-              <th key={index} className={`primary-text${theme}`}>
+              <th key={index} className={`primary-text${appTheme}`}>
                 {tableItems}
               </th>
             ))}

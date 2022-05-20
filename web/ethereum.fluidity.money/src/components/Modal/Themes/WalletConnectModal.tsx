@@ -8,7 +8,7 @@ import { JsonRpcProvider } from "ethers/providers";
 import { useState } from "react";
 import ConnectWalletModal from "components/Modal/Themes/ConnectWalletModal";
 import { useHistory } from "react-router-dom";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const WalletConnectedModal = ({
   enable,
@@ -113,7 +113,7 @@ const WalletConnectedModal = ({
                 cname="walletconnect-wallet-info"
                 defaultMargin={false}
               >
-                <div className={`swap-box-subheader primary-text${theme}`}>
+                <div className={`swap-box-subheader primary-text${appTheme}`}>
                   Connected with {walletType()}
                 </div>
                 <div className="walletconnect-account">{address}</div>

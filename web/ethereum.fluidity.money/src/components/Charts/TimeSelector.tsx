@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Button from "components/Button";
-import { theme } from "util/appTheme";
+import { appTheme } from "util/appTheme";
 
 const TimeSelector = () => {
   const [btnSelect, setBtnSelect] = useState([
@@ -25,7 +25,7 @@ const TimeSelector = () => {
       {buttonLabels.map((buttonLabels, index) => (
         <Button
           label={buttonLabels}
-          theme={`primary-text${theme}`}
+          theme={`primary-text${appTheme}`}
           className="time-selector-button"
           goto={() => btnSelector(index)}
           timeSelected={btnSelect[index]}
