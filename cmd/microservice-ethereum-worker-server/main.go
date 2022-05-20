@@ -648,12 +648,15 @@ func main() {
 				bpyStakedUsd,
 				sizeOfThePool,
 				underlyingTokenDecimalsRat,
+				fluidity.PayoutFreq,
+				fluidity.DeltaWeight,
+				fluidity.WinningClasses,
 				btx,
 				secondsSinceLastBlock,
 				emission,
 			)
 
-			res := generateRandomIntegers(probability.WinningClasses, 1, int(randomN))
+			res := generateRandomIntegers(fluidity.WinningClasses, 1, int(randomN))
 
 			// create announcement and container
 

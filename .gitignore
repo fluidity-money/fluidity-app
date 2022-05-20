@@ -37,4 +37,4 @@ contracts/solana/cargo_audit
 contracts/solana/testing/fuzz/target
 !contracts/solana/testing/*
 
-contracts/tribeca-data-store/target
+contracts/tribeca-govern-contracts/target

@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -13,7 +14,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 
 	"github.com/gagliardetto/solana-go"
@@ -23,6 +24,9 @@ import (
 const (
 	// EnvSolanaRpcUrl is the RPC url of the solana node to connect to
 	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
+
+	// EnvSolanaNetwork is the network of the trf data store account
+	EnvSolanaNetwork = `FLU_SOLANA_NETWORK`
 
 	// EnvFluidityPubkey is the program id of the fluidity program
 	EnvFluidityPubkey = `FLU_SOLANA_PROGRAM_ID`
@@ -67,6 +71,9 @@ const (
 )
 
 const (
+	// Chain for filtering TRF var in Timescale
+	TrfChain = `solana`
+
 	// SolanaBlockTime assumed by the ATX calculation
 	SolanaBlockTime uint64 = 1
 
@@ -81,6 +88,7 @@ func main() {
 
 	var (
 		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaNetwork    = util.GetEnvOrFatal(EnvSolanaNetwork)
 		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 		decimalPlaces_   = util.GetEnvOrFatal(EnvTokenDecimals)
@@ -244,12 +252,26 @@ func main() {
 
 			// send emissions out that can be actioned on when the loop ends
 
-
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
 
 			defer queue.SendMessage(worker.TopicEmissions, emission)
+
+			tribecaDataStoreTrfVars := payout.GetLatestCalculatenArgs(TrfChain, solanaNetwork)
+
+			var (
+				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
+				payoutFreqNum    = tribecaDataStoreTrfVars.PayoutFreqNum
+				payoutFreqDenom  = tribecaDataStoreTrfVars.PayoutFreqDenom
+				deltaWeightNum   = tribecaDataStoreTrfVars.DeltaWeightNum
+				deltaWeightDenom = tribecaDataStoreTrfVars.DeltaWeightDenom
+			)
+
+			var (
+				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
+				deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
+			)
 
 			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
@@ -259,13 +281,16 @@ func main() {
 				bpyStakedUsd,
 				sizeOfThePool,
 				decimalPlacesRat,
+				payoutFreq,
+				deltaWeight,
+				winningClasses,
 				fluidTransfers,
 				SolanaBlockTime,
 				emission,
 			)
 
 			randomIntegers := generateRandomIntegers(
-				probability.WinningClasses,
+				winningClasses,
 				1,
 				int(randomN),
 			)

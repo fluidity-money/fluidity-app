@@ -1128,8 +1128,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "tribeca-data-store"
-version = "0.1.0"
+name = "trf-data-store"
+version = "0.1.1"
 dependencies = [
  "anchor-lang",
  "vipers",
