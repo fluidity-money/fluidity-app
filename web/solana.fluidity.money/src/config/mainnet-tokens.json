@@ -5,7 +5,9 @@
         "mintAddress": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
         "decimals": 6,
         "colour": "rgb(36, 163, 124)",
-        "image": "img/TokenIcons/usdtIcon.svg"
+        "image": "img/TokenIcons/usdtIcon.svg",
+        "obligationAccount": "446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca",
+        "dataAccount": "C8csqsv1NxAC2ge1ZAvToaHZa8VsffmxewHHYJ7JuDVD"
     },
     {
         "symbol": "fUSDT",
@@ -21,7 +23,9 @@
         "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "decimals": 6,
         "colour": "#2775c9",
-        "image": "img/TokenIcons/usdcIcon.svg"
+        "image": "img/TokenIcons/usdcIcon.svg",
+        "obligationAccount": "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A",
+        "dataAccount": "nZtk79qJyUXMg53SYL9wZQnMUjwJeTFGTfKmFaEehKq"
     },
     {
         "symbol": "fUSDC",
@@ -37,7 +41,9 @@
         "mintAddress": "Dx8dUQ8p8zbQwv7jvXqaEdYWcK7AroNifHbcAC7YYRjg",
         "decimals": 6,
         "colour": "#000000",
-        "image": "img/TokenIcons/uxdIcon.svg"
+        "image": "img/TokenIcons/uxdIcon.svg",
+        "obligationAccount": "HH4BzUBsKwenYsGQfYB6Tyj739XXxxjFVE6oMZ6xiDsY",
+        "dataAccount": "8cVaBxKMLr2thoFxtGoBjW4Lo1xJBJQSu71uo9TCtm2s"
     },
     {
         "symbol": "fUXD",
@@ -53,7 +59,9 @@
         "mintAddress": "9vMJfxuKxXBoEa7rM12mYLMwTacLMLDJqHozw96WQL8i",
         "decimals": 6,
         "colour": "#0C3595",
-        "image": "img/TokenIcons/ustIcon.svg"
+        "image": "img/TokenIcons/ustIcon.svg",
+        "obligationAccount": "7cG2d3Shz2dUQoWXNjcqGss3jyTFc4a8Lei9oxWKMq6b",
+        "dataAccount": "HwoDGvTVbqyzabXzHnU4edBm8CRJBujCc7dU3Sqe9HmC"
     },
     {
         "symbol": "fUST",

@@ -10,6 +10,8 @@ export type TokenKind = {
   colour: string;
   mintAddress: string;
   decimals: number;
+  obligationAccount: string;
+  dataAccount: string;
   //amount: string;
   //pinned: boolean;
 };

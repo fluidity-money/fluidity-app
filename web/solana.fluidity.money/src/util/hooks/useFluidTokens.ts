@@ -3,6 +3,7 @@ import {
   networkToChainId,
   Token,
 } from "@saberhq/token-utils";
+import {PublicKey} from "@solana/web3.js"
 import {TokenKind} from "components/types";
 import {useEffect, useState} from "react";
 
@@ -13,6 +14,9 @@ export type TokenInfo = {
   config: {
     colour: string,
     image: string,
+    // only required for base token
+    obligationPubkey?: PublicKey,
+    dataAccountPubkey?: PublicKey,
   }
 }
 
@@ -56,7 +60,16 @@ const useFluidTokens = () => {
     importTokens(network).then(tokenList => {
       //map over the known list, using the token's symbol as a key
       const updatedList: FluidTokens = tokenList.reduce(
-        (allTokens, {symbol, mintAddress, name, decimals, colour, image}) => ({
+        (allTokens, {
+          symbol,
+          mintAddress,
+          name,
+          decimals,
+          colour,
+          image,
+          obligationAccount,
+          dataAccount,
+        }) => ({
           ...allTokens,
           [symbol]: {
             token: new Token({
@@ -69,6 +82,8 @@ const useFluidTokens = () => {
             config: {
               colour,
               image,
+              obligationPubkey:  symbol.startsWith('f') ? undefined : new PublicKey(obligationAccount),
+              dataAccountPubkey: symbol.startsWith('f') ? undefined : new PublicKey(dataAccount),
             }
           },
         }),

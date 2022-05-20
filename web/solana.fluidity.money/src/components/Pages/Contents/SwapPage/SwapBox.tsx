@@ -154,9 +154,9 @@ const SwapBox = () => {
 
   // Function to trigger transaction on confirm
   const initialiseTransaction = async () => {
-    const token = tokens?.[selectedToken].token;
+    const {token, config} = tokens?.[selectedToken] || {};
     const fluidToken = tokens?.[selectedFluidToken].token;
-    if (!token || !fluidToken || !amountRaw) return;
+    if (!token || !fluidToken || !amountRaw || !config?.obligationPubkey || !config.dataAccountPubkey) return;
 
     const checkBalance = new BN(swap ? balance : fbalance);
 
@@ -169,10 +169,23 @@ const SwapBox = () => {
       loadingToggleTrigger(true);
 
       let result: string;
-      if (swap)
-        result = await wrapSpl(sol, fluidToken, new TokenAmount(token, amountRaw));
-      else
-        result = await unwrapSpl(sol, fluidToken, new TokenAmount(token, amountRaw));
+      if (swap) {
+        result = await wrapSpl(
+          sol,
+          fluidToken,
+          new TokenAmount(token, amountRaw),
+          config.obligationPubkey,
+          config.dataAccountPubkey,
+        );
+      } else {
+        result = await unwrapSpl(
+          sol,
+          fluidToken,
+          new TokenAmount(token, amountRaw),
+          config.obligationPubkey,
+          config.dataAccountPubkey,
+        );
+      }
 
       console.log(result);
       toggleSuccessTransactionModal();

@@ -5,7 +5,9 @@
         "mintAddress": "Bp2nLuamFZndE7gztA1iPsNVhdJeg9xfKdq7KmvjpGoP",
         "decimals": 6,
         "colour": "rgb(36, 163, 124)",
-        "image": "img/TokenIcons/usdtIcon.svg"
+        "image": "img/TokenIcons/usdtIcon.svg",
+        "obligationAccount": "EHxPXaojrnNGmUDBqz8fCbcdgYswn9MpNHtKMR6WkY7z",
+        "dataAccount": "2PjRnkPxcpCZpokn45B23GLEYiwJnWgcfjXNQZ1E55ze"
     },
     {
         "symbol": "fUSDT",
@@ -21,7 +23,9 @@
         "mintAddress": "zVzi5VAf4qMEwzv7NXECVx5v2pQ7xnqVVjCXZwS9XzA",
         "decimals": 6,
         "colour": "#2775c9",
-        "image": "img/TokenIcons/usdcIcon.svg"
+        "image": "img/TokenIcons/usdcIcon.svg",
+        "obligationAccount": "AzC4PyevxfhrRcY4x7Xm94PQyf9nfjcheLsSiE53Rcy",
+        "dataAccount": "DDuNyoNKZMM2fSanMKUjwhtwkY5Jcg85sMoR98fsYKjU"
     },
     {
         "symbol": "fUSDC",

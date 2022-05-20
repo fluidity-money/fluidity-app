@@ -17,7 +17,9 @@ export const getFluidInstructionKeys = async (
   token: Token,
   fluidToken: Token,
   ata: PublicKey, // user token ata
-  fluidAta: PublicKey //user fluid token ata
+  fluidAta: PublicKey, //user fluid token ata
+  obligationInfo: PublicKey,
+  dataAccount: PublicKey,
 ): Promise<Array<AccountMeta> | null> => {
   // assigns solendAddress based on network
   const solendAddress =
@@ -34,15 +36,6 @@ export const getFluidInstructionKeys = async (
   const pdaAccount = await FluidityInstruction.getProgramAddress(
     token.symbol as SupportedTokens
   );
-
-  //find the pre-existing data account for this token
-  const dataAccount = process.env[`REACT_APP_FLU_DATA_ACCOUNT_${token.symbol}`];
-  if (!dataAccount) return null;
-
-  //find the pre-existing obligation account for this token
-  const obligationInfo =
-    process.env[`REACT_APP_FLU_OBLIGATION_${token.symbol}`];
-  if (!obligationInfo) return null;
 
   //find the solend asset and reserve
   const market = [...solendAddress.markets].find(({ name }) => name === "main");

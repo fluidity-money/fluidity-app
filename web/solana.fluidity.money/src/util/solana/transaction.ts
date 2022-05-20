@@ -15,7 +15,9 @@ const wrapOrUnwrapSpl = async (
   sol: UseSolana,
   token: Token,
   fluidToken: Token,
-  fluidityInstruction: FluidityInstruction
+  fluidityInstruction: FluidityInstruction,
+  obligationAccount: PublicKey,
+  dataAccount: PublicKey, 
 ): Promise<string> => {
 
   if (!sol.wallet || !sol.publicKey || !sol.connected || !sol.providerMut)
@@ -37,7 +39,15 @@ const wrapOrUnwrapSpl = async (
   if (fluidAtaResult.instruction)
     transaction.add(fluidAtaResult.instruction);
 
-  const keys = await getFluidInstructionKeys(sol, token, fluidToken, ataResult.address, fluidAtaResult.address);
+  const keys = await getFluidInstructionKeys(
+    sol,
+    token,
+    fluidToken,
+    ataResult.address,
+    fluidAtaResult.address,
+    obligationAccount,
+    dataAccount,
+  );
   if (!keys)
     return "";
   
@@ -70,31 +80,49 @@ const wrapOrUnwrapSpl = async (
 export const wrapSpl = async(
   sol: UseSolana,
   fluidToken: Token,
-  amount: TokenAmount
+  amount: TokenAmount,
+  obligationAccount: PublicKey,
+  dataAccount: PublicKey,
 ) => {
   const TokenSymbol = amount.token.symbol as SupportedTokens;
   const bumpSeed = await FluidityInstruction.getBumpSeed(TokenSymbol);
 
-  return await wrapOrUnwrapSpl(sol, amount.token, fluidToken, new FluidityInstruction({
-    Wrap: amount,
-    TokenSymbol,
-    bumpSeed,
-  }));
+  return await wrapOrUnwrapSpl(
+    sol,
+    amount.token,
+    fluidToken,
+    new FluidityInstruction({
+      Wrap: amount,
+      TokenSymbol,
+      bumpSeed,
+    }),
+    obligationAccount,
+    dataAccount,
+  );
 }
 
 export const unwrapSpl = async(
   sol: UseSolana,
   fluidToken: Token,
-  amount: TokenAmount
+  amount: TokenAmount,
+  obligationAccount: PublicKey,
+  dataAccount: PublicKey,
 ) => {
   const TokenSymbol = amount.token.symbol as SupportedTokens;
   const bumpSeed = await FluidityInstruction.getBumpSeed(TokenSymbol);
 
-  return await wrapOrUnwrapSpl(sol, amount.token, fluidToken, new FluidityInstruction({
-    Unwrap: amount,
-    TokenSymbol,
-    bumpSeed,
-  }));
+  return await wrapOrUnwrapSpl(
+    sol,
+    amount.token,
+    fluidToken,
+    new FluidityInstruction({
+      Unwrap: amount,
+      TokenSymbol,
+      bumpSeed,
+    }),
+    obligationAccount,
+    dataAccount,
+  );
 }
 
 //given a recipient that may be a user account or an ATA, return the correct ATA or null if invalid
