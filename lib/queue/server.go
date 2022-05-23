@@ -75,7 +75,7 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		false, // exclusive
 		false, // noWait,
 		amqp.Table{
-			"x-dead-letter-exchange": fmt.Sprintf("%v.dead", exchangeName),
+			"x-dead-letter-exchange": fmt.Sprintf("%v.dead-exchange", exchangeName),
 		}, // args
 	)
 
