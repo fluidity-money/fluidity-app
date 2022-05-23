@@ -35,6 +35,13 @@ const SelectBlockchainModal = ({
       networks: [
         { name: "Ropsten", address: "https://ropsten.beta.fluidity.money/" },
         { name: "Kovan", address: "https://kovan.beta.fluidity.money/" },
+      ],
+    },
+    {
+      blockchain: "Aurora",
+      icon: "/img/Aurora/AuroraLogoTextBelow.svg",
+      visible: true,
+      networks: [
         { name: "Aurora", address: "https://app.aurora.fluidity.money/" },
       ],
     },
