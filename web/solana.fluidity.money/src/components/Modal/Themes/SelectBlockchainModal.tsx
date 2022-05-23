@@ -40,8 +40,8 @@ const SelectBlockchainModal = ({
       address: "https://kovan.beta.fluidity.money/",
     },
     {
-      network: "Ethereum Aurora",
-      icon: "/img/TokenIcons/ethereumIcon.svg",
+      network: "Aurora",
+      icon: "/img/Aurora/AuroraLogoTextBelow.svg",
       address: "https://app.aurora.fluidity.money/",
     },
   ];
