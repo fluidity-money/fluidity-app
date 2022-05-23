@@ -1,10 +1,17 @@
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
 
 import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 import "./LiquidityProvider.sol";
+
+struct Winner {
+    address from;
+    address to;
+    uint256 amount;
+    bytes32 txHash;
+}
 
 contract Token is IERC20 {
     using SafeERC20 for IERC20;
@@ -139,6 +146,24 @@ contract Token is IERC20 {
         // now pay out the user
         pastRewards_[txHash] = 1;
         rewardFromPool(from, to, winAmount / 5 * 4);
+    }
+
+    function batchReward(Winner[] memory rewards) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        uint poolAmount = rewardPoolAmount();
+
+        for (uint i = 0; i < rewards.length; i++) {
+            Winner memory winner = rewards[i];
+
+            require(pastRewards_[winner.txHash] == 0, "reward already given for this tx");
+            pastRewards_[winner.txHash] = 1;
+
+            require(poolAmount >= winner.amount, "reward pool empty");
+            poolAmount = poolAmount - winner.amount;
+
+            rewardFromPool(winner.from, winner.to, winner.amount);
+        }
     }
 
     // returns the amount that the user won (can be 0), reverts on invalid rng
