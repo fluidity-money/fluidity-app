@@ -39,6 +39,26 @@ export type Routes = {
 
   // Transaction History API Route
   "/my-history": WebsocketUserAction[];
+
+  // Pending wins by user that can be manually transacted    
+  "/pending-rewards": {
+    token_details: TokenDetails;
+    transaction_hash: string;
+    from_address: string;
+    to_address: string;
+    winning_amount: string;
+  }[];
+
+  "/manual-reward": {
+    reward: {
+      transaction_hash: string,
+      from: string,
+      to: string,
+      winning_amount: string;
+    };
+    // Go encodes []byte as a `\x`-escaped B64 hex string
+    signature: string
+  }
 };
 
 export type WebsocketWinner = {
