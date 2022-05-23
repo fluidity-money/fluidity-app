@@ -17,7 +17,13 @@ contract Token is IERC20 {
     using SafeERC20 for IERC20;
     using Address for address;
 
-    event Reward(address indexed addr, uint indexed amount);
+    event Reward(
+        bytes32 txHash,
+        address indexed from,
+        uint fromAmount,
+        address indexed to,
+        uint toAmount
+    );
     event MintFluid(address indexed addr, uint indexed amount);
     event BurnFluid(address indexed addr, uint indexed amount);
 
@@ -112,15 +118,14 @@ contract Token is IERC20 {
         return totalAmount - totalFluid;
     }
 
-    function rewardFromPool(address from, address to, uint amount) internal {
+    function rewardFromPool(bytes32 hash, address from, address to, uint amount) internal {
         // mint some fluid tokens from the interest we've accrued
         // 20%
         uint256 toAmount = amount / 5;
         // 80%
         uint256 fromAmount = amount - toAmount;
 
-        emit Reward(from, fromAmount);
-        emit Reward(to, toAmount);
+        emit Reward(hash, from, fromAmount, to, toAmount);
 
         _mintDouble(from, fromAmount, to, toAmount);
     }
@@ -145,7 +150,7 @@ contract Token is IERC20 {
 
         // now pay out the user
         pastRewards_[txHash] = 1;
-        rewardFromPool(from, to, winAmount / 5 * 4);
+        rewardFromPool(txHash, from, to, winAmount / 5 * 4);
     }
 
     function batchReward(Winner[] memory rewards) public {
@@ -162,7 +167,7 @@ contract Token is IERC20 {
             require(poolAmount >= winner.amount, "reward pool empty");
             poolAmount = poolAmount - winner.amount;
 
-            rewardFromPool(winner.from, winner.to, winner.amount);
+            rewardFromPool(winner.txHash, winner.from, winner.to, winner.amount);
         }
     }
 
@@ -196,7 +201,7 @@ contract Token is IERC20 {
 
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 
-        rewardFromPool(from, to, winAmount);
+        rewardFromPool(txHash, from, to, winAmount);
     }
 
     // returns the amount that the user won (can be 0), reverts on invalid rng
