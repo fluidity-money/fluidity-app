@@ -4,11 +4,15 @@ package queue
 
 import (
 	"bytes"
+	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/state"
 )
 
 const (
@@ -23,6 +27,9 @@ const (
 
 	// ExchangeType to use for routing messages inside the queue
 	ExchangeType = `topic`
+
+	// EnvMessageRetries is the number of times a message will be retried
+	EnvMessageRetries = `FLU_QUEUE_MESSAGE_RETRIES`
 )
 
 type Message struct {
@@ -92,6 +99,12 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 	}
 
+	messageRetries := os.Getenv(EnvMessageRetries)
+	maxRetryCount, err := strconv.Atoi(messageRetries)
+	if err != nil {
+		maxRetryCount = 5
+	}
+
 	for message := range messages {
 		var (
 			deliveryTag = message.DeliveryTag
@@ -105,6 +118,25 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 
 		bodyBuf := bytes.NewBuffer(body)
+
+		hasher := sha1.New()
+		hasher.Write(body)
+		hash := string(hasher.Sum(nil))
+
+		retryKey := "worker.retry." + topic + "." + hash
+		// if Atoi fails retryCount = 0
+		retryCount, err := strconv.Atoi(string(state.Get(retryKey)))
+		if err == nil {
+			retryCount++
+
+			if retryCount >= maxRetryCount {
+				queueNackDeliveryTag(channel, deliveryTag)
+				state.Del(retryKey) // Clean up the retry key
+				continue
+			}
+		}
+
+		state.Set(retryKey, strconv.Itoa(retryCount))
 
 		f(Message{
 			Topic:   topic,
@@ -133,6 +165,8 @@ func GetMessages(topic string, f func(message Message)) {
 			"Server acked the reply for %v!",
 			deliveryTag,
 		)
+
+		state.Del(retryKey) // Clean up the retry key
 	}
 }
 

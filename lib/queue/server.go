@@ -17,13 +17,66 @@ type amqpDetails struct {
 var chanAmqpDetails = make(chan amqpDetails)
 
 func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel) (<-chan amqp.Delivery, error) {
-	_, err := channel.QueueDeclare(
-		queueName,
+	err := channel.ExchangeDeclare(
+		queueName+".dead-exchange",
+		"direct",
 		true,  // durable
 		false, // autoDelete
 		false, // exclusive
 		false, // noWait,
 		nil,   // args
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to declare an exchange with name %#v! %v",
+			queueName+".dead-exchange",
+			err,
+		)
+	}
+
+	_, err = channel.QueueDeclare(
+		queueName+".dead",
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait,
+		nil,   // args
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to declare deadletter queue with queue name %#v! %v",
+			queueName,
+			err,
+		)
+	}
+
+	err = channel.QueueBind(
+		queueName+".dead",
+		topic,                      // Key
+		queueName+".dead-exchange", // Exchange name
+		false,                      // noWait
+		nil,                        // args
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"unable to bind queue %#v to deadletter exchange! %v",
+			queueName+".dead",
+			err,
+		)
+	}
+
+	_, err = channel.QueueDeclare(
+		queueName,
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait,
+		amqp.Table{
+			"x-dead-letter-exchange": fmt.Sprintf("%v.dead", exchangeName),
+		}, // args
 	)
 
 	if err != nil {
@@ -120,4 +173,8 @@ func queuePublish(topic, exchangeName string, content []byte, channel *amqp.Chan
 
 func queueAckDeliveryTag(channel *amqp.Channel, deliveryTag uint64) error {
 	return channel.Ack(deliveryTag, false)
+}
+
+func queueNackDeliveryTag(channel *amqp.Channel, deliveryTag uint64) error {
+	return channel.Nack(deliveryTag, false, false)
 }
