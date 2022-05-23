@@ -334,3 +334,38 @@ func GetPendingRewardByHash(hash string) *PendingWinner {
 
 	return &response
 }
+
+func RemovePendingWinner(hash string) {
+	timescaleClient := timescale.Client()
+
+
+	statementText := fmt.Sprintf(
+		`UPDATE %s
+
+		SET
+			reward_sent = true
+		WHERE
+			transaction_hash = $1
+		;`,
+
+		TablePendingWinners,
+	)
+
+	_, err := timescaleClient.Exec(
+		statementText,
+		hash,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to mark transaction with hash %s as rewarded!",
+				hash,
+			)
+
+			k.Payload = err
+		})
+	}
+}
