@@ -99,7 +99,9 @@ func GetMessages(topic string, f func(message Message)) {
 	}
 
 	messageRetries := util.GetEnvOrDefault(EnvMessageRetries, "5")
+
 	maxRetryCount, err := strconv.Atoi(messageRetries)
+
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
@@ -138,7 +140,9 @@ func GetMessages(topic string, f func(message Message)) {
 
 		// if Atoi fails retryCount = 0
 		messageRetryState := string(state.Get(retryKey))
+
 		retryCount, err := strconv.Atoi(messageRetryState)
+
 		if err == nil {
 			// Bit obtuse, but runs from 0 to maxRetryCount
 			retryCount++

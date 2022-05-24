@@ -34,6 +34,7 @@ func GetEnvOrFatal(name string) string {
 	return env
 }
 
+// GetEnvOrDefault returns the env if it is set, otherwise the default value
 func GetEnvOrDefault(name string, defaultValue string) string {
 	env := os.Getenv(name)
 
@@ -44,6 +45,7 @@ func GetEnvOrDefault(name string, defaultValue string) string {
 	return env
 }
 
+// GetHash returns the sha1 hash of the byte array
 func GetHash(data []byte) string {
 	hasher := sha1.New()
 	hasher.Write(data)
