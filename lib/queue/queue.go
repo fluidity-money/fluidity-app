@@ -129,7 +129,12 @@ func GetMessages(topic string, f func(message Message)) {
 		bodyBuf := bytes.NewBuffer(body)
 
 		// Risk of a collision is near 0 enough to be ignored.
-		retryKey := "worker.retry." + util.GetHash(body)
+		retryKey := fmt.Sprintf(
+			"worker.%#v.retry.%#v.%#v",
+			workerId,
+			topic,
+			util.GetHash(body),
+		)
 
 		// if Atoi fails retryCount = 0
 		messageRetryState := string(state.Get(retryKey))
