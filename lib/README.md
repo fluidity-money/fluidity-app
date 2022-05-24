@@ -6,7 +6,7 @@ money idle generating interest. **Fluidity rewards users when they actually
 use it**.
 
 This microservice library contains code that's used internally within
-Fluidity's backend systems. Usecases include statistics, beta and feature
+Fluidity's backend systems. Usecases include statistics, feature
 rollout and more. Though not intended to be used publicly, this code can
 be open sourced.
 
@@ -40,7 +40,6 @@ To display overall test coverage:
 
 Directories that do not contain any statements are intentionally excluded from testing:
 
-	types/beta
 	types/faucet
 	types/ido
 	types/network
