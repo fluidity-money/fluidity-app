@@ -76,7 +76,7 @@ func main() {
 
 		// first, we're going to make the string lowercase
 
-		logAddress    = strings.ToLower(logAddress)
+		logAddress = strings.ToLower(logAddress)
 		filterAddress = strings.ToLower(filterAddress)
 
 		logging.Debug(func(k *logging.Log) {
@@ -134,10 +134,10 @@ func main() {
 		rewardData, err := fluidity.DecodeRewardData(log)
 
 		if err != nil {
-		   logging.Fatal(func (k *logging.Log) {
-		       k.Message = "Failed to decode reward data from events!"
-		       k.Payload = err
-		   })
+			logging.Fatal(func(k *logging.Log) {
+				k.Message = "Failed to decode reward data from events!"
+				k.Payload = err
+			})
 		}
 
 		winner1, winner2 := microservice_common_track_winners.DecodeWinner(

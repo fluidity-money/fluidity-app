@@ -7,16 +7,16 @@ import (
 )
 
 func main() {
-    winners.RewardsEthereum(func (reward winners.RewardData) {
-        transactionHash := reward.TxHash.String()
+	winners.RewardsEthereum(func(reward winners.RewardData) {
+		transactionHash := reward.TxHash.String()
 
-        log.Debug(func (k *log.Log) {
-            k.Format(
-                "Transaction %s was paid out, removing from spooler!",
-                transactionHash,
-            )
-        })
+		log.Debug(func(k *log.Log) {
+			k.Format(
+				"Transaction %s was paid out, removing from spooler!",
+				transactionHash,
+			)
+		})
 
-        spooler.RemovePendingWinner(transactionHash)
-    })
+		spooler.RemovePendingWinner(transactionHash)
+	})
 }
