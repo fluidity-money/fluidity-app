@@ -182,6 +182,26 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		rewards[i] = rewardArg
 	}
 
+	callOptions := ethAbiBind.CallOpts {
+		Pending: false,
+		From: transactionOptions.From,
+		BlockNumber: nil,
+		Context: transactionOptions.Context,
+	}
+
+	err := boundContract.Call(
+		&callOptions,
+		nil,
+		"batchReward",
+		rewards,
+	)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"reward transaction simulation failed! %w",
+			err,
+		)
+	}
+
 	transaction, err := boundContract.Transact(
 		transactionOptions,
 		"batchReward",
