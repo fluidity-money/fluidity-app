@@ -12,6 +12,8 @@ services:
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
       FLU_ETHEREUM_START_BLOCK: ${FLU_ETHEREUM_START_BLOCK}
+    depends_on:
+      - redis
     restart: unless-stopped
 
   connector-ethereum-block-headers-amqp:
@@ -23,4 +25,6 @@ services:
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
+    depends_on:
+      - redis
     restart: unless-stopped

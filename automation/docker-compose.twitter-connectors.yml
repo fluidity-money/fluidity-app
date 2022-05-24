@@ -12,4 +12,6 @@ services:
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_TWITTER_BEARER_TOKEN: ${FLU_TWITTER_BEARER_TOKEN}
       FLU_TWITTER_HASHTAGS: ${FLU_TWITTER_HASHTAGS}
+    depends_on:
+      - redis
     restart: unless-stopped

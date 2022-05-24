@@ -22,6 +22,8 @@ services:
       FLU_AURORA_TOKEN_FLUX_ADDRESS: ${FLU_AURORA_FLUX_ORACLE_USDT}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdt
       FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: aurora.worker.usdt.apy.moving-average
+    depends_on:
+      - redis
     restart: unless-stopped
 
   microservice-aurora-worker-client-usdt:
@@ -38,6 +40,8 @@ services:
       FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDT}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDT}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdt
+    depends_on:
+      - redis
     restart: unless-stopped
 
   microservice-aurora-worker-server-usdc:
@@ -60,6 +64,8 @@ services:
       FLU_AURORA_TOKEN_FLUX_ADDRESS: ${FLU_AURORA_FLUX_ORACLE_USDC}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdc
       FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: aurora.worker.usdc.apy.moving-average
+    depends_on:
+      - redis
     restart: unless-stopped
 
   microservice-aurora-worker-client-usdc:
@@ -76,4 +82,6 @@ services:
       FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDC}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDC}
       FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdc
+    depends_on:
+      - redis
     restart: unless-stopped
