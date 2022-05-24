@@ -154,7 +154,8 @@ func GetMessages(topic string, f func(message Message)) {
 			}
 		}
 
-		state.Set(retryKey, strconv.Itoa(retryCount))
+		// Timeout in 24 hours
+		state.SetTimed(retryKey, 86400, strconv.Itoa(retryCount))
 
 		f(Message{
 			Topic:   topic,
