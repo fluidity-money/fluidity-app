@@ -11,7 +11,9 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
+	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	logging "github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 const fluidityContractAbiString = `[
@@ -65,16 +67,43 @@ const fluidityContractAbiString = `[
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
+  },
+  {
+	  "anonymous": false,
+	  "inputs": [
+	    { "indexed": false, "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
+	    { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+	    { "indexed": false, "internalType": "uint256", "name": "fromAmount", "type": "uint256" },
+	    { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+	    { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+	  ],
+	  "name": "Reward",
+	  "type": "event"
   }
 ]`
 
+type RewardData struct {
+	TxHash ethCommon.Hash
+	FromAddress ethCommon.Address
+	FromAmount *big.Int
+	ToAddress ethCommon.Address
+	ToAmount *big.Int
+}
+
 var fluidityContractAbi ethAbi.ABI
 
+var ManualRewardArguments = ethAbi.Arguments{
+	ethAbiMustArgument("txHash",     "bytes32"),
+	ethAbiMustArgument("from",       "address"),
+	ethAbiMustArgument("to",         "address"),
+	ethAbiMustArgument("win_amount", "uint256"),
+}
+
 type RewardArg struct {
-	FromAddress ethCommon.Address
-	ToAddress ethCommon.Address
-	WinAmount *big.Int
-	TransactionHash ethCommon.Hash
+	FromAddress     ethCommon.Address `json:"from"`
+	ToAddress       ethCommon.Address `json:"to"`
+	WinAmount       *big.Int          `json:"amount"`
+	TransactionHash ethCommon.Hash    `json:"transaction_hash"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -119,7 +148,7 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []worker.EthereumWinnerAnnouncement) (*ethTypes.Transaction, error) {
+func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumWinnerAnnouncement) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
 		fluidityContractAbi,
@@ -196,4 +225,49 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 	}
 
 	return transaction, nil
+}
+
+func DecodeRewardData(log typesEth.Log) (RewardData, error) {
+	var rewardData RewardData
+
+	var (
+		logData   = log.Data
+		logTopics = log.Topics
+	)
+
+	decodedData, err := fluidityContractAbi.Unpack("Reward", logData)
+
+	if err != nil {
+		return rewardData, fmt.Errorf(
+			"failed to unpack reward event data! %v",
+			err,
+		)
+	}
+
+	logging.Debug(func (k *logging.Log) {
+		k.Format("data: %+v", decodedData)
+	})
+
+	var (
+		txHash = decodedData[0].([32]byte)
+		fromPadded = logTopics[1].String()
+		fromAmount = decodedData[1].(*big.Int)
+		toPadded = logTopics[2].String()
+		toAmount = decodedData[2].(*big.Int)
+	)
+
+	var (
+		from = ethCommon.HexToAddress(fromPadded)
+		to = ethCommon.HexToAddress(toPadded)
+	)
+
+	rewardData = RewardData {
+		TxHash: txHash,
+		FromAddress: from,
+		FromAmount: fromAmount,
+		ToAddress: to,
+		ToAmount: toAmount,
+	}
+
+	return rewardData, nil
 }

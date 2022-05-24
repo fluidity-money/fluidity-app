@@ -1,39 +1,39 @@
 package microservice_common_track_winners
 
 import (
-	"fmt"
-	ethCommon "github.com/ethereum/go-ethereum/common"
+	"time"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
-	"time"
 )
 
 const NetworkEthereum = `ethereum`
 
 // DecodeWinner, returning the internal definition for a winner
-func DecodeWinner(contractAddress, transactionHash, winnerAddress_, transferAmount_ string, when time.Time) (*winners.Winner, error) {
+func DecodeWinner(contractAddress, transactionHash string, rewardData fluidity.RewardData, when time.Time) (winners.Winner, winners.Winner) {
 	var (
-		winnerAddress = ethCommon.HexToAddress(winnerAddress_)
-		transferAmountAddress = ethCommon.HexToHash(transferAmount_)
+		fromAddress = rewardData.FromAddress.String()
+		fromAmount = misc.NewBigInt(*rewardData.FromAmount)
+		toAddress = rewardData.ToAddress.String()
+		toAmount = misc.NewBigInt(*rewardData.ToAmount)
 	)
 
-	transferAmount := transferAmountAddress.Big()
-
-	if transferAmount == nil {
-		return nil, fmt.Errorf(
-			"Returned big.Int was nil when decoding a transfer amount!",
-		)
-	}
-
-	winnerAddressHex := winnerAddress.Hex()
-
-	winner := winners.Winner{
+	winner1 := winners.Winner{
 		Network:         NetworkEthereum,
 		TransactionHash: transactionHash,
-		WinnerAddress:   winnerAddressHex,
-		WinningAmount:   misc.NewBigInt(*transferAmount),
+		WinnerAddress:   fromAddress,
+		WinningAmount:   fromAmount,
 		AwardedTime:     when,
 	}
 
-	return &winner, nil
+	winner2 := winners.Winner{
+		Network:         NetworkEthereum,
+		TransactionHash: transactionHash,
+		WinnerAddress:   toAddress,
+		WinningAmount:   toAmount,
+		AwardedTime:     when,
+	}
+
+	return winner1, winner2
 }

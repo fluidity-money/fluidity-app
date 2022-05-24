@@ -2,60 +2,60 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0xA5F816E2dE025A1bb419eD59652Fa03F249369A9",
-      "txHash": "0x3dcff03a325e4154996a2aaf6b464846debd22e2f260de90210640baf8192465",
-      "kind": "beacon"
-    },
-    {
-      "address": "0x238B34083055c3605d80574e04F7d68A3342de39",
-      "txHash": "0x3e76342f3160a2e1c0fa478b8f15019451608f029dd59f56e2282634c378304c",
-      "kind": "beacon"
-    },
-    {
-      "address": "0xD3a3C51BD460aCE0E83506CD1191Cf77F5eC3415",
-      "txHash": "0x23e35e00af1656d5e8afa0913909c9072ed5ed347b6c5d67be072abe849b718b",
-      "kind": "beacon"
-    },
-    {
-      "address": "0xcCb4755f8c284f0680694B7d9748DeFd325DFd22",
-      "txHash": "0xade549de7957ef300880b829b4004388ce18b64bc526dfb4468c9c5f4f505b46",
-      "kind": "beacon"
-    },
-    {
-      "address": "0xF24B32ec321e99053809f52aEbF680F70FE0dc53",
-      "txHash": "0x87e1634cec1f1eee5c2772f65150c922c54a8170a8b5d25ef258af08fdd43345",
-      "kind": "beacon"
-    },
-    {
-      "address": "0x238b2c461584C83bEe7CBd54A05efFa03Ba11D0E",
-      "txHash": "0xa6b3d53b76d5ca5902f688de14822423147b40fdb80c08d467bf0abeeb82526f",
-      "kind": "beacon"
-    },
-    {
       "address": "0xaE950EEcB370371faa8BAf150f1acBF804051a5f",
-      "txHash": "0xcba23a0a9630323dae5995cb776afd4128c26157865a1d991ab8370144f27f7a",
+      "txHash": "0x3bf12dc9a255bdc22e37b2dd80538e51fb160c4a2dde0c81917db7d78dc5c5db",
       "kind": "beacon"
     },
     {
       "address": "0x6087BE9225a6c813c87DA81Da983F0fb25599A39",
-      "txHash": "0x8136c0be825e0fa0d0727404c347294fdd066f115ac676e2060449ecb17687a2",
+      "txHash": "0xb32ff41c9393555e91aaf0a384b2917fc4129821cb26d1ea3683377b07a035ea",
       "kind": "beacon"
     },
     {
       "address": "0x0094D1019251793dB2100026736ee267946B5FA4",
-      "txHash": "0x1fb4fc1a38612de31b4d002d0b5c23ca0e904b73af2153994b44a4a16eb26585",
+      "txHash": "0x408efd5777a9e3d0c8fef8932aa2a6bfa71bc7d5aad939461a08fd996a648921",
       "kind": "beacon"
     },
     {
       "address": "0xBe30BE405881a4D2d49235B30a139bce30944680",
-      "txHash": "0x09ed24a4ba5d75c227f55d33c0a1019cfd5a1bb7845b6100077264968b46a6ea",
+      "txHash": "0xd409cb281a19ee5610b28c448331333369a3985e538e3f9d337f16379b949c30",
+      "kind": "beacon"
+    },
+    {
+      "address": "0xA5F816E2dE025A1bb419eD59652Fa03F249369A9",
+      "txHash": "0x545ac5e6cfa1cb433ad8d16e59fb71d6389402182045d4a6b5daffae0319fa57",
+      "kind": "beacon"
+    },
+    {
+      "address": "0x238B34083055c3605d80574e04F7d68A3342de39",
+      "txHash": "0x1634aeb0def312177e028a4d796dc60e4f4e29d4f43bb0c2c3ac198899c7d713",
+      "kind": "beacon"
+    },
+    {
+      "address": "0xD3a3C51BD460aCE0E83506CD1191Cf77F5eC3415",
+      "txHash": "0x81d113d53dca408453131deefce4555cbd907da9ca34065c10d1a573a35f54ae",
+      "kind": "beacon"
+    },
+    {
+      "address": "0xcCb4755f8c284f0680694B7d9748DeFd325DFd22",
+      "txHash": "0x751f10a51405e6f6183cce110a2f896983f2d6a55a76b4007f593dccf332d6ec",
+      "kind": "beacon"
+    },
+    {
+      "address": "0xF24B32ec321e99053809f52aEbF680F70FE0dc53",
+      "txHash": "0x97d6bcf4a0caf04e8343033099dc0a834644b1e7597393da95650f8252872379",
+      "kind": "beacon"
+    },
+    {
+      "address": "0x238b2c461584C83bEe7CBd54A05efFa03Ba11D0E",
+      "txHash": "0x1494c2fbe49e278e06b5ffb3204fc122e36a5d658302ac545dc770fea3a05140",
       "kind": "beacon"
     }
   ],
   "impls": {
     "bc94906ee9816e006945e6b460bb0ffb148a3cd6fd8491d8e225316b7a56fe89": {
       "address": "0x9391202B846ee3f574e59E4AD58ef6140E9ba4F6",
-      "txHash": "0x94d05beb01ffa5c6902f8750fa89da9086b264ebbed7de4eeac4c4a00e97a636",
+      "txHash": "0x45f44ae8f3d853be7b467512799cf55282f4ed30741468d079802fb6cdbe9aa9",
       "layout": {
         "storage": [
           {
@@ -111,139 +111,9 @@
         }
       }
     },
-    "8886479a8773b16dec053a0f90e770ed7fe17733abe3cbd7801f4053e975c401": {
-      "address": "0xf1721FCF509c975c3eC0f474aEB58EFcbf80e4D6",
-      "txHash": "0xa556a7813c49de6509a4ae831068ac3846022a95cad037df2b9cb95906abab63",
-      "layout": {
-        "storage": [
-          {
-            "label": "balances_",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "Token",
-            "src": "contracts/Token.sol:17"
-          },
-          {
-            "label": "allowances_",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-            "contract": "Token",
-            "src": "contracts/Token.sol:18"
-          },
-          {
-            "label": "decimals_",
-            "offset": 0,
-            "slot": "2",
-            "type": "t_uint8",
-            "contract": "Token",
-            "src": "contracts/Token.sol:19"
-          },
-          {
-            "label": "totalSupply_",
-            "offset": 0,
-            "slot": "3",
-            "type": "t_uint256",
-            "contract": "Token",
-            "src": "contracts/Token.sol:20"
-          },
-          {
-            "label": "name_",
-            "offset": 0,
-            "slot": "4",
-            "type": "t_string_storage",
-            "contract": "Token",
-            "src": "contracts/Token.sol:21"
-          },
-          {
-            "label": "symbol_",
-            "offset": 0,
-            "slot": "5",
-            "type": "t_string_storage",
-            "contract": "Token",
-            "src": "contracts/Token.sol:22"
-          },
-          {
-            "label": "initialized_",
-            "offset": 0,
-            "slot": "6",
-            "type": "t_bool",
-            "contract": "Token",
-            "src": "contracts/Token.sol:24"
-          },
-          {
-            "label": "pool_",
-            "offset": 1,
-            "slot": "6",
-            "type": "t_contract(LiquidityProvider)368",
-            "contract": "Token",
-            "src": "contracts/Token.sol:26"
-          },
-          {
-            "label": "rngOracle_",
-            "offset": 0,
-            "slot": "7",
-            "type": "t_address",
-            "contract": "Token",
-            "src": "contracts/Token.sol:28"
-          },
-          {
-            "label": "pastRewards_",
-            "offset": 0,
-            "slot": "8",
-            "type": "t_mapping(t_bytes32,t_uint256)",
-            "contract": "Token",
-            "src": "contracts/Token.sol:32"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_bytes32": {
-            "label": "bytes32",
-            "numberOfBytes": "32"
-          },
-          "t_contract(LiquidityProvider)368": {
-            "label": "contract LiquidityProvider",
-            "numberOfBytes": "20"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(address => mapping(address => uint256))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_bytes32,t_uint256)": {
-            "label": "mapping(bytes32 => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_string_storage": {
-            "label": "string",
-            "numberOfBytes": "32"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
     "a42a2e58cb86e30f23a08878e6167f24f0a1d1904f553e998f581e979a881cf6": {
       "address": "0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab",
-      "txHash": "0xd3c4e727d8f8d51cfd98a87567cefe30ec736e8d649790e8dad358b45c260c28",
+      "txHash": "0x3fa1cf6060b6c49bf58f621ccaf1c6d91c0066dbf324b14a504a9c9ca21c021d",
       "layout": {
         "storage": [
           {
@@ -307,6 +177,136 @@
           "t_contract(LendingPoolAddressesProviderInterface)1313": {
             "label": "contract LendingPoolAddressesProviderInterface",
             "numberOfBytes": "20"
+          }
+        }
+      }
+    },
+    "7a6ef354a8d65cfc3f996136e1e69c535074f531cef7d8be0cfb2da6c75b173c": {
+      "address": "0xf1721FCF509c975c3eC0f474aEB58EFcbf80e4D6",
+      "txHash": "0x91c4dfb2ed89f3ab852e54175947b3687ada0532a8408a042fd45f661d24973d",
+      "layout": {
+        "storage": [
+          {
+            "label": "balances_",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Token",
+            "src": "contracts/Token.sol:30"
+          },
+          {
+            "label": "allowances_",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "Token",
+            "src": "contracts/Token.sol:31"
+          },
+          {
+            "label": "decimals_",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint8",
+            "contract": "Token",
+            "src": "contracts/Token.sol:32"
+          },
+          {
+            "label": "totalSupply_",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "Token",
+            "src": "contracts/Token.sol:33"
+          },
+          {
+            "label": "name_",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_string_storage",
+            "contract": "Token",
+            "src": "contracts/Token.sol:34"
+          },
+          {
+            "label": "symbol_",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_string_storage",
+            "contract": "Token",
+            "src": "contracts/Token.sol:35"
+          },
+          {
+            "label": "initialized_",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_bool",
+            "contract": "Token",
+            "src": "contracts/Token.sol:37"
+          },
+          {
+            "label": "pool_",
+            "offset": 1,
+            "slot": "6",
+            "type": "t_contract(LiquidityProvider)30",
+            "contract": "Token",
+            "src": "contracts/Token.sol:39"
+          },
+          {
+            "label": "rngOracle_",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_address",
+            "contract": "Token",
+            "src": "contracts/Token.sol:41"
+          },
+          {
+            "label": "pastRewards_",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_bytes32,t_uint256)",
+            "contract": "Token",
+            "src": "contracts/Token.sol:45"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(LiquidityProvider)30": {
+            "label": "contract LiquidityProvider",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
           }
         }
       }
