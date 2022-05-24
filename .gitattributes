@@ -11,3 +11,4 @@
 /web/ethereum.fluidity.money/public/img/Aurora/AuroraSwapBox.svg filter=lfs diff=lfs merge=lfs -text
 /web/ethereum.fluidity.money/public/img/Aurora/AuroraLogoTextBelow.svg filter=lfs diff=lfs merge=lfs -text
 /web/ethereum.fluidity.money/public/img/Aurora/AuroraLogoTextRight.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/Aurora/AuroraLogoTextBelow.svg filter=lfs diff=lfs merge=lfs -text
