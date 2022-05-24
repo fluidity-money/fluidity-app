@@ -102,7 +102,7 @@
   }
 }
 
-.primary-button-aurora {
+.primary-button--aurora {
   background: $aurora;
   border-radius: 10px;
   height: 100%;
@@ -115,7 +115,7 @@
   font-size: 1rem;
   // animation: gradientShift 1s infinite;
   &--toolbar {
-    @extend .primary-button-aurora;
+    @extend .primary-button--aurora;
     @include for-smallest-toolbar {
       font-size: 0.8rem;
     }
@@ -251,7 +251,7 @@
   transition: all 0.3s ease-in-out;
 }
 
-.selected-aurora {
+.selected--aurora {
   border: none;
   width: auto;
   display: inline-block;
@@ -276,14 +276,14 @@
   -moz-text-fill-color: white;
 }
 
-.selected-aurora:before,
-.selected-aurora:after {
+.selected--aurora:before,
+.selected--aurora:after {
   content: " ";
   position: absolute;
   border-radius: 17px;
 }
 
-.selected-aurora:before {
+.selected--aurora:before {
   top: 0;
   left: 0;
   bottom: 0;
@@ -294,7 +294,7 @@
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#503b9a', endColorstr='#269cc1',GradientType=1 );
 }
 
-.selected-aurora:after {
+.selected--aurora:after {
   top: 2px;
   bottom: 2px;
   left: 2px;

@@ -8,7 +8,7 @@ import { JsonRpcProvider } from "ethers/providers";
 import { useState } from "react";
 import ConnectWalletModal from "components/Modal/Themes/ConnectWalletModal";
 import { useHistory } from "react-router-dom";
-import ChainId, { chainIdFromEnv } from "util/chainId";
+import { appTheme } from "util/appTheme";
 
 const WalletConnectedModal = ({
   enable,
@@ -113,13 +113,7 @@ const WalletConnectedModal = ({
                 cname="walletconnect-wallet-info"
                 defaultMargin={false}
               >
-                <div
-                  className={
-                    chainIdFromEnv() === ChainId.AuroraMainnet
-                      ? "swap-box-subheader primary-text--aurora"
-                      : "swap-box-subheader primary-text"
-                  }
-                >
+                <div className={`swap-box-subheader primary-text${appTheme}`}>
                   Connected with {walletType()}
                 </div>
                 <div className="walletconnect-account">{address}</div>

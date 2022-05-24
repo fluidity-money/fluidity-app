@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import GenericModal from "components/Modal/GenericModal";
 import React, { useEffect } from "react";
-import ChainId, { chainIdFromEnv } from "util/chainId";
+import { appTheme } from "util/appTheme";
 
 interface Blockchain {
   blockchain: string;
@@ -26,7 +26,6 @@ const SelectBlockchainModal = ({
   enable: boolean;
   toggle: Function;
 }) => {
-  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
   const networkOptions: Blockchain[] = [
     {
       blockchain: "Ethereum",
@@ -78,7 +77,7 @@ const SelectBlockchainModal = ({
             label={blockchain}
             key={index}
             theme={`select-button`}
-            texttheme={`wallet-text${aurora}`}
+            texttheme={`wallet-text${appTheme}`}
             visible={visible}
             icon={
               // nosemgrep: typescript.react.security.audit.react-http-leak.react-http-leak
@@ -108,7 +107,7 @@ const SelectBlockchainModal = ({
                 }}
               >
                 <img src={icon} className={`network-icon`} alt={blockchain} />
-                <div className={`primary-text${aurora}`}>{network.name}</div>
+                <div className={`primary-text${appTheme}`}>{network.name}</div>
               </div>
             ))}
         </div>
@@ -124,7 +123,7 @@ const SelectBlockchainModal = ({
       width={width}
     >
       <div className="connect-modal-body--networks">
-        <h2 className={`primary-text${aurora}`}>Select a Blockchain</h2>
+        <h2 className={`primary-text${appTheme}`}>Select a Blockchain</h2>
         <div className="connect-modal-form">{renderedOptions}</div>
       </div>
     </GenericModal>

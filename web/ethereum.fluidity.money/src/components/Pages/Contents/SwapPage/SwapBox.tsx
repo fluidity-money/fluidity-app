@@ -33,6 +33,7 @@ import { parseUnits } from "ethers/utils";
 import { decimalTrim } from "util/decimalTrim";
 import { isNonZero, shortBalance, trimAmount } from "util/amounts";
 import ChainId, { chainIdFromEnv } from "util/chainId";
+import { appTheme } from "util/appTheme";
 
 const SwapBox = () => {
   const signer = useSigner();
@@ -238,14 +239,11 @@ const SwapBox = () => {
       setAmount(currentBalance);
   }, [swap]);
 
-  const auroraStyle =
-    chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
-
   const AmountAvailable = ({ invert = false }: { invert?: boolean }) => {
     let isNonFluid = swap;
     if (invert) isNonFluid = !isNonFluid;
     return (
-      <div className={`amount-avail secondary-text${auroraStyle}`}>
+      <div className={`amount-avail secondary-text${appTheme}`}>
         {walletStatus === "connected" ? (
           isNonFluid ? (
             selectedToken !== "Select Token" ? (
@@ -263,13 +261,7 @@ const SwapBox = () => {
 
   return (
     <modalToggle.Provider value={modalContext}>
-      <div
-        className={
-          chainIdFromEnv() === ChainId.AuroraMainnet
-            ? "swap-box-container-aurora flex column"
-            : "swap-box-container flex column"
-        }
-      >
+      <div className={`swap-box-container${appTheme} flex column`}>
         <div className="swap-form flex column flex-space-between">
           <FormSection
             defaultMargin={false}
@@ -364,11 +356,7 @@ const SwapBox = () => {
               goto={() => {
                 wallet.status == "connected" ? switchPayment() : switchWallet();
               }}
-              theme={
-                chainIdFromEnv() === ChainId.AuroraMainnet
-                  ? "primary-button-aurora"
-                  : "primary-button"
-              }
+              theme={`primary-button${appTheme}`}
               padding="py-1"
               disabled={
                 (isNonZero(amount, decimals) &&
@@ -399,7 +387,7 @@ const SwapBox = () => {
               enable={successTransactionModal}
               toggle={() => setSuccessTransactionModal(false)}
               message={
-                <div className={`primary-text${auroraStyle}`}>
+                <div className={`primary-text${appTheme}`}>
                   Transaction Successful
                 </div>
               }

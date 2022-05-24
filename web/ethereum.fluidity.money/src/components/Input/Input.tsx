@@ -19,12 +19,9 @@ interface InputProps {
 const inputValidiation = (
   input: React.ChangeEvent<HTMLInputElement>,
   state: React.Dispatch<React.SetStateAction<string>>,
-  toggle?: boolean,
+  toggle?: boolean
 ) => {
-  if (
-    toggle &&
-    /^[0-9]*\.?([0-9]*)$/.test(input.target.value) === false
-  ) {
+  if (toggle && /^[0-9]*\.?([0-9]*)$/.test(input.target.value) === false) {
     return;
   }
   state(input.target.value);
@@ -53,10 +50,9 @@ const Input = ({
 
   useEffect(() => {
     const input = ref.current;
-    if (input)
-      input.setSelectionRange(cursor, cursor);
+    if (input) input.setSelectionRange(cursor, cursor);
   }, [ref, cursor, value]);
-  
+
   return (
     <input
       ref={ref}
@@ -70,7 +66,7 @@ const Input = ({
       placeholder={pholder}
       style={style}
       disabled={disabled ?? false}
-      {...props} 
+      {...props}
     ></input>
   );
 };
