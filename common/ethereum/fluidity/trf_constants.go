@@ -1,9 +1,9 @@
 package fluidity
 
-import "big"
-
 const (
-	WinningClasses  = 5
-	DeltaWeight     = big.NewRat(31536000, 1)
-	PayoutFrequency = big.NewRat(1, 4)
+	WinningClasses   = 5
+	DeltaWeightNum   = int64(31536000)
+	DeltaWeightDenom = int64(1)
+	PayoutFreqNum    = int64(1)
+	PayoutFreqDenom  = int64(4)
 )

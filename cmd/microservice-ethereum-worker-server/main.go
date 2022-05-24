@@ -642,15 +642,28 @@ func main() {
 
 			transferFeeUsd.Quo(transferFeeUsd, big.NewRat(1e18, 1))
 
+			var (
+				winningClasses   = fluidity.WinningClasses
+				deltaWeightNum   = fluidity.DeltaWeightNum
+				deltaWeightDenom = fluidity.DeltaWeightDenom
+				payoutFreqNum    = fluidity.PayoutFreqNum
+				payoutFreqDenom  = fluidity.PayoutFreqDenom
+			)
+
+			var (
+				deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
+				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
+			)
+
 			randomN, randomPayouts := probability.WinningChances(
 				transferFeeUsd,
 				currentAtx,
 				bpyStakedUsd,
 				sizeOfThePool,
 				underlyingTokenDecimalsRat,
-				fluidity.PayoutFreq,
-				fluidity.DeltaWeight,
-				fluidity.WinningClasses,
+				payoutFreq,
+				deltaWeight,
+				winningClasses,
 				btx,
 				secondsSinceLastBlock,
 				emission,
