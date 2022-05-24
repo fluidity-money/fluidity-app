@@ -4,15 +4,14 @@ package queue
 
 import (
 	"bytes"
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -99,10 +98,20 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 	}
 
-	messageRetries := os.Getenv(EnvMessageRetries)
+	messageRetries := util.GetEnvOrDefault(EnvMessageRetries, "5")
 	maxRetryCount, err := strconv.Atoi(messageRetries)
 	if err != nil {
-		maxRetryCount = 5
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to set %#v: Can't convert '%#v' to an integer!",
+				EnvMessageRetries,
+				messageRetries,
+			)
+
+			k.Payload = err
+		})
 	}
 
 	for message := range messages {
@@ -119,14 +128,14 @@ func GetMessages(topic string, f func(message Message)) {
 
 		bodyBuf := bytes.NewBuffer(body)
 
-		hasher := sha1.New()
-		hasher.Write(body)
-		hash := string(hasher.Sum(nil))
+		// Risk of a collision is near 0 enough to be ignored.
+		retryKey := "worker.retry." + util.GetHash(body)
 
-		retryKey := "worker.retry." + topic + "." + hash
 		// if Atoi fails retryCount = 0
-		retryCount, err := strconv.Atoi(string(state.Get(retryKey)))
+		messageRetryState := string(state.Get(retryKey))
+		retryCount, err := strconv.Atoi(messageRetryState)
 		if err == nil {
+			// Bit obtuse, but runs from 0 to maxRetryCount
 			retryCount++
 
 			if retryCount >= maxRetryCount {

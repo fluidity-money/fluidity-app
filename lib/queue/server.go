@@ -18,7 +18,7 @@ var chanAmqpDetails = make(chan amqpDetails)
 
 func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel) (<-chan amqp.Delivery, error) {
 	err := channel.ExchangeDeclare(
-		queueName+".dead-exchange",
+		"dead-exchange",
 		"direct",
 		true,  // durable
 		false, // autoDelete
@@ -54,10 +54,10 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 
 	err = channel.QueueBind(
 		queueName+".dead",
-		topic,                      // Key
-		queueName+".dead-exchange", // Exchange name
-		false,                      // noWait
-		nil,                        // args
+		topic,           // Key
+		"dead-exchange", // Exchange name
+		false,           // noWait
+		nil,             // args
 	)
 
 	if err != nil {
@@ -75,7 +75,7 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		false, // exclusive
 		false, // noWait,
 		amqp.Table{
-			"x-dead-letter-exchange": fmt.Sprintf("%v.dead-exchange", exchangeName),
+			"x-dead-letter-exchange": "dead-exchange",
 		}, // args
 	)
 
