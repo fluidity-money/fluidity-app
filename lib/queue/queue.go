@@ -138,24 +138,14 @@ func GetMessages(topic string, f func(message Message)) {
 			util.GetHash(body),
 		)
 
-		// if Atoi fails retryCount = 0
-		messageRetryState := string(state.Get(retryKey))
+		retryCount := state.Incr(retryKey)
+		state.Expire(retryKey, 86400) // 24 hours
 
-		retryCount, err := strconv.Atoi(messageRetryState)
-
-		if err == nil {
-			// Bit obtuse, but runs from 0 to maxRetryCount
-			retryCount++
-
-			if retryCount >= maxRetryCount {
-				queueNackDeliveryTag(channel, deliveryTag)
-				state.Del(retryKey) // Clean up the retry key
-				continue
-			}
+		if int(retryCount) >= maxRetryCount {
+			queueNackDeliveryTag(channel, deliveryTag)
+			state.Del(retryKey) // Clean up the retry key
+			continue
 		}
-
-		// Timeout in 24 hours
-		state.SetTimed(retryKey, 86400, strconv.Itoa(retryCount))
 
 		f(Message{
 			Topic:   topic,
