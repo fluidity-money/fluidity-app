@@ -19,7 +19,7 @@ const (
 	EnvSolanaWsUrl = `FLU_SOLANA_WS_URL`
 
 	// EnvSolanaNetwork is the network the TRF variables affect
-	EnvSolanaNetwork = `FLU_SOLAN_NETWORK`
+	EnvSolanaNetwork = `FLU_SOLANA_NETWORK`
 
 	// EnvFluidityPubkey is the program id of the trf data store account
 	EnvTrfDataStoreProgramId = `FLU_TRF_DATA_STORE_PROGRAM_ID`
