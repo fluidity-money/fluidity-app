@@ -333,3 +333,22 @@
   text-align: center;
   text-decoration: underline;
 }
+
+.blockchain-container {
+  background-color: transparent;
+  border: solid 2px #ffffff;
+  border-radius: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+  &--closed {
+    @extend .blockchain-container;
+    background-color: transparent;
+  }
+}
+
+.line {
+  background-color: #ffffff;
+  height: 1px;
+  border: none;
+  width: 81%;
+}
