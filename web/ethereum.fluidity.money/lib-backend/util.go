@@ -1,8 +1,8 @@
 package api_fluidity_money
 
 import (
-	"net/http"
 	"math/big"
+	"net/http"
 
 	"github.com/graphql-go/graphql/gqlerrors"
 

@@ -24,7 +24,7 @@ const NetworkButton = () => {
             : chainIdFromEnv() === ChainId.Mainnet
             ? "Mainnet"
             : chainIdFromEnv() === ChainId.AuroraMainnet
-            ? "Aurora"
+            ? ""
             : "Ethereum"}
         </div>
       </div>

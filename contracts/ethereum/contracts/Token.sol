@@ -1,16 +1,29 @@
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
 
 import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 import "./LiquidityProvider.sol";
 
+struct Winner {
+    address from;
+    address to;
+    uint256 amount;
+    bytes32 txHash;
+}
+
 contract Token is IERC20 {
     using SafeERC20 for IERC20;
     using Address for address;
 
-    event Reward(address indexed addr, uint indexed amount);
+    event Reward(
+        bytes32 txHash,
+        address indexed from,
+        uint fromAmount,
+        address indexed to,
+        uint toAmount
+    );
     event MintFluid(address indexed addr, uint indexed amount);
     event BurnFluid(address indexed addr, uint indexed amount);
 
@@ -105,15 +118,14 @@ contract Token is IERC20 {
         return totalAmount - totalFluid;
     }
 
-    function rewardFromPool(address from, address to, uint amount) internal {
+    function rewardFromPool(bytes32 hash, address from, address to, uint amount) internal {
         // mint some fluid tokens from the interest we've accrued
         // 20%
         uint256 toAmount = amount / 5;
         // 80%
         uint256 fromAmount = amount - toAmount;
 
-        emit Reward(from, fromAmount);
-        emit Reward(to, toAmount);
+        emit Reward(hash, from, fromAmount, to, toAmount);
 
         _mintDouble(from, fromAmount, to, toAmount);
     }
@@ -138,7 +150,77 @@ contract Token is IERC20 {
 
         // now pay out the user
         pastRewards_[txHash] = 1;
-        rewardFromPool(from, to, winAmount / 5 * 4);
+        rewardFromPool(txHash, from, to, winAmount / 5 * 4);
+    }
+
+    function batchReward(Winner[] memory rewards) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        uint poolAmount = rewardPoolAmount();
+
+        for (uint i = 0; i < rewards.length; i++) {
+            Winner memory winner = rewards[i];
+
+            if (pastRewards_[winner.txHash] != 0) continue; // user decided to frontrun
+            pastRewards_[winner.txHash] = 1;
+
+            require(poolAmount >= winner.amount, "reward pool empty");
+            poolAmount = poolAmount - winner.amount;
+
+            rewardFromPool(winner.txHash, winner.from, winner.to, winner.amount);
+        }
+    }
+
+    // lets a user frontrun our worker using a signature of the rng we generate
+    function manualReward(
+        bytes32 txHash,
+        address from,
+        address to,
+        uint256 winAmount,
+        bytes memory sig
+    ) external {
+        require(sig.length == 65, "invalid rng format (length)");
+        // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
+        //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
+        bytes32 hash = keccak256(abi.encode(txHash, from, to , winAmount));
+
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        assembly {
+            r := mload(add(sig, 0x20))
+            s := mload(add(sig, 0x40))
+            v := byte(0, mload(add(sig, 0x60)))
+        }
+        if (v < 27) v += 27;
+
+        require(ecrecover(hash, v, r, s) == rngOracle_, "invalid rng signature");
+
+        // now reward the user
+        require(pastRewards_[txHash] == 0, "reward already given for this tx");
+        pastRewards_[txHash] = 1;
+
+        require(rewardPoolAmount() >= winAmount, "reward pool empty");
+
+        rewardFromPool(txHash, from, to, winAmount);
+    }
+
+    function batchReward(Winner[] memory rewards) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        uint poolAmount = rewardPoolAmount();
+
+        for (uint i = 0; i < rewards.length; i++) {
+            Winner memory winner = rewards[i];
+
+            require(pastRewards_[winner.txHash] == 0, "reward already given for this tx");
+            pastRewards_[winner.txHash] = 1;
+
+            require(poolAmount >= winner.amount, "reward pool empty");
+            poolAmount = poolAmount - winner.amount;
+
+            rewardFromPool(winner.from, winner.to, winner.amount);
+        }
     }
 
     // returns the amount that the user won (can be 0), reverts on invalid rng

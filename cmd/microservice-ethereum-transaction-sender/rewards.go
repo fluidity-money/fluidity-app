@@ -17,7 +17,7 @@ import (
 // callRewardArguments provided to callRewardFunction
 type callRewardArguments struct {
 	transactionOptions       *ethAbiBind.TransactOpts
-	containerAnnouncement    worker.EthereumAnnouncement
+	containerAnnouncement    []worker.EthereumWinnerAnnouncement
 	contractAddress          ethCommon.Address
 	client                   *ethclient.Client
 	useHardhatFix            bool
@@ -68,7 +68,7 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 		}
 	}
 
-	transaction, err := fluidity.TransactReward(
+	transaction, err := fluidity.TransactBatchReward(
 		client,
 		contractAddress,
 		transactionOptions,

@@ -72,6 +72,8 @@ const App = () => {
 
   const [messageData, setMessageData] = useState<WebsocketMessage>({});
 
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>([]);
+
   const { lastJsonMessage } = useWebSocket(root_websocket);
 
   // Assigns the correct json file based on ChainId

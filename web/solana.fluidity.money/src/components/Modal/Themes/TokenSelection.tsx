@@ -3,12 +3,13 @@ import GenericModal from "components/Modal";
 import { modalToggle } from "components/context";
 import Button from "components/Button";
 import {TokenKind, TokenList} from "components/types";
+import {FluidTokenList, FluidTokens} from "util/hooks/useFluidTokens";
 
 const TokenSelection = ({
   tokenList,
   type,
 }: {
-  tokenList: TokenList["kind"];
+  tokenList: FluidTokenList;
   type: string;
 }) => {
   const [toggleFrom, togglerFrom] = useContext(modalToggle).toggleFrom;
@@ -16,14 +17,14 @@ const TokenSelection = ({
   const setterToken = useContext(modalToggle).selectedToken[1];
   const setterFluidToken = useContext(modalToggle).selectedFluidToken[1];
 
-  const setToken = (type: string, value: TokenKind["type"], index: number) => {
+  const setToken = (type: string, value: TokenKind["symbol"], index: number) => {
     switch (type) {
       case "token":
-        setterToken(value, index);
+        setterToken(value);
         togglerTo();
         return;
       case "fluid":
-        setterFluidToken(value, index);
+        setterFluidToken(value);
         togglerFrom();
         return;
       default:
@@ -31,19 +32,19 @@ const TokenSelection = ({
     }
   };
 
-  const renderedTokenSet = tokenList.map((token, index) => {
+  const renderedTokenSet = tokenList.map(({token, config}, index) => {
     return (
       <Button
         key={index}
-        label={token.type}
+        label={token.symbol}
         theme="token-button"
         texttheme="wallet-text"
         fontSize="font-large"
         icon={
           // nosemgrep
-          <img src={`${token.src}`} className="wallet-icon" alt={token.type} />
+          <img src={`${config.image}`} className="wallet-icon" alt={token.symbol} />
         }
-        goto={() => setToken(type, token.type, index)}
+        goto={() => setToken(type, token.symbol as TokenKind["symbol"], index)}
       />
     );
   });
