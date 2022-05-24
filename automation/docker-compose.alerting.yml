@@ -13,3 +13,5 @@ services:
       FLU_AMQP_USER: ${FLU_AMQP_USER}
       FLU_AMQP_USER_PASS: ${FLU_AMQP_USER_PASS}
       FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK_QUEUE_OVERLOADED}
+    depends_on:
+      - redis

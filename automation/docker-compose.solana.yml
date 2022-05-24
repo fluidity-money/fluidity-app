@@ -17,4 +17,6 @@ services:
       FLU_SOLANA_TVL_PAYER_PRIKEY: ${FLU_SOLANA_TVL_PAYER_PRIKEY}
       FLU_SOLANA_TVL_DATA_PUBKEY: ${FLU_SOLANA_TVL_DATA_PUBKEY}
       FLU_SOLANA_SOLEND_PROGRAM_ID: ${FLU_SOLANA_SOLEND_PROGRAM_ID}
+    depends_on:
+      - redis
     restart: unless-stopped

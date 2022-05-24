@@ -30,4 +30,5 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
+      - redis
 
