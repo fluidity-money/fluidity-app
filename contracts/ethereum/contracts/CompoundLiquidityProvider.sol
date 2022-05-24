@@ -39,8 +39,9 @@ contract CompoundLiquidityProvider is LiquidityProvider {
         require(msg.sender == owner_, "only the owner can use this");
 
         uint redeemRes = compoundToken_.redeemUnderlying(amount);
-        underlying_.safeTransfer(msg.sender, amount);
         require(redeemRes == 0, "compound redeem failed");
+
+        underlying_.safeTransfer(msg.sender, amount);
     }
 
     function totalPoolAmount() external returns (uint) {

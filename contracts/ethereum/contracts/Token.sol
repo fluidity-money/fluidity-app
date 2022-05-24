@@ -150,7 +150,7 @@ contract Token is IERC20 {
 
         // now pay out the user
         pastRewards_[txHash] = 1;
-        rewardFromPool(txHash, from, to, winAmount / 5 * 4);
+        rewardFromPool(txHash, from, to, winAmount);
     }
 
     function batchReward(Winner[] memory rewards) public {
@@ -184,6 +184,8 @@ contract Token is IERC20 {
         //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
         bytes32 hash = keccak256(abi.encode(txHash, from, to , winAmount));
 
+        // ECDSA verification
+        // TODO: Get a proper audit here
         uint8 v;
         bytes32 r;
         bytes32 s;
