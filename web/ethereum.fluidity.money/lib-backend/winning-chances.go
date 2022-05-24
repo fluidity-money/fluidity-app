@@ -1,19 +1,21 @@
 package api_fluidity_money
 
 import (
-	"fmt"
-	"net/http"
 	"errors"
+	"fmt"
+	"math/big"
+	"net/http"
 
-	"github.com/graphql-go/graphql"
+	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
-	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/graphql-go/graphql"
 )
 
 type Result struct {
-	N          string  `json:"n"`
-	Payouts    []int64   `json:"payouts"`
+	N       string  `json:"n"`
+	Payouts []int64 `json:"payouts"`
 }
 
 var resultType = graphql.NewObject(
@@ -68,7 +70,7 @@ var queryType = graphql.NewObject(
 					var output Result
 					err := errors.New("Bad request, missing payload value")
 
-					gasFee, ok  := validArgFloat64toBigrat(p.Args, "gasFee")
+					gasFee, ok := validArgFloat64toBigrat(p.Args, "gasFee")
 					if !ok {
 						return nil, err
 					}
@@ -78,7 +80,7 @@ var queryType = graphql.NewObject(
 						return nil, err
 					}
 
-					bpyStakedUsd, ok :=   validArgFloat64toBigrat(p.Args, "bpyStakedUsd")
+					bpyStakedUsd, ok := validArgFloat64toBigrat(p.Args, "bpyStakedUsd")
 					if !ok {
 						return nil, err
 					}
@@ -98,7 +100,7 @@ var queryType = graphql.NewObject(
 						return nil, err
 					}
 
-					secondsSinceLastBlock, ok :=   validArgInt(p.Args, "secondsSinceLastBlock")
+					secondsSinceLastBlock, ok := validArgInt(p.Args, "secondsSinceLastBlock")
 					if !ok {
 						return nil, err
 					}
@@ -106,11 +108,24 @@ var queryType = graphql.NewObject(
 					tokenName, ok := validArgString(p.Args, "tokenName")
 					if !ok {
 						return nil, err
-					}	
+					}
 
 					emission := worker.NewEthereumEmission()
 					emission.Network = "ethereum"
 					emission.TokenDetails = token_details.New(tokenName, p.Args["underlyingTokenDecimalsRat"].(int))
+
+					var (
+						winningClasses   = fluidity.WinningClasses
+						deltaWeightNum   = fluidity.DeltaWeightNum
+						deltaWeightDenom = fluidity.DeltaWeightDenom
+						payoutFreqNum    = fluidity.PayoutFreqNum
+						payoutFreqDenom  = fluidity.PayoutFreqDenom
+					)
+
+					var (
+						deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
+						payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
+					)
 
 					randomN, randomPayouts := probability.WinningChances(
 						gasFee,
@@ -118,12 +133,15 @@ var queryType = graphql.NewObject(
 						bpyStakedUsd,
 						sizeOfThePool,
 						underlyingTokenDecimalsRat,
+						payoutFreq,
+						deltaWeight,
+						winningClasses,
 						averageTransfersInBlock,
 						uint64(secondsSinceLastBlock),
 						emission,
 					)
 
-					output.N = fmt.Sprintf("%v", randomN);
+					output.N = fmt.Sprintf("%v", randomN)
 					for _, value := range randomPayouts {
 						output.Payouts = append(output.Payouts, value.Int64())
 					}
@@ -136,7 +154,7 @@ var queryType = graphql.NewObject(
 
 var schema, _ = graphql.NewSchema(
 	graphql.SchemaConfig{
-		Query:    queryType,
+		Query: queryType,
 	},
 )
 
@@ -156,6 +174,6 @@ func HandleWinningChances(w http.ResponseWriter, r *http.Request) interface{} {
 		graphQLErrorLogHandler(w, r, result.Errors)
 		return nil
 	}
-	
+
 	return result
 }
