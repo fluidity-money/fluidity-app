@@ -7,8 +7,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/state"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -23,6 +26,9 @@ const (
 
 	// ExchangeType to use for routing messages inside the queue
 	ExchangeType = `topic`
+
+	// EnvMessageRetries is the number of times a message will be retried
+	EnvMessageRetries = `FLU_QUEUE_MESSAGE_RETRIES`
 )
 
 type Message struct {
@@ -92,6 +98,24 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 	}
 
+	messageRetries := util.GetEnvOrDefault(EnvMessageRetries, "5")
+
+	maxRetryCount, err := strconv.Atoi(messageRetries)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to set %#v: Can't convert '%#v' to an integer!",
+				EnvMessageRetries,
+				messageRetries,
+			)
+
+			k.Payload = err
+		})
+	}
+
 	for message := range messages {
 		var (
 			deliveryTag = message.DeliveryTag
@@ -105,6 +129,23 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 
 		bodyBuf := bytes.NewBuffer(body)
+
+		// Risk of a collision is near 0 enough to be ignored.
+		retryKey := fmt.Sprintf(
+			"worker.%#v.retry.%#v.%#v",
+			workerId,
+			topic,
+			util.GetHash(body),
+		)
+
+		retryCount := state.Incr(retryKey)
+		state.Expire(retryKey, 86400) // 24 hours
+
+		if int(retryCount) >= maxRetryCount {
+			queueNackDeliveryTag(channel, deliveryTag)
+			state.Del(retryKey) // Clean up the retry key
+			continue
+		}
 
 		f(Message{
 			Topic:   topic,
@@ -133,6 +174,8 @@ func GetMessages(topic string, f func(message Message)) {
 			"Server acked the reply for %v!",
 			deliveryTag,
 		)
+
+		state.Del(retryKey) // Clean up the retry key
 	}
 }
 

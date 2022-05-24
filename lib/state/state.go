@@ -491,3 +491,53 @@ func LRange(key string, start, end int64) [][]byte {
 func SetTimedIfSet(name string, value interface{}) (set bool) {
 	return true
 }
+
+// Incr increments the value of a key by 1 atomically.
+func Incr(key string) int64 {
+	redisClient := client()
+
+	intCmd := redisClient.Incr(context.Background(), key)
+
+	result, err := intCmd.Result()
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to incr key %#v!",
+				key,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	return result
+}
+
+// Expire sets the expiration time of a key.
+func Expire(key string, seconds int64) {
+	redisClient := client()
+
+	intCmd := redisClient.Expire(
+		context.Background(),
+		key,
+		time.Duration(seconds)*time.Second,
+	)
+
+	_, err := intCmd.Result()
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to expire key %#v!",
+				key,
+			)
+
+			k.Payload = err
+		})
+	}
+}

@@ -38,3 +38,7 @@ contracts/solana/testing/fuzz/target
 !contracts/solana/testing/*
 
 contracts/tribeca-govern-contracts/target
+
+# Vendor specific
+.vscode
+.DS_Store
