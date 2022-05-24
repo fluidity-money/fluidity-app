@@ -126,6 +126,30 @@ func TransactReward(client *ethclient.Client, fluidityAddress ethCommon.Address,
 		client,
 	)
 
+	callOptions := ethAbiBind.CallOpts {
+		Pending: false,
+		From: transactionOptions.From,
+		BlockNumber: nil,
+		Context: transactionOptions.Context,
+	}
+
+	err := boundContract.Call(
+		&callOptions,
+		nil,
+		"reward",
+		hash,
+		from,
+		to,
+		balls,
+		payouts,
+	)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"reward transaction simulation failed! %w",
+			err,
+		)
+	}
+
 	transaction, err := boundContract.Transact(
 		transactionOptions,
 		"reward",
