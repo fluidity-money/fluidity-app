@@ -1,7 +1,7 @@
 
 # microservice-ethereum-unspool-rewards
 
-Detects reward transactions and removes them from the spooler pool, in case the transaction got frontran.
+Detects reward transactions and removes them from the spooler pool in postgres, in case the transaction got frontran.
 
 ## Environment variables
 

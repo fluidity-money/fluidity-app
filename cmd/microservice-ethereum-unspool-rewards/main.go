@@ -10,7 +10,7 @@ func main() {
 	winners.RewardsEthereum(func(reward winners.RewardData) {
 		transactionHash := reward.TxHash.String()
 
-		log.Debug(func(k *log.Log) {
+		log.App(func(k *log.Log) {
 			k.Format(
 				"Transaction %s was paid out, removing from spooler!",
 				transactionHash,

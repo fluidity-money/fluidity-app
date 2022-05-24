@@ -14,15 +14,21 @@ import (
 )
 
 type (
+	// RequestManualReward is the API request type for the manual
+	// reward route
 	RequestManualReward struct {
 		TxHash string `json:"transation_hash"`
 	}
 
+	// ManualRewardPayload is part of the message sent to users
+	// as a reply to the manual reward route
 	ManualRewardPayload struct {
 		Reward fluidity.RewardArg `json:"reward"`
 		Signature []byte `json:"signature"`
 	}
 
+	// ResponseManualReward is the API response type for the
+	// manual reward route
 	ResponseManualReward struct {
 		Error *string `json:"error"`
 		RewardPayload *ManualRewardPayload `json:"payload"`
@@ -129,7 +135,7 @@ func GetManualRewardHandler(signers map[string]*ecdsa.PrivateKey) func(http.Resp
 			return manualRewardError("transaction not found")
 		}
 
-		if transaction.RewardSent == true {
+		if transaction.RewardSent {
 			return manualRewardError("reward already sent for this transaction")
 		}
 

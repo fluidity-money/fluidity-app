@@ -161,7 +161,7 @@ contract Token is IERC20 {
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
 
-            require(pastRewards_[winner.txHash] == 0, "reward already given for this tx");
+            if (pastRewards_[winner.txHash] != 0) continue; // user decided to frontrun
             pastRewards_[winner.txHash] = 1;
 
             require(poolAmount >= winner.amount, "reward pool empty");
@@ -171,6 +171,7 @@ contract Token is IERC20 {
         }
     }
 
+    // lets a user frontrun our worker using a signature of the rng we generate
     function manualReward(
         bytes32 txHash,
         address from,

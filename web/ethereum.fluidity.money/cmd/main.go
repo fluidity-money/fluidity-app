@@ -11,11 +11,13 @@ import (
 )
 
 const (
-	EnvWorkerPrivateKey = `FLU_ETHEREUM_WORKER_PRIVATE_KEY`
+	// EnvWorkerKeyList to read supported tokend and their associated
+	// private keys for signing random numbers with
+	EnvWorkerKeyList = `FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST`
 )
 
 func main() {
-	keys := mustParseKeyListFromEnv(EnvWorkerPrivateKey)
+	keys := mustParseKeyListFromEnv(EnvWorkerKeyList)
 
 	updateMessagesEthereum := make(chan interface{})
 
