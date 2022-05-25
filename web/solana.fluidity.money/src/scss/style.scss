@@ -25,6 +25,7 @@
 @import "components/routeNotFound";
 @import "components/unsupported";
 @import "components/notificationAlert";
+@import "components/walletKit";
 // @import "components/confetti";
 @import "components/error";
 // mobile
@@ -140,4 +141,3 @@ a {
   font-family: "Raleway";
   src: url("/fonts/Raleway-VariableFont_wght.ttf") format("truetype");
 }
-
