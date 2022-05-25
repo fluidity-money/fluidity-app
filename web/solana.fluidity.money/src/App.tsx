@@ -107,6 +107,7 @@ const App = () => {
 
   return (
     // React router provider
+    // @ts-expect-error
     <Router>
       <WalletKitProvider
         defaultNetwork={network}
@@ -126,8 +127,11 @@ const App = () => {
                 addWinNotification={addWinNotification}
               />}
             />*/}
+            {/* @ts-expect-error */}
                 <Switch>
+            {/* @ts-expect-error */}
                   <Route path="/" exact component={SwapPage} />
+            {/* @ts-expect-error */}
                   <Route
                     path="/dashboard"
                     exact
@@ -157,6 +161,7 @@ const App = () => {
                     component={WalletHistory}
                     myHistory={userActions}
                   />
+            {/* @ts-expect-error */}
                   <Route component={RouteNotFound} />
                 </Switch>
                 {/* Loading modal for transactiongs */}

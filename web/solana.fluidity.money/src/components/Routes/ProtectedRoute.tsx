@@ -20,10 +20,12 @@ const ProtectedRoute =
     ) => {
         const sol = useSolana();
         return (
+            // @ts-expect-error
             <Route
                 exact={exact}
                 path={path}
                 render={(renderProps) =>
+                    // @ts-expect-error
                     sol.connected ? <Component {...renderProps} {...props} /> : <Redirect to="/" />
                 }
             />
