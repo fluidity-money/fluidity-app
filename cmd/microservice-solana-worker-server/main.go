@@ -258,7 +258,7 @@ func main() {
 
 			defer queue.SendMessage(worker.TopicEmissions, emission)
 
-			tribecaDataStoreTrfVars := payout.GetLatestCalculatenArgs(TrfChain, solanaNetwork)
+			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
 
 			var (
 				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
