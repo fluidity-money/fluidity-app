@@ -1,4 +1,4 @@
-import {getATAAddress, TokenAmount, TOKEN_PROGRAM_ID, u64, Uint64Layout} from '@saberhq/token-utils';
+import {getATAAddressSync, TokenAmount, TOKEN_PROGRAM_ID, u64, Uint64Layout} from '@saberhq/token-utils';
 import {useSolana} from '@saberhq/use-solana';
 import {PublicKey} from '@solana/web3.js';
 import {useEffect} from 'react';
@@ -68,7 +68,7 @@ const WinNotification = ({addWinNotification}: {addWinNotification: (message: st
                 const {token} = fluidTokens[fluidToken.symbol]
                 
                 //find where ATA matches user and get their balance
-                const ata = await getATAAddress({mint: new PublicKey(balance.mint), owner: publicKey});
+                const ata = getATAAddressSync({mint: new PublicKey(balance.mint), owner: publicKey});
                 //balances are indexed by position in the accounts array
                 const index = txn.transaction.message.accountKeys.findIndex(acc => acc.equals(ata))
                 const pre = txn.meta?.preTokenBalances?.find(bal => bal.accountIndex === index)

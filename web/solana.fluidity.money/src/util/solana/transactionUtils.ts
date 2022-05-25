@@ -1,8 +1,7 @@
 import { UseSolana } from "@saberhq/use-solana";
 import { PublicKey } from "@solana/web3.js";
-import { getATAAddress, Token } from "@saberhq/token-utils";
+import { getATAAddressSync, Token } from "@saberhq/token-utils";
 import * as splToken from "@solana/spl-token";
-import { BaseToken, tokenList } from "./constants";
 import { AccountMeta } from "@solana/web3.js";
 //https://github.com/solendprotocol/common/blob/master/src/devnet.json
 //provides the accounts required for Solend interaction
@@ -59,7 +58,7 @@ export const getFluidInstructionKeys = async (
   const switchboardFeedInfo = solendAsset.switchboardFeedAddress;
   const clock = "SysvarC1ock11111111111111111111111111111111";
 
-  const pdaCollateral = await getATAAddress({
+  const pdaCollateral = getATAAddressSync({
     mint: new PublicKey(reserveCollateralMintInfo),
     owner: new PublicKey(pdaAccount),
   });
