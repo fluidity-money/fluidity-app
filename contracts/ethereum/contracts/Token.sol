@@ -207,24 +207,6 @@ contract Token is IERC20 {
         rewardFromPool(txHash, from, to, winAmount);
     }
 
-    function batchReward(Winner[] memory rewards) public {
-        require(msg.sender == rngOracle_, "only the oracle account can use this");
-
-        uint poolAmount = rewardPoolAmount();
-
-        for (uint i = 0; i < rewards.length; i++) {
-            Winner memory winner = rewards[i];
-
-            require(pastRewards_[winner.txHash] == 0, "reward already given for this tx");
-            pastRewards_[winner.txHash] = 1;
-
-            require(poolAmount >= winner.amount, "reward pool empty");
-            poolAmount = poolAmount - winner.amount;
-
-            rewardFromPool(winner.from, winner.to, winner.amount);
-        }
-    }
-
     // returns the amount that the user won (can be 0), reverts on invalid rng
     function rewardAmount(
         uint[] calldata balls,
