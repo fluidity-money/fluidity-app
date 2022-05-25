@@ -1,4 +1,4 @@
-import {UseSolana} from "@saberhq/use-solana";
+import {UnknownWalletType, UseSolana, WalletTypeEnum} from "@saberhq/use-solana";
 import {Transaction as SolanaTxn, TransactionInstruction, PublicKey, sendAndConfirmRawTransaction, SendTransactionError, SystemProgram} from '@solana/web3.js';
 import {getATAAddress, getOrCreateATA, Token} from '@saberhq/token-utils';
 import * as splToken from '@solana/spl-token';
@@ -12,7 +12,7 @@ import {getFluidInstructionKeys} from "./transactionUtils";
 
 //internal method
 const wrapOrUnwrapSpl = async (
-  sol: UseSolana,
+  sol: UseSolana<any>,
   token: Token,
   fluidToken: Token,
   fluidityInstruction: FluidityInstruction,
@@ -29,7 +29,7 @@ const wrapOrUnwrapSpl = async (
   
   //create the transaction
   const transaction = new SolanaTxn({
-    feePayer: sol.publicKey
+    feePayer: sol.publicKey,
   })
 
   //add instructions to create missing ATAs
@@ -78,7 +78,7 @@ const wrapOrUnwrapSpl = async (
 
 //wrapper's wrapper functions
 export const wrapSpl = async(
-  sol: UseSolana,
+  sol: UseSolana<any>,
   fluidToken: Token,
   amount: TokenAmount,
   obligationAccount: PublicKey,
@@ -102,7 +102,7 @@ export const wrapSpl = async(
 }
 
 export const unwrapSpl = async(
-  sol: UseSolana,
+  sol: UseSolana<any>,
   fluidToken: Token,
   amount: TokenAmount,
   obligationAccount: PublicKey,
@@ -152,7 +152,7 @@ export const getRecipientATA = async(recipient: PublicKey, mint: PublicKey, prov
 
 //send a token, returning either the successful transaction hash, or null for failure, 
 //e.g. if the ATA doesn't exist or is invalid
-export const sendSol = async (sol: UseSolana, recipient: PublicKey, amount: TokenAmount, addError: (e: string) => void): Promise<string | null> => {
+export const sendSol = async (sol: UseSolana<any>, recipient: PublicKey, amount: TokenAmount, addError: (e: string) => void): Promise<string | null> => {
   if (!sol.wallet || !sol.publicKey || !sol.connected || !sol.providerMut)
     throw({message: "Not connected to wallet!"})
 

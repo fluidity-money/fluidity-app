@@ -13,7 +13,7 @@ import { SupportedTokens } from "components/types";
 
 // return the array of keys required to either wrap or unwrap fluid tokens
 export const getFluidInstructionKeys = async (
-  sol: UseSolana,
+  sol: UseSolana<any>,
   token: Token,
   fluidToken: Token,
   ata: PublicKey, // user token ata
