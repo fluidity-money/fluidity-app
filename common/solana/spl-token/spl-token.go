@@ -1,19 +1,33 @@
-package spl_token;
+package spl_token
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/gagliardetto/solana-go"
+	"github.com/btcsuite/btcutil/base58"
+	"github.com/fluidity-money/fluidity-app/common/solana"
+	solLib "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 
 	"github.com/near/borsh-go"
 )
 
 const (
-	// VariantTransfer used when transferring an amount to a user
-	VariantTransfer = 3
+	// VariantTransfer to transfer an amount to a user
+	VariantTransfer        = 3
+
+	// VariantMintTo to mint tokens to a user
+	VariantMintTo          = 7
+
+	// VariantBurn to burn tokens from a user
+	VariantBurn            = 8
+
+	// VariantTransferChecked to transfer an amount,
+	// verifying the expected token decimals
+	VariantTransferChecked = 12
 )
+
+var UnknownInstructionError = solana.UnknownInstructionError
 
 const (
 	// TokenProgramAddress to use as the SPL token
@@ -25,10 +39,10 @@ const (
 
 var (
 	// TokenProgramAddressPubkey
-	TokenProgramAddressPubkey = solana.MustPublicKeyFromBase58(TokenProgramAddress)
+	TokenProgramAddressPubkey = solLib.MustPublicKeyFromBase58(TokenProgramAddress)
 
 	// TokenAssociatedProgramAddressPubkey
-	TokenAssociatedProgramAddressPubkey = solana.MustPublicKeyFromBase58(
+	TokenAssociatedProgramAddressPubkey = solLib.MustPublicKeyFromBase58(
 		TokenAssociatedProgramAddress,
 	)
 )
@@ -41,14 +55,48 @@ type (
 	}
 )
 
+type (
+	// SplInstruction is a container storing a single variant of the decoded
+	// SPL Token instruction enum
+	SplInstruction struct {
+		Transfer        *SplTransfer
+		MintTo          *SplMintTo
+		Burn            *SplBurn
+		TransferChecked *SplTransferChecked
+	}
+
+	// SplTransfer represents Transfer(u64), transfering an SPL token
+	// between two accounts
+	SplTransfer struct {
+		Amount uint64
+	}
+
+	// SplMintTo represents MintTo(u64), minting a token to an account
+	SplMintTo struct {
+		Amount uint64
+	}
+
+	// SplBurn represents Burn(u64), burning a token from an account
+	SplBurn struct {
+		Amount uint64
+	}
+
+	// SplTransferChecked represents TransferChecked(u64, u8), transfering
+	// a token between two accounts with verification of the token decimals
+	SplTransferChecked struct {
+		Amount   uint64
+		Decimals uint8
+	}
+)
+
 // SendTransfer using the token address given, the sender address, returning
 // the signature or an error
-func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAddress, tokenMintAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, ownerPublicKey solana.PublicKey, ownerPrivateKey solana.PrivateKey) (string, error) {
+func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAddress, tokenMintAddress solLib.PublicKey, amount uint64, recentBlockHash solLib.Hash, ownerPublicKey solLib.PublicKey, ownerPrivateKey solLib.PrivateKey) (string, error) {
 
 	var (
-		senderAccountMeta = solana.NewAccountMeta(senderPdaAddress, true, false)
-		signerAccountMeta = solana.NewAccountMeta(ownerPublicKey, true, true)
-		tokenMintMeta     = solana.NewAccountMeta(tokenMintAddress, true, false)
+		senderAccountMeta = solLib.NewAccountMeta(senderPdaAddress, true, false)
+		signerAccountMeta = solLib.NewAccountMeta(ownerPublicKey, true, true)
+		tokenMintMeta     = solLib.NewAccountMeta(tokenMintAddress, true, false)
 	)
 
 	programAddressInput := [][]byte{
@@ -57,7 +105,7 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 		tokenMintAddress[:],
 	}
 
-	ataRecipientPublicKey, _, err := solana.FindProgramAddress(
+	ataRecipientPublicKey, _, err := solLib.FindProgramAddress(
 		programAddressInput,
 		TokenAssociatedProgramAddressPubkey,
 	)
@@ -69,24 +117,24 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 		)
 	}
 
-	recipientAccountMeta := solana.NewAccountMeta(ataRecipientPublicKey, true, false)
+	recipientAccountMeta := solLib.NewAccountMeta(ataRecipientPublicKey, true, false)
 
 	_, err = solanaClient.GetAccountInfo(context.Background(), ataRecipientPublicKey)
 
-	var instructions []solana.Instruction
+	var instructions []solLib.Instruction
 
 	if err != nil {
-		createAccountSlice := solana.AccountMetaSlice{
+		createAccountSlice := solLib.AccountMetaSlice{
 			signerAccountMeta,
 			recipientAccountMeta,
-			solana.NewAccountMeta(recipientAddress, false, false),
+			solLib.NewAccountMeta(recipientAddress, false, false),
 			tokenMintMeta,
-			solana.NewAccountMeta(solana.SystemProgramID, false, false),
-			solana.NewAccountMeta(TokenProgramAddressPubkey, false, false),
-			solana.NewAccountMeta(solana.SysVarRentPubkey, false, false),
+			solLib.NewAccountMeta(solLib.SystemProgramID, false, false),
+			solLib.NewAccountMeta(TokenProgramAddressPubkey, false, false),
+			solLib.NewAccountMeta(solLib.SysVarRentPubkey, false, false),
 		}
 
-		createAccountInstruction := solana.NewInstruction(
+		createAccountInstruction := solLib.NewInstruction(
 			TokenAssociatedProgramAddressPubkey,
 			createAccountSlice,
 			[]byte{},
@@ -95,7 +143,7 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 		instructions = append(instructions, createAccountInstruction)
 	}
 
-	accountMetaSlice := solana.AccountMetaSlice{
+	accountMetaSlice := solLib.AccountMetaSlice{
 		senderAccountMeta,
 		recipientAccountMeta,
 		signerAccountMeta,
@@ -115,7 +163,7 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 		)
 	}
 
-	transferInstruction := solana.NewInstruction(
+	transferInstruction := solLib.NewInstruction(
 		TokenProgramAddressPubkey,
 		accountMetaSlice,
 		dataSerialised,
@@ -123,7 +171,7 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 
 	instructions = append(instructions, transferInstruction)
 
-	transaction, err := solana.NewTransaction(instructions, recentBlockHash)
+	transaction, err := solLib.NewTransaction(instructions, recentBlockHash)
 
 	if err != nil {
 		return "", fmt.Errorf(
@@ -132,7 +180,7 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 		)
 	}
 
-	_, err = transaction.Sign(func(publicKey_ solana.PublicKey) *solana.PrivateKey {
+	_, err = transaction.Sign(func(publicKey_ solLib.PublicKey) *solLib.PrivateKey {
 
 		if ownerPublicKey.Equals(publicKey_) {
 			return &ownerPrivateKey
@@ -160,4 +208,78 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 	signatureString := fmt.Sprintf("%x", string(signature[:]))
 
 	return signatureString, nil
+}
+
+// DecodeSplInstruction tries to decode base58 encoded solana transaction
+// data into one of the SPL token instructions we care about
+func DecodeSplInstruction(data string) (SplInstruction, error) {
+	var instruction SplInstruction
+
+	byteData := base58.Decode(data)
+
+	var decoded1 struct {
+		Discriminant uint8
+		Val1         uint64
+	}
+	var decoded2 struct {
+		Discriminant uint8
+		Val1         uint64
+		Val2         uint8
+	}
+
+	var discriminant struct {
+		Discriminant uint8
+	}
+
+	if err := borsh.Deserialize(&discriminant, byteData); err != nil {
+		return instruction, fmt.Errorf("Failed to decode instruction discriminant: %w", err)
+	}
+
+	switch discriminant.Discriminant {
+	case VariantTransfer:
+		if err := borsh.Deserialize(&decoded1, byteData); err != nil {
+			return instruction, fmt.Errorf("Failed to decode instruction data: %w", err)
+		}
+
+		transfer := SplTransfer{
+			Amount: decoded1.Val1,
+		}
+		instruction.Transfer = &transfer
+
+	case VariantMintTo:
+		if err := borsh.Deserialize(&decoded1, byteData); err != nil {
+			return instruction, fmt.Errorf("Failed to decode instruction data: %w", err)
+		}
+
+		mintTo := SplMintTo{
+			Amount: decoded1.Val1,
+		}
+		instruction.MintTo = &mintTo
+
+	case VariantBurn:
+		if err := borsh.Deserialize(&decoded1, byteData); err != nil {
+			return instruction, fmt.Errorf("Failed to decode instruction data: %w", err)
+		}
+
+		burn := SplBurn{
+			Amount: decoded1.Val1,
+		}
+		instruction.Burn = &burn
+
+	case VariantTransferChecked:
+		if err := borsh.Deserialize(&decoded2, byteData); err != nil {
+			return instruction, fmt.Errorf("Failed to decode instruction data: %w", err)
+		}
+
+		transferChecked := SplTransferChecked{
+			Amount:   decoded2.Val1,
+			Decimals: decoded2.Val2,
+		}
+		instruction.TransferChecked = &transferChecked
+
+	default:
+		return instruction, UnknownInstructionError
+	}
+
+	return instruction, nil
 }

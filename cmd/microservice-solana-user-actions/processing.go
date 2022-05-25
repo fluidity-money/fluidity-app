@@ -14,7 +14,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 
-	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-user-actions/lib/abi"
+	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	spl_token "github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 )
 
 var (
@@ -51,7 +52,7 @@ func tokenIsMintEvent(senderAddress, recipientAddress, fluidityTokenMintAddress,
 
 func processFluidityTransaction(transactionHash string, instruction solana.TransactionInstruction, accounts, fluidityOwners []string, tokenDetails token_details.TokenDetails) (winner1 *winners.Winner, winner2 *winners.Winner, swapWrap *user_actions.UserAction, swapUnwrap *user_actions.UserAction, err error) {
 
-	fluidityTransaction, err := abi.DecodeFluidityInstruction(instruction.Data)
+	fluidityTransaction, err := fluidity.DecodeFluidityInstruction(instruction.Data)
 
 	if err != nil {
 		return nil, nil, nil, nil, fmt.Errorf(
@@ -77,7 +78,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 					transactionHash,
 				)
 			})
-			return nil, nil, nil, nil, nil	
+			return nil, nil, nil, nil, nil
 		}
 
 		transactionPayoutValue := fluidityTransaction.Payout.Value
@@ -194,9 +195,9 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 // processSplTransaction, returning possibly two transfers depending on
 // what's contained within the spl transaction
 func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string, tokenDetails token_details.TokenDetails) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
-	splTransaction, err := abi.DecodeSplInstruction(instruction.Data)
+	splTransaction, err := spl_token.DecodeSplInstruction(instruction.Data)
 
-	if errors.Is(err, abi.UnknownInstructionError) {
+	if errors.Is(err, fluidity.UnknownInstructionError) {
 		log.Debug(func(k *log.Log) {
 			k.Message = "Ignoring unknown SPL instruction"
 			k.Payload = err
@@ -223,7 +224,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 
 
 		// is not a fluidity transfer
-		if fluidityOwners[fromIndex] == "" { 
+		if fluidityOwners[fromIndex] == "" {
 			return nil, nil, nil
 		}
 
@@ -274,7 +275,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 
 		// is not a fluidity transfer
 		if accounts[tokenIndex] != fluidityTokenMintAddress {
-			return nil, nil, nil 
+			return nil, nil, nil
 		}
 
 		var (
