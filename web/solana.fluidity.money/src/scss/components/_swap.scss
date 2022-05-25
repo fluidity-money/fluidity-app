@@ -53,6 +53,7 @@
     width: stretch;
     max-width: 25rem;
     position: relative;
+    z-index: 1;
 
     // gradient outlines/background svg
     &:before{ 
