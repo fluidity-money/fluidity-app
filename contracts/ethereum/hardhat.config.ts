@@ -1,6 +1,7 @@
 import "@nomiclabs/hardhat-waffle";
 import "@openzeppelin/hardhat-upgrades";
 import { task, subtask } from "hardhat/config";
+import type { HardhatUserConfig } from "hardhat/types";
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
 import { deployTokens, forknetTakeFunds, mustEnv } from './script-utils';
 
@@ -8,13 +9,14 @@ import { AAVE_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
-const oracleAddress = mustEnv(oracleKey);
+let oracleAddress: string;
 
 let shouldDeploy: (keyof typeof TokenList)[] = [];
 
 task("deploy-forknet", "Starts a node on forked mainnet with the contracts initialized")
   .addOptionalParam("tokens", "the tokens to deploy")
   .setAction(async (args, hre) => {
+    oracleAddress = mustEnv(oracleKey);
     shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
 
     for (const t of shouldDeploy)
@@ -57,6 +59,30 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+const networks: HardhatUserConfig['networks'] = {};
+
+if (process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY) {
+  networks['ropsten'] = {
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_URL,
+    gas: 9000000
+  };
+}
+
+if (process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY) {
+  networks['kovan'] = {
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_KOVAN_URL
+  };
+}
+
+if (process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY) {
+  networks['aurora'] = {
+      accounts: [process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY],
+      url: process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_URL,
+    }
+}
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -76,18 +102,6 @@ module.exports = {
         blockNumber: 14098095,
       },
     },
-    ropsten: {
-      accounts: [process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY],
-      url: process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_URL,
-      gas: 9000000
-    },
-    kovan: {
-      accounts: [process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY],
-      url: process.env.FLU_ETHEREUM_DEPLOY_KOVAN_URL
-    },
-    aurora: {
-      accounts: [process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY],
-      url: process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_URL,
-    }
+    ...networks,
   }
 };
