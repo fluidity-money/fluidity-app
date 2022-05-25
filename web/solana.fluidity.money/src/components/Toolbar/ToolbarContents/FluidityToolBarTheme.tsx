@@ -12,6 +12,7 @@ import {
   enableNotifications,
 } from "components/NotificationAlert/notificationAlert";
 import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
+import NetworkButton from "components/Button/NetworkButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -113,7 +114,8 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
             </div>
             <div></div>
-            <div className="flex row flex-space-between width-auto align">
+            <div className="button-container">
+              {/* <div className="flex row flex-space-between width-auto align"> */}
               {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
@@ -149,18 +151,9 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                   padding="p-0_5"
                 />
               )}
-              <div
-                className="select-blockchain"
-                onClick={() => setBlockchainToggle(true)}
-              >
-                <img src="/img/TokenIcons/solanaIcon.svg" alt="sol icon" />
-              </div>
+              <NetworkButton />
             </div>
-            <SelectBlockchainModal
-              enable={blockchainToggle}
-              toggle={blockchainModalToggle}
-              height="auto"
-            />
+
             {active ? (
               <WalletConnectedModal
                 enable={toggle}
