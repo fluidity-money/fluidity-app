@@ -2,9 +2,9 @@ import { useState } from "react";
 import Button from "components/Button";
 import Icon from 'components/Icon';
 import { useHistory } from "react-router-dom";
-import ConnectWalletModal from "components/Modal/Themes/ConnectWalletModal";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
 import {useSolana} from "@saberhq/use-solana";
+import {useWalletKit} from "@gokiprotocol/walletkit";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -26,6 +26,7 @@ const ToolBarMobileVersion = ({
     const sol = useSolana();
     const active = sol.connected;
     const {wallet} = sol;
+    const {connect: connectWallet} = useWalletKit();
 
     const address = `${wallet?.publicKey}`.substr(0, 6) + "..." + `${wallet?.publicKey}`.substr(`${wallet?.publicKey}`.length - 4, `${wallet?.publicKey}`.length - 1);
 
@@ -63,7 +64,7 @@ const ToolBarMobileVersion = ({
                     <Button
                         label={"Connect Wallet"}
                         theme={"primary-text header-text"}
-                        goto={() => { }}
+                        goto={connectWallet}
                         padding="p-0_5"
                     />
                 </div> : <></>}
@@ -101,11 +102,12 @@ const ToolBarMobileVersion = ({
                 </div>
             </div>
 
-
             {/* Modals */}
-            {active
-                ? <WalletConnectedModal enable={toggle} toggle={modalToggle} wallet={sol} address={address} />
-                : <ConnectWalletModal enable={toggle} toggle={modalToggle} height="auto" />
+            {active && <WalletConnectedModal
+                enable={toggle} 
+                toggle={modalToggle} 
+                wallet={sol}
+                address={address} />
             }
         </div>
     );

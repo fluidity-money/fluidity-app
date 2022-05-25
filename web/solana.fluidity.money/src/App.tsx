@@ -11,7 +11,7 @@ import {
 } from "components/context";
 import { useState } from "react";
 import LoadingStatusModal from "components/Modal/Themes/LoadingStatusModal";
-import { SolanaProvider } from "@saberhq/use-solana";
+import { WalletKitProvider } from "@gokiprotocol/walletkit";
 import ProtectedRoute from "components/Routes/ProtectedRoute";
 import RouteNotFound from "components/Pages/RouteNotFound";
 import WinNotification from "components/WinNotification";
@@ -108,7 +108,10 @@ const App = () => {
   return (
     // React router provider
     <Router>
-      <SolanaProvider defaultNetwork={network}>
+      <WalletKitProvider
+        defaultNetwork={network}
+        app={{name: "Fluidity"}}
+      >
         {/* Loading Status context toggle provider */}
         <LoadingStatusToggle.Provider value={loadingToggleProps}>
           {/* Context for user actions recieved over WS, to support dynamic updates */}
@@ -181,7 +184,7 @@ const App = () => {
             </ErrorBoundary>
           </userActionContext.Provider>
         </LoadingStatusToggle.Provider>
-      </SolanaProvider>
+      </WalletKitProvider>
     </Router>
   );
 };

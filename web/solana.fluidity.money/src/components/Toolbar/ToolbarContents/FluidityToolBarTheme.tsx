@@ -3,15 +3,15 @@ import Button from "components/Button";
 import Icon from "components/Icon";
 import { useHistory } from "react-router-dom";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
-import { ConnectWalletModal } from "components/Modal";
 import ToolBarMobileVersion from "./ToolBarMobileVersion";
 import Media from "react-media";
-import { useSolana } from "@saberhq/use-solana";
+import { useConnectedWallet, useSolana } from "@saberhq/use-solana";
 import {
   EnabledButton,
   enableNotifications,
 } from "components/NotificationAlert/notificationAlert";
 import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
+import {ConnectWalletButton, useWalletKit} from "@gokiprotocol/walletkit";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -26,6 +26,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   const sol = useSolana();
   const active = sol.connected;
   const { wallet } = sol;
+  const {connect: connectWallet} = useWalletKit();
 
   const modalToggle = () => {
     setToggle(!toggle);
@@ -143,9 +144,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <Button
                   label={"Connect Wallet"}
                   theme={"primary-button"}
-                  goto={() => {
-                    setToggle(true);
-                  }}
+                  goto={connectWallet}
                   padding="p-0_5"
                 />
               )}
@@ -161,20 +160,15 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               toggle={blockchainModalToggle}
               height="auto"
             />
-            {active ? (
+            {active && (
               <WalletConnectedModal
                 enable={toggle}
                 toggle={modalToggle}
                 wallet={sol}
                 address={address}
               />
-            ) : (
-              <ConnectWalletModal
-                enable={toggle}
-                toggle={modalToggle}
-                height="auto"
-              />
-            )}
+            )
+            }
           </div>
         ) : (
           <ToolBarMobileVersion selected={selected} />
