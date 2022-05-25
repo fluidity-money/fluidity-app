@@ -21,6 +21,7 @@ web/*/build-*
 web/*/*.o
 
 contracts/ethereum/node_modules
+contracts/ethereum/.openzeppelin/unknown-31337.json
 contracts/ethereum/docker*
 
 contracts/solana/fuzz/target
