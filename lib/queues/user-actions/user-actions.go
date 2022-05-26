@@ -6,7 +6,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
 const (
@@ -23,13 +23,17 @@ const (
 	TopicBufferedUserActionsSolana   = `user_actions.buffered.` + networkSolana
 	topicBufferedUserActionsAll      = `user_actions.buffered.*`
 
+	topicPayableBufferedUserActionsAll    = `user_actions.payable.buffered.*`
+	TopicPayableBufferedUserActionsSolana = `user_actions.payable.buffered.` + networkSolana
+
 	UserActionSend = user_actions.UserActionSend
 	UserActionSwap = user_actions.UserActionSwap
 )
 
 type (
-	UserAction         = user_actions.UserAction
-	BufferedUserAction = user_actions.BufferedUserAction
+	UserAction                = user_actions.UserAction
+	BufferedUserAction        = user_actions.BufferedUserAction
+	PayableBufferedUserAction = user_actions.PayableBufferedUserAction
 )
 
 func NewSwap(network network.BlockchainNetwork, userAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
@@ -99,4 +103,22 @@ func BufferedUserActionsSolana(f func(BufferedUserAction)) {
 
 func BufferedUserActionsAll(f func(BufferedUserAction)) {
 	bufferedUserActions(topicBufferedUserActionsAll, f)
+}
+
+func payableBufferedUserActions(topic string, f func(PayableBufferedUserAction)) {
+	queue.GetMessages(topic, func(message queue.Message) {
+		var payableBufferedUserAction PayableBufferedUserAction
+
+		message.Decode(&payableBufferedUserAction)
+
+		f(payableBufferedUserAction)
+	})
+}
+
+func PayableBufferedUserActionsSolana(f func(PayableBufferedUserAction)) {
+	payableBufferedUserActions(TopicPayableBufferedUserActionsSolana, f)
+}
+
+func PayableBufferedUserActionsAll(f func(PayableBufferedUserAction)) {
+	payableBufferedUserActions(topicPayableBufferedUserActionsAll, f)
 }
