@@ -23,9 +23,6 @@ const (
 	TopicBufferedUserActionsSolana   = `user_actions.buffered.` + networkSolana
 	topicBufferedUserActionsAll      = `user_actions.buffered.*`
 
-	topicPayableBufferedUserActionsAll    = `user_actions.payable.buffered.*`
-	TopicPayableBufferedUserActionsSolana = `user_actions.payable.buffered.` + networkSolana
-
 	UserActionSend = user_actions.UserActionSend
 	UserActionSwap = user_actions.UserActionSwap
 )
@@ -113,12 +110,4 @@ func payableBufferedUserActions(topic string, f func(PayableBufferedUserAction))
 
 		f(payableBufferedUserAction)
 	})
-}
-
-func PayableBufferedUserActionsSolana(f func(PayableBufferedUserAction)) {
-	payableBufferedUserActions(TopicPayableBufferedUserActionsSolana, f)
-}
-
-func PayableBufferedUserActionsAll(f func(PayableBufferedUserAction)) {
-	payableBufferedUserActions(topicPayableBufferedUserActionsAll, f)
 }

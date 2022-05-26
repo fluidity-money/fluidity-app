@@ -22,6 +22,7 @@ services:
       FLU_SOLANA_PAYER_PRIKEY: ${FLU_SOLANA_WORKER_PRIVATE_KEY}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.usdc
     depends_on:
       - redis
     restart: unless-stopped
@@ -46,6 +47,7 @@ services:
       FLU_SOLANA_PAYER_PRIKEY: ${FLU_SOLANA_WORKER_PRIVATE_KEY}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.usdt
     depends_on:
       - redis
     restart: unless-stopped
@@ -70,6 +72,7 @@ services:
       FLU_SOLANA_PAYER_PRIKEY: ${FLU_SOLANA_WORKER_PRIVATE_KEY}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.uxd
     depends_on:
       - redis
     restart: unless-stopped
@@ -94,6 +97,7 @@ services:
       FLU_SOLANA_PAYER_PRIKEY: ${FLU_SOLANA_WORKER_PRIVATE_KEY}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_DEBUG_FAKE_PAYOUTS}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.ust
     depends_on:
       - redis
     restart: unless-stopped
@@ -114,6 +118,7 @@ services:
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDC}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDC}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.usdc
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdc.winners
     depends_on:
       - redis
@@ -134,6 +139,7 @@ services:
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDT}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDT}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.usdt
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdt.winners
     depends_on:
       - redis
@@ -154,6 +160,7 @@ services:
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_UXD}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_UXD}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.uxd
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.uxd.winners
     depends_on:
       - redis
@@ -174,6 +181,7 @@ services:
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_UST}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_UST}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.ust
       FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.ust.winners
     depends_on:
       - redis

@@ -46,13 +46,18 @@ const (
 	// EnvPayerPrikey is a private key of an account that holds solana funds
 	// this must be the payout authority of the contract
 	EnvPayerPrikey = `FLU_SOLANA_PAYER_PRIKEY`
+
+	// EnvTopicWrappedActionsQueue to use when receiving TVL, mint
+	// supply, and user actions from retriever
+	EnvTopicWrappedActionsQueue = `FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME`
 )
 
 func main() {
 
 	var (
-		rpcUrl      = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		payerPrikey = util.GetEnvOrFatal(EnvPayerPrikey)
+		rpcUrl                   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		payerPrikey              = util.GetEnvOrFatal(EnvPayerPrikey)
+		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
 
 		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
 		fluidMintPubkey   = pubkeyFromEnv(EnvFluidityMintPubkey)
@@ -128,7 +133,7 @@ func main() {
 			})
 		}
 
-		queue.SendMessage(user_actions.TopicPayableBufferedUserActionsSolana, payableBufferedUserAction)
+		queue.SendMessage(topicWrappedActionsQueue, payableBufferedUserAction)
 
 	})
 }

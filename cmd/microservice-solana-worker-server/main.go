@@ -38,6 +38,10 @@ const (
 	// EnvTokenName is the same of the token being wrapped
 	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
 
+	// EnvTopicWrappedActionsQueue to use when receiving TVL, mint
+	// supply, and user actions from retriever
+	EnvTopicWrappedActionsQueue = `FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME`
+
 	// EnvTopicWinnerQueue to use when transmitting to a client the topic of
 	// a winner
 	EnvTopicWinnerQueue = `FLU_SOLANA_WINNER_QUEUE_NAME`
@@ -60,11 +64,12 @@ const (
 func main() {
 
 	var (
-		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		solanaNetwork    = util.GetEnvOrFatal(EnvSolanaNetwork)
-		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
-		decimalPlaces_   = util.GetEnvOrFatal(EnvTokenDecimals)
-		tokenName        = util.GetEnvOrFatal(EnvTokenName)
+		rpcUrl                   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
+		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
+		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
+		decimalPlaces_           = util.GetEnvOrFatal(EnvTokenDecimals)
+		tokenName                = util.GetEnvOrFatal(EnvTokenName)
 
 		fluidMintPubkey = pubkeyFromEnv(EnvFluidityMintPubkey)
 		reservePubkey   = pubkeyFromEnv(EnvReservePubkey)
@@ -86,7 +91,7 @@ func main() {
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
-	user_actions.PayableBufferedUserActionsSolana(func(payableBufferedUserActions user_actions.PayableBufferedUserAction) {
+	queue.GetMessages(topicWrappedActionsQueue, func(payableBufferedUserActions user_actions.PayableBufferedUserAction) {
 
 		var (
 			bufferedUserActions = payableBufferedUserActions.BufferedUserAction
