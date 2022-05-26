@@ -91,7 +91,11 @@ func main() {
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
-	queue.GetMessages(topicWrappedActionsQueue, func(payableBufferedUserActions user_actions.PayableBufferedUserAction) {
+	queue.GetMessages(topicWrappedActionsQueue, func(message queue.Message) {
+
+		var payableBufferedUserActions user_actions.PayableBufferedUserAction
+
+		message.Decode(&payableBufferedUserActions)
 
 		var (
 			bufferedUserActions = payableBufferedUserActions.BufferedUserAction
