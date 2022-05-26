@@ -23,7 +23,7 @@ const getWalletSPLStatus = async (
 
     // Render external token types
     await Promise.all(nonFluidTokensList.map(async(value) => {
-        const {token} = tokens[value.token.symbol as SupportedTokens];
+        const {token} = tokens[value.token.symbol as SupportedTokens] || {};
         if (!token)
             return Promise.resolve();
         // Gets amount
@@ -42,7 +42,7 @@ const getWalletSPLStatus = async (
 
     // Render internal token types
     await Promise.all(fluidTokensList.map(async(value) => {
-        const {token} = tokens[value.token.symbol as SupportedTokens];
+        const {token} = tokens[value.token.symbol as SupportedTokens] || {};
         //if token isn't implemented, ignore it - don't fail
         if (!token)
             return Promise.resolve();

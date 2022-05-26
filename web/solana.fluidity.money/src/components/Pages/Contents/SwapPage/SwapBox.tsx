@@ -55,8 +55,11 @@ const SwapBox = () => {
   //would be more performant to memoise balances, but this would make it overly complex to update them
   //so instead just fetch every time
   useEffect(() => {
-    const fluidToken = tokens?.[selectedFluidToken].token;
-    const token = tokens?.[selectedToken].token;
+    const fluidToken = tokens?.[selectedFluidToken]?.token;
+    const token = tokens?.[selectedToken]?.token;
+    if (!fluidToken || !token)
+      return;
+
     // Balance of Fluid
     fluidToken && sol.publicKey && getBalanceOfSPL(
       fluidToken,
@@ -77,7 +80,7 @@ const SwapBox = () => {
     if (!tokens)
       return;
 
-    const currentToken = tokens[swap ? selectedToken : selectedFluidToken].token;
+    const currentToken = tokens[swap ? selectedToken : selectedFluidToken]?.token;
     const currentBalance = swap ? balance : fbalance;
 
     // swapping but no token selected
@@ -149,7 +152,7 @@ const SwapBox = () => {
   // Function to trigger transaction on confirm
   const initialiseTransaction = async () => {
     const {token, config} = tokens?.[selectedToken] || {};
-    const fluidToken = tokens?.[selectedFluidToken].token;
+    const {token: fluidToken} = tokens?.[selectedFluidToken] || {};
     if (!token || !fluidToken || !amountRaw || !config?.obligationPubkey || !config.dataAccountPubkey) return;
 
     const checkBalance = new BN(swap ? balance : fbalance);
@@ -236,7 +239,7 @@ const SwapBox = () => {
                   type="text"
                   theme="input-swap-box"
                   toggle={true}
-                  output={out => tokenValueInputHandler(out, setAmount, setAmountRaw, tokens?.[selectedToken].token ?? null)}
+                  output={out => tokenValueInputHandler(out, setAmount, setAmountRaw, tokens?.[selectedToken]?.token ?? null)}
                   pholder="0.0"
                   value={amount}
                   disabled={selectedToken === "Select Token" && selectedFluidToken === "Select FLUID"}

@@ -44,7 +44,10 @@ const SendFluid = () => {
   //would be more performant to memoise balances, but this would make it overly complex to update them
   //so instead just fetch every time
   useEffect(() => {
-      const fluidToken = tokens?.[selectedFluidToken].token;
+      const {token: fluidToken}= tokens?.[selectedFluidToken] || {};
+      if (!fluidToken)
+        return;
+
       // Balance of Fluid
       fluidToken && sol.publicKey && getBalanceOfSPL(
         fluidToken,
