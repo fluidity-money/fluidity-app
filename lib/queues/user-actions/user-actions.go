@@ -101,13 +101,3 @@ func BufferedUserActionsSolana(f func(BufferedUserAction)) {
 func BufferedUserActionsAll(f func(BufferedUserAction)) {
 	bufferedUserActions(topicBufferedUserActionsAll, f)
 }
-
-func payableBufferedUserActions(topic string, f func(PayableBufferedUserAction)) {
-	queue.GetMessages(topic, func(message queue.Message) {
-		var payableBufferedUserAction PayableBufferedUserAction
-
-		message.Decode(&payableBufferedUserAction)
-
-		f(payableBufferedUserAction)
-	})
-}
