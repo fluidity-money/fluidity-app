@@ -58,12 +58,12 @@ if (!TRF_SECRET_KEY) {
   throw new Error("FLU_TRF_DATA_STORE_SECRET_KEY not provided");
 }
 
-// FLU_SOLANA_PAYER is the base58 encoded key responsible for paying and signing
+// FLU_SOLANA_PAYER_PRIKEY is the base58 encoded key responsible for paying and signing
 //  fluidity solana transactions
-const FLU_SOLANA_PAYER = process.env.FLU_SOLANA_PAYER as string;
+const FLU_SOLANA_PAYER_PRIKEY = process.env.FLU_SOLANA_PAYER_PRIKEY as string;
 
-if (!FLU_SOLANA_PAYER) {
-  throw new Error("FLU_SOLANA_PAYER not provided");
+if (!FLU_SOLANA_PAYER_PRIKEY) {
+  throw new Error("FLU_SOLANA_PAYER_PRIKEY not provided");
 }
 
 // TRIBECA_GOVERNOR_PUBKEY is the base58 public key of active governor
@@ -126,7 +126,7 @@ const trfDataStorePayer = web3.Keypair.fromSecretKey(
 );
 
 const fluSolanaPayer = web3.Keypair.fromSecretKey(
-  base58_to_binary(FLU_SOLANA_PAYER),
+  base58_to_binary(FLU_SOLANA_PAYER_PRIKEY),
 );
 
 const governorPubkey = new PublicKey(FLU_TRIBECA_GOVERNOR_PUBKEY);
