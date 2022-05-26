@@ -19,16 +19,16 @@ import {notificationContext} from "components/Notifications/notificationContext"
 
 const SendFluid = () => {
   const sol = useSolana();
-  const tokens = useFluidToken();
+  const {tokens} = useFluidToken();
   const {addError} = useContext(notificationContext);
   const [toRaw, setToRaw] = useState(""); // records amount
   const [to, setTo] = useState(""); //displays amount (user-friendly)
   const [toggleTo, setToggleTo] = useState<boolean>(false);
   const [toggleFrom, setToggleFrom] = useState<boolean>(false);
   const [selectedToken, setSelectedToken] =
-    useState<TokenKind["type"]>("Select Token");
+    useState<TokenKind["symbol"]>("Select Token");
   const [selectedFluidToken, setSelectedFluidToken] =
-    useState<TokenKind["type"]>("Select FLUID");
+    useState<TokenKind["symbol"]>("Select FLUID");
   const [balance, setBalance] = useState("0");
   const [address, setAddress] = useState("");
   const [successTransactionModal, setSuccessTransactionModal] = useState<boolean>(false); // toggle state for the transaction confirmation
@@ -44,7 +44,10 @@ const SendFluid = () => {
   //would be more performant to memoise balances, but this would make it overly complex to update them
   //so instead just fetch every time
   useEffect(() => {
-      const fluidToken = tokens?.[selectedFluidToken];
+      const {token: fluidToken}= tokens?.[selectedFluidToken] || {};
+      if (!fluidToken)
+        return;
+
       // Balance of Fluid
       fluidToken && sol.publicKey && getBalanceOfSPL(
         fluidToken,
@@ -67,7 +70,7 @@ const SendFluid = () => {
     if (!tokens || !toRaw) return;
 
     if (new BN(balance).lt(new BN(toRaw))) {
-      addError(`Trying to send ${new TokenAmount(tokens[selectedFluidToken], toRaw).toExact()}, but balance is ${rawToDisplayString(tokens[selectedFluidToken], balance)}`);
+      addError(`Trying to send ${new TokenAmount(tokens[selectedFluidToken].token, toRaw).toExact()}, but balance is ${rawToDisplayString(tokens[selectedFluidToken].token, balance)}`);
       return;
     }
     //TODO f<> <>Fluid naming scheme needs to be fixed
@@ -75,7 +78,7 @@ const SendFluid = () => {
     try {
       // Start loading process
       loadingToggleTrigger(true);
-      const result = await sendSol(sol, new PublicKey(address), new TokenAmount(tokens[selectedFluidToken], toRaw), addError);
+      const result = await sendSol(sol, new PublicKey(address), new TokenAmount(tokens[selectedFluidToken].token, toRaw), addError);
       console.log(result);
       toggleSuccessTransactionModal()
     } catch (e: any) {
@@ -98,12 +101,12 @@ const SendFluid = () => {
     return;
   };
 
-  const setterToken = (input: TokenKind["type"]) => {
+  const setterToken = (input: TokenKind["symbol"]) => {
     setSelectedToken(input);
     return;
   };
 
-  const setterFluidToken = (input: TokenKind["type"]) => {
+  const setterFluidToken = (input: TokenKind["symbol"]) => {
     setSelectedFluidToken(input);
     return;
   };
@@ -119,8 +122,8 @@ const SendFluid = () => {
     if (!tokens)
       return;
 
-    const balanceString = new TokenAmount(tokens[selectedFluidToken], balance).toFixed();
-    tokenValueInputHandler(balanceString, setTo, setToRaw, tokens[selectedFluidToken])
+    const balanceString = new TokenAmount(tokens[selectedFluidToken].token, balance).toFixed();
+    tokenValueInputHandler(balanceString, setTo, setToRaw, tokens[selectedFluidToken].token)
   }
 
   return (
@@ -153,7 +156,7 @@ const SendFluid = () => {
                 theme="input-swap-box"
                 toggle={true}
                 value={tokens?.[selectedFluidToken] && to ? to : ""}
-                output={(out) => tokenValueInputHandler(out, setTo, setToRaw, tokens?.[selectedFluidToken] || null)}
+                output={(out) => tokenValueInputHandler(out, setTo, setToRaw, tokens?.[selectedFluidToken].token|| null)}
                 pholder="0.0"
                 disabled={selectedFluidToken === "Select FLUID"}
               />
@@ -171,7 +174,7 @@ const SendFluid = () => {
               selectedFluidToken !== "Select FLUID" ?
               // show balance if a token is selected and wallet is connected
                 <div className="flex row gap balance-container">
-                  {`Balance: ${tokens && new TokenAmount(tokens[selectedFluidToken], balance.toString()).toExact()} ${selectedFluidToken}`}
+                  {`Balance: ${tokens && new TokenAmount(tokens[selectedFluidToken].token, balance.toString()).toExact()} ${selectedFluidToken}`}
                   <Button theme={"max-button"} goto={setMaxBalance} label="max" />
                 </div> :
               null :

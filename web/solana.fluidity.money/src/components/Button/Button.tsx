@@ -1,6 +1,10 @@
 import React from "react";
 
-interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
+interface ButtonProps
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > {
   label: string;
   theme?: string;
   texttheme?: string;
@@ -15,6 +19,7 @@ interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLB
   fontSize?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
+  visible?: boolean;
 }
 
 const Button = ({
@@ -32,6 +37,7 @@ const Button = ({
   fontSize,
   icon,
   disabled,
+  visible,
   ...props
 }: ButtonProps) => {
   if (auth || priviledge === 0 || priviledge === undefined) {
@@ -54,6 +60,13 @@ const Button = ({
       >
         {icon}
         <div className={`${texttheme ?? ""}`}>{label}</div>
+        {visible === true ? (
+          <img src={"img/chevronDown.svg"} className="chevron" alt="" />
+        ) : visible === false ? (
+          <img src={"img/chevronUp.svg"} className="chevron" alt="" />
+        ) : (
+          <></>
+        )}
       </button>
     );
   }

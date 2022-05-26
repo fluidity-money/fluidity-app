@@ -1,12 +1,8 @@
-import { SupportedFluidContracts, SupportedContracts } from "util/contractList";
-import { extOptions, intOptions } from "components/Token/TokenTypes";
-import { TokenKind } from "components/types";
+import { SupportedTokens } from "components/types";
 import BN from "bn.js";
 import {getBalanceOfSPL} from "./contractUtils";
 import {UseSolana} from "@saberhq/use-solana";
-import {Token} from '@saberhq/token-utils';
-import {TokenAmount} from "@ubeswap/token-math";
-import {FluidTokens} from "./hooks/useFluidTokens";
+import {FluidTokenList, FluidTokens} from "./hooks/useFluidTokens";
 
 export interface walletDataType {
     type: string
@@ -16,7 +12,9 @@ export interface walletDataType {
 
 const getWalletSPLStatus = async (
     sol: UseSolana,
-    tokens: FluidTokens | null
+    tokens: FluidTokens | null,
+    fluidTokensList: FluidTokenList,
+    nonFluidTokensList: FluidTokenList,
 ) => {
     if (!sol.connected || !sol.publicKey || !tokens) {return []};
     const {connection, publicKey} = sol;
@@ -24,8 +22,8 @@ const getWalletSPLStatus = async (
     const renderedStatus: walletDataType[] = [];
 
     // Render external token types
-    await Promise.all(extOptions.map(async (value: TokenKind) => {
-        const token = tokens[value.type];
+    await Promise.all(nonFluidTokensList.map(async(value) => {
+        const {token} = tokens[value.token.symbol as SupportedTokens] || {};
         if (!token)
             return Promise.resolve();
         // Gets amount
@@ -33,9 +31,9 @@ const getWalletSPLStatus = async (
         const amount = await getBalanceOfSPL(token, connection, publicKey);
         if(new BN(amount.amount).gt(new BN(0))) {
             const renderedType: walletDataType = ({
-                type: value.type,
+                type: value.token.symbol,
                 amount: amount.uiAmountString || "0",
-                colour: value.colour
+                colour: value.config.colour
             })
             renderedStatus.push(renderedType)
         }
@@ -43,8 +41,8 @@ const getWalletSPLStatus = async (
     }));
 
     // Render internal token types
-    await Promise.all(intOptions.map(async (value: TokenKind) => {
-        const token = tokens[value.type];
+    await Promise.all(fluidTokensList.map(async(value) => {
+        const {token} = tokens[value.token.symbol as SupportedTokens] || {};
         //if token isn't implemented, ignore it - don't fail
         if (!token)
             return Promise.resolve();
@@ -52,9 +50,9 @@ const getWalletSPLStatus = async (
         const amount = await getBalanceOfSPL(token, connection, publicKey);
         if(new BN(amount.amount).gt(new BN(0))) {
             const renderedType: walletDataType = ({
-                type: value.type,
+                type: value.token.symbol,
                 amount: amount.uiAmountString || "0",
-                colour: value.colour
+                colour: value.config.colour
             })
             renderedStatus.push(renderedType)
         }

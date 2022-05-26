@@ -7,12 +7,12 @@ export interface SwapModalStatus {
   toggleTo: [boolean, () => void]; // State modal toggle for 'To' swap value
   toggleFrom: [boolean, () => void]; // State modal toggle for 'From' swap value
   selectedToken: [
-    TokenKind["type"],
-    (input: TokenKind["type"], index: number) => void
+    TokenKind["symbol"],
+    (input: TokenKind["symbol"]) => void
   ]; // Selected standard token
   selectedFluidToken: [
-    TokenKind["type"],
-    (input: TokenKind["type"], index: number) => void
+    TokenKind["symbol"],
+    (input: TokenKind["symbol"]) => void
   ]; // Selected fluid token
 }
 

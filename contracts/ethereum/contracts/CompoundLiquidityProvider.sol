@@ -14,6 +14,12 @@ contract CompoundLiquidityProvider is LiquidityProvider {
 
     CErc20Interface public compoundToken_;
 
+    /**
+     * @notice initializer function
+     *
+     * @param compoundToken address of the compound cToken
+     * @param owner address of the account that owns this pool
+     */
     function initialize(
         address compoundToken,
         address owner
@@ -28,6 +34,7 @@ contract CompoundLiquidityProvider is LiquidityProvider {
         underlying_.safeApprove(address(compoundToken_), type(uint).max);
     }
 
+    /// @inheritdoc LiquidityProvider
     function addToPool(uint amount) external {
         require(msg.sender == owner_, "only the owner can use this");
 
@@ -35,14 +42,17 @@ contract CompoundLiquidityProvider is LiquidityProvider {
         require(mintRes == 0, "compound mint failed");
     }
 
+    /// @inheritdoc LiquidityProvider
     function takeFromPool(uint amount) external {
         require(msg.sender == owner_, "only the owner can use this");
 
         uint redeemRes = compoundToken_.redeemUnderlying(amount);
-        underlying_.safeTransfer(msg.sender, amount);
         require(redeemRes == 0, "compound redeem failed");
+
+        underlying_.safeTransfer(msg.sender, amount);
     }
 
+    /// @inheritdoc LiquidityProvider
     function totalPoolAmount() external returns (uint) {
         return compoundToken_.balanceOfUnderlying(address(this));
     }

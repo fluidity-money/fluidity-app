@@ -17,16 +17,18 @@ services:
     depends_on:
       - redis
 
-  connector-solana-tribeca-timescale:
+  connector-solana-trf-data-postgres:
     build:
-      context: ../cmd/connector-solana-tribeca-timescale
+      context: ../cmd/connector-solana-trf-data-postgres
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-tribeca-executor
-      FLU_TRIBECA_PROGRAM_ID: ${FLU_TRIBECA_PROGRAM_ID}
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-trf-data-postgres
+      FLU_SOLANA_NETWORK: ${FLU_SOLANA_NETWORK}
+      FLU_TRF_DATA_STORE_PROGRAM_ID: ${FLU_TRF_DATA_STORE_PROGRAM_ID}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
     restart: unless-stopped
     depends_on:
-      - timescale
+      - postgres
+      - redis
 

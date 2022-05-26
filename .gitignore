@@ -21,7 +21,9 @@ web/*/build-*
 web/*/*.o
 
 contracts/ethereum/node_modules
+contracts/ethereum/.openzeppelin/unknown-31337.json
 contracts/ethereum/docker*
+contracts/ethereum/docgen
 
 contracts/solana/fuzz/target
 contracts/solana/docker
@@ -37,4 +39,8 @@ contracts/solana/cargo_audit
 contracts/solana/testing/fuzz/target
 !contracts/solana/testing/*
 
-contracts/tribeca-data-store/target
+contracts/tribeca-govern-contracts/target
+
+# Vendor specific
+.vscode
+.DS_Store

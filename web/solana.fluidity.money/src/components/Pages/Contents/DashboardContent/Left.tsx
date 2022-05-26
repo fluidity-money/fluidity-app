@@ -16,9 +16,11 @@ const Left = ({ prizePool }: left) => {
         Reward Pool
       </Header>
       <h1 className="reward">
-        $
         {prizePool.amount &&
-          parseFloat(prizePool.amount).toLocaleString("en", {
+          parseFloat(prizePool.amount).toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}
       </h1>

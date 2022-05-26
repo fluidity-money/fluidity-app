@@ -1,0 +1,22 @@
+[package]
+name = "trf-data-store"
+version = "0.1.1"
+description = "Handles storage of TRF variabes for Fluidity Solana workers"
+authors = ["Fluidity Money"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "trf_data_store"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.23.0"
+vipers = "^2.0"
+

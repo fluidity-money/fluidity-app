@@ -21,6 +21,7 @@ const (
 
 	// TableEmissions to record emissions from workers
 	TableEmissions = "worker_emissions"
+
 )
 
 type Emission = worker.Emission
@@ -311,3 +312,4 @@ func InsertTransactionCount(blockNumber uint64, tokenShortName string, transacti
 		})
 	}
 }
+

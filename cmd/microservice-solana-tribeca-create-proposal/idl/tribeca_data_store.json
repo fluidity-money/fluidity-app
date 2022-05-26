@@ -48,7 +48,7 @@
           "type": "u8"
         },
         {
-          "name": "m",
+          "name": "winningClasses",
           "type": "u8"
         }
       ]
@@ -73,8 +73,12 @@
           "type": "u8"
         },
         {
-          "name": "payoutFreq",
-          "type": "u8"
+          "name": "payoutFreqNum",
+          "type": "u32"
+        },
+        {
+          "name": "payoutFreqDenom",
+          "type": "u32"
         }
       ]
     },
@@ -98,8 +102,12 @@
           "type": "u8"
         },
         {
-          "name": "delta",
-          "type": "u8"
+          "name": "deltaWeightNum",
+          "type": "u32"
+        },
+        {
+          "name": "deltaWeightDenom",
+          "type": "u32"
         }
       ]
     }
@@ -115,20 +123,28 @@
             "type": "publicKey"
           },
           {
-            "name": "freqDiv",
-            "type": "u8"
-          },
-          {
-            "name": "m",
-            "type": "u8"
-          },
-          {
-            "name": "delta",
-            "type": "u8"
-          },
-          {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "payoutFreqNum",
+            "type": "u32"
+          },
+          {
+            "name": "payoutFreqDenom",
+            "type": "u32"
+          },
+          {
+            "name": "winningClasses",
+            "type": "u8"
+          },
+          {
+            "name": "deltaWeightNum",
+            "type": "u32"
+          },
+          {
+            "name": "deltaWeightDenom",
+            "type": "u32"
           }
         ]
       }

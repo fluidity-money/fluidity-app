@@ -236,3 +236,59 @@
 //   -moz-text-fill-color: #0d222a;
 //   transition: all 0.5s ease-in-out;
 // }
+
+.select-button {
+  background-color: transparent;
+  //font-weight: 700;
+  color: #ffffff;
+  height: 5rem;
+  width: 100%;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+
+  &--wallet {
+    @extend .select-button;
+    height: 5rem;
+    border-color: #ffffff;
+  }
+
+  &:hover {
+    background-color: rgba(56, 60, 69, 0.5);
+  }
+
+  &:active {
+    filter: brightness(60%);
+  }
+}
+
+.network-options {
+  display: flex;
+  padding: 5px 10px 5px 10px;
+  background-color: transparent;
+  border: solid transparent 1px;
+  border-radius: 10px;
+
+  cursor: pointer;
+  transition: all 0.4s linear;
+
+  &:hover {
+    background-color: rgba(56, 60, 69, 0.5);
+  }
+}
+
+.network-icon {
+  margin-right: 10px;
+  width: 20px;
+}

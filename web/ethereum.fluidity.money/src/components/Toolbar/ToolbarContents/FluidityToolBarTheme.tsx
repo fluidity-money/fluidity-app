@@ -3,6 +3,7 @@ import Button from "components/Button";
 import Icon from "components/Icon";
 import { useHistory } from "react-router-dom";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
+import PendingWinsModal from "components/Modal/Themes/PendingWinsModal";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import { ConnectWalletModal } from "components/Modal";
@@ -14,7 +15,12 @@ import {
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
 import NetworkButton from "components/Button/NetworkButton";
+import { appTheme } from "util/appTheme";
 import ChainId, { chainIdFromEnv } from "util/chainId";
+import {apiPOSTBody} from "util/api";
+import {ethers} from "ethers";
+import {B64ToUint8Array} from "util/conversion"
+import Routes from "util/api/types";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -28,6 +34,9 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   // maintain a separate setter to not spam reconnect on invalid load state
   const [active, setActive] = useState(wallet.status === "connected");
   const [address, setAddress] = useState(wallet.account || "Loading...");
+
+  const [showPendingWins, setShowPendingWins] = useState(false);
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>([])
 
   const modalToggle = () => {
     setToggle(!toggle);
@@ -76,6 +85,14 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
 
   const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
 
+  const fetchPendingWins = async() => {
+    if (!wallet.account)
+      return;
+
+    const pending = await apiPOSTBody('/pending-rewards', {address: wallet.account});
+    setPendingWins(pending);
+  }
+
   return (
     <Media queries={{ small: { maxWidth: 890 } }}>
       {(matched) =>
@@ -93,7 +110,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               <div></div>
               <Button
                 label="Dashboard"
-                theme={`primary-text${aurora}`}
+                theme={`primary-text${appTheme}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/dashboard")}
@@ -103,7 +120,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Swap"
-                theme={`primary-text${aurora}`}
+                theme={`primary-text${appTheme}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/")}
@@ -113,11 +130,24 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Wallet"
-                theme={`primary-text${aurora}`}
+                theme={`primary-text${appTheme}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/wallet")}
                 selected={selected.options[2]}
+                auth={active}
+                priviledge={1}
+              />
+              <Button
+                label={`${pendingWins.length > 0 ? "Show" : "Fetch"} Pending Wins`}
+                theme={`primary-text${aurora}`}
+                texttheme="header-text"
+                padding="toolbarBtnPadding"
+                goto={() => pendingWins.length > 0 ?
+                  setShowPendingWins(true) :
+                  fetchPendingWins()
+                }
+                selected={false}
                 auth={active}
                 priviledge={1}
               />
@@ -134,11 +164,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
                     label="Enable Notifications"
-                    theme={
-                      chainIdFromEnv() === ChainId.AuroraMainnet
-                        ? "primary-button-aurora--toolbar mx-1-r"
-                        : "primary-button--toolbar mx-1-r"
-                    }
+                    theme={`primary-button${appTheme}--toolbar mx-1-r`}
                     goto={checkNotifications}
                     padding="p-0_5"
                   />
@@ -151,7 +177,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 >
                   <Button
                     label={address}
-                    theme={`primary-text${aurora} header-text`}
+                    theme={`primary-text${appTheme} header-text`}
                     goto={() => {
                       setToggle(true);
                     }}
@@ -162,11 +188,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               ) : (
                 <Button
                   label={"Connect Wallet"}
-                  theme={
-                    chainIdFromEnv() === ChainId.AuroraMainnet
-                      ? "primary-button-aurora--toolbar"
-                      : "primary-button--toolbar"
-                  }
+                  theme={`primary-button${appTheme}--toolbar`}
                   goto={() => {
                     setToggle(true);
                   }}
@@ -175,6 +197,13 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               )}
               <NetworkButton />
             </div>
+              <PendingWinsModal
+                enable={showPendingWins}
+                toggle={() => setShowPendingWins(!showPendingWins)}
+                provider={wallet.ethereum}
+                pendingWins={pendingWins}
+                fetchNew={fetchPendingWins}
+              />
 
             {active ? (
               <WalletConnectedModal

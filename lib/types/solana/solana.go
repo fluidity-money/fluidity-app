@@ -143,7 +143,9 @@ type TribecaProgramData struct {
 	Chain   string
 	Network string
 
-	Delta   uint8
-	M       uint8
-	FreqDiv uint8
+	PayoutFreqNum    int64
+	PayoutFreqDenom  int64
+	DeltaWeightNum   int64
+	DeltaWeightDenom int64
+	WinningClasses   int
 }

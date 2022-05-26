@@ -1,17 +1,37 @@
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
 
 import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 import "./LiquidityProvider.sol";
 
+/// @dev parameter for the batchReward function
+struct Winner {
+    address from;
+    address to;
+    uint256 amount;
+    bytes32 txHash;
+}
+
+/// @title The fluid token ERC20 contract
 contract Token is IERC20 {
     using SafeERC20 for IERC20;
     using Address for address;
 
-    event Reward(address indexed addr, uint indexed amount);
+    /// @notice emitted when any reward is paid out
+    event Reward(
+        bytes32 txHash,
+        address indexed from,
+        uint fromAmount,
+        address indexed to,
+        uint toAmount
+    );
+
+    /// @notice emitted when an underlying token is wrapped into a fluid asset
     event MintFluid(address indexed addr, uint indexed amount);
+
+    /// @notice emitted when a fluid token is unwrapped to its underlying asset
     event BurnFluid(address indexed addr, uint indexed amount);
 
     mapping(address => uint256) private balances_;
@@ -25,14 +45,25 @@ contract Token is IERC20 {
 
     LiquidityProvider pool_;
 
+    /// @dev trusted account used as an oracle for submitting rewards
     address rngOracle_;
 
-    // operating at word size here saves a little bit of gas
-    // txhash => 1
+    /// @dev [txhash] => [0 if the reward for that transaction hasn't been rewarded, 1 otherwise]
+    /// @dev operating on ints saves us a bit of gas
     mapping (bytes32 => uint) private pastRewards_;
 
-    // we pass in the metadata explicitly instead of sourcing from the underlying
-    // token because some underlying tokens don't implement these methods
+    /**
+     * @notice initializer function - sets the contract's data
+     * @dev we pass in the metadata explicitly instead of sourcing from the
+     * @dev underlying token because some underlying tokens don't implement
+     * @dev these methods
+     *
+     * @param _liquidityProvider the `LiquidityProvider` contract address. Should have this contract as its owner.
+     * @param _decimals the fluid token's decimals (should be the same as the underlying token's)
+     * @param _name the fluid token's name
+     * @param _symbol the fluid token's symbol
+     * @param _oracle the public address of the trusted account allowed to pay out rewards
+     */
     function init(
         address _liquidityProvider,
         uint8 _decimals,
@@ -55,8 +86,13 @@ contract Token is IERC20 {
         symbol_ = _symbol;
     }
 
+    /**
+     * @notice getter for the `rngOracle_` variable
+     * @return the address of the trusted oracle
+     */
     function oracle() public view returns (address) { return rngOracle_; }
 
+    /// @notice updates the trusted oracle to a new address
     function updateOracle(address newOracle) public {
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
@@ -65,8 +101,15 @@ contract Token is IERC20 {
 
     // name and symbol provided by ERC20 parent
 
-    // takes `amount` underlying tokens, gives you fluid tokens
-    // requires you to have `approve`d the tokens on the erc20 first
+
+    /**
+     * @notice wraps `amount` of underlying tokens into fluid tokens
+     * @notice requires you to have called the ERC20 `approve` method
+     * @notice targeting this contract first
+     *
+     * @param amount the number of tokens to wrap
+     * @return the number of tokens wrapped
+     */
     function erc20In(uint amount) public returns (uint) {
         // take underlying tokens from the user
         uint originalBalance = pool_.underlying_().balanceOf(address(this));
@@ -87,7 +130,11 @@ contract Token is IERC20 {
         return realAmount;
     }
 
-    // takes `amount` fluid tokens from you, gives you erc20
+    /**
+     * @notice unwraps `amount` of fluid tokens back to underlying
+     *
+     * @param amount the number of fluid tokens to unwrap
+     */
     function erc20Out(uint amount) public {
         // take the user's fluid tokens
         _burn(msg.sender, amount);
@@ -98,6 +145,11 @@ contract Token is IERC20 {
         emit BurnFluid(msg.sender, amount);
     }
 
+    /**
+     * @notice calculates the size of the reward pool (the interest we've earned)
+     *
+     * @return the number of tokens in the reward pool
+     */
     function rewardPoolAmount() public returns (uint) {
         uint totalAmount = pool_.totalPoolAmount();
         uint totalFluid = totalSupply();
@@ -105,19 +157,38 @@ contract Token is IERC20 {
         return totalAmount - totalFluid;
     }
 
-    function rewardFromPool(address from, address to, uint amount) internal {
+    /**
+     * @dev rewards two users from the reward pool
+     * @dev mints tokens and emits the reward event
+     *
+     * @param hash the transaction hash that had the transfer that won
+     * @param from the address of the user that sent the transfer
+     * @param to the address of the user that received the transfer
+     * @param amount the total amount to split to the users
+     */
+    function rewardFromPool(bytes32 hash, address from, address to, uint amount) internal {
         // mint some fluid tokens from the interest we've accrued
         // 20%
         uint256 toAmount = amount / 5;
         // 80%
         uint256 fromAmount = amount - toAmount;
 
-        emit Reward(from, fromAmount);
-        emit Reward(to, toAmount);
+        emit Reward(hash, from, fromAmount, to, toAmount);
 
         _mintDouble(from, fromAmount, to, toAmount);
     }
 
+    /**
+     * @notice pays out a reward to two users
+     * @notice only usable by the trusted oracle
+     * @dev deprecated - use batchReward
+     *
+     * @param txHash the hash of the transaction that won
+     * @param from the address of the user that sent the transfer
+     * @param to the address of the user that received the transfer
+     * @param balls the array of balls drawn for this transaction
+     * @param payouts the array of payouts for this transction
+     */
     function reward(
         bytes32 txHash,
         address from,
@@ -138,10 +209,89 @@ contract Token is IERC20 {
 
         // now pay out the user
         pastRewards_[txHash] = 1;
-        rewardFromPool(from, to, winAmount / 5 * 4);
+        rewardFromPool(txHash, from, to, winAmount);
+    }
+
+    /**
+     * @notice pays out several rewards
+     * @notice only usable by the trusted oracle account
+     *
+     * @param rewards the array of rewards to pay out
+     */
+    function batchReward(Winner[] memory rewards) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        uint poolAmount = rewardPoolAmount();
+
+        for (uint i = 0; i < rewards.length; i++) {
+            Winner memory winner = rewards[i];
+
+            if (pastRewards_[winner.txHash] != 0) continue; // user decided to frontrun
+            pastRewards_[winner.txHash] = 1;
+
+            require(poolAmount >= winner.amount, "reward pool empty");
+            poolAmount = poolAmount - winner.amount;
+
+            rewardFromPool(winner.txHash, winner.from, winner.to, winner.amount);
+        }
+    }
+
+    /**
+     * @notice lets a user frontrun our worker, paying their own gas
+     * @notice requires a signature of the random numbers generated
+     * @notice by the trusted oracle
+     *
+     * @param txHash the hash of the transaction that won, provided by the oracle
+     * @param from the address of the user that sent the transfer, oracle provided
+     * @param to the address of the user that received the transfer, oracle provided
+     * @param winAmount the amount of tokens won, oracle provided
+     * @param sig the signature of the above parameters, provided by the oracle
+     */
+    function manualReward(
+        bytes32 txHash,
+        address from,
+        address to,
+        uint256 winAmount,
+        bytes memory sig
+    ) external {
+        require(sig.length == 65, "invalid rng format (length)");
+        // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
+        //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
+        bytes32 hash = keccak256(abi.encode(txHash, from, to , winAmount));
+
+        // ECDSA verification
+        // TODO: Get a proper audit here
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        assembly {
+            r := mload(add(sig, 0x20))
+            s := mload(add(sig, 0x40))
+            v := byte(0, mload(add(sig, 0x60)))
+        }
+        if (v < 27) v += 27;
+
+        require(ecrecover(hash, v, r, s) == rngOracle_, "invalid rng signature");
+
+        // now reward the user
+        require(pastRewards_[txHash] == 0, "reward already given for this tx");
+        pastRewards_[txHash] = 1;
+
+        require(rewardPoolAmount() >= winAmount, "reward pool empty");
+
+        rewardFromPool(txHash, from, to, winAmount);
     }
 
     // returns the amount that the user won (can be 0), reverts on invalid rng
+    /**
+     * @notice given a list of balls drawn by the worker and the payouts,
+     * @notice returns the number of tokens won
+     * @dev deprecated - this is done offchain now
+     *
+     * @param balls the balls drawn by the worker
+     * @param payouts the current array of payouts
+     * @return the amount of tokens won, reverting if 0
+     */
     function rewardAmount(
         uint[] calldata balls,
         uint[] calldata payouts
@@ -157,7 +307,8 @@ contract Token is IERC20 {
         return payouts[winningBalls - 1];
     }
 
-    // erc20 spec
+    // remaining functions besides `mintDouble` are taken from OpenZeppelin's ERC20 implementation
+
     function name() public view returns (string memory) { return name_; }
     function symbol() public view returns (string memory) { return symbol_; }
     function decimals() public view returns (uint8) { return decimals_; }
@@ -228,7 +379,7 @@ contract Token is IERC20 {
         emit Transfer(address(0), account, amount);
     }
 
-    // mint to two addresses, only writing to totalSupply once
+    /// @dev mint to two addresses, only writing to totalSupply once
     function _mintDouble(address account1, uint256 amount1, address account2, uint256 amount2) internal virtual {
         require(account1 != address(0), "ERC20: mint to the zero address");
         require(account2 != address(0), "ERC20: mint to the zero address");

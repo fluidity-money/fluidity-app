@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	logging "github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
@@ -20,7 +21,7 @@ import (
 
 const (
 	// FilterEventSignature to use to filter for event signatures
-	FilterEventSignature = `Reward(address,uint256)`
+	FilterEventSignature = `Reward(bytes32,address,uint256,address,uint256)`
 
 	// EnvContractAddress to watch where the reward function was called
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
@@ -31,7 +32,9 @@ const (
 	// EnvUnderlyingTokenDecimals supported by the contract
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
-	publishTopic = winners.TopicWinnersEthereum
+	winnersPublishTopic = winners.TopicWinnersEthereum
+
+	rewardPublishTopic = winners.TopicRewardsEthereum
 )
 
 func main() {
@@ -73,7 +76,7 @@ func main() {
 
 		// first, we're going to make the string lowercase
 
-		logAddress    = strings.ToLower(logAddress)
+		logAddress = strings.ToLower(logAddress)
 		filterAddress = strings.ToLower(filterAddress)
 
 		logging.Debug(func(k *logging.Log) {
@@ -128,36 +131,33 @@ func main() {
 			return
 		}
 
-		var (
-			winnerAddressPadded = string(logTopics[1])
-			winningAmountPadded = string(logTopics[2])
-		)
-
-		winner, err := microservice_common_track_winners.DecodeWinner(
-			logAddress,
-			transactionHash,
-			winnerAddressPadded,
-			winningAmountPadded,
-			messageReceivedTime,
-		)
+		rewardData, err := fluidity.DecodeRewardData(log)
 
 		if err != nil {
 			logging.Fatal(func(k *logging.Log) {
-				k.Format(
-					"Failed to decode a winner! Transaction hash %v, log %v",
-					transactionHash,
-					log,
-				)
-
+				k.Message = "Failed to decode reward data from events!"
 				k.Payload = err
 			})
 		}
 
-		winner.TokenDetails = token_details.New(
+		winner1, winner2 := microservice_common_track_winners.DecodeWinner(
+			logAddress,
+			transactionHash,
+			rewardData,
+			messageReceivedTime,
+		)
+
+		tokenDetails := token_details.New(
 			underlyingTokenName,
 			underlyingTokenDecimals,
 		)
 
-		queue.SendMessage(publishTopic, winner)
+		winner1.TokenDetails = tokenDetails
+		winner2.TokenDetails = tokenDetails
+
+		queue.SendMessage(winnersPublishTopic, winner1)
+		queue.SendMessage(winnersPublishTopic, winner2)
+
+		queue.SendMessage(rewardPublishTopic, rewardData)
 	})
 }

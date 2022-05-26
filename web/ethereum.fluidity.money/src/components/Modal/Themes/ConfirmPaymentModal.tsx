@@ -14,6 +14,7 @@ import { useContext } from "react";
 import { TokenKind, Token as TokenType } from "components/types";
 import { SupportedContracts } from "util/contractList";
 import ChainId, { chainIdFromEnv } from "util/chainId";
+import { appTheme } from "util/appTheme";
 
 const ConfirmPaymentModal = ({
   enable,
@@ -159,11 +160,7 @@ const ConfirmPaymentModal = ({
         <Button
           label="Confirm"
           goto={confirmTrigger}
-          theme={
-            chainIdFromEnv() === ChainId.AuroraMainnet
-              ? "payment-button primary-button-aurora"
-              : "payment-button primary-button"
-          }
+          theme={`payment-button primary-button${appTheme}`}
         />
       </div>
     </GenericModal>

@@ -33,6 +33,7 @@ import testing from "./config/testing-tokens.json";
 import kovan from "./config/kovan-tokens.json";
 import aurora from "./config/aurora-mainnet-tokens.json";
 import mainnet from "./config/mainnet-tokens.json";
+import { appTheme } from "util/appTheme";
 
 const App = () => {
   const chainId = chainIdFromEnv();
@@ -70,6 +71,8 @@ const App = () => {
   const [notificationTrigger, setNotificationTrigger] = useState(false);
 
   const [messageData, setMessageData] = useState<WebsocketMessage>({});
+
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>([]);
 
   const { lastJsonMessage } = useWebSocket(root_websocket);
 
@@ -157,9 +160,6 @@ const App = () => {
     setFluidTokens: setFluidTokens,
   };
 
-  const auroraStyle =
-    chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
-
   return (
     // React router provider
     <Router>
@@ -241,16 +241,13 @@ const App = () => {
                   message={[
                     <div key={"TCM1"}>
                       🎉🎉
-                      <span className={`primary-text${auroraStyle}`}>
+                      <span className={`primary-text${appTheme}`}>
                         {" "}
                         CONGRATS{" "}
                       </span>
                       🎉🎉
                     </div>,
-                    <div
-                      key={"TCM2"}
-                      className={`secondary-text${auroraStyle}`}
-                    >
+                    <div key={"TCM2"} className={`secondary-text${appTheme}`}>
                       {notificationMessage}
                     </div>,
                   ]}

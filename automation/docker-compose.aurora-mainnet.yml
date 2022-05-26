@@ -14,6 +14,8 @@ services:
       FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
       FLU_ETHEREUM_TOKENS_LIST: ${FLU_ETHEREUM_TOKENS_LIST}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+    depends_on:
+      - redis
     restart: unless-stopped
 
   microservice-aurora-user-actions-usdc:
@@ -27,6 +29,8 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
+    depends_on:
+      - redis
     restart: unless-stopped
 
   microservice-aurora-user-actions-usdt:
@@ -40,6 +44,8 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
       FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
       FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
+    depends_on:
+      - redis
     restart: unless-stopped
 
   microservice-aurora-track-winners-usdc:
@@ -53,6 +59,8 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
       FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
+    depends_on:
+      - redis
     restart: unless-stopped
 
   microservice-aurora-track-winners-usdt:
@@ -66,4 +74,6 @@ services:
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
       FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
+    depends_on:
+      - redis
     restart: unless-stopped
