@@ -81,7 +81,7 @@ const (
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
 	// The compute used by an spl-token tranfer
-	SplTranferCompute = 2721
+	SplTransferCompute = 2721
 )
 
 func main() {
