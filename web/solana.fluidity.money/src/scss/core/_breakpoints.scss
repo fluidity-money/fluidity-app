@@ -22,6 +22,35 @@ eg:
     @content;
   }
 }
+
+@mixin for-below-470 {
+  @media (max-width: 470px) {
+    @content;
+  }
+}
+
+@mixin for-below-550 {
+  @media (max-width: 550px) {
+    @content;
+  }
+}
+
+@mixin for-med-toolbar {
+  @media (max-width: 1080px) {
+    @content;
+  }
+}
+@mixin for-small-toolbar {
+  @media (max-width: 1000px) {
+    @content;
+  }
+}
+@mixin for-smallest-toolbar {
+  @media (max-width: 930px) {
+    @content;
+  }
+}
+
 @mixin for-tablet-landscape-down {
   @media (max-width: 900px) {
     @content;
