@@ -7,9 +7,11 @@ import WalletHistory from "./components/Pages/WalletHistory";
 import {
   LoadingStatus,
   LoadingStatusToggle,
+  tokenListContext,
+  TokenListContext,
   userActionContext,
 } from "components/context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingStatusModal from "components/Modal/Themes/LoadingStatusModal";
 import { SolanaProvider } from "@saberhq/use-solana";
 import ProtectedRoute from "components/Routes/ProtectedRoute";
@@ -26,6 +28,7 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import NotificationAlert from "components/NotificationAlert";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
+import useFluidTokens, { FluidTokenList } from "util/hooks/useFluidTokens";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -83,6 +86,80 @@ const App = () => {
 
   const [messageData, setMessageData] = useState<WebsocketMessage>({});
 
+  const { fluidTokensList, nonFluidTokensList } = useFluidTokens();
+
+  // pinned tokens for fluid and non-fluid in token select modal
+  const [selectPinnedTokens, setSelectPinnedTokens] = useState<FluidTokenList>([
+    ...nonFluidTokensList,
+  ]);
+
+  const [selectPinnedFluidTokens, setSelectPinnedFluidTokens] =
+    useState<FluidTokenList>([...fluidTokensList]);
+
+  // tokens for fluid and non-fluid in token select modal
+  const [selectTokens, setSelectTokens] = useState<FluidTokenList>([
+    ...nonFluidTokensList,
+  ]);
+
+  const [selectFluidTokens, setSelectFluidTokens] = useState<FluidTokenList>([
+    ...fluidTokensList,
+  ]);
+
+  useEffect(() => {
+    let count = 0;
+    if (count < 1) {
+      count++;
+      setSelectFluidTokens(() => [...fluidTokensList]);
+      setSelectPinnedFluidTokens(() => [...fluidTokensList]);
+      setSelectTokens(() => [...nonFluidTokensList]);
+      setSelectPinnedTokens(() => [...nonFluidTokensList]);
+      console.log("hey!");
+    }
+  }, [fluidTokensList, nonFluidTokensList]);
+
+  // persists tokens data in token select modal
+  useEffect(() => {
+    const pinnedData = window.localStorage.getItem("pinned");
+    if (pinnedData) setSelectPinnedTokens(JSON.parse(pinnedData));
+    const pinnedFluidData = window.localStorage.getItem("pinned-fluid");
+    if (pinnedFluidData)
+      setSelectPinnedFluidTokens(JSON.parse(pinnedFluidData));
+    const tokenData = window.localStorage.getItem("tokens");
+    if (tokenData) setSelectTokens(JSON.parse(tokenData));
+    const fluidTokenData = window.localStorage.getItem("fluid-tokens");
+    if (fluidTokenData) setSelectFluidTokens(JSON.parse(fluidTokenData));
+  }, []);
+  // updates persisted token data when changes occur for token select modal
+  useEffect(() => {
+    window.localStorage.setItem("pinned", JSON.stringify(selectPinnedTokens));
+    window.localStorage.setItem(
+      "pinned-fluid",
+      JSON.stringify(selectPinnedFluidTokens)
+    );
+    window.localStorage.setItem("tokens", JSON.stringify(selectTokens));
+    window.localStorage.setItem(
+      "fluid-tokens",
+      JSON.stringify(selectFluidTokens)
+    );
+  }, [
+    selectPinnedTokens,
+    selectPinnedFluidTokens,
+    selectTokens,
+    selectFluidTokens,
+  ]);
+
+  // token info for context for token select modal
+  const tokenListInfo: TokenListContext = {
+    selectPinnedTokens: selectPinnedTokens,
+    setSelectPinnedTokens: setSelectPinnedTokens,
+    selectPinnedFluidTokens: selectPinnedFluidTokens,
+    setSelectPinnedFluidTokens: setSelectPinnedFluidTokens,
+    selectTokens: selectTokens,
+    setSelectTokens: setSelectTokens,
+    selectFluidTokens: selectFluidTokens,
+    setSelectFluidTokens: setSelectFluidTokens,
+  };
+
   const apiState: ApiState = {
     setPastWinnings,
     setPrizeBoard,
@@ -113,72 +190,76 @@ const App = () => {
         <LoadingStatusToggle.Provider value={loadingToggleProps}>
           {/* Context for user actions recieved over WS, to support dynamic updates */}
           <userActionContext.Provider value={userActions}>
-            {/* Renders App triggers on load (such as auto logging into wallet) */}
-            {/* Loads specifically one route at a time */}
-            <ErrorBoundary>
-              <NotificationContainer>
-                <ApiStateHandler state={apiState} />
-                {/*<Route path="/" render={props =>
+            <tokenListContext.Provider value={tokenListInfo}>
+              {/* Renders App triggers on load (such as auto logging into wallet) */}
+              {/* Loads specifically one route at a time */}
+              <ErrorBoundary>
+                <NotificationContainer>
+                  <ApiStateHandler state={apiState} />
+                  {/*<Route path="/" render={props =>
               <WinNotification
                 addWinNotification={addWinNotification}
               />}
             />*/}
-                <Switch>
-                  <Route path="/" exact component={SwapPage} />
-                  <Route
-                    path="/dashboard"
-                    exact
-                    render={(props) => (
-                      <Dashboard
-                        prizeBoard={prizeBoard}
-                        prizePool={rewardPool}
-                        pastWinnings={pastWinnings}
-                        {...props}
-                      />
-                    )}
+                  <Switch>
+                    <Route path="/" exact component={SwapPage} />
+                    <Route
+                      path="/dashboard"
+                      exact
+                      render={(props) => (
+                        <Dashboard
+                          prizeBoard={prizeBoard}
+                          prizePool={rewardPool}
+                          pastWinnings={pastWinnings}
+                          {...props}
+                        />
+                      )}
+                    />
+                    <ProtectedRoute
+                      exact={true}
+                      path="/wallet"
+                      component={Wallet}
+                    />
+                    <ProtectedRoute
+                      exact={true}
+                      path="/walletsend"
+                      component={WalletSend}
+                      myHistory={userActions}
+                    />
+                    <ProtectedRoute
+                      exact={true}
+                      path="/wallethistory"
+                      component={WalletHistory}
+                      myHistory={userActions}
+                    />
+                    <Route component={RouteNotFound} />
+                  </Switch>
+                  {/* Loading modal for transactiongs */}
+                  <LoadingStatusModal enable={loadingToggler} />
+                  {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
+                  <NotificationAlert
+                    enable={notificationTrigger}
+                    setEnable={() =>
+                      setNotificationTrigger(!notificationTrigger)
+                    }
+                    active={document.hidden}
+                    message={notificationMessage}
                   />
-                  <ProtectedRoute
-                    exact={true}
-                    path="/wallet"
-                    component={Wallet}
-                  />
-                  <ProtectedRoute
-                    exact={true}
-                    path="/walletsend"
-                    component={WalletSend}
-                    myHistory={userActions}
-                  />
-                  <ProtectedRoute
-                    exact={true}
-                    path="/wallethistory"
-                    component={WalletHistory}
-                    myHistory={userActions}
-                  />
-                  <Route component={RouteNotFound} />
-                </Switch>
-                {/* Loading modal for transactiongs */}
-                <LoadingStatusModal enable={loadingToggler} />
-                {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
-                <NotificationAlert
-                  enable={notificationTrigger}
-                  setEnable={() => setNotificationTrigger(!notificationTrigger)}
-                  active={document.hidden}
-                  message={notificationMessage}
-                />
 
-                <ConfettiAnimation trigger={winAlert} />
-                <TransactionConfirmationModal
-                  enable={winAlert}
-                  toggle={() => setWinAlert(!winAlert)}
-                  message={[
-                    <div>
-                      🎉🎉<span className="primary-text"> CONGRATS </span>🎉🎉
-                    </div>,
-                    <div className="primary-text">{notificationMessage}</div>,
-                  ]}
-                />
-              </NotificationContainer>
-            </ErrorBoundary>
+                  <ConfettiAnimation trigger={winAlert} />
+                  <TransactionConfirmationModal
+                    enable={winAlert}
+                    toggle={() => setWinAlert(!winAlert)}
+                    message={[
+                      <div>
+                        🎉🎉<span className="primary-text"> CONGRATS </span>🎉🎉
+                      </div>,
+                      <div className="primary-text">{notificationMessage}</div>,
+                    ]}
+                  />
+                </NotificationContainer>
+              </ErrorBoundary>
+            </tokenListContext.Provider>
           </userActionContext.Provider>
         </LoadingStatusToggle.Provider>
       </SolanaProvider>
