@@ -136,7 +136,7 @@ func UnpaidWinningsForToken(token token_details.TokenDetails) *big.Int {
 	return &total.Int
 }
 
-func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.EthereumWinnerAnnouncement {
+func GetAndRemoveRewardsForToken(shortName string) []worker.EthereumWinnerAnnouncement {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -159,7 +159,7 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 
 	rows, err := timescaleClient.Query(
 		statementText,
-		token.TokenShortName,
+		shortName,
 	)
 
 	if err != nil {
@@ -168,7 +168,7 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 
 			k.Format(
 				"Failed to fetch and mark winners as sent for token %s!",
-				token.TokenShortName,
+				shortName,
 			)
 
 			k.Payload = err
