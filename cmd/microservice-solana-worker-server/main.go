@@ -14,10 +14,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/common/solana/solend"
 
-	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
@@ -28,42 +26,21 @@ const (
 	// EnvSolanaNetwork is the network of the trf data store account
 	EnvSolanaNetwork = `FLU_SOLANA_NETWORK`
 
-	// EnvFluidityPubkey is the program id of the fluidity program
-	EnvFluidityPubkey = `FLU_SOLANA_PROGRAM_ID`
-
 	// EnvFluidityMintPubkey is the public key of the fluid token mint
 	EnvFluidityMintPubkey = `FLU_SOLANA_FLUID_MINT_PUBKEY`
 
-	// EnvTvlDataPubkey is the public key of an initialized account for storing
-	// TVL data
-	EnvTvlDataPubkey = `FLU_SOLANA_TVL_DATA_PUBKEY`
-
-	// EnvSolendPubkey is the program id of the solend program
-	EnvSolendPubkey = `FLU_SOLANA_SOLEND_PROGRAM_ID`
-
-	// EnvObligationPubkey is the public key of the solend pool obligation
-	// account
-	EnvObligationPubkey = `FLU_SOLANA_OBLIGATION_PUBKEY`
-
 	// EnvReservePubkey is the public key of the solend pool reserve account
 	EnvReservePubkey = `FLU_SOLANA_RESERVE_PUBKEY`
-
-	// EnvPythPubkey is the public key of the solend pool pyth account
-	EnvPythPubkey = `FLU_SOLANA_PYTH_PUBKEY`
-
-	// EnvSwitchboardPubkey is the public key of the solend pool switchboard
-	// account
-	EnvSwitchboardPubkey = `FLU_SOLANA_SWITCHBOARD_PUBKEY`
-
-	// EnvPayerPrikey is a private key of an account that holds solana funds
-	// this must be the payout authority of the contract
-	EnvPayerPrikey = `FLU_SOLANA_PAYER_PRIKEY`
 
 	// EnvTokenDecimals is the number of decimals the token uses
 	EnvTokenDecimals = `FLU_SOLANA_TOKEN_DECIMALS`
 
 	// EnvTokenName is the same of the token being wrapped
 	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
+
+	// EnvTopicWrappedActionsQueue to use when receiving TVL, mint
+	// supply, and user actions from retriever
+	EnvTopicWrappedActionsQueue = `FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME`
 
 	// EnvTopicWinnerQueue to use when transmitting to a client the topic of
 	// a winner
@@ -81,27 +58,21 @@ const (
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
 	// The compute used by an spl-token tranfer
-	SplTranferCompute = 2721
+	SplTransferCompute = 2721
 )
 
 func main() {
 
 	var (
-		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		solanaNetwork    = util.GetEnvOrFatal(EnvSolanaNetwork)
-		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
-		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
-		decimalPlaces_   = util.GetEnvOrFatal(EnvTokenDecimals)
-		tokenName        = util.GetEnvOrFatal(EnvTokenName)
+		rpcUrl                   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
+		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
+		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
+		decimalPlaces_           = util.GetEnvOrFatal(EnvTokenDecimals)
+		tokenName                = util.GetEnvOrFatal(EnvTokenName)
 
-		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
-		fluidMintPubkey   = pubkeyFromEnv(EnvFluidityMintPubkey)
-		tvlDataPubkey     = pubkeyFromEnv(EnvTvlDataPubkey)
-		solendPubkey      = pubkeyFromEnv(EnvSolendPubkey)
-		obligationPubkey  = pubkeyFromEnv(EnvObligationPubkey)
-		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
-		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
-		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
+		fluidMintPubkey = pubkeyFromEnv(EnvFluidityMintPubkey)
+		reservePubkey   = pubkeyFromEnv(EnvReservePubkey)
 	)
 
 	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
@@ -120,21 +91,18 @@ func main() {
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
-	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
+	queue.GetMessages(topicWrappedActionsQueue, func(message queue.Message) {
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to decode payer private key!"
-			k.Payload = err
-		})
-	}
+		var payableBufferedUserActions user_actions.PayableBufferedUserAction
 
-	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
+		message.Decode(&payableBufferedUserActions)
 
 		var (
-			userActions    = bufferedUserActions.UserActions
-			fluidTransfers = 0
-			emission       = workerTypes.NewSolanaEmission()
+			bufferedUserActions = payableBufferedUserActions.BufferedUserAction
+			mintSupply          = payableBufferedUserActions.MintSupply
+			tvl                 = payableBufferedUserActions.Tvl
+			fluidTransfers      = 0
+			emission            = workerTypes.NewSolanaEmission()
 		)
 
 		// emissions in this loop should only contain information relevant to the
@@ -143,6 +111,8 @@ func main() {
 
 		emission.Network = "solana"
 		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
+
+		userActions := bufferedUserActions.UserActions
 
 		for _, userAction := range userActions {
 
@@ -169,57 +139,15 @@ func main() {
 
 		bpy := probability.CalculateBpy(SolanaBlockTime, apy, emission)
 
-		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
-
-		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get the mint supply! %v",
-					err,
-				)
-			})
-		}
-
 		// normalise the amount to be consistent with USDC as a floating point
 
 		entireAmountOwned := new(big.Rat).SetUint64(mintSupply)
 
 		entireAmountOwned.Quo(entireAmountOwned, decimalPlacesRat)
 
-		// get the value of all fluidity obligations
-
-		tvl, err := prize_pool.GetTvl(
-			solanaClient,
-			fluidityPubkey,
-			tvlDataPubkey,
-			solendPubkey,
-			obligationPubkey,
-			reservePubkey,
-			pythPubkey,
-			switchboardPubkey,
-			payer,
-		)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failedto get the TVL! %v",
-					err,
-				)
-			})
-		}
-
 		// get the size of the pool: obligation value minus deposited value then
 		// divide by 10e6 to get the actual number in
 		// USDC units
-
-		if mintSupply > tvl {
-			log.Fatal(func(k *log.Log) {
-				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
-			})
-		}
 
 		unscaledPool := tvl - mintSupply
 

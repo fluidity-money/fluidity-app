@@ -7,7 +7,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
 const (
@@ -66,6 +66,13 @@ type (
 	BufferedUserAction struct {
 		UserActions          []UserAction `json:"user_actions"`
 		SecondsSinceLastSlot uint64       `json:"seconds_since_last_slot"`
+	}
+
+	// PayableBufferedUserAction includes BufferedUserActions, and Pyth priced available prize pool
+	PayableBufferedUserAction struct {
+		BufferedUserAction BufferedUserAction `json:"buffered_user_action"`
+		Tvl                uint64             `json:"tvl"`
+		MintSupply         uint64             `json:"mint_supply"`
 	}
 )
 
