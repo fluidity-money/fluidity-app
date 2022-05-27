@@ -17,7 +17,7 @@ import RouteNotFound from "components/Pages/RouteNotFound";
 import WinNotification from "components/WinNotification";
 import NotificationContainer from "components/Notifications/NotificationContainer";
 import { isChrome, isFirefox, isEdge, isChromium } from "react-device-detect";
-import Unsupported from "./components/Pages/Unsupported";
+import Unsupported from "components/Pages/Unsupported";
 import ApiStateHandler, { ApiState } from "components/ApiStateHandler";
 import Routes, { WebsocketMessage } from "util/api/types";
 import TransactionConfirmationModal from "components/Modal/Themes/TransactionConfirmationModal.tsx";
@@ -107,8 +107,7 @@ const App = () => {
 
   return (
     // React router provider
-    // @ts-expect-error
-    <Router>
+      <Router>
       <WalletKitProvider
         defaultNetwork={network}
         app={{name: "Fluidity"}}
@@ -127,11 +126,8 @@ const App = () => {
                 addWinNotification={addWinNotification}
               />}
             />*/}
-            {/* @ts-expect-error */}
                 <Switch>
-            {/* @ts-expect-error */}
                   <Route path="/" exact component={SwapPage} />
-            {/* @ts-expect-error */}
                   <Route
                     path="/dashboard"
                     exact
@@ -161,7 +157,6 @@ const App = () => {
                     component={WalletHistory}
                     myHistory={userActions}
                   />
-            {/* @ts-expect-error */}
                   <Route component={RouteNotFound} />
                 </Switch>
                 {/* Loading modal for transactiongs */}
