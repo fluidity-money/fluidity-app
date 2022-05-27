@@ -15,7 +15,14 @@ const NetworkButton = () => {
         className={`select-blockchain${appTheme}`}
         onClick={() => setBlockchainToggle(true)}
       >
-        <img src="/img/TokenIcons/ethereumIcon.svg" alt="eth icon" />
+        <img
+          src={
+            chainIdFromEnv() === ChainId.AuroraMainnet
+              ? "/img/Aurora/AuroraLogoTextRight.svg"
+              : "/img/TokenIcons/ethereumIcon.svg"
+          }
+          alt="eth icon"
+        />
         <div className={`chain-name primary-text${appTheme}`}>
           {chainIdFromEnv() === ChainId.Ropsten
             ? "Ropsten"

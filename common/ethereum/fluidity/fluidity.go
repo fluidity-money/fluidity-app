@@ -12,8 +12,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
-	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	logging "github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 const fluidityContractAbiString = `[
@@ -55,7 +53,6 @@ const fluidityContractAbiString = `[
       ],
       "name": "batchReward",
       "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
 	{
@@ -82,22 +79,7 @@ const fluidityContractAbiString = `[
   }
 ]`
 
-type RewardData struct {
-	TxHash ethCommon.Hash
-	FromAddress ethCommon.Address
-	FromAmount *big.Int
-	ToAddress ethCommon.Address
-	ToAmount *big.Int
-}
-
 var fluidityContractAbi ethAbi.ABI
-
-var ManualRewardArguments = ethAbi.Arguments{
-	ethAbiMustArgument("txHash",     "bytes32"),
-	ethAbiMustArgument("from",       "address"),
-	ethAbiMustArgument("to",         "address"),
-	ethAbiMustArgument("win_amount", "uint256"),
-}
 
 type RewardArg struct {
 	FromAddress     ethCommon.Address `json:"from"`
@@ -182,27 +164,8 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		rewards[i] = rewardArg
 	}
 
-	callOptions := ethAbiBind.CallOpts {
-		Pending: false,
-		From: transactionOptions.From,
-		BlockNumber: nil,
-		Context: transactionOptions.Context,
-	}
-
-	err := boundContract.Call(
-		&callOptions,
-		nil,
-		"batchReward",
-		rewards,
-	)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"reward transaction simulation failed! %w",
-			err,
-		)
-	}
-
-	transaction, err := boundContract.Transact(
+	transaction, err := ethereum.MakeTransaction(
+		boundContract,
 		transactionOptions,
 		"batchReward",
 		rewards,
@@ -230,7 +193,8 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 		client,
 	)
 
-	transaction, err := boundContract.Transact(
+	transaction, err := ethereum.MakeTransaction(
+		boundContract,
 		transactionOptions,
 		"transfer",
 		recipientAddress,
@@ -247,47 +211,3 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 	return transaction, nil
 }
 
-func DecodeRewardData(log typesEth.Log) (RewardData, error) {
-	var rewardData RewardData
-
-	var (
-		logData   = log.Data
-		logTopics = log.Topics
-	)
-
-	decodedData, err := fluidityContractAbi.Unpack("Reward", logData)
-
-	if err != nil {
-		return rewardData, fmt.Errorf(
-			"failed to unpack reward event data! %v",
-			err,
-		)
-	}
-
-	logging.Debug(func (k *logging.Log) {
-		k.Format("data: %+v", decodedData)
-	})
-
-	var (
-		txHash = decodedData[0].([32]byte)
-		fromPadded = logTopics[1].String()
-		fromAmount = decodedData[1].(*big.Int)
-		toPadded = logTopics[2].String()
-		toAmount = decodedData[2].(*big.Int)
-	)
-
-	var (
-		from = ethCommon.HexToAddress(fromPadded)
-		to = ethCommon.HexToAddress(toPadded)
-	)
-
-	rewardData = RewardData {
-		TxHash: txHash,
-		FromAddress: from,
-		FromAmount: fromAmount,
-		ToAddress: to,
-		ToAmount: toAmount,
-	}
-
-	return rewardData, nil
-}

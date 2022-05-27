@@ -10,7 +10,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/common/solana"
 
-	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 
 	solanaGo "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -151,7 +151,7 @@ func main() {
 			mintAddress      = token.mintPubkey
 		)
 
-		signature, err := fluidity.SendTransfer(
+		signature, err := spl_token.SendTransfer(
 			solanaClient,
 			senderPdaAddress,
 			recipientAddress,

@@ -5,6 +5,7 @@ import "./aave/ATokenInterfaces.sol";
 import "./LiquidityProvider.sol";
 import "./openzeppelin/SafeERC20.sol";
 
+/// @title Liquidity provider using aave
 contract AaveLiquidityProvider is LiquidityProvider {
     using SafeERC20 for IERC20;
 
@@ -15,6 +16,13 @@ contract AaveLiquidityProvider is LiquidityProvider {
     LendingPoolAddressesProviderInterface public lendingPoolAddresses_;
     ATokenInterface public aToken_;
 
+    /**
+     * @notice initializer function
+     *
+     * @param addressProvider address of the aave LendingPoolAddressesProvider contract
+     * @param aToken address of the aToken
+     * @param owner address of the account that owns this pool
+     */
     function initialize(
         address addressProvider,
         address aToken,
@@ -30,6 +38,7 @@ contract AaveLiquidityProvider is LiquidityProvider {
         underlying_ = IERC20(aToken_.UNDERLYING_ASSET_ADDRESS());
     }
 
+    /// @inheritdoc LiquidityProvider
     function addToPool(uint amount) external {
         require(msg.sender == owner_, "only the owner can use this");
         LendingPoolInterface lendingPool = LendingPoolInterface(lendingPoolAddresses_.getLendingPool());
@@ -38,6 +47,7 @@ contract AaveLiquidityProvider is LiquidityProvider {
         lendingPool.deposit(address(underlying_), amount, address(this), 0);
     }
 
+    /// @inheritdoc LiquidityProvider
     function takeFromPool(uint amount) external {
         require(msg.sender == owner_, "only the owner can use this");
         LendingPoolInterface lendingPool = LendingPoolInterface(lendingPoolAddresses_.getLendingPool());
@@ -47,6 +57,7 @@ contract AaveLiquidityProvider is LiquidityProvider {
         underlying_.safeTransfer(msg.sender, realAmount);
     }
 
+    /// @inheritdoc LiquidityProvider
     function totalPoolAmount() external view returns (uint) {
         return aToken_.balanceOf(address(this));
     }
