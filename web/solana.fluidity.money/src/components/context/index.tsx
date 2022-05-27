@@ -1,15 +1,13 @@
 import React from "react";
-import {TokenKind} from "components/types"
+import { TokenKind } from "components/types";
 import Routes from "util/api/types";
+import { FluidTokenList } from "util/hooks/useFluidTokens";
 
 // Context for swap page modal toggle
 export interface SwapModalStatus {
   toggleTo: [boolean, () => void]; // State modal toggle for 'To' swap value
   toggleFrom: [boolean, () => void]; // State modal toggle for 'From' swap value
-  selectedToken: [
-    TokenKind["symbol"],
-    (input: TokenKind["symbol"]) => void
-  ]; // Selected standard token
+  selectedToken: [TokenKind["symbol"], (input: TokenKind["symbol"]) => void]; // Selected standard token
   selectedFluidToken: [
     TokenKind["symbol"],
     (input: TokenKind["symbol"]) => void
@@ -32,4 +30,29 @@ export const LoadingStatusToggle = React.createContext<LoadingStatus>({
   toggle: [false, () => {}],
 });
 
-export const userActionContext = React.createContext<Routes['/my-history']>([])
+export const userActionContext = React.createContext<Routes["/my-history"]>([]);
+
+// interface for token select tokens context
+export interface TokenListContext {
+  selectPinnedTokens: FluidTokenList;
+  setSelectPinnedTokens: React.Dispatch<React.SetStateAction<FluidTokenList>>;
+  selectPinnedFluidTokens: FluidTokenList;
+  setSelectPinnedFluidTokens: React.Dispatch<
+    React.SetStateAction<FluidTokenList>
+  >;
+  selectTokens: FluidTokenList;
+  setSelectTokens: React.Dispatch<React.SetStateAction<FluidTokenList>>;
+  selectFluidTokens: FluidTokenList;
+  setSelectFluidTokens: React.Dispatch<React.SetStateAction<FluidTokenList>>;
+}
+
+export const tokenListContext = React.createContext<TokenListContext>({
+  selectPinnedTokens: [],
+  selectPinnedFluidTokens: [],
+  setSelectPinnedTokens: () => {},
+  setSelectPinnedFluidTokens: () => {},
+  selectTokens: [],
+  setSelectTokens: () => {},
+  selectFluidTokens: [],
+  setSelectFluidTokens: () => {},
+});
