@@ -10,7 +10,7 @@ const NetworkButton = () => {
   };
 
   const network =
-    process.env.REACT_APP_SOL_NETWORK === "mainnet" ? "mainnet" : "devnet";
+    process.env.REACT_APP_SOL_NETWORK === "mainnet" ? "Mainnet" : "Devnet";
 
   return (
     <>
