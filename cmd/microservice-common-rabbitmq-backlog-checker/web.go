@@ -10,10 +10,18 @@ import (
 
 const (
 	// RmqManagementScheme is the scheme of RabbitMQ management API
+	// Only uses this scheme if hostname is localhost
 	RmqManagementScheme = "http"
 
 	// RmqManagementPort is the default port of RabbitMQ management API
+	// Only uses this port if hostname is localhost
 	RmqManagementPort = 15672
+
+	// AwsManagementScheme is the scheme of AWS RMQ management API
+	AwsManagementScheme = "https"
+
+	// AwsManagementPort is the default port of AWS RMQ management API
+	AwsManagementPort = 443
 )
 
 type (
@@ -58,13 +66,21 @@ func getManagementUrlFromAddr(address string) (string, error) {
 		return "", err
 	}
 
-	queueManagementUri_.Scheme = RmqManagementScheme
-
 	if port := queueManagementUri_.Port(); port != "" {
 		queueManagementUri_.Host = strings.Replace(queueManagementUri_.Host, ":"+port, "", 1)
 	}
 
-	queueManagementUri_.Host += fmt.Sprintf(":%v", RmqManagementPort)
+	queueManagementUri_.Scheme = AwsManagementScheme
+
+	portString := fmt.Sprintf(":%v", AwsManagementPort)
+
+	if queueManagementUri_.Hostname() == "localhost" {
+		queueManagementUri_.Scheme = RmqManagementScheme
+
+		portString = fmt.Sprintf(":%v", RmqManagementPort)
+	}
+
+	queueManagementUri_.Host += portString
 
 	queueManagementUri := queueManagementUri_.String()
 
