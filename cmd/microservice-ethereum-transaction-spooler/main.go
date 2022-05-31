@@ -7,6 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -40,7 +41,7 @@ func main() {
 
 		message.Decode(&announcements)
 
-		toSend := make(map[string]bool)
+		toSend := make(map[token_details.TokenDetails]bool)
 
 		for _, announcement := range announcements {
 			// write the winner into the database
@@ -84,7 +85,7 @@ func main() {
 					k.Message = "Transaction won more than instant send threshold, sending instantly!"
 				})
 
-				toSend[tokenShortName] = true
+				toSend[tokenDetails] = true
 
 				continue
 
@@ -93,7 +94,7 @@ func main() {
 					k.Message = "Total pending rewards are greater than threshold, sending!"
 				})
 
-				toSend[tokenShortName] = true
+				toSend[tokenDetails] = true
 
 				continue
 			}

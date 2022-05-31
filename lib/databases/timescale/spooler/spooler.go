@@ -136,8 +136,10 @@ func UnpaidWinningsForToken(token token_details.TokenDetails) *big.Int {
 	return &total.Int
 }
 
-func GetAndRemoveRewardsForToken(shortName string) []worker.EthereumWinnerAnnouncement {
+func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.EthereumWinnerAnnouncement {
 	timescaleClient := timescale.Client()
+
+	shortName := token.TokenShortName
 
 	statementText := fmt.Sprintf(
 		`UPDATE %s
