@@ -14,3 +14,4 @@
 /web/solana.fluidity.money/public/img/Aurora/AuroraLogoTextBelow.svg filter=lfs diff=lfs merge=lfs -text
 /web/solana.fluidity.money/public/img/chevronDown.svg filter=lfs diff=lfs merge=lfs -text
 /web/solana.fluidity.money/public/img/chevronUp.svg filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/images/fluiditylogo.svg filter=lfs diff=lfs merge=lfs -text
