@@ -117,11 +117,11 @@ func getRmqQueues(rmqAddress, vhost string) (rmqQueuesResponse, error) {
 // Returns array of queue structs from RMQ
 func getVhosts(rmqAddress string) (vhostsResponse, error) {
 	queueManagementUri, err := getManagementUrlFromAddr(rmqAddress)
-	queueManagementUri += fmt.Sprintf("/%s/%s", "api", "vhosts")
-
 	if err != nil {
 		return nil, err
 	}
+
+	queueManagementUri += fmt.Sprintf("/%s/%s", "api", "vhosts")
 
 	res, err := http.Get(queueManagementUri)
 	if err != nil {
