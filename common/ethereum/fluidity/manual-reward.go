@@ -5,8 +5,8 @@ import (
 )
 
 var ManualRewardArguments = ethAbi.Arguments{
-	ethAbiMustArgument("txHash",     "bytes32"),
-	ethAbiMustArgument("from",       "address"),
-	ethAbiMustArgument("to",         "address"),
-	ethAbiMustArgument("win_amount", "uint256"),
+	ethAbiMustArgument("winner",      "address"),
+	ethAbiMustArgument("win_amount",  "uint256"),
+	ethAbiMustArgument("first_block", "uint256"),
+	ethAbiMustArgument("last_block",  "uint256"),
 }

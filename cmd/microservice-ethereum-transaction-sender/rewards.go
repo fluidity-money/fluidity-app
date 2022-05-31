@@ -72,6 +72,7 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 		client,
 		contractAddress,
 		transactionOptions,
+		// TODO
 		containerAnnouncement,
 	)
 
