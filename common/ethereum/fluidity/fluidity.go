@@ -26,25 +26,12 @@ const fluidityContractAbiString = `[
     },
     {
       "inputs": [
-        { "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
-        { "internalType": "address", "name": "from", "type": "address" },
-        { "internalType": "address", "name": "to", "type": "address" },
-        { "internalType": "uint256[]", "name": "balls", "type": "uint256[]" },
-        { "internalType": "uint256[]", "name": "payouts", "type": "uint256[]" }
-      ],
-      "name": "reward",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
         {
           "components": [
-            { "internalType": "address", "name": "from_address", "type": "address" },
-            { "internalType": "address", "name": "to_address", "type": "address" },
+            { "internalType": "address", "name": "winner", "type": "address" },
             { "internalType": "uint256", "name": "win_amount", "type": "uint256" },
-            { "internalType": "bytes32", "name": "transaction_hash", "type": "bytes32" }
+            { "internalType": "uint256", "name": "first_block", "type": "uint256" },
+            { "internalType": "uint256", "name": "last_block", "type": "uint256" },
           ],
           "internalType": "struct Winner[]",
           "name": "rewards",
@@ -68,11 +55,9 @@ const fluidityContractAbiString = `[
   {
 	  "anonymous": false,
 	  "inputs": [
-	    { "indexed": false, "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
-	    { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
-	    { "indexed": false, "internalType": "uint256", "name": "fromAmount", "type": "uint256" },
-	    { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
-	    { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+	    { "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
+	    { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
+	    { "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" },
 	  ],
 	  "name": "Reward",
 	  "type": "event"
@@ -81,11 +66,12 @@ const fluidityContractAbiString = `[
 
 var fluidityContractAbi ethAbi.ABI
 
+// the Reward struct from solidity, to be passed to batchReward
 type RewardArg struct {
-	FromAddress     ethCommon.Address `json:"from"`
-	ToAddress       ethCommon.Address `json:"to"`
-	WinAmount       *big.Int          `json:"amount"`
-	TransactionHash ethCommon.Hash    `json:"transaction_hash"`
+	Winner     ethCommon.Address `json:"from"`
+	WinAmount  *big.Int          `json:"amount"`
+	FirstBlock *big.Int          `json:"first_block"`
+	LastBlock  *big.Int          `json:"last_block"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -130,7 +116,8 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumWinnerAnnouncement) (*ethTypes.Transaction, error) {
+// TODO
+func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
 		fluidityContractAbi,
@@ -143,22 +130,22 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 
 	for i, reward := range announcement {
 		var (
-			hashString = reward.TransactionHash.String()
-			fromString = reward.FromAddress.String()
-			toString = reward.ToAddress.String()
+			winnerString = reward.Winner.String()
 			amountInt = reward.WinAmount
+			firstBlockInt = reward.FirstBlock
+			lastBlockInt = reward.LastBlock
 
-			hash = ethCommon.HexToHash(hashString)
-			from = ethCommon.HexToAddress(fromString)
-			to = ethCommon.HexToAddress(toString)
+			winner = ethCommon.HexToAddress(winnerString)
 			amount = &amountInt.Int
+			firstBlock = &firstBlockInt.Int
+			lastBlock = &lastBlockInt.Int
 		)
 
 		rewardArg := RewardArg {
-			TransactionHash: hash,
-			FromAddress: from,
-			ToAddress: to,
+			Winner: winner,
 			WinAmount: amount,
+			FirstBlock: firstBlock,
+			LastBlock: lastBlock,
 		}
 
 		rewards[i] = rewardArg
