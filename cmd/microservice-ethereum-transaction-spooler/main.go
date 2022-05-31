@@ -45,19 +45,22 @@ func main() {
 
 		for _, announcement := range announcements {
 			// write the winner into the database
-			spooler.InsertPendingWinner(announcement)
+			spooler.InsertPendingWinners(announcement)
 
 			var (
-				winAmount      = announcement.WinAmount
-				tokenDetails   = announcement.TokenDetails
-				tokenShortName = tokenDetails.TokenShortName
-				tokenDecimals  = tokenDetails.TokenDecimals
+				// the sender's winnings will always be higher than the recipient's
+				fromWinAmount = announcement.FromWinAmount
+				tokenDetails  = announcement.TokenDetails
+				tokenDecimals = tokenDetails.TokenDecimals
 			)
 
 			tokenDecimalsNum := bigExp10(int64(tokenDecimals))
 
-			scaledWinAmount := new(misc.BigInt).Div(&winAmount.Int, tokenDecimalsNum)
+			scaledWinAmount := new(misc.BigInt).Div(&fromWinAmount.Int, tokenDecimalsNum)
 
+			log.Debug(func (k *log.Log) {
+			    k.Format("base amt $%s, decimals $%s", fromWinAmount.String(), tokenDecimalsNum.String())
+			})
 			log.Debug(func(k *log.Log) {
 				k.Format(
 					"Reward value is $%s, instant send threshhold is $%d.",

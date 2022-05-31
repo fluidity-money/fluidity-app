@@ -31,7 +31,7 @@ const fluidityContractAbiString = `[
             { "internalType": "address", "name": "winner", "type": "address" },
             { "internalType": "uint256", "name": "win_amount", "type": "uint256" },
             { "internalType": "uint256", "name": "first_block", "type": "uint256" },
-            { "internalType": "uint256", "name": "last_block", "type": "uint256" },
+            { "internalType": "uint256", "name": "last_block", "type": "uint256" }
           ],
           "internalType": "struct Winner[]",
           "name": "rewards",
@@ -57,7 +57,7 @@ const fluidityContractAbiString = `[
 	  "inputs": [
 	    { "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
 	    { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
-	    { "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" },
+	    { "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
 	  ],
 	  "name": "Reward",
 	  "type": "event"
@@ -116,7 +116,6 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-// TODO
 func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,

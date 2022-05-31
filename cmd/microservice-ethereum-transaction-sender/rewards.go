@@ -17,7 +17,7 @@ import (
 // callRewardArguments provided to callRewardFunction
 type callRewardArguments struct {
 	transactionOptions       *ethAbiBind.TransactOpts
-	containerAnnouncement    []worker.EthereumWinnerAnnouncement
+	containerAnnouncement    []worker.EthereumSpooledRewards
 	contractAddress          ethCommon.Address
 	client                   *ethclient.Client
 	useHardhatFix            bool
@@ -72,7 +72,6 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 		client,
 		contractAddress,
 		transactionOptions,
-		// TODO
 		containerAnnouncement,
 	)
 

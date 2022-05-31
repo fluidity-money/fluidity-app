@@ -98,25 +98,29 @@ func main() {
 				continue
 			}
 
-			winningAmount := sourcePayouts[winningBalls-1]
+			fromWinAmount, toWinAmount := calculatePayouts(sourcePayouts, winningBalls)
 
 			log.App(func(k *log.Log) {
 				k.Format(
-					"Transaction hash %#v with transaction from %#v to %#v has won: %v",
+					"Transaction hash %#v with transaction from %#v to %#v has won: %#v won %s,%#v won %s",
 					announcementTransactionHash,
 					fromAddress,
 					toAddress,
-					winningAmount,
+					fromAddress,
+					fromWinAmount.String(),
+					toAddress,
+					toWinAmount.String(),
 				)
 			})
 
 			winAnnouncement := worker.EthereumWinnerAnnouncement {
 				TransactionHash: announcementTransactionHash,
-				BlockNumber:     blockNumber,
-				FromAddress:     fromAddress,
-				ToAddress:       toAddress,
-				WinAmount:       winningAmount,
-				TokenDetails:    tokenDetails,
+				BlockNumber:   blockNumber,
+				FromAddress:   fromAddress,
+				FromWinAmount: fromWinAmount,
+				ToAddress:     toAddress,
+				ToWinAmount:   toWinAmount,
+				TokenDetails:  tokenDetails,
 			}
 
 			winAnnouncements = append(winAnnouncements, winAnnouncement)
