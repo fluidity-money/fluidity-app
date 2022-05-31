@@ -1,6 +1,6 @@
 import {UseSolana} from "@saberhq/use-solana";
-import {Transaction as SolanaTxn, TransactionInstruction, PublicKey, sendAndConfirmRawTransaction, SendTransactionError, SystemProgram} from '@solana/web3.js';
-import {getATAAddress, getOrCreateATA, Token} from '@saberhq/token-utils';
+import {Transaction as SolanaTxn, TransactionInstruction, PublicKey, SendTransactionError} from '@solana/web3.js';
+import {getATAAddressSync, getOrCreateATA, Token} from '@saberhq/token-utils';
 import * as splToken from '@solana/spl-token';
 import {TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {FluidityInstruction} from "util/solana/FluidityInstruction";
@@ -12,7 +12,7 @@ import {getFluidInstructionKeys} from "./transactionUtils";
 
 //internal method
 const wrapOrUnwrapSpl = async (
-  sol: UseSolana,
+  sol: UseSolana<any>,
   token: Token,
   fluidToken: Token,
   fluidityInstruction: FluidityInstruction,
@@ -25,11 +25,13 @@ const wrapOrUnwrapSpl = async (
   
   const ataResult = await getOrCreateATA({provider: sol.providerMut, mint: token.mintAccount});
   const fluidAtaResult = await getOrCreateATA({provider: sol.providerMut, mint: fluidToken.mintAccount});
-
   
   //create the transaction
   const transaction = new SolanaTxn({
-    feePayer: sol.publicKey
+    feePayer: sol.publicKey,
+    // populate with dummy values
+    blockhash: "",
+    lastValidBlockHeight: 0,
   })
 
   //add instructions to create missing ATAs
@@ -59,26 +61,33 @@ const wrapOrUnwrapSpl = async (
   });
 
   //fetch blockhash
-  const {blockhash: recentBlockhash} = await sol.connection.getRecentBlockhash();
+  const {blockhash, lastValidBlockHeight} = await sol.connection.getLatestBlockhash();
   if (!sol.wallet.connected)
     await sol.wallet.connect();
 
   //add blockhash and main swap instruction
-  transaction.recentBlockhash = recentBlockhash;
+  transaction.recentBlockhash = blockhash;
+  transaction.lastValidBlockHeight = lastValidBlockHeight;
   transaction.add(instruction);
 
+  // sign
   const signedTxn = await sol.wallet.signTransaction(transaction);
-
-  return await sendAndConfirmRawTransaction(
-    sol.sendConnection,
-    signedTxn.serialize(),
-  );
+  // send
+  const signature = await sol.sendConnection.sendRawTransaction(signedTxn.serialize())
+  // await confirmation
+  await sol.sendConnection.confirmTransaction({
+    signature,
+    blockhash,
+    lastValidBlockHeight,
+  })
+  // return hash
+  return signature;
 }
 
 
 //wrapper's wrapper functions
 export const wrapSpl = async(
-  sol: UseSolana,
+  sol: UseSolana<any>,
   fluidToken: Token,
   amount: TokenAmount,
   obligationAccount: PublicKey,
@@ -102,7 +111,7 @@ export const wrapSpl = async(
 }
 
 export const unwrapSpl = async(
-  sol: UseSolana,
+  sol: UseSolana<any>,
   fluidToken: Token,
   amount: TokenAmount,
   obligationAccount: PublicKey,
@@ -140,7 +149,7 @@ export const getRecipientATA = async(recipient: PublicKey, mint: PublicKey, prov
   if (owner.equals(TOKEN_PROGRAM_ID))
     recipientATA = recipient;
   else {
-    const maybeATA = await getATAAddress({mint, owner: recipient});
+    const maybeATA = getATAAddressSync({mint, owner: recipient});
     //getInfo to check if it exists
     const maybeATAInfo = await provider.getAccountInfo(maybeATA)
 
@@ -152,7 +161,7 @@ export const getRecipientATA = async(recipient: PublicKey, mint: PublicKey, prov
 
 //send a token, returning either the successful transaction hash, or null for failure, 
 //e.g. if the ATA doesn't exist or is invalid
-export const sendSol = async (sol: UseSolana, recipient: PublicKey, amount: TokenAmount, addError: (e: string) => void): Promise<string | null> => {
+export const sendSol = async (sol: UseSolana<any>, recipient: PublicKey, amount: TokenAmount, addError: (e: string) => void): Promise<string | null> => {
   if (!sol.wallet || !sol.publicKey || !sol.connected || !sol.providerMut)
     throw({message: "Not connected to wallet!"})
 
@@ -164,6 +173,9 @@ export const sendSol = async (sol: UseSolana, recipient: PublicKey, amount: Toke
   //create the txn
   const transaction = new SolanaTxn({
     feePayer: publicKey,
+    // use dummy values and update later
+    blockhash: "",
+    lastValidBlockHeight: 0,
   });
 
   // add instruction to create ata if not exists
@@ -195,11 +207,12 @@ export const sendSol = async (sol: UseSolana, recipient: PublicKey, amount: Toke
     recipientAddress = recipientATA.address;
   }
   //get blockhash
-  const {blockhash: recentBlockhash} = await sol.connection.getRecentBlockhash();
+  const {blockhash, lastValidBlockHeight} = await sol.connection.getLatestBlockhash();
   if (!sol.wallet.connected)
     await sol.wallet.connect();
 
-  transaction.recentBlockhash = recentBlockhash;
+  transaction.recentBlockhash = blockhash;
+  transaction.lastValidBlockHeight = lastValidBlockHeight;
     
   // add the send instruction
   transaction.add(
@@ -214,11 +227,18 @@ export const sendSol = async (sol: UseSolana, recipient: PublicKey, amount: Toke
   )
 
   try {
+    // sign
     const signedTxn = await sol.wallet.signTransaction(transaction);
-    return await sendAndConfirmRawTransaction(
-      sol.sendConnection,
-      signedTxn.serialize(),
-    );
+    // send
+    const signature = await sol.sendConnection.sendRawTransaction(signedTxn.serialize())
+    // await confirmation
+    await sol.sendConnection.confirmTransaction({
+      signature,
+      blockhash,
+      lastValidBlockHeight,
+    })
+    // return hash
+    return signature;
   } catch (e: unknown) {
     const sendError = e as SendTransactionError;
     if (sendError.message?.search('0x1') !== -1)

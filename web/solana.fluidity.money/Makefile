@@ -18,6 +18,7 @@ FRONTEND_BUILD_ASSET_MANIFEST := \
 FRONTEND_BUILD_DIR := build
 
 include ../../web.mk
+include config.mk
 
 js: ${FRONTEND_BUILD_ASSET_MANIFEST}
 

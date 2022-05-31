@@ -1,6 +1,6 @@
 
 DOCKER := docker
-NPX_REACTSCRIPTS := npx react-scripts
+NPX_REACTSCRIPTS := npx react-app-rewired
 NPX_SASS := npx sass --no-color
 
 TS_SRC := $(shell find src -name '*.ts*')

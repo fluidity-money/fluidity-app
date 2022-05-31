@@ -11,7 +11,7 @@ export interface walletDataType {
 }
 
 const getWalletSPLStatus = async (
-    sol: UseSolana,
+    sol: UseSolana<any>,
     tokens: FluidTokens | null,
     fluidTokensList: FluidTokenList,
     nonFluidTokensList: FluidTokenList,
