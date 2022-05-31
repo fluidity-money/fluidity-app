@@ -94,6 +94,13 @@ type (
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
 	}
 
+	EthereumSpooledRewards struct {
+		Winner     ethereum.Address `json:"winner"`
+		WinAmount  *misc.BigInt     `json:"amount"`
+		FirstBlock *misc.BigInt     `json:"first_block"`
+		LastBlock  *misc.BigInt     `json:"last_block"`
+	}
+
 	EthereumBlockLog struct {
 		BlockHash    ethereum.Hash          `json:"block_hash"`
 		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
