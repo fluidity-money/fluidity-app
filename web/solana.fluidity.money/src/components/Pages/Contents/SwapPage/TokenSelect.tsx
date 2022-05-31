@@ -1,6 +1,6 @@
 import TokenSelection from "components/Modal/Themes/TokenSelection";
 import { useContext, useEffect } from "react";
-import { modalToggle, tokenListContext } from "components/context";
+import { ModalToggle, TokenListContext } from "components/context";
 import Icon from "components/Icon";
 import { useFluidToken } from "util/hooks";
 import { TokenInfo } from "util/hooks/useFluidTokens";
@@ -14,25 +14,25 @@ const TokenSelect = ({
   type: string;
   toggle?: () => void;
 }) => {
-  const [selectedToken] = useContext(modalToggle).selectedToken;
-  const [selectedFluidToken] = useContext(modalToggle).selectedFluidToken;
+  const [selectedToken] = useContext(ModalToggle).selectedToken;
+  const [selectedFluidToken] = useContext(ModalToggle).selectedFluidToken;
 
   const { fluidTokensList, nonFluidTokensList } = useFluidToken();
 
   // accesses tokens from context
-  const selectTokens = useContext(tokenListContext).selectTokens;
-  const setSelectTokens = useContext(tokenListContext).setSelectTokens;
-  const selectFluidTokens = useContext(tokenListContext).selectFluidTokens;
+  const selectTokens = useContext(TokenListContext).selectTokens;
+  const setSelectTokens = useContext(TokenListContext).setSelectTokens;
+  const selectFluidTokens = useContext(TokenListContext).selectFluidTokens;
   const setSelectFluidTokens =
-    useContext(tokenListContext).setSelectFluidTokens;
+    useContext(TokenListContext).setSelectFluidTokens;
   // accesses pinned tokens from context
-  const selectPinnedTokens = useContext(tokenListContext).selectPinnedTokens;
+  const selectPinnedTokens = useContext(TokenListContext).selectPinnedTokens;
   const setSelectPinnedTokens =
-    useContext(tokenListContext).setSelectPinnedTokens;
+    useContext(TokenListContext).setSelectPinnedTokens;
   const selectPinnedFluidTokens =
-    useContext(tokenListContext).selectPinnedFluidTokens;
+    useContext(TokenListContext).selectPinnedFluidTokens;
   const setSelectPinnedFluidTokens =
-    useContext(tokenListContext).setSelectPinnedFluidTokens;
+    useContext(TokenListContext).setSelectPinnedFluidTokens;
 
   // gets each token amount
   const getAmounts = () => {};

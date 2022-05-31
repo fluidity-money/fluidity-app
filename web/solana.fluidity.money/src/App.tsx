@@ -5,13 +5,13 @@ import Wallet from "./components/Pages/Wallet";
 import WalletSend from "./components/Pages/WalletSend";
 import WalletHistory from "./components/Pages/WalletHistory";
 import {
-  LoadingStatus,
+  ILoadingStatus,
   LoadingStatusToggle,
-  tokenListContext,
   TokenListContext,
-  userActionContext,
+  ITokenListContext,
+  UserActionContext,
 } from "components/context";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import LoadingStatusModal from "components/Modal/Themes/LoadingStatusModal";
 import { SolanaProvider } from "@saberhq/use-solana";
 import ProtectedRoute from "components/Routes/ProtectedRoute";
@@ -51,7 +51,7 @@ const App = () => {
     setLoadingToggler(state);
   };
 
-  const loadingToggleProps: LoadingStatus = {
+  const loadingToggleProps: ILoadingStatus = {
     toggle: [loadingToggler, loadingModalToggle],
   };
   /* ### Base State for API context ### */
@@ -105,16 +105,11 @@ const App = () => {
     ...fluidTokensList,
   ]);
 
-  useEffect(() => {
-    let count = 0;
-    if (count < 1) {
-      count++;
-      setSelectFluidTokens(() => [...fluidTokensList]);
-      setSelectPinnedFluidTokens(() => [...fluidTokensList]);
-      setSelectTokens(() => [...nonFluidTokensList]);
-      setSelectPinnedTokens(() => [...nonFluidTokensList]);
-      console.log("hey!");
-    }
+  useMemo(() => {
+    setSelectFluidTokens(() => [...fluidTokensList]);
+    setSelectPinnedFluidTokens(() => [...fluidTokensList]);
+    setSelectTokens(() => [...nonFluidTokensList]);
+    setSelectPinnedTokens(() => [...nonFluidTokensList]);
   }, [fluidTokensList, nonFluidTokensList]);
 
   // persists tokens data in token select modal
@@ -149,7 +144,7 @@ const App = () => {
   ]);
 
   // token info for context for token select modal
-  const tokenListInfo: TokenListContext = {
+  const tokenListInfo: ITokenListContext = {
     selectPinnedTokens: selectPinnedTokens,
     setSelectPinnedTokens: setSelectPinnedTokens,
     selectPinnedFluidTokens: selectPinnedFluidTokens,
@@ -189,8 +184,8 @@ const App = () => {
         {/* Loading Status context toggle provider */}
         <LoadingStatusToggle.Provider value={loadingToggleProps}>
           {/* Context for user actions recieved over WS, to support dynamic updates */}
-          <userActionContext.Provider value={userActions}>
-            <tokenListContext.Provider value={tokenListInfo}>
+          <UserActionContext.Provider value={userActions}>
+            <TokenListContext.Provider value={tokenListInfo}>
               {/* Renders App triggers on load (such as auto logging into wallet) */}
               {/* Loads specifically one route at a time */}
               <ErrorBoundary>
@@ -259,8 +254,8 @@ const App = () => {
                   />
                 </NotificationContainer>
               </ErrorBoundary>
-            </tokenListContext.Provider>
-          </userActionContext.Provider>
+            </TokenListContext.Provider>
+          </UserActionContext.Provider>
         </LoadingStatusToggle.Provider>
       </SolanaProvider>
     </Router>

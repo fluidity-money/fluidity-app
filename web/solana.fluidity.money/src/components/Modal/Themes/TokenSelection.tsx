@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import GenericModal from "components/Modal";
-import { modalToggle } from "components/context";
+import { ModalToggle } from "components/context";
 import Button from "components/Button";
 import { TokenKind, TokenList } from "components/types";
 import {
@@ -26,10 +26,10 @@ const TokenSelection = ({
   changePinned: (token: TokenInfo) => void;
   resetLists: () => void;
 }) => {
-  const [toggleFrom, togglerFrom] = useContext(modalToggle).toggleFrom;
-  const [toggleTo, togglerTo] = useContext(modalToggle).toggleTo;
-  const setterToken = useContext(modalToggle).selectedToken[1];
-  const setterFluidToken = useContext(modalToggle).selectedFluidToken[1];
+  const [toggleFrom, togglerFrom] = useContext(ModalToggle).toggleFrom;
+  const [toggleTo, togglerTo] = useContext(ModalToggle).toggleTo;
+  const setterToken = useContext(ModalToggle).selectedToken[1];
+  const setterFluidToken = useContext(ModalToggle).selectedFluidToken[1];
 
   const setToken = (type: string, value: TokenKind["symbol"]) => {
     switch (type) {
@@ -48,7 +48,6 @@ const TokenSelection = ({
 
   const renderedTokenSet = tokenList.map(
     (item, index, tokenList, { token, config } = item) => {
-      // console.log(config.pinned);
       return (
         <div className="token-list-item" key={`${index}${token}`}>
           <Button
