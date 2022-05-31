@@ -688,6 +688,7 @@ func main() {
 
 			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
+				BlockNumber:     &blockNumber,
 				FromAddress:     senderAddress,
 				ToAddress:       recipientAddress,
 				SourceRandom:    randomSource,

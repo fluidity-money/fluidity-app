@@ -41,6 +41,7 @@ func main() {
 
 			var (
 				announcementTransactionHash = announcement.TransactionHash
+				blockNumber                 = announcement.BlockNumber
 				fromAddress                 = announcement.FromAddress
 				toAddress                   = announcement.ToAddress
 				sourceRandom                = announcement.SourceRandom
@@ -111,10 +112,11 @@ func main() {
 
 			winAnnouncement := worker.EthereumWinnerAnnouncement {
 				TransactionHash: announcementTransactionHash,
-				FromAddress: fromAddress,
-				ToAddress: toAddress,
-				WinAmount: winningAmount,
-				TokenDetails: tokenDetails,
+				BlockNumber:     blockNumber,
+				FromAddress:     fromAddress,
+				ToAddress:       toAddress,
+				WinAmount:       winningAmount,
+				TokenDetails:    tokenDetails,
 			}
 
 			winAnnouncements = append(winAnnouncements, winAnnouncement)

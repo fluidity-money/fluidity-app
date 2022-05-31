@@ -78,6 +78,7 @@ type (
 	// the contract with
 	EthereumAnnouncement struct {
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		BlockNumber     *misc.BigInt               `json:"block_number"`
 		FromAddress     ethereum.Address           `json:"from_address"`
 		ToAddress       ethereum.Address           `json:"to_address"`
 		SourceRandom    []uint32                   `json:"random_source"`
@@ -88,6 +89,7 @@ type (
 
 	EthereumWinnerAnnouncement struct {
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		BlockNumber     *misc.BigInt               `json:"block_number"`
 		FromAddress     ethereum.Address           `json:"from_address"`
 		ToAddress       ethereum.Address           `json:"to_address"`
 		WinAmount       *misc.BigInt               `json:"win_amount"`

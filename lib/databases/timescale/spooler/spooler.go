@@ -35,14 +35,15 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 	timescaleClient := timescale.Client()
 
 	var (
-		tokenDetails = winner.TokenDetails
+		tokenDetails     = winner.TokenDetails
 
-		tokenShortName = tokenDetails.TokenShortName
-		tokenDecimals = tokenDetails.TokenDecimals
-		hash = winner.TransactionHash
-		senderAddress = winner.FromAddress
+		tokenShortName   = tokenDetails.TokenShortName
+		tokenDecimals    = tokenDetails.TokenDecimals
+		hash             = winner.TransactionHash
+		blockNumber      = winner.BlockNumber
+		senderAddress    = winner.FromAddress
 		recipientAddress = winner.ToAddress
-		winAmount = winner.WinAmount
+		winAmount        = winner.WinAmount
 	)
 
 	statementText := fmt.Sprintf(
@@ -52,7 +53,8 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 			transaction_hash,
 			sender_address,
 			recipient_address,
-			win_amount
+			win_amount,
+			block_number
 		)
 
 		VALUES (
@@ -61,7 +63,8 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 			$3,
 			$4,
 			$5,
-			$6
+			$6,
+			$7
 		);`,
 
 		TablePendingWinners,
@@ -75,6 +78,7 @@ func InsertPendingWinner(winner worker.EthereumWinnerAnnouncement) {
 		senderAddress,
 		recipientAddress,
 		winAmount,
+		blockNumber,
 	)
 
 	if err != nil {
