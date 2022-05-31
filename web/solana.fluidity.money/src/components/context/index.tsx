@@ -14,7 +14,7 @@ export interface SwapModalStatus {
   ]; // Selected fluid token
 }
 
-export const modalToggle = React.createContext<SwapModalStatus>({
+export const ModalToggle = React.createContext<SwapModalStatus>({
   toggleTo: [false, () => {}],
   toggleFrom: [false, () => {}],
   selectedToken: ["Select Token", (input) => {}],
@@ -22,18 +22,18 @@ export const modalToggle = React.createContext<SwapModalStatus>({
 });
 
 // Context for loading status modal
-export interface LoadingStatus {
+export interface ILoadingStatus {
   toggle: [boolean, (state: boolean) => void]; // [state of toggle, toggle function]
 }
 
-export const LoadingStatusToggle = React.createContext<LoadingStatus>({
+export const LoadingStatusToggle = React.createContext<ILoadingStatus>({
   toggle: [false, () => {}],
 });
 
-export const userActionContext = React.createContext<Routes["/my-history"]>([]);
+export const UserActionContext = React.createContext<Routes["/my-history"]>([]);
 
 // interface for token select tokens context
-export interface TokenListContext {
+export interface ITokenListContext {
   selectPinnedTokens: FluidTokenList;
   setSelectPinnedTokens: React.Dispatch<React.SetStateAction<FluidTokenList>>;
   selectPinnedFluidTokens: FluidTokenList;
@@ -46,7 +46,7 @@ export interface TokenListContext {
   setSelectFluidTokens: React.Dispatch<React.SetStateAction<FluidTokenList>>;
 }
 
-export const tokenListContext = React.createContext<TokenListContext>({
+export const TokenListContext = React.createContext<ITokenListContext>({
   selectPinnedTokens: [],
   selectPinnedFluidTokens: [],
   setSelectPinnedTokens: () => {},
