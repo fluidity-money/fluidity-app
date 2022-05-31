@@ -3,7 +3,6 @@ package main
 import (
 	"strconv"
 
-	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-common-rabbitmq-backlog-checker/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -31,7 +30,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Format("Ready count must be a uint (%v)!", maxReadyCount_)
+			k.Format("ready count must be a uint (%v)!", maxReadyCount_)
 			k.Payload = err
 		})
 	}
@@ -40,26 +39,26 @@ func main() {
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Format("Unacked count must be a uint (%v)!", maxUnackedCount_)
+			k.Format("unacked count must be a uint (%v)!", maxUnackedCount_)
 			k.Payload = err
 		})
 	}
 
-	vhosts, err := lib.GetVhosts(queueAddress)
+	vhosts, err := getVhosts(queueAddress)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Format("Could not retrieve Vhosts from RMQ Management (%v)!", queueAddress)
+			k.Format("could not retrieve Vhosts from RMQ Management (%v)!", queueAddress)
 			k.Payload = err
 		})
 	}
 
 	for _, vhost := range vhosts {
-		queues, err := lib.GetRmqQueues(queueAddress, vhost.Name)
+		queues, err := getRmqQueues(queueAddress, vhost.Name)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format("Could not retrieve queues from RMQ Management (%v)!", queueAddress)
+				k.Format("could not retrieve queues from RMQ Management (%v)!", queueAddress)
 				k.Payload = err
 			})
 		}
@@ -73,7 +72,7 @@ func main() {
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Queue: %v has %v/%v Ready messages, and %v/%v Unacked messages",
+					"queue: %v has %v/%v Ready messages, and %v/%v Unacked messages",
 					name,
 					messagesReady,
 					maxReadyCount,
