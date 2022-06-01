@@ -16,14 +16,26 @@ eg:
 }
 
 */
-@mixin for-below-470 {
-  @media (max-width: 470px) {
+@mixin for-below-380 {
+  @media (max-width: 380px) {
     @content;
   }
 }
 
 @mixin for-below-400 {
   @media (max-width: 399px) {
+    @content;
+  }
+}
+
+@mixin for-below-420 {
+  @media (max-width: 420px) {
+    @content;
+  }
+}
+
+@mixin for-below-470 {
+  @media (max-width: 470px) {
     @content;
   }
 }
