@@ -17,7 +17,6 @@ export \
 	FLU_SOLANA_SOLEND_PROGRAM_ID=ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx \
 	FLU_SOLANA_STARTING_SLOT=latest
 
-
 export \
 	FLU_SOLANA_SABER_RPC_URL=https://saberqltest.aleph.cloud \
 	FLU_SOLANA_SABER_SWAP_PROGRAM_ID=SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ \

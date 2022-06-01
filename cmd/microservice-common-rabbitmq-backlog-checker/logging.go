@@ -1,11 +1,10 @@
 package main
 
 import (
-	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-common-rabbitmq-backlog-checker/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log/slack"
 )
 
-func reportToSlack(queue lib.RmqQueue, messageType string, numMessages uint64, limitMessages uint64) {
+func reportToSlack(queue rmqQueue, messageType string, numMessages uint64, limitMessages uint64) {
 	slack.Notify(
 		slack.ChannelProductionFailures,
 		0,
