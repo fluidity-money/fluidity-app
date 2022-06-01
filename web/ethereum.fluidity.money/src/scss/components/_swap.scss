@@ -67,8 +67,10 @@
     // copy svg offset dimensions
     left: -54px;
     top: -47px;
-    width: 511px;
-    height: 481px;
+    // width: 511px;
+    // height: 481px;
+    width: 130%;
+    height: 130%;
     content: " ";
     z-index: -1;
   }
@@ -109,6 +111,24 @@
   align-items: end;
   gap: 6px;
   padding-right: 6px;
+}
+
+.swap-field-margin {
+  margin-top: 1rem;
+
+  @extend .swap-field-margin;
+  &--aurora {
+    margin-top: 1rem;
+    @include for-below-420 {
+      margin-top: 0.8rem;
+    }
+    @include for-below-400 {
+      margin-top: 0.6rem;
+    }
+    @include for-below-380 {
+      margin-top: 0.4rem;
+    }
+  }
 }
 
 .token-selection-container {
