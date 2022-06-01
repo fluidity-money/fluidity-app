@@ -29,6 +29,7 @@ import { Integrations } from "@sentry/tracing";
 import NotificationAlert from "components/NotificationAlert";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
 import useFluidTokens, { FluidTokenList } from "util/hooks/useFluidTokens";
+import useLocalStorage from "util/hooks/useLocalStorage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -89,59 +90,52 @@ const App = () => {
   const { fluidTokensList, nonFluidTokensList } = useFluidTokens();
 
   // pinned tokens for fluid and non-fluid in token select modal
-  const [selectPinnedTokens, setSelectPinnedTokens] = useState<FluidTokenList>([
-    ...nonFluidTokensList,
-  ]);
+  // const [selectPinnedTokens, setSelectPinnedTokens] = useState<FluidTokenList>([
+  //   ...nonFluidTokensList,
+  // ]);
 
-  const [selectPinnedFluidTokens, setSelectPinnedFluidTokens] =
-    useState<FluidTokenList>([...fluidTokensList]);
+  // const [selectPinnedFluidTokens, setSelectPinnedFluidTokens] =
+  //   useState<FluidTokenList>([...fluidTokensList]);
 
-  // tokens for fluid and non-fluid in token select modal
-  const [selectTokens, setSelectTokens] = useState<FluidTokenList>([
-    ...nonFluidTokensList,
-  ]);
+  // // tokens for fluid and non-fluid in token select modal
+  // const [selectTokens, setSelectTokens] = useState<FluidTokenList>([
+  //   ...nonFluidTokensList,
+  // ]);
 
-  const [selectFluidTokens, setSelectFluidTokens] = useState<FluidTokenList>([
-    ...fluidTokensList,
-  ]);
+  // const [selectFluidTokens, setSelectFluidTokens] = useState<FluidTokenList>([
+  //   ...fluidTokensList,
+  // ]);
 
-  useMemo(() => {
-    setSelectFluidTokens(() => [...fluidTokensList]);
-    setSelectPinnedFluidTokens(() => [...fluidTokensList]);
-    setSelectTokens(() => [...nonFluidTokensList]);
-    setSelectPinnedTokens(() => [...nonFluidTokensList]);
+  const [selectPinnedTokens, setSelectPinnedTokens] = useLocalStorage(
+    "pinned",
+    nonFluidTokensList
+  );
+  const [selectPinnedFluidTokens, setSelectPinnedFluidTokens] = useLocalStorage(
+    "pinned-fluid",
+    fluidTokensList
+  );
+  const [selectTokens, setSelectTokens] = useLocalStorage(
+    "tokens",
+    nonFluidTokensList
+  );
+  const [selectFluidTokens, setSelectFluidTokens] = useLocalStorage(
+    "fluid-tokens",
+    fluidTokensList
+  );
+
+  const [count, setCount] = useLocalStorage("count", 0);
+
+  /* persists tokens data in token select modal and updates persisted
+   token data when changes occur for token select modal */
+  useEffect(() => {
+    if (count < 3) {
+      setCount(count + 1);
+      setSelectFluidTokens(() => [...fluidTokensList]);
+      setSelectPinnedFluidTokens(() => [...fluidTokensList]);
+      setSelectTokens(() => [...nonFluidTokensList]);
+      setSelectPinnedTokens(() => [...nonFluidTokensList]);
+    }
   }, [fluidTokensList, nonFluidTokensList]);
-
-  // persists tokens data in token select modal
-  useEffect(() => {
-    const pinnedData = window.localStorage.getItem("pinned");
-    if (pinnedData) setSelectPinnedTokens(JSON.parse(pinnedData));
-    const pinnedFluidData = window.localStorage.getItem("pinned-fluid");
-    if (pinnedFluidData)
-      setSelectPinnedFluidTokens(JSON.parse(pinnedFluidData));
-    const tokenData = window.localStorage.getItem("tokens");
-    if (tokenData) setSelectTokens(JSON.parse(tokenData));
-    const fluidTokenData = window.localStorage.getItem("fluid-tokens");
-    if (fluidTokenData) setSelectFluidTokens(JSON.parse(fluidTokenData));
-  }, []);
-  // updates persisted token data when changes occur for token select modal
-  useEffect(() => {
-    window.localStorage.setItem("pinned", JSON.stringify(selectPinnedTokens));
-    window.localStorage.setItem(
-      "pinned-fluid",
-      JSON.stringify(selectPinnedFluidTokens)
-    );
-    window.localStorage.setItem("tokens", JSON.stringify(selectTokens));
-    window.localStorage.setItem(
-      "fluid-tokens",
-      JSON.stringify(selectFluidTokens)
-    );
-  }, [
-    selectPinnedTokens,
-    selectPinnedFluidTokens,
-    selectTokens,
-    selectFluidTokens,
-  ]);
 
   // token info for context for token select modal
   const tokenListInfo: ITokenListContext = {
