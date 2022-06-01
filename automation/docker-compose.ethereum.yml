@@ -28,3 +28,14 @@ services:
       - postgres
       - timescale
       - redis
+
+  microservice-ethereum-unspool-rewards:
+    build:
+      context: ../cmd/microservice-ethereum-unspool-rewards
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-unspool-rewards
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+    depends_on:
+      - timescale
+    restart: unless-stopped
