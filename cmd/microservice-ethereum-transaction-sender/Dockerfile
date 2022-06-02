@@ -2,6 +2,8 @@ FROM fluidity/build-container:latest
 
 WORKDIR /usr/local/src/fluidity/cmd/microservice-ethereum-transaction-sender
 
+COPY . .
+
 RUN make
 
 ENTRYPOINT [ \

@@ -18,21 +18,21 @@ const (
 	// EnvPublishAmqpQueueName is the queue to post batched winners down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
-	// EnvInstantRewardThreshhold is the amount (in dollars) above which a
+	// EnvInstantRewardThreshold is the amount (in dollars) above which a
 	// reward should be sent instantly
-	EnvInstantRewardThreshhold = `FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHHOLD`
+	EnvInstantRewardThreshold = `FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD`
 
-	// EnvInstantRewardThreshhold is the amount (in dollars) above which
+	// EnvInstantRewardThreshold is the amount (in dollars) above which
 	// rewards should be sent if the total pending amount of rewards is greater
-	EnvTotalRewardThreshhold = `FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHHOLD`
+	EnvTotalRewardThreshold = `FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD`
 )
 
 func main() {
 	var (
 		rewardsQueue           = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 		batchedRewardsQueue    = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-		instantRewardThreshold = intFromEnvOrFatal(EnvInstantRewardThreshhold)
-		totalRewardThreshold   = intFromEnvOrFatal(EnvTotalRewardThreshhold)
+		instantRewardThreshold = intFromEnvOrFatal(EnvInstantRewardThreshold)
+		totalRewardThreshold   = intFromEnvOrFatal(EnvTotalRewardThreshold)
 	)
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
@@ -55,7 +55,7 @@ func main() {
 
 		log.Debug(func(k *log.Log) {
 			k.Format(
-				"Reward value is $%s, instant send threshhold is $%d.",
+				"Reward value is $%s, instant send threshold is $%d.",
 				scaledWinAmount.String(),
 				instantRewardThreshold,
 			)
@@ -67,7 +67,7 @@ func main() {
 
 		log.Debug(func(k *log.Log) {
 			k.Format(
-				"Total pending rewards are $%s, threshhold is $%d.",
+				"Total pending rewards are $%s, threshold is $%d.",
 				scaledTotalRewards.String(),
 				totalRewardThreshold,
 			)
