@@ -8,5 +8,6 @@ RUN make
 
 ENTRYPOINT [ \
     "wait-for-amqp", \
+    "wait-for-database", \
     "./microservice-ethereum-unspool-rewards.o" \
 ]
