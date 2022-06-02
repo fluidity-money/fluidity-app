@@ -23,6 +23,9 @@ export type FluidToken = {
 
 export type SolTokenList = Array<BaseToken | FluidToken>
 
+/**
+ * @deprecated 
+ */
 export const tokenList: SolTokenList = [
   {
     name: "USD Coin",

@@ -5,7 +5,7 @@ This codebase contains the offchain worker implementation for Fluidity's
 Ethereum deployment.
 
 It takes messages relayed from microservice-ethereum-worker-server, scans for
-winning transactions, and calls the reward contract when a winner is seen.
+winning transactions and relays to the spooler.
 
 ## Environment variables (Ethereum client)
 

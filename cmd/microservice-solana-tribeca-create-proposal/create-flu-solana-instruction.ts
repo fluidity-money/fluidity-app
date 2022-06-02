@@ -4,10 +4,10 @@ import { serialize } from "borsh";
 import BN from "bn.js";
 import { base58_to_binary } from "base58-js";
 
-const SECRET_KEY = process.env.FLU_SOLANA_PAYER as string;
+const SECRET_KEY = process.env.FLU_SOLANA_PAYER_PRIKEY as string;
 
 if (!SECRET_KEY) {
-  throw new Error("FLU_SOLANA_PAYER not provided");
+  throw new Error("FLU_SOLANA_PAYER_PRIKEY not provided");
 }
 
 const FLU_SOLANA_PROGRAM_ID = process.env.FLU_SOLANA_PROGRAM_ID as string;
