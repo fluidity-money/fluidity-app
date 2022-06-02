@@ -8,6 +8,6 @@ RUN make
 
 ENTRYPOINT [ \
     "wait-for-amqp", \
-    "wait-for-database", \
+    "wait-for-database.sh", \
     "./microservice-ethereum-transaction-spooler.o" \
 ]
