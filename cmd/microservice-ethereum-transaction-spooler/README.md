@@ -1,7 +1,8 @@
 
 # microservice-ethereum-transaction-spooler
 
-Caches rewards until a reward with high enough value, or the total value of unpaid rewards is high enough.
+Caches rewards until a reward with high enough value, or the total value
+of unpaid rewards is high enough.
 
 ## Environment variables
 
