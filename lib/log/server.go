@@ -52,7 +52,7 @@ func backoff() {
 		"[%v] [%s:%s] %s %v\n",
 		time.Now(),
 		LoggingLevelApp,
-		"CrashScheduler",
+		LoggingServerContext,
 		message,
 		"",
 	)
