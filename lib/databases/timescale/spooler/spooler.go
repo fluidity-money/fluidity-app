@@ -307,7 +307,7 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
 	return winners
 }
 
-func RemovePendingWinningsByUser(token token_details.TokenDetails, address string) {
+func RemovePendingWinnings(token token_details.TokenDetails, address string, startBlock, endBlock *misc.BigInt) {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -318,6 +318,8 @@ func RemovePendingWinningsByUser(token token_details.TokenDetails, address strin
 		WHERE
 			winner = $1
 			AND token_short_name = $2
+			AND block_number >= $3
+			AND block_number <= $4
 		;`,
 
 		TablePendingWinners,
@@ -327,6 +329,9 @@ func RemovePendingWinningsByUser(token token_details.TokenDetails, address strin
 		statementText,
 		token.TokenShortName,
 		address,
+		token.TokenShortName,
+		startBlock,
+		endBlock,
 	)
 
 	if err != nil {

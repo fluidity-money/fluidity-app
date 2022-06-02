@@ -23,6 +23,7 @@ contract Token is IERC20 {
     event Reward(
         address indexed winner,
         uint amount,
+        uint startBlock,
         uint endBlock
     );
 
@@ -167,9 +168,9 @@ contract Token is IERC20 {
      * @param winner the address being rewarded
      * @param amount the amount being rewarded
      */
-    function rewardFromPool(uint256 lastBlock, address winner, uint256 amount) internal {
+    function rewardFromPool(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
         // mint some fluid tokens from the interest we've accrued
-        emit Reward(winner, amount, lastBlock);
+        emit Reward(winner, amount, firstBlock, lastBlock);
 
         _mint(winner, amount);
     }
@@ -194,7 +195,7 @@ contract Token is IERC20 {
             require(poolAmount >= winner.amount, "reward pool empty");
             poolAmount = poolAmount - winner.amount;
 
-            rewardFromPool(winner.lastBlock, winner.winner, winner.amount);
+            rewardFromPool(winner.firstBlock, winner.lastBlock, winner.winner, winner.amount);
         }
     }
 
@@ -246,7 +247,7 @@ contract Token is IERC20 {
 
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 
-        rewardFromPool(lastBlock, winner, winAmount);
+        rewardFromPool(firstBlock, lastBlock, winner, winAmount);
     }
 
     // remaining functions are taken from OpenZeppelin's ERC20 implementation
