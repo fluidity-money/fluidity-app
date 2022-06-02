@@ -45,7 +45,17 @@ func backoff() {
 		"Sleeping for %v seconds...\n",
 		duration.Seconds(),
 	)
-	logMessage(loggingLevelApp, "CrashScheduler", message, "")
+
+	// manually write since the channel is blocked waiting for backoff
+	fmt.Fprintf(
+		loggingStream,
+		"[%v] [%s:%s] %s %v\n",
+		time.Now(),
+		LoggingLevelApp,
+		"CrashScheduler",
+		message,
+		"",
+	)
 	time.Sleep(duration)
 }
 
