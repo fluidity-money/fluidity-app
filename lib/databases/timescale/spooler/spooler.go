@@ -7,7 +7,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -21,15 +20,6 @@ const (
 	// ethereum spooler to use
 	TablePendingWinners = "ethereum_pending_winners"
 )
-
-type PendingWinner struct {
-	TransactionHash ethereum.Hash
-	FromAddress     ethereum.Address
-	ToAddress       ethereum.Address
-	WinAmount       *misc.BigInt
-	TokenDetails    token_details.TokenDetails
-	RewardSent      bool
-}
 
 func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 	timescaleClient := timescale.Client()
@@ -243,15 +233,14 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
 		`SELECT
 			token_short_name,
 			token_decimals,
-			transaction_hash,
 			address,
 			win_amount,
 			block_number
 		FROM %s
 		WHERE
 			reward_sent = false
-			AND (sender_address = $1
-				 OR recipient_address = $1)
+			AND address = $1
+		;
 		`,
 
 		TablePendingWinners,
