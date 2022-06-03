@@ -103,6 +103,9 @@
   // border-image
   padding: 10px;
   font-family: "Raleway", Arial, Helvetica, sans-serif;
+  @include for-below-400 {
+    padding: 8px 8px 6px 8px;
+  }
 }
 
 .swap-field-right {
@@ -120,9 +123,6 @@
   }
   @include for-below-400 {
     margin-top: 0.6rem;
-  }
-  @include for-below-380 {
-    margin-top: 0.4rem;
   }
 }
 
