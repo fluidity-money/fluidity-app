@@ -91,7 +91,10 @@ func main() {
 				})
 			}
 
-			err = borsh.Deserialize(&trfDataStoreData, trfDataStoreDataBinary[8:])
+			// remove account discriminator from data binary
+			trfDataStoreAccData := trfDataStoreDataBinary[8:]
+
+			err = borsh.Deserialize(&trfDataStoreData, trfDataStoreAccData)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
