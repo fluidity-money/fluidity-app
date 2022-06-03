@@ -7,17 +7,21 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/web"
+	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 type (
 	// RequestManualReward is the API request type for the manual
 	// reward route
 	RequestManualReward struct {
-		TxHash string `json:"transation_hash"`
+		Address string `json:"address"`
+		TokenShortName string `json:"token_short_name"`
 	}
 
 	// ManualRewardPayload is part of the message sent to users
@@ -42,16 +46,18 @@ func manualRewardError(msg string) ResponseManualReward {
 	}
 }
 
-func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, transaction spooler.PendingWinner) ManualRewardPayload {
+func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, reward worker.EthereumSpooledRewards) ManualRewardPayload {
 	var (
-		txHashString = transaction.TransactionHash.String()
-		fromString = transaction.FromAddress.String()
-		toString = transaction.ToAddress.String()
-		amountInt = transaction.WinAmount
-		shortName = transaction.TokenDetails.TokenShortName
+		winnerString = reward.Winner.String()
+		amountInt = reward.WinAmount
+		firstBlockInt = reward.FirstBlock
+		lastBlockInt = reward.LastBlock
+
+		shortName = reward.Token.TokenShortName
 	)
 
 	signer, exists := signers[shortName]
+
 	if !exists {
 		log.Fatal(func (k *log.Log) {
 		    k.Format("Signer for token %s not found!")
@@ -59,17 +65,17 @@ func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, transacti
 	}
 
 	var (
-		txHash = ethCommon.HexToHash(txHashString)
-		from = ethCommon.HexToAddress(fromString)
-		to = ethCommon.HexToAddress(toString)
+		winner = ethCommon.HexToAddress(winnerString)
 		amount = &amountInt.Int
+		firstBlock = &firstBlockInt.Int
+		lastBlock = &lastBlockInt.Int
 	)
 
 	encodedReward, err := fluidity.ManualRewardArguments.Pack(
-		txHash,
-		from,
-		to,
+		winner,
 		amount,
+		firstBlock,
+		lastBlock,
 	)
 
 	if err != nil {
@@ -91,9 +97,6 @@ func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, transacti
 	}
 
 	rewardArg := fluidity.RewardArg {
-		TransactionHash: txHash,
-		FromAddress: from,
-		ToAddress: to,
 		WinAmount: amount,
 	}
 
@@ -127,19 +130,25 @@ func GetManualRewardHandler(signers map[string]*ecdsa.PrivateKey) func(http.Resp
 			return returnForbidden(w)
 		}
 
-		hash := request.TxHash
+		var (
+			addressString = request.Address
+			address = typesEthereum.AddressFromString(addressString)
 
-		transaction := spooler.GetPendingRewardByHash(hash)
+			token = request.TokenShortName
+		)
 
-		if transaction == nil {
-			return manualRewardError("transaction not found")
+		winnings := spooler.GetPendingRewardsForAddress(addressString)
+
+
+		spooledWinnings := ethereum.BatchWinningsByToken(winnings, address)
+
+		tokenWinnings, exists := spooledWinnings[token]
+
+		if !exists {
+			return manualRewardError("no rewards for that token")
 		}
 
-		if transaction.RewardSent {
-			return manualRewardError("reward already sent for this transaction")
-		}
-
-		payload := generateManualRewardPayload(signers, *transaction)
+		payload := generateManualRewardPayload(signers, tokenWinnings)
 
 		res := ResponseManualReward {
 			Error: nil,

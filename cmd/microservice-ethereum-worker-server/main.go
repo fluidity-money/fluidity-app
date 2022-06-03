@@ -607,6 +607,8 @@ func main() {
 			balanceOfUnderlying,
 		)
 
+		var blockAnnouncements []worker.EthereumAnnouncement
+
 		for _, transfer := range fluidTransfers {
 
 			var (
@@ -686,6 +688,7 @@ func main() {
 
 			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
+				BlockNumber:     &blockNumber,
 				FromAddress:     senderAddress,
 				ToAddress:       recipientAddress,
 				SourceRandom:    randomSource,
@@ -705,9 +708,11 @@ func main() {
 			emission.RecipientAddress = recipientAddress.String()
 			emission.SenderAddress = senderAddress.String()
 
-			queue.SendMessage(publishAmqpQueueName, announcement)
+			blockAnnouncements = append(blockAnnouncements, announcement)
 
 			queue.SendMessage(worker.TopicEmissions, emission)
 		}
+
+		queue.SendMessage(publishAmqpQueueName, blockAnnouncements)
 	})
 }

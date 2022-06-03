@@ -21,7 +21,11 @@ import (
 
 const (
 	// FilterEventSignature to use to filter for event signatures
-	FilterEventSignature = `Reward(bytes32,address,uint256,address,uint256)`
+	FilterEventSignature = `Reward(address,uint256,uint256,uint256)`
+
+	// expectedTopicsLen to ensure logs received have the expected number of topics
+	// (sig, winner address)
+	expectedTopicsLen = 2
 
 	// EnvContractAddress to watch where the reward function was called
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
@@ -57,7 +61,7 @@ func main() {
 		})
 	}
 
-	eventSignature := microservice_common_track_winners.HashEventSignature(
+	eventSignature := microservice_ethereum_track_winners.HashEventSignature(
 		FilterEventSignature,
 	)
 
@@ -95,12 +99,12 @@ func main() {
 
 		messageReceivedTime := time.Now()
 
-		if lenLogTopics := len(logTopics); lenLogTopics != 3 {
+		if lenLogTopics := len(logTopics); lenLogTopics != expectedTopicsLen {
 			logging.Debug(func(k *logging.Log) {
 				k.Format(
 					"The number of topics for log transaction %v was expected to be %v, is %v! %v",
 					transactionHash,
-					3,
+					expectedTopicsLen,
 					lenLogTopics,
 					logTopics,
 				)
@@ -131,7 +135,12 @@ func main() {
 			return
 		}
 
-		rewardData, err := fluidity.DecodeRewardData(log)
+		tokenDetails := token_details.New(
+			underlyingTokenName,
+			underlyingTokenDecimals,
+		)
+
+		rewardData, err := fluidity.DecodeRewardData(log, tokenDetails)
 
 		if err != nil {
 			logging.Fatal(func(k *logging.Log) {
@@ -140,23 +149,9 @@ func main() {
 			})
 		}
 
-		winner1, winner2 := microservice_common_track_winners.DecodeWinner(
-			logAddress,
-			transactionHash,
-			rewardData,
-			messageReceivedTime,
-		)
+		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime)
 
-		tokenDetails := token_details.New(
-			underlyingTokenName,
-			underlyingTokenDecimals,
-		)
-
-		winner1.TokenDetails = tokenDetails
-		winner2.TokenDetails = tokenDetails
-
-		queue.SendMessage(winnersPublishTopic, winner1)
-		queue.SendMessage(winnersPublishTopic, winner2)
+		queue.SendMessage(winnersPublishTopic, convertedWinner)
 
 		queue.SendMessage(rewardPublishTopic, rewardData)
 	})
