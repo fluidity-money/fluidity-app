@@ -114,6 +114,7 @@ func main() {
 					)
 				})
 			}
+			tokenDetails[i].Backend = tokenBackend
 
 		case BackendCompound:
 			isCompound = true
