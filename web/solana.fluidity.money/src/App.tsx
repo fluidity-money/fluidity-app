@@ -89,23 +89,7 @@ const App = () => {
 
   const { fluidTokensList, nonFluidTokensList } = useFluidTokens();
 
-  // pinned tokens for fluid and non-fluid in token select modal
-  // const [selectPinnedTokens, setSelectPinnedTokens] = useState<FluidTokenList>([
-  //   ...nonFluidTokensList,
-  // ]);
-
-  // const [selectPinnedFluidTokens, setSelectPinnedFluidTokens] =
-  //   useState<FluidTokenList>([...fluidTokensList]);
-
-  // // tokens for fluid and non-fluid in token select modal
-  // const [selectTokens, setSelectTokens] = useState<FluidTokenList>([
-  //   ...nonFluidTokensList,
-  // ]);
-
-  // const [selectFluidTokens, setSelectFluidTokens] = useState<FluidTokenList>([
-  //   ...fluidTokensList,
-  // ]);
-
+  // using local storage to persist for 4 token select lists
   const [selectPinnedTokens, setSelectPinnedTokens] = useLocalStorage(
     "pinned",
     nonFluidTokensList
@@ -123,6 +107,7 @@ const App = () => {
     fluidTokensList
   );
 
+  // required to not reset the lists once populated
   const [count, setCount] = useLocalStorage("count", 0);
 
   /* persists tokens data in token select modal and updates persisted
