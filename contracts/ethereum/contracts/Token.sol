@@ -6,12 +6,15 @@ import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 import "./LiquidityProvider.sol";
 
+/// @dev sentinel to mark the start of a range iin rewardedBlocks
+uint constant FIRST_REWARDED_BLOCK = 1;
+/// @dev sentinel to mark the end of a range iin rewardedBlocks
+uint constant LAST_REWARDED_BLOCK = 2;
+
 /// @dev parameter for the batchReward function
 struct Winner {
     address winner;
     uint256 amount;
-    uint256 firstBlock;
-    uint256 lastBlock;
 }
 
 /// @title The fluid token ERC20 contract
@@ -52,8 +55,17 @@ contract Token is IERC20 {
     /// @dev deprecated
     mapping (bytes32 => uint) private pastRewards_;
 
-    /// @dev address => block number the user was last rewarded for
-    mapping (address => uint) private lastRewardedBlock_;
+    /// @dev [block number] => [rewarded block state]
+    mapping(uint => uint) rewardedBlocks_;
+
+    uint lastRewardedBlock_;
+
+    /// @dev [address] => [[block number] => [rewarded block state]]
+    mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
+
+    /// @dev amount a user has manually rewarded, to be removed from their batched rewards
+    /// @dev [address] => [amount manually rewarded]
+    mapping (address => uint) private manualRewards_;
 
     /**
      * @notice initializer function - sets the contract's data
@@ -175,27 +187,35 @@ contract Token is IERC20 {
         _mint(winner, amount);
     }
 
-    /**
-     * @notice pays out several rewards
+    /** @notice pays out several rewards
      * @notice only usable by the trusted oracle account
      *
      * @param rewards the array of rewards to pay out
      */
-    function batchReward(Winner[] memory rewards) public {
+    function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         uint poolAmount = rewardPoolAmount();
 
+        rewardedBlocks_[firstBlock] = 1;
+        // this might not happen if our transactions go through out of order
+        if (lastBlock > lastRewardedBlock_) lastRewardedBlock_ = lastBlock;
+
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
 
-            if (winner.firstBlock <= lastRewardedBlock_[winner.winner]) continue; // user decided to frontrun
-            lastRewardedBlock_[winner.winner] = winner.lastBlock;
+            if (manualRewards_[winner.winner] != 0) {
+                uint amount = winner.amount > manualRewards_[winner.winner] ?
+                    manualRewards_[winner.winner] :
+                    winner.amount;
+                winner.amount -= amount;
+                manualRewards_[winner.winner] -= amount;
+            }
 
             require(poolAmount >= winner.amount, "reward pool empty");
             poolAmount = poolAmount - winner.amount;
 
-            rewardFromPool(winner.firstBlock, winner.lastBlock, winner.winner, winner.amount);
+            rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
         }
     }
 
@@ -240,10 +260,20 @@ contract Token is IERC20 {
 
         // user decided to frontrun
         require(
-            lastRewardedBlock_[winner] < firstBlock,
+            manualRewardedBlocks_[winner][firstBlock] == 0,
+            "manual reward already given for part of this range"
+        );
+        require(
+            manualRewardedBlocks_[winner][lastBlock] == 0,
+            "manual reward already given for part of this range"
+        );
+        require(
+            firstBlock > lastRewardedBlock_,
             "reward already given for part of this range"
         );
-        lastRewardedBlock_[winner] = lastBlock;
+        manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
+        manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
+        manualRewards_[winner] += winAmount;
 
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 

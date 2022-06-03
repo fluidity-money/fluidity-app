@@ -36,7 +36,9 @@ const fluidityContractAbiString = `[
           "internalType": "struct Winner[]",
           "name": "rewards",
           "type": "tuple[]"
-        }
+        },
+        { "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
+        { "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
       ],
       "name": "batchReward",
       "outputs": [],
@@ -70,8 +72,6 @@ var fluidityContractAbi ethAbi.ABI
 type RewardArg struct {
 	Winner     ethCommon.Address `json:"from"`
 	WinAmount  *big.Int          `json:"amount"`
-	FirstBlock *big.Int          `json:"first_block"`
-	LastBlock  *big.Int          `json:"last_block"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -125,7 +125,14 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		client,
 	)
 
-	rewards := make([]RewardArg, len(announcement))
+	var (
+		rewards = make([]RewardArg, len(announcement))
+		globalFirstBlock = new(big.Int)
+		globalLastBlock = new(big.Int)
+	)
+
+	// set a default for the min block
+	globalFirstBlock.Set(&announcement[0].FirstBlock.Int)
 
 	for i, reward := range announcement {
 		var (
@@ -140,11 +147,17 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 			lastBlock = &lastBlockInt.Int
 		)
 
+		if firstBlock.Cmp(globalFirstBlock) < 0 {
+			globalFirstBlock.Set(firstBlock)
+		}
+
+		if lastBlock.Cmp(globalLastBlock) > 0 {
+			globalLastBlock.Set(lastBlock)
+		}
+
 		rewardArg := RewardArg {
 			Winner: winner,
 			WinAmount: amount,
-			FirstBlock: firstBlock,
-			LastBlock: lastBlock,
 		}
 
 		rewards[i] = rewardArg
@@ -155,6 +168,8 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		transactionOptions,
 		"batchReward",
 		rewards,
+		globalFirstBlock,
+		globalLastBlock,
 	)
 
 	if err != nil {
