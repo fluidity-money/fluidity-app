@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"math/big"
+	"time"
 
 	utility_gauge "github.com/fluidity-money/fluidity-app/common/solana/utility-gauge"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/payout"
 
 	solana "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -20,6 +23,7 @@ const SABER_ADDR = "Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1"
 const ORCA_ADDR = "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE"
 const GAUGEMEISTER_ADDR = "GvL8ZtvSzttTbvxTefDZzDETbDHeYuAtM9QS6UWSBdGt"
 const rpcUrl = "http://localhost:8899"
+const SOLANA_NETWORK = "devnet"
 
 func main() {
 	var (
@@ -68,14 +72,17 @@ func main() {
 		currentRewardsEpoch  = gaugemeister.CurrentRewardsEpoch
 	)
 
+	current_unix_timestamp := time.Now().Unix()
+
 	// Derive Gauges from whitelisted Protocols
 	// and Gaugemeister
 	whitelistedProtocols = []solana.PublicKey{saberPubkey, orcaPubkey}
 
-	gauges := make([]utility_gauge.Gauge, 0)
-
 	for _, protocolPubkey := range whitelistedProtocols {
-		gaugePubkey, _, err = utility_gauge.DeriveGaugePubkey(gaugemeisterPubkey, protocolPubkey)
+		gaugePubkey, _, err = utility_gauge.DeriveGaugePubkey(
+			gaugemeisterPubkey,
+			protocolPubkey,
+		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -113,17 +120,19 @@ func main() {
 			})
 		}
 
-		gauges = append(gauges, gauge)
-	}
+		var isDisabled = gauge.IsDisabled
 
-	currentRewardPowersTotal = big.NewInt(0)
+		// if isDisabled, Gauge is not participating in this round of voting
+		if isDisabled {
+			continue
+		}
 
-	currentRewardPowers = make([]big.Int, 0)
-
-	// TODO: Cannot differentiate between RPC failures, or if EpochGauge simply did not exist
-	// at past epoch
-	for _, gaugePubkey := range gauges {
-		epochGaugePubkey, _, err = utility_gauge.DeriveEpochGaugePubkey(gaugePubkey, currentRewardsEpoch)
+		// TODO: Cannot differentiate between RPC failures, or if EpochGauge
+		// simply did not exist at past epoch
+		epochGaugePubkey, _, err = utility_gauge.DeriveEpochGaugePubkey(
+			gaugePubkey,
+			currentRewardsEpoch,
+		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -164,7 +173,14 @@ func main() {
 		epochGaugeTotalPower := big.NewInt(0)
 		epochGaugeTotalPower.SetUint64(epochGauge.total_power)
 
-		currentRewardPowersTotal.Add(currentRewardPowers, epochGaugeTotalPower)
-		currentRewardPowers = append(currentRewardPowers, epochGaugeTotalPower)
+		// Save to Postgres
+		currentGaugePower := payout.UtilityGaugePower{
+			Network:  SOLANA_NETWORK,
+			Protocol: misc.Blob(protocolPubkey.Bytes()),
+			Epoch:    currentRewardsEpoch,
+
+			TotalPower: misc.BigIntFromUint64(epochGauge.total_power),
+		}
+
 	}
 }
