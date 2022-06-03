@@ -1,69 +1,70 @@
 .unsupported-container {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-  
-    display: grid;
-    grid-template-columns: 1fr;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
 }
 
 .unsupported-content {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 4rem auto auto 4rem 1fr;
-    grid-gap: 1rem;
-    justify-content: center;
-    align-items: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 4rem auto auto 4rem 1fr;
+  grid-gap: 1rem;
+  justify-content: center;
+  align-items: center;
 }
 
 .return-btn {
-    width: 17rem;
-    height: 3rem;
-    align-self: center;
-    justify-self: center;
-    border-radius: 3rem;
-    background: transparent;
-    border-width: 1px;
-    border-color: #ffff;
-    border-style: solid;
+  width: 17rem;
+  height: 3rem;
+  align-self: center;
+  justify-self: center;
+  border-radius: 3rem;
+  background: transparent;
+  border-width: 1px;
+  border-color: #ffff;
+  border-style: solid;
+  color: white;
 }
 
 .f-logo-container {
-    justify-self: center;
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-gap: 1rem;
+  justify-self: center;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 1rem;
 }
 
 .f-logo-icon {
-    justify-self: right;
+  justify-self: right;
 }
 
 .f-logo-text {
-    justify-self: left;
+  justify-self: left;
 }
 
 .warning-text-heading {
-    justify-self: center;
-    align-self: baseline;
-    font-size: 1.5rem;
-    text-align: center;
+  justify-self: center;
+  align-self: baseline;
+  font-size: 1.5rem;
+  text-align: center;
 }
 .warning-text {
-    justify-self: center;
-    align-self: baseline;
+  justify-self: center;
+  align-self: baseline;
 }
 
 .social-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 2rem;
-    justify-self: center;
-    align-self: baseline;
-    justify-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 2rem;
+  justify-self: center;
+  align-self: baseline;
+  justify-items: center;
 }
