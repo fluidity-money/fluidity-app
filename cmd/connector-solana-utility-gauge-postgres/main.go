@@ -182,5 +182,6 @@ func main() {
 			TotalPower: misc.BigIntFromUint64(epochGauge.total_power),
 		}
 
+		database.InsertUtilityGauge(currentGaugePower)
 	}
 }

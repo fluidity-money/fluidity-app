@@ -18,7 +18,7 @@ const (
 
 type UtilityGaugePower = payout.UtilityGaugePower
 
-func InsertTrfVars(utilityGauge UtilityGaugePower) {
+func InsertUtilityGauge(utilityGauge UtilityGaugePower) {
 	var (
 		network  = utilityGauge.Network
 		protocol = utilityGauge.Protocol
@@ -66,7 +66,7 @@ func InsertTrfVars(utilityGauge UtilityGaugePower) {
 	}
 }
 
-func GetLatestUtilityGaugesVars(network string) []UtilityGaugePower {
+func GetLatestUtilityGauges(network string) []UtilityGaugePower {
 	postgresClient := postgres.Client()
 
 	// fetch the daily average for each day we have data for
