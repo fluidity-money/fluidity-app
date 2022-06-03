@@ -87,7 +87,15 @@ a {
   @extend .gradient-background;
   &--aurora {
     background: url("img/Aurora/AuroraBackground.svg");
-    background-size: 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
   }
 }
 

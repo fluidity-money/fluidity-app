@@ -1,7 +1,8 @@
 
 # microservice-ethereum-transaction-sender
 
-Receives batched transactions from AMQP and calls the reward function on chain.
+Receives batched transactions from AMQP and calls the reward function
+on chain.
 
 ## Environment variables
 

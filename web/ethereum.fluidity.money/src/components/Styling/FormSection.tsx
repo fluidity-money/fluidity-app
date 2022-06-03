@@ -1,4 +1,6 @@
-interface FormSectionProps extends React.ComponentPropsWithoutRef<'div'> {
+import { appTheme } from "util/appTheme";
+
+interface FormSectionProps extends React.ComponentPropsWithoutRef<"div"> {
   children?: JSX.Element | JSX.Element[];
   cname?: string;
   defaultMargin?: boolean;
@@ -11,10 +13,11 @@ const FormSection = ({
   onClickHandler,
   ...props
 }: FormSectionProps) => {
-
   return (
     <div
-      className={`${cname ?? ""} ${defaultMargin === false ? "" : "my-1-t"}`}
+      className={`${cname ?? ""} ${
+        defaultMargin === false ? "" : `swap-field-margin${appTheme} `
+      }`}
       onClick={onClickHandler}
       {...props}
     >

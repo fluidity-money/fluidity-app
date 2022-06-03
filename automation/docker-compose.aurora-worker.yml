@@ -31,17 +31,42 @@ services:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-worker-server-usdt
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-worker-client-usdt
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdt
+      FLU_ETHEREUM_AMQP_PUBLISH_NAME: aurora.winners.usdt
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-aurora-transaction-spooler-usdt:
+    build:
+      context: ../cmd/microservice-ethereum-transaction-spooler
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-spooler-usdt
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: aurora.winners.usdt
+      FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: aurora.winners.batched.usdt
+      FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD}
+      FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
+    restart: unless-stopped 
+
+  microservice-aurora-transaction-sender-usdt:
+    build:
+      context: ../cmd/microservice-ethereum-transaction-sender
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-sender-usdt
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
       FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDT}
       FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDT}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDT}
-      FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdt
-    depends_on:
-      - redis
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.winners.batched.usdt
     restart: unless-stopped
 
   microservice-aurora-worker-server-usdc:
@@ -68,20 +93,46 @@ services:
       - redis
     restart: unless-stopped
 
+
   microservice-aurora-worker-client-usdc:
     build:
       context: ../cmd/microservice-ethereum-worker-client
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-worker-server-usdc
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-worker-client-usdc
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdc
+      FLU_ETHEREUM_AMQP_PUBLISH_NAME: aurora.winners.usdc
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-aurora-transaction-spooler-usdc:
+    build:
+      context: ../cmd/microservice-ethereum-transaction-spooler
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-spooler-usdc
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: aurora.winners.usdc
+      FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: aurora.winners.batched.usdc
+      FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD}
+      FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
+    restart: unless-stopped 
+
+  microservice-aurora-transaction-sender-usdc:
+    build:
+      context: ../cmd/microservice-ethereum-transaction-sender
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-sender-usdc
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_WS_URL: ${FLU_ETHEREUM_WS_URL}
       FLU_ETHEREUM_WORKER_PRIVATE_KEY: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_USDC}
       FLU_ETHEREUM_GAS_LIMIT: ${FLU_ETHEREUM_WORKER_GAS_LIMIT_USDC}
       FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_WORKER_HARDHAT_FIX_USDC}
-      FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.worker.usdc
-    depends_on:
-      - redis
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: aurora.winners.batched.usdc
     restart: unless-stopped

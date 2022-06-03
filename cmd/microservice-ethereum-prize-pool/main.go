@@ -66,6 +66,7 @@ func main() {
 	var (
 		gethAddress                 = util.GetEnvOrFatal(EnvEthereumHttpAddress)
 		tokensList_                 = util.GetEnvOrFatal(EnvTokensList)
+		tokenBackend                = os.Getenv(EnvTokenBackend)
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
 		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
 		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
@@ -84,6 +85,16 @@ func main() {
 
 	gethClient := getGethClient(gethAddress)
 
+	switch tokenBackend {
+	case BackendCompound:
+		isCompound = true
+
+	case BackendAave:
+		isAave = true
+
+	case "":
+	}
+
 	// tokensList will Fatal if bad input
 
 	tokenDetails := ethereum.GetTokensListEthereum(tokensList_)
@@ -93,13 +104,17 @@ func main() {
 		switch backend := token.Backend; backend {
 
 		case "":
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Token backend for option %v at position %d was empty!",
-					backend,
-					i,
-				)
-			})
+			// not set globally
+			if tokenBackend == "" {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Token backend for option %v at position %d was empty!",
+						backend,
+						i,
+					)
+				})
+			}
+			tokenDetails[i].Backend = tokenBackend
 
 		case BackendCompound:
 			isCompound = true

@@ -12,35 +12,33 @@ import {
   UserActionContext,
 } from "components/context";
 import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
-import { TokenKind } from "components/types";
-import { ConnectWalletModal } from "components/Modal";
+import {TokenKind} from "components/types";
 import TransactionConfirmationModal from "components/Modal/Themes/TransactionConfirmationModal.tsx";
-import { getBalanceOfSPL } from "util/contractUtils";
-import { useSolana } from "@saberhq/use-solana";
-import { TokenAmount } from "@saberhq/token-utils";
-import { PublicKey } from "@solana/web3.js";
+import {getBalanceOfSPL} from "util/contractUtils";
+import {useSolana} from "@saberhq/use-solana";
+import {TokenAmount} from '@saberhq/token-utils';
 import useFluidTokens from "util/hooks/useFluidTokens";
 import { unwrapSpl, wrapSpl } from "util/solana/transaction";
 import { bnToDisplayString, tokenValueInputHandler } from "util/numbers";
 import BN from "bn.js";
-import { notificationContext } from "components/Notifications/notificationContext";
+import {notificationContext} from "components/Notifications/notificationContext";
+import {useWalletKit} from "@gokiprotocol/walletkit";
 
 const SwapBox = () => {
   const [amountRaw, setAmountRaw] = useState(""); // Records From amount
   const [amount, setAmount] = useState(""); // Displays from amount (user-friendly)
   const [swap, setSwap] = useState<boolean>(true); // toggles between swap to and from Fluid dollars
   const [paymentModalToggle, setPaymentModalToggle] = useState<boolean>(false); // toggle state for payment modal
-  const [walletSelectionModal, setWalletSelectionModal] =
-    useState<boolean>(false); // toggle state for wallet selection modal
-  const [successTransactionModal, setSuccessTransactionModal] =
-    useState<boolean>(false); // toggle state for the transaction confirmation
-  const [balance, setBalance] = useState("0"); // state to track status of selected fluid amount in wallet
-  const [fbalance, setfBalance] = useState("0"); // state to track amount of selected standard token in wallet
 
-  const { tokens } = useFluidTokens();
+  const [successTransactionModal, setSuccessTransactionModal] = useState<boolean>(false); // toggle state for the transaction confirmation
+  const [balance, setBalance] = useState("0");  // state to track status of selected fluid amount in wallet
+  const [fbalance, setfBalance] = useState("0");  // state to track amount of selected standard token in wallet
+
+  const {tokens} = useFluidTokens();
   const sol = useSolana();
-  const { addError } = useContext(notificationContext);
-
+  const {connect: connectWallet} = useWalletKit();
+  const {addError} = useContext(notificationContext);
+  
   // userActions context to update balance when potentially sending/receiving
   const userActions = useContext(UserActionContext);
 
@@ -108,11 +106,6 @@ const SwapBox = () => {
   // Toggle payment modal
   const switchPayment = () => {
     setPaymentModalToggle(!paymentModalToggle);
-  };
-
-  // Toggle wallet select modal
-  const switchWallet = () => {
-    setWalletSelectionModal(!walletSelectionModal);
   };
 
   // Toggles from and to trade box
@@ -361,16 +354,10 @@ const SwapBox = () => {
           </FormSection>
           <FormSection>
             <Button
-              label={`${
-                sol.connected
-                  ? swap
-                    ? "Fluidify your money"
-                    : "Revert your fluid"
-                  : "Connect to Wallet"
-              }`}
-              goto={() => {
-                sol.connected ? switchPayment() : switchWallet();
-              }}
+              label={`${sol.connected
+                ? swap ? "Fluidify your money" : "Revert your fluid"
+                : "Connect to Wallet"}`}
+              goto={() => { sol.connected ? switchPayment() : connectWallet() }}
               theme={"primary-button raleway bold"}
               padding="py-1"
               disabled={
@@ -389,13 +376,6 @@ const SwapBox = () => {
                       ).greaterThan(0)
                     )
               }
-            />
-            {/* For Connecting to a Wallet */}
-            <ConnectWalletModal
-              enable={walletSelectionModal}
-              toggle={() => switchWallet()}
-              height="auto"
-              width="22.5rem"
             />
             {/* For Transaction Confirmation */}
             <ConfirmPaymentModal

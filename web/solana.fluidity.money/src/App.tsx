@@ -13,13 +13,13 @@ import {
 } from "components/context";
 import { useEffect, useMemo, useState } from "react";
 import LoadingStatusModal from "components/Modal/Themes/LoadingStatusModal";
-import { SolanaProvider } from "@saberhq/use-solana";
+import { WalletKitProvider } from "@gokiprotocol/walletkit";
 import ProtectedRoute from "components/Routes/ProtectedRoute";
 import RouteNotFound from "components/Pages/RouteNotFound";
 import WinNotification from "components/WinNotification";
 import NotificationContainer from "components/Notifications/NotificationContainer";
 import { isChrome, isFirefox, isEdge, isChromium } from "react-device-detect";
-import Unsupported from "./components/Pages/Unsupported";
+import Unsupported from "components/Pages/Unsupported";
 import ApiStateHandler, { ApiState } from "components/ApiStateHandler";
 import Routes, { WebsocketMessage } from "util/api/types";
 import TransactionConfirmationModal from "components/Modal/Themes/TransactionConfirmationModal.tsx";
@@ -158,8 +158,11 @@ const App = () => {
 
   return (
     // React router provider
-    <Router>
-      <SolanaProvider defaultNetwork={network}>
+      <Router>
+      <WalletKitProvider
+        defaultNetwork={network}
+        app={{name: "Fluidity"}}
+      >
         {/* Loading Status context toggle provider */}
         <LoadingStatusToggle.Provider value={loadingToggleProps}>
           {/* Context for user actions recieved over WS, to support dynamic updates */}
@@ -236,7 +239,7 @@ const App = () => {
             </TokenListContext.Provider>
           </UserActionContext.Provider>
         </LoadingStatusToggle.Provider>
-      </SolanaProvider>
+      </WalletKitProvider>
     </Router>
   );
 };

@@ -19,3 +19,7 @@
 /web/solana.fluidity.money/public/img/searchIcon.svg filter=lfs diff=lfs merge=lfs -text
 /web/solana.fluidity.money/public/img/close-button.svg filter=lfs diff=lfs merge=lfs -text
 /web/solana.fluidity.money/public/img/searchNotFound.svg filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/images/fluiditylogo.svg filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/images/favicon.svg filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/images/favicon.png filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/favicon.ico filter=lfs diff=lfs merge=lfs -text
