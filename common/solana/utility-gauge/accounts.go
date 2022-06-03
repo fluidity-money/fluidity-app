@@ -1,28 +1,32 @@
 package utility_gauge
 
+import (
+	solana "github.com/gagliardetto/solana-go"
+)
+
 type (
 	Gaugemeister struct {
-		Base                 ag_solanago.PublicKey
+		Base                 solana.PublicKey
 		Bump                 uint8
-		Rewarder             ag_solanago.PublicKey
-		Operator             ag_solanago.PublicKey
-		Locker               ag_solanago.PublicKey
-		Foreman              ag_solanago.PublicKey
+		Rewarder             solana.PublicKey
+		Operator             solana.PublicKey
+		Locker               solana.PublicKey
+		Foreman              solana.PublicKey
 		EpochDurationSeconds uint32
 		CurrentRewardsEpoch  uint32
 		NextEpochStartsAt    uint64
-		LockerTokenMint      ag_solanago.PublicKey
-		LockerGovernor       ag_solanago.PublicKey
+		LockerTokenMint      solana.PublicKey
+		LockerGovernor       solana.PublicKey
 	}
 
 	Gauge struct {
-		Gaugemeister ag_solanago.PublicKey
-		UtilityMine  ag_solanago.PublicKey
+		Gaugemeister solana.PublicKey
+		UtilityMine  solana.PublicKey
 		IsDisabled   bool
 	}
 
 	EpochGauge struct {
-		Gauge       ag_solanago.PublicKey
+		Gauge       solana.PublicKey
 		VotingEpoch uint32
 		TotalPower  uint64
 	}
