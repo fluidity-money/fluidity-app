@@ -5,7 +5,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
-	"github.com/fluidity-money/fluidity-app/lib/types/payout"
+	types "github.com/fluidity-money/fluidity-app/lib/types/payout"
 )
 
 const (
@@ -14,16 +14,21 @@ const (
 
 	// TableTrfVars is the table to store trf vars for the workers
 	TableUtilityGauge = `utility_gauges`
+
+	// TableTrfVars is the table to store trf vars for the workers
+	TableWhitelistedGauges = `whitelisted_gauges`
 )
 
-type UtilityGaugePower = payout.UtilityGaugePower
+type UtilityGaugePower = types.UtilityGaugePower
 
 func InsertUtilityGauge(utilityGauge UtilityGaugePower) {
 	var (
-		network  = utilityGauge.Network
-		protocol = utilityGauge.Protocol
+		chain   = utilityGauge.Chain
+		network = utilityGauge.Network
+		gauge   = utilityGauge.Gauge
 
 		epoch      = utilityGauge.Epoch
+		disabled   = utilityGauge.Disabled
 		totalPower = utilityGauge.TotalPower
 	)
 
@@ -31,9 +36,11 @@ func InsertUtilityGauge(utilityGauge UtilityGaugePower) {
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
+			chain,
 			network,
-			protocol,
+			gauge,
 			epoch,
+			disabled,
 			total_power
 		)
 		VALUES (
@@ -41,19 +48,24 @@ func InsertUtilityGauge(utilityGauge UtilityGaugePower) {
 			$2,
 			$3,
 			$4,
+			$5,
+			$6,
 		)
-		ON CONFLICT (protocol) DO UPDATE
+		ON CONFLICT (gauge) DO UPDATE
 		SET 
 			epoch = EXCLUDED.epoch,
+			disabled = EXCLUDED.disabled
 			total_power = EXCLUDED.total_power`,
 		TableUtilityGauge,
 	)
 
 	_, err := postgresClient.Exec(
 		statementText,
+		chain,
 		network,
-		protocol,
+		gauge,
 		epoch,
+		disabled,
 		totalPower,
 	)
 
@@ -72,9 +84,11 @@ func GetLatestUtilityGauges(network string) []UtilityGaugePower {
 	// fetch the daily average for each day we have data for
 	statementText := fmt.Sprintf(
 		`SELECT
+			chain,
 			network,
-			protocol,
+			gauge,
 			epoch,
+			disabled,
 			total_power
 		FROM %s
 		WHERE network = '%s'`,
@@ -100,9 +114,11 @@ func GetLatestUtilityGauges(network string) []UtilityGaugePower {
 		var utilityGauge UtilityGaugePower
 
 		err := rowsUtilityGauge.Scan(
+			&utilityGauge.Chain,
 			&utilityGauge.Network,
-			&utilityGauge.Protocol,
+			&utilityGauge.Gauge,
 			&utilityGauge.Epoch,
+			&utilityGauge.Disabled,
 			&utilityGauge.TotalPower,
 		)
 
@@ -118,4 +134,77 @@ func GetLatestUtilityGauges(network string) []UtilityGaugePower {
 	}
 
 	return utilityGauges
+}
+
+// InsertWhitelistedGauge inserts new gauge into postgres
+func InsertWhitelistedGauge(gauge string) {
+	postgresClient := postgres.Client()
+
+	statementText := fmt.Sprintf(
+		`INSERT INTO %s (
+			gauge,
+		)
+		VALUES (
+			$1,
+		)`,
+		TableWhitelistedGauges,
+	)
+
+	_, err := postgresClient.Exec(
+		statementText,
+		gauge,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = ContextUtilityGauge
+			k.Message = "failed to insert new whitelisted gauge!"
+			k.Payload = err
+		})
+	}
+}
+
+func GetWhitelistedGauges() []string {
+	postgresClient := postgres.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT
+			gauge
+		FROM %s`,
+		TableWhitelistedGauges,
+	)
+
+	rowsWhitelist, err := postgresClient.Query(statementText)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = ContextTrf
+			k.Message = "failed to fetch whitelisted-gauges!"
+			k.Payload = err
+		})
+	}
+
+	defer rowsWhitelist.Close()
+
+	var whitelistedGauges = make([]string, 0)
+
+	for rowsWhitelist.Next() {
+		var whitelistedGauge string
+
+		err := rowsWhitelist.Scan(
+			&whitelistedGauge,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = ContextTrf
+				k.Message = "failed to scan whitelisted-gauges!"
+				k.Payload = err
+			})
+		}
+
+		whitelistedGauges = append(whitelistedGauges, whitelistedGauge)
+	}
+
+	return whitelistedGauges
 }

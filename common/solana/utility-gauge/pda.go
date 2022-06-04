@@ -1,39 +1,29 @@
 package utility_gauge
 
 import (
+	"encoding/binary"
+
 	solana "github.com/gagliardetto/solana-go"
 )
 
-func DeriveGaugePubkey(gaugemeister, protocol solana.PublicKey) (solana.PublicKey, uint8, error) {
+func DeriveEpochGaugePubkey(program, gauge solana.PublicKey, epoch uint32) (solana.PublicKey, uint8, error) {
 	var (
-		gaugeString = "Gauge"
-		gaugeBytes_ = []byte(gaugeString)
-		gaugeBytes  = [][]byte(gaugeBytes_)
+		epochGaugeString      = "EpochGauge"
+		epochGaugeStringBytes = []byte(epochGaugeString)
+
+		gaugeBytes = gauge.Bytes()
+
+		epochBytes = make([]byte, 4)
 	)
 
-	gaugePda, gaugePdaBump, err := solana.FindProgramAddress(
-		gaugeBytes,
-		gaugemeister,
-		protocol,
+	binary.LittleEndian.PutUint32(epochBytes, epoch)
+
+	epochGaugeSeed := [][]byte{epochGaugeStringBytes, gaugeBytes, epochBytes}
+
+	epochGaugePda, epochGaugePdaBump, err := solana.FindProgramAddress(
+		epochGaugeSeed,
+		program,
 	)
 
-	return gaugePda, gaugePdaBump, err
-}
-
-func DeriveEpochGaugePubkey(gauge solana.PublicKey, epoch uint32) (solana.PublicKey, uint8, error) {
-	var (
-		epochGaugeString = "EpochGauge"
-		epochGaugeBytes_ = []byte(gaugeString)
-		epochGaugeBytes  = [][]byte(gaugeBytes_)
-
-		epochBytes = []byte(epoch)
-	)
-
-	epcohGaugePda, epcohGaugePdaBump, err := solana.FindProgramAddress(
-		epochGaugeBytes,
-		gauge,
-		epochBytes,
-	)
-
-	return gaugePda, gaugePdaBump, err
+	return epochGaugePda, epochGaugePdaBump, err
 }
