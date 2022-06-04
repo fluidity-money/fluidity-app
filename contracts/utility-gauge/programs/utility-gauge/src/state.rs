@@ -58,8 +58,10 @@ impl Gaugemeister {
 pub struct Gauge {
     /// The [Gaugemeister].
     pub gaugemeister: Pubkey,
+
     /// The [quarry_mine::Quarry] being voted on.
     pub utility_mine: Pubkey,
+
     /// If true, this Gauge cannot receive any more votes
     /// and rewards shares cannot be synchronized from it.
     pub is_disabled: bool,
@@ -131,8 +133,10 @@ impl GaugeVote {
 pub struct EpochGauge {
     /// The [Gauge].
     pub gauge: Pubkey,
+
     /// The epoch associated with this [EpochGauge].
     pub voting_epoch: u32,
+
     /// The total number of power to be applied to the latest voted epoch.
     /// If this number is non-zero, vote weights cannot be changed until they are all withdrawn.
     pub total_power: u64,

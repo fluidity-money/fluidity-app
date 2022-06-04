@@ -24,9 +24,6 @@ pub struct CreateGaugemeister<'info> {
     /// Base.
     pub base: Signer<'info>,
 
-    /// The Quarry [quarry_operator::Operator].
-    pub operator: Account<'info, quarry_operator::Operator>,
-
     /// [locked_voter::Locker] which determines gauge weights.
     pub locker: Account<'info, locked_voter::Locker>,
 
