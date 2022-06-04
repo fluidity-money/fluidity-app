@@ -24,8 +24,8 @@ pub struct CreateGauge<'info> {
     /// [Gaugemeister].
     pub gaugemeister: Account<'info, Gaugemeister>,
 
-    /// [quarry_mine::Quarry].
-    pub utility_mine: Account<'info, quarry_mine::Quarry>,
+    /// Protocol Identifier
+    pub utility_mine: UncheckedAccount<'info>,
 
     /// Payer.
     #[account(mut)]
