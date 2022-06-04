@@ -22,9 +22,6 @@ const (
 	// EnvSolanaRpcUrl is the RPC url of the solana node to connect to
 	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
 
-	// EnvSolanaNetwork is the network of the trf data store account
-	EnvSolanaNetwork = `FLU_SOLANA_NETWORK`
-
 	// EnvGaugemeisterPubkey is the public key of the gaugemeister of EnvGaugeProgramId
 	EnvGaugemeisterPubkey = `FLU_SOLANA_GAUGEMEISTER_PUBKEY`
 )
@@ -32,7 +29,6 @@ const (
 func main() {
 	var (
 		rpcUrl             = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		solanaNetwork      = util.GetEnvOrFatal(EnvSolanaNetwork)
 		gaugemeisterPubkey = solana.MustPublicKeyFromBase58(EnvGaugemeisterPubkey)
 	)
 
