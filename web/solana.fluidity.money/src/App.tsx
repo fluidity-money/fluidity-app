@@ -5,11 +5,13 @@ import Wallet from "./components/Pages/Wallet";
 import WalletSend from "./components/Pages/WalletSend";
 import WalletHistory from "./components/Pages/WalletHistory";
 import {
-  LoadingStatus,
+  ILoadingStatus,
   LoadingStatusToggle,
-  userActionContext,
+  TokenListContext,
+  ITokenListContext,
+  UserActionContext,
 } from "components/context";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import LoadingStatusModal from "components/Modal/Themes/LoadingStatusModal";
 import { WalletKitProvider } from "@gokiprotocol/walletkit";
 import ProtectedRoute from "components/Routes/ProtectedRoute";
@@ -26,6 +28,8 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import NotificationAlert from "components/NotificationAlert";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
+import useFluidTokens, { FluidTokenList } from "util/hooks/useFluidTokens";
+import useLocalStorage from "util/hooks/useLocalStorage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -48,7 +52,7 @@ const App = () => {
     setLoadingToggler(state);
   };
 
-  const loadingToggleProps: LoadingStatus = {
+  const loadingToggleProps: ILoadingStatus = {
     toggle: [loadingToggler, loadingModalToggle],
   };
   /* ### Base State for API context ### */
@@ -83,6 +87,53 @@ const App = () => {
 
   const [messageData, setMessageData] = useState<WebsocketMessage>({});
 
+  const { fluidTokensList, nonFluidTokensList } = useFluidTokens();
+
+  // using local storage to persist for 4 token select lists
+  const [selectPinnedTokens, setSelectPinnedTokens] = useLocalStorage(
+    "pinned",
+    nonFluidTokensList
+  );
+  const [selectPinnedFluidTokens, setSelectPinnedFluidTokens] = useLocalStorage(
+    "pinned-fluid",
+    fluidTokensList
+  );
+  const [selectTokens, setSelectTokens] = useLocalStorage(
+    "tokens",
+    nonFluidTokensList
+  );
+  const [selectFluidTokens, setSelectFluidTokens] = useLocalStorage(
+    "fluid-tokens",
+    fluidTokensList
+  );
+
+  // required to not reset the lists once populated
+  const [count, setCount] = useLocalStorage("count", 0);
+
+  /* persists tokens data in token select modal and updates persisted
+   token data when changes occur for token select modal */
+  useEffect(() => {
+    if (count < 3) {
+      setCount(count + 1);
+      setSelectFluidTokens(() => [...fluidTokensList]);
+      setSelectPinnedFluidTokens(() => [...fluidTokensList]);
+      setSelectTokens(() => [...nonFluidTokensList]);
+      setSelectPinnedTokens(() => [...nonFluidTokensList]);
+    }
+  }, [fluidTokensList, nonFluidTokensList]);
+
+  // token info for context for token select modal
+  const tokenListInfo: ITokenListContext = {
+    selectPinnedTokens: selectPinnedTokens,
+    setSelectPinnedTokens: setSelectPinnedTokens,
+    selectPinnedFluidTokens: selectPinnedFluidTokens,
+    setSelectPinnedFluidTokens: setSelectPinnedFluidTokens,
+    selectTokens: selectTokens,
+    setSelectTokens: setSelectTokens,
+    selectFluidTokens: selectFluidTokens,
+    setSelectFluidTokens: setSelectFluidTokens,
+  };
+
   const apiState: ApiState = {
     setPastWinnings,
     setPrizeBoard,
@@ -115,74 +166,78 @@ const App = () => {
         {/* Loading Status context toggle provider */}
         <LoadingStatusToggle.Provider value={loadingToggleProps}>
           {/* Context for user actions recieved over WS, to support dynamic updates */}
-          <userActionContext.Provider value={userActions}>
-            {/* Renders App triggers on load (such as auto logging into wallet) */}
-            {/* Loads specifically one route at a time */}
-            <ErrorBoundary>
-              <NotificationContainer>
-                <ApiStateHandler state={apiState} />
-                {/*<Route path="/" render={props =>
+          <UserActionContext.Provider value={userActions}>
+            <TokenListContext.Provider value={tokenListInfo}>
+              {/* Renders App triggers on load (such as auto logging into wallet) */}
+              {/* Loads specifically one route at a time */}
+              <ErrorBoundary>
+                <NotificationContainer>
+                  <ApiStateHandler state={apiState} />
+                  {/*<Route path="/" render={props =>
               <WinNotification
                 addWinNotification={addWinNotification}
               />}
             />*/}
-                <Switch>
-                  <Route path="/" exact component={SwapPage} />
-                  <Route
-                    path="/dashboard"
-                    exact
-                    render={(props) => (
-                      <Dashboard
-                        prizeBoard={prizeBoard}
-                        prizePool={rewardPool}
-                        pastWinnings={pastWinnings}
-                        {...props}
-                      />
-                    )}
+                  <Switch>
+                    <Route path="/" exact component={SwapPage} />
+                    <Route
+                      path="/dashboard"
+                      exact
+                      render={(props) => (
+                        <Dashboard
+                          prizeBoard={prizeBoard}
+                          prizePool={rewardPool}
+                          pastWinnings={pastWinnings}
+                          {...props}
+                        />
+                      )}
+                    />
+                    <ProtectedRoute
+                      exact={true}
+                      path="/wallet"
+                      component={Wallet}
+                    />
+                    <ProtectedRoute
+                      exact={true}
+                      path="/walletsend"
+                      component={WalletSend}
+                      myHistory={userActions}
+                    />
+                    <ProtectedRoute
+                      exact={true}
+                      path="/wallethistory"
+                      component={WalletHistory}
+                      myHistory={userActions}
+                    />
+                    <Route component={RouteNotFound} />
+                  </Switch>
+                  {/* Loading modal for transactiongs */}
+                  <LoadingStatusModal enable={loadingToggler} />
+                  {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
+                  <NotificationAlert
+                    enable={notificationTrigger}
+                    setEnable={() =>
+                      setNotificationTrigger(!notificationTrigger)
+                    }
+                    active={document.hidden}
+                    message={notificationMessage}
                   />
-                  <ProtectedRoute
-                    exact={true}
-                    path="/wallet"
-                    component={Wallet}
-                  />
-                  <ProtectedRoute
-                    exact={true}
-                    path="/walletsend"
-                    component={WalletSend}
-                    myHistory={userActions}
-                  />
-                  <ProtectedRoute
-                    exact={true}
-                    path="/wallethistory"
-                    component={WalletHistory}
-                    myHistory={userActions}
-                  />
-                  <Route component={RouteNotFound} />
-                </Switch>
-                {/* Loading modal for transactiongs */}
-                <LoadingStatusModal enable={loadingToggler} />
-                {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
-                <NotificationAlert
-                  enable={notificationTrigger}
-                  setEnable={() => setNotificationTrigger(!notificationTrigger)}
-                  active={document.hidden}
-                  message={notificationMessage}
-                />
 
-                <ConfettiAnimation trigger={winAlert} />
-                <TransactionConfirmationModal
-                  enable={winAlert}
-                  toggle={() => setWinAlert(!winAlert)}
-                  message={[
-                    <div>
-                      🎉🎉<span className="primary-text"> CONGRATS </span>🎉🎉
-                    </div>,
-                    <div className="primary-text">{notificationMessage}</div>,
-                  ]}
-                />
-              </NotificationContainer>
-            </ErrorBoundary>
-          </userActionContext.Provider>
+                  <ConfettiAnimation trigger={winAlert} />
+                  <TransactionConfirmationModal
+                    enable={winAlert}
+                    toggle={() => setWinAlert(!winAlert)}
+                    message={[
+                      <div>
+                        🎉🎉<span className="primary-text"> CONGRATS </span>🎉🎉
+                      </div>,
+                      <div className="primary-text">{notificationMessage}</div>,
+                    ]}
+                  />
+                </NotificationContainer>
+              </ErrorBoundary>
+            </TokenListContext.Provider>
+          </UserActionContext.Provider>
         </LoadingStatusToggle.Provider>
       </WalletKitProvider>
     </Router>

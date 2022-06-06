@@ -6,8 +6,8 @@ interface ModalProps {
   toggle: Function;
   height?: string;
   width?: string;
-  noBody?: boolean
-  children?: React.ReactNode
+  noBody?: boolean;
+  children?: React.ReactNode;
 }
 
 const GenericModal: FunctionComponent<ModalProps> = ({
@@ -16,21 +16,28 @@ const GenericModal: FunctionComponent<ModalProps> = ({
   children,
   height,
   width,
-  noBody = false
+  noBody = false,
 }: ModalProps) => {
-
   return enable ? (
     ReactDOM.createPortal(
       <div className="modal-container" onClick={() => toggle()}>
-        {noBody ? children :
+        {noBody ? (
+          children
+        ) : (
           <div
             className="modal-body"
             style={{ height: height, width: width }}
             onClick={(e) => e.stopPropagation()}
           >
+            <img
+              src="/img/x.svg"
+              alt="close-button"
+              className="clear-icon--modal"
+              onClick={() => toggle()}
+            />
             {children}
           </div>
-        }
+        )}
       </div>,
       document.querySelector("#modal-generic")!
     )

@@ -1,5 +1,5 @@
 import Button from "components/Button";
-import { userActionContext } from "components/context";
+import { UserActionContext } from "components/context";
 import GenericModal from "components/Modal/GenericModal";
 import { useContext } from "react";
 import { solExplorer } from "util/solana/solExplorer";
@@ -13,7 +13,7 @@ const TransactionConfirmationModal = ({
   toggle: () => void;
   message: React.ReactNode;
 }) => {
-  const userActions = useContext(userActionContext);
+  const userActions = useContext(UserActionContext);
   return (
     <GenericModal enable={enable} toggle={toggle}>
       <div className="modal-body transaction-confirmation-modal-form">
