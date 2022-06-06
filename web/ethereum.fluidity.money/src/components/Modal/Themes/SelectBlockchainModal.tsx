@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import GenericModal from "components/Modal/GenericModal";
-import React, { useEffect } from "react";
 import { appTheme } from "util/appTheme";
+import useLocalStorage from "util/hooks/useLocalStorage";
 
 interface Blockchain {
   blockchain: string;
@@ -55,14 +55,13 @@ const SelectBlockchainModal = ({
       ],
     },
   ];
-  const [options, setOptions] = React.useState(networkOptions);
-  useEffect(() => {
-    const data = window.localStorage.getItem("networks-open");
-    if (data) setOptions(JSON.parse(data));
-  }, []);
-  useEffect(() => {
-    window.localStorage.setItem("networks-open", JSON.stringify(options));
-  }, [options]);
+
+  // using local storage hook to persist options and if all networks are visible or not
+  const [options, setOptions] = useLocalStorage(
+    "networks-open",
+    networkOptions
+  );
+
   const renderedOptions = options.map(
     ({ blockchain, icon, networks, visible }, index) => {
       return (
