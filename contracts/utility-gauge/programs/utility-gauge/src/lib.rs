@@ -21,7 +21,7 @@ pub use state::*;
 
 use instructions::*;
 
-declare_id!("J9a1QPbmaNsQ2vvWgjYHCgcv5ThvhAMWmgVoUNquUZKw");
+declare_id!("GijCvpzEK5wQjFtekuYifb8KU3xtVERFP3mFrhf8fNNV");
 
 /// The [utility_gauge] program.
 #[program]

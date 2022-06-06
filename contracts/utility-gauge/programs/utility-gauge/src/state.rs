@@ -13,10 +13,6 @@ pub struct Gaugemeister {
     /// Bump seed.
     pub bump: u8,
 
-    /// The Rewarder.
-    pub rewarder: Pubkey,
-    /// The Utility Mining Authority.
-    pub operator: Pubkey,
     /// The [locked_voter::Locker].
     pub locker: Pubkey,
 

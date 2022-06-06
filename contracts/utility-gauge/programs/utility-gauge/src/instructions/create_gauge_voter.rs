@@ -46,7 +46,6 @@ pub fn handler(ctx: Context<CreateGaugeVoter>) -> Result<()> {
 
     emit!(GaugeVoterCreateEvent {
         gaugemeister: gauge_voter.gaugemeister,
-        rewarder: ctx.accounts.gaugemeister.rewarder,
         gauge_voter_owner: gauge_voter.owner,
     });
 
@@ -66,9 +65,6 @@ pub struct GaugeVoterCreateEvent {
     #[index]
     /// The [Gaugemeister].
     pub gaugemeister: Pubkey,
-    #[index]
-    /// The Rewarder.
-    pub rewarder: Pubkey,
     #[index]
     /// Owner of the Escrow of the [GaugeVoter].
     pub gauge_voter_owner: Pubkey,

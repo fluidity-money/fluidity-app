@@ -5,14 +5,14 @@ solana_version = "1.9.12"
 seeds = true
 
 [provider]
-cluster="localnet"
+cluster="devnet"
 wallet="~/.config/solana/id.json"
 
 [programs.localnet]
-utility_gauge = "J9a1QPbmaNsQ2vvWgjYHCgcv5ThvhAMWmgVoUNquUZKw"
+utility_gauge = "GijCvpzEK5wQjFtekuYifb8KU3xtVERFP3mFrhf8fNNV"
 
 [programs.devnet]
-utility_gauge = "J9a1QPbmaNsQ2vvWgjYHCgcv5ThvhAMWmgVoUNquUZKw"
+utility_gauge = "GijCvpzEK5wQjFtekuYifb8KU3xtVERFP3mFrhf8fNNV"
 
 [registry]
 url = "https://anchor.projectserum.com"

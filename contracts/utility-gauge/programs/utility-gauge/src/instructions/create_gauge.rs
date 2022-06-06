@@ -25,6 +25,8 @@ pub struct CreateGauge<'info> {
     pub gaugemeister: Account<'info, Gaugemeister>,
 
     /// Protocol Identifier
+    /// CHECK: This account should ONLY be used as an identifier. We don't read or write from this
+    /// account
     pub utility_mine: UncheckedAccount<'info>,
 
     /// Payer.
@@ -47,7 +49,6 @@ pub fn handler(ctx: Context<CreateGauge>) -> Result<()> {
 
 impl<'info> Validate<'info> for CreateGauge<'info> {
     fn validate(&self) -> Result<()> {
-        assert_keys_eq!(self.gaugemeister.rewarder, self.utility_mine.rewarder);
         Ok(())
     }
 }
@@ -58,9 +59,6 @@ pub struct GaugeCreateEvent {
     #[index]
     /// The [Gaugemeister].
     pub gaugemeister: Pubkey,
-    #[index]
-    /// The Rewarder.
-    pub rewarder: Pubkey,
     #[index]
     /// The [quarry_mine::Quarry] being voted on.
     pub utility_mine: Pubkey,

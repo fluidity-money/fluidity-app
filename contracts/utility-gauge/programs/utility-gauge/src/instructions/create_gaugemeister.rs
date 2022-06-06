@@ -52,8 +52,6 @@ pub fn handler(
     gaugemeister.base = ctx.accounts.base.key();
     gaugemeister.bump = *unwrap_int!(ctx.bumps.get("gaugemeister"));
 
-    gaugemeister.rewarder = ctx.accounts.operator.rewarder;
-    gaugemeister.operator = ctx.accounts.operator.key();
     gaugemeister.locker = ctx.accounts.locker.key();
 
     gaugemeister.foreman = foreman;
@@ -67,7 +65,6 @@ pub fn handler(
 
     emit!(GaugemeisterCreateEvent {
         gaugemeister: gaugemeister.key(),
-        rewarder: gaugemeister.rewarder,
         locker_token_mint: ctx.accounts.locker.token_mint,
         locker_governor: ctx.accounts.locker.governor,
         first_rewards_epoch: first_epoch_starts_at,
@@ -89,9 +86,6 @@ pub struct GaugemeisterCreateEvent {
     /// The [Gaugemeister] being created.
     #[index]
     pub gaugemeister: Pubkey,
-    /// The [Rewarder].
-    #[index]
-    pub rewarder: Pubkey,
     /// Mint of the token that must be locked in the [Locker].
     pub locker_token_mint: Pubkey,
     /// Governor associated with the [Locker].
