@@ -1,5 +1,26 @@
 import { FluidTokenList, TokenInfo } from "./hooks/useFluidTokens";
+// This file is predominantly to clean up the TokenSelect component and functions used within
 
+// function used to set token amounts
+export const setAmountUtil = (
+  token: TokenInfo,
+  r: string,
+  setTokens: React.Dispatch<React.SetStateAction<FluidTokenList>>
+) => {
+  setTokens((previousState: FluidTokenList) =>
+    [...previousState]?.map((item) =>
+      item.token.symbol === token.token.symbol
+        ? Object.assign({}, item, {
+            config: Object.assign({}, item.config, {
+              amount: r,
+            }),
+          })
+        : item
+    )
+  );
+};
+
+// function to changed if a token and its fluid conterpart are pinned or not
 export const changePinnedUtil = (
   token: TokenInfo,
   selectTokens: FluidTokenList,
@@ -79,7 +100,7 @@ export const changePinnedUtil = (
   }
 };
 
-// changes fluid token and regulat token from pinned to unpinned if less than 8 pinned
+// changes fluid token and regular token from pinned to unpinned if less than 8 pinned
 export const changePinnedFluidUtil = (
   token: TokenInfo,
   selectFluidTokens: FluidTokenList,
