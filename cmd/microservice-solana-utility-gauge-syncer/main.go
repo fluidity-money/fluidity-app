@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	utility_gauge "github.com/fluidity-money/fluidity-app/common/solana/utility-gauge"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queue"
@@ -15,12 +14,14 @@ import (
 
 	solana "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
-	"github.com/near/borsh-go"
 )
 
 const (
 	// EnvSolanaRpcUrl is the RPC url of the solana node to connect to
 	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
+
+	// EnvSolanaRpcUrl is the RPC url of the solana node to connect to
+	EnvUtilityGaugeProgramId = `FLU_UTILITY_GAUGE_PROGRAM_ID`
 
 	// EnvGaugemeisterPubkey is the public key of the gaugemeister of EnvGaugeProgramId
 	EnvGaugemeisterPubkey = `FLU_SOLANA_GAUGEMEISTER_PUBKEY`
@@ -28,50 +29,22 @@ const (
 
 func main() {
 	var (
-		rpcUrl             = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		gaugemeisterPubkey = solana.MustPublicKeyFromBase58(EnvGaugemeisterPubkey)
+		rpcUrl                = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		utilityGaugeProgramId = solana.MustPublicKeyFromBase58(EnvUtilityGaugeProgramId)
+		gaugemeisterPubkey    = solana.MustPublicKeyFromBase58(EnvGaugemeisterPubkey)
 	)
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
 	// Get current rewards epoch
-	var gaugemeister utility_gauge.Gaugemeister
-
-	accInfoRes, err := solanaClient.GetAccountInfo(
-		context.Background(),
-		gaugemeisterPubkey,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format("failed to get gaugemeister account %v!", gaugemeisterPubkey)
-			k.Payload = err
-		})
-	}
-
-	gaugemeisterDataBinary := accInfoRes.Value.Data.GetBinary()
-
-	// remove anchor account discriminator from data binary
-	gaugemeisterAccData := gaugemeisterDataBinary[8:]
-
-	err = borsh.Deserialize(&gaugemeister, gaugemeisterAccData)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "failed to decode gaugemeister account data from rpc result!"
-			k.Payload = err
-		})
-	}
+	gaugemeister := getGaugemeisterData(solanaClient, gaugemeisterPubkey)
 
 	var (
-		// epochDurationSeconds is the voting period of each epoch
-		epochDurationSeconds = gaugemeister.EpochDurationSeconds
-
 		// nextEpochStartsAt is the unix time when next epoch starts
 		nextEpochStartsAt = gaugemeister.NextEpochStartsAt
 
 		// currentRewardsEpoch is epoch with active rewards
-		// (currentRewardsEpoch + 1) is the epoch currently voting on
+		// (currentRewardsEpoch + 1) is the epoch currently being voted on
 		currentRewardsEpoch = gaugemeister.CurrentRewardsEpoch
 	)
 
@@ -81,15 +54,73 @@ func main() {
 
 	timeoutSeconds := time.Duration(timeoutSeconds_) * time.Second
 
-	for _ = range time.Tick(timeoutSeconds) {
-		whitelistedGauges := database.GetWhitelistedGauges()
+	for _ = range time.Sleep(timeoutSeconds) {
 
-		// newRewardsEpoch is the updated epoch with active rewards
-		newRewardsEpoch := currentRewardsEpoch + 1
+		// Call Trigger next Epoch here!
+		triggerNextEpochBytes_ := "TriggerNextEpoch"
+
+		triggerNextEpochBytes := [8]byte{200, 53, 104, 185, 85, 78, 187, 74}
+
+		triggerNextEpochAccounts := solana.AccountMetaSlice{
+			gaugemeister: gaugemeisterPubkey,
+		}
+
+		triggerNextEpochInstruction := solana.NewInstruction(
+			utilityGaugeProgramId,
+			triggerNextEpochAccounts,
+			triggerNextEpochBytes,
+		)
+
+		//		triggerNextEpochInstructionBytes, err := borsh.Serialize(triggerNextEpochInstruction)
+		//
+		//		if err != nil {
+		//			log.Fatal(func(k *log.Log) {
+		//				k.Message = "failed to serialize triggerNextEpoch instruction!"
+		//				k.Payload = err
+		//			})
+		//		}
+
+		instructions := []solana.Instruction{triggerNextEpochInstruction}
+
+		transaction, err := solana.NewTransaction(instructions, recentBlockhash)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to construct triggerNextEpoch transaction!"
+				k.Payload = err
+			})
+		}
+
+		_, err = transaction.Sign(func(key solana.PublicKey) *solana.PrivateKey {
+
+			if payer.PublicKey().Equals(key) {
+				return &payer.PrivateKey
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to sign transaction!"
+				k.Payload = err
+			})
+		}
+
+		sig, err := solanaClient.SendTransaction(context.Background(), transaction)
+
+		gaugemeister = getGaugemeisterData(solanaClient, gaugemeisterPubkey)
+
+		// epochDurationSeconds is the voting period duration of the epoch
+		epochDurationSeconds := gaugemeister.EpochDurationSeconds
+
+		currentRewardsEpoch = gaugemeister.CurrentRewardsEpoch
+
+		whitelistedGauges := database.GetWhitelistedGauges()
 
 		updatedGauges := types.EpochGauges{
 			Gaugemeister: gaugemeisterPubkey.String(),
-			Epoch:        newRewardsEpoch,
+			Epoch:        currentRewardsEpoch,
 			Gauges:       whitelistedGauges,
 		}
 

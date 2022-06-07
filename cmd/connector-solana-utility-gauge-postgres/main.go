@@ -42,7 +42,6 @@ func main() {
 	solanaClient := solanaRpc.New(rpcUrl)
 
 	queue.GetEpochGauges(func(epochGauges types.EpochGauges) {
-
 		var (
 			epoch  = epochGauges.Epoch
 			gauges = epochGauges.Gauges
