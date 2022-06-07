@@ -77,10 +77,10 @@
   flex-direction: column;
   text-align: center;
   align-content: center;
-  overflow-y: overlay;
+  overflow-y: auto;
 
   &:hover {
-    overflow-y: overlay;
+    overflow-y: auto;
     &::-webkit-scrollbar-thumb {
       background: #555;
       border-radius: 10px;
