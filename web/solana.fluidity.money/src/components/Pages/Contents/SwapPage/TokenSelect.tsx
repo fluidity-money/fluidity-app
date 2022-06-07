@@ -3,9 +3,15 @@ import { useContext, useEffect } from "react";
 import { ModalToggle, TokenListContext } from "components/context";
 import Icon from "components/Icon";
 import { useFluidToken } from "util/hooks";
-import { TokenInfo } from "util/hooks/useFluidTokens";
+import { FluidTokenList, TokenInfo } from "util/hooks/useFluidTokens";
 import { isTemplateTail } from "typescript";
-import { changePinnedFluidUtil, changePinnedUtil } from "util/pinnedUtils";
+import {
+  changePinnedFluidUtil,
+  changePinnedUtil,
+  setAmountUtil,
+} from "util/pinnedUtils";
+import { useSolana } from "@saberhq/use-solana";
+import { getBalanceOfSPL } from "util/contractUtils";
 
 const TokenSelect = ({
   type,
@@ -16,8 +22,8 @@ const TokenSelect = ({
 }) => {
   const [selectedToken] = useContext(ModalToggle).selectedToken;
   const [selectedFluidToken] = useContext(ModalToggle).selectedFluidToken;
-
-  const { fluidTokensList, nonFluidTokensList } = useFluidToken();
+  const sol = useSolana();
+  const { fluidTokensList, nonFluidTokensList, tokens } = useFluidToken();
 
   // accesses tokens from context
   const selectTokens = useContext(TokenListContext).selectTokens;
@@ -34,10 +40,34 @@ const TokenSelect = ({
   const setSelectPinnedFluidTokens =
     useContext(TokenListContext).setSelectPinnedFluidTokens;
 
-  // gets each token amount
-  const getAmounts = () => {};
+  // gets each token amount for fluid and non fluid
+  const getAmounts = () => {
+    tokens && getAmountUtil(nonFluidTokensList, "non fluid");
+    getAmountUtil(fluidTokensList, "fluid");
+  };
 
-  const setAmounts = () => {};
+  // repeated function for fluid and non fluid token lists
+  const getAmountUtil = (tokenList: FluidTokenList, type: string) => {
+    tokenList.forEach(
+      (token) =>
+        sol.publicKey &&
+        getBalanceOfSPL(token.token, sol.connection, sol.publicKey).then(
+          (r) => r.uiAmountString && setAmounts(token, type, r.uiAmountString)
+        )
+    );
+  };
+
+  // sets the amounts to be added to token amount
+  const setAmounts = (token: TokenInfo, type: string, r: string) => {
+    switch (type) {
+      case "non fluid":
+        setAmountUtil(token, r, setSelectTokens);
+        break;
+      case "fluid":
+        setAmountUtil(token, r, setSelectFluidTokens);
+        break;
+    }
+  };
 
   // changes token and fluid pair token from pinned to unpinned if less than 8 pinned
   // sorts pinned tokens in order when added
