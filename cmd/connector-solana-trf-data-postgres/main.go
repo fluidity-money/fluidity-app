@@ -7,7 +7,7 @@ import (
 	borsh "github.com/near/borsh-go"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
-	"github.com/fluidity-money/fluidity-app/common/solana/tribeca"
+	trf_data_store "github.com/fluidity-money/fluidity-app/common/solana/trf-data-store"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/payout"
@@ -78,7 +78,7 @@ func main() {
 				k.Message = "Tribeca updated TRF vars!"
 			})
 
-			var trfDataStoreData tribeca.TrfDataStoreProgramData
+			var trfDataStoreData trf_data_store.TrfDataStore
 
 			trfDataStoreDataBase64 := accountNotification.Value.Data[0]
 

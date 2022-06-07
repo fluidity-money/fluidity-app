@@ -1,9 +1,9 @@
-package tribeca
+package trf_data_store
 
 import solana "github.com/gagliardetto/solana-go"
 
 type (
-	TrfDataStoreProgramData struct {
+	TrfDataStore struct {
 		Authority        solana.PublicKey `json:"authority"`
 		Bump             uint8            `json:"bump"`
 		PayoutFreqNum    uint32           `json:"payout_freq_num"`
