@@ -13,6 +13,7 @@ interface Blockchain {
 interface Network {
   name: string;
   address: string;
+  id: string;
 }
 
 const SelectBlockchainModal = ({
@@ -32,8 +33,12 @@ const SelectBlockchainModal = ({
       icon: "/img/TokenIcons/solanaIcon.svg",
       visible: true,
       networks: [
-        // { name: "Mainnet", address: "https://app.solana.fluidity.money/" },
-        { name: "Devnet", address: "https://app.solana.beta.fluidity.money/" },
+        // { name: "Mainnet", address: "https://app.solana.fluidity.money/",id:"mainnet" },
+        {
+          name: "Devnet",
+          address: "https://app.solana.beta.fluidity.money/",
+          id: "devnet",
+        },
       ],
     },
     {
@@ -41,9 +46,17 @@ const SelectBlockchainModal = ({
       icon: "/img/TokenIcons/ethereumIcon.svg",
       visible: true,
       networks: [
-        // { name: "Mainnet", address: "https://app.ethereum.fluidity.money/" },
-        { name: "Ropsten", address: "https://ropsten.beta.fluidity.money/" },
-        { name: "Kovan", address: "https://kovan.beta.fluidity.money/" },
+        // { name: "Mainnet", address: "https://app.ethereum.fluidity.money/",id:"" },
+        {
+          name: "Ropsten",
+          address: "https://ropsten.beta.fluidity.money/",
+          id: "",
+        },
+        {
+          name: "Kovan",
+          address: "https://kovan.beta.fluidity.money/",
+          id: "",
+        },
       ],
     },
     {
@@ -51,7 +64,11 @@ const SelectBlockchainModal = ({
       icon: "/img/Aurora/AuroraLogoTextBelow.svg",
       visible: true,
       networks: [
-        { name: "Aurora", address: "https://app.aurora.fluidity.money/" },
+        {
+          name: "Aurora",
+          address: "https://app.aurora.fluidity.money/",
+          id: "",
+        },
       ],
     },
   ];
@@ -60,6 +77,8 @@ const SelectBlockchainModal = ({
     "networks-open",
     networkOptions
   );
+
+  const blockchainNetwork = process.env.REACT_APP_SOL_NETWORK;
 
   const renderedOptions = options.map(
     ({ blockchain, icon, networks, visible }, index) => {
@@ -97,15 +116,26 @@ const SelectBlockchainModal = ({
           {visible === true &&
             networks.map((network, idx) => (
               <div
-                className={"network-options"}
+                className={
+                  blockchainNetwork === network.id
+                    ? "network-options-current"
+                    : "network-options"
+                }
                 key={`${network} ${idx}`}
                 onClick={() => {
                   // eslint-disable-next-line no-restricted-globals
                   location.href = network.address;
                 }}
               >
-                <img src={icon} className={`network-icon`} alt={blockchain} />
-                <div className={`primary-text`}>{network.name}</div>
+                <div className="network-items">
+                  <img src={icon} className={`network-icon`} alt={blockchain} />
+                  <div className={`primary-text`}>{network.name}</div>
+                </div>
+                {blockchainNetwork === network.id ? (
+                  <img src="/img/network-dot.svg" alt="dot" />
+                ) : (
+                  <></>
+                )}
               </div>
             ))}
         </div>

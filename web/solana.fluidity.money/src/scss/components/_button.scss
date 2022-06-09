@@ -311,7 +311,7 @@
   padding: 5px 10px 5px 10px;
   background-color: transparent;
   border: solid transparent 1px;
-  border-radius: 10px;
+  border-radius: 7px;
 
   cursor: pointer;
   transition: all 0.4s linear;
@@ -319,6 +319,15 @@
   &:hover {
     background-color: rgba(56, 60, 69, 0.5);
   }
+  &-current {
+    @extend .network-options;
+    border: 2px solid #12ecab;
+    justify-content: space-between;
+  }
+}
+
+.network-items {
+  display: flex;
 }
 
 .network-icon {
