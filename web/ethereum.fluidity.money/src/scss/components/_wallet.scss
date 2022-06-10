@@ -99,7 +99,7 @@
   box-sizing: border-box;
   height: 100%;
   width: 100%;
-  max-width: 60rem;
+  max-width: 90rem;
   justify-self: center;
   // width: 100%;
   @include for-tablet-portrait-up {
@@ -115,7 +115,8 @@
 .doughnut-container {
   position: relative;
   justify-self: center;
-  width: auto;
+  // width: auto;
+  width: 175px;
   @include for-tablet-portrait-up {
     grid-column: 1/2;
   }
@@ -156,10 +157,10 @@
   height: 100%;
   align-items: center;
 
-  font-family: "Inter", Arial, Serif, sans-serif;
+  font-family: Manrope;
   font-style: normal;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 0.8rem;
   letter-spacing: 0em;
 
   color: white;
@@ -200,4 +201,72 @@
   max-width: 60rem;
   grid-column: 2/5;
   justify-self: center;
+}
+
+.yield-graph {
+  background-color: #131823;
+  padding: 10px;
+}
+
+.wallet-overview {
+  background-color: #131823;
+  padding: 10px;
+}
+
+.overview-items {
+  display: flex;
+}
+
+.chart-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.total {
+  display: flex;
+  flex-direction: column;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #19202f;
+  position: absolute;
+  top: 16%;
+  left: 16%;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.toggle-bar {
+  height: 30px;
+  width: 54px;
+  background-color: #219094;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle-slider-right {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  background-color: white;
+  margin-left: 26px;
+  transition: all 0.3s ease;
+}
+.toggle-slider-left {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  background-color: white;
+  margin-left: 3px;
+  transition: all 0.3s ease;
 }
