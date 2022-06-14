@@ -219,6 +219,9 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  @media (max-width: 520px) {
+    text-align: center;
+  }
 }
 
 .grey-primary-text {

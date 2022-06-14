@@ -78,6 +78,9 @@
   grid-column: 1/-1;
   grid-row: 0;
   justify-self: left;
+  @include for-below-520 {
+    justify-self: center;
+  }
 }
 
 .portfolio-graph-selector {
@@ -102,7 +105,10 @@
   justify-self: center;
   // width: 100%;
   @include for-tablet-portrait-up {
-    grid-template-columns: auto 1fr;
+    // grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(2rem, auto) 1fr;
+    grid-column: 2/5;
   }
   @include for-tablet-landscape-up {
     grid-template-columns: 1fr 1fr;
@@ -129,6 +135,7 @@
   display: grid;
   grid-gap: 0.5rem;
   justify-items: center;
+  width: 100%;
   @include for-tablet-portrait-up {
     grid-column: 2/-1;
     width: 100%;
@@ -145,7 +152,6 @@
   grid-template-columns: auto 1fr;
   column-gap: 2rem;
   min-width: 10rem;
-  max-width: 22rem;
   width: 100%;
   align-items: center;
 }
@@ -207,23 +213,47 @@
   background-color: #131823;
   padding: 10px;
   border-radius: 20px;
+  min-width: 400px;
+  order: 1;
+  margin-top: 10px;
+
+  @include for-tablet-landscape-up {
+    margin-top: 0;
+  }
+
+  @include for-below-520 {
+    display: none;
+  }
 }
 
 .wallet-overview {
   background-color: #131823;
   padding: 10px;
   border-radius: 20px;
+  // min-width: 400px;
+  @include for-tablet-landscape-up {
+    order: 1;
+  }
 }
 
 .overview-items {
   display: flex;
-  margin-top: 30px;
+  margin-top: 10px;
+  @include for-tablet-landscape-up {
+    margin-top: 20px;
+  }
+  @include for-below-520 {
+    flex-direction: column;
+  }
 }
 
 .chart-items {
   display: flex;
   flex-direction: column;
   align-items: center;
+  @include for-below-550 {
+    margin-bottom: 30px;
+  }
 }
 
 .total {
@@ -282,4 +312,12 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.currency-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 70%;
+  // min-width: 300px;
 }

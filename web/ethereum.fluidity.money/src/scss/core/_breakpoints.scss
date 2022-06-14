@@ -40,6 +40,12 @@ eg:
   }
 }
 
+@mixin for-below-520 {
+  @media (max-width: 520px) {
+    @content;
+  }
+}
+
 @mixin for-below-550 {
   @media (max-width: 550px) {
     @content;

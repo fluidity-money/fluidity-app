@@ -164,10 +164,14 @@
 
 .currency-icon {
   display: block;
-  height: 40px;
-  width: 40px;
+  height: 35px;
+  width: 35px;
   background-repeat: no-repeat;
   background-size: cover;
+  @include for-below-550 {
+    height: 30px;
+    width: 30px;
+  }
 }
 
 // Tick Animated Icon (modified)

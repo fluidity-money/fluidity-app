@@ -63,14 +63,16 @@ const CurrencyBreakdown = () => {
     const currencyType = token.type.toString();
 
     return (
-      <>
+      <div className="currency-container">
         <CurrencyListing
           currency={currencyType}
           amount={token.amount}
           key={token.type + index}
         />
-        <hr style={{ color: "#828a90", width: "80%", margin: 4, padding: 0 }} />
-      </>
+        <hr
+          style={{ color: "#828a90", width: "100%", margin: 4, padding: 0 }}
+        />
+      </div>
     );
   });
 
