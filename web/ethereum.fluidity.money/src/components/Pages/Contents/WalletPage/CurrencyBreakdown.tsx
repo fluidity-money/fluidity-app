@@ -6,8 +6,9 @@ import getWalletERC20Status from "util/getWalletERC20Status";
 import { walletDataType } from "util/getWalletERC20Status";
 import { useSigner } from "util/hooks";
 import _ from "lodash";
-import { appTheme } from "util/appTheme";
 import ToggleButton from "components/Button/ToggleButton";
+import LineChart from "components/Charts/LineChart";
+import LineGraph from "components/Charts/LineChart";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -62,11 +63,14 @@ const CurrencyBreakdown = () => {
     const currencyType = token.type.toString();
 
     return (
-      <CurrencyListing
-        currency={currencyType}
-        amount={token.amount}
-        key={token.type + index}
-      />
+      <>
+        <CurrencyListing
+          currency={currencyType}
+          amount={token.amount}
+          key={token.type + index}
+        />
+        <hr style={{ color: "#828a90", width: "80%", margin: 4, padding: 0 }} />
+      </>
     );
   });
 
@@ -106,37 +110,42 @@ const CurrencyBreakdown = () => {
     [walletAmounts, walletTypes, colours]
   );
 
+  const LineChart = useMemo(() => <LineGraph />, []);
+
   // Checks to see if the user's wallet is empty
   return (
     <div className="currency-breakdown">
-      <div className={`portfolio-graph-title primary-text${appTheme}`}>
+      <div className={`portfolio-graph-title white-primary-text`}>
         Account Overview
       </div>
 
       <div className="yield-graph">
-        <div className={`primary-text${appTheme}`}>
-          Total Fluid Yield Rewarded
+        <div className={`white-primary-text`}>Total Fluid Yield Rewarded</div>
+        <div className="grey-primary-text" style={{ fontSize: 8 }}>
+          *Calculations based upon user on-chain history and simulated expected
+          reward averages
         </div>
+        {LineChart}
       </div>
 
       <div className="wallet-overview">
-        <div className={`primary-text${appTheme}`}>Wallet Overview</div>
+        <div className={`white-primary-text`}>Wallet Overview</div>
 
         <div className="overview-items">
           <div className="chart-items">
             <div className="doughnut-container">
               <div className="total">
-                <div className="white-primary-text">Total</div>
+                <div className="grey-primary-text">Total</div>
                 <div className="white-primary-text">{total}</div>
               </div>
               {fluid ? DonutFluid : DonutRegular}
             </div>
             <div className="toggle-container">
-              <div className={fluid ? "white-primary-text" : "primary-text"}>
+              <div className={fluid ? "grey-primary-text" : "selected-text"}>
                 Regular
               </div>
               <ToggleButton toggled={fluid} toggle={setFluid} />
-              <div className={fluid ? "primary-text" : "white-primary-text"}>
+              <div className={fluid ? "selected-text" : "grey-primary-text"}>
                 Fluid
               </div>
             </div>

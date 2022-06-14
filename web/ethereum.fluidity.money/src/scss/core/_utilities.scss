@@ -216,10 +216,18 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
   font-style: normal;
   font-weight: 700;
   background: white;
-
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.grey-primary-text {
+  @extend .white-primary-text;
+  background: #828a90;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 0.8rem;
 }
 
 // font sizing
