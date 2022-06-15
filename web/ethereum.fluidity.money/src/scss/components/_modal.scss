@@ -80,7 +80,6 @@
   overflow-y: auto;
 
   &:hover {
-    overflow-y: auto;
     &::-webkit-scrollbar-thumb {
       background: #555;
       border-radius: 10px;
@@ -446,6 +445,7 @@
   cursor: pointer;
   padding-right: 0.8rem;
   padding-left: 0.1rem;
+  margin-right: 0.5rem;
 }
 
 .not-found-text {
