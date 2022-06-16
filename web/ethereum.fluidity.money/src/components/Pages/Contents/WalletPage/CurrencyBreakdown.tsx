@@ -7,8 +7,8 @@ import { walletDataType } from "util/getWalletERC20Status";
 import { useSigner } from "util/hooks";
 import _ from "lodash";
 import ToggleButton from "components/Button/ToggleButton";
-import LineChart from "components/Charts/LineChart";
 import LineGraph from "components/Charts/LineChart";
+import Button from "components/Button";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -32,12 +32,17 @@ const CurrencyBreakdown = () => {
     }
   }, [signer?.provider]);
 
+  // both filter functions also sort tokens in alphabetical order
   const filterFluid = () => {
-    return walletData.filter((token) => token.type.startsWith("f"));
+    return walletData
+      .sort((a, b) => a.type.localeCompare(b.type))
+      .filter((token) => token.type.startsWith("f"));
   };
 
   const filterRegular = () => {
-    return walletData.filter((token) => !token.type.startsWith("f"));
+    return walletData
+      .sort((a, b) => a.type.localeCompare(b.type))
+      .filter((token) => !token.type.startsWith("f"));
   };
 
   const distributeWalletData = () => {
@@ -77,8 +82,8 @@ const CurrencyBreakdown = () => {
   });
 
   // calculates total wallet amount
-  const total = useMemo(() => {
-    return walletData
+  const calculateTotal = (tokens: walletDataType[]) => {
+    return tokens
       .reduce((previous, current) => previous + Number(current.amount), 0)
       .toLocaleString("en-US", {
         style: "currency",
@@ -86,7 +91,16 @@ const CurrencyBreakdown = () => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
-  }, [walletData]);
+  };
+
+  // total amount for Fluid assets
+  const totalFluid = useMemo(() => calculateTotal(filterFluid()), [walletData]);
+
+  // total amount for Regular assets
+  const totalRegular = useMemo(
+    () => calculateTotal(filterRegular()),
+    [walletData]
+  );
 
   const DonutFluid = useMemo(
     () => (
@@ -122,12 +136,15 @@ const CurrencyBreakdown = () => {
       </div>
 
       <div className="yield-graph">
-        <div className={`white-primary-text`}>Total Fluid Yield Rewarded</div>
+        <div className={`white-primary-text`}>
+          Total Fluid Yield Rewarded: USD 152.21
+        </div>
         <div className="grey-primary-text" style={{ fontSize: 8 }}>
           *Calculations based upon user on-chain history and simulated expected
           reward averages
         </div>
         {LineChart}
+        {/* <Button label={"Total Unclaimed Rewards"} goto={() => {}} /> */}
       </div>
 
       <div className="wallet-overview">
@@ -138,7 +155,9 @@ const CurrencyBreakdown = () => {
             <div className="doughnut-container">
               <div className="total">
                 <div className="grey-primary-text">Total</div>
-                <div className="white-primary-text">{total}</div>
+                <div className="white-primary-text">
+                  {fluid ? totalFluid : totalRegular}
+                </div>
               </div>
               {fluid ? DonutFluid : DonutRegular}
             </div>
