@@ -1,15 +1,15 @@
-import React from "react";
+import { ChartOptions } from "chart.js";
 import { Line } from "react-chartjs-2";
 
 const LineGraph = () => {
-  const data = (canvas: any) => {
+  const data = (canvas: HTMLCanvasElement | null) => {
     const ctx = canvas?.getContext("2d");
-    const userGradient = ctx.createLinearGradient(0, 0, 0, 310);
-    userGradient.addColorStop(0, "#132A2D");
-    userGradient.addColorStop(1, "#131823");
-    const maxGradient = ctx.createLinearGradient(0, 0, 0, 180);
-    maxGradient.addColorStop(0, "#30183D");
-    maxGradient.addColorStop(1, "#131823");
+    const userGradient = ctx?.createLinearGradient(0, 0, 0, 310);
+    userGradient?.addColorStop(0, "#132A2D");
+    userGradient?.addColorStop(1, "#131823");
+    const maxGradient = ctx?.createLinearGradient(0, 0, 0, 180);
+    maxGradient?.addColorStop(0, "#30183D");
+    maxGradient?.addColorStop(1, "#131823");
     return {
       labels: [
         "04/29",
@@ -55,7 +55,15 @@ const LineGraph = () => {
     };
   };
 
-  const options = {
+  const options: ChartOptions = {
+    responsive: true,
+    scales: { xAxes: { offset: true } },
+
+    interaction: {
+      mode: "index",
+      intersect: false,
+    },
+
     plugins: {
       legend: {
         labels: {
