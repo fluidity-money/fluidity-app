@@ -48,6 +48,12 @@ if (!FLU_POSTGRES_URI) {
 }
 
 const TopicUtilityGauge = "utility_gauge.utility_gauges";
+
+const ExchangeName = "fluidity";
+const ExchangeType = "topic";
+    
+// get whitelisted gauges
+const TableWhitelistedGauges = "whitelisted_gauges";
  
 const gaugemeisterPubkey = new PublicKey(GAUGEMEISTER_PUBKEY);
 
@@ -83,7 +89,7 @@ const UTILITY_GAUGE_ADDRESSES = {
 
 /**
  * Program IDLs.
-   */
+*/
 const UTILITY_GAUGE_IDLS = {
   UtilityGauge: UtilityGaugeIdl,
 };
@@ -104,21 +110,20 @@ const sleepMs = async (ms: number) =>
 // Load Postgres
 const pgClient = new Client(FLU_POSTGRES_URI);
 
-// Load rabbitmq
-const amqpConnection = await amqp.connect(FLU_RABBITMQ_URL);
-
-const amqpChannel = await amqpConnection.createChannel();
-
-amqpChannel.assertExchange(TopicUtilityGauge, "topic", {
-  durable: true,
-  autoDelete: false,
-  internal: false,
-});
-
 (async() => {
-  // get gaugemeister data
+  // Load rabbitmq
+  const amqpConnection = await amqp.connect(FLU_RABBITMQ_URL);
+
+  const amqpChannel = await amqpConnection.createChannel();
+
+  amqpChannel.assertExchange(ExchangeName, ExchangeType, {
+    durable: true,
+    autoDelete: false,
+    internal: false,
+  });
+
+// get gaugemeister data
 //   nextEpochStartsAt
-//   currentRewardsEpoch
   const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
   
   if (gaugemeister === null) {
@@ -157,15 +162,12 @@ amqpChannel.assertExchange(TopicUtilityGauge, "topic", {
     //   epochDurationSeconds
     //   currentRewardsEpoch
     const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
-    
-    // get whitelisted gauges
-    const tableWhitelistedGauges = "whitelisted_gauges";
 
     pgClient.connect();
     const whitelistedGaugesRes = await pgClient.query(
       `SELECT
         gauge
-      FROM ${tableWhitelistedGauges}`);
+      FROM ${TableWhitelistedGauges}`);
 
     pgClient.end();
     
