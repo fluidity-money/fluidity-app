@@ -2,3 +2,4 @@ microservice-solana-transactions
 docker
 test
 lint
+node_modules

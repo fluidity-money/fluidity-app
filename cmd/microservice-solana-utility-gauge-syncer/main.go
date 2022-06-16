@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/solana/anchor"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queue"
@@ -25,11 +27,16 @@ const (
 
 	// EnvGaugemeisterPubkey is the public key of the gaugemeister of EnvGaugeProgramId
 	EnvGaugemeisterPubkey = `FLU_SOLANA_GAUGEMEISTER_PUBKEY`
+
+	// EnvGaugeSecretKey is the private key of the account triggering the next epoch
+	EnvGaugeSecretKey = `FLU_SOLANA_GAUGE_SECRET_KEY`
 )
 
 func main() {
 	var (
-		rpcUrl                = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		rpcUrl      = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		payerPrikey = util.GetEnvOrFatal(EnvGaugeSecretKey)
+
 		utilityGaugeProgramId = solana.MustPublicKeyFromBase58(EnvUtilityGaugeProgramId)
 		gaugemeisterPubkey    = solana.MustPublicKeyFromBase58(EnvGaugemeisterPubkey)
 	)
@@ -38,6 +45,15 @@ func main() {
 
 	// Get current rewards epoch
 	gaugemeister := getGaugemeisterData(solanaClient, gaugemeisterPubkey)
+
+	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "failed to decode payer private key!"
+			k.Payload = err
+		})
+	}
 
 	var (
 		// nextEpochStartsAt is the unix time when next epoch starts
@@ -59,7 +75,9 @@ func main() {
 		// Call Trigger next Epoch here!
 		triggerNextEpochBytes_ := "TriggerNextEpoch"
 
-		triggerNextEpochBytes := [8]byte{200, 53, 104, 185, 85, 78, 187, 74}
+		fmt.Println(anchor.GetAnchorDiscriminator(triggerNextEpochBytes_))
+
+		triggerNextEpochBytes := []byte{200, 53, 104, 185, 85, 78, 187, 74}
 
 		triggerNextEpochAccounts := solana.AccountMetaSlice{
 			gaugemeister: gaugemeisterPubkey,
