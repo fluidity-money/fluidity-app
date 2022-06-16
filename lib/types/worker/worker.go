@@ -1,6 +1,7 @@
 package worker
 
 import (
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -120,6 +121,43 @@ type (
 		Logs         []ethereum.Log         `json:"logs"`
 		Transactions []ethereum.Transaction `json:"transactions"`
 		BlockNumber  misc.BigInt            `json:"block_number"`
+	}
+
+	EthereumWorkerDecorator struct {
+		SenderUtilityMiningAmount    misc.BigInt `json:"sender_amount"`
+		RecipientUtilityMiningAmount misc.BigInt `json:"receiver_amount"`
+	}
+
+	EthereumDecoratedTransfer struct {
+		SenderAddress          ethereum.Address        `json:"sender_address"`
+		RecipientAddress       ethereum.Address        `json:"recipient_address"`
+		SenderWinningAmount    *misc.BigInt            `json:"sender_win_amount"`
+		RecipientWinningAmount *misc.BigInt            `json:"recipient_win_amount"`
+		Decorator              EthereumWorkerDecorator `json:"decorator"`
+	}
+
+	EthereumHintedBlock struct {
+		BlockHash          ethereum.Hash               `json:"block_hash"`
+		BlockBaseFee       misc.BigInt                 `json:"block_base_fee"`
+		BlockTime          uint64                      `json:"block_time"`
+		BlockNumber        misc.BigInt                 `json:"block_number"`
+		TransferCount      int                         `json:"transfer_count"`
+		DecoratedTransfers []EthereumDecoratedTransfer `json:"decorated_transfers"`
+	}
+
+	EthereumServerWork struct {
+		EthereumBlockLog    *EthereumBlockLog    `json:"block_log"`
+		EthereumHintedBlock *EthereumHintedBlock `json:"hinted_block"`
+	}
+
+	EthereumClientAnnouncement struct {
+		EthereumHintedBlock   *EthereumHintedBlock   `json:"hinted_block"`
+		EthereumAnnouncements []EthereumAnnouncement `json:"announcement"`
+	}
+
+	EthereumApplicationEvent struct {
+		ApplicationTransfers []libEthereum.Transfer `json:"application_transfers"`
+		BlockLog             EthereumBlockLog       `json:"block_log"`
 	}
 
 	// SolanaWinnerAnnouncement to use to report a winner and its randomness
