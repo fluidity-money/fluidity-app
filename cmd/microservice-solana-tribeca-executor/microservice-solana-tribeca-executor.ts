@@ -17,15 +17,6 @@ import {
 import { GokiSDK } from "@gokiprotocol/client/dist/cjs";
 import { GovernJSON } from "@tribecahq/tribeca-sdk/dist/cjs/idls/govern";
 
-const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
-
-if (!FLU_SENTRY_URL) {
-  throw new Error("FLU_SENTRY_URL not provided");
-};
-
-Sentry.init({
-  dsn: FLU_SENTRY_URL,
-});
 
 const WORKER_ID = process.env.FLU_WORKER_ID as string;
 
@@ -33,13 +24,23 @@ if (!WORKER_ID) {
   throw new Error("WORKER_ID not provided");
 };
 
-Sentry.configureScope(scope => {
-  scope.setTag('worker-id', WORKER_ID);
-})
+const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
 
-// Wrap in Sentry
+if (FLU_SENTRY_URL) {
+  Sentry.init({
+    dsn: FLU_SENTRY_URL,
+  });
+
+  Sentry.configureScope(scope => {
+    scope.setTag('worker-id', WORKER_ID);
+  })
+} 
+
+const reportError = Sentry.getCurrentHub().getClient() ? 
+  (e: any) => {throw e} :
+  (e: any) => Sentry.captureException(e);
+
 try {
-
 // EXECUTOR_SECRET_KEY is the base58 encoded key responsible for paying and signing
 //  tribeca/goki transactions
 const EXECUTOR_SECRET_KEY = process.env
@@ -366,5 +367,5 @@ const provider = SolanaProvider.init({
 })();
 
 } catch (e) {
-  Sentry.captureException(e)
+  reportError(e);
 }

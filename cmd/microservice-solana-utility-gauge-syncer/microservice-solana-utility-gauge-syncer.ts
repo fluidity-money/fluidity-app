@@ -1,5 +1,8 @@
 import type {Idl, Program} from "@project-serum/anchor";
 
+import * as Sentry from '@sentry/node';
+import "@sentry/tracing";
+
 import { newProgramMap } from "@saberhq/anchor-contrib";
 import {Connection} from "@solana/web3.js";
 import {Wallet, web3} from "@project-serum/anchor";
@@ -8,6 +11,29 @@ import * as b58 from 'base58-js';
 
 import UtilityGaugeIdl_ from './idls/utility_gauge.json';
 
+const WORKER_ID = process.env.FLU_WORKER_ID as string;
+
+if (!WORKER_ID) {
+  throw new Error("WORKER_ID not provided");
+};
+
+const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
+
+if (FLU_SENTRY_URL) {
+  Sentry.init({
+    dsn: FLU_SENTRY_URL,
+  });
+
+  Sentry.configureScope(scope => {
+    scope.setTag('worker-id', WORKER_ID);
+  })
+} 
+
+const reportError = Sentry.getCurrentHub().getClient() ? 
+  (e: any) => {throw e} :
+  (e: any) => Sentry.captureException(e);
+
+try {
 const SOLANA_RPC_URL = process.env.FLU_SOLANA_RPC_URL as string;
 
 if (!SOLANA_RPC_URL) {
@@ -119,5 +145,9 @@ const triggerNextEpoch = async(timeoutMs: number) => {
   await triggerNextEpoch(nextEpochStartsAtMs - currentUnixMs + 10);
 
 })();
+
+} catch (e) {
+  reportError(e);
+}
 
 
