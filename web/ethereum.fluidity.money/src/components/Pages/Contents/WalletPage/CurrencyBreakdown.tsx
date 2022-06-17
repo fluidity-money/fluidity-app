@@ -9,6 +9,7 @@ import _ from "lodash";
 import ToggleButton from "components/Button/ToggleButton";
 import LineGraph from "components/Charts/LineChart";
 import Button from "components/Button";
+import UnclaimedRewardsbutton from "components/Button/UnclaimedRewardsButton";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -144,7 +145,7 @@ const CurrencyBreakdown = () => {
           reward averages
         </div>
         {LineChart}
-        {/* <Button label={"Total Unclaimed Rewards"} goto={() => {}} /> */}
+        <UnclaimedRewardsbutton />
       </div>
 
       <div className="wallet-overview">
