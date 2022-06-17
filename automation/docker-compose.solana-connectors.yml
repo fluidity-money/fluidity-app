@@ -32,3 +32,16 @@ services:
       - postgres
       - redis
 
+  connector-solana-utility-gauge-postgres:
+    build:
+      context: ../cmd/connector-solana-utility-gauge-postgres
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-utility-gauge-postgres
+      FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
+      FLU_POSTGRES_URI: ${FLU_POSTGRES_URI}
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+
