@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	utility_gauge "github.com/fluidity-money/fluidity-app/common/solana/utility-gauge"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	queue "github.com/fluidity-money/fluidity-app/lib/queues/utility-gauge"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	types "github.com/fluidity-money/fluidity-app/lib/types/payout"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	solana "github.com/gagliardetto/solana-go"
+	goSolana "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
 )
@@ -20,135 +21,195 @@ const (
 	// EnvSolanaRpcUrl is the RPC url of the solana node to connect to
 	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
 
+	// EnvSolanaWsUrl is the RPC url of the solana node to connect to
+	EnvSolanaWsUrl = `FLU_SOLANA_WS_URL`
+
 	// EnvSolanaNetwork is the network of the Gauge ProgramId
 	EnvSolanaNetwork = `FLU_SOLANA_NETWORK`
 
+	// EnvGaugemeisterPubkey is the pubkey of the currently active gaugemeister
+	EnvGaugemeisterPubkey = `FLU_SOLANA_GAUGEMEISTER_PUKEY`
+
 	// EnvGaugeProgramId is the program used to vote on utility gauges
-	EnvGaugeProgramId = `FLU_SOLANA_GAUGE_PROGRAM_ID`
+	EnvUtilityGaugeProgramId = `FLU_UTILITY_GAUGE_PROGRAM_ID`
 )
 
-const (
-	SOLANA_CHAIN = "solana"
-)
+const SOLANA_CHAIN = "solana"
 
 func main() {
 	var (
-		rpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaRpcUrl  = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaWsUrl   = util.GetEnvOrFatal(EnvSolanaWsUrl)
 		solanaNetwork = util.GetEnvOrFatal(EnvSolanaNetwork)
 
-		gaugeProgramId = solana.MustPublicKeyFromBase58(EnvGaugeProgramId)
+		gaugemeisterPubkey    = goSolana.MustPublicKeyFromBase58(EnvGaugemeisterPubkey)
+		utilityGaugeProgramId = goSolana.MustPublicKeyFromBase58(EnvUtilityGaugeProgramId)
+
+		accountNotificationChan = make(chan solana.AccountNotification)
+		errChan                 = make(chan error)
 	)
 
-	solanaClient := solanaRpc.New(rpcUrl)
+	solanaClient := solanaRpc.New(solanaRpcUrl)
 
-	queue.GetEpochGauges(func(epochGauges types.EpochGauges) {
-		var (
-			epoch  = epochGauges.Epoch
-			gauges = epochGauges.Gauges
-		)
+	solanaSubscription, err := solana.SubscribeAccount(
+		solanaWsUrl,
+		gaugemeisterPubkey.String(),
+		accountNotificationChan,
+		errChan,
+	)
 
-		for _, gaugePubkey_ := range gauges {
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "failed to subcribe to solana events!"
+			k.Payload = err
+		})
+	}
 
-			gaugePubkey := solana.MustPublicKeyFromBase58(gaugePubkey_)
+	defer solanaSubscription.Close()
 
-			currentGaugePower := types.UtilityGaugePower{
-				Chain:   SOLANA_CHAIN,
-				Network: solanaNetwork,
-				Gauge:   gaugePubkey.String(),
+	for {
+		select {
+		case accountNotification := <-accountNotificationChan:
+			log.Debug(func(k *log.Log) {
+				k.Message = "Gaugemeister was updated!"
+			})
 
-				Epoch:      epoch,
-				Disabled:   true,
-				TotalPower: misc.BigIntFromInt64(0),
-			}
+			var gaugemeisterData utility_gauge.Gaugemeister
 
-			var gauge utility_gauge.Gauge
+			gaugemeisterDataBase64 := accountNotification.Value.Data[0]
 
-			accInfoRes, err := solanaClient.GetAccountInfo(
-				context.Background(),
-				gaugePubkey,
-			)
+			gaugemeisterDataBinary, err := base64.RawStdEncoding.DecodeString(gaugemeisterDataBase64)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Format("failed to get gauge account data %v!", gaugePubkey)
+					k.Message = "could not decode account data from base64!"
 					k.Payload = err
 				})
 			}
 
-			gaugeDataBinary := accInfoRes.Value.Data.GetBinary()
+			gaugemeisterAccDataBinary := gaugemeisterDataBinary[8:]
 
-			// remove account discriminator from data binary
-			gaugeAccData := gaugeDataBinary[8:]
-
-			err = borsh.Deserialize(&gauge, gaugeAccData)
+			err = borsh.Deserialize(&gaugemeisterData, gaugemeisterAccDataBinary)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Format("failed to decode gauge account data of %v!", gaugePubkey)
+					k.Message = "failed to decode data account!"
 					k.Payload = err
 				})
 			}
 
-			var isDisabled = gauge.IsDisabled
+			var epoch = gaugemeisterData.CurrentRewardsEpoch
 
-			// if isDisabled, Gauge is not participating in this round of rewards
-			if isDisabled {
+			var gauges = database.GetWhitelistedGauges()
+
+			for _, gaugePubkey_ := range gauges {
+
+				gaugePubkey := goSolana.MustPublicKeyFromBase58(gaugePubkey_)
+
+				currentGaugePower := types.UtilityGaugePower{
+					Chain:   SOLANA_CHAIN,
+					Network: solanaNetwork,
+					Gauge:   gaugePubkey.String(),
+
+					Epoch:      epoch,
+					Disabled:   true,
+					TotalPower: misc.BigIntFromInt64(0),
+				}
+
+				var gauge utility_gauge.Gauge
+
+				accInfoRes, err := solanaClient.GetAccountInfo(
+					context.Background(),
+					gaugePubkey,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format("failed to get gauge account data %v!", gaugePubkey)
+						k.Payload = err
+					})
+				}
+
+				gaugeDataBinary := accInfoRes.Value.Data.GetBinary()
+
+				// remove account discriminator from data binary
+				gaugeAccData := gaugeDataBinary[8:]
+
+				err = borsh.Deserialize(&gauge, gaugeAccData)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format("failed to decode gauge account data of %v!", gaugePubkey)
+						k.Payload = err
+					})
+				}
+
+				var isDisabled = gauge.IsDisabled
+
+				// if isDisabled, Gauge is not participating in this round of rewards
+				if isDisabled {
+					database.InsertUtilityGauge(currentGaugePower)
+
+					continue
+				}
+
+				currentGaugePower.Disabled = isDisabled
+
+				// TODO: Cannot differentiate between RPC failures, or if EpochGauge
+				// simply did not exist at past epoch
+				epochGaugePubkey, _, err := utility_gauge.DeriveEpochGaugePubkey(
+					utilityGaugeProgramId,
+					gaugePubkey,
+					epoch,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format("failed to derive epochGauge from gauge account %v!", gaugePubkey)
+						k.Payload = err
+					})
+				}
+
+				var epochGauge utility_gauge.EpochGauge
+
+				accInfoRes, err = solanaClient.GetAccountInfo(
+					context.Background(),
+					epochGaugePubkey,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format("failed to get epochGauge account data %v!", epochGaugePubkey)
+						k.Payload = err
+					})
+				}
+
+				epochGaugeDataBinary := accInfoRes.Value.Data.GetBinary()
+
+				// remove account discriminator from data binary
+				epochGaugeAccData := epochGaugeDataBinary[8:]
+
+				err = borsh.Deserialize(&epochGauge, epochGaugeAccData)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format("failed to decode epochGauge account data from %v!", epochGaugePubkey)
+						k.Payload = err
+					})
+				}
+
+				var totalPower = epochGauge.TotalPower
+
+				currentGaugePower.TotalPower = misc.BigIntFromUint64(totalPower)
+
 				database.InsertUtilityGauge(currentGaugePower)
-
-				continue
 			}
 
-			currentGaugePower.Disabled = isDisabled
-
-			// TODO: Cannot differentiate between RPC failures, or if EpochGauge
-			// simply did not exist at past epoch
-			epochGaugePubkey, _, err := utility_gauge.DeriveEpochGaugePubkey(
-				gaugeProgramId,
-				gaugePubkey,
-				epoch,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format("failed to derive epochGauge from gauge account %v!", gaugePubkey)
-					k.Payload = err
-				})
-			}
-
-			var epochGauge utility_gauge.EpochGauge
-
-			accInfoRes, err = solanaClient.GetAccountInfo(
-				context.Background(),
-				epochGaugePubkey,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format("failed to get epochGauge account data %v!", epochGaugePubkey)
-					k.Payload = err
-				})
-			}
-
-			epochGaugeDataBinary := accInfoRes.Value.Data.GetBinary()
-
-			// remove account discriminator from data binary
-			epochGaugeAccData := epochGaugeDataBinary[8:]
-
-			err = borsh.Deserialize(&epochGauge, epochGaugeAccData)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format("failed to decode epochGauge account data from %v!", epochGaugePubkey)
-					k.Payload = err
-				})
-			}
-
-			var totalPower = epochGauge.TotalPower
-
-			currentGaugePower.TotalPower = misc.BigIntFromUint64(totalPower)
-
-			database.InsertUtilityGauge(currentGaugePower)
+		case err := <-errChan:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "error from the solana websocket!"
+				k.Payload = err
+			})
 		}
-
-	})
+	}
 }

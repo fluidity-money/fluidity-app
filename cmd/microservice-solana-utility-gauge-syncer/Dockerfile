@@ -7,8 +7,4 @@ COPY . .
 
 RUN make build
 
-ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "wait-for-db", \
-    "./start.sh" \
-]
+ENTRYPOINT [ "./start.sh" ]

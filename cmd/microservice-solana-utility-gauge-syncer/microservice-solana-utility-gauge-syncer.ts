@@ -4,9 +4,7 @@ import { newProgramMap } from "@saberhq/anchor-contrib";
 import {Connection} from "@solana/web3.js";
 import {Wallet, web3} from "@project-serum/anchor";
 import {PublicKey, SolanaProvider, SolanaAugmentedProvider} from "@saberhq/solana-contrib";
-import * as amqp from "amqplib";
 import * as b58 from 'base58-js';
-import {Client} from "pg";
 
 import UtilityGaugeIdl_ from './idls/utility_gauge.json';
 
@@ -34,25 +32,6 @@ if (!UTILITY_GAUGE_SECRET_KEY) {
   throw new Error("FLU_SOLANA_UTILITY_GAUGE_SECRET_KEY not provided");
 }
 
-const FLU_AMQP_QUEUE_ADDR = process.env.FLU_AMQP_QUEUE_ADDR as string;
-
-if (!FLU_AMQP_QUEUE_ADDR) {
-  throw new Error("FLU_AMQP_QUEUE_ADDR not provided");
-}
-
-const FLU_POSTGRES_URI = process.env.FLU_POSTGRES_URI as string;
-
-if (!FLU_POSTGRES_URI) {
-  throw new Error("FLU_POSTGRES_URI not provided");
-}
-
-const TopicUtilityGauge = "utility_gauge.utility_gauges";
-
-const ExchangeName = "fluidity";
-const ExchangeType = "topic";
-    
-const TableWhitelistedGauges = "whitelisted_gauges";
- 
 const gaugemeisterPubkey = new PublicKey(GAUGEMEISTER_PUBKEY);
 
 const utilityGaugePubkey = new PublicKey(UTILITY_GAUGE_PROGRAM_ID);
@@ -65,7 +44,6 @@ const connection = new Connection(SOLANA_RPC_URL, "processed");
 
 const wallet = new Wallet(payerKeypair);
 
-// Load the utility gauge program
 const provider = SolanaProvider.init({
   connection,
   wallet,
@@ -85,13 +63,9 @@ const UTILITY_GAUGE_ADDRESSES = {
   UtilityGauge: utilityGaugePubkey,
 };
 
-/**
- * Program IDLs.
-*/
 const UTILITY_GAUGE_IDLS = {
   UtilityGauge: UtilityGaugeIdl,
 };
-
 
 const programs = newProgramMap<Programs>(
   provider,
@@ -101,11 +75,8 @@ const programs = newProgramMap<Programs>(
 
 const utilityGauge = programs.UtilityGauge;
 
-const pgClient = new Client(FLU_POSTGRES_URI);
-
-const triggerNextEpoch = async(amqpChannel: amqp.Channel, timeoutMs: number) => {
+const triggerNextEpoch = async(timeoutMs: number) => {
   setTimeout(async() => {
-    // trigger next epoch
     const triggerNextEpochInst = utilityGauge.instruction.triggerNextEpoch({
       accounts: {
         gaugemeister: gaugemeisterPubkey,
@@ -117,54 +88,23 @@ const triggerNextEpoch = async(amqpChannel: amqp.Channel, timeoutMs: number) => 
     triggerNextEpochTx.addSigners(payerKeypair);
   
     await triggerNextEpochTx.send();
-
-    const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
-
-    pgClient.connect();
-
-    const whitelistedGaugesRes = await pgClient.query(
-      `SELECT
-        gauge
-      FROM ${TableWhitelistedGauges}`);
-
-    pgClient.end();
     
-    const whitelistedGauges = whitelistedGaugesRes.rows;
+    const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
     
     if (gaugemeister === null) {
-      throw new Error("could not fetch gaugemeister at address " + gaugemeisterPubkey.toString());
-    }
-  
-    const {epochDurationSeconds, currentRewardsEpoch} = gaugemeister;
-  
-    const updatedGauges = {
-      gaugemeister: gaugemeisterPubkey.toString(),
-      epoch: currentRewardsEpoch,
-      gauges: whitelistedGauges,
+      throw new Error("could not fetch gaugemeister at address: " + gaugemeisterPubkey.toString());
     }
 
-    const updatedGaugesBuffer = Buffer.from(JSON.stringify(updatedGauges));
-
-    amqpChannel.sendToQueue(TopicUtilityGauge, updatedGaugesBuffer);
+    const { epochDurationSeconds } = gaugemeister;
     
-    timeoutMs = epochDurationSeconds * 1000;
+    timeoutMs = (epochDurationSeconds + 10) * 1000;
 
-    await triggerNextEpoch(amqpChannel, timeoutMs);
+    await triggerNextEpoch(timeoutMs);
 
   }, timeoutMs);
 }
 
 (async() => {
-  const amqpConnection = await amqp.connect(FLU_AMQP_QUEUE_ADDR);
-
-  const amqpChannel = await amqpConnection.createChannel();
-
-  amqpChannel.assertExchange(ExchangeName, ExchangeType, {
-    durable: true,
-    autoDelete: false,
-    internal: false,
-  });
-
   const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
   
   if (gaugemeister === null) {
@@ -176,7 +116,7 @@ const triggerNextEpoch = async(amqpChannel: amqp.Channel, timeoutMs: number) => 
   
   const currentUnixMs = (new Date()).valueOf()
   
-  await triggerNextEpoch(amqpChannel, nextEpochStartsAtMs - currentUnixMs);
+  await triggerNextEpoch(nextEpochStartsAtMs - currentUnixMs + 10);
 
 })();
 
