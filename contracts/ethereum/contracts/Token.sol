@@ -6,12 +6,15 @@ import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 import "./LiquidityProvider.sol";
 
+/// @dev sentinel to mark the start of a range iin rewardedBlocks
+uint constant FIRST_REWARDED_BLOCK = 1;
+/// @dev sentinel to mark the end of a range iin rewardedBlocks
+uint constant LAST_REWARDED_BLOCK = 2;
+
 /// @dev parameter for the batchReward function
 struct Winner {
-    address from;
-    address to;
+    address winner;
     uint256 amount;
-    bytes32 txHash;
 }
 
 /// @title The fluid token ERC20 contract
@@ -21,11 +24,10 @@ contract Token is IERC20 {
 
     /// @notice emitted when any reward is paid out
     event Reward(
-        bytes32 txHash,
-        address indexed from,
-        uint fromAmount,
-        address indexed to,
-        uint toAmount
+        address indexed winner,
+        uint amount,
+        uint startBlock,
+        uint endBlock
     );
 
     /// @notice emitted when an underlying token is wrapped into a fluid asset
@@ -50,7 +52,20 @@ contract Token is IERC20 {
 
     /// @dev [txhash] => [0 if the reward for that transaction hasn't been rewarded, 1 otherwise]
     /// @dev operating on ints saves us a bit of gas
+    /// @dev deprecated
     mapping (bytes32 => uint) private pastRewards_;
+
+    /// @dev [block number] => [rewarded block state]
+    mapping(uint => uint) rewardedBlocks_;
+
+    uint lastRewardedBlock_;
+
+    /// @dev [address] => [[block number] => [rewarded block state]]
+    mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
+
+    /// @dev amount a user has manually rewarded, to be removed from their batched rewards
+    /// @dev [address] => [amount manually rewarded]
+    mapping (address => uint) private manualRewards_;
 
     /**
      * @notice initializer function - sets the contract's data
@@ -161,78 +176,46 @@ contract Token is IERC20 {
      * @dev rewards two users from the reward pool
      * @dev mints tokens and emits the reward event
      *
-     * @param hash the transaction hash that had the transfer that won
-     * @param from the address of the user that sent the transfer
-     * @param to the address of the user that received the transfer
-     * @param amount the total amount to split to the users
+     * @param lastBlock the last block in the range being rewarded for
+     * @param winner the address being rewarded
+     * @param amount the amount being rewarded
      */
-    function rewardFromPool(bytes32 hash, address from, address to, uint amount) internal {
+    function rewardFromPool(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
         // mint some fluid tokens from the interest we've accrued
-        // 20%
-        uint256 toAmount = amount / 5;
-        // 80%
-        uint256 fromAmount = amount - toAmount;
+        emit Reward(winner, amount, firstBlock, lastBlock);
 
-        emit Reward(hash, from, fromAmount, to, toAmount);
-
-        _mintDouble(from, fromAmount, to, toAmount);
+        _mint(winner, amount);
     }
 
-    /**
-     * @notice pays out a reward to two users
-     * @notice only usable by the trusted oracle
-     * @dev deprecated - use batchReward
-     *
-     * @param txHash the hash of the transaction that won
-     * @param from the address of the user that sent the transfer
-     * @param to the address of the user that received the transfer
-     * @param balls the array of balls drawn for this transaction
-     * @param payouts the array of payouts for this transction
-     */
-    function reward(
-        bytes32 txHash,
-        address from,
-        address to,
-        uint[] calldata balls,
-        uint[] calldata payouts
-    ) public {
-        require(msg.sender == rngOracle_, "only the oracle account can use this");
-
-        // ensure the tx hasn't already been redeemed
-        require(pastRewards_[txHash] == 0, "reward already given for this tx");
-
-        // validate the rng
-        uint winAmount = rewardAmount(balls, payouts);
-
-        uint maxRewardAmount = rewardPoolAmount();
-        if (winAmount > maxRewardAmount) winAmount = maxRewardAmount;
-
-        // now pay out the user
-        pastRewards_[txHash] = 1;
-        rewardFromPool(txHash, from, to, winAmount);
-    }
-
-    /**
-     * @notice pays out several rewards
+    /** @notice pays out several rewards
      * @notice only usable by the trusted oracle account
      *
      * @param rewards the array of rewards to pay out
      */
-    function batchReward(Winner[] memory rewards) public {
+    function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         uint poolAmount = rewardPoolAmount();
 
+        rewardedBlocks_[firstBlock] = 1;
+        // this might not happen if our transactions go through out of order
+        if (lastBlock > lastRewardedBlock_) lastRewardedBlock_ = lastBlock;
+
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
 
-            if (pastRewards_[winner.txHash] != 0) continue; // user decided to frontrun
-            pastRewards_[winner.txHash] = 1;
+            if (manualRewards_[winner.winner] != 0) {
+                uint amount = winner.amount > manualRewards_[winner.winner] ?
+                    manualRewards_[winner.winner] :
+                    winner.amount;
+                winner.amount -= amount;
+                manualRewards_[winner.winner] -= amount;
+            }
 
             require(poolAmount >= winner.amount, "reward pool empty");
             poolAmount = poolAmount - winner.amount;
 
-            rewardFromPool(winner.txHash, winner.from, winner.to, winner.amount);
+            rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
         }
     }
 
@@ -241,23 +224,23 @@ contract Token is IERC20 {
      * @notice requires a signature of the random numbers generated
      * @notice by the trusted oracle
      *
-     * @param txHash the hash of the transaction that won, provided by the oracle
-     * @param from the address of the user that sent the transfer, oracle provided
-     * @param to the address of the user that received the transfer, oracle provided
-     * @param winAmount the amount of tokens won, oracle provided
+     * @param winner the address of the user being rewarded
+     * @param winAmount the amount won
+     * @param firstBlock the first block in the range being rewarded for
+     * @param lastBlock the last block in the range being rewarded for
      * @param sig the signature of the above parameters, provided by the oracle
      */
     function manualReward(
-        bytes32 txHash,
-        address from,
-        address to,
+        address winner,
         uint256 winAmount,
+        uint firstBlock,
+        uint lastBlock,
         bytes memory sig
     ) external {
         require(sig.length == 65, "invalid rng format (length)");
         // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
         //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
-        bytes32 hash = keccak256(abi.encode(txHash, from, to , winAmount));
+        bytes32 hash = keccak256(abi.encode(winner, winAmount, firstBlock, lastBlock));
 
         // ECDSA verification
         // TODO: Get a proper audit here
@@ -274,40 +257,30 @@ contract Token is IERC20 {
         require(ecrecover(hash, v, r, s) == rngOracle_, "invalid rng signature");
 
         // now reward the user
-        require(pastRewards_[txHash] == 0, "reward already given for this tx");
-        pastRewards_[txHash] = 1;
+
+        // user decided to frontrun
+        require(
+            manualRewardedBlocks_[winner][firstBlock] == 0,
+            "manual reward already given for part of this range"
+        );
+        require(
+            manualRewardedBlocks_[winner][lastBlock] == 0,
+            "manual reward already given for part of this range"
+        );
+        require(
+            firstBlock > lastRewardedBlock_,
+            "reward already given for part of this range"
+        );
+        manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
+        manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
+        manualRewards_[winner] += winAmount;
 
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 
-        rewardFromPool(txHash, from, to, winAmount);
+        rewardFromPool(firstBlock, lastBlock, winner, winAmount);
     }
 
-    // returns the amount that the user won (can be 0), reverts on invalid rng
-    /**
-     * @notice given a list of balls drawn by the worker and the payouts,
-     * @notice returns the number of tokens won
-     * @dev deprecated - this is done offchain now
-     *
-     * @param balls the balls drawn by the worker
-     * @param payouts the current array of payouts
-     * @return the amount of tokens won, reverting if 0
-     */
-    function rewardAmount(
-        uint[] calldata balls,
-        uint[] calldata payouts
-    ) public pure returns (uint) {
-        uint winningBalls = 0;
-
-        for (uint i = 0; i < balls.length; i++) {
-            // assume the user picked balls 1..n
-            if (balls[i] <= balls.length) winningBalls++;
-        }
-        require(winningBalls > 0, "transaction didn't win");
-
-        return payouts[winningBalls - 1];
-    }
-
-    // remaining functions besides `mintDouble` are taken from OpenZeppelin's ERC20 implementation
+    // remaining functions are taken from OpenZeppelin's ERC20 implementation
 
     function name() public view returns (string memory) { return name_; }
     function symbol() public view returns (string memory) { return symbol_; }
@@ -377,19 +350,6 @@ contract Token is IERC20 {
         totalSupply_ += amount;
         balances_[account] += amount;
         emit Transfer(address(0), account, amount);
-    }
-
-    /// @dev mint to two addresses, only writing to totalSupply once
-    function _mintDouble(address account1, uint256 amount1, address account2, uint256 amount2) internal virtual {
-        require(account1 != address(0), "ERC20: mint to the zero address");
-        require(account2 != address(0), "ERC20: mint to the zero address");
-
-        totalSupply_ += amount1 + amount2;
-        balances_[account1] += amount1;
-        emit Transfer(address(0), account1, amount1);
-
-        balances_[account2] += amount2;
-        emit Transfer(address(0), account2, amount2);
     }
 
     function _burn(address account, uint256 amount) internal virtual {

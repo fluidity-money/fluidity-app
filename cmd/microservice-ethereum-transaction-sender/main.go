@@ -102,7 +102,7 @@ func main() {
 
 	queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
 
-		var announcement []worker.EthereumWinnerAnnouncement
+		var announcement []worker.EthereumSpooledRewards
 
 		message.Decode(&announcement)
 

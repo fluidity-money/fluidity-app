@@ -7,6 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -36,60 +37,83 @@ func main() {
 	)
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
-		var announcement worker.EthereumWinnerAnnouncement
+		var announcements []worker.EthereumWinnerAnnouncement
 
-		message.Decode(&announcement)
+		message.Decode(&announcements)
 
-		// write the winner into the database
-		spooler.InsertPendingWinner(announcement)
+		toSend := make(map[token_details.TokenDetails]bool)
 
-		var (
-			winAmount     = announcement.WinAmount
-			tokenDetails  = announcement.TokenDetails
-			tokenDecimals = tokenDetails.TokenDecimals
-		)
+		for _, announcement := range announcements {
+			// write the winner into the database
+			spooler.InsertPendingWinners(announcement)
 
-		tokenDecimalsNum := bigExp10(int64(tokenDecimals))
-
-		scaledWinAmount := new(misc.BigInt).Div(&winAmount.Int, tokenDecimalsNum)
-
-		log.Debug(func(k *log.Log) {
-			k.Format(
-				"Reward value is $%s, instant send threshold is $%d.",
-				scaledWinAmount.String(),
-				instantRewardThreshold,
+			var (
+				// the sender's winnings will always be higher than the recipient's
+				fromWinAmount = announcement.FromWinAmount
+				tokenDetails  = announcement.TokenDetails
+				tokenDecimals = tokenDetails.TokenDecimals
 			)
-		})
 
-		totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
+			tokenDecimalsNum := bigExp10(int64(tokenDecimals))
 
-		scaledTotalRewards := new(big.Int).Div(totalRewards, tokenDecimalsNum)
+			scaledWinAmount := new(misc.BigInt).Div(&fromWinAmount.Int, tokenDecimalsNum)
 
-		log.Debug(func(k *log.Log) {
-			k.Format(
-				"Total pending rewards are $%s, threshold is $%d.",
-				scaledTotalRewards.String(),
-				totalRewardThreshold,
-			)
-		})
-
-		switch true {
-
-		case scaledWinAmount.Int64() >= instantRewardThreshold:
-			log.Debug(func(k *log.Log) {
-				k.Message = "Transaction won more than instant send threshold, sending instantly!"
+			log.Debug(func (k *log.Log) {
+			    k.Format("base amt $%s, decimals $%s", fromWinAmount.String(), tokenDecimalsNum.String())
 			})
-			sendRewards(batchedRewardsQueue, tokenDetails)
-
-			return
-
-		case scaledTotalRewards.Int64() >= totalRewardThreshold:
 			log.Debug(func(k *log.Log) {
-				k.Message = "Total pending rewards are greater than threshold, sending!"
+				k.Format(
+					"Reward value is $%s, instant send threshhold is $%d.",
+					scaledWinAmount.String(),
+					instantRewardThreshold,
+				)
 			})
-			sendRewards(batchedRewardsQueue, tokenDetails)
 
-			return
+			totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
+
+			scaledTotalRewards := new(big.Int).Div(totalRewards, tokenDecimalsNum)
+
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Total pending rewards are $%s, threshhold is $%d.",
+					scaledTotalRewards.String(),
+					totalRewardThreshold,
+				)
+			})
+
+			switch true {
+
+			case scaledWinAmount.Int64() >= instantRewardThreshold:
+				log.Debug(func(k *log.Log) {
+					k.Message = "Transaction won more than instant send threshold, sending instantly!"
+				})
+
+				toSend[tokenDetails] = true
+
+				continue
+
+			case scaledTotalRewards.Int64() >= totalRewardThreshold:
+				log.Debug(func(k *log.Log) {
+					k.Message = "Total pending rewards are greater than threshold, sending!"
+				})
+
+				toSend[tokenDetails] = true
+
+				continue
+			}
+		}
+
+		for shortName, send := range toSend {
+			if !send {
+				// should never happen
+				continue
+			}
+
+			log.Debug(func (k *log.Log) {
+			    k.Format("Sending rewards for token %s", shortName)
+			})
+
+			sendRewards(batchedRewardsQueue, shortName)
 		}
 	})
 }

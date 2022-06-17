@@ -1,7 +1,9 @@
 package log
 
 import (
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib"
 )
@@ -14,6 +16,7 @@ func init() {
 		workerId     = os.Getenv(microservice_lib.EnvWorkerId)
 	)
 
+	rand.Seed(time.Now().Unix())
 	invocation := os.Args[0]
 
 	go startLoggingServer(

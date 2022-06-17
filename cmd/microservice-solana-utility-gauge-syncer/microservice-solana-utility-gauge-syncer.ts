@@ -5,11 +5,10 @@ import {Connection} from "@solana/web3.js";
 import {Wallet, web3} from "@project-serum/anchor";
 import {PublicKey, SolanaProvider, SolanaAugmentedProvider} from "@saberhq/solana-contrib";
 import * as amqp from "amqplib";
+import * as b58 from 'base58-js';
 import {Client} from "pg";
 
 import UtilityGaugeIdl_ from './idls/utility_gauge.json';
-
-import * as b58 from 'base58-js';
 
 const SOLANA_RPC_URL = process.env.FLU_SOLANA_RPC_URL as string;
 
@@ -52,7 +51,6 @@ const TopicUtilityGauge = "utility_gauge.utility_gauges";
 const ExchangeName = "fluidity";
 const ExchangeType = "topic";
     
-// get whitelisted gauges
 const TableWhitelistedGauges = "whitelisted_gauges";
  
 const gaugemeisterPubkey = new PublicKey(GAUGEMEISTER_PUBKEY);
@@ -103,48 +101,10 @@ const programs = newProgramMap<Programs>(
 
 const utilityGauge = programs.UtilityGauge;
 
-// sleep returns a timeout promise
-const sleepMs = async (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
-// Load Postgres
 const pgClient = new Client(FLU_POSTGRES_URI);
 
-(async() => {
-  // Load rabbitmq
-  const amqpConnection = await amqp.connect(FLU_RABBITMQ_URL);
-
-  const amqpChannel = await amqpConnection.createChannel();
-
-  amqpChannel.assertExchange(ExchangeName, ExchangeType, {
-    durable: true,
-    autoDelete: false,
-    internal: false,
-  });
-
-// get gaugemeister data
-//   nextEpochStartsAt
-  const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
-  
-  if (gaugemeister === null) {
-    throw new Error("could not fetch gaugemeister at address: " + gaugemeisterPubkey.toString());
-  }
-  
-  const { nextEpochStartsAt } = gaugemeister;
-  const nextEpochStartsAtMs = nextEpochStartsAt.toNumber() * 1000;
-  
-  console.log(nextEpochStartsAt.toNumber());
-  
-  
-  // create loop here
-  // This is in ms -> must convert to seconds to match nextEpochStartsAt
-  const currentUnixMs = (new Date()).valueOf()
-
-  while (true) {
-    let timeoutMs = nextEpochStartsAtMs - currentUnixMs;
-  
-    await sleepMs(timeoutMs * 1000); 
-
+const triggerNextEpoch = async(amqpChannel: amqp.Channel, timeoutMs: number) => {
+  setTimeout(async() => {
     // trigger next epoch
     const triggerNextEpochInst = utilityGauge.instruction.triggerNextEpoch({
       accounts: {
@@ -158,12 +118,10 @@ const pgClient = new Client(FLU_POSTGRES_URI);
   
     await triggerNextEpochTx.send();
 
-    // get gaugemeisterdata
-    //   epochDurationSeconds
-    //   currentRewardsEpoch
     const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
 
     pgClient.connect();
+
     const whitelistedGaugesRes = await pgClient.query(
       `SELECT
         gauge
@@ -185,12 +143,42 @@ const pgClient = new Client(FLU_POSTGRES_URI);
       gauges: whitelistedGauges,
     }
 
-// send message to rabbitmq
     const updatedGaugesBuffer = Buffer.from(JSON.stringify(updatedGauges));
 
     amqpChannel.sendToQueue(TopicUtilityGauge, updatedGaugesBuffer);
     
     timeoutMs = epochDurationSeconds * 1000;
 
+    await triggerNextEpoch(amqpChannel, timeoutMs);
+
+  }, timeoutMs);
+}
+
+(async() => {
+  // Load rabbitmq
+  const amqpConnection = await amqp.connect(FLU_RABBITMQ_URL);
+
+  const amqpChannel = await amqpConnection.createChannel();
+
+  amqpChannel.assertExchange(ExchangeName, ExchangeType, {
+    durable: true,
+    autoDelete: false,
+    internal: false,
+  });
+
+  const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
+  
+  if (gaugemeister === null) {
+    throw new Error("could not fetch gaugemeister at address: " + gaugemeisterPubkey.toString());
   }
+  
+  const { nextEpochStartsAt } = gaugemeister;
+  const nextEpochStartsAtMs = nextEpochStartsAt.toNumber() * 1000;
+  
+  const currentUnixMs = (new Date()).valueOf()
+  
+  await triggerNextEpoch(amqpChannel, nextEpochStartsAtMs - currentUnixMs);
+
 })();
+
+

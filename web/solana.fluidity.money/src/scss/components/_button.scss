@@ -237,6 +237,39 @@
 //   transition: all 0.5s ease-in-out;
 // }
 
+.select-token-button {
+  background-color: #1a1c1f;
+  color: #ffffff;
+  height: 3rem;
+  width: 100%;
+  border-radius: 10px;
+  border-style: solid;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 0;
+  &:hover {
+    background-color: rgba(56, 60, 69, 0.5);
+  }
+}
+//HERE
+.token-list-item-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+//HERE
+.token-list-item-names {
+  display: flex;
+  flex-direction: column;
+}
+
 .select-button {
   background-color: transparent;
   //font-weight: 700;
@@ -278,7 +311,7 @@
   padding: 5px 10px 5px 10px;
   background-color: transparent;
   border: solid transparent 1px;
-  border-radius: 10px;
+  border-radius: 7px;
 
   cursor: pointer;
   transition: all 0.4s linear;
@@ -286,6 +319,15 @@
   &:hover {
     background-color: rgba(56, 60, 69, 0.5);
   }
+  &-current {
+    @extend .network-options;
+    border: 2px solid #12ecab;
+    justify-content: space-between;
+  }
+}
+
+.network-items {
+  display: flex;
 }
 
 .network-icon {

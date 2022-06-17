@@ -77,10 +77,9 @@
   flex-direction: column;
   text-align: center;
   align-content: center;
-  overflow-y: overlay;
+  overflow-y: auto;
 
   &:hover {
-    overflow-y: overlay;
     &::-webkit-scrollbar-thumb {
       background: #555;
       border-radius: 10px;
@@ -446,6 +445,7 @@
   cursor: pointer;
   padding-right: 0.8rem;
   padding-left: 0.1rem;
+  margin-right: 0.5rem;
 }
 
 .not-found-text {

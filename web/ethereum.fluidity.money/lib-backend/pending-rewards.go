@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/web"
+	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 type RequestPendingRewards struct {
@@ -34,8 +36,16 @@ func HandlePendingRewards(w http.ResponseWriter, r *http.Request) interface{} {
 		return returnForbidden(w)
 	}
 
-	address := request.Address
+	var (
+		addressString = request.Address
+		address = typesEthereum.AddressFromString(addressString)
+	)
 
-	return spooler.GetPendingRewardsForAddress(address)
+
+	rewards := spooler.GetPendingRewardsForAddress(addressString)
+
+	spooledRewards := ethereum.BatchWinningsByToken(rewards, address)
+
+	return spooledRewards
 }
 

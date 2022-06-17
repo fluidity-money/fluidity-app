@@ -2,17 +2,18 @@ const FormSection = ({
   children,
   cname,
   defaultMargin,
-  onClickHandler
+  onClickHandler,
 }: {
   children?: JSX.Element | JSX.Element[];
   cname?: string;
   defaultMargin?: boolean;
-  onClickHandler?: () => void
+  onClickHandler?: () => void;
 }) => {
-
   return (
     <div
-      className={`${cname ?? ""} ${defaultMargin === false ? "" : "my-1-t"}`}
+      className={`${cname ?? ""} ${
+        defaultMargin === false ? "" : "swap-field-margin"
+      }`}
       onClick={onClickHandler}
     >
       {children}

@@ -1,7 +1,8 @@
 import Button from "components/Button";
 import GenericModal from "components/Modal/GenericModal";
-import React, { useEffect } from "react";
 import { appTheme } from "util/appTheme";
+import { chainIdFromEnv } from "util/chainId";
+import useLocalStorage from "util/hooks/useLocalStorage";
 
 interface Blockchain {
   blockchain: string;
@@ -13,6 +14,7 @@ interface Blockchain {
 interface Network {
   name: string;
   address: string;
+  id: string;
 }
 
 const SelectBlockchainModal = ({
@@ -32,9 +34,17 @@ const SelectBlockchainModal = ({
       icon: "/img/TokenIcons/ethereumIcon.svg",
       visible: true,
       networks: [
-        // { name: "Mainnet", address: "https://app.ethereum.fluidity.money/" },
-        { name: "Ropsten", address: "https://ropsten.beta.fluidity.money/" },
-        { name: "Kovan", address: "https://kovan.beta.fluidity.money/" },
+        // { name: "Mainnet", address: "https://app.ethereum.fluidity.money/",id:"1" },
+        {
+          name: "Ropsten",
+          address: "https://ropsten.beta.fluidity.money/",
+          id: "3",
+        },
+        {
+          name: "Kovan",
+          address: "https://kovan.beta.fluidity.money/",
+          id: "42",
+        },
       ],
     },
     {
@@ -42,7 +52,11 @@ const SelectBlockchainModal = ({
       icon: "/img/Aurora/AuroraLogoTextBelow.svg",
       visible: true,
       networks: [
-        { name: "Aurora", address: "https://app.aurora.fluidity.money/" },
+        {
+          name: "Aurora",
+          address: "https://app.aurora.fluidity.money/",
+          id: "1313161554",
+        },
       ],
     },
     {
@@ -50,19 +64,22 @@ const SelectBlockchainModal = ({
       icon: "/img/TokenIcons/solanaIcon.svg",
       visible: true,
       networks: [
-        // { name: "Mainnet", address: "https://app.solana.fluidity.money/" },
-        { name: "Devnet", address: "https://app.solana.beta.fluidity.money/" },
+        // { name: "Mainnet", address: "https://app.solana.fluidity.money/",id:"" },
+        {
+          name: "Devnet",
+          address: "https://app.solana.beta.fluidity.money/",
+          id: "",
+        },
       ],
     },
   ];
-  const [options, setOptions] = React.useState(networkOptions);
-  useEffect(() => {
-    const data = window.localStorage.getItem("networks-open");
-    if (data) setOptions(JSON.parse(data));
-  }, []);
-  useEffect(() => {
-    window.localStorage.setItem("networks-open", JSON.stringify(options));
-  }, [options]);
+
+  // using local storage hook to persist options and if all networks are visible or not
+  const [options, setOptions] = useLocalStorage(
+    "networks-open",
+    networkOptions
+  );
+
   const renderedOptions = options.map(
     ({ blockchain, icon, networks, visible }, index) => {
       return (
@@ -99,15 +116,28 @@ const SelectBlockchainModal = ({
           {visible === true &&
             networks.map((network, idx) => (
               <div
-                className={"network-options"}
+                className={
+                  `${chainIdFromEnv()}` === network.id
+                    ? "network-options-current"
+                    : "network-options"
+                }
                 key={`${network} ${idx}`}
                 onClick={() => {
                   // eslint-disable-next-line no-restricted-globals
                   location.href = network.address;
                 }}
               >
-                <img src={icon} className={`network-icon`} alt={blockchain} />
-                <div className={`primary-text${appTheme}`}>{network.name}</div>
+                <div className="network-items">
+                  <img src={icon} className={`network-icon`} alt={blockchain} />
+                  <div className={`primary-text${appTheme}`}>
+                    {network.name}
+                  </div>
+                </div>
+                {`${chainIdFromEnv()}` === network.id ? (
+                  <img src="/img/network-dot.svg" alt="dot" />
+                ) : (
+                  <></>
+                )}
               </div>
             ))}
         </div>

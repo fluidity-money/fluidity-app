@@ -6,17 +6,19 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
 type RewardData struct {
-	TxHash ethCommon.Hash
-	FromAddress ethCommon.Address
-	FromAmount *big.Int
-	ToAddress ethCommon.Address
-	ToAmount *big.Int
+	TokenDetails token_details.TokenDetails
+	Winner ethCommon.Address
+	Amount *misc.BigInt
+	StartBlock *misc.BigInt
+	EndBlock *misc.BigInt
 }
 
-func DecodeRewardData(log typesEth.Log) (RewardData, error) {
+func DecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (RewardData, error) {
 	var rewardData RewardData
 
 	var (
@@ -34,24 +36,25 @@ func DecodeRewardData(log typesEth.Log) (RewardData, error) {
 	}
 
 	var (
-		txHash = decodedData[0].([32]byte)
-		fromPadded = logTopics[1].String()
-		fromAmount = decodedData[1].(*big.Int)
-		toPadded = logTopics[2].String()
-		toAmount = decodedData[2].(*big.Int)
+		winnerString = logTopics[1].String()
+		amountInt = decodedData[0].(*big.Int)
+		startBlockInt = decodedData[1].(*big.Int)
+		endBlockInt = decodedData[2].(*big.Int)
 	)
 
 	var (
-		from = ethCommon.HexToAddress(fromPadded)
-		to = ethCommon.HexToAddress(toPadded)
+		winner = ethCommon.HexToAddress(winnerString)
+		amount = misc.NewBigInt(*amountInt)
+		startBlock = misc.NewBigInt(*startBlockInt)
+		endBlock = misc.NewBigInt(*endBlockInt)
 	)
 
 	rewardData = RewardData {
-		TxHash: txHash,
-		FromAddress: from,
-		FromAmount: fromAmount,
-		ToAddress: to,
-		ToAmount: toAmount,
+		TokenDetails: token,
+		Winner: winner,
+		Amount: &amount,
+		StartBlock: &startBlock,
+		EndBlock: &endBlock,
 	}
 
 	return rewardData, nil
