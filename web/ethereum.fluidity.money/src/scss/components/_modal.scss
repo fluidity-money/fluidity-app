@@ -239,9 +239,12 @@
   box-sizing: border-box;
   display: flex;
   justify-content: flex-end;
-
   flex-wrap: wrap;
   overflow-y: auto;
+  @include for-tablet-landscape-down {
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .walletconnect-modal-body {
@@ -475,4 +478,9 @@
   height: 1px;
   border: none;
   width: 81%;
+}
+
+.notification-line {
+  @extend .line;
+  margin-top: -16px;
 }

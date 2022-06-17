@@ -35,7 +35,7 @@ const NotificationModal = ({
     >
       <div className="connect-modal-body--networks">
         <h2 className={`primary-text${appTheme}`}>Notifications</h2>
-        <hr className="line" />
+        <hr className="notification-line" />
         <div className="connect-modal-form secondary-text">
           You have no notifications
         </div>

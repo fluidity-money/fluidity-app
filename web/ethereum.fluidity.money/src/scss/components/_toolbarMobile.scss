@@ -180,9 +180,9 @@
   width: 45vw;
   justify-content: center;
   cursor: pointer;
-
+  opacity: 0.7;
   &:hover {
-    opacity: 0.8;
+    opacity: 1;
   }
 
   @include for-below-470 {
