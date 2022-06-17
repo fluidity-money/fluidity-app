@@ -37,13 +37,14 @@ func main() {
 			hintedBlock   = announcement.EthereumHintedBlock
 		)
 
-		if len(announcements) > 0 {
+		switch true {
+		case len(announcements) > 0:
 			processAnnouncements(announcements, rewardsAmqpQueueName)
 
-		} else if hintedBlock != nil {
+		case hintedBlock != nil:
 			processHintedBlock(*hintedBlock)
 
-		} else {
+		default:
 			log.Fatal(func(k *log.Log) {
 				k.Message = "Received empty announcement and no hinted blocks!"
 			})

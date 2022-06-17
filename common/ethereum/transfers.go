@@ -183,7 +183,7 @@ func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transa
 		transfers = append(transfers, transfer)
 	}
 
-	err := error(nil)
+	var err error
 
 	if len(failedTransactions) > 0 {
 		err = fmt.Errorf(
