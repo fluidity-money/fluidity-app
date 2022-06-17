@@ -123,11 +123,13 @@ type (
 		BlockNumber  misc.BigInt            `json:"block_number"`
 	}
 
+	// Decorator attached to a transfer
 	EthereumWorkerDecorator struct {
 		SenderUtilityMiningAmount    misc.BigInt `json:"sender_amount"`
 		RecipientUtilityMiningAmount misc.BigInt `json:"receiver_amount"`
 	}
 
+	// Transfer with application information attached
 	EthereumDecoratedTransfer struct {
 		SenderAddress          ethereum.Address        `json:"sender_address"`
 		RecipientAddress       ethereum.Address        `json:"recipient_address"`
@@ -136,6 +138,7 @@ type (
 		Decorator              EthereumWorkerDecorator `json:"decorator"`
 	}
 
+	// Hinted block sent from the application server
 	EthereumHintedBlock struct {
 		BlockHash          ethereum.Hash               `json:"block_hash"`
 		BlockBaseFee       misc.BigInt                 `json:"block_base_fee"`
@@ -145,16 +148,21 @@ type (
 		DecoratedTransfers []EthereumDecoratedTransfer `json:"decorated_transfers"`
 	}
 
+	// Work that the worker server receives, containing either a block
+	// log (from upstream) or a hinted block (from application server)
 	EthereumServerWork struct {
 		EthereumBlockLog    *EthereumBlockLog    `json:"block_log"`
 		EthereumHintedBlock *EthereumHintedBlock `json:"hinted_block"`
 	}
 
+	// Announcement that the worker client receives, containing winning announcements
+	// as well as hinted application blocks
 	EthereumClientAnnouncement struct {
 		EthereumHintedBlock   *EthereumHintedBlock   `json:"hinted_block"`
 		EthereumAnnouncements []EthereumAnnouncement `json:"announcement"`
 	}
 
+	// An event the worker server sends for processing when it finds a log of interest
 	EthereumApplicationEvent struct {
 		ApplicationTransfers []libEthereum.Transfer `json:"application_transfers"`
 		BlockLog             EthereumBlockLog       `json:"block_log"`

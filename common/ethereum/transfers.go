@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
@@ -11,8 +12,6 @@ import (
 var TransferLogTopic = strings.ToLower(
 	"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
 )
-
-const UniswapSwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 
 type Transfer struct {
 	FromAddress ethereum.Address
@@ -148,6 +147,7 @@ func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transa
 
 		firstTopic := strings.ToLower(topics[0].String())
 
+		// also check number of topics
 		if !IsApplicationLogTopic(firstTopic) {
 			log.Debugf(
 				"For transaction hash %#v, first topic %#v != any application log topic!",
@@ -157,17 +157,6 @@ func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transa
 
 			continue
 		}
-
-		// this could vary based on the application?
-		// if len(topics) != 3 {
-		// 	log.Debugf(
-		// 		"Number of topics for transaction hash %#v, topic content %#v length != 3!",
-		// 		transactionHash,
-		// 		topics,
-		// 	)
-
-		// 	continue
-		// }
 
 		// Remove padding 0x from addresses
 		var (
@@ -223,7 +212,7 @@ func IsTransferLogTopic(topic string) bool {
 // IsApplicationLogTopic returns whether given string matches signature of
 // any tracked application log
 func IsApplicationLogTopic(topic string) bool {
-	return topic == UniswapSwapLogTopic
+	return topic == applications.UniswapSwapLogTopic
 }
 
 // isApplicationContract returns whether the address is found in the list of contracts

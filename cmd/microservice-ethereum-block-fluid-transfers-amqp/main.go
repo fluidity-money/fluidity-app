@@ -72,7 +72,7 @@ func main() {
 			})
 
 			serverWork := worker.EthereumServerWork{
-				EthereumBlockLog: &amqpBlock,
+				EthereumBlockLog:    &amqpBlock,
 				EthereumHintedBlock: nil,
 			}
 
@@ -118,8 +118,9 @@ func main() {
 		}
 
 		amqpBlock.Logs = append(amqpBlock.Logs, newFluidLogs...)
+
 		serverWork := worker.EthereumServerWork{
-			EthereumBlockLog: &amqpBlock,
+			EthereumBlockLog:    &amqpBlock,
 			EthereumHintedBlock: nil,
 		}
 

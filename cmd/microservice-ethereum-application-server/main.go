@@ -12,10 +12,13 @@ func main() {
 		var (
 			// transfers that generated application events
 			applicationTransfers = applicationEvent.ApplicationTransfers
+
 			// the block in question
 			applicationBlock = applicationEvent.BlockLog
+
 			// worker server has already found fluid transfers using the contract in this block
 			fluidTransferCount = len(applicationTransfers)
+
 			// transfers that we're adding information to
 			decoratedTransfers = make([]worker.EthereumDecoratedTransfer, fluidTransferCount)
 		)
@@ -23,7 +26,7 @@ func main() {
 		// loop over application events in the block, add payouts as decorator
 		for i, transfer := range applicationTransfers {
 
-			senderUtilityAmount, recipientUtilityAmount := utilityPayoutCalculation()
+			senderUtilityAmount, recipientUtilityAmount := governancePayoutCalculation()
 
 			decorator := worker.EthereumWorkerDecorator{
 				SenderUtilityMiningAmount:    *senderUtilityAmount,
@@ -58,7 +61,7 @@ func main() {
 	})
 }
 
-// utilityPayoutCalculation that would determine how much the event has generated
-func utilityPayoutCalculation() (*misc.BigInt, *misc.BigInt) {
+// governancePayoutCalculation that would determine how much the event has generated
+func governancePayoutCalculation() (*misc.BigInt, *misc.BigInt) {
 	panic("unimplemented!")
 }

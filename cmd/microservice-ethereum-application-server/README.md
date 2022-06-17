@@ -3,6 +3,9 @@
 
 Receives and process blocks containing application logs of interest.
 
+Supported contracts:
+  - Uniswap transfer
+
 ## Environment variables
 
 |             Name             |                                  Description
