@@ -184,6 +184,9 @@
   &:hover {
     opacity: 1;
   }
+  &:active {
+    opacity: 1;
+  }
 
   @include for-below-470 {
     width: 85vw;
