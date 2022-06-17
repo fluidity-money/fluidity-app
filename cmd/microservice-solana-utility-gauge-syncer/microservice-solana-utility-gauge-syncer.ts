@@ -34,10 +34,10 @@ if (!UTILITY_GAUGE_SECRET_KEY) {
   throw new Error("FLU_SOLANA_UTILITY_GAUGE_SECRET_KEY not provided");
 }
 
-const FLU_RABBITMQ_URL = process.env.FLU_RABBITMQ_URL as string;
+const FLU_AMQP_QUEUE_ADDR = process.env.FLU_AMQP_QUEUE_ADDR as string;
 
-if (!FLU_RABBITMQ_URL) {
-  throw new Error("FLU_RABBITMQ_URL not provided");
+if (!FLU_AMQP_QUEUE_ADDR) {
+  throw new Error("FLU_AMQP_QUEUE_ADDR not provided");
 }
 
 const FLU_POSTGRES_URI = process.env.FLU_POSTGRES_URI as string;
@@ -155,8 +155,7 @@ const triggerNextEpoch = async(amqpChannel: amqp.Channel, timeoutMs: number) => 
 }
 
 (async() => {
-  // Load rabbitmq
-  const amqpConnection = await amqp.connect(FLU_RABBITMQ_URL);
+  const amqpConnection = await amqp.connect(FLU_AMQP_QUEUE_ADDR);
 
   const amqpChannel = await amqpConnection.createChannel();
 

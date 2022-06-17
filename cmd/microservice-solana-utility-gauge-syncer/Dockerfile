@@ -5,10 +5,10 @@ WORKDIR /usr/local/src/fluidity/cmd/microservice-solana-utility-gauge-syncer
 
 COPY . .
 
-RUN make
+RUN make build
 
 ENTRYPOINT [ \
     "wait-for-amqp", \
     "wait-for-db", \
-    "./microservice-solana-utility-gauge-syncer.o" \
+    "./start.sh" \
 ]
