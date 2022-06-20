@@ -82,10 +82,7 @@ func main() {
 
 	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
 
-		payableBufferedUserAction := new(user_actions.PayableBufferedUserAction)
-
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
-
 		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
 
 		if err != nil {
@@ -97,10 +94,7 @@ func main() {
 			})
 		}
 
-		payableBufferedUserAction.MintSupply = mintSupply
-
 		// get the value of all fluidity obligations
-
 		tvl, err := prize_pool.GetTvl(
 			solanaClient,
 			fluidityPubkey,
@@ -122,15 +116,18 @@ func main() {
 			})
 		}
 
-		payableBufferedUserAction.Tvl = tvl
-
 		// check initial supply is less than TVL so there is
 		// an available prize pool
-
 		if mintSupply > tvl {
 			log.Fatal(func(k *log.Log) {
 				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
 			})
+		}
+
+		payableBufferedUserAction := user_actions.PayableBufferedUserAction{
+			BufferedUserAction: bufferedUserActions,
+			Tvl:                tvl,
+			MintSupply:         mintSupply,
 		}
 
 		queue.SendMessage(topicWrappedActionsQueue, payableBufferedUserAction)

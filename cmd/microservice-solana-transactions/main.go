@@ -104,6 +104,7 @@ func main() {
 				Signature:   transaction.Transaction.Signatures[0],
 				Result:      transaction,
 				AdjustedFee: transactionMetaFeeRat,
+				SaberFee:    saberFee,
 			}
 		}
 

@@ -184,7 +184,8 @@ func main() {
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
 
-			defer queue.SendMessage(worker.TopicEmissions, emission)
+			// track fees used during this user action
+			emission.Fees.Saber, _ = userAction.SaberFee.Float64()
 
 			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
 
@@ -295,6 +296,8 @@ func main() {
 			}
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
+
+			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

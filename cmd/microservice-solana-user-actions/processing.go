@@ -87,7 +87,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 			Network:         network.NetworkSolana,
 			TransactionHash: transactionHash,
 			AwardedTime:     currentTime,
-			TokenDetails: tokenDetails,
+			TokenDetails:    tokenDetails,
 		}
 
 		winningAmount := new(big.Int).SetUint64(transactionPayoutValue)
@@ -194,7 +194,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 
 // processSplTransaction, returning possibly two transfers depending on
 // what's contained within the spl transaction
-func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string, tokenDetails token_details.TokenDetails) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
+func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee, saberFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string, tokenDetails token_details.TokenDetails) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
 	splTransaction, err := spl_token.DecodeSplInstruction(instruction.Data)
 
 	if errors.Is(err, fluidity.UnknownInstructionError) {
@@ -221,7 +221,6 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 			fromIndex = instruction.Accounts[0]
 			toIndex   = instruction.Accounts[1]
 		)
-
 
 		// is not a fluidity transfer
 		if fluidityOwners[fromIndex] == "" {
@@ -260,6 +259,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 			transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
 			transfer_.SolanaRecipientOwnerAddress = recipientOwnerAddress
 			transfer_.AdjustedFee = adjustedFee
+			transfer_.SaberFee = saberFee
 
 			transfer1 = &transfer_
 		}
@@ -310,6 +310,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 			transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
 			transfer_.SolanaRecipientOwnerAddress = recipientOwnerAddress
 			transfer_.AdjustedFee = adjustedFee
+			transfer_.SaberFee = saberFee
 
 			transfer2 = &transfer_
 		}

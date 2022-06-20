@@ -32,6 +32,10 @@ type (
 			RewardPool      float64 `json:"reward_pool"`
 		} `json:"payout"`
 
+		Fees struct {
+			Saber float64 `json:"saber"`
+		} `json:"fees"`
+
 		// calculate n function
 		CalculateN struct {
 			ProbabilityM float64 `json:"probability_m"`

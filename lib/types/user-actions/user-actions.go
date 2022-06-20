@@ -52,6 +52,9 @@ type (
 		// Fee adjusted based on compute units used
 		AdjustedFee *big.Rat
 
+		// Fee taken by Saber
+		SaberFee *big.Rat
+
 		// Amount that was swapped or sent
 		Amount misc.BigInt `json:"amount"`
 
