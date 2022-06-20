@@ -79,6 +79,7 @@ func main() {
 				instructions      = transaction.Result.Transaction.Message.Instructions
 				innerInstructions = transaction.Result.Meta.InnerInstructions
 				adjustedFee       = transaction.AdjustedFee
+				saberFee          = transaction.SaberFee
 				sig               = transaction.Signature
 			)
 
@@ -132,6 +133,7 @@ func main() {
 						sig,
 						instruction,
 						adjustedFee,
+						saberFee,
 						accountKeys,
 						fluidityOwners,
 						fluidityTokenMint,
