@@ -161,14 +161,6 @@ const provider = SolanaProvider.init({
   // governorEventDecoder parses emitted governor events
   const governorEventDecoder = new BorshEventCoder(GovernJSON);
 
-  const governorData = await governor.data();
-
-  // votingDelay is the period (seconds) to wait to activate a drafted proposal
-  // votingPeriod is the period (seconds) to wait for the voting period to end
-  // timelockDelaySeconds is the period to wait to execute an approved proposal
-  const { votingDelay, votingPeriod, timelockDelaySeconds } =
-    governorData.params;
-
   const payerExecCouncilIndex = execCouncil.data!.owners.findIndex(
     (key: PublicKey) => key.toString() === payerKeypair.publicKey.toString(),
   );
@@ -208,8 +200,15 @@ const provider = SolanaProvider.init({
             throw new Error(`Bad createProposal log: ${logs}`);
           }
 
+          const governorData = await governor.data();
+
+          // votingDelay is the period (seconds) to wait to activate a drafted proposal
+          // votingPeriod is the period (seconds) to wait for the voting period to end
+          // timelockDelaySeconds is the period to wait to execute an approved proposal
+          const { votingDelay } = governorData.params;
+
           const votingDelayPromise = sleep(
-            votingDelay.toNumber() * 1000 + 5000,
+            (votingDelay.toNumber() + 10) * 1000,
           );
 
           const event = logs[4].split(": ")[1];
@@ -250,8 +249,15 @@ const provider = SolanaProvider.init({
             throw new Error(`Bad activateProposal log: ${logs}`);
           }
 
+          const governorData = await governor.data();
+
+          // votingDelay is the period (seconds) to wait to activate a drafted proposal
+          // votingPeriod is the period (seconds) to wait for the voting period to end
+          // timelockDelaySeconds is the period to wait to execute an approved proposal
+          const { votingPeriod } = governorData.params;
+
           const votingPeriodPromise = sleep(
-            (votingPeriod.toNumber() * 1000) + 1000,
+            (votingPeriod.toNumber() + 10) * 1000,
           );
 
           const event = logs[4].split(": ")[1];
@@ -330,8 +336,15 @@ const provider = SolanaProvider.init({
 
           console.log("Approved transaction!");
 
+          const governorData = await governor.data();
+
+          // votingDelay is the period (seconds) to wait to activate a drafted proposal
+          // votingPeriod is the period (seconds) to wait for the voting period to end
+          // timelockDelaySeconds is the period to wait to execute an approved proposal
+          const { timelockDelaySeconds } = governorData.params;
+
           const timelockDelayPromise = sleep(
-            timelockDelaySeconds.toNumber() * 1000 + 5000,
+            (timelockDelaySeconds.toNumber() + 10) * 1000,
           );
 
           await timelockDelayPromise;
