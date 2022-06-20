@@ -40,10 +40,10 @@ if (!SOLANA_RPC_URL) {
   throw new Error("FLU_SOLANA_RPC_URL not provided");
 }
 
-const UTILITY_GAUGE_PROGRAM_ID = process.env.FLU_UTILITY_GAUGE_PROGRAM_ID as string;
+const UTILITY_GAUGE_PROGRAM_ID = process.env.FLU_SOLANA_UTILITY_GAUGE_PROGRAM_ID as string;
 
 if (!UTILITY_GAUGE_PROGRAM_ID) {
-  throw new Error("FLU_UTILITY_GAUGE_PROGRAM_ID not provided");
+  throw new Error("FLU_SOLANA_UTILITY_GAUGE_PROGRAM_ID not provided");
 }
 
 const GAUGEMEISTER_PUBKEY = process.env.FLU_SOLANA_GAUGEMEISTER_PUBKEY as string;

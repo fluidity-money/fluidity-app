@@ -31,10 +31,11 @@ const (
 	EnvGaugemeisterPubkey = `FLU_SOLANA_GAUGEMEISTER_PUKEY`
 
 	// EnvGaugeProgramId is the program used to vote on utility gauges
-	EnvUtilityGaugeProgramId = `FLU_UTILITY_GAUGE_PROGRAM_ID`
+	EnvUtilityGaugeProgramId = `FLU_SOLANA_UTILITY_GAUGE_PROGRAM_ID`
 )
 
-const SOLANA_CHAIN = "solana"
+// SolanaChainName is the chain UtilityGauge runs on
+const SolanaChainName = "solana"
 
 func main() {
 	var (
@@ -72,6 +73,7 @@ func main() {
 		case accountNotification := <-accountNotificationChan:
 			log.Debug(func(k *log.Log) {
 				k.Message = "Gaugemeister was updated!"
+				k.Payload = accountNotification
 			})
 
 			var gaugemeisterData utility_gauge.Gaugemeister
@@ -100,14 +102,14 @@ func main() {
 
 			var epoch = gaugemeisterData.CurrentRewardsEpoch
 
-			var gauges = database.GetWhitelistedGauges()
+			gauges := database.GetWhitelistedGauges()
 
 			for _, gaugePubkey_ := range gauges {
 
 				gaugePubkey := goSolana.MustPublicKeyFromBase58(gaugePubkey_)
 
 				currentGaugePower := types.UtilityGaugePower{
-					Chain:   SOLANA_CHAIN,
+					Chain:   SolanaChainName,
 					Network: solanaNetwork,
 					Gauge:   gaugePubkey.String(),
 
