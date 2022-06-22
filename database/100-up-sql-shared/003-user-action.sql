@@ -9,5 +9,5 @@ CREATE TYPE user_action AS ENUM (
 
 -- migrate:down
 
-DROP TYPE IF EXISTS user_action;
+DROP TYPE user_action;
 

@@ -1,26 +1,49 @@
 import type {Idl, Program} from "@project-serum/anchor";
 
+import * as Sentry from '@sentry/node';
+import "@sentry/tracing";
+
 import { newProgramMap } from "@saberhq/anchor-contrib";
 import {Connection} from "@solana/web3.js";
 import {Wallet, web3} from "@project-serum/anchor";
 import {PublicKey, SolanaProvider, SolanaAugmentedProvider} from "@saberhq/solana-contrib";
-import * as amqp from "amqplib";
-import {Client} from "pg";
+import * as b58 from 'base58-js';
 
 import UtilityGaugeIdl_ from './idls/utility_gauge.json';
 
-import * as b58 from 'base58-js';
+const WORKER_ID = process.env.FLU_WORKER_ID as string;
 
+if (!WORKER_ID) {
+  throw new Error("WORKER_ID not provided");
+};
+
+const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
+
+if (FLU_SENTRY_URL) {
+  Sentry.init({
+    dsn: FLU_SENTRY_URL,
+  });
+
+  Sentry.configureScope(scope => {
+    scope.setTag('worker-id', WORKER_ID);
+  })
+} 
+
+const reportError = Sentry.getCurrentHub().getClient() ? 
+  (e: any) => {throw e} :
+  (e: any) => Sentry.captureException(e);
+
+try {
 const SOLANA_RPC_URL = process.env.FLU_SOLANA_RPC_URL as string;
 
 if (!SOLANA_RPC_URL) {
   throw new Error("FLU_SOLANA_RPC_URL not provided");
 }
 
-const UTILITY_GAUGE_PROGRAM_ID = process.env.FLU_UTILITY_GAUGE_PROGRAM_ID as string;
+const UTILITY_GAUGE_PROGRAM_ID = process.env.FLU_SOLANA_UTILITY_GAUGE_PROGRAM_ID as string;
 
 if (!UTILITY_GAUGE_PROGRAM_ID) {
-  throw new Error("FLU_UTILITY_GAUGE_PROGRAM_ID not provided");
+  throw new Error("FLU_SOLANA_UTILITY_GAUGE_PROGRAM_ID not provided");
 }
 
 const GAUGEMEISTER_PUBKEY = process.env.FLU_SOLANA_GAUGEMEISTER_PUBKEY as string;
@@ -35,26 +58,6 @@ if (!UTILITY_GAUGE_SECRET_KEY) {
   throw new Error("FLU_SOLANA_UTILITY_GAUGE_SECRET_KEY not provided");
 }
 
-const FLU_RABBITMQ_URL = process.env.FLU_RABBITMQ_URL as string;
-
-if (!FLU_RABBITMQ_URL) {
-  throw new Error("FLU_RABBITMQ_URL not provided");
-}
-
-const FLU_POSTGRES_URI = process.env.FLU_POSTGRES_URI as string;
-
-if (!FLU_POSTGRES_URI) {
-  throw new Error("FLU_POSTGRES_URI not provided");
-}
-
-const TopicUtilityGauge = "utility_gauge.utility_gauges";
-
-const ExchangeName = "fluidity";
-const ExchangeType = "topic";
-    
-// get whitelisted gauges
-const TableWhitelistedGauges = "whitelisted_gauges";
- 
 const gaugemeisterPubkey = new PublicKey(GAUGEMEISTER_PUBKEY);
 
 const utilityGaugePubkey = new PublicKey(UTILITY_GAUGE_PROGRAM_ID);
@@ -67,7 +70,6 @@ const connection = new Connection(SOLANA_RPC_URL, "processed");
 
 const wallet = new Wallet(payerKeypair);
 
-// Load the utility gauge program
 const provider = SolanaProvider.init({
   connection,
   wallet,
@@ -87,13 +89,9 @@ const UTILITY_GAUGE_ADDRESSES = {
   UtilityGauge: utilityGaugePubkey,
 };
 
-/**
- * Program IDLs.
-*/
 const UTILITY_GAUGE_IDLS = {
   UtilityGauge: UtilityGaugeIdl,
 };
-
 
 const programs = newProgramMap<Programs>(
   provider,
@@ -103,46 +101,8 @@ const programs = newProgramMap<Programs>(
 
 const utilityGauge = programs.UtilityGauge;
 
-// Load Postgres
-const pgClient = new Client(FLU_POSTGRES_URI);
-
-(async() => {
-  // Load rabbitmq
-  const amqpConnection = await amqp.connect(FLU_RABBITMQ_URL);
-
-  const amqpChannel = await amqpConnection.createChannel();
-
-  amqpChannel.assertExchange(ExchangeName, ExchangeType, {
-    durable: true,
-    autoDelete: false,
-    internal: false,
-  });
-
-  // get gaugemeister data
-  //   nextEpochStartsAt
-  const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
-  
-  if (gaugemeister === null) {
-    throw new Error("could not fetch gaugemeister at address: " + gaugemeisterPubkey.toString());
-  }
-  
-  const { nextEpochStartsAt } = gaugemeister;
-  const nextEpochStartsAtMs = nextEpochStartsAt.toNumber() * 1000;
-  
-  console.log(nextEpochStartsAt.toNumber());
-  
-  
-  // create loop here
-  // This is in ms -> must convert to seconds to match nextEpochStartsAt
-  const currentUnixMs = (new Date()).valueOf()
-  
-  await triggerNextEpoch(amqpChannel, nextEpochStartsAtMs - currentUnixMs);
-
-})();
-
-const triggerNextEpoch = async(amqpChannel: amqp.Channel, timeoutMs: number) => {
+const triggerNextEpoch = async(timeoutMs: number) => {
   setTimeout(async() => {
-    // trigger next epoch
     const triggerNextEpochInst = utilityGauge.instruction.triggerNextEpoch({
       accounts: {
         gaugemeister: gaugemeisterPubkey,
@@ -154,43 +114,40 @@ const triggerNextEpoch = async(amqpChannel: amqp.Channel, timeoutMs: number) => 
     triggerNextEpochTx.addSigners(payerKeypair);
   
     await triggerNextEpochTx.send();
-
-    // get gaugemeisterdata - TODO: Depending on how slow solana propagates, might move this to a listener for changes to gaugemeister
-    //   epochDurationSeconds
-    //   currentRewardsEpoch
-    const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
-
-    pgClient.connect();
-
-    const whitelistedGaugesRes = await pgClient.query(
-      `SELECT
-        gauge
-      FROM ${TableWhitelistedGauges}`);
-
-    pgClient.end();
     
-    const whitelistedGauges = whitelistedGaugesRes.rows;
+    const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
     
     if (gaugemeister === null) {
-      throw new Error("could not fetch gaugemeister at address " + gaugemeisterPubkey.toString());
-    }
-  
-    const {epochDurationSeconds, currentRewardsEpoch} = gaugemeister;
-  
-    const updatedGauges = {
-      gaugemeister: gaugemeisterPubkey.toString(),
-      epoch: currentRewardsEpoch,
-      gauges: whitelistedGauges,
+      throw new Error("could not fetch gaugemeister at address: " + gaugemeisterPubkey.toString());
     }
 
-    // send message to rabbitmq
-    const updatedGaugesBuffer = Buffer.from(JSON.stringify(updatedGauges));
+    const { epochDurationSeconds } = gaugemeister;
+    
+    timeoutMs = (epochDurationSeconds + 10) * 1000;
 
-    amqpChannel.sendToQueue(TopicUtilityGauge, updatedGaugesBuffer);
-    
-    timeoutMs = epochDurationSeconds * 1000;
-    
-    await triggerNextEpoch(amqpChannel, timeoutMs);
+    await triggerNextEpoch(timeoutMs);
 
   }, timeoutMs);
 }
+
+(async() => {
+  const gaugemeister = await utilityGauge.account.gaugemeister.fetchNullable(gaugemeisterPubkey);
+  
+  if (gaugemeister === null) {
+    throw new Error("could not fetch gaugemeister at address: " + gaugemeisterPubkey.toString());
+  }
+  
+  const { nextEpochStartsAt } = gaugemeister;
+  const nextEpochStartsAtMs = nextEpochStartsAt.toNumber() * 1000;
+  
+  const currentUnixMs = (new Date()).valueOf()
+  
+  await triggerNextEpoch(nextEpochStartsAtMs - currentUnixMs + 10);
+
+})();
+
+} catch (e) {
+  reportError(e);
+}
+
+
