@@ -1,49 +1,50 @@
-import {UseSolana} from "@saberhq/use-solana";
-import {PublicKey} from '@solana/web3.js';
-import {getATAAddress, Token} from '@saberhq/token-utils';
-import * as splToken from '@solana/spl-token';
-import {BaseToken, tokenList} from "./constants";
-import {AccountMeta} from '@solana/web3.js';
+import { UseSolana } from "@saberhq/use-solana";
+import { PublicKey } from "@solana/web3.js";
+import { getATAAddressSync, Token } from "@saberhq/token-utils";
+import * as splToken from "@solana/spl-token";
+import { AccountMeta } from "@solana/web3.js";
 //https://github.com/solendprotocol/common/blob/master/src/devnet.json
 //provides the accounts required for Solend interaction
-import solendAddress from 'util/solendAddress.json';
-import {FluidityInstruction} from "./FluidityInstruction";
-import {SupportedTokens} from "components/types";
+import devnetSolendAddress from "util/solend/devnet-solend.json";
+import mainnetSolendAddress from "util/solend/mainnet-production-solend.json";
+import { FluidityInstruction } from "./FluidityInstruction";
+import { SupportedTokens } from "components/types";
 
 // return the array of keys required to either wrap or unwrap fluid tokens
 export const getFluidInstructionKeys = async (
-  sol: UseSolana,
+  sol: UseSolana<any>,
   token: Token,
   fluidToken: Token,
   ata: PublicKey, // user token ata
-  fluidAta: PublicKey //user fluid token ata
+  fluidAta: PublicKey, //user fluid token ata
+  obligationInfo: PublicKey,
+  dataAccount: PublicKey,
 ): Promise<Array<AccountMeta> | null> => {
+  // assigns solendAddress based on network
+  const solendAddress =
+    process.env.REACT_APP_SOL_NETWORK === "mainnet"
+      ? mainnetSolendAddress
+      : process.env.REACT_APP_SOL_NETWORK === "devnet"
+      ? devnetSolendAddress
+      : devnetSolendAddress;
 
   if (!sol.wallet || !sol.publicKey || !sol.connected || !sol.providerMut)
     return null;
 
   //pda token ata
-  const pdaAccount = await FluidityInstruction.getProgramAddress(token.symbol as SupportedTokens);
-
-  //find the pre-existing data account for this token
-  const dataAccount = process.env[`REACT_APP_FLU_DATA_ACCOUNT_${token.symbol}`];
-  if (!dataAccount)
-    return null;
-
-  //find the pre-existing obligation account for this token
-  const obligationInfo = process.env[`REACT_APP_FLU_OBLIGATION_${token.symbol}`];
-  if (!obligationInfo)
-    return null;
+  const pdaAccount = await FluidityInstruction.getProgramAddress(
+    token.symbol as SupportedTokens
+  );
 
   //find the solend asset and reserve
-  const market = solendAddress.markets.find(({name}) => name === "main");
-  if (!market)
-    return null;
+  const market = [...solendAddress.markets].find(({ name }) => name === "main");
+  if (!market) return null;
 
-  const reserve = market.reserves.find(({asset}) => asset === token.symbol);
-  const solendAsset = solendAddress.oracles.assets.find(({asset}) => asset === token.symbol);
-  if (!solendAsset || !reserve)
-    return null;
+  const reserve = market.reserves.find(({ asset }) => asset === token.symbol);
+  const solendAsset = solendAddress.oracles.assets.find(
+    ({ asset }) => asset === token.symbol
+  );
+  if (!solendAsset || !reserve) return null;
 
   // obtain the necessary accounts for both instructions
   const solendProgram = solendAddress.programID;
@@ -57,9 +58,9 @@ export const getFluidInstructionKeys = async (
   const switchboardFeedInfo = solendAsset.switchboardFeedAddress;
   const clock = "SysvarC1ock11111111111111111111111111111111";
 
-  const pdaCollateral = await getATAAddress({
+  const pdaCollateral = getATAAddressSync({
     mint: new PublicKey(reserveCollateralMintInfo),
-    owner: new PublicKey(pdaAccount)
+    owner: new PublicKey(pdaAccount),
   });
 
   return [
@@ -85,7 +86,7 @@ export const getFluidInstructionKeys = async (
       //fluid token mint address
       pubkey: new PublicKey(fluidToken.address),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       //PDA account
@@ -120,42 +121,42 @@ export const getFluidInstructionKeys = async (
     {
       pubkey: new PublicKey(pdaCollateral),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       pubkey: new PublicKey(reserveInfo),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       pubkey: new PublicKey(reserveLiquiditySupplyInfo),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       pubkey: new PublicKey(reserveCollateralMintInfo),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       pubkey: new PublicKey(lendingMarketInfo),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       pubkey: new PublicKey(lendingMarketAuthorityInfo),
       isSigner: false,
-      isWritable: false
+      isWritable: false,
     },
     {
       pubkey: new PublicKey(destinationCollateralInfo),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       pubkey: new PublicKey(obligationInfo),
       isSigner: false,
-      isWritable: true
+      isWritable: true,
     },
     {
       pubkey: new PublicKey(pythPriceInfo),
@@ -170,8 +171,7 @@ export const getFluidInstructionKeys = async (
     {
       pubkey: new PublicKey(clock),
       isSigner: false,
-      isWritable: false
+      isWritable: false,
     },
-  ]
-}
-
+  ];
+};

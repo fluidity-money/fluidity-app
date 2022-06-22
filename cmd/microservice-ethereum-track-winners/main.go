@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	logging "github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
@@ -20,7 +21,11 @@ import (
 
 const (
 	// FilterEventSignature to use to filter for event signatures
-	FilterEventSignature = `Reward(address,uint256)`
+	FilterEventSignature = `Reward(address,uint256,uint256,uint256)`
+
+	// expectedTopicsLen to ensure logs received have the expected number of topics
+	// (sig, winner address)
+	expectedTopicsLen = 2
 
 	// EnvContractAddress to watch where the reward function was called
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
@@ -31,7 +36,9 @@ const (
 	// EnvUnderlyingTokenDecimals supported by the contract
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
-	publishTopic = winners.TopicWinnersEthereum
+	winnersPublishTopic = winners.TopicWinnersEthereum
+
+	rewardPublishTopic = winners.TopicRewardsEthereum
 )
 
 func main() {
@@ -54,7 +61,7 @@ func main() {
 		})
 	}
 
-	eventSignature := microservice_common_track_winners.HashEventSignature(
+	eventSignature := microservice_ethereum_track_winners.HashEventSignature(
 		FilterEventSignature,
 	)
 
@@ -74,6 +81,7 @@ func main() {
 		// first, we're going to make the string lowercase
 
 		logAddress = strings.ToLower(logAddress)
+		filterAddress = strings.ToLower(filterAddress)
 
 		logging.Debug(func(k *logging.Log) {
 			k.Format(
@@ -91,12 +99,12 @@ func main() {
 
 		messageReceivedTime := time.Now()
 
-		if lenLogTopics := len(logTopics); lenLogTopics != 3 {
+		if lenLogTopics := len(logTopics); lenLogTopics != expectedTopicsLen {
 			logging.Debug(func(k *logging.Log) {
 				k.Format(
 					"The number of topics for log transaction %v was expected to be %v, is %v! %v",
 					transactionHash,
-					3,
+					expectedTopicsLen,
 					lenLogTopics,
 					logTopics,
 				)
@@ -127,36 +135,24 @@ func main() {
 			return
 		}
 
-		var (
-			winnerAddressPadded = string(logTopics[1])
-			winningAmountPadded = string(logTopics[2])
-		)
-
-		winner, err := microservice_common_track_winners.DecodeWinner(
-			logAddress,
-			transactionHash,
-			winnerAddressPadded,
-			winningAmountPadded,
-			messageReceivedTime,
-		)
-
-		if err != nil {
-			logging.Fatal(func(k *logging.Log) {
-				k.Format(
-					"Failed to decode a winner! Transaction hash %v, log %v",
-					transactionHash,
-					log,
-				)
-
-				k.Payload = err
-			})
-		}
-
-		winner.TokenDetails = token_details.New(
+		tokenDetails := token_details.New(
 			underlyingTokenName,
 			underlyingTokenDecimals,
 		)
 
-		queue.SendMessage(publishTopic, winner)
+		rewardData, err := fluidity.DecodeRewardData(log, tokenDetails)
+
+		if err != nil {
+			logging.Fatal(func(k *logging.Log) {
+				k.Message = "Failed to decode reward data from events!"
+				k.Payload = err
+			})
+		}
+
+		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime)
+
+		queue.SendMessage(winnersPublishTopic, convertedWinner)
+
+		queue.SendMessage(rewardPublishTopic, rewardData)
 	})
 }

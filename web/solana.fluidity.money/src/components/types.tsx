@@ -1,14 +1,21 @@
-export type SupportedTokens = "SOL" | "COMP" | "USDC" | "USDT" | "DAI";
-export type FluidSupportedTokens = `f${SupportedTokens}`
-export type Token = SupportedTokens | FluidSupportedTokens
+export type SupportedTokens = "USDC" | "USDT" | "DAI" | "UXD" | "UST";
+export type FluidSupportedTokens = `f${SupportedTokens}`;
+export type Token = SupportedTokens | FluidSupportedTokens;
 
 //for selector component
 export type TokenKind = {
-    type: Token | "Select Token" | "Select FLUID"
-    src: string;
-    colour: string;
+  symbol: Token | "Select Token" | "Select FLUID";
+  name: string;
+  image: string;
+  colour: string;
+  mintAddress: string;
+  decimals: number;
+  obligationAccount: string;
+  dataAccount: string;
+  amount: string;
+  pinned: boolean;
 };
 
 export interface TokenList {
-    kind: TokenKind[];
+  kind: TokenKind[];
 }

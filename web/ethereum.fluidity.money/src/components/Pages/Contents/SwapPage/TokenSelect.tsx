@@ -1,31 +1,33 @@
 import TokenSelection from "components/Modal/Themes/TokenSelection";
-import { useContext, useEffect, useState } from "react";
-import { modalToggle } from "components/context";
+import { useContext } from "react";
+import { modalToggle, tokenListContext } from "components/context";
 import Icon from "components/Icon";
 import { TokenKind } from "components/types";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
+import aurora from "../../../../config/aurora-mainnet-tokens.json";
+import mainnet from "../../../../config/mainnet-tokens.json";
+import ChainId, { chainIdFromEnv } from "util/chainId";
 import { useSigner } from "util/hooks";
 import { getBalanceOfERC20 } from "util/contractUtils";
 import { TokenList } from "components/types";
 import { useWallet } from "use-wallet";
 import { SupportedFluidContracts } from "util/contractList";
+import { appTheme } from "util/appTheme";
+import {
+  changePinnedFluidUtil,
+  changePinnedUtil,
+  sortPinnedFluidUtil,
+  sortPinnedUtil,
+} from "util/tokenSelectUtil";
 
 const TokenSelect = ({
   type,
   toggle,
-  pinnedTokens,
-  pinnedFluidTokens,
-  sortPinned,
-  sortPinnedFluid,
 }: {
   type: string;
-  toggle?: () => void;
-  pinnedTokens?: TokenList["kind"];
-  pinnedFluidTokens?: TokenList["kind"];
-  sortPinned?: (token: TokenKind) => void;
-  sortPinnedFluid?: (token: TokenKind) => void;
+  toggle: () => void;
 }) => {
   const [selectedToken] = useContext(modalToggle).selectedToken;
   const [selectedFluidToken] = useContext(modalToggle).selectedFluidToken;
@@ -33,34 +35,52 @@ const TokenSelect = ({
   const wallet = useWallet();
 
   // Assigns the correct json file based on ChainId
+  const chainId = chainIdFromEnv();
   const data =
-    process.env.REACT_APP_CHAIN_ID === "3"
+    chainId === ChainId.Ropsten
       ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31337"
+      : chainId === ChainId.Hardhat
       ? (testing as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "2a"
+      : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
+      : chainId === ChainId.AuroraMainnet
+      ? (aurora as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
       : (ropsten as TokenKind[]);
 
-  const [tokens, setTokens] = useState(data.slice(0, data.length / 2));
+  // accesses tokens from context
+  const tokens: TokenKind[] = useContext(tokenListContext).tokens;
+  const setTokens = useContext(tokenListContext).setTokens;
+  const fluidTokens: TokenKind[] = useContext(tokenListContext).fluidTokens;
+  const setFluidTokens = useContext(tokenListContext).setFluidTokens;
+  // accesses pinned tokens from context
+  const pinnedTokens: TokenKind[] = useContext(tokenListContext).pinnedTokens;
+  const setPinnedTokens = useContext(tokenListContext).setPinnedTokens;
+  const pinnedFluidTokens: TokenKind[] =
+    useContext(tokenListContext).pinnedFluidTokens;
+  const setPinnedFluidTokens =
+    useContext(tokenListContext).setPinnedFluidTokens;
 
-  const [fluidTokens, setFluidTokens] = useState(
-    data.slice(data.length / 2, data.length)
-  );
-
-  useEffect(() => {
-    wallet.status === "connected" && getAmounts();
-    wallet.status !== "connected" && resetAmounts();
-    resetLists();
-  }, [toggle]);
-
-  // resets token amount to zero
-  const resetAmounts = () => {
-    setTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) => Object.assign(item, { amount: "0.0" }))
+  // sorts pinned tokens in order when added
+  const sortPinned = (token: TokenKind) => {
+    sortPinnedUtil(
+      token,
+      setPinnedTokens,
+      setPinnedFluidTokens,
+      pinnedTokens,
+      pinnedFluidTokens
     );
-    setFluidTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) => Object.assign(item, { amount: "0.0" }))
+  };
+
+  // sorts pinned fluid when added
+  const sortPinnedFluid = (token: TokenKind) => {
+    sortPinnedFluidUtil(
+      token,
+      setPinnedTokens,
+      setPinnedFluidTokens,
+      pinnedTokens,
+      pinnedFluidTokens
     );
   };
 
@@ -104,49 +124,48 @@ const TokenSelect = ({
     }
   };
 
+  // changes token and fluid pair token from pinned to unpinned if less than 8 pinned
   const changePinned = (token: TokenKind) => {
-    setTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === token.symbol
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
-    );
-    setFluidTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === `f${token.symbol}`
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
+    changePinnedUtil(
+      token,
+      fluidTokens,
+      setPinnedTokens,
+      setPinnedFluidTokens,
+      setTokens,
+      setFluidTokens
     );
   };
 
+  // changes fluid token and regulat token from pinned to unpinned if less than 8 pinned
   const changePinnedFluid = (token: TokenKind) => {
-    setTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === token.symbol.substring(1)
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
-    );
-    setFluidTokens((previousState: TokenList["kind"]) =>
-      [...previousState]?.map((item) =>
-        item.symbol === token.symbol
-          ? Object.assign(item, { pinned: !item.pinned })
-          : item
-      )
+    changePinnedFluidUtil(
+      token,
+      tokens,
+      setPinnedTokens,
+      setPinnedFluidTokens,
+      setTokens,
+      setFluidTokens
     );
   };
 
+  // resets token lists matching pinned list
   const resetLists = () => {
-    setTokens(data.slice(0, data.length / 2));
-    setFluidTokens(data.slice(data.length / 2, data.length));
+    setTokens(JSON.parse(JSON.stringify(pinnedTokens)));
+    setFluidTokens(JSON.parse(JSON.stringify(pinnedFluidTokens)));
+    getAmounts();
   };
 
   switch (type) {
     case "token":
       return (
-        <div className="token-selection-container flex align" onClick={toggle}>
+        <div
+          className={`token-selection-container${appTheme} flex align`}
+          onClick={() => {
+            toggle();
+            resetLists();
+            wallet.status === "connected" && getAmounts();
+          }}
+        >
           {selectedToken}
           <Icon
             src={`${
@@ -168,7 +187,14 @@ const TokenSelect = ({
       );
     case "fluid":
       return (
-        <div className="token-selection-container flex align" onClick={toggle}>
+        <div
+          className={`token-selection-container${appTheme} flex align`}
+          onClick={() => {
+            toggle();
+            resetLists();
+            wallet.status === "connected" && getAmounts();
+          }}
+        >
           {selectedFluidToken}
           <Icon
             src={`${

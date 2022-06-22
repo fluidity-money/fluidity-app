@@ -46,12 +46,6 @@ func bigFloatFromInt(x *big.Int) *big.Float {
 	return float.SetInt(x)
 }
 
-func debug(format string, arguments ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(format, arguments...)
-	})
-}
-
 // getLastBlockTime by asking Redis for it
 func getLastBlockTimestamp() int64 {
 	blockTime_ := state.Get("block.time")
@@ -153,4 +147,20 @@ func anyStringsEmpty(strings ...string) bool {
 	}
 
 	return false
+}
+
+// mustEthereumAddressFromString to convert a string to an ethereum address,
+// or fatal if it's invalid
+func mustEthereumAddressFromString(addressString string) ethereum.Address {
+	address := ethereum.AddressFromString(addressString)
+	if address == "" {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to convert %v to an ethereum address!",
+				addressString,
+			)
+		})
+	}
+
+	return address
 }

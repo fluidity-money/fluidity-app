@@ -11,6 +11,7 @@ type footerNavigationLinks = [string, string][];
 const navLinks: socialIcons = [
   ["Home", "https://fluidity.money/#home"],
   ["About", "https://fluidity.money/#about"],
+  ["Docs", "https://docs.fluidity.money/"],
   ["Blog", "https://fluidity.money/#blog"],
   ["Whitepapers", "https://fluidity.money/#whitepapers"],
 ];
@@ -117,6 +118,11 @@ const FooterItem = styled.div`
 const FooterGrid = styled.div`
   display: grid;
   grid-template-columns: 100px 100px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 100px 100px 100px;
+    text-align: center;
+  }
 `;
 
 export default Footer;

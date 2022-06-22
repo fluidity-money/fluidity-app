@@ -15,14 +15,14 @@ func JsonEndpoint(endpoint string, handler func(http.ResponseWriter, *http.Reque
 
 		setCorsHeaders(w)
 
-		debug(
+		log.Debugf(
 			"Handling a request to the JSON endpoint %v from %v!",
 			endpoint,
 			ipAddress,
 		)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -36,7 +36,7 @@ func JsonEndpoint(endpoint string, handler func(http.ResponseWriter, *http.Reque
 		content := handler(w, r)
 
 		if content == nil {
-			debug(
+			log.Debugf(
 				"Returned content from the handler at %v serving %v is nil!",
 				endpoint,
 				ipAddress,

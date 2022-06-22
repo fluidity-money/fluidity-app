@@ -6,6 +6,12 @@
 .header-text {
   font-family: Manrope, sans-serif;
   font-size: 1.2rem;
+  @include for-smallest-toolbar {
+    font-size: 0.9rem;
+  }
+  @include for-below-470 {
+    font-size: 1rem;
+  }
 }
 
 .btn__div {

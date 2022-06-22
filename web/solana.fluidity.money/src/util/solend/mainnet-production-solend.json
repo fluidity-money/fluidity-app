@@ -1,0 +1,1067 @@
+{
+  "programID": "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo",
+  "assets": [
+    {
+      "name": "Serum",
+      "symbol": "SRM",
+      "decimals": 6,
+      "mintAddress": "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png"
+    },
+    {
+      "name": "Solend",
+      "symbol": "SLND",
+      "decimals": 6,
+      "mintAddress": "SLNDpmoWTVADgEdndyvWzroNL7zSi1dF9PC3xHGtPwp",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SLNDpmoWTVADgEdndyvWzroNL7zSi1dF9PC3xHGtPwp/logo.png"
+    },
+    {
+      "name": "FTX Token (Portal)",
+      "symbol": "FTT",
+      "decimals": 8,
+      "mintAddress": "EzfgjvkSwthhgHaceR3LnKXUoRkP6NUhfghdaHAj1tUv",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EzfgjvkSwthhgHaceR3LnKXUoRkP6NUhfghdaHAj1tUv/logo.png"
+    },
+    {
+      "name": "Mercurial",
+      "symbol": "MER",
+      "decimals": 6,
+      "mintAddress": "MERt85fc5boKw3BW1eYdxonEuJNvXbiMbs6hvheau5K",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/MERt85fc5boKw3BW1eYdxonEuJNvXbiMbs6hvheau5K/logo.png"
+    },
+    {
+      "name": "UST (Portal)",
+      "symbol": "UST",
+      "decimals": 6,
+      "mintAddress": "9vMJfxuKxXBoEa7rM12mYLMwTacLMLDJqHozw96WQL8i",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9vMJfxuKxXBoEa7rM12mYLMwTacLMLDJqHozw96WQL8i/logo.png"
+    },
+    {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 6,
+      "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+    },
+    {
+      "name": "Saber Protocol Token",
+      "symbol": "SBR",
+      "decimals": 6,
+      "mintAddress": "Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1/logo.svg"
+    },
+    {
+      "name": "Ether (Portal)",
+      "symbol": "ETH",
+      "decimals": 8,
+      "mintAddress": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs/logo.png"
+    },
+    {
+      "name": "Marinade staked SOL (mSOL)",
+      "symbol": "mSOL",
+      "decimals": 9,
+      "mintAddress": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png"
+    },
+    {
+      "name": "USDT",
+      "symbol": "USDT",
+      "decimals": 6,
+      "mintAddress": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg"
+    },
+    {
+      "name": "Raydium",
+      "symbol": "RAY",
+      "decimals": 6,
+      "mintAddress": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R/logo.png"
+    },
+    {
+      "name": "Wrapped Bitcoin (Sollet)",
+      "symbol": "BTC",
+      "decimals": 6,
+      "mintAddress": "9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png"
+    },
+    {
+      "name": "Lido Staked SOL",
+      "symbol": "stSOL",
+      "decimals": 9,
+      "mintAddress": "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj/logo.png"
+    },
+    {
+      "name": "Orca",
+      "symbol": "ORCA",
+      "decimals": 6,
+      "mintAddress": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE/logo.png"
+    },
+    {
+      "name": "Saber USDT-USDC LP",
+      "symbol": "USDT-USDC",
+      "decimals": 6,
+      "mintAddress": "2poo1w1DL6yd2WNTCnNTzDqkC6MBXq7axo77P16yrBuf",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2poo1w1DL6yd2WNTCnNTzDqkC6MBXq7axo77P16yrBuf/icon.png"
+    },
+    {
+      "name": "Wrapped SOL",
+      "symbol": "SOL",
+      "decimals": 9,
+      "mintAddress": "So11111111111111111111111111111111111111112",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
+    },
+    {
+      "name": "Wrapped FTT (Sollet)",
+      "symbol": "soFTT",
+      "decimals": 6,
+      "mintAddress": "AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3/logo.png"
+    },
+    {
+      "name": "Socean staked SOL",
+      "symbol": "scnSOL",
+      "decimals": 9,
+      "mintAddress": "5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm/logo.png"
+    },
+    {
+      "name": "Wrapped Ethereum (Sollet)",
+      "symbol": "soETH",
+      "decimals": 6,
+      "mintAddress": "2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png"
+    },
+    {
+      "name": "Saber mSOL-SOL LP",
+      "symbol": "mSOL-SOL",
+      "decimals": 9,
+      "mintAddress": "SoLEao8wTzSfqhuou8rcYsVoLjthVmiXuEjzdNPMnCz",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SoLEao8wTzSfqhuou8rcYsVoLjthVmiXuEjzdNPMnCz/icon.png"
+    },
+    {
+      "name": "PAI (Parrot USD)",
+      "symbol": "PAI",
+      "decimals": 6,
+      "mintAddress": "Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS/logo.svg"
+    },
+    {
+      "name": "UXD Stablecoin",
+      "symbol": "UXD",
+      "decimals": 6,
+      "mintAddress": "7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT/uxd-icon-black.png"
+    },
+    {
+      "name": "USDH Hubble Stablecoin",
+      "symbol": "USDH",
+      "decimals": 6,
+      "mintAddress": "USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX/usdh.svg"
+    },
+    {
+      "name": "Coin98",
+      "symbol": "C98",
+      "decimals": 6,
+      "mintAddress": "C98A4nkJXhpVZNAZdHUA95RpTF3T4whtQubL3YobiUX9",
+      "logo": "https://coin98.s3.ap-southeast-1.amazonaws.com/Coin/c98-512.svg"
+    },
+    {
+      "name": "Star Atlas DAO",
+      "symbol": "POLIS",
+      "decimals": 8,
+      "mintAddress": "poLisWXnNRwC6oBu1vHiuKQzFjGL4XDSu4g9qjz9qVk",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/poLisWXnNRwC6oBu1vHiuKQzFjGL4XDSu4g9qjz9qVk/logo.png"
+    },
+    {
+      "name": "Star Atlas",
+      "symbol": "ATLAS",
+      "decimals": 8,
+      "mintAddress": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx/logo.png"
+    },
+    {
+      "name": "Samoyed Coin",
+      "symbol": "SAMO",
+      "decimals": 9,
+      "mintAddress": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU/logo.png"
+    },
+    {
+      "name": "Step",
+      "symbol": "STEP",
+      "decimals": 9,
+      "mintAddress": "StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT/logo.png"
+    },
+    {
+      "name": "Staked Step",
+      "symbol": "xSTEP",
+      "decimals": 9,
+      "mintAddress": "xStpgUCss9piqeFUk2iLVcvJEGhAdJxJQuwLkXP555G",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/xStpgUCss9piqeFUk2iLVcvJEGhAdJxJQuwLkXP555G/logo.svg"
+    },
+    {
+      "name": "Solana Monkey Business Droplet",
+      "symbol": "SMBD",
+      "decimals": 8,
+      "mintAddress": "smbdJcLBrtKPhjrWCpDv5ABdJwz2vYo3mm6ojmePL3t",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/smbdJcLBrtKPhjrWCpDv5ABdJwz2vYo3mm6ojmePL3t/logo.png"
+    },
+    {
+      "name": "Degenerate Ape Academy Droplet",
+      "symbol": "DAPE",
+      "decimals": 8,
+      "mintAddress": "dapeM1DJj3xf2rC5o3Gcz1Cg3Rdu2ayZae9nGcsRRZT",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/dapeM1DJj3xf2rC5o3Gcz1Cg3Rdu2ayZae9nGcsRRZT/logo.png"
+    },
+    {
+      "name": "Wrapped Locked Staked Sol Invictus",
+      "symbol": "lsIN",
+      "decimals": 9,
+      "mintAddress": "LsinpBtQH68hzHqrvWw4PYbH7wMoAobQAzcvxVHwTLv"
+    },
+    {
+      "name": "Bonfida",
+      "symbol": "FIDA",
+      "decimals": 6,
+      "mintAddress": "EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp/logo.svg"
+    },
+    {
+      "name": "UXP Governance Token",
+      "symbol": "UXP",
+      "decimals": 9,
+      "mintAddress": "UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M/uxp-icon-black.png"
+    },
+    {
+      "name": "GST",
+      "symbol": "GST",
+      "decimals": 9,
+      "mintAddress": "AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB/logo.png"
+    },
+    {
+      "name": "GMT",
+      "symbol": "GMT",
+      "decimals": 9,
+      "mintAddress": "7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx",
+      "logo": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx/logo.png"
+    }
+  ],
+  "markets": [
+    {
+      "name": "main",
+      "isPrimary": true,
+      "description": null,
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY",
+      "authorityAddress": "DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby",
+      "reserves": [
+        {
+          "asset": "SRM",
+          "address": "5suXmvdbKQ98VonxGCXqViuWRu8k4zgZRxndYKsH2fJg",
+          "collateralMintAddress": "4CxGuD2NMr6zM8f18gr6kRhgd748pnmkAhkY1YJtkup1",
+          "collateralSupplyAddress": "D52HyVBEMWy2WBptV5zsPuYS8W8C62gYjYKuVzaK1ruM",
+          "liquidityAddress": "4JHVBtmMPFyRpidxHtM8gVjGuLBXhaXCF4jNFFKBdGpb",
+          "liquidityFeeReceiverAddress": "AkwRd7hZ35BmnYvj9S5PgVpiBQfuzxaapshJe9PCN5hh",
+          "userSupplyCap": 600000
+        },
+        {
+          "asset": "SLND",
+          "address": "CviGNzD2C9ZCMmjDt5DKCce5cLV4Emrcm3NFvwudBFKA",
+          "collateralMintAddress": "D3Cu5urZJhkKyNZQQq2ne6xSfzbXLU4RrywVErMA2vf8",
+          "collateralSupplyAddress": "Cc8DRe9wagmkVBeeeLsjgkAk7fkpyZt7XF8Ts3ddyYXd",
+          "liquidityAddress": "5pHGhh9pjzHP6fWQF4wQ3CKWpZM3YaerRJYN6RLTtZ5m",
+          "liquidityFeeReceiverAddress": "FtsXfVZWLgMWJH1owUmLhtET5KW1Ck8oykYXyPMkxFcE",
+          "userSupplyCap": 500000
+        },
+        {
+          "asset": "FTT",
+          "address": "8bDyV3N7ctLKoaSVqUoEwUzw6msS2F65yyNPgAVUisKm",
+          "collateralMintAddress": "DiMx1n2dJmxqFtENRPhYWsqi8Mhg2p39MpTzsm6phzMP",
+          "collateralSupplyAddress": "EPNB8NiL3vFDYQhSZY5LQAoW6AJYLdwFXezXeyqiPvEM",
+          "liquidityAddress": "ByYuFLvwVW9NSKnGbnKSMToy3Ea9StJ4t7HjAmcTjk7w",
+          "liquidityFeeReceiverAddress": "2C2aefnxUSAMQrfey1hC6yHLh18BpjkwL1zAJCS9YqDG",
+          "userSupplyCap": 100000
+        },
+        {
+          "asset": "MER",
+          "address": "5Sb6wDpweg6mtYksPJ2pfGbSyikrhR8Ut8GszcULQ83A",
+          "collateralMintAddress": "BsWLxf6hRJnyytKR52kKBiz7qU7BB3SH77mrBxNnYU1G",
+          "collateralSupplyAddress": "FeWc3QLKQBYS3RbrzEzj4ADsdNtQStomNepajeubY9cW",
+          "liquidityAddress": "CNREdzCSa2X5HQ6xjDZ1jd2XN3nmwTHfQkYj9pWAZuXs",
+          "liquidityFeeReceiverAddress": "8hWXJ8jY6WrnbRM47hJZbstfBz3eX9HtsPTHvv2RJH2D",
+          "userSupplyCap": 4000000
+        },
+        {
+          "asset": "UST",
+          "address": "Ab48bKsiEzdm481mGaNVmv9m9DmXsWWxcYHM588M59Yd",
+          "collateralMintAddress": "nZtL8HKX3aQtk3VpdvtdwPpXF2uMia522Pnan2meqdf",
+          "collateralSupplyAddress": "4HXDioboWL85gQocYNkWM62AB5ctrf8jVykSVco67Lzx",
+          "liquidityAddress": "5LyHdTXh1MSbRzE7xfTtfpV8W5eaySJnSiTs6FdHhrSo",
+          "liquidityFeeReceiverAddress": "4GctGML68E1kDcvskGTXRPY9ngxmxVnJXjpsJ68YBXPR",
+          "userSupplyCap": 5000000
+        },
+        {
+          "asset": "USDC",
+          "address": "BgxfHJDzm44T7XG68MYKx7YisTjZu73tVovyZSjJMpmw",
+          "collateralMintAddress": "993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk",
+          "collateralSupplyAddress": "UtRy8gcEu9fCkDuUrU8EmC7Uc6FZy5NCwttzG7i6nkw",
+          "liquidityAddress": "8SheGtsopRUDzdiD6v6BR9a6bqZ9QwywYQY99Fp5meNf",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        },
+        {
+          "asset": "SBR",
+          "address": "Hthrt4Lab21Yz1Dx9Q4sFW4WVihdBUTtWRQBjPsYHCor",
+          "collateralMintAddress": "Bpm2aBL57uqVhgxutfRVrbtnjDpZLV8PZrRrytV1LgeT",
+          "collateralSupplyAddress": "9wSy4XV4XN1hzp9nuC8TbCc78zDkWgu8tGNABH4cpBG5",
+          "liquidityAddress": "86hiF77ktrdVFU9xFqxsYChRirgs9KCvQDD9g4jT64bJ",
+          "liquidityFeeReceiverAddress": "7mjo1oAYVcAQmysfS64LTYi2ZkKJFveymmhYVasEc1nh",
+          "userSupplyCap": 10000000
+        },
+        {
+          "asset": "ETH",
+          "address": "CPDiKagfozERtJ33p7HHhEfJERjvfk1VAjMXAFLrvrKP",
+          "collateralMintAddress": "FbKvdbx5h6F86h1pZuEqv7FxwmsVhJ88cDuSqHvLm6Xf",
+          "collateralSupplyAddress": "BtGoQiwEWUZQfNaxSxzBgRikfT1rx3hSkzjQEWvktEMe",
+          "liquidityAddress": "8HAaZSiCbVqrLDQHxg3yey8JWuGbeyC2tNTEmzgmt4C4",
+          "liquidityFeeReceiverAddress": "86FvZEpX1y6pK5E6JPLbhoBvp6P2n1givZiikFGgi6Lj"
+        },
+        {
+          "asset": "mSOL",
+          "address": "CCpirWrgNuBVLdkP2haxLTbD6XqEgaYuVXixbbpxUB6",
+          "collateralMintAddress": "3JFC4cB56Er45nWVe29Bhnn5GnwQzSmHVf6eUq9ac91h",
+          "collateralSupplyAddress": "FG7yuhS6udX8v2LQYxqwpcsdC2J1pUREoGrRYsQjr1uh",
+          "liquidityAddress": "3R5SVe3qABRUYozgeMNVkSotVoa4HhTFFgWgx2G2QMov",
+          "liquidityFeeReceiverAddress": "83r2poRUiqaghyymPtfhhRtHdReFAKbgGGCQajkczW5w",
+          "userSupplyCap": 200000
+        },
+        {
+          "asset": "USDT",
+          "address": "8K9WC8xoh2rtQNY7iEGXtPvfbDCi563SdWhCAhuMP2xE",
+          "collateralMintAddress": "BTsbZDV7aCMRJ3VNy9ygV4Q2UeEo9GpR8D6VvmMZzNr8",
+          "collateralSupplyAddress": "CXDxj6cepVv9nWh4QYqWS2MpeoVKBLKJkMfo3c6Y1Lud",
+          "liquidityAddress": "3CdpSW5dxM7RTxBgxeyt8nnnjqoDbZe48tsBs9QUrmuN",
+          "liquidityFeeReceiverAddress": "Cpyk5WRGmdK2yFGTJCrmgyABPiNEF5eCyCMMZLxpdkXu"
+        },
+        {
+          "asset": "RAY",
+          "address": "9n2exoMQwMTzfw6NFoFFujxYPndWVLtKREJePssrKb36",
+          "collateralMintAddress": "2d95ZC8L5XP6xCnaKx8D5U5eX6rKbboBBAwuBLxaFmmJ",
+          "collateralSupplyAddress": "6uEjo58ecepRyYnKRLdAMRn8ic3oJJxnwMBH96ufMSXN",
+          "liquidityAddress": "5JT6EK5wLEYGpAXMY2BXvhoeuQCp93eo4os2EtXwnPG1",
+          "liquidityFeeReceiverAddress": "2E15BsCyBeAu9TwhWKQ9yWj9a4TKoPkv7B1JjNxFF7v7",
+          "userSupplyCap": 500000
+        },
+        {
+          "asset": "BTC",
+          "address": "GYzjMCXTDue12eUGKKWAqtF5jcBYNmewr6Db6LaguEaX",
+          "collateralMintAddress": "Gqu3TFmJXfnfSX84kqbZ5u9JjSBVoesaHjfTsaPjRSnZ",
+          "collateralSupplyAddress": "9HrQ9RuRsHjKXuAbZzMHMrYuyq62LjY3B7EBWkM4Uyke",
+          "liquidityAddress": "4jkyJVWQm8NUkiJFJQx6ZJQhfKLGpeZsNrXoT4bAPrRv",
+          "liquidityFeeReceiverAddress": "9CjhBpwiQbP2zYnj7PqHTxPPp2BCR4Y4rP4ZPWkqrCQk"
+        },
+        {
+          "asset": "stSOL",
+          "address": "5sjkv6HD8wycocJ4tC4U36HHbvgcXYqcyiPRUkncnwWs",
+          "collateralMintAddress": "QQ6WK86aUCBvNPkGeYBKikk15sUg6aMUEi5PTL6eB4i",
+          "collateralSupplyAddress": "9MBrzWjgw1sbca6X2M6YoUCQgN6udVeKp9oLFwuzPY2p",
+          "liquidityAddress": "7ma18yBbX37RbFHQXiq1XhP6c561nDnYSmF84mwiY7Wo",
+          "liquidityFeeReceiverAddress": "6N5JTX3hXRwudgbVxbAbMvnrW1GB4QdpFGQgYonaWj4C",
+          "userSupplyCap": 200000
+        },
+        {
+          "asset": "ORCA",
+          "address": "FKZTsydxPShJ8baThobis6qFxTjALMkVC49EA88wqvm7",
+          "collateralMintAddress": "E9LAZYxBVhJr9Cdfi9Tn4GSiJHDWSZDsew5tfgJja6Cu",
+          "collateralSupplyAddress": "FELidXszawDEujYLV7A5u7XXFCsPCNvTHm1heJbnh36G",
+          "liquidityAddress": "5grnVTzYxhhhbiSdbkznMff721ZPMP3SzYhy2Yzd37jt",
+          "liquidityFeeReceiverAddress": "GHoC6JumDEw5CB35wqMwZK2G6NmrhjynKAdNnVNUP9ie",
+          "userSupplyCap": 300000
+        },
+        {
+          "asset": "USDT-USDC",
+          "address": "9mZsd1b9cN7JyqJvkbqhVuTfg8PAuKjuhPxpcsVNjYoC",
+          "collateralMintAddress": "6XrbsKScacEwpEW5DVNko9t5vW3cim9wktAeT9mmiYHS",
+          "collateralSupplyAddress": "fh6Bv7k29VBYTnXBRNJX9Gqk9pZVRxwj1vjcg6M2R3M",
+          "liquidityAddress": "AZkoTbjXJubLng1MSa5beFks93KpArVu3f3efGvNB6CH",
+          "liquidityFeeReceiverAddress": "2Us5qmLmBx6rCXMg7mJGQFwvG1kq1opTvVwPKt5G8oHi",
+          "userSupplyCap": 1000000
+        },
+        {
+          "asset": "SOL",
+          "address": "8PbodeaosQP19SjYFx855UMqWxH2HynZLdBXmsrbac36",
+          "collateralMintAddress": "5h6ssFpeDeRbzsEHDbTQNH7nVGgsKrZydxdSTnLm6QdV",
+          "collateralSupplyAddress": "B1ATuYXNkacjjJS78MAmqu8Lu8PvEPt51u4oBasH1m1g",
+          "liquidityAddress": "8UviNr47S8eL6J3WfDxMRa3hvLta1VDJwNWqsDgtN3Cv",
+          "liquidityFeeReceiverAddress": "5wo1tFpi4HaVKnemqaXeQnBEpezrJXcXvuztYaPhvgC7"
+        },
+        {
+          "asset": "soFTT",
+          "address": "2dC4V23zJxuv521iYQj8c471jrxYLNQFaGS6YPwtTHMd",
+          "collateralMintAddress": "A38TjtcYrfutXT6nfRxhqwoGiXyzwJsGPmekoZYYmfgP",
+          "collateralSupplyAddress": "HbMugfk2UDNoCiBUqgXdPu75ksMZHvkJjRZ8YKrcPwz2",
+          "liquidityAddress": "9ZdwVAZsqFWtzNNGZhmQJttYQxTCVPRnaXMgA2KrQpLK",
+          "liquidityFeeReceiverAddress": "J4Zttvtnt2ECLyyEaxQRywAQEN4xcbHsgMF1Fhgdyow9",
+          "userSupplyCap": 500000
+        },
+        {
+          "asset": "scnSOL",
+          "address": "DUExYJG5sc1SQdMMdq6LdUYW9ULXbo2fFFTbedywgjNN",
+          "collateralMintAddress": "AFq1sSdevxfqWGcmcz7XpPbfjHevcJY7baZf9RkyrzoR",
+          "collateralSupplyAddress": "7NJCWoLDngquvYcCPzUBLYfpS9F3eox4ibgivEGxXweU",
+          "liquidityAddress": "5Ynq25D3t124WkQZaaWHBXkWkMGJchVg2sCRgfu1PYbs",
+          "liquidityFeeReceiverAddress": "6SytVt3JLkB5VdLPxTBd5zZFGGVDXsMhf6AdcajdZTBV",
+          "userSupplyCap": 100000
+        },
+        {
+          "asset": "soETH",
+          "address": "3PArRsZQ6SLkr1WERZWyC6AqsajtALMq4C66ZMYz4dKQ",
+          "collateralMintAddress": "AppJPZka33cu4DyUenFe9Dc1ZmZ3oQju6mBn9k37bNAa",
+          "collateralSupplyAddress": "2Yv6ZgZ9ccV8bCYD7T5t2kcAQYRbukMKha6NiPQ8cFAT",
+          "liquidityAddress": "B7Lg4cJZHPLFaGdqfaAWG35KFFaEtBMmRAGf98kNaogt",
+          "liquidityFeeReceiverAddress": "8RS6VQM1RcuVUrQmfHgF3RAUPCbsbmejgbvTLvr8ZgrV"
+        },
+        {
+          "asset": "mSOL-SOL",
+          "address": "6ve8XyELbecPdbzSTsyhYKiWr7wg3JpjfxE1cqoN9qhN",
+          "collateralMintAddress": "4icXEpFVMrcqob6fnd3jZ6KjKrc6cqre6do1f8kKAC1u",
+          "collateralSupplyAddress": "3nfgTBPf1N1NPNTTYk2HpJABaL59db3XKnjgJ8JGwtHJ",
+          "liquidityAddress": "ETnpmAETSfzmfevgUxzaHGTdDrTofHGZgCdccCHkA6nM",
+          "liquidityFeeReceiverAddress": "2TWjqvWCjMFBWJSx42AZYbDyihBrQqCo6URDpLhWA8L6",
+          "userSupplyCap": 10000
+        }
+      ]
+    },
+    {
+      "name": "Coin98",
+      "isPrimary": false,
+      "description": null,
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "7tiNvRHSjYDfc6usrWnSNPyuN68xQfKs1ZG2oqtR5F46",
+      "authorityAddress": "8web9hJK4TQJBV23WQpBw9jMvn3YE1EV3PEcnXJvgwQa",
+      "reserves": [
+        {
+          "asset": "PAI",
+          "address": "A3cQwWXzsaC5nfLDf7cbakZeBAJFGf1qMxvnf4yDRUUJ",
+          "collateralMintAddress": "CKUk55h1JcyK7DsvSYjYVw5XiEgrB2LgXMfyuBBnRmHT",
+          "collateralSupplyAddress": "97AFq1qdq5rWyyaQFybFCt2bkLSk5VWuC15LPbeFZZKV",
+          "liquidityAddress": "7bcdN2XJBhaDuQpH7vtS6dC1spQYEogQRQyCpXKiPJir",
+          "liquidityFeeReceiverAddress": "8fXGHJ6ArM9cyaZkaBFsLDM4W5HdPofjMFoHgX3Bb7K7",
+          "userSupplyCap": 200000
+        },
+        {
+          "asset": "UXD",
+          "address": "46Lh1P2XmTNG8Gnt4zkTdG1BXi2V18NggfYTbXpSzAYy",
+          "collateralMintAddress": "ErJswCkk3oRS9poFdRxJHt6j9yQisTB8YQAqJkE7iC5U",
+          "collateralSupplyAddress": "BdjGeJQNEZhCLyW89RNWgxkn3hwRMsAxncc29QNuHvRf",
+          "liquidityAddress": "Fr3A2agcj8G8jEVPhE1rYUQsGF85meEN5fDQ4etFp5Wi",
+          "liquidityFeeReceiverAddress": "AsJ7wz4a4cbP9qkX4iadD4jbfr5mcDV9D8SZdD37pm2t",
+          "userSupplyCap": 200000
+        },
+        {
+          "asset": "UST",
+          "address": "B5513y5wt161CxLX5U2o5cGFHYbcGMuTKc6yu1ni3AbC",
+          "collateralMintAddress": "DWYPVVz79kAbbiL42rWtmWoyvDX9M7aGLyf9Cu7Ewvds",
+          "collateralSupplyAddress": "9LgyN4yyT7gYWm9MCFrRX7uapcqQ1v4CBUYcaeqU9eP2",
+          "liquidityAddress": "F98wY9aiUnQL24ecXMRDptvhnmF4dkPccQdAZRhnKNrp",
+          "liquidityFeeReceiverAddress": "4GctGML68E1kDcvskGTXRPY9ngxmxVnJXjpsJ68YBXPR",
+          "userSupplyCap": 200000
+        },
+        {
+          "asset": "USDH",
+          "address": "3eDDvVgyxZ7aWLjLmKDYpeGHidCH7jkfHXcCXtpGqNKg",
+          "collateralMintAddress": "AGhAmBTQGHhDWSwmBCL91GRyv7FP3HRZarmRK6XccnM7",
+          "collateralSupplyAddress": "CeuaEJwGcLrAbUGaf3U3pyGpWyWujCTbVxc7bWJwBZnw",
+          "liquidityAddress": "BwJcKTcekXM59ML7p4gnjQEQ4p9hp5MBg4FeUS3DSdCr",
+          "liquidityFeeReceiverAddress": "5ZBZ37C9BiEHarAcnWeCyLwp8E1YnVQ7AWHRZwhhtTpR",
+          "userSupplyCap": 200000
+        },
+        {
+          "asset": "C98",
+          "address": "9bVRrxPjXBxM6rEyTLcR2opvdA2UGhdDwL8CLLm1b8KP",
+          "collateralMintAddress": "VTyR5PvnbNAp7uAg7kr9cfAhNZEodoJrCTRGC67pAjP",
+          "collateralSupplyAddress": "5gurmwpjQTgcFAh8xR6ZePe2jNC6qnp4Y3EkY4Dm8iNm",
+          "liquidityAddress": "5w4MvZvso7Shbr9Fd1mVd5nKUuRPHQ98Jxwz7wkFqVSt",
+          "liquidityFeeReceiverAddress": "CcizC7YGvroMgk6zhW5MoCt2CQtF1NXxtWhAv53Q7VFe",
+          "userSupplyCap": 100000
+        }
+      ]
+    },
+    {
+      "name": "Star Atlas",
+      "isPrimary": false,
+      "description": "Star Atlas is a blockchain-based, space-themed, grand strategy video game built on the Solana blockchain. With ATLAS pool, holders of the ATLAS and POLIS tokens will gain additional lending/borrowing utility.",
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "99S4iReDsyxKDViKdXQKWDcB6C3waDmfPWWyb5HAbcZF",
+      "authorityAddress": "2vhoVMQWEc12dUEEcJ6w8j3ZnrA4Tk6w8pPFhoWfVsUy",
+      "reserves": [
+        {
+          "asset": "POLIS",
+          "address": "29Znf6g5qmRfTdnbyRQUWvMt94Gzn2KPCzY2ixxY9Mnt",
+          "collateralMintAddress": "ZeTubq2tcT9s8sPGKihum5scLGoQDqtYd6BYAy15y2P",
+          "collateralSupplyAddress": "3E1Cinh4vYhqNKQmSBDTK8k6pxbLSr94eXWVDGvbatRP",
+          "liquidityAddress": "BnooBAnfoqbixXd7xJwiYBn3vU4UyE8G4uHAsfinCg3D",
+          "liquidityFeeReceiverAddress": "913RkijsY8rQxyuuoHs5hd4YETdhXBNwwd648ABEqXT4",
+          "userSupplyCap": 300000
+        },
+        {
+          "asset": "USDC",
+          "address": "5hVVs474TRejwwfqsecNp97riQGDtSmhTV6jiWSxJfWR",
+          "collateralMintAddress": "HwdCShcytebyeLaU79FB5cD4RDJVWnN7vs5kCJr6nKf7",
+          "collateralSupplyAddress": "49HFHN2waPusSTK6dib6Pr8gjgGGkTjziwNczq7kDeRx",
+          "liquidityAddress": "3wKtbpbm5KnG3xUp51gP5MbCynPJtYvn4ZUwmm2KHBeR",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        },
+        {
+          "asset": "ATLAS",
+          "address": "8RX5oDxnydPPsA92epWnyXrrM26w7JgAQoVVt9kbiZwq",
+          "collateralMintAddress": "EHFzasjYT1VmeKtvPtPCytJugQFBoYdhXXBt2WazinfY",
+          "collateralSupplyAddress": "GCagCmPq1uUV43DtWSd4rKh3eP8JdxE2XSKCUBJzyK2X",
+          "liquidityAddress": "DGMYGHmQiCs9H1MUxe57H78Ea1jwkAynzEfDKXUkF6ZT",
+          "liquidityFeeReceiverAddress": "3iyLRAJyLS6QMkVs4aD5KiUBDizjxtqHv4RbX3hGCrRz",
+          "userSupplyCap": 20000000
+        }
+      ]
+    },
+    {
+      "name": "Dog",
+      "isPrimary": false,
+      "description": "The Dog pool currently contains SAMO, the premier community token and symbol of the Solana ecosystem. Over time, this pool will grow to contain your favourite dog-themed meme coins. Earn interest and borrow while holding your favourite dog coins.",
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "HASr6hiYVoRcVXk3GttC4PjBBPQ3sGYDzE7HSPJdcke6",
+      "authorityAddress": "DLokPHis2W5f3jQ4Kgv5PQHebkun2KQtsXcFidhR19Za",
+      "reserves": [
+        {
+          "asset": "USDC",
+          "address": "5VuBkDYXcV1svRm1BKShA2wqKsszYWjPwoT4Q32YXcp3",
+          "collateralMintAddress": "9zCPUDEF5oGymtihmPQL6bUUxarno7w6qzM7Amiyh9bw",
+          "collateralSupplyAddress": "5YjjhzNHQoBdisyMrxhmt2nwy8yoQ9zA7o2ruUZg894g",
+          "liquidityAddress": "yumozQYL4ddiEDLhpUqa7o4UpUg46pkbmGsEF5cJibs",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        },
+        {
+          "asset": "SAMO",
+          "address": "HwZSKqyo2QQ2YCzF282ZrpH4JRQWf3Qad1fWHtKCDZjx",
+          "collateralMintAddress": "E9qQ9pdZjk9zvm7Qp3UUynddJMadK85F8ZNqWyeUHcjV",
+          "collateralSupplyAddress": "DzERiPrzkwRi4pG5SsWaevVr2jSNhRkwNCibx5eP5K1g",
+          "liquidityAddress": "GHnH17QEJvVv7bqzqrhPMrLpTvdbZW4e1jxn8ZnbgUFF",
+          "liquidityFeeReceiverAddress": "Ag3ZHEVDZPUkTQSeCs6BMmh7xweakVvUuef76tT7Syt9",
+          "userSupplyCap": 25000000
+        }
+      ]
+    },
+    {
+      "name": "Stable",
+      "isPrimary": false,
+      "description": "The Stable pool contains only stablecoins, and allows for leverage through high loan-to-value ratios. This enables better price discovery since it allows for leveraged basis trades.",
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "GktVYgkstojYd8nVXGXKJHi7SstvgZ6pkQqQhUPD7y7Q",
+      "authorityAddress": "Ej4KxxUz73edQzjfsPVWvYxT5eyhQoWoXpo7BYm2Ejhj",
+      "reserves": [
+        {
+          "asset": "UXD",
+          "address": "27YJsVpHWvjS8BKaz7Gd8unSFJAMrh6gPEFjqhYxn9AE",
+          "collateralMintAddress": "3R3mzc8o9oXCsBX2dKG7Bzc3ov1m7t4UHtb81ktAeCxY",
+          "collateralSupplyAddress": "6RTTJkwZ7NuK4JaJnnaUgqU78gaW3A8McDTfiGsBBbLX",
+          "liquidityAddress": "9v6c1QVoyQxX6hWKGCYLwcunc3JfMWQLcMS3KWR5Kqhf",
+          "liquidityFeeReceiverAddress": "AsJ7wz4a4cbP9qkX4iadD4jbfr5mcDV9D8SZdD37pm2t"
+        },
+        {
+          "asset": "UST",
+          "address": "A57FVdDgcyz1NserCSMSWaWDyfWZw77ikfXvE2cwPF18",
+          "collateralMintAddress": "5czXDWSVFjH16hJGvwZTE8sMbh4vQggZ1gMhyVE4RWgx",
+          "collateralSupplyAddress": "4VDZMvxihqGggUYGiDbce2WTgsKDBeN47128Bkv72vsc",
+          "liquidityAddress": "GRcfCPgSMBKuJicp76qRRdpFQnPnZ5KzHB2wD5nbJ3Wx",
+          "liquidityFeeReceiverAddress": "4GctGML68E1kDcvskGTXRPY9ngxmxVnJXjpsJ68YBXPR"
+        },
+        {
+          "asset": "PAI",
+          "address": "DyJZX45rgh9nADa19tsFeSV69ZwvX4UqPoPP39mdBiDq",
+          "collateralMintAddress": "Bd5pFCJf9AafuXZkfkU6SDZVpeE5xAqX69bs8nDSxd2J",
+          "collateralSupplyAddress": "4xRmRbur3HAc4nNLaAYKgZDXiEtCVc2a9wA5TSsmS1qP",
+          "liquidityAddress": "9RZi6AMPGmBZ9isLkQikvLwANNQ6UWZsyv9537KLo8EV",
+          "liquidityFeeReceiverAddress": "8fXGHJ6ArM9cyaZkaBFsLDM4W5HdPofjMFoHgX3Bb7K7"
+        },
+        {
+          "asset": "USDC",
+          "address": "JCRDg9T5mUUxazdJ2nGWDN2pdcXVQc5VM8XDp1DW6Aoa",
+          "collateralMintAddress": "4JZ6PXqRDp8jQxXUYX9cbAzHi6uzZk856aoAqPGdV5Da",
+          "collateralSupplyAddress": "7JF8e93t52SGFUHzMt5cD7vte4b8gWZHY99GLziAUeiP",
+          "liquidityAddress": "z7yTesDCUkvheHnULMjS6dggiiVczpX5JjfTx5atRgQ",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        },
+        {
+          "asset": "USDT",
+          "address": "aMyCaGf7MwsqpgoeioVGXZytadsjFZ6euuYSadLcXbY",
+          "collateralMintAddress": "9wCxum1oB9JpgPUuVmsPTqDDvKeQqP3rnGFg3GEMrUGT",
+          "collateralSupplyAddress": "8MaWP9fsX9FrzPGLsxvUfNu8Sr5rR3M8rerwHAQpFxsn",
+          "liquidityAddress": "E2cfK7KdG5NRzsFzD8o3pib7af7DmFLrfP6WbU44H3Cw",
+          "liquidityFeeReceiverAddress": "Cpyk5WRGmdK2yFGTJCrmgyABPiNEF5eCyCMMZLxpdkXu"
+        },
+        {
+          "asset": "USDH",
+          "address": "NoTf6a9khWa5cCh6v5RRronH7YuatY7gDWmdKUPoBhM",
+          "collateralMintAddress": "DE9WN39kGuqZwsBpmd8Fs8F7b4T38nzpiNo8DseznLBU",
+          "collateralSupplyAddress": "3WKotLKSFoNjPAymuP3HdkkRmoQE7cY1JrL7vnTCMWRW",
+          "liquidityAddress": "BMgsTqMrAYg2mvpqWYYkzUDjhVmipZjVMGRFE9z5y8GF",
+          "liquidityFeeReceiverAddress": "5ZBZ37C9BiEHarAcnWeCyLwp8E1YnVQ7AWHRZwhhtTpR"
+        }
+      ]
+    },
+    {
+      "name": "TURBO SOL",
+      "isPrimary": false,
+      "description": "The TURBO SOL pool offers increased LTV to allow a leveraged SOL position up to 10x. Higher leverage comes at the cost of increased liquidation risk so proceed with caution.",
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "7RCz8wb6WXxUhAigok9ttgrVgDFFFbibcirECzWSBauM",
+      "authorityAddress": "55YceCDfyvdcPPozDiMeNp9TpwmL1hdoTEFw5BMNWbpf",
+      "reserves": [
+        {
+          "asset": "USDC",
+          "address": "EjUgEaPpKMg2nqex9obb46gZQ6Ar9mWSdVKbw9A6PyXA",
+          "collateralMintAddress": "HKijBKC2zKcV2BXA9CuNemmWUhTuFkPLLgvQBP7zrQjL",
+          "collateralSupplyAddress": "8YGu5iFMKHau2XjVBwKiyPjY2rYpbaLMyxfVhM916jPd",
+          "liquidityAddress": "49mYvAcRHFYnHt3guRPsxecFqBAY8frkGSFuXRL3cqfC",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        },
+        {
+          "asset": "SOL",
+          "address": "UTABCRXirrbpCNDogCoqEECtM3V44jXGCsK23ZepV3Z",
+          "collateralMintAddress": "AVxnqyCameKsKTCGVKeyJMA7vjHnxJit6afC8AM9MdMj",
+          "collateralSupplyAddress": "9QqRewoWbePkSH919xXn826h67ea1EFAVXhTdiJArDnx",
+          "liquidityAddress": "5cSfC32xBUYqGfkURLGfANuK64naHmMp27jUT7LQSujY",
+          "liquidityFeeReceiverAddress": "5wo1tFpi4HaVKnemqaXeQnBEpezrJXcXvuztYaPhvgC7"
+        }
+      ]
+    },
+    {
+      "name": "Step",
+      "isPrimary": false,
+      "description": "Step Finance is a transaction aggregation and portfolio management platform that enables users to transact and monitor the entire Solana ecosystem in one easy to use location. The Step pool allows STEP and xSTEP tokens to be deposited and borrowed.",
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "DxdnNmdWHcW6RGTYiD5ms5f7LNZBaA7Kd1nMfASnzwdY",
+      "authorityAddress": "csotR9rcbLV3bCzBKxNJ3GjYhzH9cXffZX3TAQpw4oG",
+      "reserves": [
+        {
+          "asset": "SOL",
+          "address": "7trBAMkVU8dcPQVdScz7VNywZwqnD1rwXkwkVPQJ95bT",
+          "collateralMintAddress": "7criSZai4hqKukScLUa5W2UV6Q9pjFMdJjQphKavBqur",
+          "collateralSupplyAddress": "Cw43LkrYXWQUufbP11DKBJBikkxtXeseCuH1WMQDh6q",
+          "liquidityAddress": "FR1tYTYEcMhBiuETNs1b5DZft2pT6oEJBixDZ1Qe1WHw",
+          "liquidityFeeReceiverAddress": "5wo1tFpi4HaVKnemqaXeQnBEpezrJXcXvuztYaPhvgC7"
+        },
+        {
+          "asset": "STEP",
+          "address": "C5ozcRb4PJeJvakPeGgm9bgwcL6rPcKPfV95d2owW86C",
+          "collateralMintAddress": "9XtoqcLnc1psQuTPTGjfEwwabzBeUeFihvyZptcALwph",
+          "collateralSupplyAddress": "9PJCVs62fyRiQ1v9DqxD83TXDXqHabVeAUW2sHpsG13t",
+          "liquidityAddress": "CCfF5XivAg682CbZkHw4oMYj9wSTnEUeFLcn4pUjZJ8F",
+          "liquidityFeeReceiverAddress": "Fzbt2QWmMsK7YW7AAF4nwkJMARpviPXo8CgfBX1oLD4u",
+          "userSupplyCap": 2500000
+        },
+        {
+          "asset": "USDC",
+          "address": "FCU2wpx3ED1dY7bKszzcyxUVNTduLurUEmCGGv2w3Lfm",
+          "collateralMintAddress": "7tBwN1tWTNsepwJcuD46zPBu6FuivWMvN2J5zP6HoPYg",
+          "collateralSupplyAddress": "BPhX4N7r9z9HQTAVDyfvVcYWbjsWiL476vsWAYYFh5Lg",
+          "liquidityAddress": "E4g9gNiwtxUcdaP8C7Sx99YVArWCceSkTSErpXGCnMuB",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        },
+        {
+          "asset": "xSTEP",
+          "address": "HH9Aig5MAvMNcivGfAbWU5Da9nfiTwBaYJBK2KZyZppn",
+          "collateralMintAddress": "E1hgwtGqjT4po2vg1LFGvf5XiZgUZBQeabcstQympPPa",
+          "collateralSupplyAddress": "B4Gsh8FpAuxvVknRny2xSvdt3T1N15RAuDrt3Yg4FDVC",
+          "liquidityAddress": "38xTjUm1egfkDojm8jesRWtpy9j3fepPAwBgAHZFQMuD",
+          "liquidityFeeReceiverAddress": "8nzMDB9bp2BNpkL3QSgPEmCpevEhFrb8vigvLqxAzecv",
+          "userSupplyCap": 2500000
+        }
+      ]
+    },
+    {
+      "name": "NFT",
+      "isPrimary": false,
+      "description": "The NFT pool contains Solvent droplets, which are tokens that track the floor price of a collection and can always be redeemed for any NFT in the bucket at a 100:1 ratio. This pool unlocks borrowing against NFT price exposure, also enabling leverage longing and shorting.",
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "29yTiqjGdoNiRLMVc7ZoqFpbW3gkmefwMG9SUiMMD4J9",
+      "authorityAddress": "BtDeXoN6L5s5Nodvny3qvwK55b3YLcFkL7KqvKD7bFNz",
+      "reserves": [
+        {
+          "asset": "SMBD",
+          "address": "EpZipddM7X7TofTzypVaz9GkjBziWgZZCgPz9HhGAB1t",
+          "collateralMintAddress": "5NBAYi6ELmNCvxy1QQ3iLaNRidRSBM9R8DN4bVK6kXM2",
+          "collateralSupplyAddress": "GwGEZ7iuookTDMzq3gWmboEmvrRCTYGJGimKTxefy12D",
+          "liquidityAddress": "7QWfEYXGDDFabUGRXkQXmNHgEfmMBZPjEhCECzJFG8EL",
+          "liquidityFeeReceiverAddress": "37iSf9SzU8P3JVvHNYUg22JHfWCysvtR9bneYB2h9rBb",
+          "userSupplyCap": 200
+        },
+        {
+          "asset": "SOL",
+          "address": "8xogd14bBxBdGKDfkDciPPp6pZ3Cw4Yj5USRbGJDbZpA",
+          "collateralMintAddress": "83xjxt6wQzci6zgEukhswGVwesHC94D6C7q6fUZaAThb",
+          "collateralSupplyAddress": "ECJtpWhPfG8R6qQVrps5cm9NqyNZPk1iE5wN8Cj3H6RG",
+          "liquidityAddress": "Czx5rru4gktqTdiheTyT9TPCQ8A677ykXyKFeVxJDm1U",
+          "liquidityFeeReceiverAddress": "5wo1tFpi4HaVKnemqaXeQnBEpezrJXcXvuztYaPhvgC7",
+          "userSupplyCap": 10000
+        },
+        {
+          "asset": "USDC",
+          "address": "8WpwDA1qs28vrkS3q1B8pfEXNP5MMkAc9qhiQZeYBK9N",
+          "collateralMintAddress": "Awi5FDTwSH5XKH11kDLynccJPQbvKgkGFaekExSRk5QM",
+          "collateralSupplyAddress": "H4Z2n1wamM8Q3tmyimLn62VwFzjWu6CesnQqE12ZVNWA",
+          "liquidityAddress": "6HiP2psv16ddfPmnc5mTxxKyKuFNdB3a6ZrNBihSt5hH",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP",
+          "userSupplyCap": 1000000
+        },
+        {
+          "asset": "DAPE",
+          "address": "5mrrZ1rZmKZtzNdoCojfHqQzzf89k3PdJnkiq1ano7ti",
+          "collateralMintAddress": "EJUNzHVka2MWnTA81Jp1NjUNhvGb8Lb1SDevHR4Eqn4r",
+          "collateralSupplyAddress": "GBaPd92TrRj9RjmnkH7WaBajD5Kea8CHngBgNV8TuvkK",
+          "liquidityAddress": "37rjRZ2Y6eWY4k58WgPvHmv6JjKwBSUjhigyNDVQDisj",
+          "liquidityFeeReceiverAddress": "Co76cu45Y2eiCCiktXsgACgH4f9muHWv8JFpY2Nyk3no"
+        }
+      ]
+    },
+    {
+      "name": "Invictus",
+      "isPrimary": false,
+      "description": "The Invictus pool contains the Locked Staked IN (lsIN) token which allows you to earn lsIN staking yields while using it as collateral.",
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "5i8SzwX2LjpGUxLZRJ8EiYohpuKgW2FYDFhVjhGj66P1",
+      "authorityAddress": "6N6tqnemGoR5pUdtKKp3FvdD94Gi98f2ySEo1dzZ2Uqv",
+      "reserves": [
+        {
+          "asset": "USDC",
+          "address": "AuT5vA4bScsaJBiyNHnAttKToTCHj4Kwi4sg8bCyPPr8",
+          "collateralMintAddress": "DR1b9VzSe8o658UVJL9b6XzqkRmurcmLujpZRaBL3yDU",
+          "collateralSupplyAddress": "2877K885jCdVts6X5Kn7gPbezNPhXufEbheUbVwoZmAi",
+          "liquidityAddress": "GwRqjjkj7JhB4Tqi8PDLKTnESCtBRJwJsGZzg5NQb38W",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP",
+          "userSupplyCap": 500000
+        },
+        {
+          "asset": "lsIN",
+          "address": "4XYbgZJirfnwjmpJKQgMQEvjncYFi2CsPTFzBguCjCjG",
+          "collateralMintAddress": "5Jk2vER2x9WGAZmVGEafBtkEzjYB4mcvvVHbxMcbprhJ",
+          "collateralSupplyAddress": "734df6ZLSzQhyDyqwk8YaKdG2rWPMP6fdsBfxDREZ1nf",
+          "liquidityAddress": "BQHcDqbe9SC5yXcxwNGozD17CPfUvq6q95Lvfv8ZhRU1",
+          "liquidityFeeReceiverAddress": "FaWVdXqVxcZqW3vdiAouAPxhyK29vWR78ec5GmfayJzc",
+          "userSupplyCap": 30000
+        },
+        {
+          "asset": "UST",
+          "address": "7MymBKwTPPMC4A9Ktwc1F2V5Xw7Kj3DqvRYUvLk2SF4h",
+          "collateralMintAddress": "5vxqpDHcHhhJBwNdgeFjfJ814qL36S4fJneSihYccZNg",
+          "collateralSupplyAddress": "EKnFN4ehqwdu8RDmZ2hKnsEMJvA2Jnaszbydae8axbMu",
+          "liquidityAddress": "9DboZFVjGtPtzXKg8dy7RMDGr1hmk43BkhVF9Nz8atFc",
+          "liquidityFeeReceiverAddress": "4GctGML68E1kDcvskGTXRPY9ngxmxVnJXjpsJ68YBXPR",
+          "userSupplyCap": 500000
+        }
+      ]
+    },
+    {
+      "name": "Bonfida",
+      "isPrimary": false,
+      "description": null,
+      "creator": "5pHk2TmnqQzRF9L6egy5FfiyBgS7G9cMZ5RFaJAvghzw",
+      "address": "91taAt3bocVZwcChVgZTTaQYt2WpBVE3M9PkWekFQx4J",
+      "authorityAddress": "76Asux4XZYqrP61G52eRZRQ6GCUPQUmYme3hTCaNgmxv",
+      "reserves": [
+        {
+          "asset": "FIDA",
+          "address": "A3ZhKMuwHygRqjXiMDqM2PyeT35Z1LiDUqwrtjiHn89M",
+          "collateralMintAddress": "ArohPh341JrQsWk7paiUwJKDe4MjvhtE5XxjYUoiM2fH",
+          "collateralSupplyAddress": "FuFEvCPuCkCPn9rW3uZ7bcmLERxFzFJPRfSSyAyZNLzb",
+          "liquidityAddress": "CaVSnSWA1Tpbm79YY2SVtkkKp89AiDxifgdxoWyZLSom",
+          "liquidityFeeReceiverAddress": "61bnpU4YGZe6iHrg44HT1B3v4bPyvxwfqRixwP2ft6t6",
+          "userSupplyCap": 300000
+        },
+        {
+          "asset": "SOL",
+          "address": "3WPYWiZtc2uJq1JiF3Z3KswicFAp5VrFgEHwP3CkuDUn",
+          "collateralMintAddress": "2fHFudEbottFSbpe8oX5KyCDrnx8tfgL8PFj67iz9Y2h",
+          "collateralSupplyAddress": "AmVdrQeciRQiuisGKuuQrno6ZpygGimBvqFUwBTdrAZn",
+          "liquidityAddress": "urW2JA3FeBHjug7ingkuWh4rWJv3X8k2fnbQg2g8bNx",
+          "liquidityFeeReceiverAddress": "5wo1tFpi4HaVKnemqaXeQnBEpezrJXcXvuztYaPhvgC7"
+        },
+        {
+          "asset": "USDC",
+          "address": "EBRtjgHJiEBYnQ5QzTGcBxTwbapEQ3bvh1BrgaGzhX9e",
+          "collateralMintAddress": "7ziVqwra9BTyzXwFTL6JBMY4LtHdQZeQ9cqLkTKeYvoq",
+          "collateralSupplyAddress": "CoAKRsiTBt9vQK5irMS3HmLLRKEtSNuGLmb8RaxKnK7P",
+          "liquidityAddress": "HG9yB9xfeqxy4ZntKkLt8mzJ71ZsAf5cpsvybszZJ6Ni",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        }
+      ]
+    },
+    {
+      "name": "UXD",
+      "isPrimary": false,
+      "description": "The UXD Pool contains the UXP governance token and the UXD stablecoin. Deposit UXD & UXP to earn supply yields or borrow SOL/USDC against them.",
+      "creator": "81KTtWjRndxGQbJHGJq6EaJWL8JfXbyywVvZReVPQd1X",
+      "address": "HCuEqcXaGeioiJf5vNMTyQC7HMPqJm5aZPkSjA2qceDS",
+      "authorityAddress": "AwT1ixXdQcjQMgDWpzyNQhMyuU3z2hbMGcEYT9sHBAsU",
+      "reserves": [
+        {
+          "asset": "SOL",
+          "address": "3x4swTGLgBkCDmxXYQRP96J1evCgy3ZsnUf9YJzVPtNy",
+          "collateralMintAddress": "29icHQwfhSgSo3MYjtAgCXKyfFn6RETz2sREEtgfaXy4",
+          "collateralSupplyAddress": "7GeuioxrRAthYL2YPJDubA3jgLQWwTLexh7Ds6hqX99m",
+          "liquidityAddress": "8jVVXXxzC9N5FeHUxKBgXLM8xARzLpnzXz8dqZHzpykY",
+          "liquidityFeeReceiverAddress": "5wo1tFpi4HaVKnemqaXeQnBEpezrJXcXvuztYaPhvgC7"
+        },
+        {
+          "asset": "UXP",
+          "address": "BvZwsK3v8gqHqhNMDnGsD7z2V83bGzw82o2vrqU3kvBC",
+          "collateralMintAddress": "Gqi3AojEduDqgyNuKzTwW3QPwUD55J2WzbCuYaqCDMiU",
+          "collateralSupplyAddress": "2WHngM1w2PzwFrhofmZBjgkUpTiXH9prfUGa396YiLk8",
+          "liquidityAddress": "Fz5gcq7Z8kYRc4QkuKh46EuFjpFrpwbuZJAhkca2d1rX",
+          "liquidityFeeReceiverAddress": "D2RWgT3kstRwNhED76mDT9PuXRZeEP3jQ6wyJdgaf5YR"
+        },
+        {
+          "asset": "UXD",
+          "address": "GseYnT313pSLAVidDwKWzo48QRFMmaoF2QLk3fK8DpZU",
+          "collateralMintAddress": "GDkx8oKUf5rHx1UNCaMfvjwEGa8uZy6ECYmzGh3Pkxef",
+          "collateralSupplyAddress": "DyNMTn6V7pFmWHR4uUDgCbmiDSFp2rwSBcgEUTxW7C83",
+          "liquidityAddress": "GfNYgNM5rJrCXYVGnVvfgcucmsyoGTBoJZgdqAviUSqe",
+          "liquidityFeeReceiverAddress": "AsJ7wz4a4cbP9qkX4iadD4jbfr5mcDV9D8SZdD37pm2t"
+        },
+        {
+          "asset": "USDC",
+          "address": "Br6ucRrPNrJXPMa31FGBqS9WH86YGMQvu8Lv4dma8R5k",
+          "collateralMintAddress": "5vsr61rdgfeCtWTZHv54y7jkJ4xKg9WQDT4UusBsnePf",
+          "collateralSupplyAddress": "3TmYkdfGeeNtjRNoDdXXaTH2dFJseyREMuB6xDNZ6bnq",
+          "liquidityAddress": "T9WZyVsbL2Jvn9H9tenx2rQyi2dUtdRtGiLDvNU984p",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        }
+      ]
+    },
+    {
+      "name": "STEPN",
+      "isPrimary": false,
+      "description": "The STEPN pool allows users to deposit or borrow GST, GMT, and USDC. This pool can be used to hedge or gain leveraged exposure. For example, a user could borrow GST to fix or upgrade their shoes, then pay it off by walking.",
+      "creator": "81KTtWjRndxGQbJHGJq6EaJWL8JfXbyywVvZReVPQd1X",
+      "address": "BjsAGLZzAgBUsiaTTDQv7PWDUDL9dQfKvYwb4q6FoDuD",
+      "authorityAddress": "CqEyTyxQDSwqFcrp7GXqEhhyeDNGvYrhyDkWtUcaa9oG",
+      "reserves": [
+        {
+          "asset": "GST",
+          "address": "CaacWq72hHubpwi92UUVsoE4xDNKqr1MhRwYeqH3YPAU",
+          "collateralMintAddress": "GHuZTLtRqFH6s6nkRBaaHFrVuVpepuvHsNApX4zvP3Hg",
+          "collateralSupplyAddress": "AJSkG29hrcLB6omKbzGknLNJd9wGnABdcvcj6Jbeb5ti",
+          "liquidityAddress": "7jVwZVTJijefxy2uFv63MGXrM9xsXeoizKh5kBBuDjb8",
+          "liquidityFeeReceiverAddress": "EHbPN4aP2y9WAYY5Xmnsyy8dUtBWwQ17gSfNrTBgLgvd"
+        },
+        {
+          "asset": "USDC",
+          "address": "DxdbG2YwFFJeePbNFZRXuF2Sx34B1NTxWNbeEHdo4rzb",
+          "collateralMintAddress": "9E4YoiXauf22frwmioB7WFkQ2XAaTgKV7J7YsvM4TAN",
+          "collateralSupplyAddress": "CKzzNHHJhtva2aZkj3YNFU1X9N3zEBMGqjG7Ay3yUVdX",
+          "liquidityAddress": "7yYA4taed8iZknuQSnERwmygCTQiR1HEoQAdURgxBGTw",
+          "liquidityFeeReceiverAddress": "5Gdxn4yquneifE6uk9tK8X4CqHfWKjW2BvYU25hAykwP"
+        },
+        {
+          "asset": "GMT",
+          "address": "BqYvhari2P9mXYLqcgJv41kRUvLhBfGoQXGWHnw26UJw",
+          "collateralMintAddress": "C8Pm2aMMdvHHBV1QDFzTGMrTs5k6MdDjxBwJEXX3aJ5U",
+          "collateralSupplyAddress": "Gh9ueJbjei9L5ZRGs3JqqhMkbDL6BfeJt9JkVx2YC7z1",
+          "liquidityAddress": "Fth8CM3Vj3vPgioTZqXPvfZz44coUsfr8fkMgS2x7zUt",
+          "liquidityFeeReceiverAddress": "EFZRzYzb3iFjjt2iPgPRCA2etwNu9VwzWpQ8mxvTHZkG"
+        }
+      ]
+    }
+  ],
+  "oracles": {
+    "pythProgramID": "FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH",
+    "switchboardProgramID": "DtmE9D2CSB4L5D6A15mraeEjrGMm6auWVzgaD8hK2tZM",
+    "assets": [
+      {
+        "asset": "SRM",
+        "priceAddress": "3NBReDRTLKMQEKiLD5tGcx4kXbTf88b7f2xLS9UuGjym",
+        "switchboardFeedAddress": "BAoygKcKN7wk8yKzLD6sxzUQUqLvhBV1rjMA4UJqfZuH"
+      },
+      {
+        "asset": "SLND",
+        "priceAddress": "HkGEau5xY1e8REXUFbwvWWvyJGywkgiAZZFpryyraWqJ",
+        "switchboardFeedAddress": "7QKyBR3zLRhoEH5UMjcG8emDD2J2CCDmkxv3qsa2Mqif"
+      },
+      {
+        "asset": "FTT",
+        "priceAddress": "8JPJJkmDScpcNmBRKGZuPuG2GYAveQgP3t5gFuMymwvF",
+        "switchboardFeedAddress": "6SqRewrr5f4ycWy7NvLmNgpXJbhwXrtTc1erL9aq2gP3"
+      },
+      {
+        "asset": "MER",
+        "priceAddress": "G4AQpTYKH1Fmg38VpFQbv6uKYQMpRhJzNPALhp7hqdrs",
+        "switchboardFeedAddress": "5pHX3fd81SpGywzsw4R12L3Xu3qd418h1PcnHpQAiMWA"
+      },
+      {
+        "asset": "UST",
+        "priceAddress": "H8DvrfSaRfUyP1Ytse1exGf7VSinLWtmKNNaBhA4as9P",
+        "switchboardFeedAddress": "8o8gN6VnW45R8pPfQzUJUwJi2adFmsWwfGcFNmicWt61"
+      },
+      {
+        "asset": "USDC",
+        "priceAddress": "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD",
+        "switchboardFeedAddress": "CZx29wKMUxaJDq6aLVQTdViPL754tTR64NAgQBUGxxHb"
+      },
+      {
+        "asset": "SBR",
+        "priceAddress": "8Td9VML1nHxQK6M8VVyzsHo32D7VBk72jSpa9U861z2A",
+        "switchboardFeedAddress": "Lp3VNoRQi699VZe6u59TV8J38ELEUzxkaisoWsDuJgB"
+      },
+      {
+        "asset": "ETH",
+        "priceAddress": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
+        "switchboardFeedAddress": "QJc2HgGhdtW4e7zjvLB1TGRuwEpTre2agU5Lap2UqYz"
+      },
+      {
+        "asset": "mSOL",
+        "priceAddress": "E4v1BBgoso9s64TQvmyownAVJbhbEPGyzA3qn4n46qj9",
+        "switchboardFeedAddress": "CEPVH2t11KS4CaL3w4YxT9tRiijoGA4VEbnQ97cEpDmQ"
+      },
+      {
+        "asset": "USDT",
+        "priceAddress": "3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL",
+        "switchboardFeedAddress": "5mp8kbkTYwWWCsKSte8rURjTuyinsqBpJ9xAQsewPDD"
+      },
+      {
+        "asset": "RAY",
+        "priceAddress": "AnLf8tVYCM816gmBjiy8n53eXKKEDydT5piYjjQDPgTB",
+        "switchboardFeedAddress": "CppyF6264uKZkGua1brTUa2fSVdMFSCszwzDs76HCuzU"
+      },
+      {
+        "asset": "BTC",
+        "priceAddress": "GVXRSBjFk6e6J3NbVPXohDJetcTjaeeuykUpbQF8UoMU",
+        "switchboardFeedAddress": "74YzQPGUT9VnjrBz8MuyDLKgKpbDqGot5xZJvTtMi6Ng"
+      },
+      {
+        "asset": "stSOL",
+        "priceAddress": "Bt1hEbY62aMriY1SyQqbeZbm8VmSbQVGBFzSzMuVNWzN",
+        "switchboardFeedAddress": "9r2p6vyF8Wp5YB2DASK95yuXEakQth6wmUmV2DpH91WX"
+      },
+      {
+        "asset": "ORCA",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "EHwSRkm2ErRjWxCxrTxrmC7sT2kGb5jJcsiindUHAX7W"
+      },
+      {
+        "asset": "USDT-USDC",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "GnTHvhe4opQXHL4JGgDpfQKk2JY1ugmVLWvJocTH639q"
+      },
+      {
+        "asset": "SOL",
+        "priceAddress": "H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG",
+        "switchboardFeedAddress": "AdtRGGhmqvom3Jemp5YNrxd9q9unX36BZk1pujkkXijL"
+      },
+      {
+        "asset": "soFTT",
+        "priceAddress": "8JPJJkmDScpcNmBRKGZuPuG2GYAveQgP3t5gFuMymwvF",
+        "switchboardFeedAddress": "6SqRewrr5f4ycWy7NvLmNgpXJbhwXrtTc1erL9aq2gP3"
+      },
+      {
+        "asset": "scnSOL",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "DpzEKDSszosuzRUdRYzEcEbt6iZ4xhVEANQSRAYDYw8h"
+      },
+      {
+        "asset": "soETH",
+        "priceAddress": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
+        "switchboardFeedAddress": "QJc2HgGhdtW4e7zjvLB1TGRuwEpTre2agU5Lap2UqYz"
+      },
+      {
+        "asset": "mSOL-SOL",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "6ZuSuX14mxyZQ8JgjAC9PoDcbAU9sr1umUoyYVseVaNF"
+      },
+      {
+        "asset": "PAI",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "G26LmGqGvoggYQm2zEKD15rL4LutkZFrtP8mRPd6gPjk"
+      },
+      {
+        "asset": "UXD",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "Lj3y2beRYhCaQQH9SYjmMJv3uuTcqpCJjQYe4829FAL"
+      },
+      {
+        "asset": "USDH",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "37NFcKPTgqUVx3gwTQ4c2Q94oJWk2xZy3NQUXtDixReb"
+      },
+      {
+        "asset": "C98",
+        "priceAddress": "45rTB9ezDcTX5tMZx2uJUBbBEqAWDhXykYbBfaSWUXvD",
+        "switchboardFeedAddress": "6Lh96cq8JN9VuzRcRa6u27GXKi6P4f2SvSYJ41TqhsnZ"
+      },
+      {
+        "asset": "POLIS",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "3wFcT6hG5RYarNS3Z8FwoanBRm4PN4MBhkCiJGKWBa3v"
+      },
+      {
+        "asset": "ATLAS",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "63TGehKbqbaQUowgLudRybxQmT7p41NJxHEfkqUtyQRt"
+      },
+      {
+        "asset": "SAMO",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "DCXJ2dhdfh6UZH5zgMMHmzXTa52kbnXU3R7eDWD7jLH5"
+      },
+      {
+        "asset": "STEP",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "4bTCjzmtdRgK4ZvdaxX1Fx1Z3h6iApfM5qoaAhQBJAkj"
+      },
+      {
+        "asset": "xSTEP",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "7whYKCH5zQVQeLqgnWW6qXME3sxQozByaFbhbVwhYMkP"
+      },
+      {
+        "asset": "SMBD",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "3VxjTPfkngSYkrATdeS1sgZxzkhNePhkczquUNxb44jm"
+      },
+      {
+        "asset": "DAPE",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "BTWdcU1yxn3CFnhcoVngcLNQwCcNbJhf8KqhDx5LuLFS"
+      },
+      {
+        "asset": "lsIN",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "3YUHvezfoeY8JxLB624bnk3mamLDnJZ6VTUs9ezwJTDo"
+      },
+      {
+        "asset": "FIDA",
+        "priceAddress": "ETp9eKXVv1dWwHSpsXRUuXHmw24PwRkttCGVgpZEY9zF",
+        "switchboardFeedAddress": "GyiFJtWLYGGTCNTpnHCVKinzWpwLJN3PnscsRdqypFAL"
+      },
+      {
+        "asset": "UXP",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "EsQkrtuJdRnDp6JvAcmRiYGoQbWL668TEZDW8VmrNcm3"
+      },
+      {
+        "asset": "GST",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "JA1GQW8ta1LjNn3h1vZmhL3fWEdZ6F9QfZHvPB4y7fLm"
+      },
+      {
+        "asset": "GMT",
+        "priceAddress": "nu11111111111111111111111111111111111111111",
+        "switchboardFeedAddress": "Bys1SNouEqVdbUWj93GfpqwY1bsWjYVYtNZG1QdV5Y1B"
+      }
+    ]
+  }
+}

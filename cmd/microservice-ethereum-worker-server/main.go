@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/big"
 	"math/rand"
 	"os"
@@ -11,6 +10,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
+	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	moving_average "github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
@@ -36,11 +36,9 @@ const (
 	// is aave based
 	BackendAave = "aave"
 
-	// KeyServerBlockTime to use when recording block times!
-	KeyServerBlockTime = "ethereum.server.block.time"
-
-	// KeyMovingAverageApy to use as the base when calculating the APY using Redis
-	KeyMovingAverageApyBase = "ethereum.server.apy.moving-average"
+	// BackendAurora to use as the environment variable for Aurora
+	// to use Flux as a price oracle
+	BackendAurora = "aurora"
 
 	// CompoundBlocksPerDay to use when calculating Compound's APY
 	// (set to 13.5 seconds per block)
@@ -53,15 +51,15 @@ const (
 	// transfer condition
 	CurrentAtxTransactionMargin = 0
 
-	// EthereumDecimalPlaces to use when normalising Eth to USDT
-	EthereumDecimalPlaces = 1e6
-
 	// DefaultTransfersInBlock to use when the average transfers in the block
 	// are below 0
 	DefaultTransfersInBlock = 0
 
 	// SecondsInOneYear to use for ATX calculation
 	SecondsInOneYear = 365 * 24 * 60 * 60
+
+	// UsdtDecimals to normalise values to
+	UsdtDecimals = 1e6
 )
 
 const (
@@ -103,9 +101,22 @@ const (
 	// when converting to USDT
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
+	// EnvEthereumDecimalPlaces to use when normalising Eth to USDT
+	EnvEthereumDecimalPlaces = `FLU_ETHEREUM_ETH_DECIMAL_PLACES`
+
+	// EnvAuroraEthFluxAddress for fetching the price of Eth from a Flux oracle
+	EnvAuroraEthFluxAddress = `FLU_AURORA_ETH_FLUX_ADDRESS`
+
+	// EnvAuroraTokenFluxAddress for fetching the price of the underlying token
+	// from a Flux oracle
+	EnvAuroraTokenFluxAddress = `FLU_AURORA_TOKEN_FLUX_ADDRESS`
+
 	// EnvPublishAmqpQueue name to use when sending server-tracked transfers
 	// to the client
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
+
+	// EnvMovingAverageRedisKey to track the APY moving average with
+	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
 )
 
 // AtxBufferSize to go back in time to count the average using the database
@@ -119,6 +130,7 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		keyMovingAverageApy      = util.GetEnvOrFatal(EnvMovingAverageRedisKey)
 
 		cTokenAddress_              = os.Getenv(EnvCTokenAddress)
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
@@ -127,9 +139,36 @@ func main() {
 		ethTokenAddress_            = os.Getenv(EnvEthTokenAddress)
 		underlyingTokenAddress_     = os.Getenv(EnvUnderlyingTokenAddress)
 		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
+
+		ethereumDecimalPlaces_ = os.Getenv(EnvEthereumDecimalPlaces)
+		ethFluxAddress_        = os.Getenv(EnvAuroraTokenFluxAddress)
+		tokenFluxAddress_      = os.Getenv(EnvAuroraTokenFluxAddress)
+
+		// EthereumDecimalPlaces to use when normalising Eth to USDT
+		EthereumDecimalPlaces *big.Rat
 	)
 
 	rand.Seed(time.Now().Unix())
+
+	if ethereumDecimalPlaces_ == "" {
+		// default to 6 decimal places
+		EthereumDecimalPlaces = big.NewRat(1e6, 1)
+	} else {
+		// otherwise set to 10^decimals
+		decimals_, err := strconv.Atoi(ethereumDecimalPlaces_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to parse %v as decimals!",
+					ethereumDecimalPlaces_,
+				)
+				k.Payload = err
+			})
+		}
+
+		EthereumDecimalPlaces = exponentiate(decimals_)
+	}
 
 	var (
 		ethContractAddress            ethCommon.Address
@@ -140,59 +179,29 @@ func main() {
 		ethEthTokenAddress            ethCommon.Address
 		ethUnderlyingTokenAddress     ethCommon.Address
 		ethAaveAddressProviderAddress ethCommon.Address
+
+		auroraEthFluxAddress   ethCommon.Address
+		auroraTokenFluxAddress ethCommon.Address
 	)
 
 	switch tokenBackend {
 	case BackendCompound:
-
 		var (
-			cTokenAddress              = ethereum.AddressFromString(cTokenAddress_)
-			uniswapAnchoredViewAddress = ethereum.AddressFromString(uniswapAnchoredViewAddress_)
+			cTokenAddress              = mustEthereumAddressFromString(cTokenAddress_)
+			uniswapAnchoredViewAddress = mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
 		)
-
-		if cTokenAddress == "" || uniswapAnchoredViewAddress == "" {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"%s set to compound, but missing %s or %s!",
-					EnvTokenBackend,
-					EnvCTokenAddress,
-					EnvUniswapAnchoredViewAddress,
-				)
-			})
-		}
 
 		ethCTokenAddress = hexToAddress(cTokenAddress)
 		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
 
 	case BackendAave:
-
 		var (
-			aTokenAddress              = ethereum.AddressFromString(aTokenAddress_)
-			aaveAddressProviderAddress = ethereum.AddressFromString(aaveAddressProviderAddress_)
-			usdTokenAddress            = ethereum.AddressFromString(usdTokenAddress_)
-			ethTokenAddress            = ethereum.AddressFromString(ethTokenAddress_)
-			underlyingTokenAddress     = ethereum.AddressFromString(underlyingTokenAddress_)
+			aTokenAddress              = mustEthereumAddressFromString(aTokenAddress_)
+			aaveAddressProviderAddress = mustEthereumAddressFromString(aaveAddressProviderAddress_)
+			usdTokenAddress            = mustEthereumAddressFromString(usdTokenAddress_)
+			ethTokenAddress            = mustEthereumAddressFromString(ethTokenAddress_)
+			underlyingTokenAddress     = mustEthereumAddressFromString(underlyingTokenAddress_)
 		)
-
-		ethereumAddressesEmpty := anyEthereumAddressesEmpty(
-			aTokenAddress,
-			aaveAddressProviderAddress,
-			usdTokenAddress,
-			ethTokenAddress,
-		)
-
-		stringsEmpty := anyStringsEmpty(underlyingTokenAddress_)
-
-		if ethereumAddressesEmpty || stringsEmpty {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"%s set to aave, but missing arguments!",
-					BackendAave,
-					EnvATokenAddress,
-					EnvAaveAddressProviderAddress,
-				)
-			})
-		}
 
 		ethATokenAddress = hexToAddress(aTokenAddress)
 		ethAaveAddressProviderAddress = hexToAddress(aaveAddressProviderAddress)
@@ -200,11 +209,21 @@ func main() {
 		ethUnderlyingTokenAddress = hexToAddress(underlyingTokenAddress)
 		ethEthTokenAddress = hexToAddress(ethTokenAddress)
 
-	default:
+	case BackendAurora:
+		var (
+			cTokenAddress    = mustEthereumAddressFromString(cTokenAddress_)
+			ethFluxAddress   = mustEthereumAddressFromString(ethFluxAddress_)
+			tokenFluxAddress = mustEthereumAddressFromString(tokenFluxAddress_)
+		)
 
+		ethCTokenAddress = hexToAddress(cTokenAddress)
+		auroraEthFluxAddress = hexToAddress(ethFluxAddress)
+		auroraTokenFluxAddress = hexToAddress(tokenFluxAddress)
+
+	default:
 		log.Fatal(func(k *log.Log) {
 			k.Format(
-				"%s should be `aave` or `compound`, got %s",
+				"%s should be `aave`, `compound`, or `aurora`, got %s",
 				EnvTokenBackend,
 				tokenBackend,
 			)
@@ -217,12 +236,6 @@ func main() {
 	var (
 		currentAtxTransactionMarginRat = new(big.Rat).SetInt64(CurrentAtxTransactionMargin)
 		secondsInOneYearRat            = new(big.Rat).SetInt64(SecondsInOneYear)
-	)
-
-	keyMovingAverageApy := fmt.Sprintf(
-		"%v.%v",
-		KeyMovingAverageApyBase,
-		tokenName,
 	)
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
@@ -293,24 +306,22 @@ func main() {
 		)
 
 		if len(fluidTransfers) == 0 {
-			log.Debug(func(k *log.Log) {
-				k.Format(
-					"Couldn't find any Fluid transfers in the block %v!",
-					blockHash,
-				)
-			})
+			log.Debugf(
+				"Couldn't find any Fluid transfers in the block %v!",
+				blockHash,
+			)
 
 			return
 		}
 
-		debug(
+		log.Debugf(
 			"Average transfers in block: %#v! Transfers in block: %#v!",
 			averageTransfersInBlock,
 			transfersInBlock,
 		)
 
 		if averageTransfersInBlock < DefaultTransfersInBlock {
-			debug(
+			log.Debugf(
 				"Average transfers in block < default transfers in block (25)!",
 			)
 
@@ -372,6 +383,12 @@ func main() {
 				ethEthTokenAddress,
 				ethUsdTokenAddress,
 			)
+
+		case BackendAurora:
+			ethPriceUsd, err = flux.GetPrice(
+				gethClient,
+				auroraEthFluxAddress,
+			)
 		}
 
 		if err != nil {
@@ -383,11 +400,15 @@ func main() {
 
 		// normalise the ethereum price!
 
-		ethPriceUsd.Quo(ethPriceUsd, big.NewRat(EthereumDecimalPlaces, 1))
+		ethPriceUsd.Quo(ethPriceUsd, EthereumDecimalPlaces)
 
 		var tokenApy *big.Rat
 
-		if tokenBackend == BackendCompound {
+		switch tokenBackend {
+		case BackendAurora:
+			fallthrough
+
+		case BackendCompound:
 			tokenApy, err = compound.GetTokenApy(
 				gethClient,
 				ethCTokenAddress,
@@ -404,7 +425,7 @@ func main() {
 					)
 				})
 			}
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			tokenApy, err = aave.GetTokenApy(
 				gethClient,
 				ethAaveAddressProviderAddress,
@@ -429,7 +450,9 @@ func main() {
 		)
 
 		var tokenPriceInUsdt *big.Rat
-		if tokenBackend == BackendCompound {
+
+		switch tokenBackend {
+		case BackendCompound:
 			tokenPriceInUsdt, err = uniswap_anchored_view.GetPrice(
 				gethClient,
 				ethUniswapAnchoredViewAddress,
@@ -447,7 +470,7 @@ func main() {
 					k.Payload = err
 				})
 			}
-		} else if tokenBackend == BackendAave {
+		case BackendAave:
 			tokenPriceInUsdt, err = aave.GetPrice(
 				gethClient,
 				ethAaveAddressProviderAddress,
@@ -464,6 +487,30 @@ func main() {
 					k.Payload = err
 				})
 			}
+		case BackendAurora:
+			tokenPriceInUsdt, err = flux.GetPrice(
+				gethClient,
+				auroraTokenFluxAddress,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the token price in USDT! Flux Oracle Address address %#v",
+						auroraTokenFluxAddress,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			// normalise the token price!
+			// tokenPrice / 10^(fluxDecimals-usdtDecimals)
+			UsdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
+
+			decimalDifference := new(big.Rat).Quo(EthereumDecimalPlaces, UsdtDecimalsRat)
+
+			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
 		}
 
 		// if the token apy is below the average, then we take the current apy
@@ -490,21 +537,47 @@ func main() {
 
 		bpy := probability.CalculateBpy(secondsSinceLastBlock, currentApyInUsdt, emission)
 
-		balanceOfUnderlying, err := compound.GetBalanceOfUnderlying(
-			gethClient,
-			ethCTokenAddress,
-			ethContractAddress,
-		)
+		var balanceOfUnderlying *big.Rat
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get the prize pool in the Fluidity contract! Address %#v!",
-					contractAddress,
-				)
+		switch tokenBackend {
+		case BackendAurora:
+			fallthrough
 
-				k.Payload = err
-			})
+		case BackendCompound:
+			balanceOfUnderlying, err = compound.GetBalanceOfUnderlying(
+				gethClient,
+				ethCTokenAddress,
+				ethContractAddress,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the underlying compound balance in the Fluidity contract! Address %#v!",
+						contractAddress,
+					)
+
+					k.Payload = err
+				})
+			}
+
+		case BackendAave:
+			balanceOfUnderlying, err = aave.GetBalanceOf(
+				gethClient,
+				ethATokenAddress,
+				ethContractAddress,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the underlying aave balance in the Fluidity contract! Address %#v!",
+						contractAddress,
+					)
+
+					k.Payload = err
+				})
+			}
 		}
 
 		sizeOfThePool, err := fluidity.GetRewardPool(
@@ -533,6 +606,8 @@ func main() {
 			bpy,
 			balanceOfUnderlying,
 		)
+
+		var blockAnnouncements []worker.EthereumAnnouncement
 
 		for _, transfer := range fluidTransfers {
 
@@ -569,34 +644,51 @@ func main() {
 
 			transferFeeUsd.Quo(transferFeeUsd, big.NewRat(1e18, 1))
 
+			var (
+				winningClasses   = fluidity.WinningClasses
+				deltaWeightNum   = fluidity.DeltaWeightNum
+				deltaWeightDenom = fluidity.DeltaWeightDenom
+				payoutFreqNum    = fluidity.PayoutFreqNum
+				payoutFreqDenom  = fluidity.PayoutFreqDenom
+			)
+
+			var (
+				deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
+				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
+			)
+
 			randomN, randomPayouts := probability.WinningChances(
 				transferFeeUsd,
 				currentAtx,
 				bpyStakedUsd,
 				sizeOfThePool,
 				underlyingTokenDecimalsRat,
+				payoutFreq,
+				deltaWeight,
+				winningClasses,
 				btx,
 				secondsSinceLastBlock,
 				emission,
 			)
 
-			res := generateRandomIntegers(probability.WinningClasses, 1, int(randomN))
+			res := generateRandomIntegers(fluidity.WinningClasses, 1, int(randomN))
 
 			// create announcement and container
 
-			randomSource := make([]uint32, 0)
+			randomSource := make([]uint32, len(res))
 
-			for _, i := range res {
-				randomSource = append(randomSource, uint32(i))
+			for i, value := range res {
+				randomSource[i] = uint32(value)
 			}
 
 			tokenDetails := token_details.TokenDetails{
 				TokenShortName: tokenName,
 				TokenDecimals:  underlyingTokenDecimals,
-			}	
+			}
 
 			announcement := worker.EthereumAnnouncement{
 				TransactionHash: transactionHash,
+				BlockNumber:     &blockNumber,
 				FromAddress:     senderAddress,
 				ToAddress:       recipientAddress,
 				SourceRandom:    randomSource,
@@ -612,20 +704,15 @@ func main() {
 				k.Format("Source payouts: %v", randomSource)
 			})
 
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to make container for announcement!"
-					k.Payload = err
-				})
-			}
-
 			emission.TransactionHash = transactionHash.String()
 			emission.RecipientAddress = recipientAddress.String()
 			emission.SenderAddress = senderAddress.String()
 
-			queue.SendMessage(publishAmqpQueueName, announcement)
+			blockAnnouncements = append(blockAnnouncements, announcement)
 
 			queue.SendMessage(worker.TopicEmissions, emission)
 		}
+
+		queue.SendMessage(publishAmqpQueueName, blockAnnouncements)
 	})
 }

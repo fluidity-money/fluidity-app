@@ -81,14 +81,14 @@ func NewBroadcast() *Broadcast {
 
 				previous := broadcast.incrementCookie()
 
-				debug(
+				log.Debugf(
 					"Received a request to subscribe with cookie %#v!",
 					previous,
 				)
 
 				cookieReply <- previous
 
-				debug(
+				log.Debugf(
 					"Done sending a message with the cookie to the request to subscribe! %#v",
 					previous,
 				)
@@ -96,7 +96,7 @@ func NewBroadcast() *Broadcast {
 				broadcast.subscribed[previous] = replies
 
 			case cookie := <-unsubscriptionRequests:
-				debug(
+				log.Debugf(
 					"Cookie %#v has sent a request to unsubscribe!",
 					cookie,
 				)
@@ -105,7 +105,7 @@ func NewBroadcast() *Broadcast {
 
 			case _ = <-shutdownRequests:
 
-				debug("Received a request to shutdown the broadcast server!")
+				log.Debugf("Received a request to shutdown the broadcast server!")
 
 				return
 			}
@@ -134,7 +134,7 @@ func (broadcast Broadcast) Subscribe(messages chan []byte) uint64 {
 		subscriptionId = generateSubscriptionId()
 	}
 
-	debug(
+	log.Debugf(
 		"Subscribe to the channel request to receiving messages with subscription id %#v!",
 		subscriptionId,
 	)
@@ -144,7 +144,7 @@ func (broadcast Broadcast) Subscribe(messages chan []byte) uint64 {
 		replies:     messages,
 	}
 
-	debug(
+	log.Debugf(
 		"Received a response with subscription id %#v!",
 		subscriptionId,
 	)

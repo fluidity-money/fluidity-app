@@ -38,8 +38,8 @@ const TokenSearch = ({
       <img className="search-icon" src="img/searchIcon.svg" alt="search" />
       <input
         type="text"
-        autoFocus
-        placeholder="Search by name paste address"
+        // autoFocus
+        placeholder="Search by name or paste address"
         onChange={(text: React.FormEvent<HTMLInputElement>) => {
           setSearchInput(text.currentTarget.value);
           filterTokens(text.currentTarget.value);
@@ -53,7 +53,7 @@ const TokenSearch = ({
       />
       {searchInput.length ? (
         <img
-          className="clear-search-icon"
+          className="clear-icon"
           src="img/x.svg"
           alt="search"
           onClick={() => {

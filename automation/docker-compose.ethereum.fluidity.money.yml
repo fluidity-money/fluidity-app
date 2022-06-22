@@ -26,6 +26,7 @@ services:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-ethereum.fluidity.money-backend
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST: ${FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST}
     ports:
       - 127.0.0.1:8081:80
     restart: unless-stopped

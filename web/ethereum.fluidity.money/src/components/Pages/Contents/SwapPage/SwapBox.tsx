@@ -16,6 +16,8 @@ import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
 import ropsten from "../../../../config/ropsten-tokens.json";
 import testing from "../../../../config/testing-tokens.json";
 import kovan from "../../../../config/kovan-tokens.json";
+import mainnet from "../../../../config/mainnet-tokens.json";
+import aurora from "../../../../config/aurora-mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider, TransactionReceipt } from "ethers/providers";
@@ -30,6 +32,8 @@ import { notificationContext } from "components/Notifications/notificationContex
 import { parseUnits } from "ethers/utils";
 import { decimalTrim } from "util/decimalTrim";
 import { isNonZero, shortBalance, trimAmount } from "util/amounts";
+import ChainId, { chainIdFromEnv } from "util/chainId";
+import { appTheme } from "util/appTheme";
 
 const SwapBox = () => {
   const signer = useSigner();
@@ -52,64 +56,19 @@ const SwapBox = () => {
   const userActions = useContext(userActionContext);
 
   // Assigns the correct json file based on ChainId
+  const chainId = chainIdFromEnv();
   const data =
-    process.env.REACT_APP_CHAIN_ID === "3"
+    chainId === ChainId.Ropsten
       ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31337"
+      : chainId === ChainId.Hardhat
       ? (testing as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "2a"
+      : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
+      : chainId === ChainId.AuroraMainnet
+      ? (aurora as TokenKind[])
       : (ropsten as TokenKind[]);
-
-  const [pinnedTokens, setPinnedTokens] = useState(
-    data.slice(0, data.length / 2)
-  );
-
-  const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
-    data.slice(data.length / 2, data.length)
-  );
-
-  const sortPinned = (token: TokenKind) => {
-    setPinnedTokens(
-      pinnedTokens.sort((y, x) => {
-        return x.symbol === token.symbol
-          ? -1
-          : y.symbol === token.symbol
-          ? 1
-          : 0;
-      })
-    );
-    setPinnedFluidTokens(
-      pinnedFluidTokens.sort((y, x) => {
-        return x.symbol === `f${token.symbol}`
-          ? -1
-          : y.symbol === `f${token.symbol}`
-          ? 1
-          : 0;
-      })
-    );
-  };
-
-  const sortPinnedFluid = (token: TokenKind) => {
-    setPinnedFluidTokens(
-      pinnedFluidTokens.sort((y, x) => {
-        return x.symbol === token.symbol
-          ? -1
-          : y.symbol === token.symbol
-          ? 1
-          : 0;
-      })
-    );
-    setPinnedTokens(
-      pinnedTokens.sort((y, x) => {
-        return x.symbol === token.symbol.substring(1)
-          ? -1
-          : y.symbol === token.symbol.substring(1)
-          ? 1
-          : 0;
-      })
-    );
-  };
 
   // catches user amount input to ensure it's valid
   const amountValueChanger = (input: string) => {
@@ -283,9 +242,8 @@ const SwapBox = () => {
   const AmountAvailable = ({ invert = false }: { invert?: boolean }) => {
     let isNonFluid = swap;
     if (invert) isNonFluid = !isNonFluid;
-
     return (
-      <div className="amount-avail secondary-text">
+      <div className={`amount-avail secondary-text${appTheme}`}>
         {walletStatus === "connected" ? (
           isNonFluid ? (
             selectedToken !== "Select Token" ? (
@@ -303,7 +261,7 @@ const SwapBox = () => {
 
   return (
     <modalToggle.Provider value={modalContext}>
-      <div className="swap-box-container flex column">
+      <div className={`swap-box-container${appTheme} flex column`}>
         <div className="swap-form flex column flex-space-between">
           <FormSection
             defaultMargin={false}
@@ -337,10 +295,6 @@ const SwapBox = () => {
               <TokenSelect
                 type={swap === true ? "token" : "fluid"}
                 toggle={swap === true ? togglerTo : togglerFrom}
-                pinnedTokens={pinnedTokens}
-                pinnedFluidTokens={pinnedFluidTokens}
-                sortPinned={sortPinned}
-                sortPinnedFluid={sortPinnedFluid}
               />
               <div
                 onClick={setMaxAmount}
@@ -385,10 +339,6 @@ const SwapBox = () => {
               <TokenSelect
                 type={swap === true ? "fluid" : "token"}
                 toggle={swap === true ? togglerFrom : togglerTo}
-                pinnedTokens={pinnedTokens}
-                pinnedFluidTokens={pinnedFluidTokens}
-                sortPinned={sortPinned}
-                sortPinnedFluid={sortPinnedFluid}
               />
               {wallet.status === "connected" && <AmountAvailable invert />}
             </div>
@@ -406,7 +356,7 @@ const SwapBox = () => {
               goto={() => {
                 wallet.status == "connected" ? switchPayment() : switchWallet();
               }}
-              theme={"primary-button"}
+              theme={`primary-button${appTheme}`}
               padding="py-1"
               disabled={
                 (isNonZero(amount, decimals) &&
@@ -437,7 +387,9 @@ const SwapBox = () => {
               enable={successTransactionModal}
               toggle={() => setSuccessTransactionModal(false)}
               message={
-                <div className="primary-text">Transaction Successful</div>
+                <div className={`primary-text${appTheme}`}>
+                  Transaction Successful
+                </div>
               }
             />
           </FormSection>

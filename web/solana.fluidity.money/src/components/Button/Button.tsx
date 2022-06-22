@@ -1,7 +1,13 @@
 import React from "react";
+import { TokenInfo } from "util/hooks/useFluidTokens";
 
-interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
+interface ButtonProps
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > {
   label: string;
+  token?: TokenInfo;
   theme?: string;
   texttheme?: string;
   className?: string;
@@ -15,10 +21,12 @@ interface ButtonProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLB
   fontSize?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
+  visible?: boolean;
 }
 
 const Button = ({
   label,
+  token,
   theme,
   texttheme,
   className,
@@ -32,6 +40,7 @@ const Button = ({
   fontSize,
   icon,
   disabled,
+  visible,
   ...props
 }: ButtonProps) => {
   if (auth || priviledge === 0 || priviledge === undefined) {
@@ -53,7 +62,42 @@ const Button = ({
         {...props}
       >
         {icon}
-        <div className={`${texttheme ?? ""}`}>{label}</div>
+        {theme === "select-token-button" ? (
+          <>
+            <div className="token-list-item-info">
+              <div className="token-list-item-names">
+                <div className={`${texttheme ?? ""}`}>{token?.token.name}</div>
+                <div className="label">
+                  {token?.config.amount === "0.0"
+                    ? `${label}`
+                    : `${Number(token?.config.amount).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 6,
+                      })} ${label}`}
+                </div>
+              </div>
+              <div className={`${texttheme ?? ""}`}>
+                {token
+                  ? `${Number(token.config.amount).toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 6,
+                    })}`
+                  : "0"}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className={`${texttheme ?? ""}`}>{label}</div>
+        )}
+        {visible === true ? (
+          <img src={"img/chevronDown.svg"} className="chevron" alt="" />
+        ) : visible === false ? (
+          <img src={"img/chevronUp.svg"} className="chevron" alt="" />
+        ) : (
+          <></>
+        )}
       </button>
     );
   }

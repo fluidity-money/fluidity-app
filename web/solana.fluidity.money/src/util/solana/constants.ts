@@ -23,6 +23,9 @@ export type FluidToken = {
 
 export type SolTokenList = Array<BaseToken | FluidToken>
 
+/**
+ * @deprecated 
+ */
 export const tokenList: SolTokenList = [
   {
     name: "USD Coin",
@@ -48,4 +51,28 @@ export const tokenList: SolTokenList = [
     mintAddress: process.env.REACT_APP_FLU_MINT_USDT || "",
     decimals: 6,
   },
+  {
+    name: "UXD",
+    symbol: "UXD",
+    mintAddress: process.env.REACT_APP_BASE_MINT_UXD || "",
+    decimals: 6,
+  },
+  {
+    name: "Fluid UXD",
+    symbol: "fUXD",
+    mintAddress: process.env.REACT_APP_FLU_MINT_UXD || "",
+    decimals: 6,
+  },
+  {
+    name: "TerraUSD",
+    symbol: "UST",
+    mintAddress: process.env.REACT_APP_BASE_MINT_UST || "",
+    decimals: 6,
+  },
+  {
+    name: "Fluid UST",
+    symbol: "fUST",
+    mintAddress: process.env.REACT_APP_FLU_MINT_UST || "",
+    decimals: 6,
+  }
 ]

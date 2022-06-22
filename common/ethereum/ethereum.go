@@ -7,6 +7,7 @@ import (
 	"math/big"
 
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -95,3 +96,35 @@ func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *et
 	return nil
 }
 
+// Calls a method on a bound contract, first simulating it to see if it reverts
+func MakeTransaction(contract *ethAbiBind.BoundContract, opts *ethAbiBind.TransactOpts, method string, args ...interface{}) (*ethTypes.Transaction, error) {
+	callOptions := ethAbiBind.CallOpts {
+		Pending: false,
+		From: opts.From,
+		BlockNumber: nil,
+		Context: opts.Context,
+	}
+
+	err := contract.Call(
+		&callOptions,
+		nil,
+		method,
+		args...,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"transaction simulation failed calling method %s! %w",
+			method,
+			err,
+		)
+	}
+
+	transaction, err := contract.Transact(
+		opts,
+		method,
+		args...,
+	)
+
+	return transaction, err
+}

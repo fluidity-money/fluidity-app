@@ -32,6 +32,10 @@ type (
 			RewardPool      float64 `json:"reward_pool"`
 		} `json:"payout"`
 
+		Fees struct {
+			Saber float64 `json:"saber"`
+		} `json:"fees"`
+
 		// calculate n function
 		CalculateN struct {
 			ProbabilityM float64 `json:"probability_m"`
@@ -78,12 +82,39 @@ type (
 	// the contract with
 	EthereumAnnouncement struct {
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		BlockNumber     *misc.BigInt               `json:"block_number"`
 		FromAddress     ethereum.Address           `json:"from_address"`
 		ToAddress       ethereum.Address           `json:"to_address"`
 		SourceRandom    []uint32                   `json:"random_source"`
 		SourcePayouts   []*misc.BigInt             `json:"random_payouts"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
 		Emissions       Emission                   `json:"emissions"`
+	}
+
+	EthereumWinnerAnnouncement struct {
+		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		BlockNumber     *misc.BigInt               `json:"block_number"`
+		FromAddress     ethereum.Address           `json:"from_address"`
+		ToAddress       ethereum.Address           `json:"to_address"`
+		FromWinAmount   *misc.BigInt               `json:"from_win_amount"`
+		ToWinAmount     *misc.BigInt               `json:"to_win_amount"`
+		TokenDetails    token_details.TokenDetails `json:"token_details"`
+	}
+
+	EthereumReward struct {
+		Winner          ethereum.Address           `json:"winner"`
+		WinAmount       *misc.BigInt               `json:"amount"`
+		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		BlockNumber     *misc.BigInt               `json:"block_number"`
+		TokenDetails    token_details.TokenDetails `json:"token_details"`
+	}
+
+	EthereumSpooledRewards struct {
+		Token      token_details.TokenDetails `json:"token_details"`
+		Winner     ethereum.Address           `json:"winner"`
+		WinAmount  *misc.BigInt               `json:"amount"`
+		FirstBlock *misc.BigInt               `json:"first_block"`
+		LastBlock  *misc.BigInt               `json:"last_block"`
 	}
 
 	EthereumBlockLog struct {

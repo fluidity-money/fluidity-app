@@ -1,22 +1,15 @@
 package ethereum
 
 import (
+	"context"
 	"fmt"
 	"math/big"
-	"context"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
-	ethClient "github.com/ethereum/go-ethereum/ethclient"
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/fluidity-money/fluidity-app/lib/log"
+	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	ethClient "github.com/ethereum/go-ethereum/ethclient"
 )
-
-func Debug(format string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(format, content...)
-	})
-}
 
 func BigIntFromUint64(x uint64) (int *big.Int) {
 	int = new(big.Int)
@@ -56,7 +49,7 @@ func CoerceBoundContractResultsToRat(results []interface{}) (*big.Rat, error) {
 }
 
 func CoerceBoundContractResultsToAddress(results []interface{}) (ethCommon.Address, error) {
-	var	result ethCommon.Address
+	var result ethCommon.Address
 
 	if resultsLen := len(results); resultsLen != 1 {
 		return result, fmt.Errorf(
@@ -69,6 +62,25 @@ func CoerceBoundContractResultsToAddress(results []interface{}) (ethCommon.Addre
 
 	if !ok {
 		return result, fmt.Errorf("results did not contain an address!")
+	}
+
+	return result, nil
+}
+
+func CoerceBoundContractResultsToUint8(results []interface{}) (uint8, error) {
+	var	result uint8
+
+	if resultsLen := len(results); resultsLen != 1 {
+		return result, fmt.Errorf(
+			"returned results did not have length of 1! was %v",
+			resultsLen,
+		)
+	}
+
+	result, ok := results[0].(uint8)
+
+	if !ok {
+		return result, fmt.Errorf("results did not contain an uint8!")
 	}
 
 	return result, nil

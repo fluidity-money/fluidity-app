@@ -1,13 +1,13 @@
 // Fluidity smart contract state processor
 
 use crate::{
-    state::{Obligation, Reserve},
-    math::*,
     instruction::*,
+    math::*,
+    state::{Obligation, Reserve},
+    utils::*,
 };
 
 use {
-    std::{str::FromStr, convert::TryFrom},
     borsh::{BorshDeserialize, BorshSerialize},
     solana_program::{
         account_info::{next_account_info, AccountInfo},
@@ -16,20 +16,20 @@ use {
         log::sol_log_compute_units,
         msg,
         program::{invoke, invoke_signed},
-        program_error::ProgramError, 
-        pubkey::Pubkey,
-        system_instruction, 
-        system_program,
+        program_error::ProgramError,
         program_pack::{IsInitialized, Pack},
+        pubkey::Pubkey,
+        system_instruction, system_program,
     },
     spl_token,
+    std::{convert::TryFrom, str::FromStr},
 };
 
 // the public key of the authority for payouts and initialisation
-const AUTHORITY: &str = "sohTpNitFg3WZeEcbrMunnwoZJWP4t8yisPB5o3DGD5";
+const AUTHORITY: &str = "B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP";
 
 // the public key of the solend program
-const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
+const SOLEND: &str = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]
@@ -40,7 +40,13 @@ pub struct FluidityData {
 }
 
 // wrap amount of token into corresponding fluidity token
-fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String, bump: u8) -> ProgramResult {
+fn wrap(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    amount: u64,
+    seed: String,
+    bump: u8,
+) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
     let fluidity_data_account = next_account_info(accounts_iter)?;
@@ -71,8 +77,7 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
     }
 
     // check solend contract
-    if solend_program.key !=
-        &Pubkey::from_str(SOLEND).unwrap() {
+    if solend_program.key != &Pubkey::from_str(SOLEND).unwrap() {
         panic!("bad Solend contract!");
     }
 
@@ -81,17 +86,19 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
     let data_seed = format!("FLU:{}_DATA", seed);
 
     // check that data account is derived from pda
-    if fluidity_data_account.key !=
-        &Pubkey::create_with_seed(
-            pda_account.key,
-            &data_seed,
-            program_id,
-        ).unwrap() {
-            panic!("bad data account");
+    if fluidity_data_account.key
+        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
+    {
+        panic!("bad data account");
     }
 
     // check mints
-    check_mints_and_pda(&fluidity_data_account, *token_mint.key, *fluidity_mint.key, *pda_account.key);
+    check_mints_and_pda(
+        &fluidity_data_account,
+        *token_mint.key,
+        *fluidity_mint.key,
+        *pda_account.key,
+    );
 
     // check collateral and obligation ownership
     let obligation = Obligation::unpack(&obligation_info.data.borrow())?;
@@ -116,16 +123,21 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
             ],
         ),
         &[
-            reserve_info.clone(), pyth_price_info.clone(), switchboard_feed_info.clone(),
-            clock_info.clone(), solend_program.clone()
-        ]
+            reserve_info.clone(),
+            pyth_price_info.clone(),
+            switchboard_feed_info.clone(),
+            clock_info.clone(),
+            solend_program.clone(),
+        ],
     )?;
 
     // deposit liquidity from user token account
     invoke(
         &Instruction::new_with_borsh(
             *solend_program.key,
-            &LendingInstruction::DepositReserveLiquidity{liquidity_amount: amount},
+            &LendingInstruction::DepositReserveLiquidity {
+                liquidity_amount: amount,
+            },
             vec![
                 AccountMeta::new(*token_account.key, false),
                 AccountMeta::new(*collateral_info.key, false),
@@ -140,10 +152,16 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
             ],
         ),
         &[
-            token_account.clone(), collateral_info.clone(), reserve_info.clone(),
-            reserve_liquidity_supply_info.clone(), reserve_collateral_mint_info.clone(),
-            lending_market_info.clone(), lending_market_authority_info.clone(),
-            sender.clone(), clock_info.clone(), token_program.clone(),
+            token_account.clone(),
+            collateral_info.clone(),
+            reserve_info.clone(),
+            reserve_liquidity_supply_info.clone(),
+            reserve_collateral_mint_info.clone(),
+            lending_market_info.clone(),
+            lending_market_authority_info.clone(),
+            sender.clone(),
+            clock_info.clone(),
+            token_program.clone(),
         ],
     )?;
 
@@ -160,20 +178,25 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
             ],
         ),
         &[
-            reserve_info.clone(), pyth_price_info.clone(), switchboard_feed_info.clone(),
-            clock_info.clone(), solend_program.clone()
-        ]
+            reserve_info.clone(),
+            pyth_price_info.clone(),
+            switchboard_feed_info.clone(),
+            clock_info.clone(),
+            solend_program.clone(),
+        ],
     )?;
 
     // calculate collateral amount
     let reserve = Reserve::unpack(&reserve_info.data.borrow())?;
-    let collateral_amount = reserve.collateral_exchange_rate()?.liquidity_to_collateral(amount)?;
+    let collateral_amount = reserve
+        .collateral_exchange_rate()?
+        .liquidity_to_collateral(amount)?;
 
     // deposit collateral into obligation
     invoke_signed(
         &Instruction::new_with_borsh(
             *solend_program.key,
-            &LendingInstruction::DepositObligationCollateral{collateral_amount},
+            &LendingInstruction::DepositObligationCollateral { collateral_amount },
             vec![
                 AccountMeta::new(*collateral_info.key, false),
                 AccountMeta::new(*destination_collateral_info.key, false),
@@ -184,11 +207,17 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
                 AccountMeta::new(*pda_account.key, true),
                 AccountMeta::new_readonly(*clock_info.key, false),
                 AccountMeta::new_readonly(*token_program.key, false),
-            ]
+            ],
         ),
         &[
-            collateral_info.clone(), destination_collateral_info.clone(), reserve_info.clone(), obligation_info.clone(),
-            lending_market_info.clone(), pda_account.clone(), clock_info.clone(), token_program.clone(),
+            collateral_info.clone(),
+            destination_collateral_info.clone(),
+            reserve_info.clone(),
+            obligation_info.clone(),
+            lending_market_info.clone(),
+            pda_account.clone(),
+            clock_info.clone(),
+            token_program.clone(),
         ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )?;
@@ -196,14 +225,20 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
     // mint fluid tokens to user account
     invoke_signed(
         &spl_token::instruction::mint_to(
-           &token_program.key,
+            &token_program.key,
             &fluidity_mint.key,
             &fluidity_account.key,
             &pda_account.key,
             &[&pda_account.key],
             amount,
-        ).unwrap(),
-        &[fluidity_mint.clone(), fluidity_account.clone(), pda_account.clone(), token_program.clone()],
+        )
+        .unwrap(),
+        &[
+            fluidity_mint.clone(),
+            fluidity_account.clone(),
+            pda_account.clone(),
+            token_program.clone(),
+        ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )?;
 
@@ -211,7 +246,13 @@ fn wrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String
 }
 
 // unwrap amount of fluid token into corresponding token
-fn unwrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: String, bump: u8) -> ProgramResult {
+fn unwrap(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    amount: u64,
+    seed: String,
+    bump: u8,
+) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
     let fluidity_data_account = next_account_info(accounts_iter)?;
@@ -236,8 +277,7 @@ fn unwrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: Stri
     let clock_info = next_account_info(accounts_iter)?;
 
     // check solend contract
-    if solend_program.key !=
-        &Pubkey::from_str(SOLEND).unwrap() {
+    if solend_program.key != &Pubkey::from_str(SOLEND).unwrap() {
         panic!("bad Solend contract!");
     }
 
@@ -256,16 +296,18 @@ fn unwrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: Stri
     let data_seed = format!("FLU:{}_DATA", seed);
 
     // check that data account is derived from pda
-    if fluidity_data_account.key !=
-        &Pubkey::create_with_seed(
-            pda_account.key,
-            &data_seed,
-            program_id,
-        ).unwrap() {
-            panic!("bad data account");
+    if fluidity_data_account.key
+        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
+    {
+        panic!("bad data account");
     }
 
-    check_mints_and_pda(&fluidity_data_account, *token_mint.key, *fluidity_mint.key, *pda_account.key);
+    check_mints_and_pda(
+        &fluidity_data_account,
+        *token_mint.key,
+        *fluidity_mint.key,
+        *pda_account.key,
+    );
 
     // burn fluid tokens
     invoke(
@@ -327,7 +369,9 @@ fn unwrap(accounts: &[AccountInfo], program_id: &Pubkey, amount: u64, seed: Stri
 
     // calculate collateral amount from refreshed reserve
     let reserve = Reserve::unpack(&reserve_info.data.borrow())?;
-    let collateral_amount = reserve.collateral_exchange_rate()?.liquidity_to_collateral(amount)?;
+    let collateral_amount = reserve
+        .collateral_exchange_rate()?
+        .liquidity_to_collateral(amount)?;
 
     // withdraw from solend to the user's token account
     invoke_signed(
@@ -388,31 +432,20 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
     let payer = next_account_info(accounts_iter)?;
 
     // check payout authority
-    if !(payer.is_signer && payer.key ==
-         &Pubkey::from_str(AUTHORITY).unwrap()) {
+    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
         panic!("bad payout authority!");
     }
 
     // scale/clamp amount to be AT MOST 80% of the prize pool
 
-    // get obligation and reserve structs
-    let obligation = Obligation::unpack(&obligation_info.data.borrow())?;
-    let reserve = Reserve::unpack(&reserve_info.data.borrow())?;
-    // get value of obligations
-    let deposited_amount = obligation.deposits[0].deposited_amount;
-    let deposited_value = reserve.collateral_exchange_rate()?
-        .collateral_to_liquidity(deposited_amount).unwrap();
-    // normalise
-    // get fluidity mint object
-    let fluid_mint = spl_token::state::Mint::unpack(&fluidity_mint.data.borrow())?;
-    let decimals = fluid_mint.decimals as u32;
+    let total_prize_pool = get_available_prize_pool(obligation_info, reserve_info, fluidity_mint);
 
-    // get amount of usdc deposited (has 6 decimals)
-    let deposited_tokens = fluid_mint.supply;
     // get available prize pool (80% of pool)
-    let available_prize_pool = (deposited_value - deposited_tokens)
-        .checked_mul(8).unwrap()
-        .checked_div(10).unwrap();
+    let available_prize_pool = total_prize_pool
+        .checked_mul(8)
+        .unwrap()
+        .checked_div(10)
+        .unwrap();
 
     // set new amount
     let scaled_amount = if amount > available_prize_pool {
@@ -423,13 +456,17 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
 
     // separate pool into 8:2 split between sender and receiver
     let sender_prize = scaled_amount
-        .checked_mul(8).unwrap()
-        .checked_div(10).unwrap();
+        .checked_mul(8)
+        .unwrap()
+        .checked_div(10)
+        .unwrap();
     let receiver_prize = scaled_amount
-        .checked_mul(2).unwrap()
-        .checked_div(10).unwrap();
+        .checked_mul(2)
+        .unwrap()
+        .checked_div(10)
+        .unwrap();
 
-    let pda_seed =  format!("FLU:{}_OBLIGATION", seed);
+    let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
     // mint fluid tokens to both receivers
 
@@ -441,8 +478,14 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
             &pda_account.key,
             &[&pda_account.key],
             sender_prize,
-        ).unwrap(),
-        &[fluidity_mint.clone(), payout_account_a.clone(), pda_account.clone(), token_program.clone()],
+        )
+        .unwrap(),
+        &[
+            fluidity_mint.clone(),
+            payout_account_a.clone(),
+            pda_account.clone(),
+            token_program.clone(),
+        ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )?;
 
@@ -454,8 +497,71 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
             &pda_account.key,
             &[&pda_account.key],
             receiver_prize,
-        ).unwrap(),
-        &[fluidity_mint.clone(), payout_account_b.clone(), pda_account.clone(), token_program.clone()],
+        )
+        .unwrap(),
+        &[
+            fluidity_mint.clone(),
+            payout_account_b.clone(),
+            pda_account.clone(),
+            token_program.clone(),
+        ],
+        &[&[&pda_seed.as_bytes(), &[bump]]],
+    )?;
+
+    Ok(())
+}
+
+// Moves amount funds from prize pool to another account
+// Will fail if funds exceed total prize pool - must be run by authority
+fn move_from_prize_pool(
+    accounts: &[AccountInfo],
+    payout_amt: u64,
+    seed: String,
+    bump: u8,
+) -> ProgramResult {
+    let accounts_iter = &mut accounts.iter();
+
+    let token_program = next_account_info(accounts_iter)?;
+    let fluidity_mint = next_account_info(accounts_iter)?;
+    let pda_account = next_account_info(accounts_iter)?;
+    let obligation_info = next_account_info(accounts_iter)?;
+    let reserve_info = next_account_info(accounts_iter)?;
+    let payout_account = next_account_info(accounts_iter)?;
+    let payer = next_account_info(accounts_iter)?;
+
+    // check payout authority
+    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
+        panic!("bad payout authority!");
+    }
+
+    // Fail if amount exceeds prize pool
+    let available_prize_pool =
+        get_available_prize_pool(obligation_info, reserve_info, fluidity_mint);
+
+    if available_prize_pool < payout_amt {
+        panic!("not enought funds in prize pool!");
+    }
+
+    let pda_seed = format!("FLU:{}_OBLIGATION", seed);
+
+    // mint fluid tokens to payout account
+
+    invoke_signed(
+        &spl_token::instruction::mint_to(
+            &token_program.key,
+            &fluidity_mint.key,
+            &payout_account.key,
+            &pda_account.key,
+            &[&pda_account.key],
+            payout_amt,
+        )
+        .unwrap(),
+        &[
+            fluidity_mint.clone(),
+            payout_account.clone(),
+            pda_account.clone(),
+            token_program.clone(),
+        ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )?;
 
@@ -483,12 +589,11 @@ fn init_solend_obligation(
     let token_program = next_account_info(accounts_iter)?;
 
     // check init authority
-    if !(payer.is_signer && payer.key ==
-         &Pubkey::from_str(AUTHORITY).unwrap()) {
+    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
         panic!("bad init authority!");
     }
 
-    let pda_seed =  format!("FLU:{}_OBLIGATION", seed);
+    let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
     invoke_signed(
         &system_instruction::create_account_with_seed(
@@ -501,8 +606,12 @@ fn init_solend_obligation(
             &solend_program.key,
         ),
         &[
-            payer.clone(), obligation_info.clone(), obligation_owner_info.clone(),
-            lending_market_info.clone(), solend_program.clone(), system_program.clone()
+            payer.clone(),
+            obligation_info.clone(),
+            obligation_owner_info.clone(),
+            lending_market_info.clone(),
+            solend_program.clone(),
+            system_program.clone(),
         ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )?;
@@ -517,11 +626,18 @@ fn init_solend_obligation(
                 AccountMeta::new(*obligation_owner_info.key, true),
                 AccountMeta::new_readonly(*clock_info.key, false),
                 AccountMeta::new_readonly(*rent_info.key, false),
-                AccountMeta::new_readonly(*token_program.key, false)
-            ]
+                AccountMeta::new_readonly(*token_program.key, false),
+            ],
         ),
-        &[obligation_info.clone(), lending_market_info.clone(), obligation_owner_info.clone(),
-          clock_info.clone(), rent_info.clone(), token_program.clone(), solend_program.clone()],
+        &[
+            obligation_info.clone(),
+            lending_market_info.clone(),
+            obligation_owner_info.clone(),
+            clock_info.clone(),
+            rent_info.clone(),
+            token_program.clone(),
+            solend_program.clone(),
+        ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )?;
 
@@ -542,13 +658,9 @@ pub fn log_tvl(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
     let clock_info = next_account_info(accounts_iter)?;
 
     // check that data account is derived from base
-    if data_account.key !=
-        &Pubkey::create_with_seed(
-            base.key,
-            "FLU:TVL_DATA",
-            program_id,
-        ).unwrap() {
-            panic!("bad data account");
+    if data_account.key != &Pubkey::create_with_seed(base.key, "FLU:TVL_DATA", program_id).unwrap()
+    {
+        panic!("bad data account");
     }
 
     // refresh solend accounts
@@ -601,8 +713,10 @@ pub fn log_tvl(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
     // serialize value of obligations (incl. interest) into data account
     // get scaled u128 val. it has 18 decimal places so divide by 1e18-n to get n decimals
     let deposited_amount = obligation.deposits[0].deposited_amount;
-    let deposited_value = reserve.collateral_exchange_rate()?
-        .collateral_to_liquidity(deposited_amount).unwrap();
+    let deposited_value = reserve
+        .collateral_exchange_rate()?
+        .collateral_to_liquidity(deposited_amount)
+        .unwrap();
 
     deposited_value.serialize(&mut &mut data[..])?;
 
@@ -613,8 +727,10 @@ pub fn log_tvl(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
 fn init_data(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
-    seed: String, lamports: u64,
-    space: u64, bump: u8
+    seed: String,
+    lamports: u64,
+    space: u64,
+    bump: u8,
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
@@ -626,8 +742,7 @@ fn init_data(
     let pda = next_account_info(accounts_iter)?;
 
     // check payout authority
-    if !(payer.is_signer && payer.key ==
-         &Pubkey::from_str(AUTHORITY).unwrap()) {
+    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
         panic!("bad init authority!");
     }
 
@@ -645,55 +760,72 @@ fn init_data(
             space,
             program_id,
         ),
-        &[payer.clone(), data_account.clone(), pda.clone(), system_program.clone()],
+        &[
+            payer.clone(),
+            data_account.clone(),
+            pda.clone(),
+            system_program.clone(),
+        ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )?;
 
     // borrow the data and write
     let mut data = data_account.try_borrow_mut_data()?;
-    FluidityData{
+    FluidityData {
         token_mint: *token_mint.key,
         fluid_mint: *fluid_mint.key,
         pda: *pda.key,
-    }.serialize(&mut &mut data[..])?;
+    }
+    .serialize(&mut &mut data[..])?;
 
     Ok(())
 }
 
 // check that base mint, fluid mint, and pda match those specified in the data account
 // before doing this, check that the data account is valid!
-fn check_mints_and_pda(data_account: &AccountInfo, token_mint: Pubkey, fluid_mint: Pubkey, pda: Pubkey) {
+fn check_mints_and_pda(
+    data_account: &AccountInfo,
+    token_mint: Pubkey,
+    fluid_mint: Pubkey,
+    pda: Pubkey,
+) {
     // get fluidity data
     let data = data_account.try_borrow_data().unwrap();
     let fluidity_data = FluidityData::deserialize(&mut &data[..]).unwrap();
 
     // check that mints and pda are consistent
-    if (fluidity_data.token_mint, fluidity_data.fluid_mint, fluidity_data.pda) !=
-        (token_mint, fluid_mint, pda) {
-            panic!("bad mint or pda");
+    if (
+        fluidity_data.token_mint,
+        fluidity_data.fluid_mint,
+        fluidity_data.pda,
+    ) != (token_mint, fluid_mint, pda)
+    {
+        panic!("bad mint or pda");
     }
 }
 
 pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     let instruction = FluidityInstruction::try_from_slice(input)?;
     match instruction {
-        FluidityInstruction::Wrap (amount, seed, bump) => {
+        FluidityInstruction::Wrap(amount, seed, bump) => {
             wrap(&accounts, program_id, amount, seed, bump)
         }
-        FluidityInstruction::Unwrap (amount, seed, bump) => {
+        FluidityInstruction::Unwrap(amount, seed, bump) => {
             unwrap(&accounts, program_id, amount, seed, bump)
         }
-        FluidityInstruction::Payout (amount, seed, bump) => {
-            payout(&accounts, amount, seed, bump)
-        }
-        FluidityInstruction::InitSolendObligation(obligation_lamports, obligation_size, seed, bump) => {
-            init_solend_obligation(&accounts, obligation_lamports, obligation_size, seed, bump)
-        }
-        FluidityInstruction::LogTVL => {
-            log_tvl(&accounts, program_id)
-        }
+        FluidityInstruction::Payout(amount, seed, bump) => payout(&accounts, amount, seed, bump),
+        FluidityInstruction::InitSolendObligation(
+            obligation_lamports,
+            obligation_size,
+            seed,
+            bump,
+        ) => init_solend_obligation(&accounts, obligation_lamports, obligation_size, seed, bump),
+        FluidityInstruction::LogTVL => log_tvl(&accounts, program_id),
         FluidityInstruction::InitData(seed, lamports, space, bump) => {
             init_data(&accounts, program_id, seed, lamports, space, bump)
+        }
+        FluidityInstruction::MoveFromPrizePool(payout_amt, seed, bump) => {
+            move_from_prize_pool(&accounts, payout_amt, seed, bump)
         }
     }
 }

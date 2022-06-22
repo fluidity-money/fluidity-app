@@ -6,7 +6,7 @@ package solana
 import (
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
 type (
@@ -86,6 +86,7 @@ type (
 		Signature   string            `json:"signature"`
 		Result      TransactionResult `json:"result"`
 		AdjustedFee *big.Rat          `json:"adjustedFee"`
+		SaberFee    *big.Rat          `json:"saberFee"`
 	}
 
 	TransactionResult struct {
@@ -96,7 +97,7 @@ type (
 
 	TransactionMeta struct {
 		// TODO solana doesn't document what this type actually is
-		Err               map[string]interface{}    `json:"err"`
+		Err               interface{}               `json:"err"`
 		Fee               uint64                    `json:"fee"`
 		PreTokenBalances  []TransactionTokenBalance `json:"preTokenBalances"`
 		PostTokenBalances []TransactionTokenBalance `json:"postTokenBalances"`
@@ -137,4 +138,15 @@ type (
 // Slot is the type that logs the current slot as sent by the solana RPC
 type Slot struct {
 	Slot uint64 `json:"slot"`
+}
+
+type TribecaProgramData struct {
+	Chain   string
+	Network string
+
+	PayoutFreqNum    int64
+	PayoutFreqDenom  int64
+	DeltaWeightNum   int64
+	DeltaWeightDenom int64
+	WinningClasses   int
 }

@@ -1,7 +1,7 @@
 .send-container {
   color: black;
   background-color: $container-colour;
-  border: 1px solid #83AAA7;
+  border: 1px solid #83aaa7;
   display: grid;
   grid-gap: 1rem;
   grid-template-columns: 1fr;
@@ -52,14 +52,19 @@
   background: $primary-color;
   color: white;
   font-size: 1rem;
+  &--aurora {
+    @extend .send-button;
+    background: $aurora;
+    color: black;
+  }
 }
 
 .send-field {
   background-color: $container-colour-lighter;
-  border: 1px solid #383C45;
+  border: 1px solid #383c45;
   border-radius: 10px;
   padding: 0.5rem;
-  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-family: "Montserrat", Arial, Helvetica, sans-serif;
 }
 
 .amount-avail {
@@ -73,7 +78,7 @@
   font-weight: 500;
   font-size: 0.8rem;
   white-space: nowrap;
-  
+
   @include for-tablet-landscape-up {
     grid-column: 2/-1;
   }
@@ -81,10 +86,9 @@
   &:hover {
     cursor: pointer;
     & > .balance-container {
-      text-decoration: underline;  
+      text-decoration: underline;
     }
   }
-
 }
 
 .balance-container {
@@ -96,8 +100,7 @@
   &:hover {
     cursor: pointer;
     & > .amount-avail {
-      text-decoration: underline;  
+      text-decoration: underline;
     }
   }
 }
-

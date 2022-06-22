@@ -5,3 +5,24 @@
 /web/ethereum.fluidity.money/public/img/pinnedIcon.svg filter=lfs diff=lfs merge=lfs -text
 /web/ethereum.fluidity.money/public/img/searchIcon.svg filter=lfs diff=lfs merge=lfs -text
 /web/ethereum.fluidity.money/public/img/searchNotFound.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/chevronUp.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/chevronDown.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/Aurora/AuroraBackground.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/Aurora/AuroraSwapBox.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/Aurora/AuroraLogoTextBelow.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/Aurora/AuroraLogoTextRight.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/Aurora/AuroraLogoTextBelow.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/chevronDown.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/chevronUp.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/pinIcon.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/pinnedIcon.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/searchIcon.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/close-button.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/searchNotFound.svg filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/images/fluiditylogo.svg filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/images/favicon.svg filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/images/favicon.png filter=lfs diff=lfs merge=lfs -text
+/web/faucet.fluidity.money/public/favicon.ico filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/network-dot.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/network-dot.svg filter=lfs diff=lfs merge=lfs -text
+

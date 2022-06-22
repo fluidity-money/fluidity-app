@@ -13,16 +13,27 @@
 
 .toolbar-container-enabled {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(25rem, 27rem);
+  grid-template-columns: 1fr 1fr minmax(29rem, 31rem);
   grid-gap: 1rem;
   align-items: center;
   justify-content: center;
   width: 100%;
+  @include for-med-toolbar {
+    grid-gap: 0.5rem;
+    grid-template-columns: 33rem 0rem 29rem 0rem;
+  }
+  @include for-small-toolbar {
+    grid-template-columns: 29rem 0rem 29rem 0rem;
+  }
+  @include for-smallest-toolbar {
+    grid-template-columns: 27rem 1rem 25rem 0rem;
+    grid-gap: 0.5rem;
+  }
 }
 
 .toolbar-container-disabled {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(8rem, 12rem);
+  grid-template-columns: 1fr 1fr minmax(8rem, 18rem);
   grid-gap: 1rem;
   align-items: center;
   justify-content: center;
@@ -31,36 +42,81 @@
 
 .toolbar-container-mobile {
   display: grid;
-  grid-template-columns: 1fr 1fr 2rem;
-  grid-gap: 1rem;
+  grid-template-columns: 1fr 3fr 4rem 8fr 3rem;
+  // grid-gap: 1rem;
   align-items: center;
   justify-content: center;
   width: 100%;
+
+  @include for-below-470 {
+    grid-template-columns: 2fr 3fr 2rem 8fr 4rem;
+  }
 }
 
 .toolbar-items {
   height: 2.8rem;
   display: grid;
-  grid-template-columns: 3rem 1rem repeat(3, minmax(10rem, 10rem));
-  grid-gap: 0.5rem;
+  grid-template-columns: 3rem 1rem repeat(4, minmax(10rem, 10rem));
   align-items: center;
   width: 100%;
+
+  @include for-med-toolbar {
+    grid-template-columns: 1rem 1rem repeat(4, minmax(8rem, 10rem));
+    grid-gap: 0.5rem;
+  }
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  width: auto;
+  align-items: center;
 }
 
 .select-blockchain {
-  padding-left: 10px;
-  height: 40px;
-  width: 40px;
+  padding: 0 5px 0 10px;
+  margin-left: 10px;
+  height: 32px;
+  width: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: solid #02f5a3 1px;
+  border-radius: 10px;
+  background-color: #0d222a;
 
   cursor: pointer;
 
+  @include for-smallest-toolbar {
+    font-size: 0.9rem;
+  }
+
+  @include for-below-470 {
+    width: 75px;
+    padding: 0px 0.2rem 0px 0.4rem;
+  }
+
+  &:hover {
+    opacity: 0.7;
+  }
+
   img {
     flex-shrink: 0;
-    min-width: 100%;
-    min-height: 100%;
+    min-width: 20px;
+    min-height: 20px;
+    padding-right: 6px;
+  }
+
+  &--aurora {
+    @extend .select-blockchain;
+    border: solid #04f5ff 1px;
+  }
+}
+
+.chain-name {
+  margin-right: 5px;
+  @include for-below-470 {
+    font-size: 0.8rem;
   }
 }
 
@@ -122,25 +178,29 @@
   border-radius: 10px;
   width: 85%;
   margin: 10px 10px 10px 10px;
+  box-shadow: 0px 1px 2px 1px;
   &:hover {
     // text-decoration: none;
-    opacity: 0.9;
+    opacity: 0.8;
+  }
+  &:active {
+    background-color: pink;
   }
   @include for-tablet-portrait-up {
     width: 120px;
-    padding: 0.4rem;
+    padding: 0.5rem;
     margin: 10px 50px 10px 40px;
   }
 
   @include for-tablet-landscape-up {
     width: 120px;
-    padding: 0.3rem;
+    padding: 0.5rem;
     margin: 10px 50px 10px 40px;
   }
 
   @include for-desktop-up {
     width: 120px;
-    padding: 0.3rem;
+    padding: 0.5rem;
     margin: 0px 10px 10px 0px;
     // margin-left: 0.5rem;
   }

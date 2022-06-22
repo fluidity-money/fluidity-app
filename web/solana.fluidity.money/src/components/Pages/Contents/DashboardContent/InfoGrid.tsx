@@ -2,9 +2,6 @@ import Routes from "util/api/types";
 import { solExplorer } from "util/solana/solExplorer";
 import { trimAddress } from "util/addresses";
 import { amountToDecimalString } from "util/numbers";
-// import dateFormatter from "util/dateFormatter";
-// import { formatAmount } from "util/amounts";
-// import { etherscanAddress } from "util/etherscan";
 
 type infoGrid = {
   prizeBoard: Routes["/prize-board"];
@@ -16,8 +13,11 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
       <div className="reward-info-table-column">
         <div className="reward-info-table-header header">Amount</div>
         <div className="reward-info-table-column-container">
-          {prizeBoard.map(({ winning_amount, token_details }) => (
-            <div className="reward-info-table-content" key={winning_amount}>
+          {prizeBoard.map(({ winning_amount, token_details }, i) => (
+            <div
+              className="reward-info-table-content"
+              key={winning_amount + String(i)}
+            >
               $
               {winning_amount === "0"
                 ? "0.000000"
@@ -57,8 +57,11 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
       <div className="reward-info-table-column">
         <div className="reward-info-table-header header">Date</div>
         <div className="reward-info-table-column-container">
-          {prizeBoard.map(({ awarded_time }) => (
-            <div className="reward-info-table-content" key={awarded_time}>
+          {prizeBoard.map(({ awarded_time }, i) => (
+            <div
+              className="reward-info-table-content"
+              key={awarded_time + String(i)}
+            >
               {new Date(awarded_time)
                 .toLocaleString()
                 .split("")

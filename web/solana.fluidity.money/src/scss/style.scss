@@ -25,6 +25,7 @@
 @import "components/routeNotFound";
 @import "components/unsupported";
 @import "components/notificationAlert";
+@import "components/walletKit";
 // @import "components/confetti";
 @import "components/error";
 // mobile
@@ -41,6 +42,9 @@ body {
   margin: 0;
   overflow: hidden;
   box-sizing: border-box;
+  > #root {
+    height: 100vh;
+  }
 }
 
 a {
@@ -56,9 +60,6 @@ a {
 
 // general class properties
 .app-container {
-  position: absolute;
-  top: 0px;
-  left: 0px;
   width: 100%;
   height: 100%;
 
@@ -140,4 +141,3 @@ a {
   font-family: "Raleway";
   src: url("/fonts/Raleway-VariableFont_wght.ttf") format("truetype");
 }
-

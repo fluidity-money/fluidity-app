@@ -1,0 +1,46 @@
+[
+  {
+    "symbol": "USDT",
+    "name": "USD Tether",
+    "mintAddress": "Bp2nLuamFZndE7gztA1iPsNVhdJeg9xfKdq7KmvjpGoP",
+    "decimals": 6,
+    "colour": "rgb(36, 163, 124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "pinned": true,
+    "amount": "0.0",
+    "obligationAccount": "EHxPXaojrnNGmUDBqz8fCbcdgYswn9MpNHtKMR6WkY7z",
+    "dataAccount": "2PjRnkPxcpCZpokn45B23GLEYiwJnWgcfjXNQZ1E55ze"
+  },
+  {
+    "symbol": "fUSDT",
+    "name": "FLUID USDT",
+    "mintAddress": "Dx8dUQ8p8zbQwv7jvXqaEdYWcK7AroNifHbcAC7YYRjg",
+    "decimals": 6,
+    "colour": "rgb(36, 163, 124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "pinned": true,
+    "amount": "0.0"
+  },
+  {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "mintAddress": "zVzi5VAf4qMEwzv7NXECVx5v2pQ7xnqVVjCXZwS9XzA",
+    "decimals": 6,
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "pinned": true,
+    "amount": "0.0",
+    "obligationAccount": "AzC4PyevxfhrRcY4x7Xm94PQyf9nfjcheLsSiE53Rcy",
+    "dataAccount": "DDuNyoNKZMM2fSanMKUjwhtwkY5Jcg85sMoR98fsYKjU"
+  },
+  {
+    "symbol": "fUSDC",
+    "name": "FLUID USDC",
+    "mintAddress": "5jsh1taLrqNgiV3UN8diDxZAXRC7T4iALfNWwThBksoj",
+    "decimals": 6,
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "pinned": true,
+    "amount": "0.0"
+  }
+]

@@ -7,10 +7,14 @@ import Token from "components/Token";
 import ropsten from "../../../config/ropsten-tokens.json";
 import testing from "../../../config/testing-tokens.json";
 import kovan from "../../../config/kovan-tokens.json";
+import aurora from "../../../config/aurora-mainnet-tokens.json";
+import mainnet from "../../../config/mainnet-tokens.json";
 import { modalToggle } from "components/context";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { TokenKind, Token as TokenType } from "components/types";
 import { SupportedContracts } from "util/contractList";
+import ChainId, { chainIdFromEnv } from "util/chainId";
+import { appTheme } from "util/appTheme";
 
 const ConfirmPaymentModal = ({
   enable,
@@ -42,13 +46,18 @@ const ConfirmPaymentModal = ({
   };
 
   // Assigns the correct json file based on ChainId
+  const chainId = chainIdFromEnv();
   const data =
-    process.env.REACT_APP_CHAIN_ID === "3"
+    chainId === ChainId.Ropsten
       ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31337"
+      : chainId === ChainId.Hardhat
       ? (testing as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "2a"
+      : chainId === ChainId.Kovan
       ? (kovan as TokenKind[])
+      : chainId === ChainId.AuroraMainnet
+      ? (aurora as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
       : (ropsten as TokenKind[]);
 
   const ext = data.slice(0, data.length / 2);
@@ -151,7 +160,7 @@ const ConfirmPaymentModal = ({
         <Button
           label="Confirm"
           goto={confirmTrigger}
-          theme={"payment-button primary-button"}
+          theme={`payment-button primary-button${appTheme}`}
         />
       </div>
     </GenericModal>

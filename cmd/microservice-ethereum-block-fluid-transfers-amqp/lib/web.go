@@ -61,13 +61,13 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 
 	for i, log := range logsResponseLogs {
 		var (
-			logBlockNumber   = log.BlockNumber
-			logIndex         = log.Index
-			logTxIndex       = log.TxIndex
-			logData          = log.Data
-			blockHash        = log.BlockHash
-			address          = log.Address
-			txHash           = log.TxHash
+			logBlockNumber = log.BlockNumber
+			logIndex       = log.Index
+			logTxIndex     = log.TxIndex
+			logData        = log.Data
+			blockHash      = log.BlockHash
+			address        = log.Address
+			txHash         = log.TxHash
 		)
 
 		blockNumber, err := bigIntFromPossiblyHex(logBlockNumber)
@@ -172,5 +172,23 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 
 	blockResponseResult := blocksResponse.Result
 
-	return &blockResponseResult, nil
+	if string(blockResponseResult) == "null" {
+		return nil, fmt.Errorf(
+			"geth return null for block %v, block doesn't exist! possible geth desync?!",
+			blockHash,
+		)
+	}
+
+	var block Block
+
+	err = json.Unmarshal(blockResponseResult, &block)
+
+	if err != nil {
+	    return nil, fmt.Errorf(
+			"could not unmarshal block resonse: %v",
+			err,
+	    )
+	}
+
+	return &block, nil
 }

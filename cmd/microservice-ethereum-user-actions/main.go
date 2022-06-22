@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	logging "github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	ethereumTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -44,7 +44,7 @@ func main() {
 	tokenDecimals, err := strconv.Atoi(tokenDecimals_)
 
 	if err != nil {
-		logging.Fatal(func(k *logging.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Format(
 				"Failed to convert %#v to a number!",
 				tokenDecimals_,
@@ -54,15 +54,15 @@ func main() {
 		})
 	}
 
-	ethereum.Logs(func(log ethereum.Log) {
+	ethereum.Logs(func(ethLog ethereum.Log) {
 		var (
-			transactionHash = log.TxHash
-			logTopics       = log.Topics
-			logData         = log.Data
-			logAddress      = log.Address
+			transactionHash = ethLog.TxHash
+			logTopics       = ethLog.Topics
+			logData         = ethLog.Data
+			logAddress      = ethLog.Address
 		)
 
-		debug(
+		log.Debugf(
 			"The log address is %v, expecting %v!",
 			logAddress,
 			filterAddress,
@@ -72,7 +72,7 @@ func main() {
 			return
 		}
 
-		logging.Debug(func(k *logging.Log) {
+		log.Debug(func(k *log.Log) {
 			k.Format(
 				"The number of log topics is %v, expecting more than 2!",
 				len(logTopics),
@@ -97,7 +97,7 @@ func main() {
 		)
 
 		if err != nil {
-			debug(
+			log.Debugf(
 				"Didn't decode an event signature on the wire. %v",
 				err,
 			)
@@ -108,7 +108,7 @@ func main() {
 		switch eventClassification {
 
 		case microservice_user_actions.EventTransfer:
-			debug(
+			log.Debugf(
 				"Handling a transfer event, topic head is %#s",
 				topicHead,
 			)
@@ -123,7 +123,7 @@ func main() {
 			)
 
 		case microservice_user_actions.EventMintFluid:
-			debug(
+			log.Debugf(
 				"Handling a minting event, topic head %#v!",
 				topicHead,
 			)
@@ -137,7 +137,7 @@ func main() {
 			)
 
 		case microservice_user_actions.EventBurnFluid:
-			debug(
+			log.Debugf(
 				"Handling a burning event, topic head %#v!",
 				topicHead,
 			)

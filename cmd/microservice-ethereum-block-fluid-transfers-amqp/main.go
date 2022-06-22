@@ -92,12 +92,6 @@ func main() {
 			})
 		}
 
-		if block == nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format("Block with hash %v was empty!", blockHash.String())
-			})
-		}
-
 		newTransactions, err := ethConvert.ConvertTransactions(blockHash.String(), block.Transactions)
 
 		if err != nil {

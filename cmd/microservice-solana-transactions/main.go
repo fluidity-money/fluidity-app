@@ -79,17 +79,13 @@ func main() {
 
 		for i, transaction := range block.Transactions {
 
-			computeUsed := solana.GetComputeUsed(transaction)
-
 			transactionMetaFeeRat := new(big.Rat).SetUint64(transaction.Meta.Fee)
 
-			adjustedFee := new(big.Rat).Mul(computeUsed, transactionMetaFeeRat)
-
-			adjustedFee.Quo(adjustedFee, LamportDecimalPlacesRat)
+			transactionMetaFeeRat.Quo(transactionMetaFeeRat, LamportDecimalPlacesRat)
 
 			// normalise to usd
 
-			adjustedFee.Mul(adjustedFee, solanaPrice)
+			transactionMetaFeeRat.Mul(transactionMetaFeeRat, solanaPrice)
 
 			// saber fee is 0 if an error occurs
 			// currently this assumes all saber fees are in USD
@@ -107,7 +103,7 @@ func main() {
 				})
 			}
 
-			adjustedFee.Add(adjustedFee, saberFee)
+			transactionMetaFeeRat.Add(transactionMetaFeeRat, saberFee)
 
 			orcaFee, err := orca.GetOrcaFee(
 				solanaClient,
@@ -127,7 +123,8 @@ func main() {
 			parsedTransactions[i] = solanaQueue.Transaction{
 				Signature:   transaction.Transaction.Signatures[0],
 				Result:      transaction,
-				AdjustedFee: adjustedFee,
+				AdjustedFee: transactionMetaFeeRat,
+				SaberFee:    saberFee,
 			}
 		}
 

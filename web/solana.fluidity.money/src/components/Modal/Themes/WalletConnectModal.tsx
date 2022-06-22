@@ -2,15 +2,14 @@ import ReactDOM from "react-dom";
 import Header from "components/Header";
 import Icon from "components/Icon";
 import FormSection from "components/Styling/FormSection";
-import { useState } from "react";
-import ConnectWalletModal from "components/Modal/Themes/ConnectWalletModal";
 import { useHistory } from "react-router-dom";
 import {UseSolana} from "@saberhq/use-solana";
+import {useWalletKit} from "@gokiprotocol/walletkit";
 
-const WalletConnectedModal = ({ enable, toggle, wallet, address }: { enable: boolean; toggle: () => void; wallet: UseSolana; address: string; }) => {
+const WalletConnectedModal = ({ enable, toggle, wallet, address }: { enable: boolean; toggle: () => void; wallet: UseSolana<any>; address: string; }) => {
 
     const history = useHistory();
-    const [switchActive, setSwitchActive] = useState(false); // controls the modal status for wallet switching
+    const {connect: connectWallet} = useWalletKit();
     const copyAddress = () => {
         // Creates element
         let text = document.createElement("textarea");
@@ -36,15 +35,6 @@ const WalletConnectedModal = ({ enable, toggle, wallet, address }: { enable: boo
     // Returns name of connected wallet in our system based on connector
     const walletType = wallet.walletProviderInfo?.name ?? "";
 
-    const switchWallet = () => {
-        if (switchActive) {
-            setSwitchActive(!switchActive);
-            return;
-        }
-        setSwitchActive(!switchActive);
-        toggle();
-    }
-
     // Disconnects wallet
     const disconnect = () => {
         wallet.disconnect();
@@ -55,56 +45,50 @@ const WalletConnectedModal = ({ enable, toggle, wallet, address }: { enable: boo
         toggle();
     }
 
-    if (switchActive) {
-        return (
-            <ConnectWalletModal enable={switchActive} toggle={switchWallet} height="auto" width="22.5rem" />
-        )
-    } else {
-        return (enable ? ReactDOM.createPortal(
-            <div className="walletconnect-modal-container" onClick={() => toggle()}>
-                <div
-                    className="modal-body"
-                    style={{ maxHeight: '22rem' }}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="walletconnect-modal-body">
-                        {/* Modal header */}
-                        <Header type="left primary" className="connected-wallet-modal-header">
-                            My Wallet
-                        </Header>
-                        <FormSection cname="payment-modal-x" defaultMargin={false}>
-                            <Icon src={"modal-close-x"} trigger={toggle} />
+    return (enable ? ReactDOM.createPortal(
+        <div className="walletconnect-modal-container" onClick={() => toggle()}>
+            <div
+                className="modal-body"
+                style={{ maxHeight: '22rem' }}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="walletconnect-modal-body">
+                    {/* Modal header */}
+                    <Header type="left primary" className="connected-wallet-modal-header">
+                        My Wallet
+                    </Header>
+                    <FormSection cname="payment-modal-x" defaultMargin={false}>
+                        <Icon src={"modal-close-x"} trigger={toggle} />
+                    </FormSection>
+                    {/* Wallet information */}
+                    <FormSection cname="walletconnect-wallet-info" defaultMargin={false}>
+                        <div className="swap-box-subheader primary-text">Connected with {walletType}</div>
+                        <div className="walletconnect-account button" onClick={copyAddress}>{address}</div>
+                    </FormSection>
+                    {/* Copy Address */}
+                    <div className="walletconnect-option-form column-span">
+                        <FormSection onClickHandler={copyAddress} cname="walletconnect-option" defaultMargin={false}>
+                            <Icon src="icon i-copy-address-icon" />
+                            <div>Copy Address</div>
+                            <div className="hide" id="copied-box">Copied</div>
                         </FormSection>
-                        {/* Wallet information */}
-                        <FormSection cname="walletconnect-wallet-info" defaultMargin={false}>
-                            <div className="swap-box-subheader primary-text">Connected with {walletType}</div>
-                            <div className="walletconnect-account button" onClick={copyAddress}>{address}</div>
+                        {/* Switch Provider */}
+                        <FormSection onClickHandler={connectWallet} cname="walletconnect-option" defaultMargin={false}>
+                            <Icon src="icon i-switch_provider-icon" />
+                            <div>Switch Provider</div>
                         </FormSection>
-                        {/* Copy Address */}
-                        <div className="walletconnect-option-form column-span">
-                            <FormSection onClickHandler={copyAddress} cname="walletconnect-option" defaultMargin={false}>
-                                <Icon src="icon i-copy-address-icon" />
-                                <div>Copy Address</div>
-                                <div className="hide" id="copied-box">Copied</div>
-                            </FormSection>
-                            {/* Switch Provider */}
-                            <FormSection onClickHandler={switchWallet} cname="walletconnect-option" defaultMargin={false}>
-                                <Icon src="icon i-switch_provider-icon" />
-                                <div>Switch Provider</div>
-                            </FormSection>
-                            {/* Disconnect Wallet */}
-                            <FormSection onClickHandler={disconnect} cname="walletconnect-option" defaultMargin={false}>
-                                <Icon src="icon i-disconnect-icon" />
-                                <div>Disconnect</div>
-                            </FormSection>
-                        </div>
+                        {/* Disconnect Wallet */}
+                        <FormSection onClickHandler={disconnect} cname="walletconnect-option" defaultMargin={false}>
+                            <Icon src="icon i-disconnect-icon" />
+                            <div>Disconnect</div>
+                        </FormSection>
                     </div>
                 </div>
-            </div>,
-            document.querySelector("#modal-generic")!
-        )
-            : <></>);
-    }
+            </div>
+        </div>,
+        document.querySelector("#modal-generic")!
+    ) : <></>
+    );
 }
 
 export default WalletConnectedModal;

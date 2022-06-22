@@ -2,6 +2,7 @@ import Button from "components/Button";
 import Header from "components/Header";
 import { useHistory } from "react-router-dom";
 import Routes from "util/api/types";
+import { appTheme } from "util/appTheme";
 
 type left = {
   rewardPool: Routes["/prize-pool"];
@@ -15,11 +16,13 @@ const Left = ({ rewardPool }: left) => {
       <Header type="primary" className="reward-pool-header">
         Reward Pool
       </Header>
-      <h1 className="prize">
-        $
+      <h1 className={`prize${appTheme}`}>
         {rewardPool.amount &&
-          parseFloat(rewardPool.amount).toLocaleString("en", {
+          parseFloat(rewardPool.amount).toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
             minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           })}
       </h1>
       <div className="btn-component">
@@ -28,7 +31,7 @@ const Left = ({ rewardPool }: left) => {
           goto={() => {
             history.push("/");
           }}
-          theme={"primary-button"}
+          theme={`primary-button${appTheme}`}
           className="reward-pool-button"
         />
       </div>

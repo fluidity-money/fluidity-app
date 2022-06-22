@@ -215,6 +215,18 @@
   cursor: not-allowed;
 }
 
+.select-token-text {
+  color: white;
+  font-size: 1rem;
+  text-align: start;
+}
+
+.label {
+  color: white;
+  font-size: 0.6rem;
+  text-align: start;
+}
+
 // Wallet Connect Theme
 .walletconnect-modal-container {
   position: absolute;
@@ -332,4 +344,141 @@
   color: white;
   text-align: center;
   text-decoration: underline;
+}
+
+.token-search {
+  input {
+    background-color: #1a1c1f;
+    color: white;
+    border: solid white 1px;
+    width: 65%;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    height: 50px;
+    font-size: 0.9rem;
+    border-radius: 0.8rem;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  padding: 3px;
+  width: 5%;
+  top: 86px;
+  left: 30px;
+}
+
+.pinned-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0.75rem 0.75rem 0;
+}
+
+.pinned {
+  width: 20%;
+  color: white;
+  font-size: small;
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 700;
+  // letter-spacing: 0em;
+  background-color: #051323;
+  border: solid 0.5px white;
+  border-radius: 0.5rem;
+  margin: 4px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  cursor: pointer;
+  &:hover {
+    .pinned-content {
+      opacity: 0.6;
+    }
+    .remove-pin {
+      visibility: visible;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
+  @include for-below-470 {
+    margin: 3px;
+  }
+}
+
+.pinned-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  z-index: 2;
+}
+
+.remove-pin {
+  position: absolute;
+  padding-bottom: 20px;
+  padding-left: 70px;
+  width: 15px;
+  visibility: hidden;
+}
+
+.pinned-logo {
+  width: 21.5px;
+  padding-right: 5px;
+}
+
+.token-list-icon {
+  position: relative;
+  width: 2rem;
+  margin-top: auto;
+  margin-bottom: auto;
+  display: block;
+  padding-right: 0.4rem;
+  @include for-below-400 {
+    width: 1.5rem;
+  }
+}
+
+.pin-icon {
+  padding-bottom: 10px;
+  padding-left: 10px;
+  width: 12px;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.token-list-item {
+  display: flex;
+  cursor: pointer;
+  padding-right: 0.2rem;
+}
+
+.not-found-text {
+  color: white;
+  font-family: "Raleway";
+}
+
+.token-list {
+  height: 12rem;
+  margin: 0 0.25rem 1rem 1rem;
+}
+
+.blockchain-container {
+  background-color: transparent;
+  border: solid 2px #ffffff;
+  border-radius: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+  &--closed {
+    @extend .blockchain-container;
+    background-color: transparent;
+  }
+}
+
+.line {
+  background-color: #ffffff;
+  height: 1px;
+  border: none;
+  width: 81%;
 }

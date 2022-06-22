@@ -6,9 +6,12 @@ import contractList, {
 import ropsten from "../config/ropsten-tokens.json";
 import testing from "../config/testing-tokens.json";
 import kovan from "../config/kovan-tokens.json";
+import aurora from "../config/aurora-mainnet-tokens.json";
+import mainnet from "../config/mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { Signer } from "ethers";
 import { parseUnits } from "ethers/utils";
+import ChainId, {chainIdFromEnv} from "./chainId";
 
 export interface walletDataType {
   type: string;
@@ -18,14 +21,19 @@ export interface walletDataType {
 
 // Assigns the correct json file based on ChainId
 const getWalletERC20Status = async (signer: Signer) => {
+  const chainId = chainIdFromEnv();
   const data =
-    process.env.REACT_APP_CHAIN_ID === "3"
-      ? (ropsten as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "31337"
-      ? (testing as TokenKind[])
-      : process.env.REACT_APP_CHAIN_ID === "2a"
-      ? (kovan as TokenKind[])
-      : (ropsten as TokenKind[]);
+    chainId === ChainId.Ropsten ?
+      (ropsten as TokenKind[]) :
+    chainId === ChainId.Hardhat ?
+      (testing as TokenKind[]) :
+    chainId === ChainId.Kovan ?
+      (kovan as TokenKind[]) :
+    chainId === ChainId.AuroraMainnet ?
+      (aurora as TokenKind[]) :
+    chainId === ChainId.Mainnet ?
+      (mainnet as TokenKind[]) :
+      (ropsten as TokenKind[]);
 
   // If signer is defined (someone is logged in), nothing happens.
   // Else if signer is undefined/null, it returns a blank array since no wallet means no information

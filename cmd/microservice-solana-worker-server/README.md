@@ -12,20 +12,15 @@ sends a message to the client with the winner randomness!
 |              Name               |                                  Description                                 |
 |---------------------------------|------------------------------------------------------------------------------|
 | `FLU_WORKER_ID`                 | Worker ID used to identify the application in logging and to the AMQP queue. |
-| `FLU_REDIS_ADDR`                | Redis address pointing to Redis for state tracking							 |
 | `FLU_DEBUG`                     | Toggle debug messages produced by any application using the debug logger.    |
 | `FLU_AMQP_QUEUE_ADDR`           | AMQP queue address connected to to receive and send messages down.           |
 | `FLU_SOLANA_RPC_URL`            | Solana node RPC address.                                                     |
-| `FLU_SOLANA_PROGRAM_ID`         | Program ID of the fluidity program.                                          |
+| `FLU_SOLANA_NETWORK`            | Solana network for TRF vars.                                                 |
 | `FLU_SOLANA_FLUID_MINT_PUBKEY`  | Public key of the fluid token mint.                                          |
-| `FLU_SOLANA_TVL_DATA_PUBKEY`    | Public key of an initialized account to store TVL data.                      |
-| `FLU_SOLANA_SOLEND_PROGRAM_ID`  | Program ID of the solend program.                                            |
-| `FLU_SOLANA_OBLIGATION_PUBKEY`  | Public key of the solend obligation account.                                 |
 | `FLU_SOLANA_RESERVE_PUBKEY`     | Public key of the solend reserve account.                                    |
-| `FLU_SOLANA_PYTH_PUBKEY`        | Public key of the solend pyth account.                                       |
-| `FLU_SOLANA_SWITCHBOARD_PUBKEY` | Public key of the solend switchboard account.                                |
-| `FLU_SOLANA_PDA_PUBKEY`         | Public key of the fluidity contract's PDA for the token (USDC)               |
-| `FLU_SOLANA_PAYER_PRIKEY`       | Private key of the payout authority (base58)                                 |
+| `FLU_SOLANA_TOKEN_DECIMALS`     | Number of decimals token uses.                                               |
+| `FLU_SOLANA_TOKEN_NAME`         | Name of the token being wrapped.                                             |
+| `FLU_SOLANA_WINNER_QUEUE_NAME`  | Queue to transmit client topic of a winner.                                  |
 
 ## Building
 

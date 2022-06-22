@@ -1,0 +1,23 @@
+---
+version: "3"
+
+services:
+  microservice-solana-tribeca-executor:
+    build:
+      context: ../cmd/microservice-solana-tribeca-executor
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-tribeca-executor
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+      FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY: ${FLU_SOLANA_TRIBECA_EXECUTOR_SECRET_KEY}
+      FLU_TRF_DATA_STORE_SECRET_KEY: ${FLU_TRF_DATA_STORE_SECRET_KEY}
+      FLU_SOLANA_PAYER_PRIKEY: ${FLU_SOLANA_PAYER_PRIKEY}
+      FLU_TRIBECA_GOVERNOR_PUBKEY: ${FLU_TRIBECA_GOVERNOR_PUBKEY}
+      FLU_TRIBECA_LOCKER_PUBKEY: ${FLU_TRIBECA_LOCKER_PUBKEY}
+      FLU_TRIBECA_SMART_WALLET_PUBKEY: ${FLU_TRIBECA_SMART_WALLET_PUBKEY}
+      FLU_TRIBECA_EXEC_COUNCIL_PUBKEY: ${FLU_TRIBECA_EXEC_COUNCIL_PUBKEY}
+    depends_on:
+      - redis
+    restart: unless-stopped
+

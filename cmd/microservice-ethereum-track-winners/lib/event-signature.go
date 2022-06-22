@@ -1,4 +1,4 @@
-package microservice_common_track_winners
+package microservice_ethereum_track_winners
 
 import (
 	"fmt"

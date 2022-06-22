@@ -1,5 +1,7 @@
+// forcibly mine a block on hardhat - this is
+// sometimes useful to get external things to update
+
 import hre from 'hardhat';
-import "@nomiclabs/hardhat-waffle";
 
 async function main() {
   await hre.network.provider.send("evm_mine");

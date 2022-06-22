@@ -10,7 +10,6 @@ services:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-amqp
       FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
-      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
       FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
       FLU_SOLANA_STARTING_SLOT: ${FLU_SOLANA_STARTING_SLOT}
@@ -18,22 +17,18 @@ services:
     depends_on:
       - redis
 
-  connector-solana-tvl-amqp:
+  connector-solana-trf-data-postgres:
     build:
-      context: ../cmd/connector-solana-tvl-amqp
+      context: ../cmd/connector-solana-trf-data-postgres
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-tvl-amqp
-      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
-      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-trf-data-postgres
+      FLU_SOLANA_NETWORK: ${FLU_SOLANA_NETWORK}
+      FLU_TRF_DATA_STORE_PROGRAM_ID: ${FLU_TRF_DATA_STORE_PROGRAM_ID}
       FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
-      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
-      FLU_SOLANA_PROGRAM_ID: ${FLU_SOLANA_PROGRAM_ID}
-      FLU_SOLANA_TVL_DATA_PUBKEY: ${FLU_SOLANA_TVL_DATA_PUBKEY}
-      FLU_SOLANA_SOLEND_PUBKEY: ${FLU_SOLANA_TVL_SOLEND_PUBKEY}
-      FLU_SOLANA_OBLIGATION_PUBKEY: ${FLU_SOLANA_OBLIGATION_PUBKEY}
-      FLU_SOLANA_RESERVE_PUBKEY: ${FLU_SOLANA_RESERVE_PUBKEY}
-      FLU_SOLANA_PYTH_PUBKEY: ${FLU_SOLANA_PYTH_PUBKEY}
-      FLU_SOLANA_SWITCHBOARD_PUBKEY: ${FLU_SOLANA_SWITCHBOARD_PUBKEY}
-      FLU_SOLANA_TVL_PAYER_PRIKEY: ${FLU_SOLANA_TVL_PAYER_PRIKEY}
-      FLU_SOLANA_SOLEND_PROGRAM_ID: ${FLU_SOLANA_SOLEND_PROGRAM_ID}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+

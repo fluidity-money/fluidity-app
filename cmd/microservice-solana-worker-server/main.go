@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -14,9 +15,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/solana/solend"
-	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 
-	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
@@ -24,36 +23,14 @@ const (
 	// EnvSolanaRpcUrl is the RPC url of the solana node to connect to
 	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
 
-	// EnvFluidityPubkey is the program id of the fluidity program
-	EnvFluidityPubkey = `FLU_SOLANA_PROGRAM_ID`
+	// EnvSolanaNetwork is the network of the trf data store account
+	EnvSolanaNetwork = `FLU_SOLANA_NETWORK`
 
 	// EnvFluidityMintPubkey is the public key of the fluid token mint
 	EnvFluidityMintPubkey = `FLU_SOLANA_FLUID_MINT_PUBKEY`
 
-	// EnvTvlDataPubkey is the public key of an initialized account for storing
-	// TVL data
-	EnvTvlDataPubkey = `FLU_SOLANA_TVL_DATA_PUBKEY`
-
-	// EnvSolendPubkey is the program id of the solend program
-	EnvSolendPubkey = `FLU_SOLANA_SOLEND_PROGRAM_ID`
-
-	// EnvObligationPubkey is the public key of the solend pool obligation
-	// account
-	EnvObligationPubkey = `FLU_SOLANA_OBLIGATION_PUBKEY`
-
 	// EnvReservePubkey is the public key of the solend pool reserve account
 	EnvReservePubkey = `FLU_SOLANA_RESERVE_PUBKEY`
-
-	// EnvPythPubkey is the public key of the solend pool pyth account
-	EnvPythPubkey = `FLU_SOLANA_PYTH_PUBKEY`
-
-	// EnvSwitchboardPubkey is the public key of the solend pool switchboard
-	// account
-	EnvSwitchboardPubkey = `FLU_SOLANA_SWITCHBOARD_PUBKEY`
-
-	// EnvPayerPrikey is a private key of an account that holds solana funds
-	// this must be the payout authority of the contract
-	EnvPayerPrikey = `FLU_SOLANA_PAYER_PRIKEY`
 
 	// EnvTokenDecimals is the number of decimals the token uses
 	EnvTokenDecimals = `FLU_SOLANA_TOKEN_DECIMALS`
@@ -61,12 +38,19 @@ const (
 	// EnvTokenName is the same of the token being wrapped
 	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
 
+	// EnvTopicWrappedActionsQueue to use when receiving TVL, mint
+	// supply, and user actions from retriever
+	EnvTopicWrappedActionsQueue = `FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME`
+
 	// EnvTopicWinnerQueue to use when transmitting to a client the topic of
 	// a winner
 	EnvTopicWinnerQueue = `FLU_SOLANA_WINNER_QUEUE_NAME`
 )
 
 const (
+	// Chain for filtering TRF var in Timescale
+	TrfChain = `solana`
+
 	// SolanaBlockTime assumed by the ATX calculation
 	SolanaBlockTime uint64 = 1
 
@@ -74,26 +58,21 @@ const (
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
 	// The compute used by an spl-token tranfer
-	SplTranferCompute = 2721
+	SplTransferCompute = 2721
 )
 
 func main() {
 
 	var (
-		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
-		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
-		decimalPlaces_   = util.GetEnvOrFatal(EnvTokenDecimals)
-		tokenName        = util.GetEnvOrFatal(EnvTokenName)
+		rpcUrl                   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
+		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
+		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
+		decimalPlaces_           = util.GetEnvOrFatal(EnvTokenDecimals)
+		tokenName                = util.GetEnvOrFatal(EnvTokenName)
 
-		fluidityPubkey    = pubkeyFromEnv(EnvFluidityPubkey)
-		fluidMintPubkey   = pubkeyFromEnv(EnvFluidityMintPubkey)
-		tvlDataPubkey     = pubkeyFromEnv(EnvTvlDataPubkey)
-		solendPubkey      = pubkeyFromEnv(EnvSolendPubkey)
-		obligationPubkey  = pubkeyFromEnv(EnvObligationPubkey)
-		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
-		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
-		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
+		fluidMintPubkey = pubkeyFromEnv(EnvFluidityMintPubkey)
+		reservePubkey   = pubkeyFromEnv(EnvReservePubkey)
 	)
 
 	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
@@ -108,40 +87,32 @@ func main() {
 		})
 	}
 
-	var (
-		decimalPlacesRat     = big.NewRat(int64(decimalPlaces), 1)
-		usdcDecimalPlacesRat = big.NewRat(int64(decimalPlaces), 1)
-
-		// Amount to multiply the adjusted fee by such that a basic spl-token transfer
-		// corresponds to the basic solana fee. (200000 = default Solana compute budget)
-
-		invSolanaSplTransferComputeRat = big.NewRat(200000, SplTranferCompute)
-	)
+	decimalPlacesRat := raiseDecimalPlaces(decimalPlaces)
 
 	solanaClient := solanaRpc.New(rpcUrl)
 
-	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
+	queue.GetMessages(topicWrappedActionsQueue, func(message queue.Message) {
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to decode payer private key!"
-			k.Payload = err
-		})
-	}
+		var payableBufferedUserActions user_actions.PayableBufferedUserAction
 
-	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
+		message.Decode(&payableBufferedUserActions)
 
 		var (
-			userActions    = bufferedUserActions.UserActions
-			fluidTransfers = 0
-			emission       = workerTypes.NewSolanaEmission()
+			bufferedUserActions = payableBufferedUserActions.BufferedUserAction
+			mintSupply          = payableBufferedUserActions.MintSupply
+			tvl                 = payableBufferedUserActions.Tvl
+			fluidTransfers      = 0
+			emission            = workerTypes.NewSolanaEmission()
 		)
 
+		// emissions in this loop should only contain information relevant to the
+		// entire slot set here so that if any point the loop for the transfers
+		// shorts that it'll send out with information relevant to that transfer
+
 		emission.Network = "solana"
-
-		// USDC uses 1e6 places
-
 		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
+
+		userActions := bufferedUserActions.UserActions
 
 		for _, userAction := range userActions {
 
@@ -168,45 +139,21 @@ func main() {
 
 		bpy := probability.CalculateBpy(SolanaBlockTime, apy, emission)
 
-		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
-
-		mintSupply := prize_pool.GetMintSupply(rpcUrl, fluidMintPubkey)
-
 		// normalise the amount to be consistent with USDC as a floating point
 
 		entireAmountOwned := new(big.Rat).SetUint64(mintSupply)
 
-		entireAmountOwned.Quo(entireAmountOwned, usdcDecimalPlacesRat)
-
-		// get the value of all fluidity obligations
-
-		tvl := prize_pool.GetTvl(
-			rpcUrl,
-			fluidityPubkey,
-			tvlDataPubkey,
-			solendPubkey,
-			obligationPubkey,
-			reservePubkey,
-			pythPubkey,
-			switchboardPubkey,
-			payer,
-		)
+		entireAmountOwned.Quo(entireAmountOwned, decimalPlacesRat)
 
 		// get the size of the pool: obligation value minus deposited value then
 		// divide by 10e6 to get the actual number in
 		// USDC units
 
-		if mintSupply > tvl {
-			log.Fatal(func(k *log.Log) {
-				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
-			})
-		}
-
 		unscaledPool := tvl - mintSupply
 
 		sizeOfThePool := new(big.Rat).SetUint64(unscaledPool)
 
-		sizeOfThePool.Quo(sizeOfThePool, usdcDecimalPlacesRat)
+		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
 
 		bpyStakedUsd := probability.CalculateBpyStakedUnderlyingAsset(
 			bpy,
@@ -231,12 +178,31 @@ func main() {
 				continue
 			}
 
-			solanaTransactionFeesNormalised := userAction.AdjustedFee
+			// send emissions out that can be actioned on when the loop ends
 
-			solanaTransactionFeesNormalised.Mul(
-				solanaTransactionFeesNormalised,
-				invSolanaSplTransferComputeRat,
+			emission.TransactionHash = userActionTransactionHash
+			emission.RecipientAddress = userActionRecipientAddress
+			emission.SenderAddress = userActionSenderAddress
+
+			// track fees used during this user action
+			emission.Fees.Saber, _ = userAction.SaberFee.Float64()
+
+			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
+
+			var (
+				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
+				payoutFreqNum    = tribecaDataStoreTrfVars.PayoutFreqNum
+				payoutFreqDenom  = tribecaDataStoreTrfVars.PayoutFreqDenom
+				deltaWeightNum   = tribecaDataStoreTrfVars.DeltaWeightNum
+				deltaWeightDenom = tribecaDataStoreTrfVars.DeltaWeightDenom
 			)
+
+			var (
+				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
+				deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
+			)
+
+			solanaTransactionFeesNormalised := userAction.AdjustedFee
 
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
@@ -244,13 +210,16 @@ func main() {
 				bpyStakedUsd,
 				sizeOfThePool,
 				decimalPlacesRat,
+				payoutFreq,
+				deltaWeight,
+				winningClasses,
 				fluidTransfers,
 				SolanaBlockTime,
 				emission,
 			)
 
 			randomIntegers := generateRandomIntegers(
-				probability.WinningClasses,
+				winningClasses,
 				1,
 				int(randomN),
 			)
@@ -325,10 +294,6 @@ func main() {
 				TokenName:              tokenName,
 				FluidMintPubkey:        fluidMintPubkey.String(),
 			}
-
-			emission.TransactionHash = userActionTransactionHash
-			emission.RecipientAddress = userActionRecipientAddress
-			emission.SenderAddress = userActionSenderAddress
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
 

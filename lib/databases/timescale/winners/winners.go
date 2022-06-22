@@ -160,7 +160,7 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 // CountWinnersForDateAndWinningAmount given, just the date given (any wins
 // inside that day)
-func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, date time.Time) (uint64, misc.BigInt) {
+func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, tokenName string, date time.Time) (uint64, misc.BigInt) {
 
 	timescaleClient := timescale.Client()
 
@@ -172,15 +172,21 @@ func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, date
 		FROM %s
 		WHERE
 			network = $1
+			AND token_short_name = $2
 			AND awarded_time
-				BETWEEN $2
-				AND $2 + INTERVAL '24 HOURS'
+				BETWEEN $3
+				AND $3 + INTERVAL '24 HOURS'
 		`,
 
 		TableWinners,
 	)
 
-	row := timescaleClient.QueryRow(statementText, network, date)
+	row := timescaleClient.QueryRow(
+		statementText,
+		network,
+		tokenName,
+		date,
+	)
 
 	var (
 		winnersCount  uint64

@@ -74,7 +74,7 @@
 }
 
 // ### Wallet icons ###
-.i-{
+.i- {
   &ETH,
   &fETH {
     background: url("/img/TokenIcons/ethereumIcon.svg");
@@ -105,6 +105,14 @@
   &DAI,
   &fDAI {
     background: url("/img/TokenIcons/daiIcon.svg");
+  }
+  &UXD,
+  &fUXD {
+    background: url("/img/TokenIcons/uxdIcon.svg");
+  }
+  &UST,
+  &fUST {
+    background: url("/img/TokenIcons/ustIcon.svg");
   }
 }
 
@@ -181,7 +189,7 @@
   stroke-miterlimit: 10;
   margin: 10% auto;
   box-shadow: inset 0px 0px 0px #0eb88e;
-  animation: fill .4s ease-in-out;
+  animation: fill 0.4s ease-in-out;
 
   &-notification-circle {
     stroke-width: 0;
@@ -245,4 +253,35 @@
   @extend .notification-off;
   background: url("/img/NotificationIcons/notifications-off-icon.svg"), red;
   background-size: cover;
+}
+
+.clear-icon {
+  position: absolute;
+  cursor: pointer;
+  width: 10px;
+  right: 35px;
+  top: 87px;
+  opacity: 0.6;
+  padding: 6px;
+  border-radius: 0.2rem;
+  &:hover {
+    opacity: 1;
+    background-color: #0f2339;
+  }
+  &--modal {
+    @extend .clear-icon;
+    width: 15px;
+    right: 15px;
+    top: 15px;
+    border-radius: 0.45rem;
+  }
+}
+
+.not-found-icon {
+  width: 150px;
+  align-self: center;
+}
+
+.chevron {
+  width: 20px;
 }

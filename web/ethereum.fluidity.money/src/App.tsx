@@ -17,21 +17,27 @@ import ConfettiAnimation from "components/NotificationAlert/confettiAnimation";
 import NotificationAlert from "components/NotificationAlert";
 import { Routes, WebsocketMessage } from "util/api/types";
 import useWebSocket from "react-use-websocket";
-import { formatAmount } from "util/amounts";
 import NotificationContainer from "components/Notifications/NotificationContainer";
 import ApiStateHandler, { ApiState } from "components/ApiStateHandler";
 import { root_websocket } from "util/api";
-import { userActionContext } from "components/context";
+import {
+  TokenListContext,
+  tokenListContext,
+  userActionContext,
+} from "components/context";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
+import ChainId, { chainIdFromEnv } from "util/chainId";
+import { TokenKind } from "components/types";
+import ropsten from "./config/ropsten-tokens.json";
+import testing from "./config/testing-tokens.json";
+import kovan from "./config/kovan-tokens.json";
+import aurora from "./config/aurora-mainnet-tokens.json";
+import mainnet from "./config/mainnet-tokens.json";
+import { appTheme } from "util/appTheme";
+import useLocalStorage from "util/hooks/useLocalStorage";
 
 const App = () => {
-  const chainId_ = process.env.REACT_APP_CHAIN_ID;
-
-  if (!chainId_) {
-    throw new Error("REACT_APP_CHAIN_ID not set!");
-  }
-
-  const chainId = Number(chainId_);
+  const chainId = chainIdFromEnv();
 
   const providerOptions: Connectors = {
     injected: new InjectedConnector({ supportedChainIds: [chainId] }),
@@ -67,7 +73,44 @@ const App = () => {
 
   const [messageData, setMessageData] = useState<WebsocketMessage>({});
 
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>(
+    []
+  );
+
   const { lastJsonMessage } = useWebSocket(root_websocket);
+
+  // Assigns the correct json file based on ChainId
+  const data =
+    chainId === ChainId.Ropsten
+      ? (ropsten as TokenKind[])
+      : chainId === ChainId.Hardhat
+      ? (testing as TokenKind[])
+      : chainId === ChainId.Kovan
+      ? (kovan as TokenKind[])
+      : chainId === ChainId.AuroraMainnet
+      ? (aurora as TokenKind[])
+      : chainId === ChainId.Mainnet
+      ? (mainnet as TokenKind[])
+      : (ropsten as TokenKind[]);
+
+  /* using local storage hook to persist for pinned tokens for 
+  fluid and non-fluid states used in token select modal */
+  const [pinnedTokens, setPinnedTokens] = useLocalStorage(
+    "pinned",
+    [...data].slice(0, data.length / 2)
+  );
+  const [pinnedFluidTokens, setPinnedFluidTokens] = useLocalStorage(
+    "pinned-fluid",
+    [...data].slice(data.length / 2, data.length)
+  );
+  const [tokens, setTokens] = useLocalStorage(
+    "tokens",
+    [...data].slice(data.length / 2, data.length)
+  );
+  const [fluidTokens, setFluidTokens] = useLocalStorage(
+    "fluid-tokens",
+    [...data].slice(data.length / 2, data.length)
+  );
 
   /* browser detection. if user isn't using firefox or chromium based browser
   then render a message telling them to change browser, else render the app */
@@ -89,6 +132,18 @@ const App = () => {
     lastJsonMessage,
   };
 
+  // token info for context for token select modal
+  const tokenListInfo: TokenListContext = {
+    pinnedTokens: pinnedTokens,
+    setPinnedTokens: setPinnedTokens,
+    pinnedFluidTokens: pinnedFluidTokens,
+    setPinnedFluidTokens: setPinnedFluidTokens,
+    tokens: tokens,
+    setTokens: setTokens,
+    fluidTokens: fluidTokens,
+    setFluidTokens: setFluidTokens,
+  };
+
   return (
     // React router provider
     <Router>
@@ -96,89 +151,94 @@ const App = () => {
       <UseWalletProvider chainId={chainId} connectors={providerOptions}>
         {/* Context for user actions recieved over WS, to support dynamic updates */}
         <userActionContext.Provider value={userActions}>
-          {/* Loads specifically one route at a time */}
-          <ErrorBoundary>
-            <NotificationContainer>
-              {/* Renders App triggers on load (such as auto logging into wallet) */}
-              <AppUpdater />
-              <ApiStateHandler state={apiState} />
-              <Switch>
-                <Route
-                  path="/"
-                  exact
-                  render={(props) => (
-                    <SwapPage prizeBoard={prizeBoard} {...props} />
-                  )}
+          <tokenListContext.Provider value={tokenListInfo}>
+            {/* Loads specifically one route at a time */}
+            <ErrorBoundary>
+              <NotificationContainer>
+                {/* Renders App triggers on load (such as auto logging into wallet) */}
+                <AppUpdater />
+                <ApiStateHandler state={apiState} />
+                <Switch>
+                  <Route
+                    path="/"
+                    exact
+                    render={(props) => (
+                      <SwapPage prizeBoard={prizeBoard} {...props} />
+                    )}
+                  />
+
+                  <Route
+                    path="/dashboard"
+                    exact
+                    render={(props) => (
+                      <Dashboard
+                        pastWinnings={pastWinnings}
+                        prizeBoard={prizeBoard}
+                        rewardPool={rewardPool}
+                        {...props}
+                      />
+                    )}
+                  />
+
+                  <ProtectedRoute
+                    exact={true}
+                    path="/wallet"
+                    component={Wallet}
+                    extraProps={{
+                      rewardPool: rewardPool,
+                      prizeBoard: prizeBoard,
+                    }}
+                  />
+
+                  <ProtectedRoute
+                    exact={true}
+                    path="/walletsend"
+                    component={WalletSend}
+                    extraProps={{
+                      myHistory: userActions,
+                    }}
+                  />
+
+                  <ProtectedRoute
+                    exact={true}
+                    path="/wallethistory"
+                    component={WalletHistory}
+                    extraProps={{
+                      myHistory: userActions,
+                    }}
+                  />
+
+                  <Route component={RouteNotFound} />
+                </Switch>
+                {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
+                <NotificationAlert
+                  enable={notificationTrigger}
+                  setEnable={() => setNotificationTrigger(!notificationTrigger)}
+                  active={document.hidden}
+                  message={notificationMessage}
                 />
+                <ConfettiAnimation trigger={winAlert} />
 
-                <Route
-                  path="/dashboard"
-                  exact
-                  render={(props) => (
-                    <Dashboard
-                      pastWinnings={pastWinnings}
-                      prizeBoard={prizeBoard}
-                      rewardPool={rewardPool}
-                      {...props}
-                    />
-                  )}
+                <TransactionConfirmationModal
+                  enable={winAlert}
+                  toggle={() => setWinAlert(!winAlert)}
+                  message={[
+                    <div key={"TCM1"}>
+                      🎉🎉
+                      <span className={`primary-text${appTheme}`}>
+                        {" "}
+                        CONGRATS{" "}
+                      </span>
+                      🎉🎉
+                    </div>,
+                    <div key={"TCM2"} className={`secondary-text${appTheme}`}>
+                      {notificationMessage}
+                    </div>,
+                  ]}
                 />
-
-                <ProtectedRoute
-                  exact={true}
-                  path="/wallet"
-                  component={Wallet}
-                  extraProps={{
-                    rewardPool: rewardPool,
-                    prizeBoard: prizeBoard,
-                  }}
-                />
-
-                <ProtectedRoute
-                  exact={true}
-                  path="/walletsend"
-                  component={WalletSend}
-                  extraProps={{
-                    myHistory: userActions,
-                  }}
-                />
-
-                <ProtectedRoute
-                  exact={true}
-                  path="/wallethistory"
-                  component={WalletHistory}
-                  extraProps={{
-                    myHistory: userActions,
-                  }}
-                />
-
-                <Route component={RouteNotFound} />
-              </Switch>
-              {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
-              <NotificationAlert
-                enable={notificationTrigger}
-                setEnable={() => setNotificationTrigger(!notificationTrigger)}
-                active={document.hidden}
-                message={notificationMessage}
-              />
-              <ConfettiAnimation trigger={winAlert} />
-
-              <TransactionConfirmationModal
-                enable={winAlert}
-                toggle={() => setWinAlert(!winAlert)}
-                message={[
-                  <div key={"TCM1"}>
-                    🎉🎉
-                    <span className="primary-text"> CONGRATS </span>
-                    🎉🎉
-                  </div>,
-                  <div key={"TCM2"} className="secondary-text">
-                    {notificationMessage}
-                  </div>,
-                ]}
-              />
-            </NotificationContainer>
-          </ErrorBoundary>
+              </NotificationContainer>
+            </ErrorBoundary>
+          </tokenListContext.Provider>
         </userActionContext.Provider>
       </UseWalletProvider>
     </Router>

@@ -16,9 +16,26 @@ eg:
 }
 
 */
+@mixin for-below-380 {
+  @media (max-width: 380px) {
+    @content;
+  }
+}
 
 @mixin for-below-400 {
   @media (max-width: 399px) {
+    @content;
+  }
+}
+
+@mixin for-below-420 {
+  @media (max-width: 420px) {
+    @content;
+  }
+}
+
+@mixin for-below-470 {
+  @media (max-width: 470px) {
     @content;
   }
 }
@@ -36,6 +53,21 @@ eg:
 }
 @mixin for-tablet-landscape-down {
   @media (max-width: 900px) {
+    @content;
+  }
+}
+@mixin for-med-toolbar {
+  @media (max-width: 1080px) {
+    @content;
+  }
+}
+@mixin for-small-toolbar {
+  @media (max-width: 1000px) {
+    @content;
+  }
+}
+@mixin for-smallest-toolbar {
+  @media (max-width: 930px) {
     @content;
   }
 }

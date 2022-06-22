@@ -38,12 +38,6 @@ func generateQueueName(workerId, topicName string) string {
 	return fmt.Sprintf("%s.%s", workerId, topicName)
 }
 
-func debug(s string, args ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(s, args...)
-	})
-}
-
 func configureChannel(client *amqp.Connection, workerId, topicName, exchangeName string) (*amqp.Channel, string, error) {
 	channel, err := client.Channel()
 
@@ -168,7 +162,7 @@ func main() {
 		})
 	}
 
-	debug(
+	log.Debugf(
 		`Bound %s to %s at exchange %s!
 Sending to %s`,
 		queueFromName,
@@ -204,7 +198,7 @@ Sending to %s`,
 			Body:         message.Body,
 		}
 
-		debug(
+		log.Debugf(
 			"Publishing to %#v with content %s!",
 			amqpCopyToTopicName,
 			string(message.Body),

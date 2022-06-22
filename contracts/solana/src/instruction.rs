@@ -11,11 +11,13 @@ pub enum FluidityInstruction {
     // unwrap fluid token
     Unwrap(u64, String, u8),
     // payout two accounts
-    Payout (u64, String, u8),
+    Payout(u64, String, u8),
     // initialise solend obligation account
-    InitSolendObligation (u64, u64, String, u8),
+    InitSolendObligation(u64, u64, String, u8),
     LogTVL,
     InitData(String, u64, u64, u8),
+    // move from prize pool to account
+    MoveFromPrizePool(u64, String, u8),
 }
 
 // solend instructions
