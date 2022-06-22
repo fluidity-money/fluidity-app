@@ -272,7 +272,6 @@ contract Token is IERC20 {
             "reward already given for part of this range"
         );
 
-        // Pretty sure 1-10, 2-9, 3-8 double rewards
         manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
         manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
         manualRewards_[winner] += winAmount;
