@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
 	utility_gauge "github.com/fluidity-money/fluidity-app/common/solana/utility-gauge"
@@ -157,8 +158,6 @@ func main() {
 
 				currentGaugePower.Disabled = isDisabled
 
-				// TODO: Cannot differentiate between RPC failures, or if EpochGauge
-				// simply did not exist at past epoch
 				epochGaugePubkey, _, err := utility_gauge.DeriveEpochGaugePubkey(
 					utilityGaugeProgramId,
 					gaugePubkey,
@@ -180,6 +179,10 @@ func main() {
 				)
 
 				if err != nil {
+					if errors.Is(err, solanaRpc.ErrNotFound) {
+						continue
+					}
+
 					log.Fatal(func(k *log.Log) {
 						k.Format("failed to get epochGauge account data %v!", epochGaugePubkey)
 						k.Payload = err
