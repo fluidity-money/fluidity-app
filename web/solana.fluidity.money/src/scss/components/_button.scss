@@ -312,12 +312,13 @@
   background-color: transparent;
   border: solid transparent 1px;
   border-radius: 7px;
+  margin: 2px;
 
   cursor: pointer;
   transition: all 0.4s linear;
 
   &:hover {
-    background-color: rgba(56, 60, 69, 0.5);
+    background-color: rgba(90, 94, 104, 0.5);
   }
   &-current {
     @extend .network-options;
