@@ -1,7 +1,7 @@
 import { ChartOptions } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-const LineGraph = () => {
+const SmallLineGraph = () => {
   const data = (canvas: HTMLCanvasElement | null) => {
     const ctx = canvas?.getContext("2d");
     const userGradient = ctx?.createLinearGradient(0, 0, 0, 310);
@@ -10,7 +10,6 @@ const LineGraph = () => {
     const maxGradient = ctx?.createLinearGradient(0, 0, 0, 180);
     maxGradient?.addColorStop(0, "#30183D");
     maxGradient?.addColorStop(1, "#131823");
-
     return {
       // "04/29",
       //   "05/02",
@@ -90,17 +89,32 @@ const LineGraph = () => {
   };
 
   const options: ChartOptions = {
+    // layout: { padding: 0 },
+    // clip:{},
+
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
-      x: {
+      xAxes: {
         offset: true,
         ticks: {
-          maxTicksLimit: 11,
+          display: true,
+          autoSkip: true,
+          maxTicksLimit: 6,
+          font: { size: 8 },
+          maxRotation: 0,
+          minRotation: 0,
         },
       },
 
-      y: {
+      yAxes: {
         ticks: {
+          mirror: true,
+          z: 1,
+          display: true,
+          font: { size: 8 },
+          padding: -2,
+
           callback: function (value, index, values) {
             return value.toLocaleString("en-US", {
               style: "currency",
@@ -109,6 +123,9 @@ const LineGraph = () => {
               maximumFractionDigits: 0,
             });
           },
+          maxTicksLimit: 2,
+          //stepSize should be max value from api endpoint
+          stepSize: 30,
         },
       },
     },
@@ -122,13 +139,16 @@ const LineGraph = () => {
         backgroundColor: "transparent",
         yAlign: "bottom",
         caretSize: 70,
-        padding: { left: 80 },
+        padding: { left: 30 },
       },
+
       legend: {
         labels: {
           boxWidth: 10,
           boxHeight: 5,
           color: "#828a90",
+          font: { size: 8 },
+          padding: 5,
         },
       },
     },
@@ -137,4 +157,4 @@ const LineGraph = () => {
   return <Line data={data} options={options} />;
 };
 
-export default LineGraph;
+export default SmallLineGraph;

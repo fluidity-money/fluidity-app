@@ -8,8 +8,8 @@ import { useSigner } from "util/hooks";
 import _ from "lodash";
 import ToggleButton from "components/Button/ToggleButton";
 import LineGraph from "components/Charts/LineChart";
-import Button from "components/Button";
 import UnclaimedRewardsbutton from "components/Button/UnclaimedRewardsButton";
+import SmallLineGraph from "components/Charts/SmallLineChart";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -76,7 +76,13 @@ const CurrencyBreakdown = () => {
           key={token.type + index}
         />
         <hr
-          style={{ color: "#828a90", width: "100%", margin: 4, padding: 0 }}
+          style={{
+            color: "#828a90",
+            width: "100%",
+            margin: 4,
+            padding: 0,
+            minWidth: 155,
+          }}
         />
       </div>
     );
@@ -112,7 +118,7 @@ const CurrencyBreakdown = () => {
       />
     ),
 
-    [walletAmounts, walletTypes, colours]
+    [fluidWalletAmounts, fluidWalletTypes, fluidColours]
   );
 
   const DonutRegular = useMemo(
@@ -128,6 +134,7 @@ const CurrencyBreakdown = () => {
   );
 
   const LineChart = useMemo(() => <LineGraph />, []);
+  const SmallLineChart = useMemo(() => <SmallLineGraph />, []);
 
   // Checks to see if the user's wallet is empty
   return (
@@ -137,14 +144,16 @@ const CurrencyBreakdown = () => {
       </div>
 
       <div className="yield-graph">
-        <div className={`white-primary-text`}>
+        <div className={`white-primary-text total-yield-title`}>
           Total Fluid Yield Rewarded: USD 152.21
         </div>
         <div className="grey-primary-text" style={{ fontSize: 8 }}>
           *Calculations based upon user on-chain history and simulated expected
           reward averages
         </div>
-        {LineChart}
+        <div className="line-chart-container">{LineChart}</div>
+        <div className="small-line-chart-container">{SmallLineChart}</div>
+
         <UnclaimedRewardsbutton />
       </div>
 

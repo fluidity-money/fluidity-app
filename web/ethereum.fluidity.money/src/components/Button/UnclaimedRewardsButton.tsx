@@ -5,15 +5,15 @@ const UnclaimedRewardsbutton = () => {
   return (
     <>
       <div className={`unclaimed-rewards-button${appTheme}`} onClick={() => {}}>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div className="unclaimed-button-left">
           <img
-            style={{ width: 41, margin: "0 0 5px 0" }}
+            className="unclaimed-image"
             src={"/img/rewards.svg"}
             alt="eth icon"
           />
-          <div className="">Total Unclaimed Rewards</div>
+          <div>Total Unclaimed Rewards</div>
         </div>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div className="unclaimed-button-right">
           <div style={{ fontFamily: "manrope" }}>USD 52.30</div>
           <img
             className="chevron-right"

@@ -409,4 +409,26 @@
   &:active {
     opacity: 0.8;
   }
+  @include for-below-500 {
+    min-width: 250px;
+  }
+  &--aurora {
+    @extend .unclaimed-rewards-button;
+    background: $aurora;
+  }
+}
+
+.unclaimed-button-left {
+  display: flex;
+  align-items: center;
+}
+
+.unclaimed-image {
+  width: 41px;
+  margin: 0 0 5px 0;
+}
+
+.unclaimed-button-right {
+  display: flex;
+  align-items: center;
 }
