@@ -11,11 +11,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
-	moving_average "github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/compound"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
@@ -114,9 +112,6 @@ const (
 	// EnvPublishAmqpQueue name to use when sending server-tracked transfers
 	// to the client
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
-
-	// EnvMovingAverageRedisKey to track the APY moving average with
-	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
 )
 
 // AtxBufferSize to go back in time to count the average using the database
@@ -130,11 +125,8 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		keyMovingAverageApy      = util.GetEnvOrFatal(EnvMovingAverageRedisKey)
 
-		cTokenAddress_              = os.Getenv(EnvCTokenAddress)
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
-		aTokenAddress_              = os.Getenv(EnvATokenAddress)
 		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
 		ethTokenAddress_            = os.Getenv(EnvEthTokenAddress)
 		underlyingTokenAddress_     = os.Getenv(EnvUnderlyingTokenAddress)
@@ -172,9 +164,7 @@ func main() {
 
 	var (
 		ethContractAddress            ethCommon.Address
-		ethCTokenAddress              ethCommon.Address
 		ethUniswapAnchoredViewAddress ethCommon.Address
-		ethATokenAddress              ethCommon.Address
 		ethUsdTokenAddress            ethCommon.Address
 		ethEthTokenAddress            ethCommon.Address
 		ethUnderlyingTokenAddress     ethCommon.Address
@@ -186,24 +176,18 @@ func main() {
 
 	switch tokenBackend {
 	case BackendCompound:
-		var (
-			cTokenAddress              = mustEthereumAddressFromString(cTokenAddress_)
-			uniswapAnchoredViewAddress = mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
-		)
+		var uniswapAnchoredViewAddress = mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
 
-		ethCTokenAddress = hexToAddress(cTokenAddress)
 		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
 
 	case BackendAave:
 		var (
-			aTokenAddress              = mustEthereumAddressFromString(aTokenAddress_)
 			aaveAddressProviderAddress = mustEthereumAddressFromString(aaveAddressProviderAddress_)
 			usdTokenAddress            = mustEthereumAddressFromString(usdTokenAddress_)
 			ethTokenAddress            = mustEthereumAddressFromString(ethTokenAddress_)
 			underlyingTokenAddress     = mustEthereumAddressFromString(underlyingTokenAddress_)
 		)
 
-		ethATokenAddress = hexToAddress(aTokenAddress)
 		ethAaveAddressProviderAddress = hexToAddress(aaveAddressProviderAddress)
 		ethUsdTokenAddress = hexToAddress(usdTokenAddress)
 		ethUnderlyingTokenAddress = hexToAddress(underlyingTokenAddress)
@@ -211,12 +195,10 @@ func main() {
 
 	case BackendAurora:
 		var (
-			cTokenAddress    = mustEthereumAddressFromString(cTokenAddress_)
 			ethFluxAddress   = mustEthereumAddressFromString(ethFluxAddress_)
 			tokenFluxAddress = mustEthereumAddressFromString(tokenFluxAddress_)
 		)
 
-		ethCTokenAddress = hexToAddress(cTokenAddress)
 		auroraEthFluxAddress = hexToAddress(ethFluxAddress)
 		auroraTokenFluxAddress = hexToAddress(tokenFluxAddress)
 
@@ -402,53 +384,6 @@ func main() {
 
 		ethPriceUsd.Quo(ethPriceUsd, EthereumDecimalPlaces)
 
-		var tokenApy *big.Rat
-
-		switch tokenBackend {
-		case BackendAurora:
-			fallthrough
-
-		case BackendCompound:
-			tokenApy, err = compound.GetTokenApy(
-				gethClient,
-				ethCTokenAddress,
-				CompoundBlocksPerDay,
-				emission,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to look up the APY using CToken address %#v! %v",
-						ethCTokenAddress,
-						err,
-					)
-				})
-			}
-		case BackendAave:
-			tokenApy, err = aave.GetTokenApy(
-				gethClient,
-				ethAaveAddressProviderAddress,
-				ethUnderlyingTokenAddress,
-				emission,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to look up the APY using AToken address %#v! %v",
-						ethATokenAddress,
-						err,
-					)
-				})
-			}
-		}
-
-		tokenApyAverage, err := moving_average.StoreAndCalculateRat(
-			keyMovingAverageApy,
-			tokenApy,
-		)
-
 		var tokenPriceInUsdt *big.Rat
 
 		switch tokenBackend {
@@ -513,73 +448,6 @@ func main() {
 			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
 		}
 
-		// if the token apy is below the average, then we take the current apy
-		// instead of the average, otherwise, the average apy will be passed to
-		// the trf, causing an overestimation of Compound's APY on the block
-
-		var currentTokenApy *big.Rat
-
-		if tokenApy.Cmp(tokenApyAverage) < 0 {
-
-			currentTokenApy = tokenApy
-
-		} else {
-
-			currentTokenApy = tokenApyAverage
-
-		}
-
-		currentApyInUsdt := new(big.Rat).Mul(currentTokenApy, tokenPriceInUsdt)
-
-		// we must normalise the value here
-
-		currentApyInUsdt.Quo(currentApyInUsdt, underlyingTokenDecimalsRat)
-
-		bpy := probability.CalculateBpy(secondsSinceLastBlock, currentApyInUsdt, emission)
-
-		var balanceOfUnderlying *big.Rat
-
-		switch tokenBackend {
-		case BackendAurora:
-			fallthrough
-
-		case BackendCompound:
-			balanceOfUnderlying, err = compound.GetBalanceOfUnderlying(
-				gethClient,
-				ethCTokenAddress,
-				ethContractAddress,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get the underlying compound balance in the Fluidity contract! Address %#v!",
-						contractAddress,
-					)
-
-					k.Payload = err
-				})
-			}
-
-		case BackendAave:
-			balanceOfUnderlying, err = aave.GetBalanceOf(
-				gethClient,
-				ethATokenAddress,
-				ethContractAddress,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get the underlying aave balance in the Fluidity contract! Address %#v!",
-						contractAddress,
-					)
-
-					k.Payload = err
-				})
-			}
-		}
-
 		sizeOfThePool, err := fluidity.GetRewardPool(
 			gethClient,
 			ethContractAddress,
@@ -599,13 +467,6 @@ func main() {
 		// normalise the size of the pool and the balance of the underlying to a normal number!
 
 		sizeOfThePool.Quo(sizeOfThePool, underlyingTokenDecimalsRat)
-
-		balanceOfUnderlying.Quo(balanceOfUnderlying, underlyingTokenDecimalsRat)
-
-		bpyStakedUsd := probability.CalculateBpyStakedUnderlyingAsset(
-			bpy,
-			balanceOfUnderlying,
-		)
 
 		var blockAnnouncements []worker.EthereumAnnouncement
 
@@ -660,7 +521,7 @@ func main() {
 			randomN, randomPayouts := probability.WinningChances(
 				transferFeeUsd,
 				currentAtx,
-				bpyStakedUsd,
+				new(big.Rat), // Unused (APY)
 				sizeOfThePool,
 				underlyingTokenDecimalsRat,
 				payoutFreq,

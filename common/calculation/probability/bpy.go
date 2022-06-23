@@ -19,11 +19,3 @@ func CalculateBpy(blockTimeInSeconds uint64, compSupplyApy *big.Rat, emission *w
 
 	return bpy
 }
-
-func CalculateBpyStakedUnderlyingAsset(bpy, sizeOfThePool *big.Rat) *big.Rat {
-	stakedUsd := new(big.Rat).Mul(bpy, sizeOfThePool)
-
-	bpyStakedUsd := new(big.Rat).Quo(stakedUsd, big.NewRat(100, 1))
-
-	return bpyStakedUsd
-}

@@ -39,7 +39,7 @@ func probability(m, n, b int64) *big.Rat {
 }
 
 // A / p(b)
-func payout(atx, apy, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b int64, blockTime uint64, emission *worker.Emission) *big.Rat {
+func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b int64, blockTime uint64, emission *worker.Emission) *big.Rat {
 	m := int64(winningClasses)
 
 	blockTimeRat := new(big.Rat).SetUint64(blockTime)
@@ -54,9 +54,8 @@ func payout(atx, apy, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n
 
 	a := new(big.Rat)
 
-	apyPlusDelta := new(big.Rat).Add(apy, delta)
-
-	if gTimesAtx.Cmp(apyPlusDelta) < 0 {
+	// TODO: Check comparison logic
+	if gTimesAtx.Cmp(delta) < 0 {
 
 		a = new(big.Rat).Quo(g, mRat)
 
@@ -64,7 +63,7 @@ func payout(atx, apy, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n
 
 		atxMulM := new(big.Rat).Mul(atx, mRat)
 
-		a = new(big.Rat).Quo(apyPlusDelta, atxMulM)
+		a = new(big.Rat).Quo(delta, atxMulM)
 
 	}
 
@@ -83,10 +82,7 @@ func payout(atx, apy, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n
 	emission.Payout.G, _ = g.Float64()
 	emission.Payout.B = b
 	emission.Payout.Delta, _ = delta.Float64()
-	emission.Payout.ApyPlusDelta, _ = apyPlusDelta.Float64()
 	emission.Payout.Atx, _ = atx.Float64()
-	emission.Payout.Apy, _ = apy.Float64()
-	emission.Payout.BpyForStakedUsd, _ = apy.Float64()
 	emission.Payout.BlockTime = blockTime
 	emission.Payout.RewardPool, _ = rewardPool.Float64()
 
@@ -145,7 +141,7 @@ func calculateN(winningClasses int, g, atx, payoutFreq *big.Rat, emission *worke
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight *big.Rat, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (uint, []*misc.BigInt) {
+func WinningChances(gasFee, atx, _, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight *big.Rat, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (uint, []*misc.BigInt) {
 
 	averageTransfersInBlock_ := intToRat(averageTransfersInBlock)
 
@@ -157,7 +153,6 @@ func WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat, pay
 
 		payout := payout(
 			averageTransfersInBlock_,
-			bpyStakedUsd,
 			gasFee,
 			rewardPool,
 			deltaWeight,
