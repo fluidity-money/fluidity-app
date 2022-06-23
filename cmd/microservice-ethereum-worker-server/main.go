@@ -176,7 +176,7 @@ func main() {
 
 	switch tokenBackend {
 	case BackendCompound:
-		var uniswapAnchoredViewAddress = mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
+		uniswapAnchoredViewAddress := mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
 
 		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
 
