@@ -1,7 +1,9 @@
 package worker
 
 import (
-	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"math/big"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -125,17 +127,16 @@ type (
 
 	// Decorator attached to a transfer
 	EthereumWorkerDecorator struct {
-		SenderUtilityMiningAmount    misc.BigInt `json:"sender_amount"`
-		RecipientUtilityMiningAmount misc.BigInt `json:"receiver_amount"`
+		// Application fee in USD
+		ApplicationFee *big.Rat `json:"application_fee"`
 	}
 
 	// Transfer with application information attached
 	EthereumDecoratedTransfer struct {
-		SenderAddress          ethereum.Address        `json:"sender_address"`
-		RecipientAddress       ethereum.Address        `json:"recipient_address"`
-		SenderWinningAmount    *misc.BigInt            `json:"sender_win_amount"`
-		RecipientWinningAmount *misc.BigInt            `json:"recipient_win_amount"`
-		Decorator              EthereumWorkerDecorator `json:"decorator"`
+		Transaction      ethereum.Transaction     `json:"transaction"`
+		SenderAddress    ethereum.Address         `json:"sender_address"`
+		RecipientAddress ethereum.Address         `json:"recipient_address"`
+		Decorator        *EthereumWorkerDecorator `json:"decorator"`
 	}
 
 	// Hinted block sent from the application server
@@ -155,17 +156,21 @@ type (
 		EthereumHintedBlock *EthereumHintedBlock `json:"hinted_block"`
 	}
 
-	// Announcement that the worker client receives, containing winning announcements
-	// as well as hinted application blocks
-	EthereumClientAnnouncement struct {
-		EthereumHintedBlock   *EthereumHintedBlock   `json:"hinted_block"`
-		EthereumAnnouncements []EthereumAnnouncement `json:"announcement"`
-	}
-
 	// An event the worker server sends for processing when it finds a log of interest
 	EthereumApplicationEvent struct {
-		ApplicationTransfers []libEthereum.Transfer `json:"application_transfers"`
-		BlockLog             EthereumBlockLog       `json:"block_log"`
+		ApplicationTransfers []EthereumApplicationTransfer `json:"application_transfers"`
+		BlockLog             EthereumBlockLog              `json:"block_log"`
+	}
+
+	// An individual log included in an application event
+	EthereumApplicationTransfer struct {
+		Transaction ethereum.Transaction
+		// the log classified as an application transfer
+		// to be processed by the application server
+		Log ethereum.Log
+		// an enum representing the application this
+		// transfer is produced by
+		Application applications.Application
 	}
 
 	// SolanaWinnerAnnouncement to use to report a winner and its randomness

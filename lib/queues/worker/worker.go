@@ -16,14 +16,14 @@ const (
 )
 
 type (
-	EthereumAnnouncement       = worker.EthereumAnnouncement
-	EthereumBlockLog           = worker.EthereumBlockLog
-	EthereumServerWork         = worker.EthereumServerWork
-	EthereumHintedBlock        = worker.EthereumHintedBlock
-	EthereumDecoratedTransfer  = worker.EthereumDecoratedTransfer
-	EthereumWorkerDecorator    = worker.EthereumWorkerDecorator
-	EthereumClientAnnouncement = worker.EthereumClientAnnouncement
-	EthereumApplicationEvent   = worker.EthereumApplicationEvent
+	EthereumAnnouncement        = worker.EthereumAnnouncement
+	EthereumBlockLog            = worker.EthereumBlockLog
+	EthereumServerWork          = worker.EthereumServerWork
+	EthereumHintedBlock         = worker.EthereumHintedBlock
+	EthereumDecoratedTransfer   = worker.EthereumDecoratedTransfer
+	EthereumWorkerDecorator     = worker.EthereumWorkerDecorator
+	EthereumApplicationEvent    = worker.EthereumApplicationEvent
+	EthereumApplicationTransfer = worker.EthereumApplicationTransfer
 
 	SolanaWinnerAnnouncement = worker.SolanaWinnerAnnouncement
 

@@ -1,12 +1,64 @@
 package main
 
 import (
+	"fmt"
+	"math/big"
+	"strconv"
+
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/util"
+)
+
+const (
+	// EnvContractAddress is the contract to call when a winner's been found!
+	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
+
+	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
+	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
+
+	// EnvUnderlyingTokenDecimals supported by the contract
+	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 )
 
 func main() {
+	var (
+		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
+		gethHttpUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
+	)
+
+	contractAddress := ethCommon.HexToAddress(contractAddrString)
+	tokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Underlying token decimals %#v is a malformed int!",
+				underlyingTokenDecimals_,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	gethClient, err := ethclient.Dial(gethHttpUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to connect to Geth Websocket!"
+			k.Payload = err
+		})
+	}
+
+	defer gethClient.Close()
+
 	worker.EthereumApplicationEvents(func(applicationEvent worker.EthereumApplicationEvent) {
 
 		var (
@@ -16,7 +68,7 @@ func main() {
 			// the block in question
 			applicationBlock = applicationEvent.BlockLog
 
-			// worker server has already found fluid transfers using the contract in this block
+			// worker server has already found application transfers using the contract in this block
 			fluidTransferCount = len(applicationTransfers)
 
 			// transfers that we're adding information to
@@ -26,20 +78,35 @@ func main() {
 		// loop over application events in the block, add payouts as decorator
 		for i, transfer := range applicationTransfers {
 
-			senderUtilityAmount, recipientUtilityAmount := governancePayoutCalculation()
+			fee, err := getApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
 
-			decorator := worker.EthereumWorkerDecorator{
-				SenderUtilityMiningAmount:    *senderUtilityAmount,
-				RecipientUtilityMiningAmount: *recipientUtilityAmount,
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to get the application fee for an application transfer!"
+					k.Payload = err
+				})
+			}
+
+			// TODO: how do we deposit liquidity as the result of an application event winning?
+			// (i.e. how does the worker client transfer to liquidity deposit)
+			toAddress, fromAddress, err := getApplicationTransferParties(transfer)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to get the sender and receiver for an application transfer!"
+					k.Payload = err
+				})
+			}
+
+			decorator := &worker.EthereumWorkerDecorator{
+				ApplicationFee: fee,
 			}
 
 			decoratedTransfer := worker.EthereumDecoratedTransfer{
-				SenderAddress:    transfer.FromAddress,
-				RecipientAddress: transfer.ToAddress,
-				// added by the worker client
-				SenderWinningAmount:    nil,
-				RecipientWinningAmount: nil,
-				Decorator:              decorator,
+				SenderAddress:    fromAddress,
+				RecipientAddress: toAddress,
+				Decorator:        decorator,
+				Transaction:      transfer.Transaction,
 			}
 
 			decoratedTransfers[i] = decoratedTransfer
@@ -61,7 +128,36 @@ func main() {
 	})
 }
 
-// governancePayoutCalculation that would determine how much the event has generated
-func governancePayoutCalculation() (*misc.BigInt, *misc.BigInt) {
-	panic("unimplemented!")
+// getApplicationFee to find the fee (in USD) paid by a user for the application interaction
+func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	switch transfer.Application {
+	case applications.UniswapV2:
+		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
+
+	default:
+		return nil, fmt.Errorf(
+			"Transfer #%v did not contain an application",
+			transfer,
+		)
+	}
+}
+
+// getApplicationTransferParties to find the parties considered for payout from an application interaction
+func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
+	var (
+		transaction = transfer.Transaction
+		nilAddress  libEthereum.Address
+	)
+
+	switch transfer.Application {
+	case applications.UniswapV2:
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
+		return transaction.From, transaction.To, nil
+
+	default:
+		return nilAddress, nilAddress, fmt.Errorf(
+			"Transfer #%v did not contain an application",
+			transfer,
+		)
+	}
 }

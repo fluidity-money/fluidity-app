@@ -33,7 +33,7 @@ client.
 | `FLU_ETHEREUM_ETH_DECIMAL_PLACES`           | Token decimals returned for the value of Eth by Flux oracles (usu. 8).        |
 | `FLU_ETHEREUM_AMQP_QUEUE_NAME`              | Queue name to send messages down from the worker server to the client.        |
 | `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY` | Moving average key to use to track the APY with using Redis.                  |
-| `FLU_ETHEREUM_APPLICATION_CONTRACTS`        | List of comma-separated contract addresses to track as applications.          |
+| `FLU_ETHEREUM_APPLICATION_CONTRACTS`        | List of comma-separated contract addresses to track as applications. (Uniswap pair contract, etc.)          |
 
 ## Building
 

@@ -29,30 +29,15 @@ func main() {
 
 	queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
 
-		var announcement worker.EthereumClientAnnouncement
-		message.Decode(&announcement)
+		var announcements []worker.EthereumAnnouncement
+		message.Decode(&announcements)
 
-		var (
-			announcements = announcement.EthereumAnnouncements
-			hintedBlock   = announcement.EthereumHintedBlock
-		)
-
-		switch true {
-		case len(announcements) > 0:
-			processAnnouncements(announcements, rewardsAmqpQueueName)
-
-		case hintedBlock != nil:
-			processHintedBlock(*hintedBlock)
-
-		default:
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Received empty announcement and no hinted blocks!"
-			})
-		}
+		processAnnouncements(announcements, rewardsAmqpQueueName)
 	})
 }
 
-// processAnnouncements to handle regular win announcements and determine their winning status
+// processAnnouncements to handle fluid transfer or application-based win
+// announcements and determine their winning status
 func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAmqpQueueName string) {
 	var winAnnouncements []worker.EthereumWinnerAnnouncement
 
@@ -139,13 +124,4 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 	}
 
 	queue.SendMessage(rewardsAmqpQueueName, winAnnouncements)
-}
-
-// processHintedBlock to handle a block containing information about governance payouts
-func processHintedBlock(hintedBlock worker.EthereumHintedBlock) {
-	// do something with the hinted block
-	log.App(func(k *log.Log) {
-		k.Message = "Received hinted block - ignoring!"
-		k.Payload = hintedBlock
-	})
 }
