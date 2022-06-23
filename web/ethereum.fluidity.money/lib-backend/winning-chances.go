@@ -46,9 +46,6 @@ var queryType = graphql.NewObject(
 					"atx": &graphql.ArgumentConfig{
 						Type: graphql.Float,
 					},
-					"bpyStakedUsd": &graphql.ArgumentConfig{
-						Type: graphql.Float,
-					},
 					"sizeOfThePool": &graphql.ArgumentConfig{
 						Type: graphql.Int,
 					},
@@ -76,11 +73,6 @@ var queryType = graphql.NewObject(
 					}
 
 					atx, ok := validArgFloat64toBigrat(p.Args, "atx")
-					if !ok {
-						return nil, err
-					}
-
-					bpyStakedUsd, ok := validArgFloat64toBigrat(p.Args, "bpyStakedUsd")
 					if !ok {
 						return nil, err
 					}
@@ -130,7 +122,6 @@ var queryType = graphql.NewObject(
 					randomN, randomPayouts := probability.WinningChances(
 						gasFee,
 						atx,
-						bpyStakedUsd,
 						sizeOfThePool,
 						underlyingTokenDecimalsRat,
 						payoutFreq,

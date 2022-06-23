@@ -141,7 +141,7 @@ func calculateN(winningClasses int, g, atx, payoutFreq *big.Rat, emission *worke
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, _, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight *big.Rat, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (uint, []*misc.BigInt) {
+func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight *big.Rat, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (uint, []*misc.BigInt) {
 
 	averageTransfersInBlock_ := intToRat(averageTransfersInBlock)
 

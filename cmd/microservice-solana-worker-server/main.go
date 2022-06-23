@@ -181,7 +181,6 @@ func main() {
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
 				atx,
-				new(big.Rat), // Unused APY
 				sizeOfThePool,
 				decimalPlacesRat,
 				payoutFreq,

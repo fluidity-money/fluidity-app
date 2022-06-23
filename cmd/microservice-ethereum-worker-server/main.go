@@ -521,7 +521,6 @@ func main() {
 			randomN, randomPayouts := probability.WinningChances(
 				transferFeeUsd,
 				currentAtx,
-				new(big.Rat), // Unused (APY)
 				sizeOfThePool,
 				underlyingTokenDecimalsRat,
 				payoutFreq,
