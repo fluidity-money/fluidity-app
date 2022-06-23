@@ -168,7 +168,7 @@
 }
 
 .mobile-address-btn {
-  align-self: flex-end;
+  align-self: center;
 }
 
 .selected {
@@ -333,4 +333,16 @@
 .network-icon {
   margin-right: 10px;
   width: 20px;
+}
+
+.margin-right {
+  margin-right: 7px;
+}
+
+.notification-button {
+  width: 46px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.6;
+  }
 }
