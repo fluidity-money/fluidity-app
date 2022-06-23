@@ -87,8 +87,6 @@ func main() {
 				})
 			}
 
-			// TODO: how do we deposit liquidity as the result of an application event winning?
-			// (i.e. how does the worker client transfer to liquidity deposit)
 			toAddress, fromAddress, err := getApplicationTransferParties(transfer)
 
 			if err != nil {
