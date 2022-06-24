@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	// EnvContractAddress is the contract to call when a winner's been found!
+	// EnvContractAddress is the application contract
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
