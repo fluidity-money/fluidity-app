@@ -291,23 +291,24 @@ func main() {
 			transfersInBlock int
 		)
 
-		if serverWork.EthereumBlockLog != nil {
-			// received from logs queue
+		switch true {
+		// received from logs queue
+		case serverWork.EthereumBlockLog != nil:
 			blockBaseFee = blockLog.BlockBaseFee
 			logs = blockLog.Logs
 			transactions = blockLog.Transactions
 			blockNumber = blockLog.BlockNumber
 			blockHash = blockLog.BlockHash
 
-		} else if serverWork.EthereumHintedBlock != nil {
-			// received from application server
+		// received from application server
+		case serverWork.EthereumHintedBlock != nil:
 			blockBaseFee = hintedBlock.BlockBaseFee
 			blockNumber = hintedBlock.BlockNumber
 			blockHash = hintedBlock.BlockHash
 			transfersInBlock = hintedBlock.TransferCount
 			fluidTransfers = hintedBlock.DecoratedTransfers
 
-		} else {
+		default:
 			log.Fatal(func(k *log.Log) {
 				k.Message = "Received empty work announcement!"
 			})
@@ -335,7 +336,10 @@ func main() {
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to get a fluid transfer!"
+					k.Format(
+						"Failed to get a fluid transfer in block %#v!",
+						blockHash,
+					)
 					k.Payload = err
 				})
 			}
@@ -350,7 +354,10 @@ func main() {
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to get application events!"
+					k.Format(
+						"Failed to get application events in block %#v!",
+						blockHash,
+					)
 					k.Payload = err
 				})
 			}
@@ -361,6 +368,13 @@ func main() {
 			}
 
 			if len(applicationTransfers) > 0 {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Found %v application events in block #%v, sending them to the application server!",
+						len(applicationTransfers),
+						blockHash,
+					)
+				})
 				queue.SendMessage(worker.TopicEthereumApplicationEvents, applicationEvent)
 			}
 

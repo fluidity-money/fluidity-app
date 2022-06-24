@@ -1,10 +1,13 @@
 package applications
 
+// Enum that represents supported applications on Ethereum, used to obtain
+// application-specific information like fees and senders/recipients.
 type Application int64
 
 const (
-	None Application = iota
-	UniswapV2
+	// ApplicationNone is the nil value representing an invalid application.
+	ApplicationNone Application = iota
+	ApplicationUniswapV2
 )
 
 const (

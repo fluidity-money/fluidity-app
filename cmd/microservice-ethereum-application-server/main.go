@@ -129,7 +129,7 @@ func main() {
 // getApplicationFee to find the fee (in USD) paid by a user for the application interaction
 func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	switch transfer.Application {
-	case applications.UniswapV2:
+	case applications.ApplicationUniswapV2:
 		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
 
 	default:
@@ -140,7 +140,10 @@ func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 	}
 }
 
-// getApplicationTransferParties to find the parties considered for payout from an application interaction
+// getApplicationTransferParties to find the parties considered for payout from an application interaction.
+// In the case of an AMM (such as Uniswap) the transaction sender receives the majority payout every time,
+// with the recipient tokens being effectively burnt (sent to the contract). In the case of a P2P swap,
+// such as a DEX, the party sending the fluid tokens receives the majority payout.
 func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
 		transaction = transfer.Transaction
@@ -148,7 +151,7 @@ func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 	)
 
 	switch transfer.Application {
-	case applications.UniswapV2:
+	case applications.ApplicationUniswapV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		return transaction.From, transaction.To, nil
 

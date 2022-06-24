@@ -125,7 +125,8 @@ type (
 		BlockNumber  misc.BigInt            `json:"block_number"`
 	}
 
-	// Decorator attached to a transfer
+	// Decorator attached to a transfer, able to be expanded to
+	// include application data as needed
 	EthereumWorkerDecorator struct {
 		// Application fee in USD
 		ApplicationFee *big.Rat `json:"application_fee"`
@@ -133,7 +134,10 @@ type (
 
 	// Transfer with application information attached
 	EthereumDecoratedTransfer struct {
-		Transaction      ethereum.Transaction     `json:"transaction"`
+		// Transaction containing the event
+		Transaction ethereum.Transaction `json:"transaction"`
+		// Parties involved in the swap, where sender recieves the majority
+		// of a potential reward, and one party could be a smart contract
 		SenderAddress    ethereum.Address         `json:"sender_address"`
 		RecipientAddress ethereum.Address         `json:"recipient_address"`
 		Decorator        *EthereumWorkerDecorator `json:"decorator"`

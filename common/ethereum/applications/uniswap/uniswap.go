@@ -166,22 +166,30 @@ func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	// fluid index 0  x, 0, 0, y = swapping x fluid for y token
 	// fluid index 1  0, x, y, 0 = swapping x fluid for y token
 	// fluid index 1  x, 0, 0, y = swapping x token for y fluid
-	if token0addr == fluidTokenContract {
-		if amount0in.Cmp(zeroRat) == 0 {
-			inTokenIsFluid = false
-			fluidTransferAmount = amount0out
-		} else {
-			inTokenIsFluid = true
-			fluidTransferAmount = amount0in
-		}
-	} else {
-		if amount0in.Cmp(zeroRat) == 0 {
-			inTokenIsFluid = true
-			fluidTransferAmount = amount1in
-		} else {
-			inTokenIsFluid = false
-			fluidTransferAmount = amount1out
-		}
+
+	var (
+		// Whether token0 is the fluid token
+		fluidIndex0 = token0addr == fluidTokenContract
+		// Whether amount0 is equal to zero
+		amount0IsZero = amount0in.Cmp(zeroRat) == 0
+	)
+
+	switch true {
+	case fluidIndex0 && amount0IsZero:
+		inTokenIsFluid = false
+		fluidTransferAmount = amount0out
+
+	case fluidIndex0 && !amount0IsZero:
+		inTokenIsFluid = true
+		fluidTransferAmount = amount0in
+
+	case !fluidIndex0 && amount0IsZero:
+		inTokenIsFluid = true
+		fluidTransferAmount = amount1in
+
+	case !fluidIndex0 && !amount0IsZero:
+		inTokenIsFluid = false
+		fluidTransferAmount = amount1out
 	}
 
 	// if trading x fUSDC -> y Token B

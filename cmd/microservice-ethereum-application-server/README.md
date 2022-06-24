@@ -1,7 +1,8 @@
 
 # microservice-ethereum-application-server
 
-Receives and process blocks containing application logs of interest.
+Receives and processes logs for supported applications, then returns them to the
+worker with additional information attached.
 
 Supported contracts:
   - Uniswap V2

@@ -207,9 +207,9 @@ func IsTransferLogTopic(topic string) bool {
 func ClassifyApplicationLogTopic(topic string) applications.Application {
 	switch topic {
 	case applications.UniswapSwapLogTopic:
-		return applications.UniswapV2
+		return applications.ApplicationUniswapV2
 	default:
-		return applications.None
+		return applications.ApplicationNone
 	}
 }
 
