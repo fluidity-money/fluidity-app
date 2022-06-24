@@ -65,7 +65,7 @@ contract Token is IERC20 {
 
     /// @dev amount a user has manually rewarded, to be removed from their batched rewards
     /// @dev [address] => [amount manually rewarded]
-    mapping (address => uint) private manualRewards_;
+    mapping (address => uint) private manualRewardDebt_;
 
     /**
      * @notice initializer function - sets the contract's data
@@ -204,12 +204,12 @@ contract Token is IERC20 {
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
 
-            if (manualRewards_[winner.winner] != 0) {
-                uint amount = winner.amount > manualRewards_[winner.winner] ?
-                    manualRewards_[winner.winner] :
+            if (manualRewardDebt_[winner.winner] != 0) {
+                uint amount = winner.amount > manualRewardDebt_[winner.winner] ?
+                    manualRewardDebt_[winner.winner] :
                     winner.amount;
                 winner.amount -= amount;
-                manualRewards_[winner.winner] -= amount;
+                manualRewardDebt_[winner.winner] -= amount;
             }
 
             require(poolAmount >= winner.amount, "reward pool empty");
@@ -274,7 +274,7 @@ contract Token is IERC20 {
 
         manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
         manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
-        manualRewards_[winner] += winAmount;
+        manualRewardDebt_[winner] += winAmount;
 
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 
