@@ -231,6 +231,8 @@ contract Token is IERC20 {
      * @param sig the signature of the above parameters, provided by the oracle
      */
     function manualReward(
+        address contractAddress,
+        uint256 chainid,
         address winner,
         uint256 winAmount,
         uint firstBlock,
@@ -240,7 +242,14 @@ contract Token is IERC20 {
         require(sig.length == 65, "invalid rng format (length)");
         // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
         //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
-        bytes32 hash = keccak256(abi.encode(winner, winAmount, firstBlock, lastBlock));
+        bytes32 hash = keccak256(abi.encode(
+            contractAddress,
+            chainid,
+            winner,
+            winAmount,
+            firstBlock,
+            lastBlock
+        ));
 
         // ECDSA verification
         // TODO: Get a proper audit here
@@ -257,6 +266,9 @@ contract Token is IERC20 {
         require(ecrecover(hash, v, r, s) == rngOracle_, "invalid rng signature");
 
         // now reward the user
+
+        require(contractAddress == address(this), "payload is for the wrong contract");
+        require(chainid == block.chainid, "payload is for the wrong chain");
 
         // user decided to frontrun
         require(

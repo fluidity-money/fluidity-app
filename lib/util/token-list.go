@@ -6,12 +6,14 @@ import (
 	"strconv"
 	"strings"
 
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 // TokenDetailsBase for the minimum token information, used currently by
 // microservice-common-count-wins
 type TokenDetailsBase struct {
+	TokenAddress  ethCommon.Address
 	TokenDecimals *big.Rat
 	TokenName     string
 }
@@ -32,7 +34,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) < 2 {
+		if len(tokenDetails_) < 3 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",
@@ -42,10 +44,12 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		}
 
 		var (
-			_         = trimWhitespace(tokenDetails_[0])
-			tokenName = trimWhitespace(tokenDetails_[1])
-			decimals_ = trimWhitespace(tokenDetails_[2])
+			tokenAddress = trimWhitespace(tokenDetails_[0])
+			tokenName    = trimWhitespace(tokenDetails_[1])
+			decimals_    = trimWhitespace(tokenDetails_[2])
 		)
+
+		address := ethCommon.HexToAddress(tokenAddress)
 
 		decimals, err := strconv.Atoi(decimals_)
 
@@ -65,6 +69,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 		tokenDetail := TokenDetailsBase{
+			TokenAddress:  address,
 			TokenName:     tokenName,
 			TokenDecimals: decimalsRat,
 		}

@@ -3,9 +3,12 @@ package main
 import (
 	"github.com/fluidity-money/fluidity-app/web/ethereum.fluidity.money/lib-backend"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
 )
@@ -14,10 +17,33 @@ const (
 	// EnvWorkerKeyList to read supported tokend and their associated
 	// private keys for signing random numbers with
 	EnvWorkerKeyList = `FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST`
+
+	// EnvChainId of the chain this api is running for
+	// to properly nonce manual rewards
+	EnvChainId = `FLU_ETHEREUM_CHAIN_ID`
+
+	// EnvTokenList to fetch the contract address
+	// to properly nonce manual rewards
+	EnvTokenList = `FLU_ETHEREUM_TOKENS_LIST`
 )
 
 func main() {
-	keys := mustParseKeyListFromEnv(EnvWorkerKeyList)
+	var (
+		keys = mustParseKeyListFromEnv(EnvWorkerKeyList)
+		chainidString = util.GetEnvOrFatal(EnvChainId)
+		tokenListString = util.GetEnvOrFatal(EnvTokenList)
+
+		tokenList = util.GetTokensListBase(tokenListString)
+	)
+
+	chainid, err := misc.BigIntFromString(chainidString)
+
+	if err != nil {
+	   log.Fatal(func (k *log.Log) {
+	       k.Message = "Failed to parse chainid from env!"
+	       k.Payload = err
+	   })
+	}
 
 	updateMessagesEthereum := make(chan interface{})
 
@@ -33,7 +59,7 @@ func main() {
 
 	web.JsonEndpoint("/pending-rewards", api_fluidity_money.HandlePendingRewards)
 
-	manualRewardHandler := api_fluidity_money.GetManualRewardHandler(keys)
+	manualRewardHandler := api_fluidity_money.GetManualRewardHandler(tokenList, chainid, keys)
 
 	web.JsonEndpoint("/manual-reward", manualRewardHandler)
 
