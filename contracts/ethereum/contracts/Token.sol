@@ -6,11 +6,6 @@ import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 import "./LiquidityProvider.sol";
 
-/// @dev sentinel to mark the start of a range iin rewardedBlocks
-uint constant FIRST_REWARDED_BLOCK = 1;
-/// @dev sentinel to mark the end of a range iin rewardedBlocks
-uint constant LAST_REWARDED_BLOCK = 2;
-
 /// @dev parameter for the batchReward function
 struct Winner {
     address winner;
@@ -55,12 +50,12 @@ contract Token is IERC20 {
     /// @dev deprecated
     mapping (bytes32 => uint) private pastRewards_;
 
-    /// @dev [block number] => [rewarded block state]
+    /// @dev [block number] => [1 if it's the start of a batch reward range]
     mapping(uint => uint) rewardedBlocks_;
 
     uint lastRewardedBlock_;
 
-    /// @dev [address] => [[block number] => [rewarded block state]]
+    /// @dev [address] => [[block number] => [1 if it's the start or end of a manual reward range]]
     mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
 
     /// @dev amount a user has manually rewarded, to be removed from their batched rewards
@@ -271,6 +266,7 @@ contract Token is IERC20 {
 
         manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
         manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
+
         manualRewardDebt_[winner] += winAmount;
 
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
