@@ -5,11 +5,11 @@ package moving_average
 
 import (
 	"fmt"
-	"strconv"
 	"math/big"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/state"
-	)
+)
 
 // BufferSize to use when storing the ring buffer
 const BufferSize = 500
@@ -28,19 +28,19 @@ func CalculateMovingAverage(key string) (*int, error) {
 	valuesBytesLen := len(valuesBytes)
 
 	if valuesBytesLen > BufferSize {
-			state.Rpop(key)
-		}
+		state.Rpop(key)
+	}
 
 	// avoid dividing by zero if no bytes are stored
 	if valuesBytesLen == 0 {
-			zero := 0
-			return &zero, nil
-		}
+		zero := 0
+		return &zero, nil
+	}
 
 	var average int
 
 	for _, valueBytes := range valuesBytes {
-	
+
 		s := string(valueBytes)
 
 		value, err := strconv.Atoi(s)
@@ -70,23 +70,23 @@ func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 	valuesBytesLenRat := new(big.Rat).SetInt64(int64(valuesBytesLen))
 
 	if valuesBytesLen > BufferSize {
-			state.Rpop(key)
-		}
+		state.Rpop(key)
+	}
 
 	// avoid dividing by zero if no bytes are stored
 	if valuesBytesLen == 0 {
-			zero := big.NewRat(0, 1)
-			return zero, nil
-		}
+		zero := big.NewRat(0, 1)
+		return zero, nil
+	}
 
 	average := new(big.Rat)
 
 	for _, valueBytes := range valuesBytes {
-	
+
 		s := string(valueBytes)
 
 		rat, success := new(big.Rat).SetString(s)
-	
+
 		if !success {
 			return nil, fmt.Errorf(
 				"%#v is not a rational number!",
@@ -102,7 +102,6 @@ func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 	return average, nil
 }
 
-
 // StoreAndCalculate the moving average by storing the amount then doing
 // the calculation
 func StoreAndCalculate(key string, x int) (*int, error) {
@@ -115,4 +114,3 @@ func StoreAndCalculateRat(key string, x *big.Rat) (*big.Rat, error) {
 	StoreValue(key, s)
 	return CalculateMovingAverageRat(key)
 }
-
