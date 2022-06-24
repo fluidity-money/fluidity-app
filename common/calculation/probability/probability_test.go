@@ -154,7 +154,18 @@ func TestWinningChances(t *testing.T) {
 	expectedPayouts = append(expectedPayouts, &d)
 	expectedPayouts = append(expectedPayouts, &e)
 
-	n, payouts := WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight, winningClasses, averageTransfersInBlock, blockTimeInSeconds, emission)
+	n, payouts := WinningChances(
+		gasFee,
+		atx,
+		rewardPool,
+		decimalPlacesRat,
+		payoutFreq,
+		deltaWeight,
+		winningClasses,
+		averageTransfersInBlock,
+		blockTimeInSeconds,
+		emission,
+	)
 
 	assert.Equal(t, expectedN, n)
 	assert.Equal(t, expectedPayouts, payouts)
