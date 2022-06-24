@@ -239,7 +239,6 @@ contract Token is IERC20 {
         uint lastBlock,
         bytes memory sig
     ) external {
-        require(sig.length == 65, "invalid rng format (length)");
         // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
         //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
         bytes32 hash = keccak256(abi.encode(
@@ -252,18 +251,7 @@ contract Token is IERC20 {
         ));
 
         // ECDSA verification
-        // TODO: Get a proper audit here
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-        assembly {
-            r := mload(add(sig, 0x20))
-            s := mload(add(sig, 0x40))
-            v := byte(0, mload(add(sig, 0x60)))
-        }
-        if (v < 27) v += 27;
-
-        require(ecrecover(hash, v, r, s) == rngOracle_, "invalid rng signature");
+        require(recover(hash, sig) == rngOracle_, "invalid rng signature");
 
         // now reward the user
 
@@ -291,6 +279,51 @@ contract Token is IERC20 {
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 
         rewardFromPool(firstBlock, lastBlock, winner, winAmount);
+    }
+
+    /**
+     * @dev ECrecover with checks for signature mallmalleability
+     * @dev adapted from openzeppelin's ECDSA library
+     */
+    function recover(
+        bytes32 hash,
+        bytes memory signature
+    ) internal pure returns (address) {
+        require(signature.length == 65, "invalid rng format (length)");
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        // ecrecover takes the signature parameters, and the only way to get them
+        // currently is to use assembly.
+        /// @solidity memory-safe-assembly
+        assembly {
+            r := mload(add(signature, 0x20))
+            s := mload(add(signature, 0x40))
+            v := byte(0, mload(add(signature, 0x60)))
+        }
+        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
+        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
+        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
+        // signatures from current libraries generate a unique signature with an s-value in the lower half order.
+        //
+        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
+        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
+        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
+        // these malleable signatures as well.
+        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+            revert("invalid signature (s)");
+        }
+        if (v != 27 && v != 28) {
+            revert("invalid signature (v)");
+        }
+
+        // If the signature is valid (and not malleable), return the signer address
+        address signer = ecrecover(hash, v, r, s);
+        if (signer == address(0)) {
+            revert("invalid signature");
+        }
+
+        return signer;
     }
 
     // remaining functions are taken from OpenZeppelin's ERC20 implementation
