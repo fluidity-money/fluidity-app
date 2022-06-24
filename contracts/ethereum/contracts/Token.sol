@@ -205,11 +205,8 @@ contract Token is IERC20 {
             Winner memory winner = rewards[i];
 
             if (manualRewardDebt_[winner.winner] != 0) {
-                uint amount = winner.amount > manualRewardDebt_[winner.winner] ?
-                    manualRewardDebt_[winner.winner] :
-                    winner.amount;
-                winner.amount -= amount;
-                manualRewardDebt_[winner.winner] -= amount;
+                winner.amount -= manualRewardDebt_[winner.winner];
+                manualRewardDebt_[winner.winner] = 0;
             }
 
             require(poolAmount >= winner.amount, "reward pool empty");
