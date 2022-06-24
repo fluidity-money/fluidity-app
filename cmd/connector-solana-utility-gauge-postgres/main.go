@@ -180,6 +180,10 @@ func main() {
 
 				if err != nil {
 					if errors.Is(err, solanaRpc.ErrNotFound) {
+						log.Debug(func(k *log.Log) {
+							k.Format("could not find epochGauge at account %v (derived from %v, at epoch %v)!", epochGaugePubkey, gaugePubkey, epoch)
+						})
+
 						continue
 					}
 
