@@ -17,10 +17,11 @@ import { trimAddress } from "util/addresses";
 import NetworkButton from "components/Button/NetworkButton";
 import { appTheme } from "util/appTheme";
 import ChainId, { chainIdFromEnv } from "util/chainId";
-import {apiPOSTBody} from "util/api";
-import {ethers} from "ethers";
-import {B64ToUint8Array} from "util/conversion"
+import { apiPOSTBody } from "util/api";
+import { ethers } from "ethers";
+import { B64ToUint8Array } from "util/conversion";
 import Routes from "util/api/types";
+import NotificationButton from "components/Button/NotificationButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -36,7 +37,9 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   const [address, setAddress] = useState(wallet.account || "Loading...");
 
   const [showPendingWins, setShowPendingWins] = useState(false);
-  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>([])
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>(
+    []
+  );
 
   const modalToggle = () => {
     setToggle(!toggle);
@@ -83,15 +86,14 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
     setActive((_active) => wallet.status === "connected");
   }, [wallet.status]);
 
-  const aurora = chainIdFromEnv() === ChainId.AuroraMainnet ? "--aurora" : "";
+  const fetchPendingWins = async () => {
+    if (!wallet.account) return;
 
-  const fetchPendingWins = async() => {
-    if (!wallet.account)
-      return;
-
-    const pending = await apiPOSTBody('/pending-rewards', {address: wallet.account});
+    const pending = await apiPOSTBody("/pending-rewards", {
+      address: wallet.account,
+    });
     setPendingWins(pending);
-  }
+  };
 
   return (
     <Media queries={{ small: { maxWidth: 890 } }}>
@@ -139,13 +141,16 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 priviledge={1}
               />
               <Button
-                label={`${pendingWins.length > 0 ? "Show" : "Fetch"} Pending Wins`}
-                theme={`primary-text${aurora}`}
+                label={`${
+                  pendingWins.length > 0 ? "Show" : "Fetch"
+                } Pending Wins`}
+                theme={`primary-text${appTheme}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
-                goto={() => pendingWins.length > 0 ?
-                  setShowPendingWins(true) :
-                  fetchPendingWins()
+                goto={() =>
+                  pendingWins.length > 0
+                    ? setShowPendingWins(true)
+                    : fetchPendingWins()
                 }
                 selected={false}
                 auth={active}
@@ -164,12 +169,14 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
                     label="Enable Notifications"
-                    theme={`primary-button${appTheme}--toolbar mx-1-r`}
+                    theme={`primary-button${appTheme}--toolbar margin-right`}
                     goto={checkNotifications}
                     padding="p-0_5"
                   />
                 </EnabledButton>
               }
+              <NotificationButton />
+              <NetworkButton />
               {active ? (
                 <div
                   className="flex row align mobile-address-btn"
@@ -181,7 +188,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                     goto={() => {
                       setToggle(true);
                     }}
-                    padding="p-0_5"
+                    padding="py-0_5"
                   />
                   <Icon src="i-wallet-arrow" />
                 </div>
@@ -195,15 +202,14 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                   padding="p-0_5"
                 />
               )}
-              <NetworkButton />
             </div>
-              <PendingWinsModal
-                enable={showPendingWins}
-                toggle={() => setShowPendingWins(!showPendingWins)}
-                provider={wallet.ethereum}
-                pendingWins={pendingWins}
-                fetchNew={fetchPendingWins}
-              />
+            <PendingWinsModal
+              enable={showPendingWins}
+              toggle={() => setShowPendingWins(!showPendingWins)}
+              provider={wallet.ethereum}
+              pendingWins={pendingWins}
+              fetchNew={fetchPendingWins}
+            />
 
             {active ? (
               <WalletConnectedModal

@@ -23,7 +23,7 @@
     "symbol": "fUSDT",
     "name": "FLUID USD Tether",
     "address": "0xc0E8cD3538ba67179724f0d913907b96E6c6DDE8",
-    "colour": "#rgb(36, 163, 124)",
+    "colour": "rgb(36, 163, 124)",
     "image": "img/TokenIcons/usdtIcon.svg",
     "decimals": 6,
     "amount": "0.0",

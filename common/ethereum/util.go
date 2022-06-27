@@ -48,6 +48,30 @@ func CoerceBoundContractResultsToRat(results []interface{}) (*big.Rat, error) {
 	return resultRat, nil
 }
 
+// Wrap CoerceBoundContractResultsToRat to handle an array of results
+func CoerceBoundContractResultsToRats(results []interface{}) ([]*big.Rat, error) {
+	var (
+		rats = make([]*big.Rat, len(results))
+
+		// coercion function expects a slice with 1 element
+		wrapped = make([]interface{}, 1)
+	)
+
+	for i, result := range results {
+		wrapped[0] = result
+
+		resultRat, err := CoerceBoundContractResultsToRat(wrapped)
+
+		if err != nil {
+			return nil, err
+		}
+
+		rats[i] = resultRat
+	}
+
+	return rats, nil
+}
+
 func CoerceBoundContractResultsToAddress(results []interface{}) (ethCommon.Address, error) {
 	var result ethCommon.Address
 
@@ -68,7 +92,7 @@ func CoerceBoundContractResultsToAddress(results []interface{}) (ethCommon.Addre
 }
 
 func CoerceBoundContractResultsToUint8(results []interface{}) (uint8, error) {
-	var	result uint8
+	var result uint8
 
 	if resultsLen := len(results); resultsLen != 1 {
 		return result, fmt.Errorf(
