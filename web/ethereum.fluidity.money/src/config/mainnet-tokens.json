@@ -57,7 +57,7 @@
     "image": "img/TokenIcons/fraxIcon.svg",
     "decimals": 18,
     "amount": "0.0",
-    "pinned": false 
+    "pinned": false
   },
   {
     "symbol": "UST",
@@ -73,7 +73,7 @@
     "symbol": "fUSDT",
     "name": "FLUID USD Tether",
     "address": "0x777B135370b35737655a3BA7ca85bD0F08502313",
-    "colour": "#rgb(36, 163, 124)",
+    "colour": "rgb(36, 163, 124)",
     "image": "img/TokenIcons/usdtIcon.svg",
     "decimals": 6,
     "amount": "0.0",
