@@ -203,6 +203,16 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
   -webkit-text-fill-color: transparent;
 }
 
+.grey-primary-text {
+  @extend .primary-text;
+  background: #828a90;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 0.8rem;
+  text-align: start;
+}
+
 // font sizing
 
 // $f-sizing: (xx-small, x-small, small, smaller, medium, x-large, xx-large);

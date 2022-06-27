@@ -1,12 +1,16 @@
 import CurrencyListing from "./CurrencyListing";
 import DoughnutGraph from "components/Charts/DoughnutChart";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useEffect } from "react";
 import getWalletSPLStatus from "util/getWalletSPLStatus";
-import { walletDataType } from "util/getWalletSPLStatus"
-import _ from 'lodash';
-import {useSolana} from "@saberhq/use-solana";
-import {useFluidToken} from "util/hooks";
+import { walletDataType } from "util/getWalletSPLStatus";
+import _ from "lodash";
+import { useSolana } from "@saberhq/use-solana";
+import { useFluidToken } from "util/hooks";
+import ToggleButton from "components/Button/ToggleButton";
+import UnclaimedRewardsbutton from "components/Button/UnclaimedRewardsButton";
+import SmallLineGraph from "components/Charts/SmallLineChart";
+import LineGraph from "components/Charts/LineChart";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -14,65 +18,164 @@ const CurrencyBreakdown = () => {
   const [walletData, setWalletData] = useState<walletDataType[]>([]);
   const [walletTypes, setWalletTypes] = useState<string[]>([]);
   const [walletAmounts, setWalletAmounts] = useState<string[]>([]);
+  const [fluidColours, setFluidColours] = useState<string[]>([]);
+  const [fluidWalletTypes, setFluidWalletTypes] = useState<string[]>([]);
+  const [fluidWalletAmounts, setFluidWalletAmounts] = useState<string[]>([]);
+  // used to toggle which chart and currencies are displayed
+  const [fluid, setFluid] = useState(true);
+
   const sol = useSolana();
-  const {tokens, fluidTokensList, nonFluidTokensList} = useFluidToken();
+  const { tokens, fluidTokensList, nonFluidTokensList } = useFluidToken();
 
   // Renders out Wallet Token Data if signer connected
   useEffect(() => {
-    if (sol.connected && tokens) 
-      getWalletSPLStatus(sol, tokens, fluidTokensList, nonFluidTokensList).then(status => setWalletData(status));
-    else {
+    if (sol.connected && tokens) {
+      getWalletSPLStatus(sol, tokens, fluidTokensList, nonFluidTokensList).then(
+        (status) => setWalletData(status)
+      );
+    } else {
       // Render no wallet data case here
     }
-  },[sol.connected, tokens])
+  }, [fluidTokensList, nonFluidTokensList, sol, sol.connected, tokens]);
+
+  // both filter functions also sort tokens in alphabetical order
+  const filterFluid = () => {
+    return walletData
+      .sort((a, b) => a.type.localeCompare(b.type))
+      .filter((token) => token.type.startsWith("f"));
+  };
+
+  const filterRegular = () => {
+    return walletData
+      .sort((a, b) => a.type.localeCompare(b.type))
+      .filter((token) => !token.type.startsWith("f"));
+  };
+
+  const distributeWalletData = () => {
+    setWalletTypes(_.map(filterRegular(), "type"));
+    setWalletAmounts(_.map(filterRegular(), "amount"));
+    setColours(_.map(filterRegular(), "colour"));
+    setFluidWalletTypes(_.map(filterFluid(), "type"));
+    setFluidWalletAmounts(_.map(filterFluid(), "amount"));
+    setFluidColours(_.map(filterFluid(), "colour"));
+  };
 
   useEffect(() => {
-    if (walletData.length == 0) {
+    if (walletData.length === 0) {
       return;
     }
-
-    // Distribute walletData for graph render
-    setWalletTypes(_.map(walletData, 'type'));
-    setWalletAmounts(_.map(walletData, 'amount'));
-    setColours(_.map(walletData, 'colour'));
+    // distributes wallet data for fluid and non fluid donut charts
+    distributeWalletData();
   }, [walletData]);
 
-  const renderedCurrencyList = walletData.map((token, index) => {
+  const currencies = fluid ? filterFluid() : filterRegular();
+  const renderedCurrencyList = currencies.map((token, index) => {
     const currencyType = token.type.toString();
-    return <CurrencyListing currency={currencyType} amount={token.amount} key={token.type + index}></CurrencyListing>
-  })
+    return (
+      <div className="currency-container">
+        <CurrencyListing
+          currency={currencyType}
+          amount={token.amount}
+          key={token.type + index}
+        />
+        <hr className="currency-line" />
+      </div>
+    );
+  });
 
-    const Donut = useMemo(() =>
-    <DoughnutGraph
-      data={walletAmounts.length !== 0 ? walletAmounts : ["0"]}
-      labels={walletTypes.length !== 0 ? walletTypes : ["N/A"]}
-      colours={colours.length !== 0 ? colours : ["rgb(0,0,0)"]}
-    />
+  // calculates total wallet amount
+  const calculateTotal = (tokens: walletDataType[]) => {
+    return tokens
+      .reduce((previous, current) => previous + Number(current.amount), 0)
+      .toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+  };
 
-    , [walletAmounts, walletTypes, colours]);
+  // total amount for Fluid assets
+  const totalFluid = useMemo(() => calculateTotal(filterFluid()), [walletData]);
 
+  // total amount for Regular assets
+  const totalRegular = useMemo(
+    () => calculateTotal(filterRegular()),
+    [walletData]
+  );
+
+  const DonutFluid = useMemo(
+    () => (
+      <DoughnutGraph
+        data={fluidWalletAmounts.length !== 0 ? fluidWalletAmounts : ["0"]}
+        labels={fluidWalletTypes.length !== 0 ? fluidWalletTypes : ["N/A"]}
+        colours={fluidColours.length !== 0 ? fluidColours : ["rgb(0,0,0)"]}
+      />
+    ),
+
+    [fluidWalletAmounts, fluidWalletTypes, fluidColours]
+  );
+
+  const DonutRegular = useMemo(
+    () => (
+      <DoughnutGraph
+        data={walletAmounts.length !== 0 ? walletAmounts : ["0"]}
+        labels={walletTypes.length !== 0 ? walletTypes : ["N/A"]}
+        colours={colours.length !== 0 ? colours : ["rgb(0,0,0)"]}
+      />
+    ),
+    [walletAmounts, walletTypes, colours]
+  );
+
+  const LineChart = useMemo(() => <LineGraph />, []);
+  const SmallLineChart = useMemo(() => <SmallLineGraph />, []);
 
   // Checks to see if the user's wallet is empty
-  return ( // (walletData.length !== 0) ? (
+  return (
+    // (walletData.length !== 0) ? (
     <div className="currency-breakdown">
-      <div className="portfolio-graph-title primary-text">
-        Account Overview
+      <div className="portfolio-graph-title primary-text">Account Overview</div>
+      <div className="yield-graph">
+        <div className={`primary-text total-yield-title`}>
+          Total Fluid Yield Rewarded: USD 152.21
+        </div>
+        <div className="grey-primary-text" style={{ fontSize: 8 }}>
+          *Calculations based upon user on-chain history and simulated expected
+          reward averages
+        </div>
+        <div className="line-chart-container">{LineChart}</div>
+        <div className="small-line-chart-container">{SmallLineChart}</div>
+
+        <UnclaimedRewardsbutton />
       </div>
-      <div className="doughnut-container">
-        {Donut}
-      </div>
-      <div className="currency-list">
-        {renderedCurrencyList}
+      <div className="wallet-overview">
+        <div className="primary-text">Wallet Overview</div>
+        <div className="overview-items">
+          <div className="chart-items">
+            <div className="doughnut-container">
+              <div className="total">
+                <div className="grey-primary-text">Total</div>
+                <div className="primary-text">
+                  {fluid ? totalFluid : totalRegular}
+                </div>
+              </div>
+              {fluid ? DonutFluid : DonutRegular}
+            </div>
+            <div className="toggle-container">
+              <div className={fluid ? "grey-primary-text" : "selected-text"}>
+                Regular
+              </div>
+              <ToggleButton toggled={fluid} toggle={setFluid} />
+              <div className={fluid ? "selected-text" : "grey-primary-text"}>
+                Fluid
+              </div>
+            </div>
+          </div>
+          <div className="currency-list">{renderedCurrencyList}</div>
+        </div>
       </div>
     </div>
-  ) 
-  // : (
-  //   <div className="currency-breakdown">
-  //     <div className="portfolio-graph-title primary-text">
-  //       Account Overview
-  //     </div>
-  //     <div className="currency-walletempty-container">¯\_(ツ)_/¯  Insufficient wallet balance  ¯\_(ツ)_/¯</div>
-  //   </div>)
+  );
 };
 
 export default CurrencyBreakdown;
