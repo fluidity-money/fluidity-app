@@ -35,6 +35,7 @@ import aurora from "./config/aurora-mainnet-tokens.json";
 import mainnet from "./config/mainnet-tokens.json";
 import { appTheme } from "util/appTheme";
 import useLocalStorage from "util/hooks/useLocalStorage";
+import FluidityProviderContainer from "components/FluidityProviderContainer";
 
 const App = () => {
   const chainId = chainIdFromEnv();
@@ -152,92 +153,96 @@ const App = () => {
         {/* Context for user actions recieved over WS, to support dynamic updates */}
         <userActionContext.Provider value={userActions}>
           <tokenListContext.Provider value={tokenListInfo}>
-            {/* Loads specifically one route at a time */}
-            <ErrorBoundary>
-              <NotificationContainer>
-                {/* Renders App triggers on load (such as auto logging into wallet) */}
-                <AppUpdater />
-                <ApiStateHandler state={apiState} />
-                <Switch>
-                  <Route
-                    path="/"
-                    exact
-                    render={(props) => (
-                      <SwapPage prizeBoard={prizeBoard} {...props} />
-                    )}
+            <FluidityProviderContainer>
+              {/* Loads specifically one route at a time */}
+              <ErrorBoundary>
+                <NotificationContainer>
+                  {/* Renders App triggers on load (such as auto logging into wallet) */}
+                  <AppUpdater />
+                  <ApiStateHandler state={apiState} />
+                  <Switch>
+                    <Route
+                      path="/"
+                      exact
+                      render={(props) => (
+                        <SwapPage prizeBoard={prizeBoard} {...props} />
+                      )}
+                    />
+
+                    <Route
+                      path="/dashboard"
+                      exact
+                      render={(props) => (
+                        <Dashboard
+                          pastWinnings={pastWinnings}
+                          prizeBoard={prizeBoard}
+                          rewardPool={rewardPool}
+                          {...props}
+                        />
+                      )}
+                    />
+
+                    <ProtectedRoute
+                      exact={true}
+                      path="/wallet"
+                      component={Wallet}
+                      extraProps={{
+                        rewardPool: rewardPool,
+                        prizeBoard: prizeBoard,
+                      }}
+                    />
+
+                    <ProtectedRoute
+                      exact={true}
+                      path="/walletsend"
+                      component={WalletSend}
+                      extraProps={{
+                        myHistory: userActions,
+                      }}
+                    />
+
+                    <ProtectedRoute
+                      exact={true}
+                      path="/wallethistory"
+                      component={WalletHistory}
+                      extraProps={{
+                        myHistory: userActions,
+                      }}
+                    />
+
+                    <Route component={RouteNotFound} />
+                  </Switch>
+                  {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
+                  <NotificationAlert
+                    enable={notificationTrigger}
+                    setEnable={() =>
+                      setNotificationTrigger(!notificationTrigger)
+                    }
+                    active={document.hidden}
+                    message={notificationMessage}
                   />
+                  <ConfettiAnimation trigger={winAlert} />
 
-                  <Route
-                    path="/dashboard"
-                    exact
-                    render={(props) => (
-                      <Dashboard
-                        pastWinnings={pastWinnings}
-                        prizeBoard={prizeBoard}
-                        rewardPool={rewardPool}
-                        {...props}
-                      />
-                    )}
+                  <TransactionConfirmationModal
+                    enable={winAlert}
+                    toggle={() => setWinAlert(!winAlert)}
+                    message={[
+                      <div key={"TCM1"}>
+                        🎉🎉
+                        <span className={`primary-text${appTheme}`}>
+                          {" "}
+                          CONGRATS{" "}
+                        </span>
+                        🎉🎉
+                      </div>,
+                      <div key={"TCM2"} className={`secondary-text${appTheme}`}>
+                        {notificationMessage}
+                      </div>,
+                    ]}
                   />
-
-                  <ProtectedRoute
-                    exact={true}
-                    path="/wallet"
-                    component={Wallet}
-                    extraProps={{
-                      rewardPool: rewardPool,
-                      prizeBoard: prizeBoard,
-                    }}
-                  />
-
-                  <ProtectedRoute
-                    exact={true}
-                    path="/walletsend"
-                    component={WalletSend}
-                    extraProps={{
-                      myHistory: userActions,
-                    }}
-                  />
-
-                  <ProtectedRoute
-                    exact={true}
-                    path="/wallethistory"
-                    component={WalletHistory}
-                    extraProps={{
-                      myHistory: userActions,
-                    }}
-                  />
-
-                  <Route component={RouteNotFound} />
-                </Switch>
-                {/* Notification alert component to notifiy the user of a successful rewardpool win globally */}
-                <NotificationAlert
-                  enable={notificationTrigger}
-                  setEnable={() => setNotificationTrigger(!notificationTrigger)}
-                  active={document.hidden}
-                  message={notificationMessage}
-                />
-                <ConfettiAnimation trigger={winAlert} />
-
-                <TransactionConfirmationModal
-                  enable={winAlert}
-                  toggle={() => setWinAlert(!winAlert)}
-                  message={[
-                    <div key={"TCM1"}>
-                      🎉🎉
-                      <span className={`primary-text${appTheme}`}>
-                        {" "}
-                        CONGRATS{" "}
-                      </span>
-                      🎉🎉
-                    </div>,
-                    <div key={"TCM2"} className={`secondary-text${appTheme}`}>
-                      {notificationMessage}
-                    </div>,
-                  ]}
-                />
-              </NotificationContainer>
-            </ErrorBoundary>
+                </NotificationContainer>
+              </ErrorBoundary>
+            </FluidityProviderContainer>
           </tokenListContext.Provider>
         </userActionContext.Provider>
       </UseWalletProvider>
