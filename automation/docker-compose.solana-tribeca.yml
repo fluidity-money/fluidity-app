@@ -17,7 +17,18 @@ services:
       FLU_TRIBECA_LOCKER_PUBKEY: ${FLU_TRIBECA_LOCKER_PUBKEY}
       FLU_TRIBECA_SMART_WALLET_PUBKEY: ${FLU_TRIBECA_SMART_WALLET_PUBKEY}
       FLU_TRIBECA_EXEC_COUNCIL_PUBKEY: ${FLU_TRIBECA_EXEC_COUNCIL_PUBKEY}
-    depends_on:
-      - redis
+    restart: unless-stopped
+
+  microservice-solana-utility-gauge-syncer:
+    build:
+      context: ../cmd/microservice-solana-utility-gauge-syncer
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-utility-gauge-syncer
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+      FLU_SOLANA_GAUGEMEISTER_PUBKEY: ${FLU_SOLANA_GAUGEMEISTER_PUBKEY}
+      FLU_UTILITY_GAUGE_PROGRAM_ID: ${FLU_UTILITY_GAUGE_PROGRAM_ID}
+      FLU_SOLANA_UTILITY_GAUGE_SECRET_KEY: ${FLU_SOLANA_UTILITY_GAUGE_SECRET_KEY}
     restart: unless-stopped
 

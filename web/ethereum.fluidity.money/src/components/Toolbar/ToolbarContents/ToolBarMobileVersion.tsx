@@ -8,6 +8,7 @@ import { JsonRpcProvider } from "ethers/providers";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
 import NetworkButton from "components/Button/NetworkButton";
 import { appTheme } from "util/appTheme";
+import NotificationButton from "components/Button/NotificationButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -37,10 +38,16 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
 
   return (
     <div className="toolbar-container-mobile flex-space-between">
-      <Icon src="i-fluidity-medium" />
-      <NetworkButton />
+      <div className="fluidity-toolbar flex row flex-space-between width-auto">
+        <Icon src="i-fluidity-medium" />
+        <div className="fluidity-text">Fluidity.</div>
+      </div>
+      {/* <Icon src="i-fluidity-medium" /> */}
+
       <div className="flex column align w-50">
         <div className="menu-icon">
+          <NetworkButton />
+          <NotificationButton />
           <div
             id="nav-icon-bar"
             className={`icon ${click ? "open" : ""}`}
@@ -51,21 +58,34 @@ const ToolBarMobileVersion = ({ selected }: { selected: selected }) => {
             <span></span>
           </div>
         </div>
+      </div>
+      <div className="wallet-address-container">
         {active ? (
           <div
-            className="flex row align mobile-address-btn"
+            className="connect-wallet-address"
             onClick={() => setToggle(true)}
           >
             <Button
               label={address}
-              theme={`primary-text${appTheme} header-text`}
+              theme={`primary-text${appTheme} header-text-connect-wallet-address`}
               goto={() => {}}
               padding="p-0_5"
             />
             {active ? <Icon src="i-wallet-arrow" /> : <></>}
           </div>
         ) : (
-          <></>
+          <div
+            className="connect-wallet-address"
+            onClick={() => setToggle(true)}
+          >
+            <Button
+              label="Connect Wallet"
+              theme={`primary-text${appTheme} header-text`}
+              goto={() => {}}
+              padding="p-0_5"
+            />
+            {active ? <Icon src="i-wallet-arrow" /> : <></>}
+          </div>
         )}
       </div>
 

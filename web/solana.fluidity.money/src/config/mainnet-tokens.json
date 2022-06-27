@@ -1,74 +1,90 @@
 [
-    {
-        "symbol": "USDT",
-        "name": "USD Tether",
-        "mintAddress": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
-        "decimals": 6,
-        "colour": "rgb(36, 163, 124)",
-        "image": "img/TokenIcons/usdtIcon.svg",
-        "obligationAccount": "446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca",
-        "dataAccount": "C8csqsv1NxAC2ge1ZAvToaHZa8VsffmxewHHYJ7JuDVD"
-    },
-    {
-        "symbol": "fUSDT",
-        "name": "Fluid USDT",
-        "mintAddress": "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8",
-        "decimals": 6,
-        "colour": "rgb(36, 163, 124)",
-        "image": "img/TokenIcons/usdtIcon.svg"
-    },
-    {
-        "symbol": "USDC",
-        "name": "USD Coin",
-        "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "decimals": 6,
-        "colour": "#2775c9",
-        "image": "img/TokenIcons/usdcIcon.svg",
-        "obligationAccount": "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A",
-        "dataAccount": "nZtk79qJyUXMg53SYL9wZQnMUjwJeTFGTfKmFaEehKq"
-    },
-    {
-        "symbol": "fUSDC",
-        "name": "Fluid USDC",
-        "mintAddress": "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv",
-        "decimals": 6,
-        "colour": "#2775c9",
-        "image": "img/TokenIcons/usdcIcon.svg"
-    },
-    {
-        "symbol": "UXD",
-        "name": "UXD",
-        "mintAddress": "Dx8dUQ8p8zbQwv7jvXqaEdYWcK7AroNifHbcAC7YYRjg",
-        "decimals": 6,
-        "colour": "#000000",
-        "image": "img/TokenIcons/uxdIcon.svg",
-        "obligationAccount": "HH4BzUBsKwenYsGQfYB6Tyj739XXxxjFVE6oMZ6xiDsY",
-        "dataAccount": "8cVaBxKMLr2thoFxtGoBjW4Lo1xJBJQSu71uo9TCtm2s"
-    },
-    {
-        "symbol": "fUXD",
-        "name": "Fluid UXD",
-        "mintAddress": "7Taua7k6kX2UTD1joXTsyQ8jodAzUEjmxXfCn5zvU55m",
-        "decimals": 6,
-        "colour": "#000000",
-        "image": "img/TokenIcons/uxdIcon.svg"
-    },
-    {
-        "symbol": "UST",
-        "name": "UST",
-        "mintAddress": "9vMJfxuKxXBoEa7rM12mYLMwTacLMLDJqHozw96WQL8i",
-        "decimals": 6,
-        "colour": "#0C3595",
-        "image": "img/TokenIcons/ustIcon.svg",
-        "obligationAccount": "7cG2d3Shz2dUQoWXNjcqGss3jyTFc4a8Lei9oxWKMq6b",
-        "dataAccount": "HwoDGvTVbqyzabXzHnU4edBm8CRJBujCc7dU3Sqe9HmC"
-    },
-    {
-        "symbol": "fUST",
-        "name": "Fluid UST",
-        "mintAddress": "9Zd8kMxo6d9pMyhuxuZYTZMu8uiHSoZwX4A1vLBK9bpT",
-        "decimals": 6,
-        "colour": "#0C3595",
-        "image": "img/TokenIcons/ustIcon.svg"
-    }
+  {
+    "symbol": "USDT",
+    "name": "USD Tether",
+    "mintAddress": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "decimals": 6,
+    "colour": "rgb(36, 163, 124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "pinned": true,
+    "amount": "0.0",
+    "obligationAccount": "446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca",
+    "dataAccount": "C8csqsv1NxAC2ge1ZAvToaHZa8VsffmxewHHYJ7JuDVD"
+  },
+  {
+    "symbol": "fUSDT",
+    "name": "FLUID USDT",
+    "mintAddress": "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8",
+    "decimals": 6,
+    "colour": "rgb(36, 163, 124)",
+    "image": "img/TokenIcons/usdtIcon.svg",
+    "pinned": true,
+    "amount": "0.0"
+  },
+  {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "decimals": 6,
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "pinned": true,
+    "amount": "0.0",
+    "obligationAccount": "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A",
+    "dataAccount": "nZtk79qJyUXMg53SYL9wZQnMUjwJeTFGTfKmFaEehKq"
+  },
+  {
+    "symbol": "fUSDC",
+    "name": "FLUID USDC",
+    "mintAddress": "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv",
+    "decimals": 6,
+    "colour": "#2775c9",
+    "image": "img/TokenIcons/usdcIcon.svg",
+    "pinned": true,
+    "amount": "0.0"
+  },
+  {
+    "symbol": "UXD",
+    "name": "UXD",
+    "mintAddress": "Dx8dUQ8p8zbQwv7jvXqaEdYWcK7AroNifHbcAC7YYRjg",
+    "decimals": 6,
+    "colour": "#000000",
+    "image": "img/TokenIcons/uxdIcon.svg",
+    "pinned": true,
+    "amount": "0.0",
+    "obligationAccount": "HH4BzUBsKwenYsGQfYB6Tyj739XXxxjFVE6oMZ6xiDsY",
+    "dataAccount": "8cVaBxKMLr2thoFxtGoBjW4Lo1xJBJQSu71uo9TCtm2s"
+  },
+  {
+    "symbol": "fUXD",
+    "name": "FLUID UXD",
+    "mintAddress": "7Taua7k6kX2UTD1joXTsyQ8jodAzUEjmxXfCn5zvU55m",
+    "decimals": 6,
+    "colour": "#000000",
+    "image": "img/TokenIcons/uxdIcon.svg",
+    "pinned": true,
+    "amount": "0.0"
+  },
+  {
+    "symbol": "UST",
+    "name": "UST",
+    "mintAddress": "9vMJfxuKxXBoEa7rM12mYLMwTacLMLDJqHozw96WQL8i",
+    "decimals": 6,
+    "colour": "#0C3595",
+    "image": "img/TokenIcons/ustIcon.svg",
+    "pinned": true,
+    "amount": "0.0",
+    "obligationAccount": "7cG2d3Shz2dUQoWXNjcqGss3jyTFc4a8Lei9oxWKMq6b",
+    "dataAccount": "HwoDGvTVbqyzabXzHnU4edBm8CRJBujCc7dU3Sqe9HmC"
+  },
+  {
+    "symbol": "fUST",
+    "name": "FLUID UST",
+    "mintAddress": "9Zd8kMxo6d9pMyhuxuZYTZMu8uiHSoZwX4A1vLBK9bpT",
+    "decimals": 6,
+    "colour": "#0C3595",
+    "image": "img/TokenIcons/ustIcon.svg",
+    "pinned": true,
+    "amount": "0.0"
+  }
 ]

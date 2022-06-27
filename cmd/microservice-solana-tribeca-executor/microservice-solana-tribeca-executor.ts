@@ -17,15 +17,6 @@ import {
 import { GokiSDK } from "@gokiprotocol/client/dist/cjs";
 import { GovernJSON } from "@tribecahq/tribeca-sdk/dist/cjs/idls/govern";
 
-const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
-
-if (!FLU_SENTRY_URL) {
-  throw new Error("FLU_SENTRY_URL not provided");
-};
-
-Sentry.init({
-  dsn: FLU_SENTRY_URL,
-});
 
 const WORKER_ID = process.env.FLU_WORKER_ID as string;
 
@@ -33,13 +24,23 @@ if (!WORKER_ID) {
   throw new Error("WORKER_ID not provided");
 };
 
-Sentry.configureScope(scope => {
-  scope.setTag('worker-id', WORKER_ID);
-})
+const FLU_SENTRY_URL = process.env.FLU_SENTRY_URL as string;
 
-// Wrap in Sentry
+if (FLU_SENTRY_URL) {
+  Sentry.init({
+    dsn: FLU_SENTRY_URL,
+  });
+
+  Sentry.configureScope(scope => {
+    scope.setTag('worker-id', WORKER_ID);
+  })
+} 
+
+const reportError = Sentry.getCurrentHub().getClient() ? 
+  (e: any) => {throw e} :
+  (e: any) => Sentry.captureException(e);
+
 try {
-
 // EXECUTOR_SECRET_KEY is the base58 encoded key responsible for paying and signing
 //  tribeca/goki transactions
 const EXECUTOR_SECRET_KEY = process.env
@@ -160,14 +161,6 @@ const provider = SolanaProvider.init({
   // governorEventDecoder parses emitted governor events
   const governorEventDecoder = new BorshEventCoder(GovernJSON);
 
-  const governorData = await governor.data();
-
-  // votingDelay is the period (seconds) to wait to activate a drafted proposal
-  // votingPeriod is the period (seconds) to wait for the voting period to end
-  // timelockDelaySeconds is the period to wait to execute an approved proposal
-  const { votingDelay, votingPeriod, timelockDelaySeconds } =
-    governorData.params;
-
   const payerExecCouncilIndex = execCouncil.data!.owners.findIndex(
     (key: PublicKey) => key.toString() === payerKeypair.publicKey.toString(),
   );
@@ -207,8 +200,15 @@ const provider = SolanaProvider.init({
             throw new Error(`Bad createProposal log: ${logs}`);
           }
 
+          const governorData = await governor.data();
+
+          // votingDelay is the period (seconds) to wait to activate a drafted proposal
+          // votingPeriod is the period (seconds) to wait for the voting period to end
+          // timelockDelaySeconds is the period to wait to execute an approved proposal
+          const { votingDelay } = governorData.params;
+
           const votingDelayPromise = sleep(
-            votingDelay.toNumber() * 1000 + 5000,
+            (votingDelay.toNumber() + 10) * 1000,
           );
 
           const event = logs[4].split(": ")[1];
@@ -249,8 +249,15 @@ const provider = SolanaProvider.init({
             throw new Error(`Bad activateProposal log: ${logs}`);
           }
 
+          const governorData = await governor.data();
+
+          // votingDelay is the period (seconds) to wait to activate a drafted proposal
+          // votingPeriod is the period (seconds) to wait for the voting period to end
+          // timelockDelaySeconds is the period to wait to execute an approved proposal
+          const { votingPeriod } = governorData.params;
+
           const votingPeriodPromise = sleep(
-            (votingPeriod.toNumber() * 1000) + 1000,
+            (votingPeriod.toNumber() + 10) * 1000,
           );
 
           const event = logs[4].split(": ")[1];
@@ -329,8 +336,15 @@ const provider = SolanaProvider.init({
 
           console.log("Approved transaction!");
 
+          const governorData = await governor.data();
+
+          // votingDelay is the period (seconds) to wait to activate a drafted proposal
+          // votingPeriod is the period (seconds) to wait for the voting period to end
+          // timelockDelaySeconds is the period to wait to execute an approved proposal
+          const { timelockDelaySeconds } = governorData.params;
+
           const timelockDelayPromise = sleep(
-            timelockDelaySeconds.toNumber() * 1000 + 5000,
+            (timelockDelaySeconds.toNumber() + 10) * 1000,
           );
 
           await timelockDelayPromise;
@@ -366,5 +380,5 @@ const provider = SolanaProvider.init({
 })();
 
 } catch (e) {
-  Sentry.captureException(e)
+  reportError(e);
 }
