@@ -2,13 +2,13 @@ package orca
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"math/big"
-	"fmt"
 
-	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/gagliardetto/solana-go"
@@ -22,32 +22,39 @@ const CurveDataStartByte = 227
 // Byte offset at which the decimals of an spl-mint ins encoded
 const SplMintDecimalsStartByte = 44
 
-// Enum variant of swap instruction 
+// Enum variant of swap instruction
 const SwapVariant = 1
 
-type ConstantProductCurveFeeData struct {
-	TradeFeeNumerator        int64
-	TradeFeeDenominator      int64
-	OwnerTradeFeeNumerator   int64
-	OwnerTradeFeeDenominator int64
-}
+type (
+	// Orca fee data struct that encodes the % fee taken on this pool
+	ConstantProductCurveFeeData struct {
+		TradeFeeNumerator        int64
+		TradeFeeDenominator      int64
+		OwnerTradeFeeNumerator   int64
+		OwnerTradeFeeDenominator int64
+	}
 
-type SplAccountTruncated struct {
-	Mint solana.PublicKey
-}
+	// Truncated spl-token account struct, used to get the
+	// mint of a token account
+	SplAccountTruncated struct {
+		Mint solana.PublicKey
+	}
 
-type SplMintTruncated struct {
-	MintAuthority *solana.PublicKey
-	Supply int64
-	Decimals uint8
-}
+	// Truncated sql-token mint struct, used to get the
+	// decimals of an spl-token mint
+	SplMintTruncated struct {
+		MintAuthority *solana.PublicKey
+		Supply        int64
+		Decimals      uint8
+	}
+)
 
 // GetOrcaFee by checking that an orca swap occurred, then
 // destructuring the swap information to get the fee %, and
 // getting the fee paid by multiplying the value of the swap
 func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string) (feePaid *big.Rat, err error) {
 	instructions := transaction.Transaction.Message.Instructions
-	
+
 	for _, instruction := range instructions {
 		if transaction.Transaction.Message.AccountKeys[instruction.ProgramIdIndex] == orcaProgramId {
 			// make sure it's a swap instruction
@@ -55,7 +62,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 			if inputBytes[0] != SwapVariant {
 				continue
 			}
-			
+
 			swapAccount := transaction.Transaction.Message.AccountKeys[instruction.Accounts[0]]
 			swapAccountPubkey := solana.MustPublicKeyFromBase58(swapAccount)
 
@@ -63,7 +70,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 			if err != nil {
 				return nil, fmt.Errorf(
-					"Failed to get Orca swap data account! %v",
+					"failed to get Orca swap data account! %v",
 					err,
 				)
 			}
@@ -72,26 +79,43 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 			data := resp.Value.Data.GetBinary()
 
-			if len(data) < CurveDataStartByte + 32 {
+			if len(data) < CurveDataStartByte+32 {
 				continue
 			}
 
-			borsh.Deserialize(&feeData, data[CurveDataStartByte:])
+			err = borsh.Deserialize(&feeData, data[CurveDataStartByte:])
+			if err != nil {
+				return nil, fmt.Errorf(
+					"issue deserialising Orca fee data! %v",
+					err,
+				)
+			}
 
 			tradeFee := big.NewRat(feeData.TradeFeeNumerator, feeData.TradeFeeDenominator)
 			ownerTradeFee := big.NewRat(feeData.OwnerTradeFeeNumerator, feeData.OwnerTradeFeeDenominator)
 
 			userSplAccountA := transaction.Transaction.Message.AccountKeys[instruction.Accounts[3]]
-			userSplAccountAPubkey := solana.MustPublicKeyFromBase58(userSplAccountA)
 
 			userSplAccountB := transaction.Transaction.Message.AccountKeys[instruction.Accounts[6]]
+
+			userSplAccountAPubkey := solana.MustPublicKeyFromBase58(userSplAccountA)
+
 			userSplAccountBPubkey := solana.MustPublicKeyFromBase58(userSplAccountB)
 
-			mintA := getMint(solanaClient, userSplAccountAPubkey)
-			mintB := getMint(solanaClient, userSplAccountBPubkey)
+			mintA, err := getMint(solanaClient, userSplAccountAPubkey)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"failed to get Orca spl-token mint A! %v",
+					err,
+				)
+			}
 
-			if mintA.IsZero() && mintB.IsZero() {
-				continue
+			mintB, err := getMint(solanaClient, userSplAccountBPubkey)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"failed to get Orca spl-token mint B! %v",
+					err,
+				)
 			}
 
 			// check if the transaction involves a fluid token
@@ -104,7 +128,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 				newMint, err := fluidity.GetBaseToken(mintA.String())
 				if err != nil {
 					return nil, fmt.Errorf(
-						"Failed to convert fluid token to base token! %v",
+						"failed to convert fluid token to base token! %v",
 						err,
 					)
 				}
@@ -122,7 +146,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 			if err != nil {
 				return nil, fmt.Errorf(
-					"Failed to get Orca user source spl-token mint! %v",
+					"failed to get Orca user source spl-token mint! %v",
 					err,
 				)
 			}
@@ -131,52 +155,89 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 			var decimals uint8
 
-			borsh.Deserialize(&decimals, data[SplMintDecimalsStartByte:])
+			err = borsh.Deserialize(&decimals, data[SplMintDecimalsStartByte:])
 
-			decimalsAdjusted := math.Pow10(int(decimals))
-			decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"issue deserialising token decimals! %v",
+					err,
+				)
+			}
 
 			var amountIn int64
 			// int64 is 8 bytes
-			borsh.Deserialize(&amountIn, inputBytes[1:9])
-			amount := big.NewRat(amountIn,1)
-			amount = amount.Quo(amount, decimalsRat)
+			err = borsh.Deserialize(&amountIn, inputBytes[1:9])
+			if err != nil {
+				return nil, fmt.Errorf(
+					"issue deserialising Orca swap amountIn! %v",
+					err,
+				)
+			}
+
+			fee := big.NewRat(0, 1)
+
+			amount := adjustDecimals(amountIn, int(decimals))
 
 			// multiply by price
 			amount = amount.Mul(amount, price)
 
-			fee := big.NewRat(0, 1)
-
 			// remove fees
-			fee = fee.Add(fee, amount.Mul(amount, tradeFee))
-			fee = fee.Add(fee, amount.Mul(amount, ownerTradeFee))
+			fee = fee.Mul(amount, tradeFee)
+			fee = fee.Add(fee, new(big.Rat).Mul(amount, ownerTradeFee))
 
 			return fee, nil
 		}
 	}
 
-	none := big.NewRat(0,1)
+	none := big.NewRat(0, 1)
 
 	return none, nil
 }
 
-func getMint(solanaClient *solanaRpc.Client, splAccount solana.PublicKey) (solana.PublicKey){
+func adjustDecimals(rawAmount int64, decimals int) *big.Rat {
+	// get integer value of denominator
+	decimalsAdjusted := math.Pow10(decimals)
+
+	// convert to decimal
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	amount := big.NewRat(rawAmount, 1)
+
+	// divide amount by 10^decimals
+	amount = amount.Quo(amount, decimalsRat)
+
+	return amount
+}
+
+func getMint(solanaClient *solanaRpc.Client, splAccount solana.PublicKey) (solana.PublicKey, error) {
 	resp, err := solanaClient.GetAccountInfo(context.Background(), splAccount)
 
 	if err != nil {
-		return solana.PublicKey{}
+		return solana.PublicKey{}, fmt.Errorf(
+			"failed to get spl-token account data from the RPC! %v",
+			err,
+		)
 	}
 
 	data := resp.Value.Data.GetBinary()
 
 	// if there is not enough data for a public key
 	if len(data) < 32 {
-		return solana.PublicKey{}
+		return solana.PublicKey{}, fmt.Errorf(
+			"spl-token account data shorter than expected!",
+		)
 	}
 
 	var splData SplAccountTruncated
 
-	borsh.Deserialize(&splData, data)
+	err = borsh.Deserialize(&splData, data)
 
-	return splData.Mint
+	if err != nil {
+		return solana.PublicKey{}, fmt.Errorf(
+			"issue deserialising spl-token account data! %v",
+			err,
+		)
+	}
+
+	return splData.Mint, nil
 }
