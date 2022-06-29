@@ -105,7 +105,7 @@ func main() {
 
 			transactionMetaFeeRat.Add(transactionMetaFeeRat, saberFee)
 
-			orcaFee, err := orca.GetOrcaFee(
+			orcaFee, err := orca.GetOrcaFees(
 				solanaClient,
 				transaction,
 				orcaProgramId,

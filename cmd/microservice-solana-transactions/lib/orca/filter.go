@@ -38,10 +38,10 @@ type ConstantProductCurveFeeData struct {
 	OwnerTradeFeeDenominator int64
 }
 
-// GetOrcaFee by checking that an orca swap occurred, then
+// GetOrcaFees by checking that an orca swap occurred, then
 // destructuring the swap information to get the fee %, and
-// getting the fee paid by multiplying the value of the swap
-func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string) (feesPaid *big.Rat, err error) {
+// getting the fees paid by multiplying the value of the swap
+func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
