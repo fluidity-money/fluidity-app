@@ -61,7 +61,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 		if !transactionProgramIsOrca {
 
 			log.Debugf(
-				"instruction %v contained in %v is not an Orca instruction",
+				"instruction %v contained in %#v is not an Orca instruction",
 				instructionNumber,
 				transactionSignature,
 			)
@@ -70,7 +70,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 		}
 
 		log.Debugf(
-			"instruction %v contained in %v is an Orca instruction",
+			"instruction %v contained in %#v is an Orca instruction",
 			instructionNumber,
 			transactionSignature,
 		)
@@ -106,8 +106,8 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 			// get user source & destination accounts
 
-			userSourceSplAccount      = accountKeys[instruction.Accounts[3]]
-			userDestinationSplAccount = accountKeys[instruction.Accounts[6]]
+			userSourceSplAccount      = accountKeys[instructionAccounts[3]]
+			userDestinationSplAccount = accountKeys[instructionAccounts[6]]
 		)
 
 		swapAccountPubkey, err := solana.PublicKeyFromBase58(swapAccount)
@@ -141,7 +141,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 		if len(data) < CurveDataStartByte+32 {
 			log.Debugf(
-				"Raydium fee data doesn't contain enough bytes in instruction %v in %#v!",
+				"Orca fee data doesn't contain enough bytes in instruction %v in %#v!",
 				instructionNumber,
 				transactionSignature,
 			)
@@ -175,8 +175,8 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"failed to get Raydium source spl-token public key from string %#v in instruction %v in %#v! %v",
-				swapAccount,
+				"failed to get Orca source spl-token public key from string %#v in instruction %v in %#v! %v",
+				userSourceSplAccount,
 				instructionNumber,
 				transactionSignature,
 				err,
@@ -187,8 +187,8 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"failed to get Raydium destination spl-token public key from string %#v in instruction %v in %#v! %v",
-				swapAccount,
+				"failed to get Orca destination spl-token public key from string %#v in instruction %v in %#v! %v",
+				userDestinationSplAccount,
 				instructionNumber,
 				transactionSignature,
 				err,
@@ -213,6 +213,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 		}
 
 		// get the mint of the destination account
+
 		destinationMint, _, err := spl_token.GetMintAndDecimals(
 			solanaClient,
 			userDestinationSplAccountPubkey,
@@ -221,7 +222,7 @@ func GetOrcaFee(solanaClient *solanaRpc.Client, transaction types.TransactionRes
 		if err != nil {
 			return nil, fmt.Errorf(
 				"failed to get Orca destination spl-token mint %#v in instruction %v in %#v! %v",
-				userSourceSplAccountPubkey,
+				userDestinationSplAccountPubkey,
 				instructionNumber,
 				transactionSignature,
 				err,
