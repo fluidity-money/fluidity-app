@@ -108,7 +108,7 @@ func GetPrice(solanaClient *rpc.Client, pricePubkey solana.PublicKey) (*big.Rat,
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to get price account with pubkey %#v! %v",
+			"failed to get price account with pubkey %#v! %v",
 			pricePubkey,
 			err,
 		)
@@ -122,14 +122,14 @@ func GetPrice(solanaClient *rpc.Client, pricePubkey solana.PublicKey) (*big.Rat,
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to deserialize price data! %v",
+			"failed to deserialize price data! %v",
 			err,
 		)
 	}
 
 	if price.Magic != 0xa1b2c3d4 {
 		return nil, fmt.Errorf(
-			"Bad pyth magic bytes with pubkey %#v!",
+			"bad pyth magic bytes with pubkey %#v!",
 			pricePubkey,
 		)
 	}
@@ -147,10 +147,6 @@ func GetPrice(solanaClient *rpc.Client, pricePubkey solana.PublicKey) (*big.Rat,
 
 func GetPriceByToken(solanaClient *rpc.Client,  token string) (*big.Rat, error){
 	PythPrices := map[string]string{
-		/*
-		"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD",
-		"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": "3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL",
-		*/
 		"F6v4wfAdJB8D8p77bMXZgYt8TDKsYxLYxH5AFhUkYx9W": "5bmWuR1dgP4avtGYMNKLuxumZTVKGgoN2BCMXWDNL9nY",
 		"8HGyAAB1yoM1ttS7pXjHMa3dukTFGQggnFFH3hJZgzQh": "9xYBiDWYsh2fHzpsz3aaCnNHCKWBNtfEDLtU6kS4aFD9",
 		"Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1": "8Td9VML1nHxQK6M8VVyzsHo32D7VBk72jSpa9U861z2A",
@@ -170,7 +166,6 @@ func GetPriceByToken(solanaClient *rpc.Client,  token string) (*big.Rat, error){
 		"HxhWkVpk5NS4Ltg5nij2G671CKXFRKPK8vy271Ub4uEK": "B47CC1ULLw1jKTSsr1N1198zrUHp3LPduzepJyzgLn2g",
 		"mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So": "E4v1BBgoso9s64TQvmyownAVJbhbEPGyzA3qn4n46qj9",
 		"MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac": "79wm3jjcPr6RaNQ4DGvP5KxG1mNd3gEBsg6FsNVFezK4",
-		//"": "m24crrKFG5jw5ySpvb1k83PRFKVUgzTRm4uvK2WYZtX",
 		"SLNDpmoWTVADgEdndyvWzroNL7zSi1dF9PC3xHGtPwp": "HkGEau5xY1e8REXUFbwvWWvyJGywkgiAZZFpryyraWqJ",
 		"AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3": "8JPJJkmDScpcNmBRKGZuPuG2GYAveQgP3t5gFuMymwvF",
 		"2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
@@ -179,11 +174,7 @@ func GetPriceByToken(solanaClient *rpc.Client,  token string) (*big.Rat, error){
 		"4dmKkXNHdgYsXqBHCuMikNQWwVomZURhYvkkX5c4pQ7y": "BkN8hYgRjhyH5WNBQfDV73ivvdqNKfonCMhiYVJ1D9n9",
 		"AUrMpCDYYcPuHhyNX8gEEqbmDPFUpBpHrNW3vPeCFn5Z": "Ax9ujW5B9oqcv59N8m6f1BpTBq2rGeGaBcpKjC5UYsXU",
 		"BYPsjxa3YuZESQz1dKuBw1QSFCSpecsm8nCQhY5xbU1Z": "ECSFWQ1bnnpqPVvoy9237t2wddZAaHisW88mYxuEHKWf",
-		//"": "EHkW5sh588isxidKdTvpmBgRQTg9fta6qQMcWQirPVD2",
 		"JET6zMJWkCN9tpRT2v2jfAmm5VnQFDpUBCyaKojmGtz": "9j2xgDVWMY4WZXSj4AL4asCBtzCXz8jqRcDMbcVeZgNU",
-		//"": "FsSM3s38PX9K7Dn6eGzuE29S2Dsk1Sss1baytTQdCaQj",
-		//"": "45rTB9ezDcTX5tMZx2uJUBbBEqAWDhXykYbBfaSWUXvD",
-		//"": "CrCpTerNqtZvqLcKqz1k13oVeXV9WkMD2zA9hBKXrsbN",
 		"EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp": "ETp9eKXVv1dWwHSpsXRUuXHmw24PwRkttCGVgpZEY9zF",
 	}
 
@@ -191,13 +182,22 @@ func GetPriceByToken(solanaClient *rpc.Client,  token string) (*big.Rat, error){
 
 	if pythPricePubkeyString == "" {
 		return nil, fmt.Errorf(
-			"Token not found in Pyth price pubkey map!",
+			"token %#v not found in Pyth price pubkey map!",
+			token,
 		)
 	}
 
 	pythPricePubkey := solana.MustPublicKeyFromBase58(pythPricePubkeyString)
 
 	pythPrice, err := GetPrice(solanaClient, pythPricePubkey)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to get token Pyth price at Pyth price account %#v! %v",
+			pythPricePubkey,
+			err,
+		)
+	}
 
 	return pythPrice, err
 }

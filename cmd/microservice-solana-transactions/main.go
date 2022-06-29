@@ -118,7 +118,7 @@ func main() {
 				})
 			}
 
-			adjustedFee.Add(adjustedFee, orcaFee)
+			transactionMetaFeeRat.Add(transactionMetaFeeRat, orcaFee)
 
 			parsedTransactions[i] = solanaQueue.Transaction{
 				Signature:   transaction.Transaction.Signatures[0],
