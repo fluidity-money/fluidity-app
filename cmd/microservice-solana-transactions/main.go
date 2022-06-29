@@ -12,6 +12,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/saber"
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/orca"
+	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/raydium"
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
 
 	solanaLibrary "github.com/gagliardetto/solana-go"
@@ -28,8 +29,11 @@ const (
 	// EnvSaberRpcUrl to use when making lookups to their infrastructure
 	EnvSaberRpcUrl = `FLU_SOLANA_SABER_RPC_URL`
 
-	// EnvOrcaProgramid is the program ID of the orca swap program
+	// EnvOrcaProgramId is the program ID of the orca swap program
 	EnvOrcaProgramId = `FLU_SOLANA_ORCA_PROGRAM_ID`
+
+	// EnvRaydiumProgramId is the program ID of the Raydium swap program
+	EnvRaydiumProgramId = `FLU_SOLANA_RAYDIUM_PROGRAM_ID`
 
 	// EnvSolPythPubkey is the public key of the Pyth price account for SOL
 	EnvSolPythPubkey = `FLU_SOLANA_SOL_PYTH_PUBKEY`
@@ -46,6 +50,7 @@ func main() {
 		saberRpcUrl         = util.GetEnvOrFatal(EnvSaberRpcUrl)
 		saberSwapProgramId  = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId       = util.GetEnvOrFatal(EnvOrcaProgramId)
+		raydiumProgramId       = util.GetEnvOrFatal(EnvRaydiumProgramId)
 		solPythPubkeyString = util.GetEnvOrFatal(EnvSolPythPubkey)
 	)
 
@@ -119,6 +124,21 @@ func main() {
 			}
 
 			transactionMetaFeeRat.Add(transactionMetaFeeRat, orcaFee)
+
+			raydiumFee, err := raydium.GetRaydiumFees(
+				solanaClient,
+				transaction,
+				raydiumProgramId,
+			)
+
+			if err != nil {
+				log.App(func(k *log.Log) {
+					k.Message = "Error occurred checking for Raydium fees!"
+					k.Payload = err
+				})
+			}
+
+			transactionMetaFeeRat.Add(transactionMetaFeeRat, raydiumFee)
 
 			parsedTransactions[i] = solanaQueue.Transaction{
 				Signature:   transaction.Transaction.Signatures[0],
