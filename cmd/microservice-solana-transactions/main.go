@@ -10,9 +10,9 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 
-	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/saber"
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/orca"
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/raydium"
+	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/saber"
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
 
 	solanaLibrary "github.com/gagliardetto/solana-go"
@@ -50,7 +50,7 @@ func main() {
 		saberRpcUrl         = util.GetEnvOrFatal(EnvSaberRpcUrl)
 		saberSwapProgramId  = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId       = util.GetEnvOrFatal(EnvOrcaProgramId)
-		raydiumProgramId       = util.GetEnvOrFatal(EnvRaydiumProgramId)
+		raydiumProgramId    = util.GetEnvOrFatal(EnvRaydiumProgramId)
 		solPythPubkeyString = util.GetEnvOrFatal(EnvSolPythPubkey)
 	)
 

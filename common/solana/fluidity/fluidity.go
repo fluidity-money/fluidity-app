@@ -1,6 +1,11 @@
 package fluidity
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/fluidity-money/fluidity-app/lib/util"
+)
 
 const (
 	// 0
@@ -46,14 +51,26 @@ type (
 	}
 )
 
+// EnvSolanaTokenLookups is the map of fluid -> base tokens
+const EnvSolanaTokenLookups = `FLU_SOLANA_TOKEN_LOOKUPS`
+
 // GetBaseToken takes a fluid token and returns its counterpart
 func GetBaseToken(token string) (string, error) {
 
+	fluidTokenString := util.GetEnvOrFatal(EnvSolanaTokenLookups)
+
 	// map of fluid -> base tokens
 
-	fluidTokens := map[string]string{
-		"2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa": "zVzi5VAf4qMEwzv7NXECVx5v2pQ7xnqVVjCXZwS9XzA",
-		"97JpYk6S7i9ydzjNwb92DQEfsA1KUUWSwnWGaGDFe6bk": "Bp2nLuamFZndE7gztA1iPsNVhdJeg9xfKdq7KmvjpGoP",
+	var fluidTokens map[string]string
+
+	err := json.Unmarshal([]byte(fluidTokenString), &fluidTokens)
+
+	if err != nil {
+		return "", fmt.Errorf(
+			"failed to unmarshal fluid to base token map from env string %#v! %v",
+			fluidTokenString,
+			err,
+		)
 	}
 
 	// get the base token
@@ -73,19 +90,14 @@ func GetBaseToken(token string) (string, error) {
 }
 
 // IsFluidToken takes a token and checks if is one of the fluid tokens
-func IsFluidToken(token string) (bool) {
+func IsFluidToken(token string) bool {
 
 	// get the base token for
 
 	_, err := GetBaseToken(token)
 
 	// if there was no error, we got a base token and the input is fluid
-
-	if err != nil {
-		return true
-	}
-
 	// otherwise we don't have a fluid token
 
-	return false
+	return err != nil
 }
