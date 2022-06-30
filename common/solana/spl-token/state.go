@@ -25,12 +25,15 @@ type (
 // in SplAccountTruncated
 const SplAccountTruncatedSize = 41
 
+// GetMintAndDecimals by taking an spl-token account, getting it's data from the
+// chain, and deserialising to get the mint account and the number of decimals
 func GetMintAndDecimals(solanaClient *solanaRpc.Client, splAccount solana.PublicKey) (solana.PublicKey, uint8, error) {
 	resp, err := solanaClient.GetAccountInfo(context.Background(), splAccount)
 
 	if err != nil {
 		return solana.PublicKey{}, 0, fmt.Errorf(
-			"failed to get spl-token account data from the RPC! %v",
+			"failed to get spl-token account data for account %#v from the RPC! %v",
+			splAccount,
 			err,
 		)
 	}
@@ -40,7 +43,10 @@ func GetMintAndDecimals(solanaClient *solanaRpc.Client, splAccount solana.Public
 	// if there is not enough data to contain the struct
 	if len(data) < SplAccountTruncatedSize {
 		return solana.PublicKey{}, 0, fmt.Errorf(
-			"spl-token account data shorter than expected!",
+			"spl-token account data for account %#v shorter than expected with length %v and data %#v!",
+			len(data),
+			data,
+			splAccount,
 		)
 	}
 
@@ -50,14 +56,18 @@ func GetMintAndDecimals(solanaClient *solanaRpc.Client, splAccount solana.Public
 
 	if err != nil {
 		return solana.PublicKey{}, 0, fmt.Errorf(
-			"issue deserialising spl-token account data! %v",
+			"issue deserialising spl-token account data for account %#v with data %#v! %v",
+			splAccount,
+			data,
 			err,
 		)
 	}
 
-	return splData.Mint, splData.Decimals, nil 
+	return splData.Mint, splData.Decimals, nil
 }
 
+// AdjustDecimals takens a rawAmount (int64) and an number of decimals and
+// returns a rat of the rawAmount adjusted to that many decimal places
 func AdjustDecimals(rawAmount int64, decimals int) *big.Rat {
 	// get integer value of denominator
 	decimalsAdjusted := math.Pow10(decimals)
