@@ -152,7 +152,7 @@ const CurrencyBreakdown = () => {
           reward averages
         </div>
         <div className="line-chart-container">{LineChart}</div>
-        <div className="small-line-chart-container">{SmallLineChart}</div>
+        {/* <div className="small-line-chart-container">{SmallLineChart}</div> */}
 
         <UnclaimedRewardsbutton />
       </div>

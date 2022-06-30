@@ -334,7 +334,7 @@
 
 .line-chart-container {
   @include for-below-500 {
-    display: none;
+    width: 84vw;
   }
 }
 
