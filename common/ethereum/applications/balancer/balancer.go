@@ -212,14 +212,15 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		amountOut = swapAmounts[1]
 	)
 
-	if tokenIn == fluidContractAddress {
+	switch true {
+	case tokenIn == fluidContractAddress:
 		// get the exact value based on the inputted fluid tokens
 		// fee = amountIn * swapPercentage / tokenDecimals
 		amountIn = amountIn.Mul(amountIn, swapRat)
 		amountIn = amountIn.Quo(amountIn, decimalsRat)
 		return amountIn, nil
 
-	} else if tokenOut == fluidContractAddress {
+	case tokenOut == fluidContractAddress:
 		// get the approximated value based on the received fluid tokens
 		// fee ~= amountOut * (1 / (1 - swapPercentage)) - 1
 		// estimated the same way as Uniswap, but with a generalised swap percentage
@@ -244,7 +245,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 
 		return amountOut, nil
 
-	} else {
+	default:
 		// could be a multi-token pool swap that doesn't involve the fluid token
 		log.App(func(k *log.Log) {
 			k.Format(
