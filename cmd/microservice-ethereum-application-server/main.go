@@ -8,6 +8,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -87,6 +88,19 @@ func main() {
 				})
 			}
 
+			// nil, nil for a skipped event
+			if fee == nil {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Skipping an application transfer for transaction %#v and application %#v!",
+						transfer.Transaction.Hash.String(),
+						transfer.Application,
+					)
+				})
+
+				continue
+			}
+
 			toAddress, fromAddress, err := getApplicationTransferParties(transfer)
 
 			if err != nil {
@@ -127,10 +141,15 @@ func main() {
 }
 
 // getApplicationFee to find the fee (in USD) paid by a user for the application interaction
+// returns nil, nil in the case where the application event is legitimate, but doesn't involve
+// the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	switch transfer.Application {
 	case applications.ApplicationUniswapV2:
 		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
+
+	case applications.ApplicationBalancerV2:
+		return balancer.GetBalancerFees(transfer, client, fluidTokenContract, tokenDecimals)
 
 	default:
 		return nil, fmt.Errorf(
@@ -152,6 +171,10 @@ func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 
 	switch transfer.Application {
 	case applications.ApplicationUniswapV2:
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
+		return transaction.From, transaction.To, nil
+
+	case applications.ApplicationBalancerV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		return transaction.From, transaction.To, nil
 
