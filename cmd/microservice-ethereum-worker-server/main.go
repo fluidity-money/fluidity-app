@@ -133,7 +133,6 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		keyMovingAverageApy      = util.GetEnvOrFatal(EnvMovingAverageRedisKey)
 		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
