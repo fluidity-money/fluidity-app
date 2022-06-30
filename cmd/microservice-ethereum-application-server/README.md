@@ -6,10 +6,12 @@ worker with additional information attached.
 
 Supported contracts:
   - Uniswap V2
+  - Balancer V2 (Swap)
     
 ## Integrating a new application
 
-There are four files/folders that need to be updated:
+Update the list above with the name of the application!
+Then, there are four files/folders that need to be updated:
 
 - `common/ethereum/applications/applications.go`
 

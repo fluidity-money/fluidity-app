@@ -72,7 +72,7 @@ const uniswapV2PairAbiString = `[
       "type": "function"
     },
     {
-	      "constant": true,
+	  "constant": true,
       "inputs": [],
       "name": "token1",
       "outputs": [
