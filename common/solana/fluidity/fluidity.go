@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -92,12 +93,25 @@ func GetBaseToken(token string) (string, error) {
 // IsFluidToken takes a token and checks if is one of the fluid tokens
 func IsFluidToken(token string) bool {
 
-	// get the base token for
+	fluidTokenString := util.GetEnvOrFatal(EnvSolanaTokenLookups)
 
-	_, err := GetBaseToken(token)
+	// map of fluid -> base tokens
 
-	// if there was no error, we got a base token and the input is fluid
-	// otherwise we don't have a fluid token
+	var fluidTokens map[string]string
 
-	return err != nil
+	err := json.Unmarshal([]byte(fluidTokenString), &fluidTokens)
+
+	if err != nil {
+		log.Debugf(
+			"failed to unmarshal fluid to base token map from env string %#v! %v",
+			fluidTokenString,
+			err,
+		)
+		return false
+	}
+
+	// check if token exists in map
+	_, exists := fluidTokens[token]
+
+	return exists
 }
