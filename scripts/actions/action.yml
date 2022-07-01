@@ -1,0 +1,13 @@
+# action.yml
+name: 'fluidity-cli'
+author: 'renz@fludity.money'
+description: 'Build and Deploy fluidity micro services'
+inputs:
+  command:
+    description: 'flu cli command'
+    required: true
+runs:
+  using: 'docker'
+  image: 'docker.io/renzroque/flu-cli'
+  args:
+    - ${{ inputs.command }}
