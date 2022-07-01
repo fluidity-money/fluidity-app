@@ -338,18 +338,6 @@
   }
 }
 
-.small-line-chart-container {
-  width: 330px;
-  height: 200px;
-  @include for-above-500 {
-    display: none;
-  }
-  @include for-below-420 {
-    max-width: 105%;
-    height: 200px;
-  }
-}
-
 .total-yield-title {
   @include for-below-420 {
     font-size: small;
