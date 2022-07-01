@@ -338,7 +338,7 @@
 
 .line-chart-container {
   @include for-below-500 {
-    display: none;
+    width: 83vw;
   }
 }
 
@@ -354,4 +354,23 @@
   margin: 4px;
   padding: 0;
   min-width: 155;
+}
+
+.yield-graph-tooltip {
+  color: white;
+  font-family: "Manrope";
+  text-align: left;
+  width: 200px;
+  font-size: 10px;
+}
+
+.yield-graph-ticks {
+  background-color: "#131823";
+  border-radius: 10px;
+  font-family: "Manrope";
+}
+
+.yield-graph-legend {
+  color: white;
+  font-size: 9px;
 }
