@@ -8,6 +8,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -131,6 +132,10 @@ func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 	switch transfer.Application {
 	case applications.ApplicationUniswapV2:
 		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
+	case applications.ApplicationMooniswap:
+		return oneinch.GetMooniswapV1Fees(transfer, client, fluidTokenContract, tokenDecimals)
+	case applications.ApplicationOneInchSwap, applications.ApplicationOneInchP2P:
+		return oneinch.GetOneInchFees(transfer, client, fluidTokenContract, tokenDecimals)
 
 	default:
 		return nil, fmt.Errorf(
@@ -154,6 +159,10 @@ func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 	case applications.ApplicationUniswapV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		return transaction.From, transaction.To, nil
+	case applications.ApplicationOneInchSwap, applications.ApplicationMooniswap:
+		return transaction.From, transaction.To, nil
+	case applications.ApplicationOneInchP2P:
+		return transaction.To, transaction.From, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(

@@ -208,6 +208,10 @@ func ClassifyApplicationLogTopic(topic string) applications.Application {
 	switch topic {
 	case applications.UniswapSwapLogTopic:
 		return applications.ApplicationUniswapV2
+	case applications.OneInchSwapLogTopic:
+		return applications.ApplicationOneInchSwap
+	case applications.MooniswapSwapLogTopic:
+		return applications.ApplicationMooniswap
 	default:
 		return applications.ApplicationNone
 	}
