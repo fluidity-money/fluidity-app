@@ -14,3 +14,7 @@ build-common: ${FILES}
 	@touch build-common
 
 build: build-common
+
+test:
+	@cd calculation/probability && ${GO_TEST}
+	@cd calculation/moving-average && ${GO_TEST}

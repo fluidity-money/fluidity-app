@@ -26,3 +26,7 @@ docker-web: docker
 
 docker-compose-build:
 	@./scripts/docker-compose-all.sh build
+
+test:
+	@cd lib && ${MAKE} test
+	@cd common && ${MAKE} test
