@@ -13,6 +13,7 @@ cmd/*/lint
 cmd/*/*.o
 
 database/build
+database/db
 
 web/*/dist*
 web/*/node_modules
@@ -43,6 +44,10 @@ contracts/tribeca-govern-contracts/target
 
 contracts/utility-gauge/target
 
+deployment_list.json
 # Vendor specific
 .vscode
 .DS_Store
+
+
+

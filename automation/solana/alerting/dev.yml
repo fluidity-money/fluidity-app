@@ -1,0 +1,17 @@
+SERVICES:
+  - COMMON_RABBITMQ_BACKLOG_CHECKER:
+      ENABLE: false
+      SERVICE_NAME: microservice-common-rabbitmq-backlog-checker-solana
+      DOCKER_IMAGE: microservice-common-rabbitmq-backlog-checker
+      DOCKERFILE_PATH: ./cmd/microservice-common-rabbitmq-backlog-checker
+      DEPLOYMENT_TYPE: CRON
+      
+      ENV_FLU_WORKER_ID: production-microservice-common-rabbitmq-backlog-checker
+      SECRET_FLU_AMQP_USER: /fluidity/data/rabbitmq/user
+      SECRET_FLU_AMQP_USER_PASS: /fluidity/data/rabbitmq/password
+      SECRET_FLU_SLACK_WEBHOOK: /fluidity/slack/webhook
+
+      EVENT_ROLE: ecsEventsRole
+      EVENT_RULE: microservice-common-rabbitmq-backlog-checker-solana-cron
+      EVENT_SCHEDULE: rate(5 minutes) #every 5mins
+      
