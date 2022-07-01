@@ -9,7 +9,6 @@ import _ from "lodash";
 import ToggleButton from "components/Button/ToggleButton";
 import LineGraph from "components/Charts/LineChart";
 import UnclaimedRewardsbutton from "components/Button/UnclaimedRewardsButton";
-import SmallLineGraph from "components/Charts/SmallLineChart";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -134,7 +133,6 @@ const CurrencyBreakdown = () => {
   );
 
   const LineChart = useMemo(() => <LineGraph />, []);
-  const SmallLineChart = useMemo(() => <SmallLineGraph />, []);
 
   // Checks to see if the user's wallet is empty
   return (
@@ -152,7 +150,6 @@ const CurrencyBreakdown = () => {
           reward averages
         </div>
         <div className="line-chart-container">{LineChart}</div>
-        {/* <div className="small-line-chart-container">{SmallLineChart}</div> */}
 
         <UnclaimedRewardsbutton />
       </div>

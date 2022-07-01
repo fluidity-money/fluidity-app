@@ -21,15 +21,7 @@ const LineGraph = () => {
   }: TooltipProps<ValueType, NameType>) => {
     if (active) {
       return (
-        <div
-          style={{
-            color: "white",
-            fontFamily: "arial",
-            textAlign: "left",
-            width: 200,
-            fontSize: 10,
-          }}
-        >
+        <div className="yield-graph-tooltip">
           <p>{label}</p>
           <p>
             {payload &&
@@ -53,34 +45,19 @@ const LineGraph = () => {
     });
   };
   return (
-    <div
-      style={{
-        backgroundColor: "#131823",
-        borderRadius: 10,
-        fontFamily: "Arial",
-      }}
-    >
+    <div className="yield-graph-ticks">
       <ResponsiveContainer width={"100%"} height={250}>
         <AreaChart
           data={data}
-          margin={{ top: 10, right: 30, left: -30, bottom: 0 }}
+          margin={{ top: 10, right: 15, left: -30, bottom: 0 }}
         >
           <Legend
             verticalAlign="top"
-            align="center"
+            align="right"
             height={36}
-            // margin={{ left: 40, right: 0 }}
-
             iconType={"plainline"}
             formatter={(value, entry, index) => (
-              <span
-                style={{
-                  color: "white",
-                  fontSize: 9,
-                }}
-              >
-                {value}
-              </span>
+              <span className="yield-graph-legend">{value}</span>
             )}
           />
           <defs>
