@@ -1,141 +1,263 @@
-import { ChartOptions } from "chart.js";
-import { Line } from "react-chartjs-2";
+import {
+  Area,
+  AreaChart,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  TooltipProps,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 
 const LineGraph = () => {
-  // Dummy data until api endpoint for both lines
-  const data = (canvas: HTMLCanvasElement | null) => {
-    const ctx = canvas?.getContext("2d");
-    const userGradient = ctx?.createLinearGradient(0, 0, 0, 310);
-    userGradient?.addColorStop(0, "#132A2D");
-    userGradient?.addColorStop(1, "#131823");
-    const maxGradient = ctx?.createLinearGradient(0, 0, 0, 180);
-    maxGradient?.addColorStop(0, "#30183D");
-    maxGradient?.addColorStop(1, "#131823");
-
-    return {
-      // "04/29",
-      //   "05/02",
-      //   "05/05",
-      //   "05/08",
-      //   "05/11",
-      //   "05/14",
-      //   "05/17",
-      //   "05/20",
-      //   "05/23",
-      //   "05/26",
-      labels: [
-        "04/29",
-        "04/30",
-        "05/01",
-        "05/02",
-        "05/03",
-        "05/04",
-        "05/05",
-        "05/06",
-        "05/07",
-        "05/08",
-        "05/09",
-        "05/10",
-        "05/11",
-        "05/12",
-        "05/13",
-        "05/14",
-        "05/15",
-        "05/16",
-        "05/17",
-        "05/18",
-        "05/19",
-        "05/20",
-        "05/21",
-        "05/22",
-        "05/23",
-        "05/24",
-        "05/25",
-        "05/26",
-        "05/27",
-        "05/28",
-        "05/29",
-      ],
-      datasets: [
-        {
-          label: "User Accumulated Fluid Yield",
-          data: [
-            14, 13, 10, 12, 8, 11, 5, 7, 10, 9, 7, 8, 11, 6, 4, 3, 4, 2, 1, 1,
-            3, 1, 4, 3, 4, 2, 3, 1, 4, 2, 2,
-          ],
-          fill: true,
-
-          borderColor: "#06DCE6",
-          backgroundColor: userGradient,
-          pointRadius: 0,
-          borderWidth: 1,
-          tension: 0.1,
-          pointHoverRadius: 5,
-        },
-        {
-          label: "Maximum Expected Fluid Yield",
-          data: [
-            24, 23, 20, 22, 18, 21, 15, 17, 20, 19, 17, 18, 21, 16, 14, 13, 14,
-            12, 10, 10, 13, 10, 9, 7, 8, 5, 6, 3, 7, 5, 5,
-          ],
-          fill: true,
-          borderColor: "#C388D7",
-          backgroundColor: maxGradient,
-          pointRadius: 0,
-          borderWidth: 1,
-          tension: 0.1,
-          pointHoverRadius: 5,
-        },
-      ],
-    };
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: TooltipProps<ValueType, NameType>) => {
+    if (active) {
+      return (
+        <div className="yield-graph-tooltip">
+          <p>{label}</p>
+          <p>
+            {payload &&
+              `${payload[1].name}: $${payload[1].payload["Maximum Expected Fluid Yield"]}`}
+          </p>
+          <p>
+            {payload &&
+              `${payload[0].name}: $${payload[0].payload["User Accumulated Fluid Yield"]}`}
+          </p>
+        </div>
+      );
+    } else return null;
   };
 
-  const options: ChartOptions = {
-    responsive: true,
-    scales: {
-      x: {
-        offset: true,
-        ticks: {
-          maxTicksLimit: 11,
-        },
-      },
-
-      y: {
-        ticks: {
-          callback: function (value, index, values) {
-            return value.toLocaleString("en-US", {
-              style: "currency",
-              currency: "USD",
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0,
-            });
-          },
-        },
-      },
-    },
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
-
-    plugins: {
-      tooltip: {
-        backgroundColor: "transparent",
-        yAlign: "bottom",
-        caretSize: 70,
-        padding: { left: 80 },
-      },
-      legend: {
-        labels: {
-          boxWidth: 10,
-          boxHeight: 5,
-          color: "#828a90",
-        },
-      },
-    },
+  const DataFormater = (number: number) => {
+    return number.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
   };
+  return (
+    <div className="yield-graph-ticks">
+      <ResponsiveContainer width={"100%"} height={250}>
+        <AreaChart
+          data={data}
+          margin={{ top: 10, right: 15, left: -30, bottom: 0 }}
+        >
+          <Legend
+            verticalAlign="top"
+            align="right"
+            height={36}
+            iconType={"plainline"}
+            formatter={(value, entry, index) => (
+              <span className="yield-graph-legend">{value}</span>
+            )}
+          />
+          <defs>
+            <linearGradient id="colorUser" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#06DCE6" stopOpacity={0.4} />
+              <stop offset="85%" stopColor="#06DCE6" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="colorMax" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#C619C2" stopOpacity={0.4} />
+              <stop offset="85%" stopColor="#C619C2" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis
+            dataKey="date"
+            tick={{ fontFamily: "arial", fontSize: 12 }}
+            tickLine={true}
+          />
+          <YAxis
+            tickFormatter={DataFormater}
+            tickLine={true}
+            tick={{ fontFamily: "arial", fontSize: 12 }}
+          />
 
-  return <Line data={data} options={options} />;
+          <Tooltip content={CustomTooltip && <CustomTooltip />} />
+          <Area
+            type="monotone"
+            dataKey="User Accumulated Fluid Yield"
+            stroke="#06DCE6"
+            fillOpacity={0.6}
+            fill="url(#colorUser)"
+          />
+          <Area
+            type="monotone"
+            dataKey="Maximum Expected Fluid Yield"
+            stroke="#C619C2"
+            fillOpacity={0.5}
+            fill="url(#colorMax)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
 };
 
+// dummy data
+const data = [
+  {
+    date: "01 Aug",
+    "User Accumulated Fluid Yield": 10,
+    "Maximum Expected Fluid Yield": 20,
+  },
+  {
+    date: "02 Aug",
+    "User Accumulated Fluid Yield": 12,
+    "Maximum Expected Fluid Yield": 20,
+  },
+  {
+    date: "03 Aug",
+    "User Accumulated Fluid Yield": 9,
+    "Maximum Expected Fluid Yield": 18,
+  },
+  {
+    date: "04 Aug",
+    "User Accumulated Fluid Yield": 10,
+    "Maximum Expected Fluid Yield": 22,
+  },
+  {
+    date: "05 Aug",
+    "User Accumulated Fluid Yield": 7,
+    "Maximum Expected Fluid Yield": 21,
+  },
+  {
+    date: "06 Aug",
+    "User Accumulated Fluid Yield": 8,
+    "Maximum Expected Fluid Yield": 20,
+  },
+  {
+    date: "07 Aug",
+    "User Accumulated Fluid Yield": 9,
+    "Maximum Expected Fluid Yield": 18,
+  },
+  {
+    date: "08 Aug",
+    "User Accumulated Fluid Yield": 7,
+    "Maximum Expected Fluid Yield": 19,
+  },
+  {
+    date: "09 Aug",
+    "User Accumulated Fluid Yield": 6,
+    "Maximum Expected Fluid Yield": 17,
+  },
+  {
+    date: "10 Aug",
+    "User Accumulated Fluid Yield": 6,
+    "Maximum Expected Fluid Yield": 17,
+  },
+  {
+    date: "11 Aug",
+    "User Accumulated Fluid Yield": 8,
+    "Maximum Expected Fluid Yield": 18,
+  },
+  {
+    date: "12 Aug",
+    "User Accumulated Fluid Yield": 5,
+    "Maximum Expected Fluid Yield": 19,
+  },
+  {
+    date: "13 Aug",
+    "User Accumulated Fluid Yield": 4,
+    "Maximum Expected Fluid Yield": 16,
+  },
+  {
+    date: "14 Aug",
+    "User Accumulated Fluid Yield": 5,
+    "Maximum Expected Fluid Yield": 15,
+  },
+  {
+    date: "15 Aug",
+    "User Accumulated Fluid Yield": 4,
+    "Maximum Expected Fluid Yield": 14,
+  },
+  {
+    date: "16 Aug",
+    "User Accumulated Fluid Yield": 6,
+    "Maximum Expected Fluid Yield": 13,
+  },
+  {
+    date: "17 Aug",
+    "User Accumulated Fluid Yield": 8,
+    "Maximum Expected Fluid Yield": 17,
+  },
+  {
+    date: "18 Aug",
+    "User Accumulated Fluid Yield": 7,
+    "Maximum Expected Fluid Yield": 16,
+  },
+  {
+    date: "19 Aug",
+    "User Accumulated Fluid Yield": 6,
+    "Maximum Expected Fluid Yield": 15,
+  },
+  {
+    date: "20 Aug",
+    "User Accumulated Fluid Yield": 5,
+    "Maximum Expected Fluid Yield": 16,
+  },
+  {
+    date: "21 Aug",
+    "User Accumulated Fluid Yield": 4,
+    "Maximum Expected Fluid Yield": 14,
+  },
+  {
+    date: "22 Aug",
+    "User Accumulated Fluid Yield": 5,
+    "Maximum Expected Fluid Yield": 12,
+  },
+  {
+    date: "23 Aug",
+    "User Accumulated Fluid Yield": 3,
+    "Maximum Expected Fluid Yield": 14,
+  },
+  {
+    date: "24 Aug",
+    "User Accumulated Fluid Yield": 3,
+    "Maximum Expected Fluid Yield": 16,
+  },
+  {
+    date: "25 Aug",
+    "User Accumulated Fluid Yield": 5,
+    "Maximum Expected Fluid Yield": 14,
+  },
+  {
+    date: "26 Aug",
+    "User Accumulated Fluid Yield": 3,
+    "Maximum Expected Fluid Yield": 13,
+  },
+  {
+    date: "27 Aug",
+    "User Accumulated Fluid Yield": 2,
+    "Maximum Expected Fluid Yield": 12,
+  },
+  {
+    date: "28 Aug",
+    "User Accumulated Fluid Yield": 1,
+    "Maximum Expected Fluid Yield": 11,
+  },
+  {
+    date: "29 Aug",
+    "User Accumulated Fluid Yield": 2,
+    "Maximum Expected Fluid Yield": 13,
+  },
+  {
+    date: "30 Aug",
+    "User Accumulated Fluid Yield": 4,
+    "Maximum Expected Fluid Yield": 12,
+  },
+  {
+    date: "31 Aug",
+    "User Accumulated Fluid Yield": 3,
+    "Maximum Expected Fluid Yield": 14,
+  },
+];
 export default LineGraph;

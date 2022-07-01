@@ -1,6 +1,6 @@
 import CurrencyListing from "./CurrencyListing";
 import DoughnutGraph from "components/Charts/DoughnutChart";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useEffect } from "react";
 import getWalletSPLStatus from "util/getWalletSPLStatus";
 import { walletDataType } from "util/getWalletSPLStatus";
@@ -9,7 +9,6 @@ import { useSolana } from "@saberhq/use-solana";
 import { useFluidToken } from "util/hooks";
 import ToggleButton from "components/Button/ToggleButton";
 import UnclaimedRewardsbutton from "components/Button/UnclaimedRewardsButton";
-import SmallLineGraph from "components/Charts/SmallLineChart";
 import LineGraph from "components/Charts/LineChart";
 
 const CurrencyBreakdown = () => {
@@ -128,7 +127,6 @@ const CurrencyBreakdown = () => {
   );
 
   const LineChart = useMemo(() => <LineGraph />, []);
-  const SmallLineChart = useMemo(() => <SmallLineGraph />, []);
 
   // Checks to see if the user's wallet is empty
   return (
@@ -144,7 +142,6 @@ const CurrencyBreakdown = () => {
           reward averages
         </div>
         <div className="line-chart-container">{LineChart}</div>
-        <div className="small-line-chart-container">{SmallLineChart}</div>
 
         <UnclaimedRewardsbutton />
       </div>
