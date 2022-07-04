@@ -7,11 +7,11 @@ import (
 )
 
 func init() {
-	reader := strings.NewReader(oneInchAggregationV4AbiString)
+	reader := strings.NewReader(oneInchLiquidityPoolV2AbiString)
 
 	var err error
 
-	if oneInchExchangeAbi, err = ethAbi.JSON(reader); err != nil {
+	if oneInchLiquidityPoolV2Abi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 

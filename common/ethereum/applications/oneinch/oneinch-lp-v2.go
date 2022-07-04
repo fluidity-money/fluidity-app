@@ -109,7 +109,7 @@ var oneInchLiquidityPoolV2Abi ethAbi.ABI
 // GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetOneInchLPV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 
 	if len(transfer.Log.Topics) != 4 {
 		return nil, fmt.Errorf(

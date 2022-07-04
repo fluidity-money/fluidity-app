@@ -11,8 +11,8 @@ const (
 	ApplicationOneInchLPV2
 	ApplicationOneInchLPV1
 	ApplicationMooniswap
-	ApplicationOneInchP2P
 	ApplicationOneInchFixedRateSwap
+	ApplicationOneInchP2P
 )
 
 const (

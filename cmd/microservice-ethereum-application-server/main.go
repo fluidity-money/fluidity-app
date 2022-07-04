@@ -132,14 +132,12 @@ func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 	switch transfer.Application {
 	case applications.ApplicationUniswapV2:
 		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
+	case applications.ApplicationOneInchLPV2, applications.ApplicationOneInchLPV1:
+		return oneinch.GetOneInchLPFees(transfer, client, fluidTokenContract, tokenDecimals)
 	case applications.ApplicationMooniswap:
 		return oneinch.GetMooniswapV1Fees(transfer, client, fluidTokenContract, tokenDecimals)
 	case applications.ApplicationOneInchFixedRateSwap:
 		return oneinch.GetFixedRateSwapFees(transfer, client, fluidTokenContract, tokenDecimals)
-	case applications.ApplicationOneInchLPV2:
-		return oneinch.GetOneInchFees(transfer, client, fluidTokenContract, tokenDecimals)
-	case applications.ApplicationOneInchLPV1:
-		return oneinch.GetOneInchFees(transfer, client, fluidTokenContract, tokenDecimals)
 
 	default:
 		return nil, fmt.Errorf(
