@@ -41,7 +41,7 @@ type ConstantProductCurveFeeData struct {
 // GetOrcaFees by checking that an orca swap occurred, then
 // destructuring the swap information to get the fee %, and
 // getting the fees paid by multiplying the value of the swap
-func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string) (feesPaid *big.Rat, err error) {
+func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string, fluidTokens *map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
@@ -232,8 +232,8 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 		var (
 			// check if the transaction involves a fluid token
 
-			sourceMintIsFluid      = fluidity.IsFluidToken(sourceMint.String())
-			destinationMintIsFluid = fluidity.IsFluidToken(destinationMint.String())
+			sourceMintIsFluid      = fluidity.IsFluidToken(sourceMint.String(), fluidTokens)
+			destinationMintIsFluid = fluidity.IsFluidToken(destinationMint.String(), fluidTokens)
 		)
 
 		// if neither token is fluid we don't care about this transaction
@@ -252,7 +252,7 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 		// if the source mint is a fluid token, use its non-fluid counterpart
 
 		if sourceMintIsFluid {
-			newMint, err := fluidity.GetBaseToken(sourceMint.String())
+			newMint, err := fluidity.GetBaseToken(sourceMint.String(), fluidTokens)
 
 			if err != nil {
 				return nil, fmt.Errorf(

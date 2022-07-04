@@ -32,7 +32,7 @@ type SwapInstruction struct {
 }
 
 // GetRaydiumFees by taking 0.25% of the transaction value
-func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, raydiumProgramID string) (feesPaid *big.Rat, err error) {
+func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, raydiumProgramID string, fluidTokens *map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
@@ -177,8 +177,8 @@ func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.Transactio
 		var (
 			// check if the transaction involves a fluid token
 
-			sourceMintIsFluid      = fluidity.IsFluidToken(sourceMint.String())
-			destinationMintIsFluid = fluidity.IsFluidToken(destinationMint.String())
+			sourceMintIsFluid      = fluidity.IsFluidToken(sourceMint.String(), fluidTokens)
+			destinationMintIsFluid = fluidity.IsFluidToken(destinationMint.String(), fluidTokens)
 		)
 
 		// if neither token is fluid we don't care about this transaction
@@ -196,7 +196,10 @@ func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.Transactio
 		// if the source mint is a fluid token, use its non-fluid counterpart
 
 		if sourceMintIsFluid {
-			newMint, err := fluidity.GetBaseToken(sourceMint.String())
+			newMint, err := fluidity.GetBaseToken(sourceMint.String(), fluidTokens)
+
+// EnvSolanaTokenLookups is the map of fluid -> base tokens
+const EnvSolanaTokenLookups = `FLU_SOLANA_TOKEN_LOOKUPS`
 
 			if err != nil {
 				return nil, fmt.Errorf(
@@ -231,7 +234,8 @@ func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.Transactio
 
 		var swapInstruction SwapInstruction
 
-		// deserialise the transaction data minus the enum variant (the first byte)
+		// deserialise the transaction data minus the enum
+		// variant (the first byte)
 
 		err = borsh.Deserialize(&swapInstruction, instructionByteData[1:])
 

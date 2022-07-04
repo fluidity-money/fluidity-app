@@ -1,11 +1,7 @@
 package fluidity
 
 import (
-	"encoding/json"
 	"fmt"
-
-	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -52,31 +48,13 @@ type (
 	}
 )
 
-// EnvSolanaTokenLookups is the map of fluid -> base tokens
-const EnvSolanaTokenLookups = `FLU_SOLANA_TOKEN_LOOKUPS`
 
 // GetBaseToken takes a fluid token and returns its counterpart
-func GetBaseToken(token string) (string, error) {
-
-	fluidTokenString := util.GetEnvOrFatal(EnvSolanaTokenLookups)
-
-	// map of fluid -> base tokens
-
-	var fluidTokens map[string]string
-
-	err := json.Unmarshal([]byte(fluidTokenString), &fluidTokens)
-
-	if err != nil {
-		return "", fmt.Errorf(
-			"failed to unmarshal fluid to base token map from env string %#v! %v",
-			fluidTokenString,
-			err,
-		)
-	}
+func GetBaseToken(token string, fluidTokens *map[string]string) (string, error) {
 
 	// get the base token
 
-	baseToken := fluidTokens[token]
+	baseToken := (*fluidTokens)[token]
 
 	// check that we got a good result
 
@@ -91,27 +69,10 @@ func GetBaseToken(token string) (string, error) {
 }
 
 // IsFluidToken takes a token and checks if is one of the fluid tokens
-func IsFluidToken(token string) bool {
-
-	fluidTokenString := util.GetEnvOrFatal(EnvSolanaTokenLookups)
-
-	// map of fluid -> base tokens
-
-	var fluidTokens map[string]string
-
-	err := json.Unmarshal([]byte(fluidTokenString), &fluidTokens)
-
-	if err != nil {
-		log.Debugf(
-			"failed to unmarshal fluid to base token map from env string %#v! %v",
-			fluidTokenString,
-			err,
-		)
-		return false
-	}
+func IsFluidToken(token string, fluidTokens *map[string]string) bool {
 
 	// check if token exists in map
-	_, exists := fluidTokens[token]
+	_, exists := (*fluidTokens)[token]
 
 	return exists
 }

@@ -178,6 +178,8 @@ var pythPrices = map[string]string{
 	"EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp": "ETp9eKXVv1dWwHSpsXRUuXHmw24PwRkttCGVgpZEY9zF",
 }
 
+// GetPriceByToken takes an spl-token, and returns the corresponding pyth price
+// for that token, automatically finding the price account
 func GetPriceByToken(solanaClient *rpc.Client,  token string) (*big.Rat, error){
 
 	pythPricePubkeyString := pythPrices[token]
@@ -189,7 +191,15 @@ func GetPriceByToken(solanaClient *rpc.Client,  token string) (*big.Rat, error){
 		)
 	}
 
-	pythPricePubkey := solana.MustPublicKeyFromBase58(pythPricePubkeyString)
+	pythPricePubkey, err := solana.PublicKeyFromBase58(pythPricePubkeyString)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to get public key of Pyth price address %#v! %v",
+			pythPricePubkeyString,
+			err,
+		)
+	}
 
 	pythPrice, err := GetPrice(solanaClient, pythPricePubkey)
 

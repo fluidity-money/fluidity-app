@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -37,6 +38,9 @@ const (
 
 	// EnvSolPythPubkey is the public key of the Pyth price account for SOL
 	EnvSolPythPubkey = `FLU_SOLANA_SOL_PYTH_PUBKEY`
+
+	// EnvSolanaTokenLookups is the map of fluid -> base tokens
+	EnvSolanaTokenLookups = `FLU_SOLANA_TOKEN_LOOKUPS`
 )
 
 const (
@@ -52,7 +56,24 @@ func main() {
 		orcaProgramId       = util.GetEnvOrFatal(EnvOrcaProgramId)
 		raydiumProgramId    = util.GetEnvOrFatal(EnvRaydiumProgramId)
 		solPythPubkeyString = util.GetEnvOrFatal(EnvSolPythPubkey)
+		fluidTokenString = util.GetEnvOrFatal(EnvSolanaTokenLookups)
 	)
+
+	// map of fluid -> base tokens
+
+	var fluidTokens map[string]string
+
+	err := json.Unmarshal([]byte(fluidTokenString), &fluidTokens)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"failed to unmarshal fluid to base token map from env string %#v!",
+				fluidTokenString,
+			)
+			k.Payload = err
+		})
+	}
 
 	solPythPubkey := solanaLibrary.MustPublicKeyFromBase58(solPythPubkeyString)
 
@@ -114,6 +135,7 @@ func main() {
 				solanaClient,
 				transaction,
 				orcaProgramId,
+				&fluidTokens,
 			)
 
 			if err != nil {
@@ -129,6 +151,7 @@ func main() {
 				solanaClient,
 				transaction,
 				raydiumProgramId,
+				&fluidTokens,
 			)
 
 			if err != nil {
