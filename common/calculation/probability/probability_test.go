@@ -70,8 +70,9 @@ func TestProbability(t *testing.T) {
 
 func TestCalculateN(t *testing.T) {
 	var (
-		m = int64(8)
-		g = big.NewRat(91, 1)
+		m          = 8
+		g          = big.NewRat(91, 1)
+		payoutFreq = big.NewRat(1, 4)
 	)
 
 	// n! < p over 1000 iterations panics
@@ -82,14 +83,14 @@ func TestCalculateN(t *testing.T) {
 		t,
 		"infinite loop",
 		func() {
-			calculateN(m, g, atx, getTestEmission("ethereum", "usdt", 6))
+			calculateN(m, g, atx, payoutFreq, getTestEmission("ethereum", "usdt", 6))
 		},
 	)
 
 	g = big.NewRat(3, 1)
 	atx = big.NewRat(4728, 1)
 
-	result := calculateN(m, g, atx, getTestEmission("ethereum", "usdt", 6))
+	result := calculateN(m, g, atx, payoutFreq, getTestEmission("ethereum", "usdt", 6))
 	assert.EqualValues(t, 12, result)
 }
 
@@ -99,7 +100,7 @@ func TestPayout(t *testing.T) {
 		atx        = big.NewRat(36_500_000, 1)
 		apy        = big.NewRat(35_000_000, 1)
 		g          = big.NewRat(3, 1)
-		m          = int64(6)
+		m          = 6
 		n          = int64(1580)
 		b          = int64(1)
 		rewardPool = big.NewRat(0, 1)
@@ -128,12 +129,14 @@ func TestWinningChances(t *testing.T) {
 	var (
 		gasFee                  = big.NewRat(3, 1)
 		atx                     = big.NewRat(36_500_000, 1)
-		bpyStakedUsd            = big.NewRat(150, 1)
 		rewardPool              = big.NewRat(10, 1)
 		decimalPlacesRat        = big.NewRat(6, 1)
 		averageTransfersInBlock = 13
 		blockTimeInSeconds      = uint64(15)
-		crumb                   = getTestEmission("ethereum", "usdt", 6)
+		payoutFreq              = big.NewRat(1, 4)
+		deltaWeight             = big.NewRat(31536000, 1)
+		winningClasses          = 5
+		emission                = getTestEmission("ethereum", "usdt", 6)
 
 		expectedN       = uint(66)
 		expectedPayouts = []*misc.BigInt{}
@@ -151,7 +154,18 @@ func TestWinningChances(t *testing.T) {
 	expectedPayouts = append(expectedPayouts, &d)
 	expectedPayouts = append(expectedPayouts, &e)
 
-	n, payouts := WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat, averageTransfersInBlock, blockTimeInSeconds, crumb)
+	n, payouts := WinningChances(
+		gasFee,
+		atx,
+		rewardPool,
+		decimalPlacesRat,
+		payoutFreq,
+		deltaWeight,
+		winningClasses,
+		averageTransfersInBlock,
+		blockTimeInSeconds,
+		emission,
+	)
 
 	assert.Equal(t, expectedN, n)
 	assert.Equal(t, expectedPayouts, payouts)

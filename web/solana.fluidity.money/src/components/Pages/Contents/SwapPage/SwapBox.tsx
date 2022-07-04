@@ -1,11 +1,16 @@
-import { useState, useContext, useEffect} from "react";
+import { useState, useContext, useEffect } from "react";
 import Header from "components/Header";
 import Button from "components/Button";
 import Icon from "components/Icon";
 import FormSection from "components/Styling/FormSection";
 import Input from "components/Input";
 import TokenSelect from "components/Pages/Contents/SwapPage/TokenSelect";
-import { modalToggle, SwapModalStatus, LoadingStatusToggle, userActionContext } from "components/context";
+import {
+  ModalToggle,
+  SwapModalStatus,
+  LoadingStatusToggle,
+  UserActionContext,
+} from "components/context";
 import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
 import {TokenKind} from "components/types";
 import TransactionConfirmationModal from "components/Modal/Themes/TransactionConfirmationModal.tsx";
@@ -13,8 +18,8 @@ import {getBalanceOfSPL} from "util/contractUtils";
 import {useSolana} from "@saberhq/use-solana";
 import {TokenAmount} from '@saberhq/token-utils';
 import useFluidTokens from "util/hooks/useFluidTokens";
-import {unwrapSpl, wrapSpl} from 'util/solana/transaction';
-import {bnToDisplayString, tokenValueInputHandler} from "util/numbers";
+import { unwrapSpl, wrapSpl } from "util/solana/transaction";
+import { bnToDisplayString, tokenValueInputHandler } from "util/numbers";
 import BN from "bn.js";
 import {notificationContext} from "components/Notifications/notificationContext";
 import {useWalletKit} from "@gokiprotocol/walletkit";
@@ -22,8 +27,9 @@ import {useWalletKit} from "@gokiprotocol/walletkit";
 const SwapBox = () => {
   const [amountRaw, setAmountRaw] = useState(""); // Records From amount
   const [amount, setAmount] = useState(""); // Displays from amount (user-friendly)
-  const [swap, setSwap] = useState<boolean>(true);  // toggles between swap to and from Fluid dollars
+  const [swap, setSwap] = useState<boolean>(true); // toggles between swap to and from Fluid dollars
   const [paymentModalToggle, setPaymentModalToggle] = useState<boolean>(false); // toggle state for payment modal
+
   const [successTransactionModal, setSuccessTransactionModal] = useState<boolean>(false); // toggle state for the transaction confirmation
   const [balance, setBalance] = useState("0");  // state to track status of selected fluid amount in wallet
   const [fbalance, setfBalance] = useState("0");  // state to track amount of selected standard token in wallet
@@ -34,7 +40,7 @@ const SwapBox = () => {
   const {addError} = useContext(notificationContext);
   
   // userActions context to update balance when potentially sending/receiving
-  const userActions = useContext(userActionContext);
+  const userActions = useContext(UserActionContext);
 
   // Loading Modal Trigger Function (From App.tsx)
   const loadingToggleTrigger = useContext(LoadingStatusToggle).toggle[1];
@@ -42,7 +48,7 @@ const SwapBox = () => {
   // Transaction confirmation modal toggle function
   const toggleSuccessTransactionModal = () => {
     setSuccessTransactionModal(!successTransactionModal);
-  }
+  };
 
   // Modal toggle context definition
   const [toggleTo, setToggleTo] = useState<boolean>(false);
@@ -57,43 +63,45 @@ const SwapBox = () => {
   useEffect(() => {
     const fluidToken = tokens?.[selectedFluidToken]?.token;
     const token = tokens?.[selectedToken]?.token;
-    if (!fluidToken || !token)
-      return;
+    if (!fluidToken || !token) return;
 
     // Balance of Fluid
-    fluidToken && sol.publicKey && getBalanceOfSPL(
-      fluidToken,
-      sol.connection,
-      sol.publicKey
-    ).then(bal => setfBalance(bal.amount ?? "0"));
+    fluidToken &&
+      sol.publicKey &&
+      getBalanceOfSPL(fluidToken, sol.connection, sol.publicKey).then((bal) =>
+        setfBalance(bal.amount ?? "0")
+      );
 
     // Balance of Standard
-    token && sol.publicKey && getBalanceOfSPL(
-      token,
-      sol.connection,
-      sol.publicKey
-    ).then(bal => setBalance(bal.amount || "0"));
-  }, [selectedToken, selectedFluidToken, tokens?.[selectedToken], successTransactionModal, userActions.length])
+    token &&
+      sol.publicKey &&
+      getBalanceOfSPL(token, sol.connection, sol.publicKey).then((bal) =>
+        setBalance(bal.amount || "0")
+      );
+  }, [
+    selectedToken,
+    selectedFluidToken,
+    tokens?.[selectedToken],
+    successTransactionModal,
+    userActions.length,
+  ]);
 
   // reset input to selected token's max when switching
   useEffect(() => {
-    if (!tokens)
-      return;
+    if (!tokens) return;
 
-    const currentToken = tokens[swap ? selectedToken : selectedFluidToken]?.token;
+    const currentToken =
+      tokens[swap ? selectedToken : selectedFluidToken]?.token;
     const currentBalance = swap ? balance : fbalance;
 
     // swapping but no token selected
-    if (!currentToken)
-      return;
+    if (!currentToken) return;
 
     const tokenAmountRaw = new TokenAmount(currentToken, amountRaw);
     const tokenBalance = new TokenAmount(currentToken, currentBalance);
 
-    if (tokenAmountRaw.greaterThan(tokenBalance))
-      setMaxBalance();
-  }, [swap])
-
+    if (tokenAmountRaw.greaterThan(tokenBalance)) setMaxBalance();
+  }, [swap]);
 
   // Toggle payment modal
   const switchPayment = () => {
@@ -118,7 +126,7 @@ const SwapBox = () => {
   const setterToken = (input: TokenKind["symbol"]) => {
     setSelectedToken(input);
     // 'f<token>'
-    setSelectedFluidToken("f" + input as TokenKind["symbol"]);
+    setSelectedFluidToken(("f" + input) as TokenKind["symbol"]);
     return;
   };
 
@@ -133,33 +141,51 @@ const SwapBox = () => {
     toggleTo: [toggleTo, togglerTo],
     toggleFrom: [toggleFrom, togglerFrom],
     selectedToken: [selectedToken, setterToken],
-    selectedFluidToken: [selectedFluidToken, setterFluidToken]
-  }
+    selectedFluidToken: [selectedFluidToken, setterFluidToken],
+  };
 
   const setMaxBalance = () => {
-    if (!tokens)
-      return;
+    if (!tokens) return;
 
     const currentToken = swap ? selectedToken : selectedFluidToken;
     if (currentToken === "Select FLUID" || currentToken === "Select Token")
       return;
 
     const _balance = swap ? balance : fbalance;
-    const balanceString = new TokenAmount(tokens[currentToken].token, _balance).toExact();
-    tokenValueInputHandler(balanceString, setAmount, setAmountRaw, tokens[currentToken].token)
-  }
+    const balanceString = new TokenAmount(
+      tokens[currentToken].token,
+      _balance
+    ).toExact();
+    tokenValueInputHandler(
+      balanceString,
+      setAmount,
+      setAmountRaw,
+      tokens[currentToken].token
+    );
+  };
 
   // Function to trigger transaction on confirm
   const initialiseTransaction = async () => {
-    const {token, config} = tokens?.[selectedToken] || {};
-    const {token: fluidToken} = tokens?.[selectedFluidToken] || {};
-    if (!token || !fluidToken || !amountRaw || !config?.obligationPubkey || !config.dataAccountPubkey) return;
+    const { token, config } = tokens?.[selectedToken] || {};
+    const { token: fluidToken } = tokens?.[selectedFluidToken] || {};
+    if (
+      !token ||
+      !fluidToken ||
+      !amountRaw ||
+      !config?.obligationPubkey ||
+      !config.dataAccountPubkey
+    )
+      return;
 
     const checkBalance = new BN(swap ? balance : fbalance);
 
     if (checkBalance.lt(new BN(amountRaw))) {
       const tokenFrom = swap ? token : fluidToken;
-      addError(`Trying to swap ${new TokenAmount(tokenFrom, amountRaw).toExact()} ${tokenFrom.symbol}, but balance is ${bnToDisplayString(tokenFrom, checkBalance)}`);
+      addError(
+        `Trying to swap ${new TokenAmount(tokenFrom, amountRaw).toExact()} ${
+          tokenFrom.symbol
+        }, but balance is ${bnToDisplayString(tokenFrom, checkBalance)}`
+      );
       return;
     }
     try {
@@ -172,7 +198,7 @@ const SwapBox = () => {
           fluidToken,
           new TokenAmount(token, amountRaw),
           config.obligationPubkey,
-          config.dataAccountPubkey,
+          config.dataAccountPubkey
         );
       } else {
         result = await unwrapSpl(
@@ -180,45 +206,61 @@ const SwapBox = () => {
           fluidToken,
           new TokenAmount(token, amountRaw),
           config.obligationPubkey,
-          config.dataAccountPubkey,
+          config.dataAccountPubkey
         );
       }
 
       console.log(result);
       toggleSuccessTransactionModal();
       switchPayment();
-    }
-    catch(e) {
-      console.error(e)
-      if (e?.message === "failed to send transaction: Transaction simulation failed: Insufficient funds for fee") {
+    } catch (e) {
+      console.error(e);
+      if (
+        e?.message ===
+        "failed to send transaction: Transaction simulation failed: Insufficient funds for fee"
+      ) {
         addError("Insufficient funds for transaction fee!");
       } else addError(e?.message);
-    }
-    finally {
+    } finally {
       loadingToggleTrigger(false);
       setPaymentModalToggle(false);
     }
-  }
+  };
 
   // wrapper for current balance display component
-  const AmountAvailable = ({invert = false}: {invert?: boolean}) => {
+  const AmountAvailable = ({ invert = false }: { invert?: boolean }) => {
     let isNonFluid = swap;
-    if (invert)
-      isNonFluid = !isNonFluid;
+    if (invert) isNonFluid = !isNonFluid;
 
-    return <div className="amount-avail">
-      {
-        isNonFluid
-          ? selectedToken === "Select Token" ? null :
-            `Balance: ${tokens ? new TokenAmount(tokens[selectedToken].token, balance).toExact() : "0"}`
-          : selectedFluidToken === "Select FLUID" ? null :
-            `Balance: ${tokens ? new TokenAmount(tokens[selectedFluidToken].token, fbalance).toExact() : "0"}`
-      }
-    </div>
-  }
+    return (
+      <div className="amount-avail">
+        {isNonFluid
+          ? selectedToken === "Select Token"
+            ? null
+            : `Balance: ${
+                tokens
+                  ? new TokenAmount(
+                      tokens[selectedToken].token,
+                      balance
+                    ).toExact()
+                  : "0"
+              }`
+          : selectedFluidToken === "Select FLUID"
+          ? null
+          : `Balance: ${
+              tokens
+                ? new TokenAmount(
+                    tokens[selectedFluidToken].token,
+                    fbalance
+                  ).toExact()
+                : "0"
+            }`}
+      </div>
+    );
+  };
 
   return (
-    <modalToggle.Provider value={modalContext}>
+    <ModalToggle.Provider value={modalContext}>
       <div className="swap-box-container flex column">
         <div className="swap-form flex column flex-space-between">
           <FormSection
@@ -239,10 +281,20 @@ const SwapBox = () => {
                   type="text"
                   theme="input-swap-box"
                   toggle={true}
-                  output={out => tokenValueInputHandler(out, setAmount, setAmountRaw, tokens?.[selectedToken]?.token ?? null)}
+                  output={(out) =>
+                    tokenValueInputHandler(
+                      out,
+                      setAmount,
+                      setAmountRaw,
+                      tokens?.[selectedToken]?.token ?? null
+                    )
+                  }
                   pholder="0.0"
                   value={amount}
-                  disabled={selectedToken === "Select Token" && selectedFluidToken === "Select FLUID"}
+                  disabled={
+                    selectedToken === "Select Token" &&
+                    selectedFluidToken === "Select FLUID"
+                  }
                 />
               </div>
             </div>
@@ -251,12 +303,24 @@ const SwapBox = () => {
                 type={swap === true ? "token" : "fluid"}
                 toggle={swap === true ? togglerTo : togglerFrom}
               />
-              <div onClick={setMaxBalance} className="flex row balance-container">
-                {sol.connected &&
-                <>
-                  <AmountAvailable/>
-                  <Button theme={"max-button"} disabled={selectedFluidToken === "Select FLUID" || selectedToken === "Select Token"} goto={setMaxBalance} label="max" />
-                </>}
+              <div
+                onClick={setMaxBalance}
+                className="flex row balance-container"
+              >
+                {sol.connected && (
+                  <>
+                    <AmountAvailable />
+                    <Button
+                      theme={"max-button"}
+                      disabled={
+                        selectedFluidToken === "Select FLUID" ||
+                        selectedToken === "Select Token"
+                      }
+                      goto={setMaxBalance}
+                      label="max"
+                    />
+                  </>
+                )}
               </div>
             </div>
           </FormSection>
@@ -273,8 +337,8 @@ const SwapBox = () => {
                   type="text"
                   theme="input-swap-box"
                   toggle={true}
-                  output={() => { }}
-                  value={amount ??  ""}
+                  output={() => {}}
+                  value={amount ?? ""}
                   pholder="0.0"
                   disabled={true}
                 />
@@ -298,12 +362,19 @@ const SwapBox = () => {
               padding="py-1"
               disabled={
                 //not connected, click to connect
-                !sol.connected ? false :
-                //nothing selected
-                selectedToken === "Select Token" ||
-                selectedFluidToken === "Select FLUID" ||
-                //amount is <= 0
-                !(tokens && new TokenAmount(tokens[selectedToken].token, amountRaw).greaterThan(0))
+                !sol.connected
+                  ? false
+                  : //nothing selected
+                    selectedToken === "Select Token" ||
+                    selectedFluidToken === "Select FLUID" ||
+                    //amount is <= 0
+                    !(
+                      tokens &&
+                      new TokenAmount(
+                        tokens[selectedToken].token,
+                        amountRaw
+                      ).greaterThan(0)
+                    )
               }
             />
             {/* For Transaction Confirmation */}
@@ -320,12 +391,14 @@ const SwapBox = () => {
             <TransactionConfirmationModal
               enable={successTransactionModal}
               toggle={toggleSuccessTransactionModal}
-              message={<div className="primary-text">Transaction Successful</div>}
+              message={
+                <div className="primary-text">Transaction Successful</div>
+              }
             />
           </FormSection>
         </div>
       </div>
-    </modalToggle.Provider>
+    </ModalToggle.Provider>
   );
 };
 

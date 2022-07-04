@@ -49,7 +49,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 
 		var (
 			fluidMint_   = trimWhitespace(tokenDetails_[0])
-			_            = trimWhitespace(tokenDetails_[1])
+			tokenName    = trimWhitespace(tokenDetails_[1])
 			decimals_    = trimWhitespace(tokenDetails_[2])
 			obligation_  = trimWhitespace(tokenDetails_[3])
 			reserve_     = trimWhitespace(tokenDetails_[4])
@@ -82,6 +82,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 
 		tokenDetail := TokenDetailsSolana{
 			FluidMintPubkey:   fluidMint,
+			TokenName:         tokenName,
 			ObligationPubkey:  obligation,
 			ReservePubkey:     reserve,
 			PythPubkey:        pyth,

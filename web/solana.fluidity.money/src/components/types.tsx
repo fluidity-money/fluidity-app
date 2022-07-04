@@ -1,6 +1,6 @@
 export type SupportedTokens = "USDC" | "USDT" | "DAI" | "UXD" | "UST";
-export type FluidSupportedTokens = `f${SupportedTokens}`
-export type Token = SupportedTokens | FluidSupportedTokens
+export type FluidSupportedTokens = `f${SupportedTokens}`;
+export type Token = SupportedTokens | FluidSupportedTokens;
 
 //for selector component
 export type TokenKind = {
@@ -12,10 +12,10 @@ export type TokenKind = {
   decimals: number;
   obligationAccount: string;
   dataAccount: string;
-  //amount: string;
-  //pinned: boolean;
+  amount: string;
+  pinned: boolean;
 };
 
 export interface TokenList {
-    kind: TokenKind[];
+  kind: TokenKind[];
 }

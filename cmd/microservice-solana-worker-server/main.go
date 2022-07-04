@@ -14,9 +14,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	"github.com/fluidity-money/fluidity-app/common/solana/solend"
-
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -64,7 +61,6 @@ const (
 func main() {
 
 	var (
-		rpcUrl                   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
 		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
 		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
@@ -72,7 +68,6 @@ func main() {
 		tokenName                = util.GetEnvOrFatal(EnvTokenName)
 
 		fluidMintPubkey = pubkeyFromEnv(EnvFluidityMintPubkey)
-		reservePubkey   = pubkeyFromEnv(EnvReservePubkey)
 	)
 
 	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
@@ -88,8 +83,6 @@ func main() {
 	}
 
 	decimalPlacesRat := raiseDecimalPlaces(decimalPlaces)
-
-	solanaClient := solanaRpc.New(rpcUrl)
 
 	queue.GetMessages(topicWrappedActionsQueue, func(message queue.Message) {
 
@@ -125,20 +118,6 @@ func main() {
 
 		atx := probability.CalculateAtx(SolanaBlockTime, fluidTransfers)
 
-		apy, err := solend.GetUsdApy(solanaClient, reservePubkey)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get %v apy on Solana! %v",
-					tokenName,
-					err,
-				)
-			})
-		}
-
-		bpy := probability.CalculateBpy(SolanaBlockTime, apy, emission)
-
 		// normalise the amount to be consistent with USDC as a floating point
 
 		entireAmountOwned := new(big.Rat).SetUint64(mintSupply)
@@ -154,11 +133,6 @@ func main() {
 		sizeOfThePool := new(big.Rat).SetUint64(unscaledPool)
 
 		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
-
-		bpyStakedUsd := probability.CalculateBpyStakedUnderlyingAsset(
-			bpy,
-			entireAmountOwned,
-		)
 
 		for _, userAction := range userActions {
 
@@ -184,7 +158,8 @@ func main() {
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
 
-			defer queue.SendMessage(worker.TopicEmissions, emission)
+			// track fees used during this user action
+			emission.Fees.Saber, _ = userAction.SaberFee.Float64()
 
 			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
 
@@ -206,7 +181,6 @@ func main() {
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
 				atx,
-				bpyStakedUsd,
 				sizeOfThePool,
 				decimalPlacesRat,
 				payoutFreq,
@@ -295,6 +269,8 @@ func main() {
 			}
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
+
+			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 	})
 }

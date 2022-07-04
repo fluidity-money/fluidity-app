@@ -86,6 +86,7 @@ type (
 		Signature   string            `json:"signature"`
 		Result      TransactionResult `json:"result"`
 		AdjustedFee *big.Rat          `json:"adjustedFee"`
+		SaberFee    *big.Rat          `json:"saberFee"`
 	}
 
 	TransactionResult struct {
@@ -137,15 +138,4 @@ type (
 // Slot is the type that logs the current slot as sent by the solana RPC
 type Slot struct {
 	Slot uint64 `json:"slot"`
-}
-
-type TribecaProgramData struct {
-	Chain   string
-	Network string
-
-	PayoutFreqNum    int64
-	PayoutFreqDenom  int64
-	DeltaWeightNum   int64
-	DeltaWeightDenom int64
-	WinningClasses   int
 }

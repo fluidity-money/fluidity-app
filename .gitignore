@@ -41,6 +41,8 @@ contracts/solana/testing/fuzz/target
 
 contracts/tribeca-govern-contracts/target
 
+contracts/utility-gauge/target
+
 # Vendor specific
 .vscode
 .DS_Store

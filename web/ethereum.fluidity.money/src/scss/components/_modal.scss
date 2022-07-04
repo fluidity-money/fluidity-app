@@ -77,10 +77,9 @@
   flex-direction: column;
   text-align: center;
   align-content: center;
-  overflow-y: overlay;
+  overflow-y: auto;
 
   &:hover {
-    overflow-y: overlay;
     &::-webkit-scrollbar-thumb {
       background: #555;
       border-radius: 10px;
@@ -239,9 +238,12 @@
   box-sizing: border-box;
   display: flex;
   justify-content: flex-end;
-
   flex-wrap: wrap;
   overflow-y: auto;
+  @include for-tablet-landscape-down {
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .walletconnect-modal-body {
@@ -446,6 +448,7 @@
   cursor: pointer;
   padding-right: 0.8rem;
   padding-left: 0.1rem;
+  margin-right: 0.5rem;
 }
 
 .not-found-text {
@@ -475,4 +478,9 @@
   height: 1px;
   border: none;
   width: 81%;
+}
+
+.notification-line {
+  @extend .line;
+  margin-top: -16px;
 }

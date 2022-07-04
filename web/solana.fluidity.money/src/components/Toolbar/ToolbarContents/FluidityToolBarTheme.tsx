@@ -5,14 +5,15 @@ import { useHistory } from "react-router-dom";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
 import ToolBarMobileVersion from "./ToolBarMobileVersion";
 import Media from "react-media";
-import {useSolana} from "@saberhq/use-solana";
+import { useSolana } from "@saberhq/use-solana";
 import {
   EnabledButton,
   enableNotifications,
 } from "components/NotificationAlert/notificationAlert";
 import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
-import {useWalletKit} from "@gokiprotocol/walletkit";
+import { useWalletKit } from "@gokiprotocol/walletkit";
 import NetworkButton from "components/Button/NetworkButton";
+import NotificationButton from "components/Button/NotificationButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -27,7 +28,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   const sol = useSolana();
   const active = sol.connected;
   const { wallet } = sol;
-  const {connect: connectWallet} = useWalletKit();
+  const { connect: connectWallet } = useWalletKit();
 
   const modalToggle = () => {
     setToggle(!toggle);
@@ -127,6 +128,8 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                   />
                 </EnabledButton>
               }
+              <NotificationButton />
+              <NetworkButton />
               {active ? (
                 <div
                   className="flex row align mobile-address-btn"
@@ -138,7 +141,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                     goto={() => {
                       setToggle(true);
                     }}
-                    padding="p-0_5"
+                    padding="py-0_5"
                   />
                   <Icon src="i-wallet-arrow" />
                 </div>
@@ -150,7 +153,6 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                   padding="p-0_5"
                 />
               )}
-              <NetworkButton />
             </div>
             <SelectBlockchainModal
               enable={blockchainToggle}
@@ -164,8 +166,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 wallet={sol}
                 address={address}
               />
-            )
-            }
+            )}
           </div>
         ) : (
           <ToolBarMobileVersion selected={selected} />

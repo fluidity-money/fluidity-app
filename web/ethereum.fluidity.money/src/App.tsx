@@ -7,7 +7,7 @@ import WalletHistory from "./components/Pages/WalletHistory";
 import { Connectors, UseWalletProvider } from "use-wallet";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import AppUpdater from "./components/Updaters/AppUpdater";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import RouteNotFound from "components/Pages/RouteNotFound";
 import ProtectedRoute from "components/Routes/ProtectedRoute";
 import { isChrome, isFirefox, isEdge, isChromium } from "react-device-detect";
@@ -26,14 +26,10 @@ import {
   userActionContext,
 } from "components/context";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
-import ChainId, { chainIdFromEnv } from "util/chainId";
-import { TokenKind } from "components/types";
-import ropsten from "./config/ropsten-tokens.json";
-import testing from "./config/testing-tokens.json";
-import kovan from "./config/kovan-tokens.json";
-import aurora from "./config/aurora-mainnet-tokens.json";
-import mainnet from "./config/mainnet-tokens.json";
+import { chainIdFromEnv } from "util/chainId";
 import { appTheme } from "util/appTheme";
+import useLocalStorage from "util/hooks/useLocalStorage";
+import { tokenData } from "util/tokenData";
 
 const App = () => {
   const chainId = chainIdFromEnv();
@@ -72,61 +68,30 @@ const App = () => {
 
   const [messageData, setMessageData] = useState<WebsocketMessage>({});
 
-  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>([]);
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>(
+    []
+  );
 
   const { lastJsonMessage } = useWebSocket(root_websocket);
 
-  // Assigns the correct json file based on ChainId
-  const data =
-    chainId === ChainId.Ropsten
-      ? (ropsten as TokenKind[])
-      : chainId === ChainId.Hardhat
-      ? (testing as TokenKind[])
-      : chainId === ChainId.Kovan
-      ? (kovan as TokenKind[])
-      : chainId === ChainId.AuroraMainnet
-      ? (aurora as TokenKind[])
-      : chainId === ChainId.Mainnet
-      ? (mainnet as TokenKind[])
-      : (ropsten as TokenKind[]);
-
-  // pinned tokens for fluid and non-fluid in token select modal
-  const [pinnedTokens, setPinnedTokens] = useState(
-    [...data].slice(0, data.length / 2)
+  /* using local storage hook to persist for pinned tokens for 
+  fluid and non-fluid states used in token select modal */
+  const [pinnedTokens, setPinnedTokens] = useLocalStorage(
+    "pinned",
+    [...tokenData].slice(0, tokenData.length / 2)
   );
-
-  const [pinnedFluidTokens, setPinnedFluidTokens] = useState(
-    [...data].slice(data.length / 2, data.length)
+  const [pinnedFluidTokens, setPinnedFluidTokens] = useLocalStorage(
+    "pinned-fluid",
+    [...tokenData].slice(tokenData.length / 2, tokenData.length)
   );
-
-  // tokens for fluid and non-fluid in token select modal
-  const [tokens, setTokens] = useState([...data].slice(0, data.length / 2));
-
-  const [fluidTokens, setFluidTokens] = useState(
-    [...data].slice(data.length / 2, data.length)
+  const [tokens, setTokens] = useLocalStorage(
+    "tokens",
+    [...tokenData].slice(tokenData.length / 2, tokenData.length)
   );
-
-  // persists tokens data in token select modal
-  useEffect(() => {
-    const pinnedData = window.localStorage.getItem("pinned");
-    if (pinnedData) setPinnedTokens(JSON.parse(pinnedData));
-    const pinnedFluidData = window.localStorage.getItem("pinned-fluid");
-    if (pinnedFluidData) setPinnedFluidTokens(JSON.parse(pinnedFluidData));
-    const tokenData = window.localStorage.getItem("tokens");
-    if (tokenData) setTokens(JSON.parse(tokenData));
-    const fluidTokenData = window.localStorage.getItem("fluid-tokens");
-    if (fluidTokenData) setFluidTokens(JSON.parse(fluidTokenData));
-  }, []);
-  // updates persisted token data when changes occur for token select modal
-  useEffect(() => {
-    window.localStorage.setItem("pinned", JSON.stringify(pinnedTokens));
-    window.localStorage.setItem(
-      "pinned-fluid",
-      JSON.stringify(pinnedFluidTokens)
-    );
-    window.localStorage.setItem("tokens", JSON.stringify(tokens));
-    window.localStorage.setItem("fluid-tokens", JSON.stringify(fluidTokens));
-  }, [pinnedTokens, pinnedFluidTokens, tokens, fluidTokens]);
+  const [fluidTokens, setFluidTokens] = useLocalStorage(
+    "fluid-tokens",
+    [...tokenData].slice(tokenData.length / 2, tokenData.length)
+  );
 
   /* browser detection. if user isn't using firefox or chromium based browser
   then render a message telling them to change browser, else render the app */

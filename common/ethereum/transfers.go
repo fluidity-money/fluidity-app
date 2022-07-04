@@ -216,6 +216,8 @@ func ClassifyApplicationLogTopic(topic string) applications.Application {
 		return applications.ApplicationMooniswap
 	case applications.OneInchFixedRateSwapLogTopic:
 		return applications.ApplicationOneInchFixedRateSwap
+	case applications.BalancerSwapLogTopic:
+		return applications.ApplicationBalancerV2
 	default:
 		return applications.ApplicationNone
 	}

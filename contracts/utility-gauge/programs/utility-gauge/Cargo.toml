@@ -1,0 +1,30 @@
+[package]
+name = "utility-gauge"
+version = "0.4.1"
+description = "Forked from @quarryprotocol/gauge - Allows Tribeca Voting Escrows to vote on power allocations between protocols."
+edition = "2021"
+repository = "https://github.com/QuarryProtocol/gauge"
+authors = ["Fluidity"]
+license = "AGPL-3.0"
+keywords = ["solana", "anchor", "governance", "tribeca", "quarry"]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "utility_gauge"
+path = "src/lib.rs"
+
+[features]
+no-entrypoint = []
+no-idl = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = ">=0.22, <=0.24"
+anchor-spl = ">=0.22, <=0.24"
+locked-voter = { version = "^0.5", features = ["cpi"] }
+quarry-operator = { version = "^5", features = ["cpi"] }
+quarry-mine = { version = "^5", features = ["cpi"] }
+num-traits = "0.2"
+u128 = "0.1"
+vipers = "^2.0"

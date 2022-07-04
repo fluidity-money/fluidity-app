@@ -194,7 +194,7 @@
 }
 
 .mobile-address-btn {
-  align-self: flex-end;
+  align-self: center;
 }
 
 .selected {
@@ -373,7 +373,7 @@
   padding: 2px 10px 2px 10px;
   background-color: transparent;
   border: solid transparent 1px;
-  border-radius: 10px;
+  border-radius: 7px;
 
   cursor: pointer;
   transition: all 0.4s linear;
@@ -381,9 +381,31 @@
   &:hover {
     background-color: rgba(56, 60, 69, 0.5);
   }
+
+  &-current {
+    @extend .network-options;
+    border: 1px solid #02f5a3;
+    justify-content: space-between;
+  }
+}
+
+.network-items {
+  display: flex;
 }
 
 .network-icon {
   margin-right: 10px;
   width: 20px;
+}
+
+.margin-right {
+  margin-right: 7px;
+}
+
+.notification-button {
+  width: 46px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.6;
+  }
 }

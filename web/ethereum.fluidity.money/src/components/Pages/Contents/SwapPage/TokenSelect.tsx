@@ -3,12 +3,6 @@ import { useContext } from "react";
 import { modalToggle, tokenListContext } from "components/context";
 import Icon from "components/Icon";
 import { TokenKind } from "components/types";
-import ropsten from "../../../../config/ropsten-tokens.json";
-import testing from "../../../../config/testing-tokens.json";
-import kovan from "../../../../config/kovan-tokens.json";
-import aurora from "../../../../config/aurora-mainnet-tokens.json";
-import mainnet from "../../../../config/mainnet-tokens.json";
-import ChainId, { chainIdFromEnv } from "util/chainId";
 import { useSigner } from "util/hooks";
 import { getBalanceOfERC20 } from "util/contractUtils";
 import { TokenList } from "components/types";
@@ -21,6 +15,7 @@ import {
   sortPinnedFluidUtil,
   sortPinnedUtil,
 } from "util/tokenSelectUtil";
+import { tokenData } from "util/tokenData";
 
 const TokenSelect = ({
   type,
@@ -33,21 +28,6 @@ const TokenSelect = ({
   const [selectedFluidToken] = useContext(modalToggle).selectedFluidToken;
   const signer = useSigner();
   const wallet = useWallet();
-
-  // Assigns the correct json file based on ChainId
-  const chainId = chainIdFromEnv();
-  const data =
-    chainId === ChainId.Ropsten
-      ? (ropsten as TokenKind[])
-      : chainId === ChainId.Hardhat
-      ? (testing as TokenKind[])
-      : chainId === ChainId.Kovan
-      ? (kovan as TokenKind[])
-      : chainId === ChainId.AuroraMainnet
-      ? (aurora as TokenKind[])
-      : chainId === ChainId.Mainnet
-      ? (mainnet as TokenKind[])
-      : (ropsten as TokenKind[]);
 
   // accesses tokens from context
   const tokens: TokenKind[] = useContext(tokenListContext).tokens;
@@ -87,7 +67,7 @@ const TokenSelect = ({
   // gets each token amount
   const getAmounts = () => {
     signer &&
-      data.forEach((token) =>
+      tokenData.forEach((token) =>
         getBalanceOfERC20(
           token.symbol as SupportedFluidContracts,
           signer,
