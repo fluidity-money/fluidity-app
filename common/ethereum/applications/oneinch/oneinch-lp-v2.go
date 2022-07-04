@@ -101,14 +101,13 @@ const oneInchLiquidityPoolV2AbiString = `[
 	"type": "event"
 }]`
 
+// FEE_DECIMALS is the hardcoded denominator used by 1inchLP to derive fees
 const FEE_DECIMALS = 18
 
-// oneInchExchangeAbi set by init.go to generate the ABI code
 var oneInchLiquidityPoolV2Abi ethAbi.ABI
 
-// GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
-// If the token swapped from was the fluid token, get the exact amount,
-// otherwise approximate the cost based on the received amount of the fluid token
+// GetOneInchLPFees implements 1InchLPv1.0/1.1 fee structure.
+// Fees are split into static fees and slippage fees, controlled by 1Inch governance
 func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 
 	if len(transfer.Log.Topics) != 4 {
@@ -167,7 +166,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		fee *big.Rat
 
 		// whether the token being swapped from is the fluid token
-		inTokenIsFluid = token0addr == fluidTokenContract
+		srcTokenIsFluid = token0addr == fluidTokenContract
 	)
 
 	feeNum_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "fee")
@@ -207,6 +206,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	}
 
 	// implementation of LPv1.1 fee calculation
+	// fees are based on Token A amount, and should be converted if Token A is not a fluid token
 	feeDenom := new(big.Rat).SetFloat64(math.Pow10(FEE_DECIMALS))
 
 	staticFeeMultiplier := new(big.Rat).Quo(feeNum, feeDenom)
@@ -229,7 +229,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	// if trading (x + fee) fUSDC -> y Token B, return fUSDC fee
 	// else trading (x + fee) Token A -> y fUSDC, return (fUSDC / Token A) fee) Token A
-	if inTokenIsFluid {
+	if srcTokenIsFluid {
 		fee = srcTotalFee
 	} else {
 		srcToDstRate := new(big.Rat).Quo(dstRemovalBalance, newSrcBalance)

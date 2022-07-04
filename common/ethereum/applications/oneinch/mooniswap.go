@@ -77,7 +77,7 @@ const mooniswapPoolV1AbiString = `[
 
 var mooniswapPoolV1Abi ethAbi.ABI
 
-// GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
+// GetMooniswapFees returns Mooniswap's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
 func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {

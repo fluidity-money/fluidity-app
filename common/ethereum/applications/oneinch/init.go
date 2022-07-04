@@ -15,6 +15,12 @@ func init() {
 		panic(err)
 	}
 
+	reader = strings.NewReader(fixedRateSwapAbiString)
+
+	if fixedRateSwapAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
+
 	reader = strings.NewReader(mooniswapPoolV1AbiString)
 
 	if mooniswapPoolV1Abi, err = ethAbi.JSON(reader); err != nil {

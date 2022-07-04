@@ -12,33 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const FixedRateSwapAbiString = `[
-{
-	"inputs": [],
-	"name": "token0",
-	"outputs": [
-		{
-			"internalType": "contract IERC20",
-			"name": "",
-			"type": "address"
-		}
-	],
-	"stateMutability": "view",
-	"type": "function"
-},
-{
-	"inputs": [],
-	"name": "token1",
-	"outputs": [
-		{
-			"internalType": "contract IERC20",
-			"name": "",
-			"type": "address"
-		}
-	],
-	"stateMutability": "view",
-	"type": "function"
-},
+const fixedRateSwapAbiString = `[
 {
 	"anonymous": false,
 	"inputs": [
@@ -67,13 +41,10 @@ const FixedRateSwapAbiString = `[
 
 var fixedRateSwapAbi ethAbi.ABI
 
-// GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
-// If the token swapped from was the fluid token, get the exact amount,
-// otherwise approximate the cost based on the received amount of the fluid token
+// GetFixedRateSwapFees calculates fees from Swapping TokenA and TokenB performed by FixedRateSwap
+// Because TokenA and TokenB are required to have the same decimals, the fee is the value that
+// balances x TokenA + y TokenB + fee = const
 func GetFixedRateSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
-	// decode the amount of each token in the log
-	// doesn't contain addresses, as they're indexed
-
 	unpacked, err := fixedRateSwapAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
@@ -101,13 +72,13 @@ func GetFixedRateSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 	var (
 		// swap logs
-		// token0Amount is the net difference of token A
+		// token0Amount is the net difference of tokenA
 		token0Amount = swapAmounts[0]
-		// token1Amount is the net difference of token B
+		// token1Amount is the net difference of tokenB
 		token1Amount = swapAmounts[1]
 	)
 
-	// fee is derived under the assumption token0Amount and token1Amount are scaled
+	// fee is derived assuming token0 and token1 have the same decimals
 	// token0Amount + token1Amount + fee == 0
 	fee := new(big.Rat).Add(token0Amount, token1Amount)
 

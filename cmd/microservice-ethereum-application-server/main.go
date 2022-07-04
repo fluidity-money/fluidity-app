@@ -161,10 +161,11 @@ func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 	case applications.ApplicationUniswapV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		return transaction.From, transaction.To, nil
-	case applications.ApplicationOneInchLPV2, applications.ApplicationOneInchLPV1, applications.ApplicationMooniswap, applications.ApplicationOneInchFixedRateSwap:
+	case applications.ApplicationOneInchLPV2,
+		applications.ApplicationOneInchLPV1,
+		applications.ApplicationMooniswap,
+		applications.ApplicationOneInchFixedRateSwap:
 		return transaction.From, transaction.To, nil
-	case applications.ApplicationOneInchP2P:
-		return transaction.To, transaction.From, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
