@@ -1,5 +1,5 @@
 
-# microservice-ethereum-transaction-sender
+# microservice-ethereum-worker-sender
 
 Receives batched transactions from AMQP and calls the reward function
 on chain.

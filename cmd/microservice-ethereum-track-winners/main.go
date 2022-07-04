@@ -37,8 +37,6 @@ const (
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
 	winnersPublishTopic = winners.TopicWinnersEthereum
-
-	rewardPublishTopic = winners.TopicRewardsEthereum
 )
 
 func main() {
@@ -152,7 +150,5 @@ func main() {
 		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime)
 
 		queue.SendMessage(winnersPublishTopic, convertedWinner)
-
-		queue.SendMessage(rewardPublishTopic, rewardData)
 	})
 }
