@@ -134,7 +134,11 @@ func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
 	case applications.ApplicationMooniswap:
 		return oneinch.GetMooniswapV1Fees(transfer, client, fluidTokenContract, tokenDecimals)
-	case applications.ApplicationOneInchSwap, applications.ApplicationOneInchP2P:
+	case applications.ApplicationOneInchFixedRateSwap:
+		return oneinch.GetFixedRateSwapFees(transfer, client, fluidTokenContract, tokenDecimals)
+	case applications.ApplicationOneInchLPV2:
+		return oneinch.GetOneInchFees(transfer, client, fluidTokenContract, tokenDecimals)
+	case applications.ApplicationOneInchLPV1:
 		return oneinch.GetOneInchFees(transfer, client, fluidTokenContract, tokenDecimals)
 
 	default:
@@ -159,7 +163,7 @@ func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 	case applications.ApplicationUniswapV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		return transaction.From, transaction.To, nil
-	case applications.ApplicationOneInchSwap, applications.ApplicationMooniswap:
+	case applications.ApplicationOneInchLPV2, applications.ApplicationOneInchLPV1, applications.ApplicationMooniswap, applications.ApplicationOneInchFixedRateSwap:
 		return transaction.From, transaction.To, nil
 	case applications.ApplicationOneInchP2P:
 		return transaction.To, transaction.From, nil
