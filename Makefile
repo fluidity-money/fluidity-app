@@ -28,5 +28,4 @@ docker-compose-build:
 	@./scripts/docker-compose-all.sh build
 
 test:
-	@cd lib && ${MAKE} test
-	@cd common && ${MAKE} test
+	${GO_TEST} ./...
