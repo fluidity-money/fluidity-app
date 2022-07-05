@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -21,6 +22,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -112,6 +114,12 @@ const (
 	// EnvPublishAmqpQueue name to use when sending server-tracked transfers
 	// to the client
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
+
+	// EnvMovingAverageRedisKey to track the APY moving average with
+	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
+
+	// EnvApplicationContracts to list the application contracts to monitor
+	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
 )
 
 // AtxBufferSize to go back in time to count the average using the database
@@ -125,6 +133,7 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
 		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
@@ -169,10 +178,15 @@ func main() {
 		ethEthTokenAddress            ethCommon.Address
 		ethUnderlyingTokenAddress     ethCommon.Address
 		ethAaveAddressProviderAddress ethCommon.Address
+		applicationContracts          []string
 
 		auroraEthFluxAddress   ethCommon.Address
 		auroraTokenFluxAddress ethCommon.Address
 	)
+
+	for _, address := range strings.Split(applicationContracts_, ",") {
+		applicationContracts = append(applicationContracts, address)
+	}
 
 	switch tokenBackend {
 	case BackendCompound:
@@ -245,14 +259,45 @@ func main() {
 		})
 	}
 
-	worker.EthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
+	worker.GetEthereumServerWork(func(serverWork worker.EthereumServerWork) {
 		var (
-			blockBaseFee = blockLog.BlockBaseFee
-			logs         = blockLog.Logs
-			transactions = blockLog.Transactions
-			blockNumber  = blockLog.BlockNumber
-			blockHash    = blockLog.BlockHash
+			blockBaseFee misc.BigInt
+			logs         []ethereum.Log
+			transactions []ethereum.Transaction
+			blockNumber  misc.BigInt
+			blockHash    ethereum.Hash
+
+			blockLog    = serverWork.EthereumBlockLog
+			hintedBlock = serverWork.EthereumHintedBlock
+
+			// if a block log, fluid contract transfers
+			// if a hinted block, application events
+			fluidTransfers   []worker.EthereumDecoratedTransfer
+			transfersInBlock int
 		)
+
+		switch true {
+		// received from logs queue
+		case serverWork.EthereumBlockLog != nil:
+			blockBaseFee = blockLog.BlockBaseFee
+			logs = blockLog.Logs
+			transactions = blockLog.Transactions
+			blockNumber = blockLog.BlockNumber
+			blockHash = blockLog.BlockHash
+
+		// received from application server
+		case serverWork.EthereumHintedBlock != nil:
+			blockBaseFee = hintedBlock.BlockBaseFee
+			blockNumber = hintedBlock.BlockNumber
+			blockHash = hintedBlock.BlockHash
+			transfersInBlock = hintedBlock.TransferCount
+			fluidTransfers = hintedBlock.DecoratedTransfers
+
+		default:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Received empty work announcement!"
+			})
+		}
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)
 
@@ -265,21 +310,61 @@ func main() {
 		emission.Network = "ethereum"
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
-		fluidTransfers, err := libEthereum.GetTransfers(
-			logs,
-			transactions,
-			blockHash,
-			contractAddress,
-		)
+		if hintedBlock == nil {
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get a fluid transfer!"
-				k.Payload = err
-			})
+			fluidTransfers, err = libEthereum.GetTransfers(
+				logs,
+				transactions,
+				blockHash,
+				contractAddress,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get a fluid transfer in block %#v!",
+						blockHash,
+					)
+					k.Payload = err
+				})
+			}
+
+			// handle sending to application server
+			applicationTransfers, err := libEthereum.GetApplicationTransfers(
+				logs,
+				transactions,
+				blockHash,
+				applicationContracts,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get application events in block %#v!",
+						blockHash,
+					)
+					k.Payload = err
+				})
+			}
+
+			applicationEvent := worker.EthereumApplicationEvent{
+				ApplicationTransfers: applicationTransfers,
+				BlockLog:             *blockLog,
+			}
+
+			if len(applicationTransfers) > 0 {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Found %v application events in block #%v, sending them to the application server!",
+						len(applicationTransfers),
+						blockHash,
+					)
+				})
+				queue.SendMessage(worker.TopicEthereumApplicationEvents, applicationEvent)
+			}
+
+			transfersInBlock = len(fluidTransfers)
 		}
-
-		transfersInBlock := len(fluidTransfers)
 
 		averageTransfersInBlock := addAndComputeAverageAtx(
 			blockNumber.Uint64(),
@@ -287,7 +372,7 @@ func main() {
 			transfersInBlock,
 		)
 
-		if len(fluidTransfers) == 0 {
+		if transfersInBlock == 0 {
 			log.Debugf(
 				"Couldn't find any Fluid transfers in the block %v!",
 				blockHash,
@@ -473,12 +558,13 @@ func main() {
 		for _, transfer := range fluidTransfers {
 
 			var (
-				transactionHash  = transfer.Transaction.Hash
-				senderAddress    = transfer.FromAddress
-				recipientAddress = transfer.ToAddress
-				gasLimit         = transfer.Transaction.Gas
-				transferType     = transfer.Transaction.Type
-				gasTipCap        = transfer.Transaction.GasTipCap
+				transactionHash   = transfer.Transaction.Hash
+				senderAddress     = transfer.SenderAddress
+				recipientAddress  = transfer.RecipientAddress
+				gasLimit          = transfer.Transaction.Gas
+				transferType      = transfer.Transaction.Type
+				gasTipCap         = transfer.Transaction.GasTipCap
+				applicationFeeUsd = transfer.Decorator.ApplicationFee
 			)
 
 			var (
@@ -504,6 +590,11 @@ func main() {
 			transferFeeUsd.Mul(transferFeeUsd, ethPriceUsd)
 
 			transferFeeUsd.Quo(transferFeeUsd, big.NewRat(1e18, 1))
+
+			// if we have an application transfer, apply the fee
+			if applicationFeeUsd != nil {
+				transferFeeUsd.Add(transferFeeUsd, applicationFeeUsd)
+			}
 
 			var (
 				winningClasses   = fluidity.WinningClasses

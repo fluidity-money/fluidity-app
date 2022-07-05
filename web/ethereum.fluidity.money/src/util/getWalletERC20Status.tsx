@@ -3,15 +3,10 @@ import contractList, {
   SupportedFluidContracts,
   SupportedContracts,
 } from "util/contractList";
-import ropsten from "../config/ropsten-tokens.json";
-import testing from "../config/testing-tokens.json";
-import kovan from "../config/kovan-tokens.json";
-import aurora from "../config/aurora-mainnet-tokens.json";
-import mainnet from "../config/mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { Signer } from "ethers";
 import { parseUnits } from "ethers/utils";
-import ChainId, {chainIdFromEnv} from "./chainId";
+import { tokenData } from "./tokenData";
 
 export interface walletDataType {
   type: string;
@@ -21,20 +16,6 @@ export interface walletDataType {
 
 // Assigns the correct json file based on ChainId
 const getWalletERC20Status = async (signer: Signer) => {
-  const chainId = chainIdFromEnv();
-  const data =
-    chainId === ChainId.Ropsten ?
-      (ropsten as TokenKind[]) :
-    chainId === ChainId.Hardhat ?
-      (testing as TokenKind[]) :
-    chainId === ChainId.Kovan ?
-      (kovan as TokenKind[]) :
-    chainId === ChainId.AuroraMainnet ?
-      (aurora as TokenKind[]) :
-    chainId === ChainId.Mainnet ?
-      (mainnet as TokenKind[]) :
-      (ropsten as TokenKind[]);
-
   // If signer is defined (someone is logged in), nothing happens.
   // Else if signer is undefined/null, it returns a blank array since no wallet means no information
   if (!signer) {
@@ -42,7 +23,7 @@ const getWalletERC20Status = async (signer: Signer) => {
   }
 
   const renderedStatus: walletDataType[] = [];
-  const ext = data.slice(0, data.length / 2);
+  const ext = tokenData.slice(0, tokenData.length / 2);
   // Render external token types
   await Promise.all(
     ext.map(async (value: TokenKind) => {
@@ -68,7 +49,7 @@ const getWalletERC20Status = async (signer: Signer) => {
   );
 
   // Render internal token types
-  const int = data.slice(data.length / 2, data.length);
+  const int = tokenData.slice(tokenData.length / 2, tokenData.length);
   await Promise.all(
     int.map(async (value: TokenKind) => {
       const { decimals } =

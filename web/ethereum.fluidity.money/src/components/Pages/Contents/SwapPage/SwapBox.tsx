@@ -13,11 +13,6 @@ import {
 } from "components/context";
 import makeContractSwap from "util/makeContractSwap";
 import ConfirmPaymentModal from "components/Modal/Themes/ConfirmPaymentModal";
-import ropsten from "../../../../config/ropsten-tokens.json";
-import testing from "../../../../config/testing-tokens.json";
-import kovan from "../../../../config/kovan-tokens.json";
-import mainnet from "../../../../config/mainnet-tokens.json";
-import aurora from "../../../../config/aurora-mainnet-tokens.json";
 import { TokenKind } from "components/types";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider, TransactionReceipt } from "ethers/providers";
@@ -32,8 +27,8 @@ import { notificationContext } from "components/Notifications/notificationContex
 import { parseUnits } from "ethers/utils";
 import { decimalTrim } from "util/decimalTrim";
 import { isNonZero, shortBalance, trimAmount } from "util/amounts";
-import ChainId, { chainIdFromEnv } from "util/chainId";
 import { appTheme } from "util/appTheme";
+import { tokenData } from "util/tokenData";
 
 const SwapBox = () => {
   const signer = useSigner();
@@ -54,21 +49,6 @@ const SwapBox = () => {
 
   // userActions context to update balance when potentially sending/receiving
   const userActions = useContext(userActionContext);
-
-  // Assigns the correct json file based on ChainId
-  const chainId = chainIdFromEnv();
-  const data =
-    chainId === ChainId.Ropsten
-      ? (ropsten as TokenKind[])
-      : chainId === ChainId.Hardhat
-      ? (testing as TokenKind[])
-      : chainId === ChainId.Kovan
-      ? (kovan as TokenKind[])
-      : chainId === ChainId.Mainnet
-      ? (mainnet as TokenKind[])
-      : chainId === ChainId.AuroraMainnet
-      ? (aurora as TokenKind[])
-      : (ropsten as TokenKind[]);
 
   // catches user amount input to ensure it's valid
   const amountValueChanger = (input: string) => {
@@ -149,7 +129,7 @@ const SwapBox = () => {
     setSelectedToken(input);
     // filters to find fluid equivalent and assigns
     setSelectedFluidToken(
-      data.filter((x) => x.symbol === `f${input}`)[0].symbol
+      tokenData.filter((x) => x.symbol === `f${input}`)[0].symbol
     );
     return;
   };
@@ -168,7 +148,7 @@ const SwapBox = () => {
     setSelectedFluidToken(input);
     // filters to find non fluid equivalent and assigns
     setSelectedToken(
-      data.filter((x) => x.symbol === `${input.substring(1)}`)[0].symbol
+      tokenData.filter((x) => x.symbol === `${input.substring(1)}`)[0].symbol
     );
     return;
   };

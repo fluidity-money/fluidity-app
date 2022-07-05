@@ -1,6 +1,9 @@
 package worker
 
 import (
+	"math/big"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -124,6 +127,58 @@ type (
 		Logs         []ethereum.Log         `json:"logs"`
 		Transactions []ethereum.Transaction `json:"transactions"`
 		BlockNumber  misc.BigInt            `json:"block_number"`
+	}
+
+	// Decorator attached to a transfer, able to be expanded to
+	// include application data as needed
+	EthereumWorkerDecorator struct {
+		// Application fee in USD
+		ApplicationFee *big.Rat `json:"application_fee"`
+	}
+
+	// Transfer with application information attached
+	EthereumDecoratedTransfer struct {
+		// Transaction containing the event
+		Transaction ethereum.Transaction `json:"transaction"`
+		// Parties involved in the swap, where sender recieves the majority
+		// of a potential reward, and one party could be a smart contract
+		SenderAddress    ethereum.Address         `json:"sender_address"`
+		RecipientAddress ethereum.Address         `json:"recipient_address"`
+		Decorator        *EthereumWorkerDecorator `json:"decorator"`
+	}
+
+	// Hinted block sent from the application server
+	EthereumHintedBlock struct {
+		BlockHash          ethereum.Hash               `json:"block_hash"`
+		BlockBaseFee       misc.BigInt                 `json:"block_base_fee"`
+		BlockTime          uint64                      `json:"block_time"`
+		BlockNumber        misc.BigInt                 `json:"block_number"`
+		TransferCount      int                         `json:"transfer_count"`
+		DecoratedTransfers []EthereumDecoratedTransfer `json:"decorated_transfers"`
+	}
+
+	// Work that the worker server receives, containing either a block
+	// log (from upstream) or a hinted block (from application server)
+	EthereumServerWork struct {
+		EthereumBlockLog    *EthereumBlockLog    `json:"block_log"`
+		EthereumHintedBlock *EthereumHintedBlock `json:"hinted_block"`
+	}
+
+	// An event the worker server sends for processing when it finds a log of interest
+	EthereumApplicationEvent struct {
+		ApplicationTransfers []EthereumApplicationTransfer `json:"application_transfers"`
+		BlockLog             EthereumBlockLog              `json:"block_log"`
+	}
+
+	// An individual log included in an application event
+	EthereumApplicationTransfer struct {
+		Transaction ethereum.Transaction
+		// the log classified as an application transfer
+		// to be processed by the application server
+		Log ethereum.Log
+		// an enum representing the application this
+		// transfer is produced by
+		Application applications.Application
 	}
 
 	// SolanaWinnerAnnouncement to use to report a winner and its randomness
