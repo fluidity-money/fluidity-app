@@ -15,7 +15,7 @@ docker:
 	${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/build-container \
-		.
+		.how 
 
 docker-web: docker
 	@${DOCKER_BUILD} \
@@ -28,4 +28,5 @@ docker-compose-build:
 	@./scripts/docker-compose-all.sh build
 
 test:
-	${GO_TEST} ./...
+	@${GO_TEST} ./...
+	
