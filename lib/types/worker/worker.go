@@ -3,7 +3,7 @@ package worker
 import (
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"

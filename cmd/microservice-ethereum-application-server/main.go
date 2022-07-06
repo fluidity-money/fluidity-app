@@ -1,20 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"math/big"
 	"strconv"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -80,7 +74,7 @@ func main() {
 		// loop over application events in the block, add payouts as decorator
 		for i, transfer := range applicationTransfers {
 
-			fee, err := getApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
+			fee, err := applications.GetApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -102,7 +96,7 @@ func main() {
 				continue
 			}
 
-			toAddress, fromAddress, err := getApplicationTransferParties(transfer)
+			toAddress, fromAddress, err := applications.GetApplicationTransferParties(transfer)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -139,60 +133,4 @@ func main() {
 		// send to server
 		queue.SendMessage(worker.TopicEthereumServerWork, serverWork)
 	})
-}
-
-// getApplicationFee to find the fee (in USD) paid by a user for the application interaction
-// returns nil, nil in the case where the application event is legitimate, but doesn't involve
-// the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
-func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
-	switch transfer.Application {
-	case applications.ApplicationUniswapV2:
-		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
-	case applications.ApplicationBalancerV2:
-		return balancer.GetBalancerFees(transfer, client, fluidTokenContract, tokenDecimals)
-	case applications.ApplicationOneInchLPV2, applications.ApplicationOneInchLPV1:
-		return oneinch.GetOneInchLPFees(transfer, client, fluidTokenContract, tokenDecimals)
-	case applications.ApplicationMooniswap:
-		return oneinch.GetMooniswapV1Fees(transfer, client, fluidTokenContract, tokenDecimals)
-	case applications.ApplicationOneInchFixedRateSwap:
-		return oneinch.GetFixedRateSwapFees(transfer, client, fluidTokenContract, tokenDecimals)
-
-	default:
-		return nil, fmt.Errorf(
-			"Transfer #%v did not contain an application",
-			transfer,
-		)
-	}
-}
-
-// getApplicationTransferParties to find the parties considered for payout from an application interaction.
-// In the case of an AMM (such as Uniswap) the transaction sender receives the majority payout every time,
-// with the recipient tokens being effectively burnt (sent to the contract). In the case of a P2P swap,
-// such as a DEX, the party sending the fluid tokens receives the majority payout.
-func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
-	var (
-		transaction = transfer.Transaction
-		nilAddress  libEthereum.Address
-	)
-
-	switch transfer.Application {
-	case applications.ApplicationUniswapV2:
-		// Give the majority payout to the swap-maker (i.e. transaction sender)
-		return transaction.From, transaction.To, nil
-	case applications.ApplicationOneInchLPV2,
-		applications.ApplicationOneInchLPV1,
-		applications.ApplicationMooniswap,
-		applications.ApplicationOneInchFixedRateSwap:
-		// Give the majority payout to the swap-maker (i.e. transaction sender)
-		return transaction.From, transaction.To, nil
-	case applications.ApplicationBalancerV2:
-		// Give the majority payout to the swap-maker (i.e. transaction sender)
-		return transaction.From, transaction.To, nil
-
-	default:
-		return nilAddress, nilAddress, fmt.Errorf(
-			"Transfer #%v did not contain an application",
-			transfer,
-		)
-	}
 }
