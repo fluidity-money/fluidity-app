@@ -6,9 +6,11 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/solana"
+	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -55,13 +57,16 @@ func main() {
 
 	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
 
-	solana.BufferedTransactions(func(bufferedTransaction solana.BufferedTransaction) {
+	solana.BufferedTransactions(func(bufferedTransaction solana.BufferedApplicationTransactions) {
 		var (
 			slotNumber   = bufferedTransaction.Slot
 			transactions = bufferedTransaction.Transactions
 		)
 
-		bufferedUserActions := make([]user_actions.UserAction, 0)
+		var (
+			bufferedUserActions = make([]user_actions.UserAction, 0)
+			bufferedParsedTransactions = make([]worker.SolanaParsedTransaction, 0)
+		)
 
 		for _, transaction := range transactions {
 			if err := transaction.Result.Meta.Err; err != nil {
@@ -80,7 +85,6 @@ func main() {
 				instructions      = transaction.Result.Transaction.Message.Instructions
 				innerInstructions = transaction.Result.Meta.InnerInstructions
 				adjustedFee       = transaction.AdjustedFee
-				saberFee          = transaction.SaberFee
 				sig               = transaction.Signature
 			)
 
@@ -103,6 +107,7 @@ func main() {
 			}
 
 			allInstructions := make([]solTypes.TransactionInstruction, 0)
+
 			allInstructions = append(allInstructions, instructions...)
 
 			for _, inner := range innerInstructions {
@@ -139,7 +144,6 @@ func main() {
 						sig,
 						instruction,
 						adjustedFee,
-						saberFee,
 						accountKeys,
 						fluidityOwners,
 						fluidityTokenMint,
@@ -156,10 +160,12 @@ func main() {
 				}
 
 				if transfer1 != nil {
+					transfers = append(transfers, *transfer1)
 					bufferedUserActions = append(bufferedUserActions, *transfer1)
 				}
 
 				if transfer2 != nil {
+					transfers = append(transfers, *transfer2)
 					bufferedUserActions = append(bufferedUserActions, *transfer2)
 				}
 
@@ -178,17 +184,36 @@ func main() {
 				if swapUnwrap != nil {
 					bufferedUserActions = append(bufferedUserActions, *swapUnwrap)
 				}
+
 			}
+
+			// always pass transactions to the apps server
+			parsedTransaction := worker.SolanaParsedTransaction {
+				Transaction: transaction,
+				Transfers: transfers,
+			}
+
+			bufferedParsedTransactions = append(
+				bufferedParsedTransactions,
+				parsedTransaction,
+			)
 		}
 
-		if len(bufferedUserActions) == 0 {
-			return
+		if len(bufferedParsedTransactions) != 0 {
+			bufferedTransactionsBlock := worker.SolanaBufferedParsedTransactions {
+				Transactions: bufferedParsedTransactions,
+				Slot: slotNumber,
+			}
+
+			queue.SendMessage(worker.TopicSolanaParsedTransactions, bufferedTransactionsBlock)
 		}
 
-		bufferedUserAction := user_actions.BufferedUserAction{
-			UserActions: bufferedUserActions,
-		}
+		if len(bufferedUserActions) != 0 {
+			bufferedUserAction := user_actions.BufferedUserAction{
+				UserActions: bufferedUserActions,
+			}
 
-		queue.SendMessage(user_actions.TopicBufferedUserActionsSolana, bufferedUserAction)
+			queue.SendMessage(user_actions.TopicBufferedUserActionsSolana, bufferedUserAction)
+		}
 	})
 }
