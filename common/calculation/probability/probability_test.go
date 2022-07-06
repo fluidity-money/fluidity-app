@@ -109,14 +109,9 @@ func TestPayout(t *testing.T) {
 
 	result := payout(atx, g, rewardPool, deltaWeight, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))
 	// should be accurate to 2 decimal places, so trim then remove the last to avoid rounding
-	fmt.Println("result")
-	fmt.Println(result)
 	rf := result.FloatString(3)
 	trimmedResult := rf[:len(rf)-1]
 	expected := "9.68"
-
-	fmt.Println("trimmedResult")
-	fmt.Println(trimmedResult)
 
 	assert.Equal(t, expected, trimmedResult)
 
