@@ -65,6 +65,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
 		transaction = transfer.Transaction
+		logAddress  = transfer.Log.Address
 		nilAddress  libEthereum.Address
 	)
 
@@ -80,7 +81,8 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 		return transaction.From, transaction.To, nil
 	case ApplicationBalancerV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
-		return transaction.From, transaction.To, nil
+		// and the rest to the Balancer Vault
+		return transaction.From, logAddress, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
