@@ -172,13 +172,13 @@ type (
 
 	// An individual log included in an application event
 	EthereumApplicationTransfer struct {
-		Transaction ethereum.Transaction
+		Transaction ethereum.Transaction `json:"transaction"`
 		// the log classified as an application transfer
 		// to be processed by the application server
-		Log ethereum.Log
+		Log ethereum.Log `json:"log"`
 		// an enum representing the application this
 		// transfer is produced by
-		Application applications.Application
+		Application applications.Application `json:"application"`
 	}
 
 	// SolanaWinnerAnnouncement to use to report a winner and its randomness
