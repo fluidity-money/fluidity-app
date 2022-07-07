@@ -101,8 +101,8 @@ const oneInchLiquidityPoolV2AbiString = `[
 	"type": "event"
 }]`
 
-// FEE_DECIMALS is the hardcoded denominator used by 1inchLP to derive fees
-const FEE_DECIMALS = 18
+// FeeDecimals is the hardcoded denominator used by 1inchLP to derive fees
+const FeeDecimals = 18
 
 var oneInchLiquidityPoolV2Abi ethAbi.ABI
 
@@ -112,8 +112,9 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	if len(transfer.Log.Topics) != 4 {
 		return nil, fmt.Errorf(
-			"topics contain the wrong number of values! Expected 4, got %v",
+			"topics contain the wrong number of values (Expected 4, got %v)! TxHash: %v",
 			len(transfer.Log.Topics),
+			transfer.Transaction.Hash,
 		)
 	}
 
@@ -123,15 +124,16 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to unpack swap log data! %v",
+			"failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 6 {
 		return nil, fmt.Errorf(
-			"Unpacked the wrong number of values! Expected 6, got %v",
+			"unpacked the wrong number of values (Expected 6, got %v)! TxHash: %v",
 			len(unpacked),
+			transfer.Transaction.Hash,
 		)
 	}
 
@@ -163,84 +165,107 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		// dstRemovalBalance is amount inside Token1 pool prior to swap
 		dstRemovalBalance = swapAmounts[3]
 
-		fee *big.Rat
+		// fluidFee is total amount of fluid tokens paid in fees
+		fluidFee *big.Rat
 
 		// whether the token being swapped from is the fluid token
 		srcTokenIsFluid = token0addr == fluidTokenContract
 	)
 
-	feeNum_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "fee")
+	staticFeeNum_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "fee")
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to fetch fee! %v",
+			"failed to call \"fee\" from contract %v! %v",
+			contractAddr.String(),
 			err,
 		)
 	}
 
-	feeNum, err := ethereum.CoerceBoundContractResultsToRat(feeNum_)
+	staticFeeNum, err := ethereum.CoerceBoundContractResultsToRat(staticFeeNum_)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to coerce fee to Rat! %v",
+			"failed to coerce fee to Rat! (%v) %v",
+			staticFeeNum_,
 			err,
 		)
 	}
 
-	slippageFee_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "slippageFee")
+	slippageFeeNum_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "slippageFee")
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to fetch slippageFee! %v",
+			"failed to call \"slippageFee\" from contract %v! %v",
+			contractAddr.String(),
 			err,
 		)
 	}
 
-	slippageFee, err := ethereum.CoerceBoundContractResultsToRat(slippageFee_)
+	slippageFeeNum, err := ethereum.CoerceBoundContractResultsToRat(slippageFeeNum_)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to coerce slippageFee to Rat! %v",
+			"failed to coerce slippageFee to Rat! (%v) %v",
+			slippageFeeNum_,
 			err,
 		)
 	}
 
-	// implementation of LPv1.1 fee calculation
-	// fees are based on Token A amount, and should be converted if Token A is not a fluid token
-	feeDenom := new(big.Rat).SetFloat64(math.Pow10(FEE_DECIMALS))
-
-	staticFeeMultiplier := new(big.Rat).Quo(feeNum, feeDenom)
-
-	srcStaticFee := new(big.Rat).Quo(amount, staticFeeMultiplier)
-
-	remainingSrcTransferAmount := new(big.Rat).Sub(amount, srcStaticFee)
-
-	newSrcBalance := new(big.Rat).Add(srcAdditionBalance, remainingSrcTransferAmount)
-
-	slippageFeeNum := new(big.Rat).Mul(slippageFee, remainingSrcTransferAmount)
-
-	slippageFeeDenom := new(big.Rat).Mul(feeDenom, newSrcBalance)
-
-	slippageFeeRate := new(big.Rat).Quo(slippageFeeNum, slippageFeeDenom)
-
-	srcDynamicFee := new(big.Rat).Mul(remainingSrcTransferAmount, slippageFeeRate)
-
-	srcTotalFee := new(big.Rat).Add(srcStaticFee, srcDynamicFee)
-
-	// if trading (x + fee) fUSDC -> y Token B, return fUSDC fee
-	// else trading (x + fee) Token A -> y fUSDC, return (fUSDC / Token A) fee) Token A
-	if srcTokenIsFluid {
-		fee = srcTotalFee
-	} else {
-		srcToDstRate := new(big.Rat).Quo(dstRemovalBalance, newSrcBalance)
-		fee = fee.Mul(srcTotalFee, srcToDstRate)
-	}
+	fluidFee = calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcAdditionBalance, dstRemovalBalance, srcTokenIsFluid)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
-	fee.Quo(fee, decimalsRat)
+	fluidFee.Quo(fluidFee, decimalsRat)
 
-	return fee, nil
+	return fluidFee, nil
+}
+
+func calculateStaticFee(amount, staticFeeRate *big.Rat) *big.Rat {
+	staticFee := new(big.Rat).Mul(amount, staticFeeRate)
+
+	return staticFee
+}
+
+// implementation of LPv1.1 fee calculation
+// fees are based on Token A amount, and should be converted if Token A is not a fluid token
+func calculateSlippageFee(amount, slippageFeeRate, poolBalance *big.Rat) *big.Rat {
+	poolSlippage := new(big.Rat).Quo(amount, poolBalance)
+
+	slippageFee := new(big.Rat).Mul(slippageFeeRate, poolSlippage)
+
+	slippageFee = slippageFee.Mul(amount, slippageFee)
+
+	return slippageFee
+}
+
+func calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, dstBalance *big.Rat, amountIsFluid bool) *big.Rat {
+	feeDecimalsRat := new(big.Rat).SetFloat64(math.Pow10(FeeDecimals))
+
+	staticFeeRate := new(big.Rat).Quo(staticFeeNum, feeDecimalsRat)
+
+	srcStaticFee := calculateStaticFee(amount, staticFeeRate)
+
+	remainingSrcTransferAmount := new(big.Rat).Sub(amount, srcStaticFee)
+
+	newSrcPoolBalance := new(big.Rat).Add(srcBalance, remainingSrcTransferAmount)
+
+	slippageFeeRate := new(big.Rat).Quo(slippageFeeNum, feeDecimalsRat)
+
+	srcSlippageFee := calculateSlippageFee(remainingSrcTransferAmount, slippageFeeRate, newSrcPoolBalance)
+
+	srcTotalFee := new(big.Rat).Add(srcStaticFee, srcSlippageFee)
+
+	// if trading (x + fee) fUSDC -> y Token B, return fUSDC fee
+	if amountIsFluid {
+		return srcTotalFee
+	}
+
+	// else trading (x + fee) Token A -> y fUSDC, return (fUSDC / Token A) fee) Token A
+	srcToDstRate := new(big.Rat).Quo(dstBalance, newSrcPoolBalance)
+	fluidFee := new(big.Rat).Mul(srcTotalFee, srcToDstRate)
+
+	return fluidFee
 }
