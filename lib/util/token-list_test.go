@@ -10,12 +10,12 @@ import (
 
 func TestTokenList(t *testing.T) {
 	var (
-		ethereumTokensList_ = os.Getenv(`FLU_ETHEREUM_TOKENS_LIST`)
-
 		expectedEthereumTokensList = []TokenDetailsBase{}
+		expectedSolanaTokensList   = []TokenDetailsBase{}
 	)
 
-	resultEthereumTokensList := GetTokensListBase(ethereumTokensList_)
+	resultEthereumTokensList := GetTokensListBase(os.Getenv(`FLU_ETHEREUM_TOKENS_LIST`))
+	resultSolanaTokensList := GetTokensListBase(os.Getenv(`FLU_SOLANA_TOKENS_LIST`))
 
 	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
 		TokenName:     `USDT`,
@@ -46,5 +46,23 @@ func TestTokenList(t *testing.T) {
 		TokenDecimals: big.NewRat(1000000, 1),
 	})
 
+	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
+		TokenName:     `USDC`,
+		TokenDecimals: big.NewRat(1000000, 1),
+	})
+	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
+		TokenName:     `USDT`,
+		TokenDecimals: big.NewRat(1000000, 1),
+	})
+	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
+		TokenName:     `UXD`,
+		TokenDecimals: big.NewRat(1000000, 1),
+	})
+	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
+		TokenName:     `UST`,
+		TokenDecimals: big.NewRat(1000000, 1),
+	})
+
+	assert.Equal(t, expectedSolanaTokensList, resultSolanaTokensList)
 	assert.Equal(t, expectedEthereumTokensList, resultEthereumTokensList)
 }
