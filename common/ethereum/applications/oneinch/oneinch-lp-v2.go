@@ -212,7 +212,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	fluidFee = calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcAdditionBalance, dstRemovalBalance, srcTokenIsFluid)
+	fluidFee = calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcAdditionBalance, dstRemovalBalance, srcTokenIsFluid, FeeDecimals)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
@@ -241,8 +241,8 @@ func calculateSlippageFee(amount, slippageFeeRate, poolBalance *big.Rat) *big.Ra
 	return slippageFee
 }
 
-func calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, dstBalance *big.Rat, amountIsFluid bool) *big.Rat {
-	feeDecimalsRat := new(big.Rat).SetFloat64(math.Pow10(FeeDecimals))
+func calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, dstBalance *big.Rat, amountIsFluid bool, feeDecimals int) *big.Rat {
+	feeDecimalsRat := new(big.Rat).SetFloat64(math.Pow10(feeDecimals))
 
 	staticFeeRate := new(big.Rat).Quo(staticFeeNum, feeDecimalsRat)
 

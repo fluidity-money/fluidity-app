@@ -1,7 +1,6 @@
 package oneinch
 
 import (
-	"math"
 	"math/big"
 	"testing"
 
@@ -51,12 +50,14 @@ type calculateTotalFluidFeeTest struct {
 	srcBalance,
 	dstBalance *big.Rat
 	amountIsFluid bool
+	feeDecimals   int
+	expected      *big.Rat
 }
 
 func TestCalculateTotalFluidFee(t *testing.T) {
 	tests := []calculateTotalFluidFeeTest{
-		{big.NewRat(123, 1), big.NewRat(1, 1), big.NewRat(2, 1), big.NewRat(12345678, 1), big.NewRat(123456789, 1), false},
-		{big.NewRat(123, 1), big.NewRat(1, 1), big.NewRat(2, 1), big.NewRat(12345678, 1), big.NewRat(123456789, 1), true},
+		{big.NewRat(12, 1), big.NewRat(3, 1), big.NewRat(5, 1), big.NewRat(123, 1), big.NewRat(1234, 1), false, 3, big.NewRat(85_964_956_915_137, 510_962_500_000)},
+		{big.NewRat(12, 1), big.NewRat(3, 1), big.NewRat(5, 1), big.NewRat(123, 1), big.NewRat(1234, 1), true, 3, big.NewRat(381_279_627, 49_850_000)},
 	}
 
 	for _, test := range tests {
@@ -67,36 +68,11 @@ func TestCalculateTotalFluidFee(t *testing.T) {
 			srcBalance     = test.srcBalance
 			dstBalance     = test.dstBalance
 			amountIsFluid  = test.amountIsFluid
+			feeDecimals    = test.feeDecimals
+			expected       = test.expected
 		)
 
-		totalFluidFee := calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, dstBalance, amountIsFluid)
-
-		feeDecimalsRat := new(big.Rat).SetFloat64(math.Pow10(FeeDecimals))
-		staticFeeRate := new(big.Rat).Quo(staticFeeNum, feeDecimalsRat)
-		staticFee := calculateStaticFee(amount, staticFeeRate)
-
-		var (
-			slippageFeeNum_   *big.Rat
-			slippageFeeDenom_ *big.Rat
-		)
-
-		slippageFeeNum_.Add(amount, srcBalance)
-		slippageFeeNum_.Sub(slippageFeeNum, staticFee)
-		slippageFeeNum_.Mul(slippageFeeNum, slippageFeeNum)
-		slippageFeeNum_.Mul(slippageFeeNum, dstBalance)
-
-		slippageFeeDenom_.Sub(amount, staticFee)
-		slippageFeeDenom_.Mul(feeDecimalsRat, slippageFeeDenom_)
-
-		slippageFee := new(big.Rat).Quo(slippageFeeNum_, slippageFeeDenom_)
-
-		expected := new(big.Rat).Add(staticFee, slippageFee)
-
-		if !amountIsFluid {
-			newSrcBalance := new(big.Rat).Add(amount, srcBalance)
-			srcToDstRate := new(big.Rat).Quo(dstBalance, newSrcBalance)
-			expected = expected.Mul(expected, srcToDstRate)
-		}
+		totalFluidFee := calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, dstBalance, amountIsFluid, feeDecimals)
 
 		assert.Equal(t, expected, totalFluidFee)
 	}
