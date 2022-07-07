@@ -84,7 +84,7 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 
-	unpacked, err := oneInchExchangeAbi.Unpack("Swapped", transfer.Log.Data)
+	unpacked, err := mooniswapPoolV1Abi.Unpack("Swapped", transfer.Log.Data)
 
 	if err != nil {
 		return nil, fmt.Errorf(
