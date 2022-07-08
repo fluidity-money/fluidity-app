@@ -56,6 +56,9 @@ func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 func init() {
 	balancerTests := unmarshalJsonTestOrFatal(integrationTestBalancerV2)
 	tests = append(tests, balancerTests...)
+
+	uniswapTests := unmarshalJsonTestOrFatal(integrationTestUniswapV2)
+	tests = append(tests, uniswapTests...)
 }
 
 func TestIntegrations(t *testing.T) {

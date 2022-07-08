@@ -4,6 +4,9 @@ Contains files for testing application integrations on Ethereum. Can be used to
 test expected values of new integrations, as well as regression testing of existing
 integrations. Uses Docker Compose to build and bring up the testing files as well as
 necessary services, and Go's testing infrastructure to perform the actual tests.
+Application-specific tests (e.g. special failure cases, testing non-exported functions)
+should be performed individually using normal Go testing principles, i.e. `file.go`,
+`file_test.go` within that integration's folder.
 
 ## How to run
 
