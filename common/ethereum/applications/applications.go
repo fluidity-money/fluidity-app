@@ -72,7 +72,8 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 	switch transfer.Application {
 	case ApplicationUniswapV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
-		return transaction.From, transaction.To, nil
+		// and the rest to the Uniswap contract
+		return transaction.From, logAddress, nil
 	case ApplicationOneInchLPV2,
 		ApplicationOneInchLPV1,
 		ApplicationMooniswap,
