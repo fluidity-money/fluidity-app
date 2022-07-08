@@ -56,8 +56,8 @@ type calculateTotalFluidFeeTest struct {
 
 func TestCalculateTotalFluidFee(t *testing.T) {
 	tests := []calculateTotalFluidFeeTest{
-		{big.NewRat(12, 1), big.NewRat(3, 1), big.NewRat(5, 1), big.NewRat(123, 1), big.NewRat(1234, 1), false, 3, big.NewRat(85_964_956_915_137, 510_962_500_000)},
-		{big.NewRat(12, 1), big.NewRat(3, 1), big.NewRat(5, 1), big.NewRat(123, 1), big.NewRat(1234, 1), true, 3, big.NewRat(381_279_627, 49_850_000)},
+		{big.NewRat(12, 1), big.NewRat(3, 1), big.NewRat(5, 1), big.NewRat(123, 1), big.NewRat(1234, 1), false, 3, big.NewRat(4_776_942_953, 12_649_500_900)},
+		{big.NewRat(12, 1), big.NewRat(3, 1), big.NewRat(5, 1), big.NewRat(123, 1), big.NewRat(1234, 1), true, 3, big.NewRat(7_742_209, 187_450_000)},
 	}
 
 	for _, test := range tests {
