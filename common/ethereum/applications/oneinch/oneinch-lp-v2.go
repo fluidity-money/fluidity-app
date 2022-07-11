@@ -212,7 +212,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	fluidFee = calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcAdditionBalance, dstRemovalBalance, srcTokenIsFluid, FeeDecimals)
+	fluidFee = calculateLPTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcAdditionBalance, dstRemovalBalance, srcTokenIsFluid, FeeDecimals)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
@@ -223,7 +223,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	return fluidFee, nil
 }
 
-func calculateStaticFee(amount, staticFeeRate *big.Rat) *big.Rat {
+func calculateLPStaticFee(amount, staticFeeRate *big.Rat) *big.Rat {
 	staticFee := new(big.Rat).Mul(amount, staticFeeRate)
 
 	return staticFee
@@ -231,7 +231,7 @@ func calculateStaticFee(amount, staticFeeRate *big.Rat) *big.Rat {
 
 // implementation of LPv1.1 fee calculation
 // fees are based on Token A amount, and should be converted if Token A is not a fluid token
-func calculateSlippageFee(amount, slippageFeeRate, poolBalance *big.Rat) *big.Rat {
+func calculateLPSlippageFee(amount, slippageFeeRate, poolBalance *big.Rat) *big.Rat {
 	poolSlippage := new(big.Rat).Quo(amount, poolBalance)
 
 	slippageFee := new(big.Rat).Mul(slippageFeeRate, poolSlippage)
@@ -241,12 +241,12 @@ func calculateSlippageFee(amount, slippageFeeRate, poolBalance *big.Rat) *big.Ra
 	return slippageFee
 }
 
-func calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, dstBalance *big.Rat, amountIsFluid bool, feeDecimals int) *big.Rat {
+func calculateLPTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, dstBalance *big.Rat, amountIsFluid bool, feeDecimals int) *big.Rat {
 	feeDecimalsRat := new(big.Rat).SetFloat64(math.Pow10(feeDecimals))
 
 	staticFeeRate := new(big.Rat).Quo(staticFeeNum, feeDecimalsRat)
 
-	srcStaticFee := calculateStaticFee(amount, staticFeeRate)
+	srcStaticFee := calculateLPStaticFee(amount, staticFeeRate)
 
 	remainingSrcTransferAmount := new(big.Rat).Sub(amount, srcStaticFee)
 
@@ -254,7 +254,7 @@ func calculateTotalFluidFee(amount, staticFeeNum, slippageFeeNum, srcBalance, ds
 
 	slippageFeeRate := new(big.Rat).Quo(slippageFeeNum, feeDecimalsRat)
 
-	srcSlippageFee := calculateSlippageFee(remainingSrcTransferAmount, slippageFeeRate, newSrcPoolBalance)
+	srcSlippageFee := calculateLPSlippageFee(remainingSrcTransferAmount, slippageFeeRate, newSrcPoolBalance)
 
 	srcTotalFee := new(big.Rat).Add(srcStaticFee, srcSlippageFee)
 

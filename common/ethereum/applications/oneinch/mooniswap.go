@@ -130,29 +130,11 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 		// result is the amount of out tokens
 		result = swapAmounts[1]
 
-		// the amount of fluid tokens sent or received
-		fluidTransferAmount *big.Rat
-
-		// the multiplier to find the fee
-		feeMultiplier *big.Rat
-
 		// whether the token being swapped from is the fluid token
 		inTokenIsFluid = token0addr == fluidTokenContract
 	)
 
-	// if trading x fUSDC -> y Token B
-	// the fee is x * 0.003 (100% input -> 99.7%)
-	// if trading y Token B -> x fUSDC
-	// the fee is x * 0.003009027 (99.7% input -> 100%)
-	if inTokenIsFluid {
-		feeMultiplier = big.NewRat(3, 1000)
-		fluidTransferAmount = amount
-	} else {
-		feeMultiplier = big.NewRat(3009027, 1000000000)
-		fluidTransferAmount = result
-	}
-
-	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
+	fee := calculateMooniswapFee(amount, result, inTokenIsFluid)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
@@ -161,4 +143,27 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 	fee.Quo(fee, decimalsRat)
 
 	return fee, nil
+}
+
+// if trading x fUSDC -> y Token B
+// the fee is x * 0.003 (100% input -> 99.7%)
+// if trading y Token B -> x fUSDC
+// the fee is x * 0.003009027 (99.7% input -> 100%)
+func calculateMooniswapFee(amount, result *big.Rat, amountIsFluid bool) *big.Rat {
+	var (
+		feeMultiplier       *big.Rat
+		fluidTransferAmount *big.Rat
+	)
+
+	if amountIsFluid {
+		feeMultiplier = big.NewRat(3, 1000)
+		fluidTransferAmount = amount
+	} else {
+		feeMultiplier = big.NewRat(3, 997)
+		fluidTransferAmount = result
+	}
+
+	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
+
+	return fee
 }
