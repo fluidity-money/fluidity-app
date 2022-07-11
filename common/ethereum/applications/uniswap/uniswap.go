@@ -2,7 +2,6 @@ package uniswap
 
 import (
 	"fmt"
-	"math"
 	"math/big"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
@@ -94,7 +93,7 @@ var uniswapV2PairAbi ethAbi.ABI
 // GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (worker.FeeUSD, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	unpacked, err := uniswapV2PairAbi.Unpack("Swap", transfer.Log.Data)
@@ -204,11 +203,7 @@ func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
 
-	// adjust by decimals to get the price in USD
-	decimalsAdjusted := math.Pow10(tokenDecimals)
-	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+	feeUsd := worker.AdjustFeeToUSD(fee, tokenDecimals)
 
-	fee.Quo(fee, decimalsRat)
-
-	return fee, nil
+	return feeUsd, nil
 }

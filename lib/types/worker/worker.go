@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"math"
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
@@ -8,6 +9,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
+
+// FeeUSD is the adjusted protocol fee, in USD
+type FeeUSD *big.Rat
 
 type (
 	// Emission contains information on the modelling information that led
@@ -133,7 +137,7 @@ type (
 	// include application data as needed
 	EthereumWorkerDecorator struct {
 		// Application fee in USD
-		ApplicationFee *big.Rat `json:"application_fee"`
+		ApplicationFee FeeUSD `json:"application_fee"`
 	}
 
 	// Transfer with application information attached
@@ -203,4 +207,14 @@ func NewSolanaEmission() *Emission {
 	emission := new(Emission)
 	emission.Network = "solana"
 	return emission
+}
+
+// AdjustFeeToUSD moves Fluid fee by decimals to get USD price
+func AdjustFeeToUSD(fee *big.Rat, decimals int) FeeUSD {
+	decimalsAdjusted := math.Pow10(decimals)
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	fee.Quo(fee, decimalsRat)
+
+	return FeeUSD(fee)
 }

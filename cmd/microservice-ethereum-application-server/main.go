@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/big"
 	"strconv"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -13,7 +12,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -143,7 +143,7 @@ func main() {
 // getApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
-func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (workerTypes.FeeUSD, error) {
 	switch transfer.Application {
 	case applications.ApplicationUniswapV2:
 		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
@@ -163,10 +163,10 @@ func getApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 // In the case of an AMM (such as Uniswap) the transaction sender receives the majority payout every time,
 // with the recipient tokens being effectively burnt (sent to the contract). In the case of a P2P swap,
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
-func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
+func getApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (ethTypes.Address, ethTypes.Address, error) {
 	var (
 		transaction = transfer.Transaction
-		nilAddress  libEthereum.Address
+		nilAddress  ethTypes.Address
 	)
 
 	switch transfer.Application {

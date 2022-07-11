@@ -106,7 +106,7 @@ var balancerV2PoolAbi ethAbi.ABI
 // input token is the fluid token, or an approximation based on the swap percentage if the
 // output token is the fluid token. This method generalises for Balancer's different pools
 // (stable, weighted, etc.)
-func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (worker.FeeUSD, error) {
 	var (
 		poolId    = transfer.Log.Topics[1]
 		tokenIn_  = transfer.Log.Topics[2]
@@ -202,11 +202,6 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	swapDecimals := big.NewRat(big10e18, 1)
 	swapRat.Quo(swapRat, swapDecimals)
 
-	// `swapAmounts` are returned in their native token amounts (e.g. 45 USDC = 45000000)
-	// so we need to adjust them to return a USD value
-	decimalsAdjusted := math.Pow10(tokenDecimals)
-	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
-
 	var (
 		amountIn  = swapAmounts[0]
 		amountOut = swapAmounts[1]
@@ -217,8 +212,11 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		// get the exact value based on the inputted fluid tokens
 		// fee = amountIn * swapPercentage / tokenDecimals
 		amountIn = amountIn.Mul(amountIn, swapRat)
-		amountIn = amountIn.Quo(amountIn, decimalsRat)
-		return amountIn, nil
+
+		// adjust for token decimals
+		fee := worker.AdjustFeeToUSD(amountIn, tokenDecimals)
+
+		return fee, nil
 
 	case tokenOut == fluidContractAddress:
 		// get the approximated value based on the received fluid tokens
@@ -241,9 +239,9 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		amountOut.Mul(amountOut, outFeePercentage)
 
 		// adjust for token decimals
-		amountOut.Quo(amountOut, decimalsRat)
+		fee := worker.AdjustFeeToUSD(amountOut, tokenDecimals)
 
-		return amountOut, nil
+		return fee, nil
 
 	default:
 		// could be a multi-token pool swap that doesn't involve the fluid token
