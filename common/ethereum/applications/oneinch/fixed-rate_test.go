@@ -16,7 +16,7 @@ type calculateFixedRateFeeTest struct {
 func TestCalculateFixedRateFee(t *testing.T) {
 	tests := []calculateFixedRateFeeTest{
 		{big.NewRat(-123, 1), big.NewRat(100, 3), big.NewRat(369-100, 3)},
-		{big.NewRat(-100, 1), big.NewRat(123, 3), big.NewRat(369-100, 3)},
+		{big.NewRat(123, 1), big.NewRat(-100, 3), big.NewRat(369-100, 3)},
 	}
 
 	for _, test := range tests {
