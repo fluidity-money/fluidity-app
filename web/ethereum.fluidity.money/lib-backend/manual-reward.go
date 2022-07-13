@@ -140,7 +140,14 @@ func GetManualRewardHandler(signers map[string]*ecdsa.PrivateKey) func(http.Resp
 		winnings := spooler.GetPendingRewardsForAddress(addressString)
 
 
-		spooledWinnings := ethereum.BatchWinningsByToken(winnings, address)
+		spooledWinnings, err := ethereum.BatchWinningsByToken(winnings, address)
+
+		if err != nil {
+		    log.Fatal(func(k *log.Log) {
+		        k.Message = "Failed to batch rewards!"
+		        k.Payload = err
+		    })
+		}
 
 		tokenWinnings, exists := spooledWinnings[token]
 

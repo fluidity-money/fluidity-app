@@ -44,7 +44,14 @@ func HandlePendingRewards(w http.ResponseWriter, r *http.Request) interface{} {
 
 	rewards := spooler.GetPendingRewardsForAddress(addressString)
 
-	spooledRewards := ethereum.BatchWinningsByToken(rewards, address)
+	spooledRewards, err := ethereum.BatchWinningsByToken(rewards, address)
+
+	if err != nil {
+	    log.Fatal(func(k *log.Log) {
+	        k.Message = "Failed to batch rewards!"
+	        k.Payload = err
+	    })
+	}
 
 	return spooledRewards
 }
