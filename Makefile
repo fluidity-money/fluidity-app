@@ -15,7 +15,7 @@ docker:
 	${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/build-container \
-		.how 
+		.
 
 docker-web: docker
 	@${DOCKER_BUILD} \
