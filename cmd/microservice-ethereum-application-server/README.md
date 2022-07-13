@@ -11,19 +11,15 @@ Supported contracts:
 ## Integrating a new application
 
 Update the list above with the name of the application!
-Then, there are four files/folders that need to be updated:
+Then, there are two files/folders that need to be updated:
 
 - `common/ethereum/applications/applications.go`
 
 Add `Application<name>` to the Application Enum, and any relevant const values such as log topics.
 
-- `common/ethereum/transfers.go`
+Update `GetApplicationFee` and `GetApplicationTransferParties` to include the new application.
 
 Expand the switch case in `ClassifyApplicationLogTopic` to determine whether a given log corresponds to the application.
-
-- `cmd/microservice-ethereum-application-server/main.go`
-
-Update `getApplicationFee` and `getApplicationTransferParties` to include the new application.
 
 - `common/ethereum/applications/<application name>`
 
