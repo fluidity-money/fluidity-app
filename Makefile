@@ -28,8 +28,9 @@ docker-compose-build:
 	@./scripts/docker-compose-all.sh build
 
 test:
+	@${SEMGREP_ALL} ${SEMGREP_GO_ARGS}
 	@${GO_TEST} ./...
-	touch test
+	@touch test
 
 clean:
 	@rm -f test

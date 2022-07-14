@@ -1,0 +1,60 @@
+
+rules:
+  - id: infura-url
+    languages:
+      - go
+      - yaml
+      - docker
+      - javascript
+      - typescript
+      - rust
+    severity: ERROR
+    message: Don't include a URL from Infura!
+    pattern-regex: "([wW][sS]|[hH][tT]{2}[pP])[sS]?:\/{2}[A-Za-z]+.infura.io\/(ws\/)?v[0-9]\/[A-Za-z0-9]+"
+
+  - id: quicknode-url
+    languages:
+      - go
+      - yaml
+      - docker
+      - javascript
+      - typescript
+      - rust
+    severity: ERROR
+    message: Don't include a URL from Quicknode!
+    pattern-regex: "([wW][sS]|[hH][tT]{2}[pP])[sS]?:\/{2}([A-Za-z-]+.)*quiknode.pro\/[A-Za-z0-9]+"
+
+  - id: sentry-url
+    languages:
+      - go
+      - yaml
+      - docker
+      - javascript
+      - typescript
+      - rust
+    severity: ERROR
+    message: Sentry URL included!
+    pattern-regex: "[hH][tT]{2}[pP][sS]?:\/{2}([A-Za-z0-9]+.)*.ingest.sentry.io\/[A-Za-z0-9]+"
+
+  - id: solana-private-key
+    languages:
+      - go
+      - yaml
+      - docker
+      - javascript
+      - typescript
+      - rust
+    severity: ERROR
+    message: Potential Solana private key?
+    pattern-regex: "[A-Za-z0-9]{86,88}"
+
+  - id: ethereum-private-key
+    languages:
+      - go
+      - yaml
+      - docker
+      - javascript
+      - rust
+    severity: ERROR
+    message: Potential Ethereum private key?
+    pattern-regex: "^((?!0x).)[A-Za-z0-9]{64}"

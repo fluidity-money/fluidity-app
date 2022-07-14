@@ -38,8 +38,9 @@ func (suite *MarshalTestSuite) SetupTest() {
 	}
 
 	var (
-		receiptBlockNumber = misc.BigIntFromInt64(0)
-		receiptIndex = misc.BigIntFromInt64(0)
+		receiptBlockNumber      = misc.BigIntFromInt64(0)
+		receiptIndex            = misc.BigIntFromInt64(0)
+		receiptTransactionIndex = misc.BigIntFromInt64(2)
 	)
 
 	testReceipt := Receipt{
@@ -55,7 +56,7 @@ func (suite *MarshalTestSuite) SetupTest() {
 				Data:        misc.Blob{100, 255},
 				BlockNumber: receiptBlockNumber,
 				TxHash:      HashFromString("12"),
-				TxIndex:     2,
+				TxIndex:     receiptTransactionIndex,
 				BlockHash:   HashFromString("blockhash"),
 				Index:       receiptIndex,
 				Removed:     false,
