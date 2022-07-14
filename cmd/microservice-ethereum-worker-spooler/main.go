@@ -110,7 +110,7 @@ func main() {
 			}
 
 			log.Debug(func (k *log.Log) {
-			    k.Format("Sending rewards for token %s", shortName)
+			    k.Format("Sending rewards for token %v", shortName)
 			})
 
 			sendRewards(batchedRewardsQueue, shortName)

@@ -60,7 +60,7 @@ func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, reward wo
 
 	if !exists {
 		log.Fatal(func(k *log.Log) {
-			k.Format("Signer for token %s not found!")
+			k.Format("Signer for token %v not found!", shortName)
 		})
 	}
 
