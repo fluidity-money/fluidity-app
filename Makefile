@@ -29,4 +29,4 @@ docker-compose-build:
 
 test:
 	@${GO_TEST} ./...
-	
+	touch test
