@@ -3,7 +3,10 @@ import chaiAsync from 'chai-as-promised';
 import contractList from 'util/contractList';
 import {ethers} from 'ethers';
 import makeContractSwap from 'util/makeContractSwap';
+import { notificationContext } from "components/Notifications/notificationContext";
 import {BigNumber} from 'ethers/utils';
+import { useContext } from 'react';
+import { isNull } from 'lodash';
 
 chai.use(chaiAsync)
 
@@ -24,14 +27,19 @@ describe('ERC20 Swaps', function () {
     let newBalanceUSDT: BigNumber; 
     let originalBalanceFluid: BigNumber;
     let newBalanceFluid: BigNumber; 
-    const swapAmount = 100;
+    const swapAmount = "100";
+    process.env.REACT_APP_CHAIN_ID = "31337"
     const bnSwapAmount = ethers.utils.parseUnits(swapAmount.toString(),6);
+    const addError = (message: string) => {
+        const id = generateNotificationId();
+        setNotifications(notifications => [...notifications, {message, id, type: 'Error'}]);
+    }
     it('Make a token swap', async function() {
         //get starting balance
         originalBalanceUSDT = await USDTContract.balanceOf(wallet.address);
         originalBalanceFluid = await fluidContract.balanceOf(wallet.address);
         //would expect this, but it doesn't allow it to complete even with async test runner
-        await makeContractSwap('toFluid', swapAmount, 'USDT', wallet);
+        await makeContractSwap('toFluid', swapAmount, 'USDT', wallet, addError);
         //get updated balance 
         newBalanceUSDT = await USDTContract.balanceOf(wallet.address);
         newBalanceFluid = await fluidContract.balanceOf(wallet.address);
@@ -43,7 +51,7 @@ describe('ERC20 Swaps', function () {
         expect(originalBalanceUSDT.sub(newBalanceUSDT.toNumber()).toNumber()).to.equal(bnSwapAmount.toNumber());
       })
     it('Swap back and recheck balance', async function() {
-        await makeContractSwap('fromFluid', swapAmount, 'USDT', wallet);
+        await makeContractSwap('fromFluid', swapAmount, 'USDT', wallet, addError);
         newBalanceUSDT = await USDTContract.balanceOf(wallet.address);
         newBalanceFluid = await fluidContract.balanceOf(wallet.address);
     });
@@ -54,3 +62,11 @@ describe('ERC20 Swaps', function () {
         expect(newBalanceUSDT.toNumber()).to.equal(originalBalanceUSDT.toNumber());
     });
 });
+function generateNotificationId() {
+    throw new Error('Function not implemented.');
+}
+
+function setNotifications(arg0: (notifications: any) => any[]) {
+    throw new Error('Function not implemented.');
+}
+
