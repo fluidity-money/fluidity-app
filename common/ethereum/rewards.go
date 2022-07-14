@@ -30,11 +30,16 @@ func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpo
 
 	spooledReward.WinAmount.Add(&spooledReward.WinAmount.Int, &amount.Int)
 
-	if blockNumber.Cmp(&spooledReward.FirstBlock.Int) < 0 {
+	var (
+		blockNumBeforeFirstBlock = blockNumber.Cmp(&spooledReward.FirstBlock.Int) < 0
+		blockNumAfterLastBlock   = spooledReward.LastBlock.Cmp(&blockNumber.Int) < 0
+	)
+
+	if blockNumBeforeFirstBlock {
 		spooledReward.FirstBlock.Set(&blockNumber.Int)
 	}
 
-	if spooledReward.LastBlock.Cmp(&blockNumber.Int) < 0 {
+	if blockNumAfterLastBlock {
 		spooledReward.LastBlock.Set(&blockNumber.Int)
 	}
 
