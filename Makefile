@@ -26,3 +26,7 @@ docker-web: docker
 
 docker-compose-build:
 	@./scripts/docker-compose-all.sh build
+
+test:
+	@${GO_TEST} ./...
+	touch test

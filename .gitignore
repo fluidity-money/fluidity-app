@@ -2,6 +2,7 @@
 docker
 docker-*
 !docker-compose*
+test
 
 lib/build-lib
 
