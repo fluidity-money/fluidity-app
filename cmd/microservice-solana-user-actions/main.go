@@ -8,6 +8,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -101,7 +102,12 @@ func main() {
 				}
 			}
 
-			allInstructions := append(instructions, innerInstructions...)
+			allInstructions := make([]solTypes.TransactionInstruction, 0)
+			allInstructions = append(allInstructions, instructions...)
+
+			for _, inner := range innerInstructions {
+				allInstructions = append(allInstructions, inner.Instructions...)
+			}
 
 			for _, instruction := range allInstructions {
 
