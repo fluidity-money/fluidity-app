@@ -7,8 +7,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/web"
 	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
 type RequestPendingRewards struct {
@@ -38,14 +38,19 @@ func HandlePendingRewards(w http.ResponseWriter, r *http.Request) interface{} {
 
 	var (
 		addressString = request.Address
-		address = typesEthereum.AddressFromString(addressString)
+		address       = typesEthereum.AddressFromString(addressString)
 	)
-
 
 	rewards := spooler.GetPendingRewardsForAddress(addressString)
 
-	spooledRewards := ethereum.BatchWinningsByToken(rewards, address)
+	spooledRewards, err := ethereum.BatchWinningsByToken(rewards, address)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to batch rewards!"
+			k.Payload = err
+		})
+	}
 
 	return spooledRewards
 }
-
