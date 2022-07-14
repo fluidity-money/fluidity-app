@@ -15,6 +15,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
@@ -335,6 +336,7 @@ func main() {
 				transactions,
 				blockHash,
 				applicationContracts,
+				applications.ClassifyApplicationLogTopic,
 			)
 
 			if err != nil {

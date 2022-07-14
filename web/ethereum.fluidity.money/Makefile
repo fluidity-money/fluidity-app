@@ -65,3 +65,6 @@ watch:
 
 clean:
 	rm -f docker-backend docker-frontend
+
+frontend-test:
+	@${NPX_REACTSCRIPTS} test

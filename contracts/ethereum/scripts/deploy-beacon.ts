@@ -9,7 +9,7 @@ const tasks: {[k: string]: {contract: string, name: string}} = {
 };
 
 const main = async () => {
-    var targets = process.env['ENV_ETHEREUM_DEPLOY_TARGETS']?.split(',');
+    var targets = process.env['FLU_ETHEREUM_DEPLOY_TARGETS']?.split(',');
     if (!targets) targets = Object.keys(tasks);
 
     for (const target of targets) {

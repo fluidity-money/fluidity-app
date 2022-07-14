@@ -18,15 +18,13 @@ const dateFormatter = (unixDate: string) => {
   if (minutes.length == 1) {
     minutes = "0" + minutes;
   }
-  // If over 12 hours has passed, enforce 12-hour-time
-  if (hours > 12) {
+  // enforce 12-hour-time
+  if (hours >= 12) {
     hours = hours - 12
     timePeriod = "PM";
+  }else if(hours == 0) {
+    hours = 12;
   }
-
-  // 12PM
-  if (hours === 12)
-    timePeriod = "PM";
 
   const seconds = date.getSeconds();
 
