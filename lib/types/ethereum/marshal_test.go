@@ -37,6 +37,11 @@ func (suite *MarshalTestSuite) SetupTest() {
 		BaseFee:         misc.BigIntFromInt64(20),
 	}
 
+	var (
+		receiptBlockNumber = misc.BigIntFromInt64(0)
+		receiptIndex = misc.BigIntFromInt64(0)
+	)
+
 	testReceipt := Receipt{
 		Type:              1,
 		PostState:         misc.Blob{1},
@@ -48,11 +53,11 @@ func (suite *MarshalTestSuite) SetupTest() {
 				Address:     AddressFromString("logaddr"),
 				Topics:      []Hash{HashFromString("topic1"), HashFromString("topic2")},
 				Data:        misc.Blob{100, 255},
-				BlockNumber: 0,
+				BlockNumber: receiptBlockNumber,
 				TxHash:      HashFromString("12"),
 				TxIndex:     2,
 				BlockHash:   HashFromString("blockhash"),
-				Index:       0,
+				Index:       receiptIndex,
 				Removed:     false,
 			},
 		},
