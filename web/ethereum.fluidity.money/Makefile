@@ -68,3 +68,4 @@ clean:
 
 frontend-test:
 	@${NPX_REACTSCRIPTS} test
+	@touch test
