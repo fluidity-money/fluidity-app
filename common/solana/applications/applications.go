@@ -1,7 +1,8 @@
 package applications
 
-import "github.com/fluidity-money/fluidity-app/lib/log"
+import "fmt"
 
+// Application supported by the Solana application server
 type Application int64
 
 const (
@@ -11,18 +12,24 @@ const (
 )
 
 // applicationNames is used to map human readable names to their enum varients
-var applicationNames = map[string]Application {
-	"spl": ApplicationSpl,
+var applicationNames = map[string]Application{
+	"spl":   ApplicationSpl,
 	"saber": ApplicationSaber,
 }
 
-func ParseApplicationName(name string) Application {
-	app, exists := applicationNames[name]
+// ParseApplication based on the name given, looking it up in the internal
+// map with the internal definition
+func ParseApplicationName(name string) (*Application, error) {
+	app_, exists := applicationNames[name]
+
 	if !exists {
-		log.Fatal(func (k *log.Log) {
-			k.Format("Unknown app name %s!", name)
-		})
+		return nil, fmt.Errorf(
+			"unknown app name %s",
+			name,
+		)
 	}
 
-	return app
+	app := app_
+
+	return &app, nil
 }

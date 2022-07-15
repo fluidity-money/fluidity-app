@@ -70,17 +70,23 @@ func main() {
 		solanaPrice, err := pyth.GetPrice(solanaClient, solPythPubkey)
 
 		if err != nil {
-		    log.Fatal(func(k *log.Log) {
-		        k.Message = "Failed to get the sol-USD price from pyth!"
-		        k.Payload = err
-		    })
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to get the sol-USD price from pyth!"
+				k.Payload = err
+			})
 		}
 
 		parsedTransactions := make([]worker.SolanaApplicationTransaction, 0)
 
 		for _, transaction := range block.Transactions {
 			app := solanaLib.ClassifyApplication(transaction, applications)
+
 			if app == nil {
+				log.Debugf(
+					"Transaction %v didn't have an application classified!",
+					transaction,
+				)
+
 				continue
 			}
 
@@ -93,8 +99,8 @@ func main() {
 			transactionFeeUsd.Mul(transactionFeeUsd, solanaPrice)
 
 			parsed := worker.SolanaApplicationTransaction{
-				Signature: transaction.Transaction.Signatures[0],
-				Result:    transaction,
+				Signature:   transaction.Transaction.Signatures[0],
+				Result:      transaction,
 				AdjustedFee: transactionFeeUsd,
 				Application: *app,
 			}

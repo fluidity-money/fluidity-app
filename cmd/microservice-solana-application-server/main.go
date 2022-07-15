@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-application-server/lib/saber"
 	"github.com/fluidity-money/fluidity-app/common/solana/applications"
+	"github.com/fluidity-money/fluidity-app/common/solana/saber"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -13,114 +14,137 @@ import (
 )
 
 const (
-    // EnvSaberSwapProgramid is the program ID of the saber swap program (not router)
-    EnvSaberSwapProgramId = `FLU_SOLANA_SABER_SWAP_PROGRAM_ID`
+	// EnvSaberSwapProgramid is the program ID of the saber swap program (not router)
+	EnvSaberSwapProgramId = `FLU_SOLANA_SABER_SWAP_PROGRAM_ID`
 
-    // EnvSaberRpcUrl to use when making lookups to their infrastructure
-    EnvSaberRpcUrl = `FLU_SOLANA_SABER_RPC_URL`
+	// EnvSaberRpcUrl to use when making lookups to their infrastructure
+	EnvSaberRpcUrl = `FLU_SOLANA_SABER_RPC_URL`
 )
 
 func main() {
-    var (
-        saberRpcUrl        = util.GetEnvOrFatal(EnvSaberRpcUrl)
-        saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
-    )
+	var (
+		saberRpcUrl        = util.GetEnvOrFatal(EnvSaberRpcUrl)
+		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
+	)
 
-    worker.GetSolanaBufferedParsedTransactions(func (transactions worker.SolanaBufferedParsedTransactions) {
-        transfers := make([]worker.SolanaDecoratedTransfer, 0)
+	worker.GetSolanaBufferedParsedTransactions(func(transactions worker.SolanaBufferedParsedTransactions) {
+		transfers := make([]worker.SolanaDecoratedTransfer, 0)
 
-        for _, transaction := range transactions.Transactions {
-            var (
-                app = transaction.Transaction.Application
-                hash = transaction.Transaction.Signature
-            )
+		for transactionNumber, transaction := range transactions.Transactions {
+			var (
+				transactionApp       = transaction.Transaction.Application
+				transactionSignature = transaction.Transaction.Signature
+			)
 
-            decorated, err := parseTransaction(transaction, saberRpcUrl, saberSwapProgramId)
+			decorated, err := parseTransaction(
+				transaction,
+				saberRpcUrl,
+				saberSwapProgramId,
+			)
 
-            if err != nil {
-                log.Fatal(func(k *log.Log) {
-                    k.Format(
-                        "Failed to parse an application event! %w",
-                        err,
-                    )
-                })
-            }
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to parse an application at transaction %v! %w",
+						transactionNumber,
+						err,
+					)
+				})
+			}
 
-            if decorated == nil {
-                log.App(func(k *log.Log) {
-                    k.Format(
-                        "Application didn't return a transfer, app index %d, transaction %s",
-                        app,
-                        hash,
-                    )
-                })
-                continue
-            }
+			if decorated == nil {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Application didn't return a transfer, app index %d, transaction %s",
+						transactionApp,
+						transactionSignature,
+					)
+				})
 
-            transfers = append(transfers, decorated...)
-        }
+				continue
+			}
 
-        bufferedTransfers := worker.SolanaBufferedTransfers {
-            Transfers: transfers,
-        }
+			transfers = append(transfers, decorated...)
+		}
 
-        queue.SendMessage(worker.TopicSolanaBufferedTransfers, bufferedTransfers)
-    })
+		bufferedTransfers := worker.SolanaBufferedTransfers{
+			Transfers: transfers,
+		}
+
+		queue.SendMessage(
+			worker.TopicSolanaBufferedTransfers,
+			bufferedTransfers,
+		)
+	})
 }
 
 func parseTransaction(transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
-    var (
-        fee *big.Rat
-        err error
-    )
+	var (
+		fee *big.Rat
+		err error
+	)
 
-    switch transaction.Transaction.Application {
-    case applications.ApplicationSaber:
-        fee, _, err = saber.GetSaberFees(saberRpc, transaction, saberProgramId)
-    }
+	var (
+		transactionSignature   = transaction.Transaction.Signature
+		transactionApplication = transaction.Transaction.Application
+	)
 
-    if err != nil {
-        return nil, err
-    }
+	switch transactionApplication {
+	case applications.ApplicationSaber:
+		fee, _, err = saber.GetSaberFees(saberRpc, transaction, saberProgramId)
 
-    var (
-        transfers = transaction.Transfers
-        appTransaction = transaction.Transaction
-        decorated = make([]worker.SolanaDecoratedTransfer, len(transfers))
-    )
+	default:
+		err = fmt.Errorf(
+			"application number wasn't expected: %v",
+			transactionApplication,
+		)
+	}
 
-    for i, transfer := range(transfers) {
-        var (
-            token = transfer.TokenDetails
-            senderSpl = transfer.SenderAddress
-            recipientSpl = transfer.RecipientAddress
-            senderOwner = transfer.SolanaSenderOwnerAddress
-            recipientOwner = transfer.SolanaRecipientOwnerAddress
-        )
+	if err != nil {
+		return nil, fmt.Errorf(
+			"application decoding failed for parsed transaction %#v: %v",
+			transactionSignature,
+			err,
+		)
+	}
 
-        var decorator *types.SolanaWorkerDecorator
+	var (
+		transfers      = transaction.Transfers
+		appTransaction = transaction.Transaction
+		decorated      = make([]worker.SolanaDecoratedTransfer, len(transfers))
+	)
 
-        if fee != nil {
-            decorator_ := types.SolanaWorkerDecorator {
-                ApplicationFee: fee,
-            }
+	for i, transfer := range transfers {
+		var (
+			token          = transfer.TokenDetails
+			senderSpl      = transfer.SenderAddress
+			recipientSpl   = transfer.RecipientAddress
+			senderOwner    = transfer.SolanaSenderOwnerAddress
+			recipientOwner = transfer.SolanaRecipientOwnerAddress
+		)
 
-            decorator = &decorator_
-        }
+		var decorator *types.SolanaWorkerDecorator
 
-        decoratedTransfer := worker.SolanaDecoratedTransfer {
-            Transaction: appTransaction,
-            Token: token,
-            SenderSplAddress: senderSpl,
-            RecipientSplAddress: recipientSpl,
-            SenderOwnerAddress: senderOwner,
-            RecipientOwnerAddress: recipientOwner,
-            Decorator: decorator,
-        }
+		if fee != nil {
+			decorator_ := types.SolanaWorkerDecorator{
+				ApplicationFee: fee,
+			}
 
-        decorated[i] = decoratedTransfer
-    }
+			decorator = &decorator_
+		}
 
-    return decorated, nil
+		decoratedTransfer := worker.SolanaDecoratedTransfer{
+			Transaction:           appTransaction,
+			Token:                 token,
+			SenderSplAddress:      senderSpl,
+			RecipientSplAddress:   recipientSpl,
+			SenderOwnerAddress:    senderOwner,
+			RecipientOwnerAddress: recipientOwner,
+			Decorator:             decorator,
+		}
+
+		decorated[i] = decoratedTransfer
+	}
+
+	return decorated, nil
 }
-

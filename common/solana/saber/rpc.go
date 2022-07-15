@@ -38,6 +38,8 @@ type (
 	}
 )
 
+// GetSaberPriceAndDecimals at the public key given using Saber's RPC
+// over HTTP
 func GetSaberPriceAndDecimals(saberRpcUrl, pubKey string) (*big.Rat, int, error) {
 	request := map[string]interface{}{
 		"query": "query AllPoolStats {pools {ammId name coin{chainId address name decimals symbol logoURI} stats {price}}}",
@@ -50,7 +52,10 @@ func GetSaberPriceAndDecimals(saberRpcUrl, pubKey string) (*big.Rat, int, error)
 	err := encoder.Encode(request)
 
 	if err != nil {
-		return nil, 0, fmt.Errorf("Failed to encode RPC call: %w", err)
+		return nil, 0, fmt.Errorf(
+			"failed to encode RPC call containing Saber RPC query: %w",
+			err,
+		)
 	}
 
 	r, err := http.Post(
@@ -60,7 +65,10 @@ func GetSaberPriceAndDecimals(saberRpcUrl, pubKey string) (*big.Rat, int, error)
 	)
 
 	if err != nil {
-		return nil, 0, fmt.Errorf("Failed to make an RPC call: %w", err)
+		return nil, 0, fmt.Errorf(
+			"failed to make an RPC call to Saber RPC: %w",
+			err,
+		)
 	}
 
 	defer r.Body.Close()
@@ -70,7 +78,10 @@ func GetSaberPriceAndDecimals(saberRpcUrl, pubKey string) (*big.Rat, int, error)
 	var responseData responseData
 
 	if err := reader.Decode(&responseData); err != nil {
-		return nil, 0, fmt.Errorf("Failed decoding RPC response: %w", err)
+		return nil, 0, fmt.Errorf(
+			"failed to decode Saber RPC response: %w",
+			err,
+		)
 	}
 
 	for _, pool := range responseData.Data.Pools {
@@ -87,5 +98,10 @@ func GetSaberPriceAndDecimals(saberRpcUrl, pubKey string) (*big.Rat, int, error)
 		return priceRat, decimals, nil
 	}
 
-	return nil, 0, fmt.Errorf("Failed to find token in Saber list")
+	err = fmt.Errorf(
+		"failed to find token in Saber list, response data is %v",
+		responseData,
+	)
+
+	return nil, 0, err
 }

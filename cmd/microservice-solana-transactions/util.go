@@ -29,10 +29,22 @@ func parseApplications(list string) map[string]applications.Application {
 		var (
 			name    = appDetails[0]
 			address = appDetails[1]
-			app     = applications.ParseApplicationName(name)
 		)
 
-		apps[address] = app
+		application, err := applications.ParseApplicationName(name)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode application name %v",
+					name,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		apps[address] = *application
 	}
 
 	return apps

@@ -6,11 +6,10 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/solana"
-	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -64,7 +63,8 @@ func main() {
 		)
 
 		var (
-			bufferedUserActions = make([]user_actions.UserAction, 0)
+			transfers                  = make([]user_actions.UserAction, 0)
+			bufferedUserActions        = make([]user_actions.UserAction, 0)
 			bufferedParsedTransactions = make([]worker.SolanaParsedTransaction, 0)
 		)
 
@@ -188,9 +188,9 @@ func main() {
 			}
 
 			// always pass transactions to the apps server
-			parsedTransaction := worker.SolanaParsedTransaction {
+			parsedTransaction := worker.SolanaParsedTransaction{
 				Transaction: transaction,
-				Transfers: transfers,
+				Transfers:   transfers,
 			}
 
 			bufferedParsedTransactions = append(
@@ -200,9 +200,9 @@ func main() {
 		}
 
 		if len(bufferedParsedTransactions) != 0 {
-			bufferedTransactionsBlock := worker.SolanaBufferedParsedTransactions {
+			bufferedTransactionsBlock := worker.SolanaBufferedParsedTransactions{
 				Transactions: bufferedParsedTransactions,
-				Slot: slotNumber,
+				Slot:         slotNumber,
 			}
 
 			queue.SendMessage(worker.TopicSolanaParsedTransactions, bufferedTransactionsBlock)

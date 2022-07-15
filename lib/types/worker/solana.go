@@ -13,15 +13,15 @@ type (
 	// SolanaApplicationTransaction is a solana transaction that is relevant
 	// to fluidity with some added metadata
 	SolanaApplicationTransaction struct {
-		Signature string `json:"signature"`
-		Result solana.TransactionResult `json:"result"`
-		AdjustedFee *big.Rat `json:"adjusted_fee"`
+		Signature   string                   `json:"signature"`
+		Result      solana.TransactionResult `json:"result"`
+		AdjustedFee *big.Rat                 `json:"adjusted_fee"`
 		Application applications.Application `json:"application"`
 	}
 
 	SolanaBufferedApplicationTransactions struct {
 		Transactions []SolanaApplicationTransaction `json:"transactions"`
-		Slot uint64 `json:"slot"`
+		Slot         uint64                         `json:"slot"`
 	}
 
 	// SolanaParsedTransaction is a solana transaction with spl user actions
@@ -34,7 +34,7 @@ type (
 	// objects, buffered by slot
 	SolanaBufferedParsedTransactions struct {
 		Transactions []SolanaParsedTransaction `json:"transactions"`
-		Slot  uint64                           `json:"slot"`
+		Slot         uint64                    `json:"slot"`
 	}
 
 	// SolanaWorkerDecorator contains an adjusted application fee
@@ -45,29 +45,29 @@ type (
 
 	// SolanaDecoratedTransfer contains a solana transfer, and optionally,
 	// an adjusted app fee
-	SolanaDecoratedTransfer struct                   {
+	SolanaDecoratedTransfer struct {
 		// Transaction containing the event
-		Transaction         SolanaApplicationTransaction `json:"transaction"`
+		Transaction SolanaApplicationTransaction `json:"transaction"`
 
 		Token token_details.TokenDetails `json:"token_details"`
 
 		// SPL accounts of the parties involved in the swap,
 		// where sender recieves the majority of a potential reward,
 		// and one party could be a smart contract
-		SenderSplAddress    string                       `json:"sender_spl_address"`
-		RecipientSplAddress string                       `json:"recipient_spl_address"`
+		SenderSplAddress    string `json:"sender_spl_address"`
+		RecipientSplAddress string `json:"recipient_spl_address"`
 
 		// addresses of the accounts that own the SPL accounts
-		SenderOwnerAddress    string                 `json:"sender_owner_address"`
-		RecipientOwnerAddress string                 `json:"recipient_owner_address"`
+		SenderOwnerAddress    string `json:"sender_owner_address"`
+		RecipientOwnerAddress string `json:"recipient_owner_address"`
 
-		Decorator             *SolanaWorkerDecorator `json:"decorator"`
+		Decorator *SolanaWorkerDecorator `json:"decorator"`
 	}
 
 	// SolanaBufferedTransfers buffers decorated transfers by slot
 	SolanaBufferedTransfers struct {
-		Transfers             []SolanaDecoratedTransfer `json:"transfers"`
-		SecondsSinceLastSlot  uint64                    `json:"seconds_since_last_slot"`
+		Transfers            []SolanaDecoratedTransfer `json:"transfers"`
+		SecondsSinceLastSlot uint64                    `json:"seconds_since_last_slot"`
 	}
 
 	// SolanaWork augments SolanaBufferedTransfers with tvl and mint details

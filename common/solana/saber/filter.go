@@ -97,7 +97,7 @@ func GetSaberFees(saberRpcUrl string, transaction worker.SolanaParsedTransaction
 		}
 
 		// 32 bytes for public key, and 8 for uint64
-		if len(routerBytes) < (TokenAmountStartByte + 40){
+		if len(routerBytes) < (TokenAmountStartByte + 40) {
 			continue
 		}
 
