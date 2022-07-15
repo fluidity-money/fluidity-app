@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	microservice_lib "github.com/fluidity-money/fluidity-app/lib"
 	"github.com/stretchr/testify/assert"
 )
@@ -41,4 +42,41 @@ func TestGetWorkerId(t *testing.T) {
 			id,
 		),
 	)
+}
+
+func TestGetEnvOrDefault(t *testing.T) {
+	const (
+		EnvTestValue      = "FLU_TEST_VALUE"
+		ExpectedTestValue = "987tuv"
+		DefaultTestValue  = "my_default"
+	)
+
+	// exists, is value
+	t.Setenv(EnvTestValue, ExpectedTestValue)
+	env := GetEnvOrDefault(EnvTestValue, DefaultTestValue)
+	assert.Equal(t, ExpectedTestValue, env)
+
+	// doesn't exist, is default
+	t.Setenv(EnvTestValue, "")
+	env = GetEnvOrDefault(EnvTestValue, DefaultTestValue)
+	assert.Equal(t, DefaultTestValue, env)
+}
+
+func TestGetHash(t *testing.T) {
+	tests := [][]byte{
+		[]byte("abcdef"),
+		[]byte("99999"),
+	}
+	results := []string{
+		"0x1f8ac10f23c5b5bc1167bda84b833e5c057a77d2",
+		"0xa045b7efa463c6ed195c644163f4168952fbd34a",
+	}
+
+	for i, test := range tests {
+		expectedHash := results[i]
+		hash := GetHash(test)
+		// compare to precomputed hex hashes
+		hashHex := hexutil.Encode([]byte(hash))
+		assert.Equal(t, expectedHash, hashHex)
+	}
 }
