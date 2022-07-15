@@ -2,20 +2,24 @@ package util
 
 import (
 	"math/big"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTokenList(t *testing.T) {
+	const (
+		ExpectedTokensListEthereum = `:USDT:6,:USDC:6,:DAI:18,:TUSD:18,:FEI:18,:FRAX:18,:UST:6`
+		ExpectedTokensListSolana   = `:USDT:6,:USDC:6,:UXD:6,:UST:6`
+	)
+
 	var (
 		expectedEthereumTokensList = []TokenDetailsBase{}
 		expectedSolanaTokensList   = []TokenDetailsBase{}
 	)
 
-	resultEthereumTokensList := GetTokensListBase(os.Getenv(`FLU_ETHEREUM_TOKENS_LIST`))
-	resultSolanaTokensList := GetTokensListBase(os.Getenv(`FLU_SOLANA_TOKENS_LIST`))
+	resultEthereumTokensList := GetTokensListBase(ExpectedTokensListEthereum)
+	resultSolanaTokensList := GetTokensListBase(ExpectedTokensListSolana)
 
 	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
 		TokenName:     `USDT`,
@@ -63,6 +67,6 @@ func TestTokenList(t *testing.T) {
 		TokenDecimals: big.NewRat(1000000, 1),
 	})
 
-	assert.Equal(t, expectedSolanaTokensList, resultSolanaTokensList)
-	assert.Equal(t, expectedEthereumTokensList, resultEthereumTokensList)
+	assert.ElementsMatch(t, expectedSolanaTokensList, resultSolanaTokensList)
+	assert.ElementsMatch(t, expectedEthereumTokensList, resultEthereumTokensList)
 }

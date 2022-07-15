@@ -48,7 +48,7 @@ func CalculateMovingAverage(key string) (*int, error) {
 		if err != nil {
 			return nil, fmt.Errorf(
 				"failed to convert %#v to an int for an average conversion from Redis! %v",
-				value,
+				s,
 				err,
 			)
 		}
