@@ -4,14 +4,7 @@ export const decimalTrim = (amount: string, limit: number) => {
     return amount;
   }
 
-  const trim = amount.indexOf('.') != -1
-    ? amount.slice(0, amount.indexOf('.') + limit)
-    : amount;
-
-  // Remove the point at the end of string decimal if limit is 1
-  if(limit == 1) {
-    return trim.slice(0, (trim.length - 1))
-  }
-  
+  const trimIndex = amount.indexOf('.');
+  const trim = trimIndex > -1 ? amount.slice(0, trimIndex + limit + 1) : amount;
   return trim;
 };
