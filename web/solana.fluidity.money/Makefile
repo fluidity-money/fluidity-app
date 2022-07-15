@@ -35,9 +35,7 @@ ${FRONTEND_BUILD}: js css
 	@touch ${FRONTEND_BUILD}
 
 docker-frontend: ${FRONTEND_SRC}
-	${DOCKER_BUILD} \
-		${DOCKERFLAGS} \
-		${DOCKER_BUILD_ARGS} \
+	@${DOCKER_BUILD} \
 		-t "${ORG_ROOT}/${REPO}-frontend" \
 		-f Dockerfile.frontend \
 		.

@@ -35,8 +35,6 @@ ${FRONTEND_BUILD}: js css
 
 docker-frontend: ${FRONTEND_SRC}
 	@${DOCKER_BUILD} \
-		${DOCKERFLAGS} \
-		${DOCKER_BUILD_ARGS} \
 		-t "${ORG_ROOT}/${REPO}-frontend" \
 		-f Dockerfile.frontend \
 		.
@@ -62,9 +60,6 @@ watch-css:
 
 watch:
 	@${MAKE} -j2 watch-js watch-css 
-
-clean:
-	rm -f docker-backend docker-frontend
 
 frontend-test:
 	@${NPX_REACTSCRIPTS} test
