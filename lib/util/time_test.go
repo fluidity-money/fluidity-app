@@ -11,7 +11,7 @@ import (
 
 func TestUnixStringToTime(t *testing.T) {
 	var (
-		expectedTime     = time.Date(2022, time.February, 9, 05, 50, 27, 0, time.Local)
+		expectedTime     = time.Date(2022, time.February, 9, 04, 50, 27, 0, time.UTC)
 		unixDatestamp    = "1644382227"
 		invalidDatestamp = "a1644382227"
 	)
