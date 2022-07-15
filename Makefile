@@ -32,6 +32,3 @@ semgrep:
 
 test: semgrep
 	@${GO_TEST} ./...
-
-clean:
-	@rm -f test
