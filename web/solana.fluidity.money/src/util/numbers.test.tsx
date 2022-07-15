@@ -25,16 +25,12 @@ describe("clearTrailingZeros", () => {
     it("2000.000", () => {
       expect(numbers.clearTrailingZeros("2000.000")).toBe("2000");
     })
-})
 
-/*describe("decimalToTokenAmount", () => {
-    it("29 + 29 + 92]", () => {
-      expect(currencyParser([29,29,92])).toBe("$150.00");
+    it("1234.001", () => {
+        expect(numbers.clearTrailingZeros("1234.001")).toBe("1234.001");
+    })
+
+    it("10.000", () => {
+        expect(numbers.clearTrailingZeros("10.000")).toBe("10");
     })
 })
-
-describe("trailingDecimalZeros", () => {
-    it("29 + 29 + 92]", () => {
-      expect(currencyParser([29,29,92])).toBe("$150.00");
-    })
-})*/
