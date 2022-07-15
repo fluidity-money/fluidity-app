@@ -63,3 +63,4 @@ watch:
 
 frontend-test:
 	@${NPX_REACTSCRIPTS} test
+	@touch frontend-test
