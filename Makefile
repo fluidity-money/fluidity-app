@@ -12,7 +12,7 @@ build:
 	@cd common && ${MAKE} build-common
 
 docker:
-	@${DOCKER_BUILD} \
+	${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/build-container \
 		.
