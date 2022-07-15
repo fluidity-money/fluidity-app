@@ -1,0 +1,14 @@
+
+rules:
+- id: bad-solana-public-keys-parsing
+  languages: [go]
+  severity: WARNING
+  message: |
+    Public key parsing should not happen with the Must function! Should
+    handle the error in our code!
+  patterns:
+    - pattern-inside: |
+        import "github.com/gagliardetto/solana-go"
+        ...
+    - pattern: |
+        $SOL.MustPublicKeyFromBase58(...)

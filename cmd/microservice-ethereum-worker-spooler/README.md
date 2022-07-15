@@ -1,5 +1,5 @@
 
-# microservice-ethereum-transaction-spooler
+# microservice-ethereum-worker-spooler
 
 Caches rewards until a reward with high enough value, or the total value
 of unpaid rewards is high enough.

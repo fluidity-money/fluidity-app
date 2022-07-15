@@ -50,7 +50,14 @@ func bigExp10(val int64) *big.Int {
 func sendRewards(queueName string, token token_details.TokenDetails) {
 	transactions := spooler.GetAndRemoveRewardsForToken(token)
 
-	spooledRewards := ethereum.BatchWinningsByUser(transactions, token)
+	spooledRewards, err := ethereum.BatchWinningsByUser(transactions, token)
+
+	if err != nil {
+	    log.Fatal(func(k *log.Log) {
+	        k.Message = "Failed to batch rewards!"
+	        k.Payload = err
+	    })
+	}
 
 	rewards := make([]worker.EthereumSpooledRewards, len(spooledRewards))
 

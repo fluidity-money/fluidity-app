@@ -66,7 +66,7 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatal(
+		log.Fatalf(
 			"Failed to connect to AMQP! %v",
 			err,
 		)

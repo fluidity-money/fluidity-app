@@ -70,6 +70,13 @@ func main() {
 
 		solanaPrice, err := pyth.GetPrice(solanaClient, solPythPubkey)
 
+		if err != nil {
+		    log.Fatal(func(k *log.Log) {
+		        k.Message = "Failed to get the sol-USD price from pyth!"
+		        k.Payload = err
+		    })
+		}
+
 		parsedTransactions := make([]solanaQueue.Transaction, len(block.Transactions))
 
 		for i, transaction := range block.Transactions {

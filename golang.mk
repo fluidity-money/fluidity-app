@@ -3,6 +3,8 @@
 
 include ../../build.mk
 
+SEMGREP_GO_ARGS := --config .semgrep/golang.yml
+
 GO_FILES := $(shell ls -1 *.go)
 
 ${REPO}.o: ${GO_FILES}
@@ -13,7 +15,8 @@ lint: ${GO_FILES}
 	@touch lint
 
 test: ${GO_FILES}
-	@${GO_TEST}
+	@${GO_TEST} -cover
+	@${SEMGREP_ALL} ${SEMGREP_GO_ARGS}
 	@touch test
 
 docker: ${GO_FILES} Dockerfile Makefile

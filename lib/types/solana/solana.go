@@ -97,12 +97,12 @@ type (
 
 	TransactionMeta struct {
 		// TODO solana doesn't doccument what this type actually is
-		Err               interface{}               `json:"err"`
-		Fee               uint64                    `json:"fee"`
-		PreTokenBalances  []TransactionTokenBalance `json:"preTokenBalances"`
-		PostTokenBalances []TransactionTokenBalance `json:"postTokenBalances"`
-		InnerInstructions []TransactionInstruction  `json:"innerInstructions"`
-		Logs              []string                  `json:"logMessages"`
+		Err               interface{}                   `json:"err"`
+		Fee               uint64                        `json:"fee"`
+		PreTokenBalances  []TransactionTokenBalance     `json:"preTokenBalances"`
+		PostTokenBalances []TransactionTokenBalance     `json:"postTokenBalances"`
+		InnerInstructions []TransactionInnerInstruction `json:"innerInstructions"`
+		Logs              []string                      `json:"logMessages"`
 	}
 
 	TransactionTokenBalance struct {
@@ -128,6 +128,10 @@ type (
 		Instructions []TransactionInstruction `json:"instructions"`
 	}
 
+	TransactionInnerInstruction struct {
+		Index        int                      `json:"index"`
+		Instructions []TransactionInstruction `json:"instructions"`
+	}
 	TransactionInstruction struct {
 		Accounts       []int  `json:"accounts"`
 		Data           string `json:"data"`

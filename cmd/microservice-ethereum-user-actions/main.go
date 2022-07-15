@@ -109,7 +109,7 @@ func main() {
 
 		case microservice_user_actions.EventTransfer:
 			log.Debugf(
-				"Handling a transfer event, topic head is %#s",
+				"Handling a transfer event, topic head is %#v",
 				topicHead,
 			)
 
