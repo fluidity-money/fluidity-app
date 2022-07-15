@@ -81,6 +81,7 @@ func GetFixedRateSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	// fee is derived assuming token0 and token1 have the same decimals
 	// token0Amount + token1Amount + fee == 0
 	fee := new(big.Rat).Add(token0Amount, token1Amount)
+	fee.Abs(fee)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
