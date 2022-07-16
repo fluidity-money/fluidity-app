@@ -1,4 +1,5 @@
 import * as numbers from "./numbers";
+import { Token } from "@saberhq/token-utils";
 
 describe("amountToDecimalString", () => {
   it("Amount: 299, Decimal: 2", () => {
@@ -32,5 +33,18 @@ describe("clearTrailingZeros", () => {
 
     it("10.000", () => {
         expect(numbers.clearTrailingZeros("10.000")).toBe("10");
+    })
+})
+
+describe("decimalToTokenAmount", () => {
+    it("", () => {
+        const token = 
+      expect(numbers.decimalToTokenAmount(new Token({
+        chainId: 13355,
+        address:"0xsjafas",
+        name: "USD",
+        symbol: "USD",
+        decimals: 6,
+      }), "2000")).toBe("2000");
     })
 })
