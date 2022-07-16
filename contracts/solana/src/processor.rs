@@ -368,7 +368,7 @@ fn unwrap(
     )?;
 
     // calculate collateral amount from refreshed reserve
-    let reserve = Reserve::unpack(&reserve_info.data.borrow())?;
+    let reserve = Box::new(Reserve::unpack(&reserve_info.data.borrow())?);
     let collateral_amount = reserve
         .collateral_exchange_rate()?
         .liquidity_to_collateral(amount)?;
