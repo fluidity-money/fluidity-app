@@ -1,4 +1,5 @@
 import * as numbers from "./numbers";
+import { Token, TokenAmount } from "@saberhq/token-utils";
 
 describe("amountToDecimalString", () => {
   it("Amount: 299, Decimal: 2", () => {
@@ -32,5 +33,22 @@ describe("clearTrailingZeros", () => {
 
     it("10.000", () => {
         expect(numbers.clearTrailingZeros("10.000")).toBe("10");
+    })
+})
+
+describe("decimalToTokenAmount", () => {
+    it("2000.2928292982293283938923293829 == 2000.292829", () => {
+
+    const expectedResult = {"_isTA": true, 
+    "mint": "0x47eDA487dd907de2986e0F95F8CC4Dc8CCf6", 
+    "uiAmount": "2000.292829"}
+
+      expect(numbers.decimalToTokenAmount(new Token({
+        chainId: 3,
+        address:"0x47eDA487dd907de2986e0F95F8CC4Dc8CCf6",
+        name: "FLUID USD Tether",
+        symbol: "fUSDT",
+        decimals: 6,
+      }), "2000.2928292982293283938923293829").toJSON()).toStrictEqual(expectedResult);
     })
 })
