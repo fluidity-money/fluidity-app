@@ -18,7 +18,6 @@ to get information from the RPC sometimes.
 | `FLU_DEBUG`                | Toggle debug messages produced by any application using the debug logger.    |
 | `FLU_AMQP_QUEUE_ADDR`      | AMQP queue address connected to to receive and send messages down.           |
 | `FLU_SOLANA_RPC_URL`       | Solana node RPC address to fetch transaction info from.                      |
-| `FLU_SOLANA_SABER_RPC_URL` | RPC endpoint used to look up information from Saber.                         |
 
 ## Building
 

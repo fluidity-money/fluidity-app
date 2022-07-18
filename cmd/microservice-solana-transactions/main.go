@@ -6,13 +6,14 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	solanaQueue "github.com/fluidity-money/fluidity-app/lib/queues/solana"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 
-	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/saber"
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
 
+	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
 	solanaLibrary "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
@@ -21,14 +22,12 @@ const (
 	// EnvSolanaRpcUrl is the url used to make Solana HTTP RPC requests
 	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
 
-	// EnvSaberSwapProgramid is the program ID of the saber swap program (not router)
-	EnvSaberSwapProgramId = `FLU_SOLANA_SABER_SWAP_PROGRAM_ID`
-
-	// EnvSaberRpcUrl to use when making lookups to their infrastructure
-	EnvSaberRpcUrl = `FLU_SOLANA_SABER_RPC_URL`
-
 	// EnvSolPythPubkey is the public key of the Pyth price account for SOL
 	EnvSolPythPubkey = `FLU_SOLANA_SOL_PYTH_PUBKEY`
+
+	// EnvApplicationList is a list of applications in the form
+	// name:addresses,etc for classifying app transactions with
+	EnvApplicationList = `FLU_SOLANA_APPLICATIONS_LIST`
 )
 
 const (
@@ -39,9 +38,9 @@ const (
 func main() {
 	var (
 		solanaRpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		saberRpcUrl         = util.GetEnvOrFatal(EnvSaberRpcUrl)
-		saberSwapProgramId  = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		solPythPubkeyString = util.GetEnvOrFatal(EnvSolPythPubkey)
+		applicationsString  = util.GetEnvOrFatal(EnvApplicationList)
+		applications        = parseApplications(applicationsString)
 	)
 
 	solPythPubkey := solanaLibrary.MustPublicKeyFromBase58(solPythPubkeyString)
@@ -71,51 +70,45 @@ func main() {
 		solanaPrice, err := pyth.GetPrice(solanaClient, solPythPubkey)
 
 		if err != nil {
-		    log.Fatal(func(k *log.Log) {
-		        k.Message = "Failed to get the sol-USD price from pyth!"
-		        k.Payload = err
-		    })
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to get the sol-USD price from pyth!"
+				k.Payload = err
+			})
 		}
 
-		parsedTransactions := make([]solanaQueue.Transaction, len(block.Transactions))
+		parsedTransactions := make([]worker.SolanaApplicationTransaction, 0)
 
-		for i, transaction := range block.Transactions {
+		for _, transaction := range block.Transactions {
+			app := solanaLib.ClassifyApplication(transaction, applications)
 
-			transactionMetaFeeRat := new(big.Rat).SetUint64(transaction.Meta.Fee)
+			if app == nil {
+				log.Debugf(
+					"Transaction %v didn't have an application classified!",
+					transaction,
+				)
 
-			transactionMetaFeeRat.Quo(transactionMetaFeeRat, LamportDecimalPlacesRat)
+				continue
+			}
+
+			transactionFeeUsd := new(big.Rat).SetUint64(transaction.Meta.Fee)
+
+			transactionFeeUsd.Quo(transactionFeeUsd, LamportDecimalPlacesRat)
 
 			// normalise to usd
 
-			transactionMetaFeeRat.Mul(transactionMetaFeeRat, solanaPrice)
+			transactionFeeUsd.Mul(transactionFeeUsd, solanaPrice)
 
-			// saber fee is 0 if an error occurs
-			// currently this assumes all saber fees are in USD
-
-			saberFee, _, err := saber.GetSaberFees(
-				saberRpcUrl,
-				transaction,
-				saberSwapProgramId,
-			)
-
-			if err != nil {
-				log.App(func(k *log.Log) {
-					k.Message = "Destructured a log containing a Saber transfer, but failed to make a lookup!"
-					k.Payload = err
-				})
-			}
-
-			transactionMetaFeeRat.Add(transactionMetaFeeRat, saberFee)
-
-			parsedTransactions[i] = solanaQueue.Transaction{
+			parsed := worker.SolanaApplicationTransaction{
 				Signature:   transaction.Transaction.Signatures[0],
 				Result:      transaction,
-				AdjustedFee: transactionMetaFeeRat,
-				SaberFee:    saberFee,
+				AdjustedFee: transactionFeeUsd,
+				Application: *app,
 			}
+
+			parsedTransactions = append(parsedTransactions, parsed)
 		}
 
-		transactions := solanaQueue.BufferedTransaction{
+		transactions := worker.SolanaBufferedApplicationTransactions{
 			Slot:         slot.Slot,
 			Transactions: parsedTransactions,
 		}
