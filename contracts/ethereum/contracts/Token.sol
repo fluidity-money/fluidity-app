@@ -144,6 +144,13 @@ contract Token is IERC20 {
         pendingNewOracle_ = address(0);
     }
 
+    /// @notice updates the reward quarantine threshold
+    function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        maxUncheckedReward_ = _maxUncheckedReward;
+    }
+
     // name and symbol provided by ERC20 parent
 
     /**
