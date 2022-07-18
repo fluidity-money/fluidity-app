@@ -27,105 +27,101 @@ func main() {
 		rewardsAmqpQueueName = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 	)
 
-	var err error
-
 	queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
 
 		var announcements []worker.EthereumAnnouncement
-
 		message.Decode(&announcements)
 
-		var winAnnouncements []worker.EthereumWinnerAnnouncement
+		processAnnouncements(announcements, rewardsAmqpQueueName)
+	})
+}
 
-		for _, announcement := range announcements {
+// processAnnouncements to handle fluid transfer or application-based win
+// announcements and determine their winning status
+func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAmqpQueueName string) {
+	var winAnnouncements []worker.EthereumWinnerAnnouncement
 
-			var (
-				announcementTransactionHash = announcement.TransactionHash
-				blockNumber                 = announcement.BlockNumber
-				fromAddress                 = announcement.FromAddress
-				toAddress                   = announcement.ToAddress
-				sourceRandom                = announcement.SourceRandom
-				sourcePayouts               = announcement.SourcePayouts
-				emission                    = announcement.Emissions
-				tokenDetails                = announcement.TokenDetails
-			)
+	for _, announcement := range announcements {
 
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to decode an announcement RLP encoded message!"
-					k.Payload = err
-				})
-			}
+		var (
+			announcementTransactionHash = announcement.TransactionHash
+			blockNumber                 = announcement.BlockNumber
+			fromAddress                 = announcement.FromAddress
+			toAddress                   = announcement.ToAddress
+			sourceRandom                = announcement.SourceRandom
+			sourcePayouts               = announcement.SourcePayouts
+			emission                    = announcement.Emissions
+			tokenDetails                = announcement.TokenDetails
+		)
 
-			if fromAddress == ethereumNullAddress {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"From address was nil in transaction hash %#v! To was set to %#v!",
-						announcementTransactionHash,
-						toAddress,
-					)
-				})
-
-				continue
-			}
-
-			if toAddress == ethereumNullAddress {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"To address was nil in transaction hash %#v! From was set to %#v!",
-						announcementTransactionHash,
-						fromAddress,
-					)
-				})
-
-				continue
-			}
-
-			// check win status
-
-			winningBalls := probability.NaiveIsWinning(sourceRandom, &emission)
-
-			if winningBalls == 0 {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"From %#v to %#v transaction hash %#v didn't win anything!",
-						fromAddress,
-						toAddress,
-						announcementTransactionHash,
-					)
-				})
-
-				continue
-			}
-
-			fromWinAmount, toWinAmount := calculatePayouts(sourcePayouts, winningBalls)
-
+		if fromAddress == ethereumNullAddress {
 			log.App(func(k *log.Log) {
 				k.Format(
-					"Transaction hash %#v with transaction from %#v to %#v has won: %#v won %s,%#v won %s",
+					"From address was nil in transaction hash %#v! To was set to %#v!",
 					announcementTransactionHash,
-					fromAddress,
 					toAddress,
-					fromAddress,
-					fromWinAmount.String(),
-					toAddress,
-					toWinAmount.String(),
 				)
 			})
 
-			winAnnouncement := worker.EthereumWinnerAnnouncement {
-				TransactionHash: announcementTransactionHash,
-				BlockNumber:   blockNumber,
-				FromAddress:   fromAddress,
-				FromWinAmount: fromWinAmount,
-				ToAddress:     toAddress,
-				ToWinAmount:   toWinAmount,
-				TokenDetails:  tokenDetails,
-			}
-
-			winAnnouncements = append(winAnnouncements, winAnnouncement)
+			continue
 		}
 
-		queue.SendMessage(rewardsAmqpQueueName, winAnnouncements)
-	})
+		if toAddress == ethereumNullAddress {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"To address was nil in transaction hash %#v! From was set to %#v!",
+					announcementTransactionHash,
+					fromAddress,
+				)
+			})
+
+			continue
+		}
+
+		// check win status
+
+		winningBalls := probability.NaiveIsWinning(sourceRandom, &emission)
+
+		if winningBalls == 0 {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"From %#v to %#v transaction hash %#v didn't win anything!",
+					fromAddress,
+					toAddress,
+					announcementTransactionHash,
+				)
+			})
+
+			continue
+		}
+
+		fromWinAmount, toWinAmount := calculatePayouts(sourcePayouts, winningBalls)
+
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Transaction hash %#v with transaction from %#v to %#v has won: %#v won %s,%#v won %s",
+				announcementTransactionHash,
+				fromAddress,
+				toAddress,
+				fromAddress,
+				fromWinAmount.String(),
+				toAddress,
+				toWinAmount.String(),
+			)
+		})
+
+		winAnnouncement := worker.EthereumWinnerAnnouncement{
+			TransactionHash: announcementTransactionHash,
+			BlockNumber:     blockNumber,
+			FromAddress:     fromAddress,
+			FromWinAmount:   fromWinAmount,
+			ToAddress:       toAddress,
+			ToWinAmount:     toWinAmount,
+			TokenDetails:    tokenDetails,
+		}
+
+		winAnnouncements = append(winAnnouncements, winAnnouncement)
+	}
+
+	queue.SendMessage(rewardsAmqpQueueName, winAnnouncements)
 }

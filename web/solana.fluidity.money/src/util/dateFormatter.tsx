@@ -16,6 +16,7 @@ const dateFormatter = (unixDate: string) => {
   // Get 12 Hour time format
   // If the time is a single digit, pad with a zero to make it multiple digits
   const hours12Format = padNumStart(date.getHours() % 12, 2, '0');
+  const hours = hours12Format == "00" ? "12" : hours12Format;
   const minutes = padNumStart(date.getMinutes(), 2, '0')
   const seconds = padNumStart(date.getSeconds(), 2, '0');
   
@@ -29,7 +30,7 @@ const dateFormatter = (unixDate: string) => {
   const year = date.getFullYear();
 
   // formats unix time stamp into "HH/MM/SS AM/PM, DD MonthName YYYY"
-  return `${hours12Format}:${minutes}:${seconds} ${timePeriod}, ${date_} ${monthName} ${year}`;
+  return `${hours}:${minutes}:${seconds} ${timePeriod}, ${date_} ${monthName} ${year}`;
 }
 
 export default dateFormatter;

@@ -5,8 +5,8 @@ package moving_average
 
 import (
 	"fmt"
-	"strconv"
 	"math/big"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/state"
 )
@@ -48,7 +48,7 @@ func CalculateMovingAverage(key string) (*int, error) {
 		if err != nil {
 			return nil, fmt.Errorf(
 				"failed to convert %#v to an int for an average conversion from Redis! %v",
-				value,
+				s,
 				err,
 			)
 		}
@@ -101,7 +101,6 @@ func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 
 	return average, nil
 }
-
 
 // StoreAndCalculate the moving average by storing the amount then doing
 // the calculation

@@ -70,8 +70,9 @@ func TestProbability(t *testing.T) {
 
 func TestCalculateN(t *testing.T) {
 	var (
-		m = int64(8)
-		g = big.NewRat(91, 1)
+		m          = 8
+		g          = big.NewRat(91, 1)
+		payoutFreq = big.NewRat(1, 4)
 	)
 
 	// n! < p over 1000 iterations panics
@@ -82,35 +83,35 @@ func TestCalculateN(t *testing.T) {
 		t,
 		"infinite loop",
 		func() {
-			calculateN(m, g, atx, getTestEmission("ethereum", "usdt", 6))
+			calculateN(m, g, atx, payoutFreq, getTestEmission("ethereum", "usdt", 6))
 		},
 	)
 
 	g = big.NewRat(3, 1)
 	atx = big.NewRat(4728, 1)
 
-	result := calculateN(m, g, atx, getTestEmission("ethereum", "usdt", 6))
+	result := calculateN(m, g, atx, payoutFreq, getTestEmission("ethereum", "usdt", 6))
 	assert.EqualValues(t, 12, result)
 }
 
 func TestPayout(t *testing.T) {
 	// use whitepaper example, and approximate p
 	var (
-		atx        = big.NewRat(36_500_000, 1)
-		apy        = big.NewRat(35_000_000, 1)
-		g          = big.NewRat(3, 1)
-		m          = int64(6)
-		n          = int64(1580)
-		b          = int64(1)
-		rewardPool = big.NewRat(0, 1)
-		blockTime  = uint64(0)
+		atx         = big.NewRat(36_500_000, 1)
+		g           = big.NewRat(3, 1)
+		m           = 6
+		n           = int64(1580)
+		b           = int64(1)
+		deltaWeight = big.NewRat(31536000, 1)
+		rewardPool  = big.NewRat(100_000_000_000_000, 1)
+		blockTime   = uint64(15)
 	)
 
-	result := payout(atx, apy, g, rewardPool, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))
+	result := payout(atx, g, rewardPool, deltaWeight, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))
 	// should be accurate to 2 decimal places, so trim then remove the last to avoid rounding
 	rf := result.FloatString(3)
 	trimmedResult := rf[:len(rf)-1]
-	expected := "7.12"
+	expected := "9.68"
 
 	assert.Equal(t, expected, trimmedResult)
 
@@ -120,7 +121,7 @@ func TestPayout(t *testing.T) {
 
 	expectedRat := big.NewRat(71344570743089, 959979214533768)
 
-	result = payout(atx, apy, g, rewardPool, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))
+	result = payout(atx, g, rewardPool, deltaWeight, m, n, b, blockTime, getTestEmission("ethereum", "usdt", 6))
 	assert.Equal(t, expectedRat, result)
 }
 
@@ -128,22 +129,24 @@ func TestWinningChances(t *testing.T) {
 	var (
 		gasFee                  = big.NewRat(3, 1)
 		atx                     = big.NewRat(36_500_000, 1)
-		bpyStakedUsd            = big.NewRat(150, 1)
-		rewardPool              = big.NewRat(10, 1)
+		rewardPool              = big.NewRat(100_000_000_000_000, 1)
 		decimalPlacesRat        = big.NewRat(6, 1)
 		averageTransfersInBlock = 13
 		blockTimeInSeconds      = uint64(15)
-		crumb                   = getTestEmission("ethereum", "usdt", 6)
+		payoutFreq              = big.NewRat(1, 4)
+		deltaWeight             = big.NewRat(31536000, 1)
+		winningClasses          = 5
+		emission                = getTestEmission("ethereum", "usdt", 6)
 
-		expectedN       = uint(66)
+		expectedN       = uint(107)
 		expectedPayouts = []*misc.BigInt{}
 	)
 
-	a := misc.BigIntFromInt64(12)
-	b := misc.BigIntFromInt64(89)
-	c := misc.BigIntFromInt64(1758)
-	d := misc.BigIntFromInt64(105485)
-	e := misc.BigIntFromInt64(32172940)
+	a := misc.BigIntFromInt64(18)
+	b := misc.BigIntFromInt64(222)
+	c := misc.BigIntFromInt64(7429)
+	d := misc.BigIntFromInt64(750413)
+	e := misc.BigIntFromInt64(382710837)
 
 	expectedPayouts = append(expectedPayouts, &a)
 	expectedPayouts = append(expectedPayouts, &b)
@@ -151,8 +154,19 @@ func TestWinningChances(t *testing.T) {
 	expectedPayouts = append(expectedPayouts, &d)
 	expectedPayouts = append(expectedPayouts, &e)
 
-	n, payouts := WinningChances(gasFee, atx, bpyStakedUsd, rewardPool, decimalPlacesRat, averageTransfersInBlock, blockTimeInSeconds, crumb)
+	n, payouts := WinningChances(
+		gasFee,
+		atx,
+		rewardPool,
+		decimalPlacesRat,
+		payoutFreq,
+		deltaWeight,
+		winningClasses,
+		averageTransfersInBlock,
+		blockTimeInSeconds,
+		emission,
+	)
 
-	assert.Equal(t, expectedN, n)
 	assert.Equal(t, expectedPayouts, payouts)
+	assert.Equal(t, expectedN, n)
 }

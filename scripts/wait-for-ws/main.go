@@ -61,7 +61,7 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatal(
+		log.Fatalf(
 			"Failed to connect to WS! %v",
 			err,
 		)

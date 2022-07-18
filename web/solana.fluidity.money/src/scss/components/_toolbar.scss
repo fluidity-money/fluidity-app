@@ -9,48 +9,65 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  @include for-tablet-landscape-down {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  @include for-below-400 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }
 
 .toolbar-container-enabled {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(29rem, 31rem);
+  grid-template-columns: 33rem minmax(0rem, 29rem) 32rem;
   grid-gap: 1rem;
   align-items: center;
   justify-content: center;
   width: 100%;
   @include for-med-toolbar {
     grid-gap: 0.5rem;
-    grid-template-columns: 33rem 0rem 29rem 0rem;
+    grid-template-columns: 28rem 0rem 32rem 0rem;
   }
   @include for-small-toolbar {
-    grid-template-columns: 29rem 0rem 29rem 0rem;
+    grid-template-columns: 25rem 0rem 32rem 0rem;
+    grid-gap: 0;
   }
   @include for-smallest-toolbar {
-    grid-template-columns: 27rem 1rem 25rem 0rem;
+    rid-template-columns: 25rem 0rem 29rem 0rem;
     grid-gap: 0.5rem;
   }
 }
 
 .toolbar-container-disabled {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(8rem, 18rem);
+  grid-template-columns: 1fr 1fr minmax(8rem, 20rem);
   grid-gap: 1rem;
   align-items: center;
   justify-content: center;
   width: 100%;
+  @include for-small-toolbar {
+    grid-template-columns: 37rem 0rem minmax(19rem, 20rem);
+  }
+  @include for-smallest-toolbar {
+    grid-template-columns: 35rem 0rem minmax(18rem, 20rem);
+  }
 }
 
 .toolbar-container-mobile {
-  display: grid;
-  grid-template-columns: 1fr 3fr 4rem 8fr 3rem;
+  // display: grid;
+  // grid-template-columns: 1fr 3fr 4rem 8fr 3rem;
   // grid-gap: 1rem;
+  display: flex;
   align-items: center;
-  justify-content: center;
+  // justify-content: center;
+  justify-content: space-between;
   width: 100%;
 
-  @include for-below-470 {
-    grid-template-columns: 2fr 3fr 2rem 8fr 4rem;
-  }
+  // @include for-below-470 {
+  //   grid-template-columns: 2fr 3fr 2rem 8fr 4rem;
+  // }
 }
 
 .toolbar-items {
@@ -75,19 +92,21 @@
 
 .select-blockchain {
   padding: 0 5px 0 10px;
-  margin-left: 10px;
+  margin: 0 6px 0 7px;
   height: 32px;
   width: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: solid white 1px;
-  border-radius: 10px;
+  border-radius: 5px;
+  border: solid white 0.5px;
   background-color: #0d222a;
+  // border: solid #08a06f 0.5px;
+  // background-color: #121218;
 
   cursor: pointer;
 
-  @include for-smallest-toolbar {
+  @include for-med-toolbar {
     font-size: 0.9rem;
   }
 

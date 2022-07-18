@@ -4,17 +4,11 @@ import Header from "components/Header";
 import Icon from "components/Icon";
 import FormSection from "components/Styling/FormSection";
 import Token from "components/Token";
-import ropsten from "../../../config/ropsten-tokens.json";
-import testing from "../../../config/testing-tokens.json";
-import kovan from "../../../config/kovan-tokens.json";
-import aurora from "../../../config/aurora-mainnet-tokens.json";
-import mainnet from "../../../config/mainnet-tokens.json";
 import { modalToggle } from "components/context";
 import { useContext } from "react";
 import { TokenKind, Token as TokenType } from "components/types";
-import { SupportedContracts } from "util/contractList";
-import ChainId, { chainIdFromEnv } from "util/chainId";
 import { appTheme } from "util/appTheme";
+import { tokenData } from "util/tokenData";
 
 const ConfirmPaymentModal = ({
   enable,
@@ -45,23 +39,8 @@ const ConfirmPaymentModal = ({
     pinned: false,
   };
 
-  // Assigns the correct json file based on ChainId
-  const chainId = chainIdFromEnv();
-  const data =
-    chainId === ChainId.Ropsten
-      ? (ropsten as TokenKind[])
-      : chainId === ChainId.Hardhat
-      ? (testing as TokenKind[])
-      : chainId === ChainId.Kovan
-      ? (kovan as TokenKind[])
-      : chainId === ChainId.AuroraMainnet
-      ? (aurora as TokenKind[])
-      : chainId === ChainId.Mainnet
-      ? (mainnet as TokenKind[])
-      : (ropsten as TokenKind[]);
-
-  const ext = data.slice(0, data.length / 2);
-  const int = data.slice(data.length / 2, data.length);
+  const ext = tokenData.slice(0, tokenData.length / 2);
+  const int = tokenData.slice(tokenData.length / 2, tokenData.length);
 
   // From token
   let From = defaultVar;

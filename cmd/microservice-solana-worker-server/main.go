@@ -7,16 +7,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	"github.com/fluidity-money/fluidity-app/common/solana/solend"
-
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -64,7 +60,6 @@ const (
 func main() {
 
 	var (
-		rpcUrl                   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
 		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
 		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
@@ -72,7 +67,6 @@ func main() {
 		tokenName                = util.GetEnvOrFatal(EnvTokenName)
 
 		fluidMintPubkey = pubkeyFromEnv(EnvFluidityMintPubkey)
-		reservePubkey   = pubkeyFromEnv(EnvReservePubkey)
 	)
 
 	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
@@ -89,18 +83,16 @@ func main() {
 
 	decimalPlacesRat := raiseDecimalPlaces(decimalPlaces)
 
-	solanaClient := solanaRpc.New(rpcUrl)
-
 	queue.GetMessages(topicWrappedActionsQueue, func(message queue.Message) {
 
-		var payableBufferedUserActions user_actions.PayableBufferedUserAction
+		var bufferedTransfers worker.SolanaWork
 
-		message.Decode(&payableBufferedUserActions)
+		message.Decode(&bufferedTransfers)
 
 		var (
-			bufferedUserActions = payableBufferedUserActions.BufferedUserAction
-			mintSupply          = payableBufferedUserActions.MintSupply
-			tvl                 = payableBufferedUserActions.Tvl
+			transfers = bufferedTransfers.BufferedTransfers
+			mintSupply          = bufferedTransfers.MintSupply
+			tvl                 = bufferedTransfers.Tvl
 			fluidTransfers      = 0
 			emission            = workerTypes.NewSolanaEmission()
 		)
@@ -112,32 +104,18 @@ func main() {
 		emission.Network = "solana"
 		emission.TokenDetails = token_details.New(tokenName, decimalPlaces)
 
-		userActions := bufferedUserActions.UserActions
+		userActions := transfers.Transfers
 
 		for _, userAction := range userActions {
 
-			isSameToken := userAction.TokenDetails.TokenShortName == tokenName
+			isSameToken := userAction.Token.TokenShortName == tokenName
 
-			if userAction.Type == "send" && isSameToken {
+			if isSameToken {
 				fluidTransfers++
 			}
 		}
 
 		atx := probability.CalculateAtx(SolanaBlockTime, fluidTransfers)
-
-		apy, err := solend.GetUsdApy(solanaClient, reservePubkey)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get %v apy on Solana! %v",
-					tokenName,
-					err,
-				)
-			})
-		}
-
-		bpy := probability.CalculateBpy(SolanaBlockTime, apy, emission)
 
 		// normalise the amount to be consistent with USDC as a floating point
 
@@ -155,26 +133,18 @@ func main() {
 
 		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
 
-		bpyStakedUsd := probability.CalculateBpyStakedUnderlyingAsset(
-			bpy,
-			entireAmountOwned,
-		)
-
 		for _, userAction := range userActions {
 
 			// skip if it's not a send, or the wrong token
 
 			var (
-				userActionTransactionHash  = userAction.TransactionHash
-				userActionSenderAddress    = userAction.SenderAddress
-				userActionRecipientAddress = userAction.RecipientAddress
+				userActionTransactionHash  = userAction.Transaction.Signature
+				userActionSenderAddress    = userAction.SenderSplAddress
+				userActionRecipientAddress = userAction.RecipientSplAddress
+				tokenDetails               = userAction.Token
 			)
 
-			if userAction.Type != "send" {
-				continue
-			}
-
-			if userAction.TokenDetails.TokenShortName != tokenName {
+			if tokenDetails.TokenShortName != tokenName {
 				continue
 			}
 
@@ -183,9 +153,6 @@ func main() {
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
-
-			// track fees used during this user action
-			emission.Fees.Saber, _ = userAction.SaberFee.Float64()
 
 			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
 
@@ -202,12 +169,20 @@ func main() {
 				deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
 			)
 
-			solanaTransactionFeesNormalised := userAction.AdjustedFee
+			solanaTransactionFeesNormalised := userAction.Transaction.AdjustedFee
+
+			if userAction.Decorator != nil {
+				appFee := userAction.Decorator.ApplicationFee
+
+				solanaTransactionFeesNormalised.Add(
+					solanaTransactionFeesNormalised,
+					appFee,
+				)
+			}
 
 			randomN, randomPayouts := probability.WinningChances(
 				solanaTransactionFeesNormalised,
 				atx,
-				bpyStakedUsd,
 				sizeOfThePool,
 				decimalPlacesRat,
 				payoutFreq,

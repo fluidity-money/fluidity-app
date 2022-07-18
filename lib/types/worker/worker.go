@@ -1,8 +1,6 @@
 package worker
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
@@ -77,75 +75,5 @@ type (
 			AtxAtEnd float64 `json:"atx_at_end"`
 		} `json:"winning_chances"`
 	}
-
-	// EthereumAnnouncement contains the data to call the reward function of
-	// the contract with
-	EthereumAnnouncement struct {
-		TransactionHash ethereum.Hash              `json:"transaction_hash"`
-		BlockNumber     *misc.BigInt               `json:"block_number"`
-		FromAddress     ethereum.Address           `json:"from_address"`
-		ToAddress       ethereum.Address           `json:"to_address"`
-		SourceRandom    []uint32                   `json:"random_source"`
-		SourcePayouts   []*misc.BigInt             `json:"random_payouts"`
-		TokenDetails    token_details.TokenDetails `json:"token_details"`
-		Emissions       Emission                   `json:"emissions"`
-	}
-
-	EthereumWinnerAnnouncement struct {
-		TransactionHash ethereum.Hash              `json:"transaction_hash"`
-		BlockNumber     *misc.BigInt               `json:"block_number"`
-		FromAddress     ethereum.Address           `json:"from_address"`
-		ToAddress       ethereum.Address           `json:"to_address"`
-		FromWinAmount   *misc.BigInt               `json:"from_win_amount"`
-		ToWinAmount     *misc.BigInt               `json:"to_win_amount"`
-		TokenDetails    token_details.TokenDetails `json:"token_details"`
-	}
-
-	EthereumReward struct {
-		Winner          ethereum.Address           `json:"winner"`
-		WinAmount       *misc.BigInt               `json:"amount"`
-		TransactionHash ethereum.Hash              `json:"transaction_hash"`
-		BlockNumber     *misc.BigInt               `json:"block_number"`
-		TokenDetails    token_details.TokenDetails `json:"token_details"`
-	}
-
-	EthereumSpooledRewards struct {
-		Token      token_details.TokenDetails `json:"token_details"`
-		Winner     ethereum.Address           `json:"winner"`
-		WinAmount  *misc.BigInt               `json:"amount"`
-		FirstBlock *misc.BigInt               `json:"first_block"`
-		LastBlock  *misc.BigInt               `json:"last_block"`
-	}
-
-	EthereumBlockLog struct {
-		BlockHash    ethereum.Hash          `json:"block_hash"`
-		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
-		BlockTime    uint64                 `json:"block_time"`
-		Logs         []ethereum.Log         `json:"logs"`
-		Transactions []ethereum.Transaction `json:"transactions"`
-		BlockNumber  misc.BigInt            `json:"block_number"`
-	}
-
-	// SolanaWinnerAnnouncement to use to report a winner and its randomness
-	SolanaWinnerAnnouncement struct {
-		WinningTransactionHash string   `json:"transaction_winning"`
-		SenderAddress          string   `json:"sender_address"`
-		RecipientAddress       string   `json:"receiver_address"`
-		WinningAmount          uint64   `json:"winning_amount"`
-		TokenName              string   `json:"token_name"`
-		FluidMintPubkey        string   `json:"fluid_mint_pubkey"`
-		Emissions              Emission `json:"emissions"`
-	}
 )
 
-func NewEthereumEmission() *Emission {
-	emission := new(Emission)
-	emission.Network = "ethereum"
-	return emission
-}
-
-func NewSolanaEmission() *Emission {
-	emission := new(Emission)
-	emission.Network = "solana"
-	return emission
-}

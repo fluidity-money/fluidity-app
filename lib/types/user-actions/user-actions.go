@@ -52,9 +52,6 @@ type (
 		// Fee adjusted based on compute units used
 		AdjustedFee *big.Rat
 
-		// Fee taken by Saber
-		SaberFee *big.Rat
-
 		// Amount that was swapped or sent
 		Amount misc.BigInt `json:"amount"`
 
@@ -69,13 +66,6 @@ type (
 	BufferedUserAction struct {
 		UserActions          []UserAction `json:"user_actions"`
 		SecondsSinceLastSlot uint64       `json:"seconds_since_last_slot"`
-	}
-
-	// PayableBufferedUserAction includes BufferedUserActions, and Pyth priced available prize pool
-	PayableBufferedUserAction struct {
-		BufferedUserAction BufferedUserAction `json:"buffered_user_action"`
-		Tvl                uint64             `json:"tvl"`
-		MintSupply         uint64             `json:"mint_supply"`
 	}
 )
 

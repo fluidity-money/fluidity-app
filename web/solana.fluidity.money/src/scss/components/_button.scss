@@ -168,7 +168,7 @@
 }
 
 .mobile-address-btn {
-  align-self: flex-end;
+  align-self: center;
 }
 
 .selected {
@@ -312,12 +312,13 @@
   background-color: transparent;
   border: solid transparent 1px;
   border-radius: 7px;
+  margin: 2px;
 
   cursor: pointer;
   transition: all 0.4s linear;
 
   &:hover {
-    background-color: rgba(56, 60, 69, 0.5);
+    background-color: rgba(90, 94, 104, 0.5);
   }
   &-current {
     @extend .network-options;
@@ -378,4 +379,16 @@
   display: flex;
   align-items: center;
   font-family: "manrope";
+}
+
+.margin-right {
+  margin-right: 7px;
+}
+
+.notification-button {
+  width: 46px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.6;
+  }
 }

@@ -21,10 +21,6 @@ const (
 
 	// subWinnersAll to subscribe to winner messages from either network
 	subWinnersAll        = `winners.*`
-
-	// TopicRewardsEthereum to broadcast reward messages
-	// including both users and the transaction hash
-	TopicRewardsEthereum = `rewards.` + string(network.NetworkEthereum)
 )
 
 type (
@@ -52,15 +48,5 @@ func WinnersSolana(f func(Winner)) {
 
 func WinnersAll(f func(Winner)) {
 	winners(subWinnersAll, f)
-}
-
-func RewardsEthereum(f func(RewardData)) {
-	queue.GetMessages(TopicRewardsEthereum, func(message queue.Message) {
-		var reward RewardData
-
-		message.Decode(reward)
-
-		f(reward)
-	})
 }
 

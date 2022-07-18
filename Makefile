@@ -3,7 +3,7 @@ include build.mk
 
 AUTOMATION_DIR := automation
 
-.PHONY: docker docker-web docker-compose-build
+.PHONY: docker docker-web docker-compose-build clean semgrep test
 
 all: docker docker-web
 
@@ -26,3 +26,9 @@ docker-web: docker
 
 docker-compose-build:
 	@./scripts/docker-compose-all.sh build
+
+semgrep:
+	@${SEMGREP_ALL} --config .semgrep/golang.yml
+
+test: semgrep
+	@${GO_TEST} ./...

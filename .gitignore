@@ -2,6 +2,8 @@
 docker
 docker-*
 !docker-compose*
+test
+semgrep
 
 lib/build-lib
 
