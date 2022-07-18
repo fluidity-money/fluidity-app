@@ -13,13 +13,17 @@ func ClassifyApplication(transaction solana.TransactionResult, apps map[string]a
 	var foundApp *applications.Application
 
 	for _, account := range accounts {
-		if app, exists := apps[account]; exists {
-			// only set spl if we haven't found a more interesting app
-			if app == applications.ApplicationSpl && foundApp != nil {
-				continue
-			}
-			foundApp = &app
+		app, exists := apps[account]
+		if !exists {
+			continue
 		}
+
+		// only set spl if we haven't found a more interesting app
+		if app == applications.ApplicationSpl && foundApp != nil {
+			continue
+		}
+
+		foundApp = &app
 	}
 
 	return foundApp
