@@ -7,20 +7,16 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
-	"github.com/fluidity-money/fluidity-app/lib/web"
 	testUtils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetUniswapFees(t *testing.T) {
 	const (
-		webListenAddress = "localhost:8899"
-		dataBlobB64      = `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACz19e45lkP0loAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMVgkbc="`
-		dataBlobB64_2    = `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE95DVfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="`
-		dataBlobB64_3    = `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT0LCxAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="`
+		dataBlobB64   = `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACz19e45lkP0loAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMVgkbc="`
+		dataBlobB64_2 = `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE95DVfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="`
+		dataBlobB64_3 = `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT0LCxAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="`
 	)
-
-	t.Setenv(web.EnvHttpListenAddress, webListenAddress)
 
 	var (
 		fluidTokenAddr common.Address
@@ -38,7 +34,7 @@ func TestGetUniswapFees(t *testing.T) {
 	err := dataBlob.UnmarshalJSON([]byte(dataBlobB64))
 	assert.NoError(t, err)
 
-	client, err := testUtils.MockRpcClient(webListenAddress, rpcMethods, callMethods)
+	client, err := testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
 	// nil transfer fails
@@ -56,7 +52,7 @@ func TestGetUniswapFees(t *testing.T) {
 	callMethods["token0()"] = "0x0000000000000000000000000000000000000000000000000000000000000000"
 	rpcMethods["eth_getCode"] = "0x0"
 
-	client, err = testUtils.MockRpcClient(webListenAddress, rpcMethods, callMethods)
+	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
 	r, ok := new(big.Rat).SetString("4976280438497449851783/500000000000000000000")

@@ -34,7 +34,7 @@ const (
 	OneInchFixedRateSwapLogTopic = "0x803540962ed9acbf87226c32486d71e1c86c2bdb208e771bab2fd8a626f61e89"
 )
 
-// getApplicationFee to find the fee (in USD) paid by a user for the application interaction
+// GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
@@ -58,7 +58,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 	}
 }
 
-// getApplicationTransferParties to find the parties considered for payout from an application interaction.
+// GetApplicationTransferParties to find the parties considered for payout from an application interaction.
 // In the case of an AMM (such as Uniswap) the transaction sender receives the majority payout every time,
 // with the recipient tokens being effectively burnt (sent to the contract). In the case of a P2P swap,
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
