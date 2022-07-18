@@ -8,7 +8,6 @@ import (
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
-	"github.com/fluidity-money/fluidity-app/lib/web"
 	testUtils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
 	"github.com/stretchr/testify/assert"
 )
@@ -42,14 +41,11 @@ func TestHashTo32Bytes(t *testing.T) {
 
 func TestGetBalancerFees(t *testing.T) {
 	const (
-		webListenAddress = "localhost:8899"
 		// transfer blob containing a 2,500,000,000  -> 2,348,810,240 value swap
 		dataBlobB64 = `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJUC+QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjAAAAAAAAA=="`
 		// response that can be parsed as a 0.1% fee
 		normalRpcResponse = "0x000000000000000000000000000000000000000000000000002386F26FC100000000000000000000000000000000000000000000000000000000000000000000"
 	)
-
-	t.Setenv(web.EnvHttpListenAddress, webListenAddress)
 
 	var (
 		rpcMethods  = make(map[string]interface{})
@@ -61,7 +57,7 @@ func TestGetBalancerFees(t *testing.T) {
 	callMethods["getSwapFeePercentage()"] = normalRpcResponse
 
 	// get the mocked client
-	client, err := testUtils.MockRpcClient(webListenAddress, rpcMethods, callMethods)
+	client, err := testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
 	var (
@@ -115,7 +111,7 @@ func TestGetBalancerFees(t *testing.T) {
 	// bad RPC responses
 	// bad swap fee response
 	callMethods["getSwapFeePercentage()"] = "t"
-	client, err = testUtils.MockRpcClient(webListenAddress, rpcMethods, callMethods)
+	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
 	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
@@ -124,7 +120,7 @@ func TestGetBalancerFees(t *testing.T) {
 
 	// bad pool response
 	callMethods["getPool(bytes32)"] = "0x00"
-	client, err = testUtils.MockRpcClient(webListenAddress, rpcMethods, callMethods)
+	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
 	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
