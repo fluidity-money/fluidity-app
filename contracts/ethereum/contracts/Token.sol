@@ -62,6 +62,9 @@ contract Token is IERC20 {
     /// @dev [address] => [amount manually rewarded]
     mapping (address => uint) private manualRewardDebt_;
 
+    /// @dev new oracle address, pending a call from them to confirm
+    address pendingNewOracle_;
+
     /**
      * @notice initializer function - sets the contract's data
      * @dev we pass in the metadata explicitly instead of sourcing from the
@@ -102,11 +105,20 @@ contract Token is IERC20 {
      */
     function oracle() public view returns (address) { return rngOracle_; }
 
-    /// @notice updates the trusted oracle to a new address
+    /// @notice starts an update for the trusted oracle to a new address
     function updateOracle(address newOracle) public {
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
-        rngOracle_ = newOracle;
+        pendingNewOracle_ = newOracle;
+    }
+
+    /// @notice finishes an update of the oracle address
+    /// @notice must be used by the new account
+    function acceptUpdateOracle() public {
+        require(msg.sender == pendingNewOracle_, "only the pending new oracle account can use this");
+
+        rngOracle_ = pendingNewOracle_;
+        pendingNewOracle_ = address(0);
     }
 
     // name and symbol provided by ERC20 parent
