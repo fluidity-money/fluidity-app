@@ -83,7 +83,7 @@ if (process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY)
 
 if (process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY)
   networks['arbitrum'] = {
-    accounts: [process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY),
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY],
     url: process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_URL,
   };
 
