@@ -41,6 +41,7 @@ var webserverListening = false
 // MockRpcClient to return an eth client connected to an endpoint that mocks the given methods.
 // rpcMethods [methodName]response to provide a list of Ethereum RPC methods and how they should be mocked.
 // callMethods[methodName]response to provide a list of eth_call contract methods and how they should respond.
+// Requires web.EnvHttpListenAddress to be set. Not suitable to be used in parallel tests.
 func MockRpcClient(webListenAddress string, rpcMethods_ map[string]interface{}, callMethods_ map[string]interface{}) (*ethclient.Client, error) {
 
 	var (
