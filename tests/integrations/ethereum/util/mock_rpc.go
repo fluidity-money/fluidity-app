@@ -6,6 +6,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/http/httptest"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -35,15 +36,10 @@ func responseErr(response serverResponse, err interface{}) serverResponse {
 	return response
 }
 
-// ensure we only start the web server once
-var webserverListening = false
-
 // MockRpcClient to return an eth client connected to an endpoint that mocks the given methods.
 // rpcMethods [methodName]response to provide a list of Ethereum RPC methods and how they should be mocked.
 // callMethods[methodName]response to provide a list of eth_call contract methods and how they should respond.
-// Requires web.EnvHttpListenAddress to be set. Not suitable to be used in parallel tests.
-func MockRpcClient(webListenAddress string, rpcMethods_ map[string]interface{}, callMethods_ map[string]interface{}) (*ethclient.Client, error) {
-
+func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]interface{}) (*ethclient.Client, error) {
 	var (
 		// generate a random endpoint for the client
 		endpoint = "/" + fmt.Sprint(rand.Uint64())
@@ -119,11 +115,6 @@ func MockRpcClient(webListenAddress string, rpcMethods_ map[string]interface{}, 
 		return response
 	})
 
-	// start the web server if we haven't already
-	if !webserverListening {
-		go web.Listen()
-		webserverListening = true
-	}
-
-	return ethclient.Dial("http://" + webListenAddress + endpoint)
+	server := httptest.NewServer(nil)
+	return ethclient.Dial(server.URL + endpoint)
 }
