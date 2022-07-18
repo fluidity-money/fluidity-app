@@ -30,3 +30,4 @@
 /web/solana.fluidity.money/public/img/bell_button.svg filter=lfs diff=lfs merge=lfs -text
 /web/solana.fluidity.money/public/img/reward_button.svg filter=lfs diff=lfs merge=lfs -text
 /web/solana.fluidity.money/public/img/network-dot.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/rewards.svg filter=lfs diff=lfs merge=lfs -text
