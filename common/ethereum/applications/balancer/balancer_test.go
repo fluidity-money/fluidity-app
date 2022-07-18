@@ -65,6 +65,7 @@ func TestGetBalancerFees(t *testing.T) {
 	assert.NoError(t, err)
 
 	var (
+		transfer       worker.EthereumApplicationTransfer
 		fluidTokenAddr common.Address
 		tokenDecimals  int = 6
 	)
@@ -75,8 +76,6 @@ func TestGetBalancerFees(t *testing.T) {
 	dataBlob := new(misc.Blob)
 	err = dataBlob.UnmarshalJSON([]byte(dataBlobB64))
 	assert.NoError(t, err)
-
-	transfer := worker.EthereumApplicationTransfer{}
 
 	// nil transfer fails
 	fees, err := GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
