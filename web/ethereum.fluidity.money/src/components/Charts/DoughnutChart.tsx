@@ -3,7 +3,7 @@ import { Doughnut } from "react-chartjs-2";
 const DoughnutGraph = ({
   data,
   labels,
-  colours
+  colours,
 }: {
   data: string[];
   labels: string[];
@@ -15,7 +15,7 @@ const DoughnutGraph = ({
   // Pushes the 'other' colour onto the list of colours when more than 4 coins are found
   if (labels.length > 3) {
     colours.push("hsla(0, 100%, 55%, 1)");
-  };
+  }
 
   const graphData = {
     labels: labels,
@@ -23,12 +23,13 @@ const DoughnutGraph = ({
       {
         data: data.map(Number),
         backgroundColor: colours,
-        borderColor: () => {
-          for (let i = 0; i < labels.length; i++) {
-            return "rgba(255, 255, 255, 1)";
-          }
-          return "rgba(255, 255, 255, 1)";
-        },
+        // borderColor: () => {
+        //   for (let i = 0; i < labels.length; i++) {
+        //     return "rgba(255, 255, 255, 1)";
+        //   }
+        //   return "rgba(255, 255, 255, 1)";
+        // },
+        borderColor: colours,
         textColor: "#FFF",
         borderWidth: 1,
         hoverOffset: 15,
@@ -38,6 +39,9 @@ const DoughnutGraph = ({
   };
 
   const options = {
+    cutout: "92%",
+    borderRadius: 10,
+    spacing: 16,
     layout: {
       padding: 12,
     },
@@ -48,7 +52,13 @@ const DoughnutGraph = ({
     },
   };
 
-  return <Doughnut data={graphData} options={options} />;
+  return (
+    <Doughnut
+      data={graphData}
+      options={options}
+      style={{ position: "relative", zIndex: 3, cursor: "pointer" }}
+    ></Doughnut>
+  );
 };
 
 export default DoughnutGraph;
