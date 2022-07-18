@@ -12,6 +12,7 @@ struct Winner {
     uint256 amount;
 }
 
+
 /// @title The fluid token ERC20 contract
 contract Token is IERC20 {
     using SafeERC20 for IERC20;
@@ -33,6 +34,10 @@ contract Token is IERC20 {
 
     /// @notice emitted when the rng oracle is changed to a new address
     event OracleChanged(address indexed oldOracle, address indexed newOracle);
+
+    /// @dev sentinel to indicate a block has been rewarded in the
+    /// @dev pastRewards_ and rewardedBlocks_ maps
+    uint private constant BLOCK_REWARDED = 1;
 
     mapping(address => uint256) private balances_;
     mapping(address => mapping(address => uint256)) private allowances_;
@@ -128,7 +133,6 @@ contract Token is IERC20 {
 
     // name and symbol provided by ERC20 parent
 
-
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens
      * @notice requires you to have called the ERC20 `approve` method
@@ -209,7 +213,7 @@ contract Token is IERC20 {
 
         uint poolAmount = rewardPoolAmount();
 
-        rewardedBlocks_[firstBlock] = 1;
+        rewardedBlocks_[firstBlock] = BLOCK_REWARDED;
         // this might not happen if our transactions go through out of order
         if (lastBlock > lastRewardedBlock_) lastRewardedBlock_ = lastBlock;
 
@@ -280,9 +284,8 @@ contract Token is IERC20 {
             firstBlock > lastRewardedBlock_,
             "reward already given for part of this range"
         );
-
-        manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
-        manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
+        manualRewardedBlocks_[winner][firstBlock] = BLOCK_REWARDED;
+        manualRewardedBlocks_[winner][lastBlock] = BLOCK_REWARDED;
 
         manualRewardDebt_[winner] += winAmount;
 
