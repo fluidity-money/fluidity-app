@@ -1,21 +1,21 @@
 import React from "react";
 import { useEffect } from "react";
+import { addNetwork, switchNetwork } from "util/metamaskBrowserUtils";
 import ChainId, { chainIdFromEnv, toChainId } from "util/chainId";
 
-// switchEthereumChain for Ropsten/Kovan/Mainnet
+// switch ethereum chain or if that fails, add ethereum chain to metamask
 const changeNetwork = async () => {
   try {
-    if (!(window as any).ethereum) throw new Error("No crypto wallet found");
-    await (window as any).ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [
-        {
-          chainId: `0x${chainIdFromEnv().toString(16)}`,
-        },
-      ],
-    });
+    //  if (!(window as any).ethereum) throw new Error("No crypto wallet found");
+    if (!(window as any).ethereum) console.log("No crypto wallet found");
+    await switchNetwork();
   } catch (err) {
-    throw err;
+    // if switching chains doesn't work, try adding the chain to the users metamask browser
+    try {
+      await addNetwork();
+    } catch (err) {
+      console.log("1", err);
+    }
   }
 };
 
@@ -24,10 +24,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
   const [chainId, setChainId] = React.useState<ChainId>(0);
   const [browserChainId, setBrowserChainId] = React.useState<ChainId | null>();
 
-  const handleNetworkSwitch = async () => {
-    await changeNetwork();
-  };
-
+  // checks for metamask browser and if the chain needs to be switched/added
   const checkNetworkOnLoad = async () => {
     // if metamask browser is present, check the network
     if ((window as any).ethereum) {
@@ -39,10 +36,14 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
 
       browserChain && setChainId(envChain);
       setDesiredNetwork(browserChain === envChain);
-      if (browserChain !== envChain) handleNetworkSwitch();
+      if (browserChain !== envChain) changeNetwork();
     }
+    // maybe add a popup for no inbrowser wallet found?
+    if (!(window as any).ethereum)
+      console.log("No in browser crypto wallet found");
   };
 
+  // updates to information to match metamask chain in browser when changed
   const updateOnNetworkChange = () => {
     if ((window as any).ethereum) {
       (window as any).ethereum.on("chainChanged", () => {
@@ -51,7 +52,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
 
         browserChain && setChainId(envChain);
         // updates popup to switched chain
-        setBrowserChainId(browserChain);
+        setBrowserChainId(() => browserChain);
         setDesiredNetwork(browserChain === envChain);
       });
     }
@@ -61,6 +62,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
     checkNetworkOnLoad();
     updateOnNetworkChange();
   }, []);
+
   return (
     <div className="toolbar p-0_5">
       {children}
@@ -95,7 +97,7 @@ const Toolbar = ({ children }: { children: JSX.Element }) => {
           </div>
           <button
             className="change-network-button"
-            onClick={() => handleNetworkSwitch()}
+            onClick={() => changeNetwork()}
           >
             Change Network
           </button>

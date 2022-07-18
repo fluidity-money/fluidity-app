@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
@@ -80,12 +80,9 @@ func main() {
 		})
 	}
 
-	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
-
-		payableBufferedUserAction := new(user_actions.PayableBufferedUserAction)
+	worker.GetSolanaBufferedTransfers(func(transfers worker.SolanaBufferedTransfers) {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
-
 		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
 
 		if err != nil {
@@ -97,10 +94,7 @@ func main() {
 			})
 		}
 
-		payableBufferedUserAction.MintSupply = mintSupply
-
 		// get the value of all fluidity obligations
-
 		tvl, err := prize_pool.GetTvl(
 			solanaClient,
 			fluidityPubkey,
@@ -122,18 +116,21 @@ func main() {
 			})
 		}
 
-		payableBufferedUserAction.Tvl = tvl
-
 		// check initial supply is less than TVL so there is
 		// an available prize pool
-
 		if mintSupply > tvl {
 			log.Fatal(func(k *log.Log) {
 				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
 			})
 		}
 
-		queue.SendMessage(topicWrappedActionsQueue, payableBufferedUserAction)
+		payableBufferedTransfers := worker.SolanaWork {
+			BufferedTransfers: transfers,
+			Tvl:                tvl,
+			MintSupply:         mintSupply,
+		}
+
+		queue.SendMessage(topicWrappedActionsQueue, payableBufferedTransfers)
 
 	})
 }

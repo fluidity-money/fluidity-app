@@ -87,7 +87,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 			Network:         network.NetworkSolana,
 			TransactionHash: transactionHash,
 			AwardedTime:     currentTime,
-			TokenDetails: tokenDetails,
+			TokenDetails:    tokenDetails,
 		}
 
 		winningAmount := new(big.Int).SetUint64(transactionPayoutValue)
@@ -221,7 +221,6 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 			fromIndex = instruction.Accounts[0]
 			toIndex   = instruction.Accounts[1]
 		)
-
 
 		// is not a fluidity transfer
 		if fluidityOwners[fromIndex] == "" {

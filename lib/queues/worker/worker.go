@@ -8,17 +8,33 @@ import (
 )
 
 const (
-	TopicEthereumAnnouncements = "worker.ethereum.announcements"
-	TopicEthereumBlockLogs     = "worker.ethereum.blocks"
+	TopicEthereumAnnouncements     = "worker.ethereum.announcements"
+	TopicEthereumServerWork        = "worker.server.work"
+	TopicEthereumApplicationEvents = "worker.ethereum.application.events"
+
+	TopicSolanaParsedTransactions  = "worker.solana.parsed_transactions"
+	TopicSolanaBufferedTransfers   = "worker.solana.buffered_transfers"
+	TopicSolanaServerWork          = "worker.solana.server.work"
 
 	TopicEmissions = "worker.emissions"
 )
 
 type (
-	EthereumAnnouncement = worker.EthereumAnnouncement
-	EthereumBlockLog     = worker.EthereumBlockLog
+	EthereumAnnouncement        = worker.EthereumAnnouncement
+	EthereumBlockLog            = worker.EthereumBlockLog
+	EthereumServerWork          = worker.EthereumServerWork
+	EthereumHintedBlock         = worker.EthereumHintedBlock
+	EthereumDecoratedTransfer   = worker.EthereumDecoratedTransfer
+	EthereumWorkerDecorator     = worker.EthereumWorkerDecorator
+	EthereumApplicationEvent    = worker.EthereumApplicationEvent
+	EthereumApplicationTransfer = worker.EthereumApplicationTransfer
 
-	SolanaWinnerAnnouncement = worker.SolanaWinnerAnnouncement
+	SolanaParsedTransaction          = worker.SolanaParsedTransaction
+	SolanaBufferedParsedTransactions = worker.SolanaBufferedParsedTransactions
+	SolanaDecoratedTransfer          = worker.SolanaDecoratedTransfer
+	SolanaBufferedTransfers          = worker.SolanaBufferedTransfers
+	SolanaWork                       = worker.SolanaWork
+	SolanaWinnerAnnouncement         = worker.SolanaWinnerAnnouncement
 
 	Emission = worker.Emission
 )
@@ -34,13 +50,43 @@ func EthereumAnnouncements(f func(EthereumAnnouncement)) {
 	})
 }
 
-func EthereumBlockLogs(f func(EthereumBlockLog)) {
-	queue.GetMessages(TopicEthereumBlockLogs, func(message queue.Message) {
-		var blockLog EthereumBlockLog
+func GetEthereumServerWork(f func(EthereumServerWork)) {
+	queue.GetMessages(TopicEthereumServerWork, func(message queue.Message) {
+		var serverWork EthereumServerWork
 
-		message.Decode(&blockLog)
+		message.Decode(&serverWork)
 
-		f(blockLog)
+		f(serverWork)
+	})
+}
+
+func EthereumApplicationEvents(f func(EthereumApplicationEvent)) {
+	queue.GetMessages(TopicEthereumApplicationEvents, func(message queue.Message) {
+		var ApplicationEvent EthereumApplicationEvent
+
+		message.Decode(&ApplicationEvent)
+
+		f(ApplicationEvent)
+	})
+}
+
+func GetSolanaBufferedParsedTransactions(f func(SolanaBufferedParsedTransactions)) {
+	queue.GetMessages(TopicSolanaParsedTransactions, func(message queue.Message) {
+		var transactions SolanaBufferedParsedTransactions
+
+		message.Decode(&transactions)
+
+		f(transactions)
+	})
+}
+
+func GetSolanaBufferedTransfers(f func(SolanaBufferedTransfers)) {
+	queue.GetMessages(TopicSolanaBufferedTransfers, func(message queue.Message) {
+		var transfers SolanaBufferedTransfers
+
+		message.Decode(&transfers)
+
+		f(transfers)
 	})
 }
 

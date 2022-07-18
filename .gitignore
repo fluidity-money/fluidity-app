@@ -2,6 +2,8 @@
 docker
 docker-*
 !docker-compose*
+test
+semgrep
 
 lib/build-lib
 
@@ -40,6 +42,8 @@ contracts/solana/testing/fuzz/target
 !contracts/solana/testing/*
 
 contracts/tribeca-govern-contracts/target
+
+contracts/utility-gauge/target
 
 # Vendor specific
 .vscode

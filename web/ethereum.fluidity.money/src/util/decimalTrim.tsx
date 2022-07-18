@@ -1,8 +1,10 @@
 
 export const decimalTrim = (amount: string, limit: number) => {
-  const trim = amount.indexOf('.') != -1
-    ? amount.slice(0, amount.indexOf('.') + limit)
-    : amount;
+  if (limit <= 0) {
+    return amount;
+  }
 
+  const trimIndex = amount.indexOf('.');
+  const trim = trimIndex > -1 ? amount.slice(0, trimIndex + limit + 1) : amount;
   return trim;
 };

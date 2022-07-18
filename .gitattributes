@@ -24,3 +24,9 @@
 /web/faucet.fluidity.money/public/images/favicon.png filter=lfs diff=lfs merge=lfs -text
 /web/faucet.fluidity.money/public/favicon.ico filter=lfs diff=lfs merge=lfs -text
 /web/ethereum.fluidity.money/public/img/rewards.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/bell_button.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/reward_button.svg filter=lfs diff=lfs merge=lfs -text
+/web/ethereum.fluidity.money/public/img/network-dot.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/bell_button.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/reward_button.svg filter=lfs diff=lfs merge=lfs -text
+/web/solana.fluidity.money/public/img/network-dot.svg filter=lfs diff=lfs merge=lfs -text

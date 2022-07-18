@@ -6,11 +6,15 @@
 .header-text {
   font-family: Manrope, sans-serif;
   font-size: 1.2rem;
-  @include for-smallest-toolbar {
+  @include for-med-toolbar {
     font-size: 0.9rem;
   }
   @include for-below-470 {
     font-size: 1rem;
+  }
+  &-connect-wallet-address {
+    @extend .header-text;
+    width: fit-content;
   }
 }
 

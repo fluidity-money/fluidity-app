@@ -10,7 +10,7 @@ const AppContainer = ({
     <div className={`app-container gradient-background${appTheme}`}>
       {children}
       {/* Fluidity text footer */}
-      <div className="fluidity flex row flex-space-between width-auto">
+      <div className="fluidity-footer flex row flex-space-between width-auto">
         <Icon src="i-fluidity-medium" />
         <div className="fluidity-text">Fluidity.</div>
       </div>

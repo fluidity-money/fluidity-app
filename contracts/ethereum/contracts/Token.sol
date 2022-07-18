@@ -271,6 +271,7 @@ contract Token is IERC20 {
             firstBlock > lastRewardedBlock_,
             "reward already given for part of this range"
         );
+
         manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
         manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
         manualRewards_[winner] += winAmount;
@@ -345,6 +346,7 @@ contract Token is IERC20 {
     }
 
     function _mint(address account, uint256 amount) internal virtual {
+
         require(account != address(0), "ERC20: mint to the zero address");
 
         totalSupply_ += amount;

@@ -1,0 +1,21 @@
+anchor_version = "0.24.2"
+solana_version = "1.9.12"
+
+[features]
+seeds = true
+
+[provider]
+cluster="devnet"
+wallet="~/.config/solana/id.json"
+
+[programs.localnet]
+utility_gauge = "GijCvpzEK5wQjFtekuYifb8KU3xtVERFP3mFrhf8fNNV"
+
+[programs.devnet]
+utility_gauge = "GijCvpzEK5wQjFtekuYifb8KU3xtVERFP3mFrhf8fNNV"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

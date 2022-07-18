@@ -26,15 +26,10 @@ import {
   userActionContext,
 } from "components/context";
 import ErrorBoundary from "components/Errors/ErrorBoundary";
-import ChainId, { chainIdFromEnv } from "util/chainId";
-import { TokenKind } from "components/types";
-import ropsten from "./config/ropsten-tokens.json";
-import testing from "./config/testing-tokens.json";
-import kovan from "./config/kovan-tokens.json";
-import aurora from "./config/aurora-mainnet-tokens.json";
-import mainnet from "./config/mainnet-tokens.json";
+import { chainIdFromEnv } from "util/chainId";
 import { appTheme } from "util/appTheme";
 import useLocalStorage from "util/hooks/useLocalStorage";
+import { tokenData } from "util/tokenData";
 
 const App = () => {
   const chainId = chainIdFromEnv();
@@ -79,37 +74,23 @@ const App = () => {
 
   const { lastJsonMessage } = useWebSocket(root_websocket);
 
-  // Assigns the correct json file based on ChainId
-  const data =
-    chainId === ChainId.Ropsten
-      ? (ropsten as TokenKind[])
-      : chainId === ChainId.Hardhat
-      ? (testing as TokenKind[])
-      : chainId === ChainId.Kovan
-      ? (kovan as TokenKind[])
-      : chainId === ChainId.AuroraMainnet
-      ? (aurora as TokenKind[])
-      : chainId === ChainId.Mainnet
-      ? (mainnet as TokenKind[])
-      : (ropsten as TokenKind[]);
-
   /* using local storage hook to persist for pinned tokens for 
   fluid and non-fluid states used in token select modal */
   const [pinnedTokens, setPinnedTokens] = useLocalStorage(
     "pinned",
-    [...data].slice(0, data.length / 2)
+    [...tokenData].slice(0, tokenData.length / 2)
   );
   const [pinnedFluidTokens, setPinnedFluidTokens] = useLocalStorage(
     "pinned-fluid",
-    [...data].slice(data.length / 2, data.length)
+    [...tokenData].slice(tokenData.length / 2, tokenData.length)
   );
   const [tokens, setTokens] = useLocalStorage(
     "tokens",
-    [...data].slice(data.length / 2, data.length)
+    [...tokenData].slice(tokenData.length / 2, tokenData.length)
   );
   const [fluidTokens, setFluidTokens] = useLocalStorage(
     "fluid-tokens",
-    [...data].slice(data.length / 2, data.length)
+    [...tokenData].slice(tokenData.length / 2, tokenData.length)
   );
 
   /* browser detection. if user isn't using firefox or chromium based browser
