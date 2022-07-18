@@ -32,7 +32,7 @@ type SwapInstruction struct {
 }
 
 // GetRaydiumFees by taking 0.25% of the transaction value
-func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, raydiumProgramID string, fluidTokens *map[string]string) (feesPaid *big.Rat, err error) {
+func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, raydiumProgramID string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]

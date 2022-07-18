@@ -41,7 +41,7 @@ type ConstantProductCurveFeeData struct {
 // GetOrcaFees by checking that an orca swap occurred, then
 // destructuring the swap information to get the fee %, and
 // getting the fees paid by multiplying the value of the swap
-func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string, fluidTokens *map[string]string) (feesPaid *big.Rat, err error) {
+func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]

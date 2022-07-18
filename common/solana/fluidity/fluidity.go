@@ -50,11 +50,11 @@ type (
 
 
 // GetBaseToken takes a fluid token and returns its counterpart
-func GetBaseToken(token string, fluidTokens *map[string]string) (string, error) {
+func GetBaseToken(token string, fluidTokens map[string]string) (string, error) {
 
 	// get the base token
 
-	baseToken := (*fluidTokens)[token]
+	baseToken := fluidTokens[token]
 
 	// check that we got a good result
 
@@ -69,10 +69,10 @@ func GetBaseToken(token string, fluidTokens *map[string]string) (string, error) 
 }
 
 // IsFluidToken takes a token and checks if is one of the fluid tokens
-func IsFluidToken(token string, fluidTokens *map[string]string) bool {
+func IsFluidToken(token string, fluidTokens map[string]string) bool {
 
 	// check if token exists in map
-	_, exists := (*fluidTokens)[token]
+	_, exists := fluidTokens[token]
 
 	return exists
 }

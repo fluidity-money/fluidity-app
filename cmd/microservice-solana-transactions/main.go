@@ -135,7 +135,7 @@ func main() {
 				solanaClient,
 				transaction,
 				orcaProgramId,
-				&fluidTokens,
+				fluidTokens,
 			)
 
 			if err != nil {
@@ -151,7 +151,7 @@ func main() {
 				solanaClient,
 				transaction,
 				raydiumProgramId,
-				&fluidTokens,
+				fluidTokens,
 			)
 
 			if err != nil {
