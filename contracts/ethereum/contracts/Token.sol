@@ -12,7 +12,6 @@ struct Winner {
     uint256 amount;
 }
 
-
 /// @title The fluid token ERC20 contract
 contract Token is IERC20 {
     using SafeERC20 for IERC20;
@@ -58,12 +57,10 @@ contract Token is IERC20 {
     /// @dev deprecated
     mapping (bytes32 => uint) private pastRewards_;
 
-    /// @dev [block number] => [1 if it's the start of a batch reward range]
-    mapping(uint => uint) private rewardedBlocks_;
-
+    /// @dev the block number of the last block that's been included in a batched reward
     uint private lastRewardedBlock_;
 
-    /// @dev [address] => [[block number] => [1 if it's the start or end of a manual reward range]]
+    /// @dev [address] => [[block number] => [has the block been manually rewarded by this user?]]
     mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
 
     /// @dev amount a user has manually rewarded, to be removed from their batched rewards
@@ -213,7 +210,6 @@ contract Token is IERC20 {
 
         uint poolAmount = rewardPoolAmount();
 
-        rewardedBlocks_[firstBlock] = BLOCK_REWARDED;
         // this might not happen if our transactions go through out of order
         if (lastBlock > lastRewardedBlock_) lastRewardedBlock_ = lastBlock;
 
@@ -273,19 +269,14 @@ contract Token is IERC20 {
 
         // user decided to frontrun
         require(
-            manualRewardedBlocks_[winner][firstBlock] == 0,
-            "manual reward already given for part of this range"
-        );
-        require(
-            manualRewardedBlocks_[winner][lastBlock] == 0,
-            "manual reward already given for part of this range"
-        );
-        require(
             firstBlock > lastRewardedBlock_,
             "reward already given for part of this range"
         );
-        manualRewardedBlocks_[winner][firstBlock] = BLOCK_REWARDED;
-        manualRewardedBlocks_[winner][lastBlock] = BLOCK_REWARDED;
+
+        for (uint i = firstBlock; i <= lastBlock; i++) {
+            require(manualRewardedBlocks_[winner][i] == 0, "reward already given for part of this range");
+            manualRewardedBlocks_[winner][i] = BLOCK_REWARDED;
+        }
 
         manualRewardDebt_[winner] += winAmount;
 
