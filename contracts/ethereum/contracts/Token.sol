@@ -1,4 +1,4 @@
-pragma solidity ^0.8.11;
+pragma solidity 0.8.11;
 pragma abicoder v2;
 
 import "./openzeppelin/IERC20.sol";
@@ -41,12 +41,12 @@ contract Token is IERC20 {
     string private name_;
     string private symbol_;
 
-    bool initialized_;
+    bool private initialized_;
 
-    LiquidityProvider pool_;
+    LiquidityProvider private pool_;
 
     /// @dev trusted account used as an oracle for submitting rewards
-    address rngOracle_;
+    address private rngOracle_;
 
     /// @dev [txhash] => [0 if the reward for that transaction hasn't been rewarded, 1 otherwise]
     /// @dev operating on ints saves us a bit of gas
@@ -54,9 +54,9 @@ contract Token is IERC20 {
     mapping (bytes32 => uint) private pastRewards_;
 
     /// @dev [block number] => [1 if it's the start of a batch reward range]
-    mapping(uint => uint) rewardedBlocks_;
+    mapping(uint => uint) private rewardedBlocks_;
 
-    uint lastRewardedBlock_;
+    uint private lastRewardedBlock_;
 
     /// @dev [address] => [[block number] => [1 if it's the start or end of a manual reward range]]
     mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
@@ -66,7 +66,7 @@ contract Token is IERC20 {
     mapping (address => uint) private manualRewardDebt_;
 
     /// @dev new oracle address, pending a call from them to confirm
-    address pendingNewOracle_;
+    address private pendingNewOracle_;
 
     /**
      * @notice initializer function - sets the contract's data
