@@ -128,9 +128,7 @@ const CurrencyBreakdown = () => {
 
   const LineChart = useMemo(() => <LineGraph />, []);
 
-  // Checks to see if the user's wallet is empty
   return (
-    // (walletData.length !== 0) ? (
     <div className="currency-breakdown">
       <div className="portfolio-graph-title primary-text">Account Overview</div>
       <div className="yield-graph">
