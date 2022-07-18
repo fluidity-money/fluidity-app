@@ -147,8 +147,8 @@ contract Token is IERC20 {
         pool_.underlying_().safeTransferFrom(msg.sender, address(this), amount);
         uint finalBalance = pool_.underlying_().balanceOf(address(this));
 
-        // ensure we haven't overflowed
-        require(finalBalance > originalBalance, "erc20in overflow");
+        // ensure the token is behaving
+        require(finalBalance > originalBalance, "token balance decreased after transfer");
         uint realAmount = finalBalance - originalBalance;
 
         // add the tokens to our compound pool
