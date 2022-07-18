@@ -31,6 +31,9 @@ contract Token is IERC20 {
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
     event BurnFluid(address indexed addr, uint indexed amount);
 
+    /// @notice emitted when the rng oracle is changed to a new address
+    event OracleChanged(address indexed oldOracle, address indexed newOracle);
+
     mapping(address => uint256) private balances_;
     mapping(address => mapping(address => uint256)) private allowances_;
     uint8 private decimals_;
@@ -116,6 +119,8 @@ contract Token is IERC20 {
     /// @notice must be used by the new account
     function acceptUpdateOracle() public {
         require(msg.sender == pendingNewOracle_, "only the pending new oracle account can use this");
+
+        emit OracleChanged(rngOracle_, pendingNewOracle_);
 
         rngOracle_ = pendingNewOracle_;
         pendingNewOracle_ = address(0);
