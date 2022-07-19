@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
@@ -80,7 +80,7 @@ func main() {
 		})
 	}
 
-	user_actions.BufferedUserActionsSolana(func(bufferedUserActions user_actions.BufferedUserAction) {
+	worker.GetSolanaBufferedTransfers(func(transfers worker.SolanaBufferedTransfers) {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
 		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
@@ -124,13 +124,13 @@ func main() {
 			})
 		}
 
-		payableBufferedUserAction := user_actions.PayableBufferedUserAction{
-			BufferedUserAction: bufferedUserActions,
+		payableBufferedTransfers := worker.SolanaWork {
+			BufferedTransfers: transfers,
 			Tvl:                tvl,
 			MintSupply:         mintSupply,
 		}
 
-		queue.SendMessage(topicWrappedActionsQueue, payableBufferedUserAction)
+		queue.SendMessage(topicWrappedActionsQueue, payableBufferedTransfers)
 
 	})
 }

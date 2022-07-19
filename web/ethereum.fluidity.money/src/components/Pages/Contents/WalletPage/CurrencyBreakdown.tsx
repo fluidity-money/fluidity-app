@@ -6,15 +6,22 @@ import getWalletERC20Status from "util/getWalletERC20Status";
 import { walletDataType } from "util/getWalletERC20Status";
 import { useSigner } from "util/hooks";
 import _ from "lodash";
-import { appTheme } from "util/appTheme";
+import ToggleButton from "components/Button/ToggleButton";
+import LineGraph from "components/Charts/LineChart";
+import UnclaimedRewardsbutton from "components/Button/UnclaimedRewardsButton";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
-  const [colours, setColours] = useState<string[]>([]);
   const [walletData, setWalletData] = useState<walletDataType[]>([]);
+  const [colours, setColours] = useState<string[]>([]);
   const [walletTypes, setWalletTypes] = useState<string[]>([]);
   const [walletAmounts, setWalletAmounts] = useState<string[]>([]);
+  const [fluidColours, setFluidColours] = useState<string[]>([]);
+  const [fluidWalletTypes, setFluidWalletTypes] = useState<string[]>([]);
+  const [fluidWalletAmounts, setFluidWalletAmounts] = useState<string[]>([]);
   const signer = useSigner();
+  // used to toggle which chart and currencies are displayed
+  const [fluid, setFluid] = useState(true);
 
   // Renders out Wallet Token Data if signer connected
   useEffect(() => {
@@ -25,30 +32,95 @@ const CurrencyBreakdown = () => {
     }
   }, [signer?.provider]);
 
+  // both filter functions also sort tokens in alphabetical order
+  const filterFluid = () => {
+    return walletData
+      .sort((a, b) => a.type.localeCompare(b.type))
+      .filter((token) => token.type.startsWith("f"));
+  };
+
+  const filterRegular = () => {
+    return walletData
+      .sort((a, b) => a.type.localeCompare(b.type))
+      .filter((token) => !token.type.startsWith("f"));
+  };
+
+  const distributeWalletData = () => {
+    setWalletTypes(_.map(filterRegular(), "type"));
+    setWalletAmounts(_.map(filterRegular(), "amount"));
+    setColours(_.map(filterRegular(), "colour"));
+    setFluidWalletTypes(_.map(filterFluid(), "type"));
+    setFluidWalletAmounts(_.map(filterFluid(), "amount"));
+    setFluidColours(_.map(filterFluid(), "colour"));
+  };
+
   useEffect(() => {
     if (walletData.length == 0) {
       return;
     }
-
-    // Distribute walletData for graph render
-    setWalletTypes(_.map(walletData, "type"));
-    setWalletAmounts(_.map(walletData, "amount"));
-    setColours(_.map(walletData, "colour"));
+    // distributes wallet data for fluid and non fluid donut charts
+    distributeWalletData();
   }, [walletData]);
 
-  const renderedCurrencyList = walletData.map((token, index) => {
+  // displays currency listing based on filtered walletData
+  const currencies = fluid ? filterFluid() : filterRegular();
+  const renderedCurrencyList = currencies.map((token, index) => {
     const currencyType = token.type.toString();
 
     return (
-      <CurrencyListing
-        currency={currencyType}
-        amount={token.amount}
-        key={token.type + index}
-      />
+      <div className="currency-container">
+        <CurrencyListing
+          currency={currencyType}
+          amount={token.amount}
+          key={token.type + index}
+        />
+        <hr
+          style={{
+            color: "#828a90",
+            width: "100%",
+            margin: 4,
+            padding: 0,
+            minWidth: 155,
+          }}
+        />
+      </div>
     );
   });
 
-  const Donut = useMemo(
+  // calculates total wallet amount
+  const calculateTotal = (tokens: walletDataType[]) => {
+    return tokens
+      .reduce((previous, current) => previous + Number(current.amount), 0)
+      .toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+  };
+
+  // total amount for Fluid assets
+  const totalFluid = useMemo(() => calculateTotal(filterFluid()), [walletData]);
+
+  // total amount for Regular assets
+  const totalRegular = useMemo(
+    () => calculateTotal(filterRegular()),
+    [walletData]
+  );
+
+  const DonutFluid = useMemo(
+    () => (
+      <DoughnutGraph
+        data={fluidWalletAmounts.length !== 0 ? fluidWalletAmounts : ["0"]}
+        labels={fluidWalletTypes.length !== 0 ? fluidWalletTypes : ["N/A"]}
+        colours={fluidColours.length !== 0 ? fluidColours : ["rgb(0,0,0)"]}
+      />
+    ),
+
+    [fluidWalletAmounts, fluidWalletTypes, fluidColours]
+  );
+
+  const DonutRegular = useMemo(
     () => (
       <DoughnutGraph
         data={walletAmounts.length !== 0 ? walletAmounts : ["0"]}
@@ -60,21 +132,55 @@ const CurrencyBreakdown = () => {
     [walletAmounts, walletTypes, colours]
   );
 
+  const LineChart = useMemo(() => <LineGraph />, []);
+
   // Checks to see if the user's wallet is empty
   return (
     <div className="currency-breakdown">
-      <div className={`portfolio-graph-title primary-text${appTheme}`}>
+      <div className={`portfolio-graph-title white-primary-text`}>
         Account Overview
       </div>
 
-      <div className="doughnut-container">{Donut}</div>
+      <div className="yield-graph">
+        <div className={`white-primary-text total-yield-title`}>
+          Total Fluid Yield Rewarded: USD 152.21
+        </div>
+        <div className="grey-primary-text" style={{ fontSize: 8 }}>
+          *Calculations based upon user on-chain history and simulated expected
+          reward averages
+        </div>
+        <div className="line-chart-container">{LineChart}</div>
 
-      <div className="currency-list">{renderedCurrencyList}</div>
-      {walletData.length === 0 ? (
-        <div className={`primary-text${appTheme}`}>Your wallet is empty</div>
-      ) : (
-        <></>
-      )}
+        <UnclaimedRewardsbutton />
+      </div>
+
+      <div className="wallet-overview">
+        <div className={`white-primary-text`}>Wallet Overview</div>
+
+        <div className="overview-items">
+          <div className="chart-items">
+            <div className="doughnut-container">
+              <div className="total">
+                <div className="grey-primary-text">Total</div>
+                <div className="white-primary-text">
+                  {fluid ? totalFluid : totalRegular}
+                </div>
+              </div>
+              {fluid ? DonutFluid : DonutRegular}
+            </div>
+            <div className="toggle-container">
+              <div className={fluid ? "grey-primary-text" : "selected-text"}>
+                Regular
+              </div>
+              <ToggleButton toggled={fluid} toggle={setFluid} />
+              <div className={fluid ? "selected-text" : "grey-primary-text"}>
+                Fluid
+              </div>
+            </div>
+          </div>
+          <div className="currency-list">{renderedCurrencyList}</div>
+        </div>
+      </div>
     </div>
   );
 };

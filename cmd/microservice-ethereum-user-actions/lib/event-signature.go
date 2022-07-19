@@ -86,7 +86,7 @@ func init() {
 		k.Context = Context
 
 		k.Format(
-			"Transfer events: %#s, Mint events: %#s, Burn events: %#s",
+			"Transfer events: %#v, Mint events: %#v, Burn events: %#v",
 			eventSignatureTransfer,
 			eventSignatureMint,
 			eventSignatureBurn,

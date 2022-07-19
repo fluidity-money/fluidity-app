@@ -110,8 +110,8 @@ func GetUserActionsWithSenderAddressOrRecipientAddress(network network.Blockchai
 
 		FROM %v
 		WHERE network = $1
-		AND sender_address = $2
-		OR recipient_address = $2
+		AND (sender_address = $2
+			OR recipient_address = $2)
 		ORDER BY time DESC
 		LIMIT $3`,
 
@@ -199,8 +199,8 @@ func GetUserActionsWithSenderAddressOrRecipientOwnerAddress(network network.Bloc
 
 		FROM %v
 		WHERE network = $1
-		AND solana_sender_owner_address = $2
-		OR solana_recipient_owner_address = $2
+		AND (solana_sender_owner_address = $2
+			OR solana_recipient_owner_address = $2)
 		ORDER BY time DESC
 		LIMIT $3`,
 

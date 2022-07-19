@@ -12,6 +12,10 @@ const (
 	TopicEthereumServerWork        = "worker.server.work"
 	TopicEthereumApplicationEvents = "worker.ethereum.application.events"
 
+	TopicSolanaParsedTransactions  = "worker.solana.parsed_transactions"
+	TopicSolanaBufferedTransfers   = "worker.solana.buffered_transfers"
+	TopicSolanaServerWork          = "worker.solana.server.work"
+
 	TopicEmissions = "worker.emissions"
 )
 
@@ -25,7 +29,12 @@ type (
 	EthereumApplicationEvent    = worker.EthereumApplicationEvent
 	EthereumApplicationTransfer = worker.EthereumApplicationTransfer
 
-	SolanaWinnerAnnouncement = worker.SolanaWinnerAnnouncement
+	SolanaParsedTransaction          = worker.SolanaParsedTransaction
+	SolanaBufferedParsedTransactions = worker.SolanaBufferedParsedTransactions
+	SolanaDecoratedTransfer          = worker.SolanaDecoratedTransfer
+	SolanaBufferedTransfers          = worker.SolanaBufferedTransfers
+	SolanaWork                       = worker.SolanaWork
+	SolanaWinnerAnnouncement         = worker.SolanaWinnerAnnouncement
 
 	Emission = worker.Emission
 )
@@ -58,6 +67,26 @@ func EthereumApplicationEvents(f func(EthereumApplicationEvent)) {
 		message.Decode(&ApplicationEvent)
 
 		f(ApplicationEvent)
+	})
+}
+
+func GetSolanaBufferedParsedTransactions(f func(SolanaBufferedParsedTransactions)) {
+	queue.GetMessages(TopicSolanaParsedTransactions, func(message queue.Message) {
+		var transactions SolanaBufferedParsedTransactions
+
+		message.Decode(&transactions)
+
+		f(transactions)
+	})
+}
+
+func GetSolanaBufferedTransfers(f func(SolanaBufferedTransfers)) {
+	queue.GetMessages(TopicSolanaBufferedTransfers, func(message queue.Message) {
+		var transfers SolanaBufferedTransfers
+
+		message.Decode(&transfers)
+
+		f(transfers)
 	})
 }
 

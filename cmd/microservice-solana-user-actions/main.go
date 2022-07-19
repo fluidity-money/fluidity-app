@@ -8,6 +8,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -32,6 +34,26 @@ const (
 // SplProgramId is the program id of the SPL token program
 const SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
+// extracts instructions and innerInstructions from a solana transaction
+func getAllInstructions(result solTypes.TransactionResult) []solTypes.TransactionInstruction {
+	var (
+		instructions = result.Transaction.Message.Instructions
+		innerInstructions = result.Meta.InnerInstructions
+	)
+
+	instructionsLen := len(instructions) + len(innerInstructions)
+
+	allInstructions := make([]solTypes.TransactionInstruction, instructionsLen)
+
+	allInstructions = append(allInstructions, instructions...)
+
+	for _, inner := range innerInstructions {
+		allInstructions = append(allInstructions, inner.Instructions...)
+	}
+
+	return allInstructions
+}
+
 func main() {
 	var (
 		fluidityProgramId = util.GetEnvOrFatal(EnvFluidityProgramId)
@@ -54,13 +76,17 @@ func main() {
 
 	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
 
-	solana.BufferedTransactions(func(bufferedTransaction solana.BufferedTransaction) {
+	solana.BufferedTransactions(func(bufferedTransaction solana.BufferedApplicationTransactions) {
 		var (
 			slotNumber   = bufferedTransaction.Slot
 			transactions = bufferedTransaction.Transactions
 		)
 
-		bufferedUserActions := make([]user_actions.UserAction, 0)
+		var (
+			transfers                  = make([]user_actions.UserAction, 0)
+			bufferedUserActions        = make([]user_actions.UserAction, 0)
+			bufferedParsedTransactions = make([]worker.SolanaParsedTransaction, 0)
+		)
 
 		for _, transaction := range transactions {
 			if err := transaction.Result.Meta.Err; err != nil {
@@ -74,12 +100,10 @@ func main() {
 
 			var (
 				signature         = transaction.Signature
-				accountKeys       = transaction.Result.Transaction.Message.AccountKeys
-				tokenBalances     = transaction.Result.Meta.PostTokenBalances
-				instructions      = transaction.Result.Transaction.Message.Instructions
-				innerInstructions = transaction.Result.Meta.InnerInstructions
+				transactionResult = transaction.Result
+				accountKeys       = transactionResult.Transaction.Message.AccountKeys
+				tokenBalances     = transactionResult.Meta.PostTokenBalances
 				adjustedFee       = transaction.AdjustedFee
-				saberFee          = transaction.SaberFee
 				sig               = transaction.Signature
 			)
 
@@ -101,7 +125,7 @@ func main() {
 				}
 			}
 
-			allInstructions := append(instructions, innerInstructions...)
+			allInstructions := getAllInstructions(transactionResult)
 
 			for _, instruction := range allInstructions {
 
@@ -133,7 +157,6 @@ func main() {
 						sig,
 						instruction,
 						adjustedFee,
-						saberFee,
 						accountKeys,
 						fluidityOwners,
 						fluidityTokenMint,
@@ -150,39 +173,84 @@ func main() {
 				}
 
 				if transfer1 != nil {
+					log.App(func(k *log.Log) {
+					    k.Message = "Found a transfer!"
+					})
+
+					transfers = append(transfers, *transfer1)
 					bufferedUserActions = append(bufferedUserActions, *transfer1)
 				}
 
 				if transfer2 != nil {
+					log.App(func(k *log.Log) {
+					    k.Message = "Found a transfer!"
+					})
+
+					transfers = append(transfers, *transfer2)
 					bufferedUserActions = append(bufferedUserActions, *transfer2)
 				}
 
 				if winner1 != nil {
+					log.App(func(k *log.Log) {
+					    k.Message = "Found a winner!"
+					})
+
 					queue.SendMessage(winners.TopicWinnersSolana, winner1)
 				}
 
 				if winner2 != nil {
+					log.App(func(k *log.Log) {
+					    k.Message = "Found a winner!"
+					})
+
 					queue.SendMessage(winners.TopicWinnersSolana, winner2)
 				}
 
 				if swapWrap != nil {
+					log.App(func(k *log.Log) {
+					    k.Message = "Found a wrap!"
+					})
+
 					bufferedUserActions = append(bufferedUserActions, *swapWrap)
 				}
 
 				if swapUnwrap != nil {
+					log.App(func(k *log.Log) {
+					    k.Message = "Found an unwrap!"
+					})
+
 					bufferedUserActions = append(bufferedUserActions, *swapUnwrap)
 				}
+
 			}
+
+			// always pass transactions to the apps server
+			parsedTransaction := worker.SolanaParsedTransaction{
+				Transaction: transaction,
+				Transfers:   transfers,
+			}
+
+			bufferedParsedTransactions = append(
+				bufferedParsedTransactions,
+				parsedTransaction,
+			)
 		}
 
-		if len(bufferedUserActions) == 0 {
-			return
+		if len(bufferedParsedTransactions) != 0 {
+			bufferedTransactionsBlock := worker.SolanaBufferedParsedTransactions{
+				Transactions: bufferedParsedTransactions,
+				Slot:         slotNumber,
+			}
+
+			queue.SendMessage(worker.TopicSolanaParsedTransactions, bufferedTransactionsBlock)
 		}
 
-		bufferedUserAction := user_actions.BufferedUserAction{
-			UserActions: bufferedUserActions,
-		}
+		if len(bufferedUserActions) != 0 {
+			bufferedUserAction := user_actions.BufferedUserAction{
+				UserActions: bufferedUserActions,
+			}
 
-		queue.SendMessage(user_actions.TopicBufferedUserActionsSolana, bufferedUserAction)
+			queue.SendMessage(user_actions.TopicBufferedUserActionsSolana, bufferedUserAction)
+		}
 	})
 }

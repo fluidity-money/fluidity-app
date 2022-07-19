@@ -1,0 +1,23 @@
+---
+version: "3"
+
+services:
+  postgres:
+    command: "true"
+    entrypoint: "true"
+  timescale:
+    command: "true"
+    entrypoint: "true"
+  integration-test-runner-ethereum:
+    build:
+      # path is resolved based on the first compose file used, so we have to
+      # pre-resolve it, as described here:
+      # https://github.com/docker/buildx/issues/197#issuecomment-1098709931
+      context: ${INTEGRATIONS_DIR}
+    env_file: ${COMPOSE_ENV_FILE}
+    environment:
+      FLU_WORKER_ID: 123123123123
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_AMQP_QUEUE_ADDR: amqp://fluidity:fluidity@rabbitmq
+    depends_on:
+      - redis

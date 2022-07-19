@@ -15,6 +15,11 @@ func TestStoreValue(t *testing.T) {
 		intValue = 1573
 	)
 
+	state.Del(key)
+	t.Cleanup(func() {
+		state.Del(key)
+	})
+
 	StoreValue(key, strValue)
 	strResultBytes := state.Lpop(key)
 
@@ -31,6 +36,11 @@ func TestCalculateMovingAverage(t *testing.T) {
 		key          = "FLU_TEST_KEY" + t.Name()
 		valuesStored = 0
 	)
+
+	state.Del(key)
+	t.Cleanup(func() {
+		state.Del(key)
+	})
 
 	// no values
 	average, err := CalculateMovingAverage(key)
@@ -105,6 +115,11 @@ func TestCalculateMovingAverageRat(t *testing.T) {
 		valuesStored = 0
 	)
 
+	state.Del(key)
+	t.Cleanup(func() {
+		state.Del(key)
+	})
+
 	// no values
 	average, err := CalculateMovingAverageRat(key)
 	assert.NoError(t, err)
@@ -170,6 +185,11 @@ func TestStoreAndCalculate(t *testing.T) {
 		value = 12
 	)
 
+	state.Del(key)
+	t.Cleanup(func() {
+		state.Del(key)
+	})
+
 	result, err := StoreAndCalculate(key, value)
 	assert.NoError(t, err)
 	assert.Equal(t, value, *result)
@@ -185,6 +205,11 @@ func TestStoreAndCalculateRat(t *testing.T) {
 		key   = "FLU_TEST_KEY" + t.Name()
 		value = ratFromInt(12)
 	)
+
+	state.Del(key)
+	t.Cleanup(func() {
+		state.Del(key)
+	})
 
 	result, err := StoreAndCalculateRat(key, value)
 	assert.NoError(t, err)

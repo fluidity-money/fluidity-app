@@ -63,5 +63,9 @@ watch-css:
 watch:
 	@${MAKE} -j2 watch-js watch-css 
 
+frontend-test:
+	@${NPX_REACTSCRIPTS} test
+  
 clean:
 	rm -f docker-backend docker-frontend
+ 

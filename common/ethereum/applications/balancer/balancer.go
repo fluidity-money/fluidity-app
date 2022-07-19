@@ -11,6 +11,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -107,6 +108,14 @@ var balancerV2PoolAbi ethAbi.ABI
 // output token is the fluid token. This method generalises for Balancer's different pools
 // (stable, weighted, etc.)
 func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+
+	if len(transfer.Log.Topics) != 4 {
+		return nil, fmt.Errorf(
+			"Wrong number of log topics! Expected 4, got %v",
+			len(transfer.Log.Topics),
+		)
+	}
+
 	var (
 		poolId    = transfer.Log.Topics[1]
 		tokenIn_  = transfer.Log.Topics[2]
@@ -148,11 +157,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	vaultAddr := ethCommon.HexToAddress(vaultAddr_)
 
 	// convert pool id to fixed-length byte array to make the contract call
-	p := ethCommon.FromHex(poolId.String())
-	var idBytes [32]byte
-	for i, b := range p {
-		idBytes[i] = byte(b)
-	}
+	idBytes := hashTo32Bytes(poolId)
 
 	// [address, type]
 	pool_, err := ethereum.StaticCall(client, vaultAddr, balancerV2VaultAbi, "getPool", idBytes)
@@ -256,4 +261,21 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 
 		return nil, nil
 	}
+}
+
+// hashTo32Bytes to convert a hash to a 32 byte array
+func hashTo32Bytes(hash ethTypes.Hash) [32]byte {
+	var idBytes [32]byte
+
+	p := ethCommon.FromHex(hash.String())
+	for i, b := range p {
+		// truncate if the hash is too long
+		if i >= 32 {
+			return idBytes
+		}
+
+		idBytes[i] = byte(b)
+	}
+
+	return idBytes
 }
