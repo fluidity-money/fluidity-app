@@ -22,7 +22,9 @@
     "jsx": "react-jsx",
     "noEmit": true
   },
-  "include": [
-    "src"
+  "include": ["src"],
+  "exclude": [
+    "src/**/*.spec.*",
+    "src/**/*.test.*"
   ]
 }
