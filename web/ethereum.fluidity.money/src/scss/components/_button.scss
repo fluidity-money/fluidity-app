@@ -398,8 +398,52 @@
   width: 20px;
 }
 
-.margin-right {
-  margin-right: 7px;
+.unclaimed-rewards-button {
+  @extend .primary-button;
+  width: 50%;
+  min-width: 300px;
+  height: 30px;
+  font-weight: 0;
+  font-size: 0.5rem;
+  border-radius: 5px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 0 0;
+  margin-top: 10px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
+  &:active {
+    opacity: 0.8;
+  }
+  @include for-below-500 {
+    min-width: 250px;
+  }
+  &--aurora {
+    @extend .unclaimed-rewards-button;
+    background: $aurora;
+  }
+}
+
+.unclaimed-button-left {
+  display: flex;
+  align-items: center;
+}
+
+.unclaimed-image {
+  width: 41px;
+  margin: 0 0 5px 0;
+}
+
+.unclaimed-button-right {
+  display: flex;
+  align-items: center;
+  .margin-right {
+    margin-right: 7px;
+  }
 }
 
 .notification-button {

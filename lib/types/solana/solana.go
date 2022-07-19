@@ -85,8 +85,7 @@ type (
 		//  but we add it here for convenience
 		Signature   string            `json:"signature"`
 		Result      TransactionResult `json:"result"`
-		AdjustedFee *big.Rat          `json:"adjustedFee"`
-		SaberFee    *big.Rat          `json:"saberFee"`
+		AdjustedFee *big.Rat          `json:"adjusted_fee"`
 	}
 
 	TransactionResult struct {
