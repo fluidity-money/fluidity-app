@@ -82,5 +82,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
 	-f "$automation_dir/docker-compose.ethereum-ropsten.yml" \
 	-f "$automation_dir/docker-compose.ethereum-worker-ropsten.yml" \
-	-f "$automation_dir/docker-compose.ethereum-application-server.yml" \
+	-f "$automation_dir/docker-compose.ethereum-applications-ropsten.yml" \
 	$@
