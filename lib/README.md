@@ -21,7 +21,7 @@ be open sourced.
 | `FLU_AMQP_QUEUE_ADDR` | AMQP queue address connected to to receive and send messages down.           |
 | `FLU_POSTGRES_URI`    | Database URI to use when connecting to the Postgres database.                |
 | `FLU_TIMESCALE_URI`   | Database URI to use when connecting to the Timescale database.               |
-| `FLU_REDIS_HOST`      | Hostname to connect to for the Redis (state) codebase.                       |
+| `FLU_REDIS_ADDR`      | Hostname to connect to for the Redis (state) codebase.                       |
 | `FLU_REDIS_PASSWORD`  | Password to use when connecting to the Redis host.                           |
 
 ## Building
@@ -29,7 +29,7 @@ be open sourced.
 	make build
 
 ## Testing
-	
+
 Testing utilises the standard `testing` package as well as `testify` for assertions.
 
 	make test

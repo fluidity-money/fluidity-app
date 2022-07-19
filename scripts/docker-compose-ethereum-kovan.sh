@@ -98,4 +98,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
 	-f "$automation_dir/docker-compose.ethereum-kovan.yml" \
 	-f "$automation_dir/docker-compose.ethereum-worker-kovan.yml" \
+	-f "$automation_dir/docker-compose.ethereum-application-server.yml" \
 	$@

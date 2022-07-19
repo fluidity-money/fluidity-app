@@ -100,4 +100,5 @@ docker-compose \
 	-f "$automation_dir/docker-compose.ethereum-connectors.yml" \
 	-f "$automation_dir/docker-compose.ethereum-hardhat.yml" \
 	-f "$automation_dir/docker-compose.ethereum-worker-hardhat.yml" \
+	-f "$automation_dir/docker-compose.ethereum-application-server.yml" \
 	$@
