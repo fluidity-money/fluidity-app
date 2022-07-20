@@ -29,9 +29,10 @@ pub enum FluidityInstruction {
 }
 
 #[derive(Deserialize, Debug)]
-struct DevnetAccount {
-    pub public_key: String,
-    pub private_key: [u8; 32],
+#[allow(non_snake_case)]
+pub struct DevnetAccount {
+    pub publicKey: String,
+    pub privateKey: Vec<u8>,
     #[serde(skip)]
     pub keypair: Option<Keypair>,
     #[serde(skip)]
@@ -44,13 +45,13 @@ struct DevnetAccount {
 
 impl DevnetAccount {
     pub fn get_public_key(&self) -> Pubkey {
-        Pubkey::from_str(&self.public_key).unwrap()
+        Pubkey::from_str(&self.publicKey).unwrap()
     }
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(transparent)]
-struct DevnetAccounts {
+pub struct DevnetAccounts {
     pub accounts: Vec<DevnetAccount>,
 }
 
@@ -66,9 +67,7 @@ impl DevnetAccounts {
         let tvl_data_seed = "FLU:TVL_DATA";
 
         for account in self.accounts.iter_mut() {
-            let acc_keypair = keypair::keypair_from_seed(&account.private_key).unwrap();
-
-            account.keypair = Some(acc_keypair);
+            let acc_keypair = keypair::keypair_from_seed(&account.privateKey).unwrap();
 
             account.tvl_data_account = Some(
                 Pubkey::create_with_seed(&acc_keypair.pubkey(), &tvl_data_seed, program_id)
@@ -85,6 +84,8 @@ impl DevnetAccounts {
                 &acc_keypair.pubkey(),
                 &Pubkey::from_str(fluidity_mint).unwrap(),
             ));
+
+            account.keypair = Some(acc_keypair);
         }
     }
 }
@@ -93,7 +94,8 @@ impl DevnetAccounts {
 #[allow(non_snake_case)]
 pub struct ConfigOptions {
     pub solana_node_address: String,
-    pub solana_id_path: String,
+    #[serde(rename = "solana_accounts")]
+    pub solana_accounts_file: String,
     #[serde(skip)]
     pub accounts: Vec<DevnetAccount>,
     #[serde(rename = "slnd_common")]
@@ -142,9 +144,11 @@ impl ConfigOptions {
             .unwrap()
             .to_string();
 
-        let mut accounts = DevnetAccounts::new(&self.solana_id_path);
+        let mut accounts = DevnetAccounts::new(&self.solana_accounts_file);
 
         accounts.derive_accounts(&program_id, &self.token_mint, &self.fluidity_mint);
+
+        self.accounts = accounts.accounts;
     }
 
     pub fn derive_solend_accounts(&mut self, solend_accounts: &SolendAccounts) {

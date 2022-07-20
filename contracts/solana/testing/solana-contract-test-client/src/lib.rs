@@ -69,7 +69,6 @@ mod tests {
         system_instruction, system_program, sysvar,
         transaction::Transaction,
     };
-    use spl_token::processor::Processor;
 
     use crate::accounts::FluidityData;
 
@@ -85,9 +84,9 @@ mod tests {
 
         let fluid_contract = instructions::FluidContract::new(&config.program_id);
 
-        let payer = config.accounts[0];
+        let payer = &config.accounts[0];
 
-        let market = solend_accounts.markets[0];
+        let market = &solend_accounts.markets[0];
 
         let mint_account_seed = format!("FLU:{}_OBLIGATION", config.token_name);
         let (_, bump_seed) = Pubkey::find_program_address(
@@ -97,29 +96,20 @@ mod tests {
 
         // init obligation
         let init_obligation_accs = instructions::InitObligationInstructionAccountMetas {
-            payer_pubkey: AccountMeta::new(payer.keypair.unwrap().pubkey(), true),
-            collateral_mint: AccountMeta::new(
-                Pubkey::from_str(&config.pda_collateral.unwrap()).unwrap(),
-                true,
-            ),
-            solend_program: AccountMeta::new(
-                Pubkey::from_str(&solend_accounts.programID).unwrap(),
-                false,
-            ),
+            payer_pubkey: AccountMeta::new(payer.get_public_key(), true),
+            collateral_mint: AccountMeta::new(accounts::collateral_account(&config), true),
+            solend_program: AccountMeta::new(accounts::solend_program(&solend_accounts), false),
             system_program: AccountMeta::new_readonly(system_program::ID, false),
-            obligation_account: AccountMeta::new(
-                Pubkey::from_str(&config.pda_obligation.unwrap()).unwrap(),
-                false,
-            ),
+            obligation_account: AccountMeta::new(accounts::obligation_account(&config), false),
             lending_market: AccountMeta::new(Pubkey::from_str(&market.address).unwrap(), false),
-            pda_pubkey: AccountMeta::new(Pubkey::from_str(&config.pda_account).unwrap(), false),
+            pda_pubkey: AccountMeta::new(accounts::pda(&config), false),
             clock_program: AccountMeta::new_readonly(sysvar::clock::ID, false),
             rent_program: AccountMeta::new_readonly(sysvar::rent::ID, false),
             token_program: AccountMeta::new_readonly(spl_token::ID, false),
         };
 
         let init_obligation_args = instructions::InitObligationInstructionArgs {
-            token_name: config.token_name,
+            token_name: config.token_name.clone(),
             bump_seed,
             space: std::mem::size_of::<u64>() as u64,
             lamports: client
@@ -133,15 +123,15 @@ mod tests {
         assert!(send_instruction(
             &client,
             init_obligation_inst,
-            payer.keypair.unwrap().pubkey(),
-            vec![&payer.keypair.unwrap()]
+            payer.get_public_key(),
+            vec![&payer.keypair.as_ref().unwrap()]
         )
         .is_ok());
 
         // Init data
         let init_data_accs = instructions::InitDataInstructionAccountMetas {
             system_program: AccountMeta::new_readonly(system_program::ID, false),
-            payer_pubkey: AccountMeta::new(payer.keypair.unwrap().pubkey(), false),
+            payer_pubkey: AccountMeta::new(payer.get_public_key(), false),
             data_pubkey: AccountMeta::new(accounts::data_account(&config), false),
             token_mint: AccountMeta::new(accounts::base_token(&config, &solend_accounts), false),
             fluid_mint: AccountMeta::new(accounts::fluid_token(&config), false),
@@ -149,7 +139,7 @@ mod tests {
         };
 
         let init_data_args = instructions::InitDataInstructionArgs {
-            token_name: config.token_name,
+            token_name: config.token_name.clone(),
             bump_seed,
             space: std::mem::size_of::<u64>() as u64,
             lamports: client
@@ -161,18 +151,18 @@ mod tests {
 
         assert!(send_instruction(
             &client,
-            init_obligation_inst,
-            payer.keypair.unwrap().pubkey(),
-            vec![&payer.keypair.unwrap()]
+            init_data_inst,
+            payer.get_public_key(),
+            vec![&payer.keypair.as_ref().unwrap()]
         )
         .is_ok());
 
         // Wrap
-        let wrapping_user = config.accounts[1];
+        let wrapping_user = &config.accounts[1];
 
         // Init tvl data
         let init_tvl_data_args = instructions::InitTvlDataInstructionArgs {
-            payer_pubkey: wrapping_user.keypair.unwrap().pubkey(),
+            payer_pubkey: wrapping_user.get_public_key(),
             tvl_data_pubkey: payer.tvl_data_account.unwrap(),
             space: std::mem::size_of::<u64>() as u64,
             lamports: client
@@ -185,8 +175,8 @@ mod tests {
         assert!(send_instruction(
             &client,
             init_tvl_data_inst,
-            payer.keypair.unwrap().pubkey(),
-            vec![&payer.keypair.unwrap()]
+            payer.get_public_key(),
+            vec![&payer.keypair.as_ref().unwrap()]
         )
         .is_ok());
 
@@ -249,7 +239,7 @@ mod tests {
 
         let wrap_args = instructions::WrapInstructionArgs {
             amount: wrap_amt,
-            token_name: config.token_name,
+            token_name: config.token_name.clone(),
             bump_seed,
         };
 
@@ -258,8 +248,8 @@ mod tests {
         assert!(send_instruction(
             &client,
             wrap_inst,
-            payer.keypair.unwrap().pubkey(),
-            vec![&payer.keypair.unwrap()]
+            wrapping_user.get_public_key(),
+            vec![&wrapping_user.keypair.as_ref().unwrap()]
         )
         .is_ok());
 
