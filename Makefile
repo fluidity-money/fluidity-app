@@ -32,3 +32,6 @@ semgrep:
 
 test: semgrep
 	@${GO_TEST} ./...
+
+lint: semgrep
+	@${GO_FMT} ./...
