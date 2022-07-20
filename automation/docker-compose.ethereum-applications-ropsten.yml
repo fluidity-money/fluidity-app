@@ -4,7 +4,7 @@ version: "3"
 services:
   microservice-ethereum-application-server-usdt:
     build:
-      context: ../cmd/microservice-solana-application-server
+      context: ../cmd/microservice-ethereum-application-server
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-application-server-usdt
@@ -19,7 +19,7 @@ services:
 
   microservice-ethereum-application-server-usdc:
     build:
-      context: ../cmd/microservice-solana-application-server
+      context: ../cmd/microservice-ethereum-application-server
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-application-server-usdc
@@ -34,7 +34,7 @@ services:
 
   microservice-ethereum-application-server-dai:
     build:
-      context: ../cmd/microservice-solana-application-server
+      context: ../cmd/microservice-ethereum-application-server
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-application-server-dai
