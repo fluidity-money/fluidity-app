@@ -5,4 +5,4 @@ FLU_FLUID_MINT=Fbh3uayN1m9pmDfSYwEWGNvJQ1GdWFSuiDdGitw6nJg \
   SOLANA_ID_PATH=$HOME/.config/solana/id.json \
   SOLANA_NODE_ADDRESS=https://api.devnet.solana.com \
   SLND_COMMON=devnet.json \
-  cargo run $@
+  cargo test

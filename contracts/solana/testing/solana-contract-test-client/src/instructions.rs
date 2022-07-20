@@ -1,138 +1,12 @@
+use serde_json::from_str;
 use solana_sdk::{
     instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
     system_instruction,
 };
+use std::str::FromStr;
 
-use crate::utils::{ConfigOptions, FluidityInstruction, SolendAccounts};
-
-mod accounts {
-    use crate::utils::{ConfigOptions, SolendAccounts};
-    use solana_sdk::pubkey::Pubkey;
-    use std::str::FromStr;
-
-    pub fn program_id(config: &ConfigOptions) -> Pubkey {
-        Pubkey::from_str(&config.program_id).unwrap()
-    }
-
-    pub fn data_account(config: &ConfigOptions) -> Pubkey {
-        Pubkey::from_str(&config.data_account).unwrap()
-    }
-
-    pub fn base_token(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(
-            &solend_accounts
-                .assets
-                .iter()
-                .find(|r| r.symbol == config.token_name)
-                .unwrap()
-                .mintAddress,
-        )
-        .unwrap()
-    }
-
-    pub fn fluid_token(config: &ConfigOptions) -> Pubkey {
-        Pubkey::from_str(&config.fluidity_mint).unwrap()
-    }
-
-    pub fn pda(config: &ConfigOptions) -> Pubkey {
-        Pubkey::from_str(&config.pda_account).unwrap()
-    }
-
-    pub fn collateral_account(config: &ConfigOptions) -> Pubkey {
-        Pubkey::from_str(&config.pda_collateral.as_ref().unwrap()).unwrap()
-    }
-
-    pub fn obligation_account(config: &ConfigOptions) -> Pubkey {
-        Pubkey::from_str(&config.pda_obligation.as_ref().unwrap()).unwrap()
-    }
-
-    pub fn reserve(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(
-            &solend_accounts.markets[0]
-                .reserves
-                .iter()
-                .find(|r| r.asset == config.token_name)
-                .unwrap()
-                .address,
-        )
-        .unwrap()
-    }
-
-    pub fn reserve_liquidity(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(
-            &solend_accounts.markets[0]
-                .reserves
-                .iter()
-                .find(|r| r.asset == config.token_name)
-                .unwrap()
-                .liquidityAddress,
-        )
-        .unwrap()
-    }
-
-    pub fn collateral_mint(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(
-            &solend_accounts.markets[0]
-                .reserves
-                .iter()
-                .find(|r| r.asset == config.token_name)
-                .unwrap()
-                .collateralMintAddress,
-        )
-        .unwrap()
-    }
-
-    pub fn collateral_supply(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(
-            &solend_accounts.markets[0]
-                .reserves
-                .iter()
-                .find(|r| r.asset == config.token_name)
-                .unwrap()
-                .collateralSupplyAddress,
-        )
-        .unwrap()
-    }
-
-    pub fn pyth_account(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(
-            &solend_accounts
-                .oracle
-                .assets
-                .iter()
-                .find(|r| r.asset == config.token_name)
-                .unwrap()
-                .priceAddress,
-        )
-        .unwrap()
-    }
-
-    pub fn switchboard_account(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(
-            &solend_accounts
-                .oracle
-                .assets
-                .iter()
-                .find(|r| r.asset == config.token_name)
-                .unwrap()
-                .switchboardFeedAddress,
-        )
-        .unwrap()
-    }
-
-    pub fn solend_program(solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(&solend_accounts.programID).unwrap()
-    }
-
-    pub fn lending_market(solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(&solend_accounts.markets[0].address).unwrap()
-    }
-
-    pub fn market_authority(solend_accounts: &SolendAccounts) -> Pubkey {
-        Pubkey::from_str(&solend_accounts.markets[0].authorityAddress).unwrap()
-    }
-}
+use crate::accounts::{ConfigOptions, FluidityInstruction, SolendAccounts};
 
 pub struct WrapInstructionAccountMetas {
     fluidity_data_account: AccountMeta,
@@ -284,8 +158,10 @@ pub struct FluidContract {
 }
 
 impl FluidContract {
-    pub fn new(program_id: Pubkey) -> Self {
-        FluidContract { program_id }
+    pub fn new(program_id: &str) -> Self {
+        FluidContract {
+            program_id: Pubkey::from_str(program_id).unwrap(),
+        }
     }
 
     pub fn wrap(

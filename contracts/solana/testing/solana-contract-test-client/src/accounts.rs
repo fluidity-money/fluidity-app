@@ -35,11 +35,17 @@ struct DevnetAccount {
     #[serde(skip)]
     pub keypair: Option<Keypair>,
     #[serde(skip)]
-    pub base_token_account: Option<String>,
+    pub base_token_account: Option<Pubkey>,
     #[serde(skip)]
-    pub fluid_token_account: Option<String>,
+    pub fluid_token_account: Option<Pubkey>,
     #[serde(skip)]
-    pub tvl_data_account: Option<String>,
+    pub tvl_data_account: Option<Pubkey>,
+}
+
+impl DevnetAccount {
+    pub fn get_public_key(&self) -> Pubkey {
+        Pubkey::from_str(&self.public_key).unwrap()
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -66,26 +72,19 @@ impl DevnetAccounts {
 
             account.tvl_data_account = Some(
                 Pubkey::create_with_seed(&acc_keypair.pubkey(), &tvl_data_seed, program_id)
-                    .unwrap()
-                    .to_string(),
+                    .unwrap(),
             );
 
             // if not provided, figure out token accounts
-            account.base_token_account = Some(
-                get_associated_token_address(
-                    &acc_keypair.pubkey(),
-                    &Pubkey::from_str(token_mint).unwrap(),
-                )
-                .to_string(),
-            );
+            account.base_token_account = Some(get_associated_token_address(
+                &acc_keypair.pubkey(),
+                &Pubkey::from_str(token_mint).unwrap(),
+            ));
 
-            account.fluid_token_account = Some(
-                get_associated_token_address(
-                    &acc_keypair.pubkey(),
-                    &Pubkey::from_str(fluidity_mint).unwrap(),
-                )
-                .to_string(),
-            );
+            account.fluid_token_account = Some(get_associated_token_address(
+                &acc_keypair.pubkey(),
+                &Pubkey::from_str(fluidity_mint).unwrap(),
+            ));
         }
     }
 }
@@ -143,7 +142,7 @@ impl ConfigOptions {
             .unwrap()
             .to_string();
 
-        let accounts = DevnetAccounts::new(&self.solana_id_path);
+        let mut accounts = DevnetAccounts::new(&self.solana_id_path);
 
         accounts.derive_accounts(&program_id, &self.token_mint, &self.fluidity_mint);
     }
@@ -245,4 +244,126 @@ impl SolendAccounts {
             Err(e) => panic!("Failed to load Solend accounts: {:#?}", e),
         }
     }
+}
+
+pub fn program_id(config: &ConfigOptions) -> Pubkey {
+    Pubkey::from_str(&config.program_id).unwrap()
+}
+
+pub fn data_account(config: &ConfigOptions) -> Pubkey {
+    Pubkey::from_str(&config.data_account).unwrap()
+}
+
+pub fn base_token(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(
+        &solend_accounts
+            .assets
+            .iter()
+            .find(|r| r.symbol == config.token_name)
+            .unwrap()
+            .mintAddress,
+    )
+    .unwrap()
+}
+
+pub fn fluid_token(config: &ConfigOptions) -> Pubkey {
+    Pubkey::from_str(&config.fluidity_mint).unwrap()
+}
+
+pub fn pda(config: &ConfigOptions) -> Pubkey {
+    Pubkey::from_str(&config.pda_account).unwrap()
+}
+
+pub fn collateral_account(config: &ConfigOptions) -> Pubkey {
+    Pubkey::from_str(&config.pda_collateral.as_ref().unwrap()).unwrap()
+}
+
+pub fn obligation_account(config: &ConfigOptions) -> Pubkey {
+    Pubkey::from_str(&config.pda_obligation.as_ref().unwrap()).unwrap()
+}
+
+pub fn reserve(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(
+        &solend_accounts.markets[0]
+            .reserves
+            .iter()
+            .find(|r| r.asset == config.token_name)
+            .unwrap()
+            .address,
+    )
+    .unwrap()
+}
+
+pub fn reserve_liquidity(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(
+        &solend_accounts.markets[0]
+            .reserves
+            .iter()
+            .find(|r| r.asset == config.token_name)
+            .unwrap()
+            .liquidityAddress,
+    )
+    .unwrap()
+}
+
+pub fn collateral_mint(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(
+        &solend_accounts.markets[0]
+            .reserves
+            .iter()
+            .find(|r| r.asset == config.token_name)
+            .unwrap()
+            .collateralMintAddress,
+    )
+    .unwrap()
+}
+
+pub fn collateral_supply(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(
+        &solend_accounts.markets[0]
+            .reserves
+            .iter()
+            .find(|r| r.asset == config.token_name)
+            .unwrap()
+            .collateralSupplyAddress,
+    )
+    .unwrap()
+}
+
+pub fn pyth_account(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(
+        &solend_accounts
+            .oracle
+            .assets
+            .iter()
+            .find(|r| r.asset == config.token_name)
+            .unwrap()
+            .priceAddress,
+    )
+    .unwrap()
+}
+
+pub fn switchboard_account(config: &ConfigOptions, solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(
+        &solend_accounts
+            .oracle
+            .assets
+            .iter()
+            .find(|r| r.asset == config.token_name)
+            .unwrap()
+            .switchboardFeedAddress,
+    )
+    .unwrap()
+}
+
+pub fn solend_program(solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(&solend_accounts.programID).unwrap()
+}
+
+pub fn lending_market(solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(&solend_accounts.markets[0].address).unwrap()
+}
+
+pub fn market_authority(solend_accounts: &SolendAccounts) -> Pubkey {
+    Pubkey::from_str(&solend_accounts.markets[0].authorityAddress).unwrap()
 }
