@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	// EnvContractAddress is the application contract
+	// EnvContractAddress is the Fluid token contract
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
