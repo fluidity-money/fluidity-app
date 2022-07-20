@@ -566,8 +566,12 @@ func main() {
 				gasLimit          = transfer.Transaction.Gas
 				transferType      = transfer.Transaction.Type
 				gasTipCap         = transfer.Transaction.GasTipCap
-				applicationFeeUsd = transfer.Decorator.ApplicationFee
+				applicationFeeUsd *big.Rat
 			)
+
+			if transfer.Decorator != nil {
+				applicationFeeUsd = transfer.Decorator.ApplicationFee
+			}
 
 			var (
 				gasTipCapRat = bigIntToRat(gasTipCap)
