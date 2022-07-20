@@ -9,6 +9,8 @@ import { ethers } from "ethers";
 import { useContext } from "react";
 import { notificationContext } from "components/Notifications/notificationContext";
 import { appTheme } from "util/appTheme";
+import { getContract } from "util/contractUtils";
+import { useSigner } from "util/hooks";
 
 const PendingWinsModal = ({
   enable,
@@ -25,10 +27,11 @@ const PendingWinsModal = ({
 }) => {
   const { addError } = useContext(notificationContext);
 
-  const sendPendingWin = async (hash: string) => {
+  const sendPendingWin = async (shortName: string) => {
     // fetch signed reward body
-    const { signature } = await apiPOSTBody("/manual-reward", {
-      transaction_hash: hash,
+    const { reward, signature } = await apiPOSTBody("/manual-reward", {
+      address: '0x123',
+      token_short_name: shortName,
     });
 
     // convert B64 -> []byte -> hex string
@@ -37,7 +40,8 @@ const PendingWinsModal = ({
 
     // send signed txn
     try {
-      await provider.sendTransaction(hexSignature);
+      // TODO
+      // contract.manualReward(reward.winner, reward.win_amount, reward.first_block, reward.last_block, signature);
     } catch (e: any) {
       addError(e?.message as string);
     }
@@ -55,17 +59,14 @@ const PendingWinsModal = ({
           you can redeem them manually now by clicking on one
         </div>
         <div className="connect-modal-form">
-          {pendingWins.map((win) => (
+          {Object.values(pendingWins).map((win) => (
             <div
-              onClick={() => sendPendingWin(win.transaction_hash)}
+              onClick={() => sendPendingWin(win.token_details.token_short_name)}
               style={{ color: "white" }}
             >
-              {win.transaction_hash + " "}
-              {win.from_address + " "}
-              {win.to_address + " "}
               {win.token_details.token_short_name + " "}
               {formatAmount(
-                win.winning_amount,
+                win.amount,
                 win.token_details.token_decimals,
                 2
               ) + " "}

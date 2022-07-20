@@ -64,6 +64,7 @@ const FLUID_TOKEN_ABI = [
   "function erc20Out(uint amount) public returns (bool success)",
   "function balanceOf(address account) public view returns (uint256)",
   "function transfer(address recipient, uint256 amount) public returns (bool)",
+  "function manualReward(address winner, uint256 amount, uint256 firstBlock, uint256 lastBlock, bytes memory sig)",
   "event Transfer(address indexed from, address indexed to, uint256 val)",
 ];
 

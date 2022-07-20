@@ -3,6 +3,7 @@ package api_fluidity_money
 import (
 	"crypto/ecdsa"
 	"encoding/json"
+	"math/big"
 	"net/http"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -12,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
@@ -24,11 +26,21 @@ type (
 		TokenShortName string `json:"token_short_name"`
 	}
 
+	// ManualRewardArg to hold the arguments to call the manual reward
+	// solidity function with
+	ManualRewardArg struct {
+		Token      token_details.TokenDetails `json:"token_details"`
+		Winner     string                     `json:"winner"`
+		WinAmount  *big.Int                   `json:"win_amount"`
+		FirstBlock *big.Int                   `json:"first_block"`
+		LastBlock  *big.Int                   `json:"last_block"`
+	}
+
 	// ManualRewardPayload is part of the message sent to users
 	// as a reply to the manual reward route
 	ManualRewardPayload struct {
-		Reward    fluidity.RewardArg `json:"reward"`
-		Signature []byte             `json:"signature"`
+		Reward    ManualRewardArg `json:"reward"`
+		Signature []byte          `json:"signature"`
 	}
 
 	// ResponseManualReward is the API response type for the
@@ -52,8 +64,8 @@ func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, reward wo
 		amountInt     = reward.WinAmount
 		firstBlockInt = reward.FirstBlock
 		lastBlockInt  = reward.LastBlock
-
-		shortName = reward.Token.TokenShortName
+		tokenDetails  = reward.Token
+		shortName     = tokenDetails.TokenShortName
 	)
 
 	signer, exists := signers[shortName]
@@ -96,12 +108,16 @@ func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, reward wo
 		})
 	}
 
-	rewardArg := fluidity.RewardArg{
+	rewardArgs := ManualRewardArg {
+		Token: tokenDetails,
+		Winner: winnerString,
 		WinAmount: amount,
+		FirstBlock: firstBlock,
+		LastBlock: lastBlock,
 	}
 
 	container := ManualRewardPayload{
-		Reward:    rewardArg,
+		Reward: rewardArgs,
 		Signature: sig,
 	}
 
