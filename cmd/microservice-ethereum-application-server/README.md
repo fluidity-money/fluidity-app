@@ -7,6 +7,11 @@ worker with additional information attached.
 Supported contracts:
   - Uniswap V2
   - Balancer V2 (Swap)
+  - OneInch
+    - LP V1
+    - LP V2
+    - Fixed Rate Swap
+    - Mooniswap
     
 ## Integrating a new application
 
