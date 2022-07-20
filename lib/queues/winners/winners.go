@@ -17,10 +17,10 @@ const (
 
 	// TopicWinnersSolana to broadcast winner messages containing a single
 	// winner and their amount won
-	TopicWinnersSolana   = `winners.` + string(network.NetworkSolana)
+	TopicWinnersSolana = `winners.` + string(network.NetworkSolana)
 
 	// subWinnersAll to subscribe to winner messages from either network
-	subWinnersAll        = `winners.*`
+	subWinnersAll = `winners.*`
 )
 
 type (
@@ -49,4 +49,3 @@ func WinnersSolana(f func(Winner)) {
 func WinnersAll(f func(Winner)) {
 	winners(subWinnersAll, f)
 }
-

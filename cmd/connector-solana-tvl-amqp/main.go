@@ -88,9 +88,9 @@ func main() {
 		k.Format("Got TVL from chain: %d", tvl)
 	})
 
-	tvlContainer := idoQueue.TvlUpdateContainer {
-		Tvl: tvl,
-		Network: network.NetworkSolana,
+	tvlContainer := idoQueue.TvlUpdateContainer{
+		Tvl:             tvl,
+		Network:         network.NetworkSolana,
 		ContractAddress: fluidityPubkey.String(),
 	}
 

@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -11,7 +12,6 @@ import (
 	prize_pool_queue "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/common/solana"
 
 	solanaGo "github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"

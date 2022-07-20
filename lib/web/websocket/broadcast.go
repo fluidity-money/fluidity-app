@@ -57,7 +57,6 @@ func NewBroadcast() *Broadcast {
 					k.Payload = string(message)
 				})
 
-
 				for cookie, subscribed := range broadcast.subscribed {
 
 					if subscribed == nil {

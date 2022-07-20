@@ -72,7 +72,7 @@ func main() {
 	}
 
 	if solanaTokensList_ != "" {
-		solanaTokensList   = util.GetTokensListBase(solanaTokensList_)
+		solanaTokensList = util.GetTokensListBase(solanaTokensList_)
 	}
 
 	today := time.Now()

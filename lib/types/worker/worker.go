@@ -76,4 +76,3 @@ type (
 		} `json:"winning_chances"`
 	}
 )
-

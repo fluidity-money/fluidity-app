@@ -14,10 +14,10 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 )
@@ -31,7 +31,7 @@ const (
 	// is aave based
 	BackendAave = "aave"
 
-	// BackendAurora to use as the environment variable for Aurora 
+	// BackendAurora to use as the environment variable for Aurora
 	// to use Flux as a price oracle
 	BackendAurora = "aurora"
 )

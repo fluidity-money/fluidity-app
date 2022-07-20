@@ -53,10 +53,10 @@ func sendRewards(queueName string, token token_details.TokenDetails) {
 	spooledRewards, err := ethereum.BatchWinningsByUser(transactions, token)
 
 	if err != nil {
-	    log.Fatal(func(k *log.Log) {
-	        k.Message = "Failed to batch rewards!"
-	        k.Payload = err
-	    })
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to batch rewards!"
+			k.Payload = err
+		})
 	}
 
 	rewards := make([]worker.EthereumSpooledRewards, len(spooledRewards))

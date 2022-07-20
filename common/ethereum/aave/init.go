@@ -33,4 +33,3 @@ func init() {
 		panic(err)
 	}
 }
-

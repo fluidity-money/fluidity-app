@@ -12,13 +12,13 @@ import (
 
 const (
 	// VariantTransfer to transfer an amount to a user
-	VariantTransfer        = 3
+	VariantTransfer = 3
 
 	// VariantMintTo to mint tokens to a user
-	VariantMintTo          = 7
+	VariantMintTo = 7
 
 	// VariantBurn to burn tokens from a user
-	VariantBurn            = 8
+	VariantBurn = 8
 
 	// VariantTransferChecked to transfer an amount,
 	// verifying the expected token decimals
@@ -171,4 +171,3 @@ func SendTransfer(solanaClient *solanaRpc.Client, senderPdaAddress, recipientAdd
 
 	return signatureString, nil
 }
-

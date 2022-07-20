@@ -13,25 +13,25 @@ import (
 type FaucetSupportedToken string
 
 const (
-	TokenfUSDT  FaucetSupportedToken = `fUSDT`
-	TokenfUSDC  FaucetSupportedToken = `fUSDC`
-	TokenfDAI   FaucetSupportedToken = `fDAI`
+	TokenfUSDT FaucetSupportedToken = `fUSDT`
+	TokenfUSDC FaucetSupportedToken = `fUSDC`
+	TokenfDAI  FaucetSupportedToken = `fDAI`
 )
 
 type (
 	// FaucetUser and the last time that they used the faucet
 	FaucetUser struct {
-		Address       string                    `json:"address"`
+		Address string `json:"address"`
 
 		// UniqueAddress that must be tweeted to use the faucet
-		UniqueAddress string                    `json:"unique_address"`
+		UniqueAddress string `json:"unique_address"`
 
-		IpAddress     string                    `json:"ip_address"`
-		Network       network.BlockchainNetwork `json:"network"`
-		LastUsed      time.Time                 `json:"last_used"`
+		IpAddress string                    `json:"ip_address"`
+		Network   network.BlockchainNetwork `json:"network"`
+		LastUsed  time.Time                 `json:"last_used"`
 
 		// TokenName for the type of token this address is related to
-		TokenName     FaucetSupportedToken      `json:"token_name"`
+		TokenName FaucetSupportedToken `json:"token_name"`
 	}
 
 	// FaucetRequest that's sent on our wire to make sure that a user gets a
@@ -45,10 +45,10 @@ type (
 	}
 )
 
-func (token FaucetSupportedToken) TokenDecimals() (int64, error) {	
+func (token FaucetSupportedToken) TokenDecimals() (int64, error) {
 	switch token {
 	case TokenfDAI:
-		return 18, nil 
+		return 18, nil
 	case TokenfUSDC:
 		return 6, nil
 	case TokenfUSDT:

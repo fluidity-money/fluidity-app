@@ -14,7 +14,7 @@ const NetworkEthereum = `ethereum`
 func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, details token_details.TokenDetails, when time.Time) winners.Winner {
 	var (
 		address = rewardData.Winner.String()
-		amount = *rewardData.Amount
+		amount  = *rewardData.Amount
 	)
 
 	winner := winners.Winner{

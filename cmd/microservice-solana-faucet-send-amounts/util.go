@@ -39,8 +39,8 @@ func (tokenDetails tokenMap) addAccountDetails(accountDetailsList_ string) {
 		accountSeparated := strings.Split(account_, ":")
 
 		if len(accountSeparated) != 3 {
-			log.Fatal(func (k *log.Log) {
-			    k.Format(
+			log.Fatal(func(k *log.Log) {
+				k.Format(
 					"Invalid account details! Expected the form PDA:NAME:PRIKEY, got %s!",
 					accountSeparated,
 				)
@@ -66,28 +66,28 @@ func (tokenDetails tokenMap) addAccountDetails(accountDetailsList_ string) {
 		wallet, err := solana.WalletFromPrivateKeyBase58(accountSeparated[2])
 
 		if err != nil {
-		    log.Fatal(func (k *log.Log) {
-		        k.Format(
+			log.Fatal(func(k *log.Log) {
+				k.Format(
 					"Failed to create a wallet for %s!",
 					tokenName,
 				)
 
-		        k.Payload = err
-		    })
+				k.Payload = err
+			})
 		}
 
 		details, ok := tokenDetails[tokenName]
 
 		if !ok {
-			log.Fatal(func (k *log.Log) {
-			    k.Format(
+			log.Fatal(func(k *log.Log) {
+				k.Format(
 					"Token %s has account details but not token details!",
 					tokenName,
 				)
 			})
 		}
 
-		details.pdaPubkey    = pdaPubkey
+		details.pdaPubkey = pdaPubkey
 		details.signerWallet = wallet
 
 		tokenDetails[tokenName] = details

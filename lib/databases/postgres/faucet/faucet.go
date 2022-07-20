@@ -67,7 +67,7 @@ func GetUniqueAddress(address string) string {
 // InsertFaucetUser, not including the last used field
 func InsertFaucetUser(faucetUser FaucetUser) {
 	// insert a copy for each token we support
-	// TODO this is a hack - would be better to have an enumerable list 
+	// TODO this is a hack - would be better to have an enumerable list
 	// of supported tokens that isn't hardcoded here
 	var tokens []string
 	if faucetUser.Network == network.NetworkEthereum {
@@ -155,7 +155,7 @@ func GetFaucetLastUsedAndAddress(uniqueAddress string, network network.Blockchai
 
 	var (
 		lastUsedNullable sql.NullTime
-		address  string
+		address          string
 	)
 
 	err := resultRow.Scan(&lastUsedNullable, &address)

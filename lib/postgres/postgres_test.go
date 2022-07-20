@@ -18,5 +18,5 @@ func TestClientChannel(t *testing.T) {
 	assert.Eventually(t, func() bool {
 		Client()
 		return true
-	}, time.Second, time.Millisecond * 10, "DB channel opened, but client initialisation didn't return a result!")
+	}, time.Second, time.Millisecond*10, "DB channel opened, but client initialisation didn't return a result!")
 }

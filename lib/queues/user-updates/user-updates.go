@@ -8,8 +8,8 @@ import (
 )
 
 const (
-    TopicUserUpdatesEthereum = `user_updates.ethereum`
-    TopicUserUpdatesSolana = `user_updates.solana`
+	TopicUserUpdatesEthereum = `user_updates.ethereum`
+	TopicUserUpdatesSolana   = `user_updates.solana`
 )
 
 type Update = user_updates.Update
