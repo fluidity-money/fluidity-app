@@ -43,8 +43,11 @@ frontend: ${FRONTEND_BUILD}
 
 docker-backend: ${BACKEND_SRC}
 	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
 		-t "${ORG_ROOT}/${REPO}-backend" \
 		-f Dockerfile.backend \
 		.
 
 	@touch docker-backend
+
+

@@ -27,7 +27,7 @@ test: ${GO_FILES} semgrep
 	@touch test
 
 docker: ${GO_FILES} Dockerfile Makefile
-	@${DOCKER_BUILD} -t "${ORG_ROOT}/${REPO}" .
+	@${DOCKER_BUILD} ${DOCKERFLAGS} -t "${ORG_ROOT}/${REPO}" .
 	@touch docker
 
 build: ${REPO}
