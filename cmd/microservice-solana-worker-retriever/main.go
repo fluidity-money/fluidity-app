@@ -124,10 +124,10 @@ func main() {
 			})
 		}
 
-		payableBufferedTransfers := worker.SolanaWork {
+		payableBufferedTransfers := worker.SolanaWork{
 			BufferedTransfers: transfers,
-			Tvl:                tvl,
-			MintSupply:         mintSupply,
+			Tvl:               tvl,
+			MintSupply:        mintSupply,
 		}
 
 		queue.SendMessage(topicWrappedActionsQueue, payableBufferedTransfers)

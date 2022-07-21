@@ -12,9 +12,9 @@ const (
 	TopicEthereumServerWork        = "worker.server.work"
 	TopicEthereumApplicationEvents = "worker.ethereum.application.events"
 
-	TopicSolanaParsedTransactions  = "worker.solana.parsed_transactions"
-	TopicSolanaBufferedTransfers   = "worker.solana.buffered_transfers"
-	TopicSolanaServerWork          = "worker.solana.server.work"
+	TopicSolanaParsedTransactions = "worker.solana.parsed_transactions"
+	TopicSolanaBufferedTransfers  = "worker.solana.buffered_transfers"
+	TopicSolanaServerWork         = "worker.solana.server.work"
 
 	TopicEmissions = "worker.emissions"
 )

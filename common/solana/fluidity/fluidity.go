@@ -43,4 +43,3 @@ type (
 		BumpSeed  uint8
 	}
 )
-

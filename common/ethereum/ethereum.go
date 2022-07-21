@@ -98,11 +98,11 @@ func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *et
 
 // Calls a method on a bound contract, first simulating it to see if it reverts
 func MakeTransaction(contract *ethAbiBind.BoundContract, opts *ethAbiBind.TransactOpts, method string, args ...interface{}) (*ethTypes.Transaction, error) {
-	callOptions := ethAbiBind.CallOpts {
-		Pending: false,
-		From: opts.From,
+	callOptions := ethAbiBind.CallOpts{
+		Pending:     false,
+		From:        opts.From,
 		BlockNumber: nil,
-		Context: opts.Context,
+		Context:     opts.Context,
 	}
 
 	err := contract.Call(

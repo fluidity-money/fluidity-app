@@ -70,8 +70,8 @@ var fluidityContractAbi ethAbi.ABI
 
 // the Reward struct from solidity, to be passed to batchReward
 type RewardArg struct {
-	Winner     ethCommon.Address `json:"from"`
-	WinAmount  *big.Int          `json:"amount"`
+	Winner    ethCommon.Address `json:"from"`
+	WinAmount *big.Int          `json:"amount"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -126,9 +126,9 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 	)
 
 	var (
-		rewards = make([]RewardArg, len(announcement))
+		rewards          = make([]RewardArg, len(announcement))
 		globalFirstBlock = new(big.Int)
-		globalLastBlock = new(big.Int)
+		globalLastBlock  = new(big.Int)
 	)
 
 	// set a default for the min block
@@ -136,15 +136,15 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 
 	for i, reward := range announcement {
 		var (
-			winnerString = reward.Winner.String()
-			amountInt = reward.WinAmount
+			winnerString  = reward.Winner.String()
+			amountInt     = reward.WinAmount
 			firstBlockInt = reward.FirstBlock
-			lastBlockInt = reward.LastBlock
+			lastBlockInt  = reward.LastBlock
 
-			winner = ethCommon.HexToAddress(winnerString)
-			amount = &amountInt.Int
+			winner     = ethCommon.HexToAddress(winnerString)
+			amount     = &amountInt.Int
 			firstBlock = &firstBlockInt.Int
-			lastBlock = &lastBlockInt.Int
+			lastBlock  = &lastBlockInt.Int
 		)
 
 		if firstBlock.Cmp(globalFirstBlock) < 0 {
@@ -155,8 +155,8 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 			globalLastBlock.Set(lastBlock)
 		}
 
-		rewardArg := RewardArg {
-			Winner: winner,
+		rewardArg := RewardArg{
+			Winner:    winner,
 			WinAmount: amount,
 		}
 
@@ -211,4 +211,3 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 
 	return transaction, nil
 }
-

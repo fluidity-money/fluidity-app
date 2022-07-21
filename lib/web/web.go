@@ -42,7 +42,7 @@ type HttpFunction func(http.ResponseWriter, *http.Request)
 func AuthenticatedEndpoint(endpoint, headerName string, validateFunc func(string) error, handler HttpFunction) {
 	http.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		var (
-			headers     = r.Header
+			headers = r.Header
 
 			headerValue = headers.Get(headerName)
 			ipAddress   = headers.Get(HeaderIpAddress)

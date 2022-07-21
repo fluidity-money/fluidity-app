@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 
+	ethCommon "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	ethQueue "github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
-	ethCommon "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethTypes "github.com/ethereum/go-ethereum/core/types"

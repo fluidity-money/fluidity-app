@@ -57,7 +57,7 @@ func HandleUpdateNotifications(updates chan Update) func(string, url.Values, <-c
 					update.UserAction.SenderAddress = update.UserAction.SolanaSenderOwnerAddress
 
 					isRecipient := userAccounts[update.UserAction.RecipientAddress]
-					isSender    := userAccounts[update.UserAction.SenderAddress]
+					isSender := userAccounts[update.UserAction.SenderAddress]
 
 					if !isRecipient && !isSender {
 						continue

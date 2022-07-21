@@ -12,9 +12,9 @@ import (
 func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpooledRewards, exists bool) worker.EthereumSpooledRewards {
 	var (
 		blockNumber = reward.BlockNumber
-		token = reward.TokenDetails
-		amount = reward.WinAmount
-		winner = reward.Winner
+		token       = reward.TokenDetails
+		amount      = reward.WinAmount
+		winner      = reward.Winner
 	)
 
 	if !exists {
@@ -53,7 +53,7 @@ func BatchWinningsByUser(winnings []worker.EthereumReward, expectedToken token_d
 
 	for _, reward := range winnings {
 		var (
-			token = reward.TokenDetails
+			token  = reward.TokenDetails
 			winner = reward.Winner
 		)
 
@@ -82,9 +82,9 @@ func BatchWinningsByToken(winnings []worker.EthereumReward, address ethereum.Add
 
 	for _, reward := range winnings {
 		var (
-			token = reward.TokenDetails
+			token     = reward.TokenDetails
 			tokenName = token.TokenShortName
-			winner = reward.Winner
+			winner    = reward.Winner
 		)
 
 		if winner != address {
@@ -104,4 +104,3 @@ func BatchWinningsByToken(winnings []worker.EthereumReward, address ethereum.Add
 
 	return spooledWinnings, nil
 }
-

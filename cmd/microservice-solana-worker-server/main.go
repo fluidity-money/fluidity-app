@@ -90,11 +90,11 @@ func main() {
 		message.Decode(&bufferedTransfers)
 
 		var (
-			transfers = bufferedTransfers.BufferedTransfers
-			mintSupply          = bufferedTransfers.MintSupply
-			tvl                 = bufferedTransfers.Tvl
-			fluidTransfers      = 0
-			emission            = workerTypes.NewSolanaEmission()
+			transfers      = bufferedTransfers.BufferedTransfers
+			mintSupply     = bufferedTransfers.MintSupply
+			tvl            = bufferedTransfers.Tvl
+			fluidTransfers = 0
+			emission       = workerTypes.NewSolanaEmission()
 		)
 
 		// emissions in this loop should only contain information relevant to the

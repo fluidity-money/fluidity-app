@@ -16,22 +16,22 @@ import (
 
 // callRewardArguments provided to callRewardFunction
 type callRewardArguments struct {
-	transactionOptions       *ethAbiBind.TransactOpts
-	containerAnnouncement    []worker.EthereumSpooledRewards
-	contractAddress          ethCommon.Address
-	client                   *ethclient.Client
-	useHardhatFix            bool
-	hardcodedGasLimit        uint64
+	transactionOptions    *ethAbiBind.TransactOpts
+	containerAnnouncement []worker.EthereumSpooledRewards
+	contractAddress       ethCommon.Address
+	client                *ethclient.Client
+	useHardhatFix         bool
+	hardcodedGasLimit     uint64
 }
 
 func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, error) {
 	var (
-		transactionOptions       = arguments.transactionOptions
-		containerAnnouncement    = arguments.containerAnnouncement
-		contractAddress          = arguments.contractAddress
-		client                   = arguments.client
-		useHardhatFix            = arguments.useHardhatFix
-		hardcodedGasLimit        = arguments.hardcodedGasLimit
+		transactionOptions    = arguments.transactionOptions
+		containerAnnouncement = arguments.containerAnnouncement
+		contractAddress       = arguments.contractAddress
+		client                = arguments.client
+		useHardhatFix         = arguments.useHardhatFix
+		hardcodedGasLimit     = arguments.hardcodedGasLimit
 	)
 
 	transactionOptions.GasLimit = hardcodedGasLimit

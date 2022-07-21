@@ -1,9 +1,9 @@
 package uniswap_anchored_view
 
 import (
-	"math/big"
-	"fmt"
 	"context"
+	"fmt"
+	"math/big"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"

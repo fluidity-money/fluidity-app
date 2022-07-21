@@ -5,12 +5,12 @@ package cookie
 // or a serialisation of a successful login cookie fails.
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/web"
-	"github.com/fluidity-money/fluidity-app/lib/state"
-	"github.com/fluidity-money/fluidity-app/lib/log"
-	"time"
-	"net/http"
 	"fmt"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/state"
+	"github.com/fluidity-money/fluidity-app/lib/web"
+	"net/http"
+	"time"
 )
 
 const (
@@ -26,7 +26,6 @@ const (
 	// HeaderAccessDenied sent when cookie access fails
 	HeaderAccessDenied = http.StatusUnauthorized
 )
-
 
 type (
 	// HttpFunctionState to use when taking requests which can overtly fail.
@@ -50,8 +49,8 @@ type (
 func Endpoint(endpoint, headerName, cookieBaseName string, handler HttpFunctionState) {
 	http.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		var (
-			headers = r.Header
-			ipAddress = headers.Get(web.HeaderIpAddress)
+			headers     = r.Header
+			ipAddress   = headers.Get(web.HeaderIpAddress)
 			headerValue = headers.Get(headerName)
 		)
 

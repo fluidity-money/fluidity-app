@@ -37,7 +37,7 @@ const SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 // extracts instructions and innerInstructions from a solana transaction
 func getAllInstructions(result solTypes.TransactionResult) []solTypes.TransactionInstruction {
 	var (
-		instructions = result.Transaction.Message.Instructions
+		instructions      = result.Transaction.Message.Instructions
 		innerInstructions = result.Meta.InnerInstructions
 	)
 
@@ -174,7 +174,7 @@ func main() {
 
 				if transfer1 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a transfer!"
+						k.Message = "Found a transfer!"
 					})
 
 					transfers = append(transfers, *transfer1)
@@ -183,7 +183,7 @@ func main() {
 
 				if transfer2 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a transfer!"
+						k.Message = "Found a transfer!"
 					})
 
 					transfers = append(transfers, *transfer2)
@@ -192,7 +192,7 @@ func main() {
 
 				if winner1 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a winner!"
+						k.Message = "Found a winner!"
 					})
 
 					queue.SendMessage(winners.TopicWinnersSolana, winner1)
@@ -200,7 +200,7 @@ func main() {
 
 				if winner2 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a winner!"
+						k.Message = "Found a winner!"
 					})
 
 					queue.SendMessage(winners.TopicWinnersSolana, winner2)
@@ -208,7 +208,7 @@ func main() {
 
 				if swapWrap != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a wrap!"
+						k.Message = "Found a wrap!"
 					})
 
 					bufferedUserActions = append(bufferedUserActions, *swapWrap)
@@ -216,7 +216,7 @@ func main() {
 
 				if swapUnwrap != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found an unwrap!"
+						k.Message = "Found an unwrap!"
 					})
 
 					bufferedUserActions = append(bufferedUserActions, *swapUnwrap)

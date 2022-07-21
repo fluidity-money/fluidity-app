@@ -31,7 +31,7 @@ func validArgInt64toUInt64Bigrat(args map[string]interface{}, key string) (*big.
 	}
 
 	uVal := uint64(val.(int))
-    return new(big.Rat).SetUint64(uVal), true
+	return new(big.Rat).SetUint64(uVal), true
 }
 
 func validArgInt(args map[string]interface{}, key string) (int, bool) {
@@ -49,7 +49,7 @@ func validArgString(args map[string]interface{}, key string) (string, bool) {
 		return "", false
 	}
 
-    return val.(string), true
+	return val.(string), true
 }
 
 func graphQLErrorLogHandler(w http.ResponseWriter, r *http.Request, msg []gqlerrors.FormattedError) {

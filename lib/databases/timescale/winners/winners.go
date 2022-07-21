@@ -127,7 +127,7 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 	for rows.Next() {
 		var (
-			winner Winner
+			winner                   Winner
 			solanaWinnerOwnerAddress sql.NullString
 		)
 

@@ -116,4 +116,3 @@ func NewEthereumEmission() *Emission {
 	emission.Network = "ethereum"
 	return emission
 }
-

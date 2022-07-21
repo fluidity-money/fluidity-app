@@ -6,7 +6,7 @@ package website
 // Sources that the user went through to submit a question to our database!
 const (
 	SourceLanding = "landing"
-	SourceFaucet = "faucet"
+	SourceFaucet  = "faucet"
 )
 
 // Question asked by a user using a frontend
@@ -19,7 +19,7 @@ type (
 	}
 
 	Subscription struct {
-		Email string `json:"email"`
+		Email  string `json:"email"`
 		Source string `json:"source"`
 	}
 )

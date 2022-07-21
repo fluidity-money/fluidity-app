@@ -3,11 +3,11 @@ package past_winnings
 // past_winnings is the aggregated number of winners for a day
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"fmt"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/past-winnings"
-	"fmt"
 )
 
 const (

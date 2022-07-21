@@ -22,15 +22,15 @@ const (
 
 // Channels that the user might post in
 const (
-	ChannelGeneral              = "#general"
-	ChannelDevops               = "#devops"
-	ChannelWebsite              = "#website"
-	ChannelQuestions            = "#questions"
-	ChannelWinnings             = "#winnings"
-	ChannelFaucetTweets         = "#faucet-tweets"
-	ChannelProductionFailures   = "#production-failures"
-	ChannelTopWinners           = "#top-winners"
-	ChannelPayroll              = "#payroll"
+	ChannelGeneral            = "#general"
+	ChannelDevops             = "#devops"
+	ChannelWebsite            = "#website"
+	ChannelQuestions          = "#questions"
+	ChannelWinnings           = "#winnings"
+	ChannelFaucetTweets       = "#faucet-tweets"
+	ChannelProductionFailures = "#production-failures"
+	ChannelTopWinners         = "#top-winners"
+	ChannelPayroll            = "#payroll"
 )
 
 // Levels of logging severity for Slack users to discern based on the border

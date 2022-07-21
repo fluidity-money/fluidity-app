@@ -25,7 +25,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 	timescaleClient := timescale.Client()
 
 	var (
-		tokenDetails       = winner.TokenDetails
+		tokenDetails = winner.TokenDetails
 
 		tokenShortName     = tokenDetails.TokenShortName
 		tokenDecimals      = tokenDetails.TokenDecimals

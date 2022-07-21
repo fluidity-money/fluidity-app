@@ -13,7 +13,7 @@ func ethAbiMustArgument(name, typ string) ethAbi.Argument {
 		panic(err)
 	}
 
-	arg := ethAbi.Argument {
+	arg := ethAbi.Argument{
 		Name: name,
 		Type: ethType,
 	}

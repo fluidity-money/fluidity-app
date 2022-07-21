@@ -11,7 +11,7 @@ import (
 func bigIntFromPossiblyHex(s string) (*misc.BigInt, error) {
 	int, err := hexutil.DecodeBig(s)
 
-	if err != nil{
+	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to decode a bigint from possibly hex: %v",
 			err,

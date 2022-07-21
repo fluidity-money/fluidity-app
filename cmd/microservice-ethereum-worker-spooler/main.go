@@ -58,8 +58,8 @@ func main() {
 
 			scaledWinAmount := new(misc.BigInt).Div(&fromWinAmount.Int, tokenDecimalsNum)
 
-			log.Debug(func (k *log.Log) {
-			    k.Format("base amt $%s, decimals $%s", fromWinAmount.String(), tokenDecimalsNum.String())
+			log.Debug(func(k *log.Log) {
+				k.Format("base amt $%s, decimals $%s", fromWinAmount.String(), tokenDecimalsNum.String())
 			})
 			log.Debug(func(k *log.Log) {
 				k.Format(
@@ -109,8 +109,8 @@ func main() {
 				continue
 			}
 
-			log.Debug(func (k *log.Log) {
-			    k.Format("Sending rewards for token %v", shortName)
+			log.Debug(func(k *log.Log) {
+				k.Format("Sending rewards for token %v", shortName)
 			})
 
 			sendRewards(batchedRewardsQueue, shortName)

@@ -67,9 +67,9 @@ type (
 	}
 
 	BlocksResponse struct {
-		JsonRpc string           `json:"jsonrpc"`
-		Id      string           `json:"id"`
+		JsonRpc string `json:"jsonrpc"`
+		Id      string `json:"id"`
 		// this can be Block or null
-		Result  json.RawMessage  `json:"result"`
+		Result json.RawMessage `json:"result"`
 	}
 )
