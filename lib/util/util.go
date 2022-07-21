@@ -4,10 +4,10 @@ package util
 // failing if something goes wrong using the internal logging functions
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"os"
 
-	microservice_lib "github.com/fluidity-money/fluidity-app/lib"
+	"github.com/fluidity-money/fluidity-app/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
@@ -47,7 +47,7 @@ func GetEnvOrDefault(name string, defaultValue string) string {
 
 // GetHash returns the sha1 hash of the byte array
 func GetHash(data []byte) string {
-	hasher := sha1.New()
+	hasher := sha256.New()
 	hasher.Write(data)
 	return string(hasher.Sum(nil))
 }
