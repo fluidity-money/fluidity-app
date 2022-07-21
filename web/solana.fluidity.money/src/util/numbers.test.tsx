@@ -49,6 +49,6 @@ describe("decimalToTokenAmount", () => {
         name: "FLUID USD Tether",
         symbol: "fUSDT",
         decimals: 6,
-      }), "2000.2928292982293283938923293829") as TokenAmount).toJSON()).toStrictEqual(expectedResult);
+      }), "2000.2928292982293283938923293829") as TokenAmount).toJSON()).toMatchObject(expectedResult);
     })
 })
