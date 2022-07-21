@@ -55,13 +55,72 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 			reserve_     = trimWhitespace(tokenDetails_[4])
 			pyth_        = trimWhitespace(tokenDetails_[5])
 			switchboard_ = trimWhitespace(tokenDetails_[6])
-
-			fluidMint   = solana.MustPublicKeyFromBase58(fluidMint_)
-			obligation  = solana.MustPublicKeyFromBase58(obligation_)
-			reserve     = solana.MustPublicKeyFromBase58(reserve_)
-			pyth        = solana.MustPublicKeyFromBase58(pyth_)
-			switchboard = solana.MustPublicKeyFromBase58(switchboard_)
 		)
+
+		fluidMint, err := solana.PublicKeyFromBase58(fluidMint_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode fluid mint from base58 %#v",
+					fluidMint_,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		obligation, err := solana.PublicKeyFromBase58(obligation_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode obligation from base58 %#v",
+					obligation_,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		reserve, err := solana.PublicKeyFromBase58(reserve_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode reserve from base58 %#v",
+					reserve_,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		pyth, err := solana.PublicKeyFromBase58(pyth_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode pyth from base58 %#v",
+					pyth_,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		switchboard, err := solana.PublicKeyFromBase58(switchboard_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode switchboard from base58 %#v",
+					switchboard_,
+				)
+
+				k.Payload = err
+			})
+		}
 
 		decimals, err := strconv.Atoi(decimals_)
 

@@ -17,13 +17,15 @@ const (
 	// EnvFluidityPubkey is the program id of the fluidity program
 	EnvFluidityPubkey = `FLU_SOLANA_PROGRAM_ID`
 
-	// EnvTvlDataPubkey is the public key of an initialized account for storing TVL data
+	// EnvTvlDataPubkey is the public key of an initialized account for storing
+	// TVL data
 	EnvTvlDataPubkey = `FLU_SOLANA_TVL_DATA_PUBKEY`
 
 	// EnvSolendPubkey is the program id of the solend program
 	EnvSolendPubkey = `FLU_SOLANA_SOLEND_PROGRAM_ID`
 
-	// EnvObligationPubkey is the public key of the solend pool obligation account
+	// EnvObligationPubkey is the public key of the solend pool obligation
+	// account
 	EnvObligationPubkey = `FLU_SOLANA_OBLIGATION_PUBKEY`
 
 	// EnvReservePubkey is the public key of the solend pool reserve account
@@ -32,20 +34,33 @@ const (
 	// EnvPythPubkey is the public key of the solend pool pyth account
 	EnvPythPubkey = `FLU_SOLANA_PYTH_PUBKEY`
 
-	// EnvSwitchboardPubkey is the public key of the solend pool switchboard account
+	// EnvSwitchboardPubkey is the public key of the solend pool
+	// switchboard account
 	EnvSwitchboardPubkey = `FLU_SOLANA_SWITCHBOARD_PUBKEY`
 
-	// EnvPayerPrikey is a private key of an account that holds solana funds
-	// this program doesn't alter onchain state, and thus won't actually spend anything
+	// EnvPayerPrikey is a private key of an account that holds
+	// solana funds this program doesn't alter onchain state, and
+	// thus won't actually spend anything
 	EnvPayerPrikey = `FLU_SOLANA_TVL_PAYER_PRIKEY`
 )
 
-// pubkeyFromEnv gets and decodes a solana public key from an environment variable,
-// panicking if the env doesn't exist or isn't a valid key
+// pubkeyFromEnv gets and decodes a solana public key from an environment
+// variable, panicking if the env doesn't exist or isn't a valid key
 func pubkeyFromEnv(env string) solana.PublicKey {
 	pubkeyString := util.GetEnvOrFatal(env)
 
-	pubkey := solana.MustPublicKeyFromBase58(pubkeyString)
+	pubkey, err := solana.PublicKeyFromBase58(pubkeyString)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to decode public key %s",
+				env,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	return pubkey
 }
@@ -59,8 +74,9 @@ func main() {
 		reservePubkey     = pubkeyFromEnv(EnvReservePubkey)
 		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
-		payerPrikey       = util.GetEnvOrFatal(EnvPayerPrikey)
-		solanaRpcUrl      = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+
+		payerPrikey  = util.GetEnvOrFatal(EnvPayerPrikey)
+		solanaRpcUrl = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 	)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)

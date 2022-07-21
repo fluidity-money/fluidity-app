@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"math/rand"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/gagliardetto/solana-go"
@@ -24,7 +25,19 @@ func generateRandomIntegers(amount, min, max int) []int {
 func pubkeyFromEnv(env string) solana.PublicKey {
 	pubkeyString := util.GetEnvOrFatal(env)
 
-	pubkey := solana.MustPublicKeyFromBase58(pubkeyString)
+	pubkey, err := solana.PublicKeyFromBase58(pubkeyString)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to get a public key from env %v, %#v",
+				env,
+				pubkeyString,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	return pubkey
 }
