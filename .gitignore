@@ -4,6 +4,7 @@ docker-*
 !docker-compose*
 test
 semgrep
+npm-install
 
 lib/build-lib
 
