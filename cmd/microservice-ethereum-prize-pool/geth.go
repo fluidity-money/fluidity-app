@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE file.
+
 package main
 
 // geth connects to Geth, causing Fatal to happen if a connection fails.

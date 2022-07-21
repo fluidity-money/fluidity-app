@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE file.
+
 package solana
 
 // solana contains the types that we use for tracking Solana on-chain
