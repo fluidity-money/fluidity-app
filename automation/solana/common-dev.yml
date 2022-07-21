@@ -10,6 +10,7 @@ ENV_FLU_RABBIT_MAX_READY: 50
 ENV_FLU_RABBIT_MAX_UNACKED: 50
 
 SECRET_FLU_SENTRY_URL: /fluidity/sentryUrl
+SECRET_FLU_FRONTEND_SENTRY_URL: /fluidity/frontend/sentryURL
 SECRET_FLU_REDIS_ADDR: /fluidity/devnet/data/redis/endpoint
 SECRET_FLU_TIMESCALE_URI: /fluidity/devnet/data/timescale/uri
 SECRET_FLU_POSTGRES_URI: /fluidity/devnet/data/postgres/uri
