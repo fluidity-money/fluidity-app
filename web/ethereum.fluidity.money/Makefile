@@ -67,7 +67,7 @@ frontend-test:
 	@${NPX_REACTSCRIPTS} test
   
 npm-install:
-	@sudo docker run -v "$PWD":/usr/src/app -w /usr/src/app node:16 npm install
+	@docker run -v "$PWD":/usr/src/app -w /usr/src/app node:16 npm install
 	@touch npm-install
 
 clean:
