@@ -37,12 +37,12 @@ services:
       - redis
     restart: unless-stopped
 
-  microservice-ethereum-transaction-spooler-usdt:
+  microservice-ethereum-worker-spooler-usdt:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-spooler-usdt
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-spooler-usdt
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.usdt
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.usdt
@@ -50,12 +50,12 @@ services:
       FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
     restart: unless-stopped
 
-  microservice-ethereum-transaction-sender-usdt:
+  microservice-ethereum-worker-sender-usdt:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-sender-usdt
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-sender-usdt
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
@@ -101,12 +101,12 @@ services:
       - redis
     restart: unless-stopped
 
-  microservice-ethereum-transaction-spooler-usdc:
+  microservice-ethereum-worker-spooler-usdc:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-spooler-usdc
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-spooler-usdc
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.usdc
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.usdc
@@ -114,12 +114,12 @@ services:
       FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
     restart: unless-stopped
 
-  microservice-ethereum-transaction-sender-usdc:
+  microservice-ethereum-worker-sender-usdc:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-sender-usdc
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-sender-usdc
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
@@ -165,12 +165,12 @@ services:
       - redis
     restart: unless-stopped
 
-  microservice-ethereum-transaction-spooler-dai:
+  microservice-ethereum-worker-spooler-dai:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-spooler-dai
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-spooler-dai
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.dai
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.dai
@@ -178,12 +178,12 @@ services:
       FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
     restart: unless-stopped
 
-  microservice-ethereum-transaction-sender-dai:
+  microservice-ethereum-worker-sender-dai:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-sender-dai
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-sender-dai
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
@@ -229,12 +229,12 @@ services:
       - redis
     restart: unless-stopped
 
-  microservice-ethereum-transaction-spooler-tusd:
+  microservice-ethereum-worker-spooler-tusd:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-spooler-tusd
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-spooler-tusd
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.tusd
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.tusd
@@ -242,12 +242,12 @@ services:
       FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
     restart: unless-stopped
 
-  microservice-ethereum-transaction-sender-tusd:
+  microservice-ethereum-worker-sender-tusd:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-sender-tusd
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-sender-tusd
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FTUSD}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
@@ -297,12 +297,12 @@ services:
       - redis
     restart: unless-stopped
 
-  microservice-ethereum-transaction-spooler-fei:
+  microservice-ethereum-worker-spooler-fei:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-spooler-fei
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-spooler-fei
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.fei
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.fei
@@ -310,12 +310,12 @@ services:
       FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
     restart: unless-stopped
 
-  microservice-ethereum-transaction-sender-fei:
+  microservice-ethereum-worker-sender-fei:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-sender-fei
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-sender-fei
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FFEI}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
@@ -365,12 +365,12 @@ services:
       - redis
     restart: unless-stopped
 
-  microservice-ethereum-transaction-spooler-frax:
+  microservice-ethereum-worker-spooler-frax:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-spooler-frax
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-spooler-frax
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.frax
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.frax
@@ -378,12 +378,12 @@ services:
       FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
     restart: unless-stopped
 
-  microservice-ethereum-transaction-sender-frax:
+  microservice-ethereum-worker-sender-frax:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-sender-frax
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-sender-frax
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FFRAX}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
@@ -433,12 +433,12 @@ services:
       - redis
     restart: unless-stopped
 
-  microservice-ethereum-transaction-spooler-ust:
+  microservice-ethereum-worker-spooler-ust:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-spooler-ust
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-spooler-ust
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.ust
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.ust
@@ -446,12 +446,12 @@ services:
       FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: ${FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD}
     restart: unless-stopped
 
-  microservice-ethereum-transaction-sender-ust:
+  microservice-ethereum-worker-sender-ust:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
-      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-transaction-sender-ust
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-worker-sender-ust
       FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
       FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUST}
       FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
