@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
-	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
@@ -156,7 +156,7 @@ func HandleUniquePhrase(w http.ResponseWriter, r *http.Request) interface{} {
 	case faucetTypes.TokenfDAI:
 		if networkUsed == network.NetworkEthereum {
 			tokenNameOk = true
-			break		
+			break
 		}
 
 	case faucetTypes.TokenfUSDC:
@@ -165,7 +165,7 @@ func HandleUniquePhrase(w http.ResponseWriter, r *http.Request) interface{} {
 
 	case faucetTypes.TokenfUSDT:
 		tokenNameOk = true
-			break		
+		break
 
 	default:
 		break

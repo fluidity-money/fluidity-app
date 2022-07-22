@@ -42,7 +42,7 @@ services:
 
   microservice-aurora-transaction-spooler-usdt:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-spooler-usdt
@@ -55,7 +55,7 @@ services:
 
   microservice-aurora-transaction-sender-usdt:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-sender-usdt
@@ -110,7 +110,7 @@ services:
 
   microservice-aurora-transaction-spooler-usdc:
     build:
-      context: ../cmd/microservice-ethereum-transaction-spooler
+      context: ../cmd/microservice-ethereum-worker-spooler
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-spooler-usdc
@@ -123,7 +123,7 @@ services:
 
   microservice-aurora-transaction-sender-usdc:
     build:
-      context: ../cmd/microservice-ethereum-transaction-sender
+      context: ../cmd/microservice-ethereum-worker-sender
     env_file: ./docker-compose-envs
     environment:
       FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-aurora-transaction-sender-usdc

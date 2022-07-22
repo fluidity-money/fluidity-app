@@ -32,8 +32,8 @@ func testWs(address string) error {
 func main() {
 	var (
 		debugEnabled = os.Getenv("FLU_DEBUG") == "true"
-		wsAddress = os.Getenv("FLU_ETHEREUM_WS_URL")
-		arguments = os.Args[1:]
+		wsAddress    = os.Getenv("FLU_ETHEREUM_WS_URL")
+		arguments    = os.Args[1:]
 	)
 
 	if wsAddress == "" {
@@ -61,14 +61,14 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatal(
+		log.Fatalf(
 			"Failed to connect to WS! %v",
 			err,
 		)
 	}
 
 	var (
-		commandName string
+		commandName      string
 		commandArguments []string
 	)
 

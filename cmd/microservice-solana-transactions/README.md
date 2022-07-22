@@ -12,13 +12,13 @@ to get information from the RPC sometimes.
 
 ## Environment variables
 
-|            Name            |                                 Description
-|----------------------------|------------------------------------------------------------------------------|
-| `FLU_WORKER_ID`            | Worker ID used to identify the application in logging and to the AMQP queue. |
-| `FLU_DEBUG`                | Toggle debug messages produced by any application using the debug logger.    |
-| `FLU_AMQP_QUEUE_ADDR`      | AMQP queue address connected to to receive and send messages down.           |
-| `FLU_SOLANA_RPC_URL`       | Solana node RPC address to fetch transaction info from.                      |
-| `FLU_SOLANA_SABER_RPC_URL` | RPC endpoint used to look up information from Saber.                         |
+|              Name              |                                 Description
+|--------------------------------|------------------------------------------------------------------------------|
+| `FLU_WORKER_ID`                | Worker ID used to identify the application in logging and to the AMQP queue. |
+| `FLU_DEBUG`                    | Toggle debug messages produced by any application using the debug logger.    |
+| `FLU_AMQP_QUEUE_ADDR`          | AMQP queue address connected to to receive and send messages down.           |
+| `FLU_SOLANA_RPC_URL`           | Solana node RPC address to fetch transaction info from.                      |
+| `FLU_SOLANA_APPLICATIONS_LIST` | List of Solana addresses to send to the Solana applications server           |
 
 ## Building
 

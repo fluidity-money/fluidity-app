@@ -17,14 +17,10 @@ const (
 
 	// TopicWinnersSolana to broadcast winner messages containing a single
 	// winner and their amount won
-	TopicWinnersSolana   = `winners.` + string(network.NetworkSolana)
+	TopicWinnersSolana = `winners.` + string(network.NetworkSolana)
 
 	// subWinnersAll to subscribe to winner messages from either network
-	subWinnersAll        = `winners.*`
-
-	// TopicRewardsEthereum to broadcast reward messages
-	// including both users and the transaction hash
-	TopicRewardsEthereum = `rewards.` + string(network.NetworkEthereum)
+	subWinnersAll = `winners.*`
 )
 
 type (
@@ -53,14 +49,3 @@ func WinnersSolana(f func(Winner)) {
 func WinnersAll(f func(Winner)) {
 	winners(subWinnersAll, f)
 }
-
-func RewardsEthereum(f func(RewardData)) {
-	queue.GetMessages(TopicRewardsEthereum, func(message queue.Message) {
-		var reward RewardData
-
-		message.Decode(reward)
-
-		f(reward)
-	})
-}
-

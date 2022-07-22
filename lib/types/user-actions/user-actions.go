@@ -52,9 +52,6 @@ type (
 		// Fee adjusted based on compute units used
 		AdjustedFee *big.Rat
 
-		// Fee taken by Saber
-		SaberFee *big.Rat
-
 		// Amount that was swapped or sent
 		Amount misc.BigInt `json:"amount"`
 
@@ -70,13 +67,6 @@ type (
 		UserActions          []UserAction `json:"user_actions"`
 		SecondsSinceLastSlot uint64       `json:"seconds_since_last_slot"`
 	}
-
-	// PayableBufferedUserAction includes BufferedUserActions, and Pyth priced available prize pool
-	PayableBufferedUserAction struct {
-		BufferedUserAction BufferedUserAction `json:"buffered_user_action"`
-		Tvl                uint64             `json:"tvl"`
-		MintSupply         uint64             `json:"mint_supply"`
-	}
 )
 
 // NewSwap made by the user, either swapping in (swapIn) to a Fluid Asset
@@ -84,27 +74,27 @@ type (
 // Solana ATA owner addresses should be set outside of the function.
 func NewSwap(network_ network.BlockchainNetwork, userAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
 	var (
-		transactionHash_   = transactionHash
-		senderAddress      = userAddress
+		transactionHash_ = transactionHash
+		senderAddress    = userAddress
 	)
 
 	// Solana accounts/hashes are case sensitive
 	if network_ != network.NetworkSolana {
 		transactionHash_ = strings.ToLower(transactionHash)
-		senderAddress    = strings.ToLower(userAddress)
+		senderAddress = strings.ToLower(userAddress)
 	}
 
 	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
 
 	return UserAction{
-		Network:                  network_,
-		TransactionHash:          transactionHash_,
-		Type:                     UserActionSwap,
-		SwapIn:                   swapIn,
-		SenderAddress:            senderAddress,
-		Amount:                   amount,
-		TokenDetails:             tokenDetails,
-		Time:                     time.Now(),
+		Network:         network_,
+		TransactionHash: transactionHash_,
+		Type:            UserActionSwap,
+		SwapIn:          swapIn,
+		SenderAddress:   senderAddress,
+		Amount:          amount,
+		TokenDetails:    tokenDetails,
+		Time:            time.Now(),
 	}
 }
 
@@ -113,29 +103,29 @@ func NewSwap(network_ network.BlockchainNetwork, userAddress, transactionHash st
 // function. Solana ATA owner addresses should be set outside of the function.
 func NewSend(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
 	var (
-		transactionHash_       = transactionHash
-		senderAddress_         = senderAddress
-		recipientAddress_      = recipientAddress
+		transactionHash_  = transactionHash
+		senderAddress_    = senderAddress
+		recipientAddress_ = recipientAddress
 	)
 
 	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
 
 	// Solana accounts/hashes are case sensitive
 	if network_ != network.NetworkSolana {
-		transactionHash_       = strings.ToLower(transactionHash)
-		senderAddress_         = strings.ToLower(senderAddress)
-		recipientAddress_      = strings.ToLower(recipientAddress)
+		transactionHash_ = strings.ToLower(transactionHash)
+		senderAddress_ = strings.ToLower(senderAddress)
+		recipientAddress_ = strings.ToLower(recipientAddress)
 	}
 
 	return UserAction{
-		Network:                     network_,
-		TransactionHash:             transactionHash_,
-		Type:                        UserActionSend,
-		SenderAddress:               senderAddress_,
-		RecipientAddress:            recipientAddress_,
-		Amount:                      amount,
-		TokenDetails:                tokenDetails,
-		Time:                        time.Now(),
+		Network:          network_,
+		TransactionHash:  transactionHash_,
+		Type:             UserActionSend,
+		SenderAddress:    senderAddress_,
+		RecipientAddress: recipientAddress_,
+		Amount:           amount,
+		TokenDetails:     tokenDetails,
+		Time:             time.Now(),
 	}
 }
 

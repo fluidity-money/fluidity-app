@@ -2,8 +2,8 @@ package web
 
 import (
 	"encoding/json"
-	"net/http"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"net/http"
 )
 
 // JsonEndpoint adds some logging code and marshals the return value of

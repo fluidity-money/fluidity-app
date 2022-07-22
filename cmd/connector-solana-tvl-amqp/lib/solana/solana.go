@@ -16,7 +16,7 @@ const getTvlDiscriminant = uint8(4)
 
 // data layout for the account that GetTVL writes its response into
 type tvlDataAccount struct {
-	Tvl uint64;
+	Tvl uint64
 }
 
 // the solana-go sdk types this response incorrectly, leaving out the `value` field,

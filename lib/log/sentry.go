@@ -42,8 +42,8 @@ func sentryLogError(invocation, workerId string, log *log) {
 	}
 
 	event.Tags = map[string]string{
-		"worker-id": workerId,
-		"context":   log.context,
+		"worker-id":  workerId,
+		"context":    log.context,
 		"invocation": invocation,
 	}
 

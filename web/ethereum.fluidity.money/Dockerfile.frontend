@@ -12,6 +12,7 @@ COPY package.json package-lock.json ./
 RUN npm i
 
 COPY . ./
+RUN mv ./nginx-default.conf /etc/nginx/sites-available/default
 
 ARG REACT_APP_API_URL
 ARG REACT_APP_WALLET_CONNECT_GETH_URI

@@ -62,27 +62,30 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
 
 const networks: HardhatUserConfig['networks'] = {};
 
-if (process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY) {
+if (process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY)
   networks['ropsten'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY],
     url: process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_URL,
     gas: 9000000
   };
-}
 
-if (process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY) {
+if (process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY)
   networks['kovan'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_KOVAN_KEY],
     url: process.env.FLU_ETHEREUM_DEPLOY_KOVAN_URL
   };
-}
 
-if (process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY) {
+if (process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY)
   networks['aurora'] = {
-      accounts: [process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY],
-      url: process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_URL,
-    }
-}
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_AURORA_MAINNET_URL,
+  };
+
+if (process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY)
+  networks['arbitrum'] = {
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_URL,
+  };
 
 /**
  * @type import('hardhat/config').HardhatUserConfig

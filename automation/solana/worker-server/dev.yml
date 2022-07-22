@@ -1,0 +1,38 @@
+DOCKER_IMAGE: microservice-solana-worker-server
+DOCKERFILE_PATH: ./cmd/microservice-solana-worker-server
+
+ENV_FLU_SOLANA_PROGRAM_ID: GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaT
+ENV_FLU_SOLANA_TVL_DATA_PUBKEY: CAKG5gr5ZFGyEXb98pXMqUCdu8gqc5VtXxXkpcZix
+ENV_FLU_SOLANA_SOLEND_PROGRAM_ID: ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6Lg
+ENV_FLU_SOLANA_TOKEN_DECIMALS: 6
+SECRET_FLU_SOLANA_PAYER_PRIKEY: /fluidity/solana/payer_prikey
+SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
+
+
+SERVICES:
+  - SERVER_USDC:
+      SERVICE_NAME: microservice-solana-worker-server-usdc 
+      
+      ENV_FLU_WORKER_ID: production-solana-worker-solana-server-usdc
+      ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa
+      ENV_FLU_SOLANA_OBLIGATION_PUBKEY: HbmfhzwMF71jWxfKoD7sjCLrsVhvt2zEEux8t8oWqFAH
+      ENV_FLU_SOLANA_RESERVE_PUBKEY: FNNkz4RCQezSSS71rW2tvqZH1LCkTzaiG7Nd1LeA5x5y
+      ENV_FLU_SOLANA_PYTH_PUBKEY: 5SSkXsEKQepHHAewytPVwdej4epN1nxgLVM84L4KXgy7
+      ENV_FLU_SOLANA_SWITCHBOARD_PUBKEY: CZx29wKMUxaJDq6aLVQTdViPL754tTR64NAgQBUGxxHb
+      ENV_FLU_SOLANA_TOKEN_NAME: USDC
+      ENV_FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.usdc
+      ENV_FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdc.winners
+
+  - SERVER_USDT:
+      SERVICE_NAME: microservice-solana-worker-server-usdt
+      
+      ENV_FLU_WORKER_ID: production-solana-worker-solana-server-usdt
+      ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 97JpYk6S7i9ydzjNwb92DQEfsA1KUUWSwnWGaGDFe6bk
+      ENV_FLU_SOLANA_OBLIGATION_PUBKEY: 2VmszETnb3HkvuMKYqTaPbr7zWh8jfhHut6bUQPwAdrR
+      ENV_FLU_SOLANA_RESERVE_PUBKEY: ERm3jhg8J94hxr7KmhkRvnuYbKZgNFEL4hXzBMeb1rQ8
+      ENV_FLU_SOLANA_PYTH_PUBKEY: 38xoQ4oeJCBrcVvca2cGk7iV1dAfrmTR1kmhSCJQ8Jto
+      ENV_FLU_SOLANA_SWITCHBOARD_PUBKEY: 5mp8kbkTYwWWCsKSte8rURjTuyinsqBpJ9xAQsewPDD
+      ENV_FLU_DEBUG_FAKE_PAYOUTS: false
+      ENV_FLU_SOLANA_TOKEN_NAME: USDT
+      ENV_FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.usdt
+      ENV_FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdt.winners

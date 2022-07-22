@@ -17,8 +17,8 @@ type Subscription struct {
 
 // rpcResponse is a container to hold generic json responses
 type rpcResponse struct {
-	Result json.RawMessage `json:"result"`
-	Error map[string]interface{} `json:"error"`
+	Result json.RawMessage        `json:"result"`
+	Error  map[string]interface{} `json:"error"`
 }
 
 type (
@@ -31,7 +31,7 @@ type (
 	}
 )
 
-var commitmentFinalizedParam = map[string]interface{} {
+var commitmentFinalizedParam = map[string]interface{}{
 	"commitment": "finalized",
 }
 
@@ -43,7 +43,7 @@ var slotsSubscriptionMessage = map[string]interface{}{
 
 var (
 	getSlotMethod = "getSlot"
-	getSlotParams = []interface{} { commitmentFinalizedParam }
+	getSlotParams = []interface{}{commitmentFinalizedParam}
 )
 
 type getSlotResult = uint64
@@ -51,7 +51,7 @@ type getSlotResult = uint64
 const getBlocksWithLimitMethod = "getBlocksWithLimit"
 
 func getBlocksWithLimitParams(from, pageLength uint64) []interface{} {
-	return []interface{}{ from, pageLength, commitmentFinalizedParam }
+	return []interface{}{from, pageLength, commitmentFinalizedParam}
 }
 
 type getBlocksResult = []uint64
@@ -211,9 +211,9 @@ func rpcCall(rpcUrl, method string, params []interface{}, res interface{}) error
 
 	message := map[string]interface{}{
 		"jsonrpc": "2.0",
-		"id": 1,
-		"method": method,
-		"params": params,
+		"id":      1,
+		"method":  method,
+		"params":  params,
 	}
 
 	err := encoder.Encode(message)
@@ -234,13 +234,12 @@ func rpcCall(rpcUrl, method string, params []interface{}, res interface{}) error
 
 	defer r.Body.Close()
 
-
 	reader := json.NewDecoder(r.Body)
 
 	var decodedResponse rpcResponse
 
 	if err := reader.Decode(&decodedResponse); err != nil {
-		return  fmt.Errorf("Failed decoding RPC response: %w", err)
+		return fmt.Errorf("Failed decoding RPC response: %w", err)
 	}
 
 	if decodedResponse.Error != nil {

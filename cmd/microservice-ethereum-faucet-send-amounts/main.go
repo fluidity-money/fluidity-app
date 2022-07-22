@@ -5,12 +5,12 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -105,9 +105,9 @@ func main() {
 
 	for _, details := range tokensList_ {
 
-		tokenName_     := details.TokenName
+		tokenName_ := details.TokenName
 
-		tokenName, err := faucetTypes.TokenFromString("f"+tokenName_)
+		tokenName, err := faucetTypes.TokenFromString("f" + tokenName_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
