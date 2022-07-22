@@ -1,5 +1,9 @@
 package fluidity
 
+import (
+	"fmt"
+)
+
 const (
 	// 0
 	// VariantWrap to wrap spl tokens into fluid tokens
@@ -43,3 +47,31 @@ type (
 		BumpSeed  uint8
 	}
 )
+
+// GetBaseToken takes a fluid token and returns its counterpart
+func GetBaseToken(token string, fluidTokens map[string]string) (string, error) {
+
+	// get the base token
+
+	baseToken := fluidTokens[token]
+
+	// check that we got a good result
+
+	if baseToken == "" {
+		return "", fmt.Errorf(
+			"token %v not found when trying to get base token!",
+			token,
+		)
+	}
+
+	return baseToken, nil
+}
+
+// IsFluidToken takes a token and checks if is one of the fluid tokens
+func IsFluidToken(token string, fluidTokens map[string]string) bool {
+
+	// check if token exists in map
+	_, exists := fluidTokens[token]
+
+	return exists
+}
