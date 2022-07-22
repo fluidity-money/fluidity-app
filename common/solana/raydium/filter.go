@@ -6,12 +6,12 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 
+	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
-	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -197,8 +197,8 @@ func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.Transactio
 		if sourceMintIsFluid {
 			newMint, err := fluidity.GetBaseToken(sourceMint.String(), fluidTokens)
 
-// EnvSolanaTokenLookups is the map of fluid -> base tokens
-const EnvSolanaTokenLookups = `FLU_SOLANA_TOKEN_LOOKUPS`
+			// EnvSolanaTokenLookups is the map of fluid -> base tokens
+			const EnvSolanaTokenLookups = `FLU_SOLANA_TOKEN_LOOKUPS`
 
 			if err != nil {
 				return nil, fmt.Errorf(

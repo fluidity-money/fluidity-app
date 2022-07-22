@@ -75,4 +75,3 @@ func IsFluidToken(token string, fluidTokens map[string]string) bool {
 
 	return exists
 }
-

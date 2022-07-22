@@ -15,9 +15,9 @@ const (
 
 // applicationNames is used to map human readable names to their enum varients
 var applicationNames = map[string]Application{
-	"spl":   ApplicationSpl,
-	"saber": ApplicationSaber,
-	"orca": ApplicationOrca,
+	"spl":     ApplicationSpl,
+	"saber":   ApplicationSaber,
+	"orca":    ApplicationOrca,
 	"raydium": ApplicationRaydium,
 }
 

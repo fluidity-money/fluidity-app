@@ -28,4 +28,3 @@ func GetAllInstructions(result solTypes.TransactionResult) []solTypes.Transactio
 
 	return allInstructions
 }
-

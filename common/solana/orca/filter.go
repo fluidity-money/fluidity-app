@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"math/big"
 
+	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
-	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/gagliardetto/solana-go"
@@ -239,7 +239,7 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 		var (
 			// check if the transaction involves a fluid token
 
-			sourceMintIsFluid      = fluidity.IsFluidToken(
+			sourceMintIsFluid = fluidity.IsFluidToken(
 				sourceMint.String(),
 				fluidTokens,
 			)
