@@ -34,8 +34,12 @@ Update the environment variable `FLU_SOLANA_APPLICATIONS_LIST` in microservice-s
 | `FLU_DEBUG`                        | Toggle debug messages produced by any application using the debug logger.      |
 | `FLU_AMQP_QUEUE_ADDR`              | AMQP queue address connected to to receive and send messages down.             |
 | `FLU_SENTRY_URL`                   | String that may be optionally set with a Sentry URL to log app.                |
+| `FLU_SOLANA_RPC_URL`                    | Address of the Solana node.   |
+| `FLU_SOLANA_TOKEN_LOOKUPS`                    | JSON object of {[fluidToken: string]: baseToken: string}.   |
 | `FLU_SOLANA_SABER_SWAP_PROGRAM_ID` | Program ID for the Saber swap program.                                         |
 | `FLU_SOLANA_SABER_RPC_URL`         | RPC endpoint used to look up information from Saber.                           |
+| `FLU_SOLANA_ORCA_PROGRAM_ID` | Program ID for the Orca swap program.                                         |
+| `FLU_SOLANA_RAYDIUM_PROGRAM_ID` | Program ID for the Raydium swap program.                                         |
 
 ## Building
 
