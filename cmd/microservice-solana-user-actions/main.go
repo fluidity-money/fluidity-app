@@ -9,7 +9,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
+	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -33,26 +33,6 @@ const (
 
 // SplProgramId is the program id of the SPL token program
 const SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
-// extracts instructions and innerInstructions from a solana transaction
-func getAllInstructions(result solTypes.TransactionResult) []solTypes.TransactionInstruction {
-	var (
-		instructions      = result.Transaction.Message.Instructions
-		innerInstructions = result.Meta.InnerInstructions
-	)
-
-	instructionsLen := len(instructions) + len(innerInstructions)
-
-	allInstructions := make([]solTypes.TransactionInstruction, instructionsLen)
-
-	allInstructions = append(allInstructions, instructions...)
-
-	for _, inner := range innerInstructions {
-		allInstructions = append(allInstructions, inner.Instructions...)
-	}
-
-	return allInstructions
-}
 
 func main() {
 	var (
@@ -125,7 +105,7 @@ func main() {
 				}
 			}
 
-			allInstructions := getAllInstructions(transactionResult)
+			allInstructions := solLib.GetAllInstructions(transactionResult)
 
 			for _, instruction := range allInstructions {
 

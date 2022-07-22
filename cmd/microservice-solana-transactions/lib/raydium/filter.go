@@ -11,6 +11,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
+	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
@@ -37,11 +38,9 @@ func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.Transactio
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
 		accountKeys          = transaction.Transaction.Message.AccountKeys
-		instructions         = transaction.Transaction.Message.Instructions
-		innerInstructions    = transaction.Meta.InnerInstructions
 	)
 
-	allInstructions := append(instructions, innerInstructions...)
+	allInstructions := solLib.GetAllInstructions(transaction)
 
 	// raydiumFeeRat is the Raydium fee percentage (0.25%)
 	raydiumFeeRat := big.NewRat(25, 10000)

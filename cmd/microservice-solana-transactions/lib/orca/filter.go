@@ -10,6 +10,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
+	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/gagliardetto/solana-go"
@@ -46,13 +47,11 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
 		accountKeys          = transaction.Transaction.Message.AccountKeys
-		instructions         = transaction.Transaction.Message.Instructions
-		innerInstructions    = transaction.Meta.InnerInstructions
 	)
 
 	feesPaid = big.NewRat(0, 1)
 
-	allInstructions := append(instructions, innerInstructions...)
+	allInstructions := solLib.GetAllInstructions(transaction)
 
 	for instructionNumber, instruction := range allInstructions {
 
