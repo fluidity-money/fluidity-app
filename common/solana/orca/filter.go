@@ -121,7 +121,10 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 			)
 		}
 
-		resp, err := solanaClient.GetAccountInfo(context.Background(), swapAccountPubkey)
+		resp, err := solanaClient.GetAccountInfo(
+			context.Background(),
+			swapAccountPubkey,
+		)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -161,7 +164,10 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 
 		// calculate the fee percentages
 
-		tradeFee := big.NewRat(feeData.TradeFeeNumerator, feeData.TradeFeeDenominator)
+		tradeFee := big.NewRat(
+			feeData.TradeFeeNumerator,
+			feeData.TradeFeeDenominator,
+		)
 
 		ownerTradeFee := big.NewRat(
 			feeData.OwnerTradeFeeNumerator,
@@ -170,7 +176,9 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 
 		// convert source and destination accounts to public key
 
-		userSourceSplAccountPubkey, err := solana.PublicKeyFromBase58(userSourceSplAccount)
+		userSourceSplAccountPubkey, err := solana.PublicKeyFromBase58(
+			userSourceSplAccount,
+		)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -231,8 +239,15 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 		var (
 			// check if the transaction involves a fluid token
 
-			sourceMintIsFluid      = fluidity.IsFluidToken(sourceMint.String(), fluidTokens)
-			destinationMintIsFluid = fluidity.IsFluidToken(destinationMint.String(), fluidTokens)
+			sourceMintIsFluid      = fluidity.IsFluidToken(
+				sourceMint.String(),
+				fluidTokens,
+			)
+
+			destinationMintIsFluid = fluidity.IsFluidToken(
+				destinationMint.String(),
+				fluidTokens,
+			)
 		)
 
 		// if neither token is fluid we don't care about this transaction
@@ -251,7 +266,10 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 		// if the source mint is a fluid token, use its non-fluid counterpart
 
 		if sourceMintIsFluid {
-			newMint, err := fluidity.GetBaseToken(sourceMint.String(), fluidTokens)
+			newMint, err := fluidity.GetBaseToken(
+				sourceMint.String(),
+				fluidTokens,
+			)
 
 			if err != nil {
 				return nil, fmt.Errorf(
@@ -265,7 +283,10 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 			sourceMint = solana.MustPublicKeyFromBase58(newMint)
 		}
 
-		price, err := pyth.GetPriceByToken(solanaClient, sourceMint.String())
+		price, err := pyth.GetPriceByToken(
+			solanaClient,
+			sourceMint.String(),
+		)
 
 		if err != nil {
 			return nil, fmt.Errorf(
