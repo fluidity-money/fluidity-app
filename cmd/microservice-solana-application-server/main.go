@@ -78,7 +78,7 @@ func main() {
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
 					k.Format(
-						"Failed to parse an application at transaction %v! %w",
+						"Failed to parse an application at transaction %v! %v",
 						transactionNumber,
 						err,
 					)
