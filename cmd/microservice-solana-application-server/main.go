@@ -90,6 +90,9 @@ func parseTransaction(transaction worker.SolanaParsedTransaction, saberRpc, sabe
 	)
 
 	switch transactionApplication {
+	case applications.ApplicationSpl:
+		// no specific handling for SPL programs
+
 	case applications.ApplicationSaber:
 		fee, _, err = saber.GetSaberFees(saberRpc, transaction, saberProgramId)
 
