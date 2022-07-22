@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::sync::Once;
 
 use accounts::{ConfigOptions, SolendAccounts};
 use borsh::BorshDeserialize;
@@ -15,7 +16,8 @@ use solana_sdk::{
     transaction::Transaction,
 };
 
-use crate::accounts::FluidityData;
+use crate::accounts::{DevnetAccount, FluidityData};
+use crate::instructions::FluidContract;
 
 pub mod accounts;
 pub mod instructions;
@@ -36,6 +38,8 @@ pub enum TestingCommands {
     DumpKeys,
 }
 
+static INIT: Once = Once::new();
+
 pub fn send_instruction(
     client: &RpcClient,
     instructions: Vec<Instruction>,
@@ -49,6 +53,105 @@ pub fn send_instruction(
     txn.sign(&signers, recent_blockhash);
 
     send_txn(&client, txn)
+}
+
+pub fn setup_accs(client: &RpcClient, config: &ConfigOptions, solend_accounts: &SolendAccounts, fluid_contract: &FluidContract) {
+        INIT.call_once(|| {
+    let payer = &config.accounts[0];
+
+    let market = &solend_accounts.markets[0];
+
+    let mint_account_seed = format!("FLU:{}_OBLIGATION", config.token_name);
+    let (_, bump_seed) = Pubkey::find_program_address(
+        &[mint_account_seed.as_bytes()],
+        &Pubkey::from_str(&config.program_id).unwrap(),
+    );
+
+    // init obligation
+    let init_obligation_accs = instructions::InitObligationInstructionAccountMetas {
+        payer_pubkey: AccountMeta::new(payer.get_public_key(), true),
+        collateral_mint: AccountMeta::new(accounts::collateral_mint(&config, &solend_accounts), true),
+        solend_program: AccountMeta::new_readonly(accounts::solend_program(&solend_accounts), false),
+        system_program: AccountMeta::new_readonly(system_program::ID, false),
+        obligation_account: AccountMeta::new(accounts::obligation_account(&config), false),
+        lending_market: AccountMeta::new(Pubkey::from_str(&market.address).unwrap(), false),
+        pda_pubkey: AccountMeta::new(accounts::pda(&config), false),
+        clock_program: AccountMeta::new_readonly(sysvar::clock::ID, false),
+        rent_program: AccountMeta::new_readonly(sysvar::rent::ID, false),
+        token_program: AccountMeta::new_readonly(spl_token::ID, false),
+    };
+
+
+    let init_obligation_args = instructions::InitObligationInstructionArgs {
+        token_name: config.token_name.clone(),
+        bump_seed,
+        space: 1300,
+        lamports: client
+            .get_minimum_balance_for_rent_exemption(1300)
+            .unwrap(),
+    };
+
+    let init_obligation_inst =
+        fluid_contract.initobligation(init_obligation_accs, init_obligation_args);
+
+    dbg!(send_instruction(
+        &client,
+        init_obligation_inst,
+        payer.get_public_key(),
+        vec![&payer.keypair.as_ref().unwrap()]
+    ));
+
+    // Init data
+    let init_data_accs = instructions::InitDataInstructionAccountMetas {
+        system_program: AccountMeta::new_readonly(system_program::ID, false),
+        payer_pubkey: AccountMeta::new(payer.get_public_key(), false),
+        data_pubkey: AccountMeta::new(accounts::data_account(&config), false),
+        token_mint: AccountMeta::new(accounts::base_token(&config, &solend_accounts), false),
+        fluid_mint: AccountMeta::new(accounts::fluid_token(&config), false),
+        pda_pubkey: AccountMeta::new(accounts::pda(&config), false),
+    };
+
+    let init_data_args = instructions::InitDataInstructionArgs {
+        token_name: config.token_name.clone(),
+        bump_seed,
+        space: std::mem::size_of::<FluidityData>() as u64,
+        lamports: client
+            .get_minimum_balance_for_rent_exemption(std::mem::size_of::<FluidityData>())
+            .unwrap(),
+    };
+
+    let init_data_inst = fluid_contract.init_data(init_data_accs, init_data_args);
+
+    dbg!(send_instruction(
+        &client,
+        init_data_inst,
+        payer.get_public_key(),
+        vec![&payer.keypair.as_ref().unwrap()]
+    ));
+
+    })
+}
+
+pub fn setup_user(client: &RpcClient, user: &DevnetAccount, fluid_contract: &FluidContract) {
+        // Init tvl data
+        let init_tvl_data_args = instructions::InitTvlDataInstructionArgs {
+            payer_pubkey: user.get_public_key(),
+            tvl_data_pubkey: user.tvl_data_account.unwrap(),
+            space: std::mem::size_of::<u64>() as u64,
+            lamports: client
+                .get_minimum_balance_for_rent_exemption(std::mem::size_of::<u64>())
+                .unwrap(),
+        };
+
+        let init_tvl_data_inst = fluid_contract.init_tvl_data(init_tvl_data_args);
+
+        dbg!(send_instruction(
+            &client,
+            init_tvl_data_inst,
+            user.get_public_key(),
+            vec![&user.keypair.as_ref().unwrap()]
+        ));
+
 }
 
 #[cfg(test)]
@@ -84,101 +187,18 @@ mod tests {
 
         let fluid_contract = instructions::FluidContract::new(&config.program_id);
 
-        let payer = &config.accounts[0];
-
-        let market = &solend_accounts.markets[0];
-
         let mint_account_seed = format!("FLU:{}_OBLIGATION", config.token_name);
         let (_, bump_seed) = Pubkey::find_program_address(
             &[mint_account_seed.as_bytes()],
             &Pubkey::from_str(&config.program_id).unwrap(),
         );
-
-        // init obligation
-        let init_obligation_accs = instructions::InitObligationInstructionAccountMetas {
-            payer_pubkey: AccountMeta::new(payer.get_public_key(), true),
-            collateral_mint: AccountMeta::new(accounts::collateral_account(&config), true),
-            solend_program: AccountMeta::new(accounts::solend_program(&solend_accounts), false),
-            system_program: AccountMeta::new_readonly(system_program::ID, false),
-            obligation_account: AccountMeta::new(accounts::obligation_account(&config), false),
-            lending_market: AccountMeta::new(Pubkey::from_str(&market.address).unwrap(), false),
-            pda_pubkey: AccountMeta::new(accounts::pda(&config), false),
-            clock_program: AccountMeta::new_readonly(sysvar::clock::ID, false),
-            rent_program: AccountMeta::new_readonly(sysvar::rent::ID, false),
-            token_program: AccountMeta::new_readonly(spl_token::ID, false),
-        };
-
-        let init_obligation_args = instructions::InitObligationInstructionArgs {
-            token_name: config.token_name.clone(),
-            bump_seed,
-            space: std::mem::size_of::<u64>() as u64,
-            lamports: client
-                .get_minimum_balance_for_rent_exemption(std::mem::size_of::<u64>())
-                .unwrap(),
-        };
-
-        let init_obligation_inst =
-            fluid_contract.initobligation(init_obligation_accs, init_obligation_args);
-
-        assert!(send_instruction(
-            &client,
-            init_obligation_inst,
-            payer.get_public_key(),
-            vec![&payer.keypair.as_ref().unwrap()]
-        )
-        .is_ok());
-
-        // Init data
-        let init_data_accs = instructions::InitDataInstructionAccountMetas {
-            system_program: AccountMeta::new_readonly(system_program::ID, false),
-            payer_pubkey: AccountMeta::new(payer.get_public_key(), false),
-            data_pubkey: AccountMeta::new(accounts::data_account(&config), false),
-            token_mint: AccountMeta::new(accounts::base_token(&config, &solend_accounts), false),
-            fluid_mint: AccountMeta::new(accounts::fluid_token(&config), false),
-            pda_pubkey: AccountMeta::new(accounts::pda(&config), false),
-        };
-
-        let init_data_args = instructions::InitDataInstructionArgs {
-            token_name: config.token_name.clone(),
-            bump_seed,
-            space: std::mem::size_of::<u64>() as u64,
-            lamports: client
-                .get_minimum_balance_for_rent_exemption(std::mem::size_of::<u64>())
-                .unwrap(),
-        };
-
-        let init_data_inst = fluid_contract.init_data(init_data_accs, init_data_args);
-
-        assert!(send_instruction(
-            &client,
-            init_data_inst,
-            payer.get_public_key(),
-            vec![&payer.keypair.as_ref().unwrap()]
-        )
-        .is_ok());
+        
+        setup_accs(&client, &config, &solend_accounts, &fluid_contract);
 
         // Wrap
         let wrapping_user = &config.accounts[1];
-
-        // Init tvl data
-        let init_tvl_data_args = instructions::InitTvlDataInstructionArgs {
-            payer_pubkey: wrapping_user.get_public_key(),
-            tvl_data_pubkey: payer.tvl_data_account.unwrap(),
-            space: std::mem::size_of::<u64>() as u64,
-            lamports: client
-                .get_minimum_balance_for_rent_exemption(std::mem::size_of::<u64>())
-                .unwrap(),
-        };
-
-        let init_tvl_data_inst = fluid_contract.init_tvl_data(init_tvl_data_args);
-
-        assert!(send_instruction(
-            &client,
-            init_tvl_data_inst,
-            payer.get_public_key(),
-            vec![&payer.keypair.as_ref().unwrap()]
-        )
-        .is_ok());
+        
+        setup_user(&client, &wrapping_user, &fluid_contract);
 
         let starting_fluid_token = client
             .get_token_account_balance(&wrapping_user.fluid_token_account.unwrap())
@@ -244,14 +264,18 @@ mod tests {
         };
 
         let wrap_inst = fluid_contract.wrap(wrap_accs, wrap_args);
+        
+        println!("hello");
 
-        assert!(send_instruction(
+        assert!(dbg!(send_instruction(
             &client,
             wrap_inst,
             wrapping_user.get_public_key(),
             vec![&wrapping_user.keypair.as_ref().unwrap()]
-        )
+        ))
         .is_ok());
+        
+        println!("hello2");
 
         let new_fluid_token = client
             .get_token_account_balance(&wrapping_user.fluid_token_account.unwrap())

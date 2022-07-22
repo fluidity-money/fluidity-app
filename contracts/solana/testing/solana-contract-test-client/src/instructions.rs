@@ -99,6 +99,7 @@ pub struct MoveFromPrizePoolInstructionArgs {
     pub bump_seed: u8,
 }
 
+#[derive(Debug)]
 pub struct InitObligationInstructionAccountMetas {
     pub payer_pubkey: AccountMeta,
     pub collateral_mint: AccountMeta,
@@ -112,6 +113,7 @@ pub struct InitObligationInstructionAccountMetas {
     pub token_program: AccountMeta,
 }
 
+#[derive(Debug)]
 pub struct InitObligationInstructionArgs {
     pub lamports: u64,
     pub space: u64,
@@ -119,6 +121,8 @@ pub struct InitObligationInstructionArgs {
     pub token_name: String,
 }
 
+
+#[derive(Debug)]
 pub struct LogTvlInstructionAccountMetas {
     pub tvl_data_pubkey: AccountMeta,
     pub payer_pubkey: AccountMeta,
@@ -130,6 +134,8 @@ pub struct LogTvlInstructionAccountMetas {
     pub clock_program: AccountMeta,
 }
 
+
+#[derive(Debug)]
 pub struct InitDataInstructionAccountMetas {
     pub system_program: AccountMeta,
     pub payer_pubkey: AccountMeta,
@@ -139,6 +145,8 @@ pub struct InitDataInstructionAccountMetas {
     pub pda_pubkey: AccountMeta,
 }
 
+
+#[derive(Debug)]
 pub struct InitDataInstructionArgs {
     pub token_name: String,
     pub lamports: u64,
@@ -146,6 +154,8 @@ pub struct InitDataInstructionArgs {
     pub bump_seed: u8,
 }
 
+
+#[derive(Debug)]
 pub struct InitTvlDataInstructionArgs {
     pub payer_pubkey: Pubkey,
     pub tvl_data_pubkey: Pubkey,
