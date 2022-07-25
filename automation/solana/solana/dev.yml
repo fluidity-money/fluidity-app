@@ -2,7 +2,6 @@ SERVICES:
   - PRIZE_POOL:
       SERVICE_NAME: microservice-solana-prize-pool
       DOCKERFILE_PATH: ./cmd/microservice-solana-prize-pool
-      
       ENV_FLU_WORKER_ID: production-solana-microservice-solana-prize-pool
       ENV_FLU_SOLANA_PROGRAM_ID: GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU
       SECRET_FLU_SOLANA_TOKENS_LIST: /fluidity/solana/token_list
@@ -13,7 +12,6 @@ SERVICES:
       SECRET_FLU_SOLANA_TVL_PAYER_PRIKEY: /fluidity/solana/tvl_payer_prikey
 
   - SOL_COMMON_COUNT_WINS:
-      ENABLE: false
       SERVICE_NAME: microservice-common-count-wins-solana
       DOCKER_IMAGE: microservice-common-count-wins
       DOCKERFILE_PATH: ./cmd/microservice-common-count-wins
