@@ -40,10 +40,25 @@ func main() {
 		solanaRpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		solPythPubkeyString = util.GetEnvOrFatal(EnvSolPythPubkey)
 		applicationsString  = util.GetEnvOrFatal(EnvApplicationList)
+
 		applications        = parseApplications(applicationsString)
 	)
 
-	solPythPubkey := solanaLibrary.MustPublicKeyFromBase58(solPythPubkeyString)
+	solPythPubkey, err := solanaLibrary.PublicKeyFromBase58(
+		solPythPubkeyString,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to decode %v pyth public key %#v",
+				EnvSolPythPubkey,
+				solPythPubkeyString,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
 

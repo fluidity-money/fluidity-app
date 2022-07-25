@@ -28,10 +28,10 @@ docker-compose-build:
 	@./scripts/docker-compose-all.sh build
 
 semgrep:
-	@${SEMGREP_ALL} --config .semgrep/golang.yml
+	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
 test: semgrep
-	@${GO_TEST} ./...
+	@./run-tests.sh
 
 lint: semgrep
 	@${GO_FMT} ./...

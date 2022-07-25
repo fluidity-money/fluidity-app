@@ -50,7 +50,18 @@ const (
 func pubkeyFromEnv(env string) solanaGo.PublicKey {
 	pubkeyString := util.GetEnvOrFatal(env)
 
-	pubkey := solanaGo.MustPublicKeyFromBase58(pubkeyString)
+	pubkey, err := solanaGo.PublicKeyFromBase58(pubkeyString)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to decode public key %s",
+				env,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	return pubkey
 }
