@@ -140,22 +140,6 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 auth={active}
                 priviledge={1}
               />
-              <Button
-                label={`${
-                  pendingWins.length > 0 ? "Show" : "Fetch"
-                } Pending Wins`}
-                theme={`primary-text${appTheme}`}
-                texttheme="header-text"
-                padding="toolbarBtnPadding"
-                goto={() =>
-                  pendingWins.length > 0
-                    ? setShowPendingWins(true)
-                    : fetchPendingWins()
-                }
-                selected={false}
-                auth={active}
-                priviledge={1}
-              />
             </div>
             <div></div>
             <div className="button-container">
