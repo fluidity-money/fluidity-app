@@ -140,7 +140,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 auth={active}
                 priviledge={1}
               />
-              <Button
+              {/* <Button
                 label={`${
                   pendingWins.length > 0 ? "Show" : "Fetch"
                 } Pending Wins`}
@@ -155,7 +155,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 selected={false}
                 auth={active}
                 priviledge={1}
-              />
+              /> */}
             </div>
             <div></div>
             <div className="button-container">
