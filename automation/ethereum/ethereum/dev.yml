@@ -16,7 +16,6 @@ SERVICES:
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
   
   - ETH_COMMON_COUNT_WINS:
-      ENABLE: false
       SERVICE_NAME: microservice-common-count-wins-ethereum
       DOCKER_IMAGE: microservice-common-count-wins
       DOCKERFILE_PATH: ./cmd/microservice-common-count-wins
