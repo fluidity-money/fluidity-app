@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -30,29 +30,45 @@ const (
 	EnvRaydiumProgramId = `FLU_SOLANA_RAYDIUM_PROGRAM_ID`
 )
 
+func tokenListFromEnv(env string) map[string]string {
+	tokenListString := util.GetEnvOrFatal(env)
+
+	tokensMap := make(map[string]string)
+
+	tokens := strings.Split(tokenListString, ",")
+
+	for _, token := range tokens {
+		tokenDetails := strings.Split(token, ":")
+
+		if len(tokenDetails) != 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Unexpected token details format! Expected fluid:base, got %s",
+					token,
+				)
+			})
+		}
+
+		var (
+			fluid = tokenDetails[0]
+			base  = tokenDetails[1]
+		)
+
+		tokensMap[fluid] = base
+	}
+
+	return tokensMap
+}
+
 func main() {
 	var (
 		solanaRpcUrl       = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		fluidTokenString   = util.GetEnvOrFatal(EnvSolanaTokenLookups)
+		fluidTokens        = tokenListFromEnv(EnvSolanaTokenLookups)
 		saberRpcUrl        = util.GetEnvOrFatal(EnvSaberRpcUrl)
 		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
 		raydiumProgramId   = util.GetEnvOrFatal(EnvRaydiumProgramId)
 	)
-
-	var fluidTokens map[string]string
-
-	err := json.Unmarshal([]byte(fluidTokenString), &fluidTokens)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"failed to unmarshal fluid to base token map from env string %#v!",
-				fluidTokenString,
-			)
-			k.Payload = err
-		})
-	}
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
 
