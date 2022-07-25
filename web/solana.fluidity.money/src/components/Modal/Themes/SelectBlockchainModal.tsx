@@ -49,29 +49,30 @@ const SelectBlockchainModal = ({
         // { name: "Mainnet", address: "https://app.ethereum.fluidity.money/",id:"" },
         {
           name: "Ropsten",
-          address: "https://ropsten.beta.fluidity.money/",
+          address: "https://ropsten.ethereum.fluidity.money/",
           id: "",
         },
-        {
-          name: "Kovan",
-          address: "https://kovan.beta.fluidity.money/",
-          id: "",
-        },
+        // {
+        //   name: "Kovan",
+        //   address: "https://kovan.beta.fluidity.money/",
+        //   id: "",
+        // },
       ],
     },
-    {
-      blockchain: "Aurora",
-      icon: "/img/Aurora/AuroraLogoTextBelow.svg",
-      visible: true,
-      networks: [
-        {
-          name: "Aurora",
-          address: "https://app.aurora.fluidity.money/",
-          id: "",
-        },
-      ],
-    },
+    // {
+    //   blockchain: "Aurora",
+    //   icon: "/img/Aurora/AuroraLogoTextBelow.svg",
+    //   visible: true,
+    //   networks: [
+    //     {
+    //       name: "Aurora",
+    //       address: "https://app.aurora.fluidity.money/",
+    //       id: "",
+    //     },
+    //   ],
+    // },
   ];
+
   // creates options state and stores in local storage
   const [options, setOptions] = useLocalStorage(
     "networks-open",
