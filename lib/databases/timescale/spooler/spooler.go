@@ -167,10 +167,10 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 		RETURNING
 			token_short_name,
 			token_decimals,
-			transaction_hash
+			transaction_hash,
 			address,
 			win_amount,
-			block_number,
+			block_number
 		;`,
 
 		TablePendingWinners,
@@ -233,7 +233,7 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
 		`SELECT
 			token_short_name,
 			token_decimals,
-			transaction_hash
+			transaction_hash,
 			address,
 			win_amount,
 			block_number
