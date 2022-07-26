@@ -29,10 +29,11 @@ func GetBlock(rpcUrl string, slot uint64) (Block, error) {
 		"params": []interface{}{
 			slot,
 			map[string]interface{}{
-				"encoding":           "json",
-				"transactionDetails": "full",
-				"rewards":            false,
-				"commitment":         "confirmed",
+				"encoding":                       "json",
+				"transactionDetails":             "full",
+				"rewards":                        false,
+				"commitment":                     "confirmed",
+				"maxSupportedTransactionVersion": 0,
 			},
 		},
 	}
