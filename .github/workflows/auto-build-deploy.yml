@@ -22,7 +22,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ap-southeast-2
-          role-to-assume: arn:aws:iam::802019692967:role/fluidity.app.github.oidc.role
+          role-to-assume: ${{ secrets.FLU_DEV_AWS_GITHUB_OIDC_ROLE }}
       - name: Get Diff
         uses: ./scripts/actions
         with:
@@ -38,5 +38,11 @@ jobs:
         with:
           command: |
             flu deploy-service-diff --tag $GITHUB_SHA
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#develop-ci-alerts'
+        if: always()
 
 
