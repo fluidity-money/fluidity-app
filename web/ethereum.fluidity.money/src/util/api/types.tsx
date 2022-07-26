@@ -1,5 +1,7 @@
+import {SupportedContracts} from "util/contractList";
+
 export type TokenDetails = {
-  token_short_name: string;
+  token_short_name: SupportedContracts;
   token_decimals: number;
 };
 
@@ -52,15 +54,18 @@ export type Routes = {
   };
 
   "/manual-reward": {
-    reward: {
-      token: TokenDetails;
-      winner: string;
-      win_amount: string;
-      first_block: string;
-      last_block: string;
-    };
-    // Go encodes []byte as a `\x`-escaped B64 hex string
-    signature: string
+    error: string,
+    payload: {
+      reward: {
+        token: TokenDetails;
+        winner: string;
+        win_amount: string;
+        first_block: string;
+        last_block: string;
+      };
+      // Go encodes []byte as a `\x`-escaped B64 hex string
+      signature: string
+    }
   }
 };
 
