@@ -17,7 +17,7 @@ SERVICES:
       TARGET_GROUP: flu-dev-faucet-fe-tg
       
       DOCKER_ARGS:
-        REACT_APP_FLU_API_URI: ${FLU_FAUCET_FRONTEND_API_URL}
+        REACT_APP_FLU_API_URI: https://faucet.ropsten.ethereum.fluidity.money:8081
         PRODUCTION: "true"
 
   - FAUCET_TRACK_TWEETS:
