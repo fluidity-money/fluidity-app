@@ -70,7 +70,6 @@ docker-frontend: ${FRONTEND_SRC}
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		${DOCKER_BUILD_ARGS} \
-		--build-arg=REACT_APP_FLU_API_URI="${REACT_APP_FLU_API_URI}" \
 		-t "${ORG_ROOT}/${REPO}-frontend" \
 		-f Dockerfile.frontend \
 		.

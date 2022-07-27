@@ -2,7 +2,7 @@
 
 SERVICES:
   - FAUCET_BACKEND:
-      SERVICE_NAME: faucet.fluidity.money-backend
+      SERVICE_NAME: faucet-fluidity-money-backend
       DOCKERFILE_PATH: ./web/faucet.fluidity.money
       DOCKER_IMAGE: faucet.fluidity.money-backend
       TARGET_GROUP: flu-dev-faucet-be-tg
@@ -11,7 +11,7 @@ SERVICES:
       SECRET_FLU_SLACK_WEBHOOK: /fluidity/faucet/slack/backend_webhook_url
 
   - FLUIDITY_FRONTEND:
-      SERVICE_NAME: faucet.fluidity.money-frontend
+      SERVICE_NAME: faucet-fluidity-money-frontend
       DOCKERFILE_PATH: ./web/faucet.fluidity.money
       DOCKER_IMAGE: faucet.fluidity.money-frontend
       TARGET_GROUP: flu-dev-faucet-fe-tg
@@ -39,7 +39,6 @@ SERVICES:
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
       SECRET_FLU_ETHEREUM_FAUCET_PRIVATE_KEY: /fluidity/faucet/private_key
       
-
   - SOL_FAUCET_SEND_AMOUNTS:
       SERVICE_NAME: microservice-solana-faucet-send-amounts
       DOCKERFILE_PATH: ./cmd/microservice-solana-faucet-send-amounts
