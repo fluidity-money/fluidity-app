@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"testing"
 
@@ -59,6 +60,9 @@ func init() {
 
 	uniswapTests := unmarshalJsonTestOrFatal(integrationTestUniswapV2)
 	tests = append(tests, uniswapTests...)
+
+	mooniswapTests := unmarshalJsonTestOrFatal(integrationTestMooniswap)
+	tests = append(tests, mooniswapTests...)
 }
 
 func TestIntegrations(t *testing.T) {
@@ -66,6 +70,7 @@ func TestIntegrations(t *testing.T) {
 	client, err := ethclient.Dial(ethHttpUrl)
 	assert.NoError(t, err)
 
+	t.Logf("Tests: ", tests)
 	for i, event := range tests {
 		t.Logf("Event %d\n", i)
 
@@ -88,6 +93,8 @@ func TestIntegrations(t *testing.T) {
 		// correct fees
 		expectedFeesRat, ok := new(big.Rat).SetString(event.ExpectedFees)
 		assert.True(t, ok)
+		fmt.Println(fees)
+		fmt.Println(expectedFeesRat)
 		assert.Equal(t, expectedFeesRat, fees)
 	}
 }

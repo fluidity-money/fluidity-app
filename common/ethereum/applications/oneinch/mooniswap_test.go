@@ -15,10 +15,16 @@ type calculateMooniswapFeeTest struct {
 }
 
 func testCalculateMooniswapFee(t *testing.T) {
-	tests := []calculateMooniswapFeeTest{
-		{big.NewRat(100, 1), big.NewRat(997, 10), true, big.NewRat(3, 10)},
-		{big.NewRat(100, 1), big.NewRat(997, 10), false, big.NewRat(3, 10)},
-	}
+	var (
+		rpcMethods = make(map[string]interface{})
+
+		callMethods = make(map[string]interface{})
+
+		tests = []calculateMooniswapFeeTest{
+			{big.NewRat(100, 1), big.NewRat(997, 10), true, big.NewRat(3, 10)},
+			{big.NewRat(100, 1), big.NewRat(997, 10), false, big.NewRat(3, 10)},
+		}
+	)
 
 	for _, test := range tests {
 		var (
