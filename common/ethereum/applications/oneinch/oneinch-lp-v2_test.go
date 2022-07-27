@@ -78,3 +78,23 @@ func TestCalculateLPTotalFluidFee(t *testing.T) {
 	}
 
 }
+
+func TestGetLPFees(t *testing.T) {
+	const (
+		dataBlob64             = `""`
+		staticFeeRpcResponse   = `""`
+		slippageFeeRpcResponse = `""`
+	)
+
+	var (
+		rpcMethods  = make(map[string]interface{})
+		callMethods = make(map[string]interface{})
+	)
+
+	rpcMethods["eth_getCode"] = "0x0"
+	callMethods["fee()"] = staticFeeRpcResponse
+	callMethods["slippageFee()"] = slippageFeeRpcResponse
+
+	client, err := testUtils.MockRpcClient(rpcMethods, callMethods)
+	assert.NoError(t, err)
+}
