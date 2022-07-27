@@ -46,7 +46,7 @@ const TransactionConfirmationModal = ({
           target="_blank"
           href={
             userActions.length
-              ? solExplorer(userActions[0].transaction_hash, "address")
+              ? solExplorer(userActions[0].transaction_hash, "tx")
               : "https://explorer.solana.com/?cluster=devnet"
           }
           rel="noreferrer"
