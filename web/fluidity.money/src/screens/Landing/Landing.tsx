@@ -8,7 +8,11 @@ const Landing = () => {
     slide up,
     manual carousel then slides in from the right
     */
-  return <div className={styles.container}>Money Designed to be Moved</div>;
+  return (
+    <div className={styles.container}>
+      <h2>MONEY DESIGNED TO BE MOVED</h2>
+    </div>
+  );
 };
 
 export default Landing;

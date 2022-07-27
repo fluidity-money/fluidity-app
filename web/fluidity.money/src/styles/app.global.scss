@@ -1,6 +1,10 @@
+@import "config";
+
 html {
   // Root font size
   font-size: 16px;
+  color: $fluidWhite;
+  box-sizing: border-box;
 }
 
 // global tag properties
@@ -8,4 +12,16 @@ body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+
+ul {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
 }
