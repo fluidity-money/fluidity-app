@@ -13,7 +13,7 @@ import {
   EnabledButton,
   enableNotifications,
 } from "components/NotificationAlert/notificationAlert";
-import { prefixlessAddress, trimAddress } from "util/addresses";
+import { trimAddress } from "util/addresses";
 import NetworkButton from "components/Button/NetworkButton";
 import { appTheme } from "util/appTheme";
 import ChainId, { chainIdFromEnv } from "util/chainId";
@@ -88,7 +88,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
     if (!wallet.account) return;
 
     const pending = await apiPOSTBody("/pending-rewards", {
-      address: prefixlessAddress(wallet.account)
+      address: wallet.account
     });
 
     if (pending != null)

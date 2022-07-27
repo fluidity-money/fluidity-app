@@ -12,7 +12,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/web"
@@ -147,8 +146,8 @@ func GetManualRewardHandler(signers map[string]*ecdsa.PrivateKey) func(http.Resp
 		}
 
 		var (
-			addressString = request.Address
-			address       = typesEthereum.AddressFromString(addressString)
+			address       = addressRequestToEthereumAddress(request.Address)
+			addressString = address.String()
 
 			token = request.TokenShortName
 		)

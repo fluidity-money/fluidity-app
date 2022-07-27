@@ -3,7 +3,9 @@ package api_fluidity_money
 import (
 	"math/big"
 	"net/http"
+	"strings"
 
+	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/graphql-go/graphql/gqlerrors"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -64,4 +66,13 @@ func graphQLErrorLogHandler(w http.ResponseWriter, r *http.Request, msg []gqlerr
 	})
 
 	w.WriteHeader(http.StatusBadRequest)
+}
+
+// addressRequestToEthereumAddress for addresses that are stored without the 0x prefix
+// (only pending rewards/manual rewards)
+func addressRequestToEthereumAddress(addressString string) typesEthereum.Address {
+	if strings.HasPrefix(addressString, "0x") {
+		addressString = addressString[2:]
+	}
+	return typesEthereum.AddressFromString(addressString)
 }

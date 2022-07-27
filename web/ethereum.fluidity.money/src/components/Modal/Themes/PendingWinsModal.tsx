@@ -12,7 +12,6 @@ import { appTheme } from "util/appTheme";
 import { getContract } from "util/contractUtils";
 import { useSigner } from "util/hooks";
 import { useWallet } from "use-wallet";
-import {prefixlessAddress} from "util/addresses";
 
 const PendingWinsModal = ({
   enable,
@@ -37,7 +36,7 @@ const PendingWinsModal = ({
 
   // fetch signed reward body
   const { error, payload} = await apiPOSTBody("/manual-reward", {
-    address: prefixlessAddress(account),
+    address: account,
     token_short_name: shortName,
   });
 
