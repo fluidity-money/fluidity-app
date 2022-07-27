@@ -1,4 +1,5 @@
 import React from "react";
+import TextButton from "../Button";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
@@ -28,7 +29,7 @@ const NavBar = () => {
               </li>
             </ul>
           </nav>
-          <button>Launch Fluidity</button>
+          <TextButton colour="white">LAUNCH FLUIDITY</TextButton>
         </div>
       </div>
     </div>

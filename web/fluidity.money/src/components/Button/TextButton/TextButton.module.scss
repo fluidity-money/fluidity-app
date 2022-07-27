@@ -1,0 +1,24 @@
+@import "../../../styles/config.scss";
+
+button {
+  all: unset;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.white {
+  background-color: $fluidWhite;
+  color: $fluidBlack;
+  padding: 10px;
+  width: fit-content;
+  height: fit-content;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+coloured {
+  background-color: transparent;
+}

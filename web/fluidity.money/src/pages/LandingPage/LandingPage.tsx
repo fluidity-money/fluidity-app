@@ -14,7 +14,8 @@ const LandingPage = () => {
   return (
     <div className={styles.pageContainer}>
       <Landing />
-      {/* <Reward />
+      <Reward />
+      {/* 
       <HowItWorks />
       <UseCases />
       <SponsorsPartners />

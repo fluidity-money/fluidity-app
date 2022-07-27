@@ -3,6 +3,7 @@
 html {
   // Root font size
   font-size: 16px;
+  font-family: "arial";
   color: $fluidWhite;
   box-sizing: border-box;
 }
@@ -24,4 +25,8 @@ a {
 
 button {
   cursor: pointer;
+}
+
+.App {
+  background-color: $backgroundBlack;
 }
