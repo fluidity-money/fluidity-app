@@ -19,6 +19,17 @@ button {
   }
 }
 
+.black {
+  background-color: $fluidBlack;
+  color: $fluidWhite;
+  padding: 10px;
+  width: fit-content;
+  height: fit-content;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
 coloured {
   background-color: transparent;
 }

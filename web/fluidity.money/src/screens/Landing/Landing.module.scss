@@ -1,13 +1,66 @@
 .container {
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 750px;
   width: 100%;
   border: solid 2px red;
   // display: grid;
   // grid-template-columns: repeat(1, 1fr);
   // position: relative;
   // max-width: 1500px;
+  h1 {
+    position: absolute;
+  }
+}
+
+.fadeIn {
+  transition: opacity 3s ease;
+}
+
+.fadeInText {
+  margin-bottom: 200px;
+  transition: opacity 1s ease 0s, all 3s ease 1s;
+}
+
+.fadeOut {
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.carousel {
+  margin-right: 75vw;
+  margin-top: 300px;
+  transition: opacity 1s ease 0s, all 3s ease 1s;
+}
+
+.fadeOutCarousel {
+  opacity: 0;
+  transition: opacity 1s ease;
+  margin-left: 75vw;
+  margin-top: 300px;
+}
+
+// for making the background get very large and disapperar
+.makeBig {
+  animation-duration: 5s;
+  animation-name: animate-text;
+}
+
+@keyframes animate-text {
+  0% {
+    transform: scale(1);
+  }
+  10% {
+    transform: scale(2);
+  }
+  20% {
+    transform: scale(3);
+  }
+  100% {
+    transform: scale(200);
+  }
 }

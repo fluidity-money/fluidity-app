@@ -1,8 +1,17 @@
 import React from "react";
+import TextButton from "../../components/Button";
 import styles from "./Demo.module.scss";
 
 const Demo = () => {
-  return <div className={styles.container}>Demo</div>;
+  /*
+  full screen demo
+  */
+  return (
+    <div className={styles.container}>
+      <TextButton colour="white">SHOW ME A DEMO</TextButton>
+      <TextButton colour="black">LAUNCH FLUIDITY</TextButton>
+    </div>
+  );
 };
 
 export default Demo;

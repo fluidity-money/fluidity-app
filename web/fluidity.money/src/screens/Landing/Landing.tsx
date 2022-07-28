@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./Landing.module.scss";
 
 const Landing = () => {
@@ -8,9 +8,58 @@ const Landing = () => {
     slide up,
     manual carousel then slides in from the right
     */
+
+  const [fadeProp, setFadeProp] = useState("fadeIn");
+  const myRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    console.log("my ref", myRef.current);
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      // console.log("entry", entry);
+      console.log("bcr", entry.boundingClientRect);
+      console.log("isr", entry.intersectionRect);
+      console.log("rb", entry.rootBounds);
+      if (entry.boundingClientRect.top < 356) {
+        handleClick();
+      }
+    });
+
+    observer.observe(myRef.current as Element);
+  }, []);
+
+  const handleClick = () => {
+    if (fadeProp === "fadeIn") {
+      setFadeProp("fadeOut");
+    } else {
+      setFadeProp("fadeIn");
+    }
+    // fadeProp === "fadeIn" && setFadeProp("fadeOut");
+  };
+
   return (
-    <div className={styles.container}>
-      <h2>MONEY DESIGNED TO BE MOVED</h2>
+    <div className={`${styles.container}`} onClick={() => handleClick()}>
+      <h1
+        ref={myRef}
+        className={`${fadeProp === "fadeIn" ? styles.fadeIn : styles.fadeOut}`}
+      >
+        MONEY DESIGNED TO BE MOVED
+      </h1>
+      <h1
+        className={`${
+          fadeProp === "fadeIn" ? styles.fadeOut : `${styles.fadeInText}`
+        }`}
+      >
+        Fluidity is the blockchain incentive layer, rewarding people for using
+        their crypto.
+      </h1>
+      <div
+        className={`${
+          fadeProp === "fadeIn" ? styles.fadeOutCarousel : ` ${styles.carousel}`
+        }`}
+      >
+        I AM A CAROUSEL!
+      </div>
     </div>
   );
 };
