@@ -26,8 +26,15 @@ func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]str
 	)
 
 	switch transactionApplication {
+	case applications.ApplicationSplToken:
+		fee = big.NewRat(0, 0)
+
 	case applications.ApplicationSaber:
-		fee, _, err = saber.GetSaberFees(saberRpc, transactionResult, saberProgramId)
+		fee, _, err = saber.GetSaberFees(
+			saberRpc,
+			transactionResult,
+			saberProgramId,
+		)
 
 	case applications.ApplicationOrca:
 		fee, err = orca.GetOrcaFees(
