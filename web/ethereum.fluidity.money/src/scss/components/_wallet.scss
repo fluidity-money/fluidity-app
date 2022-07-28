@@ -77,6 +77,7 @@
 
 .portfolio-graph-title {
   font-size: 1.5rem;
+  margin-left: 33px;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   grid-column: 1/-1;
@@ -105,7 +106,7 @@
   box-sizing: border-box;
   height: 100%;
   width: 100%;
-  max-width: 80rem;
+  max-width: 50rem;
   justify-self: center;
   // width: 100%;
   @include for-tablet-portrait-up {
@@ -124,15 +125,7 @@
 .doughnut-container {
   position: relative;
   justify-self: center;
-  // width: auto;
-  width: 175px;
-  @include for-tablet-portrait-up {
-    grid-column: 1/2;
-  }
-  @include for-tablet-landscape-up {
-    grid-column: 1;
-    grid-row: 2/3;
-  }
+  width: auto;
 }
 
 .currency-list {
@@ -167,13 +160,17 @@
   height: 100%;
   align-items: center;
 
-  font-family: Manrope;
+  font-family: "Inter", Arial, Serif, sans-serif;
   font-style: normal;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 1.5rem;
   letter-spacing: 0em;
 
   color: white;
+
+  @include for-tablet-landscape-down  {
+    font-size: 1.1rem;
+  }
 }
 
 .currency-walletempty-container {
@@ -266,13 +263,13 @@
 .total {
   display: flex;
   flex-direction: column;
-  width: 120px;
-  height: 120px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
   background-color: #19202f;
   position: absolute;
-  top: 16%;
-  left: 16%;
+  top: 10%;
+  left: 10%;
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
@@ -317,7 +314,7 @@
 
 .selected-text {
   @extend .primary-text;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   background: white;
   background-clip: text;
   -webkit-background-clip: text;
@@ -361,4 +358,11 @@
 .yield-graph-legend {
   color: white;
   font-size: 9px;
+}
+
+.f-mr-10 {
+  margin-right: 100%;
+  @include for-tablet-landscape-down  {
+    margin-right: 0;
+  }
 }
