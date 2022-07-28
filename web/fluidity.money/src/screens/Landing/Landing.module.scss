@@ -3,6 +3,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 950px;
-  max-width: 1500px;
+  min-height: 100vh;
+  width: 100%;
+  border: solid 2px red;
+  // display: grid;
+  // grid-template-columns: repeat(1, 1fr);
+  // position: relative;
+  // max-width: 1500px;
 }

@@ -1,12 +1,25 @@
 @import "../../styles/config.scss";
 
 .pageContainer {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: $backgroundBlack;
+
+  // height: 100vh;
+  // width: 100%;
+
+  // padding-top: 180px;
+}
+
+.screensContainer {
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   flex-direction: column;
-  // background-color: $backgroundBlack;
-  height: 100vh;
-  width: 100vw;
-  align-items: center;
-  // padding-top: 180px;
+  width: 100%;
+  max-width: 1500px;
 }

@@ -13,16 +13,17 @@ import styles from "./LandingPage.module.scss";
 const LandingPage = () => {
   return (
     <div className={styles.pageContainer}>
-      <Landing />
-      <Reward />
-      {/* 
-      <HowItWorks />
-      <UseCases />
-      <SponsorsPartners />
-      <Projects />
-      <Resources />
-      <Demo />
-      <Footer /> */}
+      <div className={styles.screensContainer}>
+        <Landing />
+        <Reward />
+        <HowItWorks />
+        <UseCases />
+        <SponsorsPartners />
+        <Projects />
+        <Resources />
+        <Demo />
+        <Footer />
+      </div>
     </div>
   );
 };
