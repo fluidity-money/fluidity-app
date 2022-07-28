@@ -31,7 +31,7 @@ const DoughnutGraph = ({
         // },
         borderColor: colours,
         textColor: "#FFF",
-        borderWidth: 1,
+        borderWidth: 10,
         hoverOffset: 15,
         padding: 50,
       },
@@ -41,7 +41,7 @@ const DoughnutGraph = ({
   const options = {
     cutout: "92%",
     borderRadius: 10,
-    spacing: 16,
+    spacing: 20,
     layout: {
       padding: 12,
     },
