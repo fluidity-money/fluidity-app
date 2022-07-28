@@ -26,6 +26,9 @@ func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]str
 	)
 
 	switch transactionApplication {
+	case applications.ApplicationSpl:
+		// no application, nothing to be done
+
 	case applications.ApplicationSaber:
 		fee, _, err = saber.GetSaberFees(saberRpc, transactionResult, saberProgramId)
 
