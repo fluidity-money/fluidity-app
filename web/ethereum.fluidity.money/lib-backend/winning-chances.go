@@ -119,7 +119,7 @@ var queryType = graphql.NewObject(
 						payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
 					)
 
-					randomN, randomPayouts := probability.WinningChances(
+					randomN, randomPayouts, _ := probability.WinningChances(
 						gasFee,
 						atx,
 						sizeOfThePool,
@@ -133,6 +133,7 @@ var queryType = graphql.NewObject(
 					)
 
 					output.N = fmt.Sprintf("%v", randomN)
+
 					for _, value := range randomPayouts {
 						output.Payouts = append(output.Payouts, value.Int64())
 					}

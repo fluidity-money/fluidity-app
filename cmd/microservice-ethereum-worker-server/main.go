@@ -615,7 +615,7 @@ func main() {
 				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
 			)
 
-			randomN, randomPayouts := probability.WinningChances(
+			randomN, randomPayouts, _ := probability.WinningChances(
 				transferFeeUsd,
 				currentAtx,
 				sizeOfThePool,
@@ -628,7 +628,11 @@ func main() {
 				emission,
 			)
 
-			res := generateRandomIntegers(fluidity.WinningClasses, 1, int(randomN))
+			res := generateRandomIntegers(
+				fluidity.WinningClasses,
+				1,
+				int(randomN),
+			)
 
 			// create announcement and container
 

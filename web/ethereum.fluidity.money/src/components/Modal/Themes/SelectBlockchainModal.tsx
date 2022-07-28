@@ -34,37 +34,19 @@ const SelectBlockchainModal = ({
       icon: "/img/TokenIcons/ethereumIcon.svg",
       visible: true,
       networks: [
-        // { name: "Mainnet", address: "https://app.ethereum.fluidity.money/",id:"1" },
         {
           name: "Ropsten",
-          address: "https://ropsten.beta.fluidity.money/",
+          address: "https://ropsten.ethereum.fluidity.money/",
           id: "3",
         },
-        {
-          name: "Kovan",
-          address: "https://kovan.beta.fluidity.money/",
-          id: "42",
-        },
       ],
     },
-    {
-      blockchain: "Aurora",
-      icon: "/img/Aurora/AuroraLogoTextBelow.svg",
-      visible: true,
-      networks: [
-        {
-          name: "Aurora",
-          address: "https://app.aurora.fluidity.money/",
-          id: "1313161554",
-        },
-      ],
-    },
+
     {
       blockchain: "Solana",
       icon: "/img/TokenIcons/solanaIcon.svg",
       visible: true,
       networks: [
-        // { name: "Mainnet", address: "https://app.solana.fluidity.money/",id:"" },
         {
           name: "Devnet",
           address: "https://app.solana.beta.fluidity.money/",

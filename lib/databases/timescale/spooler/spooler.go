@@ -167,10 +167,10 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 		RETURNING
 			token_short_name,
 			token_decimals,
+			transaction_hash,
 			address,
 			win_amount,
-			block_number,
-			transaction_hash
+			block_number
 		;`,
 
 		TablePendingWinners,
@@ -206,10 +206,10 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 		err := rows.Scan(
 			&winner.TokenDetails.TokenShortName,
 			&winner.TokenDetails.TokenDecimals,
+			&winner.TransactionHash,
 			&winner.Winner,
 			&winner.WinAmount,
 			&winner.BlockNumber,
-			&winner.TransactionHash,
 		)
 
 		if err != nil {
@@ -233,6 +233,7 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
 		`SELECT
 			token_short_name,
 			token_decimals,
+			transaction_hash,
 			address,
 			win_amount,
 			block_number

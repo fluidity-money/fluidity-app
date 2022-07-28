@@ -1,31 +1,76 @@
 package main
 
 import (
-	"fmt"
-	"math/big"
+	"strings"
 
-	"github.com/fluidity-money/fluidity-app/common/solana/applications"
-	"github.com/fluidity-money/fluidity-app/common/solana/saber"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	types "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
+	// EnvSolanaRpcUrl is the url used to make Solana HTTP RPC requests
+	EnvSolanaRpcUrl = `FLU_SOLANA_RPC_URL`
+
+	// EnvSolanaTokenLookups is the map of fluid -> base tokens
+	EnvSolanaTokenLookups = `FLU_SOLANA_TOKEN_LOOKUPS`
+
 	// EnvSaberSwapProgramid is the program ID of the saber swap program (not router)
 	EnvSaberSwapProgramId = `FLU_SOLANA_SABER_SWAP_PROGRAM_ID`
 
 	// EnvSaberRpcUrl to use when making lookups to their infrastructure
 	EnvSaberRpcUrl = `FLU_SOLANA_SABER_RPC_URL`
+
+	// EnvOrcaProgramId is the program ID of the orca swap program
+	EnvOrcaProgramId = `FLU_SOLANA_ORCA_PROGRAM_ID`
+
+	// EnvRaydiumProgramId is the program ID of the Raydium swap program
+	EnvRaydiumProgramId = `FLU_SOLANA_RAYDIUM_PROGRAM_ID`
 )
+
+func tokenListFromEnv(env string) map[string]string {
+	tokenListString := util.GetEnvOrFatal(env)
+
+	tokensMap := make(map[string]string)
+
+	tokens := strings.Split(tokenListString, ",")
+
+	for _, token := range tokens {
+		tokenDetails := strings.Split(token, ":")
+
+		if len(tokenDetails) != 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Unexpected token details format! Expected fluid:base, got %s",
+					token,
+				)
+			})
+		}
+
+		var (
+			fluid = tokenDetails[0]
+			base  = tokenDetails[1]
+		)
+
+		tokensMap[fluid] = base
+	}
+
+	return tokensMap
+}
 
 func main() {
 	var (
+		solanaRpcUrl       = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		fluidTokens        = tokenListFromEnv(EnvSolanaTokenLookups)
 		saberRpcUrl        = util.GetEnvOrFatal(EnvSaberRpcUrl)
 		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
+		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
+		raydiumProgramId   = util.GetEnvOrFatal(EnvRaydiumProgramId)
 	)
+
+	solanaClient := solanaRpc.New(solanaRpcUrl)
 
 	worker.GetSolanaBufferedParsedTransactions(func(transactions worker.SolanaBufferedParsedTransactions) {
 		transfers := make([]worker.SolanaDecoratedTransfer, 0)
@@ -37,15 +82,19 @@ func main() {
 			)
 
 			decorated, err := parseTransaction(
+				solanaClient,
+				fluidTokens,
 				transaction,
 				saberRpcUrl,
 				saberSwapProgramId,
+				orcaProgramId,
+				raydiumProgramId,
 			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
 					k.Format(
-						"Failed to parse an application at transaction %v! %w",
+						"Failed to parse an application at transaction %v! %v",
 						transactionNumber,
 						err,
 					)
@@ -76,75 +125,4 @@ func main() {
 			bufferedTransfers,
 		)
 	})
-}
-
-func parseTransaction(transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
-	var (
-		fee *big.Rat
-		err error
-	)
-
-	var (
-		transactionSignature   = transaction.Transaction.Signature
-		transactionApplication = transaction.Transaction.Application
-	)
-
-	switch transactionApplication {
-	case applications.ApplicationSaber:
-		fee, _, err = saber.GetSaberFees(saberRpc, transaction, saberProgramId)
-
-	default:
-		err = fmt.Errorf(
-			"application number wasn't expected: %v",
-			transactionApplication,
-		)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"application decoding failed for parsed transaction %#v: %v",
-			transactionSignature,
-			err,
-		)
-	}
-
-	var (
-		transfers      = transaction.Transfers
-		appTransaction = transaction.Transaction
-		decorated      = make([]worker.SolanaDecoratedTransfer, len(transfers))
-	)
-
-	for i, transfer := range transfers {
-		var (
-			token          = transfer.TokenDetails
-			senderSpl      = transfer.SenderAddress
-			recipientSpl   = transfer.RecipientAddress
-			senderOwner    = transfer.SolanaSenderOwnerAddress
-			recipientOwner = transfer.SolanaRecipientOwnerAddress
-		)
-
-		var decorator *types.SolanaWorkerDecorator
-
-		if fee != nil {
-			decorator_ := types.SolanaWorkerDecorator{
-				ApplicationFee: fee,
-			}
-
-			decorator = &decorator_
-		}
-
-		decoratedTransfer := worker.SolanaDecoratedTransfer{
-			Transaction:           appTransaction,
-			Token:                 token,
-			SenderSplAddress:      senderSpl,
-			RecipientSplAddress:   recipientSpl,
-			SenderOwnerAddress:    senderOwner,
-			RecipientOwnerAddress: recipientOwner,
-			Decorator:             decorator,
-		}
-
-		decorated[i] = decoratedTransfer
-	}
-
-	return decorated, nil
 }

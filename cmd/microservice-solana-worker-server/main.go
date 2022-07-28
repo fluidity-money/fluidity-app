@@ -180,7 +180,7 @@ func main() {
 				)
 			}
 
-			randomN, randomPayouts := probability.WinningChances(
+			randomN, randomPayouts, _ := probability.WinningChances(
 				solanaTransactionFeesNormalised,
 				atx,
 				sizeOfThePool,

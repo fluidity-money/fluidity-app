@@ -1,0 +1,51 @@
+
+
+SERVICES:
+  - FAUCET_BACKEND:
+      SERVICE_NAME: faucet-fluidity-money-backend
+      DOCKERFILE_PATH: ./web/faucet.fluidity.money
+      DOCKER_IMAGE: faucet.fluidity.money-backend
+      TARGET_GROUP: flu-dev-faucet-be-tg
+
+      ENV_FLU_WORKER_ID: production-faucet.fluidity.money-backend
+      SECRET_FLU_SLACK_WEBHOOK: /fluidity/faucet/slack/backend_webhook_url
+
+  - FLUIDITY_FRONTEND:
+      SERVICE_NAME: faucet-fluidity-money-frontend
+      DOCKERFILE_PATH: ./web/faucet.fluidity.money
+      DOCKER_IMAGE: faucet.fluidity.money-frontend
+      TARGET_GROUP: flu-dev-faucet-fe-tg
+      
+      DOCKER_ARGS:
+        REACT_APP_FLU_API_URI: https://faucet.ropsten.ethereum.fluidity.money:8081
+        PRODUCTION: "true"
+
+  - FAUCET_TRACK_TWEETS:
+      SERVICE_NAME: microservice-common-faucet-track-tweets
+      DOCKERFILE_PATH: ./cmd/microservice-common-faucet-track-tweets
+
+      ENV_FLU_WORKER_ID: production-microservice-common-faucet-track-tweets
+      ENV_FLU_TWITTER_HASHTAGS: fluiditymoney
+      SECRET_FLU_SLACK_WEBHOOK: /fluidity/faucet/slack/tweet_webhook_url
+
+  - ETH_FAUCET_SEND_AMOUNTS:
+      SERVICE_NAME: microservice-ethereum-faucet-send-amounts
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-faucet-send-amounts
+
+      ENV_FLU_WORKER_ID: production-microservice-ethereum-faucet-send-amounts
+      ENV_FLU_ETHEREUM_HARDHAT_FIX: "false"
+      SECRET_FLU_SLACK_WEBHOOK: /fluidity/faucet/slack/tweet_webhook_url
+      SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ropsten/token_list
+      SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
+      SECRET_FLU_ETHEREUM_FAUCET_PRIVATE_KEY: /fluidity/faucet/private_key
+      
+  - SOL_FAUCET_SEND_AMOUNTS:
+      SERVICE_NAME: microservice-solana-faucet-send-amounts
+      DOCKERFILE_PATH: ./cmd/microservice-solana-faucet-send-amounts
+
+      ENV_FLU_WORKER_ID: production-microservice-solana-faucet-send-amounts
+      SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
+      SECRET_FLU_SOLANA_TOKENS_LIST: /fluidity/solana/token_list
+      SECRET_FLU_SOLANA_FAUCET_ACCOUNT_DETAILS: /fluidity/faucet/solana/account_details
+
+
