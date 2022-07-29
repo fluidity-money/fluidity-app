@@ -1,19 +1,18 @@
 import Button from "components/Button";
-import { UserActionContext } from "components/context";
 import GenericModal from "components/Modal/GenericModal";
-import { useContext } from "react";
 import { solExplorer } from "util/solana/solExplorer";
 
 const TransactionConfirmationModal = ({
   enable,
   toggle,
   message,
+  transactionHash,
 }: {
   enable: boolean;
   toggle: () => void;
   message: React.ReactNode;
+  transactionHash?: string;
 }) => {
-  const userActions = useContext(UserActionContext);
   return (
     <GenericModal enable={enable} toggle={toggle}>
       <div className="modal-body transaction-confirmation-modal-form">
@@ -45,8 +44,8 @@ const TransactionConfirmationModal = ({
           className="view-on-explorer"
           target="_blank"
           href={
-            userActions.length
-              ? solExplorer(userActions[0].transaction_hash, "tx")
+           transactionHash 
+              ? solExplorer(transactionHash, "tx")
               : "https://explorer.solana.com/?cluster=devnet"
           }
           rel="noreferrer"
