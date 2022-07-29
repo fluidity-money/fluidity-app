@@ -1,5 +1,5 @@
 import React from "react";
-import TextButton from "../../components/Button";
+import { TextButton } from "../../components/Button";
 import styles from "./Resources.module.scss";
 
 const Resources = () => {

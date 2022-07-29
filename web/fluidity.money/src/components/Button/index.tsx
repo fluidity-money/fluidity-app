@@ -1,3 +1,4 @@
 import TextButton from "./TextButton/TextButton";
+import ToggleButton from "./ToggleButton/ToggleButton";
 
-export default TextButton;
+export { TextButton, ToggleButton };

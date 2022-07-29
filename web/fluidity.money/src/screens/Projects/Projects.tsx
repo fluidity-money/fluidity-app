@@ -1,5 +1,5 @@
 import React from "react";
-import TextButton from "../../components/Button";
+import { TextButton } from "../../components/Button";
 import styles from "./Projects.module.scss";
 
 const Projects = () => {

@@ -13,3 +13,20 @@
   width: 100%;
   height: 100%;
 }
+
+.infoBox {
+  background-color: $fluidBlack;
+  padding: 60px 60px 50px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  position: absolute;
+  h1 {
+    margin: 0;
+    font-size: 80px;
+  }
+  h3 {
+    margin: 6px;
+  }
+}

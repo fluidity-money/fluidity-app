@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import TextButton from "../Button";
+import { TextButton } from "../Button";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {

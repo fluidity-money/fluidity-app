@@ -1,4 +1,5 @@
 import React from "react";
+import { ToggleButton } from "../../components/Button";
 import RewardsCarousel from "../../components/RewardsCarousel";
 import styles from "./Reward.module.scss";
 
@@ -11,7 +12,11 @@ const Reward = () => {
   */
   return (
     <div className={styles.container}>
-      {/* <div>Reward</div> */}
+      <div className={styles.infoBox}>
+        <h1>$678,123.00</h1>
+        <h3>Reward pool</h3>
+        <ToggleButton />
+      </div>
       <div className={styles.rewardsBackground}>
         <RewardsCarousel direction="right" />
         <RewardsCarousel direction="left" />
