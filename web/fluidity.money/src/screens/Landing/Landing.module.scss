@@ -32,7 +32,7 @@
 }
 
 .carousel {
-  margin-right: 75vw;
+  margin-right: 75%;
   margin-top: 300px;
   transition: opacity 1s ease 0s, all 3s ease 1s;
 }
@@ -40,7 +40,7 @@
 .fadeOutCarousel {
   opacity: 0;
   transition: opacity 1s ease;
-  margin-left: 75vw;
+  margin-left: 75%;
   margin-top: 300px;
 }
 

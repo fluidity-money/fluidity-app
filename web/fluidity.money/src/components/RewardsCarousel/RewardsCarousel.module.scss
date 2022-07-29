@@ -1,0 +1,100 @@
+@import "../../styles/config.scss";
+
+.winnersRight {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 30px;
+  // margin: auto;
+  background-color: transparent;
+  overflow: hidden;
+  z-index: 1;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  &Line {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    transform: scale(2);
+    transition: all 1s ease;
+    & > div {
+      display: flex;
+      animation: scrollRight 120s infinite linear;
+      &:hover {
+        // animation-play-state: paused;
+      }
+      .winner {
+        cursor: pointer;
+        font-size: 16px;
+        color: $textGrey;
+        position: relative;
+        min-width: fit-content;
+        padding: 0 10px 0 10px;
+        &:hover {
+          color: $fluidWhite;
+        }
+      }
+    }
+  }
+}
+
+@keyframes scrollRight {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.winnersLeft {
+  @extend .winnersRight;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  &Line {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    transform: scale(2);
+    transition: all 1s ease;
+    & > div {
+      display: flex;
+      animation: scrollLeft 120s infinite linear;
+      &:hover {
+        // animation-play-state: paused;
+      }
+      .winner {
+        cursor: pointer;
+        font-size: 16px;
+        color: $textGrey;
+        position: relative;
+        min-width: fit-content;
+        padding: 0 10px 0 10px;
+        &:hover {
+          color: $fluidWhite;
+        }
+      }
+    }
+  }
+}
+
+@keyframes scrollLeft {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
