@@ -33,6 +33,7 @@ const SwapBox = () => {
   const [successTransactionModal, setSuccessTransactionModal] = useState<boolean>(false); // toggle state for the transaction confirmation
   const [balance, setBalance] = useState("0");  // state to track status of selected fluid amount in wallet
   const [fbalance, setfBalance] = useState("0");  // state to track amount of selected standard token in wallet
+  const [previousTransactionHash, setPreviousTransactionHash] = useState(""); 
 
   const {tokens} = useFluidTokens();
   const sol = useSolana();
@@ -211,6 +212,8 @@ const SwapBox = () => {
       }
 
       console.log(result);
+      setPreviousTransactionHash(result);
+
       toggleSuccessTransactionModal();
       switchPayment();
     } catch (e) {
@@ -394,6 +397,7 @@ const SwapBox = () => {
               message={
                 <div className="primary-text">Transaction Successful</div>
               }
+              transactionHash={previousTransactionHash}
             />
           </FormSection>
         </div>
