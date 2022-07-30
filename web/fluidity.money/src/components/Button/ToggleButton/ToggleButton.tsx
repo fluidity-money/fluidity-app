@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import styles from "./ToggleButton.module.scss";
 
-const ToggleButton = () => {
-  const [toggle, setToggle] = useState(true);
+interface IToggleProps {
+  toggle: boolean;
+  setToggle: () => void;
+}
+
+const ToggleButton = ({ toggle, setToggle }: IToggleProps) => {
+  // const [toggle, setToggle] = useState(true);
   return (
     <div className={styles.container}>
-      <div className={styles.toggleBar} onClick={() => setToggle(!toggle)}>
+      <div className={styles.toggleBar} onClick={setToggle}>
         <div className={styles.blockchain}>
           <div className={`${toggle ? styles.black : styles.white}`}>
             🦍 SOL

@@ -1,21 +1,48 @@
 import React, { useState } from "react";
-import { ToggleButton } from "../../components/Button";
-import RewardsCarousel from "../../components/RewardsCarousel";
+import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
 import styles from "./Reward.module.scss";
 
 const Reward = () => {
-  /* Background of transaction info moving left and right cotinuously,
+  /* Background of transactions info moving left and right cotinuously,
   Reward pool total with sol and eth toggle,
-  click on prize total slide prize total to the top right,
-  graph background,
-  total transactions sol and eth,
+  click on prize total and switch screens to total transactions sol and eth,
+  elements fade in and out then are conditionally removed
   */
+
   const [initalView, setInitalView] = useState(true);
+  const [present, setPresent] = useState(true);
+  const [toggle, setToggle] = useState(true);
+
+  // animates then switches backgrounds
+  const switchAndAnimate = () => {
+    setInitalView(!initalView);
+    setTimeout(() => {
+      setPresent(!present);
+    }, 1000);
+  };
+
+  // information on top of second screen
+  const infoStats = (
+    <div className={styles.info}>
+      <div className={styles.infoSingle}>
+        <h1>1400+</h1>
+        <h4>Unique wallets</h4>
+      </div>
+      <div className={styles.infoSingle}>
+        <h1>32,689</h1>
+        <h4>Fluid asset pairs</h4>
+      </div>
+      <div className={styles.infoSingle}>
+        <h1>678,123.00</h1>
+        <h4>Reward Pool</h4>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <div className={styles.container}>
-        {/* info */}
         <div
           className={
             initalView
@@ -23,69 +50,36 @@ const Reward = () => {
               : `${styles.stats} ${styles.fadeIn}`
           }
         >
-          <div className={styles.info}>
-            <h4>1400+</h4>
-            <h4>Unique wallets</h4>
-          </div>
-          <div className={styles.info}>
-            <h4>32,689</h4>
-            <h4>Fluid asset pairs</h4>
-          </div>
-          <div className={styles.info}>
-            <h4>678,123.00</h4>
-            <h4>Reward Pool</h4>
-          </div>
-        </div>
-        {/* boxes */}
-        <div
-          className={
-            initalView
-              ? `${styles.infoBox} ${styles.fadeIn}`
-              : `${styles.infoBox} ${styles.fadeOut}`
-          }
-        >
-          <h1 onClick={() => setInitalView(!initalView)}>{"$678,123.00"}</h1>
-          <h3 onClick={() => setInitalView(!initalView)}>{"Reward pool"}</h3>
-          <ToggleButton />
+          {infoStats}
         </div>
 
-        <div
-          className={
-            initalView
-              ? `${styles.infoBoxTransparent} ${styles.fadeOut}`
-              : `${styles.infoBoxTransparent} ${styles.fadeIn}`
-          }
-        >
-          <h1 onClick={() => setInitalView(!initalView)}>{"$1,231,246"}</h1>
-          <h3 onClick={() => setInitalView(!initalView)}>
-            {"Total transactions"}
-          </h3>
-          <ToggleButton />
-        </div>
+        <RewardsInfoBox
+          toggle={toggle}
+          setToggle={() => setToggle(!toggle)}
+          initalView={initalView}
+          switchAndAnimate={switchAndAnimate}
+          type="black"
+        />
 
-        <div
-          className={
-            initalView
-              ? `${styles.rewardsBackground} ${styles.fadeIn}`
-              : `${styles.rewardsBackground} ${styles.fadeOut}`
-          }
-        >
-          <RewardsCarousel direction="right" />
-          <RewardsCarousel direction="left" />
-          <RewardsCarousel direction="right" />
-          <RewardsCarousel direction="left" />
-          <RewardsCarousel direction="right" />
-          <RewardsCarousel direction="left" />
-          <RewardsCarousel direction="right" />
-          <RewardsCarousel direction="left" />
-          <RewardsCarousel direction="right" />
-          <RewardsCarousel direction="left" />
-          <RewardsCarousel direction="right" />
-          <RewardsCarousel direction="left" />
-          <RewardsCarousel direction="right" />
-          <RewardsCarousel direction="left" />
-          <RewardsCarousel direction="right" />
-        </div>
+        <RewardsInfoBox
+          toggle={toggle}
+          setToggle={() => setToggle(!toggle)}
+          initalView={initalView}
+          switchAndAnimate={switchAndAnimate}
+          type="transparent"
+        />
+
+        {present && (
+          <div
+            className={
+              initalView
+                ? `${styles.rewardsBackground} ${styles.fadeIn}`
+                : `${styles.rewardsBackground} ${styles.fadeOut} `
+            }
+          >
+            <RewardsBackground />
+          </div>
+        )}
       </div>
     </>
   );

@@ -50,8 +50,8 @@ const Landing = () => {
           fadeProp === "fadeIn" ? styles.fadeOut : `${styles.fadeInText}`
         }`}
       >
-        Fluidity is the blockchain incentive layer, rewarding people for using
-        their crypto.
+        Fluidity is the blockchain incentive layer, <br />
+        rewarding people for using their crypto.
       </h1>
       <div
         className={`${

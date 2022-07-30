@@ -37,7 +37,7 @@ const NavBar = () => {
               </li>
               <li>
                 <a href="/resources">Resources</a>
-                <button>v</button>
+                {/* <button>v</button> */}
               </li>
             </ul>
           </nav>
