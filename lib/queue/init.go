@@ -3,7 +3,8 @@ package queue
 import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/streadway/amqp"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func init() {
@@ -37,7 +38,7 @@ func init() {
 
 		err, closed := <-channel.NotifyClose(errors)
 
-		if closed {
+		if closed && err == nil {
 			log.Fatal(func(k *log.Log) {
 				k.Context = Context
 				k.Message = "AMQP closed on its own without an error!!!"
