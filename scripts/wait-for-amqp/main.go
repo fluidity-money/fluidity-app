@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 // attemptCount to try before giving up (loudly!)
