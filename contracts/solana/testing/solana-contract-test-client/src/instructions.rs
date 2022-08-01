@@ -121,7 +121,6 @@ pub struct InitObligationInstructionArgs {
     pub token_name: String,
 }
 
-
 #[derive(Debug)]
 pub struct LogTvlInstructionAccountMetas {
     pub tvl_data_pubkey: AccountMeta,
@@ -134,7 +133,6 @@ pub struct LogTvlInstructionAccountMetas {
     pub clock_program: AccountMeta,
 }
 
-
 #[derive(Debug)]
 pub struct InitDataInstructionAccountMetas {
     pub system_program: AccountMeta,
@@ -145,7 +143,6 @@ pub struct InitDataInstructionAccountMetas {
     pub pda_pubkey: AccountMeta,
 }
 
-
 #[derive(Debug)]
 pub struct InitDataInstructionArgs {
     pub token_name: String,
@@ -153,7 +150,6 @@ pub struct InitDataInstructionArgs {
     pub space: u64,
     pub bump_seed: u8,
 }
-
 
 #[derive(Debug)]
 pub struct InitTvlDataInstructionArgs {

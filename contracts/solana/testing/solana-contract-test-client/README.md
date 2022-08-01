@@ -25,13 +25,9 @@ Rust CLI for testing the Solana Fluidity factory program.
 | `FLU_PDA_COLLATERAL` | The program derived account's solend collateral account.                                                                              |
 | `FLU_SIMULATE`       | A flag to tell the program to simulate the transaction instead of submitting it to the chain. Set to "true" if simulation is desired. |
 
-## Building
+## Running
 
-    make build
-
-or
-
-    cargo build
+    ./run.sh
 
 ## Getting started
 
@@ -43,35 +39,3 @@ or
     
 3. Configure run script to include Contract, Fluid Token Mint, Base Token Mint (See #Environment Variables)
 
-4. Set PDA account as Mint Authority
-  -     PDA_ACC = ./run.sh dumpallkeys | grep -e 'pda_pubkey' | awk 'print {$2}'
-  -     spl-token authorize <TOKEN> mint <PDA_ACC>
-
-5. Initialize utility accounts
-  -     ./run.sh initobligation 
-  -     ./run.sh initdata 
-
-## Testing
-
-### For each test account, make sure to run Initialize before wrapping / unwrapping
-    ./run.sh inittvldata
-
-    cargo run [commands]
-    
-or run the binary located in `target/debug`
-
-### Commands
-
-| Name                         | Description                                                                    |
-|------------------------------|--------------------------------------------------------------------------------|
-| `wrap [amount]`              | Wraps `[amount]` of the base token, converting it into fluid tokens.           |
-| `unwrap [amount]`            | Unwraps `[amount]` of the fluid token, converting it back into the base token. |
-| `payout [amount]`            | Pays `[amount]` of the fluid token from liquidity pool, moving 8/10 to \\AccountA,
- and 2/10 to AccountB. Only callable by AUTHORITY |
-| `movefromprizepool [amount]` | Pays `[amount]` of the fluid token, to AccountA. Only callable by AUTHOIRITY   |
-| `initobligation`             | Initialise the obligation account.                                             |
-| `initdata`                   | Initialise the data account.                                                   |
-| `inittvldata`                | Initialise the tvl data account.                                               |
-| `printpdakeys`               | Prints the program derived account's pubkey keys and seeds.                    |
-| `dumpallkeys`                | Prints the current config pubkey and derived PDA keys                          |
-| `help`                       | Prints a help message.                                                         |
