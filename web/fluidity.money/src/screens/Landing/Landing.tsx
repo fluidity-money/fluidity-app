@@ -16,7 +16,7 @@ const Landing = () => {
     console.log("my ref", myRef.current);
     const observer = new IntersectionObserver((entries) => {
       const entry = entries[0];
-      // console.log("entry", entry);
+      console.log("entry", entry);
       console.log("bcr", entry.boundingClientRect);
       console.log("isr", entry.intersectionRect);
       console.log("rb", entry.rootBounds);

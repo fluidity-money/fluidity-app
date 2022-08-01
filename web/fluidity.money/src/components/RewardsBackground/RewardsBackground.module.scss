@@ -8,13 +8,6 @@
   min-height: 850px;
   width: 100%;
   border: solid 2px red;
-  background: linear-gradient(
-    to right,
-    $fluidBlack,
-    transparent,
-    transparent,
-    $fluidBlack
-  );
   z-index: 1;
 }
 
@@ -44,4 +37,16 @@
   );
 
   z-index: 2;
+}
+
+.winner {
+  cursor: pointer;
+  font-size: 16px;
+  color: $textGrey;
+  position: relative;
+  min-width: fit-content;
+  padding: 0 10px 0 10px;
+  &:hover {
+    color: $fluidWhite;
+  }
 }

@@ -1,11 +1,12 @@
-import React from "react";
-import styles from "./RewardsCarousel.module.scss";
+import React, { ReactNode } from "react";
+import styles from "./ContinuousCarousel.module.scss";
 
-interface IRewardsCarousel {
-  direction: string;
+interface IContinuousCarousel {
+  direction: "right" | "left" | "up";
+  children: ReactNode;
 }
 
-const RewardsCarousel = ({ direction }: IRewardsCarousel) => {
+const ContinuousCarousel = ({ direction, children }: IContinuousCarousel) => {
   /* 
   Continuous carousel in right or left direction
   */
@@ -14,31 +15,36 @@ const RewardsCarousel = ({ direction }: IRewardsCarousel) => {
       className={
         direction === "right"
           ? `${styles.winnersRight}`
-          : `${styles.winnersLeft}`
+          : direction === "left"
+          ? `${styles.winnersLeft}`
+          : `${styles.winnersTop}`
       }
     >
       <div
         className={
           direction === "right"
             ? `${styles.winnersRightLine}`
-            : `${styles.winnersLeftLine}`
+            : direction === "left"
+            ? `${styles.winnersLeftLine}`
+            : `${styles.winnersTopLine}`
         }
       >
-        <div>
-          {RewardsCarousels.map((winner) => (
+        {/* <div>
+          {ContinuousCarousels.map((winner) => (
             <div
               className={styles.winner}
             >{`${winner.blockchain} DEX ${winner.amount} ${winner.id} ${winner.date}`}</div>
           ))}
-        </div>
+        </div> */}
+        {children}
       </div>
     </div>
   );
 };
 
-export default RewardsCarousel;
+export default ContinuousCarousel;
 
-const RewardsCarousels = [
+const ContinuousCarousels = [
   {
     blockchain: "🦍",
     amount: "1.01",
