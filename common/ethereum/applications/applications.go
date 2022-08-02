@@ -136,8 +136,6 @@ func GetSupportedContractAddrs() ([]string, error) {
 		return nil, fmt.Errorf("Could not query Sushiswap GraphQL! %v", err)
 	}
 
-	fmt.Println(sushiswapRes)
-
 	for _, pool := range sushiswapRes.MasterChefPools {
 		supportedContracts = append(supportedContracts, string(pool.LpToken))
 	}
