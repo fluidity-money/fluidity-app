@@ -1,0 +1,11 @@
+@import "../../styles/config.scss";
+.container {
+  ul {
+    li {
+      display: flex;
+      a {
+        color: $fluidWhite;
+      }
+    }
+  }
+}
