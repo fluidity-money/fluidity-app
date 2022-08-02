@@ -4,7 +4,6 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -13,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 )
 
 const (
@@ -60,7 +60,6 @@ const (
 func main() {
 
 	var (
-		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
 		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
 		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 		decimalPlaces_           = util.GetEnvOrFatal(EnvTokenDecimals)
@@ -154,14 +153,12 @@ func main() {
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
 
-			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
-
 			var (
-				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
-				payoutFreqNum    = tribecaDataStoreTrfVars.PayoutFreqNum
-				payoutFreqDenom  = tribecaDataStoreTrfVars.PayoutFreqDenom
-				deltaWeightNum   = tribecaDataStoreTrfVars.DeltaWeightNum
-				deltaWeightDenom = tribecaDataStoreTrfVars.DeltaWeightDenom
+				winningClasses   = fluidity.WinningClasses 
+				payoutFreqNum    = fluidity.PayoutFreqNum 
+				payoutFreqDenom  = fluidity.PayoutFreqDenom 
+				deltaWeightNum   = fluidity.DeltaWeightNum
+				deltaWeightDenom = fluidity.DeltaWeightDenom 
 			)
 
 			var (
