@@ -118,25 +118,88 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 
 // GetSupportedContractAddrs queries supported integration APIs for active Liquidity Pools
 // This is used to filter for supported contracts
-func GetSupportedContractAddrs() ([]string, error) {
+func GetSupportedContractAddrs(fluidToken string) ([]string, error) {
 	supportedContracts := make([]string, 0)
 
-	// Sushiswap
-	sushiswapClient := graphql.NewClient("https://api.thegraph.com/subgraphs/name/sushiswap/sushiswap", nil)
-
-	var sushiswapRes struct {
-		MasterChefPools []struct {
-			LpToken graphql.String `json:"lpToken"`
-		} `json:"masterChefPools"`
+	graphqlReqVars := map[string]interface{}{
+		"fluidToken": fluidToken,
 	}
 
-	err := sushiswapClient.Query(context.Background(), &sushiswapRes, nil)
+	// Sushiswap - MAINNET
+	sushiswapClient := graphql.NewClient("https://thegraph.com/hosted-service/subgraph/sushiswap/exchange", nil)
+
+	type sushiswapPairsFragment struct {
+		Pairs []struct {
+			Id graphql.String
+		}
+	}
+
+	var sushiswapFluidToken0Res struct {
+		sushiswapPairsFragment `graphql(where: {token0: $fluidToken})`
+	}
+
+	err := sushiswapClient.Query(context.Background(), &sushiswapFluidToken0Res, graphqlReqVars)
+
+	if err != nil {
+		return nil, fmt.Errorf("Could not query sushiswap GraphQL! %v", err)
+	}
+
+	for _, pool := range sushiswapFluidToken0Res.Pairs {
+		supportedContracts = append(supportedContracts, string(pool.LpToken))
+	}
+
+	var sushiswapFluidToken1Res struct {
+		sushiswapPairsFragment `graphql(where: {token1: $fluidToken})`
+	}
+
+	err = sushiswapClient.Query(context.Background(), &sushiswapFluidToken1Res, graphqlReqVars)
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not query Sushiswap GraphQL! %v", err)
 	}
 
-	for _, pool := range sushiswapRes.MasterChefPools {
+	for _, pool := range sushiswapFluidToken1Res.Pairs {
+		supportedContracts = append(supportedContracts, string(pool.LpToken))
+	}
+
+	// Uniswap - MAINNET
+	uniswapClient := graphql.NewClient("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2", nil)
+
+	type uniswapPairsFragment struct {
+		Pairs []struct {
+			Id graphql.String
+		}
+	}
+
+	uniswapReqVars := map[string]interface{}{
+		"fluidToken": fluidToken,
+	}
+
+	var uniswapFluidToken0Res struct {
+		uniswapPairsFragment `graphql(where: {token0: $fluidToken})`
+	}
+
+	err = uniswapClient.Query(context.Background(), &uniswapFluidToken0Res, uniswapReqVars)
+
+	if err != nil {
+		return nil, fmt.Errorf("Could not query Uniswap GraphQL! %v", err)
+	}
+
+	for _, pool := range uniswapFluidToken0Res.Pairs {
+		supportedContracts = append(supportedContracts, string(pool.LpToken))
+	}
+
+	var uniswapFluidToken1Res struct {
+		uniswapPairsFragment `graphql(where: {token1: $fluidToken})`
+	}
+
+	err = uniswapClient.Query(context.Background(), &uniswapFluidToken1Res, uniswapReqVars)
+
+	if err != nil {
+		return nil, fmt.Errorf("Could not query Uniswap GraphQL! %v", err)
+	}
+
+	for _, pool := range uniswapFluidToken1Res.Pairs {
 		supportedContracts = append(supportedContracts, string(pool.LpToken))
 	}
 

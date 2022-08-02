@@ -184,25 +184,6 @@ func main() {
 		auroraTokenFluxAddress ethCommon.Address
 	)
 
-	applicationContracts := make(map[string]struct{})
-
-	for _, address := range strings.Split(oneOffApplicationContracts_, ",") {
-		applicationContracts[address] = struct{}{}
-	}
-
-	applicationContracts_, err := applications.GetSupportedContractAddrs()
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "failed to load application contracts!"
-			k.Payload = err
-		})
-	}
-
-	for _, address := range applicationContracts_ {
-		applicationContracts[address] = struct{}{}
-	}
-
 	switch tokenBackend {
 	case BackendCompound:
 		uniswapAnchoredViewAddress := mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
@@ -264,6 +245,25 @@ func main() {
 	}
 
 	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
+
+	applicationContracts := make(map[string]struct{})
+
+	for _, address := range strings.Split(oneOffApplicationContracts_, ",") {
+		applicationContracts[address] = struct{}{}
+	}
+
+	applicationContracts_, err := applications.GetSupportedContractAddrs(contractAddress.String())
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "failed to load application contracts!"
+			k.Payload = err
+		})
+	}
+
+	for _, address := range applicationContracts_ {
+		applicationContracts[address] = struct{}{}
+	}
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
