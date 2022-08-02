@@ -134,8 +134,8 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 
+		oneOffApplicationContracts_ = os.Getenv(EnvApplicationContracts)
 		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
 		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
 		ethTokenAddress_            = os.Getenv(EnvEthTokenAddress)
@@ -179,14 +179,28 @@ func main() {
 		ethEthTokenAddress            ethCommon.Address
 		ethUnderlyingTokenAddress     ethCommon.Address
 		ethAaveAddressProviderAddress ethCommon.Address
-		applicationContracts          []string
 
 		auroraEthFluxAddress   ethCommon.Address
 		auroraTokenFluxAddress ethCommon.Address
 	)
 
-	for _, address := range strings.Split(applicationContracts_, ",") {
-		applicationContracts = append(applicationContracts, address)
+	applicationContracts := make(map[string]struct{})
+
+	for _, address := range strings.Split(oneOffApplicationContracts_, ",") {
+		applicationContracts[address] = struct{}{}
+	}
+
+	applicationContracts_, err := applications.GetSupportedContractAddrs()
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "failed to load application contracts!"
+			k.Payload = err
+		})
+	}
+
+	for _, address := range applicationContracts_ {
+		applicationContracts[address] = struct{}{}
 	}
 
 	switch tokenBackend {

@@ -1,7 +1,9 @@
 package applications
 
 import (
+	"context"
 	"fmt"
+	"github.com/shurcooL/graphql"
 	"math/big"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -112,4 +114,33 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 	default:
 		return ApplicationNone
 	}
+}
+
+// GetSupportedContractAddrs queries supported integration APIs for active Liquidity Pools
+// This is used to filter for supported contracts
+func GetSupportedContractAddrs() ([]string, error) {
+	supportedContracts := make([]string, 0)
+
+	// Sushiswap
+	sushiswapClient := graphql.NewClient("https://api.thegraph.com/subgraphs/name/sushiswap/sushiswap", nil)
+
+	var sushiswapRes struct {
+		MasterChefPools []struct {
+			LpToken graphql.String `json:"lpToken"`
+		} `json:"masterChefPools"`
+	}
+
+	err := sushiswapClient.Query(context.Background(), &sushiswapRes, nil)
+
+	if err != nil {
+		return nil, fmt.Errorf("Could not query Sushiswap GraphQL! %v", err)
+	}
+
+	fmt.Println(sushiswapRes)
+
+	for _, pool := range sushiswapRes.MasterChefPools {
+		supportedContracts = append(supportedContracts, string(pool.LpToken))
+	}
+
+	return supportedContracts, nil
 }
