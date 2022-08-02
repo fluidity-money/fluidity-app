@@ -14,7 +14,9 @@ const TextButton = ({ children, colour }: ITextButtonProps) => {
       ) : colour === "black" ? (
         <button className={styles.black}>{children}</button>
       ) : (
-        <button className={styles.coloured}>{children}</button>
+        <button className={styles.coloured}>
+          <span className={styles.inner}>{children}</span>
+        </button>
       )}
     </>
   );
