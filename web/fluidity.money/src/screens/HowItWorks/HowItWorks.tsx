@@ -11,6 +11,11 @@ const HowItWorks = () => {
   return (
     <div className={styles.container}>
       <TextButton colour="white">MORE ON HOW IT WORKS</TextButton>
+      <div>
+        <h1>HOW</h1>
+        <h1>FLUIDITY</h1>
+        <h1>WORKS</h1>
+      </div>
     </div>
   );
 };

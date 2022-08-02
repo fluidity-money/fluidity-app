@@ -17,13 +17,14 @@ const NavBar = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.navbar}>
-        <div className={styles.left}>
-          <div>Logo</div>
+      <div className={styles.navbarFixed}>
+        <div className={styles.fixed}>
           <div>Fluidity</div>
+          <TextButton colour="white">LAUNCH FLUIDITY</TextButton>
         </div>
-
-        <div className={styles.right}>
+      </div>
+      <div className={styles.navbar}>
+        <div className={styles.fade}>
           <nav>
             <ul>
               <li>
@@ -41,7 +42,6 @@ const NavBar = () => {
               </li>
             </ul>
           </nav>
-          <TextButton colour="white">LAUNCH FLUIDITY</TextButton>
         </div>
       </div>
     </div>

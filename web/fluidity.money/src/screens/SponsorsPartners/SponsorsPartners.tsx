@@ -93,4 +93,212 @@ const partners = [
     title: "ApeChain",
     info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
   },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
+  {
+    img: "🦍",
+    title: "ApeChain",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+  },
 ];
