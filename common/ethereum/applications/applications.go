@@ -171,15 +171,11 @@ func GetSupportedContractAddrs(fluidToken string) ([]string, error) {
 		}
 	}
 
-	uniswapReqVars := map[string]interface{}{
-		"fluidToken": fluidToken,
-	}
-
 	var uniswapFluidToken0Res struct {
 		uniswapPairsFragment `graphql(where: {token0: $fluidToken})`
 	}
 
-	err = uniswapClient.Query(context.Background(), &uniswapFluidToken0Res, uniswapReqVars)
+	err = uniswapClient.Query(context.Background(), &uniswapFluidToken0Res, graphqlReqVars)
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not query Uniswap GraphQL! %v", err)
@@ -193,7 +189,7 @@ func GetSupportedContractAddrs(fluidToken string) ([]string, error) {
 		uniswapPairsFragment `graphql(where: {token1: $fluidToken})`
 	}
 
-	err = uniswapClient.Query(context.Background(), &uniswapFluidToken1Res, uniswapReqVars)
+	err = uniswapClient.Query(context.Background(), &uniswapFluidToken1Res, graphqlReqVars)
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not query Uniswap GraphQL! %v", err)
