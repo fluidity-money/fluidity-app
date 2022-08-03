@@ -1,8 +1,44 @@
 .container {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr;
   align-items: center;
   min-height: 850px;
   width: 100%;
   border: solid 2px red;
+  h6 {
+    text-align: end;
+    margin: 0;
+  }
+}
+
+.content {
+  box-sizing: border-box;
+  display: flex;
+  padding: 0 40px 0 40px;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.footerItems {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.communication {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  justify-content: space-evenly;
+  height: 150px;
+}
+
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.text {
+  margin-right: 10px;
 }
