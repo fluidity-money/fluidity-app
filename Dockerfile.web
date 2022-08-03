@@ -1,13 +1,14 @@
 
-FROM fluidity/build-container:latest
-
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+FROM fluidity/build-container-root:latest
 
 RUN apt-get update && \
-	apt-get install -y nodejs nginx
+	apt-get install -qy nginx
 
 WORKDIR /usr/local/src/fluidity
 
+COPY build.mk .
+COPY golang.mk .
+COPY node.mk .
 COPY web.mk .
 
 COPY web web
