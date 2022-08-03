@@ -1,4 +1,5 @@
 import React from "react";
+import { TextButton } from "../../components/Button";
 import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./Docs.module.scss";
 
@@ -6,6 +7,7 @@ const Docs = () => {
   return (
     <div className={styles.container}>
       <div>DOCUMENTATION</div>
+      <TextButton colour="coloured">ALL DOCS</TextButton>
       <ManualCarousel>
         {items.map((item) => (
           <div
