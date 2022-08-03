@@ -1,5 +1,6 @@
 import React from "react";
 import { TextButton } from "../../components/Button";
+import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./Projects.module.scss";
 
 const Projects = () => {
@@ -14,10 +15,34 @@ const Projects = () => {
     >
       <div>Image Background</div>
       <div>Fluidity Projects</div>
-      <div>Manual carousel second half</div>
       <TextButton colour="coloured">EXPLORE THE ECOSYSTEM</TextButton>
+      <ManualCarousel>
+        {items.map((item) => (
+          <div
+            style={{
+              border: "1px solid white",
+              height: 200,
+              minWidth: 300,
+              margin: 20,
+              marginBottom: 50,
+            }}
+          >
+            {item.item}
+          </div>
+        ))}
+      </ManualCarousel>
     </div>
   );
 };
 
 export default Projects;
+
+const items = [
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+];

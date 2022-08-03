@@ -19,7 +19,9 @@ const NavBar = () => {
     <div className={styles.container}>
       <div className={styles.navbarFixed}>
         <div className={styles.fixed}>
-          <div>Fluidity</div>
+          <div>
+            <a href="/">Fluidity</a>
+          </div>
           <TextButton colour="white">LAUNCH FLUIDITY</TextButton>
         </div>
       </div>

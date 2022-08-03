@@ -1,4 +1,5 @@
 import React from "react";
+import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./UseCases.module.scss";
 
 const UseCases = () => {
@@ -11,9 +12,33 @@ const UseCases = () => {
       className={styles.container}
     >
       <div>UseCases</div>
-      <div>Manual Carousel size of page</div>
+      <ManualCarousel>
+        {items.map((item) => (
+          <div
+            style={{
+              border: "1px solid white",
+              height: 400,
+              minWidth: 350,
+              margin: 20,
+              marginBottom: 50,
+            }}
+          >
+            {item.item}
+          </div>
+        ))}
+      </ManualCarousel>
     </div>
   );
 };
 
 export default UseCases;
+
+const items = [
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+];
