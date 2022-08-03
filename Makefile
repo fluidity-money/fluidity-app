@@ -33,6 +33,13 @@ docker: docker-root
 		-t ${ORG_ROOT}/build-container \
 		.
 
+docker-runtime: docker
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/runtime-container \
+		-f Dockerfile.runtime \
+		.
+
 docker-web: docker
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
