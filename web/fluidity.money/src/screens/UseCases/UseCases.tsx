@@ -5,7 +5,15 @@ const UseCases = () => {
   /*
   manual carousel of boxes containing image and text
   */
-  return <div className={styles.container}>UseCases</div>;
+  return (
+    <div
+      style={{ display: "flex", flexDirection: "column" }}
+      className={styles.container}
+    >
+      <div>UseCases</div>
+      <div>Manual Carousel size of page</div>
+    </div>
+  );
 };
 
 export default UseCases;

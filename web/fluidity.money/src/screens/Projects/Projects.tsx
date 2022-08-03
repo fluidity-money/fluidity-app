@@ -8,8 +8,13 @@ const Projects = () => {
   manual carousel at bottom listing projects 
   */
   return (
-    <div className={styles.container}>
-      <div>Projects</div>
+    <div
+      style={{ display: "flex", flexDirection: "column" }}
+      className={styles.container}
+    >
+      <div>Image Background</div>
+      <div>Fluidity Projects</div>
+      <div>Manual carousel second half</div>
       <TextButton colour="coloured">EXPLORE THE ECOSYSTEM</TextButton>
     </div>
   );
