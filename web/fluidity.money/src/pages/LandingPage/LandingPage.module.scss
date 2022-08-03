@@ -7,8 +7,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: $backgroundBlack;
 
+  background-image: url(../../../public/img/bg3.png);
+  background-repeat: cover;
+  background-size: 100% 1440px;
   // height: 100vh;
   // width: 100%;
 
@@ -22,4 +24,9 @@
   flex-direction: column;
   width: 100%;
   max-width: 1500px;
+
+  background-image: url(../../../public/img/fluid-bg.gif);
+  opacity: 0.6;
+  background-repeat: repeat;
+  background-size: 100% 1440px;
 }
