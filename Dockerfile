@@ -7,12 +7,17 @@ COPY contracts contracts
 
 COPY database database
 
+COPY go.mod .
+COPY go.sum .
+
+COPY build.mk .
+COPY golang.mk .
+COPY node.mk .
+
 COPY common common
 COPY lib lib
 
 COPY Makefile .
-
-RUN make build
 
 COPY build.mk .
 COPY golang.mk .
