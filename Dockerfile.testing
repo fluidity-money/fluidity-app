@@ -1,0 +1,4 @@
+
+FROM fluidity/build-container:latest
+
+CMD [ "make", "test" ]

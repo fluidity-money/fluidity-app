@@ -9,7 +9,8 @@ AUTOMATION_DIR := automation
 	docker-compose-build \
 	clean \
 	semgrep \
-	test
+	test \
+	docker-test
 
 all: docker docker-web
 
@@ -38,6 +39,9 @@ docker-web: docker
 		-t ${ORG_ROOT}/web-container \
 		-f Dockerfile.web \
 		.
+
+docker-test: docker
+	@${DOCKER_RUN} -f Dockerfile.test
 
 docker-compose-build:
 	@./scripts/docker-compose-all.sh build

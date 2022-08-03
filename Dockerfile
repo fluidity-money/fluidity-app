@@ -1,17 +1,7 @@
 
 FROM fluidity/build-container-root:latest
 
-COPY scripts scripts
-
-WORKDIR ${FLUID_DIR}/scripts
-
-RUN make install
-
 WORKDIR ${FLUID_DIR}
-
-COPY build.mk .
-COPY golang.mk .
-COPY node.mk .
 
 COPY contracts contracts
 
@@ -23,3 +13,10 @@ COPY lib lib
 COPY Makefile .
 
 RUN make build
+
+COPY build.mk .
+COPY golang.mk .
+COPY node.mk .
+
+COPY go.mod .
+COPY go.sum .

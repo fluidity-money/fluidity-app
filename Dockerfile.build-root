@@ -1,18 +1,19 @@
 
-FROM golang:1.17-buster
+FROM golang:1.17-buster AS build
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -qy \
 	openssl \
 	ca-certificates \
 	make \
 	protobuf-compiler \
-	postgresql-client
+	postgresql-client \
+	python3-pip
 
 ENV FLUID_DIR /usr/local/src/fluidity
 
 ENV NODE_VERSION=16.13.0
 
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+RUN curl -so- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 ENV NVM_DIR=/root/.nvm
 
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
@@ -23,9 +24,29 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
-WORKDIR ${FLUID_DIR}
+RUN python3 -m pip install semgrep
+
+FROM build AS installed
+
+WORKDIR /tmp/fluid-build
 
 COPY go.mod .
 COPY go.sum .
 
-RUN go mod download
+COPY scripts scripts
+
+WORKDIR scripts
+
+RUN find
+
+RUN cat Makefile
+
+RUN make install
+
+FROM build
+
+COPY --from=installed /usr/local/bin/wait-for-database.sh /usr/local/bin
+COPY --from=installed /usr/local/bin/wait-for-amqp /usr/local/bin
+COPY --from=installed /usr/local/bin/wait-for-ws /usr/local/bin
+
+WORKDIR ${FLUID_DIR}
