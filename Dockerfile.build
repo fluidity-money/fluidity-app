@@ -7,13 +7,6 @@ COPY contracts contracts
 
 COPY database database
 
-COPY go.mod .
-COPY go.sum .
-
-COPY build.mk .
-COPY golang.mk .
-COPY node.mk .
-
 COPY common common
 COPY lib lib
 
@@ -25,3 +18,5 @@ COPY node.mk .
 
 COPY go.mod .
 COPY go.sum .
+
+RUN go mod download
