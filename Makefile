@@ -61,7 +61,7 @@ docker-build-web: docker-root-web
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/build-web-container \
-		-f Dockerfile.web \
+		-f Dockerfile.build-web \
 		.
 
 docker-node: docker-build
