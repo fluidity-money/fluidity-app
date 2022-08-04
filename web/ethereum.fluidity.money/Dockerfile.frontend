@@ -28,7 +28,6 @@ WORKDIR /usr/local/src/fluidity/web/ethereum.fluidity.money
 
 RUN rm -rf /var/www/html
 COPY --from=build /usr/local/src/fluidity/web/ethereum.fluidity.money/build /var/www/html
-COPY --from=build /usr/local/src/fluidity/web/ethereum.fluidity.money/nginx-default.conf /etc/nginx/http.d/default.conf
 
 EXPOSE 3000
 
