@@ -47,5 +47,15 @@ SERVICES:
       SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
       SECRET_FLU_SOLANA_TOKENS_LIST: /fluidity/solana/token_list
       SECRET_FLU_SOLANA_FAUCET_ACCOUNT_DETAILS: /fluidity/faucet/solana/account_details
+  
+  - TWITTER_HASHTAG_AMQP:
+      SERVICE_NAME: connector-common-twitter-hashtag-amqp
+      DOCKERFILE_PATH: ./cmd/connector-common-twitter-hashtag-amqp
+
+      ENV_FLU_WORKER_ID: production-connector-common-twitter-hashtag-amqp
+      SECRET_FLU_TWITTER_BEARER_TOKEN: /fluidity/faucet/twitter_bearer_token
+      FLU_TWITTER_HASHTAGS: fluiditymoney
+
+
 
 
