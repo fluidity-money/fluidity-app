@@ -11,10 +11,7 @@ const CurrencyListing = ({currency, amount}: {currency: string; amount: string})
       <Icon src={`currency-icon i-${currency}`} />
       <div className="currency-listing">
         <div className="f-mr-10">{currency}</div>
-        <div
-          onMouseOver={() => setTimeout(() => setTrim(9), 40)}
-          onMouseOut={() => setTimeout(() => setTrim(4), 40)}
-        >
+        <div>
           {decimalTrim(amount, trim)}
         </div>
       </div>

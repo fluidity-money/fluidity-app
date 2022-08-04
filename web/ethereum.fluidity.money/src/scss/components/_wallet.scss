@@ -151,6 +151,7 @@
   min-width: 10rem;
   width: 100%;
   align-items: center;
+  margin-left: -30px;
 }
 
 .currency-listing {
@@ -246,7 +247,7 @@
   @include for-tablet-landscape-up {
     margin-top: 20px;
   }
-  @include for-below-500 {
+  @include for-below-600 {
     flex-direction: column;
   }
 }
