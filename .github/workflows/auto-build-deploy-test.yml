@@ -24,6 +24,7 @@ jobs:
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_DEV_AWS_GITHUB_OIDC_ROLE }}
+          role-duration-seconds: 7200 #seconds
       - name: Get Diff
         id: diff
         uses: ./scripts/actions
