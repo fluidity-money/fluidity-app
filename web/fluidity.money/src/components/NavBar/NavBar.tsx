@@ -30,16 +30,16 @@ const NavBar = () => {
           <nav>
             <ul>
               <li>
-                <a href="/howitworks">How it works</a>
+                <a href="/howitworks">HOW IT WORKS</a>
               </li>
               <li>
-                <a href="/ecosystem">Ecosystem</a>
+                <a href="/ecosystem">ECOSYSTEM</a>
               </li>
               <li>
-                <a href="/fluidstats">Fluid stats</a>
+                <a href="/fluidstats">FLUID STATS</a>
               </li>
               <li>
-                <a href="/resources">Resources</a>
+                <a href="/resources">RESOURCES</a>
                 {/* <button>v</button> */}
               </li>
             </ul>
