@@ -1,10 +1,17 @@
-
-FROM fluidity/build-container:latest
+FROM fluidity/build-container:latest AS build
 
 WORKDIR /usr/local/src/fluidity/cmd/microservice-common-rabbitmq-backlog-checker
 
 COPY . .
-
 RUN make
 
-ENTRYPOINT [ "./microservice-common-rabbitmq-backlog-checker.o" ]
+
+FROM fluidity/runtime-container:latest
+
+COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-rabbitmq-backlog-checker/microservice-common-rabbitmq-backlog-checker.o .
+
+ENTRYPOINT [ \
+    "wait-for-amqp", \
+    "./microservice-common-rabbitmq-backlog-checker.o" \
+]
+

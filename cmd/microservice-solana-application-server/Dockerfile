@@ -14,3 +14,4 @@ ENTRYPOINT [ \
     "wait-for-amqp", \
     "./microservice-solana-application-server.o" \
 ]
+
