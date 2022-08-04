@@ -1,5 +1,5 @@
 
-FROM fluidity/web-container:latest
+FROM fluidity/build-web-container:latest AS build
 
 WORKDIR /usr/local/src/fluidity/web/ethereum.fluidity.money
 
@@ -9,10 +9,8 @@ ENV PATH /app/node_modules.bin:$PATH
 
 COPY package.json package-lock.json ./
 
-RUN npm i
-
-COPY . ./
-RUN mv ./nginx-default.conf /etc/nginx/sites-available/default
+# FIXME shouldn't be using --legacy-peer-deps
+RUN npm i --legacy-peer-deps
 
 ARG REACT_APP_API_URL
 ARG REACT_APP_WALLET_CONNECT_GETH_URI
@@ -23,9 +21,14 @@ ARG REACT_APP_SENTRY_DSN
 
 RUN make frontend
 
-RUN rm -r /var/www/html
 
-RUN cp -r build /var/www/html
+FROM fluidity/runtime-web-container:latest
+
+WORKDIR /usr/local/src/fluidity/web/ethereum.fluidity.money
+
+RUN rm -rf /var/www/html
+COPY --from=build /usr/local/src/fluidity/web/ethereum.fluidity.money/build /var/www/html
+COPY --from=build /usr/local/src/fluidity/web/ethereum.fluidity.money/nginx-default.conf /etc/nginx/http.d/default.conf
 
 EXPOSE 3000
 

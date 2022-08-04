@@ -12,7 +12,7 @@ AUTOMATION_DIR := automation
 	test \
 	docker-test
 
-all: docker-build docker-runtime docker-web
+all: docker-build docker-build-web docker-runtime
 
 build:
 	@cd lib && ${MAKE} build-lib
@@ -26,6 +26,15 @@ docker-root: go.sum go.mod Dockerfile.build-root
 		.
 
 	@touch docker-root
+
+docker-root-web: go.sum go.mod Dockerfile.build-root
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/build-container-root-web \
+		-f Dockerfile.build-root-web \
+		.
+
+	@touch docker-root-web
 
 docker-build: docker-root
 	@${DOCKER_BUILD} \
@@ -41,10 +50,17 @@ docker-runtime: docker-build
 		-f Dockerfile.runtime \
 		.
 
-docker-web: docker-build
+docker-runtime-web:
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
-		-t ${ORG_ROOT}/web-container \
+		-t ${ORG_ROOT}/runtime-web-container \
+		-f Dockerfile.runtime-web \
+		.
+
+docker-build-web: docker-root-web
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/build-web-container \
 		-f Dockerfile.web \
 		.
 
