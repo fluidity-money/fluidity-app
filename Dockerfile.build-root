@@ -1,13 +1,18 @@
 
-FROM golang:1.17-buster AS build
+FROM golang:1.17-alpine3.16 AS build
 
-RUN apt-get update && apt-get install -qy \
+RUN apk add --no-cache \
 	openssl \
 	ca-certificates \
 	make \
-	protobuf-compiler \
+	bash \
+	curl \
+	gcc \
+	musl-dev \
+	protoc \
 	postgresql-client \
-	python3-pip
+	py3-pip \
+	python3-dev
 
 ENV FLUID_DIR /usr/local/src/fluidity
 
