@@ -1,6 +1,9 @@
 package queue
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -9,9 +12,30 @@ import (
 
 func init() {
 	var (
-		workerId  = util.GetWorkerId()
+		workerId = util.GetWorkerId()
+
+		deadLetterEnabled = os.Getenv(EnvDeadLetterEnabled) != "false"
+
+		messageRetries_ = util.GetEnvOrDefault(EnvMessageRetries, "5")
+
 		queueAddr = util.GetEnvOrFatal(EnvQueueAddr)
 	)
+
+	messageRetries, err := strconv.Atoi(messageRetries_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to set %#v: Can't convert '%#v' to an integer!",
+				EnvMessageRetries,
+				messageRetries_,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	client, err := amqp.Dial(queueAddr)
 
@@ -83,9 +107,11 @@ func init() {
 	go func() {
 		for {
 			chanAmqpDetails <- amqpDetails{
-				channel:      channel,
-				exchangeName: ExchangeName,
-				workerId:     workerId,
+				channel:           channel,
+				exchangeName:      ExchangeName,
+				workerId:          workerId,
+				deadLetterEnabled: deadLetterEnabled,
+				messageRetries:    messageRetries,
 			}
 		}
 	}()
