@@ -22,7 +22,7 @@
 }
 
 .fadeInText {
-  margin-bottom: 200px;
+  margin-bottom: 250px;
   transition: opacity 1s ease 0s, all 3s ease 1s;
 }
 
@@ -32,7 +32,8 @@
 }
 
 .carousel {
-  margin-right: 75%;
+  // margin-right: 75%;
+  width: 100%;
   margin-top: 300px;
   transition: opacity 1s ease 0s, all 3s ease 1s;
 }

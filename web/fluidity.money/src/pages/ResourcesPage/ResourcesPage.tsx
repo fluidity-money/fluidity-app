@@ -1,4 +1,5 @@
 import React from "react";
+import Navigation from "../../components/Navigation";
 import Articles from "../../screens/Articles";
 import Contact from "../../screens/Contact";
 import Demo from "../../screens/Demo";
@@ -15,6 +16,7 @@ const ResourcesPage = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
+        <Navigation />
         <Hero />
         <Articles />
         <Tweets />

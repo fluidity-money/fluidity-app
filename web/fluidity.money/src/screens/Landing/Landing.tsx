@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./Landing.module.scss";
 
 const Landing = () => {
@@ -58,10 +59,34 @@ const Landing = () => {
           fadeProp === "fadeIn" ? styles.fadeOutCarousel : ` ${styles.carousel}`
         }`}
       >
-        I AM A CAROUSEL!
+        <ManualCarousel>
+          {items.map((item) => (
+            <div
+              style={{
+                border: "1px solid white",
+                height: 250,
+                minWidth: 400,
+                margin: 20,
+                marginBottom: 50,
+              }}
+            >
+              {item.item}
+            </div>
+          ))}
+        </ManualCarousel>
       </div>
     </div>
   );
 };
 
 export default Landing;
+
+const items = [
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+  { item: "🦍" },
+];
