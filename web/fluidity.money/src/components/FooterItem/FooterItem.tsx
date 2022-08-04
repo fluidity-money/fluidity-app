@@ -26,7 +26,7 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
 
   return (
     <div className={styles.container}>
-      <h2>{children}</h2>
+      <h1>{children}</h1>
       {itemList}
     </div>
   );

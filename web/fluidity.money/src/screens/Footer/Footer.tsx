@@ -20,27 +20,31 @@ const Footer = () => {
           <FooterItem items={resources}>Resources</FooterItem>
         </div>
         <div className={styles.communication}>
-          <TextButton colour={"coloured"}>LET'S TALK</TextButton>
-          <Socials />
-          <h6>
-            © 2022 Fluidity Money. <br /> All Rights Reserved.
-          </h6>
+          <div className={styles.buttons}>
+            <TextButton colour={"white"}>LAUNCH FLUIDITY</TextButton>
+            <TextButton colour={"black"}>LET'S CHAT</TextButton>
+          </div>
+          <div className={styles.legal}>
+            <h6>Terms</h6>
+            <h6>Provivacy Poilicy</h6>
+            <h6>© 2022 Fluidity Money. All Rights Reserved.</h6>
+          </div>
         </div>
       </div>
 
       <div className={styles.carousel}>
         <ContinuousCarousel direction={"right"}>
           <div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
-            <div className={styles.text}>MONEY DESIGNED TO BE MOVED</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
           </div>
         </ContinuousCarousel>
       </div>
