@@ -12,7 +12,7 @@ AUTOMATION_DIR := automation
 	test \
 	docker-test
 
-all: docker-build docker-build-web docker-runtime
+all: docker-build docker-build-web docker-runtime docker-runtime-web docker-node
 
 build:
 	@cd lib && ${MAKE} build-lib
@@ -62,6 +62,13 @@ docker-build-web: docker-root-web
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/build-web-container \
 		-f Dockerfile.web \
+		.
+
+docker-node: docker-build
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/node-container \
+		-f Dockerfile.node \
 		.
 
 docker-test: docker

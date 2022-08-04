@@ -1,0 +1,15 @@
+FROM node:18-alpine3.16
+
+RUN apk add --no-cache make
+
+COPY --from=fluidity/build-container /usr/local/bin/wait-for-database.sh /usr/local/bin
+COPY --from=fluidity/build-container /usr/local/bin/wait-for-amqp /usr/local/bin
+COPY --from=fluidity/build-container /usr/local/bin/wait-for-ws /usr/local/bin
+
+WORKDIR /usr/local/src/fluidity
+
+COPY build.mk .
+COPY node.mk .
+
+COPY cmd cmd
+
