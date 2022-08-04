@@ -145,7 +145,7 @@ func GetSupportedContractAddrs(fluidToken string) ([]string, error) {
 	}
 
 	for _, pool := range sushiswapFluidToken0Res.Pairs {
-		supportedContracts = append(supportedContracts, string(pool.LpToken))
+		supportedContracts = append(supportedContracts, string(pool.Id))
 	}
 
 	var sushiswapFluidToken1Res struct {
@@ -159,7 +159,7 @@ func GetSupportedContractAddrs(fluidToken string) ([]string, error) {
 	}
 
 	for _, pool := range sushiswapFluidToken1Res.Pairs {
-		supportedContracts = append(supportedContracts, string(pool.LpToken))
+		supportedContracts = append(supportedContracts, string(pool.Id))
 	}
 
 	// Uniswap - MAINNET
@@ -182,7 +182,7 @@ func GetSupportedContractAddrs(fluidToken string) ([]string, error) {
 	}
 
 	for _, pool := range uniswapFluidToken0Res.Pairs {
-		supportedContracts = append(supportedContracts, string(pool.LpToken))
+		supportedContracts = append(supportedContracts, string(pool.Id))
 	}
 
 	var uniswapFluidToken1Res struct {
@@ -196,7 +196,7 @@ func GetSupportedContractAddrs(fluidToken string) ([]string, error) {
 	}
 
 	for _, pool := range uniswapFluidToken1Res.Pairs {
-		supportedContracts = append(supportedContracts, string(pool.LpToken))
+		supportedContracts = append(supportedContracts, string(pool.Id))
 	}
 
 	return supportedContracts, nil
