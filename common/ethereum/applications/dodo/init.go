@@ -20,10 +20,4 @@ func init() {
 	if erc20Abi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
-
-	reader = strings.NewReader(DodoV1SwapAbiString)
-
-	if dodoV1SwapAbi, err = ethAbi.JSON(reader); err != nil {
-		panic(err)
-	}
 }
