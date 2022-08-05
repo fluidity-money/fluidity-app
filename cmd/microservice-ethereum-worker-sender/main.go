@@ -33,6 +33,10 @@ const (
 	// EnvUseHardhatFix instead of trying to guess the gas or set it manually
 	EnvUseHardhatFix = `FLU_ETHEREUM_HARDHAT_FIX`
 
+	// EnvUseLegacyContract to use the old single reward call instead of the
+	// new batchReward call
+	EnvUseLegacyContract = `FLU_ETHEREUM_LEGACY_CONTRACT`
+
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
 )
@@ -44,8 +48,9 @@ func main() {
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 
-		useHardhatFix bool
-		gasLimit      uint64 = 0
+		useHardhatFix     bool
+		useLegacyContract bool
+		gasLimit          uint64 = 0
 	)
 
 	var err error
@@ -67,6 +72,14 @@ func main() {
 				k.Payload = err
 			})
 		}
+	}
+
+	if os.Getenv(EnvUseLegacyContract) == "true" {
+		useLegacyContract = true
+
+		log.Debug(func(k *log.Log) {
+			k.Message = "Using the legacy contract ABI!"
+		})
 	}
 
 	privateKey, err := ethCrypto.HexToECDSA(privateKey_)
@@ -122,22 +135,46 @@ func main() {
 			hardcodedGasLimit:     gasLimit,
 		}
 
-		transactionHash, err := callRewardFunction(rewardTransactionArguments)
+		if !useLegacyContract {
+			transactionHash, err := callRewardFunction(rewardTransactionArguments)
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to call the reward transaction with transaction hash %#v!",
-					transactionHash,
-				)
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to call the reward transaction with transaction hash %#v!",
+						transactionHash,
+					)
 
-				k.Payload = err
+					k.Payload = err
+				})
+			}
+
+			log.App(func(k *log.Log) {
+				k.Message = "Successfully called the reward function with hash"
+				k.Payload = transactionHash.Hash().Hex()
+			})
+		} else {
+			transactions, err := callLegacyRewardFunction(rewardTransactionArguments)
+
+			if err != nil {
+			    log.Fatal(func(k *log.Log) {
+			        k.Format(
+						"Failed to call the legacy reward function! %v!",
+						err,
+					)
+			    })
+			}
+
+			hashes := make([]string, len(transactions))
+
+			for i, transaction := range transactions {
+				hashes[i] = transaction.Hash().Hex()
+			}
+
+			log.App(func(k *log.Log) {
+				k.Message = "Successfully called the legacy reward function with hashes"
+				k.Payload = hashes
 			})
 		}
-
-		log.App(func(k *log.Log) {
-			k.Message = "Successfully called the reward function with hash"
-			k.Payload = transactionHash.Hash().Hex()
-		})
 	})
 }
