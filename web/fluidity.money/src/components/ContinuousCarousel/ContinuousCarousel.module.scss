@@ -11,6 +11,7 @@
   z-index: 1;
   padding-top: 15px;
   padding-bottom: 15px;
+  box-sizing: content-box;
   &Line {
     display: flex;
     position: absolute;

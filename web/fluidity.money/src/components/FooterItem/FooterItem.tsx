@@ -16,7 +16,7 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   const itemList = (
     <ul>
       {items.map((item) => (
-        <li>
+        <li key={item.title}>
           <a href={item.src}>{item.title}</a>
           {item.type === "arrow" ? <div>{">"}</div> : <div>{"[>]"}</div>}
         </li>

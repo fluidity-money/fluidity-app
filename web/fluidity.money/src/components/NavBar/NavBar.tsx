@@ -3,18 +3,7 @@ import { TextButton } from "../Button";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
-  const [show, setShow] = useState(true);
-  const controlNavbar = () => {
-    if (window.screenY > 20) {
-      setShow(false);
-    } else setShow(true);
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", controlNavbar);
-    return window.removeEventListener("scroll", controlNavbar);
-  }, []);
-
+  // whichever page is displayed should be underlined
   return (
     <div className={styles.container}>
       <div className={styles.navbarFixed}>

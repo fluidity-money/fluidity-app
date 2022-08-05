@@ -21,9 +21,10 @@
 }
 
 .left {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-self: center;
+  grid-gap: 30px;
   font-size: 25px;
   max-width: 400px;
   color: $textGrey;
@@ -46,4 +47,9 @@
 
 .bold {
   color: $fluidWhite;
+  cursor: pointer;
+}
+
+.normal {
+  cursor: pointer;
 }

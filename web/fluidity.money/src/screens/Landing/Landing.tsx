@@ -48,7 +48,7 @@ const Landing = () => {
       </h1>
       <h1
         className={`${
-          fadeProp === "fadeIn" ? styles.fadeOut : `${styles.fadeInText}`
+          fadeProp === "fadeIn" ? styles.fadeOut : `${styles.fadeInText} `
         }`}
       >
         Fluidity is the blockchain incentive layer, <br />
@@ -56,7 +56,9 @@ const Landing = () => {
       </h1>
       <div
         className={`${
-          fadeProp === "fadeIn" ? styles.fadeOutCarousel : ` ${styles.carousel}`
+          fadeProp === "fadeIn"
+            ? styles.fadeOutCarousel
+            : ` ${styles.carousel} `
         }`}
       >
         <ManualCarousel>

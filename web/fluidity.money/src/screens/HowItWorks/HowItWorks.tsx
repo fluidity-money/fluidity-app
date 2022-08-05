@@ -8,7 +8,7 @@ const HowItWorks = () => {
   paragraph highlighted has different specific image,
   scrolls thought automatically and constantly
    */
-  const images = ["Image 1", "Image 2", "Image 3"];
+  const images = ["🦍", "🦍 🦍", "🦍 🦍 🦍"];
   const [currentImage, setCurrentImage] = useState("Image 1");
 
   useEffect(() => {
@@ -26,20 +26,16 @@ const HowItWorks = () => {
     <div className={styles.container}>
       <div className={styles.grid}>
         <div className={styles.left}>
-          <p
-            className={currentImage === "Image 1" ? styles.bold : styles.normal}
-          >
+          <p className={currentImage === "🦍" ? styles.bold : styles.normal}>
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </p>
-          <p
-            className={currentImage === "Image 2" ? styles.bold : styles.normal}
-          >
+          <p className={currentImage === "🦍🦍" ? styles.bold : styles.normal}>
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
           </p>
           <p
-            className={currentImage === "Image 3" ? styles.bold : styles.normal}
+            className={currentImage === "🦍🦍🦍" ? styles.bold : styles.normal}
           >
             The user is incentivised through governance.
           </p>
