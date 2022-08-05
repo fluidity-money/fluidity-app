@@ -173,6 +173,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	dodoDecimalsAdjusted := math.Pow10(dodoFeeDecimals)
 	dodoDecimalsRat := big.NewRat(int64(dodoDecimalsAdjusted), 1)
 
+	// Adjust lpFeeRate by decimals to get rate
 	lpFeeRate.Quo(lpFeeRate, dodoDecimalsRat)
 
 	// Find mtBaseTokenFee by taking last log. If last log was a transfer to

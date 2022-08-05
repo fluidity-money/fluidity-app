@@ -7,23 +7,23 @@ import (
 )
 
 func init() {
-	reader := strings.NewReader(DodoSwapAbiString)
+	reader := strings.NewReader(DodoV2SwapAbiString)
 
 	var err error
 
-	if oneInchLiquidityPoolV2Abi, err = ethAbi.JSON(reader); err != nil {
+	if dodoV2SwapAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 
-	reader = strings.NewReader(fixedRateSwapAbiString)
+	reader = strings.NewReader(ERC20AbiString)
 
-	if fixedRateSwapAbi, err = ethAbi.JSON(reader); err != nil {
+	if erc20Abi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 
-	reader = strings.NewReader(mooniswapPoolV1AbiString)
+	reader = strings.NewReader(DodoV1SwapAbiString)
 
-	if mooniswapPoolV1Abi, err = ethAbi.JSON(reader); err != nil {
+	if dodoV1SwapAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 }
