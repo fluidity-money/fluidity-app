@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { TextButton } from "../Button";
+import ResourcesNavModal from "../ResourcesNavModal";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
   // whichever page is displayed should be underlined
+  const [modal, setModal] = useState(false);
   return (
     <div className={styles.container}>
       <div className={styles.navbarFixed}>
@@ -29,10 +31,11 @@ const NavBar = () => {
               </li>
               <li>
                 <a href="/resources">RESOURCES</a>
-                {/* <button>v</button> */}
+                <button onClick={() => setModal(!modal)}>v</button>
               </li>
             </ul>
           </nav>
+          {modal && <ResourcesNavModal />}
         </div>
       </div>
     </div>
