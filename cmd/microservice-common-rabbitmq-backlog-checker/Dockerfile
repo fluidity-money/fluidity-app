@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-rabbitmq-backlog-checker/microservice-common-rabbitmq-backlog-checker.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-common-rabbitmq-backlog-checker.o" \
+	"wait-for-amqp", \
+	"./microservice-common-rabbitmq-backlog-checker.o" \
 ]
 

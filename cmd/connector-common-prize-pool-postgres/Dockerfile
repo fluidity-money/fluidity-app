@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/connector-common-prize-pool-postgres/connector-common-prize-pool-postgres.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./connector-common-prize-pool-postgres.o" \
+	"wait-for-amqp", \
+	"./connector-common-prize-pool-postgres.o" \
 ]
 

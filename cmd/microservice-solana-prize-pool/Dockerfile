@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-prize-pool/microservice-solana-prize-pool.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-solana-prize-pool.o" \
+	"wait-for-amqp", \
+	"./microservice-solana-prize-pool.o" \
 ]
 

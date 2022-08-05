@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/connector-common-winners-timescale/connector-common-winners-timescale.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./connector-common-winners-timescale.o" \
+	"wait-for-amqp", \
+	"./connector-common-winners-timescale.o" \
 ]
 

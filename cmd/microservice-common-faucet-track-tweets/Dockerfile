@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-faucet-track-tweets/microservice-common-faucet-track-tweets.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-common-faucet-track-tweets.o" \
+	"wait-for-amqp", \
+	"./microservice-common-faucet-track-tweets.o" \
 ]
 

@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-track-winners/microservice-ethereum-track-winners.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-ethereum-track-winners.o" \
+	"wait-for-amqp", \
+	"./microservice-ethereum-track-winners.o" \
 ]
 

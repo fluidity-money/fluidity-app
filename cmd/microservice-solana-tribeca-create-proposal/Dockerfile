@@ -6,7 +6,7 @@ COPY . .
 RUN make
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./start.sh" \
+	"wait-for-amqp", \
+	"./start.sh" \
 ]
 

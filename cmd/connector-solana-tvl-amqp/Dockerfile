@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-tvl-amqp/connector-solana-tvl-amqp.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./connector-solana-tvl-amqp.o" \
+	"wait-for-amqp", \
+	"./connector-solana-tvl-amqp.o" \
 ]
 

@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-amqp-copy-messages/microservice-common-amqp-copy-messages.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-common-amqp-copy-messages.o" \
+	"wait-for-amqp", \
+	"./microservice-common-amqp-copy-messages.o" \
 ]
 

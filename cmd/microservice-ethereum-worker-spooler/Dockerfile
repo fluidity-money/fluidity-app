@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-worker-spooler/microservice-ethereum-worker-spooler.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-ethereum-worker-spooler.o" \
+	"wait-for-amqp", \
+	"./microservice-ethereum-worker-spooler.o" \
 ]
 

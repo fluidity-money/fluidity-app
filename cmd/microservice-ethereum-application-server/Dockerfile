@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-application-server/microservice-ethereum-application-server.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-ethereum-application-server.o" \
+	"wait-for-amqp", \
+	"./microservice-ethereum-application-server.o" \
 ]
 

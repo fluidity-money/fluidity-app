@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-transactions/microservice-solana-transactions.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./microservice-solana-transactions.o" \
+	"wait-for-amqp", \
+	"./microservice-solana-transactions.o" \
 ]
 

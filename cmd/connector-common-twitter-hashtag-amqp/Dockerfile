@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/connector-common-twitter-hashtag-amqp/connector-common-twitter-hashtag-amqp.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./connector-common-twitter-hashtag-amqp.o" \
+	"wait-for-amqp", \
+	"./connector-common-twitter-hashtag-amqp.o" \
 ]
 

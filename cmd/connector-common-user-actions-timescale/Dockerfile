@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/connector-common-user-actions-timescale/connector-common-user-actions-timescale.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./connector-common-user-actions-timescale.o" \
+	"wait-for-amqp", \
+	"./connector-common-user-actions-timescale.o" \
 ]
 

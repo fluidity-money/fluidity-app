@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/connector-common-emissions-timescale/connector-common-emissions-timescale.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./connector-common-emissions-timescale.o" \
+	"wait-for-amqp", \
+	"./connector-common-emissions-timescale.o" \
 ]
 

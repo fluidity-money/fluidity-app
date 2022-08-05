@@ -11,7 +11,7 @@ FROM fluidity/runtime-container:latest
 COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-utility-gauge-postgres/connector-solana-utility-gauge-postgres.o .
 
 ENTRYPOINT [ \
-    "wait-for-amqp", \
-    "./connector-solana-utility-gauge-postgres.o" \
+	"wait-for-amqp", \
+	"./connector-solana-utility-gauge-postgres.o" \
 ]
 
