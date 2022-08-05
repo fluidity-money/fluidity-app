@@ -20,6 +20,10 @@ on:
         description: 'Environment'
         options: 
           - 'dev'
+      commit_id:
+        type: string
+        description: 'Commit ID'
+        default: latest
       build_base:
         type: boolean
         description: 'Build base image'
@@ -53,24 +57,39 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
+
+            if [[ ${{ github.event.inputs.commit_id }} -eq 'latest' ]]
+            then
+              $commit_id = $GITHUB_SHA
+            else
+              $commit_id = ${{ github.event.inputs.commit_id }}
+            fi
+
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --tag $GITHUB_SHA \
+              --tag $commit_id \
               --build-common ${{ github.event.inputs.build_base }}
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
+            if [[ ${{ github.event.inputs.commit_id }} -eq 'latest' ]]
+            then
+              $commit_id = $GITHUB_SHA
+            else
+              $commit_id = ${{ github.event.inputs.commit_id }}
+            fi
+
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --tag $GITHUB_SHA \
+              --tag $commit_id \
               --debug false
       - uses: act10ns/slack@v1
         with:
