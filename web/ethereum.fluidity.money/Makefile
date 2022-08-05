@@ -50,9 +50,9 @@ watch-js:
 	echo "@import "$${FLU_PUBLIC_URL:-http://localhost:3000}/index.css";" \
 		>${FRONTEND_SRC_DIR}/stub.css
 
-	@env REACT_APP_WEBSOCKET=$${REACT_APP_WEBSOCKET:-wss://ropsten.ethereum.fluidity.money:8081/updates} \
-		REACT_APP_WALLET_CONNECT_GETH_URI=$${REACT_APP_WALLET_CONNECT_GETH_URI:-wss://ropsten.ethereum.fluidity.money:8545} \
-		REACT_APP_API_URL=$${REACT_APP_API_URL:-https://ropsten.ethereum.fluidity.money:8081} \
+	@env REACT_APP_WEBSOCKET=$${REACT_APP_WEBSOCKET:-ws://localhost:8081/updates} \
+		REACT_APP_WALLET_CONNECT_GETH_URI=$${REACT_APP_WALLET_CONNECT_GETH_URI:-ws://localhost:8545} \
+		REACT_APP_API_URL=$${REACT_APP_API_URL:-http://localhost:8081} \
 		REACT_APP_CHAIN_ID=$${REACT_APP_CHAIN_ID:-31337} \
 		REACT_APP_TOKEN_CONFIG_FILE=$${REACT_APP_TOKEN_CONFIG_FILE:-testing-tokens.json} \
 			${NPX_REACTSCRIPTS} start
