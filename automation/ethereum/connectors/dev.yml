@@ -5,11 +5,11 @@ SERVICES:
       SERVICE_NAME: connector-ethereum-logs-amqp
       DOCKERFILE_PATH: ./cmd/connector-ethereum-logs-amqp    
       
-      ENV_FLU_WORKER_ID: production-ethereum-ropsten-connector-ethereum-logs-amqp
+      ENV_FLU_WORKER_ID: ethereum-ropsten-ethereum-ropsten-connector-ethereum-logs-amqp
       ENV_FLU_ETHEREUM_START_BLOCK: latest
 
   - CONNECTORS_ETHEREUM_BLOCK_HEADERS_AMQP:
       SERVICE_NAME: connector-ethereum-block-headers-amqp
       DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
       
-      ENV_FLU_WORKER_ID: production-ethereum-ropsten-connector-ethereum-block-headers-amqp
+      ENV_FLU_WORKER_ID: ethereum-ropsten-ethereum-ropsten-connector-ethereum-block-headers-amqp

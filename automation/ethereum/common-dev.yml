@@ -13,7 +13,7 @@ ENV_FLU_AMQP_QUEUE_DEAD_LETTER_ENABLE: "false"
 SECRET_FLU_SENTRY_URL: /fluidity/sentryUrl
 SECRET_FLU_FRONTEND_SENTRY_URL: /fluidity/frontend/sentryURL
 SECRET_FLU_REDIS_ADDR: /fluidity/ropsten/data/redis/endpoint
-SECRET_FLU_TIMESCALE_URI: /fluidity/ropsten/data/timescale/uri
+SECRET_FLU_TIMESCALE_URI: /fluidity/timescale/uri
 SECRET_FLU_POSTGRES_URI: /fluidity/ropsten/data/postgres/uri
 SECRET_FLU_AMQP_QUEUE_ADDR: /fluidity/ropsten/data/rabbitmq/uri
 
