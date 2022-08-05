@@ -9,11 +9,11 @@ ENV_FLU_SOLANA_RAYDIUM_PROGRAM_ID: "XXXXXX"
 SERVICES:
   - APPSERVER_USDT:
       SERVICE_NAME: microservice-solana-application-server-usdt
-      ENV_FLU_WORKER_ID: production-microservice-solana-application-server-usdt
+      ENV_FLU_WORKER_ID: solana-devnet-microservice-solana-application-server-usdt
       ENV_FLU_SOLANA_TOKEN_LOOKUPS: "fUSDT:USDT"
 
   - APPSERVER_USDC:
       SERVICE_NAME: microservice-solana-application-server-usdc
-      ENV_FLU_WORKER_ID: production-microservice-solana-application-server-usdc
+      ENV_FLU_WORKER_ID: solana-devnet-microservice-solana-application-server-usdc
       ENV_FLU_SOLANA_TOKEN_LOOKUPS: "fUSDC:USDC"
 
