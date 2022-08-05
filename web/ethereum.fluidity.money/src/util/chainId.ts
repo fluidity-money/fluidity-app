@@ -35,7 +35,7 @@ export const chainIdFromEnv = (): ChainId => {
     throw new Error(`REACT_APP_CHAIN_ID not set or incorrect!: ${chainId}`);
   }
 
-  return chainId;
+  return 3;
 };
 
 export default ChainId;
