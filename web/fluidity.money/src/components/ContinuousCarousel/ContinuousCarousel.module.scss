@@ -126,16 +126,20 @@
     // transform: scale(2);
     // transition: all 1s ease;
     & > div {
-      display: grid;
-      width: fit-content;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-direction: column;
+      height: fit-content;
       animation: scrollUp 50s infinite linear;
-      // grid-template-columns: repeat(2, 500px);
-      column-gap: 100px;
-      div:nth-of-type(even) {
-        grid-column: 2;
-        margin-top: 100px;
-      }
+      // display: grid;
+      // width: fit-content;
+      // grid-template-columns: 1fr 1fr;
+      // animation: scrollUp 50s infinite linear;
+      // // grid-template-columns: repeat(2, 500px);
+      // column-gap: 100px;
+      // div:nth-of-type(even) {
+      //   grid-column: 2;
+      //   margin-top: 100px;
+      // }
 
       &:hover {
         // animation-play-state: paused;
@@ -146,9 +150,9 @@
 
 @keyframes scrollUp {
   from {
-    transform: translateY(70%);
+    transform: translateY(0%);
   }
   to {
-    transform: translateY(-70%);
+    transform: translateY(-50%);
   }
 }

@@ -4,7 +4,7 @@ import styles from "./Fluniversity.module.scss";
 
 const Fluniversity = () => {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="fluniversity">
       <div>FLUNIVERSITY</div>
       <ManualCarousel>
         {items.map((item) => (

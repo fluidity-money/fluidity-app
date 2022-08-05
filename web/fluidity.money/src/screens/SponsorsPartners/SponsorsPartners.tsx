@@ -12,17 +12,41 @@ const SponsorsPartners = () => {
   return (
     <div className={styles.container}>
       <h1 className={styles.text}>{"Sponsors & Partners"}</h1>
-      <ContinuousCarousel direction="up">
-        <div>
-          {partners.map((partner) => (
-            <Partner
-              img={partner.img}
-              title={partner.title}
-              info={partner.info}
-            />
-          ))}
-        </div>
-      </ContinuousCarousel>
+      <div style={{ display: "flex", width: "100%" }}>
+        <ContinuousCarousel direction="up">
+          <div>
+            {partners.map((partner) => (
+              <Partner
+                img={partner.img}
+                title={partner.title}
+                info={partner.info}
+              />
+            ))}
+          </div>
+        </ContinuousCarousel>
+        <ContinuousCarousel direction="up">
+          <div>
+            {partners.map((partner) => (
+              <Partner
+                img={partner.img}
+                title={partner.title}
+                info={partner.info}
+              />
+            ))}
+          </div>
+        </ContinuousCarousel>
+        <ContinuousCarousel direction="up">
+          <div>
+            {partners.map((partner) => (
+              <Partner
+                img={partner.img}
+                title={partner.title}
+                info={partner.info}
+              />
+            ))}
+          </div>
+        </ContinuousCarousel>
+      </div>
     </div>
   );
 };

@@ -5,7 +5,7 @@ import styles from "./Docs.module.scss";
 
 const Docs = () => {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="docs">
       <div>DOCUMENTATION</div>
       <TextButton colour="coloured">ALL DOCS</TextButton>
       <ManualCarousel>

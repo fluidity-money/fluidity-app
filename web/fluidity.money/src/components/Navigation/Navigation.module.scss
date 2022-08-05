@@ -12,6 +12,10 @@
   left: 50vw;
   transform: translateX(-50%);
   h4 {
+    cursor: pointer;
     margin: 6px;
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }
