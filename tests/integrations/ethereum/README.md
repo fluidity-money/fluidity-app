@@ -37,7 +37,7 @@ func init() {
 ### Quick(ish) Start
 
 Given a Transaction Hash and Log Signature, run: 
-`tests/integrations/ethereum/util/createTestString.go <TxHash> <LogSignature> | jq`
+`tests/integrations/ethereum/util/createTestString.go <LogSignature> <TxHash1> [ <TxHash2> ... ]  | jq`
 Keep in mind all outputs must be manually validated! (Notably Check contract matches desired integration)
 
 ### Struct Definition
