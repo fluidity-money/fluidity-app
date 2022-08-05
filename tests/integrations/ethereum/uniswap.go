@@ -22,7 +22,7 @@ const integrationTestUniswapV2 = `
     },
     "expected_sender": "0x79328db8694a643c569740233869f4f5b344d0cf",
     "expected_recipient": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",
-    "expected_fees": "9960901864376397/1000000000000000",
+    "expected_fees": "9934320933/997000000",
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
   }
