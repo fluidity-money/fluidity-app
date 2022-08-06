@@ -41,6 +41,7 @@ var (
 
 func backoff() {
 	duration := time.Duration(2+rand.Intn(58)) * time.Second
+
 	message := fmt.Sprintf(
 		"Sleeping for %v seconds...\n",
 		duration.Seconds(),
@@ -56,6 +57,7 @@ func backoff() {
 		message,
 		"",
 	)
+
 	time.Sleep(duration)
 }
 

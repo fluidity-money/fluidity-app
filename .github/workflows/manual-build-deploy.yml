@@ -20,6 +20,10 @@ on:
         description: 'Environment'
         options: 
           - 'dev'
+      commit_id:
+        type: string
+        description: 'Commit ID'
+        default: latest
       build_base:
         type: boolean
         description: 'Build base image'
@@ -46,30 +50,46 @@ jobs:
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_DEV_AWS_GITHUB_OIDC_ROLE }}
+          role-duration-seconds: 7200 #seconds
       - name: Build
         if: ${{ github.event.inputs.skip_build == 'false' }}
         id: build
         uses: ./scripts/actions
         with:
           command: |
+
+            if [[ ${{ github.event.inputs.commit_id }} -eq 'latest' ]]
+            then
+              $commit_id = $GITHUB_SHA
+            else
+              $commit_id = ${{ github.event.inputs.commit_id }}
+            fi
+
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --tag $GITHUB_SHA \
+              --tag $commit_id \
               --build-common ${{ github.event.inputs.build_base }}
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
+            if [[ ${{ github.event.inputs.commit_id }} -eq 'latest' ]]
+            then
+              $commit_id = $GITHUB_SHA
+            else
+              $commit_id = ${{ github.event.inputs.commit_id }}
+            fi
+
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --tag $GITHUB_SHA \
+              --tag $commit_id \
               --debug false
       - uses: act10ns/slack@v1
         with:

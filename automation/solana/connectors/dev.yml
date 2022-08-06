@@ -2,7 +2,7 @@ SERVICES:
   - SOLANA_AMQP:
       SERVICE_NAME: connector-solana-amqp
       DOCKERFILE_PATH: ./cmd/connector-solana-amqp
-      ENV_FLU_WORKER_ID: production-connector-solana-amqp
+      ENV_FLU_WORKER_ID: solana-devnet-connector-solana-amqp
       ENV_FLU_SOLANA_STARTING_SLOT: latest
       SECRET_FLU_SOLANA_WS_URL: /fluidity/solana/websocket_url
       SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url

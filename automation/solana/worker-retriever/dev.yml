@@ -10,7 +10,7 @@ SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
 SERVICES:
   - RETRIEVER_USDC:
       SERVICE_NAME: microservice-solana-worker-retriever-usdc
-      ENV_FLU_WORKER_ID: production-worker-solana-worker-retriever-usdc
+      ENV_FLU_WORKER_ID: solana-devnet-worker-solana-worker-retriever-usdc
       ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa
       ENV_FLU_SOLANA_OBLIGATION_PUBKEY: HbmfhzwMF71jWxfKoD7sjCLrsVhvt2zEEux8t8oWqFAH
       ENV_FLU_SOLANA_RESERVE_PUBKEY: FNNkz4RCQezSSS71rW2tvqZH1LCkTzaiG7Nd1LeA5x5y
@@ -20,7 +20,7 @@ SERVICES:
 
   - RETRIEVER_USDT:
       SERVICE_NAME: microservice-solana-worker-retriever-usdt
-      ENV_FLU_WORKER_ID: production-worker-solana-worker-retriever-usdt
+      ENV_FLU_WORKER_ID: solana-devnet-worker-solana-worker-retriever-usdt
       ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 97JpYk6S7i9ydzjNwb92DQEfsA1KUUWSwnWGaGDFe6bk
       ENV_FLU_SOLANA_OBLIGATION_PUBKEY: 2VmszETnb3HkvuMKYqTaPbr7zWh8jfhHut6bUQPwAdrR
       ENV_FLU_SOLANA_RESERVE_PUBKEY: ERm3jhg8J94hxr7KmhkRvnuYbKZgNFEL4hXzBMeb1rQ8

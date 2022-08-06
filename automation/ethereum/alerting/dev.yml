@@ -6,7 +6,7 @@ SERVICES:
       DOCKERFILE_PATH: ./cmd/microservice-common-rabbitmq-backlog-checker
       DEPLOYMENT_TYPE: CRON
 
-      ENV_FLU_WORKER_ID: production-microservice-common-rabbitmq-backlog-checker
+      ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-common-rabbitmq-backlog-checker
       SECRET_FLU_AMQP_USER: /fluidity/data/rabbitmq/user
       SECRET_FLU_AMQP_USER_PASS: /fluidity/data/rabbitmq/password
       SECRET_FLU_SLACK_WEBHOOK: /fluidity/slack/webhook

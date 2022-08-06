@@ -142,12 +142,12 @@ const CurrencyBreakdown = () => {
               </div>
               {fluid ? DonutFluid : DonutRegular}
             </div>
-            <div className="toggle-container">
-              <div className={fluid ? "grey-primary-text" : "selected-text"}>
+            <div className="toggle-container margin-top-10">
+              <div className={`${fluid ? "grey-primary-text" : "selected-text "} margin-right-10`}>
                 Regular
               </div>
               <ToggleButton toggled={fluid} toggle={setFluid} />
-              <div className={fluid ? "selected-text" : "grey-primary-text"}>
+              <div className={`${fluid ? "selected-text" : "grey-primary-text"} margin-left-10`}>
                 Fluid
               </div>
             </div>

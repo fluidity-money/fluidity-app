@@ -199,7 +199,7 @@ func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	if inTokenIsFluid {
 		feeMultiplier = big.NewRat(3, 1000)
 	} else {
-		feeMultiplier = big.NewRat(3008027, 1000000000)
+		feeMultiplier = big.NewRat(3, 997)
 	}
 
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
