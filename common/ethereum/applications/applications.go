@@ -91,7 +91,7 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 		return transaction.From, logAddress, nil
 	case ApplicationDodoV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
-		// and the rest to the Balancer Vault
+		// and the rest to the Dodo Pool
 		return transaction.From, logAddress, nil
 
 	default:

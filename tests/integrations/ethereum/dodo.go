@@ -18,11 +18,11 @@ const integrationTestDodoV2 = `
       },
       "application": 7
     },
-    "expected_sender": "",
-    "expected_recipient": "",
-    "expected_fees": "",
-    "token_decimals": 0,
-    "contract_address": ""
+    "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
+    "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
+    "expected_fees": "3332148379/2499500000",
+    "token_decimals": 6,
+    "contract_address": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
   },
   {
     "transfer": {
@@ -40,20 +40,20 @@ const integrationTestDodoV2 = `
       },
       "application": 7
     },
-    "expected_sender": "",
-    "expected_recipient": "",
-    "expected_fees": "",
-    "token_decimals": 0,
-    "contract_address": ""
+    "expected_sender": "0xfd3f1d1f95481f91404f2042855686d42bd8a07e",
+    "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
+    "expected_fees": "813878721330648008489/5000000000000000000000",
+    "token_decimals": 18,
+    "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
   },
   {
       "transfer": {
         "log": {
           "data": "AAAAAAAAAAAAAAAAaxdUdOiQlMRNqYuVTu3qxJUnHQ8AAAAAAAAAAAAAAADawX+VjS7lI6IgYgaZRZfBPYMexwAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaoqRQ5FuPlC6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY6Hh9QAAAAAAAAAAAAAAAAi+dz0ZHCE1sMbJ2X2kQzYXBeMGAAAAAAAAAAAAAAAACL53PRkcITWwxsnZfaRDNhcF4wY",
-        "address": "0x3058ef90929cb8180174d74c507176cca6835d73",
-        "topics": [
+          "address": "0x3058ef90929cb8180174d74c507176cca6835d73",
+          "topics": [
             "0xc2c0245e056d5fb095f04cd6373bc770802ebd1e6c918eb78fdef843cdb37b0f"
-        ]
+          ]
       },
       "transaction": {
           "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
@@ -62,11 +62,11 @@ const integrationTestDodoV2 = `
       },
       "application": 7
     },
-    "expected_sender": "",
-    "expected_recipient": "",
-    "expected_fees": "",
-    "token_decimals": 0,
-    "contract_address": ""
+    "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
+    "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
+    "expected_fees": "133754123816472273637/100000000000000000000",
+    "token_decimals": 18,
+    "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
   },
   {
       "transfer": {
@@ -84,11 +84,11 @@ const integrationTestDodoV2 = `
       },
       "application": 7
     },
-    "expected_sender": "",
-    "expected_recipient": "",
-    "expected_fees": "",
-    "token_decimals": 0,
-    "contract_address": ""
+    "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
+    "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
+    "expected_fees": "6697299699/4999000000",
+    "token_decimals": 6,
+    "contract_address": "0xdac17f958d2ee523a2206206994597c13d831ec7"
   }
 ]
 `

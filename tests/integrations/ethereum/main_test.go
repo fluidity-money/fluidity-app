@@ -59,6 +59,9 @@ func init() {
 
 	uniswapTests := unmarshalJsonTestOrFatal(integrationTestUniswapV2)
 	tests = append(tests, uniswapTests...)
+
+	dodoTests := unmarshalJsonTestOrFatal(integrationTestDodoV2)
+	tests = append(tests, dodoTests...)
 }
 
 func TestIntegrations(t *testing.T) {

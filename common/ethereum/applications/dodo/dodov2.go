@@ -171,7 +171,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	// Dodo hardcodes denom as 10**18
 	dodoFeeDecimals := 18
 	dodoDecimalsAdjusted := math.Pow10(dodoFeeDecimals)
-	dodoDecimalsRat := big.NewRat(int64(dodoDecimalsAdjusted), 1)
+	dodoDecimalsRat := new(big.Rat).SetFloat64(dodoDecimalsAdjusted)
 
 	// Adjust lpFeeRate by decimals to get rate
 	lpFeeRate.Quo(lpFeeRate, dodoDecimalsRat)
