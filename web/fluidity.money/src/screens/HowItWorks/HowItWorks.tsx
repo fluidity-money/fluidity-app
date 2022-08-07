@@ -30,12 +30,14 @@ const HowItWorks = () => {
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </p>
-          <p className={currentImage === "🦍🦍" ? styles.bold : styles.normal}>
+          <p className={currentImage === "🦍 🦍" ? styles.bold : styles.normal}>
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
           </p>
           <p
-            className={currentImage === "🦍🦍🦍" ? styles.bold : styles.normal}
+            className={
+              currentImage === "🦍 🦍 🦍" ? styles.bold : styles.normal
+            }
           >
             The user is incentivised through governance.
           </p>
