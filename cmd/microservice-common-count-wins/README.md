@@ -12,8 +12,9 @@ that was won and stores it in the past_winnings table.
 | `FLU_DEBUG`                | Toggle debug messages produced by any application using the debug logger.      |
 | `FLU_POSTGRES_URI`         | Database URI to use when connecting to the Postgres database.                  |
 | `FLU_TIMESCALE_URI`        | Database URI to use when connecting to the Postgres database.                  |
-| `FLU_ETHEREUM_TOKENS_LIST` | Tokens on Ethereum in the format (<contract addr>,<token name>:<decimals>,...) |
-| `FLU_SOLANA_TOKENS_LIST`   | Tokens on Solana in the format (<contract addr>,<token name>:<decimals>,...)   |
+| `FLU_ETHEREUM_CHAIN_ID`    | Underlying chain ID of the chain this microservice is running on               |
+| `FLU_ETHEREUM_TOKENS_LIST` | Tokens on Ethereum in the format (<contract addr>:<token name>:<decimals>,...) |
+| `FLU_SOLANA_TOKENS_LIST`   | Tokens on Solana in the format (<contract addr>:<token name>:<decimals>,...)   |
 
 ## Building
 

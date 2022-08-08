@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
@@ -42,9 +43,8 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		}
 
 		var (
-			_         = trimWhitespace(tokenDetails_[0])
-			tokenName = trimWhitespace(tokenDetails_[1])
-			decimals_ = trimWhitespace(tokenDetails_[2])
+			tokenName    = trimWhitespace(tokenDetails_[0])
+			decimals_    = trimWhitespace(tokenDetails_[1])
 		)
 
 		decimals, err := strconv.Atoi(decimals_)
