@@ -48,6 +48,7 @@ func backoff() {
 	)
 
 	// manually write since the channel is blocked waiting for backoff
+
 	fmt.Fprintf(
 		loggingStream,
 		"[%v] [%s:%s] %s %v\n",
@@ -61,9 +62,13 @@ func backoff() {
 	time.Sleep(duration)
 }
 
-func processExit() {
+func processExit(dieFast bool) {
 	sentryExit()
-	backoff()
+
+	if !dieFast {
+		backoff()
+	}
+
 	os.Exit(1)
 }
 
@@ -89,8 +94,10 @@ func printLoggingMessage(stream io.WriteCloser, time time.Time, workerId, level,
 	)
 }
 
-func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUrl, environment string) {
-	// shutdownCallbacks to shut down other registered services when a service exits fatally
+func startLoggingServer(debugEnabled, dieFast bool, processInvocation, workerId, sentryUrl, environment string) {
+	// shutdownCallbacks to shut down other registered services when a service
+	// exits fatally
+
 	shutdownCallbacks := make([]func(), 0)
 
 	if err := sentryInit(sentryUrl, environment); err != nil {
@@ -99,7 +106,8 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 			"Failed to initialise Sentry! %v\n",
 			err,
 		)
-		processExit()
+
+		processExit(dieFast)
 	}
 
 	for {
@@ -157,7 +165,8 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 				for _, shutdown := range shutdownCallbacks {
 					shutdown()
 				}
-				processExit()
+
+				processExit(dieFast)
 			}
 
 			reply <- nil

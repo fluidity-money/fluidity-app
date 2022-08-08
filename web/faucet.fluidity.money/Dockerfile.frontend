@@ -1,25 +1,26 @@
-
-FROM fluidity/web-container:latest
+FROM fluidity/build-web-container:latest AS build
 
 WORKDIR /usr/local/src/fluidity/web/faucet.fluidity.money
+
+COPY package.json package-lock.json ./
 
 ENV PRODUCTION ${PRODUCTION}
 
 ENV PATH /app/node_modules.bin:$PATH
 
-COPY package.json package-lock.json ./
-
 RUN npm i
-
-COPY . ./
 
 ARG REACT_APP_FLU_API_URI
 
 RUN make frontend
 
-RUN rm -r /var/www/html
 
-RUN cp -r build /var/www/html
+FROM fluidity/runtime-web-container:latest
+
+WORKDIR /usr/local/src/fluidity/web/faucet.fluidity.money
+
+RUN rm -rf /var/www/html
+COPY --from=build /usr/local/src/fluidity/web/faucet.fluidity.money/build /var/www/html
 
 EXPOSE 3000
 
