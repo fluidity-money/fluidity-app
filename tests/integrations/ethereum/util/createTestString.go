@@ -12,19 +12,21 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 type TestStructure struct {
 	Transfer struct {
 		Log struct {
-			Data    string   `json:"data"`
-			Address string   `json:"address"`
-			Topics  []string `json:"topics"`
+			Data    string           `json:"data"`
+			Address ethTypes.Address `json:"address"`
+			Topics  []ethTypes.Hash  `json:"topics"`
 		} `json:"log"`
 		Transaction struct {
-			To   string `json:"to"`
-			From string `json:"from"`
-			Hash string `json:"hash"`
+			To   ethTypes.Address `json:"to"`
+			From ethTypes.Address `json:"from"`
+			Hash ethTypes.Hash    `json:"hash"`
 		} `json:"transaction"`
 		Application int `json:"application"`
 	} `json:"transfer"`
@@ -35,7 +37,7 @@ type TestStructure struct {
 	ContractAddress   string `json:"contract_address"`
 }
 
-const gethHttpApi = "https://main-rpc.linkpool.io"
+const ENV_ETH_RPC_URL = `FLU_ETHEREUM_RPC_URL`
 
 func main() {
 	args := os.Args
@@ -48,6 +50,10 @@ func main() {
 			)
 		})
 	}
+
+	gethHttpApi := util.GetEnvOrFatal(ENV_ETH_RPC_URL)
+
+	gethHttpApi = "https://rpc.ankr.com/eth"
 
 	swapSignature := ethcommon.HexToHash(args[1])
 
@@ -73,9 +79,9 @@ func main() {
 		txJobs.Add(1)
 
 		go func() {
-			defer txJobs.Done()
-
 			fetchTransactionValues(testChan, ethClient, transactionHex, swapSignature)
+
+			txJobs.Done()
 		}()
 
 	}
@@ -101,6 +107,11 @@ func main() {
 func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Client, transactionHash, swapSignature ethcommon.Hash) {
 	txReceipt, err := ethClient.TransactionReceipt(context.Background(), transactionHash)
 
+	if err != nil {
+		fmt.Println("Couldn't fetch receipt from ", transactionHash.String(), "! ", err)
+		return
+	}
+
 	var (
 		blockHash   = txReceipt.BlockHash
 		blockNumber = txReceipt.BlockNumber
@@ -110,7 +121,12 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 
 	transaction, _, err := ethClient.TransactionByHash(context.Background(), transactionHash)
 
-	sender, _ := ethClient.TransactionSender(context.Background(), transaction, blockHash, uint(blockNumber.Uint64()))
+	if err != nil {
+		fmt.Println("Couldn't fetch transaction from ", transactionHash.String(), "! ", err)
+		return
+	}
+
+	sender, err := ethClient.TransactionSender(context.Background(), transaction, blockHash, uint(blockNumber.Uint64()))
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -125,18 +141,18 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 
 		if logSignature == swapSignature {
 			var test TestStructure
-
 			test.Transfer.Log.Data = base64.RawStdEncoding.EncodeToString(log.Data)
-			test.Transfer.Log.Address = log.Address.String()
+			test.Transfer.Log.Address = ethTypes.AddressFromString(log.Address.String())
 
-			testTopics := test.Transfer.Log.Topics
+			testTopics := make([]ethTypes.Hash, 0)
 			for _, topic := range log.Topics {
-				testTopics = append(testTopics, topic.String())
+				testTopics = append(testTopics, ethTypes.HashFromString(topic.String()))
 			}
+			test.Transfer.Log.Topics = testTopics
 
-			test.Transfer.Transaction.To = transaction.To().String()
-			test.Transfer.Transaction.From = sender.String()
-			test.Transfer.Transaction.Hash = txHash.String()
+			test.Transfer.Transaction.To = ethTypes.AddressFromString(transaction.To().String())
+			test.Transfer.Transaction.From = ethTypes.AddressFromString(sender.String())
+			test.Transfer.Transaction.Hash = ethTypes.HashFromString(txHash.String())
 
 			testChan <- test
 		}
