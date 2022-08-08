@@ -48,7 +48,7 @@ func main() {
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 
-		useHardhatFix     bool
+		useHardhatFix     = os.Getenv(EnvUseLegacyContract) == "true"
 		useLegacyContract bool
 		gasLimit          uint64 = 0
 	)
@@ -74,13 +74,9 @@ func main() {
 		}
 	}
 
-	if os.Getenv(EnvUseLegacyContract) == "true" {
-		useLegacyContract = true
-
-		log.Debug(func(k *log.Log) {
-			k.Message = "Using the legacy contract ABI!"
-		})
-	}
+	log.Debug(func(k *log.Log) {
+		k.Format("Using the legacy contract ABI: %t!", useLegacyContract)
+	})
 
 	privateKey, err := ethCrypto.HexToECDSA(privateKey_)
 
@@ -135,25 +131,7 @@ func main() {
 			hardcodedGasLimit:     gasLimit,
 		}
 
-		if !useLegacyContract {
-			transactionHash, err := callRewardFunction(rewardTransactionArguments)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to call the reward transaction with transaction hash %#v!",
-						transactionHash,
-					)
-
-					k.Payload = err
-				})
-			}
-
-			log.App(func(k *log.Log) {
-				k.Message = "Successfully called the reward function with hash"
-				k.Payload = transactionHash.Hash().Hex()
-			})
-		} else {
+		if useLegacyContract {
 			transactions, err := callLegacyRewardFunction(rewardTransactionArguments)
 
 			if err != nil {
@@ -175,6 +153,26 @@ func main() {
 				k.Message = "Successfully called the legacy reward function with hashes"
 				k.Payload = hashes
 			})
+
+			return
 		}
+
+		transactionHash, err := callRewardFunction(rewardTransactionArguments)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to call the reward transaction with transaction hash %#v!",
+					transactionHash,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		log.App(func(k *log.Log) {
+			k.Message = "Successfully called the reward function with hash"
+			k.Payload = transactionHash.Hash().Hex()
+		})
 	})
 }

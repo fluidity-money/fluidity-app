@@ -139,9 +139,9 @@ func callLegacyRewardFunction(arguments callRewardArguments) ([]ethTypes.Transac
 		}
 	}
 
-	var transactions []ethTypes.Transaction
+	transactions := make([]ethTypes.Transaction, len(containerAnnouncement))
 
-	for _, reward := range containerAnnouncement {
+	for i, reward := range containerAnnouncement {
 		var (
 			winner       = reward.Winner
 			winnerString = winner.String()
@@ -162,11 +162,16 @@ func callLegacyRewardFunction(arguments callRewardArguments) ([]ethTypes.Transac
 			[]byte(token),
 		}
 
-		for _, field := range data {
+		for i, field := range data {
 			_, err := hasher.Write(field)
 
 			if err != nil {
-			    return nil, err
+			    return nil, fmt.Errorf(
+					"failed to write a field #%d containing %x to the hasher! %w",
+					i,
+					field,
+					err,
+				)
 			}
 		}
 
@@ -184,7 +189,7 @@ func callLegacyRewardFunction(arguments callRewardArguments) ([]ethTypes.Transac
 		    return nil, err
 		}
 
-		transactions = append(transactions, *transaction)
+		transactions[i] = *transaction
 	}
 
 	return transactions, nil
