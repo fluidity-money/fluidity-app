@@ -77,9 +77,16 @@ func main() {
 		txJobs.Add(1)
 
 		go func() {
-			fetchTransactionValues(testChan, ethClient, transactionHex, swapSignature)
+			defer txJobs.Done()
 
-			txJobs.Done()
+			err := fetchTransactionValues(testChan, ethClient, transactionHex, swapSignature)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format("could not fetch all values from tx %v!", transactionHex)
+					k.Payload = err
+				})
+			}
 		}()
 
 	}
@@ -102,13 +109,15 @@ func main() {
 // fetchTransactionValues uses ethClient to find Data, Address, Topics, Sender, Recipient and TxHash
 // to fill in TestStructure.
 // May return multiple relevant Logs per call
-func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Client, transactionHash, swapSignature ethcommon.Hash) {
+func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Client, transactionHash, swapSignature ethcommon.Hash) error {
 	txReceipt, err := ethClient.TransactionReceipt(context.Background(), transactionHash)
 
 	if err != nil {
-		fmt.Println("Couldn't fetch receipt from ", transactionHash.String(), "! ", err)
-
-		return
+		return fmt.Errorf(
+			"Couldn't fetch receipt from %v! %v",
+			transactionHash.String(),
+			err,
+		)
 	}
 
 	var (
@@ -121,17 +130,23 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 	transaction, _, err := ethClient.TransactionByHash(context.Background(), transactionHash)
 
 	if err != nil {
-		fmt.Println("Couldn't fetch transaction from ", transactionHash.String(), "! ", err)
-		return
+		return fmt.Errorf(
+			"Couldn't fetch transaction from %v! %v",
+			transactionHash.String(),
+			err,
+		)
 	}
 
 	sender, err := ethClient.TransactionSender(context.Background(), transaction, blockHash, uint(blockNumber.Uint64()))
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not POST to Geth provider"
-			k.Payload = err
-		})
+		return fmt.Errorf(
+			"Couldn't get TransactionSender from tx %v, blockHash %v, blockNum %v! %v",
+			transactionHash.String(),
+			blockHash.String(),
+			blockNumber,
+			err,
+		)
 	}
 
 	for _, log := range logs {
@@ -156,4 +171,6 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 			testChan <- test
 		}
 	}
+
+	return nil
 }
