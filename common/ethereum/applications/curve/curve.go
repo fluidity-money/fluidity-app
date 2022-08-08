@@ -78,10 +78,7 @@ const curveAbiString = `[
 	"gas": 2171
 }]`
 
-const (
-	curveFeeDecimals = 10
-	curvePrecision   = 18
-)
+const curveFeeDecimals = 10
 
 var curveAbi ethAbi.ABI
 
@@ -245,23 +242,4 @@ func calculateCurveSwapFee(soldAmount, boughtAmount, feeRate *big.Rat, soldToken
 	boughtFee := new(big.Rat).Sub(feeAdjustedBoughtAmount, boughtAmount)
 
 	return boughtFee
-}
-
-// hashTo32Bytes to convert a hash to a 32 byte array
-func sliceTo32Bytes(bytes []byte) [32]byte {
-	var fixedBytesBuf [32]byte
-
-	// Find start of buffer to get align bytes to end
-	start_index := int(math.Max(0, float64(32-len(bytes))))
-
-	for i, b := range bytes {
-		// truncate if the hash is too long
-		if i >= 32 {
-			return fixedBytesBuf
-		}
-
-		fixedBytesBuf[start_index+i] = b
-	}
-
-	return fixedBytesBuf
 }

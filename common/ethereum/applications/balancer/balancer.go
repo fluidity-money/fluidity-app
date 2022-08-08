@@ -201,8 +201,6 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		)
 	}
 
-	fmt.Println(swapRat)
-
 	// the contract always stores the fee with 18 decimals, so adjust it
 	big10e18 := int64(1_000_000_000_000_000_000)
 
