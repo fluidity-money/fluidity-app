@@ -1,4 +1,4 @@
-FROM fluidity/build-web-container:latest AS build
+FROM fluidity/build-container:latest AS build
 
 WORKDIR /usr/local/src/fluidity/web/solana.fluidity.money
 

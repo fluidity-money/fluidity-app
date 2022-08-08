@@ -15,6 +15,7 @@ COPY Makefile .
 COPY build.mk .
 COPY golang.mk .
 COPY node.mk .
+COPY web.mk .
 
 COPY go.mod .
 COPY go.sum .
