@@ -12,6 +12,7 @@ COPY package.json package-lock.json ./
 # FIXME shouldn't be using --legacy-peer-deps
 RUN npm i --legacy-peer-deps
 
+COPY . .
 ARG REACT_APP_API_URL
 ARG REACT_APP_WALLET_CONNECT_GETH_URI
 ARG REACT_APP_WEBSOCKET

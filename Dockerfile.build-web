@@ -6,4 +6,3 @@ WORKDIR /usr/local/src/fluidity
 COPY build.mk .
 COPY web.mk .
 
-COPY web web
