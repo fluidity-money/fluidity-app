@@ -24,9 +24,13 @@ on:
         type: string
         description: 'Commit ID'
         default: latest
-      build_base:
+      build_root_container:
         type: boolean
-        description: 'Build base image'
+        description: 'Build root-container'
+        default: false
+      build_build_container:
+        type: boolean
+        description: 'Build build-container'
         default: false
       skip_build:
         type: boolean
@@ -70,8 +74,9 @@ jobs:
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --tag $commit_id \
-              --build-common ${{ github.event.inputs.build_base }}
+              --build-root-container ${{ github.event.inputs.build_root_container }}
+              --build-build-container ${{ github.event.inputs.build_build_container }}
+              --tag $commit_id
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
