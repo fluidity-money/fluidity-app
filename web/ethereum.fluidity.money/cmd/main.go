@@ -29,11 +29,9 @@ const (
 
 func main() {
 	var (
-		keys = mustParseKeyListFromEnv(EnvWorkerKeyList)
+		keys          = mustParseKeyListFromEnv(EnvWorkerKeyList)
 		chainidString = util.GetEnvOrFatal(EnvChainId)
-		tokenListString = util.GetEnvOrFatal(EnvTokenList)
-
-		tokenList = util.GetTokensListBase(tokenListString)
+		tokens        = mustParseTokenNamesFromEnv(EnvTokenList)
 	)
 
 	chainid, err := misc.BigIntFromString(chainidString)
@@ -59,7 +57,7 @@ func main() {
 
 	web.JsonEndpoint("/pending-rewards", api_fluidity_money.HandlePendingRewards)
 
-	manualRewardHandler := api_fluidity_money.GetManualRewardHandler(tokenList, chainid, keys)
+	manualRewardHandler := api_fluidity_money.GetManualRewardHandler(tokens, chainid, keys)
 
 	web.JsonEndpoint("/manual-reward", manualRewardHandler)
 
