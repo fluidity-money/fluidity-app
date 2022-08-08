@@ -6,6 +6,7 @@ html {
   font-family: "arial";
   color: $fluidWhite;
   box-sizing: border-box;
+  background-color: #000;
 }
 
 * {
@@ -19,6 +20,7 @@ body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  background-color:$fluidBlack;
 }
 
 ul {
@@ -32,4 +34,25 @@ a {
 
 button {
   cursor: pointer;
+}
+
+.bg-dark {
+ background-color: $fluidBlack;
+}
+
+.bg-light {
+ background-color:$fluidWhite;
+}
+
+.opacity-5x {
+  opacity: 0.5;
+}
+
+#root {
+  position : absolute;
+  z-Index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom:5;
 }

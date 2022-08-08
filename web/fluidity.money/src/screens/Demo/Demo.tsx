@@ -7,7 +7,7 @@ const Demo = () => {
   full screen demo
   */
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} bg-light`}>
       <TextButton colour="white">SHOW ME A DEMO</TextButton>
       <TextButton colour="black">LAUNCH FLUIDITY</TextButton>
     </div>

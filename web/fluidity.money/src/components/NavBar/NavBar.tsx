@@ -7,7 +7,7 @@ const NavBar = () => {
   // whichever page is displayed should be underlined
   const [modal, setModal] = useState(false);
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} opacity-5x`}>
       <div className={styles.navbarFixed}>
         <div className={styles.fixed}>
           <div>
