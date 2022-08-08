@@ -23,7 +23,7 @@ const HowItWorks = () => {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} bg-dark`}>
       <div className={styles.grid}>
         <div className={styles.left}>
           <p

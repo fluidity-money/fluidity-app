@@ -10,7 +10,7 @@ const SponsorsPartners = () => {
   */
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} bg-dark`}>
       <h1 className={styles.text}>{"Sponsors & Partners"}</h1>
       <ContinuousCarousel direction="up">
         <div>
