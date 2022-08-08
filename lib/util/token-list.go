@@ -13,7 +13,6 @@ import (
 // TokenDetailsBase for the minimum token information, used currently by
 // microservice-common-count-wins
 type TokenDetailsBase struct {
-	TokenAddress  ethCommon.Address
 	TokenDecimals *big.Rat
 	TokenName     string
 }
@@ -34,7 +33,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) < 3 {
+		if len(tokenDetails_) < 2 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",
@@ -44,12 +43,9 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		}
 
 		var (
-			tokenAddress = trimWhitespace(tokenDetails_[0])
-			tokenName    = trimWhitespace(tokenDetails_[1])
-			decimals_    = trimWhitespace(tokenDetails_[2])
+			tokenName    = trimWhitespace(tokenDetails_[0])
+			decimals_    = trimWhitespace(tokenDetails_[1])
 		)
-
-		address := ethCommon.HexToAddress(tokenAddress)
 
 		decimals, err := strconv.Atoi(decimals_)
 
@@ -69,7 +65,6 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 		tokenDetail := TokenDetailsBase{
-			TokenAddress:  address,
 			TokenName:     tokenName,
 			TokenDecimals: decimalsRat,
 		}

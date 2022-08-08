@@ -14,7 +14,6 @@ import (
 	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
@@ -116,26 +115,14 @@ func generateManualRewardPayload(tokens map[string]ethCommon.Address, chainid *m
 	}
 
 	container := ManualRewardPayload {
-		Reward: rewardArgs,
+		Reward: rewardArg,
 		Signature: sig,
 	}
 
 	return container
 }
 
-func GetManualRewardHandler(tokens []util.TokenDetailsBase, chainid *misc.BigInt, signers map[string]*ecdsa.PrivateKey) func(http.ResponseWriter, *http.Request) interface{} {
-	tokensMap := make(map[string]ethCommon.Address)
-
-	for _, token := range tokens {
-		var (
-			addressString = token.TokenAddress.String()
-			address = ethCommon.HexToAddress(addressString)
-			shortName = token.TokenName
-		)
-
-		tokensMap[shortName] = address
-	}
-
+func GetManualRewardHandler(tokens map[string]ethCommon.Address, chainid *misc.BigInt, signers map[string]*ecdsa.PrivateKey) func(http.ResponseWriter, *http.Request) interface{} {
 	return func (w http.ResponseWriter, r *http.Request) interface{} {
 		var (
 			ipAddress = web.GetIpAddress(r)
@@ -181,7 +168,7 @@ func GetManualRewardHandler(tokens []util.TokenDetailsBase, chainid *misc.BigInt
 			return manualRewardError("no rewards for that token")
 		}
 
-		payload := generateManualRewardPayload(tokensMap, chainid, signers, tokenWinnings)
+		payload := generateManualRewardPayload(tokens, chainid, signers, tokenWinnings)
 
 		res := ResponseManualReward{
 			Error:         nil,
