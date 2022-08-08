@@ -1,4 +1,4 @@
-FROM fluidity/node-container:latest
+FROM fluidity/runtime-node-container:latest
 
 WORKDIR /usr/local/src/fluidity/cmd/microservice-solana-tribeca-executor
 

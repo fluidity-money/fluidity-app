@@ -11,5 +11,3 @@ WORKDIR /usr/local/src/fluidity
 COPY build.mk .
 COPY node.mk .
 
-COPY cmd cmd
-
