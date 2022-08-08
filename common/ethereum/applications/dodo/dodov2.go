@@ -11,6 +11,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -131,10 +132,24 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		)
 	}
 
+	addresses_ := []interface{}{unpacked[0], unpacked[1], unpacked[5]}
+
+	addresses, err := ethereum.CoerceBoundContractResultsToAddresses(addresses_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce swap log data to addresses! %v",
+			err,
+		)
+	}
+
 	var (
 		// swap logs
 		// fromToken is the address of tokenA
-		toToken_ = unpacked[1]
+		fromToken = addresses[0]
+
+		// fromToken is the address of tokenA
+		toToken = addresses[1]
 
 		// fromAmount is the amount of tokenA swapped
 		fromAmount = swapAmounts[0]
@@ -142,36 +157,36 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		// toAmount is the amount of tokenB swapped
 		toAmount = swapAmounts[1]
 
-		// swap topics
-		// receiver is the message sender
-		receiver = ethCommon.HexToHash(transfer.Log.Topics[5].String())
+		// receiver is the proxy of the swap maker
+		receiver = addresses[2]
+
+		// whether the token being swapped to is the fluid token
+		toTokenIsFluid = toToken == fluidTokenContract
+
+		// whether the transfer contains any fluid tokens
+		transferHasFluidToken = toTokenIsFluid || fromToken == fluidTokenContract
 	)
 
-	toToken, ok := toToken_.(string)
+	if !transferHasFluidToken {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a Dodo swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.Transaction.Hash.String(),
+			)
+		})
 
-	if !ok {
-		return nil, fmt.Errorf(
-			"Failed to cast toToken_ %v to string! %v",
-			toToken_,
-			err,
-		)
+		return nil, nil
 	}
-
-	// whether the token being swapped to is the fluid token
-	toTokenIsFluid := ethCommon.HexToAddress(toToken) == fluidTokenContract
 
 	// Find lpFeeRate via call to contract
 	contractAddress_ := transfer.Log.Address.String()
 	contractAddress := ethCommon.HexToAddress(contractAddress_)
 
-	method := "_LP_FEE_RATE_"
-	lpFeeRate_, err := ethereum.StaticCall(client, contractAddress, dodoV2SwapAbi, method)
+	lpFeeRate_, err := ethereum.StaticCall(client, contractAddress, dodoV2SwapAbi, "_LP_FEE_RATE_")
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to fetch %v from %v! %v",
-			method,
-			contractAddress.String(),
+			"Failed to fetch fees! %v",
 			err,
 		)
 	}
@@ -235,7 +250,10 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	// Default mtFees to 0
 	mtToTokenFee := big.NewRat(0, 1)
 
-	if prevTransferLog.Topics[2] != receiver {
+	prevTransferLogReceiver_ := prevTransferLog.Topics[2].String()
+	prevTransferLogReceiver := ethCommon.HexToAddress(prevTransferLogReceiver_)
+
+	if prevTransferLogReceiver != receiver {
 		// last transfer were mtFees, update mtFee amount
 		unpacked, err = erc20Abi.Unpack("Transfer", prevTransferLog.Data)
 
