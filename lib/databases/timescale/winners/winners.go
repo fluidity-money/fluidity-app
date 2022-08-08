@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -217,4 +218,69 @@ func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, toke
 	}
 
 	return winnersCount, awardedAmount
+}
+
+// GetUniqueTokens gets TokenDetails for each unique tokens in the winners
+func GetUniqueTokens(network network.BlockchainNetwork) []util.TokenDetailsBase {
+
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT DISTINCT token_short_name, token_decimals
+		FROM %s
+		WHERE network = $1
+		`,
+
+		TableWinners,
+	)
+
+	rows, err := timescaleClient.Query(
+		statementText,
+		network,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to query all unique winners for network %#v!",
+				network,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	defer rows.Close()
+
+	tokenDetailsCollected := make([]util.TokenDetailsBase, 0)
+
+	for rows.Next() {
+		var (
+			tokenName     string
+			tokenDecimals int
+		)
+
+		err := rows.Scan(&tokenName, &tokenDecimals)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Failed to scan the token name and decimals for network %#v!",
+					network,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		tokenDetails := util.NewTokenDetailsBase(tokenName, tokenDecimals)
+
+		tokenDetailsCollected = append(tokenDetailsCollected, tokenDetails)
+	}
+
+	return tokenDetailsCollected
 }
