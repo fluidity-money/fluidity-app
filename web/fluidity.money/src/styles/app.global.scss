@@ -1,0 +1,58 @@
+@import "config";
+
+html {
+  // Root font size
+  font-size: 16px;
+  font-family: "arial";
+  color: $fluidWhite;
+  box-sizing: border-box;
+  background-color: #000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// global tag properties
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background-color:$fluidBlack;
+}
+
+ul {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+  color: $fluidWhite;
+}
+
+button {
+  cursor: pointer;
+}
+
+.bg-dark {
+ background-color: $fluidBlack;
+}
+
+.bg-light {
+ background-color:$fluidWhite;
+}
+
+.opacity-5x {
+  opacity: 0.5;
+}
+
+#root {
+  position : absolute;
+  z-Index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom:5;
+}
