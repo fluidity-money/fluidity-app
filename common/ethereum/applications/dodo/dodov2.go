@@ -134,7 +134,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	var (
 		// swap logs
 		// fromToken is the address of tokenA
-		toToken = ethCommon.HexToAddress(unpacked[1].(string))
+		toToken_ = unpacked[1]
 
 		// fromAmount is the amount of tokenA swapped
 		fromAmount = swapAmounts[0]
@@ -145,10 +145,20 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		// swap topics
 		// receiver is the message sender
 		receiver = ethCommon.HexToHash(transfer.Log.Topics[5].String())
-
-		// whether the token being swapped to is the fluid token
-		toTokenIsFluid = toToken == fluidTokenContract
 	)
+
+	toToken, ok := toToken_.(string)
+
+	if !ok {
+		return nil, fmt.Errorf(
+			"Failed to cast toToken_ %v to string! %v",
+			toToken_,
+			err,
+		)
+	}
+
+	// whether the token being swapped to is the fluid token
+	toTokenIsFluid := ethCommon.HexToAddress(toToken) == fluidTokenContract
 
 	// Find lpFeeRate via call to contract
 	contractAddress_ := transfer.Log.Address.String()
