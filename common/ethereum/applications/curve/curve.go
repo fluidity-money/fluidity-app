@@ -240,14 +240,20 @@ func calculateCurveSwapFee(soldAmount, boughtAmount, feeRate *big.Rat, soldToken
 		return soldFee
 	}
 
+	// 1
+	bigOne := big.NewRat(1, 1)
+
 	// (1 - feeRate)
-	remainingFeeRate := new(big.Rat).Sub(big.NewRat(1, 1), feeRate)
+	remainingFeeRate := new(big.Rat).Sub(bigOne, feeRate)
 
-	// boughtAmount * (1 / (1 - feeRate))
-	feeAdjustedBoughtAmount := new(big.Rat).Quo(boughtAmount, remainingFeeRate)
+	// (1 / (1 - feeRate))
+	reciprocalFeeRate := new(big.Rat).Quo(bigOne, remainingFeeRate)
 
-	// boughtAmount * (1 / (1 - feeRate)) - boughtAmount
-	boughtFee := new(big.Rat).Sub(feeAdjustedBoughtAmount, boughtAmount)
+	// ((1 / (1 - feeRate)) - 1)
+	boughtFeeRate := new(big.Rat).Sub(reciprocalFeeRate, bigOne)
+
+	// boughtAmount * ((1 / (1 - feeRate)) - 1)
+	boughtFee := new(big.Rat).Mul(boughtAmount, boughtFeeRate)
 
 	return boughtFee
 }
