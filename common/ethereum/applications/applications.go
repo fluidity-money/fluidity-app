@@ -43,17 +43,47 @@ const (
 func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	switch transfer.Application {
 	case ApplicationUniswapV2:
-		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return uniswap.GetUniswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationBalancerV2:
-		return balancer.GetBalancerFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return balancer.GetBalancerFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationOneInchLPV2, ApplicationOneInchLPV1:
-		return oneinch.GetOneInchLPFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return oneinch.GetOneInchLPFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationMooniswap:
-		return oneinch.GetMooniswapV1Fees(transfer, client, fluidTokenContract, tokenDecimals)
+		return oneinch.GetMooniswapV1Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationOneInchFixedRateSwap:
-		return oneinch.GetFixedRateSwapFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return oneinch.GetFixedRateSwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationCurve:
-		return curve.GetCurveSwapFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return curve.GetCurveSwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 
 	default:
 		return nil, fmt.Errorf(

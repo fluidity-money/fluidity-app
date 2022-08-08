@@ -122,8 +122,6 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		bought_id = tokenExchangeData[2]
 		// tokens_sold is the amount of sold_id transferred
 		tokens_bought = tokenExchangeData[3]
-
-		fluidFee = new(big.Rat)
 	)
 
 	contractAddress_ := transfer.Log.Address.String()
@@ -171,7 +169,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	swapContainsFluid := soldTokenIsFluid || boughtCoinAddress == fluidTokenContract
+	swapContainsFluid := soldTokenIsFluid || (boughtCoinAddress == fluidTokenContract)
 
 	// TokenExchange does not contain Fluid Transfer
 	if !swapContainsFluid {
@@ -186,7 +184,12 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	}
 
 	// Get current fee rate
-	curveFeeNum_, err := ethereum.StaticCall(client, contractAddress, curveAbi, "fee")
+	curveFeeNum_, err := ethereum.StaticCall(
+		client,
+		contractAddress,
+		curveAbi,
+		"fee",
+	)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -211,7 +214,12 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	curveFeeRate := new(big.Rat).Quo(curveFeeNum, decimalsRat)
 
-	fluidFee = calculateCurveSwapFee(tokens_sold, tokens_bought, curveFeeRate, soldTokenIsFluid)
+	fluidFee := calculateCurveSwapFee(
+		tokens_sold,
+		tokens_bought,
+		curveFeeRate,
+		soldTokenIsFluid,
+	)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)

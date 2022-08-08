@@ -37,7 +37,7 @@ type TestStructure struct {
 	ContractAddress   string `json:"contract_address"`
 }
 
-const ENV_ETH_RPC_URL = `FLU_ETHEREUM_RPC_URL`
+const EnvEthereumRpcUrl = `FLU_ETHEREUM_RPC_URL`
 
 func main() {
 	args := os.Args
@@ -51,9 +51,7 @@ func main() {
 		})
 	}
 
-	gethHttpApi := util.GetEnvOrFatal(ENV_ETH_RPC_URL)
-
-	gethHttpApi = "https://rpc.ankr.com/eth"
+	gethHttpApi := util.GetEnvOrFatal(EnvEthereumRpcUrl)
 
 	swapSignature := ethcommon.HexToHash(args[1])
 
@@ -109,6 +107,7 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 
 	if err != nil {
 		fmt.Println("Couldn't fetch receipt from ", transactionHash.String(), "! ", err)
+
 		return
 	}
 
