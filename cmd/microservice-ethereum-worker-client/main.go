@@ -123,5 +123,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		winAnnouncements = append(winAnnouncements, winAnnouncement)
 	}
 
-	queue.SendMessage(rewardsAmqpQueueName, winAnnouncements)
+	if len(winAnnouncements) > 0 {
+		queue.SendMessage(rewardsAmqpQueueName, winAnnouncements)
+	}
 }
