@@ -63,7 +63,7 @@ func TestGetUniswapFees(t *testing.T) {
 	assert.Equal(t, r, fees)
 
 	tokenDecimals = 6
-	r, ok = new(big.Rat).SetString("9960901864376397/1000000000000000")
+	r, ok = new(big.Rat).SetString("9934320933/997000000")
 	assert.True(t, ok)
 
 	fees, err = GetUniswapFees(transfer, client, fluidTokenAddr2, tokenDecimals)
@@ -87,7 +87,7 @@ func TestGetUniswapFees(t *testing.T) {
 	assert.NoError(t, err)
 	transfer.Log.Data = *dataBlob
 
-	r, ok = new(big.Rat).SetString("40000000063331/40000000000000")
+	r, ok = new(big.Rat).SetString("39893259/39880000")
 	assert.True(t, ok)
 
 	fees, err = GetUniswapFees(transfer, client, fluidTokenAddr, tokenDecimals)
