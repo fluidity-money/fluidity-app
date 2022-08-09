@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
