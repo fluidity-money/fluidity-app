@@ -4,6 +4,7 @@ DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-sender
 ENV_FLU_ETHEREUM_GAS_LIMIT: 8000000
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
 ENV_FLU_ETHEREUM_WS_URL: wss://ropsten.ethereum.fluidity.money:8081/updates
+ENV_FLU_ETHEREUM_LEGACY_CONTRACT: "true"
 
 SERVICES:
  - SENDER_USDC:

@@ -27,6 +27,8 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		deadLetterEnabled,
 	)
 
+	var queueArgs amqp.Table
+
 	if deadLetterEnabled {
 		err := channel.ExchangeDeclare(
 			"dead-exchange",
@@ -78,6 +80,10 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 				err,
 			)
 		}
+
+		queueArgs = amqp.Table{
+			"x-dead-letter-exchange": "dead-exchange",
+		}
 	}
 
 	_, err := channel.QueueDeclare(
@@ -86,9 +92,7 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		false, // autoDelete
 		false, // exclusive
 		false, // noWait,
-		amqp.Table{
-			"x-dead-letter-exchange": "dead-exchange",
-		}, // args
+		queueArgs, // args
 	)
 
 	if err != nil {

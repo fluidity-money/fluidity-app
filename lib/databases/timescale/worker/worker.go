@@ -41,6 +41,7 @@ func InsertEmissions(emission Emission) {
 		aaveGetTokenApy     = emission.AaveGetTokenApy
 		compoundGetTokenApy = emission.CompoundGetTokenApy
 		winningChances      = emission.WinningChances
+		lastUpdated         = emission.LastUpdated
 	)
 
 	var testingBallsString strings.Builder
@@ -102,7 +103,9 @@ func InsertEmissions(emission Emission) {
 			compound_get_token_apy_pow_left_side_days_per_year,
 			compound_get_token_apy_supply_apy,
 
-			winning_chances
+			winning_chances,
+
+			last_updated
 		)
 
 		VALUES (
@@ -151,7 +154,9 @@ func InsertEmissions(emission Emission) {
 			$37,
 			$38,
 
-			$39
+			$39,
+
+			$40
 		);`,
 
 		TableEmissions,
@@ -206,6 +211,8 @@ func InsertEmissions(emission Emission) {
 		compoundGetTokenApy.SupplyApy,
 
 		winningChances.AtxAtEnd,
+
+		lastUpdated,
 	)
 
 	if err != nil {

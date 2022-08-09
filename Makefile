@@ -3,26 +3,76 @@ include build.mk
 
 AUTOMATION_DIR := automation
 
-.PHONY: docker docker-web docker-compose-build clean semgrep test
+.PHONY: \
+	docker \
+	docker-web \
+	docker-compose-build \
+	clean \
+	semgrep \
+	test \
+	docker-test
 
-all: docker docker-web
+all: docker-build docker-build-web docker-runtime docker-runtime-web docker-node
 
 build:
 	@cd lib && ${MAKE} build-lib
 	@cd common && ${MAKE} build-common
 
-docker:
+docker-root: go.sum go.mod Dockerfile.build-root
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/build-container-root \
+		-f Dockerfile.build-root \
+		.
+
+	@touch docker-root
+
+docker-root-web: go.sum go.mod Dockerfile.build-root
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/build-container-root-web \
+		-f Dockerfile.build-root-web \
+		.
+
+	@touch docker-root-web
+
+docker-build: docker-root
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/build-container \
+		-f Dockerfile.build \
 		.
 
-docker-web: docker
+docker-runtime: docker-build
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
-		-t ${ORG_ROOT}/web-container \
-		-f Dockerfile.web \
+		-t ${ORG_ROOT}/runtime-container \
+		-f Dockerfile.runtime \
 		.
+
+docker-runtime-web:
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/runtime-web-container \
+		-f Dockerfile.runtime-web \
+		.
+
+docker-build-web: docker-root-web
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/build-web-container \
+		-f Dockerfile.build-web \
+		.
+
+docker-node: docker-build
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/node-container \
+		-f Dockerfile.node \
+		.
+
+docker-test: docker
+	@${DOCKER_RUN} -f Dockerfile.test
 
 docker-compose-build:
 	@./scripts/docker-compose-all.sh build

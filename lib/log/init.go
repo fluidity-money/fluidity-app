@@ -10,9 +10,10 @@ import (
 
 func init() {
 	var (
-		debugEnabled = os.Getenv(EnvDebug) == "true"
+		debugEnabled   = os.Getenv(EnvDebug) == "true"
+		dieFastEnabled = os.Getenv(EnvDebugDieFast) == "true"
 
-		sentryUrl = os.Getenv(EnvSentryUrl)
+		sentryUrl   = os.Getenv(EnvSentryUrl)
 
 		environment = os.Getenv(microservice_lib.EnvEnvironmentName)
 		workerId    = os.Getenv(microservice_lib.EnvWorkerId)
@@ -24,6 +25,7 @@ func init() {
 
 	go startLoggingServer(
 		debugEnabled,
+		dieFastEnabled,
 		invocation,
 		workerId,
 		sentryUrl,

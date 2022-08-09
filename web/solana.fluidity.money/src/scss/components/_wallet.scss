@@ -35,6 +35,7 @@
     // padding-right: 1rem;
     grid-gap: 1rem;
     margin-top: -1rem;
+
     @include for-below-400 {
       grid-gap: 0rem;
     }
@@ -44,10 +45,7 @@
 .portfolio-graph {
   color: white;
   background-color: transparent;
-
-  position: relative;
-  @include border-gradient(1rem, 2px);
-
+  border: 1px solid #83aaa7;
   height: 100%;
   width: 100%;
   border-radius: 1rem;
@@ -79,6 +77,7 @@
 
 .portfolio-graph-title {
   font-size: 1.5rem;
+  margin-left: 33px;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   grid-column: 1/-1;
@@ -99,20 +98,19 @@
   grid-template-rows: minmax(2rem, auto) 1fr;
   grid-column: 2/5;
   grid-gap: 0.5rem;
-  background-color: transparent;
 
-  position: relative;
-  @include border-gradient(1rem, 2px);
-
+  background-color: #051323;
+  border: 1px solid #83aaa7;
   border-radius: 1rem;
   padding: 1rem;
   box-sizing: border-box;
   height: 100%;
   width: 100%;
-  max-width: 80rem;
+  max-width: 50rem;
   justify-self: center;
   // width: 100%;
   @include for-tablet-portrait-up {
+    // grid-template-columns: auto 1fr;
     grid-template-columns: 1fr;
     grid-template-rows: minmax(2rem, auto) 1fr;
     grid-column: 2/5;
@@ -127,14 +125,7 @@
 .doughnut-container {
   position: relative;
   justify-self: center;
-  width: 175px;
-  @include for-tablet-portrait-up {
-    grid-column: 1/2;
-  }
-  @include for-tablet-landscape-up {
-    grid-column: 1;
-    grid-row: 2/3;
-  }
+  width: auto;
 }
 
 .currency-list {
@@ -160,6 +151,7 @@
   min-width: 10rem;
   width: 100%;
   align-items: center;
+  margin-left: -30px;
 }
 
 .currency-listing {
@@ -168,13 +160,18 @@
   width: 100%;
   height: 100%;
   align-items: center;
+
   font-family: "Manrope";
   font-style: normal;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 1.5rem;
   letter-spacing: 0em;
 
   color: white;
+
+  @include for-tablet-landscape-down  {
+    font-size: 1.1rem;
+  }
 }
 
 .currency-walletempty-container {
@@ -197,10 +194,7 @@
 .networks {
   color: white;
   background-color: transparent;
-
-  position: relative;
-  @include border-gradient(1rem, 2px);
-
+  border: 1px solid #83aaa7;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column: 1/-1;
@@ -218,7 +212,7 @@
 }
 
 .yield-graph {
-  background-color: #1a1a1b;
+  background-color: #131823;
   padding: 10px;
   border-radius: 20px;
   min-width: 400px;
@@ -238,7 +232,7 @@
 }
 
 .wallet-overview {
-  background-color: #1a1a1b;
+  background-color: #131823;
   padding: 10px;
   border-radius: 20px;
   // min-width: 400px;
@@ -253,7 +247,7 @@
   @include for-tablet-landscape-up {
     margin-top: 20px;
   }
-  @include for-below-500 {
+  @include for-below-660 {
     flex-direction: column;
   }
 }
@@ -270,13 +264,13 @@
 .total {
   display: flex;
   flex-direction: column;
-  width: 120px;
-  height: 120px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
-  background-color: #19202e;
+  background-color: #19202f;
   position: absolute;
-  top: 16%;
-  left: 16%;
+  top: 10%;
+  left: 10%;
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
@@ -321,7 +315,7 @@
 
 .selected-text {
   @extend .primary-text;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   background: white;
   background-clip: text;
   -webkit-background-clip: text;
@@ -348,14 +342,6 @@
   }
 }
 
-.currency-line {
-  color: #828a90;
-  width: 100%;
-  margin: 4px;
-  padding: 0;
-  min-width: 155;
-}
-
 .yield-graph-tooltip {
   color: white;
   font-family: "Manrope";
@@ -373,4 +359,11 @@
 .yield-graph-legend {
   color: white;
   font-size: 9px;
+}
+
+.f-mr-10 {
+  margin-right: 100%;
+  @include for-tablet-landscape-down  {
+    margin-right: 0;
+  }
 }

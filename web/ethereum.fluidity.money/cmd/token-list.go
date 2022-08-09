@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"strings"
 
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -47,4 +48,36 @@ func mustParseKeyListFromEnv(env string) map[string]*ecdsa.PrivateKey {
 	}
 
 	return keys
+}
+
+func mustParseTokenNamesFromEnv(env string) map[string]ethCommon.Address {
+	listString := util.GetEnvOrFatal(env)
+
+	tokens := make(map[string]ethCommon.Address)
+
+	list := strings.Split(listString, ",")
+
+	for _, entry := range list {
+		details := strings.Split(entry, ":")
+
+		if len(details) != 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Invalid token list %s - expected shortname:address!",
+					entry,
+				)
+			})
+		}
+
+		var (
+			shortName     = details[0]
+			addressString = details[1]
+		)
+
+		address := ethCommon.HexToAddress(addressString)
+
+		tokens[shortName] = address
+	}
+
+	return tokens
 }

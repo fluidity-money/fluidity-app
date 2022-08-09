@@ -1,0 +1,97 @@
+@import "../../../styles/config.scss";
+
+button {
+  all: unset;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.white {
+  background-color: $fluidWhite;
+  color: $fluidBlack;
+  padding: 10px;
+  width: fit-content;
+  height: fit-content;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.black {
+  background-color: $fluidBlack;
+  color: $fluidWhite;
+  padding: 10px;
+  width: fit-content;
+  height: fit-content;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.coloured {
+  position: relative;
+  border-radius: 30px;
+  display: flex;
+
+  &::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1px;
+    border-radius: 30px;
+    background: -webkit-linear-gradient(
+      0deg,
+      #d897ee 6.822%,
+      #ca9def 16.962%,
+      #a4aef2 36.172%,
+      #66c9f7 62.514%,
+      #13effe 94.686%,
+      #04f5ff 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .inner {
+    background: unset;
+    border-radius: 30px;
+    border-style: none;
+    font-family: "Raleway", sans-serif;
+    color: white;
+    font-weight: 500;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    font-size: 14px;
+    margin-top: auto;
+    margin-bottom: auto;
+    border-width: 2px;
+    outline: unset;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    &:hover {
+      background: -webkit-linear-gradient(
+        0deg,
+        #d897ee 6.822%,
+        #ca9def 16.962%,
+        #a4aef2 36.172%,
+        #66c9f7 62.514%,
+        #13effe 94.686%,
+        #04f5ff 100%
+      );
+      cursor: pointer;
+    }
+  }
+}

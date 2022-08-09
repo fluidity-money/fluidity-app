@@ -1,3 +1,7 @@
+**/.git
+
+cmd
+web
 
 docker
 docker-*
@@ -14,6 +18,7 @@ cmd/*/docker
 cmd/*/lint
 cmd/*/*.o
 
+database/build/*
 database/build
 database/db
 
@@ -50,6 +55,3 @@ deployment_list.json
 # Vendor specific
 .vscode
 .DS_Store
-
-
-
