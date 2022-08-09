@@ -60,8 +60,8 @@ jobs:
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --build-root-container ${{ github.event.inputs.build_root_container }}
-              --build-build-container ${{ github.event.inputs.build_build_container }}
+              --build-root-container ${{ github.event.inputs.build_root_container }} \
+              --build-build-container ${{ github.event.inputs.build_build_container }} \
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
