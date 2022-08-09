@@ -671,6 +671,8 @@ func main() {
 
 			blockAnnouncements = append(blockAnnouncements, announcement)
 
+			emission.Update()
+
 			queue.SendMessage(worker.TopicEmissions, emission)
 		}
 
