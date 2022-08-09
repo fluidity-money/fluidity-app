@@ -1,6 +1,5 @@
 import React from "react";
-import ArticleCard from "../../components/Article/ArticleCard";
-import {ArticleList, ArticleListProps, ArticleType} from "../../components/Article/ArticleLists";
+import { ArticleCard, ArticleList, ArticleListProps } from "../../components/Article";
 import styles from "./Articles.module.scss";
 
 const Articles = () => {

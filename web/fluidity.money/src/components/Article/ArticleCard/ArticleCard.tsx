@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { TextButton } from "../../components/Button";
+import { TextButton } from "../../Button";
 
 const ArticleCard = ({ }) => {
 
