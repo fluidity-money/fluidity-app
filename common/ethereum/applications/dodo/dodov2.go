@@ -164,7 +164,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		toTokenIsFluid = toToken == fluidTokenContract
 
 		// whether the transfer contains any fluid tokens
-		transferHasFluidToken = toTokenIsFluid || fromToken == fluidTokenContract
+		transferHasFluidToken = toTokenIsFluid || (fromToken == fluidTokenContract)
 	)
 
 	if !transferHasFluidToken {
