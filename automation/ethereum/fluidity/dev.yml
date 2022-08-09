@@ -8,6 +8,7 @@ SERVICES:
       TARGET_GROUP: flu-dev-ropsten-be-tg
 
       ENV_FLU_WORKER_ID: ethereum-ropsten-ethereum.fluidity.money-backend
+      ENV_FLU_ETHEREUM_CHAIN_ID: 3
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST: /fluidity/ropsten/private_key_list
       SECRET_FLU_SLACK_WEBHOOK: /fluidity/slack/webhook
 
