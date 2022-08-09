@@ -85,3 +85,6 @@ test: semgrep
 
 lint: semgrep
 	@${GO_FMT} ./...
+
+clean:
+	rm -f docker-root docker-root-web
