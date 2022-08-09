@@ -23,7 +23,7 @@ on:
       commit_id:
         type: string
         description: 'Commit ID'
-        default: latest
+        default: 'latest'
       build_base:
         type: boolean
         description: 'Build base image'
