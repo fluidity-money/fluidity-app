@@ -1,0 +1,21 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  align-items: center;
+  background-color: $fluidBlack;
+  width: fit-content;
+  padding: 4px;
+  border-radius: 40px;
+  position: fixed;
+  top: 85vh;
+  left: 50vw;
+  transform: translateX(-50%);
+  h4 {
+    cursor: pointer;
+    margin: 6px;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}

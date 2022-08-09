@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
@@ -46,7 +47,7 @@ func manualRewardError(msg string) ResponseManualReward {
 	}
 }
 
-func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, reward worker.EthereumSpooledRewards) ManualRewardPayload {
+func generateManualRewardPayload(tokens map[string]ethCommon.Address, chainid *misc.BigInt, signers map[string]*ecdsa.PrivateKey, reward worker.EthereumSpooledRewards) ManualRewardPayload {
 	var (
 		winnerString  = reward.Winner.String()
 		amountInt     = reward.WinAmount
@@ -64,19 +65,32 @@ func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, reward wo
 		})
 	}
 
+	contractAddress, exists := tokens[shortName]
+
+	if !exists {
+	   log.Fatal(func (k *log.Log) {
+		   k.Format("Couldn't find address for token %s", shortName)
+	   })
+	}
+
 	var (
 		winner     = ethCommon.HexToAddress(winnerString)
 		amount     = &amountInt.Int
+		chainidInt = &chainid.Int
 		firstBlock = &firstBlockInt.Int
 		lastBlock  = &lastBlockInt.Int
 	)
 
-	encodedReward, err := fluidity.ManualRewardArguments.Pack(
+	rewardArgs := []interface{} {
+		contractAddress,
+		chainidInt,
 		winner,
 		amount,
 		firstBlock,
 		lastBlock,
-	)
+	}
+
+	encodedReward, err := fluidity.ManualRewardArguments.Pack(rewardArgs...)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -100,16 +114,16 @@ func generateManualRewardPayload(signers map[string]*ecdsa.PrivateKey, reward wo
 		WinAmount: amount,
 	}
 
-	container := ManualRewardPayload{
-		Reward:    rewardArg,
+	container := ManualRewardPayload {
+		Reward: rewardArg,
 		Signature: sig,
 	}
 
 	return container
 }
 
-func GetManualRewardHandler(signers map[string]*ecdsa.PrivateKey) func(http.ResponseWriter, *http.Request) interface{} {
-	return func(w http.ResponseWriter, r *http.Request) interface{} {
+func GetManualRewardHandler(tokens map[string]ethCommon.Address, chainid *misc.BigInt, signers map[string]*ecdsa.PrivateKey) func(http.ResponseWriter, *http.Request) interface{} {
+	return func (w http.ResponseWriter, r *http.Request) interface{} {
 		var (
 			ipAddress = web.GetIpAddress(r)
 			request   RequestManualReward
@@ -154,7 +168,7 @@ func GetManualRewardHandler(signers map[string]*ecdsa.PrivateKey) func(http.Resp
 			return manualRewardError("no rewards for that token")
 		}
 
-		payload := generateManualRewardPayload(signers, tokenWinnings)
+		payload := generateManualRewardPayload(tokens, chainid, signers, tokenWinnings)
 
 		res := ResponseManualReward{
 			Error:         nil,

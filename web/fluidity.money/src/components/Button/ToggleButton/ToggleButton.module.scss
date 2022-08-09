@@ -1,0 +1,49 @@
+@import "../../../styles/config.scss";
+
+.container {
+  margin: 10px;
+}
+
+.toggleBar {
+  height: 60px;
+  width: 250px;
+  background-color: transparent;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border: solid 1px $textGrey;
+  padding: 6px;
+}
+
+.toggleSliderRight {
+  color: $fluidBlack;
+  height: 50px;
+  width: 100px;
+  border-radius: 40px;
+  background-color: white;
+  margin-left: 148px;
+  transition: all 0.3s ease;
+}
+.toggleSliderLeft {
+  @extend .toggleSliderRight;
+  margin-left: 3px;
+  transition: all 0.3s ease;
+}
+
+.blockchain {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  z-index: 3;
+  width: 200px;
+  padding-left: 25px;
+}
+
+.black {
+  color: $fluidBlack;
+}
+
+.white {
+  color: $fluidWhite;
+}

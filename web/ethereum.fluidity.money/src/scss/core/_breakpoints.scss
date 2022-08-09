@@ -46,8 +46,8 @@ eg:
   }
 }
 
-@mixin for-below-600 {
-  @media (max-width: 600px) {
+@mixin for-below-660 {
+  @media (max-width: 660px) {
     @content;
   }
 }

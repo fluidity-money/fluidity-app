@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 850px;
+  width: 100%;
+  border: solid 2px red;
+}
+
+.text {
+  position: absolute;
+  z-index: 0;
+}
