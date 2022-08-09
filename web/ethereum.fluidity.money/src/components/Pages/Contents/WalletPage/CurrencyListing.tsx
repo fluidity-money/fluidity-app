@@ -10,7 +10,7 @@ const CurrencyListing = ({currency, amount}: {currency: string; amount: string})
     >
       <Icon src={`currency-icon i-${currency}`} />
       <div className="currency-listing">
-        <div className="f-mr-10">{currency}</div>
+        <div className="currency-type">{currency}</div>
         <div>
           {decimalTrim(amount, trim)}
         </div>
