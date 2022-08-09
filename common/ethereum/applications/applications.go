@@ -7,6 +7,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
@@ -24,6 +25,7 @@ const (
 	ApplicationOneInchLPV1
 	ApplicationMooniswap
 	ApplicationOneInchFixedRateSwap
+	ApplicationDodoV2
 	ApplicationCurve
 )
 
@@ -34,6 +36,7 @@ const (
 	OneInchLPV1SwapLogTopic      = "0x2a368c7f33bb86e2d999940a3989d849031aff29b750f67947e6b8e8c3d2ffd6"
 	MooniswapSwapLogTopic        = "0x86c49b5d8577da08444947f1427d23ef191cfabf2c0788f93324d79e926a9302"
 	OneInchFixedRateSwapLogTopic = "0x803540962ed9acbf87226c32486d71e1c86c2bdb208e771bab2fd8a626f61e89"
+	DodoV2DODOSwapLogTopic       = "0xc2c0245e056d5fb095f04cd6373bc770802ebd1e6c918eb78fdef843cdb37b0f"
 	CurveTokenExchangeLogTopic   = "0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140"
 )
 
@@ -77,6 +80,13 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			fluidTokenContract,
 			tokenDecimals,
 		)
+  case ApplicationDodoV2:
+		return dodo.GetDodoV2Fees(
+      transfer,
+      client,
+      fluidTokenContract,
+      tokenDecimals,
+    )
 	case ApplicationCurve:
 		return curve.GetCurveSwapFees(
 			transfer,
@@ -119,6 +129,10 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and the rest to the Balancer Vault
 		return transaction.From, logAddress, nil
+	case ApplicationDodoV2:
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
+		// and the rest to the Dodo Pool
+    return transaction.From, logAddress, nil
 	case ApplicationCurve:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
@@ -148,6 +162,8 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 		return ApplicationOneInchFixedRateSwap
 	case BalancerSwapLogTopic:
 		return ApplicationBalancerV2
+	case DodoV2DODOSwapLogTopic:
+		return ApplicationDodoV2
 	case CurveTokenExchangeLogTopic:
 		return ApplicationCurve
 	default:
