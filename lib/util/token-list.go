@@ -35,8 +35,8 @@ func NewTokenDetailsBase(name string, decimals int) TokenDetailsBase {
 }
 
 // GetTokensListBase starting with the address, token name and decimals
+// expects (but doesn't use) the first field to be the address
 func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
-	// addr, name, decimals
 
 	tokensList := strings.Split(tokensList_, ",")
 
@@ -46,7 +46,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 
 		tokenDetails_ := strings.Split(tokenInfo_, ":")
 
-		if len(tokenDetails_) < 2 {
+		if len(tokenDetails_) < 3 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Token information split not structured properly! %#v",
@@ -56,8 +56,8 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		}
 
 		var (
-			tokenName    = trimWhitespace(tokenDetails_[0])
-			decimals_    = trimWhitespace(tokenDetails_[1])
+			tokenName    = trimWhitespace(tokenDetails_[1])
+			decimals_    = trimWhitespace(tokenDetails_[2])
 		)
 
 		decimals, err := strconv.Atoi(decimals_)
