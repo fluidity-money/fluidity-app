@@ -25,6 +25,14 @@ contract Token is IERC20 {
         uint endBlock
     );
 
+    /// @notice emitted when a reward is quarantined for being too large
+    event BlockedReward(
+        address indexed winner,
+        uint amount,
+        uint startBlock,
+        uint endBlock
+    );
+
     /// @notice emitted when an underlying token is wrapped into a fluid asset
     event MintFluid(address indexed addr, uint indexed amount);
 
@@ -70,6 +78,32 @@ contract Token is IERC20 {
     /// @dev new oracle address, pending a call from them to confirm
     address private pendingNewOracle_;
 
+    /// @dev the largest amount a reward can be to not get quarantined
+    uint maxUncheckedReward_;
+
+    /// @dev [address] => [number of tokens the user won that have been quarantined]
+    mapping (address => uint) blockedRewards_;
+
+    /// @dev are the asset minting limits enabled?
+    bool mintLimitsEnabled_;
+
+    /// @dev amount of fluid tokens that can be minted
+    /// @dev only editable by the oracle
+    uint remainingGlobalMint_;
+
+    /// @dev the mint limit per user
+    uint userMintLimit_;
+
+    /// @dev the block number in which user mint limits were last reset
+    uint userMintResetBlock_;
+
+    /// @dev [user] => [amount the user has minted]
+    mapping (address => uint) userAmountMinted_;
+
+    /// @dev [user] => [last block the user minted on]
+    /// @dev (if this is <userMintResetBlock_, reset the amount minted to 0)
+    mapping (address => uint) userLastMintedBlock_;
+
     /**
      * @notice initializer function - sets the contract's data
      * @dev we pass in the metadata explicitly instead of sourcing from the
@@ -87,12 +121,17 @@ contract Token is IERC20 {
         uint8 _decimals,
         string memory _name,
         string memory _symbol,
-        address _oracle
+        address _oracle,
+        uint _maxUncheckedReward,
+        bool _mintLimitsEnabled,
+        uint _globalMint,
+        uint _userMint
     ) public {
         require(!initialized_, "contract is already initialized");
         initialized_ = true;
 
         rngOracle_ = _oracle;
+        maxUncheckedReward_ = _maxUncheckedReward;
 
         pool_ = LiquidityProvider(_liquidityProvider);
 
@@ -102,6 +141,11 @@ contract Token is IERC20 {
         decimals_ = _decimals;
         name_ = _name;
         symbol_ = _symbol;
+
+        mintLimitsEnabled_ = _mintLimitsEnabled;
+        remainingGlobalMint_ = _globalMint;
+        userMintLimit_ = _userMint;
+        userMintResetBlock_ = block.number;
     }
 
     /**
@@ -128,6 +172,29 @@ contract Token is IERC20 {
         pendingNewOracle_ = address(0);
     }
 
+    /// @notice updates the reward quarantine threshold
+    function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        maxUncheckedReward_ = _maxUncheckedReward;
+    }
+
+    /// @notice updates and resets mint limits
+    function updateMintLimits(uint global, uint user) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        remainingGlobalMint_ = global;
+        userMintLimit_ = user;
+        userMintResetBlock_ = block.number;
+    }
+
+    /// @notice enables or disables mint limits
+    function enableMintLimits(bool enable) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        mintLimitsEnabled_ = enable;
+    }
+
     // name and symbol provided by ERC20 parent
 
     /**
@@ -139,6 +206,27 @@ contract Token is IERC20 {
      * @return the number of tokens wrapped
      */
     function erc20In(uint amount) public returns (uint) {
+        if (mintLimitsEnabled_) {
+            // update global limit
+            require(amount <= remainingGlobalMint_, "mint amount exceeds global limit!");
+            remainingGlobalMint_ -= amount;
+
+            uint userMint;
+            if (userLastMintedBlock_ < userMintResetBlock) {
+                // user hasn't minted since the reset, reset their count
+                userMint = amount;
+            } else {
+                // user has, add the amount they're minting
+                userMint = userAmountMinted_[msg.sender] + amount;
+            }
+
+            require(userMint <= userMintLimit_, "mint amount exceeds user limit!");
+            // update the user's count
+            userAmountMinted_[msg.sender] = userMint;
+            // update the user's block
+            userLastMintedBlock_[msg.sender] = block.number;
+        }
+
         // take underlying tokens from the user
         uint originalBalance = pool_.underlying_().balanceOf(address(this));
         pool_.underlying_().safeTransferFrom(msg.sender, address(this), amount);
@@ -194,6 +282,18 @@ contract Token is IERC20 {
      * @param amount the amount being rewarded
      */
     function rewardFromPool(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
+        if (amount > maxUncheckedReward_) {
+            // quarantine the reward
+            emit BlockedReward(winner, amount, firstBlock, lastBlock);
+            blockedRewards_[winner] += amount;
+
+            return;
+        }
+
+        rewardInternal(firstBlock, lastBlock, winner, amount);
+    }
+
+    function rewardInternal(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
         // mint some fluid tokens from the interest we've accrued
         emit Reward(winner, amount, firstBlock, lastBlock);
 
@@ -225,6 +325,27 @@ contract Token is IERC20 {
             poolAmount = poolAmount - winner.amount;
 
             rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
+        }
+    }
+
+    /**
+     * @notice admin function, unblocks a reward that was quarantined for being too large
+     * @notice allows for paying out or removing the reward, in case of abuse
+     *
+     * @param user the address of the user who's reward was quarantined
+     * @param amount the amount of tokens to release (in case multiple rewards were quarantined)
+     * @param payout should the reward be paid out or removed?
+     * @param firstBlock the first block the rewards include (should be from the BlockedReward event)
+     * @param lastBlock the last block the rewards include
+     */
+    function unblockReward(address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        require(blockedRewards_[user] <= amount, "trying to unblock more than the user has blocked");
+        blockedRewards_[user] -= amount;
+
+        if (payout) {
+            rewardInternal(firstBlock, lastBlock, user, amount);
         }
     }
 
