@@ -42,8 +42,8 @@ const Articles = () => {
    }
   return (
     <div className={styles.container}>
-      <ArticleCard></ArticleCard>
-     <ArticleList {...arr}></ArticleList>
+      <ArticleCard />
+      <ArticleList {...arr} />
     </div>
   );
 };
