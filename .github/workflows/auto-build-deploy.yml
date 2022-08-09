@@ -13,8 +13,6 @@ jobs:
  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.FLU_CI_SLACK_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -44,11 +42,26 @@ jobs:
         with:
           command: |
             flu deploy-service-diff --tag $GITHUB_SHA
-      - uses: act10ns/slack@v1
+      - name: Discord notif (SUCCESS)
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
         with:
-          status: ${{ job.status }}
-          steps: ${{ toJson(steps) }}
-          channel: '#develop-ci-alerts'
-        if: always()
+          severity: info
+          details: Deployment succeeded.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (CANCELLED)
+        if: cancelled()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          details: Deployment cancelled.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (FAILURE)
+        if: failure()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          details: Deployment failed.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
 
 

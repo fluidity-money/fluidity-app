@@ -54,26 +54,26 @@ jobs:
               --environment ${{ env.ENVIRONMENT }} \
               --tag $GITHUB_SHA \
               --debug false
-      - name: Send Discord Message (SUCCESS)
+      - name: Discord notif (SUCCESS)
         uses: rjstone/discord-webhook-notify@v1
         if: success()
         with:
           severity: info
-          details: Deployment succeeded.
+          description: '**Commit:** {{ EVENT_PAYLOAD.head_commit.message }}\nAuthor: {{ EVENT_PAYLOAD.head_commit.author.name }}'
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
-      - name: Send Discord Message (CANCELLED)
+      - name: Discord notif (CANCELLED)
         if: cancelled()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
-          details: Deployment cancelled.
+          description: 'Commit: {{ EVENT_PAYLOAD.head_commit.message }}\nAuthor: {{ EVENT_PAYLOAD.head_commit.author.name }}'
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
-      - name: Send Discord Message (FAILURE)
+      - name: Discord notif (FAILURE)
         if: failure()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
-          details: Deployment failed.
+          description: '**Commit:** {{ EVENT_PAYLOAD.head_commit.message }}\nAuthor: {{ EVENT_PAYLOAD.head_commit.author.name }}'
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
 
 
