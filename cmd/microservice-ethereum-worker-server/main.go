@@ -296,7 +296,10 @@ func main() {
 
 		default:
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Received empty work announcement!"
+				k.Format(
+					"Received empty work announcement for block hash %v!",
+					blockHash,
+				)
 			})
 		}
 
