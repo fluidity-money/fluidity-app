@@ -42,6 +42,8 @@ func InsertEmissions(emission Emission) {
 		compoundGetTokenApy = emission.CompoundGetTokenApy
 		winningChances      = emission.WinningChances
 		lastUpdated         = emission.LastUpdated
+		ethereumBlockNumber = emission.EthereumBlockNumber
+		solanaSlotNumber    = emission.SolanaSlotNumber
 	)
 
 	var testingBallsString strings.Builder
@@ -105,7 +107,10 @@ func InsertEmissions(emission Emission) {
 
 			winning_chances,
 
-			last_updated
+			last_updated,
+
+			ethereum_block_number,
+			solana_slot_number
 		)
 
 		VALUES (
@@ -156,7 +161,10 @@ func InsertEmissions(emission Emission) {
 
 			$39,
 
-			$40
+			$40,
+
+			$41,
+			$42
 		);`,
 
 		TableEmissions,
@@ -213,6 +221,9 @@ func InsertEmissions(emission Emission) {
 		winningChances.AtxAtEnd,
 
 		lastUpdated,
+
+		ethereumBlockNumber,
+		solanaSlotNumber
 	)
 
 	if err != nil {
