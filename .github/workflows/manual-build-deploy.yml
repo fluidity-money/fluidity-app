@@ -20,10 +20,6 @@ on:
         description: 'Environment'
         options: 
           - 'dev'
-      commit_id:
-        type: string
-        description: 'Commit ID'
-        default: 'latest'
       build_root_container:
         type: boolean
         description: 'Build root-container'
@@ -59,14 +55,6 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-
-            if [[ ${{ github.event.inputs.commit_id }} -eq 'latest' ]]
-            then
-              $commit_id = $GITHUB_SHA
-            else
-              $commit_id = ${{ github.event.inputs.commit_id }}
-            fi
-
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
@@ -74,26 +62,19 @@ jobs:
               --environment ${{ github.event.inputs.environment }} \
               --build-root-container ${{ github.event.inputs.build_root_container }}
               --build-build-container ${{ github.event.inputs.build_build_container }}
-              --tag $commit_id
+              --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
-            if [[ '${{ github.event.inputs.commit_id }}' -eq 'latest' ]]
-            then
-              $commit_id = $GITHUB_SHA
-            else
-              $commit_id = ${{ github.event.inputs.commit_id }}
-            fi
-
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
               --debug false \
-              --tag $commit_id
+              --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
         uses: rjstone/discord-webhook-notify@v1
         if: success()
