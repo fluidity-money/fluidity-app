@@ -7,6 +7,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -23,6 +24,7 @@ const (
 	ApplicationOneInchLPV1
 	ApplicationMooniswap
 	ApplicationOneInchFixedRateSwap
+	ApplicationCurve
 )
 
 const (
@@ -32,6 +34,7 @@ const (
 	OneInchLPV1SwapLogTopic      = "0x2a368c7f33bb86e2d999940a3989d849031aff29b750f67947e6b8e8c3d2ffd6"
 	MooniswapSwapLogTopic        = "0x86c49b5d8577da08444947f1427d23ef191cfabf2c0788f93324d79e926a9302"
 	OneInchFixedRateSwapLogTopic = "0x803540962ed9acbf87226c32486d71e1c86c2bdb208e771bab2fd8a626f61e89"
+	CurveTokenExchangeLogTopic   = "0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140"
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -40,15 +43,47 @@ const (
 func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	switch transfer.Application {
 	case ApplicationUniswapV2:
-		return uniswap.GetUniswapFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return uniswap.GetUniswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationBalancerV2:
-		return balancer.GetBalancerFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return balancer.GetBalancerFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationOneInchLPV2, ApplicationOneInchLPV1:
-		return oneinch.GetOneInchLPFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return oneinch.GetOneInchLPFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationMooniswap:
-		return oneinch.GetMooniswapV1Fees(transfer, client, fluidTokenContract, tokenDecimals)
+		return oneinch.GetMooniswapV1Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationOneInchFixedRateSwap:
-		return oneinch.GetFixedRateSwapFees(transfer, client, fluidTokenContract, tokenDecimals)
+		return oneinch.GetFixedRateSwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+	case ApplicationCurve:
+		return curve.GetCurveSwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 
 	default:
 		return nil, fmt.Errorf(
@@ -84,6 +119,10 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and the rest to the Balancer Vault
 		return transaction.From, logAddress, nil
+	case ApplicationCurve:
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
@@ -109,6 +148,8 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 		return ApplicationOneInchFixedRateSwap
 	case BalancerSwapLogTopic:
 		return ApplicationBalancerV2
+	case CurveTokenExchangeLogTopic:
+		return ApplicationCurve
 	default:
 		return ApplicationNone
 	}
