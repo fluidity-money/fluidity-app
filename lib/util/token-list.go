@@ -42,8 +42,9 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		}
 
 		var (
-			tokenName    = trimWhitespace(tokenDetails_[0])
-			decimals_    = trimWhitespace(tokenDetails_[1])
+			_            = trimWhitespace(tokenDetails_[0])
+			tokenName    = trimWhitespace(tokenDetails_[1])
+			decimals_    = trimWhitespace(tokenDetails_[2])
 		)
 
 		decimals, err := strconv.Atoi(decimals_)
