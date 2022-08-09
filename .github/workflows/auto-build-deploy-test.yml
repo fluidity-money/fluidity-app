@@ -46,21 +46,21 @@ jobs:
         if: success()
         with:
           severity: info
-          description: '**Commit:** {{ EVENT_PAYLOAD.head_commit.message }}\nAuthor: {{ EVENT_PAYLOAD.head_commit.author.name }}'
+          details: Deployment succeeded.
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (CANCELLED)
+      - name: Discord notif (SUCCESS)
         if: cancelled()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
-          description: 'Commit: {{ EVENT_PAYLOAD.head_commit.message }}\nAuthor: {{ EVENT_PAYLOAD.head_commit.author.name }}'
+          details: Deployment cancelled.
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (FAILURE)
+      - name: Discord notif (SUCCESS)
         if: failure()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
-          description: '**Commit:** {{ EVENT_PAYLOAD.head_commit.message }}\nAuthor: {{ EVENT_PAYLOAD.head_commit.author.name }}'
+          details: Deployment failed.
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
 
 

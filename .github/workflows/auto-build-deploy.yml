@@ -49,14 +49,14 @@ jobs:
           severity: info
           details: Deployment succeeded.
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (CANCELLED)
+      - name: Discord notif (SUCCESS)
         if: cancelled()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
           details: Deployment cancelled.
           webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (FAILURE)
+      - name: Discord notif (SUCCESS)
         if: failure()
         uses: rjstone/discord-webhook-notify@v1
         with:
