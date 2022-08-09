@@ -22,7 +22,7 @@ func trimWhitespace(s string) string {
 }
 
 // NewTokenDetailsBase with the name and number to turn into an
-// eeexponential number (ie if given 10, will go 1e10)
+// exponential number (ie if given 10, will go 1e10)
 func NewTokenDetailsBase(name string, decimals int) TokenDetailsBase {
 	decimalsAdjusted := math.Pow10(decimals)
 
