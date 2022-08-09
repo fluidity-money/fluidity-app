@@ -4,7 +4,15 @@ REPO := fluidity/database
 REPO_TIMESCALE := ${REPO}-timescale
 REPO_POSTGRES := ${REPO}-postgres
 
-.PHONY: clean docker build timescale postgres test-data
+.PHONY: \
+	clean \
+	docker \
+	build \
+	timescale \
+	postgres \
+	test-data \
+	docker-timescale \
+	docker-postgres
 
 BUILD_DIR := build
 

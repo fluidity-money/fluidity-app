@@ -154,11 +154,11 @@ func main() {
 			emission.SenderAddress = userActionSenderAddress
 
 			var (
-				winningClasses   = fluidity.WinningClasses 
-				payoutFreqNum    = fluidity.PayoutFreqNum 
-				payoutFreqDenom  = fluidity.PayoutFreqDenom 
+				winningClasses   = fluidity.WinningClasses
+				payoutFreqNum    = fluidity.PayoutFreqNum
+				payoutFreqDenom  = fluidity.PayoutFreqDenom
 				deltaWeightNum   = fluidity.DeltaWeightNum
-				deltaWeightDenom = fluidity.DeltaWeightDenom 
+				deltaWeightDenom = fluidity.DeltaWeightDenom
 			)
 
 			var (
@@ -268,6 +268,8 @@ func main() {
 			}
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
+
+			emission.Update()
 
 			queue.SendMessage(worker.TopicEmissions, emission)
 		}
