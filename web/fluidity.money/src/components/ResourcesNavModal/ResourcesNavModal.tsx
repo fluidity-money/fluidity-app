@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styles from "./ResourcesNavModal.module.scss";
 
 const ResourcesNavModal = () => {
@@ -6,16 +7,16 @@ const ResourcesNavModal = () => {
   return (
     <div className={styles.container}>
       <h4>
-        <a href="/resources#articles">{"Articles >"}</a>
+        <Link to="/resources#articles">{"Articles >"}</Link>
       </h4>
       <h4>
-        <a href="/resources#fluniversity">{"Fluniversity >"}</a>
+        <Link to="/resources#fluniversity">{"Fluniversity >"}</Link>
       </h4>
       <h4>
-        <a href="/resources#whitepapers">{"Whitepapers >"}</a>
+        <Link to="/resources#whitepapers">{"Whitepapers >"}</Link>
       </h4>
       <h4>
-        <a href="/resources#docs">{"Documentation [>]"}</a>
+        <Link to="/resources#docs">{"Documentation [>]"}</Link>
       </h4>
     </div>
   );

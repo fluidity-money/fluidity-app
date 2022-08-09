@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { TextButton } from "../Button";
 import ResourcesNavModal from "../ResourcesNavModal";
 import styles from "./NavBar.module.scss";
@@ -11,7 +12,7 @@ const NavBar = () => {
       <div className={styles.navbarFixed}>
         <div className={styles.fixed}>
           <div>
-            <a href="/">Fluidity</a>
+            <Link to={"/"}>Fluidity</Link>
           </div>
           <TextButton colour="white">LAUNCH FLUIDITY</TextButton>
         </div>
@@ -21,16 +22,45 @@ const NavBar = () => {
           <nav>
             <ul>
               <li>
-                <a href="/howitworks">HOW IT WORKS</a>
+                <NavLink
+                  to={"/howitworks"}
+                  className={({ isActive }) => {
+                    return isActive ? styles.active : "";
+                  }}
+                >
+                  HOW IT WORKS
+                </NavLink>
               </li>
               <li>
-                <a href="/ecosystem">ECOSYSTEM</a>
+                <NavLink
+                  to={"/ecosystem"}
+                  className={({ isActive }) => {
+                    return isActive ? styles.active : "";
+                  }}
+                >
+                  ECOSYSTEM
+                </NavLink>
               </li>
               <li>
-                <a href="/fluidstats">FLUID STATS</a>
+                <NavLink
+                  to={"/fluidstats"}
+                  className={({ isActive }) => {
+                    return isActive ? styles.active : "";
+                  }}
+                >
+                  FLUID STATS
+                </NavLink>
               </li>
               <li>
-                <a href="/resources">RESOURCES</a>
+                <NavLink
+                  to={"/resources"}
+                  className={({ isActive }) => {
+                    return isActive ? styles.active : "";
+                  }}
+                >
+                  RESOURCES
+                </NavLink>
+
                 <button onClick={() => setModal(!modal)}>v</button>
               </li>
             </ul>
