@@ -28,6 +28,11 @@
         display: flex;
         li {
           margin: 20px;
+          .active {
+            color: $fluidWhite;
+            text-underline-offset: 2px;
+            text-decoration: underline;
+          }
           a {
             color: $textGrey;
           }
