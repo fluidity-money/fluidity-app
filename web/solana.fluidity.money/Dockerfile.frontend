@@ -10,6 +10,7 @@ COPY package.json package-lock.json ./
 
 RUN npm i
 
+COPY . .
 ARG REACT_APP_API_URL
 ARG REACT_APP_WEBSOCKET
 ARG REACT_APP_SENTRY_DSN
