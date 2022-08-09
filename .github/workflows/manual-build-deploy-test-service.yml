@@ -3,7 +3,7 @@ name: Fluidity CI/CD (Test Service)
 on:
   push:
     branches:
-      - develop-ci-slack-notif
+      - develop-ci-discord-notif
 permissions:
   id-token: write
   contents: read
@@ -12,12 +12,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      SLACK_WEBHOOK_URL: ${{ secrets.FLU_CI_SLACK_WEBHOOK_URL }}
       NETWORK: ethereum
       GROUP: worker-server
       SERVICE: WORKER_SERVER_USDT
       ENVIRONMENT: dev
-      BUILD_BASE: false
+      BUILD_ROOT-CONTAINER: false
+      BUILD_BUILD-CONTAINER: false
     steps:
       - uses: actions/checkout@v3
         with:
@@ -37,8 +37,10 @@ jobs:
               --group ${{ env.GROUP }} \
               --service ${{ env.SERVICE }} \
               --environment ${{ env.ENVIRONMENT }} \
+              --build-root-container ${{ env.BUILD_ROOT-CONTAINER }} \
+              --build-build-container ${{ env.BUILD_BUILD-CONTAINER }} \
               --tag $GITHUB_SHA \
-              --build-common ${{ env.BUILD_BASE }}
+              
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
@@ -51,11 +53,26 @@ jobs:
               --environment ${{ env.ENVIRONMENT }} \
               --tag $GITHUB_SHA \
               --debug false
-      - uses: act10ns/slack@v1
+      - name: Discord notif (SUCCESS)
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
         with:
-          status: ${{ job.status }}
-          steps: ${{ toJson(steps) }}
-          channel: '#develop-ci-alerts'
-        if: always()
+          severity: info
+          details: Deployment succeeded.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (SUCCESS)
+        if: cancelled()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          details: Deployment cancelled.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (SUCCESS)
+        if: failure()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          details: Deployment failed.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
 
 

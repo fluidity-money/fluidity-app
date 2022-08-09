@@ -24,9 +24,13 @@ on:
         type: string
         description: 'Commit ID'
         default: 'latest'
-      build_base:
+      build_root_container:
         type: boolean
-        description: 'Build base image'
+        description: 'Build root-container'
+        default: false
+      build_build_container:
+        type: boolean
+        description: 'Build build-container'
         default: false
       skip_build:
         type: boolean
@@ -39,8 +43,6 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.FLU_CI_SLACK_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -70,14 +72,15 @@ jobs:
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --tag $commit_id \
-              --build-common ${{ github.event.inputs.build_base }}
+              --build-root-container ${{ github.event.inputs.build_root_container }}
+              --build-build-container ${{ github.event.inputs.build_build_container }}
+              --tag $commit_id
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
-            if [[ ${{ github.event.inputs.commit_id }} -eq 'latest' ]]
+            if [[ '${{ github.event.inputs.commit_id }}' -eq 'latest' ]]
             then
               $commit_id = $GITHUB_SHA
             else
@@ -89,13 +92,26 @@ jobs:
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
-              --tag $commit_id \
-              --debug false
-      - uses: act10ns/slack@v1
+              --debug false \
+              --tag $commit_id
+      - name: Discord notif (SUCCESS)
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
         with:
-          status: ${{ job.status }}
-          steps: ${{ toJson(steps) }}
-          channel: '#develop-ci-alerts'
-        if: always()
-
-
+          severity: info
+          details: Deployment succeeded.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (SUCCESS)
+        if: cancelled()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          details: Deployment cancelled.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (SUCCESS)
+        if: failure()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          details: Deployment failed.
+          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
