@@ -27,72 +27,66 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		deadLetterEnabled,
 	)
 
-	var queueArgs amqp.Table
+	err := channel.ExchangeDeclare(
+		"dead-exchange",
+		"direct",
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait,
+		nil,   // args
+	)
 
-	if deadLetterEnabled {
-		err := channel.ExchangeDeclare(
-			"dead-exchange",
-			"direct",
-			true,  // durable
-			false, // autoDelete
-			false, // exclusive
-			false, // noWait,
-			nil,   // args
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to declare an exchange with name %#v! %v",
+			queueName+".dead-exchange",
+			err,
 		)
-
-		if err != nil {
-			return nil, fmt.Errorf(
-				"failed to declare an exchange with name %#v! %v",
-				queueName+".dead-exchange",
-				err,
-			)
-		}
-
-		_, err = channel.QueueDeclare(
-			queueName+".dead",
-			true,  // durable
-			false, // autoDelete
-			false, // exclusive
-			false, // noWait,
-			nil,   // args
-		)
-
-		if err != nil {
-			return nil, fmt.Errorf(
-				"failed to declare deadletter queue with queue name %#v! %v",
-				queueName,
-				err,
-			)
-		}
-
-		err = channel.QueueBind(
-			queueName+".dead",
-			topic,           // Key
-			"dead-exchange", // Exchange name
-			false,           // noWait
-			nil,             // args
-		)
-
-		if err != nil {
-			return nil, fmt.Errorf(
-				"unable to bind queue %#v to deadletter exchange! %v",
-				queueName+".dead",
-				err,
-			)
-		}
-
-		queueArgs = amqp.Table{
-			"x-dead-letter-exchange": "dead-exchange",
-		}
 	}
 
-	_, err := channel.QueueDeclare(
+	_, err = channel.QueueDeclare(
+		queueName+".dead",
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait,
+		nil,   // args
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to declare deadletter queue with queue name %#v! %v",
+			queueName,
+			err,
+		)
+	}
+
+	err = channel.QueueBind(
+		queueName+".dead",
+		topic,           // Key
+		"dead-exchange", // Exchange name
+		false,           // noWait
+		nil,             // args
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"unable to bind queue %#v to deadletter exchange! %v",
+			queueName+".dead",
+			err,
+		)
+	}
+
+	_, err = channel.QueueDeclare(
 		queueName,
 		true,  // durable
 		false, // autoDelete
 		false, // exclusive
 		false, // noWait,
-		queueArgs, // args
+		amqp.Table{
+			"x-dead-letter-exchange": "dead-exchange",
+		}, // args,
 	)
 
 	if err != nil {
