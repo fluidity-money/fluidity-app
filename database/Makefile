@@ -17,14 +17,14 @@ REPO_POSTGRES := ${REPO}-postgres
 BUILD_DIR := build
 
 TIMESCALE_DIR := 102-up-timescale
-TIMESCALE_SRC := $(shell find ${TIMESCALE_DIR} -type f)
+TIMESCALE_SRC := $(shell find ${TIMESCALE_DIR} -type f -name '*.sql')
 TIMESCALE_BUILD_DIR := ${BUILD_DIR}/timescale
-TIMESCALE_BUILD_OUT := ${TIMESCALE_BUILD_DIR}/init.sql
+TIMESCALE_BUILD_OUT := ${TIMESCALE_BUILD_DIR}/out
 
 POSTGRES_DIR := 101-up-postgres
-POSTGRES_SRC := $(shell find ${POSTGRES_DIR} -type f)
+POSTGRES_SRC := $(shell find ${POSTGRES_DIR} -type f -name '*.sql')
 POSTGRES_BUILD_DIR := ${BUILD_DIR}/postgres
-POSTGRES_BUILD_OUT := ${POSTGRES_BUILD_DIR}/init.sql
+POSTGRES_BUILD_OUT := ${POSTGRES_BUILD_DIR}/out
 
 SHARED_SQL_DIR := 100-up-sql-shared
 SHARED_SQL_SRC := $(shell find ${SHARED_SQL_DIR} -type f)
@@ -49,6 +49,8 @@ ${TIMESCALE_BUILD_OUT}: ${TIMESCALE_SRC}
 		-d "${TIMESCALE_DIR}" \
 		-o "${TIMESCALE_BUILD_DIR}"
 
+	@touch ${TIMESCALE_BUILD_OUT}
+
 postgres: ${POSTGRES_BUILD_OUT}
 
 ${POSTGRES_BUILD_OUT}: ${POSTGRES_SRC}
@@ -58,6 +60,8 @@ ${POSTGRES_BUILD_OUT}: ${POSTGRES_SRC}
 		-d "${SHARED_SQL_DIR}" \
 		-d "${POSTGRES_DIR}" \
 		-o "${POSTGRES_BUILD_DIR}"
+
+	@touch ${POSTGRES_BUILD_OUT}
 
 docker: docker-timescale docker-postgres
 
