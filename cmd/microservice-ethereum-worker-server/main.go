@@ -310,6 +310,7 @@ func main() {
 
 		emission.Network = "ethereum"
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
+		emission.BlockNumberEthereum = blockNumber
 
 		if hintedBlock == nil {
 

@@ -7,6 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -140,6 +141,7 @@ func main() {
 				userActionTransactionHash  = userAction.Transaction.Signature
 				userActionSenderAddress    = userAction.SenderSplAddress
 				userActionRecipientAddress = userAction.RecipientSplAddress
+				userActionSlotNumber       = int64(userAction.Transaction.Result.Slot)
 				tokenDetails               = userAction.Token
 			)
 
@@ -152,6 +154,7 @@ func main() {
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
+			emission.SlotNumber = misc.BigIntFromInt64(userActionSlotNumber)
 
 			var (
 				winningClasses   = fluidity.WinningClasses

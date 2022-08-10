@@ -3,6 +3,7 @@ package worker
 import (
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
@@ -11,11 +12,13 @@ import (
 type Emission struct {
 	LastUpdated time.Time `json:"last_updated"`
 
-	Network          string                     `json:"network"`
-	TokenDetails     token_details.TokenDetails `json:"token_details"`
-	TransactionHash  string                     `json:"transaction_hash"`
-	RecipientAddress string                     `json:"recipient_address"`
-	SenderAddress    string                     `json:"sender_address"`
+	Network             string                     `json:"network"`
+	TokenDetails        token_details.TokenDetails `json:"token_details"`
+	TransactionHash     string                     `json:"transaction_hash"`
+	RecipientAddress    string                     `json:"recipient_address"`
+	SenderAddress       string                     `json:"sender_address"`
+	BlockNumberEthereum misc.BigInt                `json:"block_number_ethereum"`
+	SlotNumber          misc.BigInt                `json:"slot_number"`
 
 	Payout struct {
 		Winnings        float64 `json:"winnings"` // Winnings
