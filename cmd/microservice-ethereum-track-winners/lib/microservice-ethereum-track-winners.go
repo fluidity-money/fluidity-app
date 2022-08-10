@@ -23,6 +23,7 @@ func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, detai
 		WinnerAddress:   address,
 		WinningAmount:   amount,
 		AwardedTime:     when,
+		TokenDetails:    details,
 	}
 
 	return winner

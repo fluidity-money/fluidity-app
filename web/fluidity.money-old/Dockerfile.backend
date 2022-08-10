@@ -1,0 +1,16 @@
+FROM fluidity/build-container:latest AS build
+
+WORKDIR /usr/local/src/fluidity/web/fluidity.money-old
+
+COPY . .
+
+RUN make backend
+
+FROM fluidity/runtime-container:latest
+
+COPY --from=build /usr/local/src/fluidity/web/fluidity.money-old/fluidity.money.o .
+
+ENTRYPOINT [ \
+	"wait-for-database.sh", \
+	"./fluidity.money.o" \
+]

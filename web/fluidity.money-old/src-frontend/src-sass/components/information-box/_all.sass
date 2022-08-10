@@ -1,0 +1,55 @@
+
+@use "../../global-variables"
+
+$vertical-padding: 60px
+$padding-left: 170px
+
+$title-font: global-variables.$raleway
+$title-font-weight: 800
+
+$text-font: global-variables.$raleway
+$text-font-weight: 400
+$content-font-size: 18px
+
+$line-spacing: 30px
+
+$content-max-width: 400px
+
+$text-box-colour: rgba(33, 44, 48, 0.5)
+
+.information-box-children
+  display: flex
+  justify-content: space-between
+  flex-direction: row
+
+.information-box-column
+  height: 100%
+
+.information-box-child
+  padding-top: $vertical-padding
+  padding-bottom: $vertical-padding
+  width: 50%
+  display: flex
+  flex-direction: row
+  justify-content: center
+
+.information-box-title
+  font-family: $title-font
+  font-weight: $title-font-weight
+  text-transform: uppercase
+  letter-spacing: 0.3em
+  margin-bottom: $line-spacing
+
+.information-box-text
+  background-color: $text-box-colour
+
+.information-box-content
+  font-family: $text-font
+  font-weight: $text-font-weight
+  margin-top: 0
+  padding-top: $line-spacing
+  line-height: 40px
+  font-size: $content-font-size
+
+.information-box-content-left
+  max-width: $content-max-width

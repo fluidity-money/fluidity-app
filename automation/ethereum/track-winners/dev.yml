@@ -1,5 +1,6 @@
 DOCKER_IMAGE: microservice-ethereum-track-winners
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-track-winners
+ENV_FLU_ETHEREUM_LEGACY_CONTRACT: "true"
 
 SERVICES:
   - TRACK_WINNERS_USDC:

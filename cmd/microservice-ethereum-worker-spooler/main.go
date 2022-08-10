@@ -6,7 +6,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -32,8 +31,8 @@ func main() {
 	var (
 		rewardsQueue           = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 		batchedRewardsQueue    = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-		instantRewardThreshold = intFromEnvOrFatal(EnvInstantRewardThreshold)
-		totalRewardThreshold   = intFromEnvOrFatal(EnvTotalRewardThreshold)
+		instantRewardThreshold = ratFromEnvOrFatal(EnvInstantRewardThreshold)
+		totalRewardThreshold   = ratFromEnvOrFatal(EnvTotalRewardThreshold)
 	)
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
@@ -54,13 +53,15 @@ func main() {
 				tokenDecimals = tokenDetails.TokenDecimals
 			)
 
-			tokenDecimalsNum := bigExp10(int64(tokenDecimals))
+			tokenDecimalsScale := bigExp10(int64(tokenDecimals))
 
-			scaledWinAmount := new(misc.BigInt).Div(&fromWinAmount.Int, tokenDecimalsNum)
+			// winAmount / decimalScale
+			scaledWinAmount := new(big.Rat).SetFrac(&fromWinAmount.Int, tokenDecimalsScale)
 
 			log.Debug(func(k *log.Log) {
-				k.Format("base amt $%s, decimals $%s", fromWinAmount.String(), tokenDecimalsNum.String())
+				k.Format("base amt $%s, decimals %s", fromWinAmount.String(), tokenDecimalsScale.String())
 			})
+
 			log.Debug(func(k *log.Log) {
 				k.Format(
 					"Reward value is $%s, instant send threshhold is $%d.",
@@ -71,7 +72,7 @@ func main() {
 
 			totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
 
-			scaledTotalRewards := new(big.Int).Div(totalRewards, tokenDecimalsNum)
+			scaledTotalRewards := new(big.Rat).SetFrac(totalRewards, tokenDecimalsScale)
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
@@ -81,9 +82,14 @@ func main() {
 				)
 			})
 
+			var (
+				largeSingleWin = scaledWinAmount.Cmp(instantRewardThreshold) > 0
+				largeTotalWins = scaledTotalRewards.Cmp(totalRewardThreshold) > 0
+			)
+
 			switch true {
 
-			case scaledWinAmount.Int64() >= instantRewardThreshold:
+			case largeSingleWin:
 				log.Debug(func(k *log.Log) {
 					k.Message = "Transaction won more than instant send threshold, sending instantly!"
 				})
@@ -92,7 +98,7 @@ func main() {
 
 				continue
 
-			case scaledTotalRewards.Int64() >= totalRewardThreshold:
+			case largeTotalWins:
 				log.Debug(func(k *log.Log) {
 					k.Message = "Total pending rewards are greater than threshold, sending!"
 				})
