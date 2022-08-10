@@ -48,8 +48,8 @@ func main() {
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 
-		useHardhatFix     = os.Getenv(EnvUseLegacyContract) == "true"
-		useLegacyContract bool
+		useHardhatFix     bool
+		useLegacyContract = os.Getenv(EnvUseLegacyContract) == "true"
 		gasLimit          uint64 = 0
 	)
 
