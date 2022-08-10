@@ -76,6 +76,18 @@ type Emission struct {
 
 	WinningChances struct {
 		AtxAtEnd float64 `json:"atx_at_end"`
+
+		Payout1 float64 `json:"payout_1"`
+		Payout2 float64 `json:"payout_2"`
+		Payout3 float64 `json:"payout_3"`
+		Payout4 float64 `json:"payout_4"`
+		Payout5 float64 `json:"payout_5"`
+
+		Probability1 float64 `json:"probability_1"`
+		Probability2 float64 `json:"probability_2"`
+		Probability3 float64 `json:"probability_3"`
+		Probability4 float64 `json:"probability_4"`
+		Probability5 float64 `json:"probability_5"`
 	} `json:"winning_chances"`
 }
 
