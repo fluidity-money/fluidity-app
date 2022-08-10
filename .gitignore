@@ -1,8 +1,5 @@
 **/.git
 
-cmd
-web
-
 docker
 docker-*
 !docker-compose*
