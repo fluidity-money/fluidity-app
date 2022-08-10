@@ -1,4 +1,4 @@
-import ArticleCard from "../../components/Article/ArticleCard/ArticleCard";
+import ArticleCard from "./ArticleDisplayCard/ArticleDisplayCard";
 import {ArticleList, ArticleListProps, ArticleType} from "../../components/Article/ArticleList/ArticleLists";
 
 export { ArticleCard, ArticleList };

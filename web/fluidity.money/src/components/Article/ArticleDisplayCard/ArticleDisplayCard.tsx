@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { TextButton } from "../../Button";
 
-const ArticleCard = ({ }) => {
+const ArticleDisplayCard = ({ }) => {
 
     return (
         <div style={{width: "80%", height:  "100%", border: "1px red solid", padding: "40px 40px 40px 40px", marginRight: "40px"}}>
@@ -22,4 +22,4 @@ const ArticleCard = ({ }) => {
     );
 };
 
-export default ArticleCard;
+export default ArticleDisplayCard;

@@ -1,5 +1,5 @@
 import React from 'react'
-
+import ArticleListCard from './ArticleListCard';
 
 export interface ArticleType {
     id: number;
@@ -16,14 +16,7 @@ export const ArticleList = ({articles}: ArticleListProps) => {
 
     const list = articles.map((article) => {
         return (
-               <div style={{margin: "0px 0 0 10px"}}>
-                    <h1 style={{marginBottom: "10px"}}>{article.title}</h1>
-                    <p style={{marginBottom: "10px"}}>
-                     {article.desc}
-                    </p>
-                    <p style={{marginBottom: "10px"}}>{article.info}</p>
-                    <hr />
-              </div>
+               <ArticleListCard id={article.id} title={article.title} desc={article.desc} info={article.info} />
         );
     });
 
