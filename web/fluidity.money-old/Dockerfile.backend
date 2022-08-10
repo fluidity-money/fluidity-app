@@ -1,14 +1,16 @@
+FROM fluidity/build-container:latest AS build
 
-FROM fluidity/build-container:latest
+WORKDIR /usr/local/src/fluidity/web/fluidity.money-old
 
-ENV REPO fluidity.money
-
-ENV DIR /usr/src/${REPO}
-
-COPY . ${DIR}
-
-WORKDIR ${DIR}
+COPY . .
 
 RUN make backend
 
-ENTRYPOINT [ "./fluidity.money.o" ]
+FROM fluidity/runtime-container:latest
+
+COPY --from=build /usr/local/src/fluidity/web/fluidity.money-old/fluidity.money.o .
+
+ENTRYPOINT [ \
+	"wait-for-database.sh", \
+	"./fluidity.money.o" \
+]
