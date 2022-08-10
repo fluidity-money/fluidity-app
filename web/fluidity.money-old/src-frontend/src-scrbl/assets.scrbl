@@ -85,7 +85,7 @@
                     "/img/litepaper.png"
                     "Litepaper")]
 
-@define[economics-whitepaper '("fluidity-economics-wp-v0.7.pdf"
+@define[economics-whitepaper '("fluidity-economics-wp-v0.8.pdf"
                                #t
                                "/img/economics.png"
                                "Economics Whitepaper")]
