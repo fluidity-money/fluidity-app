@@ -19,7 +19,7 @@ const Docs = () => {
     }
   }, [location]);
   return (
-    <div className={styles.container} id="docs">
+    <div className={styles.container} id="documentation">
       <div>DOCUMENTATION</div>
       <TextButton colour="coloured">ALL DOCS</TextButton>
       <ManualCarousel>

@@ -7,6 +7,9 @@ import styles from "./NavBar.module.scss";
 const NavBar = () => {
   // whichever page is displayed should be underlined
   const [modal, setModal] = useState(false);
+  const handleModal = () => {
+    setModal(!modal);
+  };
   return (
     <div className={`${styles.container} opacity-5x`}>
       <div className={styles.navbarFixed}>
@@ -61,11 +64,11 @@ const NavBar = () => {
                   RESOURCES
                 </NavLink>
 
-                <button onClick={() => setModal(!modal)}>v</button>
+                <button onClick={() => handleModal()}>v</button>
               </li>
             </ul>
           </nav>
-          {modal && <ResourcesNavModal />}
+          {modal && <ResourcesNavModal handleModal={handleModal} />}
         </div>
       </div>
     </div>
