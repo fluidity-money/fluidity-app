@@ -2,12 +2,12 @@ package main
 
 import (
 	solLib "github.com/fluidity-money/fluidity-app/cmd/connector-solana-tvl-amqp/lib/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	idoQueue "github.com/fluidity-money/fluidity-app/lib/queues/ido"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	solana "github.com/gagliardetto/solana-go"
 )
 
 const (
@@ -88,9 +88,9 @@ func main() {
 		k.Format("Got TVL from chain: %d", tvl)
 	})
 
-	tvlContainer := idoQueue.TvlUpdateContainer {
-		Tvl: tvl,
-		Network: network.NetworkSolana,
+	tvlContainer := idoQueue.TvlUpdateContainer{
+		Tvl:             tvl,
+		Network:         network.NetworkSolana,
 		ContractAddress: fluidityPubkey.String(),
 	}
 

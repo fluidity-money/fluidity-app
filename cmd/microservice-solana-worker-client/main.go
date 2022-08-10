@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -11,8 +10,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/near/borsh-go"
 )
@@ -108,7 +106,7 @@ func main() {
 		})
 	}
 
-	solanaClient := solanaRpc.New(rpcUrl)
+	solanaClient, _ := solana.SolanaCallManager(rpcUrl)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 
@@ -169,8 +167,7 @@ func main() {
 		})
 
 		recentBlockHashResult, err := solanaClient.GetRecentBlockhash(
-			context.Background(),
-			solanaRpc.CommitmentFinalized,
+			"finalized",
 		)
 
 		if err != nil {
@@ -321,7 +318,7 @@ and instruction data %+v`,
 			})
 		}
 
-		sig, err := solanaClient.SendTransaction(context.Background(), transaction)
+		sig, err := solanaClient.SendTransaction(transaction)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/base64"
 
-	goSolana "github.com/gagliardetto/solana-go"
 	borsh "github.com/near/borsh-go"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
@@ -35,7 +34,7 @@ func main() {
 		errChan                 = make(chan error)
 	)
 
-	trfDataStorePubkey := goSolana.MustPublicKeyFromBase58(trfDataStoreProgramId)
+	trfDataStorePubkey := solana.MustPublicKeyFromBase58(trfDataStoreProgramId)
 
 	var (
 		trfDataStoreString = "trfDataStore"
@@ -43,7 +42,7 @@ func main() {
 		trfDataStoreBytes  = [][]byte{trfDataStoreBytes_}
 	)
 
-	trfDataStorePda, _, err := goSolana.FindProgramAddress(
+	trfDataStorePda, _, err := solana.FindProgramAddress(
 		trfDataStoreBytes,
 		trfDataStorePubkey,
 	)

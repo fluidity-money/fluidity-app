@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/base64"
 	"errors"
 
@@ -13,8 +12,7 @@ import (
 	types "github.com/fluidity-money/fluidity-app/lib/types/payout"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	goSolana "github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	goSolana "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/near/borsh-go"
 )
 
@@ -51,7 +49,7 @@ func main() {
 		errChan                 = make(chan error)
 	)
 
-	solanaClient := solanaRpc.New(solanaRpcUrl)
+	solanaClient, _ := goSolana.SolanaCallManager(solanaRpcUrl)
 
 	solanaSubscription, err := solana.SubscribeAccount(
 		solanaWsUrl,
@@ -122,7 +120,6 @@ func main() {
 				var gauge utility_gauge.Gauge
 
 				accInfoRes, err := solanaClient.GetAccountInfo(
-					context.Background(),
 					gaugePubkey,
 				)
 
@@ -174,12 +171,11 @@ func main() {
 				var epochGauge utility_gauge.EpochGauge
 
 				accInfoRes, err = solanaClient.GetAccountInfo(
-					context.Background(),
 					epochGaugePubkey,
 				)
 
 				if err != nil {
-					if errors.Is(err, solanaRpc.ErrNotFound) {
+					if errors.Is(err, solana.ErrNotFound) {
 						log.Debug(func(k *log.Log) {
 							k.Format("could not find epochGauge at account %v (derived from %v, at epoch %v)!", epochGaugePubkey, gaugePubkey, epoch)
 						})

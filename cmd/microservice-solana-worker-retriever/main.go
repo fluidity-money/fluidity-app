@@ -8,8 +8,7 @@ import (
 
 	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 const (
@@ -69,7 +68,7 @@ func main() {
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
 	)
 
-	solanaClient := solanaRpc.New(rpcUrl)
+	solanaClient, _ := solana.SolanaCallManager(rpcUrl)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 
@@ -124,10 +123,10 @@ func main() {
 			})
 		}
 
-		payableBufferedTransfers := worker.SolanaWork {
+		payableBufferedTransfers := worker.SolanaWork{
 			BufferedTransfers: transfers,
-			Tvl:                tvl,
-			MintSupply:         mintSupply,
+			Tvl:               tvl,
+			MintSupply:        mintSupply,
 		}
 
 		queue.SendMessage(topicWrappedActionsQueue, payableBufferedTransfers)

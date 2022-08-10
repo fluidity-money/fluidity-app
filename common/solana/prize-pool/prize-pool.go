@@ -1,15 +1,15 @@
 package prize_pool
 
 import (
-	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 
-	"github.com/gagliardetto/solana-go"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
 )
@@ -20,7 +20,7 @@ const getTvlDiscriminant = uint8(4)
 
 // data layout for the account that GetTVL writes its response into
 type tvlDataAccount struct {
-	Tvl uint64;
+	Tvl uint64
 }
 
 // the solana-go sdk types this response incorrectly, leaving out the `value` field,
@@ -28,7 +28,7 @@ type tvlDataAccount struct {
 type (
 	simulateTransactionResponse struct {
 		Value   simulateTransactionValue `json:"value"`
-		Context solanaRpc.Context              `json:"context"`
+		Context solanaRpc.Context        `json:"context"`
 	}
 
 	simulateTransactionValue struct {
@@ -48,11 +48,10 @@ type (
 )
 
 // GetMintSupply fetches the supply of a token via its mint address
-func GetMintSupply(client *solanaRpc.Client, account solana.PublicKey) (uint64, error) {
+func GetMintSupply(client *solana.SolanaRPCHandle, account solana.PublicKey) (uint64, error) {
 	res, err := client.GetTokenSupply(
-		context.Background(),
 		account,
-		solanaRpc.CommitmentFinalized,
+		"finalized",
 	)
 
 	if err != nil {
@@ -78,7 +77,7 @@ func GetMintSupply(client *solanaRpc.Client, account solana.PublicKey) (uint64, 
 }
 
 // GetPrice wraps fetching the current price of a token
-func GetPrice(client *solanaRpc.Client, account solana.PublicKey) (*big.Rat, error) {
+func GetPrice(client *solana.SolanaRPCHandle, account solana.PublicKey) (*big.Rat, error) {
 	price, err := pyth.GetPrice(client, account)
 
 	if err != nil {
@@ -93,7 +92,7 @@ func GetPrice(client *solanaRpc.Client, account solana.PublicKey) (*big.Rat, err
 
 // GetTvl retrieves the current total value locked from chain using a
 // simulated transaction
-func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) (uint64, error) {
+func GetTvl(client *solana.SolanaRPCHandle, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) (uint64, error) {
 
 	params, err := getTvlTransactionParams(
 		fluidityPubkey,
@@ -113,17 +112,17 @@ func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubke
 		)
 	}
 
-	response := new(simulateTransactionResponse)
-
 	// solana-go has the response type wrong, so we manually call the method
 	// and decode into our own response type
 
-	err = client.RPCCallForInto(
-		context.Background(),
-		response,
+	response_json := client.RawInvoke(
 		"simulateTransaction",
 		params,
 	)
+
+	var response simulateTransactionResponse
+
+	err = json.Unmarshal(response_json, response)
 
 	if err != nil {
 		return 0, fmt.Errorf(

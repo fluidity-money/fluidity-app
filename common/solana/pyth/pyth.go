@@ -1,12 +1,10 @@
 package pyth
 
 import (
-	"context"
 	"fmt"
 	"math/big"
 
-	solana "github.com/gagliardetto/solana-go"
-	"github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/near/borsh-go"
 )
 
@@ -97,12 +95,11 @@ type (
 	}
 )
 
-func GetPrice(solanaClient *rpc.Client, pricePubkey solana.PublicKey) (*big.Rat, error) {
+func GetPrice(solanaClient *solana.SolanaRPCHandle, pricePubkey solana.PublicKey) (*big.Rat, error) {
 
 	// get reserve bytes
 
 	resp, err := solanaClient.GetAccountInfo(
-		context.TODO(),
 		pricePubkey,
 	)
 

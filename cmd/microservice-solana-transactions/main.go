@@ -14,8 +14,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
 
 	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
-	solanaLibrary "github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -43,9 +41,9 @@ func main() {
 		applications        = parseApplications(applicationsString)
 	)
 
-	solPythPubkey := solanaLibrary.MustPublicKeyFromBase58(solPythPubkeyString)
+	solPythPubkey := solanaLib.MustPublicKeyFromBase58(solPythPubkeyString)
 
-	solanaClient := solanaRpc.New(solanaRpcUrl)
+	solanaClient, _ := solanaLib.SolanaCallManager(solanaRpcUrl)
 
 	LamportDecimalPlacesRat := big.NewRat(LamportDecimalPlaces, 1)
 

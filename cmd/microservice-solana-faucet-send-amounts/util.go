@@ -1,19 +1,17 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
-func getBlockHash(client *solanaRpc.Client) (*solana.Hash, error) {
-	blockHashResult, err := client.GetRecentBlockhash(context.Background(), "finalized")
+func getBlockHash(client *solana.SolanaRPCHandle) (*solana.Hash, error) {
+	blockHashResult, err := client.GetRecentBlockhash("finalized")
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -39,8 +37,8 @@ func (tokenDetails tokenMap) addAccountDetails(accountDetailsList_ string) {
 		accountSeparated := strings.Split(account_, ":")
 
 		if len(accountSeparated) != 3 {
-			log.Fatal(func (k *log.Log) {
-			    k.Format(
+			log.Fatal(func(k *log.Log) {
+				k.Format(
 					"Invalid account details! Expected the form PDA:NAME:PRIKEY, got %s!",
 					accountSeparated,
 				)
@@ -66,28 +64,28 @@ func (tokenDetails tokenMap) addAccountDetails(accountDetailsList_ string) {
 		wallet, err := solana.WalletFromPrivateKeyBase58(accountSeparated[2])
 
 		if err != nil {
-		    log.Fatal(func (k *log.Log) {
-		        k.Format(
+			log.Fatal(func(k *log.Log) {
+				k.Format(
 					"Failed to create a wallet for %s!",
 					tokenName,
 				)
 
-		        k.Payload = err
-		    })
+				k.Payload = err
+			})
 		}
 
 		details, ok := tokenDetails[tokenName]
 
 		if !ok {
-			log.Fatal(func (k *log.Log) {
-			    k.Format(
+			log.Fatal(func(k *log.Log) {
+				k.Format(
 					"Token %s has account details but not token details!",
 					tokenName,
 				)
 			})
 		}
 
-		details.pdaPubkey    = pdaPubkey
+		details.pdaPubkey = pdaPubkey
 		details.signerWallet = wallet
 
 		tokenDetails[tokenName] = details

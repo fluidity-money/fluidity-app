@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
-	"github.com/gagliardetto/solana-go"
 	"github.com/near/borsh-go"
 )
 

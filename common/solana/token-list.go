@@ -7,18 +7,16 @@ import (
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-
-	"github.com/gagliardetto/solana-go"
 )
 
 // TokenDetailsSolana containing information about tokens that we unpacked using
 // the environment variables
 type TokenDetailsSolana struct {
-	FluidMintPubkey   solana.PublicKey
-	ObligationPubkey  solana.PublicKey
-	ReservePubkey     solana.PublicKey
-	PythPubkey        solana.PublicKey
-	SwitchboardPubkey solana.PublicKey
+	FluidMintPubkey   PublicKey
+	ObligationPubkey  PublicKey
+	ReservePubkey     PublicKey
+	PythPubkey        PublicKey
+	SwitchboardPubkey PublicKey
 	TokenDecimals     *big.Rat
 	TokenName         string
 	Amount            float64
@@ -56,11 +54,11 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 			pyth_        = trimWhitespace(tokenDetails_[5])
 			switchboard_ = trimWhitespace(tokenDetails_[6])
 
-			fluidMint   = solana.MustPublicKeyFromBase58(fluidMint_)
-			obligation  = solana.MustPublicKeyFromBase58(obligation_)
-			reserve     = solana.MustPublicKeyFromBase58(reserve_)
-			pyth        = solana.MustPublicKeyFromBase58(pyth_)
-			switchboard = solana.MustPublicKeyFromBase58(switchboard_)
+			fluidMint   = MustPublicKeyFromBase58(fluidMint_)
+			obligation  = MustPublicKeyFromBase58(obligation_)
+			reserve     = MustPublicKeyFromBase58(reserve_)
+			pyth        = MustPublicKeyFromBase58(pyth_)
+			switchboard = MustPublicKeyFromBase58(switchboard_)
 		)
 
 		decimals, err := strconv.Atoi(decimals_)

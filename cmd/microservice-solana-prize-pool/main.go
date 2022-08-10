@@ -4,17 +4,16 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana"
+	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	prize_pool_queue "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/common/solana"
 
-	solanaGo "github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	solanaGo "github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 const (
@@ -55,7 +54,7 @@ func pubkeyFromEnv(env string) solanaGo.PublicKey {
 	return pubkey
 }
 
-func getPrizePool(solanaClient *solanaRpc.Client, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solanaGo.PublicKey, payer *solanaGo.Wallet) *big.Rat {
+func getPrizePool(solanaClient *solana.SolanaRPCHandle, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solanaGo.PublicKey, payer *solanaGo.Wallet) *big.Rat {
 	tvl, err := prize_pool.GetTvl(
 		solanaClient,
 		fluidityPubkey,
@@ -127,7 +126,7 @@ func main() {
 
 	tokenDetails := solana.GetTokensListSolana(tokensList_)
 
-	rpcClient := solanaRpc.New(solanaRpcUrl)
+	rpcClient, _ := solana.SolanaCallManager(solanaRpcUrl)
 
 	payer, err := solanaGo.WalletFromPrivateKeyBase58(payerPrikey)
 
