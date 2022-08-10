@@ -174,7 +174,13 @@ func InsertEmissions(emission Emission) {
 			$42,
 			$43,
 			$44,
-			$45
+			$45,
+
+			$46,
+			$47,
+			$48,
+			$49,
+			$50
 		);`,
 
 		TableEmissions,
