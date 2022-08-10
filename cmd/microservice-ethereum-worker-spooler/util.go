@@ -59,7 +59,7 @@ func sendRewards(queueName string, token token_details.TokenDetails) {
 		})
 	}
 
-	rewards := make([]worker.EthereumSpooledRewards, len(spooledRewards))
+	rewards := make([]worker.EthereumSpooledRewards, 0)
 
 	for _, reward := range spooledRewards {
 		rewards = append(rewards, reward)
