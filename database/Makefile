@@ -41,9 +41,6 @@ build: timescale postgres
 
 timescale: ${TIMESCALE_BUILD_OUT}
 
-swag:
-	echo ${TIMESCALE_SRC}
-
 ${TIMESCALE_BUILD_OUT}: ${TIMESCALE_SRC}
 	@mkdir -p "${TIMESCALE_BUILD_DIR}"
 
