@@ -1,0 +1,8 @@
+SERVICES:
+  - FRONTEND:
+      SERVICE_NAME: fluidity-money
+      DOCKER_IMAGE: fluidity.money-frontend
+      DOCKERFILE_PATH: ./web/fluidity.money
+      TARGET_GROUP: flu-dev-fm-tg
+      # DOCKER_ARGS:
+      #   REACT_DOCKER_ARGS: https://devnet.solana.fluidity.money:8081
