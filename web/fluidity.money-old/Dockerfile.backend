@@ -1,0 +1,14 @@
+
+FROM fluidity/build-container:latest
+
+ENV REPO fluidity.money
+
+ENV DIR /usr/src/${REPO}
+
+COPY . ${DIR}
+
+WORKDIR ${DIR}
+
+RUN make backend
+
+ENTRYPOINT [ "./fluidity.money.o" ]
