@@ -16,7 +16,7 @@ const ResourcesPage = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
-        <Navigation />
+        <Navigation page={"resources"} pageLocations={pageLocations} />
         <Hero />
         <Articles />
         <Tweets />
@@ -33,3 +33,10 @@ const ResourcesPage = () => {
 };
 
 export default ResourcesPage;
+
+const pageLocations = [
+  "articles",
+  "fluniversity",
+  "whitepapers",
+  "documentation",
+];
