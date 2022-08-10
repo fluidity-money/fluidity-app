@@ -3,10 +3,6 @@ FROM fluidity/build-container-root:latest
 
 WORKDIR ${FLUID_DIR}
 
-COPY contracts contracts
-
-COPY database database
-
 COPY common common
 COPY lib lib
 
