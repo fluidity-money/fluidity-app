@@ -1,0 +1,38 @@
+
+@use "../global-variables"
+
+$button-background: #333333
+$font-family: global-variables.$poppins
+$font-weight: 500
+$font-size: 20px
+$text-color: #FFFFFF
+
+$padding-vertical: 14px
+$padding-horizontal: 46px
+
+$border-radius: 40px
+$border-colour: #5BFEF3
+$border-width: 1px
+
+.view-more-link
+  font-family: $font-family
+  font-weight: $font-weight
+  font-size: $font-size
+  color: $text-color
+  background: $button-background
+  padding: $padding-vertical $padding-horizontal
+  border-style: solid
+  border-color: $border-colour
+  border-width: $border-width
+  border-radius: $border-radius
+  text-align: center
+  text-decoration: none
+  animation: global-variables.$no-highlight-animation
+
+.view-more-link:disabled
+  background: green
+
+.view-more-link:hover:not(:disabled)
+  cursor: pointer
+  animation: global-variables.$highlight-animation
+  animation-fill-mode: forwards
