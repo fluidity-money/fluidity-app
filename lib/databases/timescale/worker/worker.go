@@ -105,7 +105,19 @@ func InsertEmissions(emission Emission) {
 
 			winning_chances,
 
-			last_updated
+			last_updated,
+
+			payout_1,
+			payout_2,
+			payout_3,
+			payout_4,
+			payout_5,
+
+			probability_1,
+			probability_2,
+			probability_3,
+			probability_4,
+			probability_5
 		)
 
 		VALUES (
@@ -156,7 +168,13 @@ func InsertEmissions(emission Emission) {
 
 			$39,
 
-			$40
+			$40,
+
+			$41,
+			$42,
+			$43,
+			$44,
+			$45
 		);`,
 
 		TableEmissions,
@@ -213,6 +231,18 @@ func InsertEmissions(emission Emission) {
 		winningChances.AtxAtEnd,
 
 		lastUpdated,
+
+		winningChances.Payout1,
+		winningChances.Payout2,
+		winningChances.Payout3,
+		winningChances.Payout4,
+		winningChances.Payout5,
+
+		winningChances.Probability1,
+		winningChances.Probability2,
+		winningChances.Probability3,
+		winningChances.Probability4,
+		winningChances.Probability5,
 	)
 
 	if err != nil {

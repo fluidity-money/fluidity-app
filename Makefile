@@ -43,12 +43,16 @@ docker-build: docker-root
 		-f Dockerfile.build \
 		.
 
+	@touch docker-build
+
 docker-runtime: docker-build
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/runtime-container \
 		-f Dockerfile.runtime \
 		.
+
+	@touch docker-runtime
 
 docker-runtime-web:
 	@${DOCKER_BUILD} \
@@ -57,6 +61,8 @@ docker-runtime-web:
 		-f Dockerfile.runtime-web \
 		.
 
+	@touch docker-runtime-web
+
 docker-build-web: docker-root-web
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
@@ -64,12 +70,24 @@ docker-build-web: docker-root-web
 		-f Dockerfile.build-web \
 		.
 
+	@touch docker-build-web
+
 docker-node: docker-build
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		-t ${ORG_ROOT}/node-container \
 		-f Dockerfile.node \
 		.
+
+	@touch docker-node
+
+docker: \
+	docker-root \
+	docker-root-web \
+	docker-build \
+	docker-runtime \
+	docker-build-web \
+	docker-node
 
 docker-test: docker
 	@${DOCKER_RUN} -f Dockerfile.test

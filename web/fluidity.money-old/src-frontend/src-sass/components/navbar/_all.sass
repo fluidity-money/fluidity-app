@@ -1,0 +1,134 @@
+
+@use "../../global-variables"
+
+$font-family: global-variables.$raleway
+$font-weight: 500
+$font-size: 14px
+$font-colour: #FFFFFF
+
+$button-border-width: 2px
+$button-border-colour: #3081C4
+$button-vertical-padding: 20px
+
+$navbar-vertical-padding: 20px
+$navbar-horizontal-padding: global-variables.$horizontal-padding
+
+$beta-button-border-radius: 30px
+$beta-button-border-colour: #5BFEF3
+$beta-button-font-family: "Raleway", sans-serif
+$beta-button-font-weight: 300
+$beta-button-colour: white
+
+.navbar-container
+  display: flex
+  flex-direction: row
+  padding: $navbar-vertical-padding $navbar-horizontal-padding
+
+.navbar-left,
+.navbar-right
+  animation: global-variables.$fade-in-animation
+
+.navbar-left
+  display: flex
+  justify-content: center
+  flex-direction: column
+  flex-grow: 2
+
+.navbar-right
+  display: block
+  flex-grow: 1
+  margin-top: auto
+  margin-bottom: auto
+
+.navbar-right-items
+  display: flex
+  flex-direction: row
+  justify-content: space-around
+
+.navbar-item
+  padding-top: $button-vertical-padding
+  padding-bottom: $button-vertical-padding
+  text-decoration: none
+  text-transform: uppercase
+  font-family: $font-family
+  font-weight: $font-weight
+  text-decoration: none
+  font-size: $font-size
+  color: $font-colour
+  margin-top: auto
+  margin-bottom: auto
+  padding-left: 30px
+  padding-right: 30px
+  border-width: $button-border-width
+  border-color: transparent
+  border-style: solid
+  mix-blend-mode: screen
+  border-radius: 4px
+  animation: global-variables.$no-highlight-animation
+
+.navbar-item:not([disabled]):hover
+  animation: global-variables.$highlight-animation
+  animation-fill-mode: forwards
+
+.navbar-beta-button-wrapper
+  position: relative
+  @include global-variables.use-border-gradient($beta-button-border-radius)
+  border-radius: $beta-button-border-radius
+  display: flex
+
+.navbar-beta-button
+  background: unset
+  border-radius: $beta-button-border-radius
+  border-style: none
+  font-family: $beta-button-font-family
+  color: $beta-button-colour
+  font-weight: 500
+  padding: 20px 40px
+  text-decoration: none
+  text-transform: uppercase
+  text-decoration: none
+  text-align: center
+  font-size: 14px
+  margin-top: auto
+  margin-bottom: auto
+  border-width: 2px
+  outline: unset
+
+  &:hover
+    background: global-variables.$border-gradient
+    cursor: pointer
+
+  -webkit-appearance: none
+  -moz-appearance: none
+
+.navbar-menu
+  width: 140%
+  position: absolute
+  transform-origin: top center
+  transform: translateY(65%)
+  padding: 2px
+  border-radius: 8px
+  background: white
+  font-family: $font-family
+
+  & > li
+    list-style: none
+    padding: 10px
+    display: flex
+    z-index: 100
+    border-radius: 6px
+
+    &:hover
+      background: global-variables.$border-gradient
+      color: white
+      cursor: pointer
+
+    &:is(:first-child)
+      border-radius: 6px 6px 0 0
+    
+    &:is(:last-child)
+      border-radius: 0 0 6px 6px
+
+    &:not(:last-child)
+      border-bottom: 1px solid #E0E0E0
+      
