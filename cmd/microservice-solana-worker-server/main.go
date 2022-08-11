@@ -156,7 +156,7 @@ func main() {
 			emission.SenderAddress = userActionSenderAddress
 
 			slotNumber_ := misc.BigIntFromInt64(userActionSlotNumber)
-			emission.SolanaBlockNumber = slotNumber_
+			emission.SolanaSlotNumber = slotNumber_
 
 			var (
 				winningClasses   = fluidity.WinningClasses
