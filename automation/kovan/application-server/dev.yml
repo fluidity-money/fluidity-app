@@ -12,13 +12,13 @@ SERVICES:
   - APPSERVER_USDC:
       SERVICE_NAME: microservice-ethereum-application-server-usdc
       ENV_FLU_WORKER_ID: ethereum-kovan-microservice-ethereum-application-server-usdc
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x47eD7c59A487dd907de2986e0F95F8CC4Dc8CCf6"
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x2f2204738CC4dCf1ec2d88369AB5B7e16a7C7035"
       ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
 
   - APPSERVER_DAI:
       SERVICE_NAME: microservice-ethereum-application-server-dai
       ENV_FLU_WORKER_ID: ethereum-kovan-microservice-ethereum-application-server-dai
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x2f2204738CC4dCf1ec2d88369AB5B7e16a7C7035"
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0xA4c2826Df07f0a37B125D5815B12Ff2f529a66e9"
       ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
 
   - APPSERVER_TUSD:
