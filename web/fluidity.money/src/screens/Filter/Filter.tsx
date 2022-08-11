@@ -4,9 +4,9 @@ import FluidProject from "../../components/FluidProject";
 import styles from "./Filter.module.scss";
 
 const Filter = () => {
-  const [catOptions, setCatOptions] = useState(filters.categoryOptions);
-  const [chains, setChains] = useState(filters.chains);
-  const [years, setYears] = useState(filters.years);
+  const [catOptions, setCatOptions] = useState(filters[0]);
+  const [chains, setChains] = useState(filters[1]);
+  const [years, setYears] = useState(filters[2]);
   const [projects, setProjects] = useState(fluidProjects);
 
   interface IOption {
@@ -14,18 +14,53 @@ const Filter = () => {
     selected: boolean;
   }
 
+  // updates button option from selected to not selected
   const handleFilterOption = (
     option: IOption,
     setOption: React.Dispatch<React.SetStateAction<IOption[]>>
   ) => {
-    console.log(setOption);
-    setOption((previousState: IOption[]) =>
-      [...previousState].map((item) =>
-        item.name === option.name
-          ? Object.assign(item, { selected: !item.selected })
-          : item
-      )
+    // if option is any and it isn't selected, make any selected and clear options
+    if (option.name === "any" && option.selected === false) {
+      setOption((previousState) =>
+        previousState.map((item) => {
+          if (item.name === "any") {
+            return item;
+          }
+          return { ...item, selected: false };
+        })
+      );
+    }
+
+    // if option isn't any, and isn't selected, unselect any
+    if (option.name !== "any" && option.selected === false) {
+      setOption((previousState) =>
+        previousState.map((item) => {
+          if (item.name !== "any") {
+            return item;
+          }
+          return { ...item, selected: false };
+        })
+      );
+    }
+
+    // if invert option
+    setOption((previousState) =>
+      previousState.map((item) => {
+        if (item.name !== option.name) {
+          return item;
+        }
+        // if (item.name === "any") return { ...item, selected: false };
+        return { ...item, selected: !option.selected };
+      })
     );
+  };
+
+  // filter the projects based on cat/chains/years options
+  const handleFilterProjects = () => {
+    // if any === selected show all
+    //filter cat
+    //filter chains
+    //filter years
   };
 
   const handleFilter = (
@@ -81,8 +116,13 @@ const Filter = () => {
 
 export default Filter;
 
-const filters = {
-  categoryOptions: [
+interface IOption {
+  name: string;
+  selected: boolean;
+}
+
+const filters: IOption[][] = [
+  [
     { name: "any", selected: true },
     { name: "defi", selected: false },
     { name: "dex", selected: false },
@@ -92,19 +132,19 @@ const filters = {
     { name: "metaverse", selected: false },
     { name: "dao", selected: false },
   ],
-  chains: [
+  [
     { name: "any", selected: true },
     { name: "solana", selected: false },
     { name: "polygon", selected: false },
     { name: "ethereum", selected: false },
   ],
-  years: [
+  [
     { name: "any", selected: true },
     { name: "2020", selected: false },
     { name: "2021", selected: false },
     { name: "2022", selected: false },
   ],
-};
+];
 
 const fluidProjects = [
   {
