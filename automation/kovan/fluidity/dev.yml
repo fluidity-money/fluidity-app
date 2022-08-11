@@ -1,0 +1,25 @@
+DOCKERFILE_PATH: ./web/ethereum.fluidity.money
+
+SERVICES:
+  - FLUIDITY_BACKEND:
+      SERVICE_NAME: kovan-fluidity-money-backend
+      DOCKER_IMAGE: ethereum.fluidity.money-backend
+      TARGET_GROUP: flu-dev-kovan-be-tg
+
+      ENV_FLU_WORKER_ID: ethereum-kovan-ethereum.fluidity.money-backend
+      ENV_FLU_ETHEREUM_CHAIN_ID: 3
+      SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/kovan/token_list
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST: /fluidity/kovan/private_key_list
+      SECRET_FLU_SLACK_WEBHOOK: /fluidity/slack/webhook
+
+  - FLUIDITY_FRONTEND:
+      SERVICE_NAME: kovan-fluidity-money-frontend
+      DOCKER_IMAGE: ethereum.fluidity.money-frontend
+      TARGET_GROUP: flu-dev-kovan-fe-tg
+      
+      DOCKER_ARGS:
+        REACT_APP_API_URL: https://kovan.ethereum.fluidity.money:8081
+        REACT_APP_WALLET_CONNECT_GETH_URI: wss://kovan.ethereum.fluidity.money:8081
+        REACT_APP_WEBSOCKET: wss://kovan.ethereum.fluidity.money:8081/updates
+        REACT_APP_CHAIN_ID: 3
+        REACT_APP_TOKEN_CONFIG_FILE: kovan-tokens.json

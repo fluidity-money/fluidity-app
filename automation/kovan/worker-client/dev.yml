@@ -1,0 +1,27 @@
+DOCKER_IMAGE: microservice-ethereum-worker-client
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-client
+
+SERVICES:
+  - WORKER_CLIENT_USDT:
+      SERVICE_NAME: microservice-ethereum-worker-client-usdt
+      ENV_FLU_WORKER_ID: ethereum-kovan-microservice-ethereum-worker-server-usdt
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.usdt
+
+  - WORKER_CLIENT_USDC:
+      SERVICE_NAME: microservice-ethereum-worker-client-usdc
+      ENV_FLU_WORKER_ID: ethereum-kovan-microservice-ethereum-worker-server-usdc
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.usdc
+
+  - WORKER_CLIENT_DAI:
+      SERVICE_NAME: microservice-ethereum-worker-client-dai
+      ENV_FLU_WORKER_ID: ethereum-kovan-microservice-ethereum-worker-server-dai
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.dai
+
+  - WORKER_CLIENT_TUSD:
+      SERVICE_NAME: microservice-ethereum-worker-client-tusd
+      ENV_FLU_WORKER_ID: ethereum-kovan-microservice-ethereum-worker-client-tusd
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.tusd
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.tusd
