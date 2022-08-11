@@ -2,6 +2,7 @@ package microservice_ethereum_track_winners
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
@@ -39,7 +40,12 @@ func SendWinner(legacyWinners bool, topic string, winner winners.Winner) {
 		return
 	}
 
-	key := winner.TokenDetails.TokenShortName + winner.WinnerAddress
+	var (
+		address = winner.WinnerAddress
+		shortName = winner.TokenDetails.TokenShortName
+	)
+
+	key := fmt.Sprintf("ethereum.legacy_winners.%s.%s", shortName, address)
 
 	firstWinnerJson := state.Get(key)
 
@@ -66,5 +72,6 @@ func SendWinner(legacyWinners bool, topic string, winner winners.Winner) {
 		return
 	}
 
+	// first time we've seen this winner, add them to redis
 	state.Set(key, winner)
 }
