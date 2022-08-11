@@ -8,6 +8,8 @@ ALTER TABLE worker_emissions (
 
 -- migrate:down
 
-ALTER TABLE worker_emissions DROP COLUMN ethereum_block_number;
-ALTER TABLE worker_emissions DROP COLUMN solana_block_number;
-ALTER TABLE worker_emissions DROP CONSTRAINT network_blocktype_check;
+ALTER TABLE worker_emissions (
+	DROP COLUMN ethereum_block_number
+	DROP COLUMN solana_block_number
+	DROP CONSTRAINT network_blocktype_check
+);
