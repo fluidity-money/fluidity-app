@@ -11,7 +11,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	logging "github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -184,6 +183,10 @@ func main() {
 
 		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime)
 
-		queue.SendMessage(winnersPublishTopic, convertedWinner)
+		microservice_ethereum_track_winners.SendWinner(
+			useLegacyContract,
+			winnersPublishTopic,
+			convertedWinner,
+		)
 	})
 }
