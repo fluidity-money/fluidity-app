@@ -14,18 +14,7 @@ SERVICES:
       ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-ethereum-block-fluid-transfers-amqp
       SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ropsten/websoket_url
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
-  
-  - ETH_COMMON_COUNT_WINS:
-      ENABLE: false
-      SERVICE_NAME: microservice-common-count-wins-ethereum
-      DOCKER_IMAGE: microservice-common-count-wins
-      DOCKERFILE_PATH: ./cmd/microservice-common-count-wins
-      DEPLOYMENT_TYPE: CRON
-      EVENT_ROLE: ecsEventsRole
-      EVENT_RULE: microservice-common-count-wins-ethereum-cron
-      EVENT_SCHEDULE: cron(0 22 * * ? *) #UTC
-      ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-common-count-wins-ethereum
-      SECRET_ETHEREUM_TOKENS_LIST: /fluidity/ropsten/token_list
+
 
 
   
