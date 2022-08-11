@@ -66,15 +66,5 @@ func SendWinner(legacyWinners bool, topic string, winner winners.Winner) {
 		return
 	}
 
-	// first time we've seen this winner, add them to redis
-	winnerBytes, err := json.Marshal(winner)
-
-	if err != nil {
-	    log.Fatal(func(k *log.Log) {
-	        k.Message = "Failed to marshal a winner to json!"
-	        k.Payload = err
-	    })
-	}
-
-	state.Set(key, winnerBytes)
+	state.Set(key, winner)
 }
