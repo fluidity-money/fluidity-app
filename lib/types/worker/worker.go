@@ -17,8 +17,9 @@ type Emission struct {
 	TransactionHash     string                     `json:"transaction_hash"`
 	RecipientAddress    string                     `json:"recipient_address"`
 	SenderAddress       string                     `json:"sender_address"`
-	BlockNumberEthereum misc.BigInt                `json:"block_number_ethereum"`
-	SlotNumber          misc.BigInt                `json:"slot_number"`
+
+	EthereumBlockNumber misc.BigInt                `json:"ethereum_block_number"`
+	SolanaBlockNumber   misc.BigInt                `json:"solana_block_number"`
 
 	Payout struct {
 		Winnings        float64 `json:"winnings"` // Winnings
