@@ -1,0 +1,56 @@
+.tableFilterContainer {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+      ul {
+        margin-left: 72%;
+        display:flex;
+        list-style: none;
+        li {
+          margin-right: 10px;
+        }
+      }
+  }
+  
+  .pagination {
+    span:nth-child(2) {
+      float: right;
+    }
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  
+    thead {
+        tr{
+          th{
+            padding: 0 20px 10px 20px;
+            text-align:start;
+          }
+        }
+  
+        /*th:nth-child(5) {
+          text-align: end;
+        }*/
+    }
+  
+    tbody {
+      background-color: rgb(36, 36, 36);
+      tr {
+        background-color: rgb(36, 36, 36);
+    
+        td {
+          padding: 15px 20px 15px 20px;
+          border-bottom: 5px solid black;
+          border-top: none;
+          border-right: none;
+          border-left: none;
+        }
+  
+        /*td:nth-child(5) {
+          text-align: end;
+        }*/
+      }
+    }
+  }
