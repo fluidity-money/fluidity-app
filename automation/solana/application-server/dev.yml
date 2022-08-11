@@ -5,15 +5,9 @@ SECRET_FLU_SOLANA_SABER_RPC_URL: /fluidity/devnet/saber_rpc_url
 ENV_FLU_SOLANA_SABER_SWAP_PROGRAM_ID: saber:SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ
 ENV_FLU_SOLANA_ORCA_PROGRAM_ID: 9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP
 ENV_FLU_SOLANA_RAYDIUM_PROGRAM_ID: "XXXXXX"
+ENV_FLU_SOLANA_TOKEN_LOOKUPS: "fUSDT:USDT,fUSDC:USDC"
 
 SERVICES:
-  - APPSERVER_USDT:
-      SERVICE_NAME: microservice-solana-application-server-usdt
-      ENV_FLU_WORKER_ID: solana-devnet-microservice-solana-application-server-usdt
-      ENV_FLU_SOLANA_TOKEN_LOOKUPS: "fUSDT:USDT"
-
-  - APPSERVER_USDC:
-      SERVICE_NAME: microservice-solana-application-server-usdc
-      ENV_FLU_WORKER_ID: solana-devnet-microservice-solana-application-server-usdc
-      ENV_FLU_SOLANA_TOKEN_LOOKUPS: "fUSDC:USDC"
-
+  - APPSERVER:
+      SERVICE_NAME: microservice-solana-application-server
+      ENV_FLU_WORKER_ID: solana-devnet-microservice-solana-application-server

@@ -4,7 +4,7 @@ SERVICES:
   - FLUIDITY_BACKEND:
       SERVICE_NAME: solana-fluidity-money-backend
       DOCKER_IMAGE: solana.fluidity.money-backend
-      ENV_FLU_WORKER_ID: solana-devnet-solana-solana.fluidity.money-backend
+      ENV_FLU_WORKER_ID: solana-devnet-solana.fluidity.money-backend
       TARGET_GROUP: flu-dev-devnet-be-tg
   
   - FLUIDITY_FRONTEND:

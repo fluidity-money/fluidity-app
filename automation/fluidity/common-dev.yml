@@ -1,0 +1,6 @@
+CLUSTER: fluidity
+ORG_ROOT: fluidity
+ENABLE: true
+
+SECRET_FLU_SENTRY_URL: /fluidity/sentryUrl
+SECRET_FLU_FRONTEND_SENTRY_URL: /fluidity/frontend/sentryURL

@@ -314,6 +314,8 @@ func main() {
 		emission.Network = "ethereum"
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
+		emission.EthereumBlockNumber = blockNumber
+
 		if hintedBlock == nil {
 
 			fluidTransfers, err = libEthereum.GetTransfers(
