@@ -2,7 +2,7 @@ SERVICES:
   - PRIZE_POOL:
       SERVICE_NAME: microservice-ethereum-prize-pool
       DOCKERFILE_PATH: ./cmd/microservice-ethereum-prize-pool
-      ENV_FLU_WORKER_ID: ethereum-ropsten-ethereum-ropsten-microservice-ethereum-prize-pool
+      ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-ethereum-prize-pool
       ENV_FLU_ETHEREUM_TOKEN_BACKEND: compound
       ENV_FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: "0xbef4e076a995c784be6094a432b9ca99b7431a3f"
       SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ropsten/token_list
@@ -11,7 +11,7 @@ SERVICES:
   - ETH_BLOCK_FLUID_TRANSERS_AMQP:
       SERVICE_NAME: microservice-ethereum-block-fluid-transfers-amqp
       DOCKERFILE_PATH: ./cmd/microservice-ethereum-block-fluid-transfers-amqp
-      ENV_FLU_WORKER_ID: ethereum-ropsten-ethereum-ropsten-microservice-ethereum-block-fluid-transfers-amqp
+      ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-ethereum-block-fluid-transfers-amqp
       SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ropsten/websoket_url
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
   

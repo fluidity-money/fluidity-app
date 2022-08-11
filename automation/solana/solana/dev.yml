@@ -2,7 +2,7 @@ SERVICES:
   - PRIZE_POOL:
       SERVICE_NAME: microservice-solana-prize-pool
       DOCKERFILE_PATH: ./cmd/microservice-solana-prize-pool
-      ENV_FLU_WORKER_ID: solana-devnet-solana-microservice-solana-prize-pool
+      ENV_FLU_WORKER_ID: solana-devnet-microservice-solana-prize-pool
       ENV_FLU_SOLANA_PROGRAM_ID: GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU
       SECRET_FLU_SOLANA_TOKENS_LIST: /fluidity/solana/token_list
       ENV_FLU_SOLANA_PRIZE_POOL_UPDATE_TIME: 1m
