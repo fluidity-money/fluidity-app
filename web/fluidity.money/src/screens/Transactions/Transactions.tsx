@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Transactions.module.scss";
 
-import { DataTable } from "../../components/DataTable";
+import DataTable from "../../components/DataTable";
 
 const Transactions = () => {
   const data = React.useMemo(

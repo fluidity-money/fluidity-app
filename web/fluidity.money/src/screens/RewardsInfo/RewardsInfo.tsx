@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./RewardsInfo.module.scss";
 
-import { DataTable } from "../../components/DataTable";
+import DataTable from "../../components/DataTable";
 
 const RewardsInfo = () => {
   const data = React.useMemo(

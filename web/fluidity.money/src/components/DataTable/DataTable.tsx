@@ -1,5 +1,5 @@
 import React from 'react'
-import { useTable, usePagination } from 'react-table'
+import { useTable, usePagination } from 'react-table';
 
 import styles from "./DataTable.module.scss";
 
