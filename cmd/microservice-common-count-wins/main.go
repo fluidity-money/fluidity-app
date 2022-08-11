@@ -34,7 +34,7 @@ func main() {
 		0,
 		0,
 		0,
-		today.Location(),
+		time.UTC,
 	)
 
 	for _, network := range SupportedNetworks {
