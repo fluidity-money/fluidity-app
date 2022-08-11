@@ -1,8 +1,42 @@
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 850px;
   width: 100%;
   border: solid 2px red;
+   h1 {
+     margin-left: 30px;
+     margin-top: 100px;
+   }
+}
+
+.filterContainer {
+  display: flex;
+  margin-top: 100px;
+  margin-bottom: 30px;
+    h3{
+      margin-left: 30px;
+    }
+
+    ul {
+      margin-left: 70%;;
+      display:flex;
+      list-style: none;
+      li {
+        margin-right: 10px;
+      }
+    }
+}
+
+table {
+  width: 90%;
+  margin-bottom: 30px;
+  margin-left: 30px;
+}
+
+tr {
+  background-color: rgb(36, 36, 36);
+  padding: 10px
+}
+
+th {
+  text-align:start;
 }
