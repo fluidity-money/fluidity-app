@@ -154,7 +154,9 @@ func main() {
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
-			emission.SolanaBlockNumber = misc.BigIntFromInt64(userActionSlotNumber)
+
+			slotNumber_ := misc.BigIntFromInt64(userActionSlotNumber)
+			emission.SolanaBlockNumber = slotNumber_
 
 			var (
 				winningClasses   = fluidity.WinningClasses
