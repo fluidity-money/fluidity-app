@@ -19,10 +19,10 @@ const (
 	EnvAmqpQueueAddr = `FLU_AMQP_QUEUE_ADDR`
 
 	// EnvRmqManagementUser is the username for the RMQ Management API
-	EnvRmqManagementUser = `FLU_RMQ_MANAGEMENT_USER`
+	EnvRmqManagementUser = `FLU_AMQP_USER`
 
 	// EnvRmqManagementPassword is the password for the RMQ Management API
-	EnvRmqManagementPassword = `FLU_RMQ_MANAGEMENT_PASSWORD`
+	EnvRmqManagementPassword = `FLU_AMQP_USER_PASS`
 )
 
 func main() {

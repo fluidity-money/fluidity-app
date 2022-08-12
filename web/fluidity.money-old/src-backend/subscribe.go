@@ -5,7 +5,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/website"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	discord "github.com/fluidity-money/fluidity-app/lib/log/discord"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 

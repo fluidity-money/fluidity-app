@@ -1,7 +1,7 @@
 package main
 
 import (
-	discord "github.com/fluidity-money/fluidity-app/lib/log/discord"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 )
 
 func reportToDiscord(queue rmqQueue, messageType string, numMessages uint64, limitMessages uint64) {
