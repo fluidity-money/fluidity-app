@@ -94,11 +94,11 @@ impl DevnetAccounts {
 #[allow(non_snake_case)]
 pub struct ConfigOptions {
     pub solana_node_address: String,
-    #[serde(rename = "solana_accounts")]
+    #[serde(rename = "flu_solana_accounts")]
     pub solana_accounts_file: String,
     #[serde(skip)]
     pub accounts: Vec<DevnetAccount>,
-    #[serde(rename = "slnd_common")]
+    #[serde(rename = "flu_slnd_common")]
     pub solend_account_file: String,
     #[serde(rename = "flu_program_id")]
     pub program_id: String,
