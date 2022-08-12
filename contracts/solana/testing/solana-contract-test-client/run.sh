@@ -1,5 +1,4 @@
-#!/bin/bash
-set -o errexit
+#!/bin/sh -e
 
 e2e_testing_dir="$(dirname "$0")"
 
