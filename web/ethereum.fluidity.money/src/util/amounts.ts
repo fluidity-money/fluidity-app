@@ -105,7 +105,10 @@ export const shortBalance = (balance: string) =>
       "..." +
       `${balance}`.substr(`${balance}`.length - 2, `${balance}`.length - 1);
 
-
+/** creates a shorthand for large amounts e.g 10,000 equates to 10k
+ * @param value string of the form xx.yy
+ * @param decimals the number of decimals to trim to
+ */
 export const shorthandAmountFormatter = (value: string, decimals: number): string => {
 
   let num: number = parseFloat(value)

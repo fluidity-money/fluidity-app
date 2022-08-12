@@ -136,6 +136,7 @@ export const tokenValueInputHandler = (value: string, setTo: StringDispatch, set
   } catch (e) {}
 }
 
+// Creates a shorthand for large amounts e.g 10,000 equates to 10k
 export const shorthandAmountFormatter = (value: string, decimals: number): string => {
 
   let num: number = parseFloat(value)
