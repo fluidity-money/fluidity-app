@@ -1,6 +1,5 @@
 SERVICES:
   - COMMON_RABBITMQ_BACKLOG_CHECKER:
-      ENABLE: false
       SERVICE_NAME: microservice-common-rabbitmq-backlog-checker-ethereum
       DOCKER_IMAGE: microservice-common-rabbitmq-backlog-checker
       DOCKERFILE_PATH: ./cmd/microservice-common-rabbitmq-backlog-checker
@@ -9,8 +8,8 @@ SERVICES:
       ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-common-rabbitmq-backlog-checker
       SECRET_FLU_AMQP_USER: /fluidity/data/rabbitmq/user
       SECRET_FLU_AMQP_USER_PASS: /fluidity/data/rabbitmq/password
-      SECRET_FLU_SLACK_WEBHOOK: /fluidity/slack/webhook
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-common-rabbitmq-backlog-checker-ethereum-cron
-      EVENT_SCHEDULE: rate(5 minutes) #every 5mins
+      EVENT_SCHEDULE: rate(1 hour) #every 1hr
