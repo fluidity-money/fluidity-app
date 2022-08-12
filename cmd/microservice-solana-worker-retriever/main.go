@@ -146,16 +146,27 @@ func main() {
 					)
 				})
 			}
-
-			state.SetNxTimed(RedisTvlKey, tvl, RedisTvlDuration)
 		}
 
 		// check initial supply is less than TVL so there is
-		// an available prize pool
+		// an available prize pool - we reset the key if this
+		// is the case!
+
 		if mintSupply > tvl {
+
+			state.Del(RedisTvlKey)
+
 			log.Fatal(func(k *log.Log) {
-				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
+				k.Format(
+					"The mint supply %v > the TVL %v! Prize pool not available - deleted the cache!",
+					mintSupply,
+					tvl,
+				)
 			})
+		}
+
+		if !tvlBuffered {
+			state.SetNxTimed(RedisTvlKey, tvl, RedisTvlDuration)
 		}
 
 		payableBufferedTransfers := worker.SolanaWork{
