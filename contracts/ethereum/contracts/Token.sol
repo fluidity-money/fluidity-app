@@ -212,7 +212,7 @@ contract Token is IERC20 {
             remainingGlobalMint_ -= amount;
 
             uint userMint;
-            if (userLastMintedBlock_ < userMintResetBlock) {
+            if (userLastMintedBlock_[msg.sender] < userMintResetBlock_) {
                 // user hasn't minted since the reset, reset their count
                 userMint = amount;
             } else {
@@ -341,7 +341,7 @@ contract Token is IERC20 {
     function unblockReward(address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
-        require(blockedRewards_[user] <= amount, "trying to unblock more than the user has blocked");
+        require(blockedRewards_[user] >= amount, "trying to unblock more than the user has blocked");
         blockedRewards_[user] -= amount;
 
         if (payout) {
