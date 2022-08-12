@@ -1,15 +1,26 @@
 package main
 
 import (
+	"time"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 
 	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+)
+
+const (
+	// RedisTvlKey to store the tvl calculation
+	RedisTvlKey = `worker.tvl`
+
+	// RedisTvlDuration to store the Pyth TVL calculation
+	RedisTvlDuration = time.Minute * 30
 )
 
 const (
@@ -83,6 +94,7 @@ func main() {
 	worker.GetSolanaBufferedTransfers(func(transfers worker.SolanaBufferedTransfers) {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
+
 		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
 
 		if err != nil {
@@ -94,26 +106,48 @@ func main() {
 			})
 		}
 
-		// get the value of all fluidity obligations
-		tvl, err := prize_pool.GetTvl(
-			solanaClient,
-			fluidityPubkey,
-			tvlDataPubkey,
-			solendPubkey,
-			obligationPubkey,
-			reservePubkey,
-			pythPubkey,
-			switchboardPubkey,
-			payer,
-		)
+		// try to retrieve the tvl from redis, if we fail to do
+		// so then we try to get it ourselves and store it there
+		// for RedisTvlDuration
+
+		tvl, tvlBuffered, err := redisGetTvl()
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failedto get the TVL! %v",
-					err,
-				)
+				k.Message = "Failed to decode the TVL string!"
+				k.Payload = err
 			})
+		}
+
+		if !tvlBuffered {
+
+			// get the value of all fluidity obligations
+
+			tvl, err = prize_pool.GetTvl(
+				solanaClient,
+				fluidityPubkey,
+				tvlDataPubkey,
+				solendPubkey,
+				obligationPubkey,
+				reservePubkey,
+				pythPubkey,
+				switchboardPubkey,
+				payer,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! %v",
+						tvlDataPubkey,
+						solendPubkey,
+						obligationPubkey,
+						err,
+					)
+				})
+			}
+
+			state.SetNxTimed(RedisTvlKey, tvl, RedisTvlDuration)
 		}
 
 		// check initial supply is less than TVL so there is
