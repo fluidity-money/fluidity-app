@@ -152,9 +152,14 @@ func main() {
 
 		// check initial supply is less than TVL so there is
 		// an available prize pool
+
 		if mintSupply > tvl {
 			log.Fatal(func(k *log.Log) {
-				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
+				k.Format(
+					"The mint supply %v > the TVL %v! Prize pool not available!",
+					mintSupply,
+					tvl,
+				)
 			})
 		}
 
