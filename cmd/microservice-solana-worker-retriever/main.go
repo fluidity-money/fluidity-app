@@ -111,7 +111,7 @@ func main() {
 
 		// get the value of all fluidity obligations
 
-		tvl, err := prize_pool.GetTvl(
+		tvl, tvlErr := prize_pool.GetTvl(
 			solanaClient,
 			fluidityPubkey,
 			tvlDataPubkey,
@@ -123,7 +123,7 @@ func main() {
 			payer,
 		)
 
-		if err != nil {
+		if tvlErr != nil {
 			tvl, _, err = redisGetTvl()
 
 			if err != nil {
@@ -148,15 +148,14 @@ func main() {
 		// if we didn't fail to get the tvl from pyth and redis,
 		// then we should set the tvl retrieved to redis!
 
-		state.Set(RedisTvlKey, tvl)
+		if tvlErr == nil {
+			state.Set(RedisTvlKey, tvl)
+		}
 
 		// check initial supply is less than TVL so there is
 		// an available prize pool
 
 		if mintSupply > tvl {
-
-			state.Del(RedisTvlKey)
-
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"The mint supply %v > the TVL %v! Prize pool not available - deleted the cache!",
@@ -164,10 +163,6 @@ func main() {
 					tvl,
 				)
 			})
-		}
-
-		if !tvlBuffered {
-			state.SetNxTimed(RedisTvlKey, tvl, RedisTvlDuration)
 		}
 
 		payableBufferedTransfers := worker.SolanaWork{
