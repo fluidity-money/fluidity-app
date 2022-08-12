@@ -1,4 +1,4 @@
-package slack
+package discord
 
 // notify channels in our Slack using a single function
 
@@ -17,20 +17,7 @@ const (
 	Context = "SLACK"
 
 	// EnvWebhookAddress to use to relay Slack messages to the chat
-	EnvWebhookAddress = "FLU_SLACK_WEBHOOK"
-)
-
-// Channels that the user might post in
-const (
-	ChannelGeneral            = "#general"
-	ChannelDevops             = "#devops"
-	ChannelWebsite            = "#website"
-	ChannelQuestions          = "#questions"
-	ChannelWinnings           = "#winnings"
-	ChannelFaucetTweets       = "#faucet-tweets"
-	ChannelProductionFailures = "#production-failures"
-	ChannelTopWinners         = "#top-winners"
-	ChannelPayroll            = "#payroll"
+	EnvWebhookAddress = "FLU_DISCORD_WEBHOOK"
 )
 
 // Levels of logging severity for Slack users to discern based on the border
@@ -42,35 +29,32 @@ const (
 )
 
 // slackWebhookMessage to send to Slack via a webhook
-type slackWebhookMessage struct {
-	Channel  string `json:"channel"`
-	Message  string `json:"text"`
-	Username string `json:"username"`
+type discordWebhookMessage struct {
+	Message string `json:"content"`
 }
 
 var webhookRequests = make(chan string)
 
 // Notify the Slack in the specified channel, with the severity specified
 // and a message. No guarantee to arrive in order!
-func Notify(channel string, severity int, format string, arguments ...interface{}) {
+func Notify(severity int, format string, arguments ...interface{}) {
 	webhookAddress := <-webhookRequests
 
 	workerId := util.GetWorkerId()
 
 	formatted := fmt.Sprintf(format, arguments...)
 
-	message := slackWebhookMessage{
-		Channel:  channel,
-		Message:  formatted,
-		Username: workerId,
+	withWorker := fmt.Sprintf("%v: %v", workerId, formatted)
+
+	message := discordWebhookMessage{
+		Message: withWorker,
 	}
 
 	log.Debug(func(k *log.Log) {
 		k.Context = Context
 
 		k.Format(
-			"Sending a Slack message to channel %#v, username %#v and message %#v!",
-			channel,
+			"Sending a Discord message, username %#v and message %#v!",
 			workerId,
 			message,
 		)
@@ -85,8 +69,7 @@ func Notify(channel string, severity int, format string, arguments ...interface{
 			k.Context = Context
 
 			k.Format(
-				"Failed to send a msesage to Slack channel %#v, username %#v and message %#v!",
-				channel,
+				"Failed to send a Discord message, username %#v and message %#v!",
 				workerId,
 				message,
 			)
@@ -102,8 +85,7 @@ func Notify(channel string, severity int, format string, arguments ...interface{
 			k.Context = Context
 
 			k.Format(
-				"Failed to POST a message to Slack, channel %#v, username %#v and message %#v!",
-				channel,
+				"Failed to POST a message to Discord, username %#v and message %#v!",
 				workerId,
 				message,
 			)
@@ -114,22 +96,12 @@ func Notify(channel string, severity int, format string, arguments ...interface{
 
 	defer resp.Body.Close()
 
-	var respBuf bytes.Buffer
-
-	if _, err := respBuf.ReadFrom(resp.Body); err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Failed to read the reply from Slack webhook!"
-			k.Payload = err
-		})
-	}
-
-	if reply := respBuf.String(); reply != "ok" {
+	if reply := resp.StatusCode; reply != 204 {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 
 			k.Format(
-				`Slack reply was not "ok"! was %v!`,
+				`Discord response status was not "204"! was %v!`,
 				reply,
 			)
 		})

@@ -58,6 +58,20 @@ type (
 	vhostsResponse []vhost
 )
 
+type RMQManagementClient struct {
+	rmqAddress,
+	username,
+	password string
+}
+
+func NewRmqManagementClient(rmqAddress, username, password string) *RMQManagementClient {
+	return &RMQManagementClient{
+		rmqAddress: rmqAddress,
+		username:   username,
+		password:   password,
+	}
+}
+
 // Returns URL to query RMQ Managment API for queues
 func getManagementUrlFromAddr(address string) (string, error) {
 	queueManagementUri_, err := url.Parse(address)
@@ -88,8 +102,8 @@ func getManagementUrlFromAddr(address string) (string, error) {
 }
 
 // Returns array of queue structs from RMQ
-func getRmqQueues(rmqAddress, vhost string) (rmqQueuesResponse, error) {
-	queueManagementUri, err := getManagementUrlFromAddr(rmqAddress)
+func (r *RMQManagementClient) getRmqQueues(vhost string) (rmqQueuesResponse, error) {
+	queueManagementUri, err := getManagementUrlFromAddr(r.rmqAddress)
 
 	queueManagementUri += fmt.Sprintf("/%s/%s/%s", "api", "queues", url.PathEscape(vhost))
 
@@ -97,7 +111,7 @@ func getRmqQueues(rmqAddress, vhost string) (rmqQueuesResponse, error) {
 		return nil, err
 	}
 
-	res, err := http.Get(queueManagementUri)
+	res, err := r.Get(queueManagementUri)
 	if err != nil {
 		return nil, err
 	}
@@ -114,16 +128,23 @@ func getRmqQueues(rmqAddress, vhost string) (rmqQueuesResponse, error) {
 	return response, nil
 }
 
+func (r *RMQManagementClient) Get(url string) (res *http.Response, err error) {
+	request, _ := http.NewRequest(http.MethodGet, url, nil)
+	request.SetBasicAuth(r.username, r.password)
+
+	return http.DefaultClient.Do(request)
+}
+
 // Returns array of queue structs from RMQ
-func getVhosts(rmqAddress string) (vhostsResponse, error) {
-	queueManagementUri, err := getManagementUrlFromAddr(rmqAddress)
+func (r *RMQManagementClient) getVhosts() (vhostsResponse, error) {
+	queueManagementUri, err := getManagementUrlFromAddr(r.rmqAddress)
 	if err != nil {
 		return nil, err
 	}
 
 	queueManagementUri += fmt.Sprintf("/%s/%s", "api", "vhosts")
 
-	res, err := http.Get(queueManagementUri)
+	res, err := r.Get(queueManagementUri)
 	if err != nil {
 		return nil, err
 	}

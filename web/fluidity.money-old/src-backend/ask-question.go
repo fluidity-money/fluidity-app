@@ -5,7 +5,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/website"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/slack"
+	discord "github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
@@ -62,9 +62,8 @@ func MakeHandleAskQuestion(successUrl string) func(http.ResponseWriter, *http.Re
 
 		website.InsertQuestion(question)
 
-		slack.Notify(
-			slack.ChannelQuestions,
-			slack.SeverityNotice,
+		discord.Notify(
+			discord.SeverityNotice,
 			`
 	A user with the name %#v and the email %#v has asked the following question:
 

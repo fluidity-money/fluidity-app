@@ -17,13 +17,21 @@ const (
 
 	// EnvAmqpQueueAddr is the address of the queue
 	EnvAmqpQueueAddr = `FLU_AMQP_QUEUE_ADDR`
+
+	// EnvRmqManagementUser is the username for the RMQ Management API
+	EnvRmqManagementUser = `FLU_RMQ_MANAGEMENT_USER`
+
+	// EnvRmqManagementPassword is the password for the RMQ Management API
+	EnvRmqManagementPassword = `FLU_RMQ_MANAGEMENT_PASSWORD`
 )
 
 func main() {
 	var (
-		maxReadyCount_   = util.GetEnvOrFatal(EnvMaxReadyCount)
-		maxUnackedCount_ = util.GetEnvOrFatal(EnvMaxUnackedCount)
-		queueAddress     = util.GetEnvOrFatal(EnvAmqpQueueAddr)
+		maxReadyCount_        = util.GetEnvOrFatal(EnvMaxReadyCount)
+		maxUnackedCount_      = util.GetEnvOrFatal(EnvMaxUnackedCount)
+		queueAddress          = util.GetEnvOrFatal(EnvAmqpQueueAddr)
+		rmqManagementUser     = util.GetEnvOrFatal(EnvRmqManagementUser)
+		rmqManagementPassword = util.GetEnvOrFatal(EnvRmqManagementPassword)
 	)
 
 	maxReadyCount, err := strconv.ParseUint(maxReadyCount_, 10, 32)
@@ -44,7 +52,9 @@ func main() {
 		})
 	}
 
-	vhosts, err := getVhosts(queueAddress)
+	rmq := NewRmqManagementClient(queueAddress, rmqManagementUser, rmqManagementPassword)
+
+	vhosts, err := rmq.getVhosts()
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -54,7 +64,7 @@ func main() {
 	}
 
 	for _, vhost := range vhosts {
-		queues, err := getRmqQueues(queueAddress, vhost.Name)
+		queues, err := rmq.getRmqQueues(vhost.Name)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -83,11 +93,11 @@ func main() {
 			})
 
 			if messagesReady > maxReadyCount {
-				reportToSlack(queue, "Ready", messagesReady, maxReadyCount)
+				reportToDiscord(queue, "Ready", messagesReady, maxReadyCount)
 			}
 
 			if messagesUnacked > maxUnackedCount {
-				reportToSlack(queue, "Unacked", messagesUnacked, maxUnackedCount)
+				reportToDiscord(queue, "Unacked", messagesUnacked, maxUnackedCount)
 			}
 		}
 
