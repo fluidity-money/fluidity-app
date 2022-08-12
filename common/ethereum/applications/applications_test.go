@@ -53,6 +53,11 @@ func TestGetApplicationFee(t *testing.T) {
 	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
 	assert.Nil(t, fee)
 	assert.Error(t, err)
+
+	transfer.Application = ApplicationMultichain
+	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	assert.Nil(t, fee)
+	assert.Error(t, err)
 }
 
 func TestGetApplicationTransferParties(t *testing.T) {
@@ -89,6 +94,12 @@ func TestGetApplicationTransferParties(t *testing.T) {
 	assert.Equal(t, logAddress, receiver)
 
 	transfer.Application = ApplicationCurve
+	sender, receiver, err = GetApplicationTransferParties(transfer)
+	assert.NoError(t, err)
+	assert.Equal(t, transactionSender, sender)
+	assert.Equal(t, logAddress, receiver)
+
+	transfer.Application = ApplicationMultichain
 	sender, receiver, err = GetApplicationTransferParties(transfer)
 	assert.NoError(t, err)
 	assert.Equal(t, transactionSender, sender)
@@ -130,6 +141,11 @@ func TestClassifyApplicationLogTopic(t *testing.T) {
 		t,
 		ApplicationCurve,
 		ClassifyApplicationLogTopic(CurveTokenExchangeLogTopic),
+	)
+	assert.Equal(
+		t,
+		ApplicationMultichain,
+		ClassifyApplicationLogTopic(MultichainLogAnySwapOut),
 	)
 	assert.Equal(
 		t,

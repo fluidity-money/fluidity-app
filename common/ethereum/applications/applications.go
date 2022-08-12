@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -25,6 +26,7 @@ const (
 	ApplicationMooniswap
 	ApplicationOneInchFixedRateSwap
 	ApplicationCurve
+	ApplicationMultichain
 )
 
 const (
@@ -35,6 +37,7 @@ const (
 	MooniswapSwapLogTopic        = "0x86c49b5d8577da08444947f1427d23ef191cfabf2c0788f93324d79e926a9302"
 	OneInchFixedRateSwapLogTopic = "0x803540962ed9acbf87226c32486d71e1c86c2bdb208e771bab2fd8a626f61e89"
 	CurveTokenExchangeLogTopic   = "0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140"
+	MultichainLogAnySwapOut      = "0x97116cf6cd4f6412bb47914d6db18da9e16ab2142f543b86e207c24fbd16b23a"
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -84,6 +87,13 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			fluidTokenContract,
 			tokenDecimals,
 		)
+	case ApplicationMultichain:
+		return multichain.GetMultichainAnySwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 
 	default:
 		return nil, fmt.Errorf(
@@ -123,6 +133,10 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
+	case ApplicationMultichain:
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
@@ -150,6 +164,8 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 		return ApplicationBalancerV2
 	case CurveTokenExchangeLogTopic:
 		return ApplicationCurve
+	case MultichainLogAnySwapOut:
+		return ApplicationMultichain
 	default:
 		return ApplicationNone
 	}
