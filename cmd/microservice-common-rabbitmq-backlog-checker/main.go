@@ -44,7 +44,9 @@ func main() {
 		})
 	}
 
-	vhosts, err := getVhosts(queueAddress)
+	rmq := NewRmqManagementClient(queueAddress)
+
+	vhosts, err := rmq.getVhosts()
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -54,7 +56,7 @@ func main() {
 	}
 
 	for _, vhost := range vhosts {
-		queues, err := getRmqQueues(queueAddress, vhost.Name)
+		queues, err := rmq.getRmqQueues(vhost.Name)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -83,11 +85,11 @@ func main() {
 			})
 
 			if messagesReady > maxReadyCount {
-				reportToSlack(queue, "Ready", messagesReady, maxReadyCount)
+				reportToDiscord(queue, "Ready", messagesReady, maxReadyCount)
 			}
 
 			if messagesUnacked > maxUnackedCount {
-				reportToSlack(queue, "Unacked", messagesUnacked, maxUnackedCount)
+				reportToDiscord(queue, "Unacked", messagesUnacked, maxUnackedCount)
 			}
 		}
 
