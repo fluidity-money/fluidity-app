@@ -8,7 +8,7 @@ import (
 
 	faucetDatabase "github.com/fluidity-money/fluidity-app/lib/databases/postgres/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	discord "github.com/fluidity-money/fluidity-app/lib/log/discord"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	twitterQueue "github.com/fluidity-money/fluidity-app/lib/queues/twitter"
