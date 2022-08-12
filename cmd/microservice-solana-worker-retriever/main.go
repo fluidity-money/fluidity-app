@@ -158,7 +158,7 @@ func main() {
 		if mintSupply > tvl {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
-					"The mint supply %v > the TVL %v! Prize pool not available - deleted the cache!",
+					"The mint supply %v > the TVL %v! Prize pool busted potentially!",
 					mintSupply,
 					tvl,
 				)
