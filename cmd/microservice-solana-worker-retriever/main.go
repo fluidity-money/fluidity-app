@@ -154,9 +154,20 @@ func main() {
 		// an available prize pool
 
 		if mintSupply > tvl {
+
+			state.Del(RedisTvlKey)
+
 			log.Fatal(func(k *log.Log) {
-				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
+				k.Format(
+					"The mint supply %v > the TVL %v! Prize pool not available - deleted the cache!",
+					mintSupply,
+					tvl,
+				)
 			})
+		}
+
+		if !tvlBuffered {
+			state.SetNxTimed(RedisTvlKey, tvl, RedisTvlDuration)
 		}
 
 		payableBufferedTransfers := worker.SolanaWork{
