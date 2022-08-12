@@ -129,7 +129,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 
 		swapAmount := misc.BigIntFromUint64(swapAmount_)
 
-		if senderAddress != senderOwnerAddress {
+		if fluidityOwners[accountIndex] == "" {
 			log.App(func(k *log.Log) {
 				k.Format(
 					"Got a fluid program transaction, but token mint was wrong! %v",
@@ -162,7 +162,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 			swapAmount_        = fluidityTransaction.Unwrap.Value
 		)
 
-		if senderAddress != senderOwnerAddress {
+		if fluidityOwners[unwrapIndex] == "" {
 			log.App(func(k *log.Log) {
 				k.Format(
 					"Got a fluid program transaction, but token mint was wrong! %v",
