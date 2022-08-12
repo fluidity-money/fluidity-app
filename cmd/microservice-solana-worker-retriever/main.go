@@ -106,52 +106,53 @@ func main() {
 			})
 		}
 
-		// try to retrieve the tvl from redis, if we fail to do
-		// so then we try to get it ourselves and store it there
-		// for RedisTvlDuration
+		// we try to get the tvl from pyth and if we fail read
+		// from a Redis cache!
 
-		tvl, tvlBuffered, err := redisGetTvl()
+		// get the value of all fluidity obligations
+
+		tvl, err := prize_pool.GetTvl(
+			solanaClient,
+			fluidityPubkey,
+			tvlDataPubkey,
+			solendPubkey,
+			obligationPubkey,
+			reservePubkey,
+			pythPubkey,
+			switchboardPubkey,
+			payer,
+		)
 
 		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to decode the TVL string!"
-				k.Payload = err
-			})
-		}
-
-		if !tvlBuffered {
-
-			// get the value of all fluidity obligations
-
-			tvl, err = prize_pool.GetTvl(
-				solanaClient,
-				fluidityPubkey,
-				tvlDataPubkey,
-				solendPubkey,
-				obligationPubkey,
-				reservePubkey,
-				pythPubkey,
-				switchboardPubkey,
-				payer,
-			)
+			tvl, _, err = redisGetTvl()
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! %v",
-						tvlDataPubkey,
-						solendPubkey,
-						obligationPubkey,
-						err,
-					)
+					k.Message = "Failed to get the Redis TVL key!"
+					k.Payload = err
 				})
 			}
 
-			state.SetNxTimed(RedisTvlKey, tvl, RedisTvlDuration)
+			log.App(func(k *log.Log) {
+				k.Format(
+					"USING THE CACHED AMOUNT %v - Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! %v",
+					tvl,
+					tvlDataPubkey,
+					solendPubkey,
+					obligationPubkey,
+					err,
+				)
+			})
 		}
+
+		// if we didn't fail to get the tvl from pyth and redis,
+		// then we should set the tvl retrieved to redis!
+
+		state.Set(RedisTvlKey, tvl)
 
 		// check initial supply is less than TVL so there is
 		// an available prize pool
+
 		if mintSupply > tvl {
 			log.Fatal(func(k *log.Log) {
 				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
