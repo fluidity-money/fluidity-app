@@ -30,6 +30,8 @@ export const formatCurrency = (amount: string, decimals?: number): string => {
   // trim to the desired number of decimals
   if (decimals && post) {
     post = post.slice(0, decimals);
+    if (post.length < decimals)
+      post += '0'.repeat(decimals - post.length)
   }
   // if there are decimals, put them back
   return post ? newPre + "." + post : newPre;
