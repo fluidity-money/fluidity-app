@@ -59,16 +59,12 @@ type (
 )
 
 type RMQManagementClient struct {
-	rmqAddress,
-	username,
-	password string
+	rmqAddress string
 }
 
-func NewRmqManagementClient(rmqAddress, username, password string) *RMQManagementClient {
+func NewRmqManagementClient(rmqAddress string) *RMQManagementClient {
 	return &RMQManagementClient{
 		rmqAddress: rmqAddress,
-		username:   username,
-		password:   password,
 	}
 }
 
@@ -130,7 +126,6 @@ func (r *RMQManagementClient) getRmqQueues(vhost string) (rmqQueuesResponse, err
 
 func (r *RMQManagementClient) Get(url string) (res *http.Response, err error) {
 	request, _ := http.NewRequest(http.MethodGet, url, nil)
-	request.SetBasicAuth(r.username, r.password)
 
 	return http.DefaultClient.Do(request)
 }

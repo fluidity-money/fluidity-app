@@ -17,21 +17,13 @@ const (
 
 	// EnvAmqpQueueAddr is the address of the queue
 	EnvAmqpQueueAddr = `FLU_AMQP_QUEUE_ADDR`
-
-	// EnvRmqManagementUser is the username for the RMQ Management API
-	EnvRmqManagementUser = `FLU_AMQP_USER`
-
-	// EnvRmqManagementPassword is the password for the RMQ Management API
-	EnvRmqManagementPassword = `FLU_AMQP_USER_PASS`
 )
 
 func main() {
 	var (
-		maxReadyCount_        = util.GetEnvOrFatal(EnvMaxReadyCount)
-		maxUnackedCount_      = util.GetEnvOrFatal(EnvMaxUnackedCount)
-		queueAddress          = util.GetEnvOrFatal(EnvAmqpQueueAddr)
-		rmqManagementUser     = util.GetEnvOrFatal(EnvRmqManagementUser)
-		rmqManagementPassword = util.GetEnvOrFatal(EnvRmqManagementPassword)
+		maxReadyCount_   = util.GetEnvOrFatal(EnvMaxReadyCount)
+		maxUnackedCount_ = util.GetEnvOrFatal(EnvMaxUnackedCount)
+		queueAddress     = util.GetEnvOrFatal(EnvAmqpQueueAddr)
 	)
 
 	maxReadyCount, err := strconv.ParseUint(maxReadyCount_, 10, 32)
@@ -52,7 +44,7 @@ func main() {
 		})
 	}
 
-	rmq := NewRmqManagementClient(queueAddress, rmqManagementUser, rmqManagementPassword)
+	rmq := NewRmqManagementClient(queueAddress)
 
 	vhosts, err := rmq.getVhosts()
 
