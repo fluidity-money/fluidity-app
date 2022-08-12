@@ -106,67 +106,63 @@ func main() {
 			})
 		}
 
-		// try to retrieve the tvl from redis, if we fail to do
-		// so then we try to get it ourselves and store it there
-		// for RedisTvlDuration
+		// we try to get the tvl from pyth and if we fail read
+		// from a Redis cache!
 
-		tvl, tvlBuffered, err := redisGetTvl()
+		// get the value of all fluidity obligations
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to decode the TVL string!"
-				k.Payload = err
-			})
-		}
+		tvl, tvlErr := prize_pool.GetTvl(
+			solanaClient,
+			fluidityPubkey,
+			tvlDataPubkey,
+			solendPubkey,
+			obligationPubkey,
+			reservePubkey,
+			pythPubkey,
+			switchboardPubkey,
+			payer,
+		)
 
-		if !tvlBuffered {
-
-			// get the value of all fluidity obligations
-
-			tvl, err = prize_pool.GetTvl(
-				solanaClient,
-				fluidityPubkey,
-				tvlDataPubkey,
-				solendPubkey,
-				obligationPubkey,
-				reservePubkey,
-				pythPubkey,
-				switchboardPubkey,
-				payer,
-			)
+		if tvlErr != nil {
+			tvl, _, err = redisGetTvl()
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! %v",
-						tvlDataPubkey,
-						solendPubkey,
-						obligationPubkey,
-						err,
-					)
+					k.Message = "Failed to get the Redis TVL key!"
+					k.Payload = err
 				})
 			}
-		}
 
-		// check initial supply is less than TVL so there is
-		// an available prize pool - we reset the key if this
-		// is the case!
-
-		if mintSupply > tvl {
-
-			state.Del(RedisTvlKey)
-
-			log.Fatal(func(k *log.Log) {
+			log.App(func(k *log.Log) {
 				k.Format(
-					"The mint supply %v > the TVL %v! Prize pool not available - deleted the cache!",
-					mintSupply,
+					"USING THE CACHED AMOUNT %v - Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! %v",
 					tvl,
+					tvlDataPubkey,
+					solendPubkey,
+					obligationPubkey,
+					err,
 				)
 			})
 		}
 
-		if !tvlBuffered {
-			state.SetNxTimed(RedisTvlKey, tvl, RedisTvlDuration)
+		// if we didn't fail to get the tvl from pyth and redis,
+		// then we should set the tvl retrieved to redis!
+
+		if tvlErr == nil {
+			state.Set(RedisTvlKey, tvl)
+		}
+
+		// check initial supply is less than TVL so there is
+		// an available prize pool
+
+		if mintSupply > tvl {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"The mint supply %v > the TVL %v! Prize pool busted potentially!",
+					mintSupply,
+					tvl,
+				)
+			})
 		}
 
 		payableBufferedTransfers := worker.SolanaWork{
