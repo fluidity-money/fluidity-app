@@ -11,7 +11,18 @@ import (
 func pubkeyFromEnv(env string) solana.PublicKey {
 	pubkeyString := util.GetEnvOrFatal(env)
 
-	pubkey := solana.MustPublicKeyFromBase58(pubkeyString)
+	pubkey, err := solana.PublicKeyFromBase58(pubkeyString)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to unmarshal the base58 public key %#v!",
+				pubkeyString,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	return pubkey
 }

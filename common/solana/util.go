@@ -11,11 +11,8 @@ import (
 	"fmt"
 	"sort"
 
-	// Defacto standard base58, I can't write a better one.
+	"github.com/btcsuite/btcutil/base58"
 
-	"github.com/mr-tron/base58"
-
-	// Endorsed by golang team, identical to crypto/internal/ed25519
 	"filippo.io/edwards25519"
 )
 
@@ -27,21 +24,23 @@ func (pk PublicKey) String() string {
 	return string(pk[:])
 }
 
-// Extraordinarily naïve PK construction. Intentionally.
-func MustPublicKeyFromBase58(b58 string) PublicKey {
+// PublicKeyFromBase58 using btcsuite
+func PublicKeyFromBase58(b58 string) (PublicKey, error) {
 	key, err := base58.Decode(b58)
+
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if len(key) != 32 {
-		panic(fmt.Errorf("invalid PublicKey length"))
+		return nil, fmt.Errorf("invalid PublicKey length")
 	}
 
 	pk := PublicKey{}
 
 	copy(pk[0:32], key)
-	return pk
+
+	return pk, nil
 }
 
 // Check if point exists on the ED25519 curve.
