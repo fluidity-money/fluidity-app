@@ -8,7 +8,7 @@ SERVICES:
       TARGET_GROUP: flu-dev-faucet-be-tg
 
       ENV_FLU_WORKER_ID: ethereum-ropsten-faucet.fluidity.money-backend
-      SECRET_FLU_SLACK_WEBHOOK: /fluidity/faucet/slack/backend_webhook_url
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
 
   - FLUIDITY_FRONTEND:
       SERVICE_NAME: faucet-fluidity-money-frontend
@@ -26,7 +26,7 @@ SERVICES:
 
       ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-common-faucet-track-tweets
       ENV_FLU_TWITTER_HASHTAGS: fluiditymoney
-      SECRET_FLU_SLACK_WEBHOOK: /fluidity/faucet/slack/tweet_webhook_url
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
 
   - ETH_FAUCET_SEND_AMOUNTS:
       SERVICE_NAME: microservice-ethereum-faucet-send-amounts
@@ -34,7 +34,7 @@ SERVICES:
 
       ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-ethereum-faucet-send-amounts
       ENV_FLU_ETHEREUM_HARDHAT_FIX: "false"
-      SECRET_FLU_SLACK_WEBHOOK: /fluidity/faucet/slack/tweet_webhook_url
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
       SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ropsten/token_list
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
       SECRET_FLU_ETHEREUM_FAUCET_PRIVATE_KEY: /fluidity/faucet/private_key
