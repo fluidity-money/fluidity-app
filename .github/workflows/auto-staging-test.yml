@@ -1,18 +1,18 @@
-name: Fluidity CI/CD (Auto)
+name: Staging (Auto Test)
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
+    branches:
+      - develop-ci-slack-notif
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
- build-and-deploy:
-    if: github.event.pull_request.merged == true
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - uses: actions/checkout@v3
         with:
@@ -22,7 +22,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ap-southeast-2
-          role-to-assume: ${{ secrets.FLU_DEV_AWS_GITHUB_OIDC_ROLE }}
+          role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
           role-duration-seconds: 7200 #seconds
       - name: Get Diff
         id: diff
@@ -48,20 +48,20 @@ jobs:
         with:
           severity: info
           details: Deployment succeeded.
-          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (SUCCESS)
         if: cancelled()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
           details: Deployment cancelled.
-          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (SUCCESS)
         if: failure()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
           details: Deployment failed.
-          webhookUrl: ${{ secrets.FLU_DISCORD_WEBHOOK_URL }}
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
 
 
