@@ -50,7 +50,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Format("could not retrieve Vhosts from RMQ Management (%v)!", queueAddress)
+			k.Format("could not retrieve Vhosts from RMQ Management!")
 			k.Payload = err
 		})
 	}
@@ -60,7 +60,7 @@ func main() {
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format("could not retrieve queues from RMQ Management (%v)!", queueAddress)
+				k.Format("could not retrieve queues from RMQ Management!")
 				k.Payload = err
 			})
 		}
