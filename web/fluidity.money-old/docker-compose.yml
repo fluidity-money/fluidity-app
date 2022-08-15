@@ -17,7 +17,7 @@ services:
       - FLU_WORKER_ID=fluidity.money
       - FLU_WEB_LISTEN_ADDR=:80
       - FLU_POSTGRES_URI=postgres://fluidity:fluidity@postgres?sslmode=disable
-      - FLU_SLACK_WEBHOOK=${FLU_SLACK_WEBHOOK}
+      - FLU_DISCORD_WEBHOOK=${FLU_DISCORD_WEBHOOK}
 
   frontend:
     image: fluidity/fluidity.money-frontend
