@@ -1,4 +1,4 @@
-import {formatCurrency, tokenAmountToDecimal} from "./amounts";
+import {formatCurrency, tokenAmountToDecimal, shorthandAmountFormatter} from "./amounts";
 
 describe("tokenAmountToDecimal", () => {
   it("0", () => {
@@ -48,5 +48,29 @@ describe("formatCurrency", () => {
     expect(formatCurrency("12345.67")).toBe("12,345.67");
     expect(formatCurrency("123456")).toBe("123,456");
     expect(formatCurrency("123456.78")).toBe("123,456.78");
+  })
+})
+
+describe("shorthandAmountFormatter", () => {
+  it("Amount: 0, Decimal: 1", () => {
+    expect(shorthandAmountFormatter("0", 1)).toBe("0");
+  })
+  it("Amount: 12, Decimal: 1", () => {
+    expect(shorthandAmountFormatter("12", 1)).toBe("12");
+  })
+  it("Amount: 1234, Decimal: 1", () => {
+    expect(shorthandAmountFormatter("1234", 1)).toBe("1.2K");
+  })
+  it("Amount: 100000000, Decimal: 1", () => {
+    expect(shorthandAmountFormatter("100000000", 1)).toBe("100M");
+  })
+  it("Amount: 299792458, Decimal: 1", () => {
+    expect(shorthandAmountFormatter("299792458", 1)).toBe("299.8M");
+  })
+  it("Amount: 759878, Decimal: 1", () => {
+    expect(shorthandAmountFormatter("759878", 1)).toBe("759.9K");
+  })
+  it("Amount: 759878, Decimal: 0", () => {
+    expect(shorthandAmountFormatter("759878", 0)).toBe("760K");
   })
 })
