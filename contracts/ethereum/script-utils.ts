@@ -101,6 +101,10 @@ export const deployTokens = async (
           token.name,
           token.symbol,
           oracleAddress,
+          1000, // Reward quarantine
+          false, // Limited supply
+          1000000, // Global limit
+          10000, // User limit
       );
 
       tokenAddresses[token.symbol] = [deployedToken, deployedPool];
