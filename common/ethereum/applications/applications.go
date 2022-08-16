@@ -161,11 +161,7 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
-<<<<<<< Updated upstream
-	case ApplicationXySwap:
-=======
 	case ApplicationXyFinance:
->>>>>>> Stashed changes
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
@@ -200,13 +196,8 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 		return ApplicationCurve
 	case MultichainLogAnySwapOut:
 		return ApplicationMultichain
-<<<<<<< Updated upstream
-	case XyFinanceTargetChainSwap:
-		return ApplicationXySwap
-=======
-	case XyFinanceSwapLogTopic:
+	case XyFinanceSourceChainSwap:
 		return ApplicationXyFinance
->>>>>>> Stashed changes
 	default:
 		return ApplicationNone
 	}
