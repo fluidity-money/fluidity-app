@@ -25,11 +25,6 @@ on:
       service:
         description: 'Service'
         required: true
-      environment:
-        type: choice
-        description: 'Environment'
-        options: 
-          - 'dev'
       build_root_container:
         type: boolean
         description: 'Build root-container'
