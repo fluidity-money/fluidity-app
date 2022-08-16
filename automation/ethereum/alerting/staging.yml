@@ -6,7 +6,7 @@ SERVICES:
       DEPLOYMENT_TYPE: CRON
 
       ENV_FLU_WORKER_ID: ethereum-staging-microservice-common-rabbitmq-backlog-checker
-      SECRET_FLU_AMQP_QUEUE_ADDR
+      SECRET_FLU_AMQP_QUEUE_ADDR: /fluidity/data/rabbitmq/client_uri
       SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
 
       EVENT_ROLE: ecsEventsRole
