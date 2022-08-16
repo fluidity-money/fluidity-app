@@ -4,10 +4,17 @@
 
 microservice-solana-user-restrictions &
 
-FLU_AMQP_TOPIC_PUBLISH=user_actions.buffered.solana sleep_do 2s microservice-common-amqp-producer <<EOF
+sleep 10
+
+export FLU_AMQP_TOPIC_PUBLISH=user_actions.buffered.solana
+
+microservice-common-amqp-producer <<EOF
 {
 	something
 }
 EOF
 
-fg
+microservice-common-amqp-producer <<EOF
+
+EOF
+

@@ -3,8 +3,8 @@ FROM fluidity/build-container:latest AS build
 WORKDIR /usr/local/src/fluidity/cmd/microservice-common-amqp-logger
 
 COPY . .
-RUN make
 
+RUN make
 
 FROM fluidity/runtime-container:latest
 
@@ -14,4 +14,3 @@ ENTRYPOINT [ \
 	"wait-for-amqp", \
 	"./microservice-common-amqp-logger.out" \
 ]
-

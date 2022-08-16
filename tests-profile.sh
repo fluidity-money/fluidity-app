@@ -1,13 +1,4 @@
 
-sleep_do() {
-	time="$1"
-	shift
-
-	sleep "$time"
-
-	$@
-}
-
 export \
 	FLU_DEBUG_DIE_FAST=true \
 	FLU_AMQP_QUEUE_ADDR=amqp://localhost \

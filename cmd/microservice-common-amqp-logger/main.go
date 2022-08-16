@@ -14,6 +14,6 @@ func main() {
 	topic := util.GetEnvOrFatal(EnvTopicSubscribe)
 
 	queue.GetMessages(topic, func(message queue.Message) {
-		fmt.Printf("%v: %v\n", message.Topic, message.Content)
+		fmt.Printf("%v: %v\n\r", message.Topic, message.Content)
 	})
 }
