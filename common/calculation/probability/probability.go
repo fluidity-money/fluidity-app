@@ -213,9 +213,11 @@ func NaiveIsWinning(balls []uint32, emission *worker.Emission) int {
 
 	for _, i := range balls {
 		if int(i) <= len(balls) {
-			matchedBalls = matchedBalls + 1
+			matchedBalls++
 		}
 	}
+
+	emission.NaiveIsWinning.IsWinning = matchedBalls > 0
 
 	return matchedBalls
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/website"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/slack"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
@@ -48,9 +48,8 @@ func MakeHandleSubscribe(successUrl string) func(http.ResponseWriter, *http.Requ
 
 		http.Redirect(w, r, "/#success", http.StatusTemporaryRedirect)
 
-		slack.Notify(
-			slack.ChannelQuestions,
-			slack.SeverityNotice,
+		discord.Notify(
+			discord.SeverityNotice,
 			`
 	A user has signed up with their email address at %#v!`,
 			emailAddress,
