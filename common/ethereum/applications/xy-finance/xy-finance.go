@@ -181,17 +181,17 @@ type xyFee = struct {
 }
 
 var xyFeeTable = map[int]xyFee{
-	1:     {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(40, 1)},  // Ethereum
-	56:    {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // BNB
-	137:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Polygon
-	250:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Fantom
-	25:    {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Cronos
-	108:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // ThunderCore
-	43114: {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Avalanche
-	321:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // KCC
-	42161: {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Arbitrum
-	10:    {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Optimism
-	592:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Astar
+	1:     {big.NewRat(35, 100000), big.NewRat(40, 1), big.NewRat(2000, 1)},  // Ethereum
+	56:    {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // BNB
+	137:   {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // Polygon
+	250:   {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // Fantom
+	25:    {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // Cronos
+	108:   {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // ThunderCore
+	43114: {big.NewRat(35, 100000), big.NewRat(19, 10), big.NewRat(2000, 1)}, // Avalanche
+	321:   {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // KCC
+	42161: {big.NewRat(35, 100000), big.NewRat(19, 10), big.NewRat(2000, 1)}, // Arbitrum
+	10:    {big.NewRat(35, 100000), big.NewRat(19, 10), big.NewRat(2000, 1)}, // Optimism
+	592:   {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // Astar
 }
 
 var lastFluidXySwapId libEthereum.Hash
@@ -281,9 +281,9 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	if !transferHasFluidToken {
 		log.App(func(k *log.Log) {
 			k.Format(
-				"Received a XY swap in transaction %#v not involving the fluid token - skipping!",
-				transfer.Transaction.Hash.String(),
+				"Received a XY swap %v in transaction %#v not involving the fluid token - skipping!",
 				swap_id,
+				transfer.Transaction.Hash.String(),
 			)
 		})
 
@@ -333,9 +333,9 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	if sourceChainSwapLogTxIndex == len(txLogs)-1 {
 		log.App(func(k *log.Log) {
 			k.Format(
-				"Received a XY swap in transaction %#v with no fees - skipping!",
-				transfer.Transaction.Hash.String(),
+				"Received a XY swap %v in transaction %#v with no fees - skipping!",
 				swap_id,
+				transfer.Transaction.Hash.String(),
 			)
 		})
 
@@ -392,9 +392,9 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	if (nextSourceChainSwapLogTxIndex > 0) || (firstTargetChainSwapLogTxIndex == 0) {
 		log.App(func(k *log.Log) {
 			k.Format(
-				"Received a XY swap in transaction %#v with no fees - skipping!",
-				transfer.Transaction.Hash.String(),
+				"Received a XY swap %v in transaction %#v with no fees - skipping!",
 				swap_id,
+				transfer.Transaction.Hash.String(),
 			)
 		})
 
