@@ -11,6 +11,7 @@
     "@types/node": "^16.11.45",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
+    "@visx/visx": "^2.12.2",
     "@types/react-table": "^7.7.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -24,7 +25,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "gen-gql": "gq  --introspect https://engaged-ape-38.hasura.app/v1/graphql > schema.graphql",
+    "relay": "relay-compiler"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +48,10 @@
     ]
   },
   "devDependencies": {
+    "@types/react-relay": "^13.0.2",
+    "babel-plugin-relay": "^14.1.0",
+    "graphql": "^16.5.0",
+    "relay-compiler": "^14.1.0",
     "sass": "^1.53.0"
   }
 }
