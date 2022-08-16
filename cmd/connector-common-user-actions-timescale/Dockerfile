@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/connector-common-user-actions-time
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-common-user-actions-timescale.o" \
+	"./connector-common-user-actions-timescale.out" \
 ]
 

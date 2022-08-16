@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-worker-clien
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-ethereum-worker-client.o" \
+	"./microservice-ethereum-worker-client.out" \
 ]
 

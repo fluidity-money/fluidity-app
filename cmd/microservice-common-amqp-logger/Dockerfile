@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-amqp-logger/mi
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-common-amqp-logger.o" \
+	"./microservice-common-amqp-logger.out" \
 ]
 

@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-prize-pool/m
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-ethereum-prize-pool.o" \
+	"./microservice-ethereum-prize-pool.out" \
 ]
 

@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-faucet-send-am
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-solana-faucet-send-amounts.o" \
+	"./microservice-solana-faucet-send-amounts.out" \
 ]
 

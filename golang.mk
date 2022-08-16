@@ -39,4 +39,4 @@ watch:
 	@ls -1 ${GO_FILES} | entr -ns 'clear && make build'
 
 clean:
-	@rm -f "${REPO}.o" lint test docker
+	@rm -f "${REPO}.out" lint test docker

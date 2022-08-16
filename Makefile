@@ -108,7 +108,7 @@ semgrep:
 	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
 test: semgrep
-	@./run-tests.sh
+	@./tests-golang.sh
 
 lint: semgrep
 	@${GO_FMT} ./...

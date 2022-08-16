@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-trf-data-postgres
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-solana-trf-data-postgres.o" \
+	"./connector-solana-trf-data-postgres.out" \
 ]
 

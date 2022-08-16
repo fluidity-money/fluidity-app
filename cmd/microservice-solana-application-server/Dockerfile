@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-application-se
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-solana-application-server.o" \
+	"./microservice-solana-application-server.out" \
 ]
 

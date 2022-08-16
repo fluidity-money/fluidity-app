@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-prize-pool/mic
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-solana-prize-pool.o" \
+	"./microservice-solana-prize-pool.out" \
 ]
 

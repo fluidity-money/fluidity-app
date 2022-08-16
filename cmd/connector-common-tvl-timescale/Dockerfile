@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/connector-common-tvl-timescale/con
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-common-tvl-timescale.o" \
+	"./connector-common-tvl-timescale.out" \
 ]
 

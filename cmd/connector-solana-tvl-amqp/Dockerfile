@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-tvl-amqp/connecto
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-solana-tvl-amqp.o" \
+	"./connector-solana-tvl-amqp.out" \
 ]
 

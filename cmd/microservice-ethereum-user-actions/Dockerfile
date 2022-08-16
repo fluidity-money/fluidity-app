@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-user-actions
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-ethereum-user-actions.o" \
+	"./microservice-ethereum-user-actions.out" \
 ]
 

@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-transactions/m
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-solana-transactions.o" \
+	"./microservice-solana-transactions.out" \
 ]
 

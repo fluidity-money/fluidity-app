@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-rabbitmq-backl
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-common-rabbitmq-backlog-checker.o" \
+	"./microservice-common-rabbitmq-backlog-checker.out" \
 ]
 

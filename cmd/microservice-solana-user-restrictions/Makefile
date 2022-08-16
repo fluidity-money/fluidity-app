@@ -1,4 +1,4 @@
 
-REPO := microservice-solana-user-actions
+REPO := microservice-solana-user-restrictions
 
 include ../../golang.mk

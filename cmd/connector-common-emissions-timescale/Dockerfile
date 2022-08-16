@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/connector-common-emissions-timesca
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-common-emissions-timescale.o" \
+	"./connector-common-emissions-timescale.out" \
 ]
 

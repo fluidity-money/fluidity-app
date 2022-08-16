@@ -12,5 +12,5 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-user-restricti
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-solana-user-restrictions.o" \
+	"./microservice-solana-user-restrictions.out" \
 ]

@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/connector-ethereum-logs-amqp/conne
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-ethereum-logs-amqp.o" \
+	"./connector-ethereum-logs-amqp.out" \
 ]
 
