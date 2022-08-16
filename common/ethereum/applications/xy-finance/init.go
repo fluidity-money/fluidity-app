@@ -14,4 +14,10 @@ func init() {
 	if xyFinanceAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
+
+	reader = strings.NewReader(ERC20AbiString)
+
+	if erc20Abi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }
