@@ -181,17 +181,17 @@ type xyFee = struct {
 }
 
 var xyFeeTable = map[int]xyFee{
-	1:     xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(40, 1)},  // Ethereum
-	56:    xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // BNB
-	137:   xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Polygon
-	250:   xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Fantom
-	25:    xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Cronos
-	108:   xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // ThunderCore
-	43114: xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Avalanche
-	321:   xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // KCC
-	42161: xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Arbitrum
-	10:    xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Optimism
-	592:   xyFee{big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Astar
+	1:     {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(40, 1)},  // Ethereum
+	56:    {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // BNB
+	137:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Polygon
+	250:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Fantom
+	25:    {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Cronos
+	108:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // ThunderCore
+	43114: {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Avalanche
+	321:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // KCC
+	42161: {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Arbitrum
+	10:    {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(19, 10)}, // Optimism
+	592:   {big.NewRat(35, 1000), big.NewRat(2000, 1), big.NewRat(9, 10)},  // Astar
 }
 
 var lastFluidXySwapId libEthereum.Hash
