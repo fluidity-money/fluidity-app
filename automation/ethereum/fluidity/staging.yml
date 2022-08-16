@@ -16,7 +16,6 @@ SERVICES:
   - FLUIDITY_BACKEND:
       SERVICE_NAME: ethereum-fluidity-money-backend
       DOCKER_IMAGE: ethereum.fluidity.money-backend
-      ENV_FLU_WORKER_ID: ethereum-staging-ethereum.fluidity.money-backend
       TARGET_GROUP: flu-staging-eth-be-tg
 
       ENV_FLU_WORKER_ID: ethereum-staging-ethereum.fluidity.money-backend
