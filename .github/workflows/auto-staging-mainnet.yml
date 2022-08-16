@@ -30,7 +30,7 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            flu get-diff --environment dev --tag $GITHUB_SHA
+            flu get-diff --environment staging --tag $GITHUB_SHA
       - name: Build
         id: build
         uses: ./scripts/actions

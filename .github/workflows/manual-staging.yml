@@ -16,8 +16,6 @@ on:
           - 'devnet'
           - 'ropsten'
           - 'kovan'
-          - 'solana'
-          - 'ethereum'
           - 'fluidity'
       group:
         description: 'Group'
