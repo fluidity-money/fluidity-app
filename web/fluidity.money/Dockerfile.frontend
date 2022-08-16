@@ -1,5 +1,5 @@
 
-FROM fluidity/web-container:latest
+FROM fluidity/build-web-container:latest AS build
 
 WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
@@ -12,15 +12,17 @@ COPY package.json package-lock.json ./
 RUN npm i
 
 COPY . ./
-RUN mv ./nginx-default.conf /etc/nginx/sites-available/default
 
 ARG REACT_APP_SENTRY_DSN
 
 RUN make frontend
 
-RUN rm -r /var/www/html
+FROM fluidity/runtime-web-container:latest
 
-RUN cp -r build /var/www/html
+WORKDIR /usr/local/src/fluidity/web/fluidity.money
+
+RUN rm -rf /var/www/html
+COPY --from=build /usr/local/src/fluidity/web/fluidity.money/build /var/www/html
 
 EXPOSE 3000
 

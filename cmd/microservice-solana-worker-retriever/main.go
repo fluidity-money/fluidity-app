@@ -1,15 +1,26 @@
 package main
 
 import (
+	"time"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 
 	"github.com/gagliardetto/solana-go"
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+)
+
+const (
+	// RedisTvlKey to store the tvl calculation
+	RedisTvlKey = `worker.tvl`
+
+	// RedisTvlDuration to store the Pyth TVL calculation
+	RedisTvlDuration = time.Minute * 30
 )
 
 const (
@@ -83,6 +94,7 @@ func main() {
 	worker.GetSolanaBufferedTransfers(func(transfers worker.SolanaBufferedTransfers) {
 
 		// get the entire amount of fUSDC in circulation (the amount of USDC wrapped)
+
 		mintSupply, err := prize_pool.GetMintSupply(solanaClient, fluidMintPubkey)
 
 		if err != nil {
@@ -94,8 +106,12 @@ func main() {
 			})
 		}
 
+		// we try to get the tvl from pyth and if we fail read
+		// from a Redis cache!
+
 		// get the value of all fluidity obligations
-		tvl, err := prize_pool.GetTvl(
+
+		tvl, tvlErr := prize_pool.GetTvl(
 			solanaClient,
 			fluidityPubkey,
 			tvlDataPubkey,
@@ -107,20 +123,45 @@ func main() {
 			payer,
 		)
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
+		if tvlErr != nil {
+			tvl, _, err = redisGetTvl()
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to get the Redis TVL key!"
+					k.Payload = err
+				})
+			}
+
+			log.App(func(k *log.Log) {
 				k.Format(
-					"Failedto get the TVL! %v",
+					"USING THE CACHED AMOUNT %v - Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! %v",
+					tvl,
+					tvlDataPubkey,
+					solendPubkey,
+					obligationPubkey,
 					err,
 				)
 			})
 		}
 
+		// if we didn't fail to get the tvl from pyth and redis,
+		// then we should set the tvl retrieved to redis!
+
+		if tvlErr == nil {
+			state.Set(RedisTvlKey, tvl)
+		}
+
 		// check initial supply is less than TVL so there is
 		// an available prize pool
+
 		if mintSupply > tvl {
 			log.Fatal(func(k *log.Log) {
-				k.Format("The mint supply %#v > the TVL %#v!", mintSupply, tvl)
+				k.Format(
+					"The mint supply %v > the TVL %v! Prize pool busted potentially!",
+					mintSupply,
+					tvl,
+				)
 			})
 		}
 

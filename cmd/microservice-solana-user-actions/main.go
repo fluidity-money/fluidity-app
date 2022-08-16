@@ -63,7 +63,6 @@ func main() {
 		)
 
 		var (
-			transfers                  = make([]user_actions.UserAction, 0)
 			bufferedUserActions        = make([]user_actions.UserAction, 0)
 			bufferedParsedTransactions = make([]worker.SolanaParsedTransaction, 0)
 		)
@@ -79,6 +78,8 @@ func main() {
 			}
 
 			var (
+				transfers = make([]user_actions.UserAction, 0)
+
 				signature         = transaction.Signature
 				transactionResult = transaction.Result
 				accountKeys       = transactionResult.Transaction.Message.AccountKeys
