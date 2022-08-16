@@ -11,8 +11,8 @@ GO_DIR_LIB := ../../lib
 
 GO_DIR_COMMON := ../../common
 
-${REPO}.o: ${GO_FILES}
-	@${GO_BUILD} ${GO_BUILD_EXTRA_ARGS} -o ${REPO}.o
+${REPO}.out: ${GO_FILES}
+	@${GO_BUILD} ${GO_BUILD_EXTRA_ARGS} -o ${REPO}.out
 
 lint: ${GO_FILES}
 	@${GO_FMT}
@@ -30,7 +30,10 @@ docker: ${GO_FILES} Dockerfile Makefile
 	@${DOCKER_BUILD} ${DOCKERFLAGS} -t "${ORG_ROOT}/${REPO}" .
 	@touch docker
 
-build: ${REPO}
+build: ${REPO}.out
+
+install: build
+	cp ${REPO}.out ${INSTALL_DIR}/${REPO}
 
 watch:
 	@ls -1 ${GO_FILES} | entr -ns 'clear && make build'
