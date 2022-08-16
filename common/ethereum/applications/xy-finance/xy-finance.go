@@ -20,6 +20,25 @@ import (
 
 const xyFinanceAbiString = `[
 {
+	"inputs": [
+		{
+			"internalType": "address",
+			"name": "",
+			"type": "address"
+		}
+	],
+	"name": "proxies",
+	"outputs": [
+		{
+			"internalType": "bool",
+			"name": "",
+			"type": "bool"
+		}
+	],
+	"stateMutability": "view",
+	"type": "function"
+},
+{
 	"anonymous": false,
 	"inputs": [
 		{
@@ -166,13 +185,8 @@ var erc20Abi ethAbi.ABI
 // get the price the token when making the prize pool
 const EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
 
-const (
-	// targetChainSwapLogTopic is the log hash of swaps performed on the target chain
-	targetChainSwapLogTopic = "0x9017d19859618ad034f86e0edfd056f1be7c02aed9b0904276fabae9df9a4d3e"
-
-	// ethereumTokenAddress is how XY internally stores the Ethereum token
-	etherumTokenAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-)
+// ethereumTokenAddress is how XY internally stores the Ethereum token
+const ethereumTokenAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 
 type xyFee = struct {
 	Rate,
@@ -236,9 +250,9 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 		)
 	}
 
-	tokenAddresses_ := unpacked[6:8]
+	addresses_ := unpacked[5:8]
 
-	tokenAddresses, err := ethereum.CoerceBoundContractResultsToAddresses(tokenAddresses_)
+	addresses, err := ethereum.CoerceBoundContractResultsToAddresses(addresses_)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -249,11 +263,15 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 	var (
 		// swap logs
+		// dex is the receiver of the tokenA swap
+		// If dex is a proxy, the swap starts a crosschain interaction
+		dex = addresses[0]
+
 		// fromToken is the address of tokenA
-		fromToken = tokenAddresses[0]
+		fromToken = addresses[1]
 
 		// toToken is the address of tokenB
-		toToken = tokenAddresses[1]
+		toToken = addresses[2]
 
 		// swap topics
 		// swap_id is the ID of current swap
@@ -276,13 +294,46 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 		return nil, nil
 	}
 
+	contractAddr_ := transfer.Log.Address.String()
+	contractAddr := ethCommon.HexToAddress(contractAddr_)
+
+	// if dex is a proxy, start crosschain swap
+	isCrosschainSwap_, err := ethereum.StaticCall(client, contractAddr, xyFinanceAbi, "proxies", dex)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to request whether dex is proxy! %v",
+			err,
+		)
+	}
+
+	isCrosschainSwap, casted := isCrosschainSwap_[0].(bool)
+
+	if !casted {
+		return nil, fmt.Errorf(
+			"failed to assert type bool from proxies %v! %v",
+			isCrosschainSwap_,
+			err,
+		)
+	}
+
 	// XY only takes fees if swap is crosschain
-	// Crosschain swaps can be inferred to occur if the swap is the last emitted
-	// SourceChainSwap with swap_id in the TX
+	if !isCrosschainSwap {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a XY swap %v in transaction %#v with no fees - skipping!",
+				swap_id,
+				transfer.Transaction.Hash.String(),
+			)
+		})
+
+		return nil, nil
+	}
+
+	// Get all logs in transaction
 	txHash_ := string(transfer.Transaction.Hash)
 	txHash := ethCommon.HexToHash(txHash_)
 
-	// Get all logs in transaction
 	txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
 
 	if err != nil {
@@ -303,90 +354,22 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 		return sourceChainSwapLogBlockIndex >= txLogs[i].Index
 	})
 
-	if sourceChainSwapLogTxIndex == len(txLogs) {
+	// firstTargetChainSwap log should occur right after SourceChainSwap log
+	firstTargetChainSwapLogTxIndex := sourceChainSwapLogTxIndex + 1
+
+	// assert corresponding TargetChainSwap exists
+	if firstTargetChainSwapLogTxIndex >= len(txLogs) {
 		return nil, fmt.Errorf(
-			"failed to find matching log from txHash (%v) at Index (%v)! %v",
+			"failed to find corresponding TargetChainSwap log from txHash (%v) at Index (%v)! %v",
 			txHash.String(),
-			sourceChainSwapLogTxIndex,
+			firstTargetChainSwapLogTxIndex,
 			err,
 		)
 	}
 
-	// Current swap is last log, so no crosschain interaction
-	if sourceChainSwapLogTxIndex == len(txLogs)-1 {
-		log.App(func(k *log.Log) {
-			k.Format(
-				"Received a XY swap %v in transaction %#v with no fees - skipping!",
-				swap_id,
-				transfer.Transaction.Hash.String(),
-			)
-		})
-
-		return nil, nil
-	}
-
-	var (
-		// Hash of SourceChainSwap log
-		sourceChainSwapLogHash = transfer.Log.Topics[0]
-
-		// Default to no SourceChainSwap log found after current SourceChainSwap
-		nextSourceChainSwapLogTxIndex = -1
-
-		// Hash of TargetChainSwap log
-		targetChainSwapLogHash = libEthereum.HashFromString(targetChainSwapLogTopic)
-
-		// Default to no TargetChainSwap log found after current SourceChainSwap
-		firstTargetChainSwapLogTxIndex = -1
-	)
-
-	// Search through remaining logs to find first TargetChainSwap, and
-	// next SourceChainSwap with the same swap_id
-	for txIndex, txLog := range txLogs[sourceChainSwapLogTxIndex+1:] {
-		hashTopic := libEthereum.HashFromString(txLog.Topics[0].String())
-
-		hashIsSourceChainSwap := hashTopic == sourceChainSwapLogHash
-		hashIsXYSwap := hashIsSourceChainSwap || (hashTopic == targetChainSwapLogHash)
-
-		if !hashIsXYSwap {
-			continue
-		}
-
-		nextSwapId_ := txLog.Topics[1].String()
-		nextSwapId := libEthereum.HashFromString(nextSwapId_)
-
-		// Found XY swap with different swap ID
-		// Means current swap has ended with no fees
-		if nextSwapId != swap_id {
-			break
-		}
-
-		switch hashIsSourceChainSwap {
-		case true:
-			nextSourceChainSwapLogTxIndex = txIndex
-		case false:
-			firstTargetChainSwapLogTxIndex = txIndex
-		}
-
-		// Found either next SourceChainSwap, or first TargetChainSwap
-		break
-	}
-
-	// Did not find Fluid crosschain swap, so no XY fees
-	if (nextSourceChainSwapLogTxIndex > 0) || (firstTargetChainSwapLogTxIndex == 0) {
-		log.App(func(k *log.Log) {
-			k.Format(
-				"Received a XY swap %v in transaction %#v with no fees - skipping!",
-				swap_id,
-				transfer.Transaction.Hash.String(),
-			)
-		})
-
-		return nil, nil
-	}
-
+	// TargetChainSwap contains the target chain ID, which is used to devive fee params
 	targetChainSwapTransferLog := txLogs[firstTargetChainSwapLogTxIndex]
 
-	// TargetChainSwap contains the target chain ID, which is used to devive fee params
 	unpacked, err = xyFinanceAbi.Unpack("TargetChainSwap", targetChainSwapTransferLog.Data)
 
 	if err != nil {
@@ -454,7 +437,7 @@ func getUniswapUsdToTokenRatio(client *ethclient.Client, tokenAddress, uniswapAn
 	fromTokenAddress_ := tokenAddress.String()
 	fromTokenAddress := libEthereum.AddressFromString(fromTokenAddress_)
 
-	if fromTokenAddress == libEthereum.AddressFromString(etherumTokenAddress) {
+	if fromTokenAddress == libEthereum.AddressFromString(ethereumTokenAddress) {
 		// Set Ethereum token symbol to ETH and call Uniswap Price Oracle
 		return uniswap_anchored_view.GetPrice(client, uniswapAnchoredViewAddress, "ETH")
 	}
@@ -469,9 +452,9 @@ func getUniswapUsdToTokenRatio(client *ethclient.Client, tokenAddress, uniswapAn
 		)
 	}
 
-	tokenSymbol, coerced := symbol_[0].(string)
+	tokenSymbol, casted := symbol_[0].(string)
 
-	if coerced == false {
+	if !casted {
 		return nil, fmt.Errorf(
 			"Failed to assert type string from symbol %#v!",
 			symbol_,
