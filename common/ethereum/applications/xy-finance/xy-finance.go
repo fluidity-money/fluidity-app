@@ -194,8 +194,6 @@ var xyFeeTable = map[int]xyFee{
 	592:   {big.NewRat(35, 100000), big.NewRat(9, 10), big.NewRat(2000, 1)},  // Astar
 }
 
-var lastFluidXySwapId libEthereum.Hash
-
 // GetXyFinanceSwapFees calculates fees from Swapping TokenA and TokenB crosschain
 // Swapped tokens may not be stable, so a price oracle for approximating USD is required
 // FeeRates, MinFee and MaxFee are calculated on and depending on the target chain, and is
@@ -266,18 +264,6 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 		transferHasFluidToken = fromTokenIsFluid || (toToken == fluidTokenContract)
 	)
 
-	if swap_id == lastFluidXySwapId {
-		log.App(func(k *log.Log) {
-			k.Format(
-				"Already processed XY swap in transaction %#v with swap_id %v - skipping!",
-				transfer.Transaction.Hash.String(),
-				swap_id,
-			)
-		})
-
-		return nil, nil
-	}
-
 	if !transferHasFluidToken {
 		log.App(func(k *log.Log) {
 			k.Format(
@@ -289,9 +275,6 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 		return nil, nil
 	}
-
-	// We process the Fluid swap, so update lastProcessedSwapId
-	lastFluidXySwapId = swap_id
 
 	// XY only takes fees if swap is crosschain
 	// Crosschain swaps can be inferred to occur if the swap is the last emitted
@@ -368,12 +351,12 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 			continue
 		}
 
-		swap_id_ := txLog.Topics[1].String()
-		swap_id = libEthereum.HashFromString(swap_id_)
+		nextSwapId_ := txLog.Topics[1].String()
+		nextSwapId := libEthereum.HashFromString(nextSwapId_)
 
 		// Found XY swap with different swap ID
 		// Means current swap has ended with no fees
-		if swap_id != lastFluidXySwapId {
+		if nextSwapId != swap_id {
 			break
 		}
 
