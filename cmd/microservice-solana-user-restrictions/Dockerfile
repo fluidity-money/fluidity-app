@@ -8,7 +8,7 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-user-restrictions/microservice-solana-user-restrictions.o .
+COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-user-restrictions/microservice-solana-user-restrictions.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \

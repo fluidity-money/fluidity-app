@@ -8,7 +8,7 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-application-server/microservice-ethereum-application-server.o .
+COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-application-server/microservice-ethereum-application-server.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \

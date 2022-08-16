@@ -8,7 +8,7 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-rabbitmq-backlog-checker/microservice-common-rabbitmq-backlog-checker.o .
+COPY --from=build /usr/local/src/fluidity/cmd/microservice-common-rabbitmq-backlog-checker/microservice-common-rabbitmq-backlog-checker.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
