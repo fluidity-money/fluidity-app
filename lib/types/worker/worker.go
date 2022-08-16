@@ -12,14 +12,14 @@ import (
 type Emission struct {
 	LastUpdated time.Time `json:"last_updated"`
 
-	Network             string                     `json:"network"`
-	TokenDetails        token_details.TokenDetails `json:"token_details"`
-	TransactionHash     string                     `json:"transaction_hash"`
-	RecipientAddress    string                     `json:"recipient_address"`
-	SenderAddress       string                     `json:"sender_address"`
+	Network          string                     `json:"network"`
+	TokenDetails     token_details.TokenDetails `json:"token_details"`
+	TransactionHash  string                     `json:"transaction_hash"`
+	RecipientAddress string                     `json:"recipient_address"`
+	SenderAddress    string                     `json:"sender_address"`
 
-	EthereumBlockNumber misc.BigInt                `json:"ethereum_block_number"`
-	SolanaSlotNumber    misc.BigInt                `json:"solana_slot_number"`
+	EthereumBlockNumber misc.BigInt `json:"ethereum_block_number"`
+	SolanaSlotNumber    misc.BigInt `json:"solana_slot_number"`
 
 	Payout struct {
 		Winnings        float64 `json:"winnings"` // Winnings
@@ -53,6 +53,7 @@ type Emission struct {
 
 	NaiveIsWinning struct {
 		TestingBalls []uint32 `json:"testing_balls"`
+		IsWinning    bool     `json:"is_winning"`
 	} `json:"naive_is_winning"`
 
 	CalculateBpy struct {

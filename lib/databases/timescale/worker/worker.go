@@ -117,7 +117,9 @@ func InsertEmissions(emission Emission) {
 			probability_2,
 			probability_3,
 			probability_4,
-			probability_5
+			probability_5,
+
+			naive_is_winning_is_winning
 		)
 
 		VALUES (
@@ -180,7 +182,9 @@ func InsertEmissions(emission Emission) {
 			$47,
 			$48,
 			$49,
-			$50
+			$50,
+
+			$51
 		);`,
 
 		TableEmissions,
@@ -249,6 +253,8 @@ func InsertEmissions(emission Emission) {
 		winningChances.Probability3,
 		winningChances.Probability4,
 		winningChances.Probability5,
+
+		naiveIsWinning.IsWinning,
 	)
 
 	if err != nil {
