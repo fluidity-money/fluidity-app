@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-amqp/connector-solana-amqp.o .
+COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-amqp/connector-solana-amqp.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-solana-amqp.o" \
+	"./connector-solana-amqp.out" \
 ]
 

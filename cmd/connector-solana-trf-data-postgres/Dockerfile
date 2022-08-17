@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-trf-data-postgres/connector-solana-trf-data-postgres.o .
+COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-trf-data-postgres/connector-solana-trf-data-postgres.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-solana-trf-data-postgres.o" \
+	"./connector-solana-trf-data-postgres.out" \
 ]
 

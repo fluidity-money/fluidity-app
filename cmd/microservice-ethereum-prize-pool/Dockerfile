@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-prize-pool/microservice-ethereum-prize-pool.o .
+COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-prize-pool/microservice-ethereum-prize-pool.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-ethereum-prize-pool.o" \
+	"./microservice-ethereum-prize-pool.out" \
 ]
 

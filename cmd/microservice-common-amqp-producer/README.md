@@ -1,9 +1,7 @@
 
 # AMQP Stdin Producer
 
-Simply takes lines from stdin and publishes with the queue as an
-environment variable.
-
+Takes stdin, turns it into a message, and sends it down the queue given.
 
 ## Environment variables
 

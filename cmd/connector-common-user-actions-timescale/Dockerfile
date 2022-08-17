@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/connector-common-user-actions-timescale/connector-common-user-actions-timescale.o .
+COPY --from=build /usr/local/src/fluidity/cmd/connector-common-user-actions-timescale/connector-common-user-actions-timescale.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-common-user-actions-timescale.o" \
+	"./connector-common-user-actions-timescale.out" \
 ]
 
