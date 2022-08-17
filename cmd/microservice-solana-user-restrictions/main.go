@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math"
+	"math/big"
+
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/solana"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -31,7 +34,10 @@ func main() {
 				continue
 			}
 
-			tokenName := tokenDetails.TokenShortName
+			var (
+				tokenName     = tokenDetails.TokenShortName
+				tokenDecimals = tokenDetails.TokenDecimals
+			)
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
@@ -45,10 +51,30 @@ func main() {
 
 			// the user swapped in, so we increase the user's minted amount
 
+			normalised := new(big.Rat).SetInt(&amount.Int)
+
+			tokenDecimalsAdjusted := math.Pow10(tokenDecimals)
+
+			tokenDecimalsExp := new(big.Rat).SetFloat64(tokenDecimalsAdjusted)
+
+			normalised.Quo(normalised, tokenDecimalsExp)
+
+			normalisedFloat, _ := normalised.Float64()
+
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Transaction hash %v, token name %v, decimals %v, normalised to %v",
+					transactionHash,
+					tokenName,
+					tokenDecimals,
+					normalisedFloat,
+				)
+			})
+
 			if swapIn {
-				solana.AddMintUserLimit(senderAddress, amount)
+				solana.AddMintUserLimit(senderAddress, normalisedFloat)
 			} else {
-				solana.ReduceMintUserLimit(senderAddress, amount)
+				solana.ReduceMintUserLimit(senderAddress, normalisedFloat)
 			}
 		}
 	})

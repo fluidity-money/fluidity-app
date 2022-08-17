@@ -5,10 +5,9 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
-func GetUserMintLimit(address string) misc.BigInt {
+func GetUserMintLimit(address string) float64 {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
@@ -34,7 +33,7 @@ func GetUserMintLimit(address string) misc.BigInt {
 		})
 	}
 
-	var amount misc.BigInt
+	var amount float64
 
 	if err := row.Scan(&amount); err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -52,7 +51,7 @@ func GetUserMintLimit(address string) misc.BigInt {
 	return amount
 }
 
-func ReduceMintUserLimit(address string, amount misc.BigInt) {
+func ReduceMintUserLimit(address string, amount float64) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
@@ -80,7 +79,7 @@ func ReduceMintUserLimit(address string, amount misc.BigInt) {
 	}
 }
 
-func AddMintUserLimit(address string, amount misc.BigInt) {
+func AddMintUserLimit(address string, amount float64) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
