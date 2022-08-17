@@ -86,13 +86,15 @@ func main() {
 			transfers = append(transfers, decorated...)
 		}
 
-		bufferedTransfers := worker.SolanaBufferedTransfers{
-			Transfers: transfers,
-		}
+		if len(transfers) > 0 {
+			bufferedTransfers := worker.SolanaBufferedTransfers{
+				Transfers: transfers,
+			}
 
-		queue.SendMessage(
-			worker.TopicSolanaBufferedTransfers,
-			bufferedTransfers,
-		)
+			queue.SendMessage(
+				worker.TopicSolanaBufferedTransfers,
+				bufferedTransfers,
+			)
+		}
 	})
 }

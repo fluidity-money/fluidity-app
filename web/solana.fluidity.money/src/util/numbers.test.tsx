@@ -22,6 +22,30 @@ describe("amountToDecimalString", () => {
   })
 })
 
+describe("shorthandAmountFormatter", () => {
+  it("Amount: 0, Decimal: 1", () => {
+    expect(numbers.shorthandAmountFormatter("0", 1)).toBe("0");
+  })
+  it("Amount: 12, Decimal: 1", () => {
+    expect(numbers.shorthandAmountFormatter("12", 1)).toBe("12");
+  })
+  it("Amount: 1234, Decimal: 1", () => {
+    expect(numbers.shorthandAmountFormatter("1234", 1)).toBe("1.2K");
+  })
+  it("Amount: 100000000, Decimal: 1", () => {
+    expect(numbers.shorthandAmountFormatter("100000000", 1)).toBe("100M");
+  })
+  it("Amount: 299792458, Decimal: 1", () => {
+    expect(numbers.shorthandAmountFormatter("299792458", 1)).toBe("299.8M");
+  })
+  it("Amount: 759878, Decimal: 1", () => {
+    expect(numbers.shorthandAmountFormatter("759878", 1)).toBe("759.9K");
+  })
+  it("Amount: 759878, Decimal: 0", () => {
+    expect(numbers.shorthandAmountFormatter("759878", 0)).toBe("760K");
+  })
+})
+
 describe("clearTrailingZeros", () => {
     it("2000.000", () => {
       expect(numbers.clearTrailingZeros("2000.000")).toBe("2000");

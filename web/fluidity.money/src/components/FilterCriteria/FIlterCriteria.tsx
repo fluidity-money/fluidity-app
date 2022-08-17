@@ -11,7 +11,11 @@ interface IFilterCriteriaProps {
   children: string;
   options: IOption[];
   setOptions: React.SetStateAction<any>;
-  handleFilter: (option: IOption, setOption: React.SetStateAction<any>) => void;
+  handleFilter: (
+    option: IOption,
+    setOption: React.SetStateAction<any>,
+    options: IOption[]
+  ) => void;
 }
 
 const FIlterCriteria = ({
@@ -29,6 +33,7 @@ const FIlterCriteria = ({
             option={option}
             handleFilter={handleFilter}
             setOptions={setOptions}
+            options={options}
           />
         ))}
       </div>
