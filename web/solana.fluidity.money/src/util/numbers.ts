@@ -139,7 +139,10 @@ export const tokenValueInputHandler = (value: string, setTo: StringDispatch, set
 // Creates a shorthand for large amounts e.g 10,000 equates to 10k
 export const shorthandAmountFormatter = (value: string, decimals: number): string => {
 
-  let num: number = parseFloat(value)
+  let num: number = parseFloat(value);
+  if(num < 1) {
+    return value;
+  }
   const lookup = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "K" },
