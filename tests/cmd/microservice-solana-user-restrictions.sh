@@ -15,3 +15,12 @@ EOF
 microservice-common-amqp-producer <<EOF
 
 EOF
+
+sleep 10
+
+psql -e "$FLU_POSTGRES_URI" <<EOF
+
+SELECT *
+FROM solana_users
+WHERE address = ''
+AND amount_minted = 0
