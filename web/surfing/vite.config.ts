@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/main.tsx'),
+      entry: resolve(__dirname, 'src/lib.tsx'),
       name: 'Surfing',
       // the proper extensions will be added
       fileName: 'surfing'
