@@ -4,17 +4,22 @@ import styles from "./TextButton.module.scss";
 interface ITextButtonProps {
   children: string;
   colour: string;
+  onClick?: () => void;
 }
 
-const TextButton = ({ children, colour }: ITextButtonProps) => {
+const TextButton = ({ children, colour, onClick }: ITextButtonProps) => {
   return (
     <>
       {colour === "white" ? (
-        <button className={styles.white}>{children}</button>
+        <button onClick={onClick} className={styles.white}>
+          {children}
+        </button>
       ) : colour === "black" ? (
-        <button className={styles.black}>{children}</button>
+        <button onClick={onClick} className={styles.black}>
+          {children}
+        </button>
       ) : (
-        <button className={styles.coloured}>
+        <button onClick={onClick} className={styles.coloured}>
           <span className={styles.inner}>{children}</span>
         </button>
       )}

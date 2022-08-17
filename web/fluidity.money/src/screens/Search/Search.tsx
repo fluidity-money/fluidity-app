@@ -1,8 +1,18 @@
-import React from "react";
+import SearchModal from "modals";
+import React, { useState } from "react";
 import ContinuousCarousel from "../../components/ContinuousCarousel";
 import styles from "./Search.module.scss";
 
 const Search = () => {
+  const [modal, setModal] = useState(false);
+  const closeModal = () => {
+    setModal(false);
+  };
+
+  const openModal = () => {
+    setModal(true);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.center}>
@@ -11,6 +21,7 @@ const Search = () => {
           <input
             type="text"
             placeholder="🔍 Search projects and protocols"
+            onClick={openModal}
           ></input>
         </div>
       </div>
@@ -26,6 +37,7 @@ const Search = () => {
           </div>
         </ContinuousCarousel>
       </div>
+      {modal ? <SearchModal closeModal={closeModal} /> : <></>}
     </div>
   );
 };
