@@ -1,0 +1,60 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import Display from "./Display";
+
+<Meta title="Typography/Display" component={Display} />
+
+export const Template = (args) => (
+  <Display {...args}>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+  </Display>
+);
+
+<Canvas columns={1}  withSource="open" withToolbar>
+    <Title>Display</Title>
+    <Subtitle>Beautiful typography for beautiful things.</Subtitle>
+    <Story
+        name="Display Large"
+        args={{
+            extraSmall: false,
+            small: false,
+            medium: false,
+            large: true
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Display Medium"
+        args={{
+            extraSmall: false,
+            small: false,
+            medium: true,
+            large: false
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Display Small"
+        args={{
+            extraSmall: false,
+            small: true,
+            medium: false,
+            large: false
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Display Extra Small"
+        args={{
+            extraSmall: true,
+            small: false,
+            medium: false,
+            large: false
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>
