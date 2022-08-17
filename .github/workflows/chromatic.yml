@@ -13,9 +13,7 @@ jobs:
   chromatic-deployment:
     # Operating System
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./web/surfing
+        
     # Job steps
     steps:
       - uses: actions/checkout@v1
@@ -28,3 +26,4 @@ jobs:
         with:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: ./web/surfing
