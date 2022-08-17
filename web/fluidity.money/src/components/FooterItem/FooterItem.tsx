@@ -1,10 +1,11 @@
+import { LinkButton } from "components/Button";
 import React from "react";
 import styles from "./FooterItem.module.scss";
 
 interface IItem {
   title: string;
   src: string;
-  type: string;
+  type: "internal" | "external";
 }
 
 interface IFooterItemProps {
@@ -17,8 +18,9 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
     <ul>
       {items.map((item) => (
         <li key={item.title}>
-          <a href={item.src}>{item.title}</a>
-          {item.type === "arrow" ? <div>{">"}</div> : <div>{"[>]"}</div>}
+          <LinkButton size="large" type={item.type}>
+            {item.title}
+          </LinkButton>
         </li>
       ))}
     </ul>
