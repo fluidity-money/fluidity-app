@@ -58,7 +58,15 @@ const SearchModal = ({ closeModal }: ISearchModalProps) => {
           }}
           value={searchInput}
         />
-        <TextButton colour="black">CLEAR</TextButton>
+        <TextButton
+          onClick={() => {
+            setSearchInput("");
+            resetLists();
+          }}
+          colour="black"
+        >
+          CLEAR
+        </TextButton>
       </div>
       <div className={styles.titles}>
         <h4>{`${searchProjects.length} Projects`}</h4>
