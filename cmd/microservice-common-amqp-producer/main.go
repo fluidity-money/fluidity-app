@@ -23,12 +23,12 @@ func main() {
 
 	var buf bytes.Buffer
 
-L:
+LineReading:
 	for {
 		line, isPrefix, err := reader.ReadLine()
 
 		if err == io.EOF {
-			break L
+			break LineReading
 		}
 
 		if err != nil {
@@ -49,7 +49,7 @@ L:
 			line, isPrefix, err = reader.ReadLine()
 
 			if err == io.EOF {
-				break L
+				break LineReading
 			}
 
 			if err != nil {
