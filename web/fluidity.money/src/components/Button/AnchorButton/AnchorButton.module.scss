@@ -1,0 +1,45 @@
+@import "../../../styles/config.scss";
+
+.button {
+  //   display: inline-block;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  gap: 8px;
+  width: max-content;
+  font-weight: 400;
+  border-radius: 4px;
+  .icon {
+    display: inline-block;
+  }
+  .text {
+    display: inline-block;
+    font-size: 14px;
+  }
+  &:hover {
+    background-color: $fluidWhite;
+
+    .icon {
+      -webkit-filter: grayscale(1) invert(1);
+      filter: grayscale(1) invert(1);
+    }
+    .text {
+      color: $fluidBlack;
+    }
+  }
+  &:active {
+    background-color: transparent;
+    border: solid 1px $fluidWhite;
+    padding: 3px;
+    .icon {
+      -webkit-filter: grayscale(0) invert(0);
+      filter: grayscale(0) invert(0);
+    }
+    .text {
+      color: $fluidWhite;
+    }
+  }
+}

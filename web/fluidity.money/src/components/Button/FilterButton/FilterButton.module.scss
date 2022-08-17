@@ -1,0 +1,38 @@
+@import "../../../styles/config.scss";
+
+.option {
+  color: $textGrey;
+  margin: 5px;
+  // padding: 10px 20px 10px 20px;
+  padding: 8px 16px;
+  gap: 10px;
+  border: 1px solid $textGrey;
+  border-radius: 30px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $fluidWhite;
+    color: $fluidWhite;
+  }
+  &:focus {
+    border: 2px solid $textGrey;
+    padding: 7px 15px;
+  }
+
+  &:active {
+    border: 2px solid $textGrey;
+    padding: 7px 15px;
+  }
+
+  &Selected {
+    @extend .option;
+    border: none;
+    background-color: $fluidWhite;
+    color: $fluidBlack;
+    &:hover {
+      background-color: $fluidWhite;
+      color: $fluidBlack;
+      opacity: 0.8;
+    }
+  }
+}

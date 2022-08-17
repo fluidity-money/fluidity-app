@@ -1,3 +1,4 @@
+import { AnchorButton } from "components/Button";
 import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./Navigation.module.scss";
@@ -24,9 +25,9 @@ const Navigation = ({ pageLocations, page }: INavigation) => {
     <div className={styles.container}>
       {pageLocations.map((location) => (
         <h4>
-          <Link
-            to={`/${page}#${location.replace(/\s/g, "")}`}
-          >{`↓ ${location.toUpperCase()}`}</Link>
+          <Link to={`/${page}#${location.replace(/\s/g, "")}`}>
+            {<AnchorButton>{location.toUpperCase()}</AnchorButton>}
+          </Link>
         </h4>
       ))}
     </div>
