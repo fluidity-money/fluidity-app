@@ -1,3 +1,4 @@
+import ContinuousCarousel from "components/ContinuousCarousel";
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ManualCarousel from "../../components/ManualCarousel";
@@ -18,35 +19,82 @@ const Fluniversity = () => {
     }
   }, [location]);
   return (
-    <div className={styles.container} id="fluniversity">
-      <div>FLUNIVERSITY</div>
-      <ManualCarousel>
-        {items.map((item) => (
-          <div
-            style={{
-              border: "1px solid white",
-              height: 600,
-              minWidth: 600,
-              margin: 20,
-              marginBottom: 50,
-            }}
-          >
-            {item.item}
-          </div>
-        ))}
-      </ManualCarousel>
-    </div>
+    <>
+      <ContinuousCarousel direction={"right"}>
+        <div className={styles.carouselText}>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+          <h2>FLUNIVERSITY</h2>
+        </div>
+      </ContinuousCarousel>
+        <div className={styles.container} id="fluniversity">
+          <ManualCarousel>
+            {items.map((item) => (
+              <div className={styles.fluniversityCard}>
+                <img src={item.img}/>
+                <h3>{item.title}</h3>
+                <p>
+                  {item.desc}
+                </p>
+                <span>{item.time} mins read</span>
+                <span><a href={item.link}>FLUNIVERSITY <i>*</i></a></span>
+              </div>
+            ))}
+          </ManualCarousel>
+        </div>
+     </>
   );
 };
 
 export default Fluniversity;
 
 const items = [
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
+    yield through spending and how the protocol protects itself against cheaters...`,
+    time: "8",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
+    yield through spending and how the protocol protects itself against cheaters...`,
+    time: "8",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
+    yield through spending and how the protocol protects itself against cheaters...`,
+    time: "8",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
+    yield through spending and how the protocol protects itself against cheaters...`,
+    time: "8",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
+    yield through spending and how the protocol protects itself against cheaters...`,
+    time: "8",
+    link: "",
+  },
 ];

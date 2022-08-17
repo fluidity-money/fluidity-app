@@ -11,7 +11,7 @@ const Articles = () => {
             desc: `In our previous educational posts, we have outlined the basic economics of
             a fluid Asset, from preventing cyclical transaction attacks to how the protocol distrubutes yield
             through utility mininig`, 
-            info: "Test"
+            info: "8 min read ARTICLE"
          },
          {
             id: 1, 
@@ -41,7 +41,7 @@ const Articles = () => {
    }
   return (
     <div className={styles.container}>
-      <ArticleCard />
+      <ArticleCard id={0} img={"https://picsum.photos/200/300/?blur"} title={arr.articles[0].title} desc={arr.articles[0].desc} info={arr.articles[0].info} />
       <ArticleList {...arr} />
     </div>
   );

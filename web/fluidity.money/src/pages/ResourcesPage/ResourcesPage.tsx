@@ -1,5 +1,6 @@
 import React from "react";
 import Navigation from "../../components/Navigation";
+import ResourcesPageTitle from "screens/ResourcesPageTitle";
 import Articles from "../../screens/Articles";
 import Contact from "../../screens/Contact";
 import Demo from "../../screens/Demo";
@@ -17,12 +18,9 @@ const ResourcesPage = () => {
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
         <Navigation page={"resources"} pageLocations={pageLocations} />
-        <Hero />
-        <Articles />
+        <ResourcesPageTitle />
         <Tweets />
-        <Introducing />
         <Fluniversity />
-        <Contact />
         <Whitepapers />
         <Docs />
         <Demo />

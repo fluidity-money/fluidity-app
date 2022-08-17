@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { ArticleType } from "./ArticleLists";
 
 import { TextButton } from "../../Button";

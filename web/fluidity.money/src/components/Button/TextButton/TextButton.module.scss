@@ -10,6 +10,7 @@ button {
 
 .white {
   background-color: $fluidWhite;
+  border: 1px solid $fluidBlack;
   color: $fluidBlack;
   padding: 10px;
   width: fit-content;
@@ -21,6 +22,7 @@ button {
 
 .black {
   background-color: $fluidBlack;
+  border: 1px solid $fluidWhite;
   color: $fluidWhite;
   padding: 10px;
   width: fit-content;

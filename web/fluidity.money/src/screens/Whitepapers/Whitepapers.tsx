@@ -1,3 +1,4 @@
+import ContinuousCarousel from "components/ContinuousCarousel";
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "./Whitepapers.module.scss";
@@ -17,9 +18,31 @@ const Whitepapers = () => {
     }
   }, [location]);
   return (
-    <div className={styles.container} id="whitepapers">
-      Whitepapers
-    </div>
+    <>
+      <ContinuousCarousel direction={"right"}>
+        <div className={styles.carouselText}>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+          <h2>WHITEPAPERS</h2>
+        </div>
+      </ContinuousCarousel>
+      <div className={styles.container} id="whitepapers">
+        <div>
+          <img src="https://picsum.photos/200/300/?blur"/>
+          <h3>Fluidity Money: Economics and Monetary Policy</h3>
+          <p>24th June 2022 WHITEPAPER</p>
+        </div>
+      </div>
+    </>
+    
   );
 };
 
