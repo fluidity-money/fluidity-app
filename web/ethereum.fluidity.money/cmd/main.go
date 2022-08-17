@@ -29,18 +29,19 @@ const (
 
 func main() {
 	var (
-		keys          = mustParseKeyListFromEnv(EnvWorkerKeyList)
+		keys   = mustParseKeyListFromEnv(EnvWorkerKeyList)
+		tokens = mustParseTokenNamesFromEnv(EnvTokenList)
+
 		chainidString = util.GetEnvOrFatal(EnvChainId)
-		tokens        = mustParseTokenNamesFromEnv(EnvTokenList)
 	)
 
 	chainid, err := misc.BigIntFromString(chainidString)
 
 	if err != nil {
-	   log.Fatal(func (k *log.Log) {
-	       k.Message = "Failed to parse chainid from env!"
-	       k.Payload = err
-	   })
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to parse chainid from env!"
+			k.Payload = err
+		})
 	}
 
 	updateMessagesEthereum := make(chan interface{})

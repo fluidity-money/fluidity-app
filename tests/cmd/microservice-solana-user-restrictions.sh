@@ -17,4 +17,3 @@ EOF
 microservice-common-amqp-producer <<EOF
 
 EOF
-
