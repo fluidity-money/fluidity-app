@@ -1,4 +1,4 @@
-microservice-track-winners
+*.out
+lint
 docker
 test
-lint

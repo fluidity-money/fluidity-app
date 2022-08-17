@@ -1,3 +1,4 @@
+*.out
+lint
 docker
 test
-lint
