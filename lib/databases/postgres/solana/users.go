@@ -5,10 +5,9 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
-func GetUserMintLimit(address string) misc.BigInt {
+func GetUserMintLimit(address string) float64 {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
@@ -34,7 +33,7 @@ func GetUserMintLimit(address string) misc.BigInt {
 		})
 	}
 
-	var amount misc.BigInt
+	var amount float64
 
 	if err := row.Scan(&amount); err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -52,18 +51,33 @@ func GetUserMintLimit(address string) misc.BigInt {
 	return amount
 }
 
-func ReduceMintUserLimit(address string, amount misc.BigInt) {
+func ReduceMintUserLimit(address string, amount float64) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
-		`UPDATE %s
-		SET amount_minted = amount_minted - $1
-		WHERE address = $2`,
+		`INSERT INTO solana_users (
+			address,
+			amount_minted,
+			last_updated
+		)
+
+		VALUES (
+			$1,
+			0,
+			NOW()
+		)
+
+		ON CONFLICT (address)
+		DO UPDATE SET amount_minted = solana_users.amount_minted - $2;`,
 
 		TableUsers,
 	)
 
-	_, err := databaseClient.Exec(statementText, amount, address)
+	_, err := databaseClient.Exec(
+		statementText,
+		address,
+		amount,
+	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -80,18 +94,33 @@ func ReduceMintUserLimit(address string, amount misc.BigInt) {
 	}
 }
 
-func AddMintUserLimit(address string, amount misc.BigInt) {
+func AddMintUserLimit(address string, amount float64) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
-		`UPDATE %s
-		SET amount_minted = amount_minted + $1
-		WHERE address = $2`,
+		`INSERT INTO solana_users (
+			address,
+			amount_minted,
+			last_updated
+		)
+
+		VALUES (
+			$1,
+			$2,
+			NOW()
+		)
+
+		ON CONFLICT (address)
+		DO UPDATE SET amount_minted = solana_users.amount_minted + $2;`,
 
 		TableUsers,
 	)
 
-	_, err := databaseClient.Exec(statementText, amount, address)
+	_, err := databaseClient.Exec(
+		statementText,
+		address,
+		amount,
+	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {

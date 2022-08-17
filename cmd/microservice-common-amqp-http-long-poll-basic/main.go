@@ -15,7 +15,7 @@ import (
 
 // EnvLogins, separated by , with username:password to indicate the
 // login details for BASIC auth for the long poll
-const EnvLogins = `FLU_LOGINS`
+const EnvLogins = `FLU_LONG_POLL_LOGINS`
 
 func rejectWithAuthenticateHeader(w http.ResponseWriter) {
 	w.Header().Set("WWW-Authenticate", "Basic")
