@@ -6,6 +6,8 @@ import {
   Observable,
 } from "relay-runtime";
 
+import { createClient } from "graphql-ws";
+
 async function fetchGraphQL(text: any, variables: any) {
   // Fetch data from GraphQL API:
   const response = await fetch("https://api.github.com/graphql", {
@@ -29,29 +31,27 @@ async function fetchRelay(params: any, variables: any) {
   return fetchGraphQL(params.text, variables);
 }
 
-// import { createClient } from 'graphql-ws';
+const wsClient = createClient({
+  url: "ws://localhost:3000",
+});
 
-// const wsClient = createClient({
-//   url:'ws://localhost:3000',
-// });
+const subscribe = (operation: any, variables: any) => {
+  return Observable.create((sink) => {
+    return wsClient.subscribe(
+      {
+        operationName: operation.name,
+        query: operation.text,
+        variables,
+      },
+      sink
+    );
+  });
+};
 
-// const subscribe = (operation: any, variables: any) => {
-//   return Observable.create((sink) => {
-//     return wsClient.subscribe(
-//       {
-//         operationName: operation.name,
-//         query: operation.text,
-//         variables,
-//       },
-//       sink,
-//     );
-//   });
-// }
+const network = Network.create(fetchRelay, subscribe as any);
 
-// const network = Network.create(fetchRelay, subscribe as any);
-
-// // Export a singleton instance of Relay Environment configured with our network function:
-// export default new Environment({
-//     network,
-//     store: new Store(new RecordSource()),
-//   });
+// Export a singleton instance of Relay Environment configured with our network function:
+export default new Environment({
+  network,
+  store: new Store(new RecordSource()),
+});
