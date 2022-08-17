@@ -6,6 +6,9 @@ contracts
 automation
 
 **/*.o
+**/*.out
+*.out
+*.o
 
 lib/build-lib
 common/build-common

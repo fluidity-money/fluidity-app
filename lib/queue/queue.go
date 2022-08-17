@@ -109,6 +109,7 @@ func GetMessages(topic string, f func(message Message)) {
 		var (
 			deliveryTag = message.DeliveryTag
 			body        = message.Body
+			routingKey  = message.RoutingKey
 		)
 
 		log.Debug(func(k *log.Log) {
@@ -146,7 +147,7 @@ func GetMessages(topic string, f func(message Message)) {
 		}
 
 		f(Message{
-			Topic:   topic,
+			Topic:   routingKey,
 			Content: bodyBuf,
 		})
 

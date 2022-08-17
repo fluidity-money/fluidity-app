@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-application-server/microservice-solana-application-server.o .
+COPY --from=build /usr/local/src/fluidity/cmd/microservice-solana-application-server/microservice-solana-application-server.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-solana-application-server.o" \
+	"./microservice-solana-application-server.out" \
 ]
 
