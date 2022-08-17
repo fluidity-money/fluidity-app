@@ -1,4 +1,5 @@
 import React from "react";
+import Articles from "screens/Articles";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
 import HowItWorks from "../../screens/HowItWorks";
@@ -20,6 +21,7 @@ const LandingPage = () => {
         <UseCases />
         <SponsorsPartners />
         <Projects />
+        <Articles />
         <Resources />
         <Demo />
         <Footer />
