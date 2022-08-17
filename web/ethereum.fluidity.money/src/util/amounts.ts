@@ -114,6 +114,9 @@ export const shortBalance = (balance: string) =>
 export const shorthandAmountFormatter = (value: string, decimals: number): string => {
 
   let num: number = parseFloat(value)
+  if(num < 1) {
+    return value;
+  }
   const lookup = [
     { value: 1, symbol: "" },
     { value: 1e3, symbol: "K" },
