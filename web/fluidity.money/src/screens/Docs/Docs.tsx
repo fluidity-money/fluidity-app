@@ -1,3 +1,4 @@
+import ContinuousCarousel from "components/ContinuousCarousel";
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { TextButton } from "../../components/Button";
@@ -19,36 +20,69 @@ const Docs = () => {
     }
   }, [location]);
   return (
-    <div className={styles.container} id="documentation">
-      <div>DOCUMENTATION</div>
-      <TextButton colour="coloured">ALL DOCS</TextButton>
-      <ManualCarousel>
-        {items.map((item) => (
-          <div
-            style={{
-              border: "1px solid white",
-              height: 400,
-              minWidth: 500,
-              margin: 20,
-              marginBottom: 50,
-            }}
-          >
-            {item.item}
-          </div>
-        ))}
-      </ManualCarousel>
-    </div>
+    <>
+      <ContinuousCarousel direction={"right"}>
+        <div className={styles.carouselText}>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+          <h2>DOCUMENTATION</h2>
+        </div>
+      </ContinuousCarousel>
+      <div className={styles.container} id="documentation">
+        <ManualCarousel>
+              {items.map((item) => (
+                <div className={styles.docsCard}>
+                  <img src={item.img}/>
+                  <h3>{item.title}</h3>
+                  <a href={item.link}>DOCS <i>*</i></a>
+                </div>
+              ))}
+        </ManualCarousel>    
+      </div>
+      <div className={styles.customInput}>
+         {/*To do... Refactor this input into a component*/}
+          <p>
+            EMAIL
+          </p>
+          <input type="text" placeholder="elon@email.com"/>
+          <TextButton colour="black">LAUNCH FLUIDITY</TextButton>
+      </div>
+    </>
   );
 };
 
 export default Docs;
 
 const items = [
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
-  { item: "🦍" },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+    link: "",
+  },
+  { 
+    img: "https://picsum.photos/200/300/?blur",
+    link: "",
+  },
 ];
