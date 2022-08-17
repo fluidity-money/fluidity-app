@@ -15,12 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./web/surfing
+        working-directory: web/surfing
+        
     # Job steps
     steps:
       - uses: actions/checkout@v1
       - name: Install dependencies
-        run: npm install
+        run: npm install --include dev
         # 👇 Adds Chromatic as a step in the workflow
       - name: Publish to Chromatic
         uses: chromaui/action@v1
@@ -28,3 +29,4 @@ jobs:
         with:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: web/surfing
