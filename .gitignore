@@ -13,6 +13,7 @@ cmd/*/test
 cmd/*/docker
 cmd/*/lint
 cmd/*/*.o
+cmd/*/*.out
 
 database/build/*
 database/build

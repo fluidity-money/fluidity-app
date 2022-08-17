@@ -4,5 +4,18 @@ SERVICES:
       DOCKER_IMAGE: fluidity.money-frontend
       DOCKERFILE_PATH: ./web/fluidity.money
       TARGET_GROUP: flu-dev-fluidity-fe-tg
-      # DOCKER_ARGS:
-      #   REACT_DOCKER_ARGS: https://devnet.solana.fluidity.money:8081
+
+  - BACKEND:
+      SERVICE_NAME: fluidity-money-backend
+      DOCKER_IMAGE: fluidity.money-backend
+      DOCKERFILE_PATH: ./web/fluidity.money-old
+      TARGET_GROUP: flu-dev-fluidity-be-tg
+
+      ENV_FLU_WORKER_ID: fluidity.money
+      ENV_FLU_LANDING_SUCCESS_URL: https://fluidity.money
+      ENV_FLU_WEB_LISTEN_ADDR: :80
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
+      SECRET_FLU_TIMESCALE_URI: /fluidity/timescale/uri
+      SECRET_FLU_POSTGRES_URI: /fluidity/ropsten/data/postgres/uri
+
+

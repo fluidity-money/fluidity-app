@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/connector-ethereum-logs-amqp/connector-ethereum-logs-amqp.o .
+COPY --from=build /usr/local/src/fluidity/cmd/connector-ethereum-logs-amqp/connector-ethereum-logs-amqp.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-ethereum-logs-amqp.o" \
+	"./connector-ethereum-logs-amqp.out" \
 ]
 

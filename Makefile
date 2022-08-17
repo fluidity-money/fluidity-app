@@ -10,13 +10,22 @@ AUTOMATION_DIR := automation
 	clean \
 	semgrep \
 	test \
-	docker-test
+	docker-test \
+	install
 
-all: docker-build docker-build-web docker-runtime docker-runtime-web docker-node
+all: \
+	docker-build \
+	docker-build-web \
+	docker-runtime \
+	docker-runtime-web \
+	docker-node
 
 build:
 	@cd lib && ${MAKE} build-lib
 	@cd common && ${MAKE} build-common
+
+install:
+	@cd ${GO_CMD_DIR} && ${MAKE} install
 
 docker-root: go.sum go.mod Dockerfile.build-root
 	@${DOCKER_BUILD} \
@@ -99,7 +108,7 @@ semgrep:
 	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
 test: semgrep
-	@./run-tests.sh
+	@./tests-golang.sh
 
 lint: semgrep
 	@${GO_FMT} ./...
