@@ -1,5 +1,6 @@
+import TabButton from "components/Button/TabButton";
 import React from "react";
-import { TextButton } from "../../components/Button";
+import { GeneralButton, TextButton } from "../../components/Button";
 import ContinuousCarousel from "../../components/ContinuousCarousel";
 import FooterItem from "../../components/FooterItem";
 import Socials from "../../components/Socials";
@@ -27,8 +28,22 @@ const Footer = () => {
         </div>
         <div className={styles.communication}>
           <div className={styles.buttons}>
-            <TextButton colour={"white"}>LAUNCH FLUIDITY</TextButton>
-            <TextButton colour={"black"}>LET'S CHAT</TextButton>
+            <GeneralButton
+              handleClick={() => {}}
+              version={"primary"}
+              type={"text"}
+              size={"large"}
+            >
+              LAUNCH FLUIDITY
+            </GeneralButton>
+            <GeneralButton
+              handleClick={() => {}}
+              version={"secondary"}
+              type={"text"}
+              size={"large"}
+            >
+              LET'S CHAT
+            </GeneralButton>
           </div>
           <div className={styles.legal}>
             <h6>Terms</h6>

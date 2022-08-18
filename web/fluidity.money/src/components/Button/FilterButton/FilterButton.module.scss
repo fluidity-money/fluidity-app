@@ -20,8 +20,10 @@
   }
 
   &:active {
-    border: 2px solid $textGrey;
+    border: 2px solid $fluidWhite;
+    background-color: $fluidWhite;
     padding: 7px 15px;
+    color: $fluidBlack;
   }
 
   &Selected {

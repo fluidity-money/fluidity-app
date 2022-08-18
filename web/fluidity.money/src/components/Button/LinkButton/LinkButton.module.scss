@@ -22,7 +22,7 @@
     }
   }
 
-  &:active {
+  &:focus {
     background-color: transparent;
     border: solid 2px $textGrey;
     border-radius: 2px;

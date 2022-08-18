@@ -6,7 +6,7 @@ interface IGeneralButtonProps {
   version: "primary" | "secondary";
   type: "text" | "icon before" | "icon after" | "icon only";
   size: "small" | "medium" | "large";
-  onClick?: () => void;
+  handleClick: () => void;
 }
 
 const GeneralButton = ({
@@ -14,32 +14,32 @@ const GeneralButton = ({
   version,
   type,
   size,
-  onClick,
+  handleClick,
 }: IGeneralButtonProps) => {
   return (
     <>
       {version === "primary" && type === "text" ? (
         <button
-          onClick={onClick}
+          onClick={handleClick}
           className={`${styles.primary} ${styles[size]}`}
         >
           {children.toLocaleUpperCase()}
         </button>
       ) : version === "primary" && type === "icon before" ? (
-        <button onClick={onClick} className={styles.primary}>
+        <button onClick={handleClick} className={styles.primary}>
           {children.toLocaleUpperCase()}
         </button>
       ) : version === "primary" && type === "icon after" ? (
-        <button onClick={onClick} className={styles.primary}>
+        <button onClick={handleClick} className={styles.primary}>
           {children.toLocaleUpperCase()}
         </button>
       ) : type === "icon only" ? (
-        <button onClick={onClick} className={styles.iconOnly}>
+        <button onClick={handleClick} className={styles.iconOnly}>
           {children}
         </button>
       ) : (
         <button
-          onClick={onClick}
+          onClick={handleClick}
           className={`${styles.secondary} ${styles[size]}`}
         >
           {children.toLocaleUpperCase()}

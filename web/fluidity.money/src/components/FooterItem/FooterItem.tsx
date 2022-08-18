@@ -18,7 +18,7 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
     <ul>
       {items.map((item) => (
         <li key={item.title}>
-          <LinkButton size="large" type={item.type}>
+          <LinkButton handleClick={() => {}} size="large" type={item.type}>
             {item.title}
           </LinkButton>
         </li>

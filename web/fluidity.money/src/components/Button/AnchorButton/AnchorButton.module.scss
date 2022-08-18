@@ -30,7 +30,7 @@
       color: $fluidBlack;
     }
   }
-  &:active {
+  &:focus {
     background-color: transparent;
     border: solid 1px $fluidWhite;
     padding: 3px;

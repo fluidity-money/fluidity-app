@@ -5,11 +5,17 @@ interface ILinkButtonProps {
   children: string;
   size: "small" | "medium" | "large";
   type: "internal" | "external";
+  handleClick: () => void;
 }
 
-const LinkButton = ({ children, size, type }: ILinkButtonProps) => {
+const LinkButton = ({
+  children,
+  size,
+  type,
+  handleClick,
+}: ILinkButtonProps) => {
   return (
-    <button className={styles.button}>
+    <button className={styles.button} onClick={handleClick}>
       <div className={`${styles.text} ${styles[size]}`}>
         {children.toUpperCase()}
       </div>
