@@ -1,0 +1,13 @@
+DOCKER_IMAGE: microservice-solana-application-server
+DOCKERFILE_PATH: ./cmd/microservice-solana-application-server
+SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
+SECRET_FLU_SOLANA_SABER_RPC_URL: /fluidity/solana/saber_rpc_url
+ENV_FLU_SOLANA_SABER_SWAP_PROGRAM_ID: saber:SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ
+ENV_FLU_SOLANA_ORCA_PROGRAM_ID: orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE # ??
+ENV_FLU_SOLANA_RAYDIUM_PROGRAM_ID: 4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R # ??
+ENV_FLU_SOLANA_TOKEN_LOOKUPS: "fUSDT:USDT,fUSDC:USDC,fUXD:UXD"
+
+SERVICES:
+  - APPSERVER:
+      SERVICE_NAME: microservice-solana-application-server
+      ENV_FLU_WORKER_ID: solana-staging-microservice-solana-application-server
