@@ -188,6 +188,8 @@ const ApiStateHandler = ({ state }: { state: ApiState }) => {
   );
   
   useEffect(() => {
+    if (!walletAddress) return;
+
     apiPOSTBody("/my-mint-limit", {
       address: walletAddress,
     }).then(setMintLimit)
