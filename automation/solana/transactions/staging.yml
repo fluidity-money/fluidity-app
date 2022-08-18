@@ -1,0 +1,11 @@
+
+
+SERVICES:
+  - TRANSACTIONS:
+      SERVICE_NAME: microservice-solana-transactions
+      DOCKERFILE_PATH: ./cmd/microservice-solana-transactions
+      TASK_MIN_COUNT: 10
+      SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
+      ENV_FLU_WORKER_ID: solana-staging-microservice-solana-transactions
+      ENV_FLU_SOLANA_SOL_PYTH_PUBKEY: H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG
+      ***ENV_FLU_SOLANA_APPLICATIONS_LIST: "spl:TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA,saber:SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ,orca:9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP"
