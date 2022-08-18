@@ -23,10 +23,10 @@ all: frontend backend
 
 frontend: html css
 
-backend: ${REPO}.o
+backend: ${REPO}.out
 
-${REPO}.o: ${SRC_GO}
-	@cd ${SRC_GO_DIR} && ${GO_BUILD} -o ../${REPO}.o
+${REPO}.out: ${SRC_GO}
+	@cd ${SRC_GO_DIR} && ${GO_BUILD} -o ../${REPO}.out
 
 html: ${OUT_HTML}
 

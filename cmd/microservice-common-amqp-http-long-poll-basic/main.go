@@ -129,8 +129,10 @@ func main() {
 
 		wFlusher := w.(http.Flusher)
 
+		var buf bytes.Buffer
+
 		for message := range messages {
-			_, err := w.Write(message)
+			_, err := buf.Write(message)
 
 			if err != nil {
 				log.App(func(k *log.Log) {
@@ -145,7 +147,26 @@ func main() {
 				return
 			}
 
-			wFlusher.Flush()
+			halfAMetabyteUsed := buf.Len() <= 512
+
+			if halfAMetabyteUsed {
+				_, err := buf.WriteTo(w)
+
+				if err != nil {
+					log.App(func(k *log.Log) {
+						k.Format(
+							"Failed to send the write buffer to IP %v",
+							ipAddress,
+						)
+
+						k.Payload = err
+					})
+
+					return
+				}
+
+				wFlusher.Flush()
+			}
 		}
 	})
 

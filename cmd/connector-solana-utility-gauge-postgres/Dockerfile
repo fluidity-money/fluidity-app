@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-utility-gauge-postgres/connector-solana-utility-gauge-postgres.o .
+COPY --from=build /usr/local/src/fluidity/cmd/connector-solana-utility-gauge-postgres/connector-solana-utility-gauge-postgres.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./connector-solana-utility-gauge-postgres.o" \
+	"./connector-solana-utility-gauge-postgres.out" \
 ]
 

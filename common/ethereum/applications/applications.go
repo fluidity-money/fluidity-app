@@ -7,11 +7,12 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -29,6 +30,7 @@ const (
 	ApplicationDodoV2
 	ApplicationCurve
 	ApplicationMultichain
+	ApplicationXyFinance
 )
 
 const (
@@ -41,6 +43,7 @@ const (
 	DodoV2DODOSwapLogTopic       = "0xc2c0245e056d5fb095f04cd6373bc770802ebd1e6c918eb78fdef843cdb37b0f"
 	CurveTokenExchangeLogTopic   = "0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140"
 	MultichainLogAnySwapOut      = "0x97116cf6cd4f6412bb47914d6db18da9e16ab2142f543b86e207c24fbd16b23a"
+	XyFinanceSourceChainSwap     = "0xe1e8548aad4bfb08650f3a6c68acd84675a69fb72d77b1f744b8a643c406b608"
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -83,13 +86,13 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			fluidTokenContract,
 			tokenDecimals,
 		)
-  case ApplicationDodoV2:
+	case ApplicationDodoV2:
 		return dodo.GetDodoV2Fees(
-      transfer,
-      client,
-      fluidTokenContract,
-      tokenDecimals,
-    )
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
 	case ApplicationCurve:
 		return curve.GetCurveSwapFees(
 			transfer,
@@ -99,6 +102,13 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 	case ApplicationMultichain:
 		return multichain.GetMultichainAnySwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+	case ApplicationXyFinance:
+		return xy_finance.GetXyFinanceSwapFees(
 			transfer,
 			client,
 			fluidTokenContract,
@@ -142,12 +152,16 @@ func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) 
 	case ApplicationDodoV2:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and the rest to the Dodo Pool
-    return transaction.From, logAddress, nil
+		return transaction.From, logAddress, nil
 	case ApplicationCurve:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationMultichain:
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationXyFinance:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
@@ -182,6 +196,8 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 		return ApplicationCurve
 	case MultichainLogAnySwapOut:
 		return ApplicationMultichain
+	case XyFinanceSourceChainSwap:
+		return ApplicationXyFinance
 	default:
 		return ApplicationNone
 	}

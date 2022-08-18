@@ -39,6 +39,10 @@ export type Routes = {
 
   // Transaction History API Route
   "/my-history": WebsocketUserAction[],
+
+  // Max USD minting restriction API Route
+  "/my-mint-limit": number,
+
 }
 
 export type WebsocketWinner = {
