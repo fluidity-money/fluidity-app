@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TextButton } from "../../components/Button";
+import { GeneralButton } from "../../components/Button";
 import styles from "./HowItWorks.module.scss";
 
 const HowItWorks = () => {
@@ -41,7 +41,14 @@ const HowItWorks = () => {
           >
             The user is incentivised through governance.
           </p>
-          <TextButton colour="white">MORE ON HOW IT WORKS</TextButton>
+          <GeneralButton
+            version={"primary"}
+            type={"text"}
+            size={"medium"}
+            handleClick={() => {}}
+          >
+            MORE ON HOW IT WORKS
+          </GeneralButton>
         </div>
         <div className={styles.right}>
           <div>{currentImage}</div>

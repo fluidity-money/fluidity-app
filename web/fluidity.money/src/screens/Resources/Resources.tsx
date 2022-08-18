@@ -1,5 +1,5 @@
 import React from "react";
-import { TextButton } from "../../components/Button";
+import { LinkButton } from "../../components/Button";
 import Socials from "../../components/Socials";
 import styles from "./Resources.module.scss";
 
@@ -17,7 +17,9 @@ const Resources = () => {
       <div>RESOURCES</div>
       <div style={{ display: "flex" }}>
         <Socials />
-        <TextButton colour="coloured">MORE RESOURCES</TextButton>
+        <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
+          EXPLORE ALL RESOURCES
+        </LinkButton>
       </div>
       <div>large Image with title and text top left</div>
       <div>
