@@ -11,10 +11,35 @@ import (
 )
 
 func generateRandomIntegers(amount, min, max int) []int {
+	if amount > max - min + 1 {
+		log.Fatal(func (k *log.Log) {
+		   k.Format(
+			   "Can't generate %d non-repeating integers between %d and %d!",
+			   amount,
+			   min,
+			   max,
+		   )
+		})
+	}
+
 	numbers := make([]int, amount)
 
 	for i := 0; i < amount; i++ {
-		numbers[i] = min + rand.Intn(max)
+		for {
+			numbers[i] = min + rand.Intn(max)
+
+			dup := false
+
+			for j := 0; j < i; j++ {
+				if numbers[i] == numbers[j] {
+					dup = true
+				}
+			}
+
+			if !dup {
+				break
+			}
+		}
 	}
 
 	return numbers

@@ -8,7 +8,6 @@ import { useSigner } from "util/hooks";
 import _ from "lodash";
 import ToggleButton from "components/Button/ToggleButton";
 import LineGraph from "components/Charts/LineChart";
-import UnclaimedRewardsbutton from "components/Button/UnclaimedRewardsButton";
 
 const CurrencyBreakdown = () => {
   // Accumulates token names
@@ -74,15 +73,6 @@ const CurrencyBreakdown = () => {
           amount={token.amount}
           key={token.type + index}
         />
-        <hr
-          style={{
-            color: "#828a90",
-            width: "100%",
-            margin: 4,
-            padding: 0,
-            minWidth: 155,
-          }}
-        />
       </div>
     );
   });
@@ -141,22 +131,6 @@ const CurrencyBreakdown = () => {
         Account Overview
       </div>
 
-      <div className="yield-graph">
-        <div className={`white-primary-text total-yield-title`}>
-          Total Fluid Yield Rewarded: USD 152.21
-        </div>
-        <div className="grey-primary-text" style={{ fontSize: 8 }}>
-          *Calculations based upon user on-chain history and simulated expected
-          reward averages
-        </div>
-        <div className="line-chart-container">{LineChart}</div>
-
-        <UnclaimedRewardsbutton />
-      </div>
-
-      <div className="wallet-overview">
-        <div className={`white-primary-text`}>Wallet Overview</div>
-
         <div className="overview-items">
           <div className="chart-items">
             <div className="doughnut-container">
@@ -168,12 +142,12 @@ const CurrencyBreakdown = () => {
               </div>
               {fluid ? DonutFluid : DonutRegular}
             </div>
-            <div className="toggle-container">
-              <div className={fluid ? "grey-primary-text" : "selected-text"}>
+            <div className="toggle-container margin-top-10">
+              <div className={`${fluid ? "grey-primary-text" : "selected-text "} margin-right-10`}>
                 Regular
               </div>
               <ToggleButton toggled={fluid} toggle={setFluid} />
-              <div className={fluid ? "selected-text" : "grey-primary-text"}>
+              <div className={`${fluid ? "selected-text" : "grey-primary-text"} margin-left-10`}>
                 Fluid
               </div>
             </div>
@@ -181,7 +155,6 @@ const CurrencyBreakdown = () => {
           <div className="currency-list">{renderedCurrencyList}</div>
         </div>
       </div>
-    </div>
   );
 };
 

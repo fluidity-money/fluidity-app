@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "react-relay": "^14.1.0"
+  },
+  "devDependencies": {
+    "graphqurl": "^1.0.1"
+  }
+}

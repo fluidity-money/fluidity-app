@@ -115,7 +115,13 @@ func getPrizePool(solanaClient *solanaRpc.Client, fluidityPubkey, fluidMintPubke
 	prizePool := int64(tvl - mintSupply)
 
 	log.Debug(func(k *log.Log) {
-		k.Format("Got TVL %d, supply %d, unscaled prize pool %d, for pubkey %v", tvl, mintSupply, prizePool, fluidMintPubkey.String())
+		k.Format(
+			"Got TVL %d, supply %d, unscaled prize pool %d, for pubkey %v",
+			tvl,
+			mintSupply,
+			prizePool,
+			fluidMintPubkey.String(),
+		)
 	})
 
 	// return the whole amount in the unit of that token

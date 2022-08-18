@@ -62,14 +62,20 @@ const (
 	WorkerPoolAmount = 30
 )
 
+// gets an address from the env, dying if not set
+func mustAddressFromEnv(env string) ethCommon.Address {
+	addressString := util.GetEnvOrFatal(env)
+
+	address := ethCommon.HexToAddress(addressString)
+
+	return address
+}
+
 func main() {
 	var (
-		gethAddress                 = util.GetEnvOrFatal(EnvEthereumHttpAddress)
-		tokensList_                 = util.GetEnvOrFatal(EnvTokensList)
-		tokenBackend                = os.Getenv(EnvTokenBackend)
-		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
-		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
-		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
+		gethAddress  = util.GetEnvOrFatal(EnvEthereumHttpAddress)
+		tokensList_  = util.GetEnvOrFatal(EnvTokensList)
+		tokenBackend = os.Getenv(EnvTokenBackend)
 	)
 
 	var (
@@ -125,12 +131,12 @@ func main() {
 	}
 
 	if isCompound {
-		uniswapAnchoredViewAddressEth = ethCommon.HexToAddress(uniswapAnchoredViewAddress_)
+		uniswapAnchoredViewAddressEth = mustAddressFromEnv(EnvUniswapAnchoredViewAddress)
 	}
 
 	if isAave {
-		aaveAddressProviderAddressEth = ethCommon.HexToAddress(aaveAddressProviderAddress_)
-		usdTokenAddressEth = ethCommon.HexToAddress(usdTokenAddress_)
+		aaveAddressProviderAddressEth = mustAddressFromEnv(EnvAaveAddressProviderAddress)
+		usdTokenAddressEth            = mustAddressFromEnv(EnvUsdTokenAddress)
 	}
 
 	var (

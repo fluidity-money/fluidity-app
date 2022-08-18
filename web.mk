@@ -18,7 +18,7 @@ FRONTEND_BUILD := build-frontend
 
 BACKEND_SRC_GO := $(shell find ${BACKEND_SRC_DIR} -name '*.go')
 
-BACKEND_BUILD := ${REPO}.o
+BACKEND_BUILD := ${REPO}.out
 
 .PHONY: \
 	clean-build \
@@ -34,8 +34,8 @@ BACKEND_BUILD := ${REPO}.o
 	watch-js \
 	watch
 
-${REPO}.o: ${BACKEND_SRC_GO}
-	@cd ${BACKEND_SRC_DIR} && ${GO_BUILD} -o ../${REPO}.o
+${REPO}.out: ${BACKEND_SRC_GO}
+	@cd ${BACKEND_SRC_DIR} && ${GO_BUILD} -o ../${REPO}.out
 
 backend: ${BACKEND_BUILD}
 

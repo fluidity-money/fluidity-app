@@ -2,6 +2,8 @@ package timescale
 
 import (
 	"database/sql"
+	"regexp"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	_ "github.com/lib/pq"
@@ -28,10 +30,14 @@ func init() {
 	}
 
 	if _, err := client.Exec("SELECT 1"); err != nil {
+		// hide sensitive uri components in log output
+		userPassRegex := regexp.MustCompile(`:\/\/(.*?):(.*?)@`)
+		errHidden := userPassRegex.ReplaceAllString(err.Error(),`://HIDDEN_USER_PASS@`)
+
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 			k.Message = "Failed to connect to the Timescale database!"
-			k.Payload = err
+			k.Payload = errHidden
 		})
 	}
 

@@ -136,15 +136,7 @@ func main() {
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 
-		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
-		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
-		ethTokenAddress_            = os.Getenv(EnvEthTokenAddress)
-		underlyingTokenAddress_     = os.Getenv(EnvUnderlyingTokenAddress)
-		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
-
 		ethereumDecimalPlaces_ = os.Getenv(EnvEthereumDecimalPlaces)
-		ethFluxAddress_        = os.Getenv(EnvAuroraTokenFluxAddress)
-		tokenFluxAddress_      = os.Getenv(EnvAuroraTokenFluxAddress)
 
 		// EthereumDecimalPlaces to use when normalising Eth to USDT
 		EthereumDecimalPlaces *big.Rat
@@ -191,16 +183,16 @@ func main() {
 
 	switch tokenBackend {
 	case BackendCompound:
-		uniswapAnchoredViewAddress := mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
+		uniswapAnchoredViewAddress := mustEthereumAddressFromEnv(EnvUniswapAnchoredViewAddress)
 
 		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
 
 	case BackendAave:
 		var (
-			aaveAddressProviderAddress = mustEthereumAddressFromString(aaveAddressProviderAddress_)
-			usdTokenAddress            = mustEthereumAddressFromString(usdTokenAddress_)
-			ethTokenAddress            = mustEthereumAddressFromString(ethTokenAddress_)
-			underlyingTokenAddress     = mustEthereumAddressFromString(underlyingTokenAddress_)
+			aaveAddressProviderAddress = mustEthereumAddressFromEnv(EnvAaveAddressProviderAddress)
+			usdTokenAddress            = mustEthereumAddressFromEnv(EnvUsdTokenAddress)
+			ethTokenAddress            = mustEthereumAddressFromEnv(EnvEthTokenAddress)
+			underlyingTokenAddress     = mustEthereumAddressFromEnv(EnvUnderlyingTokenAddress)
 		)
 
 		ethAaveAddressProviderAddress = hexToAddress(aaveAddressProviderAddress)
@@ -210,8 +202,8 @@ func main() {
 
 	case BackendAurora:
 		var (
-			ethFluxAddress   = mustEthereumAddressFromString(ethFluxAddress_)
-			tokenFluxAddress = mustEthereumAddressFromString(tokenFluxAddress_)
+			ethFluxAddress   = mustEthereumAddressFromEnv(EnvAuroraEthFluxAddress)
+			tokenFluxAddress = mustEthereumAddressFromEnv(EnvAuroraTokenFluxAddress)
 		)
 
 		auroraEthFluxAddress = hexToAddress(ethFluxAddress)
@@ -296,7 +288,10 @@ func main() {
 
 		default:
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Received empty work announcement!"
+				k.Format(
+					"Received empty work announcement for block hash %v!",
+					blockHash,
+				)
 			})
 		}
 
@@ -310,6 +305,8 @@ func main() {
 
 		emission.Network = "ethereum"
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
+
+		emission.EthereumBlockNumber = blockNumber
 
 		if hintedBlock == nil {
 
@@ -659,7 +656,7 @@ func main() {
 
 			// Fill in emission.NaiveIsWinning
 
-			probability.NaiveIsWinning(announcement.SourceRandom, emission)
+			_ = probability.NaiveIsWinning(announcement.SourceRandom, emission)
 
 			log.Debug(func(k *log.Log) {
 				k.Format("Source payouts: %v", randomSource)
@@ -670,6 +667,8 @@ func main() {
 			emission.SenderAddress = senderAddress.String()
 
 			blockAnnouncements = append(blockAnnouncements, announcement)
+
+			emission.Update()
 
 			queue.SendMessage(worker.TopicEmissions, emission)
 		}

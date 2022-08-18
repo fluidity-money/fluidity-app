@@ -13,6 +13,8 @@ SOTERIA_ANALYZE := ${TESTING_DIR}/soteria/soteria.sh
 
 MIRI_DOCKERFILE := ${TESTING_DIR}/miri/Dockerfile
 
+E2E_TEST := ${TESTING_DIR}/solana-contract-test-client/run.sh
+
 CARGO_GEIGER_DOCKERFILE := ${TESTING_DIR}/cargo_geiger/Dockerfile
 
 CARGO_AUDIT_DOCKERFILE := ${TESTING_DIR}/cargo_audit/Dockerfile
@@ -71,7 +73,11 @@ miri_test: ${SRC_FILES}
 	@${DOCKER_RUN} --rm flu/miri
 	@touch miri_test
 
-test: cargo_test cargo_fuzz soteria_analyze miri_test cargo_geiger cargo_audit
+e2e_test: ${SRC_FILES}
+	@${E2E_TEST}
+	@touch e2e_test
+
+test: cargo_test cargo_fuzz soteria_analyze miri_test cargo_geiger cargo_audit e2e_test
 
 clean:
 	@rm -rf \

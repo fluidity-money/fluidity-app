@@ -1,0 +1,8 @@
+FROM alpine:3.16.1
+
+RUN apk add --no-cache postgresql-client
+
+COPY --from=fluidity/build-container /usr/local/bin/wait-for-database.sh /usr/local/bin
+COPY --from=fluidity/build-container /usr/local/bin/wait-for-amqp /usr/local/bin
+COPY --from=fluidity/build-container /usr/local/bin/wait-for-ws /usr/local/bin
+

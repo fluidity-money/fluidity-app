@@ -1,15 +1,10 @@
-pragma solidity ^0.8.11;
+pragma solidity 0.8.11;
 pragma abicoder v2;
 
 import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 import "./LiquidityProvider.sol";
-
-/// @dev sentinel to mark the start of a range iin rewardedBlocks
-uint constant FIRST_REWARDED_BLOCK = 1;
-/// @dev sentinel to mark the end of a range iin rewardedBlocks
-uint constant LAST_REWARDED_BLOCK = 2;
 
 /// @dev parameter for the batchReward function
 struct Winner {
@@ -30,11 +25,26 @@ contract Token is IERC20 {
         uint endBlock
     );
 
+    /// @notice emitted when a reward is quarantined for being too large
+    event BlockedReward(
+        address indexed winner,
+        uint amount,
+        uint startBlock,
+        uint endBlock
+    );
+
     /// @notice emitted when an underlying token is wrapped into a fluid asset
     event MintFluid(address indexed addr, uint indexed amount);
 
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
     event BurnFluid(address indexed addr, uint indexed amount);
+
+    /// @notice emitted when the rng oracle is changed to a new address
+    event OracleChanged(address indexed oldOracle, address indexed newOracle);
+
+    /// @dev sentinel to indicate a block has been rewarded in the
+    /// @dev pastRewards_ and rewardedBlocks_ maps
+    uint private constant BLOCK_REWARDED = 1;
 
     mapping(address => uint256) private balances_;
     mapping(address => mapping(address => uint256)) private allowances_;
@@ -43,29 +53,56 @@ contract Token is IERC20 {
     string private name_;
     string private symbol_;
 
-    bool initialized_;
+    bool private initialized_;
 
-    LiquidityProvider pool_;
+    LiquidityProvider private pool_;
 
     /// @dev trusted account used as an oracle for submitting rewards
-    address rngOracle_;
+    address private rngOracle_;
 
     /// @dev [txhash] => [0 if the reward for that transaction hasn't been rewarded, 1 otherwise]
     /// @dev operating on ints saves us a bit of gas
     /// @dev deprecated
     mapping (bytes32 => uint) private pastRewards_;
 
-    /// @dev [block number] => [rewarded block state]
-    mapping(uint => uint) rewardedBlocks_;
+    /// @dev the block number of the last block that's been included in a batched reward
+    uint private lastRewardedBlock_;
 
-    uint lastRewardedBlock_;
-
-    /// @dev [address] => [[block number] => [rewarded block state]]
+    /// @dev [address] => [[block number] => [has the block been manually rewarded by this user?]]
     mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
 
     /// @dev amount a user has manually rewarded, to be removed from their batched rewards
     /// @dev [address] => [amount manually rewarded]
-    mapping (address => uint) private manualRewards_;
+    mapping (address => uint) private manualRewardDebt_;
+
+    /// @dev new oracle address, pending a call from them to confirm
+    address private pendingNewOracle_;
+
+    /// @dev the largest amount a reward can be to not get quarantined
+    uint maxUncheckedReward_;
+
+    /// @dev [address] => [number of tokens the user won that have been quarantined]
+    mapping (address => uint) blockedRewards_;
+
+    /// @dev are the asset minting limits enabled?
+    bool mintLimitsEnabled_;
+
+    /// @dev amount of fluid tokens that can be minted
+    /// @dev only editable by the oracle
+    uint remainingGlobalMint_;
+
+    /// @dev the mint limit per user
+    uint userMintLimit_;
+
+    /// @dev the block number in which user mint limits were last reset
+    uint userMintResetBlock_;
+
+    /// @dev [user] => [amount the user has minted]
+    mapping (address => uint) userAmountMinted_;
+
+    /// @dev [user] => [last block the user minted on]
+    /// @dev (if this is <userMintResetBlock_, reset the amount minted to 0)
+    mapping (address => uint) userLastMintedBlock_;
 
     /**
      * @notice initializer function - sets the contract's data
@@ -84,12 +121,17 @@ contract Token is IERC20 {
         uint8 _decimals,
         string memory _name,
         string memory _symbol,
-        address _oracle
+        address _oracle,
+        uint _maxUncheckedReward,
+        bool _mintLimitsEnabled,
+        uint _globalMint,
+        uint _userMint
     ) public {
         require(!initialized_, "contract is already initialized");
         initialized_ = true;
 
         rngOracle_ = _oracle;
+        maxUncheckedReward_ = _maxUncheckedReward;
 
         pool_ = LiquidityProvider(_liquidityProvider);
 
@@ -99,6 +141,11 @@ contract Token is IERC20 {
         decimals_ = _decimals;
         name_ = _name;
         symbol_ = _symbol;
+
+        mintLimitsEnabled_ = _mintLimitsEnabled;
+        remainingGlobalMint_ = _globalMint;
+        userMintLimit_ = _userMint;
+        userMintResetBlock_ = block.number;
     }
 
     /**
@@ -107,15 +154,48 @@ contract Token is IERC20 {
      */
     function oracle() public view returns (address) { return rngOracle_; }
 
-    /// @notice updates the trusted oracle to a new address
+    /// @notice starts an update for the trusted oracle to a new address
     function updateOracle(address newOracle) public {
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
-        rngOracle_ = newOracle;
+        pendingNewOracle_ = newOracle;
+    }
+
+    /// @notice finishes an update of the oracle address
+    /// @notice must be used by the new account
+    function acceptUpdateOracle() public {
+        require(msg.sender == pendingNewOracle_, "only the pending new oracle account can use this");
+
+        emit OracleChanged(rngOracle_, pendingNewOracle_);
+
+        rngOracle_ = pendingNewOracle_;
+        pendingNewOracle_ = address(0);
+    }
+
+    /// @notice updates the reward quarantine threshold
+    function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        maxUncheckedReward_ = _maxUncheckedReward;
+    }
+
+    /// @notice updates and resets mint limits
+    function updateMintLimits(uint global, uint user) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        remainingGlobalMint_ = global;
+        userMintLimit_ = user;
+        userMintResetBlock_ = block.number;
+    }
+
+    /// @notice enables or disables mint limits
+    function enableMintLimits(bool enable) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        mintLimitsEnabled_ = enable;
     }
 
     // name and symbol provided by ERC20 parent
-
 
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens
@@ -126,13 +206,34 @@ contract Token is IERC20 {
      * @return the number of tokens wrapped
      */
     function erc20In(uint amount) public returns (uint) {
+        if (mintLimitsEnabled_) {
+            // update global limit
+            require(amount <= remainingGlobalMint_, "mint amount exceeds global limit!");
+            remainingGlobalMint_ -= amount;
+
+            uint userMint;
+            if (userLastMintedBlock_[msg.sender] < userMintResetBlock_) {
+                // user hasn't minted since the reset, reset their count
+                userMint = amount;
+            } else {
+                // user has, add the amount they're minting
+                userMint = userAmountMinted_[msg.sender] + amount;
+            }
+
+            require(userMint <= userMintLimit_, "mint amount exceeds user limit!");
+            // update the user's count
+            userAmountMinted_[msg.sender] = userMint;
+            // update the user's block
+            userLastMintedBlock_[msg.sender] = block.number;
+        }
+
         // take underlying tokens from the user
         uint originalBalance = pool_.underlying_().balanceOf(address(this));
         pool_.underlying_().safeTransferFrom(msg.sender, address(this), amount);
         uint finalBalance = pool_.underlying_().balanceOf(address(this));
 
-        // ensure we haven't overflowed
-        require(finalBalance > originalBalance, "erc20in overflow");
+        // ensure the token is behaving
+        require(finalBalance > originalBalance, "token balance decreased after transfer");
         uint realAmount = finalBalance - originalBalance;
 
         // add the tokens to our compound pool
@@ -181,6 +282,18 @@ contract Token is IERC20 {
      * @param amount the amount being rewarded
      */
     function rewardFromPool(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
+        if (amount > maxUncheckedReward_) {
+            // quarantine the reward
+            emit BlockedReward(winner, amount, firstBlock, lastBlock);
+            blockedRewards_[winner] += amount;
+
+            return;
+        }
+
+        rewardInternal(firstBlock, lastBlock, winner, amount);
+    }
+
+    function rewardInternal(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
         // mint some fluid tokens from the interest we've accrued
         emit Reward(winner, amount, firstBlock, lastBlock);
 
@@ -197,25 +310,42 @@ contract Token is IERC20 {
 
         uint poolAmount = rewardPoolAmount();
 
-        rewardedBlocks_[firstBlock] = 1;
         // this might not happen if our transactions go through out of order
         if (lastBlock > lastRewardedBlock_) lastRewardedBlock_ = lastBlock;
 
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
 
-            if (manualRewards_[winner.winner] != 0) {
-                uint amount = winner.amount > manualRewards_[winner.winner] ?
-                    manualRewards_[winner.winner] :
-                    winner.amount;
-                winner.amount -= amount;
-                manualRewards_[winner.winner] -= amount;
+            if (manualRewardDebt_[winner.winner] != 0) {
+                winner.amount -= manualRewardDebt_[winner.winner];
+                manualRewardDebt_[winner.winner] = 0;
             }
 
             require(poolAmount >= winner.amount, "reward pool empty");
             poolAmount = poolAmount - winner.amount;
 
             rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
+        }
+    }
+
+    /**
+     * @notice admin function, unblocks a reward that was quarantined for being too large
+     * @notice allows for paying out or removing the reward, in case of abuse
+     *
+     * @param user the address of the user who's reward was quarantined
+     * @param amount the amount of tokens to release (in case multiple rewards were quarantined)
+     * @param payout should the reward be paid out or removed?
+     * @param firstBlock the first block the rewards include (should be from the BlockedReward event)
+     * @param lastBlock the last block the rewards include
+     */
+    function unblockReward(address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        require(blockedRewards_[user] >= amount, "trying to unblock more than the user has blocked");
+        blockedRewards_[user] -= amount;
+
+        if (payout) {
+            rewardInternal(firstBlock, lastBlock, user, amount);
         }
     }
 
@@ -231,54 +361,94 @@ contract Token is IERC20 {
      * @param sig the signature of the above parameters, provided by the oracle
      */
     function manualReward(
+        address contractAddress,
+        uint256 chainid,
         address winner,
         uint256 winAmount,
         uint firstBlock,
         uint lastBlock,
         bytes memory sig
     ) external {
-        require(sig.length == 65, "invalid rng format (length)");
         // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
         //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
-        bytes32 hash = keccak256(abi.encode(winner, winAmount, firstBlock, lastBlock));
+        bytes32 hash = keccak256(abi.encode(
+            contractAddress,
+            chainid,
+            winner,
+            winAmount,
+            firstBlock,
+            lastBlock
+        ));
 
         // ECDSA verification
-        // TODO: Get a proper audit here
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-        assembly {
-            r := mload(add(sig, 0x20))
-            s := mload(add(sig, 0x40))
-            v := byte(0, mload(add(sig, 0x60)))
-        }
-        if (v < 27) v += 27;
-
-        require(ecrecover(hash, v, r, s) == rngOracle_, "invalid rng signature");
+        require(recover(hash, sig) == rngOracle_, "invalid rng signature");
 
         // now reward the user
 
+        require(contractAddress == address(this), "payload is for the wrong contract");
+        require(chainid == block.chainid, "payload is for the wrong chain");
+
         // user decided to frontrun
-        require(
-            manualRewardedBlocks_[winner][firstBlock] == 0,
-            "manual reward already given for part of this range"
-        );
-        require(
-            manualRewardedBlocks_[winner][lastBlock] == 0,
-            "manual reward already given for part of this range"
-        );
         require(
             firstBlock > lastRewardedBlock_,
             "reward already given for part of this range"
         );
 
-        manualRewardedBlocks_[winner][firstBlock] = FIRST_REWARDED_BLOCK;
-        manualRewardedBlocks_[winner][lastBlock] = LAST_REWARDED_BLOCK;
-        manualRewards_[winner] += winAmount;
+        for (uint i = firstBlock; i <= lastBlock; i++) {
+            require(manualRewardedBlocks_[winner][i] == 0, "reward already given for part of this range");
+            manualRewardedBlocks_[winner][i] = BLOCK_REWARDED;
+        }
+
+        manualRewardDebt_[winner] += winAmount;
 
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 
         rewardFromPool(firstBlock, lastBlock, winner, winAmount);
+    }
+
+    /**
+     * @dev ECrecover with checks for signature mallmalleability
+     * @dev adapted from openzeppelin's ECDSA library
+     */
+    function recover(
+        bytes32 hash,
+        bytes memory signature
+    ) internal pure returns (address) {
+        require(signature.length == 65, "invalid rng format (length)");
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        // ecrecover takes the signature parameters, and the only way to get them
+        // currently is to use assembly.
+        /// @solidity memory-safe-assembly
+        assembly {
+            r := mload(add(signature, 0x20))
+            s := mload(add(signature, 0x40))
+            v := byte(0, mload(add(signature, 0x60)))
+        }
+        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
+        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
+        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
+        // signatures from current libraries generate a unique signature with an s-value in the lower half order.
+        //
+        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
+        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
+        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
+        // these malleable signatures as well.
+        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+            revert("invalid signature (s)");
+        }
+        if (v != 27 && v != 28) {
+            revert("invalid signature (v)");
+        }
+
+        // If the signature is valid (and not malleable), return the signer address
+        address signer = ecrecover(hash, v, r, s);
+        if (signer == address(0)) {
+            revert("invalid signature");
+        }
+
+        return signer;
     }
 
     // remaining functions are taken from OpenZeppelin's ERC20 implementation

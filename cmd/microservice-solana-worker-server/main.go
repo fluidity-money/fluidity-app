@@ -4,15 +4,16 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 )
 
 const (
@@ -60,7 +61,6 @@ const (
 func main() {
 
 	var (
-		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
 		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
 		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 		decimalPlaces_           = util.GetEnvOrFatal(EnvTokenDecimals)
@@ -141,6 +141,7 @@ func main() {
 				userActionTransactionHash  = userAction.Transaction.Signature
 				userActionSenderAddress    = userAction.SenderSplAddress
 				userActionRecipientAddress = userAction.RecipientSplAddress
+				userActionSlotNumber       = int64(userAction.Transaction.Result.Slot)
 				tokenDetails               = userAction.Token
 			)
 
@@ -154,14 +155,15 @@ func main() {
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
 
-			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
+			slotNumber_ := misc.BigIntFromInt64(userActionSlotNumber)
+			emission.SolanaSlotNumber = slotNumber_
 
 			var (
-				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
-				payoutFreqNum    = tribecaDataStoreTrfVars.PayoutFreqNum
-				payoutFreqDenom  = tribecaDataStoreTrfVars.PayoutFreqDenom
-				deltaWeightNum   = tribecaDataStoreTrfVars.DeltaWeightNum
-				deltaWeightDenom = tribecaDataStoreTrfVars.DeltaWeightDenom
+				winningClasses   = fluidity.WinningClasses
+				payoutFreqNum    = fluidity.PayoutFreqNum
+				payoutFreqDenom  = fluidity.PayoutFreqDenom
+				deltaWeightNum   = fluidity.DeltaWeightNum
+				deltaWeightDenom = fluidity.DeltaWeightDenom
 			)
 
 			var (
@@ -271,6 +273,8 @@ func main() {
 			}
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
+
+			emission.Update()
 
 			queue.SendMessage(worker.TopicEmissions, emission)
 		}

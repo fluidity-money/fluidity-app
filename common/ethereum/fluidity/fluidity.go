@@ -63,6 +63,19 @@ const fluidityContractAbiString = `[
 	  ],
 	  "name": "Reward",
 	  "type": "event"
+  },
+  {
+	  "inputs": [
+	  { "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
+	  { "internalType": "address", "name": "from", "type": "address" },
+	  { "internalType": "address", "name": "to", "type": "address" },
+	  { "internalType": "uint256[]", "name": "balls", "type": "uint256[]" },
+	  { "internalType": "uint256[]", "name": "payouts", "type": "uint256[]" }
+	  ],
+	  "name": "reward",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
   }
 ]`
 
@@ -211,3 +224,44 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 
 	return transaction, nil
 }
+
+// TransactLegacyReawrd using the deprecated single reward function
+func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, hash []byte, addressString string, amount *big.Int) (*ethTypes.Transaction, error) {
+	boundContract := ethAbiBind.NewBoundContract(
+		fluidityAddress,
+		fluidityContractAbi,
+		client,
+		client,
+		client,
+	)
+
+	var (
+		address   = ethCommon.HexToAddress(addressString)
+		balls     = []*big.Int{ big.NewInt(1) }
+		payouts   = []*big.Int{ amount }
+	)
+
+	var hashBytes [32]byte
+	copy(hashBytes[:], hash)
+
+	transaction, err := ethereum.MakeTransaction(
+		boundContract,
+		transactionOptions,
+		"reward",
+		hashBytes,
+		address,
+		address,
+		balls,
+		payouts,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to transact the legacy reward function on Fluidity's contract! %v",
+			err,
+		)
+	}
+
+	return transaction, nil
+}
+

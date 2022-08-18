@@ -18,40 +18,60 @@ func returnForbidden(w http.ResponseWriter) interface{} {
 }
 
 func validArgFloat64toBigrat(args map[string]interface{}, key string) (*big.Rat, bool) {
-	val, ok := args[key]
+	val_, ok := args[key]
 	if !ok {
 		return nil, false
 	}
 
-	return new(big.Rat).SetFloat64(val.(float64)), true
-}
-
-func validArgInt64toUInt64Bigrat(args map[string]interface{}, key string) (*big.Rat, bool) {
-	val, ok := args[key]
-	if !ok && val.(int) < 0 {
+	val, ok := val_.(float64)
+	if !ok {
 		return nil, false
 	}
 
-	uVal := uint64(val.(int))
+	return new(big.Rat).SetFloat64(val), true
+}
+
+func validArgInt64toUInt64Bigrat(args map[string]interface{}, key string) (*big.Rat, bool) {
+	val_, ok := args[key]
+	if !ok {
+		return nil, false
+	}
+
+	val, ok := val_.(int)	
+	if !ok || val < 0 {
+		return nil, false
+	}
+
+	uVal := uint64(val)
 	return new(big.Rat).SetUint64(uVal), true
 }
 
 func validArgInt(args map[string]interface{}, key string) (int, bool) {
-	val, ok := args[key]
+	val_, ok := args[key]
 	if !ok {
 		return 0, false
 	}
 
-	return val.(int), true
+	val, ok := val_.(int)
+	if !ok {
+		return 0, false
+	}
+
+	return val, true
 }
 
 func validArgString(args map[string]interface{}, key string) (string, bool) {
-	val, ok := args[key]
+	val_, ok := args[key]
 	if !ok {
 		return "", false
 	}
 
-	return val.(string), true
+	val, ok := val_.(string) 
+	if !ok {
+		return "", false
+	}
+
+	return val, true
 }
 
 func graphQLErrorLogHandler(w http.ResponseWriter, r *http.Request, msg []gqlerrors.FormattedError) {

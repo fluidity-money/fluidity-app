@@ -37,6 +37,7 @@ const SendFluid = () => {
   const [address, setAddress] = useState("");
   const [successTransactionModal, setSuccessTransactionModal] =
     useState<boolean>(false); // toggle state for the transaction confirmation
+  const [previousTransactionHash, setPreviousTransactionHash] = useState(""); 
 
   // userActions context to update balance when potentially sending/receiving
   const userActions = useContext(UserActionContext);
@@ -101,7 +102,11 @@ const SendFluid = () => {
         new TokenAmount(tokens[selectedFluidToken].token, toRaw),
         addError
       );
+
       console.log(result);
+
+      if (result)
+        setPreviousTransactionHash(result);
       toggleSuccessTransactionModal();
     } catch (e: any) {
       addError(`Failed to send tokens! ${e?.message}`);
@@ -238,6 +243,7 @@ const SendFluid = () => {
           enable={successTransactionModal}
           toggle={toggleSuccessTransactionModal}
           message={<div className="primary-text">Transaction Successful</div>}
+          transactionHash={previousTransactionHash}
         />
       </div>
     </ModalToggle.Provider>

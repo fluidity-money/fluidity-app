@@ -63,7 +63,6 @@ func main() {
 		)
 
 		var (
-			transfers                  = make([]user_actions.UserAction, 0)
 			bufferedUserActions        = make([]user_actions.UserAction, 0)
 			bufferedParsedTransactions = make([]worker.SolanaParsedTransaction, 0)
 		)
@@ -79,12 +78,13 @@ func main() {
 			}
 
 			var (
+				transfers = make([]user_actions.UserAction, 0)
+
 				signature         = transaction.Signature
 				transactionResult = transaction.Result
 				accountKeys       = transactionResult.Transaction.Message.AccountKeys
 				tokenBalances     = transactionResult.Meta.PostTokenBalances
 				adjustedFee       = transaction.AdjustedFee
-				sig               = transaction.Signature
 			)
 
 			log.Debug(func(k *log.Log) {
@@ -125,7 +125,7 @@ func main() {
 				switch accountKeys[instruction.ProgramIdIndex] {
 				case fluidityProgramId:
 					winner1, winner2, swapWrap, swapUnwrap, err = processFluidityTransaction(
-						sig,
+						signature,
 						instruction,
 						accountKeys,
 						fluidityOwners,
@@ -134,7 +134,7 @@ func main() {
 
 				case SplProgramId:
 					transfer1, transfer2, err = processSplTransaction(
-						sig,
+						signature,
 						instruction,
 						adjustedFee,
 						accountKeys,
@@ -230,7 +230,10 @@ func main() {
 				UserActions: bufferedUserActions,
 			}
 
-			queue.SendMessage(user_actions.TopicBufferedUserActionsSolana, bufferedUserAction)
+			queue.SendMessage(
+				user_actions.TopicBufferedUserActionsSolana,
+				bufferedUserAction,
+			)
 		}
 	})
 }

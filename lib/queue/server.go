@@ -5,18 +5,28 @@ import (
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/streadway/amqp"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type amqpDetails struct {
-	channel      *amqp.Channel
-	exchangeName string
-	workerId     string
+	channel           *amqp.Channel
+	exchangeName      string
+	workerId          string
+	deadLetterEnabled bool
+	messageRetries    int
 }
 
 var chanAmqpDetails = make(chan amqpDetails)
 
-func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel) (<-chan amqp.Delivery, error) {
+func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel, deadLetterEnabled bool) (<-chan amqp.Delivery, error) {
+
+	log.Debugf(
+		"Dead letter queue for %s enabled: %v",
+		queueName,
+		deadLetterEnabled,
+	)
+
 	err := channel.ExchangeDeclare(
 		"dead-exchange",
 		"direct",
@@ -76,7 +86,7 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		false, // noWait,
 		amqp.Table{
 			"x-dead-letter-exchange": "dead-exchange",
-		}, // args
+		}, // args,
 	)
 
 	if err != nil {

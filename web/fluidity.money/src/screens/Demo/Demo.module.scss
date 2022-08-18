@@ -1,0 +1,37 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 850px;
+  width: 100%;
+  background-color: $fluidBlack;
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 50%;
+    min-height: 400px;
+    h1 {
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      margin-bottom: 20px;
+      color: $textGrey;
+    }
+
+    p {
+      margin-bottom: 15px;
+      color: $textGrey;
+    }
+  }
+}
+
+.demoVideo {
+  position: absolute;
+  width: 100%;
+}

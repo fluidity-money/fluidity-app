@@ -539,7 +539,7 @@ fn move_from_prize_pool(
         get_available_prize_pool(obligation_info, reserve_info, fluidity_mint);
 
     if available_prize_pool < payout_amt {
-        panic!("not enought funds in prize pool!");
+        panic!("not enough funds in prize pool!");
     }
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);

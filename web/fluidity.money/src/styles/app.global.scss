@@ -1,0 +1,45 @@
+@import "config";
+
+html {
+  // Root font size
+  font-size: 16px;
+  font-family: "arial";
+  color: $fluidWhite;
+  box-sizing: border-box;
+  background-color: #000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// global tag properties
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background-color:$fluidBlack;
+}
+
+ul {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+  color: $fluidWhite;
+}
+
+button {
+  cursor: pointer;
+}
+
+.bg-dark {
+ background-color: $fluidBlack;
+}
+
+.bg-light {
+ background-color:$fluidWhite;
+}

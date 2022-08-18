@@ -67,110 +67,101 @@ const CurrencyBreakdown = () => {
     distributeWalletData();
   }, [walletData]);
 
-  const currencies = fluid ? filterFluid() : filterRegular();
-  const renderedCurrencyList = currencies.map((token, index) => {
-    const currencyType = token.type.toString();
-    return (
-      <div className="currency-container">
-        <CurrencyListing
-          currency={currencyType}
-          amount={token.amount}
-          key={token.type + index}
-        />
-        <hr className="currency-line" />
-      </div>
-    );
-  });
+ // displays currency listing based on filtered walletData
+ const currencies = fluid ? filterFluid() : filterRegular();
+ const renderedCurrencyList = currencies.map((token, index) => {
+   const currencyType = token.type.toString();
 
-  // calculates total wallet amount
-  const calculateTotal = (tokens: walletDataType[]) => {
-    return tokens
-      .reduce((previous, current) => previous + Number(current.amount), 0)
-      .toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-  };
+   return (
+     <div className="currency-container">
+       <CurrencyListing
+         currency={currencyType}
+         amount={token.amount}
+         key={token.type + index}
+       />
+     </div>
+   );
+ });
 
-  // total amount for Fluid assets
-  const totalFluid = useMemo(() => calculateTotal(filterFluid()), [walletData]);
+ // calculates total wallet amount
+ const calculateTotal = (tokens: walletDataType[]) => {
+   return tokens
+     .reduce((previous, current) => previous + Number(current.amount), 0)
+     .toLocaleString("en-US", {
+       style: "currency",
+       currency: "USD",
+       minimumFractionDigits: 2,
+       maximumFractionDigits: 2,
+     });
+ };
 
-  // total amount for Regular assets
-  const totalRegular = useMemo(
-    () => calculateTotal(filterRegular()),
-    [walletData]
-  );
+ // total amount for Fluid assets
+ const totalFluid = useMemo(() => calculateTotal(filterFluid()), [walletData]);
 
-  const DonutFluid = useMemo(
-    () => (
-      <DoughnutGraph
-        data={fluidWalletAmounts.length !== 0 ? fluidWalletAmounts : ["0"]}
-        labels={fluidWalletTypes.length !== 0 ? fluidWalletTypes : ["N/A"]}
-        colours={fluidColours.length !== 0 ? fluidColours : ["rgb(0,0,0)"]}
-      />
-    ),
+ // total amount for Regular assets
+ const totalRegular = useMemo(
+   () => calculateTotal(filterRegular()),
+   [walletData]
+ );
 
-    [fluidWalletAmounts, fluidWalletTypes, fluidColours]
-  );
+ const DonutFluid = useMemo(
+   () => (
+     <DoughnutGraph
+       data={fluidWalletAmounts.length !== 0 ? fluidWalletAmounts : ["0"]}
+       labels={fluidWalletTypes.length !== 0 ? fluidWalletTypes : ["N/A"]}
+       colours={fluidColours.length !== 0 ? fluidColours : ["rgb(0,0,0)"]}
+     />
+   ),
 
-  const DonutRegular = useMemo(
-    () => (
-      <DoughnutGraph
-        data={walletAmounts.length !== 0 ? walletAmounts : ["0"]}
-        labels={walletTypes.length !== 0 ? walletTypes : ["N/A"]}
-        colours={colours.length !== 0 ? colours : ["rgb(0,0,0)"]}
-      />
-    ),
-    [walletAmounts, walletTypes, colours]
-  );
+   [fluidWalletAmounts, fluidWalletTypes, fluidColours]
+ );
 
-  const LineChart = useMemo(() => <LineGraph />, []);
+ const DonutRegular = useMemo(
+   () => (
+     <DoughnutGraph
+       data={walletAmounts.length !== 0 ? walletAmounts : ["0"]}
+       labels={walletTypes.length !== 0 ? walletTypes : ["N/A"]}
+       colours={colours.length !== 0 ? colours : ["rgb(0,0,0)"]}
+     />
+   ),
 
-  return (
-    <div className="currency-breakdown">
-      <div className="portfolio-graph-title primary-text">Account Overview</div>
-      <div className="yield-graph">
-        <div className={`primary-text total-yield-title`}>
-          Total Fluid Yield Rewarded: USD 152.21
-        </div>
-        <div className="grey-primary-text" style={{ fontSize: 8 }}>
-          *Calculations based upon user on-chain history and simulated expected
-          reward averages
-        </div>
-        <div className="line-chart-container">{LineChart}</div>
+   [walletAmounts, walletTypes, colours]
+ );
 
-        <UnclaimedRewardsbutton />
-      </div>
-      <div className="wallet-overview">
-        <div className="primary-text">Wallet Overview</div>
-        <div className="overview-items">
-          <div className="chart-items">
-            <div className="doughnut-container">
-              <div className="total">
-                <div className="grey-primary-text">Total</div>
-                <div className="primary-text">
-                  {fluid ? totalFluid : totalRegular}
-                </div>
-              </div>
-              {fluid ? DonutFluid : DonutRegular}
-            </div>
-            <div className="toggle-container">
-              <div className={fluid ? "grey-primary-text" : "selected-text"}>
-                Regular
-              </div>
-              <ToggleButton toggled={fluid} toggle={setFluid} />
-              <div className={fluid ? "selected-text" : "grey-primary-text"}>
-                Fluid
-              </div>
-            </div>
-          </div>
-          <div className="currency-list">{renderedCurrencyList}</div>
-        </div>
-      </div>
-    </div>
-  );
+ const LineChart = useMemo(() => <LineGraph />, []);
+
+ // Checks to see if the user's wallet is empty
+ return (
+   <div className="currency-breakdown">
+     <div className={`portfolio-graph-title white-primary-text`}>
+       Account Overview
+     </div>
+
+       <div className="overview-items">
+         <div className="chart-items">
+           <div className="doughnut-container">
+             <div className="total">
+               <div className="grey-primary-text">Total</div>
+               <div className="white-primary-text">
+                 {fluid ? totalFluid : totalRegular}
+               </div>
+             </div>
+             {fluid ? DonutFluid : DonutRegular}
+           </div>
+           <div className="toggle-container margin-top-10">
+             <div className={`${fluid ? "grey-primary-text" : "selected-text "} margin-right-10`}>
+               Regular
+             </div>
+             <ToggleButton toggled={fluid} toggle={setFluid} />
+             <div className={`${fluid ? "selected-text" : "grey-primary-text"} margin-left-10`}>
+               Fluid
+             </div>
+           </div>
+         </div>
+         <div className="currency-list">{renderedCurrencyList}</div>
+       </div>
+     </div>
+ );
 };
 
 export default CurrencyBreakdown;

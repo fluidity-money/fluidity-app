@@ -34,7 +34,38 @@ func init() {
 }
 ```
 
-Since log  data is stored as base 64, hex log data as obtained from e.g. Etherscan must
-be converted using `tests/integrations/util/ hexToB64.go <0xyourhexdata>`. Additionally,
-applications are stored as enums internally, so must be the corresponding number as found
-in `common/ethereum/applications/applications.go`.
+### Quick(ish) Start
+
+Given a Transaction Hash and Log Signature, run: 
+`tests/integrations/ethereum/util/createTestString.go <LogSignature> <TxHash1> [ <TxHash2> ... ]  | jq`
+Keep in mind all outputs must be manually validated! (Notably Check contract matches desired integration)
+
+### Struct Definition
+```
+[
+  {
+    "transfer": {
+      "log": {
+        "data": BASE64 ENCODED Log Data
+        "address": Contract Address - VALIDATE
+        "topics": [
+          Log Topics
+        ]
+      },
+      "transaction": {
+        "to": Instruction Receiver
+        "from": Instruction Sender
+        "hash": Tx Hash
+      },
+      "application": Must Match Enum found in common/ethereum/applications/applications.go
+    },
+    "expected_sender": Sender of input token
+    "expected_recipient": Receiver of input token
+    "expected_fees": Calculated Fee (Adjusted for Mock Fluid Token decimals)
+    "token_decimals": Mock Fluid Token Decimals
+    "contract_address": Mock Fluid Token Address
+  }
+  ... Repeat Tests
+]
+````
+

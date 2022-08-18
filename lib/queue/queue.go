@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
@@ -18,17 +17,22 @@ const (
 	// Context is used to identify the AMQP server in logging
 	Context = "AMQP"
 
-	// EnvQueueAddr is the address to access RabbitMQ.
-	EnvQueueAddr = `FLU_AMQP_QUEUE_ADDR`
-
 	// ExchangeName to use for AMQP queues
 	ExchangeName = `fluidity`
 
 	// ExchangeType to use for routing messages inside the queue
 	ExchangeType = `topic`
 
-	// EnvMessageRetries is the number of times a message will be retried
-	EnvMessageRetries = `FLU_QUEUE_MESSAGE_RETRIES`
+	// EnvQueueAddr is the address to access RabbitMQ.
+	EnvQueueAddr = `FLU_AMQP_QUEUE_ADDR`
+
+	// EnvDeadLetterEnabled to disable the use of dead letter queues
+	// (disabling with "false" implies disabling retries)
+	EnvDeadLetterEnabled = `FLU_AMQP_QUEUE_DEAD_LETTER_ENABLED`
+
+	// EnvMessageRetries to attempt until giving up - defaults to
+	// 5 if not set!
+	EnvMessageRetries = `FLU_AMQP_QUEUE_MESSAGE_RETRIES`
 )
 
 type Message struct {
@@ -64,9 +68,11 @@ func GetMessages(topic string, f func(message Message)) {
 	amqpDetails := <-chanAmqpDetails
 
 	var (
-		channel      = amqpDetails.channel
-		exchangeName = amqpDetails.exchangeName
-		workerId     = amqpDetails.workerId
+		channel           = amqpDetails.channel
+		exchangeName      = amqpDetails.exchangeName
+		workerId          = amqpDetails.workerId
+		deadLetterEnabled = amqpDetails.deadLetterEnabled
+		messageRetries    = amqpDetails.messageRetries
 	)
 
 	var (
@@ -80,6 +86,7 @@ func GetMessages(topic string, f func(message Message)) {
 		exchangeName,
 		consumerId,
 		channel,
+		deadLetterEnabled,
 	)
 
 	if err != nil {
@@ -98,28 +105,11 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 	}
 
-	messageRetries := util.GetEnvOrDefault(EnvMessageRetries, "5")
-
-	maxRetryCount, err := strconv.Atoi(messageRetries)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to set %#v: Can't convert '%#v' to an integer!",
-				EnvMessageRetries,
-				messageRetries,
-			)
-
-			k.Payload = err
-		})
-	}
-
 	for message := range messages {
 		var (
 			deliveryTag = message.DeliveryTag
 			body        = message.Body
+			routingKey  = message.RoutingKey
 		)
 
 		log.Debug(func(k *log.Log) {
@@ -131,6 +121,7 @@ func GetMessages(topic string, f func(message Message)) {
 		bodyBuf := bytes.NewBuffer(body)
 
 		// Risk of a collision is near 0 enough to be ignored.
+
 		retryKey := fmt.Sprintf(
 			"worker.%#v.retry.%#v.%#v",
 			workerId,
@@ -138,17 +129,25 @@ func GetMessages(topic string, f func(message Message)) {
 			util.GetHash(body),
 		)
 
-		retryCount := state.Incr(retryKey)
-		state.Expire(retryKey, 86400) // 24 hours
+		if deadLetterEnabled {
+			retryCount := state.Incr(retryKey)
 
-		if int(retryCount) >= maxRetryCount {
-			queueNackDeliveryTag(channel, deliveryTag)
-			state.Del(retryKey) // Clean up the retry key
-			continue
+			state.Expire(retryKey, 86400) // 24 hours
+
+			// the number of retries exceeds the max retry count! giving up!
+
+			if int(retryCount) >= messageRetries {
+
+				queueNackDeliveryTag(channel, deliveryTag)
+
+				state.Del(retryKey)
+
+				continue
+			}
 		}
 
 		f(Message{
-			Topic:   topic,
+			Topic:   routingKey,
 			Content: bodyBuf,
 		})
 
@@ -175,7 +174,11 @@ func GetMessages(topic string, f func(message Message)) {
 			deliveryTag,
 		)
 
-		state.Del(retryKey) // Clean up the retry key
+		// clean up the retry key
+
+		if deadLetterEnabled {
+			state.Del(retryKey)
+		}
 	}
 }
 

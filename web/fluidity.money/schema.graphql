@@ -1,0 +1,172 @@
+schema {
+  query: query_root
+  subscription: subscription_root
+}
+
+"""whether this query should be cached (Hasura Cloud only)"""
+directive @cached(
+  """measured in seconds"""
+  ttl: Int! = 60
+
+  """refresh the cache entry"""
+  refresh: Boolean! = false
+) on QUERY
+
+scalar float8
+
+"""
+Boolean expression to compare columns of type "float8". All fields are combined with logical 'AND'.
+"""
+input float8_comparison_exp {
+  _eq: float8
+  _gt: float8
+  _gte: float8
+  _in: [float8!]
+  _is_null: Boolean
+  _lt: float8
+  _lte: float8
+  _neq: float8
+  _nin: [float8!]
+}
+
+scalar network_blockchain
+
+"""
+Boolean expression to compare columns of type "network_blockchain". All fields are combined with logical 'AND'.
+"""
+input network_blockchain_comparison_exp {
+  _eq: network_blockchain
+  _gt: network_blockchain
+  _gte: network_blockchain
+  _in: [network_blockchain!]
+  _is_null: Boolean
+  _lt: network_blockchain
+  _lte: network_blockchain
+  _neq: network_blockchain
+  _nin: [network_blockchain!]
+}
+
+"""column ordering options"""
+enum order_by {
+  """in ascending order, nulls last"""
+  asc
+
+  """in ascending order, nulls first"""
+  asc_nulls_first
+
+  """in ascending order, nulls last"""
+  asc_nulls_last
+
+  """in descending order, nulls first"""
+  desc
+
+  """in descending order, nulls first"""
+  desc_nulls_first
+
+  """in descending order, nulls last"""
+  desc_nulls_last
+}
+
+"""
+columns and relationships of "prize_pool"
+"""
+type prize_pool {
+  amount: float8!
+  last_updated: timestamp!
+  network: network_blockchain!
+}
+
+"""
+Boolean expression to filter rows from the table "prize_pool". All fields are combined with a logical 'AND'.
+"""
+input prize_pool_bool_exp {
+  _and: [prize_pool_bool_exp!]
+  _not: prize_pool_bool_exp
+  _or: [prize_pool_bool_exp!]
+  amount: float8_comparison_exp
+  last_updated: timestamp_comparison_exp
+  network: network_blockchain_comparison_exp
+}
+
+"""Ordering options when selecting data from "prize_pool"."""
+input prize_pool_order_by {
+  amount: order_by
+  last_updated: order_by
+  network: order_by
+}
+
+"""
+select columns of table "prize_pool"
+"""
+enum prize_pool_select_column {
+  """column name"""
+  amount
+
+  """column name"""
+  last_updated
+
+  """column name"""
+  network
+}
+
+type query_root {
+  """
+  fetch data from the table: "prize_pool"
+  """
+  prize_pool(
+    """distinct select on columns"""
+    distinct_on: [prize_pool_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [prize_pool_order_by!]
+
+    """filter the rows returned"""
+    where: prize_pool_bool_exp
+  ): [prize_pool!]!
+}
+
+type subscription_root {
+  """
+  fetch data from the table: "prize_pool"
+  """
+  prize_pool(
+    """distinct select on columns"""
+    distinct_on: [prize_pool_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [prize_pool_order_by!]
+
+    """filter the rows returned"""
+    where: prize_pool_bool_exp
+  ): [prize_pool!]!
+}
+
+scalar timestamp
+
+"""
+Boolean expression to compare columns of type "timestamp". All fields are combined with logical 'AND'.
+"""
+input timestamp_comparison_exp {
+  _eq: timestamp
+  _gt: timestamp
+  _gte: timestamp
+  _in: [timestamp!]
+  _is_null: Boolean
+  _lt: timestamp
+  _lte: timestamp
+  _neq: timestamp
+  _nin: [timestamp!]
+}
+

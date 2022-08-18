@@ -209,7 +209,17 @@ func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.Transactio
 				)
 			}
 
-			sourceMint = solana.MustPublicKeyFromBase58(newMint)
+			sourceMint, err = solana.PublicKeyFromBase58(newMint)
+
+			if err != nil {
+				return nil, fmt.Errorf(
+					"failed to get the mint public key from base58 %#v instruction %v in %#v: %v",
+					newMint,
+					instructionNumber,
+					transactionSignature,
+					err,
+				)
+			}
 		}
 
 		price, err := pyth.GetPriceByToken(solanaClient, sourceMint.String())

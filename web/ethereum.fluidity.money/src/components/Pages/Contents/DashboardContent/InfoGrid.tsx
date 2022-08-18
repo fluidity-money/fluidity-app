@@ -26,7 +26,7 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
               key={winning_amount + String(i)}
             >
               $
-              {formatAmount(winning_amount, token_details.token_decimals)
+              {formatAmount(winning_amount, token_details.token_decimals, token_details.token_decimals)
                 .substring(0, 8)
                 .split("")
                 .map((e, idx) =>
@@ -35,7 +35,8 @@ const InfoGrid = ({ prizeBoard }: infoGrid) => {
                   ) : (
                     <div key={idx}>{e}</div>
                   )
-                )}
+                )
+              }
             </div>
           ))}
         </div>

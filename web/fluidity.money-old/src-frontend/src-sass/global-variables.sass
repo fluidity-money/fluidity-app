@@ -1,0 +1,58 @@
+
+$page-max-width: 1920px
+$horizontal-padding: 120px
+
+$ginger-pro: "Ginger Pro Demi", "sans-serif"
+$montserrat: "Montserrat", "sans-serif"
+$manrope: "Manrope", "sans-serif"
+$raleway: "Raleway", "sans-serif"
+$poppins: "Poppins", "sans-serif"
+
+$header-size: 25px
+$header-font: "Manrope", "sans-serif"
+
+$subheader-size: 20px
+
+$default-text-color: #F5F9FC
+
+$background: #1A1A1A
+
+$selected-border: #177FFF
+
+$mobile_query: 1010px
+
+$fade-in-animation: fade-in 3s
+
+$highlight-animation: highlight 0.5s
+$no-highlight-animation: no-highlight 0.5s
+
+$social-highlight-background: linear-gradient(180deg, #5BFEF3 0%, #1881FE 100%)
+$social-no-highlight-background: #032241
+
+$social-highlight-animation: social-highlight 0.5s
+
+$social-no-highlight-animation: no-social-highlight 0.5s
+
+// https://stackoverflow.com/a/51496341
+$border-gradient: -webkit-linear-gradient(0deg, #d897ee 6.822%, #ca9def 16.962%, #a4aef2 36.172%, #66c9f7 62.514%, #13effe 94.686%, #04f5ff 100%)
+
+@mixin use-border-gradient($border-radius: 17px, $padding: 2px)
+  &:before
+    content: ""
+
+    position: absolute
+    pointer-events: none
+
+    top:     0 
+    left:    0 
+    right:   0 
+    bottom:  0 
+    padding: $padding
+
+    border-radius: $border-radius
+    background: $border-gradient
+
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)
+    -webkit-mask-composite: xor
+    mask-composite: exclude

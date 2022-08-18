@@ -1,15 +1,12 @@
-
-FROM fluidity/build-container:latest
+FROM fluidity/node-container:latest
 
 WORKDIR /usr/local/src/fluidity/cmd/microservice-solana-tribeca-create-proposal
 
-RUN apt-get install -y \
-    npm
-
 COPY . .
-
 RUN make
 
 ENTRYPOINT [ \
+	"wait-for-amqp", \
 	"./start.sh" \
 ]
+

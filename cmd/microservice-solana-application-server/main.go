@@ -1,12 +1,11 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
@@ -30,44 +29,15 @@ const (
 	EnvRaydiumProgramId = `FLU_SOLANA_RAYDIUM_PROGRAM_ID`
 )
 
-func tokenListFromEnv(env string) map[string]string {
-	tokenListString := util.GetEnvOrFatal(env)
-
-	tokensMap := make(map[string]string)
-
-	tokens := strings.Split(tokenListString, ",")
-
-	for _, token := range tokens {
-		tokenDetails := strings.Split(token, ":")
-
-		if len(tokenDetails) != 2 {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Unexpected token details format! Expected fluid:base, got %s",
-					token,
-				)
-			})
-		}
-
-		var (
-			fluid = tokenDetails[0]
-			base  = tokenDetails[1]
-		)
-
-		tokensMap[fluid] = base
-	}
-
-	return tokensMap
-}
-
 func main() {
 	var (
 		solanaRpcUrl       = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		fluidTokens        = tokenListFromEnv(EnvSolanaTokenLookups)
 		saberRpcUrl        = util.GetEnvOrFatal(EnvSaberRpcUrl)
 		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
 		raydiumProgramId   = util.GetEnvOrFatal(EnvRaydiumProgramId)
+
+		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
@@ -116,13 +86,15 @@ func main() {
 			transfers = append(transfers, decorated...)
 		}
 
-		bufferedTransfers := worker.SolanaBufferedTransfers{
-			Transfers: transfers,
-		}
+		if len(transfers) > 0 {
+			bufferedTransfers := worker.SolanaBufferedTransfers{
+				Transfers: transfers,
+			}
 
-		queue.SendMessage(
-			worker.TopicSolanaBufferedTransfers,
-			bufferedTransfers,
-		)
+			queue.SendMessage(
+				worker.TopicSolanaBufferedTransfers,
+				bufferedTransfers,
+			)
+		}
 	})
 }
