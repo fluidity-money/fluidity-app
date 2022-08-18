@@ -19,11 +19,13 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
+	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -41,23 +43,8 @@ const (
 	// to use Flux as a price oracle
 	BackendAurora = "aurora"
 
-	// CompoundBlocksPerDay to use when calculating Compound's APY
-	// (set to 13.5 seconds per block)
-	CompoundBlocksPerDay = 6570
-
-	// DefaultSecondsSinceLastBlock to use instead of calculating it on the fly
-	DefaultSecondsSinceLastBlock = 13
-
-	// CurrentAtxTransactionMargin as an upper boundary for the abnormal block
-	// transfer condition
-	CurrentAtxTransactionMargin = 0
-
-	// DefaultTransfersInBlock to use when the average transfers in the block
-	// are below 0
-	DefaultTransfersInBlock = 0
-
 	// SecondsInOneYear to use for ATX calculation
-	SecondsInOneYear = 365 * 24 * 60 * 60
+	SecondsInOneYear uint64 = 365 * 24 * 60 * 60
 
 	// UsdtDecimals to normalise values to
 	UsdtDecimals = 1e6
@@ -122,9 +109,6 @@ const (
 	// EnvApplicationContracts to list the application contracts to monitor
 	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
 )
-
-// AtxBufferSize to go back in time to count the average using the database
-var AtxBufferSize = roundUp(SecondsInOneYear / DefaultSecondsSinceLastBlock)
 
 func main() {
 	var (
@@ -222,11 +206,6 @@ func main() {
 	contractAddress := ethereum.AddressFromString(contractAddress_)
 	ethContractAddress = hexToAddress(contractAddress)
 
-	var (
-		currentAtxTransactionMarginRat = new(big.Rat).SetInt64(CurrentAtxTransactionMargin)
-		secondsInOneYearRat            = new(big.Rat).SetInt64(SecondsInOneYear)
-	)
-
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
 
 	if err != nil {
@@ -269,8 +248,31 @@ func main() {
 			transfersInBlock int
 		)
 
+		// set the configuration using what's in the database for the block
+
+		workerConfig := worker_config.GetWorkerConfigEthereum(network.NetworkEthereum)
+
+		var (
+			defaultSecondsSinceLastBlock = workerConfig.DefaultSecondsSinceLastBlock
+			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
+			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
+		)
+
+		var (
+			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(currentAtxTransactionMargin)
+			secondsInOneYearRat            = new(big.Rat).SetUint64(SecondsInOneYear)
+		)
+
+		secondsSinceLastBlock := defaultSecondsSinceLastBlock
+
+		// atxBufferSize to go back in time to count the average using the database
+
+		atxBufferSize := roundUp(float64(SecondsInOneYear / defaultSecondsSinceLastBlock))
+
 		switch true {
+
 		// received from logs queue
+
 		case serverWork.EthereumBlockLog != nil:
 			blockBaseFee = blockLog.BlockBaseFee
 			logs = blockLog.Logs
@@ -297,13 +299,14 @@ func main() {
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)
 
-		var secondsSinceLastBlock uint64 = DefaultSecondsSinceLastBlock
-
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
 		emission := worker.NewEthereumEmission()
 
-		emission.Network = "ethereum"
+		// set the network to the token backend (could be ethereum or aurora)
+
+		emission.Network = tokenBackend
+
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
 		emission.EthereumBlockNumber = blockNumber
@@ -367,9 +370,12 @@ func main() {
 
 		averageTransfersInBlock := addAndComputeAverageAtx(
 			blockNumber.Uint64(),
+			atxBufferSize,
 			tokenName,
 			transfersInBlock,
 		)
+
+		emission.AverageTransfersInBlock = float64(averageTransfersInBlock)
 
 		if transfersInBlock == 0 {
 			log.Debugf(
@@ -386,12 +392,12 @@ func main() {
 			transfersInBlock,
 		)
 
-		if averageTransfersInBlock < DefaultTransfersInBlock {
+		if averageTransfersInBlock < defaultTransfersInBlock {
 			log.Debugf(
 				"Average transfers in block < default transfers in block (25)!",
 			)
 
-			averageTransfersInBlock = DefaultTransfersInBlock
+			averageTransfersInBlock = defaultTransfersInBlock
 		}
 
 		// if this block is abnormal and could be an attack, we don't use the
@@ -671,6 +677,8 @@ func main() {
 			emission.Update()
 
 			queue.SendMessage(worker.TopicEmissions, emission)
+
+			log.Debugf("emission: %s", emission)
 		}
 
 		queue.SendMessage(publishAmqpQueueName, blockAnnouncements)

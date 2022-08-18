@@ -2,7 +2,8 @@
 
 SERVICES:
   - SLURP:
-      SERVICE_NAME: microservice-common-amqp-http-long-poll-basic
+      SERVICE_NAME: microservice-common-amqp-http-long-poll-basic-ethereum
+      DOCKER_IMAGE: microservice-common-amqp-http-long-poll-basic
       DOCKERFILE_PATH: ./cmd/microservice-common-amqp-http-long-poll-basic
       TARGET_GROUP: flu-dev-ropsten-slurp-tg
       ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-common-amqp-http-long-poll-basic

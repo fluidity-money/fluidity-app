@@ -77,7 +77,7 @@ INSERT INTO winners VALUES
 	)
 EOF
 
-./microservice-common-count-wins.o
+./microservice-common-count-wins.out
 
 psql_connect <<EOF
 DO \$\$ BEGIN

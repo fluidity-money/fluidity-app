@@ -82,6 +82,9 @@ const App = () => {
   // Toggle state for user action history
   const [userActions, setUserActions] = useState<Routes["/my-history"]>([]);
 
+  // Toggle state for user mint limit
+  const [mintLimit, setMintLimit] = useState(0);
+
   const [notificationTrigger, setNotificationTrigger] =
     useState<boolean>(false);
 
@@ -140,6 +143,8 @@ const App = () => {
     setPrizePool,
     userActions,
     setUserActions,
+    mintLimit,
+    setMintLimit,
     prizeBoard,
     messageData,
     setMessageData,

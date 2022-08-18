@@ -68,9 +68,7 @@ const App = () => {
 
   const [messageData, setMessageData] = useState<WebsocketMessage>({});
 
-  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>(
-    []
-  );
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>({});
 
   const { lastJsonMessage } = useWebSocket(root_websocket);
 

@@ -8,10 +8,10 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-worker-spooler/microservice-ethereum-worker-spooler.o .
+COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-worker-spooler/microservice-ethereum-worker-spooler.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"./microservice-ethereum-worker-spooler.o" \
+	"./microservice-ethereum-worker-spooler.out" \
 ]
 

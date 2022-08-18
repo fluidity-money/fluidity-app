@@ -3,8 +3,8 @@ FROM fluidity/build-container:latest AS build
 WORKDIR /usr/local/src/fluidity/cmd/microservice-solana-user-actions
 
 COPY . .
-RUN make
 
+RUN make
 
 FROM fluidity/runtime-container:latest
 
