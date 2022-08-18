@@ -203,7 +203,8 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 	// Find mtBaseTokenFee by taking last log. If last log was a transfer to
 	// the sender, mtBaseTokenFee is 0
-	txHash := ethCommon.HexToHash(string(transfer.Transaction.Hash))
+	txHash_ := string(transfer.Transaction.Hash)
+	txHash := ethCommon.HexToHash(txHash_)
 
 	// Get all logs in transaction
 	txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
@@ -295,10 +296,12 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 // DODO calculates fees via dynamic maintenance (mt) and static (lp) fees
 // All calculations are wrapped in toToken
-//     getQuote(fromAmount) -> quote - (quote * lpRate) - mtFee -> toAmount
+//
+//	getQuote(fromAmount) -> quote - (quote * lpRate) - mtFee -> toAmount
 //
 // calculateDodoFee performs the reverse operation to get total toTokenFee
-//     toAmount + mtFee -> mtAdjustedAmt / (1 - lpRate) -> getQuote(fromAmount)
+//
+//	toAmount + mtFee -> mtAdjustedAmt / (1 - lpRate) -> getQuote(fromAmount)
 //
 // If necessary, calculateDodoFee will approximate the conversion from toTokenFee to fromTokenFee
 func calculateDodoV2Fee(fromAmount, toAmount, lpFeeRate, mtToTokenFee *big.Rat, toTokenIsFluid bool) *big.Rat {
