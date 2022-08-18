@@ -18,7 +18,7 @@ const ResourcesPage = () => {
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
         <Navigation page={"resources"} pageLocations={pageLocations} />
-        <ResourcesPageTitle />
+        <Articles />
         <Tweets />
         <Fluniversity />
         <Whitepapers />
