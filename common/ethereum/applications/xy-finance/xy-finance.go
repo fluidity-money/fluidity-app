@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"os"
 	"sort"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -165,11 +163,12 @@ const ERC20AbiString = `[
 {
 	"constant": true,
 	"inputs": [],
-	"name": "symbol",
+	"name": "decimals",
 	"outputs": [
 		{
+			"internalType": "uint8",
 			"name": "",
-			"type": "string"
+			"type": "uint8"
 		}
 	],
 	"payable": false,
@@ -181,12 +180,14 @@ var xyFinanceAbi ethAbi.ABI
 
 var erc20Abi ethAbi.ABI
 
-// EnvUniswapAnchoredViewAddress to use to use the Uniswap price oracle to
-// get the price the token when making the prize pool
-const EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
-
-// ethereumTokenAddress is how XY internally stores the Ethereum token
-const ethereumTokenAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+// List of Day 1 supported stable tokens
+var supportedTokens = map[libEthereum.Address]bool{
+	"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": true, // USDC
+	"0x853d955acef822db058eb8505911ed77f175b99e": true, // Frax
+	"0xdac17f958d2ee523a2206206994597c13d831ec7": true, // USDT
+	"0x0000000000085d4780b73119b644ae5ecd22b376": true, // TUSD
+	"0x6b175474e89094c44da98b954eedeac495271d0f": true, // DAI
+}
 
 type xyFee = struct {
 	Rate,
@@ -214,13 +215,6 @@ var xyFeeTable = map[int]xyFee{
 // approximated via `xyFeeTable`
 // xyFeeTable is sourced here: https://docs.xy.finance/products/x-swap/fee-structure
 func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
-	var (
-		// uniswapAnchoredViewAddress is used to get the USD price of a potentially non-stable token
-		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
-
-		uniswapAnchoredViewAddress = ethCommon.HexToAddress(uniswapAnchoredViewAddress_)
-	)
-
 	unpacked, err := xyFinanceAbi.Unpack("SourceChainSwap", transfer.Log.Data)
 
 	if err != nil {
@@ -404,21 +398,28 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	// usdToTokenRatio is defined as Token/USD
 	usdToTokenRatio := big.NewRat(1, 1)
 
-	if fromTokenIsFluid {
+	switch true {
+	case fromTokenIsFluid:
 		// Assuming Fluid is a stable coin, USD = Fluid x 1eDecimals
 		decimalsAdjusted := math.Pow10(tokenDecimals)
 		usdToTokenRatio = new(big.Rat).SetFloat64(decimalsAdjusted)
-	} else {
-		// Token is potentially non-fluid, use Uniswap Price Oracle
-		usdToTokenRatio, err = getUniswapUsdToTokenRatio(client, fromToken, uniswapAnchoredViewAddress)
 
-		if err != nil {
-			return nil, fmt.Errorf(
-				"Failed to get exchange rate for non-stable token %#v! %v",
-				fromToken,
-				err,
+	case fromTokenIsSupported(fromToken):
+		// Assuming supported tokens are stable coins, USD = Token x 1eDecimals
+		decimalsAdjusted := math.Pow10(tokenDecimals)
+		usdToTokenRatio = new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	default:
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a XY swap %v in transaction %#v with unsupported token %v - skipping!",
+				swap_id,
+				transfer.Log.TxHash,
+				fromToken.String(),
 			)
-		}
+		})
+
+		return nil, nil
 	}
 
 	// Calculate USD Fee from fromTokenAmount
@@ -431,49 +432,43 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	return feeUsd, nil
 }
 
-// getUniswapUsdToTokenRatio approximates the ratio between Token/USD
-// The approximation is derived from a Uniswap Price Oracle contract
-func getUniswapUsdToTokenRatio(client *ethclient.Client, tokenAddress, uniswapAnchoredViewAddress ethCommon.Address) (*big.Rat, error) {
-	fromTokenAddress_ := tokenAddress.String()
-	fromTokenAddress := libEthereum.AddressFromString(fromTokenAddress_)
+// fromTokenIsSupported checks if fromToken is part of Day 1 supported Eth tokens
+func fromTokenIsSupported(token ethCommon.Address) bool {
+	tokenAddress_ := token.String()
+	tokenAddress := libEthereum.AddressFromString(tokenAddress_)
 
-	if fromTokenAddress == libEthereum.AddressFromString(ethereumTokenAddress) {
-		// Set Ethereum token symbol to ETH and call Uniswap Price Oracle
-		return uniswap_anchored_view.GetPrice(client, uniswapAnchoredViewAddress, "ETH")
-	}
+	_, found := supportedTokens[tokenAddress]
 
-	// Get Token Symbol
-	symbol_, err := ethereum.StaticCall(client, tokenAddress, erc20Abi, "symbol")
+	return found
+}
+
+// getUsdToTokenRatio approximates the ratio between Token/USD
+// Assuming token is stable, approximation is Token * 1eDecimals
+func getUsdToTokenRatio(client *ethclient.Client, tokenAddress ethCommon.Address) (*big.Rat, error) {
+	// Get Token Decimals
+	decimals_, err := ethereum.StaticCall(client, tokenAddress, erc20Abi, "decimals")
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to fetch token symbol! %v",
+			"Failed to fetch token decimals! %v",
 			err,
 		)
 	}
 
-	tokenSymbol, casted := symbol_[0].(string)
-
-	if !casted {
-		return nil, fmt.Errorf(
-			"Failed to assert type string from symbol %#v!",
-			symbol_,
-		)
-	}
-
-	// tokenUsdRate is in terms of Token/USD
-	tokenUsdRate, err := uniswap_anchored_view.GetPrice(client, uniswapAnchoredViewAddress, tokenSymbol)
+	decimals, err := ethereum.CoerceBoundContractResultsToUint8(decimals_)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to get the current exchange rate for %#v from address %#v! %v",
-			tokenSymbol,
-			uniswapAnchoredViewAddress,
-			err,
+			"Failed to coerce decimals to uint8 %#v!",
+			decimals_,
 		)
 	}
 
-	return tokenUsdRate, nil
+	// Assuming Fluid is a stable coin, USD = Fluid x 1eDecimals
+	decimalsAdjusted := math.Pow10(int(decimals))
+	usdToTokenRatio := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	return usdToTokenRatio, nil
 }
 
 // calculateXySwapFee takes 0.035% per transaction of stable-coins, with a minimum and maximum
