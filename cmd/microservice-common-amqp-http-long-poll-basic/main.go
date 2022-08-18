@@ -130,7 +130,7 @@ func main() {
 
 		wFlusher := w.(http.Flusher)
 
-		buf := bufio.NewWriterSize(w, 1024)
+		buf := bufio.NewWriterSize(w, 1024 * 2)
 
 		for message := range messages {
 			_, err := buf.Write(message)
