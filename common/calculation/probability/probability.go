@@ -219,5 +219,7 @@ func NaiveIsWinning(balls []uint32, emission *worker.Emission) int {
 
 	emission.NaiveIsWinning.IsWinning = matchedBalls > 0
 
+	emission.NaiveIsWinng.MatchedBalls = matchedBalls
+
 	return matchedBalls
 }
