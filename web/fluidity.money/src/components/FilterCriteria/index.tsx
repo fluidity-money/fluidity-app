@@ -1,3 +1,3 @@
-import FIlterCriteria from "./FIlterCriteria";
+import FilterCriteria from "./FilterCriteria";
 
-export default FIlterCriteria;
+export default FilterCriteria;

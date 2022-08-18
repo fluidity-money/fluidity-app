@@ -7,7 +7,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
@@ -37,8 +36,8 @@ func HandlePendingRewards(w http.ResponseWriter, r *http.Request) interface{} {
 	}
 
 	var (
-		addressString = request.Address
-		address       = typesEthereum.AddressFromString(addressString)
+		address       = addressRequestToEthereumAddress(request.Address)
+		addressString = address.String()
 	)
 
 	rewards := spooler.GetPendingRewardsForAddress(addressString)

@@ -1,9 +1,16 @@
+import TabButton from "components/Button/TabButton";
 import React from "react";
-import { TextButton } from "../../components/Button";
+import { GeneralButton, TextButton } from "../../components/Button";
 import ContinuousCarousel from "../../components/ContinuousCarousel";
 import FooterItem from "../../components/FooterItem";
 import Socials from "../../components/Socials";
 import styles from "./Footer.module.scss";
+
+interface IItem {
+  title: string;
+  src: string;
+  type: "internal" | "external";
+}
 
 const Footer = () => {
   /*
@@ -21,8 +28,22 @@ const Footer = () => {
         </div>
         <div className={styles.communication}>
           <div className={styles.buttons}>
-            <TextButton colour={"white"}>LAUNCH FLUIDITY</TextButton>
-            <TextButton colour={"black"}>LET'S CHAT</TextButton>
+            <GeneralButton
+              handleClick={() => {}}
+              version={"primary"}
+              type={"text"}
+              size={"large"}
+            >
+              LAUNCH FLUIDITY
+            </GeneralButton>
+            <GeneralButton
+              handleClick={() => {}}
+              version={"secondary"}
+              type={"text"}
+              size={"large"}
+            >
+              LET'S CHAT
+            </GeneralButton>
           </div>
           <div className={styles.legal}>
             <h6>Terms</h6>
@@ -54,27 +75,27 @@ const Footer = () => {
 
 export default Footer;
 
-const howItWorks = [
-  { title: "Fluidity demo", src: "", type: "arrow" },
-  { title: "Roadmap", src: "", type: "box" },
+const howItWorks: IItem[] = [
+  { title: "Fluidity demo", src: "", type: "internal" },
+  { title: "Roadmap", src: "", type: "external" },
 ];
 
-const ecosystem = [
-  { title: "DeFi", src: "", type: "arrow" },
-  { title: "DEX", src: "", type: "arrow" },
-  { title: "Transactions", src: "", type: "arrow" },
-  { title: "NFTs", src: "", type: "box" },
+const ecosystem: IItem[] = [
+  { title: "DeFi", src: "", type: "internal" },
+  { title: "DEX", src: "", type: "internal" },
+  { title: "Transactions", src: "", type: "internal" },
+  { title: "NFTs", src: "", type: "external" },
 ];
 
-const fluidStats = [
-  { title: "Overview", src: "", type: "arrow" },
-  { title: "Rewards", src: "", type: "arrow" },
-  { title: "Transactions", src: "", type: "arrow" },
+const fluidStats: IItem[] = [
+  { title: "Overview", src: "", type: "internal" },
+  { title: "Rewards", src: "", type: "internal" },
+  { title: "Transactions", src: "", type: "internal" },
 ];
 
-const resources = [
-  { title: "Articles", src: "", type: "arrow" },
-  { title: "Fluniversity", src: "", type: "arrow" },
-  { title: "Whitepapers", src: "", type: "arrow" },
-  { title: "Documentation", src: "", type: "box" },
+const resources: IItem[] = [
+  { title: "Articles", src: "", type: "internal" },
+  { title: "Fluniversity", src: "", type: "internal" },
+  { title: "Whitepapers", src: "", type: "internal" },
+  { title: "Documentation", src: "", type: "external" },
 ];
