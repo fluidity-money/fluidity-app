@@ -72,6 +72,10 @@ func main() {
 		})
 	}()
 
+	web.Endpoint("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "ok")
+	})
+
 	web.Endpoint("/", func(w http.ResponseWriter, r *http.Request) {
 		ipAddress := web.GetIpAddress(r)
 
