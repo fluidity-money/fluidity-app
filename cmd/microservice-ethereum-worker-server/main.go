@@ -371,6 +371,8 @@ func main() {
 			transfersInBlock,
 		)
 
+		emission.AverageTransfersInBlock = float64(averageTransfersInBlock)
+
 		if transfersInBlock == 0 {
 			log.Debugf(
 				"Couldn't find any Fluid transfers in the block %v!",

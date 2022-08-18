@@ -21,6 +21,8 @@ type Emission struct {
 	EthereumBlockNumber misc.BigInt `json:"ethereum_block_number"`
 	SolanaSlotNumber    misc.BigInt `json:"solana_slot_number"`
 
+	AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
+
 	Payout struct {
 		Winnings        float64 `json:"winnings"` // Winnings
 		P               float64 `json:"p"`        // Probability

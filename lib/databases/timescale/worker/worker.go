@@ -29,19 +29,20 @@ func InsertEmissions(emission Emission) {
 	timescaleClient := timescale.Client()
 
 	var (
-		network             = emission.Network
-		tokenDetails        = emission.TokenDetails
-		transactionHash     = emission.TransactionHash
-		recipientAddress    = emission.RecipientAddress
-		senderAddress       = emission.SenderAddress
-		payout              = emission.Payout
-		calculateN          = emission.CalculateN
-		naiveIsWinning      = emission.NaiveIsWinning
-		calculateBpy        = emission.CalculateBpy
-		aaveGetTokenApy     = emission.AaveGetTokenApy
-		compoundGetTokenApy = emission.CompoundGetTokenApy
-		winningChances      = emission.WinningChances
-		lastUpdated         = emission.LastUpdated
+		network                 = emission.Network
+		tokenDetails            = emission.TokenDetails
+		transactionHash         = emission.TransactionHash
+		recipientAddress        = emission.RecipientAddress
+		senderAddress           = emission.SenderAddress
+		payout                  = emission.Payout
+		calculateN              = emission.CalculateN
+		naiveIsWinning          = emission.NaiveIsWinning
+		calculateBpy            = emission.CalculateBpy
+		aaveGetTokenApy         = emission.AaveGetTokenApy
+		compoundGetTokenApy     = emission.CompoundGetTokenApy
+		winningChances          = emission.WinningChances
+		lastUpdated             = emission.LastUpdated
+		averageTransfersInBlock = emission.AverageTransfersInBlock
 	)
 
 	var testingBallsString strings.Builder
@@ -119,7 +120,9 @@ func InsertEmissions(emission Emission) {
 			probability_4,
 			probability_5,
 
-			naive_is_winning_is_winning
+			naive_is_winning_is_winning,
+
+			average_transfers_in_block
 		)
 
 		VALUES (
@@ -184,7 +187,9 @@ func InsertEmissions(emission Emission) {
 			$49,
 			$50,
 
-			$51
+			$51,
+
+			$52
 		);`,
 
 		TableEmissions,
@@ -255,6 +260,8 @@ func InsertEmissions(emission Emission) {
 		winningChances.Probability5,
 
 		naiveIsWinning.IsWinning,
+
+		averageTransfersInBlock,
 	)
 
 	if err != nil {
