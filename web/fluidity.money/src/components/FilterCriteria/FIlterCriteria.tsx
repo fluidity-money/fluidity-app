@@ -1,5 +1,5 @@
+import { FilterButton } from "components/Button";
 import React from "react";
-import FilterOption from "../FilterOption";
 import styles from "./FilterCriteria.module.scss";
 
 interface IOption {
@@ -18,7 +18,7 @@ interface IFilterCriteriaProps {
   ) => void;
 }
 
-const FIlterCriteria = ({
+const FilterCriteria = ({
   children,
   options,
   handleFilter,
@@ -29,7 +29,7 @@ const FIlterCriteria = ({
       <h5>{children}</h5>
       <div className={styles.options}>
         {options.map((option) => (
-          <FilterOption
+          <FilterButton
             option={option}
             handleFilter={handleFilter}
             setOptions={setOptions}
@@ -41,4 +41,4 @@ const FIlterCriteria = ({
   );
 };
 
-export default FIlterCriteria;
+export default FilterCriteria;

@@ -282,7 +282,17 @@ func handleStreaming(stream io.Reader, chanTweets chan twitter.Tweet) error {
 	for {
 		var twitterTweet twitterTweet
 
-		if err := reader.Decode(&twitterTweet); err != nil {
+		err := reader.Decode(&twitterTweet)
+
+		switch err {
+		case io.EOF:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Twitter connector connection closed!"
+			})
+
+		case nil:
+
+		default:
 			log.Fatal(func(k *log.Log) {
 				k.Message = "Failed to decode a tweet off the Twitter queue!"
 				k.Payload = err

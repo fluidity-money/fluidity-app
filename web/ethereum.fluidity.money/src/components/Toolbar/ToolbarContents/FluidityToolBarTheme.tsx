@@ -37,9 +37,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   const [address, setAddress] = useState(wallet.account || "Loading...");
 
   const [showPendingWins, setShowPendingWins] = useState(false);
-  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>(
-    []
-  );
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>({});
 
   const modalToggle = () => {
     setToggle(!toggle);
@@ -90,9 +88,11 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
     if (!wallet.account) return;
 
     const pending = await apiPOSTBody("/pending-rewards", {
-      address: wallet.account,
+      address: wallet.account
     });
-    setPendingWins(pending);
+
+    if (pending != null)
+      setPendingWins(pending);
   };
 
   return (
@@ -137,6 +137,22 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/wallet")}
                 selected={selected.options[2]}
+                auth={active}
+                priviledge={1}
+              />
+              <Button
+                label={`${
+                  Object.keys(pendingWins).length > 0 ? "Show" : "Fetch"
+                } Pending Wins`}
+                theme={`primary-text${appTheme}`}
+                texttheme="header-text"
+                padding="toolbarBtnPadding"
+                goto={() =>
+                  Object.keys(pendingWins).length > 0
+                    ? setShowPendingWins(true)
+                    : fetchPendingWins()
+                }
+                selected={false}
                 auth={active}
                 priviledge={1}
               />
@@ -190,7 +206,6 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
             <PendingWinsModal
               enable={showPendingWins}
               toggle={() => setShowPendingWins(!showPendingWins)}
-              provider={wallet.ethereum}
               pendingWins={pendingWins}
               fetchNew={fetchPendingWins}
             />

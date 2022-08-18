@@ -5,15 +5,15 @@ GO_BUILD := go build
 
 .PHONY: install
 
-all: wait-for-amqp.o wait-for-ws.o
+all: wait-for-amqp.out wait-for-ws.out
 
-wait-for-amqp.o: $(shell find wait-for-amqp -type f)
-	@cd wait-for-amqp && ${GO_BUILD} -o ../wait-for-amqp.o
+wait-for-amqp.out: $(shell find wait-for-amqp -type f)
+	@cd wait-for-amqp && ${GO_BUILD} -o ../wait-for-amqp.out
 
-wait-for-ws.o: $(shell find wait-for-ws -type f)
-	@cd wait-for-ws && ${GO_BUILD} -o ../wait-for-ws.o
+wait-for-ws.out: $(shell find wait-for-ws -type f)
+	@cd wait-for-ws && ${GO_BUILD} -o ../wait-for-ws.out
 
-install: wait-for-amqp.o wait-for-ws.o
+install: wait-for-amqp.out wait-for-ws.out
 	@cp wait-for-database.sh ${INSTALL_DIR}/wait-for-database.sh
-	@cp wait-for-amqp.o ${INSTALL_DIR}/wait-for-amqp
-	@cp wait-for-ws.o ${INSTALL_DIR}/wait-for-ws
+	@cp wait-for-amqp.out ${INSTALL_DIR}/wait-for-amqp
+	@cp wait-for-ws.out ${INSTALL_DIR}/wait-for-ws
