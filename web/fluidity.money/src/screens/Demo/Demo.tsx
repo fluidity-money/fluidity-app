@@ -1,5 +1,5 @@
 import React from "react";
-import { TextButton } from "../../components/Button";
+import { GeneralButton } from "../../components/Button";
 import styles from "./Demo.module.scss";
 
 const Demo = () => {
@@ -17,8 +17,14 @@ const Demo = () => {
           <h3>Fluid prizes claimed in the last week.</h3>
           <p>Connect your wallet to see what you could make</p>
           <section>
-            <TextButton colour="white">SHOW ME A DEMO</TextButton>
-            <TextButton colour="black">LAUNCH FLUIDITY</TextButton>  
+            <GeneralButton version={"primary"} type={"text"} size={"medium"} handleClick={function (): void {       
+            } }>
+              SHOW ME A DEMO
+            </GeneralButton>
+            <GeneralButton version={"secondary"} type={"text"} size={"medium"} handleClick={function (): void {
+            } }>
+              LAUNCH FLUIDITY
+            </GeneralButton>  
           </section>   
         </div>
       </div>

@@ -16,7 +16,7 @@ export const ArticleList = ({articles}: ArticleListProps) => {
 
     const list = articles.map((article) => {
         return (
-               <ArticleListCard id={article.id} title={article.title} desc={article.desc} info={article.info} />
+            <ArticleListCard id={article.id} title={article.title} desc={article.desc} info={article.info} />
         );
     });
 
