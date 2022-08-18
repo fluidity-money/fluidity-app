@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { TextButton } from "../Button";
+import { GeneralButton } from "../Button";
 import ResourcesNavModal from "../ResourcesNavModal";
 import styles from "./NavBar.module.scss";
 
@@ -17,7 +17,16 @@ const NavBar = () => {
           <div>
             <Link to={"/"}>Fluidity</Link>
           </div>
-          <TextButton colour="white">LAUNCH FLUIDITY</TextButton>
+          <GeneralButton
+            version={"secondary"}
+            type={"text"}
+            size={"medium"}
+            handleClick={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          >
+            LAUNCH FLUIDITY
+          </GeneralButton>
         </div>
       </div>
       <div className={styles.navbar}>

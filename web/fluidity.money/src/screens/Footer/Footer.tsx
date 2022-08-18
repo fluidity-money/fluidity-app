@@ -1,6 +1,5 @@
-import TabButton from "components/Button/TabButton";
 import React from "react";
-import { GeneralButton, TextButton } from "../../components/Button";
+import { GeneralButton } from "../../components/Button";
 import ContinuousCarousel from "../../components/ContinuousCarousel";
 import FooterItem from "../../components/FooterItem";
 import Socials from "../../components/Socials";
