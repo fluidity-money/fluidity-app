@@ -9,4 +9,4 @@ SERVICES:
       ENV_FLU_SOLANA_TVL_DATA_PUBKEY: B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP
       ENV_FLU_SOLANA_SOLEND_PROGRAM_ID: So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo
       SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
-      ***SECRET_FLU_SOLANA_TVL_PAYER_PRIKEY: /fluidity/solana/tvl_payer_prikey
+      SECRET_FLU_SOLANA_TVL_PAYER_PRIKEY: /fluidity/solana/tvl_payer_prikey
