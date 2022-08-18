@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"net/http"
@@ -125,8 +126,10 @@ func main() {
 
 		wFlusher := w.(http.Flusher)
 
+		buf := bufio.NewWriterSize(w, 1024)
+
 		for message := range messages {
-			_, err := w.Write(message)
+			_, err := buf.Write(message)
 
 			if err != nil {
 				log.App(func(k *log.Log) {
@@ -141,7 +144,12 @@ func main() {
 				return
 			}
 
-			wFlusher.Flush()
+			lessThanHalfAvailable := buf.Available() <= 512
+
+			if lessThanHalfAvailable {
+				_ = buf.Flush()
+				wFlusher.Flush()
+			}
 		}
 	})
 
