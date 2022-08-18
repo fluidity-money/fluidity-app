@@ -7,10 +7,10 @@ RUN make backend
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/web/solana.fluidity.money/solana.fluidity.money.o .
+COPY --from=build /usr/local/src/fluidity/web/solana.fluidity.money/solana.fluidity.money.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
 	"wait-for-database.sh", \
-	"./solana.fluidity.money.o" \
+	"./solana.fluidity.money.out" \
 ]

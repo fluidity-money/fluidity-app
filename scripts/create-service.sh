@@ -56,7 +56,7 @@ RUN make
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/cmd/$REPO/$REPO.o .
+COPY --from=build /usr/local/src/fluidity/cmd/$REPO/$REPO.out .
 
 ENTRYPOINT [ \\
 	"wait-for-amqp", \\

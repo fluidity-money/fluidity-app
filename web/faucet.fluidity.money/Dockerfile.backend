@@ -7,11 +7,11 @@ RUN make backend
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/web/faucet.fluidity.money/faucet.fluidity.money.o .
+COPY --from=build /usr/local/src/fluidity/web/faucet.fluidity.money/faucet.fluidity.money.out .
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
 	"wait-for-database.sh", \
-	"./faucet.fluidity.money.o" \
+	"./faucet.fluidity.money.out" \
 ]
 
