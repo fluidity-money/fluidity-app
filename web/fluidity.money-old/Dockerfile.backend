@@ -8,9 +8,9 @@ RUN make backend
 
 FROM fluidity/runtime-container:latest
 
-COPY --from=build /usr/local/src/fluidity/web/fluidity.money-old/fluidity.money.o .
+COPY --from=build /usr/local/src/fluidity/web/fluidity.money-old/fluidity.money.out .
 
 ENTRYPOINT [ \
 	"wait-for-database.sh", \
-	"./fluidity.money.o" \
+	"./fluidity.money.out" \
 ]
