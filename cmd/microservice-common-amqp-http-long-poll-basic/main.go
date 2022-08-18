@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"net/http"
@@ -126,7 +125,7 @@ func main() {
 
 		wFlusher := w.(http.Flusher)
 
-		buf := bufio.NewWriterSize(w, 1024 * 2)
+		var buf bytes.Buffer
 
 		for message := range messages {
 			_, err := buf.Write(message)
@@ -144,10 +143,24 @@ func main() {
 				return
 			}
 
-			lessThanHalfAvailable := buf.Available() <= 512
+			halfAMetabyteUsed := buf.Len() <= 512
 
-			if lessThanHalfAvailable {
-				_ = buf.Flush()
+			if halfAMetabyteUsed {
+				_, err := buf.WriteTo(w)
+
+				if err != nil {
+					log.App(func(k *log.Log) {
+						k.Format(
+							"Failed to send the write buffer to IP %v",
+							ipAddress,
+						)
+
+						k.Payload = err
+					})
+
+					return
+				}
+
 				wFlusher.Flush()
 			}
 		}
