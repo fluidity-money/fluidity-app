@@ -14,7 +14,6 @@ func GetWorkerConfigEthereum(network_ network.BlockchainNetwork) (config WorkerC
 
 	statementText := fmt.Sprintf(`
 		SELECT
-			network,
 			compound_blocks_per_day,
 			default_seconds_since_last_block,
 			current_atx_transaction_margin,
