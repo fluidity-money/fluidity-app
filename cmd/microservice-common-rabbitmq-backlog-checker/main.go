@@ -49,7 +49,7 @@ func main() {
 		})
 	}
 
-	_, err = strconv.ParseUint(maxDeadLetterCount_, 10, 32)
+	maxDeadLetterCount, err := strconv.ParseUint(maxDeadLetterCount_, 10, 32)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -98,14 +98,32 @@ func main() {
 
 			})
 
-			if messagesReady > maxReadyCount {
-				reportToDiscord(queue, "Ready", messagesReady, maxReadyCount)
-			}
+			switch isDeadLetterQueue(name) {
+			case true:
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"queue: %v is a dead letter queue! Using the message count limit of %v",
+						name,
+						maxDeadLetterCount,
+					)
+				})
 
-			if messagesUnacked > maxUnackedCount {
-				reportToDiscord(queue, "Unacked", messagesUnacked, maxUnackedCount)
+				if messagesReady > maxDeadLetterCount {
+					reportToDiscord(queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount)
+				}
+
+				if messagesUnacked > maxDeadLetterCount {
+					reportToDiscord(queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
+				}
+			case false:
+				if messagesReady > maxReadyCount {
+					reportToDiscord(queue, "Ready", messagesReady, maxReadyCount)
+				}
+
+				if messagesUnacked > maxUnackedCount {
+					reportToDiscord(queue, "Unacked", messagesUnacked, maxUnackedCount)
+				}
 			}
 		}
-
 	}
 }
