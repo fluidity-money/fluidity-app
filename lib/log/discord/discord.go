@@ -1,6 +1,6 @@
 package discord
 
-// notify channels in our Slack using a single function
+// notify channels in our Discord using a single function
 
 import (
 	"bytes"
@@ -14,13 +14,13 @@ import (
 
 const (
 	// Context to use when logging
-	Context = "SLACK"
+	Context = "DISCORD"
 
-	// EnvWebhookAddress to use to relay Slack messages to the chat
+	// EnvWebhookAddress to use to relay Discord messages to the chat
 	EnvWebhookAddress = "FLU_DISCORD_WEBHOOK"
 )
 
-// Levels of logging severity for Slack users to discern based on the border
+// Levels of logging severity for Discord users to discern based on the border
 // of the message
 const (
 	SeverityInformational = iota
@@ -28,14 +28,14 @@ const (
 	SeverityAlarm
 )
 
-// slackWebhookMessage to send to Slack via a webhook
+// discordWebhookMessage to send to Discord via a webhook
 type discordWebhookMessage struct {
 	Message string `json:"content"`
 }
 
 var webhookRequests = make(chan string)
 
-// Notify the Slack in the specified channel, with the severity specified
+// Notify the Discord in the specified channel, with the severity specified
 // and a message. No guarantee to arrive in order!
 func Notify(severity int, format string, arguments ...interface{}) {
 	webhookAddress := <-webhookRequests
