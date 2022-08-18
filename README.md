@@ -131,9 +131,9 @@ Now at this point run the command;
 ```
 make backend
 ```
-then a binary called ```ethereum.fluidity.money.o``` is generated. and finally run this command;
+then a binary called ```ethereum.fluidity.money.out``` is generated. and finally run this command;
 ```
-./ethereum.fluidity.money.o
+./ethereum.fluidity.money.out
 ```
 If you wait for at least 30secs and you don't see any error message, then you are good to go!
 
