@@ -1,12 +1,12 @@
 import React from "react";
-import styles from "./FilterOption.module.scss";
+import styles from "./FilterButton.module.scss";
 
 interface IOption {
   name: string;
   selected: boolean;
 }
 
-interface IFilterOptionProps {
+interface IFilterButtonProps {
   option: IOption;
   setOptions: React.SetStateAction<any>;
   handleFilter: (
@@ -17,12 +17,12 @@ interface IFilterOptionProps {
   options: IOption[];
 }
 
-const FIlterOption = ({
+const FilterButton = ({
   option,
   handleFilter,
   setOptions,
   options,
-}: IFilterOptionProps) => {
+}: IFilterButtonProps) => {
   return (
     <>
       {option.selected ? (
@@ -44,4 +44,4 @@ const FIlterOption = ({
   );
 };
 
-export default FIlterOption;
+export default FilterButton;

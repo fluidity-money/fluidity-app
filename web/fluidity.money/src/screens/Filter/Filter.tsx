@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import FIlterCriteria from "../../components/FilterCriteria";
+import FilterCriteria from "../../components/FilterCriteria";
 import FluidProject from "../../components/FluidProject";
 import styles from "./Filter.module.scss";
 import { clearForAny, handleFilterButton } from "./util";
@@ -109,27 +109,27 @@ const Filter = () => {
       <div className={styles.main}>
         <div className={styles.left}>
           <div className={styles.top}>Filter</div>
-          <FIlterCriteria
+          <FilterCriteria
             options={catOptions}
             setOptions={setCatOptions}
             handleFilter={handleFilter}
           >
             CATEGORIES
-          </FIlterCriteria>
-          <FIlterCriteria
+          </FilterCriteria>
+          <FilterCriteria
             options={chains}
             setOptions={setChains}
             handleFilter={handleFilter}
           >
             CHAIN
-          </FIlterCriteria>
-          <FIlterCriteria
+          </FilterCriteria>
+          <FilterCriteria
             options={years}
             setOptions={setYears}
             handleFilter={handleFilter}
           >
             YEAR
-          </FIlterCriteria>
+          </FilterCriteria>
         </div>
         <div className={styles.right}>
           <div className={styles.top}>
