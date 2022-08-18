@@ -17,6 +17,8 @@ export interface ApiState {
   setPrizePool: Dispatch<SetStateAction<Routes['/prize-pool']>>
   userActions: Routes['/my-history']
   setUserActions: Dispatch<SetStateAction<Routes['/my-history']>>
+  mintLimit: Routes['/my-mint-limit']
+  setMintLimit: Dispatch<SetStateAction<Routes['/my-mint-limit']>>
   prizeBoard: Routes['/prize-board']
   messageData: WebsocketMessage
   setMessageData: Dispatch<SetStateAction<WebsocketMessage>>
@@ -34,6 +36,7 @@ const ApiStateHandler = ({ state }: { state: ApiState }) => {
     setPrizeBoard,
     setPrizePool,
     setUserActions,
+    setMintLimit,
     messageData,
     setMessageData,
     setWinAlert,
@@ -183,6 +186,14 @@ const ApiStateHandler = ({ state }: { state: ApiState }) => {
       setPrizeBoard
     ]
   );
+  
+  useEffect(() => {
+    apiPOSTBody("/my-mint-limit", {
+      address: walletAddress,
+    }).then(setMintLimit)
+      .catch(handleAxiosError);
+
+  }, [walletAddress]);
 
   return <></>
 }
