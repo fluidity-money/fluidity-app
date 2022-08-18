@@ -1,0 +1,60 @@
+@use '../../../common' as *;
+
+.button {
+  //   display: inline-block;
+  text-transform: uppercase;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  gap: 8px;
+  width: max-content;
+  font-weight: 400;
+  border: solid 2px transparent;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  .icon {
+    display: inline-block;
+  }
+  .text {
+    color: map-get($text, "prominent");
+    display: inline-block;
+    font-size: 14px;
+  }
+  
+  &:hover:enabled {
+    background-color: map-get($bg, "alternate");
+    .icon {
+      -webkit-filter: grayscale(1) invert(1);
+      filter: grayscale(1) invert(1);
+    }
+    .text {
+      color: $black;
+    }
+  }
+
+  &:focus:enabled {
+    background-color: transparent;
+    border: solid 2px map-get($border, "focus");
+    .icon {
+      -webkit-filter: grayscale(0) invert(0);
+      filter: grayscale(0) invert(0);
+    }
+    .text {
+      color: $white;
+    }
+  }
+
+  &:disabled {
+    .icon {
+      stroke: map-get($text, "disabled");
+      // Hack to get svg the same colour as text, on black bg
+      filter: opacity(0.8);
+    }
+    .text {
+      color: map-get($text, "disabled");
+    }
+  }
+}

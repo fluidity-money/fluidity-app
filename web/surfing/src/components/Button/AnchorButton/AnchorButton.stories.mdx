@@ -1,0 +1,41 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import AnchorButton from "./AnchorButton";
+
+<Meta 
+    title="Button/AnchorButton"
+    component={AnchorButton}
+    parameters={{
+        backgrounds: {
+            default: "dark",
+        }
+    }}
+/>
+
+export const Template = (args) => <AnchorButton {...args}>
+    Distributions
+</AnchorButton>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>AnchorButton</Title>
+    <Subtitle>Button to visit Anchor points</Subtitle>
+    
+    <h2>Default</h2>
+    <Story
+        name="AnchorButton Default"
+        args={{
+            children: "default",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="AnchorButton Disabled"
+        args={{
+            children: "h4",
+            disabled: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

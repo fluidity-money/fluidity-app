@@ -1,0 +1,110 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import FilterButton from "./FilterButton";
+
+<Meta
+    title="Button/FilterButton"
+    component={FilterButton}
+    parameters={{
+        backgrounds: {
+            default: "dark",
+        }
+    }}
+/>
+
+export const Template = (args) => <FilterButton {...args}>
+    Distributions
+</FilterButton>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>FilterButton</Title>
+    <Subtitle>Button to visit Filter points</Subtitle>
+    
+    <h2>Filter Button</h2>
+    <Story
+        name="FilterButton Text"
+        args={{
+            option: {
+                name: "opt1",
+                selected: true,
+            },
+            options: [
+                {
+                    name: "opt2",
+                    selected: false,
+                },  
+                {
+                    name: "opt3",
+                    selected: false,
+                },  
+            ],
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="FilterButton Icon before"
+        args={{
+            option: {
+                name: "opt1",
+                selected: true,
+            },
+            options: [
+                {
+                    name: "opt2",
+                    selected: false,
+                },  
+                {
+                    name: "opt3",
+                    selected: false,
+                },  
+            ],
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>FilterButton States</h2>
+    <Story
+        name="FilterButton Not Selected"
+        args={{
+            option: {
+                name: "opt1",
+                selected: false,
+            },
+            options: [
+                {
+                    name: "opt2",
+                    selected: false,
+                },  
+                {
+                    name: "opt3",
+                    selected: false,
+                },  
+            ],
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="FilterButton Selected"
+        args={{
+            option: {
+                name: "opt1",
+                selected: true,
+            },
+            options: [
+                {
+                    name: "opt2",
+                    selected: false,
+                },  
+                {
+                    name: "opt3",
+                    selected: false,
+                },  
+            ],
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

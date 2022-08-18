@@ -1,0 +1,40 @@
+@use '../../../common' as *;
+
+.option {
+  color: map-get($text, "default");
+  margin: 5px;
+  // padding: 10px 20px 10px 20px;
+  padding: 8px 16px;
+  gap: 10px;
+  border: 1px solid map-get($border, "default");
+  border-radius: 30px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: map-get($border, "prominent");
+    color: map-get($text, "prominent");
+  }
+  &:focus {
+    border: 2px solid map-get($text, "focus");
+    padding: 7px 15px;
+  }
+
+  &:active {
+    border: 2px solid map-get($border, "prominent");
+    background-color: map-get($bg, "alternate");
+    padding: 7px 15px;
+    color: $black;
+  }
+
+  &Selected {
+    @extend .option;
+    border: none;
+    background-color: map-get($bg, "alternate");
+    color: $black;
+    &:hover {
+      background-color: map-get($bg, "alternate");
+      color: $black;
+      opacity: 0.8;
+    }
+  }
+}
