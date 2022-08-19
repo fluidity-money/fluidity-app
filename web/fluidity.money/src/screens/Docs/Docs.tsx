@@ -1,7 +1,7 @@
 import ContinuousCarousel from "components/ContinuousCarousel";
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { TextButton } from "../../components/Button";
+import { GeneralButton } from "components/Button";
 import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./Docs.module.scss";
 
@@ -52,7 +52,10 @@ const Docs = () => {
             EMAIL
           </p>
           <input type="text" placeholder="elon@email.com"/>
-          <TextButton colour="black">LAUNCH FLUIDITY</TextButton>
+          <GeneralButton version={"secondary"} type={"text"} size={"medium"} handleClick={function (): void {
+           throw new Error("Function not implemented.");
+          } }>LAUNCH FLUIDITY
+          </GeneralButton>
       </div>
     </>
   );

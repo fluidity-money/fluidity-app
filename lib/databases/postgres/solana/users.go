@@ -1,6 +1,7 @@
 package solana
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -35,7 +36,13 @@ func GetUserMintLimit(address string) float64 {
 
 	var amount float64
 
-	if err := row.Scan(&amount); err != nil {
+	err := row.Scan(&amount)
+
+	if err == sql.ErrNoRows {
+		return 0
+	}
+
+	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 
@@ -55,7 +62,7 @@ func ReduceMintUserLimit(address string, amount float64) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
-		`INSERT INTO solana_users (
+		`INSERT INTO %s (
 			address,
 			amount_minted,
 			last_updated
@@ -98,7 +105,7 @@ func AddMintUserLimit(address string, amount float64) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
-		`INSERT INTO solana_users (
+		`INSERT INTO %s (
 			address,
 			amount_minted,
 			last_updated

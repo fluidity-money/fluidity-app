@@ -9,8 +9,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
-	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
+	worker_types "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
@@ -48,14 +49,8 @@ const (
 	// Chain for filtering TRF var in Timescale
 	TrfChain = `solana`
 
-	// SolanaBlockTime assumed by the ATX calculation
-	SolanaBlockTime uint64 = 1
-
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
-	// The compute used by an spl-token tranfer
-	SplTransferCompute = 2721
 )
 
 func main() {
@@ -94,8 +89,12 @@ func main() {
 			mintSupply     = bufferedTransfers.MintSupply
 			tvl            = bufferedTransfers.Tvl
 			fluidTransfers = 0
-			emission       = workerTypes.NewSolanaEmission()
+			emission       = worker_types.NewSolanaEmission()
 		)
+
+		workerConfig := worker_config.GetWorkerConfigSolana()
+
+		solanaBlockTime := workerConfig.SolanaBlockTime
 
 		// emissions in this loop should only contain information relevant to the
 		// entire slot set here so that if any point the loop for the transfers
@@ -115,7 +114,7 @@ func main() {
 			}
 		}
 
-		atx := probability.CalculateAtx(SolanaBlockTime, fluidTransfers)
+		atx := probability.CalculateAtx(solanaBlockTime, fluidTransfers)
 
 		// normalise the amount to be consistent with USDC as a floating point
 
@@ -191,7 +190,7 @@ func main() {
 				deltaWeight,
 				winningClasses,
 				fluidTransfers,
-				SolanaBlockTime,
+				solanaBlockTime,
 				emission,
 			)
 
@@ -277,6 +276,8 @@ func main() {
 			emission.Update()
 
 			queue.SendMessage(worker.TopicEmissions, emission)
+
+			log.Debugf("Emission: %s", emission)
 		}
 	})
 }

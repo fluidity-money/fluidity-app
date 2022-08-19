@@ -7,6 +7,11 @@
   min-height: 850px;
   width: 100%;
   background-color: $fluidBlack;
+
+  video {
+    max-width: 1000px;
+  }
+
   div {
     display: flex;
     flex-direction: column;
@@ -15,6 +20,7 @@
     position: absolute;
     width: 50%;
     min-height: 400px;
+   
     h1 {
       margin-bottom: 16px;
     }

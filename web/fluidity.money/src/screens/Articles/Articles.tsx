@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ArticleCard, ArticleList, ArticleListProps } from "../../components/Article";
+import { useLocation } from "react-router-dom";
+import { TextButton } from "../../components/Button";
 import styles from "./Articles.module.scss";
 
 const Articles = () => {
@@ -39,8 +41,23 @@ const Articles = () => {
          },
       ]
    }
+
+   /* scrolls to location on pageload if it contains same ID or scrolls to the top
+   for ResourcesNavModal to work*/
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash) {
+      let elem = document.getElementById(location.hash.slice(1));
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [location]);
+  
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="articles">
       <ArticleCard id={0} img={"https://picsum.photos/200/300/?blur"} title={arr.articles[0].title} desc={arr.articles[0].desc} info={arr.articles[0].info} />
       <ArticleList {...arr} />
     </div>

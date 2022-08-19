@@ -1,4 +1,4 @@
-import { TextButton } from "components/Button";
+import { GeneralButton } from "components/Button";
 import FluidProject from "components/FluidProject";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
@@ -58,15 +58,17 @@ const SearchModal = ({ closeModal }: ISearchModalProps) => {
           }}
           value={searchInput}
         />
-        <TextButton
-          onClick={() => {
+        <GeneralButton
+          handleClick={() => {
             setSearchInput("");
             resetLists();
           }}
-          colour="black"
+          version={"secondary"}
+          type={"text"}
+          size={"small"}
         >
           CLEAR
-        </TextButton>
+        </GeneralButton>
       </div>
       <div className={styles.titles}>
         <h4>{`${searchProjects.length} Projects`}</h4>

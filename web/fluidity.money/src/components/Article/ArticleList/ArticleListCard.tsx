@@ -1,17 +1,16 @@
-import React from 'react'
-import { ArticleType } from "./ArticleLists";
-
+import { ArticleType } from "./ArticleList";
+import styles from "./ArticleList.module.scss"
 import { TextButton } from "../../Button";
 
 const ArticleListCard = (article: ArticleType) => {
 
     return (
-        <div style={{margin: "0px 0 0 10px"}}>
-            <h1 style={{marginBottom: "10px"}}>{article.title}</h1>
-            <p style={{marginBottom: "10px"}}>
-            {article.desc}
+        <div className={styles.listCardContainer}>
+            <h2>{article.title}</h2>
+            <p>
+                {article.desc}
             </p>
-            <p style={{marginBottom: "10px"}}>{article.info}</p>
+            <section>{article.info}</section>
             <hr />
        </div>
     );

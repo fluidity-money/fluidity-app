@@ -1,5 +1,8 @@
 .container {
   display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  border: solid 2px red;
+  min-height: 850px;
+  margin-top: -60px;
 }
