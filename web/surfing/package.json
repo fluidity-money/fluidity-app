@@ -37,7 +37,8 @@
     "sass": "^1.54.4",
     "storybook-addon-pseudo-states": "^1.15.1",
     "typescript": "^4.6.4",
-    "vite": "^3.0.7"
+    "vite": "^3.0.7",
+    "vite-plugin-svgr": "^2.2.1"
   },
   "files": [
     "dist"
