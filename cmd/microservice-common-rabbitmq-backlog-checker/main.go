@@ -69,6 +69,26 @@ func main() {
 		})
 	}
 
+	messageChan := make(chan string)
+	done := make(chan bool)
+
+	// get reports from the channel and concat them together,
+	// then report to discord once the channel is closed
+	go func() {
+		var reportBody string
+		for {
+			message, more := <-messageChan
+
+			if more {
+				reportBody += message
+			} else {
+				reportToDiscord(reportBody)
+				done <- true
+				return
+			}
+		}
+	}()
+
 	for _, vhost := range vhosts {
 		queues, err := rmq.getRmqQueues(vhost.Name)
 
@@ -109,21 +129,25 @@ func main() {
 				})
 
 				if messagesReady > maxDeadLetterCount {
-					reportToDiscord(queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount)
+					queueMessage(messageChan, queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount)
 				}
 
 				if messagesUnacked > maxDeadLetterCount {
-					reportToDiscord(queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
+					queueMessage(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
 				}
 			case false:
 				if messagesReady > maxReadyCount {
-					reportToDiscord(queue, "Ready", messagesReady, maxReadyCount)
+					queueMessage(messageChan, queue, "Ready", messagesReady, maxReadyCount)
 				}
 
 				if messagesUnacked > maxUnackedCount {
-					reportToDiscord(queue, "Unacked", messagesUnacked, maxUnackedCount)
+					queueMessage(messageChan, queue, "Unacked", messagesUnacked, maxUnackedCount)
 				}
 			}
 		}
 	}
+
+	// signal that we're done, and send the message to discord
+	close(messageChan)
+	<-done
 }
