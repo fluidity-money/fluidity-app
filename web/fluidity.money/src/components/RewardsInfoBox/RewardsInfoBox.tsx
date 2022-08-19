@@ -1,6 +1,6 @@
+import { LinkButton } from "components/Button";
 import React from "react";
 import styles from "./RewardsInfoBox.module.scss";
-import { ToggleButton } from "../Button";
 
 interface IRewardBoxProps {
   setToggle: () => void;
@@ -34,11 +34,14 @@ const RewardsInfoBox = ({
           type === "black" ? styles.infoBox : styles.infoBoxTransparent
         }
       >
+        <button>ETH v</button>
         <h1 onClick={switchAndAnimate}>
           {type === "black" ? "$678,123.00" : "$1,231,246"}
         </h1>
         <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
-        <ToggleButton toggle={toggle} setToggle={setToggle} />
+        <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
+          FLUID STATS
+        </LinkButton>
       </div>
     </div>
   );
