@@ -124,7 +124,7 @@ func InsertEmissions(emission Emission) {
 
 			average_transfers_in_block,
 
-			naive_is_winning_matched_balls
+			matched_balls
 		)
 
 		VALUES (
