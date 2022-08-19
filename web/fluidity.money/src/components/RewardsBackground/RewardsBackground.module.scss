@@ -8,7 +8,7 @@
   min-height: 850px;
   width: 100%;
   border: solid 2px red;
-  z-index: 1;
+  isolation: isolate;
 }
 
 .rewardsBackground {
@@ -19,6 +19,7 @@
   max-height: 900px;
   max-width: 1500px;
   overflow-y: hidden;
+  mix-blend-mode: darken;
 }
 
 .shade {
@@ -35,8 +36,6 @@
     transparent,
     $fluidBlack
   );
-
-  z-index: 2;
 }
 
 .winner {
