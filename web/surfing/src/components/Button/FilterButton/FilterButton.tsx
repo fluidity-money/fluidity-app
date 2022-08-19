@@ -31,16 +31,16 @@ const FilterButton = ({
         <button
           className={styles.optionSelected}
           onClick={() => handleFilter(option, setOptions, options)}
-          disabled={disabled}
         >
-          {option.name.includes("any") ? "ANY" : option.name.toUpperCase()}
+          {option.name.includes("any") ? "ANY" : option.name}
         </button>
       ) : (
         <button
           className={styles.option}
-          onClick={() => handleFilter(option, setOptions, options)}
+          onClick={() => disabled !== true && handleFilter(option, setOptions, options)}
+          disabled={disabled}
         >
-          {option.name.includes("any") ? "ANY" : option.name.toUpperCase()}
+          {option.name.includes("any") ? "ANY" : option.name}
         </button>
       )}
     </>

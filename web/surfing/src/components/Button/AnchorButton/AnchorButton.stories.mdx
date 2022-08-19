@@ -3,34 +3,62 @@ import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 import AnchorButton from "./AnchorButton";
 
 <Meta 
-    title="Button/AnchorButton"
+    title="Button/Anchor Button"
     component={AnchorButton}
     parameters={{
-        backgrounds: {
-            default: "dark",
-        }
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+            active: ".three",
+        },
     }}
 />
 
-export const Template = (args) => <AnchorButton {...args}>
+
+export let Template = (args) => <AnchorButton {...args}>
     Distributions
 </AnchorButton>;
 
+const HoverAnchorButton = Template({children: "default"});
+
 <Canvas columns={1}  withSource="open" withToolbar >
-    <Title>AnchorButton</Title>
+    <Title>Anchor Button</Title>
     <Subtitle>Button to visit Anchor points</Subtitle>
     
     <h2>Default</h2>
     <Story
-        name="AnchorButton Default"
+        name="Anchor Button Default"
         args={{
             children: "default",
         }}
     >
         {Template.bind({})}
     </Story>
+    
+    <h2>Button Hover</h2>
     <Story
-        name="AnchorButton Disabled"
+        name="Anchor Button Hover"
+        args={{
+            classname: "hover"
+            children: "default",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Focus</h2>
+    <Story
+        name="Anchor Button Hover"
+        args={{
+            children: "default",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Disabled</h2>
+    <Story
+        name="Anchor Button Disabled"
         args={{
             children: "h4",
             disabled: true,

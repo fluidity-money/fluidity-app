@@ -48,6 +48,7 @@
   }
 
   &:disabled {
+    cursor: default;
     .icon {
       stroke: map-get($text, "disabled");
       // Hack to get svg the same colour as text, on black bg

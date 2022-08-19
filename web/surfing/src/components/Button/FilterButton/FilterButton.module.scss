@@ -9,21 +9,25 @@
   border: 1px solid map-get($border, "default");
   border-radius: 30px;
   cursor: pointer;
+  text-transform: uppercase;
 
-  &:hover {
-    border-color: map-get($border, "prominent");
-    color: map-get($text, "prominent");
-  }
   &:focus {
     border: 2px solid map-get($text, "focus");
     padding: 7px 15px;
+    box-sizing: content-box;
+    box-shadow: inset 0px 0px 0px 1px map-get($border, "default");
   }
 
   &:active {
     border: 2px solid map-get($border, "prominent");
     background-color: map-get($bg, "alternate");
-    padding: 7px 15px;
     color: $black;
+  }
+
+  &:disabled {
+    
+    border: 1px solid map-get($border, "disabled");
+    color: map-get($text, "disabled");
   }
 
   &Selected {

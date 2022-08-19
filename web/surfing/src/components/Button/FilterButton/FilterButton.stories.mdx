@@ -26,12 +26,12 @@ export const Template = (args) => <FilterButton {...args}>
         args={{
             option: {
                 name: "opt1",
-                selected: true,
+                selected: false,
             },
             options: [
                 {
                     name: "opt2",
-                    selected: false,
+                    selected: true,
                 },  
                 {
                     name: "opt3",
@@ -66,11 +66,11 @@ export const Template = (args) => <FilterButton {...args}>
     
     <h2>FilterButton States</h2>
     <Story
-        name="FilterButton Not Selected"
+        name="FilterButton Selected"
         args={{
             option: {
                 name: "opt1",
-                selected: false,
+                selected: true,
             },
             options: [
                 {
@@ -103,6 +103,30 @@ export const Template = (args) => <FilterButton {...args}>
                     selected: false,
                 },  
             ],
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Disabled</h2>
+    <Story
+        name="FilterButton Disabled"
+        args={{
+            option: {
+                name: "opt1",
+                selected: false,
+            },
+            options: [
+                {
+                    name: "opt2",
+                    selected: false,
+                },  
+                {
+                    name: "opt3",
+                    selected: false,
+                },  
+            ],
+            disabled: true,
         }}
     >
         {Template.bind({})}
