@@ -15,6 +15,7 @@
   border: solid 2px transparent;
   border-radius: 4px;
   letter-spacing: 0.05em;
+  cursor: pointer;
   .icon {
     display: inline-block;
   }
@@ -52,7 +53,7 @@
     .icon {
       stroke: map-get($text, "disabled");
       // Hack to get svg the same colour as text, on black bg
-      filter: opacity(0.8);
+      filter: opacity(0.2);
     }
     .text {
       color: map-get($text, "disabled");

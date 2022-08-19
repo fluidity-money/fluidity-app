@@ -31,6 +31,7 @@ const FilterButton = ({
         <button
           className={styles.optionSelected}
           onClick={() => handleFilter(option, setOptions, options)}
+
         >
           {option.name.includes("any") ? "ANY" : option.name}
         </button>

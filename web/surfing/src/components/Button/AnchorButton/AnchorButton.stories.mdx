@@ -9,17 +9,14 @@ import AnchorButton from "./AnchorButton";
         pseudo: {
             hover: ".hover",
             focus: ".focus",
-            active: ".three",
-        },
+        }
     }}
 />
 
-
-export let Template = (args) => <AnchorButton {...args}>
+export const Template = (args) => <AnchorButton {...args}>
     Distributions
 </AnchorButton>;
 
-const HoverAnchorButton = Template({children: "default"});
 
 <Canvas columns={1}  withSource="open" withToolbar >
     <Title>Anchor Button</Title>
@@ -39,7 +36,6 @@ const HoverAnchorButton = Template({children: "default"});
     <Story
         name="Anchor Button Hover"
         args={{
-            classname: "hover"
             children: "default",
         }}
     >
@@ -48,8 +44,9 @@ const HoverAnchorButton = Template({children: "default"});
     
     <h2>Button Focus</h2>
     <Story
-        name="Anchor Button Hover"
+        name="Anchor Button Focus"
         args={{
+            className: "focus",
             children: "default",
         }}
     >

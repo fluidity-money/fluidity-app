@@ -1,14 +1,20 @@
 import type {ButtonHTMLAttributes} from "react";
 
+// import Svg from "../../../assets/images/buttonIcons/arrowDownWhite.svg";
+import Svg from "/assets/images/buttonIcons/arrowDownWhite.svg";
+
 import styles from "./AnchorButton.module.scss";
 
 interface IAnchorButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: string;
 }
 
-const AnchorButton = ({ children, disabled }: IAnchorButtonProps) => {
+const AnchorButton = ({ children, disabled, className, ...props }: IAnchorButtonProps) => {
+  const classProp = className || "";
+
   return (
-    <button className={styles.button} disabled={disabled} >
+    <button className={`${styles.button} ${classProp}`} disabled={disabled} {...props} >
+      <Svg />
       <img
         className={styles.icon}
         src="/assets/images/buttonIcons/arrowDownWhite.svg"
