@@ -13,8 +13,8 @@ import AnchorButton from "./AnchorButton";
     }}
 />
 
-export const Template = (args) => <AnchorButton {...args}>
-    Distributions
+export const Template = ({children, ...props}) => <AnchorButton {...props}>
+    {children}
 </AnchorButton>;
 
 
@@ -26,7 +26,7 @@ export const Template = (args) => <AnchorButton {...args}>
     <Story
         name="Anchor Button Default"
         args={{
-            children: "default",
+            children: "Distributions",
         }}
     >
         {Template.bind({})}
@@ -37,7 +37,7 @@ export const Template = (args) => <AnchorButton {...args}>
         name="Anchor Button Hover"
         args={{
             className: "hover",
-            children: "default",
+            children: "Distributions",
         }}
     >
         {Template.bind({})}
@@ -48,7 +48,7 @@ export const Template = (args) => <AnchorButton {...args}>
         name="Anchor Button Focus"
         args={{
             className: "focus",
-            children: "default",
+            children: "Distributions",
         }}
     >
         {Template.bind({})}
@@ -58,7 +58,7 @@ export const Template = (args) => <AnchorButton {...args}>
     <Story
         name="Anchor Button Disabled"
         args={{
-            children: "h4",
+            children: "Distributions",
             disabled: true,
         }}
     >

@@ -1,4 +1,4 @@
-@import "../../../styles/config.scss";
+@use '../../../common' as *;
 
 .button {
   display: flex;
@@ -9,29 +9,48 @@
   gap: 4px;
   border: solid 2px transparent;
   border-radius: 0;
+  text-transform: uppercase;
+  color: map-get($text, "prominent");
+  background-color: transparent;
+  cursor: pointer;
+  .icon {
+    display: inline-block;
+    stroke: map-get($text, "prominent");
+  }
 
-  &:hover {
-    background-color: $fluidWhite;
-    border: solid 2px $fluidBlack;
+  &:hover:enabled {
+    background-color: map-get($bg, "alternate");
+    border: solid 2px $black;
     .text {
-      color: $fluidBlack;
+      color: $black;
     }
     .icon {
-      -webkit-filter: grayscale(1) invert(1);
-      filter: grayscale(1) invert(1);
+      display: inline-block;
+      stroke: $black;
     }
   }
 
-  &:focus {
+  &:focus:enabled {
     background-color: transparent;
-    border: solid 2px $textGrey;
+    border: solid 2px map-get($border, "focus");
     border-radius: 2px;
     .text {
-      color: $fluidWhite;
+      color: map-get($text, "prominent");
     }
     .icon {
-      -webkit-filter: grayscale(0) invert(0);
-      filter: grayscale(0) invert(0);
+      display: inline-block;
+      stroke: map-get($text, "prominent");
+    }
+  }
+  
+  &:disabled {
+    cursor: default;
+    .text {
+      color: map-get($text, "disabled");
+    }
+    .icon {
+      display: inline-block;
+      stroke: map-get($text, "disabled");
     }
   }
 }

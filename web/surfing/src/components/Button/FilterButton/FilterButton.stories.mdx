@@ -13,8 +13,8 @@ import FilterButton from "./FilterButton";
     }}
 />
 
-export const Template = (args) => <FilterButton {...args}>
-    Label
+export const Template = ({children, ...props}) => <FilterButton {...props}>
+    {children}
 </FilterButton>;
 
 <Canvas columns={1}  withSource="open" withToolbar >

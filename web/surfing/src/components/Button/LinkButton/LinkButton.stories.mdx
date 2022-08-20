@@ -1,0 +1,105 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import LinkButton from "./LinkButton";
+
+<Meta
+    title="Button/Link Button"
+    component={LinkButton}
+    parameters={{
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+        }
+    }}
+/>
+
+export const Template = ({children, ...props}) => <LinkButton {...props}>
+    {children}
+</LinkButton>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Link Button</Title>
+    <Subtitle>Button to toggle filters</Subtitle>
+    
+    <h2>Link Button</h2>
+    <Story
+        name="Link Button Large"
+        args={{
+            children: "Label",
+            size: "large",
+            type: "internal",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <h2>Link Button</h2>
+    <Story
+        name="Link Button Medium"
+        args={{
+            children: "Label",
+            size: "medium",
+            type: "internal",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Link Button Small"
+        args={{
+            children: "Label",
+            size: "small",
+            type: "internal",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>LinkButton Types</h2>
+    <Story
+        name="Link Button External"
+        args={{
+            children: "Label",
+            size: "large",
+            type: "external",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>LinkButton States</h2>
+    <Story
+        name="Link Button Hover"
+        args={{
+            className: "hover",
+            children: "Label",
+            size: "large",
+            type: "internal",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Link Button Focus"
+        args={{
+            className: "focus",
+            children: "Label",
+            size: "large",
+            type: "internal",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Disabled</h2>
+    <Story
+        name="Link Button Disabled"
+        args={{
+            children: "Label",
+            size: "large",
+            type: "internal",
+            disabled: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

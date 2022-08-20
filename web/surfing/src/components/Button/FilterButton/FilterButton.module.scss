@@ -29,6 +29,7 @@
   }
 
   &:disabled {
+    cursor: default;
     border: 1px solid map-get($border, "disabled");
     color: map-get($text, "disabled");
   }

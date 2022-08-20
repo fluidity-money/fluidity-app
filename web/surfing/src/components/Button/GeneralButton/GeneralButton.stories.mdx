@@ -13,8 +13,8 @@ import GeneralButton from "./GeneralButton";
     }}
 />
 
-export const Template = (args) => <GeneralButton {...args}>
-    Distributions
+export const Template = ({children, ...props}) => <GeneralButton {...props}>
+    {children}
 </GeneralButton>;
 
 <Canvas columns={1}  withSource="open" withToolbar >

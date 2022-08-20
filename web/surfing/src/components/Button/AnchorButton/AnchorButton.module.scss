@@ -40,8 +40,7 @@
     background-color: transparent;
     border: solid 2px map-get($border, "focus");
     .icon {
-      -webkit-filter: grayscale(0) invert(0);
-      filter: grayscale(0) invert(0);
+      stroke: map-get($text, "prominent");
     }
     .text {
       color: $white;

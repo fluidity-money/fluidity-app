@@ -14,14 +14,14 @@
   gap: 12px;
   cursor: pointer;
 
-  &:hover {
+  &:hover:enabled {
     color: map-get($text, 'prominent');
     border-bottom: 2px solid map-get($border, 'prominent');
     border-radius: 0px;
     font-weight: 400;
   }
 
-  &:active {
+  &:active:enabled {
     color: map-get($text, 'prominent');
     font-weight: 700;
     border-bottom: 2px solid map-get($border, 'prominent');
@@ -30,7 +30,7 @@
     // text-underline-offset: 6px;
   }
 
-  &:focus {
+  &:focus:enabled {
     font-weight: 400;
     border: 2px solid map-get($border, "focus");
     border-radius: 6px;
@@ -43,7 +43,7 @@
     color: #4d4d4c;
     border: 2px solid transparent;
     border-radius: 0px;
-    cursor: none;
+    cursor: default;
   }
 }
 
