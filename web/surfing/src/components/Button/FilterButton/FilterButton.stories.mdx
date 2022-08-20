@@ -3,7 +3,7 @@ import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 import FilterButton from "./FilterButton";
 
 <Meta
-    title="Button/FilterButton"
+    title="Button/Filter Button"
     component={FilterButton}
     parameters={{
         pseudo: {
@@ -44,11 +44,11 @@ export const Template = (args) => <FilterButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="Filter Button Icon before"
+        name="Filter Button Icon Before"
         args={{
             option: {
                 name: "opt1",
-                selected: true,
+                selected: false,
             },
             options: [
                 {
@@ -72,7 +72,7 @@ export const Template = (args) => <FilterButton {...args}>
             className: "hover",
             option: {
                 name: "opt1",
-                selected: true,
+                selected: false,
             },
             options: [
                 {
@@ -110,6 +110,32 @@ export const Template = (args) => <FilterButton {...args}>
     >
         {Template.bind({})}
     </Story>
+    
+    <h2>Disabled</h2>
+    <Story
+        name="Filter Button Disabled"
+        args={{
+            option: {
+                name: "opt1",
+                selected: false,
+            },
+            options: [
+                {
+                    name: "opt2",
+                    selected: false,
+                },  
+                {
+                    name: "opt3",
+                    selected: false,
+                },  
+            ],
+            disabled: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Selected</h2>
     <Story
         name="Filter Button Active"
         args={{
@@ -131,14 +157,13 @@ export const Template = (args) => <FilterButton {...args}>
     >
         {Template.bind({})}
     </Story>
-    
-    <h2>Disabled</h2>
     <Story
-        name="Filter Button Disabled"
+        name="Filter Button Active Hover"
         args={{
+            className: "hover",
             option: {
                 name: "opt1",
-                selected: false,
+                selected: true,
             },
             options: [
                 {
@@ -150,7 +175,6 @@ export const Template = (args) => <FilterButton {...args}>
                     selected: false,
                 },  
             ],
-            disabled: true,
         }}
     >
         {Template.bind({})}

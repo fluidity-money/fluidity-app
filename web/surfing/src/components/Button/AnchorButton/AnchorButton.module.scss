@@ -18,6 +18,7 @@
   cursor: pointer;
   .icon {
     display: inline-block;
+    stroke: map-get($text, "prominent");
   }
   .text {
     color: map-get($text, "prominent");
@@ -25,11 +26,10 @@
     font-size: 14px;
   }
   
-  &:hover:enabled {
+  &:hover:enabled  {
     background-color: map-get($bg, "alternate");
     .icon {
-      -webkit-filter: grayscale(1) invert(1);
-      filter: grayscale(1) invert(1);
+      stroke: $black;
     }
     .text {
       color: $black;
@@ -52,8 +52,6 @@
     cursor: default;
     .icon {
       stroke: map-get($text, "disabled");
-      // Hack to get svg the same colour as text, on black bg
-      filter: opacity(0.2);
     }
     .text {
       color: map-get($text, "disabled");

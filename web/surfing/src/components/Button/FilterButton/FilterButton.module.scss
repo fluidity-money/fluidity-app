@@ -3,7 +3,6 @@
 .option {
   color: map-get($text, "default");
   margin: 5px;
-  // padding: 10px 20px 10px 20px;
   padding: 8px 16px;
   gap: 10px;
   border: 1px solid map-get($border, "default");
@@ -11,32 +10,34 @@
   cursor: pointer;
   text-transform: uppercase;
 
-  &:focus {
-    border: 2px solid map-get($text, "focus");
-    padding: 7px 15px;
+  &:focus:enabled {
+    border: 1px solid map-get($border, "default");
     box-sizing: content-box;
-    box-shadow: inset 0px 0px 0px 1px map-get($border, "default");
+    box-shadow: 0px 0px 0px 2px map-get($border, "focus");
   }
 
-  &:active {
+  &:active:enabled {
     border: 2px solid map-get($border, "prominent");
     background-color: map-get($bg, "alternate");
     color: $black;
   }
 
+  &:hover:enabled {
+    background-color: transparent;
+    border: 1px solid map-get($border, "prominent");
+    color: map-get($text, "prominent");
+  }
+
   &:disabled {
-    
     border: 1px solid map-get($border, "disabled");
     color: map-get($text, "disabled");
   }
 
   &Selected {
     @extend .option;
-    border: none;
     background-color: map-get($bg, "alternate");
     color: $black;
     &:hover {
-      background-color: map-get($bg, "alternate");
       color: $black;
       opacity: 0.8;
     }
