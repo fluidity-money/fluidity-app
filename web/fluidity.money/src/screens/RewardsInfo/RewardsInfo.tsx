@@ -204,7 +204,7 @@ const RewardsInfo = () => {
     <div className={styles.container}>
       <h1>Reward Distribution</h1>
       <div>
-        <DataTable name={'Transactions'} filterData={['ALL', 'DEX', 'NFT', 'DeFi']} columns={columns} data={data} />  
+        <DataTable name={'Transactions'} filterData={['ALL', 'DEX', 'NFT', 'DeFi']} columns={columns} data={data} rowSize={5} />  
       </div>
     </div>
   )

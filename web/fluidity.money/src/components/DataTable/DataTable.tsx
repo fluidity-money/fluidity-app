@@ -38,7 +38,7 @@ const SelectColumnFilter = ({
   )
 }
 
-const DataTable = ({name, filterData = [], columns, data }: any) => {
+const DataTable = ({name, filterData = [], columns, data, rowSize}: any) => {
     const {
         getTableProps,
         getTableBodyProps,
@@ -67,7 +67,7 @@ const DataTable = ({name, filterData = [], columns, data }: any) => {
         useGlobalFilter,
         usePagination,
       )
-     
+      
       return (
         <>
           <div className={styles.tableFilterContainer}>
@@ -89,8 +89,8 @@ const DataTable = ({name, filterData = [], columns, data }: any) => {
             <thead>
               {headerGroups.map((headerGroup: { getHeaderGroupProps: () => JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
-                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                  {headerGroup.headers.map((column, index) => (
+                    <th className={(rowSize - 1) === index ? styles.alignRight : ''} {...column.getHeaderProps()}>{column.render('Header')}</th>
                   ))}
                 </tr>
               ))}
@@ -100,8 +100,8 @@ const DataTable = ({name, filterData = [], columns, data }: any) => {
                 prepareRow(row)
                 return (
                   <tr {...row.getRowProps()}>
-                    {row.cells.map(cell => {
-                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    {row.cells.map((cell, index) => {
+                      return <td  className={(rowSize - 1) === index ? styles.alignRight : ''} {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     })}
                   </tr>
                 )

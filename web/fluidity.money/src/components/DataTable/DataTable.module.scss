@@ -5,8 +5,8 @@
     width: 100%;
     color: $textGrey;
     margin-bottom: 10px;
+    justify-content: space-between;
       ul {
-        margin-left: 65%;
         display:flex;
         list-style: none;
         li {
@@ -27,9 +27,12 @@
   }
   
   .pagination {
+    display: flex;
     color: $textGrey;
+    width: 100%;
+    justify-content: space-between;
     span:nth-child(2) {
-      float: right;
+      padding-right: 20px;
       button:first-child {
         margin-right: 20px;
       }
@@ -77,4 +80,8 @@
         }
       }
     }
+  }
+
+  .alignRight {
+    text-align: right;
   }
