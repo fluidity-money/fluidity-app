@@ -42,7 +42,6 @@
   table {
     width: 100%;
     border-collapse: collapse;
-  
     thead {
         tr{
           th{
@@ -54,6 +53,27 @@
   
         th:nth-child(6) {
           display: none;
+        }
+
+        @include mobile {
+          @for $i from 1 through 5 {
+            @if $i == 2  {
+              th:nth-child(3n + #{$i}) {
+                display: none;
+              }
+            }@else if $i == 4 {
+              th:nth-child(3n + #{$i}) {
+                display: none;
+              }
+            }@else if $i == 5 {
+              th:nth-child(3n + #{$i}) {
+                display: none;
+              }
+            }
+          }
+          th:nth-child(3) {
+            text-align: right;
+          }   
         }
     }
   
@@ -77,6 +97,27 @@
 
         td:nth-child(6) {
           display: none;
+        }
+
+        @include mobile {
+          @for $i from 1 through 5 {
+            @if $i == 2  {
+              td:nth-child(3n + #{$i}) {
+                display: none;
+              }
+            }@else if $i == 4 {
+              td:nth-child(3n + #{$i}) {
+                display: none;
+              }
+            }@else if $i == 5 {
+              td:nth-child(3n + #{$i}) {
+                display: none;
+              }
+            }
+            td:nth-child(3) {
+              text-align: right;
+            }
+          }
         }
       }
     }

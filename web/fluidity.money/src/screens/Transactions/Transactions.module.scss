@@ -1,3 +1,5 @@
+@import "../../styles/config.scss";
+
 .container {
   min-height: 850px;
   width: 100%;
@@ -12,5 +14,9 @@
     margin-bottom: 30px;
     margin-left: 30px;
     margin-top: 30px;
+
+    @include mobile {
+      margin-left: 16px;
+    }
    }
 }
