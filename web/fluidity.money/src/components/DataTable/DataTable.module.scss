@@ -1,20 +1,38 @@
+@import "../../styles/config.scss";
+
 .tableFilterContainer {
     display: flex;
     width: 100%;
+    color: $textGrey;
     margin-bottom: 10px;
       ul {
-        margin-left: 72%;
+        margin-left: 65%;
         display:flex;
         list-style: none;
         li {
           margin-right: 10px;
+          cursor: pointer;
+        }
+
+        li:hover {
+          border-bottom: 1px solid $fluidWhite;
+          color: $fluidWhite;
+        }
+
+        li:focus {
+          color: $fluidWhite;
+          border-bottom: 1px solid $fluidWhite;
         }
       }
   }
   
   .pagination {
+    color: $textGrey;
     span:nth-child(2) {
       float: right;
+      button:first-child {
+        margin-right: 20px;
+      }
     }
   }
   
@@ -27,12 +45,13 @@
           th{
             padding: 0 20px 10px 20px;
             text-align:start;
+            color: $textGrey
           }
         }
   
-        /*th:nth-child(5) {
-          text-align: end;
-        }*/
+        th:nth-child(6) {
+          display: none;
+        }
     }
   
     tbody {
@@ -46,11 +65,16 @@
           border-top: none;
           border-right: none;
           border-left: none;
+          color: $textGrey
         }
   
-        /*td:nth-child(5) {
-          text-align: end;
-        }*/
+        td:nth-child(3) {
+          color: $fluidWhite;
+        }
+
+        td:nth-child(6) {
+          display: none;
+        }
       }
     }
   }

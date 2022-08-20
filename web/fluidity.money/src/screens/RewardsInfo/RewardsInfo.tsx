@@ -12,7 +12,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -20,7 +21,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DEX'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -28,7 +30,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -36,7 +39,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DeFi'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -44,7 +48,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -52,7 +57,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DEX'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -60,7 +66,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -68,7 +75,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DeFi'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -76,7 +84,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -84,7 +93,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DEX'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -92,7 +102,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -100,7 +111,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DeFi'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -108,7 +120,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -116,7 +129,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DEX'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -124,7 +138,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DeFi'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -132,7 +147,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'NFT'
       },
       {
         img: 'https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png',
@@ -140,7 +156,8 @@ const RewardsInfo = () => {
         val: '$8.13',
         win: '$0.10',
         key: '9303...0393',
-        time: '10mins ago'
+        time: '10mins ago',
+        type: 'DeFi'
       },
     ],
     []
@@ -174,6 +191,10 @@ const RewardsInfo = () => {
       {
         Header: 'TIME',
         accessor: 'time',
+      },
+      {
+        Header: '',
+        accessor: 'type',
       },
     ],
     []
