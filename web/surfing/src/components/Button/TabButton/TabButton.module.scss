@@ -1,8 +1,8 @@
-@import "../../../styles/config.scss";
+@use '../../../common' as *;
 
 .button {
   all: unset;
-  color: $textGrey;
+  color: map-get($text, 'default');
   width: fit-content;
   font-weight: 400;
   font-size: 20px;
@@ -12,26 +12,27 @@
   border-radius: 0px;
   padding: 10px 4px;
   gap: 12px;
+  cursor: pointer;
+
   &:hover {
-    color: $fluidWhite;
-    border-bottom: 2px solid $fluidWhite;
+    color: map-get($text, 'prominent');
+    border-bottom: 2px solid map-get($border, 'prominent');
     border-radius: 0px;
     font-weight: 400;
   }
 
   &:active {
+    color: map-get($text, 'prominent');
     font-weight: 700;
-    border-bottom: 2px solid $fluidWhite;
+    border-bottom: 2px solid map-get($border, 'prominent');
     border-radius: 0px;
-    color: $fluidWhite;
     // text-decoration: underline;
     // text-underline-offset: 6px;
   }
 
   &:focus {
-    color: $textGrey;
     font-weight: 400;
-    border: 2px solid $textGrey;
+    border: 2px solid map-get($border, "focus");
     border-radius: 6px;
     text-decoration: none;
     // padding: 10px 4px;
