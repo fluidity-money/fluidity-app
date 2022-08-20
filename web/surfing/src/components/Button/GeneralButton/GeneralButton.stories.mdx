@@ -6,8 +6,9 @@ import GeneralButton from "./GeneralButton";
     title="Button/GeneralButton"
     component={GeneralButton}
     parameters={{
-        backgrounds: {
-            default: "dark",
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
         }
     }}
 />
@@ -17,12 +18,12 @@ export const Template = (args) => <GeneralButton {...args}>
 </GeneralButton>;
 
 <Canvas columns={1}  withSource="open" withToolbar >
-    <Title>GeneralButton</Title>
+    <Title>General Button</Title>
     <Subtitle>Button to visit General points</Subtitle>
     
     <h2>Primary Button</h2>
     <Story
-        name="GeneralButton Large Primary"
+        name="General Button Large Primary"
         args={{
             children: "default",
             version: "primary",
@@ -33,7 +34,7 @@ export const Template = (args) => <GeneralButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Medium Primary"
+        name="General Button Medium Primary"
         args={{
             children: "default",
             version: "primary",
@@ -44,7 +45,7 @@ export const Template = (args) => <GeneralButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Small Primary"
+        name="General Button Small Primary"
         args={{
             children: "default",
             version: "primary",
@@ -57,7 +58,7 @@ export const Template = (args) => <GeneralButton {...args}>
     
     <h2>Secondary Button</h2>
     <Story
-        name="GeneralButton Large Secondary"
+        name="General Button Large Secondary"
         args={{
             children: "default",
             version: "secondary",
@@ -68,7 +69,7 @@ export const Template = (args) => <GeneralButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Medium Secondary"
+        name="General Button Medium Secondary"
         args={{
             children: "default",
             version: "secondary",
@@ -79,7 +80,7 @@ export const Template = (args) => <GeneralButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Small Secondary"
+        name="General Button Small Secondary"
         args={{
             children: "default",
             version: "secondary",
@@ -92,7 +93,7 @@ export const Template = (args) => <GeneralButton {...args}>
     
     <h2>Button Types</h2>
     <Story
-        name="GeneralButton Text only"
+        name="General Button Text only"
         args={{
             children: "default",
             version: "primary",
@@ -103,18 +104,18 @@ export const Template = (args) => <GeneralButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Icon before text"
+        name="General Button Icon Before Text"
         args={{
             children: "default",
             version: "primary",
-            type: "text before",
+            type: "icon before",
             size: "large",
         }}
     >
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Icon after text"
+        name="General Button Icon After Text"
         args={{
             children: "default",
             version: "primary",
@@ -125,7 +126,7 @@ export const Template = (args) => <GeneralButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Icon only"
+        name="General Button Icon only"
         args={{
             children: "default",
             version: "primary",
@@ -136,9 +137,33 @@ export const Template = (args) => <GeneralButton {...args}>
         {Template.bind({})}
     </Story>
     
-    <h2>Disabled Buttons</h2>
+    <h2>Buttons States</h2>
     <Story
-        name="GeneralButton Disabled Primary"
+        name="General Button Hover Primary"
+        args={{
+            className: "hover",
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Focus Primary"
+        args={{
+            className: "focus",
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Disabled Primary"
         args={{
             children: "default",
             version: "primary",
@@ -149,36 +174,37 @@ export const Template = (args) => <GeneralButton {...args}>
     >
         {Template.bind({})}
     </Story>
+    
     <Story
-        name="GeneralButton Disabled Secondary"
+        name="General Button Hover Secondary"
         args={{
+            className: "hover",
             children: "default",
             version: "secondary",
             type: "text",
             size: "large",
-            disabled: true,
         }}
     >
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Disabled Primary Before text"
+        name="General Button Focus Secondary"
         args={{
+            className: "focus",
             children: "default",
-            version: "primary",
-            type: "icon before",
+            version: "secondary",
+            type: "text",
             size: "large",
-            disabled: true,
         }}
     >
         {Template.bind({})}
     </Story>
     <Story
-        name="GeneralButton Disabled Secondary After text"
+        name="General Button Disabled Secondary"
         args={{
             children: "default",
             version: "secondary",
-            type: "icon after",
+            type: "text",
             size: "large",
             disabled: true,
         }}
