@@ -24,24 +24,33 @@ const FilterButton = ({
   setOptions,
   options,
   disabled,
+  className,
+  ...props
 }: IFilterButtonProps) => {
+  const classProps = className || "";
+  
+  const optionName = option.name.includes("any") 
+    ? "ANY"
+    : option.name;
+  
   return (
     <>
       {option.selected ? (
         <button
-          className={styles.optionSelected}
+          className={`${styles.optionSelected} ${classProps}`}
           onClick={() => handleFilter(option, setOptions, options)}
-
+          {...props}
         >
-          {option.name.includes("any") ? "ANY" : option.name}
+          {optionName}
         </button>
       ) : (
         <button
-          className={styles.option}
+          className={`${styles.option} ${classProps}`}
           onClick={() => disabled !== true && handleFilter(option, setOptions, options)}
           disabled={disabled}
+          {...props}
         >
-          {option.name.includes("any") ? "ANY" : option.name}
+          {optionName}
         </button>
       )}
     </>

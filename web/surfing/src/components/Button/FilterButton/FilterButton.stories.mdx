@@ -6,23 +6,24 @@ import FilterButton from "./FilterButton";
     title="Button/FilterButton"
     component={FilterButton}
     parameters={{
-        backgrounds: {
-            default: "dark",
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
         }
     }}
 />
 
 export const Template = (args) => <FilterButton {...args}>
-    Distributions
+    Label
 </FilterButton>;
 
 <Canvas columns={1}  withSource="open" withToolbar >
-    <Title>FilterButton</Title>
-    <Subtitle>Button to visit Filter points</Subtitle>
+    <Title>Filter Button</Title>
+    <Subtitle>Button to toggle filters</Subtitle>
     
     <h2>Filter Button</h2>
     <Story
-        name="FilterButton Text"
+        name="Filter Button Text"
         args={{
             option: {
                 name: "opt1",
@@ -43,7 +44,7 @@ export const Template = (args) => <FilterButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="FilterButton Icon before"
+        name="Filter Button Icon before"
         args={{
             option: {
                 name: "opt1",
@@ -66,8 +67,9 @@ export const Template = (args) => <FilterButton {...args}>
     
     <h2>FilterButton States</h2>
     <Story
-        name="FilterButton Selected"
+        name="Filter Button Hover"
         args={{
+            className: "hover",
             option: {
                 name: "opt1",
                 selected: true,
@@ -87,7 +89,29 @@ export const Template = (args) => <FilterButton {...args}>
         {Template.bind({})}
     </Story>
     <Story
-        name="FilterButton Selected"
+        name="Filter Button Focus"
+        args={{
+            className: "focus",
+            option: {
+                name: "opt1",
+                selected: false,
+            },
+            options: [
+                {
+                    name: "opt2",
+                    selected: false,
+                },  
+                {
+                    name: "opt3",
+                    selected: false,
+                },  
+            ],
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Filter Button Active"
         args={{
             option: {
                 name: "opt1",
@@ -110,7 +134,7 @@ export const Template = (args) => <FilterButton {...args}>
     
     <h2>Disabled</h2>
     <Story
-        name="FilterButton Disabled"
+        name="Filter Button Disabled"
         args={{
             option: {
                 name: "opt1",
