@@ -2,21 +2,30 @@
 
 .infoBoxContainer {
   position: absolute;
+
+  height: 294px;
+  width: 496px;
   z-index: 2;
 }
 
 .infoBox {
   background-color: $fluidBlack;
-  padding: 70px 70px 60px 70px;
+  padding: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 10px;
   // transition: background-color 3s ease-out;
-  width: 460px;
+  width: 100%;
   h1 {
     cursor: pointer;
     margin: 0;
-    font-size: 80px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 72px;
+    line-height: 100%;
+    text-align: center;
+    letter-spacing: -0.02em;
     &:hover {
       opacity: 0.6;
     }
@@ -45,6 +54,11 @@
   }
   h3 {
     margin: 6px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 120%;
+    letter-spacing: 0.01em;
   }
 }
 

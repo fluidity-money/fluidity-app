@@ -39,7 +39,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -82,18 +82,21 @@ jobs:
         with:
           severity: info
           details: Deployment succeeded.
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Triggered by:** ${{ github.event.workflow_dispatch.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** $GITHUB_SHA"
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (SUCCESS)
+      - name: Discord notif (CANCEL)
         if: cancelled()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Triggered by:** ${{ github.event.workflow_dispatch.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** $GITHUB_SHA"
           details: Deployment cancelled.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (SUCCESS)
+      - name: Discord notif (FAIL)
         if: failure()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Triggered by:** ${{ github.event.workflow_dispatch.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** $GITHUB_SHA"
           details: Deployment failed.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}

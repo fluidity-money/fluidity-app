@@ -40,7 +40,7 @@ type (
 		EthereumBlockNumber misc.BigInt `json:"ethereum_block_number"`
 		SolanaSlotNumber    misc.BigInt `json:"solana_slot_number"`
 
-    AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
+		AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
 
 		Payout struct {
 			Winnings        float64 `json:"winnings"` // Winnings
@@ -75,6 +75,7 @@ type (
 		NaiveIsWinning struct {
 			TestingBalls []uint32 `json:"testing_balls"`
 			IsWinning    bool     `json:"is_winning"`
+			MatchedBalls int      `json:"matched_balls"`
 		} `json:"naive_is_winning"`
 
 		CalculateBpy struct {

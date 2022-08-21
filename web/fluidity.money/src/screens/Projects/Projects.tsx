@@ -1,5 +1,5 @@
 import React from "react";
-import { TextButton } from "../../components/Button";
+import { LinkButton } from "../../components/Button";
 import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./Projects.module.scss";
 
@@ -15,7 +15,10 @@ const Projects = () => {
     >
       <div>Image Background</div>
       <div>Fluidity Projects</div>
-      <TextButton colour="coloured">EXPLORE THE ECOSYSTEM</TextButton>
+      <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
+        EXPLORE THE ECOSYSTEM
+      </LinkButton>
+
       <ManualCarousel>
         {items.map((item) => (
           <div

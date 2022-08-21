@@ -303,9 +303,7 @@ func main() {
 
 		emission := worker.NewEthereumEmission()
 
-		// set the network to the token backend (could be ethereum or aurora)
-
-		emission.Network = tokenBackend
+		emission.Network = "ethereum"
 
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 

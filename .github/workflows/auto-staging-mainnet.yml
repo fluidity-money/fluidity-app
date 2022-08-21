@@ -9,11 +9,14 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  ENVIRONMENT: staging
+
 jobs:
  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    environment: staging
+    environment: $ENVIRONMENT
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,39 +33,40 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            flu get-diff --environment staging --tag $GITHUB_SHA
+            flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Build
         id: build
         uses: ./scripts/actions
         with:
           command: |
-            flu build-docker-diff --environment staging --tag $GITHUB_SHA
+            flu build-docker-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
-            flu deploy-service-diff --environment staging --tag $GITHUB_SHA
+            flu deploy-service-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
         uses: rjstone/discord-webhook-notify@v1
         if: success()
         with:
           severity: info
+          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Environment:** $ENVIRONMENT"
           details: Deployment succeeded.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (SUCCESS)
+      - name: Discord notif (CANCEL)
         if: cancelled()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
+          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Environment:** $ENVIRONMENT"
           details: Deployment cancelled.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (SUCCESS)
+      - name: Discord notif (FAIL)
         if: failure()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
+          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Environment:** $ENVIRONMENT"
           details: Deployment failed.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-
-

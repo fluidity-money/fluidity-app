@@ -122,7 +122,9 @@ func InsertEmissions(emission Emission) {
 
 			naive_is_winning_is_winning,
 
-			average_transfers_in_block
+			average_transfers_in_block,
+
+			matched_balls
 		)
 
 		VALUES (
@@ -189,7 +191,9 @@ func InsertEmissions(emission Emission) {
 
 			$51,
 
-			$52
+			$52,
+
+			$53
 		);`,
 
 		TableEmissions,
@@ -262,6 +266,8 @@ func InsertEmissions(emission Emission) {
 		naiveIsWinning.IsWinning,
 
 		averageTransfersInBlock,
+
+		naiveIsWinning.MatchedBalls,
 	)
 
 	if err != nil {
