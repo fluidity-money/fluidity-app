@@ -3,7 +3,6 @@
 .container {
   min-height: 850px;
   width: 100%;
-  border: solid 2px red;
    h1 {
      margin-left: 55px;
      margin-top: 100px;
@@ -16,7 +15,7 @@
     margin-top: 30px;
 
     @include mobile {
-      margin-left: 16px;
+      margin-left: 12px;
     }
    }
 }
