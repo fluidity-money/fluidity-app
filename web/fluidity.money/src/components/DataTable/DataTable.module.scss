@@ -6,24 +6,31 @@
     color: $textGrey;
     margin-bottom: 10px;
     justify-content: space-between;
-      ul {
-        display:flex;
-        list-style: none;
-        li {
-          margin-right: 10px;
-          cursor: pointer;
-        }
-
-        li:hover {
-          border-bottom: 1px solid $fluidWhite;
-          color: $fluidWhite;
-        }
-
-        li:focus {
-          color: $fluidWhite;
-          border-bottom: 1px solid $fluidWhite;
-        }
+    ul {
+      display:flex;
+      list-style: none;
+      li {
+        margin-right: 10px;
+        cursor: pointer;
       }
+
+      li:hover {
+        border-bottom: 1px solid $fluidWhite;
+        color: $fluidWhite;
+      }
+
+      li:focus {
+        color: $fluidWhite;
+        border-bottom: 1px solid $fluidWhite;
+      }
+    }
+    @include mobile {
+      flex-direction: column;
+
+      ul {
+        margin-top: 10px;
+      }
+    }
   }
   
   .pagination {
