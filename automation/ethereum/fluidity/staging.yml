@@ -5,10 +5,11 @@ SERVICES:
       SERVICE_NAME: ethereum-fluidity-money-frontend
       DOCKER_IMAGE: ethereum.fluidity.money-frontend
       TARGET_GROUP: flu-staging-eth-fe-tg
+      SECRET_FLU_APP_WALLET_CONNECT_GETH_URI: /fluidity/ethereum/wallet_connect_geth_uri
       
       DOCKER_ARGS:
         REACT_APP_API_URL: https://staging.ethereum.fluidity.money:8081
-        REACT_APP_WALLET_CONNECT_GETH_URI: wss://staging.ethereum.fluidity.money:8081
+        #REACT_APP_WALLET_CONNECT_GETH_URI: ${SECRET_FLU_APP_WALLET_CONNECT_GETH_URI
         REACT_APP_WEBSOCKET: wss://staging.ethereum.fluidity.money:8081/updates
         REACT_APP_CHAIN_ID: 1
         REACT_APP_TOKEN_CONFIG_FILE: staging-mainnet-tokens.json
