@@ -88,7 +88,7 @@ func main() {
 		})
 	}
 
-	tvl := solLib.GetTvl(
+	tvl, err := solLib.GetTvl(
 		solanaRpcUrl,
 		fluidityPubkey,
 		tvlDataPubkey,
@@ -99,6 +99,13 @@ func main() {
 		switchboardPubkey,
 		payer,
 	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to get tvl!"
+			k.Payload = err
+		})
+	}
 
 	log.Debug(func(k *log.Log) {
 		k.Format("Got TVL from chain: %d", tvl)
