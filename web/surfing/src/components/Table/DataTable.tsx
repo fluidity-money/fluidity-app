@@ -68,7 +68,7 @@ const DataTable = ({name, filterData = [], columns, data, displayedRowSize}: any
     return (
       <>
         <div className={styles.tableFilterContainer}>
-          <h5>  {1}-{pageCount} of { data.length } {name} </h5>       
+          <h3>  {1}-{pageCount} of { data.length } {name} </h3>      
           <ul>
             <SelectColumnFilter
               filterValue={undefined}
