@@ -112,7 +112,7 @@ func GetPrice(solanaClient *rpc.Client, pricePubkey solana.PublicKey) (*big.Rat,
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to get price account with pubkey %#v! %v",
+			"failed to get price account with pubkey %v! %v",
 			pricePubkey,
 			err,
 		)
