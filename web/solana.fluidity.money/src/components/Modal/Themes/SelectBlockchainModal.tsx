@@ -35,7 +35,7 @@ const SelectBlockchainModal = ({
       networks: [
         {
           name: "Devnet",
-          address: "https://app.solana.beta.fluidity.money/",
+          address: "https://devnet.solana.fluidity.money/",
           id: "devnet",
         },
       ],
