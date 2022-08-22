@@ -17,11 +17,10 @@ SERVICES:
       SERVICE_NAME: ethereum-fluidity-money-frontend
       DOCKER_IMAGE: ethereum.fluidity.money-frontend
       TARGET_GROUP: flu-dev-ropsten-fe-tg
-      SECRET_FLU_APP_WALLET_CONNECT_GETH_URI: /fluidity/ropsten/wallet_connect_geth_uri
       
       DOCKER_ARGS:
         REACT_APP_API_URL: https://ropsten.ethereum.fluidity.money:8081
-        #REACT_APP_WALLET_CONNECT_GETH_URI: ${SECRET_FLU_APP_WALLET_CONNECT_GETH_URI}
+        REACT_APP_WALLET_CONNECT_GETH_URI: wss://ropsten.ethereum.fluidity.money:8081
         REACT_APP_WEBSOCKET: wss://ropsten.ethereum.fluidity.money:8081/updates
         REACT_APP_CHAIN_ID: 3
         REACT_APP_TOKEN_CONFIG_FILE: ropsten-tokens.json
