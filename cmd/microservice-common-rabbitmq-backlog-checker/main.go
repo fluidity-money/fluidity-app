@@ -82,7 +82,10 @@ func main() {
 			if more {
 				reportBody += message
 			} else {
-				reportToDiscord(reportBody)
+				if reportBody != "" {
+					reportToDiscord(reportBody)
+				}
+
 				done <- true
 				return
 			}
