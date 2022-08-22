@@ -1,0 +1,88 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import TabButton from "./TabButton";
+
+<Meta
+    title="Button/Tab Button"
+    component={TabButton}
+    parameters={{
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+            active: ".active",
+        }
+    }}
+/>
+
+export const Template = ({children, ...props}) => <TabButton {...props}>
+    {children}
+</TabButton>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Tab Button</Title>
+    <Subtitle>Button to toggle filters</Subtitle>
+    
+    <h2>Tab Button</h2>
+    <Story
+        name="Tab Button Large"
+        args={{
+            size: "default",
+            children: "All categories",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Tab Button Small"
+        args={{
+            size: "small",
+            children: "All categories",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>TabButton States</h2>
+    <Story
+        name="Tab Button Hover"
+        args={{
+            className: "hover",
+            size: "default",
+            children: "All categories",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Tab Button Active"
+        args={{
+            className: "active",
+            size: "default",
+            children: "All categories",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Tab Button Focus"
+        args={{
+            className: "focus",
+            size: "default",
+            children: "All categories",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Disabled</h2>
+    <Story
+        name="Tab Button Disabled"
+        args={{
+            size: "default",
+            children: "All categories",
+            disabled: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

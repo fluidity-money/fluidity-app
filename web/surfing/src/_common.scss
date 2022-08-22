@@ -87,7 +87,8 @@ $blue-holo-angular: conic-gradient(
 // Backgrounds
 $bg: (
     "default": $black,
-    "alternate": $white
+    "alternate": $white,
+    "disabled": $grey-70,
 );
 
 // Typography

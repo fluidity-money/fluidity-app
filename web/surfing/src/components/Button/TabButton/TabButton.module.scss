@@ -1,0 +1,64 @@
+@use '../../../common' as *;
+
+.button {
+  all: unset;
+  color: map-get($text, 'default');
+  width: fit-content;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 120%;
+  letter-spacing: 0.01em;
+  border: 2px solid transparent;
+  border-radius: 0px;
+  padding: 10px 4px;
+  gap: 12px;
+  cursor: pointer;
+
+  &:hover:enabled {
+    color: map-get($text, 'prominent');
+    border-bottom: 2px solid map-get($border, 'prominent');
+    border-radius: 0px;
+    font-weight: 400;
+  }
+
+  &:active:enabled {
+    color: map-get($text, 'prominent');
+    font-weight: 700;
+    border-bottom: 2px solid map-get($border, 'prominent');
+    border-radius: 0px;
+    // text-decoration: underline;
+    // text-underline-offset: 6px;
+  }
+
+  &:focus:enabled {
+    font-weight: 400;
+    border: 2px solid map-get($border, "focus");
+    border-radius: 6px;
+    text-decoration: none;
+    // padding: 10px 4px;
+    // gap: 12px;
+  }
+
+  &:disabled {
+    color: #4d4d4c;
+    border: 2px solid transparent;
+    border-radius: 0px;
+    cursor: default;
+  }
+}
+
+.default {
+  font-style: normal;
+  //   font-weight: 700;
+  font-size: 20px;
+  line-height: 120%;
+  letter-spacing: 0.01em;
+}
+
+.small {
+  font-style: normal;
+  //   font-weight: 700;
+  font-size: 16px;
+  line-height: 120%;
+  letter-spacing: 0.01em;
+}
