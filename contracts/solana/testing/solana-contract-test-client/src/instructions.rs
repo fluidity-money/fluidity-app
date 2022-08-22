@@ -1,4 +1,4 @@
-use serde_json::from_str;
+
 use solana_sdk::{
     instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
@@ -6,7 +6,7 @@ use solana_sdk::{
 };
 use std::str::FromStr;
 
-use crate::accounts::{ConfigOptions, FluidityInstruction, SolendAccounts};
+use crate::accounts::FluidityInstruction;
 
 pub struct WrapInstructionAccountMetas {
     pub fluidity_data_account: AccountMeta,
@@ -377,10 +377,11 @@ impl FluidContract {
         let token_name = args.token_name;
 
         vec![
-            spl_associated_token_account::create_associated_token_account(
+            spl_associated_token_account::instruction::create_associated_token_account(
                 &payer_pubkey.pubkey,
                 &pda_pubkey.pubkey,
                 &collateral_mint.pubkey,
+                &token_program.pubkey,
             ),
             Instruction::new_with_borsh(
                 self.program_id,
