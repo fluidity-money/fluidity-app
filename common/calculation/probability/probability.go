@@ -211,6 +211,9 @@ func NaiveIsWinning(balls []uint32, emission *worker.Emission) int {
 
 	matchedBalls := 0
 
+	// for each ball, if the ball's number is smaller than or equal
+	// to the length of the balls, increase the matched balls by 1
+
 	for _, i := range balls {
 		if int(i) <= len(balls) {
 			matchedBalls++
