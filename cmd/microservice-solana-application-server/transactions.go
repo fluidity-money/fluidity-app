@@ -14,7 +14,7 @@ import (
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
-func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId string, aldrinProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
+func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
 	var (
 		fee *big.Rat
 		err error

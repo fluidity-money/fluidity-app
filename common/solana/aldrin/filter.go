@@ -43,7 +43,7 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 
 	var (
 		// aldrinStableFeeRat is the Aldrin fee percentage for stable swaps (0.038%)
-		aldrinStableFeeRat   = big.NewRat(38, 100000)
+		aldrinStableFeeRat = big.NewRat(38, 100000)
 		// aldrinUnstableFeeRat is the Aldrin fee percentage for unstable swaps (0.3%)
 		aldrinUnstableFeeRat = big.NewRat(3, 1000)
 	)
@@ -227,6 +227,30 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 			}
 		}
 
+		// figure out if the swap is stable or not
+
+		numberOfBaseInstructions := len(transaction.Transaction.Message.Instructions)
+		innerInstructions := transaction.Meta.InnerInstructions
+
+		isStableSwap, err := isAldrinStableSwap(
+			solanaClient,
+			allInstructions,
+			innerInstructions,
+			instruction,
+			instructionNumber,
+			numberOfBaseInstructions,
+			accountKeys,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to figure out if Aldrin swap was a stable swap in instruction %v in %#v! %v",
+				instructionNumber,
+				transactionSignature,
+				err,
+			)
+		}
+
 		price, err := pyth.GetPriceByToken(solanaClient, sourceMint.String())
 
 		if err != nil {
@@ -278,10 +302,104 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 		fee := big.NewRat(0, 1)
 
 		// remove fees
-		fee = fee.Mul(swapAmount, aldrinUnstableFeeRat)
+		if isStableSwap {
+			fee = fee.Mul(swapAmount, aldrinStableFeeRat)
+		} else {
+			fee = fee.Mul(swapAmount, aldrinUnstableFeeRat)
+		}
 
 		feesPaid.Add(feesPaid, fee)
 	}
 
 	return feesPaid, nil
+}
+
+func isAldrinStableSwap(solanaClient *solanaRpc.Client, instructions []types.TransactionInstruction, innerInstructions []types.TransactionInnerInstruction, instruction types.TransactionInstruction, instructionNumber int, numBaseInstruction int, accountKeys []string) (bool, error) {
+
+	var (
+		// the inner instruction containing the Aldrin fee mintTo
+		feeMintInstruction             types.TransactionInstruction
+		// the inner instruction containing the transfer of funds to the destination
+		destinationTransferInstruction types.TransactionInstruction
+	)
+
+	if instructionNumber <= numBaseInstruction {
+		// get the second and third inner instructions originating from this instruction
+		innerInstruction := innerInstructions[numBaseInstruction]
+		feeMintInstruction             = innerInstruction.Instructions[1]
+		destinationTransferInstruction = innerInstruction.Instructions[2]
+	} else {
+		// get the two inner instructions one after next
+		feeMintInstruction             = instructions[numBaseInstruction + 2]
+		destinationTransferInstruction = instructions[numBaseInstruction + 3]
+	}
+
+	feeMintInstructionData := base58.Decode(feeMintInstruction.Data)
+
+	var feeAmount int64
+
+	err := borsh.Deserialize(&feeAmount, feeMintInstructionData)
+
+	if err != nil {
+		return false, fmt.Errorf(
+			"failed to deserialise Aldrin fee mintTo instruction data! %v",
+			err,
+		)
+	}
+
+	// public key of the aldrin fee token account
+	aldrinFeeTokenAccountPubkeyString := accountKeys[destinationTransferInstruction.Accounts[1]]
+
+	aldrinFeeTokenAccountPubkey, err := solana.PublicKeyFromBase58(aldrinFeeTokenAccountPubkeyString)
+	if err != nil {
+		return false, fmt.Errorf(
+			"failed to get Aldrin destination spl-token public key from string %#v! %v",
+			aldrinFeeTokenAccountPubkeyString,
+			err,
+		)
+	}
+
+	_, destinationDecimals, err := spl_token.GetMintAndDecimals(
+		solanaClient,
+		aldrinFeeTokenAccountPubkey,
+	)
+
+	if err != nil {
+		return false, fmt.Errorf(
+			"failed to get Aldrin destination spl-token mint %#v! %v",
+			aldrinFeeTokenAccountPubkey,
+			err,
+		)
+	}
+
+	destinationTransferInstructionData := base58.Decode(destinationTransferInstruction.Data)
+
+	var destinationTransferAmount int64
+
+	err = borsh.Deserialize(&feeAmount, destinationTransferInstructionData)
+
+	if err != nil {
+		return false, fmt.Errorf(
+			"failed to deserialise Aldrin destination transfer instruction data! %v",
+			err,
+		)
+	}
+
+	destinationTransferAmountAdjusted := spl_token.AdjustDecimals(
+		destinationTransferAmount,
+		int(destinationDecimals),
+	)
+
+	feeRatio := destinationTransferAmountAdjusted.Quo(
+		big.NewRat(feeAmount, 1),
+		destinationTransferAmountAdjusted,
+	)
+
+	feeRatioFloat, _ := feeRatio.Float32()
+
+	if feeRatioFloat < 15.00 {
+		return true, nil
+	}
+
+	return false, nil
 }
