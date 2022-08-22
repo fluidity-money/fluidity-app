@@ -136,14 +136,22 @@ func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubke
 
 	if err := value.TransactionError; err != nil {
 		return 0, fmt.Errorf(
-			"solana error simulating logtvl transaction! %v",
+			"solana error simulating logtvl transaction! %v, logs: %v",
 			err,
+			value.Logs,
 		)
 	}
 
 	tvlAccount := new(tvlDataAccount)
 
-	decodeAccountData(value.Accounts[0], tvlAccount)
+	err = decodeAccountData(value.Accounts[0], tvlAccount)
+
+	if err != nil {
+		return 0, fmt.Errorf(
+			"failed to decode account data: %v",
+			err,
+		)
+	}
 
 	return tvlAccount.Tvl, nil
 }
@@ -155,7 +163,7 @@ func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
 
 	if err != nil {
 		return fmt.Errorf(
-			"Failed to decode account data from base64! %v",
+			"failed to decode account data from base64: %v",
 			err,
 		)
 	}
@@ -164,7 +172,7 @@ func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
 
 	if err != nil {
 		return fmt.Errorf(
-			"failed to decode tvl data! %v",
+			"failed to decode tvl data: %v",
 			err,
 		)
 	}

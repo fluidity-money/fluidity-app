@@ -3,6 +3,7 @@ package solana
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/gagliardetto/solana-go"
@@ -42,7 +43,7 @@ type (
 )
 
 // GetTvl retrieves the current total value locked from chain using a simulated transaction
-func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) uint64 {
+func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payer *solana.Wallet) (uint64, error) {
 	params := getTvlTransactionParams(
 		fluidityPubkey,
 		tvlDataPubkey,
@@ -68,29 +69,37 @@ func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligati
 	)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to simulate logtvl transaction!"
-			k.Payload = err
-		})
+		return 0, fmt.Errorf(
+			"failed to simulate logtvl transaction: %v",
+			err,
+		)
 	}
 
 	value := response.Value
 
 	if err := value.TransactionError; err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Solana error simulating logtvl transaction!"
-			k.Payload = err
-		})
+		return 0, fmt.Errorf(
+			"solana error simulating logtvl transaction: %v, logs: %v",
+			err,
+			value.Logs,
+		)
 	}
 
 	tvlAccount := new(tvlDataAccount)
 
-	decodeAccountData(value.Accounts[0], tvlAccount)
+	err = decodeAccountData(value.Accounts[0], tvlAccount)
 
-	return tvlAccount.Tvl
+	if err != nil {
+		return 0, fmt.Errorf(
+			"failed to decode account data: %v",
+			err,
+		)
+	}
+
+	return tvlAccount.Tvl, nil
 }
 
-func decodeAccountData(data simulateTransactionAccount, out interface{}) {
+func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
 	dataBase64 := data.Data[0]
 
 	dataBinary, err := base64.StdEncoding.DecodeString(dataBase64)
@@ -105,11 +114,13 @@ func decodeAccountData(data simulateTransactionAccount, out interface{}) {
 	err = borsh.Deserialize(out, dataBinary)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to decode tvl data!"
-			k.Payload = err
-		})
+		return fmt.Errorf(
+			"failed to borsh deserialise: %v",
+			err,
+		)
 	}
+
+	return nil
 }
 
 func getTvlTransactionParams(fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payerAccount *solana.Wallet) []interface{} {
