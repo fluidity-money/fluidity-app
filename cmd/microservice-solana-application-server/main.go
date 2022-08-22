@@ -27,6 +27,9 @@ const (
 
 	// EnvRaydiumProgramId is the program ID of the Raydium swap program
 	EnvRaydiumProgramId = `FLU_SOLANA_RAYDIUM_PROGRAM_ID`
+
+	// EnvAldrinProgramId is the program ID of the Aldrin swap program
+	EnvAldrinProgramId = `FLU_SOLANA_ALDRIN_PROGRAM_ID`
 )
 
 func main() {
@@ -36,6 +39,7 @@ func main() {
 		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
 		raydiumProgramId   = util.GetEnvOrFatal(EnvRaydiumProgramId)
+		aldrinProgramId   = util.GetEnvOrFatal(EnvAldrinProgramId)
 
 		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)
@@ -59,6 +63,7 @@ func main() {
 				saberSwapProgramId,
 				orcaProgramId,
 				raydiumProgramId,
+				aldrinProgramId,
 			)
 
 			if err != nil {

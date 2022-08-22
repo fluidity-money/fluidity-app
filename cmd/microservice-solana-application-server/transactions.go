@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/solana/aldrin"
 	"github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/common/solana/orca"
 	"github.com/fluidity-money/fluidity-app/common/solana/raydium"
@@ -13,7 +14,7 @@ import (
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
-func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
+func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId string, aldrinProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
 	var (
 		fee *big.Rat
 		err error
@@ -45,6 +46,14 @@ func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]str
 			solanaClient,
 			transactionResult,
 			raydiumProgramId,
+			fluidTokens,
+		)
+
+	case applications.ApplicationAldrin:
+		fee, err = aldrin.GetAldrinFees(
+			solanaClient,
+			transactionResult,
+			aldrinProgramId,
 			fluidTokens,
 		)
 
