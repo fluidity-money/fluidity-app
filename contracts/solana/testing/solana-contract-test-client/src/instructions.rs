@@ -81,6 +81,7 @@ pub struct PayoutInstructionArgs {
     pub amount: u64,
     pub token_name: String,
     pub bump_seed: u8,
+    pub ignore_cap: bool,
 }
 
 pub struct MoveFromPrizePoolInstructionAccountMetas {
@@ -149,6 +150,7 @@ pub struct InitDataInstructionArgs {
     pub lamports: u64,
     pub space: u64,
     pub bump_seed: u8,
+    pub payout_cap: u64,
 }
 
 #[derive(Debug)]
@@ -303,10 +305,11 @@ impl FluidContract {
         let amount = args.amount;
         let token_name = args.token_name;
         let bump_seed = args.bump_seed;
+        let ignore_cap = args.ignore_cap;
 
         vec![Instruction::new_with_borsh(
             self.program_id,
-            &FluidityInstruction::Payout(amount, token_name, bump_seed),
+            &FluidityInstruction::Payout(amount, token_name, bump_seed, ignore_cap),
             vec![
                 token_program,
                 fluid_token_id,
@@ -439,10 +442,11 @@ impl FluidContract {
         let lamports = args.lamports;
         let space = args.space;
         let bump_seed = args.bump_seed;
+        let payout_cap = args.payout_cap;
 
         vec![Instruction::new_with_borsh(
             self.program_id,
-            &FluidityInstruction::InitData(token_name, lamports, space, bump_seed),
+            &FluidityInstruction::InitData(token_name, lamports, space, bump_seed, payout_cap),
             vec![
                 system_program,
                 payer_pubkey,

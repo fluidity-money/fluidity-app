@@ -126,6 +126,7 @@ pub fn setup_accs(
             lamports: client
                 .get_minimum_balance_for_rent_exemption(std::mem::size_of::<FluidityData>())
                 .unwrap(),
+            payout_cap: 10000,
         };
 
         let init_data_inst = fluid_contract.init_data(init_data_accs, init_data_args);
