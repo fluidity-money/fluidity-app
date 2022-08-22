@@ -1,0 +1,214 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import GeneralButton from "./GeneralButton";
+
+<Meta
+    title="Button/GeneralButton"
+    component={GeneralButton}
+    parameters={{
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+        }
+    }}
+/>
+
+export const Template = ({children, ...props}) => <GeneralButton {...props}>
+    {children}
+</GeneralButton>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>General Button</Title>
+    <Subtitle>Button to visit General points</Subtitle>
+    
+    <h2>Primary Button</h2>
+    <Story
+        name="General Button Large Primary"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Medium Primary"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "medium",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Small Primary"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "small",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Secondary Button</h2>
+    <Story
+        name="General Button Large Secondary"
+        args={{
+            children: "default",
+            version: "secondary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Medium Secondary"
+        args={{
+            children: "default",
+            version: "secondary",
+            type: "text",
+            size: "medium",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Small Secondary"
+        args={{
+            children: "default",
+            version: "secondary",
+            type: "text",
+            size: "small",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Types</h2>
+    <Story
+        name="General Button Text only"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Icon Before Text"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "icon before",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Icon After Text"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "icon after",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Icon only"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "icon only",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Buttons States</h2>
+    <Story
+        name="General Button Hover Primary"
+        args={{
+            className: "hover",
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Focus Primary"
+        args={{
+            className: "focus",
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Disabled Primary"
+        args={{
+            children: "default",
+            version: "primary",
+            type: "text",
+            size: "large",
+            disabled: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <Story
+        name="General Button Hover Secondary"
+        args={{
+            className: "hover",
+            children: "default",
+            version: "secondary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Focus Secondary"
+        args={{
+            className: "focus",
+            children: "default",
+            version: "secondary",
+            type: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Disabled Secondary"
+        args={{
+            children: "default",
+            version: "secondary",
+            type: "text",
+            size: "large",
+            disabled: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

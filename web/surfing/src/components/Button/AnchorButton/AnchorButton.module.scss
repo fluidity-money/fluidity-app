@@ -1,0 +1,59 @@
+@use '../../../common' as *;
+
+.button {
+  //   display: inline-block;
+  text-transform: uppercase;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  gap: 8px;
+  width: max-content;
+  font-weight: 400;
+  border: solid 2px transparent;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  .icon {
+    display: inline-block;
+    stroke: map-get($text, "prominent");
+  }
+  .text {
+    color: map-get($text, "prominent");
+    display: inline-block;
+    font-size: 14px;
+  }
+  
+  &:hover:enabled  {
+    background-color: map-get($bg, "alternate");
+    .icon {
+      stroke: $black;
+    }
+    .text {
+      color: $black;
+    }
+  }
+
+  &:focus:enabled {
+    background-color: transparent;
+    border: solid 2px map-get($border, "focus");
+    .icon {
+      stroke: map-get($text, "prominent");
+    }
+    .text {
+      color: $white;
+    }
+  }
+
+  &:disabled {
+    cursor: default;
+    .icon {
+      stroke: map-get($text, "disabled");
+    }
+    .text {
+      color: map-get($text, "disabled");
+    }
+  }
+}
