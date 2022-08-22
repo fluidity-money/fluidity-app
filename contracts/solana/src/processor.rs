@@ -37,6 +37,7 @@ pub struct FluidityData {
     token_mint: Pubkey,
     fluid_mint: Pubkey,
     pda: Pubkey,
+    block_payout_threshold: u64,
 }
 
 // wrap amount of token into corresponding fluidity token
@@ -93,7 +94,7 @@ fn wrap(
     }
 
     // check mints
-    check_mints_and_pda(
+    validate_fluidity_data_account(
         &fluidity_data_account,
         *token_mint.key,
         *fluidity_mint.key,
@@ -302,7 +303,7 @@ fn unwrap(
         panic!("bad data account");
     }
 
-    check_mints_and_pda(
+    validate_fluidity_data_account(
         &fluidity_data_account,
         *token_mint.key,
         *fluidity_mint.key,
@@ -419,9 +420,18 @@ fn unwrap(
 
 // takes an amount of tokens, and two acounts and pays out in an 8:2 split,
 // totalling at most 80% of the prize pool - must be run by authority
-fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> ProgramResult {
+fn payout(
+    accounts: &[AccountInfo],
+    amount: u64,
+    seed: String,
+    bump: u8,
+    program_id: &Pubkey,
+    allow_large_payouts: bool,
+) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
+    let fluidity_data_account = next_account_info(accounts_iter)?;
+    let token_mint = next_account_info(accounts_iter)?;
     let token_program = next_account_info(accounts_iter)?;
     let fluidity_mint = next_account_info(accounts_iter)?;
     let pda_account = next_account_info(accounts_iter)?;
@@ -430,6 +440,21 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
     let payout_account_a = next_account_info(accounts_iter)?;
     let payout_account_b = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
+
+    let data_seed = format!("FLU:{}_DATA", seed);
+    if fluidity_data_account.key
+        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
+    {
+        panic!("bad data account");
+    }
+
+    // check mints
+    let fluidity_data = validate_fluidity_data_account(
+        &fluidity_data_account,
+        *token_mint.key,
+        *fluidity_mint.key,
+        *pda_account.key,
+    );
 
     // check payout authority
     if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
@@ -453,6 +478,22 @@ fn payout(accounts: &[AccountInfo], amount: u64, seed: String, bump: u8) -> Prog
     } else {
         amount
     };
+
+    if scaled_amount > fluidity_data.block_payout_threshold {
+        match allow_large_payouts {
+            false => {
+               msg!(
+                   "Large payout blocked! Token mint {}, amount {}, from {}, to {}",
+                        fluidity_mint.key,
+                        scaled_amount,
+                        payout_account_a.key,
+                        payout_account_b.key,
+                   );
+               return Ok(());
+            },
+            true => msg!("Large payout allowed through!"),
+        }
+    }
 
     // separate pool into 8:2 split between sender and receiver
     let sender_prize = scaled_amount
@@ -731,6 +772,7 @@ fn init_data(
     lamports: u64,
     space: u64,
     bump: u8,
+    block_payout_threshold: u64,
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
@@ -775,6 +817,7 @@ fn init_data(
         token_mint: *token_mint.key,
         fluid_mint: *fluid_mint.key,
         pda: *pda.key,
+        block_payout_threshold,
     }
     .serialize(&mut &mut data[..])?;
 
@@ -783,12 +826,12 @@ fn init_data(
 
 // check that base mint, fluid mint, and pda match those specified in the data account
 // before doing this, check that the data account is valid!
-fn check_mints_and_pda(
+fn validate_fluidity_data_account(
     data_account: &AccountInfo,
     token_mint: Pubkey,
     fluid_mint: Pubkey,
     pda: Pubkey,
-) {
+) -> FluidityData {
     // get fluidity data
     let data = data_account.try_borrow_data().unwrap();
     let fluidity_data = FluidityData::deserialize(&mut &data[..]).unwrap();
@@ -802,6 +845,8 @@ fn check_mints_and_pda(
     {
         panic!("bad mint or pda");
     }
+
+    fluidity_data
 }
 
 pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
@@ -813,7 +858,9 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         FluidityInstruction::Unwrap(amount, seed, bump) => {
             unwrap(&accounts, program_id, amount, seed, bump)
         }
-        FluidityInstruction::Payout(amount, seed, bump) => payout(&accounts, amount, seed, bump),
+        FluidityInstruction::Payout(amount, seed, bump, allow_large) => {
+            payout(&accounts, amount, seed, bump, program_id, allow_large)
+        },
         FluidityInstruction::InitSolendObligation(
             obligation_lamports,
             obligation_size,
@@ -821,8 +868,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
             bump,
         ) => init_solend_obligation(&accounts, obligation_lamports, obligation_size, seed, bump),
         FluidityInstruction::LogTVL => log_tvl(&accounts, program_id),
-        FluidityInstruction::InitData(seed, lamports, space, bump) => {
-            init_data(&accounts, program_id, seed, lamports, space, bump)
+        FluidityInstruction::InitData(seed, lamports, space, bump, block_payouts) => {
+            init_data(&accounts, program_id, seed, lamports, space, bump, block_payouts)
         }
         FluidityInstruction::MoveFromPrizePool(payout_amt, seed, bump) => {
             move_from_prize_pool(&accounts, payout_amt, seed, bump)
