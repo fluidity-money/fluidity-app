@@ -1,14 +1,50 @@
 import React from 'react'
-import { useTable, usePagination } from 'react-table';
+import { useTable, useFilters, useGlobalFilter, usePagination } from 'react-table';
 
 import styles from "./DataTable.module.scss";
 
-const DataTable = ({name, filterData = [], columns, data }: any) => {
+const SelectColumnFilter = ({
+  filterValue, setFilter, preFilteredRows, id, filterData
+} :any) => {
+ 
+  // Calculate the options for filtering
+  // using the preFilteredRows
+  const options = React.useMemo(() => {
+    const options :any = new Set()
+    preFilteredRows.forEach(function (row :any) {
+      
+      options.add(row.values[id])
+    })
+    return [...options.values()]
+  }, [id, preFilteredRows])
+
+  const filterList = filterData.map((filterBy: any) => {
+    return (
+      <li
+      value={filterValue}
+      onClick={() => {
+      filterBy = filterBy == 'ALL' ? undefined : filterBy;
+      setFilter(filterBy || undefined)
+      }}
+      >
+        {filterBy}
+      
+      </li>
+    );
+  });
+
+  return (
+    <ul>{filterList}</ul>
+  )
+}
+
+const DataTable = ({name, filterData = [], columns, data, rowSize}: any) => {
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         prepareRow,
+        rows,
         page,
         canPreviousPage,
         canNextPage,
@@ -19,26 +55,33 @@ const DataTable = ({name, filterData = [], columns, data }: any) => {
         previousPage,
         setPageSize,
         state: { pageIndex, pageSize },
+        visibleColumns,
+        preGlobalFilteredRows,
+        setGlobalFilter,
       }:any = useTable(
         {
           columns,
           data,
         },
-        usePagination
+        useFilters,
+        useGlobalFilter,
+        usePagination,
       )
-    
-      const filterList = filterData.map((filterBy: any) => {
-        return (
-          <li>{filterBy}</li>
-        );
-      });
-     
+      
       return (
         <>
           <div className={styles.tableFilterContainer}>
             <h3>  {1}-{pageCount} of { data.length } {name} </h3>
+           
             <ul>
-              {filterList}
+             
+              <SelectColumnFilter
+                filterValue={undefined}
+                setFilter={setGlobalFilter}
+                preFilteredRows={preGlobalFilteredRows}
+                id={'type'}
+                filterData={filterData}
+              />
             </ul>
           </div>
           <div>
@@ -46,8 +89,8 @@ const DataTable = ({name, filterData = [], columns, data }: any) => {
             <thead>
               {headerGroups.map((headerGroup: { getHeaderGroupProps: () => JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
-                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                  {headerGroup.headers.map((column, index) => (
+                    <th className={(rowSize - 1) === index ? styles.alignRight : ''} {...column.getHeaderProps()}>{column.render('Header')}</th>
                   ))}
                 </tr>
               ))}
@@ -57,8 +100,8 @@ const DataTable = ({name, filterData = [], columns, data }: any) => {
                 prepareRow(row)
                 return (
                   <tr {...row.getRowProps()}>
-                    {row.cells.map(cell => {
-                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    {row.cells.map((cell, index) => {
+                      return <td  className={(rowSize - 1) === index ? styles.alignRight : ''} {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     })}
                   </tr>
                 )
@@ -75,11 +118,11 @@ const DataTable = ({name, filterData = [], columns, data }: any) => {
           </span>
           <span>
             <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-              {'Prev'}
-            </button>{' - '}
+              <img src={window.location.origin + '/assets/images/buttonIcons/paginationArrowLeft.svg'} />
+            </button>
             <button onClick={() => nextPage()} disabled={!canNextPage}>
-              {'Next'}
-            </button>{' '}
+            <img src={window.location.origin + '/assets/images/buttonIcons/paginationArrowRight.svg'} />
+            </button>
           </span>
         </div>
       </>

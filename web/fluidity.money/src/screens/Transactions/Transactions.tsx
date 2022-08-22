@@ -221,7 +221,7 @@ const Transactions = () => {
     <div className={styles.container}>
       <h1>Reward Pools</h1>
       <div>
-        <DataTable name={'Pools'} columns={columns} data={data} />  
+        <DataTable name={'Pools'} columns={columns} data={data} rowSize={4} />  
       </div>
     </div>
   )
