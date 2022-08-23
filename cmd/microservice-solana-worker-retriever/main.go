@@ -66,7 +66,8 @@ const (
 func main() {
 
 	var (
-		rpcUrl                   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		rpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		payerPrikey              = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
 

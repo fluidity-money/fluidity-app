@@ -75,8 +75,9 @@ func main() {
 		pythPubkey        = pubkeyFromEnv(EnvPythPubkey)
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
 
-		payerPrikey  = util.GetEnvOrFatal(EnvPayerPrikey)
-		solanaRpcUrl = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		payerPrikey = util.GetEnvOrFatal(EnvPayerPrikey)
+
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
 	)
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
