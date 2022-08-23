@@ -1,3 +1,4 @@
+import ContinuousCarousel from "components/ContinuousCarousel";
 import React from "react";
 import { GeneralButton } from "../../components/Button";
 import styles from "./Demo.module.scss";

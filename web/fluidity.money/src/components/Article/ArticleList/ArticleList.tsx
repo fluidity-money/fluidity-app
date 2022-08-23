@@ -1,5 +1,5 @@
-import React from 'react'
 import ArticleListCard from './ArticleListCard';
+import styles from "./ArticleList.module.scss"
 
 export interface ArticleType {
     id: number;
@@ -21,7 +21,7 @@ export const ArticleList = ({articles}: ArticleListProps) => {
     });
 
     return (
-        <div style={{margin: "40px 40px 0px 0px", maxHeight: "550px", overflowY: "scroll"}}>
+        <div className={styles.listContainer}>
             {list}
         </div>
     );
