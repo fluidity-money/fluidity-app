@@ -2,7 +2,7 @@ import React from 'react'
 import { useTable, useFilters, useGlobalFilter, usePagination } from 'react-table';
 
 import styles from './DataTable.module.scss';
-import {ReactComponent as ArrowIcon } from "/assets/images/buttonIcons/arrowRightWhite.svg";
+import {ReactComponent as ArrowIcon } from "@assets/images/buttonIcons/arrowRightWhite.svg";
 
 const SelectColumnFilter = ({
   filterValue, setFilter, preFilteredRows, id, filterData
