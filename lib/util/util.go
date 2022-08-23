@@ -51,7 +51,7 @@ func PickEnvOrFatal(envName string) (variable string) {
 
 	variablesLen := len(variables)
 
-	if variablesLen == 0 {
+	if variablesLen == 1 {
 		log.Debug(func(k *log.Log) {
 			k.Context = Context
 
