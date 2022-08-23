@@ -72,7 +72,8 @@ const SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
 func main() {
 	var (
-		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		rpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 

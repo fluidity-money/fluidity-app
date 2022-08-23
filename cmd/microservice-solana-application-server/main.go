@@ -31,7 +31,8 @@ const (
 
 func main() {
 	var (
-		solanaRpcUrl       = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		saberRpcUrl        = util.GetEnvOrFatal(EnvSaberRpcUrl)
 		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
