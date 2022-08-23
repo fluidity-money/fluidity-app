@@ -1,0 +1,22 @@
+@use '../../common' as *;
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  color: $white;
+  
+  > * {
+    max-width: 50%;
+  }
+  
+  @include respond-to('small') {
+    flex-direction: column;
+    
+    > * {
+      max-width: 100%;
+    }
+  }
+}
+

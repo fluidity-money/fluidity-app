@@ -1,10 +1,11 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, ReactComponentElement } from "react";
 
 import styles from "./FilterButton.module.scss";
 
 interface IOption {
   name: string;
   selected: boolean;
+  icon: ReactComponentElement;
 }
 
 interface IFilterButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
