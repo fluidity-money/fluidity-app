@@ -39,3 +39,4 @@ web/fluidity.money/public/assets/images/header-transition.svg filter=lfs diff=lf
 web/fluidity.money/public/assets/images/buttonIcons/arrowDownWhite.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/buttonIcons/arrowRightWhite.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/buttonIcons/arrowTopRightWhite.svg filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/ellipse.svg filter=lfs diff=lfs merge=lfs -text
