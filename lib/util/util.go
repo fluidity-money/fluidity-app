@@ -5,7 +5,9 @@ package util
 
 import (
 	"crypto/sha256"
+	"math/rand"
 	"os"
+	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -26,12 +28,70 @@ func GetEnvOrFatal(name string) string {
 	if env == "" {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-			k.Message = "Failed to get the env"
-			k.Payload = name
+			k.Format("Failed to get the env %v!", name)
 		})
 	}
 
 	return env
+}
+
+// PickEnvOrFatal from a list of inputs provided separated by , -
+// picking one at random each time
+func PickEnvOrFatal(envName string) (variable string) {
+	env := os.Getenv(envName)
+
+	if env == "" {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Format("Failed to pick from env %v!", envName)
+		})
+	}
+
+	variables := strings.Split(env, ",")
+
+	variablesLen := len(variables)
+
+	if variablesLen == 0 {
+		log.Debug(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Picked env number 0 from env %v (only option!)",
+				envName,
+			)
+		})
+
+		return variables[0]
+	}
+
+	i := rand.Intn(variablesLen)
+
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"Picked env number %v from env %v with length %v",
+			i,
+			envName,
+			variablesLen,
+		)
+	})
+
+	variable = variables[i]
+
+	if variable == "" {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Chosen input at position %v from env %v was empty!",
+				i,
+				env,
+			)
+		})
+	}
+
+	return
 }
 
 // GetEnvOrDefault returns the env if it is set, otherwise the default value

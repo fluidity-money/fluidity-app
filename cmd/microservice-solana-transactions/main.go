@@ -37,11 +37,12 @@ const (
 
 func main() {
 	var (
-		solanaRpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		solPythPubkeyString = util.GetEnvOrFatal(EnvSolPythPubkey)
 		applicationsString  = util.GetEnvOrFatal(EnvApplicationList)
 
-		applications        = parseApplications(applicationsString)
+		applications = parseApplications(applicationsString)
 	)
 
 	solPythPubkey, err := solanaLibrary.PublicKeyFromBase58(

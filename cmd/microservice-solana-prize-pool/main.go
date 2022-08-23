@@ -130,12 +130,13 @@ func getPrizePool(solanaClient *solanaRpc.Client, fluidityPubkey, fluidMintPubke
 
 func main() {
 	var (
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		fluidityPubkey = pubkeyFromEnv(EnvFluidityPubkey)
 		tvlDataPubkey  = pubkeyFromEnv(EnvTvlDataPubkey)
 		solendPubkey   = pubkeyFromEnv(EnvSolendPubkey)
 
 		payerPrikey    = util.GetEnvOrFatal(EnvPayerPrikey)
-		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		updateInterval = util.GetEnvOrFatal(EnvUpdateInterval)
 		tokensList_    = util.GetEnvOrFatal(EnvTokensList)
 	)
