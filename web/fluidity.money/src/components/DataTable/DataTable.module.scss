@@ -24,7 +24,7 @@
         border-bottom: 1px solid $fluidWhite;
       }
     }
-    @include mobile {
+    @include max-760px {
       flex-direction: column;
       ul {
         margin-top: 10px;
@@ -61,7 +61,7 @@
           display: none;
         }
 
-        @include mobile {
+        @include max-760px {
           @for $i from 1 through 5 {
             @if $i == 2  {
               th:nth-child(3n + #{$i}) {
@@ -105,7 +105,7 @@
           display: none;
         }
 
-        @include mobile {
+        @include max-760px {
           @for $i from 1 through 5 {
             @if $i == 2  {
               td:nth-child(3n + #{$i}) {

@@ -18,8 +18,8 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
         <p>
          {article.desc}
         </p>
+        <p>{article.info}</p>
         <section>
-          <p>{article.info}</p>
           <GeneralButton version={"secondary"} type={"text"} size={"medium"} handleClick={function (): void {
           } } >
           ALL ARTICLES
