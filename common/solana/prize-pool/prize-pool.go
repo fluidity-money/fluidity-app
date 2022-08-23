@@ -26,19 +26,19 @@ type tvlDataAccount struct {
 // the solana-go sdk types this response incorrectly, leaving out the `value` field,
 // so we inline our own response type here in order to let things decode correctly
 type (
-	simulateTransactionResponse struct {
-		Value   simulateTransactionValue `json:"value"`
+	SimulateTransactionResponse struct {
+		Value   SimulateTransactionValue `json:"value"`
 		Context solanaRpc.Context        `json:"context"`
 	}
 
-	simulateTransactionValue struct {
+	SimulateTransactionValue struct {
 		TransactionError interface{}                  `json:"err"`
 		Logs             []string                     `json:"logs"`
-		Accounts         []simulateTransactionAccount `json:"accounts"`
+		Accounts         []SimulateTransactionAccount `json:"accounts"`
 		UnitsConsumed    uint64                       `json:"unitsConsumed"`
 	}
 
-	simulateTransactionAccount struct {
+	SimulateTransactionAccount struct {
 		Lamports   uint64   `json:"lamports"`
 		Owner      string   `json:"owner"`
 		Data       []string `json:"data"` // this can be an object if we use JSON encoding in our request params
@@ -113,7 +113,7 @@ func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubke
 		)
 	}
 
-	response := new(simulateTransactionResponse)
+	response := new(SimulateTransactionResponse)
 
 	// solana-go has the response type wrong, so we manually call the method
 	// and decode into our own response type
@@ -134,12 +134,8 @@ func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubke
 
 	value := response.Value
 
-	if err := value.TransactionError; err != nil {
-		return 0, fmt.Errorf(
-			"solana error simulating logtvl transaction! %v, logs: %v",
-			err,
-			value.Logs,
-		)
+	if err := HandleTransactionError(value); err != nil {
+		return 0, err
 	}
 
 	tvlAccount := new(tvlDataAccount)
@@ -156,7 +152,56 @@ func GetTvl(client *solanaRpc.Client, fluidityPubkey, tvlDataPubkey, solendPubke
 	return tvlAccount.Tvl, nil
 }
 
-func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
+// handleTransactionError to handle a TVL transaction error response
+func HandleTransactionError(value SimulateTransactionValue) error {
+	err := value.TransactionError
+	if err == nil {
+		return nil
+	}
+
+	// check switchboard 0x2a error with the condition
+	// value.TransactionError["InstructionError"][1]["Custom"] == 42
+
+	errMap, ok := value.TransactionError.(map[string]interface{})
+	if !ok || errMap["InstructionError"] == nil {
+		return logTvlError(err, value.Logs)
+	}
+
+	instructionErrors, ok := errMap["InstructionError"].([]interface{})
+	if !ok || len(instructionErrors) < 2 {
+		return logTvlError(err, value.Logs)
+	}
+
+	instructionErrMap, ok := instructionErrors[1].(map[string]interface{})
+	if !ok {
+		return logTvlError(err, value.Logs)
+	}
+
+	customError := instructionErrMap["Custom"]
+	if customError == nil {
+		return logTvlError(err, value.Logs)
+	}
+
+	errNum, ok := customError.(float64)
+	if ok && errNum == 42 {
+		return fmt.Errorf(
+			"Failed to simulate logtvl transaction: stale oracle error 42!",
+		)
+	}
+
+	return logTvlError(err, value.Logs)
+}
+
+// logTvlError for an unclassified TVL error where we display the logs
+func logTvlError(err interface{}, logs []string) error {
+	return fmt.Errorf(
+		"Solana error simulating logtvl transaction! %v, logs: %v",
+		err,
+		logs,
+	)
+}
+
+func decodeAccountData(data SimulateTransactionAccount, out interface{}) error {
 	dataBase64 := data.Data[0]
 
 	dataBinary, err := base64.StdEncoding.DecodeString(dataBase64)
