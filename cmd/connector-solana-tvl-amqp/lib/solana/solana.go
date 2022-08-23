@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/rpc"
@@ -23,23 +24,9 @@ type tvlDataAccount struct {
 // the solana-go sdk types this response incorrectly, leaving out the `value` field,
 // so we inline our own response type here in order to let things decode correctly
 type (
-	simulateTransactionResponse struct {
-		Value   simulateTransactionValue `json:"value"`
-		Context rpc.Context              `json:"context"`
-	}
-	simulateTransactionValue struct {
-		TransactionError interface{}                  `json:"err"`
-		Logs             []string                     `json:"logs"`
-		Accounts         []simulateTransactionAccount `json:"accounts"`
-		UnitsConsumed    uint64                       `json:"unitsConsumed"`
-	}
-	simulateTransactionAccount struct {
-		Lamports   uint64   `json:"lamports"`
-		Owner      string   `json:"owner"`
-		Data       []string `json:"data"` // this can be an object if we use JSON encoding in our request params
-		Executable bool     `json:"executable"`
-		RentEpoch  uint64   `json:"rentEpoch"`
-	}
+	simulateTransactionResponse = prize_pool.SimulateTransactionResponse
+	simulateTransactionValue = prize_pool.SimulateTransactionValue
+	simulateTransactionAccount = prize_pool.SimulateTransactionAccount
 )
 
 // GetTvl retrieves the current total value locked from chain using a simulated transaction
@@ -77,12 +64,8 @@ func GetTvl(rpcUrl string, fluidityPubkey, tvlDataPubkey, solendPubkey, obligati
 
 	value := response.Value
 
-	if err := value.TransactionError; err != nil {
-		return 0, fmt.Errorf(
-			"solana error simulating logtvl transaction: %v, logs: %v",
-			err,
-			value.Logs,
-		)
+	if err := prize_pool.HandleTransactionError(value); err != nil {
+		return 0, err
 	}
 
 	tvlAccount := new(tvlDataAccount)
