@@ -1,9 +1,7 @@
 import axios from "axios";
 
 export const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": `${process.env.REACT_APP_API_URL}`,
-  'Access-Control-Allow-Methods': 'POST',
+  "Content-Type": "application/json"
 }
 
 export default axios.create({
