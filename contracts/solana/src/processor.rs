@@ -797,6 +797,134 @@ pub fn log_tvl(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
     Ok(())
 }
 
+fn update_mint_limit(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    limit: u64,
+    seed: String,
+) -> ProgramResult {
+    let accounts_iter = &mut accounts.iter();
+
+    let fluidity_data_account = next_account_info(accounts_iter)?;
+    let token_mint = next_account_info(accounts_iter)?;
+    let fluidity_mint = next_account_info(accounts_iter)?;
+    let pda_account = next_account_info(accounts_iter)?;
+    let payer = next_account_info(accounts_iter)?;
+
+    let data_seed = format!("FLU:{}_DATA", seed);
+    if fluidity_data_account.key
+        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
+    {
+        panic!("bad data account");
+    }
+    let mut fluidity_data = validate_fluidity_data_account(
+        fluidity_data_account,
+        *token_mint.key,
+        *fluidity_mint.key,
+        *pda_account.key,
+    );
+
+    if !(payer.is_signer && *payer.key == fluidity_data.payout_authority) {
+        panic!("bad payout authority");
+    }
+
+    fluidity_data.global_mint_remaining = limit;
+
+    // borrow the data and write
+    let mut data = fluidity_data_account.try_borrow_mut_data()?;
+    fluidity_data.serialize(&mut &mut data[..])?;
+
+    Ok(())
+}
+
+fn update_payout_limit(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    limit: u64,
+    seed: String,
+) -> ProgramResult {
+    let accounts_iter = &mut accounts.iter();
+
+    let fluidity_data_account = next_account_info(accounts_iter)?;
+    let token_mint = next_account_info(accounts_iter)?;
+    let fluidity_mint = next_account_info(accounts_iter)?;
+    let pda_account = next_account_info(accounts_iter)?;
+    let payer = next_account_info(accounts_iter)?;
+
+    let data_seed = format!("FLU:{}_DATA", seed);
+    if fluidity_data_account.key
+        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
+    {
+        panic!("bad data account");
+    }
+    let mut fluidity_data = validate_fluidity_data_account(
+        fluidity_data_account,
+        *token_mint.key,
+        *fluidity_mint.key,
+        *pda_account.key,
+    );
+
+    if !(payer.is_signer && *payer.key == fluidity_data.large_payout_authority) {
+        panic!("bad payout authority");
+    }
+
+    fluidity_data.block_payout_threshold = limit;
+
+    // borrow the data and write
+    let mut data = fluidity_data_account.try_borrow_mut_data()?;
+    fluidity_data.serialize(&mut &mut data[..])?;
+
+    Ok(())
+}
+
+fn update_payout_authority(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    new_authority: String,
+    seed: String,
+) -> ProgramResult {
+    let accounts_iter = &mut accounts.iter();
+
+    let fluidity_data_account = next_account_info(accounts_iter)?;
+    let token_mint = next_account_info(accounts_iter)?;
+    let fluidity_mint = next_account_info(accounts_iter)?;
+    let pda_account = next_account_info(accounts_iter)?;
+    let payer = next_account_info(accounts_iter)?;
+
+    let data_seed = format!("FLU:{}_DATA", seed);
+    if fluidity_data_account.key
+        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
+    {
+        panic!("bad data account");
+    }
+    let mut fluidity_data = validate_fluidity_data_account(
+        fluidity_data_account,
+        *token_mint.key,
+        *fluidity_mint.key,
+        *pda_account.key,
+    );
+
+    if !payer.is_signer {
+        panic!("bad payout authority");
+    }
+
+    let new_authority_key = Pubkey::from_str(&new_authority).unwrap();
+
+    if *payer.key == fluidity_data.payout_authority {
+        fluidity_data.payout_authority = new_authority_key;
+    } else if *payer.key == fluidity_data.large_payout_authority {
+        fluidity_data.large_payout_authority = new_authority_key;
+    } else {
+        panic!("bad payout authority");
+    }
+
+    // borrow the data and write
+    let mut data = fluidity_data_account.try_borrow_mut_data()?;
+    fluidity_data.serialize(&mut &mut data[..])?;
+
+    Ok(())
+}
+
 // initialise a data account derived from PDA that stores valid token pairs
 fn init_data(
     accounts: &[AccountInfo],
@@ -932,6 +1060,15 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         },
         FluidityInstruction::MoveFromPrizePool(payout_amt, seed, bump) => {
             move_from_prize_pool(&accounts, payout_amt, seed, bump)
+        },
+        FluidityInstruction::UpdateMintLimit(limit, seed) => {
+            update_mint_limit(&accounts, program_id, limit, seed)
+        },
+        FluidityInstruction::UpdatePayoutLimit(limit, seed) => {
+            update_payout_limit(&accounts, program_id, limit, seed)
+        },
+        FluidityInstruction::UpdatePayoutAuthority(authority, seed) => {
+            update_payout_authority(accounts, program_id, authority, seed)
         },
     }
 }

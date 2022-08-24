@@ -18,6 +18,9 @@ pub enum FluidityInstruction {
     InitData(String, u64, u64, u8, u64, bool, u64),
     // move from prize pool to account
     MoveFromPrizePool(u64, String, u8),
+    UpdateMintLimit(u64, String),
+    UpdatePayoutLimit(u64, String),
+    UpdatePayoutAuthority(String, String),
 }
 
 // solend instructions
