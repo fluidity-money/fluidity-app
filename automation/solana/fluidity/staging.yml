@@ -12,8 +12,8 @@ SERVICES:
       DOCKER_IMAGE: solana.fluidity.money-frontend
       TARGET_GROUP: flu-staging-sol-fe-tg
       DOCKER_ARGS:
-        REACT_APP_API_URL: https://staging.solana.fluidity.money:8081
-        REACT_APP_WEBSOCKET: wss://staging.solana.fluidity.money:8081/updates
+        REACT_APP_API_URL: https://backend.staging.solana.fluidity.money
+        REACT_APP_WEBSOCKET: wss://backend.staging.solana.fluidity.money/updates
         REACT_APP_FLUID_PROGRAM_ID: HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR
         REACT_APP_FLU_MINT_USDC: Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv
         REACT_APP_FLU_OBLIGATION_USDC: J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A
