@@ -86,7 +86,7 @@ const Dashboard = () => {
             )
           },
         ]}
-        data={}
+        data={[]}
         displayedRowSize={5}
       />
     </Page>
