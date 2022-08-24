@@ -61,11 +61,13 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 
 		if !transactionProgramIsAldrin {
 
-			log.Debugf(
-				"instruction %v contained in %v is not a Aldrin instruction",
-				instructionNumber,
-				transactionSignature,
-			)
+			log.App(func(k *log.Log) {
+				k.Format(
+					"instruction %v contained in %v is not a Aldrin instruction",
+					instructionNumber,
+					transactionSignature,
+				)
+			})
 
 			continue
 		}
@@ -82,11 +84,13 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 
 		if !enoughInstructionBytes {
 
-			log.Debugf(
-				"instruction %v contained in %#v is not long enough to be a valid Aldrin swap",
-				instructionNumber,
-				transactionSignature,
-			)
+			log.App(func(k *log.Log) {
+				k.Format(
+					"instruction %v contained in %#v is not long enough to be a valid Aldrin swap",
+					instructionNumber,
+					transactionSignature,
+				)
+			})
 
 			continue
 		}
@@ -96,11 +100,13 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 		// bytes.Compare returns 0 if slices are equal
 		if isAldrinSwap != 0 {
 
-			log.Debugf(
-				"instruction %v contained in %#v is not a Aldrin swap",
-				instructionNumber,
-				transactionSignature,
-			)
+			log.App(func(k *log.Log) {
+				k.Format(
+					"instruction %v contained in %#v is not a Aldrin swap",
+					instructionNumber,
+					transactionSignature,
+				)
+			})
 
 			continue
 		}
@@ -190,11 +196,13 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 		// if neither token is fluid we don't care about this transaction
 		if !sourceMintIsFluid && !destinationMintIsFluid {
 
-			log.Debugf(
-				"no fluid tokens in Aldrin swap contained in instruction %v in %#v",
-				instructionNumber,
-				transactionSignature,
-			)
+			log.App(func(k *log.Log) {
+				k.Format(
+					"no fluid tokens in Aldrin swap contained in instruction %v in %#v",
+					instructionNumber,
+					transactionSignature,
+				)
+			})
 
 			continue
 		}
