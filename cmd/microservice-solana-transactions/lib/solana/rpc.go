@@ -53,6 +53,7 @@ func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*Block, error) {
 		},
 	}
 
+	remainingRetries := retries
 	for {
 		requestBuf := new(bytes.Buffer)
 		encoder := json.NewEncoder(requestBuf)
@@ -91,7 +92,7 @@ func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*Block, error) {
 				return nil, nil
 			}
 
-			if retries > 0 {
+			if remainingRetries > 0 {
 				// slot isn't available yet - retry
 				if code == BlockNotAvailableCode {
 					log.Debug(func(k *log.Log) {
@@ -100,7 +101,7 @@ func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*Block, error) {
 					duration := time.Duration(delay) * time.Second
 					time.Sleep(duration)
 
-					retries--
+					remainingRetries--
 					continue
 				}
 			}
