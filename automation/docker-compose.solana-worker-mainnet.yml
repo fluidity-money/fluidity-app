@@ -202,8 +202,8 @@ services:
       FLU_SOLANA_TOKEN_DECIMALS: ${FLU_SOLANA_TOKEN_DECIMALS_USDH}
       FLU_SOLANA_TOKEN_NAME: ${FLU_SOLANA_TOKEN_SHORT_NAME_USDH}
       FLU_DEBUG_FAKE_PAYOUTS: ${FLU_SOLANA_DEBUG_FAKE_PAYOUTS}
-      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solusdh.ust
-      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solusdh.ust.winners
+      FLU_SOLANA_WRAPPED_ACTIONS_QUEUE_NAME: user_actions.payable.solana.usdh
+      FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdh.winners
     depends_on:
       - redis
     restart: unless-stopped

@@ -100,8 +100,8 @@
     "dataAccount": ""
   },
   {
-    "symbol": "fUST",
-    "name": "FLUID UST",
+    "symbol": "fUSDH",
+    "name": "FLUID USDH",
     "mintAddress": "8Rm2VXdf4AjvJt6enC6rhj2qBKpaNUTPQX3j3N4aKChA",
     "decimals": 6,
     "colour": "#0C3595",
