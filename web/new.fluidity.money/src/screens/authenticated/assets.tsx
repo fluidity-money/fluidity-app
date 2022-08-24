@@ -1,7 +1,7 @@
 import Page from '../../components/page';
 import { numberToMonetaryString } from '../../utils/numberConverters';
 
-import { Display, Heading, Row, TabButton } from 'surfing';
+import { Container, Display, Heading, Row, TabButton } from 'surfing';
 
 const Assets = () => {
   const totalBalance = 100000;
@@ -28,6 +28,7 @@ const Assets = () => {
       {/** Highest Rewarders */}
       <Row>
         <Heading>Highest Rewarders</Heading>
+        <div>
           <TabButton>
             All
           </TabButton>
@@ -37,8 +38,27 @@ const Assets = () => {
           <TabButton>
             Pools
           </TabButton>
+        </div>
       </Row>
+
       {/** Provide Liquidity */}
+      <Container
+        component={"div"}
+        rounded={true}
+        type={"box"}
+      >
+        <div>
+          <Heading>Provide Liquidity</Heading>
+          <Heading as={"h6"}>Make your assets work harder for your rewards. Get involved.</Heading>
+          {/** Integrations */}
+          <div>
+            
+          </div>
+        </div>
+        {/** Logo */}
+        <div>
+        </div>
+      </Container>
     </Page>
   )
 }
