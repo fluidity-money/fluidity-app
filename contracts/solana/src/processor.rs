@@ -8,8 +8,7 @@ use crate::{
 };
 
 use {
-    borsh::{BorshDeserialize, BorshSerialize},
-    solana_program::{
+    borsh::{BorshDeserialize, BorshSerialize}, solana_program::{
         account_info::{next_account_info, AccountInfo},
         entrypoint::ProgramResult,
         instruction::{AccountMeta, Instruction},
@@ -25,8 +24,8 @@ use {
     std::{convert::TryFrom, str::FromStr},
 };
 
-// the public key of the authority for payouts and initialisation
-const AUTHORITY: &str = "B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP";
+// the public key of the account that is allowed to initialize tokens
+const INIT_AUTHORITY: &str = "B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP";
 
 // the public key of the solend program
 const SOLEND: &str = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
@@ -37,6 +36,8 @@ pub struct FluidityData {
     token_mint: Pubkey,
     fluid_mint: Pubkey,
     pda: Pubkey,
+    payout_authority: Pubkey,
+    large_payout_authority: Pubkey,
     wrapping_enabled: bool,
     block_payout_threshold: u64,
     global_mint_remaining: u64,
@@ -96,28 +97,28 @@ fn wrap(
     }
 
     // check mints
-    let data = validate_fluidity_data_account(
+    let mut fluidity_data = validate_fluidity_data_account(
         &fluidity_data_account,
         *token_mint.key,
         *fluidity_mint.key,
         *pda_account.key,
     );
 
-    if !data.wrapping_enabled {
+    if !fluidity_data.wrapping_enabled {
         panic!("wrapping is disabled");
     }
 
-    if data.global_mint_remaining < amount {
+    if fluidity_data.global_mint_remaining < amount {
         panic!("global mint limit reached");
     }
 
     // write the remaining mint limit
-    let remaining_global_mint = data.global_mint_remaining.checked_sub(amount)
+    let remaining_global_mint = fluidity_data.global_mint_remaining.checked_sub(amount)
         .expect("global mint limit reached");
-    data.global_mint_remaining = remaining_global_mint;
+    fluidity_data.global_mint_remaining = remaining_global_mint;
 
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
-    data.serialize(&mut &mut data[..])?;
+    fluidity_data.serialize(&mut &mut data[..])?;
 
     // check collateral and obligation ownership
     let obligation = Obligation::unpack(&obligation_info.data.borrow())?;
@@ -444,7 +445,6 @@ fn payout(
     seed: String,
     bump: u8,
     program_id: &Pubkey,
-    allow_large_payouts: bool,
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
@@ -475,7 +475,17 @@ fn payout(
     );
 
     // check payout authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
+    if !payer.is_signer {
+        panic!("bad payout authority!");
+    }
+
+    let large_payouts_allowed;
+
+    if *payer.key == fluidity_data.payout_authority {
+        large_payouts_allowed = false;
+    } else if *payer.key == fluidity_data.large_payout_authority {
+        large_payouts_allowed = true;
+    } else {
         panic!("bad payout authority!");
     }
 
@@ -498,18 +508,15 @@ fn payout(
     };
 
     if scaled_amount > fluidity_data.block_payout_threshold {
-        match allow_large_payouts {
-            false => {
-               msg!(
-                   "Large payout blocked! Token mint {}, amount {}, from {}, to {}",
-                        fluidity_mint.key,
-                        scaled_amount,
-                        payout_account_a.key,
-                        payout_account_b.key,
-                   );
-               return Ok(());
-            },
-            true => msg!("Large payout allowed through!"),
+        if !large_payouts_allowed {
+            msg!(
+                "Large payout blocked! Token mint {}, amount {}, from {}, to {}",
+                fluidity_mint.key,
+                scaled_amount,
+                payout_account_a.key,
+                payout_account_b.key,
+            );
+            return Ok(());
         }
     }
 
@@ -581,15 +588,23 @@ fn move_from_prize_pool(
     let accounts_iter = &mut accounts.iter();
 
     let token_program = next_account_info(accounts_iter)?;
+    let token_mint = next_account_info(accounts_iter)?;
     let fluidity_mint = next_account_info(accounts_iter)?;
     let pda_account = next_account_info(accounts_iter)?;
     let obligation_info = next_account_info(accounts_iter)?;
     let reserve_info = next_account_info(accounts_iter)?;
     let payout_account = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
+    let fluidity_data_account = next_account_info(accounts_iter)?;
 
+    let fluidity_data = validate_fluidity_data_account(
+        fluidity_data_account,
+        *token_mint.key,
+        *fluidity_mint.key,
+        *pda_account.key,
+    );
     // check payout authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
+    if !(payer.is_signer && *payer.key == fluidity_data.payout_authority) {
         panic!("bad payout authority!");
     }
 
@@ -648,7 +663,7 @@ fn init_solend_obligation(
     let token_program = next_account_info(accounts_iter)?;
 
     // check init authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
+    if !(payer.is_signer && payer.key == &Pubkey::from_str(INIT_AUTHORITY).unwrap()) {
         panic!("bad init authority!");
     }
 
@@ -802,9 +817,11 @@ fn init_data(
     let token_mint = next_account_info(accounts_iter)?;
     let fluid_mint = next_account_info(accounts_iter)?;
     let pda = next_account_info(accounts_iter)?;
+    let payout_authority = next_account_info(accounts_iter)?;
+    let large_payout_authority = next_account_info(accounts_iter)?;
 
     // check payout authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(AUTHORITY).unwrap()) {
+    if !(payer.is_signer && payer.key == &Pubkey::from_str(INIT_AUTHORITY).unwrap()) {
         panic!("bad init authority!");
     }
 
@@ -837,6 +854,8 @@ fn init_data(
         token_mint: *token_mint.key,
         fluid_mint: *fluid_mint.key,
         pda: *pda.key,
+        payout_authority: *payout_authority.key,
+        large_payout_authority: *large_payout_authority.key,
         block_payout_threshold,
         wrapping_enabled,
         global_mint_remaining: global_mint,
@@ -880,8 +899,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         FluidityInstruction::Unwrap(amount, seed, bump) => {
             unwrap(&accounts, program_id, amount, seed, bump)
         }
-        FluidityInstruction::Payout(amount, seed, bump, allow_large) => {
-            payout(&accounts, amount, seed, bump, program_id, allow_large)
+        FluidityInstruction::Payout(amount, seed, bump) => {
+            payout(&accounts, amount, seed, bump, program_id)
         },
         FluidityInstruction::InitSolendObligation(
             obligation_lamports,
@@ -890,11 +909,29 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
             bump,
         ) => init_solend_obligation(&accounts, obligation_lamports, obligation_size, seed, bump),
         FluidityInstruction::LogTVL => log_tvl(&accounts, program_id),
-        FluidityInstruction::InitData(seed, lamports, space, bump, block_payouts) => {
-            init_data(&accounts, program_id, seed, lamports, space, bump, block_payouts)
-        }
+        FluidityInstruction::InitData(
+            seed,
+            lamports,
+            space,
+            bump,
+            block_payouts,
+            wrap_enabled,
+            global_mint,
+        ) => {
+            init_data(
+                &accounts,
+                program_id,
+                seed,
+                lamports,
+                space,
+                bump,
+                block_payouts,
+                wrap_enabled,
+                global_mint,
+            )
+        },
         FluidityInstruction::MoveFromPrizePool(payout_amt, seed, bump) => {
             move_from_prize_pool(&accounts, payout_amt, seed, bump)
-        }
+        },
     }
 }
