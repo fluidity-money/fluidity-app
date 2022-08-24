@@ -27,8 +27,9 @@ const (
 
 func main() {
 	var (
+		solanaWsUrl = util.PickEnvOrFatal(EnvSolanaWsUrl)
+
 		trfDataStoreProgramId = util.GetEnvOrFatal(EnvTrfDataStoreProgramId)
-		solanaWsUrl           = util.GetEnvOrFatal(EnvSolanaWsUrl)
 		solanaNetwork         = util.GetEnvOrFatal(EnvSolanaNetwork)
 
 		accountNotificationChan = make(chan solana.AccountNotification)

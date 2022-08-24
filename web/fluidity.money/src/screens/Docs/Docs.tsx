@@ -46,16 +46,43 @@ const Docs = () => {
               ))}
         </ManualCarousel>    
       </div>
-      <div className={styles.customInput}>
-         {/*To do... Refactor this input into a component*/}
-          <p>
+      <div className={styles.desktopViewFormInput}>
+        <h4>Stay hydrated</h4>
+        <label>
             EMAIL
-          </p>
+        </label>
+        <div> 
           <input type="text" placeholder="elon@email.com"/>
           <GeneralButton version={"secondary"} type={"text"} size={"medium"} handleClick={function (): void {
-           throw new Error("Function not implemented.");
-          } }>LAUNCH FLUIDITY
+            throw new Error("Function not implemented.");
+          } }>GIMME THE JUICE
           </GeneralButton>
+        </div>
+      </div>
+      <div className={styles.mobileViewFormInput}>
+        <div>
+          <h2>Stay hydrated</h2>
+          <p>
+            Subscribe to our monthly newsletter to stay up to date with our progress and roadmap.
+          </p>
+          <form>
+            <div>
+              <label>
+                Name
+              </label>
+              <input type="text" placeholder="Elon"/>
+              <label>
+                Email
+              </label>
+              <input type="text" placeholder="elon@email.com"/>
+            </div>
+            <GeneralButton version={"primary"} type={"text"} size={"medium"} handleClick={function (): void {
+            throw new Error("Function not implemented.");
+          } }>GIMME THE JUICE
+          </GeneralButton>
+          </form>
+
+        </div>
       </div>
     </>
   );

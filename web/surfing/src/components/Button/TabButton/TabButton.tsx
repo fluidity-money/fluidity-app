@@ -1,4 +1,4 @@
-import type {ButtonHTMLAttributes} from "react";
+import type { ButtonHTMLAttributes } from "react";
 
 import styles from "./TabButton.module.scss";
 

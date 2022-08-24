@@ -1,8 +1,7 @@
 .container {
-  cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   height: 100vh;
   min-height: 750px;
@@ -12,56 +11,64 @@
   // grid-template-columns: repeat(1, 1fr);
   // position: relative;
   // max-width: 1500px;
+  padding-top: 100px;
   h1 {
-    position: absolute;
+    text-align: center;
   }
 }
 
-.fadeIn {
-  transition: opacity 3s ease;
+.video {
+  width: 444px;
+  height: 423px;
+  border: solid 1px pink;
+  border-radius: 50%;
+  background-color: gray;
+  opacity: 0.8;
 }
 
-.fadeInText {
-  margin-bottom: 250px;
-  transition: opacity 1s ease 0s, all 3s ease 1s;
-}
+// .fadeIn {
+//   transition: opacity 3s ease;
+// }
 
-.fadeOut {
-  opacity: 0;
-  transition: opacity 1s ease;
+// .fadeInText {
+//   margin-bottom: 250px;
+//   transition: opacity 1s ease 0s, all 3s ease 1s;
+// }
+
+// .fadeOut {
+//   opacity: 0;
+//   transition: opacity 1s ease;
+// }
+
+.text {
+  margin-right: 10px;
 }
 
 .carousel {
-  // margin-right: 75%;
   width: 100%;
-  margin-top: 300px;
-  transition: opacity 1s ease 0s, all 3s ease 1s;
 }
 
-.fadeOutCarousel {
-  opacity: 0;
-  transition: opacity 1s ease;
-  margin-left: 75%;
-  margin-top: 300px;
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  align-items: center;
+  min-height: 560px;
+  justify-content: space-between;
 }
 
-// for making the background get very large and disapperar
-.makeBig {
-  animation-duration: 5s;
-  animation-name: animate-text;
+.tiles {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: flex-end;
 }
 
-@keyframes animate-text {
-  0% {
-    transform: scale(1);
-  }
-  10% {
-    transform: scale(2);
-  }
-  20% {
-    transform: scale(3);
-  }
-  100% {
-    transform: scale(200);
-  }
+.right {
+  margin-right: 40px;
+}
+
+.left {
+  margin-left: 40px;
 }

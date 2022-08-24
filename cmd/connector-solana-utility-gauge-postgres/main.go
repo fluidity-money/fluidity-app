@@ -40,8 +40,9 @@ const SolanaChainName = "solana"
 
 func main() {
 	var (
-		solanaRpcUrl  = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		solanaWsUrl   = util.GetEnvOrFatal(EnvSolanaWsUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+		solanaWsUrl  = util.PickEnvOrFatal(EnvSolanaWsUrl)
+
 		solanaNetwork = util.GetEnvOrFatal(EnvSolanaNetwork)
 
 		gaugemeisterPubkey_    = util.GetEnvOrFatal(EnvGaugemeisterPubkey)

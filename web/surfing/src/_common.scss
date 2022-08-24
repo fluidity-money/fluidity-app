@@ -109,3 +109,17 @@ $border: (
 );
 
 $em-step: 0.25em;
+
+$breakpoints: (
+  'small': ( max-width: 375px ),
+  'medium': ( max-width: 992px ),
+  'large': ( max-width: 1440px ),
+) !default;
+
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media #{inspect(map-get($breakpoints, $breakpoint))} {
+      @content;
+    }
+  }
+}

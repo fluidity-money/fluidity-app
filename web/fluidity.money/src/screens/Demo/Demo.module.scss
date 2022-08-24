@@ -34,10 +34,21 @@
       margin-bottom: 15px;
       color: $textGrey;
     }
+
+    @include max-860px{
+      text-align: center;
+    }
   }
 }
 
 .demoVideo {
   position: absolute;
   width: 100%;
+}
+
+.socials {
+  img {
+    width: 10px;
+    height: 10px;
+  }
 }

@@ -1,3 +1,3 @@
-import FIlterButton from "./FIlterButton";
+import FilterButton from "./FilterButton";
 
-export default FIlterButton;
+export default FilterButton;
