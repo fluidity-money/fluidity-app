@@ -1,0 +1,47 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import Row from "./Row";
+
+<Meta
+    title="Container/Row"
+    component={Row}
+/>
+
+export const Template = ({children, ...props}) => <Row {...props}>
+    {children}
+</Row>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Row Container</Title>
+    <Subtitle>Button to visit General points</Subtitle>
+    
+    <h2>Row Container</h2>
+    <Story
+        name="Default Container"
+        args={{
+            children: <>
+                <img src="/src/assets/react.svg"></img>
+                <div>
+                    <p>A Fluid Asset is a wrapped standard token that represents and is pegged to an underlying principal token. You are free from market volatility risk when exchanging your fluid assets to the base asset you have deposited at any point in time through our web application, and if its down, through the method call on the corresponding swap contract.</p>
+                </div>
+            </>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <Story
+        name="Reversed Container"
+        args={{
+            reverse: true,
+            children: <>
+                <img src="/src/assets/react.svg"></img>
+                <div>
+                    <p>A Fluid Asset is a wrapped standard token that represents and is pegged to an underlying principal token. You are free from market volatility risk when exchanging your fluid assets to the base asset you have deposited at any point in time through our web application, and if its down, through the method call on the corresponding swap contract.</p>
+                </div>
+            </>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>
