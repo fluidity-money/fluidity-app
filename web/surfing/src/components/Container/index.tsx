@@ -1,3 +1,4 @@
 import Row from './Row';
+import DesktopOnly from './DesktopOnly';
 
-export default Row;
+export { Row, DesktopOnly };
