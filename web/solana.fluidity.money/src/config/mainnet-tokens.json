@@ -86,5 +86,27 @@
     "image": "img/TokenIcons/ustIcon.svg",
     "pinned": true,
     "amount": "0.0"
+  },
+  {
+    "symbol": "USDH",
+    "name": "USDH",
+    "mintAddress": "USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX",
+    "decimals": 6,
+    "colour": "#0C3595",
+    "image": "img/TokenIcons/ustIcon.svg",
+    "pinned": false,
+    "amount": "0.0",
+    "obligationAccount": "",
+    "dataAccount": ""
+  },
+  {
+    "symbol": "fUST",
+    "name": "FLUID UST",
+    "mintAddress": "8Rm2VXdf4AjvJt6enC6rhj2qBKpaNUTPQX3j3N4aKChA",
+    "decimals": 6,
+    "colour": "#0C3595",
+    "image": "img/TokenIcons/ustIcon.svg",
+    "pinned": false,
+    "amount": "0.0"
   }
 ]
