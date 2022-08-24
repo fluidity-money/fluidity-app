@@ -1,40 +1,48 @@
 import type { HTMLProps } from 'react';
 
-import { GeneralButton, Row, Heading } from 'surfing';
+import { DesktopOnly, GeneralButton, Heading, Row } from 'surfing';
 
-const Page = ({ children, ...props }: HTMLProps<HTMLDivElement>) => {
+interface IPage extends HTMLProps<HTMLDivElement> {
+  title: string
+}
+
+const Page = ({ children, title, ...props }: IPage) => {
   const fluVersion = 1.5;
 
   return (
     <div {...props} >
       {/** Heading + Buttons*/}
-      <Row>
-        <h2>Dashboard</h2>
-        {/** Button Group */}
-        <div>
-          <GeneralButton 
-            type={"icon before"}
-            version={"secondary"}
-          >
-            Send
-          </GeneralButton>
-          <GeneralButton 
-            type={"icon before"}
-            version={"secondary"}
-          >
-            Receive
-          </GeneralButton>
-          <GeneralButton 
-            type={"text"}
-            version={"primary"}
-          >
-            Fluidify Money
-          </GeneralButton>
-        </div>
-      </Row>
+      <DesktopOnly>
+        <Row>
+          <Heading as={"h2"}>{title}</Heading>
+          {/** Button Group */}
+          <div>
+            <GeneralButton 
+              type={"icon before"}
+              version={"secondary"}
+            >
+              Send
+            </GeneralButton>
+            <GeneralButton 
+              type={"icon before"}
+              version={"secondary"}
+            >
+              Receive
+            </GeneralButton>
+            <GeneralButton 
+              type={"text"}
+              version={"primary"}
+            >
+              Fluidify Money
+            </GeneralButton>
+          </div>
+        </Row>
+      </DesktopOnly>
+
       {/** Sidebar */}
       {children}
       {/** Footer */}
+      <DesktopOnly>
       <Row>
         {/** General Links */}
         <div>
@@ -45,8 +53,29 @@ const Page = ({ children, ...props }: HTMLProps<HTMLDivElement>) => {
         
         {/** Social Links */}
         <div>
+          <GeneralButton 
+            type={"icon only"}
+          >
+            Twitter
+          </GeneralButton>
+          <GeneralButton 
+            type={"icon only"}
+          >
+            Discord
+          </GeneralButton>
+          <GeneralButton 
+            type={"icon only"}
+          >
+            Telegram
+          </GeneralButton>
+          <GeneralButton 
+            type={"icon only"}
+          >
+            LinkedIn
+          </GeneralButton>
         </div>
       </Row>
+      </DesktopOnly>
     </div>
   )
 }
