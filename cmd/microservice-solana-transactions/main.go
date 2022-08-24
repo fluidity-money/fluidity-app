@@ -87,7 +87,7 @@ func main() {
 		}
 
 		if block == nil {
-			log.Debug(func(k *log.Log) {
+			log.App(func(k *log.Log) {
 			    k.Format("Block %d was skipped by solana!", slot.Slot)
 			})
 

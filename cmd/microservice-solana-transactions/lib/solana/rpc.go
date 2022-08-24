@@ -87,7 +87,7 @@ func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*Block, error) {
 		if blockRes.Error != nil {
 			code := blockRes.Error.Code
 
-			// slot was skipped - it will never beocome available - return
+			// slot was skipped - it will never become available - return
 			if code == SlotSkippedCode {
 				return nil, nil
 			}
