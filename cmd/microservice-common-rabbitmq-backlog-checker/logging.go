@@ -47,7 +47,7 @@ func queueReportWithMessage(messageChan chan string, queue rmqQueue, messageType
 }
 
 // getAndRequeueFirstMessage to `Nack message requeue true` the first message in a queue
-func getAndRequeueFirstMessage(queueAddress, queueName string) (string, error) {
+func getAndRequeueFirstMessage(queueAddress, queueName, vhost string) (string, error) {
 	// parse the http[s] URL into an amqp[s] URL
 	url, err := url.Parse(queueAddress)
 
@@ -71,7 +71,8 @@ func getAndRequeueFirstMessage(queueAddress, queueName string) (string, error) {
 		)
 	}
 
-	client, err := amqp091.Dial(url.String())
+	config := amqp091.Config{Vhost: vhost}
+	client, err := amqp091.DialConfig(url.String(), config)
 
 	if err != nil {
 		return "", fmt.Errorf(
