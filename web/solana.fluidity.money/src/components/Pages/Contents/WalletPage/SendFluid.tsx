@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 import { useEffect, useState, useContext } from "react";
 import TokenSelect from "../SwapPage/TokenSelect";
 import Input from "components/Input";

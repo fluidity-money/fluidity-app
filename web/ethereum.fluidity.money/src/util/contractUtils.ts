@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 import {Contract, Event, Signer} from "ethers";
 import {SupportedTokens} from "components/types";
 import contractList, {SupportedFluidContracts, SupportedNetworks} from 'util/contractList';

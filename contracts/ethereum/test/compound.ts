@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 import * as hre from "hardhat";
 import { signer, usdt_addr, fusdt_addr } from './setup';
 import * as ethers from 'ethers';
