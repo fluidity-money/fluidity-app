@@ -131,20 +131,35 @@ func main() {
 					)
 				})
 
-				if messagesReady > maxDeadLetterCount {
-					queueMessage(messageChan, queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount)
+				if messagesUnacked > maxDeadLetterCount {
+					queueReport(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
 				}
 
-				if messagesUnacked > maxDeadLetterCount {
-					queueMessage(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
+				// if there's any messages on the queue, obtain the first to be logged 
+				if messagesReady == 0 {
+					break
 				}
+
+				msg, err := getAndRequeueFirstMessage(rmq.rmqAddress, name)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Message = "Failed to get the top dead letter queue message!"
+						k.Payload = err
+					})
+				}
+
+				if len(msg) > 0 && messagesReady > maxDeadLetterCount {
+					queueReportWithMessage(messageChan, queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount, msg)
+				}
+
 			case false:
 				if messagesReady > maxReadyCount {
-					queueMessage(messageChan, queue, "Ready", messagesReady, maxReadyCount)
+					queueReport(messageChan, queue, "Ready", messagesReady, maxReadyCount)
 				}
 
 				if messagesUnacked > maxUnackedCount {
-					queueMessage(messageChan, queue, "Unacked", messagesUnacked, maxUnackedCount)
+					queueReport(messageChan, queue, "Unacked", messagesUnacked, maxUnackedCount)
 				}
 			}
 		}
