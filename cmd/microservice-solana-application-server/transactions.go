@@ -14,7 +14,7 @@ import (
 	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
-func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
+func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
 	var (
 		fee *big.Rat
 		err error
@@ -49,11 +49,19 @@ func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]str
 			fluidTokens,
 		)
 
-	case applications.ApplicationAldrin:
+	case applications.ApplicationAldrinV1:
 		fee, err = aldrin.GetAldrinFees(
 			solanaClient,
 			transactionResult,
-			aldrinProgramId,
+			aldrinV1ProgramId,
+			fluidTokens,
+		)
+
+	case applications.ApplicationAldrinV2:
+		fee, err = aldrin.GetAldrinFees(
+			solanaClient,
+			transactionResult,
+			aldrinV2ProgramId,
 			fluidTokens,
 		)
 
