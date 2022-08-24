@@ -7,6 +7,7 @@
   min-height: 850px;
   width: 100%;
   border: solid 2px red;
+
   h6 {
     text-align: end;
     margin: 0;
@@ -36,6 +37,10 @@
   justify-content: space-between;
   margin-top: 50px;
   width: 100%;
+  gap: 48px;
+  @include max-860px {
+    flex-direction: column;
+  }
 }
 
 .buttons {
