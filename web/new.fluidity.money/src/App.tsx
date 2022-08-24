@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { ProtectedRoute } from 'surfing';
 
 import Dashboard from './screens/authenticated/dashboard';
 import Rewards from './screens/authenticated/rewards';
 import Assets from './screens/authenticated/assets';
 import Dao from './screens/authenticated/dao';
-import reactLogo from './assets/react.svg'
+import Home from './screens/Home';
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const isConnected = () => true;
 
   return (
   <Router>
@@ -23,24 +24,28 @@ function App() {
       />
         
       <ProtectedRoute
+        predicate={isConnected}
         exact={true}
         path="/dashboard"
         component={Dashboard}
         extraProps={{}}
       />
       <ProtectedRoute
+        predicate={isConnected}
         exact={true}
         path="/rewards"
-        component={Reward}
+        component={Rewards}
         extraProps={{}}
       />
       <ProtectedRoute
+        predicate={isConnected}
         exact={true}
         path="/assets"
         component={Assets}
         extraProps={{}}
       />
       <ProtectedRoute
+        predicate={isConnected}
         exact={true}
         path="/dao"
         component={Dao}

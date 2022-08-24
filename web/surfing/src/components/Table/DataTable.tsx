@@ -24,7 +24,7 @@ const SelectColumnFilter = ({
       <li
       value={filterValue}
       onClick={() => {
-      filterBy = filterBy == 'ALL' ? undefined : filterBy;
+      filterBy = filterBy === 'ALL' ? undefined : filterBy;
       setFilter(filterBy || undefined)
       }}
       >
