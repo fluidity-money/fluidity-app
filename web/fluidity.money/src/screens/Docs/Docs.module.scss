@@ -8,6 +8,9 @@
   width: 100%;
   flex-direction: column;
   background-color: $fluidBlack;
+  @include max-860px {
+    padding-right: 4%;
+  }
 }
 
 .carouselText {
