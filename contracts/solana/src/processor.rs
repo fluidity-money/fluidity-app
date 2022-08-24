@@ -37,7 +37,9 @@ pub struct FluidityData {
     token_mint: Pubkey,
     fluid_mint: Pubkey,
     pda: Pubkey,
+    wrapping_enabled: bool,
     block_payout_threshold: u64,
+    global_mint_remaining: u64,
 }
 
 // wrap amount of token into corresponding fluidity token
@@ -94,12 +96,28 @@ fn wrap(
     }
 
     // check mints
-    validate_fluidity_data_account(
+    let data = validate_fluidity_data_account(
         &fluidity_data_account,
         *token_mint.key,
         *fluidity_mint.key,
         *pda_account.key,
     );
+
+    if !data.wrapping_enabled {
+        panic!("wrapping is disabled");
+    }
+
+    if data.global_mint_remaining < amount {
+        panic!("global mint limit reached");
+    }
+
+    // write the remaining mint limit
+    let remaining_global_mint = data.global_mint_remaining.checked_sub(amount)
+        .expect("global mint limit reached");
+    data.global_mint_remaining = remaining_global_mint;
+
+    let mut data = fluidity_data_account.try_borrow_mut_data()?;
+    data.serialize(&mut &mut data[..])?;
 
     // check collateral and obligation ownership
     let obligation = Obligation::unpack(&obligation_info.data.borrow())?;
@@ -773,6 +791,8 @@ fn init_data(
     space: u64,
     bump: u8,
     block_payout_threshold: u64,
+    wrapping_enabled: bool,
+    global_mint: u64,
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
@@ -818,6 +838,8 @@ fn init_data(
         fluid_mint: *fluid_mint.key,
         pda: *pda.key,
         block_payout_threshold,
+        wrapping_enabled,
+        global_mint_remaining: global_mint,
     }
     .serialize(&mut &mut data[..])?;
 
