@@ -1,9 +1,12 @@
+import ContinuousCarousel from "components/ContinuousCarousel";
 import React, { useEffect, useState } from "react";
 import { GeneralButton } from "../../components/Button";
 import styles from "./HowItWorks.module.scss";
 
 const HowItWorks = () => {
-  /* 3 paragraphs on the left, 
+  /* 
+  carousels at the top,
+  3 paragraphs on the left, 
   image on the right,
   paragraph highlighted has different specific image,
   scrolls thought automatically and constantly
@@ -24,6 +27,27 @@ const HowItWorks = () => {
 
   return (
     <div className={`${styles.container} bg-dark`}>
+      <ContinuousCarousel direction={"right"}>
+        <div className={styles.text}>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+          <div>HOW IT WORKS</div>
+        </div>
+      </ContinuousCarousel>
       <div className={styles.grid}>
         <div className={styles.left}>
           <p className={currentImage === "🦍" ? styles.bold : styles.normal}>
