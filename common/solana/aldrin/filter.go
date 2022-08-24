@@ -19,7 +19,7 @@ import (
 	"github.com/near/borsh-go"
 )
 
-// AldrinSwapInstructionSize is the size a Aldrin swap instruction enum
+// AldrinSwapInstructionSize is the size of an Aldrin swap instruction enum
 const AldrinSwapInstructionSize = 25
 
 // SwapInstruction is the instruction data of a Aldrin swap transaction
@@ -78,16 +78,12 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 
 		instructionByteData := base58.Decode(instruction.Data)
 
-		var (
-			isAldrinSwap           = bytes.Compare(instructionByteData[0:8], AldrinSwapInstructionVariant)
-			enoughInstructionBytes = len(instructionByteData) >= AldrinSwapInstructionSize
-		)
+		enoughInstructionBytes := len(instructionByteData) >= AldrinSwapInstructionSize
 
-		// bytes.Compare returns 0 if slices are equal
-		if isAldrinSwap != 0 {
+		if !enoughInstructionBytes {
 
 			log.Debugf(
-				"instruction %v contained in %#v is not a Aldrin swap",
+				"instruction %v contained in %#v is not long enough to be a valid Aldrin swap",
 				instructionNumber,
 				transactionSignature,
 			)
@@ -95,10 +91,13 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 			continue
 		}
 
-		if !enoughInstructionBytes {
+		isAldrinSwap := bytes.Compare(instructionByteData[0:8], AldrinSwapInstructionVariant)
+
+		// bytes.Compare returns 0 if slices are equal
+		if isAldrinSwap != 0 {
 
 			log.Debugf(
-				"instruction %v contained in %#v is not long enough to be a valid Aldrin swap",
+				"instruction %v contained in %#v is not a Aldrin swap",
 				instructionNumber,
 				transactionSignature,
 			)
