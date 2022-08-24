@@ -44,16 +44,39 @@ const SolanaChainName = "solana"
 
 func main() {
 	var (
-		solanaRpcUrl  = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		solanaWsUrl   = util.GetEnvOrFatal(EnvSolanaWsUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+		solanaWsUrl  = util.PickEnvOrFatal(EnvSolanaWsUrl)
+
 		solanaNetwork = util.GetEnvOrFatal(EnvSolanaNetwork)
 
-		gaugemeisterPubkey    = goSolana.MustPublicKeyFromBase58(EnvGaugemeisterPubkey)
-		utilityGaugeProgramId = goSolana.MustPublicKeyFromBase58(EnvUtilityGaugeProgramId)
+		gaugemeisterPubkey_    = util.GetEnvOrFatal(EnvGaugemeisterPubkey)
+		utilityGaugeProgramId_ = util.GetEnvOrFatal(EnvUtilityGaugeProgramId)
 
 		accountNotificationChan = make(chan solana.AccountNotification)
 		errChan                 = make(chan error)
 	)
+
+	gaugemeisterPubkey, err := goSolana.PublicKeyFromBase58(
+		gaugemeisterPubkey_,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to decode Gaugemeister's public key!"
+			k.Payload = err
+		})
+	}
+
+	utilityGaugeProgramId, err := goSolana.PublicKeyFromBase58(
+		utilityGaugeProgramId_,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to decode a utility gauge program id!"
+			k.Payload = err
+		})
+	}
 
 	solanaClient := solanaRpc.New(solanaRpcUrl)
 
@@ -111,7 +134,19 @@ func main() {
 
 			for _, gaugePubkey_ := range gauges {
 
-				gaugePubkey := goSolana.MustPublicKeyFromBase58(gaugePubkey_)
+				gaugePubkey, err := goSolana.PublicKeyFromBase58(gaugePubkey_)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to decode gauge public key %v, %#v",
+							EnvGaugemeisterPubkey,
+							gaugePubkey_,
+						)
+
+						k.Payload = err
+					})
+				}
 
 				currentGaugePower := types.UtilityGaugePower{
 					Chain:   SolanaChainName,

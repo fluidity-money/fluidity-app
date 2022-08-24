@@ -5,16 +5,41 @@
 package queue
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/streadway/amqp"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func init() {
 	var (
-		workerId  = util.GetWorkerId()
+		workerId = util.GetWorkerId()
+
+		deadLetterEnabled = os.Getenv(EnvDeadLetterEnabled) != "false"
+
+		messageRetries_ = util.GetEnvOrDefault(EnvMessageRetries, "5")
+
 		queueAddr = util.GetEnvOrFatal(EnvQueueAddr)
 	)
+
+	messageRetries, err := strconv.Atoi(messageRetries_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to set %#v: Can't convert '%#v' to an integer!",
+				EnvMessageRetries,
+				messageRetries_,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	client, err := amqp.Dial(queueAddr)
 
@@ -41,7 +66,7 @@ func init() {
 
 		err, closed := <-channel.NotifyClose(errors)
 
-		if closed {
+		if closed && err == nil {
 			log.Fatal(func(k *log.Log) {
 				k.Context = Context
 				k.Message = "AMQP closed on its own without an error!!!"
@@ -86,9 +111,11 @@ func init() {
 	go func() {
 		for {
 			chanAmqpDetails <- amqpDetails{
-				channel:      channel,
-				exchangeName: ExchangeName,
-				workerId:     workerId,
+				channel:           channel,
+				exchangeName:      ExchangeName,
+				workerId:          workerId,
+				deadLetterEnabled: deadLetterEnabled,
+				messageRetries:    messageRetries,
 			}
 		}
 	}()

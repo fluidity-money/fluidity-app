@@ -12,7 +12,7 @@ import (
 
 	faucetDatabase "github.com/fluidity-money/fluidity-app/lib/databases/postgres/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/slack"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	twitterQueue "github.com/fluidity-money/fluidity-app/lib/queues/twitter"
@@ -238,9 +238,8 @@ func main() {
 				)
 			})
 
-			slack.Notify(
-				slack.ChannelFaucetTweets,
-				slack.SeverityInformational,
+			discord.Notify(
+				discord.SeverityInformational,
 				"Tweet %#v was rate limited!",
 				tweet,
 			)
@@ -278,9 +277,8 @@ func main() {
 
 		faucetDatabase.TrackFaucetUse(address, networkChosen, tokenChosen)
 
-		slack.Notify(
-			slack.ChannelFaucetTweets,
-			slack.SeverityInformational,
+		discord.Notify(
+			discord.SeverityInformational,
 			`
 Responded to the tweet %#v with a reply indicating that the faucet was serviced!`,
 

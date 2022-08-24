@@ -1,0 +1,24 @@
+@import "../../styles/config.scss";
+
+@import "../../styles/config.scss";
+
+.container {
+  min-height: 850px;
+  width: 100%;
+  padding-right: 14px;
+   h1 {
+     margin-left: 55px;
+     margin-top: 100px;
+   }
+
+   div {
+      width: 95%;
+      margin-bottom: 30px;
+      margin-left: 30px;
+      margin-top: 30px;
+
+      @include max-760px {
+        margin-left: 16px;
+      }
+   }
+}

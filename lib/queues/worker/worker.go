@@ -108,6 +108,6 @@ func NewEthereumEmission() *Emission {
 	return worker.NewEthereumEmission()
 }
 
-func NewSolanaEmisison() *Emission {
+func NewSolanaEmission() *Emission {
 	return worker.NewSolanaEmission()
 }

@@ -1,0 +1,23 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 850px;
+  width: 100%;
+  background-color: $fluidBlack;
+}
+
+.tweetContainer {
+  background-color: $fluidDenimBlue;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 300px;
+  height: 400px;
+  margin: 10px;
+  padding: 20px;
+  margin-bottom: 50px;
+}

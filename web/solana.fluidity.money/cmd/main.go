@@ -25,6 +25,8 @@ func main() {
 
 	web.JsonEndpoint("/my-history", api_fluidity_money.HandleMyHistory)
 
+	web.JsonEndpoint("/my-mint-limit", api_fluidity_money.HandleMyMintLimit)
+
 	updateNotificationsHandlerSolana := api_fluidity_money.HandleUpdateNotifications(
 		updateMessagesSolana,
 	)

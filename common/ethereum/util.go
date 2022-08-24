@@ -95,6 +95,30 @@ func CoerceBoundContractResultsToAddress(results []interface{}) (ethCommon.Addre
 	return result, nil
 }
 
+// Wrap CoerceBoundContractResultsToRat to handle an array of results
+func CoerceBoundContractResultsToAddresses(results []interface{}) ([]ethCommon.Address, error) {
+	var (
+		addresses = make([]ethCommon.Address, len(results))
+
+		// coercion function expects a slice with 1 element
+		wrapped = make([]interface{}, 1)
+	)
+
+	for i, result := range results {
+		wrapped[0] = result
+
+		resultAddr, err := CoerceBoundContractResultsToAddress(wrapped)
+
+		if err != nil {
+			return nil, err
+		}
+
+		addresses[i] = resultAddr
+	}
+
+	return addresses, nil
+}
+
 func CoerceBoundContractResultsToUint8(results []interface{}) (uint8, error) {
 	var result uint8
 

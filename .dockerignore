@@ -1,1 +1,24 @@
-.gitignore
+.git
+cmd
+web
+tests
+contracts
+automation
+
+**/*.o
+**/*.out
+*.out
+*.o
+
+lib/build-lib
+common/build-common
+
+database/build/**
+database/build
+database/db
+
+deployment_list.json
+
+# Vendor specific
+.vscode
+.DS_Store

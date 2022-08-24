@@ -152,7 +152,7 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 		feeMultiplier = big.NewRat(3, 1000)
 		fluidTransferAmount = amount
 	} else {
-		feeMultiplier = big.NewRat(3009027, 1000000000)
+		feeMultiplier = big.NewRat(3, 997)
 		fluidTransferAmount = result
 	}
 

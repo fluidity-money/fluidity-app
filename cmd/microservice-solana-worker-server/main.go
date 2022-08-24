@@ -8,15 +8,17 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
-	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
+	worker_types "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 )
 
 const (
@@ -51,20 +53,13 @@ const (
 	// Chain for filtering TRF var in Timescale
 	TrfChain = `solana`
 
-	// SolanaBlockTime assumed by the ATX calculation
-	SolanaBlockTime uint64 = 1
-
 	// SplProgramId is the program id of the SPL token program
 	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
-	// The compute used by an spl-token tranfer
-	SplTransferCompute = 2721
 )
 
 func main() {
 
 	var (
-		solanaNetwork            = util.GetEnvOrFatal(EnvSolanaNetwork)
 		topicWrappedActionsQueue = util.GetEnvOrFatal(EnvTopicWrappedActionsQueue)
 		topicWinnerQueue         = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 		decimalPlaces_           = util.GetEnvOrFatal(EnvTokenDecimals)
@@ -98,8 +93,12 @@ func main() {
 			mintSupply     = bufferedTransfers.MintSupply
 			tvl            = bufferedTransfers.Tvl
 			fluidTransfers = 0
-			emission       = workerTypes.NewSolanaEmission()
+			emission       = worker_types.NewSolanaEmission()
 		)
+
+		workerConfig := worker_config.GetWorkerConfigSolana()
+
+		solanaBlockTime := workerConfig.SolanaBlockTime
 
 		// emissions in this loop should only contain information relevant to the
 		// entire slot set here so that if any point the loop for the transfers
@@ -119,7 +118,7 @@ func main() {
 			}
 		}
 
-		atx := probability.CalculateAtx(SolanaBlockTime, fluidTransfers)
+		atx := probability.CalculateAtx(solanaBlockTime, fluidTransfers)
 
 		// normalise the amount to be consistent with USDC as a floating point
 
@@ -145,6 +144,7 @@ func main() {
 				userActionTransactionHash  = userAction.Transaction.Signature
 				userActionSenderAddress    = userAction.SenderSplAddress
 				userActionRecipientAddress = userAction.RecipientSplAddress
+				userActionSlotNumber       = int64(userAction.Transaction.Result.Slot)
 				tokenDetails               = userAction.Token
 			)
 
@@ -158,14 +158,15 @@ func main() {
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
 
-			tribecaDataStoreTrfVars := payout.GetLatestTrfVars(TrfChain, solanaNetwork)
+			slotNumber_ := misc.BigIntFromInt64(userActionSlotNumber)
+			emission.SolanaSlotNumber = slotNumber_
 
 			var (
-				winningClasses   = tribecaDataStoreTrfVars.WinningClasses
-				payoutFreqNum    = tribecaDataStoreTrfVars.PayoutFreqNum
-				payoutFreqDenom  = tribecaDataStoreTrfVars.PayoutFreqDenom
-				deltaWeightNum   = tribecaDataStoreTrfVars.DeltaWeightNum
-				deltaWeightDenom = tribecaDataStoreTrfVars.DeltaWeightDenom
+				winningClasses   = fluidity.WinningClasses
+				payoutFreqNum    = fluidity.PayoutFreqNum
+				payoutFreqDenom  = fluidity.PayoutFreqDenom
+				deltaWeightNum   = fluidity.DeltaWeightNum
+				deltaWeightDenom = fluidity.DeltaWeightDenom
 			)
 
 			var (
@@ -184,7 +185,7 @@ func main() {
 				)
 			}
 
-			randomN, randomPayouts := probability.WinningChances(
+			randomN, randomPayouts, _ := probability.WinningChances(
 				solanaTransactionFeesNormalised,
 				atx,
 				sizeOfThePool,
@@ -193,7 +194,7 @@ func main() {
 				deltaWeight,
 				winningClasses,
 				fluidTransfers,
-				SolanaBlockTime,
+				solanaBlockTime,
 				emission,
 			)
 
@@ -276,7 +277,11 @@ func main() {
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
 
+			emission.Update()
+
 			queue.SendMessage(worker.TopicEmissions, emission)
+
+			log.Debugf("Emission: %s", emission)
 		}
 	})
 }

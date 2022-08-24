@@ -1,0 +1,73 @@
+@import "../../styles/config.scss";
+
+.infoBoxContainer {
+  position: absolute;
+
+  height: 294px;
+  width: 496px;
+  z-index: 2;
+}
+
+.infoBox {
+  background-color: $fluidBlack;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  // transition: background-color 3s ease-out;
+  width: 100%;
+  h1 {
+    cursor: pointer;
+    margin: 0;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 72px;
+    line-height: 100%;
+    text-align: center;
+    letter-spacing: -0.02em;
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+  h3 {
+    margin: 6px;
+  }
+}
+
+.infoBoxTransparent {
+  background-color: transparent;
+  padding: 70px 70px 60px 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  // transition: background-color 3s ease-out;
+  width: 460px;
+  z-index: 3;
+  h1 {
+    cursor: pointer;
+    margin: 0;
+    font-size: 80px;
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+  h3 {
+    margin: 6px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 120%;
+    letter-spacing: 0.01em;
+  }
+}
+
+.fadeIn {
+  transition: opacity 3s ease;
+}
+
+.fadeOut {
+  opacity: 0;
+  transition: opacity 1s ease;
+  z-index: 0;
+}

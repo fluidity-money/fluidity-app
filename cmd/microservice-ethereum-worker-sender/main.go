@@ -37,6 +37,10 @@ const (
 	// EnvUseHardhatFix instead of trying to guess the gas or set it manually
 	EnvUseHardhatFix = `FLU_ETHEREUM_HARDHAT_FIX`
 
+	// EnvUseLegacyContract to use the old single reward call instead of the
+	// new batchReward call
+	EnvUseLegacyContract = `FLU_ETHEREUM_LEGACY_CONTRACT`
+
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
 )
@@ -48,8 +52,9 @@ func main() {
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 
-		useHardhatFix bool
-		gasLimit      uint64 = 0
+		useHardhatFix     bool
+		useLegacyContract = os.Getenv(EnvUseLegacyContract) == "true"
+		gasLimit          uint64 = 0
 	)
 
 	var err error
@@ -72,6 +77,10 @@ func main() {
 			})
 		}
 	}
+
+	log.Debug(func(k *log.Log) {
+		k.Format("Using the legacy contract ABI: %t!", useLegacyContract)
+	})
 
 	privateKey, err := ethCrypto.HexToECDSA(privateKey_)
 
@@ -124,6 +133,32 @@ func main() {
 			client:                ethClient,
 			useHardhatFix:         useHardhatFix,
 			hardcodedGasLimit:     gasLimit,
+		}
+
+		if useLegacyContract {
+			transactions, err := callLegacyRewardFunction(rewardTransactionArguments)
+
+			if err != nil {
+			    log.Fatal(func(k *log.Log) {
+			        k.Format(
+						"Failed to call the legacy reward function! %v!",
+						err,
+					)
+			    })
+			}
+
+			hashes := make([]string, len(transactions))
+
+			for i, transaction := range transactions {
+				hashes[i] = transaction.Hash().Hex()
+			}
+
+			log.App(func(k *log.Log) {
+				k.Message = "Successfully called the legacy reward function with hashes"
+				k.Payload = hashes
+			})
+
+			return
 		}
 
 		transactionHash, err := callRewardFunction(rewardTransactionArguments)

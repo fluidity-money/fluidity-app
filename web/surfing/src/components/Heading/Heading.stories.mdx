@@ -1,0 +1,62 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import Heading from "./Heading";
+
+<Meta title="Typography/Heading" component={Heading} />
+
+export const Template = (args) => <Heading {...args}>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</Heading>;
+
+<Canvas columns={1}  withSource="open" withToolbar>
+    <Title>Heading</Title>
+    <Subtitle>Beautiful typography for beautiful things.</Subtitle>
+    <Story
+        name="Heading 1"
+        args={{
+            as: "h1",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Heading 2"
+        args={{
+            as: "h2",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Heading 3"
+        args={{
+            as: "h3",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Heading 4"
+        args={{
+            as: "h4",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Heading 5"
+        args={{
+            as: "h5",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Heading 6"
+        args={{
+            as: "h6",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

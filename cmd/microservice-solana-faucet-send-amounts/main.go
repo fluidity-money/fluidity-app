@@ -46,7 +46,8 @@ type tokenMap map[faucetTypes.FaucetSupportedToken]faucetTokenDetails
 
 func main() {
 	var (
-		solanaRpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		solanaTokenList_    = util.GetEnvOrFatal(EnvTokensList)
 		accountDetailsList_ = util.GetEnvOrFatal(EnvSolanaAccountDetails)
 

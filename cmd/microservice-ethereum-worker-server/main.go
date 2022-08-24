@@ -23,11 +23,13 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
+	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -45,23 +47,8 @@ const (
 	// to use Flux as a price oracle
 	BackendAurora = "aurora"
 
-	// CompoundBlocksPerDay to use when calculating Compound's APY
-	// (set to 13.5 seconds per block)
-	CompoundBlocksPerDay = 6570
-
-	// DefaultSecondsSinceLastBlock to use instead of calculating it on the fly
-	DefaultSecondsSinceLastBlock = 13
-
-	// CurrentAtxTransactionMargin as an upper boundary for the abnormal block
-	// transfer condition
-	CurrentAtxTransactionMargin = 0
-
-	// DefaultTransfersInBlock to use when the average transfers in the block
-	// are below 0
-	DefaultTransfersInBlock = 0
-
 	// SecondsInOneYear to use for ATX calculation
-	SecondsInOneYear = 365 * 24 * 60 * 60
+	SecondsInOneYear uint64 = 365 * 24 * 60 * 60
 
 	// UsdtDecimals to normalise values to
 	UsdtDecimals = 1e6
@@ -127,9 +114,6 @@ const (
 	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
 )
 
-// AtxBufferSize to go back in time to count the average using the database
-var AtxBufferSize = roundUp(SecondsInOneYear / DefaultSecondsSinceLastBlock)
-
 func main() {
 	var (
 		contractAddress_         = util.GetEnvOrFatal(EnvContractAddress)
@@ -140,15 +124,7 @@ func main() {
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 
-		uniswapAnchoredViewAddress_ = os.Getenv(EnvUniswapAnchoredViewAddress)
-		usdTokenAddress_            = os.Getenv(EnvUsdTokenAddress)
-		ethTokenAddress_            = os.Getenv(EnvEthTokenAddress)
-		underlyingTokenAddress_     = os.Getenv(EnvUnderlyingTokenAddress)
-		aaveAddressProviderAddress_ = os.Getenv(EnvAaveAddressProviderAddress)
-
 		ethereumDecimalPlaces_ = os.Getenv(EnvEthereumDecimalPlaces)
-		ethFluxAddress_        = os.Getenv(EnvAuroraTokenFluxAddress)
-		tokenFluxAddress_      = os.Getenv(EnvAuroraTokenFluxAddress)
 
 		// EthereumDecimalPlaces to use when normalising Eth to USDT
 		EthereumDecimalPlaces *big.Rat
@@ -195,16 +171,16 @@ func main() {
 
 	switch tokenBackend {
 	case BackendCompound:
-		uniswapAnchoredViewAddress := mustEthereumAddressFromString(uniswapAnchoredViewAddress_)
+		uniswapAnchoredViewAddress := mustEthereumAddressFromEnv(EnvUniswapAnchoredViewAddress)
 
 		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
 
 	case BackendAave:
 		var (
-			aaveAddressProviderAddress = mustEthereumAddressFromString(aaveAddressProviderAddress_)
-			usdTokenAddress            = mustEthereumAddressFromString(usdTokenAddress_)
-			ethTokenAddress            = mustEthereumAddressFromString(ethTokenAddress_)
-			underlyingTokenAddress     = mustEthereumAddressFromString(underlyingTokenAddress_)
+			aaveAddressProviderAddress = mustEthereumAddressFromEnv(EnvAaveAddressProviderAddress)
+			usdTokenAddress            = mustEthereumAddressFromEnv(EnvUsdTokenAddress)
+			ethTokenAddress            = mustEthereumAddressFromEnv(EnvEthTokenAddress)
+			underlyingTokenAddress     = mustEthereumAddressFromEnv(EnvUnderlyingTokenAddress)
 		)
 
 		ethAaveAddressProviderAddress = hexToAddress(aaveAddressProviderAddress)
@@ -214,8 +190,8 @@ func main() {
 
 	case BackendAurora:
 		var (
-			ethFluxAddress   = mustEthereumAddressFromString(ethFluxAddress_)
-			tokenFluxAddress = mustEthereumAddressFromString(tokenFluxAddress_)
+			ethFluxAddress   = mustEthereumAddressFromEnv(EnvAuroraEthFluxAddress)
+			tokenFluxAddress = mustEthereumAddressFromEnv(EnvAuroraTokenFluxAddress)
 		)
 
 		auroraEthFluxAddress = hexToAddress(ethFluxAddress)
@@ -233,11 +209,6 @@ func main() {
 
 	contractAddress := ethereum.AddressFromString(contractAddress_)
 	ethContractAddress = hexToAddress(contractAddress)
-
-	var (
-		currentAtxTransactionMarginRat = new(big.Rat).SetInt64(CurrentAtxTransactionMargin)
-		secondsInOneYearRat            = new(big.Rat).SetInt64(SecondsInOneYear)
-	)
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
 
@@ -281,8 +252,31 @@ func main() {
 			transfersInBlock int
 		)
 
+		// set the configuration using what's in the database for the block
+
+		workerConfig := worker_config.GetWorkerConfigEthereum(network.NetworkEthereum)
+
+		var (
+			defaultSecondsSinceLastBlock = workerConfig.DefaultSecondsSinceLastBlock
+			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
+			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
+		)
+
+		var (
+			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(currentAtxTransactionMargin)
+			secondsInOneYearRat            = new(big.Rat).SetUint64(SecondsInOneYear)
+		)
+
+		secondsSinceLastBlock := defaultSecondsSinceLastBlock
+
+		// atxBufferSize to go back in time to count the average using the database
+
+		atxBufferSize := roundUp(float64(SecondsInOneYear / defaultSecondsSinceLastBlock))
+
 		switch true {
+
 		// received from logs queue
+
 		case serverWork.EthereumBlockLog != nil:
 			blockBaseFee = blockLog.BlockBaseFee
 			logs = blockLog.Logs
@@ -300,20 +294,24 @@ func main() {
 
 		default:
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Received empty work announcement!"
+				k.Format(
+					"Received empty work announcement for block hash %v!",
+					blockHash,
+				)
 			})
 		}
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)
-
-		var secondsSinceLastBlock uint64 = DefaultSecondsSinceLastBlock
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
 		emission := worker.NewEthereumEmission()
 
 		emission.Network = "ethereum"
+
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
+
+		emission.EthereumBlockNumber = blockNumber
 
 		if hintedBlock == nil {
 
@@ -374,9 +372,12 @@ func main() {
 
 		averageTransfersInBlock := addAndComputeAverageAtx(
 			blockNumber.Uint64(),
+			atxBufferSize,
 			tokenName,
 			transfersInBlock,
 		)
+
+		emission.AverageTransfersInBlock = float64(averageTransfersInBlock)
 
 		if transfersInBlock == 0 {
 			log.Debugf(
@@ -393,12 +394,12 @@ func main() {
 			transfersInBlock,
 		)
 
-		if averageTransfersInBlock < DefaultTransfersInBlock {
+		if averageTransfersInBlock < defaultTransfersInBlock {
 			log.Debugf(
 				"Average transfers in block < default transfers in block (25)!",
 			)
 
-			averageTransfersInBlock = DefaultTransfersInBlock
+			averageTransfersInBlock = defaultTransfersInBlock
 		}
 
 		// if this block is abnormal and could be an attack, we don't use the
@@ -619,7 +620,7 @@ func main() {
 				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
 			)
 
-			randomN, randomPayouts := probability.WinningChances(
+			randomN, randomPayouts, _ := probability.WinningChances(
 				transferFeeUsd,
 				currentAtx,
 				sizeOfThePool,
@@ -632,7 +633,11 @@ func main() {
 				emission,
 			)
 
-			res := generateRandomIntegers(fluidity.WinningClasses, 1, int(randomN))
+			res := generateRandomIntegers(
+				fluidity.WinningClasses,
+				1,
+				int(randomN),
+			)
 
 			// create announcement and container
 
@@ -659,7 +664,7 @@ func main() {
 
 			// Fill in emission.NaiveIsWinning
 
-			probability.NaiveIsWinning(announcement.SourceRandom, emission)
+			_ = probability.NaiveIsWinning(announcement.SourceRandom, emission)
 
 			log.Debug(func(k *log.Log) {
 				k.Format("Source payouts: %v", randomSource)
@@ -671,7 +676,11 @@ func main() {
 
 			blockAnnouncements = append(blockAnnouncements, announcement)
 
+			emission.Update()
+
 			queue.SendMessage(worker.TopicEmissions, emission)
+
+			log.Debugf("emission: %s", emission)
 		}
 
 		queue.SendMessage(publishAmqpQueueName, blockAnnouncements)

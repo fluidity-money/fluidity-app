@@ -23,53 +23,58 @@ func TestTokenList(t *testing.T) {
 	)
 
 	resultEthereumTokensList := GetTokensListBase(ExpectedTokensListEthereum)
+
 	resultSolanaTokensList := GetTokensListBase(ExpectedTokensListSolana)
 
-	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
-		TokenName:     `USDT`,
-		TokenDecimals: big.NewRat(1000000, 1),
-	})
-	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
-		TokenName:     `USDC`,
-		TokenDecimals: big.NewRat(1000000, 1),
-	})
-	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
-		TokenName:     `DAI`,
-		TokenDecimals: big.NewRat(1000000000000000000, 1),
-	})
-	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
-		TokenName:     `TUSD`,
-		TokenDecimals: big.NewRat(1000000000000000000, 1),
-	})
-	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
-		TokenName:     `FEI`,
-		TokenDecimals: big.NewRat(1000000000000000000, 1),
-	})
-	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
-		TokenName:     `FRAX`,
-		TokenDecimals: big.NewRat(1000000000000000000, 1),
-	})
-	expectedEthereumTokensList = append(expectedEthereumTokensList, TokenDetailsBase{
-		TokenName:     `UST`,
-		TokenDecimals: big.NewRat(1000000, 1),
-	})
+	expectedEthereumTokensList = []TokenDetailsBase{
+		{
+			TokenName:     `USDT`,
+			TokenDecimals: big.NewRat(1000000, 1),
+		},
+		{
+			TokenName:     `USDC`,
+			TokenDecimals: big.NewRat(1000000, 1),
+		},
+		{
+			TokenName:     `DAI`,
+			TokenDecimals: big.NewRat(1000000000000000000, 1),
+		},
+		{
+			TokenName:     `TUSD`,
+			TokenDecimals: big.NewRat(1000000000000000000, 1),
+		},
+		{
+			TokenName:     `FEI`,
+			TokenDecimals: big.NewRat(1000000000000000000, 1),
+		},
+		{
+			TokenName:     `FRAX`,
+			TokenDecimals: big.NewRat(1000000000000000000, 1),
+		},
+		{
+			TokenName:     `UST`,
+			TokenDecimals: big.NewRat(1000000, 1),
+		},
+	}
 
-	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
-		TokenName:     `USDC`,
-		TokenDecimals: big.NewRat(1000000, 1),
-	})
-	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
-		TokenName:     `USDT`,
-		TokenDecimals: big.NewRat(1000000, 1),
-	})
-	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
-		TokenName:     `UXD`,
-		TokenDecimals: big.NewRat(1000000, 1),
-	})
-	expectedSolanaTokensList = append(expectedSolanaTokensList, TokenDetailsBase{
-		TokenName:     `UST`,
-		TokenDecimals: big.NewRat(1000000, 1),
-	})
+	expectedSolanaTokensList = []TokenDetailsBase{
+		{
+			TokenName:     `USDC`,
+			TokenDecimals: big.NewRat(1000000, 1),
+		},
+		{
+			TokenName:     `USDT`,
+			TokenDecimals: big.NewRat(1000000, 1),
+		},
+		{
+			TokenName:     `UXD`,
+			TokenDecimals: big.NewRat(1000000, 1),
+		},
+		{
+			TokenName:     `UST`,
+			TokenDecimals: big.NewRat(1000000, 1),
+		},
+	}
 
 	assert.ElementsMatch(t, expectedSolanaTokensList, resultSolanaTokensList)
 	assert.ElementsMatch(t, expectedEthereumTokensList, resultEthereumTokensList)

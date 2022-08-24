@@ -10,7 +10,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/website"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/slack"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
@@ -66,9 +66,8 @@ func HandleSubmitQuestion(w http.ResponseWriter, r *http.Request) interface{} {
 
 	website.InsertQuestion(faucetQuestion)
 
-	slack.Notify(
-		slack.ChannelQuestions,
-		slack.SeverityInformational,
+	discord.Notify(
+		discord.SeverityInformational,
 		`
 User at ip address %#v, name %#v and email %#v has left a question!
 

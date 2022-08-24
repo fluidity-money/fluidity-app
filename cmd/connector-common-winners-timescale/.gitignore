@@ -1,4 +1,4 @@
-connector-winners-timescale
+*.out
+lint
 docker
 test
-lint

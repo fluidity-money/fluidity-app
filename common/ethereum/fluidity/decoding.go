@@ -63,3 +63,34 @@ func DecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Rewar
 
 	return rewardData, nil
 }
+
+func DecodeLegacyRewardData(log typesEth.Log, token token_details.TokenDetails) (RewardData, error) {
+	var (
+		logTopics = log.Topics
+
+		winnerString = logTopics[1].String()
+		amountString = logTopics[2].String()
+
+		winner    = ethCommon.HexToAddress(winnerString)
+		amountHex = ethCommon.HexToHash(amountString)
+		amountBig = amountHex.Big()
+		amount    = misc.NewBigInt(*amountBig)
+
+		blockNumber = log.BlockNumber
+		fakeStartBlock = new(misc.BigInt)
+		fakeEndBlock = new(misc.BigInt)
+	)
+
+	fakeStartBlock.Set(&blockNumber.Int)
+	fakeEndBlock.Set(&blockNumber.Int)
+
+	rewardData := RewardData{
+		TokenDetails: token,
+		Winner:       winner,
+		Amount:       &amount,
+		StartBlock:   fakeStartBlock,
+		EndBlock:     fakeEndBlock,
+	}
+
+	return rewardData, nil
+}

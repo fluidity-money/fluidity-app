@@ -37,14 +37,13 @@ const (
 	TokenAssociatedProgramAddress = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
 )
 
+// initialised in init.go
 var (
 	// TokenProgramAddressPubkey
-	TokenProgramAddressPubkey = solLib.MustPublicKeyFromBase58(TokenProgramAddress)
+	TokenProgramAddressPubkey solLib.PublicKey
 
 	// TokenAssociatedProgramAddressPubkey
-	TokenAssociatedProgramAddressPubkey = solLib.MustPublicKeyFromBase58(
-		TokenAssociatedProgramAddress,
-	)
+	TokenAssociatedProgramAddressPubkey solLib.PublicKey
 )
 
 type (

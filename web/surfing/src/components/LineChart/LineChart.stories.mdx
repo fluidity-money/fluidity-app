@@ -1,0 +1,25 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import LineChart from "./LineChart";
+
+<Meta title="Data/Line Chart" component={LineChart} />
+
+export const Template = (args) => <div style={{width: "800px", height: "400px"}}>
+    <LineChart {...args} />
+</div>;
+
+<Canvas columns={1}  withSource="open" withToolbar>
+    <Title>Line Chart</Title>
+    <Subtitle>A beautiful scalable line chart designed for living data</Subtitle>
+    <Story
+        name="Line Graph"
+        args={{
+        data: [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 40, y: 20}],
+        xLabel: 'Some X Label',
+        yLabel: 'Some Y Label',
+        lineLabel: 'Some Line Label',
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

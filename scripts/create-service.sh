@@ -46,16 +46,21 @@ enter README description here!
 EOF
 
 cat > Dockerfile << EOF
-FROM fluidity/build-container:latest
+FROM fluidity/build-container:latest AS build
 
 WORKDIR /usr/local/src/fluidity/cmd/$REPO
 
+COPY . .
 RUN make
 
+
+FROM fluidity/runtime-container:latest
+
+COPY --from=build /usr/local/src/fluidity/cmd/$REPO/$REPO.out .
+
 ENTRYPOINT [ \\
-    "wait-for-ws", \\
-    "wait-for-amqp", \\
-    "./$REPO.o" \\
+	"wait-for-amqp", \\
+	"./$REPO.out" \\
 ]
 EOF
 
@@ -77,7 +82,7 @@ func main() {
     log.App(func(k *log.Log) {
         k.Context = "$REPO"
         k.Message = "Hello world!"
-    }) 
+    })
 }
 EOF
 

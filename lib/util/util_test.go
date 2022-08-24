@@ -72,8 +72,8 @@ func TestGetHash(t *testing.T) {
 		[]byte("99999"),
 	}
 	results := []string{
-		"0x1f8ac10f23c5b5bc1167bda84b833e5c057a77d2",
-		"0xa045b7efa463c6ed195c644163f4168952fbd34a",
+		"0xbef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721",
+		"0xfd5f56b40a79a385708428e7b32ab996a681080a166a2206e750eb4819186145",
 	}
 
 	for i, test := range tests {

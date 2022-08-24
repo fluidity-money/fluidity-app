@@ -19,15 +19,20 @@ const (
 	// alerting
 	EnvMaxUnackedCount = `FLU_RABBIT_MAX_UNACKED`
 
+	// EnvMaxDeadLetterCount is the maximum number of messages in the dead letter queue
+	// acceptable before alerting
+	EnvMaxDeadLetterCount = `FLU_RABBIT_MAX_DEAD_LETTER`
+
 	// EnvAmqpQueueAddr is the address of the queue
 	EnvAmqpQueueAddr = `FLU_AMQP_QUEUE_ADDR`
 )
 
 func main() {
 	var (
-		maxReadyCount_   = util.GetEnvOrFatal(EnvMaxReadyCount)
-		maxUnackedCount_ = util.GetEnvOrFatal(EnvMaxUnackedCount)
-		queueAddress     = util.GetEnvOrFatal(EnvAmqpQueueAddr)
+		maxReadyCount_      = util.GetEnvOrFatal(EnvMaxReadyCount)
+		maxUnackedCount_    = util.GetEnvOrFatal(EnvMaxUnackedCount)
+		maxDeadLetterCount_ = util.GetEnvOrFatal(EnvMaxDeadLetterCount)
+		queueAddress        = util.GetEnvOrFatal(EnvAmqpQueueAddr)
 	)
 
 	maxReadyCount, err := strconv.ParseUint(maxReadyCount_, 10, 32)
@@ -48,21 +53,55 @@ func main() {
 		})
 	}
 
-	vhosts, err := getVhosts(queueAddress)
+	maxDeadLetterCount, err := strconv.ParseUint(maxDeadLetterCount_, 10, 32)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Format("could not retrieve Vhosts from RMQ Management (%v)!", queueAddress)
+			k.Format("dead letter count must be a uint (%v)!", maxDeadLetterCount_)
 			k.Payload = err
 		})
 	}
 
+	rmq := NewRmqManagementClient(queueAddress)
+
+	vhosts, err := rmq.getVhosts()
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Could not retrieve Vhosts from RMQ Management!"
+			k.Payload = err
+		})
+	}
+
+	messageChan := make(chan string)
+	done := make(chan bool)
+
+	// get reports from the channel and concat them together,
+	// then report to discord once the channel is closed
+	go func() {
+		var reportBody string
+		for {
+			message, more := <-messageChan
+
+			if more {
+				reportBody += message
+			} else {
+				if reportBody != "" {
+					reportToDiscord(reportBody)
+				}
+
+				done <- true
+				return
+			}
+		}
+	}()
+
 	for _, vhost := range vhosts {
-		queues, err := getRmqQueues(queueAddress, vhost.Name)
+		queues, err := rmq.getRmqQueues(vhost.Name)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format("could not retrieve queues from RMQ Management (%v)!", queueAddress)
+				k.Message = "could not retrieve queues from RMQ Management!"
 				k.Payload = err
 			})
 		}
@@ -86,14 +125,51 @@ func main() {
 
 			})
 
-			if messagesReady > maxReadyCount {
-				reportToSlack(queue, "Ready", messagesReady, maxReadyCount)
-			}
+			switch isDeadLetterQueue(name) {
+			case true:
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"queue: %v is a dead letter queue! Using the message count limit of %v",
+						name,
+						maxDeadLetterCount,
+					)
+				})
 
-			if messagesUnacked > maxUnackedCount {
-				reportToSlack(queue, "Unacked", messagesUnacked, maxUnackedCount)
+				if messagesUnacked > maxDeadLetterCount {
+					queueReport(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
+				}
+
+				// if there's any messages on the queue, obtain the first to be logged
+				if messagesReady == 0 {
+					break
+				}
+
+				msg, err := getAndRequeueFirstMessage(rmq.rmqAddress, name, vhost.Name)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Message = "Failed to get the top dead letter queue message!"
+						k.Payload = err
+					})
+				}
+
+				if len(msg) > 0 && messagesReady > maxDeadLetterCount {
+					queueReportWithMessage(messageChan, queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount, msg)
+				}
+
+			case false:
+				if messagesReady > maxReadyCount {
+					queueReport(messageChan, queue, "Ready", messagesReady, maxReadyCount)
+				}
+
+				if messagesUnacked > maxUnackedCount {
+					queueReport(messageChan, queue, "Unacked", messagesUnacked, maxUnackedCount)
+				}
 			}
 		}
-
 	}
+
+	// signal that we're done, and send the message to discord
+	close(messageChan)
+	<-done
 }

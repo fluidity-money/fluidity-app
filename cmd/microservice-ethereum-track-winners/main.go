@@ -8,13 +8,13 @@ package main
 // without using abigen/etc
 
 import (
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	logging "github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -31,6 +31,14 @@ const (
 	// (sig, winner address)
 	expectedTopicsLen = 2
 
+	// FilterLegacyEventSignature to use to filter for event signatures
+	// on the legacy contract
+	FilterLegacyEventSignature = `Reward(address,uint256)`
+
+	// legacyExpectedTopicsLen to ensure legacy logs received have the expected
+	// number of topics (sig, winner, amount)
+	legacyExpectedTopicsLen = 3
+
 	// EnvContractAddress to watch where the reward function was called
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
@@ -40,6 +48,10 @@ const (
 	// EnvUnderlyingTokenDecimals supported by the contract
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
+	// EnvUseLegacyContract to use the old event signature
+	// for legacy deployments
+	EnvUseLegacyContract = `FLU_ETHEREUM_LEGACY_CONTRACT`
+
 	winnersPublishTopic = winners.TopicWinnersEthereum
 )
 
@@ -48,7 +60,20 @@ func main() {
 		filterAddress            = util.GetEnvOrFatal(EnvContractAddress)
 		underlyingTokenName      = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
+
+		useLegacyContract = os.Getenv(EnvUseLegacyContract) == "true"
+
+		eventSig string
+		expectedTopics int
 	)
+
+	if !useLegacyContract {
+		eventSig = FilterEventSignature
+		expectedTopics = expectedTopicsLen
+	} else {
+		eventSig = FilterLegacyEventSignature
+		expectedTopics = legacyExpectedTopicsLen
+	}
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
 
@@ -64,7 +89,7 @@ func main() {
 	}
 
 	eventSignature := microservice_ethereum_track_winners.HashEventSignature(
-		FilterEventSignature,
+		eventSig,
 	)
 
 	logging.Debug(func(k *logging.Log) {
@@ -101,12 +126,12 @@ func main() {
 
 		messageReceivedTime := time.Now()
 
-		if lenLogTopics := len(logTopics); lenLogTopics != expectedTopicsLen {
+		if lenLogTopics := len(logTopics); lenLogTopics != expectedTopics {
 			logging.Debug(func(k *logging.Log) {
 				k.Format(
 					"The number of topics for log transaction %v was expected to be %v, is %v! %v",
 					transactionHash,
-					expectedTopicsLen,
+					expectedTopics,
 					lenLogTopics,
 					logTopics,
 				)
@@ -120,7 +145,7 @@ func main() {
 				"The log transaction %v for topic 0 is %v, am expecting %v!",
 				transactionHash,
 				logTopics[0],
-				eventSignature,
+				eventSig,
 			)
 		})
 
@@ -130,7 +155,7 @@ func main() {
 					"The log transaction %v for topic 0 is %v, was expecting %v!",
 					transactionHash,
 					logTopics[0],
-					eventSignature,
+					eventSig,
 				)
 			})
 
@@ -142,7 +167,16 @@ func main() {
 			underlyingTokenDecimals,
 		)
 
-		rewardData, err := fluidity.DecodeRewardData(log, tokenDetails)
+		var (
+			rewardData fluidity.RewardData
+			err  error
+		)
+
+		if !useLegacyContract {
+			rewardData, err = fluidity.DecodeRewardData(log, tokenDetails)
+		} else {
+			rewardData, err = fluidity.DecodeLegacyRewardData(log, tokenDetails)
+		}
 
 		if err != nil {
 			logging.Fatal(func(k *logging.Log) {
@@ -153,6 +187,10 @@ func main() {
 
 		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime)
 
-		queue.SendMessage(winnersPublishTopic, convertedWinner)
+		microservice_ethereum_track_winners.SendWinner(
+			useLegacyContract,
+			winnersPublishTopic,
+			convertedWinner,
+		)
 	})
 }

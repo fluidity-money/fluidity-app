@@ -1,0 +1,61 @@
+
+@use "../../global-variables"
+
+$container-padding-top: 104px
+$container-padding-bottom: 80px
+
+$children-width-max: 800px
+
+$children-text-padding-bottom: 40px
+
+$inputs-message-container-padding-top: 20px
+
+$inputs-message-text-background: #333333
+$inputs-message-text-height: 300px
+
+$inputs-message-text-padding-top: 30px
+$inputs-message-text-padding-left: 40px
+
+$inputs-message-text-colour: #FFFFFF
+$inputs-message-text-font: global-variables.$poppins
+$inputs-message-text-font-size: 17px
+$inputs-message-text-border-radius: 40px
+
+.lets-talk-container
+  padding-bottom: $container-padding-bottom
+  position: relative
+
+.lets-talk-video
+  width: 100%
+  height: 100%
+  position: absolute
+  object-fit: cover
+  z-index: -1
+
+.lets-talk-children
+  max-width: $children-width-max
+  padding-top: $container-padding-top
+
+.lets-talk-children-text
+  padding-bottom: $children-text-padding-bottom
+
+.lets-talk-inputs-message-container
+  padding-top: $inputs-message-container-padding-top
+  display: flex
+
+.lets-talk-inputs-button-container
+  padding-top: 40px
+
+.lets-talk-inputs-message-text
+  flex-grow: 2
+  background: $inputs-message-text-background
+  width: 100%
+  height: $inputs-message-text-height
+  padding-top: $inputs-message-text-padding-top
+  padding-left: $inputs-message-text-padding-left
+  color: $inputs-message-text-colour
+  font-family: $inputs-message-text-font
+  font-size: $inputs-message-text-font-size
+  border-radius: $inputs-message-text-border-radius
+  border-color: $inputs-message-text-background
+  resize: none

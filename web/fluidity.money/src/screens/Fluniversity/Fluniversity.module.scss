@@ -1,0 +1,53 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 850px;
+  width: 100%;
+  flex-direction: column;
+  background-color: $fluidBlack;
+}
+
+.carouselText {
+  h2 {
+    margin-right: 20px;
+    opacity: 1;
+  }
+  background-color: $fluidBlack;
+}
+
+.fluniversityCard {
+  border: 1px solid white;
+  height: 600px;
+  min-width: 400px;
+  margin-right: 20px;
+  margin-bottom: 50px;
+
+  img {
+    height: 60%;
+    width: 100%;
+  }
+
+  h3 {
+    margin: 10px 0 10px 0;
+    padding: 10px;
+  }
+
+  p {
+    padding: 10px;
+    font-family: 'Aeonik';
+    font-size:20px;
+    color: $textGrey;
+  }
+  
+  span {
+    color: $textGrey;
+    padding: 10px;
+    font-size: 11px;
+    a{
+      color: $textGrey;
+    }
+  }
+}

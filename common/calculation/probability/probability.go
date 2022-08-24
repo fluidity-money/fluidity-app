@@ -43,7 +43,7 @@ func probability(m, n, b int64) *big.Rat {
 }
 
 // A / p(b)
-func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b int64, blockTime uint64, emission *worker.Emission) *big.Rat {
+func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b int64, blockTime uint64, emission *worker.Emission) (payout *big.Rat, probability_ *big.Rat) {
 	m := int64(winningClasses)
 
 	blockTimeRat := new(big.Rat).SetUint64(blockTime)
@@ -76,7 +76,7 @@ func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b i
 	// a / p
 	aDivP := new(big.Rat).Mul(
 		a,
-		p.Inv(p),
+		new(big.Rat).Inv(p),
 	)
 
 	emission.Payout.Winnings, _ = aDivP.Float64()
@@ -90,10 +90,10 @@ func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b i
 	emission.Payout.BlockTime = blockTime
 	emission.Payout.RewardPool, _ = rewardPool.Float64()
 
-	return aDivP
+	return aDivP, p
 }
 
-func calculateN(winningClasses int, g, atx, payoutFreq *big.Rat, emission *worker.Emission) int64 {
+func calculateN(winningClasses int, atx, payoutFreq *big.Rat, emission *worker.Emission) int64 {
 	var (
 		m = int64(winningClasses)
 		n = int64(winningClasses + 1)
@@ -145,27 +145,42 @@ func calculateN(winningClasses int, g, atx, payoutFreq *big.Rat, emission *worke
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight *big.Rat, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (uint, []*misc.BigInt) {
+func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight *big.Rat, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts []*misc.BigInt, probabilities []*big.Rat) {
 
 	averageTransfersInBlock_ := intToRat(averageTransfersInBlock)
 
-	n := calculateN(winningClasses, payoutFreq, gasFee, atx, emission)
+	n := calculateN(winningClasses, payoutFreq, atx, emission)
 
-	payouts := make([]*misc.BigInt, 0)
+	payouts = make([]*misc.BigInt, winningClasses)
 
-	for i := int64(1); i < int64(winningClasses+1); i++ {
+	probabilities = make([]*big.Rat, winningClasses)
 
-		payout := payout(
+	for i := 0; i < winningClasses; i++ {
+
+		winningClass := int64(i + 1)
+
+		payout, probability := payout(
 			averageTransfersInBlock_,
 			gasFee,
 			rewardPool,
 			deltaWeight,
 			winningClasses,
 			n,
-			i,
+			winningClass,
 			blockTimeInSeconds,
 			emission,
 		)
+
+		// set the emission for the payout before adjusting it
+		// to be sent to the blockchain
+
+		switch i {
+		case 0: emission.WinningChances.Payout1, _ = payout.Float64()
+		case 1: emission.WinningChances.Payout2, _ = payout.Float64()
+		case 2: emission.WinningChances.Payout3, _ = payout.Float64()
+		case 3: emission.WinningChances.Payout4, _ = payout.Float64()
+		case 4: emission.WinningChances.Payout5, _ = payout.Float64()
+		}
 
 		// this is the payout that a user would receive! due to the way that
 		// eth works!
@@ -175,12 +190,22 @@ func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, delta
 		leftSide := new(big.Int).Quo(payout.Num(), payout.Denom())
 
 		payoutBigInt := misc.NewBigInt(*leftSide)
-		payouts = append(payouts, &payoutBigInt)
+
+		payouts[i] = &payoutBigInt
+		probabilities[i] = probability
 	}
+
+	// set the emissions data for logging after the fact
+
+	emission.WinningChances.Probability1, _ = probabilities[0].Float64()
+	emission.WinningChances.Probability2, _ = probabilities[1].Float64()
+	emission.WinningChances.Probability3, _ = probabilities[2].Float64()
+	emission.WinningChances.Probability4, _ = probabilities[3].Float64()
+	emission.WinningChances.Probability5, _ = probabilities[4].Float64()
 
 	emission.WinningChances.AtxAtEnd, _ = atx.Float64()
 
-	return uint(n), payouts
+	return uint(n), payouts, probabilities
 }
 
 // NaiveIsWinning examines the random numbers we drew and determines if we won
@@ -190,11 +215,18 @@ func NaiveIsWinning(balls []uint32, emission *worker.Emission) int {
 
 	matchedBalls := 0
 
+	// for each ball, if the ball's number is smaller than or equal
+	// to the length of the balls, increase the matched balls by 1
+
 	for _, i := range balls {
 		if int(i) <= len(balls) {
-			matchedBalls = matchedBalls + 1
+			matchedBalls++
 		}
 	}
+
+	emission.NaiveIsWinning.IsWinning = matchedBalls > 0
+
+	emission.NaiveIsWinning.MatchedBalls = matchedBalls
 
 	return matchedBalls
 }

@@ -5,18 +5,46 @@
 package worker
 
 import (
-	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"encoding/json"
+	"time"
+
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
+	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
 type (
+	// WorkerConfigEthereum to be used with any EVM chains to store config
+	// that was previously hardcoded
+	WorkerConfigEthereum struct {
+		Network                      network.BlockchainNetwork `json:"network"`
+		CompoundBlocksPerDay         int                       `json:"compound_blocks_per_day"`
+		DefaultSecondsSinceLastBlock uint64                    `json:"default_seconds_since_last_block"`
+		CurrentAtxTransactionMargin  int64                     `json:"current_atx_transaction_margin"`
+		DefaultTransfersInBlock      int                       `json:"default_transfers_in_block"`
+	}
+
+	// WorkerConfigSolana that was previously hardcoded for Solana only
+	WorkerConfigSolana struct {
+		SolanaBlockTime uint64 `json:"solana_block_time"`
+		TransferCompute int    `json:"transfer_compute"`
+	}
+
 	// Emission contains information on the modelling information that led
 	// up to the rewarding of the user
 	Emission struct {
+		LastUpdated time.Time `json:"last_updated"`
+
 		Network          string                     `json:"network"`
 		TokenDetails     token_details.TokenDetails `json:"token_details"`
 		TransactionHash  string                     `json:"transaction_hash"`
 		RecipientAddress string                     `json:"recipient_address"`
 		SenderAddress    string                     `json:"sender_address"`
+
+		EthereumBlockNumber misc.BigInt `json:"ethereum_block_number"`
+		SolanaSlotNumber    misc.BigInt `json:"solana_slot_number"`
+
+		AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
 
 		Payout struct {
 			Winnings        float64 `json:"winnings"` // Winnings
@@ -50,6 +78,8 @@ type (
 
 		NaiveIsWinning struct {
 			TestingBalls []uint32 `json:"testing_balls"`
+			IsWinning    bool     `json:"is_winning"`
+			MatchedBalls int      `json:"matched_balls"`
 		} `json:"naive_is_winning"`
 
 		CalculateBpy struct {
@@ -77,6 +107,29 @@ type (
 
 		WinningChances struct {
 			AtxAtEnd float64 `json:"atx_at_end"`
+
+			Payout1 float64 `json:"payout_1"`
+			Payout2 float64 `json:"payout_2"`
+			Payout3 float64 `json:"payout_3"`
+			Payout4 float64 `json:"payout_4"`
+			Payout5 float64 `json:"payout_5"`
+
+			Probability1 float64 `json:"probability_1"`
+			Probability2 float64 `json:"probability_2"`
+			Probability3 float64 `json:"probability_3"`
+			Probability4 float64 `json:"probability_4"`
+			Probability5 float64 `json:"probability_5"`
 		} `json:"winning_chances"`
 	}
 )
+
+// Update LastUpdated using the current time
+func (emission *Emission) Update() {
+	emission.LastUpdated = time.Now()
+}
+
+// String the emission to make it suitable for printing
+func (emission Emission) String() string {
+	bytes, _ := json.Marshal(emission)
+	return string(bytes)
+}

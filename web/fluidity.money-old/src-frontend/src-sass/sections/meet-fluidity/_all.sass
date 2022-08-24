@@ -1,0 +1,84 @@
+
+@use "../../global-variables"
+
+$container-colour: rgba(12, 30, 52, 1)
+$container-padding-top: 90px
+$container-padding-bottom: 200px
+$container-padding-left: 130px
+$container-padding-right: global-variables.$horizontal-padding
+
+$container-children: 1050px
+
+$subtitle-container-max-width: 700px
+
+$title-size: 40px
+
+$title-font-weight: 300
+
+$subtitle-text-size: 20px
+$subtitle-font-family: global-variables.$manrope
+
+$orb-container-width: 300px
+
+$backers-list-bottom-padding: 15px
+
+$backer-width: 30px
+$backer-padding: 25px
+
+.meet-fluidity-container
+  padding-top: $container-padding-top
+  padding-bottom: $container-padding-bottom
+  border-radius: 10px
+
+.meet-fluidity-container-children
+  max-width: $container-children
+  margin-left: auto
+  margin-right: auto
+
+.meet-fluidity-children
+  animation: global-variables.$fade-in-animation
+
+.fluidity-orb-pic-container
+  margin-left: auto
+  margin-right: auto
+  padding-bottom: 30px
+
+  > img
+    width: $orb-container-width
+
+.meet-fluidity-subtitle-container
+  max-width: $subtitle-container-max-width
+
+  > *:nth-child(2)
+    padding-top: 20px
+    padding-bottom: 20px
+
+.meet-fluidity-subtitle-text
+  font-size: $subtitle-text-size
+  font-family: $subtitle-font-family
+
+.meet-fluidity-title
+  font-family: global-variables.$raleway
+  font-weight: $title-font-weight
+  color: white
+  font-size: $title-size
+  margin: 0
+
+.meet-fluidity-container-button
+  margin-top: auto
+  margin-bottom: auto
+
+.meet-fluidity-span-bold
+  font-weight: 700
+
+.meet-fluidity-backer
+  margin-top: auto
+  margin-bottom: auto
+  padding-left: $backer-padding
+
+.meet-fluidity-backer > a > img
+  height: $backer-width
+  width: $backer-width
+
+.meet-fluidity-backers-list
+  padding-bottom: $backers-list-bottom-padding

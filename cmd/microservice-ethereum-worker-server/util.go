@@ -16,16 +16,42 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 func generateRandomIntegers(amount, min, max int) []int {
+	if amount > max - min + 1 {
+		log.Fatal(func (k *log.Log) {
+		   k.Format(
+			   "Can't generate %d non-repeating integers between %d and %d!",
+			   amount,
+			   min,
+			   max,
+		   )
+		})
+	}
+
 	numbers := make([]int, amount)
 
 	for i := 0; i < amount; i++ {
-		numbers[i] = min + rand.Intn(max)
+		for {
+			numbers[i] = min + rand.Intn(max)
+
+			dup := false
+
+			for j := 0; j < i; j++ {
+				if numbers[i] == numbers[j] {
+					dup = true
+				}
+			}
+
+			if !dup {
+				break
+			}
+		}
 	}
 
 	return numbers
@@ -153,9 +179,11 @@ func anyStringsEmpty(strings ...string) bool {
 	return false
 }
 
-// mustEthereumAddressFromString to convert a string to an ethereum address,
+// mustEthereumAddressFromEnv to convert an env to an ethereum address,
 // or fatal if it's invalid
-func mustEthereumAddressFromString(addressString string) ethereum.Address {
+func mustEthereumAddressFromEnv(env string) ethereum.Address {
+	addressString := util.GetEnvOrFatal(env)
+
 	address := ethereum.AddressFromString(addressString)
 	if address == "" {
 		log.Fatal(func(k *log.Log) {

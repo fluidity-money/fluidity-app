@@ -31,15 +31,30 @@ const (
 
 func main() {
 	var (
+		solanaWsUrl = util.PickEnvOrFatal(EnvSolanaWsUrl)
+
 		trfDataStoreProgramId = util.GetEnvOrFatal(EnvTrfDataStoreProgramId)
-		solanaWsUrl           = util.GetEnvOrFatal(EnvSolanaWsUrl)
 		solanaNetwork         = util.GetEnvOrFatal(EnvSolanaNetwork)
 
 		accountNotificationChan = make(chan solana.AccountNotification)
 		errChan                 = make(chan error)
 	)
 
-	trfDataStorePubkey := goSolana.MustPublicKeyFromBase58(trfDataStoreProgramId)
+	trfDataStorePubkey, err := goSolana.PublicKeyFromBase58(
+		trfDataStoreProgramId,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to get the trf progarm store id %v, %#v",
+				EnvTrfDataStoreProgramId,
+				trfDataStoreProgramId,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	var (
 		trfDataStoreString = "trfDataStore"

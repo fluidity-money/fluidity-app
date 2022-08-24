@@ -81,8 +81,8 @@ func updateConfirmedBlocksFrom(rpcUrl string, from uint64) (uint64, error) {
 
 func main() {
 	var (
-		solanaWsUrl  = util.GetEnvOrFatal(EnvSolanaWsUrl)
-		solanaRpcUrl = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaWsUrl  = util.PickEnvOrFatal(EnvSolanaWsUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
 
 		slotsChan = make(chan types.Slot)
 		errChan   = make(chan error)
