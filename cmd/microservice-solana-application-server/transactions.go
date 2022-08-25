@@ -15,19 +15,21 @@ import (
 )
 
 func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
-	var (
-		totalFee *big.Rat = big.NewRat(0, 0)
-		fee      *big.Rat
-		err      error
-	)
 
 	var (
+		totalFee = big.NewRat(0, 0)
+
 		transactionResult       = transaction.Transaction.Result
 		transactionSignature    = transaction.Transaction.Signature
 		transactionApplications = transaction.Transaction.Applications
 	)
 
 	for _, app := range transactionApplications {
+		var (
+			fee      *big.Rat
+			err      error
+		)
+
 		switch app {
 		case applications.ApplicationSpl:
 			// no application, nothing to be done
@@ -82,7 +84,9 @@ func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]str
 			)
 		}
 
-		totalFee.Add(totalFee, fee)
+		if fee != nil {
+			totalFee.Add(totalFee, fee)
+		}
 	}
 
 	var (
