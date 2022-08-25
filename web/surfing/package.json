@@ -13,7 +13,6 @@
   "dependencies": {
     "@visx/visx": "^2.12.2",
     "@visx/xychart": "^2.12.2",
-    "framer-motion": "^7.2.0",
     "react": "18.2.0 || ^17.0.0",
     "react-dom": "18.2.0 || ^17.0.0",
     "react-table": "^7.8.0"
@@ -38,6 +37,7 @@
     "@vitejs/plugin-react": "^2.0.1",
     "babel-loader": "^8.2.5",
     "chromatic": "^6.7.4",
+    "framer-motion": "^7.2.1",
     "sass": "^1.54.4",
     "storybook-addon-pseudo-states": "^1.15.1",
     "typescript": "^4.6.4",
