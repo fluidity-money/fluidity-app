@@ -26,8 +26,8 @@ module.exports = {
       // Custom resolve paths, copied from root vite.config
       resolve: {
         alias: [
-          { find: '@assets', replacement: resolve(__dirname, 'src/assets') },
-          { find: '@', replacement: resolve(__dirname, 'src') }],
+          { find: '@assets', replacement: resolve(__dirname, '../src/assets') },
+          { find: '@', replacement: resolve(__dirname, '../src') }],
       },
       plugins: [svgr()],
     });
