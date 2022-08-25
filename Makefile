@@ -109,6 +109,7 @@ semgrep:
 
 test: semgrep
 	@./tests-golang.sh
+	@cd ${CONTRACTS_DIR} && ${MAKE} test
 
 lint: semgrep
 	@${GO_FMT} ./...
