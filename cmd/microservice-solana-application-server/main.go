@@ -29,10 +29,10 @@ const (
 	EnvRaydiumProgramId = `FLU_SOLANA_RAYDIUM_PROGRAM_ID`
 
 	// EnvAldrinV1ProgramId is the program ID of the Aldrin swap program v. 1
-	EnvAldrinV1ProgramId = `FLU_SOLANA_ALDRIN_PROGRAM_ID`
+	EnvAldrinV1ProgramId = `FLU_SOLANA_ALDRIN_V1_PROGRAM_ID`
 
 	// EnvAldrinV2ProgramId is the program ID of the Aldrin swap program v. 2
-	EnvAldrinV2ProgramId = `FLU_SOLANA_ALDRIN_PROGRAM_ID`
+	EnvAldrinV2ProgramId = `FLU_SOLANA_ALDRIN_V2_PROGRAM_ID`
 )
 
 func main() {
