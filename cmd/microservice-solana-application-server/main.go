@@ -56,7 +56,7 @@ func main() {
 
 		for transactionNumber, transaction := range transactions.Transactions {
 			var (
-				transactionApp       = transaction.Transaction.Application
+				transactionApps      = transaction.Transaction.Applications
 				transactionSignature = transaction.Transaction.Signature
 			)
 
@@ -85,8 +85,8 @@ func main() {
 			if decorated == nil {
 				log.App(func(k *log.Log) {
 					k.Format(
-						"Application didn't return a transfer, app index %d, transaction %s",
-						transactionApp,
+						"Application didn't return a transfer, app indexes %+v, transaction %s",
+						transactionApps,
 						transactionSignature,
 					)
 				})
