@@ -23,12 +23,52 @@ export const Template = ({children, ...props}) => <Card {...props}>
             children: <>
                 <img src="/src/assets/react.svg"></img>
                 <div>
-                    <h2>Solana</h2>
-                    <h4>$12.34 Avg prize/trans</h4>
+                    <h2 style={{color:"white"}}>Solana</h2>
+                    <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
                 </div>
                 <div>
-                    <h3>$351,879</h3>
-                    <h4>Top prize</h4>
+                    <h3 style={{color:"white"}}>$351,879</h3>
+                    <h4 style={{color:"white"}}>Top prize</h4>
+                </div>
+            </>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Border Card"
+        args={{
+            component: "div",
+            type: "box",
+            children: <>
+                <img src="/src/assets/react.svg"></img>
+                <div>
+                    <h2 style={{color:"white"}}>Solana</h2>
+                    <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
+                </div>
+                <div>
+                    <h3 style={{color:"white"}}>$351,879</h3>
+                    <h4 style={{color:"white"}}>Top prize</h4>
+                </div>
+            </>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Rounded Card"
+        args={{
+            component: "div",
+            rounded: true,
+            children: <>
+                <img src="/src/assets/react.svg"></img>
+                <div>
+                    <h2 style={{color:"white"}}>Solana</h2>
+                    <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
+                </div>
+                <div>
+                    <h3 style={{color:"white"}}>$351,879</h3>
+                    <h4 style={{color:"white"}}>Top prize</h4>
                 </div>
             </>
         }}
