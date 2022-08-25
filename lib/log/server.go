@@ -85,8 +85,9 @@ func printLoggingMessage(stream io.WriteCloser, time time.Time, workerId, level,
 
 	fmt.Fprintf(
 		stream,
-		"[%v] [%s:%s] %s %v\n",
+		"[%v] [%v] [%s:%s] %s %v\n",
 		time,
+		workerId,
 		level,
 		context,
 		message,
