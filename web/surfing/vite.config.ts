@@ -8,8 +8,8 @@ export default defineConfig({
   plugins: [svgr(), react()],
   resolve: {
     alias: [
-      { find: '@assets', replacement: resolve(__dirname, 'src/assets') },
-      { find: '@', replacement: resolve(__dirname, 'src') }],
+      { find: '~/assets', replacement: resolve(__dirname, 'src/assets') },
+      { find: '~/', replacement: resolve(__dirname, 'src') }],
   },
   build: {
     lib: {
