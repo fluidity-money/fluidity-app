@@ -109,8 +109,8 @@ semgrep:
 
 test: semgrep
 	-@./tests-golang.sh
-	-@cd contracts/ethereum && make test
-	-@cd contracts/solana && make test
+	-@cd contracts/ethereum && ${MAKE} test
+	-@cd contracts/solana && ${MAKE} test
 
 lint: semgrep
 	@${GO_FMT} ./...
