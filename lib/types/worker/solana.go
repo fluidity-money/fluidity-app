@@ -13,10 +13,10 @@ type (
 	// SolanaApplicationTransaction is a solana transaction that is relevant
 	// to fluidity with some added metadata
 	SolanaApplicationTransaction struct {
-		Signature   string                   `json:"signature"`
-		Result      solana.TransactionResult `json:"result"`
-		AdjustedFee *big.Rat                 `json:"adjusted_fee"`
-		Application applications.Application `json:"application"`
+		Signature    string                     `json:"signature"`
+		Result       solana.TransactionResult   `json:"result"`
+		AdjustedFee  *big.Rat                   `json:"adjusted_fee"`
+		Applications []applications.Application `json:"applications"`
 	}
 
 	SolanaBufferedApplicationTransactions struct {

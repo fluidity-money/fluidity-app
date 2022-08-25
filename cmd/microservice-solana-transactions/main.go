@@ -114,9 +114,9 @@ func main() {
 		parsedTransactions := make([]worker.SolanaApplicationTransaction, 0)
 
 		for _, transaction := range block.Transactions {
-			app := solanaLib.ClassifyApplication(transaction, applications)
+			apps := solanaLib.ClassifyApplication(transaction, applications)
 
-			if app == nil {
+			if len(apps) == 0 {
 				log.Debugf(
 					"Transaction %v didn't have an application classified!",
 					transaction,
@@ -137,7 +137,7 @@ func main() {
 				Signature:   transaction.Transaction.Signatures[0],
 				Result:      transaction,
 				AdjustedFee: transactionFeeUsd,
-				Application: *app,
+				Applications: apps,
 			}
 
 			parsedTransactions = append(parsedTransactions, parsed)
