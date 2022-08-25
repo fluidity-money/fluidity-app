@@ -1,4 +1,10 @@
-@import "../../../../fluidity.money/src/styles/config.scss";
+@use '../../../common' as *;
+
+@mixin tablet {
+  @media (max-width: 860px) {
+    @content;
+  }
+}
 
 .grid {
   width: 100%;
@@ -6,7 +12,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   padding: 40px;
-  @include max-860px {
+  @include tablet {
     grid-template-columns: 1fr;
   }
 }
