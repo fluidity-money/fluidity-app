@@ -108,9 +108,8 @@ semgrep:
 	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
 test: semgrep
-	-@./tests-golang.sh
-	-@cd contracts/ethereum && ${MAKE} test
-	-@cd contracts/solana && ${MAKE} test
+	@./tests-golang.sh
+	@cd ${CONTRACTS_DIR} && ${MAKE} test
 
 lint: semgrep
 	@${GO_FMT} ./...
