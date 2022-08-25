@@ -4,6 +4,8 @@
     width: 100%;
     height: 500px;
     margin-right: 40px;
+    padding: 0 10px 0 3px;
+
     img {
         width: 97%;
         max-height: 350px;
@@ -21,7 +23,7 @@
         color: $textGrey;
         font-size: 20px;
         @include max-560px{ 
-            font-siz: 18px;
+            font-size: 18px;
         }
     }
 

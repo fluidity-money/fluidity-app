@@ -42,3 +42,8 @@ web/fluidity.money/public/assets/images/buttonIcons/arrowTopRightWhite.svg filte
 web/fluidity.money/public/assets/images/ellipse.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/useCaseIcons/globePaperAirplane.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/useCaseIcons/sendReceive.svg filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/socials/discord.svg filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/socials/twitter.svg filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/socials/linkedin.svg filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/socials/telegram.svg filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/logoOutline.svg filter=lfs diff=lfs merge=lfs -text

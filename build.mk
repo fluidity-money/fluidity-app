@@ -19,3 +19,5 @@ SEMGREP_ALL := semgrep --config p/ci --config p/secrets
 MAKEFLAGS += --no-print-directory
 
 GO_CMD_DIR := cmd
+
+WEB_DIR := web
