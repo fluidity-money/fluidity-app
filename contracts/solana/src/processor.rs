@@ -802,12 +802,11 @@ pub fn log_tvl(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
     Ok(())
 }
 
-fn update_mint_limit(
-    accounts: &[AccountInfo],
-    program_id: &Pubkey,
-    limit: u64,
+fn validate_authority<'a, 'b>(
+    accounts: &'a [AccountInfo<'b>],
     seed: String,
-) -> ProgramResult {
+    program_id: &Pubkey,
+) -> Result<(&'a AccountInfo<'b>, FluidityData, &'a AccountInfo<'b>), ProgramError> {
     let accounts_iter = &mut accounts.iter();
 
     let fluidity_data_account = next_account_info(accounts_iter)?;
@@ -822,12 +821,28 @@ fn update_mint_limit(
     {
         panic!("bad data account");
     }
-    let mut fluidity_data = validate_fluidity_data_account(
+    let fluidity_data = validate_fluidity_data_account(
         fluidity_data_account,
         *token_mint.key,
         *fluidity_mint.key,
         *pda_account.key,
     );
+
+    if !payer.is_signer {
+        panic!("bad payout authority");
+    }
+
+    return Ok((fluidity_data_account, fluidity_data, payer));
+}
+
+fn update_mint_limit(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    limit: u64,
+    seed: String,
+) -> ProgramResult {
+    let (fluidity_data_account, mut fluidity_data, payer)
+        = validate_authority(accounts, seed, program_id)?;
 
     if !(payer.is_signer && *payer.key == fluidity_data.payout_authority) {
         panic!("bad payout authority");
@@ -848,26 +863,8 @@ fn update_payout_limit(
     limit: u64,
     seed: String,
 ) -> ProgramResult {
-    let accounts_iter = &mut accounts.iter();
-
-    let fluidity_data_account = next_account_info(accounts_iter)?;
-    let token_mint = next_account_info(accounts_iter)?;
-    let fluidity_mint = next_account_info(accounts_iter)?;
-    let pda_account = next_account_info(accounts_iter)?;
-    let payer = next_account_info(accounts_iter)?;
-
-    let data_seed = format!("FLU:{}_DATA", seed);
-    if fluidity_data_account.key
-        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
-    {
-        panic!("bad data account");
-    }
-    let mut fluidity_data = validate_fluidity_data_account(
-        fluidity_data_account,
-        *token_mint.key,
-        *fluidity_mint.key,
-        *pda_account.key,
-    );
+    let (fluidity_data_account, mut fluidity_data, payer)
+        = validate_authority(accounts, seed, program_id)?;
 
     if !(payer.is_signer && *payer.key == fluidity_data.large_payout_authority) {
         panic!("bad payout authority");
@@ -888,40 +885,38 @@ fn update_payout_authority(
     new_authority: String,
     seed: String,
 ) -> ProgramResult {
-    let accounts_iter = &mut accounts.iter();
+    let (fluidity_data_account, mut fluidity_data, payer)
+        = validate_authority(accounts, seed, program_id)?;
 
-    let fluidity_data_account = next_account_info(accounts_iter)?;
-    let token_mint = next_account_info(accounts_iter)?;
-    let fluidity_mint = next_account_info(accounts_iter)?;
-    let pda_account = next_account_info(accounts_iter)?;
-    let payer = next_account_info(accounts_iter)?;
-
-    let data_seed = format!("FLU:{}_DATA", seed);
-    if fluidity_data_account.key
-        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
-    {
-        panic!("bad data account");
-    }
-    let mut fluidity_data = validate_fluidity_data_account(
-        fluidity_data_account,
-        *token_mint.key,
-        *fluidity_mint.key,
-        *pda_account.key,
-    );
-
-    if !payer.is_signer {
-        panic!("bad payout authority");
+    if *payer.key != fluidity_data.payout_authority {
+        panic!("only the current payout authority can use this");
     }
 
     let new_authority_key = Pubkey::from_str(&new_authority).unwrap();
+    fluidity_data.payout_authority = new_authority_key;
 
-    if *payer.key == fluidity_data.payout_authority {
-        fluidity_data.payout_authority = new_authority_key;
-    } else if *payer.key == fluidity_data.large_payout_authority {
-        fluidity_data.large_payout_authority = new_authority_key;
-    } else {
-        panic!("bad payout authority");
+    // borrow the data and write
+    let mut data = fluidity_data_account.try_borrow_mut_data()?;
+    fluidity_data.serialize(&mut &mut data[..])?;
+
+    Ok(())
+}
+
+fn update_large_payout_authority(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    new_authority: String,
+    seed: String,
+) -> ProgramResult {
+    let (fluidity_data_account, mut fluidity_data, payer)
+        = validate_authority(accounts, seed, program_id)?;
+
+    if *payer.key != fluidity_data.large_payout_authority {
+        panic!("only the current payout authority can use this");
     }
+
+    let new_authority_key = Pubkey::from_str(&new_authority).unwrap();
+    fluidity_data.large_payout_authority = new_authority_key;
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
