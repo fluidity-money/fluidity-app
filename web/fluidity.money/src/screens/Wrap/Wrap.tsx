@@ -1,13 +1,43 @@
-import React from "react";
+import ReusableGrid from "components/ReusableGrid";
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Wrap.module.scss";
 
 const Wrap = () => {
+  /* scrolls to location on pageload if it contains same ID or scrolls to the top
+   for ResourcesNavModal to work*/
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash) {
+      let elem = document.getElementById(location.hash.slice(1));
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [location]);
   return (
-    <div className={styles.container}>
-      <HowItWorksTemplate>WRAP</HowItWorksTemplate>
+    <div className={styles.container} id="wraptokens">
+      <ReusableGrid
+        left={
+          <HowItWorksTemplate header={header} info={info}>
+            Wrap tokens
+          </HowItWorksTemplate>
+        }
+        right={<div style={{ fontSize: 160 }}>🦍</div>}
+      />
     </div>
   );
 };
 
 export default Wrap;
+
+const header =
+  "Fluid Assets are a 1:1 wrapped asset with perpetual payout properties. ";
+
+const info = [
+  "A Fluid Asset is a wrapped standard token that represents and is pegged to an underlying principal token. ",
+  "You are free from market volatility risk when exchanging your fluid assets to the base asset you have deposited at any point in time through our web application, and if its down, through the method call on the corresponding swap contract.",
+];
