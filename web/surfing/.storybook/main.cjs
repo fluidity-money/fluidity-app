@@ -1,5 +1,6 @@
 const svgr = require('vite-plugin-svgr');
 const { mergeConfig } = require('vite');
+const { resolve } = require('path');
 
 module.exports = {
   "stories": [
