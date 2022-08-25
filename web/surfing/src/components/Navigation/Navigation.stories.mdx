@@ -1,0 +1,24 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import Navigation from "./Navigation";
+
+<Meta title="Navigation" component={Navigation} />
+
+export const Template = (args) => <Navigation {...args}></Navigation>;
+
+<Canvas>
+  <Story
+    name="resources"
+    args={{
+      page: "resources",
+      pageLocations: [
+        "articles",
+        "fluniversity",
+        "whitepapers",
+        "documentation",
+      ],
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
