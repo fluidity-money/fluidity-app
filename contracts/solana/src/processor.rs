@@ -38,7 +38,8 @@ pub struct FluidityData {
     pda: Pubkey,
     payout_authority: Pubkey,
     large_payout_authority: Pubkey,
-    wrapping_enabled: bool,
+    // wrapping and payouts
+    fluidity_enabled: bool,
     block_payout_threshold: u64,
     global_mint_remaining: u64,
 }
@@ -104,7 +105,7 @@ fn wrap(
         *pda_account.key,
     );
 
-    if !fluidity_data.wrapping_enabled {
+    if !fluidity_data.fluidity_enabled {
         panic!("wrapping is disabled");
     }
 
@@ -473,6 +474,10 @@ fn payout(
         *fluidity_mint.key,
         *pda_account.key,
     );
+
+    if !fluidity_data.fluidity_enabled {
+        panic!("payouts are disabled!");
+    }
 
     // check payout authority
     if !payer.is_signer {
@@ -985,7 +990,7 @@ fn init_data(
         payout_authority: *payout_authority.key,
         large_payout_authority: *large_payout_authority.key,
         block_payout_threshold,
-        wrapping_enabled,
+        fluidity_enabled: wrapping_enabled,
         global_mint_remaining: global_mint,
     }
     .serialize(&mut &mut data[..])?;
