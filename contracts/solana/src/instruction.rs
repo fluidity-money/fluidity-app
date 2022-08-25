@@ -21,6 +21,9 @@ pub enum FluidityInstruction {
     UpdateMintLimit(u64, String),
     UpdatePayoutLimit(u64, String),
     UpdatePayoutAuthority(String, String),
+    UpdateLargePayoutAuthority(String, String),
+    ConfirmUpdatePayoutAuthority(String),
+    ConfirmUpdateLargePayoutAuthority(String),
 }
 
 // solend instructions

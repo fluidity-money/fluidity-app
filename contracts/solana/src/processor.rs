@@ -38,6 +38,8 @@ pub struct FluidityData {
     pda: Pubkey,
     payout_authority: Pubkey,
     large_payout_authority: Pubkey,
+    pending_payout_authority: Option<Pubkey>,
+    pending_large_payout_authority: Option<Pubkey>,
     // wrapping and payouts
     fluidity_enabled: bool,
     block_payout_threshold: u64,
@@ -893,7 +895,28 @@ fn update_payout_authority(
     }
 
     let new_authority_key = Pubkey::from_str(&new_authority).unwrap();
-    fluidity_data.payout_authority = new_authority_key;
+    fluidity_data.pending_payout_authority = Some(new_authority_key);
+
+    // borrow the data and write
+    let mut data = fluidity_data_account.try_borrow_mut_data()?;
+    fluidity_data.serialize(&mut &mut data[..])?;
+
+    Ok(())
+}
+
+fn complete_update_payout_authority(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    seed: String,
+) -> ProgramResult {
+    let (fluidity_data_account, mut fluidity_data, payer)
+        = validate_authority(accounts, seed, program_id)?;
+
+    if Some(*payer.key) != fluidity_data.pending_payout_authority {
+        panic!("only the pending payout authority can use this");
+    }
+
+    fluidity_data.payout_authority = *payer.key;
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
@@ -916,7 +939,28 @@ fn update_large_payout_authority(
     }
 
     let new_authority_key = Pubkey::from_str(&new_authority).unwrap();
-    fluidity_data.large_payout_authority = new_authority_key;
+    fluidity_data.pending_large_payout_authority = Some(new_authority_key);
+
+    // borrow the data and write
+    let mut data = fluidity_data_account.try_borrow_mut_data()?;
+    fluidity_data.serialize(&mut &mut data[..])?;
+
+    Ok(())
+}
+
+fn complete_update_large_payout_authority(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    seed: String,
+) -> ProgramResult {
+    let (fluidity_data_account, mut fluidity_data, payer)
+        = validate_authority(accounts, seed, program_id)?;
+
+    if Some(*payer.key) != fluidity_data.pending_large_payout_authority {
+        panic!("only the pending large payout authority can use this");
+    }
+
+    fluidity_data.large_payout_authority = *payer.key;
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
@@ -984,6 +1028,8 @@ fn init_data(
         pda: *pda.key,
         payout_authority: *payout_authority.key,
         large_payout_authority: *large_payout_authority.key,
+        pending_payout_authority: None,
+        pending_large_payout_authority: None,
         block_payout_threshold,
         fluidity_enabled: wrapping_enabled,
         global_mint_remaining: global_mint,
@@ -1069,6 +1115,15 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         },
         FluidityInstruction::UpdatePayoutAuthority(authority, seed) => {
             update_payout_authority(accounts, program_id, authority, seed)
+        },
+        FluidityInstruction::UpdateLargePayoutAuthority(authority, seed) => {
+            update_large_payout_authority(accounts, program_id, authority, seed)
+        },
+        FluidityInstruction::ConfirmUpdatePayoutAuthority(seed) => {
+            complete_update_payout_authority(accounts, program_id, seed)
+        },
+        FluidityInstruction::ConfirmUpdateLargePayoutAuthority(seed) => {
+            complete_update_large_payout_authority(accounts, program_id, seed)
         },
     }
 }
