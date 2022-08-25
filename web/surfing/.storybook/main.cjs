@@ -26,7 +26,7 @@ module.exports = {
     );
     // return the customized config
     return mergeConfig(config, {
-      ...userConfig,
+      resolve: userConfig.resolve,
       // customize the Vite config here
       plugins: [
         svgr(),
