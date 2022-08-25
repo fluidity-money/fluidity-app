@@ -7,8 +7,9 @@ FILES := \
 	hardhat.config.ts
 
 DOCKER := docker
+HARDHAT := npx hardhat
 
-.PHONY: clean run
+.PHONY: clean run test
 
 all: run
 
@@ -24,6 +25,8 @@ run: docker ${FILES}
 		-p 8545:8545 \
 		-e FLU_ETHEREUM_ORACLE_ADDRESS=0x50Ab74ed0dac2f82924D6E748Ce22eBeE339184c \
 		-i ${TAG}
+test:
+	${HARDHAT} test
 
 clean:
 	@rm -f docker artifacts

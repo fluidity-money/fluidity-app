@@ -8,6 +8,9 @@
   width: 100%;
   flex-direction: column;
   background-color: $fluidBlack;
+  @include max-860px {
+    padding-right: 4%;
+  }
 }
 
 .carouselText {
@@ -21,10 +24,10 @@
 .fluniversityCard {
   border: 1px solid white;
   height: 600px;
-  min-width: 400px;
+  min-width: 350px;
   margin-right: 20px;
   margin-bottom: 50px;
-
+  padding-bottom: 20px;
   img {
     height: 60%;
     width: 100%;
@@ -38,7 +41,7 @@
   p {
     padding: 10px;
     font-family: 'Aeonik';
-    font-size:20px;
+    font-size:16px;
     color: $textGrey;
   }
   
