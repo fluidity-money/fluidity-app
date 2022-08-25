@@ -16,18 +16,16 @@ const ProtectedRoute = ({
   component: Component,
   exact,
   path,
-  extraProps,
+  ...props
 }: IProtectedRoute) => {
   return (
-    <Route
-      exact={exact}
-      path={path}
-      render={(props) => 
+    <Route exact path={path} >
+      {
         predicate() 
-          ? <Component {...props} {...extraProps} />
+          ? <Component {...props} />
           : <Redirect to="/" />
       }
-    />
+    </Route
   );
 }
 
