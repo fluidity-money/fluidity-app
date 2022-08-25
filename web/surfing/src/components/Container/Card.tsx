@@ -1,6 +1,6 @@
 import type { ComponentType, HTMLProps } from "react";
 
-import styles from './Container.module.scss';
+import styles from './Card.module.scss';
 
 interface IContainer extends HTMLProps<HTMLDivElement> {
   component: ComponentType<any> | ((...args: any[]) => JSX.Element),
