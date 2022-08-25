@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { GeneralButton } from "../Button";
 import ResourcesNavModal from "../ResourcesNavModal";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
-  // whichever page is displayed should be underlined
   const [modal, setModal] = useState(false);
   const handleModal = () => {
     setModal(!modal);
@@ -25,9 +24,7 @@ const NavBar = () => {
               version={"secondary"}
               type={"text"}
               size={"medium"}
-              handleClick={function (): void {
-                throw new Error("Function not implemented.");
-              }}
+              handleClick={() => {}}
             >
               LAUNCH FLUIDITY
             </GeneralButton>
