@@ -1,6 +1,5 @@
 const svgr = require('vite-plugin-svgr');
-const { loadConfigFromFile, mergeConfig } = require('vite');
-const { resolve } = require('path');
+const { mergeConfig } = require('vite');
 
 module.exports = {
   "stories": [
@@ -21,16 +20,15 @@ module.exports = {
     "storyStoreV7": true
   },
   async viteFinal(config, { configType }) {
-    const { config: userConfig } = await loadConfigFromFile(
-      resolve(__dirname, "../vite.config.ts")
-    );
     // return the customized config
     return mergeConfig(config, {
-      resolve: userConfig.resolve,
-      // customize the Vite config here
-      plugins: [
-        svgr(),
-      ],
+      // Custom resolve paths, copied from root vite.config
+      resolve: {
+        alias: [
+          { find: '@assets', replacement: resolve(__dirname, 'src/assets') },
+          { find: '@', replacement: resolve(__dirname, 'src') }],
+      },
+      plugins: [svgr()],
     });
   },
 };
