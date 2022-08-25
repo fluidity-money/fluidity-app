@@ -101,6 +101,7 @@ export const deployTokens = async (
           token.name,
           token.symbol,
           oracleAddress,
+          true, // Wrapping and rewards enabled
           1000, // Reward quarantine
           false, // Limited supply
           1000000, // Global limit

@@ -84,6 +84,9 @@ contract Token is IERC20 {
     /// @dev [address] => [number of tokens the user won that have been quarantined]
     mapping (address => uint) blockedRewards_;
 
+    /// @dev is token wrapping and rewards enabled?
+    bool fluidityEnabled_;
+
     /// @dev are the asset minting limits enabled?
     bool mintLimitsEnabled_;
 
@@ -122,6 +125,7 @@ contract Token is IERC20 {
         string memory _name,
         string memory _symbol,
         address _oracle,
+        bool _fluidityEnabled,
         uint _maxUncheckedReward,
         bool _mintLimitsEnabled,
         uint _globalMint,
@@ -142,6 +146,7 @@ contract Token is IERC20 {
         name_ = _name;
         symbol_ = _symbol;
 
+        fluidityEnabled_ = _fluidityEnabled;
         mintLimitsEnabled_ = _mintLimitsEnabled;
         remainingGlobalMint_ = _globalMint;
         userMintLimit_ = _userMint;
@@ -195,6 +200,12 @@ contract Token is IERC20 {
         mintLimitsEnabled_ = enable;
     }
 
+    function enableFluidOperations(bool enable) public {
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        fluidityEnabled_ = enable;
+    }
+
     // name and symbol provided by ERC20 parent
 
     /**
@@ -206,6 +217,8 @@ contract Token is IERC20 {
      * @return the number of tokens wrapped
      */
     function erc20In(uint amount) public returns (uint) {
+        require(fluidityEnabled_, "wrapping tokens is disabled");
+
         if (mintLimitsEnabled_) {
             // update global limit
             require(amount <= remainingGlobalMint_, "mint amount exceeds global limit!");
@@ -306,6 +319,7 @@ contract Token is IERC20 {
      * @param rewards the array of rewards to pay out
      */
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
+        require(fluidityEnabled_, "rewards are disabled");
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         uint poolAmount = rewardPoolAmount();
@@ -339,6 +353,7 @@ contract Token is IERC20 {
      * @param lastBlock the last block the rewards include
      */
     function unblockReward(address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
+        require(fluidityEnabled_, "rewards are disabled");
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         require(blockedRewards_[user] >= amount, "trying to unblock more than the user has blocked");
@@ -369,6 +384,8 @@ contract Token is IERC20 {
         uint lastBlock,
         bytes memory sig
     ) external {
+        require(fluidityEnabled_, "rewards are disabled");
+
         // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
         //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
         bytes32 hash = keccak256(abi.encode(

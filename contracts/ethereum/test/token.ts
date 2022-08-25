@@ -66,4 +66,25 @@ describe("Token", async function () {
         await fusdt.enableMintLimits(false)
     })
 
+    it("Can be disabled", async function () {
+        await fusdt.enableFluidOperations(false);
+        expect(fusdt.erc20In(1)).to.be.revertedWith("wrapping tokens is disabled");
+        expect(fusdt.batchReward([[signerAddress, 1001]], 100, 101))
+            .to.be.revertedWith("rewards are disabled");
+        expect(fusdt.unblockReward(signerAddress, 1, true, 100, 101))
+            .to.be.revertedWith("rewards are disabled");
+
+        // Check that wrapping works when enabled
+        await fusdt.enableFluidOperations(true);
+
+        usdt = await hre.ethers.getContractAt("IERC20", usdt_addr, signer);
+        fusdt = await hre.ethers.getContractAt("Token", fusdt_addr, signer);
+
+        const initial = await fusdt.balanceOf(signerAddress);
+        await usdt.approve(fusdt.address, 0);
+        await usdt.approve(fusdt.address, 4000000);
+        await fusdt.erc20In(10);
+        const change = await fusdt.balanceOf(signerAddress) - initial;
+        expect(change).to.equal(10);
+    })
 });
