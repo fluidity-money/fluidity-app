@@ -171,10 +171,10 @@ contract Token is IERC20 {
     }
 
     /**
-     * @notice if the contract is in the state of emergency this is false
+     * @notice if the contract is in a state of emergency this is true
      * @return the contract emergency state
      */
-    function noEmergencyMode() public view returns (bool) { return noEmergencyMode_; }
+    function isEmergencyMode() public view returns (bool) { return !noEmergencyMode_; }
 
     /**
      * @notice getter for the `rngOracle_` variable
@@ -194,9 +194,9 @@ contract Token is IERC20 {
     		"can't enable emergency mode!"
     	);
 
-    	noEmergencyMode = false;
+    	noEmergencyMode_ = false;
 
-    	rngOracle_ = address(0)
+    	rngOracle_ = address(0);
     }
 
     /// @notice starts an update for the trusted oracle to a new address

@@ -10,7 +10,11 @@ import { AAVE_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
+const emergencyCouncilKey = `FLU_ETHEREUM_EMERGENCY_COUNCIL_ADDRESS`;
+
 let oracleAddress: string;
+
+let emergencyCouncilAddress: string;
 
 let shouldDeploy: (keyof typeof TokenList)[] = [];
 
@@ -18,6 +22,8 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
   .addOptionalParam("tokens", "the tokens to deploy")
   .setAction(async (args, hre) => {
     oracleAddress = mustEnv(oracleKey);
+    emergencyCouncilAddress = mustEnv(emergencyCouncilKey);
+
     shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
 
     for (const t of shouldDeploy)
@@ -36,6 +42,10 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     throw new Error(
       `Set env variable ${oracleKey} to an 0x123 encoded public key.`);
 
+  if (!emergencyCouncilAddress)
+    throw new Error(
+      `Set env variable ${emergencyCouncilKey} to an 0x123 encoded public key.`);
+
   await hre.run("forknet:take-usdt");
 
   await deployTokens(
@@ -43,7 +53,9 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     shouldDeploy.map(token => TokenList[token]),
     AAVE_POOL_PROVIDER_ADDR,
     oracleAddress,
+    emergencyCouncilAddress,
   );
+
   console.log(`deployment complete`);
 });
 

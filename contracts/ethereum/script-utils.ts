@@ -44,6 +44,7 @@ export const deployTokens = async (
     tokens: Token[],
     aavePoolProvider: string,
     oracleAddress: string,
+    emergencyCouncilAddress: string,
 ): Promise<{
     tokenBeacon: ethers.Contract,
     aaveBeacon: ethers.Contract,
@@ -63,7 +64,8 @@ export const deployTokens = async (
   for (const token of tokens) {
       console.log(`deploying ${token.name}`);
 
-      var deployedPool: ethers.Contract
+      var deployedPool: ethers.Contract;
+
       const deployedToken = await hre.upgrades.deployBeaconProxy(
           tokenBeacon,
           tokenFactory,
@@ -94,13 +96,16 @@ export const deployTokens = async (
       }
 
       await deployedPool.deployed();
+
       await deployedToken.deployed();
+
       await deployedToken.functions.init(
           deployedPool.address,
           token.decimals,
           token.name,
           token.symbol,
           oracleAddress,
+          emergencyCouncilAddress,
           1000, // Reward quarantine
           false, // Limited supply
           1000000, // Global limit

@@ -29,7 +29,7 @@ test:
 	${HARDHAT} test
 
 clean:
-	@rm -f docker artifacts
+	@rm -rf docker artifacts
 
 analysis/docker-slither: ${FILES}
 	@${DOCKER} build \

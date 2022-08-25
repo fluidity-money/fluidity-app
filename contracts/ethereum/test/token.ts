@@ -15,14 +15,25 @@ describe("Token", async function () {
         signerAddress = await signer.getAddress();
     });
 
+    it("Emergency mode functional", async function () {
+        await fusdt.enableEmergencyMode();
+
+        expect(fusdt.erc20In(1)).to.be.revertedWith("emergency mode!");
+
+        expect(fusdt.batchReward([[signerAddress, 1001]], 100, 101))
+            .to.be.revertedWith("emergency mode!");
+
+        expect(fusdt.unblockReward(signerAddress, 1, true, 100, 101))
+            .to.be.revertedWith("emergency mode!");
+    });
+
     it("Allows small rewards", async function () {
         const initial = await fusdt.balanceOf(signerAddress);
 
         await fusdt.batchReward([[signerAddress, 100]], 100, 101);
         const change = await fusdt.balanceOf(signerAddress) - initial;
         expect(change).to.equal(100);
-
-    })
+    });
 
     it("Prevents absurd rewards", async function () {
         const initial = await fusdt.balanceOf(signerAddress);
@@ -30,7 +41,7 @@ describe("Token", async function () {
         await fusdt.batchReward([[signerAddress, 1001]], 100, 101);
         const change = await fusdt.balanceOf(signerAddress) - initial;
         expect(change).to.equal(0);
-    })
+    });
 
     it("Allows us to unblock quarantined tokens", async function () {
         const initial = await fusdt.balanceOf(signerAddress);
@@ -46,24 +57,26 @@ describe("Token", async function () {
         await fusdt.unblockReward(signerAddress, blockedBalance, true, 100, 101);
         const newChange = await fusdt.balanceOf(signerAddress) - initial;
         expect(newChange).to.equal(blockedBalance);
-    })
+    });
 
     it("Prevents minting over user cap", async function () {
-        await fusdt.enableMintLimits(true)
-        await fusdt.updateMintLimits(1000, 100)
+        await fusdt.enableMintLimits(true);
+
+        await fusdt.updateMintLimits(1000, 100);
+
         expect(fusdt.erc20In(101)).to.be.revertedWith("Mint limit exceeded");
 
         // Cleanup
         await fusdt.enableMintLimits(false)
-    })
+    });
 
     it("Prevents minting over global cap", async function () {
-        await fusdt.enableMintLimits(true)
-        await fusdt.updateMintLimits(100, 1000)
+        await fusdt.enableMintLimits(true);
+        await fusdt.updateMintLimits(100, 1000);
+
         expect(fusdt.erc20In(101)).to.be.revertedWith("Mint limit exceeded");
 
         // Cleanup
-        await fusdt.enableMintLimits(false)
-    })
-
+        await fusdt.enableMintLimits(false);
+    });
 });
