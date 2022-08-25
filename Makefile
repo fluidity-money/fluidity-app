@@ -115,3 +115,5 @@ lint: semgrep
 
 clean:
 	rm -f docker-root docker-root-web
+	cd ${GO_CMD_DIR} && ${MAKE} clean
+	cd ${WEB_DIR} && ${MAKE} clean
