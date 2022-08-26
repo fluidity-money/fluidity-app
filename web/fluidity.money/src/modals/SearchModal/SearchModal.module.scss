@@ -19,6 +19,12 @@
     margin-top: 80px;
     margin-bottom: 40px;
     height: 150px;
+    .icon {
+      position: absolute;
+      width: 40px;
+      left: 85px;
+    }
+
     input {
       color: white;
       // text-align: center;
@@ -57,4 +63,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-gap: 20px;
+}
+
+.sort {
+  display: flex;
+  gap: 4px;
 }
