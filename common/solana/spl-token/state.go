@@ -1,13 +1,12 @@
 package spl_token
 
 import (
-	"context"
 	"fmt"
 	"math"
 	"math/big"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
+
 	"github.com/near/borsh-go"
 )
 
@@ -27,8 +26,8 @@ const SplAccountTruncatedSize = 41
 
 // GetMintAndDecimals by taking an spl-token account, getting it's data from the
 // chain, and deserialising to get the mint account and the number of decimals
-func GetMintAndDecimals(solanaClient *solanaRpc.Client, splAccount solana.PublicKey) (solana.PublicKey, uint8, error) {
-	resp, err := solanaClient.GetAccountInfo(context.Background(), splAccount)
+func GetMintAndDecimals(solanaClient *solana.SolanaRPCHandle, splAccount solana.PublicKey) (solana.PublicKey, uint8, error) {
+	resp, err := solanaClient.GetAccountInfo(splAccount)
 
 	if err != nil {
 		return solana.PublicKey{}, 0, fmt.Errorf(

@@ -89,9 +89,9 @@ func SendTransfer(solanaClient *solana.SolanaRPCHandle, senderPdaAddress, recipi
 			recipientAccountMeta,
 			solLib.NewAccountMeta(recipientAddress, false, false),
 			tokenMintMeta,
-			solLib.NewAccountMeta(solLib.SystemProgramId, false, false),
+			solLib.NewAccountMeta(solana.SystemProgramIdPubkey, false, false),
 			solLib.NewAccountMeta(TokenProgramAddressPubkey, false, false),
-			solLib.NewAccountMeta(solLib.SysVarRentPubkey, false, false),
+			solLib.NewAccountMeta(solana.SysVarRentPubkey, false, false),
 		}
 
 		createAccountInstruction := solLib.NewInstruction(

@@ -1,5 +1,5 @@
-// Kind of solana-go but not really.
-// Like this is actually the bare minimum.
+// mostly extracted from https://github.com/gagliardetto/solana-go
+
 package solana
 
 import (
@@ -16,9 +16,27 @@ import (
 	"filippo.io/edwards25519"
 )
 
-type PublicKey [32]byte
+const (
+	MaxSeeds      = 16
+	MaxSeedLength = 32
+)
 
-type PrivateKey []byte
+const ProgramDerivedAddressMarker = "ProgramDerivedAddress"
+
+type (
+	PublicKey  [32]byte
+	PrivateKey []byte
+)
+
+type Wallet struct {
+	PrivateKey PrivateKey
+}
+
+type AccountMeta struct {
+	PublicKey  PublicKey
+	IsWritable bool
+	IsSigner   bool
+}
 
 func (pk PublicKey) String() string {
 	return string(pk[:])
@@ -30,8 +48,11 @@ func PublicKeyFromBase58(b58 string) (PublicKey, error) {
 
 	pk := PublicKey{}
 
-	if len(key) != 32 {
-		return pk, fmt.Errorf("invalid format for public key")
+	if keyLen := len(key); keyLen != 32 {
+		return pk, fmt.Errorf(
+			"invalid format for public key, length was not 32, was %v",
+			keyLen,
+		)
 	}
 
 	copy(pk[0:32], key)
@@ -45,10 +66,6 @@ func ValidCurve(point []byte) bool {
 	_, err := new(edwards25519.Point).SetBytes(point)
 	return err == nil
 }
-
-const MaxSeeds = 16
-const MaxSeedLength = 32
-const PDA_MARKER = "ProgramDerivedAddress"
 
 var ErrMaxSeedLengthExceeded = fmt.Errorf("max seed length exceeded")
 
@@ -64,12 +81,15 @@ func CreateProgramAddress(seeds [][]byte, programID PublicKey) (PublicKey, error
 	}
 
 	buf := []byte{}
+
 	for _, seed := range seeds {
 		buf = append(buf, seed...)
 	}
 
 	buf = append(buf, programID[:]...)
-	buf = append(buf, []byte(PDA_MARKER)...)
+
+	buf = append(buf, []byte(ProgramDerivedAddressMarker)...)
+
 	hash := sha256.Sum256(buf)
 
 	if ValidCurve(hash[:]) {
@@ -89,7 +109,7 @@ func (p PublicKey) Bytes() []byte {
 	return []byte(p[:])
 }
 
-// Find a valid program address. Just enough to cover the prior use case.
+// FindProgramAddress - just enough to cover the prior use case
 func FindProgramAddress(seed [][]byte, pub PublicKey) (PublicKey, uint8, error) {
 	// Iterator to gen nonces
 	for i := 255; i > 0; i-- {
@@ -99,16 +119,6 @@ func FindProgramAddress(seed [][]byte, pub PublicKey) (PublicKey, uint8, error) 
 		}
 	}
 	return PublicKey{}, 0, fmt.Errorf("unable to find program address")
-}
-
-type Wallet struct {
-	PrivateKey PrivateKey
-}
-
-type AccountMeta struct {
-	PublicKey  PublicKey
-	IsWritable bool
-	IsSigner   bool
 }
 
 func WalletFromPrivateKeyBase58(b58 string) (*Wallet, error) {
