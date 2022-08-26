@@ -8,8 +8,10 @@ import (
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -76,6 +78,22 @@ const fluidityContractAbiString = `[
 	  "outputs": [],
 	  "stateMutability": "nonpayable",
 	  "type": "function"
+  },
+  {
+      "inputs": [
+      { "internalType": "address", "name": "newOracle", "type": "address" }
+      ],
+      "name": "updateOracle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "acceptUpdateOracle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
   }
 ]`
 
@@ -264,4 +282,49 @@ func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Ad
 
 	return transaction, nil
 }
+
+func UpdateOracle(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, newOracle ethCommon.Address) (*ethTypes.Transaction, error) {
+	// TODO replace this with a call to workerconfig that uses a list of addresses
+	panic("invalid")
+	boundContract := ethAbiBind.NewBoundContract(
+		fluidityAddress,
+		fluidityContractAbi,
+		client,
+		client,
+		client,
+	)
+
+	
+	rlp.EncodeToBytes()
+	boundContract.
+	t := types.DynamicFeeTx{
+		ChainID    *big.Int
+		Nonce      uint64
+		GasTipCap  *big.Int // a.k.a. maxPriorityFeePerGas
+		GasFeeCap  *big.Int // a.k.a. maxFeePerGas
+		Gas        uint64
+		To         *common.Address `rlp:"nil"` // nil means contract creation
+		Value      *big.Int
+		Data       []byte
+		AccessList AccessList
+	}
+	types.SignNewTx()
+
+	transaction, err := ethereum.MakeTransaction(
+		boundContract,
+		transactionOptions,
+		"updateOracle",
+		newOracle,	
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to update the oracle for Fluidity's contract! %v",
+			err,
+		)
+	}
+
+	return transaction, nil
+}
+
 
