@@ -14,6 +14,8 @@ import { numberToMonetaryString } from '../../utils/numberConverters';
 
 const Dashboard = () => {
   const filterOptions = ["ALL", "DEX", "NFT", "DeFi"]
+  
+  
   const totalTransactions = 120;
   const totalYield = 2964500;
   const totalAssets = 8;

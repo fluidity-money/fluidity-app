@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { ProtectedRoute } from 'surfing';
+import { ProtectedRoute, Web3Provider, useWallet } from 'surfing';
 
 import Dashboard from './screens/authenticated/dashboard';
 import Rewards from './screens/authenticated/rewards';
@@ -10,10 +9,14 @@ import Home from './screens/Home';
 import './App.css'
 
 const App = () => {
-  const isConnected = () => true;
+  const isConnected = () => {
+    const wallet = useWallet();
+    return wallet.status === "connected";
+  }
 
   return (
   <Router>
+    <Web3Provider>
     <Switch>
       <Route
         path="/"
@@ -52,6 +55,7 @@ const App = () => {
         extraProps={{}}
       />
     </Switch>
+    </Web3Provider>
   </Router>
   )
 }
