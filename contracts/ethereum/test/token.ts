@@ -1,29 +1,32 @@
 import * as hre from "hardhat";
-import { oracle, fusdt_addr, usdt_addr, signer } from './setup';
+import { oracle, fusdt_addr, usdt_addr, fdai_addr, signer } from './setup';
 import * as ethers from 'ethers';
 import { expect } from "chai";
 
 describe("Token", async function () {
     let fusdt: ethers.Contract;
     let usdt: ethers.Contract;
+    let fdai: ethers.Contract;
     let signerAddress: string;
 
     before(async () => {
         fusdt = await hre.ethers.getContractAt("Token", fusdt_addr, oracle);
         usdt = await hre.ethers.getContractAt("IERC20", usdt_addr, oracle);
 
+        fdai = await hre.ethers.getContractAt("Token", fdai_addr, oracle);
+
         signerAddress = await signer.getAddress();
     });
 
     it("Emergency mode functional", async function () {
-        await fusdt.enableEmergencyMode();
+        await fdai.enableEmergencyMode();
 
-        expect(fusdt.erc20In(1)).to.be.revertedWith("emergency mode!");
+        expect(fdai.erc20In(1)).to.be.revertedWith("emergency mode!");
 
-        expect(fusdt.batchReward([[signerAddress, 1001]], 100, 101))
+        expect(fdai.batchReward([[signerAddress, 1001]], 100, 101))
             .to.be.revertedWith("emergency mode!");
 
-        expect(fusdt.unblockReward(signerAddress, 1, true, 100, 101))
+        expect(fdai.unblockReward(signerAddress, 1, true, 100, 101))
             .to.be.revertedWith("emergency mode!");
     });
 

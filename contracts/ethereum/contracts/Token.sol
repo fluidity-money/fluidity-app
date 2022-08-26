@@ -176,6 +176,8 @@ contract Token is IERC20 {
 
     /**
      * @notice update the operator account to a new address
+     * @param newOperator the address of the new operator to change to
+     */
     function updateOperator(address newOperator) public {
     	require(msg.sender == operator_, "only operator can use this function!");
 
@@ -225,9 +227,11 @@ contract Token is IERC20 {
 
     /// @notice finishes an update of the oracle address
     /// @notice must be used by the multisig account
-    function acceptUpdateOracle() public {
+    function acceptUpdateOracle(address newOracle) public {
         require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == operator_, "only the operator account can use this");
+
+        require(newOracle == pendingNewOracle_, "passed new oracle doesn't match pending!");
 
         emit OracleChanged(rngOracle_, pendingNewOracle_);
 
@@ -246,7 +250,7 @@ contract Token is IERC20 {
     /// @notice updates and resets mint limits if called by the operator
     function updateMintLimits(uint global, uint user) public {
         require(noEmergencyMode_, "emergency mode!");
-        require(msg.sender == operator_, "only the operator account can use this");
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         remainingGlobalMint_ = global;
         userMintLimit_ = user;
@@ -622,7 +626,6 @@ contract Token is IERC20 {
     ) internal virtual {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
-        require(noEmergencyMode_, "emergency mode!");
 
         allowances_[owner][spender] = amount;
         emit Approval(owner, spender, amount);
@@ -633,7 +636,6 @@ contract Token is IERC20 {
         address spender,
         uint256 amount
     ) internal virtual {
-        require(noEmergencyMode_, "emergency mode!");
 
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
