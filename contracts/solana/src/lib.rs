@@ -14,7 +14,7 @@ pub mod utils;
 
 // declare the pubkey of the program
 #[cfg(all(target_arch = "bpf", not(feature = "exclude_entrypoint")))]
-declare_id!("GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU");
+declare_id!("G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj");
 
 // pass entrypoint through to processor
 #[cfg(all(target_arch = "bpf", not(feature = "exclude_entrypoint")))]

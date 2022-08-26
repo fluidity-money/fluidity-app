@@ -18,6 +18,7 @@ const Footer = () => {
    */
   return (
     <div className={styles.container}>
+      <Socials />
       <div className={styles.content}>
         <div className={styles.footerItems}>
           <FooterItem items={howItWorks}>How it works</FooterItem>

@@ -7,6 +7,9 @@
   min-height: 850px;
   width: 100%;
   background-color: $fluidBlack;
+  @include max-860px {
+    padding-right: 4%;
+  }
 }
 
 .tweetContainer {

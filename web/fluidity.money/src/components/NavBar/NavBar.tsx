@@ -12,10 +12,13 @@ const NavBar = () => {
   };
   return (
     <div className={`${styles.container} opacity-5x`}>
+      <h2 className={styles.fluidity}>fluidity</h2>
       <div className={styles.navbarFixed}>
         <div className={styles.fixed}>
           <div>
-            <Link to={"/"}>Fluidity</Link>
+            <Link to={"/"}>
+              <img src="/assets/images/logoOutline.svg" alt="home page" />
+            </Link>
           </div>
           <GeneralButton
             version={"secondary"}

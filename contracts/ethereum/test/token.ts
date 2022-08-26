@@ -1,18 +1,33 @@
 import * as hre from "hardhat";
-import { oracle, fusdt_addr, usdt_addr, signer } from './setup';
+import { oracle, fusdt_addr, usdt_addr, fdai_addr, signer } from './setup';
 import * as ethers from 'ethers';
 import { expect } from "chai";
 
 describe("Token", async function () {
     let fusdt: ethers.Contract;
     let usdt: ethers.Contract;
+    let fdai: ethers.Contract;
     let signerAddress: string;
 
     before(async () => {
         fusdt = await hre.ethers.getContractAt("Token", fusdt_addr, oracle);
         usdt = await hre.ethers.getContractAt("IERC20", usdt_addr, oracle);
 
+        fdai = await hre.ethers.getContractAt("Token", fdai_addr, oracle);
+
         signerAddress = await signer.getAddress();
+    });
+
+    it("Emergency mode functional", async function () {
+        await fdai.enableEmergencyMode();
+
+        expect(fdai.erc20In(1)).to.be.revertedWith("emergency mode!");
+
+        expect(fdai.batchReward([[signerAddress, 1001]], 100, 101))
+            .to.be.revertedWith("emergency mode!");
+
+        expect(fdai.unblockReward(signerAddress, 1, true, 100, 101))
+            .to.be.revertedWith("emergency mode!");
     });
 
     it("Allows small rewards", async function () {
@@ -21,8 +36,7 @@ describe("Token", async function () {
         await fusdt.batchReward([[signerAddress, 100]], 100, 101);
         const change = await fusdt.balanceOf(signerAddress) - initial;
         expect(change).to.equal(100);
-
-    })
+    });
 
     it("Prevents absurd rewards", async function () {
         const initial = await fusdt.balanceOf(signerAddress);
@@ -30,7 +44,7 @@ describe("Token", async function () {
         await fusdt.batchReward([[signerAddress, 1001]], 100, 101);
         const change = await fusdt.balanceOf(signerAddress) - initial;
         expect(change).to.equal(0);
-    })
+    });
 
     it("Allows us to unblock quarantined tokens", async function () {
         const initial = await fusdt.balanceOf(signerAddress);
@@ -46,24 +60,26 @@ describe("Token", async function () {
         await fusdt.unblockReward(signerAddress, blockedBalance, true, 100, 101);
         const newChange = await fusdt.balanceOf(signerAddress) - initial;
         expect(newChange).to.equal(blockedBalance);
-    })
+    });
 
     it("Prevents minting over user cap", async function () {
-        await fusdt.enableMintLimits(true)
-        await fusdt.updateMintLimits(1000, 100)
+        await fusdt.enableMintLimits(true);
+
+        await fusdt.updateMintLimits(1000, 100);
+
         expect(fusdt.erc20In(101)).to.be.revertedWith("Mint limit exceeded");
 
         // Cleanup
         await fusdt.enableMintLimits(false)
-    })
+    });
 
     it("Prevents minting over global cap", async function () {
-        await fusdt.enableMintLimits(true)
-        await fusdt.updateMintLimits(100, 1000)
+        await fusdt.enableMintLimits(true);
+        await fusdt.updateMintLimits(100, 1000);
+
         expect(fusdt.erc20In(101)).to.be.revertedWith("Mint limit exceeded");
 
         // Cleanup
-        await fusdt.enableMintLimits(false)
-    })
-
+        await fusdt.enableMintLimits(false);
+    });
 });

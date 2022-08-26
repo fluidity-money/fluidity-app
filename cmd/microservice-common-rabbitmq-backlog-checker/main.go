@@ -135,12 +135,12 @@ func main() {
 					queueReport(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
 				}
 
-				// if there's any messages on the queue, obtain the first to be logged 
+				// if there's any messages on the queue, obtain the first to be logged
 				if messagesReady == 0 {
 					break
 				}
 
-				msg, err := getAndRequeueFirstMessage(rmq.rmqAddress, name)
+				msg, err := getAndRequeueFirstMessage(rmq.rmqAddress, name, vhost.Name)
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {

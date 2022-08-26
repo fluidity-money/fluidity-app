@@ -25,7 +25,7 @@ use {
 };
 
 // the public key of the account that is allowed to initialise tokens
-const INIT_AUTHORITY: &str = "B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP";
+const INIT_AUTHORITY: &str = "G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj";
 
 // the public key of the solend program
 const SOLEND: &str = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";

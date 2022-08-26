@@ -109,9 +109,12 @@ semgrep:
 
 test: semgrep
 	@./tests-golang.sh
+	@cd ${CONTRACTS_DIR} && ${MAKE} test
 
 lint: semgrep
 	@${GO_FMT} ./...
 
 clean:
 	rm -f docker-root docker-root-web
+	cd ${GO_CMD_DIR} && ${MAKE} clean
+	cd ${WEB_DIR} && ${MAKE} clean
