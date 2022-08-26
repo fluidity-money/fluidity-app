@@ -8,7 +8,7 @@ import (
 func ClassifyApplication(transaction solana.TransactionResult, apps map[string]applications.Application) []applications.Application {
 	accounts := transaction.Transaction.Message.AccountKeys
 
-	var foundApps map[applications.Application]struct{}
+	foundApps := make(map[applications.Application]struct{}, 0)
 
 	for _, account := range accounts {
 		app, exists := apps[account]
@@ -19,7 +19,7 @@ func ClassifyApplication(transaction solana.TransactionResult, apps map[string]a
 		foundApps[app] = struct{}{}
 	}
 
-	var appsList []applications.Application
+	appsList := make([]applications.Application, 0)
 
 	for app := range foundApps {
 		appsList = append(appsList, app)
