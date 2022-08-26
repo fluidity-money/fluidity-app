@@ -17,7 +17,7 @@ import (
 func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
 
 	var (
-		totalFee = big.NewRat(0, 0)
+		totalFee = big.NewRat(0, 1)
 
 		transactionResult       = transaction.Transaction.Result
 		transactionSignature    = transaction.Transaction.Signature
