@@ -46,6 +46,9 @@ contract Token is IERC20 {
     /// @notice emitted when the rng oracle is changed to a new address
     event OracleChanged(address indexed oldOracle, address indexed newOracle);
 
+    /// @notice emitted when a new operator takes over the contract management
+    event OperatorChanged(address indexed oldOperator, address indexed newOperator);
+
     /// @dev sentinel to indicate a block has been rewarded in the
     /// @dev pastRewards_ and rewardedBlocks_ maps
     uint private constant BLOCK_REWARDED = 1;
@@ -168,6 +171,16 @@ contract Token is IERC20 {
         remainingGlobalMint_ = _globalMint;
         userMintLimit_ = _userMint;
         userMintResetBlock_ = block.number;
+    }
+
+    /**
+     * @notice update the operator account to a new address
+    function updateOperator(address newOperator) public {
+    	require(msg.sender == operator_, "only operator can use this function!");
+
+    	operator_ = newOperator;
+
+    	emit OperatorChanged(operator_, newOperator);
     }
 
     /**
