@@ -1,17 +1,29 @@
 import { LinkButton } from "components/Button";
 import FluidProject from "components/FluidProject";
+import { motion, useScroll } from "framer-motion";
 import ManualCarousel from "components/ManualCarousel";
-import React from "react";
+import React, { useRef } from "react";
 import styles from "./Ecosystem.module.scss";
 
 const Ecosystem = () => {
+  const scrollRef = useRef(null);
+  const { scrollYProgress } = useScroll({ container: scrollRef });
+  //   const opacity = useSpring(scrollYProgress);
+
   return (
     <div className={styles.container}>
       <div className={styles.textBehind}>
-        <h1>ECOSYSTEM</h1>
+        <motion.h1
+          initial={{ opacity: 1 }}
+          //   animate={{ opacity: scrollYProgress }}
+          //   transition={{ duration: 4, type: "tween" }}
+          style={{ opacity: scrollYProgress }}
+        >
+          ECOSYSTEM
+        </motion.h1>
       </div>
 
-      <div className={styles.scrollable}>
+      <div className={styles.scrollable} ref={scrollRef}>
         <div className={styles.background}>
           <h1>I'm an Image/Video</h1>
         </div>
