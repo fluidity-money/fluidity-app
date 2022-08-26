@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ProtectedRoute, Web3Provider, useWallet } from 'surfing';
 
 import Dashboard from './screens/authenticated/dashboard';
@@ -17,44 +17,37 @@ const App = () => {
   return (
   <Router>
     <Web3Provider>
-    <Switch>
+    <Routes>
       <Route
         path="/"
-        exact
-        render={(props) => (
-          <Home />
-        )}
+        element={<Home />}
       />
         
       <ProtectedRoute
         predicate={isConnected}
-        exact={true}
         path="/dashboard"
         component={Dashboard}
         extraProps={{}}
       />
       <ProtectedRoute
         predicate={isConnected}
-        exact={true}
         path="/rewards"
         component={Rewards}
         extraProps={{}}
       />
       <ProtectedRoute
         predicate={isConnected}
-        exact={true}
         path="/assets"
         component={Assets}
         extraProps={{}}
       />
       <ProtectedRoute
         predicate={isConnected}
-        exact={true}
         path="/dao"
         component={Dao}
         extraProps={{}}
       />
-    </Switch>
+    </Routes>
     </Web3Provider>
   </Router>
   )

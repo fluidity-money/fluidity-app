@@ -1,7 +1,7 @@
 import Page from '../../components/page';
 import { numberToMonetaryString } from '../../utils/numberConverters';
 
-import { Container, Display, Heading, Row, TabButton } from 'surfing';
+import { Card, Display, Heading, Row, TabButton } from 'surfing';
 
 const Assets = () => {
   const totalBalance = 100000;
@@ -42,7 +42,7 @@ const Assets = () => {
       </Row>
 
       {/** Provide Liquidity */}
-      <Container
+      <Card
         component={"div"}
         rounded={true}
         type={"box"}
@@ -58,7 +58,7 @@ const Assets = () => {
         {/** Logo */}
         <div>
         </div>
-      </Container>
+      </Card>
     </Page>
   )
 }

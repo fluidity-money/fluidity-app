@@ -13,11 +13,13 @@
   "dependencies": {
     "@visx/visx": "^2.12.2",
     "@visx/xychart": "^2.12.2",
+    "@web3-react/injected-connector": "^6.0.7",
     "react": "18.2.0 || ^17.0.0",
     "react-dom": "18.2.0 || ^17.0.0",
     "react-relay": "^14.1.0",
     "react-router-dom": "^6.3.0",
-    "react-table": "^7.8.0"
+    "react-table": "^7.8.0",
+    "use-wallet": "^0.13.6"
   },
   "peerDependencies": {
     "react": "18.2.0 || ^17.0.0",
@@ -35,6 +37,7 @@
     "@storybook/testing-library": "^0.0.13",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "@types/react-relay": "^14.1.1",
     "@types/react-table": "^7.7.12",
     "@vitejs/plugin-react": "^2.0.1",
     "babel-loader": "^8.2.5",
