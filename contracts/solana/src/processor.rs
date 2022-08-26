@@ -28,7 +28,7 @@ use {
 const INIT_AUTHORITY: &str = "G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj";
 
 // the public key of the solend program
-const SOLEND: &str = "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo";
+const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]
