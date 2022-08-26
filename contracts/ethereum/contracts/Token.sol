@@ -86,40 +86,40 @@ contract Token is IERC20 {
     address private pendingNewOracle_;
 
     /// @dev emergency council that can trigger the release of the fund
-    address emergencyCouncil_;
+    address private emergencyCouncil_;
 
     /// @dev the largest amount a reward can be to not get quarantined
-    uint maxUncheckedReward_;
+    uint private maxUncheckedReward_;
 
     /// @dev [address] => [number of tokens the user won that have been quarantined]
-    mapping (address => uint) blockedRewards_;
+    mapping (address => uint) private blockedRewards_;
 
     /// @dev are the asset minting limits enabled?
-    bool mintLimitsEnabled_;
+    bool private mintLimitsEnabled_;
 
     /// @dev if false, emergency mode is active - can be called by either the
     /// @dev operator, worker account or emergency council
-    bool noEmergencyMode_;
+    bool private noEmergencyMode_;
 
     /// @dev amount of fluid tokens that can be minted
     /// @dev only editable by the oracle
-    uint remainingGlobalMint_;
+    uint private remainingGlobalMint_;
 
     /// @dev the mint limit per user
-    uint userMintLimit_;
+    uint private userMintLimit_;
 
     /// @dev the block number in which user mint limits were last reset
-    uint userMintResetBlock_;
+    uint private userMintResetBlock_;
 
     /// @dev account to use that created the contract (multisig account)
     address private operator_;
 
     /// @dev [user] => [amount the user has minted]
-    mapping (address => uint) userAmountMinted_;
+    mapping (address => uint) private userAmountMinted_;
 
     /// @dev [user] => [last block the user minted on]
     /// @dev (if this is <userMintResetBlock_, reset the amount minted to 0)
-    mapping (address => uint) userLastMintedBlock_;
+    mapping (address => uint) private userLastMintedBlock_;
 
     /**
      * @notice initializer function - sets the contract's data
