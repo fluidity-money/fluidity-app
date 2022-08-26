@@ -1,12 +1,12 @@
 package state
 
 import (
-	"os"
 	"context"
+	"os"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/go-redis/redis/v8"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 func init() {

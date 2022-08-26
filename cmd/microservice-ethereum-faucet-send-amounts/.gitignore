@@ -1,4 +1,4 @@
+*.out
+lint
 docker
 test
-lint
-microservice-ethereum-faucet-send-amounts

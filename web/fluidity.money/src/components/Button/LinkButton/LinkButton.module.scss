@@ -1,0 +1,64 @@
+@import "../../../styles/config.scss";
+
+.button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: max-content;
+  padding: 2px;
+  gap: 4px;
+  border: solid 2px transparent;
+  border-radius: 0;
+
+  &:hover {
+    background-color: $fluidWhite;
+    border: solid 2px $fluidBlack;
+    .text {
+      color: $fluidBlack;
+    }
+    .icon {
+      -webkit-filter: grayscale(1) invert(1);
+      filter: grayscale(1) invert(1);
+    }
+  }
+
+  &:focus {
+    background-color: transparent;
+    border: solid 2px $textGrey;
+    border-radius: 2px;
+    .text {
+      color: $fluidWhite;
+    }
+    .icon {
+      -webkit-filter: grayscale(0) invert(0);
+      filter: grayscale(0) invert(0);
+    }
+  }
+}
+
+.small {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.medium {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.large {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0.05em;
+}

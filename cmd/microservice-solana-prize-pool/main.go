@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
-	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -49,7 +49,18 @@ const (
 func pubkeyFromEnv(env string) solanaGo.PublicKey {
 	pubkeyString := util.GetEnvOrFatal(env)
 
-	pubkey := solanaGo.MustPublicKeyFromBase58(pubkeyString)
+	pubkey, err := solanaGo.PublicKeyFromBase58(pubkeyString)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to decode public key %s",
+				env,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	return pubkey
 }
@@ -103,7 +114,13 @@ func getPrizePool(solanaClient *solana.SolanaRPCHandle, fluidityPubkey, fluidMin
 	prizePool := int64(tvl - mintSupply)
 
 	log.Debug(func(k *log.Log) {
-		k.Format("Got TVL %d, supply %d, unscaled prize pool %d, for pubkey %v", tvl, mintSupply, prizePool, fluidMintPubkey.String())
+		k.Format(
+			"Got TVL %d, supply %d, unscaled prize pool %d, for pubkey %v",
+			tvl,
+			mintSupply,
+			prizePool,
+			fluidMintPubkey.String(),
+		)
 	})
 
 	// return the whole amount in the unit of that token
@@ -112,12 +129,13 @@ func getPrizePool(solanaClient *solana.SolanaRPCHandle, fluidityPubkey, fluidMin
 
 func main() {
 	var (
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		fluidityPubkey = pubkeyFromEnv(EnvFluidityPubkey)
 		tvlDataPubkey  = pubkeyFromEnv(EnvTvlDataPubkey)
 		solendPubkey   = pubkeyFromEnv(EnvSolendPubkey)
 
 		payerPrikey    = util.GetEnvOrFatal(EnvPayerPrikey)
-		solanaRpcUrl   = util.GetEnvOrFatal(EnvSolanaRpcUrl)
 		updateInterval = util.GetEnvOrFatal(EnvUpdateInterval)
 		tokensList_    = util.GetEnvOrFatal(EnvTokensList)
 	)

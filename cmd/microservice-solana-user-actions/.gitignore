@@ -1,4 +1,4 @@
-microservice-solana-user-actions
+*.out
+lint
 docker
 test
-lint

@@ -1,18 +1,18 @@
 package main
 
 import (
-	"regexp"
+	"crypto/sha256"
 	"fmt"
 	"math"
-	"crypto/sha256"
 	"math/rand"
+	"regexp"
 )
 
 const UniquePhraseLength = 32
 
 var (
 	addressFilterEthereumCompiled = regexp.MustCompile("^0x[0-9A-Za-z]{40}$")
-	addressFilterSolanaCompiled = regexp.MustCompile("^[0-9A-Za-z]{43,44}$")
+	addressFilterSolanaCompiled   = regexp.MustCompile("^[0-9A-Za-z]{43,44}$")
 )
 
 func filterAddressEthereum(address string) bool {

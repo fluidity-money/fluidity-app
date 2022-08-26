@@ -213,6 +213,7 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
 
 .white-primary-text {
   font-family: Manrope;
+  font-size: 1.2rem;
   font-style: normal;
   font-weight: 700;
   background: white;
@@ -230,10 +231,21 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   text-align: start;
 }
 
+.margin-right-10 {
+  margin-right: 10px;
+}
+
+.margin-left-10 {
+  margin-left: 10px;
+}
+
+.margin-top-10 {
+  margin-top: 10px;
+}
 // font sizing
 
 // $f-sizing: (xx-small, x-small, small, smaller, medium, x-large, xx-large);

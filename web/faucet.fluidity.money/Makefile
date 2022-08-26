@@ -68,7 +68,8 @@ ${FRONTEND_BUILD}: js assets
 
 docker-frontend: ${FRONTEND_SRC}
 	@${DOCKER_BUILD} \
-		--build-arg=REACT_APP_FLU_API_URI="${REACT_APP_FLU_API_URI}" \
+		${DOCKERFLAGS} \
+		${DOCKER_BUILD_ARGS} \
 		-t "${ORG_ROOT}/${REPO}-frontend" \
 		-f Dockerfile.frontend \
 		.
@@ -77,3 +78,6 @@ docker-frontend: ${FRONTEND_SRC}
 
 watch:
 	@${NPX_WEBPACK} watch
+
+clean:
+	rm -f docker-backend docker-frontend

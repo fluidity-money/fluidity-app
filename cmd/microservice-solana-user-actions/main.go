@@ -3,13 +3,13 @@ package main
 import (
 	"strconv"
 
+	solLib "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -33,26 +33,6 @@ const (
 
 // SplProgramId is the program id of the SPL token program
 const SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
-// extracts instructions and innerInstructions from a solana transaction
-func getAllInstructions(result solTypes.TransactionResult) []solTypes.TransactionInstruction {
-	var (
-		instructions = result.Transaction.Message.Instructions
-		innerInstructions = result.Meta.InnerInstructions
-	)
-
-	instructionsLen := len(instructions) + len(innerInstructions)
-
-	allInstructions := make([]solTypes.TransactionInstruction, instructionsLen)
-
-	allInstructions = append(allInstructions, instructions...)
-
-	for _, inner := range innerInstructions {
-		allInstructions = append(allInstructions, inner.Instructions...)
-	}
-
-	return allInstructions
-}
 
 func main() {
 	var (
@@ -83,7 +63,6 @@ func main() {
 		)
 
 		var (
-			transfers                  = make([]user_actions.UserAction, 0)
 			bufferedUserActions        = make([]user_actions.UserAction, 0)
 			bufferedParsedTransactions = make([]worker.SolanaParsedTransaction, 0)
 		)
@@ -99,12 +78,13 @@ func main() {
 			}
 
 			var (
+				transfers = make([]user_actions.UserAction, 0)
+
 				signature         = transaction.Signature
 				transactionResult = transaction.Result
 				accountKeys       = transactionResult.Transaction.Message.AccountKeys
 				tokenBalances     = transactionResult.Meta.PostTokenBalances
 				adjustedFee       = transaction.AdjustedFee
-				sig               = transaction.Signature
 			)
 
 			log.Debug(func(k *log.Log) {
@@ -125,7 +105,7 @@ func main() {
 				}
 			}
 
-			allInstructions := getAllInstructions(transactionResult)
+			allInstructions := solLib.GetAllInstructions(transactionResult)
 
 			for _, instruction := range allInstructions {
 
@@ -145,7 +125,7 @@ func main() {
 				switch accountKeys[instruction.ProgramIdIndex] {
 				case fluidityProgramId:
 					winner1, winner2, swapWrap, swapUnwrap, err = processFluidityTransaction(
-						sig,
+						signature,
 						instruction,
 						accountKeys,
 						fluidityOwners,
@@ -154,7 +134,7 @@ func main() {
 
 				case SplProgramId:
 					transfer1, transfer2, err = processSplTransaction(
-						sig,
+						signature,
 						instruction,
 						adjustedFee,
 						accountKeys,
@@ -174,7 +154,7 @@ func main() {
 
 				if transfer1 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a transfer!"
+						k.Message = "Found a transfer!"
 					})
 
 					transfers = append(transfers, *transfer1)
@@ -183,7 +163,7 @@ func main() {
 
 				if transfer2 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a transfer!"
+						k.Message = "Found a transfer!"
 					})
 
 					transfers = append(transfers, *transfer2)
@@ -192,7 +172,7 @@ func main() {
 
 				if winner1 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a winner!"
+						k.Message = "Found a winner!"
 					})
 
 					queue.SendMessage(winners.TopicWinnersSolana, winner1)
@@ -200,7 +180,7 @@ func main() {
 
 				if winner2 != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a winner!"
+						k.Message = "Found a winner!"
 					})
 
 					queue.SendMessage(winners.TopicWinnersSolana, winner2)
@@ -208,7 +188,7 @@ func main() {
 
 				if swapWrap != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found a wrap!"
+						k.Message = "Found a wrap!"
 					})
 
 					bufferedUserActions = append(bufferedUserActions, *swapWrap)
@@ -216,7 +196,7 @@ func main() {
 
 				if swapUnwrap != nil {
 					log.App(func(k *log.Log) {
-					    k.Message = "Found an unwrap!"
+						k.Message = "Found an unwrap!"
 					})
 
 					bufferedUserActions = append(bufferedUserActions, *swapUnwrap)
@@ -250,7 +230,10 @@ func main() {
 				UserActions: bufferedUserActions,
 			}
 
-			queue.SendMessage(user_actions.TopicBufferedUserActionsSolana, bufferedUserAction)
+			queue.SendMessage(
+				user_actions.TopicBufferedUserActionsSolana,
+				bufferedUserAction,
+			)
 		}
 	})
 }

@@ -26,17 +26,13 @@ func (pk PublicKey) String() string {
 
 // PublicKeyFromBase58 using btcsuite
 func PublicKeyFromBase58(b58 string) (PublicKey, error) {
-	key, err := base58.Decode(b58)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if len(key) != 32 {
-		return nil, fmt.Errorf("invalid PublicKey length")
-	}
+	key := base58.Decode(b58)
 
 	pk := PublicKey{}
+
+	if len(key) != 32 {
+		return pk, fmt.Errorf("invalid format for public key")
+	}
 
 	copy(pk[0:32], key)
 
@@ -116,10 +112,23 @@ type AccountMeta struct {
 }
 
 func WalletFromPrivateKeyBase58(b58 string) (*Wallet, error) {
-	data, err := base58.Decode(b58)
-	if err != nil {
-		return nil, err
+	data := base58.Decode(b58)
+
+	privateKeyLen := len(data)
+
+	switch privateKeyLen {
+	case 63:
+		fallthrough
+
+	case 64:
+
+	default:
+		return nil, fmt.Errorf(
+			"private key was bad length, not 63 or 64, was %v!",
+			privateKeyLen,
+		)
 	}
+
 	return &Wallet{
 		PrivateKey: data,
 	}, nil
@@ -152,12 +161,6 @@ func (w Wallet) PublicKey() PublicKey {
 }
 
 type AccountMetaSlice []*AccountMeta
-
-var (
-	SysVarClockPubkey = MustPublicKeyFromBase58("SysvarC1ock11111111111111111111111111111111")
-	SystemProgramID   = MustPublicKeyFromBase58("11111111111111111111111111111111")
-	SysVarRentPubkey  = MustPublicKeyFromBase58("SysvarRent111111111111111111111111111111111")
-)
 
 type GenericInstruction struct {
 	AccountValues AccountMetaSlice

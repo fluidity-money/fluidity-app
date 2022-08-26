@@ -1,4 +1,4 @@
-connector-prize-pool-postgres
+*.out
+lint
 docker
 test
-lint

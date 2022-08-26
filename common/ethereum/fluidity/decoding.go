@@ -12,10 +12,10 @@ import (
 
 type RewardData struct {
 	TokenDetails token_details.TokenDetails
-	Winner ethCommon.Address
-	Amount *misc.BigInt
-	StartBlock *misc.BigInt
-	EndBlock *misc.BigInt
+	Winner       ethCommon.Address
+	Amount       *misc.BigInt
+	StartBlock   *misc.BigInt
+	EndBlock     *misc.BigInt
 }
 
 func DecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (RewardData, error) {
@@ -36,25 +36,56 @@ func DecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Rewar
 	}
 
 	var (
-		winnerString = logTopics[1].String()
-		amountInt = decodedData[0].(*big.Int)
+		winnerString  = logTopics[1].String()
+		amountInt     = decodedData[0].(*big.Int)
 		startBlockInt = decodedData[1].(*big.Int)
-		endBlockInt = decodedData[2].(*big.Int)
+		endBlockInt   = decodedData[2].(*big.Int)
 	)
 
 	var (
-		winner = ethCommon.HexToAddress(winnerString)
-		amount = misc.NewBigInt(*amountInt)
+		winner     = ethCommon.HexToAddress(winnerString)
+		amount     = misc.NewBigInt(*amountInt)
 		startBlock = misc.NewBigInt(*startBlockInt)
-		endBlock = misc.NewBigInt(*endBlockInt)
+		endBlock   = misc.NewBigInt(*endBlockInt)
 	)
 
-	rewardData = RewardData {
+	rewardData = RewardData{
 		TokenDetails: token,
-		Winner: winner,
-		Amount: &amount,
-		StartBlock: &startBlock,
-		EndBlock: &endBlock,
+		Winner:       winner,
+		Amount:       &amount,
+		StartBlock:   &startBlock,
+		EndBlock:     &endBlock,
+	}
+
+	return rewardData, nil
+}
+
+func DecodeLegacyRewardData(log typesEth.Log, token token_details.TokenDetails) (RewardData, error) {
+	var (
+		logTopics = log.Topics
+
+		winnerString = logTopics[1].String()
+		amountString = logTopics[2].String()
+
+		winner    = ethCommon.HexToAddress(winnerString)
+		amountHex = ethCommon.HexToHash(amountString)
+		amountBig = amountHex.Big()
+		amount    = misc.NewBigInt(*amountBig)
+
+		blockNumber = log.BlockNumber
+		fakeStartBlock = new(misc.BigInt)
+		fakeEndBlock = new(misc.BigInt)
+	)
+
+	fakeStartBlock.Set(&blockNumber.Int)
+	fakeEndBlock.Set(&blockNumber.Int)
+
+	rewardData := RewardData{
+		TokenDetails: token,
+		Winner:       winner,
+		Amount:       &amount,
+		StartBlock:   fakeStartBlock,
+		EndBlock:     fakeEndBlock,
 	}
 
 	return rewardData, nil

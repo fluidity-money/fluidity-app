@@ -1,0 +1,83 @@
+@use '../../../common' as *;
+
+.button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: max-content;
+  padding: 2px;
+  gap: 4px;
+  border: solid 2px transparent;
+  border-radius: 0;
+  text-transform: uppercase;
+  color: map-get($text, "prominent");
+  background-color: transparent;
+  cursor: pointer;
+  .icon {
+    display: inline-block;
+    stroke: map-get($text, "prominent");
+  }
+
+  &:hover:enabled {
+    background-color: map-get($bg, "alternate");
+    border: solid 2px $black;
+    .text {
+      color: $black;
+    }
+    .icon {
+      display: inline-block;
+      stroke: $black;
+    }
+  }
+
+  &:focus:enabled {
+    background-color: transparent;
+    border: solid 2px map-get($border, "focus");
+    border-radius: 2px;
+    .text {
+      color: map-get($text, "prominent");
+    }
+    .icon {
+      display: inline-block;
+      stroke: map-get($text, "prominent");
+    }
+  }
+  
+  &:disabled {
+    cursor: default;
+    .text {
+      color: map-get($text, "disabled");
+    }
+    .icon {
+      display: inline-block;
+      stroke: map-get($text, "disabled");
+    }
+  }
+}
+
+.small {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.medium {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.large {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0.05em;
+}

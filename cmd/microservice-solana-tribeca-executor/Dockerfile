@@ -1,10 +1,12 @@
-
-FROM fluidity/build-container:latest
+FROM fluidity/runtime-node-container:latest
 
 WORKDIR /usr/local/src/fluidity/cmd/microservice-solana-tribeca-executor
 
 COPY . .
+RUN make
 
-RUN make build
+ENTRYPOINT [ \
+	"wait-for-amqp", \
+	"./start.sh" \
+]
 
-ENTRYPOINT [ "./start.sh" ]

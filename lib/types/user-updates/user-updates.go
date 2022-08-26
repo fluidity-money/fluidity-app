@@ -12,4 +12,3 @@ type Update struct {
 	UserAction *user_actions.UserAction `json:"user_action"`
 	PrizePool  *prize_pool.PrizePool    `json:"prize_pool"`
 }
-

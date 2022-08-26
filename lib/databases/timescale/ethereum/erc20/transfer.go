@@ -1,10 +1,10 @@
 package erc20
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/timescale"
-	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum/erc20"
 	"fmt"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum/erc20"
 )
 
 type Transfer = erc20.Transfer

@@ -7,6 +7,9 @@ const (
 	// should be turned on.
 	EnvDebug = `FLU_DEBUG`
 
+	// EnvDebugDieFast if set to true, die immediately for testing
+	EnvDebugDieFast = `FLU_DEBUG_DIE_FAST`
+
 	// EnvSentryUrl to use for logging application logs and errors
 	EnvSentryUrl = `FLU_SENTRY_URL`
 

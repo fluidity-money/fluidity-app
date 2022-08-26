@@ -8,13 +8,13 @@
     "image": "img/TokenIcons/usdtIcon.svg",
     "pinned": true,
     "amount": "0.0",
-    "obligationAccount": "EHxPXaojrnNGmUDBqz8fCbcdgYswn9MpNHtKMR6WkY7z",
-    "dataAccount": "2PjRnkPxcpCZpokn45B23GLEYiwJnWgcfjXNQZ1E55ze"
+    "obligationAccount": "2VmszETnb3HkvuMKYqTaPbr7zWh8jfhHut6bUQPwAdrR",
+    "dataAccount": "9hKfDTt2C7Q9NDHADQpaGTuQjmotCHfvkrmjmaYonEjy"
   },
   {
     "symbol": "fUSDT",
     "name": "FLUID USDT",
-    "mintAddress": "Dx8dUQ8p8zbQwv7jvXqaEdYWcK7AroNifHbcAC7YYRjg",
+    "mintAddress": "97JpYk6S7i9ydzjNwb92DQEfsA1KUUWSwnWGaGDFe6bk",
     "decimals": 6,
     "colour": "rgb(36, 163, 124)",
     "image": "img/TokenIcons/usdtIcon.svg",
@@ -30,13 +30,13 @@
     "image": "img/TokenIcons/usdcIcon.svg",
     "pinned": true,
     "amount": "0.0",
-    "obligationAccount": "AzC4PyevxfhrRcY4x7Xm94PQyf9nfjcheLsSiE53Rcy",
-    "dataAccount": "DDuNyoNKZMM2fSanMKUjwhtwkY5Jcg85sMoR98fsYKjU"
+    "obligationAccount": "HbmfhzwMF71jWxfKoD7sjCLrsVhvt2zEEux8t8oWqFAH",
+    "dataAccount": "7ZaehFMj49vvLQbRpWhfv1evF1c8jMcuLkXy4YFAfb52"
   },
   {
     "symbol": "fUSDC",
     "name": "FLUID USDC",
-    "mintAddress": "5jsh1taLrqNgiV3UN8diDxZAXRC7T4iALfNWwThBksoj",
+    "mintAddress": "2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa",
     "decimals": 6,
     "colour": "#2775c9",
     "image": "img/TokenIcons/usdcIcon.svg",

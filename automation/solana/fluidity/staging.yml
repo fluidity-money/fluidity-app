@@ -1,0 +1,34 @@
+DOCKERFILE_PATH: ./web/solana.fluidity.money
+
+SERVICES:
+  - FLUIDITY_BACKEND:
+      SERVICE_NAME: solana-fluidity-money-backend
+      DOCKER_IMAGE: solana.fluidity.money-backend
+      ENV_FLU_WORKER_ID: solana-staging-solana.fluidity.money-backend
+      TARGET_GROUP: flu-staging-sol-be-tg
+  
+  - FLUIDITY_FRONTEND:
+      SERVICE_NAME: solana-fluidity-money-frontend
+      DOCKER_IMAGE: solana.fluidity.money-frontend
+      TARGET_GROUP: flu-staging-sol-fe-tg
+      DOCKER_ARGS:
+        REACT_APP_API_URL: https://backend.staging.solana.fluidity.money
+        REACT_APP_WEBSOCKET: wss://backend.staging.solana.fluidity.money/updates
+        REACT_APP_FLUID_PROGRAM_ID: HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR
+        REACT_APP_FLU_MINT_USDC: Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv
+        REACT_APP_FLU_OBLIGATION_USDC: J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A
+        REACT_APP_FLU_DATA_ACCOUNT_USDC: nZtk79qJyUXMg53SYL9wZQnMUjwJeTFGTfKmFaEehKq
+        REACT_APP_BASE_MINT_USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+        REACT_APP_FLU_MINT_USDT: D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8
+        REACT_APP_FLU_OBLIGATION_USDT: 446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca
+        REACT_APP_FLU_DATA_ACCOUNT_USDT: C8csqsv1NxAC2ge1ZAvToaHZa8VsffmxewHHYJ7JuDVD
+        REACT_APP_BASE_MINT_USDT: Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
+        REACT_APP_FLU_MINT_UXD: 7Taua7k6kX2UTD1joXTsyQ8jodAzUEjmxXfCn5zvU55m
+        REACT_APP_FLU_OBLIGATION_UXD: HH4BzUBsKwenYsGQfYB6Tyj739XXxxjFVE6oMZ6xiDsY
+        REACT_APP_FLU_DATA_ACCOUNT_UXD: 8cVaBxKMLr2thoFxtGoBjW4Lo1xJBJQSu71uo9TCtm2s
+        REACT_APP_BASE_MINT_UXD: 7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT
+        REACT_APP_FLU_MINT_USDH: 8Rm2VXdf4AjvJt6enC6rhj2qBKpaNUTPQX3j3N4aKChA
+        REACT_APP_FLU_OBLIGATION_USDH: HNKCUYi3Z4xPMQTjTy5tfpJEmCymw3CmDZKZjaufvxAV
+        REACT_APP_FLU_DATA_ACCOUNT_USDH: HGFswjdGsXgp9n2ahQyyY317yC2K3Dj1Gmh4iJ81girr
+        REACT_APP_BASE_MINT_USDH: USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX
+        REACT_APP_SOL_NETWORK: mainnet

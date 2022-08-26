@@ -65,14 +65,13 @@ const (
 	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
 )
 
-const (
-	// SplProgramId is the program id of the SPL token program
-	SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-)
+// SplProgramId is the program id of the SPL token program
+const SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
 
 func main() {
 	var (
-		rpcUrl           = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		rpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		payerPrikey      = util.GetEnvOrFatal(EnvPayerPrikey)
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 
@@ -117,7 +116,18 @@ func main() {
 		})
 	}
 
-	splPubkey := solana.MustPublicKeyFromBase58(SplProgramId)
+	splPubkey, err := solana.PublicKeyFromBase58(SplProgramId)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to decode the spl program id %v",
+				SplProgramId,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	queue.GetMessages(topicWinnerQueue, func(message queue.Message) {
 
@@ -187,10 +197,33 @@ func main() {
 
 		recentBlockHash := recentBlockHashResultValue.Blockhash
 
-		var (
-			aPubkey = solana.MustPublicKeyFromBase58(senderAddress)
-			bPubkey = solana.MustPublicKeyFromBase58(recipientAddress)
-		)
+		aPubkey, err := solana.PublicKeyFromBase58(senderAddress)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode the sender address %#v in transaction hash %#v",
+					senderAddress,
+					winningTransactionHash,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		bPubkey, err := solana.PublicKeyFromBase58(recipientAddress)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode the recipient address %#v in transaction hash %#v",
+					recipientAddress,
+					winningTransactionHash,
+				)
+
+				k.Payload = err
+			})
+		}
 
 		var (
 			// solanaAccountMetaSpl is used to know where to send transactions

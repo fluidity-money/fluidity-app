@@ -1,4 +1,4 @@
-microservice-solana-prize-pool
+*.out
+lint
 docker
 test
-lint

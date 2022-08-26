@@ -1,0 +1,7 @@
+
+FROM alpine:3.16 AS build
+
+RUN apk add --no-cache \
+	nodejs \
+	npm \
+	make

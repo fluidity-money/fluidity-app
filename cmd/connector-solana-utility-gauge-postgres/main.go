@@ -12,7 +12,6 @@ import (
 	types "github.com/fluidity-money/fluidity-app/lib/types/payout"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	goSolana "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/near/borsh-go"
 )
 
@@ -38,18 +37,41 @@ const SolanaChainName = "solana"
 
 func main() {
 	var (
-		solanaRpcUrl  = util.GetEnvOrFatal(EnvSolanaRpcUrl)
-		solanaWsUrl   = util.GetEnvOrFatal(EnvSolanaWsUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+		solanaWsUrl  = util.PickEnvOrFatal(EnvSolanaWsUrl)
+
 		solanaNetwork = util.GetEnvOrFatal(EnvSolanaNetwork)
 
-		gaugemeisterPubkey    = goSolana.MustPublicKeyFromBase58(EnvGaugemeisterPubkey)
-		utilityGaugeProgramId = goSolana.MustPublicKeyFromBase58(EnvUtilityGaugeProgramId)
+		gaugemeisterPubkey_    = util.GetEnvOrFatal(EnvGaugemeisterPubkey)
+		utilityGaugeProgramId_ = util.GetEnvOrFatal(EnvUtilityGaugeProgramId)
 
 		accountNotificationChan = make(chan solana.AccountNotification)
 		errChan                 = make(chan error)
 	)
 
-	solanaClient, _ := goSolana.SolanaCallManager(solanaRpcUrl)
+	solanaClient, _ := solana.SolanaCallManager(solanaRpcUrl)
+
+	gaugemeisterPubkey, err := solana.PublicKeyFromBase58(
+		gaugemeisterPubkey_,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to decode Gaugemeister's public key!"
+			k.Payload = err
+		})
+	}
+
+	utilityGaugeProgramId, err := solana.PublicKeyFromBase58(
+		utilityGaugeProgramId_,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to decode a utility gauge program id!"
+			k.Payload = err
+		})
+	}
 
 	solanaSubscription, err := solana.SubscribeAccount(
 		solanaWsUrl,
@@ -105,7 +127,19 @@ func main() {
 
 			for _, gaugePubkey_ := range gauges {
 
-				gaugePubkey := goSolana.MustPublicKeyFromBase58(gaugePubkey_)
+				gaugePubkey, err := solana.PublicKeyFromBase58(gaugePubkey_)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to decode gauge public key %v, %#v",
+							EnvGaugemeisterPubkey,
+							gaugePubkey_,
+						)
+
+						k.Payload = err
+					})
+				}
 
 				currentGaugePower := types.UtilityGaugePower{
 					Chain:   SolanaChainName,

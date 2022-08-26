@@ -47,11 +47,11 @@ func InsertTvl(update TvlUpdate) {
 	)
 
 	if err != nil {
-	    log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-	        k.Message = "Failed to insert tvl update!"
-	        k.Payload = err
-	    })
+			k.Message = "Failed to insert tvl update!"
+			k.Payload = err
+		})
 	}
 }
 
@@ -77,11 +77,11 @@ func GetDailyAverageTvl(network network.BlockchainNetwork, days int64) *big.Rat 
 	)
 
 	if err != nil {
-	    log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-	        k.Message = "Failed to get daily TVL averages!"
-	        k.Payload = err
-	    })
+			k.Message = "Failed to get daily TVL averages!"
+			k.Payload = err
+		})
 	}
 
 	defer rows.Close()
@@ -94,18 +94,18 @@ func GetDailyAverageTvl(network network.BlockchainNetwork, days int64) *big.Rat 
 
 	for rows.Next() {
 		var (
-			timestamp []byte
+			timestamp    []byte
 			averageBytes []byte
 		)
 
 		err := rows.Scan(&timestamp, &averageBytes)
 
 		if err != nil {
-		    log.Fatal(func (k *log.Log) {
+			log.Fatal(func(k *log.Log) {
 				k.Context = Context
-		        k.Message = "Failed to scan a daily average row!"
-		        k.Payload = err
-		    })
+				k.Message = "Failed to scan a daily average row!"
+				k.Payload = err
+			})
 		}
 
 		averageString := string(averageBytes)
@@ -113,9 +113,9 @@ func GetDailyAverageTvl(network network.BlockchainNetwork, days int64) *big.Rat 
 		dailyAverage, success := new(big.Rat).SetString(averageString)
 
 		if success != true {
-			log.Debug(func (k *log.Log) {
+			log.Debug(func(k *log.Log) {
 				k.Context = Context
-			    k.Format("Failed to read daily average %v as a rational number!", averageString)
+				k.Format("Failed to read daily average %v as a rational number!", averageString)
 			})
 		}
 

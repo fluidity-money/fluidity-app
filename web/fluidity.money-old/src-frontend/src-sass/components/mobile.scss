@@ -1,0 +1,17 @@
+
+@use '../global-variables';
+
+@media only screen and (max-width: 1024px) {
+  .money-designed-to-be-moved-pic-container > img {
+    max-width: 300px !important;
+  }
+}
+
+@media only screen and (max-width: global-variables.$mobile_query) {
+  @import "container/mobile";
+  @import "title/mobile";
+  @import "information-box/mobile";
+  @import "navbar/mobile";
+  @import "input/mobile";
+  @import "social/mobile";
+}

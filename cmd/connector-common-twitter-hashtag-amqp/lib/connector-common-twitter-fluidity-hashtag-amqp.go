@@ -1,7 +1,6 @@
 package connector_common_twitter_fluidity_hashtag_amqp
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -278,62 +277,26 @@ func makeUrl(username, tweetId string) string {
 
 func handleStreaming(stream io.Reader, chanTweets chan twitter.Tweet) error {
 
-	reader := bufio.NewReader(stream)
+	reader := json.NewDecoder(stream)
 
 	for {
-		line, _, err := reader.ReadLine()
-
-		if err == io.EOF {
-			continue
-		}
-
-		if err != nil {
-			return fmt.Errorf(
-				"failed to read a line off the messages being received from twitter! %v",
-				err,
-			)
-		}
-
-		if len(line) == 0 {
-			continue
-		}
-
-		log.Debug(func(k *log.Log) {
-			k.Format(
-				"Got this tweet blob: %#v!",
-				string(line),
-			)
-		})
-
-		if strings.Contains(string(line), "Unauthorized") {
-			return fmt.Errorf(
-				"failed to connect to twitter: Unauthorized! content: %#v",
-				string(line),
-			)
-		}
-
-		if strings.Contains(string(line), "ConnectionException") {
-			return fmt.Errorf(
-				"failed to connect to twitter: ConnectionException! content: %#v",
-				string(line),
-			)
-		}
-
-		if strings.Contains(string(line), "OperationalDisconnect") {
-			return fmt.Errorf(
-				"failed to connect to twitter: OperationalDisconnect! content: %#v",
-				string(line),
-			)
-		}
-
 		var twitterTweet twitterTweet
 
-		if err := json.Unmarshal(line, &twitterTweet); err != nil {
-			return fmt.Errorf(
-				"failed to unmarshal a line off the messages being received from twitter! content %#v %v",
-				string(line),
-				err,
-			)
+		err := reader.Decode(&twitterTweet)
+
+		switch err {
+		case io.EOF:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Twitter connector connection closed!"
+			})
+
+		case nil:
+
+		default:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to decode a tweet off the Twitter queue!"
+				k.Payload = err
+			})
 		}
 
 		var (
@@ -346,23 +309,11 @@ func handleStreaming(stream io.Reader, chanTweets chan twitter.Tweet) error {
 			username string
 		)
 
-		// this seems to be the case consistently and this entire codebase needs
-		// refractoring so doing it this way for now
 		if len(includes) > 0 {
 			username = includes[0].Username
 		}
 
 		url := makeUrl(username, tweetId)
-
-		// if the twitter url doesn't get parsed meaningfully it's likely we have an error
-		if url == "https://twitter.com//status/" {
-			log.Debug(func(k *log.Log) {
-				k.Format(
-					"failed to meaningfully parse the twitter URL, possibly indicates an error %#v!",
-					string(line),
-				)
-			})
-		}
 
 		hashtags := getHashtags(matchingRules)
 

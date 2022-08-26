@@ -8,7 +8,9 @@ import (
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+
+	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
+
 	"github.com/near/borsh-go"
 )
 
@@ -23,9 +25,9 @@ type TokenAmount struct {
 // GetSaberFees by breaking down the log message on the wire. Any errors
 // returned from each stage of breaking down the logs are contained within
 // an error slice, any lookup errors are returned in the final error type
-func GetSaberFees(saberRpcUrl string, transaction worker.SolanaParsedTransaction, saberSwapProgramId string) (feesPaid *big.Rat, logErrors []error, err error) {
+func GetSaberFees(saberRpcUrl string, transaction solTypes.TransactionResult, saberSwapProgramId string) (feesPaid *big.Rat, logErrors []error, err error) {
 
-	logs := transaction.Transaction.Result.Meta.Logs
+	logs := transaction.Meta.Logs
 
 	logErrors = make([]error, len(logs))
 

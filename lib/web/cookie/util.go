@@ -1,11 +1,11 @@
 package cookie
 
 import (
+	"crypto/rand"
+	"encoding/json"
+	"fmt"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/web"
-	"crypto/rand"
-	"fmt"
-	"encoding/json"
 	"io"
 	"net/http"
 )
@@ -22,7 +22,7 @@ func setCorsHeaders(w http.ResponseWriter) {
 }
 
 func generateCookie() string {
-	buf := make([]byte, CookieGeneratedSize / 2)
+	buf := make([]byte, CookieGeneratedSize/2)
 
 	if _, err := rand.Read(buf); err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -39,7 +39,7 @@ func generateCookie() string {
 
 // sendEndpointLogin to the user, after creating it and serialising it
 func sendEndpointLogin(w io.Writer, cookieName string, expiration uint64) error {
-	endpointLoginReturn := EndpointLoginReturn {
+	endpointLoginReturn := EndpointLoginReturn{
 		CookieName: cookieName,
 		Expiration: expiration,
 	}

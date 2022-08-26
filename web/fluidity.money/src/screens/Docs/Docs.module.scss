@@ -1,0 +1,147 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 850px;
+  width: 100%;
+  flex-direction: column;
+  background-color: $fluidBlack;
+  @include max-860px {
+    padding-right: 4%;
+  }
+}
+
+.carouselText {
+  h2 {
+    margin-right: 20px;
+    opacity: 1;
+  }
+  background-color: $fluidBlack;
+}
+
+.docsCard {
+  border: 1px solid white;
+  height: 350px;
+  min-width: 350px;
+  margin-right: 20px;
+  margin-bottom: 50px;
+
+  img {
+    height: 60%;
+    width: 100%;
+  }
+
+  h3 {
+    margin: 10px 0 10px 0;
+    padding: 10px;
+  }
+
+  p {
+    padding: 10px;
+    font-family: 'Aeonik';
+    font-size:20px;
+    color: $textGrey;
+  }
+
+  a{
+    color: $textGrey;
+    padding: 10px;
+    font-size: 11px;
+  }
+}
+
+.desktopViewFormInput {
+  padding: 20px;
+  h4 {
+    padding-left: 10px;
+    margin-bottom: 24px;
+  }
+  label {
+    padding: 10px;
+    font-size: 13px;
+  }
+  div {
+    display: flex;
+    background-color: $fluidBlack;
+    padding: 10px;
+    justify-content: space-between;
+    h4 {
+      margin-bottom: 30px;
+      padding-left: 10px;
+    }
+    input {
+      width: 80%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-top: 0px;
+      border-right: 0px;
+      border-left: 0px;
+      border-radius: 4px;
+      box-sizing: border-box;
+      background-color: $fluidBlack;
+      font-size: 20px;
+      color: $textGrey;
+      margin:  0 1% 10px 0;
+    }
+  }
+  @include max-860px {
+    display: none;
+  }
+  @include min-861px {
+    display: block;
+  }
+}
+
+.mobileViewFormInput {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ 
+  background-color: $fluidBlack;
+  div {
+    padding: 30px 10px 10px 10px;
+    width: 80%;
+    background-color: rgb(17, 17, 17);
+    p {
+      font-size: large;
+      margin-top: 10px;
+      color: $textGrey;
+    }
+    form {
+      padding-bottom: 20px;
+      div {
+        display: flex;
+        flex-direction: column;
+        width: 95%;
+        label {
+          margin: 20px 0  10px 5px;
+        }
+        input {
+          width: 100%;
+          padding: 12px 20px 10px 5px;
+          display: inline-block;
+          border: 1px solid #ccc;
+          border-top: 0px;
+          border-right: 0px;
+          border-left: 0px;
+          border-radius: 4px;
+          box-sizing: border-box;
+          background-color:  rgb(17, 17, 17);
+          font-size: 20px;
+          color: $textGrey;
+          margin:  0 1% 10px 0;
+        }
+      }
+    }
+  }
+  @include max-860px {
+    display: flex;
+  }
+  @include min-861px {
+    display: none;
+  }
+}

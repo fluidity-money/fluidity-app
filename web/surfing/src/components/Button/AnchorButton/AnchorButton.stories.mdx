@@ -1,0 +1,67 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import AnchorButton from "./AnchorButton";
+
+<Meta 
+    title="Button/Anchor Button"
+    component={AnchorButton}
+    parameters={{
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+        }
+    }}
+/>
+
+export const Template = ({children, ...props}) => <AnchorButton {...props}>
+    {children}
+</AnchorButton>;
+
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Anchor Button</Title>
+    <Subtitle>Button to visit Anchor points</Subtitle>
+    
+    <h2>Default</h2>
+    <Story
+        name="Anchor Button Default"
+        args={{
+            children: "Distributions",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Hover</h2>
+    <Story
+        name="Anchor Button Hover"
+        args={{
+            className: "hover",
+            children: "Distributions",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Focus</h2>
+    <Story
+        name="Anchor Button Focus"
+        args={{
+            className: "focus",
+            children: "Distributions",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Disabled</h2>
+    <Story
+        name="Anchor Button Disabled"
+        args={{
+            children: "Distributions",
+            disabled: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

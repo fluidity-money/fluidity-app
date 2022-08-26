@@ -1,5 +1,7 @@
+import {SupportedContracts} from "util/contractList";
+
 export type TokenDetails = {
-  token_short_name: string;
+  token_short_name: SupportedContracts;
   token_decimals: number;
 };
 
@@ -40,24 +42,30 @@ export type Routes = {
   // Transaction History API Route
   "/my-history": WebsocketUserAction[];
 
-  // Pending wins by user that can be manually transacted    
+  // Pending wins by user that can be manually transacted
   "/pending-rewards": {
-    token_details: TokenDetails;
-    transaction_hash: string;
-    from_address: string;
-    to_address: string;
-    winning_amount: string;
-  }[];
+    [token: string]: {
+      token_details: TokenDetails;
+      winner: string;
+      amount: string;
+      first_block: string;
+      last_block: string;
+    }
+  };
 
   "/manual-reward": {
-    reward: {
-      transaction_hash: string,
-      from: string,
-      to: string,
-      winning_amount: string;
-    };
-    // Go encodes []byte as a `\x`-escaped B64 hex string
-    signature: string
+    error: string,
+    payload: {
+      reward: {
+        token: TokenDetails;
+        winner: string;
+        win_amount: string;
+        first_block: string;
+        last_block: string;
+      };
+      // Go encodes []byte as a `\x`-escaped B64 hex string
+      signature: string
+    }
   }
 };
 

@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/fluidity-money/fluidity-app/web/solana.fluidity.money/lib"
 	"github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
+	"github.com/fluidity-money/fluidity-app/web/solana.fluidity.money/lib"
 )
 
 func main() {
@@ -20,6 +20,8 @@ func main() {
 	web.JsonEndpoint("/past-winnings", api_fluidity_money.HandlePastWinnings)
 
 	web.JsonEndpoint("/my-history", api_fluidity_money.HandleMyHistory)
+
+	web.JsonEndpoint("/my-mint-limit", api_fluidity_money.HandleMyMintLimit)
 
 	updateNotificationsHandlerSolana := api_fluidity_money.HandleUpdateNotifications(
 		updateMessagesSolana,

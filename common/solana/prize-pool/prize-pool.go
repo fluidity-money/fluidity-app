@@ -7,10 +7,9 @@ import (
 	"math/big"
 	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 
-	"github.com/fluidity-money/fluidity-app/common/solana"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
 )
 
@@ -27,18 +26,18 @@ type tvlDataAccount struct {
 // so we inline our own response type here in order to let things decode correctly
 type (
 	simulateTransactionResponse struct {
-		Value   simulateTransactionValue `json:"value"`
-		Context solanaRpc.Context        `json:"context"`
+		Value   SimulateTransactionValue `json:"value"`
+		Context solana.Context                  `json:"context"`
 	}
 
-	simulateTransactionValue struct {
+	SimulateTransactionValue struct {
 		TransactionError interface{}                  `json:"err"`
 		Logs             []string                     `json:"logs"`
-		Accounts         []simulateTransactionAccount `json:"accounts"`
+		Accounts         []SimulateTransactionAccount `json:"accounts"`
 		UnitsConsumed    uint64                       `json:"unitsConsumed"`
 	}
 
-	simulateTransactionAccount struct {
+	SimulateTransactionAccount struct {
 		Lamports   uint64   `json:"lamports"`
 		Owner      string   `json:"owner"`
 		Data       []string `json:"data"` // this can be an object if we use JSON encoding in our request params
@@ -112,7 +111,7 @@ func GetTvl(client *solana.SolanaRPCHandle, fluidityPubkey, tvlDataPubkey, solen
 		)
 	}
 
-	// solana-go has the response type wrong, so we manually call the method
+	// solana-go had the response type wrong, so we manually call the method
 	// and decode into our own response type
 
 	response_json := client.RawInvoke(
@@ -133,28 +132,81 @@ func GetTvl(client *solana.SolanaRPCHandle, fluidityPubkey, tvlDataPubkey, solen
 
 	value := response.Value
 
-	if err := value.TransactionError; err != nil {
-		return 0, fmt.Errorf(
-			"solana error simulating logtvl transaction! %v",
-			err,
-		)
+	if err := HandleTransactionError(value); err != nil {
+		return 0, err
 	}
 
 	tvlAccount := new(tvlDataAccount)
 
-	decodeAccountData(value.Accounts[0], tvlAccount)
+	err = decodeAccountData(value.Accounts[0], tvlAccount)
+
+	if err != nil {
+		return 0, fmt.Errorf(
+			"failed to decode account data: %v",
+			err,
+		)
+	}
 
 	return tvlAccount.Tvl, nil
 }
 
-func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
+// handleTransactionError to handle a TVL transaction error response
+func HandleTransactionError(value SimulateTransactionValue) error {
+	err := value.TransactionError
+	if err == nil {
+		return nil
+	}
+
+	// check switchboard 0x2a error with the condition
+	// value.TransactionError["InstructionError"][1]["Custom"] == 42
+
+	errMap, ok := value.TransactionError.(map[string]interface{})
+	if !ok || errMap["InstructionError"] == nil {
+		return logTvlError(err, value.Logs)
+	}
+
+	instructionErrors, ok := errMap["InstructionError"].([]interface{})
+	if !ok || len(instructionErrors) < 2 {
+		return logTvlError(err, value.Logs)
+	}
+
+	instructionErrMap, ok := instructionErrors[1].(map[string]interface{})
+	if !ok {
+		return logTvlError(err, value.Logs)
+	}
+
+	customError := instructionErrMap["Custom"]
+	if customError == nil {
+		return logTvlError(err, value.Logs)
+	}
+
+	errNum, ok := customError.(float64)
+	if ok && errNum == 42 {
+		return fmt.Errorf(
+			"Failed to simulate logtvl transaction: stale oracle error 42!",
+		)
+	}
+
+	return logTvlError(err, value.Logs)
+}
+
+// logTvlError for an unclassified TVL error where we display the logs
+func logTvlError(err interface{}, logs []string) error {
+	return fmt.Errorf(
+		"Solana error simulating logtvl transaction! %v, logs: %v",
+		err,
+		logs,
+	)
+}
+
+func decodeAccountData(data SimulateTransactionAccount, out interface{}) error {
 	dataBase64 := data.Data[0]
 
 	dataBinary, err := base64.StdEncoding.DecodeString(dataBase64)
 
 	if err != nil {
 		return fmt.Errorf(
-			"Failed to decode account data from base64! %v",
+			"failed to decode account data from base64: %v",
 			err,
 		)
 	}
@@ -163,7 +215,7 @@ func decodeAccountData(data simulateTransactionAccount, out interface{}) error {
 
 	if err != nil {
 		return fmt.Errorf(
-			"failed to decode tvl data! %v",
+			"failed to decode tvl data: %v",
 			err,
 		)
 	}

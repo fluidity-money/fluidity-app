@@ -9,6 +9,7 @@ import (
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 
 	spl_token "github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 )
@@ -39,7 +40,8 @@ type tokenMap map[faucetTypes.FaucetSupportedToken]faucetTokenDetails
 
 func main() {
 	var (
-		solanaRpcUrl        = util.GetEnvOrFatal(EnvSolanaRpcUrl)
+		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
+
 		solanaTokenList_    = util.GetEnvOrFatal(EnvTokensList)
 		accountDetailsList_ = util.GetEnvOrFatal(EnvSolanaAccountDetails)
 

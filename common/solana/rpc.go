@@ -1,3 +1,6 @@
+// most of this code was taken from
+// https://github.com/gagliardetto/solana-go
+
 package solana
 
 import (
@@ -57,7 +60,7 @@ type (
 )
 
 type Subscription struct {
-	requestCloseChan chan struct{}
+	requestCloseChan chan bool
 }
 
 type SolanaPartialRpcBody struct {
@@ -72,11 +75,11 @@ func SubscribeAccount(url, programId string, messageChan chan AccountNotificatio
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 
 	if err != nil {
-		return nil, fmt.Errorf("Error dialling the solana websocket: %w", err)
+		return nil, fmt.Errorf("error dialling the solana websocket: %w", err)
 	}
 
 	// user requested close
-	requestCloseChan := make(chan struct{})
+	requestCloseChan := make(chan bool)
 
 	go func() {
 		// read logs
@@ -181,24 +184,29 @@ func subscribe(message interface{}, conn *websocket.Conn) (int, error) {
 	messageBytes, err := json.Marshal(message)
 
 	if err != nil {
-		return 0, fmt.Errorf("Failed to serialize message to JSON: %w", err)
+		return 0, fmt.Errorf(
+			"failed to serialize message to JSON: %w",
+			err,
+		)
 	}
 
 	err = conn.WriteMessage(websocket.TextMessage, messageBytes)
 
 	if err != nil {
-		return 0, fmt.Errorf("Error sending subscription message: %w", err)
+		return 0, fmt.Errorf("error sending subscription message: %w", err)
 	}
 
 	var subscriptionRes SubscriptionResponse
 
 	if err := conn.ReadJSON(&subscriptionRes); err != nil {
-		return 0, fmt.Errorf("Error reading subscription response: %w", err)
+		return 0, fmt.Errorf("error reading subscription response: %w", err)
 	}
 
 	if subscriptionRes.Error.Message != "" {
-		err := fmt.Errorf("Error subscribing to solana logs: %s", subscriptionRes.Error.Message)
-		return 0, err
+		return 0, fmt.Errorf(
+			"error subscribing to solana logs: %s",
+			subscriptionRes.Error.Message,
+		)
 	}
 
 	return subscriptionRes.Id, nil
@@ -206,7 +214,7 @@ func subscribe(message interface{}, conn *websocket.Conn) (int, error) {
 
 // Close closes a solana websocket subscription
 func (s Subscription) Close() {
-	s.requestCloseChan <- struct{}{}
+	s.requestCloseChan <- true
 }
 
 type RPCClient struct {

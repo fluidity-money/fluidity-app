@@ -1,4 +1,4 @@
-connector-solana-amqp
+*.out
+lint
 docker
 test
-lint

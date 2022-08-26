@@ -45,7 +45,16 @@ func (tokenDetails tokenMap) addAccountDetails(accountDetailsList_ string) {
 			})
 		}
 
-		pdaPubkey := solana.MustPublicKeyFromBase58(accountSeparated[0])
+		pdaPubkey_ := accountSeparated[0]
+
+		pdaPubkey, err := solana.PublicKeyFromBase58(pdaPubkey_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format("Failed to decode PDA public key %#v", pdaPubkey_)
+				k.Payload = err
+			})
+		}
 
 		baseTokenName := accountSeparated[1]
 

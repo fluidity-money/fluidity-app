@@ -63,6 +63,19 @@ const fluidityContractAbiString = `[
 	  ],
 	  "name": "Reward",
 	  "type": "event"
+  },
+  {
+	  "inputs": [
+	  { "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
+	  { "internalType": "address", "name": "from", "type": "address" },
+	  { "internalType": "address", "name": "to", "type": "address" },
+	  { "internalType": "uint256[]", "name": "balls", "type": "uint256[]" },
+	  { "internalType": "uint256[]", "name": "payouts", "type": "uint256[]" }
+	  ],
+	  "name": "reward",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
   }
 ]`
 
@@ -70,8 +83,8 @@ var fluidityContractAbi ethAbi.ABI
 
 // the Reward struct from solidity, to be passed to batchReward
 type RewardArg struct {
-	Winner     ethCommon.Address `json:"from"`
-	WinAmount  *big.Int          `json:"amount"`
+	Winner    ethCommon.Address `json:"from"`
+	WinAmount *big.Int          `json:"amount"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -126,9 +139,9 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 	)
 
 	var (
-		rewards = make([]RewardArg, len(announcement))
+		rewards          = make([]RewardArg, len(announcement))
 		globalFirstBlock = new(big.Int)
-		globalLastBlock = new(big.Int)
+		globalLastBlock  = new(big.Int)
 	)
 
 	// set a default for the min block
@@ -136,15 +149,15 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 
 	for i, reward := range announcement {
 		var (
-			winnerString = reward.Winner.String()
-			amountInt = reward.WinAmount
+			winnerString  = reward.Winner.String()
+			amountInt     = reward.WinAmount
 			firstBlockInt = reward.FirstBlock
-			lastBlockInt = reward.LastBlock
+			lastBlockInt  = reward.LastBlock
 
-			winner = ethCommon.HexToAddress(winnerString)
-			amount = &amountInt.Int
+			winner     = ethCommon.HexToAddress(winnerString)
+			amount     = &amountInt.Int
 			firstBlock = &firstBlockInt.Int
-			lastBlock = &lastBlockInt.Int
+			lastBlock  = &lastBlockInt.Int
 		)
 
 		if firstBlock.Cmp(globalFirstBlock) < 0 {
@@ -155,8 +168,8 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 			globalLastBlock.Set(lastBlock)
 		}
 
-		rewardArg := RewardArg {
-			Winner: winner,
+		rewardArg := RewardArg{
+			Winner:    winner,
 			WinAmount: amount,
 		}
 
@@ -205,6 +218,46 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to transact the transfer function on Fluidity's contract! %v",
+			err,
+		)
+	}
+
+	return transaction, nil
+}
+
+// TransactLegacyReawrd using the deprecated single reward function
+func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, hash []byte, addressString string, amount *big.Int) (*ethTypes.Transaction, error) {
+	boundContract := ethAbiBind.NewBoundContract(
+		fluidityAddress,
+		fluidityContractAbi,
+		client,
+		client,
+		client,
+	)
+
+	var (
+		address   = ethCommon.HexToAddress(addressString)
+		balls     = []*big.Int{ big.NewInt(1) }
+		payouts   = []*big.Int{ amount }
+	)
+
+	var hashBytes [32]byte
+	copy(hashBytes[:], hash)
+
+	transaction, err := ethereum.MakeTransaction(
+		boundContract,
+		transactionOptions,
+		"reward",
+		hashBytes,
+		address,
+		address,
+		balls,
+		payouts,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to transact the legacy reward function on Fluidity's contract! %v",
 			err,
 		)
 	}

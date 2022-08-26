@@ -9,12 +9,20 @@ const (
 	// ApplicationSpl is the default application, representing a transfer
 	ApplicationSpl Application = iota
 	ApplicationSaber
+	ApplicationOrca
+	ApplicationRaydium
+	ApplicationAldrinV1
+	ApplicationAldrinV2
 )
 
 // applicationNames is used to map human readable names to their enum varients
 var applicationNames = map[string]Application{
-	"spl":   ApplicationSpl,
-	"saber": ApplicationSaber,
+	"spl":     ApplicationSpl,
+	"saber":   ApplicationSaber,
+	"orca":    ApplicationOrca,
+	"raydium": ApplicationRaydium,
+	"aldrinv1": ApplicationAldrinV1,
+	"aldrinv2": ApplicationAldrinV2,
 }
 
 // ParseApplication based on the name given, looking it up in the internal

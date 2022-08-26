@@ -32,14 +32,13 @@ const (
 	TokenAssociatedProgramAddress = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
 )
 
+// initialised in init.go
 var (
 	// TokenProgramAddressPubkey
-	TokenProgramAddressPubkey = solLib.MustPublicKeyFromBase58(TokenProgramAddress)
+	TokenProgramAddressPubkey solLib.PublicKey
 
 	// TokenAssociatedProgramAddressPubkey
-	TokenAssociatedProgramAddressPubkey = solLib.MustPublicKeyFromBase58(
-		TokenAssociatedProgramAddress,
-	)
+	TokenAssociatedProgramAddressPubkey solLib.PublicKey
 )
 
 type (
@@ -90,7 +89,7 @@ func SendTransfer(solanaClient *solana.SolanaRPCHandle, senderPdaAddress, recipi
 			recipientAccountMeta,
 			solLib.NewAccountMeta(recipientAddress, false, false),
 			tokenMintMeta,
-			solLib.NewAccountMeta(solLib.SystemProgramID, false, false),
+			solLib.NewAccountMeta(solLib.SystemProgramId, false, false),
 			solLib.NewAccountMeta(TokenProgramAddressPubkey, false, false),
 			solLib.NewAccountMeta(solLib.SysVarRentPubkey, false, false),
 		}

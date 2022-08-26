@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
@@ -11,7 +12,18 @@ import (
 func pubkeyFromEnv(env string) solana.PublicKey {
 	pubkeyString := util.GetEnvOrFatal(env)
 
-	pubkey := solana.MustPublicKeyFromBase58(pubkeyString)
+	pubkey, err := solana.PublicKeyFromBase58(pubkeyString)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to decode public key %s",
+				env,
+			)
+
+			k.Payload = err
+		})
+	}
 
 	return pubkey
 }

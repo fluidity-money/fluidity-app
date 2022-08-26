@@ -28,8 +28,8 @@ const (
 )
 
 type (
-	UserAction                = user_actions.UserAction
-	BufferedUserAction        = user_actions.BufferedUserAction
+	UserAction         = user_actions.UserAction
+	BufferedUserAction = user_actions.BufferedUserAction
 )
 
 func NewSwap(network network.BlockchainNetwork, userAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {

@@ -184,10 +184,10 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 	err = json.Unmarshal(blockResponseResult, &block)
 
 	if err != nil {
-	    return nil, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"could not unmarshal block resonse: %v",
 			err,
-	    )
+		)
 	}
 
 	return &block, nil

@@ -21,22 +21,35 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 
-L:
-	for {
-		var buf bytes.Buffer
+	var buf bytes.Buffer
 
-		for {
-			line, isPrefix, err := reader.ReadLine()
+LineReading:
+	for {
+		line, isPrefix, err := reader.ReadLine()
+
+		if err == io.EOF {
+			break LineReading
+		}
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to continue reading lines!"
+				k.Payload = err
+			})
+		}
+
+		_, _ = buf.Write(line)
+
+		_, _ = buf.Write([]byte{'\n'})
+
+		// continue reading the line, but have to exhaust
+		// what's left first
+
+		for isPrefix {
+			line, isPrefix, err = reader.ReadLine()
 
 			if err == io.EOF {
-				break L
-			}
-
-			if _, err := buf.Write(line); err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to get a line off stdin entirely!"
-					k.Payload = err
-				})
+				break LineReading
 			}
 
 			if err != nil {
@@ -46,11 +59,9 @@ L:
 				})
 			}
 
-			if !isPrefix {
-				break
-			}
+			_, _ = buf.Write(line)
 		}
-
-		queue.SendMessageBytes(publishTopic, buf.Bytes())
 	}
+
+	queue.SendMessageBytes(publishTopic, buf.Bytes())
 }

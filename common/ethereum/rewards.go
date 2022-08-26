@@ -12,9 +12,9 @@ import (
 func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpooledRewards, exists bool) worker.EthereumSpooledRewards {
 	var (
 		blockNumber = reward.BlockNumber
-		token = reward.TokenDetails
-		amount = reward.WinAmount
-		winner = reward.Winner
+		token       = reward.TokenDetails
+		amount      = reward.WinAmount
+		winner      = reward.Winner
 	)
 
 	if !exists {
@@ -49,11 +49,11 @@ func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpo
 // BatchWinningsByUser batches winnings that have the same token, returning
 // the total winnings each user has earned
 func BatchWinningsByUser(winnings []worker.EthereumReward, expectedToken token_details.TokenDetails) (map[ethereum.Address]worker.EthereumSpooledRewards, error) {
-	var spooledWinnings map[ethereum.Address]worker.EthereumSpooledRewards
+	spooledWinnings := make(map[ethereum.Address]worker.EthereumSpooledRewards)
 
 	for _, reward := range winnings {
 		var (
-			token = reward.TokenDetails
+			token  = reward.TokenDetails
 			winner = reward.Winner
 		)
 
@@ -78,13 +78,13 @@ func BatchWinningsByUser(winnings []worker.EthereumReward, expectedToken token_d
 // BatchWinningsByToken batches winnings that have the same winner together, returning the
 // set of tokens and their winnings for each
 func BatchWinningsByToken(winnings []worker.EthereumReward, address ethereum.Address) (map[string]worker.EthereumSpooledRewards, error) {
-	var spooledWinnings map[string]worker.EthereumSpooledRewards
+	spooledWinnings := make(map[string]worker.EthereumSpooledRewards)
 
 	for _, reward := range winnings {
 		var (
-			token = reward.TokenDetails
+			token     = reward.TokenDetails
 			tokenName = token.TokenShortName
-			winner = reward.Winner
+			winner    = reward.Winner
 		)
 
 		if winner != address {
@@ -104,4 +104,3 @@ func BatchWinningsByToken(winnings []worker.EthereumReward, address ethereum.Add
 
 	return spooledWinnings, nil
 }
-

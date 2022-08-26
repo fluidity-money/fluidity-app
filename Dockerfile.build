@@ -1,0 +1,19 @@
+
+FROM fluidity/build-container-root:latest
+
+WORKDIR ${FLUID_DIR}
+
+COPY common common
+COPY lib lib
+
+COPY Makefile .
+
+COPY build.mk .
+COPY golang.mk .
+COPY node.mk .
+COPY web.mk .
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download

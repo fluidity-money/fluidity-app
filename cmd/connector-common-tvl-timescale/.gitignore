@@ -1,4 +1,4 @@
-connector-tvl-timescale
+*.out
+lint
 docker
 test
-lint

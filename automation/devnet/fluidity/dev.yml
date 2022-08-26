@@ -1,0 +1,26 @@
+DOCKERFILE_PATH: ./web/solana.fluidity.money
+
+SERVICES:
+  - FLUIDITY_BACKEND:
+      SERVICE_NAME: solana-fluidity-money-backend
+      DOCKER_IMAGE: solana.fluidity.money-backend
+      ENV_FLU_WORKER_ID: solana-devnet-solana.fluidity.money-backend
+      TARGET_GROUP: flu-dev-devnet-be-tg
+  
+  - FLUIDITY_FRONTEND:
+      SERVICE_NAME: solana-fluidity-money-frontend
+      DOCKER_IMAGE: solana.fluidity.money-frontend
+      TARGET_GROUP: flu-dev-devnet-fe-tg
+      DOCKER_ARGS:
+        REACT_APP_API_URL: https://devnet.solana.fluidity.money:8081
+        REACT_APP_WEBSOCKET: wss://devnet.solana.fluidity.money:8081/updates
+        REACT_APP_FLUID_PROGRAM_ID: GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU
+        REACT_APP_FLU_MINT_USDC: 2XGVdHsAiMM9QDM9tV4fwQ2JnyWdSJaiXp2KifLJD1oa
+        REACT_APP_FLU_OBLIGATION_USDC: HbmfhzwMF71jWxfKoD7sjCLrsVhvt2zEEux8t8oWqFAH
+        REACT_APP_FLU_DATA_ACCOUNT_USDC: 7ZaehFMj49vvLQbRpWhfv1evF1c8jMcuLkXy4YFAfb52
+        REACT_APP_BASE_MINT_USDC: zVzi5VAf4qMEwzv7NXECVx5v2pQ7xnqVVjCXZwS9XzA
+        REACT_APP_FLU_MINT_USDT: 97JpYk6S7i9ydzjNwb92DQEfsA1KUUWSwnWGaGDFe6bk
+        REACT_APP_FLU_OBLIGATION_USDT: 2VmszETnb3HkvuMKYqTaPbr7zWh8jfhHut6bUQPwAdrR
+        REACT_APP_FLU_DATA_ACCOUNT_USDT: 9hKfDTt2C7Q9NDHADQpaGTuQjmotCHfvkrmjmaYonEjy
+        REACT_APP_BASE_MINT_USDT: Bp2nLuamFZndE7gztA1iPsNVhdJeg9xfKdq7KmvjpGoP
+        REACT_APP_SOL_NETWORK: devnet

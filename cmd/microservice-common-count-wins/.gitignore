@@ -1,4 +1,4 @@
-microservice-count-wins
+*.out
+lint
 docker
 test
-lint

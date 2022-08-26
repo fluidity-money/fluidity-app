@@ -1,8 +1,8 @@
+**/.git
 
 docker
 docker-*
 !docker-compose*
-test
 semgrep
 
 lib/build-lib
@@ -13,7 +13,9 @@ cmd/*/test
 cmd/*/docker
 cmd/*/lint
 cmd/*/*.o
+cmd/*/*.out
 
+database/build/*
 database/build
 database/db
 
@@ -50,6 +52,3 @@ deployment_list.json
 # Vendor specific
 .vscode
 .DS_Store
-
-
-

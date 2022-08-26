@@ -1,6 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
@@ -16,7 +21,8 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
-				"Failed to unmarshal the base58 public key %#v!",
+				"Failed to get a public key from env %v, %#v",
+				env,
 				pubkeyString,
 			)
 
@@ -25,4 +31,22 @@ func pubkeyFromEnv(env string) solana.PublicKey {
 	}
 
 	return pubkey
+}
+
+func redisGetTvl() (tvl uint64, isSet bool, err error) {
+	bytes := state.Get(RedisTvlKey)
+
+	if len(bytes) == 0 {
+		return 0, false, nil
+	}
+
+	if err := json.Unmarshal(bytes, &tvl); err != nil {
+		return 0, false, fmt.Errorf(
+			"failed to decode the tvl (%#v): %v",
+			string(bytes),
+			err,
+		)
+	}
+
+	return tvl, true, nil
 }

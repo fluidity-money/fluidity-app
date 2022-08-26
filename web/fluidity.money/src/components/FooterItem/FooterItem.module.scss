@@ -1,0 +1,27 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-bottom: solid 0.5px $textGrey;
+
+  h1 {
+    font-size: 36px;
+  }
+  ul {
+    display: flex;
+    @include max-860px {
+      flex-direction: column;
+    }
+    li {
+      margin-left: 20px;
+      display: flex;
+
+      a {
+        color: $fluidWhite;
+      }
+    }
+  }
+}
