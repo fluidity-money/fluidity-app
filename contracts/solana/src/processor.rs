@@ -24,7 +24,7 @@ use {
     std::{convert::TryFrom, str::FromStr},
 };
 
-// the public key of the account that is allowed to initialize tokens
+// the public key of the account that is allowed to initialise tokens
 const INIT_AUTHORITY: &str = "B6xiDeQ9gNHdM4XG1VqHwyFR3AqUukKAzzhDFJirkgqP";
 
 // the public key of the solend program
