@@ -4,14 +4,12 @@ import (
 	"os"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
-
-	spl_token "github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 )
 
 const (
@@ -113,7 +111,14 @@ func main() {
 			return
 		}
 
-		recipientAddress := solana.MustPublicKeyFromBase58(address_)
+		recipientAddress, err := solana.PublicKeyFromBase58(address_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert a faucet public key!"
+				k.Payload = err
+			})
+		}
 
 		blockHash, err := getBlockHash(solanaClient)
 
