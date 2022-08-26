@@ -8,15 +8,15 @@ import styles from "./Ecosystem.module.scss";
 const Ecosystem = () => {
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({ container: scrollRef });
-  //   const opacity = useSpring(scrollYProgress);
 
+  console.log(scrollYProgress);
   return (
     <div className={styles.container}>
       <div className={styles.textBehind}>
         <motion.h1
-          initial={{ opacity: 1 }}
-          //   animate={{ opacity: scrollYProgress }}
-          //   transition={{ duration: 4, type: "tween" }}
+          // initial={{ opacity: 1 }}
+          // animate={{ opacity: 0 }}
+          // transition={{ scrollYProgress }}
           style={{ opacity: scrollYProgress }}
         >
           ECOSYSTEM
