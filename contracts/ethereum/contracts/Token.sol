@@ -140,6 +140,7 @@ contract Token is IERC20 {
         string memory _symbol,
         address _oracle,
         address _emergencyCouncil,
+        address _operator,
         uint _maxUncheckedReward,
         bool _mintLimitsEnabled,
         uint _globalMint,
@@ -150,7 +151,7 @@ contract Token is IERC20 {
 
         // remember the operator for signing off on oracle changes, large payouts
 
-        operator_ = msg.sender;
+        operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
         rngOracle_ = _oracle;
 
@@ -198,7 +199,7 @@ contract Token is IERC20 {
     /**
      * @notice enables emergency mode preventing the swapping in of tokens,
      * @notice and setting the rng oracle address to null
-     * /
+     */
     function enableEmergencyMode() public {
     	require(
     		msg.sender == operator_ ||
@@ -254,7 +255,7 @@ contract Token is IERC20 {
 
     /// @notice enables or disables mint limits with the operator account
     function enableMintLimits(bool enable) public {
-        require(msg.sender == operator_, "only the oracle account can use this");
+        require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         mintLimitsEnabled_ = enable;
     }
@@ -362,7 +363,7 @@ contract Token is IERC20 {
     }
 
     function rewardInternal(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
-    	require(noEmergencyMode_, "emergency mode - contract funds frozen!");
+    	require(noEmergencyMode_, "emergency mode!");
 
         // mint some fluid tokens from the interest we've accrued
         emit Reward(winner, amount, firstBlock, lastBlock);
@@ -376,7 +377,7 @@ contract Token is IERC20 {
      * @param rewards the array of rewards to pay out
      */
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
-    	require(noEmergencyMode_, "emergency mode - contract funds frozen!");
+    	require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         uint poolAmount = rewardPoolAmount();
@@ -545,7 +546,6 @@ contract Token is IERC20 {
     }
 
     function approve(address spender, uint256 amount) public returns (bool) {
-        require(noEmergencyMode_, "emergency mode!");
         _approve(msg.sender, spender, amount);
         return true;
     }
@@ -561,7 +561,6 @@ contract Token is IERC20 {
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-        require(noEmergencyMode_, "emergency mode!");
         _approve(msg.sender, spender, allowances_[msg.sender][spender] + addedValue);
         return true;
     }
@@ -604,7 +603,6 @@ contract Token is IERC20 {
     }
 
     function _burn(address account, uint256 amount) internal virtual {
-        require(noEmergencyMode_, "emergency mode!");
         require(account != address(0), "ERC20: burn from the zero address");
 
         uint256 accountBalance = balances_[account];

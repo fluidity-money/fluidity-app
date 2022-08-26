@@ -12,9 +12,11 @@ export let ffei_addr: string;
 export let signer: ethers.Signer;
 export let oracle: ethers.Signer;
 export let emergencyCouncil: ethers.Signer;
+export let operator: ethers.Signer;
 
 before(async () => {
-  [signer, oracle, emergencyCouncil] = await hre.ethers.getSigners();
+  [signer, oracle, emergencyCouncil, operator] =
+    await hre.ethers.getSigners();
 
   const toDeploy = [TokenList["usdt"], TokenList["fei"]];
 
@@ -30,6 +32,7 @@ before(async () => {
     AAVE_POOL_PROVIDER_ADDR,
     await oracle.getAddress(),
     await emergencyCouncil.getAddress(),
+    await operator.getAddress()
   );
 
   usdt_addr = TokenList["usdt"].address;

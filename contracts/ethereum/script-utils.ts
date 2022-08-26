@@ -45,6 +45,7 @@ export const deployTokens = async (
     aavePoolProvider: string,
     oracleAddress: string,
     emergencyCouncilAddress: string,
+    operatorAddress: string
 ): Promise<{
     tokenBeacon: ethers.Contract,
     aaveBeacon: ethers.Contract,
@@ -106,6 +107,7 @@ export const deployTokens = async (
           token.symbol,
           oracleAddress,
           emergencyCouncilAddress,
+          operatorAddress,
           1000, // Reward quarantine
           false, // Limited supply
           1000000, // Global limit

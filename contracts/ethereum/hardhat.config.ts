@@ -12,9 +12,13 @@ const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
 const emergencyCouncilKey = `FLU_ETHEREUM_EMERGENCY_COUNCIL_ADDRESS`;
 
+const operatorKey = `FLU_ETHEREUM_OPERATOR_ADDRESS`;
+
 let oracleAddress: string;
 
 let emergencyCouncilAddress: string;
+
+let operatorAddress: string;
 
 let shouldDeploy: (keyof typeof TokenList)[] = [];
 
@@ -23,6 +27,7 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
   .setAction(async (args, hre) => {
     oracleAddress = mustEnv(oracleKey);
     emergencyCouncilAddress = mustEnv(emergencyCouncilKey);
+    operatorAddress = mustEnv(operatorKey);
 
     shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
 
@@ -54,6 +59,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     AAVE_POOL_PROVIDER_ADDR,
     oracleAddress,
     emergencyCouncilAddress,
+    operatorAddress,
   );
 
   console.log(`deployment complete`);
