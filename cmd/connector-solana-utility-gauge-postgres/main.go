@@ -49,7 +49,16 @@ func main() {
 		errChan                 = make(chan error)
 	)
 
-	solanaClient, _ := solana.SolanaCallManager(solanaRpcUrl)
+	solanaClient, err := solana.SolanaCallManager(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
+
+	defer solanaClient.Close()
 
 	gaugemeisterPubkey, err := solana.PublicKeyFromBase58(
 		gaugemeisterPubkey_,

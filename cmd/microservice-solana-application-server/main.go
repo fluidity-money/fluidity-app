@@ -57,6 +57,8 @@ func main() {
 		})
 	}
 
+	defer solanaClient.Close()
+
 	worker.GetSolanaBufferedParsedTransactions(func(transactions worker.SolanaBufferedParsedTransactions) {
 		transfers := make([]worker.SolanaDecoratedTransfer, 0)
 

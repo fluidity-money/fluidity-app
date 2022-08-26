@@ -3,17 +3,16 @@ package main
 import (
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	solanaQueue "github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
-
-	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 const (
@@ -54,7 +53,7 @@ func main() {
 		delay   = intFromEnvOrFatal(EnvRetryDelay)
 	)
 
-	solPythPubkey, err := solanaLibrary.PublicKeyFromBase58(
+	solPythPubkey, err := solanaLib.PublicKeyFromBase58(
 		solPythPubkeyString,
 	)
 
@@ -70,7 +69,14 @@ func main() {
 		})
 	}
 
-	solanaClient, _ := solanaLib.SolanaCallManager(solanaRpcUrl)
+	solanaClient, err := solanaLib.SolanaCallManager(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
 
 	LamportDecimalPlacesRat := big.NewRat(LamportDecimalPlaces, 1)
 
@@ -86,7 +92,7 @@ func main() {
 
 		if block == nil {
 			log.App(func(k *log.Log) {
-			    k.Format("Block %d was skipped by solana!", slot.Slot)
+				k.Format("Block %d was skipped by solana!", slot.Slot)
 			})
 
 			return
@@ -132,9 +138,9 @@ func main() {
 			transactionFeeUsd.Mul(transactionFeeUsd, solanaPrice)
 
 			parsed := worker.SolanaApplicationTransaction{
-				Signature:   transaction.Transaction.Signatures[0],
-				Result:      transaction,
-				AdjustedFee: transactionFeeUsd,
+				Signature:    transaction.Transaction.Signatures[0],
+				Result:       transaction,
+				AdjustedFee:  transactionFeeUsd,
 				Applications: apps,
 			}
 

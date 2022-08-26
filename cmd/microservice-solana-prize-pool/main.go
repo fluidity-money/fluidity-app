@@ -144,7 +144,16 @@ func main() {
 
 	tokenDetails := solana.GetTokensListSolana(tokensList_)
 
-	rpcClient, _ := solana.SolanaCallManager(solanaRpcUrl)
+	rpcClient, err := solana.SolanaCallManager(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
+
+	defer rpcClient.Close()
 
 	payer, err := solanaGo.WalletFromPrivateKeyBase58(payerPrikey)
 

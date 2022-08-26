@@ -50,7 +50,16 @@ func main() {
 		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
 
-	solanaClient, _ := solana.SolanaCallManager(solanaRpcUrl)
+	solanaClient, err := solana.SolanaCallManager(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
+
+	defer solanaClient.Close()
 
 	// populate map of token sessions for each token we're tracking
 
