@@ -82,6 +82,8 @@ func Notify(severity int, format string, arguments ...interface{}) {
 		})
 	}
 
+	buf2 := buf
+
 	resp, err := http.Post(webhookAddress, "application/json", &buf)
 
 	if err != nil {
@@ -105,8 +107,9 @@ func Notify(severity int, format string, arguments ...interface{}) {
 			k.Context = Context
 
 			k.Format(
-				`Discord response status was not "204"! was %v!`,
+				`Discord response status was not "204"! was %v! Content %#v`,
 				reply,
+				string(buf2.Bytes()),
 			)
 		})
 	}

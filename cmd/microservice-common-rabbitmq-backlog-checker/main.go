@@ -136,7 +136,13 @@ func main() {
 				})
 
 				if messagesUnacked > maxDeadLetterCount {
-					queueReport(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Dead Letter Unacked",
+						messagesUnacked,
+						maxDeadLetterCount,
+					)
 				}
 
 				// if there's any messages on the queue, obtain the first to be logged
@@ -154,16 +160,35 @@ func main() {
 				}
 
 				if len(msg) > 0 && messagesReady > maxDeadLetterCount {
-					queueReportWithMessage(messageChan, queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount, msg)
+					queueReportWithMessage(
+						messageChan,
+						queue,
+						"Dead Letter Ready",
+						messagesReady,
+						maxDeadLetterCount,
+						msg,
+					)
 				}
 
 			case false:
 				if messagesReady > maxReadyCount {
-					queueReport(messageChan, queue, "Ready", messagesReady, maxReadyCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Ready",
+						messagesReady,
+						maxReadyCount,
+					)
 				}
 
 				if messagesUnacked > maxUnackedCount {
-					queueReport(messageChan, queue, "Unacked", messagesUnacked, maxUnackedCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Unacked",
+						messagesUnacked,
+						maxUnackedCount,
+					)
 				}
 			}
 		}
