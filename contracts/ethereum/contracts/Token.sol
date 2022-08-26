@@ -49,6 +49,9 @@ contract Token is IERC20 {
     /// @notice emitted when a new operator takes over the contract management
     event OperatorChanged(address indexed oldOperator, address indexed newOperator);
 
+    /// @notice emitted when the contract enters emergency mode!
+    event Emergency();
+
     /// @dev sentinel to indicate a block has been rewarded in the
     /// @dev pastRewards_ and rewardedBlocks_ maps
     uint private constant BLOCK_REWARDED = 1;
@@ -85,7 +88,7 @@ contract Token is IERC20 {
     /// @dev new oracle address, pending a call from them to confirm
     address private pendingNewOracle_;
 
-    /// @dev emergency council that can trigger the release of the fund
+    /// @dev emergency council that can activate emergency mode
     address private emergencyCouncil_;
 
     /// @dev the largest amount a reward can be to not get quarantined
@@ -213,6 +216,8 @@ contract Token is IERC20 {
     	noEmergencyMode_ = false;
 
     	rngOracle_ = address(0);
+
+        emit Emergency();
     }
 
     /// @notice starts an update for the trusted oracle to a new address
