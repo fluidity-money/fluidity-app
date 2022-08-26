@@ -39,8 +39,18 @@ contract Token is IERC20 {
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
     event BurnFluid(address indexed addr, uint indexed amount);
 
+    /// @notice emitted when the rng oracle is in the process of being signed off
+    /// by the new operator account
+    event OracleChanging(address indexed oldOracle, address indexed newOracle);
+
     /// @notice emitted when the rng oracle is changed to a new address
     event OracleChanged(address indexed oldOracle, address indexed newOracle);
+
+    /// @notice emitted when a new operator takes over the contract management
+    event OperatorChanged(address indexed oldOperator, address indexed newOperator);
+
+    /// @notice emitted when the contract enters emergency mode!
+    event Emergency();
 
     /// @dev sentinel to indicate a block has been rewarded in the
     /// @dev pastRewards_ and rewardedBlocks_ maps
@@ -78,31 +88,41 @@ contract Token is IERC20 {
     /// @dev new oracle address, pending a call from them to confirm
     address private pendingNewOracle_;
 
+    /// @dev emergency council that can activate emergency mode
+    address private emergencyCouncil_;
+
     /// @dev the largest amount a reward can be to not get quarantined
-    uint maxUncheckedReward_;
+    uint private maxUncheckedReward_;
 
     /// @dev [address] => [number of tokens the user won that have been quarantined]
-    mapping (address => uint) blockedRewards_;
+    mapping (address => uint) private blockedRewards_;
 
     /// @dev are the asset minting limits enabled?
-    bool mintLimitsEnabled_;
+    bool private mintLimitsEnabled_;
+
+    /// @dev if false, emergency mode is active - can be called by either the
+    /// @dev operator, worker account or emergency council
+    bool private noEmergencyMode_;
 
     /// @dev amount of fluid tokens that can be minted
     /// @dev only editable by the oracle
-    uint remainingGlobalMint_;
+    uint private remainingGlobalMint_;
 
     /// @dev the mint limit per user
-    uint userMintLimit_;
+    uint private userMintLimit_;
 
     /// @dev the block number in which user mint limits were last reset
-    uint userMintResetBlock_;
+    uint private userMintResetBlock_;
+
+    /// @dev account to use that created the contract (multisig account)
+    address private operator_;
 
     /// @dev [user] => [amount the user has minted]
-    mapping (address => uint) userAmountMinted_;
+    mapping (address => uint) private userAmountMinted_;
 
     /// @dev [user] => [last block the user minted on]
     /// @dev (if this is <userMintResetBlock_, reset the amount minted to 0)
-    mapping (address => uint) userLastMintedBlock_;
+    mapping (address => uint) private userLastMintedBlock_;
 
     /**
      * @notice initializer function - sets the contract's data
@@ -122,6 +142,8 @@ contract Token is IERC20 {
         string memory _name,
         string memory _symbol,
         address _oracle,
+        address _emergencyCouncil,
+        address _operator,
         uint _maxUncheckedReward,
         bool _mintLimitsEnabled,
         uint _globalMint,
@@ -130,7 +152,14 @@ contract Token is IERC20 {
         require(!initialized_, "contract is already initialized");
         initialized_ = true;
 
+        // remember the operator for signing off on oracle changes, large payouts
+
+        operator_ = _operator;
+        emergencyCouncil_ = _emergencyCouncil;
         rngOracle_ = _oracle;
+
+        noEmergencyMode_ = true;
+
         maxUncheckedReward_ = _maxUncheckedReward;
 
         pool_ = LiquidityProvider(_liquidityProvider);
@@ -149,22 +178,65 @@ contract Token is IERC20 {
     }
 
     /**
+     * @notice update the operator account to a new address
+     * @param newOperator the address of the new operator to change to
+     */
+    function updateOperator(address newOperator) public {
+    	require(msg.sender == operator_, "only operator can use this function!");
+
+    	operator_ = newOperator;
+
+    	emit OperatorChanged(operator_, newOperator);
+    }
+
+    /**
+     * @notice if the contract is in a state of emergency this is true
+     * @return the contract emergency state
+     */
+    function isEmergencyMode() public view returns (bool) { return !noEmergencyMode_; }
+
+    /**
      * @notice getter for the `rngOracle_` variable
      * @return the address of the trusted oracle
      */
     function oracle() public view returns (address) { return rngOracle_; }
 
+    /**
+     * @notice enables emergency mode preventing the swapping in of tokens,
+     * @notice and setting the rng oracle address to null
+     */
+    function enableEmergencyMode() public {
+    	require(
+    		msg.sender == operator_ ||
+    		msg.sender == emergencyCouncil_ ||
+    		msg.sender == rngOracle_,
+    		"can't enable emergency mode!"
+    	);
+
+    	noEmergencyMode_ = false;
+
+    	rngOracle_ = address(0);
+
+        emit Emergency();
+    }
+
     /// @notice starts an update for the trusted oracle to a new address
     function updateOracle(address newOracle) public {
+        require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == rngOracle_, "only the oracle account can use this");
+
+        emit OracleChanging(rngOracle_, pendingNewOracle_);
 
         pendingNewOracle_ = newOracle;
     }
 
     /// @notice finishes an update of the oracle address
-    /// @notice must be used by the new account
-    function acceptUpdateOracle() public {
-        require(msg.sender == pendingNewOracle_, "only the pending new oracle account can use this");
+    /// @notice must be used by the multisig account
+    function acceptUpdateOracle(address newOracle) public {
+        require(noEmergencyMode_, "emergency mode!");
+        require(msg.sender == operator_, "only the operator account can use this");
+
+        require(newOracle == pendingNewOracle_, "passed new oracle doesn't match pending!");
 
         emit OracleChanged(rngOracle_, pendingNewOracle_);
 
@@ -172,15 +244,17 @@ contract Token is IERC20 {
         pendingNewOracle_ = address(0);
     }
 
-    /// @notice updates the reward quarantine threshold
+    /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
-        require(msg.sender == rngOracle_, "only the oracle account can use this");
+        require(noEmergencyMode_, "emergency mode!");
+        require(msg.sender == operator_, "only the operator account can use this");
 
         maxUncheckedReward_ = _maxUncheckedReward;
     }
 
-    /// @notice updates and resets mint limits
+    /// @notice updates and resets mint limits if called by the operator
     function updateMintLimits(uint global, uint user) public {
+        require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         remainingGlobalMint_ = global;
@@ -188,7 +262,7 @@ contract Token is IERC20 {
         userMintResetBlock_ = block.number;
     }
 
-    /// @notice enables or disables mint limits
+    /// @notice enables or disables mint limits with the operator account
     function enableMintLimits(bool enable) public {
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
@@ -206,6 +280,8 @@ contract Token is IERC20 {
      * @return the number of tokens wrapped
      */
     function erc20In(uint amount) public returns (uint) {
+    	require(noEmergencyMode_, "emergency mode!");
+
         if (mintLimitsEnabled_) {
             // update global limit
             require(amount <= remainingGlobalMint_, "mint amount exceeds global limit!");
@@ -282,6 +358,8 @@ contract Token is IERC20 {
      * @param amount the amount being rewarded
      */
     function rewardFromPool(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
+    	require(noEmergencyMode_, "emergency mode!");
+
         if (amount > maxUncheckedReward_) {
             // quarantine the reward
             emit BlockedReward(winner, amount, firstBlock, lastBlock);
@@ -294,6 +372,8 @@ contract Token is IERC20 {
     }
 
     function rewardInternal(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
+    	require(noEmergencyMode_, "emergency mode!");
+
         // mint some fluid tokens from the interest we've accrued
         emit Reward(winner, amount, firstBlock, lastBlock);
 
@@ -306,6 +386,7 @@ contract Token is IERC20 {
      * @param rewards the array of rewards to pay out
      */
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
+    	require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         uint poolAmount = rewardPoolAmount();
@@ -339,6 +420,7 @@ contract Token is IERC20 {
      * @param lastBlock the last block the rewards include
      */
     function unblockReward(address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
+        require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == rngOracle_, "only the oracle account can use this");
 
         require(blockedRewards_[user] >= amount, "trying to unblock more than the user has blocked");
@@ -369,6 +451,8 @@ contract Token is IERC20 {
         uint lastBlock,
         bytes memory sig
     ) external {
+        require(noEmergencyMode_, "emergency mode!");
+
         // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
         //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
         bytes32 hash = keccak256(abi.encode(
@@ -465,13 +549,16 @@ contract Token is IERC20 {
         _transfer(msg.sender, to, amount);
         return true;
     }
+
     function allowance(address owner, address spender) public view returns (uint256) {
         return allowances_[owner][spender];
     }
+
     function approve(address spender, uint256 amount) public returns (bool) {
         _approve(msg.sender, spender, amount);
         return true;
     }
+
     function transferFrom(
         address from,
         address to,
@@ -554,6 +641,7 @@ contract Token is IERC20 {
         address spender,
         uint256 amount
     ) internal virtual {
+
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
             require(currentAllowance >= amount, "ERC20: insufficient allowance");
@@ -562,5 +650,4 @@ contract Token is IERC20 {
             }
         }
     }
-
 }
