@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@visx/visx": "^2.12.2",
-    "framer-motion": "^7.2.0",
+    "@visx/xychart": "^2.12.2",
     "react": "18.2.0 || ^17.0.0",
     "react-dom": "18.2.0 || ^17.0.0",
     "react-relay": "^14.1.0",
@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
+    "@mdx-js/react": "^1.6.22",
     "@storybook/addon-actions": "^6.5.10",
     "@storybook/addon-essentials": "^6.5.10",
     "@storybook/addon-interactions": "^6.5.10",
@@ -38,11 +39,13 @@
     "@vitejs/plugin-react": "^2.0.1",
     "babel-loader": "^8.2.5",
     "chromatic": "^6.7.4",
+    "framer-motion": "^6.5.1",
     "sass": "^1.54.4",
     "storybook-addon-pseudo-states": "^1.15.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.7",
-    "vite-plugin-svgr": "^2.2.1"
+    "vite-plugin-svgr": "^2.2.1",
+    "vite-tsconfig-paths": "^3.5.0"
   },
   "files": [
     "dist"
