@@ -42,7 +42,7 @@ pub struct FluidityData {
     emergency_council: Pubkey, // can turn on emergency mode
     pending_payout_authority: Option<Pubkey>,
     // wrapping and payouts
-    fluidity_enabled: bool,
+    no_emergency: bool,
     block_payout_threshold: u64,
     global_mint_remaining: u64,
 }
@@ -108,7 +108,7 @@ fn wrap(
         *pda_account.key,
     );
 
-    if !fluidity_data.fluidity_enabled {
+    if !fluidity_data.no_emergency {
         panic!("wrapping is disabled");
     }
 
@@ -478,7 +478,7 @@ fn payout(
         *pda_account.key,
     );
 
-    if !fluidity_data.fluidity_enabled {
+    if !fluidity_data.no_emergency {
         panic!("payouts are disabled!");
     }
 
@@ -980,7 +980,7 @@ fn emergency_mode(
         panic!("not authorised to use this");
     }
 
-    fluidity_data.fluidity_enabled = false;
+    fluidity_data.no_emergency = false;
     fluidity_data.payout_authority = Pubkey::default();
 
     // borrow the data and write
@@ -999,7 +999,6 @@ fn init_data(
     space: u64,
     bump: u8,
     block_payout_threshold: u64,
-    wrapping_enabled: bool,
     global_mint: u64,
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
@@ -1053,7 +1052,7 @@ fn init_data(
         emergency_council: *emergency_council.key,
         pending_payout_authority: None,
         block_payout_threshold,
-        fluidity_enabled: wrapping_enabled,
+        no_emergency: true,
         global_mint_remaining: global_mint,
     }
     .serialize(&mut &mut data[..])?;
@@ -1111,7 +1110,6 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
             space,
             bump,
             block_payouts,
-            wrap_enabled,
             global_mint,
         ) => {
             init_data(
@@ -1122,7 +1120,6 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
                 space,
                 bump,
                 block_payouts,
-                wrap_enabled,
                 global_mint,
             )
         },

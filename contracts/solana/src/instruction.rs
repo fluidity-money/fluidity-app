@@ -15,7 +15,7 @@ pub enum FluidityInstruction {
     // initialise solend obligation account
     InitSolendObligation(u64, u64, String, u8),
     LogTVL,
-    InitData(String, u64, u64, u8, u64, bool, u64),
+    InitData(String, u64, u64, u8, u64, u64),
     // move from prize pool to account
     MoveFromPrizePool(u64, String, u8),
     UpdateMintLimit(u64, String),
