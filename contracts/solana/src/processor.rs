@@ -445,10 +445,10 @@ fn unwrap(
 // totalling at most 80% of the prize pool - must be run by authority
 fn payout(
     accounts: &[AccountInfo],
+    program_id: &Pubkey,
     amount: u64,
     seed: String,
     bump: u8,
-    program_id: &Pubkey,
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
@@ -893,7 +893,6 @@ fn update_payout_limit(
 fn update_payout_authority(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
-    new_authority: String,
     seed: String,
 ) -> ProgramResult {
     let (fluidity_data_account, mut fluidity_data, payer)
@@ -903,8 +902,9 @@ fn update_payout_authority(
         panic!("only the current payout authority can use this");
     }
 
-    let new_authority_key = Pubkey::from_str(&new_authority).unwrap();
-    fluidity_data.pending_payout_authority = Some(new_authority_key);
+    let new_authority_key = accounts.get(5).unwrap().key;
+
+    fluidity_data.pending_payout_authority = Some(*new_authority_key);
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
@@ -917,7 +917,6 @@ fn confirm_update_payout_authority(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
     seed: String,
-    new_payout_authority: String,
 ) -> ProgramResult {
     let (fluidity_data_account, mut fluidity_data, payer)
         = validate_authority(accounts, seed, program_id)?;
@@ -926,10 +925,10 @@ fn confirm_update_payout_authority(
         panic!("only the operator can use this");
     }
 
-    let new_payout_key = Pubkey::from_str(&new_payout_authority).unwrap();
+    let new_authority_key = accounts.get(5).unwrap().key;
 
     let key = match fluidity_data.pending_payout_authority {
-        Some(auth) if auth == new_payout_key => auth,
+        Some(auth) if auth == *new_authority_key => auth,
         Some(_) => panic!("pending payout authority doesn't match!"),
         None => panic!("no pending payout authority set!"),
     };
@@ -946,7 +945,6 @@ fn confirm_update_payout_authority(
 fn update_operator(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
-    new_operator: String,
     seed: String,
 ) -> ProgramResult {
     let (fluidity_data_account, mut fluidity_data, payer)
@@ -956,8 +954,8 @@ fn update_operator(
         panic!("only the current operator can use this");
     }
 
-    let new_operator_key  = Pubkey::from_str(&new_operator).unwrap();
-    fluidity_data.operator = new_operator_key;
+    let new_operator_key = accounts.get(5).unwrap().key;
+    fluidity_data.operator = *new_operator_key;
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
@@ -1095,7 +1093,7 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
             unwrap(&accounts, program_id, amount, seed, bump)
         }
         FluidityInstruction::Payout(amount, seed, bump) => {
-            payout(&accounts, amount, seed, bump, program_id)
+            payout(&accounts, program_id, amount, seed, bump)
         },
         FluidityInstruction::InitSolendObligation(
             obligation_lamports,
@@ -1132,14 +1130,14 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         FluidityInstruction::UpdatePayoutLimit(limit, seed) => {
             update_payout_limit(&accounts, program_id, limit, seed)
         },
-        FluidityInstruction::UpdatePayoutAuthority(authority, seed) => {
-            update_payout_authority(accounts, program_id, authority, seed)
+        FluidityInstruction::UpdatePayoutAuthority(seed) => {
+            update_payout_authority(accounts, program_id, seed)
         },
-        FluidityInstruction::ConfirmUpdatePayoutAuthority(authority, seed) => {
-            confirm_update_payout_authority(accounts, program_id, seed, authority)
+        FluidityInstruction::ConfirmUpdatePayoutAuthority(seed) => {
+            confirm_update_payout_authority(accounts, program_id, seed)
         },
-        FluidityInstruction::UpdateOperator(operator, seed) => {
-            update_operator(accounts, program_id, seed, operator)
+        FluidityInstruction::UpdateOperator(seed) => {
+            update_operator(accounts, program_id, seed)
         },
         FluidityInstruction::Emergency(seed) => {
             emergency_mode(accounts, program_id, seed)

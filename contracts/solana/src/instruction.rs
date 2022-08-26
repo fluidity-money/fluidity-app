@@ -20,9 +20,9 @@ pub enum FluidityInstruction {
     MoveFromPrizePool(u64, String, u8),
     UpdateMintLimit(u64, String),
     UpdatePayoutLimit(u64, String),
-    UpdatePayoutAuthority(String, String),
-    UpdateOperator(String, String),
-    ConfirmUpdatePayoutAuthority(String, String),
+    UpdatePayoutAuthority(String),
+    UpdateOperator(String),
+    ConfirmUpdatePayoutAuthority(String),
     Emergency(String),
 }
 
