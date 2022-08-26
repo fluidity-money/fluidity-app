@@ -36,10 +36,11 @@ pub struct FluidityData {
     token_mint: Pubkey,
     fluid_mint: Pubkey,
     pda: Pubkey,
-    payout_authority: Pubkey,
-    large_payout_authority: Pubkey,
+    payout_authority: Pubkey, // can turn on emergency mode, reward users, update mint limits
+    operator: Pubkey, // can turn on emergency mode, unblock rewards, update payout limits, change
+                      // the payout auth
+    emergency_council: Pubkey, // can turn on emergency mode
     pending_payout_authority: Option<Pubkey>,
-    pending_large_payout_authority: Option<Pubkey>,
     // wrapping and payouts
     fluidity_enabled: bool,
     block_payout_threshold: u64,
@@ -490,7 +491,7 @@ fn payout(
 
     if *payer.key == fluidity_data.payout_authority {
         large_payouts_allowed = false;
-    } else if *payer.key == fluidity_data.large_payout_authority {
+    } else if *payer.key == fluidity_data.operator {
         large_payouts_allowed = true;
     } else {
         panic!("bad payout authority!");
@@ -868,7 +869,7 @@ fn update_payout_limit(
     let (fluidity_data_account, mut fluidity_data, payer)
         = validate_authority(accounts, seed, program_id)?;
 
-    if !(payer.is_signer && *payer.key == fluidity_data.large_payout_authority) {
+    if *payer.key != fluidity_data.operator {
         panic!("bad payout authority");
     }
 
@@ -904,19 +905,28 @@ fn update_payout_authority(
     Ok(())
 }
 
-fn complete_update_payout_authority(
+fn confirm_update_payout_authority(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
     seed: String,
+    new_payout_authority: String,
 ) -> ProgramResult {
     let (fluidity_data_account, mut fluidity_data, payer)
         = validate_authority(accounts, seed, program_id)?;
 
-    if Some(*payer.key) != fluidity_data.pending_payout_authority {
-        panic!("only the pending payout authority can use this");
+    if *payer.key != fluidity_data.operator {
+        panic!("only the operator can use this");
     }
 
-    fluidity_data.payout_authority = *payer.key;
+    let new_payout_key = Pubkey::from_str(&new_payout_authority).unwrap();
+
+    let key = match fluidity_data.pending_payout_authority {
+        Some(auth) if auth == new_payout_key => auth,
+        Some(_) => panic!("pending payout authority doesn't match!"),
+        None => panic!("no pending payout authority set!"),
+    };
+
+    fluidity_data.payout_authority = key;
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
@@ -925,21 +935,21 @@ fn complete_update_payout_authority(
     Ok(())
 }
 
-fn update_large_payout_authority(
+fn update_operator(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
-    new_authority: String,
+    new_operator: String,
     seed: String,
 ) -> ProgramResult {
     let (fluidity_data_account, mut fluidity_data, payer)
         = validate_authority(accounts, seed, program_id)?;
 
-    if *payer.key != fluidity_data.large_payout_authority {
-        panic!("only the current payout authority can use this");
+    if *payer.key != fluidity_data.operator {
+        panic!("only the current operator can use this");
     }
 
-    let new_authority_key = Pubkey::from_str(&new_authority).unwrap();
-    fluidity_data.pending_large_payout_authority = Some(new_authority_key);
+    let new_operator_key  = Pubkey::from_str(&new_operator).unwrap();
+    fluidity_data.operator = new_operator_key;
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
@@ -948,7 +958,7 @@ fn update_large_payout_authority(
     Ok(())
 }
 
-fn complete_update_large_payout_authority(
+fn emergency_mode(
     accounts: &[AccountInfo],
     program_id: &Pubkey,
     seed: String,
@@ -956,11 +966,14 @@ fn complete_update_large_payout_authority(
     let (fluidity_data_account, mut fluidity_data, payer)
         = validate_authority(accounts, seed, program_id)?;
 
-    if Some(*payer.key) != fluidity_data.pending_large_payout_authority {
-        panic!("only the pending large payout authority can use this");
+    if *payer.key != fluidity_data.operator &&
+       *payer.key != fluidity_data.payout_authority &&
+       *payer.key != fluidity_data.emergency_council {
+        panic!("not authorised to use this");
     }
 
-    fluidity_data.large_payout_authority = *payer.key;
+    fluidity_data.fluidity_enabled = false;
+    fluidity_data.payout_authority = Pubkey::default();
 
     // borrow the data and write
     let mut data = fluidity_data_account.try_borrow_mut_data()?;
@@ -990,7 +1003,8 @@ fn init_data(
     let fluid_mint = next_account_info(accounts_iter)?;
     let pda = next_account_info(accounts_iter)?;
     let payout_authority = next_account_info(accounts_iter)?;
-    let large_payout_authority = next_account_info(accounts_iter)?;
+    let operator = next_account_info(accounts_iter)?;
+    let emergency_council = next_account_info(accounts_iter)?;
 
     // check payout authority
     if !(payer.is_signer && payer.key == &Pubkey::from_str(INIT_AUTHORITY).unwrap()) {
@@ -1027,9 +1041,9 @@ fn init_data(
         fluid_mint: *fluid_mint.key,
         pda: *pda.key,
         payout_authority: *payout_authority.key,
-        large_payout_authority: *large_payout_authority.key,
+        operator: *operator.key,
+        emergency_council: *emergency_council.key,
         pending_payout_authority: None,
-        pending_large_payout_authority: None,
         block_payout_threshold,
         fluidity_enabled: wrapping_enabled,
         global_mint_remaining: global_mint,
@@ -1116,14 +1130,14 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
         FluidityInstruction::UpdatePayoutAuthority(authority, seed) => {
             update_payout_authority(accounts, program_id, authority, seed)
         },
-        FluidityInstruction::UpdateLargePayoutAuthority(authority, seed) => {
-            update_large_payout_authority(accounts, program_id, authority, seed)
+        FluidityInstruction::ConfirmUpdatePayoutAuthority(authority, seed) => {
+            confirm_update_payout_authority(accounts, program_id, seed, authority)
         },
-        FluidityInstruction::ConfirmUpdatePayoutAuthority(seed) => {
-            complete_update_payout_authority(accounts, program_id, seed)
+        FluidityInstruction::UpdateOperator(operator, seed) => {
+            update_operator(accounts, program_id, seed, operator)
         },
-        FluidityInstruction::ConfirmUpdateLargePayoutAuthority(seed) => {
-            complete_update_large_payout_authority(accounts, program_id, seed)
+        FluidityInstruction::Emergency(seed) => {
+            emergency_mode(accounts, program_id, seed)
         },
     }
 }
