@@ -91,7 +91,7 @@ fn wrap(
 
     // create seed strings following format
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
-    let data_seed = format!("FLU:{}_DATA", seed);
+    let data_seed = format!("FLU:{}_DATA_1", seed);
 
     // check that data account is derived from pda
     if fluidity_data_account.key
@@ -317,7 +317,7 @@ fn unwrap(
 
     // create seed strings from provided token
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
-    let data_seed = format!("FLU:{}_DATA", seed);
+    let data_seed = format!("FLU:{}_DATA_1", seed);
 
     // check that data account is derived from pda
     if fluidity_data_account.key
@@ -463,7 +463,7 @@ fn payout(
     let payout_account_b = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
 
-    let data_seed = format!("FLU:{}_DATA", seed);
+    let data_seed = format!("FLU:{}_DATA_1", seed);
     if fluidity_data_account.key
         != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
     {
@@ -589,6 +589,7 @@ fn payout(
 // Will fail if funds exceed total prize pool - must be run by authority
 fn move_from_prize_pool(
     accounts: &[AccountInfo],
+    program_id: &Pubkey,
     payout_amt: u64,
     seed: String,
     bump: u8,
@@ -604,6 +605,13 @@ fn move_from_prize_pool(
     let payout_account = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
     let fluidity_data_account = next_account_info(accounts_iter)?;
+
+    let data_seed = format!("FLU:{}_DATA_1", seed);
+    if fluidity_data_account.key
+        != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
+    {
+        panic!("bad data account");
+    }
 
     let fluidity_data = validate_fluidity_data_account(
         fluidity_data_account,
@@ -818,7 +826,7 @@ fn validate_authority<'a, 'b>(
     let pda_account = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
 
-    let data_seed = format!("FLU:{}_DATA", seed);
+    let data_seed = format!("FLU:{}_DATA_1", seed);
     if fluidity_data_account.key
         != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
     {
@@ -1012,7 +1020,7 @@ fn init_data(
     }
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
-    let data_seed = format!("FLU:{}_DATA", seed);
+    let data_seed = format!("FLU:{}_DATA_1", seed);
 
     // create the acccount
     invoke_signed(
@@ -1119,7 +1127,7 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
             )
         },
         FluidityInstruction::MoveFromPrizePool(payout_amt, seed, bump) => {
-            move_from_prize_pool(&accounts, payout_amt, seed, bump)
+            move_from_prize_pool(&accounts, program_id, payout_amt, seed, bump)
         },
         FluidityInstruction::UpdateMintLimit(limit, seed) => {
             update_mint_limit(&accounts, program_id, limit, seed)
