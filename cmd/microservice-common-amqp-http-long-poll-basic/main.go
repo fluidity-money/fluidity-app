@@ -147,26 +147,22 @@ func main() {
 				return
 			}
 
-			halfAMetabyteUsed := buf.Len() <= 512
+			_, err = buf.WriteTo(w)
 
-			if halfAMetabyteUsed {
-				_, err := buf.WriteTo(w)
+			if err != nil {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Failed to send the write buffer to IP %v",
+						ipAddress,
+					)
 
-				if err != nil {
-					log.App(func(k *log.Log) {
-						k.Format(
-							"Failed to send the write buffer to IP %v",
-							ipAddress,
-						)
+					k.Payload = err
+				})
 
-						k.Payload = err
-					})
-
-					return
-				}
-
-				wFlusher.Flush()
+				return
 			}
+
+			wFlusher.Flush()
 		}
 	})
 
