@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, forknetTakeFunds } from "../script-utils";
+import { deployTokens, deployWorkerConfig, forknetTakeFunds } from "../script-utils";
 import { AAVE_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
 export let usdt_addr: string;
@@ -28,13 +28,31 @@ before(async () => {
     toDeploy,
   );
 
+  const oracleAddress = await oracle.getAddress();
+
+  const emergencyCouncilAddress = await emergencyCouncil.getAddress();
+
+  const operatorAddress = await operator.getAddress();
+
+  const workerConfigAddress = await deployWorkerConfig(
+    hre,
+    operatorAddress,
+    emergencyCouncilAddress,
+    [
+      oracleAddress,
+      oracleAddress,
+      oracleAddress,
+      oracleAddress
+    ]
+  );
+
   const { tokens } = await deployTokens(
     hre,
     toDeploy,
     AAVE_POOL_PROVIDER_ADDR,
-    await oracle.getAddress(),
-    await emergencyCouncil.getAddress(),
-    await operator.getAddress()
+    emergencyCouncilAddress,
+    operatorAddress,
+    workerConfigAddress
   );
 
   usdt_addr = TokenList["usdt"].address;
