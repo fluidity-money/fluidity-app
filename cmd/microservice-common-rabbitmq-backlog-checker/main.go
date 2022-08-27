@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -69,25 +71,42 @@ func main() {
 		})
 	}
 
-	messageChan := make(chan string)
-	done := make(chan bool)
+	var (
+		messageChan            = make(chan string)
+		messageAttachmentsChan = make(chan message)
+		done                   = make(chan bool)
+	)
 
 	// get reports from the channel and concat them together,
 	// then report to discord once the channel is closed
 	go func() {
 		var reportBody string
 		for {
-			message, more := <-messageChan
+			select {
+			case message, more := <-messageChan:
 
-			if more {
-				reportBody += message
-			} else {
-				if reportBody != "" {
-					reportToDiscord(reportBody)
+				if more {
+					reportBody += message
+				} else {
+					if reportBody != "" {
+						reportToDiscord(reportBody)
+					}
+
+					done <- true
+					return
 				}
 
-				done <- true
-				return
+			case message := <-messageAttachmentsChan:
+				var buf bytes.Buffer
+
+				_, _ = buf.WriteString(message.content)
+
+				reportToDiscordWithAttachment(
+					message.message,
+					map[string]io.Reader{
+						"last-message.txt": &buf,
+					},
+				)
 			}
 		}
 	}()
@@ -132,7 +151,13 @@ func main() {
 				})
 
 				if messagesUnacked > maxDeadLetterCount {
-					queueReport(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Dead Letter Unacked",
+						messagesUnacked,
+						maxDeadLetterCount,
+					)
 				}
 
 				// if there's any messages on the queue, obtain the first to be logged
@@ -150,16 +175,35 @@ func main() {
 				}
 
 				if len(msg) > 0 && messagesReady > maxDeadLetterCount {
-					queueReportWithMessage(messageChan, queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount, msg)
+					queueReportWithMessage(
+						messageAttachmentsChan,
+						queue,
+						"Dead Letter Ready",
+						messagesReady,
+						maxDeadLetterCount,
+						msg,
+					)
 				}
 
 			case false:
 				if messagesReady > maxReadyCount {
-					queueReport(messageChan, queue, "Ready", messagesReady, maxReadyCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Ready",
+						messagesReady,
+						maxReadyCount,
+					)
 				}
 
 				if messagesUnacked > maxUnackedCount {
-					queueReport(messageChan, queue, "Unacked", messagesUnacked, maxUnackedCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Unacked",
+						messagesUnacked,
+						maxUnackedCount,
+					)
 				}
 			}
 		}
