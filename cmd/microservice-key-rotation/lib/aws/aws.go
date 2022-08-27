@@ -19,59 +19,59 @@ func UploadToBucket(session *session.Session, fileContent io.ReadSeeker, fileNam
 
 	output, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: &bucketName,
-		Key: &fileName,
-		Body: fileContent,
-		ACL: aws.String(s3.BucketCannedACLAuthenticatedRead),
+		Key:    &fileName,
+		Body:   fileContent,
+		ACL:    aws.String(s3.BucketCannedACLAuthenticatedRead),
 	})
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Unable to upload %v to %v, %v", 
+			"Unable to upload %v to %v, %v",
 			fileName,
-			bucketName, 
+			bucketName,
 			err,
 		)
 	}
 
 	fmt.Printf("Successfully uploaded %v to %v\n", fileName, bucketName)
 
-	return output, nil 
+	return output, nil
 }
 
 // CreateBucket to create a new bucket
 func CreateBucket(session *session.Session, bucketName, acl string) (*s3.CreateBucketOutput, error) {
 
-	fmt.Printf("creating bucket %v with acl %v\n",bucketName,acl)
+	fmt.Printf("creating bucket %v with acl %v\n", bucketName, acl)
 
 	svc := s3.New(session)
 	// Create the S3 Bucket
 	output, err := svc.CreateBucket(&s3.CreateBucketInput{
-        Bucket: &bucketName,
-		ACL: &acl,
-    })
+		Bucket: &bucketName,
+		ACL:    &acl,
+	})
 
-    if err != nil {
-        return nil, fmt.Errorf(
+	if err != nil {
+		return nil, fmt.Errorf(
 			"Unable to create bucket with name %v, %v",
-			bucketName, 
+			bucketName,
 			err,
 		)
-    }
+	}
 
-    // Wait until bucket is created before finishing
-    fmt.Printf("Waiting for bucket %v to be created...\n", bucketName)
+	// Wait until bucket is created before finishing
+	fmt.Printf("Waiting for bucket %v to be created...\n", bucketName)
 
-    err = svc.WaitUntilBucketExists(&s3.HeadBucketInput{
-        Bucket: &bucketName,
-    })
+	err = svc.WaitUntilBucketExists(&s3.HeadBucketInput{
+		Bucket: &bucketName,
+	})
 
-    if err != nil {
-        return nil, fmt.Errorf(
+	if err != nil {
+		return nil, fmt.Errorf(
 			"Error occurred while waiting for bucket %v to be created: %v",
 			bucketName,
 			err,
 		)
-    }
+	}
 
 	return output, nil
 }
@@ -79,8 +79,8 @@ func CreateBucket(session *session.Session, bucketName, acl string) (*s3.CreateB
 // createBucketIfNotExists to either create a bucket, or return nil, nil if the bucket already exists
 func CreateBucketIfNotExists(session *session.Session, bucketName, acl string) (*s3.CreateBucketOutput, error) {
 	output, err := CreateBucket(session, bucketName, acl)
-	
-    if err != nil {
+
+	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
 			case s3.ErrCodeBucketAlreadyExists:

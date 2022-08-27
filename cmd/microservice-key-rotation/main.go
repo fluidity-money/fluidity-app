@@ -31,12 +31,12 @@ const (
 	// EnvOracleBucketName is the S3 bucket to place the signed transaction
 	EnvOracleBucketName = `FLU_ORACLE_BUCKET_NAME`
 
-	// EnvOracleParameterName is the comma-separated list of AWS parameters 
-	// containing oracles that need be updated, and their respective 
+	// EnvOracleParameterName is the comma-separated list of AWS parameters
+	// containing oracles that need be updated, and their respective
 	// contract addresses of the form param1:contract1,param2:contract2,...
 	EnvOracleParametersList = `FLU_ORACLE_UPDATE_LIST`
 
-	// EnvWorkerConfigPrivateKey is the key that signs the transaction to 
+	// EnvWorkerConfigPrivateKey is the key that signs the transaction to
 	// batch update the oracles
 	EnvWorkerConfigPrivateKey = `FLU_WORKER_CONFIG_PRIVATE_KEY`
 )
@@ -50,8 +50,8 @@ func main() {
 		bucketName              = util.GetEnvOrFatal(EnvOracleBucketName)
 		workerConfigPrivateKey_ = util.GetEnvOrFatal(EnvWorkerConfigPrivateKey)
 
-		oracleParametersList    = oracleParametersListFromEnv(EnvOracleParametersList)
-    )
+		oracleParametersList = oracleParametersListFromEnv(EnvOracleParametersList)
+	)
 
 	workerConfigPrivateKey, err := ethCrypto.HexToECDSA(workerConfigPrivateKey_)
 
@@ -77,21 +77,21 @@ func main() {
 		Region: &awsRegion,
 	})
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Message = "Failed to create an AWS session!"
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create an AWS session!"
+			k.Payload = err
+		})
+	}
 
-	outputTxnBucket, err :=  aws.CreateBucketIfNotExists(session, bucketName, bucketAcl)
+	outputTxnBucket, err := aws.CreateBucketIfNotExists(session, bucketName, bucketAcl)
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Message = "Failed to create an AWS bucket"
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create an AWS bucket"
+			k.Payload = err
+		})
+	}
 
 	if outputTxnBucket != nil {
 		log.App(func(k *log.Log) {
@@ -104,7 +104,7 @@ func main() {
 		timestamp = time.Now().UTC().String()
 		fileName  = "Oracle Update " + timestamp
 
-		fileContent string
+		fileContent   string
 		newOracleList []ethCommon.Address
 	)
 
@@ -112,20 +112,20 @@ func main() {
 	for _, oracle := range oracleParametersList {
 
 		var (
-			parameter = oracle.Parameter
+			parameter             = oracle.Parameter
 			contractAddressString = oracle.ContractAddress
 		)
 
 		fileName += " " + parameter
 
 		contractAddress := ethCommon.HexToAddress(contractAddressString)
-		
+
 		// get the old key
 		privateKey := aws.LookupCurrentOraclePrivateKeyUsingParameterStore()
 		previousOracleAddress := ethCrypto.PubkeyToAddress(privateKey.PublicKey)
-		
+
 		// create the new key
-		key, err := ethCrypto.GenerateKey() 
+		key, err := ethCrypto.GenerateKey()
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -137,7 +137,7 @@ func main() {
 		// store the new oracle address
 		newOracle := ethCrypto.PubkeyToAddress(key.PublicKey)
 		newOracleList = append(newOracleList, newOracle)
-		
+
 		// obtain the new key as hex to update the parameter
 		keyBytes := ethCrypto.FromECDSA(key)
 		newOraclePrivateKeyHex := hexutil.Encode(keyBytes)[2:]
@@ -157,7 +157,7 @@ func main() {
 		ssmClient := ssm.New(session)
 
 		input := &ssm.PutParameterInput{
-			Name: &parameter,
+			Name:  &parameter,
 			Value: &newOraclePrivateKeyHex,
 		}
 
@@ -186,31 +186,31 @@ func main() {
 			k.Message = "Failed to create the transaction options!"
 			k.Payload = err
 		})
-    }
+	}
 
-    // TODO have this but it returns a signed txn rather than calling the contract
-    transaction, err := fluidity.UpdateOracle(
-        ethClient,
-        workerConfigContractAddress,
-        transactionOpts,
-        newOracleList,
-    ) 
+	// TODO have this but it returns a signed txn rather than calling the contract
+	transaction, err := fluidity.UpdateOracle(
+		ethClient,
+		workerConfigContractAddress,
+		transactionOpts,
+		newOracleList,
+	)
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Message = "Failed to create and sign the oracle update transaction!"
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create and sign the oracle update transaction!"
+			k.Payload = err
+		})
+	}
 
 	txnBinary, err := transaction.MarshalBinary()
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Message = "Failed to marshal the transaction into binary!"
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to marshal the transaction into binary!"
+			k.Payload = err
+		})
+	}
 
 	signedTxnString := fmt.Sprintf(
 		"Signed transaction dump:\n---\n%v\n---\n",
@@ -225,16 +225,15 @@ func main() {
 	// upload the file containing a list of all oracle updates, and the signed transaction
 	uploadLogsOutput, err := aws.UploadToBucket(session, fileContentReader, fileName, bucketName)
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Message = "Failed to upload logs to the bucket!"
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to upload logs to the bucket!"
+			k.Payload = err
+		})
+	}
 
 	log.App(func(k *log.Log) {
 		k.Message = "Uploaded oracle transaction to bucket successfully!"
 		k.Payload = uploadLogsOutput
 	})
 }
-
