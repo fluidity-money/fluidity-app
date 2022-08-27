@@ -2,23 +2,19 @@ package main
 
 import (
 	"bytes"
-	"crypto/ecdsa"
 	"fmt"
-	"io"
-	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
+	awsCommon "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/service/ssm"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fluidity-money/fluidity-app/cmd/microservice-key-rotation/lib/aws"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -52,28 +48,10 @@ func main() {
 		gethHttpUrl             = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		awsRegion               = util.GetEnvOrFatal(EnvAwsRegion)
 		bucketName              = util.GetEnvOrFatal(EnvOracleBucketName)
-		oracleParametersList_   = util.GetEnvOrFatal(EnvOracleParametersList)
 		workerConfigPrivateKey_ = util.GetEnvOrFatal(EnvWorkerConfigPrivateKey)
+
+		oracleParametersList    = oracleParametersListFromEnv(EnvOracleParametersList)
     )
-
-
-	o := strings.Split(oracleParametersList_, ",")	
-	numberOfTokens := len(o)
-
-	type S struct {
-		ContractAddress string 
-		// the AWS parameter key containing this oracle private key
-		Parameter string	
-	}
-
-	oracleParametersList := make([]S, numberOfTokens)
-	for i, v := range o {
-		s := strings.Split(v, ":")
-		if len(s) != 2 {
-			panic("wrong len")
-		}
-		oracleParametersList[i] = S{s[0], s[1]}
-	}
 
 	workerConfigPrivateKey, err := ethCrypto.HexToECDSA(workerConfigPrivateKey_)
 
@@ -95,7 +73,7 @@ func main() {
 
 	defer ethClient.Close()
 
-	session, err := session.NewSession(&aws.Config{
+	session, err := session.NewSession(&awsCommon.Config{
 		Region: &awsRegion,
 	})
 
@@ -106,7 +84,7 @@ func main() {
         })
     }
 
-	outputTxnBucket, err := createBucketIfNotExists(session, bucketName, bucketAcl)
+	outputTxnBucket, err :=  aws.CreateBucketIfNotExists(session, bucketName, bucketAcl)
 
     if err != nil {
         log.Fatal(func(k *log.Log) {
@@ -122,19 +100,28 @@ func main() {
 		})
 	}
 
-	timestamp := time.Now().UTC().String()
-	fileName := "Oracle Update " + timestamp
-	var fileContent string
-	var newOracleList []ethCommon.Address
+	var (
+		timestamp = time.Now().UTC().String()
+		fileName  = "Oracle Update " + timestamp
+
+		fileContent string
+		newOracleList []ethCommon.Address
+	)
 
 	// update each oracle in sequence
-	for _, v := range oracleParametersList {
-		fileName += " " + v.Parameter
+	for _, oracle := range oracleParametersList {
 
-		contractAddress := ethCommon.HexToAddress(v.ContractAddress)
+		var (
+			parameter = oracle.Parameter
+			contractAddressString = oracle.ContractAddress
+		)
+
+		fileName += " " + parameter
+
+		contractAddress := ethCommon.HexToAddress(contractAddressString)
 		
 		// get the old key
-		privateKey := lookupCurrentOraclePrivateKeyUsingParameterStore()
+		privateKey := aws.LookupCurrentOraclePrivateKeyUsingParameterStore()
 		previousOracleAddress := ethCrypto.PubkeyToAddress(privateKey.PublicKey)
 		
 		// create the new key
@@ -156,7 +143,7 @@ func main() {
 		newOraclePrivateKeyHex := hexutil.Encode(keyBytes)[2:]
 
 		// append to the log
-		s := fmt.Sprintf(
+		addressChangeLog := fmt.Sprintf(
 			"[%v] Changing oracle address on contract %v from %v to %v!\n",
 			timestamp,
 			contractAddress,
@@ -164,13 +151,14 @@ func main() {
 			newOracle,
 		)
 
-		fileContent += s
+		fileContent += addressChangeLog
 
 		// update parameter store for this contract
 		ssmClient := ssm.New(session)
+
 		input := &ssm.PutParameterInput{
-			Name: aws.String(v.Parameter),
-			Value: aws.String(newOraclePrivateKeyHex),
+			Name: &parameter,
+			Value: &newOraclePrivateKeyHex,
 		}
 
 		putOutput, err := ssmClient.PutParameter(input)
@@ -189,6 +177,9 @@ func main() {
 	}
 
 	transactionOpts, err := ethereum.NewTransactionOptions(ethClient, workerConfigPrivateKey)
+
+	workerConfigPublicKey := workerConfigPrivateKey.PublicKey
+	workerConfigContractAddress := ethCrypto.PubkeyToAddress(workerConfigPublicKey)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -221,18 +212,18 @@ func main() {
         })
     }
 
-	s := fmt.Sprintf(
+	signedTxnString := fmt.Sprintf(
 		"Signed transaction dump:\n---\n%v\n---\n",
 		txnBinary,
 	)
 
-	fileContent += s
+	fileContent += signedTxnString
 
 	// create a reader with the file content
-	reader := bytes.NewReader([]byte(fileContent))
+	fileContentReader := bytes.NewReader([]byte(fileContent))
 
 	// upload the file containing a list of all oracle updates, and the signed transaction
-	uploadLogsOutput, err := uploadToBucket(session, reader, fileName, bucketName)
+	uploadLogsOutput, err := aws.UploadToBucket(session, fileContentReader, fileName, bucketName)
 
     if err != nil {
         log.Fatal(func(k *log.Log) {
@@ -247,103 +238,3 @@ func main() {
 	})
 }
 
-// uploadToBucket to put a file in a bucket
-func uploadToBucket(session *session.Session, fileContent io.ReadSeeker, fileName, bucketName string) (*s3manager.UploadOutput, error) {
-	uploader := s3manager.NewUploader(session)
-
-	output, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: &bucketName,
-		Key: &fileName,
-		Body: fileContent,
-		ACL: aws.String(s3.BucketCannedACLAuthenticatedRead),
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Unable to upload %v to %v, %v", 
-			fileName,
-			bucketName, 
-			err,
-		)
-	}
-
-	fmt.Printf("Successfully uploaded %v to %v\n", fileName, bucketName)
-
-	return output, nil 
-}
-
-// createBucket to create a new bucket
-func createBucket(session *session.Session, bucketName, acl string) (*s3.CreateBucketOutput, error) {
-
-	fmt.Printf("creating bucket %v with acl %v\n",bucketName,acl)
-
-	svc := s3.New(session)
-	// Create the S3 Bucket
-	output, err := svc.CreateBucket(&s3.CreateBucketInput{
-        Bucket: &bucketName,
-		ACL: &acl,
-    })
-
-    if err != nil {
-        return nil, fmt.Errorf(
-			"Unable to create bucket with name %v, %v",
-			bucketName, 
-			err,
-		)
-    }
-
-    // Wait until bucket is created before finishing
-    fmt.Printf("Waiting for bucket %v to be created...\n", bucketName)
-
-    err = svc.WaitUntilBucketExists(&s3.HeadBucketInput{
-        Bucket: &bucketName,
-    })
-
-    if err != nil {
-        return nil, fmt.Errorf(
-			"Error occurred while waiting for bucket %v to be created: %v",
-			bucketName,
-			err,
-		)
-    }
-
-	return output, nil
-}
-
-// createBucketIfNotExists to either create a bucket, or return nil, nil if the bucket already exists
-func createBucketIfNotExists(session *session.Session, bucketName, acl string) (*s3.CreateBucketOutput, error) {
-	output, err := createBucket(session, bucketName, acl)
-	
-    if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case s3.ErrCodeBucketAlreadyExists:
-				fallthrough
-			case s3.ErrCodeBucketAlreadyOwnedByYou:
-				log.App(func(k *log.Log) {
-					k.Format(
-						"Bucket %v already exists - using it!",
-						bucketName,
-					)
-				})
-			default:
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to create a bucket!"
-					k.Payload = aerr.Error()
-				})
-			}
-
-		} else {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to create a bucket!"
-				k.Payload = err
-			})
-		}
-	}
-
-	return output, nil
-}
-
-func lookupCurrentOraclePrivateKeyUsingParameterStore() *ecdsa.PrivateKey {
-	panic("why would you name it like that")
-}
