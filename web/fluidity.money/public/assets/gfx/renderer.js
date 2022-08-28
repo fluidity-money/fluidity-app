@@ -2885,7 +2885,7 @@ Main.prototype = $extend(snow_App.prototype,{
 		this.renderParticlesShader.set_POINT_SIZE((this.pointSize | 0) + ".0");
 	}
 	,set_simulationQuality: function(quality) {
-		quality[1] = 0;
+		quality[1] = 2;
 		switch(quality[1]) {
 		case 0:
 			this.particleCount = 1048576;
@@ -4006,12 +4006,12 @@ Reflect.isFunction = function(f) {
 	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
 };
 var SnowApp = function() { };
-$hxClasses["SnowApp"] = SnowApp;
+$hxClasses["FluidApp"] = SnowApp;
 SnowApp.__name__ = true;
 SnowApp.main = function() {
 	SnowApp._snow = new snow_Snow();
 	SnowApp._host = new Main();
-	var _snow_config = { has_loop : true, config_path : "config.json", app_package : "com.haxiomic.gpufluid"};
+	var _snow_config = { has_loop : true, config_path : "manifest.json", app_package : "fluidity.money"};
 	SnowApp._snow.init(_snow_config,SnowApp._host);
 };
 var Std = function() { };
@@ -5032,7 +5032,7 @@ js_html__$CanvasElement_CanvasUtil.getContextWebGL = function(canvas,attribs) {
 	while(_g < _g1.length) {
 		var name = _g1[_g];
 		++_g;
-		var ctx = canvas.getContext(name,attribs);
+		var ctx = canvas.getContext(name, { powerPreference: "high-performance" }) || canvas.getContext('experimental-webgl', { powerPreference: "high-performance" });
 		if(ctx != null) return ctx;
 	}
 	return null;
@@ -5793,7 +5793,7 @@ snow_Snow.prototype = {
 		return { depth : false, stencil : false, antialiasing : 0, red_bits : 8, green_bits : 8, blue_bits : 8, alpha_bits : 8, depth_bits : 0, stencil_bits : 0, opengl : { minor : 0, major : 0, profile : 0}};
 	}
 	,default_window_config: function() {
-		var conf = { fullscreen_desktop : true, fullscreen : false, borderless : false, resizable : true, x : 536805376, y : 536805376, width : 960, height : 640, title : "snow app"};
+		var conf = { fullscreen_desktop : true, fullscreen : false, borderless : false, resizable : true, x : 536805376, y : 536805376, width : 800, height : 600};
 		return conf;
 	}
 	,__class__: snow_Snow
@@ -6671,9 +6671,9 @@ snow_core_web_window_Windowing.prototype = {
 		var _handle = tmp;
 		var config = this._copy_config(_config);
 		_handle.width = "100%";
-		_handle.height = "1000px";
-		_handle.style.display = "flex";
-		_handle.style.position = "relative";
+		_handle.height = "0px";
+		_handle.style.display = "block";
+		_handle.style.position = "fixed";
 		_handle.style.background = "#000";
 		_handle.style.opacity = "1.0";
 		document.getElementsByClassName("fluid")[0].appendChild(_handle);
