@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"io"
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -73,7 +71,6 @@ func main() {
 
 	var (
 		messageChan            = make(chan string)
-		messageAttachmentsChan = make(chan message)
 		done                   = make(chan bool)
 	)
 
@@ -82,31 +79,17 @@ func main() {
 	go func() {
 		var reportBody string
 		for {
-			select {
-			case message, more := <-messageChan:
+			message, more := <-messageChan
 
-				if more {
-					reportBody += message
-				} else {
-					if reportBody != "" {
-						reportToDiscord(reportBody)
-					}
-
-					done <- true
-					return
+			if more {
+				reportBody += message
+			} else {
+				if reportBody != "" {
+					reportToDiscord(reportBody)
 				}
 
-			case message := <-messageAttachmentsChan:
-				var buf bytes.Buffer
-
-				_, _ = buf.WriteString(message.content)
-
-				reportToDiscordWithAttachment(
-					message.message,
-					map[string]io.Reader{
-						"last-message.txt": &buf,
-					},
-				)
+				done <- true
+				return
 			}
 		}
 	}()
@@ -165,23 +148,13 @@ func main() {
 					break
 				}
 
-				msg, err := getAndRequeueFirstMessage(rmq.rmqAddress, name, vhost.Name)
-
-				if err != nil {
-					log.Fatal(func(k *log.Log) {
-						k.Message = "Failed to get the top dead letter queue message!"
-						k.Payload = err
-					})
-				}
-
-				if len(msg) > 0 && messagesReady > maxDeadLetterCount {
-					queueReportWithMessage(
-						messageAttachmentsChan,
+				if messagesReady > maxDeadLetterCount {
+					queueReport(
+						messageChan,
 						queue,
 						"Dead Letter Ready",
 						messagesReady,
 						maxDeadLetterCount,
-						msg,
 					)
 				}
 
