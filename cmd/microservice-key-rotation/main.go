@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	awsCommon "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -44,6 +45,10 @@ const (
 const bucketAcl = s3.BucketCannedACLPrivate
 
 func main() {
+	lambda.Start(rotateOracleKeys)
+}
+
+func rotateOracleKeys() {
 	var (
 		gethHttpUrl             = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		awsRegion               = util.GetEnvOrFatal(EnvAwsRegion)
