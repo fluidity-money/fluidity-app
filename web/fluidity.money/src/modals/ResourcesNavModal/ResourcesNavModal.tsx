@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import styles from "./ResourcesNavModal.module.scss";
 
 interface IResourcesNavModal {
@@ -11,24 +10,24 @@ const ResourcesNavModal = ({ handleModal }: IResourcesNavModal) => {
   return (
     <div className={styles.container}>
       <h4>
-        <Link onClick={() => handleModal()} to="/resources#articles">
+        <a onClick={() => handleModal()} href="/resources#articles">
           {"Articles >"}
-        </Link>
+        </a>
       </h4>
       <h4>
-        <Link onClick={() => handleModal()} to="/resources#fluniversity">
+        <a onClick={() => handleModal()} href="/resources#fluniversity">
           {"Fluniversity >"}
-        </Link>
+        </a>
       </h4>
       <h4>
-        <Link onClick={() => handleModal()} to="/resources#whitepapers">
+        <a onClick={() => handleModal()} href="/resources#whitepapers">
           {"Whitepapers >"}
-        </Link>
+        </a>
       </h4>
       <h4>
-        <Link onClick={() => handleModal()} to="/resources#docs">
+        <a onClick={() => handleModal()} href="/resources#docs">
           {"Documentation [>]"}
-        </Link>
+        </a>
       </h4>
     </div>
   );
