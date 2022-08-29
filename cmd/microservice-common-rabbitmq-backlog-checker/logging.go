@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/url"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -9,12 +10,21 @@ import (
 	"github.com/rabbitmq/amqp091-go"
 )
 
+type message struct {
+	message string
+	content string
+}
+
 func reportToDiscord(message string, arguments ...interface{}) {
 	discord.Notify(
 		0,
 		message,
 		arguments...,
 	)
+}
+
+func reportToDiscordWithAttachment(message string, content map[string]io.Reader) {
+	discord.NotifyWithAttachment(0, message, content)
 }
 
 // queueReport to put messages into the channel, so that they can be batch processed
@@ -32,18 +42,21 @@ func queueReport(messageChan chan string, queue rmqQueue, messageType string, nu
 }
 
 // queueReportWithMessage to put messages into the channel, so that they can be batch processed, including the message body in the log
-func queueReportWithMessage(messageChan chan string, queue rmqQueue, messageType string, numMessages uint64, limitMessages uint64, messageJson string) {
-	messageChan <- fmt.Sprintf(
-		"Queue %v has too many %v messages (%v, limit: %v) Node %v/%v is %v. Message was: %v\n",
-		queue.Name,
-		messageType,
-		numMessages,
-		limitMessages,
-		queue.Vhost,
-		queue.Node,
-		queue.State,
-		messageJson,
-	)
+func queueReportWithMessage(messageAttachmentsChan chan message, queue rmqQueue, messageType string, numMessages uint64, limitMessages uint64, messageJson string) {
+	messageAttachmentsChan <- message{
+		message: fmt.Sprintf(
+			"Queue %v has too many %v messages (%v, limit: %v) Node %v/%v is %v.\n",
+			queue.Name,
+			messageType,
+			numMessages,
+			limitMessages,
+			queue.Vhost,
+			queue.Node,
+			queue.State,
+		),
+
+		content: messageJson,
+	}
 }
 
 // getAndRequeueFirstMessage to `Nack message requeue true` the first message in a queue
