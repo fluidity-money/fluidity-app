@@ -1,7 +1,6 @@
 import React, { ReactNode, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
 import { GeneralButton } from "../Button";
-import ResourcesNavModal from "../../../../fluidity.money/src/components/ResourcesNavModal";
+import ResourcesNavModal from "../../../../fluidity.money/src/modals/ResourcesNavModal";
 import styles from "./NavBar.module.scss";
 
 interface IButton {
@@ -44,26 +43,29 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
     setModal(!modal);
   };
 
-  const navLinksTitles = navLinks.map((link) => {
+  const navLinksTitles = navLinks.map((link) => (
     <li>
-      <NavLink
-        to={`/${link.name.replace(/\s+/g, "")}`}
-        className={({ isActive }) => {
-          return isActive ? styles.active : "";
-        }}
+      <a
+        href={`/${link.name.replace(/\s+/g, "")}`}
+        className={
+          window.location.pathname.toString() ===
+          `/${link.name.replace(/\s+/g, "")}`
+            ? styles.active
+            : ""
+        }
       >
         {link.name.toUpperCase()}
-      </NavLink>
+      </a>
       {link.modal && (
         <button onClick={() => handleModal()}>
           <img
-            src="/assets/images/triangleDown.svg"
+            src="./src/assets/images/triangleDown.svg"
             alt="open resource options"
           />
         </button>
       )}
-    </li>;
-  });
+    </li>
+  ));
 
   return (
     <div className={styles.outerContainer}>
@@ -73,10 +75,10 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <div>
-              <Link to={"/"}>
+              <a href={"/"}>
                 {/* prop */}
                 <img src={logo} alt="home page" />
-              </Link>
+              </a>
             </div>
             {/* props */}
             <GeneralButton

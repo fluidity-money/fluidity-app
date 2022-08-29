@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
 import { GeneralButton } from "../Button";
 import ResourcesNavModal from "../../modals/ResourcesNavModal";
 import styles from "./NavBar.module.scss";
@@ -9,6 +8,7 @@ const NavBar = () => {
   const handleModal = () => {
     setModal(!modal);
   };
+
   return (
     <div className={styles.outerContainer}>
       <div className={`${styles.container} opacity-5x`}>
@@ -16,9 +16,9 @@ const NavBar = () => {
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <div>
-              <Link to={"/"}>
+              <a href={"/"}>
                 <img src="/assets/images/logoOutline.svg" alt="home page" />
-              </Link>
+              </a>
             </div>
             <GeneralButton
               version={"secondary"}
@@ -35,44 +35,52 @@ const NavBar = () => {
             <nav>
               <ul>
                 <li>
-                  <NavLink
-                    to={"/howitworks"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                  <a
+                    href={"/howitworks"}
+                    className={
+                      window.location.pathname.toString() === "/howitworks"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     HOW IT WORKS
-                  </NavLink>
+                  </a>
                 </li>
                 <li>
-                  <NavLink
-                    to={"/ecosystem"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                  <a
+                    href={"/ecosystem"}
+                    className={
+                      window.location.pathname.toString() === "/ecosystem"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     ECOSYSTEM
-                  </NavLink>
+                  </a>
                 </li>
                 <li>
-                  <NavLink
-                    to={"/fluidstats"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                  <a
+                    href={"/fluidstats"}
+                    className={
+                      window.location.pathname.toString() === "/fluidstats"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     FLUID STATS
-                  </NavLink>
+                  </a>
                 </li>
                 <li>
-                  <NavLink
-                    to={"/resources"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                  <a
+                    href={"/resources"}
+                    className={
+                      window.location.pathname.toString() === "/resources"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     RESOURCES
-                  </NavLink>
+                  </a>
 
                   <button onClick={() => handleModal()}>
                     <img
