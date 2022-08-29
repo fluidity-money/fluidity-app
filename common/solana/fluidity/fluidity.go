@@ -27,6 +27,26 @@ const (
 
 	// VariantDrain to drain the prize pool
 	VariantDrain
+
+	// VariantUpdateMintLimits to update the mint caps
+	VariantUpdateMintLimits
+
+	// VariantUpdatePayoutLimits to update the amount that can be freely
+	// minted
+	VariantUpdatePayoutLimits
+
+	// VariantUpdatePayoutAuthority to update the worker key
+	VariantUpdatePayoutAuthority
+
+	// 10
+	// VariantUpdateOperator to update the admin account
+	VariantUpdateOperator
+
+	// VariantConfirmUpdatePayoutAuthority to finalise a worker update
+	VariantConfirmUpdatePayoutAuthority
+
+	// VariantEmergency to lock down the contract
+	VariantEmergency
 )
 
 type (
