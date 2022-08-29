@@ -1,4 +1,4 @@
-import SearchModal from "modals";
+import { SearchModal } from "modals";
 import React, { useState } from "react";
 import ContinuousCarousel from "../../components/ContinuousCarousel";
 import styles from "./Search.module.scss";
@@ -18,9 +18,14 @@ const Search = () => {
       <div className={styles.center}>
         <h1>The Fluid Ecosystem</h1>
         <div className={styles.search}>
+          <img
+            className={styles.icon}
+            src="/assets/images/magnifyingGlass.svg"
+            alt="search icon"
+          />
           <input
             type="text"
-            placeholder="🔍 Search projects and protocols"
+            placeholder="Search projects and protocols"
             onClick={openModal}
           ></input>
         </div>
