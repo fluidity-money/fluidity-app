@@ -6,7 +6,6 @@ import (
 	"crypto"
 	"crypto/ed25519"
 	crypto_rand "crypto/rand"
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"sort"
@@ -23,10 +22,7 @@ const (
 
 const ProgramDerivedAddressMarker = "ProgramDerivedAddress"
 
-type (
-	PublicKey  [32]byte
-	PrivateKey []byte
-)
+type PrivateKey []byte
 
 type Wallet struct {
 	PrivateKey PrivateKey
@@ -38,28 +34,6 @@ type AccountMeta struct {
 	IsSigner   bool
 }
 
-func (pk PublicKey) String() string {
-	return string(pk[:])
-}
-
-// PublicKeyFromBase58 using btcsuite
-func PublicKeyFromBase58(b58 string) (PublicKey, error) {
-	key := base58.Decode(b58)
-
-	pk := PublicKey{}
-
-	if keyLen := len(key); keyLen != 32 {
-		return pk, fmt.Errorf(
-			"invalid format for public key, length was not 32, was %v",
-			keyLen,
-		)
-	}
-
-	copy(pk[0:32], key)
-
-	return pk, nil
-}
-
 // Check if point exists on the ED25519 curve.
 // Solana program addresses must not appear on curve.
 func ValidCurve(point []byte) bool {
@@ -68,46 +42,6 @@ func ValidCurve(point []byte) bool {
 }
 
 var ErrMaxSeedLengthExceeded = fmt.Errorf("max seed length exceeded")
-
-func CreateProgramAddress(seeds [][]byte, programID PublicKey) (PublicKey, error) {
-	if len(seeds) > MaxSeeds {
-		return PublicKey{}, ErrMaxSeedLengthExceeded
-	}
-
-	for _, seed := range seeds {
-		if len(seed) > MaxSeedLength {
-			return PublicKey{}, ErrMaxSeedLengthExceeded
-		}
-	}
-
-	buf := []byte{}
-
-	for _, seed := range seeds {
-		buf = append(buf, seed...)
-	}
-
-	buf = append(buf, programID[:]...)
-
-	buf = append(buf, []byte(ProgramDerivedAddressMarker)...)
-
-	hash := sha256.Sum256(buf)
-
-	if ValidCurve(hash[:]) {
-		return PublicKey{}, errors.New("invalid seeds; address must fall off the curve")
-	}
-
-	return PublicKeyFromBytes(hash[:]), nil
-}
-
-func PublicKeyFromBytes(b []byte) PublicKey {
-	var pk PublicKey
-	copy(pk[:], b)
-	return pk
-}
-
-func (p PublicKey) Bytes() []byte {
-	return []byte(p[:])
-}
 
 // FindProgramAddress - just enough to cover the prior use case
 func FindProgramAddress(seed [][]byte, pub PublicKey) (PublicKey, uint8, error) {
@@ -279,14 +213,6 @@ func (in *GenericInstruction) Accounts() []*AccountMeta {
 
 func (in *GenericInstruction) Data() ([]byte, error) {
 	return in.DataBytes, nil
-}
-
-func (pk PublicKey) IsZero() bool {
-	return pk == PublicKey{}
-}
-
-func (pk PublicKey) Equals(pub PublicKey) bool {
-	return pk == pub
 }
 
 type PublicKeySlice []PublicKey

@@ -8,7 +8,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
-func (s *RpcProvider) SendTransaction(transaction *solana.Transaction) (sig solana.Signature, err error) {
+func (s *Provider) SendTransaction(transaction *solana.Transaction) (sig solana.Signature, err error) {
 	txData, err := transaction.MarshalBinary()
 
 	if err != nil {

@@ -39,18 +39,18 @@ type (
 )
 
 type (
-	rpcProviderUnderlying interface {
+	providerUnderlying interface {
 		RawInvoke(string, interface{}) (json.RawMessage, error)
 	}
 
-	// RpcProvider supporting
-	RpcProvider struct {
-		rpcProviderUnderlying
+	// Provider supporting
+	Provider struct {
+		providerUnderlying
 	}
 )
 
 // New rpc provider - wss? will use Websocket, https? will use Http
-func New(url_ string) (*RpcProvider, error) {
+func New(url_ string) (*Provider, error) {
 	url, err := url.Parse(url_)
 
 	if err != nil {
@@ -71,7 +71,7 @@ func New(url_ string) (*RpcProvider, error) {
 			return nil, err
 		}
 
-		p := RpcProvider{r}
+		p := Provider{r}
 
 		return &p, nil
 
@@ -85,7 +85,7 @@ func New(url_ string) (*RpcProvider, error) {
 			return nil, err
 		}
 
-		p := RpcProvider{r}
+		p := Provider{r}
 
 		return &p, nil
 
@@ -98,8 +98,8 @@ func New(url_ string) (*RpcProvider, error) {
 }
 
 // Invoke Solana RPC method
-func (s RpcProvider) RawInvoke(method string, body interface{}) (json.RawMessage, error) {
-	message, err := s.rpcProviderUnderlying.RawInvoke(method, body)
+func (s Provider) RawInvoke(method string, body interface{}) (json.RawMessage, error) {
+	message, err := s.providerUnderlying.RawInvoke(method, body)
 
 	if err != nil {
 		return nil, err

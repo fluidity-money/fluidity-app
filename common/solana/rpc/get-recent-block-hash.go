@@ -18,7 +18,7 @@ type GetRecentBlockhashResult struct {
 	} `json:"value"`
 }
 
-func (s *RpcProvider) GetRecentBlockhash(commitment string) (*GetRecentBlockhashResult, error) {
+func (s *Provider) GetRecentBlockhash(commitment string) (*GetRecentBlockhashResult, error) {
 	params := []interface{}{}
 
 	if commitment != "" {

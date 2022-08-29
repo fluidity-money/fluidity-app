@@ -10,7 +10,7 @@ type getBlocksResult struct {
 	Error  map[string]interface{} `json:"error"`
 }
 
-func (s RpcProvider) GetConfirmedBlocks(from, to uint64) ([]uint64, error) {
+func (s Provider) GetConfirmedBlocks(from, to uint64) ([]uint64, error) {
 	res, err := s.RawInvoke("getBlocksWithLimit", []interface{}{
 		from,
 		to,

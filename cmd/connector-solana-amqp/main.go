@@ -31,7 +31,7 @@ const (
 	EnvStartingSlot = `FLU_SOLANA_STARTING_SLOT`
 )
 
-func updateConfirmedBlocksFrom(client *solanaRpc.RpcProvider, from uint64) (uint64, error) {
+func updateConfirmedBlocksFrom(client *solanaRpc.Provider, from uint64) (uint64, error) {
 	var lastBlock uint64 = 0
 
 	for {

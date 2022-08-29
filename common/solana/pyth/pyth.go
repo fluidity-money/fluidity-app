@@ -5,6 +5,8 @@ import (
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
+
 	"github.com/near/borsh-go"
 )
 
@@ -99,13 +101,11 @@ type (
 	}
 )
 
-func GetPrice(solanaClient *solana.SolanaRPCHandle, pricePubkey solana.PublicKey) (*big.Rat, error) {
+func GetPrice(client *rpc.Provider, pricePubkey solana.PublicKey) (*big.Rat, error) {
 
 	// get reserve bytes
 
-	resp, err := solanaClient.GetAccountInfo(
-		pricePubkey,
-	)
+	resp, err := client.GetAccountInfo(pricePubkey)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -119,11 +119,20 @@ func GetPrice(solanaClient *solana.SolanaRPCHandle, pricePubkey solana.PublicKey
 
 	price := new(Price)
 
-	err = borsh.Deserialize(price, resp.Value.Data.GetBinary())
+	data, err := resp.GetBinary()
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to deserialize price data! %v",
+			"failed to deserialize price data with base64! %v",
+			err,
+		)
+	}
+
+	err = borsh.Deserialize(price, data)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to deserialize price data with borsh! %v",
 			err,
 		)
 	}
@@ -180,7 +189,7 @@ var pythPrices = map[string]string{
 
 // GetPriceByToken takes an spl-token, and returns the corresponding pyth price
 // for that token, automatically finding the price account
-func GetPriceByToken(solanaClient *solana.SolanaRPCHandle, token string) (*big.Rat, error) {
+func GetPriceByToken(solanaClient *rpc.Provider, token string) (*big.Rat, error) {
 
 	pythPricePubkeyString := pythPrices[token]
 

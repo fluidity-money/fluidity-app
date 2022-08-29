@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (s RpcProvider) GetLatestSlot() (uint64, error) {
+func (s Provider) GetLatestSlot() (uint64, error) {
 	res, err := s.RawInvoke("getSlot", []map[string]string{
 		{
 			"commitment": "finalized",

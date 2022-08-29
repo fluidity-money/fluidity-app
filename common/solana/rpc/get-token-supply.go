@@ -26,7 +26,7 @@ type GetTokenSupplyResult struct {
 	} `json:"value"`
 }
 
-func (s *RpcProvider) GetTokenSupply(mint solana.PublicKey, commitment string) (*GetTokenSupplyResult, error) {
+func (s *Provider) GetTokenSupply(mint solana.PublicKey, commitment string) (*GetTokenSupplyResult, error) {
 	params := []interface{}{}
 
 	if commitment != "" {

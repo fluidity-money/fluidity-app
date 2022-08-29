@@ -7,13 +7,19 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
-type GetAccountInfoResult struct {
-	RpcContext
-	Value *Account `json:"value"`
+type accountResponse struct {
+	Value Account `json:"value"`
 }
 
-func (s RpcProvider) GetAccountInfo(account solana.PublicKey) (*GetAccountInfoResult, error) {
-	res, err := s.RawInvoke("getAccountInfo", account)
+func (s Provider) GetAccountInfo(account_ solana.PublicKey) (*Account, error) {
+	publicKey := account_.ToBase58()
+
+	res, err := s.RawInvoke("getAccountInfo", []interface{}{
+		publicKey,
+		map[string]string{
+			"encoding": "base64",
+		},
+	})
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -22,9 +28,9 @@ func (s RpcProvider) GetAccountInfo(account solana.PublicKey) (*GetAccountInfoRe
 		)
 	}
 
-	var accountInfoResult GetAccountInfoResult
+	var accountResponse accountResponse
 
-	if err := json.Unmarshal(res, &accountInfoResult); err != nil {
+	if err := json.Unmarshal(res, &accountResponse); err != nil {
 		return nil, fmt.Errorf(
 			"failed to decode getAccountInfo, message %#v: %v",
 			string(res),
@@ -32,5 +38,7 @@ func (s RpcProvider) GetAccountInfo(account solana.PublicKey) (*GetAccountInfoRe
 		)
 	}
 
-	return &accountInfoResult, nil
+	account := accountResponse.Value
+
+	return &account, nil
 }

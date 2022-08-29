@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/fluidity-money/fluidity-app/lib/log"
 )
+
+const LogContextHttp = "COMMON/SOLANA/HTTP"
 
 type Http struct {
 	http.Client
@@ -50,6 +54,18 @@ func (client Http) RawInvoke(method string, params interface{}) (json.RawMessage
 		)
 	}
 
+	log.Debug(func(k *log.Log) {
+		buf2 := buf
+
+		k.Context = LogContextHttp
+
+		k.Format(
+			"Sending this message with method %v: %#v",
+			method,
+			string(buf2.String()),
+		)
+	})
+
 	req, err := http.NewRequest("POST", "", &buf)
 
 	if err != nil {
@@ -74,9 +90,31 @@ func (client Http) RawInvoke(method string, params interface{}) (json.RawMessage
 
 	defer resp.Body.Close()
 
+	var bodyBuf bytes.Buffer
+
+	_, err = bodyBuf.ReadFrom(resp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to read the rpc response body: %v",
+			err,
+		)
+	}
+
+	log.Debug(func(k *log.Log) {
+		bodyBuf2 := bodyBuf
+
+		k.Context = LogContextHttp
+
+		k.Format(
+			"Received this message %#v as response!",
+			string(bodyBuf2.Bytes()),
+		)
+	})
+
 	var response rpcResponse
 
-	err = json.NewDecoder(resp.Body).Decode(&response)
+	err = json.NewDecoder(&bodyBuf).Decode(&response)
 
 	if err != nil {
 		return nil, fmt.Errorf(

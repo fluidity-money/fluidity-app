@@ -3,14 +3,14 @@ package main
 import (
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
+	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	solanaQueue "github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
 )
@@ -69,7 +69,7 @@ func main() {
 		})
 	}
 
-	solanaClient, err := solanaLib.SolanaCallManager(solanaRpcUrl)
+	solanaClient, err := rpc.New(solanaRpcUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
