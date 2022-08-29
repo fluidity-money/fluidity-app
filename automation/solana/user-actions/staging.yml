@@ -18,16 +18,16 @@ SERVICES:
       ENV_FLU_SOLANA_PDA_PUBKEY: 5tCSTEkozvUw9YZxZzsGkR9upMQNacFEBiYN21nfCj77
       ENV_FLU_SOLANA_TOKEN_SHORT_NAME: USDT
 
-  - ACTIONS_UXD:
-      SERVICE_NAME: microservice-solana-user-actions-uxd
-      ENV_FLU_WORKER_ID: solana-staging-microservice-solana-user-actions-uxd
-      ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 7Taua7k6kX2UTD1joXTsyQ8jodAzUEjmxXfCn5zvU55m
-      ENV_FLU_SOLANA_PDA_PUBKEY: FwdhT2Q3dckz2EfLoKznsBm5V55uk88ZtM5ep45NuoJJ
-      ENV_FLU_SOLANA_TOKEN_SHORT_NAME: UXD
+#   - ACTIONS_UXD:
+#       SERVICE_NAME: microservice-solana-user-actions-uxd
+#       ENV_FLU_WORKER_ID: solana-staging-microservice-solana-user-actions-uxd
+#       ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 7Taua7k6kX2UTD1joXTsyQ8jodAzUEjmxXfCn5zvU55m
+#       ENV_FLU_SOLANA_PDA_PUBKEY: FwdhT2Q3dckz2EfLoKznsBm5V55uk88ZtM5ep45NuoJJ
+#       ENV_FLU_SOLANA_TOKEN_SHORT_NAME: UXD
   
-  - ACTIONS_USDH:
-      SERVICE_NAME: microservice-solana-user-actions-usdh
-      ENV_FLU_WORKER_ID: solana-staging-microservice-solana-user-actions-usdh
-      ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 8Rm2VXdf4AjvJt6enC6rhj2qBKpaNUTPQX3j3N4aKChA
-      ENV_FLU_SOLANA_PDA_PUBKEY: 4TW7HRuqaDx7phgbWDZ4xd78kMiYvgBoqZrzdTzyGEX5
-      ENV_FLU_SOLANA_TOKEN_SHORT_NAME: USDH
+#   - ACTIONS_USDH:
+#       SERVICE_NAME: microservice-solana-user-actions-usdh
+#       ENV_FLU_WORKER_ID: solana-staging-microservice-solana-user-actions-usdh
+#       ENV_FLU_SOLANA_FLUID_MINT_PUBKEY: 8Rm2VXdf4AjvJt6enC6rhj2qBKpaNUTPQX3j3N4aKChA
+#       ENV_FLU_SOLANA_PDA_PUBKEY: 4TW7HRuqaDx7phgbWDZ4xd78kMiYvgBoqZrzdTzyGEX5
+#       ENV_FLU_SOLANA_TOKEN_SHORT_NAME: USDH
