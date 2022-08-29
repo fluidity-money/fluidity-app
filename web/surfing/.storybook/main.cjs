@@ -9,7 +9,6 @@ module.exports = {
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "storybook-addon-pseudo-states",
-    ["storybook-addon-react-router-v6"],
   ],
   framework: "@storybook/react",
   core: {

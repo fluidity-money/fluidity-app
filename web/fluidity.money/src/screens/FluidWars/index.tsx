@@ -1,3 +1,3 @@
-import FuidWars from "./FuidWars";
+import FluidWars from "./FluidWars";
 
-export default FuidWars;
+export default FluidWars;

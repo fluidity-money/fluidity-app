@@ -2,9 +2,9 @@ import ReusableGrid from "components/ReusableGrid";
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import styles from "./FuidWars.module.scss";
+import styles from "./FluidWars.module.scss";
 
-const FuidWars = () => {
+const FluidWars = () => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top
    for ResourcesNavModal to work*/
   const location = useLocation();
@@ -32,7 +32,7 @@ const FuidWars = () => {
   );
 };
 
-export default FuidWars;
+export default FluidWars;
 
 const header = "User activity is incentivised through governance.";
 

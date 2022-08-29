@@ -15,7 +15,4 @@ export const parameters = {
       },
     ],
   },
-  reactRouter: {
-    routePath: "/ecosystem",
-  },
 };
