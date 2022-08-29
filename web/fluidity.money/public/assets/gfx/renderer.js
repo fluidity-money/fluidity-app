@@ -2202,7 +2202,7 @@ Main.prototype = $extend(flu_App.prototype,{
 		
 			ref.mousePointKnown = false;
 			
-		}, 800, ref);
+		}, 1200, ref);
 		this.window = this.app.window;
 		this.init();
 		this.window.onevent = $bind(this,this.onWindowEvent);
@@ -2301,7 +2301,6 @@ Main.prototype = $extend(flu_App.prototype,{
 		this.lastTime = this.initTime;
 	}
 	,update: function(dt) {
-		
 		this.time = flu_Timer.stamp() - this.initTime;
 		var _this = this.performanceMonitor;
 		if(dt > 0) {
@@ -2502,251 +2501,16 @@ Main.prototype = $extend(flu_App.prototype,{
 			}
 			var rgb = this.dyeColorHSB.toRGB();
 			var _this11 = this.dyeColor;
+
+			//shoot fluid color configuration - modify later.
 			var x = rgb.get_red() / 255;
 			var y = rgb.get_green() / 255;
 			var z = rgb.get_blue() / 255;
 			_this11.x = x;
 			_this11.y = y;
 			_this11.z = z;
-		} else if(this.isMouseDown && this.TWILIGHT == true) {
-			if(!this.HAS_RUN) {
-				var x_location = this.mouse.x / this.window.width * 2 - 1;
-				var y_location = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x = (x_location + 1) / 2 * this.fluid.width - 25;
-				var mouse_y = (y_location + 1) / 2 * this.fluid.height - 25;
-				var image = window.document.querySelector("img[src=\"images/twilight_dye.png\"]");
-				if(image != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x),Math.round(mouse_y),6407,5121,image);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx1 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy1 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g18 = this.dyeColorHSB;
-			_g18.set_hue(_g18.get_hue() + Math.sqrt(vx1 * vx1 + vy1 * vy1) * 0.5);
-			var rgb1 = this.dyeColorHSB.toRGB();
-			var _this12 = this.dyeColor;
-			_this12.x = 0.90980392156862744;
-			_this12.y = 0.6470588235294118;
-			_this12.z = 0.81176470588235294;
-		} else if(this.isMouseDown && this.SEX_BOMB == true) {
-			if(!this.HAS_RUN) {
-				var x_location1 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location1 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x1 = (x_location1 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y1 = (y_location1 + 1) / 2 * this.fluid.height - 25;
-				var image1 = window.document.querySelector("img[src=\"images/sex_bomb_dye.png\"]");
-				if(image1 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x1),Math.round(mouse_y1),6407,5121,image1);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx2 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy2 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g19 = this.dyeColorHSB;
-			_g19.set_hue(_g19.get_hue() + Math.sqrt(vx2 * vx2 + vy2 * vy2) * 0.5);
-			var rgb2 = this.dyeColorHSB.toRGB();
-			var _this13 = this.dyeColor;
-			_this13.x = 0.984313725490196;
-			_this13.y = 0.55294117647058827;
-			_this13.z = 0.60784313725490191;
-		} else if(this.isMouseDown && this.BIG_BLUE == true) {
-			if(!this.HAS_RUN) {
-				var x_location2 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location2 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x2 = (x_location2 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y2 = (y_location2 + 1) / 2 * this.fluid.height - 25;
-				var image2 = window.document.querySelector("img[src=\"images/big_blue_dye.png\"]");
-				if(image2 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x2),Math.round(mouse_y2),6407,5121,image2);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx3 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy3 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g20 = this.dyeColorHSB;
-			_g20.set_hue(_g20.get_hue() + Math.sqrt(vx3 * vx3 + vy3 * vy3) * 0.5);
-			var rgb3 = this.dyeColorHSB.toRGB();
-			var _this14 = this.dyeColor;
-			_this14.x = 0.14117647058823529;
-			_this14.y = 0.68627450980392157;
-			_this14.z = 0.74509803921568629;
-		} else if(this.isMouseDown && this.THINK_PINK == true) {
-			if(!this.HAS_RUN) {
-				var x_location3 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location3 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x3 = (x_location3 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y3 = (y_location3 + 1) / 2 * this.fluid.height - 25;
-				var image3 = window.document.querySelector("img[src=\"images/think_pink_dye.png\"]");
-				if(image3 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x3),Math.round(mouse_y3),6407,5121,image3);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx4 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy4 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g21 = this.dyeColorHSB;
-			_g21.set_hue(_g21.get_hue() + Math.sqrt(vx4 * vx4 + vy4 * vy4) * 0.5);
-			var rgb4 = this.dyeColorHSB.toRGB();
-			var _this15 = this.dyeColor;
-			_this15.x = 0.84705882352941175;
-			_this15.y = 0.27843137254901962;
-			_this15.z = 0.47058823529411764;
-		} else if(this.isMouseDown && this.AVOBATH == true) {
-			if(!this.HAS_RUN) {
-				var x_location4 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location4 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x4 = (x_location4 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y4 = (y_location4 + 1) / 2 * this.fluid.height - 25;
-				var image4 = window.document.querySelector("img[src=\"images/avobath_dye.png\"]");
-				if(image4 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x4),Math.round(mouse_y4),6407,5121,image4);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx5 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy5 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g22 = this.dyeColorHSB;
-			_g22.set_hue(_g22.get_hue() + Math.sqrt(vx5 * vx5 + vy5 * vy5) * 0.5);
-			var rgb5 = this.dyeColorHSB.toRGB();
-			var _this16 = this.dyeColor;
-			_this16.x = 0.5490196078431373;
-			_this16.y = 0.71764705882352942;
-			_this16.z = 0.4;
-		} else if(this.isMouseDown && this.CHEER_UP_BUTTERCUP == true) {
-			if(!this.HAS_RUN) {
-				var x_location5 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location5 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x5 = (x_location5 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y5 = (y_location5 + 1) / 2 * this.fluid.height - 25;
-				var image5 = window.document.querySelector("img[src=\"images/cheer_up_buttercup_dye.png\"]");
-				if(image5 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x5),Math.round(mouse_y5),6407,5121,image5);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx6 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy6 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g23 = this.dyeColorHSB;
-			_g23.set_hue(_g23.get_hue() + Math.sqrt(vx6 * vx6 + vy6 * vy6) * 0.5);
-			var rgb6 = this.dyeColorHSB.toRGB();
-			var _this17 = this.dyeColor;
-			_this17.x = 0.99215686274509807;
-			_this17.y = 0.85098039215686272;
-			_this17.z = 0.403921568627451;
-		} else if(this.isMouseDown && this.SECRET_ARTS == true) {
-			if(!this.HAS_RUN) {
-				var x_location6 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location6 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x6 = (x_location6 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y6 = (y_location6 + 1) / 2 * this.fluid.height - 25;
-				var image6 = window.document.querySelector("img[src=\"images/secret_arts_dye.png\"]");
-				if(image6 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x6),Math.round(mouse_y6),6407,5121,image6);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx7 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy7 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g24 = this.dyeColorHSB;
-			_g24.set_hue(_g24.get_hue() + Math.sqrt(vx7 * vx7 + vy7 * vy7) * 0.5);
-			var rgb7 = this.dyeColorHSB.toRGB();
-			var _this18 = this.dyeColor;
-			_this18.x = 0.55294117647058827;
-			_this18.y = 0.5490196078431373;
-			_this18.z = 0.56862745098039214;
-		} else if(this.isMouseDown && this.BIG_SLEEP == true) {
-			if(!this.HAS_RUN) {
-				var x_location7 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location7 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x7 = (x_location7 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y7 = (y_location7 + 1) / 2 * this.fluid.height - 25;
-				var image7 = window.document.querySelector("img[src=\"images/big_sleep_dye.png\"]");
-				if(image7 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x7),Math.round(mouse_y7),6407,5121,image7);
-				}
-				this.HAS_RUN = true;
-			}
-			var vx8 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-			var vy8 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-			var _g25 = this.dyeColorHSB;
-			_g25.set_hue(_g25.get_hue() + Math.sqrt(vx8 * vx8 + vy8 * vy8) * 0.5);
-			var rgb8 = this.dyeColorHSB.toRGB();
-			var _this19 = this.dyeColor;
-			_this19.x = 0.41176470588235292;
-			_this19.y = 0.83137254901960789;
-			_this19.z = 0.91764705882352937;
-		} else if(this.isMouseDown && this.THE_EXPERIMENTOR == true) {
-			if(!this.HAS_RUN) {
-				var x_location8 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location8 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x8 = (x_location8 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y8 = (y_location8 + 1) / 2 * this.fluid.height - 25;
-				var image8 = window.document.querySelector("img[src=\"images/experimenter_dye.png\"]");
-				if(image8 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x8),Math.round(mouse_y8),6407,5121,image8);
-				}
-				this.HAS_RUN = true;
-			}
-			if(this.hueCycleEnabled) {
-				var _g26 = this.dyeColorHSB;
-				_g26.set_hue(_g26.get_hue() + 1.2);
-			}
-			if(this.hueCycleEnabled) {
-				var vx9 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-				var vy9 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-				var _g27 = this.dyeColorHSB;
-				_g27.set_hue(_g27.get_hue() + Math.sqrt(vx9 * vx9 + vy9 * vy9) * 0.5);
-			}
-			var rgb9 = this.dyeColorHSB.toRGB();
-			var _this20 = this.dyeColor;
-			var x1 = rgb9.get_red() / 255;
-			var y1 = rgb9.get_green() / 255;
-			var z1 = rgb9.get_blue() / 255;
-			_this20.x = x1;
-			_this20.y = y1;
-			_this20.z = z1;
-		} else if(this.isMouseDown && this.INTERGALACTIC == true) {
-			if(!this.HAS_RUN) {
-				var x_location9 = this.mouse.x / this.window.width * 2 - 1;
-				var y_location9 = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-				var mouse_x9 = (x_location9 + 1) / 2 * this.fluid.width - 25;
-				var mouse_y9 = (y_location9 + 1) / 2 * this.fluid.height - 25;
-				var image9 = window.document.querySelector("img[src=\"images/intergalactic_dye.png\"]");
-				if(image9 != null) {
-					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
-					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x9),Math.round(mouse_y9),6407,5121,image9);
-				}
-				this.HAS_RUN = true;
-			}
-			if(this.hueCycleEnabled) {
-				var _g28 = this.dyeColorHSB;
-				_g28.set_hue(_g28.get_hue() + 1.2);
-			}
-			if(this.hueCycleEnabled) {
-				var vx10 = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-				var vy10 = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-				var _g29 = this.dyeColorHSB;
-				_g29.set_hue(_g29.get_hue() + Math.sqrt(vx10 * vx10 + vy10 * vy10) * 0.5);
-			}
-			var rgb10 = this.dyeColorHSB.toRGB();
-			var _this21 = this.dyeColor;
-			var x2 = rgb10.get_red() / 255;
-			var y2 = rgb10.get_green() / 255;
-			var z2 = rgb10.get_blue() / 255;
-			_this21.x = x2;
-			_this21.y = y2;
-			_this21.z = z2;
 		}
+
 		var _this22 = this.lastMouse;
 		_this22.x = this.mouse.x;
 		_this22.y = this.mouse.y;
@@ -2947,7 +2711,7 @@ Main.prototype = $extend(flu_App.prototype,{
 		if(magnitude < 0.5) qualityIndex += 1; else qualityIndex += 2;
 		if(qualityIndex > maxIndex) qualityIndex = maxIndex;
 		var newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
-		console.log("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
+		alert("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
 		this.set_simulationQuality(newQuality);
 		this.updateSimulationTextures();
 		this.updatePointSize();
@@ -5453,7 +5217,6 @@ flu.prototype = {
 		this.shutting_down = true;
 		this.host.ondestroy();
 		this.io.module.destroy();
-		this.audio.destroy();
 		this.input.destroy();
 		this.windowing.destroy();
 		flu.core.shutdown();
@@ -5482,7 +5245,6 @@ flu.prototype = {
 		if(this.was_ready) throw new js__$Boot_FluidError(flu_types_Error.error("firing ready event more than once is invalid usage"));
 		this.io = new flu_system_io_IO(this);
 		this.input = new flu_system_input_Input(this);
-		this.audio = new flu_system_audio_Audio(this);
 		this.assets = new flu_system_assets_Assets(this);
 		this.windowing = new flu_system_window_Windowing(this);
 		this.was_ready = true;
@@ -5515,7 +5277,6 @@ flu.prototype = {
 	,do_internal_update: function(dt) {
 		this.io.module.update();
 		this.input.update();
-		this.audio.update();
 		this.host.update(dt);
 	}
 	,on_ready: function() {
@@ -5548,7 +5309,6 @@ flu.prototype = {
 		_event.type != 3 && _event.type != 0 && _event.type != 5 && _event.type != 6;
 		if(this.is_ready) {
 			this.io.module.on_event(_event);
-			this.audio.on_event(_event);
 			this.windowing.on_event(_event);
 			this.input.on_event(_event);
 		}
@@ -5604,7 +5364,7 @@ flu.prototype = {
 		}
 	}
 	,default_config: function() {
-		return { has_window : true, runtime : { }, window : this.default_window_config(), render : this.default_render_config(), web : { no_context_menu : true, prevent_default_keys : [flu_system_input_Keycodes.left,flu_system_input_Keycodes.right,flu_system_input_Keycodes.up,flu_system_input_Keycodes.down,flu_system_input_Keycodes.backspace,flu_system_input_Keycodes.tab,flu_system_input_Keycodes["delete"]], prevent_default_mouse_wheel : true, true_fullscreen : false}, 'native' : { audio_buffer_length : 176400, audio_buffer_count : 4}};
+		return { has_window : true, runtime : { }, window : this.default_window_config(), render : this.default_render_config(), web : { no_context_menu : true, prevent_default_keys : [flu_system_input_Keycodes.left,flu_system_input_Keycodes.right,flu_system_input_Keycodes.up,flu_system_input_Keycodes.down,flu_system_input_Keycodes.backspace,flu_system_input_Keycodes.tab,flu_system_input_Keycodes["delete"]], prevent_default_mouse_wheel : true, true_fullscreen : false}};
 	}
 	,default_runtime_config: function() {
 		var _g = this;
@@ -5789,6 +5549,7 @@ var flu_core_web_Core = function(_app) {
 	this.start_timestamp = this.timestamp();
 	this.guess_os();
 };
+
 $hxClasses["fluidState.core.web.Core"] = flu_core_web_Core;
 flu_core_web_Core.__name__ = true;
 flu_core_web_Core.prototype = {
@@ -5826,49 +5587,18 @@ flu_core_web_Core.prototype = {
 	,update: function() {
 	}
 	,guess_os: function() {
-		var _ver = window.navigator.appVersion;
-		var _agent = window.navigator.userAgent;
-		var tmp;
-		var r = new EReg("mac","gi");
-		tmp = r.match(_ver);
-		if(tmp) this.app.os = "mac";
-		var tmp1;
-		var r1 = new EReg("win","gi");
-		tmp1 = r1.match(_ver);
-		if(tmp1) this.app.os = "windows";
-		var tmp2;
-		var r2 = new EReg("x11","gi");
-		tmp2 = r2.match(_ver);
-		if(tmp2) this.app.os = "linux";
-		var tmp3;
-		var r3 = new EReg("linux","gi");
-		tmp3 = r3.match(_ver);
-		if(tmp3) this.app.os = "linux";
-		var tmp4;
-		var r4 = new EReg("android","gi");
-		tmp4 = r4.match(_ver);
-		if(tmp4) this.app.os = "android";
-		var tmp5;
-		var r5 = new EReg("ipad","gi");
-		tmp5 = r5.match(_agent);
-		if(tmp5) this.app.os = "ios";
-		var tmp6;
-		var r6 = new EReg("iphone","gi");
-		tmp6 = r6.match(_agent);
-		if(tmp6) this.app.os = "ios";
-		var tmp7;
-		var r7 = new EReg("ipod","gi");
-		tmp7 = r7.match(_agent);
-		if(tmp7) this.app.os = "ios";
+	
 	}
 	,__class__: flu_core_web_Core
 };
+
 var flu_modules_interfaces_Assets = function() { };
 $hxClasses["fluidState.modules.interfaces.Assets"] = flu_modules_interfaces_Assets;
 flu_modules_interfaces_Assets.__name__ = true;
 var flu_core_web_assets_Assets = function(_system) {
 	this.system = _system;
 };
+
 $hxClasses["fluidState.core.web.assets.Assets"] = flu_core_web_assets_Assets;
 flu_core_web_assets_Assets.__name__ = true;
 flu_core_web_assets_Assets.__interfaces__ = [flu_modules_interfaces_Assets];
@@ -5892,7 +5622,8 @@ flu_system_input_Keycodes.from_scan = function(scancode) {
 var flu_core_web_input_Input = function(_system) {
 	this.gamepads_supported = false;
 	this.system = _system;
-};
+}
+;
 $hxClasses["fluidState.core.web.input.Input"] = flu_core_web_input_Input;
 flu_core_web_input_Input.__name__ = true;
 flu_core_web_input_Input.__interfaces__ = [flu_modules_interfaces_Input];
@@ -6447,145 +6178,7 @@ flu_core_web_window_Windowing.prototype = {
 	}
 	,__class__: flu_core_web_window_Windowing
 };
-var flu_modules_interfaces_Audio = function() { };
-$hxClasses["fluidState.modules.interfaces.Audio"] = flu_modules_interfaces_Audio;
-flu_modules_interfaces_Audio.__name__ = true;
-var flu_modules_howlerjs_Audio = function(_system) {
-	this.system = _system;
-	this.suspended_sounds = [];
-	this.handles = new flu_ds_ObjectMap();
-};
-$hxClasses["fluidState.modules.howlerjs.Audio"] = flu_modules_howlerjs_Audio;
-flu_modules_howlerjs_Audio.__name__ = true;
-flu_modules_howlerjs_Audio.__interfaces__ = [flu_modules_interfaces_Audio];
-flu_modules_howlerjs_Audio.prototype = {
-	init: function() {
-	}
-	,update: function() {
-	}
-	,destroy: function() {
-	}
-	,on_event: function(event) {
-	}
-	,suspend: function() {
-		var $it0 = this.handles.iterator();
-		while( $it0.hasNext() ) {
-			var sound = $it0.next();
-			if(sound.get_playing()) {
-				sound.toggle();
-				this.suspended_sounds.push(sound);
-			}
-		}
-	}
-	,resume: function() {
-		while(this.suspended_sounds.length > 0) {
-			var sound = this.suspended_sounds.pop();
-			sound.toggle();
-		}
-	}
-	,__class__: flu_modules_howlerjs_Audio
-};
-var flu_system_audio_Sound = function() {
-	this.looping = false;
-	this.pan = 0.0;
-	this.volume = 1.0;
-	this.pitch = 1.0;
-	this.playing = false;
-	this.name = "";
-};
-$hxClasses["fluidState.system.audio.Sound"] = flu_system_audio_Sound;
-flu_system_audio_Sound.__name__ = true;
-flu_system_audio_Sound.prototype = {
-	play: function() {
-		console.log("    i / sound / " + "Sound:play called in root Sound module. Nothing will happen.");
-	}
-	,loop: function() {
-		console.log("    i / sound / " + "Sound:loop called in root Sound module. Nothing will happen.");
-	}
-	,pause: function() {
-		console.log("    i / sound / " + "Sound:pause called in root Sound module. Nothing will happen.");
-	}
-	,destroy: function() {
-		console.log("    i / sound / " + "Sound:destroy called in root Sound module. Nothing will happen.");
-	}
-	,internal_update: function() {
-	}
-	,internal_play: function() {
-	}
-	,internal_pause: function() {
-	}
-	,toggle: function() {
-		this.set_playing(!this.get_playing());
-		if(this.get_playing()) {
-			if(this.get_looping()) this.loop(); else this.play();
-		} else this.pause();
-	}
-	,get_playing: function() {
-		return this.playing;
-	}
-	,get_info: function() {
-		return this.info;
-	}
-	,get_pan: function() {
-		return this.pan;
-	}
-	,get_pitch: function() {
-		return this.pitch;
-	}
-	,get_volume: function() {
-		return this.volume;
-	}
-	,get_looping: function() {
-		return this.looping;
-	}
-	,set_playing: function(_playing) {
-		return this.playing = _playing;
-	}
-	,set_looping: function(_looping) {
-		return this.looping = _looping;
-	}
-	,__class__: flu_system_audio_Sound
-};
-var flu_modules_howlerjs_sound_Sound = function() { };
-$hxClasses["fluidState.modules.howlerjs.sound.Sound"] = flu_modules_howlerjs_sound_Sound;
-flu_modules_howlerjs_sound_Sound.__name__ = true;
-flu_modules_howlerjs_sound_Sound.__super__ = flu_system_audio_Sound;
-flu_modules_howlerjs_sound_Sound.prototype = $extend(flu_system_audio_Sound.prototype,{
-	play: function() {
-		if(this.get_info() != null && this.get_info().handle != null) {
-			this.set_playing(true);
-			this.set_looping(false);
-			this.get_info().handle.loop(false);
-			this.get_info().handle.play();
-			if(this.get_info() != null && this.get_info().handle != null) {
-				this.get_info().handle.rate(this.get_pitch());
-				this.get_info().handle.volume(this.get_volume());
-				this.get_info().handle.pos3d(this.get_pan());
-			}
-		}
-	}
-	,loop: function() {
-		if(this.get_info() != null && this.get_info().handle != null) {
-			this.set_playing(true);
-			this.set_looping(true);
-			this.get_info().handle.loop(true);
-			this.get_info().handle.play();
-			if(this.get_info() != null && this.get_info().handle != null) {
-				this.get_info().handle.rate(this.get_pitch());
-				this.get_info().handle.volume(this.get_volume());
-				this.get_info().handle.pos3d(this.get_pan());
-			}
-		}
-	}
-	,pause: function() {
-		if(this.get_info() != null && this.get_info().handle != null) this.get_info().handle.pause();
-	}
-	,destroy: function() {
-		if(this.get_info() != null && this.get_info().handle != null) this.get_info().handle.unload();
-		this.system.kill(this);
-	}
-	,__class__: flu_modules_howlerjs_sound_Sound
-});
+
 var flu_modules_opengl_web_GL = function() { };
 $hxClasses["fluidState.modules.opengl.web.GL"] = flu_modules_opengl_web_GL;
 flu_modules_opengl_web_GL.__name__ = true;
@@ -6622,77 +6215,7 @@ flu_system_assets_Assets.__name__ = true;
 flu_system_assets_Assets.prototype = {
 	__class__: flu_system_assets_Assets
 };
-var flu_system_audio_Audio = function(_app) {
-	this.active = false;
-	this.app = _app;
-	this.module = new flu_modules_howlerjs_Audio(this);
-	this.module.init();
-	this.sound_list = new flu_ds_StringMap();
-	this.stream_list = new flu_ds_StringMap();
-	this.active = true;
-};
-$hxClasses["fluidState.system.audio.Audio"] = flu_system_audio_Audio;
-flu_system_audio_Audio.__name__ = true;
-flu_system_audio_Audio.prototype = {
-	kill: function(_sound) {
-		if(_sound == null) return;
-		this.sound_list.remove(_sound.name);
-		this.stream_list.remove(_sound.name);
-	}
-	,suspend: function() {
-		if(!this.active) return;
-		console.log("    i / audio / " + "suspending sound context");
-		this.active = false;
-		var tmp;
-		var _this = this.stream_list;
-		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
-		while( tmp.hasNext() ) {
-			var sound = tmp.next();
-			sound.internal_pause();
-		}
-		this.module.suspend();
-	}
-	,resume: function() {
-		if(this.active) return;
-		console.log("    i / audio / " + "resuming sound context");
-		this.active = true;
-		this.module.resume();
-		var tmp;
-		var _this = this.stream_list;
-		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
-		while( tmp.hasNext() ) {
-			var sound = tmp.next();
-			sound.internal_play();
-		}
-	}
-	,on_event: function(_event) {
-		this.module.on_event(_event);
-		if(_event.type == 10) this.suspend(); else if(_event.type == 12) this.resume();
-	}
-	,destroy: function() {
-		this.active = false;
-		var tmp;
-		var _this = this.sound_list;
-		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
-		while( tmp.hasNext() ) {
-			var sound = tmp.next();
-			sound.destroy();
-		}
-		this.module.destroy();
-	}
-	,update: function() {
-		if(!this.active) return;
-		var tmp;
-		var _this = this.sound_list;
-		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
-		while( tmp.hasNext() ) {
-			var _sound = tmp.next();
-			if(_sound.get_playing()) _sound.internal_update();
-		}
-		this.module.update();
-	}
-	,__class__: flu_system_audio_Audio
-};
+
 var flu_system_input_Input = function(_app) {
 	this.touch_count = 0;
 	this.app = _app;
