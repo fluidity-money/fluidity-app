@@ -10,6 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
@@ -110,6 +112,54 @@ func CreateBucketIfNotExists(session *session.Session, bucketName, acl string) (
 	return output, nil
 }
 
-func LookupCurrentOraclePrivateKeyUsingParameterStore() *ecdsa.PrivateKey {
-	panic("why would you name it like that")
+// GetParameter to fetch a value from AWS parameter store
+func GetParameter(session *session.Session, name string, withDecryption bool) (string, error) {
+
+	ssmClient := ssm.New(session)
+
+	input := &ssm.GetParameterInput{
+		Name:           &name,
+		WithDecryption: &withDecryption,
+	}
+
+	output, err := ssmClient.GetParameter(input)
+
+	if err != nil {
+		return "", fmt.Errorf(
+			"Failed to get parameter %v from AWS! %v",
+			name,
+			err,
+		)
+	}
+
+	value := output.Parameter.Value
+
+	if value == nil {
+		return "", fmt.Errorf("Parameter value was nil!")
+	}
+
+	return *value, nil
+}
+
+// GetPrivateKeyFromParameter to fetch and decode a private key from AWS parameter store
+func GetPrivateKeyFromParameter(session *session.Session, name string) (*ecdsa.PrivateKey, error) {
+	privateKeyHex, err := GetParameter(session, name, true)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to fetch private key! %v",
+			err,
+		)
+	}
+
+	privateKey, err := crypto.HexToECDSA(privateKeyHex)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to decode into a private key! %v",
+			err,
+		)
+	}
+
+	return privateKey, err
 }

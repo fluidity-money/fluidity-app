@@ -132,7 +132,15 @@ func rotateOracleKeys() {
 		contractAddress := ethCommon.HexToAddress(contractAddressString)
 
 		// get the old key
-		privateKey := aws.LookupCurrentOraclePrivateKeyUsingParameterStore()
+		privateKey, err := aws.GetPrivateKeyFromParameter(session, parameter)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to look up the old private key in AWS!"
+				k.Payload = err
+			})
+		}
+
 		previousOracleAddress := ethCrypto.PubkeyToAddress(privateKey.PublicKey)
 
 		// create the new key
@@ -188,7 +196,6 @@ func rotateOracleKeys() {
 	}
 
 	transactionOpts, err := ethereum.NewTransactionOptions(ethClient, workerConfigPrivateKey)
-
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
