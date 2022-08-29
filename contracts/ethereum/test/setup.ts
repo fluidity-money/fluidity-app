@@ -38,12 +38,6 @@ before(async () => {
     hre,
     operatorAddress,
     emergencyCouncilAddress,
-    [
-      oracleAddress,
-      oracleAddress,
-      oracleAddress,
-      oracleAddress
-    ]
   );
 
   const { tokens } = await deployTokens(
@@ -54,6 +48,12 @@ before(async () => {
     operatorAddress,
     workerConfigAddress
   );
+
+  const workerConfig = await hre.ethers.getContractAt("WorkerConfig", workerConfigAddress, operator);
+  const oracles = Object.values(tokens)
+    .map(t => [t[0].address, oracleAddress]);
+  console.log(oracles);
+  await workerConfig.updateOracles(oracles);
 
   usdt_addr = TokenList["usdt"].address;
   fusdt_addr = tokens.fUSDt[0].address;

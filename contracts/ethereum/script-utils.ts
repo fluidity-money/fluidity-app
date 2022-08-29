@@ -43,7 +43,6 @@ export const deployWorkerConfig = async (
   hre: HardhatRuntimeEnvironment,
   operator: string,
   emergencyCouncil: string,
-  tokenAddresses: string[]
 ): Promise<string> => {
   const factory = await hre.ethers.getContractFactory("WorkerConfig");
 
@@ -51,7 +50,7 @@ export const deployWorkerConfig = async (
 
   await workerConfig.deployed();
 
-  await workerConfig.init(operator, emergencyCouncil, tokenAddresses);
+  await workerConfig.init(operator, emergencyCouncil);
 
   return workerConfig.address;
 }
@@ -79,9 +78,7 @@ export const deployTokens = async (
 
   const tokenAddresses: { [symbol: string]: [ethers.Contract, ethers.Contract] } = {};
 
-  for (let tokenNumber = 0; tokenNumber < tokens.length; tokenNumber++) {
-    const token = tokens[tokenNumber];
-
+  for (const token of tokens) {
     console.log(`deploying ${token.name}`);
 
     var deployedPool: ethers.Contract;
@@ -127,7 +124,6 @@ export const deployTokens = async (
       emergencyCouncilAddress,
       operatorAddress,
       workerConfigAddress,
-      tokenNumber
     );
 
     tokenAddresses[token.symbol] = [deployedToken, deployedPool];

@@ -57,7 +57,6 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     hre,
     operatorAddress,
     emergencyCouncilAddress,
-    shouldDeploy.map(_ => oracleAddress)
   );
 
   await deployTokens(

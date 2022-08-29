@@ -75,7 +75,7 @@ contract Token is IERC20 {
 
     LiquidityProvider private pool_;
 
-    address workerConfig_;
+    WorkerConfig private workerConfig_;
 
     /// @dev [txhash] => [0 if the reward for that transaction hasn't been rewarded, 1 otherwise]
     /// @dev operating on ints saves us a bit of gas
@@ -144,7 +144,6 @@ contract Token is IERC20 {
      * @param _emergencyCouncil address that can activate emergency mode
      * @param _operator address that can release quarantine payouts and activate emergency mode
      * @param _workerConfig to use for retrieving RNG oracle address
-     * @param _tokenNumber that is the token to look up in the WorkerConfig array for oracle addresses
      */
     function init(
         address _liquidityProvider,
@@ -153,8 +152,7 @@ contract Token is IERC20 {
         string memory _symbol,
         address _emergencyCouncil,
         address _operator,
-        address _workerConfig,
-        uint _tokenNumber
+        address _workerConfig
     ) public {
         require(!initialised_, "contract is already initialised");
         initialised_ = true;
@@ -169,11 +167,7 @@ contract Token is IERC20 {
 
         // remember the worker config to look up the addresses for each rng oracle
 
-        workerConfig_ = _workerConfig;
-
-        // remember the token number for look up inside the worker config
-
-        tokenNumber_ = _tokenNumber;
+        workerConfig_ = WorkerConfig(_workerConfig);
 
         noEmergencyMode_ = true;
 
@@ -228,7 +222,7 @@ contract Token is IERC20 {
     }
 
     function noEmergencyMode() public view returns (bool) {
-        return WorkerConfig(workerConfig_).noGlobalEmergency()
+        return workerConfig_.noGlobalEmergency()
             && noEmergencyMode_;
     }
 
@@ -237,7 +231,7 @@ contract Token is IERC20 {
      * @return the address of the trusted oracle
      */
     function oracle() public view returns (address) {
-        return WorkerConfig(workerConfig_).getWorkerAddress(tokenNumber_);
+        return workerConfig_.getWorkerAddress(address(this));
     }
 
     /**
@@ -254,7 +248,7 @@ contract Token is IERC20 {
 
         noEmergencyMode_ = false;
 
-        workerConfig_ = address(0);
+        workerConfig_ = WorkerConfig(address(0));
 
         emit Emergency();
     }
@@ -263,7 +257,7 @@ contract Token is IERC20 {
         require(msg.sender == operator_, "only the operator account can use this");
         require(noEmergencyMode(), "emergency mode!");
 
-        workerConfig_ = _workerConfig;
+        workerConfig_ = WorkerConfig(_workerConfig);
     }
 
     /// @notice updates the reward quarantine threshold if called by the operator
