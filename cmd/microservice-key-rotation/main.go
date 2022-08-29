@@ -33,13 +33,16 @@ const (
 	EnvOracleBucketName = `FLU_ORACLE_BUCKET_NAME`
 
 	// EnvOracleParameterName is the comma-separated list of AWS parameters
-	// containing oracles that need be updated, and their respective
+	// containing oracles that need to be updated, and their respective
 	// contract addresses of the form param1:contract1,param2:contract2,...
 	EnvOracleParametersList = `FLU_ORACLE_UPDATE_LIST`
 
 	// EnvWorkerConfigPrivateKey is the key that signs the transaction to
 	// batch update the oracles
 	EnvWorkerConfigPrivateKey = `FLU_WORKER_CONFIG_PRIVATE_KEY`
+
+	// EnvWorkerConfigContractAddress is the address of the worker config contract
+	EnvWorkerConfigContractAddress = `FLU_WORKER_CONFIG_CONTRACT_ADDRESS`
 )
 
 const bucketAcl = s3.BucketCannedACLPrivate
@@ -50,13 +53,16 @@ func main() {
 
 func rotateOracleKeys() {
 	var (
-		gethHttpUrl             = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		awsRegion               = util.GetEnvOrFatal(EnvAwsRegion)
-		bucketName              = util.GetEnvOrFatal(EnvOracleBucketName)
-		workerConfigPrivateKey_ = util.GetEnvOrFatal(EnvWorkerConfigPrivateKey)
+		gethHttpUrl                  = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		awsRegion                    = util.GetEnvOrFatal(EnvAwsRegion)
+		bucketName                   = util.GetEnvOrFatal(EnvOracleBucketName)
+		workerConfigPrivateKey_      = util.GetEnvOrFatal(EnvWorkerConfigPrivateKey)
+		workerConfigContractAddress_ = util.GetEnvOrFatal(EnvWorkerConfigContractAddress)
 
 		oracleParametersList = oracleParametersListFromEnv(EnvOracleParametersList)
 	)
+
+	workerConfigContractAddress := ethCommon.HexToAddress(workerConfigContractAddress_)
 
 	workerConfigPrivateKey, err := ethCrypto.HexToECDSA(workerConfigPrivateKey_)
 
@@ -71,7 +77,7 @@ func rotateOracleKeys() {
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to connect to Geth Websocket!"
+			k.Message = "Failed to connect to Geth over HTTP!"
 			k.Payload = err
 		})
 	}
@@ -183,8 +189,6 @@ func rotateOracleKeys() {
 
 	transactionOpts, err := ethereum.NewTransactionOptions(ethClient, workerConfigPrivateKey)
 
-	workerConfigPublicKey := workerConfigPrivateKey.PublicKey
-	workerConfigContractAddress := ethCrypto.PubkeyToAddress(workerConfigPublicKey)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
