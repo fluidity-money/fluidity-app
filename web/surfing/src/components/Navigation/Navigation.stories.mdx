@@ -2,9 +2,7 @@ import { Canvas, Meta, Story } from "@storybook/addon-docs";
 
 import Navigation from "./Navigation";
 
-<Meta title="MDX/Navigation",
-  component: {Navigation},
-  } />
+<Meta title="Navigation/ecosystem" component={Navigation} />
 
 export const Template = (args) => <Navigation {...args} />;
 
@@ -15,7 +13,7 @@ export const Template = (args) => <Navigation {...args} />;
     name="ecosystem"
     args={{
       page: "ecosystem",
-      pageLocations: ["featured projects", "all projects"],
+      pageLocations: ["all projects", "featured projects"],
     }}
   >
     {Template.bind({})}
