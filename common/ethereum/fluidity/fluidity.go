@@ -2,6 +2,7 @@ package fluidity
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"fmt"
 	"math/big"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -78,26 +78,29 @@ const fluidityContractAbiString = `[
 	  "outputs": [],
 	  "stateMutability": "nonpayable",
 	  "type": "function"
-  },
-  {
-      "inputs": [
-      { "internalType": "address", "name": "newOracle", "type": "address" }
-      ],
-      "name": "updateOracle",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-  },
-  {
-      "inputs": [],
-      "name": "acceptUpdateOracle",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
   }
 ]`
 
-var fluidityContractAbi ethAbi.ABI
+const workerConfigAbiString = `[
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "newOracles",
+        "type": "address[]"
+      }
+    ],
+    "name": "updateOracles",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]`
+
+var (
+	fluidityContractAbi ethAbi.ABI
+	workerConfigAbi     ethAbi.ABI
+)
 
 // the Reward struct from solidity, to be passed to batchReward
 type RewardArg struct {
@@ -254,9 +257,9 @@ func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Ad
 	)
 
 	var (
-		address   = ethCommon.HexToAddress(addressString)
-		balls     = []*big.Int{ big.NewInt(1) }
-		payouts   = []*big.Int{ amount }
+		address = ethCommon.HexToAddress(addressString)
+		balls   = []*big.Int{big.NewInt(1)}
+		payouts = []*big.Int{amount}
 	)
 
 	var hashBytes [32]byte
@@ -283,48 +286,52 @@ func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Ad
 	return transaction, nil
 }
 
-func UpdateOracle(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, newOracle ethCommon.Address) (*ethTypes.Transaction, error) {
-	// TODO replace this with a call to workerconfig that uses a list of addresses
-	panic("invalid")
-	boundContract := ethAbiBind.NewBoundContract(
-		fluidityAddress,
-		fluidityContractAbi,
-		client,
-		client,
-		client,
-	)
-
-	
-	rlp.EncodeToBytes()
-	boundContract.
-	t := types.DynamicFeeTx{
-		ChainID    *big.Int
-		Nonce      uint64
-		GasTipCap  *big.Int // a.k.a. maxPriorityFeePerGas
-		GasFeeCap  *big.Int // a.k.a. maxFeePerGas
-		Gas        uint64
-		To         *common.Address `rlp:"nil"` // nil means contract creation
-		Value      *big.Int
-		Data       []byte
-		AccessList AccessList
-	}
-	types.SignNewTx()
-
-	transaction, err := ethereum.MakeTransaction(
-		boundContract,
-		transactionOptions,
-		"updateOracle",
-		newOracle,	
-	)
+// UpdateOracles to create and sign (but not send!) the updateOracles call to the worker config contract
+func UpdateOracles(client *ethclient.Client, workerConfigContractAddress ethCommon.Address, signerKey *ecdsa.PrivateKey, transactionOptions *ethAbiBind.TransactOpts, newOracles []ethCommon.Address) (*ethTypes.Transaction, error) {
+	chainId, err := client.ChainID(context.Background())
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to update the oracle for Fluidity's contract! %v",
+			"Failed to get chain ID from client! %v",
 			err,
 		)
 	}
 
-	return transaction, nil
+	var (
+		value     = transactionOptions.Value
+		nonce     = transactionOptions.Nonce
+		gasFeeCap = transactionOptions.GasFeeCap
+		gasTipCap = transactionOptions.GasTipCap
+	)
+
+	signer := types.NewLondonSigner(chainId)
+	dataBytes, err := workerConfigAbi.Pack("updateOracles", newOracles)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to encode call to updateOracles! %v",
+			err,
+		)
+	}
+
+	txData := &types.DynamicFeeTx{
+		ChainID:   chainId,
+		Nonce:     nonce.Uint64(),
+		GasTipCap: gasTipCap,
+		GasFeeCap: gasFeeCap,
+		To:        &workerConfigContractAddress,
+		Value:     value,
+		Data:      dataBytes,
+	}
+
+	signedTxn, err := types.SignNewTx(signerKey, signer, txData)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to sign the transaction to update the oracles! %v",
+			err,
+		)
+	}
+
+	return signedTxn, nil
 }
-
-

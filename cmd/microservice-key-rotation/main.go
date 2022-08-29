@@ -193,10 +193,10 @@ func rotateOracleKeys() {
 		})
 	}
 
-	// TODO have this but it returns a signed txn rather than calling the contract
-	transaction, err := fluidity.UpdateOracle(
+	signedTransaction, err := fluidity.UpdateOracles(
 		ethClient,
 		workerConfigContractAddress,
+		workerConfigPrivateKey,
 		transactionOpts,
 		newOracleList,
 	)
@@ -208,7 +208,7 @@ func rotateOracleKeys() {
 		})
 	}
 
-	txnBinary, err := transaction.MarshalBinary()
+	txnBinary, err := signedTransaction.MarshalBinary()
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
