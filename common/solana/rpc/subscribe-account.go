@@ -34,7 +34,7 @@ type (
 // SubscribeAccount subscribes to changes to account and dies with log.Fatal
 // if something goes wrong
 func (websocket Websocket) SubscribeAccount(programId string, f func(AccountNotification)) {
-	_, replies := websocket.subscribe("accountSubscribe", []interface{}{
+	replies := websocket.subscribe("accountSubscribe", []interface{}{
 		programId,
 		map[string]string{
 			"encoding":   "base64",
@@ -43,27 +43,27 @@ func (websocket Websocket) SubscribeAccount(programId string, f func(AccountNoti
 	})
 
 	for reply := range replies {
-		params := reply.params
+		result := reply.result
 
 		if err := reply.err; err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Context = LogContextWebsocket
-				k.Message = "Received error off queue for subscribe account!"
+				k.Message = "Received error off queue for accountSubscribe!"
 				k.Payload = err
 			})
 		}
 
 		var accountNotification AccountNotification
 
-		err := json.Unmarshal(params, &accountNotification)
+		err := json.Unmarshal(result, &accountNotification)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Context = LogContextWebsocket
 
 				k.Format(
-					"Failed to decode the message (%#v) off the accountSubscribe websocket!",
-					string(params),
+					"Failed to decode the message %#v off the accountSubscribe websocket!",
+					string(result),
 				)
 
 				k.Payload = err

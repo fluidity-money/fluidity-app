@@ -149,6 +149,11 @@ func main() {
 
 	latestBlockSeen := startingBlock - 1
 
+	log.Debug(func(k *log.Log) {
+		k.Message = "Starting to subscribe to slots..."
+		k.Payload = err
+	})
+
 	solanaWebsocket.SubscribeSlots(func(slot types.Slot) {
 		nextBlock := latestBlockSeen+1
 

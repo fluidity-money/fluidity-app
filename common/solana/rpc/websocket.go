@@ -25,11 +25,9 @@ type (
 	// message given and to tell the server to clean up memory for
 	// tracking the id on our behalf
 	websocketOutgoingResponse struct {
-		id      int
-		method  string
-		params  json.RawMessage
-		err     *rpcError
-		cleanup chan int
+		id     int
+		result json.RawMessage
+		err    *rpcError
 	}
 
 	// WebsocketOutgoing to send messages down with and to receive
@@ -58,7 +56,7 @@ func NewWebsocket(url string) (*Websocket, error) {
 		outgoingMessagesChan = make(chan websocketOutgoing)
 
 		// sent from the underlying websocket to any connected users
-		incomingMessagesChan = make(chan rpcBody)
+		incomingMessagesChan = make(chan rpcResponse)
 
 		// sent down when the connection needs to close prematurely
 		closeChannel = make(chan bool)
@@ -68,8 +66,6 @@ func NewWebsocket(url string) (*Websocket, error) {
 
 		responses = make(map[int]chan websocketOutgoingResponse, 0)
 	)
-
-	callIdCount := 0
 
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 
@@ -81,22 +77,69 @@ func NewWebsocket(url string) (*Websocket, error) {
 	}
 
 	go func() {
+	L:
 		for {
-			var response rpcBody
+			var response rpcResponse
 
-			if err := conn.ReadJSON(&response); err != nil {
+			messageType, message, err := conn.ReadMessage()
+
+			if err != nil {
 				log.Fatal(func(k *log.Log) {
 					k.Context = LogContextWebsocket
-					k.Message = "Failed to decode a message from Solana websocket!"
+					k.Message = "Failed to read a message from the Solana websocket!"
 					k.Payload = err
 				})
 			}
+
+			switch messageType {
+			case websocket.TextMessage:
+
+			case websocket.BinaryMessage:
+				log.Fatal(func(k *log.Log) {
+					k.Context = LogContextWebsocket
+					k.Message = "Received binary message from the websocket!"
+				})
+
+			case websocket.CloseMessage:
+				log.Fatal(func(k *log.Log) {
+					k.Context = LogContextWebsocket
+					k.Message = "Received a close message from the websocket!"
+				})
+
+			default:
+				continue L
+			}
+
+			err = json.Unmarshal(message, &response)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Context = LogContextWebsocket
+
+					k.Format(
+						"Failed to decode message (%#v) off the websocket!",
+						string(message),
+					)
+				})
+			}
+
+			log.Debug(func(k *log.Log) {
+				k.Context = LogContextWebsocket
+
+				k.Format(
+					"Received the message for caller id %v, %#v",
+					response.Id,
+					string(message),
+				)
+			})
 
 			// send to the internal server to relay
 
 			incomingMessagesChan <- response
 		}
 	}()
+
+	callIdCount := 0
 
 	go func() {
 		for {
@@ -107,26 +150,44 @@ func NewWebsocket(url string) (*Websocket, error) {
 				responses, ok := responses[id]
 
 				if !ok {
-					log.App(func(k *log.Log) {
+					log.Fatal(func(k *log.Log) {
 						k.Context = LogContextWebsocket
 
 						k.Format(
-							"Got a message for id %v that was previously said to have shutdown",
+							"Got a message for id %v that does not exist!",
 							id,
 						)
 					})
 				}
 
+				log.Debug(func(k *log.Log) {
+					k.Context = LogContextWebsocket
+
+					k.Format(
+						"Sending a message to caller %v!",
+						id,
+					)
+				})
+
 				responses <- websocketOutgoingResponse{
 					id:     id,
-					method: response.Method,
-					params: response.Params,
+					result: response.Result,
 					err:    response.Err,
 				}
+
+				log.Debug(func(k *log.Log) {
+					k.Context = LogContextWebsocket
+
+					k.Format(
+						"Done sending a message to caller id %v!",
+						id,
+					)
+				})
 
 			case rpcCall := <-outgoingMessagesChan:
 				var (
 					method        = rpcCall.method
+					params        = rpcCall.params
 					returnChannel = rpcCall.returnChannel
 				)
 
@@ -134,24 +195,24 @@ func NewWebsocket(url string) (*Websocket, error) {
 
 				callIdCount += 1
 
-				params, err := json.Marshal(rpcCall.params)
-
-				if err != nil {
-					log.Fatal(func(k *log.Log) {
-						k.Context = LogContextWebsocket
-						k.Message = "Failed to encode the params for the Solana socket!"
-						k.Payload = err
-					})
-				}
-
-				rpcBody := rpcBody{
+				rpcRequest := rpcRequest{
 					Id:      callId,
 					JsonRpc: "2.0",
 					Method:  method,
 					Params:  params,
 				}
 
-				err = conn.WriteJSON(rpcBody)
+				bytes, err := json.Marshal(rpcRequest)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Context = LogContextWebsocket
+						k.Message = "Failed to encode a RPC request for sending down Solana socket"
+						k.Payload = err
+					})
+				}
+
+				err = conn.WriteMessage(websocket.TextMessage, bytes)
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -159,12 +220,22 @@ func NewWebsocket(url string) (*Websocket, error) {
 
 						k.Format(
 							"Failed to write the rpc body to the Solana socket %v!",
-							rpcBody,
+							rpcRequest,
 						)
 
 						k.Payload = err
 					})
 				}
+
+				log.Debug(func(k *log.Log) {
+					k.Context = LogContextWebsocket
+
+					k.Format(
+						"Sent the message %#v, assigning the caller id %v",
+						string(bytes),
+						callId,
+					)
+				})
 
 				// remember the request so we can send them the response later
 
@@ -181,35 +252,32 @@ func NewWebsocket(url string) (*Websocket, error) {
 	return &websocket, nil
 }
 
-func (websocket Websocket) subscribe(method string, params interface{}) (ticket websocketOutgoingResponse, replies chan websocketOutgoingResponse) {
-	replies = make(chan websocketOutgoingResponse)
+func (websocket Websocket) subscribe(method string, params interface{}) chan websocketOutgoingResponse {
+	replies := make(chan websocketOutgoingResponse)
 
 	websocket.invokeChan <- websocketOutgoing{
-		method: method,
-		params: params,
+		method:        method,
+		params:        params,
+		returnChannel: replies,
 	}
 
-	ticket = <-replies
-
-	return ticket, replies
+	return replies
 }
 
 func (websocket Websocket) RawInvoke(method string, params interface{}) (json.RawMessage, error) {
-	ticket, replies := websocket.subscribe(method, params)
+	replies := websocket.subscribe(method, params)
 
 	response := <-replies
 
-	response.cleanup <- ticket.id
-
-	params_ := response.params
+	result := response.result
 
 	if err := response.err; err != nil {
-		return params_, fmt.Errorf(
+		return result, fmt.Errorf(
 			"rpc method %v returned error: %v",
 			method,
 			err,
 		)
 	}
 
-	return params_, nil
+	return result, nil
 }

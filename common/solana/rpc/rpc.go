@@ -17,12 +17,18 @@ type (
 		} `json:"context,omitempty"`
 	}
 
-	// rpcBody that's sent back and forth to the rpc provider
-	rpcBody struct {
+	// rpcRequest that's sent to the RPC provider
+	rpcRequest struct {
+		Id      int         `json:"id"`
+		JsonRpc string      `json:"jsonrpc"`
+		Method  string      `json:"method"`
+		Params  interface{} `json:"params,omitempty"`
+	}
+
+	rpcResponse struct {
 		Id      int             `json:"id"`
 		JsonRpc string          `json:"jsonrpc"`
-		Method  string          `json:"method"`
-		Params  json.RawMessage `json:"params"`
+		Result  json.RawMessage `json:"result"`
 		Err     *rpcError       `json:"error,omitempty"`
 	}
 
@@ -30,7 +36,9 @@ type (
 		Code    int    `json:"code"`
 		Message string `json:"message"`
 	}
+)
 
+type (
 	rpcProviderUnderlying interface {
 		RawInvoke(string, interface{}) (json.RawMessage, error)
 	}

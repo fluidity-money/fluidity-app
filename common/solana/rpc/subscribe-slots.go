@@ -7,17 +7,13 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/solana"
 )
 
-type slotResponse struct {
-	Result solana.Slot `json:"result"`
-}
-
 // SubscribeAccount subscribes to changes to account and dies with log.Fatal
 // if something goes wrong
 func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
-	_, replies := websocket.subscribe("slotsSubscribe", map[string]interface{}{})
+	replies := websocket.subscribe("slotSubscribe", nil)
 
 	for reply := range replies {
-		params := reply.params
+		result := reply.result
 
 		if err := reply.err; err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -27,9 +23,9 @@ func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 			})
 		}
 
-		var slot slotResponse
+		var slot uint64
 
-		err := json.Unmarshal(params, &slot)
+		err := json.Unmarshal(result, &slot)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -37,13 +33,15 @@ func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 
 				k.Format(
 					"Failed to decode the message (%#v) off the slotsSubscribe websocket!",
-					string(params),
+					string(result),
 				)
 
 				k.Payload = err
 			})
 		}
 
-		f(slot.Result)
+		f(solana.Slot{
+			Slot: slot,
+		})
 	}
 }

@@ -33,19 +33,10 @@ func NewHttp(url_ string) (*Http, error) {
 	return &client, nil
 }
 
-func (client Http) RawInvoke(method string, params_ interface{}) (json.RawMessage, error) {
+func (client Http) RawInvoke(method string, params interface{}) (json.RawMessage, error) {
 	var buf bytes.Buffer
 
-	params, err := json.Marshal(params_)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to encode the rpc params: %v",
-			err,
-		)
-	}
-
-	err = json.NewEncoder(&buf).Encode(rpcBody{
+	err := json.NewEncoder(&buf).Encode(rpcRequest{
 		JsonRpc: "2.0",
 		Id:      1,
 		Method:  method,
@@ -76,14 +67,16 @@ func (client Http) RawInvoke(method string, params_ interface{}) (json.RawMessag
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to make the request with the body given: %v",
+			"failed to make the request wirth the body given: %v",
 			err,
 		)
 	}
 
 	defer resp.Body.Close()
 
-	err = json.NewDecoder(resp.Body).Decode(&rpcBody)
+	var response rpcResponse
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -92,12 +85,12 @@ func (client Http) RawInvoke(method string, params_ interface{}) (json.RawMessag
 		)
 	}
 
-	if err := rpcBody.Err; err != nil {
+	if err := response.Err; err != nil {
 		return nil, fmt.Errorf(
 			"rpc response was not nil: %v",
 			err,
 		)
 	}
 
-	return rpcBody.Params, nil
+	return response.Result, nil
 }
