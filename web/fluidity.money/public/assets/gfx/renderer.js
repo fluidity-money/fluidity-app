@@ -21,16 +21,16 @@ EReg.prototype = {
 	}
 	,matched: function(n) {
 		var tmp;
-		if(this.r.m != null && n >= 0 && n < this.r.m.length) tmp = this.r.m[n]; else throw new js__$Boot_HaxeError("EReg::matched");
+		if(this.r.m != null && n >= 0 && n < this.r.m.length) tmp = this.r.m[n]; else throw new js__$Boot_FluidError("EReg::matched");
 		return tmp;
 	}
 	,matchedRight: function() {
-		if(this.r.m == null) throw new js__$Boot_HaxeError("No string matched");
+		if(this.r.m == null) throw new js__$Boot_FluidError("No string matched");
 		var sz = this.r.m.index + this.r.m[0].length;
 		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
 	}
 	,matchedPos: function() {
-		if(this.r.m == null) throw new js__$Boot_HaxeError("No string matched");
+		if(this.r.m == null) throw new js__$Boot_FluidError("No string matched");
 		return { pos : this.r.m.index, len : this.r.m[0].length};
 	}
 	,replace: function(s,by) {
@@ -44,27 +44,27 @@ GPUCapabilities.__name__ = true;
 GPUCapabilities.get_writeToFloat = function() {
 	if(GPUCapabilities.get_extTextureFloat() == null) return false;
 	var texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : 5126, filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
-	var framebuffer = snow_modules_opengl_web_GL.current_context.createFramebuffer();
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
-	snow_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
-	var isValid = snow_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
-	snow_modules_opengl_web_GL.current_context.deleteTexture(texture);
-	snow_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
-	snow_modules_opengl_web_GL.current_context.bindTexture(3553,null);
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,null);
+	var framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
+	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
+	var isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
+	flu_modules_opengl_web_GL.current_context.deleteTexture(texture);
+	flu_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
+	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,null);
 	return isValid;
 };
 GPUCapabilities.get_writeToHalfFloat = function() {
 	if(GPUCapabilities.get_extTextureHalfFloat() == null) return false;
 	var texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : GPUCapabilities.get_HALF_FLOAT(), filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
-	var framebuffer = snow_modules_opengl_web_GL.current_context.createFramebuffer();
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
-	snow_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
-	var isValid = snow_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
-	snow_modules_opengl_web_GL.current_context.deleteTexture(texture);
-	snow_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
-	snow_modules_opengl_web_GL.current_context.bindTexture(3553,null);
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,null);
+	var framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
+	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
+	var isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
+	flu_modules_opengl_web_GL.current_context.deleteTexture(texture);
+	flu_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
+	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,null);
 	return isValid;
 };
 GPUCapabilities.get_floatTextureLinear = function() {
@@ -83,19 +83,19 @@ GPUCapabilities.get_HALF_FLOAT = function() {
 	return GPUCapabilities._HALF_FLOAT;
 };
 GPUCapabilities.get_extTextureFloat = function() {
-	if(GPUCapabilities._extTextureFloat == null) GPUCapabilities._extTextureFloat = snow_modules_opengl_web_GL.current_context.getExtension("OES_texture_float");
+	if(GPUCapabilities._extTextureFloat == null) GPUCapabilities._extTextureFloat = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_float");
 	return GPUCapabilities._extTextureFloat;
 };
 GPUCapabilities.get_extTextureHalfFloat = function() {
-	if(GPUCapabilities._extTextureHalfFloat == null) GPUCapabilities._extTextureHalfFloat = snow_modules_opengl_web_GL.current_context.getExtension("OES_texture_half_float");
+	if(GPUCapabilities._extTextureHalfFloat == null) GPUCapabilities._extTextureHalfFloat = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_half_float");
 	return GPUCapabilities._extTextureHalfFloat;
 };
 GPUCapabilities.get_extTextureFloatLinear = function() {
-	if(GPUCapabilities._extTextureFloatLinear == null) GPUCapabilities._extTextureFloatLinear = snow_modules_opengl_web_GL.current_context.getExtension("OES_texture_float_linear");
+	if(GPUCapabilities._extTextureFloatLinear == null) GPUCapabilities._extTextureFloatLinear = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_float_linear");
 	return GPUCapabilities._extTextureFloatLinear;
 };
 GPUCapabilities.get_extTextureHalfFloatLinear = function() {
-	if(GPUCapabilities._extTextureHalfFloatLinear == null) GPUCapabilities._extTextureHalfFloatLinear = snow_modules_opengl_web_GL.current_context.getExtension("OES_texture_half_float_linear");
+	if(GPUCapabilities._extTextureHalfFloatLinear == null) GPUCapabilities._extTextureHalfFloatLinear = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_half_float_linear");
 	return GPUCapabilities._extTextureHalfFloatLinear;
 };
 var GPUFluid = function(width,height,cellSize,solverIterations) {
@@ -168,9 +168,9 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	};
 	this.dyeRenderTarget = new gltoolbox_render_RenderTarget2Phase(width,height,tmp3);
 	this.updateAllCoreShaderUniforms();
-	snow_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
-	snow_modules_opengl_web_GL.current_context.disable(3042);
-	snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+	flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
+	flu_modules_opengl_web_GL.current_context.disable(3042);
+	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 	var shader = this.clearVelocityShader;
 	if(shader._active) {
 		var _g = 0;
@@ -188,14 +188,14 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 			var att = shader._attributes[i];
 			var location = att.location;
 			if(location != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 			}
 			offset += att.byteSize;
 		}
 	} else {
 		if(!shader._ready) shader.create();
-		snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+		flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 		var _g3 = 0;
 		var _g12 = shader._uniforms;
 		while(_g3 < _g12.length) {
@@ -211,15 +211,15 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 			var att1 = shader._attributes[i1];
 			var location1 = att1.location;
 			if(location1 != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 			}
 			offset1 += att1.byteSize;
 		}
 		shader._active = true;
 	}
 	this.velocityRenderTarget.activate();
-	snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 	shader.deactivate();
 	var _this5 = this.velocityRenderTarget;
 	_this5.tmpFBO = _this5.writeFrameBufferObject;
@@ -245,14 +245,14 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 			var att2 = shader1._attributes[i2];
 			var location2 = att2.location;
 			if(location2 != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 			}
 			offset2 += att2.byteSize;
 		}
 	} else {
 		if(!shader1._ready) shader1.create();
-		snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+		flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 		var _g7 = 0;
 		var _g16 = shader1._uniforms;
 		while(_g7 < _g16.length) {
@@ -268,15 +268,15 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 			var att3 = shader1._attributes[i3];
 			var location3 = att3.location;
 			if(location3 != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 			}
 			offset3 += att3.byteSize;
 		}
 		shader1._active = true;
 	}
 	this.pressureRenderTarget.activate();
-	snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 	shader1.deactivate();
 	var _this6 = this.pressureRenderTarget;
 	_this6.tmpFBO = _this6.writeFrameBufferObject;
@@ -286,12 +286,12 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	_this6.writeToTexture = _this6.readFromTexture;
 	_this6.readFromTexture = _this6.tmpTex;
 	var _this7 = this.dyeRenderTarget;
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this7.readFrameBufferObject);
-	snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-	snow_modules_opengl_web_GL.current_context.clear(16384);
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this7.writeFrameBufferObject);
-	snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-	snow_modules_opengl_web_GL.current_context.clear(16384);
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this7.readFrameBufferObject);
+	flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+	flu_modules_opengl_web_GL.current_context.clear(16384);
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this7.writeFrameBufferObject);
+	flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+	flu_modules_opengl_web_GL.current_context.clear(16384);
 };
 $hxClasses["GPUFluid"] = GPUFluid;
 GPUFluid.__name__ = true;
@@ -443,8 +443,8 @@ GPUFluid.prototype = {
 		}
 	}
 	,step: function(dt) {
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 		var _this = this.advectVelocityShader.dt;
 		_this.dirty = true;
 		_this.data = dt;
@@ -468,14 +468,14 @@ GPUFluid.prototype = {
 				var att = shader._attributes[i];
 				var location = att.location;
 				if(location != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 				}
 				offset += att.byteSize;
 			}
 		} else {
 			if(!shader._ready) shader.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 			var _g3 = 0;
 			var _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
@@ -491,15 +491,15 @@ GPUFluid.prototype = {
 				var att1 = shader._attributes[i1];
 				var location1 = att1.location;
 				if(location1 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 				}
 				offset1 += att1.byteSize;
 			}
 			shader._active = true;
 		}
 		this.velocityRenderTarget.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
 		var _this2 = this.velocityRenderTarget;
 		_this2.tmpFBO = _this2.writeFrameBufferObject;
@@ -533,14 +533,14 @@ GPUFluid.prototype = {
 					var att2 = shader1._attributes[i2];
 					var location2 = att2.location;
 					if(location2 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 					}
 					offset2 += att2.byteSize;
 				}
 			} else {
 				if(!shader1._ready) shader1.create();
-				snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+				flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 				var _g7 = 0;
 				var _g16 = shader1._uniforms;
 				while(_g7 < _g16.length) {
@@ -556,15 +556,15 @@ GPUFluid.prototype = {
 					var att3 = shader1._attributes[i3];
 					var location3 = att3.location;
 					if(location3 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 					}
 					offset3 += att3.byteSize;
 				}
 				shader1._active = true;
 			}
 			this.velocityRenderTarget.activate();
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader1.deactivate();
 			var _this5 = this.velocityRenderTarget;
 			_this5.tmpFBO = _this5.writeFrameBufferObject;
@@ -594,14 +594,14 @@ GPUFluid.prototype = {
 				var att4 = shader2._attributes[i4];
 				var location4 = att4.location;
 				if(location4 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
 				}
 				offset4 += att4.byteSize;
 			}
 		} else {
 			if(!shader2._ready) shader2.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
 			var _g20 = 0;
 			var _g110 = shader2._uniforms;
 			while(_g20 < _g110.length) {
@@ -617,15 +617,15 @@ GPUFluid.prototype = {
 				var att5 = shader2._attributes[i5];
 				var location5 = att5.location;
 				if(location5 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
 				}
 				offset5 += att5.byteSize;
 			}
 			shader2._active = true;
 		}
 		this.divergenceRenderTarget.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader2.deactivate();
 		var _this7 = this.pressureSolveShader.divergence;
 		_this7.dirty = true;
@@ -647,14 +647,14 @@ GPUFluid.prototype = {
 				var att6 = _this8._attributes[i6];
 				var location6 = att6.location;
 				if(location6 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,_this8._aStride,offset6);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,_this8._aStride,offset6);
 				}
 				offset6 += att6.byteSize;
 			}
 		} else {
 			if(!_this8._ready) _this8.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(_this8._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(_this8._prog);
 			var _g24 = 0;
 			var _g114 = _this8._uniforms;
 			while(_g24 < _g114.length) {
@@ -670,8 +670,8 @@ GPUFluid.prototype = {
 				var att7 = _this8._attributes[i7];
 				var location7 = att7.location;
 				if(location7 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,_this8._aStride,offset7);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,_this8._aStride,offset7);
 				}
 				offset7 += att7.byteSize;
 			}
@@ -692,8 +692,8 @@ GPUFluid.prototype = {
 				++_g27;
 				u8.apply();
 			}
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.pressureRenderTarget.writeFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.pressureRenderTarget.writeFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			var _this10 = this.pressureRenderTarget;
 			_this10.tmpFBO = _this10.writeFrameBufferObject;
 			_this10.writeFrameBufferObject = _this10.readFrameBufferObject;
@@ -726,14 +726,14 @@ GPUFluid.prototype = {
 				var att8 = shader3._attributes[i8];
 				var location8 = att8.location;
 				if(location8 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location8);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location8,att8.itemCount,att8.type,false,shader3._aStride,offset8);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location8);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location8,att8.itemCount,att8.type,false,shader3._aStride,offset8);
 				}
 				offset8 += att8.byteSize;
 			}
 		} else {
 			if(!shader3._ready) shader3.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
 			var _g30 = 0;
 			var _g120 = shader3._uniforms;
 			while(_g30 < _g120.length) {
@@ -749,15 +749,15 @@ GPUFluid.prototype = {
 				var att9 = shader3._attributes[i9];
 				var location9 = att9.location;
 				if(location9 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location9);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location9,att9.itemCount,att9.type,false,shader3._aStride,offset9);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location9);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location9,att9.itemCount,att9.type,false,shader3._aStride,offset9);
 				}
 				offset9 += att9.byteSize;
 			}
 			shader3._active = true;
 		}
 		this.velocityRenderTarget.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader3.deactivate();
 		var _this13 = this.velocityRenderTarget;
 		_this13.tmpFBO = _this13.writeFrameBufferObject;
@@ -791,14 +791,14 @@ GPUFluid.prototype = {
 					var att10 = shader4._attributes[i10];
 					var location10 = att10.location;
 					if(location10 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location10);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location10,att10.itemCount,att10.type,false,shader4._aStride,offset10);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location10);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location10,att10.itemCount,att10.type,false,shader4._aStride,offset10);
 					}
 					offset10 += att10.byteSize;
 				}
 			} else {
 				if(!shader4._ready) shader4.create();
-				snow_modules_opengl_web_GL.current_context.useProgram(shader4._prog);
+				flu_modules_opengl_web_GL.current_context.useProgram(shader4._prog);
 				var _g34 = 0;
 				var _g124 = shader4._uniforms;
 				while(_g34 < _g124.length) {
@@ -814,15 +814,15 @@ GPUFluid.prototype = {
 					var att11 = shader4._attributes[i11];
 					var location11 = att11.location;
 					if(location11 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location11);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location11,att11.itemCount,att11.type,false,shader4._aStride,offset11);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location11);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location11,att11.itemCount,att11.type,false,shader4._aStride,offset11);
 					}
 					offset11 += att11.byteSize;
 				}
 				shader4._active = true;
 			}
 			this.dyeRenderTarget.activate();
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader4.deactivate();
 			var _this16 = this.dyeRenderTarget;
 			_this16.tmpFBO = _this16.writeFrameBufferObject;
@@ -859,14 +859,14 @@ GPUFluid.prototype = {
 				var att12 = shader5._attributes[i12];
 				var location12 = att12.location;
 				if(location12 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location12);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location12,att12.itemCount,att12.type,false,shader5._aStride,offset12);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location12);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location12,att12.itemCount,att12.type,false,shader5._aStride,offset12);
 				}
 				offset12 += att12.byteSize;
 			}
 		} else {
 			if(!shader5._ready) shader5.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader5._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader5._prog);
 			var _g38 = 0;
 			var _g128 = shader5._uniforms;
 			while(_g38 < _g128.length) {
@@ -882,15 +882,15 @@ GPUFluid.prototype = {
 				var att13 = shader5._attributes[i13];
 				var location13 = att13.location;
 				if(location13 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location13);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location13,att13.itemCount,att13.type,false,shader5._aStride,offset13);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location13);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location13,att13.itemCount,att13.type,false,shader5._aStride,offset13);
 				}
 				offset13 += att13.byteSize;
 			}
 			shader5._active = true;
 		}
 		target.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader5.deactivate();
 		target.tmpFBO = target.writeFrameBufferObject;
 		target.writeFrameBufferObject = target.readFrameBufferObject;
@@ -900,9 +900,9 @@ GPUFluid.prototype = {
 		target.readFromTexture = target.tmpTex;
 	}
 	,clear: function() {
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
-		snow_modules_opengl_web_GL.current_context.disable(3042);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
+		flu_modules_opengl_web_GL.current_context.disable(3042);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 		var shader = this.clearVelocityShader;
 		if(shader._active) {
 			var _g = 0;
@@ -920,14 +920,14 @@ GPUFluid.prototype = {
 				var att = shader._attributes[i];
 				var location = att.location;
 				if(location != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 				}
 				offset += att.byteSize;
 			}
 		} else {
 			if(!shader._ready) shader.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 			var _g3 = 0;
 			var _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
@@ -943,15 +943,15 @@ GPUFluid.prototype = {
 				var att1 = shader._attributes[i1];
 				var location1 = att1.location;
 				if(location1 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 				}
 				offset1 += att1.byteSize;
 			}
 			shader._active = true;
 		}
 		this.velocityRenderTarget.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
 		var _this = this.velocityRenderTarget;
 		_this.tmpFBO = _this.writeFrameBufferObject;
@@ -977,14 +977,14 @@ GPUFluid.prototype = {
 				var att2 = shader1._attributes[i2];
 				var location2 = att2.location;
 				if(location2 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 				}
 				offset2 += att2.byteSize;
 			}
 		} else {
 			if(!shader1._ready) shader1.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 			var _g7 = 0;
 			var _g16 = shader1._uniforms;
 			while(_g7 < _g16.length) {
@@ -1000,15 +1000,15 @@ GPUFluid.prototype = {
 				var att3 = shader1._attributes[i3];
 				var location3 = att3.location;
 				if(location3 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 				}
 				offset3 += att3.byteSize;
 			}
 			shader1._active = true;
 		}
 		this.pressureRenderTarget.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader1.deactivate();
 		var _this1 = this.pressureRenderTarget;
 		_this1.tmpFBO = _this1.writeFrameBufferObject;
@@ -1018,12 +1018,12 @@ GPUFluid.prototype = {
 		_this1.writeToTexture = _this1.readFromTexture;
 		_this1.readFromTexture = _this1.tmpTex;
 		var _this2 = this.dyeRenderTarget;
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this2.readFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		snow_modules_opengl_web_GL.current_context.clear(16384);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this2.writeFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		snow_modules_opengl_web_GL.current_context.clear(16384);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this2.readFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+		flu_modules_opengl_web_GL.current_context.clear(16384);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this2.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+		flu_modules_opengl_web_GL.current_context.clear(16384);
 	}
 	,__class__: GPUFluid
 };
@@ -1047,28 +1047,28 @@ shaderblox_ShaderBase.prototype = {
 		this._ready = true;
 	}
 	,destroy: function() {
-		snow_modules_opengl_web_GL.current_context.deleteShader(this._vert);
-		snow_modules_opengl_web_GL.current_context.deleteShader(this._frag);
-		snow_modules_opengl_web_GL.current_context.deleteProgram(this._prog);
+		flu_modules_opengl_web_GL.current_context.deleteShader(this._vert);
+		flu_modules_opengl_web_GL.current_context.deleteShader(this._frag);
+		flu_modules_opengl_web_GL.current_context.deleteProgram(this._prog);
 		this._prog = null;
 		this._vert = null;
 		this._frag = null;
 		this._ready = false;
 	}
 	,compile: function(vertSource,fragSource) {
-		var vertexShader = snow_modules_opengl_web_GL.current_context.createShader(35633);
-		snow_modules_opengl_web_GL.current_context.shaderSource(vertexShader,vertSource);
-		snow_modules_opengl_web_GL.current_context.compileShader(vertexShader);
-		if(snow_modules_opengl_web_GL.current_context.getShaderParameter(vertexShader,35713) == 0) {
-			console.log("Error compiling vertex shader: " + snow_modules_opengl_web_GL.current_context.getShaderInfoLog(vertexShader));
+		var vertexShader = flu_modules_opengl_web_GL.current_context.createShader(35633);
+		flu_modules_opengl_web_GL.current_context.shaderSource(vertexShader,vertSource);
+		flu_modules_opengl_web_GL.current_context.compileShader(vertexShader);
+		if(flu_modules_opengl_web_GL.current_context.getShaderParameter(vertexShader,35713) == 0) {
+			console.log("Error compiling vertex shader: " + flu_modules_opengl_web_GL.current_context.getShaderInfoLog(vertexShader));
 			console.log("\n" + vertSource);
-			throw new js__$Boot_HaxeError("Error compiling vertex shader");
+			throw new js__$Boot_FluidError("Error compiling vertex shader");
 		}
-		var fragmentShader = snow_modules_opengl_web_GL.current_context.createShader(35632);
-		snow_modules_opengl_web_GL.current_context.shaderSource(fragmentShader,fragSource);
-		snow_modules_opengl_web_GL.current_context.compileShader(fragmentShader);
-		if(snow_modules_opengl_web_GL.current_context.getShaderParameter(fragmentShader,35713) == 0) {
-			console.log("Error compiling fragment shader: " + snow_modules_opengl_web_GL.current_context.getShaderInfoLog(fragmentShader) + "\n");
+		var fragmentShader = flu_modules_opengl_web_GL.current_context.createShader(35632);
+		flu_modules_opengl_web_GL.current_context.shaderSource(fragmentShader,fragSource);
+		flu_modules_opengl_web_GL.current_context.compileShader(fragmentShader);
+		if(flu_modules_opengl_web_GL.current_context.getShaderParameter(fragmentShader,35713) == 0) {
+			console.log("Error compiling fragment shader: " + flu_modules_opengl_web_GL.current_context.getShaderInfoLog(fragmentShader) + "\n");
 			var lines = fragSource.split("\n");
 			var i = 0;
 			var _g = 0;
@@ -1077,29 +1077,29 @@ shaderblox_ShaderBase.prototype = {
 				++_g;
 				console.log(i++ + " - " + l);
 			}
-			throw new js__$Boot_HaxeError("Error compiling fragment shader");
+			throw new js__$Boot_FluidError("Error compiling fragment shader");
 		}
-		var shaderProgram = snow_modules_opengl_web_GL.current_context.createProgram();
-		snow_modules_opengl_web_GL.current_context.attachShader(shaderProgram,vertexShader);
-		snow_modules_opengl_web_GL.current_context.attachShader(shaderProgram,fragmentShader);
-		snow_modules_opengl_web_GL.current_context.linkProgram(shaderProgram);
-		if(snow_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35714) == 0) throw new js__$Boot_HaxeError("Unable to initialize the shader program.\n" + snow_modules_opengl_web_GL.current_context.getProgramInfoLog(shaderProgram));
-		var numUniforms = snow_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35718);
-		var uniformLocations = new haxe_ds_StringMap();
+		var shaderProgram = flu_modules_opengl_web_GL.current_context.createProgram();
+		flu_modules_opengl_web_GL.current_context.attachShader(shaderProgram,vertexShader);
+		flu_modules_opengl_web_GL.current_context.attachShader(shaderProgram,fragmentShader);
+		flu_modules_opengl_web_GL.current_context.linkProgram(shaderProgram);
+		if(flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35714) == 0) throw new js__$Boot_FluidError("Unable to initialize the shader program.\n" + flu_modules_opengl_web_GL.current_context.getProgramInfoLog(shaderProgram));
+		var numUniforms = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35718);
+		var uniformLocations = new flu_ds_StringMap();
 		while(numUniforms-- > 0) {
-			var uInfo = snow_modules_opengl_web_GL.current_context.getActiveUniform(shaderProgram,numUniforms);
-			var loc = snow_modules_opengl_web_GL.current_context.getUniformLocation(shaderProgram,uInfo.name);
+			var uInfo = flu_modules_opengl_web_GL.current_context.getActiveUniform(shaderProgram,numUniforms);
+			var loc = flu_modules_opengl_web_GL.current_context.getUniformLocation(shaderProgram,uInfo.name);
 			var tmp;
 			var key = uInfo.name;
 			if(__map_reserved[key] != null) uniformLocations.setReserved(key,loc); else uniformLocations.h[key] = loc;
 			tmp = loc;
 			tmp;
 		}
-		var numAttributes = snow_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35721);
-		var attributeLocations = new haxe_ds_StringMap();
+		var numAttributes = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35721);
+		var attributeLocations = new flu_ds_StringMap();
 		while(numAttributes-- > 0) {
-			var aInfo = snow_modules_opengl_web_GL.current_context.getActiveAttrib(shaderProgram,numAttributes);
-			var loc1 = snow_modules_opengl_web_GL.current_context.getAttribLocation(shaderProgram,aInfo.name);
+			var aInfo = flu_modules_opengl_web_GL.current_context.getActiveAttrib(shaderProgram,numAttributes);
+			var loc1 = flu_modules_opengl_web_GL.current_context.getAttribLocation(shaderProgram,aInfo.name);
 			var tmp1;
 			var key1 = aInfo.name;
 			if(__map_reserved[key1] != null) attributeLocations.setReserved(key1,loc1); else attributeLocations.h[key1] = loc1;
@@ -1167,8 +1167,8 @@ shaderblox_ShaderBase.prototype = {
 					var att = this._attributes[i];
 					var location = att.location;
 					if(location != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,this._aStride,offset);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,this._aStride,offset);
 					}
 					offset += att.byteSize;
 				}
@@ -1176,7 +1176,7 @@ shaderblox_ShaderBase.prototype = {
 			return;
 		}
 		if(!this._ready) this.create();
-		snow_modules_opengl_web_GL.current_context.useProgram(this._prog);
+		flu_modules_opengl_web_GL.current_context.useProgram(this._prog);
 		if(initUniforms) {
 			var _g3 = 0;
 			var _g12 = this._uniforms;
@@ -1195,8 +1195,8 @@ shaderblox_ShaderBase.prototype = {
 				var att1 = this._attributes[i1];
 				var location1 = att1.location;
 				if(location1 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,this._aStride,offset1);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,this._aStride,offset1);
 				}
 				offset1 += att1.byteSize;
 			}
@@ -1215,7 +1215,7 @@ shaderblox_ShaderBase.prototype = {
 			var i = _g1++;
 			var idx = this._attributes[i].location;
 			if(idx == -1) continue;
-			snow_modules_opengl_web_GL.current_context.disableVertexAttribArray(idx);
+			flu_modules_opengl_web_GL.current_context.disableVertexAttribArray(idx);
 		}
 	}
 	,__class__: shaderblox_ShaderBase
@@ -1502,9 +1502,9 @@ var GPUParticles = function(count) {
 	this.setCount(count);
 	var shader = this.initialPositionShader;
 	var target = this.positionData;
-	snow_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-	snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+	flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
+	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 	if(shader._active) {
 		var _g = 0;
 		var _g1 = shader._uniforms;
@@ -1521,14 +1521,14 @@ var GPUParticles = function(count) {
 			var att = shader._attributes[i];
 			var location = att.location;
 			if(location != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 			}
 			offset += att.byteSize;
 		}
 	} else {
 		if(!shader._ready) shader.create();
-		snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+		flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 		var _g3 = 0;
 		var _g12 = shader._uniforms;
 		while(_g3 < _g12.length) {
@@ -1544,14 +1544,14 @@ var GPUParticles = function(count) {
 			var att1 = shader._attributes[i1];
 			var location1 = att1.location;
 			if(location1 != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 			}
 			offset1 += att1.byteSize;
 		}
 		shader._active = true;
 	}
-	snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 	shader.deactivate();
 	target.tmpFBO = target.writeFrameBufferObject;
 	target.writeFrameBufferObject = target.readFrameBufferObject;
@@ -1561,9 +1561,9 @@ var GPUParticles = function(count) {
 	target.readFromTexture = target.tmpTex;
 	var shader1 = this.initialVelocityShader;
 	var target1 = this.velocityData;
-	snow_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-	snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+	flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
+	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 	if(shader1._active) {
 		var _g5 = 0;
 		var _g14 = shader1._uniforms;
@@ -1580,14 +1580,14 @@ var GPUParticles = function(count) {
 			var att2 = shader1._attributes[i2];
 			var location2 = att2.location;
 			if(location2 != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 			}
 			offset2 += att2.byteSize;
 		}
 	} else {
 		if(!shader1._ready) shader1.create();
-		snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+		flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 		var _g7 = 0;
 		var _g16 = shader1._uniforms;
 		while(_g7 < _g16.length) {
@@ -1603,14 +1603,14 @@ var GPUParticles = function(count) {
 			var att3 = shader1._attributes[i3];
 			var location3 = att3.location;
 			if(location3 != -1) {
-				snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-				snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 			}
 			offset3 += att3.byteSize;
 		}
 		shader1._active = true;
 	}
-	snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 	shader1.deactivate();
 	target1.tmpFBO = target1.writeFrameBufferObject;
 	target1.writeFrameBufferObject = target1.readFrameBufferObject;
@@ -1625,9 +1625,9 @@ GPUParticles.prototype = {
 	reset: function() {
 		var shader = this.initialPositionShader;
 		var target = this.positionData;
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 		if(shader._active) {
 			var _g = 0;
 			var _g1 = shader._uniforms;
@@ -1644,14 +1644,14 @@ GPUParticles.prototype = {
 				var att = shader._attributes[i];
 				var location = att.location;
 				if(location != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 				}
 				offset += att.byteSize;
 			}
 		} else {
 			if(!shader._ready) shader.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 			var _g3 = 0;
 			var _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
@@ -1667,14 +1667,14 @@ GPUParticles.prototype = {
 				var att1 = shader._attributes[i1];
 				var location1 = att1.location;
 				if(location1 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 				}
 				offset1 += att1.byteSize;
 			}
 			shader._active = true;
 		}
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
 		target.tmpFBO = target.writeFrameBufferObject;
 		target.writeFrameBufferObject = target.readFrameBufferObject;
@@ -1684,9 +1684,9 @@ GPUParticles.prototype = {
 		target.readFromTexture = target.tmpTex;
 		var shader1 = this.initialVelocityShader;
 		var target1 = this.velocityData;
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 		if(shader1._active) {
 			var _g5 = 0;
 			var _g14 = shader1._uniforms;
@@ -1703,14 +1703,14 @@ GPUParticles.prototype = {
 				var att2 = shader1._attributes[i2];
 				var location2 = att2.location;
 				if(location2 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 				}
 				offset2 += att2.byteSize;
 			}
 		} else {
 			if(!shader1._ready) shader1.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 			var _g7 = 0;
 			var _g16 = shader1._uniforms;
 			while(_g7 < _g16.length) {
@@ -1726,14 +1726,14 @@ GPUParticles.prototype = {
 				var att3 = shader1._attributes[i3];
 				var location3 = att3.location;
 				if(location3 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 				}
 				offset3 += att3.byteSize;
 			}
 			shader1._active = true;
 		}
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader1.deactivate();
 		target1.tmpFBO = target1.writeFrameBufferObject;
 		target1.writeFrameBufferObject = target1.readFrameBufferObject;
@@ -1760,8 +1760,8 @@ GPUParticles.prototype = {
 			};
 			this.velocityData = new gltoolbox_render_RenderTarget2Phase(dataWidth,dataWidth,tmp2);
 		} else this.velocityData.resize(dataWidth,dataWidth);
-		if(this.particleUVs != null) snow_modules_opengl_web_GL.current_context.deleteBuffer(this.particleUVs);
-		this.particleUVs = snow_modules_opengl_web_GL.current_context.createBuffer();
+		if(this.particleUVs != null) flu_modules_opengl_web_GL.current_context.deleteBuffer(this.particleUVs);
+		this.particleUVs = flu_modules_opengl_web_GL.current_context.createBuffer();
 		var tmp;
 		var elements = dataWidth * dataWidth * 2;
 		var this1;
@@ -1781,9 +1781,9 @@ GPUParticles.prototype = {
 				arrayUVs[idx] = j / dataWidth;
 			}
 		}
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particleUVs);
-		snow_modules_opengl_web_GL.current_context.bufferData(34962,arrayUVs,35044);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particleUVs);
+		flu_modules_opengl_web_GL.current_context.bufferData(34962,arrayUVs,35044);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
 		var particleSpacing = 2 / dataWidth;
 		var _this = this.initialPositionShader.jitterAmount;
 		_this.dirty = true;
@@ -2033,7 +2033,7 @@ Lambda.fold = function(it,f,first) {
 	}
 	return first;
 };
-var snow_App = function() {
+var flu_App = function() {
 	this.next_render = 0;
 	this.next_tick = 0;
 	this.cur_frame_start = 0.0;
@@ -2047,9 +2047,9 @@ var snow_App = function() {
 	this.fixed_delta = 0;
 	this.timescale = 1;
 };
-$hxClasses["snow.App"] = snow_App;
-snow_App.__name__ = true;
-snow_App.prototype = {
+$hxClasses["fluidState.App"] = flu_App;
+flu_App.__name__ = true;
+flu_App.prototype = {
 	config: function(config) {
 		return config;
 	}
@@ -2095,17 +2095,17 @@ snow_App.prototype = {
 	,ongamepaddevice: function(gamepad,id,type,timestamp) {
 	}
 	,on_internal_init: function() {
-		this.cur_frame_start = snow_Snow.core.timestamp();
+		this.cur_frame_start = flu.core.timestamp();
 		this.last_frame_start = this.cur_frame_start;
 		this.current_time = 0;
 		this.delta_time = 0.016;
 	}
 	,on_internal_update: function() {
 		if(this.update_rate != 0) {
-			if(snow_Snow.core.timestamp() < this.next_tick) return;
-			this.next_tick = snow_Snow.core.timestamp() + this.update_rate;
+			if(flu.core.timestamp() < this.next_tick) return;
+			this.next_tick = flu.core.timestamp() + this.update_rate;
 		}
-		this.cur_frame_start = snow_Snow.core.timestamp();
+		this.cur_frame_start = flu.core.timestamp();
 		this.delta_time = this.cur_frame_start - this.last_frame_start;
 		this.last_frame_start = this.cur_frame_start;
 		if(this.delta_time > this.max_frame_time) this.delta_time = this.max_frame_time;
@@ -2117,19 +2117,19 @@ snow_App.prototype = {
 	}
 	,on_internal_render: function() {
 		if(this.render_rate != 0) {
-			if(this.render_rate < 0 || this.next_render < snow_Snow.core.timestamp()) {
+			if(this.render_rate < 0 || this.next_render < flu.core.timestamp()) {
 				this.app.render();
 				this.next_render += this.render_rate;
 			}
 		}
 	}
-	,__class__: snow_App
+	,__class__: flu_App
 };
 var Main = function() {
 	this.rshiftDown = false;
 	this.lshiftDown = false;
 	this.qualityDirection = 10;
-	this.timer = new haxe_Timer(19000);
+	this.timer = new flu_Timer(19000);
 	this.pointSize = 1;
 	this.dyeColor = new shaderblox_uniforms_Vector3();
 	this.dyeColorHSB = new hxColorToolkit_spaces_HSB(180,100,100);
@@ -2150,18 +2150,10 @@ var Main = function() {
 	this.BIG_SLEEP = false;
 	this.SECRET_ARTS = false;
 	this.CHEER_UP_BUTTERCUP = false;
-	this.AVOBATH = false;
-	this.THINK_PINK = false;
-	this.BIG_BLUE = false;
-	this.SEX_BOMB = false;
-	this.TWILIGHT = false;
-	this.HAS_RUN = false;
-	this.screenBuffer = null;
-	this.textureQuad = null;
-	this.gl = snow_modules_opengl_web_GL;
 	
-	snow_App.call(this);
+	flu_App.call(this);
 	this.performanceMonitor = new PerformanceMonitor(35,null,800);
+				
 	this.set_simulationQuality(SimulationQuality.Medium);
 	this.performanceMonitor.fpsTooLowCallback = $bind(this,this.lowerQualityRequired);
 	var urlParams = js_Web.getParams();
@@ -2169,13 +2161,16 @@ var Main = function() {
 		var q = StringTools.trim((__map_reserved.q != null?urlParams.getReserved("q"):urlParams.h["q"]).toLowerCase());
 		var _g = 0;
 		var _g1 = Type.allEnums(SimulationQuality);
+		
 		while(_g < _g1.length) {
 			var e = _g1[_g];
 			++_g;
 			var name = e[0].toLowerCase();
+			
 			if(q == name) {
 				this.set_simulationQuality(e);
 				this.performanceMonitor.fpsTooLowCallback = null;
+				
 				break;
 			}
 		}
@@ -2187,8 +2182,8 @@ var Main = function() {
 };
 $hxClasses["Main"] = Main;
 Main.__name__ = true;
-Main.__super__ = snow_App;
-Main.prototype = $extend(snow_App.prototype,{
+Main.__super__ = flu_App;
+Main.prototype = $extend(flu_App.prototype,{
 	config: function(config) {
 		config.web.no_context_menu = false;
 		config.web.prevent_default_mouse_wheel = false;
@@ -2210,16 +2205,15 @@ Main.prototype = $extend(snow_App.prototype,{
 		}, 800, ref);
 		this.window = this.app.window;
 		this.init();
-		this.bathBombSelection();
 		this.window.onevent = $bind(this,this.onWindowEvent);
 		this.window.onrender = $bind(this,this.render);
 		
 	}
 	,init: function() {
 		var _g = this;
-		snow_modules_opengl_web_GL.current_context.disable(2929);
-		snow_modules_opengl_web_GL.current_context.disable(2884);
-		snow_modules_opengl_web_GL.current_context.disable(3024);
+		flu_modules_opengl_web_GL.current_context.disable(2929);
+		flu_modules_opengl_web_GL.current_context.disable(2884);
+		flu_modules_opengl_web_GL.current_context.disable(3024);
 		this.textureQuad = gltoolbox_GeometryTools.createQuad(0,0,1,1);
 		this.blitTextureShader = new BlitTexture();
 		this.debugBlitTextureShader = new DebugBlitTexture();
@@ -2303,19 +2297,19 @@ Main.prototype = $extend(snow_App.prototype,{
 		_this12.x = 51;
 		_this12.y = 78;
 		_this12.z = 255;
-		this.initTime = haxe_Timer.stamp();
+		this.initTime = flu_Timer.stamp();
 		this.lastTime = this.initTime;
 	}
 	,update: function(dt) {
 		
-		this.time = haxe_Timer.stamp() - this.initTime;
+		this.time = flu_Timer.stamp() - this.initTime;
 		var _this = this.performanceMonitor;
 		if(dt > 0) {
 			var fps = 1 / dt;
 			if(fps < _this.fpsIgnoreBounds[0] && fps > _this.fpsIgnoreBounds[1]) null; else {
 				_this.fpsSample.add(fps);
 				if(_this.fpsSample.sampleCount < _this.fpsSample.length) null; else {
-					var now = haxe_Timer.stamp() * 1000;
+					var now = flu_Timer.stamp() * 1000;
 					if(_this.fpsSample.average < _this.lowerBoundFPS) {
 						if(_this.lowerBoundEnterTime == null) _this.lowerBoundEnterTime = now;
 						if(now - _this.lowerBoundEnterTime >= _this.thresholdTime_ms && _this.fpsTooLowCallback != null) {
@@ -2365,9 +2359,9 @@ Main.prototype = $extend(snow_App.prototype,{
 			_this7.data = _this4.velocityData.readFromTexture;
 			var shader = _this4.velocityStepShader;
 			var target = _this4.velocityData;
-			snow_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
+			flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
 			if(shader._active) {
 				var _g = 0;
 				var _g1 = shader._uniforms;
@@ -2384,15 +2378,15 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att = shader._attributes[i];
 					var location = att.location;
 					if(location != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 					}
 					offset += att.byteSize;
 				}
 				null;
 			} else {
 				if(!shader._ready) shader.create();
-				snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+				flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 				var _g3 = 0;
 				var _g12 = shader._uniforms;
 				while(_g3 < _g12.length) {
@@ -2408,14 +2402,14 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att1 = shader._attributes[i1];
 					var location1 = att1.location;
 					if(location1 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 					}
 					offset1 += att1.byteSize;
 				}
 				shader._active = true;
 			}
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader.deactivate();
 			target.tmpFBO = target.writeFrameBufferObject;
 			target.writeFrameBufferObject = target.readFrameBufferObject;
@@ -2434,9 +2428,9 @@ Main.prototype = $extend(snow_App.prototype,{
 			_this10.data = _this4.velocityData.readFromTexture;
 			var shader1 = _this4.positionStepShader;
 			var target1 = _this4.positionData;
-			snow_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
+			flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
 			if(shader1._active) {
 				var _g5 = 0;
 				var _g14 = shader1._uniforms;
@@ -2453,15 +2447,15 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att2 = shader1._attributes[i2];
 					var location2 = att2.location;
 					if(location2 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 					}
 					offset2 += att2.byteSize;
 				}
 				null;
 			} else {
 				if(!shader1._ready) shader1.create();
-				snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+				flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 				var _g7 = 0;
 				var _g16 = shader1._uniforms;
 				while(_g7 < _g16.length) {
@@ -2477,14 +2471,14 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att3 = shader1._attributes[i3];
 					var location3 = att3.location;
 					if(location3 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 					}
 					offset3 += att3.byteSize;
 				}
 				shader1._active = true;
 			}
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader1.deactivate();
 			target1.tmpFBO = target1.writeFrameBufferObject;
 			target1.writeFrameBufferObject = target1.readFrameBufferObject;
@@ -2497,11 +2491,7 @@ Main.prototype = $extend(snow_App.prototype,{
 			var _g9 = this.dyeColorHSB;
 			_g9.set_hue(_g9.get_hue() + 1.2);
 		}
-		/*
-		this.mouse.x = -1000;
-		this.mouse.y = -1000;
-		this.lastMouse.x = 0;
-		this.lastMouse.y = 0;*/
+		
 		if(this.isMouseDown && !this.TWILIGHT && !this.SEX_BOMB && !this.BIG_BLUE && !this.THINK_PINK && !this.AVOBATH && !this.CHEER_UP_BUTTERCUP && !this.SECRET_ARTS && !this.BIG_SLEEP && !this.THE_EXPERIMENTOR && !this.INTERGALACTIC) {
 			if(this.hueCycleEnabled) {
 				
@@ -2526,7 +2516,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y = (y_location + 1) / 2 * this.fluid.height - 25;
 				var image = window.document.querySelector("img[src=\"images/twilight_dye.png\"]");
 				if(image != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x),Math.round(mouse_y),6407,5121,image);
 				}
 				this.HAS_RUN = true;
@@ -2548,7 +2538,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y1 = (y_location1 + 1) / 2 * this.fluid.height - 25;
 				var image1 = window.document.querySelector("img[src=\"images/sex_bomb_dye.png\"]");
 				if(image1 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x1),Math.round(mouse_y1),6407,5121,image1);
 				}
 				this.HAS_RUN = true;
@@ -2570,7 +2560,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y2 = (y_location2 + 1) / 2 * this.fluid.height - 25;
 				var image2 = window.document.querySelector("img[src=\"images/big_blue_dye.png\"]");
 				if(image2 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x2),Math.round(mouse_y2),6407,5121,image2);
 				}
 				this.HAS_RUN = true;
@@ -2592,7 +2582,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y3 = (y_location3 + 1) / 2 * this.fluid.height - 25;
 				var image3 = window.document.querySelector("img[src=\"images/think_pink_dye.png\"]");
 				if(image3 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x3),Math.round(mouse_y3),6407,5121,image3);
 				}
 				this.HAS_RUN = true;
@@ -2614,7 +2604,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y4 = (y_location4 + 1) / 2 * this.fluid.height - 25;
 				var image4 = window.document.querySelector("img[src=\"images/avobath_dye.png\"]");
 				if(image4 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x4),Math.round(mouse_y4),6407,5121,image4);
 				}
 				this.HAS_RUN = true;
@@ -2636,7 +2626,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y5 = (y_location5 + 1) / 2 * this.fluid.height - 25;
 				var image5 = window.document.querySelector("img[src=\"images/cheer_up_buttercup_dye.png\"]");
 				if(image5 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x5),Math.round(mouse_y5),6407,5121,image5);
 				}
 				this.HAS_RUN = true;
@@ -2658,7 +2648,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y6 = (y_location6 + 1) / 2 * this.fluid.height - 25;
 				var image6 = window.document.querySelector("img[src=\"images/secret_arts_dye.png\"]");
 				if(image6 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x6),Math.round(mouse_y6),6407,5121,image6);
 				}
 				this.HAS_RUN = true;
@@ -2680,7 +2670,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y7 = (y_location7 + 1) / 2 * this.fluid.height - 25;
 				var image7 = window.document.querySelector("img[src=\"images/big_sleep_dye.png\"]");
 				if(image7 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x7),Math.round(mouse_y7),6407,5121,image7);
 				}
 				this.HAS_RUN = true;
@@ -2702,7 +2692,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y8 = (y_location8 + 1) / 2 * this.fluid.height - 25;
 				var image8 = window.document.querySelector("img[src=\"images/experimenter_dye.png\"]");
 				if(image8 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x8),Math.round(mouse_y8),6407,5121,image8);
 				}
 				this.HAS_RUN = true;
@@ -2733,7 +2723,7 @@ Main.prototype = $extend(snow_App.prototype,{
 				var mouse_y9 = (y_location9 + 1) / 2 * this.fluid.height - 25;
 				var image9 = window.document.querySelector("img[src=\"images/intergalactic_dye.png\"]");
 				if(image9 != null) {
-					snow_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
+					flu_modules_opengl_web_GL.current_context.bindTexture(3553,this.fluid.dyeRenderTarget.readFromTexture);
 					this.gl.current_context.texSubImage2D(3553,0,Math.round(mouse_x9),Math.round(mouse_y9),6407,5121,image9);
 				}
 				this.HAS_RUN = true;
@@ -2766,19 +2756,19 @@ Main.prototype = $extend(snow_App.prototype,{
 		this.lastMousePointKnown = this.mousePointKnown;
 	}
 	,render: function(w) {
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,this.window.width,this.window.height);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.screenBuffer);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.window.width,this.window.height);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.screenBuffer);
 		var shader = this.blitTextureShader;
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 		var _this = shader.texture;
 		_this.dirty = true;
 		_this.data = this.fluid.dyeRenderTarget.readFromTexture;
 		shader.activate(true,true);
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
 		if(this.renderParticlesEnabled) {
 			var shader1 = this.renderParticlesShader;
-			snow_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particles.particleUVs);
+			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particles.particleUVs);
 			var _this1 = shader1.positionData;
 			_this1.dirty = true;
 			_this1.data = this.particles.positionData.readFromTexture;
@@ -2786,7 +2776,7 @@ Main.prototype = $extend(snow_App.prototype,{
 			_this2.dirty = true;
 			_this2.data = this.particles.velocityData.readFromTexture;
 			shader1.activate(true,true);
-			snow_modules_opengl_web_GL.current_context.drawArrays(0,0,this.particles.count);
+			flu_modules_opengl_web_GL.current_context.drawArrays(0,0,this.particles.count);
 			shader1.deactivate();
 		}
 	}
@@ -2801,16 +2791,16 @@ Main.prototype = $extend(snow_App.prototype,{
 			_this.pressureRenderTarget.resize(w,h);
 			var _this1 = _this.divergenceRenderTarget;
 			var newTexture = _this1.textureFactory(w,h);
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
-			snow_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
+			flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
 			if(_this1.texture != null) {
 				var resampler = gltoolbox_shaders_Resample.instance;
 				var _this2 = resampler.texture;
 				_this2.dirty = true;
 				_this2.data = _this1.texture;
-				snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
-				snow_modules_opengl_web_GL.current_context.viewport(0,0,w,h);
-				snow_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
+				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
+				flu_modules_opengl_web_GL.current_context.viewport(0,0,w,h);
+				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
 				if(resampler._active) {
 					var _g = 0;
 					var _g1 = resampler._uniforms;
@@ -2827,14 +2817,14 @@ Main.prototype = $extend(snow_App.prototype,{
 						var att = resampler._attributes[i];
 						var location = att.location;
 						if(location != -1) {
-							snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-							snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
+							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
 						}
 						offset += att.byteSize;
 					}
 				} else {
 					if(!resampler._ready) resampler.create();
-					snow_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
+					flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
 					var _g3 = 0;
 					var _g12 = resampler._uniforms;
 					while(_g3 < _g12.length) {
@@ -2850,20 +2840,20 @@ Main.prototype = $extend(snow_App.prototype,{
 						var att1 = resampler._attributes[i1];
 						var location1 = att1.location;
 						if(location1 != -1) {
-							snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-							snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
+							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
 						}
 						offset1 += att1.byteSize;
 					}
 					resampler._active = true;
 				}
-				snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+				flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 				resampler.deactivate();
-				snow_modules_opengl_web_GL.current_context.deleteTexture(_this1.texture);
+				flu_modules_opengl_web_GL.current_context.deleteTexture(_this1.texture);
 			} else {
-				snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
-				snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-				snow_modules_opengl_web_GL.current_context.clear(16384);
+				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
+				flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+				flu_modules_opengl_web_GL.current_context.clear(16384);
 			}
 			_this1.width = w;
 			_this1.height = h;
@@ -2885,7 +2875,6 @@ Main.prototype = $extend(snow_App.prototype,{
 		this.renderParticlesShader.set_POINT_SIZE((this.pointSize | 0) + ".0");
 	}
 	,set_simulationQuality: function(quality) {
-		quality[1] = 2;
 		switch(quality[1]) {
 		case 0:
 			this.particleCount = 1048576;
@@ -2967,9 +2956,9 @@ Main.prototype = $extend(snow_App.prototype,{
 		var _this = this.particles;
 		var shader = _this.initialPositionShader;
 		var target = _this.positionData;
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 		if(shader._active) {
 			var _g = 0;
 			var _g1 = shader._uniforms;
@@ -2986,14 +2975,14 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att = shader._attributes[i];
 				var location = att.location;
 				if(location != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 				}
 				offset += att.byteSize;
 			}
 		} else {
 			if(!shader._ready) shader.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 			var _g3 = 0;
 			var _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
@@ -3009,14 +2998,14 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att1 = shader._attributes[i1];
 				var location1 = att1.location;
 				if(location1 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 				}
 				offset1 += att1.byteSize;
 			}
 			shader._active = true;
 		}
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
 		target.tmpFBO = target.writeFrameBufferObject;
 		target.writeFrameBufferObject = target.readFrameBufferObject;
@@ -3026,9 +3015,9 @@ Main.prototype = $extend(snow_App.prototype,{
 		target.readFromTexture = target.tmpTex;
 		var shader1 = _this.initialVelocityShader;
 		var target1 = _this.velocityData;
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 		if(shader1._active) {
 			var _g5 = 0;
 			var _g14 = shader1._uniforms;
@@ -3045,14 +3034,14 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att2 = shader1._attributes[i2];
 				var location2 = att2.location;
 				if(location2 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 				}
 				offset2 += att2.byteSize;
 			}
 		} else {
 			if(!shader1._ready) shader1.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 			var _g7 = 0;
 			var _g16 = shader1._uniforms;
 			while(_g7 < _g16.length) {
@@ -3068,14 +3057,14 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att3 = shader1._attributes[i3];
 				var location3 = att3.location;
 				if(location3 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 				}
 				offset3 += att3.byteSize;
 			}
 			shader1._active = true;
 		}
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader1.deactivate();
 		target1.tmpFBO = target1.writeFrameBufferObject;
 		target1.writeFrameBufferObject = target1.readFrameBufferObject;
@@ -3084,9 +3073,9 @@ Main.prototype = $extend(snow_App.prototype,{
 		target1.writeToTexture = target1.readFromTexture;
 		target1.readFromTexture = target1.tmpTex;
 		var _this1 = this.fluid;
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
-		snow_modules_opengl_web_GL.current_context.disable(3042);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
+		flu_modules_opengl_web_GL.current_context.disable(3042);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
 		var shader2 = _this1.clearVelocityShader;
 		if(shader2._active) {
 			var _g9 = 0;
@@ -3104,14 +3093,14 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att4 = shader2._attributes[i4];
 				var location4 = att4.location;
 				if(location4 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
 				}
 				offset4 += att4.byteSize;
 			}
 		} else {
 			if(!shader2._ready) shader2.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
 			var _g20 = 0;
 			var _g110 = shader2._uniforms;
 			while(_g20 < _g110.length) {
@@ -3127,15 +3116,15 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att5 = shader2._attributes[i5];
 				var location5 = att5.location;
 				if(location5 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
 				}
 				offset5 += att5.byteSize;
 			}
 			shader2._active = true;
 		}
 		_this1.velocityRenderTarget.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader2.deactivate();
 		var _this2 = _this1.velocityRenderTarget;
 		_this2.tmpFBO = _this2.writeFrameBufferObject;
@@ -3161,14 +3150,14 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att6 = shader3._attributes[i6];
 				var location6 = att6.location;
 				if(location6 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
 				}
 				offset6 += att6.byteSize;
 			}
 		} else {
 			if(!shader3._ready) shader3.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
 			var _g24 = 0;
 			var _g114 = shader3._uniforms;
 			while(_g24 < _g114.length) {
@@ -3184,15 +3173,15 @@ Main.prototype = $extend(snow_App.prototype,{
 				var att7 = shader3._attributes[i7];
 				var location7 = att7.location;
 				if(location7 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
 				}
 				offset7 += att7.byteSize;
 			}
 			shader3._active = true;
 		}
 		_this1.pressureRenderTarget.activate();
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader3.deactivate();
 		var _this3 = _this1.pressureRenderTarget;
 		_this3.tmpFBO = _this3.writeFrameBufferObject;
@@ -3202,170 +3191,13 @@ Main.prototype = $extend(snow_App.prototype,{
 		_this3.writeToTexture = _this3.readFromTexture;
 		_this3.readFromTexture = _this3.tmpTex;
 		var _this4 = _this1.dyeRenderTarget;
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		snow_modules_opengl_web_GL.current_context.clear(16384);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.writeFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		snow_modules_opengl_web_GL.current_context.clear(16384);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+		flu_modules_opengl_web_GL.current_context.clear(16384);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+		flu_modules_opengl_web_GL.current_context.clear(16384);
 		this.HAS_RUN = false;
-	}
-	,bathBombSelection: function() {
-		var _g = this;
-		/*window.document.querySelector(".myscrollbar1").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = true;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar2").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = true;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar3").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = true;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar4").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = true;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar5").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = true;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar6").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = true;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar7").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = true;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar8").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = true;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar9").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = true;
-			_g.INTERGALACTIC = false;
-		});
-		window.document.querySelector(".myscrollbar10").addEventListener("click",function() {
-			_g.HAS_RUN = false;
-			_g.closeNav();
-			_g.reset();
-			_g.TWILIGHT = false;
-			_g.SEX_BOMB = false;
-			_g.BIG_BLUE = false;
-			_g.THINK_PINK = false;
-			_g.AVOBATH = false;
-			_g.CHEER_UP_BUTTERCUP = false;
-			_g.SECRET_ARTS = false;
-			_g.BIG_SLEEP = false;
-			_g.THE_EXPERIMENTOR = false;
-			_g.INTERGALACTIC = true;
-		});*/
-	}
-	,closeNav: function() {
-		window.document.getElementById("style-5").style.width = "0";
-		window.document.getElementById("close-button").style.display = "inline-block";
 	}
 	,onmousedown: function(x,y,button,_,_1) {
 		this.isMouseDown = true;
@@ -3442,10 +3274,10 @@ Main.prototype = $extend(snow_App.prototype,{
 	}
 	,onkeydown: function(keyCode,_,_1,_2,_3,_4) {
 		switch(keyCode) {
-		case snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.lshift):
+		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.lshift):
 			this.lshiftDown = true;
 			break;
-		case snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.rshift):
+		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.rshift):
 			this.rshiftDown = true;
 			break;
 		}
@@ -3457,9 +3289,9 @@ Main.prototype = $extend(snow_App.prototype,{
 				var _this = this.particles;
 				var shader = _this.initialPositionShader;
 				var target = _this.positionData;
-				snow_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-				snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-				snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
+				flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
+				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
+				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 				if(shader._active) {
 					var _g = 0;
 					var _g1 = shader._uniforms;
@@ -3476,14 +3308,14 @@ Main.prototype = $extend(snow_App.prototype,{
 						var att = shader._attributes[i];
 						var location = att.location;
 						if(location != -1) {
-							snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-							snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
+							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
 						}
 						offset += att.byteSize;
 					}
 				} else {
 					if(!shader._ready) shader.create();
-					snow_modules_opengl_web_GL.current_context.useProgram(shader._prog);
+					flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
 					var _g3 = 0;
 					var _g12 = shader._uniforms;
 					while(_g3 < _g12.length) {
@@ -3499,14 +3331,14 @@ Main.prototype = $extend(snow_App.prototype,{
 						var att1 = shader._attributes[i1];
 						var location1 = att1.location;
 						if(location1 != -1) {
-							snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-							snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
+							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
 						}
 						offset1 += att1.byteSize;
 					}
 					shader._active = true;
 				}
-				snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+				flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 				shader.deactivate();
 				target.tmpFBO = target.writeFrameBufferObject;
 				target.writeFrameBufferObject = target.readFrameBufferObject;
@@ -3516,9 +3348,9 @@ Main.prototype = $extend(snow_App.prototype,{
 				target.readFromTexture = target.tmpTex;
 				var shader1 = _this.initialVelocityShader;
 				var target1 = _this.velocityData;
-				snow_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-				snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-				snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
+				flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
+				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
+				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 				if(shader1._active) {
 					var _g5 = 0;
 					var _g14 = shader1._uniforms;
@@ -3535,14 +3367,14 @@ Main.prototype = $extend(snow_App.prototype,{
 						var att2 = shader1._attributes[i2];
 						var location2 = att2.location;
 						if(location2 != -1) {
-							snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-							snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
+							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
+							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
 						}
 						offset2 += att2.byteSize;
 					}
 				} else {
 					if(!shader1._ready) shader1.create();
-					snow_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
+					flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
 					var _g7 = 0;
 					var _g16 = shader1._uniforms;
 					while(_g7 < _g16.length) {
@@ -3558,14 +3390,14 @@ Main.prototype = $extend(snow_App.prototype,{
 						var att3 = shader1._attributes[i3];
 						var location3 = att3.location;
 						if(location3 != -1) {
-							snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-							snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
+							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
+							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
 						}
 						offset3 += att3.byteSize;
 					}
 					shader1._active = true;
 				}
-				snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+				flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 				shader1.deactivate();
 				target1.tmpFBO = target1.writeFrameBufferObject;
 				target1.writeFrameBufferObject = target1.readFrameBufferObject;
@@ -3583,9 +3415,9 @@ Main.prototype = $extend(snow_App.prototype,{
 			break;
 		case 115:
 			var _this1 = this.fluid;
-			snow_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
-			snow_modules_opengl_web_GL.current_context.disable(3042);
-			snow_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
+			flu_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
+			flu_modules_opengl_web_GL.current_context.disable(3042);
+			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
 			var shader2 = _this1.clearVelocityShader;
 			if(shader2._active) {
 				var _g9 = 0;
@@ -3603,14 +3435,14 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att4 = shader2._attributes[i4];
 					var location4 = att4.location;
 					if(location4 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
 					}
 					offset4 += att4.byteSize;
 				}
 			} else {
 				if(!shader2._ready) shader2.create();
-				snow_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
+				flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
 				var _g20 = 0;
 				var _g110 = shader2._uniforms;
 				while(_g20 < _g110.length) {
@@ -3626,15 +3458,15 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att5 = shader2._attributes[i5];
 					var location5 = att5.location;
 					if(location5 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
 					}
 					offset5 += att5.byteSize;
 				}
 				shader2._active = true;
 			}
 			_this1.velocityRenderTarget.activate();
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader2.deactivate();
 			var _this2 = _this1.velocityRenderTarget;
 			_this2.tmpFBO = _this2.writeFrameBufferObject;
@@ -3660,14 +3492,14 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att6 = shader3._attributes[i6];
 					var location6 = att6.location;
 					if(location6 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
 					}
 					offset6 += att6.byteSize;
 				}
 			} else {
 				if(!shader3._ready) shader3.create();
-				snow_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
+				flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
 				var _g24 = 0;
 				var _g114 = shader3._uniforms;
 				while(_g24 < _g114.length) {
@@ -3683,15 +3515,15 @@ Main.prototype = $extend(snow_App.prototype,{
 					var att7 = shader3._attributes[i7];
 					var location7 = att7.location;
 					if(location7 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
 					}
 					offset7 += att7.byteSize;
 				}
 				shader3._active = true;
 			}
 			_this1.pressureRenderTarget.activate();
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader3.deactivate();
 			var _this3 = _this1.pressureRenderTarget;
 			_this3.tmpFBO = _this3.writeFrameBufferObject;
@@ -3701,17 +3533,17 @@ Main.prototype = $extend(snow_App.prototype,{
 			_this3.writeToTexture = _this3.readFromTexture;
 			_this3.readFromTexture = _this3.tmpTex;
 			var _this4 = _this1.dyeRenderTarget;
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			snow_modules_opengl_web_GL.current_context.clear(16384);
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.writeFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			snow_modules_opengl_web_GL.current_context.clear(16384);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+			flu_modules_opengl_web_GL.current_context.clear(16384);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.writeFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+			flu_modules_opengl_web_GL.current_context.clear(16384);
 			break;
-		case snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.lshift):
+		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.lshift):
 			this.lshiftDown = false;
 			break;
-		case snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.rshift):
+		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.rshift):
 			this.rshiftDown = false;
 			break;
 		}
@@ -3988,7 +3820,7 @@ Reflect.field = function(o,field) {
 	try {
 		return o[field];
 	} catch( e ) {
-		if (e instanceof js__$Boot_HaxeError) e = e.val;
+		if (e instanceof js__$Boot_FluidError) e = e.val;
 		return null;
 	}
 };
@@ -4009,10 +3841,10 @@ var SnowApp = function() { };
 $hxClasses["FluidApp"] = SnowApp;
 SnowApp.__name__ = true;
 SnowApp.main = function() {
-	SnowApp._snow = new snow_Snow();
+	SnowApp._flu = new flu();
 	SnowApp._host = new Main();
-	var _snow_config = { has_loop : true, config_path : "manifest.json", app_package : "fluidity.money"};
-	SnowApp._snow.init(_snow_config,SnowApp._host);
+	var _flu_config = { has_loop : true, config_path : "manifest.json", app_package : "fluidity.money"};
+	SnowApp._flu.init(_flu_config,SnowApp._host);
 };
 var Std = function() { };
 $hxClasses["Std"] = Std;
@@ -4066,20 +3898,20 @@ Type.resolveEnum = function(name) {
 };
 Type.createEnum = function(e,constr,params) {
 	var f = Reflect.field(e,constr);
-	if(f == null) throw new js__$Boot_HaxeError("No such constructor " + constr);
+	if(f == null) throw new js__$Boot_FluidError("No such constructor " + constr);
 	if(Reflect.isFunction(f)) {
-		if(params == null) throw new js__$Boot_HaxeError("Constructor " + constr + " need parameters");
+		if(params == null) throw new js__$Boot_FluidError("Constructor " + constr + " need parameters");
 		var tmp;
 		var func = f;
 		tmp = func.apply(e,params);
 		return tmp;
 	}
-	if(params != null && params.length != 0) throw new js__$Boot_HaxeError("Constructor " + constr + " does not need parameters");
+	if(params != null && params.length != 0) throw new js__$Boot_FluidError("Constructor " + constr + " does not need parameters");
 	return f;
 };
 Type.createEnumIndex = function(e,index,params) {
 	var c = e.__constructs__[index];
-	if(c == null) throw new js__$Boot_HaxeError(index + " is not a valid enum constructor index");
+	if(c == null) throw new js__$Boot_FluidError(index + " is not a valid enum constructor index");
 	return Type.createEnum(e,c,params);
 };
 Type.allEnums = function(e) {
@@ -4091,7 +3923,7 @@ gltoolbox_GeometryTools.__name__ = true;
 gltoolbox_GeometryTools.getCachedUnitQuad = function(drawMode) {
 	if(drawMode == null) drawMode = 5;
 	var unitQuad = gltoolbox_GeometryTools.unitQuadCache.h[drawMode];
-	if(unitQuad == null || !snow_modules_opengl_web_GL.current_context.isBuffer(unitQuad)) {
+	if(unitQuad == null || !flu_modules_opengl_web_GL.current_context.isBuffer(unitQuad)) {
 		unitQuad = gltoolbox_GeometryTools.createQuad(0,0,1,1,drawMode);
 		gltoolbox_GeometryTools.unitQuadCache.h[drawMode] = unitQuad;
 	}
@@ -4104,7 +3936,7 @@ gltoolbox_GeometryTools.createQuad = function(originX,originY,width,height,drawM
 	if(width == null) width = 1;
 	if(originY == null) originY = 0;
 	if(originX == null) originX = 0;
-	var quad = snow_modules_opengl_web_GL.current_context.createBuffer();
+	var quad = flu_modules_opengl_web_GL.current_context.createBuffer();
 	var vertices = [];
 	switch(drawMode) {
 	case 5:case 4:
@@ -4115,14 +3947,14 @@ gltoolbox_GeometryTools.createQuad = function(originX,originY,width,height,drawM
 		vertices = [originX,originY + height,originX,originY,originX + width,originY,originX + width,originY + height];
 		break;
 	}
-	snow_modules_opengl_web_GL.current_context.bindBuffer(34962,quad);
+	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,quad);
 	var tmp;
 	var this1;
 	if(vertices != null) this1 = new Float32Array(vertices); else this1 = null;
 	tmp = this1;
 	var data = tmp;
-	snow_modules_opengl_web_GL.current_context.bufferData(34962,data,usage);
-	snow_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
+	flu_modules_opengl_web_GL.current_context.bufferData(34962,data,usage);
+	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
 	return quad;
 };
 var gltoolbox_TextureTools = function() { };
@@ -4141,16 +3973,16 @@ gltoolbox_TextureTools.createTexture = function(width,height,params,data) {
 			params[f] = value;
 		}
 	}
-	var texture = snow_modules_opengl_web_GL.current_context.createTexture();
-	snow_modules_opengl_web_GL.current_context.bindTexture(3553,texture);
-	snow_modules_opengl_web_GL.current_context.texParameteri(3553,10241,params.filter);
-	snow_modules_opengl_web_GL.current_context.texParameteri(3553,10240,params.filter);
-	snow_modules_opengl_web_GL.current_context.texParameteri(3553,10242,params.wrapS);
-	snow_modules_opengl_web_GL.current_context.texParameteri(3553,10243,params.wrapT);
-	snow_modules_opengl_web_GL.current_context.pixelStorei(3317,params.unpackAlignment);
-	snow_modules_opengl_web_GL.current_context.pixelStorei(37440,params.webGLFlipY?1:0);
-	snow_modules_opengl_web_GL.current_context.texImage2D(3553,0,params.channelType,width,height,0,params.channelType,params.dataType,data);
-	snow_modules_opengl_web_GL.current_context.bindTexture(3553,null);
+	var texture = flu_modules_opengl_web_GL.current_context.createTexture();
+	flu_modules_opengl_web_GL.current_context.bindTexture(3553,texture);
+	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10241,params.filter);
+	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10240,params.filter);
+	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10242,params.wrapS);
+	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10243,params.wrapT);
+	flu_modules_opengl_web_GL.current_context.pixelStorei(3317,params.unpackAlignment);
+	flu_modules_opengl_web_GL.current_context.pixelStorei(37440,params.webGLFlipY?1:0);
+	flu_modules_opengl_web_GL.current_context.texImage2D(3553,0,params.channelType,width,height,0,params.channelType,params.dataType,data);
+	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
 	return texture;
 };
 var gltoolbox_render_ITargetable = function() { };
@@ -4168,18 +4000,18 @@ var gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
 	this.textureFactory = textureFactory;
 	this.texture = textureFactory(width,height);
 	if(gltoolbox_render_RenderTarget.textureQuad == null) gltoolbox_render_RenderTarget.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad(5);
-	this.frameBufferObject = snow_modules_opengl_web_GL.current_context.createFramebuffer();
+	this.frameBufferObject = flu_modules_opengl_web_GL.current_context.createFramebuffer();
 	var newTexture = this.textureFactory(width,height);
-	snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
-	snow_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
+	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
+	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
 	if(this.texture != null) {
 		var resampler = gltoolbox_shaders_Resample.instance;
 		var _this = resampler.texture;
 		_this.dirty = true;
 		_this.data = this.texture;
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
-		snow_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
-		snow_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
+		flu_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
+		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
 		if(resampler._active) {
 			var _g = 0;
 			var _g1 = resampler._uniforms;
@@ -4196,14 +4028,14 @@ var gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
 				var att = resampler._attributes[i];
 				var location = att.location;
 				if(location != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
 				}
 				offset += att.byteSize;
 			}
 		} else {
 			if(!resampler._ready) resampler.create();
-			snow_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
+			flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
 			var _g3 = 0;
 			var _g12 = resampler._uniforms;
 			while(_g3 < _g12.length) {
@@ -4219,20 +4051,20 @@ var gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
 				var att1 = resampler._attributes[i1];
 				var location1 = att1.location;
 				if(location1 != -1) {
-					snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
+					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
 				}
 				offset1 += att1.byteSize;
 			}
 			resampler._active = true;
 		}
-		snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		resampler.deactivate();
-		snow_modules_opengl_web_GL.current_context.deleteTexture(this.texture);
+		flu_modules_opengl_web_GL.current_context.deleteTexture(this.texture);
 	} else {
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
-		snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		snow_modules_opengl_web_GL.current_context.clear(16384);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
+		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+		flu_modules_opengl_web_GL.current_context.clear(16384);
 	}
 	this.width = width;
 	this.height = height;
@@ -4244,7 +4076,7 @@ gltoolbox_render_RenderTarget.__name__ = true;
 gltoolbox_render_RenderTarget.__interfaces__ = [gltoolbox_render_ITargetable];
 gltoolbox_render_RenderTarget.prototype = {
 	activate: function() {
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
 	}
 	,__class__: gltoolbox_render_RenderTarget
 };
@@ -4256,8 +4088,8 @@ var gltoolbox_render_RenderTarget2Phase = function(width,height,textureFactory) 
 	this.height = height;
 	this.textureFactory = textureFactory;
 	if(gltoolbox_render_RenderTarget2Phase.textureQuad == null) gltoolbox_render_RenderTarget2Phase.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad(5);
-	this.writeFrameBufferObject = snow_modules_opengl_web_GL.current_context.createFramebuffer();
-	this.readFrameBufferObject = snow_modules_opengl_web_GL.current_context.createFramebuffer();
+	this.writeFrameBufferObject = flu_modules_opengl_web_GL.current_context.createFramebuffer();
+	this.readFrameBufferObject = flu_modules_opengl_web_GL.current_context.createFramebuffer();
 	this.resize(width,height);
 };
 $hxClasses["gltoolbox.render.RenderTarget2Phase"] = gltoolbox_render_RenderTarget2Phase;
@@ -4267,18 +4099,18 @@ gltoolbox_render_RenderTarget2Phase.prototype = {
 	resize: function(width,height) {
 		var newWriteToTexture = this.textureFactory(width,height);
 		var newReadFromTexture = this.textureFactory(width,height);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newWriteToTexture,0);
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
-		snow_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newReadFromTexture,0);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newWriteToTexture,0);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newReadFromTexture,0);
 		if(this.readFromTexture != null) {
 			var resampler = gltoolbox_shaders_Resample.instance;
 			var _this = resampler.texture;
 			_this.dirty = true;
 			_this.data = this.readFromTexture;
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
-			snow_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget2Phase.textureQuad);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
+			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget2Phase.textureQuad);
 			if(resampler._active) {
 				var _g = 0;
 				var _g1 = resampler._uniforms;
@@ -4295,14 +4127,14 @@ gltoolbox_render_RenderTarget2Phase.prototype = {
 					var att = resampler._attributes[i];
 					var location = att.location;
 					if(location != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
 					}
 					offset += att.byteSize;
 				}
 			} else {
 				if(!resampler._ready) resampler.create();
-				snow_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
+				flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
 				var _g3 = 0;
 				var _g12 = resampler._uniforms;
 				while(_g3 < _g12.length) {
@@ -4318,25 +4150,25 @@ gltoolbox_render_RenderTarget2Phase.prototype = {
 					var att1 = resampler._attributes[i1];
 					var location1 = att1.location;
 					if(location1 != -1) {
-						snow_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-						snow_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
+						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
+						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
 					}
 					offset1 += att1.byteSize;
 				}
 				resampler._active = true;
 			}
-			snow_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			resampler.deactivate();
-			snow_modules_opengl_web_GL.current_context.deleteTexture(this.readFromTexture);
+			flu_modules_opengl_web_GL.current_context.deleteTexture(this.readFromTexture);
 		} else {
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			snow_modules_opengl_web_GL.current_context.clear(16384);
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+			flu_modules_opengl_web_GL.current_context.clear(16384);
 		}
-		if(this.writeToTexture != null) snow_modules_opengl_web_GL.current_context.deleteTexture(this.writeToTexture); else {
-			snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
-			snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			snow_modules_opengl_web_GL.current_context.clear(16384);
+		if(this.writeToTexture != null) flu_modules_opengl_web_GL.current_context.deleteTexture(this.writeToTexture); else {
+			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
+			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
+			flu_modules_opengl_web_GL.current_context.clear(16384);
 		}
 		this.width = width;
 		this.height = height;
@@ -4345,7 +4177,7 @@ gltoolbox_render_RenderTarget2Phase.prototype = {
 		return this;
 	}
 	,activate: function() {
-		snow_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
+		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
 	}
 	,__class__: gltoolbox_render_RenderTarget2Phase
 };
@@ -4397,7 +4229,7 @@ js_Boot.__string_rec = function(o,s) {
 		try {
 			tostr = o.toString;
 		} catch( e ) {
-			if (e instanceof js__$Boot_HaxeError) e = e.val;
+			if (e instanceof js__$Boot_FluidError) e = e.val;
 			return "???";
 		}
 		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
@@ -4474,7 +4306,7 @@ js_Boot.__instanceof = function(o,cl) {
 	}
 };
 js_Boot.__cast = function(o,t) {
-	if(js_Boot.__instanceof(o,t)) return o; else throw new js__$Boot_HaxeError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
+	if(js_Boot.__instanceof(o,t)) return o; else throw new js__$Boot_FluidError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
 };
 js_Boot.__nativeClassName = function(o) {
 	var name = js_Boot.__toStr.call(o).slice(8,-1);
@@ -4510,44 +4342,44 @@ gltoolbox_shaders_Resample.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,__class__: gltoolbox_shaders_Resample
 });
-var haxe_IMap = function() { };
-$hxClasses["haxe.IMap"] = haxe_IMap;
-haxe_IMap.__name__ = true;
-haxe_IMap.prototype = {
-	__class__: haxe_IMap
+var flu_IMap = function() { };
+$hxClasses["fluid.IMap"] = flu_IMap;
+flu_IMap.__name__ = true;
+flu_IMap.prototype = {
+	__class__: flu_IMap
 };
-var haxe__$Int64__$_$_$Int64 = function(high,low) {
+var flu__$Int64__$_$_$Int64 = function(high,low) {
 	this.high = high;
 	this.low = low;
 };
-$hxClasses["haxe._Int64.___Int64"] = haxe__$Int64__$_$_$Int64;
-haxe__$Int64__$_$_$Int64.__name__ = true;
-haxe__$Int64__$_$_$Int64.prototype = {
-	__class__: haxe__$Int64__$_$_$Int64
+$hxClasses["fluid._Int64.___Int64"] = flu__$Int64__$_$_$Int64;
+flu__$Int64__$_$_$Int64.__name__ = true;
+flu__$Int64__$_$_$Int64.prototype = {
+	__class__: flu__$Int64__$_$_$Int64
 };
-var haxe_Timer = function(time_ms) {
+var flu_Timer = function(time_ms) {
 	var me = this;
 	this.id = setInterval(function() {
 		me.run();
 	},time_ms);
 };
-$hxClasses["haxe.Timer"] = haxe_Timer;
-haxe_Timer.__name__ = true;
-haxe_Timer.stamp = function() {
+$hxClasses["fluid.Timer"] = flu_Timer;
+flu_Timer.__name__ = true;
+flu_Timer.stamp = function() {
 	return new Date().getTime() / 1000;
 };
-haxe_Timer.prototype = {
+flu_Timer.prototype = {
 	run: function() {
 	}
-	,__class__: haxe_Timer
+	,__class__: flu_Timer
 };
-var haxe_ds_IntMap = function() {
+var flu_ds_IntMap = function() {
 	this.h = { };
 };
-$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
-haxe_ds_IntMap.__name__ = true;
-haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
-haxe_ds_IntMap.prototype = {
+$hxClasses["fluid.ds.IntMap"] = flu_ds_IntMap;
+flu_ds_IntMap.__name__ = true;
+flu_ds_IntMap.__interfaces__ = [flu_IMap];
+flu_ds_IntMap.prototype = {
 	set: function(key,value) {
 		this.h[key] = value;
 	}
@@ -4571,18 +4403,18 @@ haxe_ds_IntMap.prototype = {
 			return this.ref[i];
 		}};
 	}
-	,__class__: haxe_ds_IntMap
+	,__class__: flu_ds_IntMap
 };
-var haxe_ds_ObjectMap = function() {
+var flu_ds_ObjectMap = function() {
 	this.h = { };
 	this.h.__keys__ = { };
 };
-$hxClasses["haxe.ds.ObjectMap"] = haxe_ds_ObjectMap;
-haxe_ds_ObjectMap.__name__ = true;
-haxe_ds_ObjectMap.__interfaces__ = [haxe_IMap];
-haxe_ds_ObjectMap.prototype = {
+$hxClasses["fluid.ds.ObjectMap"] = flu_ds_ObjectMap;
+flu_ds_ObjectMap.__name__ = true;
+flu_ds_ObjectMap.__interfaces__ = [flu_IMap];
+flu_ds_ObjectMap.prototype = {
 	set: function(key,value) {
-		var id = key.__id__ || (key.__id__ = ++haxe_ds_ObjectMap.count);
+		var id = key.__id__ || (key.__id__ = ++flu_ds_ObjectMap.count);
 		this.h[id] = value;
 		this.h.__keys__[id] = key;
 	}
@@ -4608,17 +4440,17 @@ haxe_ds_ObjectMap.prototype = {
 			return this.ref[i.__id__];
 		}};
 	}
-	,__class__: haxe_ds_ObjectMap
+	,__class__: flu_ds_ObjectMap
 };
-var haxe_ds__$StringMap_StringMapIterator = function(map,keys) {
+var flu_ds__$StringMap_StringMapIterator = function(map,keys) {
 	this.map = map;
 	this.keys = keys;
 	this.index = 0;
 	this.count = keys.length;
 };
-$hxClasses["haxe.ds._StringMap.StringMapIterator"] = haxe_ds__$StringMap_StringMapIterator;
-haxe_ds__$StringMap_StringMapIterator.__name__ = true;
-haxe_ds__$StringMap_StringMapIterator.prototype = {
+$hxClasses["fluid.ds._StringMap.StringMapIterator"] = flu_ds__$StringMap_StringMapIterator;
+flu_ds__$StringMap_StringMapIterator.__name__ = true;
+flu_ds__$StringMap_StringMapIterator.prototype = {
 	hasNext: function() {
 		return this.index < this.count;
 	}
@@ -4629,15 +4461,15 @@ haxe_ds__$StringMap_StringMapIterator.prototype = {
 		if(__map_reserved[key] != null) tmp = _this.getReserved(key); else tmp = _this.h[key];
 		return tmp;
 	}
-	,__class__: haxe_ds__$StringMap_StringMapIterator
+	,__class__: flu_ds__$StringMap_StringMapIterator
 };
-var haxe_ds_StringMap = function() {
+var flu_ds_StringMap = function() {
 	this.h = { };
 };
-$hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
-haxe_ds_StringMap.__name__ = true;
-haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
-haxe_ds_StringMap.prototype = {
+$hxClasses["fluid.ds.StringMap"] = flu_ds_StringMap;
+flu_ds_StringMap.__name__ = true;
+flu_ds_StringMap.__interfaces__ = [flu_IMap];
+flu_ds_StringMap.prototype = {
 	set: function(key,value) {
 		if(__map_reserved[key] != null) this.setReserved(key,value); else this.h[key] = value;
 	}
@@ -4676,20 +4508,20 @@ haxe_ds_StringMap.prototype = {
 		}
 		return out;
 	}
-	,__class__: haxe_ds_StringMap
+	,__class__: flu_ds_StringMap
 };
-var haxe_io_Bytes = function(data) {
+var flu_io_Bytes = function(data) {
 	this.length = data.byteLength;
 	this.b = new Uint8Array(data);
 	this.b.bufferValue = data;
 	data.hxBytes = this;
 	data.bytes = this.b;
 };
-$hxClasses["haxe.io.Bytes"] = haxe_io_Bytes;
-haxe_io_Bytes.__name__ = true;
-haxe_io_Bytes.prototype = {
+$hxClasses["fluid.io.Bytes"] = flu_io_Bytes;
+flu_io_Bytes.__name__ = true;
+flu_io_Bytes.prototype = {
 	getString: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw new js__$Boot_HaxeError(haxe_io_Error.OutsideBounds);
+		if(pos < 0 || len < 0 || pos + len > this.length) throw new js__$Boot_FluidError(flu_io_Error.OutsideBounds);
 		var s = "";
 		var b = this.b;
 		var fcc = String.fromCharCode;
@@ -4716,31 +4548,31 @@ haxe_io_Bytes.prototype = {
 	,toString: function() {
 		return this.getString(0,this.length);
 	}
-	,__class__: haxe_io_Bytes
+	,__class__: flu_io_Bytes
 };
-var haxe_io_Error = $hxClasses["haxe.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
-haxe_io_Error.Blocked = ["Blocked",0];
-haxe_io_Error.Blocked.toString = $estr;
-haxe_io_Error.Blocked.__enum__ = haxe_io_Error;
-haxe_io_Error.Overflow = ["Overflow",1];
-haxe_io_Error.Overflow.toString = $estr;
-haxe_io_Error.Overflow.__enum__ = haxe_io_Error;
-haxe_io_Error.OutsideBounds = ["OutsideBounds",2];
-haxe_io_Error.OutsideBounds.toString = $estr;
-haxe_io_Error.OutsideBounds.__enum__ = haxe_io_Error;
-haxe_io_Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe_io_Error; $x.toString = $estr; return $x; };
-haxe_io_Error.__empty_constructs__ = [haxe_io_Error.Blocked,haxe_io_Error.Overflow,haxe_io_Error.OutsideBounds];
-var haxe_io_FPHelper = function() { };
-$hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;
-haxe_io_FPHelper.__name__ = true;
-haxe_io_FPHelper.i32ToFloat = function(i) {
+var flu_io_Error = $hxClasses["fluid.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
+flu_io_Error.Blocked = ["Blocked",0];
+flu_io_Error.Blocked.toString = $estr;
+flu_io_Error.Blocked.__enum__ = flu_io_Error;
+flu_io_Error.Overflow = ["Overflow",1];
+flu_io_Error.Overflow.toString = $estr;
+flu_io_Error.Overflow.__enum__ = flu_io_Error;
+flu_io_Error.OutsideBounds = ["OutsideBounds",2];
+flu_io_Error.OutsideBounds.toString = $estr;
+flu_io_Error.OutsideBounds.__enum__ = flu_io_Error;
+flu_io_Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = flu_io_Error; $x.toString = $estr; return $x; };
+flu_io_Error.__empty_constructs__ = [flu_io_Error.Blocked,flu_io_Error.Overflow,flu_io_Error.OutsideBounds];
+var flu_io_FPHelper = function() { };
+$hxClasses["fluid.io.FPHelper"] = flu_io_FPHelper;
+flu_io_FPHelper.__name__ = true;
+flu_io_FPHelper.i32ToFloat = function(i) {
 	var sign = 1 - (i >>> 31 << 1);
 	var exp = i >>> 23 & 255;
 	var sig = i & 8388607;
 	if(sig == 0 && exp == 0) return 0.0;
 	return sign * (1 + Math.pow(2,-23) * sig) * Math.pow(2,exp - 127);
 };
-haxe_io_FPHelper.floatToI32 = function(f) {
+flu_io_FPHelper.floatToI32 = function(f) {
 	if(f == 0) return 0;
 	var af = f < 0?-f:f;
 	var exp = Math.floor(Math.log(af) / 0.6931471805599453);
@@ -4748,15 +4580,15 @@ haxe_io_FPHelper.floatToI32 = function(f) {
 	var sig = Math.round((af / Math.pow(2,exp) - 1) * 8388608) & 8388607;
 	return (f < 0?-2147483648:0) | exp + 127 << 23 | sig;
 };
-haxe_io_FPHelper.i64ToDouble = function(low,high) {
+flu_io_FPHelper.i64ToDouble = function(low,high) {
 	var sign = 1 - (high >>> 31 << 1);
 	var exp = (high >> 20 & 2047) - 1023;
 	var sig = (high & 1048575) * 4294967296. + (low >>> 31) * 2147483648. + (low & 2147483647);
 	if(sig == 0 && exp == -1023) return 0.0;
 	return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
 };
-haxe_io_FPHelper.doubleToI64 = function(v) {
-	var i64 = haxe_io_FPHelper.i64tmp;
+flu_io_FPHelper.doubleToI64 = function(v) {
+	var i64 = flu_io_FPHelper.i64tmp;
 	if(v == 0) {
 		i64.low = 0;
 		i64.high = 0;
@@ -4774,10 +4606,10 @@ haxe_io_FPHelper.doubleToI64 = function(v) {
 	}
 	return i64;
 };
-var haxe_io_Path = function() { };
-$hxClasses["haxe.io.Path"] = haxe_io_Path;
-haxe_io_Path.__name__ = true;
-haxe_io_Path.join = function(paths) {
+var flu_io_Path = function() { };
+$hxClasses["fluid.io.Path"] = flu_io_Path;
+flu_io_Path.__name__ = true;
+flu_io_Path.join = function(paths) {
 	var paths1 = paths.filter(function(s) {
 		return s != null && s != "";
 	});
@@ -4787,12 +4619,12 @@ haxe_io_Path.join = function(paths) {
 	var _g = paths1.length;
 	while(_g1 < _g) {
 		var i = _g1++;
-		path = haxe_io_Path.addTrailingSlash(path);
+		path = flu_io_Path.addTrailingSlash(path);
 		path += paths1[i];
 	}
-	return haxe_io_Path.normalize(path);
+	return flu_io_Path.normalize(path);
 };
-haxe_io_Path.normalize = function(path) {
+flu_io_Path.normalize = function(path) {
 	path = path.split("\\").join("/");
 	if(path == null || path == "/") return "/";
 	var target = [];
@@ -4851,7 +4683,7 @@ haxe_io_Path.normalize = function(path) {
 	var result = acc_b;
 	return result;
 };
-haxe_io_Path.addTrailingSlash = function(path) {
+flu_io_Path.addTrailingSlash = function(path) {
 	if(path.length == 0) return "/";
 	var c1 = path.lastIndexOf("/");
 	var c2 = path.lastIndexOf("\\");
@@ -4995,23 +4827,23 @@ hxColorToolkit_spaces_HSB.prototype = {
 	}
 	,__class__: hxColorToolkit_spaces_HSB
 };
-var js__$Boot_HaxeError = function(val) {
+var js__$Boot_FluidError = function(val) {
 	Error.call(this);
 	this.val = val;
 	this.message = String(val);
-	if(Error.captureStackTrace) Error.captureStackTrace(this,js__$Boot_HaxeError);
+	if(Error.captureStackTrace) Error.captureStackTrace(this,js__$Boot_FluidError);
 };
-$hxClasses["js._Boot.HaxeError"] = js__$Boot_HaxeError;
-js__$Boot_HaxeError.__name__ = true;
-js__$Boot_HaxeError.__super__ = Error;
-js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
-	__class__: js__$Boot_HaxeError
+$hxClasses["js._Boot.FluidError"] = js__$Boot_FluidError;
+js__$Boot_FluidError.__name__ = true;
+js__$Boot_FluidError.__super__ = Error;
+js__$Boot_FluidError.prototype = $extend(Error.prototype,{
+	__class__: js__$Boot_FluidError
 });
 var js_Web = function() { };
 $hxClasses["js.Web"] = js_Web;
 js_Web.__name__ = true;
 js_Web.getParams = function() {
-	var result = new haxe_ds_StringMap();
+	var result = new flu_ds_StringMap();
 	var paramObj = eval("\r\n\t\t\t(function() {\r\n\t\t\t    var match,\r\n\t\t\t        pl     = /\\+/g,  // Regex for replacing addition symbol with a space\r\n\t\t\t        search = /([^&=]+)=?([^&]*)/g,\r\n\t\t\t        decode = function (s) { return decodeURIComponent(s.replace(pl, ' ')); },\r\n\t\t\t        query  = window.location.search.substring(1);\r\n\r\n\t\t\t    var urlParams = {};\r\n\t\t\t    while (match = search.exec(query))\r\n\t\t\t       urlParams[decode(match[1])] = decode(match[2]);\r\n\t\t\t    return urlParams;\r\n\t\t\t})();\r\n\t\t");
 	var _g = 0;
 	var _g1 = Reflect.fields(paramObj);
@@ -5071,7 +4903,7 @@ var js_html_compat_DataView = function(buffer,byteOffset,byteLength) {
 	this.buf = buffer;
 	this.offset = byteOffset == null?0:byteOffset;
 	this.length = byteLength == null?buffer.byteLength - this.offset:byteLength;
-	if(this.offset < 0 || this.length < 0 || this.offset + this.length > buffer.byteLength) throw new js__$Boot_HaxeError(haxe_io_Error.OutsideBounds);
+	if(this.offset < 0 || this.length < 0 || this.offset + this.length > buffer.byteLength) throw new js__$Boot_FluidError(flu_io_Error.OutsideBounds);
 };
 $hxClasses["js.html.compat.DataView"] = js_html_compat_DataView;
 js_html_compat_DataView.__name__ = true;
@@ -5103,12 +4935,12 @@ js_html_compat_DataView.prototype = {
 		return v < 0?v + 4294967296.:v;
 	}
 	,getFloat32: function(byteOffset,littleEndian) {
-		return haxe_io_FPHelper.i32ToFloat(this.getInt32(byteOffset,littleEndian));
+		return flu_io_FPHelper.i32ToFloat(this.getInt32(byteOffset,littleEndian));
 	}
 	,getFloat64: function(byteOffset,littleEndian) {
 		var a = this.getInt32(byteOffset,littleEndian);
 		var b = this.getInt32(byteOffset + 4,littleEndian);
-		return haxe_io_FPHelper.i64ToDouble(littleEndian?a:b,littleEndian?b:a);
+		return flu_io_FPHelper.i64ToDouble(littleEndian?a:b,littleEndian?b:a);
 	}
 	,setInt8: function(byteOffset,value) {
 		this.buf.a[byteOffset + this.offset] = value < 0?value + 128 & 255:value & 255;
@@ -5147,10 +4979,10 @@ js_html_compat_DataView.prototype = {
 		}
 	}
 	,setFloat32: function(byteOffset,value,littleEndian) {
-		this.setUint32(byteOffset,haxe_io_FPHelper.floatToI32(value),littleEndian);
+		this.setUint32(byteOffset,flu_io_FPHelper.floatToI32(value),littleEndian);
 	}
 	,setFloat64: function(byteOffset,value,littleEndian) {
-		var i64 = haxe_io_FPHelper.doubleToI64(value);
+		var i64 = flu_io_FPHelper.doubleToI64(value);
 		if(littleEndian) {
 			this.setUint32(byteOffset,i64.low);
 			this.setUint32(byteOffset,i64.high);
@@ -5189,7 +5021,7 @@ js_html_compat_Uint8Array._new = function(arg1,offset,length) {
 		arr.byteLength = arr.length;
 		arr.byteOffset = 0;
 		arr.buffer = new js_html_compat_ArrayBuffer(arr);
-	} else throw new js__$Boot_HaxeError("TODO " + Std.string(arg1));
+	} else throw new js__$Boot_FluidError("TODO " + Std.string(arg1));
 	arr.subarray = js_html_compat_Uint8Array._subarray;
 	arr.set = js_html_compat_Uint8Array._set;
 	return arr;
@@ -5198,7 +5030,7 @@ js_html_compat_Uint8Array._set = function(arg,offset) {
 	var t = this;
 	if(js_Boot.__instanceof(arg.buffer,js_html_compat_ArrayBuffer)) {
 		var a = arg;
-		if(arg.byteLength + offset > t.byteLength) throw new js__$Boot_HaxeError("set() outside of range");
+		if(arg.byteLength + offset > t.byteLength) throw new js__$Boot_FluidError("set() outside of range");
 		var _g1 = 0;
 		var _g = arg.byteLength;
 		while(_g1 < _g) {
@@ -5207,14 +5039,14 @@ js_html_compat_Uint8Array._set = function(arg,offset) {
 		}
 	} else if((arg instanceof Array) && arg.__enum__ == null) {
 		var a1 = arg;
-		if(a1.length + offset > t.byteLength) throw new js__$Boot_HaxeError("set() outside of range");
+		if(a1.length + offset > t.byteLength) throw new js__$Boot_FluidError("set() outside of range");
 		var _g11 = 0;
 		var _g2 = a1.length;
 		while(_g11 < _g2) {
 			var i1 = _g11++;
 			t[i1 + offset] = a1[i1];
 		}
-	} else throw new js__$Boot_HaxeError("TODO");
+	} else throw new js__$Boot_FluidError("TODO");
 };
 js_html_compat_Uint8Array._subarray = function(start,end) {
 	var t = this;
@@ -5412,7 +5244,7 @@ shaderblox_uniforms_UBool.__interfaces__ = [shaderblox_uniforms_IAppliable];
 shaderblox_uniforms_UBool.__super__ = shaderblox_uniforms_UniformBase_$Bool;
 shaderblox_uniforms_UBool.prototype = $extend(shaderblox_uniforms_UniformBase_$Bool.prototype,{
 	apply: function() {
-		snow_modules_opengl_web_GL.current_context.uniform1i(this.location,this.data?1:0);
+		flu_modules_opengl_web_GL.current_context.uniform1i(this.location,this.data?1:0);
 		this.dirty = false;
 	}
 	,__class__: shaderblox_uniforms_UBool
@@ -5438,7 +5270,7 @@ shaderblox_uniforms_UFloat.__interfaces__ = [shaderblox_uniforms_IAppliable];
 shaderblox_uniforms_UFloat.__super__ = shaderblox_uniforms_UniformBase_$Float;
 shaderblox_uniforms_UFloat.prototype = $extend(shaderblox_uniforms_UniformBase_$Float.prototype,{
 	apply: function() {
-		snow_modules_opengl_web_GL.current_context.uniform1f(this.location,this.data);
+		flu_modules_opengl_web_GL.current_context.uniform1f(this.location,this.data);
 		this.dirty = false;
 	}
 	,__class__: shaderblox_uniforms_UFloat
@@ -5470,10 +5302,10 @@ shaderblox_uniforms_UTexture.prototype = $extend(shaderblox_uniforms_UniformBase
 		var idx = 33984 + this.samplerIndex;
 		if(shaderblox_uniforms_UTexture.lastActiveTexture != idx) {
 			var texture = shaderblox_uniforms_UTexture.lastActiveTexture = idx;
-			snow_modules_opengl_web_GL.current_context.activeTexture(texture);
+			flu_modules_opengl_web_GL.current_context.activeTexture(texture);
 		}
-		snow_modules_opengl_web_GL.current_context.uniform1i(this.location,this.samplerIndex);
-		snow_modules_opengl_web_GL.current_context.bindTexture(this.type,this.data);
+		flu_modules_opengl_web_GL.current_context.uniform1i(this.location,this.samplerIndex);
+		flu_modules_opengl_web_GL.current_context.bindTexture(this.type,this.data);
 		this.dirty = false;
 	}
 	,__class__: shaderblox_uniforms_UTexture
@@ -5511,7 +5343,7 @@ shaderblox_uniforms_UVec2.__interfaces__ = [shaderblox_uniforms_IAppliable];
 shaderblox_uniforms_UVec2.__super__ = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2;
 shaderblox_uniforms_UVec2.prototype = $extend(shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.prototype,{
 	apply: function() {
-		snow_modules_opengl_web_GL.current_context.uniform2f(this.location,this.data.x,this.data.y);
+		flu_modules_opengl_web_GL.current_context.uniform2f(this.location,this.data.x,this.data.y);
 		this.dirty = false;
 	}
 	,__class__: shaderblox_uniforms_UVec2
@@ -5552,7 +5384,7 @@ shaderblox_uniforms_UVec3.__interfaces__ = [shaderblox_uniforms_IAppliable];
 shaderblox_uniforms_UVec3.__super__ = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3;
 shaderblox_uniforms_UVec3.prototype = $extend(shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3.prototype,{
 	apply: function() {
-		snow_modules_opengl_web_GL.current_context.uniform3f(this.location,this.data.x,this.data.y,this.data.z);
+		flu_modules_opengl_web_GL.current_context.uniform3f(this.location,this.data.x,this.data.y,this.data.z);
 		this.dirty = false;
 	}
 	,__class__: shaderblox_uniforms_UVec3
@@ -5596,12 +5428,12 @@ shaderblox_uniforms_UVec4.__interfaces__ = [shaderblox_uniforms_IAppliable];
 shaderblox_uniforms_UVec4.__super__ = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4;
 shaderblox_uniforms_UVec4.prototype = $extend(shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4.prototype,{
 	apply: function() {
-		snow_modules_opengl_web_GL.current_context.uniform4f(this.location,this.data.x,this.data.y,this.data.z,this.data.w);
+		flu_modules_opengl_web_GL.current_context.uniform4f(this.location,this.data.x,this.data.y,this.data.z,this.data.w);
 		this.dirty = false;
 	}
 	,__class__: shaderblox_uniforms_UVec4
 });
-var snow_Snow = function() {
+var flu = function() {
 	this.is_ready = false;
 	this.was_ready = false;
 	this.has_shutdown = false;
@@ -5610,13 +5442,13 @@ var snow_Snow = function() {
 	this.platform = "unknown";
 	this.freeze = false;
 	this.platform = "web";
-	snow_Snow.core = new snow_core_web_Core(this);
-	snow_Snow.next_queue = [];
-	snow_Snow.defer_queue = [];
+	flu.core = new flu_core_web_Core(this);
+	flu.next_queue = [];
+	flu.defer_queue = [];
 };
-$hxClasses["snow.Snow"] = snow_Snow;
-snow_Snow.__name__ = true;
-snow_Snow.prototype = {
+$hxClasses["fluidState.fluidState"] = flu;
+flu.__name__ = true;
+flu.prototype = {
 	shutdown: function() {
 		this.shutting_down = true;
 		this.host.ondestroy();
@@ -5624,7 +5456,7 @@ snow_Snow.prototype = {
 		this.audio.destroy();
 		this.input.destroy();
 		this.windowing.destroy();
-		snow_Snow.core.shutdown();
+		flu.core.shutdown();
 		this.has_shutdown = true;
 	}
 	,render: function() {
@@ -5633,49 +5465,49 @@ snow_Snow.prototype = {
 	,dispatch_system_event: function(_event) {
 		this.on_event(_event);
 	}
-	,init: function(_snow_config,_host) {
-		this.snow_config = _snow_config;
-		if(this.snow_config.app_package == null) this.snow_config.app_package = "org.snowkit.snow";
-		if(this.snow_config.config_path == null) this.snow_config.config_path = "";
+	,init: function(_flu_config,_host) {
+		this.flu_config = _flu_config;
+		if(this.flu_config.app_package == null) this.flu_config.app_package = "org.flukit.fluidState";
+		if(this.flu_config.config_path == null) this.flu_config.config_path = "";
 		this.config = this.default_config();
 		this.host = _host;
 		this.host.app = this;
-		snow_Snow.core.init($bind(this,this.on_event));
+		flu.core.init($bind(this,this.on_event));
 	}
-	,on_snow_init: function() {
+	,on_flu_init: function() {
 		this.host.on_internal_init();
 	}
-	,on_snow_ready: function() {
+	,on_flu_ready: function() {
 		var _g = this;
-		if(this.was_ready) throw new js__$Boot_HaxeError(snow_types_Error.error("firing ready event more than once is invalid usage"));
-		this.io = new snow_system_io_IO(this);
-		this.input = new snow_system_input_Input(this);
-		this.audio = new snow_system_audio_Audio(this);
-		this.assets = new snow_system_assets_Assets(this);
-		this.windowing = new snow_system_window_Windowing(this);
+		if(this.was_ready) throw new js__$Boot_FluidError(flu_types_Error.error("firing ready event more than once is invalid usage"));
+		this.io = new flu_system_io_IO(this);
+		this.input = new flu_system_input_Input(this);
+		this.audio = new flu_system_audio_Audio(this);
+		this.assets = new flu_system_assets_Assets(this);
+		this.windowing = new flu_system_window_Windowing(this);
 		this.was_ready = true;
 		this.setup_app_path();
 		this.setup_configs().then(function(_) {
 			_g.setup_default_window();
 			var func = $bind(_g,_g.on_ready);
-			if(func != null) snow_Snow.next_queue.push(func);
+			if(func != null) flu.next_queue.push(func);
 		}).error(function(e) {
-			throw new js__$Boot_HaxeError(snow_types_Error.init("snow / cannot recover from error: " + e));
+			throw new js__$Boot_FluidError(flu_types_Error.init("fluidState / cannot recover from error: " + e));
 		});
-		snow_api_Promises.step();
-		while(snow_Snow.next_queue.length > 0) {
-			var count = snow_Snow.next_queue.length;
+		flu_api_Promises.step();
+		while(flu.next_queue.length > 0) {
+			var count = flu.next_queue.length;
 			var i = 0;
 			while(i < count) {
-				(snow_Snow.next_queue.shift())();
+				(flu.next_queue.shift())();
 				++i;
 			}
 		}
-		while(snow_Snow.defer_queue.length > 0) {
-			var count1 = snow_Snow.defer_queue.length;
+		while(flu.defer_queue.length > 0) {
+			var count1 = flu.defer_queue.length;
 			var i1 = 0;
 			while(i1 < count1) {
-				(snow_Snow.defer_queue.shift())();
+				(flu.defer_queue.shift())();
 				++i1;
 			}
 		}
@@ -5690,14 +5522,14 @@ snow_Snow.prototype = {
 		this.is_ready = true;
 		this.host.ready();
 	}
-	,on_snow_update: function() {
+	,on_flu_update: function() {
 		if(this.freeze) return;
-		snow_api_Timer.update();
-		snow_api_Promises.step();
-		var count = snow_Snow.next_queue.length;
+		flu_api_Timer.update();
+		flu_api_Promises.step();
+		var count = flu.next_queue.length;
 		var i = 0;
 		while(i < count) {
-			(snow_Snow.next_queue.shift())();
+			(flu.next_queue.shift())();
 			++i;
 		}
 		if(!this.is_ready) return;
@@ -5705,10 +5537,10 @@ snow_Snow.prototype = {
 		this.host.on_internal_update();
 		this.host.on_internal_render();
 		this.host.ontickend();
-		var count1 = snow_Snow.defer_queue.length;
+		var count1 = flu.defer_queue.length;
 		var i1 = 0;
 		while(i1 < count1) {
-			(snow_Snow.defer_queue.shift())();
+			(flu.defer_queue.shift())();
 			++i1;
 		}
 	}
@@ -5724,19 +5556,19 @@ snow_Snow.prototype = {
 		var _g = _event.type;
 		if(_g != null) switch(_g) {
 		case 1:
-			this.on_snow_init();
+			this.on_flu_init();
 			break;
 		case 2:
-			this.on_snow_ready();
+			this.on_flu_ready();
 			break;
 		case 3:
-			this.on_snow_update();
+			this.on_flu_update();
 			break;
 		case 7:case 8:
 			this.shutdown();
 			break;
 		case 4:
-			console.log("     i / snow / " + "Goodbye.");
+			console.log("     i / fluidState / " + "Goodbye.");
 			break;
 		default:
 		} else {
@@ -5746,15 +5578,15 @@ snow_Snow.prototype = {
 	}
 	,setup_configs: function() {
 		var _g = this;
-		if(this.snow_config.config_path == "") {
+		if(this.flu_config.config_path == "") {
 			this.setup_host_config();
-			return snow_api_Promise.resolve();
+			return flu_api_Promise.resolve();
 		}
-		return new snow_api_Promise(function(resolve,reject) {
+		return new flu_api_Promise(function(resolve,reject) {
 			_g.default_runtime_config().then(function(_runtime_conf) {
 				_g.config.runtime = _runtime_conf;
 			}).error(function(error) {
-				throw new js__$Boot_HaxeError(snow_types_Error.init("config / failed / default runtime config failed to parse as JSON. cannot recover. " + error));
+				throw new js__$Boot_FluidError(flu_types_Error.init("config / failed / default runtime config failed to parse as JSON. cannot recover. " + error));
 			}).then(function() {
 				_g.setup_host_config();
 				resolve();
@@ -5767,17 +5599,17 @@ snow_Snow.prototype = {
 	,setup_default_window: function() {
 		if(this.config.has_window == true) {
 			this.window = this.windowing.create(this.config.window);
-			if(this.window.handle == null) throw new js__$Boot_HaxeError(snow_types_Error.windowing("requested default window cannot be created. cannot continue"));
+			if(this.window.handle == null) throw new js__$Boot_FluidError(flu_types_Error.windowing("requested default window cannot be created. cannot continue"));
 		} else {
 		}
 	}
 	,default_config: function() {
-		return { has_window : true, runtime : { }, window : this.default_window_config(), render : this.default_render_config(), web : { no_context_menu : true, prevent_default_keys : [snow_system_input_Keycodes.left,snow_system_input_Keycodes.right,snow_system_input_Keycodes.up,snow_system_input_Keycodes.down,snow_system_input_Keycodes.backspace,snow_system_input_Keycodes.tab,snow_system_input_Keycodes["delete"]], prevent_default_mouse_wheel : true, true_fullscreen : false}, 'native' : { audio_buffer_length : 176400, audio_buffer_count : 4}};
+		return { has_window : true, runtime : { }, window : this.default_window_config(), render : this.default_render_config(), web : { no_context_menu : true, prevent_default_keys : [flu_system_input_Keycodes.left,flu_system_input_Keycodes.right,flu_system_input_Keycodes.up,flu_system_input_Keycodes.down,flu_system_input_Keycodes.backspace,flu_system_input_Keycodes.tab,flu_system_input_Keycodes["delete"]], prevent_default_mouse_wheel : true, true_fullscreen : false}, 'native' : { audio_buffer_length : 176400, audio_buffer_count : 4}};
 	}
 	,default_runtime_config: function() {
 		var _g = this;
-		return new snow_api_Promise(function(resolve,reject) {
-			var load = _g.io.data_flow(haxe_io_Path.join([_g.assets.root,_g.snow_config.config_path]),snow_system_assets_AssetJSON.processor);
+		return new flu_api_Promise(function(resolve,reject) {
+			var load = _g.io.data_flow(flu_io_Path.join([_g.assets.root,_g.flu_config.config_path]),flu_system_assets_AssetJSON.processor);
 			load.then(resolve).error(function(error) {
 				switch(error[1]) {
 				case 3:
@@ -5796,33 +5628,33 @@ snow_Snow.prototype = {
 		var conf = { fullscreen_desktop : true, fullscreen : false, borderless : false, resizable : true, x : 536805376, y : 536805376, width : 800, height : 600};
 		return conf;
 	}
-	,__class__: snow_Snow
+	,__class__: flu
 };
-var snow_api_Promise = function(func) {
+var flu_api_Promise = function(func) {
 	this.was_caught = false;
 	var _g = this;
 	this.state = 0;
 	this.reject_reactions = [];
 	this.fulfill_reactions = [];
 	this.settle_reactions = [];
-	snow_api_Promises.queue(function() {
+	flu_api_Promises.queue(function() {
 		func($bind(_g,_g.onfulfill),$bind(_g,_g.onreject));
-		snow_api_Promises.defer(snow_api_Promises.next);
+		flu_api_Promises.defer(flu_api_Promises.next);
 	});
 };
-$hxClasses["snow.api.Promise"] = snow_api_Promise;
-snow_api_Promise.__name__ = true;
-snow_api_Promise.reject = function(reason) {
-	return new snow_api_Promise(function(ok,no) {
+$hxClasses["fluidState.api.Promise"] = flu_api_Promise;
+flu_api_Promise.__name__ = true;
+flu_api_Promise.reject = function(reason) {
+	return new flu_api_Promise(function(ok,no) {
 		no(reason);
 	});
 };
-snow_api_Promise.resolve = function(val) {
-	return new snow_api_Promise(function(ok,no) {
+flu_api_Promise.resolve = function(val) {
+	return new flu_api_Promise(function(ok,no) {
 		ok(val);
 	});
 };
-snow_api_Promise.prototype = {
+flu_api_Promise.prototype = {
 	then: function(on_fulfilled,on_rejected) {
 		var _g = this.state;
 		switch(_g) {
@@ -5831,11 +5663,11 @@ snow_api_Promise.prototype = {
 			this.add_reject(on_rejected);
 			return this.new_linked_promise();
 		case 1:
-			snow_api_Promises.defer(on_fulfilled,this.result);
-			return snow_api_Promise.resolve(this.result);
+			flu_api_Promises.defer(on_fulfilled,this.result);
+			return flu_api_Promise.resolve(this.result);
 		case 2:
-			snow_api_Promises.defer(on_rejected,this.result);
-			return snow_api_Promise.reject(this.result);
+			flu_api_Promises.defer(on_rejected,this.result);
+			return flu_api_Promise.reject(this.result);
 		}
 	}
 	,error: function(on_rejected) {
@@ -5845,18 +5677,18 @@ snow_api_Promise.prototype = {
 			this.add_reject(on_rejected);
 			return this.new_linked_resolve_empty();
 		case 1:
-			return snow_api_Promise.resolve(this.result);
+			return flu_api_Promise.resolve(this.result);
 		case 2:
-			snow_api_Promises.defer(on_rejected,this.result);
-			return snow_api_Promise.reject(this.result);
+			flu_api_Promises.defer(on_rejected,this.result);
+			return flu_api_Promise.reject(this.result);
 		}
 	}
 	,add_settle: function(f) {
-		if(this.state == 0) this.settle_reactions.push(f); else snow_api_Promises.defer(f,this.result);
+		if(this.state == 0) this.settle_reactions.push(f); else flu_api_Promises.defer(f,this.result);
 	}
 	,new_linked_promise: function() {
 		var _g = this;
-		return new snow_api_Promise(function(f,r) {
+		return new flu_api_Promise(function(f,r) {
 			_g.add_settle(function(_) {
 				if(_g.state == 1) f(_g.result); else r(_g.result);
 			});
@@ -5864,7 +5696,7 @@ snow_api_Promise.prototype = {
 	}
 	,new_linked_resolve_empty: function() {
 		var _g = this;
-		return new snow_api_Promise(function(f,r) {
+		return new flu_api_Promise(function(f,r) {
 			_g.add_settle(function(_) {
 				f();
 			});
@@ -5903,36 +5735,36 @@ snow_api_Promise.prototype = {
 			fn(this.result);
 		}
 	}
-	,__class__: snow_api_Promise
+	,__class__: flu_api_Promise
 };
-var snow_api_Promises = function() { };
-$hxClasses["snow.api.Promises"] = snow_api_Promises;
-snow_api_Promises.__name__ = true;
-snow_api_Promises.step = function() {
-	snow_api_Promises.next();
-	while(snow_api_Promises.defers.length > 0) {
-		var defer = snow_api_Promises.defers.shift();
+var flu_api_Promises = function() { };
+$hxClasses["fluidState.api.Promises"] = flu_api_Promises;
+flu_api_Promises.__name__ = true;
+flu_api_Promises.step = function() {
+	flu_api_Promises.next();
+	while(flu_api_Promises.defers.length > 0) {
+		var defer = flu_api_Promises.defers.shift();
 		defer.f(defer.a);
 	}
 };
-snow_api_Promises.next = function() {
-	if(snow_api_Promises.calls.length > 0) (snow_api_Promises.calls.shift())();
+flu_api_Promises.next = function() {
+	if(flu_api_Promises.calls.length > 0) (flu_api_Promises.calls.shift())();
 };
-snow_api_Promises.defer = function(f,a) {
+flu_api_Promises.defer = function(f,a) {
 	if(f == null) return;
-	snow_api_Promises.defers.push({ f : f, a : a});
+	flu_api_Promises.defers.push({ f : f, a : a});
 };
-snow_api_Promises.queue = function(f) {
+flu_api_Promises.queue = function(f) {
 	if(f == null) return;
-	snow_api_Promises.calls.push(f);
+	flu_api_Promises.calls.push(f);
 };
-var snow_api_Timer = function() { };
-$hxClasses["snow.api.Timer"] = snow_api_Timer;
-snow_api_Timer.__name__ = true;
-snow_api_Timer.update = function() {
-	var now = snow_Snow.core.timestamp();
+var flu_api_Timer = function() { };
+$hxClasses["fluidState.api.Timer"] = flu_api_Timer;
+flu_api_Timer.__name__ = true;
+flu_api_Timer.update = function() {
+	var now = flu.core.timestamp();
 	var _g = 0;
-	var _g1 = snow_api_Timer.running_timers;
+	var _g1 = flu_api_Timer.running_timers;
 	while(_g < _g1.length) {
 		var timer = _g1[_g];
 		++_g;
@@ -5944,12 +5776,12 @@ snow_api_Timer.update = function() {
 		}
 	}
 };
-snow_api_Timer.prototype = {
+flu_api_Timer.prototype = {
 	run: function() {
 	}
-	,__class__: snow_api_Timer
+	,__class__: flu_api_Timer
 };
-var snow_core_web_Core = function(_app) {
+var flu_core_web_Core = function(_app) {
 	this._time_now = 0.0;
 	this._lf_timestamp = 0.016;
 	this.start_timestamp = 0.0;
@@ -5957,34 +5789,34 @@ var snow_core_web_Core = function(_app) {
 	this.start_timestamp = this.timestamp();
 	this.guess_os();
 };
-$hxClasses["snow.core.web.Core"] = snow_core_web_Core;
-snow_core_web_Core.__name__ = true;
-snow_core_web_Core.prototype = {
+$hxClasses["fluidState.core.web.Core"] = flu_core_web_Core;
+flu_core_web_Core.__name__ = true;
+flu_core_web_Core.prototype = {
 	init: function(_event_handler) {
 		this.app.on_event({ type : 1});
 		this.app.on_event({ type : 2});
-		if(this.app.snow_config.has_loop) this.request_update();
+		if(this.app.flu_config.has_loop) this.request_update();
 	}
 	,shutdown: function() {
 	}
 	,timestamp: function() {
 		var now;
-		if(window.performance != null) now = window.performance.now() / 1000.0; else now = haxe_Timer.stamp();
+		if(window.performance != null) now = window.performance.now() / 1000.0; else now = flu_Timer.stamp();
 		return now - this.start_timestamp;
 	}
 	,request_update: function() {
 		var _g = this;
-		if(($_=window,$bind($_,$_.requestAnimationFrame)) != null) window.requestAnimationFrame($bind(this,this.snow_core_loop)); else {
+		if(($_=window,$bind($_,$_.requestAnimationFrame)) != null) window.requestAnimationFrame($bind(this,this.flu_core_loop)); else {
 			console.log("     i / core / " + ("warning : requestAnimationFrame not found, falling back to render_rate! render_rate:" + this.app.host.render_rate));
 			window.setTimeout(function() {
 				var _now = _g.timestamp();
 				_g._time_now += _now - _g._lf_timestamp;
-				_g.snow_core_loop(_g._time_now * 1000.0);
+				_g.flu_core_loop(_g._time_now * 1000.0);
 				_g._lf_timestamp = _now;
 			},this.app.host.render_rate * 1000.0 | 0);
 		}
 	}
-	,snow_core_loop: function(_t) {
+	,flu_core_loop: function(_t) {
 		if(_t == null) _t = 0.016;
 		this.update();
 		this.app.on_event({ type : 3});
@@ -6029,327 +5861,47 @@ snow_core_web_Core.prototype = {
 		tmp7 = r7.match(_agent);
 		if(tmp7) this.app.os = "ios";
 	}
-	,__class__: snow_core_web_Core
+	,__class__: flu_core_web_Core
 };
-var snow_modules_interfaces_Assets = function() { };
-$hxClasses["snow.modules.interfaces.Assets"] = snow_modules_interfaces_Assets;
-snow_modules_interfaces_Assets.__name__ = true;
-var snow_core_web_assets_Assets = function(_system) {
+var flu_modules_interfaces_Assets = function() { };
+$hxClasses["fluidState.modules.interfaces.Assets"] = flu_modules_interfaces_Assets;
+flu_modules_interfaces_Assets.__name__ = true;
+var flu_core_web_assets_Assets = function(_system) {
 	this.system = _system;
 };
-$hxClasses["snow.core.web.assets.Assets"] = snow_core_web_assets_Assets;
-snow_core_web_assets_Assets.__name__ = true;
-snow_core_web_assets_Assets.__interfaces__ = [snow_modules_interfaces_Assets];
-snow_core_web_assets_Assets.prototype = {
-	__class__: snow_core_web_assets_Assets
+$hxClasses["fluidState.core.web.assets.Assets"] = flu_core_web_assets_Assets;
+flu_core_web_assets_Assets.__name__ = true;
+flu_core_web_assets_Assets.__interfaces__ = [flu_modules_interfaces_Assets];
+flu_core_web_assets_Assets.prototype = {
+	__class__: flu_core_web_assets_Assets
 };
-var snow_core_web_input_DOMKeys = function() { };
-$hxClasses["snow.core.web.input.DOMKeys"] = snow_core_web_input_DOMKeys;
-snow_core_web_input_DOMKeys.__name__ = true;
-snow_core_web_input_DOMKeys.dom_key_to_keycode = function(_keycode) {
-	switch(_keycode) {
-	case 16:
-		return snow_system_input_Keycodes.lshift;
-	case 17:
-		return snow_system_input_Keycodes.lctrl;
-	case 18:
-		return snow_system_input_Keycodes.lalt;
-	case 20:
-		return snow_system_input_Keycodes.capslock;
-	case 33:
-		return snow_system_input_Keycodes.pageup;
-	case 34:
-		return snow_system_input_Keycodes.pagedown;
-	case 35:
-		return snow_system_input_Keycodes.end;
-	case 36:
-		return snow_system_input_Keycodes.home;
-	case 37:
-		return snow_system_input_Keycodes.left;
-	case 38:
-		return snow_system_input_Keycodes.up;
-	case 39:
-		return snow_system_input_Keycodes.right;
-	case 40:
-		return snow_system_input_Keycodes.down;
-	case 44:
-		return snow_system_input_Keycodes.printscreen;
-	case 45:
-		return snow_system_input_Keycodes.insert;
-	case 46:
-		return snow_system_input_Keycodes["delete"];
-	case 91:
-		return snow_system_input_Keycodes.lmeta;
-	case 93:
-		return snow_system_input_Keycodes.rmeta;
-	case 224:
-		return snow_system_input_Keycodes.lmeta;
-	case 96:
-		return snow_system_input_Keycodes.kp_0;
-	case 97:
-		return snow_system_input_Keycodes.kp_1;
-	case 98:
-		return snow_system_input_Keycodes.kp_2;
-	case 99:
-		return snow_system_input_Keycodes.kp_3;
-	case 100:
-		return snow_system_input_Keycodes.kp_4;
-	case 101:
-		return snow_system_input_Keycodes.kp_5;
-	case 102:
-		return snow_system_input_Keycodes.kp_6;
-	case 103:
-		return snow_system_input_Keycodes.kp_7;
-	case 104:
-		return snow_system_input_Keycodes.kp_8;
-	case 105:
-		return snow_system_input_Keycodes.kp_9;
-	case 106:
-		return snow_system_input_Keycodes.kp_multiply;
-	case 107:
-		return snow_system_input_Keycodes.kp_plus;
-	case 109:
-		return snow_system_input_Keycodes.kp_minus;
-	case 110:
-		return snow_system_input_Keycodes.kp_decimal;
-	case 111:
-		return snow_system_input_Keycodes.kp_divide;
-	case 144:
-		return snow_system_input_Keycodes.numlockclear;
-	case 112:
-		return snow_system_input_Keycodes.f1;
-	case 113:
-		return snow_system_input_Keycodes.f2;
-	case 114:
-		return snow_system_input_Keycodes.f3;
-	case 115:
-		return snow_system_input_Keycodes.f4;
-	case 116:
-		return snow_system_input_Keycodes.f5;
-	case 117:
-		return snow_system_input_Keycodes.f6;
-	case 118:
-		return snow_system_input_Keycodes.f7;
-	case 119:
-		return snow_system_input_Keycodes.f8;
-	case 120:
-		return snow_system_input_Keycodes.f9;
-	case 121:
-		return snow_system_input_Keycodes.f10;
-	case 122:
-		return snow_system_input_Keycodes.f11;
-	case 123:
-		return snow_system_input_Keycodes.f12;
-	case 124:
-		return snow_system_input_Keycodes.f13;
-	case 125:
-		return snow_system_input_Keycodes.f14;
-	case 126:
-		return snow_system_input_Keycodes.f15;
-	case 127:
-		return snow_system_input_Keycodes.f16;
-	case 128:
-		return snow_system_input_Keycodes.f17;
-	case 129:
-		return snow_system_input_Keycodes.f18;
-	case 130:
-		return snow_system_input_Keycodes.f19;
-	case 131:
-		return snow_system_input_Keycodes.f20;
-	case 132:
-		return snow_system_input_Keycodes.f21;
-	case 133:
-		return snow_system_input_Keycodes.f22;
-	case 134:
-		return snow_system_input_Keycodes.f23;
-	case 135:
-		return snow_system_input_Keycodes.f24;
-	case 160:
-		return snow_system_input_Keycodes.caret;
-	case 161:
-		return snow_system_input_Keycodes.exclaim;
-	case 162:
-		return snow_system_input_Keycodes.quotedbl;
-	case 163:
-		return snow_system_input_Keycodes.hash;
-	case 164:
-		return snow_system_input_Keycodes.dollar;
-	case 165:
-		return snow_system_input_Keycodes.percent;
-	case 166:
-		return snow_system_input_Keycodes.ampersand;
-	case 167:
-		return snow_system_input_Keycodes.underscore;
-	case 168:
-		return snow_system_input_Keycodes.leftparen;
-	case 169:
-		return snow_system_input_Keycodes.rightparen;
-	case 170:
-		return snow_system_input_Keycodes.asterisk;
-	case 171:
-		return snow_system_input_Keycodes.plus;
-	case 172:
-		return snow_system_input_Keycodes.backslash;
-	case 173:
-		return snow_system_input_Keycodes.minus;
-	case 174:
-		return snow_system_input_Keycodes.leftbracket;
-	case 175:
-		return snow_system_input_Keycodes.rightbracket;
-	case 176:
-		return snow_system_input_Keycodes.backquote;
-	case 181:
-		return snow_system_input_Keycodes.audiomute;
-	case 182:
-		return snow_system_input_Keycodes.volumedown;
-	case 183:
-		return snow_system_input_Keycodes.volumeup;
-	case 188:
-		return snow_system_input_Keycodes.comma;
-	case 190:
-		return snow_system_input_Keycodes.period;
-	case 191:
-		return snow_system_input_Keycodes.slash;
-	case 192:
-		return snow_system_input_Keycodes.backquote;
-	case 219:
-		return snow_system_input_Keycodes.leftbracket;
-	case 221:
-		return snow_system_input_Keycodes.rightbracket;
-	case 220:
-		return snow_system_input_Keycodes.backslash;
-	case 222:
-		return snow_system_input_Keycodes.quote;
-	}
-	return _keycode;
+
+var flu_modules_interfaces_Input = function() { };
+$hxClasses["fluidState.modules.interfaces.Input"] = flu_modules_interfaces_Input;
+flu_modules_interfaces_Input.__name__ = true;
+var flu_system_input_Scancodes = function() { };
+$hxClasses["fluidState.system.input.Scancodes"] = flu_system_input_Scancodes;
+flu_system_input_Scancodes.__name__ = true;
+var flu_system_input_Keycodes = function() { };
+$hxClasses["fluidState.system.input.Keycodes"] = flu_system_input_Keycodes;
+flu_system_input_Keycodes.__name__ = true;
+flu_system_input_Keycodes.from_scan = function(scancode) {
+	return scancode | flu_system_input_Scancodes.MASK;
 };
-var snow_modules_interfaces_Input = function() { };
-$hxClasses["snow.modules.interfaces.Input"] = snow_modules_interfaces_Input;
-snow_modules_interfaces_Input.__name__ = true;
-var snow_system_input_Scancodes = function() { };
-$hxClasses["snow.system.input.Scancodes"] = snow_system_input_Scancodes;
-snow_system_input_Scancodes.__name__ = true;
-var snow_system_input_Keycodes = function() { };
-$hxClasses["snow.system.input.Keycodes"] = snow_system_input_Keycodes;
-snow_system_input_Keycodes.__name__ = true;
-snow_system_input_Keycodes.from_scan = function(scancode) {
-	return scancode | snow_system_input_Scancodes.MASK;
-};
-snow_system_input_Keycodes.to_scan = function(keycode) {
-	if((keycode & snow_system_input_Scancodes.MASK) != 0) return keycode & ~snow_system_input_Scancodes.MASK;
-	switch(keycode) {
-	case 13:
-		return snow_system_input_Scancodes.enter;
-	case 27:
-		return snow_system_input_Scancodes.escape;
-	case 8:
-		return snow_system_input_Scancodes.backspace;
-	case 9:
-		return snow_system_input_Scancodes.tab;
-	case 32:
-		return snow_system_input_Scancodes.space;
-	case 47:
-		return snow_system_input_Scancodes.slash;
-	case 48:
-		return snow_system_input_Scancodes.key_0;
-	case 49:
-		return snow_system_input_Scancodes.key_1;
-	case 50:
-		return snow_system_input_Scancodes.key_2;
-	case 51:
-		return snow_system_input_Scancodes.key_3;
-	case 52:
-		return snow_system_input_Scancodes.key_4;
-	case 53:
-		return snow_system_input_Scancodes.key_5;
-	case 54:
-		return snow_system_input_Scancodes.key_6;
-	case 55:
-		return snow_system_input_Scancodes.key_7;
-	case 56:
-		return snow_system_input_Scancodes.key_8;
-	case 57:
-		return snow_system_input_Scancodes.key_9;
-	case 59:
-		return snow_system_input_Scancodes.semicolon;
-	case 61:
-		return snow_system_input_Scancodes.equals;
-	case 91:
-		return snow_system_input_Scancodes.leftbracket;
-	case 92:
-		return snow_system_input_Scancodes.backslash;
-	case 93:
-		return snow_system_input_Scancodes.rightbracket;
-	case 96:
-		return snow_system_input_Scancodes.grave;
-	case 97:
-		return snow_system_input_Scancodes.key_a;
-	case 98:
-		return snow_system_input_Scancodes.key_b;
-	case 99:
-		return snow_system_input_Scancodes.key_c;
-	case 100:
-		return snow_system_input_Scancodes.key_d;
-	case 101:
-		return snow_system_input_Scancodes.key_e;
-	case 102:
-		return snow_system_input_Scancodes.key_f;
-	case 103:
-		return snow_system_input_Scancodes.key_g;
-	case 104:
-		return snow_system_input_Scancodes.key_h;
-	case 105:
-		return snow_system_input_Scancodes.key_i;
-	case 106:
-		return snow_system_input_Scancodes.key_j;
-	case 107:
-		return snow_system_input_Scancodes.key_k;
-	case 108:
-		return snow_system_input_Scancodes.key_l;
-	case 109:
-		return snow_system_input_Scancodes.key_m;
-	case 110:
-		return snow_system_input_Scancodes.key_n;
-	case 111:
-		return snow_system_input_Scancodes.key_o;
-	case 112:
-		return snow_system_input_Scancodes.key_p;
-	case 113:
-		return snow_system_input_Scancodes.key_q;
-	case 114:
-		return snow_system_input_Scancodes.key_r;
-	case 115:
-		return snow_system_input_Scancodes.key_s;
-	case 116:
-		return snow_system_input_Scancodes.key_t;
-	case 117:
-		return snow_system_input_Scancodes.key_u;
-	case 118:
-		return snow_system_input_Scancodes.key_v;
-	case 119:
-		return snow_system_input_Scancodes.key_w;
-	case 120:
-		return snow_system_input_Scancodes.key_x;
-	case 121:
-		return snow_system_input_Scancodes.key_y;
-	case 122:
-		return snow_system_input_Scancodes.key_z;
-	}
-	return snow_system_input_Scancodes.unknown;
-};
-var snow_core_web_input_Input = function(_system) {
+
+var flu_core_web_input_Input = function(_system) {
 	this.gamepads_supported = false;
 	this.system = _system;
 };
-$hxClasses["snow.core.web.input.Input"] = snow_core_web_input_Input;
-snow_core_web_input_Input.__name__ = true;
-snow_core_web_input_Input.__interfaces__ = [snow_modules_interfaces_Input];
-snow_core_web_input_Input.prototype = {
+$hxClasses["fluidState.core.web.input.Input"] = flu_core_web_input_Input;
+flu_core_web_input_Input.__name__ = true;
+flu_core_web_input_Input.__interfaces__ = [flu_modules_interfaces_Input];
+flu_core_web_input_Input.prototype = {
 	init: function() {
 		window.document.addEventListener("keypress",$bind(this,this.on_keypress));
 		window.document.addEventListener("keydown",$bind(this,this.on_keydown));
 		window.document.addEventListener("keyup",$bind(this,this.on_keyup));
-		this.active_gamepads = new haxe_ds_IntMap();
+		this.active_gamepads = new flu_ds_IntMap();
 		this.gamepads_supported = this.get_gamepad_list() != null;
 		if(window.DeviceOrientationEvent) {
 			window.addEventListener("deviceorientation",$bind(this,this.on_orientation));
@@ -6376,10 +5928,10 @@ snow_core_web_input_Input.prototype = {
 	,on_event: function(_event) {
 	}
 	,on_orientation: function(event) {
-		this.system.app.dispatch_system_event({ type : 6, input : { type : 4, timestamp : snow_Snow.core.timestamp(), event : { type : "orientation", alpha : event.alpha, beta : event.beta, gamma : event.gamma}}});
+		this.system.app.dispatch_system_event({ type : 6, input : { type : 4, timestamp : flu.core.timestamp(), event : { type : "orientation", alpha : event.alpha, beta : event.beta, gamma : event.gamma}}});
 	}
 	,on_motion: function(event) {
-		this.system.app.dispatch_system_event({ type : 6, input : { type : 4, timestamp : snow_Snow.core.timestamp(), event : { type : "motion", acceleration : event.acceleration, accelerationIncludingGravity : event.accelerationIncludingGravity, rotationRate : event.rotationRate}}});
+		this.system.app.dispatch_system_event({ type : 6, input : { type : 4, timestamp : flu.core.timestamp(), event : { type : "motion", acceleration : event.acceleration, accelerationIncludingGravity : event.accelerationIncludingGravity, rotationRate : event.rotationRate}}});
 	}
 	,poll_gamepads: function() {
 		if(!this.gamepads_supported) return;
@@ -6391,7 +5943,7 @@ snow_core_web_input_Input.prototype = {
 				var i = _g1++;
 				if(list[i] != null) this.handle_gamepad(list[i]); else {
 					var _gamepad = this.active_gamepads.h[i];
-					if(_gamepad != null) this.system.dispatch_gamepad_device_event(_gamepad.index,_gamepad.id,2,snow_Snow.core.timestamp());
+					if(_gamepad != null) this.system.dispatch_gamepad_device_event(_gamepad.index,_gamepad.id,2,flu.core.timestamp());
 					this.active_gamepads.remove(i);
 				}
 			}
@@ -6403,7 +5955,7 @@ snow_core_web_input_Input.prototype = {
 		var key = _gamepad.index;
 		tmp = this.active_gamepads.h.hasOwnProperty(key);
 		if(!tmp) {
-			var _new_gamepad = { id : _gamepad.id, index : _gamepad.index, axes : [], buttons : [], timestamp : snow_Snow.core.timestamp()};
+			var _new_gamepad = { id : _gamepad.id, index : _gamepad.index, axes : [], buttons : [], timestamp : flu.core.timestamp()};
 			var axes = _gamepad.axes;
 			var _g = 0;
 			while(_g < axes.length) {
@@ -6514,21 +6066,21 @@ snow_core_web_input_Input.prototype = {
 		if(this.system.app.config.web.no_context_menu) _event.preventDefault();
 	}
 	,on_keypress: function(_key_event) {
-		if(_key_event.which != 0 && HxOverrides.indexOf(snow_core_web_input_Input._keypress_blacklist,_key_event.keyCode,0) == -1) {
+		if(_key_event.which != 0 && HxOverrides.indexOf(flu_core_web_input_Input._keypress_blacklist,_key_event.keyCode,0) == -1) {
 			var _text = String.fromCharCode(_key_event.charCode);
 			this.system.dispatch_text_event(_text,0,_text.length,2,_key_event.timeStamp,1);
 		}
 	}
 	,on_keydown: function(_key_event) {
 		var _keycode = this.convert_keycode(_key_event.keyCode);
-		var _scancode = snow_system_input_Keycodes.to_scan(_keycode);
+		var _scancode = flu_system_input_Keycodes.to_scan(_keycode);
 		var _mod_state = this.mod_state_from_event(_key_event);
 		if(HxOverrides.indexOf(this.system.app.config.web.prevent_default_keys,_keycode,0) != -1) _key_event.preventDefault();
 		this.system.dispatch_key_down_event(_keycode,_scancode,_key_event.repeat,_mod_state,_key_event.timeStamp,1);
 	}
 	,on_keyup: function(_key_event) {
 		var _keycode = this.convert_keycode(_key_event.keyCode);
-		var _scancode = snow_system_input_Keycodes.to_scan(_keycode);
+		var _scancode = flu_system_input_Keycodes.to_scan(_keycode);
 		var _mod_state = this.mod_state_from_event(_key_event);
 		if(HxOverrides.indexOf(this.system.app.config.web.prevent_default_keys,_keycode,0) != -1) _key_event.preventDefault();
 		this.system.dispatch_key_up_event(_keycode,_scancode,_key_event.repeat,_mod_state,_key_event.timeStamp,1);
@@ -6536,10 +6088,6 @@ snow_core_web_input_Input.prototype = {
 	,mod_state_from_event: function(_key_event) {
 		var _none = !_key_event.altKey && !_key_event.ctrlKey && !_key_event.metaKey && !_key_event.shiftKey;
 		return { none : _none, lshift : _key_event.shiftKey, rshift : _key_event.shiftKey, lctrl : _key_event.ctrlKey, rctrl : _key_event.ctrlKey, lalt : _key_event.altKey, ralt : _key_event.altKey, lmeta : _key_event.metaKey, rmeta : _key_event.metaKey, num : false, caps : false, mode : false, ctrl : _key_event.ctrlKey, shift : _key_event.shiftKey, alt : _key_event.altKey, meta : _key_event.metaKey};
-	}
-	,convert_keycode: function(dom_keycode) {
-		if(dom_keycode >= 65 && dom_keycode <= 90) return dom_keycode + 32;
-		return snow_core_web_input_DOMKeys.dom_key_to_keycode(dom_keycode);
 	}
 	,on_touchdown: function(_touch_event) {
 		var _window = this.system.app.windowing.window_from_handle(_touch_event.target);
@@ -6552,7 +6100,7 @@ snow_core_web_input_Input.prototype = {
 			var _y = 400 - window.pageYOffset - _window.y;
 			_x = _x / _window.width;
 			_y = _y / _window.height;
-			this.system.dispatch_touch_down_event(_x,_y,touch.identifier,snow_Snow.core.timestamp());
+			this.system.dispatch_touch_down_event(_x,_y,touch.identifier,flu.core.timestamp());
 		}
 	}
 	,on_touchup: function(_touch_event) {
@@ -6566,7 +6114,7 @@ snow_core_web_input_Input.prototype = {
 			var _y = touch.pageY - window.pageYOffset - _window.y;
 			_x = _x / _window.width;
 			_y = _y / _window.height;
-			this.system.dispatch_touch_up_event(_x,_y,touch.identifier,snow_Snow.core.timestamp());
+			this.system.dispatch_touch_up_event(_x,_y,touch.identifier,flu.core.timestamp());
 		}
 	}
 	,on_touchmove: function(_touch_event) {
@@ -6580,23 +6128,23 @@ snow_core_web_input_Input.prototype = {
 			var _y = touch.pageY - window.pageYOffset - _window.y;
 			_x = _x / _window.width;
 			_y = _y / _window.height;
-			this.system.dispatch_touch_move_event(_x,_y,0,0,touch.identifier,snow_Snow.core.timestamp());
+			this.system.dispatch_touch_move_event(_x,_y,0,0,touch.identifier,flu.core.timestamp());
 		}
 	}
-	,__class__: snow_core_web_input_Input
+	,__class__: flu_core_web_input_Input
 };
-var snow_modules_interfaces_IO = function() { };
-$hxClasses["snow.modules.interfaces.IO"] = snow_modules_interfaces_IO;
-snow_modules_interfaces_IO.__name__ = true;
-var snow_core_web_io_IO = function(_system) {
+var flu_modules_interfaces_IO = function() { };
+$hxClasses["fluidState.modules.interfaces.IO"] = flu_modules_interfaces_IO;
+flu_modules_interfaces_IO.__name__ = true;
+var flu_core_web_io_IO = function(_system) {
 	this.system = _system;
 };
-$hxClasses["snow.core.web.io.IO"] = snow_core_web_io_IO;
-snow_core_web_io_IO.__name__ = true;
-snow_core_web_io_IO.__interfaces__ = [snow_modules_interfaces_IO];
-snow_core_web_io_IO.prototype = {
+$hxClasses["fluidState.core.web.io.IO"] = flu_core_web_io_IO;
+flu_core_web_io_IO.__name__ = true;
+flu_core_web_io_IO.__interfaces__ = [flu_modules_interfaces_IO];
+flu_core_web_io_IO.prototype = {
 	data_load: function(_path,_options) {
-		return new snow_api_Promise(function(resolve,reject) {
+		return new flu_api_Promise(function(resolve,reject) {
 			var _async = true;
 			var _binary = true;
 			if(_options != null) {
@@ -6614,7 +6162,7 @@ snow_core_web_io_IO.prototype = {
 					if(elements != null) this1 = new Uint8Array(elements); else this1 = null;
 					tmp = this1;
 					resolve(tmp);
-				} else reject(snow_types_Error.error("request status was " + request.status + " / " + request.statusText));
+				} else reject(flu_types_Error.error("request status was " + request.status + " / " + request.statusText));
 			};
 			request.send();
 		});
@@ -6627,12 +6175,12 @@ snow_core_web_io_IO.prototype = {
 	}
 	,on_event: function(_event) {
 	}
-	,__class__: snow_core_web_io_IO
+	,__class__: flu_core_web_io_IO
 };
-var snow_modules_interfaces_Windowing = function() { };
-$hxClasses["snow.modules.interfaces.Windowing"] = snow_modules_interfaces_Windowing;
-snow_modules_interfaces_Windowing.__name__ = true;
-var snow_core_web_window_Windowing = function(_system) {
+var flu_modules_interfaces_Windowing = function() { };
+$hxClasses["fluidState.modules.interfaces.Windowing"] = flu_modules_interfaces_Windowing;
+flu_modules_interfaces_Windowing.__name__ = true;
+var flu_core_web_window_Windowing = function(_system) {
 	this._hidden_event_name = "";
 	this._hidden_name = "";
 	this._pre_fs_body_margin = "0";
@@ -6646,12 +6194,12 @@ var snow_core_web_window_Windowing = function(_system) {
 	this.seq_window = 1;
 	this.system = _system;
 	this.fs_windows = [];
-	this.gl_contexts = new haxe_ds_IntMap();
+	this.gl_contexts = new flu_ds_IntMap();
 };
-$hxClasses["snow.core.web.window.Windowing"] = snow_core_web_window_Windowing;
-snow_core_web_window_Windowing.__name__ = true;
-snow_core_web_window_Windowing.__interfaces__ = [snow_modules_interfaces_Windowing];
-snow_core_web_window_Windowing.prototype = {
+$hxClasses["fluidState.core.web.window.Windowing"] = flu_core_web_window_Windowing;
+flu_core_web_window_Windowing.__name__ = true;
+flu_core_web_window_Windowing.__interfaces__ = [flu_modules_interfaces_Windowing];
+flu_core_web_window_Windowing.prototype = {
 	init: function() {
 		this.listen_for_visibility();
 		this.listen_for_resize();
@@ -6683,9 +6231,9 @@ snow_core_web_window_Windowing.prototype = {
 			msg += "visit http://get.webgl.org/ for help <br/>";
 			msg += "and contact the developer of the application";
 			this.internal_fallback(msg);
-			throw new js__$Boot_HaxeError(snow_types_Error.windowing(msg));
+			throw new js__$Boot_FluidError(flu_types_Error.windowing(msg));
 		}
-		if(snow_modules_opengl_web_GL.current_context == null) snow_modules_opengl_web_GL.current_context = _gl_context;
+		if(flu_modules_opengl_web_GL.current_context == null) flu_modules_opengl_web_GL.current_context = _gl_context;
 		this.gl_contexts.h[_window_id] = _gl_context;
 		var _window_pos = this.get_real_window_position(_handle);
 		config.x = _window_pos.x;
@@ -6696,13 +6244,13 @@ snow_core_web_window_Windowing.prototype = {
 		this.seq_window++;
 	}
 	,internal_resize: function(_window,_w,_h) {
-		this.system.app.dispatch_system_event({ type : 5, window : { type : 7, timestamp : snow_Snow.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
-		this.system.app.dispatch_system_event({ type : 5, window : { type : 6, timestamp : snow_Snow.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
+		this.system.app.dispatch_system_event({ type : 5, window : { type : 7, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
+		this.system.app.dispatch_system_event({ type : 5, window : { type : 6, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 	}
 	,update_window: function(_window) {
 		var _rect = _window.handle.getBoundingClientRect();
 		if(_rect.left != _window.x || _rect.top != _window.y) {
-			var _event = { type : 5, window : { type : 5, timestamp : snow_Snow.core.timestamp(), window_id : _window.id, event : { x : _rect.left, y : _rect.top}}};
+			var _event = { type : 5, window : { type : 5, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _rect.left, y : _rect.top}}};
 			this.system.app.on_event(_event);
 		}
 		if(_rect.width != _window.width || _rect.height != _window.height) this.internal_resize(_window,_rect.width,_rect.height);
@@ -6710,7 +6258,7 @@ snow_core_web_window_Windowing.prototype = {
 	}
 	,render: function(_window) {
 		var _window_gl_context = this.gl_contexts.h[_window.id];
-		if(snow_modules_opengl_web_GL.current_context != _window_gl_context) snow_modules_opengl_web_GL.current_context = _window_gl_context;
+		if(flu_modules_opengl_web_GL.current_context != _window_gl_context) flu_modules_opengl_web_GL.current_context = _window_gl_context;
 	}
 	,swap: function(_window) {
 	}
@@ -6817,6 +6365,7 @@ snow_core_web_window_Windowing.prototype = {
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 11, timestamp : _mouse_event.timeStamp, window_id : _window.id, event : _mouse_event}});
 	}
 	,listen_for_resize: function() {
+		
 		var _g = this;
 		window.onresize = function(e) {
 			if(!_g.system.app.config.web.true_fullscreen) {
@@ -6848,7 +6397,7 @@ snow_core_web_window_Windowing.prototype = {
 		if(this._hidden_name != "" && this._hidden_event_name != "") window.document.addEventListener(this._hidden_event_name,$bind(this,this.on_visibility_change));
 	}
 	,on_visibility_change: function(jsevent) {
-		var _event = { type : 5, window : { type : 2, timestamp : snow_Snow.core.timestamp(), window_id : 1, event : jsevent}};
+		var _event = { type : 5, window : { type : 2, timestamp : flu.core.timestamp(), window_id : 1, event : jsevent}};
 		if(document[this._hidden_name]) {
 			_event.window.type = 3;
 			this.system.app.dispatch_system_event(_event);
@@ -6896,20 +6445,20 @@ snow_core_web_window_Windowing.prototype = {
 		overlay_el.appendChild(text_el);
 		window.document.body.appendChild(overlay_el);
 	}
-	,__class__: snow_core_web_window_Windowing
+	,__class__: flu_core_web_window_Windowing
 };
-var snow_modules_interfaces_Audio = function() { };
-$hxClasses["snow.modules.interfaces.Audio"] = snow_modules_interfaces_Audio;
-snow_modules_interfaces_Audio.__name__ = true;
-var snow_modules_howlerjs_Audio = function(_system) {
+var flu_modules_interfaces_Audio = function() { };
+$hxClasses["fluidState.modules.interfaces.Audio"] = flu_modules_interfaces_Audio;
+flu_modules_interfaces_Audio.__name__ = true;
+var flu_modules_howlerjs_Audio = function(_system) {
 	this.system = _system;
 	this.suspended_sounds = [];
-	this.handles = new haxe_ds_ObjectMap();
+	this.handles = new flu_ds_ObjectMap();
 };
-$hxClasses["snow.modules.howlerjs.Audio"] = snow_modules_howlerjs_Audio;
-snow_modules_howlerjs_Audio.__name__ = true;
-snow_modules_howlerjs_Audio.__interfaces__ = [snow_modules_interfaces_Audio];
-snow_modules_howlerjs_Audio.prototype = {
+$hxClasses["fluidState.modules.howlerjs.Audio"] = flu_modules_howlerjs_Audio;
+flu_modules_howlerjs_Audio.__name__ = true;
+flu_modules_howlerjs_Audio.__interfaces__ = [flu_modules_interfaces_Audio];
+flu_modules_howlerjs_Audio.prototype = {
 	init: function() {
 	}
 	,update: function() {
@@ -6934,9 +6483,9 @@ snow_modules_howlerjs_Audio.prototype = {
 			sound.toggle();
 		}
 	}
-	,__class__: snow_modules_howlerjs_Audio
+	,__class__: flu_modules_howlerjs_Audio
 };
-var snow_system_audio_Sound = function() {
+var flu_system_audio_Sound = function() {
 	this.looping = false;
 	this.pan = 0.0;
 	this.volume = 1.0;
@@ -6944,9 +6493,9 @@ var snow_system_audio_Sound = function() {
 	this.playing = false;
 	this.name = "";
 };
-$hxClasses["snow.system.audio.Sound"] = snow_system_audio_Sound;
-snow_system_audio_Sound.__name__ = true;
-snow_system_audio_Sound.prototype = {
+$hxClasses["fluidState.system.audio.Sound"] = flu_system_audio_Sound;
+flu_system_audio_Sound.__name__ = true;
+flu_system_audio_Sound.prototype = {
 	play: function() {
 		console.log("    i / sound / " + "Sound:play called in root Sound module. Nothing will happen.");
 	}
@@ -6995,13 +6544,13 @@ snow_system_audio_Sound.prototype = {
 	,set_looping: function(_looping) {
 		return this.looping = _looping;
 	}
-	,__class__: snow_system_audio_Sound
+	,__class__: flu_system_audio_Sound
 };
-var snow_modules_howlerjs_sound_Sound = function() { };
-$hxClasses["snow.modules.howlerjs.sound.Sound"] = snow_modules_howlerjs_sound_Sound;
-snow_modules_howlerjs_sound_Sound.__name__ = true;
-snow_modules_howlerjs_sound_Sound.__super__ = snow_system_audio_Sound;
-snow_modules_howlerjs_sound_Sound.prototype = $extend(snow_system_audio_Sound.prototype,{
+var flu_modules_howlerjs_sound_Sound = function() { };
+$hxClasses["fluidState.modules.howlerjs.sound.Sound"] = flu_modules_howlerjs_sound_Sound;
+flu_modules_howlerjs_sound_Sound.__name__ = true;
+flu_modules_howlerjs_sound_Sound.__super__ = flu_system_audio_Sound;
+flu_modules_howlerjs_sound_Sound.prototype = $extend(flu_system_audio_Sound.prototype,{
 	play: function() {
 		if(this.get_info() != null && this.get_info().handle != null) {
 			this.set_playing(true);
@@ -7035,56 +6584,56 @@ snow_modules_howlerjs_sound_Sound.prototype = $extend(snow_system_audio_Sound.pr
 		if(this.get_info() != null && this.get_info().handle != null) this.get_info().handle.unload();
 		this.system.kill(this);
 	}
-	,__class__: snow_modules_howlerjs_sound_Sound
+	,__class__: flu_modules_howlerjs_sound_Sound
 });
-var snow_modules_opengl_web_GL = function() { };
-$hxClasses["snow.modules.opengl.web.GL"] = snow_modules_opengl_web_GL;
-snow_modules_opengl_web_GL.__name__ = true;
-var snow_system_assets_Asset = function() { };
-$hxClasses["snow.system.assets.Asset"] = snow_system_assets_Asset;
-snow_system_assets_Asset.__name__ = true;
-var snow_system_assets_AssetJSON = function() { };
-$hxClasses["snow.system.assets.AssetJSON"] = snow_system_assets_AssetJSON;
-snow_system_assets_AssetJSON.__name__ = true;
-snow_system_assets_AssetJSON.processor = function(_app,_id,_data) {
-	if(_data == null) return snow_api_Promise.reject(snow_types_Error.error("AssetJSON: data was null"));
-	return new snow_api_Promise(function(resolve,reject) {
+var flu_modules_opengl_web_GL = function() { };
+$hxClasses["fluidState.modules.opengl.web.GL"] = flu_modules_opengl_web_GL;
+flu_modules_opengl_web_GL.__name__ = true;
+var flu_system_assets_Asset = function() { };
+$hxClasses["fluidState.system.assets.Asset"] = flu_system_assets_Asset;
+flu_system_assets_Asset.__name__ = true;
+var flu_system_assets_AssetJSON = function() { };
+$hxClasses["fluidState.system.assets.AssetJSON"] = flu_system_assets_AssetJSON;
+flu_system_assets_AssetJSON.__name__ = true;
+flu_system_assets_AssetJSON.processor = function(_app,_id,_data) {
+	if(_data == null) return flu_api_Promise.reject(flu_types_Error.error("AssetJSON: data was null"));
+	return new flu_api_Promise(function(resolve,reject) {
 		var _data_json = null;
 		try {
-			_data_json = JSON.parse(new haxe_io_Bytes(new Uint8Array(_data.buffer)).toString());
+			_data_json = JSON.parse(new flu_io_Bytes(new Uint8Array(_data.buffer)).toString());
 		} catch( e ) {
-			if (e instanceof js__$Boot_HaxeError) e = e.val;
-			return reject(snow_types_Error.parse(e));
+			if (e instanceof js__$Boot_FluidError) e = e.val;
+			return reject(flu_types_Error.parse(e));
 		}
 		return resolve(_data_json);
 	});
 };
-snow_system_assets_AssetJSON.__super__ = snow_system_assets_Asset;
-snow_system_assets_AssetJSON.prototype = $extend(snow_system_assets_Asset.prototype,{
-	__class__: snow_system_assets_AssetJSON
+flu_system_assets_AssetJSON.__super__ = flu_system_assets_Asset;
+flu_system_assets_AssetJSON.prototype = $extend(flu_system_assets_Asset.prototype,{
+	__class__: flu_system_assets_AssetJSON
 });
-var snow_system_assets_Assets = function(_app) {
+var flu_system_assets_Assets = function(_app) {
 	this.root = "";
 	this.app = _app;
-	this.module = new snow_core_web_assets_Assets(this);
+	this.module = new flu_core_web_assets_Assets(this);
 };
-$hxClasses["snow.system.assets.Assets"] = snow_system_assets_Assets;
-snow_system_assets_Assets.__name__ = true;
-snow_system_assets_Assets.prototype = {
-	__class__: snow_system_assets_Assets
+$hxClasses["fluidState.system.assets.Assets"] = flu_system_assets_Assets;
+flu_system_assets_Assets.__name__ = true;
+flu_system_assets_Assets.prototype = {
+	__class__: flu_system_assets_Assets
 };
-var snow_system_audio_Audio = function(_app) {
+var flu_system_audio_Audio = function(_app) {
 	this.active = false;
 	this.app = _app;
-	this.module = new snow_modules_howlerjs_Audio(this);
+	this.module = new flu_modules_howlerjs_Audio(this);
 	this.module.init();
-	this.sound_list = new haxe_ds_StringMap();
-	this.stream_list = new haxe_ds_StringMap();
+	this.sound_list = new flu_ds_StringMap();
+	this.stream_list = new flu_ds_StringMap();
 	this.active = true;
 };
-$hxClasses["snow.system.audio.Audio"] = snow_system_audio_Audio;
-snow_system_audio_Audio.__name__ = true;
-snow_system_audio_Audio.prototype = {
+$hxClasses["fluidState.system.audio.Audio"] = flu_system_audio_Audio;
+flu_system_audio_Audio.__name__ = true;
+flu_system_audio_Audio.prototype = {
 	kill: function(_sound) {
 		if(_sound == null) return;
 		this.sound_list.remove(_sound.name);
@@ -7096,7 +6645,7 @@ snow_system_audio_Audio.prototype = {
 		this.active = false;
 		var tmp;
 		var _this = this.stream_list;
-		tmp = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
+		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
 		while( tmp.hasNext() ) {
 			var sound = tmp.next();
 			sound.internal_pause();
@@ -7110,7 +6659,7 @@ snow_system_audio_Audio.prototype = {
 		this.module.resume();
 		var tmp;
 		var _this = this.stream_list;
-		tmp = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
+		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
 		while( tmp.hasNext() ) {
 			var sound = tmp.next();
 			sound.internal_play();
@@ -7124,7 +6673,7 @@ snow_system_audio_Audio.prototype = {
 		this.active = false;
 		var tmp;
 		var _this = this.sound_list;
-		tmp = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
+		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
 		while( tmp.hasNext() ) {
 			var sound = tmp.next();
 			sound.destroy();
@@ -7135,38 +6684,38 @@ snow_system_audio_Audio.prototype = {
 		if(!this.active) return;
 		var tmp;
 		var _this = this.sound_list;
-		tmp = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
+		tmp = new flu_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
 		while( tmp.hasNext() ) {
 			var _sound = tmp.next();
 			if(_sound.get_playing()) _sound.internal_update();
 		}
 		this.module.update();
 	}
-	,__class__: snow_system_audio_Audio
+	,__class__: flu_system_audio_Audio
 };
-var snow_system_input_Input = function(_app) {
+var flu_system_input_Input = function(_app) {
 	this.touch_count = 0;
 	this.app = _app;
-	this.module = new snow_core_web_input_Input(this);
+	this.module = new flu_core_web_input_Input(this);
 	this.module.init();
-	this.key_code_pressed = new haxe_ds_IntMap();
-	this.key_code_down = new haxe_ds_IntMap();
-	this.key_code_released = new haxe_ds_IntMap();
-	this.scan_code_pressed = new haxe_ds_IntMap();
-	this.scan_code_down = new haxe_ds_IntMap();
-	this.scan_code_released = new haxe_ds_IntMap();
-	this.mouse_button_pressed = new haxe_ds_IntMap();
-	this.mouse_button_down = new haxe_ds_IntMap();
-	this.mouse_button_released = new haxe_ds_IntMap();
-	this.gamepad_button_pressed = new haxe_ds_IntMap();
-	this.gamepad_button_down = new haxe_ds_IntMap();
-	this.gamepad_button_released = new haxe_ds_IntMap();
-	this.gamepad_axis_values = new haxe_ds_IntMap();
-	this.touches_down = new haxe_ds_IntMap();
+	this.key_code_pressed = new flu_ds_IntMap();
+	this.key_code_down = new flu_ds_IntMap();
+	this.key_code_released = new flu_ds_IntMap();
+	this.scan_code_pressed = new flu_ds_IntMap();
+	this.scan_code_down = new flu_ds_IntMap();
+	this.scan_code_released = new flu_ds_IntMap();
+	this.mouse_button_pressed = new flu_ds_IntMap();
+	this.mouse_button_down = new flu_ds_IntMap();
+	this.mouse_button_released = new flu_ds_IntMap();
+	this.gamepad_button_pressed = new flu_ds_IntMap();
+	this.gamepad_button_down = new flu_ds_IntMap();
+	this.gamepad_button_released = new flu_ds_IntMap();
+	this.gamepad_axis_values = new flu_ds_IntMap();
+	this.touches_down = new flu_ds_IntMap();
 };
-$hxClasses["snow.system.input.Input"] = snow_system_input_Input;
-snow_system_input_Input.__name__ = true;
-snow_system_input_Input.prototype = {
+$hxClasses["fluidState.system.input.Input"] = flu_system_input_Input;
+flu_system_input_Input.__name__ = true;
+flu_system_input_Input.prototype = {
 	dispatch_key_down_event: function(keycode,scancode,repeat,mod,timestamp,window_id) {
 		if(!repeat) {
 			this.key_code_pressed.h[keycode] = false;
@@ -7218,7 +6767,7 @@ snow_system_input_Input.prototype = {
 	}
 	,dispatch_gamepad_axis_event: function(gamepad,axis,value,timestamp) {
 		if(!this.gamepad_axis_values.h.hasOwnProperty(gamepad)) {
-			var value1 = new haxe_ds_IntMap();
+			var value1 = new flu_ds_IntMap();
 			this.gamepad_axis_values.h[gamepad] = value1;
 		}
 		var this1 = this.gamepad_axis_values.h[gamepad];
@@ -7227,11 +6776,11 @@ snow_system_input_Input.prototype = {
 	}
 	,dispatch_gamepad_button_down_event: function(gamepad,button,value,timestamp) {
 		if(!this.gamepad_button_pressed.h.hasOwnProperty(gamepad)) {
-			var value1 = new haxe_ds_IntMap();
+			var value1 = new flu_ds_IntMap();
 			this.gamepad_button_pressed.h[gamepad] = value1;
 		}
 		if(!this.gamepad_button_down.h.hasOwnProperty(gamepad)) {
-			var value2 = new haxe_ds_IntMap();
+			var value2 = new flu_ds_IntMap();
 			this.gamepad_button_down.h[gamepad] = value2;
 		}
 		var this1 = this.gamepad_button_pressed.h[gamepad];
@@ -7242,11 +6791,11 @@ snow_system_input_Input.prototype = {
 	}
 	,dispatch_gamepad_button_up_event: function(gamepad,button,value,timestamp) {
 		if(!this.gamepad_button_released.h.hasOwnProperty(gamepad)) {
-			var value1 = new haxe_ds_IntMap();
+			var value1 = new flu_ds_IntMap();
 			this.gamepad_button_released.h[gamepad] = value1;
 		}
 		if(!this.gamepad_button_down.h.hasOwnProperty(gamepad)) {
-			var value2 = new haxe_ds_IntMap();
+			var value2 = new flu_ds_IntMap();
 			this.gamepad_button_down.h[gamepad] = value2;
 		}
 		var this1 = this.gamepad_button_released.h[gamepad];
@@ -7327,20 +6876,20 @@ snow_system_input_Input.prototype = {
 			if(this.scan_code_released.h[_code3]) this.scan_code_released.remove(_code3); else this.scan_code_released.h[_code3] = true;
 		}
 	}
-	,__class__: snow_system_input_Input
+	,__class__: flu_system_input_Input
 };
-var snow_system_io_IO = function(_app) {
+var flu_system_io_IO = function(_app) {
 	this.app = _app;
-	this.module = new snow_core_web_io_IO(this);
+	this.module = new flu_core_web_io_IO(this);
 	this.module.init();
 };
-$hxClasses["snow.system.io.IO"] = snow_system_io_IO;
-snow_system_io_IO.__name__ = true;
-snow_system_io_IO.prototype = {
+$hxClasses["fluidState.system.io.IO"] = flu_system_io_IO;
+flu_system_io_IO.__name__ = true;
+flu_system_io_IO.prototype = {
 	data_flow: function(_id,_processor,_provider) {
 		var _g = this;
 		if(_provider == null) _provider = $bind(this,this.default_provider);
-		return new snow_api_Promise(function(resolve,reject) {
+		return new flu_api_Promise(function(resolve,reject) {
 			_provider(_g.app,_id).then(function(data) {
 				if(_processor != null) _processor(_g.app,_id,data).then(resolve,reject); else resolve(data);
 			}).error(reject);
@@ -7349,9 +6898,9 @@ snow_system_io_IO.prototype = {
 	,default_provider: function(_app,_id) {
 		return this.module.data_load(_id,null);
 	}
-	,__class__: snow_system_io_IO
+	,__class__: flu_system_io_IO
 };
-var snow_system_window_Window = function(_system,_config) {
+var flu_system_window_Window = function(_system,_config) {
 	this.internal_resize = false;
 	this.internal_position = false;
 	this.minimized = false;
@@ -7371,9 +6920,9 @@ var snow_system_window_Window = function(_system,_config) {
 	if(this.config.y == null) this.config.y = 536805376;
 	this.system.module.create(this.system.app.config.render,_config,$bind(this,this.on_window_created));
 };
-$hxClasses["snow.system.window.Window"] = snow_system_window_Window;
-snow_system_window_Window.__name__ = true;
-snow_system_window_Window.prototype = {
+$hxClasses["fluidState.system.window.Window"] = flu_system_window_Window;
+flu_system_window_Window.__name__ = true;
+flu_system_window_Window.prototype = {
 	on_window_created: function(_handle,_id,_configs) {
 		this.id = _id;
 		this.handle = _handle;
@@ -7392,7 +6941,7 @@ snow_system_window_Window.prototype = {
 		this.set_width(this.config.width);
 		this.set_height(this.config.height);
 		this.internal_resize = false;
-		this.on_event({ type : 1, window_id : _id, timestamp : snow_Snow.core.timestamp(), event : { }});
+		this.on_event({ type : 1, window_id : _id, timestamp : flu.core.timestamp(), event : { }});
 	}
 	,on_event: function(_event) {
 		var _g = _event.type;
@@ -7435,8 +6984,8 @@ snow_system_window_Window.prototype = {
 			if(this.auto_swap) this.swap();
 			return;
 		}
-		snow_modules_opengl_web_GL.current_context.clearColor(0,0,0,1.0);
-		snow_modules_opengl_web_GL.current_context.clear(16384);
+		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1.0);
+		flu_modules_opengl_web_GL.current_context.clear(16384);
 		if(this.auto_swap) this.swap();
 	}
 	,swap: function() {
@@ -7493,21 +7042,21 @@ snow_system_window_Window.prototype = {
 		if(this.get_min_size() != null && this.handle != null) this.system.module.set_min_size(this,_size.x,_size.y);
 		return this.min_size = _size;
 	}
-	,__class__: snow_system_window_Window
+	,__class__: flu_system_window_Window
 };
-var snow_system_window_Windowing = function(_app) {
+var flu_system_window_Windowing = function(_app) {
 	this.window_count = 0;
 	this.app = _app;
-	this.window_list = new haxe_ds_IntMap();
-	this.window_handles = new haxe_ds_ObjectMap();
-	this.module = new snow_core_web_window_Windowing(this);
+	this.window_list = new flu_ds_IntMap();
+	this.window_handles = new flu_ds_ObjectMap();
+	this.module = new flu_core_web_window_Windowing(this);
 	this.module.init();
 };
-$hxClasses["snow.system.window.Windowing"] = snow_system_window_Windowing;
-snow_system_window_Windowing.__name__ = true;
-snow_system_window_Windowing.prototype = {
+$hxClasses["fluidState.system.window.Windowing"] = flu_system_window_Windowing;
+flu_system_window_Windowing.__name__ = true;
+flu_system_window_Windowing.prototype = {
 	create: function(_config) {
-		var _window = new snow_system_window_Window(this,_config);
+		var _window = new flu_system_window_Window(this,_config);
 		this.window_list.h[_window.id] = _window;
 		this.window_handles.set(_window.handle,_window.id);
 		this.window_count++;
@@ -7545,14 +7094,14 @@ snow_system_window_Windowing.prototype = {
 	,destroy: function() {
 		this.module.destroy();
 	}
-	,__class__: snow_system_window_Windowing
+	,__class__: flu_system_window_Windowing
 };
-var snow_types_Error = $hxClasses["snow.types.Error"] = { __ename__ : true, __constructs__ : ["error","init","windowing","parse"] };
-snow_types_Error.error = function(value) { var $x = ["error",0,value]; $x.__enum__ = snow_types_Error; $x.toString = $estr; return $x; };
-snow_types_Error.init = function(value) { var $x = ["init",1,value]; $x.__enum__ = snow_types_Error; $x.toString = $estr; return $x; };
-snow_types_Error.windowing = function(value) { var $x = ["windowing",2,value]; $x.__enum__ = snow_types_Error; $x.toString = $estr; return $x; };
-snow_types_Error.parse = function(value) { var $x = ["parse",3,value]; $x.__enum__ = snow_types_Error; $x.toString = $estr; return $x; };
-snow_types_Error.__empty_constructs__ = [];
+var flu_types_Error = $hxClasses["fluidState.types.Error"] = { __ename__ : true, __constructs__ : ["error","init","windowing","parse"] };
+flu_types_Error.error = function(value) { var $x = ["error",0,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+flu_types_Error.init = function(value) { var $x = ["init",1,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+flu_types_Error.windowing = function(value) { var $x = ["windowing",2,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+flu_types_Error.parse = function(value) { var $x = ["parse",3,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+flu_types_Error.__empty_constructs__ = [];
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -7590,14 +7139,14 @@ var ArrayBuffer = $global.ArrayBuffer || js_html_compat_ArrayBuffer;
 if(ArrayBuffer.prototype.slice == null) ArrayBuffer.prototype.slice = js_html_compat_ArrayBuffer.sliceImpl;
 var DataView = $global.DataView || js_html_compat_DataView;
 var Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
-gltoolbox_GeometryTools.unitQuadCache = new haxe_ds_IntMap();
+gltoolbox_GeometryTools.unitQuadCache = new flu_ds_IntMap();
 gltoolbox_TextureTools.defaultParams = { channelType : 6408, dataType : 5121, filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4, webGLFlipY : true};
 js_Boot.__toStr = {}.toString;
 gltoolbox_shaders_Resample.instance = new gltoolbox_shaders_Resample();
-haxe_ds_ObjectMap.count = 0;
-haxe_io_FPHelper.i64tmp = (function($this) {
+flu_ds_ObjectMap.count = 0;
+flu_io_FPHelper.i64tmp = (function($this) {
 	var $r;
-	var x = new haxe__$Int64__$_$_$Int64(0,0);
+	var x = new flu__$Int64__$_$_$Int64(0,0);
 	$r = x;
 	return $r;
 }(this));
@@ -7605,7 +7154,7 @@ js_html_compat_Uint8Array.BYTES_PER_ELEMENT = 1;
 shaderblox_glsl_GLSLTools.PRECISION_QUALIFIERS = ["lowp","mediump","highp"];
 shaderblox_glsl_GLSLTools.STORAGE_QUALIFIER_TYPES = (function($this) {
 	var $r;
-	var _g = new haxe_ds_StringMap();
+	var _g = new flu_ds_StringMap();
 	{
 		var value = ["bool","int","float","vec2","vec3","vec4","bvec2","bvec3","bvec4","ivec2","ivec3","ivec4","mat2","mat3","mat4"];
 		if(__map_reserved["const"] != null) _g.setReserved("const",value); else _g.h["const"] = value;
@@ -7626,203 +7175,9 @@ shaderblox_glsl_GLSLTools.STORAGE_QUALIFIER_TYPES = (function($this) {
 	return $r;
 }(this));
 shaderblox_uniforms_UTexture.lastActiveTexture = -1;
-snow_api_Promises.calls = [];
-snow_api_Promises.defers = [];
-snow_api_Timer.running_timers = [];
-snow_system_input_Scancodes.MASK = 1073741824;
-snow_system_input_Scancodes.unknown = 0;
-snow_system_input_Scancodes.key_a = 4;
-snow_system_input_Scancodes.key_b = 5;
-snow_system_input_Scancodes.key_c = 6;
-snow_system_input_Scancodes.key_d = 7;
-snow_system_input_Scancodes.key_e = 8;
-snow_system_input_Scancodes.key_f = 9;
-snow_system_input_Scancodes.key_g = 10;
-snow_system_input_Scancodes.key_h = 11;
-snow_system_input_Scancodes.key_i = 12;
-snow_system_input_Scancodes.key_j = 13;
-snow_system_input_Scancodes.key_k = 14;
-snow_system_input_Scancodes.key_l = 15;
-snow_system_input_Scancodes.key_m = 16;
-snow_system_input_Scancodes.key_n = 17;
-snow_system_input_Scancodes.key_o = 18;
-snow_system_input_Scancodes.key_p = 19;
-snow_system_input_Scancodes.key_q = 20;
-snow_system_input_Scancodes.key_r = 21;
-snow_system_input_Scancodes.key_s = 22;
-snow_system_input_Scancodes.key_t = 23;
-snow_system_input_Scancodes.key_u = 24;
-snow_system_input_Scancodes.key_v = 25;
-snow_system_input_Scancodes.key_w = 26;
-snow_system_input_Scancodes.key_x = 27;
-snow_system_input_Scancodes.key_y = 28;
-snow_system_input_Scancodes.key_z = 29;
-snow_system_input_Scancodes.key_1 = 30;
-snow_system_input_Scancodes.key_2 = 31;
-snow_system_input_Scancodes.key_3 = 32;
-snow_system_input_Scancodes.key_4 = 33;
-snow_system_input_Scancodes.key_5 = 34;
-snow_system_input_Scancodes.key_6 = 35;
-snow_system_input_Scancodes.key_7 = 36;
-snow_system_input_Scancodes.key_8 = 37;
-snow_system_input_Scancodes.key_9 = 38;
-snow_system_input_Scancodes.key_0 = 39;
-snow_system_input_Scancodes.enter = 40;
-snow_system_input_Scancodes.escape = 41;
-snow_system_input_Scancodes.backspace = 42;
-snow_system_input_Scancodes.tab = 43;
-snow_system_input_Scancodes.space = 44;
-snow_system_input_Scancodes.equals = 46;
-snow_system_input_Scancodes.leftbracket = 47;
-snow_system_input_Scancodes.rightbracket = 48;
-snow_system_input_Scancodes.backslash = 49;
-snow_system_input_Scancodes.semicolon = 51;
-snow_system_input_Scancodes.grave = 53;
-snow_system_input_Scancodes.slash = 56;
-snow_system_input_Scancodes.capslock = 57;
-snow_system_input_Scancodes.f1 = 58;
-snow_system_input_Scancodes.f2 = 59;
-snow_system_input_Scancodes.f3 = 60;
-snow_system_input_Scancodes.f4 = 61;
-snow_system_input_Scancodes.f5 = 62;
-snow_system_input_Scancodes.f6 = 63;
-snow_system_input_Scancodes.f7 = 64;
-snow_system_input_Scancodes.f8 = 65;
-snow_system_input_Scancodes.f9 = 66;
-snow_system_input_Scancodes.f10 = 67;
-snow_system_input_Scancodes.f11 = 68;
-snow_system_input_Scancodes.f12 = 69;
-snow_system_input_Scancodes.printscreen = 70;
-snow_system_input_Scancodes.insert = 73;
-snow_system_input_Scancodes.home = 74;
-snow_system_input_Scancodes.pageup = 75;
-snow_system_input_Scancodes.end = 77;
-snow_system_input_Scancodes.pagedown = 78;
-snow_system_input_Scancodes.right = 79;
-snow_system_input_Scancodes.left = 80;
-snow_system_input_Scancodes.down = 81;
-snow_system_input_Scancodes.up = 82;
-snow_system_input_Scancodes.numlockclear = 83;
-snow_system_input_Scancodes.kp_divide = 84;
-snow_system_input_Scancodes.kp_multiply = 85;
-snow_system_input_Scancodes.kp_minus = 86;
-snow_system_input_Scancodes.kp_plus = 87;
-snow_system_input_Scancodes.kp_1 = 89;
-snow_system_input_Scancodes.kp_2 = 90;
-snow_system_input_Scancodes.kp_3 = 91;
-snow_system_input_Scancodes.kp_4 = 92;
-snow_system_input_Scancodes.kp_5 = 93;
-snow_system_input_Scancodes.kp_6 = 94;
-snow_system_input_Scancodes.kp_7 = 95;
-snow_system_input_Scancodes.kp_8 = 96;
-snow_system_input_Scancodes.kp_9 = 97;
-snow_system_input_Scancodes.kp_0 = 98;
-snow_system_input_Scancodes.f13 = 104;
-snow_system_input_Scancodes.f14 = 105;
-snow_system_input_Scancodes.f15 = 106;
-snow_system_input_Scancodes.f16 = 107;
-snow_system_input_Scancodes.f17 = 108;
-snow_system_input_Scancodes.f18 = 109;
-snow_system_input_Scancodes.f19 = 110;
-snow_system_input_Scancodes.f20 = 111;
-snow_system_input_Scancodes.f21 = 112;
-snow_system_input_Scancodes.f22 = 113;
-snow_system_input_Scancodes.f23 = 114;
-snow_system_input_Scancodes.f24 = 115;
-snow_system_input_Scancodes.volumeup = 128;
-snow_system_input_Scancodes.volumedown = 129;
-snow_system_input_Scancodes.kp_decimal = 220;
-snow_system_input_Scancodes.lctrl = 224;
-snow_system_input_Scancodes.lshift = 225;
-snow_system_input_Scancodes.lalt = 226;
-snow_system_input_Scancodes.lmeta = 227;
-snow_system_input_Scancodes.rshift = 229;
-snow_system_input_Scancodes.rmeta = 231;
-snow_system_input_Scancodes.audiomute = 262;
-snow_system_input_Keycodes.enter = 13;
-snow_system_input_Keycodes.backspace = 8;
-snow_system_input_Keycodes.tab = 9;
-snow_system_input_Keycodes.exclaim = 33;
-snow_system_input_Keycodes.quotedbl = 34;
-snow_system_input_Keycodes.hash = 35;
-snow_system_input_Keycodes.percent = 37;
-snow_system_input_Keycodes.dollar = 36;
-snow_system_input_Keycodes.ampersand = 38;
-snow_system_input_Keycodes.quote = 39;
-snow_system_input_Keycodes.leftparen = 40;
-snow_system_input_Keycodes.rightparen = 41;
-snow_system_input_Keycodes.asterisk = 42;
-snow_system_input_Keycodes.plus = 43;
-snow_system_input_Keycodes.comma = 44;
-snow_system_input_Keycodes.minus = 45;
-snow_system_input_Keycodes.period = 46;
-snow_system_input_Keycodes.slash = 47;
-snow_system_input_Keycodes.leftbracket = 91;
-snow_system_input_Keycodes.backslash = 92;
-snow_system_input_Keycodes.rightbracket = 93;
-snow_system_input_Keycodes.caret = 94;
-snow_system_input_Keycodes.underscore = 95;
-snow_system_input_Keycodes.backquote = 96;
-snow_system_input_Keycodes.capslock = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.capslock);
-snow_system_input_Keycodes.f1 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f1);
-snow_system_input_Keycodes.f2 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f2);
-snow_system_input_Keycodes.f3 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f3);
-snow_system_input_Keycodes.f4 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f4);
-snow_system_input_Keycodes.f5 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f5);
-snow_system_input_Keycodes.f6 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f6);
-snow_system_input_Keycodes.f7 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f7);
-snow_system_input_Keycodes.f8 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f8);
-snow_system_input_Keycodes.f9 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f9);
-snow_system_input_Keycodes.f10 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f10);
-snow_system_input_Keycodes.f11 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f11);
-snow_system_input_Keycodes.f12 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f12);
-snow_system_input_Keycodes.printscreen = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.printscreen);
-snow_system_input_Keycodes.insert = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.insert);
-snow_system_input_Keycodes.home = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.home);
-snow_system_input_Keycodes.pageup = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.pageup);
-snow_system_input_Keycodes["delete"] = 127;
-snow_system_input_Keycodes.end = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.end);
-snow_system_input_Keycodes.pagedown = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.pagedown);
-snow_system_input_Keycodes.right = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.right);
-snow_system_input_Keycodes.left = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.left);
-snow_system_input_Keycodes.down = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.down);
-snow_system_input_Keycodes.up = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.up);
-snow_system_input_Keycodes.numlockclear = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.numlockclear);
-snow_system_input_Keycodes.kp_divide = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_divide);
-snow_system_input_Keycodes.kp_multiply = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_multiply);
-snow_system_input_Keycodes.kp_minus = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_minus);
-snow_system_input_Keycodes.kp_plus = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_plus);
-snow_system_input_Keycodes.kp_1 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_1);
-snow_system_input_Keycodes.kp_2 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_2);
-snow_system_input_Keycodes.kp_3 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_3);
-snow_system_input_Keycodes.kp_4 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_4);
-snow_system_input_Keycodes.kp_5 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_5);
-snow_system_input_Keycodes.kp_6 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_6);
-snow_system_input_Keycodes.kp_7 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_7);
-snow_system_input_Keycodes.kp_8 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_8);
-snow_system_input_Keycodes.kp_9 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_9);
-snow_system_input_Keycodes.kp_0 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_0);
-snow_system_input_Keycodes.f13 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f13);
-snow_system_input_Keycodes.f14 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f14);
-snow_system_input_Keycodes.f15 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f15);
-snow_system_input_Keycodes.f16 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f16);
-snow_system_input_Keycodes.f17 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f17);
-snow_system_input_Keycodes.f18 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f18);
-snow_system_input_Keycodes.f19 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f19);
-snow_system_input_Keycodes.f20 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f20);
-snow_system_input_Keycodes.f21 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f21);
-snow_system_input_Keycodes.f22 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f22);
-snow_system_input_Keycodes.f23 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f23);
-snow_system_input_Keycodes.f24 = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.f24);
-snow_system_input_Keycodes.volumeup = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.volumeup);
-snow_system_input_Keycodes.volumedown = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.volumedown);
-snow_system_input_Keycodes.kp_decimal = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.kp_decimal);
-snow_system_input_Keycodes.lctrl = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.lctrl);
-snow_system_input_Keycodes.lshift = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.lshift);
-snow_system_input_Keycodes.lalt = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.lalt);
-snow_system_input_Keycodes.lmeta = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.lmeta);
-snow_system_input_Keycodes.rmeta = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.rmeta);
-snow_system_input_Keycodes.audiomute = snow_system_input_Keycodes.from_scan(snow_system_input_Scancodes.audiomute);
-snow_core_web_input_Input._keypress_blacklist = [snow_system_input_Keycodes.backspace,snow_system_input_Keycodes.enter];
+flu_api_Promises.calls = [];
+flu_api_Promises.defers = [];
+flu_api_Timer.running_timers = [];
+
 SnowApp.main();
 })(typeof console != "undefined" ? console : {log:function(){}}, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
