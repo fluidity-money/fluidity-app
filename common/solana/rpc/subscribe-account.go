@@ -3,37 +3,20 @@ package rpc
 import (
 	"encoding/json"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 )
 
-type (
-	accountSubscribeResponse struct {
-		Jsonrpc string `json:"jsonrpc"`
-		Method  string `json:"method"`
-		Params  struct {
-			Result       AccountNotification `json:"result"`
-			Subscription int                 `json:"subscription"`
-		} `json:"params"`
-	}
-
-	AccountNotification struct {
-		Context struct {
-			Slot int `json:"slot"`
-		} `json:"context"`
-
-		Value struct {
-			Data       [2]string `json:"data"`
-			Executable bool      `json:"executable"`
-			Lamports   int       `json:"lamports"`
-			Owner      string    `json:"owner"`
-			RentEpoch  int       `json:"rentEpoch"`
-		} `json:"value"`
-	}
-)
+type accountNotification struct {
+	Value types.Account `json:"value"`
+}
 
 // SubscribeAccount subscribes to changes to account and dies with log.Fatal
 // if something goes wrong
-func (websocket Websocket) SubscribeAccount(programId string, f func(AccountNotification)) {
+func (websocket Websocket) SubscribeAccount(publicKey solana.PublicKey, f func(types.Account)) {
+	programId := publicKey.ToBase58()
+
 	replies := websocket.subscribe("accountSubscribe", []interface{}{
 		programId,
 		map[string]string{
@@ -53,7 +36,7 @@ func (websocket Websocket) SubscribeAccount(programId string, f func(AccountNoti
 			})
 		}
 
-		var accountNotification AccountNotification
+		var accountNotification accountNotification
 
 		err := json.Unmarshal(result, &accountNotification)
 
@@ -70,6 +53,6 @@ func (websocket Websocket) SubscribeAccount(programId string, f func(AccountNoti
 			})
 		}
 
-		f(accountNotification)
+		f(accountNotification.Value)
 	}
 }

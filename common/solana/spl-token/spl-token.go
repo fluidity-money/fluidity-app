@@ -5,6 +5,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
 	solLib "github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 
 	"github.com/near/borsh-go"
 )
@@ -51,7 +52,7 @@ type (
 
 // SendTransfer using the token address given, the sender address, returning
 // the signature or an error
-func SendTransfer(solanaClient *solana.SolanaRPCHandle, senderPdaAddress, recipientAddress, tokenMintAddress solLib.PublicKey, amount uint64, recentBlockHash solLib.Hash, ownerPublicKey solLib.PublicKey, ownerPrivateKey solLib.PrivateKey) (string, error) {
+func SendTransfer(solanaClient *rpc.Provider, senderPdaAddress, recipientAddress, tokenMintAddress solLib.PublicKey, amount uint64, recentBlockHash solLib.Hash, ownerPublicKey solLib.PublicKey, ownerPrivateKey solLib.PrivateKey) (string, error) {
 
 	var (
 		senderAccountMeta = solLib.NewAccountMeta(senderPdaAddress, true, false)

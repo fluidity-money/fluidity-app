@@ -7,6 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	prize_pool_queue "github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
@@ -65,7 +66,7 @@ func pubkeyFromEnv(env string) solanaGo.PublicKey {
 	return pubkey
 }
 
-func getPrizePool(solanaClient *solana.SolanaRPCHandle, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solanaGo.PublicKey, payer *solanaGo.Wallet) *big.Rat {
+func getPrizePool(solanaClient *rpc.Provider, fluidityPubkey, fluidMintPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solanaGo.PublicKey, payer *solanaGo.Wallet) *big.Rat {
 	tvl, err := prize_pool.GetTvl(
 		solanaClient,
 		fluidityPubkey,
@@ -144,7 +145,7 @@ func main() {
 
 	tokenDetails := solana.GetTokensListSolana(tokensList_)
 
-	rpcClient, err := solana.SolanaCallManager(solanaRpcUrl)
+	rpcClient, err := rpc.New(solanaRpcUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -152,8 +153,6 @@ func main() {
 			k.Payload = err
 		})
 	}
-
-	defer rpcClient.Close()
 
 	payer, err := solanaGo.WalletFromPrivateKeyBase58(payerPrikey)
 

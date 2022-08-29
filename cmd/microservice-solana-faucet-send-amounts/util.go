@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
-
-	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
-func getBlockHash(client *solana.SolanaRPCHandle) (*solana.Hash, error) {
+func getBlockHash(client *rpc.Provider) (*solana.Hash, error) {
 	blockHashResult, err := client.GetRecentBlockhash("finalized")
 
 	if err != nil {

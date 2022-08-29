@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 
 	"github.com/near/borsh-go"
 )
@@ -26,7 +27,7 @@ const SplAccountTruncatedSize = 41
 
 // GetMintAndDecimals by taking an spl-token account, getting it's data from the
 // chain, and deserialising to get the mint account and the number of decimals
-func GetMintAndDecimals(solanaClient *solana.SolanaRPCHandle, splAccount solana.PublicKey) (solana.PublicKey, uint8, error) {
+func GetMintAndDecimals(solanaClient *rpc.Provider, splAccount solana.PublicKey) (solana.PublicKey, uint8, error) {
 	resp, err := solanaClient.GetAccountInfo(splAccount)
 
 	if err != nil {
@@ -37,7 +38,14 @@ func GetMintAndDecimals(solanaClient *solana.SolanaRPCHandle, splAccount solana.
 		)
 	}
 
-	data := resp.Value.Data.GetBinary()
+	data, err := resp.GetBinary()
+
+	if err != nil {
+		return solana.PublicKey{}, 0, fmt.Errorf(
+			"failed to decode the account info: %v",
+			err,
+		)
+	}
 
 	// if there is not enough data to contain the struct
 	if len(data) < SplAccountTruncatedSize {

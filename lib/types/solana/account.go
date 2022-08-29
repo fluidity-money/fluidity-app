@@ -1,4 +1,4 @@
-package rpc
+package solana
 
 import (
 	"encoding/base64"
@@ -32,7 +32,7 @@ func (account Account) GetBinary() ([]byte, error) {
 	}
 
 	var (
-		accountData = account.Data[0]
+		accountData    = account.Data[0]
 		encodingFormat = account.Data[1]
 	)
 

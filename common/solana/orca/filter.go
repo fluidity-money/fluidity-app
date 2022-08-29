@@ -7,6 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
@@ -39,7 +40,7 @@ type ConstantProductCurveFeeData struct {
 // GetOrcaFees by checking that an orca swap occurred, then
 // destructuring the swap information to get the fee %, and
 // getting the fees paid by multiplying the value of the swap
-func GetOrcaFees(solanaClient *solana.SolanaRPCHandle, transaction types.TransactionResult, orcaProgramId string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
+func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult, orcaProgramId string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
@@ -131,7 +132,14 @@ func GetOrcaFees(solanaClient *solana.SolanaRPCHandle, transaction types.Transac
 
 		var feeData ConstantProductCurveFeeData
 
-		data := resp.Value.Data.GetBinary()
+		data, err := resp.GetBinary()
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert the data account from base64: %v",
+				err,
+			)
+		}
 
 		// make sure the data is long enough to encode the fee data
 

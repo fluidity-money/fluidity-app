@@ -5,13 +5,14 @@ import (
 	"fmt"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 )
 
 type accountResponse struct {
-	Value Account `json:"value"`
+	Value types.Account `json:"value"`
 }
 
-func (s Provider) GetAccountInfo(account_ solana.PublicKey) (*Account, error) {
+func (s Provider) GetAccountInfo(account_ solana.PublicKey) (*types.Account, error) {
 	publicKey := account_.ToBase58()
 
 	res, err := s.RawInvoke("getAccountInfo", []interface{}{

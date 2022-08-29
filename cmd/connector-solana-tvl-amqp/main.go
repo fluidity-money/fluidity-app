@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	idoQueue "github.com/fluidity-money/fluidity-app/lib/queues/ido"
@@ -89,7 +90,7 @@ func main() {
 		})
 	}
 
-	solanaClient, err := solana.SolanaCallManager(solanaRpcUrl)
+	httpClient, err := rpc.New(solanaRpcUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -99,7 +100,7 @@ func main() {
 	}
 
 	tvl, err := prize_pool.GetTvl(
-		solanaClient,
+		httpClient,
 		fluidityPubkey,
 		tvlDataPubkey,
 		solendPubkey,

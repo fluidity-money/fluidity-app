@@ -10,6 +10,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
 )
@@ -80,7 +81,7 @@ func main() {
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
 	)
 
-	solanaClient, err := solana.SolanaCallManager(rpcUrl)
+	solanaClient, err := rpc.New(rpcUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -88,8 +89,6 @@ func main() {
 			k.Payload = err
 		})
 	}
-
-	defer solanaClient.Close()
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 

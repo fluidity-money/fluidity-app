@@ -7,8 +7,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/solana"
 )
 
-// SubscribeAccount subscribes to changes to account and dies with log.Fatal
-// if something goes wrong
+// SubscribeSlots subscribes to new slots
 func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 	replies := websocket.subscribe("slotSubscribe", nil)
 

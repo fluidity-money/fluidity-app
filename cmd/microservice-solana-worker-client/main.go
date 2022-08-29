@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -105,7 +106,7 @@ func main() {
 		})
 	}
 
-	solanaClient, err := solana.SolanaCallManager(rpcUrl)
+	solanaClient, err := rpc.New(rpcUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -113,8 +114,6 @@ func main() {
 			k.Payload = err
 		})
 	}
-
-	defer solanaClient.Close()
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 

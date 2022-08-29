@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
@@ -48,7 +49,7 @@ func main() {
 		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
 
-	solanaClient, err := solana.SolanaCallManager(solanaRpcUrl)
+	solanaClient, err := rpc.New(solanaRpcUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -56,8 +57,6 @@ func main() {
 			k.Payload = err
 		})
 	}
-
-	defer solanaClient.Close()
 
 	// populate map of token sessions for each token we're tracking
 
