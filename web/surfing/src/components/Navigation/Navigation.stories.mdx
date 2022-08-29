@@ -1,15 +1,9 @@
 import { Canvas, Meta, Story } from "@storybook/addon-docs";
-import { withRouter } from "storybook-addon-react-router-v6";
 
 import Navigation from "./Navigation";
 
 <Meta title="MDX/Navigation",
   component: {Navigation},
-  decorators: {[withRouter]},
-  parameters: {
-    reactRouter: {
-      routePath: '/ecosystem',
-    }
   } />
 
 export const Template = (args) => <Navigation {...args} />;
