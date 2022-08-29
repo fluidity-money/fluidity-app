@@ -1,4 +1,4 @@
-// mostly extracted from https://github.com/gagliardetto/solana-go
+// ripped (with changes) from https://github.com/gagliardetto/solana-go
 
 package solana
 
@@ -579,8 +579,4 @@ func (tx *Transaction) MarshalBinary() ([]byte, error) {
 	output = append(output, messageContent...)
 
 	return output, nil
-}
-
-func (dt *DataBytesOrJSON) GetBinary() []byte {
-	return dt.asDecodedBinary.Content
 }
