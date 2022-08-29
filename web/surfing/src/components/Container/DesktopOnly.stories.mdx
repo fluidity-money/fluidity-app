@@ -1,6 +1,7 @@
 import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import DesktopOnly from "./DesktopOnly";
+import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
 
 <Meta
     title="Container/DesktopOnly"
@@ -20,7 +21,7 @@ export const Template = ({children, ...props}) => <DesktopOnly {...props}>
         name="Default Container"
         args={{
             children: 
-                <img src="/src/assets/react.svg"></img>
+                <ReactSvg />
         }}
     >
         {Template.bind({})}
