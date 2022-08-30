@@ -2197,27 +2197,31 @@ Main.prototype = $extend(flu_App.prototype,{
 
 		const ref = this;
 		if (this.app.window.width >= 460) {
-			const id= setInterval(
+			setTimeout(
 				function() {
-					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-					setTimeout(
+					setInterval(
 						function() {
-							clearInterval(2);
-							ref.mousePointKnown = false;
+							ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
 							setTimeout(
 								function() {
-									ref.freeze = true;
-								}, 12000, ref
+									clearInterval(2);
+									ref.mousePointKnown = false;
+									setTimeout(
+										function() {
+											ref.freeze = true;
+										}, 12000, ref
+									);
+								}, 2000, ref
 							);
-						}, 2000, ref
+						}, 500, ref
 					);
-				}, 500, ref
+				}, 3000, ref
 			);
 		}else {
 			setTimeout(
 				function() {
 					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-				}, 800, ref
+				}, 3000, ref
 			);
 		}
 		this.window = this.app.window;
