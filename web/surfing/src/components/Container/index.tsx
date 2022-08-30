@@ -1,3 +1,5 @@
 import Row from './Row';
+import DesktopOnly from './DesktopOnly';
+import Card from './Card';
 
-export default Row;
+export { Row, DesktopOnly, Card };

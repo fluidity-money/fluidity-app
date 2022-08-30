@@ -4,13 +4,21 @@ import "hardhat-docgen";
 import { task, subtask } from "hardhat/config";
 import type { HardhatUserConfig } from "hardhat/types";
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
-import { deployTokens, forknetTakeFunds, mustEnv } from './script-utils';
+import { deployTokens, deployWorkerConfig, forknetTakeFunds, mustEnv } from './script-utils';
 
 import { AAVE_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
+const emergencyCouncilKey = `FLU_ETHEREUM_EMERGENCY_COUNCIL_ADDRESS`;
+
+const operatorKey = `FLU_ETHEREUM_OPERATOR_ADDRESS`;
+
 let oracleAddress: string;
+
+let emergencyCouncilAddress: string;
+
+let operatorAddress: string;
 
 let shouldDeploy: (keyof typeof TokenList)[] = [];
 
@@ -18,6 +26,9 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
   .addOptionalParam("tokens", "the tokens to deploy")
   .setAction(async (args, hre) => {
     oracleAddress = mustEnv(oracleKey);
+    emergencyCouncilAddress = mustEnv(emergencyCouncilKey);
+    operatorAddress = mustEnv(operatorKey);
+
     shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
 
     for (const t of shouldDeploy)
@@ -36,14 +47,27 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     throw new Error(
       `Set env variable ${oracleKey} to an 0x123 encoded public key.`);
 
+  if (!emergencyCouncilAddress)
+    throw new Error(
+      `Set env variable ${emergencyCouncilKey} to an 0x123 encoded public key.`);
+
   await hre.run("forknet:take-usdt");
+
+  const workerConfigAddress = await deployWorkerConfig(
+    hre,
+    operatorAddress,
+    emergencyCouncilAddress,
+  );
 
   await deployTokens(
     hre,
     shouldDeploy.map(token => TokenList[token]),
     AAVE_POOL_PROVIDER_ADDR,
-    oracleAddress,
+    emergencyCouncilAddress,
+    operatorAddress,
+    workerConfigAddress,
   );
+
   console.log(`deployment complete`);
 });
 

@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
@@ -19,14 +21,14 @@ import (
 )
 
 func generateRandomIntegers(amount, min, max int) []int {
-	if amount > max - min + 1 {
-		log.Fatal(func (k *log.Log) {
-		   k.Format(
-			   "Can't generate %d non-repeating integers between %d and %d!",
-			   amount,
-			   min,
-			   max,
-		   )
+	if amount > max-min+1 {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Can't generate %d non-repeating integers between %d and %d!",
+				amount,
+				min,
+				max,
+			)
 		})
 	}
 
@@ -191,4 +193,12 @@ func mustEthereumAddressFromEnv(env string) ethereum.Address {
 	}
 
 	return address
+}
+
+func sendEmission(emission *worker.Emission) {
+	emission.Update()
+
+	queue.SendMessage(worker.TopicEmissions, emission)
+
+	log.Debugf("Emission: %s", emission)
 }

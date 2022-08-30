@@ -672,11 +672,7 @@ func main() {
 
 			blockAnnouncements = append(blockAnnouncements, announcement)
 
-			emission.Update()
-
-			queue.SendMessage(worker.TopicEmissions, emission)
-
-			log.Debugf("emission: %s", emission)
+			sendEmission(emission)
 		}
 
 		queue.SendMessage(publishAmqpQueueName, blockAnnouncements)

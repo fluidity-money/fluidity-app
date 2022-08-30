@@ -52,6 +52,8 @@ describe("token aave integration", async function () {
     // invest 10k fei
     await ffei.erc20In(10 ** 10);
 
+    // mine a single block to get some interest to prevent weird nondeterminism
+    await hre.network.provider.send("evm_mine");
     const initialPoolAmount = await ffei.callStatic.rewardPoolAmount();
 
     // aave uses block timestamps
@@ -59,6 +61,7 @@ describe("token aave integration", async function () {
     for (let i = 0; i < 100; i++) {
       await hre.network.provider.send("evm_mine");
     }
+    console.log("done mining");
     const finalPoolAmount = await ffei.callStatic.rewardPoolAmount();
     expectGt(finalPoolAmount, initialPoolAmount);
     console.log(`aave earned ${finalPoolAmount.sub(initialPoolAmount).toString()} interest over 99 blocks`);

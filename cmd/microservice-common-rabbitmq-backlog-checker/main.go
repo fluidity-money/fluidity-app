@@ -69,8 +69,10 @@ func main() {
 		})
 	}
 
-	messageChan := make(chan string)
-	done := make(chan bool)
+	var (
+		messageChan            = make(chan string)
+		done                   = make(chan bool)
+	)
 
 	// get reports from the channel and concat them together,
 	// then report to discord once the channel is closed
@@ -132,7 +134,13 @@ func main() {
 				})
 
 				if messagesUnacked > maxDeadLetterCount {
-					queueReport(messageChan, queue, "Dead Letter Unacked", messagesUnacked, maxDeadLetterCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Dead Letter Unacked",
+						messagesUnacked,
+						maxDeadLetterCount,
+					)
 				}
 
 				// if there's any messages on the queue, obtain the first to be logged
@@ -140,26 +148,35 @@ func main() {
 					break
 				}
 
-				msg, err := getAndRequeueFirstMessage(rmq.rmqAddress, name, vhost.Name)
-
-				if err != nil {
-					log.Fatal(func(k *log.Log) {
-						k.Message = "Failed to get the top dead letter queue message!"
-						k.Payload = err
-					})
-				}
-
-				if len(msg) > 0 && messagesReady > maxDeadLetterCount {
-					queueReportWithMessage(messageChan, queue, "Dead Letter Ready", messagesReady, maxDeadLetterCount, msg)
+				if messagesReady > maxDeadLetterCount {
+					queueReport(
+						messageChan,
+						queue,
+						"Dead Letter Ready",
+						messagesReady,
+						maxDeadLetterCount,
+					)
 				}
 
 			case false:
 				if messagesReady > maxReadyCount {
-					queueReport(messageChan, queue, "Ready", messagesReady, maxReadyCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Ready",
+						messagesReady,
+						maxReadyCount,
+					)
 				}
 
 				if messagesUnacked > maxUnackedCount {
-					queueReport(messageChan, queue, "Unacked", messagesUnacked, maxUnackedCount)
+					queueReport(
+						messageChan,
+						queue,
+						"Unacked",
+						messagesUnacked,
+						maxUnackedCount,
+					)
 				}
 			}
 		}
