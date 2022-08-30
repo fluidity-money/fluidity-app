@@ -1,6 +1,10 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package trf_data_store
 
-import solana "github.com/gagliardetto/solana-go"
+import "github.com/fluidity-money/fluidity-app/common/solana"
 
 type (
 	// TrfDataStore is the derived account storing active TRF vars

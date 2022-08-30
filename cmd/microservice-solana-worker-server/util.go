@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
@@ -9,7 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/gagliardetto/solana-go"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 func generateRandomIntegers(amount, min, max int) []int {

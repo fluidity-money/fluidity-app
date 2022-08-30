@@ -1,18 +1,21 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/near/borsh-go"
 )
@@ -116,7 +119,14 @@ func main() {
 		})
 	}
 
-	solanaClient := solanaRpc.New(rpcUrl)
+	solanaClient, err := rpc.New(rpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 
@@ -188,8 +198,7 @@ func main() {
 		})
 
 		recentBlockHashResult, err := solanaClient.GetRecentBlockhash(
-			context.Background(),
-			solanaRpc.CommitmentFinalized,
+			"finalized",
 		)
 
 		if err != nil {
@@ -371,7 +380,7 @@ and instruction data %+v`,
 			})
 		}
 
-		sig, err := solanaClient.SendTransaction(context.Background(), transaction)
+		sig, err := solanaClient.SendTransaction(transaction)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

@@ -1,12 +1,15 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -43,13 +46,20 @@ func main() {
 		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
 		raydiumProgramId   = util.GetEnvOrFatal(EnvRaydiumProgramId)
-		aldrinProgramIdV1 = util.GetEnvOrFatal(EnvAldrinV1ProgramId)
-		aldrinProgramIdV2 = util.GetEnvOrFatal(EnvAldrinV2ProgramId)
+		aldrinProgramIdV1  = util.GetEnvOrFatal(EnvAldrinV1ProgramId)
+		aldrinProgramIdV2  = util.GetEnvOrFatal(EnvAldrinV2ProgramId)
 
 		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)
 
-	solanaClient := solanaRpc.New(solanaRpcUrl)
+	solanaClient, err := rpc.New(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana call manager!"
+			k.Payload = err
+		})
+	}
 
 	worker.GetSolanaBufferedParsedTransactions(func(transactions worker.SolanaBufferedParsedTransactions) {
 		transfers := make([]worker.SolanaDecoratedTransfer, 0)

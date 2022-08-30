@@ -1,17 +1,20 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
-	"encoding/base64"
-
-	goSolana "github.com/gagliardetto/solana-go"
-	borsh "github.com/near/borsh-go"
-
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	trf_data_store "github.com/fluidity-money/fluidity-app/common/solana/trf-data-store"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/postgres/payout"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	types "github.com/fluidity-money/fluidity-app/lib/types/payout"
+	payout_types "github.com/fluidity-money/fluidity-app/lib/types/payout"
+	solana_types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	borsh "github.com/near/borsh-go"
 )
 
 const (
@@ -31,12 +34,9 @@ func main() {
 
 		trfDataStoreProgramId = util.GetEnvOrFatal(EnvTrfDataStoreProgramId)
 		solanaNetwork         = util.GetEnvOrFatal(EnvSolanaNetwork)
-
-		accountNotificationChan = make(chan solana.AccountNotification)
-		errChan                 = make(chan error)
 	)
 
-	trfDataStorePubkey, err := goSolana.PublicKeyFromBase58(
+	trfDataStorePubkey, err := solana.PublicKeyFromBase58(
 		trfDataStoreProgramId,
 	)
 
@@ -58,7 +58,7 @@ func main() {
 		trfDataStoreBytes  = [][]byte{trfDataStoreBytes_}
 	)
 
-	trfDataStorePda, _, err := goSolana.FindProgramAddress(
+	trfDataStorePda, _, err := solana.FindProgramAddress(
 		trfDataStoreBytes,
 		trfDataStorePubkey,
 	)
@@ -70,80 +70,61 @@ func main() {
 		})
 	}
 
-	solanaSubscription, err := solana.SubscribeAccount(
-		solanaWsUrl,
-		trfDataStorePda.String(),
-		accountNotificationChan,
-		errChan,
-	)
+	websocket, err := rpc.NewWebsocket(solanaWsUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "failed to subscribe to solana events!"
+			k.Message = "Failed to create a Solana websocket!"
 			k.Payload = err
 		})
 	}
 
-	defer solanaSubscription.Close()
+	websocket.SubscribeAccount(trfDataStorePda, func(account solana_types.Account) {
+		log.Debug(func(k *log.Log) {
+			k.Message = "Tribeca updated TRF vars!"
+		})
 
-	for {
-		select {
-		case accountNotification := <-accountNotificationChan:
-			log.Debug(func(k *log.Log) {
-				k.Message = "Tribeca updated TRF vars!"
-			})
+		var trfDataStoreData trf_data_store.TrfDataStore
 
-			var trfDataStoreData trf_data_store.TrfDataStore
+		trfDataStoreDataBinary, err := account.GetBinary()
 
-			trfDataStoreDataBase64 := accountNotification.Value.Data[0]
-
-			trfDataStoreDataBinary, err := base64.StdEncoding.DecodeString(trfDataStoreDataBase64)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "failed to decode account data from base64!"
-					k.Payload = err
-				})
-			}
-
-			// remove account discriminator from data binary
-			trfDataStoreAccData := trfDataStoreDataBinary[8:]
-
-			err = borsh.Deserialize(&trfDataStoreData, trfDataStoreAccData)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "failed to decode data account!"
-					k.Payload = err
-				})
-			}
-
-			var (
-				deltaWeightNum   = trfDataStoreData.DeltaWeightNum
-				deltaWeightDenom = trfDataStoreData.DeltaWeightDenom
-				winningClasses   = trfDataStoreData.WinningClasses
-				payoutFreqNum    = trfDataStoreData.PayoutFreqNum
-				payoutFreqDenom  = trfDataStoreData.PayoutFreqDenom
-			)
-
-			trfVars := types.TrfVars{
-				Chain:            "solana",
-				Network:          solanaNetwork,
-				PayoutFreqNum:    int64(payoutFreqNum),
-				PayoutFreqDenom:  int64(payoutFreqDenom),
-				DeltaWeightNum:   int64(deltaWeightNum),
-				DeltaWeightDenom: int64(deltaWeightDenom),
-				WinningClasses:   int(winningClasses),
-			}
-
-			database.InsertTrfVars(trfVars)
-
-		case err := <-errChan:
+		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "error from the Solana websocket!"
+				k.Message = "failed to decode account data from base64!"
 				k.Payload = err
 			})
 		}
-	}
 
+		// remove account discriminator from data binary
+		trfDataStoreAccData := trfDataStoreDataBinary[8:]
+
+		err = borsh.Deserialize(&trfDataStoreData, trfDataStoreAccData)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "failed to decode data account!"
+				k.Payload = err
+			})
+		}
+
+		var (
+			deltaWeightNum   = trfDataStoreData.DeltaWeightNum
+			deltaWeightDenom = trfDataStoreData.DeltaWeightDenom
+			winningClasses   = trfDataStoreData.WinningClasses
+			payoutFreqNum    = trfDataStoreData.PayoutFreqNum
+			payoutFreqDenom  = trfDataStoreData.PayoutFreqDenom
+		)
+
+		trfVars := payout_types.TrfVars{
+			Chain:            "solana",
+			Network:          solanaNetwork,
+			PayoutFreqNum:    int64(payoutFreqNum),
+			PayoutFreqDenom:  int64(payoutFreqDenom),
+			DeltaWeightNum:   int64(deltaWeightNum),
+			DeltaWeightDenom: int64(deltaWeightDenom),
+			WinningClasses:   int(winningClasses),
+		}
+
+		database.InsertTrfVars(trfVars)
+	})
 }

@@ -1,15 +1,18 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package spl_token
 
 import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
-
-	solLib "github.com/gagliardetto/solana-go"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 func init() {
 	var err error
 
-	TokenProgramAddressPubkey, err = solLib.PublicKeyFromBase58(
+	TokenProgramAddressPubkey, err = solana.PublicKeyFromBase58(
 		TokenProgramAddress,
 	)
 
@@ -22,7 +25,7 @@ func init() {
 		})
 	}
 
-	TokenAssociatedProgramAddressPubkey, err = solLib.PublicKeyFromBase58(
+	TokenAssociatedProgramAddressPubkey, err = solana.PublicKeyFromBase58(
 		TokenAssociatedProgramAddress,
 	)
 

@@ -1,19 +1,21 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
-
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
-func getBlockHash(client *solanaRpc.Client) (*solana.Hash, error) {
-	blockHashResult, err := client.GetRecentBlockhash(context.Background(), "finalized")
+func getBlockHash(client *rpc.Provider) (*solana.Hash, error) {
+	blockHashResult, err := client.GetRecentBlockhash("finalized")
 
 	if err != nil {
 		return nil, fmt.Errorf(

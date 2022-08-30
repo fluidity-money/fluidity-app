@@ -1,19 +1,20 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
 	"os"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
-
-	solanaGo "github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -33,9 +34,9 @@ const (
 )
 
 type faucetTokenDetails struct {
-	mintPubkey   solanaGo.PublicKey
-	pdaPubkey    solanaGo.PublicKey
-	signerWallet *solanaGo.Wallet
+	mintPubkey   solana.PublicKey
+	pdaPubkey    solana.PublicKey
+	signerWallet *solana.Wallet
 }
 
 type tokenMap map[faucetTypes.FaucetSupportedToken]faucetTokenDetails
@@ -52,7 +53,14 @@ func main() {
 		testingEnabled = os.Getenv(EnvSolanaDebugFakePayouts) == "true"
 	)
 
-	solanaClient := solanaRpc.New(solanaRpcUrl)
+	solanaClient, err := rpc.New(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
 
 	// populate map of token sessions for each token we're tracking
 
@@ -106,15 +114,11 @@ func main() {
 			return
 		}
 
-		recipientAddress, err := solanaGo.PublicKeyFromBase58(address_)
+		recipientAddress, err := solana.PublicKeyFromBase58(address_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get the public key from the recipient address of %v!",
-					address_,
-				)
-
+				k.Message = "Failed to convert a faucet public key!"
 				k.Payload = err
 			})
 		}

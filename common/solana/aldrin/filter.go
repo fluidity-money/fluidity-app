@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package aldrin
 
 import (
@@ -5,18 +9,17 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/btcsuite/btcutil/base58"
-
-	solLib "github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
+
+	"github.com/btcsuite/btcutil/base58"
 )
 
 // AldrinSwapInstructionSize is the size of an Aldrin swap instruction enum
@@ -32,14 +35,14 @@ type SwapInstruction struct {
 }
 
 // GetAldrinFees by taking 0.25% of the transaction value
-func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, aldrinProgramID string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
+func GetAldrinFees(solanaClient *rpc.Provider, transaction types.TransactionResult, aldrinProgramID string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
 		accountKeys          = transaction.Transaction.Message.AccountKeys
 	)
 
-	allInstructions := solLib.GetAllInstructions(transaction)
+	allInstructions := solana.GetAllInstructions(transaction)
 
 	var (
 		// aldrinStableFeeRat is the Aldrin fee percentage for stable swaps (0.038%)
@@ -321,11 +324,11 @@ func GetAldrinFees(solanaClient *solanaRpc.Client, transaction types.Transaction
 	return feesPaid, nil
 }
 
-func isAldrinStableSwap(solanaClient *solanaRpc.Client, instructions []types.TransactionInstruction, innerInstructions []types.TransactionInnerInstruction, instruction types.TransactionInstruction, instructionNumber int, numBaseInstruction int, accountKeys []string) (bool, error) {
+func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.TransactionInstruction, innerInstructions []types.TransactionInnerInstruction, instruction types.TransactionInstruction, instructionNumber int, numBaseInstruction int, accountKeys []string) (bool, error) {
 
 	var (
 		// the inner instruction containing the Aldrin fee mintTo
-		feeMintInstruction             types.TransactionInstruction
+		feeMintInstruction types.TransactionInstruction
 		// the inner instruction containing the transfer of funds to the destination
 		destinationTransferInstruction types.TransactionInstruction
 	)
@@ -333,12 +336,12 @@ func isAldrinStableSwap(solanaClient *solanaRpc.Client, instructions []types.Tra
 	if instructionNumber <= numBaseInstruction {
 		// get the second and third inner instructions originating from this instruction
 		innerInstruction := innerInstructions[numBaseInstruction]
-		feeMintInstruction             = innerInstruction.Instructions[1]
+		feeMintInstruction = innerInstruction.Instructions[1]
 		destinationTransferInstruction = innerInstruction.Instructions[2]
 	} else {
 		// get the two inner instructions one after next
-		feeMintInstruction             = instructions[numBaseInstruction + 2]
-		destinationTransferInstruction = instructions[numBaseInstruction + 3]
+		feeMintInstruction = instructions[numBaseInstruction+2]
+		destinationTransferInstruction = instructions[numBaseInstruction+3]
 	}
 
 	feeMintInstructionData := base58.Decode(feeMintInstruction.Data)
@@ -357,10 +360,13 @@ func isAldrinStableSwap(solanaClient *solanaRpc.Client, instructions []types.Tra
 	// public key of the aldrin fee token account
 	aldrinFeeTokenAccountPubkeyString := accountKeys[destinationTransferInstruction.Accounts[1]]
 
-	aldrinFeeTokenAccountPubkey, err := solana.PublicKeyFromBase58(aldrinFeeTokenAccountPubkeyString)
+	aldrinFeeTokenAccountPubkey, err := solana.PublicKeyFromBase58(
+		aldrinFeeTokenAccountPubkeyString,
+	)
+
 	if err != nil {
 		return false, fmt.Errorf(
-			"failed to get Aldrin destination spl-token public key from string %#v! %v",
+			"failed to get Aldrin destination spl-token public key from string %#v: %v",
 			aldrinFeeTokenAccountPubkeyString,
 			err,
 		)
