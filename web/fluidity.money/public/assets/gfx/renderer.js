@@ -2195,8 +2195,14 @@ Main.prototype = $extend(flu_App.prototype,{
 	}
 	,ready: function() {
 
-		const ref = this;
 		
+		this.window = this.app.window;
+		this.init();
+		this.window.onevent = $bind(this,this.onWindowEvent);
+		this.window.onrender = $bind(this,this.render);
+
+		const ref = this;
+		if (this.app.window.width >= 460) {
 		setTimeout(
 			function() {
 				ref.mousePointKnown = false;
@@ -2213,11 +2219,15 @@ Main.prototype = $extend(flu_App.prototype,{
 					}, 200, ref
 				);
 			}, 10000, ref
-		);
-		this.window = this.app.window;
-		this.init();
-		this.window.onevent = $bind(this,this.onWindowEvent);
-		this.window.onrender = $bind(this,this.render);
+		);		
+			
+		}else {
+			setTimeout(
+				function() {
+					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+				}, 3000, ref
+			);
+		}
 	}
 	
 	,init: function() {
