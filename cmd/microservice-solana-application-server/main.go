@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -48,7 +48,7 @@ func main() {
 		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)
 
-	solanaClient, err := solana.SolanaCallManager(solanaRpcUrl)
+	solanaClient, err := rpc.New(solanaRpcUrl)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -56,8 +56,6 @@ func main() {
 			k.Payload = err
 		})
 	}
-
-	defer solanaClient.Close()
 
 	worker.GetSolanaBufferedParsedTransactions(func(transactions worker.SolanaBufferedParsedTransactions) {
 		transfers := make([]worker.SolanaDecoratedTransfer, 0)
