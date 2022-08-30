@@ -61,15 +61,24 @@ const Landing = () => {
             transition={{ duration: 4, type: "tween" }}
             className={styles.left}
           >
-            <IntroTile type={"star"} side={"left"}>
+            <IntroTile
+              img={"/assets/images/landingIcons/1to1.svg"}
+              side={"left"}
+            >
               1 to 1 exchange rate, <br />
               to base wrapped assets
             </IntroTile>
-            <IntroTile type={"star"} side={"left"}>
+            <IntroTile
+              img={"/assets/images/useCaseIcons/sendReceive.svg"}
+              side={"left"}
+            >
               Senders and receivers <br />
               both qualify
             </IntroTile>
-            <IntroTile type={"ellipse"} side={"left"}>
+            <IntroTile
+              img={"/assets/images/landingIcons/everyTransaction.svg"}
+              side={"left"}
+            >
               Every transaction <br />
               qualifies as a reward
             </IntroTile>
@@ -90,14 +99,23 @@ const Landing = () => {
             transition={{ duration: 4, type: "tween" }}
             className={styles.right}
           >
-            <IntroTile type={"star"} side={"right"}>
+            <IntroTile
+              img={"/assets/images/landingIcons/expectedOutcome.svg"}
+              side={"right"}
+            >
               Fluidity improves your expected <br />
               outcome over time
             </IntroTile>
-            <IntroTile type={"ellipse"} side={"right"}>
+            <IntroTile
+              img={"/assets/images/useCaseIcons/forReceivers.svg"}
+              side={"right"}
+            >
               Rewards can be significant
             </IntroTile>
-            <IntroTile type={"ellipse"} side={"right"}>
+            <IntroTile
+              img={"/assets/images/landingIcons/scalingEcosystem.svg"}
+              side={"right"}
+            >
               Scaling ecosystem
             </IntroTile>
           </motion.div>
