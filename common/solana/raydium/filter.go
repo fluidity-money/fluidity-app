@@ -4,18 +4,17 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/btcsuite/btcutil/base58"
-
-	solLib "github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
+
+	"github.com/btcsuite/btcutil/base58"
 )
 
 const (
@@ -33,14 +32,14 @@ type SwapInstruction struct {
 }
 
 // GetRaydiumFees by taking 0.25% of the transaction value
-func GetRaydiumFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, raydiumProgramID string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
+func GetRaydiumFees(solanaClient *rpc.Provider, transaction types.TransactionResult, raydiumProgramID string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
 		accountKeys          = transaction.Transaction.Message.AccountKeys
 	)
 
-	allInstructions := solLib.GetAllInstructions(transaction)
+	allInstructions := solana.GetAllInstructions(transaction)
 
 	// raydiumFeeRat is the Raydium fee percentage (0.25%)
 	raydiumFeeRat := big.NewRat(25, 10000)

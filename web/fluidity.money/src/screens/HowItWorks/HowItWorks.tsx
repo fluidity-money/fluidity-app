@@ -1,6 +1,6 @@
 import ContinuousCarousel from "components/ContinuousCarousel";
 import React, { useEffect, useState } from "react";
-import { GeneralButton } from "../../components/Button";
+import { GeneralButton, LinkButton } from "../../components/Button";
 import styles from "./HowItWorks.module.scss";
 
 const HowItWorks = () => {
@@ -65,14 +65,9 @@ const HowItWorks = () => {
           >
             The user is incentivised through governance.
           </p>
-          <GeneralButton
-            version={"primary"}
-            type={"text"}
-            size={"medium"}
-            handleClick={() => {}}
-          >
-            MORE ON HOW IT WORKS
-          </GeneralButton>
+          <LinkButton type={"internal"} size={"medium"} handleClick={() => {}}>
+            HOW IT WORKS
+          </LinkButton>
         </div>
         <div className={styles.right}>
           <div>{currentImage}</div>

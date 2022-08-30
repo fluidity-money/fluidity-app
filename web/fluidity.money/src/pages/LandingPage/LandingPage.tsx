@@ -1,5 +1,6 @@
 import React from "react";
 import Articles from "screens/Articles";
+import Ecosystem from "screens/Ecosystem";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
 import HowItWorks from "../../screens/HowItWorks";
@@ -21,6 +22,7 @@ const LandingPage = () => {
         <UseCases />
         <SponsorsPartners />
         {/* Ecosystem which scrolls to projects as a component */}
+        <Ecosystem />
         <Projects />
         {/* Resources not articles */}
         <Resources />

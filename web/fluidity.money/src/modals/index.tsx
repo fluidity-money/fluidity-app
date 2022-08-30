@@ -1,3 +1,4 @@
 import SearchModal from "./SearchModal";
+import ResourcesNavModal from "./ResourcesNavModal/ResourcesNavModal";
 
-export default SearchModal;
+export { SearchModal, ResourcesNavModal };

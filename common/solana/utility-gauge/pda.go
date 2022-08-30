@@ -3,7 +3,7 @@ package utility_gauge
 import (
 	"encoding/binary"
 
-	solana "github.com/gagliardetto/solana-go"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 func DeriveEpochGaugePubkey(program, gauge solana.PublicKey, epoch uint32) (solana.PublicKey, uint8, error) {

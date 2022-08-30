@@ -48,6 +48,11 @@ const SearchModal = ({ closeModal }: ISearchModalProps) => {
         ← BACK
       </div>
       <div className={styles.search}>
+        <img
+          className={styles.icon}
+          src="/assets/images/magnifyingGlass.svg"
+          alt="search icon"
+        />
         <input
           type="text"
           placeholder="Search"
@@ -65,14 +70,18 @@ const SearchModal = ({ closeModal }: ISearchModalProps) => {
           }}
           version={"secondary"}
           type={"text"}
-          size={"small"}
+          size={"large"}
         >
           CLEAR
         </GeneralButton>
       </div>
       <div className={styles.titles}>
         <h4>{`${searchProjects.length} Projects`}</h4>
-        <h4 onClick={() => sortProjects()}>Sort by Top Prize $$$ v</h4>
+        <div className={styles.sort}>
+          <h4 onClick={() => sortProjects()}>Sort by</h4>
+          <h4 className={styles.gray}>Top Prize $$$</h4>
+          <img src="/assets/images/triangleDown.svg" alt="sort" />
+        </div>
       </div>
       <div className={styles.grid}>
         {searchProjects.map((project) => (
