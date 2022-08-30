@@ -10,6 +10,7 @@ import FluidStatsPage from "./pages/FluidStatsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 
 function App() {
+  console.log("hello");
   return (
     <Router>
       <div className="App">

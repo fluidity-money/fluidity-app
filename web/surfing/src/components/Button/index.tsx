@@ -1,12 +1,12 @@
-import FilterButton from "./FilterButton";
 import AnchorButton from "./AnchorButton";
+import FilterButton from "./FilterButton";
 import GeneralButton from "./GeneralButton/GeneralButton";
 import LinkButton from "./LinkButton";
 import TabButton from "./TabButton";
 
 export {
-  FilterButton,
   AnchorButton,
+  FilterButton,
   GeneralButton,
   LinkButton,
   TabButton,
