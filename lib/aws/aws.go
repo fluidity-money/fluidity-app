@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -12,7 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 // UploadToBucket to put a file in a bucket
@@ -35,7 +36,13 @@ func UploadToBucket(session *session.Session, fileContent io.ReadSeeker, fileNam
 		)
 	}
 
-	fmt.Printf("Successfully uploaded %v to %v\n", fileName, bucketName)
+	log.Debug(func(k *log.Log) {
+		k.Format(
+			"Successfully uploaded %v to %v",
+			fileName,
+			bucketName,
+		)
+	})
 
 	return output, nil
 }
@@ -43,7 +50,13 @@ func UploadToBucket(session *session.Session, fileContent io.ReadSeeker, fileNam
 // CreateBucket to create a new bucket
 func CreateBucket(session *session.Session, bucketName, acl string) (*s3.CreateBucketOutput, error) {
 
-	fmt.Printf("creating bucket %v with acl %v\n", bucketName, acl)
+	log.Debug(func(k *log.Log) {
+		k.Format(
+			"Creating bucket %v with ACL %v",
+			bucketName,
+			acl,
+		)
+	})
 
 	svc := s3.New(session)
 	// Create the S3 Bucket
@@ -61,8 +74,6 @@ func CreateBucket(session *session.Session, bucketName, acl string) (*s3.CreateB
 	}
 
 	// Wait until bucket is created before finishing
-	fmt.Printf("Waiting for bucket %v to be created...\n", bucketName)
-
 	err = svc.WaitUntilBucketExists(&s3.HeadBucketInput{
 		Bucket: &bucketName,
 	})
