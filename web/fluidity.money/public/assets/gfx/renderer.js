@@ -2211,7 +2211,7 @@ Main.prototype = $extend(flu_App.prototype,{
 							);
 						}, 2000, ref
 					);
-				}, 100, ref
+				}, 500, ref
 			);
 		}else {
 			setTimeout(
