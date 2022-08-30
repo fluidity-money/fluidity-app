@@ -1,12 +1,12 @@
 (function (console, $global) { "use strict";
-var $hxClasses = {},$estr = function() { return js_Boot.__string_rec(this,''); };
+let $hxClasses = {},$estr = function() { return js_Boot.__string_rec(this,''); };
 function $extend(from, fields) {
-	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
-	for (var name in fields) proto[name] = fields[name];
+	function Inherit() {} Inherit.prototype = from; let proto = new Inherit();
+	for (let name in fields) proto[name] = fields[name];
 	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
 }
-var EReg = function(r,opt) {
+let EReg = function(r,opt) {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
 };
@@ -20,13 +20,13 @@ EReg.prototype = {
 		return this.r.m != null;
 	}
 	,matched: function(n) {
-		var tmp;
+		let tmp;
 		if(this.r.m != null && n >= 0 && n < this.r.m.length) tmp = this.r.m[n]; else throw new js__$Boot_FluidError("EReg::matched");
 		return tmp;
 	}
 	,matchedRight: function() {
 		if(this.r.m == null) throw new js__$Boot_FluidError("No string matched");
-		var sz = this.r.m.index + this.r.m[0].length;
+		let sz = this.r.m.index + this.r.m[0].length;
 		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
 	}
 	,matchedPos: function() {
@@ -38,16 +38,16 @@ EReg.prototype = {
 	}
 	,__class__: EReg
 };
-var GPUCapabilities = function() { };
+let GPUCapabilities = function() { };
 $hxClasses["GPUCapabilities"] = GPUCapabilities;
 GPUCapabilities.__name__ = true;
 GPUCapabilities.get_writeToFloat = function() {
 	if(GPUCapabilities.get_extTextureFloat() == null) return false;
-	var texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : 5126, filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
-	var framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
+	let texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : 5126, filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
+	let framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
 	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
 	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
-	var isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
+	let isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
 	flu_modules_opengl_web_GL.current_context.deleteTexture(texture);
 	flu_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
 	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
@@ -56,11 +56,11 @@ GPUCapabilities.get_writeToFloat = function() {
 };
 GPUCapabilities.get_writeToHalfFloat = function() {
 	if(GPUCapabilities.get_extTextureHalfFloat() == null) return false;
-	var texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : GPUCapabilities.get_HALF_FLOAT(), filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
-	var framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
+	let texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : GPUCapabilities.get_HALF_FLOAT(), filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
+	let framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
 	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
 	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
-	var isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
+	let isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
 	flu_modules_opengl_web_GL.current_context.deleteTexture(texture);
 	flu_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
 	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
@@ -77,7 +77,7 @@ GPUCapabilities.get_halfFloatTextureLinear = function() {
 };
 GPUCapabilities.get_HALF_FLOAT = function() {
 	if(GPUCapabilities._HALF_FLOAT == null) {
-		var ext = GPUCapabilities.get_extTextureHalfFloat();
+		let ext = GPUCapabilities.get_extTextureHalfFloat();
 		if(ext != null) GPUCapabilities._HALF_FLOAT = ext.HALF_FLOAT_OES; else GPUCapabilities._HALF_FLOAT = 36193;
 	}
 	return GPUCapabilities._HALF_FLOAT;
@@ -98,7 +98,7 @@ GPUCapabilities.get_extTextureHalfFloatLinear = function() {
 	if(GPUCapabilities._extTextureHalfFloatLinear == null) GPUCapabilities._extTextureHalfFloatLinear = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_half_float_linear");
 	return GPUCapabilities._extTextureHalfFloatLinear;
 };
-var GPUFluid = function(width,height,cellSize,solverIterations) {
+let GPUFluid = function(width,height,cellSize,solverIterations) {
 	if(solverIterations == null) solverIterations = 18;
 	if(cellSize == null) cellSize = 8;
 	this.clearPressureShader = new ClearPressure();
@@ -117,23 +117,23 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	this.solverIterations = solverIterations;
 	this.aspectRatio = this.width / this.height;
 	this.cellSize = cellSize;
-	var _this = this.advectShader.rdx;
+	let _this = this.advectShader.rdx;
 	_this.dirty = true;
 	_this.data = 1 / this.cellSize;
-	var _this1 = this.advectVelocityShader.rdx;
+	let _this1 = this.advectVelocityShader.rdx;
 	_this1.dirty = true;
 	_this1.data = 1 / this.cellSize;
-	var _this2 = this.divergenceShader.halfrdx;
+	let _this2 = this.divergenceShader.halfrdx;
 	_this2.dirty = true;
 	_this2.data = 0.5 * (1 / this.cellSize);
-	var _this3 = this.pressureGradientSubstractShader.halfrdx;
+	let _this3 = this.pressureGradientSubstractShader.halfrdx;
 	_this3.dirty = true;
 	_this3.data = 0.5 * (1 / this.cellSize);
-	var _this4 = this.pressureSolveShader.alpha;
+	let _this4 = this.pressureSolveShader.alpha;
 	_this4.dirty = true;
 	_this4.data = -this.cellSize * this.cellSize;
 	this.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad();
-	var floatDataType = null;
+	let floatDataType = null;
 	if(GPUCapabilities.get_writeToFloat()) {
 		floatDataType = 5126;
 		GPUCapabilities.get_floatTextureLinear();
@@ -143,26 +143,26 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	}
 	this.floatVelocity = this.floatPressure = this.floatDivergence = floatDataType != null;
 	this.floatDye = false;
-	var tmp;
-	var params = { channelType : 6408, dataType : this.floatVelocity?floatDataType:5121, filter : 9728};
+	let tmp;
+	let params = { channelType : 6408, dataType : this.floatVelocity?floatDataType:5121, filter : 9728};
 	tmp = function(width1,height1) {
 		return gltoolbox_TextureTools.createTexture(width1,height1,params);
 	};
 	this.velocityRenderTarget = new gltoolbox_render_RenderTarget2Phase(width,height,tmp);
-	var tmp1;
-	var params1 = { channelType : 6407, dataType : this.floatPressure?floatDataType:5121, filter : 9728};
+	let tmp1;
+	let params1 = { channelType : 6407, dataType : this.floatPressure?floatDataType:5121, filter : 9728};
 	tmp1 = function(width2,height2) {
 		return gltoolbox_TextureTools.createTexture(width2,height2,params1);
 	};
 	this.pressureRenderTarget = new gltoolbox_render_RenderTarget2Phase(width,height,tmp1);
-	var tmp2;
-	var params2 = { channelType : 6407, dataType : this.floatDivergence?floatDataType:5121, filter : 9728};
+	let tmp2;
+	let params2 = { channelType : 6407, dataType : this.floatDivergence?floatDataType:5121, filter : 9728};
 	tmp2 = function(width3,height3) {
 		return gltoolbox_TextureTools.createTexture(width3,height3,params2);
 	};
 	this.divergenceRenderTarget = new gltoolbox_render_RenderTarget(width,height,tmp2);
-	var tmp3;
-	var params3 = { channelType : 6407, dataType : this.floatDye?floatDataType:5121, filter : 9729};
+	let tmp3;
+	let params3 = { channelType : 6407, dataType : this.floatDye?floatDataType:5121, filter : 9729};
 	tmp3 = function(width4,height4) {
 		return gltoolbox_TextureTools.createTexture(width4,height4,params3);
 	};
@@ -171,22 +171,22 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
 	flu_modules_opengl_web_GL.current_context.disable(3042);
 	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-	var shader = this.clearVelocityShader;
+	let shader = this.clearVelocityShader;
 	if(shader._active) {
-		var _g = 0;
-		var _g1 = shader._uniforms;
+		let _g = 0;
+		let _g1 = shader._uniforms;
 		while(_g < _g1.length) {
-			var u = _g1[_g];
+			let u = _g1[_g];
 			++_g;
 			u.apply();
 		}
-		var offset = 0;
-		var _g11 = 0;
-		var _g2 = shader._attributes.length;
+		let offset = 0;
+		let _g11 = 0;
+		let _g2 = shader._attributes.length;
 		while(_g11 < _g2) {
-			var i = _g11++;
-			var att = shader._attributes[i];
-			var location = att.location;
+			let i = _g11++;
+			let att = shader._attributes[i];
+			let location = att.location;
 			if(location != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -196,20 +196,20 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	} else {
 		if(!shader._ready) shader.create();
 		flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-		var _g3 = 0;
-		var _g12 = shader._uniforms;
+		let _g3 = 0;
+		let _g12 = shader._uniforms;
 		while(_g3 < _g12.length) {
-			var u1 = _g12[_g3];
+			let u1 = _g12[_g3];
 			++_g3;
 			u1.apply();
 		}
-		var offset1 = 0;
-		var _g13 = 0;
-		var _g4 = shader._attributes.length;
+		let offset1 = 0;
+		let _g13 = 0;
+		let _g4 = shader._attributes.length;
 		while(_g13 < _g4) {
-			var i1 = _g13++;
-			var att1 = shader._attributes[i1];
-			var location1 = att1.location;
+			let i1 = _g13++;
+			let att1 = shader._attributes[i1];
+			let location1 = att1.location;
 			if(location1 != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -221,29 +221,29 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	this.velocityRenderTarget.activate();
 	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 	shader.deactivate();
-	var _this5 = this.velocityRenderTarget;
+	let _this5 = this.velocityRenderTarget;
 	_this5.tmpFBO = _this5.writeFrameBufferObject;
 	_this5.writeFrameBufferObject = _this5.readFrameBufferObject;
 	_this5.readFrameBufferObject = _this5.tmpFBO;
 	_this5.tmpTex = _this5.writeToTexture;
 	_this5.writeToTexture = _this5.readFromTexture;
 	_this5.readFromTexture = _this5.tmpTex;
-	var shader1 = this.clearPressureShader;
+	let shader1 = this.clearPressureShader;
 	if(shader1._active) {
-		var _g5 = 0;
-		var _g14 = shader1._uniforms;
+		let _g5 = 0;
+		let _g14 = shader1._uniforms;
 		while(_g5 < _g14.length) {
-			var u2 = _g14[_g5];
+			let u2 = _g14[_g5];
 			++_g5;
 			u2.apply();
 		}
-		var offset2 = 0;
-		var _g15 = 0;
-		var _g6 = shader1._attributes.length;
+		let offset2 = 0;
+		let _g15 = 0;
+		let _g6 = shader1._attributes.length;
 		while(_g15 < _g6) {
-			var i2 = _g15++;
-			var att2 = shader1._attributes[i2];
-			var location2 = att2.location;
+			let i2 = _g15++;
+			let att2 = shader1._attributes[i2];
+			let location2 = att2.location;
 			if(location2 != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -253,20 +253,20 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	} else {
 		if(!shader1._ready) shader1.create();
 		flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-		var _g7 = 0;
-		var _g16 = shader1._uniforms;
+		let _g7 = 0;
+		let _g16 = shader1._uniforms;
 		while(_g7 < _g16.length) {
-			var u3 = _g16[_g7];
+			let u3 = _g16[_g7];
 			++_g7;
 			u3.apply();
 		}
-		var offset3 = 0;
-		var _g17 = 0;
-		var _g8 = shader1._attributes.length;
+		let offset3 = 0;
+		let _g17 = 0;
+		let _g8 = shader1._attributes.length;
 		while(_g17 < _g8) {
-			var i3 = _g17++;
-			var att3 = shader1._attributes[i3];
-			var location3 = att3.location;
+			let i3 = _g17++;
+			let att3 = shader1._attributes[i3];
+			let location3 = att3.location;
 			if(location3 != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -278,14 +278,14 @@ var GPUFluid = function(width,height,cellSize,solverIterations) {
 	this.pressureRenderTarget.activate();
 	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 	shader1.deactivate();
-	var _this6 = this.pressureRenderTarget;
+	let _this6 = this.pressureRenderTarget;
 	_this6.tmpFBO = _this6.writeFrameBufferObject;
 	_this6.writeFrameBufferObject = _this6.readFrameBufferObject;
 	_this6.readFrameBufferObject = _this6.tmpFBO;
 	_this6.tmpTex = _this6.writeToTexture;
 	_this6.writeToTexture = _this6.readFromTexture;
 	_this6.readFromTexture = _this6.tmpTex;
-	var _this7 = this.dyeRenderTarget;
+	let _this7 = this.dyeRenderTarget;
 	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this7.readFrameBufferObject);
 	flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
 	flu_modules_opengl_web_GL.current_context.clear(16384);
@@ -297,15 +297,15 @@ $hxClasses["GPUFluid"] = GPUFluid;
 GPUFluid.__name__ = true;
 GPUFluid.prototype = {
 	updateAllCoreShaderUniforms: function() {
-		var shader = this.advectShader;
+		let shader = this.advectShader;
 		if(shader == null) {
 		} else {
-			var _this = shader.aspectRatio;
+			let _this = shader.aspectRatio;
 			_this.dirty = true;
 			_this.data = this.aspectRatio;
 			shader.invresolution.data.x = 1 / this.width;
 			shader.invresolution.data.y = 1 / this.height;
-			var v;
+			let v;
 			v = this.floatVelocity?"true":"false";
 			if(shader.FLOAT_VELOCITY != v) shader.set_FLOAT_VELOCITY(v);
 			v = this.floatPressure?"true":"false";
@@ -313,15 +313,15 @@ GPUFluid.prototype = {
 			v = this.floatDivergence?"true":"false";
 			if(shader.FLOAT_DIVERGENCE != v) shader.set_FLOAT_DIVERGENCE(v);
 		}
-		var shader1 = this.advectVelocityShader;
+		let shader1 = this.advectVelocityShader;
 		if(shader1 == null) {
 		} else {
-			var _this1 = shader1.aspectRatio;
+			let _this1 = shader1.aspectRatio;
 			_this1.dirty = true;
 			_this1.data = this.aspectRatio;
 			shader1.invresolution.data.x = 1 / this.width;
 			shader1.invresolution.data.y = 1 / this.height;
-			var v1;
+			let v1;
 			v1 = this.floatVelocity?"true":"false";
 			if(shader1.FLOAT_VELOCITY != v1) shader1.set_FLOAT_VELOCITY(v1);
 			v1 = this.floatPressure?"true":"false";
@@ -329,15 +329,15 @@ GPUFluid.prototype = {
 			v1 = this.floatDivergence?"true":"false";
 			if(shader1.FLOAT_DIVERGENCE != v1) shader1.set_FLOAT_DIVERGENCE(v1);
 		}
-		var shader2 = this.divergenceShader;
+		let shader2 = this.divergenceShader;
 		if(shader2 == null) {
 		} else {
-			var _this2 = shader2.aspectRatio;
+			let _this2 = shader2.aspectRatio;
 			_this2.dirty = true;
 			_this2.data = this.aspectRatio;
 			shader2.invresolution.data.x = 1 / this.width;
 			shader2.invresolution.data.y = 1 / this.height;
-			var v2;
+			let v2;
 			v2 = this.floatVelocity?"true":"false";
 			if(shader2.FLOAT_VELOCITY != v2) shader2.set_FLOAT_VELOCITY(v2);
 			v2 = this.floatPressure?"true":"false";
@@ -345,15 +345,15 @@ GPUFluid.prototype = {
 			v2 = this.floatDivergence?"true":"false";
 			if(shader2.FLOAT_DIVERGENCE != v2) shader2.set_FLOAT_DIVERGENCE(v2);
 		}
-		var shader3 = this.pressureSolveShader;
+		let shader3 = this.pressureSolveShader;
 		if(shader3 == null) {
 		} else {
-			var _this3 = shader3.aspectRatio;
+			let _this3 = shader3.aspectRatio;
 			_this3.dirty = true;
 			_this3.data = this.aspectRatio;
 			shader3.invresolution.data.x = 1 / this.width;
 			shader3.invresolution.data.y = 1 / this.height;
-			var v3;
+			let v3;
 			v3 = this.floatVelocity?"true":"false";
 			if(shader3.FLOAT_VELOCITY != v3) shader3.set_FLOAT_VELOCITY(v3);
 			v3 = this.floatPressure?"true":"false";
@@ -361,15 +361,15 @@ GPUFluid.prototype = {
 			v3 = this.floatDivergence?"true":"false";
 			if(shader3.FLOAT_DIVERGENCE != v3) shader3.set_FLOAT_DIVERGENCE(v3);
 		}
-		var shader4 = this.pressureGradientSubstractShader;
+		let shader4 = this.pressureGradientSubstractShader;
 		if(shader4 == null) {
 		} else {
-			var _this4 = shader4.aspectRatio;
+			let _this4 = shader4.aspectRatio;
 			_this4.dirty = true;
 			_this4.data = this.aspectRatio;
 			shader4.invresolution.data.x = 1 / this.width;
 			shader4.invresolution.data.y = 1 / this.height;
-			var v4;
+			let v4;
 			v4 = this.floatVelocity?"true":"false";
 			if(shader4.FLOAT_VELOCITY != v4) shader4.set_FLOAT_VELOCITY(v4);
 			v4 = this.floatPressure?"true":"false";
@@ -377,15 +377,15 @@ GPUFluid.prototype = {
 			v4 = this.floatDivergence?"true":"false";
 			if(shader4.FLOAT_DIVERGENCE != v4) shader4.set_FLOAT_DIVERGENCE(v4);
 		}
-		var shader5 = this.clearVelocityShader;
+		let shader5 = this.clearVelocityShader;
 		if(shader5 == null) {
 		} else {
-			var _this5 = shader5.aspectRatio;
+			let _this5 = shader5.aspectRatio;
 			_this5.dirty = true;
 			_this5.data = this.aspectRatio;
 			shader5.invresolution.data.x = 1 / this.width;
 			shader5.invresolution.data.y = 1 / this.height;
-			var v5;
+			let v5;
 			v5 = this.floatVelocity?"true":"false";
 			if(shader5.FLOAT_VELOCITY != v5) shader5.set_FLOAT_VELOCITY(v5);
 			v5 = this.floatPressure?"true":"false";
@@ -393,15 +393,15 @@ GPUFluid.prototype = {
 			v5 = this.floatDivergence?"true":"false";
 			if(shader5.FLOAT_DIVERGENCE != v5) shader5.set_FLOAT_DIVERGENCE(v5);
 		}
-		var shader6 = this.clearPressureShader;
+		let shader6 = this.clearPressureShader;
 		if(shader6 == null) {
 		} else {
-			var _this6 = shader6.aspectRatio;
+			let _this6 = shader6.aspectRatio;
 			_this6.dirty = true;
 			_this6.data = this.aspectRatio;
 			shader6.invresolution.data.x = 1 / this.width;
 			shader6.invresolution.data.y = 1 / this.height;
-			var v6;
+			let v6;
 			v6 = this.floatVelocity?"true":"false";
 			if(shader6.FLOAT_VELOCITY != v6) shader6.set_FLOAT_VELOCITY(v6);
 			v6 = this.floatPressure?"true":"false";
@@ -409,15 +409,15 @@ GPUFluid.prototype = {
 			v6 = this.floatDivergence?"true":"false";
 			if(shader6.FLOAT_DIVERGENCE != v6) shader6.set_FLOAT_DIVERGENCE(v6);
 		}
-		var shader7 = this.applyForcesShader;
+		let shader7 = this.applyForcesShader;
 		if(shader7 == null) {
 		} else {
-			var _this7 = shader7.aspectRatio;
+			let _this7 = shader7.aspectRatio;
 			_this7.dirty = true;
 			_this7.data = this.aspectRatio;
 			shader7.invresolution.data.x = 1 / this.width;
 			shader7.invresolution.data.y = 1 / this.height;
-			var v7;
+			let v7;
 			v7 = this.floatVelocity?"true":"false";
 			if(shader7.FLOAT_VELOCITY != v7) shader7.set_FLOAT_VELOCITY(v7);
 			v7 = this.floatPressure?"true":"false";
@@ -425,15 +425,15 @@ GPUFluid.prototype = {
 			v7 = this.floatDivergence?"true":"false";
 			if(shader7.FLOAT_DIVERGENCE != v7) shader7.set_FLOAT_DIVERGENCE(v7);
 		}
-		var shader8 = this.updateDyeShader;
+		let shader8 = this.updateDyeShader;
 		if(shader8 == null) {
 		} else {
-			var _this8 = shader8.aspectRatio;
+			let _this8 = shader8.aspectRatio;
 			_this8.dirty = true;
 			_this8.data = this.aspectRatio;
 			shader8.invresolution.data.x = 1 / this.width;
 			shader8.invresolution.data.y = 1 / this.height;
-			var v8;
+			let v8;
 			v8 = this.floatVelocity?"true":"false";
 			if(shader8.FLOAT_VELOCITY != v8) shader8.set_FLOAT_VELOCITY(v8);
 			v8 = this.floatPressure?"true":"false";
@@ -445,28 +445,28 @@ GPUFluid.prototype = {
 	,step: function(dt) {
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		var _this = this.advectVelocityShader.dt;
+		let _this = this.advectVelocityShader.dt;
 		_this.dirty = true;
 		_this.data = dt;
-		var _this1 = this.advectVelocityShader.velocity;
+		let _this1 = this.advectVelocityShader.velocity;
 		_this1.dirty = true;
 		_this1.data = this.velocityRenderTarget.readFromTexture;
-		var shader = this.advectVelocityShader;
+		let shader = this.advectVelocityShader;
 		if(shader._active) {
-			var _g = 0;
-			var _g1 = shader._uniforms;
+			let _g = 0;
+			let _g1 = shader._uniforms;
 			while(_g < _g1.length) {
-				var u = _g1[_g];
+				let u = _g1[_g];
 				++_g;
 				u.apply();
 			}
-			var offset = 0;
-			var _g11 = 0;
-			var _g2 = shader._attributes.length;
+			let offset = 0;
+			let _g11 = 0;
+			let _g2 = shader._attributes.length;
 			while(_g11 < _g2) {
-				var i = _g11++;
-				var att = shader._attributes[i];
-				var location = att.location;
+				let i = _g11++;
+				let att = shader._attributes[i];
+				let location = att.location;
 				if(location != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -476,20 +476,20 @@ GPUFluid.prototype = {
 		} else {
 			if(!shader._ready) shader.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			var _g3 = 0;
-			var _g12 = shader._uniforms;
+			let _g3 = 0;
+			let _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
-				var u1 = _g12[_g3];
+				let u1 = _g12[_g3];
 				++_g3;
 				u1.apply();
 			}
-			var offset1 = 0;
-			var _g13 = 0;
-			var _g4 = shader._attributes.length;
+			let offset1 = 0;
+			let _g13 = 0;
+			let _g4 = shader._attributes.length;
 			while(_g13 < _g4) {
-				var i1 = _g13++;
-				var att1 = shader._attributes[i1];
-				var location1 = att1.location;
+				let i1 = _g13++;
+				let att1 = shader._attributes[i1];
+				let location1 = att1.location;
 				if(location1 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -501,7 +501,7 @@ GPUFluid.prototype = {
 		this.velocityRenderTarget.activate();
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
-		var _this2 = this.velocityRenderTarget;
+		let _this2 = this.velocityRenderTarget;
 		_this2.tmpFBO = _this2.writeFrameBufferObject;
 		_this2.writeFrameBufferObject = _this2.readFrameBufferObject;
 		_this2.readFrameBufferObject = _this2.tmpFBO;
@@ -510,28 +510,28 @@ GPUFluid.prototype = {
 		_this2.readFromTexture = _this2.tmpTex;
 		if(this.applyForcesShader == null) {
 		} else {
-			var _this3 = this.applyForcesShader.dt;
+			let _this3 = this.applyForcesShader.dt;
 			_this3.dirty = true;
 			_this3.data = dt;
-			var _this4 = this.applyForcesShader.velocity;
+			let _this4 = this.applyForcesShader.velocity;
 			_this4.dirty = true;
 			_this4.data = this.velocityRenderTarget.readFromTexture;
-			var shader1 = this.applyForcesShader;
+			let shader1 = this.applyForcesShader;
 			if(shader1._active) {
-				var _g5 = 0;
-				var _g14 = shader1._uniforms;
+				let _g5 = 0;
+				let _g14 = shader1._uniforms;
 				while(_g5 < _g14.length) {
-					var u2 = _g14[_g5];
+					let u2 = _g14[_g5];
 					++_g5;
 					u2.apply();
 				}
-				var offset2 = 0;
-				var _g15 = 0;
-				var _g6 = shader1._attributes.length;
+				let offset2 = 0;
+				let _g15 = 0;
+				let _g6 = shader1._attributes.length;
 				while(_g15 < _g6) {
-					var i2 = _g15++;
-					var att2 = shader1._attributes[i2];
-					var location2 = att2.location;
+					let i2 = _g15++;
+					let att2 = shader1._attributes[i2];
+					let location2 = att2.location;
 					if(location2 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -541,20 +541,20 @@ GPUFluid.prototype = {
 			} else {
 				if(!shader1._ready) shader1.create();
 				flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-				var _g7 = 0;
-				var _g16 = shader1._uniforms;
+				let _g7 = 0;
+				let _g16 = shader1._uniforms;
 				while(_g7 < _g16.length) {
-					var u3 = _g16[_g7];
+					let u3 = _g16[_g7];
 					++_g7;
 					u3.apply();
 				}
-				var offset3 = 0;
-				var _g17 = 0;
-				var _g8 = shader1._attributes.length;
+				let offset3 = 0;
+				let _g17 = 0;
+				let _g8 = shader1._attributes.length;
 				while(_g17 < _g8) {
-					var i3 = _g17++;
-					var att3 = shader1._attributes[i3];
-					var location3 = att3.location;
+					let i3 = _g17++;
+					let att3 = shader1._attributes[i3];
+					let location3 = att3.location;
 					if(location3 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -566,7 +566,7 @@ GPUFluid.prototype = {
 			this.velocityRenderTarget.activate();
 			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader1.deactivate();
-			var _this5 = this.velocityRenderTarget;
+			let _this5 = this.velocityRenderTarget;
 			_this5.tmpFBO = _this5.writeFrameBufferObject;
 			_this5.writeFrameBufferObject = _this5.readFrameBufferObject;
 			_this5.readFrameBufferObject = _this5.tmpFBO;
@@ -574,25 +574,25 @@ GPUFluid.prototype = {
 			_this5.writeToTexture = _this5.readFromTexture;
 			_this5.readFromTexture = _this5.tmpTex;
 		}
-		var _this6 = this.divergenceShader.velocity;
+		let _this6 = this.divergenceShader.velocity;
 		_this6.dirty = true;
 		_this6.data = this.velocityRenderTarget.readFromTexture;
-		var shader2 = this.divergenceShader;
+		let shader2 = this.divergenceShader;
 		if(shader2._active) {
-			var _g9 = 0;
-			var _g18 = shader2._uniforms;
+			let _g9 = 0;
+			let _g18 = shader2._uniforms;
 			while(_g9 < _g18.length) {
-				var u4 = _g18[_g9];
+				let u4 = _g18[_g9];
 				++_g9;
 				u4.apply();
 			}
-			var offset4 = 0;
-			var _g19 = 0;
-			var _g10 = shader2._attributes.length;
+			let offset4 = 0;
+			let _g19 = 0;
+			let _g10 = shader2._attributes.length;
 			while(_g19 < _g10) {
-				var i4 = _g19++;
-				var att4 = shader2._attributes[i4];
-				var location4 = att4.location;
+				let i4 = _g19++;
+				let att4 = shader2._attributes[i4];
+				let location4 = att4.location;
 				if(location4 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
@@ -602,20 +602,20 @@ GPUFluid.prototype = {
 		} else {
 			if(!shader2._ready) shader2.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
-			var _g20 = 0;
-			var _g110 = shader2._uniforms;
+			let _g20 = 0;
+			let _g110 = shader2._uniforms;
 			while(_g20 < _g110.length) {
-				var u5 = _g110[_g20];
+				let u5 = _g110[_g20];
 				++_g20;
 				u5.apply();
 			}
-			var offset5 = 0;
-			var _g111 = 0;
-			var _g21 = shader2._attributes.length;
+			let offset5 = 0;
+			let _g111 = 0;
+			let _g21 = shader2._attributes.length;
 			while(_g111 < _g21) {
-				var i5 = _g111++;
-				var att5 = shader2._attributes[i5];
-				var location5 = att5.location;
+				let i5 = _g111++;
+				let att5 = shader2._attributes[i5];
+				let location5 = att5.location;
 				if(location5 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
@@ -627,25 +627,25 @@ GPUFluid.prototype = {
 		this.divergenceRenderTarget.activate();
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader2.deactivate();
-		var _this7 = this.pressureSolveShader.divergence;
+		let _this7 = this.pressureSolveShader.divergence;
 		_this7.dirty = true;
 		_this7.data = this.divergenceRenderTarget.texture;
-		var _this8 = this.pressureSolveShader;
+		let _this8 = this.pressureSolveShader;
 		if(_this8._active) {
-			var _g22 = 0;
-			var _g112 = _this8._uniforms;
+			let _g22 = 0;
+			let _g112 = _this8._uniforms;
 			while(_g22 < _g112.length) {
-				var u6 = _g112[_g22];
+				let u6 = _g112[_g22];
 				++_g22;
 				u6.apply();
 			}
-			var offset6 = 0;
-			var _g113 = 0;
-			var _g23 = _this8._attributes.length;
+			let offset6 = 0;
+			let _g113 = 0;
+			let _g23 = _this8._attributes.length;
 			while(_g113 < _g23) {
-				var i6 = _g113++;
-				var att6 = _this8._attributes[i6];
-				var location6 = att6.location;
+				let i6 = _g113++;
+				let att6 = _this8._attributes[i6];
+				let location6 = att6.location;
 				if(location6 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,_this8._aStride,offset6);
@@ -655,20 +655,20 @@ GPUFluid.prototype = {
 		} else {
 			if(!_this8._ready) _this8.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(_this8._prog);
-			var _g24 = 0;
-			var _g114 = _this8._uniforms;
+			let _g24 = 0;
+			let _g114 = _this8._uniforms;
 			while(_g24 < _g114.length) {
-				var u7 = _g114[_g24];
+				let u7 = _g114[_g24];
 				++_g24;
 				u7.apply();
 			}
-			var offset7 = 0;
-			var _g115 = 0;
-			var _g25 = _this8._attributes.length;
+			let offset7 = 0;
+			let _g115 = 0;
+			let _g25 = _this8._attributes.length;
 			while(_g115 < _g25) {
-				var i7 = _g115++;
-				var att7 = _this8._attributes[i7];
-				var location7 = att7.location;
+				let i7 = _g115++;
+				let att7 = _this8._attributes[i7];
+				let location7 = att7.location;
 				if(location7 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,_this8._aStride,offset7);
@@ -677,24 +677,24 @@ GPUFluid.prototype = {
 			}
 			_this8._active = true;
 		}
-		var _g116 = 0;
-		var _g26 = this.solverIterations;
+		let _g116 = 0;
+		let _g26 = this.solverIterations;
 		while(_g116 < _g26) {
 			_g116++;
-			var _this9 = this.pressureSolveShader.pressure;
-			var tmp;
+			let _this9 = this.pressureSolveShader.pressure;
+			let tmp;
 			_this9.dirty = true;
 			tmp = _this9.data = this.pressureRenderTarget.readFromTexture;
-			var _g27 = 0;
-			var _g117 = this.pressureSolveShader._uniforms;
+			let _g27 = 0;
+			let _g117 = this.pressureSolveShader._uniforms;
 			while(_g27 < _g117.length) {
-				var u8 = _g117[_g27];
+				let u8 = _g117[_g27];
 				++_g27;
 				u8.apply();
 			}
 			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.pressureRenderTarget.writeFrameBufferObject);
 			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			var _this10 = this.pressureRenderTarget;
+			let _this10 = this.pressureRenderTarget;
 			_this10.tmpFBO = _this10.writeFrameBufferObject;
 			_this10.writeFrameBufferObject = _this10.readFrameBufferObject;
 			_this10.readFrameBufferObject = _this10.tmpFBO;
@@ -703,28 +703,28 @@ GPUFluid.prototype = {
 			_this10.readFromTexture = _this10.tmpTex;
 		}
 		this.pressureSolveShader.deactivate();
-		var _this11 = this.pressureGradientSubstractShader.pressure;
+		let _this11 = this.pressureGradientSubstractShader.pressure;
 		_this11.dirty = true;
 		_this11.data = this.pressureRenderTarget.readFromTexture;
-		var _this12 = this.pressureGradientSubstractShader.velocity;
+		let _this12 = this.pressureGradientSubstractShader.velocity;
 		_this12.dirty = true;
 		_this12.data = this.velocityRenderTarget.readFromTexture;
-		var shader3 = this.pressureGradientSubstractShader;
+		let shader3 = this.pressureGradientSubstractShader;
 		if(shader3._active) {
-			var _g28 = 0;
-			var _g118 = shader3._uniforms;
+			let _g28 = 0;
+			let _g118 = shader3._uniforms;
 			while(_g28 < _g118.length) {
-				var u9 = _g118[_g28];
+				let u9 = _g118[_g28];
 				++_g28;
 				u9.apply();
 			}
-			var offset8 = 0;
-			var _g119 = 0;
-			var _g29 = shader3._attributes.length;
+			let offset8 = 0;
+			let _g119 = 0;
+			let _g29 = shader3._attributes.length;
 			while(_g119 < _g29) {
-				var i8 = _g119++;
-				var att8 = shader3._attributes[i8];
-				var location8 = att8.location;
+				let i8 = _g119++;
+				let att8 = shader3._attributes[i8];
+				let location8 = att8.location;
 				if(location8 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location8);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location8,att8.itemCount,att8.type,false,shader3._aStride,offset8);
@@ -734,20 +734,20 @@ GPUFluid.prototype = {
 		} else {
 			if(!shader3._ready) shader3.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
-			var _g30 = 0;
-			var _g120 = shader3._uniforms;
+			let _g30 = 0;
+			let _g120 = shader3._uniforms;
 			while(_g30 < _g120.length) {
-				var u10 = _g120[_g30];
+				let u10 = _g120[_g30];
 				++_g30;
 				u10.apply();
 			}
-			var offset9 = 0;
-			var _g121 = 0;
-			var _g31 = shader3._attributes.length;
+			let offset9 = 0;
+			let _g121 = 0;
+			let _g31 = shader3._attributes.length;
 			while(_g121 < _g31) {
-				var i9 = _g121++;
-				var att9 = shader3._attributes[i9];
-				var location9 = att9.location;
+				let i9 = _g121++;
+				let att9 = shader3._attributes[i9];
+				let location9 = att9.location;
 				if(location9 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location9);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location9,att9.itemCount,att9.type,false,shader3._aStride,offset9);
@@ -759,7 +759,7 @@ GPUFluid.prototype = {
 		this.velocityRenderTarget.activate();
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader3.deactivate();
-		var _this13 = this.velocityRenderTarget;
+		let _this13 = this.velocityRenderTarget;
 		_this13.tmpFBO = _this13.writeFrameBufferObject;
 		_this13.writeFrameBufferObject = _this13.readFrameBufferObject;
 		_this13.readFrameBufferObject = _this13.tmpFBO;
@@ -768,28 +768,28 @@ GPUFluid.prototype = {
 		_this13.readFromTexture = _this13.tmpTex;
 		if(this.updateDyeShader == null) {
 		} else {
-			var _this14 = this.updateDyeShader.dt;
+			let _this14 = this.updateDyeShader.dt;
 			_this14.dirty = true;
 			_this14.data = dt;
-			var _this15 = this.updateDyeShader.dye;
+			let _this15 = this.updateDyeShader.dye;
 			_this15.dirty = true;
 			_this15.data = this.dyeRenderTarget.readFromTexture;
-			var shader4 = this.updateDyeShader;
+			let shader4 = this.updateDyeShader;
 			if(shader4._active) {
-				var _g32 = 0;
-				var _g122 = shader4._uniforms;
+				let _g32 = 0;
+				let _g122 = shader4._uniforms;
 				while(_g32 < _g122.length) {
-					var u11 = _g122[_g32];
+					let u11 = _g122[_g32];
 					++_g32;
 					u11.apply();
 				}
-				var offset10 = 0;
-				var _g123 = 0;
-				var _g33 = shader4._attributes.length;
+				let offset10 = 0;
+				let _g123 = 0;
+				let _g33 = shader4._attributes.length;
 				while(_g123 < _g33) {
-					var i10 = _g123++;
-					var att10 = shader4._attributes[i10];
-					var location10 = att10.location;
+					let i10 = _g123++;
+					let att10 = shader4._attributes[i10];
+					let location10 = att10.location;
 					if(location10 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location10);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location10,att10.itemCount,att10.type,false,shader4._aStride,offset10);
@@ -799,20 +799,20 @@ GPUFluid.prototype = {
 			} else {
 				if(!shader4._ready) shader4.create();
 				flu_modules_opengl_web_GL.current_context.useProgram(shader4._prog);
-				var _g34 = 0;
-				var _g124 = shader4._uniforms;
+				let _g34 = 0;
+				let _g124 = shader4._uniforms;
 				while(_g34 < _g124.length) {
-					var u12 = _g124[_g34];
+					let u12 = _g124[_g34];
 					++_g34;
 					u12.apply();
 				}
-				var offset11 = 0;
-				var _g125 = 0;
-				var _g35 = shader4._attributes.length;
+				let offset11 = 0;
+				let _g125 = 0;
+				let _g35 = shader4._attributes.length;
 				while(_g125 < _g35) {
-					var i11 = _g125++;
-					var att11 = shader4._attributes[i11];
-					var location11 = att11.location;
+					let i11 = _g125++;
+					let att11 = shader4._attributes[i11];
+					let location11 = att11.location;
 					if(location11 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location11);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location11,att11.itemCount,att11.type,false,shader4._aStride,offset11);
@@ -824,7 +824,7 @@ GPUFluid.prototype = {
 			this.dyeRenderTarget.activate();
 			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader4.deactivate();
-			var _this16 = this.dyeRenderTarget;
+			let _this16 = this.dyeRenderTarget;
 			_this16.tmpFBO = _this16.writeFrameBufferObject;
 			_this16.writeFrameBufferObject = _this16.readFrameBufferObject;
 			_this16.readFrameBufferObject = _this16.tmpFBO;
@@ -832,32 +832,32 @@ GPUFluid.prototype = {
 			_this16.writeToTexture = _this16.readFromTexture;
 			_this16.readFromTexture = _this16.tmpTex;
 		}
-		var target = this.dyeRenderTarget;
-		var _this17 = this.advectShader.dt;
+		let target = this.dyeRenderTarget;
+		let _this17 = this.advectShader.dt;
 		_this17.dirty = true;
 		_this17.data = dt;
-		var _this18 = this.advectShader.target;
+		let _this18 = this.advectShader.target;
 		_this18.dirty = true;
 		_this18.data = target.readFromTexture;
-		var _this19 = this.advectShader.velocity;
+		let _this19 = this.advectShader.velocity;
 		_this19.dirty = true;
 		_this19.data = this.velocityRenderTarget.readFromTexture;
-		var shader5 = this.advectShader;
+		let shader5 = this.advectShader;
 		if(shader5._active) {
-			var _g36 = 0;
-			var _g126 = shader5._uniforms;
+			let _g36 = 0;
+			let _g126 = shader5._uniforms;
 			while(_g36 < _g126.length) {
-				var u13 = _g126[_g36];
+				let u13 = _g126[_g36];
 				++_g36;
 				u13.apply();
 			}
-			var offset12 = 0;
-			var _g127 = 0;
-			var _g37 = shader5._attributes.length;
+			let offset12 = 0;
+			let _g127 = 0;
+			let _g37 = shader5._attributes.length;
 			while(_g127 < _g37) {
-				var i12 = _g127++;
-				var att12 = shader5._attributes[i12];
-				var location12 = att12.location;
+				let i12 = _g127++;
+				let att12 = shader5._attributes[i12];
+				let location12 = att12.location;
 				if(location12 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location12);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location12,att12.itemCount,att12.type,false,shader5._aStride,offset12);
@@ -867,20 +867,20 @@ GPUFluid.prototype = {
 		} else {
 			if(!shader5._ready) shader5.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader5._prog);
-			var _g38 = 0;
-			var _g128 = shader5._uniforms;
+			let _g38 = 0;
+			let _g128 = shader5._uniforms;
 			while(_g38 < _g128.length) {
-				var u14 = _g128[_g38];
+				let u14 = _g128[_g38];
 				++_g38;
 				u14.apply();
 			}
-			var offset13 = 0;
-			var _g129 = 0;
-			var _g39 = shader5._attributes.length;
+			let offset13 = 0;
+			let _g129 = 0;
+			let _g39 = shader5._attributes.length;
 			while(_g129 < _g39) {
-				var i13 = _g129++;
-				var att13 = shader5._attributes[i13];
-				var location13 = att13.location;
+				let i13 = _g129++;
+				let att13 = shader5._attributes[i13];
+				let location13 = att13.location;
 				if(location13 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location13);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location13,att13.itemCount,att13.type,false,shader5._aStride,offset13);
@@ -903,22 +903,22 @@ GPUFluid.prototype = {
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
 		flu_modules_opengl_web_GL.current_context.disable(3042);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		var shader = this.clearVelocityShader;
+		let shader = this.clearVelocityShader;
 		if(shader._active) {
-			var _g = 0;
-			var _g1 = shader._uniforms;
+			let _g = 0;
+			let _g1 = shader._uniforms;
 			while(_g < _g1.length) {
-				var u = _g1[_g];
+				let u = _g1[_g];
 				++_g;
 				u.apply();
 			}
-			var offset = 0;
-			var _g11 = 0;
-			var _g2 = shader._attributes.length;
+			let offset = 0;
+			let _g11 = 0;
+			let _g2 = shader._attributes.length;
 			while(_g11 < _g2) {
-				var i = _g11++;
-				var att = shader._attributes[i];
-				var location = att.location;
+				let i = _g11++;
+				let att = shader._attributes[i];
+				let location = att.location;
 				if(location != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -928,20 +928,20 @@ GPUFluid.prototype = {
 		} else {
 			if(!shader._ready) shader.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			var _g3 = 0;
-			var _g12 = shader._uniforms;
+			let _g3 = 0;
+			let _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
-				var u1 = _g12[_g3];
+				let u1 = _g12[_g3];
 				++_g3;
 				u1.apply();
 			}
-			var offset1 = 0;
-			var _g13 = 0;
-			var _g4 = shader._attributes.length;
+			let offset1 = 0;
+			let _g13 = 0;
+			let _g4 = shader._attributes.length;
 			while(_g13 < _g4) {
-				var i1 = _g13++;
-				var att1 = shader._attributes[i1];
-				var location1 = att1.location;
+				let i1 = _g13++;
+				let att1 = shader._attributes[i1];
+				let location1 = att1.location;
 				if(location1 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -953,29 +953,29 @@ GPUFluid.prototype = {
 		this.velocityRenderTarget.activate();
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
-		var _this = this.velocityRenderTarget;
+		let _this = this.velocityRenderTarget;
 		_this.tmpFBO = _this.writeFrameBufferObject;
 		_this.writeFrameBufferObject = _this.readFrameBufferObject;
 		_this.readFrameBufferObject = _this.tmpFBO;
 		_this.tmpTex = _this.writeToTexture;
 		_this.writeToTexture = _this.readFromTexture;
 		_this.readFromTexture = _this.tmpTex;
-		var shader1 = this.clearPressureShader;
+		let shader1 = this.clearPressureShader;
 		if(shader1._active) {
-			var _g5 = 0;
-			var _g14 = shader1._uniforms;
+			let _g5 = 0;
+			let _g14 = shader1._uniforms;
 			while(_g5 < _g14.length) {
-				var u2 = _g14[_g5];
+				let u2 = _g14[_g5];
 				++_g5;
 				u2.apply();
 			}
-			var offset2 = 0;
-			var _g15 = 0;
-			var _g6 = shader1._attributes.length;
+			let offset2 = 0;
+			let _g15 = 0;
+			let _g6 = shader1._attributes.length;
 			while(_g15 < _g6) {
-				var i2 = _g15++;
-				var att2 = shader1._attributes[i2];
-				var location2 = att2.location;
+				let i2 = _g15++;
+				let att2 = shader1._attributes[i2];
+				let location2 = att2.location;
 				if(location2 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -985,20 +985,20 @@ GPUFluid.prototype = {
 		} else {
 			if(!shader1._ready) shader1.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-			var _g7 = 0;
-			var _g16 = shader1._uniforms;
+			let _g7 = 0;
+			let _g16 = shader1._uniforms;
 			while(_g7 < _g16.length) {
-				var u3 = _g16[_g7];
+				let u3 = _g16[_g7];
 				++_g7;
 				u3.apply();
 			}
-			var offset3 = 0;
-			var _g17 = 0;
-			var _g8 = shader1._attributes.length;
+			let offset3 = 0;
+			let _g17 = 0;
+			let _g8 = shader1._attributes.length;
 			while(_g17 < _g8) {
-				var i3 = _g17++;
-				var att3 = shader1._attributes[i3];
-				var location3 = att3.location;
+				let i3 = _g17++;
+				let att3 = shader1._attributes[i3];
+				let location3 = att3.location;
 				if(location3 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -1010,14 +1010,14 @@ GPUFluid.prototype = {
 		this.pressureRenderTarget.activate();
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader1.deactivate();
-		var _this1 = this.pressureRenderTarget;
+		let _this1 = this.pressureRenderTarget;
 		_this1.tmpFBO = _this1.writeFrameBufferObject;
 		_this1.writeFrameBufferObject = _this1.readFrameBufferObject;
 		_this1.readFrameBufferObject = _this1.tmpFBO;
 		_this1.tmpTex = _this1.writeToTexture;
 		_this1.writeToTexture = _this1.readFromTexture;
 		_this1.readFromTexture = _this1.tmpTex;
-		var _this2 = this.dyeRenderTarget;
+		let _this2 = this.dyeRenderTarget;
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this2.readFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
 		flu_modules_opengl_web_GL.current_context.clear(16384);
@@ -1027,7 +1027,7 @@ GPUFluid.prototype = {
 	}
 	,__class__: GPUFluid
 };
-var shaderblox_ShaderBase = function() {
+let shaderblox_ShaderBase = function() {
 	this._textures = [];
 	this._attributes = [];
 	this._uniforms = [];
@@ -1056,7 +1056,7 @@ shaderblox_ShaderBase.prototype = {
 		this._ready = false;
 	}
 	,compile: function(vertSource,fragSource) {
-		var vertexShader = flu_modules_opengl_web_GL.current_context.createShader(35633);
+		let vertexShader = flu_modules_opengl_web_GL.current_context.createShader(35633);
 		flu_modules_opengl_web_GL.current_context.shaderSource(vertexShader,vertSource);
 		flu_modules_opengl_web_GL.current_context.compileShader(vertexShader);
 		if(flu_modules_opengl_web_GL.current_context.getShaderParameter(vertexShader,35713) == 0) {
@@ -1064,44 +1064,44 @@ shaderblox_ShaderBase.prototype = {
 			console.log("\n" + vertSource);
 			throw new js__$Boot_FluidError("Error compiling vertex shader");
 		}
-		var fragmentShader = flu_modules_opengl_web_GL.current_context.createShader(35632);
+		let fragmentShader = flu_modules_opengl_web_GL.current_context.createShader(35632);
 		flu_modules_opengl_web_GL.current_context.shaderSource(fragmentShader,fragSource);
 		flu_modules_opengl_web_GL.current_context.compileShader(fragmentShader);
 		if(flu_modules_opengl_web_GL.current_context.getShaderParameter(fragmentShader,35713) == 0) {
 			console.log("Error compiling fragment shader: " + flu_modules_opengl_web_GL.current_context.getShaderInfoLog(fragmentShader) + "\n");
-			var lines = fragSource.split("\n");
-			var i = 0;
-			var _g = 0;
+			let lines = fragSource.split("\n");
+			let i = 0;
+			let _g = 0;
 			while(_g < lines.length) {
-				var l = lines[_g];
+				let l = lines[_g];
 				++_g;
 				console.log(i++ + " - " + l);
 			}
 			throw new js__$Boot_FluidError("Error compiling fragment shader");
 		}
-		var shaderProgram = flu_modules_opengl_web_GL.current_context.createProgram();
+		let shaderProgram = flu_modules_opengl_web_GL.current_context.createProgram();
 		flu_modules_opengl_web_GL.current_context.attachShader(shaderProgram,vertexShader);
 		flu_modules_opengl_web_GL.current_context.attachShader(shaderProgram,fragmentShader);
 		flu_modules_opengl_web_GL.current_context.linkProgram(shaderProgram);
 		if(flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35714) == 0) throw new js__$Boot_FluidError("Unable to initialize the shader program.\n" + flu_modules_opengl_web_GL.current_context.getProgramInfoLog(shaderProgram));
-		var numUniforms = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35718);
-		var uniformLocations = new flu_ds_StringMap();
+		let numUniforms = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35718);
+		let uniformLocations = new flu_ds_StringMap();
 		while(numUniforms-- > 0) {
-			var uInfo = flu_modules_opengl_web_GL.current_context.getActiveUniform(shaderProgram,numUniforms);
-			var loc = flu_modules_opengl_web_GL.current_context.getUniformLocation(shaderProgram,uInfo.name);
-			var tmp;
-			var key = uInfo.name;
+			let uInfo = flu_modules_opengl_web_GL.current_context.getActiveUniform(shaderProgram,numUniforms);
+			let loc = flu_modules_opengl_web_GL.current_context.getUniformLocation(shaderProgram,uInfo.name);
+			let tmp;
+			let key = uInfo.name;
 			if(__map_reserved[key] != null) uniformLocations.setReserved(key,loc); else uniformLocations.h[key] = loc;
 			tmp = loc;
 			tmp;
 		}
-		var numAttributes = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35721);
-		var attributeLocations = new flu_ds_StringMap();
+		let numAttributes = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35721);
+		let attributeLocations = new flu_ds_StringMap();
 		while(numAttributes-- > 0) {
-			var aInfo = flu_modules_opengl_web_GL.current_context.getActiveAttrib(shaderProgram,numAttributes);
-			var loc1 = flu_modules_opengl_web_GL.current_context.getAttribLocation(shaderProgram,aInfo.name);
-			var tmp1;
-			var key1 = aInfo.name;
+			let aInfo = flu_modules_opengl_web_GL.current_context.getActiveAttrib(shaderProgram,numAttributes);
+			let loc1 = flu_modules_opengl_web_GL.current_context.getAttribLocation(shaderProgram,aInfo.name);
+			let tmp1;
+			let key1 = aInfo.name;
 			if(__map_reserved[key1] != null) attributeLocations.setReserved(key1,loc1); else attributeLocations.h[key1] = loc1;
 			tmp1 = loc1;
 			tmp1;
@@ -1109,39 +1109,39 @@ shaderblox_ShaderBase.prototype = {
 		this._vert = vertexShader;
 		this._frag = fragmentShader;
 		this._prog = shaderProgram;
-		var count = this._uniforms.length;
-		var removeList = [];
+		let count = this._uniforms.length;
+		let removeList = [];
 		this._numTextures = 0;
 		this._textures = [];
-		var _g1 = 0;
-		var _g11 = this._uniforms;
+		let _g1 = 0;
+		let _g11 = this._uniforms;
 		while(_g1 < _g11.length) {
-			var u = _g11[_g1];
+			let u = _g11[_g1];
 			++_g1;
-			var tmp2;
-			var key2 = u.name;
+			let tmp2;
+			let key2 = u.name;
 			if(__map_reserved[key2] != null) tmp2 = uniformLocations.getReserved(key2); else tmp2 = uniformLocations.h[key2];
-			var loc2 = tmp2;
+			let loc2 = tmp2;
 			if(js_Boot.__instanceof(u,shaderblox_uniforms_UTexture)) {
-				var t = u;
+				let t = u;
 				t.samplerIndex = this._numTextures++;
 				this._textures[t.samplerIndex] = t;
 			}
 			if(loc2 != null) u.location = loc2; else removeList.push(u);
 		}
 		while(removeList.length > 0) {
-			var x = removeList.pop();
+			let x = removeList.pop();
 			HxOverrides.remove(this._uniforms,x);
 		}
-		var _g2 = 0;
-		var _g12 = this._attributes;
+		let _g2 = 0;
+		let _g12 = this._attributes;
 		while(_g2 < _g12.length) {
-			var a = _g12[_g2];
+			let a = _g12[_g2];
 			++_g2;
-			var tmp3;
-			var key3 = a.name;
+			let tmp3;
+			let key3 = a.name;
 			if(__map_reserved[key3] != null) tmp3 = attributeLocations.getReserved(key3); else tmp3 = attributeLocations.h[key3];
-			var loc3 = tmp3;
+			let loc3 = tmp3;
 			a.location = loc3 == null?-1:loc3;
 		}
 	}
@@ -1150,22 +1150,22 @@ shaderblox_ShaderBase.prototype = {
 		if(initUniforms == null) initUniforms = true;
 		if(this._active) {
 			if(initUniforms) {
-				var _g = 0;
-				var _g1 = this._uniforms;
+				let _g = 0;
+				let _g1 = this._uniforms;
 				while(_g < _g1.length) {
-					var u = _g1[_g];
+					let u = _g1[_g];
 					++_g;
 					u.apply();
 				}
 			}
 			if(initAttribs) {
-				var offset = 0;
-				var _g11 = 0;
-				var _g2 = this._attributes.length;
+				let offset = 0;
+				let _g11 = 0;
+				let _g2 = this._attributes.length;
 				while(_g11 < _g2) {
-					var i = _g11++;
-					var att = this._attributes[i];
-					var location = att.location;
+					let i = _g11++;
+					let att = this._attributes[i];
+					let location = att.location;
 					if(location != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,this._aStride,offset);
@@ -1178,22 +1178,22 @@ shaderblox_ShaderBase.prototype = {
 		if(!this._ready) this.create();
 		flu_modules_opengl_web_GL.current_context.useProgram(this._prog);
 		if(initUniforms) {
-			var _g3 = 0;
-			var _g12 = this._uniforms;
+			let _g3 = 0;
+			let _g12 = this._uniforms;
 			while(_g3 < _g12.length) {
-				var u1 = _g12[_g3];
+				let u1 = _g12[_g3];
 				++_g3;
 				u1.apply();
 			}
 		}
 		if(initAttribs) {
-			var offset1 = 0;
-			var _g13 = 0;
-			var _g4 = this._attributes.length;
+			let offset1 = 0;
+			let _g13 = 0;
+			let _g4 = this._attributes.length;
 			while(_g13 < _g4) {
-				var i1 = _g13++;
-				var att1 = this._attributes[i1];
-				var location1 = att1.location;
+				let i1 = _g13++;
+				let att1 = this._attributes[i1];
+				let location1 = att1.location;
 				if(location1 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,this._aStride,offset1);
@@ -1209,18 +1209,18 @@ shaderblox_ShaderBase.prototype = {
 		this.disableAttributes();
 	}
 	,disableAttributes: function() {
-		var _g1 = 0;
-		var _g = this._attributes.length;
+		let _g1 = 0;
+		let _g = this._attributes.length;
 		while(_g1 < _g) {
-			var i = _g1++;
-			var idx = this._attributes[i].location;
+			let i = _g1++;
+			let idx = this._attributes[i].location;
 			if(idx == -1) continue;
 			flu_modules_opengl_web_GL.current_context.disableVertexAttribArray(idx);
 		}
 	}
 	,__class__: shaderblox_ShaderBase
 };
-var FluidBase = function() {
+let FluidBase = function() {
 	shaderblox_ShaderBase.call(this);
 };
 $hxClasses["FluidBase"] = FluidBase;
@@ -1247,13 +1247,13 @@ FluidBase.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,createProperties: function() {
 		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UFloat("aspectRatio",null);
+		let instance = new shaderblox_uniforms_UFloat("aspectRatio",null);
 		this.aspectRatio = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UVec2("invresolution",null);
+		let instance1 = new shaderblox_uniforms_UVec2("invresolution",null);
 		this.invresolution = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		let instance2 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
 		this.vertexPosition = instance2;
 		this._attributes.push(instance2);
 		this._aStride += 8;
@@ -1264,7 +1264,7 @@ FluidBase.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,__class__: FluidBase
 });
-var Advect = function() {
+let Advect = function() {
 	FluidBase.call(this);
 };
 $hxClasses["Advect"] = Advect;
@@ -1273,16 +1273,16 @@ Advect.__super__ = FluidBase;
 Advect.prototype = $extend(FluidBase.prototype,{
 	createProperties: function() {
 		FluidBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("velocity",null,false);
+		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
 		this.velocity = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UTexture("target",null,false);
+		let instance1 = new shaderblox_uniforms_UTexture("target",null,false);
 		this.target = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UFloat("dt",null);
+		let instance2 = new shaderblox_uniforms_UFloat("dt",null);
 		this.dt = instance2;
 		this._uniforms.push(instance2);
-		var instance3 = new shaderblox_uniforms_UFloat("rdx",null);
+		let instance3 = new shaderblox_uniforms_UFloat("rdx",null);
 		this.rdx = instance3;
 		this._uniforms.push(instance3);
 		this._aStride += 0;
@@ -1293,7 +1293,7 @@ Advect.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: Advect
 });
-var AdvectVelocity = function() {
+let AdvectVelocity = function() {
 	FluidBase.call(this);
 };
 $hxClasses["AdvectVelocity"] = AdvectVelocity;
@@ -1302,13 +1302,13 @@ AdvectVelocity.__super__ = FluidBase;
 AdvectVelocity.prototype = $extend(FluidBase.prototype,{
 	createProperties: function() {
 		FluidBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("velocity",null,false);
+		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
 		this.velocity = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UFloat("dt",null);
+		let instance1 = new shaderblox_uniforms_UFloat("dt",null);
 		this.dt = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UFloat("rdx",null);
+		let instance2 = new shaderblox_uniforms_UFloat("rdx",null);
 		this.rdx = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -1319,7 +1319,7 @@ AdvectVelocity.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: AdvectVelocity
 });
-var Divergence = function() {
+let Divergence = function() {
 	FluidBase.call(this);
 };
 $hxClasses["Divergence"] = Divergence;
@@ -1328,10 +1328,10 @@ Divergence.__super__ = FluidBase;
 Divergence.prototype = $extend(FluidBase.prototype,{
 	createProperties: function() {
 		FluidBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("velocity",null,false);
+		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
 		this.velocity = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UFloat("halfrdx",null);
+		let instance1 = new shaderblox_uniforms_UFloat("halfrdx",null);
 		this.halfrdx = instance1;
 		this._uniforms.push(instance1);
 		this._aStride += 0;
@@ -1342,7 +1342,7 @@ Divergence.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: Divergence
 });
-var PressureSolve = function() {
+let PressureSolve = function() {
 	FluidBase.call(this);
 };
 $hxClasses["PressureSolve"] = PressureSolve;
@@ -1351,13 +1351,13 @@ PressureSolve.__super__ = FluidBase;
 PressureSolve.prototype = $extend(FluidBase.prototype,{
 	createProperties: function() {
 		FluidBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("pressure",null,false);
+		let instance = new shaderblox_uniforms_UTexture("pressure",null,false);
 		this.pressure = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UTexture("divergence",null,false);
+		let instance1 = new shaderblox_uniforms_UTexture("divergence",null,false);
 		this.divergence = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UFloat("alpha",null);
+		let instance2 = new shaderblox_uniforms_UFloat("alpha",null);
 		this.alpha = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -1368,7 +1368,7 @@ PressureSolve.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: PressureSolve
 });
-var PressureGradientSubstract = function() {
+let PressureGradientSubstract = function() {
 	FluidBase.call(this);
 };
 $hxClasses["PressureGradientSubstract"] = PressureGradientSubstract;
@@ -1377,13 +1377,13 @@ PressureGradientSubstract.__super__ = FluidBase;
 PressureGradientSubstract.prototype = $extend(FluidBase.prototype,{
 	createProperties: function() {
 		FluidBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("pressure",null,false);
+		let instance = new shaderblox_uniforms_UTexture("pressure",null,false);
 		this.pressure = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UTexture("velocity",null,false);
+		let instance1 = new shaderblox_uniforms_UTexture("velocity",null,false);
 		this.velocity = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UFloat("halfrdx",null);
+		let instance2 = new shaderblox_uniforms_UFloat("halfrdx",null);
 		this.halfrdx = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -1394,7 +1394,7 @@ PressureGradientSubstract.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: PressureGradientSubstract
 });
-var ApplyForces = function() {
+let ApplyForces = function() {
 	FluidBase.call(this);
 };
 $hxClasses["ApplyForces"] = ApplyForces;
@@ -1403,13 +1403,13 @@ ApplyForces.__super__ = FluidBase;
 ApplyForces.prototype = $extend(FluidBase.prototype,{
 	createProperties: function() {
 		FluidBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("velocity",null,false);
+		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
 		this.velocity = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UFloat("dt",null);
+		let instance1 = new shaderblox_uniforms_UFloat("dt",null);
 		this.dt = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UFloat("dx",null);
+		let instance2 = new shaderblox_uniforms_UFloat("dx",null);
 		this.dx = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -1420,7 +1420,7 @@ ApplyForces.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: ApplyForces
 });
-var UpdateDye = function() {
+let UpdateDye = function() {
 	FluidBase.call(this);
 };
 $hxClasses["UpdateDye"] = UpdateDye;
@@ -1429,13 +1429,13 @@ UpdateDye.__super__ = FluidBase;
 UpdateDye.prototype = $extend(FluidBase.prototype,{
 	createProperties: function() {
 		FluidBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("dye",null,false);
+		let instance = new shaderblox_uniforms_UTexture("dye",null,false);
 		this.dye = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UFloat("dt",null);
+		let instance1 = new shaderblox_uniforms_UFloat("dt",null);
 		this.dt = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UFloat("dx",null);
+		let instance2 = new shaderblox_uniforms_UFloat("dx",null);
 		this.dx = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -1446,7 +1446,7 @@ UpdateDye.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: UpdateDye
 });
-var ClearVelocity = function() {
+let ClearVelocity = function() {
 	FluidBase.call(this);
 };
 $hxClasses["ClearVelocity"] = ClearVelocity;
@@ -1463,7 +1463,7 @@ ClearVelocity.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: ClearVelocity
 });
-var ClearPressure = function() {
+let ClearPressure = function() {
 	FluidBase.call(this);
 };
 $hxClasses["ClearPressure"] = ClearPressure;
@@ -1480,7 +1480,7 @@ ClearPressure.prototype = $extend(FluidBase.prototype,{
 	}
 	,__class__: ClearPressure
 });
-var GPUParticles = function(count) {
+let GPUParticles = function(count) {
 	this.floatDataType = null;
 	if(GPUCapabilities.get_writeToFloat()) this.floatDataType = 5126; else if(GPUCapabilities.get_writeToHalfFloat()) this.floatDataType = GPUCapabilities.get_HALF_FLOAT();
 	this.floatData = this.floatDataType != null;
@@ -1493,33 +1493,33 @@ var GPUParticles = function(count) {
 	this.positionStepShader.set_FLOAT_DATA(this.floatData?"true":"false");
 	this.initialPositionShader.set_FLOAT_DATA(this.floatData?"true":"false");
 	this.initialVelocityShader.set_FLOAT_DATA(this.floatData?"true":"false");
-	var _this = this.velocityStepShader.dragCoefficient;
+	let _this = this.velocityStepShader.dragCoefficient;
 	_this.dirty = true;
 	_this.data = 1;
 	this.velocityStepShader.flowScale.data.x = 1;
 	this.velocityStepShader.flowScale.data.y = 1;
 	this.velocityStepShader.set_FLOAT_VELOCITY("false");
 	this.setCount(count);
-	var shader = this.initialPositionShader;
-	var target = this.positionData;
+	let shader = this.initialPositionShader;
+	let target = this.positionData;
 	flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
 	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
 	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 	if(shader._active) {
-		var _g = 0;
-		var _g1 = shader._uniforms;
+		let _g = 0;
+		let _g1 = shader._uniforms;
 		while(_g < _g1.length) {
-			var u = _g1[_g];
+			let u = _g1[_g];
 			++_g;
 			u.apply();
 		}
-		var offset = 0;
-		var _g11 = 0;
-		var _g2 = shader._attributes.length;
+		let offset = 0;
+		let _g11 = 0;
+		let _g2 = shader._attributes.length;
 		while(_g11 < _g2) {
-			var i = _g11++;
-			var att = shader._attributes[i];
-			var location = att.location;
+			let i = _g11++;
+			let att = shader._attributes[i];
+			let location = att.location;
 			if(location != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -1529,20 +1529,20 @@ var GPUParticles = function(count) {
 	} else {
 		if(!shader._ready) shader.create();
 		flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-		var _g3 = 0;
-		var _g12 = shader._uniforms;
+		let _g3 = 0;
+		let _g12 = shader._uniforms;
 		while(_g3 < _g12.length) {
-			var u1 = _g12[_g3];
+			let u1 = _g12[_g3];
 			++_g3;
 			u1.apply();
 		}
-		var offset1 = 0;
-		var _g13 = 0;
-		var _g4 = shader._attributes.length;
+		let offset1 = 0;
+		let _g13 = 0;
+		let _g4 = shader._attributes.length;
 		while(_g13 < _g4) {
-			var i1 = _g13++;
-			var att1 = shader._attributes[i1];
-			var location1 = att1.location;
+			let i1 = _g13++;
+			let att1 = shader._attributes[i1];
+			let location1 = att1.location;
 			if(location1 != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -1559,26 +1559,26 @@ var GPUParticles = function(count) {
 	target.tmpTex = target.writeToTexture;
 	target.writeToTexture = target.readFromTexture;
 	target.readFromTexture = target.tmpTex;
-	var shader1 = this.initialVelocityShader;
-	var target1 = this.velocityData;
+	let shader1 = this.initialVelocityShader;
+	let target1 = this.velocityData;
 	flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
 	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
 	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 	if(shader1._active) {
-		var _g5 = 0;
-		var _g14 = shader1._uniforms;
+		let _g5 = 0;
+		let _g14 = shader1._uniforms;
 		while(_g5 < _g14.length) {
-			var u2 = _g14[_g5];
+			let u2 = _g14[_g5];
 			++_g5;
 			u2.apply();
 		}
-		var offset2 = 0;
-		var _g15 = 0;
-		var _g6 = shader1._attributes.length;
+		let offset2 = 0;
+		let _g15 = 0;
+		let _g6 = shader1._attributes.length;
 		while(_g15 < _g6) {
-			var i2 = _g15++;
-			var att2 = shader1._attributes[i2];
-			var location2 = att2.location;
+			let i2 = _g15++;
+			let att2 = shader1._attributes[i2];
+			let location2 = att2.location;
 			if(location2 != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -1588,20 +1588,20 @@ var GPUParticles = function(count) {
 	} else {
 		if(!shader1._ready) shader1.create();
 		flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-		var _g7 = 0;
-		var _g16 = shader1._uniforms;
+		let _g7 = 0;
+		let _g16 = shader1._uniforms;
 		while(_g7 < _g16.length) {
-			var u3 = _g16[_g7];
+			let u3 = _g16[_g7];
 			++_g7;
 			u3.apply();
 		}
-		var offset3 = 0;
-		var _g17 = 0;
-		var _g8 = shader1._attributes.length;
+		let offset3 = 0;
+		let _g17 = 0;
+		let _g8 = shader1._attributes.length;
 		while(_g17 < _g8) {
-			var i3 = _g17++;
-			var att3 = shader1._attributes[i3];
-			var location3 = att3.location;
+			let i3 = _g17++;
+			let att3 = shader1._attributes[i3];
+			let location3 = att3.location;
 			if(location3 != -1) {
 				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -1623,26 +1623,26 @@ $hxClasses["GPUParticles"] = GPUParticles;
 GPUParticles.__name__ = true;
 GPUParticles.prototype = {
 	reset: function() {
-		var shader = this.initialPositionShader;
-		var target = this.positionData;
+		let shader = this.initialPositionShader;
+		let target = this.positionData;
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 		if(shader._active) {
-			var _g = 0;
-			var _g1 = shader._uniforms;
+			let _g = 0;
+			let _g1 = shader._uniforms;
 			while(_g < _g1.length) {
-				var u = _g1[_g];
+				let u = _g1[_g];
 				++_g;
 				u.apply();
 			}
-			var offset = 0;
-			var _g11 = 0;
-			var _g2 = shader._attributes.length;
+			let offset = 0;
+			let _g11 = 0;
+			let _g2 = shader._attributes.length;
 			while(_g11 < _g2) {
-				var i = _g11++;
-				var att = shader._attributes[i];
-				var location = att.location;
+				let i = _g11++;
+				let att = shader._attributes[i];
+				let location = att.location;
 				if(location != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -1652,20 +1652,20 @@ GPUParticles.prototype = {
 		} else {
 			if(!shader._ready) shader.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			var _g3 = 0;
-			var _g12 = shader._uniforms;
+			let _g3 = 0;
+			let _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
-				var u1 = _g12[_g3];
+				let u1 = _g12[_g3];
 				++_g3;
 				u1.apply();
 			}
-			var offset1 = 0;
-			var _g13 = 0;
-			var _g4 = shader._attributes.length;
+			let offset1 = 0;
+			let _g13 = 0;
+			let _g4 = shader._attributes.length;
 			while(_g13 < _g4) {
-				var i1 = _g13++;
-				var att1 = shader._attributes[i1];
-				var location1 = att1.location;
+				let i1 = _g13++;
+				let att1 = shader._attributes[i1];
+				let location1 = att1.location;
 				if(location1 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -1682,26 +1682,26 @@ GPUParticles.prototype = {
 		target.tmpTex = target.writeToTexture;
 		target.writeToTexture = target.readFromTexture;
 		target.readFromTexture = target.tmpTex;
-		var shader1 = this.initialVelocityShader;
-		var target1 = this.velocityData;
+		let shader1 = this.initialVelocityShader;
+		let target1 = this.velocityData;
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
 		if(shader1._active) {
-			var _g5 = 0;
-			var _g14 = shader1._uniforms;
+			let _g5 = 0;
+			let _g14 = shader1._uniforms;
 			while(_g5 < _g14.length) {
-				var u2 = _g14[_g5];
+				let u2 = _g14[_g5];
 				++_g5;
 				u2.apply();
 			}
-			var offset2 = 0;
-			var _g15 = 0;
-			var _g6 = shader1._attributes.length;
+			let offset2 = 0;
+			let _g15 = 0;
+			let _g6 = shader1._attributes.length;
 			while(_g15 < _g6) {
-				var i2 = _g15++;
-				var att2 = shader1._attributes[i2];
-				var location2 = att2.location;
+				let i2 = _g15++;
+				let att2 = shader1._attributes[i2];
+				let location2 = att2.location;
 				if(location2 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -1711,20 +1711,20 @@ GPUParticles.prototype = {
 		} else {
 			if(!shader1._ready) shader1.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-			var _g7 = 0;
-			var _g16 = shader1._uniforms;
+			let _g7 = 0;
+			let _g16 = shader1._uniforms;
 			while(_g7 < _g16.length) {
-				var u3 = _g16[_g7];
+				let u3 = _g16[_g7];
 				++_g7;
 				u3.apply();
 			}
-			var offset3 = 0;
-			var _g17 = 0;
-			var _g8 = shader1._attributes.length;
+			let offset3 = 0;
+			let _g17 = 0;
+			let _g8 = shader1._attributes.length;
 			while(_g17 < _g8) {
-				var i3 = _g17++;
-				var att3 = shader1._attributes[i3];
-				var location3 = att3.location;
+				let i3 = _g17++;
+				let att3 = shader1._attributes[i3];
+				let location3 = att3.location;
 				if(location3 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -1743,18 +1743,18 @@ GPUParticles.prototype = {
 		target1.readFromTexture = target1.tmpTex;
 	}
 	,setCount: function(newCount) {
-		var dataWidth = Math.ceil(Math.sqrt(newCount));
+		let dataWidth = Math.ceil(Math.sqrt(newCount));
 		if(this.positionData == null) {
-			var tmp1;
-			var params = { channelType : 6408, dataType : this.floatData?this.floatDataType:5121, filter : 9728};
+			let tmp1;
+			let params = { channelType : 6408, dataType : this.floatData?this.floatDataType:5121, filter : 9728};
 			tmp1 = function(width,height) {
 				return gltoolbox_TextureTools.createTexture(width,height,params);
 			};
 			this.positionData = new gltoolbox_render_RenderTarget2Phase(dataWidth,dataWidth,tmp1);
 		} else this.positionData.resize(dataWidth,dataWidth);
 		if(this.velocityData == null) {
-			var tmp2;
-			var params1 = { channelType : 6408, dataType : this.floatData?this.floatDataType:5121, filter : 9728};
+			let tmp2;
+			let params1 = { channelType : 6408, dataType : this.floatData?this.floatDataType:5121, filter : 9728};
 			tmp2 = function(width1,height1) {
 				return gltoolbox_TextureTools.createTexture(width1,height1,params1);
 			};
@@ -1762,37 +1762,37 @@ GPUParticles.prototype = {
 		} else this.velocityData.resize(dataWidth,dataWidth);
 		if(this.particleUVs != null) flu_modules_opengl_web_GL.current_context.deleteBuffer(this.particleUVs);
 		this.particleUVs = flu_modules_opengl_web_GL.current_context.createBuffer();
-		var tmp;
-		var elements = dataWidth * dataWidth * 2;
-		var this1;
+		let tmp;
+		let elements = dataWidth * dataWidth * 2;
+		let this1;
 		if(elements != null) this1 = new Float32Array(elements); else this1 = null;
 		tmp = this1;
-		var arrayUVs = tmp;
-		var index;
-		var _g = 0;
+		let arrayUVs = tmp;
+		let index;
+		let _g = 0;
 		while(_g < dataWidth) {
-			var i = _g++;
-			var _g1 = 0;
+			let i = _g++;
+			let _g1 = 0;
 			while(_g1 < dataWidth) {
-				var j = _g1++;
+				let j = _g1++;
 				index = (i * dataWidth + j) * 2;
 				arrayUVs[index] = i / dataWidth;
-				var idx = ++index;
+				let idx = ++index;
 				arrayUVs[idx] = j / dataWidth;
 			}
 		}
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particleUVs);
 		flu_modules_opengl_web_GL.current_context.bufferData(34962,arrayUVs,35044);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
-		var particleSpacing = 2 / dataWidth;
-		var _this = this.initialPositionShader.jitterAmount;
+		let particleSpacing = 2 / dataWidth;
+		let _this = this.initialPositionShader.jitterAmount;
 		_this.dirty = true;
 		_this.data = particleSpacing;
 		return this.count = newCount;
 	}
 	,__class__: GPUParticles
 };
-var PlaneTexture = function() {
+let PlaneTexture = function() {
 	shaderblox_ShaderBase.call(this);
 };
 $hxClasses["PlaneTexture"] = PlaneTexture;
@@ -1801,7 +1801,7 @@ PlaneTexture.__super__ = shaderblox_ShaderBase;
 PlaneTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	createProperties: function() {
 		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		let instance = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
 		this.vertexPosition = instance;
 		this._attributes.push(instance);
 		this._aStride += 8;
@@ -1812,7 +1812,7 @@ PlaneTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,__class__: PlaneTexture
 });
-var ParticleBase = function() {
+let ParticleBase = function() {
 	PlaneTexture.call(this);
 };
 $hxClasses["ParticleBase"] = ParticleBase;
@@ -1821,13 +1821,13 @@ ParticleBase.__super__ = PlaneTexture;
 ParticleBase.prototype = $extend(PlaneTexture.prototype,{
 	createProperties: function() {
 		PlaneTexture.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UFloat("dt",null);
+		let instance = new shaderblox_uniforms_UFloat("dt",null);
 		this.dt = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UTexture("positionData",null,false);
+		let instance1 = new shaderblox_uniforms_UTexture("positionData",null,false);
 		this.positionData = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UTexture("velocityData",null,false);
+		let instance2 = new shaderblox_uniforms_UTexture("velocityData",null,false);
 		this.velocityData = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -1838,7 +1838,7 @@ ParticleBase.prototype = $extend(PlaneTexture.prototype,{
 	}
 	,__class__: ParticleBase
 });
-var VelocityStep = function() {
+let VelocityStep = function() {
 	ParticleBase.call(this);
 };
 $hxClasses["VelocityStep"] = VelocityStep;
@@ -1859,13 +1859,13 @@ VelocityStep.prototype = $extend(ParticleBase.prototype,{
 	}
 	,createProperties: function() {
 		ParticleBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UFloat("dragCoefficient",null);
+		let instance = new shaderblox_uniforms_UFloat("dragCoefficient",null);
 		this.dragCoefficient = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UVec2("flowScale",null);
+		let instance1 = new shaderblox_uniforms_UVec2("flowScale",null);
 		this.flowScale = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UTexture("flowVelocityField",null,false);
+		let instance2 = new shaderblox_uniforms_UTexture("flowVelocityField",null,false);
 		this.flowVelocityField = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -1876,7 +1876,7 @@ VelocityStep.prototype = $extend(ParticleBase.prototype,{
 	}
 	,__class__: VelocityStep
 });
-var PositionStep = function() {
+let PositionStep = function() {
 	ParticleBase.call(this);
 };
 $hxClasses["PositionStep"] = PositionStep;
@@ -1899,7 +1899,7 @@ PositionStep.prototype = $extend(ParticleBase.prototype,{
 	}
 	,__class__: PositionStep
 });
-var InitialPosition = function() {
+let InitialPosition = function() {
 	PlaneTexture.call(this);
 };
 $hxClasses["InitialPosition"] = InitialPosition;
@@ -1914,7 +1914,7 @@ InitialPosition.prototype = $extend(PlaneTexture.prototype,{
 	}
 	,createProperties: function() {
 		PlaneTexture.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UFloat("jitterAmount",null);
+		let instance = new shaderblox_uniforms_UFloat("jitterAmount",null);
 		this.jitterAmount = instance;
 		this._uniforms.push(instance);
 		this._aStride += 0;
@@ -1925,7 +1925,7 @@ InitialPosition.prototype = $extend(PlaneTexture.prototype,{
 	}
 	,__class__: InitialPosition
 });
-var InitialVelocity = function() {
+let InitialVelocity = function() {
 	PlaneTexture.call(this);
 };
 $hxClasses["InitialVelocity"] = InitialVelocity;
@@ -1948,7 +1948,7 @@ InitialVelocity.prototype = $extend(PlaneTexture.prototype,{
 	}
 	,__class__: InitialVelocity
 });
-var RenderParticles = function() {
+let RenderParticles = function() {
 	shaderblox_ShaderBase.call(this);
 };
 $hxClasses["RenderParticles"] = RenderParticles;
@@ -1963,13 +1963,13 @@ RenderParticles.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,createProperties: function() {
 		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("positionData",null,false);
+		let instance = new shaderblox_uniforms_UTexture("positionData",null,false);
 		this.positionData = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UTexture("velocityData",null,false);
+		let instance1 = new shaderblox_uniforms_UTexture("velocityData",null,false);
 		this.velocityData = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_attributes_FloatAttribute("particleUV",0,2);
+		let instance2 = new shaderblox_attributes_FloatAttribute("particleUV",0,2);
 		this.particleUV = instance2;
 		this._attributes.push(instance2);
 		this._aStride += 8;
@@ -1980,11 +1980,11 @@ RenderParticles.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,__class__: RenderParticles
 });
-var HxOverrides = function() { };
+let HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
 HxOverrides.__name__ = true;
 HxOverrides.cca = function(s,index) {
-	var x = s.charCodeAt(index);
+	let x = s.charCodeAt(index);
 	if(x != x) return undefined;
 	return x;
 };
@@ -1998,7 +1998,7 @@ HxOverrides.substr = function(s,pos,len) {
 	return s.substr(pos,len);
 };
 HxOverrides.indexOf = function(a,obj,i) {
-	var len = a.length;
+	let len = a.length;
 	if(i < 0) {
 		i += len;
 		if(i < 0) i = 0;
@@ -2010,7 +2010,7 @@ HxOverrides.indexOf = function(a,obj,i) {
 	return -1;
 };
 HxOverrides.remove = function(a,obj) {
-	var i = HxOverrides.indexOf(a,obj,0);
+	let i = HxOverrides.indexOf(a,obj,0);
 	if(i == -1) return false;
 	a.splice(i,1);
 	return true;
@@ -2022,18 +2022,18 @@ HxOverrides.iter = function(a) {
 		return this.arr[this.cur++];
 	}};
 };
-var Lambda = function() { };
+let Lambda = function() { };
 $hxClasses["Lambda"] = Lambda;
 Lambda.__name__ = true;
 Lambda.fold = function(it,f,first) {
-	var $it0 = $iterator(it)();
+	let $it0 = $iterator(it)();
 	while( $it0.hasNext() ) {
-		var x = $it0.next();
+		let x = $it0.next();
 		first = f(x,first);
 	}
 	return first;
 };
-var flu_App = function() {
+let flu_App = function() {
 	this.next_render = 0;
 	this.next_tick = 0;
 	this.cur_frame_start = 0.0;
@@ -2109,7 +2109,7 @@ flu_App.prototype = {
 		this.delta_time = this.cur_frame_start - this.last_frame_start;
 		this.last_frame_start = this.cur_frame_start;
 		if(this.delta_time > this.max_frame_time) this.delta_time = this.max_frame_time;
-		var used_delta = this.fixed_delta == 0?this.delta_time:this.fixed_delta;
+		let used_delta = this.fixed_delta == 0?this.delta_time:this.fixed_delta;
 		used_delta *= this.timescale;
 		this.delta_sim = used_delta;
 		this.current_time += used_delta;
@@ -2126,7 +2126,7 @@ flu_App.prototype = {
 	,__class__: flu_App
 };
 
-var Main = function() {
+let Main = function() {
 	this.rshiftDown = false;
 	this.lshiftDown = false;
 	this.qualityDirection = 10;
@@ -2157,16 +2157,16 @@ var Main = function() {
 				
 	this.set_simulationQuality(SimulationQuality.Medium);
 	this.performanceMonitor.fpsTooLowCallback = $bind(this,this.lowerQualityRequired);
-	var urlParams = js_Web.getParams();
+	let urlParams = js_Web.getParams();
 	if(__map_reserved.q != null?urlParams.existsReserved("q"):urlParams.h.hasOwnProperty("q")) {
-		var q = StringTools.trim((__map_reserved.q != null?urlParams.getReserved("q"):urlParams.h["q"]).toLowerCase());
-		var _g = 0;
-		var _g1 = Type.allEnums(SimulationQuality);
+		let q = StringTools.trim((__map_reserved.q != null?urlParams.getReserved("q"):urlParams.h["q"]).toLowerCase());
+		let _g = 0;
+		let _g1 = Type.allEnums(SimulationQuality);
 		
 		while(_g < _g1.length) {
-			var e = _g1[_g];
+			let e = _g1[_g];
 			++_g;
-			var name = e[0].toLowerCase();
+			let name = e[0].toLowerCase();
 			
 			if(q == name) {
 				this.set_simulationQuality(e);
@@ -2177,7 +2177,7 @@ var Main = function() {
 		}
 	}
 	if(__map_reserved.iterations != null?urlParams.existsReserved("iterations"):urlParams.h.hasOwnProperty("iterations")) {
-		var iterationsParam = Std.parseInt(__map_reserved.iterations != null?urlParams.getReserved("iterations"):urlParams.h["iterations"]);
+		let iterationsParam = Std.parseInt(__map_reserved.iterations != null?urlParams.getReserved("iterations"):urlParams.h["iterations"]);
 		if(((iterationsParam | 0) === iterationsParam)) this.set_fluidIterations(iterationsParam);
 	}
 };
@@ -2218,7 +2218,7 @@ Main.prototype = $extend(flu_App.prototype,{
 	}
 	
 	,init: function() {
-		var _g = this;
+		let _g = this;
 		flu_modules_opengl_web_GL.current_context.disable(2929);
 		flu_modules_opengl_web_GL.current_context.disable(2884);
 		flu_modules_opengl_web_GL.current_context.disable(3024);
@@ -2229,39 +2229,39 @@ Main.prototype = $extend(flu_App.prototype,{
 		this.renderParticlesShader = new ColorParticleMotion();
 		this.updateDyeShader = new MouseDye();
 		this.mouseForceShader = new MouseForce();
-		var _this = this.updateDyeShader.mouse;
+		let _this = this.updateDyeShader.mouse;
 		_this.dirty = true;
 		_this.data = this.mouseFluid;
-		var _this1 = this.updateDyeShader.lastMouse;
+		let _this1 = this.updateDyeShader.lastMouse;
 		_this1.dirty = true;
 		_this1.data = this.lastMouseFluid;
-		var _this2 = this.updateDyeShader.dyeColor;
+		let _this2 = this.updateDyeShader.dyeColor;
 		_this2.dirty = true;
 		_this2.data = this.dyeColor;
-		var _this3 = this.mouseForceShader.mouse;
+		let _this3 = this.mouseForceShader.mouse;
 		_this3.dirty = true;
 		_this3.data = this.mouseFluid;
-		var _this4 = this.mouseForceShader.lastMouse;
+		let _this4 = this.mouseForceShader.lastMouse;
 		_this4.dirty = true;
 		_this4.data = this.lastMouseFluid;
 		this.updatePointSize();
-		var cellScale = 32;
+		let cellScale = 32;
 		this.fluid = new GPUFluid(Math.round(this.window.width * this.fluidScale),Math.round(this.window.height * this.fluidScale),cellScale,this.fluidIterations);
-		var _this5 = this.fluid;
+		let _this5 = this.fluid;
 		_this5.updateDyeShader = this.updateDyeShader;
-		var _this6 = _this5.updateDyeShader.dx;
+		let _this6 = _this5.updateDyeShader.dx;
 		_this6.dirty = true;
 		_this6.data = _this5.cellSize;
-		var shader = _this5.updateDyeShader;
+		let shader = _this5.updateDyeShader;
 		if(shader == null) null; else {
-			var _this7 = shader.aspectRatio;
+			let _this7 = shader.aspectRatio;
 			{
 				_this7.dirty = true;
 				_this7.data = _this5.aspectRatio;
 			}
 			shader.invresolution.data.x = 1 / _this5.width;
 			shader.invresolution.data.y = 1 / _this5.height;
-			var v;
+			let v;
 			v = _this5.floatVelocity?"true":"false";
 			if(shader.FLOAT_VELOCITY != v) shader.set_FLOAT_VELOCITY(v);
 			v = _this5.floatPressure?"true":"false";
@@ -2270,21 +2270,21 @@ Main.prototype = $extend(flu_App.prototype,{
 			if(shader.FLOAT_DIVERGENCE != v) shader.set_FLOAT_DIVERGENCE(v);
 		}
 		_this5.updateDyeShader;
-		var _this8 = this.fluid;
+		let _this8 = this.fluid;
 		_this8.applyForcesShader = this.mouseForceShader;
-		var _this9 = _this8.applyForcesShader.dx;
+		let _this9 = _this8.applyForcesShader.dx;
 		_this9.dirty = true;
 		_this9.data = _this8.cellSize;
-		var shader1 = _this8.applyForcesShader;
+		let shader1 = _this8.applyForcesShader;
 		if(shader1 == null) null; else {
-			var _this10 = shader1.aspectRatio;
+			let _this10 = shader1.aspectRatio;
 			{
 				_this10.dirty = true;
 				_this10.data = _this8.aspectRatio;
 			}
 			shader1.invresolution.data.x = 1 / _this8.width;
 			shader1.invresolution.data.y = 1 / _this8.height;
-			var v1;
+			let v1;
 			v1 = _this8.floatVelocity?"true":"false";
 			if(shader1.FLOAT_VELOCITY != v1) shader1.set_FLOAT_VELOCITY(v1);
 			v1 = _this8.floatPressure?"true":"false";
@@ -2297,11 +2297,11 @@ Main.prototype = $extend(flu_App.prototype,{
 		this.particles.velocityStepShader.flowScale.data.x = 1 / (this.fluid.cellSize * this.fluid.aspectRatio);
 		this.particles.velocityStepShader.flowScale.data.y = 1 / this.fluid.cellSize;
 		this.particles.velocityStepShader.set_FLOAT_VELOCITY(this.fluid.floatVelocity?"true":"false");
-		var _this11 = this.particles.velocityStepShader.dragCoefficient;
+		let _this11 = this.particles.velocityStepShader.dragCoefficient;
 		_this11.dirty = true;
 		_this11.data = 1;
 		this.renderParticlesShader.set_FLOAT_DATA(this.particles.floatData?"true":"false");
-		var _this12 = this.dyeColor;
+		let _this12 = this.dyeColor;
 		_this12.x = 51;
 		_this12.y = 78;
 		_this12.z = 255;
@@ -2310,13 +2310,13 @@ Main.prototype = $extend(flu_App.prototype,{
 	}
 	,update: function(dt) {
 		this.time = flu_Timer.stamp() - this.initTime;
-		var _this = this.performanceMonitor;
+		let _this = this.performanceMonitor;
 		if(dt > 0) {
-			var fps = 1 / dt;
+			let fps = 1 / dt;
 			if(fps < _this.fpsIgnoreBounds[0] && fps > _this.fpsIgnoreBounds[1]) null; else {
 				_this.fpsSample.add(fps);
 				if(_this.fpsSample.sampleCount < _this.fpsSample.length) null; else {
-					var now = flu_Timer.stamp() * 1000;
+					let now = flu_Timer.stamp() * 1000;
 					if(_this.fpsSample.average < _this.lowerBoundFPS) {
 						if(_this.lowerBoundEnterTime == null) _this.lowerBoundEnterTime = now;
 						if(now - _this.lowerBoundEnterTime >= _this.thresholdTime_ms && _this.fpsTooLowCallback != null) {
@@ -2339,51 +2339,51 @@ Main.prototype = $extend(flu_App.prototype,{
 			}
 		}
 		dt = 0.090;
-		var _this1 = this.updateDyeShader.isMouseDown;
-		var tmp;
+		let _this1 = this.updateDyeShader.isMouseDown;
+		let tmp;
 		_this1.dirty = true;
 		tmp = _this1.data = this.isMouseDown && this.lastMousePointKnown;
 		tmp;
-		var _this2 = this.mouseForceShader.isMouseDown;
-		var tmp1;
+		let _this2 = this.mouseForceShader.isMouseDown;
+		let tmp1;
 		_this2.dirty = true;
 		tmp1 = _this2.data = this.isMouseDown && this.lastMousePointKnown;
 		tmp1;
 		this.fluid.step(dt);
-		var _this3 = this.particles.velocityStepShader.flowVelocityField;
+		let _this3 = this.particles.velocityStepShader.flowVelocityField;
 		_this3.dirty = true;
 		_this3.data = this.fluid.velocityRenderTarget.readFromTexture;
 		if(this.renderParticlesEnabled) {
-			var _this4 = this.particles;
-			var _this5 = _this4.velocityStepShader.dt;
+			let _this4 = this.particles;
+			let _this5 = _this4.velocityStepShader.dt;
 			_this5.dirty = true;
 			_this5.data = dt;
-			var _this6 = _this4.velocityStepShader.positionData;
+			let _this6 = _this4.velocityStepShader.positionData;
 			_this6.dirty = true;
 			_this6.data = _this4.positionData.readFromTexture;
-			var _this7 = _this4.velocityStepShader.velocityData;
+			let _this7 = _this4.velocityStepShader.velocityData;
 			_this7.dirty = true;
 			_this7.data = _this4.velocityData.readFromTexture;
-			var shader = _this4.velocityStepShader;
-			var target = _this4.velocityData;
+			let shader = _this4.velocityStepShader;
+			let target = _this4.velocityData;
 			flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
 			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
 			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
 			if(shader._active) {
-				var _g = 0;
-				var _g1 = shader._uniforms;
+				let _g = 0;
+				let _g1 = shader._uniforms;
 				while(_g < _g1.length) {
-					var u = _g1[_g];
+					let u = _g1[_g];
 					++_g;
 					u.apply();
 				}
-				var offset = 0;
-				var _g11 = 0;
-				var _g2 = shader._attributes.length;
+				let offset = 0;
+				let _g11 = 0;
+				let _g2 = shader._attributes.length;
 				while(_g11 < _g2) {
-					var i = _g11++;
-					var att = shader._attributes[i];
-					var location = att.location;
+					let i = _g11++;
+					let att = shader._attributes[i];
+					let location = att.location;
 					if(location != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -2394,20 +2394,20 @@ Main.prototype = $extend(flu_App.prototype,{
 			} else {
 				if(!shader._ready) shader.create();
 				flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-				var _g3 = 0;
-				var _g12 = shader._uniforms;
+				let _g3 = 0;
+				let _g12 = shader._uniforms;
 				while(_g3 < _g12.length) {
-					var u1 = _g12[_g3];
+					let u1 = _g12[_g3];
 					++_g3;
 					u1.apply();
 				}
-				var offset1 = 0;
-				var _g13 = 0;
-				var _g4 = shader._attributes.length;
+				let offset1 = 0;
+				let _g13 = 0;
+				let _g4 = shader._attributes.length;
 				while(_g13 < _g4) {
-					var i1 = _g13++;
-					var att1 = shader._attributes[i1];
-					var location1 = att1.location;
+					let i1 = _g13++;
+					let att1 = shader._attributes[i1];
+					let location1 = att1.location;
 					if(location1 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -2424,35 +2424,35 @@ Main.prototype = $extend(flu_App.prototype,{
 			target.tmpTex = target.writeToTexture;
 			target.writeToTexture = target.readFromTexture;
 			target.readFromTexture = target.tmpTex;
-			var _this8 = _this4.positionStepShader.dt;
+			let _this8 = _this4.positionStepShader.dt;
 			_this8.dirty = true;
 			_this8.data = dt;
-			var _this9 = _this4.positionStepShader.positionData;
+			let _this9 = _this4.positionStepShader.positionData;
 			_this9.dirty = true;
 			_this9.data = _this4.positionData.readFromTexture;
-			var _this10 = _this4.positionStepShader.velocityData;
+			let _this10 = _this4.positionStepShader.velocityData;
 			_this10.dirty = true;
 			_this10.data = _this4.velocityData.readFromTexture;
-			var shader1 = _this4.positionStepShader;
-			var target1 = _this4.positionData;
+			let shader1 = _this4.positionStepShader;
+			let target1 = _this4.positionData;
 			flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
 			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
 			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
 			if(shader1._active) {
-				var _g5 = 0;
-				var _g14 = shader1._uniforms;
+				let _g5 = 0;
+				let _g14 = shader1._uniforms;
 				while(_g5 < _g14.length) {
-					var u2 = _g14[_g5];
+					let u2 = _g14[_g5];
 					++_g5;
 					u2.apply();
 				}
-				var offset2 = 0;
-				var _g15 = 0;
-				var _g6 = shader1._attributes.length;
+				let offset2 = 0;
+				let _g15 = 0;
+				let _g6 = shader1._attributes.length;
 				while(_g15 < _g6) {
-					var i2 = _g15++;
-					var att2 = shader1._attributes[i2];
-					var location2 = att2.location;
+					let i2 = _g15++;
+					let att2 = shader1._attributes[i2];
+					let location2 = att2.location;
 					if(location2 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -2463,20 +2463,20 @@ Main.prototype = $extend(flu_App.prototype,{
 			} else {
 				if(!shader1._ready) shader1.create();
 				flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-				var _g7 = 0;
-				var _g16 = shader1._uniforms;
+				let _g7 = 0;
+				let _g16 = shader1._uniforms;
 				while(_g7 < _g16.length) {
-					var u3 = _g16[_g7];
+					let u3 = _g16[_g7];
 					++_g7;
 					u3.apply();
 				}
-				var offset3 = 0;
-				var _g17 = 0;
-				var _g8 = shader1._attributes.length;
+				let offset3 = 0;
+				let _g17 = 0;
+				let _g8 = shader1._attributes.length;
 				while(_g17 < _g8) {
-					var i3 = _g17++;
-					var att3 = shader1._attributes[i3];
-					var location3 = att3.location;
+					let i3 = _g17++;
+					let att3 = shader1._attributes[i3];
+					let location3 = att3.location;
 					if(location3 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -2495,34 +2495,34 @@ Main.prototype = $extend(flu_App.prototype,{
 			target1.readFromTexture = target1.tmpTex;
 		}
 		if(this.hueCycleEnabled) {
-			var _g9 = this.dyeColorHSB;
+			let _g9 = this.dyeColorHSB;
 			_g9.set_hue(_g9.get_hue() + 1.2);
 		}
 		
 		if(this.isMouseDown && !this.TWILIGHT && !this.SEX_BOMB && !this.BIG_BLUE && !this.THINK_PINK && !this.AVOBATH && !this.CHEER_UP_BUTTERCUP && !this.SECRET_ARTS && !this.BIG_SLEEP && !this.THE_EXPERIMENTOR && !this.INTERGALACTIC) {
 			if(this.hueCycleEnabled) {
 				
-				var vx = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-				var vy = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-				var _g10 = this.dyeColorHSB;
+				let vx = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
+				let vy = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
+				let _g10 = this.dyeColorHSB;
 				_g10.set_hue(_g10.get_hue() + Math.sqrt(vx * vx + vy * vy) * 0.5);
 			}
-			var rgb = this.dyeColorHSB.toRGB();
-			var _this11 = this.dyeColor;
+			let rgb = this.dyeColorHSB.toRGB();
+			let _this11 = this.dyeColor;
 
 			//shoot fluid color configuration - modify later.
-			var x = 160 / 255;
-			var y = 32 / 255;
-			var z = 240 / 255;
+			let x = 160 / 255;
+			let y = 32 / 255;
+			let z = 240 / 255;
 			_this11.x = x;
 			_this11.y = y;
 			_this11.z = z;
 		}
 
-		var _this22 = this.lastMouse;
+		let _this22 = this.lastMouse;
 		_this22.x = this.mouse.x;
 		_this22.y = this.mouse.y;
-		var _this23 = this.lastMouseFluid;
+		let _this23 = this.lastMouseFluid;
 		_this23.x = (this.mouse.x / this.window.width * 2 - 1) * this.fluid.aspectRatio;
 		_this23.y = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
 		this.lastMousePointKnown = this.mousePointKnown;
@@ -2530,21 +2530,21 @@ Main.prototype = $extend(flu_App.prototype,{
 	,render: function(w) {
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.window.width,this.window.height);
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.screenBuffer);
-		var shader = this.blitTextureShader;
+		let shader = this.blitTextureShader;
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		var _this = shader.texture;
+		let _this = shader.texture;
 		_this.dirty = true;
 		_this.data = this.fluid.dyeRenderTarget.readFromTexture;
 		shader.activate(true,true);
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader.deactivate();
 		if(this.renderParticlesEnabled) {
-			var shader1 = this.renderParticlesShader;
+			let shader1 = this.renderParticlesShader;
 			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particles.particleUVs);
-			var _this1 = shader1.positionData;
+			let _this1 = shader1.positionData;
 			_this1.dirty = true;
 			_this1.data = this.particles.positionData.readFromTexture;
-			var _this2 = shader1.velocityData;
+			let _this2 = shader1.velocityData;
 			_this2.dirty = true;
 			_this2.data = this.particles.velocityData.readFromTexture;
 			shader1.activate(true,true);
@@ -2553,41 +2553,41 @@ Main.prototype = $extend(flu_App.prototype,{
 		}
 	}
 	,updateSimulationTextures: function() {
-		var w;
-		var h;
+		let w;
+		let h;
 		w = Math.round(this.window.width * this.fluidScale);
 		h = Math.round(this.window.height * this.fluidScale);
 		if(w != this.fluid.width || h != this.fluid.height) {
-			var _this = this.fluid;
+			let _this = this.fluid;
 			_this.velocityRenderTarget.resize(w,h);
 			_this.pressureRenderTarget.resize(w,h);
-			var _this1 = _this.divergenceRenderTarget;
-			var newTexture = _this1.textureFactory(w,h);
+			let _this1 = _this.divergenceRenderTarget;
+			let newTexture = _this1.textureFactory(w,h);
 			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
 			flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
 			if(_this1.texture != null) {
-				var resampler = gltoolbox_shaders_Resample.instance;
-				var _this2 = resampler.texture;
+				let resampler = gltoolbox_shaders_Resample.instance;
+				let _this2 = resampler.texture;
 				_this2.dirty = true;
 				_this2.data = _this1.texture;
 				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
 				flu_modules_opengl_web_GL.current_context.viewport(0,0,w,h);
 				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
 				if(resampler._active) {
-					var _g = 0;
-					var _g1 = resampler._uniforms;
+					let _g = 0;
+					let _g1 = resampler._uniforms;
 					while(_g < _g1.length) {
-						var u = _g1[_g];
+						let u = _g1[_g];
 						++_g;
 						u.apply();
 					}
-					var offset = 0;
-					var _g11 = 0;
-					var _g2 = resampler._attributes.length;
+					let offset = 0;
+					let _g11 = 0;
+					let _g2 = resampler._attributes.length;
 					while(_g11 < _g2) {
-						var i = _g11++;
-						var att = resampler._attributes[i];
-						var location = att.location;
+						let i = _g11++;
+						let att = resampler._attributes[i];
+						let location = att.location;
 						if(location != -1) {
 							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
@@ -2597,20 +2597,20 @@ Main.prototype = $extend(flu_App.prototype,{
 				} else {
 					if(!resampler._ready) resampler.create();
 					flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
-					var _g3 = 0;
-					var _g12 = resampler._uniforms;
+					let _g3 = 0;
+					let _g12 = resampler._uniforms;
 					while(_g3 < _g12.length) {
-						var u1 = _g12[_g3];
+						let u1 = _g12[_g3];
 						++_g3;
 						u1.apply();
 					}
-					var offset1 = 0;
-					var _g13 = 0;
-					var _g4 = resampler._attributes.length;
+					let offset1 = 0;
+					let _g13 = 0;
+					let _g4 = resampler._attributes.length;
 					while(_g13 < _g4) {
-						var i1 = _g13++;
-						var att1 = resampler._attributes[i1];
-						var location1 = att1.location;
+						let i1 = _g13++;
+						let att1 = resampler._attributes[i1];
+						let location1 = att1.location;
 						if(location1 != -1) {
 							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
@@ -2639,7 +2639,7 @@ Main.prototype = $extend(flu_App.prototype,{
 		if(this.particleCount != this.particles.count) this.particles.setCount(this.particleCount);
 		this.particles.velocityStepShader.flowScale.data.x = 1 / (this.fluid.cellSize * this.fluid.aspectRatio);
 		this.particles.velocityStepShader.flowScale.data.y = 1 / this.fluid.cellSize;
-		var _this3 = this.particles.velocityStepShader.dragCoefficient;
+		let _this3 = this.particles.velocityStepShader.dragCoefficient;
 		_this3.dirty = true;
 		_this3.data = 1;
 	}
@@ -2713,39 +2713,39 @@ Main.prototype = $extend(flu_App.prototype,{
 	,lowerQualityRequired: function(magnitude) {
 		if(this.qualityDirection > 0) return;
 		this.qualityDirection = -1;
-		var qualityIndex = this.simulationQuality[1];
-		var maxIndex = Type.allEnums(SimulationQuality).length - 1;
+		let qualityIndex = this.simulationQuality[1];
+		let maxIndex = Type.allEnums(SimulationQuality).length - 1;
 		if(qualityIndex >= maxIndex) return;
 		if(magnitude < 0.5) qualityIndex += 1; else qualityIndex += 2;
 		if(qualityIndex > maxIndex) qualityIndex = maxIndex;
-		var newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
+		let newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
 		//console.log("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
 		this.set_simulationQuality(newQuality);
 		this.updateSimulationTextures();
 		this.updatePointSize();
 	}
 	,reset: function() {
-		var _this = this.particles;
-		var shader = _this.initialPositionShader;
-		var target = _this.positionData;
+		let _this = this.particles;
+		let shader = _this.initialPositionShader;
+		let target = _this.positionData;
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 		if(shader._active) {
-			var _g = 0;
-			var _g1 = shader._uniforms;
+			let _g = 0;
+			let _g1 = shader._uniforms;
 			while(_g < _g1.length) {
-				var u = _g1[_g];
+				let u = _g1[_g];
 				++_g;
 				u.apply();
 			}
-			var offset = 0;
-			var _g11 = 0;
-			var _g2 = shader._attributes.length;
+			let offset = 0;
+			let _g11 = 0;
+			let _g2 = shader._attributes.length;
 			while(_g11 < _g2) {
-				var i = _g11++;
-				var att = shader._attributes[i];
-				var location = att.location;
+				let i = _g11++;
+				let att = shader._attributes[i];
+				let location = att.location;
 				if(location != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -2755,20 +2755,20 @@ Main.prototype = $extend(flu_App.prototype,{
 		} else {
 			if(!shader._ready) shader.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			var _g3 = 0;
-			var _g12 = shader._uniforms;
+			let _g3 = 0;
+			let _g12 = shader._uniforms;
 			while(_g3 < _g12.length) {
-				var u1 = _g12[_g3];
+				let u1 = _g12[_g3];
 				++_g3;
 				u1.apply();
 			}
-			var offset1 = 0;
-			var _g13 = 0;
-			var _g4 = shader._attributes.length;
+			let offset1 = 0;
+			let _g13 = 0;
+			let _g4 = shader._attributes.length;
 			while(_g13 < _g4) {
-				var i1 = _g13++;
-				var att1 = shader._attributes[i1];
-				var location1 = att1.location;
+				let i1 = _g13++;
+				let att1 = shader._attributes[i1];
+				let location1 = att1.location;
 				if(location1 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -2785,26 +2785,26 @@ Main.prototype = $extend(flu_App.prototype,{
 		target.tmpTex = target.writeToTexture;
 		target.writeToTexture = target.readFromTexture;
 		target.readFromTexture = target.tmpTex;
-		var shader1 = _this.initialVelocityShader;
-		var target1 = _this.velocityData;
+		let shader1 = _this.initialVelocityShader;
+		let target1 = _this.velocityData;
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 		if(shader1._active) {
-			var _g5 = 0;
-			var _g14 = shader1._uniforms;
+			let _g5 = 0;
+			let _g14 = shader1._uniforms;
 			while(_g5 < _g14.length) {
-				var u2 = _g14[_g5];
+				let u2 = _g14[_g5];
 				++_g5;
 				u2.apply();
 			}
-			var offset2 = 0;
-			var _g15 = 0;
-			var _g6 = shader1._attributes.length;
+			let offset2 = 0;
+			let _g15 = 0;
+			let _g6 = shader1._attributes.length;
 			while(_g15 < _g6) {
-				var i2 = _g15++;
-				var att2 = shader1._attributes[i2];
-				var location2 = att2.location;
+				let i2 = _g15++;
+				let att2 = shader1._attributes[i2];
+				let location2 = att2.location;
 				if(location2 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -2814,20 +2814,20 @@ Main.prototype = $extend(flu_App.prototype,{
 		} else {
 			if(!shader1._ready) shader1.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-			var _g7 = 0;
-			var _g16 = shader1._uniforms;
+			let _g7 = 0;
+			let _g16 = shader1._uniforms;
 			while(_g7 < _g16.length) {
-				var u3 = _g16[_g7];
+				let u3 = _g16[_g7];
 				++_g7;
 				u3.apply();
 			}
-			var offset3 = 0;
-			var _g17 = 0;
-			var _g8 = shader1._attributes.length;
+			let offset3 = 0;
+			let _g17 = 0;
+			let _g8 = shader1._attributes.length;
 			while(_g17 < _g8) {
-				var i3 = _g17++;
-				var att3 = shader1._attributes[i3];
-				var location3 = att3.location;
+				let i3 = _g17++;
+				let att3 = shader1._attributes[i3];
+				let location3 = att3.location;
 				if(location3 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -2844,26 +2844,26 @@ Main.prototype = $extend(flu_App.prototype,{
 		target1.tmpTex = target1.writeToTexture;
 		target1.writeToTexture = target1.readFromTexture;
 		target1.readFromTexture = target1.tmpTex;
-		var _this1 = this.fluid;
+		let _this1 = this.fluid;
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
 		flu_modules_opengl_web_GL.current_context.disable(3042);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
-		var shader2 = _this1.clearVelocityShader;
+		let shader2 = _this1.clearVelocityShader;
 		if(shader2._active) {
-			var _g9 = 0;
-			var _g18 = shader2._uniforms;
+			let _g9 = 0;
+			let _g18 = shader2._uniforms;
 			while(_g9 < _g18.length) {
-				var u4 = _g18[_g9];
+				let u4 = _g18[_g9];
 				++_g9;
 				u4.apply();
 			}
-			var offset4 = 0;
-			var _g19 = 0;
-			var _g10 = shader2._attributes.length;
+			let offset4 = 0;
+			let _g19 = 0;
+			let _g10 = shader2._attributes.length;
 			while(_g19 < _g10) {
-				var i4 = _g19++;
-				var att4 = shader2._attributes[i4];
-				var location4 = att4.location;
+				let i4 = _g19++;
+				let att4 = shader2._attributes[i4];
+				let location4 = att4.location;
 				if(location4 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
@@ -2873,20 +2873,20 @@ Main.prototype = $extend(flu_App.prototype,{
 		} else {
 			if(!shader2._ready) shader2.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
-			var _g20 = 0;
-			var _g110 = shader2._uniforms;
+			let _g20 = 0;
+			let _g110 = shader2._uniforms;
 			while(_g20 < _g110.length) {
-				var u5 = _g110[_g20];
+				let u5 = _g110[_g20];
 				++_g20;
 				u5.apply();
 			}
-			var offset5 = 0;
-			var _g111 = 0;
-			var _g21 = shader2._attributes.length;
+			let offset5 = 0;
+			let _g111 = 0;
+			let _g21 = shader2._attributes.length;
 			while(_g111 < _g21) {
-				var i5 = _g111++;
-				var att5 = shader2._attributes[i5];
-				var location5 = att5.location;
+				let i5 = _g111++;
+				let att5 = shader2._attributes[i5];
+				let location5 = att5.location;
 				if(location5 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
@@ -2898,29 +2898,29 @@ Main.prototype = $extend(flu_App.prototype,{
 		_this1.velocityRenderTarget.activate();
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader2.deactivate();
-		var _this2 = _this1.velocityRenderTarget;
+		let _this2 = _this1.velocityRenderTarget;
 		_this2.tmpFBO = _this2.writeFrameBufferObject;
 		_this2.writeFrameBufferObject = _this2.readFrameBufferObject;
 		_this2.readFrameBufferObject = _this2.tmpFBO;
 		_this2.tmpTex = _this2.writeToTexture;
 		_this2.writeToTexture = _this2.readFromTexture;
 		_this2.readFromTexture = _this2.tmpTex;
-		var shader3 = _this1.clearPressureShader;
+		let shader3 = _this1.clearPressureShader;
 		if(shader3._active) {
-			var _g22 = 0;
-			var _g112 = shader3._uniforms;
+			let _g22 = 0;
+			let _g112 = shader3._uniforms;
 			while(_g22 < _g112.length) {
-				var u6 = _g112[_g22];
+				let u6 = _g112[_g22];
 				++_g22;
 				u6.apply();
 			}
-			var offset6 = 0;
-			var _g113 = 0;
-			var _g23 = shader3._attributes.length;
+			let offset6 = 0;
+			let _g113 = 0;
+			let _g23 = shader3._attributes.length;
 			while(_g113 < _g23) {
-				var i6 = _g113++;
-				var att6 = shader3._attributes[i6];
-				var location6 = att6.location;
+				let i6 = _g113++;
+				let att6 = shader3._attributes[i6];
+				let location6 = att6.location;
 				if(location6 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
@@ -2930,20 +2930,20 @@ Main.prototype = $extend(flu_App.prototype,{
 		} else {
 			if(!shader3._ready) shader3.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
-			var _g24 = 0;
-			var _g114 = shader3._uniforms;
+			let _g24 = 0;
+			let _g114 = shader3._uniforms;
 			while(_g24 < _g114.length) {
-				var u7 = _g114[_g24];
+				let u7 = _g114[_g24];
 				++_g24;
 				u7.apply();
 			}
-			var offset7 = 0;
-			var _g115 = 0;
-			var _g25 = shader3._attributes.length;
+			let offset7 = 0;
+			let _g115 = 0;
+			let _g25 = shader3._attributes.length;
 			while(_g115 < _g25) {
-				var i7 = _g115++;
-				var att7 = shader3._attributes[i7];
-				var location7 = att7.location;
+				let i7 = _g115++;
+				let att7 = shader3._attributes[i7];
+				let location7 = att7.location;
 				if(location7 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
@@ -2955,14 +2955,14 @@ Main.prototype = $extend(flu_App.prototype,{
 		_this1.pressureRenderTarget.activate();
 		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 		shader3.deactivate();
-		var _this3 = _this1.pressureRenderTarget;
+		let _this3 = _this1.pressureRenderTarget;
 		_this3.tmpFBO = _this3.writeFrameBufferObject;
 		_this3.writeFrameBufferObject = _this3.readFrameBufferObject;
 		_this3.readFrameBufferObject = _this3.tmpFBO;
 		_this3.tmpTex = _this3.writeToTexture;
 		_this3.writeToTexture = _this3.readFromTexture;
 		_this3.readFromTexture = _this3.tmpTex;
-		var _this4 = _this1.dyeRenderTarget;
+		let _this4 = _this1.dyeRenderTarget;
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
 		flu_modules_opengl_web_GL.current_context.clear(16384);
@@ -2976,37 +2976,37 @@ Main.prototype = $extend(flu_App.prototype,{
 		this.hueCycleEnabled = true;
 	}
 	,onmouseup: function(x,y,button,_,_1) {
-		var _g = this;
+		let _g = this;
 		this.timer.run = function() {
 			_g.isMouseDown = false;
 			_g.HAS_RUN = false;
 		};
 	}
 	,onmousemove: function(x,y,xrel,yrel,_,_1) {
-		var _this = this.mouse;
+		let _this = this.mouse;
 		_this.x = x;
 		_this.y = y;
-		var _this1 = this.mouseFluid;
+		let _this1 = this.mouseFluid;
 		_this1.x = (x / this.window.width * 2 - 1) * this.fluid.aspectRatio;
 		_this1.y = (this.window.height - y) / this.window.height * 2 - 1;
 		this.mousePointKnown = true;
 	}
 	,ontouchdown: function(x,y,touch_id,_) {
-		var x1 = x;
-		var y1 = y;
+		let x1 = x;
+		let y1 = y;
 		x1 = x * this.window.width;
 		y1 = y * this.window.height;
-		var _this = this.mouse;
+		let _this = this.mouse;
 		_this.x = x1;
 		_this.y = y1;
-		var _this1 = this.mouseFluid;
+		let _this1 = this.mouseFluid;
 		_this1.x = (x1 / this.window.width * 2 - 1) * this.fluid.aspectRatio;
 		_this1.y = (this.window.height - y1) / this.window.height * 2 - 1;
 		this.mousePointKnown = true;
-		var _this2 = this.lastMouse;
+		let _this2 = this.lastMouse;
 		_this2.x = this.mouse.x;
 		_this2.y = this.mouse.y;
-		var _this3 = this.lastMouseFluid;
+		let _this3 = this.lastMouseFluid;
 		_this3.x = (this.mouse.x / this.window.width * 2 - 1) * this.fluid.aspectRatio;
 		_this3.y = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
 		this.lastMousePointKnown = this.mousePointKnown;
@@ -3014,15 +3014,15 @@ Main.prototype = $extend(flu_App.prototype,{
 		this.hueCycleEnabled = true;
 	}
 	,ontouchup: function(x,y,touch_id,_) {
-		var _g = this;
-		var x1 = x;
-		var y1 = y;
+		let _g = this;
+		let x1 = x;
+		let y1 = y;
 		x1 = x * this.window.width;
 		y1 = y * this.window.height;
-		var _this = this.mouse;
+		let _this = this.mouse;
 		_this.x = x1;
 		_this.y = y1;
-		var _this1 = this.mouseFluid;
+		let _this1 = this.mouseFluid;
 		_this1.x = (x1 / this.window.width * 2 - 1) * this.fluid.aspectRatio;
 		_this1.y = (this.window.height - y1) / this.window.height * 2 - 1;
 		this.mousePointKnown = true;
@@ -3032,14 +3032,14 @@ Main.prototype = $extend(flu_App.prototype,{
 		};
 	}
 	,ontouchmove: function(x,y,dx,dy,touch_id,_) {
-		var x1 = x;
-		var y1 = y;
+		let x1 = x;
+		let y1 = y;
 		x1 = x * this.window.width;
 		y1 = y * this.window.height;
-		var _this = this.mouse;
+		let _this = this.mouse;
 		_this.x = x1;
 		_this.y = y1;
-		var _this1 = this.mouseFluid;
+		let _this1 = this.mouseFluid;
 		_this1.x = (x1 / this.window.width * 2 - 1) * this.fluid.aspectRatio;
 		_this1.y = (this.window.height - y1) / this.window.height * 2 - 1;
 		this.mousePointKnown = true;
@@ -3058,27 +3058,27 @@ Main.prototype = $extend(flu_App.prototype,{
 		switch(keyCode) {
 		case 114:
 			if(this.lshiftDown || this.rshiftDown) {
-				var _this = this.particles;
-				var shader = _this.initialPositionShader;
-				var target = _this.positionData;
+				let _this = this.particles;
+				let shader = _this.initialPositionShader;
+				let target = _this.positionData;
 				flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
 				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
 				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 				if(shader._active) {
-					var _g = 0;
-					var _g1 = shader._uniforms;
+					let _g = 0;
+					let _g1 = shader._uniforms;
 					while(_g < _g1.length) {
-						var u = _g1[_g];
+						let u = _g1[_g];
 						++_g;
 						u.apply();
 					}
-					var offset = 0;
-					var _g11 = 0;
-					var _g2 = shader._attributes.length;
+					let offset = 0;
+					let _g11 = 0;
+					let _g2 = shader._attributes.length;
 					while(_g11 < _g2) {
-						var i = _g11++;
-						var att = shader._attributes[i];
-						var location = att.location;
+						let i = _g11++;
+						let att = shader._attributes[i];
+						let location = att.location;
 						if(location != -1) {
 							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
@@ -3088,20 +3088,20 @@ Main.prototype = $extend(flu_App.prototype,{
 				} else {
 					if(!shader._ready) shader.create();
 					flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-					var _g3 = 0;
-					var _g12 = shader._uniforms;
+					let _g3 = 0;
+					let _g12 = shader._uniforms;
 					while(_g3 < _g12.length) {
-						var u1 = _g12[_g3];
+						let u1 = _g12[_g3];
 						++_g3;
 						u1.apply();
 					}
-					var offset1 = 0;
-					var _g13 = 0;
-					var _g4 = shader._attributes.length;
+					let offset1 = 0;
+					let _g13 = 0;
+					let _g4 = shader._attributes.length;
 					while(_g13 < _g4) {
-						var i1 = _g13++;
-						var att1 = shader._attributes[i1];
-						var location1 = att1.location;
+						let i1 = _g13++;
+						let att1 = shader._attributes[i1];
+						let location1 = att1.location;
 						if(location1 != -1) {
 							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
@@ -3118,26 +3118,26 @@ Main.prototype = $extend(flu_App.prototype,{
 				target.tmpTex = target.writeToTexture;
 				target.writeToTexture = target.readFromTexture;
 				target.readFromTexture = target.tmpTex;
-				var shader1 = _this.initialVelocityShader;
-				var target1 = _this.velocityData;
+				let shader1 = _this.initialVelocityShader;
+				let target1 = _this.velocityData;
 				flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
 				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
 				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
 				if(shader1._active) {
-					var _g5 = 0;
-					var _g14 = shader1._uniforms;
+					let _g5 = 0;
+					let _g14 = shader1._uniforms;
 					while(_g5 < _g14.length) {
-						var u2 = _g14[_g5];
+						let u2 = _g14[_g5];
 						++_g5;
 						u2.apply();
 					}
-					var offset2 = 0;
-					var _g15 = 0;
-					var _g6 = shader1._attributes.length;
+					let offset2 = 0;
+					let _g15 = 0;
+					let _g6 = shader1._attributes.length;
 					while(_g15 < _g6) {
-						var i2 = _g15++;
-						var att2 = shader1._attributes[i2];
-						var location2 = att2.location;
+						let i2 = _g15++;
+						let att2 = shader1._attributes[i2];
+						let location2 = att2.location;
 						if(location2 != -1) {
 							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
 							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
@@ -3147,20 +3147,20 @@ Main.prototype = $extend(flu_App.prototype,{
 				} else {
 					if(!shader1._ready) shader1.create();
 					flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-					var _g7 = 0;
-					var _g16 = shader1._uniforms;
+					let _g7 = 0;
+					let _g16 = shader1._uniforms;
 					while(_g7 < _g16.length) {
-						var u3 = _g16[_g7];
+						let u3 = _g16[_g7];
 						++_g7;
 						u3.apply();
 					}
-					var offset3 = 0;
-					var _g17 = 0;
-					var _g8 = shader1._attributes.length;
+					let offset3 = 0;
+					let _g17 = 0;
+					let _g8 = shader1._attributes.length;
 					while(_g17 < _g8) {
-						var i3 = _g17++;
-						var att3 = shader1._attributes[i3];
-						var location3 = att3.location;
+						let i3 = _g17++;
+						let att3 = shader1._attributes[i3];
+						let location3 = att3.location;
 						if(location3 != -1) {
 							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
 							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
@@ -3186,26 +3186,26 @@ Main.prototype = $extend(flu_App.prototype,{
 			this.renderFluidEnabled = !this.renderFluidEnabled;
 			break;
 		case 115:
-			var _this1 = this.fluid;
+			let _this1 = this.fluid;
 			flu_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
 			flu_modules_opengl_web_GL.current_context.disable(3042);
 			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
-			var shader2 = _this1.clearVelocityShader;
+			let shader2 = _this1.clearVelocityShader;
 			if(shader2._active) {
-				var _g9 = 0;
-				var _g18 = shader2._uniforms;
+				let _g9 = 0;
+				let _g18 = shader2._uniforms;
 				while(_g9 < _g18.length) {
-					var u4 = _g18[_g9];
+					let u4 = _g18[_g9];
 					++_g9;
 					u4.apply();
 				}
-				var offset4 = 0;
-				var _g19 = 0;
-				var _g10 = shader2._attributes.length;
+				let offset4 = 0;
+				let _g19 = 0;
+				let _g10 = shader2._attributes.length;
 				while(_g19 < _g10) {
-					var i4 = _g19++;
-					var att4 = shader2._attributes[i4];
-					var location4 = att4.location;
+					let i4 = _g19++;
+					let att4 = shader2._attributes[i4];
+					let location4 = att4.location;
 					if(location4 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
@@ -3215,20 +3215,20 @@ Main.prototype = $extend(flu_App.prototype,{
 			} else {
 				if(!shader2._ready) shader2.create();
 				flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
-				var _g20 = 0;
-				var _g110 = shader2._uniforms;
+				let _g20 = 0;
+				let _g110 = shader2._uniforms;
 				while(_g20 < _g110.length) {
-					var u5 = _g110[_g20];
+					let u5 = _g110[_g20];
 					++_g20;
 					u5.apply();
 				}
-				var offset5 = 0;
-				var _g111 = 0;
-				var _g21 = shader2._attributes.length;
+				let offset5 = 0;
+				let _g111 = 0;
+				let _g21 = shader2._attributes.length;
 				while(_g111 < _g21) {
-					var i5 = _g111++;
-					var att5 = shader2._attributes[i5];
-					var location5 = att5.location;
+					let i5 = _g111++;
+					let att5 = shader2._attributes[i5];
+					let location5 = att5.location;
 					if(location5 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
@@ -3240,29 +3240,29 @@ Main.prototype = $extend(flu_App.prototype,{
 			_this1.velocityRenderTarget.activate();
 			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader2.deactivate();
-			var _this2 = _this1.velocityRenderTarget;
+			let _this2 = _this1.velocityRenderTarget;
 			_this2.tmpFBO = _this2.writeFrameBufferObject;
 			_this2.writeFrameBufferObject = _this2.readFrameBufferObject;
 			_this2.readFrameBufferObject = _this2.tmpFBO;
 			_this2.tmpTex = _this2.writeToTexture;
 			_this2.writeToTexture = _this2.readFromTexture;
 			_this2.readFromTexture = _this2.tmpTex;
-			var shader3 = _this1.clearPressureShader;
+			let shader3 = _this1.clearPressureShader;
 			if(shader3._active) {
-				var _g22 = 0;
-				var _g112 = shader3._uniforms;
+				let _g22 = 0;
+				let _g112 = shader3._uniforms;
 				while(_g22 < _g112.length) {
-					var u6 = _g112[_g22];
+					let u6 = _g112[_g22];
 					++_g22;
 					u6.apply();
 				}
-				var offset6 = 0;
-				var _g113 = 0;
-				var _g23 = shader3._attributes.length;
+				let offset6 = 0;
+				let _g113 = 0;
+				let _g23 = shader3._attributes.length;
 				while(_g113 < _g23) {
-					var i6 = _g113++;
-					var att6 = shader3._attributes[i6];
-					var location6 = att6.location;
+					let i6 = _g113++;
+					let att6 = shader3._attributes[i6];
+					let location6 = att6.location;
 					if(location6 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
@@ -3272,20 +3272,20 @@ Main.prototype = $extend(flu_App.prototype,{
 			} else {
 				if(!shader3._ready) shader3.create();
 				flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
-				var _g24 = 0;
-				var _g114 = shader3._uniforms;
+				let _g24 = 0;
+				let _g114 = shader3._uniforms;
 				while(_g24 < _g114.length) {
-					var u7 = _g114[_g24];
+					let u7 = _g114[_g24];
 					++_g24;
 					u7.apply();
 				}
-				var offset7 = 0;
-				var _g115 = 0;
-				var _g25 = shader3._attributes.length;
+				let offset7 = 0;
+				let _g115 = 0;
+				let _g25 = shader3._attributes.length;
 				while(_g115 < _g25) {
-					var i7 = _g115++;
-					var att7 = shader3._attributes[i7];
-					var location7 = att7.location;
+					let i7 = _g115++;
+					let att7 = shader3._attributes[i7];
+					let location7 = att7.location;
 					if(location7 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
@@ -3297,14 +3297,14 @@ Main.prototype = $extend(flu_App.prototype,{
 			_this1.pressureRenderTarget.activate();
 			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
 			shader3.deactivate();
-			var _this3 = _this1.pressureRenderTarget;
+			let _this3 = _this1.pressureRenderTarget;
 			_this3.tmpFBO = _this3.writeFrameBufferObject;
 			_this3.writeFrameBufferObject = _this3.readFrameBufferObject;
 			_this3.readFrameBufferObject = _this3.tmpFBO;
 			_this3.tmpTex = _this3.writeToTexture;
 			_this3.writeToTexture = _this3.readFromTexture;
 			_this3.readFromTexture = _this3.tmpTex;
-			var _this4 = _this1.dyeRenderTarget;
+			let _this4 = _this1.dyeRenderTarget;
 			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
 			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
 			flu_modules_opengl_web_GL.current_context.clear(16384);
@@ -3321,7 +3321,7 @@ Main.prototype = $extend(flu_App.prototype,{
 		}
 	}
 	,onWindowEvent: function(e) {
-		var _g = e.type;
+		let _g = e.type;
 		if(_g != null) switch(_g) {
 		case 6:
 			this.updateSimulationTextures();
@@ -3342,7 +3342,7 @@ Main.prototype = $extend(flu_App.prototype,{
 	}
 	,__class__: Main
 });
-var SimulationQuality = $hxClasses["SimulationQuality"] = { __ename__ : true, __constructs__ : ["UltraHigh","High","Medium","Low","UltraLow","Android_IOS","UltraUltraLow"] };
+let SimulationQuality = $hxClasses["SimulationQuality"] = { __ename__ : true, __constructs__ : ["UltraHigh","High","Medium","Low","UltraLow","Android_IOS","UltraUltraLow"] };
 SimulationQuality.UltraHigh = ["UltraHigh",0];
 SimulationQuality.UltraHigh.toString = $estr;
 SimulationQuality.UltraHigh.__enum__ = SimulationQuality;
@@ -3365,7 +3365,7 @@ SimulationQuality.UltraUltraLow = ["UltraUltraLow",6];
 SimulationQuality.UltraUltraLow.toString = $estr;
 SimulationQuality.UltraUltraLow.__enum__ = SimulationQuality;
 SimulationQuality.__empty_constructs__ = [SimulationQuality.UltraHigh,SimulationQuality.High,SimulationQuality.Medium,SimulationQuality.Low,SimulationQuality.UltraLow,SimulationQuality.Android_IOS,SimulationQuality.UltraUltraLow];
-var BlitTexture = function() {
+let BlitTexture = function() {
 	shaderblox_ShaderBase.call(this);
 };
 $hxClasses["BlitTexture"] = BlitTexture;
@@ -3374,10 +3374,10 @@ BlitTexture.__super__ = shaderblox_ShaderBase;
 BlitTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	createProperties: function() {
 		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("texture",null,false);
+		let instance = new shaderblox_uniforms_UTexture("texture",null,false);
 		this.texture = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		let instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
 		this.vertexPosition = instance1;
 		this._attributes.push(instance1);
 		this._aStride += 8;
@@ -3388,7 +3388,7 @@ BlitTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,__class__: BlitTexture
 });
-var FluidRender = function() {
+let FluidRender = function() {
 	shaderblox_ShaderBase.call(this);
 };
 $hxClasses["FluidRender"] = FluidRender;
@@ -3397,10 +3397,10 @@ FluidRender.__super__ = shaderblox_ShaderBase;
 FluidRender.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	createProperties: function() {
 		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("texture",null,false);
+		let instance = new shaderblox_uniforms_UTexture("texture",null,false);
 		this.texture = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		let instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
 		this.vertexPosition = instance1;
 		this._attributes.push(instance1);
 		this._aStride += 8;
@@ -3411,7 +3411,7 @@ FluidRender.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,__class__: FluidRender
 });
-var ColorParticleMotion = function() {
+let ColorParticleMotion = function() {
 	RenderParticles.call(this);
 };
 $hxClasses["ColorParticleMotion"] = ColorParticleMotion;
@@ -3434,7 +3434,7 @@ ColorParticleMotion.prototype = $extend(RenderParticles.prototype,{
 	}
 	,__class__: ColorParticleMotion
 });
-var MouseDye = function() {
+let MouseDye = function() {
 	UpdateDye.call(this);
 };
 $hxClasses["MouseDye"] = MouseDye;
@@ -3443,16 +3443,16 @@ MouseDye.__super__ = UpdateDye;
 MouseDye.prototype = $extend(UpdateDye.prototype,{
 	createProperties: function() {
 		UpdateDye.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UBool("isMouseDown",null);
+		let instance = new shaderblox_uniforms_UBool("isMouseDown",null);
 		this.isMouseDown = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UVec2("mouse",null);
+		let instance1 = new shaderblox_uniforms_UVec2("mouse",null);
 		this.mouse = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UVec2("lastMouse",null);
+		let instance2 = new shaderblox_uniforms_UVec2("lastMouse",null);
 		this.lastMouse = instance2;
 		this._uniforms.push(instance2);
-		var instance3 = new shaderblox_uniforms_UVec3("dyeColor",null);
+		let instance3 = new shaderblox_uniforms_UVec3("dyeColor",null);
 		this.dyeColor = instance3;
 		this._uniforms.push(instance3);
 		this._aStride += 0;
@@ -3463,7 +3463,7 @@ MouseDye.prototype = $extend(UpdateDye.prototype,{
 	}
 	,__class__: MouseDye
 });
-var MouseForce = function() {
+let MouseForce = function() {
 	ApplyForces.call(this);
 };
 $hxClasses["MouseForce"] = MouseForce;
@@ -3472,13 +3472,13 @@ MouseForce.__super__ = ApplyForces;
 MouseForce.prototype = $extend(ApplyForces.prototype,{
 	createProperties: function() {
 		ApplyForces.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UBool("isMouseDown",null);
+		let instance = new shaderblox_uniforms_UBool("isMouseDown",null);
 		this.isMouseDown = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UVec2("mouse",null);
+		let instance1 = new shaderblox_uniforms_UVec2("mouse",null);
 		this.mouse = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UVec2("lastMouse",null);
+		let instance2 = new shaderblox_uniforms_UVec2("lastMouse",null);
 		this.lastMouse = instance2;
 		this._uniforms.push(instance2);
 		this._aStride += 0;
@@ -3489,7 +3489,7 @@ MouseForce.prototype = $extend(ApplyForces.prototype,{
 	}
 	,__class__: MouseForce
 });
-var DebugBlitTexture = function() {
+let DebugBlitTexture = function() {
 	shaderblox_ShaderBase.call(this);
 };
 $hxClasses["DebugBlitTexture"] = DebugBlitTexture;
@@ -3498,16 +3498,16 @@ DebugBlitTexture.__super__ = shaderblox_ShaderBase;
 DebugBlitTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	createProperties: function() {
 		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UVec2("invresolution",null);
+		let instance = new shaderblox_uniforms_UVec2("invresolution",null);
 		this.invresolution = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_uniforms_UFloat("aspectRatio",null);
+		let instance1 = new shaderblox_uniforms_UFloat("aspectRatio",null);
 		this.aspectRatio = instance1;
 		this._uniforms.push(instance1);
-		var instance2 = new shaderblox_uniforms_UTexture("texture",null,false);
+		let instance2 = new shaderblox_uniforms_UTexture("texture",null,false);
 		this.texture = instance2;
 		this._uniforms.push(instance2);
-		var instance3 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		let instance3 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
 		this.vertexPosition = instance3;
 		this._attributes.push(instance3);
 		this._aStride += 8;
@@ -3519,7 +3519,7 @@ DebugBlitTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	,__class__: DebugBlitTexture
 });
 Math.__name__ = true;
-var PerformanceMonitor = function(lowerBoundFPS,upperBoundFPS,thresholdTime_ms,fpsSampleSize) {
+let PerformanceMonitor = function(lowerBoundFPS,upperBoundFPS,thresholdTime_ms,fpsSampleSize) {
 	if(fpsSampleSize == null) fpsSampleSize = 30;
 	if(thresholdTime_ms == null) thresholdTime_ms = 3000;
 	if(lowerBoundFPS == null) lowerBoundFPS = 30;
@@ -3538,15 +3538,15 @@ PerformanceMonitor.__name__ = true;
 PerformanceMonitor.prototype = {
 	__class__: PerformanceMonitor
 };
-var RollingSample = function(length) {
+let RollingSample = function(length) {
 	this.m2 = 0;
 	this.pos = 0;
 	this.sampleCount = 0;
 	this.standardDeviation = 0;
 	this.variance = 0;
 	this.average = 0;
-	var tmp;
-	var this1;
+	let tmp;
+	let this1;
 	this1 = new Array(length);
 	tmp = this1;
 	this.samples = tmp;
@@ -3555,9 +3555,9 @@ $hxClasses["RollingSample"] = RollingSample;
 RollingSample.__name__ = true;
 RollingSample.prototype = {
 	add: function(v) {
-		var delta;
+		let delta;
 		if(this.sampleCount >= this.samples.length) {
-			var bottomValue = this.samples[this.pos];
+			let bottomValue = this.samples[this.pos];
 			delta = bottomValue - this.average;
 			this.average -= delta / (this.sampleCount - 1);
 			this.m2 -= delta * (bottomValue - this.average);
@@ -3571,10 +3571,10 @@ RollingSample.prototype = {
 		return this.pos;
 	}
 	,clear: function() {
-		var _g1 = 0;
-		var _g = this.samples.length;
+		let _g1 = 0;
+		let _g = this.samples.length;
 		while(_g1 < _g) {
-			var i = _g1++;
+			let i = _g1++;
 			this.samples[i] = 0;
 		}
 		this.average = 0;
@@ -3585,7 +3585,7 @@ RollingSample.prototype = {
 	}
 	,__class__: RollingSample
 };
-var Reflect = function() { };
+let Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = true;
 Reflect.field = function(o,field) {
@@ -3597,10 +3597,10 @@ Reflect.field = function(o,field) {
 	}
 };
 Reflect.fields = function(o) {
-	var a = [];
+	let a = [];
 	if(o != null) {
-		var hasOwnProperty = Object.prototype.hasOwnProperty;
-		for( var f in o ) {
+		let hasOwnProperty = Object.prototype.hasOwnProperty;
+		for( let f in o ) {
 		if(f != "__id__" && f != "hx__closures__" && hasOwnProperty.call(o,f)) a.push(f);
 		}
 	}
@@ -3609,43 +3609,43 @@ Reflect.fields = function(o) {
 Reflect.isFunction = function(f) {
 	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
 };
-var SnowApp = function() { };
+let SnowApp = function() { };
 $hxClasses["FluidApp"] = SnowApp;
 SnowApp.__name__ = true;
 SnowApp.main = function() {
 	SnowApp._flu = new flu();
 	SnowApp._host = new Main();
-	var _flu_config = { has_loop : true, config_path : "manifest.json", app_package : "fluidity.money"};
+	let _flu_config = { has_loop : true, config_path : "manifest.json", app_package : "fluidity.money"};
 	SnowApp._flu.init(_flu_config,SnowApp._host);
 };
-var Std = function() { };
+let Std = function() { };
 $hxClasses["Std"] = Std;
 Std.__name__ = true;
 Std.string = function(s) {
 	return js_Boot.__string_rec(s,"");
 };
 Std.parseInt = function(x) {
-	var v = parseInt(x,10);
+	let v = parseInt(x,10);
 	if(v == 0 && (HxOverrides.cca(x,1) == 120 || HxOverrides.cca(x,1) == 88)) v = parseInt(x);
 	if(isNaN(v)) return null;
 	return v;
 };
-var StringTools = function() { };
+let StringTools = function() { };
 $hxClasses["StringTools"] = StringTools;
 StringTools.__name__ = true;
 StringTools.isSpace = function(s,pos) {
-	var c = HxOverrides.cca(s,pos);
+	let c = HxOverrides.cca(s,pos);
 	return c > 8 && c < 14 || c == 32;
 };
 StringTools.ltrim = function(s) {
-	var l = s.length;
-	var r = 0;
+	let l = s.length;
+	let r = 0;
 	while(r < l && StringTools.isSpace(s,r)) r++;
 	if(r > 0) return HxOverrides.substr(s,r,l - r); else return s;
 };
 StringTools.rtrim = function(s) {
-	var l = s.length;
-	var r = 0;
+	let l = s.length;
+	let r = 0;
 	while(r < l && StringTools.isSpace(s,l - r - 1)) r++;
 	if(r > 0) return HxOverrides.substr(s,0,l - r); else return s;
 };
@@ -3655,26 +3655,26 @@ StringTools.trim = function(s) {
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
 };
-var Type = function() { };
+let Type = function() { };
 $hxClasses["Type"] = Type;
 Type.__name__ = true;
 Type.resolveClass = function(name) {
-	var cl = $hxClasses[name];
+	let cl = $hxClasses[name];
 	if(cl == null || !cl.__name__) return null;
 	return cl;
 };
 Type.resolveEnum = function(name) {
-	var e = $hxClasses[name];
+	let e = $hxClasses[name];
 	if(e == null || !e.__ename__) return null;
 	return e;
 };
 Type.createEnum = function(e,constr,params) {
-	var f = Reflect.field(e,constr);
+	let f = Reflect.field(e,constr);
 	if(f == null) throw new js__$Boot_FluidError("No such constructor " + constr);
 	if(Reflect.isFunction(f)) {
 		if(params == null) throw new js__$Boot_FluidError("Constructor " + constr + " need parameters");
-		var tmp;
-		var func = f;
+		let tmp;
+		let func = f;
 		tmp = func.apply(e,params);
 		return tmp;
 	}
@@ -3682,19 +3682,19 @@ Type.createEnum = function(e,constr,params) {
 	return f;
 };
 Type.createEnumIndex = function(e,index,params) {
-	var c = e.__constructs__[index];
+	let c = e.__constructs__[index];
 	if(c == null) throw new js__$Boot_FluidError(index + " is not a valid enum constructor index");
 	return Type.createEnum(e,c,params);
 };
 Type.allEnums = function(e) {
 	return e.__empty_constructs__;
 };
-var gltoolbox_GeometryTools = function() { };
+let gltoolbox_GeometryTools = function() { };
 $hxClasses["gltoolbox.GeometryTools"] = gltoolbox_GeometryTools;
 gltoolbox_GeometryTools.__name__ = true;
 gltoolbox_GeometryTools.getCachedUnitQuad = function(drawMode) {
 	if(drawMode == null) drawMode = 5;
-	var unitQuad = gltoolbox_GeometryTools.unitQuadCache.h[drawMode];
+	let unitQuad = gltoolbox_GeometryTools.unitQuadCache.h[drawMode];
 	if(unitQuad == null || !flu_modules_opengl_web_GL.current_context.isBuffer(unitQuad)) {
 		unitQuad = gltoolbox_GeometryTools.createQuad(0,0,1,1,drawMode);
 		gltoolbox_GeometryTools.unitQuadCache.h[drawMode] = unitQuad;
@@ -3708,8 +3708,8 @@ gltoolbox_GeometryTools.createQuad = function(originX,originY,width,height,drawM
 	if(width == null) width = 1;
 	if(originY == null) originY = 0;
 	if(originX == null) originX = 0;
-	var quad = flu_modules_opengl_web_GL.current_context.createBuffer();
-	var vertices = [];
+	let quad = flu_modules_opengl_web_GL.current_context.createBuffer();
+	let vertices = [];
 	switch(drawMode) {
 	case 5:case 4:
 		vertices = [originX,originY + height,originX,originY,originX + width,originY + height,originX + width,originY];
@@ -3720,32 +3720,32 @@ gltoolbox_GeometryTools.createQuad = function(originX,originY,width,height,drawM
 		break;
 	}
 	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,quad);
-	var tmp;
-	var this1;
+	let tmp;
+	let this1;
 	if(vertices != null) this1 = new Float32Array(vertices); else this1 = null;
 	tmp = this1;
-	var data = tmp;
+	let data = tmp;
 	flu_modules_opengl_web_GL.current_context.bufferData(34962,data,usage);
 	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
 	return quad;
 };
-var gltoolbox_TextureTools = function() { };
+let gltoolbox_TextureTools = function() { };
 $hxClasses["gltoolbox.TextureTools"] = gltoolbox_TextureTools;
 gltoolbox_TextureTools.__name__ = true;
 gltoolbox_TextureTools.createTexture = function(width,height,params,data) {
 	if(params == null) params = { };
 	if(data == null) data = null;
-	var _g = 0;
-	var _g1 = Reflect.fields(gltoolbox_TextureTools.defaultParams);
+	let _g = 0;
+	let _g1 = Reflect.fields(gltoolbox_TextureTools.defaultParams);
 	while(_g < _g1.length) {
-		var f = _g1[_g];
+		let f = _g1[_g];
 		++_g;
 		if(!Object.prototype.hasOwnProperty.call(params,f)) {
-			var value = Reflect.field(gltoolbox_TextureTools.defaultParams,f);
+			let value = Reflect.field(gltoolbox_TextureTools.defaultParams,f);
 			params[f] = value;
 		}
 	}
-	var texture = flu_modules_opengl_web_GL.current_context.createTexture();
+	let texture = flu_modules_opengl_web_GL.current_context.createTexture();
 	flu_modules_opengl_web_GL.current_context.bindTexture(3553,texture);
 	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10241,params.filter);
 	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10240,params.filter);
@@ -3757,13 +3757,13 @@ gltoolbox_TextureTools.createTexture = function(width,height,params,data) {
 	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
 	return texture;
 };
-var gltoolbox_render_ITargetable = function() { };
+let gltoolbox_render_ITargetable = function() { };
 $hxClasses["gltoolbox.render.ITargetable"] = gltoolbox_render_ITargetable;
 gltoolbox_render_ITargetable.__name__ = true;
 gltoolbox_render_ITargetable.prototype = {
 	__class__: gltoolbox_render_ITargetable
 };
-var gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
+let gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
 	if(textureFactory == null) textureFactory = function(width1,height1) {
 		return gltoolbox_TextureTools.createTexture(width1,height1,null);
 	};
@@ -3773,32 +3773,32 @@ var gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
 	this.texture = textureFactory(width,height);
 	if(gltoolbox_render_RenderTarget.textureQuad == null) gltoolbox_render_RenderTarget.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad(5);
 	this.frameBufferObject = flu_modules_opengl_web_GL.current_context.createFramebuffer();
-	var newTexture = this.textureFactory(width,height);
+	let newTexture = this.textureFactory(width,height);
 	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
 	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
 	if(this.texture != null) {
-		var resampler = gltoolbox_shaders_Resample.instance;
-		var _this = resampler.texture;
+		let resampler = gltoolbox_shaders_Resample.instance;
+		let _this = resampler.texture;
 		_this.dirty = true;
 		_this.data = this.texture;
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
 		flu_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
 		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
 		if(resampler._active) {
-			var _g = 0;
-			var _g1 = resampler._uniforms;
+			let _g = 0;
+			let _g1 = resampler._uniforms;
 			while(_g < _g1.length) {
-				var u = _g1[_g];
+				let u = _g1[_g];
 				++_g;
 				u.apply();
 			}
-			var offset = 0;
-			var _g11 = 0;
-			var _g2 = resampler._attributes.length;
+			let offset = 0;
+			let _g11 = 0;
+			let _g2 = resampler._attributes.length;
 			while(_g11 < _g2) {
-				var i = _g11++;
-				var att = resampler._attributes[i];
-				var location = att.location;
+				let i = _g11++;
+				let att = resampler._attributes[i];
+				let location = att.location;
 				if(location != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
@@ -3808,20 +3808,20 @@ var gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
 		} else {
 			if(!resampler._ready) resampler.create();
 			flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
-			var _g3 = 0;
-			var _g12 = resampler._uniforms;
+			let _g3 = 0;
+			let _g12 = resampler._uniforms;
 			while(_g3 < _g12.length) {
-				var u1 = _g12[_g3];
+				let u1 = _g12[_g3];
 				++_g3;
 				u1.apply();
 			}
-			var offset1 = 0;
-			var _g13 = 0;
-			var _g4 = resampler._attributes.length;
+			let offset1 = 0;
+			let _g13 = 0;
+			let _g4 = resampler._attributes.length;
 			while(_g13 < _g4) {
-				var i1 = _g13++;
-				var att1 = resampler._attributes[i1];
-				var location1 = att1.location;
+				let i1 = _g13++;
+				let att1 = resampler._attributes[i1];
+				let location1 = att1.location;
 				if(location1 != -1) {
 					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
@@ -3852,7 +3852,7 @@ gltoolbox_render_RenderTarget.prototype = {
 	}
 	,__class__: gltoolbox_render_RenderTarget
 };
-var gltoolbox_render_RenderTarget2Phase = function(width,height,textureFactory) {
+let gltoolbox_render_RenderTarget2Phase = function(width,height,textureFactory) {
 	if(textureFactory == null) textureFactory = function(width1,height1) {
 		return gltoolbox_TextureTools.createTexture(width1,height1,null);
 	};
@@ -3869,35 +3869,35 @@ gltoolbox_render_RenderTarget2Phase.__name__ = true;
 gltoolbox_render_RenderTarget2Phase.__interfaces__ = [gltoolbox_render_ITargetable];
 gltoolbox_render_RenderTarget2Phase.prototype = {
 	resize: function(width,height) {
-		var newWriteToTexture = this.textureFactory(width,height);
-		var newReadFromTexture = this.textureFactory(width,height);
+		let newWriteToTexture = this.textureFactory(width,height);
+		let newReadFromTexture = this.textureFactory(width,height);
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newWriteToTexture,0);
 		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
 		flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newReadFromTexture,0);
 		if(this.readFromTexture != null) {
-			var resampler = gltoolbox_shaders_Resample.instance;
-			var _this = resampler.texture;
+			let resampler = gltoolbox_shaders_Resample.instance;
+			let _this = resampler.texture;
 			_this.dirty = true;
 			_this.data = this.readFromTexture;
 			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
 			flu_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
 			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget2Phase.textureQuad);
 			if(resampler._active) {
-				var _g = 0;
-				var _g1 = resampler._uniforms;
+				let _g = 0;
+				let _g1 = resampler._uniforms;
 				while(_g < _g1.length) {
-					var u = _g1[_g];
+					let u = _g1[_g];
 					++_g;
 					u.apply();
 				}
-				var offset = 0;
-				var _g11 = 0;
-				var _g2 = resampler._attributes.length;
+				let offset = 0;
+				let _g11 = 0;
+				let _g2 = resampler._attributes.length;
 				while(_g11 < _g2) {
-					var i = _g11++;
-					var att = resampler._attributes[i];
-					var location = att.location;
+					let i = _g11++;
+					let att = resampler._attributes[i];
+					let location = att.location;
 					if(location != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
@@ -3907,20 +3907,20 @@ gltoolbox_render_RenderTarget2Phase.prototype = {
 			} else {
 				if(!resampler._ready) resampler.create();
 				flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
-				var _g3 = 0;
-				var _g12 = resampler._uniforms;
+				let _g3 = 0;
+				let _g12 = resampler._uniforms;
 				while(_g3 < _g12.length) {
-					var u1 = _g12[_g3];
+					let u1 = _g12[_g3];
 					++_g3;
 					u1.apply();
 				}
-				var offset1 = 0;
-				var _g13 = 0;
-				var _g4 = resampler._attributes.length;
+				let offset1 = 0;
+				let _g13 = 0;
+				let _g4 = resampler._attributes.length;
 				while(_g13 < _g4) {
-					var i1 = _g13++;
-					var att1 = resampler._attributes[i1];
-					var location1 = att1.location;
+					let i1 = _g13++;
+					let att1 = resampler._attributes[i1];
+					let location1 = att1.location;
 					if(location1 != -1) {
 						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
 						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
@@ -3953,14 +3953,14 @@ gltoolbox_render_RenderTarget2Phase.prototype = {
 	}
 	,__class__: gltoolbox_render_RenderTarget2Phase
 };
-var js_Boot = function() { };
+let js_Boot = function() { };
 $hxClasses["js.Boot"] = js_Boot;
 js_Boot.__name__ = true;
 js_Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) return Array; else {
-		var cl = o.__class__;
+		let cl = o.__class__;
 		if(cl != null) return cl;
-		var name = js_Boot.__nativeClassName(o);
+		let name = js_Boot.__nativeClassName(o);
 		if(name != null) return js_Boot.__resolveNativeClass(name);
 		return null;
 	}
@@ -3968,36 +3968,36 @@ js_Boot.getClass = function(o) {
 js_Boot.__string_rec = function(o,s) {
 	if(o == null) return "null";
 	if(s.length >= 5) return "<...>";
-	var t = typeof(o);
+	let t = typeof(o);
 	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
 	switch(t) {
 	case "object":
 		if(o instanceof Array) {
 			if(o.__enum__) {
 				if(o.length == 2) return o[0];
-				var str2 = o[0] + "(";
+				let str2 = o[0] + "(";
 				s += "\t";
-				var _g1 = 2;
-				var _g = o.length;
+				let _g1 = 2;
+				let _g = o.length;
 				while(_g1 < _g) {
-					var i1 = _g1++;
+					let i1 = _g1++;
 					if(i1 != 2) str2 += "," + js_Boot.__string_rec(o[i1],s); else str2 += js_Boot.__string_rec(o[i1],s);
 				}
 				return str2 + ")";
 			}
-			var l = o.length;
-			var i;
-			var str1 = "[";
+			let l = o.length;
+			let i;
+			let str1 = "[";
 			s += "\t";
-			var _g2 = 0;
+			let _g2 = 0;
 			while(_g2 < l) {
-				var i2 = _g2++;
+				let i2 = _g2++;
 				str1 += (i2 > 0?",":"") + js_Boot.__string_rec(o[i2],s);
 			}
 			str1 += "]";
 			return str1;
 		}
-		var tostr;
+		let tostr;
 		try {
 			tostr = o.toString;
 		} catch( e ) {
@@ -4005,14 +4005,14 @@ js_Boot.__string_rec = function(o,s) {
 			return "???";
 		}
 		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
-			var s2 = o.toString();
+			let s2 = o.toString();
 			if(s2 != "[object Object]") return s2;
 		}
-		var k = null;
-		var str = "{\n";
+		let k = null;
+		let str = "{\n";
 		s += "\t";
-		var hasp = o.hasOwnProperty != null;
-		for( var k in o ) {
+		let hasp = o.hasOwnProperty != null;
+		for( let k in o ) {
 		if(hasp && !o.hasOwnProperty(k)) {
 			continue;
 		}
@@ -4036,13 +4036,13 @@ js_Boot.__string_rec = function(o,s) {
 js_Boot.__interfLoop = function(cc,cl) {
 	if(cc == null) return false;
 	if(cc == cl) return true;
-	var intf = cc.__interfaces__;
+	let intf = cc.__interfaces__;
 	if(intf != null) {
-		var _g1 = 0;
-		var _g = intf.length;
+		let _g1 = 0;
+		let _g = intf.length;
 		while(_g1 < _g) {
-			var i = _g1++;
-			var i1 = intf[i];
+			let i = _g1++;
+			let i1 = intf[i];
 			if(i1 == cl || js_Boot.__interfLoop(i1,cl)) return true;
 		}
 	}
@@ -4081,7 +4081,7 @@ js_Boot.__cast = function(o,t) {
 	if(js_Boot.__instanceof(o,t)) return o; else throw new js__$Boot_FluidError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
 };
 js_Boot.__nativeClassName = function(o) {
-	var name = js_Boot.__toStr.call(o).slice(8,-1);
+	let name = js_Boot.__toStr.call(o).slice(8,-1);
 	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") return null;
 	return name;
 };
@@ -4091,7 +4091,7 @@ js_Boot.__isNativeObj = function(o) {
 js_Boot.__resolveNativeClass = function(name) {
 	return $global[name];
 };
-var gltoolbox_shaders_Resample = function() {
+let gltoolbox_shaders_Resample = function() {
 	shaderblox_ShaderBase.call(this);
 };
 $hxClasses["gltoolbox.shaders.Resample"] = gltoolbox_shaders_Resample;
@@ -4100,10 +4100,10 @@ gltoolbox_shaders_Resample.__super__ = shaderblox_ShaderBase;
 gltoolbox_shaders_Resample.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	createProperties: function() {
 		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		var instance = new shaderblox_uniforms_UTexture("texture",null,false);
+		let instance = new shaderblox_uniforms_UTexture("texture",null,false);
 		this.texture = instance;
 		this._uniforms.push(instance);
-		var instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		let instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
 		this.vertexPosition = instance1;
 		this._attributes.push(instance1);
 		this._aStride += 8;
@@ -4114,13 +4114,13 @@ gltoolbox_shaders_Resample.prototype = $extend(shaderblox_ShaderBase.prototype,{
 	}
 	,__class__: gltoolbox_shaders_Resample
 });
-var flu_IMap = function() { };
+let flu_IMap = function() { };
 $hxClasses["fluid.IMap"] = flu_IMap;
 flu_IMap.__name__ = true;
 flu_IMap.prototype = {
 	__class__: flu_IMap
 };
-var flu__$Int64__$_$_$Int64 = function(high,low) {
+let flu__$Int64__$_$_$Int64 = function(high,low) {
 	this.high = high;
 	this.low = low;
 };
@@ -4129,8 +4129,8 @@ flu__$Int64__$_$_$Int64.__name__ = true;
 flu__$Int64__$_$_$Int64.prototype = {
 	__class__: flu__$Int64__$_$_$Int64
 };
-var flu_Timer = function(time_ms) {
-	var me = this;
+let flu_Timer = function(time_ms) {
+	let me = this;
 	this.id = setInterval(function() {
 		me.run();
 	},time_ms);
@@ -4145,7 +4145,7 @@ flu_Timer.prototype = {
 	}
 	,__class__: flu_Timer
 };
-var flu_ds_IntMap = function() {
+let flu_ds_IntMap = function() {
 	this.h = { };
 };
 $hxClasses["fluid.ds.IntMap"] = flu_ds_IntMap;
@@ -4161,8 +4161,8 @@ flu_ds_IntMap.prototype = {
 		return true;
 	}
 	,keys: function() {
-		var a = [];
-		for( var key in this.h ) {
+		let a = [];
+		for( let key in this.h ) {
 		if(this.h.hasOwnProperty(key)) a.push(key | 0);
 		}
 		return HxOverrides.iter(a);
@@ -4171,13 +4171,13 @@ flu_ds_IntMap.prototype = {
 		return { ref : this.h, it : this.keys(), hasNext : function() {
 			return this.it.hasNext();
 		}, next : function() {
-			var i = this.it.next();
+			let i = this.it.next();
 			return this.ref[i];
 		}};
 	}
 	,__class__: flu_ds_IntMap
 };
-var flu_ds_ObjectMap = function() {
+let flu_ds_ObjectMap = function() {
 	this.h = { };
 	this.h.__keys__ = { };
 };
@@ -4186,20 +4186,20 @@ flu_ds_ObjectMap.__name__ = true;
 flu_ds_ObjectMap.__interfaces__ = [flu_IMap];
 flu_ds_ObjectMap.prototype = {
 	set: function(key,value) {
-		var id = key.__id__ || (key.__id__ = ++flu_ds_ObjectMap.count);
+		let id = key.__id__ || (key.__id__ = ++flu_ds_ObjectMap.count);
 		this.h[id] = value;
 		this.h.__keys__[id] = key;
 	}
 	,remove: function(key) {
-		var id = key.__id__;
+		let id = key.__id__;
 		if(this.h.__keys__[id] == null) return false;
 		delete(this.h[id]);
 		delete(this.h.__keys__[id]);
 		return true;
 	}
 	,keys: function() {
-		var a = [];
-		for( var key in this.h.__keys__ ) {
+		let a = [];
+		for( let key in this.h.__keys__ ) {
 		if(this.h.hasOwnProperty(key)) a.push(this.h.__keys__[key]);
 		}
 		return HxOverrides.iter(a);
@@ -4208,13 +4208,13 @@ flu_ds_ObjectMap.prototype = {
 		return { ref : this.h, it : this.keys(), hasNext : function() {
 			return this.it.hasNext();
 		}, next : function() {
-			var i = this.it.next();
+			let i = this.it.next();
 			return this.ref[i.__id__];
 		}};
 	}
 	,__class__: flu_ds_ObjectMap
 };
-var flu_ds__$StringMap_StringMapIterator = function(map,keys) {
+let flu_ds__$StringMap_StringMapIterator = function(map,keys) {
 	this.map = map;
 	this.keys = keys;
 	this.index = 0;
@@ -4227,15 +4227,15 @@ flu_ds__$StringMap_StringMapIterator.prototype = {
 		return this.index < this.count;
 	}
 	,next: function() {
-		var tmp;
-		var _this = this.map;
-		var key = this.keys[this.index++];
+		let tmp;
+		let _this = this.map;
+		let key = this.keys[this.index++];
 		if(__map_reserved[key] != null) tmp = _this.getReserved(key); else tmp = _this.h[key];
 		return tmp;
 	}
 	,__class__: flu_ds__$StringMap_StringMapIterator
 };
-var flu_ds_StringMap = function() {
+let flu_ds_StringMap = function() {
 	this.h = { };
 };
 $hxClasses["fluid.ds.StringMap"] = flu_ds_StringMap;
@@ -4269,12 +4269,12 @@ flu_ds_StringMap.prototype = {
 		}
 	}
 	,arrayKeys: function() {
-		var out = [];
-		for( var key in this.h ) {
+		let out = [];
+		for( let key in this.h ) {
 		if(this.h.hasOwnProperty(key)) out.push(key);
 		}
 		if(this.rh != null) {
-			for( var key in this.rh ) {
+			for( let key in this.rh ) {
 			if(key.charCodeAt(0) == 36) out.push(key.substr(1));
 			}
 		}
@@ -4282,7 +4282,7 @@ flu_ds_StringMap.prototype = {
 	}
 	,__class__: flu_ds_StringMap
 };
-var flu_io_Bytes = function(data) {
+let flu_io_Bytes = function(data) {
 	this.length = data.byteLength;
 	this.b = new Uint8Array(data);
 	this.b.bufferValue = data;
@@ -4294,23 +4294,23 @@ flu_io_Bytes.__name__ = true;
 flu_io_Bytes.prototype = {
 	getString: function(pos,len) {
 		if(pos < 0 || len < 0 || pos + len > this.length) throw new js__$Boot_FluidError(flu_io_Error.OutsideBounds);
-		var s = "";
-		var b = this.b;
-		var fcc = String.fromCharCode;
-		var i = pos;
-		var max = pos + len;
+		let s = "";
+		let b = this.b;
+		let fcc = String.fromCharCode;
+		let i = pos;
+		let max = pos + len;
 		while(i < max) {
-			var c = b[i++];
+			let c = b[i++];
 			if(c < 128) {
 				if(c == 0) break;
 				s += fcc(c);
 			} else if(c < 224) s += fcc((c & 63) << 6 | b[i++] & 127); else if(c < 240) {
-				var c2 = b[i++];
+				let c2 = b[i++];
 				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
 			} else {
-				var c21 = b[i++];
-				var c3 = b[i++];
-				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
+				let c21 = b[i++];
+				let c3 = b[i++];
+				let u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
 				s += fcc((u >> 10) + 55232);
 				s += fcc(u & 1023 | 56320);
 			}
@@ -4322,7 +4322,7 @@ flu_io_Bytes.prototype = {
 	}
 	,__class__: flu_io_Bytes
 };
-var flu_io_Error = $hxClasses["fluid.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
+let flu_io_Error = $hxClasses["fluid.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
 flu_io_Error.Blocked = ["Blocked",0];
 flu_io_Error.Blocked.toString = $estr;
 flu_io_Error.Blocked.__enum__ = flu_io_Error;
@@ -4332,65 +4332,65 @@ flu_io_Error.Overflow.__enum__ = flu_io_Error;
 flu_io_Error.OutsideBounds = ["OutsideBounds",2];
 flu_io_Error.OutsideBounds.toString = $estr;
 flu_io_Error.OutsideBounds.__enum__ = flu_io_Error;
-flu_io_Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = flu_io_Error; $x.toString = $estr; return $x; };
+flu_io_Error.Custom = function(e) { let $x = ["Custom",3,e]; $x.__enum__ = flu_io_Error; $x.toString = $estr; return $x; };
 flu_io_Error.__empty_constructs__ = [flu_io_Error.Blocked,flu_io_Error.Overflow,flu_io_Error.OutsideBounds];
-var flu_io_FPHelper = function() { };
+let flu_io_FPHelper = function() { };
 $hxClasses["fluid.io.FPHelper"] = flu_io_FPHelper;
 flu_io_FPHelper.__name__ = true;
 flu_io_FPHelper.i32ToFloat = function(i) {
-	var sign = 1 - (i >>> 31 << 1);
-	var exp = i >>> 23 & 255;
-	var sig = i & 8388607;
+	let sign = 1 - (i >>> 31 << 1);
+	let exp = i >>> 23 & 255;
+	let sig = i & 8388607;
 	if(sig == 0 && exp == 0) return 0.0;
 	return sign * (1 + Math.pow(2,-23) * sig) * Math.pow(2,exp - 127);
 };
 flu_io_FPHelper.floatToI32 = function(f) {
 	if(f == 0) return 0;
-	var af = f < 0?-f:f;
-	var exp = Math.floor(Math.log(af) / 0.6931471805599453);
+	let af = f < 0?-f:f;
+	let exp = Math.floor(Math.log(af) / 0.6931471805599453);
 	if(exp < -127) exp = -127; else if(exp > 128) exp = 128;
-	var sig = Math.round((af / Math.pow(2,exp) - 1) * 8388608) & 8388607;
+	let sig = Math.round((af / Math.pow(2,exp) - 1) * 8388608) & 8388607;
 	return (f < 0?-2147483648:0) | exp + 127 << 23 | sig;
 };
 flu_io_FPHelper.i64ToDouble = function(low,high) {
-	var sign = 1 - (high >>> 31 << 1);
-	var exp = (high >> 20 & 2047) - 1023;
-	var sig = (high & 1048575) * 4294967296. + (low >>> 31) * 2147483648. + (low & 2147483647);
+	let sign = 1 - (high >>> 31 << 1);
+	let exp = (high >> 20 & 2047) - 1023;
+	let sig = (high & 1048575) * 4294967296. + (low >>> 31) * 2147483648. + (low & 2147483647);
 	if(sig == 0 && exp == -1023) return 0.0;
 	return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
 };
 flu_io_FPHelper.doubleToI64 = function(v) {
-	var i64 = flu_io_FPHelper.i64tmp;
+	let i64 = flu_io_FPHelper.i64tmp;
 	if(v == 0) {
 		i64.low = 0;
 		i64.high = 0;
 	} else {
-		var av = v < 0?-v:v;
-		var exp = Math.floor(Math.log(av) / 0.6931471805599453);
-		var tmp;
-		var v1 = (av / Math.pow(2,exp) - 1) * 4503599627370496.;
+		let av = v < 0?-v:v;
+		let exp = Math.floor(Math.log(av) / 0.6931471805599453);
+		let tmp;
+		let v1 = (av / Math.pow(2,exp) - 1) * 4503599627370496.;
 		tmp = Math.round(v1);
-		var sig = tmp;
-		var sig_l = sig | 0;
-		var sig_h = sig / 4294967296.0 | 0;
+		let sig = tmp;
+		let sig_l = sig | 0;
+		let sig_h = sig / 4294967296.0 | 0;
 		i64.low = sig_l;
 		i64.high = (v < 0?-2147483648:0) | exp + 1023 << 20 | sig_h;
 	}
 	return i64;
 };
-var flu_io_Path = function() { };
+let flu_io_Path = function() { };
 $hxClasses["fluid.io.Path"] = flu_io_Path;
 flu_io_Path.__name__ = true;
 flu_io_Path.join = function(paths) {
-	var paths1 = paths.filter(function(s) {
+	let paths1 = paths.filter(function(s) {
 		return s != null && s != "";
 	});
 	if(paths1.length == 0) return "";
-	var path = paths1[0];
-	var _g1 = 1;
-	var _g = paths1.length;
+	let path = paths1[0];
+	let _g1 = 1;
+	let _g = paths1.length;
 	while(_g1 < _g) {
-		var i = _g1++;
+		let i = _g1++;
 		path = flu_io_Path.addTrailingSlash(path);
 		path += paths1[i];
 	}
@@ -4399,25 +4399,25 @@ flu_io_Path.join = function(paths) {
 flu_io_Path.normalize = function(path) {
 	path = path.split("\\").join("/");
 	if(path == null || path == "/") return "/";
-	var target = [];
-	var _g = 0;
-	var _g1 = path.split("/");
+	let target = [];
+	let _g = 0;
+	let _g1 = path.split("/");
 	while(_g < _g1.length) {
-		var token = _g1[_g];
+		let token = _g1[_g];
 		++_g;
 		if(token == ".." && target.length > 0 && target[target.length - 1] != "..") target.pop(); else if(token != ".") target.push(token);
 	}
-	var tmp = target.join("/");
-	var regex = new EReg("([^:])/+","g");
+	let tmp = target.join("/");
+	let regex = new EReg("([^:])/+","g");
 	regex.replace(tmp,"$1" + "/");
-	var acc_b = "";
-	var colon = false;
-	var slashes = false;
-	var _g11 = 0;
-	var _g2 = tmp.length;
+	let acc_b = "";
+	let colon = false;
+	let slashes = false;
+	let _g11 = 0;
+	let _g2 = tmp.length;
 	while(_g11 < _g2) {
-		var i = _g11++;
-		var _g21 = HxOverrides.cca(tmp,i);
+		let i = _g11++;
+		let _g21 = HxOverrides.cca(tmp,i);
 		if(_g21 != null) switch(_g21) {
 		case 58:
 			acc_b += ":";
@@ -4430,7 +4430,7 @@ flu_io_Path.normalize = function(path) {
 					acc_b += "/";
 					slashes = false;
 				}
-				var x = String.fromCharCode(_g21);
+				let x = String.fromCharCode(_g21);
 				acc_b += x == null?"null":"" + x;
 			}
 			break;
@@ -4440,7 +4440,7 @@ flu_io_Path.normalize = function(path) {
 				acc_b += "/";
 				slashes = false;
 			}
-			var x1 = String.fromCharCode(_g21);
+			let x1 = String.fromCharCode(_g21);
 			acc_b += x1 == null?"null":"" + x1;
 		} else {
 			colon = false;
@@ -4448,23 +4448,23 @@ flu_io_Path.normalize = function(path) {
 				acc_b += "/";
 				slashes = false;
 			}
-			var x1 = String.fromCharCode(_g21);
+			let x1 = String.fromCharCode(_g21);
 			acc_b += x1 == null?"null":"" + x1;
 		}
 	}
-	var result = acc_b;
+	let result = acc_b;
 	return result;
 };
 flu_io_Path.addTrailingSlash = function(path) {
 	if(path.length == 0) return "/";
-	var c1 = path.lastIndexOf("/");
-	var c2 = path.lastIndexOf("\\");
+	let c1 = path.lastIndexOf("/");
+	let c2 = path.lastIndexOf("\\");
 	return c1 < c2?c2 != path.length - 1?path + "\\":path:c1 != path.length - 1?path + "/":path;
 };
-var hxColorToolkit_spaces_Color = function() { };
+let hxColorToolkit_spaces_Color = function() { };
 $hxClasses["hxColorToolkit.spaces.Color"] = hxColorToolkit_spaces_Color;
 hxColorToolkit_spaces_Color.__name__ = true;
-var hxColorToolkit_spaces_RGB = function(r,g,b) {
+let hxColorToolkit_spaces_RGB = function(r,g,b) {
 	if(b == null) b = 0;
 	if(g == null) g = 0;
 	if(r == null) r = 0;
@@ -4505,7 +4505,7 @@ hxColorToolkit_spaces_RGB.prototype = {
 	}
 	,__class__: hxColorToolkit_spaces_RGB
 };
-var hxColorToolkit_spaces_HSB = function(hue,saturation,brightness) {
+let hxColorToolkit_spaces_HSB = function(hue,saturation,brightness) {
 	if(brightness == null) brightness = 0;
 	if(saturation == null) saturation = 0;
 	if(hue == null) hue = 0;
@@ -4549,17 +4549,17 @@ hxColorToolkit_spaces_HSB.prototype = {
 		return val;
 	}
 	,toRGB: function() {
-		var hue = this.get_hue();
-		var saturation = this.get_saturation();
-		var brightness = this.get_brightness();
-		var r = 0;
-		var g = 0;
-		var b = 0;
-		var i;
-		var f;
-		var p;
-		var q;
-		var t;
+		let hue = this.get_hue();
+		let saturation = this.get_saturation();
+		let brightness = this.get_brightness();
+		let r = 0;
+		let g = 0;
+		let b = 0;
+		let i;
+		let f;
+		let p;
+		let q;
+		let t;
 		hue %= 360;
 		if(brightness == 0) return new hxColorToolkit_spaces_RGB();
 		saturation *= 0.01;
@@ -4599,7 +4599,7 @@ hxColorToolkit_spaces_HSB.prototype = {
 	}
 	,__class__: hxColorToolkit_spaces_HSB
 };
-var js__$Boot_FluidError = function(val) {
+let js__$Boot_FluidError = function(val) {
 	Error.call(this);
 	this.val = val;
 	this.message = String(val);
@@ -4611,46 +4611,46 @@ js__$Boot_FluidError.__super__ = Error;
 js__$Boot_FluidError.prototype = $extend(Error.prototype,{
 	__class__: js__$Boot_FluidError
 });
-var js_Web = function() { };
+let js_Web = function() { };
 $hxClasses["js.Web"] = js_Web;
 js_Web.__name__ = true;
 js_Web.getParams = function() {
-	var result = new flu_ds_StringMap();
-	var paramObj = eval("\r\n\t\t\t(function() {\r\n\t\t\t    var match,\r\n\t\t\t        pl     = /\\+/g,  // Regex for replacing addition symbol with a space\r\n\t\t\t        search = /([^&=]+)=?([^&]*)/g,\r\n\t\t\t        decode = function (s) { return decodeURIComponent(s.replace(pl, ' ')); },\r\n\t\t\t        query  = window.location.search.substring(1);\r\n\r\n\t\t\t    var urlParams = {};\r\n\t\t\t    while (match = search.exec(query))\r\n\t\t\t       urlParams[decode(match[1])] = decode(match[2]);\r\n\t\t\t    return urlParams;\r\n\t\t\t})();\r\n\t\t");
-	var _g = 0;
-	var _g1 = Reflect.fields(paramObj);
+	let result = new flu_ds_StringMap();
+	let paramObj = eval("\r\n\t\t\t(function() {\r\n\t\t\t    let match,\r\n\t\t\t        pl     = /\\+/g,  // Regex for replacing addition symbol with a space\r\n\t\t\t        search = /([^&=]+)=?([^&]*)/g,\r\n\t\t\t        decode = function (s) { return decodeURIComponent(s.replace(pl, ' ')); },\r\n\t\t\t        query  = window.location.search.substring(1);\r\n\r\n\t\t\t    let urlParams = {};\r\n\t\t\t    while (match = search.exec(query))\r\n\t\t\t       urlParams[decode(match[1])] = decode(match[2]);\r\n\t\t\t    return urlParams;\r\n\t\t\t})();\r\n\t\t");
+	let _g = 0;
+	let _g1 = Reflect.fields(paramObj);
 	while(_g < _g1.length) {
-		var f = _g1[_g];
+		let f = _g1[_g];
 		++_g;
-		var value = Reflect.field(paramObj,f);
+		let value = Reflect.field(paramObj,f);
 		if(__map_reserved[f] != null) result.setReserved(f,value); else result.h[f] = value;
 	}
 	return result;
 };
-var js_html__$CanvasElement_CanvasUtil = function() { };
+let js_html__$CanvasElement_CanvasUtil = function() { };
 $hxClasses["js.html._CanvasElement.CanvasUtil"] = js_html__$CanvasElement_CanvasUtil;
 js_html__$CanvasElement_CanvasUtil.__name__ = true;
 js_html__$CanvasElement_CanvasUtil.getContextWebGL = function(canvas,attribs) {
-	var _g = 0;
-	var _g1 = ["webgl","experimental-webgl"];
+	let _g = 0;
+	let _g1 = ["webgl","experimental-webgl"];
 	while(_g < _g1.length) {
-		var name = _g1[_g];
+		let name = _g1[_g];
 		++_g;
-		var ctx = canvas.getContext(name, { powerPreference: "high-performance" }) || canvas.getContext('experimental-webgl', { powerPreference: "high-performance" });
+		let ctx = canvas.getContext(name, { powerPreference: "high-performance" }) || canvas.getContext('experimental-webgl', { powerPreference: "high-performance" });
 		if(ctx != null) return ctx;
 	}
 	return null;
 };
-var js_html_compat_ArrayBuffer = function(a) {
+let js_html_compat_ArrayBuffer = function(a) {
 	if((a instanceof Array) && a.__enum__ == null) {
 		this.a = a;
 		this.byteLength = a.length;
 	} else {
-		var len = a;
+		let len = a;
 		this.a = [];
-		var _g = 0;
+		let _g = 0;
 		while(_g < len) {
-			var i = _g++;
+			let i = _g++;
 			this.a[i] = 0;
 		}
 		this.byteLength = len;
@@ -4659,9 +4659,9 @@ var js_html_compat_ArrayBuffer = function(a) {
 $hxClasses["js.html.compat.ArrayBuffer"] = js_html_compat_ArrayBuffer;
 js_html_compat_ArrayBuffer.__name__ = true;
 js_html_compat_ArrayBuffer.sliceImpl = function(begin,end) {
-	var u = new Uint8Array(this,begin,end == null?null:end - begin);
-	var result = new ArrayBuffer(u.byteLength);
-	var resultArray = new Uint8Array(result);
+	let u = new Uint8Array(this,begin,end == null?null:end - begin);
+	let result = new ArrayBuffer(u.byteLength);
+	let resultArray = new Uint8Array(result);
 	resultArray.set(u);
 	return result;
 };
@@ -4671,7 +4671,7 @@ js_html_compat_ArrayBuffer.prototype = {
 	}
 	,__class__: js_html_compat_ArrayBuffer
 };
-var js_html_compat_DataView = function(buffer,byteOffset,byteLength) {
+let js_html_compat_DataView = function(buffer,byteOffset,byteLength) {
 	this.buf = buffer;
 	this.offset = byteOffset == null?0:byteOffset;
 	this.length = byteLength == null?buffer.byteLength - this.offset:byteLength;
@@ -4681,37 +4681,37 @@ $hxClasses["js.html.compat.DataView"] = js_html_compat_DataView;
 js_html_compat_DataView.__name__ = true;
 js_html_compat_DataView.prototype = {
 	getInt8: function(byteOffset) {
-		var v = this.buf.a[this.offset + byteOffset];
+		let v = this.buf.a[this.offset + byteOffset];
 		return v >= 128?v - 256:v;
 	}
 	,getUint8: function(byteOffset) {
 		return this.buf.a[this.offset + byteOffset];
 	}
 	,getInt16: function(byteOffset,littleEndian) {
-		var v = this.getUint16(byteOffset,littleEndian);
+		let v = this.getUint16(byteOffset,littleEndian);
 		return v >= 32768?v - 65536:v;
 	}
 	,getUint16: function(byteOffset,littleEndian) {
 		return littleEndian?this.buf.a[this.offset + byteOffset] | this.buf.a[this.offset + byteOffset + 1] << 8:this.buf.a[this.offset + byteOffset] << 8 | this.buf.a[this.offset + byteOffset + 1];
 	}
 	,getInt32: function(byteOffset,littleEndian) {
-		var p = this.offset + byteOffset;
-		var a = this.buf.a[p++];
-		var b = this.buf.a[p++];
-		var c = this.buf.a[p++];
-		var d = this.buf.a[p++];
+		let p = this.offset + byteOffset;
+		let a = this.buf.a[p++];
+		let b = this.buf.a[p++];
+		let c = this.buf.a[p++];
+		let d = this.buf.a[p++];
 		return littleEndian?a | b << 8 | c << 16 | d << 24:d | c << 8 | b << 16 | a << 24;
 	}
 	,getUint32: function(byteOffset,littleEndian) {
-		var v = this.getInt32(byteOffset,littleEndian);
+		let v = this.getInt32(byteOffset,littleEndian);
 		return v < 0?v + 4294967296.:v;
 	}
 	,getFloat32: function(byteOffset,littleEndian) {
 		return flu_io_FPHelper.i32ToFloat(this.getInt32(byteOffset,littleEndian));
 	}
 	,getFloat64: function(byteOffset,littleEndian) {
-		var a = this.getInt32(byteOffset,littleEndian);
-		var b = this.getInt32(byteOffset + 4,littleEndian);
+		let a = this.getInt32(byteOffset,littleEndian);
+		let b = this.getInt32(byteOffset + 4,littleEndian);
 		return flu_io_FPHelper.i64ToDouble(littleEndian?a:b,littleEndian?b:a);
 	}
 	,setInt8: function(byteOffset,value) {
@@ -4724,7 +4724,7 @@ js_html_compat_DataView.prototype = {
 		this.setUint16(byteOffset,value < 0?value + 65536:value,littleEndian);
 	}
 	,setUint16: function(byteOffset,value,littleEndian) {
-		var p = byteOffset + this.offset;
+		let p = byteOffset + this.offset;
 		if(littleEndian) {
 			this.buf.a[p] = value & 255;
 			this.buf.a[p++] = value >> 8 & 255;
@@ -4737,7 +4737,7 @@ js_html_compat_DataView.prototype = {
 		this.setUint32(byteOffset,value,littleEndian);
 	}
 	,setUint32: function(byteOffset,value,littleEndian) {
-		var p = byteOffset + this.offset;
+		let p = byteOffset + this.offset;
 		if(littleEndian) {
 			this.buf.a[p++] = value & 255;
 			this.buf.a[p++] = value >> 8 & 255;
@@ -4754,7 +4754,7 @@ js_html_compat_DataView.prototype = {
 		this.setUint32(byteOffset,flu_io_FPHelper.floatToI32(value),littleEndian);
 	}
 	,setFloat64: function(byteOffset,value,littleEndian) {
-		var i64 = flu_io_FPHelper.doubleToI64(value);
+		let i64 = flu_io_FPHelper.doubleToI64(value);
 		if(littleEndian) {
 			this.setUint32(byteOffset,i64.low);
 			this.setUint32(byteOffset,i64.high);
@@ -4765,23 +4765,23 @@ js_html_compat_DataView.prototype = {
 	}
 	,__class__: js_html_compat_DataView
 };
-var js_html_compat_Uint8Array = function() { };
+let js_html_compat_Uint8Array = function() { };
 $hxClasses["js.html.compat.Uint8Array"] = js_html_compat_Uint8Array;
 js_html_compat_Uint8Array.__name__ = true;
 js_html_compat_Uint8Array._new = function(arg1,offset,length) {
-	var arr;
+	let arr;
 	if(typeof(arg1) == "number") {
 		arr = [];
-		var _g = 0;
+		let _g = 0;
 		while(_g < arg1) {
-			var i = _g++;
+			let i = _g++;
 			arr[i] = 0;
 		}
 		arr.byteLength = arr.length;
 		arr.byteOffset = 0;
 		arr.buffer = new js_html_compat_ArrayBuffer(arr);
 	} else if(js_Boot.__instanceof(arg1,js_html_compat_ArrayBuffer)) {
-		var buffer = arg1;
+		let buffer = arg1;
 		if(offset == null) offset = 0;
 		if(length == null) length = buffer.byteLength - offset;
 		if(offset == 0) arr = buffer.a; else arr = buffer.a.slice(offset,offset + length);
@@ -4799,40 +4799,40 @@ js_html_compat_Uint8Array._new = function(arg1,offset,length) {
 	return arr;
 };
 js_html_compat_Uint8Array._set = function(arg,offset) {
-	var t = this;
+	let t = this;
 	if(js_Boot.__instanceof(arg.buffer,js_html_compat_ArrayBuffer)) {
-		var a = arg;
+		let a = arg;
 		if(arg.byteLength + offset > t.byteLength) throw new js__$Boot_FluidError("set() outside of range");
-		var _g1 = 0;
-		var _g = arg.byteLength;
+		let _g1 = 0;
+		let _g = arg.byteLength;
 		while(_g1 < _g) {
-			var i = _g1++;
+			let i = _g1++;
 			t[i + offset] = a[i];
 		}
 	} else if((arg instanceof Array) && arg.__enum__ == null) {
-		var a1 = arg;
+		let a1 = arg;
 		if(a1.length + offset > t.byteLength) throw new js__$Boot_FluidError("set() outside of range");
-		var _g11 = 0;
-		var _g2 = a1.length;
+		let _g11 = 0;
+		let _g2 = a1.length;
 		while(_g11 < _g2) {
-			var i1 = _g11++;
+			let i1 = _g11++;
 			t[i1 + offset] = a1[i1];
 		}
 	} else throw new js__$Boot_FluidError("TODO");
 };
 js_html_compat_Uint8Array._subarray = function(start,end) {
-	var t = this;
-	var a = js_html_compat_Uint8Array._new(t.slice(start,end));
+	let t = this;
+	let a = js_html_compat_Uint8Array._new(t.slice(start,end));
 	a.byteOffset = start;
 	return a;
 };
-var shaderblox_attributes_Attribute = function() { };
+let shaderblox_attributes_Attribute = function() { };
 $hxClasses["shaderblox.attributes.Attribute"] = shaderblox_attributes_Attribute;
 shaderblox_attributes_Attribute.__name__ = true;
 shaderblox_attributes_Attribute.prototype = {
 	__class__: shaderblox_attributes_Attribute
 };
-var shaderblox_attributes_FloatAttribute = function(name,location,nFloats) {
+let shaderblox_attributes_FloatAttribute = function(name,location,nFloats) {
 	if(nFloats == null) nFloats = 1;
 	this.name = name;
 	this.location = location;
@@ -4846,38 +4846,38 @@ shaderblox_attributes_FloatAttribute.__super__ = shaderblox_attributes_Attribute
 shaderblox_attributes_FloatAttribute.prototype = $extend(shaderblox_attributes_Attribute.prototype,{
 	__class__: shaderblox_attributes_FloatAttribute
 });
-var shaderblox_glsl_GLSLTools = function() { };
+let shaderblox_glsl_GLSLTools = function() { };
 $hxClasses["shaderblox.glsl.GLSLTools"] = shaderblox_glsl_GLSLTools;
 shaderblox_glsl_GLSLTools.__name__ = true;
 shaderblox_glsl_GLSLTools.injectConstValue = function(src,name,value) {
-	var storageQualifier = "const";
-	var tmp;
-	var _this = shaderblox_glsl_GLSLTools.STORAGE_QUALIFIER_TYPES;
+	let storageQualifier = "const";
+	let tmp;
+	let _this = shaderblox_glsl_GLSLTools.STORAGE_QUALIFIER_TYPES;
 	if(__map_reserved[storageQualifier] != null) tmp = _this.getReserved(storageQualifier); else tmp = _this.h[storageQualifier];
-	var types = tmp;
-	var reg = new EReg(storageQualifier + "\\s+((" + shaderblox_glsl_GLSLTools.PRECISION_QUALIFIERS.join("|") + ")\\s+)?(" + types.join("|") + ")\\s+([^;]+)","m");
-	var src1 = shaderblox_glsl_GLSLTools.stripComments(src);
-	var currStr = src1;
+	let types = tmp;
+	let reg = new EReg(storageQualifier + "\\s+((" + shaderblox_glsl_GLSLTools.PRECISION_QUALIFIERS.join("|") + ")\\s+)?(" + types.join("|") + ")\\s+([^;]+)","m");
+	let src1 = shaderblox_glsl_GLSLTools.stripComments(src);
+	let currStr = src1;
 	while(reg.match(currStr)) {
-		var declarationPos = reg.matchedPos();
-		var rawDeclarationString = reg.matched(0);
-		var exploded = shaderblox_glsl_GLSLTools.bracketExplode(rawDeclarationString,"()");
-		var rootScopeStr = Lambda.fold(exploded.contents,function(n,rs) {
+		let declarationPos = reg.matchedPos();
+		let rawDeclarationString = reg.matched(0);
+		let exploded = shaderblox_glsl_GLSLTools.bracketExplode(rawDeclarationString,"()");
+		let rootScopeStr = Lambda.fold(exploded.contents,function(n,rs) {
 			return rs + (js_Boot.__instanceof(n,shaderblox_glsl__$GLSLTools_StringNode)?n.toString():"");
 		},"");
-		var rConstName = new EReg("\\b(" + name + ")\\b\\s*=","m");
-		var nameFound = rConstName.match(rootScopeStr);
+		let rConstName = new EReg("\\b(" + name + ")\\b\\s*=","m");
+		let nameFound = rConstName.match(rootScopeStr);
 		if(nameFound) {
-			var namePos = rConstName.matchedPos();
-			var initializerLength = 0;
+			let namePos = rConstName.matchedPos();
+			let initializerLength = 0;
 			if((initializerLength = rConstName.matchedRight().indexOf(",")) == -1) initializerLength = rConstName.matchedRight().length;
-			var initializerRangeInRootStr_start = namePos.pos + namePos.len;
-			var initializerRangeInRootStr_end = namePos.pos + namePos.len + initializerLength;
-			var absoluteOffset = src1.length - currStr.length + declarationPos.pos;
-			var initializerRangeAbsolute_start = shaderblox_glsl_GLSLTools.compressedToExploded(exploded,initializerRangeInRootStr_start) + absoluteOffset;
-			var initializerRangeAbsolute_end = shaderblox_glsl_GLSLTools.compressedToExploded(exploded,initializerRangeInRootStr_end) + absoluteOffset;
-			var srcBefore = src1.substring(0,initializerRangeAbsolute_start);
-			var srcAfter = src1.substring(initializerRangeAbsolute_end);
+			let initializerRangeInRootStr_start = namePos.pos + namePos.len;
+			let initializerRangeInRootStr_end = namePos.pos + namePos.len + initializerLength;
+			let absoluteOffset = src1.length - currStr.length + declarationPos.pos;
+			let initializerRangeAbsolute_start = shaderblox_glsl_GLSLTools.compressedToExploded(exploded,initializerRangeInRootStr_start) + absoluteOffset;
+			let initializerRangeAbsolute_end = shaderblox_glsl_GLSLTools.compressedToExploded(exploded,initializerRangeInRootStr_end) + absoluteOffset;
+			let srcBefore = src1.substring(0,initializerRangeAbsolute_start);
+			let srcAfter = src1.substring(initializerRangeAbsolute_end);
 			return srcBefore + value + srcAfter;
 		}
 		currStr = reg.matchedRight();
@@ -4885,15 +4885,15 @@ shaderblox_glsl_GLSLTools.injectConstValue = function(src,name,value) {
 	return null;
 };
 shaderblox_glsl_GLSLTools.compressedToExploded = function(scope,compressedPosition) {
-	var stringTotal = 0;
-	var nodeTotal = 0;
-	var targetIndex = null;
-	var _g1 = 0;
-	var _g = scope.contents.length;
+	let stringTotal = 0;
+	let nodeTotal = 0;
+	let targetIndex = null;
+	let _g1 = 0;
+	let _g = scope.contents.length;
 	while(_g1 < _g) {
-		var i = _g1++;
-		var n = scope.contents[i];
-		var len = n.toString().length;
+		let i = _g1++;
+		let n = scope.contents[i];
+		let len = n.toString().length;
 		if(js_Boot.__instanceof(n,shaderblox_glsl__$GLSLTools_StringNode)) {
 			if(stringTotal + len > compressedPosition) {
 				targetIndex = i;
@@ -4910,22 +4910,22 @@ shaderblox_glsl_GLSLTools.stripComments = function(src) {
 };
 shaderblox_glsl_GLSLTools.bracketExplode = function(src,brackets) {
 	if(brackets.length != 2) return null;
-	var open = brackets.charAt(0);
-	var close = brackets.charAt(1);
-	var root = new shaderblox_glsl__$GLSLTools_ScopeNode();
-	var scopeStack = [];
-	var currentScope = root;
-	var currentNode = null;
-	var c;
-	var level = 0;
-	var _g1 = 0;
-	var _g = src.length;
+	let open = brackets.charAt(0);
+	let close = brackets.charAt(1);
+	let root = new shaderblox_glsl__$GLSLTools_ScopeNode();
+	let scopeStack = [];
+	let currentScope = root;
+	let currentNode = null;
+	let c;
+	let level = 0;
+	let _g1 = 0;
+	let _g = src.length;
 	while(_g1 < _g) {
-		var i = _g1++;
+		let i = _g1++;
 		c = src.charAt(i);
 		if(c == open) {
 			level++;
-			var newScope = new shaderblox_glsl__$GLSLTools_ScopeNode(brackets);
+			let newScope = new shaderblox_glsl__$GLSLTools_ScopeNode(brackets);
 			currentScope.contents.push(newScope);
 			scopeStack.push(currentScope);
 			currentScope = newScope;
@@ -4944,13 +4944,13 @@ shaderblox_glsl_GLSLTools.bracketExplode = function(src,brackets) {
 	}
 	return root;
 };
-var shaderblox_glsl__$GLSLTools_INode = function() { };
+let shaderblox_glsl__$GLSLTools_INode = function() { };
 $hxClasses["shaderblox.glsl._GLSLTools.INode"] = shaderblox_glsl__$GLSLTools_INode;
 shaderblox_glsl__$GLSLTools_INode.__name__ = true;
 shaderblox_glsl__$GLSLTools_INode.prototype = {
 	__class__: shaderblox_glsl__$GLSLTools_INode
 };
-var shaderblox_glsl__$GLSLTools_StringNode = function(str) {
+let shaderblox_glsl__$GLSLTools_StringNode = function(str) {
 	if(str == null) str = "";
 	this.contents = str;
 };
@@ -4963,7 +4963,7 @@ shaderblox_glsl__$GLSLTools_StringNode.prototype = {
 	}
 	,__class__: shaderblox_glsl__$GLSLTools_StringNode
 };
-var shaderblox_glsl__$GLSLTools_ScopeNode = function(brackets) {
+let shaderblox_glsl__$GLSLTools_ScopeNode = function(brackets) {
 	this.closeBracket = "";
 	this.openBracket = "";
 	this.contents = [];
@@ -4977,11 +4977,11 @@ shaderblox_glsl__$GLSLTools_ScopeNode.__name__ = true;
 shaderblox_glsl__$GLSLTools_ScopeNode.__interfaces__ = [shaderblox_glsl__$GLSLTools_INode];
 shaderblox_glsl__$GLSLTools_ScopeNode.prototype = {
 	toString: function() {
-		var str = this.openBracket;
-		var _g = 0;
-		var _g1 = this.contents;
+		let str = this.openBracket;
+		let _g = 0;
+		let _g1 = this.contents;
 		while(_g < _g1.length) {
-			var n = _g1[_g];
+			let n = _g1[_g];
 			++_g;
 			str += n.toString();
 		}
@@ -4989,13 +4989,13 @@ shaderblox_glsl__$GLSLTools_ScopeNode.prototype = {
 	}
 	,__class__: shaderblox_glsl__$GLSLTools_ScopeNode
 };
-var shaderblox_uniforms_IAppliable = function() { };
+let shaderblox_uniforms_IAppliable = function() { };
 $hxClasses["shaderblox.uniforms.IAppliable"] = shaderblox_uniforms_IAppliable;
 shaderblox_uniforms_IAppliable.__name__ = true;
 shaderblox_uniforms_IAppliable.prototype = {
 	__class__: shaderblox_uniforms_IAppliable
 };
-var shaderblox_uniforms_UniformBase_$Bool = function(name,index,data) {
+let shaderblox_uniforms_UniformBase_$Bool = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
@@ -5006,7 +5006,7 @@ shaderblox_uniforms_UniformBase_$Bool.__name__ = true;
 shaderblox_uniforms_UniformBase_$Bool.prototype = {
 	__class__: shaderblox_uniforms_UniformBase_$Bool
 };
-var shaderblox_uniforms_UBool = function(name,index,f) {
+let shaderblox_uniforms_UBool = function(name,index,f) {
 	if(f == null) f = false;
 	shaderblox_uniforms_UniformBase_$Bool.call(this,name,index,f);
 };
@@ -5021,7 +5021,7 @@ shaderblox_uniforms_UBool.prototype = $extend(shaderblox_uniforms_UniformBase_$B
 	}
 	,__class__: shaderblox_uniforms_UBool
 });
-var shaderblox_uniforms_UniformBase_$Float = function(name,index,data) {
+let shaderblox_uniforms_UniformBase_$Float = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
@@ -5032,7 +5032,7 @@ shaderblox_uniforms_UniformBase_$Float.__name__ = true;
 shaderblox_uniforms_UniformBase_$Float.prototype = {
 	__class__: shaderblox_uniforms_UniformBase_$Float
 };
-var shaderblox_uniforms_UFloat = function(name,index,f) {
+let shaderblox_uniforms_UFloat = function(name,index,f) {
 	if(f == null) f = 0.0;
 	shaderblox_uniforms_UniformBase_$Float.call(this,name,index,f);
 };
@@ -5047,7 +5047,7 @@ shaderblox_uniforms_UFloat.prototype = $extend(shaderblox_uniforms_UniformBase_$
 	}
 	,__class__: shaderblox_uniforms_UFloat
 });
-var shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture = function(name,index,data) {
+let shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
@@ -5058,7 +5058,7 @@ shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture.__name__ = true;
 shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture.prototype = {
 	__class__: shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture
 };
-var shaderblox_uniforms_UTexture = function(name,index,cube) {
+let shaderblox_uniforms_UTexture = function(name,index,cube) {
 	if(cube == null) cube = false;
 	this.cube = cube;
 	this.type = cube?34067:3553;
@@ -5071,9 +5071,9 @@ shaderblox_uniforms_UTexture.__super__ = shaderblox_uniforms_UniformBase_$js_$ht
 shaderblox_uniforms_UTexture.prototype = $extend(shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture.prototype,{
 	apply: function() {
 		if(this.data == null) return;
-		var idx = 33984 + this.samplerIndex;
+		let idx = 33984 + this.samplerIndex;
 		if(shaderblox_uniforms_UTexture.lastActiveTexture != idx) {
-			var texture = shaderblox_uniforms_UTexture.lastActiveTexture = idx;
+			let texture = shaderblox_uniforms_UTexture.lastActiveTexture = idx;
 			flu_modules_opengl_web_GL.current_context.activeTexture(texture);
 		}
 		flu_modules_opengl_web_GL.current_context.uniform1i(this.location,this.samplerIndex);
@@ -5082,7 +5082,7 @@ shaderblox_uniforms_UTexture.prototype = $extend(shaderblox_uniforms_UniformBase
 	}
 	,__class__: shaderblox_uniforms_UTexture
 });
-var shaderblox_uniforms_Vector2 = function(x,y) {
+let shaderblox_uniforms_Vector2 = function(x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	this.x = x;
@@ -5093,7 +5093,7 @@ shaderblox_uniforms_Vector2.__name__ = true;
 shaderblox_uniforms_Vector2.prototype = {
 	__class__: shaderblox_uniforms_Vector2
 };
-var shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2 = function(name,index,data) {
+let shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2 = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
@@ -5104,7 +5104,7 @@ shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.__name__ = true;
 shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.prototype = {
 	__class__: shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2
 };
-var shaderblox_uniforms_UVec2 = function(name,index,x,y) {
+let shaderblox_uniforms_UVec2 = function(name,index,x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
 	shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.call(this,name,index,new shaderblox_uniforms_Vector2(x,y));
@@ -5120,7 +5120,7 @@ shaderblox_uniforms_UVec2.prototype = $extend(shaderblox_uniforms_UniformBase_$s
 	}
 	,__class__: shaderblox_uniforms_UVec2
 });
-var shaderblox_uniforms_Vector3 = function(x,y,z) {
+let shaderblox_uniforms_Vector3 = function(x,y,z) {
 	if(z == null) z = 0;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -5133,7 +5133,7 @@ shaderblox_uniforms_Vector3.__name__ = true;
 shaderblox_uniforms_Vector3.prototype = {
 	__class__: shaderblox_uniforms_Vector3
 };
-var shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3 = function(name,index,data) {
+let shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3 = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
@@ -5144,7 +5144,7 @@ shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3.__name__ = true;
 shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3.prototype = {
 	__class__: shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3
 };
-var shaderblox_uniforms_UVec3 = function(name,index,x,y,z) {
+let shaderblox_uniforms_UVec3 = function(name,index,x,y,z) {
 	if(z == null) z = 0;
 	if(y == null) y = 0;
 	if(x == null) x = 0;
@@ -5161,7 +5161,7 @@ shaderblox_uniforms_UVec3.prototype = $extend(shaderblox_uniforms_UniformBase_$s
 	}
 	,__class__: shaderblox_uniforms_UVec3
 });
-var shaderblox_uniforms_Vector4 = function(x,y,z,w) {
+let shaderblox_uniforms_Vector4 = function(x,y,z,w) {
 	if(w == null) w = 0;
 	if(z == null) z = 0;
 	if(y == null) y = 0;
@@ -5176,7 +5176,7 @@ shaderblox_uniforms_Vector4.__name__ = true;
 shaderblox_uniforms_Vector4.prototype = {
 	__class__: shaderblox_uniforms_Vector4
 };
-var shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4 = function(name,index,data) {
+let shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4 = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
@@ -5187,7 +5187,7 @@ shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4.__name__ = true;
 shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4.prototype = {
 	__class__: shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4
 };
-var shaderblox_uniforms_UVec4 = function(name,index,x,y,z,w) {
+let shaderblox_uniforms_UVec4 = function(name,index,x,y,z,w) {
 	if(w == null) w = 0;
 	if(z == null) z = 0;
 	if(y == null) y = 0;
@@ -5205,7 +5205,7 @@ shaderblox_uniforms_UVec4.prototype = $extend(shaderblox_uniforms_UniformBase_$s
 	}
 	,__class__: shaderblox_uniforms_UVec4
 });
-var flu = function() {
+let flu = function() {
 	this.is_ready = false;
 	this.was_ready = false;
 	this.has_shutdown = false;
@@ -5249,7 +5249,7 @@ flu.prototype = {
 		this.host.on_internal_init();
 	}
 	,on_flu_ready: function() {
-		var _g = this;
+		let _g = this;
 		if(this.was_ready) throw new js__$Boot_FluidError(flu_types_Error.error("firing ready event more than once is invalid usage"));
 		this.io = new flu_system_io_IO(this);
 		this.input = new flu_system_input_Input(this);
@@ -5259,23 +5259,23 @@ flu.prototype = {
 		this.setup_app_path();
 		this.setup_configs().then(function(_) {
 			_g.setup_default_window();
-			var func = $bind(_g,_g.on_ready);
+			let func = $bind(_g,_g.on_ready);
 			if(func != null) flu.next_queue.push(func);
 		}).error(function(e) {
 			throw new js__$Boot_FluidError(flu_types_Error.init("fluidState / cannot recover from error: " + e));
 		});
 		flu_api_Promises.step();
 		while(flu.next_queue.length > 0) {
-			var count = flu.next_queue.length;
-			var i = 0;
+			let count = flu.next_queue.length;
+			let i = 0;
 			while(i < count) {
 				(flu.next_queue.shift())();
 				++i;
 			}
 		}
 		while(flu.defer_queue.length > 0) {
-			var count1 = flu.defer_queue.length;
-			var i1 = 0;
+			let count1 = flu.defer_queue.length;
+			let i1 = 0;
 			while(i1 < count1) {
 				(flu.defer_queue.shift())();
 				++i1;
@@ -5295,8 +5295,8 @@ flu.prototype = {
 		if(this.freeze) return;
 		flu_api_Timer.update();
 		flu_api_Promises.step();
-		var count = flu.next_queue.length;
-		var i = 0;
+		let count = flu.next_queue.length;
+		let i = 0;
 		while(i < count) {
 			(flu.next_queue.shift())();
 			++i;
@@ -5306,8 +5306,8 @@ flu.prototype = {
 		this.host.on_internal_update();
 		this.host.on_internal_render();
 		this.host.ontickend();
-		var count1 = flu.defer_queue.length;
-		var i1 = 0;
+		let count1 = flu.defer_queue.length;
+		let i1 = 0;
 		while(i1 < count1) {
 			(flu.defer_queue.shift())();
 			++i1;
@@ -5321,7 +5321,7 @@ flu.prototype = {
 			this.input.on_event(_event);
 		}
 		this.host.onevent(_event);
-		var _g = _event.type;
+		let _g = _event.type;
 		if(_g != null) switch(_g) {
 		case 1:
 			this.on_flu_init();
@@ -5345,7 +5345,7 @@ flu.prototype = {
 	,setup_app_path: function() {
 	}
 	,setup_configs: function() {
-		var _g = this;
+		let _g = this;
 		if(this.flu_config.config_path == "") {
 			this.setup_host_config();
 			return flu_api_Promise.resolve();
@@ -5375,9 +5375,9 @@ flu.prototype = {
 		return { has_window : true, runtime : { }, window : this.default_window_config(), render : this.default_render_config(), web : { no_context_menu : true, prevent_default_keys : [flu_system_input_Keycodes.left,flu_system_input_Keycodes.right,flu_system_input_Keycodes.up,flu_system_input_Keycodes.down,flu_system_input_Keycodes.backspace,flu_system_input_Keycodes.tab,flu_system_input_Keycodes["delete"]], prevent_default_mouse_wheel : true, true_fullscreen : false}};
 	}
 	,default_runtime_config: function() {
-		var _g = this;
+		let _g = this;
 		return new flu_api_Promise(function(resolve,reject) {
-			var load = _g.io.data_flow(flu_io_Path.join([_g.assets.root,_g.flu_config.config_path]),flu_system_assets_AssetJSON.processor);
+			let load = _g.io.data_flow(flu_io_Path.join([_g.assets.root,_g.flu_config.config_path]),flu_system_assets_AssetJSON.processor);
 			load.then(resolve).error(function(error) {
 				switch(error[1]) {
 				case 3:
@@ -5393,14 +5393,14 @@ flu.prototype = {
 		return { depth : false, stencil : false, antialiasing : 0, red_bits : 8, green_bits : 8, blue_bits : 8, alpha_bits : 8, depth_bits : 0, stencil_bits : 0, opengl : { minor : 0, major : 0, profile : 0}};
 	}
 	,default_window_config: function() {
-		var conf = { fullscreen_desktop : true, fullscreen : false, borderless : false, resizable : true, x : 536805376, y : 536805376, width : 800, height : 600};
+		let conf = { fullscreen_desktop : true, fullscreen : false, borderless : false, resizable : true, x : 536805376, y : 536805376, width : 800, height : 600};
 		return conf;
 	}
 	,__class__: flu
 };
-var flu_api_Promise = function(func) {
+let flu_api_Promise = function(func) {
 	this.was_caught = false;
-	var _g = this;
+	let _g = this;
 	this.state = 0;
 	this.reject_reactions = [];
 	this.fulfill_reactions = [];
@@ -5424,7 +5424,7 @@ flu_api_Promise.resolve = function(val) {
 };
 flu_api_Promise.prototype = {
 	then: function(on_fulfilled,on_rejected) {
-		var _g = this.state;
+		let _g = this.state;
 		switch(_g) {
 		case 0:
 			this.add_fulfill(on_fulfilled);
@@ -5439,7 +5439,7 @@ flu_api_Promise.prototype = {
 		}
 	}
 	,error: function(on_rejected) {
-		var _g = this.state;
+		let _g = this.state;
 		switch(_g) {
 		case 0:
 			this.add_reject(on_rejected);
@@ -5455,7 +5455,7 @@ flu_api_Promise.prototype = {
 		if(this.state == 0) this.settle_reactions.push(f); else flu_api_Promises.defer(f,this.result);
 	}
 	,new_linked_promise: function() {
-		var _g = this;
+		let _g = this;
 		return new flu_api_Promise(function(f,r) {
 			_g.add_settle(function(_) {
 				if(_g.state == 1) f(_g.result); else r(_g.result);
@@ -5463,7 +5463,7 @@ flu_api_Promise.prototype = {
 		});
 	}
 	,new_linked_resolve_empty: function() {
-		var _g = this;
+		let _g = this;
 		return new flu_api_Promise(function(f,r) {
 			_g.add_settle(function(_) {
 				f();
@@ -5483,7 +5483,7 @@ flu_api_Promise.prototype = {
 		this.state = 1;
 		this.result = val;
 		while(this.fulfill_reactions.length > 0) {
-			var fn = this.fulfill_reactions.shift();
+			let fn = this.fulfill_reactions.shift();
 			fn(this.result);
 		}
 		this.onsettle();
@@ -5492,26 +5492,26 @@ flu_api_Promise.prototype = {
 		this.state = 2;
 		this.result = reason;
 		while(this.reject_reactions.length > 0) {
-			var fn = this.reject_reactions.shift();
+			let fn = this.reject_reactions.shift();
 			fn(this.result);
 		}
 		this.onsettle();
 	}
 	,onsettle: function() {
 		while(this.settle_reactions.length > 0) {
-			var fn = this.settle_reactions.shift();
+			let fn = this.settle_reactions.shift();
 			fn(this.result);
 		}
 	}
 	,__class__: flu_api_Promise
 };
-var flu_api_Promises = function() { };
+let flu_api_Promises = function() { };
 $hxClasses["fluidState.api.Promises"] = flu_api_Promises;
 flu_api_Promises.__name__ = true;
 flu_api_Promises.step = function() {
 	flu_api_Promises.next();
 	while(flu_api_Promises.defers.length > 0) {
-		var defer = flu_api_Promises.defers.shift();
+		let defer = flu_api_Promises.defers.shift();
 		defer.f(defer.a);
 	}
 };
@@ -5526,15 +5526,15 @@ flu_api_Promises.queue = function(f) {
 	if(f == null) return;
 	flu_api_Promises.calls.push(f);
 };
-var flu_api_Timer = function() { };
+let flu_api_Timer = function() { };
 $hxClasses["fluidState.api.Timer"] = flu_api_Timer;
 flu_api_Timer.__name__ = true;
 flu_api_Timer.update = function() {
-	var now = flu.core.timestamp();
-	var _g = 0;
-	var _g1 = flu_api_Timer.running_timers;
+	let now = flu.core.timestamp();
+	let _g = 0;
+	let _g1 = flu_api_Timer.running_timers;
 	while(_g < _g1.length) {
-		var timer = _g1[_g];
+		let timer = _g1[_g];
 		++_g;
 		if(timer.running) {
 			if(timer.fire_at < now) {
@@ -5549,7 +5549,7 @@ flu_api_Timer.prototype = {
 	}
 	,__class__: flu_api_Timer
 };
-var flu_core_web_Core = function(_app) {
+let flu_core_web_Core = function(_app) {
 	this._time_now = 0.0;
 	this._lf_timestamp = 0.016;
 	this.start_timestamp = 0.0;
@@ -5569,16 +5569,16 @@ flu_core_web_Core.prototype = {
 	,shutdown: function() {
 	}
 	,timestamp: function() {
-		var now;
+		let now;
 		if(window.performance != null) now = window.performance.now() / 1000.0; else now = flu_Timer.stamp();
 		return now - this.start_timestamp;
 	}
 	,request_update: function() {
-		var _g = this;
+		let _g = this;
 		if(($_=window,$bind($_,$_.requestAnimationFrame)) != null) window.requestAnimationFrame($bind(this,this.flu_core_loop)); else {
 			console.log("     i / core / " + ("warning : requestAnimationFrame not found, falling back to render_rate! render_rate:" + this.app.host.render_rate));
 			window.setTimeout(function() {
-				var _now = _g.timestamp();
+				let _now = _g.timestamp();
 				_g._time_now += _now - _g._lf_timestamp;
 				_g.flu_core_loop(_g._time_now * 1000.0);
 				_g._lf_timestamp = _now;
@@ -5600,10 +5600,10 @@ flu_core_web_Core.prototype = {
 	,__class__: flu_core_web_Core
 };
 
-var flu_modules_interfaces_Assets = function() { };
+let flu_modules_interfaces_Assets = function() { };
 $hxClasses["fluidState.modules.interfaces.Assets"] = flu_modules_interfaces_Assets;
 flu_modules_interfaces_Assets.__name__ = true;
-var flu_core_web_assets_Assets = function(_system) {
+let flu_core_web_assets_Assets = function(_system) {
 	this.system = _system;
 };
 
@@ -5614,20 +5614,20 @@ flu_core_web_assets_Assets.prototype = {
 	__class__: flu_core_web_assets_Assets
 };
 
-var flu_modules_interfaces_Input = function() { };
+let flu_modules_interfaces_Input = function() { };
 $hxClasses["fluidState.modules.interfaces.Input"] = flu_modules_interfaces_Input;
 flu_modules_interfaces_Input.__name__ = true;
-var flu_system_input_Scancodes = function() { };
+let flu_system_input_Scancodes = function() { };
 $hxClasses["fluidState.system.input.Scancodes"] = flu_system_input_Scancodes;
 flu_system_input_Scancodes.__name__ = true;
-var flu_system_input_Keycodes = function() { };
+let flu_system_input_Keycodes = function() { };
 $hxClasses["fluidState.system.input.Keycodes"] = flu_system_input_Keycodes;
 flu_system_input_Keycodes.__name__ = true;
 flu_system_input_Keycodes.from_scan = function(scancode) {
 	return scancode | flu_system_input_Scancodes.MASK;
 };
 
-var flu_core_web_input_Input = function(_system) {
+let flu_core_web_input_Input = function(_system) {
 	this.gamepads_supported = false;
 	this.system = _system;
 }
@@ -5674,14 +5674,14 @@ flu_core_web_input_Input.prototype = {
 	}
 	,poll_gamepads: function() {
 		if(!this.gamepads_supported) return;
-		var list = this.get_gamepad_list();
+		let list = this.get_gamepad_list();
 		if(list != null) {
-			var _g1 = 0;
-			var _g = list.length;
+			let _g1 = 0;
+			let _g = list.length;
 			while(_g1 < _g) {
-				var i = _g1++;
+				let i = _g1++;
 				if(list[i] != null) this.handle_gamepad(list[i]); else {
-					var _gamepad = this.active_gamepads.h[i];
+					let _gamepad = this.active_gamepads.h[i];
 					if(_gamepad != null) this.system.dispatch_gamepad_device_event(_gamepad.index,_gamepad.id,2,flu.core.timestamp());
 					this.active_gamepads.remove(i);
 				}
@@ -5690,20 +5690,20 @@ flu_core_web_input_Input.prototype = {
 	}
 	,handle_gamepad: function(_gamepad) {
 		if(_gamepad == null) return;
-		var tmp;
-		var key = _gamepad.index;
+		let tmp;
+		let key = _gamepad.index;
 		tmp = this.active_gamepads.h.hasOwnProperty(key);
 		if(!tmp) {
-			var _new_gamepad = { id : _gamepad.id, index : _gamepad.index, axes : [], buttons : [], timestamp : flu.core.timestamp()};
-			var axes = _gamepad.axes;
-			var _g = 0;
+			let _new_gamepad = { id : _gamepad.id, index : _gamepad.index, axes : [], buttons : [], timestamp : flu.core.timestamp()};
+			let axes = _gamepad.axes;
+			let _g = 0;
 			while(_g < axes.length) {
-				var value = axes[_g];
+				let value = axes[_g];
 				++_g;
 				_new_gamepad.axes.push(value);
 			}
-			var _button_list = _gamepad.buttons;
-			var _g1 = 0;
+			let _button_list = _gamepad.buttons;
+			let _g1 = 0;
 			while(_g1 < _button_list.length) {
 				++_g1;
 				_new_gamepad.buttons.push({ pressed : false, value : 0});
@@ -5711,21 +5711,21 @@ flu_core_web_input_Input.prototype = {
 			this.active_gamepads.h[_new_gamepad.index] = _new_gamepad;
 			this.system.dispatch_gamepad_device_event(_new_gamepad.index,_new_gamepad.id,1,_new_gamepad.timestamp);
 		} else {
-			var tmp1;
-			var key1 = _gamepad.index;
+			let tmp1;
+			let key1 = _gamepad.index;
 			tmp1 = this.active_gamepads.h[key1];
-			var gamepad = tmp1;
+			let gamepad = tmp1;
 			if(gamepad.id != _gamepad.id) gamepad.id = _gamepad.id;
-			var axes_changed = [];
-			var buttons_changed = [];
-			var last_axes = gamepad.axes;
-			var last_buttons = gamepad.buttons;
-			var new_axes = _gamepad.axes;
-			var new_buttons = _gamepad.buttons;
-			var axis_index = 0;
-			var _g2 = 0;
+			let axes_changed = [];
+			let buttons_changed = [];
+			let last_axes = gamepad.axes;
+			let last_buttons = gamepad.buttons;
+			let new_axes = _gamepad.axes;
+			let new_buttons = _gamepad.buttons;
+			let axis_index = 0;
+			let _g2 = 0;
 			while(_g2 < new_axes.length) {
-				var axis = new_axes[_g2];
+				let axis = new_axes[_g2];
 				++_g2;
 				if(axis != last_axes[axis_index]) {
 					axes_changed.push(axis_index);
@@ -5733,10 +5733,10 @@ flu_core_web_input_Input.prototype = {
 				}
 				axis_index++;
 			}
-			var button_index = 0;
-			var _g3 = 0;
+			let button_index = 0;
+			let _g3 = 0;
 			while(_g3 < new_buttons.length) {
-				var button = new_buttons[_g3];
+				let button = new_buttons[_g3];
 				++_g3;
 				if(button.value != last_buttons[button_index].value) {
 					buttons_changed.push(button_index);
@@ -5745,15 +5745,15 @@ flu_core_web_input_Input.prototype = {
 				}
 				button_index++;
 			}
-			var _g4 = 0;
+			let _g4 = 0;
 			while(_g4 < axes_changed.length) {
-				var index = axes_changed[_g4];
+				let index = axes_changed[_g4];
 				++_g4;
 				this.system.dispatch_gamepad_axis_event(gamepad.index,index,new_axes[index],gamepad.timestamp);
 			}
-			var _g5 = 0;
+			let _g5 = 0;
 			while(_g5 < buttons_changed.length) {
-				var index1 = buttons_changed[_g5];
+				let index1 = buttons_changed[_g5];
 				++_g5;
 				if(new_buttons[index1].pressed == true) this.system.dispatch_gamepad_button_down_event(gamepad.index,index1,new_buttons[index1].value,gamepad.timestamp); else this.system.dispatch_gamepad_button_up_event(gamepad.index,index1,new_buttons[index1].value,gamepad.timestamp);
 			}
@@ -5770,17 +5770,17 @@ flu_core_web_input_Input.prototype = {
 		return null;
 	}
 	,on_mousedown: function(_mouse_event) {
-		var _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
+		let _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
 		this.system.dispatch_mouse_down_event(_mouse_event.pageX - window.pageXOffset - _window.x,_mouse_event.pageY - window.pageYOffset - _window.y,_mouse_event.button + 1,_mouse_event.timeStamp,_window.id);
 	}
 	,on_mouseup: function(_mouse_event) {
-		var _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
+		let _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
 		this.system.dispatch_mouse_up_event(_mouse_event.pageX - window.pageXOffset - _window.x,_mouse_event.pageY - window.pageYOffset - _window.y,_mouse_event.button + 1,_mouse_event.timeStamp,_window.id);
 	}
 	,on_mousemove: function(_mouse_event) {
-		var _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
-		var _movement_x = _mouse_event.movementX;
-		var _movement_y = _mouse_event.movementY;
+		let _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
+		let _movement_x = _mouse_event.movementX;
+		let _movement_y = _mouse_event.movementY;
 		if(_movement_x == null) {
 			if(_mouse_event.webkitMovementX != null) {
 				_movement_x = _mouse_event.webkitMovementX;
@@ -5794,9 +5794,9 @@ flu_core_web_input_Input.prototype = {
 	}
 	,on_mousewheel: function(_wheel_event) {
 		if(this.system.app.config.web.prevent_default_mouse_wheel) _wheel_event.preventDefault();
-		var _window = this.system.app.windowing.window_from_handle(_wheel_event.target);
-		var _x = 0;
-		var _y = 0;
+		let _window = this.system.app.windowing.window_from_handle(_wheel_event.target);
+		let _x = 0;
+		let _y = 0;
 		if(_wheel_event.deltaY != null) _y = _wheel_event.deltaY; else if(_wheel_event.wheelDeltaY != null) _y = -_wheel_event.wheelDeltaY / 3 | 0;
 		if(_wheel_event.deltaX != null) _x = _wheel_event.deltaX; else if(_wheel_event.wheelDeltaX != null) _x = -_wheel_event.wheelDeltaX / 3 | 0;
 		this.system.dispatch_mouse_wheel_event(Math.round(_x / 16),Math.round(_y / 16),_wheel_event.timeStamp,_window.id);
@@ -5806,65 +5806,65 @@ flu_core_web_input_Input.prototype = {
 	}
 	,on_keypress: function(_key_event) {
 		if(_key_event.which != 0 && HxOverrides.indexOf(flu_core_web_input_Input._keypress_blacklist,_key_event.keyCode,0) == -1) {
-			var _text = String.fromCharCode(_key_event.charCode);
+			let _text = String.fromCharCode(_key_event.charCode);
 			this.system.dispatch_text_event(_text,0,_text.length,2,_key_event.timeStamp,1);
 		}
 	}
 	,on_keydown: function(_key_event) {
-		var _keycode = this.convert_keycode(_key_event.keyCode);
-		var _scancode = flu_system_input_Keycodes.to_scan(_keycode);
-		var _mod_state = this.mod_state_from_event(_key_event);
+		let _keycode = this.convert_keycode(_key_event.keyCode);
+		let _scancode = flu_system_input_Keycodes.to_scan(_keycode);
+		let _mod_state = this.mod_state_from_event(_key_event);
 		if(HxOverrides.indexOf(this.system.app.config.web.prevent_default_keys,_keycode,0) != -1) _key_event.preventDefault();
 		this.system.dispatch_key_down_event(_keycode,_scancode,_key_event.repeat,_mod_state,_key_event.timeStamp,1);
 	}
 	,on_keyup: function(_key_event) {
-		var _keycode = this.convert_keycode(_key_event.keyCode);
-		var _scancode = flu_system_input_Keycodes.to_scan(_keycode);
-		var _mod_state = this.mod_state_from_event(_key_event);
+		let _keycode = this.convert_keycode(_key_event.keyCode);
+		let _scancode = flu_system_input_Keycodes.to_scan(_keycode);
+		let _mod_state = this.mod_state_from_event(_key_event);
 		if(HxOverrides.indexOf(this.system.app.config.web.prevent_default_keys,_keycode,0) != -1) _key_event.preventDefault();
 		this.system.dispatch_key_up_event(_keycode,_scancode,_key_event.repeat,_mod_state,_key_event.timeStamp,1);
 	}
 	,mod_state_from_event: function(_key_event) {
-		var _none = !_key_event.altKey && !_key_event.ctrlKey && !_key_event.metaKey && !_key_event.shiftKey;
+		let _none = !_key_event.altKey && !_key_event.ctrlKey && !_key_event.metaKey && !_key_event.shiftKey;
 		return { none : _none, lshift : _key_event.shiftKey, rshift : _key_event.shiftKey, lctrl : _key_event.ctrlKey, rctrl : _key_event.ctrlKey, lalt : _key_event.altKey, ralt : _key_event.altKey, lmeta : _key_event.metaKey, rmeta : _key_event.metaKey, num : false, caps : false, mode : false, ctrl : _key_event.ctrlKey, shift : _key_event.shiftKey, alt : _key_event.altKey, meta : _key_event.metaKey};
 	}
 	,on_touchdown: function(_touch_event) {
-		var _window = this.system.app.windowing.window_from_handle(_touch_event.target);
-		var _g = 0;
-		var _g1 = _touch_event.changedTouches;
+		let _window = this.system.app.windowing.window_from_handle(_touch_event.target);
+		let _g = 0;
+		let _g1 = _touch_event.changedTouches;
 		while(_g < _g1.length) {
-			var touch = _g1[_g];
+			let touch = _g1[_g];
 			++_g;
-			var _x = 500 - window.pageXOffset - _window.x;
-			var _y = 400 - window.pageYOffset - _window.y;
+			let _x = 500 - window.pageXOffset - _window.x;
+			let _y = 400 - window.pageYOffset - _window.y;
 			_x = _x / _window.width;
 			_y = _y / _window.height;
 			this.system.dispatch_touch_down_event(_x,_y,touch.identifier,flu.core.timestamp());
 		}
 	}
 	,on_touchup: function(_touch_event) {
-		var _window = this.system.app.windowing.window_from_handle(_touch_event.target);
-		var _g = 0;
-		var _g1 = _touch_event.changedTouches;
+		let _window = this.system.app.windowing.window_from_handle(_touch_event.target);
+		let _g = 0;
+		let _g1 = _touch_event.changedTouches;
 		while(_g < _g1.length) {
-			var touch = _g1[_g];
+			let touch = _g1[_g];
 			++_g;
-			var _x = touch.pageX - window.pageXOffset - _window.x;
-			var _y = touch.pageY - window.pageYOffset - _window.y;
+			let _x = touch.pageX - window.pageXOffset - _window.x;
+			let _y = touch.pageY - window.pageYOffset - _window.y;
 			_x = _x / _window.width;
 			_y = _y / _window.height;
 			this.system.dispatch_touch_up_event(_x,_y,touch.identifier,flu.core.timestamp());
 		}
 	}
 	,on_touchmove: function(_touch_event) {
-		var _window = this.system.app.windowing.window_from_handle(_touch_event.target);
-		var _g = 0;
-		var _g1 = _touch_event.changedTouches;
+		let _window = this.system.app.windowing.window_from_handle(_touch_event.target);
+		let _g = 0;
+		let _g1 = _touch_event.changedTouches;
 		while(_g < _g1.length) {
-			var touch = _g1[_g];
+			let touch = _g1[_g];
 			++_g;
-			var _x = touch.pageX - window.pageXOffset - _window.x;
-			var _y = touch.pageY - window.pageYOffset - _window.y;
+			let _x = touch.pageX - window.pageXOffset - _window.x;
+			let _y = touch.pageY - window.pageYOffset - _window.y;
 			_x = _x / _window.width;
 			_y = _y / _window.height;
 			this.system.dispatch_touch_move_event(_x,_y,0,0,touch.identifier,flu.core.timestamp());
@@ -5872,10 +5872,10 @@ flu_core_web_input_Input.prototype = {
 	}
 	,__class__: flu_core_web_input_Input
 };
-var flu_modules_interfaces_IO = function() { };
+let flu_modules_interfaces_IO = function() { };
 $hxClasses["fluidState.modules.interfaces.IO"] = flu_modules_interfaces_IO;
 flu_modules_interfaces_IO.__name__ = true;
-var flu_core_web_io_IO = function(_system) {
+let flu_core_web_io_IO = function(_system) {
 	this.system = _system;
 };
 $hxClasses["fluidState.core.web.io.IO"] = flu_core_web_io_IO;
@@ -5884,20 +5884,20 @@ flu_core_web_io_IO.__interfaces__ = [flu_modules_interfaces_IO];
 flu_core_web_io_IO.prototype = {
 	data_load: function(_path,_options) {
 		return new flu_api_Promise(function(resolve,reject) {
-			var _async = true;
-			var _binary = true;
+			let _async = true;
+			let _binary = true;
 			if(_options != null) {
 				if(_options.binary != null) _binary = _options.binary;
 			}
-			var request = new XMLHttpRequest();
+			let request = new XMLHttpRequest();
 			request.open("GET",_path,_async);
 			if(_binary) request.overrideMimeType("text/plain; charset=x-user-defined"); else request.overrideMimeType("text/plain; charset=UTF-8");
 			if(_async) request.responseType = "arraybuffer";
 			request.onload = function(data) {
 				if(request.status == 200) {
-					var tmp;
-					var elements = request.response;
-					var this1;
+					let tmp;
+					let elements = request.response;
+					let this1;
 					if(elements != null) this1 = new Uint8Array(elements); else this1 = null;
 					tmp = this1;
 					resolve(tmp);
@@ -5916,10 +5916,10 @@ flu_core_web_io_IO.prototype = {
 	}
 	,__class__: flu_core_web_io_IO
 };
-var flu_modules_interfaces_Windowing = function() { };
+let flu_modules_interfaces_Windowing = function() { };
 $hxClasses["fluidState.modules.interfaces.Windowing"] = flu_modules_interfaces_Windowing;
 flu_modules_interfaces_Windowing.__name__ = true;
-var flu_core_web_window_Windowing = function(_system) {
+let flu_core_web_window_Windowing = function(_system) {
 	this._hidden_event_name = "";
 	this._hidden_name = "";
 	this._pre_fs_body_margin = "0";
@@ -5951,12 +5951,12 @@ flu_core_web_window_Windowing.prototype = {
 		return { borderless : _config.borderless, fullscreen : _config.fullscreen, fullscreen_desktop : _config.fullscreen_desktop, height : _config.height, no_input : _config.no_input, resizable : _config.resizable, title : _config.title, width : _config.width, x : _config.x, y : _config.y};
 	}
 	,create: function(render_config,_config,on_created) {
-		var _window_id = this.seq_window;
-		var tmp;
-		var _this = window.document;
+		let _window_id = this.seq_window;
+		let tmp;
+		let _this = window.document;
 		tmp = _this.createElement("canvas");
-		var _handle = tmp;
-		var config = this._copy_config(_config);
+		let _handle = tmp;
+		let config = this._copy_config(_config);
 		_handle.width = "100%";
 		_handle.height = "0px";
 		_handle.style.display = "block";
@@ -5964,9 +5964,9 @@ flu_core_web_window_Windowing.prototype = {
 		_handle.style.background = "#000";
 		_handle.style.opacity = "1.0";
 		document.getElementsByClassName("fluid")[0].appendChild(_handle);
-		var _gl_context = js_html__$CanvasElement_CanvasUtil.getContextWebGL(_handle,{ alpha : false, premultipliedAlpha : false, antialias : render_config.antialiasing > 0});
+		let _gl_context = js_html__$CanvasElement_CanvasUtil.getContextWebGL(_handle,{ alpha : false, premultipliedAlpha : false, antialias : render_config.antialiasing > 0});
 		if(_gl_context == null) {
-			var msg = "WebGL is required to run this!<br/><br/>";
+			let msg = "WebGL is required to run this!<br/><br/>";
 			msg += "visit http://get.webgl.org/ for help <br/>";
 			msg += "and contact the developer of the application";
 			this.internal_fallback(msg);
@@ -5974,7 +5974,7 @@ flu_core_web_window_Windowing.prototype = {
 		}
 		if(flu_modules_opengl_web_GL.current_context == null) flu_modules_opengl_web_GL.current_context = _gl_context;
 		this.gl_contexts.h[_window_id] = _gl_context;
-		var _window_pos = this.get_real_window_position(_handle);
+		let _window_pos = this.get_real_window_position(_handle);
 		config.x = _window_pos.x;
 		config.y = _window_pos.y;
 		if(config.title != null && config.title != "") window.document.title = config.title;
@@ -5995,16 +5995,16 @@ flu_core_web_window_Windowing.prototype = {
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 6, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 	}
 	,update_window: function(_window) {
-		var _rect = _window.handle.getBoundingClientRect();
+		let _rect = _window.handle.getBoundingClientRect();
 		if(_rect.left != _window.x || _rect.top != _window.y) {
-			var _event = { type : 5, window : { type : 5, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _rect.left, y : _rect.top}}};
+			let _event = { type : 5, window : { type : 5, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _rect.left, y : _rect.top}}};
 			this.system.app.on_event(_event);
 		}
 		if(_rect.width != _window.width || _rect.height != _window.height) this.internal_resize(_window,_rect.width,_rect.height);
 		null;
 	}
 	,render: function(_window) {
-		var _window_gl_context = this.gl_contexts.h[_window.id];
+		let _window_gl_context = this.gl_contexts.h[_window.id];
 		if(flu_modules_opengl_web_GL.current_context != _window_gl_context) flu_modules_opengl_web_GL.current_context = _window_gl_context;
 	}
 	,swap: function(_window) {
@@ -6021,11 +6021,11 @@ flu_core_web_window_Windowing.prototype = {
 		_window.handle.style.top = "" + y + "px";
 	}
 	,get_real_window_position: function(handle) {
-		var curleft = 0;
-		var curtop = 0;
-		var _obj = handle;
-		var _has_parent = true;
-		var _max_count = 0;
+		let curleft = 0;
+		let curtop = 0;
+		let _obj = handle;
+		let _has_parent = true;
+		let _max_count = 0;
 		while(_has_parent == true) {
 			_max_count++;
 			if(_max_count > 100) {
@@ -6049,11 +6049,11 @@ flu_core_web_window_Windowing.prototype = {
 		_window.handle.style.minHeight = "" + h + "px";
 	}
 	,internal_fullscreen: function(_window,fullscreen) {
-		var _handle = _window.handle;
+		let _handle = _window.handle;
 		if(fullscreen) {
 			if(HxOverrides.indexOf(this.fs_windows,_window,0) == -1) this.fs_windows.push(_window);
 		} else HxOverrides.remove(this.fs_windows,_window);
-		var true_fullscreen = this.system.app.config.web.true_fullscreen;
+		let true_fullscreen = this.system.app.config.web.true_fullscreen;
 		if(fullscreen) {
 			if(true_fullscreen) {
 				if($bind(_handle,_handle.requestFullscreen) == null) {
@@ -6104,22 +6104,22 @@ flu_core_web_window_Windowing.prototype = {
 		}
 	}
 	,on_internal_leave: function(_mouse_event) {
-		var _window = this.system.window_from_handle(_mouse_event.target);
+		let _window = this.system.window_from_handle(_mouse_event.target);
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 12, timestamp : _mouse_event.timeStamp, window_id : _window.id, event : _mouse_event}});
 	}
 	,on_internal_enter: function(_mouse_event) {
-		var _window = this.system.window_from_handle(_mouse_event.target);
+		let _window = this.system.window_from_handle(_mouse_event.target);
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 11, timestamp : _mouse_event.timeStamp, window_id : _window.id, event : _mouse_event}});
 	}
 	,listen_for_resize: function() {
 		
-		var _g = this;
+		let _g = this;
 		window.onresize = function(e) {
 			if(!_g.system.app.config.web.true_fullscreen) {
-				var _g1 = 0;
-				var _g2 = _g.fs_windows;
+				let _g1 = 0;
+				let _g2 = _g.fs_windows;
 				while(_g1 < _g2.length) {
-					var $window = _g2[_g1];
+					let $window = _g2[_g1];
 					++_g1;
 					$window.set_size(window.innerWidth,window.innerHeight);
 					_g.internal_resize($window,$window.width,$window.height);
@@ -6144,7 +6144,7 @@ flu_core_web_window_Windowing.prototype = {
 		if(this._hidden_name != "" && this._hidden_event_name != "") window.document.addEventListener(this._hidden_event_name,$bind(this,this.on_visibility_change));
 	}
 	,on_visibility_change: function(jsevent) {
-		var _event = { type : 5, window : { type : 2, timestamp : flu.core.timestamp(), window_id : 1, event : jsevent}};
+		let _event = { type : 5, window : { type : 2, timestamp : flu.core.timestamp(), window_id : 1, event : jsevent}};
 		if(document[this._hidden_name]) {
 			_event.window.type = 3;
 			this.system.app.dispatch_system_event(_event);
@@ -6162,14 +6162,14 @@ flu_core_web_window_Windowing.prototype = {
 		}
 	}
 	,internal_fallback: function(message) {
-		var text_el;
-		var overlay_el;
-		var tmp;
-		var _this = window.document;
+		let text_el;
+		let overlay_el;
+		let tmp;
+		let _this = window.document;
 		tmp = _this.createElement("div");
 		text_el = tmp;
-		var tmp1;
-		var _this1 = window.document;
+		let tmp1;
+		let _this1 = window.document;
 		tmp1 = _this1.createElement("div");
 		overlay_el = tmp1;
 		text_el.style.marginLeft = "auto";
@@ -6195,19 +6195,19 @@ flu_core_web_window_Windowing.prototype = {
 	,__class__: flu_core_web_window_Windowing
 };
 
-var flu_modules_opengl_web_GL = function() { };
+let flu_modules_opengl_web_GL = function() { };
 $hxClasses["fluidState.modules.opengl.web.GL"] = flu_modules_opengl_web_GL;
 flu_modules_opengl_web_GL.__name__ = true;
-var flu_system_assets_Asset = function() { };
+let flu_system_assets_Asset = function() { };
 $hxClasses["fluidState.system.assets.Asset"] = flu_system_assets_Asset;
 flu_system_assets_Asset.__name__ = true;
-var flu_system_assets_AssetJSON = function() { };
+let flu_system_assets_AssetJSON = function() { };
 $hxClasses["fluidState.system.assets.AssetJSON"] = flu_system_assets_AssetJSON;
 flu_system_assets_AssetJSON.__name__ = true;
 flu_system_assets_AssetJSON.processor = function(_app,_id,_data) {
 	if(_data == null) return flu_api_Promise.reject(flu_types_Error.error("AssetJSON: data was null"));
 	return new flu_api_Promise(function(resolve,reject) {
-		var _data_json = null;
+		let _data_json = null;
 		try {
 			_data_json = JSON.parse(new flu_io_Bytes(new Uint8Array(_data.buffer)).toString());
 		} catch( e ) {
@@ -6221,7 +6221,7 @@ flu_system_assets_AssetJSON.__super__ = flu_system_assets_Asset;
 flu_system_assets_AssetJSON.prototype = $extend(flu_system_assets_Asset.prototype,{
 	__class__: flu_system_assets_AssetJSON
 });
-var flu_system_assets_Assets = function(_app) {
+let flu_system_assets_Assets = function(_app) {
 	this.root = "";
 	this.app = _app;
 	this.module = new flu_core_web_assets_Assets(this);
@@ -6232,7 +6232,7 @@ flu_system_assets_Assets.prototype = {
 	__class__: flu_system_assets_Assets
 };
 
-var flu_system_input_Input = function(_app) {
+let flu_system_input_Input = function(_app) {
 	this.touch_count = 0;
 	this.app = _app;
 	this.module = new flu_core_web_input_Input(this);
@@ -6306,40 +6306,40 @@ flu_system_input_Input.prototype = {
 	}
 	,dispatch_gamepad_axis_event: function(gamepad,axis,value,timestamp) {
 		if(!this.gamepad_axis_values.h.hasOwnProperty(gamepad)) {
-			var value1 = new flu_ds_IntMap();
+			let value1 = new flu_ds_IntMap();
 			this.gamepad_axis_values.h[gamepad] = value1;
 		}
-		var this1 = this.gamepad_axis_values.h[gamepad];
+		let this1 = this.gamepad_axis_values.h[gamepad];
 		this1.set(axis,value);
 		this.app.host.ongamepadaxis(gamepad,axis,value,timestamp);
 	}
 	,dispatch_gamepad_button_down_event: function(gamepad,button,value,timestamp) {
 		if(!this.gamepad_button_pressed.h.hasOwnProperty(gamepad)) {
-			var value1 = new flu_ds_IntMap();
+			let value1 = new flu_ds_IntMap();
 			this.gamepad_button_pressed.h[gamepad] = value1;
 		}
 		if(!this.gamepad_button_down.h.hasOwnProperty(gamepad)) {
-			var value2 = new flu_ds_IntMap();
+			let value2 = new flu_ds_IntMap();
 			this.gamepad_button_down.h[gamepad] = value2;
 		}
-		var this1 = this.gamepad_button_pressed.h[gamepad];
+		let this1 = this.gamepad_button_pressed.h[gamepad];
 		this1.set(button,false);
-		var this2 = this.gamepad_button_down.h[gamepad];
+		let this2 = this.gamepad_button_down.h[gamepad];
 		this2.set(button,true);
 		this.app.host.ongamepaddown(gamepad,button,value,timestamp);
 	}
 	,dispatch_gamepad_button_up_event: function(gamepad,button,value,timestamp) {
 		if(!this.gamepad_button_released.h.hasOwnProperty(gamepad)) {
-			var value1 = new flu_ds_IntMap();
+			let value1 = new flu_ds_IntMap();
 			this.gamepad_button_released.h[gamepad] = value1;
 		}
 		if(!this.gamepad_button_down.h.hasOwnProperty(gamepad)) {
-			var value2 = new flu_ds_IntMap();
+			let value2 = new flu_ds_IntMap();
 			this.gamepad_button_down.h[gamepad] = value2;
 		}
-		var this1 = this.gamepad_button_released.h[gamepad];
+		let this1 = this.gamepad_button_released.h[gamepad];
 		this1.set(button,false);
-		var this2 = this.gamepad_button_down.h[gamepad];
+		let this2 = this.gamepad_button_down.h[gamepad];
 		this2.remove(button);
 		this.app.host.ongamepadup(gamepad,button,value,timestamp);
 	}
@@ -6362,62 +6362,62 @@ flu_system_input_Input.prototype = {
 		this.module.destroy();
 	}
 	,_update_mousestate: function() {
-		var $it0 = this.mouse_button_pressed.keys();
+		let $it0 = this.mouse_button_pressed.keys();
 		while( $it0.hasNext() ) {
-			var _code = $it0.next();
+			let _code = $it0.next();
 			if(this.mouse_button_pressed.h[_code]) this.mouse_button_pressed.remove(_code); else this.mouse_button_pressed.h[_code] = true;
 		}
-		var $it1 = this.mouse_button_released.keys();
+		let $it1 = this.mouse_button_released.keys();
 		while( $it1.hasNext() ) {
-			var _code1 = $it1.next();
+			let _code1 = $it1.next();
 			if(this.mouse_button_released.h[_code1]) this.mouse_button_released.remove(_code1); else this.mouse_button_released.h[_code1] = true;
 		}
 	}
 	,_update_gamepadstate: function() {
-		var $it0 = this.gamepad_button_pressed.iterator();
+		let $it0 = this.gamepad_button_pressed.iterator();
 		while( $it0.hasNext() ) {
-			var _gamepad_pressed = $it0.next();
-			var $it1 = _gamepad_pressed.keys();
+			let _gamepad_pressed = $it0.next();
+			let $it1 = _gamepad_pressed.keys();
 			while( $it1.hasNext() ) {
-				var _button = $it1.next();
+				let _button = $it1.next();
 				if(_gamepad_pressed.h[_button]) _gamepad_pressed.remove(_button); else _gamepad_pressed.h[_button] = true;
 			}
 		}
-		var $it2 = this.gamepad_button_released.iterator();
+		let $it2 = this.gamepad_button_released.iterator();
 		while( $it2.hasNext() ) {
-			var _gamepad_released = $it2.next();
-			var $it3 = _gamepad_released.keys();
+			let _gamepad_released = $it2.next();
+			let $it3 = _gamepad_released.keys();
 			while( $it3.hasNext() ) {
-				var _button1 = $it3.next();
+				let _button1 = $it3.next();
 				if(_gamepad_released.h[_button1]) _gamepad_released.remove(_button1); else _gamepad_released.h[_button1] = true;
 			}
 		}
 	}
 	,_update_keystate: function() {
-		var $it0 = this.key_code_pressed.keys();
+		let $it0 = this.key_code_pressed.keys();
 		while( $it0.hasNext() ) {
-			var _code = $it0.next();
+			let _code = $it0.next();
 			if(this.key_code_pressed.h[_code]) this.key_code_pressed.remove(_code); else this.key_code_pressed.h[_code] = true;
 		}
-		var $it1 = this.key_code_released.keys();
+		let $it1 = this.key_code_released.keys();
 		while( $it1.hasNext() ) {
-			var _code1 = $it1.next();
+			let _code1 = $it1.next();
 			if(this.key_code_released.h[_code1]) this.key_code_released.remove(_code1); else this.key_code_released.h[_code1] = true;
 		}
-		var $it2 = this.scan_code_pressed.keys();
+		let $it2 = this.scan_code_pressed.keys();
 		while( $it2.hasNext() ) {
-			var _code2 = $it2.next();
+			let _code2 = $it2.next();
 			if(this.scan_code_pressed.h[_code2]) this.scan_code_pressed.remove(_code2); else this.scan_code_pressed.h[_code2] = true;
 		}
-		var $it3 = this.scan_code_released.keys();
+		let $it3 = this.scan_code_released.keys();
 		while( $it3.hasNext() ) {
-			var _code3 = $it3.next();
+			let _code3 = $it3.next();
 			if(this.scan_code_released.h[_code3]) this.scan_code_released.remove(_code3); else this.scan_code_released.h[_code3] = true;
 		}
 	}
 	,__class__: flu_system_input_Input
 };
-var flu_system_io_IO = function(_app) {
+let flu_system_io_IO = function(_app) {
 	this.app = _app;
 	this.module = new flu_core_web_io_IO(this);
 	this.module.init();
@@ -6426,7 +6426,7 @@ $hxClasses["fluidState.system.io.IO"] = flu_system_io_IO;
 flu_system_io_IO.__name__ = true;
 flu_system_io_IO.prototype = {
 	data_flow: function(_id,_processor,_provider) {
-		var _g = this;
+		let _g = this;
 		if(_provider == null) _provider = $bind(this,this.default_provider);
 		return new flu_api_Promise(function(resolve,reject) {
 			_provider(_g.app,_id).then(function(data) {
@@ -6439,7 +6439,7 @@ flu_system_io_IO.prototype = {
 	}
 	,__class__: flu_system_io_IO
 };
-var flu_system_window_Window = function(_system,_config) {
+let flu_system_window_Window = function(_system,_config) {
 	this.internal_resize = false;
 	this.internal_position = false;
 	this.minimized = false;
@@ -6483,7 +6483,7 @@ flu_system_window_Window.prototype = {
 		this.on_event({ type : 1, window_id : _id, timestamp : flu.core.timestamp(), event : { }});
 	}
 	,on_event: function(_event) {
-		var _g = _event.type;
+		let _g = _event.type;
 		if(_g != null) switch(_g) {
 		case 5:
 			this.internal_position = true;
@@ -6558,7 +6558,7 @@ flu_system_window_Window.prototype = {
 		return this.height;
 	}
 	,set_position: function(_x,_y) {
-		var last_internal_position_flag = this.internal_position;
+		let last_internal_position_flag = this.internal_position;
 		this.internal_position = true;
 		this.set_x(_x);
 		this.set_y(_y);
@@ -6566,7 +6566,7 @@ flu_system_window_Window.prototype = {
 		if(this.handle != null && !this.internal_position) this.system.module.set_position(this,this.x,this.y);
 	}
 	,set_size: function(_width,_height) {
-		var last_internal_resize_flag = this.internal_resize;
+		let last_internal_resize_flag = this.internal_resize;
 		this.internal_resize = true;
 		this.set_width(_width);
 		this.set_height(_height);
@@ -6583,7 +6583,7 @@ flu_system_window_Window.prototype = {
 	}
 	,__class__: flu_system_window_Window
 };
-var flu_system_window_Windowing = function(_app) {
+let flu_system_window_Windowing = function(_app) {
 	this.window_count = 0;
 	this.app = _app;
 	this.window_list = new flu_ds_IntMap();
@@ -6595,7 +6595,7 @@ $hxClasses["fluidState.system.window.Windowing"] = flu_system_window_Windowing;
 flu_system_window_Windowing.__name__ = true;
 flu_system_window_Windowing.prototype = {
 	create: function(_config) {
-		var _window = new flu_system_window_Window(this,_config);
+		let _window = new flu_system_window_Window(this,_config);
 		this.window_list.h[_window.id] = _window;
 		this.window_handles.set(_window.handle,_window.id);
 		this.window_count++;
@@ -6605,28 +6605,28 @@ flu_system_window_Windowing.prototype = {
 	}
 	,window_from_handle: function(_handle) {
 		if(this.window_handles.h.__keys__[_handle.__id__] != null) {
-			var _id = this.window_handles.h[_handle.__id__];
+			let _id = this.window_handles.h[_handle.__id__];
 			return this.window_list.h[_id];
 		}
 		return null;
 	}
 	,on_event: function(_event) {
 		if(_event.type == 5) {
-			var _window_event = _event.window;
-			var _window = this.window_list.h[_window_event.window_id];
+			let _window_event = _event.window;
+			let _window = this.window_list.h[_window_event.window_id];
 			if(_window != null) _window.on_event(_window_event);
 		}
 	}
 	,update: function() {
 		this.module.update();
-		var $it0 = this.window_list.iterator();
+		let $it0 = this.window_list.iterator();
 		while( $it0.hasNext() ) {
-			var $window = $it0.next();
+			let $window = $it0.next();
 			$window.update();
 		}
-		var $it1 = this.window_list.iterator();
+		let $it1 = this.window_list.iterator();
 		while( $it1.hasNext() ) {
-			var window1 = $it1.next();
+			let window1 = $it1.next();
 			if(window1.auto_render) window1.render();
 		}
 	}
@@ -6635,15 +6635,15 @@ flu_system_window_Windowing.prototype = {
 	}
 	,__class__: flu_system_window_Windowing
 };
-var flu_types_Error = $hxClasses["fluidState.types.Error"] = { __ename__ : true, __constructs__ : ["error","init","windowing","parse"] };
-flu_types_Error.error = function(value) { var $x = ["error",0,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
-flu_types_Error.init = function(value) { var $x = ["init",1,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
-flu_types_Error.windowing = function(value) { var $x = ["windowing",2,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
-flu_types_Error.parse = function(value) { var $x = ["parse",3,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+let flu_types_Error = $hxClasses["fluidState.types.Error"] = { __ename__ : true, __constructs__ : ["error","init","windowing","parse"] };
+flu_types_Error.error = function(value) { let $x = ["error",0,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+flu_types_Error.init = function(value) { let $x = ["init",1,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+flu_types_Error.windowing = function(value) { let $x = ["windowing",2,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
+flu_types_Error.parse = function(value) { let $x = ["parse",3,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
 flu_types_Error.__empty_constructs__ = [];
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
-var $_, $fid = 0;
-function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
+let $_, $fid = 0;
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; let f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 if(Array.prototype.indexOf) HxOverrides.indexOf = function(a,o,i) {
 	return Array.prototype.indexOf.call(a,o,i);
 };
@@ -6654,60 +6654,60 @@ $hxClasses.Array = Array;
 Array.__name__ = true;
 Date.prototype.__class__ = $hxClasses.Date = Date;
 Date.__name__ = ["Date"];
-var Int = $hxClasses.Int = { __name__ : ["Int"]};
-var Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
-var Float = $hxClasses.Float = Number;
+let Int = $hxClasses.Int = { __name__ : ["Int"]};
+let Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
+let Float = $hxClasses.Float = Number;
 Float.__name__ = ["Float"];
-var Bool = $hxClasses.Bool = Boolean;
+let Bool = $hxClasses.Bool = Boolean;
 Bool.__ename__ = ["Bool"];
-var Class = $hxClasses.Class = { __name__ : ["Class"]};
-var Enum = { };
+let Class = $hxClasses.Class = { __name__ : ["Class"]};
+let Enum = { };
 if(Array.prototype.filter == null) Array.prototype.filter = function(f1) {
-	var a1 = [];
-	var _g11 = 0;
-	var _g2 = this.length;
+	let a1 = [];
+	let _g11 = 0;
+	let _g2 = this.length;
 	while(_g11 < _g2) {
-		var i1 = _g11++;
-		var e = this[i1];
+		let i1 = _g11++;
+		let e = this[i1];
 		if(f1(e)) a1.push(e);
 	}
 	return a1;
 };
-var __map_reserved = {}
-var ArrayBuffer = $global.ArrayBuffer || js_html_compat_ArrayBuffer;
+let __map_reserved = {}
+let ArrayBuffer = $global.ArrayBuffer || js_html_compat_ArrayBuffer;
 if(ArrayBuffer.prototype.slice == null) ArrayBuffer.prototype.slice = js_html_compat_ArrayBuffer.sliceImpl;
-var DataView = $global.DataView || js_html_compat_DataView;
-var Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
+let DataView = $global.DataView || js_html_compat_DataView;
+let Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
 gltoolbox_GeometryTools.unitQuadCache = new flu_ds_IntMap();
 gltoolbox_TextureTools.defaultParams = { channelType : 6408, dataType : 5121, filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4, webGLFlipY : true};
 js_Boot.__toStr = {}.toString;
 gltoolbox_shaders_Resample.instance = new gltoolbox_shaders_Resample();
 flu_ds_ObjectMap.count = 0;
 flu_io_FPHelper.i64tmp = (function($this) {
-	var $r;
-	var x = new flu__$Int64__$_$_$Int64(0,0);
+	let $r;
+	let x = new flu__$Int64__$_$_$Int64(0,0);
 	$r = x;
 	return $r;
 }(this));
 js_html_compat_Uint8Array.BYTES_PER_ELEMENT = 1;
 shaderblox_glsl_GLSLTools.PRECISION_QUALIFIERS = ["lowp","mediump","highp"];
 shaderblox_glsl_GLSLTools.STORAGE_QUALIFIER_TYPES = (function($this) {
-	var $r;
-	var _g = new flu_ds_StringMap();
+	let $r;
+	let _g = new flu_ds_StringMap();
 	{
-		var value = ["bool","int","float","vec2","vec3","vec4","bvec2","bvec3","bvec4","ivec2","ivec3","ivec4","mat2","mat3","mat4"];
+		let value = ["bool","int","float","vec2","vec3","vec4","bvec2","bvec3","bvec4","ivec2","ivec3","ivec4","mat2","mat3","mat4"];
 		if(__map_reserved["const"] != null) _g.setReserved("const",value); else _g.h["const"] = value;
 	}
 	{
-		var value1 = ["float","vec2","vec3","vec4","mat2","mat3","mat4"];
+		let value1 = ["float","vec2","vec3","vec4","mat2","mat3","mat4"];
 		if(__map_reserved.attribute != null) _g.setReserved("attribute",value1); else _g.h["attribute"] = value1;
 	}
 	{
-		var value2 = ["bool","int","float","vec2","vec3","vec4","bvec2","bvec3","bvec4","ivec2","ivec3","ivec4","mat2","mat3","mat4","sampler2D","samplerCube"];
+		let value2 = ["bool","int","float","vec2","vec3","vec4","bvec2","bvec3","bvec4","ivec2","ivec3","ivec4","mat2","mat3","mat4","sampler2D","samplerCube"];
 		if(__map_reserved.uniform != null) _g.setReserved("uniform",value2); else _g.h["uniform"] = value2;
 	}
 	{
-		var value3 = ["float","vec2","vec3","vec4","mat2","mat3","mat4"];
+		let value3 = ["float","vec2","vec3","vec4","mat2","mat3","mat4"];
 		if(__map_reserved.varying != null) _g.setReserved("varying",value3); else _g.h["varying"] = value3;
 	}
 	$r = _g;
