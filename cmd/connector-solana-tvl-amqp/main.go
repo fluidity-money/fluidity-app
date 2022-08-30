@@ -1,13 +1,14 @@
 package main
 
 import (
-	solLib "github.com/fluidity-money/fluidity-app/cmd/connector-solana-tvl-amqp/lib/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	idoQueue "github.com/fluidity-money/fluidity-app/lib/queues/ido"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	solana "github.com/gagliardetto/solana-go"
 )
 
 const (
@@ -89,8 +90,17 @@ func main() {
 		})
 	}
 
-	tvl, err := solLib.GetTvl(
-		solanaRpcUrl,
+	httpClient, err := rpc.New(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
+
+	tvl, err := prize_pool.GetTvl(
+		httpClient,
 		fluidityPubkey,
 		tvlDataPubkey,
 		solendPubkey,
