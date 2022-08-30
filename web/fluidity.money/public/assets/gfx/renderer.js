@@ -2198,17 +2198,23 @@ Main.prototype = $extend(flu_App.prototype,{
 	,ready: function() {
 
 		const ref = this;
-		setTimeout(
-			function() {
-				ref.mousePointKnown = false;		
-			}, 1700, ref
-		);
-
+		if (this.app.window.width >= 760) {
+			const id= setInterval(
+				function() {
+					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+				}, 100, ref
+			);
+		}else {
+			setTimeout(
+				function() {
+					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+				}, 1200, ref
+			);
+		}
 		this.window = this.app.window;
 		this.init();
 		this.window.onevent = $bind(this,this.onWindowEvent);
 		this.window.onrender = $bind(this,this.render);
-		
 	}
 	
 	,init: function() {
@@ -2505,9 +2511,9 @@ Main.prototype = $extend(flu_App.prototype,{
 			var _this11 = this.dyeColor;
 
 			//shoot fluid color configuration - modify later.
-			var x = rgb.get_red() / 255;
-			var y = rgb.get_green() / 255;
-			var z = rgb.get_blue() / 255;
+			var x = 160 / 255;
+			var y = 32 / 255;
+			var z = 240 / 255;
 			_this11.x = x;
 			_this11.y = y;
 			_this11.z = z;
@@ -5977,6 +5983,14 @@ flu_core_web_window_Windowing.prototype = {
 		this.seq_window++;
 	}
 	,internal_resize: function(_window,_w,_h) {
+		const ref = this;
+		if (this.app.window.width >= 760) {
+			setInterval(
+				function() {
+					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+				}, 500, ref
+			);
+		}
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 7, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 6, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 	}

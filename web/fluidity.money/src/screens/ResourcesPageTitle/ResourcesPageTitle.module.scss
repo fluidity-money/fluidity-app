@@ -1,12 +1,20 @@
+@import "../../styles/config.scss";
+
 .container {
     display: flex;
+    justify-content: center;
+    align-items: center;
     min-height: 850px;
     width: 100%;
-    border: solid 2px red;
-    opacity: 0.7;
-    background-image: url("../../../public/assets/images/header-transition.svg");
+    opacity: 0.5;
+    background-image: url("../../../public/assets/images/dot-graph.svg");
     background-position: center;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: 100%;
+    
+    h1 {
+      color: $fluidWhite;
+      font-size: 14vw;
+    }
   }
   
