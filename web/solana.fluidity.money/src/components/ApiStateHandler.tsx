@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import {useSolana} from "@saberhq/use-solana";
 import { AxiosError } from "axios";
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
