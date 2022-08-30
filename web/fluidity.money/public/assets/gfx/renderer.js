@@ -2153,7 +2153,7 @@ let Main = function() {
 	flu_App.call(this);
 	this.performanceMonitor = new PerformanceMonitor(35,null,800);
 				
-	this.set_simulationQuality(SimulationQuality.Medium);
+	this.set_simulationQuality(SimulationQuality.UltraLow);
 	this.performanceMonitor.fpsTooLowCallback = $bind(this,this.lowerQualityRequired);
 	let urlParams = js_Web.getParams();
 	if(__map_reserved.q != null?urlParams.existsReserved("q"):urlParams.h.hasOwnProperty("q")) {
