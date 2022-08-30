@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/aldrin"
 	"github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/common/solana/orca"
@@ -11,13 +12,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/saber"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	types "github.com/fluidity-money/fluidity-app/lib/types/worker"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
-func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
+func parseTransaction(solanaClient *solana.SolanaRPCHandle, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
 
 	var (
-		totalFee = big.NewRat(0, 0)
+		totalFee = big.NewRat(0, 1)
 
 		transactionResult       = transaction.Transaction.Result
 		transactionSignature    = transaction.Transaction.Signature
@@ -26,8 +26,8 @@ func parseTransaction(solanaClient *solanaRpc.Client, fluidTokens map[string]str
 
 	for _, app := range transactionApplications {
 		var (
-			fee      *big.Rat
-			err      error
+			fee *big.Rat
+			err error
 		)
 
 		switch app {

@@ -42,10 +42,6 @@ COPY scripts scripts
 
 WORKDIR scripts
 
-RUN find
-
-RUN cat Makefile
-
 RUN make install
 
 FROM build

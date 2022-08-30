@@ -1,18 +1,17 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 
 	"github.com/near/borsh-go"
 )
@@ -30,6 +29,13 @@ const (
 	// EnvTvlDataPubkey is the public key of an initialized account for storing
 	// TVL data
 	EnvTvlDataPubkey = `FLU_SOLANA_TVL_DATA_PUBKEY`
+
+	// EnvFluidityDataPubkey is the public key of an initialised fluidity
+	// data account
+	EnvFluidityDataPubkey = `FLU_SOLANA_FLUIDITY_DATA_PUBKEY`
+
+	// EnvUnderlyingMintPubkey is the mint address of the underlying token
+	EnvUnderlyingMintPubkey = `FLU_SOLANA_UNDERLYING_MINT_PUBKEY`
 
 	// EnvSolendPubkey is the program id of the solend program
 	EnvSolendPubkey = `FLU_SOLANA_SOLEND_PROGRAM_ID`
@@ -78,6 +84,8 @@ func main() {
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 
 		fluidityPubkey   = pubkeyFromEnv(EnvFluidityPubkey)
+		fluidDataPubkey  = pubkeyFromEnv(EnvFluidityDataPubkey)
+		tokenMintPubkey  = pubkeyFromEnv(EnvUnderlyingMintPubkey)
 		fluidMintPubkey  = pubkeyFromEnv(EnvFluidityMintPubkey)
 		obligationPubkey = pubkeyFromEnv(EnvObligationPubkey)
 		reservePubkey    = pubkeyFromEnv(EnvReservePubkey)
@@ -107,7 +115,14 @@ func main() {
 		})
 	}
 
-	solanaClient := solanaRpc.New(rpcUrl)
+	solanaClient, err := rpc.New(rpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 
@@ -179,8 +194,7 @@ func main() {
 		})
 
 		recentBlockHashResult, err := solanaClient.GetRecentBlockhash(
-			context.Background(),
-			solanaRpc.CommitmentFinalized,
+			"finalized",
 		)
 
 		if err != nil {
@@ -229,6 +243,12 @@ func main() {
 		}
 
 		var (
+			// fluidityDataAccount is used to read keys from
+			fluidityDataAccount = solana.NewAccountMeta(fluidDataPubkey, false, false)
+
+			// underlyingTokenMint is used to ensure the correct fluid account is being used
+			underlyingTokenMint = solana.NewAccountMeta(tokenMintPubkey, false, false)
+
 			// solanaAccountMetaSpl is used to know where to send transactions
 			solanaAccountMetaSpl = solana.NewAccountMeta(splPubkey, false, false)
 
@@ -274,6 +294,8 @@ func main() {
 		)
 
 		accountMetas := solana.AccountMetaSlice{
+			fluidityDataAccount,
+			underlyingTokenMint,
 			solanaAccountMetaSpl,
 			solanaAccountFluidMint,
 			solanaAccountPDA,
@@ -354,7 +376,7 @@ and instruction data %+v`,
 			})
 		}
 
-		sig, err := solanaClient.SendTransaction(context.Background(), transaction)
+		sig, err := solanaClient.SendTransaction(transaction)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

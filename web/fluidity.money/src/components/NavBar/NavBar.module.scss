@@ -1,5 +1,16 @@
 @import "../../styles/config.scss";
 
+.outerContainer {
+  box-sizing: border-box;
+  position: absolute;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+}
+
 .container {
   box-sizing: border-box;
   position: absolute;
@@ -9,6 +20,9 @@
   align-items: center;
   width: 100%;
   height: 100px;
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr;
+  max-width: 1500px;
   .navbar {
     box-sizing: border-box;
     justify-content: space-between;
@@ -17,6 +31,7 @@
     width: fit-content;
     padding: 10px;
     z-index: 99;
+    justify-self: center;
 
     .fade {
       box-sizing: border-box;
@@ -64,8 +79,7 @@
 
 .fluidity {
   z-index: 1;
-  position: absolute;
-  left: 51px;
+  margin-left: 50px;
   font-size: 30.5px;
-  top: 30px;
+  padding-bottom: 2px;
 }

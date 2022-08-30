@@ -54,7 +54,6 @@ func NewBroadcast() *Broadcast {
 				log.Debug(func(k *log.Log) {
 					k.Context = ContextBroadcast
 					k.Message = "Received a message to broadcast!"
-					k.Payload = string(message)
 				})
 
 				for cookie, subscribed := range broadcast.subscribed {

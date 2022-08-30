@@ -12,3 +12,12 @@ rules:
         ...
     - pattern: |
         $SOL.MustPublicKeyFromBase58(...)
+
+- id: bad-map-nil-assignment
+  languages: [go]
+  severity: ERROR
+  message: |
+    Don't create a map this way! Should be make(map..., len)!
+  patterns:
+    - pattern: |
+        var $NAME map[$KEY]$TYPE

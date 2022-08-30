@@ -12,7 +12,7 @@
   color: $white;
 
   > * {
-    max-width: 50%;
+    flex: 1 1 0px;
   }
   
   @include respond-to('small') {
