@@ -65,7 +65,7 @@ const Landing = () => {
               img={"/assets/images/landingIcons/1to1.svg"}
               side={"left"}
             >
-              1 to 1 exchange rate, <br />
+              1 to 1 exchange rate <br />
               to base wrapped assets
             </IntroTile>
             <IntroTile
@@ -110,7 +110,8 @@ const Landing = () => {
               img={"/assets/images/useCaseIcons/forReceivers.svg"}
               side={"right"}
             >
-              Rewards can be significant
+              Rewards can range from cents
+              <br /> to millions
             </IntroTile>
             <IntroTile
               img={"/assets/images/landingIcons/scalingEcosystem.svg"}
