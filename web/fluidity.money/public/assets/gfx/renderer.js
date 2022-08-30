@@ -2196,7 +2196,7 @@ Main.prototype = $extend(flu_App.prototype,{
 	,ready: function() {
 
 		const ref = this;
-		if (this.app.window.width >= 760) {
+		if (this.app.window.width >= 460) {
 			const id= setInterval(
 				function() {
 					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
@@ -2217,7 +2217,7 @@ Main.prototype = $extend(flu_App.prototype,{
 			setTimeout(
 				function() {
 					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-				}, 1200, ref
+				}, 800, ref
 			);
 		}
 		this.window = this.app.window;
