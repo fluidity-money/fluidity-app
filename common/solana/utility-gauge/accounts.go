@@ -1,7 +1,7 @@
 package utility_gauge
 
 import (
-	solana "github.com/gagliardetto/solana-go"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 type (

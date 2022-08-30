@@ -1,6 +1,10 @@
 
-.PHONY: install
+.PHONY: install clean
 
-install: $(shell find . -name '*.go')
+install:
 	@find . -mindepth 1 -maxdepth 1 -type d \
 		-exec sh -c 'cd {} && ${MAKE} install' \;
+
+clean:
+	@find . -mindepth 1 -maxdepth 1 -type d \
+		-exec sh -c 'cd {} && ${MAKE} clean' \;

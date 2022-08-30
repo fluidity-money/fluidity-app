@@ -26,10 +26,12 @@ const Reward = () => {
   const infoStats = (
     <div className={styles.info}>
       <div className={styles.infoSingle}>
+        {/* hard coded on launch */}
         <h1>1400+</h1>
         <h4>Unique wallets</h4>
       </div>
       <div className={styles.infoSingle}>
+        {/* hard coded on launch */}
         <h1>32,689</h1>
         <h4>Fluid asset pairs</h4>
       </div>

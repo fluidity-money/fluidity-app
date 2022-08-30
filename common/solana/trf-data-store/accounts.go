@@ -1,6 +1,6 @@
 package trf_data_store
 
-import solana "github.com/gagliardetto/solana-go"
+import "github.com/fluidity-money/fluidity-app/common/solana"
 
 type (
 	// TrfDataStore is the derived account storing active TRF vars

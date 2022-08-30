@@ -112,12 +112,6 @@ func GetMessages(topic string, f func(message Message)) {
 			routingKey  = message.RoutingKey
 		)
 
-		log.Debug(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Received a message from the queue!"
-			k.Payload = string(body)
-		})
-
 		bodyBuf := bytes.NewBuffer(body)
 
 		// Risk of a collision is near 0 enough to be ignored.

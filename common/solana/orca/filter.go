@@ -1,20 +1,18 @@
 package orca
 
 import (
-	"context"
 	"fmt"
 	"math/big"
 
-	solLib "github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 	"github.com/near/borsh-go"
 )
 
@@ -42,7 +40,7 @@ type ConstantProductCurveFeeData struct {
 // GetOrcaFees by checking that an orca swap occurred, then
 // destructuring the swap information to get the fee %, and
 // getting the fees paid by multiplying the value of the swap
-func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionResult, orcaProgramId string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
+func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult, orcaProgramId string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
@@ -51,7 +49,7 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 
 	feesPaid = big.NewRat(0, 1)
 
-	allInstructions := solLib.GetAllInstructions(transaction)
+	allInstructions := solana.GetAllInstructions(transaction)
 
 	for instructionNumber, instruction := range allInstructions {
 
@@ -121,10 +119,7 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 			)
 		}
 
-		resp, err := solanaClient.GetAccountInfo(
-			context.Background(),
-			swapAccountPubkey,
-		)
+		resp, err := solanaClient.GetAccountInfo(swapAccountPubkey)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -137,7 +132,14 @@ func GetOrcaFees(solanaClient *solanaRpc.Client, transaction types.TransactionRe
 
 		var feeData ConstantProductCurveFeeData
 
-		data := resp.Value.Data.GetBinary()
+		data, err := resp.GetBinary()
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to convert the data account from base64: %v",
+				err,
+			)
+		}
 
 		// make sure the data is long enough to encode the fee data
 

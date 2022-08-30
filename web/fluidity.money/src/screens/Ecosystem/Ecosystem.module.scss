@@ -1,0 +1,57 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 850px;
+  width: 100%;
+  flex-direction: column;
+  background-color: $fluidBlack;
+  border: 2px solid red;
+  position: relative;
+}
+
+.background {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 500px;
+}
+
+.textBehind {
+  width: 100%;
+  display: flex;
+  top: 100px;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  max-height: 850px;
+  h1 {
+    font-size: 200px;
+    height: 100%;
+  }
+}
+
+.scrollable {
+  width: 100%;
+  z-index: 2;
+  overflow-y: auto;
+  max-height: 850px;
+}
+
+.projects {
+  width: 100%;
+  margin-top: 900px;
+  margin-bottom: 300px;
+}
+
+.above {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding-left: 40px;
+  padding-right: 40px;
+}

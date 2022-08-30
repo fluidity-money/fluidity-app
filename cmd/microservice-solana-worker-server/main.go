@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"strconv"
 
+	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -11,7 +12,6 @@ import (
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	worker_types "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
@@ -145,6 +145,7 @@ func main() {
 			)
 
 			if tokenDetails.TokenShortName != tokenName {
+				sendEmission(emission)
 				continue
 			}
 
@@ -221,6 +222,8 @@ func main() {
 					)
 				})
 
+				sendEmission(emission)
+
 				continue
 			}
 
@@ -256,6 +259,7 @@ func main() {
 			// don't bother paying out if the unlucky winner won nothing
 
 			if winningAmount <= 0 {
+				sendEmission(emission)
 				continue
 			}
 
@@ -273,11 +277,7 @@ func main() {
 
 			queue.SendMessage(topicWinnerQueue, winnerAnnouncement)
 
-			emission.Update()
-
-			queue.SendMessage(worker.TopicEmissions, emission)
-
-			log.Debugf("Emission: %s", emission)
+			sendEmission(emission)
 		}
 	})
 }

@@ -1,12 +1,11 @@
 package main
 
 import (
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -27,6 +26,12 @@ const (
 
 	// EnvRaydiumProgramId is the program ID of the Raydium swap program
 	EnvRaydiumProgramId = `FLU_SOLANA_RAYDIUM_PROGRAM_ID`
+
+	// EnvAldrinV1ProgramId is the program ID of the Aldrin swap program v. 1
+	EnvAldrinV1ProgramId = `FLU_SOLANA_ALDRIN_V1_PROGRAM_ID`
+
+	// EnvAldrinV2ProgramId is the program ID of the Aldrin swap program v. 2
+	EnvAldrinV2ProgramId = `FLU_SOLANA_ALDRIN_V2_PROGRAM_ID`
 )
 
 func main() {
@@ -37,18 +42,27 @@ func main() {
 		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
 		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
 		raydiumProgramId   = util.GetEnvOrFatal(EnvRaydiumProgramId)
+		aldrinProgramIdV1  = util.GetEnvOrFatal(EnvAldrinV1ProgramId)
+		aldrinProgramIdV2  = util.GetEnvOrFatal(EnvAldrinV2ProgramId)
 
 		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)
 
-	solanaClient := solanaRpc.New(solanaRpcUrl)
+	solanaClient, err := rpc.New(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana call manager!"
+			k.Payload = err
+		})
+	}
 
 	worker.GetSolanaBufferedParsedTransactions(func(transactions worker.SolanaBufferedParsedTransactions) {
 		transfers := make([]worker.SolanaDecoratedTransfer, 0)
 
 		for transactionNumber, transaction := range transactions.Transactions {
 			var (
-				transactionApp       = transaction.Transaction.Application
+				transactionApps      = transaction.Transaction.Applications
 				transactionSignature = transaction.Transaction.Signature
 			)
 
@@ -60,6 +74,8 @@ func main() {
 				saberSwapProgramId,
 				orcaProgramId,
 				raydiumProgramId,
+				aldrinProgramIdV1,
+				aldrinProgramIdV2,
 			)
 
 			if err != nil {
@@ -75,8 +91,8 @@ func main() {
 			if decorated == nil {
 				log.App(func(k *log.Log) {
 					k.Format(
-						"Application didn't return a transfer, app index %d, transaction %s",
-						transactionApp,
+						"Application didn't return a transfer, app indexes %+v, transaction %s",
+						transactionApps,
 						transactionSignature,
 					)
 				})

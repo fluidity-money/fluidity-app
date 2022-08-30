@@ -1,0 +1,29 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import DesktopOnly from "./DesktopOnly";
+import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
+
+<Meta
+    title="Container/DesktopOnly"
+    component={DesktopOnly}
+/>
+
+export const Template = ({children, ...props}) => <DesktopOnly {...props}>
+    {children}
+</DesktopOnly>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>DesktopOnly Container</Title>
+    <Subtitle>Container that renders when screen is wide enough</Subtitle>
+    
+    <h2>DesktopOnly Container</h2>
+    <Story
+        name="Default Container"
+        args={{
+            children: 
+                <ReactSvg />
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

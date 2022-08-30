@@ -2,17 +2,13 @@ use std::str::FromStr;
 use std::sync::Once;
 
 use accounts::{ConfigOptions, SolendAccounts};
-use borsh::BorshDeserialize;
+
 use rpc::send_txn;
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::{
-    account::Account,
-    account_info::IntoAccountInfo,
     instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
-    signature::Keypair,
-    signer::Signer,
-    system_instruction, system_program, sysvar,
+    signature::Keypair, system_program, sysvar,
     transaction::Transaction,
 };
 
@@ -107,7 +103,7 @@ pub fn setup_accs(
             &init_obligation_inst,
             payer.get_public_key(),
             vec![&payer.keypair.as_ref().unwrap()]
-        ));
+        ).unwrap());
 
         // Init data
         let init_data_accs = InitDataInstructionAccountMetas {
@@ -126,6 +122,7 @@ pub fn setup_accs(
             lamports: client
                 .get_minimum_balance_for_rent_exemption(std::mem::size_of::<FluidityData>())
                 .unwrap(),
+            payout_cap: 10000,
         };
 
         let init_data_inst = fluid_contract.init_data(init_data_accs, init_data_args);
@@ -135,10 +132,7 @@ pub fn setup_accs(
             &init_data_inst,
             payer.get_public_key(),
             vec![&payer.keypair.as_ref().unwrap()]
-        ));
-
-        let new_auth_pubkey = Some(&accounts::pda(&config));
-        let signers = vec![&payer.get_public_key()];
+        ).unwrap());
 
         // Authorize minting
         let authorize_pda_mint_inst = vec![spl_token::instruction::set_authority(
@@ -156,7 +150,7 @@ pub fn setup_accs(
             &authorize_pda_mint_inst,
             payer.get_public_key(),
             vec![&payer.keypair.as_ref().unwrap()]
-        ));
+        ).unwrap());
     })
 }
 
@@ -178,7 +172,7 @@ pub fn setup_user(client: &RpcClient, user: &DevnetAccount, fluid_contract: &Flu
         &init_tvl_data_inst,
         user.get_public_key(),
         vec![&user.keypair.as_ref().unwrap()]
-    ));
+    ).unwrap());
 }
 
 #[cfg(test)]
