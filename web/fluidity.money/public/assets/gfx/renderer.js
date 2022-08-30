@@ -2098,7 +2098,7 @@ flu_App.prototype = {
 		this.cur_frame_start = flu.core.timestamp();
 		this.last_frame_start = this.cur_frame_start;
 		this.current_time = 0;
-		this.delta_time = 0.016;
+		this.delta_time = 0.00016;
 	}
 	,on_internal_update: function() {
 		if(this.freeze != true) {
@@ -2153,7 +2153,7 @@ let Main = function() {
 	flu_App.call(this);
 	this.performanceMonitor = new PerformanceMonitor(35,null,800);
 				
-	this.set_simulationQuality(SimulationQuality.UltraLow);
+	this.set_simulationQuality(SimulationQuality.Low);
 	this.performanceMonitor.fpsTooLowCallback = $bind(this,this.lowerQualityRequired);
 	let urlParams = js_Web.getParams();
 	if(__map_reserved.q != null?urlParams.existsReserved("q"):urlParams.h.hasOwnProperty("q")) {
@@ -2207,9 +2207,9 @@ Main.prototype = $extend(flu_App.prototype,{
 							setTimeout(
 								function() {
 									ref.freeze = true;
-								}, 18000, ref
+								}, 12000, ref
 							);
-						}, 5000, ref
+						}, 2000, ref
 					);
 				}, 100, ref
 			);
@@ -2347,7 +2347,7 @@ Main.prototype = $extend(flu_App.prototype,{
 				}
 			}
 		}
-		dt = 0.090;
+		dt = 0.039;
 		let _this1 = this.updateDyeShader.isMouseDown;
 		let tmp;
 		_this1.dirty = true;
