@@ -21,10 +21,10 @@ pub struct FluidityData {
 pub enum FluidityInstruction {
     Wrap(u64, String, u8),
     Unwrap(u64, String, u8),
-    Payout(u64, String, u8),
+    Payout(u64, String, u8, bool),
     InitSolendObligation(u64, u64, String, u8),
     LogTVL,
-    InitData(String, u64, u64, u8),
+    InitData(String, u64, u64, u8, u64),
     MoveFromPrizePool(u64, String, u8),
 }
 

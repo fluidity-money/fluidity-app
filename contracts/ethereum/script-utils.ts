@@ -23,32 +23,50 @@ export type Token = {
 
 
 export const mustEnv = (env: string): string => {
-    const e = process.env[env];
-    if (e === undefined) {
-        throw new Error(`Env ${env} not set!`);
-    }
-    return e;
+  const e = process.env[env];
+  if (e === undefined) {
+    throw new Error(`Env ${env} not set!`);
+  }
+  return e;
 };
 
 export const optionalEnv = (env: string, fallback: string): string => {
-    let e = process.env[env];
-    if (e === undefined) {
-      console.log(`Optional env ${env} not set - defaulting to '${fallback}`);
-      e = fallback;
-    }
-    return e;
+  let e = process.env[env];
+  if (e === undefined) {
+    console.log(`Optional env ${env} not set - defaulting to '${fallback}`);
+    e = fallback;
+  }
+  return e;
 };
 
+export const deployWorkerConfig = async (
+  hre: HardhatRuntimeEnvironment,
+  operator: string,
+  emergencyCouncil: string,
+): Promise<string> => {
+  const factory = await hre.ethers.getContractFactory("WorkerConfig");
+
+  const workerConfig = await factory.deploy();
+
+  await workerConfig.deployed();
+
+  await workerConfig.init(operator, emergencyCouncil);
+
+  return workerConfig.address;
+}
+
 export const deployTokens = async (
-    hre: HardhatRuntimeEnvironment,
-    tokens: Token[],
-    aavePoolProvider: string,
-    oracleAddress: string,
+  hre: HardhatRuntimeEnvironment,
+  tokens: Token[],
+  aavePoolProvider: string,
+  emergencyCouncilAddress: string,
+  operatorAddress: string,
+  workerConfigAddress: string
 ): Promise<{
-    tokenBeacon: ethers.Contract,
-    aaveBeacon: ethers.Contract,
-    compoundBeacon: ethers.Contract,
-    tokens: {[symbol: string]: [ethers.Contract, ethers.Contract]},
+  tokenBeacon: ethers.Contract,
+  aaveBeacon: ethers.Contract,
+  compoundBeacon: ethers.Contract,
+  tokens: { [symbol: string]: [ethers.Contract, ethers.Contract] },
 }> => {
   const tokenFactory = await hre.ethers.getContractFactory("Token");
   const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
@@ -58,58 +76,61 @@ export const deployTokens = async (
   const compoundBeacon = await hre.upgrades.deployBeacon(compoundFactory);
   const aaveBeacon = await hre.upgrades.deployBeacon(aaveFactory);
 
-  const tokenAddresses: {[symbol: string]: [ethers.Contract, ethers.Contract]} = {};
+  const tokenAddresses: { [symbol: string]: [ethers.Contract, ethers.Contract] } = {};
 
   for (const token of tokens) {
-      console.log(`deploying ${token.name}`);
+    console.log(`deploying ${token.name}`);
 
-      var deployedPool: ethers.Contract
-      const deployedToken = await hre.upgrades.deployBeaconProxy(
-          tokenBeacon,
-          tokenFactory,
-      );
+    let deployedPool: ethers.Contract;
 
-      switch (token.backend) {
-          case 'compound':
-              deployedPool = await hre.upgrades.deployBeaconProxy(
-                  compoundBeacon,
-                  compoundFactory,
-                  [token.compoundAddress, deployedToken.address],
-          );
+    const deployedToken = await hre.upgrades.deployBeaconProxy(
+      tokenBeacon,
+      tokenFactory,
+    );
 
-          break;
+    switch (token.backend) {
+      case 'compound':
+        deployedPool = await hre.upgrades.deployBeaconProxy(
+          compoundBeacon,
+          compoundFactory,
+          [token.compoundAddress, deployedToken.address],
+          {initializer: "init(address, address)"},
+        );
 
-          case 'aave':
-              deployedPool = await hre.upgrades.deployBeaconProxy(
-                  aaveBeacon,
-                  aaveFactory,
-                  [aavePoolProvider, token.aaveAddress, deployedToken.address],
-          );
+        break;
 
-          break;
+      case 'aave':
+        deployedPool = await hre.upgrades.deployBeaconProxy(
+          aaveBeacon,
+          aaveFactory,
+          [aavePoolProvider, token.aaveAddress, deployedToken.address],
+          {initializer: "init(address, address, address)"},
+        );
 
-          default:
-              assertNever(token);
+        break;
 
-      }
+      default:
+        assertNever(token);
 
-      await deployedPool.deployed();
-      await deployedToken.deployed();
-      await deployedToken.functions.init(
-          deployedPool.address,
-          token.decimals,
-          token.name,
-          token.symbol,
-          oracleAddress,
-          1000, // Reward quarantine
-          false, // Limited supply
-          1000000, // Global limit
-          10000, // User limit
-      );
+    }
 
-      tokenAddresses[token.symbol] = [deployedToken, deployedPool];
+    await deployedPool.deployed();
 
-      console.log(`deployed ${token.name} to ${deployedToken.address}`);
+    await deployedToken.deployed();
+
+    await deployedToken.functions.init(
+      deployedPool.address,
+      token.decimals,
+      token.name,
+      token.symbol,
+      emergencyCouncilAddress,
+      operatorAddress,
+      workerConfigAddress,
+    );
+
+    tokenAddresses[token.symbol] = [deployedToken, deployedPool];
+
+    console.log(`deployed ${token.name} to ${deployedToken.address}`);
   }
 
   return {
@@ -148,23 +169,23 @@ export const forknetTakeFunds = async (
     console.log(
       `token holder for ${token.name} has balance ${initialUsdtBalanceString}`);
 
-      const amount = initialUsdtBalance.div(accounts.length);
+    const amount = initialUsdtBalance.div(accounts.length);
 
-      const promises = accounts.map(async address => {
-        await impersonatedToken.transfer(await address.getAddress(), amount);
+    const promises = accounts.map(async address => {
+      await impersonatedToken.transfer(await address.getAddress(), amount);
 
-        if (!(await impersonatedToken.balanceOf(await address.getAddress())).eq(amount))
-          throw new Error(`failed to take token ${token.name} ${token.address}`);
-      });
+      if (!(await impersonatedToken.balanceOf(await address.getAddress())).eq(amount))
+        throw new Error(`failed to take token ${token.name} ${token.address}`);
+    });
 
-      await Promise.all(promises);
+    await Promise.all(promises);
 
-      await hre.network.provider.request({
-        method: "hardhat_stopImpersonatingAccount",
-        params: [token.owner],
-      });
+    await hre.network.provider.request({
+      method: "hardhat_stopImpersonatingAccount",
+      params: [token.owner],
+    });
 
-      console.log(`finished taking ${token.name}`);
+    console.log(`finished taking ${token.name}`);
   }
 };
 

@@ -53,3 +53,10 @@
 .normal {
   cursor: pointer;
 }
+
+.text {
+  align-items: center;
+  & div {
+    margin-left: 6px;
+  }
+}

@@ -4,17 +4,19 @@
   display: flex;
   position: relative;
   width: 100%;
-  height: 30px;
+  height: 24px;
+  font-size: 16px;
   // margin: auto;
   background-color: transparent;
   overflow: hidden;
   z-index: 1;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 24px;
+  padding-bottom: 24px;
   box-sizing: content-box;
   &Line {
     display: flex;
     position: absolute;
+    font-size: 16px;
     top: 0;
     left: 0;
     align-items: center;
@@ -27,6 +29,7 @@
     & > div {
       display: flex;
       animation: scrollRight 120s infinite linear;
+      font-size: 16px;
       &:hover {
         // animation-play-state: paused;
       }
@@ -56,8 +59,8 @@
 
 .winnersLeft {
   @extend .winnersRight;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 24px;
+  padding-bottom: 24px;
   &Line {
     display: flex;
     position: absolute;
@@ -103,31 +106,32 @@
 .winnersTop {
   display: flex;
   position: relative;
-  width: 90%;
+  width: 100%;
   height: 100%;
   min-height: 850px;
   // margin: auto;
   background-color: transparent;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 2;
   padding-top: 15px;
   padding-bottom: 15px;
   justify-content: center;
   &Line {
-    display: flex;
+    // display: flex;
     position: absolute;
     top: 0;
     left: 0;
-    align-items: center;
-    justify-content: space-evenly;
+    // align-items: center;
+    // justify-content: space-evenly;
     width: 100%;
     height: 100%;
     // white-space: nowrap;
     // transform: scale(2);
     // transition: all 1s ease;
     & > div {
-      display: flex;
-      flex-direction: column;
+      // display: flex;
+      // flex-direction: column;
       height: fit-content;
       animation: scrollUp 50s infinite linear;
       // display: grid;
@@ -150,9 +154,9 @@
 
 @keyframes scrollUp {
   from {
-    transform: translateY(0%);
+    transform: translateY(30%);
   }
   to {
-    transform: translateY(-50%);
+    transform: translateY(-80%);
   }
 }

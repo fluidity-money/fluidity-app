@@ -5,20 +5,22 @@ import (
 	"math/rand"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 func generateRandomIntegers(amount, min, max int) []int {
-	if amount > max - min + 1 {
-		log.Fatal(func (k *log.Log) {
-		   k.Format(
-			   "Can't generate %d non-repeating integers between %d and %d!",
-			   amount,
-			   min,
-			   max,
-		   )
+	if amount > max-min+1 {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Can't generate %d non-repeating integers between %d and %d!",
+				amount,
+				min,
+				max,
+			)
 		})
 	}
 
@@ -78,4 +80,12 @@ func raiseDecimalPlaces(places int) *big.Rat {
 	}
 
 	return decimalPlacesRat
+}
+
+func sendEmission(emission *worker.Emission) {
+	emission.Update()
+
+	queue.SendMessage(worker.TopicEmissions, emission)
+
+	log.Debugf("Emission: %s", emission)
 }

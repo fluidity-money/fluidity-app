@@ -30,6 +30,13 @@ const (
 	// TVL data
 	EnvTvlDataPubkey = `FLU_SOLANA_TVL_DATA_PUBKEY`
 
+	// EnvFluidityDataPubkey is the public key of an initialised fluidity
+	// data account
+	EnvFluidityDataPubkey = `FLU_SOLANA_FLUIDITY_DATA_PUBKEY`
+
+	// EnvUnderlyingMintPubkey is the mint address of the underlying token
+	EnvUnderlyingMintPubkey = `FLU_SOLANA_UNDERLYING_MINT_PUBKEY`
+
 	// EnvSolendPubkey is the program id of the solend program
 	EnvSolendPubkey = `FLU_SOLANA_SOLEND_PROGRAM_ID`
 
@@ -77,6 +84,8 @@ func main() {
 		topicWinnerQueue = util.GetEnvOrFatal(EnvTopicWinnerQueue)
 
 		fluidityPubkey   = pubkeyFromEnv(EnvFluidityPubkey)
+		fluidDataPubkey  = pubkeyFromEnv(EnvFluidityDataPubkey)
+		tokenMintPubkey  = pubkeyFromEnv(EnvUnderlyingMintPubkey)
 		fluidMintPubkey  = pubkeyFromEnv(EnvFluidityMintPubkey)
 		obligationPubkey = pubkeyFromEnv(EnvObligationPubkey)
 		reservePubkey    = pubkeyFromEnv(EnvReservePubkey)
@@ -234,6 +243,12 @@ func main() {
 		}
 
 		var (
+			// fluidityDataAccount is used to read keys from
+			fluidityDataAccount = solana.NewAccountMeta(fluidDataPubkey, false, false)
+
+			// underlyingTokenMint is used to ensure the correct fluid account is being used
+			underlyingTokenMint = solana.NewAccountMeta(tokenMintPubkey, false, false)
+
 			// solanaAccountMetaSpl is used to know where to send transactions
 			solanaAccountMetaSpl = solana.NewAccountMeta(splPubkey, false, false)
 
@@ -279,6 +294,8 @@ func main() {
 		)
 
 		accountMetas := solana.AccountMetaSlice{
+			fluidityDataAccount,
+			underlyingTokenMint,
 			solanaAccountMetaSpl,
 			solanaAccountFluidMint,
 			solanaAccountPDA,

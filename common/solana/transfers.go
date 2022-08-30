@@ -19,7 +19,7 @@ func ClassifyApplication(transaction solana.TransactionResult, apps map[string]a
 		foundApps[app] = struct{}{}
 	}
 
-	var appsList []applications.Application
+	appsList := make([]applications.Application, 0)
 
 	for app := range foundApps {
 		appsList = append(appsList, app)
