@@ -29,4 +29,10 @@ func init() {
 	if fluidityContractAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
+
+	reader = strings.NewReader(workerConfigAbiString)
+
+	if workerConfigAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }

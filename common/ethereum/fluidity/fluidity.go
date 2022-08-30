@@ -2,12 +2,14 @@ package fluidity
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"fmt"
 	"math/big"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
@@ -79,7 +81,26 @@ const fluidityContractAbiString = `[
   }
 ]`
 
-var fluidityContractAbi ethAbi.ABI
+const workerConfigAbiString = `[
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "newOracles",
+        "type": "address[]"
+      }
+    ],
+    "name": "updateOracles",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]`
+
+var (
+	fluidityContractAbi ethAbi.ABI
+	workerConfigAbi     ethAbi.ABI
+)
 
 // the Reward struct from solidity, to be passed to batchReward
 type RewardArg struct {
@@ -236,9 +257,9 @@ func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Ad
 	)
 
 	var (
-		address   = ethCommon.HexToAddress(addressString)
-		balls     = []*big.Int{ big.NewInt(1) }
-		payouts   = []*big.Int{ amount }
+		address = ethCommon.HexToAddress(addressString)
+		balls   = []*big.Int{big.NewInt(1)}
+		payouts = []*big.Int{amount}
 	)
 
 	var hashBytes [32]byte
@@ -265,3 +286,52 @@ func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Ad
 	return transaction, nil
 }
 
+// UpdateOracles to create and sign (but not send!) the updateOracles call to the worker config contract
+func UpdateOracles(client *ethclient.Client, workerConfigContractAddress ethCommon.Address, signerKey *ecdsa.PrivateKey, transactionOptions *ethAbiBind.TransactOpts, newOracles []ethCommon.Address) (*ethTypes.Transaction, error) {
+	chainId, err := client.ChainID(context.Background())
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get chain ID from client! %v",
+			err,
+		)
+	}
+
+	var (
+		value     = transactionOptions.Value
+		nonce     = transactionOptions.Nonce
+		gasFeeCap = transactionOptions.GasFeeCap
+		gasTipCap = transactionOptions.GasTipCap
+	)
+
+	signer := types.NewLondonSigner(chainId)
+	dataBytes, err := workerConfigAbi.Pack("updateOracles", newOracles)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to encode call to updateOracles! %v",
+			err,
+		)
+	}
+
+	txData := &types.DynamicFeeTx{
+		ChainID:   chainId,
+		Nonce:     nonce.Uint64(),
+		GasTipCap: gasTipCap,
+		GasFeeCap: gasFeeCap,
+		To:        &workerConfigContractAddress,
+		Value:     value,
+		Data:      dataBytes,
+	}
+
+	signedTxn, err := types.SignNewTx(signerKey, signer, txData)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to sign the transaction to update the oracles! %v",
+			err,
+		)
+	}
+
+	return signedTxn, nil
+}
