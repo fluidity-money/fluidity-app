@@ -2101,19 +2101,21 @@ flu_App.prototype = {
 		this.delta_time = 0.016;
 	}
 	,on_internal_update: function() {
-		if(this.update_rate != 0) {
-			if(flu.core.timestamp() < this.next_tick) return;
-			this.next_tick = flu.core.timestamp() + this.update_rate;
+		if(this.freeze != true) {
+			if(this.update_rate != 0) {
+				if(flu.core.timestamp() < this.next_tick) return;
+				this.next_tick = flu.core.timestamp() + this.update_rate;
+			}
+			this.cur_frame_start = flu.core.timestamp();
+			this.delta_time = this.cur_frame_start - this.last_frame_start;
+			this.last_frame_start = this.cur_frame_start;
+			if(this.delta_time > this.max_frame_time) this.delta_time = this.max_frame_time;
+			let used_delta = this.fixed_delta == 0?this.delta_time:this.fixed_delta;
+			used_delta *= this.timescale;
+			this.delta_sim = used_delta;
+			this.current_time += used_delta;
+			this.app.do_internal_update(used_delta);
 		}
-		this.cur_frame_start = flu.core.timestamp();
-		this.delta_time = this.cur_frame_start - this.last_frame_start;
-		this.last_frame_start = this.cur_frame_start;
-		if(this.delta_time > this.max_frame_time) this.delta_time = this.max_frame_time;
-		let used_delta = this.fixed_delta == 0?this.delta_time:this.fixed_delta;
-		used_delta *= this.timescale;
-		this.delta_sim = used_delta;
-		this.current_time += used_delta;
-		this.app.do_internal_update(used_delta);
 	}
 	,on_internal_render: function() {
 		if(this.render_rate != 0) {
@@ -2146,12 +2148,8 @@ let Main = function() {
 	this.mouse.x = 500;
 	this.mouse.y = 400;
 	this.isMouseDown = true;
-	this.INTERGALACTIC = false;
-	this.THE_EXPERIMENTOR = false;
-	this.BIG_SLEEP = false;
-	this.SECRET_ARTS = false;
-	this.CHEER_UP_BUTTERCUP = false;
-	
+	this.freeze = false;
+
 	flu_App.call(this);
 	this.performanceMonitor = new PerformanceMonitor(35,null,800);
 				
@@ -2202,6 +2200,17 @@ Main.prototype = $extend(flu_App.prototype,{
 			const id= setInterval(
 				function() {
 					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+					setTimeout(
+						function() {
+							clearInterval(2);
+							ref.mousePointKnown = false;
+							setTimeout(
+								function() {
+									ref.freeze = true;
+								}, 18000, ref
+							);
+						}, 5000, ref
+					);
 				}, 100, ref
 			);
 		}else {
