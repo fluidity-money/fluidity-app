@@ -5996,14 +5996,6 @@ flu_core_web_window_Windowing.prototype = {
 		this.seq_window++;
 	}
 	,internal_resize: function(_window,_w,_h) {
-		const ref = this;
-		if (this.app.window.width >= 760) {
-			setInterval(
-				function() {
-					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-				}, 500, ref
-			);
-		}
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 7, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 6, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 	}
