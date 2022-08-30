@@ -2196,20 +2196,21 @@ Main.prototype = $extend(flu_App.prototype,{
 		return config;
 	}
 	,ready: function() {
-		
-	const ref = this;
-	setTimeout(
-		function() {
-		
-			ref.mousePointKnown = false;
-			
-		}, 1200, ref);
+
+		const ref = this;
+		setTimeout(
+			function() {
+				ref.mousePointKnown = false;		
+			}, 1700, ref
+		);
+
 		this.window = this.app.window;
 		this.init();
 		this.window.onevent = $bind(this,this.onWindowEvent);
 		this.window.onrender = $bind(this,this.render);
 		
 	}
+	
 	,init: function() {
 		var _g = this;
 		flu_modules_opengl_web_GL.current_context.disable(2929);
@@ -2712,7 +2713,7 @@ Main.prototype = $extend(flu_App.prototype,{
 		if(magnitude < 0.5) qualityIndex += 1; else qualityIndex += 2;
 		if(qualityIndex > maxIndex) qualityIndex = maxIndex;
 		var newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
-		console.log("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
+		//console.log("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
 		this.set_simulationQuality(newQuality);
 		this.updateSimulationTextures();
 		this.updatePointSize();
