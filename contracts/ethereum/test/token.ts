@@ -1,16 +1,18 @@
 import * as hre from "hardhat";
-import { oracle, fusdt_addr, usdt_addr, fdai_addr, signer } from './setup';
+import { oracle, operator, fusdt_addr, usdt_addr, fdai_addr, signer } from './setup';
 import * as ethers from 'ethers';
 import { expect } from "chai";
 
 describe("Token", async function () {
     let fusdt: ethers.Contract;
+    let fusdt_operator: ethers.Contract;
     let usdt: ethers.Contract;
     let fdai: ethers.Contract;
     let signerAddress: string;
 
     before(async () => {
         fusdt = await hre.ethers.getContractAt("Token", fusdt_addr, oracle);
+        fusdt_operator = await hre.ethers.getContractAt("Token", fusdt_addr, operator);
         usdt = await hre.ethers.getContractAt("IERC20", usdt_addr, oracle);
 
         fdai = await hre.ethers.getContractAt("Token", fdai_addr, oracle);
@@ -57,7 +59,7 @@ describe("Token", async function () {
             return acc.add(amount);
         }, ethers.constants.Zero);
 
-        await fusdt.unblockReward(signerAddress, blockedBalance, true, 100, 101);
+        await fusdt_operator.unblockReward(signerAddress, blockedBalance, true, 100, 101);
         const newChange = await fusdt.balanceOf(signerAddress) - initial;
         expect(newChange).to.equal(blockedBalance);
     });
