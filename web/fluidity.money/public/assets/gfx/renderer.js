@@ -2047,6 +2047,7 @@ var flu_App = function() {
 	this.fixed_delta = 0;
 	this.timescale = 1;
 };
+
 $hxClasses["fluidState.App"] = flu_App;
 flu_App.__name__ = true;
 flu_App.prototype = {
@@ -2070,7 +2071,6 @@ flu_App.prototype = {
 	,onkeyup: function(keycode,scancode,repeat,mod,timestamp,window_id) {
 	}
 	,ontextinput: function(text,start,length,type,timestamp,window_id) {
-		alert('testsdk')
 	}
 	,onmousedown: function(x,y,button,timestamp,window_id) {
 	}
@@ -2125,6 +2125,7 @@ flu_App.prototype = {
 	}
 	,__class__: flu_App
 };
+
 var Main = function() {
 	this.rshiftDown = false;
 	this.lshiftDown = false;
@@ -2711,7 +2712,7 @@ Main.prototype = $extend(flu_App.prototype,{
 		if(magnitude < 0.5) qualityIndex += 1; else qualityIndex += 2;
 		if(qualityIndex > maxIndex) qualityIndex = maxIndex;
 		var newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
-		alert("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
+		console.log("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
 		this.set_simulationQuality(newQuality);
 		this.updateSimulationTextures();
 		this.updatePointSize();
@@ -3334,7 +3335,7 @@ Main.prototype = $extend(flu_App.prototype,{
 	}
 	,__class__: Main
 });
-var SimulationQuality = $hxClasses["SimulationQuality"] = { __ename__ : true, __constructs__ : ["UltraHigh","High","Medium","Low","UltraLow","iOS","UltraUltraLow"] };
+var SimulationQuality = $hxClasses["SimulationQuality"] = { __ename__ : true, __constructs__ : ["UltraHigh","High","Medium","Low","UltraLow","Android_IOS","UltraUltraLow"] };
 SimulationQuality.UltraHigh = ["UltraHigh",0];
 SimulationQuality.UltraHigh.toString = $estr;
 SimulationQuality.UltraHigh.__enum__ = SimulationQuality;
@@ -3350,13 +3351,13 @@ SimulationQuality.Low.__enum__ = SimulationQuality;
 SimulationQuality.UltraLow = ["UltraLow",4];
 SimulationQuality.UltraLow.toString = $estr;
 SimulationQuality.UltraLow.__enum__ = SimulationQuality;
-SimulationQuality.iOS = ["iOS",5];
-SimulationQuality.iOS.toString = $estr;
-SimulationQuality.iOS.__enum__ = SimulationQuality;
+SimulationQuality.Android_IOS = ["Android_IOS",5];
+SimulationQuality.Android_IOS.toString = $estr;
+SimulationQuality.Android_IOS.__enum__ = SimulationQuality;
 SimulationQuality.UltraUltraLow = ["UltraUltraLow",6];
 SimulationQuality.UltraUltraLow.toString = $estr;
 SimulationQuality.UltraUltraLow.__enum__ = SimulationQuality;
-SimulationQuality.__empty_constructs__ = [SimulationQuality.UltraHigh,SimulationQuality.High,SimulationQuality.Medium,SimulationQuality.Low,SimulationQuality.UltraLow,SimulationQuality.iOS,SimulationQuality.UltraUltraLow];
+SimulationQuality.__empty_constructs__ = [SimulationQuality.UltraHigh,SimulationQuality.High,SimulationQuality.Medium,SimulationQuality.Low,SimulationQuality.UltraLow,SimulationQuality.Android_IOS,SimulationQuality.UltraUltraLow];
 var BlitTexture = function() {
 	shaderblox_ShaderBase.call(this);
 };
