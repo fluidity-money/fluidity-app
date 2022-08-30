@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import { FluidTokenList, TokenInfo } from "./hooks/useFluidTokens";
 // This file is predominantly to clean up the TokenSelect component and functions used within
 
