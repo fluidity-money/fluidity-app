@@ -2197,26 +2197,25 @@ Main.prototype = $extend(flu_App.prototype,{
 
 		const ref = this;
 		if (this.app.window.width >= 460) {
-			setTimeout(
-				function() {
-					setInterval(
-						function() {
-							ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-							setTimeout(
-								function() {
-									clearInterval(2);
-									ref.mousePointKnown = false;
-									setTimeout(
-										function() {
-											ref.freeze = true;
-										}, 12000, ref
-									);
-								}, 2000, ref
-							);
-						}, 500, ref
-					);
-				}, 3000, ref
-			);
+		
+		setTimeout(
+			function() {
+				ref.mousePointKnown = false;
+			}, 1000, ref
+		);
+
+		setInterval(
+			function() {
+				ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+
+				setTimeout(
+					function() {
+						ref.mousePointKnown = false;
+					}, 200, ref
+				);
+			}, 10000, ref
+		);		
+			
 		}else {
 			setTimeout(
 				function() {
@@ -2660,11 +2659,12 @@ Main.prototype = $extend(flu_App.prototype,{
 		this.renderParticlesShader.set_POINT_SIZE((this.pointSize | 0) + ".0");
 	}
 	,set_simulationQuality: function(quality) {
+		quality[1] = 2;
 		switch(quality[1]) {
 		case 0:
 			this.particleCount = 1048576;
 			this.fluidScale = 0.5;
-			this.set_fluidIterations(30);
+			this.set_fluidIterations(3);
 			this.offScreenScale = 1.;
 			this.offScreenFilter = 9728;
 			break;
@@ -2676,24 +2676,24 @@ Main.prototype = $extend(flu_App.prototype,{
 			this.offScreenFilter = 9728;
 			break;
 		case 2:
-			this.particleCount = 262144;
+			this.particleCount = 150144;
 			this.fluidScale = 0.25;
-			this.set_fluidIterations(18);
-			this.offScreenScale = 0.5;
+			this.set_fluidIterations(5);
+			this.offScreenScale = 0.25;
 			this.offScreenFilter = 9729;
 			break;
 		case 3:
 			this.particleCount = 65536;
 			this.fluidScale = 0.2;
-			this.set_fluidIterations(14);
+			this.set_fluidIterations(1);
 			this.offScreenScale = 0.25;
 			this.offScreenFilter = 9729;
 			this.pointSize = 2;
 			break;
 		case 4:
-			this.particleCount = 16384;
+			this.particleCount = 65384;
 			this.fluidScale = 0.16666666666666666;
-			this.set_fluidIterations(12);
+			this.set_fluidIterations(2);
 			this.offScreenScale = 0.25;
 			this.offScreenFilter = 9729;
 			this.pointSize = 2;
