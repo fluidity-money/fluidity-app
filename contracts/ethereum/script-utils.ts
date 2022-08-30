@@ -81,7 +81,7 @@ export const deployTokens = async (
   for (const token of tokens) {
     console.log(`deploying ${token.name}`);
 
-    var deployedPool: ethers.Contract;
+    let deployedPool: ethers.Contract;
 
     const deployedToken = await hre.upgrades.deployBeaconProxy(
       tokenBeacon,
@@ -94,6 +94,7 @@ export const deployTokens = async (
           compoundBeacon,
           compoundFactory,
           [token.compoundAddress, deployedToken.address],
+          {initializer: "init(address, address)"},
         );
 
         break;
@@ -103,6 +104,7 @@ export const deployTokens = async (
           aaveBeacon,
           aaveFactory,
           [aavePoolProvider, token.aaveAddress, deployedToken.address],
+          {initializer: "init(address, address, address)"},
         );
 
         break;

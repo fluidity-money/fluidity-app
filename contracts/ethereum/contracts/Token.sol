@@ -27,6 +27,10 @@ contract Token is IERC20 {
 
     uint constant DEFAULT_USER_MINT_LIMIT = 10000;
 
+    /// @dev sentinel to indicate a block has been rewarded in the
+    /// @dev pastRewards_ and rewardedBlocks_ maps
+    uint private constant BLOCK_REWARDED = 1;
+
     /// @notice emitted when any reward is paid out
     event Reward(
         address indexed winner,
@@ -55,32 +59,31 @@ contract Token is IERC20 {
     /// @notice emitted when the contract enters emergency mode!
     event Emergency();
 
-    /// @dev sentinel to indicate a block has been rewarded in the
-    /// @dev pastRewards_ and rewardedBlocks_ maps
-    uint private constant BLOCK_REWARDED = 1;
-
+    // erc20 props
     mapping(address => uint256) private balances_;
-
     mapping(address => mapping(address => uint256)) private allowances_;
-
     uint8 private decimals_;
-
     uint256 private totalSupply_;
-
     string private name_;
-
     string private symbol_;
 
-    bool private initialised_;
+    /// @dev if false, emergency mode is active - can be called by either the
+    /// @dev operator, worker account or emergency council
+    bool private noEmergencyMode_;
+
+    // for migrations
+    uint private version_;
 
     LiquidityProvider private pool_;
 
     WorkerConfig private workerConfig_;
 
-    /// @dev [txhash] => [0 if the reward for that transaction hasn't been rewarded, 1 otherwise]
-    /// @dev operating on ints saves us a bit of gas
-    /// @dev deprecated
-    mapping (bytes32 => uint) private pastRewards_;
+    /// @dev emergency council that can activate emergency mode
+    address private emergencyCouncil_;
+
+    /// @dev account to use that created the contract (multisig account)
+    address private operator_;
+
 
     /// @dev the block number of the last block that's been included in a batched reward
     uint private lastRewardedBlock_;
@@ -92,18 +95,6 @@ contract Token is IERC20 {
     /// @dev [address] => [amount manually rewarded]
     mapping (address => uint) private manualRewardDebt_;
 
-    /// @dev emergency council that can activate emergency mode
-    address private emergencyCouncil_;
-
-    /// @dev if false, emergency mode is active - can be called by either the
-    /// @dev operator, worker account or emergency council
-    bool private noEmergencyMode_;
-
-    /// @dev account to use that created the contract (multisig account)
-    address private operator_;
-
-    /// @dev token number to use in for rng oracle lookup
-    uint private tokenNumber_;
 
     /// @dev the largest amount a reward can be to not get quarantined
     uint maxUncheckedReward_;
@@ -131,8 +122,9 @@ contract Token is IERC20 {
     /// @dev the block number in which user mint limits were last reset
     uint userMintResetBlock_;
 
+
     /**
-     * @notice initializer function - sets the contract's data
+     * @notice initialiser function - sets the contract's data
      * @dev we pass in the metadata explicitly instead of sourcing from the
      * @dev underlying token because some underlying tokens don't implement
      * @dev these methods
@@ -154,32 +146,32 @@ contract Token is IERC20 {
         address _operator,
         address _workerConfig
     ) public {
-        require(!initialised_, "contract is already initialised");
-        initialised_ = true;
+        require(version_ == 0, "contract is already initialised");
+        version_ = 1;
 
         // remember the operator for signing off on oracle changes, large payouts
-
         operator_ = _operator;
 
         // remember the emergency council for shutting down this token
-
         emergencyCouncil_ = _emergencyCouncil;
 
         // remember the worker config to look up the addresses for each rng oracle
-
         workerConfig_ = WorkerConfig(_workerConfig);
 
-        noEmergencyMode_ = true;
-
+        // remember the liquidity provider to deposit tokens into
         pool_ = LiquidityProvider(_liquidityProvider);
 
         // sanity check
         pool_.underlying_().totalSupply();
 
+        noEmergencyMode_ = true;
+
+        // erc20 props
         decimals_ = _decimals;
         name_ = _name;
         symbol_ = _symbol;
 
+        // initialise mint limits
         maxUncheckedReward_ = DEFAULT_MAX_UNCHECKED_REWARD;
         mintLimitsEnabled_ = DEFAULT_MINT_LIMITS_ENABLED;
         remainingGlobalMint_ = DEFAULT_GLOBAL_MINT_LIMIT;
@@ -189,10 +181,10 @@ contract Token is IERC20 {
     }
 
     /*
-     * @ param _maxUncheckedReward that can be paid out before a quarantine happens
-     * @ param _mintLimitsEnabled to prevent users from minting a large amount
-     * @ param _globalMint that is the global amount that users can cumulatively mint without restriction
-     * @ param _userMint that is the amount that each individual user can mint without restriction
+     * @param _maxUncheckedReward that can be paid out before a quarantine happens
+     * @param _mintLimitsEnabled to prevent users from minting a large amount
+     * @param _globalMint that is the global amount that users can cumulatively mint without restriction
+     * @param _userMint that is the amount that each individual user can mint without restriction
      */
     function setRestrictions(
     	uint _maxUncheckedReward,
@@ -284,8 +276,6 @@ contract Token is IERC20 {
 
         mintLimitsEnabled_ = enable;
     }
-
-    // name and symbol provided by ERC20 parent
 
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens

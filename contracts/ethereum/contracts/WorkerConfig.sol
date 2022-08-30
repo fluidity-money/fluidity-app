@@ -17,14 +17,19 @@ contract WorkerConfig {
     /// @notice emitted when an emergency is declared!
     event Emergency();
 
-    bool private initialised_;
-
-    address private operator_;
-
-    address private emergencyCouncil_;
-
+    /// @dev if false, emergency mode is active!
     bool private noGlobalEmergency_;
 
+    /// @dev for migrations
+    uint256 private version_;
+
+    /// @dev can set emergency mode
+    address private emergencyCouncil_;
+
+    /// @dev can set emergency mode and update contract props
+    address private operator_;
+
+    /// @dev token => oracle
     mapping(address => address) private oracles_;
 
     /**
@@ -37,8 +42,8 @@ contract WorkerConfig {
         address _operator,
         address _emergencyCouncil
     ) public {
-        require(!initialised_, "contract is already initialised");
-        initialised_ = true;
+        require(version_ == 0, "contract is already initialised");
+        version_ = 1;
 
         operator_ = _operator;
 
@@ -51,7 +56,7 @@ contract WorkerConfig {
         return noGlobalEmergency_;
     }
 
-    /// @notice starts an update for the trusted oracle to a new address
+    /// @notice updates the trusted oracle to a new address
     function updateOracles(OracleUpdate[] memory newOracles) public {
         require(noGlobalEmergency(), "emergency mode!");
         require(msg.sender == operator_, "only operator account can use this");
