@@ -1,4 +1,4 @@
-import { GeneralButton, TextButton } from "../../Button";
+import { GeneralButton } from "surfing";
 import styles from "./ArticleDisplayCard.module.scss"
 
 export interface ArticleDisplayCardType {

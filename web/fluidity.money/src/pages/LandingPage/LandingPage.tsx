@@ -1,4 +1,3 @@
-import React from "react";
 import Articles from "screens/Articles";
 import Ecosystem from "screens/Ecosystem";
 import Demo from "../../screens/Demo";
