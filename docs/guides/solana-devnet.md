@@ -5,7 +5,7 @@ description: How to test out Fluidity
 # ☀ Solana Devnet
 
 {% hint style="info" %}
-#### _Please read the fully detailed **Fluidity Devnet release** article for a step by step guide on how to get the most out of our beta_ [_here_](https://blog.fluidity.money/fluidity-solana-devnet-beta-is-live-751918993eb0)__
+_**Please read the fully detailed Fluidity Devnet release article for a step by step guide on how to get the most out of our beta**_** ** [_**here**_](https://blog.fluidity.money/fluidity-solana-devnet-beta-is-live-751918993eb0)**\_\_**
 {% endhint %}
 
 When using the [**Fluidity web app**](https://app.solana.beta.fluidity.money/) ([https://app.solana.beta.fluidity.money/](https://app.solana.beta.fluidity.money/)) for the first time you need to make sure you are using the Solana Devnet test network and have the following:
@@ -16,8 +16,6 @@ When using the [**Fluidity web app**](https://app.solana.beta.fluidity.money/) (
 * Other users or wallet addresses to send your fluid assets to and receive from.
 
 Within this beta, you will be able to interact with a myriad of utilities that you should expect to see in the final version of the Fluidity protocol, however, there are certain features that are not in the current version of the beta, including things such as interactions that have dependencies on the FLUID governance token as well as the correspondent heightened reward probability that a user has by holding said token.
-
-
 
 **You will be able to:**
 
@@ -33,6 +31,5 @@ Within this beta, you will be able to interact with a myriad of utilities that y
 We recommend that you follow the guide below to have the best experience and be able to provide the best possible feedback so that we are able to continually improve your interaction with the Fluidity protocol and its applications!
 
 {% hint style="info" %}
-#### _Please read the fully detailed **Fluidity Devnet release** article for a step by step guide on how to get the most out of our beta_ [_here_](https://blog.fluidity.money/fluidity-solana-devnet-beta-is-live-751918993eb0)__
+_**Please read the fully detailed Fluidity Devnet release article for a step by step guide on how to get the most out of our beta**_** ** [_**here**_](https://blog.fluidity.money/fluidity-solana-devnet-beta-is-live-751918993eb0)**\_\_**
 {% endhint %}
-
