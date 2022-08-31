@@ -28,6 +28,14 @@ func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 
 		var slot uint64
 
+		isEmptyMessage := len(result) == 0
+
+		if isEmptyMessage {
+			continue
+		}
+
+		// assume that the message was empty for keepalive!
+
 		err := json.Unmarshal(result, &slot)
 
 		if err != nil {
@@ -35,7 +43,7 @@ func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 				k.Context = LogContextWebsocket
 
 				k.Format(
-					"Failed to decode the message (%#v) off the slotsSubscribe websocket!",
+					"Failed to decode the message %#v off the slotsSubscribe websocket!",
 					string(result),
 				)
 
