@@ -50,3 +50,5 @@ web/fluidity.money/public/assets/images/logoOutline.svg filter=lfs diff=lfs merg
 web/fluidity.money/public/assets/images/triangleDown.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/magnifyingGlass.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/dot-graph.svg filter=lfs diff=lfs merge=lfs -text
+**/*.png filter=lfs diff=lfs merge=lfs -text
+**/*.jpg filter=lfs diff=lfs merge=lfs -text

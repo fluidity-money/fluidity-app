@@ -17,4 +17,4 @@ export \
 	FLU_WALLET_URL=http://localhost:3000 \
 	FLU_ETHEREUM_URL=http://localhost:8545
 
-export FLU_WORKER_ID="$(date +%s)"
+export FLU_WORKER_ID="tests-$(date +%s)"

@@ -147,16 +147,18 @@ func GetTvl(client *rpc.Provider, fluidityPubkey, tvlDataPubkey, solendPubkey, o
 		return 0, err
 	}
 
+	simulateAccounts := value.Accounts
+
 	tvlAccount := new(tvlDataAccount)
 
-	if lenAccounts := len(accounts); lenAccounts >= 1 {
+	if lenAccounts := len(simulateAccounts); lenAccounts != 1 {
 		return 0, fmt.Errorf(
-			"length of the returned accounts is not greater than 1, is %v",
+			"length of the returned accounts isn't 1, is %v",
 			lenAccounts,
 		)
 	}
 
-	bytes, err := value.Accounts[0].GetBinary()
+	bytes, err := simulateAccounts[0].GetBinary()
 
 	if err != nil {
 		return 0, fmt.Errorf(
