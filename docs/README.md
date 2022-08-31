@@ -15,3 +15,5 @@
 {% content-ref url="use-cases/" %}
 [use-cases](use-cases/)
 {% endcontent-ref %}
+
+<figure><img src="../.gitbook/assets/background-1.png" alt=""><figcaption></figcaption></figure>
