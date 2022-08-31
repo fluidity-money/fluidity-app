@@ -2204,7 +2204,7 @@ Main.prototype = $extend(flu_App.prototype,{
 						function() {
 							clearInterval(2);
 							ref.mousePointKnown = false;
-							ref.freeze = true;
+							//ref.freeze = true;
 						}, 3000, ref
 					);
 				}, 100, ref
