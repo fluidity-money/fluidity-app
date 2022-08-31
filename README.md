@@ -58,9 +58,7 @@ _The future of finance excites us. In the world of tomorrow, the way we think ab
 
 ## Useful links
 
-Fluidity Website: [https://www.fluidity.money/](https://www.fluidity.money/)
-
-Economic Whitepaper: [https://whitepapers.fluidity.money/fluidity-economics-wp-v0.6.pdf](https://whitepapers.fluidity.money/fluidity-economics-wp-v0.6.pdf)
+Website and whitepapers: [https://www.fluidity.money/](https://www.fluidity.money/)
 
 Medium: [https://blog.fluidity.money/](https://blog.fluidity.money/)
 
