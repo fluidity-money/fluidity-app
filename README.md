@@ -1,6 +1,6 @@
 ---
 description: Money designed to be moved
-cover: .gitbook/assets/BACKGROUND1Artboard 38 copy@2x.png
+cover: broken-reference
 coverY: 0
 ---
 
@@ -34,16 +34,16 @@ Btw, we won 5th Place on the Defi Track for the Solana Ignition Hackathon!
 
 Follow our handy guides to get started on the basics as quickly as possible:
 
-{% content-ref url="broken-reference" %}
-[Broken link](broken-reference)
+{% content-ref url="docs/learning-and-getting-started/" %}
+[learning-and-getting-started](docs/learning-and-getting-started/)
 {% endcontent-ref %}
 
-{% content-ref url="broken-reference" %}
-[Broken link](broken-reference)
+{% content-ref url="docs/use-cases/" %}
+[use-cases](docs/use-cases/)
 {% endcontent-ref %}
 
-{% content-ref url="broken-reference" %}
-[Broken link](broken-reference)
+{% content-ref url="docs/guides/" %}
+[guides](docs/guides/)
 {% endcontent-ref %}
 
 ### Fundamentals: Dive a little deeper
@@ -54,8 +54,8 @@ Learn the fundamentals of Fluidity to get a deeper understanding of our main fea
 [Broken link](broken-reference)
 {% endcontent-ref %}
 
-{% content-ref url="fundamentals/utility-mining.md" %}
-[utility-mining.md](fundamentals/utility-mining.md)
+{% content-ref url="docs/fundamentals/utility-mining.md" %}
+[utility-mining.md](docs/fundamentals/utility-mining.md)
 {% endcontent-ref %}
 
 _---_
