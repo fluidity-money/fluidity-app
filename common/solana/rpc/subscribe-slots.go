@@ -30,6 +30,10 @@ func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 
 		isEmptyMessage := len(result) == 0
 
+		if isEmptyMessage {
+			continue
+		}
+
 		// assume that the message was empty for keepalive!
 
 		err := json.Unmarshal(result, &slot)
