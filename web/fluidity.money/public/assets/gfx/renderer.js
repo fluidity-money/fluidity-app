@@ -2098,7 +2098,7 @@ flu_App.prototype = {
 		this.cur_frame_start = flu.core.timestamp();
 		this.last_frame_start = this.cur_frame_start;
 		this.current_time = 0;
-		this.delta_time = 0.00016;
+		this.delta_time = 0.016;
 	}
 	,on_internal_update: function() {
 		if(this.freeze != true) {
@@ -2153,7 +2153,7 @@ let Main = function() {
 	flu_App.call(this);
 	this.performanceMonitor = new PerformanceMonitor(35,null,800);
 				
-	this.set_simulationQuality(SimulationQuality.Low);
+	this.set_simulationQuality(SimulationQuality.Medium);
 	this.performanceMonitor.fpsTooLowCallback = $bind(this,this.lowerQualityRequired);
 	let urlParams = js_Web.getParams();
 	if(__map_reserved.q != null?urlParams.existsReserved("q"):urlParams.h.hasOwnProperty("q")) {
@@ -2195,39 +2195,31 @@ Main.prototype = $extend(flu_App.prototype,{
 	}
 	,ready: function() {
 
-		
-		this.window = this.app.window;
-		this.init();
-		this.window.onevent = $bind(this,this.onWindowEvent);
-		this.window.onrender = $bind(this,this.render);
-
 		const ref = this;
-		if (this.app.window.width >= 460) {
-		setTimeout(
-			function() {
-				ref.mousePointKnown = false;
-			}, 1000, ref
-		);
-
-		setInterval(
-			function() {
-				ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-
-				setTimeout(
-					function() {
-						ref.mousePointKnown = false;
-					}, 200, ref
-				);
-			}, 10000, ref
-		);		
-			
+		if (this.app.window.width >= 760) {
+			const id= setInterval(
+				function() {
+					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+					setTimeout(
+						function() {
+							clearInterval(2);
+							ref.mousePointKnown = false;
+							ref.freeze = true;
+						}, 3000, ref
+					);
+				}, 100, ref
+			);
 		}else {
 			setTimeout(
 				function() {
 					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-				}, 3000, ref
+				}, 1200, ref
 			);
 		}
+		this.window = this.app.window;
+		this.init();
+		this.window.onevent = $bind(this,this.onWindowEvent);
+		this.window.onrender = $bind(this,this.render);
 	}
 	
 	,init: function() {
@@ -2351,7 +2343,7 @@ Main.prototype = $extend(flu_App.prototype,{
 				}
 			}
 		}
-		dt = 0.039;
+		dt = 0.090;
 		let _this1 = this.updateDyeShader.isMouseDown;
 		let tmp;
 		_this1.dirty = true;
@@ -2660,12 +2652,11 @@ Main.prototype = $extend(flu_App.prototype,{
 		this.renderParticlesShader.set_POINT_SIZE((this.pointSize | 0) + ".0");
 	}
 	,set_simulationQuality: function(quality) {
-		quality[1] = 2;
 		switch(quality[1]) {
 		case 0:
 			this.particleCount = 1048576;
 			this.fluidScale = 0.5;
-			this.set_fluidIterations(3);
+			this.set_fluidIterations(30);
 			this.offScreenScale = 1.;
 			this.offScreenFilter = 9728;
 			break;
@@ -2677,7 +2668,7 @@ Main.prototype = $extend(flu_App.prototype,{
 			this.offScreenFilter = 9728;
 			break;
 		case 2:
-			this.particleCount = 150144;
+			this.particleCount = 262144;
 			this.fluidScale = 0.25;
 			this.set_fluidIterations(5);
 			this.offScreenScale = 0.25;
@@ -2686,15 +2677,15 @@ Main.prototype = $extend(flu_App.prototype,{
 		case 3:
 			this.particleCount = 65536;
 			this.fluidScale = 0.2;
-			this.set_fluidIterations(1);
+			this.set_fluidIterations(14);
 			this.offScreenScale = 0.25;
 			this.offScreenFilter = 9729;
 			this.pointSize = 2;
 			break;
 		case 4:
-			this.particleCount = 65384;
+			this.particleCount = 16384;
 			this.fluidScale = 0.16666666666666666;
-			this.set_fluidIterations(2);
+			this.set_fluidIterations(12);
 			this.offScreenScale = 0.25;
 			this.offScreenFilter = 9729;
 			this.pointSize = 2;
@@ -5997,6 +5988,14 @@ flu_core_web_window_Windowing.prototype = {
 		this.seq_window++;
 	}
 	,internal_resize: function(_window,_w,_h) {
+		const ref = this;
+		if (this.app.window.width >= 760) {
+			setInterval(
+				function() {
+					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
+				}, 500, ref
+			);
+		}
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 7, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 		this.system.app.dispatch_system_event({ type : 5, window : { type : 6, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
 	}
