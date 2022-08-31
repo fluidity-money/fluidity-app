@@ -50,8 +50,8 @@ Follow our handy guides to get started on the basics as quickly as possible:
 
 Learn the fundamentals of Fluidity to get a deeper understanding of our main features:
 
-{% content-ref url="broken-reference" %}
-[Broken link](broken-reference)
+{% content-ref url="docs/fundamentals/" %}
+[fundamentals](docs/fundamentals/)
 {% endcontent-ref %}
 
 {% content-ref url="docs/fundamentals/utility-mining.md" %}

@@ -1,6 +1,6 @@
 ---
 description: Frequently asked questions about the security of Fluidity and its mechanisms.
-cover: ../.gitbook/assets/BACKGROUND1Artboard 38@2x.png
+cover: broken-reference
 coverY: 0
 ---
 

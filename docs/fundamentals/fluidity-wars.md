@@ -2,7 +2,7 @@
 description: >-
   Fluidity Wars, Utility Mining, Curve Wars and a snapshot of the present state
   of liquidity mining and DeFi.
-cover: ../.gitbook/assets/Fluidity Wars.png
+cover: broken-reference
 coverY: 0
 ---
 
