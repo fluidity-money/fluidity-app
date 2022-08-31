@@ -93,6 +93,7 @@ impl DevnetAccounts {
 #[derive(Deserialize, Debug)]
 #[allow(non_snake_case)]
 pub struct ConfigOptions {
+    #[serde(rename = "flu_solana_node_address")]
     pub solana_node_address: String,
     #[serde(rename = "flu_solana_accounts")]
     pub solana_accounts_file: String,

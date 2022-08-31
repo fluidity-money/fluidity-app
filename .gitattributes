@@ -59,3 +59,6 @@ web/fluidity.money/public/assets/images/useCaseIcons.forReceivers.svg filter=lfs
 web/fluidity.money/public/assets/images/useCaseIcons.forSenders.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/useCaseIcons.metaverseGaming.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/useCaseIcons.nfts.svg filter=lfs diff=lfs merge=lfs -text
+**/*.png filter=lfs diff=lfs merge=lfs -text
+**/*.jpg filter=lfs diff=lfs merge=lfs -text
+

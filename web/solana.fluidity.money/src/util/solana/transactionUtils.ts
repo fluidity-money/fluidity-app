@@ -72,7 +72,7 @@ export const getFluidInstructionKeys = async (
       //data account
       pubkey: new PublicKey(dataAccount),
       isSigner: false,
-      isWritable: false,
+      isWritable: true,
     },
     {
       //token program

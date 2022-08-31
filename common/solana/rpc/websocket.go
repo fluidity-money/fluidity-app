@@ -34,6 +34,19 @@ type (
 		err    *rpcError
 	}
 
+	websocketResponseParams struct {
+		Subscription int             `json:"subscription"`
+		Result       json.RawMessage `json:"result"`
+	}
+
+	websocketResponse struct {
+		Id      int                     `json:"id"`
+		JsonRpc string                  `json:"jsonrpc"`
+		Params  websocketResponseParams `json:"params"`
+		// TODO where is this actually located? is it on params? does it exist at all?
+		Err     *rpcError               `json:"error"`
+	}
+
 	// WebsocketOutgoing to send messages down with and to receive
 	// a response
 	websocketOutgoing struct {
@@ -60,7 +73,7 @@ func NewWebsocket(url string) (*Websocket, error) {
 		outgoingMessagesChan = make(chan websocketOutgoing)
 
 		// sent from the underlying websocket to any connected users
-		incomingMessagesChan = make(chan rpcResponse)
+		incomingMessagesChan = make(chan websocketResponse)
 
 		// sent down when the connection needs to close prematurely
 		closeChannel = make(chan bool)
@@ -83,7 +96,7 @@ func NewWebsocket(url string) (*Websocket, error) {
 	go func() {
 	L:
 		for {
-			var response rpcResponse
+			var response websocketResponse
 
 			messageType, message, err := conn.ReadMessage()
 
@@ -175,7 +188,7 @@ func NewWebsocket(url string) (*Websocket, error) {
 
 				responses <- websocketOutgoingResponse{
 					id:     id,
-					result: response.Result,
+					result: response.Params.Result,
 					err:    response.Err,
 				}
 
