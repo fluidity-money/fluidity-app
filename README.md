@@ -1,6 +1,6 @@
 ---
 description: Money designed to be moved
-cover: broken-reference
+cover: background-2.png
 coverY: 0
 ---
 
