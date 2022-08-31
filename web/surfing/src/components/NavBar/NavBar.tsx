@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from "react";
 import { GeneralButton } from "../Button";
-import ResourcesNavModal from "../../../../fluidity.money/src/modals/ResourcesNavModal";
+import NavBarModal from "../NavBarModal";
+
 import styles from "./NavBar.module.scss";
 
 interface IButton {
@@ -14,6 +15,7 @@ interface IButton {
 interface INavLinks {
   name: string;
   modal: boolean;
+  modalInfo?: IModalProps;
 }
 
 interface INavBarProps {
@@ -23,18 +25,16 @@ interface INavBarProps {
   navLinks: INavLinks[];
 }
 
-//tbd
-interface IModalNavLinkButtons {
+interface ILinkButton {
   children: string;
-  size: string;
-  type: string;
+  size: "small" | "medium" | "large";
+  type: "internal" | "external";
   handleClick: () => void;
 }
 
-// tbd
 interface IModalProps {
   navLinks: string[];
-  modalButtons: IModalNavLinkButtons[];
+  modalButtons: ILinkButton[];
 }
 
 const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
@@ -96,7 +96,9 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
             <nav>
               <ul>{navLinksTitles as ReactNode}</ul>
             </nav>
-            {modal && <ResourcesNavModal handleModal={handleModal} />}
+            {modal && (
+              <NavBarModal handleModal={handleModal} navLinks={links} />
+            )}
           </div>
         </div>
       </div>
@@ -105,3 +107,30 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
 };
 
 export default NavBar;
+
+const links: ILinkButton[] = [
+  {
+    children: "articles",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "fluniversity",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "whitpapers",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "documentation",
+    size: "small",
+    type: "external",
+    handleClick: () => {},
+  },
+];
