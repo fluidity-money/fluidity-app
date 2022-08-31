@@ -1,14 +1,16 @@
 
 include ../build.mk
 
-all: build
+all: build-lib
 
-DIRS := $(shell \
-	find . -name '*.go' -exec dirname '{}' ';' \
-		| uniq -u)
+FILES := $(shell find . -name '*.go')
 
-build: ${DIRS}
-	@echo ${DIRS} \
-		| xargs -d' ' -I '{}' sh -xc 'cd $$(readlink -f {}); ${GO_BUILD}'
+build-lib: ${FILES}
+	@echo ${FILES} \
+		| xargs -d' ' -I '{}' dirname {} \
+		| uniq -u \
+		| xargs -I '{}' sh -c 'cd {} && ${GO_BUILD}'
 
-	@touch build
+	@touch build-lib
+
+build: build-lib

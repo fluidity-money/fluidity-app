@@ -1,0 +1,195 @@
+.title__div {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.title {
+  margin: auto;
+  font-family: Inter;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 35px;
+
+  background: -webkit-linear-gradient(#16899b, #02f5a3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.reward-pool-total-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  @include for-1300-up {
+    width: 30rem;
+  }
+}
+
+.reward {
+  margin: auto;
+  font-family: Inter;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 4rem;
+  background: $prize-color;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  @include for-below-400 {
+    font-size: 3.3rem;
+  }
+  @include for-tablet-portrait-up {
+    font-size: 4rem;
+  }
+}
+
+.reward-box-body {
+  flex: 2;
+  padding: 1rem;
+  display: none;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  background: $container-colour;
+  border-radius: 1rem;
+  @include for-tablet-landscape-up {
+    display: flex;
+  }
+}
+
+.btn-component {
+  margin-top: 30px;
+  width: 100%;
+  height: 3.5rem;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.btn__div {
+  text-align: left;
+}
+
+.btn {
+  margin-top: 30 * 1.25px;
+  width: 273 * 1.25px;
+  height: 50px;
+
+  background: linear-gradient(90deg, #15929c 0.23%, #0acaa0 97.93%);
+  border-radius: 10px;
+
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 19px;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* Right Box csss */
+
+.pool-title-container {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 1rem;
+  text-align: left;
+}
+
+.title__right__winning {
+  margin: auto;
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 22px;
+  color: #b9bed3;
+}
+
+.title__right__number {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 22px;
+  color: #ffffff;
+}
+
+.bar__div {
+  height: 100px;
+  width: 3px;
+  margin-right: 10px;
+  background: linear-gradient(180deg, #0acaa0 100%, rgba(10, 202, 160, 0) 0%);
+  border-radius: 1px;
+}
+
+.bar__div__2 {
+  height: 100px;
+  width: 3px;
+  margin-right: 10px;
+  background: linear-gradient(180deg, #0acaa0 100%, rgba(10, 202, 160, 0) 0%);
+  border-radius: 1px;
+}
+
+.timeline__bar {
+  border: 0.5px solid rgb(185, 190, 211);
+  transform: rotate(0.23deg);
+  margin-top: 10px;
+}
+
+.timeline__div {
+  width: 89%;
+  align-self: flex-end;
+  @include for-1300-up {
+    width: 88%;
+  }
+  @include for-big-desktop-up {
+    width: 90.5%;
+  }
+}
+
+.timeline {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.timeline__text {
+  font-family: Open Sans;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: #b9bed3;
+}
+
+.reward-pool-header {
+  text-align: center;
+
+  font-size: 2rem;
+  @include for-tablet-portrait-up {
+    font-size: 2.2rem;
+  }
+  @include for-tablet-landscape-up {
+    font-size: 3rem;
+  }
+}
+
+.reward-board-column-header {
+  text-align: center;
+  font-size: 1.5rem;
+
+  -webkit-background-clip: unset;
+  -moz-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  -moz-text-fill-color: unset;
+  color: white;
+  background: unset;
+}
+
+.reward-pool-button {
+  min-height: 3rem;
+}

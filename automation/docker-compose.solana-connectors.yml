@@ -1,0 +1,49 @@
+---
+version: "3"
+
+services:
+  connector-solana-amqp:
+    build:
+      context: ../cmd/connector-solana-amqp
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-amqp
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
+      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+      FLU_SOLANA_STARTING_SLOT: ${FLU_SOLANA_STARTING_SLOT}
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  connector-solana-trf-data-postgres:
+    build:
+      context: ../cmd/connector-solana-trf-data-postgres
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-trf-data-postgres
+      FLU_SOLANA_NETWORK: ${FLU_SOLANA_NETWORK}
+      FLU_TRF_DATA_STORE_PROGRAM_ID: ${FLU_TRF_DATA_STORE_PROGRAM_ID}
+      FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  connector-solana-utility-gauge-postgres:
+    build:
+      context: ../cmd/connector-solana-utility-gauge-postgres
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-connector-solana-utility-gauge-postgres
+      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+      FLU_SOLANA_WS_URL: ${FLU_SOLANA_WS_URL}
+      FLU_POSTGRES_URI: ${FLU_POSTGRES_URI}
+      FLU_SOLANA_NETWORK: ${FLU_SOLANA_NETWORK}
+      FLU_SOLANA_GAUGEMEISTER_PUBKEY: ${FLU_SOLANA_GAUGEMEISTER_PUBKEY}
+      FLU_SOLANA_UTILITY_GAUGE_PROGRAM_ID: ${FLU_UTILITY_GAUGE_PROGRAM_ID}
+    restart: unless-stopped
+    depends_on:
+      - postgres
+

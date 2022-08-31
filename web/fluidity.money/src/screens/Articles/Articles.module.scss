@@ -1,0 +1,13 @@
+@import "../../styles/config.scss";
+
+.container {
+  display: flex;
+  justify-content: center;
+  padding-top: 90px;
+  width: 100%;
+  min-height: 850px;
+
+  @include max-860px {
+    flex-direction: column;
+  }
+}

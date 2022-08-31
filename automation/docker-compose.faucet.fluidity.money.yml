@@ -1,0 +1,74 @@
+---
+version: "3"
+
+services:
+  microservice-common-faucet-track-tweets:
+    build:
+      context: ../cmd/microservice-common-faucet-track-tweets
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-common-faucet-track-tweets
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK_FAUCET_TWEET}
+      FLU_TWITTER_HASHTAGS: ${FLU_TWITTER_HASHTAGS}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  microservice-ethereum-faucet-send-amounts:
+    build:
+      context: ../cmd/microservice-ethereum-faucet-send-amounts
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-faucet-send-amounts
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK_FAUCET_AMOUNT_SENT}
+      FLU_ETHEREUM_TOKENS_LIST: ${FLU_ETHEREUM_TOKENS_LIST}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+      FLU_ETHEREUM_FAUCET_PRIVATE_KEY: ${FLU_ETHEREUM_FAUCET_PRIVATE_KEY}
+      FLU_ETHEREUM_HARDHAT_FIX: ${FLU_ETHEREUM_HARDHAT_FIX}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-solana-faucet-send-amounts:
+    build:
+      context: ../cmd/microservice-solana-faucet-send-amounts
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-solana-faucet-send-amounts
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SOLANA_RPC_URL: ${FLU_SOLANA_RPC_URL}
+      FLU_SOLANA_TOKENS_LIST: ${FLU_SOLANA_TOKENS_LIST}
+      FLU_SOLANA_FAUCET_ACCOUNT_DETAILS: ${FLU_SOLANA_FAUCET_ACCOUNT_DETAILS}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  faucet.fluidity.money-frontend:
+    build:
+      context: ../web/faucet.fluidity.money
+      dockerfile: Dockerfile.frontend
+      args:
+        REACT_APP_FLU_API_URI: ${FLU_FAUCET_FRONTEND_API_URL}
+        PRODUCTION: "true"
+    ports:
+      - "127.0.0.1:8082:80"
+
+  faucet.fluidity.money-backend:
+    build:
+      context: ../web/faucet.fluidity.money
+      dockerfile: Dockerfile.backend
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-faucet.fluidity.money-backend
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_SLACK_WEBHOOK: ${FLU_SLACK_WEBHOOK_FAUCET_BACKEND}
+    ports:
+      - "127.0.0.1:8083:80"
+    restart: unless-stopped

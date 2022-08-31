@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package winners
 
 // winners is a winner tracked by an event on-chain.
@@ -12,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -127,7 +132,7 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 	for rows.Next() {
 		var (
-			winner Winner
+			winner                   Winner
 			solanaWinnerOwnerAddress sql.NullString
 		)
 
@@ -160,7 +165,7 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 // CountWinnersForDateAndWinningAmount given, just the date given (any wins
 // inside that day)
-func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, date time.Time) (uint64, misc.BigInt) {
+func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, tokenName string, date time.Time) (uint64, misc.BigInt) {
 
 	timescaleClient := timescale.Client()
 
@@ -172,15 +177,21 @@ func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, date
 		FROM %s
 		WHERE
 			network = $1
+			AND token_short_name = $2
 			AND awarded_time
-				BETWEEN $2
-				AND $2 + INTERVAL '24 HOURS'
+				BETWEEN $3
+				AND $3 + INTERVAL '24 HOURS'
 		`,
 
 		TableWinners,
 	)
 
-	row := timescaleClient.QueryRow(statementText, network, date)
+	row := timescaleClient.QueryRow(
+		statementText,
+		network,
+		tokenName,
+		date,
+	)
 
 	var (
 		winnersCount  uint64
@@ -211,4 +222,69 @@ func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, date
 	}
 
 	return winnersCount, awardedAmount
+}
+
+// GetUniqueTokens gets TokenDetails for each unique tokens in the winners
+func GetUniqueTokens(network network.BlockchainNetwork) []util.TokenDetailsBase {
+
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT DISTINCT token_short_name, token_decimals
+		FROM %s
+		WHERE network = $1
+		`,
+
+		TableWinners,
+	)
+
+	rows, err := timescaleClient.Query(
+		statementText,
+		network,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to query all unique winners for network %#v!",
+				network,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	defer rows.Close()
+
+	tokenDetailsCollected := make([]util.TokenDetailsBase, 0)
+
+	for rows.Next() {
+		var (
+			tokenName     string
+			tokenDecimals int
+		)
+
+		err := rows.Scan(&tokenName, &tokenDecimals)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Failed to scan the token name and decimals for network %#v!",
+					network,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		tokenDetails := util.NewTokenDetailsBase(tokenName, tokenDecimals)
+
+		tokenDetailsCollected = append(tokenDetailsCollected, tokenDetails)
+	}
+
+	return tokenDetailsCollected
 }

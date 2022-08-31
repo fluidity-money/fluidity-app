@@ -1,0 +1,6 @@
+
+FROM fluidity/build-container:latest
+
+RUN go mod download
+
+ENTRYPOINT make test

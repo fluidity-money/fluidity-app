@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package ethereum
 
 // types contains types that are downloaded from Ethereum geth and relayed
@@ -6,9 +10,6 @@ package ethereum
 import "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 
 type (
-	BlockHeader = ethereum.BlockHeader
-	Block       = ethereum.Block
-	BlockBody   = ethereum.BlockBody
-	Transaction = ethereum.Transaction
 	Log         = ethereum.Log
+	BlockHeader = ethereum.BlockHeader
 )

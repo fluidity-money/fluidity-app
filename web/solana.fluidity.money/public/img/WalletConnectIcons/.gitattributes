@@ -1,0 +1,4 @@
+switch_provider.svg filter=lfs diff=lfs merge=lfs -text
+wallet_arrow.svg filter=lfs diff=lfs merge=lfs -text
+copy_address.svg filter=lfs diff=lfs merge=lfs -text
+disconnect.svg filter=lfs diff=lfs merge=lfs -text

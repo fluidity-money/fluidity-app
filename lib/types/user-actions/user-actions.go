@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package user_actions
 
 import (
@@ -7,7 +11,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
 const (
@@ -74,27 +78,27 @@ type (
 // Solana ATA owner addresses should be set outside of the function.
 func NewSwap(network_ network.BlockchainNetwork, userAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
 	var (
-		transactionHash_   = transactionHash
-		senderAddress      = userAddress
+		transactionHash_ = transactionHash
+		senderAddress    = userAddress
 	)
 
 	// Solana accounts/hashes are case sensitive
 	if network_ != network.NetworkSolana {
 		transactionHash_ = strings.ToLower(transactionHash)
-		senderAddress    = strings.ToLower(userAddress)
+		senderAddress = strings.ToLower(userAddress)
 	}
 
 	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
 
 	return UserAction{
-		Network:                  network_,
-		TransactionHash:          transactionHash_,
-		Type:                     UserActionSwap,
-		SwapIn:                   swapIn,
-		SenderAddress:            senderAddress,
-		Amount:                   amount,
-		TokenDetails:             tokenDetails,
-		Time:                     time.Now(),
+		Network:         network_,
+		TransactionHash: transactionHash_,
+		Type:            UserActionSwap,
+		SwapIn:          swapIn,
+		SenderAddress:   senderAddress,
+		Amount:          amount,
+		TokenDetails:    tokenDetails,
+		Time:            time.Now(),
 	}
 }
 
@@ -103,29 +107,29 @@ func NewSwap(network_ network.BlockchainNetwork, userAddress, transactionHash st
 // function. Solana ATA owner addresses should be set outside of the function.
 func NewSend(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
 	var (
-		transactionHash_       = transactionHash
-		senderAddress_         = senderAddress
-		recipientAddress_      = recipientAddress
+		transactionHash_  = transactionHash
+		senderAddress_    = senderAddress
+		recipientAddress_ = recipientAddress
 	)
 
 	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
 
 	// Solana accounts/hashes are case sensitive
 	if network_ != network.NetworkSolana {
-		transactionHash_       = strings.ToLower(transactionHash)
-		senderAddress_         = strings.ToLower(senderAddress)
-		recipientAddress_      = strings.ToLower(recipientAddress)
+		transactionHash_ = strings.ToLower(transactionHash)
+		senderAddress_ = strings.ToLower(senderAddress)
+		recipientAddress_ = strings.ToLower(recipientAddress)
 	}
 
 	return UserAction{
-		Network:                     network_,
-		TransactionHash:             transactionHash_,
-		Type:                        UserActionSend,
-		SenderAddress:               senderAddress_,
-		RecipientAddress:            recipientAddress_,
-		Amount:                      amount,
-		TokenDetails:                tokenDetails,
-		Time:                        time.Now(),
+		Network:          network_,
+		TransactionHash:  transactionHash_,
+		Type:             UserActionSend,
+		SenderAddress:    senderAddress_,
+		RecipientAddress: recipientAddress_,
+		Amount:           amount,
+		TokenDetails:     tokenDetails,
+		Time:             time.Now(),
 	}
 }
 

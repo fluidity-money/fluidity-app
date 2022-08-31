@@ -13,7 +13,7 @@ if (envFluApiUri === undefined)
   err("REACT_APP_FLU_API_URI not set!");
 
 module.exports = {
-  entry: './src-frontend/index.tsx',
+  entry: './src/index.tsx',
   devtool: 'inline-source-map',
   mode: 'development',
 
@@ -45,7 +45,7 @@ module.exports = {
   },
 
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'build'),
     filename: 'index.js',
   },
 };

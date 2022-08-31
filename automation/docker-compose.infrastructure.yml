@@ -1,0 +1,29 @@
+---
+version: "3"
+
+services:
+  redis:
+    image: redis:7.0-rc2
+    env_file: ./docker-compose-envs
+    logging:
+      driver: none
+
+  postgres:
+    build:
+      context: ../database
+      dockerfile: Dockerfile.postgres
+    env_file: ./docker-compose-envs
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - postgres-var-lib:/var/lib/postgresql
+
+  timescale:
+    build:
+      context: ../database
+      dockerfile: Dockerfile.timescale
+    env_file: ./docker-compose-envs
+    ports:
+      - 127.0.0.1:5433:5432
+    volumes:
+      - timescale-var-lib:/var/lib/postgresql

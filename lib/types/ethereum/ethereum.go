@@ -1,11 +1,16 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package ethereum
 
 // ethereum contains the types that we use for tracking Ethereum on-chain
 // state
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"strings"
+
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 // Some of the less complicated types that shadow the definition provided
@@ -19,6 +24,7 @@ type (
 type (
 	// BlockHeader contained within a block on Ethereum, may be forked
 	BlockHeader struct {
+		BlockHash       Hash        `json:"block_hash"`
 		ParentHash      Hash        `json:"parent_hash"`
 		UncleHash       Hash        `json:"uncle_hash"`
 		Coinbase        Address     `json:"coinbase"`
@@ -35,20 +41,6 @@ type (
 		Nonce           BlockNonce  `json:"nonce"`
 		ReceiptHash     Hash        `json:"receipt_hash"`
 		BaseFee         misc.BigInt `json:"base_fee"`
-	}
-
-	// BlockBody contains the block fields that aren't included in the header
-	BlockBody struct {
-		Uncles       []BlockHeader `json:"uncles"`
-		Transactions []Transaction `json:"transactions"`
-	}
-
-	// Block submitted on-chain on Ethereum, may be forked
-	Block struct {
-		Header BlockHeader `json:"block_header"`
-		Body   BlockBody   `json:"block_body"`
-		Hash   Hash        `json:"block_hash"`
-		Number uint64      `json:"block_number"`
 	}
 
 	// Transaction made on Ethereum, may be forked
@@ -69,7 +61,7 @@ type (
 		Value     misc.BigInt `json:"value"`
 
 		// Receipt is a transaction receipt collected optionally!
-		Receipt   *Receipt    `json:"receipt"`
+		Receipt *Receipt `json:"receipt"`
 	}
 
 	// Log represents a contract event log that we have confirmed isn't removed
@@ -84,19 +76,19 @@ type (
 		Data misc.Blob `json:"data"`
 
 		// block in which the transaction was included
-		BlockNumber uint64 `json:"block_number"`
+		BlockNumber misc.BigInt `json:"block_number"`
 
 		// hash of the transaction
 		TxHash Hash `json:"transaction_hash"`
 
 		// index of the transaction in the block
-		TxIndex uint `json:"transaction_index"`
+		TxIndex misc.BigInt `json:"transaction_index"`
 
 		// hash of the block in which the transaction was included
 		BlockHash Hash `json:"block_hash"`
 
 		// index of the log in the block
-		Index uint `json:"log_index"`
+		Index misc.BigInt `json:"log_index"`
 
 		// whether the log was removed due to a chain reorganisation!
 		Removed bool `json:"removed"`

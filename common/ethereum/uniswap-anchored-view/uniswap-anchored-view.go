@@ -1,14 +1,19 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package uniswap_anchored_view
 
 import (
-	"math/big"
-	"fmt"
 	"context"
+	"fmt"
+	"math/big"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 )
 
 const uniswapContractAbiString = `[
@@ -59,7 +64,7 @@ func GetPrice(client *ethclient.Client, cTokenAddress ethCommon.Address, tokenSy
 		)
 	}
 
-	amountRat, err := coerceBoundContractResultsToRat(results)
+	amountRat, err := ethereum.CoerceBoundContractResultsToRat(results)
 
 	if err != nil {
 		return nil, fmt.Errorf(

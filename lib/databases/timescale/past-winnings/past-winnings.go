@@ -1,13 +1,17 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package past_winnings
 
 // past_winnings is the aggregated number of winners for a day
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"fmt"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/past-winnings"
-	"fmt"
 )
 
 const (
@@ -24,15 +28,20 @@ func GetPastWinnings(network network.BlockchainNetwork, amount int) (pastWinning
 	databaseClient := timescale.Client()
 
 	statementText := fmt.Sprintf(`
-		SELECT
-			winning_date,
-			amount_of_winners,
-			winning_amount
+		SELECT *
+			FROM (
+				SELECT
+					winning_date,
+					amount_of_winners,
+					winning_amount
 
-		FROM %s
-		WHERE network = $1
-		ORDER BY winning_date
-		LIMIT $2
+				FROM %s
+				WHERE network = $1
+				ORDER BY winning_date DESC
+				LIMIT $2
+			) AS t
+
+		ORDER BY winning_date ASC;
 		`,
 
 		TablePastWinnings,

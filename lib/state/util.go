@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package state
 
 import (
@@ -17,11 +21,4 @@ func serialiseToBytes(content interface{}) []byte {
 	}
 
 	return bytes
-}
-
-func debug(message string, arguments ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Context = Context
-		k.Format(message, arguments...)
-	})
 }

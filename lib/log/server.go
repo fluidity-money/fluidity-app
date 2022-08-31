@@ -1,8 +1,13 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package log
 
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"time"
 )
@@ -33,12 +38,41 @@ type log struct {
 var (
 	loggingServer               = make(chan *log)
 	loggingAreWeDebuggingServer = make(chan bool)
+	shutdownChan                = make(chan func())
 
 	loggingStream = os.Stderr
 )
 
-func processExit() {
+func backoff() {
+	duration := time.Duration(2+rand.Intn(58)) * time.Second
+
+	message := fmt.Sprintf(
+		"Sleeping for %v seconds...\n",
+		duration.Seconds(),
+	)
+
+	// manually write since the channel is blocked waiting for backoff
+
+	fmt.Fprintf(
+		loggingStream,
+		"[%v] [%s:%s] %s %v\n",
+		time.Now(),
+		LoggingLevelApp,
+		LoggingServerContext,
+		message,
+		"",
+	)
+
+	time.Sleep(duration)
+}
+
+func processExit(dieFast bool) {
 	sentryExit()
+
+	if !dieFast {
+		backoff()
+	}
+
 	os.Exit(1)
 }
 
@@ -55,8 +89,9 @@ func printLoggingMessage(stream io.WriteCloser, time time.Time, workerId, level,
 
 	fmt.Fprintf(
 		stream,
-		"[%v] [%s:%s] %s %v\n",
+		"[%v] [%v] [%s:%s] %s %v\n",
 		time,
+		workerId,
 		level,
 		context,
 		message,
@@ -64,7 +99,11 @@ func printLoggingMessage(stream io.WriteCloser, time time.Time, workerId, level,
 	)
 }
 
-func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUrl, environment string) {
+func startLoggingServer(debugEnabled, dieFast bool, processInvocation, workerId, sentryUrl, environment string) {
+	// shutdownCallbacks to shut down other registered services when a service
+	// exits fatally
+
+	shutdownCallbacks := make([]func(), 0)
 
 	if err := sentryInit(sentryUrl, environment); err != nil {
 		fmt.Fprintf(
@@ -73,12 +112,15 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 			err,
 		)
 
-		processExit()
+		processExit(dieFast)
 	}
 
 	for {
 		select {
 		case loggingAreWeDebuggingServer <- debugEnabled:
+
+		case shutdownFunc := <-shutdownChan:
+			shutdownCallbacks = append(shutdownCallbacks, shutdownFunc)
 
 		case log := <-loggingServer:
 			var (
@@ -125,7 +167,11 @@ func startLoggingServer(debugEnabled bool, processInvocation, workerId, sentryUr
 			}
 
 			if shouldExit {
-				processExit()
+				for _, shutdown := range shutdownCallbacks {
+					shutdown()
+				}
+
+				processExit(dieFast)
 			}
 
 			reply <- nil
@@ -148,4 +194,9 @@ func logCooking(level int, k func(k *Log)) {
 	log := new(Log)
 	k(log)
 	logMessage(level, log.Context, log.Message, log.Payload)
+}
+
+// RegisterShutdown to register a callback to occur when a process exits fatally
+func RegisterShutdown(callback func()) {
+	shutdownChan <- callback
 }

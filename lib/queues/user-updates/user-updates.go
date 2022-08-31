@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package user_updates
 
 // user_updates contains messages used to inform web users of fluidity events
@@ -8,8 +12,8 @@ import (
 )
 
 const (
-    TopicUserUpdatesEthereum = `user_updates.ethereum`
-    TopicUserUpdatesSolana = `user_updates.solana`
+	TopicUserUpdatesEthereum = `user_updates.ethereum`
+	TopicUserUpdatesSolana   = `user_updates.solana`
 )
 
 type Update = user_updates.Update

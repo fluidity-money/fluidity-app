@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package ethereum
 
 // marshal handles marshal and unmarshal code for our ethereum types
@@ -10,14 +14,6 @@ func marshalJson(obj interface{}) ([]byte, error) {
 
 func (blockHeader BlockHeader) MarshalBinary() ([]byte, error) {
 	return marshalJson(blockHeader)
-}
-
-func (blockBody BlockBody) MarshalBinary() ([]byte, error) {
-	return marshalJson(blockBody)
-}
-
-func (block Block) MarshalBinary() ([]byte, error) {
-	return marshalJson(block)
 }
 
 func (transaction Transaction) MarshalBinary() ([]byte, error) {

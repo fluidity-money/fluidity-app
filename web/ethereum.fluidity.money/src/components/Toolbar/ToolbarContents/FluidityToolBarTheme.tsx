@@ -1,8 +1,13 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import { useEffect, useState } from "react";
 import Button from "components/Button";
 import Icon from "components/Icon";
 import { useHistory } from "react-router-dom";
 import WalletConnectedModal from "components/Modal/Themes/WalletConnectModal";
+import PendingWinsModal from "components/Modal/Themes/PendingWinsModal";
 import { useWallet } from "use-wallet";
 import { JsonRpcProvider } from "ethers/providers";
 import { ConnectWalletModal } from "components/Modal";
@@ -13,7 +18,14 @@ import {
   enableNotifications,
 } from "components/NotificationAlert/notificationAlert";
 import { trimAddress } from "util/addresses";
-import SelectBlockchainModal from "components/Modal/Themes/SelectBlockchainModal";
+import NetworkButton from "components/Button/NetworkButton";
+import { appTheme } from "util/appTheme";
+import ChainId, { chainIdFromEnv } from "util/chainId";
+import { apiPOSTBody } from "util/api";
+import { ethers } from "ethers";
+import { B64ToUint8Array } from "util/conversion";
+import Routes from "util/api/types";
+import NotificationButton from "components/Button/NotificationButton";
 
 // For toolbar toggle of which button is selected
 interface selected {
@@ -23,18 +35,16 @@ interface selected {
 export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
   const history = useHistory();
   const [toggle, setToggle] = useState(false); // State to toggle connect wallet modal status
-  const [blockchainToggle, setBlockchainToggle] = useState(false);
   const wallet = useWallet<JsonRpcProvider>();
   // maintain a separate setter to not spam reconnect on invalid load state
   const [active, setActive] = useState(wallet.status === "connected");
   const [address, setAddress] = useState(wallet.account || "Loading...");
 
+  const [showPendingWins, setShowPendingWins] = useState(false);
+  const [pendingWins, setPendingWins] = useState<Routes["/pending-rewards"]>({});
+
   const modalToggle = () => {
     setToggle(!toggle);
-  };
-
-  const blockchainModalToggle = () => {
-    setBlockchainToggle(!blockchainToggle);
   };
 
   const [notificationStatus, setNotificationStatus] = useState(false);
@@ -78,6 +88,17 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
     setActive((_active) => wallet.status === "connected");
   }, [wallet.status]);
 
+  const fetchPendingWins = async () => {
+    if (!wallet.account) return;
+
+    const pending = await apiPOSTBody("/pending-rewards", {
+      address: wallet.account
+    });
+
+    if (pending != null)
+      setPendingWins(pending);
+  };
+
   return (
     <Media queries={{ small: { maxWidth: 890 } }}>
       {(matched) =>
@@ -95,7 +116,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               <div></div>
               <Button
                 label="Dashboard"
-                theme="primary-text"
+                theme={`primary-text${appTheme}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/dashboard")}
@@ -105,7 +126,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Swap"
-                theme="primary-text"
+                theme={`primary-text${appTheme}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/")}
@@ -115,7 +136,7 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
               />
               <Button
                 label="Wallet"
-                theme="primary-text"
+                theme={`primary-text${appTheme}`}
                 texttheme="header-text"
                 padding="toolbarBtnPadding"
                 goto={() => history.push("/wallet")}
@@ -123,9 +144,25 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 auth={active}
                 priviledge={1}
               />
+              <Button
+                label={`${
+                  Object.keys(pendingWins).length > 0 ? "Show" : "Fetch"
+                } Pending Wins`}
+                theme={`primary-text${appTheme}`}
+                texttheme="header-text"
+                padding="toolbarBtnPadding"
+                goto={() =>
+                  Object.keys(pendingWins).length > 0
+                    ? setShowPendingWins(true)
+                    : fetchPendingWins()
+                }
+                selected={false}
+                auth={active}
+                priviledge={1}
+              />
             </div>
             <div></div>
-            <div className="flex row flex-space-between width-auto align">
+            <div className="button-container">
               {/* <div className="primary-button p-0_5" onClick={() => enableNotifications()}> */}
               {/* <Icon
           src={updateNotificationStatus()}
@@ -136,12 +173,14 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 <EnabledButton enabled={notificationStatus}>
                   <Button
                     label="Enable Notifications"
-                    theme={"primary-button mx-1-r"}
+                    theme={`primary-button${appTheme}--toolbar margin-right`}
                     goto={checkNotifications}
                     padding="p-0_5"
                   />
                 </EnabledButton>
               }
+              <NotificationButton />
+              <NetworkButton />
               {active ? (
                 <div
                   className="flex row align mobile-address-btn"
@@ -149,36 +188,32 @@ export const FluidityToolBarTheme = ({ selected }: { selected: selected }) => {
                 >
                   <Button
                     label={address}
-                    theme={"primary-text header-text"}
+                    theme={`primary-text${appTheme} header-text`}
                     goto={() => {
                       setToggle(true);
                     }}
-                    padding="p-0_5"
+                    padding="py-0_5"
                   />
                   <Icon src="i-wallet-arrow" />
                 </div>
               ) : (
                 <Button
                   label={"Connect Wallet"}
-                  theme={"primary-button"}
+                  theme={`primary-button${appTheme}--toolbar`}
                   goto={() => {
                     setToggle(true);
                   }}
                   padding="p-0_5"
                 />
               )}
-              <div
-                className="select-blockchain"
-                onClick={() => setBlockchainToggle(true)}
-              >
-                <img src="/img/TokenIcons/ethereumIcon.svg" alt="sol icon" />
-              </div>
             </div>
-            <SelectBlockchainModal
-              enable={blockchainToggle}
-              toggle={blockchainModalToggle}
-              height="auto"
+            <PendingWinsModal
+              enable={showPendingWins}
+              toggle={() => setShowPendingWins(!showPendingWins)}
+              pendingWins={pendingWins}
+              fetchNew={fetchPendingWins}
             />
+
             {active ? (
               <WalletConnectedModal
                 enable={toggle}

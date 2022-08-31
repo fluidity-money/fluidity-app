@@ -1,16 +1,10 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package pyth
 
-import (
-	"math/big"
-
-	"github.com/fluidity-money/fluidity-app/lib/log"
-)
-
-func debug(format string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(format, content...)
-	})
-}
+import "math/big"
 
 func bigPowInt32(left *big.Rat, count int32) *big.Rat {
 

@@ -11,7 +11,7 @@
   text-align: center;
   align-items: center;
   background: rgba(10, 26, 32, 0.95);
-  z-index: 1;
+  z-index: 9999;
   border: 1px solid #979797;
   box-sizing: border-box;
   border-radius: 10px 0px 0px 10px;
@@ -26,9 +26,10 @@
 }
 
 .menu-icon {
-  display: block;
+  display: flex;
+  align-items: center;
   position: absolute;
-  top: 14px;
+  top: 4px;
   right: 13px;
   font-size: 1.8rem;
   cursor: pointer;
@@ -90,8 +91,8 @@
 /* Nav Icon */
 // Credit: https://codepen.io/designcouch/pen/Atyop
 #nav-icon-bar {
-  width: 45px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
   -o-transform: rotate(0deg);
@@ -101,6 +102,7 @@
   -o-transition: 0.2s ease-in-out;
   transition: 0.2s ease-in-out;
   cursor: pointer;
+  margin-left: 5px;
 }
 
 #nav-icon-bar span {
@@ -123,7 +125,7 @@
 }
 
 #nav-icon-bar span:nth-child(1) {
-  top: 0px;
+  top: 4px;
   -webkit-transform-origin: left center;
   -moz-transform-origin: left center;
   -o-transform-origin: left center;
@@ -131,7 +133,7 @@
 }
 
 #nav-icon-bar span:nth-child(2) {
-  top: 14px;
+  top: 15px;
   -webkit-transform-origin: left center;
   -moz-transform-origin: left center;
   -o-transform-origin: left center;
@@ -139,7 +141,7 @@
 }
 
 #nav-icon-bar span:nth-child(3) {
-  top: 27.5px;
+  top: 25.5px;
   -webkit-transform-origin: left center;
   -moz-transform-origin: left center;
   -o-transform-origin: left center;
@@ -151,8 +153,8 @@
   -moz-transform: rotate(45deg);
   -o-transform: rotate(45deg);
   transform: rotate(45deg);
-  top: -3px;
-  left: 8px;
+  top: 5px;
+  left: 9px;
 }
 
 #nav-icon-bar.open span:nth-child(2) {
@@ -166,5 +168,37 @@
   -o-transform: rotate(-45deg);
   transform: rotate(-45deg);
   top: 30px;
-  left: 8px;
+  left: 9px;
+}
+
+.connect-wallet-address {
+  display: flex;
+  align-items: center;
+  border: 1px solid #08a06f;
+  background-color: #121218;
+  border-radius: 5px;
+  width: 45vw;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  &:hover {
+    opacity: 1;
+  }
+  &:active {
+    opacity: 1;
+  }
+
+  @include for-below-470 {
+    width: 85vw;
+  }
+}
+
+.wallet-address-container {
+  width: 100vw;
+  justify-content: center;
+  position: fixed;
+  left: 0;
+  bottom: 4vh;
+  display: flex;
+  z-index: 5;
 }

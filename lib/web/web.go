@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package web
 
 // web is a series of functions that can be useful for building an
@@ -42,7 +46,7 @@ type HttpFunction func(http.ResponseWriter, *http.Request)
 func AuthenticatedEndpoint(endpoint, headerName string, validateFunc func(string) error, handler HttpFunction) {
 	http.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		var (
-			headers     = r.Header
+			headers = r.Header
 
 			headerValue = headers.Get(headerName)
 			ipAddress   = headers.Get(HeaderIpAddress)
@@ -50,14 +54,14 @@ func AuthenticatedEndpoint(endpoint, headerName string, validateFunc func(string
 
 		setCorsHeaders(w)
 
-		debug(
+		log.Debugf(
 			"Received request from %s to authenticated endpoint %s.",
 			ipAddress,
 			endpoint,
 		)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -99,14 +103,14 @@ func Endpoint(endpoint string, handler HttpFunction) {
 
 		setCorsHeaders(w)
 
-		debug(
+		log.Debugf(
 			"Received request from IP %v to %v!",
 			ipAddress,
 			endpoint,
 		)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,

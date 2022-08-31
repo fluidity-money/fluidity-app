@@ -1,16 +1,20 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
 	"context"
-	"strings"
+	"os"
+	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/faucet"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -20,7 +24,7 @@ import (
 
 const (
 	// EnvTokensList to relate the received token names to a contract address
-	// of the form ADDR1:TOKEN1,ADDR2:TOKEN2,...
+	// of the form ADDR1:TOKEN1:DECIMALS1,ADDR2:TOKEN2:DECIMALS2,...
 	EnvTokensList = "FLU_ETHEREUM_TOKENS_LIST"
 
 	// EnvEthereumHttpUrl to use to connect to Geth to send amounts
@@ -31,6 +35,13 @@ const (
 
 	// NullAddress to filter for to prevent it from blocking the thing
 	NullAddress = "0x0000000000000000000000000000000000000000"
+
+	// EnvGasLimit to use to manually set the gas limit on chains with bad
+	// behaviour. Should be set to 8 million for Ropsten.
+	EnvGasLimit = `FLU_ETHEREUM_GAS_LIMIT`
+
+	// EnvUseHardhatFix instead of trying to guess the gas or set it manually
+	EnvUseHardhatFix = `FLU_ETHEREUM_HARDHAT_FIX`
 )
 
 func main() {
@@ -40,7 +51,30 @@ func main() {
 		ethereumHttpAddress = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 
 		tokenAddresses = make(map[faucetTypes.FaucetSupportedToken]ethCommon.Address)
+
+		useHardhatFix bool
+		gasLimit      uint64 = 0
 	)
+
+	if os.Getenv(EnvUseHardhatFix) == "true" {
+		useHardhatFix = true
+
+		log.Debug(func(k *log.Log) {
+			k.Message = "Using the hardhat gas fix!"
+		})
+	}
+
+	if gasLimit_ := os.Getenv(EnvGasLimit); gasLimit_ != "" {
+		var err error
+		gasLimit, err = strconv.ParseUint(gasLimit_, 10, 64)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to parse hardcoded gas limit!"
+				k.Payload = err
+			})
+		}
+	}
 
 	privateKey, err := ethCrypto.HexToECDSA(privateKey_)
 
@@ -71,36 +105,25 @@ func main() {
 
 	// populate map of token sessions for each token we're tracking
 
-	ethereumTokensList := strings.Split(ethereumTokensList_, ",")
+	tokensList_ := ethereum.GetTokensListEthereum(ethereumTokensList_)
 
-	for _, token_ := range ethereumTokensList {
+	for _, details := range tokensList_ {
 
-		tokenSeparated := strings.Split(token_, ":")
+		tokenName_ := details.TokenName
 
-		if len(tokenSeparated) != 2 {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to separate %#v into a valid token - expected format ADDRESS:TOKEN",
-					token_,
-				)
-			})
-		}
-
-		contractAddress := ethCommon.HexToAddress(tokenSeparated[0])
-
-		tokenName, err := faucetTypes.TokenFromString(tokenSeparated[1])
+		tokenName, err := faucetTypes.TokenFromString("f" + tokenName_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to convert token %#v to a supported token! %v",
-					tokenSeparated[1],
+					tokenName_,
 					err,
 				)
 			})
 		}
 
-		tokenAddresses[tokenName] = contractAddress
+		tokenAddresses[tokenName] = details.FluidAddress
 	}
 
 	faucet.FaucetRequests(func(faucetRequest faucet.FaucetRequest) {
@@ -120,7 +143,6 @@ func main() {
 		}
 
 		// check for invalid token name
-
 		if _, err := tokenName.TokenDecimals(); err != nil {
 			return
 		}
@@ -142,19 +164,21 @@ func main() {
 			})
 		}
 
-		transaction, err := fluidity.TransactTransfer(
+		transaction, err := callTransferFunction(
 			ethClient,
 			tokenAddress,
 			ethAddress,
 			&amount.Int,
 			transferOpts,
+			useHardhatFix,
+			gasLimit,
 		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to transfer an amount to %#v!",
-					address,
+					ethAddress.String(),
 				)
 
 				k.Payload = err

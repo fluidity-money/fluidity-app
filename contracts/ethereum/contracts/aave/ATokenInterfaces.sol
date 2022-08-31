@@ -1,13 +1,13 @@
 pragma solidity 0.8.11;
 pragma abicoder v1;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+import "../openzeppelin/IERC20Metadata.sol";
 
 interface LendingPoolAddressesProviderInterface {
     function getLendingPool() external view returns (address);
 }
 
-interface ATokenInterface is IERC20MetadataUpgradeable {
+interface ATokenInterface is IERC20Metadata {
     function UNDERLYING_ASSET_ADDRESS() external view returns (address);
 
     function balanceOf(address _user) external view returns (uint256);

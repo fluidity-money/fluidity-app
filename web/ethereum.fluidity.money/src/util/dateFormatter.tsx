@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 const dateFormatter = (unixDate: string) => {
   const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -18,15 +22,13 @@ const dateFormatter = (unixDate: string) => {
   if (minutes.length == 1) {
     minutes = "0" + minutes;
   }
-  // If over 12 hours has passed, enforce 12-hour-time
-  if (hours > 12) {
+  // enforce 12-hour-time
+  if (hours >= 12) {
     hours = hours - 12
     timePeriod = "PM";
+  }else if(hours == 0) {
+    hours = 12;
   }
-
-  // 12PM
-  if (hours === 12)
-    timePeriod = "PM";
 
   const seconds = date.getSeconds();
 

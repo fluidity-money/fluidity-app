@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package user_actions
 
 // user_actions contains queue code that receives user actions
@@ -6,7 +10,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
 const (

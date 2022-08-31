@@ -1,12 +1,16 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package moving_average
 
-// use redis with the state package in lib to store a ring
+// use redis with the state package in fluidity-app/lib to store a ring
 // buffer and recalculate moving averages on the fly
 
 import (
 	"fmt"
-	"strconv"
 	"math/big"
+	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/state"
 )
@@ -31,6 +35,12 @@ func CalculateMovingAverage(key string) (*int, error) {
 		state.Rpop(key)
 	}
 
+	// avoid dividing by zero if no bytes are stored
+	if valuesBytesLen == 0 {
+		zero := 0
+		return &zero, nil
+	}
+
 	var average int
 
 	for _, valueBytes := range valuesBytes {
@@ -41,8 +51,8 @@ func CalculateMovingAverage(key string) (*int, error) {
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"failed to convert %#v to an int for a aveage conversion from Redis! %v",
-				value,
+				"failed to convert %#v to an int for an average conversion from Redis! %v",
+				s,
 				err,
 			)
 		}
@@ -67,6 +77,12 @@ func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 		state.Rpop(key)
 	}
 
+	// avoid dividing by zero if no bytes are stored
+	if valuesBytesLen == 0 {
+		zero := big.NewRat(0, 1)
+		return zero, nil
+	}
+
 	average := new(big.Rat)
 
 	for _, valueBytes := range valuesBytes {
@@ -89,7 +105,6 @@ func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 
 	return average, nil
 }
-
 
 // StoreAndCalculate the moving average by storing the amount then doing
 // the calculation

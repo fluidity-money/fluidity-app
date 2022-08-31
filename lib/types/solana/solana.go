@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package solana
 
 // solana contains the types that we use for tracking Solana on-chain
@@ -6,7 +10,7 @@ package solana
 import (
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
 type (
@@ -85,7 +89,7 @@ type (
 		//  but we add it here for convenience
 		Signature   string            `json:"signature"`
 		Result      TransactionResult `json:"result"`
-		AdjustedFee *big.Rat          `json:"adjustedFee"`
+		AdjustedFee *big.Rat          `json:"adjusted_fee"`
 	}
 
 	TransactionResult struct {
@@ -96,12 +100,12 @@ type (
 
 	TransactionMeta struct {
 		// TODO solana doesn't doccument what this type actually is
-		Err               map[string]interface{}    `json:"err"`
-		Fee               uint64                    `json:"fee"`
-		PreTokenBalances  []TransactionTokenBalance `json:"preTokenBalances"`
-		PostTokenBalances []TransactionTokenBalance `json:"postTokenBalances"`
-		InnerInstructions []TransactionInstruction  `json:"innerInstructions"`
-		Logs              []string                  `json:"logMessages"`
+		Err               interface{}                   `json:"err"`
+		Fee               uint64                        `json:"fee"`
+		PreTokenBalances  []TransactionTokenBalance     `json:"preTokenBalances"`
+		PostTokenBalances []TransactionTokenBalance     `json:"postTokenBalances"`
+		InnerInstructions []TransactionInnerInstruction `json:"innerInstructions"`
+		Logs              []string                      `json:"logMessages"`
 	}
 
 	TransactionTokenBalance struct {
@@ -127,6 +131,10 @@ type (
 		Instructions []TransactionInstruction `json:"instructions"`
 	}
 
+	TransactionInnerInstruction struct {
+		Index        int                      `json:"index"`
+		Instructions []TransactionInstruction `json:"instructions"`
+	}
 	TransactionInstruction struct {
 		Accounts       []int  `json:"accounts"`
 		Data           string `json:"data"`

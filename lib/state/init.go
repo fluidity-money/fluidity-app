@@ -1,12 +1,16 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package state
 
 import (
-	"os"
 	"context"
+	"os"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/go-redis/redis/v8"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 func init() {
@@ -25,7 +29,7 @@ func init() {
 
 	_redisClient = redis.NewClient(&redisOptions)
 
-	debug(
+	log.Debugf(
 		"Connecting to the Redis server!",
 	)
 
@@ -39,7 +43,7 @@ func init() {
 		})
 	}
 
-	debug(
+	log.Debugf(
 		"Connected to the Redis server!",
 	)
 

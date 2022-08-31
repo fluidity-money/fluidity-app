@@ -1,14 +1,21 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 package probability
 
 // atx calculates the ATX that we see in the current TRF version
 
-import "math/big"
+import (
+	"math/big"
+)
 
 // CalculateAtx using the duration since the last block and the number of
 // fluid transfers
 func CalculateAtx(secondsSinceLastBlock uint64, fluidTransfers int) *big.Rat {
 
-	if fluidTransfers == 0 {
+	// set to zero if negative, or either value is zero
+	if fluidTransfers <= 0 || secondsSinceLastBlock == 0 {
 		// zero type here is zero
 		return new(big.Rat)
 	}

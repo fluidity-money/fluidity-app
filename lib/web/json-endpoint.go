@@ -1,9 +1,13 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package web
 
 import (
 	"encoding/json"
-	"net/http"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"net/http"
 )
 
 // JsonEndpoint adds some logging code and marshals the return value of
@@ -15,14 +19,14 @@ func JsonEndpoint(endpoint string, handler func(http.ResponseWriter, *http.Reque
 
 		setCorsHeaders(w)
 
-		debug(
+		log.Debugf(
 			"Handling a request to the JSON endpoint %v from %v!",
 			endpoint,
 			ipAddress,
 		)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -36,7 +40,7 @@ func JsonEndpoint(endpoint string, handler func(http.ResponseWriter, *http.Reque
 		content := handler(w, r)
 
 		if content == nil {
-			debug(
+			log.Debugf(
 				"Returned content from the handler at %v serving %v is nil!",
 				endpoint,
 				ipAddress,

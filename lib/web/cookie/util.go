@@ -1,21 +1,18 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package cookie
 
 import (
+	"crypto/rand"
+	"encoding/json"
+	"fmt"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/web"
-	"crypto/rand"
-	"fmt"
-	"encoding/json"
 	"io"
 	"net/http"
 )
-
-func debug(message string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Context = Context
-		k.Format(message, content...)
-	})
-}
 
 func returnAccessDenied(w http.ResponseWriter) {
 	w.WriteHeader(HeaderAccessDenied)
@@ -29,7 +26,7 @@ func setCorsHeaders(w http.ResponseWriter) {
 }
 
 func generateCookie() string {
-	buf := make([]byte, CookieGeneratedSize / 2)
+	buf := make([]byte, CookieGeneratedSize/2)
 
 	if _, err := rand.Read(buf); err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -46,7 +43,7 @@ func generateCookie() string {
 
 // sendEndpointLogin to the user, after creating it and serialising it
 func sendEndpointLogin(w io.Writer, cookieName string, expiration uint64) error {
-	endpointLoginReturn := EndpointLoginReturn {
+	endpointLoginReturn := EndpointLoginReturn{
 		CookieName: cookieName,
 		Expiration: expiration,
 	}

@@ -66,6 +66,10 @@
   flex-direction: column;
   text-align: center;
   box-sizing: border-box;
+  &--networks {
+    @extend .connect-modal-body;
+    height: 330px;
+  }
 }
 
 .connect-modal-form {
@@ -73,7 +77,48 @@
   flex-direction: column;
   text-align: center;
   align-content: center;
-  justify-content: center;
+  overflow-y: auto;
+
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
+      border: 2px solid #051323;
+    }
+    &::-webkit-scrollbar-track {
+      background: #051323;
+      border-radius: 10px;
+    }
+  }
+
+  /* width */
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-track:hover {
+    background: #555;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    background: transparent;
+    border: 2px solid #051323;
+    border-radius: 10px;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.844);
+    border: none;
+  }
 
   margin: 0 1rem 1rem 1rem;
 
@@ -160,6 +205,24 @@
   @include for-below-400 {
     font-size: 1.4rem;
   }
+  &--aurora {
+    @extend.wallet-text;
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
+}
+
+.select-token-text {
+  color: white;
+  font-size: 1rem;
+  text-align: start;
+}
+
+.label {
+  color: white;
+  font-size: 0.6rem;
+  text-align: start;
 }
 
 // Wallet Connect Theme
@@ -175,9 +238,12 @@
   box-sizing: border-box;
   display: flex;
   justify-content: flex-end;
-
   flex-wrap: wrap;
   overflow-y: auto;
+  @include for-tablet-landscape-down {
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .walletconnect-modal-body {
@@ -273,4 +339,148 @@
   color: #66d3f2;
   text-align: center;
   text-decoration: underline;
+}
+
+.token-search {
+  input {
+    background-color: #051323;
+    color: white;
+    border: solid white 1px;
+    width: 65%;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    height: 50px;
+    font-size: 0.9rem;
+    border-radius: 0.8rem;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  padding: 3px;
+  width: 5%;
+  top: 86px;
+  left: 30px;
+}
+
+.pinned-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0.75rem 0.75rem 0;
+}
+
+.pinned {
+  width: 20%;
+  color: white;
+  font-size: small;
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 700;
+  // letter-spacing: 0em;
+  background-color: #051323;
+  border: solid 0.5px white;
+  border-radius: 0.5rem;
+  margin: 4px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  cursor: pointer;
+  &:hover {
+    .pinned-content {
+      opacity: 0.6;
+    }
+    .remove-pin {
+      visibility: visible;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
+  @include for-below-470 {
+    margin: 3px;
+  }
+}
+
+.pinned-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  z-index: 2;
+}
+
+.remove-pin {
+  position: absolute;
+  padding-bottom: 20px;
+  padding-left: 70px;
+  width: 15px;
+  visibility: hidden;
+}
+
+.pinned-logo {
+  width: 21.5px;
+  padding-right: 5px;
+}
+
+.token-list-icon {
+  position: relative;
+  width: 2rem;
+  margin-top: auto;
+  margin-bottom: auto;
+  display: block;
+  padding-right: 0.4rem;
+  @include for-below-400 {
+    width: 1.5rem;
+  }
+}
+
+.pin-icon {
+  padding-bottom: 10px;
+  padding-left: 10px;
+  width: 12px;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.token-list-item {
+  display: flex;
+  cursor: pointer;
+  padding-right: 0.8rem;
+  padding-left: 0.1rem;
+  margin-right: 0.5rem;
+}
+
+.not-found-text {
+  color: white;
+  font-family: "Raleway";
+}
+
+.token-list {
+  height: 12rem;
+  margin: 0 0.25rem 1rem 1rem;
+}
+
+.blockchain-container {
+  background-color: transparent;
+  border: solid 2px #333333;
+  border-radius: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+  &--closed {
+    @extend .blockchain-container;
+    background-color: transparent;
+  }
+}
+
+.line {
+  background-color: #333333;
+  height: 1px;
+  border: none;
+  width: 81%;
+}
+
+.notification-line {
+  @extend .line;
+  margin-top: -16px;
 }

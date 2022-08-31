@@ -4,21 +4,29 @@ REPO := fluidity/database
 REPO_TIMESCALE := ${REPO}-timescale
 REPO_POSTGRES := ${REPO}-postgres
 
-.PHONY: clean docker build timescale postgres test-data
+.PHONY: \
+	clean \
+	docker \
+	build \
+	timescale \
+	postgres \
+	test-data \
+	docker-timescale \
+	docker-postgres
 
 BUILD_DIR := build
 
-TIMESCALE_DIR := up-timescale
-TIMESCALE_SRC := $(shell find ${TIMESCALE_DIR} -type f)
+TIMESCALE_DIR := 102-up-timescale
+TIMESCALE_SRC := $(shell find ${TIMESCALE_DIR} -type f -name '*.sql')
 TIMESCALE_BUILD_DIR := ${BUILD_DIR}/timescale
-TIMESCALE_BUILD_OUT := ${TIMESCALE_BUILD_DIR}/init.sql
+TIMESCALE_BUILD_OUT := ${TIMESCALE_BUILD_DIR}/out
 
-POSTGRES_DIR := up-postgres
-POSTGRES_SRC := $(shell find ${POSTGRES_DIR} -type f)
+POSTGRES_DIR := 101-up-postgres
+POSTGRES_SRC := $(shell find ${POSTGRES_DIR} -type f -name '*.sql')
 POSTGRES_BUILD_DIR := ${BUILD_DIR}/postgres
-POSTGRES_BUILD_OUT := ${POSTGRES_BUILD_DIR}/init.sql
+POSTGRES_BUILD_OUT := ${POSTGRES_BUILD_DIR}/out
 
-SHARED_SQL_DIR := up-sql-shared
+SHARED_SQL_DIR := 100-up-sql-shared
 SHARED_SQL_SRC := $(shell find ${SHARED_SQL_DIR} -type f)
 
 TEST_DATA_DIR := test-data
@@ -36,20 +44,24 @@ timescale: ${TIMESCALE_BUILD_OUT}
 ${TIMESCALE_BUILD_OUT}: ${TIMESCALE_SRC}
 	@mkdir -p "${TIMESCALE_BUILD_DIR}"
 
-	@sh inline-sqls.sh \
-		"${SHARED_SQL_DIR}" \
-		"${TIMESCALE_DIR}" \
-		>"${TIMESCALE_BUILD_OUT}"
+	@sh create_migration_dir.sh \
+		-d "${SHARED_SQL_DIR}" \
+		-d "${TIMESCALE_DIR}" \
+		-o "${TIMESCALE_BUILD_DIR}"
+
+	@touch ${TIMESCALE_BUILD_OUT}
 
 postgres: ${POSTGRES_BUILD_OUT}
 
 ${POSTGRES_BUILD_OUT}: ${POSTGRES_SRC}
 	@mkdir -p "${POSTGRES_BUILD_DIR}"
 
-	@sh inline-sqls.sh \
-		"${SHARED_SQL_DIR}" \
-		"${POSTGRES_DIR}" \
-		>"${POSTGRES_BUILD_OUT}"
+	@sh create_migration_dir.sh \
+		-d "${SHARED_SQL_DIR}" \
+		-d "${POSTGRES_DIR}" \
+		-o "${POSTGRES_BUILD_DIR}"
+
+	@touch ${POSTGRES_BUILD_OUT}
 
 docker: docker-timescale docker-postgres
 

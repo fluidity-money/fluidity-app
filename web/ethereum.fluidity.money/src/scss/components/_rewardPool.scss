@@ -56,6 +56,13 @@
   @include for-tablet-portrait-up {
     font-size: 4rem;
   }
+
+  &--aurora {
+    @extend .prize;
+    background: #12ecab;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
 }
 
 .prize-box-body {

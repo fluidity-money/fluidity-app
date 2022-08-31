@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import { AxiosError } from "axios";
 import { JsonRpcProvider } from "ethers/providers";
 import {
@@ -142,11 +146,14 @@ const ApiStateHandler = ({ state }: { state: ApiState }) => {
         setUserActions((userActions) => [user_action, ...userActions]);
       }
 
-      if (
+      else if (
         wallet.account?.toLowerCase() ===
         user_action.sender_address.toLowerCase()
       ) {
-        user_action.type = "send";
+        // if there's no recipient, it's a swap so don't change
+        if (user_action.recipient_address)
+          user_action.type = "send";
+
         setUserActions((userActions) => [user_action, ...userActions]);
       }
     }

@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 850px;
+  max-height: 960px;
+  width: 100%;
+  border: solid 2px red;
+  overflow-y: auto;
+}
+
+.text {
+  position: absolute;
+  z-index: 0;
+}

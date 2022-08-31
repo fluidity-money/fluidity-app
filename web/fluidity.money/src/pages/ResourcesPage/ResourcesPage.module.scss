@@ -1,0 +1,20 @@
+@import "../../styles/config.scss";
+
+.pageContainer {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: $fluidBlack;
+}
+
+.screensContainer {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1500px;
+}

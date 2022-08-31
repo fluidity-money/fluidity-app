@@ -1,0 +1,7 @@
+
+FROM fluidity/build-container-root-web:latest
+
+WORKDIR /usr/local/src/fluidity
+
+COPY build.mk .
+COPY web.mk .

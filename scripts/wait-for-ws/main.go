@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 // hacky script to test that websocket is working on the environment
@@ -32,8 +36,8 @@ func testWs(address string) error {
 func main() {
 	var (
 		debugEnabled = os.Getenv("FLU_DEBUG") == "true"
-		wsAddress = os.Getenv("FLU_ETHEREUM_WS_URL")
-		arguments = os.Args[1:]
+		wsAddress    = os.Getenv("FLU_ETHEREUM_WS_URL")
+		arguments    = os.Args[1:]
 	)
 
 	if wsAddress == "" {
@@ -52,19 +56,23 @@ func main() {
 		}
 
 		if debugEnabled {
-			log.Print(err)
+			log.Printf(
+				"Failed to connect to %#v! %v",
+				wsAddress,
+				err,
+			)
 		}
 	}
 
 	if err != nil {
-		log.Fatal(
+		log.Fatalf(
 			"Failed to connect to WS! %v",
 			err,
 		)
 	}
 
 	var (
-		commandName string
+		commandName      string
 		commandArguments []string
 	)
 

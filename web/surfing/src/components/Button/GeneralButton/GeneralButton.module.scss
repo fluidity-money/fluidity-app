@@ -1,0 +1,93 @@
+@use '../../../common' as *;
+
+button {
+  all: unset;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.small {
+  padding: 12px;
+  gap: 8px;
+  border-radius: 50px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 100%;
+}
+
+.medium {
+  padding: 16px;
+  gap: 8px;
+  border-radius: 50px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 100%;
+}
+
+.large {
+  padding: 24px;
+  gap: 8px;
+  border-radius: 50px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 100%;
+}
+
+.primary {
+  background-color: map-get($bg, "alternate");
+  border: 0.5px solid map-get($border, "prominent");
+  color: $black;
+  width: fit-content;
+  height: fit-content;
+  text-transform: uppercase;
+
+  &:focus:enabled {
+    background-color: map-get($bg, "alternate");
+    box-shadow: 0px 0px 0px 2px map-get($border, "focus");
+  }
+
+  &:hover:enabled {
+    background-color: transparent;
+    border: 0.5px solid map-get($border, "prominent");
+    color: map-get($text, "prominent");
+  }
+
+  &:disabled {
+    cursor: default;
+    color: $black;
+    background-color: map-get($bg, "disabled");
+    border: 0.5px solid map-get($bg, "disabled");
+  }
+}
+
+.secondary {
+  background-color: transparent;
+  border: 0.5px solid $white-a80;
+  color: map-get($text, "prominent");
+  width: fit-content;
+  height: fit-content;
+  text-transform: uppercase;
+
+  &:focus:enabled {
+    box-shadow: 0px 0px 0px 2px map-get($border, "focus");
+    color: map-get($text, "prominent");
+  }
+
+  &:hover:enabled {
+    background-color: map-get($bg, "alternate");
+    border: 0.5px solid map-get($border, "prominent");
+    color: $black;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: map-get($text, "disabled");
+    background-color: transparent;
+    border: 0.5px solid map-get($border, "disabled");
+  }
+}

@@ -1,0 +1,125 @@
+// Mono
+$black: #000000;
+$white: #ffffff;
+
+// Brand
+$greyish-white: #efeeea;
+$holo: conic-gradient(
+  from 209.59deg at 50% 50%,
+  #f3b8d8 0deg,
+  #b793e9 50.06deg,
+  #9fd4f3 85.94deg,
+  #ffd2c4 134.97deg,
+  #fbf3f3 172.05deg,
+  #d9abdf 200.75deg,
+  #af9ce3 224.67deg,
+  #aae4e1 259.36deg,
+  #c6ead0 298.82deg,
+  #ffffff 328.72deg,
+  #fdb5e4 360deg
+);
+
+// Neutral
+$grey-100: #151516;
+$grey-90: #323432;
+$grey-80: #4d4d4c;
+$grey-70: #696a68;
+$grey-60: #828381;
+$grey-50: #9e9e9a;
+$grey-40: #babab5;
+$grey-30: #d3d3cf;
+$grey-20: #efeeea;
+$grey-10: #fdfcfc;
+
+// Shades
+$black-a90: rgba(0, 0, 0, 0.9);
+$black-a80: rgba(0, 0, 0, 0.8);
+$black-a70: rgba(0, 0, 0, 0.7);
+$black-a60: rgba(0, 0, 0, 0.6);
+$black-a50: rgba(0, 0, 0, 0.5);
+$black-a40: rgba(0, 0, 0, 0.4);
+$black-a30: rgba(0, 0, 0, 0.3);
+$black-a20: rgba(0, 0, 0, 0.2);
+$black-a10: rgba(0, 0, 0, 0.1);
+
+// Tints
+$white-a90: rgba(255, 255, 255, 0.9);
+$white-a80: rgba(255, 255, 255, 0.8);
+$white-a70: rgba(255, 255, 255, 0.7);
+$white-a60: rgba(255, 255, 255, 0.6);
+$white-a50: rgba(255, 255, 255, 0.5);
+$white-a40: rgba(255, 255, 255, 0.4);
+$white-a30: rgba(255, 255, 255, 0.3);
+$white-a20: rgba(255, 255, 255, 0.2);
+$white-a10: rgba(255, 255, 255, 0.1);
+$white-a5: rgba(255, 255, 255, 0.05);
+
+// Accents
+$green: #67f550;
+$red: #e20044;
+$blue-holo-linear: linear-gradient(
+  90deg,
+  #0b4c89 0%,
+  #20baff 15.1%,
+  #ffbff9 26.04%,
+  #c975ec 36.46%,
+  #632bef 46.88%,
+  #46d1ff 57.29%,
+  #001147 72.4%,
+  #0c5098 85.42%,
+  #44dbec 93.23%,
+  #0c539d 100%
+);
+$blue-holo-angular: conic-gradient(
+  from 141.19deg at 50% 55.04%,
+  #0b4c89 0deg,
+  #20baff 54.38deg,
+  #ffbff9 93.75deg,
+  #c975ec 131.25deg,
+  #632bef 168.75deg,
+  #46d1ff 206.25deg,
+  #001147 260.62deg,
+  #0c5098 307.5deg,
+  #44dbec 335.63deg,
+  #0c539d 360deg
+);
+
+// Backgrounds
+$bg: (
+    "default": $black,
+    "alternate": $white,
+    "disabled": $grey-70,
+);
+
+// Typography
+$text: (
+    "disabled": $grey-80,
+    "default": $grey-60,
+    "prominent": $white,
+    "prominent-light": $white,
+    "default-light": $grey-80,
+);
+
+// Borders
+$border: (
+    "disabled": $white-a10,
+    "default": $white-a20,
+    "prominent": $white,
+    "focus": $white-a40,
+);
+
+$em-step: 0.25em;
+
+$breakpoints: (
+  'small': ( max-width: 375px ),
+  'medium': ( max-width: 992px ),
+  'large': ( max-width: 1440px ),
+) !default;
+
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media #{inspect(map-get($breakpoints, $breakpoint))} {
+      @content;
+    }
+  }
+}

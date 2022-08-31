@@ -1,0 +1,153 @@
+{
+  "version": "0.1.0",
+  "name": "tribeca_data_store",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "calculatenArgs",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "changeNumRewardTiers",
+      "accounts": [
+        {
+          "name": "calculatenArgs",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "winningClasses",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "changePayoutFrequency",
+      "accounts": [
+        {
+          "name": "calculatenArgs",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "payoutFreqNum",
+          "type": "u32"
+        },
+        {
+          "name": "payoutFreqDenom",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "changeDelta",
+      "accounts": [
+        {
+          "name": "calculatenArgs",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "deltaWeightNum",
+          "type": "u32"
+        },
+        {
+          "name": "deltaWeightDenom",
+          "type": "u32"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CalculateNArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "payoutFreqNum",
+            "type": "u32"
+          },
+          {
+            "name": "payoutFreqDenom",
+            "type": "u32"
+          },
+          {
+            "name": "winningClasses",
+            "type": "u8"
+          },
+          {
+            "name": "deltaWeightNum",
+            "type": "u32"
+          },
+          {
+            "name": "deltaWeightDenom",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,10 +1,14 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package erc20
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/timescale"
-	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum/erc20"
 	"fmt"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum/erc20"
 )
 
 type Transfer = erc20.Transfer

@@ -161,6 +161,17 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
 
   -webkit-text-fill-color: transparent;
   -moz-text-fill-color: transparent;
+
+  &--aurora {
+    @extend .primary-text;
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+  }
 }
 
 .primary-text-btn {
@@ -190,19 +201,51 @@ $spaceamounts: (0, 1, 2, 3, 4, 5);
 
   -webkit-text-fill-color: transparent;
   -moz-text-fill-color: transparent;
+
+  &--aurora {
+    @extend .secondary-text;
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+  }
 }
 
 .white-primary-text {
-  font-family: "Open Sans", "sans-serif";
+  font-family: Manrope;
+  font-size: 1.2rem;
   font-style: normal;
   font-weight: 700;
   background: white;
-
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  @media (max-width: 520px) {
+    text-align: center;
+  }
 }
 
+.grey-primary-text {
+  @extend .white-primary-text;
+  background: #828a90;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.2rem;
+  text-align: start;
+}
+
+.margin-right-10 {
+  margin-right: 10px;
+}
+
+.margin-left-10 {
+  margin-left: 10px;
+}
+
+.margin-top-10 {
+  margin-top: 10px;
+}
 // font sizing
 
 // $f-sizing: (xx-small, x-small, small, smaller, medium, x-large, xx-large);

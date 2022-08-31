@@ -1,0 +1,70 @@
+
+@use "global-variables";
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes money-designed-to-be-moved-dot {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes highlight {
+  from {
+    border-color: transparent;
+  }
+
+  to {
+    border-color: global-variables.$selected-border;
+  }
+}
+
+@keyframes no-highlight {
+  from {
+    border-color: global-variables.$selected-border;
+  }
+
+  to {
+    border-color: transparent;
+  }
+}
+
+@keyframes social-highlight {
+  from {
+    background: global-variables.$social-no-highlight-background;
+  }
+
+  to {
+    background: global-variables.$social-highlight-background;
+  }
+}
+
+@keyframes social-no-highlight {
+  from {
+    background: global-variables.$social-highlight-background;
+  }
+
+  to {
+    background: global-variables.$social-no-highlight-background;
+  }
+}

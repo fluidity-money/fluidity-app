@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package ethereum
 
 // ethereum contains queue code that receives blocks, transactions and
@@ -7,72 +11,29 @@ package ethereum
 import "github.com/fluidity-money/fluidity-app/lib/queue"
 
 const (
-	// TopicBlocks follow to get every block published on the network
-	TopicBlocks = "ethereum.block"
-
-	// TopicTransactions follow to get every transaction seen
-	TopicTransactions = "ethereum.transaction"
-
-	// TopicBlockHeaders follow to get every block header seen
-	TopicBlockHeaders = "ethereum.block.header"
-
-	// TopicBlockBodies follow to get every block body
-	TopicBlockBodies = "ethereum.block.body"
-
 	// TopicLogs follow to get every contract log that's confirmed
 	TopicLogs = "ethereum.log"
 
-	// TopicUnconfirmedLogs to use for tracking logs that haven't been confirmed
-	// according to what Ethereum considers secure.
-	TopicUnconfirmedLogs = "ethereum.unconfirmed.logs"
+	// TopicBlockHeaders follow to get every block header seen
+	TopicBlockHeaders = "ethereum.block.header"
 )
 
-func Blocks(f func(Block)) {
-	queue.GetMessages(TopicBlocks, func(message queue.Message) {
-		var	block Block
+func Logs(f func(Log)) {
+	queue.GetMessages(TopicLogs, func(message queue.Message) {
+		var log Log
 
-		message.Decode(&block)
+		message.Decode(&log)
 
-		f(block)
-	})
-}
-
-func Transactions(f func(Transaction)) {
-	queue.GetMessages(TopicTransactions, func(message queue.Message) {
-		var	transaction Transaction
-
-		message.Decode(&transaction)
-
-		f(transaction)
+		f(log)
 	})
 }
 
 func BlockHeaders(f func(BlockHeader)) {
 	queue.GetMessages(TopicBlockHeaders, func(message queue.Message) {
-		var	header BlockHeader
+		var header BlockHeader
 
 		message.Decode(&header)
 
 		f(header)
-	})
-}
-
-func BlockBodies(f func(BlockBody)) {
-	queue.GetMessages(TopicBlockBodies, func(message queue.Message) {
-		var	body BlockBody
-
-		message.Decode(&body)
-
-		f(body)
-	})
-}
-
-func Logs(f func(Log)) {
-	queue.GetMessages(TopicLogs, func(message queue.Message) {
-		var	log Log
-
-		message.Decode(&log)
-
-		f(log)
 	})
 }

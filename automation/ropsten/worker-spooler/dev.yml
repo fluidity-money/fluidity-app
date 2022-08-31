@@ -1,0 +1,26 @@
+
+DOCKER_IMAGE: microservice-ethereum-worker-spooler
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-spooler
+ENV_FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD: 1
+ENV_FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD: 0.1
+
+SERVICES:
+ - SPOOLER_USDC:
+    SERVICE_NAME: microservice-ethereum-worker-spooler-usdc
+    ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-ethereum-worker-spooler-usdc
+    ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.usdc
+    ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.usdc
+
+ - SPOOLER_USDT:
+    SERVICE_NAME: microservice-ethereum-worker-spooler-usdt
+    ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-ethereum-worker-spooler-usdt
+    ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.usdt
+    ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.usdt
+
+ - SPOOLER_DAI:
+    SERVICE_NAME: microservice-ethereum-worker-spooler-dai
+    ENV_FLU_WORKER_ID: ethereum-ropsten-microservice-ethereum-worker-spooler-dai
+    ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.dai
+    ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.dai
+
+

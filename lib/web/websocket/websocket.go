@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package websocket
 
 // websocket supports an easy-to-use websocket server and series of broadcast
@@ -33,7 +37,7 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 	http.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		ipAddress := r.Header.Get(web.HeaderIpAddress)
 
-		debug(
+		log.Debugf(
 			"Upgrading IP %v to a websocket!",
 			ipAddress,
 		)
@@ -74,7 +78,7 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 		)
 
 		go func() {
-			debug("Beginning to read messages from IP %#v!", ipAddress)
+			log.Debugf("Beginning to read messages from IP %#v!", ipAddress)
 
 			for {
 				_, content, err := websocketConn.ReadMessage()
@@ -91,14 +95,14 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 						k.Payload = err
 					})
 
-					debug(
+					log.Debugf(
 						"After an error with IP %#v, sending a message to chanHandlerShutdown...",
 						ipAddress,
 					)
 
 					chanHandlerShutdown <- true
 
-					debug(
+					log.Debugf(
 						"After an error with IP %#v, sending a message to chanShutdownWriter...",
 						ipAddress,
 					)
@@ -108,7 +112,7 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 					return
 				}
 
-				debug(
+				log.Debugf(
 					"Sending a mesage to the replies channel for IP %#v!",
 					ipAddress,
 				)
@@ -121,7 +125,7 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 			for {
 				select {
 				case _ = <-chanShutdownWriter:
-					debug(
+					log.Debugf(
 						"Received a message to shut down the writer for IP %#v!",
 						ipAddress,
 					)
@@ -129,7 +133,7 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 					return
 
 				case message := <-messages:
-					debug(
+					log.Debugf(
 						"Received a message to write to IP %#v!",
 						ipAddress,
 					)
@@ -156,7 +160,7 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 						return
 					}
 
-					debug(
+					log.Debugf(
 						"Wrote a message to the websocket for IP %#v!",
 						ipAddress,
 					)

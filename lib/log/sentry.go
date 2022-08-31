@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package log
 
 import (
@@ -42,8 +46,8 @@ func sentryLogError(invocation, workerId string, log *log) {
 	}
 
 	event.Tags = map[string]string{
-		"worker-id": workerId,
-		"context":   log.context,
+		"worker-id":  workerId,
+		"context":    log.context,
 		"invocation": invocation,
 	}
 

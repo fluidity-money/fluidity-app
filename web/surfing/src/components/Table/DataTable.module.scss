@@ -1,0 +1,148 @@
+@import "../../common";
+
+@mixin mobile {
+  @media (max-width: 650px) {
+    @content;
+  }
+}
+
+.tableFilterContainer {
+  display: flex;
+  width: 100%;
+  color: $grey-60;
+  margin-bottom: 10px;
+  justify-content: space-between;
+  ul {
+    display:flex;
+    list-style: none;
+    li {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    li:hover {
+      border-bottom: 1px solid $white-a90;
+      color: $white-a90;
+    }
+
+    li:focus {
+      color: $white-a90;
+      border-bottom: 1px solid $white-a90;
+    }
+  }
+  @include mobile {
+    flex-direction: column;
+    ul {
+      margin-top: 10px;
+    }
+  }
+}
+  
+.pagination {
+  display: flex;
+  color: $grey-60;
+  width: 100%;
+  justify-content: space-between;
+  span:nth-child(2) {
+    padding-right: 3px;
+    button {
+      border: 0;
+      background-color: transparent;
+      stroke: map-get($text, "prominent");
+    }
+    button:first-child {
+      margin-right: 20px;
+      .icon:first-child {
+        transform: scaleX(-1);
+      }
+    }
+  }
+}
+  
+table {
+  width: 100%;
+  border-collapse: collapse;
+  thead {
+      tr{
+        th{
+          padding: 0 20px 10px 20px;
+          text-align:start;
+          color: $grey-60
+        }
+      }
+
+      th:nth-child(6) {
+        display: none;
+      }
+
+      @include mobile {
+        @for $i from 1 through 5 {
+          @if $i == 2  {
+            th:nth-child(3n + #{$i}) {
+              display: none;
+            }
+          }@else if $i == 4 {
+            th:nth-child(3n + #{$i}) {
+              display: none;
+            }
+          }@else if $i == 5 {
+            th:nth-child(3n + #{$i}) {
+              display: none;
+            }
+          }
+        }
+        th:nth-child(3) {
+          text-align: right;
+        }   
+      }
+  }
+  
+  tbody {
+    background-color: rgb(36, 36, 36);
+
+    tr {
+  
+      td {
+        padding: 15px 20px 15px 20px;
+        border-bottom: 5px solid $black-a90;
+        border-top: none;
+        border-right: none;
+        border-left: none;
+        color: $grey-60;
+      }
+
+      td:nth-child(3) {
+        color: $white-a90;
+      }
+
+      td:nth-child(6) {
+        display: none;
+      }
+
+      @include mobile {
+        @for $i from 1 through 5 {
+          @if $i == 2  {
+            td:nth-child(3n + #{$i}) {
+              display: none;
+            }
+          }@else if $i == 4 {
+            td:nth-child(3n + #{$i}) {
+              display: none;
+            }
+          }@else if $i == 5 {
+            td:nth-child(3n + #{$i}) {
+              display: none;
+            }
+          }
+          td:nth-child(3) {
+            text-align: right;
+          }
+        }
+      }
+    }
+  }
+}
+
+.alignRight {
+  text-align: right;
+}

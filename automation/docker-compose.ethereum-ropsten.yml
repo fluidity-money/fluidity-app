@@ -1,0 +1,110 @@
+---
+version: "3"
+
+services:
+  microservice-ethereum-prize-pool:
+    build:
+      context: ../cmd/microservice-ethereum-prize-pool
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-prize-pool
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_TOKEN_BACKEND: compound 
+      FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: ${FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR}
+      FLU_ETHEREUM_TOKEN_BACKEND: compound
+      FLU_ETHEREUM_TOKENS_LIST: ${FLU_ETHEREUM_TOKENS_LIST}
+      FLU_ETHEREUM_HTTP_URL: ${FLU_ETHEREUM_HTTP_URL}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-ethereum-user-actions-usdc:
+    build:
+      context: ../cmd/microservice-ethereum-user-actions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-user-actions-usdc
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
+      FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
+      FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-ethereum-user-actions-usdt:
+    build:
+      context: ../cmd/microservice-ethereum-user-actions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-user-actions-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
+      FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
+      FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-ethereum-user-actions-dai:
+    build:
+      context: ../cmd/microservice-ethereum-user-actions
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-user-actions-dai
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
+      FLU_ETHEREUM_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_DAI}
+      FLU_ETHEREUM_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-ethereum-track-winners-usdc:
+    build:
+      context: ../cmd/microservice-ethereum-track-winners
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-track-winners-usdc
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDC}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDC}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDC}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-ethereum-track-winners-usdt:
+    build:
+      context: ../cmd/microservice-ethereum-track-winners
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-track-winners-usdt
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FUSDT}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_USDT}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_USDT}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  microservice-ethereum-track-winners-dai:
+    build:
+      context: ../cmd/microservice-ethereum-track-winners
+    env_file: ./docker-compose-envs
+    environment:
+      FLU_WORKER_ID: ${FLU_UNIVERSE}-microservice-ethereum-track-winners-dai
+      FLU_SENTRY_URL: ${FLU_SENTRY_URL}
+      FLU_AMQP_QUEUE_ADDR: ${FLU_AMQP_QUEUE_ADDR}
+      FLU_ETHEREUM_CONTRACT_ADDR: ${FLU_ETHEREUM_CONTRACT_ADDR_FDAI}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: ${FLU_ETHEREUM_TOKEN_NAME_DAI}
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: ${FLU_ETHEREUM_TOKEN_DECIMALS_DAI}
+    depends_on:
+      - redis
+    restart: unless-stopped

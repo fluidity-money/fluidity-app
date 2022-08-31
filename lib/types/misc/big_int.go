@@ -1,12 +1,16 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package misc
 
 // big_int contains exceedingly large numbers, wrapping big.Int
 
 import (
-	"math/big"
-	"fmt"
-	"encoding/json"
 	sqlDriver "database/sql/driver"
+	"encoding/json"
+	"fmt"
+	"math/big"
 )
 
 // BigInt contains big.Int and has some extra functions to support storage
@@ -18,13 +22,13 @@ type BigInt struct {
 func BigIntFromString(s string) (*BigInt, error) {
 	var int BigInt
 
-    if _, success := int.SetString(s, 10); !success {
-    	return nil, fmt.Errorf(
-    		"Failed to set the bigint! Bad number!",
-    	)
-    }
+	if _, success := int.SetString(s, 10); !success {
+		return nil, fmt.Errorf(
+			"Failed to set the bigint! Bad string number!",
+		)
+	}
 
-    return &int, nil
+	return &int, nil
 }
 
 func BigIntFromInt64(x int64) BigInt {
@@ -50,27 +54,27 @@ func NewBigInt(x big.Int) BigInt {
 func (i *BigInt) UnmarshalJSON(b []byte) error {
 	var str string
 
-    if err := json.Unmarshal(b, &str); err != nil {
-        return fmt.Errorf(
-        	"Failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
-        	b,
-        	err,
-        )
-    }
+	if err := json.Unmarshal(b, &str); err != nil {
+		return fmt.Errorf(
+			"failed to unmarshal a JSON marshalled byte array of %v to a string! %v",
+			b,
+			err,
+		)
+	}
 
-    int, err := BigIntFromString(str)
+	int, err := BigIntFromString(str)
 
-    if err != nil {
-    	return fmt.Errorf(
-    		"Failed to unharsmal a BigInt of %v! %v",
-    		str,
-    		err,
-    	)
-    }
+	if err != nil {
+		return fmt.Errorf(
+			"failed to unharsmal a BigInt of %v! %v",
+			str,
+			err,
+		)
+	}
 
-    *i = *int
+	*i = *int
 
-    return nil
+	return nil
 }
 
 func (i BigInt) MarshalJSON() ([]byte, error) {

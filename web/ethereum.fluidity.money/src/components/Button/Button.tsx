@@ -1,7 +1,14 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
+import { TokenKind } from "components/types";
 import React from "react";
+import { appTheme } from "util/appTheme";
 
 interface ButtonProps {
   label: string;
+  token?: TokenKind;
   theme?: string;
   texttheme?: string;
   className?: string;
@@ -15,10 +22,12 @@ interface ButtonProps {
   fontSize?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
+  visible?: boolean;
 }
 
 const Button = ({
   label,
+  token,
   theme,
   texttheme,
   className,
@@ -32,6 +41,7 @@ const Button = ({
   fontSize,
   icon,
   disabled,
+  visible,
 }: ButtonProps) => {
   if (auth || priviledge === 0 || priviledge === undefined) {
     return (
@@ -41,8 +51,8 @@ const Button = ({
         button
         ${fontSize ?? ""}
         ${theme}
-        ${selected === true ? "selected" : ""}
-        ${className ?? ""}
+        ${selected === true ? `selected${appTheme}` : ""}
+        ${className}
         ${subSelected === true ? "subSelected" : ""}
         ${timeSelected === true ? "timeSelected" : ""}
         ${disabled ? "disabled" : ""}
@@ -51,11 +61,45 @@ const Button = ({
         onClick={goto}
       >
         {icon}
-        <div className={`${texttheme ?? ""}`}>{label}</div>
+        {theme === "select-token-button" ? (
+          <>
+            <div className="token-list-item-info">
+              <div className="token-list-item-names">
+                <div className={`${texttheme ?? ""}`}>{token?.name}</div>
+                <div className="label">
+                  {token?.amount === "0.0"
+                    ? `${label}`
+                    : `${Number(token?.amount).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 6,
+                      })} ${label}`}
+                </div>
+              </div>
+              <div className={`${texttheme ?? ""}`}>
+                {token
+                  ? `${Number(token?.amount).toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 6,
+                    })}`
+                  : "0"}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className={`${texttheme ?? ""}`}>{label}</div>
+        )}
+        {visible === true ? (
+          <img src={"img/chevronDown.svg"} className="chevron" alt="" />
+        ) : visible === false ? (
+          <img src={"img/chevronUp.svg"} className="chevron" alt="" />
+        ) : (
+          <></>
+        )}
       </button>
     );
   }
   return <></>;
 };
-
 export default Button;

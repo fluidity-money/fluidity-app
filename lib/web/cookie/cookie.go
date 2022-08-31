@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package cookie
 
 // cookie implements code that uses Redis and Postgres in tandem to utilise
@@ -5,12 +9,12 @@ package cookie
 // or a serialisation of a successful login cookie fails.
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/web"
-	"github.com/fluidity-money/fluidity-app/lib/state"
-	"github.com/fluidity-money/fluidity-app/lib/log"
-	"time"
-	"net/http"
 	"fmt"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/state"
+	"github.com/fluidity-money/fluidity-app/lib/web"
+	"net/http"
+	"time"
 )
 
 const (
@@ -26,7 +30,6 @@ const (
 	// HeaderAccessDenied sent when cookie access fails
 	HeaderAccessDenied = http.StatusUnauthorized
 )
-
 
 type (
 	// HttpFunctionState to use when taking requests which can overtly fail.
@@ -50,15 +53,15 @@ type (
 func Endpoint(endpoint, headerName, cookieBaseName string, handler HttpFunctionState) {
 	http.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		var (
-			headers = r.Header
-			ipAddress = headers.Get(web.HeaderIpAddress)
+			headers     = r.Header
+			ipAddress   = headers.Get(web.HeaderIpAddress)
 			headerValue = headers.Get(headerName)
 		)
 
 		setCorsHeaders(w)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -132,7 +135,7 @@ func Endpoint(endpoint, headerName, cookieBaseName string, handler HttpFunctionS
 			return
 		}
 
-		debug(
+		log.Debugf(
 			"Cookie name %v, IP %v is being updated with a new value of %v!",
 			cookieName,
 			ipAddress,
@@ -142,7 +145,7 @@ func Endpoint(endpoint, headerName, cookieBaseName string, handler HttpFunctionS
 		updated := state.SetTimedIfSet(cookieName, newCookieValue)
 
 		if !updated {
-			debug(
+			log.Debugf(
 				"Cookie name %v, IP %v was not updated in the end, key expired.",
 				cookieName,
 				ipAddress,
@@ -162,14 +165,14 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 
 		setCorsHeaders(w)
 
-		debug(
+		log.Debugf(
 			"Handling an endpoint login at %v with IP address %v!",
 			endpoint,
 			ipAddress,
 		)
 
 		if r.Method == http.MethodOptions {
-			debug(
+			log.Debugf(
 				"Request from %v to %v was an OPTIONS preflight(?) request, sending OK",
 				ipAddress,
 				endpoint,
@@ -198,14 +201,14 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 			return
 		}
 
-		debug(
+		log.Debugf(
 			"Handler serving endpoint %v with IP %v returned!",
 			endpoint,
 			ipAddress,
 		)
 
 		if newState == nil {
-			debug(
+			log.Debugf(
 				"Handled a login at endpoint %v from IP %v, but the new state is empty!",
 				endpoint,
 				ipAddress,
@@ -222,7 +225,7 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 			newCookie,
 		)
 
-		debug(
+		log.Debugf(
 			"Generated a new cookie for %v serving IP %v, %v. Value %v!",
 			endpoint,
 			ipAddress,
@@ -232,7 +235,7 @@ func Login(endpoint, cookieName string, cacheTime uint64, handler HttpFunctionSt
 
 		state.SetTimed(newCookieName, cacheTime, newState)
 
-		debug(
+		log.Debugf(
 			"Set a new timed state for endpoint %v IP %v cookie %v!",
 			endpoint,
 			ipAddress,

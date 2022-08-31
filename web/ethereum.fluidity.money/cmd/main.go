@@ -1,18 +1,54 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
+	"github.com/fluidity-money/fluidity-app/web/ethereum.fluidity.money/lib-backend"
+
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/prize-pool"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
+)
 
-	"github.com/fluidity-money/fluidity-app/web/ethereum.fluidity.money/lib-backend"
+const (
+	// EnvWorkerKeyList to read supported tokend and their associated
+	// private keys for signing random numbers with
+	EnvWorkerKeyList = `FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST`
+
+	// EnvChainId of the chain this api is running for
+	// to properly nonce manual rewards
+	EnvChainId = `FLU_ETHEREUM_CHAIN_ID`
+
+	// EnvTokenList to fetch the contract address
+	// to properly nonce manual rewards
+	EnvTokenList = `FLU_ETHEREUM_TOKENS_LIST`
 )
 
 func main() {
+	var (
+		keys   = mustParseKeyListFromEnv(EnvWorkerKeyList)
+		tokens = mustParseTokenNamesFromEnv(EnvTokenList)
 
-	updateMessagesSolana := make(chan api_fluidity_money.Update)
+		chainidString = util.GetEnvOrFatal(EnvChainId)
+	)
+
+	chainid, err := misc.BigIntFromString(chainidString)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to parse chainid from env!"
+			k.Payload = err
+		})
+	}
+
+	updateMessagesEthereum := make(chan interface{})
 
 	web.JsonEndpoint("/prize-pool", api_fluidity_money.HandlePrizePool)
 
@@ -22,47 +58,43 @@ func main() {
 
 	web.JsonEndpoint("/my-history", api_fluidity_money.HandleMyHistory)
 
-	updateNotificationsHandlerSolana := api_fluidity_money.HandleUpdateNotifications(
-		updateMessagesSolana,
+	web.JsonEndpoint("/winning-chances", api_fluidity_money.HandleWinningChances)
+
+	web.JsonEndpoint("/pending-rewards", api_fluidity_money.HandlePendingRewards)
+
+	manualRewardHandler := api_fluidity_money.GetManualRewardHandler(tokens, chainid, keys)
+
+	web.JsonEndpoint("/manual-reward", manualRewardHandler)
+
+	updateNotificationsHandlerEthereum := api_fluidity_money.HandleUpdateNotifications(
+		updateMessagesEthereum,
 	)
 
-	websocket.Endpoint("/updates", updateNotificationsHandlerSolana)
+	websocket.Endpoint("/updates", updateNotificationsHandlerEthereum)
 
 	go func() {
-		winners.WinnersSolana(func(winner winners.Winner) {
-			winner.WinnerAddress = winner.SolanaWinnerOwnerAddress
-
-			updateMessagesSolana <- api_fluidity_money.Update{
+		winners.WinnersEthereum(func(winner winners.Winner) {
+			updateMessagesEthereum <- Update{
 				Winner: &winner,
 			}
 		})
 	}()
 
 	go func() {
-		user_actions.BufferedUserActionsSolana(func(bufferedUserAction user_actions.BufferedUserAction) {
-			for _, userAction := range bufferedUserAction.UserActions {
-
-				userAction.SenderAddress = userAction.SolanaSenderOwnerAddress
-				userAction.RecipientAddress = userAction.SolanaRecipientOwnerAddress
-
-				updateMessagesSolana <- api_fluidity_money.Update{
-					UserAction: &userAction,
-				}
+		user_actions.UserActionsEthereum(func(userAction user_actions.UserAction) {
+			updateMessagesEthereum <- Update{
+				UserAction: &userAction,
 			}
 		})
 	}()
 
 	go func() {
-		prize_pool.PrizePoolUpdatesSolana(func(prizePool prize_pool.PrizePool) {
-			updateMessagesSolana <- api_fluidity_money.Update{
+		prize_pool.PrizePoolUpdatesEthereum(func(prizePool prize_pool.PrizePool) {
+			updateMessagesEthereum <- Update{
 				PrizePool: &prizePool,
 			}
 		})
 	}()
-
-	healthcheckHandler := makeHealthcheckHandler()
-
-	web.Endpoint("/healthcheck", healthcheckHandler)
 
 	web.Listen()
 }

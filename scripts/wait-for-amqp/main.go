@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 // test if AMQP is running using an environment variable every second
@@ -10,7 +14,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 // attemptCount to try before giving up (loudly!)
@@ -66,7 +70,7 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatal(
+		log.Fatalf(
 			"Failed to connect to AMQP! %v",
 			err,
 		)

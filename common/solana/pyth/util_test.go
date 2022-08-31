@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package pyth
 
 import (
@@ -6,10 +10,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestDebug(t *testing.T) {
-	debug("format string %v", 123)
-}
 
 func TestBigPowInt32(t *testing.T) {
 	// 5 ^ 3 = 125

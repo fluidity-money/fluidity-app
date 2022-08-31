@@ -1,66 +1,48 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package ethereum
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
-	logging "github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-var transferLogTopic = strings.ToLower(
+var TransferLogTopic = strings.ToLower(
 	"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
 )
 
-type Transfer struct {
-	FromAddress ethereum.Address
-	ToAddress   ethereum.Address
-	Transaction ethereum.Transaction
-}
+// Get transfer receipts
+func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethereum.Address) ([]worker.EthereumDecoratedTransfer, error) {
+	blockTransactions := make(map[ethereum.Hash]ethereum.Transaction)
 
-func transactionGetTransfers(client *ethclient.Client, fluidContractAddress ethereum.Address, transaction ethereum.Transaction) ([]Transfer, error) {
-
-	transactionHashString := transaction.Hash.String()
-
-	transactionHash := ethCommon.HexToHash(transactionHashString)
-
-	transactionReceipt, err := client.TransactionReceipt(
-		context.Background(),
-		transactionHash,
-	)
-
-	if err != nil {
-		logging.App(func(k *logging.Log) {
-			k.Format(
-				"Failed to get the transaction receipt for transaction hash %#v! Returning nothing!",
-				transactionHashString,
-			)
-
-			k.Payload = err
-		})
-
-		return nil, nil
+	for _, transaction := range transactions {
+		blockTransactions[transaction.Hash] = transaction
 	}
 
-	transfers := make([]Transfer, 0)
+	transfers := make([]worker.EthereumDecoratedTransfer, 0)
+	failedTransactions := make([]ethereum.Hash, 0)
 
-	for _, log := range transactionReceipt.Logs {
+	for _, transferLog := range logs {
+		transactionHash := transferLog.TxHash
 
 		var (
-			transferContractAddress_ = log.Address.Hex()
-			topics                   = log.Topics
+			transferContractAddress_ = transferLog.Address.String()
+			topics                   = transferLog.Topics
 		)
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
 
 		if transferContractAddress != string(fluidContractAddress) {
-			debug(
+			log.Debugf(
 				"For transaction hash %#v, contract was %#v, not %#v!",
-				transactionHashString,
+				transactionHash,
 				transferContractAddress,
 				fluidContractAddress,
 			)
@@ -68,75 +50,169 @@ func transactionGetTransfers(client *ethclient.Client, fluidContractAddress ethe
 			continue
 		}
 
-		firstTopic := strings.ToLower(topics[0].Hex())
+		firstTopic := strings.ToLower(topics[0].String())
 
-		if firstTopic != transferLogTopic {
-			debug(
+		if !IsTransferLogTopic(firstTopic) {
+			log.Debugf(
 				"For transaction hash %#v, first topic %#v != transfer log topic %#v!",
-				transactionHashString,
+				transactionHash,
 				firstTopic,
-				transferLogTopic,
+				TransferLogTopic,
 			)
 
 			continue
 		}
 
 		if len(topics) != 3 {
-			debug(
+			log.Debugf(
 				"Number of topics for transaction hash %#v, topic content %#v length != 3!",
-				transactionHashString,
+				transactionHash,
 				topics,
 			)
 
 			continue
 		}
 
+		// Remove padding 0x from addresses
 		var (
-			fromAddress_ = topics[1].Hex()[26:]
-			toAddress_   = topics[2].Hex()[26:]
+			fromAddress_ = topics[1].String()[26:]
+			toAddress_   = topics[2].String()[26:]
 		)
 
 		fromAddress := ethereum.AddressFromString(fromAddress_)
 
 		toAddress := ethereum.AddressFromString(toAddress_)
 
-		transfer := Transfer{
-			FromAddress: fromAddress,
-			ToAddress:   toAddress,
-			Transaction: transaction,
+		logTransaction, found := blockTransactions[transferLog.TxHash]
+
+		if !found {
+			failedTransactions = append(failedTransactions, transferLog.TxHash)
+		}
+
+		transfer := worker.EthereumDecoratedTransfer{
+			SenderAddress:    fromAddress,
+			RecipientAddress: toAddress,
+			Transaction:      logTransaction,
+			Decorator:        nil,
 		}
 
 		transfers = append(transfers, transfer)
 	}
 
-	return transfers, nil
-}
+	err := error(nil)
 
-// GetUserActions by taking the logs from each transaction
-func GetTransfers(client *ethclient.Client, contractAddress ethereum.Address, transactions ...ethereum.Transaction) ([]Transfer, error) {
-
-	transfers := make([]Transfer, 0)
-
-	for _, transaction := range transactions {
-
-		transfers_, err := transactionGetTransfers(client, contractAddress, transaction)
-
-		if err != nil {
-			return nil, fmt.Errorf(
-				"failed to get the logs for transaction hash %#v! %v",
-				transaction.Hash,
-				err,
-			)
-		}
-
-		transfers = append(transfers, transfers_...)
+	if len(failedTransactions) > 0 {
+		err = fmt.Errorf(
+			"Block %v had %v unreferenced txs: %v",
+			blockHash,
+			len(failedTransactions),
+			failedTransactions,
+		)
 	}
 
-	return transfers, nil
+	return transfers, err
 }
 
-// GetTransferRecipient of the transfer function, returning nil if the
-// null address was being sent to
-func GetTransferRecipient(transaction ethereum.Transaction) (ethereum.Address, error) {
-	return ethereum.AddressFromString("0x0000000000000000000000000000000000000000"), nil
+// GetApplicationTransfers to use the passed function to classify
+// individual logs and their respective transactions as generated by
+// an application we support, to be processed later
+func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, applicationContracts []string, classifyApplicationLogTopic func(topic string) applications.Application) ([]worker.EthereumApplicationTransfer, error) {
+	blockTransactions := make(map[ethereum.Hash]ethereum.Transaction)
+
+	for _, transaction := range transactions {
+		blockTransactions[transaction.Hash] = transaction
+	}
+
+	var (
+		transfers          []worker.EthereumApplicationTransfer
+		failedTransactions []ethereum.Hash
+	)
+
+	for _, transferLog := range logs {
+		transactionHash := transferLog.TxHash
+
+		var (
+			transferContractAddress_ = transferLog.Address.String()
+			topics                   = transferLog.Topics
+		)
+
+		transferContractAddress := strings.ToLower(transferContractAddress_)
+
+		if !IsApplicationContract(transferContractAddress, applicationContracts) {
+			log.Debugf(
+				"For transaction hash %#v, contract was %#v, not any of %#v!",
+				transactionHash,
+				transferContractAddress,
+				applicationContracts,
+			)
+
+			continue
+		}
+
+		if len(topics) == 0 {
+			log.Debugf(
+				"For transaction hash %#v, no topics were found!",
+				transactionHash,
+			)
+
+			continue
+		}
+
+		firstTopic := strings.ToLower(topics[0].String())
+		logApplication := classifyApplicationLogTopic(firstTopic)
+
+		// also check number of topics
+		if logApplication == 0 {
+			log.Debugf(
+				"For transaction hash %#v, first topic %#v != any application log topic!",
+				transactionHash,
+				firstTopic,
+			)
+
+			continue
+		}
+
+		logTransaction, found := blockTransactions[transferLog.TxHash]
+
+		if !found {
+			failedTransactions = append(failedTransactions, transferLog.TxHash)
+		}
+
+		transfer := worker.EthereumApplicationTransfer{
+			Transaction: logTransaction,
+			Log:         transferLog,
+			Application: logApplication,
+		}
+
+		transfers = append(transfers, transfer)
+	}
+
+	var err error
+
+	if len(failedTransactions) > 0 {
+		err = fmt.Errorf(
+			"Block %v had %v unreferenced txs: %v",
+			blockHash,
+			len(failedTransactions),
+			failedTransactions,
+		)
+	}
+
+	return transfers, err
+}
+
+// IsTransferLogTopic returns whether given string matches signature of
+// the fluid transfer ABI
+func IsTransferLogTopic(topic string) bool {
+	return topic == TransferLogTopic
+}
+
+// ClassifyApplicationContract returns whether the address is found in the list of contracts
+func IsApplicationContract(address string, contracts []string) bool {
+	for _, contract := range contracts {
+		if address == contract {
+			return true
+		}
+	}
+	return false
 }

@@ -1,11 +1,15 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package misc
 
 // blob contains byte arrays that should be implicitly coerced into base64
 // on the wire and into the database
 
 import (
-	"encoding/base64"
 	sqlDriver "database/sql/driver"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 )
@@ -66,15 +70,15 @@ func (blob *Blob) Scan(v interface{}) error {
 	case string:
 		var err error
 
-	 	*blob, err = base64.StdEncoding.DecodeString(v.(string))
+		*blob, err = base64.StdEncoding.DecodeString(v.(string))
 
-	 	if err != nil {
-	 		return fmt.Errorf(
-	 			"Failed to decode a string of %v as base64! %v",
-	 			v.(string),
-	 			err,
-	 		)
-	 	}
+		if err != nil {
+			return fmt.Errorf(
+				"Failed to decode a string of %v as base64! %v",
+				v.(string),
+				err,
+			)
+		}
 
 	default:
 		return fmt.Errorf(

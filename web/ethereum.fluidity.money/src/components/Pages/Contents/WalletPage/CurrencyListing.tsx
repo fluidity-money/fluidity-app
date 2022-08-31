@@ -1,21 +1,22 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import Icon from "components/Icon";
 import {useState} from "react";
 import { decimalTrim } from "util/decimalTrim";
+import { shorthandAmountFormatter } from "util/amounts";
 
 const CurrencyListing = ({currency, amount}: {currency: string; amount: string}) => {
-  const [trim, setTrim] = useState(4);
-  
+  const [trim, setTrim] = useState(3);
   return (
     <div className="currency-listing-container"
     >
       <Icon src={`currency-icon i-${currency}`} />
       <div className="currency-listing">
-        <div>{currency}</div>
-        <div
-          onMouseOver={() => setTimeout(() => setTrim(9), 40)}
-          onMouseOut={() => setTimeout(() => setTrim(4), 40)}
-        >
-          {decimalTrim(amount, trim)}
+        <div className="currency-type">{currency}</div>
+        <div title={amount}>
+          {shorthandAmountFormatter(decimalTrim(amount, trim), trim)}
         </div>
       </div>
     </div>

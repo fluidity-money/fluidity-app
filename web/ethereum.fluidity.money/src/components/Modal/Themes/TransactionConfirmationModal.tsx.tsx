@@ -1,8 +1,13 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import Button from "components/Button";
 import { userActionContext } from "components/context";
 import GenericModal from "components/Modal/GenericModal";
 import { useContext } from "react";
 import { WebsocketUserAction } from "util/api/types";
+import { appTheme } from "util/appTheme";
 import { etherscanTransaction } from "util/etherscan";
 
 const TransactionConfirmationModal = ({
@@ -49,7 +54,7 @@ const TransactionConfirmationModal = ({
           href={
             userActions.length
               ? etherscanTransaction(userActions[0].transaction_hash)
-              : "https://ropsten.etherscan.io/"
+              : "https://etherscan.io"
           }
           rel="noreferrer"
         >
@@ -58,7 +63,7 @@ const TransactionConfirmationModal = ({
         <h2 className="text-center">{message}</h2>
 
         <Button
-          theme={"primary-button"}
+          theme={`primary-button${appTheme}`}
           padding="py-1"
           label={"Dismiss"}
           goto={toggle}

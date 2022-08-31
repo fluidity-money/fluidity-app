@@ -1,0 +1,49 @@
+[package]
+name = "solana-fluidity-fuzz"
+version = "0.0.0"
+authors = ["Automatically generated"]
+publish = false
+edition = "2018"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+bumpalo = { version = "3.4.0", features = ["collections", "boxed"] }
+safe-transmute = "0.11.0"
+rand = "0.8.4"
+arrayref = "0.3.6"
+borsh = "0.9.1"
+solana-program = "=1.7.4"
+spl-token = { version = "3.1.1", features=["no-entrypoint"] }
+uint = "0.9"
+num-derive = "0.3"
+num-traits = "0.2"
+thiserror = "1.0"
+
+[dependencies.solana-fluidity]
+path = "../.."
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+# Fuzzing targets
+# [[bin]]
+# name = "fuzz_payout"
+# path = "fuzz_targets/fuzz_payout.rs"
+# test = false
+# doc = false
+
+[[bin]]
+name = "fuzz_log_tvl"
+path = "fuzz_targets/fuzz_log_tvl.rs"
+test = false
+doc = false
+
+# [[bin]]
+# name = "fuzz_wrap"
+# path = "fuzz_targets/fuzz_wrap.rs"
+# test = false
+# doc = false

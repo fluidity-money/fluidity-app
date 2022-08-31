@@ -1,19 +1,54 @@
+**/.git
 
 docker
 docker-*
+!docker-compose*
+semgrep
+
+lib/build-lib
+
+common/build-common
 
 cmd/*/test
 cmd/*/docker
 cmd/*/lint
 cmd/*/*.o
+cmd/*/*.out
 
+database/build/*
 database/build
+database/db
 
 web/*/dist*
 web/*/node_modules
 web/*/build*
+web/*/build-*
+web/*/*.o
 
 contracts/ethereum/node_modules
+contracts/ethereum/.openzeppelin/unknown-31337.json
 contracts/ethereum/docker*
+contracts/ethereum/docgen
 
-automation/*
+contracts/solana/fuzz/target
+contracts/solana/docker
+contracts/solana/validator
+contracts/solana/cargo_fuzz
+contracts/solana/target
+contracts/solana/cargo_test
+contracts/solana/soteria_analyze
+contracts/solana/.coderrect
+contracts/solana/miri_test
+contracts/solana/cargo_geiger
+contracts/solana/cargo_audit
+contracts/solana/testing/fuzz/target
+!contracts/solana/testing/*
+
+contracts/tribeca-govern-contracts/target
+
+contracts/utility-gauge/target
+
+deployment_list.json
+# Vendor specific
+.vscode
+.DS_Store

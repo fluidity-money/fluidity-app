@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
@@ -42,10 +46,4 @@ func newBig(x uint64) *big.Int {
 
 func writeLastBlock(lastBlock uint64) {
 	state.Set(RedisBlockKey, lastBlock)
-}
-
-func debug(message string, content ...interface{}) {
-	log.Debug(func(k *log.Log) {
-		k.Format(message, content...)
-	})
 }

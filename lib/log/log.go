@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package log
 
 import "time"
@@ -6,6 +10,9 @@ const (
 	// EnvDebug is the environment variable that's tested to see if debugging
 	// should be turned on.
 	EnvDebug = `FLU_DEBUG`
+
+	// EnvDebugDieFast if set to true, die immediately for testing
+	EnvDebugDieFast = `FLU_DEBUG_DIE_FAST`
 
 	// EnvSentryUrl to use for logging application logs and errors
 	EnvSentryUrl = `FLU_SENTRY_URL`
@@ -30,6 +37,12 @@ func Debug(k func(k *Log)) {
 	}
 
 	logCooking(loggingLevelDebug, k)
+}
+
+func Debugf(message string, format ...interface{}) {
+	Debug(func(k *Log) {
+		k.Format(message, format...)
+	})
 }
 
 func App(k func(k *Log)) {

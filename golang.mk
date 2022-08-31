@@ -3,27 +3,40 @@
 
 include ../../build.mk
 
+SEMGREP_GO_ARGS := --config ../../.semgrep/golang.yml
+
 GO_FILES := $(shell ls -1 *.go)
 
-${REPO}.o: ${GO_FILES}
-	@${GO_BUILD} -o ${REPO}.o
+GO_DIR_LIB := ../../lib
+
+GO_DIR_COMMON := ../../common
+
+${REPO}.out: ${GO_FILES}
+	@${GO_BUILD} ${GO_BUILD_EXTRA_ARGS} -o ${REPO}.out
 
 lint: ${GO_FILES}
 	@${GO_FMT}
 	@touch lint
 
-test: ${GO_FILES}
-	@${GO_TEST}
+semgrep: ${GO_FILES}
+	@${SEMGREP_ALL} ${SEMGREP_GO_ARGS} ${GO_DIR_LIB} ${GO_DIR_COMMON} .
+	@touch semgrep
+
+test: ${GO_FILES} semgrep
+	@${GO_TEST} -cover
 	@touch test
 
 docker: ${GO_FILES} Dockerfile Makefile
-	@${DOCKER_BUILD} -t "${ORG_ROOT}/${REPO}" .
+	@${DOCKER_BUILD} ${DOCKERFLAGS} -t "${ORG_ROOT}/${REPO}" .
 	@touch docker
 
-build: ${REPO}
+build: ${REPO}.out
+
+install: build
+	cp ${REPO}.out ${INSTALL_DIR}/${REPO}
 
 watch:
 	@ls -1 ${GO_FILES} | entr -ns 'clear && make build'
 
 clean:
-	@rm -f "${REPO}.o" lint test docker
+	@rm -f "${REPO}.out" lint test docker

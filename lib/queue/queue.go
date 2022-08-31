@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package queue
 
 // queue implements code that talks to RabbitMQ over AMQP.
@@ -9,20 +13,30 @@ import (
 	"io"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/state"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
 	// Context is used to identify the AMQP server in logging
 	Context = "AMQP"
 
-	// EnvQueueAddr is the address to access RabbitMQ.
-	EnvQueueAddr = `FLU_AMQP_QUEUE_ADDR`
-
 	// ExchangeName to use for AMQP queues
 	ExchangeName = `fluidity`
 
 	// ExchangeType to use for routing messages inside the queue
 	ExchangeType = `topic`
+
+	// EnvQueueAddr is the address to access RabbitMQ.
+	EnvQueueAddr = `FLU_AMQP_QUEUE_ADDR`
+
+	// EnvDeadLetterEnabled to disable the use of dead letter queues
+	// (disabling with "false" implies disabling retries)
+	EnvDeadLetterEnabled = `FLU_AMQP_QUEUE_DEAD_LETTER_ENABLED`
+
+	// EnvMessageRetries to attempt until giving up - defaults to
+	// 5 if not set!
+	EnvMessageRetries = `FLU_AMQP_QUEUE_MESSAGE_RETRIES`
 )
 
 type Message struct {
@@ -44,7 +58,7 @@ func (message Message) Decode(decoded interface{}) {
 		})
 	}
 
-	debug("Successfully decoded a message from JSON!")
+	log.Debugf("Successfully decoded a message from JSON!")
 }
 
 // GetMessages from the AMQP server, calling the function each time a
@@ -58,9 +72,11 @@ func GetMessages(topic string, f func(message Message)) {
 	amqpDetails := <-chanAmqpDetails
 
 	var (
-		channel      = amqpDetails.channel
-		exchangeName = amqpDetails.exchangeName
-		workerId     = amqpDetails.workerId
+		channel           = amqpDetails.channel
+		exchangeName      = amqpDetails.exchangeName
+		workerId          = amqpDetails.workerId
+		deadLetterEnabled = amqpDetails.deadLetterEnabled
+		messageRetries    = amqpDetails.messageRetries
 	)
 
 	var (
@@ -74,6 +90,7 @@ func GetMessages(topic string, f func(message Message)) {
 		exchangeName,
 		consumerId,
 		channel,
+		deadLetterEnabled,
 	)
 
 	if err != nil {
@@ -96,22 +113,43 @@ func GetMessages(topic string, f func(message Message)) {
 		var (
 			deliveryTag = message.DeliveryTag
 			body        = message.Body
+			routingKey  = message.RoutingKey
 		)
-
-		log.Debug(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Received a message from the queue!"
-			k.Payload = string(body)
-		})
 
 		bodyBuf := bytes.NewBuffer(body)
 
+		// Risk of a collision is near 0 enough to be ignored.
+
+		retryKey := fmt.Sprintf(
+			"worker.%#v.retry.%#v.%#v",
+			workerId,
+			topic,
+			util.GetHash(body),
+		)
+
+		if deadLetterEnabled {
+			retryCount := state.Incr(retryKey)
+
+			state.Expire(retryKey, 86400) // 24 hours
+
+			// the number of retries exceeds the max retry count! giving up!
+
+			if int(retryCount) >= messageRetries {
+
+				queueNackDeliveryTag(channel, deliveryTag)
+
+				state.Del(retryKey)
+
+				continue
+			}
+		}
+
 		f(Message{
-			Topic:   topic,
+			Topic:   routingKey,
 			Content: bodyBuf,
 		})
 
-		debug(
+		log.Debugf(
 			"Asking the server to ack the receipt of %v!",
 			deliveryTag,
 		)
@@ -129,10 +167,16 @@ func GetMessages(topic string, f func(message Message)) {
 			})
 		}
 
-		debug(
+		log.Debugf(
 			"Server acked the reply for %v!",
 			deliveryTag,
 		)
+
+		// clean up the retry key
+
+		if deadLetterEnabled {
+			state.Del(retryKey)
+		}
 	}
 }
 
@@ -152,7 +196,7 @@ func SendMessage(topic string, content interface{}) {
 
 // SendMessageBytes down a topic, with bytes as content
 func SendMessageBytes(topic string, content []byte) {
-	debug("Starting to send a publish request to the sending goroutine.")
+	log.Debugf("Starting to send a publish request to the sending goroutine.")
 
 	amqpDetails := <-chanAmqpDetails
 
@@ -178,5 +222,11 @@ func SendMessageBytes(topic string, content []byte) {
 		})
 	}
 
-	debug("Sending goroutine has received the request!")
+	log.Debugf("Sending goroutine has received the request!")
+}
+
+// Finish up, by clearing the buffer
+func Finish() {
+	amqpDetails := <-chanAmqpDetails
+	amqpDetails.channel.Close()
 }

@@ -1,8 +1,13 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package solana
 
 import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/solana"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 const (
@@ -18,8 +23,9 @@ type (
 	TransactionLog = solana.TransactionLog
 	Transaction    = solana.Transaction
 
-	BufferedTransactionLog = solana.BufferedTransactionLog
-	BufferedTransaction    = solana.BufferedTransaction
+	BufferedTransactionLog          = solana.BufferedTransactionLog
+	BufferedTransaction             = solana.BufferedTransaction
+	BufferedApplicationTransactions = worker.SolanaBufferedApplicationTransactions
 )
 
 func Slots(f func(Slot)) {
@@ -42,9 +48,9 @@ func BufferedTransactionLogs(f func(BufferedTransactionLog)) {
 	})
 }
 
-func BufferedTransactions(f func(BufferedTransaction)) {
+func BufferedTransactions(f func(BufferedApplicationTransactions)) {
 	queue.GetMessages(TopicBufferedTransactions, func(message queue.Message) {
-		var bufferedTransaction BufferedTransaction
+		var bufferedTransaction BufferedApplicationTransactions
 
 		message.Decode(&bufferedTransaction)
 

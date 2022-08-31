@@ -1,22 +1,56 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package fluidity
 
 import (
-	"context"
 	"fmt"
-
-	"github.com/fluidity-money/fluidity-app/lib/log"
-
-	solana "github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
-	"github.com/near/borsh-go"
 )
 
 const (
-	// VariantPayout to use when making payouts
-	VariantPayout = 2
+	// 0
+	// VariantWrap to wrap spl tokens into fluid tokens
+	VariantWrap = iota
 
-	// VariantSendAmount to use when submitting transfers in the contract
-	VariantSendAmount = 3
+	// VariantUnwrap to unwrap fluid tokens to spl tokens
+	VariantUnwrap
+
+	// VariantPayout to pay winnings to users
+	VariantPayout
+
+	// VariantInitSolendObligation to initialize solend accounts
+	VariantInitSolendObligation
+
+	// VariantLogTvl to write the current TVL to an account
+	VariantLogTvl
+
+	// 5
+	// VariantInitData to initialize contract account
+	VariantInitData
+
+	// VariantDrain to drain the prize pool
+	VariantDrain
+
+	// VariantUpdateMintLimits to update the mint caps
+	VariantUpdateMintLimits
+
+	// VariantUpdatePayoutLimits to update the amount that can be freely
+	// minted
+	VariantUpdatePayoutLimits
+
+	// VariantUpdatePayoutAuthority to update the worker key
+	VariantUpdatePayoutAuthority
+
+	// 10
+	// VariantUpdateOperator to update the admin account
+	VariantUpdateOperator
+
+	// VariantConfirmUpdatePayoutAuthority to finalise a worker update
+	VariantConfirmUpdatePayoutAuthority
+
+	// VariantEmergency to lock down the contract
+	VariantEmergency
 )
 
 type (
@@ -29,140 +63,39 @@ type (
 		BumpSeed  uint8
 	}
 
-	// InstructionTransfer used when making transfers of the token
-	InstructionTransfer struct {
-		Variant uint8
-		Amount  uint64
+	// InstructionDrain used to send payout funds to a receiver
+	InstructionDrain struct {
+		Variant   uint8
+		Amount    uint64
+		TokenName string
+		BumpSeed  uint8
 	}
 )
 
-// SendTransfer using the token address given, the sender address, returning
-// the signature or an error. Derives the user's program address, then creates
-// a new ATA if the address doesn't exist!
-func SendTransfer(solanaClient *solanaRpc.Client, tokenProgramAddressPublicKey, tokenAssociatedProgramAddressPublicKey, senderAddress, recipientAddress, tokenAddress solana.PublicKey, amount uint64, recentBlockHash solana.Hash, publicKey solana.PublicKey, privateKey solana.PrivateKey) (string, error) {
+// GetBaseToken takes a fluid token and returns its counterpart
+func GetBaseToken(token string, fluidTokens map[string]string) (string, error) {
 
-	var (
-		senderAccountMeta = solana.NewAccountMeta(senderAddress, true, false)
-		signerAccountMeta = solana.NewAccountMeta(publicKey, true, true)
-		tokenAddressMeta  = solana.NewAccountMeta(tokenAddress, true, false)
-	)
+	// get the base token
 
-	programAddressInput := [][]byte{
-		recipientAddress[:],
-		tokenProgramAddressPublicKey[:],
-		tokenAddress[:],
-	}
+	baseToken := fluidTokens[token]
 
-	ataRecipientPublicKey, _, err := solana.FindProgramAddress(
-		programAddressInput,
-		tokenAssociatedProgramAddressPublicKey,
-	)
+	// check that we got a good result
 
-	log.App(func(k *log.Log) {
-		address := base58PublicKey(ataRecipientPublicKey)
-
-		k.Format(
-			"About to send an amount to the key %v!",
-			address,
-		)
-	})
-
-	if err != nil {
+	if baseToken == "" {
 		return "", fmt.Errorf(
-			"unable to derive the user's ATA key! %v",
-			err,
-		)
-	}
-	recipientAccountMeta := solana.NewAccountMeta(ataRecipientPublicKey, true, false)
-
-	_, err = solanaClient.GetAccountInfo(context.Background(), ataRecipientPublicKey)
-
-	var instructions []solana.Instruction
-
-	if err != nil {
-		createAccountSlice := solana.AccountMetaSlice{
-			signerAccountMeta,
-			recipientAccountMeta,
-			solana.NewAccountMeta(recipientAddress, true, false),
-			tokenAddressMeta,
-			solana.NewAccountMeta(solana.SystemProgramID, false, false),
-			solana.NewAccountMeta(tokenProgramAddressPublicKey, false, false),
-			solana.NewAccountMeta(solana.SysVarRentPubkey, false, false),
-		}
-
-		createAccountInstruction := solana.NewInstruction(
-			tokenAssociatedProgramAddressPublicKey,
-			createAccountSlice,
-			[]byte{},
-		)
-
-		instructions = append(instructions, createAccountInstruction)
-	}
-
-	accountMetaSlice := solana.AccountMetaSlice{
-		senderAccountMeta,
-		recipientAccountMeta,
-		signerAccountMeta,
-		tokenAddressMeta,
-	}
-
-	data := InstructionTransfer{
-		Variant: VariantSendAmount,
-		Amount:  amount,
-	}
-
-	dataSerialised, err := borsh.Serialize(data)
-
-	if err != nil {
-		return "", fmt.Errorf(
-			"Failed to serialise the data content to send out! %v",
-			err,
+			"token %v not found when trying to get base token!",
+			token,
 		)
 	}
 
-	transferInstruction := solana.NewInstruction(
-		tokenProgramAddressPublicKey,
-		accountMetaSlice,
-		dataSerialised,
-	)
+	return baseToken, nil
+}
 
-	instructions = append(instructions, transferInstruction)
+// IsFluidToken takes a token and checks if is one of the fluid tokens
+func IsFluidToken(token string, fluidTokens map[string]string) bool {
 
-	transaction, err := solana.NewTransaction(instructions, recentBlockHash)
+	// check if token exists in map
+	_, exists := fluidTokens[token]
 
-	if err != nil {
-		return "", fmt.Errorf(
-			"failed to make a new transaction with the instructions given and the block hash! %v",
-			err,
-		)
-	}
-
-	_, err = transaction.Sign(func(publicKey_ solana.PublicKey) *solana.PrivateKey {
-
-		if publicKey.Equals(publicKey_) {
-			return &privateKey
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return "", fmt.Errorf(
-			"failed to sign the transaction using the user's private key! %v",
-			err,
-		)
-	}
-
-	signature, err := solanaClient.SendTransaction(context.Background(), transaction)
-
-	if err != nil {
-		return "", fmt.Errorf(
-			"failed to send the transaction to Solana! %v",
-			err,
-		)
-	}
-
-	signatureString := fmt.Sprintf("%x", string(signature[:]))
-
-	return signatureString, nil
+	return exists
 }

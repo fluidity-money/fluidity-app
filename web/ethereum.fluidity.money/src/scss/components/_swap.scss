@@ -51,6 +51,41 @@
   }
 }
 
+.swap-box-container--aurora {
+  width: stretch;
+  max-width: 25rem;
+  position: relative;
+
+  // gradient outlines/background svg
+  &:before {
+    pointer-events: none;
+    background: url("/img/Aurora/AuroraSwapBox.svg");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    position: absolute;
+
+    // copy svg offset dimensions
+    left: -54px;
+    top: -47px;
+    // width: 511px;
+    // height: 481px;
+    width: 130%;
+    height: 130%;
+    content: " ";
+    z-index: -1;
+  }
+
+  border-radius: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 0;
+  grid-column: 1/-1;
+  @include for-tablet-landscape-up {
+    grid-column: 2/-1;
+    margin-left: 3rem;
+  }
+}
+
 .swap-form {
   margin: 1.5em;
 }
@@ -78,6 +113,24 @@
   padding-right: 6px;
 }
 
+.swap-field-margin {
+  margin-top: 1rem;
+
+  @extend .swap-field-margin;
+  &--aurora {
+    margin-top: 1rem;
+    @include for-below-420 {
+      margin-top: 0.8rem;
+    }
+    @include for-below-400 {
+      margin-top: 0.6rem;
+    }
+    @include for-below-380 {
+      margin-top: 0.4rem;
+    }
+  }
+}
+
 .token-selection-container {
   border: 0px;
   cursor: pointer;
@@ -102,5 +155,10 @@
 
   &:hover {
     opacity: 0.8;
+  }
+
+  &--aurora {
+    @extend .token-selection-container;
+    background-color: white;
   }
 }

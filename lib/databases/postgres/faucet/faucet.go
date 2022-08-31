@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package faucet
 
 // ethereum contains database code to use when interacting with the faucet
@@ -66,58 +70,69 @@ func GetUniqueAddress(address string) string {
 
 // InsertFaucetUser, not including the last used field
 func InsertFaucetUser(faucetUser FaucetUser) {
-	postgresClient := postgres.Client()
+	// insert a copy for each token we support
+	// TODO this is a hack - would be better to have an enumerable list
+	// of supported tokens that isn't hardcoded here
+	var tokens []string
+	if faucetUser.Network == network.NetworkEthereum {
+		tokens = []string{string(faucet.TokenfDAI), string(faucet.TokenfUSDC), string(faucet.TokenfUSDT)}
+	} else {
+		tokens = []string{string(faucet.TokenfUSDC), string(faucet.TokenfUSDT)}
+	}
 
-	statementText := fmt.Sprintf(
-		`INSERT INTO %s (
-			address,
-			unique_address,
-			ip_address,
-			network,
-			token_name
-		)
+	for _, tokenName := range tokens {
+		postgresClient := postgres.Client()
 
-		VALUES (
-			$1,
-			$2,
-			$3,
-			$4,
-			$5
-		);`,
-
-		TableUsers,
-	)
-
-	var (
-		address       = faucetUser.Address
-		uniqueAddress = faucetUser.UniqueAddress
-		ipAddress     = faucetUser.IpAddress
-		network       = faucetUser.Network
-		tokenName     = faucetUser.TokenName
-	)
-
-	_, err := postgresClient.Exec(
-		statementText,
-		address,
-		uniqueAddress,
-		ipAddress,
-		network,
-		tokenName,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to insert into the faucet database address %#v, unique address %#v and ip %#v",
+		statementText := fmt.Sprintf(
+			`INSERT INTO %s (
 				address,
-				uniqueAddress,
-				ipAddress,
+				unique_address,
+				ip_address,
+				network,
+				token_name
 			)
 
-			k.Payload = err
-		})
+			VALUES (
+				$1,
+				$2,
+				$3,
+				$4,
+				$5
+			);`,
+
+			TableUsers,
+		)
+
+		var (
+			address       = faucetUser.Address
+			uniqueAddress = faucetUser.UniqueAddress
+			ipAddress     = faucetUser.IpAddress
+			network       = faucetUser.Network
+		)
+
+		_, err := postgresClient.Exec(
+			statementText,
+			address,
+			uniqueAddress,
+			ipAddress,
+			network,
+			tokenName,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Failed to insert into the faucet database address %#v, unique address %#v and ip %#v",
+					address,
+					uniqueAddress,
+					ipAddress,
+				)
+
+				k.Payload = err
+			})
+		}
 	}
 }
 
@@ -144,7 +159,7 @@ func GetFaucetLastUsedAndAddress(uniqueAddress string, network network.Blockchai
 
 	var (
 		lastUsedNullable sql.NullTime
-		address  string
+		address          string
 	)
 
 	err := resultRow.Scan(&lastUsedNullable, &address)

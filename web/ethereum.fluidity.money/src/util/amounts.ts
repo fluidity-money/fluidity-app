@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import { parseUnits } from "ethers/utils";
 
 // Format a raw token amount and insert a decimal place at the correct offset
@@ -30,6 +34,8 @@ export const formatCurrency = (amount: string, decimals?: number): string => {
   // trim to the desired number of decimals
   if (decimals && post) {
     post = post.slice(0, decimals);
+    if (post.length < decimals)
+      post += '0'.repeat(decimals - post.length)
   }
   // if there are decimals, put them back
   return post ? newPre + "." + post : newPre;
@@ -104,3 +110,27 @@ export const shortBalance = (balance: string) =>
     : `${balance}`.substr(0, 4) +
       "..." +
       `${balance}`.substr(`${balance}`.length - 2, `${balance}`.length - 1);
+
+/** creates a shorthand for large amounts e.g 10,000 equates to 10k
+ * @param value string of the form xx.yy
+ * @param decimals the number of decimals to trim to
+ */
+export const shorthandAmountFormatter = (value: string, decimals: number): string => {
+
+  let num: number = parseFloat(value)
+  if(num < 1) {
+    return value;
+  }
+  const lookup = [
+    { value: 1, symbol: "" },
+    { value: 1e3, symbol: "K" },
+    { value: 1e6, symbol: "M" },
+    { value: 1e9, symbol: "B" },
+    { value: 1e12, symbol: "T" },
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var item = lookup.slice().reverse().find(function(item) {
+    return num >= item.value;
+  });
+  return item ? (num / item.value).toFixed(decimals).replace(rx, "$1") + item.symbol : "0";
+};
