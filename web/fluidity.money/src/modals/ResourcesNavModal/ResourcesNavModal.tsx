@@ -1,34 +1,35 @@
-import React from "react";
+import { LinkButton } from "components/Button";
 import styles from "./ResourcesNavModal.module.scss";
 
 interface IResourcesNavModal {
   handleModal: () => void;
+  navLinks: ILinkButton[];
 }
 
-const ResourcesNavModal = ({ handleModal }: IResourcesNavModal) => {
+interface ILinkButton {
+  children: string;
+  size: "small" | "medium" | "large";
+  type: "internal" | "external";
+  handleClick: () => void;
+}
+
+const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
   return (
     <div className={styles.container}>
-      <h4>
-        <a onClick={() => handleModal()} href="/resources#articles">
-          {"Articles >"}
-        </a>
-      </h4>
-      <h4>
-        <a onClick={() => handleModal()} href="/resources#fluniversity">
-          {"Fluniversity >"}
-        </a>
-      </h4>
-      <h4>
-        <a onClick={() => handleModal()} href="/resources#whitepapers">
-          {"Whitepapers >"}
-        </a>
-      </h4>
-      <h4>
-        <a onClick={() => handleModal()} href="/resources#docs">
-          {"Documentation [>]"}
-        </a>
-      </h4>
+      {navLinks.map((link) => (
+        <h4>
+          <a onClick={() => handleModal()} href="/resources#articles">
+            <LinkButton
+              size={link.size}
+              type={link.type}
+              handleClick={() => {}}
+            >
+              {link.children}
+            </LinkButton>
+          </a>
+        </h4>
+      ))}
     </div>
   );
 };

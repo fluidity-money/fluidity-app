@@ -21,7 +21,6 @@ const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
       {navLinks.map((link) => (
         <h4>
           <a onClick={() => handleModal()} href="/resources#articles">
-            {"Articles >"}
             <LinkButton
               size={link.size}
               type={link.type}

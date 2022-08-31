@@ -91,7 +91,9 @@ const NavBar = () => {
                 </li>
               </ul>
             </nav>
-            {modal && <ResourcesNavModal handleModal={handleModal} />}
+            {modal && (
+              <ResourcesNavModal handleModal={handleModal} navLinks={links} />
+            )}
           </div>
         </div>
       </div>
@@ -100,3 +102,37 @@ const NavBar = () => {
 };
 
 export default NavBar;
+
+interface ILinkButton {
+  children: string;
+  size: "small" | "medium" | "large";
+  type: "internal" | "external";
+  handleClick: () => void;
+}
+
+const links: ILinkButton[] = [
+  {
+    children: "articles",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "fluniversity",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "whitpapers",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "documentation",
+    size: "small",
+    type: "external",
+    handleClick: () => {},
+  },
+];
