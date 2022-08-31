@@ -5,7 +5,6 @@
 package worker
 
 import (
-	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
@@ -47,6 +46,10 @@ func InsertEmissions(emission Emission) {
 		winningChances          = emission.WinningChances
 		lastUpdated             = emission.LastUpdated
 		averageTransfersInBlock = emission.AverageTransfersInBlock
+		atxBufferSize           = emission.AtxBufferSize
+		transfersInBlock        = emission.TransfersInBlock
+		transfersPast           = emission.TransfersPast
+		secondsSinceLastBlock   = emission.SecondsSinceLastBlock
 	)
 
 	var testingBallsString strings.Builder
@@ -128,7 +131,12 @@ func InsertEmissions(emission Emission) {
 
 			average_transfers_in_block,
 
-			matched_balls
+			matched_balls,
+
+			atx_buffer_size,
+			transfers_in_block,
+			transfers_past,
+			seconds_since_last_block
 		)
 
 		VALUES (
@@ -197,7 +205,12 @@ func InsertEmissions(emission Emission) {
 
 			$52,
 
-			$53
+			$53,
+
+			$54,
+			$55,
+			$56,
+			$57
 		);`,
 
 		TableEmissions,
@@ -272,6 +285,11 @@ func InsertEmissions(emission Emission) {
 		averageTransfersInBlock,
 
 		naiveIsWinning.MatchedBalls,
+
+		atxBufferSize,
+		transfersInBlock,
+		transfersPast,
+		secondsSinceLastBlock,
 	)
 
 	if err != nil {
@@ -285,50 +303,70 @@ func InsertEmissions(emission Emission) {
 
 // GetAverageAtx, rounding up the average, taking the returned float64 and
 // casting it to an integer
-func GetAverageAtx(blockFrom uint64, tokenShortName string, network network.BlockchainNetwork) int {
+func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, blocks []uint64, transactionCounts []int) {
 
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
-		`SELECT AVG(transaction_count)
+		`SELECT block_number, transaction_count
 		FROM %s
-		WHERE block_number >= $1
-		AND token_short_name = $2
-		AND network = $3`,
+		WHERE token_short_name = $1
+		AND network = $2
+		ORDER BY block_number DESC
+		LIMIT $3`,
 
 		TableAverageAtx,
 	)
 
-	row := timescaleClient.QueryRow(
+	rows, err := timescaleClient.Query(
 		statementText,
-		blockFrom,
 		tokenShortName,
 		network,
+		limit,
 	)
 
-	var average_ float64
-
-	err := row.Scan(&average_)
-
-	switch err {
-	case nil:
-
-	case sql.ErrNoRows:
-		return 0
-
-	default:
+	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-			k.Message = "Failed to query the row for averages"
+			k.Message = "Failed to query the average atx field for calculation!"
 			k.Payload = err
 		})
 	}
 
-	// the number here discards the fraction!
+	defer rows.Close()
 
-	average := int(average_)
+	sum := 0
 
-	return average
+	blocks = make([]uint64, 0)
+
+	transactionCounts = make([]int, 0)
+
+	for rows.Next() {
+		var (
+			blockNumber      uint64
+			transactionCount int
+		)
+
+		err := rows.Scan(&blockNumber, &transactionCount)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+				k.Message = "Failed to scan the transaction count to an int!"
+				k.Payload = err
+			})
+		}
+
+		blocks = append(blocks, blockNumber)
+
+		transactionCounts = append(transactionCounts, transactionCount)
+
+		sum += transactionCount
+	}
+
+	average = sum / len(transactionCounts)
+
+	return average, blocks, transactionCounts
 }
 
 // InsertTransactionCount for a block number for the number of transactions

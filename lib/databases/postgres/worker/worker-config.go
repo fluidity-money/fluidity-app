@@ -21,7 +21,8 @@ func GetWorkerConfigEthereum(network_ network.BlockchainNetwork) (config WorkerC
 			compound_blocks_per_day,
 			default_seconds_since_last_block,
 			current_atx_transaction_margin,
-			default_transfers_in_block
+			default_transfers_in_block,
+			atx_buffer_size
 		FROM %s
 		WHERE network = $1`,
 
@@ -45,6 +46,7 @@ func GetWorkerConfigEthereum(network_ network.BlockchainNetwork) (config WorkerC
 		&config.DefaultSecondsSinceLastBlock,
 		&config.CurrentAtxTransactionMargin,
 		&config.DefaultTransfersInBlock,
+		&config.AtxBufferSize,
 	)
 
 	if err != nil {
@@ -65,7 +67,8 @@ func GetWorkerConfigSolana() (config WorkerConfigSolana) {
 	statementText := fmt.Sprintf(`
 		SELECT
 			solana_block_time,
-			transfer_compute
+			transfer_compute,
+			atx_buffer_size
 		FROM %s`,
 
 		TableWorkerConfigSolana,
@@ -84,6 +87,7 @@ func GetWorkerConfigSolana() (config WorkerConfigSolana) {
 	err := row.Scan(
 		&config.SolanaBlockTime,
 		&config.TransferCompute,
+		&config.AtxBufferSize,
 	)
 
 	if err != nil {
