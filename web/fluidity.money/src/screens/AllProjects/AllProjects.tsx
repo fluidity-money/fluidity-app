@@ -3,9 +3,10 @@
 // LICENSE_TRF.md file.
 
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import FilterCriteria from "../../components/FilterCriteria";
 import FluidProject from "../../components/FluidProject";
-import styles from "./Filter.module.scss";
+import styles from "./AllProjects.module.scss";
 import { clearForAny, handleFilterButton } from "./util";
 
 interface IOption {
@@ -14,6 +15,20 @@ interface IOption {
 }
 
 const Filter = () => {
+  /* scrolls to location on pageload if it contains same ID or scrolls to the top
+   for ResourcesNavModal to work*/
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash) {
+      let elem = document.getElementById(location.hash.slice(1));
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [location]);
+
   const [catOptions, setCatOptions] = useState(filters[0]);
   const [chains, setChains] = useState(filters[1]);
   const [years, setYears] = useState(filters[2]);
@@ -108,7 +123,7 @@ const Filter = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="allprojects">
       <h1>Fluid projects</h1>
       <div className={styles.main}>
         <div className={styles.left}>

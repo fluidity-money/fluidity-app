@@ -2,6 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import FuidWars from "./FuidWars";
+import FluidWars from "./FuidWars";
 
-export default FuidWars;
+export default FluidWars;

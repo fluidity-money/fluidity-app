@@ -1,9 +1,9 @@
-@import "../../styles/config.scss";
+@use '../../common' as *;
 
 .container {
   display: flex;
   align-items: center;
-  background-color: $fluidBlack;
+  background-color: $black;
   width: fit-content;
   padding: 4px;
   border-radius: 40px;
