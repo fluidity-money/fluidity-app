@@ -22,8 +22,6 @@ With Fluidity, you are rewarded for doing what you already do. Using your favour
 
 Senders and Receivers receive the reward amount if a transaction that qualifies wins. You could earn a life-changing amount of money just for receiving a payment. This creates an incentive for a counterparty to accept a Fluid Asset.
 
-**Got 4 minutes?** Check out a video overview of our product:
-
 ### Guides: Jump right in
 
 Follow our handy guides to get started on the basics as quickly as possible:
@@ -67,4 +65,5 @@ Telegram: [https://t.me/fluiditymoney](https://t.me/fluiditymoney)
 Twitter: [https://twitter.com/fluiditymoney](https://twitter.com/fluiditymoney)
 
 Discord: [https://discord.gg/CNvpJk4HpC](https://discord.gg/CNvpJk4HpC)
->>>>>>> docs
+
+> > > > > > > docs
