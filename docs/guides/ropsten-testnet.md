@@ -5,7 +5,7 @@ description: How to test out Fluidity
 # 🧪 Ropsten Testnet
 
 {% hint style="info" %}
-#### _Please read the fully detailed **Fluidity Testnet release** article for a step by step guide on how to get the most out of our beta_ [_here_](https://blog.fluidity.money) _(_[_blog.fluidity.money_](https://blog.fluidity.money)_)_
+_**Please read the fully detailed Fluidity Testnet release article for a step by step guide on how to get the most out of our beta**_** ** [_**here**_](https://blog.fluidity.money) ** **_**(**_[_**blog.fluidity.money**_](https://blog.fluidity.money)_**)**_
 {% endhint %}
 
 When using the [**Fluidity web app**](https://https/ropsten.beta.fluidity.money) ([https:/ropsten.beta.fluidity.money](https://ropsten.beta.fluidity.money/)) for the first time you need to make sure you are using the Ethereum Ropsten test network and have the following:
@@ -31,5 +31,5 @@ Within this beta, you will be able to interact with a myriad of utilities that y
 We recommend that you follow the guide below to have the best experience and be able to provide the best possible feedback so that we are able to continually improve your interaction with the Fluidity protocol and its applications!
 
 {% hint style="info" %}
-#### _Please read the fully detailed **Fluidity Testnet release** article for a step by step guide on how to get the most out of our beta_ [_here_](https://blog.fluidity.money) _(_[_blog.fluidity.money_](https://blog.fluidity.money)_)_
+_**Please read the fully detailed Fluidity Testnet release article for a step by step guide on how to get the most out of our beta**_** ** [_**here**_](https://blog.fluidity.money) ** **_**(**_[_**blog.fluidity.money**_](https://blog.fluidity.money)_**)**_
 {% endhint %}
