@@ -5,8 +5,9 @@ import styles from "./RewardsBackground.module.scss";
 const RewardsBackground = () => {
   const carouselInfo = (
     <div>
-      {ContinuousCarousels.map((winner) => (
+      {ContinuousCarousels.map((winner, i) => (
         <div
+          key={`winner-${i}`}
           className={styles.winner}
         >{`${winner.blockchain} DEX ${winner.amount} ${winner.id} ${winner.date}`}</div>
       ))}

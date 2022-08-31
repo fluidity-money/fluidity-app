@@ -68,7 +68,7 @@ button {
 .secondary {
   background-color: transparent;
   border: 0.5px solid $white-a80;
-  color: map-get($text, "prominent");
+  color: "orange";
   width: fit-content;
   height: fit-content;
   text-transform: uppercase;

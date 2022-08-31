@@ -14,8 +14,8 @@ const UseCases = () => {
     >
       <h1>A FLUID ECONOMY</h1>
       <ManualCarousel>
-        {items.map((item) => (
-          <UseCase useCase={item} />
+        {items.map((item, i) => (
+          <UseCase key={`usecase-${i}`} useCase={item} />
         ))}
       </ManualCarousel>
     </div>

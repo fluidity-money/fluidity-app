@@ -20,8 +20,9 @@ const Projects = () => {
       </LinkButton>
 
       <ManualCarousel>
-        {items.map((item) => (
+        {items.map((item, i) => (
           <div
+            key={`proj-${i}`}
             style={{
               border: "1px solid white",
               height: 200,

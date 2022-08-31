@@ -89,7 +89,7 @@ const Reward = () => {
 
 export default Reward;
 
-const rewards = [
+export const rewards = [
   {
     blockchain: "🦍",
     amount: "1.01",

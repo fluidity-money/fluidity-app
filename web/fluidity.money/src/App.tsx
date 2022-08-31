@@ -1,7 +1,9 @@
-import React from "react";
 import "./styles/app.global.scss";
+import "surfing/dist/style.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 // Pages
+//import { NavBar } from "surfing";
 import NavBar from "./components/NavBar";
 import LandingPage from "./pages/LandingPage";
 import EcosystemPage from "./pages/EcosystemPage";
@@ -10,7 +12,6 @@ import FluidStatsPage from "./pages/FluidStatsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 
 function App() {
-  console.log("hello");
   return (
     <Router>
       <div className="App">

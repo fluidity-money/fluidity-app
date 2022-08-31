@@ -2,6 +2,7 @@ export { default as LineChart } from "./LineChart";
 export { default as DataTable } from "./Table";
 export { Display } from "./Display";
 export { Heading } from "./Heading";
+export { NavBar } from "./NavBar";
 export { Tab, TabBar } from "./Tab";
 export { DesktopOnly, Row, Card } from "./Container";
 export { ProtectedRoute } from "./Route";

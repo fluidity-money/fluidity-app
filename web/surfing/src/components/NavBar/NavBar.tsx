@@ -1,16 +1,9 @@
-import React, { ReactNode, useState } from "react";
+import type { IGeneralButtonProps } from "../Button/GeneralButton/GeneralButton";
+
+import { ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { GeneralButton } from "../Button";
-import ResourcesNavModal from "../../../../fluidity.money/src/components/ResourcesNavModal";
 import styles from "./NavBar.module.scss";
-
-interface IButton {
-  children: string;
-  version: "primary" | "secondary";
-  type: "text" | "icon before" | "icon after" | "icon only";
-  size: "small" | "medium" | "large";
-  handleClick: () => void;
-}
 
 interface INavLinks {
   name: string;
@@ -20,30 +13,11 @@ interface INavLinks {
 interface INavBarProps {
   logo: string;
   text: string;
-  button: IButton;
+  button: IGeneralButtonProps;
   navLinks: INavLinks[];
 }
 
-//tbd
-interface IModalNavLinkButtons {
-  children: string;
-  size: string;
-  type: string;
-  handleClick: () => void;
-}
-
-// tbd
-interface IModalProps {
-  navLinks: string[];
-  modalButtons: IModalNavLinkButtons[];
-}
-
 const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
-  const [modal, setModal] = useState(false);
-  const handleModal = () => {
-    setModal(!modal);
-  };
-
   const navLinksTitles = navLinks.map((link) => {
     <li>
       <NavLink
@@ -55,7 +29,7 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
         {link.name.toUpperCase()}
       </NavLink>
       {link.modal && (
-        <button onClick={() => handleModal()}>
+        <button onClick={() => {}}>
           <img
             src="/assets/images/triangleDown.svg"
             alt="open resource options"
@@ -94,7 +68,7 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
             <nav>
               <ul>{navLinksTitles as ReactNode}</ul>
             </nav>
-            {modal && <ResourcesNavModal handleModal={handleModal} />}
+            {/**{modal && <ResourcesNavModal handleModal={handleModal} />}*/}
           </div>
         </div>
       </div>

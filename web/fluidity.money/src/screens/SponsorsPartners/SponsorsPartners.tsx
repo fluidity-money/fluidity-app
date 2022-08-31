@@ -23,8 +23,9 @@ const SponsorsPartners = () => {
               // left: `${Math.floor((Math.random() - 0.6) * 900)}px`,
             }}
           >
-            {partners.map((partner) => (
+            {partners.map((partner, i) => (
               <div
+                key={`sponsor-${i}`}
                 style={{
                   position: "relative",
                   display: "block",

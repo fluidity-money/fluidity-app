@@ -11,17 +11,14 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+  },
+  "peerDependencies": {
     "@visx/visx": "^2.12.2",
     "@visx/xychart": "^2.12.2",
     "@web3-react/injected-connector": "^6.0.7",
-    "react": "18.2.0 || ^17.0.0",
-    "react-dom": "18.2.0 || ^17.0.0",
     "react-relay": "^14.1.0",
     "react-router-dom": "^6.3.0",
     "react-table": "^7.8.0",
-    "use-wallet": "^0.13.6"
-  },
-  "peerDependencies": {
     "react": "18.2.0 || ^17.0.0",
     "react-dom": "18.2.0 || ^17.0.0"
   },
@@ -43,13 +40,17 @@
     "babel-loader": "^8.2.5",
     "chromatic": "^6.7.4",
     "framer-motion": "^6.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "sass": "^1.54.4",
     "storybook-addon-pseudo-states": "^1.15.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.7",
+    "vite-plugin-dts": "^1.4.1",
     "vite-plugin-svgr": "^2.2.1",
     "vite-tsconfig-paths": "^3.5.0"
   },
+  "types": "dist/lib.d.ts",
   "files": [
     "dist"
   ],
@@ -59,6 +60,10 @@
     ".": {
       "import": "./dist/surfing.js",
       "require": "./dist/surfing.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
     }
   }
 }
