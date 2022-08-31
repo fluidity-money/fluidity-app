@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../tests-profile.sh
+. ../tests-profile.sh
 
 microservice-solana-user-restrictions &
 
