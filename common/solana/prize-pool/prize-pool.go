@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
 	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 
 	"github.com/near/borsh-go"
 )
@@ -72,11 +73,13 @@ func GetPrice(client *rpc.Provider, account solana.PublicKey) (*big.Rat, error) 
 // simulated transaction
 func GetTvl(client *rpc.Provider, fluidityPubkey, tvlDataPubkey, solendPubkey, obligationPubkey, reservePubkey, pythPubkey, switchboardPubkey solana.PublicKey, payerAccount *solana.Wallet) (uint64, error) {
 
-	payer := solana.TransactionPayer(payerAccount.PublicKey())
+	payerPubkey := payerAccount.PublicKey()
+
+	payer := solana.TransactionPayer(payerPubkey)
 
 	accounts := solana.AccountMetaSlice{
 		solana.NewAccountMeta(tvlDataPubkey, true, false),
-		solana.NewAccountMeta(payerAccount.PublicKey(), false, false),
+		solana.NewAccountMeta(payerPubkey, false, false),
 		solana.NewAccountMeta(solendPubkey, false, false),
 		solana.NewAccountMeta(obligationPubkey, true, false),
 		solana.NewAccountMeta(reservePubkey, true, false),
@@ -84,6 +87,17 @@ func GetTvl(client *rpc.Provider, fluidityPubkey, tvlDataPubkey, solendPubkey, o
 		solana.NewAccountMeta(switchboardPubkey, false, false),
 		solana.NewAccountMeta(solana.SysVarClockPubkey, false, false),
 	}
+
+	log.Debugf(
+		"Getting tvl with tvl data pubkey %v, payer pubkey %v, solend pubkey %v, obligation pubkey %v, reserve pubkey %v, pyth pubkey %v, switchboard pubkey %v",
+		tvlDataPubkey,
+		payerPubkey,
+		solendPubkey,
+		obligationPubkey,
+		reservePubkey,
+		pythPubkey,
+		switchboardPubkey,
+	)
 
 	instruction := solana.NewInstruction(
 		fluidityPubkey,
