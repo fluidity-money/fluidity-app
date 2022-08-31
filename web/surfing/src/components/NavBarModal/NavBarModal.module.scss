@@ -3,8 +3,8 @@
   height: 220px;
   border-radius: 20px;
   padding: 20px;
-  background-color: $fluidWhite;
-  color: $fluidBlack;
+  background-color: white;
+  color: black;
   position: absolute;
   top: 60px;
   transform: translateX(105%);
@@ -12,7 +12,7 @@
   flex-direction: column;
   justify-content: space-evenly;
   a {
-    color: $fluidBlack;
+    color: black;
     &:hover {
       opacity: 0.8;
     }
