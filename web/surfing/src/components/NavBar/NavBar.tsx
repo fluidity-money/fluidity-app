@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 import type { IGeneralButtonProps } from "../Button/GeneralButton/GeneralButton";
 
 import { ReactNode } from "react";
+=======
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
+import React, { ReactNode, useState } from "react";
+>>>>>>> develop
 import { Link, NavLink } from "react-router-dom";
 import { GeneralButton } from "../Button";
 import styles from "./NavBar.module.scss";

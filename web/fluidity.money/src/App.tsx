@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import "./styles/app.global.scss";
 import "surfing/dist/style.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";

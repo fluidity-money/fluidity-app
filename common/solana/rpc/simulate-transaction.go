@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package rpc
 
 import (
@@ -13,6 +17,7 @@ type SimulationResponse struct {
 	TransactionError interface{}     `json:"err"`
 	Logs             []string        `json:"logs"`
 	Accounts         []types.Account `json:"accounts"`
+	Err              string          `json:"err"`
 	UnitsConsumed    uint64          `json:"unitsConsumed"`
 }
 
@@ -31,7 +36,7 @@ func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, 
 		"sigVerify":              signatureVerify,
 		"commitment":             "finalized",
 		"encoding":               "base64",
-		"replaceRecentBlockHash": true,
+		"replaceRecentBlockhash": true,
 		"accounts": map[string]interface{}{
 			"encoding":  "base64",
 			"addresses": accountsStrings,
@@ -59,6 +64,13 @@ func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, 
 			"failed to decode getAccountInfo, message %#v: %v",
 			string(res),
 			err,
+		)
+	}
+
+	if err_ := simulationResponse.Err; err_ != "" {
+		return nil, fmt.Errorf(
+			"getAccountInfo returned error %v",
+			err_,
 		)
 	}
 

@@ -1,20 +1,24 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
 	"fmt"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/aldrin"
 	"github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/common/solana/orca"
 	"github.com/fluidity-money/fluidity-app/common/solana/raydium"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/saber"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	types "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-func parseTransaction(solanaClient *solana.SolanaRPCHandle, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
+func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
 
 	var (
 		totalFee = big.NewRat(0, 1)
