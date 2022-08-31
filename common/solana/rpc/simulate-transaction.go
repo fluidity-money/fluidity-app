@@ -36,7 +36,7 @@ func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, 
 		"sigVerify":              signatureVerify,
 		"commitment":             "finalized",
 		"encoding":               "base64",
-		"replaceRecentBlockHash": true,
+		"replaceRecentBlockhash": true,
 		"accounts": map[string]interface{}{
 			"encoding":  "base64",
 			"addresses": accountsStrings,
