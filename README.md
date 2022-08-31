@@ -65,5 +65,3 @@ Telegram: [https://t.me/fluiditymoney](https://t.me/fluiditymoney)
 Twitter: [https://twitter.com/fluiditymoney](https://twitter.com/fluiditymoney)
 
 Discord: [https://discord.gg/CNvpJk4HpC](https://discord.gg/CNvpJk4HpC)
-
-> > > > > > > docs
