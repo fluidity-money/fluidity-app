@@ -26,7 +26,7 @@ func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 			})
 		}
 
-		var slot uint64
+		var slot solana.Slot
 
 		isEmptyMessage := len(result) == 0
 
@@ -51,8 +51,6 @@ func (websocket Websocket) SubscribeSlots(f func(solana.Slot)) {
 			})
 		}
 
-		f(solana.Slot{
-			Slot: slot,
-		})
+		f(slot)
 	}
 }
