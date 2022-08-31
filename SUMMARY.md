@@ -29,6 +29,8 @@
   * [🖼 NFTs](docs/use-cases/nfts.md)
   * [🌊 Other Use-Cases](docs/use-cases/other-use-cases.md)
   * [💳 Transactions and Payments](docs/use-cases/transactions-and-payments.md)
+* [🎪 Developers](docs/developers/README.md)
+  * [Addresses](docs/developers/addresses.md)
 * [Relevant links](docs/relevant-links/README.md)
   * [Fluidity website and whitepapers](https://fluidity.money/)
   * [Discord server](https://discord.gg/CNvpJk4HpC)
