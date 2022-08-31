@@ -2,11 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import ContinuousCarousel from "components/ContinuousCarousel";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { GeneralButton } from "components/Button";
-import ManualCarousel from "../../components/ManualCarousel";
+import { ContinuousCarousel, ManualCarousel, GeneralButton }from "surfing";
 import styles from "./Docs.module.scss";
 
 const Docs = () => {

@@ -1,14 +1,9 @@
-<<<<<<< HEAD
-//import { UseWalletProvider, useWallet } from "use-wallet";
-//import { InjectedConnector } from "@web3-react/injected-connector";
-=======
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this source
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { UseWalletProvider, useWallet } from "use-wallet";
-import { InjectedConnector } from "@web3-react/injected-connector";
->>>>>>> develop
+// import { UseWalletProvider, useWallet } from "use-wallet";
+// import { InjectedConnector } from "@web3-react/injected-connector";
 
 const EthProvider = ({children, chainId, ...props}: any) => {
   //const providerOptions = {

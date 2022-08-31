@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { useState } from "react";
+import { useState } from "react";
 import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
 import styles from "./Reward.module.scss";

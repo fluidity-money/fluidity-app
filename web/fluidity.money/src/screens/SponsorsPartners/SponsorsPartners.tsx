@@ -2,9 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import ContinuousCarousel from "../../components/ContinuousCarousel";
-import Partner from "../../components/Partner";
+import { ContinuousCarousel, Partner } from "surfing";
 import styles from "./SponsorsPartners.module.scss";
 
 const SponsorsPartners = () => {

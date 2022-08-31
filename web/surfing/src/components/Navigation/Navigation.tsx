@@ -1,5 +1,4 @@
-import { AnchorButton } from "components/Button";
-import React, { useEffect } from "react";
+import { AnchorButton } from "~/components/Button";
 import styles from "./Navigation.module.scss";
 
 interface INavigation {
@@ -12,8 +11,8 @@ const Navigation = ({ pageLocations, page }: INavigation) => {
 
   return (
     <div className={styles.container}>
-      {pageLocations.map((location) => (
-        <h4>
+      {pageLocations.map((location, i) => (
+        <h4 key={`anchor-${i}`}>
           <a href={`/${page}#${location.replace(/\s/g, "")}`}>
             {<AnchorButton>{location.toUpperCase()}</AnchorButton>}
           </a>

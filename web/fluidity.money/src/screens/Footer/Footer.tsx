@@ -2,10 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import { GeneralButton } from "../../components/Button";
-import ContinuousCarousel from "../../components/ContinuousCarousel";
-import FooterItem from "../../components/FooterItem";
+import { ContinuousCarousel, GeneralButton, FooterItem } from "surfing";
 import Socials from "../../components/Socials";
 import styles from "./Footer.module.scss";
 

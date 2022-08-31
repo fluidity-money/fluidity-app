@@ -2,8 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import ContinuousCarousel from "components/ContinuousCarousel";
-import React from "react";
+import { ContinuousCarousel } from "surfing";
 import styles from "./Socials.module.scss";
 
 const Socials = () => {

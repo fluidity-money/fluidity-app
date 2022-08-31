@@ -2,9 +2,8 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { ManualCarousel } from "surfing";
 import UseCase from "components/UseCase";
-import React from "react";
-import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./UseCases.module.scss";
 
 const UseCases = () => {

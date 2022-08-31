@@ -1,9 +1,7 @@
-import Navigation from "components/Navigation";
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this source
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
 import Demo from "../../screens/Demo";
 import FluidWars from "../../screens/FluidWars";
 import Footer from "../../screens/Footer";
@@ -12,6 +10,7 @@ import Roadmap from "../../screens/Roadmap";
 import Use from "../../screens/Use";
 import Wrap from "../../screens/Wrap";
 import Yield from "../../screens/Yield";
+import { Navigation } from "surfing";
 import styles from "./HowItWorksPage.module.scss";
 
 const HowItWorksPage = () => {

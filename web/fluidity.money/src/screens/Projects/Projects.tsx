@@ -2,9 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import { LinkButton } from "../../components/Button";
-import ManualCarousel from "../../components/ManualCarousel";
+import { LinkButton, ManualCarousel } from "surfing";
 import styles from "./Projects.module.scss";
 
 const Projects = () => {

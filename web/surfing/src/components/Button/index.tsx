@@ -1,11 +1,7 @@
-<<<<<<< HEAD
-=======
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this source
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import FilterButton from "./FilterButton";
->>>>>>> develop
 import AnchorButton from "./AnchorButton";
 import FilterButton from "./FilterButton";
 import GeneralButton from "./GeneralButton/GeneralButton";
