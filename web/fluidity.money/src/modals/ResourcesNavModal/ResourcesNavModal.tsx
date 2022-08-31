@@ -19,7 +19,7 @@ const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
     <div className={styles.container}>
       {navLinks.map((link) => (
         <h4>
-          <a onClick={() => handleModal()} href="/resources#articles">
+          <a onClick={() => handleModal()} href={`/resources#${link.children}`}>
             <LinkButton
               size={link.size}
               type={link.type}
@@ -30,6 +30,11 @@ const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
           </a>
         </h4>
       ))}
+      <div className={styles.socials}>
+        <img src="/assets/images/socials/twitter.svg" />
+        <img src="/assets/images/socials/discord.svg" />
+        <img src="/assets/images/socials/telegram.svg" />
+      </div>
     </div>
   );
 };

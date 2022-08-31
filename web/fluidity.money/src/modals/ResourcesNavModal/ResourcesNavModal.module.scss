@@ -3,9 +3,11 @@
 .container {
   width: 200px;
   height: 220px;
-  border-radius: 20px;
+  border-radius: 10px;
+  border: 0.5px solid grey;
   padding: 20px;
-  background-color: $fluidWhite;
+  background-color: $fluidBlack;
+  opacity: 0.9;
   color: $fluidBlack;
   position: absolute;
   top: 60px;
@@ -14,9 +16,13 @@
   flex-direction: column;
   justify-content: space-evenly;
   a {
-    color: $fluidBlack;
     &:hover {
       opacity: 0.8;
     }
   }
+}
+
+.socials {
+  display: flex;
+  gap: 15px;
 }
