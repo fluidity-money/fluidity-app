@@ -1,5 +1,5 @@
 import ReusableGrid from "components/ReusableGrid";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Use.module.scss";
@@ -27,7 +27,7 @@ const Use = () => {
         left={<div style={{ fontSize: 160 }}>🦍</div>}
         right={
           <HowItWorksTemplate header={header} info={info}>
-            Use assets
+            Fluid asset use-cases
           </HowItWorksTemplate>
         }
       />
@@ -37,10 +37,9 @@ const Use = () => {
 
 export default Use;
 
-const header =
-  "Fluid Assets distribute yield when used on any on-chain use-case. ";
+const header = " Fluid assets apportion yield when utilized on-chain.  ";
 
 const info = [
-  "Fluidity is realigning incentives by by rewarding utility and usage. Fluid assets are composable in nature and as a result, are able to promote both user and platform engagement through their reward distribution mechanisms, as well as allow for developers to customise and compose how and when these rewards are distributed. ",
-  "Use cases include marketplaces, decentralised exchanges, and any use-case where tokens are being transacted on chain.",
+  "Fluidity is realigning incentives by rewarding utility and usage. Fluid assets are composable by nature and can successfully promote both user and platform engagement through its novel reward distribution mechanisms. The fluid ecosystem also allows developers to compose how and when these rewards are distributed.  ",
+  "Use cases include marketplaces, decentralized exchanges, and any use-case where tokens are transacted on chain.",
 ];
