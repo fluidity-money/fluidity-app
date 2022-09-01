@@ -2,7 +2,9 @@ import hre from 'hardhat'
 import { mustEnv } from '../script-utils';
 import type { ethers } from 'ethers';
 
-const ENV_ORACLE = `FLU_ETHEREUM_ORACLE_ADDRESS`;
+const ENV_CONFIG = `FLU_ETHEREUM_WORKER_CONFIG_ADDRESS`;
+const ENV_OPERATOR = `FLU_ETHEREUM_OPERATOR_ADDRESS`;
+const ENV_COUNCIL = `FLU_ETHEREUM_EMERGENCY_COUNCIL_ADDRESS`;
 
 const ENV_TOKEN_BACKEND = `FLU_ETHEREUM_TOKEN_BACKEND`;
 
@@ -29,10 +31,14 @@ const main = async () => {
     const aaveFactory = await hre.ethers.getContractFactory("AaveLiquidityProvider");
 
     console.log(`deploying token with beacon address ${tokenAddress}`);
+
     const token = await hre.upgrades.deployBeaconProxy(
         tokenAddress,
         tokenFactory,
     );
+
+    await token.deployed();
+
     console.log(`token deployed to address ${token.address}`);
 
     let pool: ethers.Contract;
@@ -44,6 +50,7 @@ const main = async () => {
             poolAddress,
             compoundFactory,
             [cToken, token.address],
+            {initializer: "init(address, address)"},
         );
     } else if (backend === "aave") {
         const aToken = mustEnv(ENV_AAVE_ATOKEN);
@@ -53,6 +60,7 @@ const main = async () => {
             poolAddress,
             aaveFactory,
             [aavePool, aToken, token.address],
+            {initializer: "init(address, address, address)"},
         );
     } else {
         throw new Error(`Invalid token backend: ${backend} - should be 'compound' or 'aave'`);
@@ -60,20 +68,23 @@ const main = async () => {
     await pool.deployed();
     console.log(`liquidity pool deployed to address ${pool.address}`);
 
-    const oracle = mustEnv(ENV_ORACLE);
+    const workerConfig = mustEnv(ENV_CONFIG);
+    const operator = mustEnv(ENV_OPERATOR);
+    const council = mustEnv(ENV_COUNCIL);
     const decimals = mustEnv(ENV_DECIMALS);
     const symbol = mustEnv(ENV_SYMBOL);
     const name = mustEnv(ENV_NAME);
 
-    console.log(`initialising token with oracle ${oracle} decimals ${decimals} symbol ${symbol} name ${name}`);
+    console.log(`initialising token with config ${workerConfig} operator ${operator} council ${council} decimals ${decimals} symbol ${symbol} name ${name}`);
 
-    await token.deployed();
     await token.functions.init(
         pool.address,
         decimals,
         name,
         symbol,
-        oracle,
+        council,
+        operator,
+        workerConfig,
     );
 };
 

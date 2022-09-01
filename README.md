@@ -1,6 +1,6 @@
 ---
 description: Money designed to be moved
-cover: .gitbook/assets/background-2.png
+cover: https://fluidity.money/gitbook-content/background-2.png
 coverY: 0
 ---
 
@@ -21,8 +21,6 @@ With Fluidity, you are rewarded for doing what you already do. Using your favour
 **For Receivers**
 
 Senders and Receivers receive the reward amount if a transaction that qualifies wins. You could earn a life-changing amount of money just for receiving a payment. This creates an incentive for a counterparty to accept a Fluid Asset.
-
-**Got 4 minutes?** Check out a video overview of our product:
 
 ### Guides: Jump right in
 
@@ -67,4 +65,3 @@ Telegram: [https://t.me/fluiditymoney](https://t.me/fluiditymoney)
 Twitter: [https://twitter.com/fluiditymoney](https://twitter.com/fluiditymoney)
 
 Discord: [https://discord.gg/CNvpJk4HpC](https://discord.gg/CNvpJk4HpC)
->>>>>>> docs

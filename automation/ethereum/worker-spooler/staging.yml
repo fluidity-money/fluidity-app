@@ -29,16 +29,4 @@ SERVICES:
     ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.tusd
     ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.tusd
 
- - SPOOLER_FRAX:
-    SERVICE_NAME: microservice-ethereum-worker-spooler-frax
-    ENV_FLU_WORKER_ID: ethereum-staging-microservice-ethereum-worker-spooler-frax
-    ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.frax
-    ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.frax
-
- - SPOOLER_FEI:
-    SERVICE_NAME: microservice-ethereum-worker-spooler-fei
-    ENV_FLU_WORKER_ID: ethereum-staging-microservice-ethereum-worker-spooler-fei
-    ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.fei
-    ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.fei
-
 
