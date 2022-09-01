@@ -1,0 +1,26 @@
+.container {
+  width: 200px;
+  height: 220px;
+  border-radius: 10px;
+  border: 0.5px solid grey;
+  padding: 20px;
+  background-color: black;
+  opacity: 0.9;
+  color: black;
+  position: absolute;
+  top: 60px;
+  transform: translateX(105%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  a {
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.socials {
+  display: flex;
+  gap: 15px;
+}

@@ -9,12 +9,22 @@
 
   h1 {
     font-size: 36px;
+    @include max-560px {
+      font-size: 20px;
+    }
   }
   ul {
     display: flex;
+
     @include max-860px {
       flex-direction: column;
+      min-width: 232px;
     }
+
+    @include max-560px {
+      min-width: 155px;
+    }
+
     li {
       margin-left: 20px;
       display: flex;

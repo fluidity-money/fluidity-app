@@ -1,0 +1,21 @@
+.container {
+  cursor: pointer;
+  padding: 18px;
+  border: 0.5px solid white;
+  border-radius: 50%;
+}
+
+.burger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.span {
+  height: 1px;
+  width: 12px;
+  background-color: white;
+  border-radius: 40%;
+}

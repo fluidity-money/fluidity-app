@@ -30,33 +30,38 @@ export default UseCases;
 
 const items = [
   {
-    img: "/assets/images/useCaseIcons/globePaperAirplane.svg",
+    img: "/assets/images/useCaseIcons/forSenders.svg",
     title: "For senders",
-    info: "Every time you use a fluid asset in any use case, you are earning yield. Make purchases and send money as you normally would but with the potential to win rewards. ",
+    info: "Every time you use fluid assets in any use case, you earn yield. Make purchases and send money as you normally would, but with the added potential to win rewards.",
+  },
+  {
+    img: "/assets/images/useCaseIcons/forReceivers.svg",
+    title: "For receivers",
+    info: "Fluid assets incentivise adoption by rewarding counterparts to participate in the fluid economy.",
+  },
+  {
+    img: "/assets/images/useCaseIcons/assetsUtility.svg",
+    title: "Assets & utility",
+    info: "Fluid assets are composable by nature and can successfully promote both user and platform engagement through its novel reward distribution mechanisms. ",
   },
   {
     img: "/assets/images/useCaseIcons/sendReceive.svg",
-    title: "For receivers",
-    info: "Fluid assets incentivise adoption by rewarding counterparts to participate in the Fluid economy.",
-  },
-  {
-    img: "/assets/images/useCaseIcons/globePaperAirplane.svg",
-    title: "Assets & utility",
-    info: "Fluid assets are quite composable in nature and as a result, are able to promote both user and platform engagement through their reward distribution mechanisms... ",
-  },
-  {
-    img: "/assets/images/useCaseIcons/globePaperAirplane.svg",
     title: "Transactions & payments",
-    info: "Cashback programs and incentives have always been a consumer-facing affair. It is unusual to have counter-parties being rewarded and gaining yield through...",
+    info: "Cashback programs/incentives have always been single-sided, pro-consumer. Fluidity rectifies that by rewarding the recipient/counterparty with a cut of the yield.",
   },
   {
-    img: "/assets/images/useCaseIcons/globePaperAirplane.svg",
+    img: "/assets/images/useCaseIcons/metaverseGaming.svg",
     title: "Metaverse & gaming",
-    info: "The fluid layer rewards all forms of use cases. Games and meteverses are high velocity use cases that can benefit from adopting the Fluid Layer...",
+    info: "Fluidity rewards all forms of use cases. Gaming and metaverses are high-velocity use cases that can massively benefit from the fluid ecosystem.",
   },
   {
-    img: "/assets/images/useCaseIcons/globePaperAirplane.svg",
+    img: "/assets/images/useCaseIcons/decentralizedExchanges.svg",
     title: "Decentralized exchanges",
     info: "Transacting, trading and asset movement are integral activities within decentralised programs and their applications. Value transfers can greatly benefit from adopting the fluid layer. ",
+  },
+  {
+    img: "/assets/images/useCaseIcons/nfts.svg",
+    title: "NFTs",
+    info: "The Fluid Layer rewards all forms of use cases. Games and metaverses are high velocity use-cases that can highly benefit from adopting the Fluid Layer; allowing supplementary income sources..",
   },
 ];

@@ -1,4 +1,22 @@
-.container {
+.containerLeft {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 48px 0px;
+  gap: 24px;
+  width: 440px;
+  height: 160px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  img {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.containerRight {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -30,5 +48,6 @@
 
 .right {
   text-align: right;
-  align-items: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
