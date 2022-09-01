@@ -3,9 +3,9 @@
 // LICENSE_TRF.md file.
 
 import React, { ReactNode, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
 import { GeneralButton } from "../Button";
-import ResourcesNavModal from "../../../../fluidity.money/src/components/ResourcesNavModal";
+import NavBarModal from "../NavBarModal";
+
 import styles from "./NavBar.module.scss";
 
 interface IButton {
@@ -19,6 +19,7 @@ interface IButton {
 interface INavLinks {
   name: string;
   modal: boolean;
+  modalInfo?: IModalProps;
 }
 
 interface INavBarProps {
@@ -28,18 +29,16 @@ interface INavBarProps {
   navLinks: INavLinks[];
 }
 
-//tbd
-interface IModalNavLinkButtons {
+interface ILinkButton {
   children: string;
-  size: string;
-  type: string;
+  size: "small" | "medium" | "large";
+  type: "internal" | "external";
   handleClick: () => void;
 }
 
-// tbd
 interface IModalProps {
   navLinks: string[];
-  modalButtons: IModalNavLinkButtons[];
+  modalButtons: ILinkButton[];
 }
 
 const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
@@ -48,26 +47,29 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
     setModal(!modal);
   };
 
-  const navLinksTitles = navLinks.map((link) => {
+  const navLinksTitles = navLinks.map((link) => (
     <li>
-      <NavLink
-        to={`/${link.name.replace(/\s+/g, "")}`}
-        className={({ isActive }) => {
-          return isActive ? styles.active : "";
-        }}
+      <a
+        href={`/${link.name.replace(/\s+/g, "")}`}
+        className={
+          window.location.pathname.toString() ===
+          `/${link.name.replace(/\s+/g, "")}`
+            ? styles.active
+            : ""
+        }
       >
         {link.name.toUpperCase()}
-      </NavLink>
+      </a>
       {link.modal && (
         <button onClick={() => handleModal()}>
           <img
-            src="/assets/images/triangleDown.svg"
+            src="./src/assets/images/triangleDown.svg"
             alt="open resource options"
           />
         </button>
       )}
-    </li>;
-  });
+    </li>
+  ));
 
   return (
     <div className={styles.outerContainer}>
@@ -77,10 +79,10 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <div>
-              <Link to={"/"}>
+              <a href={"/"}>
                 {/* prop */}
                 <img src={logo} alt="home page" />
-              </Link>
+              </a>
             </div>
             {/* props */}
             <GeneralButton
@@ -98,7 +100,9 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
             <nav>
               <ul>{navLinksTitles as ReactNode}</ul>
             </nav>
-            {modal && <ResourcesNavModal handleModal={handleModal} />}
+            {modal && (
+              <NavBarModal handleModal={handleModal} navLinks={links} />
+            )}
           </div>
         </div>
       </div>
@@ -107,3 +111,30 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
 };
 
 export default NavBar;
+
+const links: ILinkButton[] = [
+  {
+    children: "articles",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "fluniversity",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "whitpapers",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "documentation",
+    size: "small",
+    type: "external",
+    handleClick: () => {},
+  },
+];

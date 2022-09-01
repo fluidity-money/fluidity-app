@@ -1,14 +1,12 @@
-@import "../../styles/config.scss";
-
 .container {
   width: 200px;
   height: 220px;
   border-radius: 10px;
   border: 0.5px solid grey;
   padding: 20px;
-  background-color: $fluidBlack;
+  background-color: black;
   opacity: 0.9;
-  color: $fluidBlack;
+  color: black;
   position: absolute;
   top: 60px;
   transform: translateX(105%);
