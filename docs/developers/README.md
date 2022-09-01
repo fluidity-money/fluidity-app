@@ -18,6 +18,6 @@ Fluid Assets support the following additional features:
 * Swapping in
 * Swapping out
 
-{% content-ref url="addresses.md" %}
-[addresses.md](addresses.md)
+{% content-ref url="addresses/" %}
+[addresses](addresses/)
 {% endcontent-ref %}
