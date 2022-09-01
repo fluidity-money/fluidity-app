@@ -71,7 +71,7 @@ const main = async () => {
     const symbol = mustEnv(ENV_SYMBOL);
     const name = mustEnv(ENV_NAME);
 
-    console.log(`initialising token with config ${workerConfig} oracle ${oracle} operator ${operator} council ${council} decimals ${decimals} symbol ${symbol} name ${name}`);
+    console.log(`initialising token with config ${workerConfig} operator ${operator} council ${council} decimals ${decimals} symbol ${symbol} name ${name}`);
 
     await token.deployed();
     await token.functions.init(

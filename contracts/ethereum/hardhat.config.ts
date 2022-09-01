@@ -111,6 +111,12 @@ if (process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_URL,
   };
 
+if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
+  networks['mainnet'] = {
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_MAINNET_URL,
+  };
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
