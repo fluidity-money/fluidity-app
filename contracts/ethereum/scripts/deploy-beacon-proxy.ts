@@ -31,10 +31,14 @@ const main = async () => {
     const aaveFactory = await hre.ethers.getContractFactory("AaveLiquidityProvider");
 
     console.log(`deploying token with beacon address ${tokenAddress}`);
+
     const token = await hre.upgrades.deployBeaconProxy(
         tokenAddress,
         tokenFactory,
     );
+
+    await token.deployed();
+
     console.log(`token deployed to address ${token.address}`);
 
     let pool: ethers.Contract;
@@ -73,7 +77,6 @@ const main = async () => {
 
     console.log(`initialising token with config ${workerConfig} operator ${operator} council ${council} decimals ${decimals} symbol ${symbol} name ${name}`);
 
-    await token.deployed();
     await token.functions.init(
         pool.address,
         decimals,
