@@ -151,14 +151,14 @@ func GetTvl(client *rpc.Provider, fluidityPubkey, tvlDataPubkey, solendPubkey, o
 	)
 
 	if err != nil {
+		if err := handleTransactionError(value); err != nil {
+			return 0, err
+		}
+
 		return 0, fmt.Errorf(
 			"failed to simulate logtvl transaction: %v",
 			err,
 		)
-	}
-
-	if err := handleTransactionError(value); err != nil {
-		return 0, err
 	}
 
 	simulateAccounts := value.Accounts

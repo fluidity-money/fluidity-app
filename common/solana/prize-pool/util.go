@@ -12,6 +12,10 @@ import (
 
 // handleTransactionError to handle a TVL transaction error response
 func handleTransactionError(value *rpc.SimulationValue) error {
+	if value == nil {
+		return nil
+	}
+
 	err := value.TransactionError
 	if err == nil {
 		return nil
@@ -20,7 +24,7 @@ func handleTransactionError(value *rpc.SimulationValue) error {
 	// check switchboard 0x2a error with the condition
 	// value.TransactionError["InstructionError"][1]["Custom"] == 42
 
-	errMap, ok := value.TransactionError.(map[string]interface{})
+	errMap, ok := (*err).(map[string]interface{})
 	if !ok || errMap["InstructionError"] == nil {
 		return logTvlError(err, value.Logs)
 	}
