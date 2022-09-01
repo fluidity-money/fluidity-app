@@ -3,6 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { LinkButton } from "components/Button";
+import useViewport from "hooks/useViewport";
 import React from "react";
 import styles from "./FooterItem.module.scss";
 
@@ -18,11 +19,25 @@ interface IFooterItemProps {
 }
 
 const FooterItem = ({ children, items }: IFooterItemProps) => {
+  const { width } = useViewport();
+  const firstBreakpoint = 620;
+  const secondBreakpoint = 560;
+
   const itemList = (
     <ul>
       {items.map((item) => (
         <li key={item.title}>
-          <LinkButton handleClick={() => {}} size="large" type={item.type}>
+          <LinkButton
+            handleClick={() => {}}
+            size={
+              width > firstBreakpoint
+                ? "large"
+                : width > secondBreakpoint && width < firstBreakpoint
+                ? "medium"
+                : "small"
+            }
+            type={item.type}
+          >
             {item.title}
           </LinkButton>
         </li>
