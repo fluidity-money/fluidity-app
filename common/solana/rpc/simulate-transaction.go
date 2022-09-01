@@ -15,7 +15,7 @@ import (
 
 type (
 	SimulationValue struct {
-		TransactionError interface{}     `json:"err"`
+		TransactionError *interface{}    `json:"err"`
 		Logs             []string        `json:"logs"`
 		Accounts         []types.Account `json:"accounts"`
 		UnitsConsumed    uint64          `json:"unitsConsumed"`
@@ -74,9 +74,9 @@ func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, 
 
 	value := simulationResponse.Value
 
-	if err_ := value.TransactionError; err_ != "" {
+	if err_ := value.TransactionError; err_ != nil {
 		return nil, fmt.Errorf(
-			"getAccountInfo returned error %v",
+			"simulateTransaction returned error %v",
 			err_,
 		)
 	}
