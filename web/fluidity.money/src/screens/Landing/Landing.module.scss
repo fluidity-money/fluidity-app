@@ -110,4 +110,11 @@
   @include max-1080px {
     margin-left: 10px;
   }
+  @include max-620px {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 20px;
+  }
 }
