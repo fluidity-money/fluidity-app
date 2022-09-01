@@ -4,8 +4,9 @@
 
 ### Ropsten
 
-| fUSDT                       | 0x26FC224B37952Bd12C792425F242E0B0a55453a6 |
+| Text                        | Value                                      |
 | --------------------------- | ------------------------------------------ |
+| fUSDT                       | 0x26FC224B37952Bd12C792425F242E0B0a55453a6 |
 | USDT                        | 0x110a13fc3efe6a245b50102d2d79b3e76125ae83 |
 | fUSDC                       | 0x2835Bed5dB82f84180eCBC7dE7C1944E154b1035 |
 | USDC                        | 0x07865c6e87b9f70255377e024ace6630c1eaa37f |
@@ -22,8 +23,9 @@
 
 ### Devnet
 
-| The program’s address                         | GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU |
+| Text                                          | Value                                        |
 | --------------------------------------------- | -------------------------------------------- |
+| The program’s address                         | GjRwsHMgCAX2QUrw64tyT9RQhqm28fmntNAjgxoaTztU |
 | The time to update the prize pool             | 1m                                           |
 | The TVL data account public key               | CAKG5gr5ZFGyEXb98pXMqUCdu8gqc5VtXxXkonpcZixW |
 | The Solend public key                         | ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx |
@@ -98,17 +100,17 @@
 | The name of the token                                       | fUSDC                                        |
 | The number of decimals in the token                         | 6                                            |
 | Data account                                                | Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce |
-| PDA                                                         |  |
-| Base token account                                          |   |
-| Fluid token account                                         |  |
-| Solend program                                              |   |
-| Collateral account                                          |  |
-| Reserve                                                     |  |
-| Reserve liquidity supply                                    |  |
-| Collateral mint                                             |  |
-| Lending market                                              |  |
-| Market authority                                            |  |
-| Collateral supply                                           |   |
+| PDA                                                         | CBrYRFyEwyn9gMPVFbRBwfcoU6JnViTEBaYyvFZGgZnc |
+| Base token account                                          | PwXvsW9wzK3cBryYa8xXNm9gfamfmDGdWUE9YLiuhHD |
+| Fluid token account                                         | 3GCJGw174tvJfP4vXrZ3Xoev1c9sG1HNzUep84AAPHoM |
+| Solend program                                              | So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo  |
+| Collateral account                                          | 8uXbxhRBGijWWgFhCw6kPAMHBBnqijwvKCZ1GGVLjErc |
+| Reserve                                                     | BgxfHJDzm44T7XG68MYKx7YisTjZu73tVovyZSjJMpmw |
+| Reserve liquidity supply                                    | 8SheGtsopRUDzdiD6v6BR9a6bqZ9QwywYQY99Fp5meNf |
+| Collateral mint                                             | 993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk |
+| Lending market                                              | 4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY |
+| Market authority                                            | DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby |
+| Collateral supply                                           | UtRy8gcEu9fCkDuUrU8EmC7Uc6FZy5NCwttzG7i6nkw  |
 
 #### USDT
 
@@ -124,7 +126,7 @@
 | The number of decimals in the token                         |  |
 | Data account                                                | DrKwQQrKcbNCLkVfAVasxk1j7ccCaXVfdVdS6RijRZo |
 | PDA                                                         |  |
-| Base token account                                          | Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB|
+| Base token account                                          | |
 | Fluid token account                                         |  |
 | Solend program                                              |  |
 | Collateral account                                          |  |
