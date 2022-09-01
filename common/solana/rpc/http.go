@@ -87,7 +87,7 @@ func (client Http) RawInvoke(method string, params interface{}) (json.RawMessage
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to make the request wirth the body given: %v",
+			"failed to make the request with the body given: %v",
 			err,
 		)
 	}
