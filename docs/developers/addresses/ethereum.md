@@ -2,6 +2,16 @@
 
 ## Mainnet
 
+### At a glance...
+
+| Token name | Address                                    |
+| ---------- | ------------------------------------------ |
+| fUSDT      | 0xADc234a4e90E2045f353F5d4fCdE66144d23b458 |
+| fUSDC      | 0x9d1089802eE608BA84C5c98211afE5f37F96B36C |
+| fDAI       | 0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387 |
+| fTUSD      | 0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F |
+| fFRAX      | 0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C |
+
 ### USDT
 
 | Text                        | Value                                      |

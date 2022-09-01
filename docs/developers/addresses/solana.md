@@ -1,4 +1,4 @@
-# Solana
+# ☀ Solana
 
 ## Devnet
 
@@ -80,7 +80,7 @@
 | The number of decimals in the token                         | 6                                            |
 | Data account                                                | Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce |
 | PDA                                                         | CBrYRFyEwyn9gMPVFbRBwfcoU6JnViTEBaYyvFZGgZnc |
-| Base token account                                          | PwXvsW9wzK3cBryYa8xXNm9gfamfmDGdWUE9YLiuhHD |
+| Base token account                                          | PwXvsW9wzK3cBryYa8xXNm9gfamfmDGdWUE9YLiuhHD  |
 | Fluid token account                                         | 3GCJGw174tvJfP4vXrZ3Xoev1c9sG1HNzUep84AAPHoM |
 | Solend program                                              | So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo  |
 | Collateral account                                          | 8uXbxhRBGijWWgFhCw6kPAMHBBnqijwvKCZ1GGVLjErc |

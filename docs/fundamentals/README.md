@@ -15,3 +15,11 @@
 {% content-ref url="understanding-the-usdfluid-governance-token/" %}
 [understanding-the-usdfluid-governance-token](understanding-the-usdfluid-governance-token/)
 {% endcontent-ref %}
+
+{% content-ref url="governance-structure.md" %}
+[governance-structure.md](governance-structure.md)
+{% endcontent-ref %}
+
+{% content-ref url="launch-restrictions-mint-limits.md" %}
+[launch-restrictions-mint-limits.md](launch-restrictions-mint-limits.md)
+{% endcontent-ref %}

@@ -1,2 +1,0 @@
-# 🏢 Fluidity architecture
-

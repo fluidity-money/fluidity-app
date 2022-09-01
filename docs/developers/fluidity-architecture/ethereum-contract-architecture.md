@@ -1,0 +1,2 @@
+# Ethereum contract architecture
+
