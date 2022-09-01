@@ -10,14 +10,14 @@ Fluidity is a mostly off-chain system that:
 
 Events produced on-chain are aggregated into winners below a threshold while rewarding massive winners instantly. A redemption feature is built into the webapp that lets users instantly redeem small prizes.
 
-{% content-ref url="worker-architecture.md" %}
-[worker-architecture.md](worker-architecture.md)
+{% content-ref url="fluidity-architecture/worker-architecture.md" %}
+[worker-architecture.md](fluidity-architecture/worker-architecture.md)
 {% endcontent-ref %}
 
-{% content-ref url="ethereum-contract-architecture.md" %}
-[ethereum-contract-architecture.md](ethereum-contract-architecture.md)
+{% content-ref url="fluidity-architecture/ethereum-contract-architecture.md" %}
+[ethereum-contract-architecture.md](fluidity-architecture/ethereum-contract-architecture.md)
 {% endcontent-ref %}
 
-{% content-ref url="solana-program-architecture.md" %}
-[solana-program-architecture.md](solana-program-architecture.md)
+{% content-ref url="fluidity-architecture/solana-program-architecture.md" %}
+[solana-program-architecture.md](fluidity-architecture/solana-program-architecture.md)
 {% endcontent-ref %}
