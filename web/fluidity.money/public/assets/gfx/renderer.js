@@ -1251,25 +1251,28 @@ Main.prototype = $extend(lime.app.Application.prototype,{
 			this.particles.set_flowScaleX(this.fluid.simToClipSpaceX(1));
 			this.particles.set_flowScaleY(this.fluid.simToClipSpaceY(1));
 			this.particles.stepParticlesShader.dragCoefficient.set_data(1);
-			ga("send","pageview",{ dimension2 : Std.string(gl.getExtension("OES_texture_float_linear") != null), dimension3 : Std.string(gl.getExtension("OES_texture_float") != null)});
+			
 			var clickCount = 0;
 			lime.ui.MouseEventManager.onMouseUp.add(function(x,y,button) {
 				clickCount++;
 			});
 			haxe.Timer.delay(function() {
-				var fps = _g.performanceMonitor.fpsSample.average;
-				ga("set",{ metric1 : Math.round(fps != null?fps:0), metric2 : _g.particleCount, metric3 : _g.fluidIterations, metric4 : _g.fluidScale, metric5 : _g.fluid.width * _g.fluid.height, metric6 : clickCount, dimension1 : _g.simulationQuality[0]});
+				var fps = _g.performanceMonitor.fpsSamgaple.average;
 			},6000);
 		}
 		this.lastTime = haxe.Timer.stamp();
 		const ref = this;
 		document.getElementById("root").addEventListener("mouseover",function(e) {
-			console.log(ref)
 			ref.mouse.setTo(e.clientX, e.clientY)
 			ref.mouseClipSpace.setTo(e.clientX / ref.windows[0].width * 2 - 1,(ref.windows[0].height - e.clientY) / ref.windows[0].height * 2 - 1);
 			ref.mousePointKnown = true;
-			ref.isMouseDown = true;
-			
+			ref.isMouseDown = true;	
+		},false, ref);
+		document.getElementById("root").addEventListener("mouseleave",function(e) {
+			ref.mouse.setTo(0, 0)
+			ref.mouseClipSpace.setTo(e.clientX / ref.windows[0].width * 2 - 1,(ref.windows[0].height - e.clientY) / ref.windows[0].height * 2 - 1);
+			ref.mousePointKnown = false;
+			ref.isMouseDown = false;
 		},false, ref);
 	}
 	,render: function(context) {
