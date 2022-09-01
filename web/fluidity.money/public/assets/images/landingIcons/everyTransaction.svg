@@ -1,28 +1,3 @@
-<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M40 61.25C51.736 61.25 61.25 51.736 61.25 40C61.25 28.2639 51.736 18.75 40 18.75C28.2639 18.75 18.75 28.2639 18.75 40C18.75 51.736 28.2639 61.25 40 61.25Z" stroke="url(#paint0_angular_828_7123)" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="2 2"/>
-<path d="M40 53.75C47.5939 53.75 53.75 47.5939 53.75 40C53.75 32.4061 47.5939 26.25 40 26.25C32.4061 26.25 26.25 32.4061 26.25 40C26.25 47.5939 32.4061 53.75 40 53.75Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M35.3345 41.8304L39.6646 44.3304L44.6646 35.6702" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<path d="M66.875 21.25C71.3623 21.25 75 17.6123 75 13.125C75 8.63769 71.3623 5 66.875 5C62.3877 5 58.75 8.63769 58.75 13.125C58.75 17.6123 62.3877 21.25 66.875 21.25Z" stroke="#4D4D4C" stroke-linecap="square"/>
-<path d="M63.7489 14.3083L66.5281 15.9128L69.7371 10.3545" stroke="#4D4D4C" stroke-linecap="square"/>
-<path d="M13.125 21.25C17.6123 21.25 21.25 17.6123 21.25 13.125C21.25 8.63769 17.6123 5 13.125 5C8.63769 5 5 8.63769 5 13.125C5 17.6123 8.63769 21.25 13.125 21.25Z" stroke="#4D4D4C" stroke-linecap="square"/>
-<path d="M9.99895 14.3083L12.7781 15.9128L15.9871 10.3545" stroke="#4D4D4C" stroke-linecap="square"/>
-<path d="M13.125 75C17.6123 75 21.25 71.3623 21.25 66.875C21.25 62.3877 17.6123 58.75 13.125 58.75C8.63769 58.75 5 62.3877 5 66.875C5 71.3623 8.63769 75 13.125 75Z" stroke="#4D4D4C" stroke-linecap="square"/>
-<path d="M9.99895 68.0583L12.7781 69.6628L15.9871 64.1045" stroke="#4D4D4C" stroke-linecap="square"/>
-<path d="M66.875 75C71.3623 75 75 71.3623 75 66.875C75 62.3877 71.3623 58.75 66.875 58.75C62.3877 58.75 58.75 62.3877 58.75 66.875C58.75 71.3623 62.3877 75 66.875 75Z" stroke="#4D4D4C" stroke-linecap="square"/>
-<path d="M63.7489 68.0583L66.5281 69.6628L69.7371 64.1045" stroke="#4D4D4C" stroke-linecap="square"/>
-<defs>
-<radialGradient id="paint0_angular_828_7123" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(40 40) rotate(119.592) scale(29.6917)">
-<stop stop-color="#F3B8D8"/>
-<stop offset="0.139053" stop-color="#B793E9"/>
-<stop offset="0.238718" stop-color="#9FD4F3"/>
-<stop offset="0.374927" stop-color="#FFD2C4"/>
-<stop offset="0.477914" stop-color="#FBF3F3"/>
-<stop offset="0.557645" stop-color="#D9ABDF"/>
-<stop offset="0.624089" stop-color="#AF9CE3"/>
-<stop offset="0.720431" stop-color="#AAE4E1"/>
-<stop offset="0.830062" stop-color="#C6EAD0"/>
-<stop offset="0.913116" stop-color="white"/>
-<stop offset="1" stop-color="#FDB5E4"/>
-</radialGradient>
-</defs>
-</svg>
+version https://git-lfs.github.com/spec/v1
+oid sha256:1c021a4c0142c1dff7b0e477eb4f547a633603eca40d1e1aa62315cb9203aeb9
+size 2648
