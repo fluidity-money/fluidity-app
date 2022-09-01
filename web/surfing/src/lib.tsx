@@ -3,4 +3,5 @@
 // LICENSE_TRF.md file.
 
 export * from './components';
-//export * from './util';
+export * from './util';
+
