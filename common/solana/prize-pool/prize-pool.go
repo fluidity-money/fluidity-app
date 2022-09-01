@@ -181,7 +181,7 @@ func GetTvl(client *rpc.Provider, fluidityPubkey, tvlDataPubkey, solendPubkey, o
 		)
 	}
 
-	err = borsh.Deserialize(&tvlAccount, bytes)
+	err = borsh.Deserialize(tvlAccount, bytes)
 
 	if err != nil {
 		return 0, fmt.Errorf(
