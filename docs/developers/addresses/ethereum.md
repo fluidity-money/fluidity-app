@@ -1,22 +1,5 @@
 # 💠 Ethereum
 
-## Ropsten
-
-| Text                        | Value                                      |
-| --------------------------- | ------------------------------------------ |
-| fUSDT                       | 0x26FC224B37952Bd12C792425F242E0B0a55453a6 |
-| USDT                        | 0x110a13fc3efe6a245b50102d2d79b3e76125ae83 |
-| fUSDC                       | 0x2835Bed5dB82f84180eCBC7dE7C1944E154b1035 |
-| USDC                        | 0x07865c6e87b9f70255377e024ace6630c1eaa37f |
-| fDAI                        | 0x5BA8d8e005aDe3A8333CF85c3bf2A0869d606569 |
-| DAI                         | 0x31F42841c2db5173425b5223809CF3A38FEde360 |
-| Compound Comptroller        | 0xcfa7b0e37f5ac60f3ae25226f5e39ec59ad26152 |
-| cUSDT                       | 0xF6958Cf3127e62d3EB26c79F4f45d3F3b2CcdeD4 |
-| cUSDC                       | 0x2973e69b20563bcc66dC63Bde153072c33eF37fe |
-| cDAI                        | 0xbc689667C13FB2a04f09272753760E38a95B998C |
-| Uniswap Price Anchor Oracle | 0xbef4e076a995c784be6094a432b9ca99b7431a3f |
-| Uniswap V2                  | 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D |
-
 ## Mainnet
 
 ### USDT
@@ -60,3 +43,20 @@
 | Decimals                | 18                                         |
 | Short name              | fDAI                                       |
 | Name                    | Fluid DAI                                  |
+
+## Ropsten
+
+| Text                        | Value                                      |
+| --------------------------- | ------------------------------------------ |
+| fUSDT                       | 0x26FC224B37952Bd12C792425F242E0B0a55453a6 |
+| USDT                        | 0x110a13fc3efe6a245b50102d2d79b3e76125ae83 |
+| fUSDC                       | 0x2835Bed5dB82f84180eCBC7dE7C1944E154b1035 |
+| USDC                        | 0x07865c6e87b9f70255377e024ace6630c1eaa37f |
+| fDAI                        | 0x5BA8d8e005aDe3A8333CF85c3bf2A0869d606569 |
+| DAI                         | 0x31F42841c2db5173425b5223809CF3A38FEde360 |
+| Compound Comptroller        | 0xcfa7b0e37f5ac60f3ae25226f5e39ec59ad26152 |
+| cUSDT                       | 0xF6958Cf3127e62d3EB26c79F4f45d3F3b2CcdeD4 |
+| cUSDC                       | 0x2973e69b20563bcc66dC63Bde153072c33eF37fe |
+| cDAI                        | 0xbc689667C13FB2a04f09272753760E38a95B998C |
+| Uniswap Price Anchor Oracle | 0xbef4e076a995c784be6094a432b9ca99b7431a3f |
+| Uniswap V2                  | 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D |
