@@ -44,7 +44,7 @@ const main = async () => {
             poolAddress,
             compoundFactory,
             [cToken, token.address],
-            {initializer: "init(address, address, address)"},
+            {initializer: "init(address, address)"},
         );
     } else if (backend === "aave") {
         const aToken = mustEnv(ENV_AAVE_ATOKEN);
