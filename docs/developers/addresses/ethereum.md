@@ -1,4 +1,4 @@
-# Ethereum
+# 💠 Ethereum
 
 ## Ropsten
 
@@ -35,8 +35,8 @@
 
 ### USDC
 
-| Text                        | Value                                      |
-| -------------------------- -| ------------------------------------------ |
+|                             | Value                                      |
+| --------------------------- | ------------------------------------------ |
 | Token address               | 0x9d1089802eE608BA84C5c98211afE5f37F96B36C |
 | WorkerConfig                | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
 | Compound liquidity provider | 0xE87Adc9D382Eee54C1eDE017D6E5C1324D59F457 |
@@ -50,7 +50,7 @@
 ### DAI
 
 | Text                    | Value                                      |
-| ------------------------| ------------------------------------------ |
+| ----------------------- | ------------------------------------------ |
 | Token address           | 0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387 |
 | WorkerConfig            | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
 | AAVE liquidity provider | 0xFC66c25dbDb0606e7F9cA1d2754Eb0A0f8306dA9 |
