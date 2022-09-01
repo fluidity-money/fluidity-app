@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
@@ -10,9 +14,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	prize_pool "github.com/fluidity-money/fluidity-app/common/solana/prize-pool"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 
-	"github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 const (
@@ -81,7 +85,14 @@ func main() {
 		switchboardPubkey = pubkeyFromEnv(EnvSwitchboardPubkey)
 	)
 
-	solanaClient := solanaRpc.New(rpcUrl)
+	solanaClient, err := rpc.New(rpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create solana call manager!"
+			k.Payload = err
+		})
+	}
 
 	payer, err := solana.WalletFromPrivateKeyBase58(payerPrikey)
 

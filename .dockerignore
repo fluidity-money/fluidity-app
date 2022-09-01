@@ -4,6 +4,7 @@ web
 tests
 contracts
 automation
+docs
 
 **/*.o
 **/*.out

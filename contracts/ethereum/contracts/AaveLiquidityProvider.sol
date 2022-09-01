@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 pragma solidity ^0.8.11;
 pragma abicoder v1;
 
@@ -9,27 +13,32 @@ import "./openzeppelin/SafeERC20.sol";
 contract AaveLiquidityProvider is LiquidityProvider {
     using SafeERC20 for IERC20;
 
-    bool private initialized_;
-    address public owner_;
-    IERC20 public underlying_;
+    /// @dev for migrations
+    uint256 private version_;
 
+    /// @dev the owner of this pool
+    address public owner_;
+
+    /// @dev token being invested
+    IERC20 public underlying_;
     LendingPoolAddressesProviderInterface public lendingPoolAddresses_;
     ATokenInterface public aToken_;
 
     /**
-     * @notice initializer function
+     * @notice initialiser function
      *
      * @param addressProvider address of the aave LendingPoolAddressesProvider contract
      * @param aToken address of the aToken
      * @param owner address of the account that owns this pool
      */
-    function initialize(
+    function init(
         address addressProvider,
         address aToken,
         address owner
     ) external {
-        require(initialized_ == false, "contract is already initialized");
-        initialized_ = true;
+        require(version_ == 0, "contract is already initialized");
+        version_ = 1;
+
         owner_ = owner;
 
         lendingPoolAddresses_ = LendingPoolAddressesProviderInterface(addressProvider);

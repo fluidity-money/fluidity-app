@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package solana
 
 import (
@@ -7,18 +11,16 @@ import (
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-
-	"github.com/gagliardetto/solana-go"
 )
 
 // TokenDetailsSolana containing information about tokens that we unpacked using
 // the environment variables
 type TokenDetailsSolana struct {
-	FluidMintPubkey   solana.PublicKey
-	ObligationPubkey  solana.PublicKey
-	ReservePubkey     solana.PublicKey
-	PythPubkey        solana.PublicKey
-	SwitchboardPubkey solana.PublicKey
+	FluidMintPubkey   PublicKey
+	ObligationPubkey  PublicKey
+	ReservePubkey     PublicKey
+	PythPubkey        PublicKey
+	SwitchboardPubkey PublicKey
 	TokenDecimals     *big.Rat
 	TokenName         string
 	Amount            float64
@@ -57,7 +59,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 			switchboard_ = trimWhitespace(tokenDetails_[6])
 		)
 
-		fluidMint, err := solana.PublicKeyFromBase58(fluidMint_)
+		fluidMint, err := PublicKeyFromBase58(fluidMint_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -70,7 +72,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 			})
 		}
 
-		obligation, err := solana.PublicKeyFromBase58(obligation_)
+		obligation, err := PublicKeyFromBase58(obligation_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -83,7 +85,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 			})
 		}
 
-		reserve, err := solana.PublicKeyFromBase58(reserve_)
+		reserve, err := PublicKeyFromBase58(reserve_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -96,7 +98,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 			})
 		}
 
-		pyth, err := solana.PublicKeyFromBase58(pyth_)
+		pyth, err := PublicKeyFromBase58(pyth_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -109,7 +111,7 @@ func GetTokensListSolana(tokensList_ string) []TokenDetailsSolana {
 			})
 		}
 
-		switchboard, err := solana.PublicKeyFromBase58(switchboard_)
+		switchboard, err := PublicKeyFromBase58(switchboard_)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

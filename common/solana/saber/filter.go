@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package saber
 
 import (
@@ -7,8 +11,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/common/solana"
+
 	solTypes "github.com/fluidity-money/fluidity-app/lib/types/solana"
-	"github.com/gagliardetto/solana-go"
+
 	"github.com/near/borsh-go"
 )
 

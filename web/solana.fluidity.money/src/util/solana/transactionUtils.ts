@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import { UseSolana } from "@saberhq/use-solana";
 import { PublicKey } from "@solana/web3.js";
 import { getATAAddressSync, Token } from "@saberhq/token-utils";
@@ -68,7 +72,7 @@ export const getFluidInstructionKeys = async (
       //data account
       pubkey: new PublicKey(dataAccount),
       isSigner: false,
-      isWritable: false,
+      isWritable: true,
     },
     {
       //token program

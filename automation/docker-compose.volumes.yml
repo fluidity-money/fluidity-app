@@ -1,9 +1,0 @@
----
-version: "3"
-
-volumes:
-  timescale-var-lib:
-    external: true
-
-  postgres-var-lib:
-    external: true

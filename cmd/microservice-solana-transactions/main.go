@@ -1,21 +1,22 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
 	"math/big"
 
+	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	solanaQueue "github.com/fluidity-money/fluidity-app/lib/queues/solana"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
-
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-solana-transactions/lib/solana"
-
-	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
-	solanaLibrary "github.com/gagliardetto/solana-go"
-	solanaRpc "github.com/gagliardetto/solana-go/rpc"
 )
 
 const (
@@ -56,7 +57,7 @@ func main() {
 		delay   = intFromEnvOrFatal(EnvRetryDelay)
 	)
 
-	solPythPubkey, err := solanaLibrary.PublicKeyFromBase58(
+	solPythPubkey, err := solanaLib.PublicKeyFromBase58(
 		solPythPubkeyString,
 	)
 
@@ -72,7 +73,14 @@ func main() {
 		})
 	}
 
-	solanaClient := solanaRpc.New(solanaRpcUrl)
+	solanaClient, err := rpc.New(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the Solana RPC client!"
+			k.Payload = err
+		})
+	}
 
 	LamportDecimalPlacesRat := big.NewRat(LamportDecimalPlaces, 1)
 
@@ -88,7 +96,7 @@ func main() {
 
 		if block == nil {
 			log.App(func(k *log.Log) {
-			    k.Format("Block %d was skipped by solana!", slot.Slot)
+				k.Format("Block %d was skipped by solana!", slot.Slot)
 			})
 
 			return
@@ -113,13 +121,14 @@ func main() {
 
 		parsedTransactions := make([]worker.SolanaApplicationTransaction, 0)
 
-		for _, transaction := range block.Transactions {
+		for i, transaction := range block.Transactions {
 			apps := solanaLib.ClassifyApplication(transaction, applications)
 
 			if len(apps) == 0 {
 				log.Debugf(
-					"Transaction %v didn't have an application classified!",
-					transaction,
+					"Transaction position %d block %v didn't have an application classified!",
+					i,
+					slot.Slot,
 				)
 
 				continue
@@ -134,9 +143,9 @@ func main() {
 			transactionFeeUsd.Mul(transactionFeeUsd, solanaPrice)
 
 			parsed := worker.SolanaApplicationTransaction{
-				Signature:   transaction.Transaction.Signatures[0],
-				Result:      transaction,
-				AdjustedFee: transactionFeeUsd,
+				Signature:    transaction.Transaction.Signatures[0],
+				Result:       transaction,
+				AdjustedFee:  transactionFeeUsd,
 				Applications: apps,
 			}
 

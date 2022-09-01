@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 pragma solidity ^0.8.11;
 pragma abicoder v1;
 
@@ -8,24 +12,30 @@ import "./openzeppelin/SafeERC20.sol";
 contract CompoundLiquidityProvider is LiquidityProvider {
     using SafeERC20 for IERC20;
 
-    bool private initialized_;
+    /// @dev for migrations
+    uint256 private version_;
+
+    /// @dev address that owns this pool
     address public owner_;
+
+    /// @dev token being invested
     IERC20 public underlying_;
 
     CErc20Interface public compoundToken_;
 
     /**
-     * @notice initializer function
+     * @notice initialiser function
      *
      * @param compoundToken address of the compound cToken
      * @param owner address of the account that owns this pool
      */
-    function initialize(
+    function init(
         address compoundToken,
         address owner
     ) external {
-        require(initialized_ == false, "contract is already initialized");
-        initialized_ = true;
+        require(version_ == 0, "contract is already initialized");
+        version_ = 1;
+
         owner_ = owner;
 
         compoundToken_ = CErc20Interface(compoundToken);

@@ -1,3 +1,7 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
@@ -6,12 +10,12 @@ import (
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/cmd/connector-solana-amqp/lib/queue"
+	solanaRpc "github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/cmd/connector-solana-amqp/lib/redis"
-	"github.com/fluidity-money/fluidity-app/cmd/connector-solana-amqp/lib/solana"
 )
 
 const (
@@ -31,10 +35,11 @@ const (
 	EnvStartingSlot = `FLU_SOLANA_STARTING_SLOT`
 )
 
-func updateConfirmedBlocksFrom(rpcUrl string, from uint64) (uint64, error) {
+func updateConfirmedBlocksFrom(client *solanaRpc.Provider, from uint64) (uint64, error) {
 	var lastBlock uint64 = 0
+
 	for {
-		blocks, err := solana.GetConfirmedBlocks(rpcUrl, from, BlockPageLength)
+		blocks, err := client.GetConfirmedBlocks(from, BlockPageLength)
 
 		if err != nil {
 			return 0, fmt.Errorf("Failed to get confirmed blocks! %w", err)
@@ -79,9 +84,6 @@ func main() {
 	var (
 		solanaWsUrl  = util.PickEnvOrFatal(EnvSolanaWsUrl)
 		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
-
-		slotsChan = make(chan types.Slot)
-		errChan   = make(chan error)
 	)
 
 	var (
@@ -89,7 +91,25 @@ func main() {
 		startingBlockEnv = os.Getenv(EnvStartingSlot)
 	)
 
-	latestSlot, err := solana.GetLatestSlot(solanaRpcUrl)
+	solanaHttp, err := solanaRpc.New(solanaRpcUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the HTTP client!"
+			k.Payload = err
+		})
+	}
+
+	solanaWebsocket, err := solanaRpc.NewWebsocket(solanaWsUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to create the websocket client!"
+			k.Payload = err
+		})
+	}
+
+	latestSlot, err := solanaHttp.GetLatestSlot()
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -131,56 +151,47 @@ func main() {
 		startingBlock = startingBlock - 1
 	}
 
-	solanaSubscription, err := solana.SubscribeSlots(solanaWsUrl, slotsChan, errChan)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to subscribe to solana events!"
-			k.Payload = err
-		})
-	}
-
-	defer solanaSubscription.Close()
-
 	latestBlockSeen := startingBlock - 1
 
-	for {
-		select {
-		case <-slotsChan:
-			log.Debug(func(k *log.Log) {
-				k.Message = "Got a new slot from solana!"
-			})
+	log.Debug(func(k *log.Log) {
+		k.Message = "Starting to subscribe to slots..."
+		k.Payload = err
+	})
 
-			latestBlockSent, err := updateConfirmedBlocksFrom(solanaRpcUrl, latestBlockSeen+1)
+	solanaWebsocket.SubscribeSlots(func(slot types.Slot) {
+		nextBlock := latestBlockSeen+1
 
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to fetch confirmed blocks!"
-					k.Payload = err
-				})
-			}
+		log.Debug(func(k *log.Log) {
+			k.Format(
+				"Got a new slot from solana - next block is %v",
+				nextBlock,
+			)
+		})
 
-			if latestBlockSent > latestBlockSeen {
-				latestBlockSeen = latestBlockSent
+		latestBlockSent, err := updateConfirmedBlocksFrom(
+			solanaHttp,
+			nextBlock,
+		)
 
-				redis.WriteLastBlock(RedisBlockKey, latestBlockSeen)
-			} else {
-				log.Debug(func(k *log.Log) {
-					k.Format(
-						"Last seen block is before what we think we've sent! We can see %d, we've sent %d!",
-						latestBlockSeen,
-						latestBlockSent,
-					)
-				})
-			}
-
-		case err := <-errChan:
+		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Error from the Solana websocket!"
+				k.Message = "Failed to fetch confirmed blocks!"
 				k.Payload = err
 			})
-
-			return
 		}
-	}
+
+		if latestBlockSent > latestBlockSeen {
+			latestBlockSeen = latestBlockSent
+
+			redis.WriteLastBlock(RedisBlockKey, latestBlockSeen)
+		} else {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Last seen block is before what we think we've sent! We can see %d, we've sent %d!",
+					latestBlockSeen,
+					latestBlockSent,
+				)
+			})
+		}
+	})
 }
