@@ -7,9 +7,11 @@ package main
 import (
 	"crypto/ecdsa"
 	"encoding/json"
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -205,4 +207,14 @@ func sendEmission(emission *worker.Emission) {
 	queue.SendMessage(worker.TopicEmissions, emission)
 
 	log.Debugf("Emission: %s", emission)
+}
+
+func concatenatePastTransfers(blocks []uint64, transactionCounts []int) string {
+	var buf strings.Builder
+
+	for i, block := range blocks {
+		fmt.Fprintf(&buf, "%v:%v,", block, transactionCounts[i])
+	}
+
+	return buf.String()
 }
