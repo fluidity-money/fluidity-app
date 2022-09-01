@@ -1,15 +1,26 @@
+@import "../../../src/styles/config.scss";
+
 .containerLeft {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 48px 0px;
   gap: 24px;
-  width: 440px;
+  max-width: 440px;
   height: 160px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   flex: none;
   order: 0;
   align-self: stretch;
+
+  @include max-1080px {
+    gap: 5px;
+  }
+
+  @include max-900px {
+    height: 100px;
+  }
+
   img {
     width: 64px;
     height: 64px;
@@ -22,12 +33,22 @@
   align-items: center;
   padding: 48px 0px;
   gap: 24px;
-  width: 440px;
+  max-width: 440px;
   height: 160px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   flex: none;
   order: 0;
   align-self: stretch;
+  justify-content: flex-end;
+
+  @include max-1080px {
+    gap: 10px;
+  }
+
+  @include max-900px {
+    height: 100px;
+  }
+
   img {
     width: 64px;
     height: 64px;
@@ -35,15 +56,25 @@
 }
 
 .text {
-  width: 352px;
+  max-width: 352px;
   height: 48px;
   font-style: normal;
   font-weight: 400;
   font-size: 20px;
   line-height: 120%;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   letter-spacing: 0.01em;
+  @include max-1205px {
+    font-size: 15px;
+  }
+  @include max-900px {
+    font-size: 10px;
+  }
+
+  @include max-620px {
+    font-size: 20px;
+  }
 }
 
 .right {

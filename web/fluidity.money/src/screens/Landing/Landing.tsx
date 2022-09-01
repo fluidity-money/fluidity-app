@@ -8,6 +8,7 @@ import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
 import IntroTile from "components/IntroTile";
+import useViewport from "hooks/useViewport";
 
 const Landing = () => {
   /* 
@@ -43,6 +44,9 @@ const Landing = () => {
   //   observer.observe(myRef.current as Element);
   // }, []);
 
+  const { width } = useViewport();
+  const breakpoint = 620;
+
   return (
     <div className={`${styles.containerLanding}`}>
       <motion.div className={styles.content}>
@@ -55,6 +59,19 @@ const Landing = () => {
           rewarding people for using their crypto.
         </motion.h1>
         <div className={styles.tiles}>
+          {width < breakpoint && (
+            <motion.div
+              className={styles.video}
+              initial={{ y: -150, scale: 1 }}
+              animate={{
+                opacity: 1,
+                y: [-150, -150, -150, 0],
+                scale: [1, 1, 1, 0.8],
+              }}
+              transition={{ duration: 4, type: "tween" }}
+            ></motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
@@ -83,45 +100,49 @@ const Landing = () => {
               qualifies as a reward
             </IntroTile>
           </motion.div>
-          <motion.div
-            className={styles.video}
-            initial={{ y: -150, scale: 1 }}
-            animate={{
-              opacity: 1,
-              y: [-150, -150, -150, 0],
-              scale: [1, 1, 1, 0.8],
-            }}
-            transition={{ duration: 4, type: "tween" }}
-          ></motion.div>
+          {width > breakpoint && (
+            <motion.div
+              className={styles.video}
+              initial={{ y: -150, scale: 1 }}
+              animate={{
+                opacity: 1,
+                y: [-150, -150, -150, 0],
+                scale: [1, 1, 1, 0.8],
+              }}
+              transition={{ duration: 4, type: "tween" }}
+            ></motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 4, type: "tween" }}
-            className={styles.right}
+            className={width < breakpoint ? styles.left : styles.right}
           >
             <IntroTile
               img={"/assets/images/landingIcons/expectedOutcome.svg"}
-              side={"right"}
+              side={width < breakpoint ? "left" : "right"}
             >
               Fluidity improves your expected <br />
               outcome over time
             </IntroTile>
             <IntroTile
               img={"/assets/images/useCaseIcons/forReceivers.svg"}
-              side={"right"}
+              side={width < breakpoint ? "left" : "right"}
             >
               Rewards can range from cents
               <br /> to millions
             </IntroTile>
             <IntroTile
               img={"/assets/images/landingIcons/scalingEcosystem.svg"}
-              side={"right"}
+              side={width < breakpoint ? "left" : "right"}
             >
               Scaling ecosystem
             </IntroTile>
           </motion.div>
         </div>
       </motion.div>
+
       <motion.div
         className={styles.carousel}
         initial={{ opacity: 0, y: "100vh" }}
