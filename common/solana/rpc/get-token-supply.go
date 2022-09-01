@@ -31,7 +31,9 @@ type GetTokenSupplyResult struct {
 }
 
 func (s *Provider) GetTokenSupply(mint solana.PublicKey, commitment string) (*GetTokenSupplyResult, error) {
-	params := []interface{}{}
+	params := []interface{}{
+		mint.String(),
+	}
 
 	if commitment != "" {
 		params = append(params, map[string]string{
