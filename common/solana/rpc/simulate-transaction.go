@@ -75,7 +75,7 @@ func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, 
 	value := simulationResponse.Value
 
 	if err_ := value.TransactionError; err_ != nil {
-		return nil, fmt.Errorf(
+		return &value, fmt.Errorf(
 			"simulateTransaction returned error %v",
 			err_,
 		)
