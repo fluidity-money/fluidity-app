@@ -2,7 +2,7 @@
 
 At the core of Fluidity lies Fluid Assets, which pay yield when you use them.&#x20;
 
-A Fluid Asset is a wrapped standard (ERC-20, sol) token that represents an underlying principal token.&#x20;
+A Fluid Asset is a wrapped standard (ERC-20, SPL) token that represents an underlying principal token.&#x20;
 
 A novel property of Fluid Assets is that they expose users to randomly paid rewards or yield when they are used (sent or received).
 
