@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="Cache-Control" content="no-cache" />
-
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
@@ -17,37 +16,70 @@
 
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="icon" href="logo.png" />
-
-        <meta
-         name="description"
-         content="Money designed to be moved. With Fluidity, every spend is an opportunity to win a reward."
-        />
-        <meta
-            property="og:description"
-            content="Money designed to be moved. With Fluidity, every spend is an opportunity to win a reward."
-        />
-        <meta property="og:title" content="Fluidity Wallet" />
-        <meta property="og:url" content="%PUBLIC_URL%" />
-        <meta
-            property="og:image"
-            content="%PUBLIC_URL%/img/FluidityOpenGraph.svg"
-        />
-        <script async src="https://www.google-analytics.com/analytics.js"></script>
-        <style>
-          #root {
-            position : absolute;
-            z-Index: 1;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom:5;	
-          }
-       </style>
-    </head>
-    <body>
-		<div class="fluid"></div>
-		<div id="root"></div>
-		<div id="modal"></div>
-		<script type="text/javascript" src="./assets/gfx/renderer.js"></script>
-    </body>
+      <meta
+        name="description"
+        content="Money designed to be moved. With Fluidity, every spend is an opportunity to win a reward."
+      />
+      <meta
+          property="og:description"
+          content="Money designed to be moved. With Fluidity, every spend is an opportunity to win a reward."
+      />
+      <meta property="og:title" content="Fluidity Wallet" />
+      <meta property="og:url" content="%PUBLIC_URL%" />
+      <meta
+          property="og:image"
+          content="%PUBLIC_URL%/img/FluidityOpenGraph.svg"
+      />
+      <script async src="https://www.google-analytics.com/analytics.js"></script>
+      <style>
+		  #root {
+				position : absolute;
+				z-Index: 1;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom:5;	
+      }
+    </style>
+	<script type="text/javascript" src="./assets/gfx/renderer.js"></script>
+	<script>
+		window.addEventListener ("touchmove", function (event) { event.preventDefault (); }, false);
+		if (typeof window.devicePixelRatio != 'undefined' && window.devicePixelRatio > 2) {
+			var meta = document.getElementById ("viewport");
+			meta.setAttribute ('content', 'width=device-width, initial-scale=' + (2 / window.devicePixelRatio) + ', user-scalable=no');
+		}
+	</script>
+	<style>
+		html,body { margin: 0; padding: 0; height: 100%;}
+		#fluid { 
+			background: #000000;
+      position: fixed;
+      top:0;
+      left: 0;
+			width: 100%;
+			height: 100%;
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			cursor: pointer;
+		}
+	</style>
+	<script>
+	  (function(i,s,o,g,r,a,m){i['']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','','ga');
+	</script>
+</head>
+<body>
+	<div id="fluid"></div>
+  <div id="root"></div>
+	<div id="modal"></div>
+	<script type="text/javascript">
+		lime.embed ("fluid", 0, 0, "FFFFFF");
+	</script>
+</body>
 </html>
