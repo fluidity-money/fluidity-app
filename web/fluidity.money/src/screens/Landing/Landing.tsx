@@ -44,7 +44,7 @@ const Landing = () => {
   // }, []);
 
   return (
-    <div className={`${styles.container}`}>
+    <div className={`${styles.containerLanding}`}>
       <motion.div className={styles.content}>
         <motion.h1
           initial={{ opacity: 0, y: "-100vh" }}

@@ -6,7 +6,7 @@
   padding-top: 90px;
   width: 100%;
   min-height: 850px;
-
+  background-color: $fluidBlack;
   @include max-860px {
     flex-direction: column;
   }
