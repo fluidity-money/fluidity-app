@@ -1,12 +1,194 @@
-(function (console, $global) { "use strict";
-let $hxClasses = {},$estr = function() { return js_Boot.__string_rec(this,''); };
+(function ($hx_exports) { "use strict";
+$hx_exports.lime = $hx_exports.lime || {};
+var console = (1,eval)('this').console || {log:function(){}};
+var $hxClasses = {},$estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
-	function Inherit() {} Inherit.prototype = from; let proto = new Inherit();
-	for (let name in fields) proto[name] = fields[name];
+	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
+	for (var name in fields) proto[name] = fields[name];
 	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
 }
-let EReg = function(r,opt) {
+var ApplicationMain = function() { };
+$hxClasses["ApplicationMain"] = ApplicationMain;
+ApplicationMain.__name__ = true;
+ApplicationMain.create = function() {
+	ApplicationMain.preloader = new lime.app.Preloader();
+	ApplicationMain.preloader.onComplete = ApplicationMain.start;
+	ApplicationMain.preloader.create(ApplicationMain.config);
+	var urls = [];
+	var types = [];
+	ApplicationMain.preloader.load(urls,types);
+};
+ApplicationMain.main = function() {
+	ApplicationMain.config = { antialiasing : 0, background : 16777215, borderless : false, depthBuffer : false, fps : 0, fullscreen : false, height : 0, orientation : "", resizable : true, stencilBuffer : false, title : "WebGL Fluid Experiment", vsync : true, width : 0};
+};
+ApplicationMain.start = function() {
+	ApplicationMain.app = new Main();
+	ApplicationMain.app.create(ApplicationMain.config);
+	var result = ApplicationMain.app.exec();
+};
+var lime = {};
+lime.AssetLibrary = function() {
+};
+$hxClasses["lime.AssetLibrary"] = lime.AssetLibrary;
+lime.AssetLibrary.__name__ = true;
+lime.AssetLibrary.prototype = {
+	exists: function(id,type) {
+		return false;
+	}
+	,getAudioBuffer: function(id) {
+		return null;
+	}
+	,getBytes: function(id) {
+		return null;
+	}
+	,getFont: function(id) {
+		return null;
+	}
+	,getImage: function(id) {
+		return null;
+	}
+	,getPath: function(id) {
+		return null;
+	}
+	,getText: function(id) {
+		var bytes = this.getBytes(id);
+		if(bytes == null) return null; else return bytes.readUTFBytes(bytes.length);
+	}
+	,isLocal: function(id,type) {
+		return true;
+	}
+	,list: function(type) {
+		return null;
+	}
+	,load: function(handler) {
+		handler(this);
+	}
+	,loadAudioBuffer: function(id,handler) {
+		handler(this.getAudioBuffer(id));
+	}
+	,loadBytes: function(id,handler) {
+		handler(this.getBytes(id));
+	}
+	,loadFont: function(id,handler) {
+		handler(this.getFont(id));
+	}
+	,loadImage: function(id,handler) {
+		handler(this.getImage(id));
+	}
+	,loadText: function(id,handler) {
+		var callback = function(bytes) {
+			if(bytes == null) handler(null); else handler(bytes.readUTFBytes(bytes.length));
+		};
+		this.loadBytes(id,callback);
+	}
+	,__class__: lime.AssetLibrary
+};
+var DefaultAssetLibrary = function() {
+	this.type = new haxe.ds.StringMap();
+	this.path = new haxe.ds.StringMap();
+	this.className = new haxe.ds.StringMap();
+	lime.AssetLibrary.call(this);
+	var id;
+};
+$hxClasses["DefaultAssetLibrary"] = DefaultAssetLibrary;
+DefaultAssetLibrary.__name__ = true;
+DefaultAssetLibrary.__super__ = lime.AssetLibrary;
+DefaultAssetLibrary.prototype = $extend(lime.AssetLibrary.prototype,{
+	exists: function(id,type) {
+		var requestedType;
+		if(type != null) requestedType = js.Boot.__cast(type , String); else requestedType = null;
+		var assetType = this.type.get(id);
+		if(assetType != null) {
+			if(assetType == requestedType || (requestedType == "SOUND" || requestedType == "MUSIC") && (assetType == "MUSIC" || assetType == "SOUND")) return true;
+			if(requestedType == "BINARY" || requestedType == null || assetType == "BINARY" && requestedType == "TEXT") return true;
+		}
+		return false;
+	}
+	,getAudioBuffer: function(id) {
+		return null;
+	}
+	,getBytes: function(id) {
+		var bytes = null;
+		var data;
+		data = ((function($this) {
+			var $r;
+			var key = $this.path.get(id);
+			$r = lime.app.Preloader.loaders.get(key);
+			return $r;
+		}(this))).data;
+		if(typeof(data) == "string") {
+			bytes = new lime.utils.ByteArray();
+			bytes.writeUTFBytes(data);
+		} else if(js.Boot.__instanceof(data,lime.utils.ByteArray)) bytes = data; else bytes = null;
+		if(bytes != null) {
+			bytes.position = 0;
+			return bytes;
+		} else return null;
+	}
+	,getFont: function(id) {
+		return null;
+	}
+	,getImage: function(id) {
+		return lime.graphics.Image.fromImageElement((function($this) {
+			var $r;
+			var key = $this.path.get(id);
+			$r = lime.app.Preloader.images.get(key);
+			return $r;
+		}(this)));
+	}
+	,getPath: function(id) {
+		return this.path.get(id);
+	}
+	,getText: function(id) {
+		var bytes = null;
+		var data;
+		data = ((function($this) {
+			var $r;
+			var key = $this.path.get(id);
+			$r = lime.app.Preloader.loaders.get(key);
+			return $r;
+		}(this))).data;
+		if(typeof(data) == "string") return data; else if(js.Boot.__instanceof(data,lime.utils.ByteArray)) bytes = data; else bytes = null;
+		if(bytes != null) {
+			bytes.position = 0;
+			return bytes.readUTFBytes(bytes.length);
+		} else return null;
+	}
+	,isLocal: function(id,type) {
+		var requestedType;
+		if(type != null) requestedType = js.Boot.__cast(type , String); else requestedType = null;
+		return true;
+	}
+	,list: function(type) {
+		var requestedType;
+		if(type != null) requestedType = js.Boot.__cast(type , String); else requestedType = null;
+		var items = [];
+		var $it0 = this.type.keys();
+		while( $it0.hasNext() ) {
+			var id = $it0.next();
+			if(requestedType == null || this.exists(id,type)) items.push(id);
+		}
+		return items;
+	}
+	,loadAudioBuffer: function(id,handler) {
+		handler(this.getAudioBuffer(id));
+	}
+	,loadBytes: function(id,handler) {
+		handler(this.getBytes(id));
+	}
+	,loadImage: function(id,handler) {
+		handler(this.getImage(id));
+	}
+	,loadText: function(id,handler) {
+		var callback = function(bytes) {
+			if(bytes == null) handler(null); else handler(bytes.readUTFBytes(bytes.length));
+		};
+		this.loadBytes(id,callback);
+	}
+	,__class__: DefaultAssetLibrary
+});
+var EReg = function(r,opt) {
 	opt = opt.split("u").join("");
 	this.r = new RegExp(r,opt);
 };
@@ -19,879 +201,92 @@ EReg.prototype = {
 		this.r.s = s;
 		return this.r.m != null;
 	}
-	,matched: function(n) {
-		let tmp;
-		if(this.r.m != null && n >= 0 && n < this.r.m.length) tmp = this.r.m[n]; else throw new js__$Boot_FluidError("EReg::matched");
-		return tmp;
-	}
-	,matchedRight: function() {
-		if(this.r.m == null) throw new js__$Boot_FluidError("No string matched");
-		let sz = this.r.m.index + this.r.m[0].length;
-		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
-	}
-	,matchedPos: function() {
-		if(this.r.m == null) throw new js__$Boot_FluidError("No string matched");
-		return { pos : this.r.m.index, len : this.r.m[0].length};
-	}
-	,replace: function(s,by) {
-		return s.replace(this.r,by);
-	}
 	,__class__: EReg
 };
-let GPUCapabilities = function() { };
-$hxClasses["GPUCapabilities"] = GPUCapabilities;
-GPUCapabilities.__name__ = true;
-GPUCapabilities.get_writeToFloat = function() {
-	if(GPUCapabilities.get_extTextureFloat() == null) return false;
-	let texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : 5126, filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
-	let framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
-	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
-	let isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
-	flu_modules_opengl_web_GL.current_context.deleteTexture(texture);
-	flu_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
-	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,null);
-	return isValid;
-};
-GPUCapabilities.get_writeToHalfFloat = function() {
-	if(GPUCapabilities.get_extTextureHalfFloat() == null) return false;
-	let texture = gltoolbox_TextureTools.createTexture(2,2,{ channelType : 6408, dataType : GPUCapabilities.get_HALF_FLOAT(), filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4});
-	let framebuffer = flu_modules_opengl_web_GL.current_context.createFramebuffer();
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,framebuffer);
-	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,texture,0);
-	let isValid = flu_modules_opengl_web_GL.current_context.checkFramebufferStatus(36160) == 36053;
-	flu_modules_opengl_web_GL.current_context.deleteTexture(texture);
-	flu_modules_opengl_web_GL.current_context.deleteFramebuffer(framebuffer);
-	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,null);
-	return isValid;
-};
-GPUCapabilities.get_floatTextureLinear = function() {
-	if(GPUCapabilities._floatTextureLinear == null) GPUCapabilities._floatTextureLinear = GPUCapabilities.get_extTextureFloatLinear() != null;
-	return GPUCapabilities._floatTextureLinear;
-};
-GPUCapabilities.get_halfFloatTextureLinear = function() {
-	if(GPUCapabilities._halfFloatTextureLinear == null) GPUCapabilities._halfFloatTextureLinear = GPUCapabilities.get_extTextureHalfFloatLinear() != null;
-	return GPUCapabilities._halfFloatTextureLinear;
-};
-GPUCapabilities.get_HALF_FLOAT = function() {
-	if(GPUCapabilities._HALF_FLOAT == null) {
-		let ext = GPUCapabilities.get_extTextureHalfFloat();
-		if(ext != null) GPUCapabilities._HALF_FLOAT = ext.HALF_FLOAT_OES; else GPUCapabilities._HALF_FLOAT = 36193;
-	}
-	return GPUCapabilities._HALF_FLOAT;
-};
-GPUCapabilities.get_extTextureFloat = function() {
-	if(GPUCapabilities._extTextureFloat == null) GPUCapabilities._extTextureFloat = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_float");
-	return GPUCapabilities._extTextureFloat;
-};
-GPUCapabilities.get_extTextureHalfFloat = function() {
-	if(GPUCapabilities._extTextureHalfFloat == null) GPUCapabilities._extTextureHalfFloat = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_half_float");
-	return GPUCapabilities._extTextureHalfFloat;
-};
-GPUCapabilities.get_extTextureFloatLinear = function() {
-	if(GPUCapabilities._extTextureFloatLinear == null) GPUCapabilities._extTextureFloatLinear = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_float_linear");
-	return GPUCapabilities._extTextureFloatLinear;
-};
-GPUCapabilities.get_extTextureHalfFloatLinear = function() {
-	if(GPUCapabilities._extTextureHalfFloatLinear == null) GPUCapabilities._extTextureHalfFloatLinear = flu_modules_opengl_web_GL.current_context.getExtension("OES_texture_half_float_linear");
-	return GPUCapabilities._extTextureHalfFloatLinear;
-};
-let GPUFluid = function(width,height,cellSize,solverIterations) {
+var GPUFluid = function(gl,width,height,cellSize,solverIterations) {
 	if(solverIterations == null) solverIterations = 18;
 	if(cellSize == null) cellSize = 8;
-	this.clearPressureShader = new ClearPressure();
-	this.clearVelocityShader = new ClearVelocity();
 	this.pressureGradientSubstractShader = new PressureGradientSubstract();
 	this.pressureSolveShader = new PressureSolve();
 	this.divergenceShader = new Divergence();
-	this.advectVelocityShader = new AdvectVelocity();
 	this.advectShader = new Advect();
-	this.floatDye = false;
-	this.floatDivergence = false;
-	this.floatPressure = false;
-	this.floatVelocity = false;
+	this.gl = gl;
 	this.width = width;
 	this.height = height;
 	this.solverIterations = solverIterations;
 	this.aspectRatio = this.width / this.height;
 	this.cellSize = cellSize;
-	let _this = this.advectShader.rdx;
-	_this.dirty = true;
-	_this.data = 1 / this.cellSize;
-	let _this1 = this.advectVelocityShader.rdx;
-	_this1.dirty = true;
-	_this1.data = 1 / this.cellSize;
-	let _this2 = this.divergenceShader.halfrdx;
-	_this2.dirty = true;
-	_this2.data = 0.5 * (1 / this.cellSize);
-	let _this3 = this.pressureGradientSubstractShader.halfrdx;
-	_this3.dirty = true;
-	_this3.data = 0.5 * (1 / this.cellSize);
-	let _this4 = this.pressureSolveShader.alpha;
-	_this4.dirty = true;
-	_this4.data = -this.cellSize * this.cellSize;
-	this.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad();
-	let floatDataType = null;
-	if(GPUCapabilities.get_writeToFloat()) {
-		floatDataType = 5126;
-		GPUCapabilities.get_floatTextureLinear();
-	} else if(GPUCapabilities.get_writeToHalfFloat()) {
-		floatDataType = GPUCapabilities.get_HALF_FLOAT();
-		GPUCapabilities.get_halfFloatTextureLinear();
-	}
-	this.floatVelocity = this.floatPressure = this.floatDivergence = floatDataType != null;
-	this.floatDye = false;
-	let tmp;
-	let params = { channelType : 6408, dataType : this.floatVelocity?floatDataType:5121, filter : 9728};
-	tmp = function(width1,height1) {
-		return gltoolbox_TextureTools.createTexture(width1,height1,params);
-	};
-	this.velocityRenderTarget = new gltoolbox_render_RenderTarget2Phase(width,height,tmp);
-	let tmp1;
-	let params1 = { channelType : 6407, dataType : this.floatPressure?floatDataType:5121, filter : 9728};
-	tmp1 = function(width2,height2) {
-		return gltoolbox_TextureTools.createTexture(width2,height2,params1);
-	};
-	this.pressureRenderTarget = new gltoolbox_render_RenderTarget2Phase(width,height,tmp1);
-	let tmp2;
-	let params2 = { channelType : 6407, dataType : this.floatDivergence?floatDataType:5121, filter : 9728};
-	tmp2 = function(width3,height3) {
-		return gltoolbox_TextureTools.createTexture(width3,height3,params2);
-	};
-	this.divergenceRenderTarget = new gltoolbox_render_RenderTarget(width,height,tmp2);
-	let tmp3;
-	let params3 = { channelType : 6407, dataType : this.floatDye?floatDataType:5121, filter : 9729};
-	tmp3 = function(width4,height4) {
-		return gltoolbox_TextureTools.createTexture(width4,height4,params3);
-	};
-	this.dyeRenderTarget = new gltoolbox_render_RenderTarget2Phase(width,height,tmp3);
-	this.updateAllCoreShaderUniforms();
-	flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
-	flu_modules_opengl_web_GL.current_context.disable(3042);
-	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-	let shader = this.clearVelocityShader;
-	if(shader._active) {
-		let _g = 0;
-		let _g1 = shader._uniforms;
-		while(_g < _g1.length) {
-			let u = _g1[_g];
-			++_g;
-			u.apply();
-		}
-		let offset = 0;
-		let _g11 = 0;
-		let _g2 = shader._attributes.length;
-		while(_g11 < _g2) {
-			let i = _g11++;
-			let att = shader._attributes[i];
-			let location = att.location;
-			if(location != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-			}
-			offset += att.byteSize;
-		}
-	} else {
-		if(!shader._ready) shader.create();
-		flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-		let _g3 = 0;
-		let _g12 = shader._uniforms;
-		while(_g3 < _g12.length) {
-			let u1 = _g12[_g3];
-			++_g3;
-			u1.apply();
-		}
-		let offset1 = 0;
-		let _g13 = 0;
-		let _g4 = shader._attributes.length;
-		while(_g13 < _g4) {
-			let i1 = _g13++;
-			let att1 = shader._attributes[i1];
-			let location1 = att1.location;
-			if(location1 != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-			}
-			offset1 += att1.byteSize;
-		}
-		shader._active = true;
-	}
-	this.velocityRenderTarget.activate();
-	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-	shader.deactivate();
-	let _this5 = this.velocityRenderTarget;
-	_this5.tmpFBO = _this5.writeFrameBufferObject;
-	_this5.writeFrameBufferObject = _this5.readFrameBufferObject;
-	_this5.readFrameBufferObject = _this5.tmpFBO;
-	_this5.tmpTex = _this5.writeToTexture;
-	_this5.writeToTexture = _this5.readFromTexture;
-	_this5.readFromTexture = _this5.tmpTex;
-	let shader1 = this.clearPressureShader;
-	if(shader1._active) {
-		let _g5 = 0;
-		let _g14 = shader1._uniforms;
-		while(_g5 < _g14.length) {
-			let u2 = _g14[_g5];
-			++_g5;
-			u2.apply();
-		}
-		let offset2 = 0;
-		let _g15 = 0;
-		let _g6 = shader1._attributes.length;
-		while(_g15 < _g6) {
-			let i2 = _g15++;
-			let att2 = shader1._attributes[i2];
-			let location2 = att2.location;
-			if(location2 != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-			}
-			offset2 += att2.byteSize;
-		}
-	} else {
-		if(!shader1._ready) shader1.create();
-		flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-		let _g7 = 0;
-		let _g16 = shader1._uniforms;
-		while(_g7 < _g16.length) {
-			let u3 = _g16[_g7];
-			++_g7;
-			u3.apply();
-		}
-		let offset3 = 0;
-		let _g17 = 0;
-		let _g8 = shader1._attributes.length;
-		while(_g17 < _g8) {
-			let i3 = _g17++;
-			let att3 = shader1._attributes[i3];
-			let location3 = att3.location;
-			if(location3 != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-			}
-			offset3 += att3.byteSize;
-		}
-		shader1._active = true;
-	}
-	this.pressureRenderTarget.activate();
-	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-	shader1.deactivate();
-	let _this6 = this.pressureRenderTarget;
-	_this6.tmpFBO = _this6.writeFrameBufferObject;
-	_this6.writeFrameBufferObject = _this6.readFrameBufferObject;
-	_this6.readFrameBufferObject = _this6.tmpFBO;
-	_this6.tmpTex = _this6.writeToTexture;
-	_this6.writeToTexture = _this6.readFromTexture;
-	_this6.readFromTexture = _this6.tmpTex;
-	let _this7 = this.dyeRenderTarget;
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this7.readFrameBufferObject);
-	flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-	flu_modules_opengl_web_GL.current_context.clear(16384);
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this7.writeFrameBufferObject);
-	flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-	flu_modules_opengl_web_GL.current_context.clear(16384);
+	this.advectShader.rdx.set(1 / this.cellSize);
+	this.divergenceShader.halfrdx.set(0.5 * (1 / this.cellSize));
+	this.pressureGradientSubstractShader.halfrdx.set(0.5 * (1 / this.cellSize));
+	this.pressureSolveShader.alpha.set(-this.cellSize * this.cellSize);
+	this.cellSize;
+	var texture_float_linear_supported = true;
+	if(gl.getExtension("OES_texture_float_linear") == null) texture_float_linear_supported = false;
+	if(gl.getExtension("OES_texture_float") == null) null;
+	this.textureQuad = gltoolbox.GeometryTools.getCachedTextureQuad();
+	var nearestFactory = gltoolbox.TextureTools.createTextureFactory(gl.RGBA,gl.FLOAT,gl.NEAREST,null);
+	this.velocityRenderTarget = new gltoolbox.render.RenderTarget2Phase(width,height,nearestFactory);
+	this.pressureRenderTarget = new gltoolbox.render.RenderTarget2Phase(width,height,nearestFactory);
+	this.divergenceRenderTarget = new gltoolbox.render.RenderTarget(width,height,nearestFactory);
+	this.dyeRenderTarget = new gltoolbox.render.RenderTarget2Phase(width,height,gltoolbox.TextureTools.createTextureFactory(gl.RGB,gl.FLOAT,texture_float_linear_supported?gl.LINEAR:gl.NEAREST,null));
+	this.updateCoreShaderUniforms(this.advectShader);
+	this.updateCoreShaderUniforms(this.divergenceShader);
+	this.updateCoreShaderUniforms(this.pressureSolveShader);
+	this.updateCoreShaderUniforms(this.pressureGradientSubstractShader);
 };
 $hxClasses["GPUFluid"] = GPUFluid;
 GPUFluid.__name__ = true;
 GPUFluid.prototype = {
-	updateAllCoreShaderUniforms: function() {
-		let shader = this.advectShader;
-		if(shader == null) {
-		} else {
-			let _this = shader.aspectRatio;
-			_this.dirty = true;
-			_this.data = this.aspectRatio;
-			shader.invresolution.data.x = 1 / this.width;
-			shader.invresolution.data.y = 1 / this.height;
-			let v;
-			v = this.floatVelocity?"true":"false";
-			if(shader.FLOAT_VELOCITY != v) shader.set_FLOAT_VELOCITY(v);
-			v = this.floatPressure?"true":"false";
-			if(shader.FLOAT_PRESSURE != v) shader.set_FLOAT_PRESSURE(v);
-			v = this.floatDivergence?"true":"false";
-			if(shader.FLOAT_DIVERGENCE != v) shader.set_FLOAT_DIVERGENCE(v);
+	step: function(dt) {
+		this.gl.viewport(0,0,this.width,this.height);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.textureQuad);
+		this.advect(this.velocityRenderTarget,dt);
+		if(this.applyForcesShader == null) null; else {
+			this.applyForcesShader.dt.set(dt);
+			this.applyForcesShader.velocity.set(this.velocityRenderTarget.readFromTexture);
+			this.renderShaderTo(this.applyForcesShader,this.velocityRenderTarget);
+			this.velocityRenderTarget.swap();
 		}
-		let shader1 = this.advectVelocityShader;
-		if(shader1 == null) {
-		} else {
-			let _this1 = shader1.aspectRatio;
-			_this1.dirty = true;
-			_this1.data = this.aspectRatio;
-			shader1.invresolution.data.x = 1 / this.width;
-			shader1.invresolution.data.y = 1 / this.height;
-			let v1;
-			v1 = this.floatVelocity?"true":"false";
-			if(shader1.FLOAT_VELOCITY != v1) shader1.set_FLOAT_VELOCITY(v1);
-			v1 = this.floatPressure?"true":"false";
-			if(shader1.FLOAT_PRESSURE != v1) shader1.set_FLOAT_PRESSURE(v1);
-			v1 = this.floatDivergence?"true":"false";
-			if(shader1.FLOAT_DIVERGENCE != v1) shader1.set_FLOAT_DIVERGENCE(v1);
+		this.divergenceShader.velocity.set(this.velocityRenderTarget.readFromTexture);
+		this.renderShaderTo(this.divergenceShader,this.divergenceRenderTarget);
+		this.solvePressure();
+		this.pressureGradientSubstractShader.pressure.set(this.pressureRenderTarget.readFromTexture);
+		this.pressureGradientSubstractShader.velocity.set(this.velocityRenderTarget.readFromTexture);
+		this.renderShaderTo(this.pressureGradientSubstractShader,this.velocityRenderTarget);
+		this.velocityRenderTarget.swap();
+		if(this.updateDyeShader == null) null; else {
+			this.updateDyeShader.dt.set(dt);
+			this.updateDyeShader.dye.set(this.dyeRenderTarget.readFromTexture);
+			this.renderShaderTo(this.updateDyeShader,this.dyeRenderTarget);
+			this.dyeRenderTarget.swap();
 		}
-		let shader2 = this.divergenceShader;
-		if(shader2 == null) {
-		} else {
-			let _this2 = shader2.aspectRatio;
-			_this2.dirty = true;
-			_this2.data = this.aspectRatio;
-			shader2.invresolution.data.x = 1 / this.width;
-			shader2.invresolution.data.y = 1 / this.height;
-			let v2;
-			v2 = this.floatVelocity?"true":"false";
-			if(shader2.FLOAT_VELOCITY != v2) shader2.set_FLOAT_VELOCITY(v2);
-			v2 = this.floatPressure?"true":"false";
-			if(shader2.FLOAT_PRESSURE != v2) shader2.set_FLOAT_PRESSURE(v2);
-			v2 = this.floatDivergence?"true":"false";
-			if(shader2.FLOAT_DIVERGENCE != v2) shader2.set_FLOAT_DIVERGENCE(v2);
-		}
-		let shader3 = this.pressureSolveShader;
-		if(shader3 == null) {
-		} else {
-			let _this3 = shader3.aspectRatio;
-			_this3.dirty = true;
-			_this3.data = this.aspectRatio;
-			shader3.invresolution.data.x = 1 / this.width;
-			shader3.invresolution.data.y = 1 / this.height;
-			let v3;
-			v3 = this.floatVelocity?"true":"false";
-			if(shader3.FLOAT_VELOCITY != v3) shader3.set_FLOAT_VELOCITY(v3);
-			v3 = this.floatPressure?"true":"false";
-			if(shader3.FLOAT_PRESSURE != v3) shader3.set_FLOAT_PRESSURE(v3);
-			v3 = this.floatDivergence?"true":"false";
-			if(shader3.FLOAT_DIVERGENCE != v3) shader3.set_FLOAT_DIVERGENCE(v3);
-		}
-		let shader4 = this.pressureGradientSubstractShader;
-		if(shader4 == null) {
-		} else {
-			let _this4 = shader4.aspectRatio;
-			_this4.dirty = true;
-			_this4.data = this.aspectRatio;
-			shader4.invresolution.data.x = 1 / this.width;
-			shader4.invresolution.data.y = 1 / this.height;
-			let v4;
-			v4 = this.floatVelocity?"true":"false";
-			if(shader4.FLOAT_VELOCITY != v4) shader4.set_FLOAT_VELOCITY(v4);
-			v4 = this.floatPressure?"true":"false";
-			if(shader4.FLOAT_PRESSURE != v4) shader4.set_FLOAT_PRESSURE(v4);
-			v4 = this.floatDivergence?"true":"false";
-			if(shader4.FLOAT_DIVERGENCE != v4) shader4.set_FLOAT_DIVERGENCE(v4);
-		}
-		let shader5 = this.clearVelocityShader;
-		if(shader5 == null) {
-		} else {
-			let _this5 = shader5.aspectRatio;
-			_this5.dirty = true;
-			_this5.data = this.aspectRatio;
-			shader5.invresolution.data.x = 1 / this.width;
-			shader5.invresolution.data.y = 1 / this.height;
-			let v5;
-			v5 = this.floatVelocity?"true":"false";
-			if(shader5.FLOAT_VELOCITY != v5) shader5.set_FLOAT_VELOCITY(v5);
-			v5 = this.floatPressure?"true":"false";
-			if(shader5.FLOAT_PRESSURE != v5) shader5.set_FLOAT_PRESSURE(v5);
-			v5 = this.floatDivergence?"true":"false";
-			if(shader5.FLOAT_DIVERGENCE != v5) shader5.set_FLOAT_DIVERGENCE(v5);
-		}
-		let shader6 = this.clearPressureShader;
-		if(shader6 == null) {
-		} else {
-			let _this6 = shader6.aspectRatio;
-			_this6.dirty = true;
-			_this6.data = this.aspectRatio;
-			shader6.invresolution.data.x = 1 / this.width;
-			shader6.invresolution.data.y = 1 / this.height;
-			let v6;
-			v6 = this.floatVelocity?"true":"false";
-			if(shader6.FLOAT_VELOCITY != v6) shader6.set_FLOAT_VELOCITY(v6);
-			v6 = this.floatPressure?"true":"false";
-			if(shader6.FLOAT_PRESSURE != v6) shader6.set_FLOAT_PRESSURE(v6);
-			v6 = this.floatDivergence?"true":"false";
-			if(shader6.FLOAT_DIVERGENCE != v6) shader6.set_FLOAT_DIVERGENCE(v6);
-		}
-		let shader7 = this.applyForcesShader;
-		if(shader7 == null) {
-		} else {
-			let _this7 = shader7.aspectRatio;
-			_this7.dirty = true;
-			_this7.data = this.aspectRatio;
-			shader7.invresolution.data.x = 1 / this.width;
-			shader7.invresolution.data.y = 1 / this.height;
-			let v7;
-			v7 = this.floatVelocity?"true":"false";
-			if(shader7.FLOAT_VELOCITY != v7) shader7.set_FLOAT_VELOCITY(v7);
-			v7 = this.floatPressure?"true":"false";
-			if(shader7.FLOAT_PRESSURE != v7) shader7.set_FLOAT_PRESSURE(v7);
-			v7 = this.floatDivergence?"true":"false";
-			if(shader7.FLOAT_DIVERGENCE != v7) shader7.set_FLOAT_DIVERGENCE(v7);
-		}
-		let shader8 = this.updateDyeShader;
-		if(shader8 == null) {
-		} else {
-			let _this8 = shader8.aspectRatio;
-			_this8.dirty = true;
-			_this8.data = this.aspectRatio;
-			shader8.invresolution.data.x = 1 / this.width;
-			shader8.invresolution.data.y = 1 / this.height;
-			let v8;
-			v8 = this.floatVelocity?"true":"false";
-			if(shader8.FLOAT_VELOCITY != v8) shader8.set_FLOAT_VELOCITY(v8);
-			v8 = this.floatPressure?"true":"false";
-			if(shader8.FLOAT_PRESSURE != v8) shader8.set_FLOAT_PRESSURE(v8);
-			v8 = this.floatDivergence?"true":"false";
-			if(shader8.FLOAT_DIVERGENCE != v8) shader8.set_FLOAT_DIVERGENCE(v8);
-		}
+		this.advect(this.dyeRenderTarget,dt);
 	}
-	,step: function(dt) {
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		let _this = this.advectVelocityShader.dt;
-		_this.dirty = true;
-		_this.data = dt;
-		let _this1 = this.advectVelocityShader.velocity;
-		_this1.dirty = true;
-		_this1.data = this.velocityRenderTarget.readFromTexture;
-		let shader = this.advectVelocityShader;
-		if(shader._active) {
-			let _g = 0;
-			let _g1 = shader._uniforms;
-			while(_g < _g1.length) {
-				let u = _g1[_g];
-				++_g;
-				u.apply();
-			}
-			let offset = 0;
-			let _g11 = 0;
-			let _g2 = shader._attributes.length;
-			while(_g11 < _g2) {
-				let i = _g11++;
-				let att = shader._attributes[i];
-				let location = att.location;
-				if(location != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-				}
-				offset += att.byteSize;
-			}
-		} else {
-			if(!shader._ready) shader.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			let _g3 = 0;
-			let _g12 = shader._uniforms;
-			while(_g3 < _g12.length) {
-				let u1 = _g12[_g3];
-				++_g3;
-				u1.apply();
-			}
-			let offset1 = 0;
-			let _g13 = 0;
-			let _g4 = shader._attributes.length;
-			while(_g13 < _g4) {
-				let i1 = _g13++;
-				let att1 = shader._attributes[i1];
-				let location1 = att1.location;
-				if(location1 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-				}
-				offset1 += att1.byteSize;
-			}
-			shader._active = true;
-		}
-		this.velocityRenderTarget.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader.deactivate();
-		let _this2 = this.velocityRenderTarget;
-		_this2.tmpFBO = _this2.writeFrameBufferObject;
-		_this2.writeFrameBufferObject = _this2.readFrameBufferObject;
-		_this2.readFrameBufferObject = _this2.tmpFBO;
-		_this2.tmpTex = _this2.writeToTexture;
-		_this2.writeToTexture = _this2.readFromTexture;
-		_this2.readFromTexture = _this2.tmpTex;
-		if(this.applyForcesShader == null) {
-		} else {
-			let _this3 = this.applyForcesShader.dt;
-			_this3.dirty = true;
-			_this3.data = dt;
-			let _this4 = this.applyForcesShader.velocity;
-			_this4.dirty = true;
-			_this4.data = this.velocityRenderTarget.readFromTexture;
-			let shader1 = this.applyForcesShader;
-			if(shader1._active) {
-				let _g5 = 0;
-				let _g14 = shader1._uniforms;
-				while(_g5 < _g14.length) {
-					let u2 = _g14[_g5];
-					++_g5;
-					u2.apply();
-				}
-				let offset2 = 0;
-				let _g15 = 0;
-				let _g6 = shader1._attributes.length;
-				while(_g15 < _g6) {
-					let i2 = _g15++;
-					let att2 = shader1._attributes[i2];
-					let location2 = att2.location;
-					if(location2 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-					}
-					offset2 += att2.byteSize;
-				}
-			} else {
-				if(!shader1._ready) shader1.create();
-				flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-				let _g7 = 0;
-				let _g16 = shader1._uniforms;
-				while(_g7 < _g16.length) {
-					let u3 = _g16[_g7];
-					++_g7;
-					u3.apply();
-				}
-				let offset3 = 0;
-				let _g17 = 0;
-				let _g8 = shader1._attributes.length;
-				while(_g17 < _g8) {
-					let i3 = _g17++;
-					let att3 = shader1._attributes[i3];
-					let location3 = att3.location;
-					if(location3 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-					}
-					offset3 += att3.byteSize;
-				}
-				shader1._active = true;
-			}
-			this.velocityRenderTarget.activate();
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			shader1.deactivate();
-			let _this5 = this.velocityRenderTarget;
-			_this5.tmpFBO = _this5.writeFrameBufferObject;
-			_this5.writeFrameBufferObject = _this5.readFrameBufferObject;
-			_this5.readFrameBufferObject = _this5.tmpFBO;
-			_this5.tmpTex = _this5.writeToTexture;
-			_this5.writeToTexture = _this5.readFromTexture;
-			_this5.readFromTexture = _this5.tmpTex;
-		}
-		let _this6 = this.divergenceShader.velocity;
-		_this6.dirty = true;
-		_this6.data = this.velocityRenderTarget.readFromTexture;
-		let shader2 = this.divergenceShader;
-		if(shader2._active) {
-			let _g9 = 0;
-			let _g18 = shader2._uniforms;
-			while(_g9 < _g18.length) {
-				let u4 = _g18[_g9];
-				++_g9;
-				u4.apply();
-			}
-			let offset4 = 0;
-			let _g19 = 0;
-			let _g10 = shader2._attributes.length;
-			while(_g19 < _g10) {
-				let i4 = _g19++;
-				let att4 = shader2._attributes[i4];
-				let location4 = att4.location;
-				if(location4 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
-				}
-				offset4 += att4.byteSize;
-			}
-		} else {
-			if(!shader2._ready) shader2.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
-			let _g20 = 0;
-			let _g110 = shader2._uniforms;
-			while(_g20 < _g110.length) {
-				let u5 = _g110[_g20];
-				++_g20;
-				u5.apply();
-			}
-			let offset5 = 0;
-			let _g111 = 0;
-			let _g21 = shader2._attributes.length;
-			while(_g111 < _g21) {
-				let i5 = _g111++;
-				let att5 = shader2._attributes[i5];
-				let location5 = att5.location;
-				if(location5 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
-				}
-				offset5 += att5.byteSize;
-			}
-			shader2._active = true;
-		}
-		this.divergenceRenderTarget.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader2.deactivate();
-		let _this7 = this.pressureSolveShader.divergence;
-		_this7.dirty = true;
-		_this7.data = this.divergenceRenderTarget.texture;
-		let _this8 = this.pressureSolveShader;
-		if(_this8._active) {
-			let _g22 = 0;
-			let _g112 = _this8._uniforms;
-			while(_g22 < _g112.length) {
-				let u6 = _g112[_g22];
-				++_g22;
-				u6.apply();
-			}
-			let offset6 = 0;
-			let _g113 = 0;
-			let _g23 = _this8._attributes.length;
-			while(_g113 < _g23) {
-				let i6 = _g113++;
-				let att6 = _this8._attributes[i6];
-				let location6 = att6.location;
-				if(location6 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,_this8._aStride,offset6);
-				}
-				offset6 += att6.byteSize;
-			}
-		} else {
-			if(!_this8._ready) _this8.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(_this8._prog);
-			let _g24 = 0;
-			let _g114 = _this8._uniforms;
-			while(_g24 < _g114.length) {
-				let u7 = _g114[_g24];
-				++_g24;
-				u7.apply();
-			}
-			let offset7 = 0;
-			let _g115 = 0;
-			let _g25 = _this8._attributes.length;
-			while(_g115 < _g25) {
-				let i7 = _g115++;
-				let att7 = _this8._attributes[i7];
-				let location7 = att7.location;
-				if(location7 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,_this8._aStride,offset7);
-				}
-				offset7 += att7.byteSize;
-			}
-			_this8._active = true;
-		}
-		let _g116 = 0;
-		let _g26 = this.solverIterations;
-		while(_g116 < _g26) {
-			_g116++;
-			let _this9 = this.pressureSolveShader.pressure;
-			let tmp;
-			_this9.dirty = true;
-			tmp = _this9.data = this.pressureRenderTarget.readFromTexture;
-			let _g27 = 0;
-			let _g117 = this.pressureSolveShader._uniforms;
-			while(_g27 < _g117.length) {
-				let u8 = _g117[_g27];
-				++_g27;
-				u8.apply();
-			}
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.pressureRenderTarget.writeFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			let _this10 = this.pressureRenderTarget;
-			_this10.tmpFBO = _this10.writeFrameBufferObject;
-			_this10.writeFrameBufferObject = _this10.readFrameBufferObject;
-			_this10.readFrameBufferObject = _this10.tmpFBO;
-			_this10.tmpTex = _this10.writeToTexture;
-			_this10.writeToTexture = _this10.readFromTexture;
-			_this10.readFromTexture = _this10.tmpTex;
-		}
-		this.pressureSolveShader.deactivate();
-		let _this11 = this.pressureGradientSubstractShader.pressure;
-		_this11.dirty = true;
-		_this11.data = this.pressureRenderTarget.readFromTexture;
-		let _this12 = this.pressureGradientSubstractShader.velocity;
-		_this12.dirty = true;
-		_this12.data = this.velocityRenderTarget.readFromTexture;
-		let shader3 = this.pressureGradientSubstractShader;
-		if(shader3._active) {
-			let _g28 = 0;
-			let _g118 = shader3._uniforms;
-			while(_g28 < _g118.length) {
-				let u9 = _g118[_g28];
-				++_g28;
-				u9.apply();
-			}
-			let offset8 = 0;
-			let _g119 = 0;
-			let _g29 = shader3._attributes.length;
-			while(_g119 < _g29) {
-				let i8 = _g119++;
-				let att8 = shader3._attributes[i8];
-				let location8 = att8.location;
-				if(location8 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location8);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location8,att8.itemCount,att8.type,false,shader3._aStride,offset8);
-				}
-				offset8 += att8.byteSize;
-			}
-		} else {
-			if(!shader3._ready) shader3.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
-			let _g30 = 0;
-			let _g120 = shader3._uniforms;
-			while(_g30 < _g120.length) {
-				let u10 = _g120[_g30];
-				++_g30;
-				u10.apply();
-			}
-			let offset9 = 0;
-			let _g121 = 0;
-			let _g31 = shader3._attributes.length;
-			while(_g121 < _g31) {
-				let i9 = _g121++;
-				let att9 = shader3._attributes[i9];
-				let location9 = att9.location;
-				if(location9 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location9);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location9,att9.itemCount,att9.type,false,shader3._aStride,offset9);
-				}
-				offset9 += att9.byteSize;
-			}
-			shader3._active = true;
-		}
-		this.velocityRenderTarget.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader3.deactivate();
-		let _this13 = this.velocityRenderTarget;
-		_this13.tmpFBO = _this13.writeFrameBufferObject;
-		_this13.writeFrameBufferObject = _this13.readFrameBufferObject;
-		_this13.readFrameBufferObject = _this13.tmpFBO;
-		_this13.tmpTex = _this13.writeToTexture;
-		_this13.writeToTexture = _this13.readFromTexture;
-		_this13.readFromTexture = _this13.tmpTex;
-		if(this.updateDyeShader == null) {
-		} else {
-			let _this14 = this.updateDyeShader.dt;
-			_this14.dirty = true;
-			_this14.data = dt;
-			let _this15 = this.updateDyeShader.dye;
-			_this15.dirty = true;
-			_this15.data = this.dyeRenderTarget.readFromTexture;
-			let shader4 = this.updateDyeShader;
-			if(shader4._active) {
-				let _g32 = 0;
-				let _g122 = shader4._uniforms;
-				while(_g32 < _g122.length) {
-					let u11 = _g122[_g32];
-					++_g32;
-					u11.apply();
-				}
-				let offset10 = 0;
-				let _g123 = 0;
-				let _g33 = shader4._attributes.length;
-				while(_g123 < _g33) {
-					let i10 = _g123++;
-					let att10 = shader4._attributes[i10];
-					let location10 = att10.location;
-					if(location10 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location10);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location10,att10.itemCount,att10.type,false,shader4._aStride,offset10);
-					}
-					offset10 += att10.byteSize;
-				}
-			} else {
-				if(!shader4._ready) shader4.create();
-				flu_modules_opengl_web_GL.current_context.useProgram(shader4._prog);
-				let _g34 = 0;
-				let _g124 = shader4._uniforms;
-				while(_g34 < _g124.length) {
-					let u12 = _g124[_g34];
-					++_g34;
-					u12.apply();
-				}
-				let offset11 = 0;
-				let _g125 = 0;
-				let _g35 = shader4._attributes.length;
-				while(_g125 < _g35) {
-					let i11 = _g125++;
-					let att11 = shader4._attributes[i11];
-					let location11 = att11.location;
-					if(location11 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location11);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location11,att11.itemCount,att11.type,false,shader4._aStride,offset11);
-					}
-					offset11 += att11.byteSize;
-				}
-				shader4._active = true;
-			}
-			this.dyeRenderTarget.activate();
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			shader4.deactivate();
-			let _this16 = this.dyeRenderTarget;
-			_this16.tmpFBO = _this16.writeFrameBufferObject;
-			_this16.writeFrameBufferObject = _this16.readFrameBufferObject;
-			_this16.readFrameBufferObject = _this16.tmpFBO;
-			_this16.tmpTex = _this16.writeToTexture;
-			_this16.writeToTexture = _this16.readFromTexture;
-			_this16.readFromTexture = _this16.tmpTex;
-		}
-		let target = this.dyeRenderTarget;
-		let _this17 = this.advectShader.dt;
-		_this17.dirty = true;
-		_this17.data = dt;
-		let _this18 = this.advectShader.target;
-		_this18.dirty = true;
-		_this18.data = target.readFromTexture;
-		let _this19 = this.advectShader.velocity;
-		_this19.dirty = true;
-		_this19.data = this.velocityRenderTarget.readFromTexture;
-		let shader5 = this.advectShader;
-		if(shader5._active) {
-			let _g36 = 0;
-			let _g126 = shader5._uniforms;
-			while(_g36 < _g126.length) {
-				let u13 = _g126[_g36];
-				++_g36;
-				u13.apply();
-			}
-			let offset12 = 0;
-			let _g127 = 0;
-			let _g37 = shader5._attributes.length;
-			while(_g127 < _g37) {
-				let i12 = _g127++;
-				let att12 = shader5._attributes[i12];
-				let location12 = att12.location;
-				if(location12 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location12);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location12,att12.itemCount,att12.type,false,shader5._aStride,offset12);
-				}
-				offset12 += att12.byteSize;
-			}
-		} else {
-			if(!shader5._ready) shader5.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader5._prog);
-			let _g38 = 0;
-			let _g128 = shader5._uniforms;
-			while(_g38 < _g128.length) {
-				let u14 = _g128[_g38];
-				++_g38;
-				u14.apply();
-			}
-			let offset13 = 0;
-			let _g129 = 0;
-			let _g39 = shader5._attributes.length;
-			while(_g129 < _g39) {
-				let i13 = _g129++;
-				let att13 = shader5._attributes[i13];
-				let location13 = att13.location;
-				if(location13 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location13);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location13,att13.itemCount,att13.type,false,shader5._aStride,offset13);
-				}
-				offset13 += att13.byteSize;
-			}
-			shader5._active = true;
-		}
-		target.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader5.deactivate();
+	,resize: function(width,height) {
+		this.velocityRenderTarget.resize(width,height);
+		this.pressureRenderTarget.resize(width,height);
+		this.divergenceRenderTarget.resize(width,height);
+		this.dyeRenderTarget.resize(width,height);
+		this.width = width;
+		this.height = height;
+	}
+	,clear: function() {
+		this.velocityRenderTarget.clear(this.gl.COLOR_BUFFER_BIT);
+		this.pressureRenderTarget.clear(this.gl.COLOR_BUFFER_BIT);
+		this.dyeRenderTarget.clear(this.gl.COLOR_BUFFER_BIT);
+	}
+	,simToClipSpaceX: function(simX) {
+		return simX / (this.cellSize * this.aspectRatio);
+	}
+	,simToClipSpaceY: function(simY) {
+		return simY / this.cellSize;
+	}
+	,advect: function(target,dt) {
+		this.advectShader.dt.set(dt);
+		this.advectShader.target.set(target.readFromTexture);
+		this.advectShader.velocity.set(this.velocityRenderTarget.readFromTexture);
+		this.renderShaderTo(this.advectShader,target);
 		target.tmpFBO = target.writeFrameBufferObject;
 		target.writeFrameBufferObject = target.readFrameBufferObject;
 		target.readFrameBufferObject = target.tmpFBO;
@@ -899,782 +294,494 @@ GPUFluid.prototype = {
 		target.writeToTexture = target.readFromTexture;
 		target.readFromTexture = target.tmpTex;
 	}
-	,clear: function() {
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.width,this.height);
-		flu_modules_opengl_web_GL.current_context.disable(3042);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		let shader = this.clearVelocityShader;
-		if(shader._active) {
-			let _g = 0;
-			let _g1 = shader._uniforms;
-			while(_g < _g1.length) {
-				let u = _g1[_g];
-				++_g;
-				u.apply();
-			}
-			let offset = 0;
-			let _g11 = 0;
-			let _g2 = shader._attributes.length;
-			while(_g11 < _g2) {
-				let i = _g11++;
-				let att = shader._attributes[i];
-				let location = att.location;
-				if(location != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-				}
-				offset += att.byteSize;
-			}
-		} else {
-			if(!shader._ready) shader.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			let _g3 = 0;
-			let _g12 = shader._uniforms;
-			while(_g3 < _g12.length) {
-				let u1 = _g12[_g3];
-				++_g3;
-				u1.apply();
-			}
-			let offset1 = 0;
-			let _g13 = 0;
-			let _g4 = shader._attributes.length;
-			while(_g13 < _g4) {
-				let i1 = _g13++;
-				let att1 = shader._attributes[i1];
-				let location1 = att1.location;
-				if(location1 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-				}
-				offset1 += att1.byteSize;
-			}
-			shader._active = true;
+	,applyForces: function(dt) {
+		if(this.applyForcesShader == null) return;
+		this.applyForcesShader.dt.set(dt);
+		this.applyForcesShader.velocity.set(this.velocityRenderTarget.readFromTexture);
+		this.renderShaderTo(this.applyForcesShader,this.velocityRenderTarget);
+		this.velocityRenderTarget.swap();
+	}
+	,computeDivergence: function() {
+		this.divergenceShader.velocity.set(this.velocityRenderTarget.readFromTexture);
+		this.renderShaderTo(this.divergenceShader,this.divergenceRenderTarget);
+	}
+	,solvePressure: function() {
+		this.pressureSolveShader.divergence.set(this.divergenceRenderTarget.texture);
+		this.pressureSolveShader.activate(true,true);
+		var _g1 = 0;
+		var _g = this.solverIterations;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.pressureSolveShader.pressure.set(this.pressureRenderTarget.readFromTexture);
+			this.pressureSolveShader.setUniforms();
+			lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.pressureRenderTarget.writeFrameBufferObject);
+			this.gl.drawArrays(this.gl.TRIANGLE_STRIP,0,4);
+			this.pressureRenderTarget.swap();
 		}
-		this.velocityRenderTarget.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		this.pressureSolveShader.deactivate();
+	}
+	,subtractPressureGradient: function() {
+		this.pressureGradientSubstractShader.pressure.set(this.pressureRenderTarget.readFromTexture);
+		this.pressureGradientSubstractShader.velocity.set(this.velocityRenderTarget.readFromTexture);
+		this.renderShaderTo(this.pressureGradientSubstractShader,this.velocityRenderTarget);
+		this.velocityRenderTarget.swap();
+	}
+	,updateDye: function(dt) {
+		if(this.updateDyeShader == null) return;
+		this.updateDyeShader.dt.set(dt);
+		this.updateDyeShader.dye.set(this.dyeRenderTarget.readFromTexture);
+		this.renderShaderTo(this.updateDyeShader,this.dyeRenderTarget);
+		this.dyeRenderTarget.swap();
+	}
+	,renderShaderTo: function(shader,target) {
+		if(shader.active) {
+			shader.setUniforms();
+			shader.setAttributes();
+			null;
+		} else {
+			if(!shader.ready) shader.create();
+			lime.graphics.opengl.GL.context.useProgram(shader.prog);
+			shader.setUniforms();
+			shader.setAttributes();
+			shader.active = true;
+		}
+		target.activate();
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP,0,4);
 		shader.deactivate();
-		let _this = this.velocityRenderTarget;
-		_this.tmpFBO = _this.writeFrameBufferObject;
-		_this.writeFrameBufferObject = _this.readFrameBufferObject;
-		_this.readFrameBufferObject = _this.tmpFBO;
-		_this.tmpTex = _this.writeToTexture;
-		_this.writeToTexture = _this.readFromTexture;
-		_this.readFromTexture = _this.tmpTex;
-		let shader1 = this.clearPressureShader;
-		if(shader1._active) {
-			let _g5 = 0;
-			let _g14 = shader1._uniforms;
-			while(_g5 < _g14.length) {
-				let u2 = _g14[_g5];
-				++_g5;
-				u2.apply();
-			}
-			let offset2 = 0;
-			let _g15 = 0;
-			let _g6 = shader1._attributes.length;
-			while(_g15 < _g6) {
-				let i2 = _g15++;
-				let att2 = shader1._attributes[i2];
-				let location2 = att2.location;
-				if(location2 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-				}
-				offset2 += att2.byteSize;
-			}
-		} else {
-			if(!shader1._ready) shader1.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-			let _g7 = 0;
-			let _g16 = shader1._uniforms;
-			while(_g7 < _g16.length) {
-				let u3 = _g16[_g7];
-				++_g7;
-				u3.apply();
-			}
-			let offset3 = 0;
-			let _g17 = 0;
-			let _g8 = shader1._attributes.length;
-			while(_g17 < _g8) {
-				let i3 = _g17++;
-				let att3 = shader1._attributes[i3];
-				let location3 = att3.location;
-				if(location3 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-				}
-				offset3 += att3.byteSize;
-			}
-			shader1._active = true;
-		}
-		this.pressureRenderTarget.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader1.deactivate();
-		let _this1 = this.pressureRenderTarget;
-		_this1.tmpFBO = _this1.writeFrameBufferObject;
-		_this1.writeFrameBufferObject = _this1.readFrameBufferObject;
-		_this1.readFrameBufferObject = _this1.tmpFBO;
-		_this1.tmpTex = _this1.writeToTexture;
-		_this1.writeToTexture = _this1.readFromTexture;
-		_this1.readFromTexture = _this1.tmpTex;
-		let _this2 = this.dyeRenderTarget;
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this2.readFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		flu_modules_opengl_web_GL.current_context.clear(16384);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this2.writeFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		flu_modules_opengl_web_GL.current_context.clear(16384);
+	}
+	,updateCoreShaderUniforms: function(shader) {
+		if(shader == null) return;
+		shader.aspectRatio.set(this.aspectRatio);
+		shader.invresolution.data.x = 1 / this.width;
+		shader.invresolution.data.y = 1 / this.height;
+	}
+	,set_applyForcesShader: function(v) {
+		this.applyForcesShader = v;
+		this.applyForcesShader.dx.set_data(this.cellSize);
+		this.updateCoreShaderUniforms(this.applyForcesShader);
+		return this.applyForcesShader;
+	}
+	,set_updateDyeShader: function(v) {
+		this.updateDyeShader = v;
+		this.updateDyeShader.dx.set_data(this.cellSize);
+		this.updateCoreShaderUniforms(this.updateDyeShader);
+		return this.updateDyeShader;
+	}
+	,set_cellSize: function(v) {
+		this.cellSize = v;
+		this.advectShader.rdx.set(1 / this.cellSize);
+		this.divergenceShader.halfrdx.set(0.5 * (1 / this.cellSize));
+		this.pressureGradientSubstractShader.halfrdx.set(0.5 * (1 / this.cellSize));
+		this.pressureSolveShader.alpha.set(-this.cellSize * this.cellSize);
+		return this.cellSize;
 	}
 	,__class__: GPUFluid
 };
-let shaderblox_ShaderBase = function() {
-	this._textures = [];
-	this._attributes = [];
-	this._uniforms = [];
-	this._name = ("" + Std.string(js_Boot.getClass(this))).split(".").pop();
-	this.initSources();
+var shaderblox = {};
+shaderblox.ShaderBase = function() {
+	this.textures = [];
+	this.uniforms = [];
+	this.attributes = [];
+	this.name = ("" + Std.string(Type.getClass(this))).split(".").pop();
 	this.createProperties();
 };
-$hxClasses["shaderblox.ShaderBase"] = shaderblox_ShaderBase;
-shaderblox_ShaderBase.__name__ = true;
-shaderblox_ShaderBase.prototype = {
-	initSources: function() {
-	}
-	,createProperties: function() {
+$hxClasses["shaderblox.ShaderBase"] = shaderblox.ShaderBase;
+shaderblox.ShaderBase.__name__ = true;
+shaderblox.ShaderBase.prototype = {
+	createProperties: function() {
 	}
 	,create: function() {
-		this.compile(this._vertSource,this._fragSource);
-		this._ready = true;
 	}
 	,destroy: function() {
-		flu_modules_opengl_web_GL.current_context.deleteShader(this._vert);
-		flu_modules_opengl_web_GL.current_context.deleteShader(this._frag);
-		flu_modules_opengl_web_GL.current_context.deleteProgram(this._prog);
-		this._prog = null;
-		this._vert = null;
-		this._frag = null;
-		this._ready = false;
+		haxe.Log.trace("Destroying " + Std.string(this),{ fileName : "ShaderBase.hx", lineNumber : 51, className : "shaderblox.ShaderBase", methodName : "destroy"});
+		lime.graphics.opengl.GL.context.deleteShader(this.vert);
+		lime.graphics.opengl.GL.context.deleteShader(this.frag);
+		lime.graphics.opengl.GL.context.deleteProgram(this.prog);
+		this.prog = null;
+		this.vert = null;
+		this.frag = null;
+		this.ready = false;
 	}
-	,compile: function(vertSource,fragSource) {
-		let vertexShader = flu_modules_opengl_web_GL.current_context.createShader(35633);
-		flu_modules_opengl_web_GL.current_context.shaderSource(vertexShader,vertSource);
-		flu_modules_opengl_web_GL.current_context.compileShader(vertexShader);
-		if(flu_modules_opengl_web_GL.current_context.getShaderParameter(vertexShader,35713) == 0) {
-			console.log("Error compiling vertex shader: " + flu_modules_opengl_web_GL.current_context.getShaderInfoLog(vertexShader));
-			console.log("\n" + vertSource);
-			throw new js__$Boot_FluidError("Error compiling vertex shader");
+	,initFromSource: function(vertSource,fragSource) {
+		var vertexShader = lime.graphics.opengl.GL.context.createShader(35633);
+		lime.graphics.opengl.GL.context.shaderSource(vertexShader,vertSource);
+		lime.graphics.opengl.GL.context.compileShader(vertexShader);
+		if(lime.graphics.opengl.GL.context.getShaderParameter(vertexShader,35713) == 0) {
+			haxe.Log.trace("Error compiling vertex shader: " + lime.graphics.opengl.GL.context.getShaderInfoLog(vertexShader),{ fileName : "ShaderBase.hx", lineNumber : 67, className : "shaderblox.ShaderBase", methodName : "initFromSource"});
+			haxe.Log.trace("\n" + vertSource,{ fileName : "ShaderBase.hx", lineNumber : 68, className : "shaderblox.ShaderBase", methodName : "initFromSource"});
+			throw "Error compiling vertex shader";
 		}
-		let fragmentShader = flu_modules_opengl_web_GL.current_context.createShader(35632);
-		flu_modules_opengl_web_GL.current_context.shaderSource(fragmentShader,fragSource);
-		flu_modules_opengl_web_GL.current_context.compileShader(fragmentShader);
-		if(flu_modules_opengl_web_GL.current_context.getShaderParameter(fragmentShader,35713) == 0) {
-			console.log("Error compiling fragment shader: " + flu_modules_opengl_web_GL.current_context.getShaderInfoLog(fragmentShader) + "\n");
-			let lines = fragSource.split("\n");
-			let i = 0;
-			let _g = 0;
+		var fragmentShader = lime.graphics.opengl.GL.context.createShader(35632);
+		lime.graphics.opengl.GL.context.shaderSource(fragmentShader,fragSource);
+		lime.graphics.opengl.GL.context.compileShader(fragmentShader);
+		if(lime.graphics.opengl.GL.context.getShaderParameter(fragmentShader,35713) == 0) {
+			haxe.Log.trace("Error compiling fragment shader: " + lime.graphics.opengl.GL.context.getShaderInfoLog(fragmentShader) + "\n",{ fileName : "ShaderBase.hx", lineNumber : 77, className : "shaderblox.ShaderBase", methodName : "initFromSource"});
+			var lines = fragSource.split("\n");
+			var i = 0;
+			var _g = 0;
 			while(_g < lines.length) {
-				let l = lines[_g];
+				var l = lines[_g];
 				++_g;
-				console.log(i++ + " - " + l);
+				haxe.Log.trace(i++ + " - " + l,{ fileName : "ShaderBase.hx", lineNumber : 81, className : "shaderblox.ShaderBase", methodName : "initFromSource"});
 			}
-			throw new js__$Boot_FluidError("Error compiling fragment shader");
+			throw "Error compiling fragment shader";
 		}
-		let shaderProgram = flu_modules_opengl_web_GL.current_context.createProgram();
-		flu_modules_opengl_web_GL.current_context.attachShader(shaderProgram,vertexShader);
-		flu_modules_opengl_web_GL.current_context.attachShader(shaderProgram,fragmentShader);
-		flu_modules_opengl_web_GL.current_context.linkProgram(shaderProgram);
-		if(flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35714) == 0) throw new js__$Boot_FluidError("Unable to initialize the shader program.\n" + flu_modules_opengl_web_GL.current_context.getProgramInfoLog(shaderProgram));
-		let numUniforms = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35718);
-		let uniformLocations = new flu_ds_StringMap();
+		var shaderProgram = lime.graphics.opengl.GL.context.createProgram();
+		lime.graphics.opengl.GL.context.attachShader(shaderProgram,vertexShader);
+		lime.graphics.opengl.GL.context.attachShader(shaderProgram,fragmentShader);
+		lime.graphics.opengl.GL.context.linkProgram(shaderProgram);
+		if(lime.graphics.opengl.GL.context.getProgramParameter(shaderProgram,35714) == 0) throw "Unable to initialize the shader program.\n" + lime.graphics.opengl.GL.context.getProgramInfoLog(shaderProgram);
+		var numUniforms = lime.graphics.opengl.GL.context.getProgramParameter(shaderProgram,35718);
+		var uniformLocations = new haxe.ds.StringMap();
 		while(numUniforms-- > 0) {
-			let uInfo = flu_modules_opengl_web_GL.current_context.getActiveUniform(shaderProgram,numUniforms);
-			let loc = flu_modules_opengl_web_GL.current_context.getUniformLocation(shaderProgram,uInfo.name);
-			let tmp;
-			let key = uInfo.name;
-			if(__map_reserved[key] != null) uniformLocations.setReserved(key,loc); else uniformLocations.h[key] = loc;
-			tmp = loc;
-			tmp;
+			var uInfo = lime.graphics.opengl.GL.context.getActiveUniform(shaderProgram,numUniforms);
+			var loc = lime.graphics.opengl.GL.context.getUniformLocation(shaderProgram,uInfo.name);
+			uniformLocations.set(uInfo.name,loc);
+			loc;
 		}
-		let numAttributes = flu_modules_opengl_web_GL.current_context.getProgramParameter(shaderProgram,35721);
-		let attributeLocations = new flu_ds_StringMap();
+		var numAttributes = lime.graphics.opengl.GL.context.getProgramParameter(shaderProgram,35721);
+		var attributeLocations = new haxe.ds.StringMap();
 		while(numAttributes-- > 0) {
-			let aInfo = flu_modules_opengl_web_GL.current_context.getActiveAttrib(shaderProgram,numAttributes);
-			let loc1 = flu_modules_opengl_web_GL.current_context.getAttribLocation(shaderProgram,aInfo.name);
-			let tmp1;
-			let key1 = aInfo.name;
-			if(__map_reserved[key1] != null) attributeLocations.setReserved(key1,loc1); else attributeLocations.h[key1] = loc1;
-			tmp1 = loc1;
-			tmp1;
+			var aInfo = lime.graphics.opengl.GL.context.getActiveAttrib(shaderProgram,numAttributes);
+			var loc1 = lime.graphics.opengl.GL.context.getAttribLocation(shaderProgram,aInfo.name);
+			attributeLocations.set(aInfo.name,loc1);
+			loc1;
 		}
-		this._vert = vertexShader;
-		this._frag = fragmentShader;
-		this._prog = shaderProgram;
-		let count = this._uniforms.length;
-		let removeList = [];
-		this._numTextures = 0;
-		this._textures = [];
-		let _g1 = 0;
-		let _g11 = this._uniforms;
+		this.vert = vertexShader;
+		this.frag = fragmentShader;
+		this.prog = shaderProgram;
+		var count = this.uniforms.length;
+		var removeList = [];
+		this.numTextures = 0;
+		this.textures = [];
+		var _g1 = 0;
+		var _g11 = this.uniforms;
 		while(_g1 < _g11.length) {
-			let u = _g11[_g1];
+			var u = _g11[_g1];
 			++_g1;
-			let tmp2;
-			let key2 = u.name;
-			if(__map_reserved[key2] != null) tmp2 = uniformLocations.getReserved(key2); else tmp2 = uniformLocations.h[key2];
-			let loc2 = tmp2;
-			if(js_Boot.__instanceof(u,shaderblox_uniforms_UTexture)) {
-				let t = u;
-				t.samplerIndex = this._numTextures++;
-				this._textures[t.samplerIndex] = t;
+			var loc2 = uniformLocations.get(u.name);
+			if(js.Boot.__instanceof(u,shaderblox.uniforms.UTexture)) {
+				var t = u;
+				t.samplerIndex = this.numTextures++;
+				this.textures[t.samplerIndex] = t;
 			}
 			if(loc2 != null) u.location = loc2; else removeList.push(u);
 		}
 		while(removeList.length > 0) {
-			let x = removeList.pop();
-			HxOverrides.remove(this._uniforms,x);
+			var x = removeList.pop();
+			HxOverrides.remove(this.uniforms,x);
 		}
-		let _g2 = 0;
-		let _g12 = this._attributes;
+		var _g2 = 0;
+		var _g12 = this.attributes;
 		while(_g2 < _g12.length) {
-			let a = _g12[_g2];
+			var a = _g12[_g2];
 			++_g2;
-			let tmp3;
-			let key3 = a.name;
-			if(__map_reserved[key3] != null) tmp3 = attributeLocations.getReserved(key3); else tmp3 = attributeLocations.h[key3];
-			let loc3 = tmp3;
-			a.location = loc3 == null?-1:loc3;
+			var loc3 = attributeLocations.get(a.name);
+			if(loc3 == null) a.location = -1; else a.location = loc3;
 		}
 	}
 	,activate: function(initUniforms,initAttribs) {
 		if(initAttribs == null) initAttribs = false;
 		if(initUniforms == null) initUniforms = true;
-		if(this._active) {
-			if(initUniforms) {
-				let _g = 0;
-				let _g1 = this._uniforms;
-				while(_g < _g1.length) {
-					let u = _g1[_g];
-					++_g;
-					u.apply();
-				}
-			}
-			if(initAttribs) {
-				let offset = 0;
-				let _g11 = 0;
-				let _g2 = this._attributes.length;
-				while(_g11 < _g2) {
-					let i = _g11++;
-					let att = this._attributes[i];
-					let location = att.location;
-					if(location != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,this._aStride,offset);
-					}
-					offset += att.byteSize;
-				}
-			}
+		if(this.active) {
+			if(initUniforms) this.setUniforms();
+			if(initAttribs) this.setAttributes();
 			return;
 		}
-		if(!this._ready) this.create();
-		flu_modules_opengl_web_GL.current_context.useProgram(this._prog);
-		if(initUniforms) {
-			let _g3 = 0;
-			let _g12 = this._uniforms;
-			while(_g3 < _g12.length) {
-				let u1 = _g12[_g3];
-				++_g3;
-				u1.apply();
-			}
-		}
-		if(initAttribs) {
-			let offset1 = 0;
-			let _g13 = 0;
-			let _g4 = this._attributes.length;
-			while(_g13 < _g4) {
-				let i1 = _g13++;
-				let att1 = this._attributes[i1];
-				let location1 = att1.location;
-				if(location1 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,this._aStride,offset1);
-				}
-				offset1 += att1.byteSize;
-			}
-		}
-		this._active = true;
+		if(!this.ready) this.create();
+		lime.graphics.opengl.GL.context.useProgram(this.prog);
+		if(initUniforms) this.setUniforms();
+		if(initAttribs) this.setAttributes();
+		this.active = true;
 	}
 	,deactivate: function() {
-		if(!this._active) return;
-		this._active = false;
+		if(!this.active) return;
+		this.active = false;
 		this.disableAttributes();
 	}
-	,disableAttributes: function() {
-		let _g1 = 0;
-		let _g = this._attributes.length;
-		while(_g1 < _g) {
-			let i = _g1++;
-			let idx = this._attributes[i].location;
-			if(idx == -1) continue;
-			flu_modules_opengl_web_GL.current_context.disableVertexAttribArray(idx);
+	,setUniforms: function() {
+		var _g = 0;
+		var _g1 = this.uniforms;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			u.apply();
 		}
 	}
-	,__class__: shaderblox_ShaderBase
+	,setAttributes: function() {
+		var offset = 0;
+		var _g1 = 0;
+		var _g = this.attributes.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var att = this.attributes[i];
+			var location = att.location;
+			if(location != -1) {
+				lime.graphics.opengl.GL.context.enableVertexAttribArray(location);
+				lime.graphics.opengl.GL.context.vertexAttribPointer(location,att.itemCount,att.type,false,this.aStride,offset);
+			}
+			offset += att.byteSize;
+		}
+	}
+	,disableAttributes: function() {
+		var _g1 = 0;
+		var _g = this.attributes.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var idx = this.attributes[i].location;
+			if(idx == -1) continue;
+			lime.graphics.opengl.GL.context.disableVertexAttribArray(idx);
+		}
+	}
+	,toString: function() {
+		return "[Shader(" + this.name + ", attributes:" + this.attributes.length + ", uniforms:" + this.uniforms.length + ")]";
+	}
+	,__class__: shaderblox.ShaderBase
 };
-let FluidBase = function() {
-	shaderblox_ShaderBase.call(this);
+var FluidBase = function() {
+	shaderblox.ShaderBase.call(this);
 };
 $hxClasses["FluidBase"] = FluidBase;
 FluidBase.__name__ = true;
-FluidBase.__super__ = shaderblox_ShaderBase;
-FluidBase.prototype = $extend(shaderblox_ShaderBase.prototype,{
-	set_FLOAT_VELOCITY: function(value) {
-		this.FLOAT_VELOCITY = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_VELOCITY",value);
-		if(this._ready) this.destroy();
-		return value;
-	}
-	,set_FLOAT_PRESSURE: function(value) {
-		this.FLOAT_PRESSURE = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_PRESSURE",value);
-		if(this._ready) this.destroy();
-		return value;
-	}
-	,set_FLOAT_DIVERGENCE: function(value) {
-		this.FLOAT_DIVERGENCE = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_DIVERGENCE",value);
-		if(this._ready) this.destroy();
-		return value;
+FluidBase.__super__ = shaderblox.ShaderBase;
+FluidBase.prototype = $extend(shaderblox.ShaderBase.prototype,{
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n");
+		this.ready = true;
 	}
 	,createProperties: function() {
-		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UFloat("aspectRatio",null);
+		shaderblox.ShaderBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["aspectRatio",-1]);
 		this.aspectRatio = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UVec2("invresolution",null);
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UVec2"),["invresolution",-1]);
 		this.invresolution = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.attributes.FloatAttribute"),["vertexPosition",0,2]);
 		this.vertexPosition = instance2;
-		this._attributes.push(instance2);
-		this._aStride += 8;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n";
+		this.attributes.push(instance2);
+		this.aStride += 8;
 	}
 	,__class__: FluidBase
 });
-let Advect = function() {
+var Advect = function() {
 	FluidBase.call(this);
 };
 $hxClasses["Advect"] = Advect;
 Advect.__name__ = true;
 Advect.__super__ = FluidBase;
 Advect.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
-		this.velocity = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UTexture("target",null,false);
-		this.target = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UFloat("dt",null);
-		this.dt = instance2;
-		this._uniforms.push(instance2);
-		let instance3 = new shaderblox_uniforms_UFloat("rdx",null);
-		this.rdx = instance3;
-		this._uniforms.push(instance3);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D velocity;\nuniform sampler2D target;\nuniform float dt;\nuniform float rdx; \n\nvarying vec2 texelCoord;\nvarying vec2 p;\n\nvoid main(void){\n  \n  \n  vec2 tracedPos = p - dt * rdx * texture2D(velocity, texelCoord ).xy;\n\n  \n  tracedPos = simToTexelSpace(tracedPos)/invresolution; \n  \n  vec4 st;\n  st.xy = floor(tracedPos-.5)+.5; \n  st.zw = st.xy+1.;               \n\n  vec2 t = tracedPos - st.xy;\n\n  st*=invresolution.xyxy; \n  \n  vec4 tex11 = texture2D(target, st.xy );\n  vec4 tex21 = texture2D(target, st.zy );\n  vec4 tex12 = texture2D(target, st.xw );\n  vec4 tex22 = texture2D(target, st.zw );\n\n  \n  gl_FragColor = mix(mix(tex11, tex21, t.x), mix(tex12, tex22, t.x), t.y);\n}\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D velocity;\r\nuniform sampler2D target;\r\nuniform float dt;\r\nuniform float rdx; \n\r\nvarying vec2 texelCoord;\r\nvarying vec2 p;\n\r\nvoid main(void){\r\n  \n  \r\n  vec2 tracedPos = p - dt * rdx * sampleVelocity(velocity, texelCoord ).xy; \n\r\n  \n  \n  tracedPos = aspectToTexelSpace(tracedPos);\r\n  \n  tracedPos /= invresolution;\r\n  \r\n  vec4 st;\r\n  st.xy = floor(tracedPos-.5)+.5; \n  st.zw = st.xy+1.;               \n\r\n  vec2 t = tracedPos - st.xy;\r\n\r\n  st *= invresolution.xyxy; \n  \r\n  vec4 tex11 = texture2D(target, st.xy );\r\n  vec4 tex21 = texture2D(target, st.zy );\r\n  vec4 tex12 = texture2D(target, st.xw );\r\n  vec4 tex22 = texture2D(target, st.zw );\r\n\r\n  \n  gl_FragColor = mix(mix(tex11, tex21, t.x), mix(tex12, tex22, t.x), t.y);\r\n}\n";
+	,createProperties: function() {
+		FluidBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["velocity",-1,false]);
+		this.velocity = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["target",-1,false]);
+		this.target = instance1;
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["dt",-1]);
+		this.dt = instance2;
+		this.uniforms.push(instance2);
+		var instance3 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["rdx",-1]);
+		this.rdx = instance3;
+		this.uniforms.push(instance3);
+		this.aStride += 0;
 	}
 	,__class__: Advect
 });
-let AdvectVelocity = function() {
-	FluidBase.call(this);
-};
-$hxClasses["AdvectVelocity"] = AdvectVelocity;
-AdvectVelocity.__name__ = true;
-AdvectVelocity.__super__ = FluidBase;
-AdvectVelocity.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
-		this.velocity = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UFloat("dt",null);
-		this.dt = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UFloat("rdx",null);
-		this.rdx = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D velocity;\r\nuniform float dt;\r\nuniform float rdx; \n\r\nvarying vec2 texelCoord;\r\nvarying vec2 p;\n\r\nvoid main(void){\r\n  \n  \r\n  vec2 tracedPos = p - dt * rdx * sampleVelocity(velocity, texelCoord).xy; \n\r\n  \n  \n  tracedPos = aspectToTexelSpace(tracedPos);\r\n  \n  tracedPos /= invresolution;\r\n  \r\n  vec4 st;\r\n  st.xy = floor(tracedPos-.5)+.5; \n  st.zw = st.xy+1.;               \n\r\n  vec2 t = tracedPos - st.xy;\r\n\r\n  st *= invresolution.xyxy; \n  \r\n  vec2 tex11 = sampleVelocity(velocity, st.xy);\r\n  vec2 tex21 = sampleVelocity(velocity, st.zy);\r\n  vec2 tex12 = sampleVelocity(velocity, st.xw);\r\n  vec2 tex22 = sampleVelocity(velocity, st.zw);\r\n  \r\n  \n  gl_FragColor = packFluidVelocity(mix(mix(tex11, tex21, t.x), mix(tex12, tex22, t.x), t.y));\r\n}\n";
-	}
-	,__class__: AdvectVelocity
-});
-let Divergence = function() {
+var Divergence = function() {
 	FluidBase.call(this);
 };
 $hxClasses["Divergence"] = Divergence;
 Divergence.__name__ = true;
 Divergence.__super__ = FluidBase;
 Divergence.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
-		this.velocity = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UFloat("halfrdx",null);
-		this.halfrdx = instance1;
-		this._uniforms.push(instance1);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D velocity;\t\nuniform float halfrdx;\t\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvoid main(void){\r\n\t\n \t\n\tvec2 L = sampleVelocity(velocity, texelCoord - vec2(invresolution.x, 0));\r\n\tvec2 R = sampleVelocity(velocity, texelCoord + vec2(invresolution.x, 0));\r\n\tvec2 B = sampleVelocity(velocity, texelCoord - vec2(0, invresolution.y));\r\n\tvec2 T = sampleVelocity(velocity, texelCoord + vec2(0, invresolution.y));\r\n\r\n\tgl_FragColor = vec4( halfrdx * ((R.x - L.x) + (T.y - B.y)), 0, 0, 1);\r\n}\r\n\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D velocity;\t\nuniform float halfrdx;\t\n\r\nvarying vec2 texelCoord;\r\n\r\nvoid main(void){\r\n\t\n \t\n\tvec2 L = sampleVelocity(velocity, texelCoord - vec2(invresolution.x, 0));\r\n\tvec2 R = sampleVelocity(velocity, texelCoord + vec2(invresolution.x, 0));\r\n\tvec2 B = sampleVelocity(velocity, texelCoord - vec2(0, invresolution.y));\r\n\tvec2 T = sampleVelocity(velocity, texelCoord + vec2(0, invresolution.y));\r\n\r\n\tgl_FragColor = packFluidDivergence( halfrdx * ((R.x - L.x) + (T.y - B.y)));\r\n}\r\n\n";
+	,createProperties: function() {
+		FluidBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["velocity",-1,false]);
+		this.velocity = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["halfrdx",-1]);
+		this.halfrdx = instance1;
+		this.uniforms.push(instance1);
+		this.aStride += 0;
 	}
 	,__class__: Divergence
 });
-let PressureSolve = function() {
+var PressureSolve = function() {
 	FluidBase.call(this);
 };
 $hxClasses["PressureSolve"] = PressureSolve;
 PressureSolve.__name__ = true;
 PressureSolve.__super__ = FluidBase;
 PressureSolve.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("pressure",null,false);
-		this.pressure = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UTexture("divergence",null,false);
-		this.divergence = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UFloat("alpha",null);
-		this.alpha = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D pressure;\nuniform sampler2D divergence;\nuniform float alpha;\n\nvarying vec2 texelCoord;\n\nvoid main(void){\n  \n  \n  float L = samplePressue(pressure, texelCoord - vec2(invresolution.x, 0));\n  float R = samplePressue(pressure, texelCoord + vec2(invresolution.x, 0));\n  float B = samplePressue(pressure, texelCoord - vec2(0, invresolution.y));\n  float T = samplePressue(pressure, texelCoord + vec2(0, invresolution.y));\n\n  float bC = texture2D(divergence, texelCoord).x;\n\n  gl_FragColor = vec4( (L + R + B + T + alpha * bC) * .25, 0, 0, 1 );\n}\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D pressure;\r\nuniform sampler2D divergence;\r\nuniform float alpha;\n\r\nvarying vec2 texelCoord;\r\n\r\nvoid main(void){\r\n  \n  \n  float L = samplePressue(pressure, texelCoord - vec2(invresolution.x, 0));\r\n  float R = samplePressue(pressure, texelCoord + vec2(invresolution.x, 0));\r\n  float B = samplePressue(pressure, texelCoord - vec2(0, invresolution.y));\r\n  float T = samplePressue(pressure, texelCoord + vec2(0, invresolution.y));\r\n\r\n  float bC = sampleDivergence(divergence, texelCoord);\r\n\r\n  gl_FragColor = packFluidPressure((L + R + B + T + alpha * bC) * .25);\n}\n";
+	,createProperties: function() {
+		FluidBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["pressure",-1,false]);
+		this.pressure = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["divergence",-1,false]);
+		this.divergence = instance1;
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["alpha",-1]);
+		this.alpha = instance2;
+		this.uniforms.push(instance2);
+		this.aStride += 0;
 	}
 	,__class__: PressureSolve
 });
-let PressureGradientSubstract = function() {
+var PressureGradientSubstract = function() {
 	FluidBase.call(this);
 };
 $hxClasses["PressureGradientSubstract"] = PressureGradientSubstract;
 PressureGradientSubstract.__name__ = true;
 PressureGradientSubstract.__super__ = FluidBase;
 PressureGradientSubstract.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("pressure",null,false);
-		this.pressure = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UTexture("velocity",null,false);
-		this.velocity = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UFloat("halfrdx",null);
-		this.halfrdx = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D pressure;\r\nuniform sampler2D velocity;\r\nuniform float halfrdx;\r\n\r\nvarying vec2 texelCoord;\r\n\r\nvoid main(void){\r\n  float L = samplePressue(pressure, texelCoord - vec2(invresolution.x, 0));\r\n  float R = samplePressue(pressure, texelCoord + vec2(invresolution.x, 0));\r\n  float B = samplePressue(pressure, texelCoord - vec2(0, invresolution.y));\r\n  float T = samplePressue(pressure, texelCoord + vec2(0, invresolution.y));\r\n\r\n  vec2 v = texture2D(velocity, texelCoord).xy;\r\n\r\n  gl_FragColor = vec4(v - halfrdx*vec2(R-L, T-B), 0, 1);\r\n}\r\n\r\n\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D pressure;\r\nuniform sampler2D velocity;\r\nuniform float halfrdx;\r\n\r\nvarying vec2 texelCoord;\r\n\r\nvoid main(void){\r\n  float L = samplePressue(pressure, texelCoord - vec2(invresolution.x, 0));\r\n  float R = samplePressue(pressure, texelCoord + vec2(invresolution.x, 0));\r\n  float B = samplePressue(pressure, texelCoord - vec2(0, invresolution.y));\r\n  float T = samplePressue(pressure, texelCoord + vec2(0, invresolution.y));\r\n\r\n  vec2 v = sampleVelocity(velocity, texelCoord);\r\n\r\n  gl_FragColor = packFluidVelocity(v - halfrdx*vec2(R-L, T-B));\r\n}\r\n\r\n\n";
+	,createProperties: function() {
+		FluidBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["pressure",-1,false]);
+		this.pressure = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["velocity",-1,false]);
+		this.velocity = instance1;
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["halfrdx",-1]);
+		this.halfrdx = instance2;
+		this.uniforms.push(instance2);
+		this.aStride += 0;
 	}
 	,__class__: PressureGradientSubstract
 });
-let ApplyForces = function() {
+var ApplyForces = function() {
 	FluidBase.call(this);
 };
 $hxClasses["ApplyForces"] = ApplyForces;
 ApplyForces.__name__ = true;
 ApplyForces.__super__ = FluidBase;
 ApplyForces.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("velocity",null,false);
-		this.velocity = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UFloat("dt",null);
-		this.dt = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UFloat("dx",null);
-		this.dx = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D velocity;\n\tuniform float dt;\n\tuniform float dx;\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D velocity;\n\tuniform float dt;\n\tuniform float dx;\n\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n";
+	,createProperties: function() {
+		FluidBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["velocity",-1,false]);
+		this.velocity = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["dt",-1]);
+		this.dt = instance1;
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["dx",-1]);
+		this.dx = instance2;
+		this.uniforms.push(instance2);
+		this.aStride += 0;
 	}
 	,__class__: ApplyForces
 });
-let UpdateDye = function() {
+var UpdateDye = function() {
 	FluidBase.call(this);
 };
 $hxClasses["UpdateDye"] = UpdateDye;
 UpdateDye.__name__ = true;
 UpdateDye.__super__ = FluidBase;
 UpdateDye.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("dye",null,false);
-		this.dye = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UFloat("dt",null);
-		this.dt = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UFloat("dx",null);
-		this.dx = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D dye;\n\tuniform float dt;\n\tuniform float dx;\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D dye;\n\tuniform float dt;\n\tuniform float dx;\n\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n";
+	,createProperties: function() {
+		FluidBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["dye",-1,false]);
+		this.dye = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["dt",-1]);
+		this.dt = instance1;
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["dx",-1]);
+		this.dx = instance2;
+		this.uniforms.push(instance2);
+		this.aStride += 0;
 	}
 	,__class__: UpdateDye
 });
-let ClearVelocity = function() {
-	FluidBase.call(this);
-};
-$hxClasses["ClearVelocity"] = ClearVelocity;
-ClearVelocity.__name__ = true;
-ClearVelocity.__super__ = FluidBase;
-ClearVelocity.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		this._aStride += 0;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nvoid main(){\n\tgl_FragColor = packFluidVelocity(vec2(0));\n}\n";
-	}
-	,__class__: ClearVelocity
-});
-let ClearPressure = function() {
-	FluidBase.call(this);
-};
-$hxClasses["ClearPressure"] = ClearPressure;
-ClearPressure.__name__ = true;
-ClearPressure.__super__ = FluidBase;
-ClearPressure.prototype = $extend(FluidBase.prototype,{
-	createProperties: function() {
-		FluidBase.prototype.createProperties.call(this);
-		this._aStride += 0;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nvoid main(){\n\tgl_FragColor = packFluidPressure(0.0);\n}\n";
-	}
-	,__class__: ClearPressure
-});
-let GPUParticles = function(count) {
-	this.floatDataType = null;
-	if(GPUCapabilities.get_writeToFloat()) this.floatDataType = 5126; else if(GPUCapabilities.get_writeToHalfFloat()) this.floatDataType = GPUCapabilities.get_HALF_FLOAT();
-	this.floatData = this.floatDataType != null;
-	this.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad();
-	this.velocityStepShader = new VelocityStep();
-	this.positionStepShader = new PositionStep();
-	this.initialPositionShader = new InitialPosition();
-	this.initialVelocityShader = new InitialVelocity();
-	this.velocityStepShader.set_FLOAT_DATA(this.floatData?"true":"false");
-	this.positionStepShader.set_FLOAT_DATA(this.floatData?"true":"false");
-	this.initialPositionShader.set_FLOAT_DATA(this.floatData?"true":"false");
-	this.initialVelocityShader.set_FLOAT_DATA(this.floatData?"true":"false");
-	let _this = this.velocityStepShader.dragCoefficient;
-	_this.dirty = true;
-	_this.data = 1;
-	this.velocityStepShader.flowScale.data.x = 1;
-	this.velocityStepShader.flowScale.data.y = 1;
-	this.velocityStepShader.set_FLOAT_VELOCITY("false");
+var GPUParticles = function(gl,count) {
+	if(count == null) count = 524288;
+	this.gl = gl;
+	gl.getExtension("OES_texture_float");
+	this.textureQuad = gltoolbox.GeometryTools.getCachedTextureQuad();
+	this.inititalConditionsShader = new InitialConditions();
+	this.stepParticlesShader = new StepParticles();
+	this.stepParticlesShader.dragCoefficient.set_data(1);
+	this.stepParticlesShader.flowScale.data.x = 1;
+	this.stepParticlesShader.flowScale.data.y = 1;
 	this.setCount(count);
-	let shader = this.initialPositionShader;
-	let target = this.positionData;
-	flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-	if(shader._active) {
-		let _g = 0;
-		let _g1 = shader._uniforms;
-		while(_g < _g1.length) {
-			let u = _g1[_g];
-			++_g;
-			u.apply();
-		}
-		let offset = 0;
-		let _g11 = 0;
-		let _g2 = shader._attributes.length;
-		while(_g11 < _g2) {
-			let i = _g11++;
-			let att = shader._attributes[i];
-			let location = att.location;
-			if(location != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-			}
-			offset += att.byteSize;
-		}
-	} else {
-		if(!shader._ready) shader.create();
-		flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-		let _g3 = 0;
-		let _g12 = shader._uniforms;
-		while(_g3 < _g12.length) {
-			let u1 = _g12[_g3];
-			++_g3;
-			u1.apply();
-		}
-		let offset1 = 0;
-		let _g13 = 0;
-		let _g4 = shader._attributes.length;
-		while(_g13 < _g4) {
-			let i1 = _g13++;
-			let att1 = shader._attributes[i1];
-			let location1 = att1.location;
-			if(location1 != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-			}
-			offset1 += att1.byteSize;
-		}
-		shader._active = true;
-	}
-	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-	shader.deactivate();
-	target.tmpFBO = target.writeFrameBufferObject;
-	target.writeFrameBufferObject = target.readFrameBufferObject;
-	target.readFrameBufferObject = target.tmpFBO;
-	target.tmpTex = target.writeToTexture;
-	target.writeToTexture = target.readFromTexture;
-	target.readFromTexture = target.tmpTex;
-	let shader1 = this.initialVelocityShader;
-	let target1 = this.velocityData;
-	flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-	if(shader1._active) {
-		let _g5 = 0;
-		let _g14 = shader1._uniforms;
-		while(_g5 < _g14.length) {
-			let u2 = _g14[_g5];
-			++_g5;
-			u2.apply();
-		}
-		let offset2 = 0;
-		let _g15 = 0;
-		let _g6 = shader1._attributes.length;
-		while(_g15 < _g6) {
-			let i2 = _g15++;
-			let att2 = shader1._attributes[i2];
-			let location2 = att2.location;
-			if(location2 != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-			}
-			offset2 += att2.byteSize;
-		}
-	} else {
-		if(!shader1._ready) shader1.create();
-		flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-		let _g7 = 0;
-		let _g16 = shader1._uniforms;
-		while(_g7 < _g16.length) {
-			let u3 = _g16[_g7];
-			++_g7;
-			u3.apply();
-		}
-		let offset3 = 0;
-		let _g17 = 0;
-		let _g8 = shader1._attributes.length;
-		while(_g17 < _g8) {
-			let i3 = _g17++;
-			let att3 = shader1._attributes[i3];
-			let location3 = att3.location;
-			if(location3 != -1) {
-				flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-				flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-			}
-			offset3 += att3.byteSize;
-		}
-		shader1._active = true;
-	}
-	flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-	shader1.deactivate();
-	target1.tmpFBO = target1.writeFrameBufferObject;
-	target1.writeFrameBufferObject = target1.readFrameBufferObject;
-	target1.readFrameBufferObject = target1.tmpFBO;
-	target1.tmpTex = target1.writeToTexture;
-	target1.writeToTexture = target1.readFromTexture;
-	target1.readFromTexture = target1.tmpTex;
+	this.renderShaderTo(this.inititalConditionsShader,this.particleData);
 };
 $hxClasses["GPUParticles"] = GPUParticles;
 GPUParticles.__name__ = true;
 GPUParticles.prototype = {
-	reset: function() {
-		let shader = this.initialPositionShader;
-		let target = this.positionData;
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		if(shader._active) {
-			let _g = 0;
-			let _g1 = shader._uniforms;
-			while(_g < _g1.length) {
-				let u = _g1[_g];
-				++_g;
-				u.apply();
+	step: function(dt) {
+		this.stepParticlesShader.dt.set_data(dt);
+		this.stepParticlesShader.particleData.set_data(this.particleData.readFromTexture);
+		this.renderShaderTo(this.stepParticlesShader,this.particleData);
+	}
+	,reset: function() {
+		this.renderShaderTo(this.inititalConditionsShader,this.particleData);
+	}
+	,setCount: function(newCount) {
+		var dataWidth = Math.ceil(Math.sqrt(newCount));
+		var dataHeight = dataWidth;
+		if(this.particleData != null) this.particleData.resize(dataWidth,dataHeight); else this.particleData = new gltoolbox.render.RenderTarget2Phase(dataWidth,dataHeight,gltoolbox.TextureTools.floatTextureFactoryRGBA);
+		if(this.particleUVs != null) this.gl.deleteBuffer(this.particleUVs);
+		this.particleUVs = this.gl.createBuffer();
+		var arrayUVs = new Array();
+		var _g = 0;
+		while(_g < dataWidth) {
+			var i = _g++;
+			var _g1 = 0;
+			while(_g1 < dataHeight) {
+				var j = _g1++;
+				arrayUVs.push(i / dataWidth);
+				arrayUVs.push(j / dataHeight);
 			}
-			let offset = 0;
-			let _g11 = 0;
-			let _g2 = shader._attributes.length;
-			while(_g11 < _g2) {
-				let i = _g11++;
-				let att = shader._attributes[i];
-				let location = att.location;
-				if(location != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-				}
-				offset += att.byteSize;
-			}
-		} else {
-			if(!shader._ready) shader.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			let _g3 = 0;
-			let _g12 = shader._uniforms;
-			while(_g3 < _g12.length) {
-				let u1 = _g12[_g3];
-				++_g3;
-				u1.apply();
-			}
-			let offset1 = 0;
-			let _g13 = 0;
-			let _g4 = shader._attributes.length;
-			while(_g13 < _g4) {
-				let i1 = _g13++;
-				let att1 = shader._attributes[i1];
-				let location1 = att1.location;
-				if(location1 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-				}
-				offset1 += att1.byteSize;
-			}
-			shader._active = true;
 		}
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.particleUVs);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER,new Float32Array(arrayUVs),this.gl.STATIC_DRAW);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER,null);
+		return this.count = newCount;
+	}
+	,renderShaderTo: function(shader,target) {
+		this.gl.viewport(0,0,target.width,target.height);
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,target.writeFrameBufferObject);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.textureQuad);
+		if(shader.active) {
+			shader.setUniforms();
+			shader.setAttributes();
+			null;
+		} else {
+			if(!shader.ready) shader.create();
+			lime.graphics.opengl.GL.context.useProgram(shader.prog);
+			shader.setUniforms();
+			shader.setAttributes();
+			shader.active = true;
+		}
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP,0,4);
 		shader.deactivate();
 		target.tmpFBO = target.writeFrameBufferObject;
 		target.writeFrameBufferObject = target.readFrameBufferObject;
@@ -1682,309 +789,147 @@ GPUParticles.prototype = {
 		target.tmpTex = target.writeToTexture;
 		target.writeToTexture = target.readFromTexture;
 		target.readFromTexture = target.tmpTex;
-		let shader1 = this.initialVelocityShader;
-		let target1 = this.velocityData;
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		if(shader1._active) {
-			let _g5 = 0;
-			let _g14 = shader1._uniforms;
-			while(_g5 < _g14.length) {
-				let u2 = _g14[_g5];
-				++_g5;
-				u2.apply();
-			}
-			let offset2 = 0;
-			let _g15 = 0;
-			let _g6 = shader1._attributes.length;
-			while(_g15 < _g6) {
-				let i2 = _g15++;
-				let att2 = shader1._attributes[i2];
-				let location2 = att2.location;
-				if(location2 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-				}
-				offset2 += att2.byteSize;
-			}
-		} else {
-			if(!shader1._ready) shader1.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-			let _g7 = 0;
-			let _g16 = shader1._uniforms;
-			while(_g7 < _g16.length) {
-				let u3 = _g16[_g7];
-				++_g7;
-				u3.apply();
-			}
-			let offset3 = 0;
-			let _g17 = 0;
-			let _g8 = shader1._attributes.length;
-			while(_g17 < _g8) {
-				let i3 = _g17++;
-				let att3 = shader1._attributes[i3];
-				let location3 = att3.location;
-				if(location3 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-				}
-				offset3 += att3.byteSize;
-			}
-			shader1._active = true;
-		}
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader1.deactivate();
-		target1.tmpFBO = target1.writeFrameBufferObject;
-		target1.writeFrameBufferObject = target1.readFrameBufferObject;
-		target1.readFrameBufferObject = target1.tmpFBO;
-		target1.tmpTex = target1.writeToTexture;
-		target1.writeToTexture = target1.readFromTexture;
-		target1.readFromTexture = target1.tmpTex;
 	}
-	,setCount: function(newCount) {
-		let dataWidth = Math.ceil(Math.sqrt(newCount));
-		if(this.positionData == null) {
-			let tmp1;
-			let params = { channelType : 6408, dataType : this.floatData?this.floatDataType:5121, filter : 9728};
-			tmp1 = function(width,height) {
-				return gltoolbox_TextureTools.createTexture(width,height,params);
-			};
-			this.positionData = new gltoolbox_render_RenderTarget2Phase(dataWidth,dataWidth,tmp1);
-		} else this.positionData.resize(dataWidth,dataWidth);
-		if(this.velocityData == null) {
-			let tmp2;
-			let params1 = { channelType : 6408, dataType : this.floatData?this.floatDataType:5121, filter : 9728};
-			tmp2 = function(width1,height1) {
-				return gltoolbox_TextureTools.createTexture(width1,height1,params1);
-			};
-			this.velocityData = new gltoolbox_render_RenderTarget2Phase(dataWidth,dataWidth,tmp2);
-		} else this.velocityData.resize(dataWidth,dataWidth);
-		if(this.particleUVs != null) flu_modules_opengl_web_GL.current_context.deleteBuffer(this.particleUVs);
-		this.particleUVs = flu_modules_opengl_web_GL.current_context.createBuffer();
-		let tmp;
-		let elements = dataWidth * dataWidth * 2;
-		let this1;
-		if(elements != null) this1 = new Float32Array(elements); else this1 = null;
-		tmp = this1;
-		let arrayUVs = tmp;
-		let index;
-		let _g = 0;
-		while(_g < dataWidth) {
-			let i = _g++;
-			let _g1 = 0;
-			while(_g1 < dataWidth) {
-				let j = _g1++;
-				index = (i * dataWidth + j) * 2;
-				arrayUVs[index] = i / dataWidth;
-				let idx = ++index;
-				arrayUVs[idx] = j / dataWidth;
-			}
-		}
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particleUVs);
-		flu_modules_opengl_web_GL.current_context.bufferData(34962,arrayUVs,35044);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
-		let particleSpacing = 2 / dataWidth;
-		let _this = this.initialPositionShader.jitterAmount;
-		_this.dirty = true;
-		_this.data = particleSpacing;
-		return this.count = newCount;
+	,get_dragCoefficient: function() {
+		return this.stepParticlesShader.dragCoefficient.data;
+	}
+	,get_flowScaleX: function() {
+		return this.stepParticlesShader.flowScale.data.x;
+	}
+	,get_flowScaleY: function() {
+		return this.stepParticlesShader.flowScale.data.y;
+	}
+	,get_flowVelocityField: function() {
+		return this.stepParticlesShader.flowVelocityField.data;
+	}
+	,set_dragCoefficient: function(v) {
+		return this.stepParticlesShader.dragCoefficient.set_data(v);
+	}
+	,set_flowScaleX: function(v) {
+		return this.stepParticlesShader.flowScale.data.x = v;
+	}
+	,set_flowScaleY: function(v) {
+		return this.stepParticlesShader.flowScale.data.y = v;
+	}
+	,set_flowVelocityField: function(v) {
+		return this.stepParticlesShader.flowVelocityField.set_data(v);
 	}
 	,__class__: GPUParticles
 };
-let PlaneTexture = function() {
-	shaderblox_ShaderBase.call(this);
+var PlaneTexture = function() {
+	shaderblox.ShaderBase.call(this);
 };
 $hxClasses["PlaneTexture"] = PlaneTexture;
 PlaneTexture.__name__ = true;
-PlaneTexture.__super__ = shaderblox_ShaderBase;
-PlaneTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
-	createProperties: function() {
-		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
-		this.vertexPosition = instance;
-		this._attributes.push(instance);
-		this._aStride += 8;
+PlaneTexture.__super__ = shaderblox.ShaderBase;
+PlaneTexture.prototype = $extend(shaderblox.ShaderBase.prototype,{
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec2 texelCoord;\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec2 texelCoord;\n";
+	,createProperties: function() {
+		shaderblox.ShaderBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.attributes.FloatAttribute"),["vertexPosition",0,2]);
+		this.vertexPosition = instance;
+		this.attributes.push(instance);
+		this.aStride += 8;
 	}
 	,__class__: PlaneTexture
 });
-let ParticleBase = function() {
+var InitialConditions = function() {
+	PlaneTexture.call(this);
+};
+$hxClasses["InitialConditions"] = InitialConditions;
+InitialConditions.__name__ = true;
+InitialConditions.__super__ = PlaneTexture;
+InitialConditions.prototype = $extend(PlaneTexture.prototype,{
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec2 texelCoord;\n\nvoid main(){\n\t\tvec2 ip = vec2((texelCoord.x), (texelCoord.y)) * 2.0 - 1.0;\n\t\tvec2 iv = vec2(0,0);\n\t\tgl_FragColor = vec4(ip, iv);\n\t}\n");
+		this.ready = true;
+	}
+	,createProperties: function() {
+		PlaneTexture.prototype.createProperties.call(this);
+		this.aStride += 0;
+	}
+	,__class__: InitialConditions
+});
+var ParticleBase = function() {
 	PlaneTexture.call(this);
 };
 $hxClasses["ParticleBase"] = ParticleBase;
 ParticleBase.__name__ = true;
 ParticleBase.__super__ = PlaneTexture;
 ParticleBase.prototype = $extend(PlaneTexture.prototype,{
-	createProperties: function() {
-		PlaneTexture.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UFloat("dt",null);
-		this.dt = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UTexture("positionData",null,false);
-		this.positionData = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UTexture("velocityData",null,false);
-		this.velocityData = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec2 texelCoord;\n\nuniform float dt;\n\tuniform sampler2D particleData;\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec2 texelCoord;\n\nuniform float dt;\n\tuniform sampler2D positionData;\n\tuniform sampler2D velocityData;\n";
+	,createProperties: function() {
+		PlaneTexture.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["dt",-1]);
+		this.dt = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["particleData",-1,false]);
+		this.particleData = instance1;
+		this.uniforms.push(instance1);
+		this.aStride += 0;
 	}
 	,__class__: ParticleBase
 });
-let VelocityStep = function() {
+var StepParticles = function() {
 	ParticleBase.call(this);
 };
-$hxClasses["VelocityStep"] = VelocityStep;
-VelocityStep.__name__ = true;
-VelocityStep.__super__ = ParticleBase;
-VelocityStep.prototype = $extend(ParticleBase.prototype,{
-	set_FLOAT_VELOCITY: function(value) {
-		this.FLOAT_VELOCITY = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_VELOCITY",value);
-		if(this._ready) this.destroy();
-		return value;
-	}
-	,set_FLOAT_DATA: function(value) {
-		this.FLOAT_DATA = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_DATA",value);
-		if(this._ready) this.destroy();
-		return value;
+$hxClasses["StepParticles"] = StepParticles;
+StepParticles.__name__ = true;
+StepParticles.__super__ = ParticleBase;
+StepParticles.prototype = $extend(ParticleBase.prototype,{
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec2 texelCoord;\n\nuniform float dt;\n\tuniform sampler2D particleData;\n\nuniform float dragCoefficient;\n\tuniform vec2 flowScale;\n\tuniform sampler2D flowVelocityField;\n\tvoid main(){\n\t\tvec2 p = texture2D(particleData, texelCoord).xy;\n\t\tvec2 v = texture2D(particleData, texelCoord).zw;\n\t\tvec2 vf = texture2D(flowVelocityField, (p+1.)*.5).xy * flowScale;\n\t\tv += (vf - v) * dragCoefficient;\n\t\tp+=dt*v;\n\t\tgl_FragColor = vec4(p, v);\n\t}\n");
+		this.ready = true;
 	}
 	,createProperties: function() {
 		ParticleBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UFloat("dragCoefficient",null);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UFloat"),["dragCoefficient",-1]);
 		this.dragCoefficient = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UVec2("flowScale",null);
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UVec2"),["flowScale",-1]);
 		this.flowScale = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UTexture("flowVelocityField",null,false);
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["flowVelocityField",-1,false]);
 		this.flowVelocityField = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
+		this.uniforms.push(instance2);
+		this.aStride += 0;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec2 texelCoord;\n\nuniform float dt;\n\tuniform sampler2D positionData;\n\tuniform sampler2D velocityData;\n\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\nconst float PACK_PARTICLE_VELOCITY_SCALE = 0.05; \n\r\nconst bool FLOAT_DATA = false;\r\n\r\n\nvec4 packParticlePosition(in vec2 p){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(p.xy, 0.0, 0.0);\r\n\t}else{\t\r\n\t    vec2 np = (p)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(np.x), packFloat8bitRG(np.y));\r\n\t}\r\n}\r\n\r\nvec2 unpackParticlePosition(in vec4 pp){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pp.xy;\r\n\t}else{\r\n\t    vec2 np = vec2(unpackFloat8bitRG(pp.xy), unpackFloat8bitRG(pp.zw));\r\n\t    return (2.0*np.xy - 1.0);\r\n\t}\r\n}\r\n\r\n\nvec4 packParticleVelocity(in vec2 v){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(v.xy, 0.0, 0.0);\r\n\t}else{\r\n\t    vec2 nv = (v * PACK_PARTICLE_VELOCITY_SCALE)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n\t}\r\n\r\n}\r\n\r\nvec2 unpackParticleVelocity(in vec4 pv){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pv.xy;\r\n\t}else{\r\n\t    const float INV_PACK_PARTICLE_VELOCITY_SCALE = 1./PACK_PARTICLE_VELOCITY_SCALE;\r\n\t    vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n\t    return (2.0*nv.xy - 1.0)* INV_PACK_PARTICLE_VELOCITY_SCALE;\r\n\t}\r\n}\n\n\tuniform float dragCoefficient;\n\tuniform vec2 flowScale;\n\tuniform sampler2D flowVelocityField;\n\n\tvoid main(){\n\t\t\n\t\tvec2 p = unpackParticlePosition(texture2D(positionData, texelCoord));\n\t\tvec2 v = unpackParticleVelocity(texture2D(velocityData, texelCoord));\n\n\t\t\n\t\tvec2 vf = unpackFluidVelocity(texture2D(flowVelocityField, p*.5 + .5)) * flowScale;\n\n\t\t\n\t\tv += (vf - v) * dragCoefficient;\n\n\t\t\n\t\tgl_FragColor = packParticleVelocity(v);\n\t}\n";
-	}
-	,__class__: VelocityStep
+	,__class__: StepParticles
 });
-let PositionStep = function() {
-	ParticleBase.call(this);
-};
-$hxClasses["PositionStep"] = PositionStep;
-PositionStep.__name__ = true;
-PositionStep.__super__ = ParticleBase;
-PositionStep.prototype = $extend(ParticleBase.prototype,{
-	set_FLOAT_DATA: function(value) {
-		this.FLOAT_DATA = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_DATA",value);
-		if(this._ready) this.destroy();
-		return value;
-	}
-	,createProperties: function() {
-		ParticleBase.prototype.createProperties.call(this);
-		this._aStride += 0;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec2 texelCoord;\n\nuniform float dt;\n\tuniform sampler2D positionData;\n\tuniform sampler2D velocityData;\n\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_PARTICLE_VELOCITY_SCALE = 0.05; \n\r\nconst bool FLOAT_DATA = false;\r\n\r\n\nvec4 packParticlePosition(in vec2 p){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(p.xy, 0.0, 0.0);\r\n\t}else{\t\r\n\t    vec2 np = (p)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(np.x), packFloat8bitRG(np.y));\r\n\t}\r\n}\r\n\r\nvec2 unpackParticlePosition(in vec4 pp){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pp.xy;\r\n\t}else{\r\n\t    vec2 np = vec2(unpackFloat8bitRG(pp.xy), unpackFloat8bitRG(pp.zw));\r\n\t    return (2.0*np.xy - 1.0);\r\n\t}\r\n}\r\n\r\n\nvec4 packParticleVelocity(in vec2 v){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(v.xy, 0.0, 0.0);\r\n\t}else{\r\n\t    vec2 nv = (v * PACK_PARTICLE_VELOCITY_SCALE)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n\t}\r\n\r\n}\r\n\r\nvec2 unpackParticleVelocity(in vec4 pv){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pv.xy;\r\n\t}else{\r\n\t    const float INV_PACK_PARTICLE_VELOCITY_SCALE = 1./PACK_PARTICLE_VELOCITY_SCALE;\r\n\t    vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n\t    return (2.0*nv.xy - 1.0)* INV_PACK_PARTICLE_VELOCITY_SCALE;\r\n\t}\r\n}\n\n\tvoid main(){\n\t\t\n\t\tvec2 p = unpackParticlePosition(texture2D(positionData, texelCoord));\n\t\tvec2 v = unpackParticleVelocity(texture2D(velocityData, texelCoord));\n\n\t\t\n\t\tp += v * dt;\n\n\t\t\n\t\tgl_FragColor = packParticlePosition(p);\n\t}\n";
-	}
-	,__class__: PositionStep
-});
-let InitialPosition = function() {
-	PlaneTexture.call(this);
-};
-$hxClasses["InitialPosition"] = InitialPosition;
-InitialPosition.__name__ = true;
-InitialPosition.__super__ = PlaneTexture;
-InitialPosition.prototype = $extend(PlaneTexture.prototype,{
-	set_FLOAT_DATA: function(value) {
-		this.FLOAT_DATA = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_DATA",value);
-		if(this._ready) this.destroy();
-		return value;
-	}
-	,createProperties: function() {
-		PlaneTexture.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UFloat("jitterAmount",null);
-		this.jitterAmount = instance;
-		this._uniforms.push(instance);
-		this._aStride += 0;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec2 texelCoord;\n\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_PARTICLE_VELOCITY_SCALE = 0.05; \n\r\nconst bool FLOAT_DATA = false;\r\n\r\n\nvec4 packParticlePosition(in vec2 p){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(p.xy, 0.0, 0.0);\r\n\t}else{\t\r\n\t    vec2 np = (p)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(np.x), packFloat8bitRG(np.y));\r\n\t}\r\n}\r\n\r\nvec2 unpackParticlePosition(in vec4 pp){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pp.xy;\r\n\t}else{\r\n\t    vec2 np = vec2(unpackFloat8bitRG(pp.xy), unpackFloat8bitRG(pp.zw));\r\n\t    return (2.0*np.xy - 1.0);\r\n\t}\r\n}\r\n\r\n\nvec4 packParticleVelocity(in vec2 v){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(v.xy, 0.0, 0.0);\r\n\t}else{\r\n\t    vec2 nv = (v * PACK_PARTICLE_VELOCITY_SCALE)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n\t}\r\n\r\n}\r\n\r\nvec2 unpackParticleVelocity(in vec4 pv){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pv.xy;\r\n\t}else{\r\n\t    const float INV_PACK_PARTICLE_VELOCITY_SCALE = 1./PACK_PARTICLE_VELOCITY_SCALE;\r\n\t    vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n\t    return (2.0*nv.xy - 1.0)* INV_PACK_PARTICLE_VELOCITY_SCALE;\r\n\t}\r\n}\nfloat rand(vec2 co){\r\n\treturn fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);\r\n}\n\n\n\tuniform float jitterAmount;\n\n\tvoid main(){\n\t\tvec2 initialPosition = vec2(texelCoord.x, texelCoord.y) * 2.0 - 1.0;\n\t\t\n\t\tinitialPosition.x += rand(initialPosition)*jitterAmount;\n\t\tinitialPosition.y += rand(initialPosition + 0.3415)*jitterAmount;\n\n\t\tgl_FragColor = packParticlePosition(initialPosition);\n\t}\n";
-	}
-	,__class__: InitialPosition
-});
-let InitialVelocity = function() {
-	PlaneTexture.call(this);
-};
-$hxClasses["InitialVelocity"] = InitialVelocity;
-InitialVelocity.__name__ = true;
-InitialVelocity.__super__ = PlaneTexture;
-InitialVelocity.prototype = $extend(PlaneTexture.prototype,{
-	set_FLOAT_DATA: function(value) {
-		this.FLOAT_DATA = value;
-		this._fragSource = shaderblox_glsl_GLSLTools.injectConstValue(this._fragSource,"FLOAT_DATA",value);
-		if(this._ready) this.destroy();
-		return value;
-	}
-	,createProperties: function() {
-		PlaneTexture.prototype.createProperties.call(this);
-		this._aStride += 0;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n\t}\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec2 texelCoord;\n\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_PARTICLE_VELOCITY_SCALE = 0.05; \n\r\nconst bool FLOAT_DATA = false;\r\n\r\n\nvec4 packParticlePosition(in vec2 p){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(p.xy, 0.0, 0.0);\r\n\t}else{\t\r\n\t    vec2 np = (p)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(np.x), packFloat8bitRG(np.y));\r\n\t}\r\n}\r\n\r\nvec2 unpackParticlePosition(in vec4 pp){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pp.xy;\r\n\t}else{\r\n\t    vec2 np = vec2(unpackFloat8bitRG(pp.xy), unpackFloat8bitRG(pp.zw));\r\n\t    return (2.0*np.xy - 1.0);\r\n\t}\r\n}\r\n\r\n\nvec4 packParticleVelocity(in vec2 v){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(v.xy, 0.0, 0.0);\r\n\t}else{\r\n\t    vec2 nv = (v * PACK_PARTICLE_VELOCITY_SCALE)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n\t}\r\n\r\n}\r\n\r\nvec2 unpackParticleVelocity(in vec4 pv){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pv.xy;\r\n\t}else{\r\n\t    const float INV_PACK_PARTICLE_VELOCITY_SCALE = 1./PACK_PARTICLE_VELOCITY_SCALE;\r\n\t    vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n\t    return (2.0*nv.xy - 1.0)* INV_PACK_PARTICLE_VELOCITY_SCALE;\r\n\t}\r\n}\n\t\n\tvoid main(){\n\t\tgl_FragColor = packParticleVelocity(vec2(0));\n\t}\n";
-	}
-	,__class__: InitialVelocity
-});
-let RenderParticles = function() {
-	shaderblox_ShaderBase.call(this);
+var RenderParticles = function() {
+	shaderblox.ShaderBase.call(this);
 };
 $hxClasses["RenderParticles"] = RenderParticles;
 RenderParticles.__name__ = true;
-RenderParticles.__super__ = shaderblox_ShaderBase;
-RenderParticles.prototype = $extend(shaderblox_ShaderBase.prototype,{
-	set_FLOAT_DATA: function(value) {
-		this.FLOAT_DATA = value;
-		this._vertSource = shaderblox_glsl_GLSLTools.injectConstValue(this._vertSource,"FLOAT_DATA",value);
-		if(this._ready) this.destroy();
-		return value;
+RenderParticles.__super__ = shaderblox.ShaderBase;
+RenderParticles.prototype = $extend(shaderblox.ShaderBase.prototype,{
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform sampler2D particleData;\n\tattribute vec2 particleUV;\n\tvarying vec4 color;\n\t\n\tvoid main(){\n\t\tvec2 p = texture2D(particleData, particleUV).xy;\n\t\tvec2 v = texture2D(particleData, particleUV).zw;\n\t\tgl_PointSize = 1.0;\n\t\tgl_Position = vec4(p, 0.0, 1.0);\n\t\tcolor = vec4(1.0, 1.0, 1.0, 1.0);\n\t}\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec4 color;\n\tvoid main(){\n\t\tgl_FragColor = vec4(color);\n\t}\n");
+		this.ready = true;
 	}
 	,createProperties: function() {
-		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("positionData",null,false);
-		this.positionData = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UTexture("velocityData",null,false);
-		this.velocityData = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_attributes_FloatAttribute("particleUV",0,2);
-		this.particleUV = instance2;
-		this._attributes.push(instance2);
-		this._aStride += 8;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_PARTICLE_VELOCITY_SCALE = 0.05; \n\r\nconst bool FLOAT_DATA = false;\r\n\r\n\nvec4 packParticlePosition(in vec2 p){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(p.xy, 0.0, 0.0);\r\n\t}else{\t\r\n\t    vec2 np = (p)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(np.x), packFloat8bitRG(np.y));\r\n\t}\r\n}\r\n\r\nvec2 unpackParticlePosition(in vec4 pp){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pp.xy;\r\n\t}else{\r\n\t    vec2 np = vec2(unpackFloat8bitRG(pp.xy), unpackFloat8bitRG(pp.zw));\r\n\t    return (2.0*np.xy - 1.0);\r\n\t}\r\n}\r\n\r\n\nvec4 packParticleVelocity(in vec2 v){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(v.xy, 0.0, 0.0);\r\n\t}else{\r\n\t    vec2 nv = (v * PACK_PARTICLE_VELOCITY_SCALE)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n\t}\r\n\r\n}\r\n\r\nvec2 unpackParticleVelocity(in vec4 pv){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pv.xy;\r\n\t}else{\r\n\t    const float INV_PACK_PARTICLE_VELOCITY_SCALE = 1./PACK_PARTICLE_VELOCITY_SCALE;\r\n\t    vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n\t    return (2.0*nv.xy - 1.0)* INV_PACK_PARTICLE_VELOCITY_SCALE;\r\n\t}\r\n}\n\n\tuniform sampler2D positionData;\n\tuniform sampler2D velocityData;\n\n\tattribute vec2 particleUV;\n\tvarying vec4 color;\n\t\n\tvoid main(){\n\t\tvec2 p = unpackParticlePosition(texture2D(positionData, particleUV));\n\t\tvec2 v = unpackParticleVelocity(texture2D(velocityData, particleUV));\n\n\t\tgl_PointSize = 1.0;\n\t\tgl_Position = vec4(p, 0.0, 1.0);\n\n\t\tcolor = vec4(1.0, 1.0, 1.0, 1.0);\n\t}\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec4 color;\n\n\tvoid main(){\n\t\tgl_FragColor = vec4(color);\n\t}\n";
+		shaderblox.ShaderBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["particleData",-1,false]);
+		this.particleData = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.attributes.FloatAttribute"),["particleUV",0,2]);
+		this.particleUV = instance1;
+		this.attributes.push(instance1);
+		this.aStride += 8;
 	}
 	,__class__: RenderParticles
 });
-let HxOverrides = function() { };
+var HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
 HxOverrides.__name__ = true;
 HxOverrides.cca = function(s,index) {
-	let x = s.charCodeAt(index);
+	var x = s.charCodeAt(index);
 	if(x != x) return undefined;
 	return x;
 };
@@ -1998,7 +943,7 @@ HxOverrides.substr = function(s,pos,len) {
 	return s.substr(pos,len);
 };
 HxOverrides.indexOf = function(a,obj,i) {
-	let len = a.length;
+	var len = a.length;
 	if(i < 0) {
 		i += len;
 		if(i < 0) i = 0;
@@ -2010,7 +955,7 @@ HxOverrides.indexOf = function(a,obj,i) {
 	return -1;
 };
 HxOverrides.remove = function(a,obj) {
-	let i = HxOverrides.indexOf(a,obj,0);
+	var i = HxOverrides.indexOf(a,obj,0);
 	if(i == -1) return false;
 	a.splice(i,1);
 	return true;
@@ -2022,1332 +967,7 @@ HxOverrides.iter = function(a) {
 		return this.arr[this.cur++];
 	}};
 };
-let Lambda = function() { };
-$hxClasses["Lambda"] = Lambda;
-Lambda.__name__ = true;
-Lambda.fold = function(it,f,first) {
-	let $it0 = $iterator(it)();
-	while( $it0.hasNext() ) {
-		let x = $it0.next();
-		first = f(x,first);
-	}
-	return first;
-};
-let flu_App = function() {
-	this.next_render = 0;
-	this.next_tick = 0;
-	this.cur_frame_start = 0.0;
-	this.current_time = 0;
-	this.last_frame_start = 0.0;
-	this.delta_sim = 0.016666666666666666;
-	this.delta_time = 0.016666666666666666;
-	this.max_frame_time = 0.25;
-	this.update_rate = 0;
-	this.render_rate = -1;
-	this.fixed_delta = 0;
-	this.timescale = 1;
-};
-
-$hxClasses["fluidState.App"] = flu_App;
-flu_App.__name__ = true;
-flu_App.prototype = {
-	config: function(config) {
-		return config;
-	}
-	,ready: function() {
-	}
-	,update: function(dt) {
-	}
-	,ondestroy: function() {
-	}
-	,onevent: function(event) {
-	}
-	,ontickstart: function() {
-	}
-	,ontickend: function() {
-	}
-	,onkeydown: function(keycode,scancode,repeat,mod,timestamp,window_id) {
-	}
-	,onkeyup: function(keycode,scancode,repeat,mod,timestamp,window_id) {
-	}
-	,ontextinput: function(text,start,length,type,timestamp,window_id) {
-	}
-	,onmousedown: function(x,y,button,timestamp,window_id) {
-	}
-	,onmouseup: function(x,y,button,timestamp,window_id) {
-	}
-	,onmousewheel: function(x,y,timestamp,window_id) {
-	}
-	,onmousemove: function(x,y,xrel,yrel,timestamp,window_id) {
-	}
-	,ontouchdown: function(x,y,touch_id,timestamp) {
-	}
-	,ontouchup: function(x,y,touch_id,timestamp) {
-	}
-	,ontouchmove: function(x,y,dx,dy,touch_id,timestamp) {
-	}
-	,ongamepadaxis: function(gamepad,axis,value,timestamp) {
-	}
-	,ongamepaddown: function(gamepad,button,value,timestamp) {
-	}
-	,ongamepadup: function(gamepad,button,value,timestamp) {
-	}
-	,ongamepaddevice: function(gamepad,id,type,timestamp) {
-	}
-	,on_internal_init: function() {
-		this.cur_frame_start = flu.core.timestamp();
-		this.last_frame_start = this.cur_frame_start;
-		this.current_time = 0;
-		this.delta_time = 0.016;
-	}
-	,on_internal_update: function() {
-		if(this.freeze != true) {
-			if(this.update_rate != 0) {
-				if(flu.core.timestamp() < this.next_tick) return;
-				this.next_tick = flu.core.timestamp() + this.update_rate;
-			}
-			this.cur_frame_start = flu.core.timestamp();
-			this.delta_time = this.cur_frame_start - this.last_frame_start;
-			this.last_frame_start = this.cur_frame_start;
-			if(this.delta_time > this.max_frame_time) this.delta_time = this.max_frame_time;
-			let used_delta = this.fixed_delta == 0?this.delta_time:this.fixed_delta;
-			used_delta *= this.timescale;
-			this.delta_sim = used_delta;
-			this.current_time += used_delta;
-			this.app.do_internal_update(used_delta);
-		}
-	}
-	,on_internal_render: function() {
-		if(this.render_rate != 0) {
-			if(this.render_rate < 0 || this.next_render < flu.core.timestamp()) {
-				this.app.render();
-				this.next_render += this.render_rate;
-			}
-		}
-	}
-	,__class__: flu_App
-};
-
-let Main = function() {
-	this.rshiftDown = false;
-	this.lshiftDown = false;
-	this.qualityDirection = 10;
-	this.timer = new flu_Timer(19000);
-	this.pointSize = 1;
-	this.dyeColor = new shaderblox_uniforms_Vector3();
-	this.dyeColorHSB = new hxColorToolkit_spaces_HSB(180,100,100);
-	this.hueCycleEnabled = false;
-	this.renderFluidEnabled = true;
-	this.renderParticlesEnabled = true;
-	this.lastMouseFluid = new shaderblox_uniforms_Vector2();
-	this.lastMouse = new shaderblox_uniforms_Vector2();
-	this.mouseFluid = new shaderblox_uniforms_Vector2();
-	this.mouse = new shaderblox_uniforms_Vector2();
-	this.lastMousePointKnown = false;
-	this.mousePointKnown = true;
-	this.mouse.x = 500;
-	this.mouse.y = 400;
-	this.isMouseDown = true;
-	this.freeze = false;
-
-	flu_App.call(this);
-	this.performanceMonitor = new PerformanceMonitor(35,null,800);
-				
-	this.set_simulationQuality(SimulationQuality.Medium);
-	this.performanceMonitor.fpsTooLowCallback = $bind(this,this.lowerQualityRequired);
-	let urlParams = js_Web.getParams();
-	if(__map_reserved.q != null?urlParams.existsReserved("q"):urlParams.h.hasOwnProperty("q")) {
-		let q = StringTools.trim((__map_reserved.q != null?urlParams.getReserved("q"):urlParams.h["q"]).toLowerCase());
-		let _g = 0;
-		let _g1 = Type.allEnums(SimulationQuality);
-		
-		while(_g < _g1.length) {
-			let e = _g1[_g];
-			++_g;
-			let name = e[0].toLowerCase();
-			
-			if(q == name) {
-				this.set_simulationQuality(e);
-				this.performanceMonitor.fpsTooLowCallback = null;
-				
-				break;
-			}
-		}
-	}
-	if(__map_reserved.iterations != null?urlParams.existsReserved("iterations"):urlParams.h.hasOwnProperty("iterations")) {
-		let iterationsParam = Std.parseInt(__map_reserved.iterations != null?urlParams.getReserved("iterations"):urlParams.h["iterations"]);
-		if(((iterationsParam | 0) === iterationsParam)) this.set_fluidIterations(iterationsParam);
-	}
-};
-$hxClasses["Main"] = Main;
-Main.__name__ = true;
-Main.__super__ = flu_App;
-Main.prototype = $extend(flu_App.prototype,{
-	config: function(config) {
-		config.web.no_context_menu = false;
-		config.web.prevent_default_mouse_wheel = false;
-		config.window.borderless = true;
-		config.window.fullscreen = true;
-		config.window.width = window.innerWidth;
-		config.window.height = window.innerHeight;
-		config.render.antialiasing = 0;
-		return config;
-	}
-	,ready: function() {
-
-		const ref = this;
-		if (this.app.window.width >= 760) {
-			const id= setInterval(
-				function() {
-					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-					setTimeout(
-						function() {
-							clearInterval(2);
-							ref.mousePointKnown = false;
-							//ref.freeze = true;
-						}, 3000, ref
-					);
-				}, 100, ref
-			);
-		}else {
-			setTimeout(
-				function() {
-					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-				}, 1200, ref
-			);
-		}
-		this.window = this.app.window;
-		this.init();
-		this.window.onevent = $bind(this,this.onWindowEvent);
-		this.window.onrender = $bind(this,this.render);
-	}
-	
-	,init: function() {
-		let _g = this;
-		flu_modules_opengl_web_GL.current_context.disable(2929);
-		flu_modules_opengl_web_GL.current_context.disable(2884);
-		flu_modules_opengl_web_GL.current_context.disable(3024);
-		this.textureQuad = gltoolbox_GeometryTools.createQuad(0,0,1,1);
-		this.blitTextureShader = new BlitTexture();
-		this.debugBlitTextureShader = new DebugBlitTexture();
-		this.renderFluidShader = new FluidRender();
-		this.renderParticlesShader = new ColorParticleMotion();
-		this.updateDyeShader = new MouseDye();
-		this.mouseForceShader = new MouseForce();
-		let _this = this.updateDyeShader.mouse;
-		_this.dirty = true;
-		_this.data = this.mouseFluid;
-		let _this1 = this.updateDyeShader.lastMouse;
-		_this1.dirty = true;
-		_this1.data = this.lastMouseFluid;
-		let _this2 = this.updateDyeShader.dyeColor;
-		_this2.dirty = true;
-		_this2.data = this.dyeColor;
-		let _this3 = this.mouseForceShader.mouse;
-		_this3.dirty = true;
-		_this3.data = this.mouseFluid;
-		let _this4 = this.mouseForceShader.lastMouse;
-		_this4.dirty = true;
-		_this4.data = this.lastMouseFluid;
-		this.updatePointSize();
-		let cellScale = 32;
-		this.fluid = new GPUFluid(Math.round(this.window.width * this.fluidScale),Math.round(this.window.height * this.fluidScale),cellScale,this.fluidIterations);
-		let _this5 = this.fluid;
-		_this5.updateDyeShader = this.updateDyeShader;
-		let _this6 = _this5.updateDyeShader.dx;
-		_this6.dirty = true;
-		_this6.data = _this5.cellSize;
-		let shader = _this5.updateDyeShader;
-		if(shader == null) null; else {
-			let _this7 = shader.aspectRatio;
-			{
-				_this7.dirty = true;
-				_this7.data = _this5.aspectRatio;
-			}
-			shader.invresolution.data.x = 1 / _this5.width;
-			shader.invresolution.data.y = 1 / _this5.height;
-			let v;
-			v = _this5.floatVelocity?"true":"false";
-			if(shader.FLOAT_VELOCITY != v) shader.set_FLOAT_VELOCITY(v);
-			v = _this5.floatPressure?"true":"false";
-			if(shader.FLOAT_PRESSURE != v) shader.set_FLOAT_PRESSURE(v);
-			v = _this5.floatDivergence?"true":"false";
-			if(shader.FLOAT_DIVERGENCE != v) shader.set_FLOAT_DIVERGENCE(v);
-		}
-		_this5.updateDyeShader;
-		let _this8 = this.fluid;
-		_this8.applyForcesShader = this.mouseForceShader;
-		let _this9 = _this8.applyForcesShader.dx;
-		_this9.dirty = true;
-		_this9.data = _this8.cellSize;
-		let shader1 = _this8.applyForcesShader;
-		if(shader1 == null) null; else {
-			let _this10 = shader1.aspectRatio;
-			{
-				_this10.dirty = true;
-				_this10.data = _this8.aspectRatio;
-			}
-			shader1.invresolution.data.x = 1 / _this8.width;
-			shader1.invresolution.data.y = 1 / _this8.height;
-			let v1;
-			v1 = _this8.floatVelocity?"true":"false";
-			if(shader1.FLOAT_VELOCITY != v1) shader1.set_FLOAT_VELOCITY(v1);
-			v1 = _this8.floatPressure?"true":"false";
-			if(shader1.FLOAT_PRESSURE != v1) shader1.set_FLOAT_PRESSURE(v1);
-			v1 = _this8.floatDivergence?"true":"false";
-			if(shader1.FLOAT_DIVERGENCE != v1) shader1.set_FLOAT_DIVERGENCE(v1);
-		}
-		_this8.applyForcesShader;
-		this.particles = new GPUParticles(this.particleCount);
-		this.particles.velocityStepShader.flowScale.data.x = 1 / (this.fluid.cellSize * this.fluid.aspectRatio);
-		this.particles.velocityStepShader.flowScale.data.y = 1 / this.fluid.cellSize;
-		this.particles.velocityStepShader.set_FLOAT_VELOCITY(this.fluid.floatVelocity?"true":"false");
-		let _this11 = this.particles.velocityStepShader.dragCoefficient;
-		_this11.dirty = true;
-		_this11.data = 1;
-		this.renderParticlesShader.set_FLOAT_DATA(this.particles.floatData?"true":"false");
-		let _this12 = this.dyeColor;
-		_this12.x = 51;
-		_this12.y = 78;
-		_this12.z = 255;
-		this.initTime = flu_Timer.stamp();
-		this.lastTime = this.initTime;
-	}
-	,update: function(dt) {
-		this.time = flu_Timer.stamp() - this.initTime;
-		let _this = this.performanceMonitor;
-		if(dt > 0) {
-			let fps = 1 / dt;
-			if(fps < _this.fpsIgnoreBounds[0] && fps > _this.fpsIgnoreBounds[1]) null; else {
-				_this.fpsSample.add(fps);
-				if(_this.fpsSample.sampleCount < _this.fpsSample.length) null; else {
-					let now = flu_Timer.stamp() * 1000;
-					if(_this.fpsSample.average < _this.lowerBoundFPS) {
-						if(_this.lowerBoundEnterTime == null) _this.lowerBoundEnterTime = now;
-						if(now - _this.lowerBoundEnterTime >= _this.thresholdTime_ms && _this.fpsTooLowCallback != null) {
-							_this.fpsTooLowCallback((_this.lowerBoundFPS - _this.fpsSample.average) / _this.lowerBoundFPS);
-							_this.fpsSample.clear();
-							_this.lowerBoundEnterTime = null;
-						}
-					} else if(_this.fpsSample.average > _this.upperBoundFPS) {
-						if(_this.upperBoundEnterTime == null) _this.upperBoundEnterTime = now;
-						if(now - _this.upperBoundEnterTime >= _this.thresholdTime_ms && _this.fpsTooHighCallback != null) {
-							_this.fpsTooHighCallback((_this.fpsSample.average - _this.upperBoundFPS) / _this.upperBoundFPS);
-							_this.fpsSample.clear();
-							_this.upperBoundEnterTime = null;
-						}
-					} else {
-						_this.lowerBoundEnterTime = null;
-						_this.upperBoundEnterTime = null;
-					}
-				}
-			}
-		}
-		dt = 0.090;
-		let _this1 = this.updateDyeShader.isMouseDown;
-		let tmp;
-		_this1.dirty = true;
-		tmp = _this1.data = this.isMouseDown && this.lastMousePointKnown;
-		tmp;
-		let _this2 = this.mouseForceShader.isMouseDown;
-		let tmp1;
-		_this2.dirty = true;
-		tmp1 = _this2.data = this.isMouseDown && this.lastMousePointKnown;
-		tmp1;
-		this.fluid.step(dt);
-		let _this3 = this.particles.velocityStepShader.flowVelocityField;
-		_this3.dirty = true;
-		_this3.data = this.fluid.velocityRenderTarget.readFromTexture;
-		if(this.renderParticlesEnabled) {
-			let _this4 = this.particles;
-			let _this5 = _this4.velocityStepShader.dt;
-			_this5.dirty = true;
-			_this5.data = dt;
-			let _this6 = _this4.velocityStepShader.positionData;
-			_this6.dirty = true;
-			_this6.data = _this4.positionData.readFromTexture;
-			let _this7 = _this4.velocityStepShader.velocityData;
-			_this7.dirty = true;
-			_this7.data = _this4.velocityData.readFromTexture;
-			let shader = _this4.velocityStepShader;
-			let target = _this4.velocityData;
-			flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
-			if(shader._active) {
-				let _g = 0;
-				let _g1 = shader._uniforms;
-				while(_g < _g1.length) {
-					let u = _g1[_g];
-					++_g;
-					u.apply();
-				}
-				let offset = 0;
-				let _g11 = 0;
-				let _g2 = shader._attributes.length;
-				while(_g11 < _g2) {
-					let i = _g11++;
-					let att = shader._attributes[i];
-					let location = att.location;
-					if(location != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-					}
-					offset += att.byteSize;
-				}
-				null;
-			} else {
-				if(!shader._ready) shader.create();
-				flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-				let _g3 = 0;
-				let _g12 = shader._uniforms;
-				while(_g3 < _g12.length) {
-					let u1 = _g12[_g3];
-					++_g3;
-					u1.apply();
-				}
-				let offset1 = 0;
-				let _g13 = 0;
-				let _g4 = shader._attributes.length;
-				while(_g13 < _g4) {
-					let i1 = _g13++;
-					let att1 = shader._attributes[i1];
-					let location1 = att1.location;
-					if(location1 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-					}
-					offset1 += att1.byteSize;
-				}
-				shader._active = true;
-			}
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			shader.deactivate();
-			target.tmpFBO = target.writeFrameBufferObject;
-			target.writeFrameBufferObject = target.readFrameBufferObject;
-			target.readFrameBufferObject = target.tmpFBO;
-			target.tmpTex = target.writeToTexture;
-			target.writeToTexture = target.readFromTexture;
-			target.readFromTexture = target.tmpTex;
-			let _this8 = _this4.positionStepShader.dt;
-			_this8.dirty = true;
-			_this8.data = dt;
-			let _this9 = _this4.positionStepShader.positionData;
-			_this9.dirty = true;
-			_this9.data = _this4.positionData.readFromTexture;
-			let _this10 = _this4.positionStepShader.velocityData;
-			_this10.dirty = true;
-			_this10.data = _this4.velocityData.readFromTexture;
-			let shader1 = _this4.positionStepShader;
-			let target1 = _this4.positionData;
-			flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this4.textureQuad);
-			if(shader1._active) {
-				let _g5 = 0;
-				let _g14 = shader1._uniforms;
-				while(_g5 < _g14.length) {
-					let u2 = _g14[_g5];
-					++_g5;
-					u2.apply();
-				}
-				let offset2 = 0;
-				let _g15 = 0;
-				let _g6 = shader1._attributes.length;
-				while(_g15 < _g6) {
-					let i2 = _g15++;
-					let att2 = shader1._attributes[i2];
-					let location2 = att2.location;
-					if(location2 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-					}
-					offset2 += att2.byteSize;
-				}
-				null;
-			} else {
-				if(!shader1._ready) shader1.create();
-				flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-				let _g7 = 0;
-				let _g16 = shader1._uniforms;
-				while(_g7 < _g16.length) {
-					let u3 = _g16[_g7];
-					++_g7;
-					u3.apply();
-				}
-				let offset3 = 0;
-				let _g17 = 0;
-				let _g8 = shader1._attributes.length;
-				while(_g17 < _g8) {
-					let i3 = _g17++;
-					let att3 = shader1._attributes[i3];
-					let location3 = att3.location;
-					if(location3 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-					}
-					offset3 += att3.byteSize;
-				}
-				shader1._active = true;
-			}
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			shader1.deactivate();
-			target1.tmpFBO = target1.writeFrameBufferObject;
-			target1.writeFrameBufferObject = target1.readFrameBufferObject;
-			target1.readFrameBufferObject = target1.tmpFBO;
-			target1.tmpTex = target1.writeToTexture;
-			target1.writeToTexture = target1.readFromTexture;
-			target1.readFromTexture = target1.tmpTex;
-		}
-		if(this.hueCycleEnabled) {
-			let _g9 = this.dyeColorHSB;
-			_g9.set_hue(_g9.get_hue() + 1.2);
-		}
-		
-		if(this.isMouseDown && !this.TWILIGHT && !this.SEX_BOMB && !this.BIG_BLUE && !this.THINK_PINK && !this.AVOBATH && !this.CHEER_UP_BUTTERCUP && !this.SECRET_ARTS && !this.BIG_SLEEP && !this.THE_EXPERIMENTOR && !this.INTERGALACTIC) {
-			if(this.hueCycleEnabled) {
-				
-				let vx = (this.mouse.x - this.lastMouse.x) / (dt * this.window.width);
-				let vy = (this.mouse.y - this.lastMouse.y) / (dt * this.window.height);
-				let _g10 = this.dyeColorHSB;
-				_g10.set_hue(_g10.get_hue() + Math.sqrt(vx * vx + vy * vy) * 0.5);
-			}
-			let rgb = this.dyeColorHSB.toRGB();
-			let _this11 = this.dyeColor;
-
-			//shoot fluid color configuration - modify later.
-			let x = 160 / 255;
-			let y = 32 / 255;
-			let z = 240 / 255;
-			_this11.x = x;
-			_this11.y = y;
-			_this11.z = z;
-		}
-
-		let _this22 = this.lastMouse;
-		_this22.x = this.mouse.x;
-		_this22.y = this.mouse.y;
-		let _this23 = this.lastMouseFluid;
-		_this23.x = (this.mouse.x / this.window.width * 2 - 1) * this.fluid.aspectRatio;
-		_this23.y = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-		this.lastMousePointKnown = this.mousePointKnown;
-	}
-	,render: function(w) {
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,this.window.width,this.window.height);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.screenBuffer);
-		let shader = this.blitTextureShader;
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.textureQuad);
-		let _this = shader.texture;
-		_this.dirty = true;
-		_this.data = this.fluid.dyeRenderTarget.readFromTexture;
-		shader.activate(true,true);
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader.deactivate();
-		if(this.renderParticlesEnabled) {
-			let shader1 = this.renderParticlesShader;
-			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,this.particles.particleUVs);
-			let _this1 = shader1.positionData;
-			_this1.dirty = true;
-			_this1.data = this.particles.positionData.readFromTexture;
-			let _this2 = shader1.velocityData;
-			_this2.dirty = true;
-			_this2.data = this.particles.velocityData.readFromTexture;
-			shader1.activate(true,true);
-			flu_modules_opengl_web_GL.current_context.drawArrays(0,0,this.particles.count);
-			shader1.deactivate();
-		}
-	}
-	,updateSimulationTextures: function() {
-		let w;
-		let h;
-		w = Math.round(this.window.width * this.fluidScale);
-		h = Math.round(this.window.height * this.fluidScale);
-		if(w != this.fluid.width || h != this.fluid.height) {
-			let _this = this.fluid;
-			_this.velocityRenderTarget.resize(w,h);
-			_this.pressureRenderTarget.resize(w,h);
-			let _this1 = _this.divergenceRenderTarget;
-			let newTexture = _this1.textureFactory(w,h);
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
-			flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
-			if(_this1.texture != null) {
-				let resampler = gltoolbox_shaders_Resample.instance;
-				let _this2 = resampler.texture;
-				_this2.dirty = true;
-				_this2.data = _this1.texture;
-				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
-				flu_modules_opengl_web_GL.current_context.viewport(0,0,w,h);
-				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
-				if(resampler._active) {
-					let _g = 0;
-					let _g1 = resampler._uniforms;
-					while(_g < _g1.length) {
-						let u = _g1[_g];
-						++_g;
-						u.apply();
-					}
-					let offset = 0;
-					let _g11 = 0;
-					let _g2 = resampler._attributes.length;
-					while(_g11 < _g2) {
-						let i = _g11++;
-						let att = resampler._attributes[i];
-						let location = att.location;
-						if(location != -1) {
-							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
-						}
-						offset += att.byteSize;
-					}
-				} else {
-					if(!resampler._ready) resampler.create();
-					flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
-					let _g3 = 0;
-					let _g12 = resampler._uniforms;
-					while(_g3 < _g12.length) {
-						let u1 = _g12[_g3];
-						++_g3;
-						u1.apply();
-					}
-					let offset1 = 0;
-					let _g13 = 0;
-					let _g4 = resampler._attributes.length;
-					while(_g13 < _g4) {
-						let i1 = _g13++;
-						let att1 = resampler._attributes[i1];
-						let location1 = att1.location;
-						if(location1 != -1) {
-							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
-						}
-						offset1 += att1.byteSize;
-					}
-					resampler._active = true;
-				}
-				flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-				resampler.deactivate();
-				flu_modules_opengl_web_GL.current_context.deleteTexture(_this1.texture);
-			} else {
-				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this1.frameBufferObject);
-				flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-				flu_modules_opengl_web_GL.current_context.clear(16384);
-			}
-			_this1.width = w;
-			_this1.height = h;
-			_this1.texture = newTexture;
-			_this.dyeRenderTarget.resize(w,h);
-			_this.width = w;
-			_this.height = h;
-			_this.aspectRatio = w / h;
-			_this.updateAllCoreShaderUniforms();
-		}
-		if(this.particleCount != this.particles.count) this.particles.setCount(this.particleCount);
-		this.particles.velocityStepShader.flowScale.data.x = 1 / (this.fluid.cellSize * this.fluid.aspectRatio);
-		this.particles.velocityStepShader.flowScale.data.y = 1 / this.fluid.cellSize;
-		let _this3 = this.particles.velocityStepShader.dragCoefficient;
-		_this3.dirty = true;
-		_this3.data = 1;
-	}
-	,updatePointSize: function() {
-		this.renderParticlesShader.set_POINT_SIZE((this.pointSize | 0) + ".0");
-	}
-	,set_simulationQuality: function(quality) {
-		switch(quality[1]) {
-		case 0:
-			this.particleCount = 1048576;
-			this.fluidScale = 0.5;
-			this.set_fluidIterations(30);
-			this.offScreenScale = 1.;
-			this.offScreenFilter = 9728;
-			break;
-		case 1:
-			this.particleCount = 1048576;
-			this.fluidScale = 0.25;
-			this.set_fluidIterations(20);
-			this.offScreenScale = 1.;
-			this.offScreenFilter = 9728;
-			break;
-		case 2:
-			this.particleCount = 262144;
-			this.fluidScale = 0.25;
-			this.set_fluidIterations(5);
-			this.offScreenScale = 0.25;
-			this.offScreenFilter = 9729;
-			break;
-		case 3:
-			this.particleCount = 65536;
-			this.fluidScale = 0.2;
-			this.set_fluidIterations(14);
-			this.offScreenScale = 0.25;
-			this.offScreenFilter = 9729;
-			this.pointSize = 2;
-			break;
-		case 4:
-			this.particleCount = 16384;
-			this.fluidScale = 0.16666666666666666;
-			this.set_fluidIterations(12);
-			this.offScreenScale = 0.25;
-			this.offScreenFilter = 9729;
-			this.pointSize = 2;
-			break;
-		case 5:
-			this.particleCount = 16384;
-			this.fluidScale = 0.1;
-			this.set_fluidIterations(6);
-			this.offScreenScale = 0.25;
-			this.offScreenFilter = 9729;
-			this.pointSize = 2;
-			break;
-		case 6:
-			this.particleCount = 4096;
-			this.fluidScale = 0.0625;
-			this.set_fluidIterations(5);
-			this.offScreenScale = 0.25;
-			this.offScreenFilter = 9729;
-			this.pointSize = 2;
-			break;
-		}
-		this.renderParticlesEnabled = this.particleCount > 1;
-		return this.simulationQuality = quality;
-	}
-	,set_fluidIterations: function(v) {
-		this.fluidIterations = v;
-		if(this.fluid != null) this.fluid.solverIterations = v;
-		return v;
-	}
-	,lowerQualityRequired: function(magnitude) {
-		if(this.qualityDirection > 0) return;
-		this.qualityDirection = -1;
-		let qualityIndex = this.simulationQuality[1];
-		let maxIndex = Type.allEnums(SimulationQuality).length - 1;
-		if(qualityIndex >= maxIndex) return;
-		if(magnitude < 0.5) qualityIndex += 1; else qualityIndex += 2;
-		if(qualityIndex > maxIndex) qualityIndex = maxIndex;
-		let newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
-		//console.log("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality));
-		this.set_simulationQuality(newQuality);
-		this.updateSimulationTextures();
-		this.updatePointSize();
-	}
-	,reset: function() {
-		let _this = this.particles;
-		let shader = _this.initialPositionShader;
-		let target = _this.positionData;
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
-		if(shader._active) {
-			let _g = 0;
-			let _g1 = shader._uniforms;
-			while(_g < _g1.length) {
-				let u = _g1[_g];
-				++_g;
-				u.apply();
-			}
-			let offset = 0;
-			let _g11 = 0;
-			let _g2 = shader._attributes.length;
-			while(_g11 < _g2) {
-				let i = _g11++;
-				let att = shader._attributes[i];
-				let location = att.location;
-				if(location != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-				}
-				offset += att.byteSize;
-			}
-		} else {
-			if(!shader._ready) shader.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-			let _g3 = 0;
-			let _g12 = shader._uniforms;
-			while(_g3 < _g12.length) {
-				let u1 = _g12[_g3];
-				++_g3;
-				u1.apply();
-			}
-			let offset1 = 0;
-			let _g13 = 0;
-			let _g4 = shader._attributes.length;
-			while(_g13 < _g4) {
-				let i1 = _g13++;
-				let att1 = shader._attributes[i1];
-				let location1 = att1.location;
-				if(location1 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-				}
-				offset1 += att1.byteSize;
-			}
-			shader._active = true;
-		}
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader.deactivate();
-		target.tmpFBO = target.writeFrameBufferObject;
-		target.writeFrameBufferObject = target.readFrameBufferObject;
-		target.readFrameBufferObject = target.tmpFBO;
-		target.tmpTex = target.writeToTexture;
-		target.writeToTexture = target.readFromTexture;
-		target.readFromTexture = target.tmpTex;
-		let shader1 = _this.initialVelocityShader;
-		let target1 = _this.velocityData;
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
-		if(shader1._active) {
-			let _g5 = 0;
-			let _g14 = shader1._uniforms;
-			while(_g5 < _g14.length) {
-				let u2 = _g14[_g5];
-				++_g5;
-				u2.apply();
-			}
-			let offset2 = 0;
-			let _g15 = 0;
-			let _g6 = shader1._attributes.length;
-			while(_g15 < _g6) {
-				let i2 = _g15++;
-				let att2 = shader1._attributes[i2];
-				let location2 = att2.location;
-				if(location2 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-				}
-				offset2 += att2.byteSize;
-			}
-		} else {
-			if(!shader1._ready) shader1.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-			let _g7 = 0;
-			let _g16 = shader1._uniforms;
-			while(_g7 < _g16.length) {
-				let u3 = _g16[_g7];
-				++_g7;
-				u3.apply();
-			}
-			let offset3 = 0;
-			let _g17 = 0;
-			let _g8 = shader1._attributes.length;
-			while(_g17 < _g8) {
-				let i3 = _g17++;
-				let att3 = shader1._attributes[i3];
-				let location3 = att3.location;
-				if(location3 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-				}
-				offset3 += att3.byteSize;
-			}
-			shader1._active = true;
-		}
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader1.deactivate();
-		target1.tmpFBO = target1.writeFrameBufferObject;
-		target1.writeFrameBufferObject = target1.readFrameBufferObject;
-		target1.readFrameBufferObject = target1.tmpFBO;
-		target1.tmpTex = target1.writeToTexture;
-		target1.writeToTexture = target1.readFromTexture;
-		target1.readFromTexture = target1.tmpTex;
-		let _this1 = this.fluid;
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
-		flu_modules_opengl_web_GL.current_context.disable(3042);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
-		let shader2 = _this1.clearVelocityShader;
-		if(shader2._active) {
-			let _g9 = 0;
-			let _g18 = shader2._uniforms;
-			while(_g9 < _g18.length) {
-				let u4 = _g18[_g9];
-				++_g9;
-				u4.apply();
-			}
-			let offset4 = 0;
-			let _g19 = 0;
-			let _g10 = shader2._attributes.length;
-			while(_g19 < _g10) {
-				let i4 = _g19++;
-				let att4 = shader2._attributes[i4];
-				let location4 = att4.location;
-				if(location4 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
-				}
-				offset4 += att4.byteSize;
-			}
-		} else {
-			if(!shader2._ready) shader2.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
-			let _g20 = 0;
-			let _g110 = shader2._uniforms;
-			while(_g20 < _g110.length) {
-				let u5 = _g110[_g20];
-				++_g20;
-				u5.apply();
-			}
-			let offset5 = 0;
-			let _g111 = 0;
-			let _g21 = shader2._attributes.length;
-			while(_g111 < _g21) {
-				let i5 = _g111++;
-				let att5 = shader2._attributes[i5];
-				let location5 = att5.location;
-				if(location5 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
-				}
-				offset5 += att5.byteSize;
-			}
-			shader2._active = true;
-		}
-		_this1.velocityRenderTarget.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader2.deactivate();
-		let _this2 = _this1.velocityRenderTarget;
-		_this2.tmpFBO = _this2.writeFrameBufferObject;
-		_this2.writeFrameBufferObject = _this2.readFrameBufferObject;
-		_this2.readFrameBufferObject = _this2.tmpFBO;
-		_this2.tmpTex = _this2.writeToTexture;
-		_this2.writeToTexture = _this2.readFromTexture;
-		_this2.readFromTexture = _this2.tmpTex;
-		let shader3 = _this1.clearPressureShader;
-		if(shader3._active) {
-			let _g22 = 0;
-			let _g112 = shader3._uniforms;
-			while(_g22 < _g112.length) {
-				let u6 = _g112[_g22];
-				++_g22;
-				u6.apply();
-			}
-			let offset6 = 0;
-			let _g113 = 0;
-			let _g23 = shader3._attributes.length;
-			while(_g113 < _g23) {
-				let i6 = _g113++;
-				let att6 = shader3._attributes[i6];
-				let location6 = att6.location;
-				if(location6 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
-				}
-				offset6 += att6.byteSize;
-			}
-		} else {
-			if(!shader3._ready) shader3.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
-			let _g24 = 0;
-			let _g114 = shader3._uniforms;
-			while(_g24 < _g114.length) {
-				let u7 = _g114[_g24];
-				++_g24;
-				u7.apply();
-			}
-			let offset7 = 0;
-			let _g115 = 0;
-			let _g25 = shader3._attributes.length;
-			while(_g115 < _g25) {
-				let i7 = _g115++;
-				let att7 = shader3._attributes[i7];
-				let location7 = att7.location;
-				if(location7 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
-				}
-				offset7 += att7.byteSize;
-			}
-			shader3._active = true;
-		}
-		_this1.pressureRenderTarget.activate();
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		shader3.deactivate();
-		let _this3 = _this1.pressureRenderTarget;
-		_this3.tmpFBO = _this3.writeFrameBufferObject;
-		_this3.writeFrameBufferObject = _this3.readFrameBufferObject;
-		_this3.readFrameBufferObject = _this3.tmpFBO;
-		_this3.tmpTex = _this3.writeToTexture;
-		_this3.writeToTexture = _this3.readFromTexture;
-		_this3.readFromTexture = _this3.tmpTex;
-		let _this4 = _this1.dyeRenderTarget;
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		flu_modules_opengl_web_GL.current_context.clear(16384);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.writeFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		flu_modules_opengl_web_GL.current_context.clear(16384);
-		this.HAS_RUN = false;
-	}
-	,onmousedown: function(x,y,button,_,_1) {
-		this.isMouseDown = true;
-		this.hueCycleEnabled = true;
-	}
-	,onmouseup: function(x,y,button,_,_1) {
-		let _g = this;
-		this.timer.run = function() {
-			_g.isMouseDown = false;
-			_g.HAS_RUN = false;
-		};
-	}
-	,onmousemove: function(x,y,xrel,yrel,_,_1) {
-		let _this = this.mouse;
-		_this.x = x;
-		_this.y = y;
-		let _this1 = this.mouseFluid;
-		_this1.x = (x / this.window.width * 2 - 1) * this.fluid.aspectRatio;
-		_this1.y = (this.window.height - y) / this.window.height * 2 - 1;
-		this.mousePointKnown = true;
-	}
-	,ontouchdown: function(x,y,touch_id,_) {
-		let x1 = x;
-		let y1 = y;
-		x1 = x * this.window.width;
-		y1 = y * this.window.height;
-		let _this = this.mouse;
-		_this.x = x1;
-		_this.y = y1;
-		let _this1 = this.mouseFluid;
-		_this1.x = (x1 / this.window.width * 2 - 1) * this.fluid.aspectRatio;
-		_this1.y = (this.window.height - y1) / this.window.height * 2 - 1;
-		this.mousePointKnown = true;
-		let _this2 = this.lastMouse;
-		_this2.x = this.mouse.x;
-		_this2.y = this.mouse.y;
-		let _this3 = this.lastMouseFluid;
-		_this3.x = (this.mouse.x / this.window.width * 2 - 1) * this.fluid.aspectRatio;
-		_this3.y = (this.window.height - this.mouse.y) / this.window.height * 2 - 1;
-		this.lastMousePointKnown = this.mousePointKnown;
-		this.isMouseDown = true;
-		this.hueCycleEnabled = true;
-	}
-	,ontouchup: function(x,y,touch_id,_) {
-		let _g = this;
-		let x1 = x;
-		let y1 = y;
-		x1 = x * this.window.width;
-		y1 = y * this.window.height;
-		let _this = this.mouse;
-		_this.x = x1;
-		_this.y = y1;
-		let _this1 = this.mouseFluid;
-		_this1.x = (x1 / this.window.width * 2 - 1) * this.fluid.aspectRatio;
-		_this1.y = (this.window.height - y1) / this.window.height * 2 - 1;
-		this.mousePointKnown = true;
-		this.timer.run = function() {
-			_g.isMouseDown = false;
-			_g.HAS_RUN = false;
-		};
-	}
-	,ontouchmove: function(x,y,dx,dy,touch_id,_) {
-		let x1 = x;
-		let y1 = y;
-		x1 = x * this.window.width;
-		y1 = y * this.window.height;
-		let _this = this.mouse;
-		_this.x = x1;
-		_this.y = y1;
-		let _this1 = this.mouseFluid;
-		_this1.x = (x1 / this.window.width * 2 - 1) * this.fluid.aspectRatio;
-		_this1.y = (this.window.height - y1) / this.window.height * 2 - 1;
-		this.mousePointKnown = true;
-	}
-	,onkeydown: function(keyCode,_,_1,_2,_3,_4) {
-		switch(keyCode) {
-		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.lshift):
-			this.lshiftDown = true;
-			break;
-		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.rshift):
-			this.rshiftDown = true;
-			break;
-		}
-	}
-	,onkeyup: function(keyCode,_,_1,_2,_3,_4) {
-		switch(keyCode) {
-		case 114:
-			if(this.lshiftDown || this.rshiftDown) {
-				let _this = this.particles;
-				let shader = _this.initialPositionShader;
-				let target = _this.positionData;
-				flu_modules_opengl_web_GL.current_context.viewport(0,0,target.width,target.height);
-				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target.writeFrameBufferObject);
-				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
-				if(shader._active) {
-					let _g = 0;
-					let _g1 = shader._uniforms;
-					while(_g < _g1.length) {
-						let u = _g1[_g];
-						++_g;
-						u.apply();
-					}
-					let offset = 0;
-					let _g11 = 0;
-					let _g2 = shader._attributes.length;
-					while(_g11 < _g2) {
-						let i = _g11++;
-						let att = shader._attributes[i];
-						let location = att.location;
-						if(location != -1) {
-							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,shader._aStride,offset);
-						}
-						offset += att.byteSize;
-					}
-				} else {
-					if(!shader._ready) shader.create();
-					flu_modules_opengl_web_GL.current_context.useProgram(shader._prog);
-					let _g3 = 0;
-					let _g12 = shader._uniforms;
-					while(_g3 < _g12.length) {
-						let u1 = _g12[_g3];
-						++_g3;
-						u1.apply();
-					}
-					let offset1 = 0;
-					let _g13 = 0;
-					let _g4 = shader._attributes.length;
-					while(_g13 < _g4) {
-						let i1 = _g13++;
-						let att1 = shader._attributes[i1];
-						let location1 = att1.location;
-						if(location1 != -1) {
-							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,shader._aStride,offset1);
-						}
-						offset1 += att1.byteSize;
-					}
-					shader._active = true;
-				}
-				flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-				shader.deactivate();
-				target.tmpFBO = target.writeFrameBufferObject;
-				target.writeFrameBufferObject = target.readFrameBufferObject;
-				target.readFrameBufferObject = target.tmpFBO;
-				target.tmpTex = target.writeToTexture;
-				target.writeToTexture = target.readFromTexture;
-				target.readFromTexture = target.tmpTex;
-				let shader1 = _this.initialVelocityShader;
-				let target1 = _this.velocityData;
-				flu_modules_opengl_web_GL.current_context.viewport(0,0,target1.width,target1.height);
-				flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,target1.writeFrameBufferObject);
-				flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this.textureQuad);
-				if(shader1._active) {
-					let _g5 = 0;
-					let _g14 = shader1._uniforms;
-					while(_g5 < _g14.length) {
-						let u2 = _g14[_g5];
-						++_g5;
-						u2.apply();
-					}
-					let offset2 = 0;
-					let _g15 = 0;
-					let _g6 = shader1._attributes.length;
-					while(_g15 < _g6) {
-						let i2 = _g15++;
-						let att2 = shader1._attributes[i2];
-						let location2 = att2.location;
-						if(location2 != -1) {
-							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location2);
-							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location2,att2.itemCount,att2.type,false,shader1._aStride,offset2);
-						}
-						offset2 += att2.byteSize;
-					}
-				} else {
-					if(!shader1._ready) shader1.create();
-					flu_modules_opengl_web_GL.current_context.useProgram(shader1._prog);
-					let _g7 = 0;
-					let _g16 = shader1._uniforms;
-					while(_g7 < _g16.length) {
-						let u3 = _g16[_g7];
-						++_g7;
-						u3.apply();
-					}
-					let offset3 = 0;
-					let _g17 = 0;
-					let _g8 = shader1._attributes.length;
-					while(_g17 < _g8) {
-						let i3 = _g17++;
-						let att3 = shader1._attributes[i3];
-						let location3 = att3.location;
-						if(location3 != -1) {
-							flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location3);
-							flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location3,att3.itemCount,att3.type,false,shader1._aStride,offset3);
-						}
-						offset3 += att3.byteSize;
-					}
-					shader1._active = true;
-				}
-				flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-				shader1.deactivate();
-				target1.tmpFBO = target1.writeFrameBufferObject;
-				target1.writeFrameBufferObject = target1.readFrameBufferObject;
-				target1.readFrameBufferObject = target1.tmpFBO;
-				target1.tmpTex = target1.writeToTexture;
-				target1.writeToTexture = target1.readFromTexture;
-				target1.readFromTexture = target1.tmpTex;
-			} else this.reset();
-			break;
-		case 112:
-			this.renderParticlesEnabled = !this.renderParticlesEnabled;
-			break;
-		case 100:
-			this.renderFluidEnabled = !this.renderFluidEnabled;
-			break;
-		case 115:
-			let _this1 = this.fluid;
-			flu_modules_opengl_web_GL.current_context.viewport(0,0,_this1.width,_this1.height);
-			flu_modules_opengl_web_GL.current_context.disable(3042);
-			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,_this1.textureQuad);
-			let shader2 = _this1.clearVelocityShader;
-			if(shader2._active) {
-				let _g9 = 0;
-				let _g18 = shader2._uniforms;
-				while(_g9 < _g18.length) {
-					let u4 = _g18[_g9];
-					++_g9;
-					u4.apply();
-				}
-				let offset4 = 0;
-				let _g19 = 0;
-				let _g10 = shader2._attributes.length;
-				while(_g19 < _g10) {
-					let i4 = _g19++;
-					let att4 = shader2._attributes[i4];
-					let location4 = att4.location;
-					if(location4 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location4);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location4,att4.itemCount,att4.type,false,shader2._aStride,offset4);
-					}
-					offset4 += att4.byteSize;
-				}
-			} else {
-				if(!shader2._ready) shader2.create();
-				flu_modules_opengl_web_GL.current_context.useProgram(shader2._prog);
-				let _g20 = 0;
-				let _g110 = shader2._uniforms;
-				while(_g20 < _g110.length) {
-					let u5 = _g110[_g20];
-					++_g20;
-					u5.apply();
-				}
-				let offset5 = 0;
-				let _g111 = 0;
-				let _g21 = shader2._attributes.length;
-				while(_g111 < _g21) {
-					let i5 = _g111++;
-					let att5 = shader2._attributes[i5];
-					let location5 = att5.location;
-					if(location5 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location5);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location5,att5.itemCount,att5.type,false,shader2._aStride,offset5);
-					}
-					offset5 += att5.byteSize;
-				}
-				shader2._active = true;
-			}
-			_this1.velocityRenderTarget.activate();
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			shader2.deactivate();
-			let _this2 = _this1.velocityRenderTarget;
-			_this2.tmpFBO = _this2.writeFrameBufferObject;
-			_this2.writeFrameBufferObject = _this2.readFrameBufferObject;
-			_this2.readFrameBufferObject = _this2.tmpFBO;
-			_this2.tmpTex = _this2.writeToTexture;
-			_this2.writeToTexture = _this2.readFromTexture;
-			_this2.readFromTexture = _this2.tmpTex;
-			let shader3 = _this1.clearPressureShader;
-			if(shader3._active) {
-				let _g22 = 0;
-				let _g112 = shader3._uniforms;
-				while(_g22 < _g112.length) {
-					let u6 = _g112[_g22];
-					++_g22;
-					u6.apply();
-				}
-				let offset6 = 0;
-				let _g113 = 0;
-				let _g23 = shader3._attributes.length;
-				while(_g113 < _g23) {
-					let i6 = _g113++;
-					let att6 = shader3._attributes[i6];
-					let location6 = att6.location;
-					if(location6 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location6);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location6,att6.itemCount,att6.type,false,shader3._aStride,offset6);
-					}
-					offset6 += att6.byteSize;
-				}
-			} else {
-				if(!shader3._ready) shader3.create();
-				flu_modules_opengl_web_GL.current_context.useProgram(shader3._prog);
-				let _g24 = 0;
-				let _g114 = shader3._uniforms;
-				while(_g24 < _g114.length) {
-					let u7 = _g114[_g24];
-					++_g24;
-					u7.apply();
-				}
-				let offset7 = 0;
-				let _g115 = 0;
-				let _g25 = shader3._attributes.length;
-				while(_g115 < _g25) {
-					let i7 = _g115++;
-					let att7 = shader3._attributes[i7];
-					let location7 = att7.location;
-					if(location7 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location7);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location7,att7.itemCount,att7.type,false,shader3._aStride,offset7);
-					}
-					offset7 += att7.byteSize;
-				}
-				shader3._active = true;
-			}
-			_this1.pressureRenderTarget.activate();
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-			shader3.deactivate();
-			let _this3 = _this1.pressureRenderTarget;
-			_this3.tmpFBO = _this3.writeFrameBufferObject;
-			_this3.writeFrameBufferObject = _this3.readFrameBufferObject;
-			_this3.readFrameBufferObject = _this3.tmpFBO;
-			_this3.tmpTex = _this3.writeToTexture;
-			_this3.writeToTexture = _this3.readFromTexture;
-			_this3.readFromTexture = _this3.tmpTex;
-			let _this4 = _this1.dyeRenderTarget;
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.readFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			flu_modules_opengl_web_GL.current_context.clear(16384);
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,_this4.writeFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			flu_modules_opengl_web_GL.current_context.clear(16384);
-			break;
-		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.lshift):
-			this.lshiftDown = false;
-			break;
-		case flu_system_input_Keycodes.from_scan(flu_system_input_Scancodes.rshift):
-			this.rshiftDown = false;
-			break;
-		}
-	}
-	,onWindowEvent: function(e) {
-		let _g = e.type;
-		if(_g != null) switch(_g) {
-		case 6:
-			this.updateSimulationTextures();
-			this.lastMousePointKnown = false;
-			this.mousePointKnown = false;
-			this.isMouseDown = false;
-			break;
-		case 12:
-			this.isMouseDown = false;
-			break;
-		case 11:
-			this.mousePointKnown = false;
-			this.lastMousePointKnown = false;
-			break;
-		default:
-		} else {
-		}
-	}
-	,__class__: Main
-});
-let SimulationQuality = $hxClasses["SimulationQuality"] = { __ename__ : true, __constructs__ : ["UltraHigh","High","Medium","Low","UltraLow","Android_IOS","UltraUltraLow"] };
+var SimulationQuality = $hxClasses["SimulationQuality"] = { __ename__ : true, __constructs__ : ["UltraHigh","High","Medium","Low","UltraLow"] };
 SimulationQuality.UltraHigh = ["UltraHigh",0];
 SimulationQuality.UltraHigh.toString = $estr;
 SimulationQuality.UltraHigh.__enum__ = SimulationQuality;
@@ -3363,168 +983,594 @@ SimulationQuality.Low.__enum__ = SimulationQuality;
 SimulationQuality.UltraLow = ["UltraLow",4];
 SimulationQuality.UltraLow.toString = $estr;
 SimulationQuality.UltraLow.__enum__ = SimulationQuality;
-SimulationQuality.Android_IOS = ["Android_IOS",5];
-SimulationQuality.Android_IOS.toString = $estr;
-SimulationQuality.Android_IOS.__enum__ = SimulationQuality;
-SimulationQuality.UltraUltraLow = ["UltraUltraLow",6];
-SimulationQuality.UltraUltraLow.toString = $estr;
-SimulationQuality.UltraUltraLow.__enum__ = SimulationQuality;
-SimulationQuality.__empty_constructs__ = [SimulationQuality.UltraHigh,SimulationQuality.High,SimulationQuality.Medium,SimulationQuality.Low,SimulationQuality.UltraLow,SimulationQuality.Android_IOS,SimulationQuality.UltraUltraLow];
-let BlitTexture = function() {
-	shaderblox_ShaderBase.call(this);
+SimulationQuality.__empty_constructs__ = [SimulationQuality.UltraHigh,SimulationQuality.High,SimulationQuality.Medium,SimulationQuality.Low,SimulationQuality.UltraLow];
+lime.app = {};
+lime.app.Module = function() {
 };
-$hxClasses["BlitTexture"] = BlitTexture;
-BlitTexture.__name__ = true;
-BlitTexture.__super__ = shaderblox_ShaderBase;
-BlitTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
-	createProperties: function() {
-		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("texture",null,false);
-		this.texture = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
-		this.vertexPosition = instance1;
-		this._attributes.push(instance1);
-		this._aStride += 8;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\r\nvarying vec2 texelCoord;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n}\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nuniform sampler2D texture;\n\tvarying vec2 texelCoord;\n\n\tvoid main(void){\n\t\tgl_FragColor = texture2D(texture, texelCoord);\n\t}\n";
-	}
-	,__class__: BlitTexture
-});
-let FluidRender = function() {
-	shaderblox_ShaderBase.call(this);
+$hxClasses["lime.app.Module"] = lime.app.Module;
+lime.app.Module.__name__ = true;
+lime.app.Module.prototype = {
+	__class__: lime.app.Module
 };
-$hxClasses["FluidRender"] = FluidRender;
-FluidRender.__name__ = true;
-FluidRender.__super__ = shaderblox_ShaderBase;
-FluidRender.prototype = $extend(shaderblox_ShaderBase.prototype,{
-	createProperties: function() {
-		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("texture",null,false);
-		this.texture = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
-		this.vertexPosition = instance1;
-		this._attributes.push(instance1);
-		this._aStride += 8;
+lime.app._Application = {};
+lime.app._Application.UpdateEventInfo = function(type,deltaTime) {
+	if(deltaTime == null) deltaTime = 0;
+	this.type = type;
+	this.deltaTime = deltaTime;
+};
+$hxClasses["lime.app._Application.UpdateEventInfo"] = lime.app._Application.UpdateEventInfo;
+lime.app._Application.UpdateEventInfo.__name__ = true;
+lime.app._Application.UpdateEventInfo.prototype = {
+	clone: function() {
+		return new lime.app._Application.UpdateEventInfo(this.type,this.deltaTime);
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\r\nvarying vec2 texelCoord;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n}\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nuniform sampler2D texture;\n\tvarying vec2 texelCoord;\n\n\tvoid main(void){\n\t\tgl_FragColor = texture2D(texture, texelCoord);\n\t}\n";
+	,__class__: lime.app._Application.UpdateEventInfo
+};
+lime.app.Event = function() {
+	this.listeners = new Array();
+	this.priorities = new Array();
+	this.repeat = new Array();
+};
+$hxClasses["lime.app.Event"] = lime.app.Event;
+lime.app.Event.__name__ = true;
+lime.app.Event.prototype = {
+	add: function(listener,once,priority) {
+		if(priority == null) priority = 0;
+		if(once == null) once = false;
+		var _g1 = 0;
+		var _g = this.priorities.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(priority > this.priorities[i]) {
+				this.listeners.splice(i,0,listener);
+				this.priorities.splice(i,0,priority);
+				this.repeat.splice(i,0,!once);
+				return;
+			}
+		}
+		this.listeners.push(listener);
+		this.priorities.push(priority);
+		this.repeat.push(!once);
 	}
-	,__class__: FluidRender
+	,remove: function(listener) {
+		var index = HxOverrides.indexOf(this.listeners,listener,0);
+		if(index > -1) {
+			this.listeners.splice(index,1);
+			this.priorities.splice(index,1);
+			this.repeat.splice(index,1);
+		}
+	}
+	,__class__: lime.app.Event
+};
+lime.app.Application = function() {
+	lime.app.Module.call(this);
+	lime.app.Application.__instance = this;
+	this.windows = new Array();
+	if(!lime.app.Application.__registered) {
+		lime.app.Application.__registered = true;
+		lime.audio.AudioManager.init();
+	}
+};
+$hxClasses["lime.app.Application"] = lime.app.Application;
+lime.app.Application.__name__ = true;
+lime.app.Application.__dispatch = function() {
+	lime.app.Application.__instance.update(lime.app.Application.__eventInfo.deltaTime);
+	var listeners = lime.app.Application.onUpdate.listeners;
+	var repeat = lime.app.Application.onUpdate.repeat;
+	var length = listeners.length;
+	var i = 0;
+	while(i < length) {
+		listeners[i](lime.app.Application.__eventInfo.deltaTime);
+		if(!repeat[i]) {
+			lime.app.Application.onUpdate.remove(listeners[i]);
+			length--;
+		} else i++;
+	}
+};
+lime.app.Application.__super__ = lime.app.Module;
+lime.app.Application.prototype = $extend(lime.app.Module.prototype,{
+	addWindow: function(window) {
+		this.windows.push(window);
+		window.create(this);
+	}
+	,create: function(config) {
+		this.config = config;
+		lime.ui.KeyEventManager.create();
+		lime.ui.MouseEventManager.create();
+		lime.ui.TouchEventManager.create();
+		lime.ui.KeyEventManager.onKeyDown.add($bind(this,this.onKeyDown));
+		lime.ui.KeyEventManager.onKeyUp.add($bind(this,this.onKeyUp));
+		lime.ui.MouseEventManager.onMouseDown.add($bind(this,this.onMouseDown));
+		lime.ui.MouseEventManager.onMouseMove.add($bind(this,this.onMouseMove));
+		lime.ui.MouseEventManager.onMouseUp.add($bind(this,this.onMouseUp));
+		lime.ui.MouseEventManager.onMouseWheel.add($bind(this,this.onMouseWheel));
+		lime.ui.TouchEventManager.onTouchStart.add($bind(this,this.onTouchStart));
+		lime.ui.TouchEventManager.onTouchMove.add($bind(this,this.onTouchMove));
+		lime.ui.TouchEventManager.onTouchEnd.add($bind(this,this.onTouchEnd));
+		lime.ui.Window.onWindowActivate.add($bind(this,this.onWindowActivate));
+		lime.ui.Window.onWindowClose.add($bind(this,this.onWindowClose));
+		lime.ui.Window.onWindowDeactivate.add($bind(this,this.onWindowDeactivate));
+		lime.ui.Window.onWindowFocusIn.add($bind(this,this.onWindowFocusIn));
+		lime.ui.Window.onWindowFocusOut.add($bind(this,this.onWindowFocusOut));
+		lime.ui.Window.onWindowMove.add($bind(this,this.onWindowMove));
+		lime.ui.Window.onWindowResize.add($bind(this,this.onWindowResize));
+		var $window = new lime.ui.Window(config);
+		var renderer = new lime.graphics.Renderer($window);
+		$window.width = config.width;
+		$window.height = config.height;
+		$window.element = config.element;
+		this.addWindow($window);
+	}
+	,exec: function() {
+		
+			var lastTime = 0;
+			var vendors = ['ms', 'moz', 'webkit', 'o'];
+			for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+				window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+				window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+										   || window[vendors[x]+'CancelRequestAnimationFrame'];
+			}
+			
+			if (!window.requestAnimationFrame)
+				window.requestAnimationFrame = function(callback, element) {
+					var currTime = new Date().getTime();
+					var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+					var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+					  timeToCall);
+					lastTime = currTime + timeToCall;
+					return id;
+				};
+			
+			if (!window.cancelAnimationFrame)
+				window.cancelAnimationFrame = function(id) {
+					clearTimeout(id);
+				};
+			
+			window.requestAnimFrame = window.requestAnimationFrame;
+		;
+		this.__triggerFrame();
+		return 0;
+	}
+	,init: function(context) {
+	}
+	,onKeyDown: function(keyCode,modifier) {
+	}
+	,onKeyUp: function(keyCode,modifier) {
+	}
+	,onMouseDown: function(x,y,button) {
+	}
+	,onMouseMove: function(x,y,button) {
+	}
+	,onMouseUp: function(x,y,button) {
+	}
+	,onMouseWheel: function(deltaX,deltaY) {
+	}
+	,onTouchEnd: function(x,y,id) {
+	}
+	,onTouchMove: function(x,y,id) {
+	}
+	,onTouchStart: function(x,y,id) {
+	}
+	,onWindowActivate: function() {
+	}
+	,onWindowClose: function() {
+	}
+	,onWindowDeactivate: function() {
+	}
+	,onWindowFocusIn: function() {
+	}
+	,onWindowFocusOut: function() {
+	}
+	,onWindowMove: function(x,y) {
+	}
+	,onWindowResize: function(width,height) {
+	}
+	,render: function(context) {
+	}
+	,update: function(deltaTime) {
+	}
+	,__triggerFrame: function(_) {
+		lime.app.Application.__eventInfo.deltaTime = 16;
+		lime.app.Application.__dispatch();
+		lime.graphics.Renderer.dispatch();
+		window.requestAnimationFrame($bind(this,this.__triggerFrame));
+	}
+	,get_window: function() {
+		return this.windows[0];
+	}
+	,__class__: lime.app.Application
 });
-let ColorParticleMotion = function() {
+var Main = function() {
+	this.qualityDirection = 0;
+	this.renderFluidEnabled = true;
+	this.renderParticlesEnabled = true;
+	this.lastMouseClipSpace = new lime.math.Vector2();
+	this.lastMouse = new lime.math.Vector2();
+	this.mouseClipSpace = new lime.math.Vector2();
+	this.mouse = new lime.math.Vector2();
+	this.lastMousePointKnown = false;
+	this.mousePointKnown = false;
+	this.isMouseDown = false;
+	this.screenBuffer = null;
+	this.textureQuad = null;
+	lime.app.Application.call(this);
+	this.performanceMonitor = new PerformanceMonitor(35,null,2000);
+	this.set_simulationQuality(SimulationQuality.UltraLow);
+	this.performanceMonitor.fpsTooLowCallback = $bind(this,this.lowerQualityRequired);
+	var urlParams = js.Web.getParams();
+	if(urlParams.exists("q")) {
+		var q = StringTools.trim(urlParams.get("q").toLowerCase());
+		var _g = 0;
+		var _g1 = Type.allEnums(SimulationQuality);
+		while(_g < _g1.length) {
+			var e = _g1[_g];
+			++_g;
+			var name = e[0].toLowerCase();
+			if(q == name) {
+				this.set_simulationQuality(e);
+				this.performanceMonitor.fpsTooLowCallback = null;
+				break;
+			}
+		}
+	}
+};
+$hxClasses["Main"] = Main;
+Main.__name__ = true;
+Main.__super__ = lime.app.Application;
+Main.prototype = $extend(lime.app.Application.prototype,{
+	init: function(context) {
+		var _g = this;
+		var isIOSBrowser = new EReg("(iPad|iPhone|iPod)","g").match(window.navigator.userAgent);
+		if(isIOSBrowser) {
+			js.Lib.alert("iOS is not supported yet :(");
+			window.location.href = "mobile-app/index.html";
+			return;
+		}
+		switch(context[1]) {
+		case 0:
+			var gl = context[2];
+			this.gl = gl;
+			gl.disable(gl.DEPTH_TEST);
+			gl.disable(gl.CULL_FACE);
+			gl.disable(gl.DITHER);
+			this.textureQuad = gltoolbox.GeometryTools.createQuad(0,0,1,1);
+			this.offScreenTarget = new gltoolbox.render.RenderTarget(Math.round(this.windows[0].width * this.offScreenScale),Math.round(this.windows[0].height * this.offScreenScale),gltoolbox.TextureTools.createTextureFactory(gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,null));
+			this.screenTextureShader = new ScreenTexture();
+			this.renderParticlesShader = new ColorParticleMotion();
+			this.updateDyeShader = new MouseDye();
+			this.mouseForceShader = new MouseForce();
+			this.updateDyeShader.mouseClipSpace.set_data(this.mouseClipSpace);
+			this.updateDyeShader.lastMouseClipSpace.set_data(this.lastMouseClipSpace);
+			this.mouseForceShader.mouseClipSpace.set_data(this.mouseClipSpace);
+			this.mouseForceShader.lastMouseClipSpace.set_data(this.lastMouseClipSpace);
+			var cellScale = 32;
+			this.fluid = new GPUFluid(gl,Math.round(this.windows[0].width * this.fluidScale),Math.round(this.windows[0].height * this.fluidScale),cellScale,this.fluidIterations);
+			this.fluid.set_updateDyeShader(this.updateDyeShader);
+			this.fluid.set_applyForcesShader(this.mouseForceShader);
+			this.particles = new GPUParticles(gl,this.particleCount);
+			this.particles.set_flowScaleX(this.fluid.simToClipSpaceX(1));
+			this.particles.set_flowScaleY(this.fluid.simToClipSpaceY(1));
+			this.particles.stepParticlesShader.dragCoefficient.set_data(1);
+			ga("send","pageview",{ dimension2 : Std.string(gl.getExtension("OES_texture_float_linear") != null), dimension3 : Std.string(gl.getExtension("OES_texture_float") != null)});
+			var clickCount = 0;
+			lime.ui.MouseEventManager.onMouseUp.add(function(x,y,button) {
+				clickCount++;
+			});
+			haxe.Timer.delay(function() {
+				var fps = _g.performanceMonitor.fpsSample.average;
+				ga("set",{ metric1 : Math.round(fps != null?fps:0), metric2 : _g.particleCount, metric3 : _g.fluidIterations, metric4 : _g.fluidScale, metric5 : _g.fluid.width * _g.fluid.height, metric6 : clickCount, dimension1 : _g.simulationQuality[0]});
+			},6000);
+		}
+		this.lastTime = haxe.Timer.stamp();
+		const ref = this;
+		document.getElementById("root").addEventListener("mouseover",function(e) {
+			console.log(ref)
+			ref.mouse.setTo(e.clientX, e.clientY)
+			ref.mouseClipSpace.setTo(e.clientX / ref.windows[0].width * 2 - 1,(ref.windows[0].height - e.clientY) / ref.windows[0].height * 2 - 1);
+			ref.mousePointKnown = true;
+			ref.isMouseDown = true;
+			
+		},false, ref);
+	}
+	,render: function(context) {
+		this.time = haxe.Timer.stamp();
+		var dt = this.time - this.lastTime;
+		this.lastTime = this.time;
+		if(dt > 0) this.performanceMonitor.recordFPS(1 / dt);
+		if(this.lastMousePointKnown) {
+			this.updateDyeShader.isMouseDown.set(this.isMouseDown);
+			this.mouseForceShader.isMouseDown.set(this.isMouseDown);
+		}
+		this.fluid.step(dt);
+		this.particles.stepParticlesShader.flowVelocityField.set_data(this.fluid.velocityRenderTarget.readFromTexture);
+		if(this.renderParticlesEnabled) this.particles.step(dt);
+		this.gl.viewport(0,0,this.offScreenTarget.width,this.offScreenTarget.height);
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,this.offScreenTarget.frameBufferObject);
+		this.gl.clearColor(0,0,0,1);
+		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+		this.gl.enable(this.gl.BLEND);
+		this.gl.blendFunc(this.gl.SRC_ALPHA,this.gl.SRC_ALPHA);
+		this.gl.blendEquation(this.gl.FUNC_ADD);
+		if(this.renderParticlesEnabled) {
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.particles.particleUVs);
+			this.renderParticlesShader.particleData.set_data(this.particles.particleData.readFromTexture);
+			this.renderParticlesShader.activate(true,true);
+			this.gl.drawArrays(this.gl.POINTS,0,this.particles.count);
+			this.renderParticlesShader.deactivate();
+		}
+		if(this.renderFluidEnabled) {
+			this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.textureQuad);
+			this.screenTextureShader.texture.set_data(this.fluid.dyeRenderTarget.readFromTexture);
+			this.screenTextureShader.activate(true,true);
+			this.gl.drawArrays(this.gl.TRIANGLE_STRIP,0,4);
+			this.screenTextureShader.deactivate();
+		}
+		this.gl.disable(this.gl.BLEND);
+		this.gl.viewport(0,0,this.windows[0].width,this.windows[0].height);
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,this.screenBuffer);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.textureQuad);
+		this.screenTextureShader.texture.set_data(this.offScreenTarget.texture);
+		this.screenTextureShader.activate(true,true);
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP,0,4);
+		this.screenTextureShader.deactivate();
+		this.lastMouse.setTo(this.mouse.x,this.mouse.y);
+		this.lastMouseClipSpace.setTo(this.mouse.x / this.windows[0].width * 2 - 1,(this.windows[0].height - this.mouse.y) / this.windows[0].height * 2 - 1);
+		this.lastMousePointKnown = this.mousePointKnown;
+	}
+	,renderTexture: function(texture) {
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.textureQuad);
+		this.screenTextureShader.texture.set_data(texture);
+		this.screenTextureShader.activate(true,true);
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP,0,4);
+		this.screenTextureShader.deactivate();
+	}
+	,renderParticles: function() {
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.particles.particleUVs);
+		this.renderParticlesShader.particleData.set_data(this.particles.particleData.readFromTexture);
+		this.renderParticlesShader.activate(true,true);
+		this.gl.drawArrays(this.gl.POINTS,0,this.particles.count);
+		this.renderParticlesShader.deactivate();
+	}
+	,updateSimulationTextures: function() {
+		var w;
+		var h;
+		w = Math.round(this.windows[0].width * this.fluidScale);
+		h = Math.round(this.windows[0].height * this.fluidScale);
+		if(w != this.fluid.width || h != this.fluid.height) this.fluid.resize(w,h);
+		w = Math.round(this.windows[0].width * this.offScreenScale);
+		h = Math.round(this.windows[0].height * this.offScreenScale);
+		if(w != this.offScreenTarget.width || h != this.offScreenTarget.height) this.offScreenTarget.resize(w,h);
+		if(this.particleCount != this.particles.count) this.particles.setCount(this.particleCount);
+	}
+	,set_simulationQuality: function(quality) {
+		switch(quality[1]) {
+		case 0:
+			this.particleCount = 1048576;
+			this.fluidScale = 0.5;
+			this.set_fluidIterations(30);
+			this.offScreenScale = 1.;
+			break;
+		case 1:
+			this.particleCount = 1048576;
+			this.fluidScale = 0.25;
+			this.set_fluidIterations(20);
+			this.offScreenScale = 1.;
+			break;
+		case 2:
+			this.particleCount = 262144;
+			this.fluidScale = 0.25;
+			this.set_fluidIterations(18);
+			this.offScreenScale = 1.;
+			break;
+		case 3:
+			this.particleCount = 65536;
+			this.fluidScale = 0.2;
+			this.set_fluidIterations(14);
+			this.offScreenScale = 1.;
+			break;
+		case 4:
+			this.particleCount = 16384;
+			this.fluidScale = 0.166666666666666657;
+			this.set_fluidIterations(12);
+			this.offScreenScale = 0.5;
+			break;
+		}
+		return this.simulationQuality = quality;
+	}
+	,set_fluidIterations: function(v) {
+		this.fluidIterations = v;
+		if(this.fluid != null) this.fluid.solverIterations = v;
+		return v;
+	}
+	,lowerQualityRequired: function(magnitude) {
+		if(this.qualityDirection > 0) return;
+		this.qualityDirection = -1;
+		var qualityIndex = this.simulationQuality[1];
+		var maxIndex = Type.allEnums(SimulationQuality).length - 1;
+		if(qualityIndex >= maxIndex) return;
+		if(magnitude < 0.5) qualityIndex += 1; else qualityIndex += 2;
+		if(qualityIndex > maxIndex) qualityIndex = maxIndex;
+		var newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
+		haxe.Log.trace("Average FPS: " + this.performanceMonitor.fpsSample.average + ", lowering quality to: " + Std.string(newQuality),{ fileName : "Main.hx", lineNumber : 367, className : "Main", methodName : "lowerQualityRequired"});
+		this.set_simulationQuality(newQuality);
+		this.updateSimulationTextures();
+	}
+	,higherQualityRequired: function(magnitude) {
+		if(this.qualityDirection < 0) return;
+		this.qualityDirection = 1;
+		var qualityIndex = this.simulationQuality[1];
+		var minIndex = 0;
+		if(qualityIndex <= minIndex) return;
+		if(magnitude < 0.5) qualityIndex -= 1; else qualityIndex -= 2;
+		if(qualityIndex < minIndex) qualityIndex = minIndex;
+		var newQuality = Type.createEnumIndex(SimulationQuality,qualityIndex);
+		haxe.Log.trace("Raising quality to: " + Std.string(newQuality),{ fileName : "Main.hx", lineNumber : 387, className : "Main", methodName : "higherQualityRequired"});
+		this.set_simulationQuality(newQuality);
+		this.updateSimulationTextures();
+	}
+	,reset: function() {
+		this.particles.reset();
+		this.fluid.clear();
+	}
+	,windowToClipSpaceX: function(x) {
+		return x / this.windows[0].width * 2 - 1;
+	}
+	,windowToClipSpaceY: function(y) {
+		return (this.windows[0].height - y) / this.windows[0].height * 2 - 1;
+	}
+	,onMouseDown: function(x,y,button) {
+		this.isMouseDown = true;
+	}
+	,onMouseUp: function(x,y,button) {
+		this.isMouseDown = false;
+	}
+	,onMouseMove: function(x,y,button) {
+		this.mouse.setTo(x,y);
+		this.mouseClipSpace.setTo(x / this.windows[0].width * 2 - 1,(this.windows[0].height - y) / this.windows[0].height * 2 - 1);
+		this.mousePointKnown = true;
+	}
+	,updateMouseCoord: function(x,y) {
+		this.mouse.setTo(x,y);
+		this.mouseClipSpace.setTo(x / this.windows[0].width * 2 - 1,(this.windows[0].height - y) / this.windows[0].height * 2 - 1);
+		this.mousePointKnown = true;
+	}
+	,updateLastMouse: function() {
+		this.lastMouse.setTo(this.mouse.x,this.mouse.y);
+		this.lastMouseClipSpace.setTo(this.mouse.x / this.windows[0].width * 2 - 1,(this.windows[0].height - this.mouse.y) / this.windows[0].height * 2 - 1);
+		this.lastMousePointKnown = this.mousePointKnown;
+	}
+	,onTouchStart: function(x,y,id) {
+		this.mouse.setTo(x,y);
+		this.mouseClipSpace.setTo(x / this.windows[0].width * 2 - 1,(this.windows[0].height - y) / this.windows[0].height * 2 - 1);
+		this.mousePointKnown = true;
+		this.lastMouse.setTo(this.mouse.x,this.mouse.y);
+		this.lastMouseClipSpace.setTo(this.mouse.x / this.windows[0].width * 2 - 1,(this.windows[0].height - this.mouse.y) / this.windows[0].height * 2 - 1);
+		this.lastMousePointKnown = this.mousePointKnown;
+		this.isMouseDown = true;
+	}
+	,onTouchEnd: function(x,y,id) {
+		this.mouse.setTo(x,y);
+		this.mouseClipSpace.setTo(x / this.windows[0].width * 2 - 1,(this.windows[0].height - y) / this.windows[0].height * 2 - 1);
+		this.mousePointKnown = true;
+		this.isMouseDown = false;
+	}
+	,onTouchMove: function(x,y,id) {
+		this.mouse.setTo(x,y);
+		this.mouseClipSpace.setTo(x / this.windows[0].width * 2 - 1,(this.windows[0].height - y) / this.windows[0].height * 2 - 1);
+		this.mousePointKnown = true;
+	}
+	,onKeyUp: function(keyCode,modifier) {
+		switch(keyCode) {
+		case 114:
+			this.reset();
+			break;
+		case 112:
+			this.renderParticlesEnabled = !this.renderParticlesEnabled;
+			break;
+		case 100:
+			this.renderFluidEnabled = !this.renderFluidEnabled;
+			break;
+		case 115:
+			this.fluid.clear();
+			break;
+		}
+	}
+	,__class__: Main
+});
+var ScreenTexture = function() {
+	shaderblox.ShaderBase.call(this);
+};
+$hxClasses["ScreenTexture"] = ScreenTexture;
+ScreenTexture.__name__ = true;
+ScreenTexture.__super__ = shaderblox.ShaderBase;
+ScreenTexture.prototype = $extend(shaderblox.ShaderBase.prototype,{
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec2 vertexPosition;\nvarying vec2 texelCoord;\n\nvoid main() {\n\ttexelCoord = vertexPosition;\n\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n}\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform sampler2D texture;\nvarying vec2 texelCoord;\n\nvoid main(void){\n\tgl_FragColor = abs(texture2D(texture, texelCoord));\n}\n");
+		this.ready = true;
+	}
+	,createProperties: function() {
+		shaderblox.ShaderBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["texture",-1,false]);
+		this.texture = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.attributes.FloatAttribute"),["vertexPosition",0,2]);
+		this.vertexPosition = instance1;
+		this.attributes.push(instance1);
+		this.aStride += 8;
+	}
+	,__class__: ScreenTexture
+});
+var ColorParticleMotion = function() {
 	RenderParticles.call(this);
 };
 $hxClasses["ColorParticleMotion"] = ColorParticleMotion;
 ColorParticleMotion.__name__ = true;
 ColorParticleMotion.__super__ = RenderParticles;
 ColorParticleMotion.prototype = $extend(RenderParticles.prototype,{
-	set_POINT_SIZE: function(value) {
-		this.POINT_SIZE = value;
-		this._vertSource = shaderblox_glsl_GLSLTools.injectConstValue(this._vertSource,"POINT_SIZE",value);
-		if(this._ready) this.destroy();
-		return value;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform sampler2D particleData;\n\tattribute vec2 particleUV;\n\tvarying vec4 color;\n\t\n\n\nvoid main(){\n\t\tvec2 p = texture2D(particleData, particleUV).xy;\n\t\tvec2 v = texture2D(particleData, particleUV).zw;\n\t\tgl_PointSize = 1.0;\n\t\tgl_Position = vec4(p, 0.0, 1.0);\n\t\tfloat speed = length(v);\n\t\tfloat x = clamp(speed * 4.0, 0., 1.);\n\t\tcolor.rgb = (\n\t\t\t\tmix(vec3(40.4, 0.0, 35.0) / 300.0, vec3(0.2, 47.8, 100) / 100.0, x)\n\t\t\t\t+ (vec3(63.1, 92.5, 100) / 100.) * x*x*x * .1\n\t\t);\n\t\tcolor.a = 1.0;\n\t}\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec4 color;\n\tvoid main(){\n\t\tgl_FragColor = vec4(color);\n\t}\n\n\n");
+		this.ready = true;
 	}
 	,createProperties: function() {
 		RenderParticles.prototype.createProperties.call(this);
-		this._aStride += 0;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_PARTICLE_VELOCITY_SCALE = 0.05; \n\r\nconst bool FLOAT_DATA = false;\r\n\r\n\nvec4 packParticlePosition(in vec2 p){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(p.xy, 0.0, 0.0);\r\n\t}else{\t\r\n\t    vec2 np = (p)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(np.x), packFloat8bitRG(np.y));\r\n\t}\r\n}\r\n\r\nvec2 unpackParticlePosition(in vec4 pp){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pp.xy;\r\n\t}else{\r\n\t    vec2 np = vec2(unpackFloat8bitRG(pp.xy), unpackFloat8bitRG(pp.zw));\r\n\t    return (2.0*np.xy - 1.0);\r\n\t}\r\n}\r\n\r\n\nvec4 packParticleVelocity(in vec2 v){\r\n\tif(FLOAT_DATA){\r\n\t\treturn vec4(v.xy, 0.0, 0.0);\r\n\t}else{\r\n\t    vec2 nv = (v * PACK_PARTICLE_VELOCITY_SCALE)*0.5 + 0.5;\r\n\t    return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n\t}\r\n\r\n}\r\n\r\nvec2 unpackParticleVelocity(in vec4 pv){\r\n\tif(FLOAT_DATA){\r\n\t\treturn pv.xy;\r\n\t}else{\r\n\t    const float INV_PACK_PARTICLE_VELOCITY_SCALE = 1./PACK_PARTICLE_VELOCITY_SCALE;\r\n\t    vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n\t    return (2.0*nv.xy - 1.0)* INV_PACK_PARTICLE_VELOCITY_SCALE;\r\n\t}\r\n}\n\n\tuniform sampler2D positionData;\n\tuniform sampler2D velocityData;\n\n\tattribute vec2 particleUV;\n\tvarying vec4 color;\n\t\n\n\nvec3 saturation(in vec3 rgb, in float amount){\n\t\tconst vec3 CW = vec3(0.299, 0.587, 0.114);\n\t\tvec3 bw = vec3(dot(rgb, CW));\n\t\treturn mix(bw, rgb, amount);\n\t}\n\n\tconst float POINT_SIZE = 1.0;\n\n\tvoid main(){\n\t\tvec2 p = unpackParticlePosition(texture2D(positionData, particleUV));\n\t\tvec2 v = unpackParticleVelocity(texture2D(velocityData, particleUV));\n\t\tgl_PointSize = 1.0;\n\t\tgl_Position = vec4(p, 0.0, 1.0);\n\t\tfloat speed = length(v);\n\t\tfloat x = clamp(speed * 4.0, 0., 1.);\n\t\tcolor.rgb = (\n\t\t\t\tmix(vec3(40.4, 0.0, 35.0) / 300.0, vec3(0.2, 47.8, 100) / 100.0, x)\n\t\t\t\t+ (vec3(63.1, 92.5, 100) / 100.) * x*x*x * .1\n\t\t);\n\t\tcolor.a = 1.0;\n\t}\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nvarying vec4 color;\n\n\tvoid main(){\n\t\tgl_FragColor = vec4(color);\n\t}\n\n\n";
+		this.aStride += 0;
 	}
 	,__class__: ColorParticleMotion
 });
-let MouseDye = function() {
+var MouseDye = function() {
 	UpdateDye.call(this);
 };
 $hxClasses["MouseDye"] = MouseDye;
 MouseDye.__name__ = true;
 MouseDye.__super__ = UpdateDye;
 MouseDye.prototype = $extend(UpdateDye.prototype,{
-	createProperties: function() {
-		UpdateDye.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UBool("isMouseDown",null);
-		this.isMouseDown = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UVec2("mouse",null);
-		this.mouse = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UVec2("lastMouse",null);
-		this.lastMouse = instance2;
-		this._uniforms.push(instance2);
-		let instance3 = new shaderblox_uniforms_UVec3("dyeColor",null);
-		this.dyeColor = instance3;
-		this._uniforms.push(instance3);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D dye;\n\tuniform float dt;\n\tuniform float dx;\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n\n\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p, out float fp){\n\tvec2 d = p - a;\n\tvec2 x = b - a;\n\n\tfp = 0.0; \n\tfloat lx = length(x);\n\t\n\tif(lx <= 0.0001) return length(d);\n\n\tfloat projection = dot(d, x / lx); \n\n\tfp = projection / lx;\n\n\tif(projection < 0.0)            return length(d);\n\telse if(projection > length(x)) return length(p - b);\n\treturn sqrt(abs(dot(d,d) - projection*projection));\n}\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p){\n\tfloat fp;\n\treturn distanceToSegment(a, b, p, fp);\n}\n\tuniform bool isMouseDown;\n\tuniform vec2 mouseClipSpace;\n\tuniform vec2 lastMouseClipSpace;\n\tvoid main(){\n\t\tvec4 color = texture2D(dye, texelCoord);\n\t\tcolor.r *= (0.9797);\n\t\tcolor.g *= (0.9494);\n\t\tcolor.b *= (0.9696);\n\t\tif(isMouseDown){\t\t\t\n\t\t\tvec2 mouse = clipToSimSpace(mouseClipSpace);\n\t\t\tvec2 lastMouse = clipToSimSpace(lastMouseClipSpace);\n\t\t\tvec2 mouseVelocity = -(lastMouse - mouse)/dt;\n\t\t\t\n\t\t\t\n\t\t\tfloat fp;\n\t\t\tfloat l = distanceToSegment(mouse, lastMouse, p, fp);\n\t\t\tfloat taperFactor = 0.6;\n\t\t\tfloat projectedFraction = 1.0 - clamp(fp, 0.0, 1.0)*taperFactor;\n\t\t\tfloat R = 0.025;\n\t\t\tfloat m = exp(-l/R);\n\t\t\t\n \t\t\tfloat speed = length(mouseVelocity);\n\t\t\tfloat x = clamp((speed * speed * 0.02 - l * 5.0) * projectedFraction, 0., 1.);\n\t\t\tcolor.rgb += m * (\n\t\t\t\tmix(vec3(2.4, 0, 5.9) / 60.0, vec3(0.2, 51.8, 100) / 30.0, x)\n \t\t\t\t+ (vec3(100) / 100.) * pow(x, 9.)\n\t\t\t);\n\t\t}\n\t\tgl_FragColor = color;\n\t}\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D dye;\n\tuniform float dt;\n\tuniform float dx;\n\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n\n\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p, out float fp){\r\n\tvec2 d = p - a;\r\n\tvec2 x = b - a;\r\n\r\n\tfp = 0.0; \n\tfloat lx = length(x);\r\n\t\r\n\tif(lx <= 0.0001) return length(d);\n\r\n\tfloat projection = dot(d, x / lx); \n\r\n\tfp = projection / lx;\r\n\r\n\tif(projection < 0.0)            return length(d);\r\n\telse if(projection > length(x)) return length(p - b);\r\n\treturn sqrt(abs(dot(d,d) - projection*projection));\r\n}\r\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p){\r\n\tfloat fp;\r\n\treturn distanceToSegment(a, b, p, fp);\r\n}\n\tuniform bool isMouseDown;\n\tuniform vec2 mouse; \n\tuniform vec2 lastMouse;\n\tuniform vec3 dyeColor;\n\n\tvec3 saturation(in vec3 rgb, in float amount){\n\t\tconst vec3 CW = vec3(0.299, 0.587, 0.114);\n\t\tvec3 bw = vec3(dot(rgb, CW));\n\t\treturn mix(bw, rgb, amount);\n\t}\n\n\tvoid main(){\n\t\tvec4 color = texture2D(dye, texelCoord);\n\t\t\n\t\tcolor -= sign(color)*(0.006 - (1.0 - color)*0.004);\n\t\t\n\n\t\t\n\t\t\n\n\t\tif(isMouseDown){\t\t\t\n\t\t\tvec2 mouseVelocity = (mouse - lastMouse)/dt;\n\t\t\t\n\t\t\t\n\t\t\tfloat projection;\n\t\t\tfloat l = distanceToSegment(mouse, lastMouse, p, projection);\n\t\t\tfloat taperFactor = 0.6;\n\t\t\tfloat projectedFraction = 1.0 - clamp(projection, 0.0, 1.0)*taperFactor;\n\n\t\t\tfloat speed = 0.016*length(mouseVelocity)/dt;\n\t\t\tfloat x = speed;\n\t\t\t\t\t\t\t\t\t\n\t\t\tfloat R = 0.3;\n\t\t\tfloat m = 1.0*exp(-l/R);\n\t\t\tfloat m2 = m*m;\n\t\t\tfloat m3 = m2*m;\n\t\t\tfloat m4 = m3*m;\n\t\t\tfloat m6 = m4*m*m;\n\n\t\t\tcolor.rgb +=\n\t\t\t\t0.004*dyeColor*(16.0*m3*(0.5*x+1.0)+m2) \n\t\t\t  + 0.03*m6*m*m*vec3(1.0)*(0.5*m3*x + 1.0);     \n\t\t}\n\n\t\tgl_FragColor = color;\n\t}\n";
+	,createProperties: function() {
+		UpdateDye.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UBool"),["isMouseDown",-1]);
+		this.isMouseDown = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UVec2"),["mouseClipSpace",-1]);
+		this.mouseClipSpace = instance1;
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UVec2"),["lastMouseClipSpace",-1]);
+		this.lastMouseClipSpace = instance2;
+		this.uniforms.push(instance2);
+		this.aStride += 0;
 	}
 	,__class__: MouseDye
 });
-let MouseForce = function() {
+var MouseForce = function() {
 	ApplyForces.call(this);
 };
 $hxClasses["MouseForce"] = MouseForce;
 MouseForce.__name__ = true;
 MouseForce.__super__ = ApplyForces;
 MouseForce.prototype = $extend(ApplyForces.prototype,{
-	createProperties: function() {
-		ApplyForces.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UBool("isMouseDown",null);
-		this.isMouseDown = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UVec2("mouse",null);
-		this.mouse = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UVec2("lastMouse",null);
-		this.lastMouse = instance2;
-		this._uniforms.push(instance2);
-		this._aStride += 0;
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n \r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n\n\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\n#define PRESSURE_BOUNDARY\n#define VELOCITY_BOUNDARY\n\nuniform vec2 invresolution;\nuniform float aspectRatio;\n\nvec2 clipToSimSpace(vec2 clipSpace){\n    return  vec2(clipSpace.x * aspectRatio, clipSpace.y);\n}\n\nvec2 simToTexelSpace(vec2 simSpace){\n    return vec2(simSpace.x / aspectRatio + 1.0 , simSpace.y + 1.0)*.5;\n}\n\n\nfloat samplePressue(sampler2D pressure, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n\n    \n    \n    \n    #ifdef PRESSURE_BOUNDARY\n    if(coord.x < 0.0)      cellOffset.x = 1.0;\n    else if(coord.x > 1.0) cellOffset.x = -1.0;\n    if(coord.y < 0.0)      cellOffset.y = 1.0;\n    else if(coord.y > 1.0) cellOffset.y = -1.0;\n    #endif\n\n    return texture2D(pressure, coord + cellOffset * invresolution).x;\n}\n\n\nvec2 sampleVelocity(sampler2D velocity, vec2 coord){\n    vec2 cellOffset = vec2(0.0, 0.0);\n    vec2 multiplier = vec2(1.0, 1.0);\n\n    \n    \n    \n    #ifdef VELOCITY_BOUNDARY\n    if(coord.x<0.0){\n        cellOffset.x = 1.0;\n        multiplier.x = -1.0;\n    }else if(coord.x>1.0){\n        cellOffset.x = -1.0;\n        multiplier.x = -1.0;\n    }\n    if(coord.y<0.0){\n        cellOffset.y = 1.0;\n        multiplier.y = -1.0;\n    }else if(coord.y>1.0){\n        cellOffset.y = -1.0;\n        multiplier.y = -1.0;\n    }\n    #endif\n\n    return multiplier * texture2D(velocity, coord + cellOffset * invresolution).xy;\n}\n\nuniform sampler2D velocity;\n\tuniform float dt;\n\tuniform float dx;\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n\n\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p, out float fp){\n\tvec2 d = p - a;\n\tvec2 x = b - a;\n\n\tfp = 0.0; \n\tfloat lx = length(x);\n\t\n\tif(lx <= 0.0001) return length(d);\n\n\tfloat projection = dot(d, x / lx); \n\n\tfp = projection / lx;\n\n\tif(projection < 0.0)            return length(d);\n\telse if(projection > length(x)) return length(p - b);\n\treturn sqrt(abs(dot(d,d) - projection*projection));\n}\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p){\n\tfloat fp;\n\treturn distanceToSegment(a, b, p, fp);\n}\n\tuniform bool isMouseDown;\n\tuniform vec2 mouseClipSpace;\n\tuniform vec2 lastMouseClipSpace;\n\tvoid main(){\n\t\tvec2 v = texture2D(velocity, texelCoord).xy;\n\t\tv.xy *= 0.999;\n\t\tif(isMouseDown){\n\t\t\tvec2 mouse = clipToSimSpace(mouseClipSpace);\n\t\t\tvec2 lastMouse = clipToSimSpace(lastMouseClipSpace);\n\t\t\tvec2 mouseVelocity = -(lastMouse - mouse)/dt;\n\t\t\t\t\n\t\t\t\n\t\t\tfloat fp; \n\t\t\tfloat l = distanceToSegment(mouse, lastMouse, p, fp);\n\t\t\tfloat taperFactor = 0.6;\n\t\t\tfloat projectedFraction = 1.0 - clamp(fp, 0.0, 1.0)*taperFactor;\n\t\t\tfloat R = 0.015;\n\t\t\tfloat m = exp(-l/R); \n\t\t\tm *= projectedFraction * projectedFraction;\n\t\t\tvec2 targetVelocity = mouseVelocity*dx;\n\t\t\tv += (targetVelocity - v)*m;\n\t\t}\n\t\tgl_FragColor = vec4(v, 0, 1.);\n\t}\n");
+		this.ready = true;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\nattribute vec2 vertexPosition;\r\n\r\nuniform float aspectRatio;\r\n\r\nvarying vec2 texelCoord;\r\n\r\n\r\nvarying vec2 p;\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\t\r\n\tvec2 clipSpace = 2.0*texelCoord - 1.0;\t\n\t\r\n\tp = vec2(clipSpace.x * aspectRatio, clipSpace.y);\r\n\r\n\tgl_Position = vec4(clipSpace, 0.0, 1.0 );\t\r\n}\r\n\n\n\n\n\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\nuniform sampler2D velocity;\n\tuniform float dt;\n\tuniform float dx;\n\n\tvarying vec2 texelCoord;\n\tvarying vec2 p;\n\n\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p, out float fp){\r\n\tvec2 d = p - a;\r\n\tvec2 x = b - a;\r\n\r\n\tfp = 0.0; \n\tfloat lx = length(x);\r\n\t\r\n\tif(lx <= 0.0001) return length(d);\n\r\n\tfloat projection = dot(d, x / lx); \n\r\n\tfp = projection / lx;\r\n\r\n\tif(projection < 0.0)            return length(d);\r\n\telse if(projection > length(x)) return length(p - b);\r\n\treturn sqrt(abs(dot(d,d) - projection*projection));\r\n}\r\nfloat distanceToSegment(vec2 a, vec2 b, vec2 p){\r\n\tfloat fp;\r\n\treturn distanceToSegment(a, b, p, fp);\r\n}\nfloat rand(vec2 co){\r\n\treturn fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);\r\n}\n\tuniform bool isMouseDown;\n\tuniform vec2 mouse; \n\tuniform vec2 lastMouse;\n\n\tvoid main(){\n\t\tvec2 v = sampleVelocity(velocity, texelCoord);\n\t\t\n\t\t\n\t\tv *= 0.999;\n\t\tif(isMouseDown){\n\t\t\tvec2 mouseVelocity = -(lastMouse - mouse)/dt;\n\t\t\t\n\t\t\t\t\n\t\t\t\n\t\t\tfloat projection;\n\t\t\tfloat l = distanceToSegment(mouse, lastMouse, p, projection);\n\t\t\tfloat taperFactor = 0.6;\n\t\t\t\n\t\t\t\n\t\t\tfloat projectedFraction = 2.3 - clamp(projection, 0.0, 1.0) * taperFactor;\n\t\t\t\n\t\t\tfloat R = 0.010;\n\t\t\tfloat m = exp(-l/R); \n\t\t\tm *= projectedFraction * projectedFraction;\n\t\t\t\n\t\t\tvec2 targetVelocity = mouseVelocity * 1.4;\n\n\t\t\tv += (targetVelocity - v)*(m + m*m*m*8.0)*(0.2);\n\t\t}\n\n\t\t\n\t\t\n\n\t\tgl_FragColor = packFluidVelocity(v);\n\t}\n";
+	,createProperties: function() {
+		ApplyForces.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UBool"),["isMouseDown",-1]);
+		this.isMouseDown = instance;
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UVec2"),["mouseClipSpace",-1]);
+		this.mouseClipSpace = instance1;
+		this.uniforms.push(instance1);
+		var instance2 = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UVec2"),["lastMouseClipSpace",-1]);
+		this.lastMouseClipSpace = instance2;
+		this.uniforms.push(instance2);
+		this.aStride += 0;
 	}
 	,__class__: MouseForce
 });
-let DebugBlitTexture = function() {
-	shaderblox_ShaderBase.call(this);
-};
-$hxClasses["DebugBlitTexture"] = DebugBlitTexture;
-DebugBlitTexture.__name__ = true;
-DebugBlitTexture.__super__ = shaderblox_ShaderBase;
-DebugBlitTexture.prototype = $extend(shaderblox_ShaderBase.prototype,{
-	createProperties: function() {
-		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UVec2("invresolution",null);
-		this.invresolution = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_uniforms_UFloat("aspectRatio",null);
-		this.aspectRatio = instance1;
-		this._uniforms.push(instance1);
-		let instance2 = new shaderblox_uniforms_UTexture("texture",null,false);
-		this.texture = instance2;
-		this._uniforms.push(instance2);
-		let instance3 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
-		this.vertexPosition = instance3;
-		this._attributes.push(instance3);
-		this._aStride += 8;
-	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\r\nvarying vec2 texelCoord;\r\n\r\nvoid main() {\r\n\ttexelCoord = vertexPosition;\r\n\tgl_Position = vec4(vertexPosition*2.0 - vec2(1.0, 1.0), 0.0, 1.0 );\n}\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\n\r\n\r\n#define PRESSURE_BOUNDARY\r\n#define VELOCITY_BOUNDARY\r\n\r\nuniform vec2 invresolution;\r\nuniform float aspectRatio;\r\n\r\nvec2 clipToAspectSpace(in vec2 p){\r\n    return vec2(p.x * aspectRatio, p.y);\r\n}\r\n\r\nvec2 aspectToTexelSpace(in vec2 p){\r\n    return vec2(p.x / aspectRatio + 1.0 , p.y + 1.0)*.5;\r\n}\r\n\r\n\n#define FLOAT_PACKING_LIB\r\n\r\n\nvec4 packFloat8bitRGBA(in float val) {\r\n    vec4 pack = vec4(1.0, 255.0, 65025.0, 16581375.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec4(pack.yzw / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGBA(in vec4 pack) {\r\n    return dot(pack, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\r\n}\r\n\r\nvec3 packFloat8bitRGB(in float val) {\r\n    vec3 pack = vec3(1.0, 255.0, 65025.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec3(pack.yz / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRGB(in vec3 pack) {\r\n    return dot(pack, vec3(1.0, 1.0 / 255.0, 1.0 / 65025.0));\r\n}\r\n\r\nvec2 packFloat8bitRG(in float val) {\r\n    vec2 pack = vec2(1.0, 255.0) * val;\r\n    pack = fract(pack);\r\n    pack -= vec2(pack.y / 255.0, 0.0);\r\n    return pack;\r\n}\r\n\r\nfloat unpackFloat8bitRG(in vec2 pack) {\r\n    return dot(pack, vec2(1.0, 1.0 / 255.0));\r\n}\r\n\n\r\nconst float PACK_FLUID_VELOCITY_SCALE = 0.0025; \nconst float PACK_FLUID_PRESSURE_SCALE = 0.00025;\r\nconst float PACK_FLUID_DIVERGENCE_SCALE = 0.25;\r\n\r\nconst bool FLOAT_VELOCITY = true;\r\nconst bool FLOAT_PRESSURE = true;\r\nconst bool FLOAT_DIVERGENCE = true;\r\n\r\n\nvec4 packFluidVelocity(in vec2 v){\r\n    if(FLOAT_VELOCITY){\r\n        return vec4(v, 0.0, 0.0);\r\n    }else{\r\n        vec2 nv = (v * PACK_FLUID_VELOCITY_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRG(nv.x), packFloat8bitRG(nv.y));\r\n    }\r\n}\r\n\r\nvec2 unpackFluidVelocity(in vec4 pv){\r\n    if(FLOAT_VELOCITY){\r\n        return pv.xy;\r\n    }else{    \r\n        const float INV_PACK_FLUID_VELOCITY_SCALE = 1./PACK_FLUID_VELOCITY_SCALE;\r\n        vec2 nv = vec2(unpackFloat8bitRG(pv.xy), unpackFloat8bitRG(pv.zw));\r\n        return (2.0*nv.xy - 1.0)* INV_PACK_FLUID_VELOCITY_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidPressure(in float p){\r\n    if(FLOAT_PRESSURE){\r\n        return vec4(p, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float np = (p * PACK_FLUID_PRESSURE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(np), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidPressure(in vec4 pp){\r\n    if(FLOAT_PRESSURE){\r\n        return pp.x;\r\n    }else{    \r\n        const float INV_PACK_FLUID_PRESSURE_SCALE = 1./PACK_FLUID_PRESSURE_SCALE;\r\n        float np = unpackFloat8bitRGB(pp.rgb);\r\n        return (2.0*np - 1.0) * INV_PACK_FLUID_PRESSURE_SCALE;\r\n    }\r\n}\r\n\r\n\nvec4 packFluidDivergence(in float d){\r\n    if(FLOAT_DIVERGENCE){\r\n        return vec4(d, 0.0, 0.0, 0.0);\r\n    }else{\r\n        float nd = (d * PACK_FLUID_DIVERGENCE_SCALE)*0.5 + 0.5;\r\n        return vec4(packFloat8bitRGB(nd), 0.0);\r\n    }\r\n}\r\n\r\nfloat unpackFluidDivergence(in vec4 pd){\r\n    if(FLOAT_DIVERGENCE){\r\n        return pd.x;\r\n    }else{\r\n        const float INV_PACK_FLUID_DIVERGENCE_SCALE = 1./PACK_FLUID_DIVERGENCE_SCALE;\r\n        float nd = unpackFloat8bitRGB(pd.rgb);\r\n        return (2.0*nd - 1.0) * INV_PACK_FLUID_DIVERGENCE_SCALE;\r\n    }\r\n}\n\r\n\nfloat samplePressue(in sampler2D pressure, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n\r\n    #ifdef PRESSURE_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    #endif\r\n\r\n    return unpackFluidPressure(texture2D(pressure, coord + cellOffset * invresolution));\r\n}\r\n\r\n\r\n\nvec2 sampleVelocity(in sampler2D velocity, in vec2 coord){\r\n    vec2 cellOffset = vec2(0.0, 0.0);\r\n    vec2 multiplier = vec2(1.0, 1.0);\r\n\r\n    #ifdef VELOCITY_BOUNDARY\r\n    \n    \n    \n    \n    \n    \n    cellOffset = -floor(coord);\r\n    multiplier -= 2.0*abs(cellOffset);\r\n    #endif\r\n\r\n    vec2 v = unpackFluidVelocity(texture2D(velocity, coord + cellOffset * invresolution));\r\n    return multiplier * v;\r\n}\r\n\r\n#define sampleDivergence(divergence, coord) unpackFluidDivergence(texture2D(divergence, coord))\r\n\r\n\n\tuniform sampler2D texture;\n\tvarying vec2 texelCoord;\n\n\tvoid main(void){\n\t\tfloat d = sampleDivergence(texture, texelCoord);\n\t\tgl_FragColor = vec4(d, -d, 0.0, 1.0);\n\t}\n";
-	}
-	,__class__: DebugBlitTexture
-});
 Math.__name__ = true;
-let PerformanceMonitor = function(lowerBoundFPS,upperBoundFPS,thresholdTime_ms,fpsSampleSize) {
+var PerformanceMonitor = function(lowerBoundFPS,upperBoundFPS,thresholdTime_ms,fpsSampleSize) {
 	if(fpsSampleSize == null) fpsSampleSize = 30;
 	if(thresholdTime_ms == null) thresholdTime_ms = 3000;
 	if(lowerBoundFPS == null) lowerBoundFPS = 30;
@@ -3541,28 +1587,62 @@ let PerformanceMonitor = function(lowerBoundFPS,upperBoundFPS,thresholdTime_ms,f
 $hxClasses["PerformanceMonitor"] = PerformanceMonitor;
 PerformanceMonitor.__name__ = true;
 PerformanceMonitor.prototype = {
-	__class__: PerformanceMonitor
+	recordFrameTime: function(dt_seconds) {
+		if(dt_seconds > 0) this.recordFPS(1 / dt_seconds);
+	}
+	,recordFPS: function(fps) {
+		if(fps < this.fpsIgnoreBounds[0] && fps > this.fpsIgnoreBounds[1]) return;
+		this.fpsSample.add(fps);
+		if(this.fpsSample.sampleCount < this.fpsSample.length) return;
+		var now = haxe.Timer.stamp() * 1000;
+		if(this.fpsSample.average < this.lowerBoundFPS) {
+			if(this.lowerBoundEnterTime == null) this.lowerBoundEnterTime = now;
+			if(now - this.lowerBoundEnterTime >= this.thresholdTime_ms && this.fpsTooLowCallback != null) {
+				this.fpsTooLowCallback((this.lowerBoundFPS - this.fpsSample.average) / this.lowerBoundFPS);
+				this.fpsSample.clear();
+				this.lowerBoundEnterTime = null;
+			}
+		} else if(this.fpsSample.average > this.upperBoundFPS) {
+			if(this.upperBoundEnterTime == null) this.upperBoundEnterTime = now;
+			if(now - this.upperBoundEnterTime >= this.thresholdTime_ms && this.fpsTooHighCallback != null) {
+				this.fpsTooHighCallback((this.fpsSample.average - this.upperBoundFPS) / this.upperBoundFPS);
+				this.fpsSample.clear();
+				this.upperBoundEnterTime = null;
+			}
+		} else {
+			this.lowerBoundEnterTime = null;
+			this.upperBoundEnterTime = null;
+		}
+	}
+	,get_fpsAverage: function() {
+		return this.fpsSample.average;
+	}
+	,get_fpsVariance: function() {
+		return this.fpsSample.get_variance();
+	}
+	,get_fpsStandardDeviation: function() {
+		return this.fpsSample.get_standardDeviation();
+	}
+	,__class__: PerformanceMonitor
 };
-let RollingSample = function(length) {
+var RollingSample = function(length) {
 	this.m2 = 0;
 	this.pos = 0;
 	this.sampleCount = 0;
 	this.standardDeviation = 0;
 	this.variance = 0;
 	this.average = 0;
-	let tmp;
-	let this1;
+	var this1;
 	this1 = new Array(length);
-	tmp = this1;
-	this.samples = tmp;
+	this.samples = this1;
 };
 $hxClasses["RollingSample"] = RollingSample;
 RollingSample.__name__ = true;
 RollingSample.prototype = {
 	add: function(v) {
-		let delta;
+		var delta;
 		if(this.sampleCount >= this.samples.length) {
-			let bottomValue = this.samples[this.pos];
+			var bottomValue = this.samples[this.pos];
 			delta = bottomValue - this.average;
 			this.average -= delta / (this.sampleCount - 1);
 			this.m2 -= delta * (bottomValue - this.average);
@@ -3576,10 +1656,10 @@ RollingSample.prototype = {
 		return this.pos;
 	}
 	,clear: function() {
-		let _g1 = 0;
-		let _g = this.samples.length;
+		var _g1 = 0;
+		var _g = this.samples.length;
 		while(_g1 < _g) {
-			let i = _g1++;
+			var i = _g1++;
 			this.samples[i] = 0;
 		}
 		this.average = 0;
@@ -3588,24 +1668,41 @@ RollingSample.prototype = {
 		this.sampleCount = 0;
 		this.m2 = 0;
 	}
+	,get_variance: function() {
+		return this.m2 / (this.sampleCount - 1);
+	}
+	,get_standardDeviation: function() {
+		return Math.sqrt(this.get_variance());
+	}
+	,get_length: function() {
+		return this.samples.length;
+	}
 	,__class__: RollingSample
 };
-let Reflect = function() { };
+var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = true;
+Reflect.hasField = function(o,field) {
+	return Object.prototype.hasOwnProperty.call(o,field);
+};
 Reflect.field = function(o,field) {
 	try {
 		return o[field];
 	} catch( e ) {
-		if (e instanceof js__$Boot_FluidError) e = e.val;
 		return null;
 	}
 };
+Reflect.setField = function(o,field,value) {
+	o[field] = value;
+};
+Reflect.callMethod = function(o,func,args) {
+	return func.apply(o,args);
+};
 Reflect.fields = function(o) {
-	let a = [];
+	var a = [];
 	if(o != null) {
-		let hasOwnProperty = Object.prototype.hasOwnProperty;
-		for( let f in o ) {
+		var hasOwnProperty = Object.prototype.hasOwnProperty;
+		for( var f in o ) {
 		if(f != "__id__" && f != "hx__closures__" && hasOwnProperty.call(o,f)) a.push(f);
 		}
 	}
@@ -3614,43 +1711,63 @@ Reflect.fields = function(o) {
 Reflect.isFunction = function(f) {
 	return typeof(f) == "function" && !(f.__name__ || f.__ename__);
 };
-let SnowApp = function() { };
-$hxClasses["FluidApp"] = SnowApp;
-SnowApp.__name__ = true;
-SnowApp.main = function() {
-	SnowApp._flu = new flu();
-	SnowApp._host = new Main();
-	let _flu_config = { has_loop : true, config_path : "manifest.json", app_package : "fluidity.money"};
-	SnowApp._flu.init(_flu_config,SnowApp._host);
+Reflect.deleteField = function(o,field) {
+	if(!Object.prototype.hasOwnProperty.call(o,field)) return false;
+	delete(o[field]);
+	return true;
 };
-let Std = function() { };
+Reflect.makeVarArgs = function(f) {
+	return function() {
+		var a = Array.prototype.slice.call(arguments);
+		return f(a);
+	};
+};
+var Std = function() { };
 $hxClasses["Std"] = Std;
 Std.__name__ = true;
 Std.string = function(s) {
-	return js_Boot.__string_rec(s,"");
+	return js.Boot.__string_rec(s,"");
+};
+Std["int"] = function(x) {
+	return x | 0;
 };
 Std.parseInt = function(x) {
-	let v = parseInt(x,10);
+	var v = parseInt(x,10);
 	if(v == 0 && (HxOverrides.cca(x,1) == 120 || HxOverrides.cca(x,1) == 88)) v = parseInt(x);
 	if(isNaN(v)) return null;
 	return v;
 };
-let StringTools = function() { };
+var StringBuf = function() { };
+$hxClasses["StringBuf"] = StringBuf;
+StringBuf.__name__ = true;
+StringBuf.prototype = {
+	__class__: StringBuf
+};
+var StringTools = function() { };
 $hxClasses["StringTools"] = StringTools;
 StringTools.__name__ = true;
+StringTools.urlEncode = function(s) {
+	return encodeURIComponent(s);
+};
+StringTools.urlDecode = function(s) {
+	return decodeURIComponent(s.split("+").join(" "));
+};
+StringTools.startsWith = function(s,start) {
+	return s.length >= start.length && HxOverrides.substr(s,0,start.length) == start;
+};
 StringTools.isSpace = function(s,pos) {
-	let c = HxOverrides.cca(s,pos);
+	var c = HxOverrides.cca(s,pos);
 	return c > 8 && c < 14 || c == 32;
 };
 StringTools.ltrim = function(s) {
-	let l = s.length;
-	let r = 0;
+	var l = s.length;
+	var r = 0;
 	while(r < l && StringTools.isSpace(s,r)) r++;
 	if(r > 0) return HxOverrides.substr(s,r,l - r); else return s;
 };
 StringTools.rtrim = function(s) {
-	let l = s.length;
-	let r = 0;
+	var l = s.length;
+	var r = 0;
 	while(r < l && StringTools.isSpace(s,l - r - 1)) r++;
 	if(r > 0) return HxOverrides.substr(s,0,l - r); else return s;
 };
@@ -3660,61 +1777,118 @@ StringTools.trim = function(s) {
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
 };
-let Type = function() { };
+StringTools.fastCodeAt = function(s,index) {
+	return s.charCodeAt(index);
+};
+var Type = function() { };
 $hxClasses["Type"] = Type;
 Type.__name__ = true;
+Type.getClass = function(o) {
+	if(o == null) return null;
+	return js.Boot.getClass(o);
+};
 Type.resolveClass = function(name) {
-	let cl = $hxClasses[name];
+	var cl = $hxClasses[name];
 	if(cl == null || !cl.__name__) return null;
 	return cl;
 };
 Type.resolveEnum = function(name) {
-	let e = $hxClasses[name];
+	var e = $hxClasses[name];
 	if(e == null || !e.__ename__) return null;
 	return e;
 };
-Type.createEnum = function(e,constr,params) {
-	let f = Reflect.field(e,constr);
-	if(f == null) throw new js__$Boot_FluidError("No such constructor " + constr);
-	if(Reflect.isFunction(f)) {
-		if(params == null) throw new js__$Boot_FluidError("Constructor " + constr + " need parameters");
-		let tmp;
-		let func = f;
-		tmp = func.apply(e,params);
-		return tmp;
+Type.createInstance = function(cl,args) {
+	var _g = args.length;
+	switch(_g) {
+	case 0:
+		return new cl();
+	case 1:
+		return new cl(args[0]);
+	case 2:
+		return new cl(args[0],args[1]);
+	case 3:
+		return new cl(args[0],args[1],args[2]);
+	case 4:
+		return new cl(args[0],args[1],args[2],args[3]);
+	case 5:
+		return new cl(args[0],args[1],args[2],args[3],args[4]);
+	case 6:
+		return new cl(args[0],args[1],args[2],args[3],args[4],args[5]);
+	case 7:
+		return new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6]);
+	case 8:
+		return new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
+	default:
+		throw "Too many arguments";
 	}
-	if(params != null && params.length != 0) throw new js__$Boot_FluidError("Constructor " + constr + " does not need parameters");
+	return null;
+};
+Type.createEnum = function(e,constr,params) {
+	var f = Reflect.field(e,constr);
+	if(f == null) throw "No such constructor " + constr;
+	if(Reflect.isFunction(f)) {
+		if(params == null) throw "Constructor " + constr + " need parameters";
+		return Reflect.callMethod(e,f,params);
+	}
+	if(params != null && params.length != 0) throw "Constructor " + constr + " does not need parameters";
 	return f;
 };
 Type.createEnumIndex = function(e,index,params) {
-	let c = e.__constructs__[index];
-	if(c == null) throw new js__$Boot_FluidError(index + " is not a valid enum constructor index");
+	var c = e.__constructs__[index];
+	if(c == null) throw index + " is not a valid enum constructor index";
 	return Type.createEnum(e,c,params);
 };
 Type.allEnums = function(e) {
 	return e.__empty_constructs__;
 };
-let gltoolbox_GeometryTools = function() { };
-$hxClasses["gltoolbox.GeometryTools"] = gltoolbox_GeometryTools;
-gltoolbox_GeometryTools.__name__ = true;
-gltoolbox_GeometryTools.getCachedUnitQuad = function(drawMode) {
-	if(drawMode == null) drawMode = 5;
-	let unitQuad = gltoolbox_GeometryTools.unitQuadCache.h[drawMode];
-	if(unitQuad == null || !flu_modules_opengl_web_GL.current_context.isBuffer(unitQuad)) {
-		unitQuad = gltoolbox_GeometryTools.createQuad(0,0,1,1,drawMode);
-		gltoolbox_GeometryTools.unitQuadCache.h[drawMode] = unitQuad;
-	}
-	return unitQuad;
+var _UInt = {};
+_UInt.UInt_Impl_ = function() { };
+$hxClasses["_UInt.UInt_Impl_"] = _UInt.UInt_Impl_;
+_UInt.UInt_Impl_.__name__ = true;
+_UInt.UInt_Impl_.gt = function(a,b) {
+	var aNeg = a < 0;
+	var bNeg = b < 0;
+	if(aNeg != bNeg) return aNeg; else return a > b;
 };
-gltoolbox_GeometryTools.createQuad = function(originX,originY,width,height,drawMode,usage) {
+var gltoolbox = {};
+gltoolbox.GeometryTools = function() { };
+$hxClasses["gltoolbox.GeometryTools"] = gltoolbox.GeometryTools;
+gltoolbox.GeometryTools.__name__ = true;
+gltoolbox.GeometryTools.getCachedTextureQuad = function(drawMode) {
+	if(drawMode == null) drawMode = 5;
+	var textureQuad = gltoolbox.GeometryTools.textureQuadCache.get(drawMode);
+	if(textureQuad == null || !lime.graphics.opengl.GL.context.isBuffer(textureQuad)) {
+		textureQuad = gltoolbox.GeometryTools.createQuad(0,0,1,1,drawMode);
+		gltoolbox.GeometryTools.textureQuadCache.set(drawMode,textureQuad);
+	}
+	return textureQuad;
+};
+gltoolbox.GeometryTools.getCachedClipSpaceQuad = function(drawMode) {
+	if(drawMode == null) drawMode = 5;
+	var clipSpaceQuad = gltoolbox.GeometryTools.clipSpaceQuadCache.get(drawMode);
+	if(clipSpaceQuad == null || !lime.graphics.opengl.GL.context.isBuffer(clipSpaceQuad)) {
+		clipSpaceQuad = gltoolbox.GeometryTools.createQuad(-1,-1,2,2,drawMode);
+		gltoolbox.GeometryTools.clipSpaceQuadCache.set(drawMode,clipSpaceQuad);
+	}
+	return clipSpaceQuad;
+};
+gltoolbox.GeometryTools.createTextureQuad = function(drawMode) {
+	if(drawMode == null) drawMode = 5;
+	return gltoolbox.GeometryTools.createQuad(0,0,1,1,drawMode);
+};
+gltoolbox.GeometryTools.createClipSpaceQuad = function(drawMode) {
+	if(drawMode == null) drawMode = 5;
+	return gltoolbox.GeometryTools.createQuad(-1,-1,2,2,drawMode);
+};
+gltoolbox.GeometryTools.createQuad = function(originX,originY,width,height,drawMode,usage) {
 	if(usage == null) usage = 35044;
 	if(drawMode == null) drawMode = 5;
 	if(height == null) height = 1;
 	if(width == null) width = 1;
 	if(originY == null) originY = 0;
 	if(originX == null) originX = 0;
-	let quad = flu_modules_opengl_web_GL.current_context.createBuffer();
-	let vertices = [];
+	var quad = lime.graphics.opengl.GL.context.createBuffer();
+	var vertices = new Array();
 	switch(drawMode) {
 	case 5:case 4:
 		vertices = [originX,originY + height,originX,originY,originX + width,originY + height,originX + width,originY];
@@ -3724,228 +1898,168 @@ gltoolbox_GeometryTools.createQuad = function(originX,originY,width,height,drawM
 		vertices = [originX,originY + height,originX,originY,originX + width,originY,originX + width,originY + height];
 		break;
 	}
-	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,quad);
-	let tmp;
-	let this1;
-	if(vertices != null) this1 = new Float32Array(vertices); else this1 = null;
-	tmp = this1;
-	let data = tmp;
-	flu_modules_opengl_web_GL.current_context.bufferData(34962,data,usage);
-	flu_modules_opengl_web_GL.current_context.bindBuffer(34962,null);
+	lime.graphics.opengl.GL.context.bindBuffer(34962,quad);
+	lime.graphics.opengl.GL.bufferData(34962,new Float32Array(vertices),usage);
+	lime.graphics.opengl.GL.context.bindBuffer(34962,null);
 	return quad;
 };
-let gltoolbox_TextureTools = function() { };
-$hxClasses["gltoolbox.TextureTools"] = gltoolbox_TextureTools;
-gltoolbox_TextureTools.__name__ = true;
-gltoolbox_TextureTools.createTexture = function(width,height,params,data) {
-	if(params == null) params = { };
-	if(data == null) data = null;
-	let _g = 0;
-	let _g1 = Reflect.fields(gltoolbox_TextureTools.defaultParams);
-	while(_g < _g1.length) {
-		let f = _g1[_g];
-		++_g;
-		if(!Object.prototype.hasOwnProperty.call(params,f)) {
-			let value = Reflect.field(gltoolbox_TextureTools.defaultParams,f);
-			params[f] = value;
-		}
-	}
-	let texture = flu_modules_opengl_web_GL.current_context.createTexture();
-	flu_modules_opengl_web_GL.current_context.bindTexture(3553,texture);
-	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10241,params.filter);
-	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10240,params.filter);
-	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10242,params.wrapS);
-	flu_modules_opengl_web_GL.current_context.texParameteri(3553,10243,params.wrapT);
-	flu_modules_opengl_web_GL.current_context.pixelStorei(3317,params.unpackAlignment);
-	flu_modules_opengl_web_GL.current_context.pixelStorei(37440,params.webGLFlipY?1:0);
-	flu_modules_opengl_web_GL.current_context.texImage2D(3553,0,params.channelType,width,height,0,params.channelType,params.dataType,data);
-	flu_modules_opengl_web_GL.current_context.bindTexture(3553,null);
+gltoolbox.GeometryTools.boundaryLinesArray = function(width,height) {
+	return new Float32Array([0.5,0,0.5,height,0,height - 0.5,width,height - 0.5,width - 0.5,height,width - 0.5,0,width,0.5,0,0.5]);
+};
+gltoolbox.TextureTools = function() { };
+$hxClasses["gltoolbox.TextureTools"] = gltoolbox.TextureTools;
+gltoolbox.TextureTools.__name__ = true;
+gltoolbox.TextureTools.createTextureFactory = function(channelType,dataType,filter,unpackAlignment) {
+	if(unpackAlignment == null) unpackAlignment = 4;
+	if(filter == null) filter = 9728;
+	if(dataType == null) dataType = 5121;
+	if(channelType == null) channelType = 6408;
+	return function(width,height) {
+		return gltoolbox.TextureTools.textureFactory(width,height,channelType,dataType,filter,unpackAlignment);
+	};
+};
+gltoolbox.TextureTools.floatTextureFactoryRGB = function(width,height) {
+	return gltoolbox.TextureTools.textureFactory(width,height,6407,5126,null,null);
+};
+gltoolbox.TextureTools.floatTextureFactoryRGBA = function(width,height) {
+	return gltoolbox.TextureTools.textureFactory(width,height,6408,5126,null,null);
+};
+gltoolbox.TextureTools.textureFactory = function(width,height,channelType,dataType,filter,unpackAlignment) {
+	if(unpackAlignment == null) unpackAlignment = 4;
+	if(filter == null) filter = 9728;
+	if(dataType == null) dataType = 5121;
+	if(channelType == null) channelType = 6408;
+	var texture = lime.graphics.opengl.GL.context.createTexture();
+	lime.graphics.opengl.GL.context.bindTexture(3553,texture);
+	lime.graphics.opengl.GL.context.texParameteri(3553,10241,filter);
+	lime.graphics.opengl.GL.context.texParameteri(3553,10240,filter);
+	lime.graphics.opengl.GL.context.texParameteri(3553,10242,33071);
+	lime.graphics.opengl.GL.context.texParameteri(3553,10243,33071);
+	lime.graphics.opengl.GL.context.pixelStorei(3317,4);
+	lime.graphics.opengl.GL.context.texImage2D(3553,0,channelType,width,height,0,channelType,dataType,null);
+	lime.graphics.opengl.GL.context.bindTexture(3553,null);
 	return texture;
 };
-let gltoolbox_render_ITargetable = function() { };
-$hxClasses["gltoolbox.render.ITargetable"] = gltoolbox_render_ITargetable;
-gltoolbox_render_ITargetable.__name__ = true;
-gltoolbox_render_ITargetable.prototype = {
-	__class__: gltoolbox_render_ITargetable
+gltoolbox.render = {};
+gltoolbox.render.ITargetable = function() { };
+$hxClasses["gltoolbox.render.ITargetable"] = gltoolbox.render.ITargetable;
+gltoolbox.render.ITargetable.__name__ = true;
+gltoolbox.render.ITargetable.prototype = {
+	__class__: gltoolbox.render.ITargetable
 };
-let gltoolbox_render_RenderTarget = function(width,height,textureFactory) {
-	if(textureFactory == null) textureFactory = function(width1,height1) {
-		return gltoolbox_TextureTools.createTexture(width1,height1,null);
-	};
+gltoolbox.render.RenderTarget = function(width,height,textureFactory) {
+	if(textureFactory == null) textureFactory = gltoolbox.TextureTools.createTextureFactory(null,null,null,null);
 	this.width = width;
 	this.height = height;
 	this.textureFactory = textureFactory;
 	this.texture = textureFactory(width,height);
-	if(gltoolbox_render_RenderTarget.textureQuad == null) gltoolbox_render_RenderTarget.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad(5);
-	this.frameBufferObject = flu_modules_opengl_web_GL.current_context.createFramebuffer();
-	let newTexture = this.textureFactory(width,height);
-	flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
-	flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newTexture,0);
-	if(this.texture != null) {
-		let resampler = gltoolbox_shaders_Resample.instance;
-		let _this = resampler.texture;
-		_this.dirty = true;
-		_this.data = this.texture;
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
-		flu_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
-		flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget.textureQuad);
-		if(resampler._active) {
-			let _g = 0;
-			let _g1 = resampler._uniforms;
-			while(_g < _g1.length) {
-				let u = _g1[_g];
-				++_g;
-				u.apply();
+	if(gltoolbox.render.RenderTarget.textureQuad == null) gltoolbox.render.RenderTarget.textureQuad = gltoolbox.GeometryTools.getCachedTextureQuad(5);
+	this.frameBufferObject = lime.graphics.opengl.GL.context.createFramebuffer();
+	this.resize(width,height);
+};
+$hxClasses["gltoolbox.render.RenderTarget"] = gltoolbox.render.RenderTarget;
+gltoolbox.render.RenderTarget.__name__ = true;
+gltoolbox.render.RenderTarget.__interfaces__ = [gltoolbox.render.ITargetable];
+gltoolbox.render.RenderTarget.prototype = {
+	resize: function(width,height) {
+		var newTexture = this.textureFactory(width,height);
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.frameBufferObject);
+		lime.graphics.opengl.GL.context.framebufferTexture2D(36160,36064,3553,newTexture,0);
+		if(this.texture != null) {
+			var resampler = gltoolbox.shaders.Resample.instance;
+			resampler.texture.set_data(this.texture);
+			lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.frameBufferObject);
+			lime.graphics.opengl.GL.context.viewport(0,0,width,height);
+			lime.graphics.opengl.GL.context.bindBuffer(34962,gltoolbox.render.RenderTarget.textureQuad);
+			if(resampler.active) {
+				resampler.setUniforms();
+				resampler.setAttributes();
+				null;
+			} else {
+				if(!resampler.ready) resampler.create();
+				lime.graphics.opengl.GL.context.useProgram(resampler.prog);
+				resampler.setUniforms();
+				resampler.setAttributes();
+				resampler.active = true;
 			}
-			let offset = 0;
-			let _g11 = 0;
-			let _g2 = resampler._attributes.length;
-			while(_g11 < _g2) {
-				let i = _g11++;
-				let att = resampler._attributes[i];
-				let location = att.location;
-				if(location != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
-				}
-				offset += att.byteSize;
-			}
+			lime.graphics.opengl.GL.context.drawArrays(5,0,4);
+			resampler.deactivate();
+			lime.graphics.opengl.GL.context.deleteTexture(this.texture);
 		} else {
-			if(!resampler._ready) resampler.create();
-			flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
-			let _g3 = 0;
-			let _g12 = resampler._uniforms;
-			while(_g3 < _g12.length) {
-				let u1 = _g12[_g3];
-				++_g3;
-				u1.apply();
-			}
-			let offset1 = 0;
-			let _g13 = 0;
-			let _g4 = resampler._attributes.length;
-			while(_g13 < _g4) {
-				let i1 = _g13++;
-				let att1 = resampler._attributes[i1];
-				let location1 = att1.location;
-				if(location1 != -1) {
-					flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-					flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
-				}
-				offset1 += att1.byteSize;
-			}
-			resampler._active = true;
+			lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.frameBufferObject);
+			lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+			lime.graphics.opengl.GL.context.clear(16384);
 		}
-		flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
-		resampler.deactivate();
-		flu_modules_opengl_web_GL.current_context.deleteTexture(this.texture);
-	} else {
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
-		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-		flu_modules_opengl_web_GL.current_context.clear(16384);
+		this.width = width;
+		this.height = height;
+		this.texture = newTexture;
+		return this;
 	}
-	this.width = width;
-	this.height = height;
-	this.texture = newTexture;
-	this;
-};
-$hxClasses["gltoolbox.render.RenderTarget"] = gltoolbox_render_RenderTarget;
-gltoolbox_render_RenderTarget.__name__ = true;
-gltoolbox_render_RenderTarget.__interfaces__ = [gltoolbox_render_ITargetable];
-gltoolbox_render_RenderTarget.prototype = {
-	activate: function() {
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.frameBufferObject);
+	,activate: function() {
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.frameBufferObject);
 	}
-	,__class__: gltoolbox_render_RenderTarget
+	,clear: function(mask) {
+		if(mask == null) mask = 16384;
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.frameBufferObject);
+		lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+		lime.graphics.opengl.GL.context.clear(mask);
+	}
+	,dispose: function() {
+		lime.graphics.opengl.GL.context.deleteFramebuffer(this.frameBufferObject);
+		lime.graphics.opengl.GL.context.deleteTexture(this.texture);
+	}
+	,__class__: gltoolbox.render.RenderTarget
 };
-let gltoolbox_render_RenderTarget2Phase = function(width,height,textureFactory) {
-	if(textureFactory == null) textureFactory = function(width1,height1) {
-		return gltoolbox_TextureTools.createTexture(width1,height1,null);
-	};
+gltoolbox.render.RenderTarget2Phase = function(width,height,textureFactory) {
+	if(textureFactory == null) textureFactory = gltoolbox.TextureTools.createTextureFactory(null,null,null,null);
 	this.width = width;
 	this.height = height;
 	this.textureFactory = textureFactory;
-	if(gltoolbox_render_RenderTarget2Phase.textureQuad == null) gltoolbox_render_RenderTarget2Phase.textureQuad = gltoolbox_GeometryTools.getCachedUnitQuad(5);
-	this.writeFrameBufferObject = flu_modules_opengl_web_GL.current_context.createFramebuffer();
-	this.readFrameBufferObject = flu_modules_opengl_web_GL.current_context.createFramebuffer();
+	if(gltoolbox.render.RenderTarget2Phase.textureQuad == null) gltoolbox.render.RenderTarget2Phase.textureQuad = gltoolbox.GeometryTools.getCachedTextureQuad(5);
+	this.writeFrameBufferObject = lime.graphics.opengl.GL.context.createFramebuffer();
+	this.readFrameBufferObject = lime.graphics.opengl.GL.context.createFramebuffer();
 	this.resize(width,height);
 };
-$hxClasses["gltoolbox.render.RenderTarget2Phase"] = gltoolbox_render_RenderTarget2Phase;
-gltoolbox_render_RenderTarget2Phase.__name__ = true;
-gltoolbox_render_RenderTarget2Phase.__interfaces__ = [gltoolbox_render_ITargetable];
-gltoolbox_render_RenderTarget2Phase.prototype = {
+$hxClasses["gltoolbox.render.RenderTarget2Phase"] = gltoolbox.render.RenderTarget2Phase;
+gltoolbox.render.RenderTarget2Phase.__name__ = true;
+gltoolbox.render.RenderTarget2Phase.__interfaces__ = [gltoolbox.render.ITargetable];
+gltoolbox.render.RenderTarget2Phase.prototype = {
 	resize: function(width,height) {
-		let newWriteToTexture = this.textureFactory(width,height);
-		let newReadFromTexture = this.textureFactory(width,height);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newWriteToTexture,0);
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
-		flu_modules_opengl_web_GL.current_context.framebufferTexture2D(36160,36064,3553,newReadFromTexture,0);
+		var newWriteToTexture = this.textureFactory(width,height);
+		var newReadFromTexture = this.textureFactory(width,height);
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.writeFrameBufferObject);
+		lime.graphics.opengl.GL.context.framebufferTexture2D(36160,36064,3553,newWriteToTexture,0);
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.readFrameBufferObject);
+		lime.graphics.opengl.GL.context.framebufferTexture2D(36160,36064,3553,newReadFromTexture,0);
 		if(this.readFromTexture != null) {
-			let resampler = gltoolbox_shaders_Resample.instance;
-			let _this = resampler.texture;
-			_this.dirty = true;
-			_this.data = this.readFromTexture;
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.viewport(0,0,width,height);
-			flu_modules_opengl_web_GL.current_context.bindBuffer(34962,gltoolbox_render_RenderTarget2Phase.textureQuad);
-			if(resampler._active) {
-				let _g = 0;
-				let _g1 = resampler._uniforms;
-				while(_g < _g1.length) {
-					let u = _g1[_g];
-					++_g;
-					u.apply();
-				}
-				let offset = 0;
-				let _g11 = 0;
-				let _g2 = resampler._attributes.length;
-				while(_g11 < _g2) {
-					let i = _g11++;
-					let att = resampler._attributes[i];
-					let location = att.location;
-					if(location != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location,att.itemCount,att.type,false,resampler._aStride,offset);
-					}
-					offset += att.byteSize;
-				}
+			var resampler = gltoolbox.shaders.Resample.instance;
+			resampler.texture.set_data(this.readFromTexture);
+			lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.readFrameBufferObject);
+			lime.graphics.opengl.GL.context.viewport(0,0,width,height);
+			lime.graphics.opengl.GL.context.bindBuffer(34962,gltoolbox.render.RenderTarget2Phase.textureQuad);
+			if(resampler.active) {
+				resampler.setUniforms();
+				resampler.setAttributes();
+				null;
 			} else {
-				if(!resampler._ready) resampler.create();
-				flu_modules_opengl_web_GL.current_context.useProgram(resampler._prog);
-				let _g3 = 0;
-				let _g12 = resampler._uniforms;
-				while(_g3 < _g12.length) {
-					let u1 = _g12[_g3];
-					++_g3;
-					u1.apply();
-				}
-				let offset1 = 0;
-				let _g13 = 0;
-				let _g4 = resampler._attributes.length;
-				while(_g13 < _g4) {
-					let i1 = _g13++;
-					let att1 = resampler._attributes[i1];
-					let location1 = att1.location;
-					if(location1 != -1) {
-						flu_modules_opengl_web_GL.current_context.enableVertexAttribArray(location1);
-						flu_modules_opengl_web_GL.current_context.vertexAttribPointer(location1,att1.itemCount,att1.type,false,resampler._aStride,offset1);
-					}
-					offset1 += att1.byteSize;
-				}
-				resampler._active = true;
+				if(!resampler.ready) resampler.create();
+				lime.graphics.opengl.GL.context.useProgram(resampler.prog);
+				resampler.setUniforms();
+				resampler.setAttributes();
+				resampler.active = true;
 			}
-			flu_modules_opengl_web_GL.current_context.drawArrays(5,0,4);
+			lime.graphics.opengl.GL.context.drawArrays(5,0,4);
 			resampler.deactivate();
-			flu_modules_opengl_web_GL.current_context.deleteTexture(this.readFromTexture);
+			lime.graphics.opengl.GL.context.deleteTexture(this.readFromTexture);
 		} else {
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.readFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			flu_modules_opengl_web_GL.current_context.clear(16384);
+			lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.readFrameBufferObject);
+			lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+			lime.graphics.opengl.GL.context.clear(16384);
 		}
-		if(this.writeToTexture != null) flu_modules_opengl_web_GL.current_context.deleteTexture(this.writeToTexture); else {
-			flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
-			flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1);
-			flu_modules_opengl_web_GL.current_context.clear(16384);
+		if(this.writeToTexture != null) lime.graphics.opengl.GL.context.deleteTexture(this.writeToTexture); else {
+			lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.writeFrameBufferObject);
+			lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+			lime.graphics.opengl.GL.context.clear(16384);
 		}
 		this.width = width;
 		this.height = height;
@@ -3954,70 +2068,134 @@ gltoolbox_render_RenderTarget2Phase.prototype = {
 		return this;
 	}
 	,activate: function() {
-		flu_modules_opengl_web_GL.current_context.bindFramebuffer(36160,this.writeFrameBufferObject);
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.writeFrameBufferObject);
 	}
-	,__class__: gltoolbox_render_RenderTarget2Phase
+	,swap: function() {
+		this.tmpFBO = this.writeFrameBufferObject;
+		this.writeFrameBufferObject = this.readFrameBufferObject;
+		this.readFrameBufferObject = this.tmpFBO;
+		this.tmpTex = this.writeToTexture;
+		this.writeToTexture = this.readFromTexture;
+		this.readFromTexture = this.tmpTex;
+	}
+	,clear: function(mask) {
+		if(mask == null) mask = 16384;
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.readFrameBufferObject);
+		lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+		lime.graphics.opengl.GL.context.clear(mask);
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.writeFrameBufferObject);
+		lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+		lime.graphics.opengl.GL.context.clear(mask);
+	}
+	,clearRead: function(mask) {
+		if(mask == null) mask = 16384;
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.readFrameBufferObject);
+		lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+		lime.graphics.opengl.GL.context.clear(mask);
+	}
+	,clearWrite: function(mask) {
+		if(mask == null) mask = 16384;
+		lime.graphics.opengl.GL.context.bindFramebuffer(36160,this.writeFrameBufferObject);
+		lime.graphics.opengl.GL.context.clearColor(0,0,0,1);
+		lime.graphics.opengl.GL.context.clear(mask);
+	}
+	,dispose: function() {
+		lime.graphics.opengl.GL.context.deleteFramebuffer(this.writeFrameBufferObject);
+		lime.graphics.opengl.GL.context.deleteFramebuffer(this.readFrameBufferObject);
+		lime.graphics.opengl.GL.context.deleteTexture(this.writeToTexture);
+		lime.graphics.opengl.GL.context.deleteTexture(this.readFromTexture);
+	}
+	,__class__: gltoolbox.render.RenderTarget2Phase
 };
-let js_Boot = function() { };
-$hxClasses["js.Boot"] = js_Boot;
-js_Boot.__name__ = true;
-js_Boot.getClass = function(o) {
+var js = {};
+js.Boot = function() { };
+$hxClasses["js.Boot"] = js.Boot;
+js.Boot.__name__ = true;
+js.Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js.Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js.Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js.Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
+js.Boot.__clear_trace = function() {
+	var d = document.getElementById("haxe:trace");
+	if(d != null) d.innerHTML = "";
+};
+js.Boot.isClass = function(o) {
+	return o.__name__;
+};
+js.Boot.isEnum = function(e) {
+	return e.__ename__;
+};
+js.Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) return Array; else {
-		let cl = o.__class__;
+		var cl = o.__class__;
 		if(cl != null) return cl;
-		let name = js_Boot.__nativeClassName(o);
-		if(name != null) return js_Boot.__resolveNativeClass(name);
+		var name = js.Boot.__nativeClassName(o);
+		if(name != null) return js.Boot.__resolveNativeClass(name);
 		return null;
 	}
 };
-js_Boot.__string_rec = function(o,s) {
+js.Boot.__string_rec = function(o,s) {
 	if(o == null) return "null";
 	if(s.length >= 5) return "<...>";
-	let t = typeof(o);
+	var t = typeof(o);
 	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
 	switch(t) {
 	case "object":
 		if(o instanceof Array) {
 			if(o.__enum__) {
 				if(o.length == 2) return o[0];
-				let str2 = o[0] + "(";
+				var str2 = o[0] + "(";
 				s += "\t";
-				let _g1 = 2;
-				let _g = o.length;
+				var _g1 = 2;
+				var _g = o.length;
 				while(_g1 < _g) {
-					let i1 = _g1++;
-					if(i1 != 2) str2 += "," + js_Boot.__string_rec(o[i1],s); else str2 += js_Boot.__string_rec(o[i1],s);
+					var i1 = _g1++;
+					if(i1 != 2) str2 += "," + js.Boot.__string_rec(o[i1],s); else str2 += js.Boot.__string_rec(o[i1],s);
 				}
 				return str2 + ")";
 			}
-			let l = o.length;
-			let i;
-			let str1 = "[";
+			var l = o.length;
+			var i;
+			var str1 = "[";
 			s += "\t";
-			let _g2 = 0;
+			var _g2 = 0;
 			while(_g2 < l) {
-				let i2 = _g2++;
-				str1 += (i2 > 0?",":"") + js_Boot.__string_rec(o[i2],s);
+				var i2 = _g2++;
+				str1 += (i2 > 0?",":"") + js.Boot.__string_rec(o[i2],s);
 			}
 			str1 += "]";
 			return str1;
 		}
-		let tostr;
+		var tostr;
 		try {
 			tostr = o.toString;
 		} catch( e ) {
-			if (e instanceof js__$Boot_FluidError) e = e.val;
 			return "???";
 		}
 		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
-			let s2 = o.toString();
+			var s2 = o.toString();
 			if(s2 != "[object Object]") return s2;
 		}
-		let k = null;
-		let str = "{\n";
+		var k = null;
+		var str = "{\n";
 		s += "\t";
-		let hasp = o.hasOwnProperty != null;
-		for( let k in o ) {
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) {
 		if(hasp && !o.hasOwnProperty(k)) {
 			continue;
 		}
@@ -4025,7 +2203,7 @@ js_Boot.__string_rec = function(o,s) {
 			continue;
 		}
 		if(str.length != 2) str += ", \n";
-		str += s + k + " : " + js_Boot.__string_rec(o[k],s);
+		str += s + k + " : " + js.Boot.__string_rec(o[k],s);
 		}
 		s = s.substring(1);
 		str += "\n" + s + "}";
@@ -4038,22 +2216,22 @@ js_Boot.__string_rec = function(o,s) {
 		return String(o);
 	}
 };
-js_Boot.__interfLoop = function(cc,cl) {
+js.Boot.__interfLoop = function(cc,cl) {
 	if(cc == null) return false;
 	if(cc == cl) return true;
-	let intf = cc.__interfaces__;
+	var intf = cc.__interfaces__;
 	if(intf != null) {
-		let _g1 = 0;
-		let _g = intf.length;
+		var _g1 = 0;
+		var _g = intf.length;
 		while(_g1 < _g) {
-			let i = _g1++;
-			let i1 = intf[i];
-			if(i1 == cl || js_Boot.__interfLoop(i1,cl)) return true;
+			var i = _g1++;
+			var i1 = intf[i];
+			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) return true;
 		}
 	}
-	return js_Boot.__interfLoop(cc.__super__,cl);
+	return js.Boot.__interfLoop(cc.__super__,cl);
 };
-js_Boot.__instanceof = function(o,cl) {
+js.Boot.__instanceof = function(o,cl) {
 	if(cl == null) return false;
 	switch(cl) {
 	case Int:
@@ -4072,8 +2250,8 @@ js_Boot.__instanceof = function(o,cl) {
 		if(o != null) {
 			if(typeof(cl) == "function") {
 				if(o instanceof cl) return true;
-				if(js_Boot.__interfLoop(js_Boot.getClass(o),cl)) return true;
-			} else if(typeof(cl) == "object" && js_Boot.__isNativeObj(cl)) {
+				if(js.Boot.__interfLoop(js.Boot.getClass(o),cl)) return true;
+			} else if(typeof(cl) == "object" && js.Boot.__isNativeObj(cl)) {
 				if(o instanceof cl) return true;
 			}
 		} else return false;
@@ -4082,93 +2260,167 @@ js_Boot.__instanceof = function(o,cl) {
 		return o.__enum__ == cl;
 	}
 };
-js_Boot.__cast = function(o,t) {
-	if(js_Boot.__instanceof(o,t)) return o; else throw new js__$Boot_FluidError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
+js.Boot.__cast = function(o,t) {
+	if(js.Boot.__instanceof(o,t)) return o; else throw "Cannot cast " + Std.string(o) + " to " + Std.string(t);
 };
-js_Boot.__nativeClassName = function(o) {
-	let name = js_Boot.__toStr.call(o).slice(8,-1);
+js.Boot.__nativeClassName = function(o) {
+	var name = js.Boot.__toStr.call(o).slice(8,-1);
 	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") return null;
 	return name;
 };
-js_Boot.__isNativeObj = function(o) {
-	return js_Boot.__nativeClassName(o) != null;
+js.Boot.__isNativeObj = function(o) {
+	return js.Boot.__nativeClassName(o) != null;
 };
-js_Boot.__resolveNativeClass = function(name) {
-	return $global[name];
+js.Boot.__resolveNativeClass = function(name) {
+	if(typeof window != "undefined") return window[name]; else return global[name];
 };
-let gltoolbox_shaders_Resample = function() {
-	shaderblox_ShaderBase.call(this);
+gltoolbox.shaders = {};
+gltoolbox.shaders.Resample = function() {
+	shaderblox.ShaderBase.call(this);
 };
-$hxClasses["gltoolbox.shaders.Resample"] = gltoolbox_shaders_Resample;
-gltoolbox_shaders_Resample.__name__ = true;
-gltoolbox_shaders_Resample.__super__ = shaderblox_ShaderBase;
-gltoolbox_shaders_Resample.prototype = $extend(shaderblox_ShaderBase.prototype,{
-	createProperties: function() {
-		shaderblox_ShaderBase.prototype.createProperties.call(this);
-		let instance = new shaderblox_uniforms_UTexture("texture",null,false);
+$hxClasses["gltoolbox.shaders.Resample"] = gltoolbox.shaders.Resample;
+gltoolbox.shaders.Resample.__name__ = true;
+gltoolbox.shaders.Resample.__super__ = shaderblox.ShaderBase;
+gltoolbox.shaders.Resample.prototype = $extend(shaderblox.ShaderBase.prototype,{
+	create: function() {
+		this.initFromSource("\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - 1.0, 0.0, 1.0 );\n\t}\n","\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform sampler2D texture;\n\tvarying vec2 texelCoord;\n\tvoid main(){\n\t\tgl_FragColor = texture2D(texture, texelCoord);\n\t}\n");
+		this.ready = true;
+	}
+	,createProperties: function() {
+		shaderblox.ShaderBase.prototype.createProperties.call(this);
+		var instance = Type.createInstance(Type.resolveClass("shaderblox.uniforms.UTexture"),["texture",-1,false]);
 		this.texture = instance;
-		this._uniforms.push(instance);
-		let instance1 = new shaderblox_attributes_FloatAttribute("vertexPosition",0,2);
+		this.uniforms.push(instance);
+		var instance1 = Type.createInstance(Type.resolveClass("shaderblox.attributes.FloatAttribute"),["vertexPosition",0,2]);
 		this.vertexPosition = instance1;
-		this._attributes.push(instance1);
-		this._aStride += 8;
+		this.attributes.push(instance1);
+		this.aStride += 8;
 	}
-	,initSources: function() {
-		this._vertSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nattribute vec2 vertexPosition;\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\ttexelCoord = vertexPosition;\n\t\tgl_Position = vec4(vertexPosition*2.0 - 1.0, 0.0, 1.0 );\n\t}\n";
-		this._fragSource = "\r\n#ifdef GL_ES\r\nprecision highp float;\r\nprecision highp sampler2D;\r\n#endif\n\nuniform sampler2D texture;\n\n\tvarying vec2 texelCoord;\n\n\tvoid main(){\n\t\tgl_FragColor = texture2D(texture, texelCoord);\n\t}\n";
-	}
-	,__class__: gltoolbox_shaders_Resample
+	,__class__: gltoolbox.shaders.Resample
 });
-let flu_IMap = function() { };
-$hxClasses["fluid.IMap"] = flu_IMap;
-flu_IMap.__name__ = true;
-flu_IMap.prototype = {
-	__class__: flu_IMap
+var haxe = {};
+haxe.IMap = function() { };
+$hxClasses["haxe.IMap"] = haxe.IMap;
+haxe.IMap.__name__ = true;
+haxe.Log = function() { };
+$hxClasses["haxe.Log"] = haxe.Log;
+haxe.Log.__name__ = true;
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
 };
-let flu__$Int64__$_$_$Int64 = function(high,low) {
-	this.high = high;
-	this.low = low;
-};
-$hxClasses["fluid._Int64.___Int64"] = flu__$Int64__$_$_$Int64;
-flu__$Int64__$_$_$Int64.__name__ = true;
-flu__$Int64__$_$_$Int64.prototype = {
-	__class__: flu__$Int64__$_$_$Int64
-};
-let flu_Timer = function(time_ms) {
-	let me = this;
+haxe.Timer = function(time_ms) {
+	var me = this;
 	this.id = setInterval(function() {
 		me.run();
 	},time_ms);
 };
-$hxClasses["fluid.Timer"] = flu_Timer;
-flu_Timer.__name__ = true;
-flu_Timer.stamp = function() {
+$hxClasses["haxe.Timer"] = haxe.Timer;
+haxe.Timer.__name__ = true;
+haxe.Timer.delay = function(f,time_ms) {
+	var t = new haxe.Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+};
+haxe.Timer.measure = function(f,pos) {
+	var t0 = haxe.Timer.stamp();
+	var r = f();
+	haxe.Log.trace(haxe.Timer.stamp() - t0 + "s",pos);
+	return r;
+};
+haxe.Timer.stamp = function() {
 	return new Date().getTime() / 1000;
 };
-flu_Timer.prototype = {
-	run: function() {
+haxe.Timer.prototype = {
+	stop: function() {
+		if(this.id == null) return;
+		clearInterval(this.id);
+		this.id = null;
 	}
-	,__class__: flu_Timer
+	,run: function() {
+	}
+	,__class__: haxe.Timer
 };
-let flu_ds_IntMap = function() {
+haxe.crypto = {};
+haxe.crypto.BaseCode = function(base) {
+	var len = base.length;
+	var nbits = 1;
+	while(len > 1 << nbits) nbits++;
+	if(nbits > 8 || len != 1 << nbits) throw "BaseCode : base length must be a power of two.";
+	this.base = base;
+	this.nbits = nbits;
+};
+$hxClasses["haxe.crypto.BaseCode"] = haxe.crypto.BaseCode;
+haxe.crypto.BaseCode.__name__ = true;
+haxe.crypto.BaseCode.prototype = {
+	encodeBytes: function(b) {
+		var nbits = this.nbits;
+		var base = this.base;
+		var size = b.length * 8 / nbits | 0;
+		var out = haxe.io.Bytes.alloc(size + (b.length * 8 % nbits == 0?0:1));
+		var buf = 0;
+		var curbits = 0;
+		var mask = (1 << nbits) - 1;
+		var pin = 0;
+		var pout = 0;
+		while(pout < size) {
+			while(curbits < nbits) {
+				curbits += 8;
+				buf <<= 8;
+				buf |= b.get(pin++);
+			}
+			curbits -= nbits;
+			out.set(pout++,base.b[buf >> curbits & mask]);
+		}
+		if(curbits > 0) out.set(pout++,base.b[buf << nbits - curbits & mask]);
+		return out;
+	}
+	,__class__: haxe.crypto.BaseCode
+};
+haxe.ds = {};
+haxe.ds.IntMap = function() {
 	this.h = { };
 };
-$hxClasses["fluid.ds.IntMap"] = flu_ds_IntMap;
-flu_ds_IntMap.__name__ = true;
-flu_ds_IntMap.__interfaces__ = [flu_IMap];
-flu_ds_IntMap.prototype = {
+$hxClasses["haxe.ds.IntMap"] = haxe.ds.IntMap;
+haxe.ds.IntMap.__name__ = true;
+haxe.ds.IntMap.__interfaces__ = [haxe.IMap];
+haxe.ds.IntMap.prototype = {
 	set: function(key,value) {
 		this.h[key] = value;
 	}
+	,get: function(key) {
+		return this.h[key];
+	}
+	,__class__: haxe.ds.IntMap
+};
+haxe.ds.StringMap = function() {
+	this.h = { };
+};
+$hxClasses["haxe.ds.StringMap"] = haxe.ds.StringMap;
+haxe.ds.StringMap.__name__ = true;
+haxe.ds.StringMap.__interfaces__ = [haxe.IMap];
+haxe.ds.StringMap.prototype = {
+	set: function(key,value) {
+		this.h["$" + key] = value;
+	}
+	,get: function(key) {
+		return this.h["$" + key];
+	}
+	,exists: function(key) {
+		return this.h.hasOwnProperty("$" + key);
+	}
 	,remove: function(key) {
+		key = "$" + key;
 		if(!this.h.hasOwnProperty(key)) return false;
 		delete(this.h[key]);
 		return true;
 	}
 	,keys: function() {
-		let a = [];
-		for( let key in this.h ) {
-		if(this.h.hasOwnProperty(key)) a.push(key | 0);
+		var a = [];
+		for( var key in this.h ) {
+		if(this.h.hasOwnProperty(key)) a.push(key.substr(1));
 		}
 		return HxOverrides.iter(a);
 	}
@@ -4176,146 +2428,83 @@ flu_ds_IntMap.prototype = {
 		return { ref : this.h, it : this.keys(), hasNext : function() {
 			return this.it.hasNext();
 		}, next : function() {
-			let i = this.it.next();
-			return this.ref[i];
+			var i = this.it.next();
+			return this.ref["$" + i];
 		}};
 	}
-	,__class__: flu_ds_IntMap
+	,__class__: haxe.ds.StringMap
 };
-let flu_ds_ObjectMap = function() {
-	this.h = { };
-	this.h.__keys__ = { };
+haxe.ds._Vector = {};
+haxe.ds._Vector.Vector_Impl_ = function() { };
+$hxClasses["haxe.ds._Vector.Vector_Impl_"] = haxe.ds._Vector.Vector_Impl_;
+haxe.ds._Vector.Vector_Impl_.__name__ = true;
+haxe.io = {};
+haxe.io.Bytes = function(length,b) {
+	this.length = length;
+	this.b = b;
 };
-$hxClasses["fluid.ds.ObjectMap"] = flu_ds_ObjectMap;
-flu_ds_ObjectMap.__name__ = true;
-flu_ds_ObjectMap.__interfaces__ = [flu_IMap];
-flu_ds_ObjectMap.prototype = {
-	set: function(key,value) {
-		let id = key.__id__ || (key.__id__ = ++flu_ds_ObjectMap.count);
-		this.h[id] = value;
-		this.h.__keys__[id] = key;
+$hxClasses["haxe.io.Bytes"] = haxe.io.Bytes;
+haxe.io.Bytes.__name__ = true;
+haxe.io.Bytes.alloc = function(length) {
+	var a = new Array();
+	var _g = 0;
+	while(_g < length) {
+		var i = _g++;
+		a.push(0);
 	}
-	,remove: function(key) {
-		let id = key.__id__;
-		if(this.h.__keys__[id] == null) return false;
-		delete(this.h[id]);
-		delete(this.h.__keys__[id]);
-		return true;
-	}
-	,keys: function() {
-		let a = [];
-		for( let key in this.h.__keys__ ) {
-		if(this.h.hasOwnProperty(key)) a.push(this.h.__keys__[key]);
-		}
-		return HxOverrides.iter(a);
-	}
-	,iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			let i = this.it.next();
-			return this.ref[i.__id__];
-		}};
-	}
-	,__class__: flu_ds_ObjectMap
+	return new haxe.io.Bytes(length,a);
 };
-let flu_ds__$StringMap_StringMapIterator = function(map,keys) {
-	this.map = map;
-	this.keys = keys;
-	this.index = 0;
-	this.count = keys.length;
-};
-$hxClasses["fluid.ds._StringMap.StringMapIterator"] = flu_ds__$StringMap_StringMapIterator;
-flu_ds__$StringMap_StringMapIterator.__name__ = true;
-flu_ds__$StringMap_StringMapIterator.prototype = {
-	hasNext: function() {
-		return this.index < this.count;
-	}
-	,next: function() {
-		let tmp;
-		let _this = this.map;
-		let key = this.keys[this.index++];
-		if(__map_reserved[key] != null) tmp = _this.getReserved(key); else tmp = _this.h[key];
-		return tmp;
-	}
-	,__class__: flu_ds__$StringMap_StringMapIterator
-};
-let flu_ds_StringMap = function() {
-	this.h = { };
-};
-$hxClasses["fluid.ds.StringMap"] = flu_ds_StringMap;
-flu_ds_StringMap.__name__ = true;
-flu_ds_StringMap.__interfaces__ = [flu_IMap];
-flu_ds_StringMap.prototype = {
-	set: function(key,value) {
-		if(__map_reserved[key] != null) this.setReserved(key,value); else this.h[key] = value;
-	}
-	,setReserved: function(key,value) {
-		if(this.rh == null) this.rh = { };
-		this.rh["$" + key] = value;
-	}
-	,getReserved: function(key) {
-		return this.rh == null?null:this.rh["$" + key];
-	}
-	,existsReserved: function(key) {
-		if(this.rh == null) return false;
-		return this.rh.hasOwnProperty("$" + key);
-	}
-	,remove: function(key) {
-		if(__map_reserved[key] != null) {
-			key = "$" + key;
-			if(this.rh == null || !this.rh.hasOwnProperty(key)) return false;
-			delete(this.rh[key]);
-			return true;
+haxe.io.Bytes.ofString = function(s) {
+	var a = new Array();
+	var i = 0;
+	while(i < s.length) {
+		var c = StringTools.fastCodeAt(s,i++);
+		if(55296 <= c && c <= 56319) c = c - 55232 << 10 | StringTools.fastCodeAt(s,i++) & 1023;
+		if(c <= 127) a.push(c); else if(c <= 2047) {
+			a.push(192 | c >> 6);
+			a.push(128 | c & 63);
+		} else if(c <= 65535) {
+			a.push(224 | c >> 12);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
 		} else {
-			if(!this.h.hasOwnProperty(key)) return false;
-			delete(this.h[key]);
-			return true;
+			a.push(240 | c >> 18);
+			a.push(128 | c >> 12 & 63);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
 		}
 	}
-	,arrayKeys: function() {
-		let out = [];
-		for( let key in this.h ) {
-		if(this.h.hasOwnProperty(key)) out.push(key);
-		}
-		if(this.rh != null) {
-			for( let key in this.rh ) {
-			if(key.charCodeAt(0) == 36) out.push(key.substr(1));
-			}
-		}
-		return out;
+	return new haxe.io.Bytes(a.length,a);
+};
+haxe.io.Bytes.ofData = function(b) {
+	return new haxe.io.Bytes(b.length,b);
+};
+haxe.io.Bytes.prototype = {
+	get: function(pos) {
+		return this.b[pos];
 	}
-	,__class__: flu_ds_StringMap
-};
-let flu_io_Bytes = function(data) {
-	this.length = data.byteLength;
-	this.b = new Uint8Array(data);
-	this.b.bufferValue = data;
-	data.hxBytes = this;
-	data.bytes = this.b;
-};
-$hxClasses["fluid.io.Bytes"] = flu_io_Bytes;
-flu_io_Bytes.__name__ = true;
-flu_io_Bytes.prototype = {
-	getString: function(pos,len) {
-		if(pos < 0 || len < 0 || pos + len > this.length) throw new js__$Boot_FluidError(flu_io_Error.OutsideBounds);
-		let s = "";
-		let b = this.b;
-		let fcc = String.fromCharCode;
-		let i = pos;
-		let max = pos + len;
+	,set: function(pos,v) {
+		this.b[pos] = v & 255;
+	}
+	,getString: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw haxe.io.Error.OutsideBounds;
+		var s = "";
+		var b = this.b;
+		var fcc = String.fromCharCode;
+		var i = pos;
+		var max = pos + len;
 		while(i < max) {
-			let c = b[i++];
+			var c = b[i++];
 			if(c < 128) {
 				if(c == 0) break;
 				s += fcc(c);
 			} else if(c < 224) s += fcc((c & 63) << 6 | b[i++] & 127); else if(c < 240) {
-				let c2 = b[i++];
+				var c2 = b[i++];
 				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
 			} else {
-				let c21 = b[i++];
-				let c3 = b[i++];
-				let u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
+				var c21 = b[i++];
+				var c3 = b[i++];
+				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
 				s += fcc((u >> 10) + 55232);
 				s += fcc(u & 1023 | 56320);
 			}
@@ -4325,519 +2514,5422 @@ flu_io_Bytes.prototype = {
 	,toString: function() {
 		return this.getString(0,this.length);
 	}
-	,__class__: flu_io_Bytes
+	,__class__: haxe.io.Bytes
 };
-let flu_io_Error = $hxClasses["fluid.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
-flu_io_Error.Blocked = ["Blocked",0];
-flu_io_Error.Blocked.toString = $estr;
-flu_io_Error.Blocked.__enum__ = flu_io_Error;
-flu_io_Error.Overflow = ["Overflow",1];
-flu_io_Error.Overflow.toString = $estr;
-flu_io_Error.Overflow.__enum__ = flu_io_Error;
-flu_io_Error.OutsideBounds = ["OutsideBounds",2];
-flu_io_Error.OutsideBounds.toString = $estr;
-flu_io_Error.OutsideBounds.__enum__ = flu_io_Error;
-flu_io_Error.Custom = function(e) { let $x = ["Custom",3,e]; $x.__enum__ = flu_io_Error; $x.toString = $estr; return $x; };
-flu_io_Error.__empty_constructs__ = [flu_io_Error.Blocked,flu_io_Error.Overflow,flu_io_Error.OutsideBounds];
-let flu_io_FPHelper = function() { };
-$hxClasses["fluid.io.FPHelper"] = flu_io_FPHelper;
-flu_io_FPHelper.__name__ = true;
-flu_io_FPHelper.i32ToFloat = function(i) {
-	let sign = 1 - (i >>> 31 << 1);
-	let exp = i >>> 23 & 255;
-	let sig = i & 8388607;
-	if(sig == 0 && exp == 0) return 0.0;
-	return sign * (1 + Math.pow(2,-23) * sig) * Math.pow(2,exp - 127);
+haxe.io.BytesBuffer = function() { };
+$hxClasses["haxe.io.BytesBuffer"] = haxe.io.BytesBuffer;
+haxe.io.BytesBuffer.__name__ = true;
+haxe.io.BytesBuffer.prototype = {
+	__class__: haxe.io.BytesBuffer
 };
-flu_io_FPHelper.floatToI32 = function(f) {
-	if(f == 0) return 0;
-	let af = f < 0?-f:f;
-	let exp = Math.floor(Math.log(af) / 0.6931471805599453);
-	if(exp < -127) exp = -127; else if(exp > 128) exp = 128;
-	let sig = Math.round((af / Math.pow(2,exp) - 1) * 8388608) & 8388607;
-	return (f < 0?-2147483648:0) | exp + 127 << 23 | sig;
-};
-flu_io_FPHelper.i64ToDouble = function(low,high) {
-	let sign = 1 - (high >>> 31 << 1);
-	let exp = (high >> 20 & 2047) - 1023;
-	let sig = (high & 1048575) * 4294967296. + (low >>> 31) * 2147483648. + (low & 2147483647);
-	if(sig == 0 && exp == -1023) return 0.0;
-	return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
-};
-flu_io_FPHelper.doubleToI64 = function(v) {
-	let i64 = flu_io_FPHelper.i64tmp;
-	if(v == 0) {
-		i64.low = 0;
-		i64.high = 0;
-	} else {
-		let av = v < 0?-v:v;
-		let exp = Math.floor(Math.log(av) / 0.6931471805599453);
-		let tmp;
-		let v1 = (av / Math.pow(2,exp) - 1) * 4503599627370496.;
-		tmp = Math.round(v1);
-		let sig = tmp;
-		let sig_l = sig | 0;
-		let sig_h = sig / 4294967296.0 | 0;
-		i64.low = sig_l;
-		i64.high = (v < 0?-2147483648:0) | exp + 1023 << 20 | sig_h;
-	}
-	return i64;
-};
-let flu_io_Path = function() { };
-$hxClasses["fluid.io.Path"] = flu_io_Path;
-flu_io_Path.__name__ = true;
-flu_io_Path.join = function(paths) {
-	let paths1 = paths.filter(function(s) {
-		return s != null && s != "";
-	});
-	if(paths1.length == 0) return "";
-	let path = paths1[0];
-	let _g1 = 1;
-	let _g = paths1.length;
-	while(_g1 < _g) {
-		let i = _g1++;
-		path = flu_io_Path.addTrailingSlash(path);
-		path += paths1[i];
-	}
-	return flu_io_Path.normalize(path);
-};
-flu_io_Path.normalize = function(path) {
-	path = path.split("\\").join("/");
-	if(path == null || path == "/") return "/";
-	let target = [];
-	let _g = 0;
-	let _g1 = path.split("/");
-	while(_g < _g1.length) {
-		let token = _g1[_g];
-		++_g;
-		if(token == ".." && target.length > 0 && target[target.length - 1] != "..") target.pop(); else if(token != ".") target.push(token);
-	}
-	let tmp = target.join("/");
-	let regex = new EReg("([^:])/+","g");
-	regex.replace(tmp,"$1" + "/");
-	let acc_b = "";
-	let colon = false;
-	let slashes = false;
-	let _g11 = 0;
-	let _g2 = tmp.length;
-	while(_g11 < _g2) {
-		let i = _g11++;
-		let _g21 = HxOverrides.cca(tmp,i);
-		if(_g21 != null) switch(_g21) {
-		case 58:
-			acc_b += ":";
-			colon = true;
-			break;
-		case 47:
-			if(colon == false) slashes = true; else {
-				colon = false;
-				if(slashes) {
-					acc_b += "/";
-					slashes = false;
-				}
-				let x = String.fromCharCode(_g21);
-				acc_b += x == null?"null":"" + x;
-			}
-			break;
-		default:
-			colon = false;
-			if(slashes) {
-				acc_b += "/";
-				slashes = false;
-			}
-			let x1 = String.fromCharCode(_g21);
-			acc_b += x1 == null?"null":"" + x1;
-		} else {
-			colon = false;
-			if(slashes) {
-				acc_b += "/";
-				slashes = false;
-			}
-			let x1 = String.fromCharCode(_g21);
-			acc_b += x1 == null?"null":"" + x1;
-		}
-	}
-	let result = acc_b;
-	return result;
-};
-flu_io_Path.addTrailingSlash = function(path) {
-	if(path.length == 0) return "/";
-	let c1 = path.lastIndexOf("/");
-	let c2 = path.lastIndexOf("\\");
-	return c1 < c2?c2 != path.length - 1?path + "\\":path:c1 != path.length - 1?path + "/":path;
-};
-let hxColorToolkit_spaces_Color = function() { };
-$hxClasses["hxColorToolkit.spaces.Color"] = hxColorToolkit_spaces_Color;
-hxColorToolkit_spaces_Color.__name__ = true;
-let hxColorToolkit_spaces_RGB = function(r,g,b) {
-	if(b == null) b = 0;
-	if(g == null) g = 0;
-	if(r == null) r = 0;
-	this.numOfChannels = 3;
-	this.data = [];
-	this.set_red(r);
-	this.set_green(g);
-	this.set_blue(b);
-};
-$hxClasses["hxColorToolkit.spaces.RGB"] = hxColorToolkit_spaces_RGB;
-hxColorToolkit_spaces_RGB.__name__ = true;
-hxColorToolkit_spaces_RGB.__interfaces__ = [hxColorToolkit_spaces_Color];
-hxColorToolkit_spaces_RGB.prototype = {
-	getValue: function(channel) {
-		return this.data[channel];
-	}
-	,setValue: function(channel,val) {
-		this.data[channel] = Math.min(255,Math.max(val,0));
-		return val;
-	}
-	,get_red: function() {
-		return this.getValue(0);
-	}
-	,set_red: function(value) {
-		return this.setValue(0,value);
-	}
-	,get_green: function() {
-		return this.getValue(1);
-	}
-	,set_green: function(value) {
-		return this.setValue(1,value);
-	}
-	,get_blue: function() {
-		return this.getValue(2);
-	}
-	,set_blue: function(value) {
-		return this.setValue(2,value);
-	}
-	,__class__: hxColorToolkit_spaces_RGB
-};
-let hxColorToolkit_spaces_HSB = function(hue,saturation,brightness) {
-	if(brightness == null) brightness = 0;
-	if(saturation == null) saturation = 0;
-	if(hue == null) hue = 0;
-	this.numOfChannels = 3;
-	this.data = [];
-	this.set_hue(hue);
-	this.set_saturation(saturation);
-	this.set_brightness(brightness);
-};
-$hxClasses["hxColorToolkit.spaces.HSB"] = hxColorToolkit_spaces_HSB;
-hxColorToolkit_spaces_HSB.__name__ = true;
-hxColorToolkit_spaces_HSB.__interfaces__ = [hxColorToolkit_spaces_Color];
-hxColorToolkit_spaces_HSB.loop = function(index,length) {
-	if(index < 0) index = length + index % length;
-	if(index >= length) index %= length;
-	return index;
-};
-hxColorToolkit_spaces_HSB.prototype = {
-	getValue: function(channel) {
-		return this.data[channel];
-	}
-	,get_hue: function() {
-		return this.getValue(0);
-	}
-	,set_hue: function(val) {
-		this.data[0] = hxColorToolkit_spaces_HSB.loop(val,360);
-		return val;
-	}
-	,get_saturation: function() {
-		return this.getValue(1);
-	}
-	,set_saturation: function(val) {
-		this.data[1] = Math.min(100,Math.max(val,0));
-		return val;
-	}
-	,get_brightness: function() {
-		return this.getValue(2);
-	}
-	,set_brightness: function(val) {
-		this.data[2] = Math.min(100,Math.max(val,0));
-		return val;
-	}
-	,toRGB: function() {
-		let hue = this.get_hue();
-		let saturation = this.get_saturation();
-		let brightness = this.get_brightness();
-		let r = 0;
-		let g = 0;
-		let b = 0;
-		let i;
-		let f;
-		let p;
-		let q;
-		let t;
-		hue %= 360;
-		if(brightness == 0) return new hxColorToolkit_spaces_RGB();
-		saturation *= 0.01;
-		brightness *= 0.01;
-		hue /= 60;
-		i = Math.floor(hue);
-		f = hue - i;
-		p = brightness * (1 - saturation);
-		q = brightness * (1 - saturation * f);
-		t = brightness * (1 - saturation * (1 - f));
-		if(i == 0) {
-			r = brightness;
-			g = t;
-			b = p;
-		} else if(i == 1) {
-			r = q;
-			g = brightness;
-			b = p;
-		} else if(i == 2) {
-			r = p;
-			g = brightness;
-			b = t;
-		} else if(i == 3) {
-			r = p;
-			g = q;
-			b = brightness;
-		} else if(i == 4) {
-			r = t;
-			g = p;
-			b = brightness;
-		} else if(i == 5) {
-			r = brightness;
-			g = p;
-			b = q;
-		}
-		return new hxColorToolkit_spaces_RGB(r * 255,g * 255,b * 255);
-	}
-	,__class__: hxColorToolkit_spaces_HSB
-};
-let js__$Boot_FluidError = function(val) {
-	Error.call(this);
-	this.val = val;
-	this.message = String(val);
-	if(Error.captureStackTrace) Error.captureStackTrace(this,js__$Boot_FluidError);
-};
-$hxClasses["js._Boot.FluidError"] = js__$Boot_FluidError;
-js__$Boot_FluidError.__name__ = true;
-js__$Boot_FluidError.__super__ = Error;
-js__$Boot_FluidError.prototype = $extend(Error.prototype,{
-	__class__: js__$Boot_FluidError
+haxe.io.Input = function() { };
+$hxClasses["haxe.io.Input"] = haxe.io.Input;
+haxe.io.Input.__name__ = true;
+haxe.io.BytesInput = function() { };
+$hxClasses["haxe.io.BytesInput"] = haxe.io.BytesInput;
+haxe.io.BytesInput.__name__ = true;
+haxe.io.BytesInput.__super__ = haxe.io.Input;
+haxe.io.BytesInput.prototype = $extend(haxe.io.Input.prototype,{
+	__class__: haxe.io.BytesInput
 });
-let js_Web = function() { };
-$hxClasses["js.Web"] = js_Web;
-js_Web.__name__ = true;
-js_Web.getParams = function() {
-	let result = new flu_ds_StringMap();
-	let paramObj = eval("\r\n\t\t\t(function() {\r\n\t\t\t    let match,\r\n\t\t\t        pl     = /\\+/g,  // Regex for replacing addition symbol with a space\r\n\t\t\t        search = /([^&=]+)=?([^&]*)/g,\r\n\t\t\t        decode = function (s) { return decodeURIComponent(s.replace(pl, ' ')); },\r\n\t\t\t        query  = window.location.search.substring(1);\r\n\r\n\t\t\t    let urlParams = {};\r\n\t\t\t    while (match = search.exec(query))\r\n\t\t\t       urlParams[decode(match[1])] = decode(match[2]);\r\n\t\t\t    return urlParams;\r\n\t\t\t})();\r\n\t\t");
-	let _g = 0;
-	let _g1 = Reflect.fields(paramObj);
+haxe.io.Output = function() { };
+$hxClasses["haxe.io.Output"] = haxe.io.Output;
+haxe.io.Output.__name__ = true;
+haxe.io.BytesOutput = function() { };
+$hxClasses["haxe.io.BytesOutput"] = haxe.io.BytesOutput;
+haxe.io.BytesOutput.__name__ = true;
+haxe.io.BytesOutput.__super__ = haxe.io.Output;
+haxe.io.BytesOutput.prototype = $extend(haxe.io.Output.prototype,{
+	__class__: haxe.io.BytesOutput
+});
+haxe.io.Eof = function() { };
+$hxClasses["haxe.io.Eof"] = haxe.io.Eof;
+haxe.io.Eof.__name__ = true;
+haxe.io.Eof.prototype = {
+	toString: function() {
+		return "Eof";
+	}
+	,__class__: haxe.io.Eof
+};
+haxe.io.Error = $hxClasses["haxe.io.Error"] = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
+haxe.io.Error.Blocked = ["Blocked",0];
+haxe.io.Error.Blocked.toString = $estr;
+haxe.io.Error.Blocked.__enum__ = haxe.io.Error;
+haxe.io.Error.Overflow = ["Overflow",1];
+haxe.io.Error.Overflow.toString = $estr;
+haxe.io.Error.Overflow.__enum__ = haxe.io.Error;
+haxe.io.Error.OutsideBounds = ["OutsideBounds",2];
+haxe.io.Error.OutsideBounds.toString = $estr;
+haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
+haxe.io.Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe.io.Error; $x.toString = $estr; return $x; };
+haxe.io.Error.__empty_constructs__ = [haxe.io.Error.Blocked,haxe.io.Error.Overflow,haxe.io.Error.OutsideBounds];
+js.Browser = function() { };
+$hxClasses["js.Browser"] = js.Browser;
+js.Browser.__name__ = true;
+js.Lib = function() { };
+$hxClasses["js.Lib"] = js.Lib;
+js.Lib.__name__ = true;
+js.Lib.alert = function(v) {
+	alert(js.Boot.__string_rec(v,""));
+};
+js.Web = function() { };
+$hxClasses["js.Web"] = js.Web;
+js.Web.__name__ = true;
+js.Web.getParams = function() {
+	var result = new haxe.ds.StringMap();
+	var paramObj = eval("\n\t\t\t(function() {\n\t\t\t    var match,\n\t\t\t        pl     = /\\+/g,  // Regex for replacing addition symbol with a space\n\t\t\t        search = /([^&=]+)=?([^&]*)/g,\n\t\t\t        decode = function (s) { return decodeURIComponent(s.replace(pl, ' ')); },\n\t\t\t        query  = window.location.search.substring(1);\n\n\t\t\t    var urlParams = {};\n\t\t\t    while (match = search.exec(query))\n\t\t\t       urlParams[decode(match[1])] = decode(match[2]);\n\t\t\t    return urlParams;\n\t\t\t})();\n\t\t");
+	var _g = 0;
+	var _g1 = Reflect.fields(paramObj);
 	while(_g < _g1.length) {
-		let f = _g1[_g];
+		var f = _g1[_g];
 		++_g;
-		let value = Reflect.field(paramObj,f);
-		if(__map_reserved[f] != null) result.setReserved(f,value); else result.h[f] = value;
+		result.set(f,Reflect.field(paramObj,f));
 	}
 	return result;
 };
-let js_html__$CanvasElement_CanvasUtil = function() { };
-$hxClasses["js.html._CanvasElement.CanvasUtil"] = js_html__$CanvasElement_CanvasUtil;
-js_html__$CanvasElement_CanvasUtil.__name__ = true;
-js_html__$CanvasElement_CanvasUtil.getContextWebGL = function(canvas,attribs) {
-	let _g = 0;
-	let _g1 = ["webgl","experimental-webgl"];
+js.html = {};
+js.html._CanvasElement = {};
+js.html._CanvasElement.CanvasUtil = function() { };
+$hxClasses["js.html._CanvasElement.CanvasUtil"] = js.html._CanvasElement.CanvasUtil;
+js.html._CanvasElement.CanvasUtil.__name__ = true;
+js.html._CanvasElement.CanvasUtil.getContextWebGL = function(canvas,attribs) {
+	var _g = 0;
+	var _g1 = ["webgl","experimental-webgl"];
 	while(_g < _g1.length) {
-		let name = _g1[_g];
+		var name = _g1[_g];
 		++_g;
-		let ctx = canvas.getContext(name, { powerPreference: "high-performance" }) || canvas.getContext('experimental-webgl', { powerPreference: "high-performance" });
+		var ctx = canvas.getContext(name,attribs);
 		if(ctx != null) return ctx;
 	}
 	return null;
 };
-let js_html_compat_ArrayBuffer = function(a) {
-	if((a instanceof Array) && a.__enum__ == null) {
-		this.a = a;
-		this.byteLength = a.length;
-	} else {
-		let len = a;
-		this.a = [];
-		let _g = 0;
-		while(_g < len) {
-			let i = _g++;
-			this.a[i] = 0;
+lime.AssetCache = function() {
+	this.enabled = true;
+	this.audio = new haxe.ds.StringMap();
+	this.font = new haxe.ds.StringMap();
+	this.image = new haxe.ds.StringMap();
+};
+$hxClasses["lime.AssetCache"] = lime.AssetCache;
+lime.AssetCache.__name__ = true;
+lime.AssetCache.prototype = {
+	clear: function(prefix) {
+		if(prefix == null) {
+			this.audio = new haxe.ds.StringMap();
+			this.font = new haxe.ds.StringMap();
+			this.image = new haxe.ds.StringMap();
+		} else {
+			var keys = this.audio.keys();
+			while( keys.hasNext() ) {
+				var key = keys.next();
+				if(StringTools.startsWith(key,prefix)) this.audio.remove(key);
+			}
+			var keys1 = this.font.keys();
+			while( keys1.hasNext() ) {
+				var key1 = keys1.next();
+				if(StringTools.startsWith(key1,prefix)) this.font.remove(key1);
+			}
+			var keys2 = this.image.keys();
+			while( keys2.hasNext() ) {
+				var key2 = keys2.next();
+				if(StringTools.startsWith(key2,prefix)) this.image.remove(key2);
+			}
 		}
-		this.byteLength = len;
+	}
+	,__class__: lime.AssetCache
+};
+lime.Assets = function() { };
+$hxClasses["lime.Assets"] = lime.Assets;
+lime.Assets.__name__ = true;
+lime.Assets.exists = function(id,type) {
+	lime.Assets.initialize();
+	if(type == null) type = "BINARY";
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) return library.exists(symbolName,type);
+	return false;
+};
+lime.Assets.getAudioBuffer = function(id,useCache) {
+	if(useCache == null) useCache = true;
+	lime.Assets.initialize();
+	if(useCache && lime.Assets.cache.enabled && lime.Assets.cache.audio.exists(id)) {
+		var audio = lime.Assets.cache.audio.get(id);
+		if(lime.Assets.isValidAudio(audio)) return audio;
+	}
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"SOUND")) {
+			if(library.isLocal(symbolName,"SOUND")) {
+				var audio1 = library.getAudioBuffer(symbolName);
+				if(useCache && lime.Assets.cache.enabled) lime.Assets.cache.audio.set(id,audio1);
+				return audio1;
+			} else haxe.Log.trace("[Assets] Audio asset \"" + id + "\" exists, but only asynchronously",{ fileName : "Assets.hx", lineNumber : 115, className : "lime.Assets", methodName : "getAudioBuffer"});
+		} else haxe.Log.trace("[Assets] There is no audio asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 121, className : "lime.Assets", methodName : "getAudioBuffer"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 127, className : "lime.Assets", methodName : "getAudioBuffer"});
+	return null;
+};
+lime.Assets.getBytes = function(id) {
+	lime.Assets.initialize();
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"BINARY")) {
+			if(library.isLocal(symbolName,"BINARY")) return library.getBytes(symbolName); else haxe.Log.trace("[Assets] String or ByteArray asset \"" + id + "\" exists, but only asynchronously",{ fileName : "Assets.hx", lineNumber : 164, className : "lime.Assets", methodName : "getBytes"});
+		} else haxe.Log.trace("[Assets] There is no String or ByteArray asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 170, className : "lime.Assets", methodName : "getBytes"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 176, className : "lime.Assets", methodName : "getBytes"});
+	return null;
+};
+lime.Assets.getFont = function(id,useCache) {
+	if(useCache == null) useCache = true;
+	lime.Assets.initialize();
+	if(useCache && lime.Assets.cache.enabled && lime.Assets.cache.font.exists(id)) return lime.Assets.cache.font.get(id);
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"FONT")) {
+			if(library.isLocal(symbolName,"FONT")) {
+				var font = library.getFont(symbolName);
+				if(useCache && lime.Assets.cache.enabled) lime.Assets.cache.font.set(id,font);
+				return font;
+			} else haxe.Log.trace("[Assets] Font asset \"" + id + "\" exists, but only asynchronously",{ fileName : "Assets.hx", lineNumber : 227, className : "lime.Assets", methodName : "getFont"});
+		} else haxe.Log.trace("[Assets] There is no Font asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 233, className : "lime.Assets", methodName : "getFont"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 239, className : "lime.Assets", methodName : "getFont"});
+	return null;
+};
+lime.Assets.getImage = function(id,useCache) {
+	if(useCache == null) useCache = true;
+	lime.Assets.initialize();
+	if(useCache && lime.Assets.cache.enabled && lime.Assets.cache.image.exists(id)) {
+		var image = lime.Assets.cache.image.get(id);
+		if(lime.Assets.isValidImage(image)) return image;
+	}
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"IMAGE")) {
+			if(library.isLocal(symbolName,"IMAGE")) {
+				var image1 = library.getImage(symbolName);
+				if(useCache && lime.Assets.cache.enabled) lime.Assets.cache.image.set(id,image1);
+				return image1;
+			} else haxe.Log.trace("[Assets] Image asset \"" + id + "\" exists, but only asynchronously",{ fileName : "Assets.hx", lineNumber : 297, className : "lime.Assets", methodName : "getImage"});
+		} else haxe.Log.trace("[Assets] There is no Image asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 303, className : "lime.Assets", methodName : "getImage"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 309, className : "lime.Assets", methodName : "getImage"});
+	return null;
+};
+lime.Assets.getLibrary = function(name) {
+	if(name == null || name == "") name = "default";
+	return lime.Assets.libraries.get(name);
+};
+lime.Assets.getPath = function(id) {
+	lime.Assets.initialize();
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,null)) return library.getPath(symbolName); else haxe.Log.trace("[Assets] There is no asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 426, className : "lime.Assets", methodName : "getPath"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 432, className : "lime.Assets", methodName : "getPath"});
+	return null;
+};
+lime.Assets.getText = function(id) {
+	lime.Assets.initialize();
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"TEXT")) {
+			if(library.isLocal(symbolName,"TEXT")) return library.getText(symbolName); else haxe.Log.trace("[Assets] String asset \"" + id + "\" exists, but only asynchronously",{ fileName : "Assets.hx", lineNumber : 469, className : "lime.Assets", methodName : "getText"});
+		} else haxe.Log.trace("[Assets] There is no String asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 475, className : "lime.Assets", methodName : "getText"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 481, className : "lime.Assets", methodName : "getText"});
+	return null;
+};
+lime.Assets.initialize = function() {
+	if(!lime.Assets.initialized) {
+		lime.Assets.registerLibrary("default",new DefaultAssetLibrary());
+		lime.Assets.initialized = true;
 	}
 };
-$hxClasses["js.html.compat.ArrayBuffer"] = js_html_compat_ArrayBuffer;
-js_html_compat_ArrayBuffer.__name__ = true;
-js_html_compat_ArrayBuffer.sliceImpl = function(begin,end) {
-	let u = new Uint8Array(this,begin,end == null?null:end - begin);
-	let result = new ArrayBuffer(u.byteLength);
-	let resultArray = new Uint8Array(result);
-	resultArray.set(u);
+lime.Assets.isLocal = function(id,type,useCache) {
+	if(useCache == null) useCache = true;
+	lime.Assets.initialize();
+	if(useCache && lime.Assets.cache.enabled) {
+		if(type == "IMAGE" || type == null) {
+			if(lime.Assets.cache.image.exists(id)) return true;
+		}
+		if(type == "FONT" || type == null) {
+			if(lime.Assets.cache.font.exists(id)) return true;
+		}
+		if(type == "SOUND" || type == "MUSIC" || type == null) {
+			if(lime.Assets.cache.audio.exists(id)) return true;
+		}
+	}
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) return library.isLocal(symbolName,type);
+	return false;
+};
+lime.Assets.isValidAudio = function(buffer) {
+	return buffer != null;
+	return true;
+};
+lime.Assets.isValidImage = function(buffer) {
+	return true;
+};
+lime.Assets.list = function(type) {
+	lime.Assets.initialize();
+	var items = [];
+	var $it0 = lime.Assets.libraries.iterator();
+	while( $it0.hasNext() ) {
+		var library = $it0.next();
+		var libraryItems = library.list(type);
+		if(libraryItems != null) items = items.concat(libraryItems);
+	}
+	return items;
+};
+lime.Assets.loadAudioBuffer = function(id,handler,useCache) {
+	if(useCache == null) useCache = true;
+	lime.Assets.initialize();
+	if(useCache && lime.Assets.cache.enabled && lime.Assets.cache.audio.exists(id)) {
+		var audio = lime.Assets.cache.audio.get(id);
+		if(lime.Assets.isValidAudio(audio)) {
+			handler(audio);
+			return;
+		}
+	}
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"SOUND")) {
+			if(useCache && lime.Assets.cache.enabled) library.loadAudioBuffer(symbolName,function(audio1) {
+				var value = audio1;
+				lime.Assets.cache.audio.set(id,value);
+				handler(audio1);
+			}); else library.loadAudioBuffer(symbolName,handler);
+			return;
+		} else haxe.Log.trace("[Assets] There is no audio asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 666, className : "lime.Assets", methodName : "loadAudioBuffer"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 672, className : "lime.Assets", methodName : "loadAudioBuffer"});
+	handler(null);
+};
+lime.Assets.loadBytes = function(id,handler) {
+	lime.Assets.initialize();
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"BINARY")) {
+			library.loadBytes(symbolName,handler);
+			return;
+		} else haxe.Log.trace("[Assets] There is no String or ByteArray asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 702, className : "lime.Assets", methodName : "loadBytes"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 708, className : "lime.Assets", methodName : "loadBytes"});
+	handler(null);
+};
+lime.Assets.loadImage = function(id,handler,useCache) {
+	if(useCache == null) useCache = true;
+	lime.Assets.initialize();
+	if(useCache && lime.Assets.cache.enabled && lime.Assets.cache.image.exists(id)) {
+		var image = lime.Assets.cache.image.get(id);
+		if(lime.Assets.isValidImage(image)) {
+			handler(image);
+			return;
+		}
+	}
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"IMAGE")) {
+			if(useCache && lime.Assets.cache.enabled) library.loadImage(symbolName,function(image1) {
+				lime.Assets.cache.image.set(id,image1);
+				handler(image1);
+			}); else library.loadImage(symbolName,handler);
+			return;
+		} else haxe.Log.trace("[Assets] There is no Image asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 765, className : "lime.Assets", methodName : "loadImage"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 771, className : "lime.Assets", methodName : "loadImage"});
+	handler(null);
+};
+lime.Assets.loadLibrary = function(name,handler) {
+	lime.Assets.initialize();
+	var data = lime.Assets.getText("libraries/" + name + ".json");
+	if(data != null && data != "") {
+		var info = JSON.parse(data);
+		var library = Type.createInstance(Type.resolveClass(info.type),info.args);
+		lime.Assets.libraries.set(name,library);
+		library.eventCallback = lime.Assets.library_onEvent;
+		library.load(handler);
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + name + "\"",{ fileName : "Assets.hx", lineNumber : 800, className : "lime.Assets", methodName : "loadLibrary"});
+};
+lime.Assets.loadText = function(id,handler) {
+	lime.Assets.initialize();
+	var libraryName = id.substring(0,id.indexOf(":"));
+	var symbolName;
+	var pos = id.indexOf(":") + 1;
+	symbolName = HxOverrides.substr(id,pos,null);
+	var library = lime.Assets.getLibrary(libraryName);
+	if(library != null) {
+		if(library.exists(symbolName,"TEXT")) {
+			library.loadText(symbolName,handler);
+			return;
+		} else haxe.Log.trace("[Assets] There is no String asset with an ID of \"" + id + "\"",{ fileName : "Assets.hx", lineNumber : 891, className : "lime.Assets", methodName : "loadText"});
+	} else haxe.Log.trace("[Assets] There is no asset library named \"" + libraryName + "\"",{ fileName : "Assets.hx", lineNumber : 897, className : "lime.Assets", methodName : "loadText"});
+	handler(null);
+};
+lime.Assets.registerLibrary = function(name,library) {
+	if(lime.Assets.libraries.exists(name)) lime.Assets.unloadLibrary(name);
+	if(library != null) library.eventCallback = lime.Assets.library_onEvent;
+	lime.Assets.libraries.set(name,library);
+};
+lime.Assets.unloadLibrary = function(name) {
+	lime.Assets.initialize();
+	var library = lime.Assets.libraries.get(name);
+	if(library != null) {
+		lime.Assets.cache.clear(name + ":");
+		library.eventCallback = null;
+	}
+	lime.Assets.libraries.remove(name);
+};
+lime.Assets.library_onEvent = function(library,type) {
+	if(type == "change") lime.Assets.cache.clear();
+};
+lime.app.Preloader = function() {
+	this.total = 0;
+	this.loaded = 0;
+};
+$hxClasses["lime.app.Preloader"] = lime.app.Preloader;
+lime.app.Preloader.__name__ = true;
+lime.app.Preloader.prototype = {
+	create: function(config) {
+	}
+	,load: function(urls,types) {
+		var url = null;
+		var _g1 = 0;
+		var _g = urls.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			url = urls[i];
+			var _g2 = types[i];
+			switch(_g2) {
+			case "IMAGE":
+				var image = new Image();
+				lime.app.Preloader.images.set(url,image);
+				image.onload = $bind(this,this.image_onLoad);
+				image.src = url;
+				this.total++;
+				break;
+			case "BINARY":
+				var loader = new lime.net.URLLoader();
+				loader.set_dataFormat(lime.net.URLLoaderDataFormat.BINARY);
+				lime.app.Preloader.loaders.set(url,loader);
+				this.total++;
+				break;
+			case "TEXT":
+				var loader1 = new lime.net.URLLoader();
+				lime.app.Preloader.loaders.set(url,loader1);
+				this.total++;
+				break;
+			case "FONT":
+				this.total++;
+				this.loadFont(url);
+				break;
+			default:
+			}
+		}
+		var $it0 = lime.app.Preloader.loaders.keys();
+		while( $it0.hasNext() ) {
+			var url1 = $it0.next();
+			var loader2 = lime.app.Preloader.loaders.get(url1);
+			loader2.onComplete.add($bind(this,this.loader_onComplete));
+			loader2.load(new lime.net.URLRequest(url1));
+		}
+		if(this.total == 0) this.start();
+	}
+	,loadFont: function(font) {
+		var _g = this;
+		var node = window.document.createElement("span");
+		node.innerHTML = "giItT1WQy@!-/#";
+		var style = node.style;
+		style.position = "fixed";
+		style.fontSize = "300px";
+		style.fontFamily = "sans-serif";
+		style.fontVariant = "normal";
+		style.fontStyle = "normal";
+		style.fontWeight = "normal";
+		style.letterSpacing = "0";
+		window.document.body.appendChild(node);
+		var width = node.offsetWidth;
+		style.fontFamily = "'" + font + "'";
+		var interval = null;
+		var found = false;
+		var checkFont = function() {
+			if(node.offsetWidth != width) {
+				if(!found) {
+					found = true;
+					return false;
+				}
+				_g.loaded++;
+				if(interval != null) window.clearInterval(interval);
+				node.parentNode.removeChild(node);
+				node = null;
+				_g.update(_g.loaded,_g.total);
+				if(_g.loaded == _g.total) _g.start();
+				return true;
+			}
+			return false;
+		};
+		if(!checkFont()) interval = window.setInterval(checkFont,50);
+	}
+	,start: function() {
+		if(this.onComplete != null) this.onComplete();
+	}
+	,update: function(loaded,total) {
+	}
+	,image_onLoad: function(_) {
+		this.loaded++;
+		this.update(this.loaded,this.total);
+		if(this.loaded == this.total) this.start();
+	}
+	,loader_onComplete: function(loader) {
+		this.loaded++;
+		this.update(this.loaded,this.total);
+		if(this.loaded == this.total) this.start();
+	}
+	,__class__: lime.app.Preloader
+};
+lime.audio = {};
+lime.audio.ALAudioContext = function() {
+	this.EXPONENT_DISTANCE_CLAMPED = 53254;
+	this.EXPONENT_DISTANCE = 53253;
+	this.LINEAR_DISTANCE_CLAMPED = 53252;
+	this.LINEAR_DISTANCE = 53251;
+	this.INVERSE_DISTANCE_CLAMPED = 53250;
+	this.INVERSE_DISTANCE = 53249;
+	this.DISTANCE_MODEL = 53248;
+	this.DOPPLER_VELOCITY = 49153;
+	this.SPEED_OF_SOUND = 49155;
+	this.DOPPLER_FACTOR = 49152;
+	this.EXTENSIONS = 45060;
+	this.RENDERER = 45059;
+	this.VERSION = 45058;
+	this.VENDOR = 45057;
+	this.OUT_OF_MEMORY = 40965;
+	this.INVALID_OPERATION = 40964;
+	this.INVALID_VALUE = 40963;
+	this.INVALID_ENUM = 40962;
+	this.INVALID_NAME = 40961;
+	this.NO_ERROR = 0;
+	this.SIZE = 8196;
+	this.CHANNELS = 8195;
+	this.BITS = 8194;
+	this.FREQUENCY = 8193;
+	this.FORMAT_STEREO16 = 4355;
+	this.FORMAT_STEREO8 = 4354;
+	this.FORMAT_MONO16 = 4353;
+	this.FORMAT_MONO8 = 4352;
+	this.UNDETERMINED = 4144;
+	this.STREAMING = 4137;
+	this.STATIC = 4136;
+	this.SOURCE_TYPE = 4135;
+	this.BYTE_OFFSET = 4134;
+	this.SAMPLE_OFFSET = 4133;
+	this.SEC_OFFSET = 4132;
+	this.MAX_DISTANCE = 4131;
+	this.CONE_OUTER_GAIN = 4130;
+	this.ROLLOFF_FACTOR = 4129;
+	this.REFERENCE_DISTANCE = 4128;
+	this.BUFFERS_PROCESSED = 4118;
+	this.BUFFERS_QUEUED = 4117;
+	this.STOPPED = 4116;
+	this.PAUSED = 4115;
+	this.PLAYING = 4114;
+	this.INITIAL = 4113;
+	this.SOURCE_STATE = 4112;
+	this.ORIENTATION = 4111;
+	this.MAX_GAIN = 4110;
+	this.MIN_GAIN = 4109;
+	this.GAIN = 4106;
+	this.BUFFER = 4105;
+	this.LOOPING = 4103;
+	this.VELOCITY = 4102;
+	this.DIRECTION = 4101;
+	this.POSITION = 4100;
+	this.PITCH = 4099;
+	this.CONE_OUTER_ANGLE = 4098;
+	this.CONE_INNER_ANGLE = 4097;
+	this.SOURCE_RELATIVE = 514;
+	this.TRUE = 1;
+	this.FALSE = 0;
+	this.NONE = 0;
+};
+$hxClasses["lime.audio.ALAudioContext"] = lime.audio.ALAudioContext;
+lime.audio.ALAudioContext.__name__ = true;
+lime.audio.ALAudioContext.prototype = {
+	bufferData: function(buffer,format,data,size,freq) {
+		lime.audio.openal.AL.bufferData(buffer,format,data,size,freq);
+	}
+	,buffer3f: function(buffer,param,value1,value2,value3) {
+		lime.audio.openal.AL.buffer3f(buffer,param,value1,value2,value3);
+	}
+	,buffer3i: function(buffer,param,value1,value2,value3) {
+		lime.audio.openal.AL.buffer3i(buffer,param,value1,value2,value3);
+	}
+	,bufferf: function(buffer,param,value) {
+		lime.audio.openal.AL.bufferf(buffer,param,value);
+	}
+	,bufferfv: function(buffer,param,values) {
+		lime.audio.openal.AL.bufferfv(buffer,param,values);
+	}
+	,bufferi: function(buffer,param,value) {
+		lime.audio.openal.AL.bufferi(buffer,param,value);
+	}
+	,bufferiv: function(buffer,param,values) {
+		lime.audio.openal.AL.bufferiv(buffer,param,values);
+	}
+	,deleteBuffer: function(buffer) {
+		lime.audio.openal.AL.deleteBuffer(buffer);
+	}
+	,deleteBuffers: function(buffers) {
+		lime.audio.openal.AL.deleteBuffers(buffers);
+	}
+	,deleteSource: function(source) {
+		lime.audio.openal.AL.deleteSource(source);
+	}
+	,deleteSources: function(sources) {
+		lime.audio.openal.AL.deleteSources(sources);
+	}
+	,disable: function(capability) {
+		lime.audio.openal.AL.disable(capability);
+	}
+	,distanceModel: function(distanceModel) {
+		lime.audio.openal.AL.distanceModel(distanceModel);
+	}
+	,dopplerFactor: function(value) {
+		lime.audio.openal.AL.dopplerFactor(value);
+	}
+	,dopplerVelocity: function(value) {
+		lime.audio.openal.AL.dopplerVelocity(value);
+	}
+	,enable: function(capability) {
+		lime.audio.openal.AL.enable(capability);
+	}
+	,genSource: function() {
+		return lime.audio.openal.AL.genSource();
+	}
+	,genSources: function(n) {
+		return lime.audio.openal.AL.genSources(n);
+	}
+	,genBuffer: function() {
+		return lime.audio.openal.AL.genBuffer();
+	}
+	,genBuffers: function(n) {
+		return lime.audio.openal.AL.genBuffers(n);
+	}
+	,getBoolean: function(param) {
+		return lime.audio.openal.AL.getBoolean(param);
+	}
+	,getBooleanv: function(param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getBooleanv(param,count);
+	}
+	,getBuffer3f: function(buffer,param) {
+		return lime.audio.openal.AL.getBuffer3f(buffer,param);
+	}
+	,getBuffer3i: function(buffer,param) {
+		return lime.audio.openal.AL.getBuffer3i(buffer,param);
+	}
+	,getBufferf: function(buffer,param) {
+		return lime.audio.openal.AL.getBufferf(buffer,param);
+	}
+	,getBufferfv: function(buffer,param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getBufferfv(buffer,param,count);
+	}
+	,getBufferi: function(buffer,param) {
+		return lime.audio.openal.AL.getBufferi(buffer,param);
+	}
+	,getBufferiv: function(buffer,param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getBufferiv(buffer,param,count);
+	}
+	,getDouble: function(param) {
+		return lime.audio.openal.AL.getDouble(param);
+	}
+	,getDoublev: function(param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getDoublev(param,count);
+	}
+	,getEnumValue: function(ename) {
+		return lime.audio.openal.AL.getEnumValue(ename);
+	}
+	,getError: function() {
+		return lime.audio.openal.AL.getError();
+	}
+	,getErrorString: function() {
+		return lime.audio.openal.AL.getErrorString();
+	}
+	,getFloat: function(param) {
+		return lime.audio.openal.AL.getFloat(param);
+	}
+	,getFloatv: function(param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getFloatv(param,count);
+	}
+	,getInteger: function(param) {
+		return lime.audio.openal.AL.getInteger(param);
+	}
+	,getIntegerv: function(param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getIntegerv(param,count);
+	}
+	,getListener3f: function(param) {
+		return lime.audio.openal.AL.getListener3f(param);
+	}
+	,getListener3i: function(param) {
+		return lime.audio.openal.AL.getListener3i(param);
+	}
+	,getListenerf: function(param) {
+		return lime.audio.openal.AL.getListenerf(param);
+	}
+	,getListenerfv: function(param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getListenerfv(param,count);
+	}
+	,getListeneri: function(param) {
+		return lime.audio.openal.AL.getListeneri(param);
+	}
+	,getListeneriv: function(param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getListeneriv(param,count);
+	}
+	,getProcAddress: function(fname) {
+		return lime.audio.openal.AL.getProcAddress(fname);
+	}
+	,getSource3f: function(source,param) {
+		return lime.audio.openal.AL.getSource3f(source,param);
+	}
+	,getSourcef: function(source,param) {
+		return lime.audio.openal.AL.getSourcef(source,param);
+	}
+	,getSource3i: function(source,param) {
+		return lime.audio.openal.AL.getSource3i(source,param);
+	}
+	,getSourcefv: function(source,param) {
+		return lime.audio.openal.AL.getSourcefv(source,param);
+	}
+	,getSourcei: function(source,param) {
+		return lime.audio.openal.AL.getSourcei(source,param);
+	}
+	,getSourceiv: function(source,param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.AL.getSourceiv(source,param,count);
+	}
+	,getString: function(param) {
+		return lime.audio.openal.AL.getString(param);
+	}
+	,isBuffer: function(buffer) {
+		return lime.audio.openal.AL.isBuffer(buffer);
+	}
+	,isEnabled: function(capability) {
+		return lime.audio.openal.AL.isEnabled(capability);
+	}
+	,isExtensionPresent: function(extname) {
+		return lime.audio.openal.AL.isExtensionPresent(extname);
+	}
+	,isSource: function(source) {
+		return lime.audio.openal.AL.isSource(source);
+	}
+	,listener3f: function(param,value1,value2,value3) {
+		lime.audio.openal.AL.listener3f(param,value1,value2,value3);
+	}
+	,listener3i: function(param,value1,value2,value3) {
+		lime.audio.openal.AL.listener3i(param,value1,value2,value3);
+	}
+	,listenerf: function(param,value) {
+		lime.audio.openal.AL.listenerf(param,value);
+	}
+	,listenerfv: function(param,values) {
+		lime.audio.openal.AL.listenerfv(param,values);
+	}
+	,listeneri: function(param,value) {
+		lime.audio.openal.AL.listeneri(param,value);
+	}
+	,listeneriv: function(param,values) {
+		lime.audio.openal.AL.listeneriv(param,values);
+	}
+	,source3f: function(source,param,value1,value2,value3) {
+		lime.audio.openal.AL.source3f(source,param,value1,value2,value3);
+	}
+	,source3i: function(source,param,value1,value2,value3) {
+		lime.audio.openal.AL.source3i(source,param,value1,value2,value3);
+	}
+	,sourcef: function(source,param,value) {
+		lime.audio.openal.AL.sourcef(source,param,value);
+	}
+	,sourcefv: function(source,param,values) {
+		lime.audio.openal.AL.sourcefv(source,param,values);
+	}
+	,sourcei: function(source,param,value) {
+		lime.audio.openal.AL.sourcei(source,param,value);
+	}
+	,sourceiv: function(source,param,values) {
+		lime.audio.openal.AL.sourceiv(source,param,values);
+	}
+	,sourcePlay: function(source) {
+		lime.audio.openal.AL.sourcePlay(source);
+	}
+	,sourcePlayv: function(sources) {
+		lime.audio.openal.AL.sourcePlayv(sources);
+	}
+	,sourceStop: function(source) {
+		lime.audio.openal.AL.sourceStop(source);
+	}
+	,sourceStopv: function(sources) {
+		lime.audio.openal.AL.sourceStopv(sources);
+	}
+	,sourceRewind: function(source) {
+		lime.audio.openal.AL.sourceRewind(source);
+	}
+	,sourceRewindv: function(sources) {
+		lime.audio.openal.AL.sourceRewindv(sources);
+	}
+	,sourcePause: function(source) {
+		lime.audio.openal.AL.sourcePause(source);
+	}
+	,sourcePausev: function(sources) {
+		lime.audio.openal.AL.sourcePausev(sources);
+	}
+	,sourceQueueBuffer: function(source,buffer) {
+		lime.audio.openal.AL.sourceQueueBuffer(source,buffer);
+	}
+	,sourceQueueBuffers: function(source,nb,buffers) {
+		lime.audio.openal.AL.sourceQueueBuffers(source,nb,buffers);
+	}
+	,sourceUnqueueBuffer: function(source) {
+		return lime.audio.openal.AL.sourceUnqueueBuffer(source);
+	}
+	,sourceUnqueueBuffers: function(source,nb) {
+		return lime.audio.openal.AL.sourceUnqueueBuffers(source,nb);
+	}
+	,speedOfSound: function(value) {
+		lime.audio.openal.AL.speedOfSound(value);
+	}
+	,__class__: lime.audio.ALAudioContext
+};
+lime.audio.ALCAudioContext = function() {
+	this.ALL_DEVICES_SPECIFIER = 4115;
+	this.DEFAULT_ALL_DEVICES_SPECIFIER = 4114;
+	this.ENUMERATE_ALL_EXT = 1;
+	this.EXTENSIONS = 4102;
+	this.DEVICE_SPECIFIER = 4101;
+	this.DEFAULT_DEVICE_SPECIFIER = 4100;
+	this.ALL_ATTRIBUTES = 4099;
+	this.ATTRIBUTES_SIZE = 4098;
+	this.OUT_OF_MEMORY = 40965;
+	this.INVALID_VALUE = 40964;
+	this.INVALID_ENUM = 40963;
+	this.INVALID_CONTEXT = 40962;
+	this.INVALID_DEVICE = 40961;
+	this.NO_ERROR = 0;
+	this.STEREO_SOURCES = 4113;
+	this.MONO_SOURCES = 4112;
+	this.SYNC = 4105;
+	this.REFRESH = 4104;
+	this.FREQUENCY = 4103;
+	this.TRUE = 1;
+	this.FALSE = 0;
+};
+$hxClasses["lime.audio.ALCAudioContext"] = lime.audio.ALCAudioContext;
+lime.audio.ALCAudioContext.__name__ = true;
+lime.audio.ALCAudioContext.prototype = {
+	closeDevice: function(device) {
+		return lime.audio.openal.ALC.closeDevice(device);
+	}
+	,createContext: function(device,attrlist) {
+		return lime.audio.openal.ALC.createContext(device,attrlist);
+	}
+	,destroyContext: function(context) {
+		lime.audio.openal.ALC.destroyContext(context);
+	}
+	,getContextsDevice: function(context) {
+		return lime.audio.openal.ALC.getContextsDevice(context);
+	}
+	,getCurrentContext: function() {
+		return lime.audio.openal.ALC.getCurrentContext();
+	}
+	,getError: function(device) {
+		return lime.audio.openal.ALC.getError(device);
+	}
+	,getErrorString: function(device) {
+		return lime.audio.openal.ALC.getErrorString(device);
+	}
+	,getIntegerv: function(device,param,count) {
+		if(count == null) count = 1;
+		return lime.audio.openal.ALC.getIntegerv(device,param,count);
+	}
+	,getString: function(device,param) {
+		return lime.audio.openal.ALC.getString(device,param);
+	}
+	,makeContextCurrent: function(context) {
+		return lime.audio.openal.ALC.makeContextCurrent(context);
+	}
+	,openDevice: function(deviceName) {
+		return lime.audio.openal.ALC.openDevice(deviceName);
+	}
+	,processContext: function(context) {
+		lime.audio.openal.ALC.processContext(context);
+	}
+	,suspendContext: function(context) {
+		lime.audio.openal.ALC.suspendContext(context);
+	}
+	,__class__: lime.audio.ALCAudioContext
+};
+lime.audio.AudioBuffer = function() {
+	this.id = 0;
+};
+$hxClasses["lime.audio.AudioBuffer"] = lime.audio.AudioBuffer;
+lime.audio.AudioBuffer.__name__ = true;
+lime.audio.AudioBuffer.fromBytes = function(bytes) {
+	return null;
+};
+lime.audio.AudioBuffer.fromFile = function(path) {
+	return null;
+};
+lime.audio.AudioBuffer.fromURL = function(url,handler) {
+};
+lime.audio.AudioBuffer.prototype = {
+	dispose: function() {
+	}
+	,__class__: lime.audio.AudioBuffer
+};
+lime.audio.AudioContext = $hxClasses["lime.audio.AudioContext"] = { __ename__ : true, __constructs__ : ["OPENAL","HTML5","WEB","FLASH","CUSTOM"] };
+lime.audio.AudioContext.OPENAL = function(alc,al) { var $x = ["OPENAL",0,alc,al]; $x.__enum__ = lime.audio.AudioContext; $x.toString = $estr; return $x; };
+lime.audio.AudioContext.HTML5 = function(context) { var $x = ["HTML5",1,context]; $x.__enum__ = lime.audio.AudioContext; $x.toString = $estr; return $x; };
+lime.audio.AudioContext.WEB = function(context) { var $x = ["WEB",2,context]; $x.__enum__ = lime.audio.AudioContext; $x.toString = $estr; return $x; };
+lime.audio.AudioContext.FLASH = function(context) { var $x = ["FLASH",3,context]; $x.__enum__ = lime.audio.AudioContext; $x.toString = $estr; return $x; };
+lime.audio.AudioContext.CUSTOM = function(data) { var $x = ["CUSTOM",4,data]; $x.__enum__ = lime.audio.AudioContext; $x.toString = $estr; return $x; };
+lime.audio.AudioContext.__empty_constructs__ = [];
+lime.audio.AudioManager = function() { };
+$hxClasses["lime.audio.AudioManager"] = lime.audio.AudioManager;
+lime.audio.AudioManager.__name__ = true;
+lime.audio.AudioManager.init = function(context) {
+	if(context == null) try {
+		window.AudioContext = window.AudioContext || window.webkitAudioContext;;
+		lime.audio.AudioManager.context = lime.audio.AudioContext.WEB(new AudioContext ());
+	} catch( e ) {
+		lime.audio.AudioManager.context = lime.audio.AudioContext.HTML5(new lime.audio.HTML5AudioContext());
+	} else lime.audio.AudioManager.context = context;
+};
+lime.audio.AudioManager.resume = function() {
+	if(lime.audio.AudioManager.context != null) {
+		var _g = lime.audio.AudioManager.context;
+		switch(_g[1]) {
+		case 0:
+			var al = _g[3];
+			var alc = _g[2];
+			alc.processContext(alc.getCurrentContext());
+			break;
+		default:
+		}
+	}
+};
+lime.audio.AudioManager.shutdown = function() {
+	if(lime.audio.AudioManager.context != null) {
+		var _g = lime.audio.AudioManager.context;
+		switch(_g[1]) {
+		case 0:
+			var al = _g[3];
+			var alc = _g[2];
+			var currentContext = alc.getCurrentContext();
+			if(currentContext != null) {
+				var device = alc.getContextsDevice(currentContext);
+				alc.makeContextCurrent(null);
+				alc.destroyContext(currentContext);
+				alc.closeDevice(device);
+			}
+			break;
+		default:
+		}
+	}
+};
+lime.audio.AudioManager.suspend = function() {
+	if(lime.audio.AudioManager.context != null) {
+		var _g = lime.audio.AudioManager.context;
+		switch(_g[1]) {
+		case 0:
+			var al = _g[3];
+			var alc = _g[2];
+			alc.suspendContext(alc.getCurrentContext());
+			break;
+		default:
+		}
+	}
+};
+lime.audio.FlashAudioContext = function() {
+};
+$hxClasses["lime.audio.FlashAudioContext"] = lime.audio.FlashAudioContext;
+lime.audio.FlashAudioContext.__name__ = true;
+lime.audio.FlashAudioContext.prototype = {
+	createBuffer: function(stream,context) {
+		return null;
+	}
+	,getBytesLoaded: function(buffer) {
+		return 0;
+	}
+	,getBytesTotal: function(buffer) {
+		return 0;
+	}
+	,getID3: function(buffer) {
+		return null;
+	}
+	,getIsBuffering: function(buffer) {
+		return false;
+	}
+	,getIsURLInaccessible: function(buffer) {
+		return false;
+	}
+	,getLength: function(buffer) {
+		return 0;
+	}
+	,getURL: function(buffer) {
+		return null;
+	}
+	,close: function(buffer) {
+	}
+	,extract: function(buffer,target,length,startPosition) {
+		if(startPosition == null) startPosition = -1;
+		return 0;
+	}
+	,load: function(buffer,stream,context) {
+	}
+	,loadCompressedDataFromByteArray: function(buffer,bytes,bytesLength) {
+	}
+	,loadPCMFromByteArray: function(buffer,bytes,samples,format,stereo,sampleRate) {
+		if(sampleRate == null) sampleRate = 44100;
+		if(stereo == null) stereo = true;
+	}
+	,play: function(buffer,startTime,loops,sndTransform) {
+		if(loops == null) loops = 0;
+		if(startTime == null) startTime = 0;
+		return null;
+	}
+	,__class__: lime.audio.FlashAudioContext
+};
+lime.audio.HTML5AudioContext = function() {
+	this.NETWORK_NO_SOURCE = 3;
+	this.NETWORK_LOADING = 2;
+	this.NETWORK_IDLE = 1;
+	this.NETWORK_EMPTY = 0;
+	this.HAVE_NOTHING = 0;
+	this.HAVE_METADATA = 1;
+	this.HAVE_FUTURE_DATA = 3;
+	this.HAVE_ENOUGH_DATA = 4;
+	this.HAVE_CURRENT_DATA = 2;
+};
+$hxClasses["lime.audio.HTML5AudioContext"] = lime.audio.HTML5AudioContext;
+lime.audio.HTML5AudioContext.__name__ = true;
+lime.audio.HTML5AudioContext.prototype = {
+	canPlayType: function(buffer,type) {
+		if(buffer.src != null) return buffer.src.canPlayType(type);
+		return null;
+	}
+	,createBuffer: function(urlString) {
+		var buffer = new lime.audio.AudioBuffer();
+		buffer.src = new Audio();
+		buffer.src.src = urlString;
+		return buffer;
+	}
+	,getAudioDecodedByteCount: function(buffer) {
+		if(buffer.src != null) return buffer.src.audioDecodedByteCount;
+		return 0;
+	}
+	,getAutoplay: function(buffer) {
+		if(buffer.src != null) return buffer.src.autoplay;
+		return false;
+	}
+	,getBuffered: function(buffer) {
+		if(buffer.src != null) return buffer.src.buffered;
+		return null;
+	}
+	,getController: function(buffer) {
+		if(buffer.src != null) return buffer.src.controller;
+		return null;
+	}
+	,getCurrentSrc: function(buffer) {
+		if(buffer.src != null) return buffer.src.currentSrc;
+		return null;
+	}
+	,getCurrentTime: function(buffer) {
+		if(buffer.src != null) return buffer.src.currentTime;
+		return 0;
+	}
+	,getDefaultPlaybackRate: function(buffer) {
+		if(buffer.src != null) return buffer.src.defaultPlaybackRate;
+		return 1;
+	}
+	,getDuration: function(buffer) {
+		if(buffer.src != null) return buffer.src.duration;
+		return 0;
+	}
+	,getEnded: function(buffer) {
+		if(buffer.src != null) return buffer.src.ended;
+		return false;
+	}
+	,getError: function(buffer) {
+		if(buffer.src != null) return buffer.src.error;
+		return null;
+	}
+	,getInitialTime: function(buffer) {
+		if(buffer.src != null) return buffer.src.initialTime;
+		return 0;
+	}
+	,getLoop: function(buffer) {
+		if(buffer.src != null) return buffer.src.loop;
+		return false;
+	}
+	,getMediaGroup: function(buffer) {
+		if(buffer.src != null) return buffer.src.mediaGroup;
+		return null;
+	}
+	,getMuted: function(buffer) {
+		if(buffer.src != null) return buffer.src.muted;
+		return false;
+	}
+	,getNetworkState: function(buffer) {
+		if(buffer.src != null) return buffer.src.networkState;
+		return 0;
+	}
+	,getPaused: function(buffer) {
+		if(buffer.src != null) return buffer.src.paused;
+		return false;
+	}
+	,getPlaybackRate: function(buffer) {
+		if(buffer.src != null) return buffer.src.playbackRate;
+		return 1;
+	}
+	,getPlayed: function(buffer) {
+		if(buffer.src != null) return buffer.src.played;
+		return null;
+	}
+	,getPreload: function(buffer) {
+		if(buffer.src != null) return buffer.src.preload;
+		return null;
+	}
+	,getReadyState: function(buffer) {
+		if(buffer.src != null) return buffer.src.readyState;
+		return 0;
+	}
+	,getSeekable: function(buffer) {
+		if(buffer.src != null) return buffer.src.seekable;
+		return null;
+	}
+	,getSeeking: function(buffer) {
+		if(buffer.src != null) return buffer.src.seeking;
+		return false;
+	}
+	,getSrc: function(buffer) {
+		if(buffer.src != null) return buffer.src.src;
+		return null;
+	}
+	,getStartTime: function(buffer) {
+		if(buffer.src != null) return buffer.src.playbackRate;
+		return 0;
+	}
+	,getVolume: function(buffer) {
+		if(buffer.src != null) return buffer.src.volume;
+		return 1;
+	}
+	,load: function(buffer) {
+		if(buffer.src != null) return buffer.src.load();
+	}
+	,pause: function(buffer) {
+		if(buffer.src != null) return buffer.src.pause();
+	}
+	,play: function(buffer) {
+		if(buffer.src != null) return buffer.src.play();
+	}
+	,setAutoplay: function(buffer,value) {
+		if(buffer.src != null) buffer.src.autoplay = value;
+	}
+	,setController: function(buffer,value) {
+		if(buffer.src != null) buffer.src.controller = value;
+	}
+	,setCurrentTime: function(buffer,value) {
+		if(buffer.src != null) buffer.src.currentTime = value;
+	}
+	,setDefaultPlaybackRate: function(buffer,value) {
+		if(buffer.src != null) buffer.src.defaultPlaybackRate = value;
+	}
+	,setLoop: function(buffer,value) {
+		if(buffer.src != null) buffer.src.loop = value;
+	}
+	,setMediaGroup: function(buffer,value) {
+		if(buffer.src != null) buffer.src.mediaGroup = value;
+	}
+	,setMuted: function(buffer,value) {
+		if(buffer.src != null) buffer.src.muted = value;
+	}
+	,setPlaybackRate: function(buffer,value) {
+		if(buffer.src != null) buffer.src.playbackRate = value;
+	}
+	,setPreload: function(buffer,value) {
+		if(buffer.src != null) buffer.src.preload = value;
+	}
+	,setSrc: function(buffer,value) {
+		if(buffer.src != null) buffer.src.src = value;
+	}
+	,setVolume: function(buffer,value) {
+		if(buffer.src != null) buffer.src.volume = value;
+	}
+	,__class__: lime.audio.HTML5AudioContext
+};
+lime.audio.openal = {};
+lime.audio.openal.AL = function() { };
+$hxClasses["lime.audio.openal.AL"] = lime.audio.openal.AL;
+lime.audio.openal.AL.__name__ = true;
+lime.audio.openal.AL.bufferData = function(buffer,format,data,size,freq) {
+};
+lime.audio.openal.AL.buffer3f = function(buffer,param,value1,value2,value3) {
+};
+lime.audio.openal.AL.buffer3i = function(buffer,param,value1,value2,value3) {
+};
+lime.audio.openal.AL.bufferf = function(buffer,param,value) {
+};
+lime.audio.openal.AL.bufferfv = function(buffer,param,values) {
+};
+lime.audio.openal.AL.bufferi = function(buffer,param,value) {
+};
+lime.audio.openal.AL.bufferiv = function(buffer,param,values) {
+};
+lime.audio.openal.AL.deleteBuffer = function(buffer) {
+};
+lime.audio.openal.AL.deleteBuffers = function(buffers) {
+};
+lime.audio.openal.AL.deleteSource = function(source) {
+};
+lime.audio.openal.AL.deleteSources = function(sources) {
+};
+lime.audio.openal.AL.disable = function(capability) {
+};
+lime.audio.openal.AL.distanceModel = function(distanceModel) {
+};
+lime.audio.openal.AL.dopplerFactor = function(value) {
+};
+lime.audio.openal.AL.dopplerVelocity = function(value) {
+};
+lime.audio.openal.AL.enable = function(capability) {
+};
+lime.audio.openal.AL.genSource = function() {
+	return 0;
+};
+lime.audio.openal.AL.genSources = function(n) {
+	return null;
+};
+lime.audio.openal.AL.genBuffer = function() {
+	return 0;
+};
+lime.audio.openal.AL.genBuffers = function(n) {
+	return null;
+};
+lime.audio.openal.AL.getBoolean = function(param) {
+	return false;
+};
+lime.audio.openal.AL.getBooleanv = function(param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getBuffer3f = function(buffer,param) {
+	return null;
+};
+lime.audio.openal.AL.getBuffer3i = function(buffer,param) {
+	return null;
+};
+lime.audio.openal.AL.getBufferf = function(buffer,param) {
+	return 0;
+};
+lime.audio.openal.AL.getBufferfv = function(buffer,param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getBufferi = function(buffer,param) {
+	return 0;
+};
+lime.audio.openal.AL.getBufferiv = function(buffer,param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getDouble = function(param) {
+	return 0;
+};
+lime.audio.openal.AL.getDoublev = function(param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getEnumValue = function(ename) {
+	return 0;
+};
+lime.audio.openal.AL.getError = function() {
+	return 0;
+};
+lime.audio.openal.AL.getErrorString = function() {
+	var _g = lime.audio.openal.AL.getError();
+	switch(_g) {
+	case 40961:
+		return "INVALID_NAME: Invalid parameter name";
+	case 40962:
+		return "INVALID_ENUM: Invalid enum value";
+	case 40963:
+		return "INVALID_VALUE: Invalid parameter value";
+	case 40964:
+		return "INVALID_OPERATION: Illegal operation or call";
+	case 40965:
+		return "OUT_OF_MEMORY: OpenAL has run out of memory";
+	default:
+		return "";
+	}
+};
+lime.audio.openal.AL.getFloat = function(param) {
+	return 0;
+};
+lime.audio.openal.AL.getFloatv = function(param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getInteger = function(param) {
+	return 0;
+};
+lime.audio.openal.AL.getIntegerv = function(param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getListener3f = function(param) {
+	return null;
+};
+lime.audio.openal.AL.getListener3i = function(param) {
+	return null;
+};
+lime.audio.openal.AL.getListenerf = function(param) {
+	return 0;
+};
+lime.audio.openal.AL.getListenerfv = function(param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getListeneri = function(param) {
+	return 0;
+};
+lime.audio.openal.AL.getListeneriv = function(param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getProcAddress = function(fname) {
+	return null;
+};
+lime.audio.openal.AL.getSource3f = function(source,param) {
+	return null;
+};
+lime.audio.openal.AL.getSourcef = function(source,param) {
+	return 0;
+};
+lime.audio.openal.AL.getSource3i = function(source,param) {
+	return null;
+};
+lime.audio.openal.AL.getSourcefv = function(source,param) {
+	return null;
+};
+lime.audio.openal.AL.getSourcei = function(source,param) {
+	return 0;
+};
+lime.audio.openal.AL.getSourceiv = function(source,param,count) {
+	if(count == null) count = 1;
+	return null;
+};
+lime.audio.openal.AL.getString = function(param) {
+	return null;
+};
+lime.audio.openal.AL.isBuffer = function(buffer) {
+	return false;
+};
+lime.audio.openal.AL.isEnabled = function(capability) {
+	return false;
+};
+lime.audio.openal.AL.isExtensionPresent = function(extname) {
+	return false;
+};
+lime.audio.openal.AL.isSource = function(source) {
+	return false;
+};
+lime.audio.openal.AL.listener3f = function(param,value1,value2,value3) {
+};
+lime.audio.openal.AL.listener3i = function(param,value1,value2,value3) {
+};
+lime.audio.openal.AL.listenerf = function(param,value) {
+};
+lime.audio.openal.AL.listenerfv = function(param,values) {
+};
+lime.audio.openal.AL.listeneri = function(param,value) {
+};
+lime.audio.openal.AL.listeneriv = function(param,values) {
+};
+lime.audio.openal.AL.source3f = function(source,param,value1,value2,value3) {
+};
+lime.audio.openal.AL.source3i = function(source,param,value1,value2,value3) {
+};
+lime.audio.openal.AL.sourcef = function(source,param,value) {
+};
+lime.audio.openal.AL.sourcefv = function(source,param,values) {
+};
+lime.audio.openal.AL.sourcei = function(source,param,value) {
+};
+lime.audio.openal.AL.sourceiv = function(source,param,values) {
+};
+lime.audio.openal.AL.sourcePlay = function(source) {
+};
+lime.audio.openal.AL.sourcePlayv = function(sources) {
+};
+lime.audio.openal.AL.sourceStop = function(source) {
+};
+lime.audio.openal.AL.sourceStopv = function(sources) {
+};
+lime.audio.openal.AL.sourceRewind = function(source) {
+};
+lime.audio.openal.AL.sourceRewindv = function(sources) {
+};
+lime.audio.openal.AL.sourcePause = function(source) {
+};
+lime.audio.openal.AL.sourcePausev = function(sources) {
+};
+lime.audio.openal.AL.sourceQueueBuffer = function(source,buffer) {
+};
+lime.audio.openal.AL.sourceQueueBuffers = function(source,nb,buffers) {
+};
+lime.audio.openal.AL.sourceUnqueueBuffer = function(source) {
+	return 0;
+};
+lime.audio.openal.AL.sourceUnqueueBuffers = function(source,nb) {
+	return null;
+};
+lime.audio.openal.AL.speedOfSound = function(value) {
+};
+lime.audio.openal.ALC = function() { };
+$hxClasses["lime.audio.openal.ALC"] = lime.audio.openal.ALC;
+lime.audio.openal.ALC.__name__ = true;
+lime.audio.openal.ALC.closeDevice = function(device) {
+	return false;
+};
+lime.audio.openal.ALC.createContext = function(device,attrlist) {
+	return null;
+};
+lime.audio.openal.ALC.destroyContext = function(context) {
+};
+lime.audio.openal.ALC.getContextsDevice = function(context) {
+	return null;
+};
+lime.audio.openal.ALC.getCurrentContext = function() {
+	return null;
+};
+lime.audio.openal.ALC.getError = function(device) {
+	return 0;
+};
+lime.audio.openal.ALC.getErrorString = function(device) {
+	var _g = lime.audio.openal.ALC.getError(device);
+	switch(_g) {
+	case 40961:
+		return "INVALID_DEVICE: Invalid device (or no device?)";
+	case 40962:
+		return "INVALID_CONTEXT: Invalid context (or no context?)";
+	case 40963:
+		return "INVALID_ENUM: Invalid enum value";
+	case 40964:
+		return "INVALID_VALUE: Invalid param value";
+	case 40965:
+		return "OUT_OF_MEMORY: OpenAL has run out of memory";
+	default:
+		return "";
+	}
+};
+lime.audio.openal.ALC.getIntegerv = function(device,param,size) {
+	return null;
+};
+lime.audio.openal.ALC.getString = function(device,param) {
+	return null;
+};
+lime.audio.openal.ALC.makeContextCurrent = function(context) {
+	return false;
+};
+lime.audio.openal.ALC.openDevice = function(deviceName) {
+	return null;
+};
+lime.audio.openal.ALC.processContext = function(context) {
+};
+lime.audio.openal.ALC.suspendContext = function(context) {
+};
+lime.audio.openal._ALContext = {};
+lime.audio.openal._ALContext.ALContext_Impl_ = function() { };
+$hxClasses["lime.audio.openal._ALContext.ALContext_Impl_"] = lime.audio.openal._ALContext.ALContext_Impl_;
+lime.audio.openal._ALContext.ALContext_Impl_.__name__ = true;
+lime.audio.openal._ALContext.ALContext_Impl_._new = function(handle) {
+	return handle;
+};
+lime.audio.openal._ALDevice = {};
+lime.audio.openal._ALDevice.ALDevice_Impl_ = function() { };
+$hxClasses["lime.audio.openal._ALDevice.ALDevice_Impl_"] = lime.audio.openal._ALDevice.ALDevice_Impl_;
+lime.audio.openal._ALDevice.ALDevice_Impl_.__name__ = true;
+lime.audio.openal._ALDevice.ALDevice_Impl_._new = function(handle) {
+	return handle;
+};
+lime.graphics = {};
+lime.graphics.FlashRenderContext = function() {
+};
+$hxClasses["lime.graphics.FlashRenderContext"] = lime.graphics.FlashRenderContext;
+lime.graphics.FlashRenderContext.__name__ = true;
+lime.graphics.FlashRenderContext.prototype = {
+	addChild: function(child) {
+		return null;
+	}
+	,addChildAt: function(child,index) {
+		return null;
+	}
+	,addEventListener: function(type,listener,useCapture,priority,useWeakReference) {
+		if(useWeakReference == null) useWeakReference = false;
+		if(priority == null) priority = 0;
+		if(useCapture == null) useCapture = false;
+	}
+	,areInaccessibleObjectsUnderPoint: function(point) {
+		return false;
+	}
+	,contains: function(child) {
+		return false;
+	}
+	,dispatchEvent: function(event) {
+		return false;
+	}
+	,getBounds: function(targetCoordinateSpace) {
+		return null;
+	}
+	,getChildAt: function(index) {
+		return null;
+	}
+	,getChildByName: function(name) {
+		return null;
+	}
+	,getChildIndex: function(child) {
+		return 0;
+	}
+	,getObjectsUnderPoint: function(point) {
+		return null;
+	}
+	,getRect: function(targetCoordinateSpace) {
+		return null;
+	}
+	,globalToLocal: function(point) {
+		return null;
+	}
+	,globalToLocal3D: function(point) {
+		return null;
+	}
+	,hasEventListener: function(type) {
+		return false;
+	}
+	,hitTestObject: function(obj) {
+		return false;
+	}
+	,hitTestPoint: function(x,y,shapeFlag) {
+		if(shapeFlag == null) shapeFlag = false;
+		return false;
+	}
+	,local3DToGlobal: function(point3d) {
+		return null;
+	}
+	,localToGlobal: function(point) {
+		return null;
+	}
+	,removeChild: function(child) {
+		return null;
+	}
+	,removeChildAt: function(index) {
+		return null;
+	}
+	,removeChildren: function(beginIndex,endIndex) {
+		if(endIndex == null) endIndex = 2147483647;
+		if(beginIndex == null) beginIndex = 0;
+	}
+	,removeEventListener: function(type,listener,useCapture) {
+		if(useCapture == null) useCapture = false;
+	}
+	,requestSoftKeyboard: function() {
+		return false;
+	}
+	,setChildIndex: function(child,index) {
+	}
+	,startDrag: function(lockCenter,bounds) {
+		if(lockCenter == null) lockCenter = false;
+	}
+	,startTouchDrag: function(touchPointID,lockCenter,bounds) {
+		if(lockCenter == null) lockCenter = false;
+	}
+	,stopAllMovieClips: function() {
+	}
+	,stopDrag: function() {
+	}
+	,stopTouchDrag: function(touchPointID) {
+	}
+	,swapChildren: function(child1,child2) {
+	}
+	,swapChildrenAt: function(index1,index2) {
+	}
+	,toString: function() {
+		return null;
+	}
+	,willTrigger: function(type) {
+		return false;
+	}
+	,__class__: lime.graphics.FlashRenderContext
+};
+lime.graphics.Font = function(fontName) {
+	this.fontName = fontName;
+	this.glyphs = new haxe.ds.IntMap();
+};
+$hxClasses["lime.graphics.Font"] = lime.graphics.Font;
+lime.graphics.Font.__name__ = true;
+lime.graphics.Font.fromBytes = function(bytes) {
+	var font = new lime.graphics.Font();
+	return font;
+};
+lime.graphics.Font.fromFile = function(path) {
+	var font = new lime.graphics.Font();
+	font.__fromFile(path);
+	return font;
+};
+lime.graphics.Font.prototype = {
+	createImage: function() {
+		this.glyphs = new haxe.ds.IntMap();
+		return null;
+	}
+	,decompose: function() {
+		return null;
+	}
+	,loadRange: function(size,start,end) {
+	}
+	,loadGlyphs: function(size,glyphs) {
+		if(glyphs == null) glyphs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^`'\"/\\&*()[]{}<>|:;_-+=?,. ";
+	}
+	,__fromFile: function(path) {
+		this.__fontPath = path;
+	}
+	,__class__: lime.graphics.Font
+};
+lime.graphics.GlyphRect = function(x,y,width,height,xOffset,yOffset) {
+	if(yOffset == null) yOffset = 0;
+	if(xOffset == null) xOffset = 0;
+	this.x = x;
+	this.y = y;
+	this.xOffset = xOffset;
+	this.yOffset = yOffset;
+	this.width = width;
+	this.height = height;
+};
+$hxClasses["lime.graphics.GlyphRect"] = lime.graphics.GlyphRect;
+lime.graphics.GlyphRect.__name__ = true;
+lime.graphics.GlyphRect.prototype = {
+	__class__: lime.graphics.GlyphRect
+};
+lime.graphics.Image = function(buffer,offsetX,offsetY,width,height,color,type) {
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	if(offsetY == null) offsetY = 0;
+	if(offsetX == null) offsetX = 0;
+	this.offsetX = offsetX;
+	this.offsetY = offsetY;
+	this.width = width;
+	this.height = height;
+	if(type == null) {
+		if(lime.app.Application.__instance != null && lime.app.Application.__instance.windows != null && lime.app.Application.__instance.windows[0].currentRenderer != null) {
+			var _g = lime.app.Application.__instance.windows[0].currentRenderer.context;
+			switch(_g[1]) {
+			case 2:case 1:
+				this.type = lime.graphics.ImageType.CANVAS;
+				break;
+			case 3:
+				this.type = lime.graphics.ImageType.FLASH;
+				break;
+			default:
+				this.type = lime.graphics.ImageType.DATA;
+			}
+		} else this.type = lime.graphics.ImageType.DATA;
+	} else this.type = type;
+	if(buffer == null) {
+		if(width > 0 && height > 0) {
+			var _g1 = this.type;
+			switch(_g1[1]) {
+			case 0:
+				this.buffer = new lime.graphics.ImageBuffer(null,width,height);
+				lime.graphics.utils.ImageCanvasUtil.createCanvas(this,width,height);
+				if(color != null) this.fillRect(new lime.math.Rectangle(0,0,width,height),color);
+				break;
+			case 1:
+				this.buffer = new lime.graphics.ImageBuffer(new Uint8Array(width * height * 4),width,height);
+				if(color != null) this.fillRect(new lime.math.Rectangle(0,0,width,height),color);
+				break;
+			case 2:
+				break;
+			default:
+			}
+		}
+	} else this.__fromImageBuffer(buffer);
+};
+$hxClasses["lime.graphics.Image"] = lime.graphics.Image;
+lime.graphics.Image.__name__ = true;
+lime.graphics.Image.fromBase64 = function(base64,type,onload) {
+	var image = new lime.graphics.Image();
+	image.__fromBase64(base64,type,onload);
+	return image;
+};
+lime.graphics.Image.fromBitmapData = function(bitmapData) {
+	var buffer = new lime.graphics.ImageBuffer(null,bitmapData.width,bitmapData.height);
+	buffer.__srcBitmapData = bitmapData;
+	return new lime.graphics.Image(buffer);
+};
+lime.graphics.Image.fromBytes = function(bytes,onload) {
+	var image = new lime.graphics.Image();
+	image.__fromBytes(bytes,onload);
+	return image;
+};
+lime.graphics.Image.fromCanvas = function(canvas) {
+	var buffer = new lime.graphics.ImageBuffer(null,canvas.width,canvas.height);
+	buffer.set_src(canvas);
+	return new lime.graphics.Image(buffer);
+};
+lime.graphics.Image.fromFile = function(path,onload,onerror) {
+	var image = new lime.graphics.Image();
+	image.__fromFile(path,onload,onerror);
+	return image;
+};
+lime.graphics.Image.fromImageElement = function(image) {
+	var buffer = new lime.graphics.ImageBuffer(null,image.width,image.height);
+	buffer.set_src(image);
+	return new lime.graphics.Image(buffer);
+};
+lime.graphics.Image.__base64Encode = function(bytes) {
+	var extension;
+	var _g = bytes.length % 3;
+	switch(_g) {
+	case 1:
+		extension = "==";
+		break;
+	case 2:
+		extension = "=";
+		break;
+	default:
+		extension = "";
+	}
+	if(lime.graphics.Image.__base64Encoder == null) lime.graphics.Image.__base64Encoder = new haxe.crypto.BaseCode(haxe.io.Bytes.ofString(lime.graphics.Image.__base64Chars));
+	return lime.graphics.Image.__base64Encoder.encodeBytes(haxe.io.Bytes.ofData(bytes.byteView)).toString() + extension;
+};
+lime.graphics.Image.__isJPG = function(bytes) {
+	bytes.position = 0;
+	return bytes.readByte() == 255 && bytes.readByte() == 216;
+};
+lime.graphics.Image.__isPNG = function(bytes) {
+	bytes.position = 0;
+	return bytes.readByte() == 137 && bytes.readByte() == 80 && bytes.readByte() == 78 && bytes.readByte() == 71 && bytes.readByte() == 13 && bytes.readByte() == 10 && bytes.readByte() == 26 && bytes.readByte() == 10;
+};
+lime.graphics.Image.__isGIF = function(bytes) {
+	bytes.position = 0;
+	if(bytes.readByte() == 71 && bytes.readByte() == 73 && bytes.readByte() == 70 && bytes.readByte() == 38) {
+		var b = bytes.readByte();
+		return (b == 7 || b == 9) && bytes.readByte() == 97;
+	}
+	return false;
+};
+lime.graphics.Image.prototype = {
+	clone: function() {
+		lime.graphics.utils.ImageCanvasUtil.sync(this);
+		var image = new lime.graphics.Image(this.buffer.clone(),this.offsetX,this.offsetY,this.width,this.height,null,this.type);
+		return image;
+	}
+	,colorTransform: function(rect,colorMatrix) {
+		rect = this.__clipRect(rect);
+		if(this.buffer == null || rect == null) return;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.colorTransform(this,rect,colorMatrix);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageDataUtil.colorTransform(this,rect,colorMatrix);
+			break;
+		case 2:
+			rect.offset(this.offsetX,this.offsetY);
+			this.buffer.__srcBitmapData.colorTransform(rect.__toFlashRectangle(),lime.math._ColorMatrix.ColorMatrix_Impl_.__toFlashColorTransform(colorMatrix));
+			break;
+		default:
+		}
+	}
+	,copyChannel: function(sourceImage,sourceRect,destPoint,sourceChannel,destChannel) {
+		sourceRect = this.__clipRect(sourceRect);
+		if(this.buffer == null || sourceRect == null) return;
+		if(destChannel == lime.graphics.ImageChannel.ALPHA && !this.get_transparent()) return;
+		if(sourceRect.width <= 0 || sourceRect.height <= 0) return;
+		if(sourceRect.x + sourceRect.width > sourceImage.width) sourceRect.width = sourceImage.width - sourceRect.x;
+		if(sourceRect.y + sourceRect.height > sourceImage.height) sourceRect.height = sourceImage.height - sourceRect.y;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.copyChannel(this,sourceImage,sourceRect,destPoint,sourceChannel,destChannel);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageDataUtil.copyChannel(this,sourceImage,sourceRect,destPoint,sourceChannel,destChannel);
+			break;
+		case 2:
+			var srcChannel;
+			switch(sourceChannel[1]) {
+			case 0:
+				srcChannel = 1;
+				break;
+			case 1:
+				srcChannel = 2;
+				break;
+			case 2:
+				srcChannel = 4;
+				break;
+			case 3:
+				srcChannel = 8;
+				break;
+			}
+			var dstChannel;
+			switch(destChannel[1]) {
+			case 0:
+				dstChannel = 1;
+				break;
+			case 1:
+				dstChannel = 2;
+				break;
+			case 2:
+				dstChannel = 4;
+				break;
+			case 3:
+				dstChannel = 8;
+				break;
+			}
+			sourceRect.offset(sourceImage.offsetX,sourceImage.offsetY);
+			destPoint.offset(this.offsetX,this.offsetY);
+			this.buffer.__srcBitmapData.copyChannel(sourceImage.buffer.get_src(),sourceRect.__toFlashRectangle(),destPoint.__toFlashPoint(),srcChannel,dstChannel);
+			break;
+		default:
+		}
+	}
+	,copyPixels: function(sourceImage,sourceRect,destPoint,alphaImage,alphaPoint,mergeAlpha) {
+		if(mergeAlpha == null) mergeAlpha = false;
+		if(this.buffer == null || sourceImage == null) return;
+		if(sourceRect.x + sourceRect.width > sourceImage.width) sourceRect.width = sourceImage.width - sourceRect.x;
+		if(sourceRect.y + sourceRect.height > sourceImage.height) sourceRect.height = sourceImage.height - sourceRect.y;
+		if(sourceRect.width <= 0 || sourceRect.height <= 0) return;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.copyPixels(this,sourceImage,sourceRect,destPoint,alphaImage,alphaPoint,mergeAlpha);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageCanvasUtil.convertToData(sourceImage);
+			lime.graphics.utils.ImageDataUtil.copyPixels(this,sourceImage,sourceRect,destPoint,alphaImage,alphaPoint,mergeAlpha);
+			break;
+		case 2:
+			sourceRect.offset(sourceImage.offsetX,sourceImage.offsetY);
+			destPoint.offset(this.offsetX,this.offsetY);
+			if(alphaImage != null && alphaPoint != null) alphaPoint.offset(alphaImage.offsetX,alphaImage.offsetY);
+			this.buffer.__srcBitmapData.copyPixels(sourceImage.buffer.__srcBitmapData,sourceRect.__toFlashRectangle(),destPoint.__toFlashPoint(),alphaImage != null?alphaImage.buffer.get_src():null,alphaPoint != null?alphaPoint.__toFlashPoint():null,mergeAlpha);
+			break;
+		default:
+		}
+	}
+	,encode: function(format,quality) {
+		if(quality == null) quality = 90;
+		if(format == null) format = "png";
+		return null;
+	}
+	,fillRect: function(rect,color) {
+		rect = this.__clipRect(rect);
+		if(this.buffer == null || rect == null) return;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.fillRect(this,rect,color);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageDataUtil.fillRect(this,rect,color);
+			break;
+		case 2:
+			rect.offset(this.offsetX,this.offsetY);
+			this.buffer.__srcBitmapData.fillRect(rect.__toFlashRectangle(),color);
+			break;
+		default:
+		}
+	}
+	,floodFill: function(x,y,color) {
+		if(this.buffer == null) return;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.floodFill(this,x,y,color);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageDataUtil.floodFill(this,x,y,color);
+			break;
+		case 2:
+			this.buffer.__srcBitmapData.floodFill(x + this.offsetX,y + this.offsetY,color);
+			break;
+		default:
+		}
+	}
+	,getPixel: function(x,y) {
+		if(this.buffer == null || x < 0 || y < 0 || x >= this.width || y >= this.height) return 0;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			return lime.graphics.utils.ImageCanvasUtil.getPixel(this,x,y);
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			return lime.graphics.utils.ImageDataUtil.getPixel(this,x,y);
+		case 2:
+			return this.buffer.__srcBitmapData.getPixel(x + this.offsetX,y + this.offsetY);
+		default:
+			return 0;
+		}
+	}
+	,getPixel32: function(x,y) {
+		if(this.buffer == null || x < 0 || y < 0 || x >= this.width || y >= this.height) return 0;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			return lime.graphics.utils.ImageCanvasUtil.getPixel32(this,x,y);
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			return lime.graphics.utils.ImageDataUtil.getPixel32(this,x,y);
+		case 2:
+			return this.buffer.__srcBitmapData.getPixel32(x + this.offsetX,y + this.offsetY);
+		default:
+			return 0;
+		}
+	}
+	,getPixels: function(rect) {
+		if(this.buffer == null) return null;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			return lime.graphics.utils.ImageCanvasUtil.getPixels(this,rect);
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			return lime.graphics.utils.ImageDataUtil.getPixels(this,rect);
+		case 2:
+			rect.offset(this.offsetX,this.offsetY);
+			return this.buffer.__srcBitmapData.getPixels(rect.__toFlashRectangle());
+		default:
+			return null;
+		}
+	}
+	,resize: function(newWidth,newHeight) {
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.resize(this,newWidth,newHeight);
+			break;
+		case 1:
+			lime.graphics.utils.ImageDataUtil.resize(this,newWidth,newHeight);
+			break;
+		case 2:
+			break;
+		default:
+		}
+		this.buffer.width = newWidth;
+		this.buffer.height = newHeight;
+		this.offsetX = 0;
+		this.offsetY = 0;
+		this.width = newWidth;
+		this.height = newHeight;
+	}
+	,setPixel: function(x,y,color) {
+		if(this.buffer == null || x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.setPixel(this,x,y,color);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageDataUtil.setPixel(this,x,y,color);
+			break;
+		case 2:
+			this.buffer.__srcBitmapData.setPixel(x + this.offsetX,y + this.offsetX,color);
+			break;
+		default:
+		}
+	}
+	,setPixel32: function(x,y,color) {
+		if(this.buffer == null || x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.setPixel32(this,x,y,color);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageDataUtil.setPixel32(this,x,y,color);
+			break;
+		case 2:
+			this.buffer.__srcBitmapData.setPixel32(x + this.offsetX,y + this.offsetY,color);
+			break;
+		default:
+		}
+	}
+	,setPixels: function(rect,byteArray) {
+		rect = this.__clipRect(rect);
+		if(this.buffer == null || rect == null) return;
+		var _g = this.type;
+		switch(_g[1]) {
+		case 0:
+			lime.graphics.utils.ImageCanvasUtil.setPixels(this,rect,byteArray);
+			break;
+		case 1:
+			lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+			lime.graphics.utils.ImageDataUtil.setPixels(this,rect,byteArray);
+			break;
+		case 2:
+			rect.offset(this.offsetX,this.offsetY);
+			this.buffer.__srcBitmapData.setPixels(rect.__toFlashRectangle(),byteArray);
+			break;
+		default:
+		}
+	}
+	,__clipRect: function(r) {
+		if(r == null) return null;
+		if(r.x < 0) {
+			r.width -= -r.x;
+			r.x = 0;
+			if(r.x + r.width <= 0) return null;
+		}
+		if(r.y < 0) {
+			r.height -= -r.y;
+			r.y = 0;
+			if(r.y + r.height <= 0) return null;
+		}
+		if(r.x + r.width >= this.width) {
+			r.width -= r.x + r.width - this.width;
+			if(r.width <= 0) return null;
+		}
+		if(r.y + r.height >= this.height) {
+			r.height -= r.y + r.height - this.height;
+			if(r.height <= 0) return null;
+		}
+		return r;
+	}
+	,__fromBase64: function(base64,type,onload) {
+		var _g = this;
+		var image = new Image();
+		var image_onLoaded = function(event) {
+			_g.buffer = new lime.graphics.ImageBuffer(null,image.width,image.height);
+			_g.buffer.__srcImage = image;
+			_g.offsetX = 0;
+			_g.offsetY = 0;
+			_g.width = _g.buffer.width;
+			_g.height = _g.buffer.height;
+			if(onload != null) onload(_g);
+		};
+		image.addEventListener("load",image_onLoaded,false);
+		image.src = "data:" + type + ";base64," + base64;
+	}
+	,__fromBytes: function(bytes,onload) {
+		var type = "";
+		if(lime.graphics.Image.__isPNG(bytes)) type = "image/png"; else if(lime.graphics.Image.__isJPG(bytes)) type = "image/jpeg"; else if(lime.graphics.Image.__isGIF(bytes)) type = "image/gif"; else throw "Image tried to read a PNG/JPG ByteArray, but found an invalid header.";
+		this.__fromBase64(lime.graphics.Image.__base64Encode(bytes),type,onload);
+	}
+	,__fromFile: function(path,onload,onerror) {
+		var _g = this;
+		var image = new Image();
+		image.onload = function(_) {
+			_g.buffer = new lime.graphics.ImageBuffer(null,image.width,image.height);
+			_g.buffer.__srcImage = image;
+			_g.width = image.width;
+			_g.height = image.height;
+			if(onload != null) onload(_g);
+		};
+		image.onerror = function(_1) {
+			if(onerror != null) onerror();
+		};
+		image.src = path;
+		if(image.complete) {
+		}
+	}
+	,__fromImageBuffer: function(buffer) {
+		this.buffer = buffer;
+		if(buffer != null) {
+			if(this.width == 0) this.width = buffer.width;
+			if(this.height == 0) this.height = buffer.height;
+		}
+	}
+	,get_data: function() {
+		if(this.buffer.data == null && this.buffer.width > 0 && this.buffer.height > 0) {
+			lime.graphics.utils.ImageCanvasUtil.convertToCanvas(this);
+			lime.graphics.utils.ImageCanvasUtil.createImageData(this);
+		}
+		return this.buffer.data;
+	}
+	,set_data: function(value) {
+		return this.buffer.data = value;
+	}
+	,get_powerOfTwo: function() {
+		return this.buffer.width != 0 && (this.buffer.width & ~this.buffer.width + 1) == this.buffer.width && (this.buffer.height != 0 && (this.buffer.height & ~this.buffer.height + 1) == this.buffer.height);
+	}
+	,set_powerOfTwo: function(value) {
+		if(value != this.get_powerOfTwo()) {
+			var newWidth = 1;
+			var newHeight = 1;
+			while(newWidth < this.buffer.width) newWidth <<= 1;
+			while(newHeight < this.buffer.height) newHeight <<= 1;
+			var _g = this.type;
+			switch(_g[1]) {
+			case 0:
+				break;
+			case 1:
+				lime.graphics.utils.ImageDataUtil.resizeBuffer(this,newWidth,newHeight);
+				break;
+			case 2:
+				break;
+			default:
+			}
+		}
+		return value;
+	}
+	,get_premultiplied: function() {
+		return this.buffer.premultiplied;
+	}
+	,set_premultiplied: function(value) {
+		if(value && !this.buffer.premultiplied) {
+			var _g = this.type;
+			switch(_g[1]) {
+			case 1:
+				lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+				lime.graphics.utils.ImageDataUtil.multiplyAlpha(this);
+				break;
+			default:
+			}
+		} else if(!value && this.buffer.premultiplied) {
+			var _g1 = this.type;
+			switch(_g1[1]) {
+			case 1:
+				lime.graphics.utils.ImageCanvasUtil.convertToData(this);
+				lime.graphics.utils.ImageDataUtil.unmultiplyAlpha(this);
+				break;
+			default:
+			}
+		}
+		return value;
+	}
+	,get_rect: function() {
+		return new lime.math.Rectangle(0,0,this.width,this.height);
+	}
+	,get_src: function() {
+		return this.buffer.get_src();
+	}
+	,set_src: function(value) {
+		return this.buffer.set_src(value);
+	}
+	,get_transparent: function() {
+		return this.buffer.transparent;
+	}
+	,set_transparent: function(value) {
+		return this.buffer.transparent = value;
+	}
+	,__class__: lime.graphics.Image
+};
+lime.graphics.ImageChannel = $hxClasses["lime.graphics.ImageChannel"] = { __ename__ : true, __constructs__ : ["RED","GREEN","BLUE","ALPHA"] };
+lime.graphics.ImageChannel.RED = ["RED",0];
+lime.graphics.ImageChannel.RED.toString = $estr;
+lime.graphics.ImageChannel.RED.__enum__ = lime.graphics.ImageChannel;
+lime.graphics.ImageChannel.GREEN = ["GREEN",1];
+lime.graphics.ImageChannel.GREEN.toString = $estr;
+lime.graphics.ImageChannel.GREEN.__enum__ = lime.graphics.ImageChannel;
+lime.graphics.ImageChannel.BLUE = ["BLUE",2];
+lime.graphics.ImageChannel.BLUE.toString = $estr;
+lime.graphics.ImageChannel.BLUE.__enum__ = lime.graphics.ImageChannel;
+lime.graphics.ImageChannel.ALPHA = ["ALPHA",3];
+lime.graphics.ImageChannel.ALPHA.toString = $estr;
+lime.graphics.ImageChannel.ALPHA.__enum__ = lime.graphics.ImageChannel;
+lime.graphics.ImageChannel.__empty_constructs__ = [lime.graphics.ImageChannel.RED,lime.graphics.ImageChannel.GREEN,lime.graphics.ImageChannel.BLUE,lime.graphics.ImageChannel.ALPHA];
+lime.graphics.ImageBuffer = function(data,width,height,bitsPerPixel) {
+	if(bitsPerPixel == null) bitsPerPixel = 4;
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	this.data = data;
+	this.width = width;
+	this.height = height;
+	this.bitsPerPixel = bitsPerPixel;
+	this.transparent = true;
+};
+$hxClasses["lime.graphics.ImageBuffer"] = lime.graphics.ImageBuffer;
+lime.graphics.ImageBuffer.__name__ = true;
+lime.graphics.ImageBuffer.prototype = {
+	clone: function() {
+		var buffer = new lime.graphics.ImageBuffer(this.data,this.width,this.height,this.bitsPerPixel);
+		buffer.set_src(this.get_src());
+		buffer.premultiplied = this.premultiplied;
+		buffer.transparent = this.transparent;
+		return buffer;
+	}
+	,get_src: function() {
+		if(this.__srcImage != null) return this.__srcImage;
+		return this.__srcCanvas;
+	}
+	,set_src: function(value) {
+		if(js.Boot.__instanceof(value,Image)) this.__srcImage = value; else if(js.Boot.__instanceof(value,HTMLCanvasElement)) {
+			this.__srcCanvas = value;
+			this.__srcContext = this.__srcCanvas.getContext("2d");
+		}
+		return value;
+	}
+	,__class__: lime.graphics.ImageBuffer
+};
+lime.graphics.ImageType = $hxClasses["lime.graphics.ImageType"] = { __ename__ : true, __constructs__ : ["CANVAS","DATA","FLASH","CUSTOM"] };
+lime.graphics.ImageType.CANVAS = ["CANVAS",0];
+lime.graphics.ImageType.CANVAS.toString = $estr;
+lime.graphics.ImageType.CANVAS.__enum__ = lime.graphics.ImageType;
+lime.graphics.ImageType.DATA = ["DATA",1];
+lime.graphics.ImageType.DATA.toString = $estr;
+lime.graphics.ImageType.DATA.__enum__ = lime.graphics.ImageType;
+lime.graphics.ImageType.FLASH = ["FLASH",2];
+lime.graphics.ImageType.FLASH.toString = $estr;
+lime.graphics.ImageType.FLASH.__enum__ = lime.graphics.ImageType;
+lime.graphics.ImageType.CUSTOM = ["CUSTOM",3];
+lime.graphics.ImageType.CUSTOM.toString = $estr;
+lime.graphics.ImageType.CUSTOM.__enum__ = lime.graphics.ImageType;
+lime.graphics.ImageType.__empty_constructs__ = [lime.graphics.ImageType.CANVAS,lime.graphics.ImageType.DATA,lime.graphics.ImageType.FLASH,lime.graphics.ImageType.CUSTOM];
+lime.graphics.RenderContext = $hxClasses["lime.graphics.RenderContext"] = { __ename__ : true, __constructs__ : ["OPENGL","CANVAS","DOM","FLASH","CUSTOM"] };
+lime.graphics.RenderContext.OPENGL = function(gl) { var $x = ["OPENGL",0,gl]; $x.__enum__ = lime.graphics.RenderContext; $x.toString = $estr; return $x; };
+lime.graphics.RenderContext.CANVAS = function(context) { var $x = ["CANVAS",1,context]; $x.__enum__ = lime.graphics.RenderContext; $x.toString = $estr; return $x; };
+lime.graphics.RenderContext.DOM = function(element) { var $x = ["DOM",2,element]; $x.__enum__ = lime.graphics.RenderContext; $x.toString = $estr; return $x; };
+lime.graphics.RenderContext.FLASH = function(stage) { var $x = ["FLASH",3,stage]; $x.__enum__ = lime.graphics.RenderContext; $x.toString = $estr; return $x; };
+lime.graphics.RenderContext.CUSTOM = function(data) { var $x = ["CUSTOM",4,data]; $x.__enum__ = lime.graphics.RenderContext; $x.toString = $estr; return $x; };
+lime.graphics.RenderContext.__empty_constructs__ = [];
+lime.graphics._Renderer = {};
+lime.graphics._Renderer.RenderEventInfo = function(type,context) {
+	this.type = type;
+	this.context = context;
+};
+$hxClasses["lime.graphics._Renderer.RenderEventInfo"] = lime.graphics._Renderer.RenderEventInfo;
+lime.graphics._Renderer.RenderEventInfo.__name__ = true;
+lime.graphics._Renderer.RenderEventInfo.prototype = {
+	clone: function() {
+		return new lime.graphics._Renderer.RenderEventInfo(this.type,this.context);
+	}
+	,__class__: lime.graphics._Renderer.RenderEventInfo
+};
+lime.graphics.Renderer = function(window) {
+	this.window = window;
+	this.window.currentRenderer = this;
+};
+$hxClasses["lime.graphics.Renderer"] = lime.graphics.Renderer;
+lime.graphics.Renderer.__name__ = true;
+lime.graphics.Renderer.dispatch = function() {
+	var _g = 0;
+	var _g1 = lime.app.Application.__instance.windows;
+	while(_g < _g1.length) {
+		var $window = _g1[_g];
+		++_g;
+		if($window.currentRenderer != null) {
+			var context = $window.currentRenderer.context;
+			if(!lime.app.Application.__initialized) {
+				lime.app.Application.__initialized = true;
+				lime.app.Application.__instance.init(context);
+			}
+			lime.app.Application.__instance.render(context);
+			var listeners = lime.graphics.Renderer.onRender.listeners;
+			var repeat = lime.graphics.Renderer.onRender.repeat;
+			var length = listeners.length;
+			var i = 0;
+			while(i < length) {
+				listeners[i](context);
+				if(!repeat[i]) {
+					lime.graphics.Renderer.onRender.remove(listeners[i]);
+					length--;
+				} else i++;
+			}
+			$window.currentRenderer.flip();
+		}
+	}
+};
+lime.graphics.Renderer.prototype = {
+	create: function() {
+		if(this.window.div != null) this.context = lime.graphics.RenderContext.DOM(this.window.div); else if(this.window.canvas != null) {
+			var options = { alpha : true, antialias : this.window.config.antialiasing > 0, depth : this.window.config.depthBuffer, premultipliedAlpha : true, stencil : this.window.config.stencilBuffer, preserveDrawingBuffer : false};
+			var webgl = js.html._CanvasElement.CanvasUtil.getContextWebGL(this.window.canvas,options);
+			if(webgl == null) this.context = lime.graphics.RenderContext.CANVAS(this.window.canvas.getContext("2d")); else {
+				lime.graphics.opengl.GL.context = webgl;
+				this.context = lime.graphics.RenderContext.OPENGL(lime.graphics.opengl.GL.context);
+			}
+		}
+		if(!lime.graphics.Renderer.registered) lime.graphics.Renderer.registered = true;
+	}
+	,flip: function() {
+	}
+	,__class__: lime.graphics.Renderer
+};
+lime.graphics.opengl = {};
+lime.graphics.opengl.GL = function() { };
+$hxClasses["lime.graphics.opengl.GL"] = lime.graphics.opengl.GL;
+lime.graphics.opengl.GL.__name__ = true;
+lime.graphics.opengl.GL.activeTexture = function(texture) {
+	lime.graphics.opengl.GL.context.activeTexture(texture);
+};
+lime.graphics.opengl.GL.attachShader = function(program,shader) {
+	lime.graphics.opengl.GL.context.attachShader(program,shader);
+};
+lime.graphics.opengl.GL.bindAttribLocation = function(program,index,name) {
+	lime.graphics.opengl.GL.context.bindAttribLocation(program,index,name);
+};
+lime.graphics.opengl.GL.bindBuffer = function(target,buffer) {
+	lime.graphics.opengl.GL.context.bindBuffer(target,buffer);
+};
+lime.graphics.opengl.GL.bindFramebuffer = function(target,framebuffer) {
+	lime.graphics.opengl.GL.context.bindFramebuffer(target,framebuffer);
+};
+lime.graphics.opengl.GL.bindRenderbuffer = function(target,renderbuffer) {
+	lime.graphics.opengl.GL.context.bindRenderbuffer(target,renderbuffer);
+};
+lime.graphics.opengl.GL.bindTexture = function(target,texture) {
+	lime.graphics.opengl.GL.context.bindTexture(target,texture);
+};
+lime.graphics.opengl.GL.blendColor = function(red,green,blue,alpha) {
+	lime.graphics.opengl.GL.context.blendColor(red,green,blue,alpha);
+};
+lime.graphics.opengl.GL.blendEquation = function(mode) {
+	lime.graphics.opengl.GL.context.blendEquation(mode);
+};
+lime.graphics.opengl.GL.blendEquationSeparate = function(modeRGB,modeAlpha) {
+	lime.graphics.opengl.GL.context.blendEquationSeparate(modeRGB,modeAlpha);
+};
+lime.graphics.opengl.GL.blendFunc = function(sfactor,dfactor) {
+	lime.graphics.opengl.GL.context.blendFunc(sfactor,dfactor);
+};
+lime.graphics.opengl.GL.blendFuncSeparate = function(srcRGB,dstRGB,srcAlpha,dstAlpha) {
+	lime.graphics.opengl.GL.context.blendFuncSeparate(srcRGB,dstRGB,srcAlpha,dstAlpha);
+};
+lime.graphics.opengl.GL.bufferData = function(target,data,usage) {
+	lime.graphics.opengl.GL.context.bufferData(target,data,usage);
+};
+lime.graphics.opengl.GL.bufferSubData = function(target,offset,data) {
+	lime.graphics.opengl.GL.context.bufferSubData(target,offset,data);
+};
+lime.graphics.opengl.GL.checkFramebufferStatus = function(target) {
+	return lime.graphics.opengl.GL.context.checkFramebufferStatus(target);
+};
+lime.graphics.opengl.GL.clear = function(mask) {
+	lime.graphics.opengl.GL.context.clear(mask);
+};
+lime.graphics.opengl.GL.clearColor = function(red,green,blue,alpha) {
+	lime.graphics.opengl.GL.context.clearColor(red,green,blue,alpha);
+};
+lime.graphics.opengl.GL.clearDepth = function(depth) {
+	lime.graphics.opengl.GL.context.clearDepth(depth);
+};
+lime.graphics.opengl.GL.clearStencil = function(s) {
+	lime.graphics.opengl.GL.context.clearStencil(s);
+};
+lime.graphics.opengl.GL.colorMask = function(red,green,blue,alpha) {
+	lime.graphics.opengl.GL.context.colorMask(red,green,blue,alpha);
+};
+lime.graphics.opengl.GL.compileShader = function(shader) {
+	lime.graphics.opengl.GL.context.compileShader(shader);
+};
+lime.graphics.opengl.GL.compressedTexImage2D = function(target,level,internalformat,width,height,border,data) {
+	lime.graphics.opengl.GL.context.compressedTexImage2D(target,level,internalformat,width,height,border,data);
+};
+lime.graphics.opengl.GL.compressedTexSubImage2D = function(target,level,xoffset,yoffset,width,height,format,data) {
+	lime.graphics.opengl.GL.context.compressedTexSubImage2D(target,level,xoffset,yoffset,width,height,format,data);
+};
+lime.graphics.opengl.GL.copyTexImage2D = function(target,level,internalformat,x,y,width,height,border) {
+	lime.graphics.opengl.GL.context.copyTexImage2D(target,level,internalformat,x,y,width,height,border);
+};
+lime.graphics.opengl.GL.copyTexSubImage2D = function(target,level,xoffset,yoffset,x,y,width,height) {
+	lime.graphics.opengl.GL.context.copyTexSubImage2D(target,level,xoffset,yoffset,x,y,width,height);
+};
+lime.graphics.opengl.GL.createBuffer = function() {
+	return lime.graphics.opengl.GL.context.createBuffer();
+};
+lime.graphics.opengl.GL.createFramebuffer = function() {
+	return lime.graphics.opengl.GL.context.createFramebuffer();
+};
+lime.graphics.opengl.GL.createProgram = function() {
+	return lime.graphics.opengl.GL.context.createProgram();
+};
+lime.graphics.opengl.GL.createRenderbuffer = function() {
+	return lime.graphics.opengl.GL.context.createRenderbuffer();
+};
+lime.graphics.opengl.GL.createShader = function(type) {
+	return lime.graphics.opengl.GL.context.createShader(type);
+};
+lime.graphics.opengl.GL.createTexture = function() {
+	return lime.graphics.opengl.GL.context.createTexture();
+};
+lime.graphics.opengl.GL.cullFace = function(mode) {
+	lime.graphics.opengl.GL.context.cullFace(mode);
+};
+lime.graphics.opengl.GL.deleteBuffer = function(buffer) {
+	lime.graphics.opengl.GL.context.deleteBuffer(buffer);
+};
+lime.graphics.opengl.GL.deleteFramebuffer = function(framebuffer) {
+	lime.graphics.opengl.GL.context.deleteFramebuffer(framebuffer);
+};
+lime.graphics.opengl.GL.deleteProgram = function(program) {
+	lime.graphics.opengl.GL.context.deleteProgram(program);
+};
+lime.graphics.opengl.GL.deleteRenderbuffer = function(renderbuffer) {
+	lime.graphics.opengl.GL.context.deleteRenderbuffer(renderbuffer);
+};
+lime.graphics.opengl.GL.deleteShader = function(shader) {
+	lime.graphics.opengl.GL.context.deleteShader(shader);
+};
+lime.graphics.opengl.GL.deleteTexture = function(texture) {
+	lime.graphics.opengl.GL.context.deleteTexture(texture);
+};
+lime.graphics.opengl.GL.depthFunc = function(func) {
+	lime.graphics.opengl.GL.context.depthFunc(func);
+};
+lime.graphics.opengl.GL.depthMask = function(flag) {
+	lime.graphics.opengl.GL.context.depthMask(flag);
+};
+lime.graphics.opengl.GL.depthRange = function(zNear,zFar) {
+	lime.graphics.opengl.GL.context.depthRange(zNear,zFar);
+};
+lime.graphics.opengl.GL.detachShader = function(program,shader) {
+	lime.graphics.opengl.GL.context.detachShader(program,shader);
+};
+lime.graphics.opengl.GL.disable = function(cap) {
+	lime.graphics.opengl.GL.context.disable(cap);
+};
+lime.graphics.opengl.GL.disableVertexAttribArray = function(index) {
+	lime.graphics.opengl.GL.context.disableVertexAttribArray(index);
+};
+lime.graphics.opengl.GL.drawArrays = function(mode,first,count) {
+	lime.graphics.opengl.GL.context.drawArrays(mode,first,count);
+};
+lime.graphics.opengl.GL.drawElements = function(mode,count,type,offset) {
+	lime.graphics.opengl.GL.context.drawElements(mode,count,type,offset);
+};
+lime.graphics.opengl.GL.enable = function(cap) {
+	lime.graphics.opengl.GL.context.enable(cap);
+};
+lime.graphics.opengl.GL.enableVertexAttribArray = function(index) {
+	lime.graphics.opengl.GL.context.enableVertexAttribArray(index);
+};
+lime.graphics.opengl.GL.finish = function() {
+	lime.graphics.opengl.GL.context.finish();
+};
+lime.graphics.opengl.GL.flush = function() {
+	lime.graphics.opengl.GL.context.flush();
+};
+lime.graphics.opengl.GL.framebufferRenderbuffer = function(target,attachment,renderbuffertarget,renderbuffer) {
+	lime.graphics.opengl.GL.context.framebufferRenderbuffer(target,attachment,renderbuffertarget,renderbuffer);
+};
+lime.graphics.opengl.GL.framebufferTexture2D = function(target,attachment,textarget,texture,level) {
+	lime.graphics.opengl.GL.context.framebufferTexture2D(target,attachment,textarget,texture,level);
+};
+lime.graphics.opengl.GL.frontFace = function(mode) {
+	lime.graphics.opengl.GL.context.frontFace(mode);
+};
+lime.graphics.opengl.GL.generateMipmap = function(target) {
+	lime.graphics.opengl.GL.context.generateMipmap(target);
+};
+lime.graphics.opengl.GL.getActiveAttrib = function(program,index) {
+	return lime.graphics.opengl.GL.context.getActiveAttrib(program,index);
+};
+lime.graphics.opengl.GL.getActiveUniform = function(program,index) {
+	return lime.graphics.opengl.GL.context.getActiveUniform(program,index);
+};
+lime.graphics.opengl.GL.getAttachedShaders = function(program) {
+	return lime.graphics.opengl.GL.context.getAttachedShaders(program);
+};
+lime.graphics.opengl.GL.getAttribLocation = function(program,name) {
+	return lime.graphics.opengl.GL.context.getAttribLocation(program,name);
+};
+lime.graphics.opengl.GL.getBufferParameter = function(target,pname) {
+	return lime.graphics.opengl.GL.context.getBufferParameter(target,pname);
+};
+lime.graphics.opengl.GL.getContextAttributes = function() {
+	return lime.graphics.opengl.GL.context.getContextAttributes();
+};
+lime.graphics.opengl.GL.getError = function() {
+	return lime.graphics.opengl.GL.context.getError();
+};
+lime.graphics.opengl.GL.getExtension = function(name) {
+	return lime.graphics.opengl.GL.context.getExtension(name);
+};
+lime.graphics.opengl.GL.getFramebufferAttachmentParameter = function(target,attachment,pname) {
+	return lime.graphics.opengl.GL.context.getFramebufferAttachmentParameter(target,attachment,pname);
+};
+lime.graphics.opengl.GL.getParameter = function(pname) {
+	return lime.graphics.opengl.GL.context.getParameter(pname);
+};
+lime.graphics.opengl.GL.getProgramInfoLog = function(program) {
+	return lime.graphics.opengl.GL.context.getProgramInfoLog(program);
+};
+lime.graphics.opengl.GL.getProgramParameter = function(program,pname) {
+	return lime.graphics.opengl.GL.context.getProgramParameter(program,pname);
+};
+lime.graphics.opengl.GL.getRenderbufferParameter = function(target,pname) {
+	return lime.graphics.opengl.GL.context.getRenderbufferParameter(target,pname);
+};
+lime.graphics.opengl.GL.getShaderInfoLog = function(shader) {
+	return lime.graphics.opengl.GL.context.getShaderInfoLog(shader);
+};
+lime.graphics.opengl.GL.getShaderParameter = function(shader,pname) {
+	return lime.graphics.opengl.GL.context.getShaderParameter(shader,pname);
+};
+lime.graphics.opengl.GL.getShaderPrecisionFormat = function(shadertype,precisiontype) {
+	return lime.graphics.opengl.GL.context.getShaderPrecisionFormat(shadertype,precisiontype);
+};
+lime.graphics.opengl.GL.getShaderSource = function(shader) {
+	return lime.graphics.opengl.GL.context.getShaderSource(shader);
+};
+lime.graphics.opengl.GL.getSupportedExtensions = function() {
+	return lime.graphics.opengl.GL.context.getSupportedExtensions();
+};
+lime.graphics.opengl.GL.getTexParameter = function(target,pname) {
+	return lime.graphics.opengl.GL.context.getTexParameter(target,pname);
+};
+lime.graphics.opengl.GL.getUniform = function(program,location) {
+	return lime.graphics.opengl.GL.context.getUniform(program,location);
+};
+lime.graphics.opengl.GL.getUniformLocation = function(program,name) {
+	return lime.graphics.opengl.GL.context.getUniformLocation(program,name);
+};
+lime.graphics.opengl.GL.getVertexAttrib = function(index,pname) {
+	return lime.graphics.opengl.GL.context.getVertexAttrib(index,pname);
+};
+lime.graphics.opengl.GL.getVertexAttribOffset = function(index,pname) {
+	return lime.graphics.opengl.GL.context.getVertexAttribOffset(index,pname);
+};
+lime.graphics.opengl.GL.hint = function(target,mode) {
+	lime.graphics.opengl.GL.context.hint(target,mode);
+};
+lime.graphics.opengl.GL.isBuffer = function(buffer) {
+	return lime.graphics.opengl.GL.context.isBuffer(buffer);
+};
+lime.graphics.opengl.GL.isEnabled = function(cap) {
+	return lime.graphics.opengl.GL.context.isEnabled(cap);
+};
+lime.graphics.opengl.GL.isFramebuffer = function(framebuffer) {
+	return lime.graphics.opengl.GL.context.isFramebuffer(framebuffer);
+};
+lime.graphics.opengl.GL.isProgram = function(program) {
+	return lime.graphics.opengl.GL.context.isProgram(program);
+};
+lime.graphics.opengl.GL.isRenderbuffer = function(renderbuffer) {
+	return lime.graphics.opengl.GL.context.isRenderbuffer(renderbuffer);
+};
+lime.graphics.opengl.GL.isShader = function(shader) {
+	return lime.graphics.opengl.GL.context.isShader(shader);
+};
+lime.graphics.opengl.GL.isTexture = function(texture) {
+	return lime.graphics.opengl.GL.context.isTexture(texture);
+};
+lime.graphics.opengl.GL.lineWidth = function(width) {
+	lime.graphics.opengl.GL.context.lineWidth(width);
+};
+lime.graphics.opengl.GL.linkProgram = function(program) {
+	lime.graphics.opengl.GL.context.linkProgram(program);
+};
+lime.graphics.opengl.GL.pixelStorei = function(pname,param) {
+	lime.graphics.opengl.GL.context.pixelStorei(pname,param);
+};
+lime.graphics.opengl.GL.polygonOffset = function(factor,units) {
+	lime.graphics.opengl.GL.context.polygonOffset(factor,units);
+};
+lime.graphics.opengl.GL.readPixels = function(x,y,width,height,format,type,pixels) {
+	lime.graphics.opengl.GL.context.readPixels(x,y,width,height,format,type,pixels);
+};
+lime.graphics.opengl.GL.renderbufferStorage = function(target,internalformat,width,height) {
+	lime.graphics.opengl.GL.context.renderbufferStorage(target,internalformat,width,height);
+};
+lime.graphics.opengl.GL.sampleCoverage = function(value,invert) {
+	lime.graphics.opengl.GL.context.sampleCoverage(value,invert);
+};
+lime.graphics.opengl.GL.scissor = function(x,y,width,height) {
+	lime.graphics.opengl.GL.context.scissor(x,y,width,height);
+};
+lime.graphics.opengl.GL.shaderSource = function(shader,source) {
+	lime.graphics.opengl.GL.context.shaderSource(shader,source);
+};
+lime.graphics.opengl.GL.stencilFunc = function(func,ref,mask) {
+	lime.graphics.opengl.GL.context.stencilFunc(func,ref,mask);
+};
+lime.graphics.opengl.GL.stencilFuncSeparate = function(face,func,ref,mask) {
+	lime.graphics.opengl.GL.context.stencilFuncSeparate(face,func,ref,mask);
+};
+lime.graphics.opengl.GL.stencilMask = function(mask) {
+	lime.graphics.opengl.GL.context.stencilMask(mask);
+};
+lime.graphics.opengl.GL.stencilMaskSeparate = function(face,mask) {
+	lime.graphics.opengl.GL.context.stencilMaskSeparate(face,mask);
+};
+lime.graphics.opengl.GL.stencilOp = function(fail,zfail,zpass) {
+	lime.graphics.opengl.GL.context.stencilOp(fail,zfail,zpass);
+};
+lime.graphics.opengl.GL.stencilOpSeparate = function(face,fail,zfail,zpass) {
+	lime.graphics.opengl.GL.context.stencilOpSeparate(face,fail,zfail,zpass);
+};
+lime.graphics.opengl.GL.texImage2D = function(target,level,internalformat,width,height,border,format,type,pixels) {
+	lime.graphics.opengl.GL.context.texImage2D(target,level,internalformat,width,height,border,format,type,pixels);
+};
+lime.graphics.opengl.GL.texParameterf = function(target,pname,param) {
+	lime.graphics.opengl.GL.context.texParameterf(target,pname,param);
+};
+lime.graphics.opengl.GL.texParameteri = function(target,pname,param) {
+	lime.graphics.opengl.GL.context.texParameteri(target,pname,param);
+};
+lime.graphics.opengl.GL.texSubImage2D = function(target,level,xoffset,yoffset,width,height,format,type,pixels) {
+	lime.graphics.opengl.GL.context.texSubImage2D(target,level,xoffset,yoffset,width,height,format,type,pixels);
+};
+lime.graphics.opengl.GL.uniform1f = function(location,x) {
+	lime.graphics.opengl.GL.context.uniform1f(location,x);
+};
+lime.graphics.opengl.GL.uniform1fv = function(location,x) {
+	lime.graphics.opengl.GL.context.uniform1fv(location,x);
+};
+lime.graphics.opengl.GL.uniform1i = function(location,x) {
+	lime.graphics.opengl.GL.context.uniform1i(location,x);
+};
+lime.graphics.opengl.GL.uniform1iv = function(location,v) {
+	lime.graphics.opengl.GL.context.uniform1iv(location,v);
+};
+lime.graphics.opengl.GL.uniform2f = function(location,x,y) {
+	lime.graphics.opengl.GL.context.uniform2f(location,x,y);
+};
+lime.graphics.opengl.GL.uniform2fv = function(location,v) {
+	lime.graphics.opengl.GL.context.uniform2fv(location,v);
+};
+lime.graphics.opengl.GL.uniform2i = function(location,x,y) {
+	lime.graphics.opengl.GL.context.uniform2i(location,x,y);
+};
+lime.graphics.opengl.GL.uniform2iv = function(location,v) {
+	lime.graphics.opengl.GL.context.uniform2iv(location,v);
+};
+lime.graphics.opengl.GL.uniform3f = function(location,x,y,z) {
+	lime.graphics.opengl.GL.context.uniform3f(location,x,y,z);
+};
+lime.graphics.opengl.GL.uniform3fv = function(location,v) {
+	lime.graphics.opengl.GL.context.uniform3fv(location,v);
+};
+lime.graphics.opengl.GL.uniform3i = function(location,x,y,z) {
+	lime.graphics.opengl.GL.context.uniform3i(location,x,y,z);
+};
+lime.graphics.opengl.GL.uniform3iv = function(location,v) {
+	lime.graphics.opengl.GL.context.uniform3iv(location,v);
+};
+lime.graphics.opengl.GL.uniform4f = function(location,x,y,z,w) {
+	lime.graphics.opengl.GL.context.uniform4f(location,x,y,z,w);
+};
+lime.graphics.opengl.GL.uniform4fv = function(location,v) {
+	lime.graphics.opengl.GL.context.uniform4fv(location,v);
+};
+lime.graphics.opengl.GL.uniform4i = function(location,x,y,z,w) {
+	lime.graphics.opengl.GL.context.uniform4i(location,x,y,z,w);
+};
+lime.graphics.opengl.GL.uniform4iv = function(location,v) {
+	lime.graphics.opengl.GL.context.uniform4iv(location,v);
+};
+lime.graphics.opengl.GL.uniformMatrix2fv = function(location,transpose,v) {
+	lime.graphics.opengl.GL.context.uniformMatrix2fv(location,transpose,v);
+};
+lime.graphics.opengl.GL.uniformMatrix3fv = function(location,transpose,v) {
+	lime.graphics.opengl.GL.context.uniformMatrix3fv(location,transpose,v);
+};
+lime.graphics.opengl.GL.uniformMatrix4fv = function(location,transpose,v) {
+	lime.graphics.opengl.GL.context.uniformMatrix4fv(location,transpose,v);
+};
+lime.graphics.opengl.GL.useProgram = function(program) {
+	lime.graphics.opengl.GL.context.useProgram(program);
+};
+lime.graphics.opengl.GL.validateProgram = function(program) {
+	lime.graphics.opengl.GL.context.validateProgram(program);
+};
+lime.graphics.opengl.GL.vertexAttrib1f = function(indx,x) {
+	lime.graphics.opengl.GL.context.vertexAttrib1f(indx,x);
+};
+lime.graphics.opengl.GL.vertexAttrib1fv = function(indx,values) {
+	lime.graphics.opengl.GL.context.vertexAttrib1fv(indx,values);
+};
+lime.graphics.opengl.GL.vertexAttrib2f = function(indx,x,y) {
+	lime.graphics.opengl.GL.context.vertexAttrib2f(indx,x,y);
+};
+lime.graphics.opengl.GL.vertexAttrib2fv = function(indx,values) {
+	lime.graphics.opengl.GL.context.vertexAttrib2fv(indx,values);
+};
+lime.graphics.opengl.GL.vertexAttrib3f = function(indx,x,y,z) {
+	lime.graphics.opengl.GL.context.vertexAttrib3f(indx,x,y,z);
+};
+lime.graphics.opengl.GL.vertexAttrib3fv = function(indx,values) {
+	lime.graphics.opengl.GL.context.vertexAttrib3fv(indx,values);
+};
+lime.graphics.opengl.GL.vertexAttrib4f = function(indx,x,y,z,w) {
+	lime.graphics.opengl.GL.context.vertexAttrib4f(indx,x,y,z,w);
+};
+lime.graphics.opengl.GL.vertexAttrib4fv = function(indx,values) {
+	lime.graphics.opengl.GL.context.vertexAttrib4fv(indx,values);
+};
+lime.graphics.opengl.GL.vertexAttribPointer = function(indx,size,type,normalized,stride,offset) {
+	lime.graphics.opengl.GL.context.vertexAttribPointer(indx,size,type,normalized,stride,offset);
+};
+lime.graphics.opengl.GL.viewport = function(x,y,width,height) {
+	lime.graphics.opengl.GL.context.viewport(x,y,width,height);
+};
+lime.graphics.opengl.GL.get_version = function() {
+	return 2;
+};
+lime.graphics.utils = {};
+lime.graphics.utils.ImageCanvasUtil = function() { };
+$hxClasses["lime.graphics.utils.ImageCanvasUtil"] = lime.graphics.utils.ImageCanvasUtil;
+lime.graphics.utils.ImageCanvasUtil.__name__ = true;
+lime.graphics.utils.ImageCanvasUtil.colorTransform = function(image,rect,colorMatrix) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	lime.graphics.utils.ImageDataUtil.colorTransform(image,rect,colorMatrix);
+};
+lime.graphics.utils.ImageCanvasUtil.convertToCanvas = function(image) {
+	var buffer = image.buffer;
+	if(buffer.__srcImage != null) {
+		if(buffer.__srcCanvas == null) {
+			lime.graphics.utils.ImageCanvasUtil.createCanvas(image,buffer.__srcImage.width,buffer.__srcImage.height);
+			buffer.__srcContext.drawImage(buffer.__srcImage,0,0);
+		}
+		buffer.__srcImage = null;
+	}
+};
+lime.graphics.utils.ImageCanvasUtil.convertToData = function(image) {
+	if(image.buffer.data == null) {
+		lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+		lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+		image.buffer.__srcCanvas = null;
+		image.buffer.__srcContext = null;
+	}
+};
+lime.graphics.utils.ImageCanvasUtil.copyChannel = function(image,sourceImage,sourceRect,destPoint,sourceChannel,destChannel) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(sourceImage);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(sourceImage);
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	lime.graphics.utils.ImageDataUtil.copyChannel(image,sourceImage,sourceRect,destPoint,sourceChannel,destChannel);
+};
+lime.graphics.utils.ImageCanvasUtil.copyPixels = function(image,sourceImage,sourceRect,destPoint,alphaImage,alphaPoint,mergeAlpha) {
+	if(mergeAlpha == null) mergeAlpha = false;
+	if(alphaImage != null && alphaImage.get_transparent()) {
+		if(alphaPoint == null) alphaPoint = new lime.math.Vector2();
+		var tempData = image.clone();
+		tempData.copyChannel(alphaImage,new lime.math.Rectangle(alphaPoint.x,alphaPoint.y,sourceRect.width,sourceRect.height),new lime.math.Vector2(sourceRect.x,sourceRect.y),lime.graphics.ImageChannel.ALPHA,lime.graphics.ImageChannel.ALPHA);
+		sourceImage = tempData;
+	}
+	lime.graphics.utils.ImageCanvasUtil.sync(image);
+	if(!mergeAlpha) {
+		if(image.get_transparent() && sourceImage.get_transparent()) image.buffer.__srcContext.clearRect(destPoint.x + image.offsetX,destPoint.y + image.offsetY,sourceRect.width + image.offsetX,sourceRect.height + image.offsetY);
+	}
+	lime.graphics.utils.ImageCanvasUtil.sync(sourceImage);
+	if(sourceImage.buffer.get_src() != null) image.buffer.__srcContext.drawImage(sourceImage.buffer.get_src(),sourceRect.x + sourceImage.offsetX | 0,sourceRect.y + sourceImage.offsetY | 0,sourceRect.width | 0,sourceRect.height | 0,destPoint.x + image.offsetX | 0,destPoint.y + image.offsetY | 0,sourceRect.width | 0,sourceRect.height | 0);
+};
+lime.graphics.utils.ImageCanvasUtil.createCanvas = function(image,width,height) {
+	var buffer = image.buffer;
+	if(buffer.__srcCanvas == null) {
+		buffer.__srcCanvas = window.document.createElement("canvas");
+		buffer.__srcCanvas.width = width;
+		buffer.__srcCanvas.height = height;
+		if(!image.get_transparent()) {
+			if(!image.get_transparent()) buffer.__srcCanvas.setAttribute("moz-opaque","true");
+			buffer.__srcContext = buffer.__srcCanvas.getContext ("2d", { alpha: false });
+		} else buffer.__srcContext = buffer.__srcCanvas.getContext("2d");
+		buffer.__srcContext.mozImageSmoothingEnabled = false;
+		buffer.__srcContext.webkitImageSmoothingEnabled = false;
+		buffer.__srcContext.imageSmoothingEnabled = false;
+	}
+};
+lime.graphics.utils.ImageCanvasUtil.createImageData = function(image) {
+	var buffer = image.buffer;
+	if(buffer.data == null) {
+		buffer.__srcImageData = buffer.__srcContext.getImageData(0,0,buffer.width,buffer.height);
+		if(image.type == lime.graphics.ImageType.CANVAS) buffer.data = buffer.__srcImageData.data; else buffer.data = new Uint8Array(buffer.__srcImageData.data);
+	}
+};
+lime.graphics.utils.ImageCanvasUtil.fillRect = function(image,rect,color) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.sync(image);
+	if(rect.x == 0 && rect.y == 0 && rect.width == image.width && rect.height == image.height) {
+		if(image.get_transparent() && (color & -16777216) == 0) {
+			image.buffer.__srcCanvas.width = image.buffer.width;
+			return;
+		}
+	}
+	var a;
+	if(image.get_transparent()) a = (color & -16777216) >>> 24; else a = 255;
+	var r = (color & 16711680) >>> 16;
+	var g = (color & 65280) >>> 8;
+	var b = color & 255;
+	image.buffer.__srcContext.fillStyle = "rgba(" + r + ", " + g + ", " + b + ", " + a / 255 + ")";
+	image.buffer.__srcContext.fillRect(rect.x + image.offsetX,rect.y + image.offsetY,rect.width + image.offsetX,rect.height + image.offsetY);
+};
+lime.graphics.utils.ImageCanvasUtil.floodFill = function(image,x,y,color) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	lime.graphics.utils.ImageDataUtil.floodFill(image,x,y,color);
+};
+lime.graphics.utils.ImageCanvasUtil.getPixel = function(image,x,y) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	return lime.graphics.utils.ImageDataUtil.getPixel(image,x,y);
+};
+lime.graphics.utils.ImageCanvasUtil.getPixel32 = function(image,x,y) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	return lime.graphics.utils.ImageDataUtil.getPixel32(image,x,y);
+};
+lime.graphics.utils.ImageCanvasUtil.getPixels = function(image,rect) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	return lime.graphics.utils.ImageDataUtil.getPixels(image,rect);
+};
+lime.graphics.utils.ImageCanvasUtil.resize = function(image,newWidth,newHeight) {
+	var buffer = image.buffer;
+	if(buffer.__srcCanvas == null) {
+		lime.graphics.utils.ImageCanvasUtil.createCanvas(image,newWidth,newHeight);
+		buffer.__srcContext.drawImage(buffer.get_src(),0,0,newWidth,newHeight);
+	} else {
+		var sourceCanvas = buffer.__srcCanvas;
+		buffer.__srcCanvas = null;
+		lime.graphics.utils.ImageCanvasUtil.createCanvas(image,newWidth,newHeight);
+		buffer.__srcContext.drawImage(sourceCanvas,0,0,newWidth,newHeight);
+	}
+};
+lime.graphics.utils.ImageCanvasUtil.setPixel = function(image,x,y,color) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	lime.graphics.utils.ImageDataUtil.setPixel(image,x,y,color);
+};
+lime.graphics.utils.ImageCanvasUtil.setPixel32 = function(image,x,y,color) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	lime.graphics.utils.ImageDataUtil.setPixel32(image,x,y,color);
+};
+lime.graphics.utils.ImageCanvasUtil.setPixels = function(image,rect,byteArray) {
+	lime.graphics.utils.ImageCanvasUtil.convertToCanvas(image);
+	lime.graphics.utils.ImageCanvasUtil.createImageData(image);
+	lime.graphics.utils.ImageDataUtil.setPixels(image,rect,byteArray);
+};
+lime.graphics.utils.ImageCanvasUtil.sync = function(image) {
+	if(image.dirty && image.type != lime.graphics.ImageType.DATA) {
+		image.buffer.__srcContext.putImageData(image.buffer.__srcImageData,0,0);
+		image.buffer.data = null;
+		image.dirty = false;
+	}
+};
+lime.graphics.utils.ImageDataUtil = function() { };
+$hxClasses["lime.graphics.utils.ImageDataUtil"] = lime.graphics.utils.ImageDataUtil;
+lime.graphics.utils.ImageDataUtil.__name__ = true;
+lime.graphics.utils.ImageDataUtil.colorTransform = function(image,rect,colorMatrix) {
+	var data = image.buffer.data;
+	var stride = image.buffer.width * 4;
+	var offset;
+	var rowStart = Std["int"](rect.get_top() + image.offsetY);
+	var rowEnd = Std["int"](rect.get_bottom() + image.offsetY);
+	var columnStart = Std["int"](rect.get_left() + image.offsetX);
+	var columnEnd = Std["int"](rect.get_right() + image.offsetX);
+	var r;
+	var g;
+	var b;
+	var a;
+	var ex = 0;
+	var _g = rowStart;
+	while(_g < rowEnd) {
+		var row = _g++;
+		var _g1 = columnStart;
+		while(_g1 < columnEnd) {
+			var column = _g1++;
+			offset = row * stride + column * 4;
+			a = data[offset + 3] * colorMatrix[18] + colorMatrix[19] * 255 | 0;
+			if(a > 255) ex = a - 255; else ex = 0;
+			b = data[offset + 2] * colorMatrix[12] + colorMatrix[14] * 255 + ex | 0;
+			if(b > 255) ex = b - 255; else ex = 0;
+			g = data[offset + 1] * colorMatrix[6] + colorMatrix[9] * 255 + ex | 0;
+			if(g > 255) ex = g - 255; else ex = 0;
+			r = data[offset] * colorMatrix[0] + colorMatrix[4] * 255 + ex | 0;
+			if(r > 255) data[offset] = 255; else data[offset] = r;
+			if(g > 255) data[offset + 1] = 255; else data[offset + 1] = g;
+			if(b > 255) data[offset + 2] = 255; else data[offset + 2] = b;
+			if(a > 255) data[offset + 3] = 255; else data[offset + 3] = a;
+		}
+	}
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.copyChannel = function(image,sourceImage,sourceRect,destPoint,sourceChannel,destChannel) {
+	var destIdx;
+	switch(destChannel[1]) {
+	case 0:
+		destIdx = 0;
+		break;
+	case 1:
+		destIdx = 1;
+		break;
+	case 2:
+		destIdx = 2;
+		break;
+	case 3:
+		destIdx = 3;
+		break;
+	}
+	var srcIdx;
+	switch(sourceChannel[1]) {
+	case 0:
+		srcIdx = 0;
+		break;
+	case 1:
+		srcIdx = 1;
+		break;
+	case 2:
+		srcIdx = 2;
+		break;
+	case 3:
+		srcIdx = 3;
+		break;
+	}
+	var srcStride = sourceImage.buffer.width * 4 | 0;
+	var srcPosition = (sourceRect.x + sourceImage.offsetX) * 4 + srcStride * (sourceRect.y + sourceImage.offsetY) + srcIdx | 0;
+	var srcRowOffset = srcStride - (4 * (sourceRect.width + sourceImage.offsetX) | 0);
+	var srcRowEnd = 4 * (sourceRect.x + sourceImage.offsetX + sourceRect.width) | 0;
+	var srcData = sourceImage.buffer.data;
+	var destStride = image.buffer.width * 4 | 0;
+	var destPosition = (destPoint.x + image.offsetX) * 4 + destStride * (destPoint.y + image.offsetY) + destIdx | 0;
+	var destRowOffset = destStride - (4 * (sourceRect.width + image.offsetX) | 0);
+	var destRowEnd = 4 * (destPoint.x + image.offsetX + sourceRect.width) | 0;
+	var destData = image.buffer.data;
+	var length = sourceRect.width * sourceRect.height | 0;
+	var _g = 0;
+	while(_g < length) {
+		var i = _g++;
+		destData[destPosition] = srcData[srcPosition];
+		srcPosition += 4;
+		destPosition += 4;
+		if(srcPosition % srcStride > srcRowEnd) srcPosition += srcRowOffset;
+		if(destPosition % destStride > destRowEnd) destPosition += destRowOffset;
+	}
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.copyPixels = function(image,sourceImage,sourceRect,destPoint,alphaImage,alphaPoint,mergeAlpha) {
+	if(mergeAlpha == null) mergeAlpha = false;
+	if(alphaImage != null && alphaImage.get_transparent()) {
+		if(alphaPoint == null) alphaPoint = new lime.math.Vector2();
+		var tempData = image.clone();
+		tempData.copyChannel(alphaImage,new lime.math.Rectangle(alphaPoint.x,alphaPoint.y,sourceRect.width,sourceRect.height),new lime.math.Vector2(sourceRect.x,sourceRect.y),lime.graphics.ImageChannel.ALPHA,lime.graphics.ImageChannel.ALPHA);
+		sourceImage = tempData;
+	}
+	var rowOffset = destPoint.y + image.offsetY - sourceRect.y - sourceImage.offsetY | 0;
+	var columnOffset = destPoint.x + image.offsetX - sourceRect.x - sourceImage.offsetY | 0;
+	var sourceData = sourceImage.buffer.data;
+	var sourceStride = sourceImage.buffer.width * 4;
+	var sourceOffset = 0;
+	var data = image.buffer.data;
+	var stride = image.buffer.width * 4;
+	var offset = 0;
+	if(!mergeAlpha || !sourceImage.get_transparent()) {
+		var _g1 = Std["int"](sourceRect.get_top() + sourceImage.offsetY);
+		var _g = Std["int"](sourceRect.get_bottom() + sourceImage.offsetY);
+		while(_g1 < _g) {
+			var row = _g1++;
+			var _g3 = Std["int"](sourceRect.get_left() + sourceImage.offsetX);
+			var _g2 = Std["int"](sourceRect.get_right() + sourceImage.offsetX);
+			while(_g3 < _g2) {
+				var column = _g3++;
+				sourceOffset = row * sourceStride + column * 4;
+				offset = (row + rowOffset) * stride + (column + columnOffset) * 4;
+				data[offset] = sourceData[sourceOffset];
+				data[offset + 1] = sourceData[sourceOffset + 1];
+				data[offset + 2] = sourceData[sourceOffset + 2];
+				data[offset + 3] = sourceData[sourceOffset + 3];
+			}
+		}
+	} else {
+		var sourceAlpha;
+		var oneMinusSourceAlpha;
+		var _g11 = Std["int"](sourceRect.get_top() + sourceImage.offsetY);
+		var _g4 = Std["int"](sourceRect.get_bottom() + sourceImage.offsetY);
+		while(_g11 < _g4) {
+			var row1 = _g11++;
+			var _g31 = Std["int"](sourceRect.get_left() + sourceImage.offsetX);
+			var _g21 = Std["int"](sourceRect.get_right() + sourceImage.offsetX);
+			while(_g31 < _g21) {
+				var column1 = _g31++;
+				sourceOffset = row1 * sourceStride + column1 * 4;
+				offset = (row1 + rowOffset) * stride + (column1 + columnOffset) * 4;
+				sourceAlpha = sourceData[sourceOffset + 3] / 255;
+				oneMinusSourceAlpha = 1 - sourceAlpha;
+				data[offset] = lime.graphics.utils.ImageDataUtil.__clamp[sourceData[sourceOffset] + data[offset] * oneMinusSourceAlpha | 0];
+				data[offset + 1] = lime.graphics.utils.ImageDataUtil.__clamp[sourceData[sourceOffset + 1] + data[offset + 1] * oneMinusSourceAlpha | 0];
+				data[offset + 2] = lime.graphics.utils.ImageDataUtil.__clamp[sourceData[sourceOffset + 2] + data[offset + 2] * oneMinusSourceAlpha | 0];
+				data[offset + 3] = lime.graphics.utils.ImageDataUtil.__clamp[sourceData[sourceOffset + 3] + data[offset + 3] * oneMinusSourceAlpha | 0];
+			}
+		}
+	}
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.fillRect = function(image,rect,color) {
+	var a;
+	if(image.get_transparent()) a = (color & -16777216) >>> 24; else a = 255;
+	var r = (color & 16711680) >>> 16;
+	var g = (color & 65280) >>> 8;
+	var b = color & 255;
+	var rgba = r | g << 8 | b << 16 | a << 24;
+	var data = image.buffer.data;
+	if(rect.width == image.buffer.width && rect.height == image.buffer.height && rect.x == 0 && rect.y == 0 && image.offsetX == 0 && image.offsetY == 0) {
+		var length = image.buffer.width * image.buffer.height;
+		var _g = 0;
+		while(_g < length) {
+			var i = _g++;
+			data[i] = r;
+			data[i + 1] = g;
+			data[i + 2] = b;
+			data[i + 3] = a;
+		}
+	} else {
+		var stride = image.buffer.width * 4;
+		var offset;
+		var rowStart = rect.y + image.offsetY | 0;
+		var rowEnd = Std["int"](rect.get_bottom() + image.offsetY);
+		var columnStart = rect.x + image.offsetX | 0;
+		var columnEnd = Std["int"](rect.get_right() + image.offsetX);
+		var _g1 = rowStart;
+		while(_g1 < rowEnd) {
+			var row = _g1++;
+			var _g11 = columnStart;
+			while(_g11 < columnEnd) {
+				var column = _g11++;
+				offset = row * stride + column * 4;
+				data[offset] = r;
+				data[offset + 1] = g;
+				data[offset + 2] = b;
+				data[offset + 3] = a;
+			}
+		}
+	}
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.floodFill = function(image,x,y,color) {
+	var data = image.buffer.data;
+	var offset = (y + image.offsetY) * (image.buffer.width * 4) + (x + image.offsetX) * 4;
+	var hitColorR = data[offset];
+	var hitColorG = data[offset + 1];
+	var hitColorB = data[offset + 2];
+	var hitColorA;
+	if(image.get_transparent()) hitColorA = data[offset + 3]; else hitColorA = 255;
+	var r = (color & 16711680) >>> 16;
+	var g = (color & 65280) >>> 8;
+	var b = color & 255;
+	var a;
+	if(image.get_transparent()) a = (color & -16777216) >>> 24; else a = 255;
+	if(hitColorR == r && hitColorG == g && hitColorB == b && hitColorA == a) return;
+	var dx = [0,-1,1,0];
+	var dy = [-1,0,0,1];
+	var minX = -image.offsetX;
+	var minY = -image.offsetY;
+	var maxX = minX + image.width;
+	var maxY = minY + image.height;
+	var queue = new Array();
+	queue.push(x);
+	queue.push(y);
+	while(queue.length > 0) {
+		var curPointY = queue.pop();
+		var curPointX = queue.pop();
+		var _g = 0;
+		while(_g < 4) {
+			var i = _g++;
+			var nextPointX = curPointX + dx[i];
+			var nextPointY = curPointY + dy[i];
+			if(nextPointX < minX || nextPointY < minY || nextPointX >= maxX || nextPointY >= maxY) continue;
+			var nextPointOffset = (nextPointY * image.width + nextPointX) * 4;
+			if(data[nextPointOffset] == hitColorR && data[nextPointOffset + 1] == hitColorG && data[nextPointOffset + 2] == hitColorB && data[nextPointOffset + 3] == hitColorA) {
+				data[nextPointOffset] = r;
+				data[nextPointOffset + 1] = g;
+				data[nextPointOffset + 2] = b;
+				data[nextPointOffset + 3] = a;
+				queue.push(nextPointX);
+				queue.push(nextPointY);
+			}
+		}
+	}
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.getPixel = function(image,x,y) {
+	var data = image.buffer.data;
+	var offset = 4 * (y + image.offsetY) * image.buffer.width + (x + image.offsetX) * 4;
+	if(image.get_premultiplied()) {
+		var unmultiply = 255.0 / data[offset + 3];
+		haxe.Log.trace(unmultiply,{ fileName : "ImageDataUtil.hx", lineNumber : 361, className : "lime.graphics.utils.ImageDataUtil", methodName : "getPixel"});
+		return lime.graphics.utils.ImageDataUtil.__clamp[data[offset] * unmultiply | 0] << 16 | lime.graphics.utils.ImageDataUtil.__clamp[data[offset + 1] * unmultiply | 0] << 8 | lime.graphics.utils.ImageDataUtil.__clamp[data[offset + 2] * unmultiply | 0];
+	} else return data[offset] << 16 | data[offset + 1] << 8 | data[offset + 2];
+};
+lime.graphics.utils.ImageDataUtil.getPixel32 = function(image,x,y) {
+	var data = image.buffer.data;
+	var offset = 4 * (y + image.offsetY) * image.buffer.width + (x + image.offsetX) * 4;
+	var a;
+	if(image.get_transparent()) a = data[offset + 3]; else a = 255;
+	if(image.get_premultiplied() && a != 0) {
+		var unmultiply = 255.0 / a;
+		return a << 24 | (function($this) {
+			var $r;
+			var index = Math.round(data[offset] * unmultiply);
+			$r = lime.graphics.utils.ImageDataUtil.__clamp[index];
+			return $r;
+		}(this)) << 16 | lime.graphics.utils.ImageDataUtil.__clamp[data[offset + 1] * unmultiply | 0] << 8 | lime.graphics.utils.ImageDataUtil.__clamp[data[offset + 2] * unmultiply | 0];
+	} else return a << 24 | data[offset] << 16 | data[offset + 1] << 8 | data[offset + 2];
+};
+lime.graphics.utils.ImageDataUtil.getPixels = function(image,rect) {
+	var byteArray = new lime.utils.ByteArray(image.width * image.height * 4);
+	var srcData = image.buffer.data;
+	var srcStride = image.buffer.width * 4 | 0;
+	var srcPosition = rect.x * 4 + srcStride * rect.y | 0;
+	var srcRowOffset = srcStride - (4 * rect.width | 0);
+	var srcRowEnd = 4 * (rect.x + rect.width) | 0;
+	var length = 4 * rect.width * rect.height | 0;
+	if(byteArray.allocated < length) byteArray.___resizeBuffer(byteArray.allocated = Std["int"](Math.max(length,byteArray.allocated * 2))); else if(byteArray.allocated > length) byteArray.___resizeBuffer(byteArray.allocated = length);
+	byteArray.length = length;
+	length;
+	var _g = 0;
+	while(_g < length) {
+		var i = _g++;
+		byteArray.__set(i,srcData[srcPosition++]);
+		if(srcPosition % srcStride > srcRowEnd) srcPosition += srcRowOffset;
+	}
+	byteArray.position = 0;
+	return byteArray;
+};
+lime.graphics.utils.ImageDataUtil.multiplyAlpha = function(image) {
+	var data = image.buffer.data;
+	if(data == null) return;
+	var index;
+	var a16;
+	var length = data.length / 4 | 0;
+	var _g = 0;
+	while(_g < length) {
+		var i = _g++;
+		index = i * 4;
+		var a161 = lime.graphics.utils.ImageDataUtil.__alpha16[data[index + 3]];
+		data[index] = data[index] * a161 >> 16;
+		data[index + 1] = data[index + 1] * a161 >> 16;
+		data[index + 2] = data[index + 2] * a161 >> 16;
+	}
+	image.buffer.premultiplied = true;
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.resize = function(image,newWidth,newHeight) {
+	var buffer = image.buffer;
+	var newBuffer = new lime.graphics.ImageBuffer(new Uint8Array(newWidth * newHeight * 4),newWidth,newHeight);
+	var imageWidth = image.width;
+	var imageHeight = image.height;
+	var data = image.get_data();
+	var newData = newBuffer.data;
+	var sourceIndex;
+	var sourceIndexX;
+	var sourceIndexY;
+	var sourceIndexXY;
+	var index;
+	var sourceX;
+	var sourceY;
+	var u;
+	var v;
+	var uRatio;
+	var vRatio;
+	var uOpposite;
+	var vOpposite;
+	var _g = 0;
+	while(_g < newHeight) {
+		var y = _g++;
+		var _g1 = 0;
+		while(_g1 < newWidth) {
+			var x = _g1++;
+			u = (x + 0.5) / newWidth * imageWidth - 0.5;
+			v = (y + 0.5) / newHeight * imageHeight - 0.5;
+			sourceX = u | 0;
+			sourceY = v | 0;
+			sourceIndex = (sourceY * imageWidth + sourceX) * 4;
+			if(sourceX < imageWidth - 1) sourceIndexX = sourceIndex + 4; else sourceIndexX = sourceIndex;
+			if(sourceY < imageHeight - 1) sourceIndexY = sourceIndex + imageWidth * 4; else sourceIndexY = sourceIndex;
+			if(sourceIndexX != sourceIndex) sourceIndexXY = sourceIndexY + 4; else sourceIndexXY = sourceIndexY;
+			index = (y * newWidth + x) * 4;
+			uRatio = u - sourceX;
+			vRatio = v - sourceY;
+			uOpposite = 1 - uRatio;
+			vOpposite = 1 - vRatio;
+			newData[index] = (data[sourceIndex] * uOpposite + data[sourceIndexX] * uRatio) * vOpposite + (data[sourceIndexY] * uOpposite + data[sourceIndexXY] * uRatio) * vRatio | 0;
+			newData[index + 1] = (data[sourceIndex + 1] * uOpposite + data[sourceIndexX + 1] * uRatio) * vOpposite + (data[sourceIndexY + 1] * uOpposite + data[sourceIndexXY + 1] * uRatio) * vRatio | 0;
+			newData[index + 2] = (data[sourceIndex + 2] * uOpposite + data[sourceIndexX + 2] * uRatio) * vOpposite + (data[sourceIndexY + 2] * uOpposite + data[sourceIndexXY + 2] * uRatio) * vRatio | 0;
+			if(data[sourceIndexX + 3] == 0 || data[sourceIndexY + 3] == 0 || data[sourceIndexXY + 3] == 0) newData[index + 3] = 0; else newData[index + 3] = data[sourceIndex + 3];
+		}
+	}
+	buffer.data = newData;
+	buffer.width = newWidth;
+	buffer.height = newHeight;
+};
+lime.graphics.utils.ImageDataUtil.resizeBuffer = function(image,newWidth,newHeight) {
+	var buffer = image.buffer;
+	var data = image.get_data();
+	var newData = new Uint8Array(newWidth * newHeight * 4);
+	var sourceIndex;
+	var index;
+	var _g1 = 0;
+	var _g = buffer.height;
+	while(_g1 < _g) {
+		var y = _g1++;
+		var _g3 = 0;
+		var _g2 = buffer.width;
+		while(_g3 < _g2) {
+			var x = _g3++;
+			sourceIndex = (y * buffer.width + x) * 4;
+			index = (y * newWidth + x) * 4;
+			newData[index] = data[sourceIndex];
+			newData[index + 1] = data[sourceIndex + 1];
+			newData[index + 2] = data[sourceIndex + 2];
+			newData[index + 3] = data[sourceIndex + 3];
+		}
+	}
+	buffer.data = newData;
+	buffer.width = newWidth;
+	buffer.height = newHeight;
+};
+lime.graphics.utils.ImageDataUtil.setPixel = function(image,x,y,color) {
+	var data = image.buffer.data;
+	var offset = 4 * (y + image.offsetY) * image.buffer.width + (x + image.offsetX) * 4;
+	data[offset] = (color & 16711680) >>> 16;
+	data[offset + 1] = (color & 65280) >>> 8;
+	data[offset + 2] = color & 255;
+	if(image.get_transparent()) data[offset + 3] = 255;
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.setPixel32 = function(image,x,y,color) {
+	var data = image.buffer.data;
+	var offset = 4 * (y + image.offsetY) * image.buffer.width + (x + image.offsetX) * 4;
+	var a;
+	if(image.get_transparent()) a = (color & -16777216) >>> 24; else a = 255;
+	if(image.get_transparent() && image.get_premultiplied()) {
+		var a16 = lime.graphics.utils.ImageDataUtil.__alpha16[a];
+		data[offset] = ((color & 16711680) >>> 16) * a16 >> 16;
+		data[offset + 1] = ((color & 65280) >>> 8) * a16 >> 16;
+		data[offset + 2] = (color & 255) * a16 >> 16;
+		data[offset + 3] = a;
+	} else {
+		data[offset] = (color & 16711680) >>> 16;
+		data[offset + 1] = (color & 65280) >>> 8;
+		data[offset + 2] = color & 255;
+		data[offset + 3] = a;
+	}
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.setPixels = function(image,rect,byteArray) {
+	var len = Math.round(4 * rect.width * rect.height);
+	var data = image.buffer.data;
+	var offset = Math.round(4 * image.buffer.width * (rect.y + image.offsetX) + (rect.x + image.offsetY) * 4);
+	var pos = offset;
+	var boundR = Math.round(4 * (rect.x + rect.width + image.offsetX));
+	var width = image.buffer.width;
+	var _g = 0;
+	while(_g < len) {
+		var i = _g++;
+		if(pos % (width * 4) > boundR - 1) pos += width * 4 - boundR;
+		data[pos] = byteArray.readByte();
+		pos++;
+	}
+	image.dirty = true;
+};
+lime.graphics.utils.ImageDataUtil.unmultiplyAlpha = function(image) {
+	var data = image.buffer.data;
+	var index;
+	var a;
+	var unmultiply;
+	var length = data.length / 4 | 0;
+	var _g = 0;
+	while(_g < length) {
+		var i = _g++;
+		index = i * 4;
+		a = data[index + 3];
+		if(a != 0) {
+			unmultiply = 255.0 / a;
+			data[index] = lime.graphics.utils.ImageDataUtil.__clamp[data[index] * unmultiply | 0];
+			data[index + 1] = lime.graphics.utils.ImageDataUtil.__clamp[data[index + 1] * unmultiply | 0];
+			data[index + 2] = lime.graphics.utils.ImageDataUtil.__clamp[data[index + 2] * unmultiply | 0];
+		}
+	}
+	image.buffer.premultiplied = false;
+	image.dirty = true;
+};
+lime.math = {};
+lime.math._ColorMatrix = {};
+lime.math._ColorMatrix.ColorMatrix_Impl_ = function() { };
+$hxClasses["lime.math._ColorMatrix.ColorMatrix_Impl_"] = lime.math._ColorMatrix.ColorMatrix_Impl_;
+lime.math._ColorMatrix.ColorMatrix_Impl_.__name__ = true;
+lime.math._ColorMatrix.ColorMatrix_Impl_._new = function(data) {
+	var this1;
+	if(data != null && data.length == 20) this1 = data; else this1 = new Float32Array(lime.math._ColorMatrix.ColorMatrix_Impl_.__identity);
+	return this1;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.clone = function(this1) {
+	return lime.math._ColorMatrix.ColorMatrix_Impl_._new(new Float32Array(this1));
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.concat = function(this1,second) {
+	var _g = this1;
+	var value = _g[0] + second[0];
+	_g[0] = value;
+	value;
+	var _g1 = this1;
+	var value1 = _g1[6] + second[6];
+	_g1[6] = value1;
+	value1;
+	var _g2 = this1;
+	var value2 = _g2[12] + second[12];
+	_g2[12] = value2;
+	value2;
+	var _g3 = this1;
+	var value3 = _g3[18] + second[18];
+	_g3[18] = value3;
+	value3;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.copyFrom = function(this1,other) {
+	this1.set(other);
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.identity = function(this1) {
+	this1[0] = 1;
+	this1[1] = 0;
+	this1[2] = 0;
+	this1[3] = 0;
+	this1[4] = 0;
+	this1[5] = 0;
+	this1[6] = 1;
+	this1[7] = 0;
+	this1[8] = 0;
+	this1[9] = 0;
+	this1[10] = 0;
+	this1[11] = 0;
+	this1[12] = 1;
+	this1[13] = 0;
+	this1[14] = 0;
+	this1[15] = 0;
+	this1[16] = 0;
+	this1[17] = 0;
+	this1[18] = 1;
+	this1[19] = 0;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.__toFlashColorTransform = function(this1) {
+	return null;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_alphaMultiplier = function(this1) {
+	return this1[18];
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_alphaMultiplier = function(this1,value) {
+	this1[18] = value;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_alphaOffset = function(this1) {
+	return this1[19] * 255;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_alphaOffset = function(this1,value) {
+	this1[19] = value / 255;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_blueMultiplier = function(this1) {
+	return this1[12];
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_blueMultiplier = function(this1,value) {
+	this1[12] = value;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_blueOffset = function(this1) {
+	return this1[14] * 255;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_blueOffset = function(this1,value) {
+	this1[14] = value / 255;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_color = function(this1) {
+	return (this1[4] * 255 | 0) << 16 | (this1[9] * 255 | 0) << 8 | (this1[14] * 255 | 0);
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_color = function(this1,value) {
+	var value1 = value >> 16 & 255;
+	this1[4] = value1 / 255;
+	value1;
+	var value2 = value >> 8 & 255;
+	this1[9] = value2 / 255;
+	value2;
+	var value3 = value & 255;
+	this1[14] = value3 / 255;
+	value3;
+	this1[0] = 0;
+	0;
+	this1[6] = 0;
+	0;
+	this1[12] = 0;
+	0;
+	return lime.math._ColorMatrix.ColorMatrix_Impl_.get_color(this1);
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_greenMultiplier = function(this1) {
+	return this1[6];
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_greenMultiplier = function(this1,value) {
+	this1[6] = value;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_greenOffset = function(this1) {
+	return this1[9] * 255;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_greenOffset = function(this1,value) {
+	this1[9] = value / 255;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_redMultiplier = function(this1) {
+	return this1[0];
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_redMultiplier = function(this1,value) {
+	this1[0] = value;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get_redOffset = function(this1) {
+	return this1[4] * 255;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set_redOffset = function(this1,value) {
+	this1[4] = value / 255;
+	return value;
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.get = function(this1,index) {
+	return this1[index];
+};
+lime.math._ColorMatrix.ColorMatrix_Impl_.set = function(this1,index,value) {
+	this1[index] = value;
+	return value;
+};
+lime.math.Matrix3 = function(a,b,c,d,tx,ty) {
+	if(ty == null) ty = 0;
+	if(tx == null) tx = 0;
+	if(d == null) d = 1;
+	if(c == null) c = 0;
+	if(b == null) b = 0;
+	if(a == null) a = 1;
+	this.a = a;
+	this.b = b;
+	this.c = c;
+	this.d = d;
+	this.tx = tx;
+	this.ty = ty;
+};
+$hxClasses["lime.math.Matrix3"] = lime.math.Matrix3;
+lime.math.Matrix3.__name__ = true;
+lime.math.Matrix3.prototype = {
+	clone: function() {
+		return new lime.math.Matrix3(this.a,this.b,this.c,this.d,this.tx,this.ty);
+	}
+	,concat: function(m) {
+		var a1 = this.a * m.a + this.b * m.c;
+		this.b = this.a * m.b + this.b * m.d;
+		this.a = a1;
+		var c1 = this.c * m.a + this.d * m.c;
+		this.d = this.c * m.b + this.d * m.d;
+		this.c = c1;
+		var tx1 = this.tx * m.a + this.ty * m.c + m.tx;
+		this.ty = this.tx * m.b + this.ty * m.d + m.ty;
+		this.tx = tx1;
+	}
+	,copyColumnFrom: function(column,vector4) {
+		if(column > 2) throw "Column " + column + " out of bounds (2)"; else if(column == 0) {
+			this.a = vector4.x;
+			this.c = vector4.y;
+		} else if(column == 1) {
+			this.b = vector4.x;
+			this.d = vector4.y;
+		} else {
+			this.tx = vector4.x;
+			this.ty = vector4.y;
+		}
+	}
+	,copyColumnTo: function(column,vector4) {
+		if(column > 2) throw "Column " + column + " out of bounds (2)"; else if(column == 0) {
+			vector4.x = this.a;
+			vector4.y = this.c;
+			vector4.z = 0;
+		} else if(column == 1) {
+			vector4.x = this.b;
+			vector4.y = this.d;
+			vector4.z = 0;
+		} else {
+			vector4.x = this.tx;
+			vector4.y = this.ty;
+			vector4.z = 1;
+		}
+	}
+	,copyFrom: function(sourceMatrix3) {
+		this.a = sourceMatrix3.a;
+		this.b = sourceMatrix3.b;
+		this.c = sourceMatrix3.c;
+		this.d = sourceMatrix3.d;
+		this.tx = sourceMatrix3.tx;
+		this.ty = sourceMatrix3.ty;
+	}
+	,copyRowFrom: function(row,vector4) {
+		if(row > 2) throw "Row " + row + " out of bounds (2)"; else if(row == 0) {
+			this.a = vector4.x;
+			this.c = vector4.y;
+		} else if(row == 1) {
+			this.b = vector4.x;
+			this.d = vector4.y;
+		} else {
+			this.tx = vector4.x;
+			this.ty = vector4.y;
+		}
+	}
+	,copyRowTo: function(row,vector4) {
+		if(row > 2) throw "Row " + row + " out of bounds (2)"; else if(row == 0) {
+			vector4.x = this.a;
+			vector4.y = this.b;
+			vector4.z = this.tx;
+		} else if(row == 1) {
+			vector4.x = this.c;
+			vector4.y = this.d;
+			vector4.z = this.ty;
+		} else {
+			vector4.x = 0;
+			vector4.y = 0;
+			vector4.z = 1;
+		}
+	}
+	,createBox: function(scaleX,scaleY,rotation,tx,ty) {
+		if(ty == null) ty = 0;
+		if(tx == null) tx = 0;
+		if(rotation == null) rotation = 0;
+		this.a = scaleX;
+		this.d = scaleY;
+		this.b = rotation;
+		this.tx = tx;
+		this.ty = ty;
+	}
+	,createGradientBox: function(width,height,rotation,tx,ty) {
+		if(ty == null) ty = 0;
+		if(tx == null) tx = 0;
+		if(rotation == null) rotation = 0;
+		this.a = width / 1638.4;
+		this.d = height / 1638.4;
+		if(rotation != 0) {
+			var cos = Math.cos(rotation);
+			var sin = Math.sin(rotation);
+			this.b = sin * this.d;
+			this.c = -sin * this.a;
+			this.a *= cos;
+			this.d *= cos;
+		} else {
+			this.b = 0;
+			this.c = 0;
+		}
+		this.tx = tx + width / 2;
+		this.ty = ty + height / 2;
+	}
+	,equals: function(Matrix3) {
+		return Matrix3 != null && this.tx == Matrix3.tx && this.ty == Matrix3.ty && this.a == Matrix3.a && this.b == Matrix3.b && this.c == Matrix3.c && this.d == Matrix3.d;
+	}
+	,deltaTransformVector2: function(Vector2) {
+		return new lime.math.Vector2(Vector2.x * this.a + Vector2.y * this.c,Vector2.x * this.b + Vector2.y * this.d);
+	}
+	,identity: function() {
+		this.a = 1;
+		this.b = 0;
+		this.c = 0;
+		this.d = 1;
+		this.tx = 0;
+		this.ty = 0;
+	}
+	,invert: function() {
+		var norm = this.a * this.d - this.b * this.c;
+		if(norm == 0) {
+			this.a = this.b = this.c = this.d = 0;
+			this.tx = -this.tx;
+			this.ty = -this.ty;
+		} else {
+			norm = 1.0 / norm;
+			var a1 = this.d * norm;
+			this.d = this.a * norm;
+			this.a = a1;
+			this.b *= -norm;
+			this.c *= -norm;
+			var tx1 = -this.a * this.tx - this.c * this.ty;
+			this.ty = -this.b * this.tx - this.d * this.ty;
+			this.tx = tx1;
+		}
+		return this;
+	}
+	,mult: function(m) {
+		var result = new lime.math.Matrix3(this.a,this.b,this.c,this.d,this.tx,this.ty);
+		result.concat(m);
+		return result;
+	}
+	,rotate: function(theta) {
+		var cos = Math.cos(theta);
+		var sin = Math.sin(theta);
+		var a1 = this.a * cos - this.b * sin;
+		this.b = this.a * sin + this.b * cos;
+		this.a = a1;
+		var c1 = this.c * cos - this.d * sin;
+		this.d = this.c * sin + this.d * cos;
+		this.c = c1;
+		var tx1 = this.tx * cos - this.ty * sin;
+		this.ty = this.tx * sin + this.ty * cos;
+		this.tx = tx1;
+	}
+	,scale: function(sx,sy) {
+		this.a *= sx;
+		this.b *= sy;
+		this.c *= sx;
+		this.d *= sy;
+		this.tx *= sx;
+		this.ty *= sy;
+	}
+	,setRotation: function(theta,scale) {
+		if(scale == null) scale = 1;
+		this.a = Math.cos(theta) * scale;
+		this.c = Math.sin(theta) * scale;
+		this.b = -this.c;
+		this.d = this.a;
+	}
+	,setTo: function(a,b,c,d,tx,ty) {
+		this.a = a;
+		this.b = b;
+		this.c = c;
+		this.d = d;
+		this.tx = tx;
+		this.ty = ty;
+	}
+	,to3DString: function(roundPixels) {
+		if(roundPixels == null) roundPixels = false;
+		if(roundPixels) return "Matrix33d(" + this.a + ", " + this.b + ", " + "0, 0, " + this.c + ", " + this.d + ", " + "0, 0, 0, 0, 1, 0, " + (this.tx | 0) + ", " + (this.ty | 0) + ", 0, 1)"; else return "Matrix33d(" + this.a + ", " + this.b + ", " + "0, 0, " + this.c + ", " + this.d + ", " + "0, 0, 0, 0, 1, 0, " + this.tx + ", " + this.ty + ", 0, 1)";
+	}
+	,toMozString: function() {
+		return "Matrix3(" + this.a + ", " + this.b + ", " + this.c + ", " + this.d + ", " + this.tx + "px, " + this.ty + "px)";
+	}
+	,toString: function() {
+		return "Matrix3(" + this.a + ", " + this.b + ", " + this.c + ", " + this.d + ", " + this.tx + ", " + this.ty + ")";
+	}
+	,transformVector2: function(pos) {
+		return new lime.math.Vector2(pos.x * this.a + pos.y * this.c + this.tx,pos.x * this.b + pos.y * this.d + this.ty);
+	}
+	,translate: function(dx,dy) {
+		var m = new lime.math.Matrix3();
+		m.tx = dx;
+		m.ty = dy;
+		this.concat(m);
+	}
+	,__cleanValues: function() {
+		this.a = Math.round(this.a * 1000) / 1000;
+		this.b = Math.round(this.b * 1000) / 1000;
+		this.c = Math.round(this.c * 1000) / 1000;
+		this.d = Math.round(this.d * 1000) / 1000;
+		this.tx = Math.round(this.tx * 10) / 10;
+		this.ty = Math.round(this.ty * 10) / 10;
+	}
+	,__transformX: function(pos) {
+		return pos.x * this.a + pos.y * this.c + this.tx;
+	}
+	,__transformY: function(pos) {
+		return pos.x * this.b + pos.y * this.d + this.ty;
+	}
+	,__translateTransformed: function(pos) {
+		this.tx = pos.x * this.a + pos.y * this.c + this.tx;
+		this.ty = pos.x * this.b + pos.y * this.d + this.ty;
+	}
+	,__class__: lime.math.Matrix3
+};
+lime.math.Rectangle = function(x,y,width,height) {
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+};
+$hxClasses["lime.math.Rectangle"] = lime.math.Rectangle;
+lime.math.Rectangle.__name__ = true;
+lime.math.Rectangle.prototype = {
+	clone: function() {
+		return new lime.math.Rectangle(this.x,this.y,this.width,this.height);
+	}
+	,contains: function(x,y) {
+		return x >= this.x && y >= this.y && x < this.get_right() && y < this.get_bottom();
+	}
+	,containsPoint: function(point) {
+		return this.contains(point.x,point.y);
+	}
+	,containsRect: function(rect) {
+		if(rect.width <= 0 || rect.height <= 0) return rect.x > this.x && rect.y > this.y && rect.get_right() < this.get_right() && rect.get_bottom() < this.get_bottom(); else return rect.x >= this.x && rect.y >= this.y && rect.get_right() <= this.get_right() && rect.get_bottom() <= this.get_bottom();
+	}
+	,copyFrom: function(sourceRect) {
+		this.x = sourceRect.x;
+		this.y = sourceRect.y;
+		this.width = sourceRect.width;
+		this.height = sourceRect.height;
+	}
+	,equals: function(toCompare) {
+		return toCompare != null && this.x == toCompare.x && this.y == toCompare.y && this.width == toCompare.width && this.height == toCompare.height;
+	}
+	,inflate: function(dx,dy) {
+		this.x -= dx;
+		this.width += dx * 2;
+		this.y -= dy;
+		this.height += dy * 2;
+	}
+	,inflatePoint: function(point) {
+		this.inflate(point.x,point.y);
+	}
+	,intersection: function(toIntersect) {
+		var x0;
+		if(this.x < toIntersect.x) x0 = toIntersect.x; else x0 = this.x;
+		var x1;
+		if(this.get_right() > toIntersect.get_right()) x1 = toIntersect.get_right(); else x1 = this.get_right();
+		if(x1 <= x0) return new lime.math.Rectangle();
+		var y0;
+		if(this.y < toIntersect.y) y0 = toIntersect.y; else y0 = this.y;
+		var y1;
+		if(this.get_bottom() > toIntersect.get_bottom()) y1 = toIntersect.get_bottom(); else y1 = this.get_bottom();
+		if(y1 <= y0) return new lime.math.Rectangle();
+		return new lime.math.Rectangle(x0,y0,x1 - x0,y1 - y0);
+	}
+	,intersects: function(toIntersect) {
+		var x0;
+		if(this.x < toIntersect.x) x0 = toIntersect.x; else x0 = this.x;
+		var x1;
+		if(this.get_right() > toIntersect.get_right()) x1 = toIntersect.get_right(); else x1 = this.get_right();
+		if(x1 <= x0) return false;
+		var y0;
+		if(this.y < toIntersect.y) y0 = toIntersect.y; else y0 = this.y;
+		var y1;
+		if(this.get_bottom() > toIntersect.get_bottom()) y1 = toIntersect.get_bottom(); else y1 = this.get_bottom();
+		return y1 > y0;
+	}
+	,isEmpty: function() {
+		return this.width <= 0 || this.height <= 0;
+	}
+	,offset: function(dx,dy) {
+		this.x += dx;
+		this.y += dy;
+	}
+	,offsetPoint: function(point) {
+		this.x += point.x;
+		this.y += point.y;
+	}
+	,setEmpty: function() {
+		this.x = this.y = this.width = this.height = 0;
+	}
+	,setTo: function(xa,ya,widtha,heighta) {
+		this.x = xa;
+		this.y = ya;
+		this.width = widtha;
+		this.height = heighta;
+	}
+	,transform: function(m) {
+		var tx0 = m.a * this.x + m.c * this.y;
+		var tx1 = tx0;
+		var ty0 = m.b * this.x + m.d * this.y;
+		var ty1 = tx0;
+		var tx = m.a * (this.x + this.width) + m.c * this.y;
+		var ty = m.b * (this.x + this.width) + m.d * this.y;
+		if(tx < tx0) tx0 = tx;
+		if(ty < ty0) ty0 = ty;
+		if(tx > tx1) tx1 = tx;
+		if(ty > ty1) ty1 = ty;
+		tx = m.a * (this.x + this.width) + m.c * (this.y + this.height);
+		ty = m.b * (this.x + this.width) + m.d * (this.y + this.height);
+		if(tx < tx0) tx0 = tx;
+		if(ty < ty0) ty0 = ty;
+		if(tx > tx1) tx1 = tx;
+		if(ty > ty1) ty1 = ty;
+		tx = m.a * this.x + m.c * (this.y + this.height);
+		ty = m.b * this.x + m.d * (this.y + this.height);
+		if(tx < tx0) tx0 = tx;
+		if(ty < ty0) ty0 = ty;
+		if(tx > tx1) tx1 = tx;
+		if(ty > ty1) ty1 = ty;
+		return new lime.math.Rectangle(tx0 + m.tx,ty0 + m.ty,tx1 - tx0,ty1 - ty0);
+	}
+	,union: function(toUnion) {
+		if(this.width == 0 || this.height == 0) return toUnion.clone(); else if(toUnion.width == 0 || toUnion.height == 0) return this.clone();
+		var x0;
+		if(this.x > toUnion.x) x0 = toUnion.x; else x0 = this.x;
+		var x1;
+		if(this.get_right() < toUnion.get_right()) x1 = toUnion.get_right(); else x1 = this.get_right();
+		var y0;
+		if(this.y > toUnion.y) y0 = toUnion.y; else y0 = this.y;
+		var y1;
+		if(this.get_bottom() < toUnion.get_bottom()) y1 = toUnion.get_bottom(); else y1 = this.get_bottom();
+		return new lime.math.Rectangle(x0,y0,x1 - x0,y1 - y0);
+	}
+	,__contract: function(x,y,width,height) {
+		if(this.width == 0 && this.height == 0) return;
+		var cacheRight = this.get_right();
+		var cacheBottom = this.get_bottom();
+		if(this.x < x) this.x = x;
+		if(this.y < y) this.y = y;
+		if(this.get_right() > x + width) this.width = x + width - this.x;
+		if(this.get_bottom() > y + height) this.height = y + height - this.y;
+	}
+	,__expand: function(x,y,width,height) {
+		if(this.width == 0 && this.height == 0) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			return;
+		}
+		var cacheRight = this.get_right();
+		var cacheBottom = this.get_bottom();
+		if(this.x > x) this.x = x;
+		if(this.y > y) this.y = y;
+		if(cacheRight < x + width) this.width = x + width - this.x;
+		if(cacheBottom < y + height) this.height = y + height - this.y;
+	}
+	,__toFlashRectangle: function() {
+		return null;
+	}
+	,get_bottom: function() {
+		return this.y + this.height;
+	}
+	,set_bottom: function(b) {
+		this.height = b - this.y;
+		return b;
+	}
+	,get_bottomRight: function() {
+		return new lime.math.Vector2(this.x + this.width,this.y + this.height);
+	}
+	,set_bottomRight: function(p) {
+		this.width = p.x - this.x;
+		this.height = p.y - this.y;
+		return p.clone();
+	}
+	,get_left: function() {
+		return this.x;
+	}
+	,set_left: function(l) {
+		this.width -= l - this.x;
+		this.x = l;
+		return l;
+	}
+	,get_right: function() {
+		return this.x + this.width;
+	}
+	,set_right: function(r) {
+		this.width = r - this.x;
+		return r;
+	}
+	,get_size: function() {
+		return new lime.math.Vector2(this.width,this.height);
+	}
+	,set_size: function(p) {
+		this.width = p.x;
+		this.height = p.y;
+		return p.clone();
+	}
+	,get_top: function() {
+		return this.y;
+	}
+	,set_top: function(t) {
+		this.height -= t - this.y;
+		this.y = t;
+		return t;
+	}
+	,get_topLeft: function() {
+		return new lime.math.Vector2(this.x,this.y);
+	}
+	,set_topLeft: function(p) {
+		this.x = p.x;
+		this.y = p.y;
+		return p.clone();
+	}
+	,__class__: lime.math.Rectangle
+};
+lime.math.Vector2 = function(x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.x = x;
+	this.y = y;
+};
+$hxClasses["lime.math.Vector2"] = lime.math.Vector2;
+lime.math.Vector2.__name__ = true;
+lime.math.Vector2.distance = function(pt1,pt2) {
+	var dx = pt1.x - pt2.x;
+	var dy = pt1.y - pt2.y;
+	return Math.sqrt(dx * dx + dy * dy);
+};
+lime.math.Vector2.interpolate = function(pt1,pt2,f) {
+	return new lime.math.Vector2(pt2.x + f * (pt1.x - pt2.x),pt2.y + f * (pt1.y - pt2.y));
+};
+lime.math.Vector2.polar = function(len,angle) {
+	return new lime.math.Vector2(len * Math.cos(angle),len * Math.sin(angle));
+};
+lime.math.Vector2.prototype = {
+	add: function(v) {
+		return new lime.math.Vector2(v.x + this.x,v.y + this.y);
+	}
+	,clone: function() {
+		return new lime.math.Vector2(this.x,this.y);
+	}
+	,equals: function(toCompare) {
+		return toCompare != null && toCompare.x == this.x && toCompare.y == this.y;
+	}
+	,normalize: function(thickness) {
+		if(this.x == 0 && this.y == 0) return; else {
+			var norm = thickness / Math.sqrt(this.x * this.x + this.y * this.y);
+			this.x *= norm;
+			this.y *= norm;
+		}
+	}
+	,offset: function(dx,dy) {
+		this.x += dx;
+		this.y += dy;
+	}
+	,setTo: function(xa,ya) {
+		this.x = xa;
+		this.y = ya;
+	}
+	,subtract: function(v) {
+		return new lime.math.Vector2(this.x - v.x,this.y - v.y);
+	}
+	,__toFlashPoint: function() {
+		return null;
+	}
+	,get_length: function() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	,__class__: lime.math.Vector2
+};
+lime.math.Vector4 = function(x,y,z,w) {
+	if(w == null) w = 0.;
+	if(z == null) z = 0.;
+	if(y == null) y = 0.;
+	if(x == null) x = 0.;
+	this.w = w;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+};
+$hxClasses["lime.math.Vector4"] = lime.math.Vector4;
+lime.math.Vector4.__name__ = true;
+lime.math.Vector4.angleBetween = function(a,b) {
+	var a0 = new lime.math.Vector4(a.x,a.y,a.z,a.w);
+	a0.normalize();
+	var b0 = new lime.math.Vector4(b.x,b.y,b.z,b.w);
+	b0.normalize();
+	return Math.acos(a0.x * b0.x + a0.y * b0.y + a0.z * b0.z);
+};
+lime.math.Vector4.distance = function(pt1,pt2) {
+	var x = pt2.x - pt1.x;
+	var y = pt2.y - pt1.y;
+	var z = pt2.z - pt1.z;
+	return Math.sqrt(x * x + y * y + z * z);
+};
+lime.math.Vector4.get_X_AXIS = function() {
+	return new lime.math.Vector4(1,0,0);
+};
+lime.math.Vector4.get_Y_AXIS = function() {
+	return new lime.math.Vector4(0,1,0);
+};
+lime.math.Vector4.get_Z_AXIS = function() {
+	return new lime.math.Vector4(0,0,1);
+};
+lime.math.Vector4.prototype = {
+	add: function(a) {
+		return new lime.math.Vector4(this.x + a.x,this.y + a.y,this.z + a.z);
+	}
+	,clone: function() {
+		return new lime.math.Vector4(this.x,this.y,this.z,this.w);
+	}
+	,copyFrom: function(sourceVector4) {
+		this.x = sourceVector4.x;
+		this.y = sourceVector4.y;
+		this.z = sourceVector4.z;
+	}
+	,crossProduct: function(a) {
+		return new lime.math.Vector4(this.y * a.z - this.z * a.y,this.z * a.x - this.x * a.z,this.x * a.y - this.y * a.x,1);
+	}
+	,decrementBy: function(a) {
+		this.x -= a.x;
+		this.y -= a.y;
+		this.z -= a.z;
+	}
+	,dotProduct: function(a) {
+		return this.x * a.x + this.y * a.y + this.z * a.z;
+	}
+	,equals: function(toCompare,allFour) {
+		if(allFour == null) allFour = false;
+		return this.x == toCompare.x && this.y == toCompare.y && this.z == toCompare.z && (!allFour || this.w == toCompare.w);
+	}
+	,incrementBy: function(a) {
+		this.x += a.x;
+		this.y += a.y;
+		this.z += a.z;
+	}
+	,nearEquals: function(toCompare,tolerance,allFour) {
+		if(allFour == null) allFour = false;
+		return Math.abs(this.x - toCompare.x) < tolerance && Math.abs(this.y - toCompare.y) < tolerance && Math.abs(this.z - toCompare.z) < tolerance && (!allFour || Math.abs(this.w - toCompare.w) < tolerance);
+	}
+	,negate: function() {
+		this.x *= -1;
+		this.y *= -1;
+		this.z *= -1;
+	}
+	,normalize: function() {
+		var l = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+		if(l != 0) {
+			this.x /= l;
+			this.y /= l;
+			this.z /= l;
+		}
+		return l;
+	}
+	,project: function() {
+		this.x /= this.w;
+		this.y /= this.w;
+		this.z /= this.w;
+	}
+	,scaleBy: function(s) {
+		this.x *= s;
+		this.y *= s;
+		this.z *= s;
+	}
+	,setTo: function(xa,ya,za) {
+		this.x = xa;
+		this.y = ya;
+		this.z = za;
+	}
+	,subtract: function(a) {
+		return new lime.math.Vector4(this.x - a.x,this.y - a.y,this.z - a.z);
+	}
+	,toString: function() {
+		return "Vector4(" + this.x + ", " + this.y + ", " + this.z + ")";
+	}
+	,get_length: function() {
+		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+	}
+	,get_lengthSquared: function() {
+		return this.x * this.x + this.y * this.y + this.z * this.z;
+	}
+	,__class__: lime.math.Vector4
+};
+lime.net = {};
+lime.net.URLLoader = function(request) {
+	this.onSecurityError = new lime.app.Event();
+	this.onProgress = new lime.app.Event();
+	this.onOpen = new lime.app.Event();
+	this.onIOError = new lime.app.Event();
+	this.onHTTPStatus = new lime.app.Event();
+	this.onComplete = new lime.app.Event();
+	this.bytesLoaded = 0;
+	this.bytesTotal = 0;
+	this.set_dataFormat(lime.net.URLLoaderDataFormat.TEXT);
+	this.__data = "";
+	this.__curl = lime.net.curl.CURLEasy.init();
+	if(request != null) this.load(request);
+};
+$hxClasses["lime.net.URLLoader"] = lime.net.URLLoader;
+lime.net.URLLoader.__name__ = true;
+lime.net.URLLoader.prototype = {
+	close: function() {
+		lime.net.curl.CURLEasy.cleanup(this.__curl);
+	}
+	,getData: function() {
+		return null;
+	}
+	,load: function(request) {
+		this.requestUrl(request.url,request.method,request.data,request.formatRequestHeaders());
+	}
+	,registerEvents: function(subject) {
+		var _g = this;
+		var self = this;
+		if(typeof XMLHttpRequestProgressEvent != "undefined") subject.addEventListener("progress",$bind(this,this.__onProgress),false);
+		subject.onreadystatechange = function() {
+			if(subject.readyState != 4) return;
+			var s;
+			try {
+				s = subject.status;
+			} catch( e ) {
+				s = null;
+			}
+			if(s == undefined) s = null;
+			if(s != null) {
+				var listeners = self.onHTTPStatus.listeners;
+				var repeat = self.onHTTPStatus.repeat;
+				var length = listeners.length;
+				var i = 0;
+				while(i < length) {
+					listeners[i](_g,s);
+					if(!repeat[i]) {
+						self.onHTTPStatus.remove(listeners[i]);
+						length--;
+					} else i++;
+				}
+			}
+			if(s != null && s >= 200 && s < 400) self.__onData(subject.response); else if(s == null) {
+				var listeners1 = self.onIOError.listeners;
+				var repeat1 = self.onIOError.repeat;
+				var length1 = listeners1.length;
+				var i1 = 0;
+				while(i1 < length1) {
+					listeners1[i1](_g,"Failed to connect or resolve host");
+					if(!repeat1[i1]) {
+						self.onIOError.remove(listeners1[i1]);
+						length1--;
+					} else i1++;
+				}
+			} else if(s == 12029) {
+				var listeners2 = self.onIOError.listeners;
+				var repeat2 = self.onIOError.repeat;
+				var length2 = listeners2.length;
+				var i2 = 0;
+				while(i2 < length2) {
+					listeners2[i2](_g,"Failed to connect to host");
+					if(!repeat2[i2]) {
+						self.onIOError.remove(listeners2[i2]);
+						length2--;
+					} else i2++;
+				}
+			} else if(s == 12007) {
+				var listeners3 = self.onIOError.listeners;
+				var repeat3 = self.onIOError.repeat;
+				var length3 = listeners3.length;
+				var i3 = 0;
+				while(i3 < length3) {
+					listeners3[i3](_g,"Unknown host");
+					if(!repeat3[i3]) {
+						self.onIOError.remove(listeners3[i3]);
+						length3--;
+					} else i3++;
+				}
+			} else if(s == 0) {
+				var listeners4 = self.onIOError.listeners;
+				var repeat4 = self.onIOError.repeat;
+				var length4 = listeners4.length;
+				var i4 = 0;
+				while(i4 < length4) {
+					listeners4[i4](_g,"Unable to make request (may be blocked due to cross-domain permissions)");
+					if(!repeat4[i4]) {
+						self.onIOError.remove(listeners4[i4]);
+						length4--;
+					} else i4++;
+				}
+				var listeners5 = self.onSecurityError.listeners;
+				var repeat5 = self.onSecurityError.repeat;
+				var length5 = listeners5.length;
+				var i5 = 0;
+				while(i5 < length5) {
+					listeners5[i5](_g,"Unable to make request (may be blocked due to cross-domain permissions)");
+					if(!repeat5[i5]) {
+						self.onSecurityError.remove(listeners5[i5]);
+						length5--;
+					} else i5++;
+				}
+			} else {
+				var listeners6 = self.onIOError.listeners;
+				var repeat6 = self.onIOError.repeat;
+				var length6 = listeners6.length;
+				var i6 = 0;
+				while(i6 < length6) {
+					listeners6[i6](_g,"Http Error #" + subject.status);
+					if(!repeat6[i6]) {
+						self.onIOError.remove(listeners6[i6]);
+						length6--;
+					} else i6++;
+				}
+			}
+		};
+	}
+	,requestUrl: function(url,method,data,requestHeaders) {
+		var xmlHttpRequest = new XMLHttpRequest();
+		this.registerEvents(xmlHttpRequest);
+		var uri = "";
+		if(js.Boot.__instanceof(data,lime.utils.ByteArray)) {
+			var data1 = data;
+			var _g = this.dataFormat;
+			switch(_g[1]) {
+			case 0:
+				uri = data1.data.buffer;
+				break;
+			default:
+				uri = data1.readUTFBytes(data1.length);
+			}
+		} else if(js.Boot.__instanceof(data,lime.net.URLVariables)) {
+			var data2 = data;
+			var _g1 = 0;
+			var _g11 = Reflect.fields(data2);
+			while(_g1 < _g11.length) {
+				var p = _g11[_g1];
+				++_g1;
+				if(uri.length != 0) uri += "&";
+				uri += encodeURIComponent(p) + "=" + StringTools.urlEncode(Reflect.field(data2,p));
+			}
+		} else if(data != null) uri = data.toString();
+		try {
+			if(method == "GET" && uri != null && uri != "") {
+				var question = url.split("?").length <= 1;
+				xmlHttpRequest.open("GET",url + (question?"?":"&") + Std.string(uri),true);
+				uri = "";
+			} else xmlHttpRequest.open(js.Boot.__cast(method , String),url,true);
+		} catch( e ) {
+			var listeners = this.onIOError.listeners;
+			var repeat = this.onIOError.repeat;
+			var length = listeners.length;
+			var i = 0;
+			while(i < length) {
+				listeners[i](this,e.toString());
+				if(!repeat[i]) {
+					this.onIOError.remove(listeners[i]);
+					length--;
+				} else i++;
+			}
+			return;
+		}
+		var _g2 = this.dataFormat;
+		switch(_g2[1]) {
+		case 0:
+			xmlHttpRequest.responseType = "arraybuffer";
+			break;
+		default:
+		}
+		var _g3 = 0;
+		while(_g3 < requestHeaders.length) {
+			var header = requestHeaders[_g3];
+			++_g3;
+			xmlHttpRequest.setRequestHeader(header.name,header.value);
+		}
+		xmlHttpRequest.send(uri);
+		var listeners1 = this.onOpen.listeners;
+		var repeat1 = this.onOpen.repeat;
+		var length1 = listeners1.length;
+		var i1 = 0;
+		while(i1 < length1) {
+			listeners1[i1](this);
+			if(!repeat1[i1]) {
+				this.onOpen.remove(listeners1[i1]);
+				length1--;
+			} else i1++;
+		}
+		this.getData = function() {
+			if(xmlHttpRequest.response != null) return xmlHttpRequest.response; else return xmlHttpRequest.responseText;
+		};
+	}
+	,__onData: function(_) {
+		var content = this.getData();
+		var _g = this.dataFormat;
+		switch(_g[1]) {
+		case 0:
+			this.data = lime.utils.ByteArray.__ofBuffer(content);
+			break;
+		default:
+			this.data = Std.string(content);
+		}
+		var listeners = this.onComplete.listeners;
+		var repeat = this.onComplete.repeat;
+		var length = listeners.length;
+		var i = 0;
+		while(i < length) {
+			listeners[i](this);
+			if(!repeat[i]) {
+				this.onComplete.remove(listeners[i]);
+				length--;
+			} else i++;
+		}
+	}
+	,__onProgress: function(event) {
+		this.bytesLoaded = event.loaded;
+		this.bytesTotal = event.total;
+		var listeners = this.onProgress.listeners;
+		var repeat = this.onProgress.repeat;
+		var length = listeners.length;
+		var i = 0;
+		while(i < length) {
+			listeners[i](this,this.bytesLoaded,this.bytesTotal);
+			if(!repeat[i]) {
+				this.onProgress.remove(listeners[i]);
+				length--;
+			} else i++;
+		}
+	}
+	,set_dataFormat: function(inputVal) {
+		if(inputVal == lime.net.URLLoaderDataFormat.BINARY && !Reflect.hasField(window,"ArrayBuffer")) this.dataFormat = lime.net.URLLoaderDataFormat.TEXT; else this.dataFormat = inputVal;
+		return this.dataFormat;
+	}
+	,__class__: lime.net.URLLoader
+};
+lime.net.URLLoaderDataFormat = $hxClasses["lime.net.URLLoaderDataFormat"] = { __ename__ : true, __constructs__ : ["BINARY","TEXT","VARIABLES"] };
+lime.net.URLLoaderDataFormat.BINARY = ["BINARY",0];
+lime.net.URLLoaderDataFormat.BINARY.toString = $estr;
+lime.net.URLLoaderDataFormat.BINARY.__enum__ = lime.net.URLLoaderDataFormat;
+lime.net.URLLoaderDataFormat.TEXT = ["TEXT",1];
+lime.net.URLLoaderDataFormat.TEXT.toString = $estr;
+lime.net.URLLoaderDataFormat.TEXT.__enum__ = lime.net.URLLoaderDataFormat;
+lime.net.URLLoaderDataFormat.VARIABLES = ["VARIABLES",2];
+lime.net.URLLoaderDataFormat.VARIABLES.toString = $estr;
+lime.net.URLLoaderDataFormat.VARIABLES.__enum__ = lime.net.URLLoaderDataFormat;
+lime.net.URLLoaderDataFormat.__empty_constructs__ = [lime.net.URLLoaderDataFormat.BINARY,lime.net.URLLoaderDataFormat.TEXT,lime.net.URLLoaderDataFormat.VARIABLES];
+lime.net.URLRequest = function(inURL) {
+	if(inURL != null) this.url = inURL;
+	this.requestHeaders = [];
+	this.method = "GET";
+	this.contentType = null;
+};
+$hxClasses["lime.net.URLRequest"] = lime.net.URLRequest;
+lime.net.URLRequest.__name__ = true;
+lime.net.URLRequest.prototype = {
+	formatRequestHeaders: function() {
+		var res = this.requestHeaders;
+		if(res == null) res = [];
+		if(this.method == "GET" || this.data == null) return res;
+		if(typeof(this.data) == "string" || js.Boot.__instanceof(this.data,lime.utils.ByteArray)) {
+			res = res.slice();
+			res.push(new lime.net.URLRequestHeader("Content-Type",this.contentType != null?this.contentType:"application/x-www-form-urlencoded"));
+		}
+		return res;
+	}
+	,__class__: lime.net.URLRequest
+};
+lime.net.URLRequestHeader = function(name,value) {
+	if(value == null) value = "";
+	if(name == null) name = "";
+	this.name = name;
+	this.value = value;
+};
+$hxClasses["lime.net.URLRequestHeader"] = lime.net.URLRequestHeader;
+lime.net.URLRequestHeader.__name__ = true;
+lime.net.URLRequestHeader.prototype = {
+	__class__: lime.net.URLRequestHeader
+};
+lime.net.URLVariables = function(inEncoded) {
+	if(inEncoded != null) this.decode(inEncoded);
+};
+$hxClasses["lime.net.URLVariables"] = lime.net.URLVariables;
+lime.net.URLVariables.__name__ = true;
+lime.net.URLVariables.prototype = {
+	decode: function(inVars) {
+		var fields = Reflect.fields(this);
+		var _g = 0;
+		while(_g < fields.length) {
+			var f = fields[_g];
+			++_g;
+			Reflect.deleteField(this,f);
+		}
+		var fields1 = inVars.split(";").join("&").split("&");
+		var _g1 = 0;
+		while(_g1 < fields1.length) {
+			var f1 = fields1[_g1];
+			++_g1;
+			var eq = f1.indexOf("=");
+			if(eq > 0) Reflect.setField(this,StringTools.urlDecode(HxOverrides.substr(f1,0,eq)),StringTools.urlDecode(HxOverrides.substr(f1,eq + 1,null))); else if(eq != 0) Reflect.setField(this,decodeURIComponent(f1.split("+").join(" ")),"");
+		}
+	}
+	,toString: function() {
+		var result = new Array();
+		var fields = Reflect.fields(this);
+		var _g = 0;
+		while(_g < fields.length) {
+			var f = fields[_g];
+			++_g;
+			result.push(encodeURIComponent(f) + "=" + StringTools.urlEncode(Reflect.field(this,f)));
+		}
+		return result.join("&");
+	}
+	,__class__: lime.net.URLVariables
+};
+lime.net.curl = {};
+lime.net.curl._CURL = {};
+lime.net.curl._CURL.CURL_Impl_ = function() { };
+$hxClasses["lime.net.curl._CURL.CURL_Impl_"] = lime.net.curl._CURL.CURL_Impl_;
+lime.net.curl._CURL.CURL_Impl_.__name__ = true;
+lime.net.curl._CURL.CURL_Impl_.getDate = function(date,now) {
+	return 0;
+};
+lime.net.curl._CURL.CURL_Impl_.globalCleanup = function() {
+};
+lime.net.curl._CURL.CURL_Impl_.globalInit = function(flags) {
+	return 0;
+};
+lime.net.curl._CURL.CURL_Impl_.version = function() {
+	return null;
+};
+lime.net.curl._CURL.CURL_Impl_.versionInfo = function(type) {
+	return null;
+};
+lime.net.curl._CURL.CURL_Impl_.intGt = function(a,b) {
+	return a > b;
+};
+lime.net.curl.CURLEasy = function() { };
+$hxClasses["lime.net.curl.CURLEasy"] = lime.net.curl.CURLEasy;
+lime.net.curl.CURLEasy.__name__ = true;
+lime.net.curl.CURLEasy.cleanup = function(handle) {
+};
+lime.net.curl.CURLEasy.duphandle = function(handle) {
+	return 0;
+};
+lime.net.curl.CURLEasy.escape = function(handle,url,length) {
+	return null;
+};
+lime.net.curl.CURLEasy.getinfo = function(handle,info) {
+	return null;
+};
+lime.net.curl.CURLEasy.init = function() {
+	return 0;
+};
+lime.net.curl.CURLEasy.pause = function(handle,bitMask) {
+	return 0;
+};
+lime.net.curl.CURLEasy.perform = function(handle) {
+	return 0;
+};
+lime.net.curl.CURLEasy.reset = function(handle) {
+	return 0;
+};
+lime.net.curl.CURLEasy.setopt = function(handle,option,parameter) {
+	return 0;
+};
+lime.net.curl.CURLEasy.strerror = function(code) {
+	return null;
+};
+lime.net.curl.CURLEasy.unescape = function(handle,url,inLength,outLength) {
+	return null;
+};
+lime.system = {};
+lime.system.System = function() { };
+$hxClasses["lime.system.System"] = lime.system.System;
+lime.system.System.__name__ = true;
+lime.system.System.embed = $hx_exports.lime.embed = function(elementName,width,height,background) {
+	var element = null;
+	if(elementName != null) element = window.document.getElementById(elementName); else element = window.document.createElement("div");
+	var color = null;
+	if(background != null) {
+		background = StringTools.replace(background,"#","");
+		if(background.indexOf("0x") > -1) color = Std.parseInt(background); else color = Std.parseInt("0x" + background);
+	}
+	if(width == null) width = 0;
+	if(height == null) height = 0;
+	ApplicationMain.config.background = color;
+	ApplicationMain.config.element = element;
+	ApplicationMain.config.width = width;
+	ApplicationMain.config.height = height;
+	ApplicationMain.create();
+};
+lime.system.System.findHaxeLib = function(library) {
+	return "";
+};
+lime.system.System.load = function(library,method,args,lazy) {
+	if(lazy == null) lazy = false;
+	if(args == null) args = 0;
+	if(lime.system.System.disableCFFI) return Reflect.makeVarArgs(function(_) {
+		return { };
+	});
+	if(lazy) {
+	}
+	var result = null;
 	return result;
 };
-js_html_compat_ArrayBuffer.prototype = {
-	slice: function(begin,end) {
-		return new js_html_compat_ArrayBuffer(this.a.slice(begin,end));
-	}
-	,__class__: js_html_compat_ArrayBuffer
+lime.system.System.sysName = function() {
+	return null;
 };
-let js_html_compat_DataView = function(buffer,byteOffset,byteLength) {
-	this.buf = buffer;
-	this.offset = byteOffset == null?0:byteOffset;
-	this.length = byteLength == null?buffer.byteLength - this.offset:byteLength;
-	if(this.offset < 0 || this.length < 0 || this.offset + this.length > buffer.byteLength) throw new js__$Boot_FluidError(flu_io_Error.OutsideBounds);
+lime.system.System.tryLoad = function(name,library,func,args) {
+	return null;
 };
-$hxClasses["js.html.compat.DataView"] = js_html_compat_DataView;
-js_html_compat_DataView.__name__ = true;
-js_html_compat_DataView.prototype = {
-	getInt8: function(byteOffset) {
-		let v = this.buf.a[this.offset + byteOffset];
-		return v >= 128?v - 256:v;
-	}
-	,getUint8: function(byteOffset) {
-		return this.buf.a[this.offset + byteOffset];
-	}
-	,getInt16: function(byteOffset,littleEndian) {
-		let v = this.getUint16(byteOffset,littleEndian);
-		return v >= 32768?v - 65536:v;
-	}
-	,getUint16: function(byteOffset,littleEndian) {
-		return littleEndian?this.buf.a[this.offset + byteOffset] | this.buf.a[this.offset + byteOffset + 1] << 8:this.buf.a[this.offset + byteOffset] << 8 | this.buf.a[this.offset + byteOffset + 1];
-	}
-	,getInt32: function(byteOffset,littleEndian) {
-		let p = this.offset + byteOffset;
-		let a = this.buf.a[p++];
-		let b = this.buf.a[p++];
-		let c = this.buf.a[p++];
-		let d = this.buf.a[p++];
-		return littleEndian?a | b << 8 | c << 16 | d << 24:d | c << 8 | b << 16 | a << 24;
-	}
-	,getUint32: function(byteOffset,littleEndian) {
-		let v = this.getInt32(byteOffset,littleEndian);
-		return v < 0?v + 4294967296.:v;
-	}
-	,getFloat32: function(byteOffset,littleEndian) {
-		return flu_io_FPHelper.i32ToFloat(this.getInt32(byteOffset,littleEndian));
-	}
-	,getFloat64: function(byteOffset,littleEndian) {
-		let a = this.getInt32(byteOffset,littleEndian);
-		let b = this.getInt32(byteOffset + 4,littleEndian);
-		return flu_io_FPHelper.i64ToDouble(littleEndian?a:b,littleEndian?b:a);
-	}
-	,setInt8: function(byteOffset,value) {
-		this.buf.a[byteOffset + this.offset] = value < 0?value + 128 & 255:value & 255;
-	}
-	,setUint8: function(byteOffset,value) {
-		this.buf.a[byteOffset + this.offset] = value & 255;
-	}
-	,setInt16: function(byteOffset,value,littleEndian) {
-		this.setUint16(byteOffset,value < 0?value + 65536:value,littleEndian);
-	}
-	,setUint16: function(byteOffset,value,littleEndian) {
-		let p = byteOffset + this.offset;
-		if(littleEndian) {
-			this.buf.a[p] = value & 255;
-			this.buf.a[p++] = value >> 8 & 255;
-		} else {
-			this.buf.a[p++] = value >> 8 & 255;
-			this.buf.a[p] = value & 255;
-		}
-	}
-	,setInt32: function(byteOffset,value,littleEndian) {
-		this.setUint32(byteOffset,value,littleEndian);
-	}
-	,setUint32: function(byteOffset,value,littleEndian) {
-		let p = byteOffset + this.offset;
-		if(littleEndian) {
-			this.buf.a[p++] = value & 255;
-			this.buf.a[p++] = value >> 8 & 255;
-			this.buf.a[p++] = value >> 16 & 255;
-			this.buf.a[p++] = value >>> 24;
-		} else {
-			this.buf.a[p++] = value >>> 24;
-			this.buf.a[p++] = value >> 16 & 255;
-			this.buf.a[p++] = value >> 8 & 255;
-			this.buf.a[p++] = value & 255;
-		}
-	}
-	,setFloat32: function(byteOffset,value,littleEndian) {
-		this.setUint32(byteOffset,flu_io_FPHelper.floatToI32(value),littleEndian);
-	}
-	,setFloat64: function(byteOffset,value,littleEndian) {
-		let i64 = flu_io_FPHelper.doubleToI64(value);
-		if(littleEndian) {
-			this.setUint32(byteOffset,i64.low);
-			this.setUint32(byteOffset,i64.high);
-		} else {
-			this.setUint32(byteOffset,i64.high);
-			this.setUint32(byteOffset,i64.low);
-		}
-	}
-	,__class__: js_html_compat_DataView
+lime.system.System.loaderTrace = function(message) {
 };
-let js_html_compat_Uint8Array = function() { };
-$hxClasses["js.html.compat.Uint8Array"] = js_html_compat_Uint8Array;
-js_html_compat_Uint8Array.__name__ = true;
-js_html_compat_Uint8Array._new = function(arg1,offset,length) {
-	let arr;
-	if(typeof(arg1) == "number") {
-		arr = [];
-		let _g = 0;
-		while(_g < arg1) {
-			let i = _g++;
-			arr[i] = 0;
+lime.ui = {};
+lime.ui.KeyEventManager = function() { };
+$hxClasses["lime.ui.KeyEventManager"] = lime.ui.KeyEventManager;
+lime.ui.KeyEventManager.__name__ = true;
+lime.ui.KeyEventManager.create = function() {
+	lime.ui.KeyEventManager.eventInfo = new lime.ui._KeyEventManager.KeyEventInfo();
+	window.addEventListener("keydown",lime.ui.KeyEventManager.handleEvent,false);
+	window.addEventListener("keyup",lime.ui.KeyEventManager.handleEvent,false);
+};
+lime.ui.KeyEventManager.convertKeyCode = function(keyCode) {
+	if(keyCode >= 65 && keyCode <= 90) return keyCode + 32;
+	switch(keyCode) {
+	case 16:
+		return 1073742049;
+	case 17:
+		return 1073742048;
+	case 18:
+		return 1073742050;
+	case 20:
+		return 1073741881;
+	case 144:
+		return 1073741907;
+	case 37:
+		return 1073741904;
+	case 38:
+		return 1073741906;
+	case 39:
+		return 1073741903;
+	case 40:
+		return 1073741905;
+	case 45:
+		return 1073741897;
+	case 46:
+		return 127;
+	case 36:
+		return 1073741898;
+	case 35:
+		return 1073741901;
+	case 33:
+		return 1073741899;
+	case 34:
+		return 1073741902;
+	case 112:
+		return 1073741882;
+	case 113:
+		return 1073741883;
+	case 114:
+		return 1073741884;
+	case 115:
+		return 1073741885;
+	case 116:
+		return 1073741886;
+	case 117:
+		return 1073741887;
+	case 118:
+		return 1073741888;
+	case 119:
+		return 1073741889;
+	case 120:
+		return 1073741890;
+	case 121:
+		return 1073741891;
+	case 122:
+		return 1073741892;
+	case 123:
+		return 1073741893;
+	}
+	return keyCode;
+};
+lime.ui.KeyEventManager.handleEvent = function(event) {
+	var _g = event.keyCode;
+	switch(_g) {
+	case 32:case 37:case 38:case 39:case 40:
+		event.preventDefault();
+		break;
+	}
+	lime.ui.KeyEventManager.eventInfo.keyCode = lime.ui.KeyEventManager.convertKeyCode(event.keyCode != null?event.keyCode:event.which);
+	if(event.type == "keydown") lime.ui.KeyEventManager.eventInfo.type = 0; else lime.ui.KeyEventManager.eventInfo.type = 1;
+	var _g1 = lime.ui.KeyEventManager.eventInfo.type;
+	switch(_g1) {
+	case 0:
+		var listeners = lime.ui.KeyEventManager.onKeyDown.listeners;
+		var repeat = lime.ui.KeyEventManager.onKeyDown.repeat;
+		var length = listeners.length;
+		var i = 0;
+		while(i < length) {
+			listeners[i](lime.ui.KeyEventManager.eventInfo.keyCode,lime.ui.KeyEventManager.eventInfo.modifier);
+			if(!repeat[i]) {
+				lime.ui.KeyEventManager.onKeyDown.remove(listeners[i]);
+				length--;
+			} else i++;
 		}
-		arr.byteLength = arr.length;
-		arr.byteOffset = 0;
-		arr.buffer = new js_html_compat_ArrayBuffer(arr);
-	} else if(js_Boot.__instanceof(arg1,js_html_compat_ArrayBuffer)) {
-		let buffer = arg1;
+		break;
+	case 1:
+		var listeners1 = lime.ui.KeyEventManager.onKeyUp.listeners;
+		var repeat1 = lime.ui.KeyEventManager.onKeyUp.repeat;
+		var length1 = listeners1.length;
+		var i1 = 0;
+		while(i1 < length1) {
+			listeners1[i1](lime.ui.KeyEventManager.eventInfo.keyCode,lime.ui.KeyEventManager.eventInfo.modifier);
+			if(!repeat1[i1]) {
+				lime.ui.KeyEventManager.onKeyUp.remove(listeners1[i1]);
+				length1--;
+			} else i1++;
+		}
+		break;
+	}
+};
+lime.ui._KeyEventManager = {};
+lime.ui._KeyEventManager.KeyEventInfo = function(type,keyCode,modifier) {
+	if(modifier == null) modifier = 0;
+	if(keyCode == null) keyCode = 0;
+	this.type = type;
+	this.keyCode = keyCode;
+	this.modifier = modifier;
+};
+$hxClasses["lime.ui._KeyEventManager.KeyEventInfo"] = lime.ui._KeyEventManager.KeyEventInfo;
+lime.ui._KeyEventManager.KeyEventInfo.__name__ = true;
+lime.ui._KeyEventManager.KeyEventInfo.prototype = {
+	clone: function() {
+		return new lime.ui._KeyEventManager.KeyEventInfo(this.type,this.keyCode,this.modifier);
+	}
+	,__class__: lime.ui._KeyEventManager.KeyEventInfo
+};
+lime.ui.MouseEventManager = function() { };
+$hxClasses["lime.ui.MouseEventManager"] = lime.ui.MouseEventManager;
+lime.ui.MouseEventManager.__name__ = true;
+lime.ui.MouseEventManager.create = function() {
+	lime.ui.MouseEventManager.eventInfo = new lime.ui._MouseEventManager.MouseEventInfo();
+};
+lime.ui.MouseEventManager.handleEvent = function(event) {
+	var _g = event.type;
+	switch(_g) {
+	case "mousedown":
+		lime.ui.MouseEventManager.eventInfo.type = 0;
+		break;
+	case "mouseup":
+		lime.ui.MouseEventManager.eventInfo.type = 1;
+		break;
+	case "mousemove":
+		lime.ui.MouseEventManager.eventInfo.type = 2;
+		break;
+	case "wheel":
+		lime.ui.MouseEventManager.eventInfo.type = 3;
+		break;
+	default:
+		lime.ui.MouseEventManager.eventInfo.type = null;
+	}
+	if(lime.ui.MouseEventManager.eventInfo.type != 3) {
+		if(lime.ui.MouseEventManager.window != null && lime.ui.MouseEventManager.window.element != null) {
+			if(lime.ui.MouseEventManager.window.canvas != null) {
+				var rect = lime.ui.MouseEventManager.window.canvas.getBoundingClientRect();
+				lime.ui.MouseEventManager.eventInfo.x = (event.clientX - rect.left) * (lime.ui.MouseEventManager.window.width / rect.width);
+				lime.ui.MouseEventManager.eventInfo.y = (event.clientY - rect.top) * (lime.ui.MouseEventManager.window.height / rect.height);
+			} else if(lime.ui.MouseEventManager.window.div != null) {
+				var rect1 = lime.ui.MouseEventManager.window.div.getBoundingClientRect();
+				lime.ui.MouseEventManager.eventInfo.x = event.clientX - rect1.left;
+				lime.ui.MouseEventManager.eventInfo.y = event.clientY - rect1.top;
+			} else {
+				var rect2 = lime.ui.MouseEventManager.window.element.getBoundingClientRect();
+				lime.ui.MouseEventManager.eventInfo.x = (event.clientX - rect2.left) * (lime.ui.MouseEventManager.window.width / rect2.width);
+				lime.ui.MouseEventManager.eventInfo.y = (event.clientY - rect2.top) * (lime.ui.MouseEventManager.window.height / rect2.height);
+			}
+		} else {
+			lime.ui.MouseEventManager.eventInfo.x = event.clientX;
+			lime.ui.MouseEventManager.eventInfo.y = event.clientY;
+		}
+	} else {
+		lime.ui.MouseEventManager.eventInfo.x = event.deltaX;
+		lime.ui.MouseEventManager.eventInfo.y = event.deltaY;
+	}
+	lime.ui.MouseEventManager.eventInfo.button = event.button;
+	var _g1 = lime.ui.MouseEventManager.eventInfo.type;
+	switch(_g1) {
+	case 0:
+		var listeners = lime.ui.MouseEventManager.onMouseDown.listeners;
+		var repeat = lime.ui.MouseEventManager.onMouseDown.repeat;
+		var length = listeners.length;
+		var i = 0;
+		while(i < length) {
+			listeners[i](lime.ui.MouseEventManager.eventInfo.x,lime.ui.MouseEventManager.eventInfo.y,lime.ui.MouseEventManager.eventInfo.button);
+			if(!repeat[i]) {
+				lime.ui.MouseEventManager.onMouseDown.remove(listeners[i]);
+				length--;
+			} else i++;
+		}
+		break;
+	case 1:
+		var listeners1 = lime.ui.MouseEventManager.onMouseUp.listeners;
+		var repeat1 = lime.ui.MouseEventManager.onMouseUp.repeat;
+		var length1 = listeners1.length;
+		var i1 = 0;
+		while(i1 < length1) {
+			listeners1[i1](lime.ui.MouseEventManager.eventInfo.x,lime.ui.MouseEventManager.eventInfo.y,lime.ui.MouseEventManager.eventInfo.button);
+			if(!repeat1[i1]) {
+				lime.ui.MouseEventManager.onMouseUp.remove(listeners1[i1]);
+				length1--;
+			} else i1++;
+		}
+		break;
+	case 2:
+		var listeners2 = lime.ui.MouseEventManager.onMouseMove.listeners;
+		var repeat2 = lime.ui.MouseEventManager.onMouseMove.repeat;
+		var length2 = listeners2.length;
+		var i2 = 0;
+		while(i2 < length2) {
+			listeners2[i2](lime.ui.MouseEventManager.eventInfo.x,lime.ui.MouseEventManager.eventInfo.y,lime.ui.MouseEventManager.eventInfo.button);
+			if(!repeat2[i2]) {
+				lime.ui.MouseEventManager.onMouseMove.remove(listeners2[i2]);
+				length2--;
+			} else i2++;
+		}
+		break;
+	case 3:
+		var listeners3 = lime.ui.MouseEventManager.onMouseWheel.listeners;
+		var repeat3 = lime.ui.MouseEventManager.onMouseWheel.repeat;
+		var length3 = listeners3.length;
+		var i3 = 0;
+		while(i3 < length3) {
+			listeners3[i3](lime.ui.MouseEventManager.eventInfo.x,lime.ui.MouseEventManager.eventInfo.y);
+			if(!repeat3[i3]) {
+				lime.ui.MouseEventManager.onMouseWheel.remove(listeners3[i3]);
+				length3--;
+			} else i3++;
+		}
+		break;
+	}
+};
+lime.ui.MouseEventManager.registerWindow = function(_window) {
+	var events = ["mousedown","mousemove","mouseup","wheel"];
+	var _g = 0;
+	while(_g < events.length) {
+		var event = events[_g];
+		++_g;
+		_window.element.addEventListener(event,lime.ui.MouseEventManager.handleEvent,true);
+	}
+	lime.ui.MouseEventManager.window = _window;
+	window.document.addEventListener("dragstart",function(e) {
+		if(e.target.nodeName.toLowerCase() == "img") {
+			e.preventDefault();
+			return false;
+		}
+		return true;
+	},false);
+};
+lime.ui._MouseEventManager = {};
+lime.ui._MouseEventManager.MouseEventInfo = function(type,x,y,button) {
+	if(button == null) button = 0;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.type = type;
+	this.x = x;
+	this.y = y;
+	this.button = button;
+};
+$hxClasses["lime.ui._MouseEventManager.MouseEventInfo"] = lime.ui._MouseEventManager.MouseEventInfo;
+lime.ui._MouseEventManager.MouseEventInfo.__name__ = true;
+lime.ui._MouseEventManager.MouseEventInfo.prototype = {
+	clone: function() {
+		return new lime.ui._MouseEventManager.MouseEventInfo(this.type,this.x,this.y,this.button);
+	}
+	,__class__: lime.ui._MouseEventManager.MouseEventInfo
+};
+lime.ui.TouchEventManager = function() { };
+$hxClasses["lime.ui.TouchEventManager"] = lime.ui.TouchEventManager;
+lime.ui.TouchEventManager.__name__ = true;
+lime.ui.TouchEventManager.create = function() {
+	lime.ui.TouchEventManager.eventInfo = new lime.ui._TouchEventManager.TouchEventInfo();
+};
+lime.ui.TouchEventManager.handleEvent = function(event) {
+	event.preventDefault();
+	var _g = event.type;
+	switch(_g) {
+	case "touchstart":
+		lime.ui.TouchEventManager.eventInfo.type = 0;
+		break;
+	case "touchmove":
+		lime.ui.TouchEventManager.eventInfo.type = 2;
+		break;
+	case "touchend":
+		lime.ui.TouchEventManager.eventInfo.type = 1;
+		break;
+	default:
+		lime.ui.TouchEventManager.eventInfo.type = null;
+	}
+	var touch = event.changedTouches[0];
+	lime.ui.TouchEventManager.eventInfo.id = touch.identifier;
+	if(lime.ui.TouchEventManager.window != null && lime.ui.TouchEventManager.window.element != null) {
+		var rect = lime.ui.TouchEventManager.window.element.getBoundingClientRect();
+		lime.ui.TouchEventManager.eventInfo.x = (touch.pageX - rect.left) * (lime.ui.TouchEventManager.window.width / rect.width);
+		lime.ui.TouchEventManager.eventInfo.y = (touch.pageY - rect.top) * (lime.ui.TouchEventManager.window.height / rect.height);
+	} else {
+		lime.ui.TouchEventManager.eventInfo.x = touch.pageX;
+		lime.ui.TouchEventManager.eventInfo.y = touch.pageY;
+	}
+	var _g1 = lime.ui.TouchEventManager.eventInfo.type;
+	switch(_g1) {
+	case 0:
+		var listeners = lime.ui.TouchEventManager.onTouchStart.listeners;
+		var repeat = lime.ui.TouchEventManager.onTouchStart.repeat;
+		var length = listeners.length;
+		var i = 0;
+		while(i < length) {
+			listeners[i](lime.ui.TouchEventManager.eventInfo.x,lime.ui.TouchEventManager.eventInfo.y,lime.ui.TouchEventManager.eventInfo.id);
+			if(!repeat[i]) {
+				lime.ui.TouchEventManager.onTouchStart.remove(listeners[i]);
+				length--;
+			} else i++;
+		}
+		break;
+	case 1:
+		var listeners1 = lime.ui.TouchEventManager.onTouchEnd.listeners;
+		var repeat1 = lime.ui.TouchEventManager.onTouchEnd.repeat;
+		var length1 = listeners1.length;
+		var i1 = 0;
+		while(i1 < length1) {
+			listeners1[i1](lime.ui.TouchEventManager.eventInfo.x,lime.ui.TouchEventManager.eventInfo.y,lime.ui.TouchEventManager.eventInfo.id);
+			if(!repeat1[i1]) {
+				lime.ui.TouchEventManager.onTouchEnd.remove(listeners1[i1]);
+				length1--;
+			} else i1++;
+		}
+		break;
+	case 2:
+		var listeners2 = lime.ui.TouchEventManager.onTouchMove.listeners;
+		var repeat2 = lime.ui.TouchEventManager.onTouchMove.repeat;
+		var length2 = listeners2.length;
+		var i2 = 0;
+		while(i2 < length2) {
+			listeners2[i2](lime.ui.TouchEventManager.eventInfo.x,lime.ui.TouchEventManager.eventInfo.y,lime.ui.TouchEventManager.eventInfo.id);
+			if(!repeat2[i2]) {
+				lime.ui.TouchEventManager.onTouchMove.remove(listeners2[i2]);
+				length2--;
+			} else i2++;
+		}
+		break;
+	}
+};
+lime.ui.TouchEventManager.registerWindow = function(window) {
+	window.element.addEventListener("touchstart",lime.ui.TouchEventManager.handleEvent,true);
+	window.element.addEventListener("touchmove",lime.ui.TouchEventManager.handleEvent,true);
+	window.element.addEventListener("touchend",lime.ui.TouchEventManager.handleEvent,true);
+	lime.ui.TouchEventManager.window = window;
+};
+lime.ui._TouchEventManager = {};
+lime.ui._TouchEventManager.TouchEventInfo = function(type,x,y,id) {
+	if(id == null) id = 0;
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	this.type = type;
+	this.x = x;
+	this.y = y;
+	this.id = id;
+};
+$hxClasses["lime.ui._TouchEventManager.TouchEventInfo"] = lime.ui._TouchEventManager.TouchEventInfo;
+lime.ui._TouchEventManager.TouchEventInfo.__name__ = true;
+lime.ui._TouchEventManager.TouchEventInfo.prototype = {
+	clone: function() {
+		return new lime.ui._TouchEventManager.TouchEventInfo(this.type,this.x,this.y,this.id);
+	}
+	,__class__: lime.ui._TouchEventManager.TouchEventInfo
+};
+lime.ui._Window = {};
+lime.ui._Window.WindowEventInfo = function(type,width,height,x,y) {
+	if(y == null) y = 0;
+	if(x == null) x = 0;
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	this.type = type;
+	this.width = width;
+	this.height = height;
+	this.x = x;
+	this.y = y;
+};
+$hxClasses["lime.ui._Window.WindowEventInfo"] = lime.ui._Window.WindowEventInfo;
+lime.ui._Window.WindowEventInfo.__name__ = true;
+lime.ui._Window.WindowEventInfo.prototype = {
+	clone: function() {
+		return new lime.ui._Window.WindowEventInfo(this.type,this.width,this.height,this.x,this.y);
+	}
+	,__class__: lime.ui._Window.WindowEventInfo
+};
+lime.ui.Window = function(config) {
+	this.config = config;
+	if(!lime.ui.Window.registered) lime.ui.Window.registered = true;
+};
+$hxClasses["lime.ui.Window"] = lime.ui.Window;
+lime.ui.Window.__name__ = true;
+lime.ui.Window.prototype = {
+	create: function(application) {
+		this.setWidth = this.width;
+		this.setHeight = this.height;
+		if(js.Boot.__instanceof(this.element,HTMLCanvasElement)) this.canvas = this.element; else this.canvas = window.document.createElement("canvas");
+		if(this.canvas != null) {
+			var style = this.canvas.style;
+			style.setProperty("-webkit-transform","translateZ(0)",null);
+			style.setProperty("transform","translateZ(0)",null);
+		} else if(this.div != null) {
+			var style1 = this.div.style;
+			style1.setProperty("-webkit-transform","translate3D(0,0,0)",null);
+			style1.setProperty("transform","translate3D(0,0,0)",null);
+			style1.position = "relative";
+			style1.overflow = "hidden";
+			style1.setProperty("-webkit-user-select","none",null);
+			style1.setProperty("-moz-user-select","none",null);
+			style1.setProperty("-ms-user-select","none",null);
+			style1.setProperty("-o-user-select","none",null);
+		}
+		if(this.width == 0 && this.height == 0) {
+			if(this.element != null) {
+				this.width = this.element.clientWidth;
+				this.height = this.element.clientHeight;
+			} else {
+				this.width = window.innerWidth;
+				this.height = window.innerHeight;
+			}
+			this.fullscreen = true;
+		}
+		if(this.canvas != null) {
+			this.canvas.width = this.width;
+			this.canvas.height = this.height;
+		} else {
+			this.div.style.width = this.width + "px";
+			this.div.style.height = this.height + "px";
+		}
+		this.handleDOMResize();
+		if(this.element != null) {
+			if(this.canvas != null) {
+				if(this.element != this.canvas) this.element.appendChild(this.canvas);
+			} else this.element.appendChild(this.div);
+		}
+		lime.ui.MouseEventManager.registerWindow(this);
+		lime.ui.TouchEventManager.registerWindow(this);
+		window.addEventListener("focus",$bind(this,this.handleDOMEvent),false);
+		window.addEventListener("blur",$bind(this,this.handleDOMEvent),false);
+		window.addEventListener("resize",$bind(this,this.handleDOMEvent),false);
+		window.addEventListener("beforeunload",$bind(this,this.handleDOMEvent),false);
+		if(this.currentRenderer != null) this.currentRenderer.create();
+	}
+	,dispatch: function() {
+		var _g = lime.ui.Window.eventInfo.type;
+		switch(_g) {
+		case 0:
+			var listeners = lime.ui.Window.onWindowActivate.listeners;
+			var repeat = lime.ui.Window.onWindowActivate.repeat;
+			var length = listeners.length;
+			var i = 0;
+			while(i < length) {
+				listeners[i]();
+				if(!repeat[i]) {
+					lime.ui.Window.onWindowActivate.remove(listeners[i]);
+					length--;
+				} else i++;
+			}
+			break;
+		case 1:
+			var listeners1 = lime.ui.Window.onWindowClose.listeners;
+			var repeat1 = lime.ui.Window.onWindowClose.repeat;
+			var length1 = listeners1.length;
+			var i1 = 0;
+			while(i1 < length1) {
+				listeners1[i1]();
+				if(!repeat1[i1]) {
+					lime.ui.Window.onWindowClose.remove(listeners1[i1]);
+					length1--;
+				} else i1++;
+			}
+			break;
+		case 2:
+			var listeners2 = lime.ui.Window.onWindowDeactivate.listeners;
+			var repeat2 = lime.ui.Window.onWindowDeactivate.repeat;
+			var length2 = listeners2.length;
+			var i2 = 0;
+			while(i2 < length2) {
+				listeners2[i2]();
+				if(!repeat2[i2]) {
+					lime.ui.Window.onWindowDeactivate.remove(listeners2[i2]);
+					length2--;
+				} else i2++;
+			}
+			break;
+		case 3:
+			var listeners3 = lime.ui.Window.onWindowFocusIn.listeners;
+			var repeat3 = lime.ui.Window.onWindowFocusIn.repeat;
+			var length3 = listeners3.length;
+			var i3 = 0;
+			while(i3 < length3) {
+				listeners3[i3]();
+				if(!repeat3[i3]) {
+					lime.ui.Window.onWindowFocusIn.remove(listeners3[i3]);
+					length3--;
+				} else i3++;
+			}
+			break;
+		case 4:
+			var listeners4 = lime.ui.Window.onWindowFocusOut.listeners;
+			var repeat4 = lime.ui.Window.onWindowFocusOut.repeat;
+			var length4 = listeners4.length;
+			var i4 = 0;
+			while(i4 < length4) {
+				listeners4[i4]();
+				if(!repeat4[i4]) {
+					lime.ui.Window.onWindowFocusOut.remove(listeners4[i4]);
+					length4--;
+				} else i4++;
+			}
+			break;
+		case 5:
+			this.x = lime.ui.Window.eventInfo.x;
+			this.y = lime.ui.Window.eventInfo.y;
+			var listeners5 = lime.ui.Window.onWindowMove.listeners;
+			var repeat5 = lime.ui.Window.onWindowMove.repeat;
+			var length5 = listeners5.length;
+			var i5 = 0;
+			while(i5 < length5) {
+				listeners5[i5](lime.ui.Window.eventInfo.x,lime.ui.Window.eventInfo.y);
+				if(!repeat5[i5]) {
+					lime.ui.Window.onWindowMove.remove(listeners5[i5]);
+					length5--;
+				} else i5++;
+			}
+			break;
+		case 6:
+			this.width = lime.ui.Window.eventInfo.width;
+			this.height = lime.ui.Window.eventInfo.height;
+			var listeners6 = lime.ui.Window.onWindowResize.listeners;
+			var repeat6 = lime.ui.Window.onWindowResize.repeat;
+			var length6 = listeners6.length;
+			var i6 = 0;
+			while(i6 < length6) {
+				listeners6[i6](lime.ui.Window.eventInfo.width,lime.ui.Window.eventInfo.height);
+				if(!repeat6[i6]) {
+					lime.ui.Window.onWindowResize.remove(listeners6[i6]);
+					length6--;
+				} else i6++;
+			}
+			break;
+		}
+	}
+	,handleDOMEvent: function(event) {
+		var _g = event.type;
+		switch(_g) {
+		case "focus":
+			lime.ui.Window.eventInfo.type = 3;
+			this.dispatch();
+			lime.ui.Window.eventInfo.type = 0;
+			this.dispatch();
+			break;
+		case "blur":
+			lime.ui.Window.eventInfo.type = 4;
+			this.dispatch();
+			lime.ui.Window.eventInfo.type = 2;
+			this.dispatch();
+			break;
+		case "resize":
+			var cacheWidth = this.width;
+			var cacheHeight = this.height;
+			this.handleDOMResize();
+			if(this.width != cacheWidth || this.height != cacheHeight) {
+				lime.ui.Window.eventInfo.type = 6;
+				lime.ui.Window.eventInfo.width = this.width;
+				lime.ui.Window.eventInfo.height = this.height;
+				this.dispatch();
+			}
+			break;
+		case "beforeunload":
+			lime.ui.Window.eventInfo.type = 1;
+			this.dispatch();
+			break;
+		}
+	}
+	,handleDOMResize: function() {
+		var stretch = this.fullscreen || this.setWidth == 0 && this.setHeight == 0;
+		if(this.element != null && (this.div == null || this.div != null && stretch)) {
+			if(stretch) {
+				if(this.width != this.element.clientWidth || this.height != this.element.clientHeight) {
+					this.width = this.element.clientWidth;
+					this.height = this.element.clientHeight;
+					if(this.canvas != null) {
+						if(this.element != this.canvas) {
+							this.canvas.width = this.element.clientWidth;
+							this.canvas.height = this.element.clientHeight;
+						}
+					} else {
+						this.div.style.width = this.element.clientWidth + "px";
+						this.div.style.height = this.element.clientHeight + "px";
+					}
+				}
+			} else {
+				var scaleX = this.element.clientWidth / this.setWidth;
+				var scaleY = this.element.clientHeight / this.setHeight;
+				var currentRatio = scaleX / scaleY;
+				var targetRatio = Math.min(scaleX,scaleY);
+				if(this.canvas != null) {
+					if(this.element != this.canvas) {
+						this.canvas.style.width = this.setWidth * targetRatio + "px";
+						this.canvas.style.height = this.setHeight * targetRatio + "px";
+						this.canvas.style.marginLeft = (this.element.clientWidth - this.setWidth * targetRatio) / 2 + "px";
+						this.canvas.style.marginTop = (this.element.clientHeight - this.setHeight * targetRatio) / 2 + "px";
+					}
+				} else {
+					this.div.style.width = this.setWidth * targetRatio + "px";
+					this.div.style.height = this.setHeight * targetRatio + "px";
+					this.div.style.marginLeft = (this.element.clientWidth - this.setWidth * targetRatio) / 2 + "px";
+					this.div.style.marginTop = (this.element.clientHeight - this.setHeight * targetRatio) / 2 + "px";
+				}
+			}
+		}
+	}
+	,move: function(x,y) {
+	}
+	,resize: function(width,height) {
+		this.setWidth = width;
+		this.setHeight = height;
+	}
+	,__class__: lime.ui.Window
+};
+lime.utils = {};
+lime.utils.ByteArray = function(size) {
+	if(size == null) size = 0;
+	this.littleEndian = false;
+	this.allocated = 0;
+	this.position = 0;
+	this.length = 0;
+	if(size > 0) this.allocated = size;
+	this.___resizeBuffer(this.allocated);
+	this.set_length(this.allocated);
+};
+$hxClasses["lime.utils.ByteArray"] = lime.utils.ByteArray;
+lime.utils.ByteArray.__name__ = true;
+lime.utils.ByteArray.fromBytes = function(bytes) {
+	var result = new lime.utils.ByteArray();
+	result.byteView = new Uint8Array(bytes.b);
+	result.set_length(result.byteView.length);
+	result.allocated = result.length;
+	return result;
+};
+lime.utils.ByteArray.readFile = function(path) {
+	return null;
+};
+lime.utils.ByteArray.__ofBuffer = function(buffer) {
+	var bytes = new lime.utils.ByteArray();
+	bytes.set_length(bytes.allocated = buffer.byteLength);
+	bytes.data = new DataView(buffer);
+	bytes.byteView = new Uint8Array(buffer);
+	return bytes;
+};
+lime.utils.ByteArray.prototype = {
+	clear: function() {
+		if(this.allocated < 0) this.___resizeBuffer(this.allocated = Std["int"](Math.max(0,this.allocated * 2))); else if(this.allocated > 0) this.___resizeBuffer(this.allocated = 0);
+		this.length = 0;
+		0;
+		this.position = 0;
+	}
+	,compress: function(algorithm) {
+	}
+	,deflate: function() {
+		this.compress(lime.utils.CompressionAlgorithm.DEFLATE);
+	}
+	,inflate: function() {
+		this.uncompress(lime.utils.CompressionAlgorithm.DEFLATE);
+	}
+	,readBoolean: function() {
+		return this.readByte() != 0;
+	}
+	,readByte: function() {
+		var data = this.data;
+		return data.getInt8(this.position++);
+	}
+	,readBytes: function(bytes,offset,length) {
+		if(length == null) length = 0;
 		if(offset == null) offset = 0;
-		if(length == null) length = buffer.byteLength - offset;
-		if(offset == 0) arr = buffer.a; else arr = buffer.a.slice(offset,offset + length);
-		arr.byteLength = arr.length;
-		arr.byteOffset = offset;
-		arr.buffer = buffer;
-	} else if((arg1 instanceof Array) && arg1.__enum__ == null) {
-		arr = arg1.slice();
-		arr.byteLength = arr.length;
-		arr.byteOffset = 0;
-		arr.buffer = new js_html_compat_ArrayBuffer(arr);
-	} else throw new js__$Boot_FluidError("TODO " + Std.string(arg1));
-	arr.subarray = js_html_compat_Uint8Array._subarray;
-	arr.set = js_html_compat_Uint8Array._set;
-	return arr;
-};
-js_html_compat_Uint8Array._set = function(arg,offset) {
-	let t = this;
-	if(js_Boot.__instanceof(arg.buffer,js_html_compat_ArrayBuffer)) {
-		let a = arg;
-		if(arg.byteLength + offset > t.byteLength) throw new js__$Boot_FluidError("set() outside of range");
-		let _g1 = 0;
-		let _g = arg.byteLength;
+		if(offset < 0 || length < 0) throw "Read error - Out of bounds";
+		if(length == 0) length = this.length - this.position;
+		var lengthToEnsure = offset + length;
+		if(bytes.length < lengthToEnsure) {
+			if(bytes.allocated < lengthToEnsure) bytes.___resizeBuffer(bytes.allocated = Std["int"](Math.max(lengthToEnsure,bytes.allocated * 2))); else if(bytes.allocated > lengthToEnsure) bytes.___resizeBuffer(bytes.allocated = lengthToEnsure);
+			bytes.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		bytes.byteView.set(this.byteView.subarray(this.position,this.position + length),offset);
+		bytes.position = offset;
+		this.position += length;
+		if(bytes.position + length > bytes.length) bytes.set_length(bytes.position + length);
+	}
+	,readDouble: function() {
+		var $double = this.data.getFloat64(this.position,this.littleEndian);
+		this.position += 8;
+		return $double;
+	}
+	,readFloat: function() {
+		var $float = this.data.getFloat32(this.position,this.littleEndian);
+		this.position += 4;
+		return $float;
+	}
+	,readInt: function() {
+		var $int = this.data.getInt32(this.position,this.littleEndian);
+		this.position += 4;
+		return $int;
+	}
+	,readMultiByte: function(length,charSet) {
+		return this.readUTFBytes(length);
+	}
+	,readShort: function() {
+		var $short = this.data.getInt16(this.position,this.littleEndian);
+		this.position += 2;
+		return $short;
+	}
+	,readUnsignedByte: function() {
+		var data = this.data;
+		return data.getUint8(this.position++);
+	}
+	,readUnsignedInt: function() {
+		var uInt = this.data.getUint32(this.position,this.littleEndian);
+		this.position += 4;
+		return uInt;
+	}
+	,readUnsignedShort: function() {
+		var uShort = this.data.getUint16(this.position,this.littleEndian);
+		this.position += 2;
+		return uShort;
+	}
+	,readUTF: function() {
+		var bytesCount = this.readUnsignedShort();
+		return this.readUTFBytes(bytesCount);
+	}
+	,readUTFBytes: function(len) {
+		var value = "";
+		var max = this.position + len;
+		while(this.position < max) {
+			var data = this.data;
+			var c = data.getUint8(this.position++);
+			if(c < 128) {
+				if(c == 0) break;
+				value += String.fromCharCode(c);
+			} else if(c < 224) value += String.fromCharCode((c & 63) << 6 | data.getUint8(this.position++) & 127); else if(c < 240) {
+				var c2 = data.getUint8(this.position++);
+				value += String.fromCharCode((c & 31) << 12 | (c2 & 127) << 6 | data.getUint8(this.position++) & 127);
+			} else {
+				var c21 = data.getUint8(this.position++);
+				var c3 = data.getUint8(this.position++);
+				value += String.fromCharCode((c & 15) << 18 | (c21 & 127) << 12 | c3 << 6 & 127 | data.getUint8(this.position++) & 127);
+			}
+		}
+		return value;
+	}
+	,toString: function() {
+		var cachePosition = this.position;
+		this.position = 0;
+		var value = this.readUTFBytes(this.length);
+		this.position = cachePosition;
+		return value;
+	}
+	,uncompress: function(algorithm) {
+		haxe.Log.trace("Warning: ByteArray.uncompress on JS target requires the 'format' haxelib",{ fileName : "ByteArray.hx", lineNumber : 650, className : "lime.utils.ByteArray", methodName : "uncompress"});
+	}
+	,write_uncheck: function($byte) {
+		__dollar__sset(b,this.position++,$byte & 255);
+	}
+	,writeBoolean: function(value) {
+		this.writeByte(value?1:0);
+	}
+	,writeByte: function(value) {
+		var lengthToEnsure = this.position + 1;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		var data = this.data;
+		data.setInt8(this.position,value);
+		this.position += 1;
+	}
+	,writeBytes: function(bytes,offset,length) {
+		if(length == null) length = 0;
+		if(offset == null) offset = 0;
+		if(bytes.length == 0) return;
+		if(_UInt.UInt_Impl_.gt(0,offset) || _UInt.UInt_Impl_.gt(0,length)) throw "Write error - Out of bounds";
+		if(length == 0) length = bytes.length;
+		var lengthToEnsure = this.position + length;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		this.byteView.set(bytes.byteView.subarray(offset,offset + length),this.position);
+		this.position = this.position + length;
+	}
+	,writeDouble: function(x) {
+		var lengthToEnsure = this.position + 8;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		this.data.setFloat64(this.position,x,this.littleEndian);
+		this.position += 8;
+	}
+	,writeFile: function(path) {
+	}
+	,writeFloat: function(x) {
+		var lengthToEnsure = this.position + 4;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		this.data.setFloat32(this.position,x,this.littleEndian);
+		this.position += 4;
+	}
+	,writeInt: function(value) {
+		var lengthToEnsure = this.position + 4;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		this.data.setInt32(this.position,value,this.littleEndian);
+		this.position += 4;
+	}
+	,writeShort: function(value) {
+		var lengthToEnsure = this.position + 2;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		this.data.setInt16(this.position,value,this.littleEndian);
+		this.position += 2;
+	}
+	,writeUnsignedInt: function(value) {
+		var lengthToEnsure = this.position + 4;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		this.data.setUint32(this.position,value,this.littleEndian);
+		this.position += 4;
+	}
+	,writeUnsignedShort: function(value) {
+		var lengthToEnsure = this.position + 2;
+		if(this.length < lengthToEnsure) {
+			if(this.allocated < lengthToEnsure) this.___resizeBuffer(this.allocated = Std["int"](Math.max(lengthToEnsure,this.allocated * 2))); else if(this.allocated > lengthToEnsure) this.___resizeBuffer(this.allocated = lengthToEnsure);
+			this.length = lengthToEnsure;
+			lengthToEnsure;
+		}
+		this.data.setUint16(this.position,value,this.littleEndian);
+		this.position += 2;
+	}
+	,writeUTF: function(value) {
+		this.writeUnsignedShort(this.__getUTFBytesCount(value));
+		this.writeUTFBytes(value);
+	}
+	,writeUTFBytes: function(value) {
+		var _g1 = 0;
+		var _g = value.length;
 		while(_g1 < _g) {
-			let i = _g1++;
-			t[i + offset] = a[i];
+			var i = _g1++;
+			var c = value.charCodeAt(i);
+			if(c <= 127) this.writeByte(c); else if(c <= 2047) {
+				this.writeByte(192 | c >> 6);
+				this.writeByte(128 | c & 63);
+			} else if(c <= 65535) {
+				this.writeByte(224 | c >> 12);
+				this.writeByte(128 | c >> 6 & 63);
+				this.writeByte(128 | c & 63);
+			} else {
+				this.writeByte(240 | c >> 18);
+				this.writeByte(128 | c >> 12 & 63);
+				this.writeByte(128 | c >> 6 & 63);
+				this.writeByte(128 | c & 63);
+			}
 		}
-	} else if((arg instanceof Array) && arg.__enum__ == null) {
-		let a1 = arg;
-		if(a1.length + offset > t.byteLength) throw new js__$Boot_FluidError("set() outside of range");
-		let _g11 = 0;
-		let _g2 = a1.length;
-		while(_g11 < _g2) {
-			let i1 = _g11++;
-			t[i1 + offset] = a1[i1];
+	}
+	,__fromBytes: function(bytes) {
+		this.byteView = new Uint8Array(bytes.b);
+		this.set_length(this.byteView.length);
+		this.allocated = this.length;
+	}
+	,__get: function(pos) {
+		return this.data.getInt8(pos);
+	}
+	,__getBuffer: function() {
+		return this.data.buffer;
+	}
+	,__getUTFBytesCount: function(value) {
+		var count = 0;
+		var _g1 = 0;
+		var _g = value.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var c = value.charCodeAt(i);
+			if(c <= 127) count += 1; else if(c <= 2047) count += 2; else if(c <= 65535) count += 3; else count += 4;
 		}
-	} else throw new js__$Boot_FluidError("TODO");
+		return count;
+	}
+	,___resizeBuffer: function(len) {
+		var oldByteView = this.byteView;
+		var newByteView = new Uint8Array(len);
+		if(oldByteView != null) {
+			if(oldByteView.length <= len) newByteView.set(oldByteView); else newByteView.set(oldByteView.subarray(0,len));
+		}
+		this.byteView = newByteView;
+		this.data = new DataView(newByteView.buffer);
+	}
+	,__set: function(pos,v) {
+		this.data.setUint8(pos,v);
+	}
+	,get_bytesAvailable: function() {
+		return this.length - this.position;
+	}
+	,get_endian: function() {
+		if(this.littleEndian) return "littleEndian"; else return "bigEndian";
+	}
+	,set_endian: function(endian) {
+		this.littleEndian = endian == "littleEndian";
+		return endian;
+	}
+	,set_length: function(value) {
+		if(this.allocated < value) this.___resizeBuffer(this.allocated = Std["int"](Math.max(value,this.allocated * 2))); else if(this.allocated > value) this.___resizeBuffer(this.allocated = value);
+		this.length = value;
+		return value;
+	}
+	,__class__: lime.utils.ByteArray
 };
-js_html_compat_Uint8Array._subarray = function(start,end) {
-	let t = this;
-	let a = js_html_compat_Uint8Array._new(t.slice(start,end));
-	a.byteOffset = start;
-	return a;
+lime.utils.CompressionAlgorithm = $hxClasses["lime.utils.CompressionAlgorithm"] = { __ename__ : true, __constructs__ : ["DEFLATE","ZLIB","LZMA","GZIP"] };
+lime.utils.CompressionAlgorithm.DEFLATE = ["DEFLATE",0];
+lime.utils.CompressionAlgorithm.DEFLATE.toString = $estr;
+lime.utils.CompressionAlgorithm.DEFLATE.__enum__ = lime.utils.CompressionAlgorithm;
+lime.utils.CompressionAlgorithm.ZLIB = ["ZLIB",1];
+lime.utils.CompressionAlgorithm.ZLIB.toString = $estr;
+lime.utils.CompressionAlgorithm.ZLIB.__enum__ = lime.utils.CompressionAlgorithm;
+lime.utils.CompressionAlgorithm.LZMA = ["LZMA",2];
+lime.utils.CompressionAlgorithm.LZMA.toString = $estr;
+lime.utils.CompressionAlgorithm.LZMA.__enum__ = lime.utils.CompressionAlgorithm;
+lime.utils.CompressionAlgorithm.GZIP = ["GZIP",3];
+lime.utils.CompressionAlgorithm.GZIP.toString = $estr;
+lime.utils.CompressionAlgorithm.GZIP.__enum__ = lime.utils.CompressionAlgorithm;
+lime.utils.CompressionAlgorithm.__empty_constructs__ = [lime.utils.CompressionAlgorithm.DEFLATE,lime.utils.CompressionAlgorithm.ZLIB,lime.utils.CompressionAlgorithm.LZMA,lime.utils.CompressionAlgorithm.GZIP];
+lime.utils.IDataInput = function() { };
+$hxClasses["lime.utils.IDataInput"] = lime.utils.IDataInput;
+lime.utils.IDataInput.__name__ = true;
+lime.utils.IDataInput.prototype = {
+	__class__: lime.utils.IDataInput
 };
-let shaderblox_attributes_Attribute = function() { };
-$hxClasses["shaderblox.attributes.Attribute"] = shaderblox_attributes_Attribute;
-shaderblox_attributes_Attribute.__name__ = true;
-shaderblox_attributes_Attribute.prototype = {
-	__class__: shaderblox_attributes_Attribute
+lime.utils.IMemoryRange = function() { };
+$hxClasses["lime.utils.IMemoryRange"] = lime.utils.IMemoryRange;
+lime.utils.IMemoryRange.__name__ = true;
+lime.utils.IMemoryRange.prototype = {
+	__class__: lime.utils.IMemoryRange
 };
-let shaderblox_attributes_FloatAttribute = function(name,location,nFloats) {
+shaderblox.attributes = {};
+shaderblox.attributes.Attribute = function() { };
+$hxClasses["shaderblox.attributes.Attribute"] = shaderblox.attributes.Attribute;
+shaderblox.attributes.Attribute.__name__ = true;
+shaderblox.attributes.Attribute.prototype = {
+	__class__: shaderblox.attributes.Attribute
+};
+shaderblox.attributes.FloatAttribute = function(name,location,nFloats) {
 	if(nFloats == null) nFloats = 1;
 	this.name = name;
 	this.location = location;
@@ -4845,1810 +7937,194 @@ let shaderblox_attributes_FloatAttribute = function(name,location,nFloats) {
 	this.itemCount = nFloats;
 	this.type = 5126;
 };
-$hxClasses["shaderblox.attributes.FloatAttribute"] = shaderblox_attributes_FloatAttribute;
-shaderblox_attributes_FloatAttribute.__name__ = true;
-shaderblox_attributes_FloatAttribute.__super__ = shaderblox_attributes_Attribute;
-shaderblox_attributes_FloatAttribute.prototype = $extend(shaderblox_attributes_Attribute.prototype,{
-	__class__: shaderblox_attributes_FloatAttribute
+$hxClasses["shaderblox.attributes.FloatAttribute"] = shaderblox.attributes.FloatAttribute;
+shaderblox.attributes.FloatAttribute.__name__ = true;
+shaderblox.attributes.FloatAttribute.__super__ = shaderblox.attributes.Attribute;
+shaderblox.attributes.FloatAttribute.prototype = $extend(shaderblox.attributes.Attribute.prototype,{
+	toString: function() {
+		return "[FloatAttribute itemCount=" + this.itemCount + " byteSize=" + this.byteSize + " location=" + this.location + " name=" + this.name + "]";
+	}
+	,__class__: shaderblox.attributes.FloatAttribute
 });
-let shaderblox_glsl_GLSLTools = function() { };
-$hxClasses["shaderblox.glsl.GLSLTools"] = shaderblox_glsl_GLSLTools;
-shaderblox_glsl_GLSLTools.__name__ = true;
-shaderblox_glsl_GLSLTools.injectConstValue = function(src,name,value) {
-	let storageQualifier = "const";
-	let tmp;
-	let _this = shaderblox_glsl_GLSLTools.STORAGE_QUALIFIER_TYPES;
-	if(__map_reserved[storageQualifier] != null) tmp = _this.getReserved(storageQualifier); else tmp = _this.h[storageQualifier];
-	let types = tmp;
-	let reg = new EReg(storageQualifier + "\\s+((" + shaderblox_glsl_GLSLTools.PRECISION_QUALIFIERS.join("|") + ")\\s+)?(" + types.join("|") + ")\\s+([^;]+)","m");
-	let src1 = shaderblox_glsl_GLSLTools.stripComments(src);
-	let currStr = src1;
-	while(reg.match(currStr)) {
-		let declarationPos = reg.matchedPos();
-		let rawDeclarationString = reg.matched(0);
-		let exploded = shaderblox_glsl_GLSLTools.bracketExplode(rawDeclarationString,"()");
-		let rootScopeStr = Lambda.fold(exploded.contents,function(n,rs) {
-			return rs + (js_Boot.__instanceof(n,shaderblox_glsl__$GLSLTools_StringNode)?n.toString():"");
-		},"");
-		let rConstName = new EReg("\\b(" + name + ")\\b\\s*=","m");
-		let nameFound = rConstName.match(rootScopeStr);
-		if(nameFound) {
-			let namePos = rConstName.matchedPos();
-			let initializerLength = 0;
-			if((initializerLength = rConstName.matchedRight().indexOf(",")) == -1) initializerLength = rConstName.matchedRight().length;
-			let initializerRangeInRootStr_start = namePos.pos + namePos.len;
-			let initializerRangeInRootStr_end = namePos.pos + namePos.len + initializerLength;
-			let absoluteOffset = src1.length - currStr.length + declarationPos.pos;
-			let initializerRangeAbsolute_start = shaderblox_glsl_GLSLTools.compressedToExploded(exploded,initializerRangeInRootStr_start) + absoluteOffset;
-			let initializerRangeAbsolute_end = shaderblox_glsl_GLSLTools.compressedToExploded(exploded,initializerRangeInRootStr_end) + absoluteOffset;
-			let srcBefore = src1.substring(0,initializerRangeAbsolute_start);
-			let srcAfter = src1.substring(initializerRangeAbsolute_end);
-			return srcBefore + value + srcAfter;
-		}
-		currStr = reg.matchedRight();
-	}
-	return null;
+shaderblox.helpers = {};
+shaderblox.helpers.GLUniformLocationHelper = function() { };
+$hxClasses["shaderblox.helpers.GLUniformLocationHelper"] = shaderblox.helpers.GLUniformLocationHelper;
+shaderblox.helpers.GLUniformLocationHelper.__name__ = true;
+shaderblox.helpers.GLUniformLocationHelper.isValid = function(u) {
+	return u != null;
 };
-shaderblox_glsl_GLSLTools.compressedToExploded = function(scope,compressedPosition) {
-	let stringTotal = 0;
-	let nodeTotal = 0;
-	let targetIndex = null;
-	let _g1 = 0;
-	let _g = scope.contents.length;
-	while(_g1 < _g) {
-		let i = _g1++;
-		let n = scope.contents[i];
-		let len = n.toString().length;
-		if(js_Boot.__instanceof(n,shaderblox_glsl__$GLSLTools_StringNode)) {
-			if(stringTotal + len > compressedPosition) {
-				targetIndex = i;
-				break;
-			}
-			stringTotal += len;
-		}
-		nodeTotal += len;
-	}
-	return compressedPosition - stringTotal + nodeTotal;
+shaderblox.uniforms = {};
+shaderblox.uniforms.IAppliable = function() { };
+$hxClasses["shaderblox.uniforms.IAppliable"] = shaderblox.uniforms.IAppliable;
+shaderblox.uniforms.IAppliable.__name__ = true;
+shaderblox.uniforms.IAppliable.prototype = {
+	__class__: shaderblox.uniforms.IAppliable
 };
-shaderblox_glsl_GLSLTools.stripComments = function(src) {
-	return new EReg("(/\\*([\\s\\S]*?)\\*/)|(//(.*)$)","igm").replace(src,"");
-};
-shaderblox_glsl_GLSLTools.bracketExplode = function(src,brackets) {
-	if(brackets.length != 2) return null;
-	let open = brackets.charAt(0);
-	let close = brackets.charAt(1);
-	let root = new shaderblox_glsl__$GLSLTools_ScopeNode();
-	let scopeStack = [];
-	let currentScope = root;
-	let currentNode = null;
-	let c;
-	let level = 0;
-	let _g1 = 0;
-	let _g = src.length;
-	while(_g1 < _g) {
-		let i = _g1++;
-		c = src.charAt(i);
-		if(c == open) {
-			level++;
-			let newScope = new shaderblox_glsl__$GLSLTools_ScopeNode(brackets);
-			currentScope.contents.push(newScope);
-			scopeStack.push(currentScope);
-			currentScope = newScope;
-			currentNode = currentScope;
-		} else if(c == close) {
-			level--;
-			currentScope = scopeStack.pop();
-			currentNode = currentScope;
-		} else {
-			if(!js_Boot.__instanceof(currentNode,shaderblox_glsl__$GLSLTools_StringNode)) {
-				currentNode = new shaderblox_glsl__$GLSLTools_StringNode();
-				currentScope.contents.push(currentNode);
-			}
-			(js_Boot.__cast(currentNode , shaderblox_glsl__$GLSLTools_StringNode)).contents += c;
-		}
-	}
-	return root;
-};
-let shaderblox_glsl__$GLSLTools_INode = function() { };
-$hxClasses["shaderblox.glsl._GLSLTools.INode"] = shaderblox_glsl__$GLSLTools_INode;
-shaderblox_glsl__$GLSLTools_INode.__name__ = true;
-shaderblox_glsl__$GLSLTools_INode.prototype = {
-	__class__: shaderblox_glsl__$GLSLTools_INode
-};
-let shaderblox_glsl__$GLSLTools_StringNode = function(str) {
-	if(str == null) str = "";
-	this.contents = str;
-};
-$hxClasses["shaderblox.glsl._GLSLTools.StringNode"] = shaderblox_glsl__$GLSLTools_StringNode;
-shaderblox_glsl__$GLSLTools_StringNode.__name__ = true;
-shaderblox_glsl__$GLSLTools_StringNode.__interfaces__ = [shaderblox_glsl__$GLSLTools_INode];
-shaderblox_glsl__$GLSLTools_StringNode.prototype = {
-	toString: function() {
-		return this.contents;
-	}
-	,__class__: shaderblox_glsl__$GLSLTools_StringNode
-};
-let shaderblox_glsl__$GLSLTools_ScopeNode = function(brackets) {
-	this.closeBracket = "";
-	this.openBracket = "";
-	this.contents = [];
-	if(brackets != null) {
-		this.openBracket = brackets.charAt(0);
-		this.closeBracket = brackets.charAt(1);
-	}
-};
-$hxClasses["shaderblox.glsl._GLSLTools.ScopeNode"] = shaderblox_glsl__$GLSLTools_ScopeNode;
-shaderblox_glsl__$GLSLTools_ScopeNode.__name__ = true;
-shaderblox_glsl__$GLSLTools_ScopeNode.__interfaces__ = [shaderblox_glsl__$GLSLTools_INode];
-shaderblox_glsl__$GLSLTools_ScopeNode.prototype = {
-	toString: function() {
-		let str = this.openBracket;
-		let _g = 0;
-		let _g1 = this.contents;
-		while(_g < _g1.length) {
-			let n = _g1[_g];
-			++_g;
-			str += n.toString();
-		}
-		return str + this.closeBracket;
-	}
-	,__class__: shaderblox_glsl__$GLSLTools_ScopeNode
-};
-let shaderblox_uniforms_IAppliable = function() { };
-$hxClasses["shaderblox.uniforms.IAppliable"] = shaderblox_uniforms_IAppliable;
-shaderblox_uniforms_IAppliable.__name__ = true;
-shaderblox_uniforms_IAppliable.prototype = {
-	__class__: shaderblox_uniforms_IAppliable
-};
-let shaderblox_uniforms_UniformBase_$Bool = function(name,index,data) {
+shaderblox.uniforms.UniformBase_Bool = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
 	this.data = data;
+	this.dirty = true;
 };
-$hxClasses["shaderblox.uniforms.UniformBase_Bool"] = shaderblox_uniforms_UniformBase_$Bool;
-shaderblox_uniforms_UniformBase_$Bool.__name__ = true;
-shaderblox_uniforms_UniformBase_$Bool.prototype = {
-	__class__: shaderblox_uniforms_UniformBase_$Bool
+$hxClasses["shaderblox.uniforms.UniformBase_Bool"] = shaderblox.uniforms.UniformBase_Bool;
+shaderblox.uniforms.UniformBase_Bool.__name__ = true;
+shaderblox.uniforms.UniformBase_Bool.prototype = {
+	set: function(data) {
+		this.dirty = true;
+		this.dirty = true;
+		return this.data = data;
+	}
+	,setDirty: function() {
+		this.dirty = true;
+	}
+	,set_data: function(data) {
+		this.dirty = true;
+		return this.data = data;
+	}
+	,__class__: shaderblox.uniforms.UniformBase_Bool
 };
-let shaderblox_uniforms_UBool = function(name,index,f) {
+shaderblox.uniforms.UBool = function(name,index,f) {
 	if(f == null) f = false;
-	shaderblox_uniforms_UniformBase_$Bool.call(this,name,index,f);
+	shaderblox.uniforms.UniformBase_Bool.call(this,name,index,f);
 };
-$hxClasses["shaderblox.uniforms.UBool"] = shaderblox_uniforms_UBool;
-shaderblox_uniforms_UBool.__name__ = true;
-shaderblox_uniforms_UBool.__interfaces__ = [shaderblox_uniforms_IAppliable];
-shaderblox_uniforms_UBool.__super__ = shaderblox_uniforms_UniformBase_$Bool;
-shaderblox_uniforms_UBool.prototype = $extend(shaderblox_uniforms_UniformBase_$Bool.prototype,{
+$hxClasses["shaderblox.uniforms.UBool"] = shaderblox.uniforms.UBool;
+shaderblox.uniforms.UBool.__name__ = true;
+shaderblox.uniforms.UBool.__interfaces__ = [shaderblox.uniforms.IAppliable];
+shaderblox.uniforms.UBool.__super__ = shaderblox.uniforms.UniformBase_Bool;
+shaderblox.uniforms.UBool.prototype = $extend(shaderblox.uniforms.UniformBase_Bool.prototype,{
 	apply: function() {
-		flu_modules_opengl_web_GL.current_context.uniform1i(this.location,this.data?1:0);
+		lime.graphics.opengl.GL.context.uniform1i(this.location,this.data?1:0);
 		this.dirty = false;
 	}
-	,__class__: shaderblox_uniforms_UBool
+	,__class__: shaderblox.uniforms.UBool
 });
-let shaderblox_uniforms_UniformBase_$Float = function(name,index,data) {
+shaderblox.uniforms.UniformBase_Float = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
 	this.data = data;
+	this.dirty = true;
 };
-$hxClasses["shaderblox.uniforms.UniformBase_Float"] = shaderblox_uniforms_UniformBase_$Float;
-shaderblox_uniforms_UniformBase_$Float.__name__ = true;
-shaderblox_uniforms_UniformBase_$Float.prototype = {
-	__class__: shaderblox_uniforms_UniformBase_$Float
+$hxClasses["shaderblox.uniforms.UniformBase_Float"] = shaderblox.uniforms.UniformBase_Float;
+shaderblox.uniforms.UniformBase_Float.__name__ = true;
+shaderblox.uniforms.UniformBase_Float.prototype = {
+	set: function(data) {
+		this.dirty = true;
+		this.dirty = true;
+		return this.data = data;
+	}
+	,setDirty: function() {
+		this.dirty = true;
+	}
+	,set_data: function(data) {
+		this.dirty = true;
+		return this.data = data;
+	}
+	,__class__: shaderblox.uniforms.UniformBase_Float
 };
-let shaderblox_uniforms_UFloat = function(name,index,f) {
+shaderblox.uniforms.UFloat = function(name,index,f) {
 	if(f == null) f = 0.0;
-	shaderblox_uniforms_UniformBase_$Float.call(this,name,index,f);
+	shaderblox.uniforms.UniformBase_Float.call(this,name,index,f);
 };
-$hxClasses["shaderblox.uniforms.UFloat"] = shaderblox_uniforms_UFloat;
-shaderblox_uniforms_UFloat.__name__ = true;
-shaderblox_uniforms_UFloat.__interfaces__ = [shaderblox_uniforms_IAppliable];
-shaderblox_uniforms_UFloat.__super__ = shaderblox_uniforms_UniformBase_$Float;
-shaderblox_uniforms_UFloat.prototype = $extend(shaderblox_uniforms_UniformBase_$Float.prototype,{
+$hxClasses["shaderblox.uniforms.UFloat"] = shaderblox.uniforms.UFloat;
+shaderblox.uniforms.UFloat.__name__ = true;
+shaderblox.uniforms.UFloat.__interfaces__ = [shaderblox.uniforms.IAppliable];
+shaderblox.uniforms.UFloat.__super__ = shaderblox.uniforms.UniformBase_Float;
+shaderblox.uniforms.UFloat.prototype = $extend(shaderblox.uniforms.UniformBase_Float.prototype,{
 	apply: function() {
-		flu_modules_opengl_web_GL.current_context.uniform1f(this.location,this.data);
+		lime.graphics.opengl.GL.context.uniform1f(this.location,this.data);
 		this.dirty = false;
 	}
-	,__class__: shaderblox_uniforms_UFloat
+	,__class__: shaderblox.uniforms.UFloat
 });
-let shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture = function(name,index,data) {
+shaderblox.uniforms.UniformBase_js_html_webgl_Texture = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
 	this.data = data;
+	this.dirty = true;
 };
-$hxClasses["shaderblox.uniforms.UniformBase_js_html_webgl_Texture"] = shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture;
-shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture.__name__ = true;
-shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture.prototype = {
-	__class__: shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture
+$hxClasses["shaderblox.uniforms.UniformBase_js_html_webgl_Texture"] = shaderblox.uniforms.UniformBase_js_html_webgl_Texture;
+shaderblox.uniforms.UniformBase_js_html_webgl_Texture.__name__ = true;
+shaderblox.uniforms.UniformBase_js_html_webgl_Texture.prototype = {
+	set: function(data) {
+		this.dirty = true;
+		this.dirty = true;
+		return this.data = data;
+	}
+	,setDirty: function() {
+		this.dirty = true;
+	}
+	,set_data: function(data) {
+		this.dirty = true;
+		return this.data = data;
+	}
+	,__class__: shaderblox.uniforms.UniformBase_js_html_webgl_Texture
 };
-let shaderblox_uniforms_UTexture = function(name,index,cube) {
+shaderblox.uniforms.UTexture = function(name,index,cube) {
 	if(cube == null) cube = false;
 	this.cube = cube;
-	this.type = cube?34067:3553;
-	shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture.call(this,name,index,null);
+	if(cube) this.type = 34067; else this.type = 3553;
+	shaderblox.uniforms.UniformBase_js_html_webgl_Texture.call(this,name,index,null);
 };
-$hxClasses["shaderblox.uniforms.UTexture"] = shaderblox_uniforms_UTexture;
-shaderblox_uniforms_UTexture.__name__ = true;
-shaderblox_uniforms_UTexture.__interfaces__ = [shaderblox_uniforms_IAppliable];
-shaderblox_uniforms_UTexture.__super__ = shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture;
-shaderblox_uniforms_UTexture.prototype = $extend(shaderblox_uniforms_UniformBase_$js_$html_$webgl_$Texture.prototype,{
+$hxClasses["shaderblox.uniforms.UTexture"] = shaderblox.uniforms.UTexture;
+shaderblox.uniforms.UTexture.__name__ = true;
+shaderblox.uniforms.UTexture.__interfaces__ = [shaderblox.uniforms.IAppliable];
+shaderblox.uniforms.UTexture.__super__ = shaderblox.uniforms.UniformBase_js_html_webgl_Texture;
+shaderblox.uniforms.UTexture.prototype = $extend(shaderblox.uniforms.UniformBase_js_html_webgl_Texture.prototype,{
 	apply: function() {
 		if(this.data == null) return;
-		let idx = 33984 + this.samplerIndex;
-		if(shaderblox_uniforms_UTexture.lastActiveTexture != idx) {
-			let texture = shaderblox_uniforms_UTexture.lastActiveTexture = idx;
-			flu_modules_opengl_web_GL.current_context.activeTexture(texture);
-		}
-		flu_modules_opengl_web_GL.current_context.uniform1i(this.location,this.samplerIndex);
-		flu_modules_opengl_web_GL.current_context.bindTexture(this.type,this.data);
+		var idx = 33984 + this.samplerIndex;
+		if(shaderblox.uniforms.UTexture.lastActiveTexture != idx) lime.graphics.opengl.GL.activeTexture(shaderblox.uniforms.UTexture.lastActiveTexture = idx);
+		lime.graphics.opengl.GL.context.uniform1i(this.location,this.samplerIndex);
+		lime.graphics.opengl.GL.context.bindTexture(this.type,this.data);
 		this.dirty = false;
 	}
-	,__class__: shaderblox_uniforms_UTexture
+	,__class__: shaderblox.uniforms.UTexture
 });
-let shaderblox_uniforms_Vector2 = function(x,y) {
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	this.x = x;
-	this.y = y;
-};
-$hxClasses["shaderblox.uniforms.Vector2"] = shaderblox_uniforms_Vector2;
-shaderblox_uniforms_Vector2.__name__ = true;
-shaderblox_uniforms_Vector2.prototype = {
-	__class__: shaderblox_uniforms_Vector2
-};
-let shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2 = function(name,index,data) {
+shaderblox.uniforms.UniformBase_lime_math_Vector2 = function(name,index,data) {
 	this.name = name;
 	this.location = index;
 	this.dirty = true;
 	this.data = data;
-};
-$hxClasses["shaderblox.uniforms.UniformBase_shaderblox_uniforms_Vector2"] = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2;
-shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.__name__ = true;
-shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.prototype = {
-	__class__: shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2
-};
-let shaderblox_uniforms_UVec2 = function(name,index,x,y) {
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.call(this,name,index,new shaderblox_uniforms_Vector2(x,y));
-};
-$hxClasses["shaderblox.uniforms.UVec2"] = shaderblox_uniforms_UVec2;
-shaderblox_uniforms_UVec2.__name__ = true;
-shaderblox_uniforms_UVec2.__interfaces__ = [shaderblox_uniforms_IAppliable];
-shaderblox_uniforms_UVec2.__super__ = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2;
-shaderblox_uniforms_UVec2.prototype = $extend(shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector2.prototype,{
-	apply: function() {
-		flu_modules_opengl_web_GL.current_context.uniform2f(this.location,this.data.x,this.data.y);
-		this.dirty = false;
-	}
-	,__class__: shaderblox_uniforms_UVec2
-});
-let shaderblox_uniforms_Vector3 = function(x,y,z) {
-	if(z == null) z = 0;
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	this.x = x;
-	this.y = y;
-	this.z = z;
-};
-$hxClasses["shaderblox.uniforms.Vector3"] = shaderblox_uniforms_Vector3;
-shaderblox_uniforms_Vector3.__name__ = true;
-shaderblox_uniforms_Vector3.prototype = {
-	__class__: shaderblox_uniforms_Vector3
-};
-let shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3 = function(name,index,data) {
-	this.name = name;
-	this.location = index;
 	this.dirty = true;
-	this.data = data;
 };
-$hxClasses["shaderblox.uniforms.UniformBase_shaderblox_uniforms_Vector3"] = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3;
-shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3.__name__ = true;
-shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3.prototype = {
-	__class__: shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3
+$hxClasses["shaderblox.uniforms.UniformBase_lime_math_Vector2"] = shaderblox.uniforms.UniformBase_lime_math_Vector2;
+shaderblox.uniforms.UniformBase_lime_math_Vector2.__name__ = true;
+shaderblox.uniforms.UniformBase_lime_math_Vector2.prototype = {
+	set: function(data) {
+		this.dirty = true;
+		this.dirty = true;
+		return this.data = data;
+	}
+	,setDirty: function() {
+		this.dirty = true;
+	}
+	,set_data: function(data) {
+		this.dirty = true;
+		return this.data = data;
+	}
+	,__class__: shaderblox.uniforms.UniformBase_lime_math_Vector2
 };
-let shaderblox_uniforms_UVec3 = function(name,index,x,y,z) {
-	if(z == null) z = 0;
+shaderblox.uniforms.UVec2 = function(name,index,x,y) {
 	if(y == null) y = 0;
 	if(x == null) x = 0;
-	shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3.call(this,name,index,new shaderblox_uniforms_Vector3(x,y,z));
+	shaderblox.uniforms.UniformBase_lime_math_Vector2.call(this,name,index,new lime.math.Vector2(x,y));
 };
-$hxClasses["shaderblox.uniforms.UVec3"] = shaderblox_uniforms_UVec3;
-shaderblox_uniforms_UVec3.__name__ = true;
-shaderblox_uniforms_UVec3.__interfaces__ = [shaderblox_uniforms_IAppliable];
-shaderblox_uniforms_UVec3.__super__ = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3;
-shaderblox_uniforms_UVec3.prototype = $extend(shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector3.prototype,{
+$hxClasses["shaderblox.uniforms.UVec2"] = shaderblox.uniforms.UVec2;
+shaderblox.uniforms.UVec2.__name__ = true;
+shaderblox.uniforms.UVec2.__interfaces__ = [shaderblox.uniforms.IAppliable];
+shaderblox.uniforms.UVec2.__super__ = shaderblox.uniforms.UniformBase_lime_math_Vector2;
+shaderblox.uniforms.UVec2.prototype = $extend(shaderblox.uniforms.UniformBase_lime_math_Vector2.prototype,{
 	apply: function() {
-		flu_modules_opengl_web_GL.current_context.uniform3f(this.location,this.data.x,this.data.y,this.data.z);
+		lime.graphics.opengl.GL.context.uniform2f(this.location,this.data.x,this.data.y);
 		this.dirty = false;
 	}
-	,__class__: shaderblox_uniforms_UVec3
+	,__class__: shaderblox.uniforms.UVec2
 });
-let shaderblox_uniforms_Vector4 = function(x,y,z,w) {
-	if(w == null) w = 0;
-	if(z == null) z = 0;
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	this.x = x;
-	this.y = y;
-	this.z = z;
-	this.w = w;
-};
-$hxClasses["shaderblox.uniforms.Vector4"] = shaderblox_uniforms_Vector4;
-shaderblox_uniforms_Vector4.__name__ = true;
-shaderblox_uniforms_Vector4.prototype = {
-	__class__: shaderblox_uniforms_Vector4
-};
-let shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4 = function(name,index,data) {
-	this.name = name;
-	this.location = index;
-	this.dirty = true;
-	this.data = data;
-};
-$hxClasses["shaderblox.uniforms.UniformBase_shaderblox_uniforms_Vector4"] = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4;
-shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4.__name__ = true;
-shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4.prototype = {
-	__class__: shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4
-};
-let shaderblox_uniforms_UVec4 = function(name,index,x,y,z,w) {
-	if(w == null) w = 0;
-	if(z == null) z = 0;
-	if(y == null) y = 0;
-	if(x == null) x = 0;
-	shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4.call(this,name,index,new shaderblox_uniforms_Vector4(x,y,z,w));
-};
-$hxClasses["shaderblox.uniforms.UVec4"] = shaderblox_uniforms_UVec4;
-shaderblox_uniforms_UVec4.__name__ = true;
-shaderblox_uniforms_UVec4.__interfaces__ = [shaderblox_uniforms_IAppliable];
-shaderblox_uniforms_UVec4.__super__ = shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4;
-shaderblox_uniforms_UVec4.prototype = $extend(shaderblox_uniforms_UniformBase_$shaderblox_$uniforms_$Vector4.prototype,{
-	apply: function() {
-		flu_modules_opengl_web_GL.current_context.uniform4f(this.location,this.data.x,this.data.y,this.data.z,this.data.w);
-		this.dirty = false;
-	}
-	,__class__: shaderblox_uniforms_UVec4
-});
-let flu = function() {
-	this.is_ready = false;
-	this.was_ready = false;
-	this.has_shutdown = false;
-	this.shutting_down = false;
-	this.os = "unknown";
-	this.platform = "unknown";
-	this.freeze = false;
-	this.platform = "web";
-	flu.core = new flu_core_web_Core(this);
-	flu.next_queue = [];
-	flu.defer_queue = [];
-};
-$hxClasses["fluidState.fluidState"] = flu;
-flu.__name__ = true;
-flu.prototype = {
-	shutdown: function() {
-		this.shutting_down = true;
-		this.host.ondestroy();
-		this.io.module.destroy();
-		this.input.destroy();
-		this.windowing.destroy();
-		flu.core.shutdown();
-		this.has_shutdown = true;
-	}
-	,render: function() {
-		this.windowing.update();
-	}
-	,dispatch_system_event: function(_event) {
-		this.on_event(_event);
-	}
-	,init: function(_flu_config,_host) {
-		this.flu_config = _flu_config;
-		if(this.flu_config.app_package == null) this.flu_config.app_package = "org.flukit.fluidState";
-		if(this.flu_config.config_path == null) this.flu_config.config_path = "";
-		this.config = this.default_config();
-		this.host = _host;
-		this.host.app = this;
-		flu.core.init($bind(this,this.on_event));
-	}
-	,on_flu_init: function() {
-		this.host.on_internal_init();
-	}
-	,on_flu_ready: function() {
-		let _g = this;
-		if(this.was_ready) throw new js__$Boot_FluidError(flu_types_Error.error("firing ready event more than once is invalid usage"));
-		this.io = new flu_system_io_IO(this);
-		this.input = new flu_system_input_Input(this);
-		this.assets = new flu_system_assets_Assets(this);
-		this.windowing = new flu_system_window_Windowing(this);
-		this.was_ready = true;
-		this.setup_app_path();
-		this.setup_configs().then(function(_) {
-			_g.setup_default_window();
-			let func = $bind(_g,_g.on_ready);
-			if(func != null) flu.next_queue.push(func);
-		}).error(function(e) {
-			throw new js__$Boot_FluidError(flu_types_Error.init("fluidState / cannot recover from error: " + e));
-		});
-		flu_api_Promises.step();
-		while(flu.next_queue.length > 0) {
-			let count = flu.next_queue.length;
-			let i = 0;
-			while(i < count) {
-				(flu.next_queue.shift())();
-				++i;
-			}
-		}
-		while(flu.defer_queue.length > 0) {
-			let count1 = flu.defer_queue.length;
-			let i1 = 0;
-			while(i1 < count1) {
-				(flu.defer_queue.shift())();
-				++i1;
-			}
-		}
-	}
-	,do_internal_update: function(dt) {
-		this.io.module.update();
-		this.input.update();
-		this.host.update(dt);
-	}
-	,on_ready: function() {
-		this.is_ready = true;
-		this.host.ready();
-	}
-	,on_flu_update: function() {
-		if(this.freeze) return;
-		flu_api_Timer.update();
-		flu_api_Promises.step();
-		let count = flu.next_queue.length;
-		let i = 0;
-		while(i < count) {
-			(flu.next_queue.shift())();
-			++i;
-		}
-		if(!this.is_ready) return;
-		this.host.ontickstart();
-		this.host.on_internal_update();
-		this.host.on_internal_render();
-		this.host.ontickend();
-		let count1 = flu.defer_queue.length;
-		let i1 = 0;
-		while(i1 < count1) {
-			(flu.defer_queue.shift())();
-			++i1;
-		}
-	}
-	,on_event: function(_event) {
-		_event.type != 3 && _event.type != 0 && _event.type != 5 && _event.type != 6;
-		if(this.is_ready) {
-			this.io.module.on_event(_event);
-			this.windowing.on_event(_event);
-			this.input.on_event(_event);
-		}
-		this.host.onevent(_event);
-		let _g = _event.type;
-		if(_g != null) switch(_g) {
-		case 1:
-			this.on_flu_init();
-			break;
-		case 2:
-			this.on_flu_ready();
-			break;
-		case 3:
-			this.on_flu_update();
-			break;
-		case 7:case 8:
-			this.shutdown();
-			break;
-		case 4:
-			console.log("     i / fluidState / " + "Goodbye.");
-			break;
-		default:
-		} else {
-		}
-	}
-	,setup_app_path: function() {
-	}
-	,setup_configs: function() {
-		let _g = this;
-		if(this.flu_config.config_path == "") {
-			this.setup_host_config();
-			return flu_api_Promise.resolve();
-		}
-		return new flu_api_Promise(function(resolve,reject) {
-			_g.default_runtime_config().then(function(_runtime_conf) {
-				_g.config.runtime = _runtime_conf;
-			}).error(function(error) {
-				throw new js__$Boot_FluidError(flu_types_Error.init("config / failed / default runtime config failed to parse as JSON. cannot recover. " + error));
-			}).then(function() {
-				_g.setup_host_config();
-				resolve();
-			});
-		});
-	}
-	,setup_host_config: function() {
-		this.config = this.host.config(this.config);
-	}
-	,setup_default_window: function() {
-		if(this.config.has_window == true) {
-			this.window = this.windowing.create(this.config.window);
-			if(this.window.handle == null) throw new js__$Boot_FluidError(flu_types_Error.windowing("requested default window cannot be created. cannot continue"));
-		} else {
-		}
-	}
-	,default_config: function() {
-		return { has_window : true, runtime : { }, window : this.default_window_config(), render : this.default_render_config(), web : { no_context_menu : true, prevent_default_keys : [flu_system_input_Keycodes.left,flu_system_input_Keycodes.right,flu_system_input_Keycodes.up,flu_system_input_Keycodes.down,flu_system_input_Keycodes.backspace,flu_system_input_Keycodes.tab,flu_system_input_Keycodes["delete"]], prevent_default_mouse_wheel : true, true_fullscreen : false}};
-	}
-	,default_runtime_config: function() {
-		let _g = this;
-		return new flu_api_Promise(function(resolve,reject) {
-			let load = _g.io.data_flow(flu_io_Path.join([_g.assets.root,_g.flu_config.config_path]),flu_system_assets_AssetJSON.processor);
-			load.then(resolve).error(function(error) {
-				switch(error[1]) {
-				case 3:
-					reject(error);
-					break;
-				default:
-					resolve();
-				}
-			});
-		});
-	}
-	,default_render_config: function() {
-		return { depth : false, stencil : false, antialiasing : 0, red_bits : 8, green_bits : 8, blue_bits : 8, alpha_bits : 8, depth_bits : 0, stencil_bits : 0, opengl : { minor : 0, major : 0, profile : 0}};
-	}
-	,default_window_config: function() {
-		let conf = { fullscreen_desktop : true, fullscreen : false, borderless : false, resizable : true, x : 536805376, y : 536805376, width : 800, height : 600};
-		return conf;
-	}
-	,__class__: flu
-};
-let flu_api_Promise = function(func) {
-	this.was_caught = false;
-	let _g = this;
-	this.state = 0;
-	this.reject_reactions = [];
-	this.fulfill_reactions = [];
-	this.settle_reactions = [];
-	flu_api_Promises.queue(function() {
-		func($bind(_g,_g.onfulfill),$bind(_g,_g.onreject));
-		flu_api_Promises.defer(flu_api_Promises.next);
-	});
-};
-$hxClasses["fluidState.api.Promise"] = flu_api_Promise;
-flu_api_Promise.__name__ = true;
-flu_api_Promise.reject = function(reason) {
-	return new flu_api_Promise(function(ok,no) {
-		no(reason);
-	});
-};
-flu_api_Promise.resolve = function(val) {
-	return new flu_api_Promise(function(ok,no) {
-		ok(val);
-	});
-};
-flu_api_Promise.prototype = {
-	then: function(on_fulfilled,on_rejected) {
-		let _g = this.state;
-		switch(_g) {
-		case 0:
-			this.add_fulfill(on_fulfilled);
-			this.add_reject(on_rejected);
-			return this.new_linked_promise();
-		case 1:
-			flu_api_Promises.defer(on_fulfilled,this.result);
-			return flu_api_Promise.resolve(this.result);
-		case 2:
-			flu_api_Promises.defer(on_rejected,this.result);
-			return flu_api_Promise.reject(this.result);
-		}
-	}
-	,error: function(on_rejected) {
-		let _g = this.state;
-		switch(_g) {
-		case 0:
-			this.add_reject(on_rejected);
-			return this.new_linked_resolve_empty();
-		case 1:
-			return flu_api_Promise.resolve(this.result);
-		case 2:
-			flu_api_Promises.defer(on_rejected,this.result);
-			return flu_api_Promise.reject(this.result);
-		}
-	}
-	,add_settle: function(f) {
-		if(this.state == 0) this.settle_reactions.push(f); else flu_api_Promises.defer(f,this.result);
-	}
-	,new_linked_promise: function() {
-		let _g = this;
-		return new flu_api_Promise(function(f,r) {
-			_g.add_settle(function(_) {
-				if(_g.state == 1) f(_g.result); else r(_g.result);
-			});
-		});
-	}
-	,new_linked_resolve_empty: function() {
-		let _g = this;
-		return new flu_api_Promise(function(f,r) {
-			_g.add_settle(function(_) {
-				f();
-			});
-		});
-	}
-	,add_fulfill: function(f) {
-		if(f != null) this.fulfill_reactions.push(f);
-	}
-	,add_reject: function(f) {
-		if(f != null) {
-			this.was_caught = true;
-			this.reject_reactions.push(f);
-		}
-	}
-	,onfulfill: function(val) {
-		this.state = 1;
-		this.result = val;
-		while(this.fulfill_reactions.length > 0) {
-			let fn = this.fulfill_reactions.shift();
-			fn(this.result);
-		}
-		this.onsettle();
-	}
-	,onreject: function(reason) {
-		this.state = 2;
-		this.result = reason;
-		while(this.reject_reactions.length > 0) {
-			let fn = this.reject_reactions.shift();
-			fn(this.result);
-		}
-		this.onsettle();
-	}
-	,onsettle: function() {
-		while(this.settle_reactions.length > 0) {
-			let fn = this.settle_reactions.shift();
-			fn(this.result);
-		}
-	}
-	,__class__: flu_api_Promise
-};
-let flu_api_Promises = function() { };
-$hxClasses["fluidState.api.Promises"] = flu_api_Promises;
-flu_api_Promises.__name__ = true;
-flu_api_Promises.step = function() {
-	flu_api_Promises.next();
-	while(flu_api_Promises.defers.length > 0) {
-		let defer = flu_api_Promises.defers.shift();
-		defer.f(defer.a);
-	}
-};
-flu_api_Promises.next = function() {
-	if(flu_api_Promises.calls.length > 0) (flu_api_Promises.calls.shift())();
-};
-flu_api_Promises.defer = function(f,a) {
-	if(f == null) return;
-	flu_api_Promises.defers.push({ f : f, a : a});
-};
-flu_api_Promises.queue = function(f) {
-	if(f == null) return;
-	flu_api_Promises.calls.push(f);
-};
-let flu_api_Timer = function() { };
-$hxClasses["fluidState.api.Timer"] = flu_api_Timer;
-flu_api_Timer.__name__ = true;
-flu_api_Timer.update = function() {
-	let now = flu.core.timestamp();
-	let _g = 0;
-	let _g1 = flu_api_Timer.running_timers;
-	while(_g < _g1.length) {
-		let timer = _g1[_g];
-		++_g;
-		if(timer.running) {
-			if(timer.fire_at < now) {
-				timer.fire_at += timer.time;
-				timer.run();
-			}
-		}
-	}
-};
-flu_api_Timer.prototype = {
-	run: function() {
-	}
-	,__class__: flu_api_Timer
-};
-let flu_core_web_Core = function(_app) {
-	this._time_now = 0.0;
-	this._lf_timestamp = 0.016;
-	this.start_timestamp = 0.0;
-	this.app = _app;
-	this.start_timestamp = this.timestamp();
-	this.guess_os();
-};
-
-$hxClasses["fluidState.core.web.Core"] = flu_core_web_Core;
-flu_core_web_Core.__name__ = true;
-flu_core_web_Core.prototype = {
-	init: function(_event_handler) {
-		this.app.on_event({ type : 1});
-		this.app.on_event({ type : 2});
-		if(this.app.flu_config.has_loop) this.request_update();
-	}
-	,shutdown: function() {
-	}
-	,timestamp: function() {
-		let now;
-		if(window.performance != null) now = window.performance.now() / 1000.0; else now = flu_Timer.stamp();
-		return now - this.start_timestamp;
-	}
-	,request_update: function() {
-		let _g = this;
-		if(($_=window,$bind($_,$_.requestAnimationFrame)) != null) window.requestAnimationFrame($bind(this,this.flu_core_loop)); else {
-			console.log("     i / core / " + ("warning : requestAnimationFrame not found, falling back to render_rate! render_rate:" + this.app.host.render_rate));
-			window.setTimeout(function() {
-				let _now = _g.timestamp();
-				_g._time_now += _now - _g._lf_timestamp;
-				_g.flu_core_loop(_g._time_now * 1000.0);
-				_g._lf_timestamp = _now;
-			},this.app.host.render_rate * 1000.0 | 0);
-		}
-	}
-	,flu_core_loop: function(_t) {
-		if(_t == null) _t = 0.016;
-		this.update();
-		this.app.on_event({ type : 3});
-		this.request_update();
-		return true;
-	}
-	,update: function() {
-	}
-	,guess_os: function() {
-	
-	}
-	,__class__: flu_core_web_Core
-};
-
-let flu_modules_interfaces_Assets = function() { };
-$hxClasses["fluidState.modules.interfaces.Assets"] = flu_modules_interfaces_Assets;
-flu_modules_interfaces_Assets.__name__ = true;
-let flu_core_web_assets_Assets = function(_system) {
-	this.system = _system;
-};
-
-$hxClasses["fluidState.core.web.assets.Assets"] = flu_core_web_assets_Assets;
-flu_core_web_assets_Assets.__name__ = true;
-flu_core_web_assets_Assets.__interfaces__ = [flu_modules_interfaces_Assets];
-flu_core_web_assets_Assets.prototype = {
-	__class__: flu_core_web_assets_Assets
-};
-
-let flu_modules_interfaces_Input = function() { };
-$hxClasses["fluidState.modules.interfaces.Input"] = flu_modules_interfaces_Input;
-flu_modules_interfaces_Input.__name__ = true;
-let flu_system_input_Scancodes = function() { };
-$hxClasses["fluidState.system.input.Scancodes"] = flu_system_input_Scancodes;
-flu_system_input_Scancodes.__name__ = true;
-let flu_system_input_Keycodes = function() { };
-$hxClasses["fluidState.system.input.Keycodes"] = flu_system_input_Keycodes;
-flu_system_input_Keycodes.__name__ = true;
-flu_system_input_Keycodes.from_scan = function(scancode) {
-	return scancode | flu_system_input_Scancodes.MASK;
-};
-
-let flu_core_web_input_Input = function(_system) {
-	this.gamepads_supported = false;
-	this.system = _system;
-}
-;
-$hxClasses["fluidState.core.web.input.Input"] = flu_core_web_input_Input;
-flu_core_web_input_Input.__name__ = true;
-flu_core_web_input_Input.__interfaces__ = [flu_modules_interfaces_Input];
-flu_core_web_input_Input.prototype = {
-	init: function() {
-		window.document.addEventListener("keypress",$bind(this,this.on_keypress));
-		window.document.addEventListener("keydown",$bind(this,this.on_keydown));
-		window.document.addEventListener("keyup",$bind(this,this.on_keyup));
-		this.active_gamepads = new flu_ds_IntMap();
-		this.gamepads_supported = this.get_gamepad_list() != null;
-		if(window.DeviceOrientationEvent) {
-			window.addEventListener("deviceorientation",$bind(this,this.on_orientation));
-			window.addEventListener("devicemotion",$bind(this,this.on_motion));
-		}
-		console.log("    i / input / " + ("Gamepads supported: " + Std.string(this.gamepads_supported)));
-	}
-	,update: function() {
-		if(this.gamepads_supported) this.poll_gamepads();
-	}
-	,destroy: function() {
-	}
-	,listen: function(window) {
-		window.handle.addEventListener("contextmenu",$bind(this,this.on_contextmenu));
-		window.handle.addEventListener("mousedown",$bind(this,this.on_mousedown));
-		window.handle.addEventListener("mouseup",$bind(this,this.on_mouseup));
-		window.handle.addEventListener("mousemove",$bind(this,this.on_mousemove));
-		window.handle.addEventListener("mousewheel",$bind(this,this.on_mousewheel));
-		window.handle.addEventListener("wheel",$bind(this,this.on_mousewheel));
-		window.handle.addEventListener("touchstart",$bind(this,this.on_touchdown));
-		window.handle.addEventListener("touchend",$bind(this,this.on_touchup));
-		window.handle.addEventListener("touchmove",$bind(this,this.on_touchmove));
-	}
-	,on_event: function(_event) {
-	}
-	,on_orientation: function(event) {
-		this.system.app.dispatch_system_event({ type : 6, input : { type : 4, timestamp : flu.core.timestamp(), event : { type : "orientation", alpha : event.alpha, beta : event.beta, gamma : event.gamma}}});
-	}
-	,on_motion: function(event) {
-		this.system.app.dispatch_system_event({ type : 6, input : { type : 4, timestamp : flu.core.timestamp(), event : { type : "motion", acceleration : event.acceleration, accelerationIncludingGravity : event.accelerationIncludingGravity, rotationRate : event.rotationRate}}});
-	}
-	,poll_gamepads: function() {
-		if(!this.gamepads_supported) return;
-		let list = this.get_gamepad_list();
-		if(list != null) {
-			let _g1 = 0;
-			let _g = list.length;
-			while(_g1 < _g) {
-				let i = _g1++;
-				if(list[i] != null) this.handle_gamepad(list[i]); else {
-					let _gamepad = this.active_gamepads.h[i];
-					if(_gamepad != null) this.system.dispatch_gamepad_device_event(_gamepad.index,_gamepad.id,2,flu.core.timestamp());
-					this.active_gamepads.remove(i);
-				}
-			}
-		}
-	}
-	,handle_gamepad: function(_gamepad) {
-		if(_gamepad == null) return;
-		let tmp;
-		let key = _gamepad.index;
-		tmp = this.active_gamepads.h.hasOwnProperty(key);
-		if(!tmp) {
-			let _new_gamepad = { id : _gamepad.id, index : _gamepad.index, axes : [], buttons : [], timestamp : flu.core.timestamp()};
-			let axes = _gamepad.axes;
-			let _g = 0;
-			while(_g < axes.length) {
-				let value = axes[_g];
-				++_g;
-				_new_gamepad.axes.push(value);
-			}
-			let _button_list = _gamepad.buttons;
-			let _g1 = 0;
-			while(_g1 < _button_list.length) {
-				++_g1;
-				_new_gamepad.buttons.push({ pressed : false, value : 0});
-			}
-			this.active_gamepads.h[_new_gamepad.index] = _new_gamepad;
-			this.system.dispatch_gamepad_device_event(_new_gamepad.index,_new_gamepad.id,1,_new_gamepad.timestamp);
-		} else {
-			let tmp1;
-			let key1 = _gamepad.index;
-			tmp1 = this.active_gamepads.h[key1];
-			let gamepad = tmp1;
-			if(gamepad.id != _gamepad.id) gamepad.id = _gamepad.id;
-			let axes_changed = [];
-			let buttons_changed = [];
-			let last_axes = gamepad.axes;
-			let last_buttons = gamepad.buttons;
-			let new_axes = _gamepad.axes;
-			let new_buttons = _gamepad.buttons;
-			let axis_index = 0;
-			let _g2 = 0;
-			while(_g2 < new_axes.length) {
-				let axis = new_axes[_g2];
-				++_g2;
-				if(axis != last_axes[axis_index]) {
-					axes_changed.push(axis_index);
-					gamepad.axes[axis_index] = axis;
-				}
-				axis_index++;
-			}
-			let button_index = 0;
-			let _g3 = 0;
-			while(_g3 < new_buttons.length) {
-				let button = new_buttons[_g3];
-				++_g3;
-				if(button.value != last_buttons[button_index].value) {
-					buttons_changed.push(button_index);
-					gamepad.buttons[button_index].pressed = button.pressed;
-					gamepad.buttons[button_index].value = button.value;
-				}
-				button_index++;
-			}
-			let _g4 = 0;
-			while(_g4 < axes_changed.length) {
-				let index = axes_changed[_g4];
-				++_g4;
-				this.system.dispatch_gamepad_axis_event(gamepad.index,index,new_axes[index],gamepad.timestamp);
-			}
-			let _g5 = 0;
-			while(_g5 < buttons_changed.length) {
-				let index1 = buttons_changed[_g5];
-				++_g5;
-				if(new_buttons[index1].pressed == true) this.system.dispatch_gamepad_button_down_event(gamepad.index,index1,new_buttons[index1].value,gamepad.timestamp); else this.system.dispatch_gamepad_button_up_event(gamepad.index,index1,new_buttons[index1].value,gamepad.timestamp);
-			}
-		}
-	}
-	,fail_gamepads: function() {
-		this.gamepads_supported = false;
-		console.log("    i / input / " + "Gamepads are not supported in this browser :(");
-	}
-	,get_gamepad_list: function() {
-		if(($_=window.navigator,$bind($_,$_.getGamepads)) != null) return window.navigator.getGamepads();
-		if(window.navigator.webkitGetGamepads != null) return window.navigator.webkitGetGamepads();
-		this.fail_gamepads();
-		return null;
-	}
-	,on_mousedown: function(_mouse_event) {
-		let _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
-		this.system.dispatch_mouse_down_event(_mouse_event.pageX - window.pageXOffset - _window.x,_mouse_event.pageY - window.pageYOffset - _window.y,_mouse_event.button + 1,_mouse_event.timeStamp,_window.id);
-	}
-	,on_mouseup: function(_mouse_event) {
-		let _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
-		this.system.dispatch_mouse_up_event(_mouse_event.pageX - window.pageXOffset - _window.x,_mouse_event.pageY - window.pageYOffset - _window.y,_mouse_event.button + 1,_mouse_event.timeStamp,_window.id);
-	}
-	,on_mousemove: function(_mouse_event) {
-		let _window = this.system.app.windowing.window_from_handle(_mouse_event.target);
-		let _movement_x = _mouse_event.movementX;
-		let _movement_y = _mouse_event.movementY;
-		if(_movement_x == null) {
-			if(_mouse_event.webkitMovementX != null) {
-				_movement_x = _mouse_event.webkitMovementX;
-				_movement_y = _mouse_event.webkitMovementY;
-			} else if(_mouse_event.mozMovementX != null) {
-				_movement_x = _mouse_event.mozMovementX;
-				_movement_y = _mouse_event.mozMovementY;
-			}
-		}
-		this.system.dispatch_mouse_move_event(_mouse_event.pageX - window.pageXOffset - _window.x,_mouse_event.pageY - window.pageYOffset - _window.y,_movement_x,_movement_y,_mouse_event.timeStamp,_window.id);
-	}
-	,on_mousewheel: function(_wheel_event) {
-		if(this.system.app.config.web.prevent_default_mouse_wheel) _wheel_event.preventDefault();
-		let _window = this.system.app.windowing.window_from_handle(_wheel_event.target);
-		let _x = 0;
-		let _y = 0;
-		if(_wheel_event.deltaY != null) _y = _wheel_event.deltaY; else if(_wheel_event.wheelDeltaY != null) _y = -_wheel_event.wheelDeltaY / 3 | 0;
-		if(_wheel_event.deltaX != null) _x = _wheel_event.deltaX; else if(_wheel_event.wheelDeltaX != null) _x = -_wheel_event.wheelDeltaX / 3 | 0;
-		this.system.dispatch_mouse_wheel_event(Math.round(_x / 16),Math.round(_y / 16),_wheel_event.timeStamp,_window.id);
-	}
-	,on_contextmenu: function(_event) {
-		if(this.system.app.config.web.no_context_menu) _event.preventDefault();
-	}
-	,on_keypress: function(_key_event) {
-		if(_key_event.which != 0 && HxOverrides.indexOf(flu_core_web_input_Input._keypress_blacklist,_key_event.keyCode,0) == -1) {
-			let _text = String.fromCharCode(_key_event.charCode);
-			this.system.dispatch_text_event(_text,0,_text.length,2,_key_event.timeStamp,1);
-		}
-	}
-	,on_keydown: function(_key_event) {
-		let _keycode = this.convert_keycode(_key_event.keyCode);
-		let _scancode = flu_system_input_Keycodes.to_scan(_keycode);
-		let _mod_state = this.mod_state_from_event(_key_event);
-		if(HxOverrides.indexOf(this.system.app.config.web.prevent_default_keys,_keycode,0) != -1) _key_event.preventDefault();
-		this.system.dispatch_key_down_event(_keycode,_scancode,_key_event.repeat,_mod_state,_key_event.timeStamp,1);
-	}
-	,on_keyup: function(_key_event) {
-		let _keycode = this.convert_keycode(_key_event.keyCode);
-		let _scancode = flu_system_input_Keycodes.to_scan(_keycode);
-		let _mod_state = this.mod_state_from_event(_key_event);
-		if(HxOverrides.indexOf(this.system.app.config.web.prevent_default_keys,_keycode,0) != -1) _key_event.preventDefault();
-		this.system.dispatch_key_up_event(_keycode,_scancode,_key_event.repeat,_mod_state,_key_event.timeStamp,1);
-	}
-	,mod_state_from_event: function(_key_event) {
-		let _none = !_key_event.altKey && !_key_event.ctrlKey && !_key_event.metaKey && !_key_event.shiftKey;
-		return { none : _none, lshift : _key_event.shiftKey, rshift : _key_event.shiftKey, lctrl : _key_event.ctrlKey, rctrl : _key_event.ctrlKey, lalt : _key_event.altKey, ralt : _key_event.altKey, lmeta : _key_event.metaKey, rmeta : _key_event.metaKey, num : false, caps : false, mode : false, ctrl : _key_event.ctrlKey, shift : _key_event.shiftKey, alt : _key_event.altKey, meta : _key_event.metaKey};
-	}
-	,on_touchdown: function(_touch_event) {
-		let _window = this.system.app.windowing.window_from_handle(_touch_event.target);
-		let _g = 0;
-		let _g1 = _touch_event.changedTouches;
-		while(_g < _g1.length) {
-			let touch = _g1[_g];
-			++_g;
-			let _x = 500 - window.pageXOffset - _window.x;
-			let _y = 400 - window.pageYOffset - _window.y;
-			_x = _x / _window.width;
-			_y = _y / _window.height;
-			this.system.dispatch_touch_down_event(_x,_y,touch.identifier,flu.core.timestamp());
-		}
-	}
-	,on_touchup: function(_touch_event) {
-		let _window = this.system.app.windowing.window_from_handle(_touch_event.target);
-		let _g = 0;
-		let _g1 = _touch_event.changedTouches;
-		while(_g < _g1.length) {
-			let touch = _g1[_g];
-			++_g;
-			let _x = touch.pageX - window.pageXOffset - _window.x;
-			let _y = touch.pageY - window.pageYOffset - _window.y;
-			_x = _x / _window.width;
-			_y = _y / _window.height;
-			this.system.dispatch_touch_up_event(_x,_y,touch.identifier,flu.core.timestamp());
-		}
-	}
-	,on_touchmove: function(_touch_event) {
-		let _window = this.system.app.windowing.window_from_handle(_touch_event.target);
-		let _g = 0;
-		let _g1 = _touch_event.changedTouches;
-		while(_g < _g1.length) {
-			let touch = _g1[_g];
-			++_g;
-			let _x = touch.pageX - window.pageXOffset - _window.x;
-			let _y = touch.pageY - window.pageYOffset - _window.y;
-			_x = _x / _window.width;
-			_y = _y / _window.height;
-			this.system.dispatch_touch_move_event(_x,_y,0,0,touch.identifier,flu.core.timestamp());
-		}
-	}
-	,__class__: flu_core_web_input_Input
-};
-let flu_modules_interfaces_IO = function() { };
-$hxClasses["fluidState.modules.interfaces.IO"] = flu_modules_interfaces_IO;
-flu_modules_interfaces_IO.__name__ = true;
-let flu_core_web_io_IO = function(_system) {
-	this.system = _system;
-};
-$hxClasses["fluidState.core.web.io.IO"] = flu_core_web_io_IO;
-flu_core_web_io_IO.__name__ = true;
-flu_core_web_io_IO.__interfaces__ = [flu_modules_interfaces_IO];
-flu_core_web_io_IO.prototype = {
-	data_load: function(_path,_options) {
-		return new flu_api_Promise(function(resolve,reject) {
-			let _async = true;
-			let _binary = true;
-			if(_options != null) {
-				if(_options.binary != null) _binary = _options.binary;
-			}
-			let request = new XMLHttpRequest();
-			request.open("GET",_path,_async);
-			if(_binary) request.overrideMimeType("text/plain; charset=x-user-defined"); else request.overrideMimeType("text/plain; charset=UTF-8");
-			if(_async) request.responseType = "arraybuffer";
-			request.onload = function(data) {
-				if(request.status == 200) {
-					let tmp;
-					let elements = request.response;
-					let this1;
-					if(elements != null) this1 = new Uint8Array(elements); else this1 = null;
-					tmp = this1;
-					resolve(tmp);
-				} else reject(flu_types_Error.error("request status was " + request.status + " / " + request.statusText));
-			};
-			request.send();
-		});
-	}
-	,init: function() {
-	}
-	,update: function() {
-	}
-	,destroy: function() {
-	}
-	,on_event: function(_event) {
-	}
-	,__class__: flu_core_web_io_IO
-};
-let flu_modules_interfaces_Windowing = function() { };
-$hxClasses["fluidState.modules.interfaces.Windowing"] = flu_modules_interfaces_Windowing;
-flu_modules_interfaces_Windowing.__name__ = true;
-let flu_core_web_window_Windowing = function(_system) {
-	this._hidden_event_name = "";
-	this._hidden_name = "";
-	this._pre_fs_body_margin = "0";
-	this._pre_fs_body_overflow = "0";
-	this._pre_fs_height = 0;
-	this._pre_fs_width = 0;
-	this._pre_fs_s_height = "";
-	this._pre_fs_s_width = "";
-	this._pre_fs_margin = "0";
-	this._pre_fs_padding = "0";
-	this.seq_window = 1;
-	this.system = _system;
-	this.fs_windows = [];
-	this.gl_contexts = new flu_ds_IntMap();
-};
-$hxClasses["fluidState.core.web.window.Windowing"] = flu_core_web_window_Windowing;
-flu_core_web_window_Windowing.__name__ = true;
-flu_core_web_window_Windowing.__interfaces__ = [flu_modules_interfaces_Windowing];
-flu_core_web_window_Windowing.prototype = {
-	init: function() {
-		this.listen_for_visibility();
-		this.listen_for_resize();
-	}
-	,update: function() {
-	}
-	,destroy: function() {
-	}
-	,_copy_config: function(_config) {
-		return { borderless : _config.borderless, fullscreen : _config.fullscreen, fullscreen_desktop : _config.fullscreen_desktop, height : _config.height, no_input : _config.no_input, resizable : _config.resizable, title : _config.title, width : _config.width, x : _config.x, y : _config.y};
-	}
-	,create: function(render_config,_config,on_created) {
-		let _window_id = this.seq_window;
-		let tmp;
-		let _this = window.document;
-		tmp = _this.createElement("canvas");
-		let _handle = tmp;
-		let config = this._copy_config(_config);
-		_handle.width = "100%";
-		_handle.height = "0px";
-		_handle.style.display = "block";
-		_handle.style.position = "fixed";
-		_handle.style.background = "#000";
-		_handle.style.opacity = "1.0";
-		document.getElementsByClassName("fluid")[0].appendChild(_handle);
-		let _gl_context = js_html__$CanvasElement_CanvasUtil.getContextWebGL(_handle,{ alpha : false, premultipliedAlpha : false, antialias : render_config.antialiasing > 0});
-		if(_gl_context == null) {
-			let msg = "WebGL is required to run this!<br/><br/>";
-			msg += "visit http://get.webgl.org/ for help <br/>";
-			msg += "and contact the developer of the application";
-			this.internal_fallback(msg);
-			throw new js__$Boot_FluidError(flu_types_Error.windowing(msg));
-		}
-		if(flu_modules_opengl_web_GL.current_context == null) flu_modules_opengl_web_GL.current_context = _gl_context;
-		this.gl_contexts.h[_window_id] = _gl_context;
-		let _window_pos = this.get_real_window_position(_handle);
-		config.x = _window_pos.x;
-		config.y = _window_pos.y;
-		if(config.title != null && config.title != "") window.document.title = config.title;
-		on_created(_handle,_window_id,{ config : config, render_config : render_config});
-		_handle.setAttribute("id","window" + _window_id);
-		this.seq_window++;
-	}
-	,internal_resize: function(_window,_w,_h) {
-		const ref = this;
-		if (this.app.window.width >= 760) {
-			setInterval(
-				function() {
-					ref.mousePointKnown = ref.mousePointKnown == false ? true : false;
-				}, 500, ref
-			);
-		}
-		this.system.app.dispatch_system_event({ type : 5, window : { type : 7, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
-		this.system.app.dispatch_system_event({ type : 5, window : { type : 6, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _w, y : _h}}});
-	}
-	,update_window: function(_window) {
-		let _rect = _window.handle.getBoundingClientRect();
-		if(_rect.left != _window.x || _rect.top != _window.y) {
-			let _event = { type : 5, window : { type : 5, timestamp : flu.core.timestamp(), window_id : _window.id, event : { x : _rect.left, y : _rect.top}}};
-			this.system.app.on_event(_event);
-		}
-		if(_rect.width != _window.width || _rect.height != _window.height) this.internal_resize(_window,_rect.width,_rect.height);
-		null;
-	}
-	,render: function(_window) {
-		let _window_gl_context = this.gl_contexts.h[_window.id];
-		if(flu_modules_opengl_web_GL.current_context != _window_gl_context) flu_modules_opengl_web_GL.current_context = _window_gl_context;
-	}
-	,swap: function(_window) {
-	}
-	,set_size: function(_window,w,h) {
-		_window.handle.width = w;
-		_window.handle.height = h;
-		_window.handle.style.width = "" + w + "px";
-		_window.handle.style.height = "" + h + "px";
-		this.internal_resize(_window,w,h);
-	}
-	,set_position: function(_window,x,y) {
-		_window.handle.style.left = "" + x + "px";
-		_window.handle.style.top = "" + y + "px";
-	}
-	,get_real_window_position: function(handle) {
-		let curleft = 0;
-		let curtop = 0;
-		let _obj = handle;
-		let _has_parent = true;
-		let _max_count = 0;
-		while(_has_parent == true) {
-			_max_count++;
-			if(_max_count > 100) {
-				_has_parent = false;
-				break;
-			}
-			if(_obj.offsetParent != null) {
-				curleft += _obj.offsetLeft;
-				curtop += _obj.offsetTop;
-				_obj = _obj.offsetParent;
-			} else _has_parent = false;
-		}
-		return { x : curleft, y : curtop};
-	}
-	,set_max_size: function(_window,w,h) {
-		_window.handle.style.maxWidth = "" + w + "px";
-		_window.handle.style.maxHeight = "" + h + "px";
-	}
-	,set_min_size: function(_window,w,h) {
-		_window.handle.style.minWidth = "" + w + "px";
-		_window.handle.style.minHeight = "" + h + "px";
-	}
-	,internal_fullscreen: function(_window,fullscreen) {
-		let _handle = _window.handle;
-		if(fullscreen) {
-			if(HxOverrides.indexOf(this.fs_windows,_window,0) == -1) this.fs_windows.push(_window);
-		} else HxOverrides.remove(this.fs_windows,_window);
-		let true_fullscreen = this.system.app.config.web.true_fullscreen;
-		if(fullscreen) {
-			if(true_fullscreen) {
-				if($bind(_handle,_handle.requestFullscreen) == null) {
-					if(_handle.requestFullScreen == null) {
-						if(_handle.webkitRequestFullscreen == null) {
-							if(_handle.mozRequestFullScreen == null) {
-							} else _handle.mozRequestFullScreen();
-						} else _handle.webkitRequestFullscreen();
-					} else _handle.requestFullScreen(null);
-				} else _handle.requestFullscreen();
-			} else {
-				this._pre_fs_padding = _handle.style.padding;
-				this._pre_fs_margin = _handle.style.margin;
-				this._pre_fs_s_width = _handle.style.width;
-				this._pre_fs_s_height = _handle.style.height;
-				this._pre_fs_width = _handle.width;
-				this._pre_fs_height = _handle.height;
-				this._pre_fs_body_margin = window.document.body.style.margin;
-				this._pre_fs_body_overflow = window.document.body.style.overflow;
-				_handle.style.margin = "0";
-				_handle.style.padding = "0";
-				_handle.style.width = window.innerWidth + "px";
-				_handle.style.height = window.innerHeight + "px";
-				_handle.width = window.innerWidth;
-				_handle.height = window.innerHeight;
-				window.document.body.style.margin = "0";
-				window.document.body.style.overflow = "scroll";
-			}
-		} else if(true_fullscreen) {
-		} else {
-			_handle.style.padding = this._pre_fs_padding;
-			_handle.style.margin = this._pre_fs_margin;
-			_handle.style.width = this._pre_fs_s_width;
-			_handle.style.height = this._pre_fs_s_height;
-			_handle.width = this._pre_fs_width;
-			_handle.height = this._pre_fs_height;
-			window.document.body.style.margin = this._pre_fs_body_margin;
-			window.document.body.style.overflow = this._pre_fs_body_overflow;
-		}
-	}
-	,listen: function(_window) {
-		_window.handle.addEventListener("mouseleave",$bind(this,this.on_internal_leave));
-		_window.handle.addEventListener("mouseenter",$bind(this,this.on_internal_enter));
-		if(_window.config.fullscreen) {
-			this.internal_fullscreen(_window,_window.config.fullscreen);
-			_window.config.width = _window.handle.width;
-			_window.config.height = _window.handle.height;
-		}
-	}
-	,on_internal_leave: function(_mouse_event) {
-		let _window = this.system.window_from_handle(_mouse_event.target);
-		this.system.app.dispatch_system_event({ type : 5, window : { type : 12, timestamp : _mouse_event.timeStamp, window_id : _window.id, event : _mouse_event}});
-	}
-	,on_internal_enter: function(_mouse_event) {
-		let _window = this.system.window_from_handle(_mouse_event.target);
-		this.system.app.dispatch_system_event({ type : 5, window : { type : 11, timestamp : _mouse_event.timeStamp, window_id : _window.id, event : _mouse_event}});
-	}
-	,listen_for_resize: function() {
-		
-		let _g = this;
-		window.onresize = function(e) {
-			if(!_g.system.app.config.web.true_fullscreen) {
-				let _g1 = 0;
-				let _g2 = _g.fs_windows;
-				while(_g1 < _g2.length) {
-					let $window = _g2[_g1];
-					++_g1;
-					$window.set_size(window.innerWidth,window.innerHeight);
-					_g.internal_resize($window,$window.width,$window.height);
-				}
-			}
-		};
-	}
-	,listen_for_visibility: function() {
-		if(typeof document.hidden !== undefined) {
-			this._hidden_name = "hidden";
-			this._hidden_event_name = "visibilitychange";
-		} else if(typeof document.mozHidden !== undefined ) {
-			this._hidden_name = "mozHidden";
-			this._hidden_name = "mozvisibilitychange";
-		} else if(typeof document.msHidden !== "undefined") {
-			this._hidden_name = "msHidden";
-			this._hidden_event_name = "msvisibilitychange";
-		} else if(typeof document.webkitHidden !== "undefined") {
-			this._hidden_name = "webkitHidden";
-			this._hidden_event_name = "webkitvisibilitychange";
-		}
-		if(this._hidden_name != "" && this._hidden_event_name != "") window.document.addEventListener(this._hidden_event_name,$bind(this,this.on_visibility_change));
-	}
-	,on_visibility_change: function(jsevent) {
-		let _event = { type : 5, window : { type : 2, timestamp : flu.core.timestamp(), window_id : 1, event : jsevent}};
-		if(document[this._hidden_name]) {
-			_event.window.type = 3;
-			this.system.app.dispatch_system_event(_event);
-			_event.window.type = 8;
-			this.system.app.dispatch_system_event(_event);
-			_event.window.type = 14;
-			this.system.app.dispatch_system_event(_event);
-		} else {
-			_event.window.type = 2;
-			this.system.app.dispatch_system_event(_event);
-			_event.window.type = 10;
-			this.system.app.dispatch_system_event(_event);
-			_event.window.type = 13;
-			this.system.app.dispatch_system_event(_event);
-		}
-	}
-	,internal_fallback: function(message) {
-		let text_el;
-		let overlay_el;
-		let tmp;
-		let _this = window.document;
-		tmp = _this.createElement("div");
-		text_el = tmp;
-		let tmp1;
-		let _this1 = window.document;
-		tmp1 = _this1.createElement("div");
-		overlay_el = tmp1;
-		text_el.style.marginLeft = "auto";
-		text_el.style.marginRight = "auto";
-		text_el.style.color = "#d3d3d3";
-		text_el.style.marginTop = "5em";
-		text_el.style.fontSize = "1.4em";
-		text_el.style.fontFamily = "helvetica,sans-serif";
-		text_el.innerHTML = message;
-		overlay_el.style.top = "0";
-		overlay_el.style.left = "0";
-		overlay_el.style.width = "100%";
-		overlay_el.style.height = "100%";
-		overlay_el.style.display = "block";
-		overlay_el.style.minWidth = "100%";
-		overlay_el.style.minHeight = "100%";
-		overlay_el.style.textAlign = "center";
-		overlay_el.style.position = "absolute";
-		overlay_el.style.background = "rgba(1,1,1,0.90)";
-		overlay_el.appendChild(text_el);
-		window.document.body.appendChild(overlay_el);
-	}
-	,__class__: flu_core_web_window_Windowing
-};
-
-let flu_modules_opengl_web_GL = function() { };
-$hxClasses["fluidState.modules.opengl.web.GL"] = flu_modules_opengl_web_GL;
-flu_modules_opengl_web_GL.__name__ = true;
-let flu_system_assets_Asset = function() { };
-$hxClasses["fluidState.system.assets.Asset"] = flu_system_assets_Asset;
-flu_system_assets_Asset.__name__ = true;
-let flu_system_assets_AssetJSON = function() { };
-$hxClasses["fluidState.system.assets.AssetJSON"] = flu_system_assets_AssetJSON;
-flu_system_assets_AssetJSON.__name__ = true;
-flu_system_assets_AssetJSON.processor = function(_app,_id,_data) {
-	if(_data == null) return flu_api_Promise.reject(flu_types_Error.error("AssetJSON: data was null"));
-	return new flu_api_Promise(function(resolve,reject) {
-		let _data_json = null;
-		try {
-			_data_json = JSON.parse(new flu_io_Bytes(new Uint8Array(_data.buffer)).toString());
-		} catch( e ) {
-			if (e instanceof js__$Boot_FluidError) e = e.val;
-			return reject(flu_types_Error.parse(e));
-		}
-		return resolve(_data_json);
-	});
-};
-flu_system_assets_AssetJSON.__super__ = flu_system_assets_Asset;
-flu_system_assets_AssetJSON.prototype = $extend(flu_system_assets_Asset.prototype,{
-	__class__: flu_system_assets_AssetJSON
-});
-let flu_system_assets_Assets = function(_app) {
-	this.root = "";
-	this.app = _app;
-	this.module = new flu_core_web_assets_Assets(this);
-};
-$hxClasses["fluidState.system.assets.Assets"] = flu_system_assets_Assets;
-flu_system_assets_Assets.__name__ = true;
-flu_system_assets_Assets.prototype = {
-	__class__: flu_system_assets_Assets
-};
-
-let flu_system_input_Input = function(_app) {
-	this.touch_count = 0;
-	this.app = _app;
-	this.module = new flu_core_web_input_Input(this);
-	this.module.init();
-	this.key_code_pressed = new flu_ds_IntMap();
-	this.key_code_down = new flu_ds_IntMap();
-	this.key_code_released = new flu_ds_IntMap();
-	this.scan_code_pressed = new flu_ds_IntMap();
-	this.scan_code_down = new flu_ds_IntMap();
-	this.scan_code_released = new flu_ds_IntMap();
-	this.mouse_button_pressed = new flu_ds_IntMap();
-	this.mouse_button_down = new flu_ds_IntMap();
-	this.mouse_button_released = new flu_ds_IntMap();
-	this.gamepad_button_pressed = new flu_ds_IntMap();
-	this.gamepad_button_down = new flu_ds_IntMap();
-	this.gamepad_button_released = new flu_ds_IntMap();
-	this.gamepad_axis_values = new flu_ds_IntMap();
-	this.touches_down = new flu_ds_IntMap();
-};
-$hxClasses["fluidState.system.input.Input"] = flu_system_input_Input;
-flu_system_input_Input.__name__ = true;
-flu_system_input_Input.prototype = {
-	dispatch_key_down_event: function(keycode,scancode,repeat,mod,timestamp,window_id) {
-		if(!repeat) {
-			this.key_code_pressed.h[keycode] = false;
-			this.key_code_down.h[keycode] = true;
-			this.scan_code_pressed.h[scancode] = false;
-			this.scan_code_down.h[scancode] = true;
-		}
-		this.app.host.onkeydown(keycode,scancode,repeat,mod,timestamp,window_id);
-	}
-	,dispatch_key_up_event: function(keycode,scancode,repeat,mod,timestamp,window_id) {
-		this.key_code_released.h[keycode] = false;
-		this.key_code_down.remove(keycode);
-		this.scan_code_released.h[scancode] = false;
-		this.scan_code_down.remove(scancode);
-		this.app.host.onkeyup(keycode,scancode,repeat,mod,timestamp,window_id);
-	}
-	,dispatch_text_event: function(text,start,length,type,timestamp,window_id) {
-		this.app.host.ontextinput(text,start,length,type,timestamp,window_id);
-	}
-	,dispatch_mouse_move_event: function(x,y,xrel,yrel,timestamp,window_id) {
-		this.app.host.onmousemove(x,y,xrel,yrel,timestamp,window_id);
-	}
-	,dispatch_mouse_down_event: function(x,y,button,timestamp,window_id) {
-		this.mouse_button_pressed.h[button] = false;
-		this.mouse_button_down.h[button] = true;
-		this.app.host.onmousedown(x,y,button,timestamp,window_id);
-	}
-	,dispatch_mouse_up_event: function(x,y,button,timestamp,window_id) {
-		this.mouse_button_released.h[button] = false;
-		this.mouse_button_down.remove(button);
-		this.app.host.onmouseup(x,y,button,timestamp,window_id);
-	}
-	,dispatch_mouse_wheel_event: function(x,y,timestamp,window_id) {
-		this.app.host.onmousewheel(x,y,timestamp,window_id);
-	}
-	,dispatch_touch_down_event: function(x,y,touch_id,timestamp) {
-		if(!this.touches_down.h.hasOwnProperty(touch_id)) {
-			this.touch_count++;
-			this.touches_down.h[touch_id] = true;
-		}
-		this.app.host.ontouchdown(x,y,touch_id,timestamp);
-	}
-	,dispatch_touch_up_event: function(x,y,touch_id,timestamp) {
-		this.app.host.ontouchup(x,y,touch_id,timestamp);
-		if(this.touches_down.remove(touch_id)) this.touch_count--;
-	}
-	,dispatch_touch_move_event: function(x,y,dx,dy,touch_id,timestamp) {
-		this.app.host.ontouchmove(x,y,dx,dy,touch_id,timestamp);
-	}
-	,dispatch_gamepad_axis_event: function(gamepad,axis,value,timestamp) {
-		if(!this.gamepad_axis_values.h.hasOwnProperty(gamepad)) {
-			let value1 = new flu_ds_IntMap();
-			this.gamepad_axis_values.h[gamepad] = value1;
-		}
-		let this1 = this.gamepad_axis_values.h[gamepad];
-		this1.set(axis,value);
-		this.app.host.ongamepadaxis(gamepad,axis,value,timestamp);
-	}
-	,dispatch_gamepad_button_down_event: function(gamepad,button,value,timestamp) {
-		if(!this.gamepad_button_pressed.h.hasOwnProperty(gamepad)) {
-			let value1 = new flu_ds_IntMap();
-			this.gamepad_button_pressed.h[gamepad] = value1;
-		}
-		if(!this.gamepad_button_down.h.hasOwnProperty(gamepad)) {
-			let value2 = new flu_ds_IntMap();
-			this.gamepad_button_down.h[gamepad] = value2;
-		}
-		let this1 = this.gamepad_button_pressed.h[gamepad];
-		this1.set(button,false);
-		let this2 = this.gamepad_button_down.h[gamepad];
-		this2.set(button,true);
-		this.app.host.ongamepaddown(gamepad,button,value,timestamp);
-	}
-	,dispatch_gamepad_button_up_event: function(gamepad,button,value,timestamp) {
-		if(!this.gamepad_button_released.h.hasOwnProperty(gamepad)) {
-			let value1 = new flu_ds_IntMap();
-			this.gamepad_button_released.h[gamepad] = value1;
-		}
-		if(!this.gamepad_button_down.h.hasOwnProperty(gamepad)) {
-			let value2 = new flu_ds_IntMap();
-			this.gamepad_button_down.h[gamepad] = value2;
-		}
-		let this1 = this.gamepad_button_released.h[gamepad];
-		this1.set(button,false);
-		let this2 = this.gamepad_button_down.h[gamepad];
-		this2.remove(button);
-		this.app.host.ongamepadup(gamepad,button,value,timestamp);
-	}
-	,dispatch_gamepad_device_event: function(gamepad,id,type,timestamp) {
-		this.app.host.ongamepaddevice(gamepad,id,type,timestamp);
-	}
-	,listen: function(_window) {
-		this.module.listen(_window);
-	}
-	,on_event: function(_event) {
-		this.module.on_event(_event);
-	}
-	,update: function() {
-		this.module.update();
-		this._update_keystate();
-		this._update_gamepadstate();
-		this._update_mousestate();
-	}
-	,destroy: function() {
-		this.module.destroy();
-	}
-	,_update_mousestate: function() {
-		let $it0 = this.mouse_button_pressed.keys();
-		while( $it0.hasNext() ) {
-			let _code = $it0.next();
-			if(this.mouse_button_pressed.h[_code]) this.mouse_button_pressed.remove(_code); else this.mouse_button_pressed.h[_code] = true;
-		}
-		let $it1 = this.mouse_button_released.keys();
-		while( $it1.hasNext() ) {
-			let _code1 = $it1.next();
-			if(this.mouse_button_released.h[_code1]) this.mouse_button_released.remove(_code1); else this.mouse_button_released.h[_code1] = true;
-		}
-	}
-	,_update_gamepadstate: function() {
-		let $it0 = this.gamepad_button_pressed.iterator();
-		while( $it0.hasNext() ) {
-			let _gamepad_pressed = $it0.next();
-			let $it1 = _gamepad_pressed.keys();
-			while( $it1.hasNext() ) {
-				let _button = $it1.next();
-				if(_gamepad_pressed.h[_button]) _gamepad_pressed.remove(_button); else _gamepad_pressed.h[_button] = true;
-			}
-		}
-		let $it2 = this.gamepad_button_released.iterator();
-		while( $it2.hasNext() ) {
-			let _gamepad_released = $it2.next();
-			let $it3 = _gamepad_released.keys();
-			while( $it3.hasNext() ) {
-				let _button1 = $it3.next();
-				if(_gamepad_released.h[_button1]) _gamepad_released.remove(_button1); else _gamepad_released.h[_button1] = true;
-			}
-		}
-	}
-	,_update_keystate: function() {
-		let $it0 = this.key_code_pressed.keys();
-		while( $it0.hasNext() ) {
-			let _code = $it0.next();
-			if(this.key_code_pressed.h[_code]) this.key_code_pressed.remove(_code); else this.key_code_pressed.h[_code] = true;
-		}
-		let $it1 = this.key_code_released.keys();
-		while( $it1.hasNext() ) {
-			let _code1 = $it1.next();
-			if(this.key_code_released.h[_code1]) this.key_code_released.remove(_code1); else this.key_code_released.h[_code1] = true;
-		}
-		let $it2 = this.scan_code_pressed.keys();
-		while( $it2.hasNext() ) {
-			let _code2 = $it2.next();
-			if(this.scan_code_pressed.h[_code2]) this.scan_code_pressed.remove(_code2); else this.scan_code_pressed.h[_code2] = true;
-		}
-		let $it3 = this.scan_code_released.keys();
-		while( $it3.hasNext() ) {
-			let _code3 = $it3.next();
-			if(this.scan_code_released.h[_code3]) this.scan_code_released.remove(_code3); else this.scan_code_released.h[_code3] = true;
-		}
-	}
-	,__class__: flu_system_input_Input
-};
-let flu_system_io_IO = function(_app) {
-	this.app = _app;
-	this.module = new flu_core_web_io_IO(this);
-	this.module.init();
-};
-$hxClasses["fluidState.system.io.IO"] = flu_system_io_IO;
-flu_system_io_IO.__name__ = true;
-flu_system_io_IO.prototype = {
-	data_flow: function(_id,_processor,_provider) {
-		let _g = this;
-		if(_provider == null) _provider = $bind(this,this.default_provider);
-		return new flu_api_Promise(function(resolve,reject) {
-			_provider(_g.app,_id).then(function(data) {
-				if(_processor != null) _processor(_g.app,_id,data).then(resolve,reject); else resolve(data);
-			}).error(reject);
-		});
-	}
-	,default_provider: function(_app,_id) {
-		return this.module.data_load(_id,null);
-	}
-	,__class__: flu_system_io_IO
-};
-let flu_system_window_Window = function(_system,_config) {
-	this.internal_resize = false;
-	this.internal_position = false;
-	this.minimized = false;
-	this.closed = true;
-	this.auto_render = true;
-	this.auto_swap = true;
-	this.height = 0;
-	this.width = 0;
-	this.y = 0;
-	this.x = 0;
-	this.set_max_size({ x : 0, y : 0});
-	this.set_min_size({ x : 0, y : 0});
-	this.system = _system;
-	this.asked_config = _config;
-	this.config = _config;
-	if(this.config.x == null) this.config.x = 536805376;
-	if(this.config.y == null) this.config.y = 536805376;
-	this.system.module.create(this.system.app.config.render,_config,$bind(this,this.on_window_created));
-};
-$hxClasses["fluidState.system.window.Window"] = flu_system_window_Window;
-flu_system_window_Window.__name__ = true;
-flu_system_window_Window.prototype = {
-	on_window_created: function(_handle,_id,_configs) {
-		this.id = _id;
-		this.handle = _handle;
-		if(this.handle == null) {
-			console.log("   i / window / " + "failed to create window");
-			return;
-		}
-		this.closed = false;
-		this.config = _configs.config;
-		this.system.app.config.render = _configs.render_config;
-		this.internal_position = true;
-		this.set_x(this.config.x);
-		this.set_y(this.config.y);
-		this.internal_position = false;
-		this.internal_resize = true;
-		this.set_width(this.config.width);
-		this.set_height(this.config.height);
-		this.internal_resize = false;
-		this.on_event({ type : 1, window_id : _id, timestamp : flu.core.timestamp(), event : { }});
-	}
-	,on_event: function(_event) {
-		let _g = _event.type;
-		if(_g != null) switch(_g) {
-		case 5:
-			this.internal_position = true;
-			this.set_position(_event.event.x,_event.event.y);
-			this.internal_position = false;
-			break;
-		case 6:
-			this.internal_resize = true;
-			this.set_size(_event.event.x,_event.event.y);
-			this.internal_resize = false;
-			break;
-		case 7:
-			this.internal_resize = true;
-			this.set_size(_event.event.x,_event.event.y);
-			this.internal_resize = false;
-			break;
-		case 8:
-			this.minimized = true;
-			break;
-		case 10:
-			this.minimized = false;
-			break;
-		default:
-		} else {
-		}
-		if(this.onevent != null) this.onevent(_event);
-	}
-	,update: function() {
-		if(this.handle != null && !this.closed) this.system.module.update_window(this);
-	}
-	,render: function() {
-		if(this.minimized || this.closed) return;
-		if(this.handle == null) return;
-		this.system.module.render(this);
-		if(this.onrender != null) {
-			this.onrender(this);
-			if(this.auto_swap) this.swap();
-			return;
-		}
-		flu_modules_opengl_web_GL.current_context.clearColor(0,0,0,1.0);
-		flu_modules_opengl_web_GL.current_context.clear(16384);
-		if(this.auto_swap) this.swap();
-	}
-	,swap: function() {
-		if(this.handle == null || this.closed || this.minimized) return;
-		this.system.module.swap(this);
-	}
-	,get_max_size: function() {
-		return this.max_size;
-	}
-	,get_min_size: function() {
-		return this.min_size;
-	}
-	,set_x: function(_x) {
-		this.x = _x;
-		if(this.handle != null && !this.internal_position) this.system.module.set_position(this,this.x,this.y);
-		return this.x;
-	}
-	,set_y: function(_y) {
-		this.y = _y;
-		if(this.handle != null && !this.internal_position) this.system.module.set_position(this,this.x,this.y);
-		return this.y;
-	}
-	,set_width: function(_width) {
-		this.width = _width;
-		if(this.handle != null && !this.internal_resize) this.system.module.set_size(this,this.width,this.height);
-		return this.width;
-	}
-	,set_height: function(_height) {
-		this.height = _height;
-		if(this.handle != null && !this.internal_resize) this.system.module.set_size(this,this.width,this.height);
-		return this.height;
-	}
-	,set_position: function(_x,_y) {
-		let last_internal_position_flag = this.internal_position;
-		this.internal_position = true;
-		this.set_x(_x);
-		this.set_y(_y);
-		this.internal_position = last_internal_position_flag;
-		if(this.handle != null && !this.internal_position) this.system.module.set_position(this,this.x,this.y);
-	}
-	,set_size: function(_width,_height) {
-		let last_internal_resize_flag = this.internal_resize;
-		this.internal_resize = true;
-		this.set_width(_width);
-		this.set_height(_height);
-		this.internal_resize = last_internal_resize_flag;
-		if(this.handle != null && !this.internal_resize) this.system.module.set_size(this,_width,_height);
-	}
-	,set_max_size: function(_size) {
-		if(this.get_max_size() != null && this.handle != null) this.system.module.set_max_size(this,_size.x,_size.y);
-		return this.max_size = _size;
-	}
-	,set_min_size: function(_size) {
-		if(this.get_min_size() != null && this.handle != null) this.system.module.set_min_size(this,_size.x,_size.y);
-		return this.min_size = _size;
-	}
-	,__class__: flu_system_window_Window
-};
-let flu_system_window_Windowing = function(_app) {
-	this.window_count = 0;
-	this.app = _app;
-	this.window_list = new flu_ds_IntMap();
-	this.window_handles = new flu_ds_ObjectMap();
-	this.module = new flu_core_web_window_Windowing(this);
-	this.module.init();
-};
-$hxClasses["fluidState.system.window.Windowing"] = flu_system_window_Windowing;
-flu_system_window_Windowing.__name__ = true;
-flu_system_window_Windowing.prototype = {
-	create: function(_config) {
-		let _window = new flu_system_window_Window(this,_config);
-		this.window_list.h[_window.id] = _window;
-		this.window_handles.set(_window.handle,_window.id);
-		this.window_count++;
-		this.module.listen(_window);
-		if(_config.no_input == null || _config.no_input == false) this.app.input.listen(_window);
-		return _window;
-	}
-	,window_from_handle: function(_handle) {
-		if(this.window_handles.h.__keys__[_handle.__id__] != null) {
-			let _id = this.window_handles.h[_handle.__id__];
-			return this.window_list.h[_id];
-		}
-		return null;
-	}
-	,on_event: function(_event) {
-		if(_event.type == 5) {
-			let _window_event = _event.window;
-			let _window = this.window_list.h[_window_event.window_id];
-			if(_window != null) _window.on_event(_window_event);
-		}
-	}
-	,update: function() {
-		this.module.update();
-		let $it0 = this.window_list.iterator();
-		while( $it0.hasNext() ) {
-			let $window = $it0.next();
-			$window.update();
-		}
-		let $it1 = this.window_list.iterator();
-		while( $it1.hasNext() ) {
-			let window1 = $it1.next();
-			if(window1.auto_render) window1.render();
-		}
-	}
-	,destroy: function() {
-		this.module.destroy();
-	}
-	,__class__: flu_system_window_Windowing
-};
-let flu_types_Error = $hxClasses["fluidState.types.Error"] = { __ename__ : true, __constructs__ : ["error","init","windowing","parse"] };
-flu_types_Error.error = function(value) { let $x = ["error",0,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
-flu_types_Error.init = function(value) { let $x = ["init",1,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
-flu_types_Error.windowing = function(value) { let $x = ["windowing",2,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
-flu_types_Error.parse = function(value) { let $x = ["parse",3,value]; $x.__enum__ = flu_types_Error; $x.toString = $estr; return $x; };
-flu_types_Error.__empty_constructs__ = [];
-function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
-let $_, $fid = 0;
-function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; let f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
+var $_, $fid = 0;
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 if(Array.prototype.indexOf) HxOverrides.indexOf = function(a,o,i) {
 	return Array.prototype.indexOf.call(a,o,i);
 };
@@ -6659,69 +8135,460 @@ $hxClasses.Array = Array;
 Array.__name__ = true;
 Date.prototype.__class__ = $hxClasses.Date = Date;
 Date.__name__ = ["Date"];
-let Int = $hxClasses.Int = { __name__ : ["Int"]};
-let Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
-let Float = $hxClasses.Float = Number;
+var Int = $hxClasses.Int = { __name__ : ["Int"]};
+var Dynamic = $hxClasses.Dynamic = { __name__ : ["Dynamic"]};
+var Float = $hxClasses.Float = Number;
 Float.__name__ = ["Float"];
-let Bool = $hxClasses.Bool = Boolean;
+var Bool = $hxClasses.Bool = Boolean;
 Bool.__ename__ = ["Bool"];
-let Class = $hxClasses.Class = { __name__ : ["Class"]};
-let Enum = { };
-if(Array.prototype.filter == null) Array.prototype.filter = function(f1) {
-	let a1 = [];
-	let _g11 = 0;
-	let _g2 = this.length;
-	while(_g11 < _g2) {
-		let i1 = _g11++;
-		let e = this[i1];
-		if(f1(e)) a1.push(e);
-	}
-	return a1;
-};
-let __map_reserved = {}
-let ArrayBuffer = $global.ArrayBuffer || js_html_compat_ArrayBuffer;
-if(ArrayBuffer.prototype.slice == null) ArrayBuffer.prototype.slice = js_html_compat_ArrayBuffer.sliceImpl;
-let DataView = $global.DataView || js_html_compat_DataView;
-let Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
-gltoolbox_GeometryTools.unitQuadCache = new flu_ds_IntMap();
-gltoolbox_TextureTools.defaultParams = { channelType : 6408, dataType : 5121, filter : 9728, wrapS : 33071, wrapT : 33071, unpackAlignment : 4, webGLFlipY : true};
-js_Boot.__toStr = {}.toString;
-gltoolbox_shaders_Resample.instance = new gltoolbox_shaders_Resample();
-flu_ds_ObjectMap.count = 0;
-flu_io_FPHelper.i64tmp = (function($this) {
-	let $r;
-	let x = new flu__$Int64__$_$_$Int64(0,0);
-	$r = x;
-	return $r;
-}(this));
-js_html_compat_Uint8Array.BYTES_PER_ELEMENT = 1;
-shaderblox_glsl_GLSLTools.PRECISION_QUALIFIERS = ["lowp","mediump","highp"];
-shaderblox_glsl_GLSLTools.STORAGE_QUALIFIER_TYPES = (function($this) {
-	let $r;
-	let _g = new flu_ds_StringMap();
-	{
-		let value = ["bool","int","float","vec2","vec3","vec4","bvec2","bvec3","bvec4","ivec2","ivec3","ivec4","mat2","mat3","mat4"];
-		if(__map_reserved["const"] != null) _g.setReserved("const",value); else _g.h["const"] = value;
-	}
-	{
-		let value1 = ["float","vec2","vec3","vec4","mat2","mat3","mat4"];
-		if(__map_reserved.attribute != null) _g.setReserved("attribute",value1); else _g.h["attribute"] = value1;
-	}
-	{
-		let value2 = ["bool","int","float","vec2","vec3","vec4","bvec2","bvec3","bvec4","ivec2","ivec3","ivec4","mat2","mat3","mat4","sampler2D","samplerCube"];
-		if(__map_reserved.uniform != null) _g.setReserved("uniform",value2); else _g.h["uniform"] = value2;
-	}
-	{
-		let value3 = ["float","vec2","vec3","vec4","mat2","mat3","mat4"];
-		if(__map_reserved.varying != null) _g.setReserved("varying",value3); else _g.h["varying"] = value3;
-	}
-	$r = _g;
-	return $r;
-}(this));
-shaderblox_uniforms_UTexture.lastActiveTexture = -1;
-flu_api_Promises.calls = [];
-flu_api_Promises.defers = [];
-flu_api_Timer.running_timers = [];
-
-SnowApp.main();
-})(typeof console != "undefined" ? console : {log:function(){}}, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
+var Class = $hxClasses.Class = { __name__ : ["Class"]};
+var Enum = { };
+var this1;
+this1 = new Array(256);
+lime.graphics.utils.ImageDataUtil.__alpha16 = this1;
+var _g = 0;
+while(_g < 256) {
+	var i = _g++;
+	lime.graphics.utils.ImageDataUtil.__alpha16[i] = i * 65536 / 255 | 0;
+}
+var this2;
+this2 = new Array(510);
+lime.graphics.utils.ImageDataUtil.__clamp = this2;
+var _g1 = 0;
+while(_g1 < 255) {
+	var i1 = _g1++;
+	lime.graphics.utils.ImageDataUtil.__clamp[i1] = i1;
+}
+var _g11 = 255;
+var _g2 = 511;
+while(_g11 < _g2) {
+	var i2 = _g11++;
+	lime.graphics.utils.ImageDataUtil.__clamp[i2] = 255;
+}
+lime.app.Application.onUpdate = new lime.app.Event();
+lime.app.Application.__eventInfo = new lime.app._Application.UpdateEventInfo();
+Main.OFFSCREEN_RENDER = true;
+gltoolbox.GeometryTools.textureQuadCache = new haxe.ds.IntMap();
+gltoolbox.GeometryTools.clipSpaceQuadCache = new haxe.ds.IntMap();
+js.Boot.__toStr = {}.toString;
+gltoolbox.shaders.Resample.instance = new gltoolbox.shaders.Resample();
+lime.Assets.cache = new lime.AssetCache();
+lime.Assets.libraries = new haxe.ds.StringMap();
+lime.Assets.initialized = false;
+lime.app.Preloader.images = new haxe.ds.StringMap();
+lime.app.Preloader.loaders = new haxe.ds.StringMap();
+lime.audio.openal.AL.NONE = 0;
+lime.audio.openal.AL.FALSE = 0;
+lime.audio.openal.AL.TRUE = 1;
+lime.audio.openal.AL.SOURCE_RELATIVE = 514;
+lime.audio.openal.AL.CONE_INNER_ANGLE = 4097;
+lime.audio.openal.AL.CONE_OUTER_ANGLE = 4098;
+lime.audio.openal.AL.PITCH = 4099;
+lime.audio.openal.AL.POSITION = 4100;
+lime.audio.openal.AL.DIRECTION = 4101;
+lime.audio.openal.AL.VELOCITY = 4102;
+lime.audio.openal.AL.LOOPING = 4103;
+lime.audio.openal.AL.BUFFER = 4105;
+lime.audio.openal.AL.GAIN = 4106;
+lime.audio.openal.AL.MIN_GAIN = 4109;
+lime.audio.openal.AL.MAX_GAIN = 4110;
+lime.audio.openal.AL.ORIENTATION = 4111;
+lime.audio.openal.AL.SOURCE_STATE = 4112;
+lime.audio.openal.AL.INITIAL = 4113;
+lime.audio.openal.AL.PLAYING = 4114;
+lime.audio.openal.AL.PAUSED = 4115;
+lime.audio.openal.AL.STOPPED = 4116;
+lime.audio.openal.AL.BUFFERS_QUEUED = 4117;
+lime.audio.openal.AL.BUFFERS_PROCESSED = 4118;
+lime.audio.openal.AL.REFERENCE_DISTANCE = 4128;
+lime.audio.openal.AL.ROLLOFF_FACTOR = 4129;
+lime.audio.openal.AL.CONE_OUTER_GAIN = 4130;
+lime.audio.openal.AL.MAX_DISTANCE = 4131;
+lime.audio.openal.AL.SEC_OFFSET = 4132;
+lime.audio.openal.AL.SAMPLE_OFFSET = 4133;
+lime.audio.openal.AL.BYTE_OFFSET = 4134;
+lime.audio.openal.AL.SOURCE_TYPE = 4135;
+lime.audio.openal.AL.STATIC = 4136;
+lime.audio.openal.AL.STREAMING = 4137;
+lime.audio.openal.AL.UNDETERMINED = 4144;
+lime.audio.openal.AL.FORMAT_MONO8 = 4352;
+lime.audio.openal.AL.FORMAT_MONO16 = 4353;
+lime.audio.openal.AL.FORMAT_STEREO8 = 4354;
+lime.audio.openal.AL.FORMAT_STEREO16 = 4355;
+lime.audio.openal.AL.FREQUENCY = 8193;
+lime.audio.openal.AL.BITS = 8194;
+lime.audio.openal.AL.CHANNELS = 8195;
+lime.audio.openal.AL.SIZE = 8196;
+lime.audio.openal.AL.NO_ERROR = 0;
+lime.audio.openal.AL.INVALID_NAME = 40961;
+lime.audio.openal.AL.INVALID_ENUM = 40962;
+lime.audio.openal.AL.INVALID_VALUE = 40963;
+lime.audio.openal.AL.INVALID_OPERATION = 40964;
+lime.audio.openal.AL.OUT_OF_MEMORY = 40965;
+lime.audio.openal.AL.VENDOR = 45057;
+lime.audio.openal.AL.VERSION = 45058;
+lime.audio.openal.AL.RENDERER = 45059;
+lime.audio.openal.AL.EXTENSIONS = 45060;
+lime.audio.openal.AL.DOPPLER_FACTOR = 49152;
+lime.audio.openal.AL.SPEED_OF_SOUND = 49155;
+lime.audio.openal.AL.DOPPLER_VELOCITY = 49153;
+lime.audio.openal.AL.DISTANCE_MODEL = 53248;
+lime.audio.openal.AL.INVERSE_DISTANCE = 53249;
+lime.audio.openal.AL.INVERSE_DISTANCE_CLAMPED = 53250;
+lime.audio.openal.AL.LINEAR_DISTANCE = 53251;
+lime.audio.openal.AL.LINEAR_DISTANCE_CLAMPED = 53252;
+lime.audio.openal.AL.EXPONENT_DISTANCE = 53253;
+lime.audio.openal.AL.EXPONENT_DISTANCE_CLAMPED = 53254;
+lime.audio.openal.ALC.FALSE = 0;
+lime.audio.openal.ALC.TRUE = 1;
+lime.audio.openal.ALC.FREQUENCY = 4103;
+lime.audio.openal.ALC.REFRESH = 4104;
+lime.audio.openal.ALC.SYNC = 4105;
+lime.audio.openal.ALC.MONO_SOURCES = 4112;
+lime.audio.openal.ALC.STEREO_SOURCES = 4113;
+lime.audio.openal.ALC.NO_ERROR = 0;
+lime.audio.openal.ALC.INVALID_DEVICE = 40961;
+lime.audio.openal.ALC.INVALID_CONTEXT = 40962;
+lime.audio.openal.ALC.INVALID_ENUM = 40963;
+lime.audio.openal.ALC.INVALID_VALUE = 40964;
+lime.audio.openal.ALC.OUT_OF_MEMORY = 40965;
+lime.audio.openal.ALC.ATTRIBUTES_SIZE = 4098;
+lime.audio.openal.ALC.ALL_ATTRIBUTES = 4099;
+lime.audio.openal.ALC.DEFAULT_DEVICE_SPECIFIER = 4100;
+lime.audio.openal.ALC.DEVICE_SPECIFIER = 4101;
+lime.audio.openal.ALC.EXTENSIONS = 4102;
+lime.audio.openal.ALC.ENUMERATE_ALL_EXT = 1;
+lime.audio.openal.ALC.DEFAULT_ALL_DEVICES_SPECIFIER = 4114;
+lime.audio.openal.ALC.ALL_DEVICES_SPECIFIER = 4115;
+lime.graphics.Image.__base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+lime.graphics.Renderer.onRender = new lime.app.Event();
+lime.graphics.Renderer.eventInfo = new lime.graphics._Renderer.RenderEventInfo();
+lime.graphics.opengl.GL.DEPTH_BUFFER_BIT = 256;
+lime.graphics.opengl.GL.STENCIL_BUFFER_BIT = 1024;
+lime.graphics.opengl.GL.COLOR_BUFFER_BIT = 16384;
+lime.graphics.opengl.GL.POINTS = 0;
+lime.graphics.opengl.GL.LINES = 1;
+lime.graphics.opengl.GL.LINE_LOOP = 2;
+lime.graphics.opengl.GL.LINE_STRIP = 3;
+lime.graphics.opengl.GL.TRIANGLES = 4;
+lime.graphics.opengl.GL.TRIANGLE_STRIP = 5;
+lime.graphics.opengl.GL.TRIANGLE_FAN = 6;
+lime.graphics.opengl.GL.ZERO = 0;
+lime.graphics.opengl.GL.ONE = 1;
+lime.graphics.opengl.GL.SRC_COLOR = 768;
+lime.graphics.opengl.GL.ONE_MINUS_SRC_COLOR = 769;
+lime.graphics.opengl.GL.SRC_ALPHA = 770;
+lime.graphics.opengl.GL.ONE_MINUS_SRC_ALPHA = 771;
+lime.graphics.opengl.GL.DST_ALPHA = 772;
+lime.graphics.opengl.GL.ONE_MINUS_DST_ALPHA = 773;
+lime.graphics.opengl.GL.DST_COLOR = 774;
+lime.graphics.opengl.GL.ONE_MINUS_DST_COLOR = 775;
+lime.graphics.opengl.GL.SRC_ALPHA_SATURATE = 776;
+lime.graphics.opengl.GL.FUNC_ADD = 32774;
+lime.graphics.opengl.GL.BLEND_EQUATION = 32777;
+lime.graphics.opengl.GL.BLEND_EQUATION_RGB = 32777;
+lime.graphics.opengl.GL.BLEND_EQUATION_ALPHA = 34877;
+lime.graphics.opengl.GL.FUNC_SUBTRACT = 32778;
+lime.graphics.opengl.GL.FUNC_REVERSE_SUBTRACT = 32779;
+lime.graphics.opengl.GL.BLEND_DST_RGB = 32968;
+lime.graphics.opengl.GL.BLEND_SRC_RGB = 32969;
+lime.graphics.opengl.GL.BLEND_DST_ALPHA = 32970;
+lime.graphics.opengl.GL.BLEND_SRC_ALPHA = 32971;
+lime.graphics.opengl.GL.CONSTANT_COLOR = 32769;
+lime.graphics.opengl.GL.ONE_MINUS_CONSTANT_COLOR = 32770;
+lime.graphics.opengl.GL.CONSTANT_ALPHA = 32771;
+lime.graphics.opengl.GL.ONE_MINUS_CONSTANT_ALPHA = 32772;
+lime.graphics.opengl.GL.BLEND_COLOR = 32773;
+lime.graphics.opengl.GL.ARRAY_BUFFER = 34962;
+lime.graphics.opengl.GL.ELEMENT_ARRAY_BUFFER = 34963;
+lime.graphics.opengl.GL.ARRAY_BUFFER_BINDING = 34964;
+lime.graphics.opengl.GL.ELEMENT_ARRAY_BUFFER_BINDING = 34965;
+lime.graphics.opengl.GL.STREAM_DRAW = 35040;
+lime.graphics.opengl.GL.STATIC_DRAW = 35044;
+lime.graphics.opengl.GL.DYNAMIC_DRAW = 35048;
+lime.graphics.opengl.GL.BUFFER_SIZE = 34660;
+lime.graphics.opengl.GL.BUFFER_USAGE = 34661;
+lime.graphics.opengl.GL.CURRENT_VERTEX_ATTRIB = 34342;
+lime.graphics.opengl.GL.FRONT = 1028;
+lime.graphics.opengl.GL.BACK = 1029;
+lime.graphics.opengl.GL.FRONT_AND_BACK = 1032;
+lime.graphics.opengl.GL.CULL_FACE = 2884;
+lime.graphics.opengl.GL.BLEND = 3042;
+lime.graphics.opengl.GL.DITHER = 3024;
+lime.graphics.opengl.GL.STENCIL_TEST = 2960;
+lime.graphics.opengl.GL.DEPTH_TEST = 2929;
+lime.graphics.opengl.GL.SCISSOR_TEST = 3089;
+lime.graphics.opengl.GL.POLYGON_OFFSET_FILL = 32823;
+lime.graphics.opengl.GL.SAMPLE_ALPHA_TO_COVERAGE = 32926;
+lime.graphics.opengl.GL.SAMPLE_COVERAGE = 32928;
+lime.graphics.opengl.GL.NO_ERROR = 0;
+lime.graphics.opengl.GL.INVALID_ENUM = 1280;
+lime.graphics.opengl.GL.INVALID_VALUE = 1281;
+lime.graphics.opengl.GL.INVALID_OPERATION = 1282;
+lime.graphics.opengl.GL.OUT_OF_MEMORY = 1285;
+lime.graphics.opengl.GL.CW = 2304;
+lime.graphics.opengl.GL.CCW = 2305;
+lime.graphics.opengl.GL.LINE_WIDTH = 2849;
+lime.graphics.opengl.GL.ALIASED_POINT_SIZE_RANGE = 33901;
+lime.graphics.opengl.GL.ALIASED_LINE_WIDTH_RANGE = 33902;
+lime.graphics.opengl.GL.CULL_FACE_MODE = 2885;
+lime.graphics.opengl.GL.FRONT_FACE = 2886;
+lime.graphics.opengl.GL.DEPTH_RANGE = 2928;
+lime.graphics.opengl.GL.DEPTH_WRITEMASK = 2930;
+lime.graphics.opengl.GL.DEPTH_CLEAR_VALUE = 2931;
+lime.graphics.opengl.GL.DEPTH_FUNC = 2932;
+lime.graphics.opengl.GL.STENCIL_CLEAR_VALUE = 2961;
+lime.graphics.opengl.GL.STENCIL_FUNC = 2962;
+lime.graphics.opengl.GL.STENCIL_FAIL = 2964;
+lime.graphics.opengl.GL.STENCIL_PASS_DEPTH_FAIL = 2965;
+lime.graphics.opengl.GL.STENCIL_PASS_DEPTH_PASS = 2966;
+lime.graphics.opengl.GL.STENCIL_REF = 2967;
+lime.graphics.opengl.GL.STENCIL_VALUE_MASK = 2963;
+lime.graphics.opengl.GL.STENCIL_WRITEMASK = 2968;
+lime.graphics.opengl.GL.STENCIL_BACK_FUNC = 34816;
+lime.graphics.opengl.GL.STENCIL_BACK_FAIL = 34817;
+lime.graphics.opengl.GL.STENCIL_BACK_PASS_DEPTH_FAIL = 34818;
+lime.graphics.opengl.GL.STENCIL_BACK_PASS_DEPTH_PASS = 34819;
+lime.graphics.opengl.GL.STENCIL_BACK_REF = 36003;
+lime.graphics.opengl.GL.STENCIL_BACK_VALUE_MASK = 36004;
+lime.graphics.opengl.GL.STENCIL_BACK_WRITEMASK = 36005;
+lime.graphics.opengl.GL.VIEWPORT = 2978;
+lime.graphics.opengl.GL.SCISSOR_BOX = 3088;
+lime.graphics.opengl.GL.COLOR_CLEAR_VALUE = 3106;
+lime.graphics.opengl.GL.COLOR_WRITEMASK = 3107;
+lime.graphics.opengl.GL.UNPACK_ALIGNMENT = 3317;
+lime.graphics.opengl.GL.PACK_ALIGNMENT = 3333;
+lime.graphics.opengl.GL.MAX_TEXTURE_SIZE = 3379;
+lime.graphics.opengl.GL.MAX_VIEWPORT_DIMS = 3386;
+lime.graphics.opengl.GL.SUBPIXEL_BITS = 3408;
+lime.graphics.opengl.GL.RED_BITS = 3410;
+lime.graphics.opengl.GL.GREEN_BITS = 3411;
+lime.graphics.opengl.GL.BLUE_BITS = 3412;
+lime.graphics.opengl.GL.ALPHA_BITS = 3413;
+lime.graphics.opengl.GL.DEPTH_BITS = 3414;
+lime.graphics.opengl.GL.STENCIL_BITS = 3415;
+lime.graphics.opengl.GL.POLYGON_OFFSET_UNITS = 10752;
+lime.graphics.opengl.GL.POLYGON_OFFSET_FACTOR = 32824;
+lime.graphics.opengl.GL.TEXTURE_BINDING_2D = 32873;
+lime.graphics.opengl.GL.SAMPLE_BUFFERS = 32936;
+lime.graphics.opengl.GL.SAMPLES = 32937;
+lime.graphics.opengl.GL.SAMPLE_COVERAGE_VALUE = 32938;
+lime.graphics.opengl.GL.SAMPLE_COVERAGE_INVERT = 32939;
+lime.graphics.opengl.GL.COMPRESSED_TEXTURE_FORMATS = 34467;
+lime.graphics.opengl.GL.DONT_CARE = 4352;
+lime.graphics.opengl.GL.FASTEST = 4353;
+lime.graphics.opengl.GL.NICEST = 4354;
+lime.graphics.opengl.GL.GENERATE_MIPMAP_HINT = 33170;
+lime.graphics.opengl.GL.BYTE = 5120;
+lime.graphics.opengl.GL.UNSIGNED_BYTE = 5121;
+lime.graphics.opengl.GL.SHORT = 5122;
+lime.graphics.opengl.GL.UNSIGNED_SHORT = 5123;
+lime.graphics.opengl.GL.INT = 5124;
+lime.graphics.opengl.GL.UNSIGNED_INT = 5125;
+lime.graphics.opengl.GL.FLOAT = 5126;
+lime.graphics.opengl.GL.DEPTH_COMPONENT = 6402;
+lime.graphics.opengl.GL.ALPHA = 6406;
+lime.graphics.opengl.GL.RGB = 6407;
+lime.graphics.opengl.GL.RGBA = 6408;
+lime.graphics.opengl.GL.LUMINANCE = 6409;
+lime.graphics.opengl.GL.LUMINANCE_ALPHA = 6410;
+lime.graphics.opengl.GL.UNSIGNED_SHORT_4_4_4_4 = 32819;
+lime.graphics.opengl.GL.UNSIGNED_SHORT_5_5_5_1 = 32820;
+lime.graphics.opengl.GL.UNSIGNED_SHORT_5_6_5 = 33635;
+lime.graphics.opengl.GL.FRAGMENT_SHADER = 35632;
+lime.graphics.opengl.GL.VERTEX_SHADER = 35633;
+lime.graphics.opengl.GL.MAX_VERTEX_ATTRIBS = 34921;
+lime.graphics.opengl.GL.MAX_VERTEX_UNIFORM_VECTORS = 36347;
+lime.graphics.opengl.GL.MAX_VARYING_VECTORS = 36348;
+lime.graphics.opengl.GL.MAX_COMBINED_TEXTURE_IMAGE_UNITS = 35661;
+lime.graphics.opengl.GL.MAX_VERTEX_TEXTURE_IMAGE_UNITS = 35660;
+lime.graphics.opengl.GL.MAX_TEXTURE_IMAGE_UNITS = 34930;
+lime.graphics.opengl.GL.MAX_FRAGMENT_UNIFORM_VECTORS = 36349;
+lime.graphics.opengl.GL.SHADER_TYPE = 35663;
+lime.graphics.opengl.GL.DELETE_STATUS = 35712;
+lime.graphics.opengl.GL.LINK_STATUS = 35714;
+lime.graphics.opengl.GL.VALIDATE_STATUS = 35715;
+lime.graphics.opengl.GL.ATTACHED_SHADERS = 35717;
+lime.graphics.opengl.GL.ACTIVE_UNIFORMS = 35718;
+lime.graphics.opengl.GL.ACTIVE_ATTRIBUTES = 35721;
+lime.graphics.opengl.GL.SHADING_LANGUAGE_VERSION = 35724;
+lime.graphics.opengl.GL.CURRENT_PROGRAM = 35725;
+lime.graphics.opengl.GL.NEVER = 512;
+lime.graphics.opengl.GL.LESS = 513;
+lime.graphics.opengl.GL.EQUAL = 514;
+lime.graphics.opengl.GL.LEQUAL = 515;
+lime.graphics.opengl.GL.GREATER = 516;
+lime.graphics.opengl.GL.NOTEQUAL = 517;
+lime.graphics.opengl.GL.GEQUAL = 518;
+lime.graphics.opengl.GL.ALWAYS = 519;
+lime.graphics.opengl.GL.KEEP = 7680;
+lime.graphics.opengl.GL.REPLACE = 7681;
+lime.graphics.opengl.GL.INCR = 7682;
+lime.graphics.opengl.GL.DECR = 7683;
+lime.graphics.opengl.GL.INVERT = 5386;
+lime.graphics.opengl.GL.INCR_WRAP = 34055;
+lime.graphics.opengl.GL.DECR_WRAP = 34056;
+lime.graphics.opengl.GL.VENDOR = 7936;
+lime.graphics.opengl.GL.RENDERER = 7937;
+lime.graphics.opengl.GL.VERSION = 7938;
+lime.graphics.opengl.GL.NEAREST = 9728;
+lime.graphics.opengl.GL.LINEAR = 9729;
+lime.graphics.opengl.GL.NEAREST_MIPMAP_NEAREST = 9984;
+lime.graphics.opengl.GL.LINEAR_MIPMAP_NEAREST = 9985;
+lime.graphics.opengl.GL.NEAREST_MIPMAP_LINEAR = 9986;
+lime.graphics.opengl.GL.LINEAR_MIPMAP_LINEAR = 9987;
+lime.graphics.opengl.GL.TEXTURE_MAG_FILTER = 10240;
+lime.graphics.opengl.GL.TEXTURE_MIN_FILTER = 10241;
+lime.graphics.opengl.GL.TEXTURE_WRAP_S = 10242;
+lime.graphics.opengl.GL.TEXTURE_WRAP_T = 10243;
+lime.graphics.opengl.GL.TEXTURE_2D = 3553;
+lime.graphics.opengl.GL.TEXTURE = 5890;
+lime.graphics.opengl.GL.TEXTURE_CUBE_MAP = 34067;
+lime.graphics.opengl.GL.TEXTURE_BINDING_CUBE_MAP = 34068;
+lime.graphics.opengl.GL.TEXTURE_CUBE_MAP_POSITIVE_X = 34069;
+lime.graphics.opengl.GL.TEXTURE_CUBE_MAP_NEGATIVE_X = 34070;
+lime.graphics.opengl.GL.TEXTURE_CUBE_MAP_POSITIVE_Y = 34071;
+lime.graphics.opengl.GL.TEXTURE_CUBE_MAP_NEGATIVE_Y = 34072;
+lime.graphics.opengl.GL.TEXTURE_CUBE_MAP_POSITIVE_Z = 34073;
+lime.graphics.opengl.GL.TEXTURE_CUBE_MAP_NEGATIVE_Z = 34074;
+lime.graphics.opengl.GL.MAX_CUBE_MAP_TEXTURE_SIZE = 34076;
+lime.graphics.opengl.GL.TEXTURE0 = 33984;
+lime.graphics.opengl.GL.TEXTURE1 = 33985;
+lime.graphics.opengl.GL.TEXTURE2 = 33986;
+lime.graphics.opengl.GL.TEXTURE3 = 33987;
+lime.graphics.opengl.GL.TEXTURE4 = 33988;
+lime.graphics.opengl.GL.TEXTURE5 = 33989;
+lime.graphics.opengl.GL.TEXTURE6 = 33990;
+lime.graphics.opengl.GL.TEXTURE7 = 33991;
+lime.graphics.opengl.GL.TEXTURE8 = 33992;
+lime.graphics.opengl.GL.TEXTURE9 = 33993;
+lime.graphics.opengl.GL.TEXTURE10 = 33994;
+lime.graphics.opengl.GL.TEXTURE11 = 33995;
+lime.graphics.opengl.GL.TEXTURE12 = 33996;
+lime.graphics.opengl.GL.TEXTURE13 = 33997;
+lime.graphics.opengl.GL.TEXTURE14 = 33998;
+lime.graphics.opengl.GL.TEXTURE15 = 33999;
+lime.graphics.opengl.GL.TEXTURE16 = 34000;
+lime.graphics.opengl.GL.TEXTURE17 = 34001;
+lime.graphics.opengl.GL.TEXTURE18 = 34002;
+lime.graphics.opengl.GL.TEXTURE19 = 34003;
+lime.graphics.opengl.GL.TEXTURE20 = 34004;
+lime.graphics.opengl.GL.TEXTURE21 = 34005;
+lime.graphics.opengl.GL.TEXTURE22 = 34006;
+lime.graphics.opengl.GL.TEXTURE23 = 34007;
+lime.graphics.opengl.GL.TEXTURE24 = 34008;
+lime.graphics.opengl.GL.TEXTURE25 = 34009;
+lime.graphics.opengl.GL.TEXTURE26 = 34010;
+lime.graphics.opengl.GL.TEXTURE27 = 34011;
+lime.graphics.opengl.GL.TEXTURE28 = 34012;
+lime.graphics.opengl.GL.TEXTURE29 = 34013;
+lime.graphics.opengl.GL.TEXTURE30 = 34014;
+lime.graphics.opengl.GL.TEXTURE31 = 34015;
+lime.graphics.opengl.GL.ACTIVE_TEXTURE = 34016;
+lime.graphics.opengl.GL.REPEAT = 10497;
+lime.graphics.opengl.GL.CLAMP_TO_EDGE = 33071;
+lime.graphics.opengl.GL.MIRRORED_REPEAT = 33648;
+lime.graphics.opengl.GL.FLOAT_VEC2 = 35664;
+lime.graphics.opengl.GL.FLOAT_VEC3 = 35665;
+lime.graphics.opengl.GL.FLOAT_VEC4 = 35666;
+lime.graphics.opengl.GL.INT_VEC2 = 35667;
+lime.graphics.opengl.GL.INT_VEC3 = 35668;
+lime.graphics.opengl.GL.INT_VEC4 = 35669;
+lime.graphics.opengl.GL.BOOL = 35670;
+lime.graphics.opengl.GL.BOOL_VEC2 = 35671;
+lime.graphics.opengl.GL.BOOL_VEC3 = 35672;
+lime.graphics.opengl.GL.BOOL_VEC4 = 35673;
+lime.graphics.opengl.GL.FLOAT_MAT2 = 35674;
+lime.graphics.opengl.GL.FLOAT_MAT3 = 35675;
+lime.graphics.opengl.GL.FLOAT_MAT4 = 35676;
+lime.graphics.opengl.GL.SAMPLER_2D = 35678;
+lime.graphics.opengl.GL.SAMPLER_CUBE = 35680;
+lime.graphics.opengl.GL.VERTEX_ATTRIB_ARRAY_ENABLED = 34338;
+lime.graphics.opengl.GL.VERTEX_ATTRIB_ARRAY_SIZE = 34339;
+lime.graphics.opengl.GL.VERTEX_ATTRIB_ARRAY_STRIDE = 34340;
+lime.graphics.opengl.GL.VERTEX_ATTRIB_ARRAY_TYPE = 34341;
+lime.graphics.opengl.GL.VERTEX_ATTRIB_ARRAY_NORMALIZED = 34922;
+lime.graphics.opengl.GL.VERTEX_ATTRIB_ARRAY_POINTER = 34373;
+lime.graphics.opengl.GL.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 34975;
+lime.graphics.opengl.GL.VERTEX_PROGRAM_POINT_SIZE = 34370;
+lime.graphics.opengl.GL.POINT_SPRITE = 34913;
+lime.graphics.opengl.GL.COMPILE_STATUS = 35713;
+lime.graphics.opengl.GL.LOW_FLOAT = 36336;
+lime.graphics.opengl.GL.MEDIUM_FLOAT = 36337;
+lime.graphics.opengl.GL.HIGH_FLOAT = 36338;
+lime.graphics.opengl.GL.LOW_INT = 36339;
+lime.graphics.opengl.GL.MEDIUM_INT = 36340;
+lime.graphics.opengl.GL.HIGH_INT = 36341;
+lime.graphics.opengl.GL.FRAMEBUFFER = 36160;
+lime.graphics.opengl.GL.RENDERBUFFER = 36161;
+lime.graphics.opengl.GL.RGBA4 = 32854;
+lime.graphics.opengl.GL.RGB5_A1 = 32855;
+lime.graphics.opengl.GL.RGB565 = 36194;
+lime.graphics.opengl.GL.DEPTH_COMPONENT16 = 33189;
+lime.graphics.opengl.GL.STENCIL_INDEX = 6401;
+lime.graphics.opengl.GL.STENCIL_INDEX8 = 36168;
+lime.graphics.opengl.GL.DEPTH_STENCIL = 34041;
+lime.graphics.opengl.GL.RENDERBUFFER_WIDTH = 36162;
+lime.graphics.opengl.GL.RENDERBUFFER_HEIGHT = 36163;
+lime.graphics.opengl.GL.RENDERBUFFER_INTERNAL_FORMAT = 36164;
+lime.graphics.opengl.GL.RENDERBUFFER_RED_SIZE = 36176;
+lime.graphics.opengl.GL.RENDERBUFFER_GREEN_SIZE = 36177;
+lime.graphics.opengl.GL.RENDERBUFFER_BLUE_SIZE = 36178;
+lime.graphics.opengl.GL.RENDERBUFFER_ALPHA_SIZE = 36179;
+lime.graphics.opengl.GL.RENDERBUFFER_DEPTH_SIZE = 36180;
+lime.graphics.opengl.GL.RENDERBUFFER_STENCIL_SIZE = 36181;
+lime.graphics.opengl.GL.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE = 36048;
+lime.graphics.opengl.GL.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME = 36049;
+lime.graphics.opengl.GL.FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL = 36050;
+lime.graphics.opengl.GL.FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE = 36051;
+lime.graphics.opengl.GL.COLOR_ATTACHMENT0 = 36064;
+lime.graphics.opengl.GL.DEPTH_ATTACHMENT = 36096;
+lime.graphics.opengl.GL.STENCIL_ATTACHMENT = 36128;
+lime.graphics.opengl.GL.DEPTH_STENCIL_ATTACHMENT = 33306;
+lime.graphics.opengl.GL.NONE = 0;
+lime.graphics.opengl.GL.FRAMEBUFFER_COMPLETE = 36053;
+lime.graphics.opengl.GL.FRAMEBUFFER_INCOMPLETE_ATTACHMENT = 36054;
+lime.graphics.opengl.GL.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 36055;
+lime.graphics.opengl.GL.FRAMEBUFFER_INCOMPLETE_DIMENSIONS = 36057;
+lime.graphics.opengl.GL.FRAMEBUFFER_UNSUPPORTED = 36061;
+lime.graphics.opengl.GL.FRAMEBUFFER_BINDING = 36006;
+lime.graphics.opengl.GL.RENDERBUFFER_BINDING = 36007;
+lime.graphics.opengl.GL.MAX_RENDERBUFFER_SIZE = 34024;
+lime.graphics.opengl.GL.INVALID_FRAMEBUFFER_OPERATION = 1286;
+lime.graphics.opengl.GL.UNPACK_FLIP_Y_WEBGL = 37440;
+lime.graphics.opengl.GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL = 37441;
+lime.graphics.opengl.GL.CONTEXT_LOST_WEBGL = 37442;
+lime.graphics.opengl.GL.UNPACK_COLORSPACE_CONVERSION_WEBGL = 37443;
+lime.graphics.opengl.GL.BROWSER_DEFAULT_WEBGL = 37444;
+lime.math._ColorMatrix.ColorMatrix_Impl_.__identity = [1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0];
+lime.math.Matrix3.__identity = new lime.math.Matrix3();
+lime.net.curl._CURL.CURL_Impl_.GLOBAL_SSL = 1;
+lime.net.curl._CURL.CURL_Impl_.GLOBAL_WIN32 = 2;
+lime.net.curl._CURL.CURL_Impl_.GLOBAL_ALL = 3;
+lime.net.curl._CURL.CURL_Impl_.GLOBAL_NOTHING = 0;
+lime.net.curl._CURL.CURL_Impl_.GLOBAL_DEFAULT = 3;
+lime.net.curl._CURL.CURL_Impl_.GLOBAL_ACK_EINTR = 4;
+lime.ui.KeyEventManager.onKeyDown = new lime.app.Event();
+lime.ui.KeyEventManager.onKeyUp = new lime.app.Event();
+lime.ui.MouseEventManager.onMouseDown = new lime.app.Event();
+lime.ui.MouseEventManager.onMouseMove = new lime.app.Event();
+lime.ui.MouseEventManager.onMouseUp = new lime.app.Event();
+lime.ui.MouseEventManager.onMouseWheel = new lime.app.Event();
+lime.ui.TouchEventManager.onTouchEnd = new lime.app.Event();
+lime.ui.TouchEventManager.onTouchMove = new lime.app.Event();
+lime.ui.TouchEventManager.onTouchStart = new lime.app.Event();
+lime.ui.Window.onWindowActivate = new lime.app.Event();
+lime.ui.Window.onWindowClose = new lime.app.Event();
+lime.ui.Window.onWindowDeactivate = new lime.app.Event();
+lime.ui.Window.onWindowFocusIn = new lime.app.Event();
+lime.ui.Window.onWindowFocusOut = new lime.app.Event();
+lime.ui.Window.onWindowMove = new lime.app.Event();
+lime.ui.Window.onWindowResize = new lime.app.Event();
+lime.ui.Window.eventInfo = new lime.ui._Window.WindowEventInfo();
+lime.utils.ByteArray.lime_byte_array_overwrite_file = lime.system.System.load("lime","lime_byte_array_overwrite_file",2);
+lime.utils.ByteArray.lime_byte_array_read_file = lime.system.System.load("lime","lime_byte_array_read_file",1);
+lime.utils.ByteArray.lime_lzma_decode = lime.system.System.load("lime","lime_lzma_decode",1);
+lime.utils.ByteArray.lime_lzma_encode = lime.system.System.load("lime","lime_lzma_encode",1);
+shaderblox.uniforms.UTexture.lastActiveTexture = -1;
+ApplicationMain.main();
+})(typeof window != "undefined" ? window : exports);
