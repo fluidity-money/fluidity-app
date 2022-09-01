@@ -11,7 +11,7 @@ import (
 )
 
 // handleTransactionError to handle a TVL transaction error response
-func handleTransactionError(value *rpc.SimulationResponse) error {
+func handleTransactionError(value *rpc.SimulationValue) error {
 	err := value.TransactionError
 	if err == nil {
 		return nil

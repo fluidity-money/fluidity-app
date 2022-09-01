@@ -8,7 +8,6 @@ import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
 import HowItWorks from "../../screens/HowItWorks";
 import Landing from "../../screens/Landing";
-import Projects from "../../screens/Projects";
 import Resources from "../../screens/Resources";
 import Reward from "../../screens/Reward";
 import SponsorsPartners from "../../screens/SponsorsPartners";
@@ -26,8 +25,6 @@ const LandingPage = () => {
         <SponsorsPartners />
         {/* Ecosystem which scrolls to projects as a component */}
         <Ecosystem />
-        <Projects />
-        {/* Resources not articles */}
         <Resources />
         {/* Remove articles but style resources the same, reuse? */}
         <Articles />

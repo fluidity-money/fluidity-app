@@ -7,6 +7,7 @@ export { default as DataTable } from "./Table";
 export { Display } from "./Display";
 export { Heading } from "./Heading";
 export { NavBar } from "./NavBar";
+export { NavBarModal } from "./NavBarModal";
 export { Navigation } from "./Navigation";
 export { ReusableGrid } from "./ReusableGrid";
 export { FilterCriteria } from "./Filter";

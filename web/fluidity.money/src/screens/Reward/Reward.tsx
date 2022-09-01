@@ -3,6 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useState } from "react";
+import useViewport from "hooks/useViewport";
 import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
 import styles from "./Reward.module.scss";
@@ -17,6 +18,8 @@ const Reward = () => {
   const [initalView, setInitalView] = useState(true);
   const [present, setPresent] = useState(true);
   const [toggle, setToggle] = useState(true);
+  const { width } = useViewport();
+  const breakpoint = 620;
 
   // animates then switches backgrounds
   const switchAndAnimate = () => {
@@ -39,10 +42,12 @@ const Reward = () => {
         <h1>32,689</h1>
         <h4>Fluid asset pairs</h4>
       </div>
-      <div className={styles.infoSingle}>
-        <h1>678,123.00</h1>
-        <h4>Reward Pool</h4>
-      </div>
+      {width > breakpoint && (
+        <div className={styles.infoSingle}>
+          <h1>678,123.00</h1>
+          <h4>Reward Pool</h4>
+        </div>
+      )}
     </div>
   );
 

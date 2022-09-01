@@ -2,8 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { ContinuousCarousel, GeneralButton, FooterItem } from "surfing";
+import useViewport from "hooks/useViewport";
 import Socials from "../../components/Socials";
+import { ContinuousCarousel, GeneralButton, FooterItem } from "surfing";
 import styles from "./Footer.module.scss";
 
 interface IItem {
@@ -13,10 +14,9 @@ interface IItem {
 }
 
 const Footer = () => {
-  /*
-  data,
-  continuous carousel at the bottom of large text
-   */
+  const { width } = useViewport();
+  const firstBreakpoint = 620;
+  const secondBreakpoint = 560;
   return (
     <div className={styles.container}>
       <Socials />
@@ -33,7 +33,13 @@ const Footer = () => {
               handleClick={() => {}}
               version={"primary"}
               type={"text"}
-              size={"large"}
+              size={
+                width > firstBreakpoint
+                  ? "large"
+                  : width > secondBreakpoint && width < firstBreakpoint
+                  ? "medium"
+                  : "small"
+              }
             >
               LAUNCH FLUIDITY
             </GeneralButton>
@@ -41,14 +47,23 @@ const Footer = () => {
               handleClick={() => {}}
               version={"secondary"}
               type={"text"}
-              size={"large"}
+              size={
+                width > firstBreakpoint
+                  ? "large"
+                  : width > secondBreakpoint && width < firstBreakpoint
+                  ? "medium"
+                  : "small"
+              }
             >
               LET'S CHAT
             </GeneralButton>
           </div>
           <div className={styles.legal}>
-            <h6>Terms</h6>
-            <h6>Provivacy Poilicy</h6>
+            <div>
+              <h6>Terms</h6>
+              <h6>Provivacy Poilicy</h6>
+            </div>
+
             <h6>© 2022 Fluidity Money. All Rights Reserved.</h6>
           </div>
         </div>

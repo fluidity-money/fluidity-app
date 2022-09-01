@@ -37,19 +37,4 @@ SERVICES:
       ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.tusd
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/tusd/private_key
 
-  - WORKER_CLIENT_FRAX:
-      SERVICE_NAME: microservice-ethereum-worker-client-frax
-      ENV_FLU_WORKER_ID: ethereum-staging-microservice-ethereum-worker-server-frax
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0xeDfE9eD77162e7EA830FC4aE8a892b7E4b8D4940"
-      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.frax
-      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.frax
-      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/frax/private_key
-
-  - WORKER_CLIENT_FEI:
-      SERVICE_NAME: microservice-ethereum-worker-client-fei
-      ENV_FLU_WORKER_ID: ethereum-staging-microservice-ethereum-worker-server-fei
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x3cd03e4016d3DD590AFD524daBede7609EC357CA"
-      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.fei
-      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.fei
-      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/fei/private_key
 

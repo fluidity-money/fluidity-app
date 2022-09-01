@@ -7,9 +7,9 @@ package main
 import (
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	solanaLib "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/common/solana/pyth"
+	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	solanaQueue "github.com/fluidity-money/fluidity-app/lib/queues/solana"
@@ -121,13 +121,14 @@ func main() {
 
 		parsedTransactions := make([]worker.SolanaApplicationTransaction, 0)
 
-		for _, transaction := range block.Transactions {
+		for i, transaction := range block.Transactions {
 			apps := solanaLib.ClassifyApplication(transaction, applications)
 
 			if len(apps) == 0 {
 				log.Debugf(
-					"Transaction %v didn't have an application classified!",
-					transaction,
+					"Transaction position %d block %v didn't have an application classified!",
+					i,
+					slot.Slot,
 				)
 
 				continue

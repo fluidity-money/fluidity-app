@@ -13,15 +13,20 @@ import (
 	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 )
 
-type SimulationResponse struct {
-	TransactionError interface{}     `json:"err"`
-	Logs             []string        `json:"logs"`
-	Accounts         []types.Account `json:"accounts"`
-	Err              string          `json:"err"`
-	UnitsConsumed    uint64          `json:"unitsConsumed"`
-}
+type (
+	SimulationValue struct {
+		TransactionError interface{}     `json:"err"`
+		Logs             []string        `json:"logs"`
+		Accounts         []types.Account `json:"accounts"`
+		UnitsConsumed    uint64          `json:"unitsConsumed"`
+	}
 
-func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, commitment string, replaceRecentBlockHash bool, accounts ...solana.PublicKey) (*SimulationResponse, error) {
+	SimulationResponse struct {
+		Value SimulationValue `json:"value"`
+	}
+)
+
+func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, commitment string, replaceRecentBlockHash bool, accounts ...solana.PublicKey) (*SimulationValue, error) {
 	transactionBase64 := base64.StdEncoding.EncodeToString(
 		transaction,
 	)
@@ -67,12 +72,14 @@ func (s Provider) SimulateTransaction(transaction []byte, signatureVerify bool, 
 		)
 	}
 
-	if err_ := simulationResponse.Err; err_ != "" {
+	value := simulationResponse.Value
+
+	if err_ := value.TransactionError; err_ != "" {
 		return nil, fmt.Errorf(
 			"getAccountInfo returned error %v",
 			err_,
 		)
 	}
 
-	return &simulationResponse, nil
+	return &value, nil
 }

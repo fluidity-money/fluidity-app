@@ -7,36 +7,31 @@ import styles from "./IntroTile.module.scss";
 
 interface IIntroTileProps {
   children: ReactNode;
-  type: "star" | "ellipse";
+  img: string;
   side: "left" | "right";
 }
 
-const IntroTile = ({ type, side, children }: IIntroTileProps) => {
+const IntroTile = ({ img, side, children }: IIntroTileProps) => {
   return (
-    <div className={styles.container}>
+    <>
       {side === "left" && (
-        <img
-          src={
-            type === "star"
-              ? "/assets/images/ellipse.svg"
-              : "/assets/images/ellipse.svg"
-          }
-          alt=""
-        />
-      )}
+        <div className={styles.containerLeft}>
+          <img src={img} alt="" />
 
-      <div className={`${styles.text} ${styles[side]}`}>{children}</div>
-      {side === "right" && (
-        <img
-          src={
-            type === "star"
-              ? "/assets/images/ellipse.svg"
-              : "/assets/images/ellipse.svg"
-          }
-          alt=""
-        />
+          <div className={`${styles.text} ${styles.left}`}>
+            <p>{children}</p>
+          </div>
+        </div>
       )}
-    </div>
+      {side === "right" && (
+        <div className={styles.containerRight}>
+          <div className={`${styles.text} ${styles.right}`}>
+            <p>{children}</p>
+          </div>
+          <img src={img} alt="" />
+        </div>
+      )}
+    </>
   );
 };
 
