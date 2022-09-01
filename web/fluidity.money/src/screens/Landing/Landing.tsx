@@ -8,6 +8,7 @@ import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
 import IntroTile from "components/IntroTile";
+import useViewport from "hooks/useViewport";
 
 const Landing = () => {
   /* 
@@ -24,7 +25,8 @@ const Landing = () => {
   7. Text items fade in with new looped video, perhaps staggered with slight delay, or with lines building out from left to righ ton left, and right  to left on right.
     */
 
-  const [fadeProp, setFadeProp] = useState("fadeIn");
+  const { width } = useViewport();
+  const breakpoint = 620;
   // const myRef = useRef<HTMLInputElement>(null);
 
   // useEffect(() => {
@@ -46,14 +48,25 @@ const Landing = () => {
   return (
     <div className={`${styles.container}`}>
       <motion.div className={styles.content}>
-        <motion.h1
-          initial={{ opacity: 0, y: "-100vh" }}
-          animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-          transition={{ duration: 4, type: "tween" }}
-        >
-          Fluidity is the blockchain incentive layer, <br />
-          rewarding people for using their crypto.
-        </motion.h1>
+        {width < breakpoint ? (
+          <motion.h1
+            initial={{ opacity: 0, y: "-100vh" }}
+            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
+            transition={{ duration: 4, type: "tween" }}
+          >
+            Fluidity is the <br /> blockchain incentive <br /> layer, rewarding{" "}
+            <br /> people for using <br /> their crypto.
+          </motion.h1>
+        ) : (
+          <motion.h1
+            initial={{ opacity: 0, y: "-100vh" }}
+            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
+            transition={{ duration: 4, type: "tween" }}
+          >
+            Fluidity is the blockchain incentive layer, <br />
+            rewarding people for using their crypto.
+          </motion.h1>
+        )}
         <div className={styles.tiles}>
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
