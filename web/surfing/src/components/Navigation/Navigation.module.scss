@@ -2,8 +2,9 @@
 
 .container {
   display: flex;
+  // grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
-  background-color: $black;
+  background-color: $fluidBlack;
   width: fit-content;
   padding: 4px;
   border-radius: 40px;
@@ -11,12 +12,20 @@
   top: 85vh;
   left: 50vw;
   transform: translateX(-50%);
-  z-index: 60;
+  z-index: 1000;
   h4 {
     cursor: pointer;
     margin: 6px;
     &:hover {
       opacity: 0.8;
     }
+  }
+  @media (max-width: 620px) {
+    // grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
+    top: 75vh;
+    background-color: transparent;
+    opacity: 0.9;
   }
 }
