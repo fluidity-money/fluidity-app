@@ -19,6 +19,10 @@ const (
 	// winner and their amount won
 	TopicWinnersEthereum = `winners.` + string(network.NetworkEthereum)
 
+	// TopicBlockedWinnersEthereum to broadcast winner messages containing
+	// a single blocked winner and their amount won
+	TopicBlockedWinnersEthereum = `blocked_winners.` + string(network.NetworkEthereum)
+
 	// TopicWinnersSolana to broadcast winner messages containing a single
 	// winner and their amount won
 	TopicWinnersSolana = `winners.` + string(network.NetworkSolana)
