@@ -6,3 +6,10 @@ SERVICES:
       ENV_FLU_SOLANA_STARTING_SLOT: latest
       SECRET_FLU_SOLANA_WS_URL: /fluidity/solana/websocket_url
       SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
+
+  - CONNECTORS_COMMON_BLOCKED_PAYOUTS_REPORTING_SOLANA:
+      SERVICE_NAME: connector-common-blocked-payouts-reporting-solana
+      DOCKER_IMAGE: connector-common-blocked-payouts-reporting
+      DOCKERFILE_PATH: ./cmd/connector-common-blocked-payouts-reporting
+      ENV_FLU_WORKER_ID: solana-staging-connector-common-blocked-payouts-reporting
+      ENV_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
