@@ -11,7 +11,7 @@ Ethereum the following lending protocols are supported:
 
 On Solana:
 
-* [Sollend](https://solend.fi/)
+* [Solend](https://solend.fi/)
 
 Fluid Assets support the following additional features:
 
