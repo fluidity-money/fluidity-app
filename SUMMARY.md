@@ -36,7 +36,7 @@
 * [🎪 Developers](docs/developers/README.md)
   * [🏢 High level architecture](docs/developers/fluidity-architecture.md)
     * [👷 Worker architecture](docs/developers/fluidity-architecture/worker-architecture.md)
-    * [Ethereum contract architecture](docs/developers/fluidity-architecture/ethereum-contract-architecture.md)
+    * [💠 Ethereum contract architecture](docs/developers/fluidity-architecture/ethereum-contract-architecture.md)
     * [Solana program architecture](docs/developers/fluidity-architecture/solana-program-architecture.md)
   * [🏡 Addresses](docs/developers/addresses/README.md)
     * [💠 Ethereum](docs/developers/addresses/ethereum.md)
