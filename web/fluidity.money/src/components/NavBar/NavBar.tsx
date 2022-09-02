@@ -4,6 +4,7 @@
 
 import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
+import useViewport from "hooks/useViewport";
 import { useState } from "react";
 import { GeneralButton, NavBarModal } from "surfing";
 import styles from "./NavBar.module.scss";
@@ -13,6 +14,9 @@ const NavBar = () => {
   const handleModal = () => {
     setModal(!modal);
   };
+
+  const { width } = useViewport();
+  const breakpoint = 700;
 
   const { scrollDir } = useScrollDirection();
   const scrollVariants = {
@@ -41,7 +45,7 @@ const NavBar = () => {
             <GeneralButton
               version={"secondary"}
               type={"text"}
-              size={"medium"}
+              size={width < breakpoint ? "small" : "medium"}
               handleClick={() => {}}
             >
               LAUNCH FLUIDITY
