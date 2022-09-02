@@ -128,8 +128,7 @@ func NewInstruction(
 	}
 }
 
-// Requisite Types for NewTransaction
-type Hash PublicKey // Alias
+type Hash PublicKey
 
 type MessageHeader struct {
 	// The total number of signatures required to make the transaction valid.
