@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -31,6 +32,8 @@ var (
 
 	// winner10Split that's finally used to get the 80/20 split for winners
 	winner10Split = big.NewInt(10)
+
+	blockPayoutPrefix = "Large payout blocked! Token mint "
 )
 
 func tokenIsMintEvent(senderAddress, recipientAddress, fluidityTokenMintAddress, fluidityPdaPubkey string) bool {
@@ -321,4 +324,16 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 	}
 
 	return transfer1, transfer2, nil
+}
+
+func fluidityPayoutWasBlocked(transaction solana.Transaction) bool {
+	logs := transaction.Result.Meta.Logs
+
+	for _, line := range logs {
+		if strings.HasPrefix(line, blockPayoutPrefix) {
+			return true
+		}
+	}
+
+	return false
 }
