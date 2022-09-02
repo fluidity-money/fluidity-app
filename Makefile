@@ -23,6 +23,7 @@ all: \
 build:
 	@cd lib && ${MAKE} build-lib
 	@cd common && ${MAKE} build-common
+	cd ${GO_CMD_DIR} && ${MAKE} build
 
 install:
 	@cd ${GO_CMD_DIR} && ${MAKE} install

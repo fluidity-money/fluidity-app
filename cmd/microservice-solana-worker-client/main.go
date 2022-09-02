@@ -8,16 +8,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
+	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/common/solana/payout"
 	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
+	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	"github.com/fluidity-money/fluidity-app/common/solana"
-
-	"github.com/near/borsh-go"
 )
 
 const (
@@ -77,9 +75,6 @@ const (
 	EnvTokenName = `FLU_SOLANA_TOKEN_NAME`
 )
 
-// SplProgramId is the program id of the SPL token program
-const SplProgramId = `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`
-
 func main() {
 	var (
 		rpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
@@ -133,19 +128,6 @@ func main() {
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to decode payer private key!"
-			k.Payload = err
-		})
-	}
-
-	splPubkey, err := solana.PublicKeyFromBase58(SplProgramId)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Failed to decode the spl program id %v",
-				SplProgramId,
-			)
-
 			k.Payload = err
 		})
 	}
@@ -236,75 +218,30 @@ func main() {
 			})
 		}
 
-		var (
-			// fluidityDataAccount is used to read keys from
-			fluidityDataAccount = solana.NewAccountMeta(fluidDataPubkey, false, false)
-
-			// underlyingTokenMint is used to ensure the correct fluid account is being used
-			underlyingTokenMint = solana.NewAccountMeta(tokenMintPubkey, false, false)
-
-			// solanaAccountMetaSpl is used to know where to send transactions
-			solanaAccountMetaSpl = solana.NewAccountMeta(splPubkey, false, false)
-
-			// solanaAccountFluidMint is needed to be writable and used as a mint,
-			// tracking the amounts of Fluid tokens that the account has. is set to true
-			// to indicate mutability
-			solanaAccountFluidMint = solana.NewAccountMeta(fluidMintPubkey, true, false)
-
-			// solanaAccountPDA is used as an authority to sign off on minting
-			// by the payout function
-			solanaAccountPDA = solana.NewAccountMeta(pdaPubkey, false, false)
-
-			// solanaAccountObligation to use to track the amount of Solend
-			// obligations that Fluidity owns to pass the account to do a calculation for
-			// the prize pool
-			solanaAccountObligation = solana.NewAccountMeta(
-				obligationPubkey,
-				false,
-				false,
-			)
-
-			// solanaAccountReserve to use to track the exchange rate of obligation
-			// collateral
-			solanaAccountReserve = solana.NewAccountMeta(
-				reservePubkey,
-				false,
-				false,
-			)
-
-			// accounts used to indicate the payout recipients from the reward function.
-			// both accounts are mutable to support sending to the token accounts
-
-			solanaAccountA = solana.NewAccountMeta(aPubkey, true, false)
-			solanaAccountB = solana.NewAccountMeta(bPubkey, true, false)
-
-			// solanaAccountPayer, with true set to sign amounts paid out to the
-			// recipients, strictly the fluidity authority
-			solanaAccountPayer = solana.NewAccountMeta(
-				payer.PublicKey(),
-				true,
-				true,
-			)
-		)
-
-		accountMetas := solana.AccountMetaSlice{
-			fluidityDataAccount,
-			underlyingTokenMint,
-			solanaAccountMetaSpl,
-			solanaAccountFluidMint,
-			solanaAccountPDA,
-			solanaAccountObligation,
-			solanaAccountReserve,
-			solanaAccountA,
-			solanaAccountB,
-			solanaAccountPayer,
+		payoutArgs := payout.PayoutArgs{
+			DataAccountPubkey: fluidDataPubkey,
+			MetaSplPubkey:     spl_token.TokenProgramAddressPubkey,
+			TokenMintPubkey:   tokenMintPubkey,
+			FluidMintPubkey:   fluidMintPubkey,
+			PdaPubkey:         pdaPubkey,
+			ObligationPubkey:  obligationPubkey,
+			ReservePubkey:     reservePubkey,
+			AccountAPubkey:    aPubkey,
+			AccountBPubkey:    bPubkey,
+			PayerPubkey:       payer.PublicKey(),
+			WinningAmount:     winningAmount,
+			TokenName:         tokenName,
+			BumpSeed:          bumpSeed,
+			RecentBlockHash:   recentBlockHash,
 		}
 
-		payoutInstruction := fluidity.InstructionPayout{
-			fluidity.VariantPayout,
-			winningAmount,
-			tokenName,
-			bumpSeed,
+		transaction, payoutInstruction, err := payout.CreatePayoutTransaction(payoutArgs)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to create a payout transaction!"
+				k.Payload = err
+			})
 		}
 
 		// if flag is set, print debug information and don't actually send payout
@@ -314,7 +251,7 @@ func main() {
 					`Payout would have been sent with account metas:
 {SPL program: %v, fluid mint: %v, PDA: %v, obligation: %v, reserve: %v, account A: %v, account B: %v, payer: %v}
 and instruction data %+v`,
-					splPubkey,
+					spl_token.TokenProgramAddressPubkey,
 					fluidMintPubkey,
 					pdaPubkey,
 					obligationPubkey,
@@ -325,33 +262,8 @@ and instruction data %+v`,
 					payoutInstruction,
 				)
 			})
+
 			return
-		}
-
-		payoutInstructionBytes, err := borsh.Serialize(payoutInstruction)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to serialize payout instruction data!"
-				k.Payload = err
-			})
-		}
-
-		instruction := solana.NewInstruction(
-			fluidityPubkey,
-			accountMetas,
-			payoutInstructionBytes,
-		)
-
-		instructions := []solana.Instruction{instruction}
-
-		transaction, err := solana.NewTransaction(instructions, recentBlockHash)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to construct payout transaction!"
-				k.Payload = err
-			})
 		}
 
 		_, err = transaction.Sign(func(key solana.PublicKey) *solana.PrivateKey {
