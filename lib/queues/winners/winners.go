@@ -27,6 +27,10 @@ const (
 	// winner and their amount won
 	TopicWinnersSolana = `winners.` + string(network.NetworkSolana)
 
+	// TopicBlockedWinnersSolana to broadcast winner messages containing
+	// a single blocked winner and their amount won
+	TopicBlockedWinnersSolana = `blocked_winners.` + string(network.NetworkSolana)
+
 	// subWinnersAll to subscribe to winner messages from either network
 	subWinnersAll = `winners.*`
 )
