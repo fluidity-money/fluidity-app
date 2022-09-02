@@ -7,9 +7,19 @@ Fluidity is governed by a pair of multisigs:
 
 These multisigs protect the community and the protocol.
 
-### Members of the multisig
+### Multisig powers
 
-#### Community multisig
+| Community multisig                                                                                                   | Emergency multisig                                                                                                   |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| <ul><li>Can enable emergency mode (can freeze swap-ins, prevent payouts and allow transfers and swap outs)</li></ul> | <ul><li>Can enable emergency mode (can freeze swap-ins, prevent payouts and allow transfers and swap outs)</li></ul> |
+| <ul><li>Can upgrade the contract/program</li></ul>                                                                   |                                                                                                                      |
+| <ul><li>Can adjust and release minting limits</li></ul>                                                              |                                                                                                                      |
+| <ul><li>Can unblock large payouts</li></ul>                                                                          |                                                                                                                      |
+| <ul><li>Can change the worker operator key once a month</li></ul>                                                    |                                                                                                                      |
+
+### Ethereum multisig
+
+#### Community
 
 {% embed url="https://gnosis-safe.io/app/eth:0xe0ead43d9266154f777Cb831476be99f6c40B96d/home" %}
 Community multisig
@@ -22,7 +32,7 @@ Community multisig
 
 (in progress)
 
-#### Emergency multisig
+#### Emergency
 
 {% embed url="https://gnosis-safe.io/app/eth:0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd" %}
 Emergency multisig
@@ -37,12 +47,22 @@ Emergency multisig
 
 (in progress)
 
-### Multisig powers
+### Solana multisig
 
-| Community multisig                                                                                                   | Emergency multisig                                                                                                   |
-| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| <ul><li>Can enable emergency mode (can freeze swap-ins, prevent payouts and allow transfers and swap outs)</li></ul> | <ul><li>Can enable emergency mode (can freeze swap-ins, prevent payouts and allow transfers and swap outs)</li></ul> |
-| <ul><li>Can upgrade the contract/program</li></ul>                                                                   |                                                                                                                      |
-| <ul><li>Can adjust and release minting limits</li></ul>                                                              |                                                                                                                      |
-| <ul><li>Can unblock large payouts</li></ul>                                                                          |                                                                                                                      |
-| <ul><li>Can change the worker operator key once a month</li></ul>                                                    |                                                                                                                      |
+#### Community
+
+[https://goki.so/wallets/AsbM4BP7A4YiPV89BYkUjMkBkgT1ycCvpc7uNALyfHFG](https://goki.so/wallets/AsbM4BP7A4YiPV89BYkUjMkBkgT1ycCvpc7uNALyfHFG/propose)
+
+| Owner name/pseudonym                         | Address                                      |
+| -------------------------------------------- | -------------------------------------------- |
+| Shahmeer Chaudhry, Fluidity CEO (shahmeerch) |                                              |
+| Alexander Baigent, Fluidity CTO (bayge)      | G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj |
+
+#### Emergency
+
+0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd
+
+| Owner name/pseudonym | Address |
+| -------------------- | ------- |
+|                      |         |
+|                      |         |
