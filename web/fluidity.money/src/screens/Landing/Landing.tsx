@@ -44,8 +44,6 @@ const Landing = () => {
   //   observer.observe(myRef.current as Element);
   // }, []);
 
-  const { width } = useViewport();
-  const breakpoint = 620;
 
   return (
     <div className={`${styles.containerLanding}`}>

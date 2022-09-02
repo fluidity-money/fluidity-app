@@ -28,7 +28,7 @@ export interface WinnersRes {
 
 
 const winningTransactionsByAddressSubscription = graphql`
-subscription winnersGetWinningTransactionsByAddressSubscription($network: network_blockchain!, $address: String!, $date: String!) {
+subscription winnersGetWinningTransactionsByAddressSubscription($network: network_blockchain!, $address: String!, $date: timestamp!) {
   winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, winning_address: {_eq: $address}, awarded_time: {_gte: $date}}) {
     awarded_time
     transaction_hash
@@ -41,7 +41,7 @@ subscription winnersGetWinningTransactionsByAddressSubscription($network: networ
 `;
 
 const winningTransactionsAllSubscription = graphql`
-subscription winnersGetWinningTransactionsAllSubscription($network: network_blockchain!, $date: String!) {
+subscription winnersGetWinningTransactionsAllSubscription($network: network_blockchain!, $date: timestamp!) {
   winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, awarded_time: {_gte: $date}}) {
     awarded_time
     transaction_hash
