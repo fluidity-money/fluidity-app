@@ -1,6 +1,7 @@
 const svgr = require("vite-plugin-svgr");
 const tsconfigPaths = require("vite-tsconfig-paths").default;
 const { mergeConfig } = require("vite");
+const { resolve } = require("path");
 
 module.exports = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
