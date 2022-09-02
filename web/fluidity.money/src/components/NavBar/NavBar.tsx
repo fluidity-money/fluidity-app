@@ -52,6 +52,7 @@ const NavBar = () => {
           className={styles.navbar}
           variants={scrollVariants}
           animate={scrollDir === "up" ? "appear" : "disappear"}
+          transition={{ type: "tween" }}
         >
           <div className={styles.fade}>
             <nav>
