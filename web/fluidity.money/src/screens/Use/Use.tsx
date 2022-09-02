@@ -1,6 +1,6 @@
-import ReusableGrid from "components/ReusableGrid";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import ReusableGrid from "components/ReusableGrid";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Use.module.scss";
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this source

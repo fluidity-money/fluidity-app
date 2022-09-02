@@ -27,28 +27,27 @@ const Yield = () => {
   const { width } = useViewport();
   const breakpoint = 860;
 
+  const left =
+    width < breakpoint ? (
+      <div style={{ fontSize: 160 }}>🦍</div>
+    ) : (
+      <HowItWorksTemplate header={header} info={info}>
+        "Yield through utility"
+      </HowItWorksTemplate>
+    );
+
+  const right =
+    width > breakpoint ? (
+      <div style={{ fontSize: 160 }}>🦍</div>
+    ) : (
+      <HowItWorksTemplate header={header} info={info}>
+        "Yield through utility"
+      </HowItWorksTemplate>
+    );
+
   return (
     <div className={styles.container} id="yield&win">
-      <ReusableGrid
-        left={
-          width < breakpoint ? (
-            <div style={{ fontSize: 160 }}>🦍</div>
-          ) : (
-            <HowItWorksTemplate header={header} info={info}>
-              {"Yield through utility"}
-            </HowItWorksTemplate>
-          )
-        }
-        right={
-          width > breakpoint ? (
-            <div style={{ fontSize: 160 }}>🦍</div>
-          ) : (
-            <HowItWorksTemplate header={header} info={info}>
-              {"Yield through utility"}
-            </HowItWorksTemplate>
-          )
-        }
-      />
+      <ReusableGrid left={left} right={right} />
     </div>
   );
 };

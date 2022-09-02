@@ -27,28 +27,27 @@ const Wrap = () => {
   const { width } = useViewport();
   const breakpoint = 860;
 
+  const left =
+    width < breakpoint ? (
+      <div style={{ fontSize: 160 }}>🦍</div>
+    ) : (
+      <HowItWorksTemplate header={header} info={info}>
+        Wrapped tokens
+      </HowItWorksTemplate>
+    );
+
+  const right =
+    width > breakpoint ? (
+      <div style={{ fontSize: 160 }}>🦍</div>
+    ) : (
+      <HowItWorksTemplate header={header} info={info}>
+        Wrapped tokens
+      </HowItWorksTemplate>
+    );
+
   return (
     <div className={styles.container} id="wraptokens">
-      <ReusableGrid
-        left={
-          width < breakpoint ? (
-            <div style={{ fontSize: 160 }}>🦍</div>
-          ) : (
-            <HowItWorksTemplate header={header} info={info}>
-              Wrapped tokens
-            </HowItWorksTemplate>
-          )
-        }
-        right={
-          width > breakpoint ? (
-            <div style={{ fontSize: 160 }}>🦍</div>
-          ) : (
-            <HowItWorksTemplate header={header} info={info}>
-              Wrap tokens
-            </HowItWorksTemplate>
-          )
-        }
-      />
+      <ReusableGrid left={left} right={right} />
     </div>
   );
 };
