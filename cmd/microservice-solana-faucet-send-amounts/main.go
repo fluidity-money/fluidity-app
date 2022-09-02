@@ -123,7 +123,7 @@ func main() {
 			})
 		}
 
-		blockHash, err := getBlockHash(solanaClient)
+		blockHash, err := solanaClient.GetRecentBlockhash("finalized")
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -162,7 +162,7 @@ func main() {
 			recipientAddress,
 			mintAddress,
 			amountInt64,
-			*blockHash,
+			blockHash,
 			senderAddress,
 			senderPrivateKey,
 		)

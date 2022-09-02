@@ -2,6 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { default as ProtectedRoute } from './ProtectedRoute'
+import MobileNavBar from "./MobileNavBar";
 
-export { ProtectedRoute };
+export default MobileNavBar;

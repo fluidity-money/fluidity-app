@@ -14,26 +14,31 @@ import HowItWorksPage from "./pages/HowItWorksPage";
 import FluidStatsPage from "./pages/FluidStatsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import fluRelayEnvironment from "./data/relayEnvironment";
+import useViewport from "hooks/useViewport";
+import MobileNavBar from "components/MobileNavBar";
 
 import "./styles/app.global.scss";
 import "surfing/dist/style.css";
 
 function App() {
+  const { width } = useViewport();
+  const breakpoint = 620;
   return (
     <RelayEnvironmentProvider environment={fluRelayEnvironment}>
       <ChainContextProvider>
-      <Router>
-        <div className="App">
-          <NavBar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/howitworks" element={<HowItWorksPage />} />
-            <Route path="/ecosystem" element={<EcosystemPage />} />
-            <Route path="/fluidstats" element={<FluidStatsPage />} />
-            <Route path="/resources" element={<ResourcesPage />} />
-          </Routes>
-        </div>
-      </Router>
+        <Router>
+          <div className="App">
+            {width < breakpoint ? <MobileNavBar /> : <NavBar />}
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/howitworks" element={<HowItWorksPage />} />
+              {/* Pages removed for now, not yet ready for production */}
+              {/* <Route path="/ecosystem" element={<EcosystemPage />} />
+              <Route path="/fluidstats" element={<FluidStatsPage />} /> */}
+              <Route path="/resources" element={<ResourcesPage />} />
+            </Routes>
+          </div>
+        </Router>
       </ChainContextProvider>
     </RelayEnvironmentProvider>
   );

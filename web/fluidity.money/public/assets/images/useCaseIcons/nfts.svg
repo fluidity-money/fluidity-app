@@ -1,33 +1,3 @@
-<svg width="192" height="193" viewBox="0 0 192 193" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M48 27.625L159 9.5V183.5L48 165.375V27.625Z" stroke="url(#paint0_linear_823_29114)" stroke-linecap="square"/>
-<path d="M57 36.625L144 24.5V168.5L57 156.375V36.625Z" stroke="url(#paint1_linear_823_29114)" stroke-linecap="square"/>
-<path d="M48 27.5L57 36.5" stroke="#3E3F3E"/>
-<path d="M48 165.5L57 156.5" stroke="#272726"/>
-<path d="M159 183.5L144 168.5" stroke="#313231"/>
-<path d="M159 9.5L144 24.5" stroke="#4D4D4C"/>
-<path d="M78 147.5C106.167 147.5 129 124.667 129 96.5C129 68.3335 106.167 45.5 78 45.5C49.8335 45.5 27 68.3335 27 96.5C27 124.667 49.8335 147.5 78 147.5Z" fill="black" stroke="url(#paint2_angular_823_29114)" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="2 2"/>
-<path d="M64.6389 92.8644L81.6095 109.835M59.3356 115.138L50.8504 123.624M52.9717 108.774L48.729 113.017M65.6996 121.502L61.457 125.745M72.0636 115.138L73.3364 124.048C73.686 126.495 76.6795 127.493 78.4275 125.745L87.9735 116.199C88.6412 115.531 88.9555 114.588 88.822 113.653L87.9735 107.714M59.3356 102.41L50.426 101.138C47.9787 100.788 46.9809 97.7945 48.729 96.0464L58.2749 86.5005C58.9426 85.8328 59.8857 85.5184 60.8205 85.6519L66.7602 86.5005M96.4586 99.2285C90.4732 105.682 80.9177 110.895 75.7203 113.443C73.528 114.518 70.9342 114.009 69.2078 112.283L62.1912 105.266C60.4648 103.54 59.9564 100.946 61.0311 98.7536C63.5791 93.5562 68.7919 84.0007 75.2454 78.0153C82.4391 71.3434 93.8316 68.8617 100.855 67.9431C104.231 67.5016 106.972 70.2425 106.531 73.6187C105.612 80.6422 103.131 92.0348 96.4586 99.2285ZM82.6702 83.3184C80.327 85.6616 80.327 89.4606 82.6702 91.8037C85.0133 94.1469 88.8123 94.1469 91.1554 91.8037C93.4986 89.4606 93.4986 85.6616 91.1554 83.3184C88.8123 80.9753 85.0133 80.9753 82.6702 83.3184Z" stroke="white" stroke-width="2" stroke-miterlimit="10"/>
-<defs>
-<linearGradient id="paint0_linear_823_29114" x1="159" y1="21.5" x2="48" y2="165.5" gradientUnits="userSpaceOnUse">
-<stop stop-color="#4D4D4C"/>
-<stop offset="1" stop-color="#4D4D4C" stop-opacity="0.5"/>
-</linearGradient>
-<linearGradient id="paint1_linear_823_29114" x1="144" y1="34.431" x2="50.9873" y2="148.71" gradientUnits="userSpaceOnUse">
-<stop stop-color="#4D4D4C"/>
-<stop offset="1" stop-color="#4D4D4C" stop-opacity="0.5"/>
-</linearGradient>
-<radialGradient id="paint2_angular_823_29114" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(78 96.5) rotate(119.592) scale(71.2601)">
-<stop stop-color="#F3B8D8"/>
-<stop offset="0.139053" stop-color="#B793E9"/>
-<stop offset="0.238718" stop-color="#9FD4F3"/>
-<stop offset="0.374927" stop-color="#FFD2C4"/>
-<stop offset="0.477914" stop-color="#FBF3F3"/>
-<stop offset="0.557645" stop-color="#D9ABDF"/>
-<stop offset="0.624089" stop-color="#AF9CE3"/>
-<stop offset="0.720431" stop-color="#AAE4E1"/>
-<stop offset="0.830062" stop-color="#C6EAD0"/>
-<stop offset="0.913116" stop-color="white"/>
-<stop offset="1" stop-color="#FDB5E4"/>
-</radialGradient>
-</defs>
-</svg>
+version https://git-lfs.github.com/spec/v1
+oid sha256:b8097ba4929a34a0e334f0063de9cdc7376a801a369d2f99976235183525477d
+size 3034

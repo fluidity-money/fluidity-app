@@ -13,5 +13,4 @@ export { ReusableGrid } from "./ReusableGrid";
 export { FilterCriteria } from "./Filter";
 export { Tab, TabBar } from "./Tab";
 export { DesktopOnly, Row, Card, ManualCarousel, ContinuousCarousel, FooterItem, Partner } from "./Container";
-export { ProtectedRoute } from "./Route";
 export { FilterButton, AnchorButton, GeneralButton, LinkButton, TabButton } from "./Button";

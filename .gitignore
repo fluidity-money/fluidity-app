@@ -20,13 +20,14 @@ database/build
 database/db
 
 web/*/dist*
+!web/surfing-prebuilt/*
 web/*/node_modules
 web/*/build*
 web/*/build-*
 web/*/*.o
 
 contracts/ethereum/node_modules
-contracts/ethereum/.openzeppelin/unknown-31337.json
+contracts/ethereum/.openzeppelin
 contracts/ethereum/docker*
 contracts/ethereum/docgen
 

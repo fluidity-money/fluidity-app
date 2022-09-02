@@ -22,6 +22,10 @@
   height: 100%;
   justify-content: flex-end;
   align-items: center;
+  & > div {
+    width: 100%;
+    margin-bottom: 30px;
+  }
 }
 
 .footerItems {
