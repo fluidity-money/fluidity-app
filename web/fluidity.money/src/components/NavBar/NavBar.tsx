@@ -50,7 +50,7 @@ const NavBar = () => {
                     HOW IT WORKS
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a
                     href={"/ecosystem"}
                     className={
@@ -73,7 +73,7 @@ const NavBar = () => {
                   >
                     FLUID STATS
                   </a>
-                </li>
+                </li> */}
                 <li>
                   <a
                     href={"/resources"}
