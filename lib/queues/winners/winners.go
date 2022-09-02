@@ -33,6 +33,9 @@ const (
 
 	// subWinnersAll to subscribe to winner messages from either network
 	subWinnersAll = `winners.*`
+
+	// subBlockedWinnersAll to subscribe to blocked winner messages from either network
+	subBlockedWinnersAll = `blocked_winners.*`
 )
 
 type (
@@ -60,4 +63,14 @@ func WinnersSolana(f func(Winner)) {
 
 func WinnersAll(f func(Winner)) {
 	winners(subWinnersAll, f)
+}
+
+func BlockedWinnersAll(f func(Winner)) {
+	queue.GetMessages(subBlockedWinnersAll, func(message queue.Message) {
+		var winner Winner
+
+		message.Decode(&winner)
+
+		f(winner)
+	})
 }
