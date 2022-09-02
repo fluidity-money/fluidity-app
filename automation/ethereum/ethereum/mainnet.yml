@@ -13,7 +13,7 @@ SERVICES:
       SERVICE_NAME: microservice-ethereum-block-fluid-transfers-amqp
       DOCKERFILE_PATH: ./cmd/microservice-ethereum-block-fluid-transfers-amqp
       ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-block-fluid-transfers-amqp
-      SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ethereum/websoket_url
+      SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ethereum/websocket_url
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
 
 
