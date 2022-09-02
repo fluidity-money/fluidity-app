@@ -20,6 +20,8 @@ jobs:
     # Job steps
     steps:
       - uses: actions/checkout@v1
+        with:
+          lfs: true
       - name: Install dependencies
         run: npm install --include dev
         # 👇 Adds Chromatic as a step in the workflow
@@ -30,4 +32,3 @@ jobs:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           workingDir: web/surfing
-          lfs: true
