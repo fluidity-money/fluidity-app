@@ -2,19 +2,11 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { ReactNode, useState } from "react";
-import { GeneralButton } from "../Button";
-import NavBarModal from "../NavBarModal";
+import type { IGeneralButtonProps } from "../Button/GeneralButton/GeneralButton";
 
+import { ReactNode, useState } from "react";
+import { GeneralButton, NavBarModal } from "~/components";
 import styles from "./NavBar.module.scss";
-
-interface IButton {
-  children: string;
-  version: "primary" | "secondary";
-  type: "text" | "icon before" | "icon after" | "icon only";
-  size: "small" | "medium" | "large";
-  handleClick: () => void;
-}
 
 interface INavLinks {
   name: string;
@@ -25,7 +17,7 @@ interface INavLinks {
 interface INavBarProps {
   logo: string;
   text: string;
-  button: IButton;
+  button: IGeneralButtonProps;
   navLinks: INavLinks[];
 }
 
@@ -61,7 +53,7 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
         {link.name.toUpperCase()}
       </a>
       {link.modal && (
-        <button onClick={() => handleModal()}>
+        <button onClick={() => {}}>
           <img
             src="./src/assets/images/triangleDown.svg"
             alt="open resource options"

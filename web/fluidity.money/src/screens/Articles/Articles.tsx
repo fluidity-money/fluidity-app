@@ -2,10 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { ArticleCard, ArticleList, ArticleListProps } from "../../components/Article";
 import { useLocation } from "react-router-dom";
-import { TextButton } from "../../components/Button";
 import styles from "./Articles.module.scss";
 
 const Articles = () => {

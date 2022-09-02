@@ -4,4 +4,4 @@
 
 import LineChart from "./LineChart";
 
-export default LineChart
+export default LineChart;

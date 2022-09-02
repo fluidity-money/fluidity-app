@@ -1,12 +1,13 @@
-import ReusableGrid from "components/ReusableGrid";
-import useViewport from "hooks/useViewport";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import styles from "./Yield.module.scss";
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this source
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
+
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { ReusableGrid } from "surfing";
+import useViewport from "hooks/useViewport";
+import HowItWorksTemplate from "../../components/HowItWorksTemplate";
+import styles from "./Yield.module.scss";
 
 const Yield = () => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top

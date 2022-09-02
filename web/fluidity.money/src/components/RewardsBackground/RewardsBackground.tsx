@@ -2,15 +2,15 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import ContinuousCarousel from "../ContinuousCarousel";
+import { ContinuousCarousel } from "surfing";
 import styles from "./RewardsBackground.module.scss";
 
 const RewardsBackground = () => {
   const carouselInfo = (
     <div>
-      {ContinuousCarousels.map((winner) => (
+      {ContinuousCarousels.map((winner, i) => (
         <div
+          key={`winner-${i}`}
           className={styles.winner}
         >{`${winner.blockchain} DEX ${winner.amount} ${winner.id} ${winner.date}`}</div>
       ))}

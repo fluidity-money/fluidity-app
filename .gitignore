@@ -20,6 +20,7 @@ database/build
 database/db
 
 web/*/dist*
+!web/surfing-prebuilt/*
 web/*/node_modules
 web/*/build*
 web/*/build-*

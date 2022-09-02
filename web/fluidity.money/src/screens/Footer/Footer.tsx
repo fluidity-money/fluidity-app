@@ -3,11 +3,8 @@
 // LICENSE_TRF.md file.
 
 import useViewport from "hooks/useViewport";
-import React from "react";
-import { GeneralButton } from "../../components/Button";
-import ContinuousCarousel from "../../components/ContinuousCarousel";
-import FooterItem from "../../components/FooterItem";
 import Socials from "../../components/Socials";
+import { ContinuousCarousel, GeneralButton, FooterItem } from "surfing";
 import styles from "./Footer.module.scss";
 
 interface IItem {

@@ -2,12 +2,11 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import ContinuousCarousel from "components/ContinuousCarousel";
-import React, { useEffect, useRef, useState } from "react";
-import ManualCarousel from "../../components/ManualCarousel";
+import { useEffect, useRef, useState } from "react";
+import { ContinuousCarousel, ManualCarousel } from "surfing";
+import IntroTile from "components/IntroTile";
 import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
-import IntroTile from "components/IntroTile";
 import useViewport from "hooks/useViewport";
 
 const Landing = () => {

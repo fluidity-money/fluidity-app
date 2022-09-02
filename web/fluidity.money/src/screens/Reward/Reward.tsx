@@ -2,8 +2,8 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { useState } from "react";
 import useViewport from "hooks/useViewport";
-import React, { useState } from "react";
 import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
 import styles from "./Reward.module.scss";
@@ -98,7 +98,7 @@ const Reward = () => {
 
 export default Reward;
 
-const rewards = [
+export const rewards = [
   {
     blockchain: "🦍",
     amount: "1.01",

@@ -2,11 +2,11 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from 'react'
 import { useTable, useFilters, useGlobalFilter, usePagination } from 'react-table';
+import { useMemo } from 'react';
 
 import styles from './DataTable.module.scss';
-import {ReactComponent as ArrowIcon } from "~/assets/images/buttonIcons/arrowRightWhite.svg";
+import {ReactComponent as ArrowIcon } from "/src/assets/images/buttonIcons/arrowRightWhite.svg";
 
 const SelectColumnFilter = ({
   filterValue, setFilter, preFilteredRows, id, filterData
@@ -14,7 +14,7 @@ const SelectColumnFilter = ({
  
   // Calculate the options for filtering
   // using the preFilteredRows
-  const options = React.useMemo(() => {
+  const options = useMemo(() => {
     const options :any = new Set()
     preFilteredRows.forEach(function (row :any) {
       

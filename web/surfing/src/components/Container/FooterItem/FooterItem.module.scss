@@ -1,0 +1,27 @@
+@use 'common' as *;
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-bottom: solid 0.5px map-get($text, "default");
+
+  h1 {
+    font-size: 36px;
+  }
+  ul {
+    display: flex;
+    @include respond-to('medium') {
+      flex-direction: column;
+    }
+    li {
+      margin-left: 20px;
+      display: flex;
+
+      a {
+        color: map-get($text, "prominent");
+      }
+    }
+  }
+}

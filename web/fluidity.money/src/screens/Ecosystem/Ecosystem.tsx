@@ -2,18 +2,16 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { LinkButton } from "components/Button";
-import FluidProject from "components/FluidProject";
+import { useRef } from "react";
+import { ManualCarousel, LinkButton } from "surfing";
 import { motion, useScroll } from "framer-motion";
-import ManualCarousel from "components/ManualCarousel";
-import React, { useRef } from "react";
 import styles from "./Ecosystem.module.scss";
 
 const Ecosystem = () => {
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({ container: scrollRef });
 
-  console.log(scrollYProgress);
+  // console.log(scrollYProgress);
   return (
     <div className={styles.container}>
       <div className={styles.textBehind}>
@@ -43,8 +41,9 @@ const Ecosystem = () => {
             </LinkButton>
           </div>
           <ManualCarousel>
-            {items.map((item) => (
+            {items.map((item, i) => (
               <div
+                key={`ecosystem-item-${i}`}
                 style={{
                   border: "1px solid white",
                   height: 200,

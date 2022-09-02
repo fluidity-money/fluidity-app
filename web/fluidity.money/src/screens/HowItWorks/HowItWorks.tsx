@@ -2,9 +2,8 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import ContinuousCarousel from "components/ContinuousCarousel";
-import React, { useEffect, useState } from "react";
-import { GeneralButton, LinkButton } from "../../components/Button";
+import { useEffect, useState } from "react";
+import { ContinuousCarousel, GeneralButton, LinkButton } from "surfing";
 import styles from "./HowItWorks.module.scss";
 
 const HowItWorks = () => {

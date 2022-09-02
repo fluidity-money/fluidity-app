@@ -2,9 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import FilterCriteria from "../../components/FilterCriteria";
+import { FilterCriteria } from "surfing";
 import FluidProject from "../../components/FluidProject";
 import styles from "./AllProjects.module.scss";
 import { clearForAny, handleFilterButton } from "./util";

@@ -2,8 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { LinkButton } from "components/Button";
-import React from "react";
+import { LinkButton } from "surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {

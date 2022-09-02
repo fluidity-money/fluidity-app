@@ -2,9 +2,8 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { useState } from "react";
-import { GeneralButton } from "../Button";
-import ResourcesNavModal from "../../modals/ResourcesNavModal";
+import { useState } from "react";
+import { GeneralButton, NavBarModal } from "surfing";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
@@ -96,7 +95,7 @@ const NavBar = () => {
               </ul>
             </nav>
             {modal && (
-              <ResourcesNavModal handleModal={handleModal} navLinks={links} />
+              <NavBarModal handleModal={handleModal} navLinks={links} />
             )}
           </div>
         </div>

@@ -1,0 +1,67 @@
+{
+  "name": "surfing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run clean && tsc && vite build",
+    "preview": "vite preview",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "clean": "rm -rf dist",
+    "watch-dev": "./watch-dev.sh"
+  },
+  "peerDependencies": {
+    "react": "18.2.0 || ^17.0.0",
+    "react-dom": "18.2.0 || ^17.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.10",
+    "@mdx-js/react": "^1.6.2",
+    "@storybook/addon-actions": "^6.5.10",
+    "@storybook/addon-essentials": "^6.5.10",
+    "@storybook/addon-interactions": "^6.5.10",
+    "@storybook/addon-links": "^6.5.10",
+    "@storybook/builder-vite": "^0.2.2",
+    "@storybook/react": "^6.5.10",
+    "@storybook/testing-library": "^0.0.13",
+    "@types/react-dom": "^18.0.6",
+    "@types/react-relay": "^14.1.1",
+    "@types/react-table": "^7.7.12",
+    "@types/react": "^18.0.17",
+    "@visx/visx": "^2.12.2",
+    "@visx/xychart": "^2.12.2",
+    "@vitejs/plugin-react": "^2.0.1",
+    "babel-loader": "^8.2.5",
+    "chromatic": "^6.7.4",
+    "framer-motion": "^6.5.1",
+    "react-dom": "^17.0.2",
+    "react-relay": "^14.1.0",
+    "react-table": "^7.8.0",
+    "react": "^17.0.2",
+    "sass": "^1.54.4",
+    "storybook-addon-pseudo-states": "^1.15.1",
+    "typescript": "^4.6.4",
+    "vite-plugin-dts": "^1.4.1",
+    "vite-plugin-svgr": "^2.2.1",
+    "vite-tsconfig-paths": "^3.5.0",
+    "vite": "^3.0.7"
+  },
+  "types": "dist/types/lib.d.ts",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/surfing.umd.cjs",
+  "module": "./dist/surfing.js",
+  "exports": {
+    ".": {
+      "import": "./dist/surfing.js",
+      "require": "./dist/surfing.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  }
+}

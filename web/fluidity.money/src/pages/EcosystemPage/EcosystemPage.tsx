@@ -2,16 +2,15 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
 import Demo from "../../screens/Demo";
 import FeaturedProjects from "../../screens/FeaturedProjects";
 import Filter from "../../screens/AllProjects";
 import FluidProjects from "../../screens/FluidProjects";
 import Footer from "../../screens/Footer";
 import Search from "../../screens/Search";
-import styles from "./EcosystemPage.module.scss";
 import AllProjects from "../../screens/AllProjects";
-import Navigation from "components/Navigation";
+import { Navigation } from "surfing";
+import styles from "./EcosystemPage.module.scss";
 
 const FluidEcosystemPage = () => {
   return (

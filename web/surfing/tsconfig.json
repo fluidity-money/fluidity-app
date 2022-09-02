@@ -14,14 +14,16 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,
-    "noEmit": true,
+    "outDir": "dist/types",
+    "emitDeclarationOnly": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
     "paths": {
-      "~/assets/*": ["assets/*"],
+      "~assets/*": ["assets/*"],
       "~/*": ["*"]
     }
   },
+  "exclude": ["node_modules", "dist"],
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,12 +1,10 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
-
-import React from "react";
 import "./styles/app.global.scss";
+import "surfing/dist/style.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 // Pages
 import NavBar from "./components/NavBar";
+//import { NavBar } from "surfing";
 import LandingPage from "./pages/LandingPage";
 import EcosystemPage from "./pages/EcosystemPage";
 import HowItWorksPage from "./pages/HowItWorksPage";

@@ -2,9 +2,8 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { ManualCarousel } from "surfing";
 import UseCase from "components/UseCase";
-import React from "react";
-import ManualCarousel from "../../components/ManualCarousel";
 import styles from "./UseCases.module.scss";
 
 const UseCases = () => {
@@ -18,8 +17,8 @@ const UseCases = () => {
     >
       <h1>A FLUID ECONOMY</h1>
       <ManualCarousel>
-        {items.map((item) => (
-          <UseCase useCase={item} />
+        {items.map((item, i) => (
+          <UseCase key={`usecase-${i}`} useCase={item} />
         ))}
       </ManualCarousel>
     </div>
