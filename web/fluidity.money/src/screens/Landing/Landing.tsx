@@ -25,8 +25,6 @@ const Landing = () => {
   7. Text items fade in with new looped video, perhaps staggered with slight delay, or with lines building out from left to righ ton left, and right  to left on right.
     */
 
-  const { width } = useViewport();
-  const breakpoint = 620;
   // const myRef = useRef<HTMLInputElement>(null);
 
   // useEffect(() => {
