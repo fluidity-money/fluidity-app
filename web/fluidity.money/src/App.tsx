@@ -10,12 +10,16 @@ import EcosystemPage from "./pages/EcosystemPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import FluidStatsPage from "./pages/FluidStatsPage";
 import ResourcesPage from "./pages/ResourcesPage";
+import useViewport from "hooks/useViewport";
+import MobileNavBar from "components/MobileNavBar";
 
 function App() {
+  const { width } = useViewport();
+  const breakpoint = 620;
   return (
     <Router>
       <div className="App">
-        <NavBar />
+        {width < breakpoint ? <MobileNavBar /> : <NavBar />}
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/howitworks" element={<HowItWorksPage />} />
