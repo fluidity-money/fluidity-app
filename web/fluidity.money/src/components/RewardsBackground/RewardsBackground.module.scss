@@ -39,6 +39,8 @@
 }
 
 .winner {
+  display: flex;
+  flex-direction: row;
   cursor: pointer;
   font-size: 16px;
   color: $textGrey;

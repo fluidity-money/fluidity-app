@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useEffect, useState } from "react";
-import { ContinuousCarousel, GeneralButton, LinkButton } from "surfing";
+import { ContinuousCarousel, LinkButton } from "surfing";
 import styles from "./HowItWorks.module.scss";
 
 const HowItWorks = () => {
