@@ -18,6 +18,7 @@ import (
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	spl_token "github.com/fluidity-money/fluidity-app/common/solana/spl-token"
@@ -326,7 +327,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 	return transfer1, transfer2, nil
 }
 
-func fluidityPayoutWasBlocked(transaction solana.Transaction) bool {
+func fluidityPayoutWasBlocked(transaction worker.SolanaApplicationTransaction) bool {
 	logs := transaction.Result.Meta.Logs
 
 	for _, line := range logs {
