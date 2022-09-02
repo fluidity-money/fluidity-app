@@ -12,7 +12,7 @@
 | fTUSD      | 0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F |
 | fFRAX      | 0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C |
 
-### USDT
+### fUSDT
 
 | Text                        | Value                                      |
 | --------------------------- | ------------------------------------------ |
@@ -26,7 +26,7 @@
 | Short name                  | fUSDT                                      |
 | Name                        | Fluid USDT                                 |
 
-### USDC
+### fUSDC
 
 |                             | Value                                      |
 | --------------------------- | ------------------------------------------ |
@@ -40,7 +40,7 @@
 | Short name                  | fUSDC                                      |
 | Name                        | Fluid USDC                                 |
 
-### DAI
+### fDAI
 
 | Text                    | Value                                      |
 | ----------------------- | ------------------------------------------ |
@@ -53,6 +53,34 @@
 | Decimals                | 18                                         |
 | Short name              | fDAI                                       |
 | Name                    | Fluid DAI                                  |
+
+### fTUSD
+
+| Text                    | Value                                      |
+| ----------------------- | ------------------------------------------ |
+| Token address           | 0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F |
+| WorkerConfig            | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
+| AAVE liquidity provider | 0x5E88f6dc0aa126FA28A137B24d0B4d7231352a0B |
+| aToken address          | 0x101cc05f4A51C0319f570d5E146a8C625198e636 |
+| Current operator        | 0xe0ead43d9266154f777Cb831476be99f6c40B96d |
+| Emergency council       | 0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd |
+| Decimals                | 18                                         |
+| Short name              | fTUSD                                      |
+| Name                    | Fluid TUSD                                 |
+
+### fFRAX
+
+| Text                    | Value                                      |
+| ----------------------- | ------------------------------------------ |
+| Token address           | 0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C |
+| WorkerConfig            | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
+| AAVE liquidity provider | 0xB7a2930e66D84Da74CdcFE4f97FaE9fC8f1114e8 |
+| aToken address          | 0xd4937682df3C8aEF4FE912A96A74121C0829E664 |
+| Current operator        | 0xe0ead43d9266154f777Cb831476be99f6c40B96d |
+| Emergency council       | 0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd |
+| Decimals                | 18                                         |
+| Short name              | fFRAX                                      |
+| Name                    | Fluid FRAX                                 |
 
 ## Ropsten
 
