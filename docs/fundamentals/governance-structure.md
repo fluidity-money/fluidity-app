@@ -46,23 +46,3 @@ Emergency multisig
 | Alexander Baigent, Fluidity CTO (bayge)      | 0xdcbcc6773aaf289a880037cbaffc316d4f1c96a4 |
 
 (in progress)
-
-### Solana multisig
-
-#### Community
-
-[https://goki.so/wallets/AsbM4BP7A4YiPV89BYkUjMkBkgT1ycCvpc7uNALyfHFG](https://goki.so/wallets/AsbM4BP7A4YiPV89BYkUjMkBkgT1ycCvpc7uNALyfHFG/propose)
-
-| Owner name/pseudonym                         | Address                                      |
-| -------------------------------------------- | -------------------------------------------- |
-| Shahmeer Chaudhry, Fluidity CEO (shahmeerch) |                                              |
-| Alexander Baigent, Fluidity CTO (bayge)      | G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj |
-
-#### Emergency
-
-0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd
-
-| Owner name/pseudonym | Address |
-| -------------------- | ------- |
-|                      |         |
-|                      |         |
