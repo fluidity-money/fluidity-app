@@ -28,7 +28,7 @@ const FluidWars = () => {
         left={<div style={{ fontSize: 160 }}>🦍</div>}
         right={
           <HowItWorksTemplate header={header} info={info}>
-            Fluid wars
+            Fluidity wars
           </HowItWorksTemplate>
         }
       />

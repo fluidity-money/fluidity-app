@@ -11,18 +11,19 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
-type GetRecentBlockhashResult struct {
+type getRecentBlockhashResult struct {
 	RpcContext
 
 	Value *struct {
-		Blockhash     solana.Hash `json:"blockhash"`
+		Blockhash string `json:"blockhash"`
+
 		FeeCalculator struct {
 			LamportsPerSignature uint64 `json:"lamportsPerSignature"`
 		} `json:"feeCalculator"`
 	} `json:"value"`
 }
 
-func (s *Provider) GetRecentBlockhash(commitment string) (*GetRecentBlockhashResult, error) {
+func (s *Provider) GetRecentBlockhash(commitment string) (hash solana.Hash, err error) {
 	params := []interface{}{}
 
 	if commitment != "" {
@@ -34,21 +35,35 @@ func (s *Provider) GetRecentBlockhash(commitment string) (*GetRecentBlockhashRes
 	raw, err := s.RawInvoke("getRecentBlockhash", params)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return hash, fmt.Errorf(
 			"failed to getRecentBlock: %v",
 			err,
 		)
 	}
 
-	var recentBlockhashResult GetRecentBlockhashResult
+	var recentBlockhashResult getRecentBlockhashResult
 
 	if err := json.Unmarshal(raw, &recentBlockhashResult); err != nil {
-		return nil, fmt.Errorf(
+		return hash, fmt.Errorf(
 			"failed to decode getRecentBlockhash, message %#v: %v",
 			string(raw),
 			err,
 		)
 	}
 
-	return &recentBlockhashResult, nil
+	blockHash := recentBlockhashResult.Value.Blockhash
+
+	publicKey, err := solana.PublicKeyFromBase58(blockHash)
+
+	if err != nil {
+		return hash, fmt.Errorf(
+			"failed to convert getRecentBlockHash returned hash %#v from base58: %v",
+			string(blockHash),
+			err,
+		)
+	}
+
+	hash = solana.Hash(publicKey)
+
+	return hash, nil
 }

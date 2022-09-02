@@ -21,6 +21,11 @@ const Footer = () => {
     <div className={styles.container}>
       <Socials />
       <div className={styles.content}>
+        {width < secondBreakpoint && (
+          <div>
+            <img src="/assets/images/logoOutline.svg" alt="fluidityLogo" />
+          </div>
+        )}
         <div className={styles.footerItems}>
           <FooterItem items={howItWorks}>How it works</FooterItem>
           <FooterItem items={ecosystem}>Ecosystem</FooterItem>

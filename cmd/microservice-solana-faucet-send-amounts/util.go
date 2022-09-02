@@ -5,33 +5,12 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/common/solana"
-	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	faucetTypes "github.com/fluidity-money/fluidity-app/lib/types/faucet"
 )
-
-func getBlockHash(client *rpc.Provider) (*solana.Hash, error) {
-	blockHashResult, err := client.GetRecentBlockhash("finalized")
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to get the most recent block hash! %v",
-			err,
-		)
-	}
-
-	if blockHashResult == nil {
-		return nil, nil
-	}
-
-	blockHash := blockHashResult.Value.Blockhash
-
-	return &blockHash, nil
-}
 
 // addAccountDetails to parse the env PDAs and private keys and add them to the map
 func (tokenDetails tokenMap) addAccountDetails(accountDetailsList_ string) {

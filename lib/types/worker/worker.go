@@ -22,12 +22,14 @@ type (
 		DefaultSecondsSinceLastBlock uint64                    `json:"default_seconds_since_last_block"`
 		CurrentAtxTransactionMargin  int64                     `json:"current_atx_transaction_margin"`
 		DefaultTransfersInBlock      int                       `json:"default_transfers_in_block"`
+		AtxBufferSize                int                       `json:"atx_buffer_size"`
 	}
 
 	// WorkerConfigSolana that was previously hardcoded for Solana only
 	WorkerConfigSolana struct {
 		SolanaBlockTime uint64 `json:"solana_block_time"`
 		TransferCompute int    `json:"transfer_compute"`
+		AtxBufferSize   int    `json:"atx_buffer_size"`
 	}
 
 	// Emission contains information on the modelling information that led
@@ -45,6 +47,12 @@ type (
 		SolanaSlotNumber    misc.BigInt `json:"solana_slot_number"`
 
 		AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
+
+		AtxBufferSize      int    `json:"atx_buffer_size"`
+		TransfersInBlock   int    `json:"transfers_in_block"`
+		TransfersPast      string `json:"transfers_past"`
+
+		SecondsSinceLastBlock uint64 `json:"seconds_since_last_block"`
 
 		Payout struct {
 			Winnings        float64 `json:"winnings"` // Winnings
