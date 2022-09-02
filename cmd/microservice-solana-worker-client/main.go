@@ -197,7 +197,7 @@ func main() {
 			)
 		})
 
-		recentBlockHashResult, err := solanaClient.GetRecentBlockhash(
+		recentBlockHash, err := solanaClient.GetRecentBlockhash(
 			"finalized",
 		)
 
@@ -207,16 +207,6 @@ func main() {
 				k.Payload = err
 			})
 		}
-
-		recentBlockHashResultValue := recentBlockHashResult.Value
-
-		if recentBlockHashResultValue == nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Block hash requested from Solana was nil!"
-			})
-		}
-
-		recentBlockHash := recentBlockHashResultValue.Blockhash
 
 		aPubkey, err := solana.PublicKeyFromBase58(senderAddress)
 
