@@ -10,8 +10,6 @@ import (
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/aws"
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -24,30 +22,19 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
-	// EnvEthereumHttpUrl is the url to use to connect to the HTTP Geth endpoint
-	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
-
 	// EnvAwsRegion is the AWS region to use (probably ap-southeast-2)
 	EnvAwsRegion = `FLU_AWS_REGION`
 
 	// EnvOracleBucketName is the S3 bucket to place the signed transaction
 	EnvOracleBucketName = `FLU_ORACLE_BUCKET_NAME`
 
-	// EnvOracleParameterName is the comma-separated list of AWS parameters
+	// EnvOracleParametersList is the comma-separated list of AWS parameters
 	// containing oracles that need to be updated, and their respective
-	// contract addresses of the form param1:contract1,param2:contract2,...
+	// contract addresses of the form contract1:param1,contract2:param2,...
 	EnvOracleParametersList = `FLU_ORACLE_UPDATE_LIST`
-
-	// EnvWorkerConfigPrivateKey is the key that signs the transaction to
-	// batch update the oracles
-	EnvWorkerConfigPrivateKey = `FLU_WORKER_CONFIG_PRIVATE_KEY`
-
-	// EnvWorkerConfigContractAddress is the address of the worker config contract
-	EnvWorkerConfigContractAddress = `FLU_WORKER_CONFIG_CONTRACT_ADDRESS`
 )
 
 const bucketAcl = s3.BucketCannedACLPrivate
@@ -58,37 +45,13 @@ func main() {
 
 func rotateOracleKeys() {
 	var (
-		gethHttpUrl                  = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		awsRegion                    = util.GetEnvOrFatal(EnvAwsRegion)
-		bucketName                   = util.GetEnvOrFatal(EnvOracleBucketName)
-		workerConfigPrivateKey_      = util.GetEnvOrFatal(EnvWorkerConfigPrivateKey)
-		workerConfigContractAddress_ = util.GetEnvOrFatal(EnvWorkerConfigContractAddress)
+		awsRegion  = util.GetEnvOrFatal(EnvAwsRegion)
+		bucketName = util.GetEnvOrFatal(EnvOracleBucketName)
 
 		oracleParametersList = oracleParametersListFromEnv(EnvOracleParametersList)
 	)
 
-	workerConfigContractAddress := ethCommon.HexToAddress(workerConfigContractAddress_)
-
-	workerConfigPrivateKey, err := ethCrypto.HexToECDSA(workerConfigPrivateKey_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to convert the hex string private key to a private key!"
-			k.Payload = err
-		})
-	}
-
-	ethClient, err := ethclient.Dial(gethHttpUrl)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to connect to Geth over HTTP!"
-			k.Payload = err
-		})
-	}
-
-	defer ethClient.Close()
-
+	// create AWS session
 	session, err := session.NewSession(&awsCommon.Config{
 		Region: &awsRegion,
 	})
@@ -100,6 +63,7 @@ func rotateOracleKeys() {
 		})
 	}
 
+	// create output bucket
 	outputTxnBucket, err := aws.CreateBucketIfNotExists(session, bucketName, bucketAcl)
 
 	if err != nil {
@@ -110,18 +74,17 @@ func rotateOracleKeys() {
 	}
 
 	if outputTxnBucket != nil {
-		log.App(func(k *log.Log) {
+		log.Debug(func(k *log.Log) {
 			k.Message = "Created the AWS bucket!"
 			k.Payload = outputTxnBucket
 		})
 	}
 
 	var (
+		fileContent string
+
 		timestamp = time.Now().UTC().String()
 		fileName  = "Oracle Update " + timestamp
-
-		fileContent   string
-		newOracleList []ethCommon.Address
 	)
 
 	// update each oracle in sequence
@@ -137,7 +100,7 @@ func rotateOracleKeys() {
 		contractAddress := ethCommon.HexToAddress(contractAddressString)
 
 		// get the old key
-		privateKey, err := aws.GetPrivateKeyFromParameter(session, parameter)
+		oldOraclePrivateKey, err := aws.GetPrivateKeyFromParameter(session, parameter)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -146,10 +109,10 @@ func rotateOracleKeys() {
 			})
 		}
 
-		previousOracleAddress := ethCrypto.PubkeyToAddress(privateKey.PublicKey)
+		previousOracleAddress := ethCrypto.PubkeyToAddress(oldOraclePrivateKey.PublicKey)
 
 		// create the new key
-		key, err := ethCrypto.GenerateKey()
+		newOraclePrivateKey, err := ethCrypto.GenerateKey()
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -158,21 +121,34 @@ func rotateOracleKeys() {
 			})
 		}
 
-		// store the new oracle address
-		newOracle := ethCrypto.PubkeyToAddress(key.PublicKey)
-		newOracleList = append(newOracleList, newOracle)
+		// get the new address
+		newOraclePublicKey := ethCrypto.PubkeyToAddress(newOraclePrivateKey.PublicKey)
 
-		// obtain the new key as hex to update the parameter
-		keyBytes := ethCrypto.FromECDSA(key)
+		// left pad with zeros to 32 bytes
+		digest := newOraclePublicKey.Hash().Bytes()
+
+		// sign the new address using the old private key
+		signature, err := ethCrypto.Sign(digest, oldOraclePrivateKey)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to sign the new address wih the old private key!"
+				k.Payload = err
+			})
+		}
+
+		// convert the new key to hex to update the parameter
+		keyBytes := ethCrypto.FromECDSA(newOraclePrivateKey)
 		newOraclePrivateKeyHex := hexutil.Encode(keyBytes)[2:]
 
 		// append to the log
 		addressChangeLog := fmt.Sprintf(
-			"[%v] Changing oracle address on contract %v from %v to %v!\n",
+			"[%v] Changing oracle address on contract %v from %v to %v!\n-----Begin Digest-----\n%v\n-----End Digest-----\n",
 			timestamp,
 			contractAddress,
 			previousOracleAddress,
-			newOracle,
+			newOraclePublicKey,
+			signature,
 		)
 
 		fileContent += addressChangeLog
@@ -200,50 +176,10 @@ func rotateOracleKeys() {
 		})
 	}
 
-	transactionOpts, err := ethereum.NewTransactionOptions(ethClient, workerConfigPrivateKey)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to create the transaction options!"
-			k.Payload = err
-		})
-	}
-
-	signedTransaction, err := fluidity.UpdateOracles(
-		ethClient,
-		workerConfigContractAddress,
-		workerConfigPrivateKey,
-		transactionOpts,
-		newOracleList,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to create and sign the oracle update transaction!"
-			k.Payload = err
-		})
-	}
-
-	txnBinary, err := signedTransaction.MarshalBinary()
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to marshal the transaction into binary!"
-			k.Payload = err
-		})
-	}
-
-	signedTxnString := fmt.Sprintf(
-		"Signed transaction dump:\n---\n%v\n---\n",
-		txnBinary,
-	)
-
-	fileContent += signedTxnString
-
 	// create a reader with the file content
 	fileContentReader := bytes.NewReader([]byte(fileContent))
 
-	// upload the file containing a list of all oracle updates, and the signed transaction
+	// upload the file containing a list of all oracle updates and their signed digests
 	uploadLogsOutput, err := aws.UploadToBucket(session, fileContentReader, fileName, bucketName)
 
 	if err != nil {
