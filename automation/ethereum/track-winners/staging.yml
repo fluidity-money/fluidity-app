@@ -26,7 +26,7 @@ SERVICES:
 
   - TRACK_WINNERS_TUSD:
       SERVICE_NAME: microservice-ethereum-track-winners-tusd
-      ENV_FLU_WORKER_ID: ethereum-staging-microservice-ethereum-track-winners-dai
+      ENV_FLU_WORKER_ID: ethereum-staging-microservice-ethereum-track-winners-tusd
       ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0xA49BB086ca9Fa2DFbb9feE1b2033112485b743D4"
       ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: TUSD
       ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
