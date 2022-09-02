@@ -1,6 +1,6 @@
 # 🏢 High level architecture
 
-Fluidity is a mostly off-chain technology that:
+Fluidity is a mostly off-chain system that:
 
 * Determines winners according to the TRF with all data available
 * Aggregates transfers made
