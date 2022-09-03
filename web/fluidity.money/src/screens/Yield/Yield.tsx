@@ -42,7 +42,7 @@ const Yield = () => {
       <div style={{ fontSize: 160 }}>🦍</div>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
-        "Yield through utility"
+        Yield through utility
       </HowItWorksTemplate>
     );
 

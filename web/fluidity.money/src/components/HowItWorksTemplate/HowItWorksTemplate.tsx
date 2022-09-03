@@ -6,11 +6,17 @@ import styles from "./HowItWorksTemplate.module.scss";
 
 interface ITemplateProps {
   children: string;
-  header: string;
+  header?: string;
+  button?: any;
   info: string[];
 }
 
-const HowItWorksTemplate = ({ children, header, info }: ITemplateProps) => {
+const HowItWorksTemplate = ({
+  children,
+  header,
+  info,
+  button,
+}: ITemplateProps) => {
   return (
     <div className={styles.content}>
       <h1>{children}</h1>
@@ -18,6 +24,7 @@ const HowItWorksTemplate = ({ children, header, info }: ITemplateProps) => {
       {info.map((paragraph, i) => (
         <p key={`para-${i}`}>{paragraph}</p>
       ))}
+      {button}
     </div>
   );
 };
