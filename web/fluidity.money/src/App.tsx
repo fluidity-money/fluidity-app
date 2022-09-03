@@ -32,9 +32,9 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/howitworks" element={<HowItWorksPage />} />
               {/* Pages removed for now, not yet ready for production */}
-              {/* <Route path="/ecosystem" element={<EcosystemPage />} />
-              <Route path="/fluidstats" element={<FluidStatsPage />} /> */}
-              <Route path="/resources" element={<ResourcesPage />} />
+              <Route path="/ecosystem" element={<EcosystemPage />} />
+              {/* <Route path="/fluidstats" element={<FluidStatsPage /> */}
+              {/* <Route path="/resources" element={<ResourcesPage />} /> */}
             </Routes>
           </div>
         </Router>

@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { ContinuousCarousel, Partner } from "surfing";
+import { ContinuousCarousel, Partner, Card } from "surfing";
 import styles from "./SponsorsPartners.module.scss";
 
 const SponsorsPartners = () => {
@@ -26,7 +26,9 @@ const SponsorsPartners = () => {
             }}
           >
             {partners.map((partner, i) => (
-              <div
+              <Card
+                rounded={true}
+                type={"transparent"}
                 key={`sponsor-${i}`}
                 style={{
                   position: "relative",
@@ -40,7 +42,7 @@ const SponsorsPartners = () => {
                   title={partner.title}
                   info={partner.info}
                 />
-              </div>
+              </Card>
             ))}
           </div>
         </ContinuousCarousel>
@@ -56,7 +58,7 @@ const partners = [
   {
     img: "🦍",
     title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
   },
   {
     img: "🦍",

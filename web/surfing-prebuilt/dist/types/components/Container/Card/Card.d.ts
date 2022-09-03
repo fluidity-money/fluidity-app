@@ -1,8 +1,8 @@
-import type { ComponentType, HTMLProps } from "react";
-interface IContainer extends HTMLProps<HTMLDivElement> {
-    component: ComponentType<any> | ((...args: any[]) => JSX.Element);
+interface ICard {
+    component?: "div" | "button" | "tr";
     rounded?: boolean;
-    type?: "gray" | "box";
+    type?: "gray" | "box" | "transparent";
+    [_: string]: any;
 }
-declare const Container: ({ component, rounded, className, children, type, ...props }: IContainer) => JSX.Element;
-export default Container;
+declare const Card: ({ component, rounded, className, children, type, ...props }: ICard) => JSX.Element;
+export default Card;

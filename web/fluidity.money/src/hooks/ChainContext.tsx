@@ -41,7 +41,7 @@ export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.El
   }
 
   const prevWeekDate = new Date();
-  prevWeekDate.setDate(prevWeekDate.getDate() - 7)
+  prevWeekDate.setDate(prevWeekDate.getDate() - 7);
 
   useWinningTransactions(
     (winner: WinnersRes) => setWeekWinnings(winner.winners),

@@ -1,0 +1,48 @@
+@use 'common' as *;
+
+.project {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  
+  &.lg {
+    padding: 32px;
+    width: 360px;
+    height: 334px;
+  }
+
+  &.md {
+    padding: 24px;
+    width: 280px;
+    height: 300px;
+  }
+  
+  &.expanded {
+    height: auto;
+  }
+  
+  &.sm {
+    padding: 24px;
+    width: 360px;
+    height: 96px;
+  }
+  
+  &.xs {
+    padding: 12px 16px;
+    width: 315px;
+    height: 72px;
+  }
+
+  &:hover {
+    border: 1px solid map-get($border, "prominent");
+  }
+
+  &:focus {
+    border: 4px solid map-get($border, "focus");
+  }
+  
+  &:disabled {
+    color: map-get($text, "disabled");
+    border: 1px solid map-get($border, "disabled");
+  }
+}
