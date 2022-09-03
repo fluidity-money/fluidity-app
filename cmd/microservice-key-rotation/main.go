@@ -63,20 +63,16 @@ func rotateOracleKeys() {
 		})
 	}
 
-	// create output bucket
-	outputTxnBucket, err := aws.CreateBucketIfNotExists(session, bucketName, bucketAcl)
+	// ensure output bucket exists
+	err = aws.WaitUntilBucketExists(session, bucketName)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to create an AWS bucket"
-			k.Payload = err
-		})
-	}
-
-	if outputTxnBucket != nil {
-		log.Debug(func(k *log.Log) {
-			k.Message = "Created the AWS bucket!"
-			k.Payload = outputTxnBucket
+			k.Format(
+				"Failed to wait for bucket %v: %v",
+				bucketName,
+				err,
+			)
 		})
 	}
 
@@ -94,8 +90,6 @@ func rotateOracleKeys() {
 			parameter             = oracle.Parameter
 			contractAddressString = oracle.ContractAddress
 		)
-
-		fileName += " " + parameter
 
 		contractAddress := ethCommon.HexToAddress(contractAddressString)
 
@@ -159,6 +153,7 @@ func rotateOracleKeys() {
 		input := &ssm.PutParameterInput{
 			Name:  &parameter,
 			Value: &newOraclePrivateKeyHex,
+			Overwrite: awsCommon.Bool(true),
 		}
 
 		putOutput, err := ssmClient.PutParameter(input)

@@ -1,15 +1,32 @@
 @use 'common' as *;
 
-.gray {
-  background-color: $white-a5;
+button {
+  cursor: pointer;
+  
+  &:disabled {
+    cursor: default;
+  }
 }
 
-.box {
-  border: 2px solid;
-  border-image-slice: 1;
-  border-image-source: $holo;
-}
+.card {
+  width: fit-content;
+  height: fit-content;
+  &.gray {
+    background-color: $white-a5;
+  }
 
-.rounded {
-  border-radius: 12px;
+  &.transparent {
+    background-color: $white-a5;
+    background-filter: blur(10px);
+  }
+
+  &.box {
+    border: 2px solid;
+    border-image-slice: 1;
+    border-image-source: $holo;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
 }

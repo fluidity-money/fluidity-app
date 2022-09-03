@@ -2,20 +2,40 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { motion } from "framer-motion";
+import useScrollDirection from "hooks/useScrollDirection";
+import useViewport from "hooks/useViewport";
 import { useState } from "react";
 import { GeneralButton, NavBarModal } from "surfing";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
+
   const handleModal = () => {
-    setModal(!modal);
+    setModal(modal => !modal);
+  };
+
+  const { width } = useViewport();
+  const breakpoint = 700;
+
+  const { scrollDir } = useScrollDirection();
+  const scrollVariants = {
+    appear: { y: 0 },
+    disappear: { y: -100 },
   };
 
   return (
     <div className={styles.outerContainer}>
       <div className={`${styles.container} opacity-5x`}>
-        <h2 className={styles.fluidity}>fluidity</h2>
+        <motion.h2
+          className={styles.fluidity}
+          variants={scrollVariants}
+          animate={scrollDir === "up" ? "appear" : "disappear"}
+          transition={{ type: "tween" }}
+        >
+          fluidity
+        </motion.h2>
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <div>
@@ -26,14 +46,19 @@ const NavBar = () => {
             <GeneralButton
               version={"secondary"}
               type={"text"}
-              size={"medium"}
+              size={width < breakpoint ? "small" : "medium"}
               handleClick={() => {}}
             >
               LAUNCH FLUIDITY
             </GeneralButton>
           </div>
         </div>
-        <div className={styles.navbar}>
+        <motion.div
+          className={styles.navbar}
+          variants={scrollVariants}
+          animate={scrollDir === "up" ? "appear" : "disappear"}
+          transition={{ type: "tween" }}
+        >
           <div className={styles.fade}>
             <nav>
               <ul>
@@ -98,7 +123,7 @@ const NavBar = () => {
               <NavBarModal handleModal={handleModal} navLinks={links} />
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

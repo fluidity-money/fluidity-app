@@ -75,6 +75,9 @@
       justify-content: space-between;
       align-items: center;
     }
+    @media (max-width: 700px) {
+      padding: 10px 30px 10px 30px;
+    }
   }
 }
 

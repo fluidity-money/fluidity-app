@@ -2,24 +2,29 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import type { ComponentType, HTMLProps } from "react";
+import type { HTMLProps } from "react";
 
 import styles from './Card.module.scss';
 
-interface IContainer extends HTMLProps<HTMLDivElement> {
-  component: ComponentType<any> | ((...args: any[]) => JSX.Element),
-  rounded?: boolean,
-  type?: "gray" | "box",
+interface ICard {
+  component?: "div" | "button" | "tr";
+  rounded?: boolean;
+  type?: "gray" | "box" | "transparent";
+  [_: string]: any;
 }
 
-const Container = ({component: Component, rounded, className, children, type, ...props}: IContainer) => {
+const Card = ({component, rounded, className, children, type, ...props}: ICard) => {
   const classProps = className || "";
+  const Component = component || "div";
+
+  const typeClass = styles[type || "gray"];
   
   return (
-    <Component className={`${type === "box" ? styles.box : styles.gray} ${rounded && styles.rounded} ${classProps}`} {...props}>
+    <Component className={`${styles.card} ${typeClass} ${rounded && styles.rounded} ${classProps}`} {...props}>
       {children}
     </Component>
   )
 }
 
-export default Container;
+export default Card;
+

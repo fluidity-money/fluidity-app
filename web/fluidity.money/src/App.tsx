@@ -16,7 +16,6 @@ import ResourcesPage from "./pages/ResourcesPage";
 import fluRelayEnvironment from "./data/relayEnvironment";
 import useViewport from "hooks/useViewport";
 import MobileNavBar from "components/MobileNavBar";
-
 import "./styles/app.global.scss";
 import "surfing/dist/style.css";
 
@@ -33,9 +32,9 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/howitworks" element={<HowItWorksPage />} />
               {/* Pages removed for now, not yet ready for production */}
-              {/* <Route path="/ecosystem" element={<EcosystemPage />} />
-              <Route path="/fluidstats" element={<FluidStatsPage />} /> */}
-              <Route path="/resources" element={<ResourcesPage />} />
+              <Route path="/ecosystem" element={<EcosystemPage />} />
+              {/* <Route path="/fluidstats" element={<FluidStatsPage /> */}
+              {/* <Route path="/resources" element={<ResourcesPage />} /> */}
             </Routes>
           </div>
         </Router>
