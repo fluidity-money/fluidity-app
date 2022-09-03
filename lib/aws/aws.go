@@ -51,6 +51,17 @@ func UploadToBucket(session *session.Session, fileContent io.ReadSeeker, fileNam
 	return output, nil
 }
 
+// WaitUntilBucketExists to return nil if a bucket exists, or hang for the timeout
+// interval then error
+func WaitUntilBucketExists(session *session.Session, bucketName string) error {
+	svc := s3.New(session)
+	err := svc.WaitUntilBucketExists(&s3.HeadBucketInput{
+		Bucket: &bucketName,
+	})
+
+	return err
+}
+
 // CreateBucket to create a new bucket
 func CreateBucket(session *session.Session, bucketName, acl string) (*s3.CreateBucketOutput, error) {
 
