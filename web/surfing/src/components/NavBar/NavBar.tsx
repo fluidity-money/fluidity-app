@@ -7,6 +7,7 @@ import type { IGeneralButtonProps } from "../Button/GeneralButton/GeneralButton"
 import { ReactNode, useState } from "react";
 import { GeneralButton, NavBarModal } from "~/components";
 import styles from "./NavBar.module.scss";
+import useViewport from "~/util/hooks/useViewport";
 
 interface INavLinks {
   name: string;
@@ -38,6 +39,9 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
   const handleModal = () => {
     setModal(!modal);
   };
+
+  const { width } = useViewport();
+  const breakpoint = 700;
 
   const navLinksTitles = navLinks.map((link) => (
     <li>
@@ -80,7 +84,7 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
             <GeneralButton
               version={button.version}
               type={button.type}
-              size={button.size}
+              size={width < breakpoint ? "small" : "medium"}
               handleClick={button.handleClick}
             >
               {button.children}

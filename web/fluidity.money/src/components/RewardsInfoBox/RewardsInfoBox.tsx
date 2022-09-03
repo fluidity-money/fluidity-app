@@ -6,8 +6,8 @@ import { LinkButton, numberToMonetaryString } from "surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
-  rewardPool: number,
-  totalTransactionValue: number,
+  rewardPool: number;
+  totalTransactionValue: number;
   setToggle: () => void;
   toggle: boolean;
   initalView: boolean;
@@ -43,7 +43,9 @@ const RewardsInfoBox = ({
       >
         <button>ETH v</button>
         <h1 onClick={switchAndAnimate}>
-          {type === "black" ? numberToMonetaryString(rewardPool) : totalTransactionValue}
+          {type === "black"
+            ? numberToMonetaryString(rewardPool)
+            : totalTransactionValue.toLocaleString("en-US")}
         </h1>
         <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
         <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>

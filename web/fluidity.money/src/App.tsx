@@ -16,7 +16,6 @@ import ResourcesPage from "./pages/ResourcesPage";
 import fluRelayEnvironment from "./data/relayEnvironment";
 import useViewport from "hooks/useViewport";
 import MobileNavBar from "components/MobileNavBar";
-
 import "./styles/app.global.scss";
 import "surfing/dist/style.css";
 

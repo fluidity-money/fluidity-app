@@ -2,9 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import BurgerMenu from "components/BurgerMenu";
-import MobileNavModal from "modals/MobileNavModal";
 import { useState } from "react";
+import BurgerMenu from "../BurgerMenu";
+import MobileNavModal from "../MobileNavModal";
 import styles from "./MobileNavBar.module.scss";
 
 const MobileNavBar = () => {
