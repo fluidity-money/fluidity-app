@@ -155,6 +155,7 @@ func rotateOracleKeys() {
 		input := &ssm.PutParameterInput{
 			Name:  &parameter,
 			Value: &newOraclePrivateKeyHex,
+			Overwrite: awsCommon.Bool(true),
 		}
 
 		putOutput, err := ssmClient.PutParameter(input)
