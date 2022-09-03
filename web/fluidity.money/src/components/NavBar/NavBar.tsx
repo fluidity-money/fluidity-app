@@ -8,8 +8,9 @@ import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
+
   const handleModal = () => {
-    setModal(!modal);
+    setModal(modal => !modal);
   };
 
   return (

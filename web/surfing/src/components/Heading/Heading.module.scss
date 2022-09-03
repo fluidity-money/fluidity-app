@@ -29,5 +29,8 @@ h5 {
 
 h6 {
     font-size: $em-step * 3.5;
-    text-transform: uppercase;
+}
+
+.uppercase {
+  text-transform: uppercase
 }
