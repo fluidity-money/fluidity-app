@@ -91,8 +91,6 @@ func rotateOracleKeys() {
 			contractAddressString = oracle.ContractAddress
 		)
 
-		fileName += " " + parameter
-
 		contractAddress := ethCommon.HexToAddress(contractAddressString)
 
 		// get the old key
@@ -155,6 +153,7 @@ func rotateOracleKeys() {
 		input := &ssm.PutParameterInput{
 			Name:  &parameter,
 			Value: &newOraclePrivateKeyHex,
+			Overwrite: awsCommon.Bool(true),
 		}
 
 		putOutput, err := ssmClient.PutParameter(input)

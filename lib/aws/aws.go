@@ -11,7 +11,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -28,7 +27,6 @@ func UploadToBucket(session *session.Session, fileContent io.ReadSeeker, fileNam
 		Bucket: &bucketName,
 		Key:    &fileName,
 		Body:   fileContent,
-		ACL:    aws.String(s3.BucketCannedACLAuthenticatedRead),
 	})
 
 	if err != nil {
