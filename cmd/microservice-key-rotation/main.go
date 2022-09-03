@@ -91,8 +91,6 @@ func rotateOracleKeys() {
 			contractAddressString = oracle.ContractAddress
 		)
 
-		fileName += " " + parameter
-
 		contractAddress := ethCommon.HexToAddress(contractAddressString)
 
 		// get the old key
