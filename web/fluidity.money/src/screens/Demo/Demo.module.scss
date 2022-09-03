@@ -6,10 +6,9 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
+  border: 1px solid red;
   background-color: $fluidBlack;
-  video {
-    max-width: 1000px;
-  }
+
   div {
     display: flex;
     flex-direction: column;

@@ -31,9 +31,10 @@ const SponsorsPartners = () => {
               <div
                 style={{
                   position: "relative",
-                  display: "block",
-                  top: `${Math.floor((Math.random() + 0.5) * 500)}px`,
-                  left: `${Math.floor(Math.random() * (1200 - 1 + 1) + 1)}px`,
+                  display: "flex",
+                  top: `0`,
+                  left: `${Math.floor(Math.random() * (1150 - 1) + 1)}px`,
+                  filter: `${Math.floor(Math.random() * (3 - 1) + 1) === 1 ? 'blur(8px)' : 'blur(0px)'}`
                 }}
               >
                 <Partner
