@@ -112,15 +112,6 @@ input bigint_comparison_exp {
   _nin: [bigint!]
 }
 
-"""ordering argument of a cursor"""
-enum cursor_ordering {
-  """ascending ordering of the cursor"""
-  ASC
-
-  """descending ordering of the cursor"""
-  DESC
-}
-
 scalar float8
 
 """
@@ -235,24 +226,6 @@ enum prize_pool_select_column {
   network
 }
 
-"""
-Streaming cursor of the table "prize_pool"
-"""
-input prize_pool_stream_cursor_input {
-  """Stream column input with initial value"""
-  initial_value: prize_pool_stream_cursor_value_input!
-
-  """cursor ordering"""
-  ordering: cursor_ordering
-}
-
-"""Initial value of the column from where the streaming should start"""
-input prize_pool_stream_cursor_value_input {
-  amount: float8
-  last_updated: timestamp
-  network: network_blockchain
-}
-
 type query_root {
   """
   fetch data from the table: "prize_pool"
@@ -357,20 +330,6 @@ type subscription_root {
   ): [prize_pool!]!
 
   """
-  fetch data from the table in a streaming manner : "prize_pool"
-  """
-  prize_pool_stream(
-    """maximum number of rows returned in a single batch"""
-    batch_size: Int!
-
-    """cursor to stream the results returned by the query"""
-    cursor: [prize_pool_stream_cursor_input]!
-
-    """filter the rows returned"""
-    where: prize_pool_bool_exp
-  ): [prize_pool!]!
-
-  """
   fetch data from the table: "user_actions"
   """
   user_actions(
@@ -411,20 +370,6 @@ type subscription_root {
   ): user_actions_aggregate!
 
   """
-  fetch data from the table in a streaming manner : "user_actions"
-  """
-  user_actions_stream(
-    """maximum number of rows returned in a single batch"""
-    batch_size: Int!
-
-    """cursor to stream the results returned by the query"""
-    cursor: [user_actions_stream_cursor_input]!
-
-    """filter the rows returned"""
-    where: user_actions_bool_exp
-  ): [user_actions!]!
-
-  """
   fetch data from the table: "winners"
   """
   winners(
@@ -439,20 +384,6 @@ type subscription_root {
 
     """sort the rows by one or more columns"""
     order_by: [winners_order_by!]
-
-    """filter the rows returned"""
-    where: winners_bool_exp
-  ): [winners!]!
-
-  """
-  fetch data from the table in a streaming manner : "winners"
-  """
-  winners_stream(
-    """maximum number of rows returned in a single batch"""
-    batch_size: Int!
-
-    """cursor to stream the results returned by the query"""
-    cursor: [winners_stream_cursor_input]!
 
     """filter the rows returned"""
     where: winners_bool_exp
@@ -680,34 +611,6 @@ type user_actions_stddev_samp_fields {
   token_decimals: Float
 }
 
-"""
-Streaming cursor of the table "user_actions"
-"""
-input user_actions_stream_cursor_input {
-  """Stream column input with initial value"""
-  initial_value: user_actions_stream_cursor_value_input!
-
-  """cursor ordering"""
-  ordering: cursor_ordering
-}
-
-"""Initial value of the column from where the streaming should start"""
-input user_actions_stream_cursor_value_input {
-  amount: numeric
-  event_number: bigint
-  network: network_blockchain
-  recipient_address: String
-  sender_address: String
-  solana_recipient_owner_address: String
-  solana_sender_owner_address: String
-  swap_in: Boolean
-  time: timestamp
-  token_decimals: Int
-  token_short_name: String
-  transaction_hash: String
-  type: user_action
-}
-
 """aggregate sum on columns"""
 type user_actions_sum_fields {
   amount: numeric
@@ -812,29 +715,5 @@ enum winners_select_column {
 
   """column name"""
   winning_amount
-}
-
-"""
-Streaming cursor of the table "winners"
-"""
-input winners_stream_cursor_input {
-  """Stream column input with initial value"""
-  initial_value: winners_stream_cursor_value_input!
-
-  """cursor ordering"""
-  ordering: cursor_ordering
-}
-
-"""Initial value of the column from where the streaming should start"""
-input winners_stream_cursor_value_input {
-  awarded_time: timestamp
-  created: timestamp
-  network: network_blockchain
-  solana_winning_owner_address: String
-  token_decimals: Int
-  token_short_name: String
-  transaction_hash: String
-  winning_address: String
-  winning_amount: numeric
 }
 
