@@ -41,8 +41,7 @@ export default FluidWars;
 const header = "User activity is incentivised through governance.";
 
 const info = [
-  "Fluidity and other protocols’ governance tokens can influence emissions, yield and incentives. Protocols can complement yield through their governance token.",
-  "Fluidity’s Utility Mining creates incentive for users to participate, and aligns with genuine participation within the protocols. ",
-  "User attention is an active engagement that protocols and users can participate in. ",
-  "Enter Fluidity Wars - a perpetual war to control the flow of users.",
+  "Fluidity will act as an incentive layer that operates at the blockchain level, orchestrating the primary user sentiments that drive the secondary liquidity effects. ",
+  "Through Utility Mining, Fluidity and other protocols can drive in users whose primary yield incentives are to explore the protocol and exhibit intended behaviours that are beneficial for all parties involved.",
+  "Enter Fluidity Wars—a perpetual war to control the flow of users in a world where genuine user engagement is apex currency.",
 ];

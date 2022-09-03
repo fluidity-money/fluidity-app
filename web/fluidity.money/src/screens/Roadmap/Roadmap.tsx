@@ -46,5 +46,5 @@ const Roadmap = () => {
 export default Roadmap;
 
 const info = [
-  "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Explicabo sint, voluptatibus omnis modi incidunt ex possimus obcaecati soluta cum corporis alias veritatis aperiam non amet, eligendi, itaque architecto et voluptatem?",
+  "An incentive layer that bridges Web2 and Web3 is forming, and the way money moves is about to change. ",
 ];
