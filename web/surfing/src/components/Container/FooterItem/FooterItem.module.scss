@@ -9,19 +9,19 @@
 
   h1 {
     font-size: 36px;
-    @include max-560px {
+    @media (max-width: 560px) {
       font-size: 20px;
     }
   }
   ul {
     display: flex;
 
-    @include max-860px {
+    @media (max-width: 860px) {
       flex-direction: column;
       min-width: 232px;
     }
 
-    @include max-560px {
+    @media (max-width: 560px) {
       min-width: 155px;
     }
 

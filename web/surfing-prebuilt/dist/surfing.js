@@ -15955,7 +15955,7 @@ const wN = ({
   fileName: uh,
   lineNumber: 18,
   columnNumber: 5
-}, void 0), XT = "_container_1c71e_1", KT = {
+}, void 0), XT = "_container_1ksfl_1", KT = {
   container: XT
 };
 var Kr = "/Users/conno/Fluidity/monorepo/fluidity-app/web/surfing/src/components/Container/FooterItem/FooterItem.tsx";
