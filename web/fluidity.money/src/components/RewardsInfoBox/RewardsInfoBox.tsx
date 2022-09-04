@@ -44,13 +44,13 @@ const RewardsInfoBox = ({
         <button>ETH v</button>
         <h1 onClick={switchAndAnimate}>
           {type === "black"
-            ? numberToMonetaryString(rewardPool)
+            ? totalReward
             : totalTransactionValue.toLocaleString("en-US")}
         </h1>
         <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
-        <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
+        {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
           FLUID STATS
-        </LinkButton>
+        </LinkButton> */}
       </div>
     </div>
   );
