@@ -1,0 +1,32 @@
+import { Canvas, Meta, Story } from "@storybook/addon-docs";
+
+import NavBar from "./NavBar";
+
+<Meta title="NavBar/NavBar" component={NavBar} />
+
+export const Template = (args) => <NavBar {...args} />;
+
+<Canvas>
+  <Story
+    name="Website"
+    args={{
+      logo: "./src/assets/images/logos/logoOutline.svg",
+      text: "fluidity",
+      button: {
+        children: "LAUNCH FLUIDITY",
+        version: "secondary",
+        type: "text",
+        size: "medium",
+        handleClick: () => {},
+      },
+      navLinks: [
+        { name: "how it works", modal: false },
+        { name: "ecosystem", modal: false },
+        { name: "fluid stats", modal: false },
+        { name: "resources", modal: true },
+      ],
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

@@ -1,4 +1,4 @@
-SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ropsten/websoket_url
+SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ropsten/websocket_url
 
 SERVICES:
   - CONNECTORS_ETHEREUM_LOGS-AMQP:

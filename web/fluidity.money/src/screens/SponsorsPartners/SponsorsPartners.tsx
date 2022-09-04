@@ -2,9 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import ContinuousCarousel from "../../components/ContinuousCarousel";
-import Partner from "../../components/Partner";
+import { ContinuousCarousel, Partner, Card } from "surfing";
 import styles from "./SponsorsPartners.module.scss";
 
 const SponsorsPartners = () => {
@@ -27,8 +25,11 @@ const SponsorsPartners = () => {
               // left: `${Math.floor((Math.random() - 0.6) * 900)}px`,
             }}
           >
-            {partners.map((partner) => (
-              <div
+            {partners.map((partner, i) => (
+              <Card
+                rounded={true}
+                type={"transparent"}
+                key={`sponsor-${i}`}
                 style={{
                   position: "relative",
                   display: "flex",
@@ -42,7 +43,7 @@ const SponsorsPartners = () => {
                   title={partner.title}
                   info={partner.info}
                 />
-              </div>
+              </Card>
             ))}
           </div>
         </ContinuousCarousel>
@@ -58,7 +59,7 @@ const partners = [
   {
     img: "🦍",
     title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
   },
   {
     img: "🦍",

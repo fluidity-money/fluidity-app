@@ -23,3 +23,5 @@ GO_CMD_DIR := cmd
 CONTRACTS_DIR := contracts
 
 WEB_DIR := web
+
+TESTS_DIR := tests

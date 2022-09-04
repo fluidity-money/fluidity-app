@@ -305,6 +305,16 @@ func GetPrice(client *ethclient.Client, addressProvider ethCommon.Address, token
 		)
 	}
 
+	isAssetPriceZero := big.NewRat(0, 1).Cmp(assetPriceEth) == 0
+
+	if isAssetPriceZero {
+		return nil, fmt.Errorf(
+			"asset price at AddressProvider %v, token address %v is 0!",
+			addressProvider,
+			token,
+		)
+	}
+
 	assetPriceUsd := new(big.Rat).Quo(assetPriceEth, usdPriceEth)
 
 	return assetPriceUsd, nil

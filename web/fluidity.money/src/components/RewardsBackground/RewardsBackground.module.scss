@@ -7,7 +7,6 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
-  border: solid 2px red;
   isolation: isolate;
 }
 
@@ -39,6 +38,8 @@
 }
 
 .winner {
+  display: flex;
+  flex-direction: row;
   cursor: pointer;
   font-size: 16px;
   color: $textGrey;

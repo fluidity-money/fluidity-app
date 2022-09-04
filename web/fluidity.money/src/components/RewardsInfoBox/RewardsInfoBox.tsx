@@ -2,11 +2,12 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { LinkButton } from "components/Button";
-import React from "react";
+import { LinkButton, numberToMonetaryString } from "surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
+  rewardPool: number;
+  totalTransactionValue: number;
   setToggle: () => void;
   toggle: boolean;
   initalView: boolean;
@@ -15,6 +16,8 @@ interface IRewardBoxProps {
 }
 
 const RewardsInfoBox = ({
+  rewardPool,
+  totalTransactionValue,
   setToggle,
   toggle,
   initalView,
@@ -40,7 +43,9 @@ const RewardsInfoBox = ({
       >
         <button>ETH v</button>
         <h1 onClick={switchAndAnimate}>
-          {type === "black" ? "$678,123.00" : "$1,231,246"}
+          {type === "black"
+            ? numberToMonetaryString(rewardPool)
+            : totalTransactionValue.toLocaleString("en-US")}
         </h1>
         <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
         <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>

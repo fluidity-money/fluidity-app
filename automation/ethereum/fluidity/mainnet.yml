@@ -1,0 +1,28 @@
+DOCKERFILE_PATH: ./web/ethereum.fluidity.money
+
+SERVICES:
+  - FLUIDITY_FRONTEND:
+      SERVICE_NAME: ethereum-fluidity-money-frontend
+      DOCKER_IMAGE: ethereum.fluidity.money-frontend
+      TARGET_GROUP: flu-mainnet-eth-fe-tg
+      #SECRET_FLU_APP_WALLET_CONNECT_GETH_URI: /fluidity/ethereum/wallet_connect_geth_uri
+      
+      DOCKER_ARGS:
+        REACT_APP_API_URL: https://backend.ethereum.fluidity.money
+        REACT_APP_WALLET_CONNECT_GETH_URI: wss://backend.ethereum.fluidity.money
+        REACT_APP_WEBSOCKET: wss://backend.ethereum.fluidity.money/updates
+        REACT_APP_CHAIN_ID: 1
+        REACT_APP_TOKEN_CONFIG_FILE: mainnet-tokens.json
+
+  - FLUIDITY_BACKEND:
+      SERVICE_NAME: ethereum-fluidity-money-backend
+      DOCKER_IMAGE: ethereum.fluidity.money-backend
+      TARGET_GROUP: flu-mainnet-eth-be-tg
+
+      ENV_FLU_WORKER_ID: ethereum-ethereum.fluidity.money-backend
+      ENV_FLU_ETHEREUM_CHAIN_ID: 1
+      SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ethereum/token_list
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST: /fluidity/ethereum/private_key_list
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
+
+

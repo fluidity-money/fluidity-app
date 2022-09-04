@@ -1,9 +1,10 @@
-@use '../../common' as *;
+@use 'common' as *;
 
 .container {
   display: flex;
+  // grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
-  background-color: $black;
+  background-color: black;
   width: fit-content;
   padding: 4px;
   border-radius: 40px;
@@ -18,5 +19,13 @@
     &:hover {
       opacity: 0.8;
     }
+  }
+  @media (max-width: 620px) {
+    // grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
+    top: 75vh;
+    background-color: transparent;
+    opacity: 0.9;
   }
 }

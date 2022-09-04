@@ -156,6 +156,12 @@ func main() {
 					})
 				}
 
+				payoutWasBlocked := false
+
+				if winner1 != nil || winner2 != nil {
+					payoutWasBlocked = fluidityPayoutWasBlocked(transaction)
+				}
+
 				if transfer1 != nil {
 					log.App(func(k *log.Log) {
 						k.Message = "Found a transfer!"
@@ -174,12 +180,17 @@ func main() {
 					bufferedUserActions = append(bufferedUserActions, *transfer2)
 				}
 
+
 				if winner1 != nil {
 					log.App(func(k *log.Log) {
 						k.Message = "Found a winner!"
 					})
 
-					queue.SendMessage(winners.TopicWinnersSolana, winner1)
+					if payoutWasBlocked {
+						queue.SendMessage(winners.TopicBlockedWinnersSolana, winner1)
+					} else {
+						queue.SendMessage(winners.TopicWinnersSolana, winner1)
+					}
 				}
 
 				if winner2 != nil {
@@ -187,7 +198,11 @@ func main() {
 						k.Message = "Found a winner!"
 					})
 
-					queue.SendMessage(winners.TopicWinnersSolana, winner2)
+					if payoutWasBlocked {
+						queue.SendMessage(winners.TopicBlockedWinnersSolana, winner2)
+					} else {
+						queue.SendMessage(winners.TopicWinnersSolana, winner2)
+					}
 				}
 
 				if swapWrap != nil {

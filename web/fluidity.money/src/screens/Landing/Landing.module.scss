@@ -1,3 +1,5 @@
+@import "../../../src/styles/config.scss";
+
 .containerLanding {
   display: flex;
   flex-direction: column;
@@ -18,11 +20,31 @@
 
 .video {
   width: 444px;
-  height: 423px;
+  height: 444px;
+  // min-width: 225px;
+  // min-height: 225px;
   border: solid 1px pink;
   border-radius: 50%;
   background-color: gray;
   opacity: 0.8;
+  @include max-1080px {
+    width: 350px;
+    height: 350px;
+  }
+  @include max-900px {
+    width: 300px;
+    height: 300px;
+  }
+
+  @include max-760px {
+    width: 200px;
+    height: 200px;
+  }
+
+  @include max-620px {
+    width: 350px;
+    height: 350px;
+  }
 }
 
 // .fadeIn {
@@ -55,6 +77,9 @@
   align-items: center;
   min-height: 560px;
   justify-content: space-between;
+  @include max-900px {
+    min-height: 425px;
+  }
 }
 
 .tiles {
@@ -62,12 +87,34 @@
   justify-content: space-between;
   width: 100%;
   align-items: flex-end;
+  @include max-1080px {
+    align-items: center;
+  }
+  @include max-620px {
+    flex-direction: column;
+    align-items: center;
+  }
+  // display: grid;
+  // grid-template-columns: 1fr 1fr 1fr;
 }
 
 .right {
   margin-right: 40px;
+  @include max-1080px {
+    margin-right: 10px;
+  }
 }
 
 .left {
   margin-left: 40px;
+  @include max-1080px {
+    margin-left: 10px;
+  }
+  @include max-620px {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 20px;
+  }
 }

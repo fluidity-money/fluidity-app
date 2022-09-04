@@ -2,13 +2,13 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
+import { useMemo } from "react";
+import { DataTable } from "surfing";
+
 import styles from "./Transactions.module.scss";
 
-import DataTable from "../../components/DataTable";
-
 const Transactions = () => {
-  const data = React.useMemo(
+  const data = useMemo(
     () => [
       {
         img: ['https://cryptomarketpool.com/wp-content/uploads/2021/07/eth-1.png', 'https://cryptomarketpool.com/wp-content/uploads/2021/07/bnb-1.png'],
@@ -183,7 +183,7 @@ const Transactions = () => {
     []
   )
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: 'ACTIVITY',

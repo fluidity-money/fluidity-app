@@ -1,8 +1,0 @@
-@use '../../common' as *;
-
-.desktop {
-  @include respond-to('small') {
-    display: none;
-  }
-}
-

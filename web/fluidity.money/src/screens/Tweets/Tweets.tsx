@@ -2,8 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import ManualCarousel from "../../components/ManualCarousel";
+import { ManualCarousel } from "surfing";
 import styles from "./Tweets.module.scss";
 
 const Tweets = () => {

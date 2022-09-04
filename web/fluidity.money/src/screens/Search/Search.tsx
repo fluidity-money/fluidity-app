@@ -2,9 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { useState } from "react";
+import { ContinuousCarousel } from "surfing";
 import { SearchModal } from "modals";
-import React, { useState } from "react";
-import ContinuousCarousel from "../../components/ContinuousCarousel";
 import styles from "./Search.module.scss";
 
 const Search = () => {
@@ -38,8 +38,8 @@ const Search = () => {
       <div className={styles.carousel}>
         <ContinuousCarousel direction="right">
           <div>
-            {blockchains.map((blockchain) => (
-              <div className={styles.blockchain}>
+            {blockchains.map((blockchain, i) => (
+              <div key={`blockchain-${i}`} className={styles.blockchain}>
                 <h5>{blockchain}</h5>
               </div>
             ))}

@@ -4,6 +4,7 @@ web
 tests
 contracts
 automation
+!automation/nginx-default.conf
 docs
 
 **/*.o

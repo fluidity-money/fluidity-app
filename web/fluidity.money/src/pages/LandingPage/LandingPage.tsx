@@ -2,14 +2,12 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
 import Articles from "screens/Articles";
 import Ecosystem from "screens/Ecosystem";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
 import HowItWorks from "../../screens/HowItWorks";
 import Landing from "../../screens/Landing";
-import Projects from "../../screens/Projects";
 import Resources from "../../screens/Resources";
 import Reward from "../../screens/Reward";
 import SponsorsPartners from "../../screens/SponsorsPartners";
@@ -25,10 +23,8 @@ const LandingPage = () => {
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />
-        {/* Ecosystem which scrolls to projects as a component */}
-        <Ecosystem />
-        <Projects />
-        {/* Resources not articles */}
+        {/* Ecosystem which scrolls to projects as a component, not ready for production yet */}
+        {/* <Ecosystem /> */}
         <Resources />
         {/* Remove articles but style resources the same, reuse? */}
         <Articles />

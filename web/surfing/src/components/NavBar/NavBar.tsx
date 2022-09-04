@@ -2,44 +2,36 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { ReactNode, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { GeneralButton } from "../Button";
-import ResourcesNavModal from "../../../../fluidity.money/src/components/ResourcesNavModal";
-import styles from "./NavBar.module.scss";
+import type { IGeneralButtonProps } from "../Button/GeneralButton/GeneralButton";
 
-interface IButton {
-  children: string;
-  version: "primary" | "secondary";
-  type: "text" | "icon before" | "icon after" | "icon only";
-  size: "small" | "medium" | "large";
-  handleClick: () => void;
-}
+import { ReactNode, useState } from "react";
+import { GeneralButton, NavBarModal } from "~/components";
+import styles from "./NavBar.module.scss";
+import useViewport from "~/util/hooks/useViewport";
 
 interface INavLinks {
   name: string;
   modal: boolean;
+  modalInfo?: IModalProps;
 }
 
 interface INavBarProps {
   logo: string;
   text: string;
-  button: IButton;
+  button: IGeneralButtonProps;
   navLinks: INavLinks[];
 }
 
-//tbd
-interface IModalNavLinkButtons {
+interface ILinkButton {
   children: string;
-  size: string;
-  type: string;
+  size: "small" | "medium" | "large";
+  type: "internal" | "external";
   handleClick: () => void;
 }
 
-// tbd
 interface IModalProps {
   navLinks: string[];
-  modalButtons: IModalNavLinkButtons[];
+  modalButtons: ILinkButton[];
 }
 
 const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
@@ -48,26 +40,32 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
     setModal(!modal);
   };
 
-  const navLinksTitles = navLinks.map((link) => {
+  const { width } = useViewport();
+  const breakpoint = 700;
+
+  const navLinksTitles = navLinks.map((link) => (
     <li>
-      <NavLink
-        to={`/${link.name.replace(/\s+/g, "")}`}
-        className={({ isActive }) => {
-          return isActive ? styles.active : "";
-        }}
+      <a
+        href={`/${link.name.replace(/\s+/g, "")}`}
+        className={
+          window.location.pathname.toString() ===
+          `/${link.name.replace(/\s+/g, "")}`
+            ? styles.active
+            : ""
+        }
       >
         {link.name.toUpperCase()}
-      </NavLink>
+      </a>
       {link.modal && (
-        <button onClick={() => handleModal()}>
+        <button onClick={() => {}}>
           <img
-            src="/assets/images/triangleDown.svg"
+            src="./src/assets/images/triangleDown.svg"
             alt="open resource options"
           />
         </button>
       )}
-    </li>;
-  });
+    </li>
+  ));
 
   return (
     <div className={styles.outerContainer}>
@@ -77,16 +75,16 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <div>
-              <Link to={"/"}>
+              <a href={"/"}>
                 {/* prop */}
                 <img src={logo} alt="home page" />
-              </Link>
+              </a>
             </div>
             {/* props */}
             <GeneralButton
               version={button.version}
               type={button.type}
-              size={button.size}
+              size={width < breakpoint ? "small" : "medium"}
               handleClick={button.handleClick}
             >
               {button.children}
@@ -98,7 +96,9 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
             <nav>
               <ul>{navLinksTitles as ReactNode}</ul>
             </nav>
-            {modal && <ResourcesNavModal handleModal={handleModal} />}
+            {modal && (
+              <NavBarModal handleModal={handleModal} navLinks={links} />
+            )}
           </div>
         </div>
       </div>
@@ -107,3 +107,30 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
 };
 
 export default NavBar;
+
+const links: ILinkButton[] = [
+  {
+    children: "articles",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "fluniversity",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "whitpapers",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "documentation",
+    size: "small",
+    type: "external",
+    handleClick: () => {},
+  },
+];

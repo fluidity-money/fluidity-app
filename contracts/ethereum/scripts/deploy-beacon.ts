@@ -6,6 +6,7 @@ const tasks: {[k: string]: {contract: string, name: string}} = {
     token: {contract: "Token", name: "token"},
     aave: {contract: "AaveLiquidityProvider", name: "aave liquidity pool"},
     compound: {contract: "CompoundLiquidityProvider", name: "compound liquidity pool"},
+    workerconfig: {contract: "WorkerConfig", name: "worker config storage"},
 };
 
 const main = async () => {

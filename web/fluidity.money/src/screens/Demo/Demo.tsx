@@ -2,14 +2,14 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import ContinuousCarousel from "components/ContinuousCarousel";
-import React from "react";
-import { GeneralButton } from "../../components/Button";
-import Video from "components/Video";
-
+import { GeneralButton, numberToMonetaryString } from "surfing";
+import { useChainContext } from "hooks/ChainContext";
 import styles from "./Demo.module.scss";
 
 const Demo = () => {
+  const { apiState } = useChainContext();
+  const weekTotalRewards = apiState.weekWinnings
+    .reduce((weekSum, { winning_amount, token_decimals }) => weekSum + (winning_amount / 10 ** token_decimals), 0)
   /*
   full screen demo
   */
@@ -18,7 +18,7 @@ const Demo = () => {
       <div className={`${styles.container} bg-light`}>
         <Video src={window.location.origin + '/assets/videos/sample.mp4'}/>
         <div>
-          <h1>$48, 907.50</h1>
+          <h1>{numberToMonetaryString(weekTotalRewards)}</h1>
           <h3>Fluid prizes claimed in the last week.</h3>
           <p>Connect your wallet to see what you could make</p>
           <section>

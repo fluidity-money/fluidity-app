@@ -4,7 +4,6 @@
 
 import { ArticleType } from "./ArticleList";
 import styles from "./ArticleList.module.scss"
-import { TextButton } from "../../Button";
 
 const ArticleListCard = (article: ArticleType) => {
 

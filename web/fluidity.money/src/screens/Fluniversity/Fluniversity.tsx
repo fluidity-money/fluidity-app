@@ -2,10 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import ContinuousCarousel from "components/ContinuousCarousel";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import ManualCarousel from "../../components/ManualCarousel";
+import { ContinuousCarousel, ManualCarousel } from "surfing";
 import styles from "./Fluniversity.module.scss";
 
 const Fluniversity = () => {
