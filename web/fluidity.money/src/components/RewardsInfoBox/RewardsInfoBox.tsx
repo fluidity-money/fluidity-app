@@ -44,7 +44,7 @@ const RewardsInfoBox = ({
         <button>ETH v</button>
         <h1 onClick={switchAndAnimate}>
           {type === "black"
-            ? totalReward
+            ? numberToMonetaryString(rewardPool)
             : totalTransactionValue.toLocaleString("en-US")}
         </h1>
         <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
