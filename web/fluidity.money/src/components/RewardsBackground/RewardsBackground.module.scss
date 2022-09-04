@@ -46,6 +46,12 @@
   position: relative;
   min-width: fit-content;
   padding: 0 10px 0 10px;
+  gap: 5px;
+  align-items: center;
+
+  img {
+    width: 18px;
+  }
   &:hover {
     color: $fluidWhite;
   }

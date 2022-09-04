@@ -91,3 +91,10 @@
   transition: opacity 1s ease;
   z-index: 0;
 }
+
+.loadingRow {
+  height: 20px;
+  width: 20px;
+  background-color: gray;
+  border-radius: 50%;
+}

@@ -2,43 +2,29 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import HowItWorksTemplate from "components/HowItWorksTemplate";
-import useViewport from "hooks/useViewport";
-import { LinkButton, ReusableGrid } from "surfing";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { ReusableGrid } from "surfing";
 import styles from "./Roadmap.module.scss";
 
 const Roadmap = () => {
-  // to set order correct when in column layout
-  const { width } = useViewport();
-  const breakpoint = 860;
-
-  const button = (
-    <LinkButton size={"medium"} type={"external"} handleClick={() => {}}>
-      EXPLORE OUR FUTURE
-    </LinkButton>
-  );
-
-  const left =
-    width < breakpoint ? (
-      <div style={{ fontSize: 160 }}>🦍</div>
-    ) : (
-      <HowItWorksTemplate info={info} button={button}>
-        Roadmap
-      </HowItWorksTemplate>
-    );
-
-  const right =
-    width > breakpoint ? (
-      <div style={{ fontSize: 160 }}>🦍</div>
-    ) : (
-      <HowItWorksTemplate info={info} button={button}>
-        Roadmap
-      </HowItWorksTemplate>
-    );
-
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash) {
+      let elem = document.getElementById(location.hash.slice(1));
+      if (elem) {
+        elem.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [location]);
   return (
-    <div className={styles.container} id="yield&win">
-      <ReusableGrid left={left} right={right} />
+    <div className={styles.container} id="roadmap">
+      <ReusableGrid
+        left={<h1>Roadmap</h1>}
+        right={<div style={{ fontSize: 160 }}>🦍</div>}
+      />
     </div>
   );
 };
