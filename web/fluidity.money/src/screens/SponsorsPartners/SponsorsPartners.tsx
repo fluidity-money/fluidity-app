@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import useViewport from "hooks/useViewport";
 import { ContinuousCarousel, Partner, Card } from "surfing";
 import styles from "./SponsorsPartners.module.scss";
 
@@ -11,10 +12,14 @@ const SponsorsPartners = () => {
   on hover, more info is provided
   */
 
+  // to set order correct when in column layout
+  const { width } = useViewport();
+  const breakpoint = 660;
+  
   return (
     <div className={`${styles.container} bg-dark`}>
       <h1 className={styles.text}>{"Sponsors & Partners"}</h1>
-      <div style={{ display: "flex", width: "100%" }}>
+      <div style={{ display: "flex", width: "100%", justifyContent:"center" }}>
         <ContinuousCarousel direction="up">
           <div
             style={{
@@ -26,7 +31,26 @@ const SponsorsPartners = () => {
             }}
           >
             {partners.map((partner, i) => (
-              <Card
+               width < breakpoint ? (
+                <Card
+                rounded={true}
+                type={"transparent"}
+                key={`sponsor-${i}`}
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  bottom: `90px`,
+                  left: `23%`,
+                }}
+              >
+                <Partner
+                  img={partner.img}
+                  title={partner.title}
+                  info={partner.info}
+                />
+              </Card>
+              ) : (
+                <Card
                 rounded={true}
                 type={"transparent"}
                 key={`sponsor-${i}`}
@@ -44,6 +68,9 @@ const SponsorsPartners = () => {
                   info={partner.info}
                 />
               </Card>
+              )
+
+              
             ))}
           </div>
         </ContinuousCarousel>
