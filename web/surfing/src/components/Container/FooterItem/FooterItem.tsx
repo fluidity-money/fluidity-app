@@ -21,15 +21,16 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   const { width } = useViewport();
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
+  console.log("======>", children.replace(/\s+/g, "").toLowerCase());
 
   const itemList = (
     <ul>
       {items.map((item) => (
         <li key={item.title}>
           <a
-            href={`/${children.replace(/\s+/g, "").toLowerCase()}}#${item.title
+            href={`/${children
               .replace(/\s+/g, "")
-              .toLowerCase()}}`}
+              .toLowerCase()}#${item.title.toLowerCase()}`}
           >
             <LinkButton
               handleClick={() => {}}

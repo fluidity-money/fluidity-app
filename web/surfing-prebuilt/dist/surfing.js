@@ -15965,10 +15965,12 @@ const xN = ({
 }) => {
   const {
     width: n
-  } = Nm(), r = 620, i = 560, o = /* @__PURE__ */ L("ul", {
+  } = Nm(), r = 620, i = 560;
+  console.log("======>", e.replace(/\s+/g, "").toLowerCase());
+  const o = /* @__PURE__ */ L("ul", {
     children: t.map((a) => /* @__PURE__ */ L("li", {
       children: /* @__PURE__ */ L("a", {
-        href: `/${e.replace(/\s+/g, "").toLowerCase()}}#${a.title.replace(/\s+/g, "").toLowerCase()}}`,
+        href: `/${e.replace(/\s+/g, "").toLowerCase()}#${a.title.toLowerCase()}`,
         children: /* @__PURE__ */ L(Em, {
           handleClick: () => {
           },
@@ -15977,22 +15979,22 @@ const xN = ({
           children: a.title
         }, void 0, !1, {
           fileName: Kr,
-          lineNumber: 34,
+          lineNumber: 35,
           columnNumber: 13
         }, void 0)
       }, void 0, !1, {
         fileName: Kr,
-        lineNumber: 29,
+        lineNumber: 30,
         columnNumber: 11
       }, void 0)
     }, a.title, !1, {
       fileName: Kr,
-      lineNumber: 28,
+      lineNumber: 29,
       columnNumber: 9
     }, void 0))
   }, void 0, !1, {
     fileName: Kr,
-    lineNumber: 26,
+    lineNumber: 27,
     columnNumber: 5
   }, void 0);
   return /* @__PURE__ */ L("div", {
@@ -16003,17 +16005,17 @@ const xN = ({
         children: e
       }, void 0, !1, {
         fileName: Kr,
-        lineNumber: 56,
+        lineNumber: 57,
         columnNumber: 9
       }, void 0)
     }, void 0, !1, {
       fileName: Kr,
-      lineNumber: 55,
+      lineNumber: 56,
       columnNumber: 7
     }, void 0), o]
   }, void 0, !0, {
     fileName: Kr,
-    lineNumber: 54,
+    lineNumber: 55,
     columnNumber: 5
   }, void 0);
 }, QT = "_container_1250o_1", ZT = {
