@@ -27,19 +27,25 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
     <ul>
       {items.map((item) => (
         <li key={item.title}>
-          <LinkButton
-            handleClick={() => {}}
-            size={
-              width > firstBreakpoint
-                ? "large"
-                : width > secondBreakpoint && width < firstBreakpoint
-                ? "medium"
-                : "small"
-            }
-            type={item.type}
+          <a
+            href={`/${children.replace(/\s+/g, "").toLowerCase()}}#${item.title
+              .replace(/\s+/g, "")
+              .toLowerCase()}}`}
           >
-            {item.title}
-          </LinkButton>
+            <LinkButton
+              handleClick={() => {}}
+              size={
+                width > firstBreakpoint
+                  ? "large"
+                  : width > secondBreakpoint && width < firstBreakpoint
+                  ? "medium"
+                  : "small"
+              }
+              type={item.type}
+            >
+              {item.title}
+            </LinkButton>
+          </a>
         </li>
       ))}
     </ul>
@@ -47,7 +53,9 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
 
   return (
     <div className={styles.container}>
-      <h1>{children}</h1>
+      <a href={`/${children.replace(/\s+/g, "").toLowerCase()}`}>
+        <h1>{children}</h1>
+      </a>
 
       {itemList}
     </div>

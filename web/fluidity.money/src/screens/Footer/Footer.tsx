@@ -28,8 +28,8 @@ const Footer = () => {
         )}
         <div className={styles.footerItems}>
           <FooterItem items={howItWorks}>How it works</FooterItem>
-          <FooterItem items={ecosystem}>Ecosystem</FooterItem>
-          <FooterItem items={fluidStats}>Fluid stats</FooterItem>
+          {/* <FooterItem items={ecosystem}>Ecosystem</FooterItem>
+          <FooterItem items={fluidStats}>Fluid stats</FooterItem> */}
           <FooterItem items={resources}>Resources</FooterItem>
         </div>
         <div className={styles.communication}>
@@ -96,10 +96,7 @@ const Footer = () => {
 
 export default Footer;
 
-const howItWorks: IItem[] = [
-  { title: "Fluidity demo", src: "", type: "internal" },
-  { title: "Roadmap", src: "", type: "external" },
-];
+const howItWorks: IItem[] = [{ title: "Roadmap", src: "", type: "external" }];
 
 const ecosystem: IItem[] = [
   { title: "DeFi", src: "", type: "internal" },
