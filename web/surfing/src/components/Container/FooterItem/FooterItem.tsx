@@ -3,6 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { LinkButton } from "components/Button";
+import useViewport from "~/util/hooks/useViewport";
 import styles from "./FooterItem.module.scss";
 
 interface IItem {
@@ -17,13 +18,33 @@ interface IFooterItemProps {
 }
 
 const FooterItem = ({ children, items }: IFooterItemProps) => {
+  const { width } = useViewport();
+  const firstBreakpoint = 620;
+  const secondBreakpoint = 560;
+
   const itemList = (
     <ul>
       {items.map((item) => (
         <li key={item.title}>
-          <LinkButton handleClick={() => {}} size="large" type={item.type}>
-            {item.title}
-          </LinkButton>
+          <a
+            href={`/${children.replace(/\s+/g, "").toLowerCase()}}#${item.title
+              .replace(/\s+/g, "")
+              .toLowerCase()}}`}
+          >
+            <LinkButton
+              handleClick={() => {}}
+              size={
+                width > firstBreakpoint
+                  ? "large"
+                  : width > secondBreakpoint && width < firstBreakpoint
+                  ? "medium"
+                  : "small"
+              }
+              type={item.type}
+            >
+              {item.title}
+            </LinkButton>
+          </a>
         </li>
       ))}
     </ul>
@@ -31,7 +52,9 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
 
   return (
     <div className={styles.container}>
-      <h1>{children}</h1>
+      <a href={`/${children.replace(/\s+/g, "").toLowerCase()}`}>
+        <h1>{children}</h1>
+      </a>
 
       {itemList}
     </div>
