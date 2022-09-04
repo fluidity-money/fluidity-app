@@ -3,6 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { GeneralButton, numberToMonetaryString } from "surfing";
+import Video from "components/Video";
 import { useChainContext } from "hooks/ChainContext";
 import styles from "./Demo.module.scss";
 
