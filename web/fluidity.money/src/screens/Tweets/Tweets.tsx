@@ -9,8 +9,8 @@ const Tweets = () => {
   return (
     <div className={styles.container}>
       <ManualCarousel>
-        {tweets.map((tweet) => (
-          <div className={styles.tweetContainer}>
+        {tweets.map((tweet, index) => (
+          <div key={index} className={styles.tweetContainer}>
             <p>{tweet.text}</p>
             <div>{tweet.date}</div>
           </div>

@@ -39,8 +39,8 @@ const Docs = () => {
       </ContinuousCarousel>
       <div className={styles.container} id="documentation">
         <ManualCarousel>
-              {items.map((item) => (
-                <div className={styles.docsCard}>
+              {items.map((item, index) => (
+                <div key={index} className={styles.docsCard}>
                   <img src={item.img}/>
                   <h3>{item.title}</h3>
                   <a href={item.link}>DOCS <i>*</i></a>
