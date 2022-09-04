@@ -1220,12 +1220,12 @@ Main.__super__ = lime.app.Application;
 Main.prototype = $extend(lime.app.Application.prototype,{
 	init: function(context) {
 		var _g = this;
-		var isIOSBrowser = new EReg("(iPad|iPhone|iPod)","g").match(window.navigator.userAgent);
+		/*var isIOSBrowser = new EReg("(iPad|iPhone|iPod)","g").match(window.navigator.userAgent);
 		if(isIOSBrowser) {
 			js.Lib.alert("iOS is not supported yet :(");
 			window.location.href = "mobile-app/index.html";
 			return;
-		}
+		}*/
 		switch(context[1]) {
 		case 0:
 			var gl = context[2];

@@ -5,6 +5,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { ReusableGrid } from "surfing";
+import Video from "components/Video";
 import styles from "./Roadmap.module.scss";
 
 const Roadmap = () => {
@@ -23,7 +24,7 @@ const Roadmap = () => {
     <div className={styles.container} id="roadmap">
       <ReusableGrid
         left={<h1>Roadmap</h1>}
-        right={<div style={{ fontSize: 160 }}>🦍</div>}
+        right={<Video src={window.location.origin + '/assets/videos/Fluidity_RoadMap.mp4'} type={'fit'} view={'desktop'} loop={true}/>}
       />
     </div>
   );

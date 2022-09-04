@@ -38,7 +38,7 @@ const Fluniversity = () => {
           <h2>FLUNIVERSITY</h2>
         </div>
       </ContinuousCarousel>
-      <div className={styles.container} id="fluniversity">
+<div className={styles.container} id="fluniversity">
         <ManualCarousel>
           {items.map((item) => (
             <div className={styles.fluniversityCard}>

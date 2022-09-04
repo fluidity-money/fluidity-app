@@ -39,6 +39,7 @@ const Docs = () => {
       </ContinuousCarousel>
       <div className={styles.container} id="documentation">
         <ManualCarousel>
+
           {items.map((item) => (
             <div className={styles.docsCard}>
               <div className={styles.imgContainer}>
@@ -51,6 +52,7 @@ const Docs = () => {
             </div>
           ))}
         </ManualCarousel>
+
       </div>
       <div className={styles.desktopViewFormInput}>
         <h4>Stay hydrated</h4>

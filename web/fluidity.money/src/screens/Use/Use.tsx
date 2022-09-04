@@ -5,8 +5,10 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
+import useViewport from "hooks/useViewport";
 import { ReusableGrid } from "surfing";
 import styles from "./Use.module.scss";
+import Video from "components/Video";
 
 const Use = () => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top
@@ -22,15 +24,34 @@ const Use = () => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     }
   }, [location]);
+
+  // to set order correct when in column layout
+  const { width } = useViewport();
+  const breakpoint = 860;
+
+  const left =
+  width < breakpoint ? (
+    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'mobile'} loop={true}/>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+     Fluid asset use-cases
+    </HowItWorksTemplate>
+  );
+
+const right =
+  width > breakpoint ? (
+    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'desktop'} loop={true}/>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+     Fluid asset use-cases
+    </HowItWorksTemplate>
+  );
+
   return (
     <div className={styles.container} id="useassets">
       <ReusableGrid
-        left={<div style={{ fontSize: 160 }}>🦍</div>}
-        right={
-          <HowItWorksTemplate header={header} info={info}>
-            Fluid asset use-cases
-          </HowItWorksTemplate>
-        }
+        left={left}
+        right={right}
       />
     </div>
   );

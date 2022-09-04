@@ -4,6 +4,7 @@
 
 import { GeneralButton, numberToMonetaryString } from "surfing";
 import { useChainContext } from "hooks/ChainContext";
+import Video from "components/Video";
 import styles from "./Demo.module.scss";
 
 const Demo = () => {
@@ -19,12 +20,9 @@ const Demo = () => {
   return (
     <>
       <div className={`${styles.container} bg-light`}>
-        <video autoPlay muted loop className={styles.demoVideo}>
-          <source
-            src={window.location.origin + "/assets/videos/sample.mp4"}
-            type="video/mp4"
-          />
-        </video>
+
+        <Video src={window.location.origin + '/assets/videos/Fluidity_OpportunityB.mp4'} type={'none'} view={'desktop'} loop={true}/>
+
         <div>
           <h1>{numberToMonetaryString(weekTotalRewards)}</h1>
           <h3>Fluid prizes claimed in the last week.</h3>
