@@ -6,14 +6,17 @@ import styles from "./Video.module.scss"
 
 interface IPropsVideo {
     src: string;
+    type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
+    view: "mobile" | "desktop";
+    loop: boolean;
 }
-  
-export const Video = ({src}: IPropsVideo) => {
+
+export const Video = ({src, type, view, loop}: IPropsVideo) => {
     let ext = src.split('.').pop();
     return (
-          <video  autoPlay muted loop className={styles.videoContainer}>
-           <source src={src} type={'video/' + ext}/>
-          </video>
+        <video  loop={loop} autoPlay muted  className={`${styles.videoContainer} ${styles[type]} ${styles[view]}`}>
+        <source src={src} type={'video/' + ext}/>
+        </video>
     );
 };
 

@@ -21,6 +21,7 @@
 .video {
   width: 444px;
   height: 444px;
+  position: relative;
   // min-width: 225px;
   // min-height: 225px;
   border: solid 1px pink;
@@ -71,11 +72,14 @@
 
 .content {
   width: 100%;
+  margin-top: -940px;
   display: flex;
+  position: relative;
   flex-direction: column;
   opacity: 1;
   align-items: center;
-  min-height: 560px;
+  min-height: 650px;
+  padding-bottom: 45px;
   justify-content: space-between;
   @include max-900px {
     min-height: 425px;

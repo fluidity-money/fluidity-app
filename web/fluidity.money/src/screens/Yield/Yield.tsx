@@ -8,6 +8,7 @@ import { ReusableGrid } from "surfing";
 import useViewport from "hooks/useViewport";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Yield.module.scss";
+import Video from "components/Video";
 
 const Yield = () => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top
@@ -30,7 +31,7 @@ const Yield = () => {
 
   const left =
     width < breakpoint ? (
-      <div style={{ fontSize: 160 }}>🦍</div>
+      <Video src={window.location.origin + '/assets/videos/Fluidity_Yield.mp4'} type={'fit'} view={'mobile'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         "Yield through utility"
@@ -39,7 +40,7 @@ const Yield = () => {
 
   const right =
     width > breakpoint ? (
-      <div style={{ fontSize: 160 }}>🦍</div>
+      <Video src={window.location.origin + '/assets/videos/Fluidity_Yield.mp4'} type={'fit'} view={'desktop'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         "Yield through utility"

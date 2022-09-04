@@ -25,7 +25,6 @@ const LandingPage = () => {
         <SponsorsPartners />
         {/* Ecosystem which scrolls to projects as a component, not ready for production yet */}
         {/* <Ecosystem /> */}
-        <Resources />
         {/* Remove articles but style resources the same, reuse? */}
         <Articles />
         <Demo />
