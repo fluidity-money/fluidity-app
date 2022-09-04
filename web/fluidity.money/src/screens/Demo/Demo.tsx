@@ -21,7 +21,7 @@ const Demo = () => {
     <>
       <div className={`${styles.container} bg-light`}>
 
-        <Video src={window.location.origin + '/assets/videos/Fluidity_OpportunityB.mp4'} type={'none'} view={'desktop'} loop={true}/>
+        <Video src={window.location.origin + '/assets/videos/Fluidity_OpportunityB.mp4'} type={'none'} view={'normal'} loop={true}/>
 
         <div>
           <h1>{numberToMonetaryString(weekTotalRewards)}</h1>

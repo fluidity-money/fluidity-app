@@ -31,7 +31,7 @@ const Wrap = () => {
 
   const left =
     width < breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'desktop'} loop={true}/>
+      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'normal'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens
@@ -40,7 +40,7 @@ const Wrap = () => {
 
   const right =
     width > breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'desktop'} loop={true}/>
+      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'normal'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens

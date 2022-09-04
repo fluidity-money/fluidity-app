@@ -40,8 +40,8 @@ const Fluniversity = () => {
       </ContinuousCarousel>
 <div className={styles.container} id="fluniversity">
         <ManualCarousel>
-          {items.map((item) => (
-            <div className={styles.fluniversityCard}>
+          {items.map((item, index) => (
+            <div key={index} className={styles.fluniversityCard}>
               <div className={styles.imgContainer}>
                 <img src={item.img} />
               </div>

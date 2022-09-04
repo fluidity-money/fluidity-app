@@ -27,7 +27,8 @@
   border: solid 1px pink;
   border-radius: 50%;
   background-color: gray;
-  opacity: 0.8;
+  opacity: 0;
+  visibility: hidden;
   @include max-1080px {
     width: 350px;
     height: 350px;
@@ -72,7 +73,7 @@
 
 .content {
   width: 100%;
-  margin-top: -940px;
+  margin-top: -975px;
   display: flex;
   position: relative;
   flex-direction: column;

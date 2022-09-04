@@ -29,18 +29,18 @@ const Use = () => {
   const { width } = useViewport();
   const breakpoint = 860;
 
-  const left =
+  const right =
   width < breakpoint ? (
-    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'mobile'} loop={true}/>
+    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'scale-up'} loop={true}/>
   ) : (
     <HowItWorksTemplate header={header} info={info}>
      Fluid asset use-cases
     </HowItWorksTemplate>
   );
 
-const right =
+const left =
   width > breakpoint ? (
-    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'desktop'} loop={true}/>
+    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'normal'} loop={true}/>
   ) : (
     <HowItWorksTemplate header={header} info={info}>
      Fluid asset use-cases

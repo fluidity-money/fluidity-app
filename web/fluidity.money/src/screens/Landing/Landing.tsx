@@ -49,10 +49,10 @@ const Landing = () => {
   return (
     <div className={`${styles.containerLanding}`}>
       {width > breakpoint && (
-          <Video src={window.location.origin + '/assets/videos/Fluidity_Home.mp4'} type={'reduce'} view={'desktop'} loop={false}/>
+          <Video src={window.location.origin + '/assets/videos/Fluidity_Home.mp4'} type={'reduce'} view={'normal'} loop={false}/>
       )} 
       {width < breakpoint && (
-          <Video src={window.location.origin + '/assets/videos/Fluidity_Home.mp4'} type={'fit'} view={'mobile'} loop={false}/>
+          <Video src={window.location.origin + '/assets/videos/Fluidity_Homeloop.mp4'} type={'fit'} view={'normal'} loop={false}/>
       )} 
       <motion.div className={styles.content}>
         {width < breakpoint ? (
@@ -75,6 +75,21 @@ const Landing = () => {
           </motion.h1>
         )}
         <div className={styles.tiles}>
+          {width < breakpoint && (
+            <motion.div
+              className={styles.video}
+              initial={{ y: -150, scale: 1 }}
+              animate={{
+                opacity: 1,
+                y: [-150, -150, -150, 0],
+                scale: [1, 1, 1, 0.8],
+              }}
+              transition={{ duration: 6, type: "tween" }}
+            >
+             
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}

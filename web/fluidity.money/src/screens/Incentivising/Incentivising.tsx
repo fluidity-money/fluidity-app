@@ -8,7 +8,7 @@ import styles from "./Incentivising.module.scss";
 const Incentivising = () => {
   return (
     <div className={styles.container}>
-      <Video src={window.location.origin + '/assets/videos/Fluidity_HowItWorks.mp4'} type={'reduce'} view={'desktop'} loop={true}/>
+      <Video src={window.location.origin + '/assets/videos/Fluidity_HowItWorks.mp4'} type={'reduce'} view={'normal'} loop={true}/>
       <div>
         <h2>INCENTIVISING BLOCKCHAIN</h2>
         <h2>UTILITY</h2>

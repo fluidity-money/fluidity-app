@@ -24,7 +24,7 @@ const Roadmap = () => {
     <div className={styles.container} id="roadmap">
       <ReusableGrid
         left={<h1>Roadmap</h1>}
-        right={<Video src={window.location.origin + '/assets/videos/Fluidity_RoadMap.mp4'} type={'fit'} view={'desktop'} loop={true}/>}
+        right={<Video src={window.location.origin + '/assets/videos/Fluidity_RoadMap.mp4'} type={'fit'} view={'normal'} loop={true}/>}
       />
     </div>
   );

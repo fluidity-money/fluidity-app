@@ -7,7 +7,7 @@ import styles from "./Video.module.scss"
 interface IPropsVideo {
     src: string;
     type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
-    view: "mobile" | "desktop";
+    view: "scale-up" | "normal";
     loop: boolean;
 }
 

@@ -40,8 +40,8 @@ const Docs = () => {
       <div className={styles.container} id="documentation">
         <ManualCarousel>
 
-          {items.map((item) => (
-            <div className={styles.docsCard}>
+          {items.map((item, index) => (
+            <div key={index} className={styles.docsCard}>
               <div className={styles.imgContainer}>
                 <img src={item.img} />
               </div>
