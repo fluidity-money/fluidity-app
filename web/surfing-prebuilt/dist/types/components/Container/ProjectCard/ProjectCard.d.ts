@@ -1,4 +1,3 @@
-/// <reference types="react" />
 interface IProjectCard {
     project: string;
     size: "lg" | "md" | "sm" | "xs";

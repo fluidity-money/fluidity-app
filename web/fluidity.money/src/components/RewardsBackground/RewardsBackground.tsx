@@ -32,7 +32,14 @@ const RewardsBackground = () => {
     <div>
       {rewards.slice(100).map(({ token, amount, address, date }, i) => (
         <div key={`winner-${i}`} className={styles.winner}>
-          <p>{token} </p>
+          <img
+            src={
+              token === "USDT"
+                ? "/assets/images/tokenIcons/usdt.svg"
+                : "/assets/images/tokenIcons/usdc.svg"
+            }
+            alt="tokenIcon"
+          />
           <p>{numberToMonetaryString(amount)} </p>
           <p>{trimAddress(address)} </p>
           <p>{formatTo12HrDate(date)}</p>
