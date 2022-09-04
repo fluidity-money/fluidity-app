@@ -1,9 +1,9 @@
-name: Staging Mainnet (Auto)
+name: Mainnet (Auto)
 
 on:
   pull_request:
     branches:
-      - develop
+      - production
     types:
       - closed
 
@@ -12,13 +12,13 @@ permissions:
   contents: read
 
 env:
-  ENVIRONMENT: staging
+  ENVIRONMENT: mainnet
 
 jobs:
  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    environment: staging
+    environment: mainnet
     steps:
       - uses: actions/checkout@v3
         with:
