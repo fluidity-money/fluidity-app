@@ -38,66 +38,63 @@ const Fluniversity = () => {
           <h2>FLUNIVERSITY</h2>
         </div>
       </ContinuousCarousel>
-        <div className={styles.container} id="fluniversity">
-          <ManualCarousel>
-            {items.map((item, index) => (
-              <div key={index} className={styles.fluniversityCard}>
-                <img src={item.img}/>
-                <h3>{item.title}</h3>
-                <p>
-                  {item.desc}
-                </p>
-                <span>{item.time} mins read</span>
-                <span><a href={item.link}>FLUNIVERSITY <i>*</i></a></span>
+<div className={styles.container} id="fluniversity">
+        <ManualCarousel>
+          {items.map((item) => (
+            <div className={styles.fluniversityCard}>
+              <div className={styles.imgContainer}>
+                <img src={item.img} />
               </div>
-            ))}
-          </ManualCarousel>
-        </div>
-     </>
+
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
+              <span>{item.time} mins read</span>
+              <span>
+                <a href={item.link}>
+                  FLUNIVERSITY <i>*</i>
+                </a>
+              </span>
+            </div>
+          ))}
+        </ManualCarousel>
+      </div>
+    </>
   );
 };
 
 export default Fluniversity;
 
 const items = [
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
-    yield through spending and how the protocol protects itself against cheaters...`,
-    time: "8",
-    link: "",
+  {
+    img: "https://miro.medium.com/max/700/1*HJbEUecOrcNxPDBK4vHZSQ.jpeg",
+    title: "Governance and Fluidity Wars: Steering the Invisible Hand",
+    desc: `In our previous educational posts, we have outlined the basic economics of a Fluid Asset, from preventing cyclical transaction attacks to how the...`,
+    time: "9 min",
+    link: "https://blog.fluidity.money/governance-and-fluidity-wars-steering-the-invisible-hand-e5a71afb2757",
   },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
+  {
+    img: "https://miro.medium.com/max/700/1*gRGFqHLNDPUvkHi0kZYqag.jpeg",
+    title:
+      "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
     desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
     yield through spending and how the protocol protects itself against cheaters...`,
-    time: "8",
-    link: "",
+    time: "5 min",
+    link: "https://blog.fluidity.money/fluidity-university-part-3-utility-mining-a-fairer-token-distribution-strategy-4008323aa1bb",
   },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
-    yield through spending and how the protocol protects itself against cheaters...`,
-    time: "8",
-    link: "",
+  {
+    img: "https://miro.medium.com/max/700/1*CJHj6OywDEjA2jSXoMVXTQ.png",
+    title:
+      "Fluidity University Part 2: Distributing yield through the Transfer Reward Function",
+    desc: `In the first part of Fluidity University, we’ve seen how the protocol protects itself against fraudulent transactions by piggy backing off transaction fees...`,
+    time: "4 min",
+    link: "https://blog.fluidity.money/fluidity-university-part-2-distributing-yield-through-the-transfer-reward-function-b34941ec8f7e",
   },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
-    yield through spending and how the protocol protects itself against cheaters...`,
-    time: "8",
-    link: "",
-  },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    desc: `In the first two parts of fluidity University, we've introduced the basics of how to distribute
-    yield through spending and how the protocol protects itself against cheaters...`,
-    time: "8",
-    link: "",
+  {
+    img: "https://miro.medium.com/max/2400/0*vxcr4Z8urUbzFuuF",
+    title:
+      "Fluidity University Part 1: How does Fluidity protect itself against fraudulent transactions?",
+    desc: `In the first part of our Fluidity University series, we’re diving into one of the most important aspects of Fluidity’s economics design: the Optimistic...`,
+    time: "3 min",
+    link: "https://blog.fluidity.money/fluidity-university-part-1-how-does-fluidity-protect-itself-against-frudulent-transactions-8dc39b4f5672",
   },
 ];

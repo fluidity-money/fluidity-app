@@ -48,9 +48,9 @@ const RewardsInfoBox = ({
             : totalTransactionValue.toLocaleString("en-US")}
         </h1>
         <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
-        <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
+        {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
           FLUID STATS
-        </LinkButton>
+        </LinkButton> */}
       </div>
     </div>
   );

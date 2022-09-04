@@ -22,15 +22,23 @@
 }
 
 .docsCard {
-  border: 1px solid white;
+  // border: 1px solid white;
   height: 350px;
   min-width: 350px;
   margin-right: 20px;
   margin-bottom: 50px;
+  background-color: $backgroundBlack;
+  padding: 20px;
 
-  img {
-    height: 60%;
+  .imgContainer {
     width: 100%;
+
+    display: flex;
+    justify-content: center;
+    img {
+      max-width: 100%;
+      display: block;
+    }
   }
 
   h3 {
@@ -40,12 +48,12 @@
 
   p {
     padding: 10px;
-    font-family: 'Aeonik';
-    font-size:20px;
+    font-family: "Aeonik";
+    font-size: 20px;
     color: $textGrey;
   }
 
-  a{
+  a {
     color: $textGrey;
     padding: 10px;
     font-size: 11px;
@@ -86,7 +94,7 @@
       background-color: $fluidBlack;
       font-size: 20px;
       color: $textGrey;
-      margin:  0 1% 10px 0;
+      margin: 0 1% 10px 0;
     }
   }
   @include max-860px {
@@ -101,7 +109,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
- 
+
   background-color: $fluidBlack;
   div {
     padding: 30px 10px 10px 10px;
@@ -119,7 +127,7 @@
         flex-direction: column;
         width: 95%;
         label {
-          margin: 20px 0  10px 5px;
+          margin: 20px 0 10px 5px;
         }
         input {
           width: 100%;
@@ -131,10 +139,10 @@
           border-left: 0px;
           border-radius: 4px;
           box-sizing: border-box;
-          background-color:  rgb(17, 17, 17);
+          background-color: rgb(17, 17, 17);
           font-size: 20px;
           color: $textGrey;
-          margin:  0 1% 10px 0;
+          margin: 0 1% 10px 0;
         }
       }
     }

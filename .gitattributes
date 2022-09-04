@@ -54,6 +54,8 @@ web/fluidity.money/public/assets/images/dot-graph.svg filter=lfs diff=lfs merge=
 **/*.png filter=lfs diff=lfs merge=lfs -text
 **/*.jpg filter=lfs diff=lfs merge=lfs -text
 **/*.mov filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/tokenIcons/usdt.svg filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/tokenIcons/usdc.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/videos/Fluidity_Ecosystem.mp4 filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/videos/Fluidity_FluidWars.mp4 filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/videos/Fluidity_Home.mp4 filter=lfs diff=lfs merge=lfs -text

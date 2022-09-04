@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ContinuousCarousel, ManualCarousel, GeneralButton }from "surfing";
+import { ContinuousCarousel, ManualCarousel, GeneralButton } from "surfing";
 import styles from "./Docs.module.scss";
 
 const Docs = () => {
@@ -39,25 +39,35 @@ const Docs = () => {
       </ContinuousCarousel>
       <div className={styles.container} id="documentation">
         <ManualCarousel>
-              {items.map((item, index) => (
-                <div key={index} className={styles.docsCard}>
-                  <img src={item.img}/>
-                  <h3>{item.title}</h3>
-                  <a href={item.link}>DOCS <i>*</i></a>
-                </div>
-              ))}
-        </ManualCarousel>    
+
+          {items.map((item) => (
+            <div className={styles.docsCard}>
+              <div className={styles.imgContainer}>
+                <img src={item.img} />
+              </div>
+              <h3>{item.title}</h3>
+              <a href={item.link}>
+                DOCS <i>*</i>
+              </a>
+            </div>
+          ))}
+        </ManualCarousel>
+
       </div>
       <div className={styles.desktopViewFormInput}>
         <h4>Stay hydrated</h4>
-        <label>
-            EMAIL
-        </label>
-        <div> 
-          <input type="text" placeholder="elon@email.com"/>
-          <GeneralButton version={"secondary"} type={"text"} size={"medium"} handleClick={function (): void {
-            throw new Error("Function not implemented.");
-          } }>GIMME THE JUICE
+        <label>EMAIL</label>
+        <div>
+          <input type="text" placeholder="elon@email.com" />
+          <GeneralButton
+            version={"secondary"}
+            type={"text"}
+            size={"medium"}
+            handleClick={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          >
+            GIMME THE JUICE
           </GeneralButton>
         </div>
       </div>
@@ -65,25 +75,27 @@ const Docs = () => {
         <div>
           <h2>Stay hydrated</h2>
           <p>
-            Subscribe to our monthly newsletter to stay up to date with our progress and roadmap.
+            Subscribe to our monthly newsletter to stay up to date with our
+            progress and roadmap.
           </p>
           <form>
             <div>
-              <label>
-                Name
-              </label>
-              <input type="text" placeholder="Elon"/>
-              <label>
-                Email
-              </label>
-              <input type="text" placeholder="elon@email.com"/>
+              <label>Name</label>
+              <input type="text" placeholder="Elon" />
+              <label>Email</label>
+              <input type="text" placeholder="elon@email.com" />
             </div>
-            <GeneralButton version={"primary"} type={"text"} size={"medium"} handleClick={function (): void {
-            throw new Error("Function not implemented.");
-          } }>GIMME THE JUICE
-          </GeneralButton>
+            <GeneralButton
+              version={"primary"}
+              type={"text"}
+              size={"medium"}
+              handleClick={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+            >
+              GIMME THE JUICE
+            </GeneralButton>
           </form>
-
         </div>
       </div>
     </>
@@ -93,28 +105,29 @@ const Docs = () => {
 export default Docs;
 
 const items = [
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    link: "",
+  {
+    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    title: "Why Fluidity?",
+    link: "https://docs.fluidity.money/docs/learning-and-getting-started/why-fluidity",
   },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    link: "",
+  {
+    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    title: "What are Fluid Assets?",
+    link: "https://docs.fluidity.money/docs/learning-and-getting-started/what-are-fluid-assets",
   },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    link: "",
+  {
+    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    title: "How do you get a Fluid Asset?",
+    link: "https://docs.fluidity.money/docs/learning-and-getting-started/how-do-you-get-a-fluid-asset",
   },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    title: "Fluidity University Part 3: Utility Mining: A fairer token distribution strategy",
-    link: "",
+  {
+    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    title: "How are the rewards earned?",
+    link: "https://docs.fluidity.money/docs/learning-and-getting-started/how-are-the-rewards-earned",
   },
-  { 
-    img: "https://picsum.photos/200/300/?blur",
-    link: "",
+  {
+    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    title: "The Economics of a Fluid Asset",
+    link: "https://docs.fluidity.money/docs/learning-and-getting-started/the-economics-of-a-fluid-asset",
   },
 ];
