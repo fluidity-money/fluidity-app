@@ -1,1 +1,0 @@
-export { SupportedChains } from './chains';
