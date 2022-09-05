@@ -1,0 +1,86 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import DropDownButton from "./ChainSelectorButton";
+import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
+
+<Meta 
+    title="Button/DropDown Button"
+    component={DropDownButton}
+    parameters={{
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+        }
+    }}
+/>
+
+export const Template = (props) => <DropDownButton {...props} />
+
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>DropDown Button</Title>
+    <Subtitle>Button to switch Chains</Subtitle>
+    
+    <h2>Default</h2>
+    <Story
+        name="DropDown Button Default"
+        args={{
+            option: {
+                name: "OPT",
+                icon: <ReactSvg />
+            },
+            options: [],
+            setOptions: () => {},
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Hover</h2>
+    <Story
+        name="DropDown Button Hover"
+        args={{
+            className: "hover",
+            option: {
+                name: "OPT",
+                icon: <ReactSvg />
+            },
+            options: [],
+            setOptions: () => {},
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Focus</h2>
+    <Story
+        name="DropDown Button Focus"
+        args={{
+            className: "focus",
+            option: {
+                name: "OPT",
+                icon: <ReactSvg />
+            },
+            options: [],
+            setOptions: () => {},
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Disabled</h2>
+    <Story
+        name="DropDown Button Disabled"
+        args={{
+            disabled: true,
+            option: {
+                name: "OPT",
+                icon: <ReactSvg />
+            },
+            options: [],
+            setOptions: () => {},
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

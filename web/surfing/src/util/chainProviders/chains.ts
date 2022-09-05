@@ -1,7 +1,20 @@
-export enum SupportedChains {
-  ETH = "ethereum",
-  SOL = "solana",
+export const SupportedChains = {
+  ETH: {
+    name: "ethereum",
+    short: "ETH",
+  },
+  SOL: {
+    name: "solana",
+    short: "SOL",
+  },
   // Unused
-  CMPD = "compound",
-  POL = "polygon",
+  // CMPD = {
+  //   name: "compound",
+  //   short: "CMPD"
+  // },
+  // POL = {
+  //   name: "polygon",
+  //   short: "POL"
+  // },
 }
+

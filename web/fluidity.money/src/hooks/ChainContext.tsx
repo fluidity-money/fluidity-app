@@ -13,9 +13,15 @@ import { useWinningTransactions } from "../data/winners";
 import { useLivePrizePool } from "../data/prizePool";
 import { useCountTransactions } from "../data/userActions";
 
+const ChainContext = createContext<ChainState>(null!);
+
+export const SupportedChainsList = Object.keys(SupportedChains);
+
+export type Chain = "ETH" | "SOL";
+
 interface ChainState {
-  chain: SupportedChains,
-  setChain: Dispatch<SetStateAction<SupportedChains>>,
+  chain: Chain,
+  setChain: Dispatch<SetStateAction<Chain>>,
   apiState: ApiState,
 }
 
@@ -25,10 +31,8 @@ interface ApiState {
   txCount: number,
 }
 
-const ChainContext = createContext<ChainState>(null!);
-
 export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]}) => {
-  const [chain, setChain] = useState<SupportedChains>(SupportedChains.ETH);
+  const [chain, setChain] = useState<Chain>("ETH");
 
   const [weekWinnings, setWeekWinnings] = useState<Winner[]>([]);
   const [rewardPool, setRewardPool] = useState(0);
@@ -45,7 +49,7 @@ export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.El
 
   useWinningTransactions(
     (winner: WinnersRes) => setWeekWinnings(winner.winners),
-    chain,
+    SupportedChains[chain].name,
     formatToGraphQLDate(prevWeekDate),
   )
 
@@ -60,7 +64,7 @@ export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.El
     (txCount: TransactionCount) => setTxCount(
       txCount.user_actions_aggregate.aggregate.count
     ),
-    chain,
+    SupportedChains[chain].name,
   );
   
   return (

@@ -5,7 +5,6 @@
 import type { ButtonHTMLAttributes } from "react";
 
 import styles from "./GeneralButton.module.scss";
-import { useState } from "react";
 
 export interface IGeneralButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: string;
@@ -26,7 +25,6 @@ const GeneralButton = ({
   ...props
 }: IGeneralButtonProps) => {
   const classProps = className || "";
-  const blah = useState(1);
 
   return (
     <>
