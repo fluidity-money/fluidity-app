@@ -53,7 +53,7 @@ const ResourcesPage = () => {
               transition={{ transform: { duration: 1 } }}
             >
               <Articles />
-              <Tweets />
+              {/* <Tweets /> */}
               <Fluniversity />
               <Whitepapers />
               <Docs />

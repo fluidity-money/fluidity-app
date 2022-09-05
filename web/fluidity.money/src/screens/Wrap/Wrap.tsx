@@ -8,6 +8,7 @@ import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "surfing";
 import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";
+import Video from "components/Video";
 
 const Wrap = () => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top
@@ -30,7 +31,7 @@ const Wrap = () => {
 
   const left =
     width < breakpoint ? (
-      <div style={{ fontSize: 160 }}>🦍</div>
+      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'normal'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens
@@ -39,7 +40,7 @@ const Wrap = () => {
 
   const right =
     width > breakpoint ? (
-      <div style={{ fontSize: 160 }}>🦍</div>
+      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'normal'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens

@@ -8,6 +8,7 @@ import IntroTile from "components/IntroTile";
 import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
+import Video from "components/Video";
 
 const Landing = () => {
   /* 
@@ -47,12 +48,18 @@ const Landing = () => {
 
   return (
     <div className={`${styles.containerLanding}`}>
+      {width > breakpoint && (
+          <Video src={window.location.origin + '/assets/videos/Fluidity_Home.mp4'} type={'reduce'} view={'normal'} loop={false}/>
+      )} 
+      {width < breakpoint && (
+          <Video src={window.location.origin + '/assets/videos/Fluidity_Homeloop.mp4'} type={'fit'} view={'normal'} loop={false}/>
+      )} 
       <motion.div className={styles.content}>
         {width < breakpoint ? (
           <motion.h1
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 4, type: "tween" }}
+            transition={{ duration: 6, type: "tween" }}
           >
             Fluidity is the <br /> blockchain incentive <br /> layer, rewarding{" "}
             <br /> people for using <br /> their crypto.
@@ -61,7 +68,7 @@ const Landing = () => {
           <motion.h1
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 4, type: "tween" }}
+            transition={{ duration: 6, type: "tween" }}
           >
             Fluidity is the blockchain incentive layer, <br />
             rewarding people for using their crypto.
@@ -77,14 +84,16 @@ const Landing = () => {
                 y: [-150, -150, -150, 0],
                 scale: [1, 1, 1, 0.8],
               }}
-              transition={{ duration: 4, type: "tween" }}
-            ></motion.div>
+              transition={{ duration: 6, type: "tween" }}
+            >
+             
+            </motion.div>
           )}
 
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 4, type: "tween" }}
+            transition={{ duration: 6, type: "tween" }}
             className={styles.left}
           >
             <IntroTile
@@ -109,23 +118,12 @@ const Landing = () => {
               qualifies as a reward
             </IntroTile>
           </motion.div>
-          {width > breakpoint && (
-            <motion.div
-              className={styles.video}
-              initial={{ y: -150, scale: 1 }}
-              animate={{
-                opacity: 1,
-                y: [-150, -150, -150, 0],
-                scale: [1, 1, 1, 0.8],
-              }}
-              transition={{ duration: 4, type: "tween" }}
-            ></motion.div>
-          )}
+         
 
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 4, type: "tween" }}
+            transition={{ duration: 6, type: "tween" }}
             className={width < breakpoint ? styles.left : styles.right}
           >
             <IntroTile
@@ -156,7 +154,7 @@ const Landing = () => {
         className={styles.carousel}
         initial={{ opacity: 0, y: "100vh" }}
         animate={{ opacity: [1, 1, 1, 0], y: [0, 0, 0, 100] }}
-        transition={{ duration: 4, type: "tween" }}
+        transition={{ duration: 6, type: "tween" }}
       >
         <ContinuousCarousel direction={"right"}>
           <div>

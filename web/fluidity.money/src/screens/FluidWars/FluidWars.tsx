@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "surfing";
+import Video from "components/Video";
 import styles from "./FluidWars.module.scss";
 
 const FluidWars = () => {
@@ -25,7 +26,7 @@ const FluidWars = () => {
   return (
     <div className={styles.container} id="fluiditywars">
       <ReusableGrid
-        left={<div style={{ fontSize: 160 }}>🦍</div>}
+        left={<Video src={window.location.origin + '/assets/videos/Fluidity_FluidWars.mp4'} type={'fit'} view={'normal'} loop={true}/>}
         right={
           <HowItWorksTemplate header={header} info={info}>
             Fluidity wars

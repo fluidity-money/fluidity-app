@@ -15,14 +15,19 @@
     align-items: center;
     width: 90%;
     min-height: 500px;
-    border: 1px solid $fluidWhite;
+    // border: 1px solid $fluidWhite;
     text-align: center;
+    background-color: $backgroundBlack;
+    padding: 20px;
+    &:hover {
+      opacity: 0.8;
+    }
 
     img {
       margin-bottom: 25px;
     }
 
-    P{
+    P {
       font-size: 10px;
       margin-top: 10px;
     }

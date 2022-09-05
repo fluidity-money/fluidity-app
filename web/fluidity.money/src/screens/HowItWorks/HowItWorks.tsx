@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import Video from "components/Video";
 import { useEffect, useState } from "react";
 import { ContinuousCarousel, LinkButton } from "surfing";
 import styles from "./HowItWorks.module.scss";
@@ -53,7 +54,7 @@ const HowItWorks = () => {
       </ContinuousCarousel>
       <div className={styles.grid}>
         <div className={styles.left}>
-          <p className={currentImage === "🦍" ? styles.bold : styles.normal}>
+          <p className={currentImage === "/assets/videos/Fluidity_Wrap.mp4" ? styles.bold : styles.normal}>
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </p>
@@ -73,7 +74,7 @@ const HowItWorks = () => {
           </LinkButton>
         </div>
         <div className={styles.right}>
-          <div>{currentImage}</div>
+          <div><Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'normal'} loop={true}/></div>
         </div>
       </div>
 
