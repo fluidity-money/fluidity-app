@@ -15,8 +15,14 @@ const HowItWorks = () => {
   paragraph highlighted has different specific image,
   scrolls thought automatically and constantly
    */
-  const images = ["🦍", "🦍 🦍", "🦍 🦍 🦍"];
-  const [currentImage, setCurrentImage] = useState("Image 1");
+  const images = [
+    "/assets/videos/Fluidity_Wrap.mp4",
+    "'/assets/videos/Fluidity_Yield.mp4'",
+    "/assets/videos/Fluidity_HowItWorks.mp4",
+  ];
+  const [currentImage, setCurrentImage] = useState(
+    "/assets/videos/Fluidity_Wrap.mp4"
+  );
 
   useEffect(() => {
     let counter = 0;
@@ -54,17 +60,31 @@ const HowItWorks = () => {
       </ContinuousCarousel>
       <div className={styles.grid}>
         <div className={styles.left}>
-          <p className={currentImage === "/assets/videos/Fluidity_Wrap.mp4" ? styles.bold : styles.normal}>
+          <p
+            className={
+              currentImage === "/assets/videos/Fluidity_Wrap.mp4"
+                ? styles.bold
+                : styles.normal
+            }
+          >
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </p>
-          <p className={currentImage === "🦍 🦍" ? styles.bold : styles.normal}>
+          <p
+            className={
+              currentImage === "'/assets/videos/Fluidity_Yield.mp4'"
+                ? styles.bold
+                : styles.normal
+            }
+          >
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
           </p>
           <p
             className={
-              currentImage === "🦍 🦍 🦍" ? styles.bold : styles.normal
+              currentImage === "/assets/videos/Fluidity_HowItWorks.mp4"
+                ? styles.bold
+                : styles.normal
             }
           >
             The user is incentivised through governance.
@@ -74,7 +94,14 @@ const HowItWorks = () => {
           </LinkButton>
         </div>
         <div className={styles.right}>
-          <div><Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} view={'normal'} loop={true}/></div>
+          <div>
+            <Video
+              src={window.location.origin + currentImage}
+              type={"fit"}
+              view={"normal"}
+              loop={true}
+            />
+          </div>
         </div>
       </div>
 
