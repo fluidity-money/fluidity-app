@@ -8,20 +8,16 @@ import type { PrizePool } from "../data/prizePool";
 import type { TransactionCount } from "../data/userActions";
 
 import { createContext, useContext, useState  } from "react";
-import { SupportedChains, formatToGraphQLDate } from "surfing";
+import { SupportedChains, SupportedChainsList, formatToGraphQLDate } from "surfing";
 import { useWinningTransactions } from "../data/winners";
 import { useLivePrizePool } from "../data/prizePool";
 import { useCountTransactions } from "../data/userActions";
 
 const ChainContext = createContext<ChainState>(null!);
 
-export const SupportedChainsList = Object.keys(SupportedChains);
-
-export type Chain = "ETH" | "SOL";
-
 interface ChainState {
-  chain: Chain,
-  setChain: Dispatch<SetStateAction<Chain>>,
+  chain: SupportedChainsList,
+  setChain: Dispatch<SetStateAction<SupportedChainsList>>,
   apiState: ApiState,
 }
 
@@ -32,7 +28,7 @@ interface ApiState {
 }
 
 export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]}) => {
-  const [chain, setChain] = useState<Chain>("ETH");
+  const [chain, setChain] = useState<SupportedChainsList>("ETH");
 
   const [weekWinnings, setWeekWinnings] = useState<Winner[]>([]);
   const [rewardPool, setRewardPool] = useState(0);

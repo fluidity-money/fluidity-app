@@ -1,13 +1,14 @@
 import type { ReactComponentElement } from "react";
+import type { SupportedChainsList } from "~/util/chainProviders/chains";
 
 import { useRef } from "react";
 import { useClickOutside } from "../Modal";
 import { ReactComponent as Checkmark } from "~/assets/images/buttonIcons/Checkmark.svg";
-import { Card, Heading, Row, Text } from "~/components";
+import { Card, Heading, Text } from "~/components";
+import { SupportedChains } from "~/util";
 import styles from "./BlockchainModal.module.scss";
 
 interface IOption {
-  key: string;
   name: string;
   icon: ReactComponentElement<any>;
 }
@@ -28,39 +29,6 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption }: 
     
   const isSelected = (option: IOption) => option.name == selected.name;
   
-  const SelectedCard = ({option, ...props}: any) => (
-    <Card
-      component="button"
-      className={`${styles.card}`}
-      type={"holobox"}
-      rounded={true}
-      {...props}
-    >
-      {option.icon}
-      <Text size={"xl"} prominent={true}>
-        <strong>
-          {option.name}
-        </strong>
-      </Text>
-      <Checkmark style={{marginLeft: "auto", marginRight: "24px"}}/>
-    </Card>
-  );
-
-  const UnselectedCard = ({option, ...props}: any) => (
-    <Card
-      component="button"
-      className={styles.card}
-      type={"box"}
-      rounded={true}
-      {...props}
-    >
-      {option.icon}
-      <Text size={"xl"}>
-        {option.name}
-      </Text>
-    </Card>
-  );
-  
   const blockchainModal = useRef(null);
   
   useClickOutside(blockchainModal, () => handleModal(false));
@@ -76,8 +44,36 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption }: 
         <button onClick={() => handleModal(false)}>X</button>
       </div>
       {options.map((option, i) => isSelected(option) 
-        ? <SelectedCard key={`${option.name}-opt`} option={option} />
-        : <UnselectedCard key={`${option.name}-opt`} option={option} onClick={() => handleOnClick(i)} />
+        ? (
+            <Card
+              component="button"
+              className={`${styles.card}`}
+              type={"holobox"}
+              rounded={true}
+            >
+              {option.icon}
+              <Text size={"xl"} prominent={true}>
+                <strong>
+                  {SupportedChains[option.name].name}
+                </strong>
+              </Text>
+              <Checkmark style={{marginLeft: "auto", marginRight: "24px"}}/>
+            </Card>
+        )
+        : (
+          <Card
+            component="button"
+            className={styles.card}
+            type={"box"}
+            rounded={true}
+            onClick={() => handleOnClick(i)}
+          >
+            {option.icon}
+            <Text size={"xl"}>
+              {SupportedChains[option.name].name}
+            </Text>
+          </Card>
+        )
       )}
     </div>
   );

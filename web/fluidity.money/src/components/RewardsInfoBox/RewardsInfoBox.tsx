@@ -2,11 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import type { Chain } from "hooks/ChainContext"
-
 import { useState } from "react";
 import { BlockchainModal, ChainSelectorButton, numberToMonetaryString, SupportedChains } from "surfing";
-import { useChainContext, SupportedChainsList } from "hooks/ChainContext";
+import { useChainContext } from "hooks/ChainContext";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
@@ -32,9 +30,9 @@ const RewardsInfoBox = ({
   
   const [showModal, setShowModal] = useState(false);
 
-  const options = SupportedChainsList.map(chain => ({
-    name: SupportedChains[chain as Chain].short,
-    icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />
+  const options = Object.keys(SupportedChains).map((chain) => ({
+    name: chain,
+    icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
 
   return (
@@ -55,12 +53,11 @@ const RewardsInfoBox = ({
         }
       >
         <ChainSelectorButton 
-          option={{
+          chain={{
             name: chain,
-            icon: <img src={imgLink(chain)} alt="hello" />,
+            icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
           }}
-          setOptions={setShowModal}
-          options={options}
+          onClick={() => setShowModal(true)}
         />
         <h1 onClick={switchAndAnimate}>
           {type === "black"
@@ -71,8 +68,8 @@ const RewardsInfoBox = ({
         {showModal && <BlockchainModal 
           handleModal={setShowModal}
           option={{
-            name: SupportedChains[chain as Chain].short,
-            icon: <img src={imgLink(chain)} alt="hello" />,
+            name: chain,
+            icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
           }}
           options={options}
           setOption={setChain}

@@ -4,6 +4,8 @@
 
 // export { default as Web3Provider, useWallet } from "./hooks/useWeb3State";
 // export { fluRelayEnvironment, useWinningTransactions } from './api';
+export type { SupportedChainsList } from './chainProviders';
+
 export { SupportedChains } from './chainProviders';
 export { numberToMonetaryString, numberToCommaSeparated, trimAddress, formatTo12HrDate, formatToGraphQLDate } from './formatters';
 

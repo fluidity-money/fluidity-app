@@ -8,35 +8,32 @@ import { Text } from "~/components";
 import { ReactComponent as ArrowDiag } from '~/assets/images/buttonIcons/arrowDiagWhite.svg';
 import styles from "./ChainSelectorButton.module.scss";
 
-interface IOption {
+interface ChainOption {
   name: string;
   icon: ReactComponentElement<any>;
 }
 
-interface IDropDownButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  option: IOption;
-  setOptions: React.SetStateAction<any>;
-  options: IOption[];
+interface IChainSelectorButton extends ButtonHTMLAttributes<HTMLButtonElement> {
+  chain: ChainOption;
+  onClick: () => void;
 }
 
 const ChainSelectorButton = ({
-  option,
-  setOptions,
-  options,
-  disabled,
+  chain,
   className,
+  onClick,
   ...props
-}: IDropDownButtonProps) => {
+}: IChainSelectorButton) => {
   const classProps = className || "";
   
   return (
-    <button onClick={() => setOptions(true)} className={`${styles.dropdown} ${classProps}`} {...props}>
-      {option.icon}
+    <button onClick={onClick} className={`${styles.dropdown} ${classProps}`} {...props}>
+      {chain.icon}
       <Text
         size={"lg"}
         prominent={true}
       >
-        {option.name}
+        {chain.name}
       </Text>
       <ArrowDiag />
     </button>
