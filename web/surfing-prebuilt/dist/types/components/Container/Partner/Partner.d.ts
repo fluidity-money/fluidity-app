@@ -1,3 +1,4 @@
+/// <reference types="react" />
 interface IPropsPartner {
     img: string;
     title: string;

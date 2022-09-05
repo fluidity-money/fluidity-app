@@ -2,7 +2,7 @@ export { default as LineChart } from "./LineChart";
 export { default as DataTable } from "./Table";
 export { Display } from "./Display";
 export { Heading } from "./Heading";
-export { Text } from "./Text";
+export { default as Text } from "./Text";
 export { NavBar } from "./NavBar";
 export { NavBarModal } from "./NavBarModal";
 export { Navigation } from "./Navigation";

@@ -1,3 +1,4 @@
+/// <reference types="react" />
 interface ICard {
     component?: "div" | "button" | "tr";
     rounded?: boolean;
