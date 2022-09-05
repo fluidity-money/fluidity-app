@@ -1,27 +1,6 @@
-# 🏡 Addresses
+# ☀ Solana
 
-## Ethereum
-
-### Ropsten
-
-| Text                        | Value                                      |
-| --------------------------- | ------------------------------------------ |
-| fUSDT                       | 0x26FC224B37952Bd12C792425F242E0B0a55453a6 |
-| USDT                        | 0x110a13fc3efe6a245b50102d2d79b3e76125ae83 |
-| fUSDC                       | 0x2835Bed5dB82f84180eCBC7dE7C1944E154b1035 |
-| USDC                        | 0x07865c6e87b9f70255377e024ace6630c1eaa37f |
-| fDAI                        | 0x5BA8d8e005aDe3A8333CF85c3bf2A0869d606569 |
-| DAI                         | 0x31F42841c2db5173425b5223809CF3A38FEde360 |
-| Compound Comptroller        | 0xcfa7b0e37f5ac60f3ae25226f5e39ec59ad26152 |
-| cUSDT                       | 0xF6958Cf3127e62d3EB26c79F4f45d3F3b2CcdeD4 |
-| cUSDC                       | 0x2973e69b20563bcc66dC63Bde153072c33eF37fe |
-| cDAI                        | 0xbc689667C13FB2a04f09272753760E38a95B998C |
-| Uniswap Price Anchor Oracle | 0xbef4e076a995c784be6094a432b9ca99b7431a3f |
-| Uniswap V2                  | 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D |
-
-## Solana
-
-### Devnet
+## Devnet
 
 | Text                                          | Value                                        |
 | --------------------------------------------- | -------------------------------------------- |
@@ -35,7 +14,7 @@
 | Saber program ID for swapping                 | SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ  |
 | Pyth program public key                       | J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix |
 
-#### USDC
+### USDC
 
 | Text                                                        | Value                                        |
 | ----------------------------------------------------------- | -------------------------------------------- |
@@ -61,7 +40,7 @@
 | Pyth account                                                | 5SSkXsEKQepHHAewytPVwdej4epN1nxgLVM84L4KXgy7 |
 | Switchboard account                                         | CZx29wKMUxaJDq6aLVQTdViPL754tTR64NAgQBUGxxHb |
 
-#### USDT
+### USDT
 
 | Text                                                        | Value                                        |
 | ----------------------------------------------------------- | -------------------------------------------- |
@@ -85,9 +64,9 @@
 | Market authority                                            | EhJ4fwaXUp7aiwvZThSUaGWCaBQAJe3AEaJJJVCn3UCK |
 | Collateral supply                                           | 8vC5UkqSAJkrZ5Srwbn243sCx7s8UC1nBZ5cbtNv1ui3 |
 
-### Mainnet
+## Mainnet
 
-#### USDC
+### USDC
 
 | Text                                                        | Value                                        |
 | ----------------------------------------------------------- | -------------------------------------------- |
@@ -101,7 +80,7 @@
 | The number of decimals in the token                         | 6                                            |
 | Data account                                                | Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce |
 | PDA                                                         | CBrYRFyEwyn9gMPVFbRBwfcoU6JnViTEBaYyvFZGgZnc |
-| Base token account                                          | PwXvsW9wzK3cBryYa8xXNm9gfamfmDGdWUE9YLiuhHD |
+| Base token account                                          | PwXvsW9wzK3cBryYa8xXNm9gfamfmDGdWUE9YLiuhHD  |
 | Fluid token account                                         | 3GCJGw174tvJfP4vXrZ3Xoev1c9sG1HNzUep84AAPHoM |
 | Solend program                                              | So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo  |
 | Collateral account                                          | 8uXbxhRBGijWWgFhCw6kPAMHBBnqijwvKCZ1GGVLjErc |
@@ -112,7 +91,7 @@
 | Market authority                                            | DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby |
 | Collateral supply                                           | UtRy8gcEu9fCkDuUrU8EmC7Uc6FZy5NCwttzG7i6nkw  |
 
-#### USDT
+### USDT
 
 | Text                                                        | Value                                        |
 | ----------------------------------------------------------- | -------------------------------------------- |
