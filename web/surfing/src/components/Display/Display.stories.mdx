@@ -1,18 +1,24 @@
-import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
 
 import Display from "./Display";
 
 <Meta title="Typography/Display" component={Display} />
 
 export const Template = (args) => (
-  <Display {...args}>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-  </Display>
+    <Display {...args}>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    </Display>
 );
 
-<Canvas columns={1}  withSource="open" withToolbar>
-    <Title>Display</Title>
-    <Subtitle>Beautiful typography for beautiful things.</Subtitle>
+<Title>Display</Title>
+<Subtitle>Beautiful typography for beautiful things.</Subtitle>
+
+<ArgsTable of={Display} default />
+
+## Variants
+
+### Large
+<Canvas>
     <Story
         name="Display Large"
         args={{
@@ -24,6 +30,10 @@ export const Template = (args) => (
     >
         {Template.bind({})}
     </Story>
+</Canvas>
+
+### Medium
+<Canvas>
     <Story
         name="Display Medium"
         args={{
@@ -35,6 +45,10 @@ export const Template = (args) => (
     >
         {Template.bind({})}
     </Story>
+</Canvas>
+
+### Small
+<Canvas>
     <Story
         name="Display Small"
         args={{
@@ -46,6 +60,10 @@ export const Template = (args) => (
     >
         {Template.bind({})}
     </Story>
+</Canvas>
+
+### Extra Small
+<Canvas>
     <Story
         name="Display Extra Small"
         args={{

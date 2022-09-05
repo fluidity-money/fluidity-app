@@ -1,7 +1,7 @@
-const svgr = require("vite-plugin-svgr");
-const tsconfigPaths = require("vite-tsconfig-paths").default;
-const { mergeConfig } = require("vite");
-const { resolve } = require("path");
+const svgr = require('vite-plugin-svgr');
+const tsconfigPaths = require('vite-tsconfig-paths').default;
+const { mergeConfig } = require('vite');
+
 
 module.exports = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
@@ -20,17 +20,10 @@ module.exports = {
   },
   async viteFinal(config, { configType }) {
     // return the customized config
-    console.log(tsconfigPaths);
-    const conf = mergeConfig(config, {
+    console.log(tsconfigPaths)
+    const conf =  mergeConfig(config, {
       // Custom resolve paths, copied from root vite.config
       plugins: [svgr(), tsconfigPaths()],
-      css: {
-        preprocessorOptions: {
-          scss: {
-            includePaths: [resolve(__dirname, "../src")],
-          },
-        },
-      },
     });
 
     return conf;
