@@ -20,7 +20,7 @@
   * [⛓ Launch restrictions (mint limits)](docs/fundamentals/launch-restrictions-mint-limits.md)
   * [🔓 Governance structure](docs/fundamentals/governance-structure.md)
   * [🚂 Advisory team](docs/fundamentals/advisory-team.md)
-  * [👩🏫 👩🏫 👩🏫 Laws of Fluidity](docs/fundamentals/laws-of-fluidity.md)
+  * [👩🏫 👩🏫 👩🏫 👩🏫 Laws of Fluidity](docs/fundamentals/laws-of-fluidity.md)
 * [📖 Guides](docs/guides/README.md)
   * [☀ Solana Devnet](docs/guides/solana-devnet.md)
   * [🧪 Ropsten Testnet](docs/guides/ropsten-testnet.md)
@@ -63,4 +63,4 @@
 
 ***
 
-* [HACKING](hacking.md)
+* [⌨ HACKING](hacking.md)
