@@ -2,24 +2,23 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import "./Display.scss";
+import styles from "./Display.module.scss";
 
-type Props = {
-    children: React.ReactNode;
-    extraSmall?: boolean;
-    small?: boolean;
-    medium?: boolean;
-    large?: boolean;
+type DisplayProps = {
+    children: React.ReactNode
+    extraSmall?: boolean
+    small?: boolean
+    medium?: boolean
+    large?: boolean
 
-    [key: string]: any;
+    [key: string]: any
 };
 
-const Display = ({ children, ...props }: Props & unknown) => {
+const Display = ({ children, large = true, ...props }: DisplayProps ) => {
     const sizeMap = {
         "extraSmall": "xs",
         "small": "sm",
         "medium": "md",
-        "large": "lg",
     };
 
     const size = Object.entries(sizeMap).reduce((acc, [key, value]) => {
@@ -31,8 +30,10 @@ const Display = ({ children, ...props }: Props & unknown) => {
 
     const propClasses = props.className || "";
 
-    const className = `${size} ${propClasses}`;
-    return <h1 {...props } className={className} >
+    const { extraSmall, small, medium, large: _, ...rest } = props;
+
+    const className = `${styles[size]} ${styles.text} ${propClasses}`;
+    return <h1 {...rest } className={className}>
         {children}
     </h1>
 };

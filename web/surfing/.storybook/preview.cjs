@@ -14,5 +14,5 @@ export const parameters = {
         value: "#000000",
       },
     ],
-  },
-};
+  }
+}

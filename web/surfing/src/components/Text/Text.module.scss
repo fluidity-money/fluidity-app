@@ -1,56 +1,38 @@
 @use 'common' as *;
 
-p {
-  font-family: "Whyte Inktrap", sans-serif;
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
+.text {
+    font-family: "Aeonik", sans-serif;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+
+    color: map-get($text, "default");
+    
+    &.prominent {
+        color: map-get($text, "prominent")
+    }
 }
 
 .xxl {
   font-size: $em-step * 7;
 }
+
 .xl {
-  font-size: $em-step * 6;
+    font-size: $em-step * 6;
 }
 
 .lg {
-  font-size: $em-step * 5;
+    font-size: $em-step * 5;
 }
 
 .md {
-  font-size: $em-step * 10;
+    font-size: $em-step * 4;
 }
 
 .sm {
-  font-size: $em-step * 3.5;
+    font-size: $em-step * 3.5;
 }
 
 .xs {
-  font-size: $em-step * 3;
+    font-size: $em-step * 3;
 }
-
-.underline {
-  text-decoration: underline;
-}
-
-.bold{
-  font-weight: 700;
-}
-
-.default {
-  color: map-get($text, "default");
-}
-
-.black {
-  color: map-get($text, "secondary");
-}
-
-.white {
-  color: map-get($text, "prominent");
-}
-
-.disabled {
-  color: map-get($text, "disabled");
-}
-

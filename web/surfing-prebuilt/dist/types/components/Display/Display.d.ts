@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import "./Display.scss";
-declare type Props = {
+declare type DisplayProps = {
     children: React.ReactNode;
     extraSmall?: boolean;
     small?: boolean;
@@ -8,5 +7,5 @@ declare type Props = {
     large?: boolean;
     [key: string]: any;
 };
-declare const Display: ({ children, ...props }: Props & unknown) => JSX.Element;
+declare const Display: ({ children, large, ...props }: DisplayProps) => JSX.Element;
 export default Display;
