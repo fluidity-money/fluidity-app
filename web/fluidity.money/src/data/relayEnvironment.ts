@@ -42,7 +42,6 @@ const wsClient = createClient({
 
 const subscribe = (operation: any, variables: any) => {
   return Observable.create((sink) => {
-    console.log("sink", sink);
     return wsClient.subscribe(
       {
         operationName: operation.name,
