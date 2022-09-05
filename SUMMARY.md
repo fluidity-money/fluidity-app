@@ -60,7 +60,3 @@
   * [Discord server](https://discord.gg/CNvpJk4HpC)
   * [Medium](https://blog.fluidity.money/)
   * [Telegram](https://t.me/fluiditymoney)
-
-***
-
-* [⌨ HACKING](hacking.md)
