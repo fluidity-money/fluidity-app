@@ -22,7 +22,7 @@ const Docs = () => {
     }
   }, [location]);
   return (
-    <>
+    <div id="documentation">
       <ContinuousCarousel direction={"right"}>
         <div className={styles.carouselText}>
           <h2>DOCUMENTATION</h2>
@@ -37,9 +37,8 @@ const Docs = () => {
           <h2>DOCUMENTATION</h2>
         </div>
       </ContinuousCarousel>
-      <div className={styles.container} id="documentation">
+      <div className={styles.container}>
         <ManualCarousel>
-
           {items.map((item, index) => (
             <div key={index} className={styles.docsCard}>
               <div className={styles.imgContainer}>
@@ -52,7 +51,6 @@ const Docs = () => {
             </div>
           ))}
         </ManualCarousel>
-
       </div>
       <div className={styles.desktopViewFormInput}>
         <h4>Stay hydrated</h4>
@@ -98,7 +96,7 @@ const Docs = () => {
           </form>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -16280,9 +16280,7 @@ const BT = ({
 }) => {
   const {
     width: n
-  } = Mg(), r = 620, i = 560;
-  console.log("======>", e.replace(/\s+/g, "").toLowerCase());
-  const o = /* @__PURE__ */ B("ul", {
+  } = Mg(), r = 620, i = 560, o = /* @__PURE__ */ B("ul", {
     children: t.map((a) => /* @__PURE__ */ B("li", {
       children: /* @__PURE__ */ B("a", {
         href: `/${e.replace(/\s+/g, "").toLowerCase()}#${a.title.toLowerCase()}`,
@@ -16294,22 +16292,22 @@ const BT = ({
           children: a.title
         }, void 0, !1, {
           fileName: Kr,
-          lineNumber: 35,
+          lineNumber: 34,
           columnNumber: 13
         }, void 0)
       }, void 0, !1, {
         fileName: Kr,
-        lineNumber: 30,
+        lineNumber: 29,
         columnNumber: 11
       }, void 0)
     }, a.title, !1, {
       fileName: Kr,
-      lineNumber: 29,
+      lineNumber: 28,
       columnNumber: 9
     }, void 0))
   }, void 0, !1, {
     fileName: Kr,
-    lineNumber: 27,
+    lineNumber: 26,
     columnNumber: 5
   }, void 0);
   return /* @__PURE__ */ B("div", {
@@ -16320,17 +16318,17 @@ const BT = ({
         children: e
       }, void 0, !1, {
         fileName: Kr,
-        lineNumber: 57,
+        lineNumber: 56,
         columnNumber: 9
       }, void 0)
     }, void 0, !1, {
       fileName: Kr,
-      lineNumber: 56,
+      lineNumber: 55,
       columnNumber: 7
     }, void 0), o]
   }, void 0, !0, {
     fileName: Kr,
-    lineNumber: 55,
+    lineNumber: 54,
     columnNumber: 5
   }, void 0);
 }, pT = "_container_t6o1w_10", hT = {

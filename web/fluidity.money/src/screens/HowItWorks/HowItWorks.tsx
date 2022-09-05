@@ -104,12 +104,6 @@ const HowItWorks = () => {
           </div>
         </div>
       </div>
-
-      <div className={styles.footer}>
-        <h1>HOW</h1>
-        <h1>FLUIDITY</h1>
-        <h1>WORKS</h1>
-      </div>
     </div>
   );
 };

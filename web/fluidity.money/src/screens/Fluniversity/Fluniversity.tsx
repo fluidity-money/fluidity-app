@@ -22,7 +22,7 @@ const Fluniversity = () => {
     }
   }, [location]);
   return (
-    <>
+    <div id="fluniversity">
       <ContinuousCarousel direction={"right"}>
         <div className={styles.carouselText}>
           <h2>FLUNIVERSITY</h2>
@@ -38,7 +38,7 @@ const Fluniversity = () => {
           <h2>FLUNIVERSITY</h2>
         </div>
       </ContinuousCarousel>
-<div className={styles.container} id="fluniversity">
+      <div className={styles.container}>
         <ManualCarousel>
           {items.map((item, index) => (
             <div key={index} className={styles.fluniversityCard}>
@@ -58,7 +58,7 @@ const Fluniversity = () => {
           ))}
         </ManualCarousel>
       </div>
-    </>
+    </div>
   );
 };
 
