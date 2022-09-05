@@ -27,7 +27,7 @@ module.exports = {
       css: {
         preprocessorOptions: {
           scss: {
-            includePaths: [resolve(__dirname, "src")],
+            includePaths: [resolve(__dirname, "../src")],
           },
         },
       },
