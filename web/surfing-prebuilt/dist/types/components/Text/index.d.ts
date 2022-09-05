@@ -1,1 +1,2 @@
-export { default as Text } from "./Text";
+import Text from "./Text";
+export default Text;
