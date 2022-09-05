@@ -40,11 +40,4 @@ export default defineConfig({
       },
     },
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        includePaths: [resolve(__dirname, "src")],
-      },
-    },
-  },
 });

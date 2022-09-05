@@ -1,3 +1,4 @@
+/// <reference types="react" />
 interface INavigation {
     page: string;
     pageLocations: string[];

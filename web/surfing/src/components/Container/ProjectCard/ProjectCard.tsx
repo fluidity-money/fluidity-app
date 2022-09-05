@@ -26,15 +26,15 @@ const ProjectCard = ({icon, project, description, className, size, disabled}: IP
   
   const PrizeBreakdown = () => (
     <>
-    <Text as={"xs"}>
+    <Text size={"xs"}>
       {numberToCommaSeparated(47976)} Total transactions
     </Text>
     <hr />
-    <Text as={"xs"}>
+    <Text size={"xs"}>
       {numberToCommaSeparated(897)} Prizes distributed
     </Text>
     <hr />
-    <Text as={"xs"}>
+    <Text size={"xs"}>
       {32}% Prize probability
     </Text>
     </>
@@ -56,7 +56,7 @@ const ProjectCard = ({icon, project, description, className, size, disabled}: IP
       </Heading>
 
       {/* Description */}
-      <Text as={"sm"}>
+      <Text size={"sm"}>
         {description}
       </Text>
       
@@ -65,20 +65,20 @@ const ProjectCard = ({icon, project, description, className, size, disabled}: IP
         <Row>
           {/* Avg prize/trans */}
           <div>
-            <Text as={"lg"} colour={"white"}>
+            <Text size={"lg"} prominent={true}>
               {numberToMonetaryString(12.34)}
             </Text>
-            <Text as={"sm"}>
+            <Text size={"sm"}>
               Avg prize/trans
             </Text>
           </div>
 
           {/* Top prize */}
           <div>
-            <Text as={"lg"} colour={"white"}>
+            <Text size={"lg"} prominent={true}>
               {numberToMonetaryString(351879)}
             </Text>
-            <Text as={"sm"}>
+            <Text size={"sm"}>
               Avg prize/trans
             </Text>
           </div>
@@ -87,7 +87,7 @@ const ProjectCard = ({icon, project, description, className, size, disabled}: IP
         {/* Expand Button */}
         <button onClick={() => !disabled && setExpanded(expanded => !expanded)}>
           <InfoSvg />
-          <Text as={"sm"} >
+          <Text size={"sm"} >
             Prize breakdown
           </Text>
         </button>

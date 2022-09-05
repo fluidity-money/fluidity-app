@@ -1,3 +1,4 @@
+/// <reference types="react" />
 interface IItem {
     title: string;
     src: string;
