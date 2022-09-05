@@ -43,7 +43,7 @@ const Yield = () => {
       <Video src={window.location.origin + '/assets/videos/Fluidity_Yield.mp4'} type={'fit'} view={'normal'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
-        "Yield through utility"
+        Yield through utility
       </HowItWorksTemplate>
     );
 

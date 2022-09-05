@@ -31,3 +31,7 @@ const Roadmap = () => {
 };
 
 export default Roadmap;
+
+const info = [
+  "An incentive layer that bridges Web2 and Web3 is forming, and the way money moves is about to change. ",
+];

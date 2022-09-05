@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import type { IGeneralButtonProps } from "../Button/GeneralButton/GeneralButton";
 interface INavLinks {
     name: string;
