@@ -51,7 +51,7 @@ export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.El
 
   useLivePrizePool((prizePool: PrizePool) => setRewardPool(
     prizePool.prize_pool
-      .filter(({network}) => network === chain)
+      .filter(({network}) => network === SupportedChains[chain].name)
       .reduce((latestPool, pool) => latestPool.last_updated > pool.last_updated ? latestPool : pool)
       .amount
   ));
