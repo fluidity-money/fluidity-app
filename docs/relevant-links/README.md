@@ -1,9 +1,11 @@
-# Relevant links
-
-
+# Useful links
 
 {% embed url="https://fluidity.money" %}
 Website and whitepapers
+{% endembed %}
+
+{% embed url="https://faucet.fluidity.money" %}
+Testnet faucet
 {% endembed %}
 
 {% embed url="https://discord.gg/CNvpJk4HpC" %}
@@ -19,4 +21,3 @@ Medium
 {% embed url="https://twitter.com/fluiditymoney" %}
 **Twitter**
 {% endembed %}
-

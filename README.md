@@ -34,8 +34,8 @@ Follow our handy guides to get started on the basics as quickly as possible:
 [use-cases](docs/use-cases/)
 {% endcontent-ref %}
 
-{% content-ref url="docs/guides/" %}
-[guides](docs/guides/)
+{% content-ref url="broken-reference" %}
+[Broken link](broken-reference)
 {% endcontent-ref %}
 
 ### Fundamentals: Dive a little deeper
