@@ -4,9 +4,11 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ReusableGrid } from "@fluidity-money/surfing";
+import { LinkButton, ReusableGrid } from "surfing";
 import Video from "components/Video";
 import styles from "./Roadmap.module.scss";
+import HowItWorksTemplate from "components/HowItWorksTemplate";
+import useViewport from "hooks/useViewport";
 
 const Roadmap = () => {
   const location = useLocation();
@@ -20,12 +22,47 @@ const Roadmap = () => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     }
   }, [location]);
+
+  const { width } = useViewport();
+  const breakpoint = 860;
+
+  const button = (
+    <LinkButton size={"medium"} type={"external"} handleClick={() => {}}>
+      EXPLORE OUR FUTURE
+    </LinkButton>
+  );
+
+  const left =
+    width < breakpoint ? (
+      <Video
+        src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
+        type={"fit"}
+        view={"normal"}
+        loop={true}
+      />
+    ) : (
+      <HowItWorksTemplate button={button} info={info}>
+        Roadmap
+      </HowItWorksTemplate>
+    );
+
+  const right =
+    width > breakpoint ? (
+      <Video
+        src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
+        type={"fit"}
+        view={"normal"}
+        loop={true}
+      />
+    ) : (
+      <HowItWorksTemplate info={info} button={button}>
+        Roadmap
+      </HowItWorksTemplate>
+    );
+
   return (
     <div className={styles.container} id="roadmap">
-      <ReusableGrid
-        left={<h1>Roadmap</h1>}
-        right={<Video src={window.location.origin + '/assets/videos/Fluidity_RoadMap.mp4'} type={'fit'} view={'normal'} loop={true}/>}
-      />
+      <ReusableGrid left={left} right={right} />
     </div>
   );
 };

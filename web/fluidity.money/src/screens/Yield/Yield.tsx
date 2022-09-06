@@ -31,16 +31,26 @@ const Yield = () => {
 
   const left =
     width < breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/Fluidity_Yield.mp4'} type={'fit'} view={'scale-up'} loop={true}/>
+      <Video
+        src={window.location.origin + "/assets/videos/Fluidity_Yield.mp4"}
+        type={"fit"}
+        view={"scale-up"}
+        loop={true}
+      />
     ) : (
       <HowItWorksTemplate header={header} info={info}>
-        "Yield through utility"
+        Yield through utility
       </HowItWorksTemplate>
     );
 
   const right =
     width > breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/Fluidity_Yield.mp4'} type={'fit'} view={'normal'} loop={true}/>
+      <Video
+        src={window.location.origin + "/assets/videos/Fluidity_Yield.mp4"}
+        type={"fit"}
+        view={"normal"}
+        loop={true}
+      />
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Yield through utility

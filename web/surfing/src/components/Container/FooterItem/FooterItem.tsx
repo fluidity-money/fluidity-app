@@ -21,7 +21,6 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   const { width } = useViewport();
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
-  console.log("======>", children.replace(/\s+/g, "").toLowerCase());
 
   const itemList = (
     <ul>
