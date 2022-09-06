@@ -9,7 +9,7 @@ ARG GITHUB_TOKEN
 
 ENV PATH /app/node_modules.bin:$PATH
 
-COPY package.json package-lock.json ./
+COPY .npmrc package.json package-lock.json ./
 
 RUN npm set //npm.pkg.github.com/:_authToken $GITHUB_TOKEN
 
