@@ -11,6 +11,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  ENVIRONMENT: dev
+
 jobs:
  build-and-deploy:
     if: github.event.pull_request.merged == true
@@ -31,21 +34,18 @@ jobs:
         id: diff
         uses: ./scripts/actions
         with:
-          version: latest
           command: |
             flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Build
         id: build
         uses: ./scripts/actions
         with:
-          version: latest
           command: |
             flu build-docker-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
-          version: latest
           command: |
             flu deploy-service-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
