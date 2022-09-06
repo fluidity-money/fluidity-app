@@ -11,6 +11,13 @@ button {
 .card {
   width: fit-content;
   height: fit-content;
+  
+  &.heading {
+    > * {
+      flex: 0 0;
+    }
+  }
+
   &.gray {
     background-color: $white-a5;
   }
@@ -21,6 +28,10 @@ button {
   }
 
   &.box {
+    border: 1px solid map-get($border, "default");
+  }
+
+  &.holobox {
     border: 2px solid;
     border-image-slice: 1;
     border-image-source: $holo;

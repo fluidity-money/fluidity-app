@@ -2,14 +2,12 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import type { HTMLProps } from "react";
-
 import styles from './Card.module.scss';
 
 interface ICard {
   component?: "div" | "button" | "tr";
   rounded?: boolean;
-  type?: "gray" | "box" | "transparent";
+  type?: "gray" | "box" | "holobox" | "transparent";
   [_: string]: any;
 }
 

@@ -9,6 +9,7 @@ import styles from "./Demo.module.scss";
 
 const Demo = () => {
   const { apiState } = useChainContext();
+
   const weekTotalRewards = apiState.weekWinnings.reduce(
     (weekSum, { winning_amount, token_decimals }) =>
       weekSum + winning_amount / 10 ** token_decimals,

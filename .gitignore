@@ -19,8 +19,9 @@ database/build/*
 database/build
 database/db
 
-web/*/dist*
-!web/surfing-prebuilt/*
+web/*/dist/*
+web/*/storybook-static/*
+web/surfing-prebuilt/*
 web/*/node_modules
 web/*/build*
 web/*/build-*
