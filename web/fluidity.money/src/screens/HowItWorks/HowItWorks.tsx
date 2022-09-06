@@ -9,6 +9,7 @@ import {
   Display,
   Heading,
   LinkButton,
+  Text,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
 import useViewport from "hooks/useViewport";
@@ -76,7 +77,8 @@ const HowItWorks = () => {
       </ContinuousCarousel>
       <div className={styles.grid}>
         <div className={styles.left}>
-          <p
+          <Text
+            as={"p"}
             className={
               currentImage === "/assets/videos/Fluidity_Wrap.mp4"
                 ? styles.bold
@@ -85,8 +87,9 @@ const HowItWorks = () => {
           >
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
-          </p>
-          <p
+          </Text>
+          <Text
+            as={"p"}
             className={
               currentImage === "/assets/videos/Fluidity_Yield.mp4"
                 ? styles.bold
@@ -95,8 +98,9 @@ const HowItWorks = () => {
           >
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
-          </p>
-          <p
+          </Text>
+          <Text
+            as={"p"}
             className={
               currentImage === "/assets/videos/Fluidity_HowItWorks.mp4"
                 ? styles.bold
@@ -104,7 +108,7 @@ const HowItWorks = () => {
             }
           >
             The user is incentivised through governance.
-          </p>
+          </Text>
           <a href="/howitworks">
             <LinkButton
               type={"internal"}
