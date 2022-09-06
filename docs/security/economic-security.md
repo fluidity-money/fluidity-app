@@ -1,2 +1,0 @@
-# 🚃 Economic security
-
