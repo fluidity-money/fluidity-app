@@ -9,7 +9,7 @@ import FluidProjects from "../../screens/FluidProjects";
 import Footer from "../../screens/Footer";
 import Search from "../../screens/Search";
 import AllProjects from "../../screens/AllProjects";
-import { Navigation } from "surfing";
+import { Navigation } from "@fluidity-money/surfing";
 import styles from "./EcosystemPage.module.scss";
 
 const FluidEcosystemPage = () => {

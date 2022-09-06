@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 import React, { useEffect, useState } from "react";
-import { Navigation } from "surfing";
+import { Navigation } from "@fluidity-money/surfing";
 import ResourcesPageTitle from "screens/ResourcesPageTitle";
 import Articles from "../../screens/Articles";
 import Contact from "../../screens/Contact";

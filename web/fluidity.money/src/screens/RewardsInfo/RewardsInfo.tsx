@@ -5,7 +5,7 @@
 import styles from "./RewardsInfo.module.scss";
 
 import { useMemo } from "react";
-import { DataTable } from "surfing";
+import { DataTable } from "@fluidity-money/surfing";
 
 const RewardsInfo = () => {
   const data = useMemo(

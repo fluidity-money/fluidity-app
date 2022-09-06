@@ -3,8 +3,8 @@
 // LICENSE_TRF.md file.
 
 import { useState } from "react";
-import { BlockchainModal, ChainSelectorButton, numberToMonetaryString, SupportedChains } from "surfing";
 import { useChainContext } from "hooks/ChainContext";
+import { LinkButton, BlockchainModal, ChainSelectorButton, numberToMonetaryString, SupportedChains } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {

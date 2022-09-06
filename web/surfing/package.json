@@ -1,8 +1,12 @@
 {
-  "name": "@fluidity/surfing",
-  "private": true,
-  "version": "0.0.3",
+  "name": "@fluidity-money/surfing",
+  "version": "0.0.4",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fluidity-money/fluidity-app",
+    "directory": "web/surfing"
+  },
   "scripts": {
     "dev": "vite",
     "build": "npm run clean && tsc && vite build",
@@ -58,7 +62,7 @@
   },
   "types": "dist/types/lib.d.ts",
   "files": [
-    "./dist"
+    "dist"
   ],
   "main": "./dist/surfing.umd.cjs",
   "module": "./dist/surfing.js",
@@ -71,5 +75,8 @@
       "import": "./dist/style.css",
       "require": "./dist/style.css"
     }
+  },
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com"
   }
 }

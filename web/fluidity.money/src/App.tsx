@@ -17,7 +17,7 @@ import fluRelayEnvironment from "./data/relayEnvironment";
 import useViewport from "hooks/useViewport";
 import MobileNavBar from "components/MobileNavBar";
 import "./styles/app.global.scss";
-import "surfing/dist/style.css";
+import "@fluidity-money/surfing/dist/style.css";
 
 function App() {
   const { width } = useViewport();
