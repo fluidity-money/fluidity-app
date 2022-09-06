@@ -12,8 +12,8 @@ on:
         type: choice
         description: 'Network'
         options: 
-          - 'devnet'
           - 'ropsten'
+          - 'devnet'
           - 'fluidity'
       group:
         description: 'Group'
@@ -56,6 +56,7 @@ jobs:
         id: build
         uses: ./scripts/actions
         with:
+          version: latest
           command: |
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
@@ -69,6 +70,7 @@ jobs:
         id: deploy
         uses: ./scripts/actions
         with:
+          version: latest
           command: |
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
