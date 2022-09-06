@@ -20,17 +20,6 @@ _Information on the Solana Mainnet launch coming soon..._
 {% tab title="Polygon" %}
 _Information on the Polygon Mainnet launch coming soon..._
 {% endtab %}
-
-{% tab title="Coming Soon..." %}
-
-{% endtab %}
 {% endtabs %}
 
-If you would like to contact us about participating directly in the Fluidity Ecosystem, please reach out on our socials below or at **contact@fluidity.money.**
-
-Telegram: [https://t.me/fluiditymoney](https://t.me/fluiditymoney)
-
-Twitter: [https://twitter.com/fluiditymoney](https://twitter.com/fluiditymoney)
-
-Discord: [https://discord.gg/CNvpJk4HpC](https://discord.gg/CNvpJk4HpC)
-
+If you would like to contact us about participating directly in the Fluidity Ecosystem, please reach out on our socials below or at [**contact@fluidity.money**](mailto:contact@fluidity.money)**.**
