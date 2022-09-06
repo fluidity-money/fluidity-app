@@ -30,7 +30,7 @@ const HowItWorks = () => {
       setCurrentImage(images[counter]);
       counter++;
       if (counter === 3) counter = 0;
-    }, 4000);
+    }, 7000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -100,14 +100,41 @@ const HowItWorks = () => {
           </a>
         </div>
         <div className={styles.right}>
-          <div>
-            <Video
-              src={window.location.origin + currentImage}
-              type={"fit"}
-              view={"normal"}
-              loop={true}
-            />
-          </div>
+          {currentImage === "/assets/videos/Fluidity_Wrap.mp4" ? (
+            <div>
+              <Video
+                src={
+                  window.location.origin + "/assets/videos/Fluidity_Wrap.mp4"
+                }
+                type={"fit"}
+                view={"normal"}
+                loop={true}
+              />
+            </div>
+          ) : currentImage === "/assets/videos/Fluidity_Yield.mp4" ? (
+            <div>
+              <Video
+                src={
+                  window.location.origin + "/assets/videos/Fluidity_Yield.mp4"
+                }
+                type={"fit"}
+                view={"normal"}
+                loop={true}
+              />
+            </div>
+          ) : (
+            <div>
+              <Video
+                src={
+                  window.location.origin +
+                  "/assets/videos/Fluidity_HowItWorks.mp4"
+                }
+                type={"fit"}
+                view={"normal"}
+                loop={true}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
