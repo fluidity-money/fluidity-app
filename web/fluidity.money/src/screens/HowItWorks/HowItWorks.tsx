@@ -4,7 +4,7 @@
 
 import Video from "components/Video";
 import { useEffect, useState } from "react";
-import { ContinuousCarousel, LinkButton } from "surfing";
+import { ContinuousCarousel, LinkButton } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
 
 const HowItWorks = () => {

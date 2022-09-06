@@ -10,7 +10,7 @@ import Roadmap from "../../screens/Roadmap";
 import Use from "../../screens/Use";
 import Wrap from "../../screens/Wrap";
 import Yield from "../../screens/Yield";
-import { Navigation } from "surfing";
+import { Navigation } from "@fluidity-money/surfing";
 import styles from "./HowItWorksPage.module.scss";
 
 const HowItWorksPage = () => {

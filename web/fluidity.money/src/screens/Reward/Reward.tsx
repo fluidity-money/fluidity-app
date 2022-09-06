@@ -7,7 +7,7 @@ import useViewport from "hooks/useViewport";
 import { useChainContext } from "hooks/ChainContext";
 import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
-import { numberToMonetaryString } from "surfing";
+import { numberToMonetaryString } from "@fluidity-money/surfing";
 import styles from "./Reward.module.scss";
 
 const Reward = () => {

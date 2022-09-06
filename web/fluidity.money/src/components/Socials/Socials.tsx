@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { ContinuousCarousel } from "surfing";
+import { ContinuousCarousel } from "@fluidity-money/surfing";
 import styles from "./Socials.module.scss";
 
 const Socials = () => {

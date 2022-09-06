@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { GeneralButton, NavBarModal } from "surfing";
+import { GeneralButton, NavBarModal } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
