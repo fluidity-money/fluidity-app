@@ -3,14 +3,11 @@ name: 'fluidity-cli'
 author: 'renz@fludity.money'
 description: 'Build and Deploy fluidity microservices'
 inputs:
-  version:
-    description: 'git/docker tag'
-    required: true
   command:
     description: 'flu cli command'
     required: true
 runs:
   using: 'docker'
-  image: 'docker.io/flualex/flu-cli:${{ inputs.version }}'
+  image: 'docker.io/flualex/flu-cli'
   args:
     - ${{ inputs.command }}
