@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
-    "@fluidity-money/surfing": "^0.0.3",
+    "@fluidity-money/surfing": "^0.0.4",
     "@reduxjs/toolkit": "^1.8.3",
     "@visx/visx": "^2.12.2",
     "babel-plugin-relay": "^14.1.0",
@@ -14,7 +14,6 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "react-table": "^7.8.0",
-    "surfing": "file:../surfing-prebuilt",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4"
   },

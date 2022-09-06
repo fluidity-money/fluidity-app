@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useState } from "react";
-import { GeneralButton } from "surfing";
+import { GeneralButton } from "@fluidity-money/surfing";
 import FluidProject from "components/FluidProject";
 import ReactDOM from "react-dom";
 import styles from "./SearchModal.module.scss";

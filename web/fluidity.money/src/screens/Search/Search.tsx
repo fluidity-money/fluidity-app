@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useState } from "react";
-import { ContinuousCarousel } from "surfing";
+import { ContinuousCarousel } from "@fluidity-money/surfing";
 import { SearchModal } from "modals";
 import styles from "./Search.module.scss";
 

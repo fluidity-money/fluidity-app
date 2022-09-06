@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ReusableGrid } from "surfing";
+import { ReusableGrid } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./Roadmap.module.scss";
 

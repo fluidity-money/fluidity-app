@@ -8,7 +8,7 @@ import {
   numberToMonetaryString,
   trimAddress,
   formatTo12HrDate,
-} from "surfing";
+} from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
 import { JsxElement } from "typescript";
 

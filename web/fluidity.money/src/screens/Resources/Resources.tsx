@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { LinkButton } from "surfing";
+import { LinkButton } from "@fluidity-money/surfing";
 import Socials from "../../components/Socials";
 import styles from "./Resources.module.scss";
 

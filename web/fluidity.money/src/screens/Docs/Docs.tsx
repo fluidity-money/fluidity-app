@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ContinuousCarousel, ManualCarousel, GeneralButton } from "surfing";
+import { ContinuousCarousel, ManualCarousel, GeneralButton } from "@fluidity-money/surfing";
 import styles from "./Docs.module.scss";
 
 const Docs = () => {

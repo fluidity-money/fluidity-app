@@ -5,7 +5,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import { ReusableGrid } from "surfing";
+import { ReusableGrid } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./FluidWars.module.scss";
 
