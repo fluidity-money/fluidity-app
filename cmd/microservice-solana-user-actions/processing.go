@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -17,6 +18,7 @@ import (
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	spl_token "github.com/fluidity-money/fluidity-app/common/solana/spl-token"
@@ -31,6 +33,8 @@ var (
 
 	// winner10Split that's finally used to get the 80/20 split for winners
 	winner10Split = big.NewInt(10)
+
+	blockPayoutPrefix = "Large payout blocked! Token mint "
 )
 
 func tokenIsMintEvent(senderAddress, recipientAddress, fluidityTokenMintAddress, fluidityPdaPubkey string) bool {
@@ -321,4 +325,16 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 	}
 
 	return transfer1, transfer2, nil
+}
+
+func fluidityPayoutWasBlocked(transaction worker.SolanaApplicationTransaction) bool {
+	logs := transaction.Result.Meta.Logs
+
+	for _, line := range logs {
+		if strings.HasPrefix(line, blockPayoutPrefix) {
+			return true
+		}
+	}
+
+	return false
 }

@@ -18,9 +18,9 @@ export interface ArticleListProps{
 
 export const ArticleList = ({articles}: ArticleListProps) => {
 
-    const list = articles.map((article) => {
+    const list = articles.map((article, i) => {
         return (
-            <ArticleListCard id={article.id} title={article.title} desc={article.desc} info={article.info} />
+            <ArticleListCard key={`article-${i}`} id={article.id} title={article.title} desc={article.desc} info={article.info} />
         );
     });
 

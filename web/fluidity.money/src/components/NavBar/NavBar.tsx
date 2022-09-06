@@ -2,81 +2,113 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { GeneralButton } from "../Button";
-import ResourcesNavModal from "../../modals/ResourcesNavModal";
+import { motion } from "framer-motion";
+import useScrollDirection from "hooks/useScrollDirection";
+import useViewport from "hooks/useViewport";
+import { useState } from "react";
+import { GeneralButton, NavBarModal } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
+
   const handleModal = () => {
-    setModal(!modal);
+    setModal(modal => !modal);
   };
+
+  const { width } = useViewport();
+  const breakpoint = 700;
+
+  const { scrollDir } = useScrollDirection();
+  const scrollVariants = {
+    appear: { y: 0 },
+    disappear: { y: -100 },
+  };
+
   return (
     <div className={styles.outerContainer}>
       <div className={`${styles.container} opacity-5x`}>
-        <h2 className={styles.fluidity}>fluidity</h2>
+        <motion.h2
+          className={styles.fluidity}
+          variants={scrollVariants}
+          animate={scrollDir === "up" ? "appear" : "disappear"}
+          transition={{ type: "tween" }}
+        >
+          fluidity
+        </motion.h2>
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <div>
-              <Link to={"/"}>
+              <a href={"/"}>
                 <img src="/assets/images/logoOutline.svg" alt="home page" />
-              </Link>
+              </a>
             </div>
             <GeneralButton
               version={"secondary"}
               type={"text"}
-              size={"medium"}
+              size={width < breakpoint ? "small" : "medium"}
               handleClick={() => {}}
             >
               LAUNCH FLUIDITY
             </GeneralButton>
           </div>
         </div>
-        <div className={styles.navbar}>
+        <motion.div
+          className={styles.navbar}
+          variants={scrollVariants}
+          animate={scrollDir === "up" ? "appear" : "disappear"}
+          transition={{ type: "tween" }}
+        >
           <div className={styles.fade}>
             <nav>
               <ul>
                 <li>
-                  <NavLink
-                    to={"/howitworks"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                  <a
+                    href={"/howitworks"}
+                    className={
+                      window.location.pathname.toString() === "/howitworks"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     HOW IT WORKS
-                  </NavLink>
+                  </a>
                 </li>
-                <li>
-                  <NavLink
-                    to={"/ecosystem"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                {/* <li>
+                  <a
+                    href={"/ecosystem"}
+                    className={
+                      window.location.pathname.toString() === "/ecosystem"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     ECOSYSTEM
-                  </NavLink>
+                  </a>
                 </li>
                 <li>
-                  <NavLink
-                    to={"/fluidstats"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                  <a
+                    href={"/fluidstats"}
+                    className={
+                      window.location.pathname.toString() === "/fluidstats"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     FLUID STATS
-                  </NavLink>
-                </li>
+                  </a>
+                </li> */}
                 <li>
-                  <NavLink
-                    to={"/resources"}
-                    className={({ isActive }) => {
-                      return isActive ? styles.active : "";
-                    }}
+                  <a
+                    href={"/resources"}
+                    className={
+                      window.location.pathname.toString() === "/resources"
+                        ? styles.active
+                        : ""
+                    }
                   >
                     RESOURCES
-                  </NavLink>
+                  </a>
 
                   <button onClick={() => handleModal()}>
                     <img
@@ -87,12 +119,48 @@ const NavBar = () => {
                 </li>
               </ul>
             </nav>
-            {modal && <ResourcesNavModal handleModal={handleModal} />}
+            {modal && (
+              <NavBarModal handleModal={handleModal} navLinks={links} />
+            )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 };
 
 export default NavBar;
+
+interface ILinkButton {
+  children: string;
+  size: "small" | "medium" | "large";
+  type: "internal" | "external";
+  handleClick: () => void;
+}
+
+const links: ILinkButton[] = [
+  {
+    children: "articles",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "fluniversity",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "whitpapers",
+    size: "small",
+    type: "internal",
+    handleClick: () => {},
+  },
+  {
+    children: "documentation",
+    size: "small",
+    type: "external",
+    handleClick: () => {},
+  },
+];

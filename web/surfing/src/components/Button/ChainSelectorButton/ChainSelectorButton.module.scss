@@ -1,0 +1,29 @@
+@use 'common' as *;
+
+.dropdown {
+  background-color: transparent;
+  border: 1px solid map-get($border, "default");
+  width: 95px;
+  height: 32px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 6px 12px 6px 8px;
+  border-radius: 40px;
+
+  &:focus:enabled {
+    box-shadow: 0px 0px 0px 4px map-get($border, "focus");
+  }
+
+  &:disabled {
+    cursor: default;
+    color: map-get($text, "disabled");
+    background-color: transparent;
+    border: 0.5px solid map-get($border, "disabled");
+  }
+}
+
+.options {
+  
+}

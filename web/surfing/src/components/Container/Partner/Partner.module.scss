@@ -1,0 +1,26 @@
+@use "common" as *;
+
+.container {
+  padding: 50px 20px 20px 20px;
+  width: 300px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  p {
+    max-height: 130px;
+    padding: 0;
+    overflow-y: auto;
+    color: transparent;
+    text-align: center;
+  }
+
+  &:hover {
+    background-color: map-get($bg, "alternate");
+    color: $black;
+    p {
+      color: $black;
+    }
+  }
+}

@@ -1,0 +1,43 @@
+@use 'common' as *;
+
+button {
+  cursor: pointer;
+  
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.card {
+  width: fit-content;
+  height: fit-content;
+  
+  &.heading {
+    > * {
+      flex: 0 0;
+    }
+  }
+
+  &.gray {
+    background-color: $white-a5;
+  }
+
+  &.transparent {
+    background-color: $white-a5;
+    background-filter: blur(10px);
+  }
+
+  &.box {
+    border: 1px solid map-get($border, "default");
+  }
+
+  &.holobox {
+    border: 2px solid;
+    border-image-slice: 1;
+    border-image-source: $holo;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
+}

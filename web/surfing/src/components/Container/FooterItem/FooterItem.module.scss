@@ -1,0 +1,37 @@
+@use 'common' as *;
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-bottom: solid 0.5px map-get($text, "default");
+
+  h1 {
+    font-size: 36px;
+    @media (max-width: 560px) {
+      font-size: 20px;
+    }
+  }
+  ul {
+    display: flex;
+
+    @media (max-width: 860px) {
+      flex-direction: column;
+      min-width: 232px;
+    }
+
+    @media (max-width: 560px) {
+      min-width: 155px;
+    }
+
+    li {
+      margin-left: 20px;
+      display: flex;
+
+      a {
+        color: map-get($text, "prominent");
+      }
+    }
+  }
+}

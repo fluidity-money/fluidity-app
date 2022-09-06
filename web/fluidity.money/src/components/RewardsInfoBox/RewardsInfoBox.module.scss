@@ -2,10 +2,14 @@
 
 .infoBoxContainer {
   position: absolute;
-
   height: 294px;
   width: 496px;
   z-index: 2;
+  @include max-620px {
+    width: 296px;
+    height: 249px;
+    display: flex;
+  }
 }
 
 .infoBox {
@@ -26,12 +30,20 @@
     line-height: 100%;
     text-align: center;
     letter-spacing: -0.02em;
+
+    @include max-620px {
+      font-size: 36px;
+    }
+
     &:hover {
       opacity: 0.6;
     }
   }
   h3 {
     margin: 6px;
+    @include max-620px {
+      font-size: 16px;
+    }
   }
 }
 
@@ -48,6 +60,11 @@
     cursor: pointer;
     margin: 0;
     font-size: 80px;
+
+    @include max-620px {
+      font-size: 36px;
+    }
+
     &:hover {
       opacity: 0.6;
     }
@@ -59,6 +76,9 @@
     font-size: 20px;
     line-height: 120%;
     letter-spacing: 0.01em;
+    @include max-620px {
+      font-size: 16px;
+    }
   }
 }
 
@@ -70,4 +90,11 @@
   opacity: 0;
   transition: opacity 1s ease;
   z-index: 0;
+}
+
+.loadingRow {
+  height: 20px;
+  width: 20px;
+  background-color: gray;
+  border-radius: 50%;
 }

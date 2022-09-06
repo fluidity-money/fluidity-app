@@ -2,7 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
 import Demo from "../../screens/Demo";
 import FluidWars from "../../screens/FluidWars";
 import Footer from "../../screens/Footer";
@@ -11,12 +10,14 @@ import Roadmap from "../../screens/Roadmap";
 import Use from "../../screens/Use";
 import Wrap from "../../screens/Wrap";
 import Yield from "../../screens/Yield";
+import { Navigation } from "@fluidity-money/surfing";
 import styles from "./HowItWorksPage.module.scss";
 
 const HowItWorksPage = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
+        <Navigation page={"howitworks"} pageLocations={pageLocations} />
         <Incentivising />
         <Wrap />
         <Use />
@@ -31,3 +32,10 @@ const HowItWorksPage = () => {
 };
 
 export default HowItWorksPage;
+
+const pageLocations = [
+  "wrap tokens",
+  "use assets",
+  "yield & win",
+  "fluidity wars",
+];

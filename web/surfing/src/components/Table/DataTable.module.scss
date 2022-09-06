@@ -1,4 +1,4 @@
-@import "../../common";
+@use "common" as *;
 
 @mixin mobile {
   @media (max-width: 650px) {

@@ -27,6 +27,9 @@ const (
 	// FilterEventSignature to use to filter for event signatures
 	FilterEventSignature = `Reward(address,uint256,uint256,uint256)`
 
+	// FilterBlockedEventSignature to use to filter for blocked reward events
+	FilterBlockedEventSignature = `BlockedReward(address,uint256,uint256,uint256)`
+
 	// expectedTopicsLen to ensure logs received have the expected number of topics
 	// (sig, winner address)
 	expectedTopicsLen = 2
@@ -53,6 +56,8 @@ const (
 	EnvUseLegacyContract = `FLU_ETHEREUM_LEGACY_CONTRACT`
 
 	winnersPublishTopic = winners.TopicWinnersEthereum
+
+	blockedWinnersPublishTopic = winners.TopicBlockedWinnersEthereum
 )
 
 func main() {
@@ -92,9 +97,16 @@ func main() {
 		eventSig,
 	)
 
+	blockedEventSignature := microservice_ethereum_track_winners.HashEventSignature(
+		FilterBlockedEventSignature,
+	)
+
 	logging.Debug(func(k *logging.Log) {
-		k.Message = "Filtering for event signature"
-		k.Payload = eventSignature
+		k.Format(
+			"Filtering for event signatures %s and %s",
+			eventSignature,
+			blockedEventSignature,
+		)
 	})
 
 	ethereum.Logs(func(log ethereum.Log) {
@@ -142,14 +154,24 @@ func main() {
 
 		logging.Debug(func(k *logging.Log) {
 			k.Format(
-				"The log transaction %v for topic 0 is %v, am expecting %v!",
+				"The log transaction %v for topic 0 is %v, am expecting %v or %v!",
 				transactionHash,
 				logTopics[0],
-				eventSig,
+				eventSignature,
+				blockedEventSignature,
 			)
 		})
 
-		if string(logTopics[0]) != eventSignature {
+		var blockedReward bool
+
+		switch string(logTopics[0]) {
+		case eventSignature:
+			blockedReward = false
+
+		case blockedEventSignature:
+			blockedReward = true
+
+		default:
 			logging.Debug(func(k *logging.Log) {
 				k.Format(
 					"The log transaction %v for topic 0 is %v, was expecting %v!",
@@ -187,9 +209,17 @@ func main() {
 
 		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime)
 
+		var publishTopic string
+
+		if blockedReward {
+			publishTopic = blockedWinnersPublishTopic
+		} else {
+			publishTopic = winnersPublishTopic
+		}
+
 		microservice_ethereum_track_winners.SendWinner(
 			useLegacyContract,
-			winnersPublishTopic,
+			publishTopic,
 			convertedWinner,
 		)
 	})

@@ -1,0 +1,38 @@
+@use 'common' as *;
+
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: "Whyte Inktrap", sans-serif;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+
+    color: map-get($text, "prominent")
+}
+
+.h1 {
+    font-size: $em-step * 12;
+}
+
+.h2 {
+    font-size: $em-step * 10;
+}
+
+.h3 {
+    font-size: $em-step * 8;
+}
+
+.h4 {
+    font-size: $em-step * 7;
+}
+
+.h5 {
+    font-size: $em-step * 5;
+}
+
+.h6 {
+    font-size: $em-step * 3.5;
+}
+
+.uppercase {
+  text-transform: uppercase
+}

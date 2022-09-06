@@ -7,7 +7,6 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
-  border: solid 2px red;
   isolation: isolate;
 }
 
@@ -39,12 +38,20 @@
 }
 
 .winner {
+  display: flex;
+  flex-direction: row;
   cursor: pointer;
   font-size: 16px;
   color: $textGrey;
   position: relative;
   min-width: fit-content;
   padding: 0 10px 0 10px;
+  gap: 5px;
+  align-items: center;
+
+  img {
+    width: 18px;
+  }
   &:hover {
     color: $fluidWhite;
   }

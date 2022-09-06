@@ -6,7 +6,7 @@ import type { ButtonHTMLAttributes } from "react";
 
 import styles from "./GeneralButton.module.scss";
 
-interface IGeneralButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface IGeneralButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: string;
   version: "primary" | "secondary";
   type: "text" | "icon before" | "icon after" | "icon only";

@@ -1,0 +1,40 @@
+DOCKER_IMAGE: microservice-ethereum-track-winners
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-track-winners
+ENV_FLU_ETHEREUM_LEGACY_CONTRACT: "true"
+
+SERVICES:
+  - TRACK_WINNERS_USDC:
+      SERVICE_NAME: microservice-ethereum-track-winners-usdc      
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-track-winners-usdc
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x9d1089802eE608BA84C5c98211afE5f37F96B36C"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: USDC
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+
+  - TRACK_WINNERS_USDT:
+      SERVICE_NAME: microservice-ethereum-track-winners-usdt
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-track-winners-usdt
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0xADc234a4e90E2045f353F5d4fCdE66144d23b458"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: USDT
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+
+  - TRACK_WINNERS_DAI:
+      SERVICE_NAME: microservice-ethereum-track-winners-dai
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-track-winners-dai
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: DAI
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
+
+  - TRACK_WINNERS_TUSD:
+      SERVICE_NAME: microservice-ethereum-track-winners-tusd
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-track-winners-tusd
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: TUSD
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
+
+  - TRACK_WINNERS_FRAX:
+      SERVICE_NAME: microservice-ethereum-track-winners-frax
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-track-winners-frax
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: FRAX
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
+

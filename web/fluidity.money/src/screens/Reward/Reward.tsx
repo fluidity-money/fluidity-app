@@ -2,9 +2,12 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { useState } from "react";
+import { useState } from "react";
+import useViewport from "hooks/useViewport";
+import { useChainContext } from "hooks/ChainContext";
 import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
+import { numberToMonetaryString } from "@fluidity-money/surfing";
 import styles from "./Reward.module.scss";
 
 const Reward = () => {
@@ -13,11 +16,15 @@ const Reward = () => {
   click on prize total and switch screens to total transactions sol and eth,
   elements fade in and out then are conditionally removed
   */
+  const { apiState } = useChainContext();
+  const { txCount, rewardPool } = apiState;
 
   const [initalView, setInitalView] = useState(true);
   const [present, setPresent] = useState(true);
   const [toggle, setToggle] = useState(true);
-
+  const { width } = useViewport();
+  const breakpoint = 620;
+  
   // animates then switches backgrounds
   const switchAndAnimate = () => {
     setInitalView(!initalView);
@@ -27,7 +34,7 @@ const Reward = () => {
   };
 
   // information on top of second screen
-  const infoStats = (
+  const InfoStats = () => (
     <div className={styles.info}>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
@@ -39,10 +46,12 @@ const Reward = () => {
         <h1>32,689</h1>
         <h4>Fluid asset pairs</h4>
       </div>
-      <div className={styles.infoSingle}>
-        <h1>678,123.00</h1>
-        <h4>Reward Pool</h4>
-      </div>
+      {width > breakpoint && (
+        <div className={styles.infoSingle}>
+          <h1>{numberToMonetaryString(rewardPool)}</h1>
+          <h4>Reward Pool</h4>
+        </div>
+      )}
     </div>
   );
 
@@ -56,10 +65,12 @@ const Reward = () => {
               : `${styles.stats} ${styles.fadeIn}`
           }
         >
-          {infoStats}
+          <InfoStats />
         </div>
 
         <RewardsInfoBox
+          rewardPool={rewardPool}
+          totalTransactionValue={txCount}
           toggle={toggle}
           setToggle={() => setToggle(!toggle)}
           initalView={initalView}
@@ -68,6 +79,8 @@ const Reward = () => {
         />
 
         <RewardsInfoBox
+          rewardPool={rewardPool}
+          totalTransactionValue={txCount}
           toggle={toggle}
           setToggle={() => setToggle(!toggle)}
           initalView={initalView}
@@ -92,66 +105,3 @@ const Reward = () => {
 };
 
 export default Reward;
-
-const rewards = [
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-];

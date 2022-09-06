@@ -2,7 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
 import styles from "./FluidProject.module.scss";
 
 interface IProject {
@@ -25,20 +24,20 @@ const FluidProject = ({ project }: IFluidProjectProps) => {
         <h3 style={{ paddingTop: 15 }}>Categories</h3>
         {project.categories
           .filter((x) => x !== "anyCat")
-          .map((category) => (
-            <h5>{category}</h5>
+          .map((category, i) => (
+            <h5 key={`cat-${i}`}>{category}</h5>
           ))}
         <h3 style={{ paddingTop: 10 }}>Chain</h3>
         {project.chains
           .filter((x) => x !== "anyChain")
-          .map((chain) => (
-            <h5>{chain}</h5>
+          .map((chain, i) => (
+            <h5 key={`chain-${i}`}>{chain}</h5>
           ))}
         <h3 style={{ paddingTop: 10 }}>Year</h3>
         {project.years
           .filter((x) => x !== "anyYear")
-          .map((year) => (
-            <h5>{year}</h5>
+          .map((year, i) => (
+            <h5 key={`year-${i}`}>{year}</h5>
           ))}
         <h4 style={{ paddingTop: 10 }}>{`Top prize: $${project.topPrize}`}</h4>
       </div>

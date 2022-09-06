@@ -1,23 +1,47 @@
 @mixin max-560px {
-    @media (max-width: 860px) {
-      @content;
-    }
+  @media (max-width: 560px) {
+    @content;
+  }
+}
+
+@mixin max-620px {
+  @media (max-width: 620px) {
+    @content;
+  }
 }
 
 @mixin max-760px {
-    @media (max-width: 760px) {
-      @content;
-    }
+  @media (max-width: 760px) {
+    @content;
+  }
 }
 
 @mixin max-860px {
-    @media (max-width: 860px) {
-      @content;
-    }
+  @media (max-width: 860px) {
+    @content;
+  }
+}
+
+@mixin max-900px {
+  @media (max-width: 900px) {
+    @content;
+  }
 }
 
 @mixin min-861px {
-    @media (min-width: 861px) {
-      @content;
-    }
+  @media (min-width: 861px) {
+    @content;
+  }
+}
+
+@mixin max-1080px {
+  @media (max-width: 1080px) {
+    @content;
+  }
+}
+
+@mixin max-1205px {
+  @media (max-width: 1205px) {
+    @content;
+  }
 }

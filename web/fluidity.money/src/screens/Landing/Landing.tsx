@@ -2,12 +2,13 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import ContinuousCarousel from "components/ContinuousCarousel";
-import React, { useEffect, useRef, useState } from "react";
-import ManualCarousel from "../../components/ManualCarousel";
+import { useEffect, useRef, useState } from "react";
+import { ContinuousCarousel, ManualCarousel } from "@fluidity-money/surfing";
+import IntroTile from "components/IntroTile";
 import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
-import IntroTile from "components/IntroTile";
+import useViewport from "hooks/useViewport";
+import Video from "components/Video";
 
 const Landing = () => {
   /* 
@@ -24,7 +25,6 @@ const Landing = () => {
   7. Text items fade in with new looped video, perhaps staggered with slight delay, or with lines building out from left to righ ton left, and right  to left on right.
     */
 
-  const [fadeProp, setFadeProp] = useState("fadeIn");
   // const myRef = useRef<HTMLInputElement>(null);
 
   // useEffect(() => {
@@ -41,73 +41,120 @@ const Landing = () => {
   //   });
 
   //   observer.observe(myRef.current as Element);
-  // }, []);
+  // }, [ ]);
+
+  const { width } = useViewport();
+  const breakpoint = 620;
 
   return (
-    <div className={`${styles.container}`}>
+    <div className={`${styles.containerLanding}`}>
+      {width > breakpoint && (
+          <Video src={window.location.origin + '/assets/videos/Fluidity_Home.mp4'} type={'reduce'} view={'normal'} loop={false}/>
+      )} 
+      {width < breakpoint && (
+          <Video src={window.location.origin + '/assets/videos/Fluidity_Homeloop.mp4'} type={'fit'} view={'normal'} loop={false}/>
+      )} 
       <motion.div className={styles.content}>
-        <motion.h1
-          initial={{ opacity: 0, y: "-100vh" }}
-          animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-          transition={{ duration: 4, type: "tween" }}
-        >
-          Fluidity is the blockchain incentive layer, <br />
-          rewarding people for using their crypto.
-        </motion.h1>
+        {width < breakpoint ? (
+          <motion.h1
+            initial={{ opacity: 0, y: "-100vh" }}
+            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
+            transition={{ duration: 6, type: "tween" }}
+          >
+            Fluidity is the <br /> blockchain incentive <br /> layer, rewarding{" "}
+            <br /> people for using <br /> their crypto.
+          </motion.h1>
+        ) : (
+          <motion.h1
+            initial={{ opacity: 0, y: "-100vh" }}
+            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
+            transition={{ duration: 6, type: "tween" }}
+          >
+            Fluidity is the blockchain incentive layer, <br />
+            rewarding people for using their crypto.
+          </motion.h1>
+        )}
         <div className={styles.tiles}>
+          {width < breakpoint && (
+            <motion.div
+              className={styles.video}
+              initial={{ y: -150, scale: 1 }}
+              animate={{
+                opacity: 1,
+                y: [-150, -150, -150, 0],
+                scale: [1, 1, 1, 0.8],
+              }}
+              transition={{ duration: 6, type: "tween" }}
+            >
+             
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 4, type: "tween" }}
+            transition={{ duration: 6, type: "tween" }}
             className={styles.left}
           >
-            <IntroTile type={"star"} side={"left"}>
-              1 to 1 exchange rate, <br />
+            <IntroTile
+              img={"/assets/images/landingIcons/1to1.svg"}
+              side={"left"}
+            >
+              1 to 1 exchange rate <br />
               to base wrapped assets
             </IntroTile>
-            <IntroTile type={"star"} side={"left"}>
+            <IntroTile
+              img={"/assets/images/useCaseIcons/sendReceive.svg"}
+              side={"left"}
+            >
               Senders and receivers <br />
               both qualify
             </IntroTile>
-            <IntroTile type={"ellipse"} side={"left"}>
+            <IntroTile
+              img={"/assets/images/landingIcons/everyTransaction.svg"}
+              side={"left"}
+            >
               Every transaction <br />
               qualifies as a reward
             </IntroTile>
           </motion.div>
-          <motion.div
-            className={styles.video}
-            initial={{ y: -150, scale: 1 }}
-            animate={{
-              opacity: 1,
-              y: [-150, -150, -150, 0],
-              scale: [1, 1, 1, 0.8],
-            }}
-            transition={{ duration: 4, type: "tween" }}
-          ></motion.div>
+         
+
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 4, type: "tween" }}
-            className={styles.right}
+            transition={{ duration: 6, type: "tween" }}
+            className={width < breakpoint ? styles.left : styles.right}
           >
-            <IntroTile type={"star"} side={"right"}>
+            <IntroTile
+              img={"/assets/images/landingIcons/expectedOutcome.svg"}
+              side={width < breakpoint ? "left" : "right"}
+            >
               Fluidity improves your expected <br />
               outcome over time
             </IntroTile>
-            <IntroTile type={"ellipse"} side={"right"}>
-              Rewards can be significant
+            <IntroTile
+              img={"/assets/images/useCaseIcons/forReceivers.svg"}
+              side={width < breakpoint ? "left" : "right"}
+            >
+              Rewards can range from cents
+              <br /> to millions
             </IntroTile>
-            <IntroTile type={"ellipse"} side={"right"}>
+            <IntroTile
+              img={"/assets/images/landingIcons/scalingEcosystem.svg"}
+              side={width < breakpoint ? "left" : "right"}
+            >
               Scaling ecosystem
             </IntroTile>
           </motion.div>
         </div>
       </motion.div>
+
       <motion.div
         className={styles.carousel}
         initial={{ opacity: 0, y: "100vh" }}
         animate={{ opacity: [1, 1, 1, 0], y: [0, 0, 0, 100] }}
-        transition={{ duration: 4, type: "tween" }}
+        transition={{ duration: 6, type: "tween" }}
       >
         <ContinuousCarousel direction={"right"}>
           <div>

@@ -2,17 +2,48 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import ContinuousCarousel from "../ContinuousCarousel";
+import { useChainContext } from "../../hooks/ChainContext";
+import {
+  ContinuousCarousel,
+  numberToMonetaryString,
+  trimAddress,
+  formatTo12HrDate,
+} from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
+import { JsxElement } from "typescript";
+
+interface Reward {
+  token: string;
+  amount: number;
+  address: string;
+  date: Date;
+}
 
 const RewardsBackground = () => {
+  const { apiState } = useChainContext();
+  const rewards: Reward[] = apiState.weekWinnings.map((winning) => ({
+    token: winning.token_short_name,
+    amount: winning.winning_amount,
+    address: winning.winning_address,
+    date: new Date(winning.awarded_time),
+  }));
+
   const carouselInfo = (
     <div>
-      {ContinuousCarousels.map((winner) => (
-        <div
-          className={styles.winner}
-        >{`${winner.blockchain} DEX ${winner.amount} ${winner.id} ${winner.date}`}</div>
+      {rewards.slice(100).map(({ token, amount, address, date }, i) => (
+        <div key={`winner-${i}`} className={styles.winner}>
+          <img
+            src={
+              token === "USDT"
+                ? "/assets/images/tokenIcons/usdt.svg"
+                : "/assets/images/tokenIcons/usdc.svg"
+            }
+            alt="tokenIcon"
+          />
+          <p>{numberToMonetaryString(amount)} </p>
+          <p>{trimAddress(address)} </p>
+          <p>{formatTo12HrDate(date)}</p>
+        </div>
       ))}
     </div>
   );
@@ -57,66 +88,3 @@ const RewardsBackground = () => {
 };
 
 export default RewardsBackground;
-
-const ContinuousCarousels = [
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-  {
-    blockchain: "🦍",
-    amount: "1.01",
-    id: "9ozY5b..saDwFf",
-    date: "21.06.22 11:54am",
-  },
-];

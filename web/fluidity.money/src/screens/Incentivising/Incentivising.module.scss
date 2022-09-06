@@ -3,8 +3,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
   height: 100vh;
   min-height: 750px;
   width: 100%;
-  border: solid 2px red;
+
+  div {
+    position: absolute;
+  }
 }

@@ -100,12 +100,24 @@ func NewWebsocket(url string) (*Websocket, error) {
 
 			messageType, message, err := conn.ReadMessage()
 
-			if err != nil {
+			isUnexpectedErr := websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway)
+
+			switch true {
+			case err != nil && isUnexpectedErr:
 				log.Fatal(func(k *log.Log) {
 					k.Context = LogContextWebsocket
 					k.Message = "Failed to read a message from the Solana websocket!"
 					k.Payload = err
 				})
+
+			case err != nil:
+				log.Fatal(func(k *log.Log) {
+					k.Context = LogContextWebsocket
+					k.Message = "Solana websocket went away!"
+					k.Payload = err
+				})
+
+			default:
 			}
 
 			switch messageType {

@@ -23,6 +23,7 @@ all: \
 build:
 	@cd lib && ${MAKE} build-lib
 	@cd common && ${MAKE} build-common
+	cd ${GO_CMD_DIR} && ${MAKE} build
 
 install:
 	@cd ${GO_CMD_DIR} && ${MAKE} install
@@ -108,7 +109,7 @@ semgrep:
 	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
 test: semgrep
-	@./tests-golang.sh
+	@cd ${TESTS_DIR} && ./tests-golang.sh
 	@cd ${CONTRACTS_DIR} && ${MAKE} test
 
 lint: semgrep

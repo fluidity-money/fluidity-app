@@ -5,6 +5,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -169,8 +170,10 @@ func main() {
 
 		if mintSupply > tvl {
 			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"The mint supply %v > the TVL %v! Prize pool busted potentially!",
+				k.Message = "Prize pool busted potentially!"
+
+				k.Payload = fmt.Errorf(
+					"mint supply %v > tvl %v",
 					mintSupply,
 					tvl,
 				)

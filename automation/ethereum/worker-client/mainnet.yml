@@ -1,0 +1,48 @@
+DOCKER_IMAGE: microservice-ethereum-worker-client
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-client
+ENV_FLU_ETHEREUM_GAS_LIMIT: 8000000
+ENV_FLU_ETHEREUM_HARDHAT_FIX: "false"
+SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
+
+SERVICES:
+  - WORKER_CLIENT_USDT:
+      SERVICE_NAME: microservice-ethereum-worker-client-usdt
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-worker-server-usdt
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0xADc234a4e90E2045f353F5d4fCdE66144d23b458"
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.usdt
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/usdt/private_key
+
+  - WORKER_CLIENT_USDC:
+      SERVICE_NAME: microservice-ethereum-worker-client-usdc
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-worker-server-usdc
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x9d1089802eE608BA84C5c98211afE5f37F96B36C"
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.usdc
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/usdc/private_key
+
+  - WORKER_CLIENT_DAI:
+      SERVICE_NAME: microservice-ethereum-worker-client-dai
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-worker-server-dai
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.dai
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/dai/private_key
+
+  - WORKER_CLIENT_TUSD:
+      SERVICE_NAME: microservice-ethereum-worker-client-tusd
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-worker-server-tusd
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F"
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.tusd
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.tusd
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/tusd/private_key
+  
+  - WORKER_CLIENT_FRAX:
+      SERVICE_NAME: microservice-ethereum-worker-client-frax
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-worker-server-frax
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C"
+      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.frax
+      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.frax
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/frax/private_key
+
+

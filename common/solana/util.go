@@ -1,7 +1,3 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this
-// source code is governed by a GPL-style license that can be found in the
-// LICENSE.md file.
-
 // ripped (with changes) from https://github.com/gagliardetto/solana-go
 
 package solana
@@ -128,8 +124,7 @@ func NewInstruction(
 	}
 }
 
-// Requisite Types for NewTransaction
-type Hash PublicKey // Alias
+type Hash PublicKey
 
 type MessageHeader struct {
 	// The total number of signatures required to make the transaction valid.

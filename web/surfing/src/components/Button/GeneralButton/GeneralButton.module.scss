@@ -1,4 +1,4 @@
-@use '../../../common' as *;
+@use 'common' as *;
 
 button {
   all: unset;
@@ -31,11 +31,11 @@ button {
 .large {
   padding: 24px;
   gap: 8px;
-  border-radius: 50px;
   font-style: normal;
   font-weight: 700;
   font-size: 16px;
   line-height: 100%;
+  border-radius: 50px;
 }
 
 .primary {
@@ -68,7 +68,7 @@ button {
 .secondary {
   background-color: transparent;
   border: 0.5px solid $white-a80;
-  color: map-get($text, "prominent");
+  color: "orange";
   width: fit-content;
   height: fit-content;
   text-transform: uppercase;

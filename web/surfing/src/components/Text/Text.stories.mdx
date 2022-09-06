@@ -1,0 +1,37 @@
+import { Meta, Title, Subtitle, Story, Canvas, ArgsTable } from "@storybook/addon-docs";
+import Text from "./Text";
+
+<Meta title={"Typography/Text"} component={Text} />
+
+
+<Title>Text</Title>
+
+<Subtitle>
+  Everyday text components - with variations for size, emphasis, and style.
+</Subtitle>
+
+export const Template = (args) => <Text {...args}>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</Text>;
+
+## Default
+<Canvas>
+<Story name="Default" args={{
+    as: "p",
+}}>
+    {Template.bind({})}
+</Story>
+</Canvas>
+
+## Configuration
+
+<ArgsTable of={Text}/>
+
+<Canvas>
+<Story name="Prominent" args={{
+    as: "p",
+    prominent: true
+}}>
+    {Template.bind({})}
+</Story>
+</Canvas>

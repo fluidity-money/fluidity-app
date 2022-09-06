@@ -6,7 +6,6 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
-  border: solid 2px red;
 
   h6 {
     text-align: end;
@@ -23,6 +22,10 @@
   height: 100%;
   justify-content: flex-end;
   align-items: center;
+  & > div {
+    width: 100%;
+    margin-bottom: 30px;
+  }
 }
 
 .footerItems {
@@ -41,19 +44,38 @@
   @include max-860px {
     flex-direction: column;
   }
+  @include max-560px {
+    align-items: flex-start;
+  }
 }
 
 .buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 20px;
+  grid-gap: 22px;
+  @include max-560px {
+    grid-gap: 12px;
+  }
 }
 
 .legal {
   display: flex;
   justify-content: flex-end;
+  @include max-620px {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  & > div {
+    display: flex;
+
+    & > h6 {
+      margin-right: 20px;
+    }
+  }
+
   & > h6 {
-    margin-left: 20px;
+    margin-right: 20px;
   }
 }
 

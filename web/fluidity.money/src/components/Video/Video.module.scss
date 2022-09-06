@@ -1,0 +1,36 @@
+.videoContainer {
+    position: relative;
+    min-height: 1080px;
+}
+
+.fill {
+    object-fit: fill;
+}
+
+.fit {
+    object-fit: fit;
+}
+
+.contain {
+    object-fit: contain;
+}
+
+.cover {
+    object-fit: cover;
+}
+
+.reduce {
+    object-fit: scale-down;
+}
+
+.none {
+    object-fit: none;
+}
+
+.normal {
+    width: 100%;
+}
+
+.scale-up {
+  width: 250%;
+}

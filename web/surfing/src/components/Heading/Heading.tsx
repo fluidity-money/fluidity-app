@@ -2,16 +2,19 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import "./Heading.scss";
+import styles from "./Heading.module.scss";
 
 type Props = {
     children: React.ReactNode;
-    as: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    className?: string;
 };
 
-const Heading = ({ children, as, ...props }: Props & unknown) => {
+const Heading = ({ children, as="h1", className, ...props }: Props & unknown) => {
     const Component = as || "h1";
-    return <Component {...props}>
+    const _className = `${styles[as]} ${className || ""}`;
+
+    return <Component {...props} className={_className}>
         {children}
     </Component>
 };

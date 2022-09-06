@@ -2,16 +2,15 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
-import ManualCarousel from "../../components/ManualCarousel";
+import { ManualCarousel } from "@fluidity-money/surfing";
 import styles from "./Tweets.module.scss";
 
 const Tweets = () => {
   return (
     <div className={styles.container}>
       <ManualCarousel>
-        {tweets.map((tweet) => (
-          <div className={styles.tweetContainer}>
+        {tweets.map((tweet, index) => (
+          <div key={index} className={styles.tweetContainer}>
             <p>{tweet.text}</p>
             <div>{tweet.date}</div>
           </div>

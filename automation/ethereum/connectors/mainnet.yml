@@ -1,0 +1,20 @@
+SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ethereum/websocket_url
+
+SERVICES:
+  - CONNECTORS_ETHEREUM_LOGS-AMQP:
+      SERVICE_NAME: connector-ethereum-logs-amqp
+      DOCKERFILE_PATH: ./cmd/connector-ethereum-logs-amqp    
+      ENV_FLU_WORKER_ID: ethereum-connector-ethereum-logs-amqp
+      ENV_FLU_ETHEREUM_START_BLOCK: latest
+
+  - CONNECTORS_ETHEREUM_BLOCK_HEADERS_AMQP:
+      SERVICE_NAME: connector-ethereum-block-headers-amqp
+      DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
+      ENV_FLU_WORKER_ID: ethereum-connector-ethereum-block-headers-amqp
+
+  - CONNECTORS_COMMON_BLOCKED_PAYOUTS_REPORTING_ETHEREUM:
+      SERVICE_NAME: connector-common-blocked-payouts-reporting-ethereum
+      DOCKER_IMAGE: connector-common-blocked-payouts-reporting
+      DOCKERFILE_PATH: ./cmd/connector-common-blocked-payouts-reporting
+      ENV_FLU_WORKER_ID: ethereum-connector-common-blocked-payouts-reporting
+      ENV_FLU_DISCORD_WEBHOOK: /fluidity/discord/blocked_payouts/webhook

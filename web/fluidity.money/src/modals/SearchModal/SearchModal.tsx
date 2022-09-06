@@ -2,9 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { GeneralButton } from "components/Button";
+import { useState } from "react";
+import { GeneralButton } from "@fluidity-money/surfing";
 import FluidProject from "components/FluidProject";
-import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import styles from "./SearchModal.module.scss";
 

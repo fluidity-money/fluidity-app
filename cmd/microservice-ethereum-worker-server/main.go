@@ -260,6 +260,7 @@ func main() {
 			defaultSecondsSinceLastBlock = workerConfig.DefaultSecondsSinceLastBlock
 			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
 			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
+			atxBufferSize                = workerConfig.AtxBufferSize
 		)
 
 		var (
@@ -268,10 +269,6 @@ func main() {
 		)
 
 		secondsSinceLastBlock := defaultSecondsSinceLastBlock
-
-		// atxBufferSize to go back in time to count the average using the database
-
-		atxBufferSize := roundUp(float64(SecondsInOneYear / defaultSecondsSinceLastBlock))
 
 		switch true {
 
@@ -312,6 +309,8 @@ func main() {
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
 		emission.EthereumBlockNumber = blockNumber
+
+		emission.SecondsSinceLastBlock = secondsSinceLastBlock
 
 		if hintedBlock == nil {
 
@@ -370,11 +369,20 @@ func main() {
 			transfersInBlock = len(fluidTransfers)
 		}
 
-		averageTransfersInBlock := addAndComputeAverageAtx(
+		averageTransfersInBlock, atxBlocks, atxTxCounts := addAndComputeAverageAtx(
 			blockNumber.Uint64(),
-			atxBufferSize,
 			tokenName,
 			transfersInBlock,
+			atxBufferSize,
+		)
+
+		emission.AtxBufferSize = atxBufferSize
+
+		emission.TransfersInBlock = transfersInBlock
+
+		emission.TransfersPast = concatenatePastTransfers(
+			atxBlocks,
+			atxTxCounts,
 		)
 
 		emission.AverageTransfersInBlock = float64(averageTransfersInBlock)
@@ -603,6 +611,7 @@ func main() {
 			transferFeeUsd.Quo(transferFeeUsd, big.NewRat(1e18, 1))
 
 			// if we have an application transfer, apply the fee
+
 			if applicationFeeUsd != nil {
 				transferFeeUsd.Add(transferFeeUsd, applicationFeeUsd)
 			}

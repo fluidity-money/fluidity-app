@@ -2,38 +2,44 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React from "react";
 import { Link } from "react-router-dom";
+import { LinkButton } from "@fluidity-money/surfing";
 import styles from "./ResourcesNavModal.module.scss";
 
 interface IResourcesNavModal {
   handleModal: () => void;
+  navLinks: ILinkButton[];
 }
 
-const ResourcesNavModal = ({ handleModal }: IResourcesNavModal) => {
+interface ILinkButton {
+  children: string;
+  size: "small" | "medium" | "large";
+  type: "internal" | "external";
+  handleClick: () => void;
+}
+
+const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
   return (
     <div className={styles.container}>
-      <h4>
-        <Link onClick={() => handleModal()} to="/resources#articles">
-          {"Articles >"}
-        </Link>
-      </h4>
-      <h4>
-        <Link onClick={() => handleModal()} to="/resources#fluniversity">
-          {"Fluniversity >"}
-        </Link>
-      </h4>
-      <h4>
-        <Link onClick={() => handleModal()} to="/resources#whitepapers">
-          {"Whitepapers >"}
-        </Link>
-      </h4>
-      <h4>
-        <Link onClick={() => handleModal()} to="/resources#docs">
-          {"Documentation [>]"}
-        </Link>
-      </h4>
+      {navLinks.map((link) => (
+        <h4>
+          <a onClick={() => handleModal()} href={`/resources#${link.children}`}>
+            <LinkButton
+              size={link.size}
+              type={link.type}
+              handleClick={() => {}}
+            >
+              {link.children}
+            </LinkButton>
+          </a>
+        </h4>
+      ))}
+      <div className={styles.socials}>
+        <img src="/assets/images/socials/twitter.svg" />
+        <img src="/assets/images/socials/discord.svg" />
+        <img src="/assets/images/socials/telegram.svg" />
+      </div>
     </div>
   );
 };

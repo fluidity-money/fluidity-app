@@ -1,0 +1,2 @@
+# ☀ Solana account structure
+
