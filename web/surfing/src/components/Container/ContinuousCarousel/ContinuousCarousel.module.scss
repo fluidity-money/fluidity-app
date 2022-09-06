@@ -160,3 +160,15 @@
     transform: translateY(-80%);
   }
 }
+
+.backgroundLeft {
+  & > div {
+    animation: scrollLeft 2000s infinite linear;
+  }
+}
+
+.backgroundRight {
+  & > div {
+    animation: scrollRight 2000s infinite linear;
+  }
+}

@@ -55,6 +55,7 @@ jobs:
         id: build
         uses: ./scripts/actions
         with:
+          version: v1.0.0
           command: |
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
@@ -68,6 +69,7 @@ jobs:
         id: deploy
         uses: ./scripts/actions
         with:
+          version: v1.0.0
           command: |
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \

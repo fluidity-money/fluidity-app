@@ -11,3 +11,10 @@ SERVICES:
       SERVICE_NAME: connector-ethereum-block-headers-amqp
       DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
       ENV_FLU_WORKER_ID: ethereum-connector-ethereum-block-headers-amqp
+
+  - CONNECTORS_COMMON_BLOCKED_PAYOUTS_REPORTING_ETHEREUM:
+      SERVICE_NAME: connector-common-blocked-payouts-reporting-ethereum
+      DOCKER_IMAGE: connector-common-blocked-payouts-reporting
+      DOCKERFILE_PATH: ./cmd/connector-common-blocked-payouts-reporting
+      ENV_FLU_WORKER_ID: ethereum-connector-common-blocked-payouts-reporting
+      ENV_FLU_DISCORD_WEBHOOK: /fluidity/discord/blocked_payouts/webhook

@@ -34,18 +34,21 @@ jobs:
         id: diff
         uses: ./scripts/actions
         with:
+          version: v1.0.0
           command: |
             flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Build
         id: build
         uses: ./scripts/actions
         with:
+          version: v1.0.0
           command: |
             flu build-docker-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
+          version: v1.0.0
           command: |
             flu deploy-service-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
