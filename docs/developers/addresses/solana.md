@@ -1,5 +1,58 @@
 # ☀ Solana
 
+## Mainnet
+
+### USDC
+
+| Text                                                        | Value                                        |
+| ----------------------------------------------------------- | -------------------------------------------- |
+| The address of the regular USDC token, as used by Solend    | EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v |
+| The address of the fUSDC token                              | Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv |
+| Obligation account                                          | J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A |
+| Reserve account                                             | BgxfHJDzm44T7XG68MYKx7YisTjZu73tVovyZSjJMpmw |
+| The public key of Pyth (used as an oracle for price lookup) | Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD |
+| The public key of the Switchboard oracle for USDC           | CZx29wKMUxaJDq6aLVQTdViPL754tTR64NAgQBUGxxHb |
+| The name of the token                                       | fUSDC                                        |
+| The number of decimals in the token                         | 6                                            |
+| Data account                                                | Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce |
+| PDA                                                         | CBrYRFyEwyn9gMPVFbRBwfcoU6JnViTEBaYyvFZGgZnc |
+| Base token account                                          | PwXvsW9wzK3cBryYa8xXNm9gfamfmDGdWUE9YLiuhHD  |
+| Fluid token account                                         | 3GCJGw174tvJfP4vXrZ3Xoev1c9sG1HNzUep84AAPHoM |
+| Solend program                                              | So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo  |
+| Collateral account                                          | 8uXbxhRBGijWWgFhCw6kPAMHBBnqijwvKCZ1GGVLjErc |
+| Reserve                                                     | BgxfHJDzm44T7XG68MYKx7YisTjZu73tVovyZSjJMpmw |
+| Reserve liquidity supply                                    | 8SheGtsopRUDzdiD6v6BR9a6bqZ9QwywYQY99Fp5meNf |
+| Collateral mint                                             | 993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk |
+| Lending market                                              | 4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY |
+| Market authority                                            | DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby |
+| Collateral supply                                           | UtRy8gcEu9fCkDuUrU8EmC7Uc6FZy5NCwttzG7i6nkw  |
+
+### USDT
+
+| Text                                                        | Value                                        |
+| ----------------------------------------------------------- | -------------------------------------------- |
+| The address of the regular USDT token, as used by Solend    | Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB |
+| The address of the fUSDT token                              | D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8 |
+| Obligation account                                          | 446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca |
+| Reserve account                                             | 8K9WC8xoh2rtQNY7iEGXtPvfbDCi563SdWhCAhuMP2xE |
+| The public key of Pyth (used as an oracle for price lookup) | 3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL |
+| The public key of the Switchboard oracle for USDT           | 5mp8kbkTYwWWCsKSte8rURjTuyinsqBpJ9xAQsewPDD  |
+| The name of the token                                       | fUSDT                                        |
+| The number of decimals in the token                         | 6                                            |
+| Data account                                                | DrKwQQrKcbNCLkVfAVasxk1j7ccCaXVfdVdS6RijRZo  |
+| PDA                                                         | 5tCSTEkozvUw9YZxZzsGkR9upMQNacFEBiYN21nfCj77 |
+| Base token account                                          | jBFDkQVdhX5E3EDtisNGozg2zQR1ZGMgX2edWbuao1T  |
+| Fluid token account                                         | 45u3LjY7ehw6ZGh8KK2HVPRdYY52BQJskja9J2PUQUEu |
+| Solend program                                              | So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo  |
+| Collateral account                                          | DHoXhJ53JJit81q9zTUCCxkDCQBMh3C75wqW4jSjEPeo |
+| Reserve liquidity supply                                    | 3CdpSW5dxM7RTxBgxeyt8nnnjqoDbZe48tsBs9QUrmuN |
+| Collateral mint                                             | BTsbZDV7aCMRJ3VNy9ygV4Q2UeEo9GpR8D6VvmMZzNr8 |
+| Lending market                                              | 4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY |
+| Market authority                                            | DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby |
+| Collateral supply                                           | CXDxj6cepVv9nWh4QYqWS2MpeoVKBLKJkMfo3c6Y1Lud |
+| Pyth account                                                | 3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL |
+| Switchboard account                                         | 5mp8kbkTYwWWCsKSte8rURjTuyinsqBpJ9xAQsewPDD  |
+
 ## Devnet
 
 | Text                                          | Value                                        |
@@ -63,56 +116,3 @@
 | Lending market                                              | GvjoVKNjBvQcFaSKUW1gTE7DxhSpjHbE69umVR5nPuQp |
 | Market authority                                            | EhJ4fwaXUp7aiwvZThSUaGWCaBQAJe3AEaJJJVCn3UCK |
 | Collateral supply                                           | 8vC5UkqSAJkrZ5Srwbn243sCx7s8UC1nBZ5cbtNv1ui3 |
-
-## Mainnet
-
-### USDC
-
-| Text                                                        | Value                                        |
-| ----------------------------------------------------------- | -------------------------------------------- |
-| The address of the regular USDC token, as used by Solend    | EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v |
-| The address of the fUSDC token                              | Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv |
-| Obligation account                                          | J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A |
-| Reserve account                                             | BgxfHJDzm44T7XG68MYKx7YisTjZu73tVovyZSjJMpmw |
-| The public key of Pyth (used as an oracle for price lookup) | Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD |
-| The public key of the Switchboard oracle for USDC           | CZx29wKMUxaJDq6aLVQTdViPL754tTR64NAgQBUGxxHb |
-| The name of the token                                       | fUSDC                                        |
-| The number of decimals in the token                         | 6                                            |
-| Data account                                                | Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce |
-| PDA                                                         | CBrYRFyEwyn9gMPVFbRBwfcoU6JnViTEBaYyvFZGgZnc |
-| Base token account                                          | PwXvsW9wzK3cBryYa8xXNm9gfamfmDGdWUE9YLiuhHD  |
-| Fluid token account                                         | 3GCJGw174tvJfP4vXrZ3Xoev1c9sG1HNzUep84AAPHoM |
-| Solend program                                              | So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo  |
-| Collateral account                                          | 8uXbxhRBGijWWgFhCw6kPAMHBBnqijwvKCZ1GGVLjErc |
-| Reserve                                                     | BgxfHJDzm44T7XG68MYKx7YisTjZu73tVovyZSjJMpmw |
-| Reserve liquidity supply                                    | 8SheGtsopRUDzdiD6v6BR9a6bqZ9QwywYQY99Fp5meNf |
-| Collateral mint                                             | 993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk |
-| Lending market                                              | 4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY |
-| Market authority                                            | DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby |
-| Collateral supply                                           | UtRy8gcEu9fCkDuUrU8EmC7Uc6FZy5NCwttzG7i6nkw  |
-
-### USDT
-
-| Text                                                        | Value                                        |
-| ----------------------------------------------------------- | -------------------------------------------- |
-| The address of the regular USDT token, as used by Solend    | Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB |
-| The address of the fUSDT token                              | D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8 |
-| Obligation account                                          | 446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca |
-| Reserve account                                             | 8K9WC8xoh2rtQNY7iEGXtPvfbDCi563SdWhCAhuMP2xE |
-| The public key of Pyth (used as an oracle for price lookup) | 3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL |
-| The public key of the Switchboard oracle for USDT           | 5mp8kbkTYwWWCsKSte8rURjTuyinsqBpJ9xAQsewPDD  |
-| The name of the token                                       | fUSDT                                        |
-| The number of decimals in the token                         | 6                                            |
-| Data account                                                | DrKwQQrKcbNCLkVfAVasxk1j7ccCaXVfdVdS6RijRZo  |
-| PDA                                                         | 5tCSTEkozvUw9YZxZzsGkR9upMQNacFEBiYN21nfCj77 |
-| Base token account                                          | jBFDkQVdhX5E3EDtisNGozg2zQR1ZGMgX2edWbuao1T  |
-| Fluid token account                                         | 45u3LjY7ehw6ZGh8KK2HVPRdYY52BQJskja9J2PUQUEu |
-| Solend program                                              | So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo  |
-| Collateral account                                          | DHoXhJ53JJit81q9zTUCCxkDCQBMh3C75wqW4jSjEPeo |
-| Reserve liquidity supply                                    | 3CdpSW5dxM7RTxBgxeyt8nnnjqoDbZe48tsBs9QUrmuN |
-| Collateral mint                                             | BTsbZDV7aCMRJ3VNy9ygV4Q2UeEo9GpR8D6VvmMZzNr8 |
-| Lending market                                              | 4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY |
-| Market authority                                            | DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby |
-| Collateral supply                                           | CXDxj6cepVv9nWh4QYqWS2MpeoVKBLKJkMfo3c6Y1Lud |
-| Pyth account                                                | 3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL |
-| Switchboard account                                         | 5mp8kbkTYwWWCsKSte8rURjTuyinsqBpJ9xAQsewPDD  |
