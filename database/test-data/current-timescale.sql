@@ -26,6 +26,53 @@ INSERT INTO past_winnings VALUES (
 	'solana'
 );
 
+INSERT INTO winners VALUES (
+	'ethereum',
+	'0xabc',
+	'0x00000000000000000000000000000000',
+	500,
+	'2022-05-08',
+	now(),
+	'USDC',
+	6,
+	NULL
+);
+
+INSERT INTO winners VALUES (
+	'ethereum',
+	'0xabc',
+	'0x00000000000000000000000000000001',
+	500,
+	'2022-05-07',
+	now(),
+	'USDC',
+	6,
+	NULL
+);
+INSERT INTO winners VALUES (
+	'ethereum',
+	'0xabc',
+	'0x00000000000000000000000000000002',
+	1500000000000000000,
+	'2022-05-08',
+	now(),
+	'DAI',
+	18,
+	NULL
+);
+
+INSERT INTO winners VALUES (
+	'solana',
+	'abc',
+	'3',
+	500,
+	'2022-05-08',
+	now(),
+	'USDC',
+	6,
+	NULL
+);
+
 INSERT INTO worker_emissions VALUES (
 	-- transaction info
 	'0x00000000000000000000000000000000',
