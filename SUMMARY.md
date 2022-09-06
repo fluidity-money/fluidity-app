@@ -58,6 +58,7 @@
   * [🔮 Oracle Key Rotation](docs/security/oracle-key-rotation.md)
   * [📥 Dropboxes](docs/security/dropboxes.md)
   * [💰 Bounty program](docs/security/bounty-program.md)
+* [💬 Partnerships](docs/partnerships.md)
 * [Relevant links](docs/relevant-links/README.md)
   * [Fluidity website and whitepapers](https://fluidity.money/)
   * [Discord server](https://discord.gg/CNvpJk4HpC)
