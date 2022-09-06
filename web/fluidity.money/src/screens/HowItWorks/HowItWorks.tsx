@@ -4,8 +4,14 @@
 
 import Video from "components/Video";
 import { useEffect, useState } from "react";
-import { ContinuousCarousel, LinkButton } from "@fluidity-money/surfing";
+import {
+  ContinuousCarousel,
+  Display,
+  Heading,
+  LinkButton,
+} from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
+import useViewport from "hooks/useViewport";
 
 const HowItWorks = () => {
   /* 
@@ -34,6 +40,16 @@ const HowItWorks = () => {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  const { width } = useViewport();
+  const size = width > 1000 ? "h3" : width < 1000 && width > 520 ? "h4" : "h5";
+
+  const backgroundText =
+    currentImage === "/assets/videos/Fluidity_Wrap.mp4"
+      ? "FLUIDIFY"
+      : currentImage === "/assets/videos/Fluidity_Yield.mp4"
+      ? "YIELD"
+      : "GOVERN";
 
   return (
     <div className={`${styles.container} bg-dark`}>
@@ -100,6 +116,10 @@ const HowItWorks = () => {
           </a>
         </div>
         <div className={styles.right}>
+          <div className={styles.backgroundText}>
+            {<Heading as={size}>{backgroundText}</Heading>}
+          </div>
+
           {currentImage === "/assets/videos/Fluidity_Wrap.mp4" ? (
             <div>
               <Video
