@@ -20,10 +20,10 @@
 [nfts.md](nfts.md)
 {% endcontent-ref %}
 
-{% content-ref url="other-use-cases.md" %}
-[other-use-cases.md](other-use-cases.md)
-{% endcontent-ref %}
-
 {% content-ref url="transactions-and-payments.md" %}
 [transactions-and-payments.md](transactions-and-payments.md)
+{% endcontent-ref %}
+
+{% content-ref url="other-use-cases.md" %}
+[other-use-cases.md](other-use-cases.md)
 {% endcontent-ref %}
