@@ -23,15 +23,3 @@
 {% content-ref url="launch-restrictions-mint-limits.md" %}
 [launch-restrictions-mint-limits.md](launch-restrictions-mint-limits.md)
 {% endcontent-ref %}
-
-{% content-ref url="advisory-team.md" %}
-[advisory-team.md](advisory-team.md)
-{% endcontent-ref %}
-
-{% content-ref url="laws-of-fluidity.md" %}
-[laws-of-fluidity.md](laws-of-fluidity.md)
-{% endcontent-ref %}
-
-{% content-ref url="roadmap/" %}
-[roadmap](roadmap/)
-{% endcontent-ref %}
