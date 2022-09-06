@@ -1,6 +1,6 @@
 -- migrate:up
 
--- aggregate each user's rewards daily
+-- aggregate rewards daily for each network
 
 CREATE MATERIALIZED VIEW aggregated_rewards_daily
 WITH (timescaledb.continuous) AS
@@ -17,7 +17,7 @@ SELECT add_continuous_aggregate_policy('aggregated_rewards_daily',
     end_offset => INTERVAL '1 day',
     schedule_interval => INTERVAL '1 hour');
 
--- aggregate each user's rewards monthly
+-- aggregate rewards monthly for each network
 
 CREATE MATERIALIZED VIEW aggregated_rewards_monthly
 WITH (timescaledb.continuous) AS
