@@ -6,4 +6,5 @@ ALTER TABLE past_winnings
 -- migrate:down
 
 ALTER TABLE past_winnings
-	ALTER COLUMN winning_amount TYPE uint256 NOT NULL;
+	ALTER COLUMN winning_amount TYPE uint256,
+	ALTER COLUMN winning_amount SET NOT NULL;
