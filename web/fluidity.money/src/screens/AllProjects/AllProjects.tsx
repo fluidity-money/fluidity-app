@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { FilterCriteria } from "surfing";
+import { FilterCriteria } from "@fluidity-money/surfing";
 import FluidProject from "../../components/FluidProject";
 import styles from "./AllProjects.module.scss";
 import { clearForAny, handleFilterButton } from "./util";

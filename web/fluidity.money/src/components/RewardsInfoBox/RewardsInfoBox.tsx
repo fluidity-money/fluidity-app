@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { LinkButton, numberToMonetaryString } from "surfing";
+import { LinkButton, numberToMonetaryString } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {

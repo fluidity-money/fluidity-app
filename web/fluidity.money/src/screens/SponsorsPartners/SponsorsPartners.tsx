@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import useViewport from "hooks/useViewport";
-import { ContinuousCarousel, Partner, Card } from "surfing";
+import { ContinuousCarousel, Partner, Card } from "@fluidity-money/surfing";
 import styles from "./SponsorsPartners.module.scss";
 
 const SponsorsPartners = () => {

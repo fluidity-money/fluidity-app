@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { GeneralButton, numberToMonetaryString } from "surfing";
+import { GeneralButton, numberToMonetaryString } from "@fluidity-money/surfing";
 import { useChainContext } from "hooks/ChainContext";
 import Video from "components/Video";
 import styles from "./Demo.module.scss";

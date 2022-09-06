@@ -4,7 +4,7 @@
 
 import useViewport from "hooks/useViewport";
 import Socials from "../../components/Socials";
-import { ContinuousCarousel, GeneralButton, FooterItem } from "surfing";
+import { ContinuousCarousel, GeneralButton, FooterItem } from "@fluidity-money/surfing";
 import styles from "./Footer.module.scss";
 
 interface IItem {

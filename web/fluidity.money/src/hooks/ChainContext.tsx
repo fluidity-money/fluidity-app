@@ -8,7 +8,7 @@ import type { PrizePool } from "../data/prizePool";
 import type { TransactionCount } from "../data/userActions";
 
 import { createContext, useContext, useState  } from "react";
-import { SupportedChains, formatToGraphQLDate } from "surfing";
+import { SupportedChains, formatToGraphQLDate } from "@fluidity-money/surfing";
 import { useWinningTransactions } from "../data/winners";
 import { useLivePrizePool } from "../data/prizePool";
 import { useCountTransactions } from "../data/userActions";

@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { Link } from "react-router-dom";
-import { LinkButton } from "surfing";
+import { LinkButton } from "@fluidity-money/surfing";
 import styles from "./ResourcesNavModal.module.scss";
 
 interface IResourcesNavModal {

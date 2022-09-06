@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useMemo } from "react";
-import { DataTable } from "surfing";
+import { DataTable } from "@fluidity-money/surfing";
 
 import styles from "./Transactions.module.scss";
 

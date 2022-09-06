@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useRef } from "react";
-import { ManualCarousel, LinkButton } from "surfing";
+import { ManualCarousel, LinkButton } from "@fluidity-money/surfing";
 import { motion, useScroll } from "framer-motion";
 import styles from "./Ecosystem.module.scss";
 

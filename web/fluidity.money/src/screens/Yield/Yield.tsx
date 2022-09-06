@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ReusableGrid } from "surfing";
+import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Yield.module.scss";
