@@ -30,7 +30,7 @@ const RewardsBackground = () => {
 
   const carouselInfo = (
     <div>
-      {rewards.slice(100).map(({ token, amount, address, date }, i) => (
+      {rewards.slice(10).map(({ token, amount, address, date }, i) => (
         <div key={`winner-${i}`} className={styles.winner}>
           <img
             src={
@@ -51,35 +51,49 @@ const RewardsBackground = () => {
     <div className={styles.container}>
       <div className={styles.shade}></div>
       <div className={styles.rewardsBackground}>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
       </div>
