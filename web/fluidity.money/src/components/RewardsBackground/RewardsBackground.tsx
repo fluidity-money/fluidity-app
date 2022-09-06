@@ -8,6 +8,7 @@ import {
   numberToMonetaryString,
   trimAddress,
   formatTo12HrDate,
+  Text,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
 import { JsxElement } from "typescript";
@@ -40,9 +41,9 @@ const RewardsBackground = () => {
             }
             alt="tokenIcon"
           />
-          <p>{numberToMonetaryString(amount)} </p>
-          <p>{trimAddress(address)} </p>
-          <p>{formatTo12HrDate(date)}</p>
+          <Text as="p">{numberToMonetaryString(amount)} </Text>
+          <Text as="p">{trimAddress(address)} </Text>
+          <Text as="p">{formatTo12HrDate(date)}</Text>
         </div>
       ))}
     </div>
