@@ -109,6 +109,7 @@ const HowItWorks = () => {
                 type={"fit"}
                 view={"normal"}
                 loop={true}
+                key={"abc"}
               />
             </div>
           ) : currentImage === "/assets/videos/Fluidity_Yield.mp4" ? (
@@ -120,6 +121,7 @@ const HowItWorks = () => {
                 type={"fit"}
                 view={"normal"}
                 loop={true}
+                key={"xyz"}
               />
             </div>
           ) : (
@@ -132,6 +134,7 @@ const HowItWorks = () => {
                 type={"fit"}
                 view={"normal"}
                 loop={true}
+                key={"jfk"}
               />
             </div>
           )}
