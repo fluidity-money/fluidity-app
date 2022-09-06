@@ -89,9 +89,15 @@ const HowItWorks = () => {
           >
             The user is incentivised through governance.
           </p>
-          <LinkButton type={"internal"} size={"medium"} handleClick={() => {}}>
-            HOW IT WORKS
-          </LinkButton>
+          <a href="/howitworks">
+            <LinkButton
+              type={"internal"}
+              size={"medium"}
+              handleClick={() => {}}
+            >
+              HOW IT WORKS
+            </LinkButton>
+          </a>
         </div>
         <div className={styles.right}>
           <div>
