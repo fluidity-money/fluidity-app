@@ -17,7 +17,7 @@ const HowItWorks = () => {
    */
   const images = [
     "/assets/videos/Fluidity_Wrap.mp4",
-    "'/assets/videos/Fluidity_Yield.mp4'",
+    "/assets/videos/Fluidity_Yield.mp4",
     "/assets/videos/Fluidity_HowItWorks.mp4",
   ];
   const [currentImage, setCurrentImage] = useState(
@@ -72,7 +72,7 @@ const HowItWorks = () => {
           </p>
           <p
             className={
-              currentImage === "'/assets/videos/Fluidity_Yield.mp4'"
+              currentImage === "/assets/videos/Fluidity_Yield.mp4"
                 ? styles.bold
                 : styles.normal
             }
