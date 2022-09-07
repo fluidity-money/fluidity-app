@@ -1,2 +1,2 @@
 # Surfing 🌊
-Fluidity Design System, V1
+Fluidity Design System, V1.0
