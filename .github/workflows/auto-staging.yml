@@ -29,6 +29,7 @@ jobs:
           node-version: 16
       - name: Build changed dependencies
         id: lib_diff
+        continue-on-error: true
         run: |
           git diff HEAD^ HEAD --exit-code -- web/surfing
           echo "::set-output name=surfing::$?"
