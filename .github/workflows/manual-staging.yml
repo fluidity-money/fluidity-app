@@ -12,8 +12,8 @@ on:
         type: choice
         description: 'Network'
         options: 
-          - 'ropsten'
           - 'devnet'
+          - 'ropsten'
           - 'fluidity'
       group:
         description: 'Group'
@@ -54,9 +54,8 @@ jobs:
       - name: Build
         if: ${{ github.event.inputs.skip_build == 'false' }}
         id: build
-        uses: ./scripts/actions
+        uses: ./scripts/actions/staging
         with:
-          version: latest
           command: |
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
@@ -68,9 +67,8 @@ jobs:
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
-        uses: ./scripts/actions
+        uses: ./scripts/actions/staging
         with:
-          version: latest
           command: |
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \

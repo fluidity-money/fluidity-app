@@ -53,9 +53,8 @@ jobs:
       - name: Build
         if: ${{ github.event.inputs.skip_build == 'false' }}
         id: build
-        uses: ./scripts/actions
+        uses: ./scripts/actions/mainnet
         with:
-          version: v1.0.0
           command: |
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
@@ -67,9 +66,8 @@ jobs:
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
-        uses: ./scripts/actions
+        uses: ./scripts/actions/mainnet
         with:
-          version: v1.0.0
           command: |
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
