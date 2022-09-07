@@ -4,9 +4,13 @@
 
 import { Display } from "@fluidity-money/surfing";
 import Video from "components/Video";
+import useViewport from "hooks/useViewport";
 import styles from "./Incentivising.module.scss";
 
 const Incentivising = () => {
+  const { width } = useViewport();
+  const breakpoint = 620;
+
   return (
     <div className={styles.container}>
       <Video
@@ -15,10 +19,18 @@ const Incentivising = () => {
         loop={true}
       />
       <div>
-        <Display className={styles.backgroundText} large={true}>
+        <Display
+          className={styles.backgroundText}
+          large={width > breakpoint && true}
+          small={width < breakpoint && true}
+        >
           Incentivising
         </Display>
-        <Display className={styles.backgroundText} large={true}>
+        <Display
+          className={styles.backgroundText}
+          large={width > breakpoint && true}
+          small={width < breakpoint && true}
+        >
           blockchain utility
         </Display>
       </div>
