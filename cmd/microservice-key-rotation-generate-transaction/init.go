@@ -1,16 +1,16 @@
 package main
 
 import (
-    "strings"
-    ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	"strings"
 )
 
 func init() {
-    reader := strings.NewReader(workerConfigAbiString)
+	reader := strings.NewReader(workerConfigAbiString)
 
-    var err error
+	var err error
 
-    if workerConfigAbi, err = ethAbi.JSON(reader); err != nil {
-	panic(err)
-    }
+	if workerConfigAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }
