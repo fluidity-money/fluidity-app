@@ -13,7 +13,9 @@ const MobileNavBar = () => {
   return (
     <div className={styles.container}>
       <div className={`${styles.nav} opacity-5x`}>
-        <h2 className={open ? styles.hidden : styles.fluidity}>fluidity</h2>
+        <a className={open ? styles.hidden : styles.fluidity} href={"/"}>
+          <img src="/assets/images/textLogo.svg" alt="home page" />
+        </a>
 
         <BurgerMenu isOpen={open} setIsOpen={setIsOpen} />
       </div>

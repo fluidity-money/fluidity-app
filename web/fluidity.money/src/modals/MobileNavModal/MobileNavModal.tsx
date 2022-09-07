@@ -25,7 +25,12 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
 
   return (
     <div className={styles.container}>
-      <img src="/assets/images/logoOutline.svg" alt="logo" />
+      <div className={styles.imgContainer}>
+        <a href={"/"}>
+          <img src="/assets/images/logoMetallic.png" alt="logo" />
+        </a>
+      </div>
+
       {links}
       <GeneralButton
         version={"primary"}
@@ -44,10 +49,18 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
         LET'S CHAT
       </GeneralButton>
       <div className={styles.socials}>
-        <img src="/assets/images/socials/twitter.svg" alt="twitter" />
-        <img src="/assets/images/socials/discord.svg" alt="discord" />
-        <img src="/assets/images/socials/telegram.svg" alt="telegram" />
-        <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+        <a href="https://twitter.com/fluiditymoney">
+          <img src="/assets/images/socials/twitter.svg" alt="twitter" />
+        </a>
+        <a href="https://discord.gg/CNvpJk4HpC">
+          <img src="/assets/images/socials/discord.svg" alt="discord" />
+        </a>
+        <a href="https://t.me/fluiditymoney">
+          <img src="/assets/images/socials/telegram.svg" alt="telegram" />
+        </a>
+        <a href="https://www.linkedin.com/company/74689228/">
+          <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+        </a>
       </div>
     </div>
   );
