@@ -1,0 +1,24 @@
+SERVICES:
+  - CONNECTOR_COMMON_USER_ACTIONS_TIMESCALE:
+      SERVICE_NAME: connector-common-user-actions-timescale-solana
+      DOCKERFILE_PATH: ./cmd/connector-common-user-actions-timescale
+      DOCKER_IMAGE: connector-common-user-actions-timescale
+      ENV_FLU_WORKER_ID: solana-connector-common-user-actions-timescale
+
+  - CONNECTOR_COMMON_PRIZE_POOL_POSTGRES:
+      SERVICE_NAME: connector-common-prize-pool-postgres-solana
+      DOCKERFILE_PATH: ./cmd/connector-common-prize-pool-postgres
+      DOCKER_IMAGE: connector-common-prize-pool-postgres
+      ENV_FLU_WORKER_ID: solana-connector-common-prize-pool-postgres
+
+  - CONNECTOR_COMMON_WINNERS_TIMESCALE:
+      SERVICE_NAME: connector-common-winners-timescale-solana
+      DOCKERFILE_PATH: ./cmd/connector-common-winners-timescale
+      DOCKER_IMAGE: connector-common-winners-timescale
+      ENV_FLU_WORKER_ID: solana-connector-common-prize-pool
+
+  - CONNECTOR_COMMON_EMISSIONS_TIMESCALE:
+      SERVICE_NAME: connector-common-emissions-timescale-solana
+      DOCKERFILE_PATH: ./cmd/connector-common-emissions-timescale
+      DOCKER_IMAGE: connector-common-emissions-timescale
+      ENV_FLU_WORKER_ID: solana-connector-common-emissions-timescale
