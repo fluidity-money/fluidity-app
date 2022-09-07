@@ -210,7 +210,7 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 
 		// get the mint and decimals of the source account
 
-		sourceMint, decimals, err := spl_token.GetMintAndDecimals(
+		sourceMint, err := spl_token.GetMintFromPda(
 			solanaClient,
 			userSourceSplAccountPubkey,
 		)
@@ -225,9 +225,25 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 			)
 		}
 
+		decimals, err := spl_token.GetDecimalsFromPda(
+			solanaClient,
+			userSourceSplAccountPubkey,
+			"",
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to get Orca source spl-token decimals %#v in instruction %v in %#v! %v",
+				userSourceSplAccountPubkey,
+				instructionNumber,
+				transactionSignature,
+				err,
+			)
+		}
+
 		// get the mint of the destination account
 
-		destinationMint, _, err := spl_token.GetMintAndDecimals(
+		destinationMint, err := spl_token.GetMintFromPda(
 			solanaClient,
 			userDestinationSplAccountPubkey,
 		)
