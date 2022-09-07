@@ -5,18 +5,29 @@
 import styles from "./Heading.module.scss";
 
 type Props = {
-    children: React.ReactNode;
-    as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-    className?: string;
+  children: React.ReactNode;
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  className?: string;
+  hollow?: boolean;
 };
 
-const Heading = ({ children, as="h1", className, ...props }: Props & unknown) => {
-    const Component = as || "h1";
-    const _className = `${styles[as]} ${className || ""}`;
+const Heading = ({
+  children,
+  as = "h1",
+  className,
+  hollow,
+  ...props
+}: Props & unknown) => {
+  const Component = as || "h1";
+  const _className = `${styles[as]} ${className || ""} ${
+    hollow && styles.hollow
+  }`;
 
-    return <Component {...props} className={_className}>
-        {children}
+  return (
+    <Component {...props} className={_className}>
+      {children}
     </Component>
+  );
 };
 
 export default Heading;

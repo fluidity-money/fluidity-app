@@ -4,7 +4,13 @@
 
 import useViewport from "hooks/useViewport";
 import Socials from "../../components/Socials";
-import { ContinuousCarousel, GeneralButton, FooterItem } from "@fluidity-money/surfing";
+import {
+  ContinuousCarousel,
+  GeneralButton,
+  FooterItem,
+  Text,
+  Heading,
+} from "@fluidity-money/surfing";
 import styles from "./Footer.module.scss";
 
 interface IItem {
@@ -17,6 +23,18 @@ const Footer = () => {
   const { width } = useViewport();
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
+
+  const callout = (
+    <div className={styles.callout}>
+      <Heading hollow={true} as="h4" className={styles.text}>
+        USE YIELD WIN
+      </Heading>
+      <Heading as="h4" className={styles.text}>
+        FLUIDITY
+      </Heading>
+    </div>
+  );
+
   return (
     <div className={styles.container}>
       <Socials />
@@ -40,7 +58,7 @@ const Footer = () => {
               type={"text"}
               size={
                 width > firstBreakpoint
-                  ? "large"
+                  ? "medium"
                   : width > secondBreakpoint && width < firstBreakpoint
                   ? "medium"
                   : "small"
@@ -54,7 +72,7 @@ const Footer = () => {
               type={"text"}
               size={
                 width > firstBreakpoint
-                  ? "large"
+                  ? "medium"
                   : width > secondBreakpoint && width < firstBreakpoint
                   ? "medium"
                   : "small"
@@ -65,11 +83,17 @@ const Footer = () => {
           </div>
           <div className={styles.legal}>
             <div>
-              <h6>Terms</h6>
-              <h6>Provivacy Poilicy</h6>
+              <Text as="p" size="xs">
+                Terms
+              </Text>
+              <Text as="p" size="xs">
+                Provivacy Poilicy
+              </Text>
             </div>
 
-            <h6>© 2022 Fluidity Money. All Rights Reserved.</h6>
+            <Text as="p" size="xs">
+              © 2022 Fluidity Money. All Rights Reserved.
+            </Text>
           </div>
         </div>
       </div>
@@ -77,16 +101,17 @@ const Footer = () => {
       <div className={styles.carousel}>
         <ContinuousCarousel direction={"right"}>
           <div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
-            <div className={styles.text}>USE YIELD WIN FLUIDITY</div>
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
           </div>
         </ContinuousCarousel>
       </div>

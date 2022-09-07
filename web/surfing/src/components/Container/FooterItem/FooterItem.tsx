@@ -3,6 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { LinkButton } from "components/Button";
+import { Heading } from "~/components/Heading";
 import useViewport from "~/util/hooks/useViewport";
 import styles from "./FooterItem.module.scss";
 
@@ -21,6 +22,14 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   const { width } = useViewport();
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
+  const heading = width < 405 ? "h5" : "h4";
+
+  //  h1 {
+  //   font-size: 36px;
+  //   @media (max-width: 560px) {
+  //     font-size: 20px;
+  //   }
+  // }
 
   const itemList = (
     <ul>
@@ -35,9 +44,9 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
               handleClick={() => {}}
               size={
                 width > firstBreakpoint
-                  ? "large"
+                  ? "small"
                   : width > secondBreakpoint && width < firstBreakpoint
-                  ? "medium"
+                  ? "small"
                   : "small"
               }
               type={item.type}
@@ -53,7 +62,7 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   return (
     <div className={styles.container}>
       <a href={`/${children.replace(/\s+/g, "").toLowerCase()}`}>
-        <h1>{children}</h1>
+        <Heading as={heading}>{children}</Heading>
       </a>
 
       {itemList}
