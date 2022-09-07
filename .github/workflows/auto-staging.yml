@@ -41,7 +41,9 @@ jobs:
       - name: Build Surfing
         if: steps.lib_diff.results.surfing == 1
         working-directory: web/surfing
-        run: npm build
+        run: |
+          npm install
+          npm build
       - name: Release Surfing
         if: steps.lib_diff.results.surfing == 1
         uses: JS-DevTools/npm-publish@v1
