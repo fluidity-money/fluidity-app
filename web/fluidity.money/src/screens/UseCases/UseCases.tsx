@@ -4,18 +4,26 @@
 
 import { Display, ManualCarousel } from "@fluidity-money/surfing";
 import UseCase from "components/UseCase";
+import useViewport from "hooks/useViewport";
 import styles from "./UseCases.module.scss";
 
 const UseCases = () => {
   /*
   manual carousel of boxes containing image and text
   */
+
+  const { width } = useViewport();
+  const breakpoint = 665;
   return (
     <div
       style={{ display: "flex", flexDirection: "column" }}
       className={styles.container}
     >
-      <Display large={true} className={styles.backgroundText}>
+      <Display
+        large={width > breakpoint && true}
+        extraSmall={width < breakpoint && true}
+        className={styles.backgroundText}
+      >
         A FLUID ECONOMY
       </Display>
       <ManualCarousel>

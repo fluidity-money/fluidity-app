@@ -40,6 +40,9 @@
   justify-content: center;
   align-items: center;
   font-size: 60px;
+  @include max-860px {
+    max-height: 500px;
+  }
 }
 
 .footer {

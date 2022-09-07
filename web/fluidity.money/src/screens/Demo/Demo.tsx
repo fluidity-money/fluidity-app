@@ -11,9 +11,12 @@ import {
 import { useChainContext } from "hooks/ChainContext";
 import Video from "components/Video";
 import styles from "./Demo.module.scss";
+import useViewport from "hooks/useViewport";
 
 const Demo = () => {
   const { apiState } = useChainContext();
+  const { width } = useViewport();
+  const breakpoint = 620;
 
   const weekTotalRewards = apiState.weekWinnings.reduce(
     (weekSum, { winning_amount, token_decimals }) =>
@@ -35,13 +38,22 @@ const Demo = () => {
         />
 
         <div>
-          <Display large={true}>
+          <Display
+            large={width > breakpoint && true}
+            small={width < breakpoint && true}
+          >
             {numberToMonetaryString(weekTotalRewards)}
           </Display>
-          <Heading as="h2" className={styles.gray}>
+          <Heading
+            as={width > breakpoint ? "h2" : "h4"}
+            className={styles.gray}
+          >
             Fluid prizes claimed in the last week.
           </Heading>
-          <Heading as="h4" className={styles.gray}>
+          <Heading
+            as={width > breakpoint ? "h4" : "h5"}
+            className={styles.gray}
+          >
             Connect your wallet to see what you could make
           </Heading>
           <section>
