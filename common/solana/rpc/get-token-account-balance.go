@@ -11,11 +11,11 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
-type GetTokenSupplyResult struct {
+type GetTokenAccountBalanceResult struct {
 	RpcContext
 
 	Value *struct {
-		// Raw amount of tokens as a string, ignoring decimals.
+		// Raw balance of tokens as a string, ignoring decimals.
 		Amount string `json:"amount"`
 
 		// Number of decimals configured for token's mint.
@@ -30,9 +30,9 @@ type GetTokenSupplyResult struct {
 	} `json:"value"`
 }
 
-func (s *Provider) GetTokenSupply(mint solana.PublicKey, commitment string) (*GetTokenSupplyResult, error) {
+func (s *Provider) GetTokenAccountBalance(pda solana.PublicKey, commitment string) (*GetTokenAccountBalanceResult, error) {
 	params := []interface{}{
-		mint.String(),
+		pda.String(),
 	}
 
 	if commitment != "" {
@@ -41,24 +41,24 @@ func (s *Provider) GetTokenSupply(mint solana.PublicKey, commitment string) (*Ge
 		})
 	}
 
-	res, err := s.RawInvoke("getTokenSupply", params)
+	res, err := s.RawInvoke("getTokenAccountBalance", params)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"failed to getTokenSupply: %v",
+			"failed to getTokenAccountBalance: %v",
 			err,
 		)
 	}
 
-	var tokenSupplyResult GetTokenSupplyResult
+	var tokenBalanceResult GetTokenAccountBalanceResult
 
-	if err := json.Unmarshal(res, &tokenSupplyResult); err != nil {
+	if err := json.Unmarshal(res, &tokenBalanceResult); err != nil {
 		return nil, fmt.Errorf(
-			"failed to decode getTokenSupply, message %#v: %v",
+			"failed to decode getTokenAccountBalance, message %#v: %v",
 			string(res),
 			err,
 		)
 	}
 
-	return &tokenSupplyResult, nil
+	return &tokenBalanceResult, nil
 }

@@ -157,7 +157,7 @@ func GetAldrinFees(solanaClient *rpc.Provider, transaction types.TransactionResu
 
 		// get the mint and decimals of the source account
 
-		sourceMint, decimals, err := spl_token.GetMintAndDecimals(
+		sourceMint, err := spl_token.GetMintFromPda(
 			solanaClient,
 			userSourceSplAccountPubkey,
 		)
@@ -172,9 +172,25 @@ func GetAldrinFees(solanaClient *rpc.Provider, transaction types.TransactionResu
 			)
 		}
 
+		decimals, err := spl_token.GetDecimalsFromPda(
+			solanaClient,
+			userSourceSplAccountPubkey,
+			"",
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to get Aldrin source spl-token decimals %#v in instruction %v in %#v! %v",
+				sourceMint,
+				instructionNumber,
+				transactionSignature,
+				err,
+			)
+		}
+
 		// get the mint of the destination account
 
-		destinationMint, _, err := spl_token.GetMintAndDecimals(
+		destinationMint, err := spl_token.GetMintFromPda(
 			solanaClient,
 			userDestinationSplAccountPubkey,
 		)
@@ -372,9 +388,10 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 		)
 	}
 
-	_, destinationDecimals, err := spl_token.GetMintAndDecimals(
+	destinationDecimals, err := spl_token.GetDecimalsFromPda(
 		solanaClient,
 		aldrinFeeTokenAccountPubkey,
+		"",
 	)
 
 	if err != nil {
