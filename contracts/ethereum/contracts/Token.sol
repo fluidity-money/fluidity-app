@@ -88,7 +88,6 @@ contract Token is IERC20 {
     /// @dev account to use that created the contract (multisig account)
     address private operator_;
 
-
     /// @dev the block number of the last block that's been included in a batched reward
     uint private lastRewardedBlock_;
 
@@ -98,7 +97,6 @@ contract Token is IERC20 {
     /// @dev amount a user has manually rewarded, to be removed from their batched rewards
     /// @dev [address] => [amount manually rewarded]
     mapping (address => uint) private manualRewardDebt_;
-
 
     /// @dev the largest amount a reward can be to not get quarantined
     uint maxUncheckedReward_;
@@ -125,7 +123,6 @@ contract Token is IERC20 {
 
     /// @dev the block number in which user mint limits were last reset
     uint userMintResetBlock_;
-
 
     /**
      * @notice initialiser function - sets the contract's data
@@ -218,8 +215,8 @@ contract Token is IERC20 {
     }
 
     function noEmergencyMode() public view returns (bool) {
-        return workerConfig_.noGlobalEmergency()
-            && noEmergencyMode_;
+        return noEmergencyMode_
+            && workerConfig_.noGlobalEmergency();
     }
 
     /**

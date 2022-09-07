@@ -26,11 +26,18 @@ const main = async () => {
     const poolAddress = mustEnv(ENV_BEACON_POOL);
     const tokenAddress = mustEnv(ENV_BEACON_TOKEN);
 
+    const workerConfig = mustEnv(ENV_CONFIG);
+    const operator = mustEnv(ENV_OPERATOR);
+    const council = mustEnv(ENV_COUNCIL);
+    const decimals = mustEnv(ENV_DECIMALS);
+    const symbol = mustEnv(ENV_SYMBOL);
+    const name = mustEnv(ENV_NAME);
+
     const tokenFactory = await hre.ethers.getContractFactory("Token");
     const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
     const aaveFactory = await hre.ethers.getContractFactory("AaveLiquidityProvider");
 
-    console.log(`deploying token with beacon address ${tokenAddress}`);
+    console.log(`deploying token with beacon proxy address ${tokenAddress}`);
 
     const token = await hre.upgrades.deployBeaconProxy(
         tokenAddress,
@@ -65,15 +72,10 @@ const main = async () => {
     } else {
         throw new Error(`Invalid token backend: ${backend} - should be 'compound' or 'aave'`);
     }
-    await pool.deployed();
-    console.log(`liquidity pool deployed to address ${pool.address}`);
 
-    const workerConfig = mustEnv(ENV_CONFIG);
-    const operator = mustEnv(ENV_OPERATOR);
-    const council = mustEnv(ENV_COUNCIL);
-    const decimals = mustEnv(ENV_DECIMALS);
-    const symbol = mustEnv(ENV_SYMBOL);
-    const name = mustEnv(ENV_NAME);
+    await pool.deployed();
+
+    console.log(`liquidity pool deployed to address ${pool.address}`);
 
     console.log(`initialising token with config ${workerConfig} operator ${operator} council ${council} decimals ${decimals} symbol ${symbol} name ${name}`);
 
