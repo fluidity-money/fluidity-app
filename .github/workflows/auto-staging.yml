@@ -28,25 +28,24 @@ jobs:
         with:
           node-version: 16
       - name: Build changed dependencies
+        uses: technote-space/get-diff-action@v6
         id: lib_diff
-        continue-on-error: true
-        run: |
-          git diff HEAD^ HEAD --exit-code -- web/surfing
-          echo "::set-output name=surfing::$?"
+        with:
+          PATTERN: "web/surfing/**/*"
       - name: Bump Surfing
-        if: steps.lib_diff.results.surfing == 1
+        if: steps.lib_diff.outputs.diff
         uses: 'phips28/gh-action-bump-version@master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PACKAGEJSON_DIR:  'web/surfing'
       - name: Build Surfing
-        if: steps.lib_diff.results.surfing == 1
+        if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
         run: |
           npm install
           npm build
       - name: Release Surfing
-        if: steps.lib_diff.results.surfing == 1
+        if: steps.lib_diff.outputs.diff
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
