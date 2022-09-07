@@ -37,7 +37,7 @@ jobs:
         working-directory: web/surfing
         run: |
           npm install
-          npm build
+          npm run build
           npm version patch
       - name: Release Surfing
         if: steps.lib_diff.outputs.diff
