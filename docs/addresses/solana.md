@@ -2,6 +2,15 @@
 
 ## Mainnet
 
+### At a glance...
+
+| Text             | Value                                        |
+| ---------------- | -------------------------------------------- |
+| Program ID       | HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR |
+| Program PDA      | CBrYRFyEwyn9gMPVFbRBwfcoU6JnViTEBaYyvFZGgZnc |
+| fUSDC token mint | Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv |
+| fUSDT token mint | D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8 |
+
 ### USDC
 
 | Text                                                        | Value                                        |
