@@ -12,6 +12,12 @@
 | fTUSD      | 0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F |
 | fFRAX      | 0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C |
 
+### Extra
+
+| Text                  | Value                                      |
+| --------------------- | ------------------------------------------ |
+| fUSDT pool on Uniswap | 0x79c3878b18B94d91AD571255b51e011d5277CB39 |
+
 ### fUSDT
 
 | Text                        | Value                                      |
