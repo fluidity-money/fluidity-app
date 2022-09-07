@@ -16,10 +16,10 @@ const Incentivising = () => {
       />
       <div>
         <Display className={styles.backgroundText} large={true}>
-          INCENTIVISING BLOCKCHAIN
+          Incentivising
         </Display>
         <Display className={styles.backgroundText} large={true}>
-          UTILITY
+          blockchain utility
         </Display>
       </div>
     </div>
