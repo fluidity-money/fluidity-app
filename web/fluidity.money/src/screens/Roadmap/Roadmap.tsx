@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { LinkButton, ReusableGrid } from "surfing";
+import { LinkButton, ReusableGrid } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./Roadmap.module.scss";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
@@ -37,7 +37,6 @@ const Roadmap = () => {
       <Video
         src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
         type={"fit"}
-        view={"normal"}
         loop={true}
       />
     ) : (
@@ -51,7 +50,6 @@ const Roadmap = () => {
       <Video
         src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
         type={"fit"}
-        view={"normal"}
         loop={true}
       />
     ) : (

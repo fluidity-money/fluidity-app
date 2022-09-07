@@ -4,8 +4,15 @@
 
 import Video from "components/Video";
 import { useEffect, useState } from "react";
-import { ContinuousCarousel, LinkButton } from "@fluidity-money/surfing";
+import {
+  ContinuousCarousel,
+  Display,
+  Heading,
+  LinkButton,
+  Text,
+} from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
+import useViewport from "hooks/useViewport";
 
 const HowItWorks = () => {
   /* 
@@ -30,10 +37,20 @@ const HowItWorks = () => {
       setCurrentImage(images[counter]);
       counter++;
       if (counter === 3) counter = 0;
-    }, 4000);
+    }, 7000);
 
     return () => clearInterval(intervalId);
   }, []);
+
+  const { width } = useViewport();
+  const size = width > 1000 ? "h3" : width < 1000 && width > 520 ? "h4" : "h5";
+
+  const backgroundText =
+    currentImage === "/assets/videos/Fluidity_Wrap.mp4"
+      ? "FLUIDIFY"
+      : currentImage === "/assets/videos/Fluidity_Yield.mp4"
+      ? "YIELD"
+      : "GOVERN";
 
   return (
     <div className={`${styles.container} bg-dark`}>
@@ -60,7 +77,8 @@ const HowItWorks = () => {
       </ContinuousCarousel>
       <div className={styles.grid}>
         <div className={styles.left}>
-          <p
+          <Text
+            as={"p"}
             className={
               currentImage === "/assets/videos/Fluidity_Wrap.mp4"
                 ? styles.bold
@@ -69,8 +87,9 @@ const HowItWorks = () => {
           >
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
-          </p>
-          <p
+          </Text>
+          <Text
+            as={"p"}
             className={
               currentImage === "/assets/videos/Fluidity_Yield.mp4"
                 ? styles.bold
@@ -79,8 +98,9 @@ const HowItWorks = () => {
           >
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
-          </p>
-          <p
+          </Text>
+          <Text
+            as={"p"}
             className={
               currentImage === "/assets/videos/Fluidity_HowItWorks.mp4"
                 ? styles.bold
@@ -88,7 +108,7 @@ const HowItWorks = () => {
             }
           >
             The user is incentivised through governance.
-          </p>
+          </Text>
           <a href="/howitworks">
             <LinkButton
               type={"internal"}
@@ -100,14 +120,47 @@ const HowItWorks = () => {
           </a>
         </div>
         <div className={styles.right}>
-          <div>
-            <Video
-              src={window.location.origin + currentImage}
-              type={"fit"}
-              view={"normal"}
-              loop={true}
-            />
+          <div className={styles.backgroundText}>
+            {<Heading as={size}>{backgroundText}</Heading>}
           </div>
+
+          {currentImage === "/assets/videos/Fluidity_Wrap.mp4" ? (
+            <div>
+              <Video
+                src={
+                  window.location.origin + "/assets/videos/Fluidity_Wrap.mp4"
+                }
+                type={"fit"}
+                loop={true}
+                key={"abc"}
+                scale={.8}
+              />
+            </div>
+          ) : currentImage === "/assets/videos/Fluidity_Yield.mp4" ? (
+            <div>
+              <Video
+                src={
+                  window.location.origin + "/assets/videos/Fluidity_Yield.mp4"
+                }
+                type={"fit"}
+                loop={true}
+                key={"xyz"}
+              />
+            </div>
+          ) : (
+            <div>
+              <Video
+                src={
+                  window.location.origin +
+                  "/assets/videos/Fluidity_HowItWorks.mp4"
+                }
+                type={"fit"}
+                loop={true}
+                key={"jfk"}
+                scale={.8}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

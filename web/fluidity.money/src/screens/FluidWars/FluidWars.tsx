@@ -26,7 +26,7 @@ const FluidWars = () => {
   return (
     <div className={styles.container} id="fluiditywars">
       <ReusableGrid
-        left={<Video src={window.location.origin + '/assets/videos/Fluidity_FluidWars.mp4'} type={'fit'} view={'normal'} loop={true}/>}
+        left={<Video src={window.location.origin + '/assets/videos/Fluidity_FluidWars.mp4'} type={'fit'} loop={true}/>}
         right={
           <HowItWorksTemplate header={header} info={info}>
             Fluidity wars

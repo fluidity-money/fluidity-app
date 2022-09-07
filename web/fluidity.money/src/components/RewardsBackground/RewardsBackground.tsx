@@ -8,6 +8,7 @@ import {
   numberToMonetaryString,
   trimAddress,
   formatTo12HrDate,
+  Text,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
 import { JsxElement } from "typescript";
@@ -30,7 +31,7 @@ const RewardsBackground = () => {
 
   const carouselInfo = (
     <div>
-      {rewards.slice(100).map(({ token, amount, address, date }, i) => (
+      {rewards.slice(10).map(({ token, amount, address, date }, i) => (
         <div key={`winner-${i}`} className={styles.winner}>
           <img
             src={
@@ -40,9 +41,9 @@ const RewardsBackground = () => {
             }
             alt="tokenIcon"
           />
-          <p>{numberToMonetaryString(amount)} </p>
-          <p>{trimAddress(address)} </p>
-          <p>{formatTo12HrDate(date)}</p>
+          <Text as="p">{numberToMonetaryString(amount)} </Text>
+          <Text as="p">{trimAddress(address)} </Text>
+          <Text as="p">{formatTo12HrDate(date)}</Text>
         </div>
       ))}
     </div>
@@ -51,35 +52,49 @@ const RewardsBackground = () => {
     <div className={styles.container}>
       <div className={styles.shade}></div>
       <div className={styles.rewardsBackground}>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
-        <ContinuousCarousel direction="left">{carouselInfo}</ContinuousCarousel>
-        <ContinuousCarousel direction="right">
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="left">
+          {carouselInfo}
+        </ContinuousCarousel>
+        <ContinuousCarousel background={true} direction="right">
           {carouselInfo}
         </ContinuousCarousel>
       </div>

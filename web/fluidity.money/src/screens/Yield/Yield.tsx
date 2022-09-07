@@ -34,7 +34,6 @@ const Yield = () => {
       <Video
         src={window.location.origin + "/assets/videos/Fluidity_Yield.mp4"}
         type={"fit"}
-        view={"scale-up"}
         loop={true}
       />
     ) : (
@@ -48,7 +47,6 @@ const Yield = () => {
       <Video
         src={window.location.origin + "/assets/videos/Fluidity_Yield.mp4"}
         type={"fit"}
-        view={"normal"}
         loop={true}
       />
     ) : (

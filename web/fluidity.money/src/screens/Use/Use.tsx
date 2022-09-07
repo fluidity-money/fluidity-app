@@ -5,7 +5,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import useViewport from "hooks/useViewport";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
 import Video from "components/Video";
@@ -25,34 +24,23 @@ const Use = () => {
     }
   }, [location]);
 
-  // to set order correct when in column layout
-  const { width } = useViewport();
-  const breakpoint = 860;
-
-  const right =
-  width < breakpoint ? (
-    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'scale-up'} loop={true}/>
-  ) : (
+  const right = (
     <HowItWorksTemplate header={header} info={info}>
-     Fluid asset use-cases
+      Fluid asset use-cases
     </HowItWorksTemplate>
   );
 
-const left =
-  width > breakpoint ? (
-    <Video src={window.location.origin + '/assets/videos/Fluidity_Use.mp4'} type={'fit'} view={'normal'} loop={true}/>
-  ) : (
-    <HowItWorksTemplate header={header} info={info}>
-     Fluid asset use-cases
-    </HowItWorksTemplate>
+  const left = (
+    <Video
+      src={window.location.origin + "/assets/videos/Fluidity_Use.mp4"}
+      type={"fit"}
+      loop={true}
+    />
   );
 
   return (
     <div className={styles.container} id="useassets">
-      <ReusableGrid
-        left={left}
-        right={right}
-      />
+      <ReusableGrid left={left} right={right} />
     </div>
   );
 };
