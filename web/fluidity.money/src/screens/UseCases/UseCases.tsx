@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { ManualCarousel } from "@fluidity-money/surfing";
+import { Display, ManualCarousel } from "@fluidity-money/surfing";
 import UseCase from "components/UseCase";
 import styles from "./UseCases.module.scss";
 
@@ -15,7 +15,9 @@ const UseCases = () => {
       style={{ display: "flex", flexDirection: "column" }}
       className={styles.container}
     >
-      <h1>A FLUID ECONOMY</h1>
+      <Display large={true} className={styles.backgroundText}>
+        A FLUID ECONOMY
+      </Display>
       <ManualCarousel>
         {items.map((item, i) => (
           <UseCase key={`usecase-${i}`} useCase={item} />

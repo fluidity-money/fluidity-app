@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { Heading } from "@fluidity-money/surfing";
 import { ReactNode } from "react";
 import styles from "./IntroTile.module.scss";
 
@@ -19,14 +20,14 @@ const IntroTile = ({ img, side, children }: IIntroTileProps) => {
           <img src={img} alt="" />
 
           <div className={`${styles.text} ${styles.left}`}>
-            <p>{children}</p>
+            <Heading as="h6">{children}</Heading>
           </div>
         </div>
       )}
       {side === "right" && (
         <div className={styles.containerRight}>
           <div className={`${styles.text} ${styles.right}`}>
-            <p>{children}</p>
+            <Heading as="h6">{children}</Heading>
           </div>
           <img src={img} alt="" />
         </div>

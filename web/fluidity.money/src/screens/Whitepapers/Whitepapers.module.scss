@@ -15,6 +15,7 @@
     align-items: center;
     width: 90%;
     min-height: 500px;
+    gap: 10px;
     // border: 1px solid $fluidWhite;
     text-align: center;
     background-color: $backgroundBlack;
@@ -27,17 +28,25 @@
       margin-bottom: 25px;
     }
 
-    P {
-      font-size: 10px;
-      margin-top: 10px;
-    }
+    // P {
+    //   font-size: 10px;
+    //   margin-top: 10px;
+    // }
   }
 }
 
-.carouselText {
-  h2 {
-    margin-right: 20px;
-    opacity: 1;
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
+}
+
+.text {
+  margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
   }
-  background-color: $fluidBlack;
 }

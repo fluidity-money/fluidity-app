@@ -60,9 +60,9 @@
 }
 
 .text {
-  align-items: center;
-  & div {
-    margin-left: 6px;
+  margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
   }
 }
 
@@ -70,4 +70,13 @@
   position: absolute;
   opacity: 0.2;
   z-index: 5;
+}
+
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
 }

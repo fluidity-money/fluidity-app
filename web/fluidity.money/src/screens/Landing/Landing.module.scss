@@ -18,7 +18,7 @@
   }
 }
 
-.bgVid{
+.bgVid {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,6 +71,9 @@
 
 .text {
   margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
+  }
 }
 
 .carousel {
@@ -128,4 +131,13 @@
     align-items: flex-start;
     padding-left: 20px;
   }
+}
+
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
 }

@@ -2,7 +2,12 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { GeneralButton, numberToMonetaryString } from "@fluidity-money/surfing";
+import {
+  Display,
+  GeneralButton,
+  Heading,
+  numberToMonetaryString,
+} from "@fluidity-money/surfing";
 import { useChainContext } from "hooks/ChainContext";
 import Video from "components/Video";
 import styles from "./Demo.module.scss";
@@ -21,13 +26,24 @@ const Demo = () => {
   return (
     <>
       <div className={`${styles.container} bg-light`}>
-
-        <Video src={window.location.origin + '/assets/videos/Fluidity_OpportunityB.mp4'} type={'none'} loop={true}/>
+        <Video
+          src={
+            window.location.origin + "/assets/videos/Fluidity_OpportunityB.mp4"
+          }
+          type={"none"}
+          loop={true}
+        />
 
         <div>
-          <h1>{numberToMonetaryString(weekTotalRewards)}</h1>
-          <h3>Fluid prizes claimed in the last week.</h3>
-          <p>Connect your wallet to see what you could make</p>
+          <Display large={true}>
+            {numberToMonetaryString(weekTotalRewards)}
+          </Display>
+          <Heading as="h2" className={styles.gray}>
+            Fluid prizes claimed in the last week.
+          </Heading>
+          <Heading as="h4" className={styles.gray}>
+            Connect your wallet to see what you could make
+          </Heading>
           <section>
             {/* <GeneralButton version={"primary"} type={"text"} size={"medium"} handleClick={function (): void {       
             } }>

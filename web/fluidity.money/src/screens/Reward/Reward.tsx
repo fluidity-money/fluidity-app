@@ -7,7 +7,7 @@ import useViewport from "hooks/useViewport";
 import { useChainContext } from "hooks/ChainContext";
 import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
-import { numberToMonetaryString } from "@fluidity-money/surfing";
+import { Heading, numberToMonetaryString } from "@fluidity-money/surfing";
 import styles from "./Reward.module.scss";
 
 const Reward = () => {
@@ -24,7 +24,7 @@ const Reward = () => {
   const [toggle, setToggle] = useState(true);
   const { width } = useViewport();
   const breakpoint = 620;
-  
+
   // animates then switches backgrounds
   const switchAndAnimate = () => {
     setInitalView(!initalView);
@@ -38,18 +38,18 @@ const Reward = () => {
     <div className={styles.info}>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <h1>1400+</h1>
-        <h4>Unique wallets</h4>
+        <Heading as="h2">1400+</Heading>
+        <Heading as="h5">Unique wallets</Heading>
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <h1>32,689</h1>
-        <h4>Fluid asset pairs</h4>
+        <Heading as="h2">32,689</Heading>
+        <Heading as="h5">Fluid asset pairs</Heading>
       </div>
       {width > breakpoint && (
         <div className={styles.infoSingle}>
-          <h1>{numberToMonetaryString(rewardPool)}</h1>
-          <h4>Reward Pool</h4>
+          <Heading as="h2">{numberToMonetaryString(rewardPool)}</Heading>
+          <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
     </div>

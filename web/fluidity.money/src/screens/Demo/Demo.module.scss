@@ -16,7 +16,8 @@
     position: absolute;
     width: 50%;
     min-height: 400px;
-   
+    gap: 20px;
+
     h1 {
       margin-bottom: 16px;
     }
@@ -31,7 +32,7 @@
       color: $textGrey;
     }
 
-    @include max-860px{
+    @include max-860px {
       text-align: center;
     }
   }
@@ -47,4 +48,9 @@
     width: 10px;
     height: 10px;
   }
+}
+
+.gray {
+  color: #828381;
+  font-weight: 100;
 }
