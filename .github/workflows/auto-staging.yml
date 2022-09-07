@@ -32,18 +32,13 @@ jobs:
         id: lib_diff
         with:
           PATTERN: "web/surfing/**/*"
-      - name: Bump Surfing
-        if: steps.lib_diff.outputs.diff
-        uses: 'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGEJSON_DIR:  'web/surfing'
-      - name: Build Surfing
+      - name: Build & Bump Surfing
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
         run: |
           npm install
           npm build
+          npm version patch
       - name: Release Surfing
         if: steps.lib_diff.outputs.diff
         uses: JS-DevTools/npm-publish@v1
@@ -51,6 +46,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           package: ./web/surfing
           registry: https://npm.pkg.github.com
+      - name: Update version
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/surfing
+        run: |
+          git add package.json package-lock.json
+          git config user.name "Bump Bot 🤖"
+          git config user.email "noreply@fluidity.money"
+          git commit -m "Bump Surfing version"
+          git push origin develop
  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
