@@ -9,51 +9,46 @@ import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
+import { stat } from "fs";
 
 const Landing = () => {
-  /* 
-  1. BG blurs dissolve in and start slowly moving (example)
-  2. ‘Money designed to move’ ticker moves and fades in from bottom (off canvas), and immediately starts scrolling slowly on loop (right to left)
-  3. Video with 3D disolves in (1000ms)
-  --
-  4. 3D video autoplays
-  5. After a few seconds (tbc based on animation provided), page auto scrolls 
-  6. ‘Money dedigned to move’ text moves and fades out (top to bottom) off bottom of screen
-  --
-  5. 3D video scales down slightly on scroll to sit in final position between content list.
-  6. A new looping 3D video appears in place of previous (seemless) and continues subtle looping animation. 
-  7. Text items fade in with new looped video, perhaps staggered with slight delay, or with lines building out from left to righ ton left, and right  to left on right.
-    */
+  
+  const [state, setState] =  useState({
+    src: '/assets/videos/Fluidity_Home.mp4',
+    key: '0',
+    loop: false,
+    scale: .7,
+  });
+ 
+  useEffect(() => {
 
-  // const myRef = useRef<HTMLInputElement>(null);
+    setTimeout(function() { 
+      setState({
+      src: '/assets/videos/Fluidity_Homeloop.mp4',
+      key: '1',
+      loop: true,
+      scale: .5,
+    })
+    }, 6000);
 
-  // useEffect(() => {
-  //   console.log("my ref", myRef.current);
-  //   const observer = new IntersectionObserver((entries) => {
-  //     const entry = entries[0];
-  //     console.log("entry", entry);
-  //     console.log("bcr", entry.boundingClientRect);
-  //     console.log("isr", entry.intersectionRect);
-  //     console.log("rb", entry.rootBounds);
-  //     if (entry.boundingClientRect.top < 356) {
-  //       handleClick();
-  //     }
-  //   });
-
-  //   observer.observe(myRef.current as Element);
-  // }, [ ]);
+  }, []);
 
   const { width } = useViewport();
   const breakpoint = 620;
 
   return (
     <div className={`${styles.containerLanding}`}>
-      {width > breakpoint && (
-          <Video src={window.location.origin + '/assets/videos/Fluidity_Home.mp4'} type={'reduce'} view={'normal'} loop={false}/>
-      )} 
-      {width < breakpoint && (
-          <Video src={window.location.origin + '/assets/videos/Fluidity_Homeloop.mp4'} type={'fit'} view={'normal'} loop={false}/>
-      )} 
+      
+      
+      {width > breakpoint ? (
+          <div className={`${styles.bgVid}`}>
+            <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale}/>;
+          </div>
+        ) : (
+          <div className={`${styles.bgVid}`}>
+           <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale * 2}/>;
+          </div>
+        )}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
           <motion.h1

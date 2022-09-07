@@ -34,7 +34,6 @@ const Use = () => {
     <Video
       src={window.location.origin + "/assets/videos/Fluidity_Use.mp4"}
       type={"fit"}
-      view={"normal"}
       loop={true}
     />
   );

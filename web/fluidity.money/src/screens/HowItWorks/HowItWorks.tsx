@@ -131,9 +131,9 @@ const HowItWorks = () => {
                   window.location.origin + "/assets/videos/Fluidity_Wrap.mp4"
                 }
                 type={"fit"}
-                view={"normal"}
                 loop={true}
                 key={"abc"}
+                scale={.8}
               />
             </div>
           ) : currentImage === "/assets/videos/Fluidity_Yield.mp4" ? (
@@ -143,7 +143,6 @@ const HowItWorks = () => {
                   window.location.origin + "/assets/videos/Fluidity_Yield.mp4"
                 }
                 type={"fit"}
-                view={"normal"}
                 loop={true}
                 key={"xyz"}
               />
@@ -156,9 +155,9 @@ const HowItWorks = () => {
                   "/assets/videos/Fluidity_HowItWorks.mp4"
                 }
                 type={"fit"}
-                view={"normal"}
                 loop={true}
                 key={"jfk"}
+                scale={.8}
               />
             </div>
           )}

@@ -5,14 +5,14 @@
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
+  key?: string;
   src: string;
   type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
-  view: "scale-up" | "normal";
   loop: boolean;
-  key?: string;
+  scale?: number;
 }
 
-export const Video = ({ src, type, view, loop, key }: IPropsVideo) => {
+export const Video = ({key, src, type, loop, scale=1}: IPropsVideo) => {
   let ext = src.split(".").pop();
   return (
     <video
@@ -20,7 +20,10 @@ export const Video = ({ src, type, view, loop, key }: IPropsVideo) => {
       loop={loop}
       autoPlay
       muted
-      className={`${styles.videoContainer} ${styles[type]} ${styles[view]}`}
+      className={`${styles.videoContainer} ${styles[type]}`}
+      style={{
+        width: `${scale * 100}%`,
+      }}
     >
       <source src={src} type={"video/" + ext} />
     </video>
