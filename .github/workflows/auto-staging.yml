@@ -31,7 +31,7 @@ jobs:
         uses: technote-space/get-diff-action@v6
         id: lib_diff
         with:
-          PATTERN: "web/surfing/**/*"
+          PATTERNS: "web/surfing/**/*"
       - name: Build & Bump Surfing
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
