@@ -1,4 +1,5 @@
 import { AnchorButton } from "~/components/Button";
+import Text from "../Text";
 import styles from "./Navigation.module.scss";
 
 interface INavigation {
@@ -12,11 +13,11 @@ const Navigation = ({ pageLocations, page }: INavigation) => {
   return (
     <div className={styles.container}>
       {pageLocations.map((location, i) => (
-        <h4 key={`anchor-${i}`}>
+        <Text key={`anchor-${i}`}>
           <a href={`/${page}#${location.replace(/\s/g, "")}`}>
             {<AnchorButton>{location.toUpperCase()}</AnchorButton>}
           </a>
-        </h4>
+        </Text>
       ))}
     </div>
   );

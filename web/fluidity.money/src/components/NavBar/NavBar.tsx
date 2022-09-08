@@ -6,14 +6,14 @@ import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { GeneralButton, NavBarModal } from "@fluidity-money/surfing";
+import { GeneralButton, NavBarModal, Text } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
 
   const handleModal = () => {
-    setModal(modal => !modal);
+    setModal((modal) => !modal);
   };
 
   const { width } = useViewport();
@@ -28,21 +28,28 @@ const NavBar = () => {
   return (
     <div className={styles.outerContainer}>
       <div className={`${styles.container} opacity-5x`}>
-        <motion.h2
+        <motion.div
           className={styles.fluidity}
           variants={scrollVariants}
           animate={scrollDir === "up" ? "appear" : "disappear"}
           transition={{ type: "tween" }}
         >
-          fluidity
-        </motion.h2>
+          <a href={"/"}>
+            <img src="/assets/images/textLogo.svg" alt="home page" />
+          </a>
+        </motion.div>
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
-            <div>
+            <motion.div
+              variants={scrollVariants}
+              initial={{ y: -100 }}
+              animate={scrollDir === "up" ? "disappear" : "appear"}
+              transition={{ type: "tween" }}
+            >
               <a href={"/"}>
                 <img src="/assets/images/logoOutline.svg" alt="home page" />
               </a>
-            </div>
+            </motion.div>
             <GeneralButton
               version={"secondary"}
               type={"text"}
@@ -71,7 +78,7 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    HOW IT WORKS
+                    <Text size="md">HOW IT WORKS</Text>
                   </a>
                 </li>
                 {/* <li>
@@ -107,7 +114,7 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    RESOURCES
+                    <Text size="md">RESOURCES</Text>
                   </a>
 
                   <button onClick={() => handleModal()}>

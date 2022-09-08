@@ -82,9 +82,10 @@
 }
 
 .fluidity {
-  z-index: 1;
-  margin-left: 50px;
+  cursor: pointer;
+  z-index: 51;
+  margin-left: 50.5px;
   font-size: 30.5px;
-  padding-bottom: 2px;
+  padding-top: 7px;
   position: fixed;
 }
