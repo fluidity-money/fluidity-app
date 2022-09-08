@@ -9,7 +9,7 @@ import { SupportedChains } from "~/util";
 import styles from "./BlockchainModal.module.scss";
 
 interface IOption {
-  name: string;
+  name: SupportedChainsList;
   icon: ReactComponentElement<any>;
 }
 
@@ -45,22 +45,21 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption }: 
       </div>
       {options.map((option, i) => isSelected(option) 
         ? (
-            <Card
-              component="button"
-              className={`${styles.card}`}
-              type={"holobox"}
-              rounded={true}
-            >
-              {option.icon}
-              <Text size={"xl"} prominent={true}>
-                <strong>
-                  {SupportedChains[option.name].name}
-                </strong>
-              </Text>
-              <Checkmark style={{marginLeft: "auto", marginRight: "24px"}}/>
-            </Card>
-        )
-        : (
+          <Card
+            component="button"
+            className={`${styles.card}`}
+            type={"holobox"}
+            rounded={true}
+          >
+            {option.icon}{"  "}
+            <Text size={"xl"} prominent={true}>
+              <strong>
+                {SupportedChains[option.name].name}
+              </strong>
+            </Text>
+            <Checkmark style={{marginLeft: "auto", marginRight: "24px"}}/>
+          </Card>
+        ) : (
           <Card
             component="button"
             className={styles.card}
@@ -68,7 +67,7 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption }: 
             rounded={true}
             onClick={() => handleOnClick(i)}
           >
-            {option.icon}
+            {option.icon}{"  "}
             <Text size={"xl"}>
               {SupportedChains[option.name].name}
             </Text>

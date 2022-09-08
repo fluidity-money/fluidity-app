@@ -59,7 +59,6 @@ const Landing = () => {
             key={state.key}
             scale={state.scale}
           />
-          ;
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
@@ -70,7 +69,6 @@ const Landing = () => {
             key={state.key}
             scale={state.scale * 2}
           />
-          ;
         </div>
       )}
       <motion.div className={styles.content}>
