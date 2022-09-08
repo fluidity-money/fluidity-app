@@ -10,9 +10,10 @@ interface IPropsVideo {
   type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
   loop: boolean;
   scale?: number;
+  opacity?: number;
 }
 
-export const Video = ({key, src, type, loop, scale=1}: IPropsVideo) => {
+export const Video = ({key, src, type, loop, scale=1, opacity=1}: IPropsVideo) => {
   let ext = src.split(".").pop();
   return (
     <video
@@ -23,6 +24,7 @@ export const Video = ({key, src, type, loop, scale=1}: IPropsVideo) => {
       className={`${styles.videoContainer} ${styles[type]}`}
       style={{
         width: `${scale * 100}%`,
+        opacity: `${opacity}`
       }}
     >
       <source src={src} type={"video/" + ext} />
