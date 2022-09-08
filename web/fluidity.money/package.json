@@ -40,7 +40,7 @@
     "eject": "react-scripts eject",
     "gen-gql": "gq  --introspect https://fluidity.hasura.app/v1/graphql > schema.graphql",
     "relay": "relay-compiler",
-    "prepare": "git config core.hookspath=.hooks"
+    "prepare": "if [[ '$CI' != 'true' ]] git config core.hookspath=.hooks"
   },
   "eslintConfig": {
     "extends": [
