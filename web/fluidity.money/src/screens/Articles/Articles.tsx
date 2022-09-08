@@ -106,8 +106,7 @@ const arr: ArticleListProps = {
     },
     {
       id: 3,
-      title:
-        "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
+      title: "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
       desc: `The year 2020 marked the explosion of DeFi protocols in public imagination, driven largely by the rise of liquidity mining — Compound...`,
       info: "5 min  read ARBITRUM",
       link: "",
@@ -123,7 +122,7 @@ const arr: ArticleListProps = {
     },
     {
       id: 5,
-      title: "Fluidity — Using Chainlink VRF to power the future of money", 
+      title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money", 
       desc: `Providing Users With a Secure Source of Verifiable Randomness Fluidity — Next-Generation Assets If your money’s on the move, exposure to DeFi can...`,
       info: "4 min read FLUIDITY",
       link: "",
