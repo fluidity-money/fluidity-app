@@ -5,27 +5,46 @@
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
-  key?: string;
   src: string;
   type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
   loop: boolean;
+  display?: "none" | "inline";
+  key?: string;
+  preload?: "none" | "metadata" | "auto";
   scale?: number;
   opacity?: number;
+  onLoad?: VoidFunction;
+  onEnded?: VoidFunction;
 }
 
-export const Video = ({key, src, type, loop, scale=1, opacity=1}: IPropsVideo) => {
+export const Video = ({
+  key,
+  src,
+  type,
+  loop,
+  display="inline",
+  preload="none",
+  scale=1,
+  opacity=1,
+  onEnded=() => {},
+  onLoad=() => {},
+}: IPropsVideo) => {
   let ext = src.split(".").pop();
   return (
     <video
       key={key}
       loop={loop}
+      preload={preload}
       autoPlay
       muted
       className={`${styles.videoContainer} ${styles[type]}`}
       style={{
+        display: display,
         width: `${scale * 100}%`,
         opacity: `${opacity}`
       }}
+      onEnded={onEnded}
+      onLoad={onLoad}
     >
       <source src={src} type={"video/" + ext} />
     </video>

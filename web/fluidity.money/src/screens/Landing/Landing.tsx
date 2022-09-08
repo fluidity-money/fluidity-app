@@ -7,32 +7,40 @@ import {
   ContinuousCarousel,
   Heading,
   ManualCarousel,
+  LoadFirst,
+  Prioritize,
 } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
-import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import { stat } from "fs";
+import styles from "./Landing.module.scss";
 
 const Landing = () => {
+  const vidSources = ["/assets/videos/Fluidity_Home.mp4", "/assets/videos/Fluidity_Homeloop.mp4"].map(link =>
+    window.location.origin + link
+  )
+
+  const [ onHomeVidLoaded, setOnHomeVidLoaded ] = useState(false);
+  const [ homeVidEnded, setHomeVidEnded ] = useState(false);
+
   const [state, setState] = useState({
-    src: "/assets/videos/Fluidity_Home.mp4",
+    src: vidSources[0],
     key: "0",
     loop: false,
     scale: 0.7,
   });
 
   useEffect(() => {
-    setTimeout(function () {
+    homeVidEnded &&
       setState({
-        src: "/assets/videos/Fluidity_Homeloop.mp4",
+        src: vidSources[1],
         key: "1",
         loop: true,
         scale: 0.5,
       });
-    }, 6000);
-  }, []);
+  }, [homeVidEnded]);
 
   const { width } = useViewport();
   const breakpoint = 620;
@@ -50,27 +58,55 @@ const Landing = () => {
 
   return (
     <div className={`${styles.containerLanding}`}>
+      {/* Video Container */}
       {width > breakpoint ? (
         <div className={`${styles.bgVid}`}>
           <Video
-            src={window.location.origin + state.src}
+            src={state.src}
             type={"reduce"}
             loop={state.loop}
             key={state.key}
             scale={state.scale}
+            onLoad={!homeVidEnded 
+              ? () => setOnHomeVidLoaded(true)
+              : () => {}
+            }
+            onEnded={!homeVidEnded 
+              ? () => setHomeVidEnded(true)
+              : () => {}
+            }
           />
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
           <Video
-            src={window.location.origin + state.src}
+            src={state.src}
             type={"reduce"}
             loop={state.loop}
             key={state.key}
             scale={state.scale * 2}
+            onLoad={!homeVidEnded 
+              ? () => setOnHomeVidLoaded(true)
+              : () => {}
+            }
+            onEnded={!homeVidEnded 
+              ? () => setHomeVidEnded(true)
+              : () => {}
+            }
           />
         </div>
       )}
+      {/* Preload Loop video */}
+      {!homeVidEnded && (
+        <Video
+          display={"none"}
+          src={vidSources[1]}
+          preload={"auto"}
+          type={"none"}
+          loop={false}
+        />
+      )}
+      {/* Hero animation */}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
           <motion.div
@@ -95,7 +131,9 @@ const Landing = () => {
             </Heading>
           </motion.div>
         )}
-        <div className={styles.tiles}>
+
+        {/* Descriptors */}
+        <div className={`${styles.tiles} `}>
           {width < breakpoint && (
             <motion.div
               className={styles.video}
@@ -109,6 +147,7 @@ const Landing = () => {
             ></motion.div>
           )}
 
+          {/* Left Descriptors */}
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
@@ -138,6 +177,7 @@ const Landing = () => {
             </IntroTile>
           </motion.div>
 
+          {/* Right Descriptors */}
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
@@ -167,6 +207,7 @@ const Landing = () => {
           </motion.div>
         </div>
       </motion.div>
+
 
       <motion.div
         className={styles.carousel}

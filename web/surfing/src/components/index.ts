@@ -16,3 +16,4 @@ export { Tab, TabBar } from "./Tab";
 export { DesktopOnly, Row, Card, ManualCarousel, ContinuousCarousel, FooterItem, Partner } from "./Container";
 export { FilterButton, AnchorButton, ChainSelectorButton, GeneralButton, LinkButton, TabButton } from "./Button";
 export { BlockchainModal } from "./Modal";
+export { LoadFirst, Prioritize } from "./Suspense";
