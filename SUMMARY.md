@@ -53,7 +53,7 @@
     * [🎁 Wrapping and unwrapping a Fluid Asset in your app](docs/developers/tutorials/wrapping-and-unwrapping-a-fluid-asset-in-your-app.md)
     * [🌊 Providing liquidity for a Fluid Asset](docs/developers/whitepaper-source-code/providing-liquidity-for-a-fluid-asset.md)
   * [📔 Whitepapers](docs/developers/whitepaper-source-code/README.md)
-  * [⛽ Gas fees](docs/developers/gas-fees.md)
+  * [⛽ Gas fees comparison](docs/developers/gas-fees-comparison.md)
 * [💪 Security](docs/security/README.md)
   * [🔮 Oracle Key Rotation](docs/security/oracle-key-rotation.md)
   * [📥 Dropboxes](docs/security/dropboxes.md)
