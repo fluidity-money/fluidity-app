@@ -25,6 +25,7 @@ jobs:
         with:
           fetch-depth: 2
           lfs: true
+          persist-credentials: false
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -48,6 +49,11 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+          clean: false
+          token: ${{ secret.GH_SUPER_TOKEN }}
       - name: Update version
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
