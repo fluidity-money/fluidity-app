@@ -11,7 +11,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
-import { JsxElement } from "typescript";
 
 interface Reward {
   token: string;
