@@ -56,9 +56,8 @@ jobs:
           token: ${{ secrets.GH_SUPER_TOKEN }}
       - name: Update version
         if: steps.lib_diff.outputs.diff
-        working-directory: web/surfing
         run: |
-          git add package.json package-lock.json
+          git add .
           git config user.name "Bump Bot 🤖"
           git config user.email "noreply@fluidity.money"
           git commit -m "Bump Surfing version"
