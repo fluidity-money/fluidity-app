@@ -2,19 +2,15 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ContinuousCarousel,
   Heading,
-  ManualCarousel,
-  LoadFirst,
-  Prioritize,
 } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
-import { stat } from "fs";
 import styles from "./Landing.module.scss";
 
 const Landing = () => {
@@ -133,7 +129,7 @@ const Landing = () => {
         )}
 
         {/* Descriptors */}
-        <div className={`${styles.tiles} `}>
+        <div className={`${styles.tiles} ${!onHomeVidLoaded && styles.notLoaded}`}>
           {width < breakpoint && (
             <motion.div
               className={styles.video}
