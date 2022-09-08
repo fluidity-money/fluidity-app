@@ -42,9 +42,11 @@ jobs:
           npm run build
           npm version patch
       - uses: actions/setup-node@v3
+        if: steps.lib_diff.outputs.diff
         with:
           registry-url: 'https://npm.pkg.github.com'
       - name: Publish Surfing
+        if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
         run: npm publish
         env:
