@@ -2,8 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-// swag
-
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 // Pages
