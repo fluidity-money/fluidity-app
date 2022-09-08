@@ -30,7 +30,6 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
         {article.resources ? (
           <a href="/resources">
             <LinkButton
-              version={"secondary"}
               type={"internal"}
               size={"medium"}
               handleClick={function (): void {}}
