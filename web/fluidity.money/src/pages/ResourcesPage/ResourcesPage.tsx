@@ -52,7 +52,7 @@ const ResourcesPage = () => {
               animate={{ opacity: 1, transform: "translateY(0px)" }}
               transition={{ transform: { duration: 1 } }}
             >
-              <Articles />
+              <Articles isResourcesPage={true}/>
               {/* <Tweets /> */}
               <Fluniversity />
               <Whitepapers />

@@ -13,10 +13,10 @@ import styles from "./Articles.module.scss";
 import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
 
 interface IArticleProps {
-  resources?: boolean;
+  isResourcesPage?: boolean;
 }
 
-const Articles = ({ resources }: IArticleProps) => {
+const Articles = ({ isResourcesPage }: IArticleProps) => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top
    for ResourcesNavModal to work*/
   const location = useLocation();
@@ -45,21 +45,24 @@ const Articles = ({ resources }: IArticleProps) => {
   return (
     <div className={styles.outerContainer}>
       <div className={styles.carousel}>
-        <ContinuousCarousel direction={"right"}>
-          <div>
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-          </div>
-        </ContinuousCarousel>
+        {
+          !(isResourcesPage) ? (
+            <ContinuousCarousel direction={"right"}>
+            <div>
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+            </div>
+          </ContinuousCarousel>): ''
+        }
       </div>
       <div className={styles.container} id="articles">
         <ArticleCard
@@ -68,7 +71,7 @@ const Articles = ({ resources }: IArticleProps) => {
           title={arr.articles[0].title}
           desc={arr.articles[0].desc}
           info={arr.articles[0].info}
-          resources={true}
+          isResourcesPage={isResourcesPage}
         />
         <ArticleList {...arr} />
       </div>
