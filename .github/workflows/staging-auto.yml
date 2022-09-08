@@ -25,7 +25,6 @@ jobs:
         with:
           fetch-depth: 2
           lfs: true
-          persist-credentials: false
           token: ${{ secrets.GH_SUPER_TOKEN }}
       - uses: actions/setup-node@v3
         with:
