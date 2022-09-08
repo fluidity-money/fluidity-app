@@ -60,6 +60,6 @@ const header =
   "Fluid Assets are a 1:1 wrapped asset with perpetual payout properties. ";
 
 const info = [
-  "A 'fluid' asset is a wrapped standard token that is pegged to the underlying principal.  ",
-  "Users are free from market volatility risks, and can redeem the base asset at any point of time through our web application or the method call on the corresponding swap contract.",
+  "A Fluid Asset is a wrapped standard token that represents and is pegged to an underlying principal token. ",
+  "You are free from market volatility risk when exchanging your fluid assets to the base asset you have deposited at any point in time through our web application, and if its down, through the method call on the corresponding swap contract.",
 ];

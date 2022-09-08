@@ -32,7 +32,11 @@ const ResourcesPage = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
-        <Navigation page={"resources"} pageLocations={pageLocations} />
+        <Navigation
+          page={"resources"}
+          pageLocations={pageLocations}
+          style={"black"}
+        />
         <AnimatePresence initial={false}>
           {introVisible && (
             <motion.div

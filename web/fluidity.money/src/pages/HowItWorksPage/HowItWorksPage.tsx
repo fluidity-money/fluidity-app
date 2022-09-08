@@ -17,7 +17,11 @@ const HowItWorksPage = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
-        <Navigation page={"howitworks"} pageLocations={pageLocations} />
+        <Navigation
+          page={"howitworks"}
+          pageLocations={pageLocations}
+          style={"clear"}
+        />
         <Incentivising />
         <Wrap />
         <Use />
