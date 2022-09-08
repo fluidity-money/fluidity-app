@@ -9,6 +9,8 @@ ARG CI
 
 ARG GITHUB_TOKEN
 
+ENV CI $CI
+
 ENV PATH /app/node_modules.bin:$PATH
 
 COPY .npmrc package.json package-lock.json ./
