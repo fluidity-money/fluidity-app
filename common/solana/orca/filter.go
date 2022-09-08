@@ -175,7 +175,7 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 			feeData.TradeFeeDenominator,
 		)
 
-		ownerTradeFee := big.NewRat(
+		ownerTradeFee := safeNewRat(
 			feeData.OwnerTradeFeeNumerator,
 			feeData.OwnerTradeFeeDenominator,
 		)
