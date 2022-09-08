@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useChainContext } from "../../hooks/ChainContext";
+import { useChainContext } from "hooks/ChainContext";
 import {
   ContinuousCarousel,
   numberToMonetaryString,
@@ -11,7 +11,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
-import { JsxElement } from "typescript";
 
 interface Reward {
   token: string;

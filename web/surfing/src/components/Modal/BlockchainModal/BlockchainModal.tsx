@@ -9,7 +9,7 @@ import { SupportedChains } from "~/util";
 import styles from "./BlockchainModal.module.scss";
 
 interface IOption {
-  name: string;
+  name: SupportedChainsList;
   icon: ReactComponentElement<any>;
 }
 
