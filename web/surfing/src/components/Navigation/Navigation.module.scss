@@ -4,7 +4,6 @@
   display: flex;
   // grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
-  background-color: black;
   width: fit-content;
   padding: 4px;
   border-radius: 40px;
@@ -13,9 +12,14 @@
   left: 50vw;
   transform: translateX(-50%);
   z-index: 60;
-  h4 {
+  
+  .black {
+    background-color: black;
+  }
+
+  & span {
     cursor: pointer;
-    margin: 6px;
+    margin: 20px;
     &:hover {
       opacity: 0.8;
     }
