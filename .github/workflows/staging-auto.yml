@@ -53,7 +53,7 @@ jobs:
         with:
           lfs: true
           clean: false
-          token: ${{ secret.GH_SUPER_TOKEN }}
+          token: ${{ secrets.GH_SUPER_TOKEN }}
       - name: Update version
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
