@@ -19,13 +19,31 @@ const UseCases = () => {
       style={{ display: "flex", flexDirection: "column" }}
       className={styles.container}
     >
-      <Display
-        large={width > breakpoint && true}
-        extraSmall={width < breakpoint && true}
-        className={styles.backgroundText}
-      >
-        A FLUID ECONOMY
-      </Display>
+      {/* Missing font WHYTE INK SUPER */ }
+      {/*<Display */}
+      {/*  large={width > breakpoint && true} */}
+      {/*  extraSmall={width < breakpoint && true} */}
+      {/*  className={styles.backgroundText} */}
+      {/*> */}
+      {/*  A FLUID ECONOMY */}
+      {/*</Display> */}
+      {
+        width > breakpoint
+          ? (
+            <img
+              style={{height: "auto", maxWidth: "90%"}}
+              src={window.location.origin + "/assets/text/AFLUIDECONOMY.svg"}
+              alt={"A FLUID ECONOMY"}
+            />
+          ) : (
+            <img
+              style={{height: "auto", maxWidth: "90%"}}
+              src={window.location.origin + "/assets/text/AFLUIDECONOMY-Broken.svg"}
+              alt={"A FLUID ECONOMY"}
+            />
+          )
+      }
+
       <ManualCarousel>
         {items.map((item, i) => (
           <UseCase key={`usecase-${i}`} useCase={item} />

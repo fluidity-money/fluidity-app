@@ -6,7 +6,7 @@
 .h4,
 .h5,
 .h6 {
-  font-family: "Whyte Inktrap", sans-serif;
+  font-family: "Whyte Inktrap";
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -36,6 +36,10 @@
 
 .h6 {
   font-size: $em-step * 3.5;
+}
+
+strong {
+  font-weight: 1000;
 }
 
 .uppercase {
