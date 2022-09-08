@@ -34,6 +34,8 @@ BACKEND_BUILD := ${REPO}.out
 	watch-js \
 	watch
 
+all: frontend
+
 ${REPO}.out: ${BACKEND_SRC_GO}
 	@cd ${BACKEND_SRC_DIR} && ${GO_BUILD} -o ../${REPO}.out
 
