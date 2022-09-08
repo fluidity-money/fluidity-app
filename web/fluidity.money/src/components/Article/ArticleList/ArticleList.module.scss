@@ -12,13 +12,13 @@
 
   p {
     margin-bottom: 10px;
-    color: $textGrey;
+    font-size: 18px;
   }
 
   section {
     font-size: 13px;
     color: $textGrey;
-    padding-bottom: 14px;
+    padding-bottom: 40px;
   }
 
   hr {
@@ -26,7 +26,7 @@
     margin-bottom: 40px;
     margin-bottom: 40px;
     justify-content: center;
-    border: 1px solid $textGrey;
+    border: 0.5px solid $textGrey;
   }
 }
 

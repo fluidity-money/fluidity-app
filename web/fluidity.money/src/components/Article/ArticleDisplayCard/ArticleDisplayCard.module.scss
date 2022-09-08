@@ -12,7 +12,7 @@
     margin: 10px 10px 10px 10px;
   }
 
-  h3 {
+  h4 {
     margin: 14px 0 18px 0;
     padding-left: 10px;
   }
@@ -20,7 +20,7 @@
   p {
     margin-bottom: 20px;
     padding-left: 10px;
-    color: $textGrey;
+
     font-size: 20px;
     @include max-560px {
       font-size: 18px;

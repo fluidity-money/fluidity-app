@@ -23,7 +23,7 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
   return (
     <div className={styles.cardContainer}>
       <img src={article.img} />
-      <Heading as="h3" className={styles.leftMargin10px}>{article.title}</Heading>
+      <Heading as="h4" className={styles.leftMargin10px}>{article.title}</Heading>
       <Text as="p">{article.desc}</Text>
       <Text as="p">{article.info}</Text>
       <section>
