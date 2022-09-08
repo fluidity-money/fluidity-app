@@ -20,7 +20,7 @@ const HowItWorksPage = () => {
         <Navigation
           page={"howitworks"}
           pageLocations={pageLocations}
-          style={"clear"}
+          background={"clear"}
         />
         <Incentivising />
         <Wrap />

@@ -19,7 +19,7 @@ const FluidEcosystemPage = () => {
         <Navigation
           page={"ecosystem"}
           pageLocations={["featured projects", "all projects"]}
-          style={"clear"}
+          background={"clear"}
         />
         <Search />
         <FeaturedProjects />

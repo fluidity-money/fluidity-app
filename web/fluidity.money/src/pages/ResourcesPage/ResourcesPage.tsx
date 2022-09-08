@@ -35,7 +35,7 @@ const ResourcesPage = () => {
         <Navigation
           page={"resources"}
           pageLocations={pageLocations}
-          style={"black"}
+          background={"black"}
         />
         <AnimatePresence initial={false}>
           {introVisible && (
