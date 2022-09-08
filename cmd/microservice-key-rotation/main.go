@@ -54,9 +54,9 @@ func main() {
 
 func rotateOracleKeys() {
 	var (
-		awsRegion	= util.GetEnvOrFatal(EnvAwsRegion)
-		bucketName 	= util.GetEnvOrFatal(EnvOracleBucketName)
-	    gethHttpUrl = util.GetEnvOrFatal(EnvGethHttpUrl)
+		awsRegion   = util.GetEnvOrFatal(EnvAwsRegion)
+		bucketName  = util.GetEnvOrFatal(EnvOracleBucketName)
+		gethHttpUrl = util.GetEnvOrFatal(EnvGethHttpUrl)
 		clusterName = util.GetEnvOrFatal(EnvAwsClusterName)
 		serviceName = util.GetEnvOrFatal(EnvAwsServiceName)
 
@@ -103,8 +103,8 @@ func rotateOracleKeys() {
 		fileContent string
 
 		signedTxnAttachments = make(map[string]io.Reader)
-		timestamp = time.Now().UTC().String()
-		fileName  = "Oracle Update " + timestamp
+		timestamp            = time.Now().UTC().String()
+		fileName             = "Oracle Update " + timestamp
 	)
 
 	// update each oracle in sequence
@@ -184,8 +184,8 @@ func rotateOracleKeys() {
 		ssmClient := ssm.New(session)
 
 		input := &ssm.PutParameterInput{
-			Name:  &parameter,
-			Value: &newOraclePrivateKeyHex,
+			Name:      &parameter,
+			Value:     &newOraclePrivateKeyHex,
 			Overwrite: awsCommon.Bool(true),
 		}
 
@@ -222,11 +222,11 @@ func rotateOracleKeys() {
 		k.Payload = uploadLogsOutput
 	})
 
-	// send a discord message containing the public URL, with Eth transfer 
+	// send a discord message containing the public URL, with Eth transfer
 	// transactions as attachments
 	bucketUrl := uploadLogsOutput.Location
 
-	discordMessage := fmt.Sprintf("Uploaded log to S3 bucket at URL: %v",bucketUrl)
+	discordMessage := fmt.Sprintf("Uploaded log to S3 bucket at URL: %v", bucketUrl)
 
 	discord.NotifyWithAttachment(
 		discord.SeverityNotice,
