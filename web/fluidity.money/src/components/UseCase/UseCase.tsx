@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { Heading, Text } from "@fluidity-money/surfing";
 import React from "react";
 import styles from "./UseCase.module.scss";
 
@@ -18,8 +19,8 @@ const UseCase = ({ useCase }: UseCaseProps) => {
     <div className={styles.container}>
       <img src={useCase.img} alt="text representation" />
       <div className={styles.text}>
-        <h2>{useCase.title}</h2>
-        <p>{useCase.info}</p>
+        <Heading as="h3">{useCase.title}</Heading>
+        <Text as="p">{useCase.info}</Text>
       </div>
     </div>
   );

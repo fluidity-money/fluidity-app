@@ -23,6 +23,9 @@
   align-items: center;
   justify-self: center;
   max-width: 400px;
+  @include tablet {
+    max-height: 500px;
+  }
 }
 
 .right {

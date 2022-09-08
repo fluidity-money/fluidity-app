@@ -13,13 +13,13 @@
   }
 }
 
-.carouselText {
-  h2 {
-    margin-right: 20px;
-    opacity: 1;
-  }
-  background-color: $fluidBlack;
-}
+// .carouselText {
+//   h2 {
+//     margin-right: 20px;
+//     opacity: 1;
+//   }
+//   background-color: $fluidBlack;
+// }
 
 .fluniversityCard {
   // border: 1px solid white;
@@ -27,7 +27,7 @@
   min-width: 550px;
   margin-right: 20px;
   margin-bottom: 50px;
-  padding-bottom: 20px;
+  padding: 20px;
   background-color: $backgroundBlack;
   .imgContainer {
     width: 100%;
@@ -41,24 +41,41 @@
     }
   }
 
-  h3 {
-    margin: 10px 0 10px 0;
-    padding: 10px;
-  }
+  // h3 {
+  //   margin: 10px 0 10px 0;
+  //   padding: 10px;
+  // }
 
-  p {
-    padding: 10px;
-    font-family: "Aeonik";
-    font-size: 16px;
-    color: $textGrey;
-  }
+  // p {
+  //   padding: 10px;
+  //   font-family: "Aeonik";
+  //   font-size: 16px;
+  //   color: $textGrey;
+  // }
 
   span {
     color: $textGrey;
     padding: 10px;
     font-size: 11px;
+    padding-left: 0px;
     a {
       color: $textGrey;
     }
+  }
+}
+
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
+}
+
+.text {
+  margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
   }
 }

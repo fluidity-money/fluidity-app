@@ -6,7 +6,6 @@ import Video from "components/Video";
 import { useEffect, useState } from "react";
 import {
   ContinuousCarousel,
-  Display,
   Heading,
   LinkButton,
   Text,
@@ -52,29 +51,37 @@ const HowItWorks = () => {
       ? "YIELD"
       : "GOVERN";
 
+  const callout = (
+    <div className={styles.callout}>
+      <Heading hollow={true} as="h4" className={styles.text}>
+        HOW IT WORKS HOW IT WORKS HOW IT WORKS
+      </Heading>
+      <Heading as="h4" className={styles.text}>
+        HOW IT WORKS
+      </Heading>
+    </div>
+  );
+
   return (
     <div className={`${styles.container} bg-dark`}>
-      <ContinuousCarousel direction={"right"}>
-        <div className={styles.text}>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-          <div>HOW IT WORKS</div>
-        </div>
-      </ContinuousCarousel>
+      <div className={styles.carousel}>
+        <ContinuousCarousel direction={"right"}>
+          <div>
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+          </div>
+        </ContinuousCarousel>
+      </div>
+
       <div className={styles.grid}>
         <div className={styles.left}>
           <Text
@@ -133,7 +140,7 @@ const HowItWorks = () => {
                 type={"fit"}
                 loop={true}
                 key={"abc"}
-                scale={.8}
+                scale={0.8}
               />
             </div>
           ) : currentImage === "/assets/videos/Fluidity_Yield.mp4" ? (
@@ -157,7 +164,7 @@ const HowItWorks = () => {
                 type={"fit"}
                 loop={true}
                 key={"jfk"}
-                scale={.8}
+                scale={0.8}
               />
             </div>
           )}

@@ -4,7 +4,13 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ContinuousCarousel, ManualCarousel, GeneralButton } from "@fluidity-money/surfing";
+import {
+  ContinuousCarousel,
+  ManualCarousel,
+  GeneralButton,
+  Heading,
+  Text,
+} from "@fluidity-money/surfing";
 import styles from "./Docs.module.scss";
 
 const Docs = () => {
@@ -21,22 +27,37 @@ const Docs = () => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     }
   }, [location]);
+
+  const callout = (
+    <div className={styles.callout}>
+      <Heading hollow={true} as="h4" className={styles.text}>
+        DOCUMENTATION DOCUMENTATION
+      </Heading>
+      <Heading as="h4" className={styles.text}>
+        DOCUMENTATION
+      </Heading>
+    </div>
+  );
+
   return (
     <div id="documentation">
-      <ContinuousCarousel direction={"right"}>
-        <div className={styles.carouselText}>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-          <h2>DOCUMENTATION</h2>
-        </div>
-      </ContinuousCarousel>
+      <div className={styles.carousel}>
+        <ContinuousCarousel direction={"right"}>
+          <div>
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+          </div>
+        </ContinuousCarousel>
+      </div>
       <div className={styles.container}>
         <ManualCarousel>
           {items.map((item, index) => (
@@ -44,7 +65,7 @@ const Docs = () => {
               <div className={styles.imgContainer}>
                 <img src={item.img} />
               </div>
-              <h3>{item.title}</h3>
+              <Heading as="h3">{item.title}</Heading>
               <a href={item.link}>
                 DOCS <i>*</i>
               </a>
@@ -53,8 +74,8 @@ const Docs = () => {
         </ManualCarousel>
       </div>
       <div className={styles.desktopViewFormInput}>
-        <h4>Stay hydrated</h4>
-        <label>EMAIL</label>
+        <Heading as="h4">Stay hydrated</Heading>
+        <Heading as="h6">EMAIL</Heading>
         <div>
           <input type="text" placeholder="elon@email.com" />
           <GeneralButton
@@ -71,11 +92,11 @@ const Docs = () => {
       </div>
       <div className={styles.mobileViewFormInput}>
         <div>
-          <h2>Stay hydrated</h2>
-          <p>
+          <Heading as="h3">Stay hydrated</Heading>
+          <Text as="p">
             Subscribe to our monthly newsletter to stay up to date with our
             progress and roadmap.
-          </p>
+          </Text>
           <form>
             <div>
               <label>Name</label>

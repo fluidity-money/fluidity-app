@@ -2,20 +2,30 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { ManualCarousel } from "@fluidity-money/surfing";
+import { Display, ManualCarousel } from "@fluidity-money/surfing";
 import UseCase from "components/UseCase";
+import useViewport from "hooks/useViewport";
 import styles from "./UseCases.module.scss";
 
 const UseCases = () => {
   /*
   manual carousel of boxes containing image and text
   */
+
+  const { width } = useViewport();
+  const breakpoint = 665;
   return (
     <div
       style={{ display: "flex", flexDirection: "column" }}
       className={styles.container}
     >
-      <h1>A FLUID ECONOMY</h1>
+      <Display
+        large={width > breakpoint && true}
+        extraSmall={width < breakpoint && true}
+        className={styles.backgroundText}
+      >
+        A FLUID ECONOMY
+      </Display>
       <ManualCarousel>
         {items.map((item, i) => (
           <UseCase key={`usecase-${i}`} useCase={item} />

@@ -4,7 +4,12 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ContinuousCarousel, ManualCarousel } from "@fluidity-money/surfing";
+import {
+  ContinuousCarousel,
+  Heading,
+  ManualCarousel,
+  Text,
+} from "@fluidity-money/surfing";
 import styles from "./Fluniversity.module.scss";
 
 const Fluniversity = () => {
@@ -21,23 +26,37 @@ const Fluniversity = () => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     }
   }, [location]);
+
+  const callout = (
+    <div className={styles.callout}>
+      <Heading hollow={true} as="h4" className={styles.text}>
+        FLUNIVERSITY FLUNIVERSITY
+      </Heading>
+      <Heading as="h4" className={styles.text}>
+        FLUNIVERSITY
+      </Heading>
+    </div>
+  );
+
   return (
     <div id="fluniversity">
-      <ContinuousCarousel direction={"right"}>
-        <div className={styles.carouselText}>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-          <h2>FLUNIVERSITY</h2>
-        </div>
-      </ContinuousCarousel>
+      <div className={styles.carousel}>
+        <ContinuousCarousel direction={"right"}>
+          <div>
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+            {callout}
+          </div>
+        </ContinuousCarousel>
+      </div>
       <div className={styles.container}>
         <ManualCarousel>
           {items.map((item, index) => (
@@ -46,14 +65,14 @@ const Fluniversity = () => {
                 <img src={item.img} />
               </div>
 
-              <h3>{item.title}</h3>
-              <p>{item.desc}</p>
-              <span>{item.time} mins read</span>
-              <span>
+              <Heading as="h4">{item.title}</Heading>
+              <Text as="p">{item.desc}</Text>
+              <Text>{item.time} mins read</Text>
+              <Text>
                 <a href={item.link}>
                   FLUNIVERSITY <i>*</i>
                 </a>
-              </span>
+              </Text>
             </div>
           ))}
         </ManualCarousel>

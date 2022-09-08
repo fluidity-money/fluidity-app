@@ -3,7 +3,11 @@
 // LICENSE_TRF.md file.
 
 import { useEffect, useRef, useState } from "react";
-import { ContinuousCarousel, ManualCarousel } from "@fluidity-money/surfing";
+import {
+  ContinuousCarousel,
+  Heading,
+  ManualCarousel,
+} from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
@@ -12,62 +16,86 @@ import Video from "components/Video";
 import { stat } from "fs";
 
 const Landing = () => {
-  
-  const [state, setState] =  useState({
-    src: '/assets/videos/Fluidity_Home.mp4',
-    key: '0',
+  const [state, setState] = useState({
+    src: "/assets/videos/Fluidity_Home.mp4",
+    key: "0",
     loop: false,
-    scale: .7,
+    scale: 0.7,
   });
- 
+
   useEffect(() => {
-
-    setTimeout(function() { 
+    setTimeout(function () {
       setState({
-      src: '/assets/videos/Fluidity_Homeloop.mp4',
-      key: '1',
-      loop: true,
-      scale: .5,
-    })
+        src: "/assets/videos/Fluidity_Homeloop.mp4",
+        key: "1",
+        loop: true,
+        scale: 0.5,
+      });
     }, 6000);
-
   }, []);
 
   const { width } = useViewport();
   const breakpoint = 620;
 
+  const callout = (
+    <div className={styles.callout}>
+      <Heading hollow={true} as="h4" className={styles.text}>
+        MONEY DESIGNED TO MOVE MONEY DESIGNED TO MOVE
+      </Heading>
+      <Heading as="h4" className={styles.text}>
+        MONEY DESIGNED TO MOVE
+      </Heading>
+    </div>
+  );
+
   return (
     <div className={`${styles.containerLanding}`}>
-      
-      
       {width > breakpoint ? (
-          <div className={`${styles.bgVid}`}>
-            <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale} opacity={0.5}/>;
-          </div>
-        ) : (
-          <div className={`${styles.bgVid}`}>
-           <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale * 2} opacity={0.5}/>;
-          </div>
-        )}
+        <div className={`${styles.bgVid}`}>
+          <Video
+            src={window.location.origin + state.src}
+            type={"reduce"}
+            loop={state.loop}
+            key={state.key}
+            scale={state.scale}
+          />
+          ;
+        </div>
+      ) : (
+        <div className={`${styles.bgVid}`}>
+          <Video
+            src={window.location.origin + state.src}
+            type={"reduce"}
+            loop={state.loop}
+            key={state.key}
+            scale={state.scale * 2}
+          />
+          ;
+        </div>
+      )}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 6, type: "tween" }}
           >
-            Fluidity is the <br /> blockchain incentive <br /> layer, rewarding{" "}
-            <br /> people for using <br /> their crypto.
-          </motion.h1>
+            <Heading as="h3">
+              Fluidity is the <br /> blockchain incentive <br /> layer,
+              rewarding <br /> people for using <br /> their crypto.
+            </Heading>
+          </motion.div>
         ) : (
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 6, type: "tween" }}
           >
-            Fluidity is the blockchain incentive layer, <br />
-            rewarding people for using their crypto.
-          </motion.h1>
+            <Heading as="h3">
+              Fluidity is the blockchain incentive layer, <br />
+              rewarding people for using their crypto.
+            </Heading>
+          </motion.div>
         )}
         <div className={styles.tiles}>
           {width < breakpoint && (
@@ -80,9 +108,7 @@ const Landing = () => {
                 scale: [1, 1, 1, 0.8],
               }}
               transition={{ duration: 6, type: "tween" }}
-            >
-             
-            </motion.div>
+            ></motion.div>
           )}
 
           <motion.div
@@ -113,7 +139,6 @@ const Landing = () => {
               qualifies as a reward
             </IntroTile>
           </motion.div>
-         
 
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
@@ -151,20 +176,23 @@ const Landing = () => {
         animate={{ opacity: [1, 1, 1, 0], y: [0, 0, 0, 100] }}
         transition={{ duration: 6, type: "tween" }}
       >
-        <ContinuousCarousel direction={"right"}>
-          <div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-          </div>
-        </ContinuousCarousel>
+        <div className={styles.carousel}>
+          <ContinuousCarousel direction={"right"}>
+            <div>
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+            </div>
+          </ContinuousCarousel>
+        </div>
       </motion.div>
     </div>
   );

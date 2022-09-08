@@ -40,6 +40,9 @@
   justify-content: center;
   align-items: center;
   font-size: 60px;
+  @include max-860px {
+    max-height: 500px;
+  }
 }
 
 .footer {
@@ -52,17 +55,17 @@
 
 .bold {
   color: $fluidWhite;
-  cursor: pointer;
+  // cursor: pointer;
 }
 
 .normal {
-  cursor: pointer;
+  // cursor: pointer;
 }
 
 .text {
-  align-items: center;
-  & div {
-    margin-left: 6px;
+  margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
   }
 }
 
@@ -70,4 +73,13 @@
   position: absolute;
   opacity: 0.2;
   z-index: 5;
+}
+
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
 }
