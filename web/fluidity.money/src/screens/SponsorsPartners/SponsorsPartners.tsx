@@ -3,8 +3,10 @@
 // LICENSE_TRF.md file.
 
 import useViewport from "hooks/useViewport";
-import { ContinuousCarousel, Partner, Card } from "@fluidity-money/surfing";
+import { ContinuousCarousel, Card } from "@fluidity-money/surfing";
+import Partner from "components/Partner";
 import styles from "./SponsorsPartners.module.scss";
+import { useEffect, useState } from "react";
 
 const SponsorsPartners = () => {
   /*
@@ -15,11 +17,10 @@ const SponsorsPartners = () => {
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 660;
-  
   return (
     <div className={`${styles.container} bg-dark`}>
-      <h1 className={styles.text}>{"Sponsors & Partners"}</h1>
-      <div style={{ display: "flex", width: "100%", justifyContent:"center" }}>
+      <h1 className={styles.text}>{"Partners & Investors"}</h1>
+      <div style={{ display: "flex", width: "100%", justifyContent:"center", overflowY: "hidden" }}>
         <ContinuousCarousel direction="up">
           <div
             style={{
@@ -31,46 +32,51 @@ const SponsorsPartners = () => {
             }}
           >
             {partners.map((partner, i) => (
-               width < breakpoint ? (
+              width > 960 ? (
+              <Card
+              rounded={true}
+              type={"transparent"}
+              key={`sponsor-${i}`}
+              className={styles.card}
+              style={{
+                position: "relative",
+                display: "block",
+                top: `${Math.floor(Math.random() * (200 - 1) + 1)}px`,
+                left: `${Math.floor(Math.random() * ((width - (width - 1180)) - 1) + 1)}px`,
+                visibility: `${i % 2 > 0 ? 'hidden' : 'visible'}`,
+                filter: `${Math.floor(Math.random() * (21 - 1) + 1) >= 15 ? 'blur(8px)' : 'blur(0px)'}`,
+                opacity: `${Math.floor(Math.random() * (21 - 1) + 1) >= 15 ? '0.6' : '1.0'}`
+              }}
+              >
+                <Partner
+                  img={partner.img}
+                  title={partner.title}
+                  info={partner.info}
+                  url={partner.url}
+                />
+              </Card>) :
+              (
                 <Card
                 rounded={true}
                 type={"transparent"}
                 key={`sponsor-${i}`}
                 style={{
                   position: "relative",
-                  display: "flex",
-                  bottom: `90px`,
-                  left: `23%`,
+                  width: "300px",
+                  display: "block",
+                  top: `${Math.floor(Math.random() * (250 - 1) + 1)}px`,
+                  left: `${Math.floor(Math.random() * ((width - 350) - 1) + 1)}px`,
+                  visibility: `${i % 2 > 0 ? 'hidden' : 'visible'}`,
+                  filter: `${Math.floor(Math.random() * (21 - 1) + 1) >= 15 ? 'blur(8px)' : 'blur(0px)'}`
                 }}
               >
                 <Partner
-                  img={partner.img}
+                  img={"/assets/images/chainIcons/Compound.svg"}
                   title={partner.title}
                   info={partner.info}
+                  url={partner.url}
                 />
-              </Card>
-              ) : (
-                <Card
-                rounded={true}
-                type={"transparent"}
-                key={`sponsor-${i}`}
-                style={{
-                  position: "relative",
-                  display: "flex",
-                  top: `0`,
-                  left: `${Math.floor(Math.random() * (1150 - 1) + 1)}px`,
-                  filter: `${Math.floor(Math.random() * (3 - 1) + 1) === 1 ? 'blur(8px)' : 'blur(0px)'}`
-                }}
-              >
-                <Partner
-                  img={partner.img}
-                  title={partner.title}
-                  info={partner.info}
-                />
-              </Card>
-              )
-
-              
+              </Card>)
             ))}
           </div>
         </ContinuousCarousel>
@@ -84,91 +90,162 @@ export default SponsorsPartners;
 // array of array of array of 4 objects at a time
 const partners = [
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://www.circle.com/en/",
+    title: "Circle ",
+    info: "Circle is a global internet finance company built on blockchain technology and powered by crypto assets.",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://multicoin.capital",
+    title: "Multicoin Capital",
+    info: "Multicoin Capital is a thesis-driven cryptofund that invests long term in tokens that reshape entire sectors of the global economy.",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://solana.ventures",
+    title: "Solana Ventures",
+    info: "Solana Ventures' mission is to accelerate the growth of the Solana blockchain and adjacent ecosystems by providing capital to the most promising teams building in the crypto ecosystem.",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
-  },
-
-  {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://lemniscap.com",
+    title: "Lemniscap",
+    info: "Lemniscap is an investment firm specializing in investments in emerging cryptoassets and blockchain companies",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
-  },
-  {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
-  },
-  {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://aave.com",
+    title: "Aave",
+    info: "Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers",
   },
 
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://compound.finance",
+    title: "Compound",
+    info: "Compound is an algorithmic, autonomous interest rate protocol built for developers, to unlock a universe of open financial applications. ",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://jup.ag",
+    title: "Jupiter",
+    info: "Jupiter is the key liquidity aggregator for Solana, offering the widest range of tokens and best route discovery between any token pair.",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://makerdao.com",
+    title: "MakerDAO",
+    info: "MakerDAO enables the generation of Dai, the world's first unbiased currency and leading decentralized stablecoin.",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
-  },
-  {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
-  },
-  {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://aldrin.com",
+    title: "Aldrin",
+    info: "Aldrin is a decentralized exchange whose mission is to simplify DeFi and create powerful tools to help all traders succeed, leading to more equality.",
   },
 
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://dodoex.io",
+    title: "DODO",
+    info: "DODO is a decentralized exchange that uses the innovative algorithms to provide efficient on-chain liquidity for Web3 assets.",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://www.orca.so",
+    title: "Orca",
+    info: "Orca is the easiest, fastest, and most user-friendly cryptocurrency exchange on the Solana blockchain.",
   },
   {
-    img: "🦍",
-    title: "ApeChain",
-    info: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos qui velit culpa voluptates quam ea accusantium!",
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://app.saber.so/swap",
+    title: "Saber",
+    info: "Saber is an automated market maker for trading assets on Solana.",
+  },
+  //second round of switches
+
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://multicoin.capital",
+    title: "Multicoin Capital",
+    info: "Multicoin Capital is a thesis-driven cryptofund that invests long term in tokens that reshape entire sectors of the global economy.",
+  },
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://www.circle.com/en/",
+    title: "Circle ",
+    info: "Circle is a global internet finance company built on blockchain technology and powered by crypto assets.",
+  },
+
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://lemniscap.com",
+    title: "Lemniscap",
+    info: "Lemniscap is an investment firm specializing in investments in emerging cryptoassets and blockchain companies",
+  },
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://solana.ventures",
+    title: "Solana Ventures",
+    info: "Solana Ventures' mission is to accelerate the growth of the Solana blockchain and adjacent ecosystems by providing capital to the most promising teams building in the crypto ecosystem.",
+  },
+  
+ 
+
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://compound.finance",
+    title: "Compound",
+    info: "Compound is an algorithmic, autonomous interest rate protocol built for developers, to unlock a universe of open financial applications. ",
+  },
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://aave.com",
+    title: "Aave",
+    info: "Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers",
+  },
+
+  
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://makerdao.com",
+    title: "MakerDAO",
+    info: "MakerDAO enables the generation of Dai, the world's first unbiased currency and leading decentralized stablecoin.",
+  },
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://jup.ag",
+    title: "Jupiter",
+    info: "Jupiter is the key liquidity aggregator for Solana, offering the widest range of tokens and best route discovery between any token pair.",
+  },
+
+  
+
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://dodoex.io",
+    title: "DODO",
+    info: "DODO is a decentralized exchange that uses the innovative algorithms to provide efficient on-chain liquidity for Web3 assets.",
+  },
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://aldrin.com",
+    title: "Aldrin",
+    info: "Aldrin is a decentralized exchange whose mission is to simplify DeFi and create powerful tools to help all traders succeed, leading to more equality.",
+  },
+
+  
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://app.saber.so/swap",
+    title: "Saber",
+    info: "Saber is an automated market maker for trading assets on Solana.",
+  },
+  {
+    img: "/assets/images/chainIcons/Compound.svg",
+    url: "https://www.orca.so",
+    title: "Orca",
+    info: "Orca is the easiest, fastest, and most user-friendly cryptocurrency exchange on the Solana blockchain.",
   },
 ];

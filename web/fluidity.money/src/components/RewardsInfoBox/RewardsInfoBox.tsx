@@ -4,7 +4,14 @@
 
 import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
-import { LinkButton, BlockchainModal, ChainSelectorButton, numberToMonetaryString, SupportedChains } from "@fluidity-money/surfing";
+import {
+  LinkButton,
+  BlockchainModal,
+  ChainSelectorButton,
+  numberToMonetaryString,
+  SupportedChains,
+  Heading,
+} from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
@@ -26,8 +33,11 @@ const RewardsInfoBox = ({
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
 
-  const imgLink = (opt: string) => opt === "ETH" ? "/assets/images/chainIcons/ethIcon.svg" : "/assets/images/chainIcons/solanaIcon.svg";
-  
+  const imgLink = (opt: string) =>
+    opt === "ETH"
+      ? "/assets/images/chainIcons/ethIcon.svg"
+      : "/assets/images/chainIcons/solanaIcon.svg";
+
   const [showModal, setShowModal] = useState(false);
 
   const options = Object.keys(SupportedChains).map((chain) => ({
@@ -52,28 +62,34 @@ const RewardsInfoBox = ({
           type === "black" ? styles.infoBox : styles.infoBoxTransparent
         }
       >
-        <ChainSelectorButton 
+        <ChainSelectorButton
           chain={{
             name: chain,
             icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
           }}
           onClick={() => setShowModal(true)}
         />
-        <h1 onClick={switchAndAnimate}>
-          {type === "black"
-            ? numberToMonetaryString(rewardPool)
-            : totalTransactionValue.toLocaleString("en-US")}
-        </h1>
-        <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
-        {showModal && <BlockchainModal 
-          handleModal={setShowModal}
-          option={{
-            name: chain,
-            icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
-          }}
-          options={options}
-          setOption={setChain}
-        />}
+        <div onClick={switchAndAnimate}>
+          <Heading as="h1">
+            {type === "black"
+              ? numberToMonetaryString(rewardPool)
+              : totalTransactionValue.toLocaleString("en-US")}
+          </Heading>
+        </div>
+        <Heading as="h4">
+          {type === "black" ? "Reward pool" : "Total transactions"}
+        </Heading>
+        {showModal && (
+          <BlockchainModal
+            handleModal={setShowModal}
+            option={{
+              name: chain,
+              icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
+            }}
+            options={options}
+            setOption={setChain}
+          />
+        )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
           FLUID STATS
         </LinkButton> */}

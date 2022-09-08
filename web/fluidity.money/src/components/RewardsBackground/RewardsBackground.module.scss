@@ -56,3 +56,10 @@
     color: $fluidWhite;
   }
 }
+
+.hover {
+  cursor: pointer;
+  &:hover {
+    color: white;
+  }
+}

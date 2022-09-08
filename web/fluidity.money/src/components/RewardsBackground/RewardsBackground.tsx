@@ -41,9 +41,15 @@ const RewardsBackground = () => {
             }
             alt="tokenIcon"
           />
-          <Text as="p">{numberToMonetaryString(amount)} </Text>
-          <Text as="p">{trimAddress(address)} </Text>
-          <Text as="p">{formatTo12HrDate(date)}</Text>
+          <Text as="p" className={styles.hover}>
+            {numberToMonetaryString(amount)}{" "}
+          </Text>
+          <Text as="p" className={styles.hover}>
+            {trimAddress(address)}{" "}
+          </Text>
+          <Text as="p" className={styles.hover}>
+            {formatTo12HrDate(date)}
+          </Text>
         </div>
       ))}
     </div>

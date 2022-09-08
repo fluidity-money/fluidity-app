@@ -14,10 +14,10 @@
 }
 
 .carouselText {
-  h2 {
-    margin-right: 20px;
-    opacity: 1;
-  }
+  // h2 {
+  //   margin-right: 20px;
+  //   opacity: 1;
+  // }
   background-color: $fluidBlack;
 }
 
@@ -41,17 +41,17 @@
     }
   }
 
-  h3 {
-    margin: 10px 0 10px 0;
-    padding: 10px;
-  }
+  // h3 {
+  //   margin: 10px 0 10px 0;
+  //   padding: 10px;
+  // }
 
-  p {
-    padding: 10px;
-    font-family: "Aeonik";
-    font-size: 20px;
-    color: $textGrey;
-  }
+  // p {
+  //   padding: 10px;
+  //   font-family: "Aeonik";
+  //   font-size: 20px;
+  //   color: $textGrey;
+  // }
 
   a {
     color: $textGrey;
@@ -63,10 +63,10 @@
 .desktopViewFormInput {
   padding: 20px;
   background-color: $fluidBlack;
-  h4 {
-    padding-left: 10px;
-    margin-bottom: 24px;
-  }
+  // h4 {
+  //   padding-left: 10px;
+  //   margin-bottom: 24px;
+  // }
   label {
     padding: 10px;
     font-size: 13px;
@@ -76,10 +76,10 @@
     background-color: $fluidBlack;
     padding: 10px;
     justify-content: space-between;
-    h4 {
-      margin-bottom: 30px;
-      padding-left: 10px;
-    }
+    // h4 {
+    //   margin-bottom: 30px;
+    //   padding-left: 10px;
+    // }
     input {
       width: 80%;
       padding: 12px 20px;
@@ -115,11 +115,11 @@
     padding: 30px 10px 10px 10px;
     width: 80%;
     background-color: rgb(17, 17, 17);
-    p {
-      font-size: large;
-      margin-top: 10px;
-      color: $textGrey;
-    }
+    // p {
+    //   font-size: large;
+    //   margin-top: 10px;
+    //   color: $textGrey;
+    // }
     form {
       padding-bottom: 20px;
       div {
@@ -152,5 +152,21 @@
   }
   @include min-861px {
     display: none;
+  }
+}
+
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
+}
+
+.text {
+  margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
   }
 }
