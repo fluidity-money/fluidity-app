@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { Display } from "@fluidity-money/surfing";
+import { Display, Heading } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import useViewport from "hooks/useViewport";
 import styles from "./Incentivising.module.scss";
@@ -19,6 +19,7 @@ const Incentivising = () => {
         loop={true}
       />
       <div>
+        <Heading as={"h6"}>HOW IT WORKS</Heading>
         <Display
           className={styles.backgroundText}
           large={width > breakpoint && true}
