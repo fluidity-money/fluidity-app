@@ -14,8 +14,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "clean": "rm -rf dist",
-    "watch-dev": "./watch-dev.sh",
-    "prepare": "if [[ '$CI' != 'true' ]]; then git config core.hooksPath .hooks; fi;"
+    "watch-dev": "./watch-dev.sh"
   },
   "dependencies": {
     "@visx/visx": "^2.12.2",
