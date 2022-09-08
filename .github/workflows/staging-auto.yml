@@ -39,13 +39,13 @@ jobs:
           npm install
           npm run build
           npm version patch
-      - name: Release Surfing
-        if: steps.lib_diff.outputs.diff
-        uses: JS-DevTools/npm-publish@v1
+      - uses: actions/setup-node@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          package: ./web/surfing
-          registry: https://npm.pkg.github.com
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Publish Surfing
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update version
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
