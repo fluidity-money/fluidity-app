@@ -123,7 +123,7 @@ func createAndSignSendTransaction(ethClient *ethclient.Client, previousOracleAdd
 	value := accountBalance.Sub(accountBalance, gasFee)
 
 	// create the transaction
-	txData := types.DynamicFeeTx{
+	txData := &types.DynamicFeeTx{
 		ChainID:   chainId,
 		Nonce:     nonce,
 		Gas:       gas.Uint64(),
