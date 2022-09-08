@@ -315,7 +315,7 @@ func GetPrice(client *ethclient.Client, addressProvider ethCommon.Address, token
 		)
 	}
 
-	assetPriceUsd := new(big.Rat).Quo(assetPriceEth, usdPriceEth)
+	assetPriceUsd := safeQuo(assetPriceEth, usdPriceEth)
 
 	return assetPriceUsd, nil
 }
