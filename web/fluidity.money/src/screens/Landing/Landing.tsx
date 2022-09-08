@@ -73,12 +73,12 @@ const Landing = () => {
       )}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
-          <motion.div
+          <motion.div 
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 6, type: "tween" }}
           >
-            <Heading as="h3">
+            <Heading className={styles.title} as="h3">
               Fluidity is the <br /> blockchain incentive <br /> layer,
               rewarding <br /> people for using <br /> their crypto.
             </Heading>
