@@ -155,7 +155,8 @@ const Landing = () => {
               img={"/assets/images/useCaseIcons/forReceivers.svg"}
               side={width < breakpoint ? "left" : "right"}
             >
-              Rewards can be significant
+              Rewards can range from cents
+              <br /> to millions
             </IntroTile>
             <IntroTile
               img={"/assets/images/landingIcons/scalingEcosystem.svg"}
