@@ -42,11 +42,11 @@ const Landing = () => {
       
       {width > breakpoint ? (
           <div className={`${styles.bgVid}`}>
-            <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale}/>;
+            <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale} opacity={0.5}/>;
           </div>
         ) : (
           <div className={`${styles.bgVid}`}>
-           <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale * 2}/>;
+           <Video src={window.location.origin + state.src} type={'reduce'} loop={state.loop} key={state.key} scale={state.scale * 2} opacity={0.5}/>;
           </div>
         )}
       <motion.div className={styles.content}>
