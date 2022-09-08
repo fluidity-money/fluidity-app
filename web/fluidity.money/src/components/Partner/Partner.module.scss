@@ -5,16 +5,16 @@
   border-radius: 10px;
   padding: 50px 33px 20px 20px;
   width: 300px;
-  height: fit-content;
+  height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 10px;
   background-color: $backgroundBlack;
-
+  transition: height 0.1s ease-out;
   img {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 50px;
     margin-bottom: 20px;
   }
 
@@ -34,17 +34,20 @@
   p {
     max-height: 130px;
     padding: 0;
-    overflow-y: auto;
+    overflow-y: hidden;
     color: transparent;
     text-align: center;
+    display: hidden;
   }
 
   &:hover {
     background-color: $fluidWhite;
     color: $fluidBlack;
-    height: 400px;
+    height: 350px;
+    transition: height 0.1s ease-in;
     p {
       color: $fluidBlack;
+      display:block
     }
     div {
       img {

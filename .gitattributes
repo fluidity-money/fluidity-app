@@ -69,3 +69,4 @@ web/fluidity.money/public/assets/videos/Fluidity_Wrap.mp4 filter=lfs diff=lfs me
 web/fluidity.money/public/assets/videos/Fluidity_Yield.mp4 filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/Group.svg filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/chainIcons/Compound.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/images/Partners/ filter=lfs diff=lfs merge=lfs -text
