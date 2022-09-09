@@ -21,11 +21,7 @@
   width: 100%;
   height: 100%;
   justify-content: flex-end;
-  align-items: center;
-  & > div {
-    width: 100%;
-    margin-bottom: 30px;
-  }
+  align-items: flex-start;
 }
 
 .footerItems {
@@ -87,4 +83,15 @@
 
 .callout {
   display: flex;
+}
+
+.imgContainer {
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  img {
+    max-width: 100%;
+    display: block;
+  }
 }

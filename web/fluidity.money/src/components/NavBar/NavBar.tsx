@@ -47,7 +47,9 @@ const NavBar = () => {
               transition={{ type: "tween" }}
             >
               <a href={"/"}>
-                <img src="/assets/images/logoOutline.svg" alt="home page" />
+                <div className={styles.imgContainer}>
+                  <img src="/assets/images/logoOutline.png" alt="home page" />
+                </div>
               </a>
             </motion.div>
             <GeneralButton
