@@ -9,7 +9,7 @@
     "pinned": true,
     "amount": "0.0",
     "obligationAccount": "446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca",
-    "dataAccount": "C8csqsv1NxAC2ge1ZAvToaHZa8VsffmxewHHYJ7JuDVD"
+    "dataAccount": "DrKwQQrKcbNCLkVfAVasxk1j7ccCaXVfdVdS6RijRZo"
   },
   {
     "symbol": "fUSDT",
@@ -19,7 +19,9 @@
     "colour": "rgb(36, 163, 124)",
     "image": "img/TokenIcons/usdtIcon.svg",
     "pinned": true,
-    "amount": "0.0"
+    "amount": "0.0",
+    "obligationAccount": "446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca",
+    "dataAccount": "DrKwQQrKcbNCLkVfAVasxk1j7ccCaXVfdVdS6RijRZo"
   },
   {
     "symbol": "USDC",
@@ -31,7 +33,7 @@
     "pinned": true,
     "amount": "0.0",
     "obligationAccount": "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A",
-    "dataAccount": "nZtk79qJyUXMg53SYL9wZQnMUjwJeTFGTfKmFaEehKq"
+    "dataAccount": "Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce"
   },
   {
     "symbol": "fUSDC",
@@ -41,72 +43,8 @@
     "colour": "#2775c9",
     "image": "img/TokenIcons/usdcIcon.svg",
     "pinned": true,
-    "amount": "0.0"
-  },
-  {
-    "symbol": "UXD",
-    "name": "UXD",
-    "mintAddress": "Dx8dUQ8p8zbQwv7jvXqaEdYWcK7AroNifHbcAC7YYRjg",
-    "decimals": 6,
-    "colour": "#000000",
-    "image": "img/TokenIcons/uxdIcon.svg",
-    "pinned": true,
     "amount": "0.0",
-    "obligationAccount": "HH4BzUBsKwenYsGQfYB6Tyj739XXxxjFVE6oMZ6xiDsY",
-    "dataAccount": "8cVaBxKMLr2thoFxtGoBjW4Lo1xJBJQSu71uo9TCtm2s"
-  },
-  {
-    "symbol": "fUXD",
-    "name": "FLUID UXD",
-    "mintAddress": "7Taua7k6kX2UTD1joXTsyQ8jodAzUEjmxXfCn5zvU55m",
-    "decimals": 6,
-    "colour": "#000000",
-    "image": "img/TokenIcons/uxdIcon.svg",
-    "pinned": true,
-    "amount": "0.0"
-  },
-  {
-    "symbol": "UST",
-    "name": "UST",
-    "mintAddress": "9vMJfxuKxXBoEa7rM12mYLMwTacLMLDJqHozw96WQL8i",
-    "decimals": 6,
-    "colour": "#0C3595",
-    "image": "img/TokenIcons/ustIcon.svg",
-    "pinned": true,
-    "amount": "0.0",
-    "obligationAccount": "7cG2d3Shz2dUQoWXNjcqGss3jyTFc4a8Lei9oxWKMq6b",
-    "dataAccount": "HwoDGvTVbqyzabXzHnU4edBm8CRJBujCc7dU3Sqe9HmC"
-  },
-  {
-    "symbol": "fUST",
-    "name": "FLUID UST",
-    "mintAddress": "9Zd8kMxo6d9pMyhuxuZYTZMu8uiHSoZwX4A1vLBK9bpT",
-    "decimals": 6,
-    "colour": "#0C3595",
-    "image": "img/TokenIcons/ustIcon.svg",
-    "pinned": true,
-    "amount": "0.0"
-  },
-  {
-    "symbol": "USDH",
-    "name": "USDH",
-    "mintAddress": "USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX",
-    "decimals": 6,
-    "colour": "#0C3595",
-    "image": "img/TokenIcons/ustIcon.svg",
-    "pinned": false,
-    "amount": "0.0",
-    "obligationAccount": "",
-    "dataAccount": ""
-  },
-  {
-    "symbol": "fUSDH",
-    "name": "FLUID USDH",
-    "mintAddress": "8Rm2VXdf4AjvJt6enC6rhj2qBKpaNUTPQX3j3N4aKChA",
-    "decimals": 6,
-    "colour": "#0C3595",
-    "image": "img/TokenIcons/ustIcon.svg",
-    "pinned": false,
-    "amount": "0.0"
+    "obligationAccount": "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A",
+    "dataAccount": "Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce"
   }
 ]
