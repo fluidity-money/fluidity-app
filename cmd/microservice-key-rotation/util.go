@@ -63,9 +63,15 @@ func oracleParametersListFromEnv(env string) []OracleInfo {
 	return oracleParametersList
 }
 
+const (
+	standardTransferGas = 21000
+	nonceOffset         = 10
+)
+
 // createAndSignSendTransaction to create, sign, and add to the signedTxnAttachments map
 // a transaction that transfers the previous oracle's entire balance to the new oracle
 func createAndSignSendTransaction(ethClient *ethclient.Client, previousOracleAddress, newOraclePublicKey, contractAddress ethCommon.Address, oldOraclePrivateKey *ecdsa.PrivateKey, signedTxnAttachments map[string]io.Reader) error {
+
 	// fetch transaction parameters
 	chainId, err := ethClient.ChainID(context.Background())
 
@@ -87,7 +93,7 @@ func createAndSignSendTransaction(ethClient *ethclient.Client, previousOracleAdd
 	}
 
 	// use a higher nonce in case transactions are made before the worker is restarted
-	nonce += 10
+	nonce += nonceOffset
 
 	accountBalance, err := ethClient.BalanceAt(context.Background(), previousOracleAddress, nil)
 	if err != nil {

@@ -207,6 +207,14 @@ func arnStringToService(arnString string) (*service, error) {
 
 	split := strings.Split(parsed.Resource, "/")
 
+	if len(split) < 3 {
+		return nil, fmt.Errorf(
+			"ARN resource string %v was too short - expected at least 3 splits on '/', got %v!",
+			parsed.Resource,
+			len(split),
+		)
+	}
+
 	var (
 		cluster     = split[1]
 		serviceName = split[2]
