@@ -29,7 +29,7 @@ type OracleInfo struct {
 
 // oracleParametersListFromEnv to parse the AWS parameter names from the environment
 func oracleParametersListFromEnv(env string) []OracleInfo {
-	oracleParametersString := util.GetEnvOrFatal(EnvOracleParametersList)
+	oracleParametersString := util.GetEnvOrFatal(env)
 
 	oracleParametersList_ := strings.Split(oracleParametersString, ",")
 	numberOfTokens := len(oracleParametersList_)
