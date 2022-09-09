@@ -1,6 +1,7 @@
 CLUSTER: ethereum
 ORG_ROOT: fluidity
 ENABLE: true
+TASK_MIN_COUNT: 5
 
 ENV_FLU_DEBUG: true
 ENV_FLU_ENVIRONMENT: mainnet
