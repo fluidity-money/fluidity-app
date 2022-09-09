@@ -115,12 +115,17 @@ func createAndSignSendTransaction(ethClient *ethclient.Client, previousOracleAdd
 		)
 	}
 
-	// default gas for a transfer
-	gas := big.NewInt(21000)
+	gas := big.NewInt(standardTransferGas)
 
-	// accountBalance - gas * gasPrice
-	gasFee := suggestedGasPrice.Mul(suggestedGasPrice, gas)
-	value := accountBalance.Sub(accountBalance, gasFee)
+	// send entire account balance - gas fee
+	value, err := sendAmountFromAccountBalance(gas, suggestedGasPrice, accountBalance)
+
+	if err != nil {
+		return fmt.Errorf(
+			"Failed to calculate balance excluding gas! %v",
+			err,
+		)
+	}
 
 	// create the transaction
 	txData := &types.DynamicFeeTx{
@@ -155,10 +160,27 @@ func createAndSignSendTransaction(ethClient *ethclient.Client, previousOracleAdd
 
 	marshalled := ethCommon.Bytes2Hex(marshalled_)
 	txnReader := bytes.NewReader([]byte("0x" + marshalled))
-	contractAddressString := contractAddress.String()
 
-	attachmentName := "signed_transaction_" + contractAddressString
+	attachmentName := "signed_transaction_" + contractAddress.String()
 	signedTxnAttachments[attachmentName] = txnReader
 
 	return nil
+}
+
+// sendAmountFromAccountBalance to obtain the amount that can be sent after paying gas
+func sendAmountFromAccountBalance(gas, gasPrice, accountBalance *big.Int) (*big.Int, error) {
+
+	// sendAmount - gas * gasPrice
+	gasFee := new(big.Int).Mul(gasPrice, gas)
+	value := new(big.Int).Sub(accountBalance, gasFee)
+
+	if value.Cmp(big.NewInt(0)) == -1 {
+		return nil, fmt.Errorf(
+			"Gas fee was higher than account balance! fee was %v, balance was %v",
+			gasFee.String(),
+			accountBalance.String(),
+		)
+	}
+
+	return value, nil
 }
