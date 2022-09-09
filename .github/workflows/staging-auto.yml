@@ -51,9 +51,6 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update in related
-        if: steps.lib_diff.outputs.diff
-        
       - name: Update version (Fluidity Landing)
         if: steps.lib_diff.outputs.diff
         working-directory: web/fluidity-app
