@@ -301,19 +301,10 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 					)
 				}
 
-				log.Debug(func (k *log.Log) {
-					k.Format("fee: %+v decimals %d", feeData, decimals)
-				})
 				feeAmount := spl_token.AdjustDecimals(int64(feeData.Fee), int(decimals))
-				log.Debug(func (k *log.Log) {
-					k.Format("feeamount: %+v", feeAmount.FloatString(20))
-				})
 
 				// normalise to USD
 				feeAmount = feeAmount.Mul(feeAmount, price)
-				log.Debug(func (k *log.Log) {
-					k.Format("feeamount_usd: %+v", feeAmount.FloatString(20))
-				})
 
 				feesPaid.Add(feesPaid, feeAmount)
 			}
@@ -323,7 +314,4 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 	}
 
 	return feesPaid, nil
-
 }
-
-
