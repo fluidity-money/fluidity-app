@@ -43,6 +43,7 @@ export const Video = ({
       loop={loop}
       autoPlay
       muted
+      playsInline
       className={`${styles.videoContainer} ${styles[type]}`}
       style={{
         display: display,
