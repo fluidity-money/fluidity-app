@@ -26,13 +26,7 @@ const networkInputOptions = {
     "Ethereum Ropsten",
     "0x0000000000000000000000000000",
     ["fUSDC", "fDAI"],
-  ],
-  solana: [
-    "Solana Devnet",
-    "5qUccmFqGdFcTQprrVeRdCGy9sGB2TzTKv2KKMStG9kG",
-    ["fUSDC"],
-  ],
-
+  ]
 } as const;
 
 const App = () => (

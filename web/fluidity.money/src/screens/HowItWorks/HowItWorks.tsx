@@ -22,34 +22,44 @@ const HowItWorks = () => {
   scrolls thought automatically and constantly
    */
   const images = [
-    "/assets/videos/FluidityWrap.mp4",
-    "/assets/videos/FluidityYield.mp4",
-    "/assets/videos/FluidityHowItWorks.mp4",
-  ];
-  const [currentImage, setCurrentImage] = useState(
-    "/assets/videos/FluidityWrap.mp4"
-  );
+    {
+      bgImage: "/assets/videos/Fluidity_Wrap.mp4",
+      text: "FLUIDIFY",
+    },
+    {
+      bgImage: "/assets/videos/Fluidity_Yield.mp4",
+      text: "YIELD",
+    },
+    {
+      bgImage: "/assets/videos/Fluidity_HowItWorks.mp4",
+      text: "GOVERN",
+    },
+  ].map(({bgImage, ...image}) => ({
+    ...image,
+    bgImage: window.location.origin + bgImage,
+  }));
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const { width } = useViewport();
 
   useEffect(() => {
-    let counter = 0;
     const intervalId = setInterval(() => {
-      setCurrentImage(images[counter]);
-      counter++;
-      if (counter === 3) counter = 0;
+      setCurrentImageIndex(
+        currentImageIndex => (currentImageIndex + 1) % images.length
+      );
     }, 7000);
 
     return () => clearInterval(intervalId);
   }, []);
 
-  const { width } = useViewport();
-  const size = width > 1000 ? "h3" : width < 1000 && width > 520 ? "h4" : "h5";
+  const backgroundText = images[currentImageIndex].text;
 
-  const backgroundText =
-    currentImage === "/assets/videos/FluidityWrap.mp4"
-      ? "FLUIDIFY"
-      : currentImage === "/assets/videos/FluidityYield.mp4"
-      ? "YIELD"
-      : "GOVERN";
+  const size = width > 1000 
+    ? "h1" 
+    : width < 1000 && width > 520 
+    ? "h4" 
+    : "h5";
 
   const callout = (
     <div className={styles.callout}>
@@ -87,7 +97,7 @@ const HowItWorks = () => {
           <Text
             as={"p"}
             className={
-              currentImage === "/assets/videos/FluidityWrap.mp4"
+              currentImageIndex === 0
                 ? styles.bold
                 : styles.normal
             }
@@ -98,7 +108,7 @@ const HowItWorks = () => {
           <Text
             as={"p"}
             className={
-              currentImage === "/assets/videos/FluidityYield.mp4"
+              currentImageIndex === 1
                 ? styles.bold
                 : styles.normal
             }
@@ -109,7 +119,7 @@ const HowItWorks = () => {
           <Text
             as={"p"}
             className={
-              currentImage === "/assets/videos/FluidityHowItWorks.mp4"
+              currentImageIndex === 2
                 ? styles.bold
                 : styles.normal
             }
@@ -127,47 +137,49 @@ const HowItWorks = () => {
           </a>
         </div>
         <div className={styles.right}>
-          <div className={styles.backgroundText}>
-            {<Heading as={size}>{backgroundText}</Heading>}
-          </div>
-
-          {currentImage === "/assets/videos/FluidityWrap.mp4" ? (
-            <div>
-              <Video
-                src={
-                  window.location.origin + "/assets/videos/FluidityWrap.mp4"
-                }
-                type={"fit"}
-                loop={true}
-                key={"abc"}
-                scale={0.8}
-              />
-            </div>
-          ) : currentImage === "/assets/videos/FluidityYield.mp4" ? (
-            <div>
-              <Video
-                src={
-                  window.location.origin + "/assets/videos/FluidityYield.mp4"
-                }
-                type={"fit"}
-                loop={true}
-                key={"xyz"}
-              />
-            </div>
+        {
+          // Text == FLUIDITY
+          currentImageIndex === 0 
+          ? (
+            <img
+              style={{opacity: 1, position: "absolute", zIndex: 5}}
+              src={window.location.origin + "/assets/text/FLUIDIFY.svg"}
+              alt={images[currentImageIndex].text}
+            />
           ) : (
-            <div>
-              <Video
-                src={
-                  window.location.origin +
-                  "/assets/videos/FluidityHowItWorks.mp4"
-                }
-                type={"fit"}
-                loop={true}
-                key={"jfk"}
-                scale={0.7}
-              />
+            <div className={styles.backgroundText}>
+              {/* Missing font WHYTE INK SUPER */ }
+              <Heading as={size}><strong>{backgroundText}</strong></Heading>
             </div>
+          )
+        }
+
+        <div className={styles.video}>
+          {currentImageIndex === 0 ? (
+            <Video
+              src={images[currentImageIndex].bgImage}
+              type={"fit"}
+              loop={true}
+              key={"abc"}
+              scale={0.8}
+            />
+          ) : currentImageIndex === 1 ? (
+            <Video
+              src={images[currentImageIndex].bgImage}
+              type={"fit"}
+              loop={true}
+              key={"xyz"}
+            />
+          ) : (
+            <Video
+              src={images[currentImageIndex].bgImage}
+              type={"fit"}
+              loop={true}
+              key={"jfk"}
+              scale={0.8}
+            />
           )}
+          </div>
         </div>
       </div>
     </div>

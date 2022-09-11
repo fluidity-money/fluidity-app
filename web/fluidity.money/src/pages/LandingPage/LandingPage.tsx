@@ -25,7 +25,7 @@ const LandingPage = () => {
         <SponsorsPartners />
         {/* Ecosystem which scrolls to projects as a component, not ready for production yet */}
         {/* <Ecosystem /> */}
-        <Articles resources={true} />
+        <Articles isResourcesPage={false} />
         <Demo />
         <Footer />
       </div>

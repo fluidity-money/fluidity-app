@@ -11,6 +11,7 @@ export interface ArticleType {
   desc: string;
   info: string;
   link: string;
+  linkTitle: string;
 }
 
 export interface ArticleListProps {
@@ -27,6 +28,7 @@ export const ArticleList = ({ articles }: ArticleListProps) => {
         desc={article.desc}
         info={article.info}
         link={article.link}
+        linkTitle={article.linkTitle}
       />
     );
   });

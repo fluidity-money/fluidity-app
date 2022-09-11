@@ -20,11 +20,13 @@ func GetAllInstructions(result solTypes.TransactionResult) []solTypes.Transactio
 		innerInstructions = result.Meta.InnerInstructions
 	)
 
-	instructionsLen := len(instructions) + len(innerInstructions)
+	baseInstructionsLen := len(instructions)
 
-	allInstructions := make([]solTypes.TransactionInstruction, instructionsLen)
+	allInstructions := make([]solTypes.TransactionInstruction, baseInstructionsLen)
 
-	allInstructions = append(allInstructions, instructions...)
+	for i, instruction := range instructions {
+		allInstructions[i] = instruction
+	}
 
 	for _, inner := range innerInstructions {
 		allInstructions = append(allInstructions, inner.Instructions...)

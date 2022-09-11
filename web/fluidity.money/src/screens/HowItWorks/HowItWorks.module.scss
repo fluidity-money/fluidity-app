@@ -75,6 +75,12 @@
   z-index: 5;
 }
 
+.video {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .carousel {
   width: 100%;
   align-self: flex-end;

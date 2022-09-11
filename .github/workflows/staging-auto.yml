@@ -9,7 +9,8 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
+  packages: write
 
 env:
   ENVIRONMENT: dev
@@ -24,6 +25,7 @@ jobs:
         with:
           fetch-depth: 2
           lfs: true
+          token: ${{ secrets.GH_SUPER_TOKEN }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -39,18 +41,25 @@ jobs:
           npm install
           npm run build
           npm version patch
-      - name: Release Surfing
+      - uses: actions/setup-node@v3
         if: steps.lib_diff.outputs.diff
-        uses: JS-DevTools/npm-publish@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          package: ./web/surfing
-          registry: https://npm.pkg.github.com
-      - name: Update version
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Publish Surfing
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update version (Fluidity Landing)
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/fluidity-app
         run: |
-          git add package.json package-lock.json
+          npm install
+          npm update surfing
+      - name: Commit changed
+        run: |
+          git add .
           git config user.name "Bump Bot 🤖"
           git config user.email "noreply@fluidity.money"
           git commit -m "Bump Surfing version"

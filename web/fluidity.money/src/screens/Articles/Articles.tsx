@@ -13,10 +13,10 @@ import styles from "./Articles.module.scss";
 import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
 
 interface IArticleProps {
-  resources?: boolean;
+  isResourcesPage?: boolean;
 }
 
-const Articles = ({ resources }: IArticleProps) => {
+const Articles = ({ isResourcesPage }: IArticleProps) => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top
    for ResourcesNavModal to work*/
   const location = useLocation();
@@ -45,21 +45,24 @@ const Articles = ({ resources }: IArticleProps) => {
   return (
     <div className={styles.outerContainer}>
       <div className={styles.carousel}>
-        <ContinuousCarousel direction={"right"}>
-          <div>
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-            {callout}
-          </div>
-        </ContinuousCarousel>
+        {
+          !(isResourcesPage) ? (
+            <ContinuousCarousel direction={"right"}>
+            <div>
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+            </div>
+          </ContinuousCarousel>): ''
+        }
       </div>
       <div className={styles.container} id="articles">
         <ArticleCard
@@ -68,7 +71,7 @@ const Articles = ({ resources }: IArticleProps) => {
           title={arr.articles[0].title}
           desc={arr.articles[0].desc}
           info={arr.articles[0].info}
-          resources={true}
+          isResourcesPage={isResourcesPage}
         />
         <ArticleList {...arr} />
       </div>
@@ -86,6 +89,7 @@ const arr: ArticleListProps = {
       desc: `Crypto assets worth billions of dollars are traded every single day. Arbitrage traders take advantage of the volatility and pricing imperfections, exploiting different values for the same asset across different markets. Take...`,
       info: "9 min read ARBITRAGE",
       link: "",
+      linkTitle: "",
     },
     {
       id: 1,
@@ -93,6 +97,7 @@ const arr: ArticleListProps = {
       desc: `“But the Judge said he never had summed up before; So the Snark undertook it instead, And summed it so well that it came to far more Than the Witnesses ever had said!” Lewis Carroll Zero-knowledge succinct non...`,
       info: "5 min read CRYPTOCURRENCY",
       link: "",
+      linkTitle: "",
     },
     {
       id: 2,
@@ -100,14 +105,15 @@ const arr: ArticleListProps = {
       desc: `In the past few months, there has been a lot of discussion in the Uniswap Governance Forum about activating the “fee switch”, a piece of code that...`,
       info: "6 min read UNISWAP",
       link: "",
+      linkTitle: "",
     },
     {
       id: 3,
-      title:
-        "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
+      title: "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
       desc: `The year 2020 marked the explosion of DeFi protocols in public imagination, driven largely by the rise of liquidity mining — Compound...`,
       info: "5 min  read ARBITRUM",
       link: "",
+      linkTitle: "",
     },
     {
       id: 4,
@@ -115,13 +121,15 @@ const arr: ArticleListProps = {
       desc: `“2022 has been a wild year for Decentralized Finance. Novel concepts were introduced and big scandals were reported, but most importantly, DeFi has...`,
       info: "5 min read CRYPTOCURRENCY",
       link: "",
+      linkTitle: "",
     },
     {
       id: 5,
-      title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money",
+      title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money", 
       desc: `Providing Users With a Secure Source of Verifiable Randomness Fluidity — Next-Generation Assets If your money’s on the move, exposure to DeFi can...`,
       info: "4 min read FLUIDITY",
       link: "",
+      linkTitle: "",
     },
     // {
     //   id: 6,

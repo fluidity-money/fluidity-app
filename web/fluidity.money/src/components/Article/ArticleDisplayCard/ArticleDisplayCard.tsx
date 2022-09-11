@@ -16,29 +16,18 @@ export interface ArticleDisplayCardType {
   title: string;
   desc: string;
   info: string;
-  resources?: boolean;
+  isResourcesPage?: boolean;
 }
 
 const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
   return (
     <div className={styles.cardContainer}>
       <img src={article.img} />
-      <Heading as="h3">{article.title}</Heading>
+      <Heading as="h3" className={styles.leftMargin10px}>{article.title}</Heading>
       <Text as="p">{article.desc}</Text>
       <Text as="p">{article.info}</Text>
       <section>
-        {article.resources ? (
-          <a href="/resources">
-            <LinkButton
-              version={"secondary"}
-              type={"internal"}
-              size={"medium"}
-              handleClick={function (): void {}}
-            >
-              EXPLORE ALL RESOURCES
-            </LinkButton>
-          </a>
-        ) : (
+        {article.isResourcesPage ? (
           <a href="https://blog.fluidity.money/">
             <GeneralButton
               version={"secondary"}
@@ -48,6 +37,16 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
             >
               ALL ARTICLES
             </GeneralButton>
+         </a>  
+        ) : (
+          <a href="/resources">
+            <LinkButton
+              type={"internal"}
+              size={"medium"}
+              handleClick={function (): void {}}
+            >
+              EXPLORE ALL RESOURCES
+            </LinkButton>
           </a>
         )}
       </section>

@@ -4,7 +4,7 @@
   width: 582px;
   height: 356px;
   padding: 48px;
-  background: $white-a5;
+  background: $black-a90;
   backdrop-filter: blur(10px);
   border-radius: 8px;
   position: fixed;
@@ -30,5 +30,9 @@
     display: flex;
     align-items: center;
     text-transform: capitalize;
+    
+    & > * {
+      margin: 4px;
+    }
   }
 }

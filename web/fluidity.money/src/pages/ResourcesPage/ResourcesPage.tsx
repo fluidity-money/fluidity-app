@@ -32,7 +32,11 @@ const ResourcesPage = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
-        <Navigation page={"resources"} pageLocations={pageLocations} />
+        <Navigation
+          page={"resources"}
+          pageLocations={pageLocations}
+          background={"black"}
+        />
         <AnimatePresence initial={false}>
           {introVisible && (
             <motion.div
@@ -52,7 +56,7 @@ const ResourcesPage = () => {
               animate={{ opacity: 1, transform: "translateY(0px)" }}
               transition={{ transform: { duration: 1 } }}
             >
-              <Articles />
+              <Articles isResourcesPage={true}/>
               {/* <Tweets /> */}
               <Fluniversity />
               <Whitepapers />
