@@ -22,12 +22,12 @@ const HowItWorks = () => {
   scrolls thought automatically and constantly
    */
   const images = [
-    "/assets/videos/Fluidity_Wrap.mp4",
-    "/assets/videos/Fluidity_Yield.mp4",
-    "/assets/videos/Fluidity_HowItWorks.mp4",
+    "/assets/videos/FluidityWrap.mp4",
+    "/assets/videos/FluidityYield.mp4",
+    "/assets/videos/FluidityHowItWorks.mp4",
   ];
   const [currentImage, setCurrentImage] = useState(
-    "/assets/videos/Fluidity_Wrap.mp4"
+    "/assets/videos/FluidityWrap.mp4"
   );
 
   useEffect(() => {
@@ -45,9 +45,9 @@ const HowItWorks = () => {
   const size = width > 1000 ? "h3" : width < 1000 && width > 520 ? "h4" : "h5";
 
   const backgroundText =
-    currentImage === "/assets/videos/Fluidity_Wrap.mp4"
+    currentImage === "/assets/videos/FluidityWrap.mp4"
       ? "FLUIDIFY"
-      : currentImage === "/assets/videos/Fluidity_Yield.mp4"
+      : currentImage === "/assets/videos/FluidityYield.mp4"
       ? "YIELD"
       : "GOVERN";
 
@@ -87,7 +87,7 @@ const HowItWorks = () => {
           <Text
             as={"p"}
             className={
-              currentImage === "/assets/videos/Fluidity_Wrap.mp4"
+              currentImage === "/assets/videos/FluidityWrap.mp4"
                 ? styles.bold
                 : styles.normal
             }
@@ -98,7 +98,7 @@ const HowItWorks = () => {
           <Text
             as={"p"}
             className={
-              currentImage === "/assets/videos/Fluidity_Yield.mp4"
+              currentImage === "/assets/videos/FluidityYield.mp4"
                 ? styles.bold
                 : styles.normal
             }
@@ -109,7 +109,7 @@ const HowItWorks = () => {
           <Text
             as={"p"}
             className={
-              currentImage === "/assets/videos/Fluidity_HowItWorks.mp4"
+              currentImage === "/assets/videos/FluidityHowItWorks.mp4"
                 ? styles.bold
                 : styles.normal
             }
@@ -131,11 +131,11 @@ const HowItWorks = () => {
             {<Heading as={size}>{backgroundText}</Heading>}
           </div>
 
-          {currentImage === "/assets/videos/Fluidity_Wrap.mp4" ? (
+          {currentImage === "/assets/videos/FluidityWrap.mp4" ? (
             <div>
               <Video
                 src={
-                  window.location.origin + "/assets/videos/Fluidity_Wrap.mp4"
+                  window.location.origin + "/assets/videos/FluidityWrap.mp4"
                 }
                 type={"fit"}
                 loop={true}
@@ -143,11 +143,11 @@ const HowItWorks = () => {
                 scale={0.8}
               />
             </div>
-          ) : currentImage === "/assets/videos/Fluidity_Yield.mp4" ? (
+          ) : currentImage === "/assets/videos/FluidityYield.mp4" ? (
             <div>
               <Video
                 src={
-                  window.location.origin + "/assets/videos/Fluidity_Yield.mp4"
+                  window.location.origin + "/assets/videos/FluidityYield.mp4"
                 }
                 type={"fit"}
                 loop={true}
@@ -159,12 +159,12 @@ const HowItWorks = () => {
               <Video
                 src={
                   window.location.origin +
-                  "/assets/videos/Fluidity_HowItWorks.mp4"
+                  "/assets/videos/FluidityHowItWorks.mp4"
                 }
                 type={"fit"}
                 loop={true}
                 key={"jfk"}
-                scale={0.8}
+                scale={0.7}
               />
             </div>
           )}

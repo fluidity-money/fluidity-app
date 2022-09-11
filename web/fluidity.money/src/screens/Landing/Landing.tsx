@@ -12,9 +12,10 @@ import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
+import { relative } from "path";
 
 const Landing = () => {
-  const vidSources = ["/assets/videos/Fluidity_Home.mp4", "/assets/videos/Fluidity_Homeloop.mp4"].map(link =>
+  const vidSources = ["/assets/videos/FluidityHome.mp4", "/assets/videos/FluidityHomeloop.mp4"].map(link =>
     window.location.origin + link
   )
 
@@ -57,12 +58,19 @@ const Landing = () => {
       {/* Video Container */}
       {width > breakpoint ? (
         <div className={`${styles.bgVid}`}>
+          <img src="assets/images/load.webp"
+           style={{
+            position: "absolute",
+            display: `${onHomeVidLoaded === true ? 'none' : 'block'}`
+          }}
+          />
           <Video
             src={state.src}
             type={"reduce"}
             loop={state.loop}
             key={state.key}
             scale={state.scale}
+            opacity = {.4}
             onLoad={!homeVidEnded 
               ? () => setOnHomeVidLoaded(true)
               : () => {}
@@ -75,6 +83,12 @@ const Landing = () => {
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
+          <img src="assets/images/loadanimation.gif"
+           style={{
+            position: "absolute",
+            display: `${onHomeVidLoaded === true ? 'none' : 'block'}`
+          }}
+          />
           <Video
             src={state.src}
             type={"reduce"}
@@ -92,16 +106,7 @@ const Landing = () => {
           />
         </div>
       )}
-      {/* Preload Loop video */}
-      {!homeVidEnded && (
-        <Video
-          display={"none"}
-          src={vidSources[1]}
-          preload={"auto"}
-          type={"none"}
-          loop={false}
-        />
-      )}
+    
       {/* Hero animation */}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
@@ -127,9 +132,7 @@ const Landing = () => {
             </Heading>
           </motion.div>
         )}
-
-        {/* Descriptors */}
-        <div className={`${styles.tiles} ${!onHomeVidLoaded && styles.notLoaded}`}>
+        <div className={styles.tiles}>
           {width < breakpoint && (
             <motion.div
               className={styles.video}
@@ -143,7 +146,6 @@ const Landing = () => {
             ></motion.div>
           )}
 
-          {/* Left Descriptors */}
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
@@ -173,7 +175,6 @@ const Landing = () => {
             </IntroTile>
           </motion.div>
 
-          {/* Right Descriptors */}
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
@@ -203,7 +204,6 @@ const Landing = () => {
           </motion.div>
         </div>
       </motion.div>
-
 
       <motion.div
         className={styles.carousel}

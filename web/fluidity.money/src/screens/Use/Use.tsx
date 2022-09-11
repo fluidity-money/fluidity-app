@@ -32,7 +32,7 @@ const Use = () => {
 
   const left = (
     <Video
-      src={window.location.origin + "/assets/videos/Fluidity_Use.mp4"}
+      src={window.location.origin + "/assets/videos/FluidityUse.mp4"}
       type={"fit"}
       loop={true}
     />

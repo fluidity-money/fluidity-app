@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { useEffect } from "react";
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
@@ -10,7 +11,6 @@ interface IPropsVideo {
   loop: boolean;
   display?: "none" | "inline";
   key?: string;
-  preload?: "none" | "metadata" | "auto";
   scale?: number;
   opacity?: number;
   onLoad?: VoidFunction;
@@ -23,18 +23,21 @@ export const Video = ({
   type,
   loop,
   display="inline",
-  preload="none",
   scale=1,
   opacity=1,
   onEnded=() => {},
   onLoad=() => {},
 }: IPropsVideo) => {
   let ext = src.split(".").pop();
+
+  useEffect(() => {
+     
+  });
+
   return (
     <video
       key={key}
       loop={loop}
-      preload={preload}
       autoPlay
       muted
       className={`${styles.videoContainer} ${styles[type]}`}
@@ -44,7 +47,7 @@ export const Video = ({
         opacity: `${opacity}`
       }}
       onEnded={onEnded}
-      onLoad={onLoad}
+      onPlaying={onLoad}
     >
       <source src={src} type={"video/" + ext} />
     </video>
