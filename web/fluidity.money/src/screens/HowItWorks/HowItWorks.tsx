@@ -23,15 +23,15 @@ const HowItWorks = () => {
    */
   const images = [
     {
-      bgImage: "/assets/videos/Fluidity_Wrap.mp4",
+      bgImage: "/assets/videos/FluidityWrap.mp4",
       text: "FLUIDIFY",
     },
     {
-      bgImage: "/assets/videos/Fluidity_Yield.mp4",
+      bgImage: "/assets/videos/FluidityYield.mp4",
       text: "YIELD",
     },
     {
-      bgImage: "/assets/videos/Fluidity_HowItWorks.mp4",
+      bgImage: "/assets/videos/FluidityHowItWorks.mp4",
       text: "GOVERN",
     },
   ].map(({bgImage, ...image}) => ({
