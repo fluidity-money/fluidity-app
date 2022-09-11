@@ -97,6 +97,7 @@ const Landing = () => {
             key={state.key}
             scale={state.scale * 2}
             margin = {"-700px 0 0 0"}
+            opacity = {.6}
             onLoad={!homeVidEnded 
               ? () => setOnHomeVidLoaded(true)
               : () => {}
