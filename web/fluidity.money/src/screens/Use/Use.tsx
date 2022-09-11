@@ -35,6 +35,7 @@ const Use = () => {
       src={window.location.origin + "/assets/videos/FluidityUse.mp4"}
       type={"fit"}
       loop={true}
+      scale={2.0}
     />
   );
 

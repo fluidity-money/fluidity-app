@@ -4,7 +4,7 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-gap: 20px;
-
+  z-index: 1;
   h2 {
     font-size: 22px;
   }

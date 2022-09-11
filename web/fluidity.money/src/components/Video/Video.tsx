@@ -13,6 +13,7 @@ interface IPropsVideo {
   key?: string;
   scale?: number;
   opacity?: number;
+  margin? : string;
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
 }
@@ -25,8 +26,10 @@ export const Video = ({
   display="inline",
   scale=1,
   opacity=1,
+  margin = `0px 0px 0px 0px`,
   onEnded=() => {},
   onLoad=() => {},
+  ...props
 }: IPropsVideo) => {
   let ext = src.split(".").pop();
 
@@ -44,7 +47,8 @@ export const Video = ({
       style={{
         display: display,
         width: `${scale * 100}%`,
-        opacity: `${opacity}`
+        opacity: `${opacity}`,
+        margin: margin
       }}
       onEnded={onEnded}
       onPlaying={onLoad}
