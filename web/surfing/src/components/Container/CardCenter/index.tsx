@@ -2,6 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE.md file.
 
-import VerticalContainer from "./VerticalContainer";
+import CardCenter from "./CardCenter";
 
-export default VerticalContainer;
+export default CardCenter;

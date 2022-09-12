@@ -1,0 +1,42 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import TitleSubtitle from "./TitleSubtitle";
+
+<Meta
+  title="TitleSubtitle"
+  component={TitleSubtitle}
+/>
+
+export const Template = ({ children, ...props }) =>
+  <TitleSubtitle {...props}>
+    {children}
+  </TitleSubtitle>;
+
+## default
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story
+    name="Default TitleSubtitle"
+    args={{
+      title: "Get. That. Money.",
+      subtitle: "$23,536 in unclaimed prizes"
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+## centered
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story
+    name="Centered TitleSubtitle"
+    args={{
+      title: "Get. That. Money.",
+      subtitle: "$23,536 in unclaimed prizes",
+      center: true
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

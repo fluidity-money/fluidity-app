@@ -2,8 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE.md file.
 
-// allow scss imports to components
-declare module "*.module.scss";
+import TitleSubtitle from "./TitleSubtitle";
 
-// allow sass imports to components
-declare module "*.module.sass";
+export default TitleSubtitle;

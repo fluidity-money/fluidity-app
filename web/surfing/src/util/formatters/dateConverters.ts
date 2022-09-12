@@ -1,6 +1,6 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this source
 // code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// LICENSE.md file.
 
 export const formatTo12HrDate = (date: Date) => {
   const dateDate = `${date.getDate()}`.padStart(2, '0');

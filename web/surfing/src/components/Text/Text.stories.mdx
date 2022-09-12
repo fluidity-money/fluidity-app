@@ -15,12 +15,13 @@ export const Template = (args) => <Text {...args}>
 </Text>;
 
 ## Default
+
 <Canvas>
-<Story name="Default" args={{
+  <Story name="Default" args={{
     as: "p",
-}}>
+  }}>
     {Template.bind({})}
-</Story>
+  </Story>
 </Canvas>
 
 ## Configuration
@@ -28,10 +29,21 @@ export const Template = (args) => <Text {...args}>
 <ArgsTable of={Text}/>
 
 <Canvas>
-<Story name="Prominent" args={{
+  <Story name="Prominent" args={{
     as: "p",
     prominent: true
-}}>
+  }}>
+      {Template.bind({})}
+  </Story>
+</Canvas>
+
+## Default with center
+
+<Canvas>
+  <Story name="Centered" args={{
+    as: "p",
+    center: true
+  }}>
     {Template.bind({})}
-</Story>
+  </Story>
 </Canvas>

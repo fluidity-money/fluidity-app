@@ -1,0 +1,31 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import { CardCenter } from "./CardCenter";
+
+import { Display } from "../../Display";
+
+<Meta
+    title="CardCenter"
+    component={CardCenter}
+/>
+
+export const Template = ({children, ...props}) => <Card {...props}>
+    {children}
+</Card>;
+
+<Canvas columns={1} withSource="open" withToolbar >
+    <Title>Card</Title>
+    <Subtitle>General Card Component</Subtitle>
+    <h2>Card Component</h2>
+    <Story
+        name="Default CardCenter"
+        args={{
+            component: "CardCenter",
+            children: <>
+                <Display>Content lives here</Display>
+            </>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

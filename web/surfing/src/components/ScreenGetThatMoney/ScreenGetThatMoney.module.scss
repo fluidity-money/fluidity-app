@@ -1,0 +1,8 @@
+@use 'common' as *;
+
+.container {
+	display: flex;
+	justify-content: center;
+	flex-direction: row;
+	align-self: center;
+}

@@ -1,0 +1,19 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import ScreenGetThatMoney from "./ScreenGetThatMoney";
+
+<Meta
+  title="ScreenGetThatMoney"
+  component={ScreenGetThatMoney}
+/>
+
+export const Template = ({ children, ...props }) => <ScreenGetThatMoney {...props}>
+  {children}
+</ScreenGetThatMoney>;
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story name="Default ScreenGetThatMoney">
+    {Template.bind({})}
+  </Story>
+</Canvas>
+

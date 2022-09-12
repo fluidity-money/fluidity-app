@@ -5,6 +5,7 @@
 import { Row } from './Row';
 import { DesktopOnly } from './DesktopOnly';
 import { Card } from './Card';
+import { CardCenter } from './CardCenter';
 import { ManualCarousel } from './ManualCarousel';
 import { ContinuousCarousel } from './ContinuousCarousel';
 import { FooterItem } from './FooterItem';
