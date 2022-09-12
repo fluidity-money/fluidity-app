@@ -87,7 +87,7 @@ const Footer = () => {
                 Terms
               </Text>
               <Text as="p" size="xs">
-                Privacy Poilicy
+                Privacy Policy
               </Text>
             </div>
 
