@@ -35,7 +35,7 @@ const Roadmap = () => {
   const left =
     width < breakpoint ? (
       <Video
-        src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
+        src={window.location.origin + "/assets/videos/FluidityRoadMap.mp4"}
         type={"fit"}
         loop={true}
       />
@@ -48,9 +48,11 @@ const Roadmap = () => {
   const right =
     width > breakpoint ? (
       <Video
-        src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
+        src={window.location.origin + "/assets/videos/FluidityRoadMap.mp4"}
         type={"fit"}
         loop={true}
+        scale={2.0}
+        margin={"0px 400px 0px 0px"}
       />
     ) : (
       <HowItWorksTemplate info={info} button={button}>

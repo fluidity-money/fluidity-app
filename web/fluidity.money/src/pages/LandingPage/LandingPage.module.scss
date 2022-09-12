@@ -21,10 +21,13 @@
   flex-direction: column;
   width: 100%;
   max-width: 1500px;
-  margin-top: -120px;
+  margin-top: 300px;
   // gif background
   // background-image: url("../../../public/img/fluid-bg.gif");
   // opacity: 1;
   // background-repeat: repeat;
   // background-size: 100% 1440px;
+  @include max-620px {
+    margin-top: 730px;
+  }
 }

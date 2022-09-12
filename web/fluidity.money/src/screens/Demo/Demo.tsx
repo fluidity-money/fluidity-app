@@ -31,7 +31,7 @@ const Demo = () => {
       <div className={`${styles.container} bg-light`}>
         <Video
           src={
-            window.location.origin + "/assets/videos/Fluidity_OpportunityB.mp4"
+            window.location.origin + "/assets/videos/FluidityOpportunityB.mp4"
           }
           type={"none"}
           loop={true}
