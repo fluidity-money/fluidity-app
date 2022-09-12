@@ -4,8 +4,7 @@
 
 import type { ButtonHTMLAttributes } from "react";
 
-import { ReactComponent as ArrowRight } from "/src/assets/images/buttonIcons/arrowRightWhite.svg";
-import { ReactComponent as ArrowTopRight } from "/src/assets/images/buttonIcons/arrowTopRightWhite.svg";
+import { ArrowRight, ArrowTopRight } from "components";
 import styles from "./LinkButton.module.scss";
 
 interface ILinkButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {

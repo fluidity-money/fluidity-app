@@ -55,7 +55,7 @@ const Footer = () => {
             <GeneralButton
               handleClick={() => {}}
               version={"primary"}
-              type={"text"}
+              buttonType={"text"}
               size={
                 width > firstBreakpoint
                   ? "medium"
@@ -69,7 +69,7 @@ const Footer = () => {
             <GeneralButton
               handleClick={() => {}}
               version={"secondary"}
-              type={"text"}
+              buttonType={"text"}
               size={
                 width > firstBreakpoint
                   ? "medium"
