@@ -89,3 +89,14 @@
   padding-top: 7px;
   position: fixed;
 }
+
+.imgContainer {
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  img {
+    max-width: 100%;
+    display: block;
+  }
+}
