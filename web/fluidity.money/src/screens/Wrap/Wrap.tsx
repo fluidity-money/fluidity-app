@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import HowItWorksTemplate from "../../components/HowItWorksTemplate";
+import HowItWorksTemplate from "components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";

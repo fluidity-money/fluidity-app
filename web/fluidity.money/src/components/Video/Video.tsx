@@ -2,7 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
@@ -16,6 +15,7 @@ interface IPropsVideo {
   margin? : string;
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
+  className?: string;
 }
 
 export const Video = ({
@@ -29,13 +29,12 @@ export const Video = ({
   margin = `0px 0px 0px 0px`,
   onEnded=() => {},
   onLoad=() => {},
+  className,
   ...props
 }: IPropsVideo) => {
   let ext = src.split(".").pop();
-
-  useEffect(() => {
-     
-  });
+  
+  const classProps = className || "";
 
   return (
     <video
@@ -44,7 +43,7 @@ export const Video = ({
       autoPlay
       muted
       playsInline
-      className={`${styles.videoContainer} ${styles[type]}`}
+      className={`${styles.videoContainer} ${styles[type]} ${classProps}`}
       style={{
         display: display,
         width: `${scale * 100}%`,
@@ -53,6 +52,7 @@ export const Video = ({
       }}
       onEnded={onEnded}
       onPlaying={onLoad}
+      {...props}
     >
       <source src={src} type={"video/" + ext} />
     </video>
