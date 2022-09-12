@@ -8,7 +8,7 @@
   padding: 4px;
   border-radius: 40px;
   position: fixed;
-  top: 85vh;
+  bottom: 5vh;
   left: 50vw;
   transform: translateX(-50%);
   z-index: 60;
@@ -28,7 +28,7 @@
     // grid-template-columns: 1fr;
     // flex-direction: column;
     align-items: center;
-    top: 93vh;
+    bottom: 2vh;
     background-color: transparent;
     opacity: 0.9;
     width: 100%;

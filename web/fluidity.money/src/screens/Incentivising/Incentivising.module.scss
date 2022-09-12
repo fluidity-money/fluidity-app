@@ -5,7 +5,6 @@
   align-items: center;
   text-align: center;
   height: 100vh;
-  min-height: 750px;
   width: 100%;
 
   div {
@@ -15,4 +14,10 @@
 
 .backgroundText {
   font-weight: 1000;
+  text-shadow: 0px 0px 30px #000;
+}
+
+.video {
+  max-height: 800px;
+  filter: brightness(90%)
 }
