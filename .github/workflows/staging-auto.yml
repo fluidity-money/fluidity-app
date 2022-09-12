@@ -53,7 +53,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update version (Fluidity Landing)
         if: steps.lib_diff.outputs.diff
-        working-directory: web/fluidity-app
+        working-directory: web/fluidity.money
         run: |
           npm install
           npm update surfing
