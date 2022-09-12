@@ -46,15 +46,14 @@ jobs:
       - name: Publish Surfing
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          npm publish
       - name: Update version (Fluidity Landing)
         if: steps.lib_diff.outputs.diff
         working-directory: web/fluidity.money
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
           npm install
           npm update surfing
       - name: Commit changed
