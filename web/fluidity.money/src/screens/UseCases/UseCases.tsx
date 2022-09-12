@@ -19,7 +19,7 @@ const UseCases = () => {
       style={{ display: "flex", flexDirection: "column" }}
       className={styles.container}
     >
-      {/* Missing font WHYTE INK SUPER */ }
+      {/* Missing font WHYTE INK SUPER */}
       {/*<Display */}
       {/*  large={width > breakpoint && true} */}
       {/*  extraSmall={width < breakpoint && true} */}
@@ -27,24 +27,21 @@ const UseCases = () => {
       {/*> */}
       {/*  A FLUID ECONOMY */}
       {/*</Display> */}
-      {
-        width > breakpoint
-          ? (
-            <img
-              style={{height: "auto", maxWidth: "90%"}}
-              src={window.location.origin + "/assets/text/AFLUIDECONOMY.svg"}
-              alt={"A FLUID ECONOMY"}
-            />
-          ) : (
-            <img
-              style={{height: "auto", maxWidth: "90%"}}
-              src={window.location.origin + "/assets/text/AFLUIDECONOMY-Broken.svg"}
-              alt={"A FLUID ECONOMY"}
-            />
-          )
-      }
+      {width > breakpoint ? (
+        <img
+          style={{ height: "auto", maxWidth: "90%" }}
+          src={window.location.origin + "/assets/text/AFLUIDECONOMY.svg"}
+          alt={"A FLUID ECONOMY"}
+        />
+      ) : (
+        <img
+          style={{ height: "auto", maxWidth: "90%" }}
+          src={window.location.origin + "/assets/text/AFLUIDECONOMY-Broken.svg"}
+          alt={"A FLUID ECONOMY"}
+        />
+      )}
 
-      <ManualCarousel>
+      <ManualCarousel scrollBar={false} className={styles.map}>
         {items.map((item, i) => (
           <UseCase key={`usecase-${i}`} useCase={item} />
         ))}

@@ -43,3 +43,17 @@
   //     cursor: pointer;
   //   }
 }
+
+.hidden {
+  box-sizing: border-box;
+  display: flex;
+  background-color: transparent;
+  overflow-x: auto;
+
+  /* width */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

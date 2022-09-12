@@ -34,7 +34,7 @@ const HowItWorks = () => {
       bgImage: "/assets/videos/Fluidity_HowItWorks.mp4",
       text: "GOVERN",
     },
-  ].map(({bgImage, ...image}) => ({
+  ].map(({ bgImage, ...image }) => ({
     ...image,
     bgImage: window.location.origin + bgImage,
   }));
@@ -46,7 +46,7 @@ const HowItWorks = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentImageIndex(
-        currentImageIndex => (currentImageIndex + 1) % images.length
+        (currentImageIndex) => (currentImageIndex + 1) % images.length
       );
     }, 7000);
 
@@ -55,11 +55,7 @@ const HowItWorks = () => {
 
   const backgroundText = images[currentImageIndex].text;
 
-  const size = width > 1000 
-    ? "h1" 
-    : width < 1000 && width > 520 
-    ? "h4" 
-    : "h5";
+  const size = width > 1000 ? "h1" : width < 1000 && width > 520 ? "h4" : "h5";
 
   const callout = (
     <div className={styles.callout}>
@@ -96,33 +92,21 @@ const HowItWorks = () => {
         <div className={styles.left}>
           <Text
             as={"p"}
-            className={
-              currentImageIndex === 0
-                ? styles.bold
-                : styles.normal
-            }
+            className={currentImageIndex === 0 ? styles.bold : styles.normal}
           >
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </Text>
           <Text
             as={"p"}
-            className={
-              currentImageIndex === 1
-                ? styles.bold
-                : styles.normal
-            }
+            className={currentImageIndex === 1 ? styles.bold : styles.normal}
           >
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
           </Text>
           <Text
             as={"p"}
-            className={
-              currentImageIndex === 2
-                ? styles.bold
-                : styles.normal
-            }
+            className={currentImageIndex === 2 ? styles.bold : styles.normal}
           >
             The user is incentivised through governance.
           </Text>
@@ -137,48 +121,50 @@ const HowItWorks = () => {
           </a>
         </div>
         <div className={styles.right}>
-        {
-          // Text == FLUIDITY
-          currentImageIndex === 0 
-          ? (
-            <img
-              style={{opacity: 1, position: "absolute", zIndex: 5}}
-              src={window.location.origin + "/assets/text/FLUIDIFY.svg"}
-              alt={images[currentImageIndex].text}
-            />
-          ) : (
-            <div className={styles.backgroundText}>
-              {/* Missing font WHYTE INK SUPER */ }
-              <Heading as={size}><strong>{backgroundText}</strong></Heading>
-            </div>
-          )
-        }
+          {
+            // Text == FLUIDITY
+            currentImageIndex === 0 ? (
+              <img
+                className={styles.behind}
+                style={{ opacity: 1, position: "absolute", zIndex: 5 }}
+                src={window.location.origin + "/assets/text/FLUIDIFY.svg"}
+                alt={images[currentImageIndex].text}
+              />
+            ) : (
+              <div className={styles.backgroundText}>
+                {/* Missing font WHYTE INK SUPER */}
+                <Heading as={size}>
+                  <strong>{backgroundText}</strong>
+                </Heading>
+              </div>
+            )
+          }
 
-        <div className={styles.video}>
-          {currentImageIndex === 0 ? (
-            <Video
-              src={images[currentImageIndex].bgImage}
-              type={"fit"}
-              loop={true}
-              key={"abc"}
-              scale={0.8}
-            />
-          ) : currentImageIndex === 1 ? (
-            <Video
-              src={images[currentImageIndex].bgImage}
-              type={"fit"}
-              loop={true}
-              key={"xyz"}
-            />
-          ) : (
-            <Video
-              src={images[currentImageIndex].bgImage}
-              type={"fit"}
-              loop={true}
-              key={"jfk"}
-              scale={0.8}
-            />
-          )}
+          <div className={styles.video}>
+            {currentImageIndex === 0 ? (
+              <Video
+                src={images[currentImageIndex].bgImage}
+                type={"fit"}
+                loop={true}
+                key={"abc"}
+                scale={0.8}
+              />
+            ) : currentImageIndex === 1 ? (
+              <Video
+                src={images[currentImageIndex].bgImage}
+                type={"fit"}
+                loop={true}
+                key={"xyz"}
+              />
+            ) : (
+              <Video
+                src={images[currentImageIndex].bgImage}
+                type={"fit"}
+                loop={true}
+                key={"jfk"}
+                scale={0.8}
+              />
+            )}
           </div>
         </div>
       </div>
