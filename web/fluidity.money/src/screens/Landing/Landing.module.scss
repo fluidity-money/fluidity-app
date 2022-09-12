@@ -7,6 +7,9 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
+  background-image: url("../../../public/assets/images/bg-blur-desktop.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   // display: grid;
   // grid-template-columns: repeat(1, 1fr);
   // position: relative;
@@ -81,7 +84,7 @@
 
 .content {
   width: 100%;
-  margin-top: -975px;
+  margin-top: -680px;
   display: flex;
   position: relative;
   flex-direction: column;
