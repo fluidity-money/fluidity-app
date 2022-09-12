@@ -83,10 +83,10 @@ const Footer = () => {
           </div>
           <div className={styles.legal}>
             <div>
-              <Text as="p" size="xs">
+              <Text as="p" size="xs" className={styles.underline}>
                 Terms
               </Text>
-              <Text as="p" size="xs">
+              <Text as="p" size="xs" className={styles.underline}>
                 Privacy Policy
               </Text>
             </div>

@@ -12,7 +12,7 @@ const Socials = () => {
         <div className={styles.imageContainer}>
           <img src="/assets/images/socials/twitter.svg" alt="twitter" />
         </div>
-        <Text as="p" prominent={true} className={styles.text}>
+        <Text as="p" prominent={true} className={styles.socialText}>
           @FLUIDITYMONEY
         </Text>
       </a>
@@ -20,7 +20,7 @@ const Socials = () => {
         <div className={styles.imageContainer}>
           <img src="/assets/images/socials/discord.svg" alt="discord" />
         </div>
-        <Text as="p" prominent={true} className={styles.text}>
+        <Text as="p" prominent={true} className={styles.socialText}>
           DISCORD
         </Text>
       </a>
@@ -29,7 +29,7 @@ const Socials = () => {
         <div className={styles.imageContainer}>
           <img src="/assets/images/socials/telegram.svg" alt="telegram" />
         </div>
-        <Text as="p" prominent={true} className={styles.text}>
+        <Text as="p" prominent={true} className={styles.socialText}>
           TELEGRAM
         </Text>
       </a>
@@ -40,7 +40,7 @@ const Socials = () => {
         <div className={styles.imageContainer}>
           <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
         </div>
-        <Text as="p" prominent={true} className={styles.text}>
+        <Text as="p" prominent={true} className={styles.socialText}>
           LINKEDIN
         </Text>
       </a>
