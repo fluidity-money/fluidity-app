@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { LinkButton, ReusableGrid } from "@fluidity-money/surfing";
+import { ArrowTopRight, ReusableGrid, GeneralButton } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./Roadmap.module.scss";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
@@ -26,19 +26,27 @@ const Roadmap = () => {
   const { width } = useViewport();
   const breakpoint = 860;
 
-  const button = (
-    <LinkButton size={"medium"} type={"external"} handleClick={() => {}}>
-      EXPLORE OUR FUTURE
-    </LinkButton>
-  );
+  const button = <GeneralButton
+    buttonType={"icon after"}
+    version={"secondary"}
+    size={"large"}
+    handleClick={() => {}}
+    icon={<ArrowTopRight/>}
+  >
+    EXPLORE OUR FUTURE
+  </GeneralButton>;
 
   const left =
     width < breakpoint ? (
+      <div className={styles.smallVid}>
       <Video
         src={window.location.origin + "/assets/videos/FluidityRoadMap.mp4"}
         type={"fit"}
         loop={true}
+        className={styles.video}
       />
+      <div className={styles.smallClip} />
+      </div>
     ) : (
       <HowItWorksTemplate button={button} info={info}>
         Roadmap
@@ -47,13 +55,17 @@ const Roadmap = () => {
 
   const right =
     width > breakpoint ? (
+      <>
       <Video
         src={window.location.origin + "/assets/videos/FluidityRoadMap.mp4"}
         type={"fit"}
         loop={true}
         scale={2.0}
         margin={"0px 400px 0px 0px"}
+        className={styles.video}
       />
+      <div className={styles.clip} />
+      </>
     ) : (
       <HowItWorksTemplate info={info} button={button}>
         Roadmap

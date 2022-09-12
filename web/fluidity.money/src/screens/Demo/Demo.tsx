@@ -57,13 +57,13 @@ const Demo = () => {
             Connect your wallet to see what you could make
           </Heading>
           <section>
-            {/* <GeneralButton version={"primary"} type={"text"} size={"medium"} handleClick={function (): void {       
+            {/* <GeneralButton version={"primary"} buttonType={"text"} size={"medium"} handleClick={function (): void {       
             } }>
               SHOW ME A DEMO
             </GeneralButton> */}
             <GeneralButton
               version={"secondary"}
-              type={"text"}
+              buttonType={"text"}
               size={"medium"}
               handleClick={function (): void {}}
             >

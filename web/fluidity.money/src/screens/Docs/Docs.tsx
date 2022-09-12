@@ -80,7 +80,7 @@ const Docs = () => {
           <input type="text" placeholder="elon@email.com" />
           <GeneralButton
             version={"secondary"}
-            type={"text"}
+            buttonType={"text"}
             size={"medium"}
             handleClick={function (): void {
               throw new Error("Function not implemented.");
@@ -106,7 +106,7 @@ const Docs = () => {
             </div>
             <GeneralButton
               version={"primary"}
-              type={"text"}
+              buttonType={"text"}
               size={"medium"}
               handleClick={function (): void {
                 throw new Error("Function not implemented.");

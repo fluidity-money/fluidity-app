@@ -54,7 +54,7 @@ const NavBar = () => {
             </motion.div>
             <GeneralButton
               version={"secondary"}
-              type={"text"}
+              buttonType={"text"}
               size={width < breakpoint ? "small" : "medium"}
               handleClick={() => {}}
             >
