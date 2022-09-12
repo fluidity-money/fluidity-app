@@ -43,8 +43,6 @@ jobs:
           npm version patch
       - uses: actions/setup-node@v3
         if: steps.lib_diff.outputs.diff
-        with:
-          registry-url: 'https://npm.pkg.github.com'
       - name: Publish Surfing
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
@@ -54,6 +52,8 @@ jobs:
       - name: Update version (Fluidity Landing)
         if: steps.lib_diff.outputs.diff
         working-directory: web/fluidity.money
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm install
           npm update surfing
