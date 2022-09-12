@@ -30,6 +30,7 @@ const Incentivising = () => {
         type={"reduce"}
         loop={true}
         onLoad={() => setReady(true)}
+        className={styles.video}
       />): (
       <Video
         src={window.location.origin + "/assets/videos/FluidityHowItWorks.mp4"}
@@ -37,9 +38,12 @@ const Incentivising = () => {
         loop={true}
         scale={.6}
         onLoad={() => setReady(true)}
+        className={styles.video}
       />)}
       <div>
-        <Heading as={"h6"}>HOW IT WORKS</Heading>
+        <div className={styles.blur} />
+        <Heading as={"h6"} className={styles.backgroundText}>HOW IT WORKS</Heading>
+        <br />
         <Display
           className={styles.backgroundText}
           large={width > breakpoint && true}

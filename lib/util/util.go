@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/fluidity-money/fluidity-app/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
@@ -109,9 +110,15 @@ func GetEnvOrDefault(name string, defaultValue string) string {
 	return env
 }
 
-// GetHash returns the sha1 hash of the byte array
-func GetHash(data []byte) string {
+// GetB16Hash returns the sha1 hash of the byte array encoded to base16
+func GetB16Hash(data []byte) string {
 	hasher := sha256.New()
 	hasher.Write(data)
-	return string(hasher.Sum(nil))
+	sum := hasher.Sum(nil)
+
+	hashHex := hexutil.Encode(sum)
+
+	hashHex = hashHex[2:] // slice off the 0x
+
+	return hashHex
 }

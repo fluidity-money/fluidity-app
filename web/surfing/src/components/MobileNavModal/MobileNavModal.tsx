@@ -47,7 +47,7 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
 
       <GeneralButton
         version={"primary"}
-        type={"text"}
+        buttonType={"text"}
         size={"large"}
         handleClick={() => {}}
       >
@@ -55,7 +55,7 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
       </GeneralButton>
       <GeneralButton
         version={"secondary"}
-        type={"text"}
+        buttonType={"text"}
         size={"large"}
         handleClick={() => {}}
       >

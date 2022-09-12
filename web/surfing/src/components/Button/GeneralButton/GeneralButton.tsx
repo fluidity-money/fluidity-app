@@ -6,10 +6,20 @@ import type { ButtonHTMLAttributes } from "react";
 
 import styles from "./GeneralButton.module.scss";
 
-export interface IGeneralButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: string;
+type GeneralButtonText = {
+  buttonType: "text",
+}
+
+type GeneralButtonLogo = {
+  icon: React.ReactNode,
+  buttonType: "icon before" | "icon after" | "icon only",
+}
+
+export type IGeneralButtonProps = 
+ButtonHTMLAttributes<HTMLButtonElement> &
+(GeneralButtonText | GeneralButtonLogo) & 
+{
   version: "primary" | "secondary";
-  type: "text" | "icon before" | "icon after" | "icon only";
   size: "small" | "medium" | "large";
   handleClick: () => void;
 }
@@ -17,7 +27,6 @@ export interface IGeneralButtonProps extends Omit<ButtonHTMLAttributes<HTMLButto
 const GeneralButton = ({
   children,
   version,
-  type,
   size,
   handleClick,
   disabled,
@@ -25,53 +34,57 @@ const GeneralButton = ({
   ...props
 }: IGeneralButtonProps) => {
   const classProps = className || "";
+  
+  const { buttonType } = props as GeneralButtonText | GeneralButtonLogo
+  
+  if (buttonType == "text") {
+    return (
+      <button
+        onClick={handleClick}
+        className={`${styles[version]} ${styles[size]} ${classProps}`}
+        disabled={disabled}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  };
 
   return (
     <>
-      {version === "primary" && type === "text" ? (
+      {buttonType === "icon before" ? (
         <button
           onClick={handleClick}
-          className={`${styles.primary} ${styles[size]} ${classProps}`}
+          className={`${styles[version]} ${styles[size]} ${classProps}`}
           disabled={disabled}
           {...props}
         >
-          {children}
+          <div className={styles.icon}>
+            {(props as GeneralButtonLogo).icon}
+          </div>
+          {" "}{children}
         </button>
-      ) : version === "primary" && type === "icon before" ? (
+      ) : buttonType === "icon after" ? (
         <button
           onClick={handleClick}
-          className={`${styles.primary} ${classProps}`}
+          className={`${styles[version]} ${styles[size]} ${classProps}`}
           disabled={disabled}
           {...props}
         >
-          {children}
+          {children}{" "}
+          <div className={styles.icon}>
+            {(props as GeneralButtonLogo).icon}
+          </div>
         </button>
-      ) : version === "primary" && type === "icon after" ? (
-        <button
-          onClick={handleClick}
-          className={`${styles.primary} ${classProps}`}
-          disabled={disabled}
-          {...props}
-        >
-          {children}
-        </button>
-      ) : type === "icon only" ? (
+      ) : (
         <button
           onClick={handleClick}
           className={`${styles.iconOnly} ${classProps}`}
           {...props}
         >
-          {children}
-        </button>
-      ) : (
-        // Secondary Buttons are text only
-        <button
-          onClick={handleClick}
-          className={`${styles.secondary} ${styles[size]} ${classProps}`}
-          disabled={disabled}
-          {...props}
-        >
-          {children}
+          <div className={styles.icon}>
+            {(props as GeneralButtonLogo).icon}
+          </div>
         </button>
       )}
     </>
