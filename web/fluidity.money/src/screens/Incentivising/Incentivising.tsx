@@ -41,6 +41,7 @@ const Incentivising = () => {
         className={styles.video}
       />)}
       <div>
+        <div className={styles.blur} />
         <Heading as={"h6"} className={styles.backgroundText}>HOW IT WORKS</Heading>
         <br />
         <Display
