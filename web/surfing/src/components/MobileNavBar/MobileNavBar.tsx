@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import BurgerMenu from "../BurgerMenu";
-import MobileNavModal from "../MobileNavModal";
+import { MobileNavModal } from "../MobileNavModal";
 import styles from "./MobileNavBar.module.scss";
 
 const MobileNavBar = () => {
@@ -17,7 +17,7 @@ const MobileNavBar = () => {
 
         <BurgerMenu isOpen={open} setIsOpen={setIsOpen} />
       </div>
-      {open && <MobileNavModal navLinks={["how it works", "resources"]} />}
+      {open && <MobileNavModal navLinks={["How it works", "Resources"]} />}
     </div>
   );
 };

@@ -40,8 +40,8 @@ const Footer = () => {
       <Socials />
       <div className={styles.content}>
         {width < secondBreakpoint && (
-          <div>
-            <img src="/assets/images/logoOutline.svg" alt="fluidityLogo" />
+          <div className={styles.imgContainer}>
+            <img src="/assets/images/logoOutline.png" alt="home page" />
           </div>
         )}
         <div className={styles.footerItems}>

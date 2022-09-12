@@ -1,3 +1,5 @@
+@use 'common' as *;
+
 .container {
   position: fixed;
   width: 100%;
@@ -11,7 +13,50 @@
   z-index: 61;
 }
 
+h3 {
+  font-weight: 100;
+}
+
 .socials {
   display: flex;
-  gap: 10px;
+  gap: 30px;
+}
+
+.imgContainer {
+  width: 160px;
+
+  display: flex;
+  justify-content: center;
+  img {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+.button {
+  background-color: transparent;
+  border: 0.5px solid $white-a80;
+  color: "orange";
+  // width: fit-content;
+  // height: fit-content;
+  max-width: 300px;
+  border-radius: 20px;
+
+  &:focus:enabled {
+    box-shadow: 0px 0px 0px 2px map-get($border, "focus");
+    color: map-get($text, "prominent");
+  }
+
+  &:hover:enabled {
+    background-color: map-get($bg, "alternate");
+    border: 0.5px solid map-get($border, "prominent");
+    color: $black;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: map-get($text, "disabled");
+    background-color: transparent;
+    border: 0.5px solid map-get($border, "disabled");
+  }
 }
