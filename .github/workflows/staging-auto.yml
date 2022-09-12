@@ -58,6 +58,7 @@ jobs:
           npm install
           npm update surfing
       - name: Commit changed
+        if: steps.lib_diff.outputs.diff
         run: |
           git add .
           git config user.name "Bump Bot 🤖"
