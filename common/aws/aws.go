@@ -8,11 +8,14 @@ import (
 	"crypto/ecdsa"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 
+	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/service/ssm"
@@ -186,4 +189,142 @@ func GetPrivateKeyFromParameter(session *session.Session, name string) (*ecdsa.P
 	}
 
 	return privateKey, err
+}
+
+// service is the simplified definition used for restarting tasks
+type service struct {
+	Cluster,
+	ServiceName *string
+}
+
+// arnStringToService to extract cluster and service name from an ARN string
+func arnStringToService(arnString string) (*service, error) {
+	parsed, err := arn.Parse(arnString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	split := strings.Split(parsed.Resource, "/")
+
+	if len(split) < 3 {
+		return nil, fmt.Errorf(
+			"ARN resource string %v was too short - expected at least 3 splits on '/', got %v!",
+			parsed.Resource,
+			len(split),
+		)
+	}
+
+	var (
+		cluster     = split[1]
+		serviceName = split[2]
+	)
+
+	s := &service{
+		Cluster:     &cluster,
+		ServiceName: &serviceName,
+	}
+
+	return s, nil
+}
+
+// RestartTasksMatchingServiceName to restart tasks created by services containing `matchName` in their names using `StopTask`
+func RestartTasksMatchingServiceName(session *session.Session, cluster, matchName string) error {
+	ecsClient := ecs.New(session)
+
+	var (
+		serviceArns []*string
+		maxResults  = int64(100)
+	)
+
+	// list all services in the cluster
+	services, err := ecsClient.ListServices(&ecs.ListServicesInput{
+		Cluster:    &cluster,
+		MaxResults: &maxResults,
+	})
+
+	if err != nil {
+		return fmt.Errorf(
+			"Failed to list services! %v",
+			err,
+		)
+	}
+
+	serviceArns = append(serviceArns, services.ServiceArns...)
+
+	// if NextToken isn't nil, there are still services to look through
+	for services.NextToken != nil {
+		services, err = ecsClient.ListServices(&ecs.ListServicesInput{
+			Cluster:   &cluster,
+			NextToken: services.NextToken,
+		})
+
+		if err != nil {
+			return fmt.Errorf(
+				"Failed to list services! %v",
+				err,
+			)
+		}
+
+		serviceArns = append(serviceArns, services.ServiceArns...)
+	}
+
+	// get the cluster and service name for each matching service
+	var matchingServices []*service
+	for _, arn_ := range serviceArns {
+		arn, err := arnStringToService(*arn_)
+
+		if err != nil {
+			return fmt.Errorf(
+				"Failed to convert ARN string! %v",
+				err,
+			)
+		}
+
+		if strings.Contains(*arn.ServiceName, matchName) {
+			matchingServices = append(matchingServices, arn)
+		}
+	}
+
+	// fetch the tasks and restart them
+	for _, arn := range matchingServices {
+		var (
+			cluster     = arn.Cluster
+			serviceName = arn.ServiceName
+		)
+
+		tasks, err := ecsClient.ListTasks(&ecs.ListTasksInput{
+			Cluster:     cluster,
+			ServiceName: serviceName,
+		})
+
+		if err != nil {
+			return fmt.Errorf(
+				"Failed to list tasks! %v",
+				err,
+			)
+		}
+
+		for _, taskArn := range tasks.TaskArns {
+			var (
+				task           = taskArn
+				stopTaskReason = "Key Rotation"
+			)
+
+			_, err := ecsClient.StopTask(&ecs.StopTaskInput{
+				Task:    task,
+				Cluster: cluster,
+				Reason:  &stopTaskReason,
+			})
+
+			if err != nil {
+				return fmt.Errorf(
+					"Failed to stop task! %v",
+					err,
+				)
+			}
+		}
+	}
+
+	return nil
 }
