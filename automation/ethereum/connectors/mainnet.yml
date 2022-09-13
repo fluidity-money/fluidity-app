@@ -6,11 +6,13 @@ SERVICES:
       DOCKERFILE_PATH: ./cmd/connector-ethereum-logs-amqp    
       ENV_FLU_WORKER_ID: ethereum-connector-ethereum-logs-amqp
       ENV_FLU_ETHEREUM_START_BLOCK: latest
+      TASK_MIN_COUNT: 1
 
   - CONNECTORS_ETHEREUM_BLOCK_HEADERS_AMQP:
       SERVICE_NAME: connector-ethereum-block-headers-amqp
       DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
       ENV_FLU_WORKER_ID: ethereum-connector-ethereum-block-headers-amqp
+      TASK_MIN_COUNT: 1
 
   - CONNECTORS_COMMON_BLOCKED_PAYOUTS_REPORTING_ETHEREUM:
       SERVICE_NAME: connector-common-blocked-payouts-reporting-ethereum
