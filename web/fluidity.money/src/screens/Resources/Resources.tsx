@@ -20,7 +20,7 @@ const Resources = () => {
       <div>RESOURCES</div>
       <div style={{ display: "flex" }}>
         <Socials />
-        <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
+        <LinkButton size={"large"} type={"internal"} handleClick={() => {}}>
           EXPLORE ALL RESOURCES
         </LinkButton>
       </div>

@@ -1,7 +1,7 @@
 @use 'common' as *;
 
 .button {
-  font-family: "Aeonik", sans-serif;
+  font-family: "Aeonik Mono";
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -43,7 +43,7 @@
       stroke: map-get($text, "prominent");
     }
   }
-  
+
   &:disabled {
     cursor: default;
     .text {

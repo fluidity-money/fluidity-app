@@ -55,7 +55,7 @@ const HowItWorks = () => {
 
   const backgroundText = images[currentImageIndex].text;
 
-  const size = width > 1000 ? "h1" : width < 1000 && width > 520 ? "h4" : "h5";
+  const size = width > 1000 ? "h2" : width < 1000 && width > 520 ? "h4" : "h5";
 
   const callout = (
     <div className={styles.callout}>
