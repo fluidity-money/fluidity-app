@@ -7,10 +7,10 @@
     min-height: 850px;
     width: 100%;
     opacity: 0.5;
-    background-image: url("../../../public/assets/images/dot-graph.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100%;
+    background-image: url("../../../public/assets/images/dot-graph.svg"), url("../../../public/assets/images/bg-blur-desktop.png");
+    background-position: left bottom, left top;;
+    background-repeat: no-repeat, no-repeat;
+    background-size: 100% 40%, cover;
     
     h1 {
       color: $fluidWhite;
