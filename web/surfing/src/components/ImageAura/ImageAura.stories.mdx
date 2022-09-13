@@ -1,0 +1,21 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import ImageAura from "./ImageAura";
+
+<Meta
+  title="ImageAura"
+  component={ImageAura}
+/>
+
+export const Template = ImageAura;
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story
+    name="Default ImageAura"
+    args={{
+      children: <h1>Content lives here</h1>
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

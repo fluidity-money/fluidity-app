@@ -7,10 +7,12 @@ type TextProps = {
     prominent?: boolean,
     className?: string,
     as?: "span" | "p",
-    center ?: boolean
+    center ?: boolean;
 }
 
-const Text = ({ children, size="sm", as="span", prominent=false, className, center, ...props }: TextProps) => {
+const Text =
+  ({ children, size="sm", as="span", prominent=false, className, center, noMargin, ...props }: TextProps) =>
+{
     const sizeProps = `${styles[size]}`
     const prominentProps = `${prominent ? styles.prominent : ""}`
     const classNameProps = `${className || ""}`

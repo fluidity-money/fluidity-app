@@ -1,8 +1,10 @@
 @use 'common' as *;
 
 .container {
+	height: 100%;
+	max-width: 375px;
 	display: flex;
 	justify-content: center;
-	flex-direction: row;
+	flex-direction: column;
 	align-self: center;
 }

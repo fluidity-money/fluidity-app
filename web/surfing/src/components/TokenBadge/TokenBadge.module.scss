@@ -1,0 +1,28 @@
+@use 'common' as *;
+
+.root_container {
+  background: conic-gradient(from 209.59deg at 50% 50%, #F3B8D8 0deg, #B793E9 50.06deg, #9FD4F3 85.94deg, #FFD2C4 134.97deg, #FBF3F3 172.05deg, #D9ABDF 200.75deg, #AF9CE3 224.67deg, #AAE4E1 259.36deg, #C6EAD0 298.82deg, #FFFFFF 328.72deg, #FDB5E4 360deg);
+  padding: 4px;
+  max-height: 170px;
+  max-width: 170px;
+  border-radius: 50%;
+}
+
+.container {
+  width: 160px;
+  height: 160px;
+  margin: auto auto;
+}
+
+.badge {
+  position: absolute;
+  x: 5px;
+  y: 5px;
+  height: 60px;
+  width: 60px;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+}

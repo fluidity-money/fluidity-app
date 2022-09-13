@@ -13,11 +13,14 @@ type DisplayProps = {
   large ?: boolean;
 
   center ?: boolean;
+  noMarginBottom ?: boolean;
 
   [key : string] : any
 };
 
-const Display = ({ children, large = true, center, ...props } : DisplayProps) => {
+const Display =
+  ({ children, large = true, center, noMarginBottom, ...props } : DisplayProps) =>
+{
   const sizeMap = {
     "extraSmall": "xs",
     "small": "sm",
@@ -37,7 +40,10 @@ const Display = ({ children, large = true, center, ...props } : DisplayProps) =>
 
   const propCenter = center ? styles.center : "";
 
-  const className = `${styles[size]} ${styles.text} ${propClasses} ${propCenter}`;
+  const noMarginBottomProp = noMarginBottom ? styles.noMarginBottom : "";
+
+  const className =
+    `${styles[size]} ${styles.text} ${propClasses} ${propCenter} ${noMarginBottomProp}`;
 
   return <h1 {...rest} className={className}>
     {children}

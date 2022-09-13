@@ -1,0 +1,43 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import TokenBadge from "./TokenBadge";
+
+<Meta
+  title="TokenBadge"
+  component={TokenBadge}
+/>
+
+export const Template = TokenBadge;
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story
+    name="USDC TokenBadge"
+    args={{
+      imageSrc: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=023"
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story
+    name="DAI TokenBadge"
+    args={{
+      imageSrc: "https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.svg?v=023"
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story
+    name="USDT TokenBadge"
+    args={{
+      imageSrc: "https://cryptologos.cc/logos/tether-usdt-logo.svg?v=023"
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

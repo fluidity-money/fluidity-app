@@ -7,13 +7,19 @@ import ScreenGetThatMoney from "./ScreenGetThatMoney";
   component={ScreenGetThatMoney}
 />
 
-export const Template = ({ children, ...props }) => <ScreenGetThatMoney {...props}>
-  {children}
-</ScreenGetThatMoney>;
+export const Template = ScreenGetThatMoney;
 
 <Canvas columns={1} withSource="open" withToolbar >
-  <Story name="Default ScreenGetThatMoney">
+  <Story
+    name="ScreenGetThatMoney USDC"
+    args={{
+      unclaimedPrizes: 23000,
+      tokenBadgeSrc: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=023",
+      winningsFluidAsset: 23.535921,
+      winningsUsd: 23.54,
+      fluidAssetName: "fUSDC"
+    }}
+  >
     {Template.bind({})}
   </Story>
 </Canvas>
-
