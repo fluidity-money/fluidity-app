@@ -2,9 +2,8 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { LinkButton } from "components/Button";
-import { Heading } from "~/components/Heading";
 import useViewport from "~/util/hooks/useViewport";
+import { LinkButton, Heading } from "~/components";
 import styles from "./FooterItem.module.scss";
 
 interface IItem {
@@ -49,6 +48,7 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
                   ? "small"
                   : "small"
               }
+              color={"gray"}
               type={item.type}
             >
               {item.title}
