@@ -47,15 +47,11 @@ const RewardsInfoBox = ({
 
   return (
     <div
-      className={
-        initalView
-          ? `${styles.infoBoxContainer} ${
-              type === "black" ? styles.fadeIn : styles.fadeOut
-            }`
-          : `${styles.infoBoxContainer} ${
-              type === "black" ? styles.fadeOut : styles.fadeIn
-            }`
-      }
+      className={`${
+        type === "black"
+          ? styles.infoBoxContainer
+          : styles.infoBoxContainerStats
+      }`}
     >
       <div
         className={

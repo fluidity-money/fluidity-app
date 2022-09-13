@@ -24,13 +24,15 @@ const RewardsStats = () => {
     <div className={styles.info}>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <Heading as="h2">1400+</Heading>
-        <Heading as="h5">Unique wallets</Heading>
+        <Heading as={width > breakpoint ? "h2" : "h3"}>1400+</Heading>
+        <Heading as={width > breakpoint ? "h5" : "h6"}>Unique wallets</Heading>
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <Heading as="h2">32,689</Heading>
-        <Heading as="h5">Fluid asset pairs</Heading>
+        <Heading as={width > breakpoint ? "h2" : "h3"}>32,689</Heading>
+        <Heading as={width > breakpoint ? "h5" : "h6"}>
+          Fluid asset pairs
+        </Heading>
       </div>
       {width > breakpoint && (
         <div className={styles.infoSingle}>
@@ -42,19 +44,10 @@ const RewardsStats = () => {
   );
   return (
     <div className={styles.container}>
-      {/* <div className={initalView ? `${styles.stats} ` : `${styles.stats} `}>
+      <div className={initalView ? `${styles.stats} ` : `${styles.stats} `}>
         <InfoStats />
       </div>
-      <RewardsInfoBox
-        rewardPool={rewardPool}
-        totalTransactionValue={txCount}
-        toggle={toggle}
-        setToggle={() => setToggle(!toggle)}
-        initalView={initalView}
-        switchAndAnimate={() => {}}
-        type="transparent"
-      /> */}
-      <div style={{ height: 450, width: "100%" }}>
+      <div style={{ height: 254, width: "100%" }}>
         <LineChart
           data={[
             { x: 10, y: 10 },
@@ -75,6 +68,16 @@ const RewardsStats = () => {
           }}
         />
       </div>
+
+      <RewardsInfoBox
+        rewardPool={rewardPool}
+        totalTransactionValue={txCount}
+        toggle={toggle}
+        setToggle={() => setToggle(!toggle)}
+        initalView={initalView}
+        switchAndAnimate={() => {}}
+        type="transparent"
+      />
     </div>
   );
 };
