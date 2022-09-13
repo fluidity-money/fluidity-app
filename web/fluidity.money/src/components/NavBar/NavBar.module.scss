@@ -13,7 +13,7 @@
 
 .container {
   box-sizing: border-box;
-  position: absolute;
+  position: fixed;
   background-color: transparent;
   display: flex;
   justify-content: center;
@@ -23,6 +23,7 @@
   display: grid;
   grid-template-columns: 1fr 4fr 1fr;
   max-width: 1500px;
+  z-index: 1000;
   .navbar {
     box-sizing: border-box;
     justify-content: space-between;
@@ -32,7 +33,7 @@
     padding: 10px;
     z-index: 99;
     justify-self: center;
-    position: fixed;
+    // position: fixed;
 
     .fade {
       box-sizing: border-box;
@@ -57,6 +58,9 @@
           }
         }
       }
+    }
+    @media (max-width: 750px) {
+      grid-template-columns: 1fr 2fr 1fr;
     }
   }
   .navbarFixed {
@@ -83,11 +87,11 @@
 
 .fluidity {
   cursor: pointer;
-  z-index: 51;
+  // z-index: 51;
   margin-left: 50.5px;
-  font-size: 30.5px;
-  padding-top: 7px;
-  position: fixed;
+  // font-size: 30.5px;
+  // padding-top: 7px;
+  // position: fixed;
 }
 
 .imgContainer {

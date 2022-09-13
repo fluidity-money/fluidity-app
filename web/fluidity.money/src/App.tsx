@@ -18,6 +18,7 @@ import useViewport from "hooks/useViewport";
 import MobileNavBar from "components/MobileNavBar";
 import "./styles/app.global.scss";
 import "@fluidity-money/surfing/dist/style.css";
+// import { NavBar } from "@fluidity-money/surfing";
 
 function App() {
   const { width } = useViewport();
@@ -27,7 +28,17 @@ function App() {
       <ChainContextProvider>
         <Router>
           <div className="App">
-            {width < breakpoint ? <MobileNavBar /> : <NavBar />}
+            {width < breakpoint ? (
+              <MobileNavBar />
+            ) : (
+              // <NavBar
+              //   logo={logo}
+              //   text={text}
+              //   button={button}
+              //   navLinks={navLinks}
+              // />
+              <NavBar />
+            )}
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/howitworks" element={<HowItWorksPage />} />
@@ -36,7 +47,6 @@ function App() {
               {/* <Route path="/fluidstats" element={<FluidStatsPage /> */}
 
               <Route path="/resources" element={<ResourcesPage />} />
-
             </Routes>
           </div>
         </Router>
@@ -46,3 +56,19 @@ function App() {
 }
 
 export default App;
+
+const logo = "./src/assets/images/logos/logoOutline.svg";
+const text = "fluidity";
+const button = {
+  children: "LAUNCH FLUIDITY",
+  version: "secondary",
+  type: "text",
+  size: "medium",
+  handleClick: () => {},
+};
+const navLinks = [
+  { name: "how it works", modal: false },
+  // { name: "ecosystem", modal: false },
+  // { name: "fluid stats", modal: false },
+  { name: "resources", modal: true },
+];
