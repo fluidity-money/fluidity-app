@@ -37,4 +37,17 @@ func init() {
 			)
 		})
 	}
+
+	WrappedSolMintAddressPubkey, err = solana.PublicKeyFromBase58(
+		WrappedSolMintAddress,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to decode wrapped sol mint address pubkey %#v",
+				WrappedSolMintAddress,
+			)
+		})
+	}
 }

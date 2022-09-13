@@ -15,6 +15,9 @@ import (
 )
 
 const (
+	// VariantInitialiseAccount to initialise a spl token account
+	VariantInitialiseAccount = 1
+
 	// VariantTransfer to transfer an amount to a user
 	VariantTransfer = 3
 
@@ -35,6 +38,12 @@ const (
 
 	// TokenAssociatedProgramAddress used to create accounts
 	TokenAssociatedProgramAddress = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+
+	// WrappedSolMintAddress used to wrap sol into an SPL token
+	WrappedSolMintAddress = "So11111111111111111111111111111111111111112"
+
+	// WrappedSolDecimals to calculate decimals for the wrapped sol token
+	WrappedSolDecimals = 9
 )
 
 // initialised in init.go
@@ -44,6 +53,9 @@ var (
 
 	// TokenAssociatedProgramAddressPubkey
 	TokenAssociatedProgramAddressPubkey solLib.PublicKey
+
+	// WrappedSolMintAddressPubkey
+	WrappedSolMintAddressPubkey solLib.PublicKey
 )
 
 type (
