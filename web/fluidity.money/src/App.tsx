@@ -12,7 +12,6 @@ import NavBar from "./components/NavBar";
 import LandingPage from "./pages/LandingPage";
 import EcosystemPage from "./pages/EcosystemPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
-import FluidStatsPage from "./pages/FluidStatsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import fluRelayEnvironment from "./data/relayEnvironment";
 import useViewport from "hooks/useViewport";
