@@ -22,7 +22,7 @@
   }
 
   hr {
-    width: 95%;
+    width: 100%;
     margin-bottom: 40px;
     margin-bottom: 40px;
     justify-content: center;
@@ -40,4 +40,16 @@
     max-height: 100%;
     overflow: hidden;
   }
+}
+
+.listContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.listContainer::-webkit-scrollbar-track {
+  display:none;
+}
+
+.listContainer::-webkit-scrollbar-thumb {
+ display: none;
 }

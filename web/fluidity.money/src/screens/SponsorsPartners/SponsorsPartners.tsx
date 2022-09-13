@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import useViewport from "hooks/useViewport";
-import { ContinuousCarousel, Card } from "@fluidity-money/surfing";
+import { ContinuousCarousel, Card, Heading } from "@fluidity-money/surfing";
 import Partner from "components/Partner";
 import styles from "./SponsorsPartners.module.scss";
 import { useEffect, useState } from "react";
@@ -19,7 +19,7 @@ const SponsorsPartners = () => {
   const breakpoint = 660;
   return (
     <div className={`${styles.container} bg-dark`}>
-      <h1 className={styles.text}>{"Partners & Investors"}</h1>
+      <Heading as="h1" className={styles.SPtext}>{"Partners & Investors"}</Heading>
       <div style={{ display: "flex", width: "100%", justifyContent:"center", overflowY: "hidden" }}>
         <ContinuousCarousel direction="up">
           <div

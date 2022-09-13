@@ -86,3 +86,4 @@ web/fluidity.money/public/assets/videos/FluidityWrap.mp4 filter=lfs diff=lfs mer
 web/fluidity.money/public/assets/videos/FluidityYield.mp4 filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/load.webp filter=lfs diff=lfs merge=lfs -text
 web/fluidity.money/public/assets/images/FluidityHowItWorks.png filter=lfs diff=lfs merge=lfs -text
+web/fluidity.money/public/assets/images/bg-blur-desktop.png filter=lfs diff=lfs merge=lfs -text

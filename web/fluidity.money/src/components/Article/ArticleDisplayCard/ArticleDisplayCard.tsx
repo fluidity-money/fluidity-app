@@ -43,7 +43,9 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
             >
               ALL ARTICLES
             </GeneralButton>
+
           </a>
+
         ) : (
           <a href="/resources">
             <LinkButton

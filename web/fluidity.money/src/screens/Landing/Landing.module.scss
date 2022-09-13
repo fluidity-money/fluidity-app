@@ -7,13 +7,14 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
-  opacity: 0.9;
+  background-image: url("../../../public/assets/images/bg-blur-desktop.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   // display: grid;
   // grid-template-columns: repeat(1, 1fr);
   // position: relative;
   // max-width: 1500px;
   padding-top: 100px;
-  background-color: black;
   h1 {
     text-align: center;
   }
@@ -83,7 +84,7 @@
 
 .content {
   width: 100%;
-  margin-top: -975px;
+  margin-top: -680px;
   display: flex;
   position: relative;
   flex-direction: column;
