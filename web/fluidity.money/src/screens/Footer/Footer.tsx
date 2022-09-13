@@ -83,12 +83,20 @@ const Footer = () => {
           </div>
           <div className={styles.legal}>
             <div>
-              <Text as="p" size="xs">
-                Terms
-              </Text>
-              <Text as="p" size="xs">
-                Privacy Policy
-              </Text>
+              <a href={"#"}>
+                <Text as="p" size="xs">
+                  <u>
+                    Terms
+                  </u>
+                </Text>
+              </a>
+              <a href={"#"}>
+                <Text as="p" size="xs">
+                  <u>
+                    Privacy Policy
+                  </u>
+                </Text>
+              </a>
             </div>
 
             <Text as="p" size="xs">
@@ -140,5 +148,5 @@ const resources: IItem[] = [
   { title: "Articles", src: "", type: "internal" },
   { title: "Fluniversity", src: "", type: "internal" },
   { title: "Whitepapers", src: "", type: "internal" },
-  { title: "Documentation", src: "", type: "external" },
+  { title: "Documentation", src: "https://docs.fluidity.money/", type: "external" },
 ];
