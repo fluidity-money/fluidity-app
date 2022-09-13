@@ -9,14 +9,14 @@ import { Chain, chainContext, Network, Chains, NullableChain} from "./chainConte
 import './App.css'
 import {ReactNode, useContext, useEffect, useState} from "react";
 import {isInArray, ReactSetter} from "./utils/types";
+import {useSolana, useWalletKit, WalletKitProvider} from "@gokiprotocol/walletkit";
 
 const ChainInterface = ({children}: {children: React.ReactNode}) => {
   const [chain, setChain] = useState<NullableChain>(null);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    if (chain === null)
-      setConnected(false);
+    setConnected(false);
   }, [chain]);
 
   switch (chain) {
@@ -29,9 +29,13 @@ const ChainInterface = ({children}: {children: React.ReactNode}) => {
     </>
   case "solana":
     return <>
-      <SolanaInterface setChain={setChain} connected={connected} setConnected={setConnected}>
-        {children}
-      </SolanaInterface>
+      <WalletKitProvider
+        app={{name: "Fluidity"}}
+      >
+        <SolanaInterface setChain={setChain} connected={connected} setConnected={setConnected}>
+          {children}
+        </SolanaInterface>
+      </WalletKitProvider>
     </>
   }
 }
@@ -45,24 +49,35 @@ type InterfaceProps = {
 
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain: Chain = "solana";
-  const [network, setNetwork] = useState<Network<"solana">>("mainnet");
+  const [network, setNetwork] = useState<Network<"solana">>("mainnet-beta");
+  const wallet = useWalletKit();
+  const solana = useSolana();
+  const solanaConnected = solana.connected;
+
+  useEffect(() => {
+    setConnected(solanaConnected)
+  }, [solanaConnected])
+
+  useEffect(() => {
+    setNetworkChecked(solana.network);
+  }, [solana.network])
 
   // set network if it's valid for the chain
   const setNetworkChecked = (network: string) => {
     if (isInArray(network, Chains[chain]))
-      setNetwork(network)
+      solana.setNetwork(network);
   }
 
   const connect = (network: Network) => {
     if (!isInArray(network, Chains[chain]))
       return;
 
+    wallet.connect()
     setNetwork(network);
-    setConnected(true);
   }
 
-  const disconnect = () => {
-    setConnected(false);
+  const disconnect = async() => {
+    solana.disconnect();
   }
 
   const wrap = () => {
@@ -153,7 +168,7 @@ const Div = () => {
   // if (chain === "solana") setNetwork("devnet")
 
 return <div>
-      {`connected: ${connected}. ${connected ? `chain: ${chain}, network: ${network}` : ""}`}
+      {`connected: ${connected}. chain: ${chain}, network: ${network}`}
       <br/>
       <button onClick={() => chain !== null && connect(network)}>connect</button>
       <button onClick={disconnect}>disconnect</button>
@@ -163,7 +178,13 @@ return <div>
       <br/>
       <button onClick={() => setChain("solana")}>solana</button>
       <button onClick={() => setChain("ethereum")}>ethereum</button>
-      {connected && chain !== null && <ul>{Chains[chain].map((k,i)=><li style={{cursor: 'pointer'}} onClick={() => setNetwork(k)} key={i}>{k}</li>)}</ul>}
+      {chain !== null && 
+        <ul>{Chains[chain].map((k,i)=>
+          <li style={{cursor: 'pointer'}} onClick={() => setNetwork(k)} key={i}>
+          {k}
+          </li>)}
+        </ul>
+      }
       </div>
   }
 const App = () => {

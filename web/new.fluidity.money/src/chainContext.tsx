@@ -5,8 +5,14 @@
 import {createContext} from "react";
 
 export const Chains = {
-  ethereum: ["ropsten", "mainnet"],
-  solana: ["devnet", "mainnet"],
+  ethereum: [
+    "ropsten", 
+    "mainnet",
+  ],
+  solana: [
+    "devnet",
+    "mainnet-beta",
+  ],
 } as const;
 
 export type Chain = keyof typeof Chains;
