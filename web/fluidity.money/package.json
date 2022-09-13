@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
-    "@fluidity-money/surfing": "^0",
+    "@fluidity-money/surfing": "^0.0.16",
     "@reduxjs/toolkit": "^1.8.3",
     "@visx/visx": "^2.12.2",
     "babel-plugin-relay": "^14.1.0",
