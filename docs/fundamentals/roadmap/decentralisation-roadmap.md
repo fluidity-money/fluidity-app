@@ -20,6 +20,10 @@ A natural suggestion would be to use a service provided by Chainlink (an oracle 
 
 **Stage 3** is possible to build following solving some of the randomness challenges and the development of the token and incentive program overall. The three laws make this system a challenge, but by relaxing the instant reward constraint in attacker-led scenarios and matching large payouts with a market (a la Boba) it can be done. We can guarantee liveliness with the token and the staking incentive system and generate the graph needed for the longterm infrastructure including the sell-down of accumulated randomness.
 
+There are other considerations in our decentralisation roadmap including:
+
+1. IPFS hosting everything
+
 We've since spent some time ideating these in a pair of whitepapers which explores these further:[whitepaper-source-code](../../developers/whitepaper-source-code/ "mention")
 
 Stay tuned to this page and look forward to an announcement.
