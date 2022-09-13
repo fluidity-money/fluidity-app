@@ -11,7 +11,7 @@ const Contact = () => {
       <div>Contact</div>
       <GeneralButton
         version={"primary"}
-        type={"text"}
+        buttonType={"text"}
         size={"small"}
         handleClick={function (): void {
           throw new Error("Function not implemented.");

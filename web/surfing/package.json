@@ -1,6 +1,6 @@
 {
   "name": "@fluidity-money/surfing",
-  "version": "0.0.16",
+  "version": "0.0.29",
   "type": "module",
   "repository": {
     "type": "git",
@@ -41,7 +41,7 @@
     "@storybook/react": "^6.5.10",
     "@storybook/testing-library": "^0.0.13",
     "@storybook/theming": "^6.5.10",
-    "@types/react": "^18.0.17",
+    "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "@types/react-table": "^7.7.12",
     "@visx/visx": "^2.12.2",

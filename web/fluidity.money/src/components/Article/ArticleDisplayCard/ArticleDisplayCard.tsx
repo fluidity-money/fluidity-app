@@ -31,13 +31,13 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
           <a href="https://blog.fluidity.money/">
             <GeneralButton
               version={"secondary"}
-              type={"text"}
+              buttonType="text"
               size={"medium"}
               handleClick={function (): void {}}
             >
               ALL ARTICLES
             </GeneralButton>
-         </a>  
+         </a>
         ) : (
           <a href="/resources">
             <LinkButton

@@ -1,6 +1,7 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
+//
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -11,7 +12,6 @@ import NavBar from "./components/NavBar";
 import LandingPage from "./pages/LandingPage";
 import EcosystemPage from "./pages/EcosystemPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
-import FluidStatsPage from "./pages/FluidStatsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import fluRelayEnvironment from "./data/relayEnvironment";
 import useViewport from "hooks/useViewport";

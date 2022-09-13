@@ -205,7 +205,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 // processSplTransaction, returning possibly two transfers depending on
 // what's contained within the spl transaction
 func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string, tokenDetails token_details.TokenDetails) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
-	splTransaction, err := spl_token.DecodeSplInstruction(instruction.Data)
+	splTransaction, err := spl_token.DecodeSplUserAction(instruction.Data)
 
 	if errors.Is(err, fluidity.UnknownInstructionError) {
 		log.Debug(func(k *log.Log) {

@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import HowItWorksTemplate from "../../components/HowItWorksTemplate";
+import HowItWorksTemplate from "components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";
@@ -31,7 +31,7 @@ const Wrap = () => {
 
   const left =
     width < breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} loop={true}/>
+      <Video src={window.location.origin + '/assets/videos/FluidityWrap.mp4'} type={'fit'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens
@@ -40,7 +40,7 @@ const Wrap = () => {
 
   const right =
     width > breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/Fluidity_Wrap.mp4'} type={'fit'} loop={true}/>
+      <Video src={window.location.origin + '/assets/videos/FluidityWrap.mp4'} type={'fit'} loop={true}/>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens
