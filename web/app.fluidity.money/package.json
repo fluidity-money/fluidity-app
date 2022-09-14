@@ -26,6 +26,9 @@
     "surfing": "file:../surfing"
   },
   "devDependencies": {
+    "@fluidity-money/surfing": "^0.0.30",
+    "@sentry/react": "^7.12.1",
+    "@sentry/tracing": "^7.12.1",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/react-helmet": "^6.1.5",

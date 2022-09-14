@@ -1,10 +1,14 @@
 import { Outlet } from "react-router-dom";
+import { ErrorBoundary } from "@sentry/react";
+import Error from "@/screens/Error";
 
 export const DashLayout = () => {
   return (
     <>
       Dashboard Outlet
-      <Outlet />
+      <ErrorBoundary fallback={Error}>
+        <Outlet />
+      </ErrorBoundary>
     </>
   );
 };

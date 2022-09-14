@@ -5,13 +5,15 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
+
 import { Helmet } from "react-helmet";
 
 import { Loading } from "@/screens";
 
 import "./App.css";
-import NetworkCore from "./common/NetworkCore";
-import DashLayout from "./common/DashLayout";
+
+import NetworkCore from "@/common/NetworkCore";
+import DashLayout from "@/common/DashLayout";
 
 const Home = lazy(() => import("@/screens/Home"));
 const Dashboard = lazy(() => import("@/screens/Dashboard"));
