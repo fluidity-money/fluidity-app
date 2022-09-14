@@ -20,25 +20,19 @@ const Reward = () => {
   */
   const { apiState } = useChainContext();
   const { txCount, rewardPool } = apiState;
-
-  const [initalView, setInitalView] = useState(false);
+  //sets which screen is present
   const [present, setPresent] = useState(true);
-  const [toggle, setToggle] = useState(false);
   const { width } = useViewport();
   const breakpoint = 620;
-
-  // animates then switches backgrounds
-  const switchAndAnimate = () => {
-    setInitalView(!initalView);
-    setTimeout(() => {
-      setPresent(!present);
-    }, 1000);
-  };
 
   return (
     <>
       <div className={styles.container}>
-        {!present ? <RewardsInitial /> : <RewardStats />}
+        {present ? (
+          <RewardsInitial changeScreen={() => setPresent(!present)} />
+        ) : (
+          <RewardStats changeScreen={() => setPresent(!present)} />
+        )}
       </div>
     </>
   );

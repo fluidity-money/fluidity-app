@@ -4,18 +4,19 @@ import {
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import RewardsInfoBox from "components/RewardsInfoBox";
+import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
 import styles from "./RewardsStats.module.scss";
 
-const RewardsStats = () => {
+interface IProps {
+  changeScreen: () => void;
+}
+
+const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState } = useChainContext();
   const { txCount, rewardPool } = apiState;
-
-  const [initalView, setInitalView] = useState(false);
-  const [present, setPresent] = useState(true);
-  const [toggle, setToggle] = useState(false);
   const { width } = useViewport();
   const breakpoint = 620;
 
@@ -43,42 +44,50 @@ const RewardsStats = () => {
     </div>
   );
   return (
-    <div className={styles.container}>
-      <div className={initalView ? `${styles.stats} ` : `${styles.stats} `}>
-        <InfoStats />
-      </div>
-      <div style={{ height: 254, width: "100%" }}>
-        <LineChart
-          data={[
-            { x: 10, y: 10 },
-            { x: 20, y: 20 },
-            { x: 30, y: 30 },
-            { x: 40, y: 20 },
-          ]}
-          xLabel={"Some X Label"}
-          yLabel={"Some Y Label"}
-          lineLabel={"Some Line Label"}
-          accessors={{
-            xAccessor: (d: any) => {
-              return d.x as any;
-            },
-            yAccessor: (d: any) => {
-              return d.y as any;
-            },
-          }}
-        />
-      </div>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className={styles.container}
+      >
+        <div className={`${styles.stats} `}>
+          <InfoStats />
+        </div>
+        <div style={{ height: 254, width: "100%" }}>
+          <LineChart
+            data={[
+              { x: 10, y: 5 },
+              { x: 20, y: 15 },
+              { x: 30, y: 10 },
+              { x: 40, y: 15 },
+              { x: 50, y: 20 },
+              { x: 60, y: 22 },
+              { x: 70, y: 30 },
+              { x: 80, y: 25 },
+            ]}
+            xLabel={"Date"}
+            yLabel={"Prize Amount"}
+            lineLabel={"Transactions"}
+            accessors={{
+              xAccessor: (d: any) => {
+                return d.x as any;
+              },
+              yAccessor: (d: any) => {
+                return d.y as any;
+              },
+            }}
+          />
+        </div>
 
-      <RewardsInfoBox
-        rewardPool={rewardPool}
-        totalTransactionValue={txCount}
-        toggle={toggle}
-        setToggle={() => setToggle(!toggle)}
-        initalView={initalView}
-        switchAndAnimate={() => {}}
-        type="transparent"
-      />
-    </div>
+        <RewardsInfoBox
+          rewardPool={rewardPool}
+          totalTransactionValue={txCount}
+          changeScreen={changeScreen}
+          type="transparent"
+        />
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

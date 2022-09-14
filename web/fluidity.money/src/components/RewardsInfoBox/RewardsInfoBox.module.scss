@@ -17,13 +17,12 @@
   position: absolute;
   height: 294px;
   width: 496px;
-  top: 200px;
+  top: 250px;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   @include max-620px {
-    top: 250px;
     width: 296px;
     height: 249px;
     display: flex;

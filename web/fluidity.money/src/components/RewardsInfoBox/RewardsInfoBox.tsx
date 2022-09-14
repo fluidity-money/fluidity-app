@@ -17,18 +17,14 @@ import styles from "./RewardsInfoBox.module.scss";
 interface IRewardBoxProps {
   rewardPool: number;
   totalTransactionValue: number;
-  setToggle: () => void;
-  toggle: boolean;
-  initalView: boolean;
-  switchAndAnimate: () => void;
+  changeScreen: () => void;
   type: "black" | "transparent";
 }
 
 const RewardsInfoBox = ({
   rewardPool,
   totalTransactionValue,
-  initalView,
-  switchAndAnimate,
+  changeScreen,
   type,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
@@ -65,7 +61,7 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={switchAndAnimate}>
+        <div onClick={changeScreen}>
           <Heading as="h1">
             {type === "black"
               ? numberToMonetaryString(rewardPool)
