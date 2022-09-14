@@ -4,19 +4,20 @@
 import React, { useEffect, useState } from "react";
 import { Navigation } from "@fluidity-money/surfing";
 import ResourcesPageTitle from "screens/ResourcesPageTitle";
-import Articles from "../../screens/Articles";
-import Contact from "../../screens/Contact";
-import Demo from "../../screens/Demo";
-import Docs from "../../screens/Docs";
-import Fluniversity from "../../screens/Fluniversity";
-import Footer from "../../screens/Footer";
-import Hero from "../../screens/Hero";
-import Introducing from "../../screens/Introducing";
-import Tweets from "../../screens/Tweets";
-import Whitepapers from "../../screens/Whitepapers";
-import styles from "./ResourcesPage.module.scss";
+import Articles from "screens/Articles";
+import Contact from "screens/Contact";
+import Demo from "screens/Demo";
+import Docs from "screens/Docs";
+import Fluniversity from "screens/Fluniversity";
+import Footer from "screens/Footer";
+import Hero from "screens/Hero";
+import Introducing from "screens/Introducing";
+import Tweets from "screens/Tweets";
+import MailingList from "screens/MailingList";
+import Whitepapers from "screens/Whitepapers";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import styles from "./ResourcesPage.module.scss";
 
 const ResourcesPage = () => {
   const [introVisible, setIntroVisibility] = useState(true);
@@ -61,6 +62,7 @@ const ResourcesPage = () => {
               <Fluniversity />
               <Whitepapers />
               <Docs />
+              <MailingList />
               <Demo />
               <Footer />
             </motion.div>
