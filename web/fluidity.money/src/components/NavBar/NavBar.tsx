@@ -38,6 +38,7 @@ const NavBar = () => {
             <img src="/assets/images/textLogo.svg" alt="home page" />
           </a>
         </motion.div>
+
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <motion.div
@@ -62,6 +63,7 @@ const NavBar = () => {
             </GeneralButton>
           </div>
         </div>
+
         <motion.div
           className={styles.navbar}
           variants={scrollVariants}
@@ -80,7 +82,9 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    <Text size="md">HOW IT WORKS</Text>
+                    <Text size={width < breakpoint ? "sm" : "md"}>
+                      HOW IT WORKS
+                    </Text>
                   </a>
                 </li>
                 {/* <li>
@@ -116,7 +120,9 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    <Text size="md">RESOURCES</Text>
+                    <Text size={width < breakpoint ? "sm" : "md"}>
+                      RESOURCES
+                    </Text>
                   </a>
 
                   <button onClick={() => handleModal()}>

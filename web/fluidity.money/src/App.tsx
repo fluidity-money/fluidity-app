@@ -36,7 +36,6 @@ function App() {
               {/* <Route path="/fluidstats" element={<FluidStatsPage /> */}
 
               <Route path="/resources" element={<ResourcesPage />} />
-
             </Routes>
           </div>
         </Router>
@@ -46,3 +45,19 @@ function App() {
 }
 
 export default App;
+
+const logo = "./src/assets/images/logos/logoOutline.svg";
+const text = "fluidity";
+const button = {
+  children: "LAUNCH FLUIDITY",
+  version: "secondary",
+  type: "text",
+  size: "medium",
+  handleClick: () => {},
+};
+const navLinks = [
+  { name: "how it works", modal: false },
+  // { name: "ecosystem", modal: false },
+  // { name: "fluid stats", modal: false },
+  { name: "resources", modal: true },
+];
