@@ -2,9 +2,8 @@ import React from "react";
 
 import styles from "./TokenBadge.module.scss";
 
-import pickCss from "../util/pickCss";
-
 interface TokenBadgeProps {
+  imageSrc : string;
   children ?: React.ReactNode;
 };
 

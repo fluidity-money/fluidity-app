@@ -24,12 +24,12 @@ export const TitleSubtitleGlowImageModal = ({
   winningsUsd,
   totalBalanceFluidAsset,
   fluidAssetName
-}: Props) =>
-  <div class={ styles.container }>
+}: TitleSubtitleGlowImageModalProps) =>
+  <div className={ styles.container }>
     <TitleSubtitle
       title="Get. That. Money."
       subtitle={`$${unclaimedPrizesUsd} USD in unclaimed prizes.`}
-      subtitleSize="s"
+      subtitleSize="xs"
       center />
 
     <ImageAura>
@@ -41,11 +41,11 @@ export const TitleSubtitleGlowImageModal = ({
        subtitle={`($${winningsUsd} USD)`}
        center />
 
-     <Text center size="s">
+     <Text center size="md">
        Won for <a href="#">sending</a> Fluid Assets.
      </Text>
 
-     <Text center size="s">
+     <Text center size="md">
        { winningsFluidAsset} { fluidAssetName } total balance
      </Text>
   </div>;

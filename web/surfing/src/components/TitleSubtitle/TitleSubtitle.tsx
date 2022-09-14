@@ -5,8 +5,6 @@ import styles from "./TitleSubtitle.module.scss";
 import { Display } from "../Display";
 import Text from "../Text";
 
-import pickCss from "../util/pickCss";
-
 interface TitleSubtitleProps {
   title : string | React.ReactNode;
   subtitle : string | React.ReactNode;
