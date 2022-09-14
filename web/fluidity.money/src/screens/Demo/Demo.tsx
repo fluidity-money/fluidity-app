@@ -2,16 +2,17 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { useChainContext } from "hooks/ChainContext";
+import useViewport from "hooks/useViewport";
 import {
   Display,
   GeneralButton,
   Heading,
+  Text,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
-import { useChainContext } from "hooks/ChainContext";
 import Video from "components/Video";
 import styles from "./Demo.module.scss";
-import useViewport from "hooks/useViewport";
 
 const Demo = () => {
   const { apiState } = useChainContext();
@@ -44,18 +45,18 @@ const Demo = () => {
           >
             {numberToMonetaryString(weekTotalRewards)}
           </Display>
-          <Heading
-            as={width > breakpoint ? "h2" : "h4"}
-            className={styles.gray}
+          <Display
+            extraSmall={width > breakpoint}
+            xxs={width <= breakpoint}
+            color={"gray"}
           >
             Fluid prizes claimed in the last week.
-          </Heading>
-          <Heading
-            as={width > breakpoint ? "h4" : "h5"}
-            className={styles.gray}
+          </Display>
+          <Text
+            size={width > breakpoint ? "xl" : "lg"}
           >
-            Connect your wallet to see what you could make
-          </Heading>
+            Connect your wallet to see what you could make.
+          </Text>
           <section>
             {/* <GeneralButton version={"primary"} buttonType={"text"} size={"medium"} handleClick={function (): void {       
             } }>

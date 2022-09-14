@@ -10,12 +10,12 @@
 
   div {
     display: flex;
+    text-align: center;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: absolute;
     width: 50%;
-    min-height: 400px;
     gap: 20px;
 
     h1 {
@@ -33,7 +33,6 @@
     }
 
     @include max-860px {
-      text-align: center;
       width: 70%;
     }
   }
