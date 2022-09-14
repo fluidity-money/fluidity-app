@@ -1,5 +1,14 @@
+import { Helmet } from "react-helmet";
+
 const Assets = () => {
-  return <div>Assets</div>;
+  return (
+    <>
+      Assets
+      <Helmet>
+        <title>Assets Dashboard - Fluidity</title>
+      </Helmet>
+    </>
+  );
 };
 
 export default Assets;

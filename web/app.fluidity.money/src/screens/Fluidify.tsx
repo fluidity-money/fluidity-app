@@ -1,4 +1,13 @@
+import { Helmet } from "react-helmet";
+
 const Fluidify = () => {
-  return <div>Fluidify</div>;
+  return (
+    <>
+      Fluidify
+      <Helmet>
+        <title>Fluidify your money - Fluidity</title>
+      </Helmet>
+    </>
+  );
 };
 export default Fluidify;

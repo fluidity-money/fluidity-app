@@ -1,6 +1,7 @@
 import type { FallbackRender } from "@sentry/react";
 
 import { Display, Text } from "@fluidity-money/surfing";
+import { Helmet } from "react-helmet";
 
 type ErrorProps = {
   error: Error;
@@ -33,6 +34,10 @@ const Error: FallbackRender = ({ error, resetError }: ErrorProps) => {
       </Text>
 
       <button onClick={resetError}>Retry</button>
+
+      <Helmet>
+        <title>An error has occured - Fluidity</title>
+      </Helmet>
     </>
   );
 };

@@ -29,6 +29,7 @@
     "@fluidity-money/surfing": "^0.0.30",
     "@sentry/react": "^7.12.1",
     "@sentry/tracing": "^7.12.1",
+    "@types/jest": "^29.0.2",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/react-helmet": "^6.1.5",
@@ -45,6 +46,7 @@
     "prettier": "^2.7.1",
     "react-helmet": "^6.1.0",
     "relay-compiler": "^14.1.0",
+    "ts-jest": "^29.0.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.7",
     "vite-tsconfig-paths": "^3.5.0"

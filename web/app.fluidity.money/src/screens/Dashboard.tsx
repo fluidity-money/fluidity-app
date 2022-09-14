@@ -1,8 +1,13 @@
+import { Helmet } from "react-helmet";
+
 const Dashboard = () => {
   return (
-    <div>
+    <>
       <h1>Dashboard</h1>
-    </div>
+      <Helmet>
+        <title>Dashboard - Fluidity</title>
+      </Helmet>
+    </>
   );
 };
 

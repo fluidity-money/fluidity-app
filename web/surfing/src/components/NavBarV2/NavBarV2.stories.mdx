@@ -1,0 +1,19 @@
+import { Title, Subtitle, Canvas, Meta, Story } from "@storybook/addon-docs";
+import NavBarV2, {Item} from "./NavBarV2";
+
+<Title>Navigation Bar</Title>
+<Subtitle>A versatile navigation bar component, for all devices.</Subtitle>
+
+<Meta title="Navigation/Navigation Bar"/>
+
+export const Template = (args) => <NavBarV2 {...args}>
+    <Item>Test</Item>
+    <Item>Test</Item>
+    <Item>Test</Item>
+</NavBarV2>;
+
+<Canvas>
+    <Story name="Navigation Bar" args={{}}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
