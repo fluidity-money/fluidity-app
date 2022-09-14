@@ -27,6 +27,7 @@
 }
 
 .socialText {
-  font-size: 8px;
-  font-family: "Aeonik Mono";
+  // Important here because surfing keeps overriding styles
+  font-size: 8px !important;
+  font-family: "Aeonik Mono" !important;
 }
