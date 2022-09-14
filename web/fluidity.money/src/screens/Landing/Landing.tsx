@@ -38,7 +38,7 @@ const Landing = () => {
 
   const [state, setState] = useState({
     src: vidSources[0],
-    mimeType: ["quicktime", "webm"],
+    mimeType: ["video/quicktime", "video/webm"],
     key: "0",
     loop: false,
     scale: 0.7,
