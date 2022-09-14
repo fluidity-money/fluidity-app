@@ -7,14 +7,14 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 // Pages
 import { RelayEnvironmentProvider } from "react-relay";
-import { ChainContextProvider } from "./hooks/ChainContext";
-import NavBar from "./components/NavBar";
-import LandingPage from "./pages/LandingPage";
-import EcosystemPage from "./pages/EcosystemPage";
-import HowItWorksPage from "./pages/HowItWorksPage";
-import ResourcesPage from "./pages/ResourcesPage";
-import fluRelayEnvironment from "./data/relayEnvironment";
 import useViewport from "hooks/useViewport";
+import { ChainContextProvider } from "hooks/ChainContext";
+import fluRelayEnvironment from "data/relayEnvironment";
+import NavBar from "components/NavBar";
+import LandingPage from "pages/LandingPage";
+import EcosystemPage from "pages/EcosystemPage";
+import HowItWorksPage from "pages/HowItWorksPage";
+import ResourcesPage from "pages/ResourcesPage";
 import MobileNavBar from "components/MobileNavBar";
 import "./styles/app.global.scss";
 import "@fluidity-money/surfing/dist/style.css";
@@ -36,6 +36,7 @@ function App() {
               {/* <Route path="/fluidstats" element={<FluidStatsPage /> */}
 
               <Route path="/resources" element={<ResourcesPage />} />
+
             </Routes>
           </div>
         </Router>
@@ -45,19 +46,3 @@ function App() {
 }
 
 export default App;
-
-const logo = "./src/assets/images/logos/logoOutline.svg";
-const text = "fluidity";
-const button = {
-  children: "LAUNCH FLUIDITY",
-  version: "secondary",
-  type: "text",
-  size: "medium",
-  handleClick: () => {},
-};
-const navLinks = [
-  { name: "how it works", modal: false },
-  // { name: "ecosystem", modal: false },
-  // { name: "fluid stats", modal: false },
-  { name: "resources", modal: true },
-];
