@@ -2,6 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE.md file.
 
-import ScreenGetThatMoney from "./ScreenGetThatMoney";
+import Center from "./Center";
 
-export default ScreenGetThatMoney;
+export default Center;

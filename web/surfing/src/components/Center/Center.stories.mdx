@@ -1,0 +1,22 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import Center from "./Center";
+
+<Meta
+  title="Center"
+  component={Center}
+/>
+
+export const Template = Center;
+
+<Canvas columns={1} withSource="open" withToolbar >
+  <Story
+    name="Default Center"
+    args={{
+      component: "div",
+      children: <h1>Content lives here</h1>
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

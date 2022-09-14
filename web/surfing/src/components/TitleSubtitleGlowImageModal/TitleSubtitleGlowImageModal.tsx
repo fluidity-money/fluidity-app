@@ -1,6 +1,6 @@
 import React from "react";
 
-import styles from "./ScreenGetThatMoney.module.scss";
+import styles from "./TitleSubtitleGlowImageModal.module.scss";
 
 import TitleSubtitle from "../TitleSubtitle";
 import TokenBadge from "../TokenBadge";
@@ -8,7 +8,7 @@ import ImageAura from "../ImageAura";
 import Text from "../Text";
 import GeneralButton from "../Button/GeneralButton";
 
-interface ScreenGetThatMoneyProps {
+interface TitleSubtitleGlowImageModalProps {
   unclaimedPrizesUsd : number;
   tokenBadgeSrc : string;
   winningsFluidAsset : number;
@@ -17,19 +17,18 @@ interface ScreenGetThatMoneyProps {
   fluidAssetName : string;
 };
 
-export const ScreenGetThatMoney = ({
+export const TitleSubtitleGlowImageModal = ({
   unclaimedPrizesUsd,
   tokenBadgeSrc,
   winningsFluidAsset,
   winningsUsd,
   totalBalanceFluidAsset,
   fluidAssetName
-}:
-  ScreenGetThatMoneyProps) =>
+}: Props) =>
   <div class={ styles.container }>
     <TitleSubtitle
       title="Get. That. Money."
-      subtitle={`${unclaimedPrizesUsd} USD in unclaimed prizes.`}
+      subtitle={`$${unclaimedPrizesUsd} USD in unclaimed prizes.`}
       subtitleSize="s"
       center />
 
@@ -39,22 +38,16 @@ export const ScreenGetThatMoney = ({
 
      <TitleSubtitle
        title={`${winningsFluidAsset} ${fluidAssetName}`}
-       subtitle="(${winningsUsd} USD)"
+       subtitle={`($${winningsUsd} USD)`}
        center />
 
-     <Text center size="s">Won for sending Fluid Assets.</Text>
+     <Text center size="s">
+       Won for <a href="#">sending</a> Fluid Assets.
+     </Text>
 
      <Text center size="s">
        { winningsFluidAsset} { fluidAssetName } total balance
      </Text>
-
-     <GeneralButton
-       type="text"
-       size="medium"
-       version="primary"
-     >
-       Winnings Breakdown
-     </GeneralButton>
   </div>;
 
-export default ScreenGetThatMoney;
+export default TitleSubtitleGlowImageModal;

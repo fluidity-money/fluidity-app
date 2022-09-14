@@ -1,6 +1,7 @@
 import React from "react";
 
 import styles from "./ImageAura.module.scss";
+import Center from "../Center";
 
 interface ImageAuraProps {
   children ?: React.ReactNode;
@@ -8,14 +9,10 @@ interface ImageAuraProps {
 };
 
 export const ImageAura = ({ children, backgroundColour="#2775CA", ...props }: ImageAuraProps) =>
-  <div
-    class={ styles.container }
-    styles={{
-      backgroundColor: backgroundColour
-    }}
-    { ...props }
-    >
-     { children }
-  </div>;
+  <Center>
+    <div className={ styles.container } { ...props }>
+       { children }
+    </div>
+  </Center>;
 
 export default ImageAura;

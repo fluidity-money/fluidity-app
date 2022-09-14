@@ -1,19 +1,16 @@
 import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
-import ScreenGetThatMoney from "./ScreenGetThatMoney";
+import TitleSubtitleGlowImageModal from "./TitleSubtitleGlowImageModal";
 
-<Meta
-  title="ScreenGetThatMoney"
-  component={ScreenGetThatMoney}
-/>
+<Meta title="TitleSubtitleGlowImageModal" component={TitleSubtitleGlowImageModal} />
 
-export const Template = ScreenGetThatMoney;
+export const Template = TitleSubtitleGlowImageModal;
 
 <Canvas columns={1} withSource="open" withToolbar >
   <Story
-    name="ScreenGetThatMoney USDC"
+    name="TitleSubtitleGlowImageModal USDC"
     args={{
-      unclaimedPrizes: 23000,
+      unclaimedPrizesUsd: 23000,
       tokenBadgeSrc: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=023",
       winningsFluidAsset: 23.535921,
       winningsUsd: 23.54,

@@ -8,8 +8,8 @@ import Text from "../Text";
 import pickCss from "../util/pickCss";
 
 interface TitleSubtitleProps {
-  title : string;
-  subtitle : string;
+  title : string | React.ReactNode;
+  subtitle : string | React.ReactNode;
 
   subtitleSize ?: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
 
@@ -17,7 +17,7 @@ interface TitleSubtitleProps {
 };
 
 export const TitleSubtitle = ({ title, subtitle, subtitleSize="lg", center } : TitleSubtitleProps) =>
-  <div>
+  <div className={ styles.container }>
     <Display noMarginBottom extraSmall center={ center }>
       {title}
     </Display>

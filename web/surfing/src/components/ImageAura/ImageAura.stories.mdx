@@ -1,6 +1,7 @@
 import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import ImageAura from "./ImageAura";
+import TokenBadge from "../TokenBadge";
 
 <Meta
   title="ImageAura"
@@ -13,7 +14,8 @@ export const Template = ImageAura;
   <Story
     name="Default ImageAura"
     args={{
-      children: <h1>Content lives here</h1>
+      children: <TokenBadge
+        imageSrc="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=023" />
     }}
   >
     {Template.bind({})}

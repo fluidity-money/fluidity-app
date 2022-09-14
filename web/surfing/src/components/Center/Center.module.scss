@@ -1,0 +1,13 @@
+@use 'common' as *;
+
+.container {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.final {
+    display: block;
+}
