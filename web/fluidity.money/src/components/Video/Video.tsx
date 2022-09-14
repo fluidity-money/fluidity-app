@@ -5,7 +5,7 @@
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
-  src: string;
+  src: string | string[];
   type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
   loop: boolean;
   display?: "none" | "inline";
@@ -16,12 +16,14 @@ interface IPropsVideo {
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
   className?: string;
+  mimeType?: string | string[];
 }
 
 export const Video = ({
   key,
   src,
   type,
+  mimeType = "video/mp4",
   loop,
   display="inline",
   scale=1,
@@ -32,7 +34,6 @@ export const Video = ({
   className,
   ...props
 }: IPropsVideo) => {
-  let ext = src.split(".").pop();
   
   const classProps = className || "";
 
@@ -54,7 +55,8 @@ export const Video = ({
       onPlaying={onLoad}
       {...props}
     >
-      <source src={src} type={"video/" + ext} />
+      {Array.isArray(src) ?
+        src.map((v, i) => {return <source src={v} type={mimeType[i]} />}) :  <source src={src} type={mimeType as string} /> }
     </video>
   );
 };

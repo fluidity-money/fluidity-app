@@ -15,15 +15,30 @@ import styles from "./Landing.module.scss";
 import { relative } from "path";
 
 const Landing = () => {
-  const vidSources = ["/assets/videos/FluidityHome.mp4", "/assets/videos/FluidityHomeloop.mp4"].map(link =>
+  const fqVidSources = [
+    "/assets/videos/FluidityHome.mov",
+    "/assets/videos/FluidityHome.webm",
+    "/assets/videos/FluidityHomeloop.mov",
+    "/assets/videos/FluidityHomeloop.webm"
+  ].map(link =>
     window.location.origin + link
   )
+
+  const vidSources = [
+    [
+      fqVidSources[0], fqVidSources[1]
+    ],
+    [
+      fqVidSources[2], fqVidSources[3]
+    ]
+  ]
 
   const [ onHomeVidLoaded, setOnHomeVidLoaded ] = useState(false);
   const [ homeVidEnded, setHomeVidEnded ] = useState(false);
 
   const [state, setState] = useState({
     src: vidSources[0],
+    mimeType: ["quicktime", "webm"],
     key: "0",
     loop: false,
     scale: 0.7,
@@ -33,6 +48,7 @@ const Landing = () => {
     homeVidEnded &&
       setState({
         src: vidSources[1],
+        mimeType: ["video/quicktime", "video/webm"],
         key: "1",
         loop: true,
         scale: 0.5,
@@ -67,10 +83,10 @@ const Landing = () => {
           <Video
             src={state.src}
             type={"reduce"}
+            mimeType={state.mimeType}
             loop={state.loop}
             key={state.key}
             scale={state.scale}
-            opacity = {.4}
             margin = {"200px 0 0 0"}
             onLoad={!homeVidEnded 
               ? () => setOnHomeVidLoaded(true)
@@ -93,11 +109,11 @@ const Landing = () => {
           <Video
             src={state.src}
             type={"reduce"}
+            mimeType={state.mimeType}
             loop={state.loop}
             key={state.key}
             scale={state.scale * 2}
             margin = {"-400px 0 0 0"}
-            opacity = {.6}
             onLoad={!homeVidEnded 
               ? () => setOnHomeVidLoaded(true)
               : () => {}
