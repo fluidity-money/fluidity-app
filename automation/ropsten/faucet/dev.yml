@@ -34,6 +34,7 @@ SERVICES:
       SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ropsten/token_list
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
       SECRET_FLU_ETHEREUM_FAUCET_PRIVATE_KEY: /fluidity/faucet/private_key
+      TASK_MIN_COUNT: 1
       
   - SOL_FAUCET_SEND_AMOUNTS:
       SERVICE_NAME: microservice-solana-faucet-send-amounts
@@ -49,3 +50,4 @@ SERVICES:
       ENV_FLU_WORKER_ID: ethereum-ropsten-connector-common-twitter-hashtag-amqp
       SECRET_FLU_TWITTER_BEARER_TOKEN: /fluidity/faucet/twitter_bearer_token
       ENV_FLU_TWITTER_HASHTAGS: fluiditymoney
+      TASK_MIN_COUNT: 1
