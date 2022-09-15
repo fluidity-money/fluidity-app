@@ -67,12 +67,14 @@ const Fluniversity = () => {
 
               <Heading as="h4">{item.title}</Heading>
               <Text as="p">{item.desc}</Text>
-              <Text>{item.time} mins read</Text>
-              <Text>
-                <a href={item.link}>
-                  FLUNIVERSITY <i>*</i>
-                </a>
-              </Text>
+              <div className={styles.footer}>
+                <Text>{item.time} mins read</Text>
+                <Text>
+                  <a href={item.link}>
+                    FLUNIVERSITY <i>*</i>
+                  </a>
+                </Text>
+              </div>
             </div>
           ))}
         </ManualCarousel>
