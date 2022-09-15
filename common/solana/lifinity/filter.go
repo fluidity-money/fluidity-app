@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
 	"math/big"
 	"strings"
 
@@ -39,11 +40,62 @@ type FeeData struct {
 	Percent float32	`json:"percent"`
 }
 
+func GetLogFees(logs []string, lifinityProgramID string, transactionSignature string) (logFees []uint64, err error) {
+
+	var (
+		startString  = fmt.Sprintf("Program %s invoke", lifinityProgramID)
+		endString    = fmt.Sprintf("Program %s consumed", lifinityProgramID)
+		searchString = "Program log: TotalFee: "
+		inSwapLogs   = false
+	)
+
+
+	for i, logString := range logs {
+
+		if !inSwapLogs {
+			if strings.HasPrefix(logString, startString) {
+				inSwapLogs = true
+			}
+
+			continue
+		}
+
+		if strings.HasPrefix(logString, endString) {
+			inSwapLogs = false
+
+			continue
+		}
+
+		if strings.HasPrefix(logString, searchString) {
+			var feeData FeeData
+
+			substring := logString[len(searchString):]
+			err := json.Unmarshal([]byte(substring), &feeData)
+
+			if err != nil {
+				return nil, fmt.Errorf(
+					"failed to parse fee from log line %v in %#v! %v",
+					i,
+					transactionSignature,
+					err,
+				)
+			}
+
+			logFees = append(logFees, feeData.Fee)
+		}
+
+	}
+
+	return logFees, nil
+
+}
+
 func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionResult, lifinityProgramID string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 	
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
 		accountKeys          = transaction.Transaction.Message.AccountKeys
+		adjustedPrices         []*big.Rat
 	)
 
 	allInstructions := solLib.GetAllInstructions(transaction)
@@ -109,10 +161,10 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 			transactionSignature,
 		)
 
-		instructionAccounts := instruction.Accounts
 
 		var (
 			// get user source & destination accounts
+			instructionAccounts = instruction.Accounts
 			userSourceSplAccount      = accountKeys[instructionAccounts[5]]
 			userDestinationSplAccount = accountKeys[instructionAccounts[6]]
 		)
@@ -211,6 +263,10 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 				)
 			})
 
+			// add an empty entry to adjustedPrices to maintain correspondence
+			emptyRat := big.NewRat(0, 1)
+			adjustedPrices = append(adjustedPrices, emptyRat)
+
 			continue
 		}
 
@@ -241,8 +297,6 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 			}
 		}
 
-		logs := transaction.Meta.Logs
-
 		price, err := pyth.GetPriceByToken(solanaClient, sourceMint.String())
 
 		if err != nil {
@@ -261,57 +315,47 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 			transactionSignature,
 			price,
 		)
+		
+		// Adjust token price by decimals
+		decimalScalingFactor := math.Pow10(int(decimals))
+		decimalRat := new(big.Rat).SetFloat64(decimalScalingFactor)
 
-		var (
-			startString  = fmt.Sprintf("Program %s invoke", lifinityProgramID)
-			endString    = fmt.Sprintf("Program %s consumed", lifinityProgramID)
-			searchString = "Program log: TotalFee: "
-		)
-
-		inSwapLogs := false
-
-		for i, logString := range logs {
-
-			if !inSwapLogs {
-				if strings.HasPrefix(logString, startString) {
-					inSwapLogs = true
-				}
-
-				continue
-			}
-
-			if strings.HasPrefix(logString, endString) {
-				inSwapLogs = false
-
-				continue
-			}
-
-			if strings.HasPrefix(logString, searchString) {
-				var feeData FeeData
-
-				err := json.Unmarshal([]byte(logString[len(searchString):]), &feeData)
-
-				if err != nil {
-					return nil, fmt.Errorf(
-						"failed to parse fee from log line %v in instruction %v in %#v! %v",
-						i,
-						instructionNumber,
-						transactionSignature,
-						err,
-					)
-				}
-
-				feeAmount := spl_token.AdjustDecimals(int64(feeData.Fee), int(decimals))
-
-				// normalise to USD
-				feeAmount = feeAmount.Mul(feeAmount, price)
-
-				feesPaid.Add(feesPaid, feeAmount)
-			}
-
-		}
-
+		adjustedPrice := price.Quo(price, decimalRat)
+		adjustedPrices = append(adjustedPrices, adjustedPrice)
 	}
+
+	logFees, err := GetLogFees(transaction.Meta.Logs, lifinityProgramID, transactionSignature)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to get fees from logs in %#v! %v",
+			transactionSignature,
+			err,
+		)
+	}
+
+	// adjustedPrices and logFeeDatas should have exact correspondence
+	// lack of correspondence likely indicates error in log processing
+
+	if len(adjustedPrices) != len(logFees) {
+		return nil, fmt.Errorf(
+			"failed to parse fee from log line %v in %#v! %v",
+			"lifinity swap token price count (%v) and logged fee count (%v) did not match!",
+			len(adjustedPrices),
+			len(logFees),
+		)
+	}
+
+	for i, price := range adjustedPrices {
+
+		fee := logFees[i]
+		feeAmount := big.NewRat(int64(fee), 1)
+
+		// normalise to USD
+		feeAmount = feeAmount.Mul(feeAmount, price)
+
+		feesPaid.Add(feesPaid, feeAmount)
+	}	
 
 	return feesPaid, nil
 }
