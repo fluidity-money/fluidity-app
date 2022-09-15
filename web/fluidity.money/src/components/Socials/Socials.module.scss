@@ -8,8 +8,8 @@
     gap: 10px;
 
     .imageContainer {
-      width: 14px;
-      height: 18px;
+      width: 11px;
+      height: 19px;
 
       img {
         max-width: 100%;
@@ -24,4 +24,10 @@
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.socialText {
+  // Important here because surfing keeps overriding styles
+  font-size: 8px !important;
+  font-family: "Aeonik Mono" !important;
 }

@@ -23,26 +23,34 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
   return (
     <div className={styles.cardContainer}>
       <img src={article.img} />
-      <Heading as="h3" className={styles.leftMargin10px}>{article.title}</Heading>
-      <Text as="p">{article.desc}</Text>
-      <Text as="p">{article.info}</Text>
+      <Heading as="h4" className={styles.leftMargin10px}>
+        {article.title}
+      </Heading>
+      <Text size="md" as="p">
+        {article.desc}
+      </Text>
+      <Text size="md" as="p">
+        {article.info}
+      </Text>
       <section>
         {article.isResourcesPage ? (
           <a href="https://blog.fluidity.money/">
             <GeneralButton
               version={"secondary"}
-              type={"text"}
-              size={"medium"}
+              buttonType={"text"}
+              size={"large"}
               handleClick={function (): void {}}
             >
               ALL ARTICLES
             </GeneralButton>
-         </a>  
+
+          </a>
+
         ) : (
           <a href="/resources">
             <LinkButton
               type={"internal"}
-              size={"medium"}
+              size={"large"}
               handleClick={function (): void {}}
             >
               EXPLORE ALL RESOURCES

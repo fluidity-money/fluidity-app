@@ -7,21 +7,23 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/lib/aws"
+	"github.com/fluidity-money/fluidity-app/common/aws"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	awsCommon "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/ssm"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
@@ -35,9 +37,16 @@ const (
 	// containing oracles that need to be updated, and their respective
 	// contract addresses of the form contract1:param1,contract2:param2,...
 	EnvOracleParametersList = `FLU_ORACLE_UPDATE_LIST`
-)
 
-const bucketAcl = s3.BucketCannedACLPrivate
+	// EnvGethHttpUrl to use when performing RPC requests
+	EnvGethHttpUrl = `FLU_ETHEREUM_HTTP_URL`
+
+	// EnvAwsClusterName to determine which cluster to restart the services in
+	EnvAwsClusterName = `FLU_AWS_CLUSTER`
+
+	// EnvAwsServiceName to match services that include it in their names
+	EnvAwsServiceName = `FLU_AWS_SERVICE`
+)
 
 func main() {
 	lambda.Start(rotateOracleKeys)
@@ -45,8 +54,11 @@ func main() {
 
 func rotateOracleKeys() {
 	var (
-		awsRegion  = util.GetEnvOrFatal(EnvAwsRegion)
-		bucketName = util.GetEnvOrFatal(EnvOracleBucketName)
+		awsRegion   = util.GetEnvOrFatal(EnvAwsRegion)
+		bucketName  = util.GetEnvOrFatal(EnvOracleBucketName)
+		gethHttpUrl = util.GetEnvOrFatal(EnvGethHttpUrl)
+		clusterName = util.GetEnvOrFatal(EnvAwsClusterName)
+		serviceName = util.GetEnvOrFatal(EnvAwsServiceName)
 
 		oracleParametersList = oracleParametersListFromEnv(EnvOracleParametersList)
 	)
@@ -62,6 +74,17 @@ func rotateOracleKeys() {
 			k.Payload = err
 		})
 	}
+
+	ethClient, err := ethclient.Dial(gethHttpUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to connect to Geth Websocket!"
+			k.Payload = err
+		})
+	}
+
+	defer ethClient.Close()
 
 	// ensure output bucket exists
 	err = aws.WaitUntilBucketExists(session, bucketName)
@@ -79,8 +102,9 @@ func rotateOracleKeys() {
 	var (
 		fileContent string
 
-		timestamp = time.Now().UTC().String()
-		fileName  = "Oracle Update " + timestamp
+		signedTxnAttachments = make(map[string]io.Reader)
+		timestamp            = time.Now().UTC().String()
+		fileName             = "Oracle Update " + timestamp
 	)
 
 	// update each oracle in sequence
@@ -131,6 +155,15 @@ func rotateOracleKeys() {
 			})
 		}
 
+		err = createAndSignSendTransaction(ethClient, previousOracleAddress, newOraclePublicKey, contractAddress, oldOraclePrivateKey, signedTxnAttachments)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to create and sign the send transaction!"
+				k.Payload = err
+			})
+		}
+
 		// convert the new key to hex to update the parameter
 		keyBytes := ethCrypto.FromECDSA(newOraclePrivateKey)
 		newOraclePrivateKeyHex := hexutil.Encode(keyBytes)[2:]
@@ -151,8 +184,8 @@ func rotateOracleKeys() {
 		ssmClient := ssm.New(session)
 
 		input := &ssm.PutParameterInput{
-			Name:  &parameter,
-			Value: &newOraclePrivateKeyHex,
+			Name:      &parameter,
+			Value:     &newOraclePrivateKeyHex,
 			Overwrite: awsCommon.Bool(true),
 		}
 
@@ -188,4 +221,25 @@ func rotateOracleKeys() {
 		k.Message = "Uploaded oracle transaction to bucket successfully!"
 		k.Payload = uploadLogsOutput
 	})
+
+	// send a discord message containing the public URL, with Eth transfer
+	// transactions as attachments
+	bucketUrl := uploadLogsOutput.Location
+
+	discordMessage := fmt.Sprintf("Uploaded log to S3 bucket at URL: %v", bucketUrl)
+
+	discord.NotifyWithAttachment(
+		discord.SeverityNotice,
+		discordMessage,
+		signedTxnAttachments,
+	)
+
+	err = aws.RestartTasksMatchingServiceName(session, clusterName, serviceName)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to restart worker tasks!"
+			k.Payload = err
+		})
+	}
 }

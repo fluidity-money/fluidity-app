@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import styles from "./ContinuousCarousel.module.scss";
 
 interface IContinuousCarousel {

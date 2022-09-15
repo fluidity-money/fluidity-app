@@ -3,7 +3,7 @@ name: Mainnet (Auto)
 on:
   pull_request:
     branches:
-      - production
+      - develop
     types:
       - closed
 

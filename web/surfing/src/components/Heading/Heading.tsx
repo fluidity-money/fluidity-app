@@ -9,6 +9,7 @@ type Props = {
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   className?: string;
   hollow?: boolean;
+  black?: boolean;
 };
 
 const Heading = ({
@@ -16,12 +17,13 @@ const Heading = ({
   as = "h1",
   className,
   hollow,
+  black,
   ...props
 }: Props & unknown) => {
   const Component = as || "h1";
   const _className = `${styles[as]} ${className || ""} ${
     hollow && styles.hollow
-  }`;
+  } ${black && styles.black}`;
 
   return (
     <Component {...props} className={_className}>

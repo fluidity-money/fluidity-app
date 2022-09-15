@@ -10,13 +10,15 @@ const ArticleListCard = (article: ArticleType) => {
   return (
     <div className={styles.listCardContainer}>
       <Heading as="h4">{article.title}</Heading>
-      <Text as="p">{article.desc}</Text>
+      <Text size="md" as="p">
+        {article.desc}
+      </Text>
       <section>
         {article.info}
         <LinkButton
           size={"small"}
           type={"external"}
-          handleClick={() => window.location.href = article.link}
+          handleClick={() => (window.location.href = article.link)}
         >
           {article.linkTitle}
         </LinkButton>

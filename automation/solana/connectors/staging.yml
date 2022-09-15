@@ -12,4 +12,4 @@ SERVICES:
       DOCKER_IMAGE: connector-common-blocked-payouts-reporting
       DOCKERFILE_PATH: ./cmd/connector-common-blocked-payouts-reporting
       ENV_FLU_WORKER_ID: solana-staging-connector-common-blocked-payouts-reporting
-      ENV_FLU_DISCORD_WEBHOOK: /fluidity/discord/blocked_payouts/webhook
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/blocked_payouts/webhook

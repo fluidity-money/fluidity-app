@@ -3,5 +3,41 @@
   justify-content: center;
   align-items: center;
   min-height: 850px;
+  height: 100%;
   width: 100%;
+  
+  .video {
+    // Cleaner but doesn't work - Maybe revisit
+    // &:before {
+    //  display: inline-block;
+    //  position: absolute;
+    //  background: linear-gradient(298.63deg, #000000 -4.7%, rgba(0, 0, 0, 0) 31.44%), linear-gradient(68.1deg, #000000 -6.08%, rgba(0, 0, 0, 0) 31.12%), linear-gradient(360deg, #000000 0%, rgba(0, 0, 0, 0) 34.32%), linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 25.97%), linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0) 13.53%), linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 34.04%);
+    //  content: '';
+    // }
+  }
+
+  .clip {
+    position: absolute;
+    margin-right: 400px;
+    min-height: 450px;
+    min-width: 800px;
+
+    background: linear-gradient(298.63deg, #000000 -4.7%, rgba(0, 0, 0, 0) 31.44%), linear-gradient(68.1deg, #000000 -6.08%, rgba(0, 0, 0, 0) 31.12%), linear-gradient(360deg, #000000 0%, rgba(0, 0, 0, 0) 34.32%), linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 25.97%), linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0) 13.53%), linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 34.04%);
+  }
+  
+  .smallVid {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .smallClip {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(298.63deg, #000000 -4.7%, rgba(0, 0, 0, 0) 31.44%), linear-gradient(68.1deg, #000000 -6.08%, rgba(0, 0, 0, 0) 31.12%), linear-gradient(360deg, #000000 0%, rgba(0, 0, 0, 0) 34.32%), linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 25.97%), linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0) 13.53%), linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 34.04%);
+  }
 }
+
+

@@ -5,49 +5,60 @@
 import styles from "./Display.module.scss";
 
 type DisplayProps = {
-  children : React.ReactNode;
+  children: React.ReactNode;
+  xxs?: boolean
+  extraSmall?: boolean
+  small?: boolean
+  medium?: boolean
+  large?: boolean
+  color?: "white" | "gray";
+  center?: boolean;
+  noMarginBottom?: boolean;
 
-  extraSmall ?: boolean;
-  small ?: boolean;
-  medium ?: boolean;
-  large ?: boolean;
-
-  center ?: boolean;
-  noMarginBottom ?: boolean;
-
-  [key : string] : any
+  [key: string]: any
 };
 
 const Display =
-  ({ children, large = true, center, noMarginBottom, ...props } : DisplayProps) =>
-{
-  const sizeMap = {
-    "extraSmall": "xs",
-    "small": "sm",
-    "medium": "md",
+  ({
+    children,
+    large = true,
+    center,
+    color="white",
+    noMarginBottom,
+    ...props }: DisplayProps
+  ) => {
+    const sizeMap = {
+      "xxs": "xxs",
+      "extraSmall": "xs",
+      "small": "sm",
+      "medium": "md",
+    };
+
+    const size = Object.entries(sizeMap).reduce((acc, [key, value]) => {
+      if (props[key]) {
+        return value;
+      }
+      return acc;
+    }, "lg"); // Large is default if no size is specified.
+
+    const propClasses = props.className || "";
+
+    const { extraSmall, small, medium, large: _, ...rest } = props;
+
+    const centerProp = center ? styles.center : "";
+
+    const noMarginBottomProp = noMarginBottom ? styles.noMarginBottom : "";
+    
+    const sizeProps = styles[size];
+
+    const colorProps = styles[color];
+
+    const className =
+      ` ${styles.display} ${sizeProps} ${colorProps} ${centerProp} ${noMarginBottomProp} ${propClasses}`;
+
+    return <h1 {...rest} className={className}>
+      {children}
+    </h1>
   };
-
-  const size = Object.entries(sizeMap).reduce((acc, [key, value]) => {
-    if (props[key]) {
-      return value;
-    }
-    return acc;
-  }, "lg"); // Large is default if no size is specified.
-
-  const propClasses = props.className || "";
-
-  const { extraSmall, small, medium, large: _, ...rest } = props;
-
-  const propCenter = center ? styles.center : "";
-
-  const noMarginBottomProp = noMarginBottom ? styles.noMarginBottom : "";
-
-  const className =
-    `${styles[size]} ${styles.text} ${propClasses} ${propCenter} ${noMarginBottomProp}`;
-
-  return <h1 {...rest} className={className}>
-    {children}
-  </h1>
-};
 
 export default Display;

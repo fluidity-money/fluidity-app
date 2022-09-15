@@ -1,6 +1,7 @@
 @use 'common' as *;
 
 .button {
+  font-family: "Aeonik Mono";
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -10,9 +11,29 @@
   border: solid 2px transparent;
   border-radius: 0;
   text-transform: uppercase;
-  color: map-get($text, "prominent");
   background-color: transparent;
   cursor: pointer;
+  
+  .icon {
+    display: inline-block;
+  }
+  
+  &.white{
+    color: map-get($text, "prominent");
+    
+    .icon {
+      stroke: map-get($text, "prominent");
+    }
+  }
+  
+  &.gray {
+    color: map-get($text, "default");
+    
+    .icon {
+      stroke: map-get($text, "default");
+    }
+  }
+
   .icon {
     display: inline-block;
     stroke: map-get($text, "prominent");
@@ -42,7 +63,7 @@
       stroke: map-get($text, "prominent");
     }
   }
-  
+
   &:disabled {
     cursor: default;
     .text {

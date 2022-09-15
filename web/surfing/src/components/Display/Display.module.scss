@@ -1,12 +1,22 @@
 @use 'common' as *;
 
-.text {
+.display {
     font-family: "Whyte Inktrap", sans-serif;
     font-weight: 400;
     line-height: 1.2;
     letter-spacing: -0.02em;
 
-    color: map-get($text, "prominent")
+    &.white {
+        color: map-get($text, "prominent");
+    }
+
+    &.gray {
+        color: map-get($text, "default");
+    }
+}
+
+.xss {
+    font-size: $em-step * 8;
 }
 
 .xs {

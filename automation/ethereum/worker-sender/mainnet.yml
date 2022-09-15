@@ -5,6 +5,7 @@ ENV_FLU_ETHEREUM_GAS_LIMIT: 8000000
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
 ENV_FLU_ETHEREUM_WS_URL: wss://backend.ethereum.fluidity.money/updates
 ENV_FLU_ETHEREUM_LEGACY_CONTRACT: "true"
+TASK_MIN_COUNT: 1
 
 SERVICES:
  - SENDER_USDC:

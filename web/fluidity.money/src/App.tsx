@@ -1,6 +1,7 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
+//
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -11,7 +12,6 @@ import NavBar from "./components/NavBar";
 import LandingPage from "./pages/LandingPage";
 import EcosystemPage from "./pages/EcosystemPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
-import FluidStatsPage from "./pages/FluidStatsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import fluRelayEnvironment from "./data/relayEnvironment";
 import useViewport from "hooks/useViewport";
@@ -36,7 +36,6 @@ function App() {
               {/* <Route path="/fluidstats" element={<FluidStatsPage /> */}
 
               <Route path="/resources" element={<ResourcesPage />} />
-
             </Routes>
           </div>
         </Router>
@@ -46,3 +45,19 @@ function App() {
 }
 
 export default App;
+
+const logo = "./src/assets/images/logos/logoOutline.svg";
+const text = "fluidity";
+const button = {
+  children: "LAUNCH FLUIDITY",
+  version: "secondary",
+  type: "text",
+  size: "medium",
+  handleClick: () => {},
+};
+const navLinks = [
+  { name: "how it works", modal: false },
+  // { name: "ecosystem", modal: false },
+  // { name: "fluid stats", modal: false },
+  { name: "resources", modal: true },
+];

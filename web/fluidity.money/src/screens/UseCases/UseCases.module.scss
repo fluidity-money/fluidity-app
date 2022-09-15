@@ -4,6 +4,7 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
+  background-color: black;
 }
 
 .backgroundText {
@@ -15,4 +16,8 @@
 section {
   display: flex;
   align-items: center;
+}
+
+.map {
+  gap: 20px;
 }

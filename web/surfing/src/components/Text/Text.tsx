@@ -1,14 +1,13 @@
-import React from "react"
 import styles from "./Text.module.scss"
 
 type TextProps = {
-    children: React.ReactNode,
-    size?: "xs" | "sm" | "md" | "lg" | "xl" | "xxl",
-    prominent?: boolean,
-    className?: string,
-    as?: "span" | "p",
-    noMargin ?: boolean,
-    center ?: boolean;
+  children: React.ReactNode,
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "xxl",
+  prominent?: boolean,
+  className?: string,
+  as?: "span" | "p",
+  noMargin ?: boolean,
+  center ?: boolean;
 }
 
 const Text = ({
@@ -23,19 +22,18 @@ const Text = ({
 {
   const sizeProps = `${styles[size]}`
   const prominentProps = `${prominent ? styles.prominent : ""}`
-  const classNameProps = `${className || ""}`
+  const classNameProps = `${className || styles.text}`
 
-  const propCenter = center ? styles.center : "";
-
-  const classProps =
-    `${styles.text} ${sizeProps} ${prominentProps} ${classNameProps} ${propCenter}`;
+  const centerProp = center ? styles.center : "";
 
   const Component = as || "span";
 
+  const classProps = `${classNameProps} ${prominentProps} ${sizeProps} ${centerProp}`;
+
   return (
-    <Component {...props} className={classProps}>
+    <Component className={classProps} {...props}>
       {children}
-    </Component>
+   </Component>
   );
 }
 

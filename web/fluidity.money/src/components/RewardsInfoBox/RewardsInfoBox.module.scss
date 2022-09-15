@@ -4,6 +4,7 @@
   position: absolute;
   height: 294px;
   width: 496px;
+
   z-index: 2;
   @include max-620px {
     width: 296px;
@@ -37,7 +38,6 @@
 
     &:hover {
       opacity: 0.6;
-      
     }
   }
   h3 {
@@ -85,6 +85,8 @@
 
 .fadeIn {
   transition: opacity 3s ease;
+  display: flex;
+  justify-content: center;
 }
 
 .fadeOut {

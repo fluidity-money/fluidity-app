@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	microservice_lib "github.com/fluidity-money/fluidity-app/lib"
 	"github.com/stretchr/testify/assert"
 )
@@ -72,15 +71,14 @@ func TestGetHash(t *testing.T) {
 		[]byte("99999"),
 	}
 	results := []string{
-		"0xbef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721",
-		"0xfd5f56b40a79a385708428e7b32ab996a681080a166a2206e750eb4819186145",
+		"bef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721",
+		"fd5f56b40a79a385708428e7b32ab996a681080a166a2206e750eb4819186145",
 	}
 
 	for i, test := range tests {
 		expectedHash := results[i]
-		hash := GetHash(test)
+		hash := GetB16Hash(test)
 		// compare to precomputed hex hashes
-		hashHex := hexutil.Encode([]byte(hash))
-		assert.Equal(t, expectedHash, hashHex)
+		assert.Equal(t, expectedHash, hash)
 	}
 }

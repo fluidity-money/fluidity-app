@@ -40,8 +40,8 @@ const Footer = () => {
       <Socials />
       <div className={styles.content}>
         {width < secondBreakpoint && (
-          <div>
-            <img src="/assets/images/logoOutline.svg" alt="fluidityLogo" />
+          <div className={styles.imgContainer}>
+            <img src="/assets/images/logoOutline.png" alt="home page" />
           </div>
         )}
         <div className={styles.footerItems}>
@@ -55,7 +55,7 @@ const Footer = () => {
             <GeneralButton
               handleClick={() => {}}
               version={"primary"}
-              type={"text"}
+              buttonType={"text"}
               size={
                 width > firstBreakpoint
                   ? "medium"
@@ -69,7 +69,7 @@ const Footer = () => {
             <GeneralButton
               handleClick={() => {}}
               version={"secondary"}
-              type={"text"}
+              buttonType={"text"}
               size={
                 width > firstBreakpoint
                   ? "medium"
@@ -83,12 +83,20 @@ const Footer = () => {
           </div>
           <div className={styles.legal}>
             <div>
-              <Text as="p" size="xs">
-                Terms
-              </Text>
-              <Text as="p" size="xs">
-                Privacy Poilicy
-              </Text>
+              <a href={"#"}>
+                <Text as="p" size="xs">
+                  <u>
+                    Terms
+                  </u>
+                </Text>
+              </a>
+              <a href={"#"}>
+                <Text as="p" size="xs">
+                  <u>
+                    Privacy Policy
+                  </u>
+                </Text>
+              </a>
             </div>
 
             <Text as="p" size="xs">
@@ -140,5 +148,5 @@ const resources: IItem[] = [
   { title: "Articles", src: "", type: "internal" },
   { title: "Fluniversity", src: "", type: "internal" },
   { title: "Whitepapers", src: "", type: "internal" },
-  { title: "Documentation", src: "", type: "external" },
+  { title: "Documentation", src: "https://docs.fluidity.money/", type: "external" },
 ];
