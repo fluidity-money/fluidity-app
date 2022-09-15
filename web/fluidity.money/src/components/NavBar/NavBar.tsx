@@ -6,14 +6,14 @@ import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { GeneralButton, NavBarModal, Text } from "@fluidity-money/surfing";
+import { GeneralButton, NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
 
-  const handleModal = () => {
-    setModal((modal) => !modal);
+  const handleModal = (show: boolean) => {
+    setModal(show);
   };
 
   const { width } = useViewport();
@@ -38,7 +38,6 @@ const NavBar = () => {
             <img src="/assets/images/textLogo.svg" alt="home page" />
           </a>
         </motion.div>
-
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <motion.div
@@ -63,7 +62,6 @@ const NavBar = () => {
             </GeneralButton>
           </div>
         </div>
-
         <motion.div
           className={styles.navbar}
           variants={scrollVariants}
@@ -82,9 +80,7 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    <Text size={width < breakpoint ? "sm" : "md"}>
-                      HOW IT WORKS
-                    </Text>
+                    <Text size="md" className={styles.transparent}>HOW IT WORKS</Text>
                   </a>
                 </li>
                 {/* <li>
@@ -120,16 +116,11 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    <Text size={width < breakpoint ? "sm" : "md"}>
-                      RESOURCES
-                    </Text>
+                    <Text size="md" className={styles.transparent}>RESOURCES</Text>
                   </a>
 
-                  <button onClick={() => handleModal()}>
-                    <img
-                      src="/assets/images/triangleDown.svg"
-                      alt="open resource options"
-                    />
+                  <button className={`${styles.modalButton} ${styles.transparent}`} onClick={() => handleModal(!modal)}>
+                    <TriangleDown />
                   </button>
                 </li>
               </ul>
@@ -167,7 +158,7 @@ const links: ILinkButton[] = [
     handleClick: () => {},
   },
   {
-    children: "whitpapers",
+    children: "whitepapers",
     size: "small",
     type: "internal",
     handleClick: () => {},
