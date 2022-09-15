@@ -13,7 +13,7 @@
 
 .container {
   box-sizing: border-box;
-  position: absolute;
+  position: fixed;
   background-color: transparent;
   display: flex;
   justify-content: center;
@@ -23,6 +23,7 @@
   display: grid;
   grid-template-columns: 1fr 4fr 1fr;
   max-width: 1500px;
+  z-index: 1000;
 
   .navbar {
     box-sizing: border-box;
@@ -73,12 +74,17 @@
     max-width: 1500px;
     padding: 10px 50px 10px 50px;
     position: fixed;
+    z-index: 50;
     .fixed {
       box-sizing: border-box;
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
+
+      & > * {
+        z-index: 9;
+      }
     }
     @media (max-width: 700px) {
       padding: 10px 30px 10px 30px;
@@ -87,7 +93,7 @@
 }
 
 .fluidity {
-  z-index: 1;
+  z-index: 51;
   cursor: pointer;
   margin-left: 50.5px;
   position: fixed;
