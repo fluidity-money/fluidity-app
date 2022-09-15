@@ -9,3 +9,14 @@ export const isInArray = <T, A extends T>(
   array: ReadonlyArray<A>
 ): item is A => array.includes(item as A);
 
+// BaseToken is the base for any token on any network
+export class BaseToken {
+  constructor(
+    readonly symbol: string,
+    readonly name: string,
+    readonly address: string,
+    readonly decimals: number,
+    readonly colour: string,
+    readonly image: string,
+  ) {};
+}

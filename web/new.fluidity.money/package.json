@@ -11,7 +11,9 @@
     "relay": "relay-compiler"
   },
   "dependencies": {
+    "@saberhq/token-utils": "^1.14.6",
     "@saberhq/use-solana": "^1.14.6",
+    "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
     "graphql-ws": "^5.10.1",
     "localforage": "^1.10.0",
@@ -24,6 +26,7 @@
     "surfing": "file:../surfing"
   },
   "devDependencies": {
+    "@types/bn.js": "^5.1.1",
     "@types/react": "^18.0.19",
     "@types/react-dom": "^18.0.6",
     "@types/react-relay": "^14.1.1",
