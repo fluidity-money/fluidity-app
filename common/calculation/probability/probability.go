@@ -28,6 +28,8 @@ func factorial(n int64) *big.Rat {
 	return r.SetInt(int)
 }
 
+
+// Calculates the probabilities for the different reward tiers
 func probability(m, n, b int64) *big.Rat {
 	mulLeftSide := new(big.Int).Binomial(m, b)
 
