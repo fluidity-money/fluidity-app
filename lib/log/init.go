@@ -16,6 +16,7 @@ func init() {
 	var (
 		debugEnabled   = os.Getenv(EnvDebug) == "true"
 		dieFastEnabled = os.Getenv(EnvDebugDieFast) == "true"
+		silentEnabled  = os.Getenv(EnvSilentMode) == "true"
 
 		sentryUrl   = os.Getenv(EnvSentryUrl)
 
@@ -30,6 +31,7 @@ func init() {
 	go startLoggingServer(
 		debugEnabled,
 		dieFastEnabled,
+		silentEnabled,
 		invocation,
 		workerId,
 		sentryUrl,
