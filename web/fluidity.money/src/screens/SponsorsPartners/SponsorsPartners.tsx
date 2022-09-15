@@ -116,7 +116,7 @@ const SponsorsPartners = () => {
   const boxWidth = 300;
 
   const partnerCards = partners.map((partner, i) => {
-    let top = Math.floor(Math.random() * (250 - 1) + 1);
+    let top = Math.floor(Math.random() * ((boxHeight - tolerance) - 1) + 1);
     let left = Math.floor(Math.random() * ((width - (width - 1180)) - 1) + 1);
 
     if(prevTop > 0 && prevLeft > 0) {
@@ -133,7 +133,7 @@ const SponsorsPartners = () => {
         }
 
         //If it gets here - a collision occured generate another set of randoms. then loop again to check along every axis if this is valid.
-        top = Math.floor(Math.random() * (250 - 1) + 1);
+        top = Math.floor(Math.random() * ((boxHeight - tolerance) - 1) + 1);
         left = Math.floor(Math.random() * ((width - (width - 1180)) - 1) + 1);
       }
     }
