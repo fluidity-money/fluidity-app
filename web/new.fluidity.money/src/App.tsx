@@ -9,7 +9,7 @@ import { Chain, chainContext, Network, Chains, NullableChain} from "./chainConte
 import './App.css'
 import {ReactNode, useContext, useEffect, useState} from "react";
 import {isInArray, ReactSetter} from "./utils/types";
-import {useSolana, useWalletKit, WalletKitProvider} from "@gokiprotocol/walletkit";
+import {SolanaProvider, useSolana} from "@saberhq/use-solana";
 
 const ChainInterface = ({children}: {children: React.ReactNode}) => {
   const [chain, setChain] = useState<NullableChain>(null);
@@ -29,13 +29,11 @@ const ChainInterface = ({children}: {children: React.ReactNode}) => {
     </>
   case "solana":
     return <>
-      <WalletKitProvider
-        app={{name: "Fluidity"}}
-      >
+    <SolanaProvider>
         <SolanaInterface setChain={setChain} connected={connected} setConnected={setConnected}>
           {children}
         </SolanaInterface>
-      </WalletKitProvider>
+    </SolanaProvider>
     </>
   }
 }
@@ -50,7 +48,6 @@ type InterfaceProps = {
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain: Chain = "solana";
   const [network, setNetwork] = useState<Network<"solana">>("mainnet-beta");
-  const wallet = useWalletKit();
   const solana = useSolana();
   const solanaConnected = solana.connected;
 
@@ -72,7 +69,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     if (!isInArray(network, Chains[chain]))
       return;
 
-    wallet.connect()
+    solana.activate("Sollet")
     setNetwork(network);
   }
 
@@ -83,12 +80,14 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
   const wrap = () => {
     if (!connected)
       return;
+
     console.log("wrap solana!")
   }
 
   const unwrap = () => {
     if (!connected)
       return;
+
     console.log("unwrap solana!")
   }
 

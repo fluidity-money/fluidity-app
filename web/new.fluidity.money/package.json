@@ -11,12 +11,10 @@
     "relay": "relay-compiler"
   },
   "dependencies": {
-    "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
-    "@gokiprotocol/walletkit": "^1.7.3",
-    "@saberhq/use-solana": "^1.14.5",
-    "@types/react-relay": "^14.1.1",
+    "@saberhq/use-solana": "^1.14.6",
     "buffer": "^6.0.3",
     "graphql-ws": "^5.10.1",
+    "localforage": "^1.10.0",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -28,6 +26,7 @@
   "devDependencies": {
     "@types/react": "^18.0.19",
     "@types/react-dom": "^18.0.6",
+    "@types/react-relay": "^14.1.1",
     "@types/relay-runtime": "^14.1.2",
     "@vitejs/plugin-react": "^2.0.1",
     "graphql": "^16.6.0",
