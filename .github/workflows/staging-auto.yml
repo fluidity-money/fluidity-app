@@ -98,6 +98,10 @@ jobs:
         with:
           command: |
             flu deploy-service-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+      - name: Invalidate Cache
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: cloudfront create-invalidation --distribution-id E1K41F9AJJR1Y3 --paths "/*"
       - name: Discord notif (SUCCESS)
         uses: rjstone/discord-webhook-notify@v1
         if: success()
