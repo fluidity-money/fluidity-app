@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
+import useViewport from "hooks/useViewport";
 import {
   LinkButton,
   BlockchainModal,
@@ -35,6 +36,9 @@ const RewardsInfoBox = ({
       : "/assets/images/chainIcons/solanaIcon.svg";
 
   const [showModal, setShowModal] = useState(false);
+  
+  const { width } = useViewport();
+  const mobileBreakpoint = 620;
 
   const options = Object.keys(SupportedChains).map((chain) => ({
     name: chain,
@@ -80,6 +84,7 @@ const RewardsInfoBox = ({
             }}
             options={options}
             setOption={setChain}
+            mobile={width <= mobileBreakpoint}
           />
         )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
