@@ -2,7 +2,6 @@
 
 .container {
   display: flex;
-  // grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
   width: fit-content;
   padding: 4px;
@@ -12,7 +11,7 @@
   left: 50vw;
   transform: translateX(-50%);
   z-index: 60;
-  
+
   .black {
     background-color: black;
   }
@@ -20,17 +19,18 @@
   & span {
     cursor: pointer;
     margin: 20px;
+    @media (max-width: 620px) {
+      margin: 10px 20px 10px 20px;
+    }
+
     &:hover {
       opacity: 0.8;
     }
   }
   @media (max-width: 620px) {
-    // grid-template-columns: 1fr;
-    // flex-direction: column;
     align-items: center;
-    bottom: 2vh;
-    background-color: transparent;
-    opacity: 0.9;
+    bottom: 0vh;
+    background-color: black;
     width: 100%;
     overflow-x: auto;
     &::-webkit-scrollbar {

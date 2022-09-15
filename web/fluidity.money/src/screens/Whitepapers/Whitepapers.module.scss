@@ -8,7 +8,7 @@
   margin-top: 5%;
   margin-bottom: 5%;
   background-color: $fluidBlack;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
 
   div {
@@ -17,7 +17,6 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
-    // border: 1px solid $fluidWhite;
     text-align: center;
     padding: 20px;
     &:hover {
@@ -26,12 +25,10 @@
 
     img {
       margin-bottom: 25px;
+      @media (max-width: 500px) {
+        width: 310px;
+      }
     }
-
-    // P {
-    //   font-size: 10px;
-    //   margin-top: 10px;
-    // }
   }
 }
 

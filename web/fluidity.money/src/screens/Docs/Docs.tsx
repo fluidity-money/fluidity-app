@@ -8,6 +8,8 @@ import {
   ContinuousCarousel,
   ManualCarousel,
   Heading,
+  Text,
+  LinkButton,
 } from "@fluidity-money/surfing";
 import styles from "./Docs.module.scss";
 
@@ -63,13 +65,32 @@ const Docs = () => {
               <div className={styles.imgContainer}>
                 <img src={item.img} />
               </div>
-              <Heading as="h3">{item.title}</Heading>
-              <a href={item.link}>
-                DOCS <i>*</i>
-              </a>
+              <div className={styles.content}>
+                <Heading as="h3">{item.title}</Heading>
+                <a href={item.link}>
+                  <LinkButton
+                    size={"medium"}
+                    type={"external"}
+                    handleClick={() => {}}
+                  >
+                    DOCS
+                  </LinkButton>
+                </a>
+              </div>
             </div>
           ))}
         </ManualCarousel>
+        <div className={styles.allDocs}>
+          <a href={"https://docs.fluidity.money/</div>"}>
+            <LinkButton
+              size={"medium"}
+              type={"external"}
+              handleClick={() => {}}
+            >
+              ALL DOCS
+            </LinkButton>
+          </a>
+        </div>
       </div>
     </div>
   );

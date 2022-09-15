@@ -59,7 +59,9 @@ const Whitepapers = () => {
             <Heading as="h3">
               Fluidity Money: Economics and Monetary Policy
             </Heading>
-            <Text prominent={true}>24th June 2022 <b>WHITEPAPER</b></Text>
+            <Text prominent={true}>
+              24th June 2022 <b>WHITEPAPER</b>
+            </Text>
           </div>
         </a>
       </div>
