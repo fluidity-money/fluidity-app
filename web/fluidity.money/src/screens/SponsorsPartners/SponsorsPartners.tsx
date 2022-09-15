@@ -142,7 +142,7 @@ const SponsorsPartners = () => {
     prevLeft = left;
     
     const filter = Math.floor(Math.random() * (21 - 1) + 1) >= 17 ? 'blur(3px)' : 'blur(0px)'
-    const opacity = filter === 'blur(3px)' ? '0.5' : '1.0';
+    const opacity = filter === 'blur(3px)' ? '0.6' : '1.0';
     return(
           width > 960 ? (
           <Card
