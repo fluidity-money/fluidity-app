@@ -2,8 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import Video from "components/Video";
 import { useEffect, useState } from "react";
+import useViewport from "hooks/useViewport";
+import Video from "components/Video";
 import {
   ContinuousCarousel,
   Heading,
@@ -11,7 +12,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
-import useViewport from "hooks/useViewport";
 
 const HowItWorks = () => {
   /* 
@@ -92,21 +92,21 @@ const HowItWorks = () => {
         <div className={styles.left}>
           <Text
             as={"p"}
-            className={currentImageIndex === 0 ? styles.bold : styles.normal}
+            prominent={currentImageIndex === 0}
           >
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </Text>
           <Text
             as={"p"}
-            className={currentImageIndex === 1 ? styles.bold : styles.normal}
+            prominent={currentImageIndex === 1}
           >
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
           </Text>
           <Text
             as={"p"}
-            className={currentImageIndex === 2 ? styles.bold : styles.normal}
+            prominent={currentImageIndex === 2}
           >
             The user is incentivised through governance.
           </Text>
