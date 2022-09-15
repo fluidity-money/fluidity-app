@@ -6,15 +6,20 @@ import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { GeneralButton, NavBarModal, Text } from "@fluidity-money/surfing";
+import { GeneralButton, NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
 
-  const handleModal = () => {
-    setModal((modal) => !modal);
+  const handleModal = (show: boolean) => {
+    setModal(show);
   };
+  
+  const goToDemoAnchor = () => {
+    const origin = document.location.toString().split('#')[0];
+    document.location = origin + '#demo';
+  }
 
   const { width } = useViewport();
   const breakpoint = 700;
@@ -38,7 +43,6 @@ const NavBar = () => {
             <img src="/assets/images/textLogo.svg" alt="home page" />
           </a>
         </motion.div>
-
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
             <motion.div
@@ -57,13 +61,12 @@ const NavBar = () => {
               version={"secondary"}
               buttonType={"text"}
               size={width < breakpoint ? "small" : "medium"}
-              handleClick={() => {}}
+              handleClick={goToDemoAnchor}
             >
               LAUNCH FLUIDITY
             </GeneralButton>
           </div>
         </div>
-
         <motion.div
           className={styles.navbar}
           variants={scrollVariants}
@@ -82,9 +85,7 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    <Text size={width < breakpoint ? "sm" : "md"}>
-                      HOW IT WORKS
-                    </Text>
+                    <Text size="md" className={styles.transparent}>HOW IT WORKS</Text>
                   </a>
                 </li>
                 {/* <li>
@@ -120,22 +121,17 @@ const NavBar = () => {
                         : ""
                     }
                   >
-                    <Text size={width < breakpoint ? "sm" : "md"}>
-                      RESOURCES
-                    </Text>
+                    <Text size="md" className={styles.transparent}>RESOURCES</Text>
                   </a>
 
-                  <button onClick={() => handleModal()}>
-                    <img
-                      src="/assets/images/triangleDown.svg"
-                      alt="open resource options"
-                    />
+                  <button className={`${styles.modalButton} ${styles.transparent}`} onClick={() => handleModal(!modal)}>
+                    <TriangleDown />
                   </button>
                 </li>
               </ul>
             </nav>
             {modal && (
-              <NavBarModal handleModal={handleModal} navLinks={links} />
+              <NavBarModal handleModal={() => handleModal(false)} navLinks={links} />
             )}
           </div>
         </motion.div>
@@ -167,7 +163,7 @@ const links: ILinkButton[] = [
     handleClick: () => {},
   },
   {
-    children: "whitpapers",
+    children: "whitepapers",
     size: "small",
     type: "internal",
     handleClick: () => {},
