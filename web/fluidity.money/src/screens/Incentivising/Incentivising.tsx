@@ -21,7 +21,7 @@ const Incentivising = () => {
         style={{
          position: "absolute",
          display: `${ready === true ? 'none' : 'block'}`,
-         width: `${width <= breakpoint ? '100%' : '60%'}`,
+         width: `${width <= breakpoint ? '100%' : '42%'}`,
        }}
        />
       {width <= breakpoint ? (
