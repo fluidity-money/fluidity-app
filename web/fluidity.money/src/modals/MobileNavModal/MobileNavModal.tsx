@@ -44,7 +44,7 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
         </a>
       </div>
 
-      <a className={`${styles.whiteButton} ${styles.smaller}`} href={``}>
+      <a className={`${styles.whiteButton} ${styles.smaller}`} href={`#demo`}>
         <Heading className={styles.black} black={true} as="h3">
           LAUNCH FLUIDITY
         </Heading>

@@ -15,6 +15,11 @@ const NavBar = () => {
   const handleModal = (show: boolean) => {
     setModal(show);
   };
+  
+  const goToDemoAnchor = () => {
+    const origin = document.location.toString().split('#')[0];
+    document.location = origin + '#demo';
+  }
 
   const { width } = useViewport();
   const breakpoint = 700;
@@ -56,7 +61,7 @@ const NavBar = () => {
               version={"secondary"}
               buttonType={"text"}
               size={width < breakpoint ? "small" : "medium"}
-              handleClick={() => {}}
+              handleClick={goToDemoAnchor}
             >
               LAUNCH FLUIDITY
             </GeneralButton>
@@ -126,7 +131,7 @@ const NavBar = () => {
               </ul>
             </nav>
             {modal && (
-              <NavBarModal handleModal={handleModal} navLinks={links} />
+              <NavBarModal handleModal={() => handleModal(false)} navLinks={links} />
             )}
           </div>
         </motion.div>
