@@ -18,7 +18,6 @@ import Whitepapers from "screens/Whitepapers";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import styles from "./ResourcesPage.module.scss";
-import styles from "./ResourcesPage.module.scss";
 
 const ResourcesPage = () => {
   const [introVisible, setIntroVisibility] = useState(true);
