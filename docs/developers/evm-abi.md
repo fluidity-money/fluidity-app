@@ -9,7 +9,7 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
 ```
 {
   "contractName": "Token",
-  "abi": [
+  "abi": 
     {
       "anonymous": false,
       "inputs": [
@@ -87,8 +87,41 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
     },
     {
       "anonymous": false,
-      "inputs": [],
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
       "name": "Emergency",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "GlobalMintLimitChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "MaxUncheckedRewardLimitChanged",
       "type": "event"
     },
     {
@@ -108,6 +141,19 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
         }
       ],
       "name": "MintFluid",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "MintLimitsStateChanged",
       "type": "event"
     },
     {
@@ -164,6 +210,19 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
       "anonymous": false,
       "inputs": [
         {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "RewardQuarantineThresholdUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": true,
           "internalType": "address",
           "name": "from",
@@ -183,6 +242,32 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
         }
       ],
       "name": "Transfer",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "UserMintLimitChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "newConfig",
+          "type": "address"
+        }
+      ],
+      "name": "WorkerConfigUpdated",
       "type": "event"
     },
     {
@@ -321,6 +406,19 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
           "type": "bool"
         }
       ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_workerConfig",
+          "type": "address"
+        }
+      ],
+      "name": "disableEmergencyMode",
+      "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -649,6 +747,40 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
       "inputs": [
         {
           "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        },
+        {
+          "internalType": "uint64",
+          "name": "data",
+          "type": "uint64"
+        }
+      ],
+      "name": "transferWithBeneficiary",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "user",
           "type": "address"
         },
@@ -735,7 +867,7 @@ The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-
       "stateMutability": "nonpayable",
       "type": "function"
     }
-  ]
+  
 }
 ```
 
