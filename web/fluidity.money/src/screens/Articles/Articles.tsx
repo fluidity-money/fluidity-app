@@ -72,6 +72,7 @@ const Articles = ({ isResourcesPage }: IArticleProps) => {
           desc={arr.articles[0].desc}
           info={arr.articles[0].info}
           isResourcesPage={isResourcesPage}
+          link={arr.articles[0].link}
         />
         <ArticleList {...arr} />
       </div>

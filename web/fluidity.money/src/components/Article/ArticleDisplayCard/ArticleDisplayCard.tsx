@@ -16,22 +16,25 @@ export interface ArticleDisplayCardType {
   title: string;
   desc: string;
   info: string;
+  link: string;
   isResourcesPage?: boolean;
 }
 
 const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
   return (
     <div className={styles.cardContainer}>
-      <img src={article.img} />
-      <Heading as="h4" className={styles.leftMargin10px}>
-        {article.title}
-      </Heading>
-      <Text size="md" as="p">
-        {article.desc}
-      </Text>
-      <Text size="md" as="p">
-        {article.info}
-      </Text>
+      <a href={article.link}>
+        <img src={article.img} />
+        <Heading as="h4" className={styles.leftMargin10px}>
+          {article.title}
+        </Heading>
+        <Text size="md" as="p">
+          {article.desc}
+        </Text>
+        <Text size="md" as="p">
+          {article.info}
+        </Text>
+      </a>
       <section>
         {article.isResourcesPage ? (
           <a href="https://blog.fluidity.money/">
