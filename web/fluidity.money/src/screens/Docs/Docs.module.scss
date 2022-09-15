@@ -26,15 +26,14 @@
   margin-right: 20px;
   margin-bottom: 50px;
   background-color: $backgroundBlack;
-  padding: 20px;
+  padding: 30px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
 
   .imgContainer {
-    width: 100%;
-
+    width: 90%;
     display: flex;
     justify-content: center;
     img {
