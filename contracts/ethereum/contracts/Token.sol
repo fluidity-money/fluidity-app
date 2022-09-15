@@ -63,7 +63,28 @@ contract Token is IERC20 {
     event OperatorChanged(address indexed oldOperator, address indexed newOperator);
 
     /// @notice emitted when the contract enters emergency mode!
-    event Emergency();
+    event Emergency(bool status);
+
+    /// @notice emitted when restrictions
+    event MaxUncheckedRewardLimitChanged(uint amount);
+
+    /// @notice global mint limit changed by setRestrictions
+    event GlobalMintLimitChanged(uint amount);
+
+    /// @notice user mint limits changed by setRestrictions
+    event UserMintLimitChanged(uint amount);
+
+    /// @notice worker config changed, either by disabling emergency
+    /// @notice mode or updateWorkerConfig
+    event WorkerConfigUpdated(address newConfig);
+
+    /// @notice updating the reward quarantine before manual signoff
+    /// @notice by the multisig (with updateRewardQuarantineThreshold)
+    event RewardQuarantineThresholdUpdated(uint amount);
+
+    /// @notice emitted when the mint limits are enabled or disabled
+    /// @notice by enableMintLimits
+    event MintLimitsStateChanged(bool status);
 
     // erc20 props
     mapping(address => uint256) private balances_;
@@ -202,6 +223,11 @@ contract Token is IERC20 {
         remainingGlobalMint_ = _globalMint;
         userMintLimit_ = _userMint;
         userMintResetBlock_ = block.number;
+
+        emit MaxUncheckedRewardLimitChanged(_maxUncheckedReward);
+        emit MintLimitsStateChanged(_mintLimitsEnabled);
+        emit GlobalMintLimitChanged(_globalMint);
+        emit UserMintLimitChanged(_userMint);
     }
 
     /**
@@ -245,22 +271,38 @@ contract Token is IERC20 {
 
         workerConfig_ = WorkerConfig(address(0));
 
-        emit Emergency();
+        emit Emergency(true);
+    }
+
+    /**
+     * @notice disables emergency mode, following presumably a contract upgrade
+     * @notice (operator only)
+     */
+    function disableEmergencyMode(address _workerConfig) public {
+        require(msg.sender == operator_, "only the operator account can use this");
+
+        noEmergencyMode_ = true;
+
+        updateWorkerConfig(_workerConfig);
+
+        emit Emergency(false);
     }
 
     function updateWorkerConfig(address _workerConfig) public {
         require(msg.sender == operator_, "only the operator account can use this");
-        require(noEmergencyMode(), "emergency mode!");
 
         workerConfig_ = WorkerConfig(_workerConfig);
+
+        emit WorkerConfigUpdated(_workerConfig);
     }
 
     /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
-        require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == operator_, "only the operator account can use this");
 
         maxUncheckedReward_ = _maxUncheckedReward;
+
+        emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
     /// @notice updates and resets mint limits if called by the operator
@@ -271,13 +313,18 @@ contract Token is IERC20 {
         remainingGlobalMint_ = global;
         userMintLimit_ = user;
         userMintResetBlock_ = block.number;
+
+        emit GlobalMintLimitChanged(global);
+        emit UserMintLimitChanged(userMintLimit_);
     }
 
     /// @notice enables or disables mint limits with the operator account
     function enableMintLimits(bool enable) public {
-        require(msg.sender == oracle(), "only the oracle account can use this");
+        require(msg.sender == operator_, "only the operator account can use this");
 
         mintLimitsEnabled_ = enable;
+
+        emit MintLimitsStateChanged(enable);
     }
 
     /**
@@ -303,10 +350,10 @@ contract Token is IERC20 {
 
             if (userHasMinted) {
                 // user hasn't minted since the reset, reset their count
-                userLastMintedBlock_[msg.sender] = amount;
+                userAmountMinted_[msg.sender] = amount;
             } else {
                 // user has, add the amount they're minting
-                userLastMintedBlock_[msg.sender] = userAmountMinted_[msg.sender] + amount;
+                userAmountMinted_[msg.sender] = userAmountMinted_[msg.sender] + amount;
             }
 
             require(userMint <= userMintLimit_, "mint amount exceeds user limit!");
@@ -621,7 +668,6 @@ contract Token is IERC20 {
     }
 
     function _mint(address account, uint256 amount) internal virtual {
-
         require(account != address(0), "ERC20: mint to the zero address");
 
         totalSupply_ += amount;

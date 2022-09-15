@@ -6,7 +6,7 @@ import { useChainContext } from "hooks/ChainContext";
 import {
   ContinuousCarousel,
   numberToMonetaryString,
-  trimAddress,
+  trimAddressShort,
   formatTo12HrDate,
   Text,
 } from "@fluidity-money/surfing";
@@ -37,37 +37,32 @@ const RewardsBackground = () => {
         .slice(10)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
-            <img
-              src={
-                token === "USDT"
-                  ? "/assets/images/tokenIcons/usdt.svg"
-                  : "/assets/images/tokenIcons/usdc.svg"
-              }
-              alt="tokenIcon"
-            />
             <a
               href={`https://etherscan.io/tx/${transaction}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Text as="p" className={styles.hover}>
+              <img
+                src={
+                  token === "USDT"
+                    ? "/assets/images/tokenIcons/usdt.svg"
+                    : "/assets/images/tokenIcons/usdc.svg"
+                }
+                alt="tokenIcon"
+              />
+
+              <Text as="p" prominent={true} className={styles.hover}>
                 {numberToMonetaryString(amount)}{" "}
               </Text>
-            </a>
-            <a
-              href={`https://etherscan.io/address/${trimAddress(address)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+
               <Text as="p" className={styles.hover}>
-                {trimAddress(address)}{" "}
+                {`sent to`}{" "}
               </Text>
-            </a>
-            <a
-              href={`https://etherscan.io/tx/${transaction}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+
+              <Text as="p" className={styles.hoverUnderline}>
+                {`${trimAddressShort(address)}`}{" "}
+              </Text>
+
               <Text as="p" className={styles.hover}>
                 {formatTo12HrDate(date)}
               </Text>
