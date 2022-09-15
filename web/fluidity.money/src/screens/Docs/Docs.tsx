@@ -7,9 +7,7 @@ import { useLocation } from "react-router-dom";
 import {
   ContinuousCarousel,
   ManualCarousel,
-  GeneralButton,
   Heading,
-  Text,
 } from "@fluidity-money/surfing";
 import styles from "./Docs.module.scss";
 
@@ -72,50 +70,6 @@ const Docs = () => {
             </div>
           ))}
         </ManualCarousel>
-      </div>
-      <div className={styles.desktopViewFormInput}>
-        <Heading as="h4">Stay hydrated</Heading>
-        <Heading as="h6">EMAIL</Heading>
-        <div>
-          <input type="text" placeholder="elon@email.com" />
-          <GeneralButton
-            version={"secondary"}
-            buttonType={"text"}
-            size={"medium"}
-            handleClick={function (): void {
-              throw new Error("Function not implemented.");
-            }}
-          >
-            GIMME THE JUICE
-          </GeneralButton>
-        </div>
-      </div>
-      <div className={styles.mobileViewFormInput}>
-        <div>
-          <Heading as="h3">Stay hydrated</Heading>
-          <Text as="p">
-            Subscribe to our monthly newsletter to stay up to date with our
-            progress and roadmap.
-          </Text>
-          <form>
-            <div>
-              <label>Name</label>
-              <input type="text" placeholder="Elon" />
-              <label>Email</label>
-              <input type="text" placeholder="elon@email.com" />
-            </div>
-            <GeneralButton
-              version={"primary"}
-              buttonType={"text"}
-              size={"medium"}
-              handleClick={function (): void {
-                throw new Error("Function not implemented.");
-              }}
-            >
-              GIMME THE JUICE
-            </GeneralButton>
-          </form>
-        </div>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import Footer from "screens/Footer";
 import Hero from "screens/Hero";
 import Introducing from "screens/Introducing";
 import Tweets from "screens/Tweets";
+import MailingList from "screens/MailingList";
 import Whitepapers from "screens/Whitepapers";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
@@ -61,6 +62,7 @@ const ResourcesPage = () => {
               <Fluniversity />
               <Whitepapers />
               <Docs />
+              <MailingList />
               <Demo />
               <Footer />
             </motion.div>
