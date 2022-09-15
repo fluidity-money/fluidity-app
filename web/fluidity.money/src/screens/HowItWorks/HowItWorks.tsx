@@ -55,7 +55,7 @@ const HowItWorks = () => {
 
   const backgroundText = images[currentImageIndex].text;
 
-  const size = width > 1000 ? "h2" : width < 1000 && width > 520 ? "h4" : "h5";
+  const size = width > 1130 ? "h2" : width < 1130 && width > 520 ? "h4" : "h5";
 
   const callout = (
     <div className={styles.callout}>
@@ -90,24 +90,15 @@ const HowItWorks = () => {
 
       <div className={styles.grid}>
         <div className={styles.left}>
-          <Text
-            as={"p"}
-            prominent={currentImageIndex === 0}
-          >
+          <Text as={"p"} prominent={currentImageIndex === 0}>
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </Text>
-          <Text
-            as={"p"}
-            prominent={currentImageIndex === 1}
-          >
+          <Text as={"p"} prominent={currentImageIndex === 1}>
             They distribute yield when when used on any on-chain use-case. Yiled
             is gained through utility.
           </Text>
-          <Text
-            as={"p"}
-            prominent={currentImageIndex === 2}
-          >
+          <Text as={"p"} prominent={currentImageIndex === 2}>
             The user is incentivised through governance.
           </Text>
           <a href="/howitworks">
