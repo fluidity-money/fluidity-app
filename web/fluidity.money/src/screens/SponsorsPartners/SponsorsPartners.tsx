@@ -116,7 +116,7 @@ const SponsorsPartners = () => {
   const boxWidth = 300;
 
   const partnerCards = partners.map((partner, i) => {
-    let top = Math.floor(Math.random() * (300 - 1) + 1);
+    let top = Math.floor(Math.random() * (250 - 1) + 1);
     let left = Math.floor(Math.random() * ((width - (width - 1180)) - 1) + 1);
 
     if(prevTop > 0 && prevLeft > 0) {
@@ -155,8 +155,8 @@ const SponsorsPartners = () => {
             display: "block",
             top: `${top}px`,
             left: `${left}px`,
-            filter: {filter},
-            opacity: {opacity}
+            filter: filter,
+            opacity: opacity
           }}
           >
             <Partner
@@ -174,7 +174,6 @@ const SponsorsPartners = () => {
             className={styles.card}
             style={{
               position: "relative",
-              width: "300px",
               display: "block",
               top: `0px`,
               left: `${(width * 0.5) - boxWidth * 0.5}px`, // places it at the centre;
