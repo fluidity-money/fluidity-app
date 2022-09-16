@@ -1,6 +1,7 @@
 CLUSTER: fluidity
 ORG_ROOT: fluidity
 ENABLE: true
+CLOUDFRONT_ID: E1K41F9AJJR1Y3
 
 SECRET_FLU_SENTRY_URL: /fluidity/sentryUrl
 SECRET_FLU_FRONTEND_SENTRY_URL: /fluidity/frontend/sentryURL
