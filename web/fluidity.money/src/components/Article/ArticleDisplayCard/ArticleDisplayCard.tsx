@@ -8,6 +8,7 @@ import {
   LinkButton,
   Text,
 } from "@fluidity-money/surfing";
+import useViewport from "hooks/useViewport";
 import styles from "./ArticleDisplayCard.module.scss";
 
 export interface ArticleDisplayCardType {
@@ -21,6 +22,9 @@ export interface ArticleDisplayCardType {
 }
 
 const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
+  const { width } = useViewport();
+  const breakpoint = 860;
+
   return (
     <div className={styles.cardContainer}>
       <a href={article.link}>
@@ -38,22 +42,19 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
       <section>
         {article.isResourcesPage ? (
           <a href="https://blog.fluidity.money/">
-            <GeneralButton
-              version={"secondary"}
-              buttonType={"text"}
-              size={"large"}
+            <LinkButton
+              type={"internal"}
+              size={width < breakpoint ? "medium" : "large"}
               handleClick={function (): void {}}
             >
               ALL ARTICLES
-            </GeneralButton>
-
+            </LinkButton>
           </a>
-
         ) : (
           <a href="/resources">
             <LinkButton
               type={"internal"}
-              size={"large"}
+              size={width < breakpoint ? "medium" : "large"}
               handleClick={function (): void {}}
             >
               EXPLORE ALL RESOURCES

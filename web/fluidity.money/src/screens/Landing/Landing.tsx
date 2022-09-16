@@ -79,9 +79,17 @@ const Landing = () => {
             loop={state.loop}
             key={state.key}
             scale={state.scale}
-            margin={"200px 0 0 0"}
-            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
-            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
+
+            margin = {"-60px 0 0 0"}
+            onLoad={!homeVidEnded 
+              ? () => setOnHomeVidLoaded(true)
+              : () => {}
+            }
+            onEnded={!homeVidEnded 
+              ? () => setHomeVidEnded(true)
+              : () => {}
+            }
+
           />
         </div>
       ) : (
