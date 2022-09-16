@@ -89,7 +89,7 @@ const arr: ArticleListProps = {
       title: "With Fluidity, supercharge your arbitrage trades",
       desc: `Crypto assets worth billions of dollars are traded every single day. Arbitrage traders take advantage of the volatility and pricing imperfections, exploiting different values for the same asset across different markets. Take...`,
       info: "9 min read ARBITRAGE",
-      link: "",
+      link: "https://blog.fluidity.money/with-fluidity-supercharge-your-arbitrage-trades-f0b956622e9e",
       linkTitle: "",
     },
     {
@@ -97,7 +97,7 @@ const arr: ArticleListProps = {
       title: "The Hunting of the zk-SNARK: Homomorphic Hidings",
       desc: `“But the Judge said he never had summed up before; So the Snark undertook it instead, And summed it so well that it came to far more Than the Witnesses ever had said!” Lewis Carroll Zero-knowledge succinct non...`,
       info: "5 min read CRYPTOCURRENCY",
-      link: "",
+      link: "https://blog.fluidity.money/the-hunting-of-the-zk-snark-homomorphic-hidings-aa6c7824597",
       linkTitle: "",
     },
     {
@@ -105,7 +105,7 @@ const arr: ArticleListProps = {
       title: "An alternative solution to Uniswap’s “fee switch” problem",
       desc: `In the past few months, there has been a lot of discussion in the Uniswap Governance Forum about activating the “fee switch”, a piece of code that...`,
       info: "6 min read UNISWAP",
-      link: "",
+      link: "https://blog.fluidity.money/an-alternative-solution-to-uniswaps-fee-switch-problem-61a5e4f6057c",
       linkTitle: "",
     },
     {
@@ -113,7 +113,7 @@ const arr: ArticleListProps = {
       title: "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
       desc: `The year 2020 marked the explosion of DeFi protocols in public imagination, driven largely by the rise of liquidity mining — Compound...`,
       info: "5 min  read ARBITRUM",
-      link: "",
+      link: "https://blog.fluidity.money/tiki-talk-minutes-fluidity-x-dopex-x-arbitrum-and-the-evolving-boundaries-of-defi-ea7f1110f741",
       linkTitle: "",
     },
     {
@@ -121,7 +121,7 @@ const arr: ArticleListProps = {
       title: "Ghost in the machine: Fluidity Partners with AAVE Grants DAO",
       desc: `“2022 has been a wild year for Decentralized Finance. Novel concepts were introduced and big scandals were reported, but most importantly, DeFi has...`,
       info: "5 min read CRYPTOCURRENCY",
-      link: "",
+      link: "https://blog.fluidity.money/ghost-in-the-machine-fluidity-partners-with-aave-a217e65ab72b",
       linkTitle: "",
     },
     {
@@ -129,7 +129,7 @@ const arr: ArticleListProps = {
       title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money", 
       desc: `Providing Users With a Secure Source of Verifiable Randomness Fluidity — Next-Generation Assets If your money’s on the move, exposure to DeFi can...`,
       info: "4 min read FLUIDITY",
-      link: "",
+      link: "https://blog.fluidity.money/fluidity-using-chainlink-vrf-to-power-the-future-of-money-11882c51ae89",
       linkTitle: "",
     },
     // {

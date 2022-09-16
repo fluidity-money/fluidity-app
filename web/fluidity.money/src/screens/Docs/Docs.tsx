@@ -62,21 +62,23 @@ const Docs = () => {
         <ManualCarousel>
           {items.map((item, index) => (
             <div key={index} className={styles.docsCard}>
-              <div className={styles.imgContainer}>
-                <img src={item.img} />
-              </div>
-              <div className={styles.content}>
-                <Heading as="h3">{item.title}</Heading>
-                <a href={item.link}>
-                  <LinkButton
-                    size={"medium"}
-                    type={"external"}
-                    handleClick={() => {}}
-                  >
-                    DOCS
-                  </LinkButton>
-                </a>
-              </div>
+              <a href={item.link}>
+                <div className={styles.imgContainer}>
+                  <img src={item.img} />
+                </div>
+                <div className={styles.content}>
+                  <Heading as="h3">{item.title}</Heading>
+                  <a href={item.link}>
+                    <LinkButton
+                      size={"medium"}
+                      type={"external"}
+                      handleClick={() => {}}
+                    >
+                      DOCS
+                    </LinkButton>
+                  </a>
+                </div>
+              </a>
             </div>
           ))}
         </ManualCarousel>
