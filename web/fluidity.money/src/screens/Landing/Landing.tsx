@@ -87,7 +87,7 @@ const Landing = () => {
             loop={state.loop}
             key={state.key}
             scale={state.scale}
-            margin = {"200px 0 0 0"}
+            margin = {"-60px 0 0 0"}
             onLoad={!homeVidEnded 
               ? () => setOnHomeVidLoaded(true)
               : () => {}
