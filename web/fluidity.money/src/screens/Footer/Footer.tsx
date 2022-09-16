@@ -82,23 +82,6 @@ const Footer = () => {
             </GeneralButton>
           </div>
           <div className={styles.legal}>
-            <div>
-              <a href={"#"}>
-                <Text as="p" size="xs">
-                  <u>
-                    Terms
-                  </u>
-                </Text>
-              </a>
-              <a href={"#"}>
-                <Text as="p" size="xs">
-                  <u>
-                    Privacy Policy
-                  </u>
-                </Text>
-              </a>
-            </div>
-
             <Text as="p" size="xs">
               © 2022 Fluidity Money. All Rights Reserved.
             </Text>
