@@ -63,7 +63,7 @@ const Landing = () => {
       {width > breakpoint ? (
         <div className={`${styles.bgVid}`}>
           <img
-            src="assets/images/load.webp"
+            src="assets/images/LoopAnim.webp"
             style={{
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
