@@ -37,6 +37,12 @@ export const Video = ({
   
   const classProps = className || "";
 
+  let dynamicWidth = `${scale * 100}%`;
+  
+  //the best i can do for mozilla-firefox, lol
+  if(navigator.userAgent.indexOf("Firefox") != -1) {
+    dynamicWidth = `${scale * 400}px`;
+  }
   return (
     <video
       key={key}
@@ -47,9 +53,10 @@ export const Video = ({
       className={`${styles.videoContainer} ${styles[type]} ${classProps}`}
       style={{
         display: display,
-        width: `${scale * 100}%`,
+        width: dynamicWidth,
         opacity: `${opacity}`,
-        margin: margin
+        margin: margin,
+        height: '900px'
       }}
       onEnded={onEnded}
       onPlaying={onLoad}

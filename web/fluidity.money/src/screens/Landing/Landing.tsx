@@ -3,42 +3,30 @@
 // LICENSE_TRF.md file.
 
 import { useEffect, useState } from "react";
-import {
-  ContinuousCarousel,
-  Heading,
-} from "@fluidity-money/surfing";
+import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
 import { relative } from "path";
+import { isSafari } from "react-device-detect";
 
 const Landing = () => {
-  const fqVidSources = [
+  const vidSources = (isSafari ? [
     "/assets/videos/FluidityHome.mov",
-    "/assets/videos/FluidityHome.webm",
     "/assets/videos/FluidityHomeloop.mov",
-    "/assets/videos/FluidityHomeloop.webm"
-  ].map(link =>
-    window.location.origin + link
-  )
+  ] : [
+    "/assets/videos/FluidityHome.webm",
+    "/assets/videos/FluidityHomeloop.webm",
+  ]).map((link) => window.location.origin + link);
 
-  const vidSources = [
-    [
-      fqVidSources[0], fqVidSources[1]
-    ],
-    [
-      fqVidSources[2], fqVidSources[3]
-    ]
-  ]
-
-  const [ onHomeVidLoaded, setOnHomeVidLoaded ] = useState(false);
-  const [ homeVidEnded, setHomeVidEnded ] = useState(false);
+  const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
+  const [homeVidEnded, setHomeVidEnded] = useState(false);
 
   const [state, setState] = useState({
     src: vidSources[0],
-    mimeType: ["video/quicktime", "video/webm"],
+    mimeType: isSafari ? "video/quicktime" : "video/webm",
     key: "0",
     loop: false,
     scale: 0.7,
@@ -48,7 +36,7 @@ const Landing = () => {
     homeVidEnded &&
       setState({
         src: vidSources[1],
-        mimeType: ["video/quicktime", "video/webm"],
+        mimeType: isSafari ? "video/quicktime" : "video/webm",
         key: "1",
         loop: true,
         scale: 0.5,
@@ -74,11 +62,12 @@ const Landing = () => {
       {/* Video Container */}
       {width > breakpoint ? (
         <div className={`${styles.bgVid}`}>
-          <img src="assets/images/load.webp"
-           style={{
-            position: "absolute",
-            display: `${onHomeVidLoaded === true ? 'none' : 'block'}`
-          }}
+          <img
+            src="assets/images/load.webp"
+            style={{
+              position: "absolute",
+              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+            }}
           />
           <Video
             src={state.src}
@@ -87,7 +76,8 @@ const Landing = () => {
             loop={state.loop}
             key={state.key}
             scale={state.scale}
-            margin = {"200px 0 0 0"}
+
+            margin = {"-60px 0 0 0"}
             onLoad={!homeVidEnded 
               ? () => setOnHomeVidLoaded(true)
               : () => {}
@@ -96,15 +86,17 @@ const Landing = () => {
               ? () => setHomeVidEnded(true)
               : () => {}
             }
+
           />
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
-          <img src="assets/images/loadanimation.gif"
-           style={{
-            position: "absolute",
-            display: `${onHomeVidLoaded === true ? 'none' : 'block'}`
-          }}
+          <img
+            src="assets/images/loadanimation.gif"
+            style={{
+              position: "absolute",
+              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+            }}
           />
           <Video
             src={state.src}
@@ -113,23 +105,17 @@ const Landing = () => {
             loop={state.loop}
             key={state.key}
             scale={state.scale * 2}
-            margin = {"-400px 0 0 0"}
-            onLoad={!homeVidEnded 
-              ? () => setOnHomeVidLoaded(true)
-              : () => {}
-            }
-            onEnded={!homeVidEnded 
-              ? () => setHomeVidEnded(true)
-              : () => {}
-            }
+            margin={"-400px 0 0 0"}
+            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
+            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
           />
         </div>
       )}
-    
+
       {/* Hero animation */}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 6, type: "tween" }}

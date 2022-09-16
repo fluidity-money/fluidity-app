@@ -8,6 +8,7 @@ import {
   LinkButton,
   Text,
 } from "@fluidity-money/surfing";
+import useViewport from "hooks/useViewport";
 import styles from "./ArticleDisplayCard.module.scss";
 
 export interface ArticleDisplayCardType {
@@ -16,41 +17,44 @@ export interface ArticleDisplayCardType {
   title: string;
   desc: string;
   info: string;
+  link: string;
   isResourcesPage?: boolean;
 }
 
 const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
+  const { width } = useViewport();
+  const breakpoint = 860;
+
   return (
     <div className={styles.cardContainer}>
-      <img src={article.img} />
-      <Heading as="h4" className={styles.leftMargin10px}>
-        {article.title}
-      </Heading>
-      <Text size="md" as="p">
-        {article.desc}
-      </Text>
-      <Text size="md" as="p">
-        {article.info}
-      </Text>
+      <a href={article.link}>
+        <img src={article.img} />
+        <Heading as="h4" className={styles.leftMargin10px}>
+          {article.title}
+        </Heading>
+        <Text size="md" as="p">
+          {article.desc}
+        </Text>
+        <Text size="md" as="p">
+          {article.info}
+        </Text>
+      </a>
       <section>
         {article.isResourcesPage ? (
           <a href="https://blog.fluidity.money/">
-            <GeneralButton
-              version={"secondary"}
-              buttonType={"text"}
-              size={"large"}
+            <LinkButton
+              type={"internal"}
+              size={width < breakpoint ? "medium" : "large"}
               handleClick={function (): void {}}
             >
               ALL ARTICLES
-            </GeneralButton>
-
+            </LinkButton>
           </a>
-
         ) : (
           <a href="/resources">
             <LinkButton
               type={"internal"}
-              size={"large"}
+              size={width < breakpoint ? "medium" : "large"}
               handleClick={function (): void {}}
             >
               EXPLORE ALL RESOURCES

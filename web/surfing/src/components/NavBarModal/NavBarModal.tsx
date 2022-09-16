@@ -1,9 +1,10 @@
-import React from "react";
-import { LinkButton } from "../Button";
+import { useRef } from "react";
+import { useClickOutside } from "../Modal/Modal";
+import { LinkButton } from "~/components/Button";
 import styles from "./NavBarModal.module.scss";
 
 interface INavBarModal {
-  handleModal: () => void;
+  handleModal: (_: boolean) => void;
   navLinks: ILinkButton[];
 }
 
@@ -16,11 +17,15 @@ interface ILinkButton {
 
 const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
+  const navBarModal = useRef(null);
+  
+  useClickOutside(navBarModal, () => handleModal(false));
+
   return (
-    <div className={styles.container}>
+    <div ref={navBarModal} className={styles.container}>
       {navLinks.map((link) => (
         <h4>
-          <a onClick={() => handleModal()} href={`/resources#${link.children}`}>
+          <a onClick={() => handleModal(false)} href={`/resources#${link.children}`}>
             <LinkButton
               size={link.size}
               type={link.type}

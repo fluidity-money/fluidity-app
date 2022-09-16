@@ -30,7 +30,7 @@ const Roadmap = () => {
     buttonType={"icon after"}
     version={"secondary"}
     size={"large"}
-    handleClick={() => {}}
+    handleClick={() => {window.location.href = "https://docs.fluidity.money/docs/fundamentals/roadmap"}}
     icon={<ArrowTopRight/>}
   >
     EXPLORE OUR FUTURE

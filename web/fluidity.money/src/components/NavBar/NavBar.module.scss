@@ -24,6 +24,7 @@
   grid-template-columns: 1fr 4fr 1fr;
   max-width: 1500px;
   z-index: 1000;
+
   .navbar {
     box-sizing: border-box;
     justify-content: space-between;
@@ -32,27 +33,31 @@
     padding: 10px;
     z-index: 99;
     justify-self: center;
+    position: fixed;
 
     .fade {
-      box-sizing: border-box;
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       ul {
         display: flex;
         li {
           margin: 20px;
           .active {
-            color: $fluidWhite;
-            text-underline-offset: 2px;
-            text-decoration: underline;
+            & > * {
+              font-weight: 700;
+              color: $fluidWhite;
+              text-decoration: underline;
+              text-underline-offset: 0.5em;
+            }
           }
           a {
             color: $textGrey;
           }
           button {
             margin: 0px 8px 0px 8px;
+          }
+
+          .modalButton {
+            fill: $textGrey;
           }
         }
       }
@@ -76,6 +81,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+
+      & > * {
+        z-index: 9;
+      }
     }
     @media (max-width: 700px) {
       padding: 10px 30px 10px 30px;
@@ -84,8 +93,10 @@
 }
 
 .fluidity {
+  z-index: 51;
   cursor: pointer;
   margin-left: 50.5px;
+  position: fixed;
 }
 
 .imgContainer {
@@ -97,4 +108,8 @@
     max-width: 100%;
     display: block;
   }
+}
+
+.transparent {
+  mix-blend-mode: difference;
 }
