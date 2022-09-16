@@ -95,7 +95,7 @@ const HowItWorks = () => {
             properties.
           </Text>
           <Text as={"p"} prominent={currentImageIndex === 1}>
-            They distribute yield when when used on any on-chain use-case. Yiled
+            They distribute yield when when used on any on-chain use-case. Yield
             is gained through utility.
           </Text>
           <Text as={"p"} prominent={currentImageIndex === 2}>
@@ -117,7 +117,7 @@ const HowItWorks = () => {
             currentImageIndex === 0 ? (
               <img
                 className={styles.behind}
-                style={{ opacity: 1, position: "absolute", zIndex: 5 }}
+                style={{ opacity: 1, position: "absolute", zIndex: 1 }}
                 src={window.location.origin + "/assets/text/FLUIDIFY.svg"}
                 alt={images[currentImageIndex].text}
               />

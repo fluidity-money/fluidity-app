@@ -6,10 +6,10 @@ import type { ReactComponentElement } from "react";
 import type { SupportedChainsList } from "~/util/chainProviders/chains";
 
 import { useRef } from "react";
+import { SupportedChains } from "~/util";
 import { useClickOutside } from "../Modal";
 import { ReactComponent as Checkmark } from "~/assets/images/buttonIcons/Checkmark.svg";
 import { Card, Heading, Text } from "~/components";
-import { SupportedChains } from "~/util";
 import styles from "./BlockchainModal.module.scss";
 
 export interface IOption {
@@ -23,9 +23,10 @@ export interface IBlockchainModal {
   options: IOption[];
   handleModal: React.SetStateAction<any>;
   mobile: boolean;
+  className?: string;
 }
 
-const BlockchainModal = ({ handleModal, option: selected, options, setOption, mobile }: IBlockchainModal) => {
+const BlockchainModal = ({ handleModal, option: selected, options, setOption, mobile, className }: IBlockchainModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
   const handleOnClick = (i: number) => {
     setOption(options[i].name);
@@ -40,7 +41,7 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption, mo
   
   const mobileProps = mobile && styles.mobile;
   
-  const classProps = `${styles.container} ${mobileProps}`
+  const classProps = `${styles.container} ${mobileProps} ${className || ""}`
 
   return (
     <div ref={blockchainModal} className={classProps}>

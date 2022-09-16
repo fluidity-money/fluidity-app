@@ -8,9 +8,9 @@ import { useChainContext } from "hooks/ChainContext";
 import RewardsBackground from "../../components/RewardsBackground";
 import RewardsInfoBox from "../../components/RewardsInfoBox";
 import { Heading, numberToMonetaryString } from "@fluidity-money/surfing";
-import styles from "./Reward.module.scss";
 import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
+import styles from "./Reward.module.scss";
 
 const Reward = () => {
   /* Background of transactions info moving left and right cotinuously,

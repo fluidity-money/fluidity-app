@@ -17,7 +17,7 @@ import styles from "./LandingPage.module.scss";
 const LandingPage = () => {
   return (
     <div className={styles.pageContainer}>
-      <div className={styles.screensContainer}>
+      <div id={"modal"} className={styles.screensContainer}>
         <Landing />
         <Reward />
         <HowItWorks />

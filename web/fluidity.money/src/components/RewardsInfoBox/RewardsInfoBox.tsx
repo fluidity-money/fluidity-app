@@ -82,6 +82,7 @@ const RewardsInfoBox = ({
               name: chain,
               icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
             }}
+            className={styles.overlap}
             options={options}
             setOption={setChain}
             mobile={width <= mobileBreakpoint}
