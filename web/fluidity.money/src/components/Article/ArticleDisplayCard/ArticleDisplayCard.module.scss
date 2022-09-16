@@ -38,7 +38,7 @@
     padding-left: 10px;
 
     @include max-860px {
-      display: none;
+      padding-left: 5px;
     }
   }
 }
