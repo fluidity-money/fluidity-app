@@ -54,7 +54,7 @@ export const Video = ({
   
   //the best i can do for mozilla-firefox, lol
   if(navigator.userAgent.indexOf("Firefox") != -1) {
-    dynamicWidth = `${scale * 400}px`;
+    dynamicWidth = `${scale * 1000}px`;
   }
   
   let widthProp = width;
