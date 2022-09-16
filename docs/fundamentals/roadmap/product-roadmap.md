@@ -23,8 +23,7 @@ Given the successful testnet and devnet deployments as well as the massive commu
    2. System Architecture
 6. Ambassador program and Fluidity Ecosystem Fund
 7. Web2 - Web3 and retail: Bridging adoption
-8. Projected Timeline
-9. 🌊 ,💸  Join The Movement
+8. (🌊 ,💸 ) Join The Movement
 
 
 
