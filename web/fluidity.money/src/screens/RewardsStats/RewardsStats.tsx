@@ -55,7 +55,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
           <InfoStats />
         </div>
         <div style={{ height: 254, width: "100%" }}>
-          <LineChart
+          {/* <LineChart
             data={[
               { x: 10, y: 5 },
               { x: 20, y: 15 },
@@ -77,7 +77,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
                 return d.y as any;
               },
             }}
-          />
+          /> */}
         </div>
 
         <RewardsInfoBox
