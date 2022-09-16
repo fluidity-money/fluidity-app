@@ -5,36 +5,54 @@
 import { GeneralButton, Heading, Text } from '@fluidity-money/surfing';
 import styles from './MailingList.module.scss';
 
-const MailingList = () => (
-  <div className={styles.container}>
-    <div>
-      <Heading as="h3">Stay hydrated</Heading>
-      <Text as="p" size={"lg"} >
-        Subscribe to our monthly newsletter to stay up to date with our
-        progress and roadmap.
-      </Text>
-      <form>
-        <section>
-          <Text size={"md"} prominent={true} >NAME</Text>
-          <input type="text" placeholder="Elon" />
-        </section>
-        <section>
-          <Text size={"md"} prominent={true} >EMAIL</Text>
-          <input type="text" placeholder="elon@email.com" />
-        </section>
-        <GeneralButton
-          version={"primary"}
-          buttonType={"text"}
-          size={"medium"}
-          handleClick={function (): void {
-            throw new Error("Function not implemented.");
-          }}
-        >
-          GIMME THE JUICE
-        </GeneralButton>
-      </form>
+const MailingList = () => {
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    const endpoint = "https://landing-cdn.fluidity.money/submit-email";
+    
+    const data = {email: e.target.email.value}
+    
+    fetch(
+      endpoint, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        mode: 'no-cors',
+      }
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div>
+        <Heading as="h3">Stay hydrated</Heading>
+        <Text as="p" size={"lg"} >
+          Subscribe to our monthly newsletter to stay up to date with our
+          progress and roadmap.
+        </Text>
+        <form id={"mailform"} onSubmit={handleSubmit}>
+          <section>
+            <Text size={"md"} prominent={true} >NAME</Text>
+            <input type="text" placeholder="Elon" name={"name"} />
+          </section>
+          <section>
+            <Text size={"md"} prominent={true} >EMAIL</Text>
+            <input type="text" placeholder="elon@email.com" name={"email"} />
+          </section>
+          <GeneralButton
+            type={'submit'}
+            version={"primary"}
+            buttonType={"text"}
+            size={"medium"}
+            //handleClick={() => {(document.getElementById('mailform') as HTMLFormElement).submit()}}
+          >
+            GIMME THE JUICE
+          </GeneralButton>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 export default MailingList;
