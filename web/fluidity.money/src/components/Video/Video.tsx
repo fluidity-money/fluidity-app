@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { isFirefox } from "react-device-detect";
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
@@ -50,12 +51,9 @@ export const Video = ({
   
   const classProps = className || "";
 
-  let dynamicWidth = `${scale * 100}%`;
-  
-  //the best i can do for mozilla-firefox, lol
-  if(navigator.userAgent.indexOf("Firefox") != -1) {
-    dynamicWidth = `${scale * 400}px`;
-  }
+  const dynamicWidth = isFirefox
+    ? `${scale * 1000}px`
+    : `${scale * 100}%`;
   
   let widthProp = width;
   
