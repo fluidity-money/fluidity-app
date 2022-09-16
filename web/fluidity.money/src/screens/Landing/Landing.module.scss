@@ -10,6 +10,9 @@
   background-image: url("../../../public/assets/images/bg-blur-desktop.png");
   background-repeat: no-repeat;
   background-size: 100% 100%;
+  @include max-620px {
+    background-size: 0%;
+  }
   // display: grid;
   // grid-template-columns: repeat(1, 1fr);
   // position: relative;
