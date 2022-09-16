@@ -17,7 +17,16 @@ interface IPropsVideo {
   onEnded?: VoidFunction;
   className?: string;
   mimeType?: string | string[];
+  
+  // Width of container
+  //   dynamic - Change explicit scale
+  //   auto - Automatically scale container width
+  //   number - Fixed width
   width?: "dynamic" | "auto" | number;
+  
+  // Height of container
+  //   auto - Automatically scale container height
+  //   number - Fixed height
   height?: "auto" | number;
 }
 
