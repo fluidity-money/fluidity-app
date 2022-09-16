@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
-import { relative } from "path";
 import { isSafari } from "react-device-detect";
 
 const Landing = () => {
