@@ -24,6 +24,12 @@ const Footer = () => {
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
 
+  const goToDemoAnchor = () => {
+    const origin = document.location.toString().split('#')[0];
+    document.location = origin + '#demo';
+  }
+
+
   const callout = (
     <div className={styles.callout}>
       <Heading hollow={true} as="h4" className={styles.text}>
@@ -53,9 +59,9 @@ const Footer = () => {
         <div className={styles.communication}>
           <div className={styles.buttons}>
             <GeneralButton
-              handleClick={() => {}}
               version={"primary"}
               buttonType={"text"}
+              handleClick={goToDemoAnchor}
               size={
                 width > firstBreakpoint
                   ? "medium"
@@ -67,7 +73,7 @@ const Footer = () => {
               LAUNCH FLUIDITY
             </GeneralButton>
             <GeneralButton
-              handleClick={() => {}}
+              handleClick={() => {window.location.href = "mailto:contact@fluidity.money"}}
               version={"secondary"}
               buttonType={"text"}
               size={
@@ -112,7 +118,7 @@ const Footer = () => {
 
 export default Footer;
 
-const howItWorks: IItem[] = [{ title: "Roadmap", src: "", type: "external" }];
+const howItWorks: IItem[] = [{ title: "Roadmap", src: "https://docs.fluidity.money/docs/fundamentals/roadmap", type: "external" }];
 
 const ecosystem: IItem[] = [
   { title: "DeFi", src: "", type: "internal" },
