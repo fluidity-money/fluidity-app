@@ -112,12 +112,12 @@
   }
   // display: grid;
   // grid-template-columns: 1fr 1fr 1fr;
-  
+
   &.notLoaded {
     & > .left {
       width: 50%;
     }
-    
+
     & > .right {
       width: 50%;
     }
@@ -152,4 +152,8 @@
 
 .callout {
   display: flex;
+}
+
+.title {
+  text-align: center;
 }
