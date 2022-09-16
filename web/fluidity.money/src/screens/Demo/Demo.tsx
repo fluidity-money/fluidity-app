@@ -85,7 +85,9 @@ const Demo = () => {
                 type={"reduce"}
                 mimeType={"video/quicktime"}
                 loop={true}
-                scale={1}
+                scale={0.4}
+                width={"auto"}
+                height={80}
              />
           </section>
         </div>

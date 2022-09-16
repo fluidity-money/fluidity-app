@@ -17,6 +17,8 @@ interface IPropsVideo {
   onEnded?: VoidFunction;
   className?: string;
   mimeType?: string | string[];
+  width?: "dynamic" | "auto" | number;
+  height?: "auto" | number;
 }
 
 export const Video = ({
@@ -32,6 +34,8 @@ export const Video = ({
   onEnded=() => {},
   onLoad=() => {},
   className,
+  width="dynamic",
+  height=900,
   ...props
 }: IPropsVideo) => {
   
@@ -43,6 +47,17 @@ export const Video = ({
   if(navigator.userAgent.indexOf("Firefox") != -1) {
     dynamicWidth = `${scale * 400}px`;
   }
+  
+  const widthProp = width === "dynamic"
+    ? dynamicWidth
+    : typeof width === "number"
+    ? `${width}px`
+    : width;
+  
+  const heightProp = typeof height === "number"
+    ? `${height}px`
+    : height;
+  
   return (
     <video
       key={key}
@@ -53,10 +68,10 @@ export const Video = ({
       className={`${styles.videoContainer} ${styles[type]} ${classProps}`}
       style={{
         display: display,
-        width: dynamicWidth,
         opacity: `${opacity}`,
         margin: margin,
-        height: '900px'
+        width: widthProp,
+        height: heightProp,
       }}
       onEnded={onEnded}
       onPlaying={onLoad}
