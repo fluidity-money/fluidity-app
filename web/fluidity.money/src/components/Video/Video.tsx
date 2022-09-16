@@ -22,7 +22,7 @@ interface IPropsVideo {
   //   dynamic - Change explicit scale
   //   auto - Automatically scale container width
   //   number - Fixed width
-  width?: "dynamic" | "auto" | number;
+  width?: "dynamic" | "auto" | string | number;
   
   // Height of container
   //   auto - Automatically scale container height
@@ -57,11 +57,13 @@ export const Video = ({
     dynamicWidth = `${scale * 400}px`;
   }
   
-  const widthProp = width === "dynamic"
-    ? dynamicWidth
-    : typeof width === "number"
-    ? `${width}px`
-    : width;
+  let widthProp = width;
+  
+  if (widthProp === "dynamic") {
+    widthProp = dynamicWidth;
+  } else if (typeof widthProp === "number") {
+    widthProp = `${widthProp}px`;
+  }
   
   const heightProp = typeof height === "number"
     ? `${height}px`
