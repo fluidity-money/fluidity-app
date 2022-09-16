@@ -83,7 +83,6 @@ const Demo = () => {
                 className={styles.comingSoonButton}
                 src={window.location.origin + "/assets/videos/FluidityComingSoon.mp4"}
                 type={"reduce"}
-                mimeType={"video/quicktime"}
                 loop={true}
                 scale={0.4}
                 width={"auto"}
