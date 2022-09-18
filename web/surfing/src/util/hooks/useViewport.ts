@@ -1,7 +1,6 @@
 import React from "react";
 // used to detect window width
 const useViewport = () => {
-
   const [width, setWidth] = React.useState(0);
 
   React.useEffect(() => {
