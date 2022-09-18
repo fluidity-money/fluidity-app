@@ -26,14 +26,14 @@ const Incentivising = () => {
        />
       {width <= breakpoint ? (
       <Video
-        src={window.location.origin + "/assets/videos/FluidityHowItWorks.mp4"}
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
         type={"reduce"}
         loop={true}
         onLoad={() => setReady(true)}
         className={styles.video}
       />): (
       <Video
-        src={window.location.origin + "/assets/videos/FluidityHowItWorks.mp4"}
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
         type={"reduce"}
         loop={true}
         scale={.6}

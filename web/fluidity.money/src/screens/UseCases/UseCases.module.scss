@@ -5,6 +5,10 @@
   min-height: 850px;
   width: 100%;
   background-color: black;
+  section {
+    display: flex;
+    align-items: center;
+  }
 }
 
 .backgroundText {
@@ -13,10 +17,6 @@
   opacity: 0.1;
 }
 
-section {
-  display: flex;
-  align-items: center;
-}
 
 .map {
   gap: 20px;

@@ -18,7 +18,7 @@ const Landing = () => {
   ] : [
     "/assets/videos/FluidityHome.webm",
     "/assets/videos/FluidityHomeloop.webm",
-  ]).map((link) => window.location.origin + link);
+  ]).map((link) => link);
 
   const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
   const [homeVidEnded, setHomeVidEnded] = useState(false);

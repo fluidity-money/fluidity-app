@@ -11,27 +11,13 @@ import styles from "./FluidWars.module.scss";
 import useViewport from "hooks/useViewport";
 
 const FluidWars = () => {
-  /* scrolls to location on pageload if it contains same ID or scrolls to the top
-   for ResourcesNavModal to work*/
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash) {
-      let elem = document.getElementById(location.hash.slice(1));
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }
-  }, [location]);
-
   const { width } = useViewport();
   const breakpoint = 860;
 
   const left =
     width > breakpoint ? (
       <Video
-        src={window.location.origin + '/assets/videos/FluidityFluidWars.mp4'}
+        src={'/assets/videos/FluidityFluidWars.mp4'}
         type={"fit"}
         loop={true}
         scale={2.0}
@@ -39,7 +25,7 @@ const FluidWars = () => {
       />
     ) : (
       <Video
-        src={window.location.origin + '/assets/videos/FluidityFluidWars.mp4'}
+        src={'/assets/videos/FluidityFluidWars.mp4'}
         type={"fit"}
         loop={true}
       />
