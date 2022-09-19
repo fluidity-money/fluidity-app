@@ -9,7 +9,7 @@ import {BigintIsh} from "@saberhq/token-utils";
 import {useSolanaTokens} from "../../utils/hooks/useSolanaTokens";
 import {unwrapSpl, wrapSpl} from "../../utils/solana/transaction";
 import {InterfaceProps} from ".";
-import {chainContext, Chain, Chains, Network, SupportedFluidToken, SupportedUnwrappedToken} from "./chainContext";
+import {chainContext, Chain, Chains, Network, SupportedFluidToken, isSupportedToken} from "./chainContext";
 import localforage from "localforage";
 
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
@@ -59,14 +59,14 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
   }
 
   // amount in token's decimals, e.g. 1,500,000 to wrap 1.5 of a 6 decimal token
-  const wrap = async (token: SupportedUnwrappedToken<"solana">, amount: BigintIsh) => {
-    if (!connected || !fluidProgramId)
+  const wrap = async (token: string, amount: BigintIsh) => {
+    if (!connected || !fluidProgramId || !network || !isSupportedToken(token, chain))
       return;
-    
+
     const fluidToken = fluidTokens['f' + token as SupportedFluidToken<"solana">]
     const unwrappedToken = unwrappedTokens[token]
 
-    if (!fluidToken || !unwrappedToken || !network)
+    if (!fluidToken || !unwrappedToken) 
       return;
 
     try {
@@ -76,20 +76,20 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     }
   }
 
-  const unwrap = async(token: SupportedUnwrappedToken<"solana">, amount: BigintIsh) => {
-    if (!connected || !fluidProgramId)
+  const unwrap = async(token: string, amount: BigintIsh) => {
+    if (!connected || !fluidProgramId || !network || !isSupportedToken(token, chain))
       return;
     
-    const f = fluidTokens['f' + token as SupportedFluidToken<"solana">]
-    const u = unwrappedTokens[token]
+    const fluidToken = fluidTokens['f' + token as SupportedFluidToken<"solana">]
+    const unwrappedToken = unwrappedTokens[token]
 
-    if (!f || !u || !network)
+    if (!fluidToken || !unwrappedToken)
       return;
 
     try {
-      return await unwrapSpl(solana, fluidProgramId, u, f, amount, network);
+      return await unwrapSpl(solana, fluidProgramId, unwrappedToken, fluidToken, amount, network);
     } catch(e) {
-      console.error(`Failed to wrap token ${token}!`, e);
+      console.error(`Failed to unwrap token ${token}!`, e);
     }
   }
 

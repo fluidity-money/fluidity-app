@@ -4,6 +4,7 @@
 
 import {BigintIsh} from "@saberhq/token-utils";
 import {createContext} from "react";
+import {isInArray} from "../../utils/types";
 
 export const Chains = {
   ethereum: [
@@ -27,6 +28,10 @@ export type SupportedFluidToken<T extends Chain = Chain> = `f${SupportedUnwrappe
 export type Chain = keyof typeof Chains;
 export type NullableChain = Chain | null;
 export type Network<C extends Chain = Chain> = typeof Chains[C][number]
+
+export const isSupportedToken = <C extends Chain>(token: string, chain: C): token is SupportedUnwrappedToken<C> => {
+  return isInArray(token, Tokens[chain])
+}
 
 interface ChainContextBase {
     setChain: (chain: Chain) => void
