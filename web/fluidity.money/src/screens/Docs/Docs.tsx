@@ -61,14 +61,14 @@ const Docs = () => {
       <div className={styles.container}>
         <ManualCarousel>
           {items.map((item, index) => (
-            <div key={index} className={styles.docsCard}>
-              <a href={item.link}>
+            <a href={item.link} rel="noopener noreferrer" target="_blank">
+              <div key={index} className={styles.docsCard}>
                 <div className={styles.imgContainer}>
-                  <img src={item.img} />
+                  <img src={item.img} alt="document title" />
                 </div>
                 <div className={styles.content}>
                   <Heading as="h3">{item.title}</Heading>
-                  <a href={item.link}>
+                  <a href={item.link} rel="noopener noreferrer" target="_blank">
                     <LinkButton
                       size={"medium"}
                       type={"external"}
@@ -78,8 +78,8 @@ const Docs = () => {
                     </LinkButton>
                   </a>
                 </div>
-              </a>
-            </div>
+              </div>
+            </a>
           ))}
         </ManualCarousel>
         <div className={styles.allDocs}>

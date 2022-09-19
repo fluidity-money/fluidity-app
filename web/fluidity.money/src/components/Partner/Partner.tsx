@@ -13,18 +13,16 @@ interface IPropsPartner {
 }
 
 const Partner = ({ img, title, info, url }: IPropsPartner) => {
-
-  const redirect = (url : string) => {
-    window.location.href = url;
-  };
-
   return (
-    <div className={styles.container} onClick={() => redirect(url)}>
-      <img src= {img} alt=""/>
-      <div>
-       <h2>{title}</h2><img src="assets/images/Group.svg"/>
-      </div>  
-      <p>{info}</p>
+    <div className={styles.container}>
+      <a href={url} rel="noopener noreferrer" target="_blank">
+        <img src={img} alt={title} />
+        <div>
+          <h2>{title}</h2>
+          <img src="assets/images/Group.svg" alt={`link to ${title}`} />
+        </div>
+        <p>{info}</p>
+      </a>
     </div>
   );
 };

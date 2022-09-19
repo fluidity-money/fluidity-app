@@ -12,13 +12,17 @@ import styles from "./Landing.module.scss";
 import { isSafari } from "react-device-detect";
 
 const Landing = () => {
-  const vidSources = (isSafari ? [
-    "/assets/videos/FluidityHome.mov",
-    "/assets/videos/FluidityHomeloop.mov",
-  ] : [
-    "/assets/videos/FluidityHome.webm",
-    "/assets/videos/FluidityHomeloop.webm",
-  ]).map((link) => window.location.origin + link);
+  const vidSources = (
+    isSafari
+      ? [
+          "/assets/videos/FluidityHome.mov",
+          "/assets/videos/FluidityHomeloop.mov",
+        ]
+      : [
+          "/assets/videos/FluidityHome.webm",
+          "/assets/videos/FluidityHomeloop.webm",
+        ]
+  ).map((link) => window.location.origin + link);
 
   const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
   const [homeVidEnded, setHomeVidEnded] = useState(false);
@@ -67,6 +71,7 @@ const Landing = () => {
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
+            alt="fluid sphere"
           />
           <Video
             src={state.src}
@@ -75,16 +80,9 @@ const Landing = () => {
             loop={state.loop}
             key={state.key}
             scale={state.scale}
-            margin = {"-60px 0 0 0"}
-            onLoad={!homeVidEnded 
-              ? () => setOnHomeVidLoaded(true)
-              : () => {}
-            }
-            onEnded={!homeVidEnded 
-              ? () => setHomeVidEnded(true)
-              : () => {}
-            }
-
+            margin={"-60px 0 0 0"}
+            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
+            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
           />
         </div>
       ) : (
@@ -95,6 +93,7 @@ const Landing = () => {
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
+            alt="loading"
           />
           <Video
             src={state.src}

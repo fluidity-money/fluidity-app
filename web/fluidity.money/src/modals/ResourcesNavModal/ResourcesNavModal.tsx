@@ -2,7 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { Link } from "react-router-dom";
 import { LinkButton } from "@fluidity-money/surfing";
 import styles from "./ResourcesNavModal.module.scss";
 
