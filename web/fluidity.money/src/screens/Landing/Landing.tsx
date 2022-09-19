@@ -67,6 +67,15 @@ const Landing = () => {
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
+            alt="Loop-Ring"
+          />
+          <img
+            src="assets/images/TextLoop.webp"
+            style={{
+              position: "absolute",
+              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+            }}
+            alt="Loop-Text"
           />
           <Video
             src={state.src}
@@ -84,17 +93,25 @@ const Landing = () => {
               ? () => setHomeVidEnded(true)
               : () => {}
             }
-
           />
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
           <img
-            src="assets/images/loadanimation.gif"
+            src="assets/images/LoopAnim.webp"
             style={{
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
+            alt="Loop-Ring"
+          />
+          <img
+            src="assets/images/TextLoop.webp"
+            style={{
+              position: "absolute",
+              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+            }}
+            alt="Loop-Text"
           />
           <Video
             src={state.src}
