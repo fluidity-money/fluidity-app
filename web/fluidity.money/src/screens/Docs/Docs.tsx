@@ -64,7 +64,9 @@ const Docs = () => {
             <a href={item.link} rel="noopener noreferrer" target="_blank">
               <div key={index} className={styles.docsCard}>
                 <div className={styles.imgContainer}>
-                  <img src={item.img} alt="document title" />
+
+                  <img src={item.img} alt="carousel-object"/>
+
                 </div>
                 <div className={styles.content}>
                   <Heading as="h3">{item.title}</Heading>

@@ -17,7 +17,9 @@ const IntroTile = ({ img, side, children }: IIntroTileProps) => {
     <>
       {side === "left" && (
         <div className={styles.containerLeft}>
-          <img src={img} alt="intro tile" />
+
+          <img src={img} alt="Intro-Title-Left" />
+
 
           <div className={`${styles.text} ${styles.left}`}>
             <Heading as="h6">{children}</Heading>
@@ -29,7 +31,9 @@ const IntroTile = ({ img, side, children }: IIntroTileProps) => {
           <div className={`${styles.text} ${styles.right}`}>
             <Heading as="h6">{children}</Heading>
           </div>
-          <img src={img} alt="intro tile" />
+
+          <img src={img} alt="Intro-Title-Right" />
+
         </div>
       )}
     </>

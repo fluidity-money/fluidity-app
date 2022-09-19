@@ -144,42 +144,31 @@ const DataTable = ({ name, filterData = [], columns, data, rowSize }: any) => {
                       );
                     })}
                   </tr>
-                );
-              }
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div className={styles.pagination}>
-        <span>
-          Page{" "}
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>{" "}
-        </span>
-        <span>
-          <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-            <img
-              src={
-                window.location.origin +
-                "/assets/images/buttonIcons/paginationArrowLeft.svg"
-              }
-              alt="arrow left"
-            />
-          </button>
-          <button onClick={() => nextPage()} disabled={!canNextPage}>
-            <img
-              src={
-                window.location.origin +
-                "/assets/images/buttonIcons/paginationArrowRight.svg"
-              }
-              alt="arrow right"
-            />
-          </button>
-        </span>
-      </div>
-    </>
-  );
+
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className={styles.pagination}>
+          <span>
+              Page{' '}
+              <strong>
+                {pageIndex + 1} of {pageOptions.length}
+              </strong>{' '}
+          </span>
+          <span>
+            <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+              <img src={window.location.origin + '/assets/images/buttonIcons/paginationArrowLeft.svg'} alt="Prev"/>
+            </button>
+            <button onClick={() => nextPage()} disabled={!canNextPage}>
+            <img src={window.location.origin + '/assets/images/buttonIcons/paginationArrowRight.svg'} alt="Next"/>
+            </button>
+          </span>
+        </div>
+      </>
+    )
+
 };
 
 export default DataTable;
