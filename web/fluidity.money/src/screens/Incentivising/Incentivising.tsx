@@ -17,12 +17,13 @@ const Incentivising = () => {
 
   return (
     <div className={styles.container}>
-      <img src="assets/images/FluidityHowItWorks.png"
+      <img src="assets/images/Animations/FluidityHowItWorks.webp"
         style={{
          position: "absolute",
          display: `${ready === true ? 'none' : 'block'}`,
-         width: `${width <= breakpoint ? '100%' : '42%'}`,
+         width: `${width <= breakpoint ? '100%' : '18%'}`,
        }}
+       alt="How-It-Works"
        />
       {width <= breakpoint ? (
       <Video

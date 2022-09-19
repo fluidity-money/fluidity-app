@@ -20,9 +20,9 @@ const Partner = ({ img, title, info, url }: IPropsPartner) => {
 
   return (
     <div className={styles.container} onClick={() => redirect(url)}>
-      <img src= {img} alt=""/>
+      <img src= {img} alt="card"/>
       <div>
-       <h2>{title}</h2><img src="assets/images/Group.svg"/>
+       <h2>{title}</h2><img src="assets/images/Group.svg" alt="link"/>
       </div>  
       <p>{info}</p>
     </div>

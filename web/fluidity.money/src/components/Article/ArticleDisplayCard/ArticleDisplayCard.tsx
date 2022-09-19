@@ -28,7 +28,7 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
   return (
     <div className={styles.cardContainer}>
       <a href={article.link}>
-        <img src={article.img} />
+        <img src={article.img} alt="Article-Image"/>
         <Heading as="h4" className={styles.leftMargin10px}>
           {article.title}
         </Heading>

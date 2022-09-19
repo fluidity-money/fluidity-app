@@ -63,7 +63,7 @@ const Fluniversity = () => {
             <div key={index} className={styles.fluniversityCard}>
               <a href={item.link}>
                 <div className={styles.imgContainer}>
-                  <img src={item.img} />
+                  <img src={item.img} alt="Link"/>
                 </div>
 
                 <Heading as="h4">{item.title}</Heading>
