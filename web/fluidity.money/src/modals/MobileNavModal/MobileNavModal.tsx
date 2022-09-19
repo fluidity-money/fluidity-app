@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { GeneralButton, Heading } from "@fluidity-money/surfing";
+import { Heading } from "@fluidity-money/surfing";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
@@ -30,16 +30,32 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
       {links}
 
       <div className={styles.socials}>
-        <a href="https://twitter.com/fluiditymoney">
+        <a
+          href="https://twitter.com/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/twitter.svg" alt="twitter" />
         </a>
-        <a href="https://discord.gg/CNvpJk4HpC">
+        <a
+          href="https://discord.gg/CNvpJk4HpC"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/discord.svg" alt="discord" />
         </a>
-        <a href="https://t.me/fluiditymoney">
+        <a
+          href="https://t.me/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/telegram.svg" alt="telegram" />
         </a>
-        <a href="https://www.linkedin.com/company/74689228/">
+        <a
+          href="https://www.linkedin.com/company/74689228/"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
         </a>
       </div>
@@ -49,7 +65,10 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
           LAUNCH FLUIDITY
         </Heading>
       </a>
-      <a className={`${styles.button} ${styles.smaller}`} href={``}>
+      <a
+        className={`${styles.button} ${styles.smaller}`}
+        href="mailto:contact@fluidity.money"
+      >
         <Heading as="h3">LET'S CHAT</Heading>
       </a>
     </div>
