@@ -32,6 +32,12 @@
       color: $textGrey;
     }
 
+    section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @include max-860px {
       width: 70%;
     }
@@ -57,6 +63,9 @@
 
 .comingSoonButton {
     cursor: pointer;
+    position: relative;
+    width: 130px;
+    height: 60px;
     border-radius: 50px;
     border: 0.5px solid $fluidWhite;
 }

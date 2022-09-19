@@ -14,16 +14,29 @@ interface IPropsPartner {
 
 const Partner = ({ img, title, info, url }: IPropsPartner) => {
   return (
+<<<<<<< HEAD
     <a href={url} rel="noopener noreferrer" target="_blank">
       <div className={styles.container}>
         <img src={img} alt={title} />
+=======
+
+    <div className={styles.container}>
+      <a href={url} rel="noopener noreferrer" target="_blank">
+        <img src={img} alt="card" />
+>>>>>>> ddb3ddfaae972a66bc3e9669bd8ec8a5da8ffea8
         <div>
           <h2>{title}</h2>
-          <img src="assets/images/Group.svg" alt={`link to ${title}`} />
+          <img src="assets/images/Group.svg" alt="link" />
         </div>
         <p>{info}</p>
+<<<<<<< HEAD
       </div>
     </a>
+=======
+      </a>
+
+    </div>
+>>>>>>> ddb3ddfaae972a66bc3e9669bd8ec8a5da8ffea8
   );
 };
 

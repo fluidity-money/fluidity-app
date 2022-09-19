@@ -71,7 +71,17 @@ const Landing = () => {
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
-            alt="fluid sphere"
+
+            alt="Loop-Ring"
+          />
+          <img
+            src="assets/images/TextLoop.webp"
+            style={{
+              position: "absolute",
+              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+            }}
+            alt="Loop-Text"
+
           />
           <Video
             src={state.src}
@@ -80,20 +90,38 @@ const Landing = () => {
             loop={state.loop}
             key={state.key}
             scale={state.scale}
-            margin={"-60px 0 0 0"}
-            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
-            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
+
+            margin = {"-60px 0 0 0"}
+            onLoad={!homeVidEnded 
+              ? () => setOnHomeVidLoaded(true)
+              : () => {}
+            }
+            onEnded={!homeVidEnded 
+              ? () => setHomeVidEnded(true)
+              : () => {}
+            }
+
           />
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
           <img
-            src="assets/images/loadanimation.gif"
+            src="assets/images/LoopAnim.webp"
             style={{
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
-            alt="loading"
+            alt="Loop-Ring"
+          />
+          <img
+            src="assets/images/TextLoop.webp"
+            style={{
+              position: "absolute",
+              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+            }}
+
+            alt="Loop-Text"
+
           />
           <Video
             src={state.src}

@@ -63,7 +63,9 @@ const Fluniversity = () => {
             <a href={item.link} rel="noopener noreferrer" target="_blank">
               <div key={index} className={styles.fluniversityCard}>
                 <div className={styles.imgContainer}>
-                  <img src={item.img} alt="article" />
+
+                  <img src={item.img} alt="Link"/>
+
                 </div>
 
                 <Heading as="h4">{item.title}</Heading>
