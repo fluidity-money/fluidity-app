@@ -10,12 +10,22 @@ import {useSolanaTokens} from "../../utils/hooks/useSolanaTokens";
 import {unwrapSpl, wrapSpl} from "../../utils/solana/transaction";
 import {InterfaceProps} from ".";
 import {chainContext, Chain, Chains, Network, SupportedFluidToken, SupportedUnwrappedToken} from "./chainContext";
+import localforage from "localforage";
 
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain: Chain = "solana";
+  const solanaNetworkKey = "persist.lastNetwork.solana";
   const {fluidProgramId, fluidTokens, unwrappedTokens, network, setNetwork} = useSolanaTokens();
   const solana = useSolana();
   const solanaConnected = solana.connected;
+
+  useEffect(() => {
+    localforage.getItem(solanaNetworkKey).then(storedNetwork => {
+      if (isInArray(storedNetwork, Chains[chain])) {
+        setNetworkChecked(storedNetwork);
+      }
+    });
+  }, [])
 
   useEffect(() => {
     setConnected(solanaConnected)
@@ -28,6 +38,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
   // set network if it's valid for the chain
   const setNetworkChecked = (network: string) => {
     if (isInArray(network, Chains[chain])) {
+        localforage.setItem(solanaNetworkKey, network);
         solana.setNetwork(network);
         setNetwork(network)
     }
