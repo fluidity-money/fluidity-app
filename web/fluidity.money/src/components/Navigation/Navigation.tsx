@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { AnchorButton } from "components/Button";
+import { AnchorButton } from "@fluidity-money/surfing";
 import styles from "./Navigation.module.scss";
 
 interface INavigation {
