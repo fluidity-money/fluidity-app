@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE.md file.
 
+import {BigintIsh} from "@saberhq/token-utils";
 import {createContext} from "react";
 
 export const Chains = {
@@ -15,6 +16,12 @@ export const Chains = {
   ],
 } as const;
 
+const Tokens = {
+  ethereum: ["USDT", "USDC", "DAI"],
+  solana: ["USDT", "USDC"],
+} as const;
+
+export type SupportedToken<T extends keyof typeof Tokens = keyof typeof Tokens> = typeof Tokens[T][number];
 export type Chain = keyof typeof Chains;
 export type NullableChain = Chain | null;
 export type Network<C extends Chain = keyof typeof Chains> = typeof Chains[C][number]

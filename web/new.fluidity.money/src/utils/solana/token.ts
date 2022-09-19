@@ -2,6 +2,17 @@ import {BigintIsh, Token as SaberToken, TokenAmount} from '@saberhq/token-utils'
 import {PublicKey} from '@solana/web3.js';
 import {BaseToken} from '../types';
 
+export interface SolanaTokenConfig {
+  symbol: string,
+  name: string,
+  address: string,
+  decimals: number,
+  colour: string,
+  image: string,
+  obligationAccount?: PublicKey,
+  dataAccount?: PublicKey,
+}
+
 export class SolanaToken extends BaseToken{
   isFluid(): this is FluidSolanaToken {
     return this instanceof FluidSolanaToken;
@@ -30,12 +41,12 @@ export class FluidSolanaToken extends SolanaToken {};
 // UnwrappedSolanaToken has the obligation and data accounts
 export class UnwrappedSolanaToken extends SolanaToken {
   constructor(
-    readonly symbol: string,
-    readonly name: string,
-    readonly address: string,
-    readonly decimals: number,
-    readonly colour: string,
-    readonly image: string,
+    symbol: string,
+    name: string,
+    address: string,
+    decimals: number,
+    colour: string,
+    image: string,
     readonly obligationAccount: PublicKey,
     readonly dataAccount: PublicKey,
   ) {
