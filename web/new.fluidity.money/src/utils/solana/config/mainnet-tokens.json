@@ -1,0 +1,41 @@
+{
+  "fluidProgramId": "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR",
+  "tokens": [
+    {
+      "symbol": "USDT",
+      "name": "USD Tether",
+      "address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+      "decimals": 6,
+      "colour": "rgb(36, 163, 124)",
+      "image": "img/TokenIcons/usdtIcon.svg",
+      "obligationAccount": "446FsyYfANPuiK18DYGLwQm6B5b2MecTUvm1KtnDMGca",
+      "dataAccount": "DrKwQQrKcbNCLkVfAVasxk1j7ccCaXVfdVdS6RijRZo"
+    },
+    {
+      "symbol": "fUSDT",
+      "name": "FLUID USDT",
+      "address": "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8",
+      "decimals": 6,
+      "colour": "rgb(36, 163, 124)",
+      "image": "img/TokenIcons/usdtIcon.svg"
+    },
+    {
+      "symbol": "USDC",
+      "name": "USD Coin",
+      "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "decimals": 6,
+      "colour": "#2775c9",
+      "image": "img/TokenIcons/usdcIcon.svg",
+      "obligationAccount": "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A",
+      "dataAccount": "Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce"
+    },
+    {
+      "symbol": "fUSDC",
+      "name": "FLUID USDC",
+      "address": "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv",
+      "decimals": 6,
+      "colour": "#2775c9",
+      "image": "img/TokenIcons/usdcIcon.svg"
+    }
+  ]
+}

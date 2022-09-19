@@ -16,22 +16,24 @@ export const Chains = {
   ],
 } as const;
 
-const Tokens = {
+export const Tokens = {
   ethereum: ["USDT", "USDC", "DAI"],
   solana: ["USDT", "USDC"],
 } as const;
 
-export type SupportedToken<T extends keyof typeof Tokens = keyof typeof Tokens> = typeof Tokens[T][number];
+export type SupportedUnwrappedToken<T extends Chain = Chain> = typeof Tokens[T][number];
+export type SupportedFluidToken<T extends Chain = Chain> = `f${SupportedUnwrappedToken<T>}`;
+
 export type Chain = keyof typeof Chains;
 export type NullableChain = Chain | null;
-export type Network<C extends Chain = keyof typeof Chains> = typeof Chains[C][number]
+export type Network<C extends Chain = Chain> = typeof Chains[C][number]
 
 interface ChainContextBase {
     setChain: (chain: Chain) => void
 
     disconnect: () => void
-    wrap: () => void
-    unwrap: () => void
+    wrap: (token: string, amount: BigintIsh) => void
+    unwrap: (token: string, amount: BigintIsh) => void
     connected: boolean
 }
 

@@ -1,23 +1,32 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-
 import Dashboard from './screens/authenticated/dashboard';
 import Rewards from './screens/authenticated/rewards';
 import Assets from './screens/authenticated/assets';
 import Dao from './screens/authenticated/dao';
 import Home from './screens/Home';
-import { Chain, chainContext, Network, Chains, NullableChain} from "./chainContext";
+import { Chain, chainContext, Network, Chains, NullableChain, SupportedUnwrappedToken, SupportedFluidToken} from "./chainContext";
 import './App.css'
 import {ReactNode, useContext, useEffect, useState} from "react";
 import {isInArray, ReactSetter} from "./utils/types";
 import {SolanaProvider, useSolana} from "@saberhq/use-solana";
+import {BigintIsh} from "@saberhq/token-utils";
+import {useSolanaTokens} from "./utils/hooks/useSolanaTokens";
+import {unwrapSpl, wrapSpl} from "./utils/solana/transaction";
 
 const ChainInterface = ({children}: {children: React.ReactNode}) => {
-  const [chain, setChain] = useState<NullableChain>(null);
+  // TODO try to source from localforage on first load
+  const [chain, setChain_] = useState<NullableChain>(null);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     setConnected(false);
   }, [chain]);
+
+  // stop auto login when setting chain
+  const setChain = (chain: NullableChain) => {
+    localStorage.removeItem("use-solana/wallet-config");
+    setChain_(chain)
+  }
 
   switch (chain) {
   case "ethereum":
@@ -40,14 +49,14 @@ const ChainInterface = ({children}: {children: React.ReactNode}) => {
 
 type InterfaceProps = {
   children?: ReactNode,
-  setChain: ReactSetter<NullableChain>,
+  setChain: (chain: NullableChain) => void,
   connected: boolean,
   setConnected: ReactSetter<boolean>
 }
 
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain: Chain = "solana";
-  const [network, setNetwork] = useState<Network<"solana">>("mainnet-beta");
+  const {fluidProgramId, fluidTokens, unwrappedTokens, network, setNetwork} = useSolanaTokens();
   const solana = useSolana();
   const solanaConnected = solana.connected;
 
@@ -61,34 +70,59 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
 
   // set network if it's valid for the chain
   const setNetworkChecked = (network: string) => {
-    if (isInArray(network, Chains[chain]))
-      solana.setNetwork(network);
+    if (isInArray(network, Chains[chain])) {
+        solana.setNetwork(network);
+        setNetwork(network)
+    }
   }
 
   const connect = (network: Network) => {
     if (!isInArray(network, Chains[chain]))
       return;
 
-    solana.activate("Sollet")
-    setNetwork(network);
+    // TODO choose wallet
+    let b: string = "Sollet";
+    solana.activate(b);
+    // setNetwork(network);
   }
 
   const disconnect = async() => {
     solana.disconnect();
   }
 
-  const wrap = () => {
-    if (!connected)
+  // amount in token's decimals, e.g. 1,500,000 to wrap 1.5 of a 6 decimal token
+  const wrap = async (token: SupportedUnwrappedToken<"solana">, amount: BigintIsh) => {
+    if (!connected || !fluidProgramId)
+      return;
+    
+    const fluidToken = fluidTokens['f' + token as SupportedFluidToken<"solana">]
+    const unwrappedToken = unwrappedTokens[token]
+
+    if (!fluidToken || !unwrappedToken || !network)
       return;
 
-    console.log("wrap solana!")
+    try {
+      return await wrapSpl(solana, fluidProgramId, unwrappedToken, fluidToken, amount, network);
+    } catch(e) {
+      console.error(`Failed to wrap token ${token}!`, e);
+    }
   }
 
-  const unwrap = () => {
-    if (!connected)
+  const unwrap = async(token: SupportedUnwrappedToken<"solana">, amount: BigintIsh) => {
+    if (!connected || !fluidProgramId)
+      return;
+    
+    const f = fluidTokens['f' + token as SupportedFluidToken<"solana">]
+    const u = unwrappedTokens[token]
+
+    if (!f || !u || !network)
       return;
 
-    console.log("unwrap solana!")
+    try {
+      return await unwrapSpl(solana, fluidProgramId, u, f, amount, network);
+    } catch(e) {
+      console.error(`Failed to wrap token ${token}!`, e);
+    }
   }
 
   const value = {
@@ -172,8 +206,8 @@ return <div>
       <button onClick={() => chain !== null && connect(network)}>connect</button>
       <button onClick={disconnect}>disconnect</button>
       <br/>
-      <button onClick={wrap}>wrap</button>
-      <button onClick={unwrap}>unwrap</button>
+      <button onClick={() => wrap("USDC", 10000)}>wrap</button>
+      <button onClick={() => unwrap("USDC", 10000)}>unwrap</button>
       <br/>
       <button onClick={() => setChain("solana")}>solana</button>
       <button onClick={() => setChain("ethereum")}>ethereum</button>

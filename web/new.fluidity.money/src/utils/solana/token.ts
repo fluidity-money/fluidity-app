@@ -3,14 +3,17 @@ import {PublicKey} from '@solana/web3.js';
 import {BaseToken} from '../types';
 
 export interface SolanaTokenConfig {
-  symbol: string,
-  name: string,
-  address: string,
-  decimals: number,
-  colour: string,
-  image: string,
-  obligationAccount?: PublicKey,
-  dataAccount?: PublicKey,
+  fluidProgramId: string,
+  tokens: {
+    symbol: string,
+    name: string,
+    address: string,
+    decimals: number,
+    colour: string,
+    image: string,
+    obligationAccount?: string,
+    dataAccount?: string,
+  }[]
 }
 
 export class SolanaToken extends BaseToken{

@@ -1,6 +1,4 @@
 import {Dispatch, SetStateAction} from "react";
-import {PublicKey} from "@solana/web3.js";
-import {SupportedToken} from "../chainContext";
 
 export type ReactSetter<T> = Dispatch<SetStateAction<T>>
 export type Mapped<K extends string | number | symbol, T> = {[P in K]: T}
