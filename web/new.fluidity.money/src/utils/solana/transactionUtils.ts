@@ -8,7 +8,7 @@ import {getATAAddressSync} from "@saberhq/token-utils";
 import * as splToken from "@solana/spl-token";
 import { AccountMeta } from "@solana/web3.js";
 import { FluidityInstruction } from "./FluidityInstruction";
-import {Network} from "../../chainContext";
+import {Network} from "../../components/chains/chainContext";
 import {FluidSolanaToken, UnwrappedSolanaToken} from "./token";
 
 const importSolendAddress = async(network: Network<"solana">) => {
