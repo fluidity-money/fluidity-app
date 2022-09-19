@@ -146,6 +146,7 @@ const HowItWorks = () => {
               src="assets/images/Animations/FluidYield.webp"
               style={{
                 position: "relative",
+                width: "90%"
               }}
               alt="Fluidity-Yield"
               />
@@ -154,6 +155,7 @@ const HowItWorks = () => {
               src="assets/images/Animations/FluidityHowItWorks.webp"
               style={{
                 position: "relative",
+                width: "70%"
               }}
               alt="How-It-Works"
               />
