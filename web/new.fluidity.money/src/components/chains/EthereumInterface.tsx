@@ -2,20 +2,32 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE.md file.
 
-import {useState} from "react";
+import localforage from "localforage";
+import {useEffect, useState} from "react";
 import {InterfaceProps} from ".";
 import {isInArray} from "../../utils/types";
 import {chainContext, Chains, Network} from "./chainContext";
 
 const EthereumInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain = "ethereum" as const;
+  const ethereumNetworkKey = "persist.lastNetwork.ethereum";
   const [network, setNetwork] = useState<Network<"ethereum">>("mainnet");
 
   // set network if it's valid for the chain
   const setNetworkChecked = (network: string) => {
-    if (isInArray(network, Chains[chain]))
-      setNetwork(network)
+    if (isInArray(network, Chains[chain])) {
+        localforage.setItem(ethereumNetworkKey, network);
+        setNetwork(network)
+      }
   }
+
+  useEffect(() => {
+    localforage.getItem(ethereumNetworkKey).then(storedNetwork => {
+      if (isInArray(storedNetwork, Chains[chain])) {
+        setNetworkChecked(storedNetwork);
+      }
+    });
+  }, [])
 
   const connect = (network: Network) => {
     if (!isInArray(network, Chains[chain]))

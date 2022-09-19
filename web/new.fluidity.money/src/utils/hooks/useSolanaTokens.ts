@@ -21,7 +21,6 @@ const importSolanaTokens = async(network: Network<"solana">): Promise<SolanaToke
 type FluidTokenMap = Partial<Mapped<SupportedFluidToken<"solana">, FluidSolanaToken>>;
 type UnwrappedTokenMap = Partial<Mapped<SupportedUnwrappedToken<"solana">, UnwrappedSolanaToken>>;
 
-// TODO try to source from localforage on first load
 export const useSolanaTokens = () => {
   const [fluidTokens, setFluidTokens] = useState<FluidTokenMap>({});
   const [unwrappedTokens, setUnwrappedTokens] = useState<UnwrappedTokenMap>({});
