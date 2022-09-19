@@ -15,7 +15,6 @@
   box-sizing: border-box;
   position: fixed;
   background-color: transparent;
-  display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -25,6 +24,10 @@
   max-width: 1500px;
   z-index: 1000;
 
+  @media (max-width: 750px) {
+    grid-template-columns: 1fr 3fr 1fr;
+  }
+
   .navbar {
     box-sizing: border-box;
     justify-content: space-between;
@@ -33,7 +36,6 @@
     padding: 10px;
     z-index: 99;
     justify-self: center;
-    position: fixed;
 
     .fade {
       width: 100%;
@@ -96,7 +98,6 @@
   z-index: 51;
   cursor: pointer;
   margin-left: 50.5px;
-  position: fixed;
 }
 
 .imgContainer {
