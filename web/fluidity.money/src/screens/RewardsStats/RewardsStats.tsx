@@ -7,6 +7,7 @@ import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
+import { useState } from "react";
 import styles from "./RewardsStats.module.scss";
 
 interface IProps {

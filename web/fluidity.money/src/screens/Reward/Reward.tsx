@@ -3,6 +3,11 @@
 // LICENSE_TRF.md file.
 
 import { useState } from "react";
+import useViewport from "hooks/useViewport";
+import { useChainContext } from "hooks/ChainContext";
+import RewardsBackground from "../../components/RewardsBackground";
+import RewardsInfoBox from "../../components/RewardsInfoBox";
+import { Heading, numberToMonetaryString } from "@fluidity-money/surfing";
 import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
 import styles from "./Reward.module.scss";
@@ -13,8 +18,12 @@ const Reward = () => {
   click on prize total and switch screens to total transactions sol and eth,
   elements fade in and out then are conditionally removed
   */
+  const { apiState } = useChainContext();
+  const { txCount, rewardPool } = apiState;
   //sets which screen is present
   const [present, setPresent] = useState(true);
+  const { width } = useViewport();
+  const breakpoint = 620;
 
   return (
     <>

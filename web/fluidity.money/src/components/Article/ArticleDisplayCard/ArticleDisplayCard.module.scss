@@ -20,6 +20,11 @@
   p {
     margin-bottom: 20px;
     padding-left: 10px;
+
+    // font-size: 20px;
+    @include max-560px {
+      // font-size: 18px;
+    }
   }
 
   p:nth-last-child(2) {

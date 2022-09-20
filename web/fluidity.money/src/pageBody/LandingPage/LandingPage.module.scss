@@ -7,6 +7,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  // background-color: $backgroundBlack;
+
+  // height: 100vh;
+  // width: 100%;
+  // padding-top: 180px;
 }
 
 .screensContainer {
@@ -16,6 +21,11 @@
   flex-direction: column;
   width: 100%;
   max-width: 1500px;
+  // gif background
+  // background-image: url("../../../public/img/fluid-bg.gif");
+  // opacity: 1;
+  // background-repeat: repeat;
+  // background-size: 100% 1440px;
   @include max-620px {
     margin-top: 360px;
   }

@@ -1,4 +1,4 @@
-@use "common" as *;
+@import "../../styles/config.scss";
 
 .winnersRight {
   display: flex;
@@ -146,7 +146,7 @@
       // }
 
       &:hover {
-        animation-play-state: paused;
+        // animation-play-state: paused;
       }
     }
   }
@@ -159,28 +159,4 @@
   to {
     transform: translateY(-80%);
   }
-}
-
-.backgroundLeft {
-  & > div {
-    animation: scrollLeft 2000s infinite linear;
-  }
-}
-
-.backgroundRight {
-  & > div {
-    animation: scrollRight 2000s infinite linear;
-  }
-}
-
-.winnersTop::-webkit-scrollbar {
-  display: none;
-}
-
-.winnersTop::-webkit-scrollbar-track {
-  display:none;
-}
-
-.winnersTop::-webkit-scrollbar-thumb {
- display: none;
 }
