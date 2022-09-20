@@ -9,3 +9,4 @@ export { default as FluidIn } from "./FluidIn";
 export { default as FluidOut } from "./FluidOut";
 export { default as Rewards } from "./Rewards";
 export { default as Settings } from "./Settings";
+export { default as TotalBalance } from "./TotalBalance";

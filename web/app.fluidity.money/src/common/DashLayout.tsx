@@ -7,6 +7,7 @@ export const DashLayout = () => {
     <>
       Dashboard Outlet
       <ErrorBoundary fallback={Error}>
+        {/* NavBar */}
         <Outlet />
       </ErrorBoundary>
     </>
