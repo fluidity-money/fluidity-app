@@ -52,7 +52,7 @@ export const Video = ({
   const classProps = className || "";
 
   const dynamicWidth = isFirefox
-    ? `${scale * 1000}px`
+    ? `${scale * 400}px`
     : `${scale * 100}%`;
   
   let widthProp = width;

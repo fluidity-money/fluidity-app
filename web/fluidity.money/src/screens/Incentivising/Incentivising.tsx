@@ -6,6 +6,7 @@ import { Display, Heading } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
+import { isFirefox } from "react-device-detect";
 import styles from "./Incentivising.module.scss";
 
 const Incentivising = () => {
@@ -38,7 +39,7 @@ const Incentivising = () => {
         src={"/assets/videos/FluidityHowItWorks.mp4"}
         type={"reduce"}
         loop={true}
-        scale={.6}
+        scale={isFirefox ? 1.5 : .6}
         onLoad={() => setReady(true)}
         className={styles.video}
       />)}
