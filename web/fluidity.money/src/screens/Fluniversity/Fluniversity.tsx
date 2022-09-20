@@ -7,12 +7,15 @@ import { useLocation } from "react-router-dom";
 import {
   ContinuousCarousel,
   Heading,
+  LinkButton,
   ManualCarousel,
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./Fluniversity.module.scss";
+import useViewport from "hooks/useViewport";
 
 const Fluniversity = () => {
+  const { width } = useViewport();
 
   const callout = (
     <div className={styles.callout}>
@@ -45,29 +48,25 @@ const Fluniversity = () => {
         </ContinuousCarousel>
       </div>
       <div className={styles.container}>
-        <ManualCarousel>
+        <ManualCarousel scrollBar={width < 500 ? true : false}>
           {items.map((item, index) => (
             <a href={item.link} rel="noopener noreferrer" target="_blank">
               <div key={index} className={styles.fluniversityCard}>
                 <div className={styles.imgContainer}>
-
-                  <img src={item.img} alt="Link"/>
-
+                  <img src={item.img} alt="Link" />
                 </div>
 
                 <Heading as="h4">{item.title}</Heading>
                 <Text as="p">{item.desc}</Text>
                 <div className={styles.footer}>
                   <Text>{item.time} mins read</Text>
-                  <Text>
-                    <a
-                      href={item.link}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      FLUNIVERSITY <i>*</i>
-                    </a>
-                  </Text>
+                  <LinkButton
+                    type="external"
+                    size="small"
+                    handleClick={() => {}}
+                  >
+                    FLUNIVERSITY
+                  </LinkButton>
                 </div>
               </div>
             </a>

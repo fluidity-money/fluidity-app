@@ -10,6 +10,7 @@
   background-color: $fluidBlack;
   @include max-860px {
     padding-right: 4%;
+    min-height: 550px;
   }
 }
 
@@ -24,7 +25,9 @@
   flex-direction: column;
   gap: 20px;
   @media (max-width: 500px) {
-    min-width: 350px;
+    min-width: 300px;
+    height: 510px;
+    margin-bottom: 10px;
   }
   .imgContainer {
     width: 100%;
@@ -32,7 +35,7 @@
     display: flex;
     justify-content: center;
     @media (max-width: 500px) {
-      height: 195px;
+      height: 150px;
     }
     img {
       max-height: 100%;
