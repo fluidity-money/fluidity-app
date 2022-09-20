@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useMemo } from 'react';
-import { graphql } from 'babel-plugin-relay/macro';
+import { graphql } from 'relay-runtime';
 import { useSubscription } from 'react-relay';
 
 export interface PrizePool {

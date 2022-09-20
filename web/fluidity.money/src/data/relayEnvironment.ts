@@ -36,8 +36,11 @@ async function fetchRelay(params: any, variables: any) {
   return fetchGraphQL(params.text, variables);
 }
 
+const webSocketImpl = typeof Window === "undefined" ? require("ws") : WebSocket;
+
 const wsClient = createClient({
   url: `wss://fluidity.hasura.app/v1/graphql`,
+  webSocketImpl
 });
 
 const subscribe = (operation: any, variables: any) => {

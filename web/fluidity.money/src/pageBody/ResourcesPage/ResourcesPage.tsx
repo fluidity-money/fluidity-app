@@ -18,6 +18,7 @@ import Whitepapers from "screens/Whitepapers";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import styles from "./ResourcesPage.module.scss";
+import Head from "next/head";
 
 const ResourcesPage = () => {
   const [introVisible, setIntroVisibility] = useState(true);
@@ -32,6 +33,10 @@ const ResourcesPage = () => {
 
   return (
     <div className={styles.pageContainer}>
+      <Head>
+        <title>Resources - Fluidity</title>
+        <meta name="description" content="Fluidity's research and platform will supercharge the adoption of Web3 and Crypto. Read about the future of Crypto and Fluidity's vision." />
+      </Head>
       <div className={styles.screensContainer}>
         <Navigation
           page={"resources"}
@@ -62,7 +67,6 @@ const ResourcesPage = () => {
               <Fluniversity />
               <Whitepapers />
               <Docs />
-              <MailingList />
               <Demo />
               <Footer />
             </motion.div>

@@ -19,20 +19,6 @@ import styles from "./Demo.module.scss";
 const Demo = () => {
   const { apiState } = useChainContext();
 
-  /* scrolls to location on pageload if it contains same ID or scrolls to the top
-   for ResourcesNavModal to work*/
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash) {
-      let elem = document.getElementById(location.hash.slice(1));
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }
-  }, [location]);
-
   const { width } = useViewport();
   const breakpoint = 620;
 
@@ -49,7 +35,7 @@ const Demo = () => {
       <div className={`${styles.container} bg-light`}>
         <Video
           src={
-            window.location.origin + "/assets/videos/FluidityOpportunityB.mp4"
+            "/assets/videos/FluidityOpportunityB.mp4"
           }
           type={"none"}
           loop={true}
@@ -80,7 +66,7 @@ const Demo = () => {
               SHOW ME A DEMO
             </GeneralButton> */}
              <img
-              src="assets/images/Animations/ComingSoon.webp"
+              src="/assets/images/Animations/ComingSoon.webp"
               className={styles.comingSoonButton}
               alt="Coming-Soon"
             />
