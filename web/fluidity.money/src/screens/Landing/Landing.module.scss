@@ -13,10 +13,6 @@
   @include max-620px {
     background-size: 0%;
   }
-  // display: grid;
-  // grid-template-columns: repeat(1, 1fr);
-  // position: relative;
-  // max-width: 1500px;
   padding-top: 100px;
   h1 {
     text-align: center;
@@ -33,8 +29,6 @@
   width: 444px;
   height: 444px;
   position: relative;
-  // min-width: 225px;
-  // min-height: 225px;
   border: solid 1px pink;
   border-radius: 50%;
   background-color: gray;
@@ -59,20 +53,6 @@
     height: 350px;
   }
 }
-
-// .fadeIn {
-//   transition: opacity 3s ease;
-// }
-
-// .fadeInText {
-//   margin-bottom: 250px;
-//   transition: opacity 1s ease 0s, all 3s ease 1s;
-// }
-
-// .fadeOut {
-//   opacity: 0;
-//   transition: opacity 1s ease;
-// }
 
 .text {
   margin-right: 10px;
@@ -113,8 +93,6 @@
     flex-direction: column;
     align-items: center;
   }
-  // display: grid;
-  // grid-template-columns: 1fr 1fr 1fr;
 
   &.notLoaded {
     & > .left {

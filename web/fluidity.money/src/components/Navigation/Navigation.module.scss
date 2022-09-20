@@ -2,7 +2,6 @@
 
 .container {
   display: flex;
-  // grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
   background-color: $fluidBlack;
   width: fit-content;
@@ -21,7 +20,6 @@
     }
   }
   @media (max-width: 620px) {
-    // grid-template-columns: 1fr;
     flex-direction: column;
     align-items: center;
     top: 75vh;
