@@ -8,7 +8,6 @@ import HowItWorksTemplate from "components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";
-import Video from "components/Video";
 
 const Wrap = () => {
 
@@ -18,7 +17,14 @@ const Wrap = () => {
 
   const left =
     width < breakpoint ? (
-      <Video src={'/assets/videos/FluidityWrap.mp4'} type={'fit'} loop={true}/>
+      <img
+      src="/assets/images/Animations/FluidityWrap.webp"
+      style={{
+        position: "relative",
+        width: "100%"
+      }}
+      alt="Fluidity-Wrap"
+    />
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens
@@ -27,7 +33,14 @@ const Wrap = () => {
 
   const right =
     width > breakpoint ? (
-      <Video src={'/assets/videos/FluidityWrap.mp4'} type={'fit'} loop={true}/>
+      <img
+      src="/assets/images/Animations/FluidityWrap.webp"
+      style={{
+        position: "relative",
+        width: "100%"
+      }}
+      alt="Fluidity-Wrap"
+    />
     ) : (
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens

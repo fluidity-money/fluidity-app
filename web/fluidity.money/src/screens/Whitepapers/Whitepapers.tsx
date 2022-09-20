@@ -40,9 +40,16 @@ const Whitepapers = () => {
         </ContinuousCarousel>
       </div>
       <div className={styles.container}>
-        <a href="https://whitepapers.fluidity.money/fluidity-economics-wp-v0.8.pdf">
+        <a
+          href="https://whitepapers.fluidity.money/fluidity-economics-wp-v0.8.pdf"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <div>
-            <img src="/assets/images/resources/flu-whitepaper.webp" />
+            <img
+              src="/assets/images/resources/flu-whitepaper.webp"
+              alt="whitepaper"
+            />
             <Heading as="h3">
               Fluidity Money: Economics and Monetary Policy
             </Heading>

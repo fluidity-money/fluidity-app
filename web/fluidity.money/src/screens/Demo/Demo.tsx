@@ -65,15 +65,11 @@ const Demo = () => {
             } }>
               SHOW ME A DEMO
             </GeneralButton> */}
-              <Video
-                className={styles.comingSoonButton}
-                src={"/assets/videos/FluidityComingSoon.mp4"}
-                type={"reduce"}
-                loop={true}
-                scale={0.4}
-                width={"auto"}
-                height={80}
-             />
+             <img
+              src="/assets/images/Animations/ComingSoon.webp"
+              className={styles.comingSoonButton}
+              alt="Coming-Soon"
+            />
           </section>
         </div>
       </div>

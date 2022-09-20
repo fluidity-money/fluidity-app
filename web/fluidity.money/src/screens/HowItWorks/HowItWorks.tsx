@@ -133,27 +133,31 @@ const HowItWorks = () => {
 
           <div className={styles.video}>
             {currentImageIndex === 0 ? (
-              <Video
-                src={images[currentImageIndex].bgImage}
-                type={"fit"}
-                loop={true}
-                key={"abc"}
-                scale={0.8}
+              <img
+              src="assets/images/Animations/FluidityWrap.webp"
+              style={{
+                position: "relative",
+                width: "60%"
+              }}
+              alt="Fluidity-Wrap"
               />
             ) : currentImageIndex === 1 ? (
-              <Video
-                src={images[currentImageIndex].bgImage}
-                type={"fit"}
-                loop={true}
-                key={"xyz"}
+              <img
+              src="assets/images/Animations/FluidYield.webp"
+              style={{
+                position: "relative",
+                width: "90%"
+              }}
+              alt="Fluidity-Yield"
               />
             ) : (
-              <Video
-                src={images[currentImageIndex].bgImage}
-                type={"fit"}
-                loop={true}
-                key={"jfk"}
-                scale={0.8}
+              <img
+              src="assets/images/Animations/FluidityHowItWorks.webp"
+              style={{
+                position: "relative",
+                width: "70%"
+              }}
+              alt="How-It-Works"
               />
             )}
           </div>

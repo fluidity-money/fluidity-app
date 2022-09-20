@@ -28,7 +28,9 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
   return (
     <div className={styles.cardContainer}>
       <a href={article.link}>
-        <img src={article.img} />
+
+        <img src={article.img} alt="Article-Image"/>
+
         <Heading as="h4" className={styles.leftMargin10px}>
           {article.title}
         </Heading>
@@ -41,7 +43,11 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
       </a>
       <section>
         {article.isResourcesPage ? (
-          <a href="https://blog.fluidity.money/">
+          <a
+            href="https://blog.fluidity.money/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             <LinkButton
               type={"internal"}
               size={width < breakpoint ? "medium" : "large"}
@@ -51,7 +57,7 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
             </LinkButton>
           </a>
         ) : (
-          <a href="/resources">
+          <a href="/resources" rel="noopener noreferrer" target="_blank">
             <LinkButton
               type={"internal"}
               size={width < breakpoint ? "medium" : "large"}

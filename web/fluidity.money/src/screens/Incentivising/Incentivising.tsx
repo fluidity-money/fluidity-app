@@ -9,21 +9,23 @@ import { useState } from "react";
 import styles from "./Incentivising.module.scss";
 
 const Incentivising = () => {
-
-  const [ ready, setReady ] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const { width } = useViewport();
   const breakpoint = 860;
 
   return (
     <div className={styles.container}>
-      <img src="assets/images/FluidityHowItWorks.png"
+
+      <img src="assets/images/Animations/FluidityHowItWorks.webp"
         style={{
          position: "absolute",
          display: `${ready === true ? 'none' : 'block'}`,
-         width: `${width <= breakpoint ? '100%' : '42%'}`,
+         width: `${width <= breakpoint ? '100%' : '18%'}`,
        }}
+       alt="How-It-Works"
        />
+
       {width <= breakpoint ? (
       <Video
         src={"/assets/videos/FluidityHowItWorks.mp4"}
@@ -42,7 +44,9 @@ const Incentivising = () => {
       />)}
       <div>
         <div className={styles.blur} />
-        <Heading as={"h6"} className={styles.backgroundText}>HOW IT WORKS</Heading>
+        <Heading as={"h6"} className={styles.backgroundText}>
+          HOW IT WORKS
+        </Heading>
         <br />
         <Display
           className={styles.backgroundText}

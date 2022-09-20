@@ -7,7 +7,6 @@ import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
-import Video from "components/Video";
 
 const Use = () => {
 
@@ -18,12 +17,13 @@ const Use = () => {
   );
 
   const left = (
-    <Video
-      src={"/assets/videos/FluidityUse.mp4"}
-      type={"fit"}
-      loop={true}
-      scale={2.0}
-    />
+    <img
+    src="/assets/images/Animations/FluidityUse.webp"
+    style={{
+      position: "relative",
+    }}
+    alt="Fluidity-Use"
+  />
   );
 
   return (

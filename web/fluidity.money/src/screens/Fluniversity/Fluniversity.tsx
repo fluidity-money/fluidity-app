@@ -47,10 +47,12 @@ const Fluniversity = () => {
       <div className={styles.container}>
         <ManualCarousel>
           {items.map((item, index) => (
-            <div key={index} className={styles.fluniversityCard}>
-              <a href={item.link}>
+            <a href={item.link} rel="noopener noreferrer" target="_blank">
+              <div key={index} className={styles.fluniversityCard}>
                 <div className={styles.imgContainer}>
-                  <img src={item.img} />
+
+                  <img src={item.img} alt="Link"/>
+
                 </div>
 
                 <Heading as="h4">{item.title}</Heading>
@@ -58,13 +60,17 @@ const Fluniversity = () => {
                 <div className={styles.footer}>
                   <Text>{item.time} mins read</Text>
                   <Text>
-                    <a href={item.link}>
+                    <a
+                      href={item.link}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
                       FLUNIVERSITY <i>*</i>
                     </a>
                   </Text>
                 </div>
-              </a>
-            </div>
+              </div>
+            </a>
           ))}
         </ManualCarousel>
       </div>
