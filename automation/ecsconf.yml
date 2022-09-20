@@ -4,8 +4,8 @@ NETWORK_MODE: awsvpc
 DEV:
   TASK_ROLE: flu.default.task.role
   TASK_EXECUTION_ROLE: flu.default.task.execution.role
-  CPU_LIMIT: 256
-  MEM_LIMIT: 512
+  CPU_LIMIT: 128
+  MEM_LIMIT: 256
   SECURITY_GROUP: sg-0190855874db0065a
   SUBNETA: subnet-0da97e2bef4bbcaf9
   SUBNETB: subnet-09292973d45046c54
@@ -20,8 +20,8 @@ DEV:
 STAGING:
   TASK_ROLE: flu.default.task.role
   TASK_EXECUTION_ROLE: flu.default.task.execution.role
-  CPU_LIMIT: 256
-  MEM_LIMIT: 512
+  CPU_LIMIT: 128
+  MEM_LIMIT: 256
   SECURITY_GROUP: sg-0c20191013f4a3406
   SUBNETA: subnet-0705a6ea8e22c1780
   SUBNETB: subnet-086cdd512fbeee405
@@ -36,8 +36,8 @@ STAGING:
 MAINNET:
   TASK_ROLE: flu.default.task.role
   TASK_EXECUTION_ROLE: flu.default.task.execution.role
-  CPU_LIMIT: 256
-  MEM_LIMIT: 512
+  CPU_LIMIT: 128
+  MEM_LIMIT: 256
   SECURITY_GROUP: sg-082294a946540b089
   SUBNETA: subnet-0a2e4a484dfbc70be
   SUBNETB: subnet-0a7243b28d4da684b
