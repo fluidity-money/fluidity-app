@@ -8,6 +8,7 @@ import {
   ContinuousCarousel,
   ManualCarousel,
   Heading,
+  Text,
   LinkButton,
 } from "@fluidity-money/surfing";
 import styles from "./Docs.module.scss";
@@ -50,7 +51,9 @@ const Docs = () => {
             <a href={item.link} rel="noopener noreferrer" target="_blank">
               <div key={index} className={styles.docsCard}>
                 <div className={styles.imgContainer}>
-                  <img src={item.img} alt="carousel-object" />
+
+                  <img src={item.img} alt="carousel-object"/>
+
                 </div>
                 <div className={styles.content}>
                   <Heading as="h3">{item.title}</Heading>

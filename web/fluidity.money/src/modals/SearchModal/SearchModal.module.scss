@@ -10,6 +10,7 @@
   background-color: $backgroundBlack;
   padding: 50px;
   z-index: 1000;
+  //   opacity: 0.96;
   overflow-y: auto;
   .search {
     display: flex;
@@ -26,8 +27,10 @@
 
     input {
       color: white;
+      // text-align: center;
       min-width: 250px;
       width: 100%;
+      // border: solid white 1px;
       border: none;
       background-color: transparent;
       padding-left: 6rem;
@@ -36,6 +39,7 @@
       height: 100%;
       font-size: 60px;
       border-radius: 50px;
+      // outline: none;
     }
   }
 }

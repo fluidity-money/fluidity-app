@@ -1,0 +1,87 @@
+@import "../../../styles/config.scss";
+
+button {
+  all: unset;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.small {
+  padding: 12px;
+  gap: 8px;
+  border-radius: 50px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 100%;
+  &:focus {
+    padding: 10.5px;
+  }
+}
+
+.medium {
+  padding: 16px;
+  gap: 8px;
+  border-radius: 50px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 100%;
+  &:focus {
+    padding: 14.5px;
+  }
+}
+
+.large {
+  padding: 24px;
+  gap: 8px;
+  border-radius: 50px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 100%;
+  &:focus {
+    padding: 22.5px;
+  }
+}
+
+.primary {
+  background-color: $fluidWhite;
+  border: 0.5px solid $fluidBlack;
+  color: $fluidBlack;
+  width: fit-content;
+  height: fit-content;
+
+  &:hover {
+    background-color: transparent;
+    border: 0.5px solid $fluidWhite;
+    color: $fluidWhite;
+  }
+
+  &:focus {
+    color: $fluidBlack;
+    border: 2px solid $textGrey;
+    background-color: $fluidWhite;
+  }
+}
+
+.secondary {
+  background-color: transparent;
+  border: 0.5px solid $textGrey;
+  color: $fluidWhite;
+  width: fit-content;
+  height: fit-content;
+  &:hover {
+    background-color: $fluidWhite;
+    border: 0.5px solid $fluidWhite;
+    color: $fluidBlack;
+  }
+
+  &:focus {
+    color: $fluidWhite;
+    border: 2px solid $textGrey;
+    background-color: transparent;
+  }
+}
