@@ -10,19 +10,6 @@ import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";
 
 const Wrap = () => {
-  /* scrolls to location on pageload if it contains same ID or scrolls to the top
-   for ResourcesNavModal to work*/
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash) {
-      let elem = document.getElementById(location.hash.slice(1));
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }
-  }, [location]);
 
   // to set order correct when in column layout
   const { width } = useViewport();
@@ -31,7 +18,7 @@ const Wrap = () => {
   const left =
     width < breakpoint ? (
       <img
-      src="assets/images/Animations/FluidityWrap.webp"
+      src="/assets/images/Animations/FluidityWrap.webp"
       style={{
         position: "relative",
         width: "100%"
@@ -47,7 +34,7 @@ const Wrap = () => {
   const right =
     width > breakpoint ? (
       <img
-      src="assets/images/Animations/FluidityWrap.webp"
+      src="/assets/images/Animations/FluidityWrap.webp"
       style={{
         position: "relative",
         width: "100%"

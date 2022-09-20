@@ -159,10 +159,10 @@ const DataTable = ({ name, filterData = [], columns, data, rowSize }: any) => {
           </span>
           <span>
             <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-              <img src={window.location.origin + '/assets/images/buttonIcons/paginationArrowLeft.svg'} alt="Prev"/>
+              <img src={'/assets/images/buttonIcons/paginationArrowLeft.svg'} />
             </button>
             <button onClick={() => nextPage()} disabled={!canNextPage}>
-            <img src={window.location.origin + '/assets/images/buttonIcons/paginationArrowRight.svg'} alt="Next"/>
+            <img src={'/assets/images/buttonIcons/paginationArrowRight.svg'} />
             </button>
           </span>
         </div>

@@ -12,11 +12,16 @@ import Wrap from "screens/Wrap";
 import Yield from "screens/Yield";
 import { Navigation } from "@fluidity-money/surfing";
 import styles from "./HowItWorksPage.module.scss";
+import Head from "next/head";
 
 const HowItWorksPage = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.screensContainer}>
+        <Head>
+          <title>How it works - Fluidity</title>
+          <meta name="description" content="Fluidity is a platfrom that incentivises user activity through yield - See how." />
+        </Head>
         <Navigation
           page={"howitworks"}
           pageLocations={pageLocations}

@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import Head from "next/head";
 import Articles from "screens/Articles";
 import Ecosystem from "screens/Ecosystem";
 import Demo from "../../screens/Demo";
@@ -17,6 +18,10 @@ import styles from "./LandingPage.module.scss";
 const LandingPage = () => {
   return (
     <div className={styles.pageContainer}>
+      <Head>
+        <title>Fluidity - Supercharge your Crypto</title>
+        <meta name="description" content="Fluidity lets you earn while spending your crypto. Get more out your crypto - Fluidify your money." />
+      </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
         <Reward />

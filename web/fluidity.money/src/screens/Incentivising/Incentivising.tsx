@@ -6,6 +6,7 @@ import { Display, Heading } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
+import { isFirefox } from "react-device-detect";
 import styles from "./Incentivising.module.scss";
 
 const Incentivising = () => {
@@ -27,23 +28,21 @@ const Incentivising = () => {
        />
 
       {width <= breakpoint ? (
-        <Video
-          src={window.location.origin + "/assets/videos/FluidityHowItWorks.mp4"}
-          type={"reduce"}
-          loop={true}
-          onLoad={() => setReady(true)}
-          className={styles.video}
-        />
-      ) : (
-        <Video
-          src={window.location.origin + "/assets/videos/FluidityHowItWorks.mp4"}
-          type={"reduce"}
-          loop={true}
-          scale={0.6}
-          onLoad={() => setReady(true)}
-          className={styles.video}
-        />
-      )}
+      <Video
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
+        type={"reduce"}
+        loop={true}
+        onLoad={() => setReady(true)}
+        className={styles.video}
+      />): (
+      <Video
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
+        type={"reduce"}
+        loop={true}
+        scale={isFirefox ? 1.5 : .6}
+        onLoad={() => setReady(true)}
+        className={styles.video}
+      />)}
       <div>
         <div className={styles.blur} />
         <Heading as={"h6"} className={styles.backgroundText}>

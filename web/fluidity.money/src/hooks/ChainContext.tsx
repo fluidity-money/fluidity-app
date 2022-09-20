@@ -3,15 +3,15 @@
 // LICENSE.md file.
 
 import type { Dispatch, SetStateAction } from "react";
-import type { Winner, WinnersRes } from "../data/winners";
-import type { PrizePool } from "../data/prizePool";
-import type { TransactionCount } from "../data/userActions";
+import type { Winner, WinnersRes } from "data/winners";
+import type { Tvl, TvlRes } from "data/tvl";
+import type { TransactionCount } from "data/userActions";
 
 import { createContext, useContext, useState  } from "react";
 import { SupportedChains, SupportedChainsList, formatToGraphQLDate } from "@fluidity-money/surfing";
-import { useWinningTransactions } from "../data/winners";
-import { useLivePrizePool } from "../data/prizePool";
-import { useCountTransactions } from "../data/userActions";
+import { useWinningTransactions } from "data/winners";
+import { useLiveTvl } from "data/tvl";
+import { useCountTransactions } from "data/userActions";
 
 const ChainContext = createContext<ChainState>(null!);
 
@@ -48,13 +48,30 @@ export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.El
     SupportedChains[chain].name,
     formatToGraphQLDate(prevWeekDate),
   )
-
-  useLivePrizePool((prizePool: PrizePool) => setRewardPool(
-    prizePool.prize_pool
+  
+  useLiveTvl(({ tvl }: TvlRes) => {
+    const latestNetworkPools = tvl
       .filter(({network}) => network === SupportedChains[chain].name)
-      .reduce((latestPool, pool) => latestPool.last_updated > pool.last_updated ? latestPool : pool)
-      .amount
-  ));
+      .reduce((pools, pool) => {
+        const prevPool = pools[pool.contract_address];
+        const poolFound = !!prevPool;
+
+        if (!poolFound) return {
+          ...pools,
+          [pool.contract_address]: pool
+        }
+
+        return ({
+          ...pools,
+          [pool.contract_address]: prevPool.time > pool.time ? prevPool : pool
+        })
+      }, {} as {[key: string]: Tvl});
+    
+    setRewardPool(
+      Object.values(latestNetworkPools)
+        .reduce((sum, pool) => sum + pool.tvl, 0)
+    )
+  });
 
   useCountTransactions(
     (txCount: TransactionCount) => setTxCount(

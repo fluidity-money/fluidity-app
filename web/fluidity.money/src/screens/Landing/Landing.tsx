@@ -9,20 +9,16 @@ import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
-import { isSafari } from "react-device-detect";
+import { isSafari, isFirefox } from "react-device-detect";
 
 const Landing = () => {
-  const vidSources = (
-    isSafari
-      ? [
-          "/assets/videos/FluidityHome.mov",
-          "/assets/videos/FluidityHomeloop.mov",
-        ]
-      : [
-          "/assets/videos/FluidityHome.webm",
-          "/assets/videos/FluidityHomeloop.webm",
-        ]
-  ).map((link) => window.location.origin + link);
+  const vidSources = (isSafari ? [
+    "/assets/videos/FluidityHome.mov",
+    "/assets/videos/FluidityHomeloop.mov",
+  ] : [
+    "/assets/videos/FluidityHome.webm",
+    "/assets/videos/FluidityHomeloop.webm",
+  ]).map((link) => link);
 
   const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
   const [homeVidEnded, setHomeVidEnded] = useState(false);
@@ -32,7 +28,7 @@ const Landing = () => {
     mimeType: isSafari ? "video/quicktime" : "video/webm",
     key: "0",
     loop: false,
-    scale: 0.7,
+    scale: isFirefox ? 2 : 0.7,
   });
 
   useEffect(() => {
@@ -42,7 +38,7 @@ const Landing = () => {
         mimeType: isSafari ? "video/quicktime" : "video/webm",
         key: "1",
         loop: true,
-        scale: 0.5,
+        scale: isFirefox ? 1 : 0.5,
       });
   }, [homeVidEnded]);
 
@@ -66,7 +62,7 @@ const Landing = () => {
       {width > breakpoint ? (
         <div className={`${styles.bgVid}`}>
           <img
-            src="assets/images/LoopAnim.webp"
+            src="assets/images/load.webp"
             style={{
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,

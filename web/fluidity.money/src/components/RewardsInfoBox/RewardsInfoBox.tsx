@@ -36,7 +36,7 @@ const RewardsInfoBox = ({
       : "/assets/images/chainIcons/solanaIcon.svg";
 
   const [showModal, setShowModal] = useState(false);
-  
+
   const { width } = useViewport();
   const mobileBreakpoint = 620;
 
@@ -68,12 +68,12 @@ const RewardsInfoBox = ({
         <div onClick={changeScreen}>
           <Heading as="h1">
             {type === "black"
-              ? numberToMonetaryString(rewardPool)
-              : totalTransactionValue.toLocaleString("en-US")}
+              ? "$100,000"
+              : "5,000,000+"}
           </Heading>
         </div>
         <Heading as="h4">
-          {type === "black" ? "Reward pool" : "Total transactions"}
+          {type === "black" ? "Reward pool" : "Total transactions (on testing)"}
         </Heading>
         {showModal && (
           <BlockchainModal

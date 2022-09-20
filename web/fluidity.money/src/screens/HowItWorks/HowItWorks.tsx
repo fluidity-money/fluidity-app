@@ -36,7 +36,7 @@ const HowItWorks = () => {
     },
   ].map(({ bgImage, ...image }) => ({
     ...image,
-    bgImage: window.location.origin + bgImage,
+    bgImage: bgImage,
   }));
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -118,7 +118,7 @@ const HowItWorks = () => {
               <img
                 className={styles.behind}
                 style={{ opacity: 1, position: "absolute", zIndex: 1 }}
-                src={window.location.origin + "/assets/text/FLUIDIFY.svg"}
+                src={"/assets/text/FLUIDIFY.svg"}
                 alt={images[currentImageIndex].text}
               />
             ) : (
@@ -146,6 +146,7 @@ const HowItWorks = () => {
               src="assets/images/Animations/FluidYield.webp"
               style={{
                 position: "relative",
+                width: "90%"
               }}
               alt="Fluidity-Yield"
               />
@@ -154,6 +155,7 @@ const HowItWorks = () => {
               src="assets/images/Animations/FluidityHowItWorks.webp"
               style={{
                 position: "relative",
+                width: "70%"
               }}
               alt="How-It-Works"
               />

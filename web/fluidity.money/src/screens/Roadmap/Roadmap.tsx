@@ -11,17 +11,6 @@ import HowItWorksTemplate from "components/HowItWorksTemplate";
 import useViewport from "hooks/useViewport";
 
 const Roadmap = () => {
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash) {
-      let elem = document.getElementById(location.hash.slice(1));
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }
-  }, [location]);
 
   const { width } = useViewport();
   const breakpoint = 860;
@@ -40,7 +29,7 @@ const Roadmap = () => {
     width < breakpoint ? (
       <div className={styles.smallVid}>
       <Video
-        src={window.location.origin + "/assets/videos/FluidityRoadMap.mp4"}
+        src={"/assets/videos/FluidityRoadMap.mp4"}
         type={"fit"}
         loop={true}
         className={styles.video}
@@ -57,7 +46,7 @@ const Roadmap = () => {
     width > breakpoint ? (
       <>
       <Video
-        src={window.location.origin + "/assets/videos/FluidityRoadMap.mp4"}
+        src={"/assets/videos/FluidityRoadMap.mp4"}
         type={"fit"}
         loop={true}
         scale={2.0}
