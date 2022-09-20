@@ -62,7 +62,7 @@ const Landing = () => {
       {width > breakpoint ? (
         <div className={`${styles.bgVid}`}>
           <img
-            src="assets/images/load.webp"
+            src="assets/images/LoopAnim.webp"
             style={{
               position: "absolute",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
@@ -101,21 +101,25 @@ const Landing = () => {
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
-          <img
+         <img
             src="assets/images/LoopAnim.webp"
             style={{
               position: "absolute",
+              width: "70%",
+              marginTop: "-400px",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
+
             alt="Loop-Ring"
           />
           <img
             src="assets/images/TextLoop.webp"
             style={{
               position: "absolute",
+              width: "40%",
+              marginTop: "-400px",
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
-
             alt="Loop-Text"
 
           />
