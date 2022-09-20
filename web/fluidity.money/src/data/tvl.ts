@@ -3,7 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { useMemo } from 'react';
-import { graphql } from 'babel-plugin-relay/macro';
+import { graphql } from 'react-relay';
 import { useSubscription } from 'react-relay';
 
 export interface Tvl {
