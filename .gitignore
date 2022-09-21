@@ -4,6 +4,7 @@ docker
 docker-*
 !docker-compose*
 semgrep
+*.map
 
 lib/build-lib
 
@@ -26,6 +27,9 @@ web/*/node_modules
 web/*/build*
 web/*/build-*
 web/*/*.o
+web/*/.next/
+web/*/run
+web/*/npm
 
 contracts/ethereum/node_modules
 contracts/ethereum/.openzeppelin
