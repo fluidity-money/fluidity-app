@@ -12,33 +12,25 @@ FRONTEND_SRC_SASS := ${FRONTEND_SRC_SASS_DIR}/config.scss
 
 FRONTEND_SRC := ${FRONTEND_SRC_TS} ${FRONTEND_SRC_SASS}
 
-FRONTEND_BUILD_ASSET_MANIFEST := \
-	${FRONTEND_BUILD_DIR}/asset-manifest.json
-
-FRONTEND_BUILD_DIR := build
-
 include ../../web.mk
 
 NEXTJS_BUILD := npm run build
 
-js: ${FRONTEND_BUILD_ASSET_MANIFEST}
+GRAPHQL_BUILD := npm run gen-gql
 
-css: ${FRONTEND_BUILD_CSS}
+RELAY := npm run relay
 
-nextjs: ${NEXTJS_BUILD}
+graphql:
+	${GRAPHQL_BUILD}
 
-${FRONTEND_BUILD_CSS}: ${FRONTEND_SRC_SASS}
-	${NPX_SASS} ${FRONTEND_SRC_SASS} ${FRONTEND_BUILD_CSS}
+relay: 
+	${RELAY}
 
-${FRONTEND_BUILD_ASSET_MANIFEST}: ${FRONTEND_SRC_TS} ${FRONTEND_TSCONFIG_JSON}
-	@echo >${FRONTEND_SRC_TS_DIR}/stub.css
-	@${NPX_REACTSCRIPTS} build
+nextjs:
+	${NEXTJS_BUILD}
 
-${FRONTEND_BUILD}: js css
+${FRONTEND_BUILD}: graphql relay nextjs
 	@touch ${FRONTEND_BUILD}
-
-${WEBSITE_BUILD}: nextjs
-	@touch ${WEBSITE_BUILD}
 
 docker-frontend: ${FRONTEND_SRC}
 	@${DOCKER_BUILD} \
@@ -51,22 +43,7 @@ docker-frontend: ${FRONTEND_SRC}
 	@touch docker-frontend
 
 run-docker: ${FILES} docker
-	@${DOCKER} run -i -p 3000:80 ${REPO}
-
-watch-js:
-	echo "@import "$${FLU_PUBLIC_URL:-http://localhost:3000}/index.css";" \
-		>${FRONTEND_SRC_DIR}/stub.css
-
-	@${NPX_REACTSCRIPTS} start
-
-watch-css:
-	@${NPX_SASS} --watch ${FRONTEND_SRC_SASS} ${FRONTEND_PUBLIC_CSS}
-
-watch:
-	@${MAKE} -j2 watch-js watch-css
-
-frontend-test:
-	@${NPX_REACTSCRIPTS} test
+	@${DOCKER} run ${DOCKERFLAGS} -i -p 80:80 ${REPO}
 
 clean:
 	rm -f docker-backend docker-frontend

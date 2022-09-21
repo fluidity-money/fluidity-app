@@ -39,7 +39,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 80",
     "lint": "next lint",
     "gen-gql": "gq  --introspect https://fluidity.hasura.app/v1/graphql > schema.graphql",
     "relay": "relay-compiler"
