@@ -1,7 +1,7 @@
 // dynamically import JSON from relevant config
 import {useEffect, useState} from "react";
 import {PublicKey} from "@solana/web3.js";
-import {Network, SupportedFluidToken, SupportedUnwrappedToken} from "../../components/chains/chainContext";
+import {Network, SupportedFluidToken, SupportedUnwrappedToken} from "../../components/chains/ChainContext";
 import {FluidSolanaToken, SolanaTokenConfig, UnwrappedSolanaToken} from "../solana/token";
 import {Mapped} from "../types";
 

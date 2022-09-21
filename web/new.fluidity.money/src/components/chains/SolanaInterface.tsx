@@ -9,7 +9,7 @@ import {BigintIsh} from "@saberhq/token-utils";
 import {useSolanaTokens} from "../../utils/hooks/useSolanaTokens";
 import {unwrapSpl, wrapSpl} from "../../utils/solana/transaction";
 import {InterfaceProps} from ".";
-import {chainContext, Chain, Chains, Network, SupportedFluidToken, isSupportedToken} from "./chainContext";
+import {ChainContext, Chain, Chains, Network, SupportedFluidToken, isSupportedToken} from "./ChainContext";
 import localforage from "localforage";
 
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
@@ -55,7 +55,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
   }
 
   const disconnect = async() => {
-    solana.disconnect();
+    await solana.disconnect();
   }
 
   // amount in token's decimals, e.g. 1,500,000 to wrap 1.5 of a 6 decimal token
@@ -105,9 +105,9 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     unwrap,
   }
 
-  return <chainContext.Provider value={value}>
+  return <ChainContext.Provider value={value}>
     {children}
-  </chainContext.Provider>
+  </ChainContext.Provider>
 }
 
 export default SolanaInterface;

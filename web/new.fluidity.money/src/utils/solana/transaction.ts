@@ -11,7 +11,7 @@ import {FluidityInstruction} from "./FluidityInstruction";
 import {TokenAmount} from "@saberhq/token-utils";
 import {ReadonlyProvider} from "@saberhq/solana-contrib";
 import {getFluidInstructionKeys} from "./transactionUtils";
-import {Network} from "../../components/chains/chainContext";
+import {Network} from "../../components/chains/ChainContext";
 import {FluidSolanaToken, UnwrappedSolanaToken} from "./token";
 
 //internal method

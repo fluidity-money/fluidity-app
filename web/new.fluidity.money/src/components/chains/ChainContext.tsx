@@ -2,7 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE.md file.
 
-import {BigintIsh} from "@saberhq/token-utils";
 import {createContext} from "react";
 import {isInArray} from "../../utils/types";
 
@@ -22,6 +21,11 @@ export const Tokens = {
   solana: ["USDT", "USDC"],
 } as const;
 
+export const ChainIds: {[K in Network<"ethereum">]: number} = {
+  mainnet: 1,
+  ropsten: 3,
+}; 
+
 export type SupportedUnwrappedToken<T extends Chain = Chain> = typeof Tokens[T][number];
 export type SupportedFluidToken<T extends Chain = Chain> = `f${SupportedUnwrappedToken<T>}`;
 
@@ -37,8 +41,8 @@ interface ChainContextBase {
     setChain: (chain: Chain) => void
 
     disconnect: () => void
-    wrap: (token: string, amount: BigintIsh) => void
-    unwrap: (token: string, amount: BigintIsh) => void
+    wrap: (token: string, amount: string | number) => void
+    unwrap: (token: string, amount: string | number) => void
     connected: boolean
 }
 
@@ -57,7 +61,7 @@ type ChainContext = ChainContextBase &
     connect?: never,
   })
 
-export const chainContext = createContext<ChainContext>({
+export const ChainContext = createContext<ChainContext>({
     chain: null,
     connected: false,
 

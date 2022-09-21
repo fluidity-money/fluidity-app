@@ -3,13 +3,18 @@
 // LICENSE.md file.
 
 import {SolanaProvider} from "@saberhq/use-solana";
+import {InjectedConnector} from "@web3-react/injected-connector";
 import localforage from "localforage";
 import {useEffect, useState} from "react";
+import {UseWalletProvider} from "use-wallet";
 import {isInArray} from "../../utils/types";
-import {Chain, Chains, NullableChain} from "./chainContext";
+import {Chain, ChainIds, Chains, NullableChain} from "./ChainContext";
 import EthereumInterface from "./EthereumInterface";
 import SolanaInterface from "./SolanaInterface";
 
+const providerOptions = {
+  injected: new InjectedConnector({ supportedChainIds: Object.values(ChainIds) }),
+};
 
 const ChainInterface = ({children}: {children: React.ReactNode}) => {
   const lastChainKey = "persist.lastChain";

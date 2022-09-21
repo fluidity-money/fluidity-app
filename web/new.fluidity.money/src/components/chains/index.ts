@@ -6,7 +6,7 @@ import ChainInterface from "./ChainInterface"
 import SolanaInterface from "./SolanaInterface";
 import EthereumInterface from "./EthereumInterface";
 import {ReactNode} from "react";
-import {NullableChain} from "./chainContext";
+import {NullableChain} from "./ChainContext";
 import {ReactSetter} from "../../utils/types";
 
 export type InterfaceProps = {

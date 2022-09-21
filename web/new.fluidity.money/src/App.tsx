@@ -4,13 +4,13 @@ import Rewards from './screens/authenticated/rewards';
 import Assets from './screens/authenticated/assets';
 import Dao from './screens/authenticated/dao';
 import Home from './screens/Home';
-import {chainContext, Chains} from "./components/chains/chainContext";
+import {ChainContext, Chains} from "./components/chains/ChainContext";
 import './App.css'
 import {useContext} from "react";
 import ChainInterface from "./components/chains";
 
 const Div = () => {
-  const con = useContext(chainContext)
+  const con = useContext(ChainContext)
   const {connected, chain, network, setNetwork, connect, disconnect, wrap, unwrap, setChain} = con || {};
 
   return <div>
