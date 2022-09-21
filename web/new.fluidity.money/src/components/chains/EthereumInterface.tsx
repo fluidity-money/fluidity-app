@@ -3,15 +3,21 @@
 // LICENSE.md file.
 
 import localforage from "localforage";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {InterfaceProps} from ".";
 import {isInArray} from "../../utils/types";
-import {chainContext, Chains, Network} from "./chainContext";
+import {ChainContext, Chains, isSupportedToken, Network, SupportedFluidToken} from "./ChainContext";
+import {useWallet} from "use-wallet"
+import {useEthereumTokens} from "../../utils/hooks/useEthereumTokens";
+import makeContractSwap from "../../utils/ethereum/transaction";
+import useSigner from "../../utils/hooks/useSigner";
 
 const EthereumInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain = "ethereum" as const;
   const ethereumNetworkKey = "persist.lastNetwork.ethereum";
-  const [network, setNetwork] = useState<Network<"ethereum">>("mainnet");
+  const {fluidTokens, unwrappedTokens, network, setNetwork} = useEthereumTokens();
+  const wallet = useWallet();
+  const signer = useSigner();
 
   // set network if it's valid for the chain
   const setNetworkChecked = (network: string) => {
@@ -29,28 +35,65 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     });
   }, [])
 
+  useEffect(() => {
+    setConnected(wallet.isConnected)
+  }, [wallet.isConnected])
+
+  // useEffect(() => {
+  //   console.log("network", wallet.networkName);
+  // }, [wallet.networkName])
+
   const connect = (network: Network) => {
     if (!isInArray(network, Chains[chain]))
       return;
 
-    setNetwork(network);
-    setConnected(true);
+    wallet.connect("injected").then(_ => {
+      setNetwork(network);
+      setConnected(true);
+    });
   }
 
   const disconnect = () => {
+    wallet.reset();
     setConnected(false);
   }
 
-  const wrap = () => {
-    if (!connected)
+  // @param token: the base token
+  const wrap = async(token: string, amount: string | number) => {
+    if (!connected || !signer || !isSupportedToken(token, chain))
       return;
-    console.log("wrap ethereum!")
+
+    const fluidToken = fluidTokens['f' + token as SupportedFluidToken<"ethereum">]
+    const unwrappedToken = unwrappedTokens[token]
+
+    if (!fluidToken || !unwrappedToken) 
+      return;
+
+    try {
+      const result = await makeContractSwap(signer, unwrappedToken, fluidToken, amount);
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  const unwrap = () => {
-    if (!connected)
+  // @param token: the base token
+  const unwrap = async(token: string, amount: string | number) => {
+    if (!connected || !signer || !isSupportedToken(token, chain))
       return;
-    console.log("unwrap ethereum!")
+
+    const fluidToken = fluidTokens['f' + token as SupportedFluidToken<"ethereum">]
+    const unwrappedToken = unwrappedTokens[token]
+
+    if (!fluidToken || !unwrappedToken) 
+      return;
+
+    try {
+      const result = await makeContractSwap(signer, fluidToken, unwrappedToken, amount);
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const value = {
@@ -65,9 +108,11 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     unwrap,
   }
 
-  return <chainContext.Provider value={value}>
-    {children}
-  </chainContext.Provider>
+  return <>
+      <ChainContext.Provider value={value}>
+        {children}
+      </ChainContext.Provider>
+  </>
 }
 
 export default EthereumInterface;

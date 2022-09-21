@@ -13,6 +13,7 @@
   "dependencies": {
     "@saberhq/token-utils": "^1.14.6",
     "@saberhq/use-solana": "^1.14.6",
+    "@web3-react/injected-connector": "^6.0.7",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
     "graphql-ws": "^5.10.1",
@@ -23,7 +24,10 @@
     "react-relay": "^14.1.0",
     "react-router-dom": "^6.3.0",
     "relay-runtime": "^14.1.0",
-    "surfing": "file:../surfing"
+    "surfing": "file:../surfing",
+    "use-wallet": "^0.13.6",
+    "web3": "^1.8.0",
+    "web3-eth": "^1.8.0"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.1",
