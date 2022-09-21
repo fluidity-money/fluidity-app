@@ -12,8 +12,6 @@ SERVICES:
       SERVICE_NAME: connector-ethereum-block-headers-amqp
       DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
       ENV_FLU_WORKER_ID: ethereum-connector-ethereum-block-headers-amqp
-      ENV_FLU_ETHEREUM_BLOCK_RETRIES: 5
-      ENV_FLU_ETHEREUM_BLOCK_RETRY_DELAY: 5
       TASK_MIN_COUNT: 1
 
   - CONNECTORS_COMMON_BLOCKED_PAYOUTS_REPORTING_ETHEREUM:

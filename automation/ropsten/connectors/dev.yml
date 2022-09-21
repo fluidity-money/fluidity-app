@@ -13,5 +13,3 @@ SERVICES:
       DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
 
       ENV_FLU_WORKER_ID: ethereum-ropsten-connector-ethereum-block-headers-amqp
-      ENV_FLU_ETHEREUM_BLOCK_RETRIES: 5
-      ENV_FLU_ETHEREUM_BLOCK_RETRY_DELAY: 5
