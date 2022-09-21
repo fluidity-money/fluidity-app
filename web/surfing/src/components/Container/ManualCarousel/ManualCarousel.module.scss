@@ -32,7 +32,6 @@
   /* Handle */
   &::-webkit-scrollbar-thumb {
     background: map-get($bg, "alternate");
-    // border: 1px solid #051323;
     border-radius: 10px;
   }
 
