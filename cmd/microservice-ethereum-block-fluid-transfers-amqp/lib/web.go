@@ -138,24 +138,24 @@ func GetBlockFromHash(gethHttpApi, blockHash string, retries int, delay int) (*B
 		true,
 	}
 
-	blocksReqBody_, err := json.Marshal(GethBody{
-		Method:  "eth_getBlockByHash",
-		JsonRpc: "2.0",
-		Id:      "1",
-		Params:  blocksReqParams,
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"could not marshal Geth provider eth_getBlockByNumber body: %v",
-			err,
-		)
-	}
-
-	blocksReqBody := bytes.NewBuffer(blocksReqBody_)
-
 	remainingRetries := retries
 	for {
+		blocksReqBody_, err := json.Marshal(GethBody{
+			Method:  "eth_getBlockByHash",
+			JsonRpc: "2.0",
+			Id:      "1",
+			Params:  blocksReqParams,
+		})
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"could not marshal Geth provider eth_getBlockByNumber body: %v",
+				err,
+			)
+		}
+
+		blocksReqBody := bytes.NewBuffer(blocksReqBody_)
+
 		resp, err := http.Post(gethHttpApi, "application/json", blocksReqBody)
 
 		if err != nil {
