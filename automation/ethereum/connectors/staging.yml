@@ -3,7 +3,7 @@ SECRET_FLU_ETHEREUM_WS_URL: /fluidity/ethereum/websocket_url
 SERVICES:
   - CONNECTORS_ETHEREUM_LOGS-AMQP:
       SERVICE_NAME: connector-ethereum-logs-amqp
-      DOCKERFILE_PATH: ./cmd/connector-ethereum-logs-amqp    
+      DOCKERFILE_PATH: ./cmd/connector-ethereum-logs-amqp
       ENV_FLU_WORKER_ID: ethereum-staging-connector-ethereum-logs-amqp
       ENV_FLU_ETHEREUM_START_BLOCK: latest
 
@@ -11,6 +11,8 @@ SERVICES:
       SERVICE_NAME: connector-ethereum-block-headers-amqp
       DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
       ENV_FLU_WORKER_ID: ethereum-staging-connector-ethereum-block-headers-amqp
+      ENV_FLU_ETHEREUM_BLOCK_RETRIES: 5
+      ENV_FLU_ETHEREUM_BLOCK_RETRY_DELAY: 5
 
   - CONNECTORS_COMMON_BLOCKED_PAYOUTS_REPORTING_ETHEREUM:
       SERVICE_NAME: connector-common-blocked-payouts-reporting-ethereum

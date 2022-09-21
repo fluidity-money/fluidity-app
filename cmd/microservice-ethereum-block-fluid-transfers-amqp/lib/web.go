@@ -9,8 +9,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
@@ -130,7 +132,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 	return logs, nil
 }
 
-func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
+func GetBlockFromHash(gethHttpApi, blockHash string, retries int, delay int) (*Block, error) {
 	blocksReqParams := BlockParams{
 		blockHash,
 		true,
@@ -152,47 +154,67 @@ func GetBlockFromHash(gethHttpApi, blockHash string) (*Block, error) {
 
 	blocksReqBody := bytes.NewBuffer(blocksReqBody_)
 
-	resp, err := http.Post(gethHttpApi, "application/json", blocksReqBody)
+	remainingRetries := retries
+	for {
+		resp, err := http.Post(gethHttpApi, "application/json", blocksReqBody)
 
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Could not POST to Geth provider: %v",
-			err,
-		)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Could not POST to Geth provider: %v",
+				err,
+			)
+		}
+
+		defer resp.Body.Close()
+
+		var blocksResponse BlocksResponse
+
+		err = json.NewDecoder(resp.Body).Decode(&blocksResponse)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"could not unmarshal response body: %v",
+				err,
+			)
+		}
+
+		blockResponseResult := blocksResponse.Result
+
+		if string(blockResponseResult) == "null" {
+			// block isn't available
+			if remainingRetries > 0 {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Block %s not available yet! sleeping for %d seconds before retrying",
+							blockHash,
+							delay,
+						)
+					})
+
+					duration := time.Duration(delay) * time.Second
+					time.Sleep(duration)
+
+					remainingRetries--
+					continue
+			}
+
+			return nil, fmt.Errorf(
+				"geth return null for block %v, block doesn't exist! possible geth desync?!",
+				blockHash,
+			)
+		}
+
+		var block Block
+
+		err = json.Unmarshal(blockResponseResult, &block)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"could not unmarshal block resonse: %v",
+				err,
+			)
+		}
+
+		return &block, nil
 	}
-
-	defer resp.Body.Close()
-
-	var blocksResponse BlocksResponse
-
-	err = json.NewDecoder(resp.Body).Decode(&blocksResponse)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"could not unmarshal response body: %v",
-			err,
-		)
-	}
-
-	blockResponseResult := blocksResponse.Result
-
-	if string(blockResponseResult) == "null" {
-		return nil, fmt.Errorf(
-			"geth return null for block %v, block doesn't exist! possible geth desync?!",
-			blockHash,
-		)
-	}
-
-	var block Block
-
-	err = json.Unmarshal(blockResponseResult, &block)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"could not unmarshal block resonse: %v",
-			err,
-		)
-	}
-
-	return &block, nil
 }
