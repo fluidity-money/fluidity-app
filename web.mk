@@ -28,6 +28,9 @@ BACKEND_BUILD := ${REPO}.out
 	clean \
 	css \
 	js \
+	gengql \
+	relay \
+	nextjs \
 	build \
 	frontend \
 	website \
