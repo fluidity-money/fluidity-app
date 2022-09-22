@@ -35,7 +35,10 @@ const ResourcesPage = () => {
     <div className={styles.pageContainer}>
       <Head>
         <title>Resources - Fluidity</title>
-        <meta name="description" content="Fluidity's research and platform will supercharge the adoption of Web3 and Crypto. Read about the future of Crypto and Fluidity's vision." />
+        <meta
+          name="description"
+          content="Fluidity's research and platform will supercharge the adoption of Web3 and Crypto. Read about the future of Crypto and Fluidity's vision."
+        />
       </Head>
       <div className={styles.screensContainer}>
         <Navigation
@@ -62,11 +65,12 @@ const ResourcesPage = () => {
               animate={{ opacity: 1, transform: "translateY(0px)" }}
               transition={{ transform: { duration: 1 } }}
             >
-              <Articles isResourcesPage={true}/>
+              <Articles isResourcesPage={true} />
               {/* <Tweets /> */}
               <Fluniversity />
               <Whitepapers />
               <Docs />
+              <MailingList />
               <Demo />
               <Footer />
             </motion.div>

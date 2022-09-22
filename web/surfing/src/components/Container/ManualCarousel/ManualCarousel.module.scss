@@ -22,8 +22,8 @@
   &::-webkit-scrollbar-track {
     background: #2c2c2d;
     border-radius: 10px;
-    margin-right: 80px;
-    margin-left: 40px;
+    margin-right: 20px;
+    margin-left: 5px;
   }
   &::-webkit-scrollbar-track:hover {
     background: #555;
@@ -32,7 +32,6 @@
   /* Handle */
   &::-webkit-scrollbar-thumb {
     background: map-get($bg, "alternate");
-    // border: 1px solid #051323;
     border-radius: 10px;
   }
 
