@@ -44,7 +44,8 @@
     height: 640px;
   }
   @media (max-width: 620px) {
-    height: 500px;
+    height: fit-content;
+    min-height: 225px;
   }
 }
 

@@ -10,7 +10,7 @@
   box-sizing: border-box;
   display: flex;
   background-color: transparent;
-  overflow-x: auto;
+  overflow-x: scroll;
 
   /* width */
   &::-webkit-scrollbar {

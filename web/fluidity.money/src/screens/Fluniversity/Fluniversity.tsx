@@ -56,7 +56,7 @@ const Fluniversity = () => {
                   <img src={item.img} alt="Link" />
                 </div>
 
-                <Heading as="h4">{item.title}</Heading>
+                <Heading as={width < 500 ? "h5" : "h4"}>{item.title}</Heading>
                 <Text as="p">{item.desc}</Text>
                 <div className={styles.footer}>
                   <Text>{item.time} mins read</Text>

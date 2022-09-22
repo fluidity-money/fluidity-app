@@ -15,10 +15,7 @@ const UseCases = () => {
   const { width } = useViewport();
   const breakpoint = 665;
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column" }}
-      className={styles.container}
-    >
+    <div className={styles.container}>
       {/* Missing font WHYTE INK SUPER */}
       {/*<Display */}
       {/*  large={width > breakpoint && true} */}
