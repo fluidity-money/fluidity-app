@@ -2,46 +2,49 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
 import useViewport from "hooks/useViewport";
+import Video from "components/Video";
 
 const Use = () => {
 
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
-
-  const right = (
-    <HowItWorksTemplate header={header} info={info}>
-      Fluid asset use-cases
-    </HowItWorksTemplate>
-  );
-
-  const left = width <= breakpoint ? (
+  //for whatever happens that stops the video from playing like on ios due to powersaver turned on. - play a low res webp
+  //also for an awful network - play a low res webp while main vid loads
+  const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
+  
+  const right =
+  <HowItWorksTemplate header={header} info={info}>
+    Fluid asset use-cases
+  </HowItWorksTemplate>
+   
+  const left =
+  <>
     <img
     src="/assets/images/Animations/FluidityUse.webp"
     style={{
       position: "relative",
-      width: "200%",
+      width: "100%",
+      display: `${onHomeVidLoaded === true ? "none" : "block"}`,
     }}
-    alt="Fluidity-Use"
-  />
-  ): (
-    <img
-      src="/assets/images/Animations/FluidityUse.webp"
-      style={{
-        position: "relative",
-      }}
-      alt="Fluidity-Use"
+    alt="Fluidity Yield" />
+    <Video
+      src={"/assets/videos/FluidityUse.mp4"}
+      type={"fit"}
+      display= {!onHomeVidLoaded ? "none" : "inline"}
+      loop={true}
+      onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
     />
-  );
+  </>
 
   return (
-    <div className={styles.container} id="useassets">
+    <div className={styles.container} id="yield&win">
       <ReusableGrid left={left} right={right} />
     </div>
   );
