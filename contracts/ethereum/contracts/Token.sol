@@ -305,7 +305,7 @@ contract Token is IERC20 {
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    /// @notice updates and resets mint limits if called by the operator
+    /// @notice updates and resets mint limits if called by the oracle
     function updateMintLimits(uint global, uint user) public {
         require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == oracle(), "only the oracle account can use this");
