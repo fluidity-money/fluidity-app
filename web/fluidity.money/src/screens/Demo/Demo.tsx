@@ -66,7 +66,7 @@ const Demo = () => {
               SHOW ME A DEMO
             </GeneralButton> */}
              <img
-              src="/assets/images/Animations/ComingSoon.webp"
+              src="/assets/images/ComingSoon.webp"
               className={styles.comingSoonButton}
               alt="Coming-Soon"
             />

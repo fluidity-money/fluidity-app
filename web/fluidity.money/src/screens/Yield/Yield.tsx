@@ -2,8 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
@@ -17,35 +15,34 @@ const Yield = () => {
   const breakpoint = 860;
 
   const left =
-    width <= breakpoint ? (
-      <img
-      src="/assets/images/Animations/FluidYield.webp"
-      style={{
-        position: "relative",
-        width: "200%",
-      }}
-      alt="Fluidity Yield"
-    />
-    ) : (
-      <HowItWorksTemplate header={header} info={info}>
-        Yield through utility
-      </HowItWorksTemplate>
-    );
+  width <= breakpoint ? (
+    <>
+      <Video
+        src={"/assets/videos/FluidityYield.mp4"}
+        type={"fit"}
+        loop={true}
+      />
+    </>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+      Yield through utility
+    </HowItWorksTemplate>
+  );
 
   const right =
-    width > breakpoint ? (
-      <img
-      src="/assets/images/Animations/FluidYield.webp"
-      style={{
-        position: "relative",
-      }}
-      alt="Fluidity Yield"
-    />
-    ) : (
-      <HowItWorksTemplate header={header} info={info}>
-        Yield through utility
-      </HowItWorksTemplate>
-    );
+  width > breakpoint ? (
+    <>
+      <Video
+        src={"/assets/videos/FluidityYield.mp4"}
+        type={"fit"}
+        loop={true}
+      />
+    </>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+      Yield through utility
+    </HowItWorksTemplate>
+  );
 
   return (
     <div className={styles.container} id="yield&win">

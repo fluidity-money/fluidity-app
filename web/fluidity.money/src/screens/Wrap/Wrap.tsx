@@ -2,53 +2,51 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";
+import Video from "components/Video";
 
 const Wrap = () => {
-
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
 
   const left =
-    width < breakpoint ? (
-      <img
-      src="/assets/images/Animations/FluidityWrap.webp"
-      style={{
-        position: "relative",
-        width: "100%"
-      }}
-      alt="Fluidity-Wrap"
-    />
+  width <= breakpoint ? (
+    <>
+      <Video
+        src={"/assets/videos/FluidityWrap.mp4"}
+        type={"fit"}
+        loop={true}
+        scale={0.7}
+      />
+    </>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
-        Wrapped tokens
+         Wrapped tokens
       </HowItWorksTemplate>
     );
 
   const right =
-    width > breakpoint ? (
-      <img
-      src="/assets/images/Animations/FluidityWrap.webp"
-      style={{
-        position: "relative",
-        width: "100%"
-      }}
-      alt="Fluidity-Wrap"
-    />
-    ) : (
-      <HowItWorksTemplate header={header} info={info}>
-        Wrapped tokens
-      </HowItWorksTemplate>
-    );
+  width > breakpoint ? (
+    <>
+      <Video
+        src={"/assets/videos/FluidityWrap.mp4"}
+        type={"fit"}
+        loop={true}
+        scale={0.7}
+      />
+    </>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+      Wrapped tokens
+    </HowItWorksTemplate>
+  );
 
   return (
-    <div className={styles.container} id="wraptokens">
+    <div className={styles.container} id="yield&win">
       <ReusableGrid left={left} right={right} />
     </div>
   );
