@@ -2,8 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
@@ -21,54 +20,54 @@ const Yield = () => {
   const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
   
   const left =
-    width <= breakpoint ? (
-      <>
-       <img
-        src="/assets/images/Animations/FluidYield.webp"
-        style={{
-          position: "relative",
-          width: "100%",
-          display: `${onHomeVidLoaded === true ? "none" : "block"}`,
-        }}
-        alt="Fluidity Yield" />
-        <Video
-          src={"/assets/videos/FluidityYield.mp4"}
-          type={"fit"}
-          display= {!onHomeVidLoaded ? "none" : "inline"}
-          loop={true}
-          onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
-        />
-      </>
-    ) : (
-      <HowItWorksTemplate header={header} info={info}>
-        Yield through utility
-      </HowItWorksTemplate>
-    );
+  width <= breakpoint ? (
+    <>
+      <img
+      src="/assets/images/Animations/FluidYield.webp"
+      style={{
+        position: "relative",
+        width: "100%",
+        display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+      }}
+      alt="Fluidity Yield" />
+      <Video
+        src={"/assets/videos/FluidityYield.mp4"}
+        type={"fit"}
+        display= {!onHomeVidLoaded ? "none" : "inline"}
+        loop={true}
+        onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
+      />
+    </>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+      Yield through utility
+    </HowItWorksTemplate>
+  );
 
   const right =
-    width > breakpoint ? (
-      <>
-       <img
-        src="/assets/images/Animations/FluidYield.webp"
-        style={{
-          position: "relative",
-          width: "100%",
-          display: `${onHomeVidLoaded === true ? "none" : "block"}`,
-        }}
-        alt="Fluidity Yield" />
-        <Video
-          src={"/assets/videos/FluidityYield.mp4"}
-          type={"fit"}
-          loop={true}
-          display= {!onHomeVidLoaded ? "none" : "inline"}
-          onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
-        />
-        </>
-    ) : (
-      <HowItWorksTemplate header={header} info={info}>
-        Yield through utility
-      </HowItWorksTemplate>
-    );
+  width > breakpoint ? (
+    <>
+      <img
+      src="/assets/images/Animations/FluidYield.webp"
+      style={{
+        position: "relative",
+        width: "100%",
+        display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+      }}
+      alt="Fluidity Yield" />
+      <Video
+        src={"/assets/videos/FluidityYield.mp4"}
+        type={"fit"}
+        loop={true}
+        display= {!onHomeVidLoaded ? "none" : "inline"}
+        onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
+      />
+      </>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+      Yield through utility
+    </HowItWorksTemplate>
+  );
 
   return (
     <div className={styles.container} id="yield&win">

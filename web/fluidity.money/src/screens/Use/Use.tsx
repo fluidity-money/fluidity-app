@@ -2,8 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
@@ -11,7 +10,6 @@ import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 
 const Use = () => {
-
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
