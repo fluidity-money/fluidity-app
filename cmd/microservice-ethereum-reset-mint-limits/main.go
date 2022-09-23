@@ -25,8 +25,8 @@ const (
 	// EnvEthereumHttpUrl to use to connect to Geth to send amounts
 	EnvEthereumHttpUrl = "FLU_ETHEREUM_HTTP_URL"
 
-	// EnvPrivateKey to use when signing requests to send amount from the faucet
-	EnvPrivateKey = `FLU_ETHEREUM_FAUCET_PRIVATE_KEY`
+	// EnvPrivateKey to use when signing requests to update the mint limits
+	EnvPrivateKey = `FLU_ETHEREUM_WORKER_PRIVATE_KEY`
 
 	// EnvGlobalMintLimits to update the restriction set to
 	EnvGlobalMintLimit = `FLU_ETHEREUM_GLOBAL_MINT_LIMIT`
