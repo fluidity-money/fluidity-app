@@ -2,8 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import {
   ContinuousCarousel,
   Heading,
@@ -13,9 +11,29 @@ import {
 } from "@fluidity-money/surfing";
 import styles from "./Fluniversity.module.scss";
 import useViewport from "hooks/useViewport";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const Fluniversity = () => {
   const { width } = useViewport();
+
+  const location = useRouter().asPath;
+  // scroll to element id when selected via navbar resources modal
+  // works for entire
+  useEffect(() => {
+    if (location.includes("#")) {
+      // slice off after the hash
+      let elem = document.getElementById(location.slice(11));
+      if (elem) {
+        const yOffset = -1150;
+        const y =
+          elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, left: 0, behavior: "smooth" });
+      }
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [location]);
 
   const callout = (
     <div className={styles.callout}>
@@ -56,7 +74,7 @@ const Fluniversity = () => {
                   <img src={item.img} alt="Link" />
                 </div>
 
-                <Heading as="h4">{item.title}</Heading>
+                <Heading as={width < 500 ? "h5" : "h4"}>{item.title}</Heading>
                 <Text as="p">{item.desc}</Text>
                 <div className={styles.footer}>
                   <Text>{item.time} mins read</Text>
