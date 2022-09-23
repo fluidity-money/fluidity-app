@@ -54,16 +54,16 @@ contract Token is IERC20 {
     );
 
     /// @notice emitted when an underlying token is wrapped into a fluid asset
-    event MintFluid(address indexed addr, uint indexed amount);
+    event MintFluid(address indexed addr, uint amount);
 
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
-    event BurnFluid(address indexed addr, uint indexed amount);
+    event BurnFluid(address indexed addr, uint amount);
 
     /// @notice emitted when a new operator takes over the contract management
     event OperatorChanged(address indexed oldOperator, address indexed newOperator);
 
     /// @notice emitted when the contract enters emergency mode!
-    event Emergency(bool status);
+    event Emergency(bool indexed status);
 
     /// @notice emitted when restrictions
     event MaxUncheckedRewardLimitChanged(uint amount);
@@ -76,7 +76,7 @@ contract Token is IERC20 {
 
     /// @notice worker config changed, either by disabling emergency
     /// @notice mode or updateWorkerConfig
-    event WorkerConfigUpdated(address newConfig);
+    event WorkerConfigUpdated(address indexed newConfig);
 
     /// @notice updating the reward quarantine before manual signoff
     /// @notice by the multisig (with updateRewardQuarantineThreshold)
@@ -84,7 +84,7 @@ contract Token is IERC20 {
 
     /// @notice emitted when the mint limits are enabled or disabled
     /// @notice by enableMintLimits
-    event MintLimitsStateChanged(bool status);
+    event MintLimitsStateChanged(bool indexed status);
 
     // erc20 props
     mapping(address => uint256) private balances_;

@@ -18,10 +18,10 @@ contract WorkerConfig {
     }
 
     /// @notice emitted when the rng oracles are changed to a new address
-    event OracleChanged(address contractAddr, address oldOracle, address newOracle);
+    event OracleChanged(address indexed contractAddr, address indexed oldOracle, address indexed newOracle);
 
     /// @notice emitted when an emergency is declared!
-    event Emergency(bool);
+    event Emergency(bool indexed enabled);
 
     /// @dev if false, emergency mode is active!
     bool private noGlobalEmergency_;
