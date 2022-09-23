@@ -133,32 +133,35 @@ const HowItWorks = () => {
 
           <div className={styles.video}>
             {currentImageIndex === 0 ? (
-              <img
-              src="assets/images/Animations/FluidityWrap.webp"
-              style={{
-                position: "relative",
-                width: "60%"
-              }}
-              alt="Fluidity-Wrap"
-              />
+            <Video
+              src={
+                "/assets/videos/FluidityWrap.mp4"
+              }
+              type={"fit"}
+              loop={true}
+              key={"abc"}
+              scale={0.6}
+            />
             ) : currentImageIndex === 1 ? (
-              <img
-              src="assets/images/Animations/FluidYield.webp"
-              style={{
-                position: "relative",
-                width: "90%"
-              }}
-              alt="Fluidity-Yield"
-              />
+            <Video
+              src={
+                "/assets/videos/FluidityYield.mp4"
+              }
+              type={"fit"}
+              loop={true}
+              key={"xyz"}
+              scale={0.7}
+            />
             ) : (
-              <img
-              src="assets/images/Animations/FluidityHowItWorks.webp"
-              style={{
-                position: "relative",
-                width: "70%"
-              }}
-              alt="How-It-Works"
-              />
+            <Video
+              src={
+                "/assets/videos/FluidityHowItWorks.mp4"
+              }
+              type={"fit"}
+              loop={true}
+              key={"jfk"}
+              scale={0.7}
+            />
             )}
           </div>
         </div>

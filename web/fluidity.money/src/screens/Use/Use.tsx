@@ -13,10 +13,7 @@ const Use = () => {
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
-  //for whatever happens that stops the video from playing like on ios due to powersaver turned on. - play a low res webp
-  //also for an awful network - play a low res webp while main vid loads
-  const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
-  
+
   const right =
   <HowItWorksTemplate header={header} info={info}>
     Fluid asset use-cases
@@ -24,20 +21,10 @@ const Use = () => {
    
   const left =
   <>
-    <img
-    src="/assets/images/Animations/FluidityUse.webp"
-    style={{
-      position: "relative",
-      width: "100%",
-      display: `${onHomeVidLoaded === true ? "none" : "block"}`,
-    }}
-    alt="Fluidity Use" />
     <Video
       src={"/assets/videos/FluidityUse.mp4"}
       type={"fit"}
-      display= {!onHomeVidLoaded ? "none" : "inline"}
       loop={true}
-      onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
     />
   </>
 
