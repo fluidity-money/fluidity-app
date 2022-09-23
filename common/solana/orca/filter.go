@@ -55,40 +55,14 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 
 	allInstructions := solana.GetAllInstructions(transaction)
 
-	wrappedSolAccounts := make(map[string]bool)
-
 	for instructionNumber, instruction := range allInstructions {
 		var (
-			splProgramId = spl_token.TokenProgramAddress
-
 			programId                = accountKeys[instruction.ProgramIdIndex]
-			transactionProgramIsSpl  = programId == splProgramId
 			transactionProgramIsOrca = programId == orcaProgramId
 
 			instructionData = instruction.Data
-			accounts = instruction.Accounts
+			accounts        = instruction.Accounts
 		)
-
-		if transactionProgramIsSpl {
-			isInitialise, err := spl_token.IsInitialiseAccount(instructionData)
-
-			if err != nil {
-			    return nil, fmt.Errorf(
-					"Failed to decode an spl instruction! %w",
-					err,
-				)
-			}
-
-			if isInitialise {
-				var (
-					initialisedAccount = accountKeys[accounts[0]]
-					mint = accountKeys[accounts[1]]
-				)
-				accountIsWrappedSol := mint == spl_token.WrappedSolMintAddress
-
-				wrappedSolAccounts[initialisedAccount] = accountIsWrappedSol
-			}
-		}
 
 		if !transactionProgramIsOrca {
 
@@ -134,10 +108,10 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 
 			swapAccount = accountKeys[accounts[0]]
 
-			// get user source & destination accounts
+			// get source & destination accounts
 
-			userSourceSplAccount      = accountKeys[accounts[3]]
-			userDestinationSplAccount = accountKeys[accounts[6]]
+			poolSourceSplAccount      = accountKeys[accounts[4]]
+			poolDestinationSplAccount = accountKeys[accounts[5]]
 		)
 
 		swapAccountPubkey, err := solana.PublicKeyFromBase58(swapAccount)
@@ -211,26 +185,26 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 
 		// convert source and destination accounts to public key
 
-		userSourceSplAccountPubkey, err := solana.PublicKeyFromBase58(
-			userSourceSplAccount,
+		poolSourceSplAccountPubkey, err := solana.PublicKeyFromBase58(
+			poolSourceSplAccount,
 		)
 
 		if err != nil {
 			return nil, fmt.Errorf(
 				"failed to get Orca source spl-token public key from string %#v in instruction %v in %#v! %v",
-				userSourceSplAccount,
+				poolSourceSplAccount,
 				instructionNumber,
 				transactionSignature,
 				err,
 			)
 		}
 
-		userDestinationSplAccountPubkey, err := solana.PublicKeyFromBase58(userDestinationSplAccount)
+		poolDestinationSplAccountPubkey, err := solana.PublicKeyFromBase58(poolDestinationSplAccount)
 
 		if err != nil {
 			return nil, fmt.Errorf(
 				"failed to get Orca destination spl-token public key from string %#v in instruction %v in %#v! %v",
-				userDestinationSplAccount,
+				poolDestinationSplAccount,
 				instructionNumber,
 				transactionSignature,
 				err,
@@ -244,68 +218,54 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 			decimals uint8
 		)
 
-		if wrappedSolAccounts[userSourceSplAccount] {
-			// don't do a lookup if we think this is a wrapped sol account
-			// since orca loves to create ephemeral wsol accounts that
-			// won't exist when we do the lookup
-			sourceMint = spl_token.WrappedSolMintAddressPubkey
-			decimals = spl_token.WrappedSolDecimals
+		sourceMint, err = spl_token.GetMintFromPda(
+			solanaClient,
+			poolSourceSplAccountPubkey,
+		)
 
-		} else {
-			sourceMint, err = spl_token.GetMintFromPda(
-				solanaClient,
-				userSourceSplAccountPubkey,
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to get Orca source spl-token mint %#v in instruction %v in %#v! %v",
+				poolSourceSplAccountPubkey,
+				instructionNumber,
+				transactionSignature,
+				err,
 			)
+		}
 
-			if err != nil {
-				return nil, fmt.Errorf(
-					"failed to get Orca source spl-token mint %#v in instruction %v in %#v! %v",
-					userSourceSplAccountPubkey,
-					instructionNumber,
-					transactionSignature,
-					err,
-				)
-			}
+		decimals, err = spl_token.GetDecimalsFromPda(
+			solanaClient,
+			poolSourceSplAccountPubkey,
+			"",
+		)
 
-			decimals, err = spl_token.GetDecimalsFromPda(
-				solanaClient,
-				userSourceSplAccountPubkey,
-				"",
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to get Orca source spl-token decimals %#v in instruction %v in %#v! %v",
+				poolSourceSplAccountPubkey,
+				instructionNumber,
+				transactionSignature,
+				err,
 			)
-
-			if err != nil {
-				return nil, fmt.Errorf(
-					"failed to get Orca source spl-token decimals %#v in instruction %v in %#v! %v",
-					userSourceSplAccountPubkey,
-					instructionNumber,
-					transactionSignature,
-					err,
-				)
-			}
 		}
 
 		// get the mint of the destination account
 
 		var destinationMint solana.PublicKey
 
-		if wrappedSolAccounts[userDestinationSplAccount] {
-			destinationMint = spl_token.TokenAssociatedProgramAddressPubkey
+		destinationMint, err = spl_token.GetMintFromPda(
+			solanaClient,
+			poolDestinationSplAccountPubkey,
+		)
 
-		} else {
-			destinationMint, err = spl_token.GetMintFromPda(
-				solanaClient,
-				userDestinationSplAccountPubkey,
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to get Orca destination spl-token mint %#v in instruction %v in %#v! %v",
+				poolDestinationSplAccountPubkey,
+				instructionNumber,
+				transactionSignature,
+				err,
 			)
-
-			if err != nil {
-				return nil, fmt.Errorf(
-					"failed to get Orca destination spl-token mint %#v in instruction %v in %#v! %v",
-					userDestinationSplAccountPubkey,
-					instructionNumber,
-					transactionSignature,
-					err,
-				)
-			}
 		}
 
 		var (
