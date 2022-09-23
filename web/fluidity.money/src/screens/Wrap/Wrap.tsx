@@ -2,12 +2,13 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";
+import Video from "components/Video";
 
 const Wrap = () => {
 
@@ -15,40 +16,62 @@ const Wrap = () => {
   const { width } = useViewport();
   const breakpoint = 860;
 
+  //for whatever happens that stops the video from playing like on ios due to powersaver turned on. - play a low res webp
+  //also for an awful network - play a low res webp while main vid loads
+  const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
+  
   const left =
-    width < breakpoint ? (
+  width <= breakpoint ? (
+    <>
       <img
       src="/assets/images/Animations/FluidityWrap.webp"
       style={{
         position: "relative",
-        width: "100%"
+        width: "100%",
+        display: `${onHomeVidLoaded === true ? "none" : "block"}`,
       }}
-      alt="Fluidity-Wrap"
-    />
+      alt="Fluidity Wrap" />
+      <Video
+        src={"/assets/videos/FluidityWrap.mp4"}
+        type={"fit"}
+        display= {!onHomeVidLoaded ? "none" : "inline"}
+        loop={true}
+        onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
+      />
+    </>
     ) : (
       <HowItWorksTemplate header={header} info={info}>
-        Wrapped tokens
+         Wrapped tokens
       </HowItWorksTemplate>
     );
 
   const right =
-    width > breakpoint ? (
+  width > breakpoint ? (
+    <>
       <img
       src="/assets/images/Animations/FluidityWrap.webp"
       style={{
         position: "relative",
-        width: "100%"
+        width: "100%",
+        display: `${onHomeVidLoaded === true ? "none" : "block"}`,
       }}
-      alt="Fluidity-Wrap"
-    />
-    ) : (
-      <HowItWorksTemplate header={header} info={info}>
-        Wrapped tokens
-      </HowItWorksTemplate>
-    );
+      alt="Fluidity Wrap" />
+      <Video
+        src={"/assets/videos/FluidityWrap.mp4"}
+        type={"fit"}
+        loop={true}
+        display= {!onHomeVidLoaded ? "none" : "inline"}
+        onLoad={!onHomeVidLoaded ? () => setOnHomeVidLoaded(true) : () => { } }
+      />
+    </>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+      Wrapped tokens
+    </HowItWorksTemplate>
+  );
 
   return (
-    <div className={styles.container} id="wraptokens">
+    <div className={styles.container} id="yield&win">
       <ReusableGrid left={left} right={right} />
     </div>
   );

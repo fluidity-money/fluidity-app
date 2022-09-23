@@ -33,7 +33,7 @@ const Use = () => {
       width: "100%",
       display: `${onHomeVidLoaded === true ? "none" : "block"}`,
     }}
-    alt="Fluidity Yield" />
+    alt="Fluidity Use" />
     <Video
       src={"/assets/videos/FluidityUse.mp4"}
       type={"fit"}
