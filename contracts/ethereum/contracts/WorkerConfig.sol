@@ -21,7 +21,7 @@ contract WorkerConfig {
     event OracleChanged(address contractAddr, address oldOracle, address newOracle);
 
     /// @notice emitted when an emergency is declared!
-    event Emergency();
+    event Emergency(bool);
 
     /// @dev if false, emergency mode is active!
     bool private noGlobalEmergency_;
@@ -93,6 +93,18 @@ contract WorkerConfig {
         require(authorised, "only the operator or emergency council can use this");
 
         noGlobalEmergency_ = false;
-        emit Emergency();
+        emit Emergency(true);
+    }
+
+    /**
+     * @notice disables emergency mode, following presumably a contract upgrade
+     * @notice (operator only)
+     */
+    function disableEmergencyMode() public {
+        require(msg.sender == operator_, "only the operator account can use this");
+
+        noGlobalEmergency_ = true;
+
+        emit Emergency(false);
     }
 }
