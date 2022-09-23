@@ -346,14 +346,14 @@ contract Token is IERC20 {
 
             uint userMint;
 
-            bool userHasMinted = userLastMintedBlock_[msg.sender] < userMintResetBlock_;
+            bool userHasntMinted = userLastMintedBlock_[msg.sender] < userMintResetBlock_;
 
-            if (userHasMinted) {
+            if (userHasntMinted) {
                 // user hasn't minted since the reset, reset their count
-                userAmountMinted_[msg.sender] = amount;
+                userMint = amount;
             } else {
                 // user has, add the amount they're minting
-                userAmountMinted_[msg.sender] = userAmountMinted_[msg.sender] + amount;
+                userMint = userAmountMinted_[msg.sender] + amount;
             }
 
             require(userMint <= userMintLimit_, "mint amount exceeds user limit!");
