@@ -5,7 +5,6 @@
 import { Display, Heading } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import useViewport from "hooks/useViewport";
-import { useState } from "react";
 import { isFirefox } from "react-device-detect";
 import styles from "./Incentivising.module.scss";
 

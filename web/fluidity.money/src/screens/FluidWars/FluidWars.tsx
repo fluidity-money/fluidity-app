@@ -2,7 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
