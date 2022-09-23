@@ -22,6 +22,7 @@ const Yield = () => {
       src="/assets/images/Animations/FluidYield.webp"
       style={{
         position: "relative",
+        width: "200%",
       }}
       alt="Fluidity Yield"
     />

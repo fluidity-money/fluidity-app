@@ -17,16 +17,6 @@ const Incentivising = () => {
 
   return (
     <div className={styles.container}>
-
-      <img src="assets/images/Animations/FluidityHowItWorks.webp"
-        style={{
-         position: "absolute",
-         display: `${ready === true ? 'none' : 'block'}`,
-         width: `${width <= breakpoint ? '100%' : '18%'}`,
-       }}
-       alt="How-It-Works"
-       />
-
       {width <= breakpoint ? (
       <Video
         src={"/assets/videos/FluidityHowItWorks.mp4"}
@@ -40,7 +30,7 @@ const Incentivising = () => {
         type={"reduce"}
         loop={true}
         scale={isFirefox ? 1.5 : .6}
-        onLoad={() => setReady(true)}
+        onLoad={() => setReady(false)}
         className={styles.video}
       />)}
       <div>

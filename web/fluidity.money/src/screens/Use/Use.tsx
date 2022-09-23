@@ -7,8 +7,13 @@ import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
+import useViewport from "hooks/useViewport";
 
 const Use = () => {
+
+  // to set order correct when in column layout
+  const { width } = useViewport();
+  const breakpoint = 860;
 
   const right = (
     <HowItWorksTemplate header={header} info={info}>
@@ -16,14 +21,23 @@ const Use = () => {
     </HowItWorksTemplate>
   );
 
-  const left = (
+  const left = width <= breakpoint ? (
     <img
     src="/assets/images/Animations/FluidityUse.webp"
     style={{
       position: "relative",
+      width: "200%",
     }}
     alt="Fluidity-Use"
   />
+  ): (
+    <img
+      src="/assets/images/Animations/FluidityUse.webp"
+      style={{
+        position: "relative",
+      }}
+      alt="Fluidity-Use"
+    />
   );
 
   return (

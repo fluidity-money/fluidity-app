@@ -74,12 +74,12 @@ const items = [
     info: "Cashback programs/incentives have always been single-sided, pro-consumer. Fluidity rectifies that by rewarding the recipient/counterparty with a cut of the yield.",
   },
   {
-    img: "/assets/images/useCaseIcons/metaverseGaming.svg",
+    img: "/assets/images/useCaseIcons/metaverseGaming.png",
     title: "Metaverse & gaming",
     info: "Fluidity rewards all forms of use cases. Gaming and metaverses are high-velocity use cases that can massively benefit from the fluid ecosystem.",
   },
   {
-    img: "/assets/images/useCaseIcons/decentralizedExchanges.svg",
+    img: "/assets/images/useCaseIcons/decentralizedExchanges.png",
     title: "Decentralized exchanges",
     info: "Transacting, trading and asset movement are integral activities within decentralised programs and their applications. Value transfers can greatly benefit from adopting the fluid layer. ",
   },
