@@ -5,13 +5,10 @@
 import { Display, Heading } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import useViewport from "hooks/useViewport";
-import { useState } from "react";
 import { isFirefox } from "react-device-detect";
 import styles from "./Incentivising.module.scss";
 
 const Incentivising = () => {
-  const [ready, setReady] = useState(false);
-
   const { width } = useViewport();
   const breakpoint = 860;
 
@@ -22,7 +19,6 @@ const Incentivising = () => {
         src={"/assets/videos/FluidityHowItWorks.mp4"}
         type={"reduce"}
         loop={true}
-        onLoad={() => setReady(true)}
         className={styles.video}
       />): (
       <Video
@@ -30,7 +26,6 @@ const Incentivising = () => {
         type={"reduce"}
         loop={true}
         scale={isFirefox ? 1.5 : .6}
-        onLoad={() => setReady(false)}
         className={styles.video}
       />)}
       <div>
