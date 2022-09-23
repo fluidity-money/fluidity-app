@@ -23,9 +23,9 @@ const HowItWorksPage = () => {
         </Head>
       <div className={styles.screensContainer}>
         <Navigation
-          page={"resources"}
+          page={"howitworks"}
           pageLocations={pageLocations}
-          background={"black"}
+          background={"clear"}
         />
         <Incentivising />
         <Wrap />
