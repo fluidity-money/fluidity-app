@@ -349,7 +349,7 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 		destinationTransferInstruction types.TransactionInstruction
 	)
 
-	if instructionNumber <= numBaseInstructions {
+	if instructionNumber < numBaseInstructions {
 		// get the second and third inner instructions originating from this instruction
 		innerInstruction := innerInstructions[instructionNumber]
 		feeMintInstruction = innerInstruction.Instructions[1]
