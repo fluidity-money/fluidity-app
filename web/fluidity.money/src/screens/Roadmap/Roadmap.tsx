@@ -30,6 +30,7 @@ const Roadmap = () => {
         src={"/assets/videos/FluidityRoadMap.mp4"}
         type={"fit"}
         loop={true}
+        margin={"-120px 0 0 0"}
         className={styles.video}
       />
       <div className={styles.smallClip} />
