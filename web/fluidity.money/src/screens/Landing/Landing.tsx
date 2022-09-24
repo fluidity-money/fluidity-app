@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
-import { isSafari, isFirefox } from "react-device-detect";
+import { isSafari, isFirefox, isIOS } from "react-device-detect";
 
 const Landing = () => {
   const vidSources = (isSafari ? [
@@ -23,6 +23,12 @@ const Landing = () => {
   const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
   const [homeVidEnded, setHomeVidEnded] = useState(false);
 
+  //IOS support for home and homeloop animations using webp.
+  const [iosAnimation, setIOSAnimation] = useState({
+    started: false,
+    src: null
+  })
+
   const [state, setState] = useState({
     src: vidSources[0],
     mimeType: isSafari ? "video/quicktime" : "video/webm",
@@ -33,17 +39,47 @@ const Landing = () => {
 
   useEffect(() => {
     homeVidEnded &&
-      setState({
-        src: vidSources[1],
-        mimeType: isSafari ? "video/quicktime" : "video/webm",
-        key: "1",
-        loop: true,
-        scale: isFirefox ? 1 : 0.5,
-      });
+    setState({
+      src: vidSources[1],
+      mimeType: isSafari ? "video/quicktime" : "video/webm",
+      key: "1",
+      loop: true,
+      scale: isFirefox ? 1 : 0.5,
+    });
+
+    if(!iosAnimation.started) {
+      setTimeout(
+      () => {
+       setIOSAnimation({
+        started: true,
+        src: "assets/videos/ios/FluidityHome.webp"
+       })
+      }, 3000, );
+      setTimeout(
+      () => {
+        setIOSAnimation({
+        started: true,
+        src: "assets/videos/ios/FluidityHomeLoop.webp"
+        })
+      }, 8000, );
+    }
   }, [homeVidEnded]);
 
   const { width } = useViewport();
   const breakpoint = 620;
+
+  const iosAnimationBackup = isIOS ? (
+    <img
+      src={iosAnimation.src}
+      style={{
+        position: "absolute",
+        width: "100%",
+        marginTop: "-400px",
+        display: `${!iosAnimation.started || onHomeVidLoaded ? "none" : "block"}`,
+      }}
+      alt="ios home animation"
+    />
+  ) : (<></>);
 
   const callout = (
     <div className={styles.callout}>
@@ -77,7 +113,6 @@ const Landing = () => {
               display: `${onHomeVidLoaded === true ? "none" : "block"}`,
             }}
             alt="Loop-Text"
-
           />
           <Video
             src={state.src}
@@ -96,20 +131,20 @@ const Landing = () => {
               ? () => setHomeVidEnded(true)
               : () => {}
             }
-
           />
+          {/* Incase normal videos fails to play on ios due to lack of support or battery saver turned on :) */}
+          {iosAnimationBackup}
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>
-         <img
+          <img
             src="assets/images/LoopAnim.webp"
             style={{
               position: "absolute",
               width: "70%",
               marginTop: "-400px",
-              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+              display: `${onHomeVidLoaded || iosAnimation.started ? "none" : "block"}`,
             }}
-
             alt="Loop-Ring"
           />
           <img
@@ -118,10 +153,9 @@ const Landing = () => {
               position: "absolute",
               width: "40%",
               marginTop: "-400px",
-              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
+              display: `${onHomeVidLoaded || iosAnimation.started ? "none" : "block"}`,
             }}
             alt="Loop-Text"
-
           />
           <Video
             src={state.src}
@@ -134,6 +168,7 @@ const Landing = () => {
             onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
             onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
           />
+          {iosAnimationBackup}
         </div>
       )}
 
