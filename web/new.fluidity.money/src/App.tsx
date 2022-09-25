@@ -19,9 +19,9 @@ const Div = () => {
     <button onClick={() => chain !== null && connect(network)}>connect</button>
     <button onClick={disconnect}>disconnect</button>
     <br/>
-    <button onClick={() => send("fUSDC", 10000, chain === "ethereum" ? "0x0000000000000000000000000000000000000000" : "8qgGrwdb7Lphf2fq8pdyRCjdEi9Z9qNHwK4Dtn7BL1Kj")}>send</button>
-    <button onClick={() => wrap("USDC", 10000)}>wrap</button>
-    <button onClick={() => unwrap("USDC", 10000)}>unwrap</button>
+    <button onClick={() => chain !== null && send("fUSDC", 10000, chain === "ethereum" ? "0x0000000000000000000000000000000000000000" : "8qgGrwdb7Lphf2fq8pdyRCjdEi9Z9qNHwK4Dtn7BL1Kj")}>send</button>
+    <button onClick={() => chain !== null && wrap("USDC", 10000)}>wrap</button>
+    <button onClick={() => chain !== null && unwrap("USDC", 10000)}>unwrap</button>
     <br/>
     <button onClick={() => setChain("solana")}>solana</button>
     <button onClick={() => setChain("ethereum")}>ethereum</button>

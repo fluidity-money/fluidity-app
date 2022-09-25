@@ -7,6 +7,14 @@ export const getContract =(signer: Signer, token: EthereumToken) => {
   return new Contract(address, ABI, signer);
 }
 
+//get ERC20 balance for the given token
+export const getBalanceOfERC20 = async(token: EthereumToken, signer: Signer) => {
+    const contract = getContract(signer, token);
+    if (!contract) return "0";
+    const address = await signer.getAddress();
+    return (await contract.balanceOf(address)).toString();
+}
+
 export const handleContractErrors = async(error: any, provider: Provider | undefined) => {
     const msg: string = error?.data?.message ?? error?.message;
     // check for denial separately (these don't contain an error code for some reason)

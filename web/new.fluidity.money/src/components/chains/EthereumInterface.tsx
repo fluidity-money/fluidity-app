@@ -3,13 +3,13 @@
 // LICENSE.md file.
 
 import localforage from "localforage";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {InterfaceProps} from ".";
 import {isInArray} from "../../utils/types";
-import {ChainContext, ChainIds, Chains, isSupportedToken, Network, SupportedFluidToken} from "./ChainContext";
+import {ChainContext, ChainIds, Chains, isSupportedToken, Network, SupportedFluidToken, SupportedToken} from "./ChainContext";
 import {useWallet} from "use-wallet"
 import {useEthereumTokens} from "../../utils/hooks/useEthereumTokens";
-import makeContractSwap, {getContract, handleContractErrors} from "../../utils/ethereum/transaction";
+import makeContractSwap, {getBalanceOfERC20, getContract, handleContractErrors} from "../../utils/ethereum/transaction";
 import {utils} from "ethers";
 import useSigner from "../../utils/hooks/useSigner";
 
@@ -17,8 +17,24 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
   const chain = "ethereum" as const;
   const ethereumNetworkKey = "persist.lastNetwork.ethereum";
   const {fluidTokens, unwrappedTokens, network, setNetwork} = useEthereumTokens();
+  const [balances, setBalances] = useState<{[K in SupportedToken]?: string}>({});
   const wallet = useWallet();
   const signer = useSigner();
+
+  useEffect(() => {
+    if (!signer || !connected)
+      return;
+
+    const pendingBalances: typeof balances = {};
+    (async () => {
+      for (const token of Object.values({...fluidTokens, ...unwrappedTokens})) {
+        const balance = await getBalanceOfERC20(token, signer);
+        pendingBalances[token.symbol as SupportedToken] = balance;
+      }
+      setBalances(pendingBalances);
+    })();
+
+  }, [unwrappedTokens, fluidTokens, connected])
 
   // set network if it's valid for the chain
   const setNetworkChecked = async(network: string) => {
@@ -113,6 +129,10 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     if (!fluidToken)
       return;
 
+    const balance = balances[token as SupportedFluidToken<"ethereum">]
+    if (!balance)
+      return;
+
     const balanceBig = utils.parseUnits(balance, fluidToken.decimals);
     const amountBig = utils.parseUnits(String(amount), fluidToken.decimals);
 
@@ -144,6 +164,7 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     chain,
     setChain,
     connected,
+    balances,
     network: network as Network,
     setNetwork: setNetworkChecked,
     connect,

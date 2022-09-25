@@ -28,6 +28,7 @@ export const ChainIds: {[K in Network<"ethereum">]: string} = {
 
 export type SupportedUnwrappedToken<T extends Chain = Chain> = typeof Tokens[T][number];
 export type SupportedFluidToken<T extends Chain = Chain> = `f${SupportedUnwrappedToken<T>}`;
+export type SupportedToken = SupportedUnwrappedToken | SupportedFluidToken;
 
 export type Chain = keyof typeof Chains;
 export type NullableChain = Chain | null;
@@ -41,9 +42,6 @@ interface ChainContextBase {
     setChain: (chain: Chain) => void
 
     disconnect: () => void
-    wrap: (token: string, amount: string | number) => void
-    unwrap: (token: string, amount: string | number) => void
-    send: (token: string, amount: string | number, recipient: string) => void
     connected: boolean
 }
 
@@ -52,6 +50,10 @@ interface ChainContextNonNull {
     network: Network
     setNetwork: (network: string) => void
     connect: (network: Network) => void
+    wrap: (token: string, amount: string | number) => void
+    unwrap: (token: string, amount: string | number) => void
+    send: (token: string, amount: string | number, recipient: string) => void
+    balances: {[K in SupportedToken]?: string}
 }
 
 type ChainContext = ChainContextBase & 
@@ -60,6 +62,10 @@ type ChainContext = ChainContextBase &
     network?: never,
     setNetwork?: never,
     connect?: never,
+    wrap?: never,
+    unwrap?: never,
+    send?: never,
+    balances?: never
   })
 
 export const ChainContext = createContext<ChainContext>({
@@ -68,8 +74,5 @@ export const ChainContext = createContext<ChainContext>({
 
     setChain: () => 0,
     disconnect: () => 0,
-    wrap: () => 0,
-    unwrap: () => 0,
-    send: () => 0
 });
 
