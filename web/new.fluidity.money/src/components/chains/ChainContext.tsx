@@ -28,7 +28,7 @@ export const ChainIds: {[K in Network<"ethereum">]: string} = {
 
 export type SupportedUnwrappedToken<T extends Chain = Chain> = typeof Tokens[T][number];
 export type SupportedFluidToken<T extends Chain = Chain> = `f${SupportedUnwrappedToken<T>}`;
-export type SupportedToken = SupportedUnwrappedToken | SupportedFluidToken;
+export type SupportedToken<T extends Chain = Chain> = SupportedUnwrappedToken<T> | SupportedFluidToken<T>;
 
 export type Chain = keyof typeof Chains;
 export type NullableChain = Chain | null;

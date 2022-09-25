@@ -17,7 +17,7 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
   const chain = "ethereum" as const;
   const ethereumNetworkKey = "persist.lastNetwork.ethereum";
   const {fluidTokens, unwrappedTokens, network, setNetwork} = useEthereumTokens();
-  const [balances, setBalances] = useState<{[K in SupportedToken]?: string}>({});
+  const [balances, setBalances] = useState<{[K in SupportedToken<"ethereum">]?: string}>({});
   const wallet = useWallet();
   const signer = useSigner();
 
