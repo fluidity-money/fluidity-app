@@ -87,7 +87,7 @@ const Roadmap = () => {
       type={"fit"}
       loop={true}
       scale={2.0}
-      margin={"0px 400px 0px 0px"}
+      margin={"0px 150px 0px 0px"}
       className={styles.video}
     />
     <div className={styles.clip} />
