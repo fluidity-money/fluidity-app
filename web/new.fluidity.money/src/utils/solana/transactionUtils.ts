@@ -3,13 +3,12 @@
 // LICENSE.md file.
 
 import { UseSolana } from "@saberhq/use-solana";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, AccountMeta, Connection } from "@solana/web3.js";
 import {getATAAddressSync} from "@saberhq/token-utils";
 import * as splToken from "@solana/spl-token";
-import { AccountMeta } from "@solana/web3.js";
 import { FluidityInstruction } from "./FluidityInstruction";
 import {Network} from "../../components/chains/ChainContext";
-import {FluidSolanaToken, UnwrappedSolanaToken} from "./token";
+import {FluidSolanaToken, SolanaToken, UnwrappedSolanaToken} from "./token";
 
 const importSolendAddress = async(network: Network<"solana">) => {
   // nb these strings have to be inline, or vite can't optimise the dynamic import
@@ -185,3 +184,19 @@ export const getFluidInstructionKeys = async(
     },
   ];
 };
+
+//get SPL balance for the given token
+export const getBalanceOfSPL = async(token: SolanaToken, connection: Connection, ownerPub: PublicKey): Promise<string> => {
+    try {
+        //balance of SOL represented as a TokenAmount
+        if (token.name === "Solana")
+            return String(await connection.getBalance(ownerPub));
+
+        //otherwise balance of an SPL token
+        const ata = getATAAddressSync({mint: new PublicKey(token.address), owner: ownerPub});
+        const {value} = await connection.getTokenAccountBalance(ata);
+        return value.amount;
+    } catch (e) {
+      return "0";
+    }
+}

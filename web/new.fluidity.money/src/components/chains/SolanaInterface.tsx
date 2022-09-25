@@ -2,7 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE.md file.
 
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {isInArray} from "../../utils/types";
 import {useSolana} from "@saberhq/use-solana";
 import {BigintIsh} from "@saberhq/token-utils";
@@ -10,16 +10,34 @@ import {PublicKey} from "@solana/web3.js";
 import {useSolanaTokens} from "../../utils/hooks/useSolanaTokens";
 import {sendSol, unwrapSpl, wrapSpl} from "../../utils/solana/transaction";
 import {InterfaceProps} from ".";
-import {ChainContext, Chain, Chains, Network, SupportedFluidToken, isSupportedToken} from "./ChainContext";
+import {ChainContext, Chain, Chains, Network, SupportedFluidToken, isSupportedToken, SupportedToken} from "./ChainContext";
 import localforage from "localforage";
 import BN from "bn.js";
+import {getBalanceOfSPL} from "../../utils/solana/transactionUtils";
 
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain: Chain = "solana";
   const solanaNetworkKey = "persist.lastNetwork.solana";
   const {fluidProgramId, fluidTokens, unwrappedTokens, network, setNetwork} = useSolanaTokens();
+  const [balances, setBalances] = useState<{[K in SupportedToken<"solana">]?: string}>({});
   const solana = useSolana();
   const solanaConnected = solana.connected;
+
+  useEffect(() => {
+    const {publicKey} = solana || {};
+    if (!publicKey || !connected)
+      return;
+
+    const pendingBalances: typeof balances = {};
+    (async () => {
+      for (const token of Object.values({...fluidTokens, ...unwrappedTokens})) {
+        const balance = await getBalanceOfSPL(token, solana.connection, publicKey);
+        pendingBalances[token.symbol as SupportedToken<"solana">] = balance;
+      }
+      setBalances(pendingBalances);
+    })();
+
+  }, [unwrappedTokens, fluidTokens, connected])
 
   useEffect(() => {
     localforage.getItem(solanaNetworkKey).then(storedNetwork => {
@@ -100,6 +118,10 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     if (!fluidToken)
       return;
 
+    const balance = balances[token as SupportedFluidToken<"solana">]
+    if (!balance)
+      return;
+
     const tokenAmount = fluidToken.tokenAmount(amount);
      
     if (new BN(balance).lt(new BN(amount))) {
@@ -129,6 +151,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     chain,
     setChain,
     connected,
+    balances,
     network: network as Network,
     setNetwork: setNetworkChecked,
     connect,
