@@ -52,7 +52,7 @@ const ChainInterface = ({children}: {children: React.ReactNode}) => {
   case "ethereum":
   default:
     return <>
-    <UseWalletProvider chainId={3} connectors={providerOptions}>
+    <UseWalletProvider connectors={providerOptions}>
       <EthereumInterface setChain={setChain} connected={connected} setConnected={setConnected}>
         {children}
       </EthereumInterface>

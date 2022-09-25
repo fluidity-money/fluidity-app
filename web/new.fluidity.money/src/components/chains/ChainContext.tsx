@@ -21,9 +21,9 @@ export const Tokens = {
   solana: ["USDT", "USDC"],
 } as const;
 
-export const ChainIds: {[K in Network<"ethereum">]: number} = {
-  mainnet: 1,
-  ropsten: 3,
+export const ChainIds: {[K in Network<"ethereum">]: string} = {
+  mainnet: "0x1",
+  ropsten: "0x3",
 }; 
 
 export type SupportedUnwrappedToken<T extends Chain = Chain> = typeof Tokens[T][number];

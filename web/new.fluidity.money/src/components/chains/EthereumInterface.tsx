@@ -6,7 +6,7 @@ import localforage from "localforage";
 import {useEffect} from "react";
 import {InterfaceProps} from ".";
 import {isInArray} from "../../utils/types";
-import {ChainContext, Chains, isSupportedToken, Network, SupportedFluidToken} from "./ChainContext";
+import {ChainContext, ChainIds, Chains, isSupportedToken, Network, SupportedFluidToken} from "./ChainContext";
 import {useWallet} from "use-wallet"
 import {useEthereumTokens} from "../../utils/hooks/useEthereumTokens";
 import makeContractSwap from "../../utils/ethereum/transaction";
@@ -20,11 +20,19 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
   const signer = useSigner();
 
   // set network if it's valid for the chain
-  const setNetworkChecked = (network: string) => {
+  const setNetworkChecked = async(network: string) => {
     if (isInArray(network, Chains[chain])) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{chainId: ChainIds[network]}],
+        });
         localforage.setItem(ethereumNetworkKey, network);
-        setNetwork(network)
+        setNetwork(network);
+      } catch (e) {
+        console.error("Failed to switch network!", e);
       }
+    }
   }
 
   useEffect(() => {
