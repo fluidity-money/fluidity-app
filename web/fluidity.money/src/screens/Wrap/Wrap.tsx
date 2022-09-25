@@ -4,49 +4,100 @@
 
 import HowItWorksTemplate from "components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
+import { useInView } from "react-intersection-observer";
+import { motion, useAnimation} from "framer-motion";
 import useViewport from "hooks/useViewport";
 import styles from "./Wrap.module.scss";
 import Video from "components/Video";
+import { useEffect } from "react";
 
 const Wrap = () => {
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
 
+  const topDrop = {
+    visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 2.8 } },
+    hidden: { opacity: 0, transform: width <= 620 ? "translateY(-180px)" : "translateY(-500px)" }
+  };
+
+  const leftIn = {
+    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
+    hidden: { opacity: 0, transform: width <= 620 ? "translateX(-180px)" : "translateX(-500px)" }
+  };
+
+  const rightIn = {
+    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
+    hidden: { opacity: 0, transform: width <= 620 ? "translateX(180px)" : "translateX(500px)" }
+  };
+
+  const control = useAnimation();
+  const [ref, inView] = useInView();
+
+  useEffect(() => {
+    control.stop();
+    inView ? (control.start("visible") ) : (control.set("hidden"));
+
+  }, [control, inView]);
+
   const left =
   width <= breakpoint ? (
     <>
-      <Video
-        src={"/assets/videos/FluidityWrap.mp4"}
-        type={"fit"}
-        loop={true}
-        scale={0.7}
-      />
+      <motion.div
+        animate={control}
+        initial="hidden"
+        variants={rightIn}
+      >
+        <Video
+          src={"/assets/videos/FluidityWrap.mp4"}
+          type={"fit"}
+          loop={true}
+          scale={0.7}
+        />
+      </motion.div>
     </>
     ) : (
-      <HowItWorksTemplate header={header} info={info}>
-         Wrapped tokens
-      </HowItWorksTemplate>
+      <motion.div
+        animate={control}
+        initial="hidden"
+        variants={leftIn}
+      >
+        <HowItWorksTemplate header={header} info={info}>
+          Wrapped tokens
+        </HowItWorksTemplate>
+      </motion.div>
     );
 
   const right =
   width > breakpoint ? (
     <>
-      <Video
-        src={"/assets/videos/FluidityWrap.mp4"}
-        type={"fit"}
-        loop={true}
-        scale={0.7}
-      />
+      <motion.div
+        animate={control}
+        initial="hidden"
+        variants={topDrop}
+      >
+        <Video
+          src={"/assets/videos/FluidityWrap.mp4"}
+          type={"fit"}
+          loop={true}
+          scale={0.7}
+        />
+      </motion.div>
     </>
   ) : (
-    <HowItWorksTemplate header={header} info={info}>
-      Wrapped tokens
-    </HowItWorksTemplate>
+    <motion.div
+      animate={control}
+      initial="hidden"
+      variants={leftIn}
+    >
+      <HowItWorksTemplate header={header} info={info}>
+        Wrapped tokens
+      </HowItWorksTemplate>
+    </motion.div>
   );
 
   return (
-    <div className={styles.container} id="yield&win">
+    <div ref={ref} className={styles.container} id="yield&win">
       <ReusableGrid left={left} right={right} />
     </div>
   );
