@@ -172,7 +172,7 @@ export const getRecipientATA = async(recipient: PublicKey, mint: PublicKey, prov
 
 //send a token, returning either the successful transaction hash, or null for failure, 
 //e.g. if the ATA doesn't exist or is invalid
-export const sendSol = async (sol: UseSolana<any>, recipient: PublicKey, amount: TokenAmount, addError: (e: string) => void): Promise<string | null> => {
+export const sendSol = async (sol: UseSolana<any>, recipient: PublicKey, amount: TokenAmount): Promise<string | null> => {
   if (!sol.wallet || !sol.publicKey || !sol.connected || !sol.providerMut)
     throw({message: "Not connected to wallet!"})
 
@@ -253,7 +253,7 @@ export const sendSol = async (sol: UseSolana<any>, recipient: PublicKey, amount:
   } catch (e: unknown) {
     const sendError = e as SendTransactionError;
     if (sendError.message?.search('0x1') !== -1)
-      addError("Failed to send transaction - balance too low")
+      console.error("Failed to send transaction - balance too low")
 
     throw e;
   }

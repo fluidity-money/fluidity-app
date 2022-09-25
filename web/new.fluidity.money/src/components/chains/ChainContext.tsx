@@ -43,6 +43,7 @@ interface ChainContextBase {
     disconnect: () => void
     wrap: (token: string, amount: string | number) => void
     unwrap: (token: string, amount: string | number) => void
+    send: (token: string, amount: string | number, recipient: string) => void
     connected: boolean
 }
 
@@ -69,5 +70,6 @@ export const ChainContext = createContext<ChainContext>({
     disconnect: () => 0,
     wrap: () => 0,
     unwrap: () => 0,
+    send: () => 0
 });
 

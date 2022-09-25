@@ -6,11 +6,13 @@ import {useEffect} from "react";
 import {isInArray} from "../../utils/types";
 import {useSolana} from "@saberhq/use-solana";
 import {BigintIsh} from "@saberhq/token-utils";
+import {PublicKey} from "@solana/web3.js";
 import {useSolanaTokens} from "../../utils/hooks/useSolanaTokens";
-import {unwrapSpl, wrapSpl} from "../../utils/solana/transaction";
+import {sendSol, unwrapSpl, wrapSpl} from "../../utils/solana/transaction";
 import {InterfaceProps} from ".";
 import {ChainContext, Chain, Chains, Network, SupportedFluidToken, isSupportedToken} from "./ChainContext";
 import localforage from "localforage";
+import BN from "bn.js";
 
 const SolanaInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
   const chain: Chain = "solana";
@@ -93,6 +95,36 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     }
   }
 
+  const send = async(token: string, amount: string | number, recipient: string) => {
+    const fluidToken = fluidTokens[token as SupportedFluidToken<"solana">];
+    if (!fluidToken)
+      return;
+
+    const tokenAmount = fluidToken.tokenAmount(amount);
+     
+    if (new BN(balance).lt(new BN(amount))) {
+      console.error(
+        `Trying to send ${fluidToken.tokenAmount(amount)
+          .toExact()
+        }, but balance is ${fluidToken.tokenAmount(balance)
+          .toExact()
+        }`
+      );
+      return;
+    }
+
+    try {
+      const result = await sendSol(
+        solana,
+        new PublicKey(recipient),
+        tokenAmount,
+      );
+      console.log(result);
+    } catch (e: any) {
+      console.error(`Failed to send tokens! ${e?.message}`);
+    }
+  }
+
   const value = {
     chain,
     setChain,
@@ -103,6 +135,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     disconnect,
     wrap,
     unwrap,
+    send,
   }
 
   return <ChainContext.Provider value={value}>

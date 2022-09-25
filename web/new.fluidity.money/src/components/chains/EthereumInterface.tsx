@@ -9,7 +9,8 @@ import {isInArray} from "../../utils/types";
 import {ChainContext, ChainIds, Chains, isSupportedToken, Network, SupportedFluidToken} from "./ChainContext";
 import {useWallet} from "use-wallet"
 import {useEthereumTokens} from "../../utils/hooks/useEthereumTokens";
-import makeContractSwap from "../../utils/ethereum/transaction";
+import makeContractSwap, {getContract, handleContractErrors} from "../../utils/ethereum/transaction";
+import {utils} from "ethers";
 import useSigner from "../../utils/hooks/useSigner";
 
 const EthereumInterface = ({children, setChain, connected, setConnected}: InterfaceProps): JSX.Element => {
@@ -104,6 +105,41 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     }
   }
 
+  const send = async(token: string, amount: string | number, recipient: string) => {
+    if (!signer)
+      return;
+ 
+    const fluidToken = fluidTokens[token as SupportedFluidToken<"ethereum">]
+    if (!fluidToken)
+      return;
+
+    const balanceBig = utils.parseUnits(balance, fluidToken.decimals);
+    const amountBig = utils.parseUnits(String(amount), fluidToken.decimals);
+
+    if (balanceBig.lt(amountBig)) {
+      console.error(`Trying to send ${amount}, but balance is only ${balance}`);
+      return;
+    }
+
+    const contract = getContract(
+      signer,
+      fluidToken
+    );
+
+    if (!contract)
+      return;
+
+    try {
+      const transferResult = await contract.transfer(recipient, amountBig);
+      await transferResult.wait();
+      console.log(transferResult);
+    } catch (e: any) {
+      e.arg == "address"
+        ? console.error(`${recipient} is an invalid Ethereum address`)
+        : await handleContractErrors(e, signer.provider);
+    }
+  }
+
   const value = {
     chain,
     setChain,
@@ -114,6 +150,7 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     disconnect,
     wrap,
     unwrap,
+    send,
   }
 
   return <>

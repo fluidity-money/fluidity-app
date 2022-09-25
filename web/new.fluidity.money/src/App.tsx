@@ -11,7 +11,7 @@ import ChainInterface from "./components/chains";
 
 const Div = () => {
   const con = useContext(ChainContext)
-  const {connected, chain, network, setNetwork, connect, disconnect, wrap, unwrap, setChain} = con || {};
+  const {connected, chain, network, setNetwork, connect, disconnect, wrap, unwrap, send, setChain} = con || {};
 
   return <div>
     {`connected: ${connected}. chain: ${chain}, network: ${network}`}
@@ -19,6 +19,7 @@ const Div = () => {
     <button onClick={() => chain !== null && connect(network)}>connect</button>
     <button onClick={disconnect}>disconnect</button>
     <br/>
+    <button onClick={() => send("fUSDC", 10000, chain === "ethereum" ? "0x0000000000000000000000000000000000000000" : "8qgGrwdb7Lphf2fq8pdyRCjdEi9Z9qNHwK4Dtn7BL1Kj")}>send</button>
     <button onClick={() => wrap("USDC", 10000)}>wrap</button>
     <button onClick={() => unwrap("USDC", 10000)}>unwrap</button>
     <br/>
