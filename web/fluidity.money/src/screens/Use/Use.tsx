@@ -69,7 +69,7 @@ const Use = () => {
   </motion.div>
 
   return (
-    <div ref={ref} className={styles.container} id="yield&win">
+    <div ref={ref} className={styles.container} id="useassets">
       <ReusableGrid left={left} right={right} />
     </div>
   );

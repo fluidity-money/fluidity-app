@@ -97,7 +97,7 @@ const Wrap = () => {
   );
 
   return (
-    <div ref={ref} className={styles.container} id="yield&win">
+    <div ref={ref} className={styles.container} id="wraptokens">
       <ReusableGrid left={left} right={right} />
     </div>
   );
