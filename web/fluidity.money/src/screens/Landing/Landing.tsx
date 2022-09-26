@@ -182,8 +182,8 @@ const Landing = () => {
             key={state.key}
             scale={state.scale * 2}
             margin={"-400px 0 0 0"}
-            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(false) : () => {}}
-            onEnded={!homeVidEnded ? () => setHomeVidEnded(false) : () => {}}
+            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
+            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
           />
           {iosAnimationBackup}
         </div>
