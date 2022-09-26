@@ -10,29 +10,34 @@
   box-sizing: border-box;
   display: flex;
   background-color: transparent;
-  overflow-x: scroll;
+  overflow-x: scroll !important;
 
   /* width */
   &::-webkit-scrollbar {
-    height: 5px;
-    border-radius: 10px;
+    -webkit-appearance: none;
+    height: 5px !important;
+    border-radius: 10px !important;
   }
 
   /* Track */
   &::-webkit-scrollbar-track {
-    background: #2c2c2d;
-    border-radius: 10px;
-    margin-right: 20px;
-    margin-left: 5px;
+    background: #2c2c2d !important;
+    border-radius: 10px !important;
+    margin-right: 20px !important;
+    margin-left: 5px !important;
   }
   &::-webkit-scrollbar-track:hover {
-    background: #555;
+    background: #555 !important;
   }
 
   /* Handle */
   &::-webkit-scrollbar-thumb {
-    background: map-get($bg, "alternate");
-    border-radius: 10px;
+    background: map-get($bg, "alternate") !important;
+    border-radius: 10px !important;
+  }
+
+  &::-webkit-scrollbar:horizontal {
+    height: 5px !important;
   }
 
   /* Handle on hover */
