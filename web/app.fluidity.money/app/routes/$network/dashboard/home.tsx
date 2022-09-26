@@ -10,7 +10,6 @@ import { UserTransaction } from "~/queries/useUserTransactions";
 import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
 
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 

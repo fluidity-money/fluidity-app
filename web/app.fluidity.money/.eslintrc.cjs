@@ -18,6 +18,14 @@ module.exports = {
   },
   plugins: ["react", "@typescript-eslint"],
   rules: {
-    destructuredArrayIgnorePattern: "^_",
+    "no-unused-vars": [
+      "error",
+      { "destructuredArrayIgnorePattern": "^_" }
+    ]
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
   },
 };

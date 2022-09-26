@@ -37,7 +37,7 @@ const query = gql`
   }
 `;
 
-const useUserTransactions = async (address: string, page: number = 1) => {
+const useUserTransactions = async (address: string, page = 1) => {
   const variables = {
     address: address,
     offset: (page - 1) * 12,
