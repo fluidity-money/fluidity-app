@@ -132,8 +132,6 @@ const Landing = () => {
               : () => {}
             }
           />
-          {/* Incase normal videos fails to play on ios due to lack of support or battery saver turned on :) */}
-          {iosAnimationBackup}
         </div>
       ) : (
         <div className={`${styles.bgVid}`}>

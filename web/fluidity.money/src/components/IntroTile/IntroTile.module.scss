@@ -1,6 +1,7 @@
 @import "../../../src/styles/config.scss";
 
 .containerLeft {
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -28,6 +29,7 @@
 }
 
 .containerRight {
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;

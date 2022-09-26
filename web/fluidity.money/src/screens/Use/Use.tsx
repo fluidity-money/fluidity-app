@@ -7,69 +7,25 @@ import { ReusableGrid } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
-import { motion, useAnimation } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
 
 const Use = () => {
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
 
-  const topDrop = {
-    visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateY(-180px)" : "translateY(-500px)" }
-  };
-
-  const bottomPush = {
-    visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateY(180px)" : "translateY(500px)" }
-  };
-
-  const leftIn = {
-    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateX(-180px)" : "translateX(-500px)" }
-  };
-
-  const rightIn = {
-    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateX(180px)" : "translateX(500px)" }
-  };
-
-  const control = useAnimation();
-  const [ref, inView] = useInView();
-
-  useEffect(() => {
-    control.stop();
-    inView ? (control.start("visible") ) : (control.set("hidden"));
-
-  }, [control, inView]);
-  
   const right =
-  <motion.div
-    animate={control}
-    initial="hidden"
-    variants= {width <= breakpoint ? leftIn : topDrop}
-  >
-    <HowItWorksTemplate header={header} info={info}>
-      Fluid asset use-cases
-    </HowItWorksTemplate>
-  </motion.div>
-  const left =
-  <motion.div
-    animate={control}
-    initial="hidden"
-    variants= {width <= breakpoint ? rightIn : bottomPush}
-  >
-    <Video
-      src={"/assets/videos/FluidityUse.mp4"}
-      type={"fit"}
-      loop={true}
-    />
-  </motion.div>
+  <HowItWorksTemplate header={header} info={info}>
+    Fluid asset use-cases
+  </HowItWorksTemplate>
 
+  const left =
+  <Video
+    src={"/assets/videos/FluidityUse.mp4"}
+    type={"fit"}
+    loop={true}
+  />
   return (
-    <div ref={ref} className={styles.container} id="useassets">
+    <div className={styles.container} id="useassets">
       <ReusableGrid left={left} right={right} />
     </div>
   );

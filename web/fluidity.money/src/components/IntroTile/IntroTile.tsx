@@ -23,38 +23,36 @@ const IntroTile = ({ img, side, children }: IIntroTileProps) => {
   };
   return (
     <>
-     <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.8 }} >
-        {side === "left" && (
-          <div className={styles.containerLeft}>
-            <motion.div
-              transition={bounceTransition}
-              animate={{
-                y: ["0px", "13px"]
-              }}
-            >
-              <img src={img} alt="Intro-Title-Left" />
-            </motion.div>
-            <div className={`${styles.text} ${styles.left}`}>
-              <Heading as="h6">{children}</Heading>
-            </div>
+      {side === "left" && (
+        <div className={styles.containerLeft}>
+          <motion.div
+            transition={bounceTransition}
+            animate={{
+              y: ["0px", "13px"]
+            }}
+          >
+            <img src={img} alt="Intro-Title-Left" />
+          </motion.div>
+          <div className={`${styles.text} ${styles.left}`}>
+            <Heading as="h6">{children}</Heading>
           </div>
-        )}
-        {side === "right" && (
-          <div className={styles.containerRight}>
-            <div className={`${styles.text} ${styles.right}`}>
-              <Heading as="h6">{children}</Heading>
-            </div>
-            <motion.div
-              transition={bounceTransition}
-              animate={{
-                y: ["0px", "13px"]
-              }}
-            >
-              <img src={img} alt="Intro-Title-Right" />
-            </motion.div>
+        </div>
+      )}
+      {side === "right" && (
+        <div className={styles.containerRight}>
+          <div className={`${styles.text} ${styles.right}`}>
+            <Heading as="h6">{children}</Heading>
           </div>
-        )}
-      </motion.div>
+          <motion.div
+            transition={bounceTransition}
+            animate={{
+              y: ["0px", "13px"]
+            }}
+          >
+            <img src={img} alt="Intro-Title-Right" />
+          </motion.div>
+        </div>
+      )}
     </>
   );
 };

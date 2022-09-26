@@ -7,37 +7,10 @@ import { ReusableGrid } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./FluidWars.module.scss";
 import useViewport from "hooks/useViewport";
-import { motion, useAnimation } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
 
 const FluidWars = () => {
   const { width } = useViewport();
   const breakpoint = 860;
-
-  const topDrop = {
-    visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateY(-180px)" : "translateY(-500px)" }
-  };
-
-  const leftIn = {
-    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateX(-180px)" : "translateX(-500px)" }
-  };
-
-  const rightIn = {
-    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateX(180px)" : "translateX(500px)" }
-  };
-
-  const control = useAnimation();
-  const [ref, inView] = useInView();
-
-  useEffect(() => {
-    control.stop();
-    inView ? (control.start("visible") ) : (control.set("hidden"));
-
-  }, [control, inView]);
   
   const left =
   width > breakpoint ? (
@@ -53,33 +26,21 @@ const FluidWars = () => {
 
   ) : (
     <>
-      <motion.div
-        animate={control}
-        initial="hidden"
-        variants= {rightIn}
-      >
-        <Video
-          src={'/assets/videos/FluidityFluidWars.mp4'}
-          type={"fit"}
-          loop={true}
-        />
-      </motion.div>
+      <Video
+        src={'/assets/videos/FluidityFluidWars.mp4'}
+        type={"fit"}
+        loop={true}
+      />
     </>
   );
 
   const right =
-  <motion.div
-    animate={control}
-    initial="hidden"
-    variants= {width <= breakpoint ? leftIn : topDrop}
-  >
-    <HowItWorksTemplate header={header} info={info}>
-      Fluidity wars
-    </HowItWorksTemplate>
-  </motion.div> 
+  <HowItWorksTemplate header={header} info={info}>
+    Fluidity wars
+  </HowItWorksTemplate>
 
   return (
-    <div ref={ref} className={styles.container} id="fluiditywars">
+    <div className={styles.container} id="fluiditywars">
       <ReusableGrid left={left} right={right} />
     </div>
   );
