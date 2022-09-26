@@ -9,16 +9,26 @@ import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
-import { isSafari, isFirefox, isIOS } from "react-device-detect";
+import { isSafari, isFirefox, isIOS, isMobileSafari, isChrome } from "react-device-detect";
 
 const Landing = () => {
-  const vidSources = (isSafari ? [
+
+  let type = isSafari ? "video/quicktime" : "video/webm";
+  let vidSources = (isSafari ? [
     "/assets/videos/FluidityHome.mov",
     "/assets/videos/FluidityHomeloop.mov",
   ] : [
     "/assets/videos/FluidityHome.webm",
     "/assets/videos/FluidityHomeloop.webm",
   ]).map((link) => link);
+
+  if (isMobileSafari || isChrome && isIOS) {
+    type = "video/webm"
+    vidSources = ([
+      "/assets/videos/FluidityHome.webm",
+      "/assets/videos/FluidityHomeloop.webm",
+    ]).map((link) => link)
+  }
 
   const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
   const [homeVidEnded, setHomeVidEnded] = useState(false);
@@ -34,7 +44,7 @@ const Landing = () => {
   const [mobileLoadAnimationisActive, setMobileLoadAnimationisActive] = useState(false);
   const [state, setState] = useState({
     src: vidSources[0],
-    mimeType: isSafari ? "video/quicktime" : "video/webm",
+    mimeType: type,
     key: "0",
     loop: false,
     scale: isFirefox ? 2 : 0.7,
@@ -44,7 +54,7 @@ const Landing = () => {
     homeVidEnded &&
     setState({
       src: vidSources[1],
-      mimeType: isSafari ? "video/quicktime" : "video/webm",
+      mimeType: type,
       key: "1",
       loop: true,
       scale: isFirefox ? 1 : 0.5,
@@ -62,7 +72,7 @@ const Landing = () => {
       () => {
         setIOSAnimation({
         started: true,
-        src: "assets/videos/ios/FluidityHomeLoop.webp"
+        src: "assets/images/landing-backup.png"
         })
       }, 8000, );
     }
@@ -82,7 +92,7 @@ const Landing = () => {
       src={iosAnimation.src}
       style={{
         position: "absolute",
-        width: "100%",
+        width: "60%",
         marginTop: "-400px",
         display: `${!iosAnimation.started || onHomeVidLoaded ? "none" : "block"}`,
       }}
@@ -172,8 +182,8 @@ const Landing = () => {
             key={state.key}
             scale={state.scale * 2}
             margin={"-400px 0 0 0"}
-            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
-            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
+            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(false) : () => {}}
+            onEnded={!homeVidEnded ? () => setHomeVidEnded(false) : () => {}}
           />
           {iosAnimationBackup}
         </div>
