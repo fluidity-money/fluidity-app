@@ -13,8 +13,6 @@ import { useWinningTransactions } from "data/winners";
 import { useLiveTvl } from "data/tvl";
 import { useCountTransactions } from "data/userActions";
 
-const ChainContext = createContext<ChainState>(null!);
-
 interface ChainState {
   chain: SupportedChainsList,
   setChain: Dispatch<SetStateAction<SupportedChainsList>>,
@@ -27,7 +25,21 @@ interface ApiState {
   txCount: number,
 }
 
-export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]}) => {
+const initChainState = (): ChainState => {
+  return {
+    chain: "ETH",
+    setChain: () => {},
+    apiState: {
+      weekWinnings: [],
+      rewardPool: 0,
+      txCount: 0,
+    }
+  }
+}
+
+const ChainContext = createContext<ChainState>(initChainState());
+
+const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]}) => {
   const [chain, setChain] = useState<SupportedChainsList>("ETH");
 
   const [weekWinnings, setWeekWinnings] = useState<Winner[]>([]);
@@ -87,7 +99,9 @@ export const ChainContextProvider = ({children}: {children: JSX.Element | JSX.El
   );
 };
 
-export const useChainContext = () => {
+const useChainContext = () => {
   return useContext(ChainContext)
 };
+
+export { ChainContextProvider, useChainContext };
 

@@ -13,16 +13,16 @@ import Video from "components/Video";
 import styles from "./Demo.module.scss";
 
 const Demo = () => {
-  const chainContext = useChainContext();
+  const { apiState } = useChainContext();
 
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const weekTotalRewards = chainContext ? chainContext.apiState.weekWinnings.reduce(
+  const weekTotalRewards = apiState.weekWinnings.reduce(
     (weekSum, { winning_amount, token_decimals }) =>
       weekSum + winning_amount / 10 ** token_decimals,
     0
-  ) : 0;
+  );
   /*
   full screen demo
   */
