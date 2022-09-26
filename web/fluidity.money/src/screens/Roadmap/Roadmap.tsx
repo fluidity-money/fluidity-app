@@ -58,11 +58,6 @@ const Roadmap = () => {
       variants={rightIn}
     >
       <div className={styles.smallVid}>
-        <Video
-          src={"/assets/videos/FluidityRoadMap.mp4"}
-          type={"fit"}
-          loop={true}
-        />
       </div>
     </motion.div>
   ) : (

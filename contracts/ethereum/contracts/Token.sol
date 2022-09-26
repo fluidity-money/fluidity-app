@@ -11,6 +11,8 @@ import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 
+import "./ITransferWithBeneficiary.sol";
+
 import "./LiquidityProvider.sol";
 import "./WorkerConfig.sol";
 
@@ -21,7 +23,7 @@ struct Winner {
 }
 
 /// @title The fluid token ERC20 contract
-contract Token is IERC20 {
+contract Token is IERC20, ITransferWithBeneficiary {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -632,6 +634,25 @@ contract Token is IERC20 {
         _spendAllowance(from, msg.sender, amount);
         _transfer(from, to, amount);
         return true;
+    }
+
+    /// @notice support for meson's crosschain swap for ERC20
+    /// @notice transfers deposited assets to the 3rd party dapp contract
+    /// @notice for the user - we don't do anything special :)
+    function transferWithBeneficiary(
+        address token,
+        uint256 amount,
+        address beneficiary,
+        uint64 data
+    ) external override returns (bool) {
+        bool rc;
+
+        rc = Token(token).transferFrom(msg.sender, address(this), amount);
+        if (!rc) return false;
+
+        rc = Token(token).transfer(beneficiary, amount);
+
+        return rc;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
