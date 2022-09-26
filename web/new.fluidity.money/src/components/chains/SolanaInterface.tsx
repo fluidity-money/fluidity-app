@@ -4,7 +4,8 @@
 
 import {useEffect, useState} from "react";
 import {isInArray} from "../../utils/types";
-import {useSolana} from "@saberhq/use-solana";
+import {DefaultWalletType, useSolana, WalletTypeEnum} from "@saberhq/use-solana";
+import {DEFAULT_WALLET_PROVIDERS} from "@saberhq/use-solana";
 import {BigintIsh} from "@saberhq/token-utils";
 import {PublicKey} from "@solana/web3.js";
 import {useSolanaTokens} from "../../utils/hooks/useSolanaTokens";
@@ -22,6 +23,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
   const [balances, setBalances] = useState<{[K in SupportedToken<"solana">]?: string}>({});
   const solana = useSolana();
   const solanaConnected = solana.connected;
+  const wallets = DEFAULT_WALLET_PROVIDERS;
 
   useEffect(() => {
     const {publicKey} = solana || {};
@@ -64,14 +66,15 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     }
   }
 
-  const connect = (network: Network) => {
+  const connect = (network: Network, wallet?: string) => {
     if (!isInArray(network, Chains[chain]))
       return;
 
-    // TODO choose wallet
-    let b: string = "Sollet";
-    solana.activate(b);
-    // setNetwork(network);
+    if (!isInArray(wallet, Object.keys(wallets) as Array<keyof typeof DEFAULT_WALLET_PROVIDERS>)) {
+      return;
+    }
+
+    solana.activate(wallet);
   }
 
   const disconnect = async() => {
@@ -152,6 +155,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     setChain,
     connected,
     balances,
+    wallets,
     network: network as Network,
     setNetwork: setNetworkChecked,
     connect,
