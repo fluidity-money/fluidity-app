@@ -19,7 +19,7 @@ const MobileNavBar = () => {
 
         <BurgerMenu isOpen={open} setIsOpen={setIsOpen} />
       </div>
-      {open && <MobileNavModal navLinks={["How it works", "Resources"]} />}
+      {open && <MobileNavModal navLinks={["How it works", "Resources"]} setIsOpen={setIsOpen} />}
     </div>
   );
 };

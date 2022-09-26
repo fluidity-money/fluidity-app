@@ -2,14 +2,10 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
   Display,
-  GeneralButton,
-  Heading,
   Text,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
