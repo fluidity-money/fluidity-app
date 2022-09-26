@@ -20,6 +20,7 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
   const [balances, setBalances] = useState<{[K in SupportedToken<"ethereum">]?: string}>({});
   const wallet = useWallet();
   const signer = useSigner();
+  const wallets = {metamask: "metamask"};
 
   useEffect(() => {
     if (!signer || !connected)
@@ -165,6 +166,7 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     setChain,
     connected,
     balances,
+    wallets,
     network: network as Network,
     setNetwork: setNetworkChecked,
     connect,

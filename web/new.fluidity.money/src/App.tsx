@@ -11,27 +11,37 @@ import ChainInterface from "./components/chains";
 
 const Div = () => {
   const con = useContext(ChainContext)
-  const {connected, chain, network, setNetwork, connect, disconnect, wrap, unwrap, send, setChain} = con || {};
+  const {wallets, connected, chain, network, setNetwork, connect, disconnect, wrap, unwrap, send, setChain} = con || {};
 
-  return <div>
-    {`connected: ${connected}. chain: ${chain}, network: ${network}`}
-    <br/>
-    <button onClick={() => chain !== null && connect(network)}>connect</button>
-    <button onClick={disconnect}>disconnect</button>
-    <br/>
-    <button onClick={() => chain !== null && send("fUSDC", 10000, chain === "ethereum" ? "0x0000000000000000000000000000000000000000" : "8qgGrwdb7Lphf2fq8pdyRCjdEi9Z9qNHwK4Dtn7BL1Kj")}>send</button>
-    <button onClick={() => chain !== null && wrap("USDC", 10000)}>wrap</button>
-    <button onClick={() => chain !== null && unwrap("USDC", 10000)}>unwrap</button>
-    <br/>
-    <button onClick={() => setChain("solana")}>solana</button>
-    <button onClick={() => setChain("ethereum")}>ethereum</button>
-    {chain !== null && 
-      <ul>{Chains[chain].map((k,i)=>
-        <li style={{cursor: 'pointer'}} onClick={() => setNetwork(k)} key={i}>
-        {k}
-        </li>)}
-      </ul>
-    }
+  return <div style={{flexDirection: 'row', display: 'flex'}}>
+    <div>
+      {`connected: ${connected}. chain: ${chain}, network: ${network}`}
+      <br/>
+      <button onClick={disconnect}>disconnect</button>
+      <br/>
+      <button onClick={() => chain !== null && send("fUSDC", 10000, chain === "ethereum" ? "0x0000000000000000000000000000000000000000" : "8qgGrwdb7Lphf2fq8pdyRCjdEi9Z9qNHwK4Dtn7BL1Kj")}>send</button>
+      <button onClick={() => chain !== null && wrap("USDC", 10000)}>wrap</button>
+      <button onClick={() => chain !== null && unwrap("USDC", 10000)}>unwrap</button>
+      <br/>
+      <button onClick={() => setChain("solana")}>solana</button>
+      <button onClick={() => setChain("ethereum")}>ethereum</button>
+      {chain !== null && 
+        <ul>{Chains[chain].map((k,i)=>
+          <li style={{cursor: 'pointer'}} onClick={() => setNetwork(k)} key={i}>
+          {k}
+          </li>)}
+        </ul>
+      }
+    </div>
+    <div>
+      {chain !== null && 
+        <ul>{Object.keys(wallets).map((k,i)=>
+          <li style={{cursor: 'pointer'}} onClick={() => connect(network, k)} key={i}>
+          {k}
+          </li>)}
+        </ul>
+      }
+    </div>
   </div>
 }
 
