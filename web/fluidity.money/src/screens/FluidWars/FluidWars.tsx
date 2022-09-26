@@ -2,17 +2,43 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./FluidWars.module.scss";
 import useViewport from "hooks/useViewport";
+import { motion, useAnimation } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
 
 const FluidWars = () => {
   const { width } = useViewport();
   const breakpoint = 860;
 
+  const topDrop = {
+    visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 2.8 } },
+    hidden: { opacity: 0, transform: width <= 620 ? "translateY(-180px)" : "translateY(-500px)" }
+  };
+
+  const leftIn = {
+    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
+    hidden: { opacity: 0, transform: width <= 620 ? "translateX(-180px)" : "translateX(-500px)" }
+  };
+
+  const rightIn = {
+    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
+    hidden: { opacity: 0, transform: width <= 620 ? "translateX(180px)" : "translateX(500px)" }
+  };
+
+  const control = useAnimation();
+  const [ref, inView] = useInView();
+
+  useEffect(() => {
+    control.stop();
+    inView ? (control.start("visible") ) : (control.set("hidden"));
+
+  }, [control, inView]);
+  
   const left =
   width > breakpoint ? (
     <>
@@ -27,21 +53,33 @@ const FluidWars = () => {
 
   ) : (
     <>
-      <Video
-        src={'/assets/videos/FluidityFluidWars.mp4'}
-        type={"fit"}
-        loop={true}
-      />     
+      <motion.div
+        animate={control}
+        initial="hidden"
+        variants= {rightIn}
+      >
+        <Video
+          src={'/assets/videos/FluidityFluidWars.mp4'}
+          type={"fit"}
+          loop={true}
+        />
+      </motion.div>
     </>
   );
 
-  const right = 
-  <HowItWorksTemplate header={header} info={info}>
-    Fluidity wars
-  </HowItWorksTemplate>
+  const right =
+  <motion.div
+    animate={control}
+    initial="hidden"
+    variants= {width <= breakpoint ? leftIn : topDrop}
+  >
+    <HowItWorksTemplate header={header} info={info}>
+      Fluidity wars
+    </HowItWorksTemplate>
+  </motion.div> 
 
   return (
-    <div className={styles.container} id="fluiditywars">
+    <div ref={ref} className={styles.container} id="fluiditywars">
       <ReusableGrid left={left} right={right} />
     </div>
   );
