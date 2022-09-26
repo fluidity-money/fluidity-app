@@ -6,6 +6,7 @@
     "@fluidity-money/surfing": "^0.0",
     "@reduxjs/toolkit": "^1.8.3",
     "@visx/visx": "^2.12.2",
+    "axios": "^0.27.2",
     "babel-plugin-relay": "^14.1.0",
     "framer-motion": "^7.2.1",
     "next": "^12.3.0",

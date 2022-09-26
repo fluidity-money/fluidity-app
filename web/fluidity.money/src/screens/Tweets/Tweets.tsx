@@ -2,17 +2,47 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { ManualCarousel } from "@fluidity-money/surfing";
+import axios from "axios";
+import { useEffect } from "react";
+import { ManualCarousel, Text } from "@fluidity-money/surfing";
+import useViewport from "hooks/useViewport";
 import styles from "./Tweets.module.scss";
 
 const Tweets = () => {
+  const instance = axios.create({
+    baseURL: "https://api.twitter.com",
+    withCredentials: false,
+    timeout: 1000,
+    headers: {
+      Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+    },
+  });
+
+  useEffect(() => {
+    instance
+      .get(
+        `/2/users/${process.env.FLUIDITY_ID}/tweets?tweet.fields=created_at,text`
+      )
+      .then((response) => {
+        console.log(response);
+        return response.data;
+      });
+  }, []);
+
+  const { width } = useViewport();
   return (
     <div className={styles.container}>
-      <ManualCarousel>
+      <ManualCarousel scrollBar={width < 500 ? true : false}>
         {tweets.map((tweet, index) => (
           <div key={index} className={styles.tweetContainer}>
-            <p>{tweet.text}</p>
-            <div>{tweet.date}</div>
+            <Text prominent={true}>{tweet.text}</Text>
+            <div className={styles.footer}>
+              <img
+                src="/assets/images/socials/twitterBlue.svg"
+                alt="twitter logo"
+              />
+              <Text size="sm">{tweet.date}</Text>
+            </div>
           </div>
         ))}
       </ManualCarousel>
