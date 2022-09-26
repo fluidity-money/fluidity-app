@@ -2,14 +2,10 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
   Display,
-  GeneralButton,
-  Heading,
   Text,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
@@ -17,16 +13,16 @@ import Video from "components/Video";
 import styles from "./Demo.module.scss";
 
 const Demo = () => {
-  const { apiState } = useChainContext();
+  const chainContext = useChainContext();
 
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const weekTotalRewards = apiState.weekWinnings.reduce(
+  const weekTotalRewards = chainContext ? chainContext.apiState.weekWinnings.reduce(
     (weekSum, { winning_amount, token_decimals }) =>
       weekSum + winning_amount / 10 ** token_decimals,
     0
-  );
+  ) : 0;
   /*
   full screen demo
   */

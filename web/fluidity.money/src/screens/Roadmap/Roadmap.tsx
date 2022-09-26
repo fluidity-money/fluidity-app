@@ -2,14 +2,14 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
+import { motion, useAnimation } from "framer-motion";
+import useViewport from "hooks/useViewport";
 import { ArrowTopRight, ReusableGrid, GeneralButton } from "@fluidity-money/surfing";
 import Video from "components/Video";
-import styles from "./Roadmap.module.scss";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
-import useViewport from "hooks/useViewport";
-import { motion, useAnimation } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
+import styles from "./Roadmap.module.scss";
 
 const Roadmap = () => {
 
@@ -51,7 +51,7 @@ const Roadmap = () => {
   </GeneralButton>;
 
   const left =
-  width < breakpoint ? (
+  width <= breakpoint ? (
     <motion.div
       animate={control}
       initial="hidden"
@@ -62,9 +62,7 @@ const Roadmap = () => {
           src={"/assets/videos/FluidityRoadMap.mp4"}
           type={"fit"}
           loop={true}
-          className={styles.video}
         />
-        <div className={styles.smallClip} />
       </div>
     </motion.div>
   ) : (
@@ -81,17 +79,15 @@ const Roadmap = () => {
 
   const right =
   width > breakpoint ? (
-    <>
-    <Video
-      src={"/assets/videos/FluidityRoadMap.mp4"}
-      type={"fit"}
-      loop={true}
-      scale={2.0}
-      margin={"0px 150px 0px 0px"}
-      className={styles.video}
-    />
-    <div className={styles.clip} />
-    </>
+    <div className={styles.video}>
+      <Video
+        src={"/assets/videos/FluidityRoadMap.mp4"}
+        type={"fit"}
+        loop={true}
+        scale={2.0}
+        margin={"0px 150px 0px 0px"}
+      />
+    </div>
   ) : (
     <motion.div
       animate={control}
