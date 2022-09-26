@@ -1,5 +1,5 @@
 // dynamically import JSON from relevant config
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {PublicKey} from "@solana/web3.js";
 import {Network, SupportedFluidToken, SupportedUnwrappedToken} from "../../components/chains/ChainContext";
 import {FluidSolanaToken, SolanaTokenConfig, UnwrappedSolanaToken} from "../solana/token";
@@ -20,8 +20,11 @@ const importSolanaTokens = async(network: Network<"solana">): Promise<SolanaToke
 
 type FluidTokenMap = Partial<Mapped<SupportedFluidToken<"solana">, FluidSolanaToken>>;
 type UnwrappedTokenMap = Partial<Mapped<SupportedUnwrappedToken<"solana">, UnwrappedSolanaToken>>;
+type TokenCache = {[K in Network<"solana">]?: {fluidTokens: FluidTokenMap, unwrappedTokens: UnwrappedTokenMap, fluidProgramId: PublicKey}}
 
 export const useSolanaTokens = () => {
+  // cache fetched tokens in a ref
+  let {current: cache} = useRef<TokenCache>({});
   const [fluidTokens, setFluidTokens] = useState<FluidTokenMap>({});
   const [unwrappedTokens, setUnwrappedTokens] = useState<UnwrappedTokenMap>({});
   const [network, setNetwork] = useState<Network<"solana">>();
@@ -30,6 +33,17 @@ export const useSolanaTokens = () => {
   useEffect(() => {
     if (!network)
       return;
+
+    if (cache?.[network]) {
+      const {[network]: cachedNetwork} = cache;
+      if (cachedNetwork?.fluidTokens && cachedNetwork?.fluidProgramId && cachedNetwork?.unwrappedTokens) {
+        setFluidProgramId(new PublicKey(cachedNetwork.fluidProgramId));
+        setFluidTokens(cachedNetwork.fluidTokens);
+        setUnwrappedTokens(cachedNetwork.unwrappedTokens);
+        return;
+      }
+    }
+
     importSolanaTokens(network).then((config: SolanaTokenConfig) => {
       const fluid_: FluidTokenMap = {};
       const unwrapped_: UnwrappedTokenMap = {};
@@ -57,6 +71,12 @@ export const useSolanaTokens = () => {
             image,
           )
       });
+
+      cache[network] = {
+        fluidProgramId: new PublicKey(fluidProgramId),
+        unwrappedTokens: unwrapped_,
+        fluidTokens: fluid_,
+      }
 
       setFluidProgramId(new PublicKey(fluidProgramId));
       setFluidTokens(fluid_);
