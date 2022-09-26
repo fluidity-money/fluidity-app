@@ -1,11 +1,31 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this source
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
-
+import axios from "axios";
 import { ManualCarousel } from "@fluidity-money/surfing";
 import styles from "./Tweets.module.scss";
+import { useEffect } from "react";
 
 const Tweets = () => {
+  const instance = axios.create({
+    baseURL: "https://cors-anywhere.herokuapp.com/https://api.twitter.com",
+    withCredentials: false,
+    timeout: 1000,
+    headers: {
+      Authorization:
+        "Bearer AAAAAAAAAAAAAAAAAAAAANadhQEAAAAADsZogDf3wzgzYezSG6biCGr%2BOjM%3DKs0pCOyCAmM6glaOFnWZUl8IU0M89tDyZDVlWjMj4LoK8b5zku",
+    },
+  });
+
+  useEffect(() => {
+    instance
+      .get("/2/users/1372816026933424129/tweets?tweet.fields=created_at,text")
+      .then((response) => {
+        console.log(response);
+        return response.data;
+      });
+  }, []);
+
   return (
     <div className={styles.container}>
       <ManualCarousel>
