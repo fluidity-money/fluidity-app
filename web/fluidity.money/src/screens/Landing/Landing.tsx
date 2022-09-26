@@ -29,6 +29,9 @@ const Landing = () => {
     src: null
   })
 
+  //slapping this in for a delay in mobile load animation, because of how NEXT works.
+  //prevents loadanimation from slipping into web desktop view before NEXT determines if you are running on web or mobile
+  const [mobileLoadAnimationisActive, setMobileLoadAnimationisActive] = useState(false);
   const [state, setState] = useState({
     src: vidSources[0],
     mimeType: isSafari ? "video/quicktime" : "video/webm",
@@ -54,7 +57,7 @@ const Landing = () => {
         started: true,
         src: "assets/videos/ios/FluidityHome.webp"
        })
-      }, 3000, );
+      }, 4000, );
       setTimeout(
       () => {
         setIOSAnimation({
@@ -63,6 +66,12 @@ const Landing = () => {
         })
       }, 8000, );
     }
+
+    setTimeout(
+      () => {
+      setMobileLoadAnimationisActive(true);
+    }, 1000);
+
   }, [homeVidEnded]);
 
   const { width } = useViewport();
@@ -141,7 +150,7 @@ const Landing = () => {
               position: "absolute",
               width: "70%",
               marginTop: "-400px",
-              display: `${onHomeVidLoaded || iosAnimation.started ? "none" : "block"}`,
+              display: `${onHomeVidLoaded || iosAnimation.started || !mobileLoadAnimationisActive ? "none" : "block"}`,
             }}
             alt="Loop-Ring"
           />
@@ -151,7 +160,7 @@ const Landing = () => {
               position: "absolute",
               width: "40%",
               marginTop: "-400px",
-              display: `${onHomeVidLoaded || iosAnimation.started ? "none" : "block"}`,
+              display: `${onHomeVidLoaded || iosAnimation.started || !mobileLoadAnimationisActive ? "none" : "block"}`,
             }}
             alt="Loop-Text"
           />
