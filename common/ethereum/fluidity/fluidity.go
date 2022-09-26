@@ -19,69 +19,159 @@ import (
 )
 
 const fluidityContractAbiString = `[
-	{
-      "inputs": [],
-      "name": "rewardPoolAmount",
-      "outputs": [
-        { "internalType": "uint256", "name": "", "type": "uint256" }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
-            { "internalType": "address", "name": "winner", "type": "address" },
-            { "internalType": "uint256", "name": "win_amount", "type": "uint256" },
-            { "internalType": "uint256", "name": "first_block", "type": "uint256" },
-            { "internalType": "uint256", "name": "last_block", "type": "uint256" }
-          ],
-          "internalType": "struct Winner[]",
-          "name": "rewards",
-          "type": "tuple[]"
-        },
-        { "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
-        { "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
-      ],
-      "name": "batchReward",
-      "outputs": [],
-      "type": "function"
-    },
-	{
-      "inputs": [
-        { "internalType": "address", "name": "to", "type": "address" },
-        { "internalType": "uint256", "name": "amount", "type": "uint256" }
-      ],
-      "name": "transfer",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+  {
+    "inputs": [],
+    "name": "rewardPoolAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-	  "anonymous": false,
-	  "inputs": [
-	    { "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
-	    { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
-	    { "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
-	  ],
-	  "name": "Reward",
-	  "type": "event"
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "winner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "win_amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "first_block",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "last_block",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Winner[]",
+        "name": "rewards",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "firstBlock",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "batchReward",
+    "outputs": [],
+    "type": "function"
   },
   {
-	  "inputs": [
-	  { "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
-	  { "internalType": "address", "name": "from", "type": "address" },
-	  { "internalType": "address", "name": "to", "type": "address" },
-	  { "internalType": "uint256[]", "name": "balls", "type": "uint256[]" },
-	  { "internalType": "uint256[]", "name": "payouts", "type": "uint256[]" }
-	  ],
-	  "name": "reward",
-	  "outputs": [],
-	  "stateMutability": "nonpayable",
-	  "type": "function"
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "winner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "Reward",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "txHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "balls",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "payouts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "reward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "global",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "user",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateMintLimits",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
-]`
+]
+`
 
 const workerConfigAbiString = `[
   {
@@ -251,6 +341,36 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to transact the transfer function on Fluidity's contract! %v",
+			err,
+		)
+	}
+
+	return transaction, nil
+}
+
+// TransactUpdateMintLimits as the worker, releasing restrictions on
+// the amount that can be minted at the time
+func TransactUpdateMintLimits(client *ethclient.Client, fluidityContractAddress ethCommon.Address, global, user *big.Int, transactionOptions *ethAbiBind.TransactOpts) (*ethTypes.Transaction, error) {
+
+	boundContract := ethAbiBind.NewBoundContract(
+		fluidityContractAddress,
+		fluidityContractAbi,
+		client,
+		client,
+		client,
+	)
+
+	transaction, err := ethereum.MakeTransaction(
+		boundContract,
+		transactionOptions,
+		"updateMintLimits",
+		global,
+		user,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to transact the updateMintLimits function on Fluidity's contract! %v",
 			err,
 		)
 	}
