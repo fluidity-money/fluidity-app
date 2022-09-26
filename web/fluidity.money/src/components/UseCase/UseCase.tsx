@@ -19,7 +19,6 @@ interface UseCaseProps {
 const UseCase = ({ useCase }: UseCaseProps) => {
   const { width } = useViewport();
   return (
-    <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.8 }} >
       <div className={styles.container}>
         <img src={useCase.img} alt="text representation" />
         <div className={styles.text}>
@@ -29,7 +28,6 @@ const UseCase = ({ useCase }: UseCaseProps) => {
           </Text>
         </div>
       </div>
-    </motion.div>
   );
 };
 

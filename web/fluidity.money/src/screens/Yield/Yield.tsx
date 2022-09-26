@@ -7,101 +7,45 @@ import useViewport from "hooks/useViewport";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Yield.module.scss";
 import Video from "components/Video";
-import { motion, useAnimation } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
 
 const Yield = () => {
 
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
-
-  const topDrop = {
-    visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateY(-180px)" : "translateY(-500px)" }
-  };
-
-  const bottomPush = {
-    visible: { opacity: 1, transform: "translateY(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateY(180px)" : "translateY(500px)" }
-  };
-
-  const leftIn = {
-    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateX(-180px)" : "translateX(-500px)" }
-  };
-
-  const rightIn = {
-    visible: { opacity: 1, transform: "translateX(0px)", transition: { duration: 2.8 } },
-    hidden: { opacity: 0, transform: width <= 620 ? "translateX(180px)" : "translateX(500px)" }
-  };
-
-  const control = useAnimation();
-  const [ref, inView] = useInView();
-
-  useEffect(() => {
-    control.stop();
-    inView ? (control.start("visible") ) : (control.set("hidden"));
-
-  }, [control, inView]);
   
   const left =
   width <= breakpoint ? (
     <>
-      <motion.div
-        animate={control}
-        initial="hidden"
-        variants={rightIn}
-      >
-        <Video
-          src={"/assets/videos/FluidityYield.mp4"}
-          type={"fit"}
-          loop={true}
-        />
-      </motion.div>
+      <Video
+        src={"/assets/videos/FluidityYield.mp4"}
+        type={"fit"}
+        loop={true}
+      />
     </>
   ) : (
-    <motion.div
-      animate={control}
-      initial="hidden"
-      variants={leftIn}
-    >
-      <HowItWorksTemplate header={header} info={info}>
-        Yield through utility
-      </HowItWorksTemplate>
-    </motion.div>
+    <HowItWorksTemplate header={header} info={info}>
+      Yield through utility
+    </HowItWorksTemplate>
   );
 
   const right =
   width > breakpoint ? (
     <>
-      <motion.div
-        animate={control}
-        initial="hidden"
-        variants={bottomPush}
-      >
-        <Video
-          src={"/assets/videos/FluidityYield.mp4"}
-          type={"fit"}
-          loop={true}
-        />
-      </motion.div>
+      <Video
+        src={"/assets/videos/FluidityYield.mp4"}
+        type={"fit"}
+        loop={true}
+      />
     </>
   ) : (
-    <motion.div
-      animate={control}
-      initial="hidden"
-      variants={leftIn}
-    >   
-      <HowItWorksTemplate header={header} info={info}>
-        Yield through utility
-      </HowItWorksTemplate>
-    </motion.div>
+    <HowItWorksTemplate header={header} info={info}>
+      Yield through utility
+    </HowItWorksTemplate>
   );
 
   return (
-    <div ref={ref} className={styles.container} id="yield&win">
+    <div className={styles.container} id="yield&win">
       <ReusableGrid left={left} right={right} />
     </div>
   );
