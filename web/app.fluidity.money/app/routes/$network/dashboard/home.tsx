@@ -12,7 +12,7 @@ import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6"
+const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { network } = params;
@@ -22,66 +22,54 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const { 
+  const {
     data: {
-      [network as string]: { 
-        transfers: [{
-          count
-        }]
-      }
+      [network as string]: {
+        transfers: [{ count }],
+      },
     },
   } = await (await useUserTransactionCount(address)).json();
 
   const {
     data: {
-      [network as string]: {
-        transfers: transactions
-      }
+      [network as string]: { transfers: transactions },
     },
   } = await (await useUserTransactions(address, page)).json();
-  console.log(transactions)
+  console.log(transactions);
 
   // Destructure GraphQL data
-  const sanitizedTransactions = transactions.map((transaction: UserTransaction) => {
-    const { 
-      sender: {
-        address: sender,
-      },
-      receiver: {
-        address: receiver,
-      },
-      block: {
-        timestamp: {
-          unixtime: timestamp,
-        }
-      },
-      amount: value,
-      currency: {
-        symbol: currency,
-      }
-    } = transaction;
+  const sanitizedTransactions = transactions.map(
+    (transaction: UserTransaction) => {
+      const {
+        sender: { address: sender },
+        receiver: { address: receiver },
+        block: {
+          timestamp: { unixtime: timestamp },
+        },
+        amount: value,
+        currency: { symbol: currency },
+      } = transaction;
 
-    return {
-      sender,
-      receiver,
-      timestamp,
-      value,
-      currency,
+      return {
+        sender,
+        receiver,
+        timestamp,
+        value,
+        currency,
+      };
     }
-  });
+  );
 
   if (Math.ceil(count / 12) < page && count > 0) {
     return redirect(`./`, 301);
   }
 
-  return json( {
-      transactions: sanitizedTransactions,
-      count,
-      page
-    },
-  );
-}
-
+  return json({
+    transactions: sanitizedTransactions,
+    count,
+    page,
+  });
+};
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
@@ -103,15 +91,11 @@ type LoaderData = {
 
 const ActivityLabel = (activity: Transaction, address: string) => {
   const { sender, currency } = activity;
-    return sender === address ? `Sent ${currency}` : `Received ${currency}`;
-  }
+  return sender === address ? `Sent ${currency}` : `Received ${currency}`;
+};
 
 export default function Home() {
-  const {
-    transactions,
-    count,
-    page
-  } = useLoaderData<LoaderData>();
+  const { transactions, count, page } = useLoaderData<LoaderData>();
 
   const pageCount = Math.ceil(count / 12);
   const startTransaction = (page - 1) * 12 + 1;
@@ -167,7 +151,9 @@ export default function Home() {
       </section>
       <section id="transactions">
         <div className="transactions-header row justify-between">
-          <Text>{startTransaction}-{endTransaction} of {count} transactions</Text>
+          <Text>
+            {startTransaction}-{endTransaction} of {count} transactions
+          </Text>
           <div>
             <span>All</span>
             <span>DEX</span>
@@ -185,30 +171,35 @@ export default function Home() {
               <th>Time</th>
             </tr>
           </thead>
-            <AnimatePresence mode="wait" initial={false}>
-          <motion.tbody key={`page-${page}`} 
-          initial="enter"
-          animate={isTransition.state === "idle" ? "enter" : "transitioning"}
-          exit="exit"
-          variants={{
-            enter: {
-              opacity: 1,
-              transition: {
-                when: "beforeChildren",
-                staggerChildren: 0.05,
-              },
-            },
-            exit: {
-              opacity: 0,
-              transition: {
-                when: "afterChildren",
-                staggerChildren: 0.05,
-              },
-            },
-            transitioning: {}
-          }}>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.tbody
+              key={`page-${page}`}
+              initial="enter"
+              animate={
+                isTransition.state === "idle" ? "enter" : "transitioning"
+              }
+              exit="exit"
+              variants={{
+                enter: {
+                  opacity: 1,
+                  transition: {
+                    when: "beforeChildren",
+                    staggerChildren: 0.05,
+                  },
+                },
+                exit: {
+                  opacity: 0,
+                  transition: {
+                    when: "afterChildren",
+                    staggerChildren: 0.05,
+                  },
+                },
+                transitioning: {},
+              }}
+            >
               {transactions.map((transaction, i) => {
-                const { sender, receiver, timestamp, value, currency } = transaction;
+                const { sender, receiver, timestamp, value, currency } =
+                  transaction;
 
                 const isTransactionToday = isToday(timestamp * 1000);
                 const isTransactionYesterday = isYesterday(timestamp * 1000);
@@ -220,48 +211,55 @@ export default function Home() {
                     addSuffix: true,
                   });
                 } else if (isTransactionYesterday) {
-                  timeLabel = `Yesterday ${format(timestamp * 1000, "h:mmaaa")}`;
-
+                  timeLabel = `Yesterday ${format(
+                    timestamp * 1000,
+                    "h:mmaaa"
+                  )}`;
                 } else {
                   timeLabel = format(timestamp * 1000, "dd.MM.yy h:mmaaa");
                 }
 
-
-                return <motion.tr 
+                return (
+                  <motion.tr
                     key={`${timestamp}-${i}`}
                     variants={{
                       enter: { opacity: [0, 1] },
                       ready: { opacity: 1 },
                       exit: { opacity: 0 },
-                      transitioning: { opacity: [0.75, 1, 0.75], transition: { duration: 1.5, repeat: Infinity } },
+                      transitioning: {
+                        opacity: [0.75, 1, 0.75],
+                        transition: { duration: 1.5, repeat: Infinity },
+                      },
                     }}
-
                   >
-                  <td>
-                    <Text>{currency} {ActivityLabel(transaction, address)}</Text>
-                  </td>
-                  <td>
-                    {value.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                  </td>
-                  <td>
-                    -
-                  </td>
-                  <td>
-                    {sender === address ? receiver : sender}
-                  </td>
-                  <td>
-                    {timeLabel}
-                  </td>
-                </motion.tr>
+                    <td>
+                      <Text>
+                        {currency} {ActivityLabel(transaction, address)}
+                      </Text>
+                    </td>
+                    <td>
+                      {value.toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      })}
+                    </td>
+                    <td>-</td>
+                    <td>{sender === address ? receiver : sender}</td>
+                    <td>{timeLabel}</td>
+                  </motion.tr>
+                );
               })}
-          </motion.tbody>
-            </AnimatePresence>
+            </motion.tbody>
+          </AnimatePresence>
         </table>
         <motion.div className="pagination" layout="position">
           {Array.from(Array(pageCount).keys()).map((_, i) => {
-            return <Link key={i} to={`?page=${i + 1}`}>{i + 1}</Link>
-          }
-          )}
+            return (
+              <Link key={i} to={`?page=${i + 1}`}>
+                {i + 1}
+              </Link>
+            );
+          })}
         </motion.div>
       </section>
     </>

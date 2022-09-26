@@ -38,20 +38,20 @@ const query = gql`
 `;
 
 const useUserTransactions = async (address: string, page: number = 1) => {
-    const variables = {
-      address: address,
-      offset: (page - 1) * 12,
-      fluidCurrencies: config.ethereum.currencies,
-    }
+  const variables = {
+    address: address,
+    offset: (page - 1) * 12,
+    fluidCurrencies: config.ethereum.currencies,
+  };
   return fetch("https://graphql.bitquery.io", {
     method: "POST",
     headers: {
-        "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
-        "Content-Type": "application/json",
+      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-        query,
-        variables,
+      query,
+      variables,
     }),
   });
 };
