@@ -6,8 +6,10 @@ import Dao from './screens/authenticated/dao';
 import Home from './screens/Home';
 import {ChainContext, Chains} from "./components/chains/ChainContext";
 import './App.css'
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import ChainInterface from "./components/chains";
+import localforage from "localforage";
+import memoryStorageDriver from "localforage-memoryStorageDriver";
 
 const Div = () => {
   const con = useContext(ChainContext)
@@ -46,6 +48,29 @@ const Div = () => {
 }
 
 const App = () => {
+  const [loadingDriver, setLoadingDriver] = useState(true);
+
+  // use in-memory driver if regular driver blocked due to cookies
+  useEffect(() => {
+    localforage.ready(error => {
+      if (!error) {
+        setLoadingDriver(false);
+        return;
+      } 
+      console.error(error);
+      localforage.defineDriver(memoryStorageDriver).then(_ =>
+        localforage.setDriver(
+          memoryStorageDriver._driver,
+          () => setLoadingDriver(false),
+          e => console.error(e)
+        )
+      )
+    });
+   }, []) 
+
+  if (loadingDriver)
+    return <></>
+
   return <>
     <ChainInterface>
     <Div/>

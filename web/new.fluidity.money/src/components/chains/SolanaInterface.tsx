@@ -4,7 +4,7 @@
 
 import {useEffect, useState} from "react";
 import {isInArray} from "../../utils/types";
-import {DefaultWalletType, useSolana, WalletTypeEnum} from "@saberhq/use-solana";
+import {useSolana} from "@saberhq/use-solana";
 import {DEFAULT_WALLET_PROVIDERS} from "@saberhq/use-solana";
 import {BigintIsh} from "@saberhq/token-utils";
 import {PublicKey} from "@solana/web3.js";

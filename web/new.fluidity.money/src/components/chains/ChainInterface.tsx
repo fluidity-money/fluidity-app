@@ -8,12 +8,15 @@ import localforage from "localforage";
 import {useEffect, useState} from "react";
 import {UseWalletProvider} from "use-wallet";
 import {isInArray} from "../../utils/types";
-import {Chain, ChainIds, Chains, NullableChain} from "./ChainContext";
+import {Chain, ChainContext, ChainIds, Chains, NullableChain} from "./ChainContext";
 import EthereumInterface from "./EthereumInterface";
 import SolanaInterface from "./SolanaInterface";
 
 const providerOptions = {
-  injected: new InjectedConnector({ supportedChainIds: Object.values(ChainIds) }),
+  injected: new InjectedConnector({ 
+    supportedChainIds: Object.values(ChainIds)
+      .map(id=>Number(id)) 
+    }),
 };
 
 const ChainInterface = ({children}: {children: React.ReactNode}) => {
@@ -39,15 +42,29 @@ const ChainInterface = ({children}: {children: React.ReactNode}) => {
 
   // stop auto login when setting chain
   const setChain = (chain: NullableChain) => {
-    localStorage.removeItem("use-solana/wallet-config");
-    localforage.setItem(lastChainKey, chain)
-    setChain_(chain)
+    try {
+      // fails if cookies are banned, since we directly access localStorage here
+      localStorage.removeItem("use-solana/wallet-config");
+      localforage.setItem(lastChainKey, chain)
+    } catch (e) {
+      console.error("Failed to set and remove", e);
+    } finally {
+      setChain_(chain)
+    }
   }
 
   switch (chain) {
   case "loading" || null:
     return <>
+    <ChainContext.Provider 
+      value={{
+        chain:null,
+        setChain: setChain,
+        disconnect: () => 0,
+        connected: false,
+      }}>
       {children}
+    </ChainContext.Provider>
     </>
   case "ethereum":
   default:

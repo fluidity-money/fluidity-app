@@ -21,7 +21,13 @@ const importSolanaTokens = async(network: Network<"solana">): Promise<SolanaToke
 
 type FluidTokenMap = Partial<Mapped<SupportedFluidToken<"solana">, FluidSolanaToken>>;
 type UnwrappedTokenMap = Partial<Mapped<SupportedUnwrappedToken<"solana">, UnwrappedSolanaToken>>;
-type TokenCache = {[K in Network<"solana">]?: {fluidTokens: FluidTokenMap, unwrappedTokens: UnwrappedTokenMap, fluidProgramId: PublicKey}}
+type TokenCache = {
+  [K in Network<"solana">]?: {
+    fluidTokens: FluidTokenMap, 
+    unwrappedTokens: UnwrappedTokenMap, 
+    fluidProgramId: PublicKey
+  }
+}
 
 export const useSolanaTokens = () => {
   // cache fetched tokens in a ref for network and chain switches
