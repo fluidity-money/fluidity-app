@@ -41,13 +41,13 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            flu build-docker-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+            flu build-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
-            flu deploy-service-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+            flu deploy-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
         uses: rjstone/discord-webhook-notify@v1
         if: success()
