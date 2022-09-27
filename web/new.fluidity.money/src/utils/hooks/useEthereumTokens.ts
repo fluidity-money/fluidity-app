@@ -22,7 +22,7 @@ type UnwrappedTokenMap = Partial<Mapped<SupportedUnwrappedToken<"ethereum">, Unw
 export const useEthereumTokens = () => {
   const [fluidTokens, setFluidTokens] = useState<FluidTokenMap>({});
   const [unwrappedTokens, setUnwrappedTokens] = useState<UnwrappedTokenMap>({});
-  const [network, setNetwork] = useState<Network<"ethereum">>();
+  const [network, setNetwork] = useState<Network<"ethereum">>("mainnet");
 
   useEffect(() => {
     if (!network)

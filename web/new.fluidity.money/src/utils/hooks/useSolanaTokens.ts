@@ -30,7 +30,7 @@ export const useSolanaTokens = () => {
   const [fluidTokens, setFluidTokens] = useState<FluidTokenMap>({});
   const [loading, setLoading] = useState(true);
   const [unwrappedTokens, setUnwrappedTokens] = useState<UnwrappedTokenMap>({});
-  const [network, setNetwork] = useState<Network<"solana">>();
+  const [network, setNetwork] = useState<Network<"solana">>("mainnet-beta");
   const [fluidProgramId, setFluidProgramId] = useState<PublicKey>();
 
   // clear cache on page reset, to avoid becoming stale
