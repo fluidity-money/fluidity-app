@@ -2,13 +2,16 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import Script from "next/script";
+import { useEffect, useRef } from "react";
 import { isFirefox } from "react-device-detect";
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
-  src: string | string[];
+  src: string;
   type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
   loop: boolean;
+  preload?: "none" | "metadata" | "auto";
   display?: "none" | "inline";
   key?: string;
   scale?: number;
@@ -17,7 +20,7 @@ interface IPropsVideo {
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
   className?: string;
-  mimeType?: string | string[];
+  mimeType?: string;
   
   // Width of container
   //   dynamic - Change explicit scale
@@ -38,6 +41,7 @@ export const Video = ({
   mimeType = "video/mp4",
   loop,
   display="inline",
+  preload="auto",
   scale=1,
   opacity=1,
   margin = `0px 0px 0px 0px`,
@@ -50,7 +54,7 @@ export const Video = ({
 }: IPropsVideo) => {
   
   const classProps = className || "";
-
+  
   const dynamicWidth = isFirefox
     ? `${scale * 400}px`
     : `${scale * 100}%`;
@@ -67,28 +71,34 @@ export const Video = ({
     ? `${height}px`
     : height;
   
+  const vidRef = useRef(null);
+  useEffect(() => {
+    vidRef.current.play();
+  });
+  
   return (
-    <video
-      key={key}
-      loop={loop}
-      autoPlay
-      muted
-      playsInline
-      className={`${styles.videoContainer} ${styles[type]} ${classProps}`}
-      style={{
-        display: display,
-        opacity: `${opacity}`,
-        margin: margin,
-        width: widthProp,
-        height: heightProp,
-      }}
-      onEnded={onEnded}
-      onPlaying={onLoad}
-      {...props}
-    >
-      {Array.isArray(src) ?
-        src.map((v, i) => {return <source src={v} type={mimeType[i]} />}) :  <source src={src} type={mimeType as string} /> }
-    </video>
+    <>
+      <video
+        ref={vidRef}
+        key={key}
+        loop={loop}
+        preload={preload}
+        muted
+        playsInline
+        src={src} 
+        className={`${styles.videoContainer} ${styles[type]} ${classProps}`}
+        style={{
+          display: display,
+          opacity: `${opacity}`,
+          margin: margin,
+          width: widthProp,
+          height: heightProp,
+        }}
+        onEnded={onEnded}
+        onLoad={onLoad}
+        {...props}
+      /> 
+    </>
   );
 };
 

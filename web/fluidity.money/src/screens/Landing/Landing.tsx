@@ -9,12 +9,12 @@ import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
-import { isSafari, isFirefox, isIOS, isMobileSafari, isChrome } from "react-device-detect";
+import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
 
 const Landing = () => {
 
-  let type = isSafari ? "video/quicktime" : "video/webm";
-  let vidSources = (isSafari ? [
+  let type = isSafari || isIOS ? "video/quicktime" : "video/webm";
+  let vidSources = (isSafari || isIOS ? [
     "/assets/videos/FluidityHome.mov",
     "/assets/videos/FluidityHomeloop.mov",
   ] : [
@@ -22,26 +22,9 @@ const Landing = () => {
     "/assets/videos/FluidityHomeloop.webm",
   ]).map((link) => link);
 
-  if (isMobileSafari || isChrome && isIOS) {
-    type = "video/webm"
-    vidSources = ([
-      "/assets/videos/FluidityHome.webm",
-      "/assets/videos/FluidityHomeloop.webm",
-    ]).map((link) => link)
-  }
-
   const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
   const [homeVidEnded, setHomeVidEnded] = useState(false);
 
-  //IOS support for home and homeloop animations using webp.
-  const [iosAnimation, setIOSAnimation] = useState({
-    started: false,
-    src: null
-  })
-
-  //slapping this in for a delay in mobile load animation, because of how NEXT works.
-  //prevents loadanimation from slipping into web desktop view before NEXT determines if you are running on web or mobile
-  const [mobileLoadAnimationisActive, setMobileLoadAnimationisActive] = useState(false);
   const [state, setState] = useState({
     src: vidSources[0],
     mimeType: type,
@@ -59,46 +42,10 @@ const Landing = () => {
       loop: true,
       scale: isFirefox ? 1 : 0.5,
     });
-
-    if(!iosAnimation.started) {
-      setTimeout(
-      () => {
-       setIOSAnimation({
-        started: true,
-        src: "assets/videos/ios/FluidityHome.webp"
-       })
-      }, 4000, );
-      setTimeout(
-      () => {
-        setIOSAnimation({
-        started: true,
-        src: "assets/images/landing-backup.png"
-        })
-      }, 8000, );
-    }
-
-    setTimeout(
-      () => {
-      setMobileLoadAnimationisActive(true);
-    }, 1000);
-
   }, [homeVidEnded]);
 
   const { width } = useViewport();
   const breakpoint = 620;
-
-  const iosAnimationBackup = isIOS ? (
-    <img
-      src={iosAnimation.src}
-      style={{
-        position: "absolute",
-        width: "60%",
-        marginTop: "-400px",
-        display: `${!iosAnimation.started || onHomeVidLoaded ? "none" : "block"}`,
-      }}
-      alt="ios home animation"
-    />
-  ) : (<></>);
 
   const callout = (
     <div className={styles.callout}>
@@ -113,26 +60,8 @@ const Landing = () => {
 
   return (
     <div className={`${styles.containerLanding}`}>
-      {/* Video Container */}
-      {width > breakpoint ? (
-        <div className={`${styles.bgVid}`}>
-          <img
-            src="assets/images/LoopAnim.webp"
-            style={{
-              position: "absolute",
-              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
-            }}
-
-            alt="Loop-Ring"
-          />
-          <img
-            src="assets/images/TextLoop.webp"
-            style={{
-              position: "absolute",
-              display: `${onHomeVidLoaded === true ? "none" : "block"}`,
-            }}
-            alt="Loop-Text"
-          />
+      <div className={`${styles.bgVid}`}>
+        {width > breakpoint ? (
           <Video
             src={state.src}
             type={"reduce"}
@@ -151,30 +80,10 @@ const Landing = () => {
               : () => {}
             }
           />
-        </div>
-      ) : (
-        <div className={`${styles.bgVid}`}>
-          <img
-            src="assets/images/LoopAnim.webp"
-            style={{
-              position: "absolute",
-              width: "70%",
-              marginTop: "-400px",
-              display: `${onHomeVidLoaded || iosAnimation.started || !mobileLoadAnimationisActive ? "none" : "block"}`,
-            }}
-            alt="Loop-Ring"
-          />
-          <img
-            src="assets/images/TextLoop.webp"
-            style={{
-              position: "absolute",
-              width: "40%",
-              marginTop: "-400px",
-              display: `${onHomeVidLoaded || iosAnimation.started || !mobileLoadAnimationisActive ? "none" : "block"}`,
-            }}
-            alt="Loop-Text"
-          />
-          <Video
+          
+        ) : ( isMobile ?
+          (
+            <Video
             src={state.src}
             type={"reduce"}
             mimeType={state.mimeType}
@@ -184,11 +93,10 @@ const Landing = () => {
             margin={"-400px 0 0 0"}
             onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
             onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
-          />
-          {iosAnimationBackup}
-        </div>
-      )}
-
+            />
+          ) : (<></>) 
+        )}
+      </div>
       {/* Hero animation */}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
