@@ -4,6 +4,7 @@ import {PublicKey} from "@solana/web3.js";
 import {Network, SupportedFluidToken, SupportedUnwrappedToken} from "../../components/chains/ChainContext";
 import {FluidSolanaToken, SolanaTokenConfig, UnwrappedSolanaToken} from "../solana/token";
 import {Mapped} from "../types";
+import localforage from "localforage";
 
 // defaults to devnet
 const importSolanaTokens = async(network: Network<"solana">): Promise<SolanaTokenConfig> => {
@@ -23,27 +24,62 @@ type UnwrappedTokenMap = Partial<Mapped<SupportedUnwrappedToken<"solana">, Unwra
 type TokenCache = {[K in Network<"solana">]?: {fluidTokens: FluidTokenMap, unwrappedTokens: UnwrappedTokenMap, fluidProgramId: PublicKey}}
 
 export const useSolanaTokens = () => {
-  // cache fetched tokens in a ref
-  let {current: cache} = useRef<TokenCache>({});
+  // cache fetched tokens in a ref for network and chain switches
+  const tokenCache  = useRef<TokenCache>({});
+  const tokenCacheKey = "persist.tokenCache.solana";
   const [fluidTokens, setFluidTokens] = useState<FluidTokenMap>({});
+  const [loading, setLoading] = useState(true);
   const [unwrappedTokens, setUnwrappedTokens] = useState<UnwrappedTokenMap>({});
   const [network, setNetwork] = useState<Network<"solana">>();
   const [fluidProgramId, setFluidProgramId] = useState<PublicKey>();
 
+  // clear cache on page reset, to avoid becoming stale
   useEffect(() => {
-    if (!network)
+      window.onbeforeunload = function() {
+        localforage.removeItem(tokenCacheKey);
+      };
+      return () => {
+          window.onbeforeunload = null;
+      };
+  }, []);
+
+  // fetch and set tokens from cache if exists
+  useEffect(() => {
+    localforage.getItem(tokenCacheKey).then((localCache: any) => {
+      if (localCache && Object.keys(localCache).length > 0) {
+        tokenCache.current = localCache;
+        localforage.removeItem(tokenCacheKey)
+      };
+    }).finally(() => {
+      setLoading(false)
+    });
+    // set cache on component unmount
+    return (() => {
+      if (Object.keys(tokenCache.current).length > 0) {
+        localforage.setItem(tokenCacheKey, tokenCache.current);
+      }
+    })
+  }, [])
+
+
+  useEffect(() => {
+    if (!network || loading)
       return;
 
-    if (cache?.[network]) {
-      const {[network]: cachedNetwork} = cache;
-      if (cachedNetwork?.fluidTokens && cachedNetwork?.fluidProgramId && cachedNetwork?.unwrappedTokens) {
-        setFluidProgramId(new PublicKey(cachedNetwork.fluidProgramId));
-        setFluidTokens(cachedNetwork.fluidTokens);
-        setUnwrappedTokens(cachedNetwork.unwrappedTokens);
+    // load from cache if possible
+    if (tokenCache.current?.[network]) {
+      const {[network]: cachedNetwork} = tokenCache.current;
+      const {fluidTokens, fluidProgramId, unwrappedTokens} = cachedNetwork || {};
+
+      if (fluidTokens && fluidProgramId && unwrappedTokens) {
+        setFluidProgramId(new PublicKey(fluidProgramId));
+        setFluidTokens(fluidTokens);
+        setUnwrappedTokens(unwrappedTokens);
         return;
       }
     }
 
+    // otherwise import from JSON
     importSolanaTokens(network).then((config: SolanaTokenConfig) => {
       const fluid_: FluidTokenMap = {};
       const unwrapped_: UnwrappedTokenMap = {};
@@ -72,7 +108,8 @@ export const useSolanaTokens = () => {
           )
       });
 
-      cache[network] = {
+      // update the cache
+      tokenCache.current[network] = {
         fluidProgramId: new PublicKey(fluidProgramId),
         unwrappedTokens: unwrapped_,
         fluidTokens: fluid_,
@@ -82,7 +119,7 @@ export const useSolanaTokens = () => {
       setFluidTokens(fluid_);
       setUnwrappedTokens(unwrapped_);
     });
-  }, [network]);
+  }, [network, loading]);
 
   return {fluidProgramId, fluidTokens, unwrappedTokens, network, setNetwork}
 }
