@@ -17,6 +17,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env*.local
 
 npm-debug.log*
 yarn-debug.log*
@@ -27,3 +28,5 @@ public/index.css
 schema.graphql
 src/data/__generated__/tvlLiveTvlSubscription.graphql.ts
 .vercel
+
+

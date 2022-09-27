@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { ManualCarousel, Text } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
 import styles from "./Tweets.module.scss";
+// require("dotenv").config();
 
 const Tweets = () => {
   const instance = axios.create({
@@ -14,14 +15,14 @@ const Tweets = () => {
     withCredentials: false,
     timeout: 1000,
     headers: {
-      Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+      Authorization: `Bearer ${process.env.twitterBearerToken}`,
     },
   });
 
   useEffect(() => {
     instance
       .get(
-        `/2/users/${process.env.FLUIDITY_ID}/tweets?tweet.fields=created_at,text`
+        `/2/users/${process.env.fluidityID}/tweets?tweet.fields=created_at,text`
       )
       .then((response) => {
         console.log(response);
