@@ -105,12 +105,7 @@ func main() {
 				k.Format("Block %v did NOT contain transfer ABI topic", blockHash)
 			})
 
-			serverWork := worker.EthereumServerWork{
-				EthereumBlockLog:    &amqpBlock,
-				EthereumHintedBlock: nil,
-			}
-
-			queue.SendMessage(workerQueue.TopicEthereumServerWork, serverWork)
+			queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
 
 			return
 		}
@@ -153,11 +148,6 @@ func main() {
 
 		amqpBlock.Logs = append(amqpBlock.Logs, newFluidLogs...)
 
-		serverWork := worker.EthereumServerWork{
-			EthereumBlockLog:    &amqpBlock,
-			EthereumHintedBlock: nil,
-		}
-
-		queue.SendMessage(workerQueue.TopicEthereumServerWork, serverWork)
+		queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
 	})
 }

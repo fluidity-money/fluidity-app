@@ -110,8 +110,6 @@ const (
 	// EnvMovingAverageRedisKey to track the APY moving average with
 	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
 
-	// EnvApplicationContracts to list the application contracts to monitor
-	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
 )
 
 func main() {
@@ -122,7 +120,6 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 
 		ethereumDecimalPlaces_ = os.Getenv(EnvEthereumDecimalPlaces)
 
@@ -159,15 +156,10 @@ func main() {
 		ethEthTokenAddress            ethCommon.Address
 		ethUnderlyingTokenAddress     ethCommon.Address
 		ethAaveAddressProviderAddress ethCommon.Address
-		applicationContracts          []string
 
 		auroraEthFluxAddress   ethCommon.Address
 		auroraTokenFluxAddress ethCommon.Address
 	)
-
-	for _, address := range strings.Split(applicationContracts_, ",") {
-		applicationContracts = append(applicationContracts, address)
-	}
 
 	switch tokenBackend {
 	case BackendCompound:
@@ -236,27 +228,9 @@ func main() {
 	}
 
 	worker.GetEthereumServerWork(func(serverWork worker.EthereumServerWork) {
-		var (
-			blockBaseFee misc.BigInt
-			logs         []ethereum.Log
-			transactions []ethereum.Transaction
-			blockNumber  misc.BigInt
-			blockHash    ethereum.Hash
-
-			blockLog    = serverWork.EthereumBlockLog
-			hintedBlock = serverWork.EthereumHintedBlock
-
-			// if a block log, fluid contract transfers
-			// if a hinted block, application events
-			fluidTransfers   []worker.EthereumDecoratedTransfer
-			transfersInBlock int
-		)
-
 		// set the configuration using what's in the database for the block
-
-		workerConfig := worker_config.GetWorkerConfigEthereum(network.NetworkEthereum)
-
 		var (
+			workerConfig                 = worker_config.GetWorkerConfigEthereum(network.NetworkEthereum)
 			defaultSecondsSinceLastBlock = workerConfig.DefaultSecondsSinceLastBlock
 			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
 			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
@@ -266,37 +240,18 @@ func main() {
 		var (
 			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(currentAtxTransactionMargin)
 			secondsInOneYearRat            = new(big.Rat).SetUint64(SecondsInOneYear)
+			secondsSinceLastBlock              = defaultSecondsSinceLastBlock
 		)
 
-		secondsSinceLastBlock := defaultSecondsSinceLastBlock
+		var (
+			hintedBlock      = serverWork.EthereumHintedBlock
 
-		switch true {
-
-		// received from logs queue
-
-		case serverWork.EthereumBlockLog != nil:
-			blockBaseFee = blockLog.BlockBaseFee
-			logs = blockLog.Logs
-			transactions = blockLog.Transactions
-			blockNumber = blockLog.BlockNumber
-			blockHash = blockLog.BlockHash
-
-		// received from application server
-		case serverWork.EthereumHintedBlock != nil:
-			blockBaseFee = hintedBlock.BlockBaseFee
-			blockNumber = hintedBlock.BlockNumber
-			blockHash = hintedBlock.BlockHash
+			blockBaseFee     = hintedBlock.BlockBaseFee
+			blockNumber      = hintedBlock.BlockNumber
+			blockHash        = hintedBlock.BlockHash
 			transfersInBlock = hintedBlock.TransferCount
-			fluidTransfers = hintedBlock.DecoratedTransfers
-
-		default:
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Received empty work announcement for block hash %v!",
-					blockHash,
-				)
-			})
-		}
+			fluidTransfers   = hintedBlock.DecoratedTransfers
+		)
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)
 
@@ -311,63 +266,6 @@ func main() {
 		emission.EthereumBlockNumber = blockNumber
 
 		emission.SecondsSinceLastBlock = secondsSinceLastBlock
-
-		if hintedBlock == nil {
-
-			fluidTransfers, err = libEthereum.GetTransfers(
-				logs,
-				transactions,
-				blockHash,
-				contractAddress,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get a fluid transfer in block %#v!",
-						blockHash,
-					)
-					k.Payload = err
-				})
-			}
-
-			// handle sending to application server
-			applicationTransfers, err := libEthereum.GetApplicationTransfers(
-				logs,
-				transactions,
-				blockHash,
-				applicationContracts,
-				applications.ClassifyApplicationLogTopic,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get application events in block %#v!",
-						blockHash,
-					)
-					k.Payload = err
-				})
-			}
-
-			applicationEvent := worker.EthereumApplicationEvent{
-				ApplicationTransfers: applicationTransfers,
-				BlockLog:             *blockLog,
-			}
-
-			if len(applicationTransfers) > 0 {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"Found %v application events in block #%v, sending them to the application server!",
-						len(applicationTransfers),
-						blockHash,
-					)
-				})
-				queue.SendMessage(worker.TopicEthereumApplicationEvents, applicationEvent)
-			}
-
-			transfersInBlock = len(fluidTransfers)
-		}
 
 		averageTransfersInBlock, atxBlocks, atxTxCounts := addAndComputeAverageAtx(
 			blockNumber.Uint64(),

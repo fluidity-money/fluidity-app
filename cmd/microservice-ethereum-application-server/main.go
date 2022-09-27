@@ -6,9 +6,11 @@ package main
 
 import (
 	"strconv"
+	"strings"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -25,6 +27,9 @@ const (
 
 	// EnvUnderlyingTokenDecimals supported by the contract
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
+
+	// EnvApplicationContracts to list the application contracts to monitor
+	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
 )
 
 func main() {
@@ -32,6 +37,7 @@ func main() {
 		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
 		gethHttpUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
+		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 	)
 
 	contractAddress := ethCommon.HexToAddress(contractAddrString)
@@ -48,6 +54,12 @@ func main() {
 		})
 	}
 
+	var applicationContracts []string
+
+	for _, address := range strings.Split(applicationContracts_, ",") {
+		applicationContracts = append(applicationContracts, address)
+	}
+
 	gethClient, err := ethclient.Dial(gethHttpUrl)
 
 	if err != nil {
@@ -59,17 +71,56 @@ func main() {
 
 	defer gethClient.Close()
 
-	worker.EthereumApplicationEvents(func(applicationEvent worker.EthereumApplicationEvent) {
+	worker.GetEthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
 
 		var (
-			// transfers that generated application events
-			applicationTransfers = applicationEvent.ApplicationTransfers
+			logs = blockLog.Logs
+			transactions = blockLog.Transactions
+			blockHash = blockLog.BlockHash
+		)
 
+		fluidTransfers, err := libEthereum.GetTransfers(
+			logs,
+			transactions,
+			blockHash,
+			contractAddress,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get a fluid transfer in block %#v!",
+					blockHash,
+				)
+				k.Payload = err
+			})
+		}
+
+		// handle sending to application server
+		applicationTransfers, err := libEthereum.GetApplicationTransfers(
+			logs,
+			transactions,
+			blockHash,
+			applicationContracts,
+			applications.ClassifyApplicationLogTopic,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get application events in block %#v!",
+					blockHash,
+				)
+				k.Payload = err
+			})
+		}
+
+		var (
 			// the block in question
-			applicationBlock = applicationEvent.BlockLog
+			applicationBlock = blockLog
 
 			// worker server has already found application transfers using the contract in this block
-			fluidTransferCount = len(applicationTransfers)
+			fluidTransferCount = len(fluidTransfers)
 
 			// transfers that we're adding information to
 			decoratedTransfers = make([]worker.EthereumDecoratedTransfer, fluidTransferCount)
@@ -87,17 +138,13 @@ func main() {
 				})
 			}
 
-			// nil, nil for a skipped event
-			if fee == nil {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"Skipping an application transfer for transaction %#v and application %#v!",
-						transfer.Transaction.Hash.String(),
-						transfer.Application,
-					)
-				})
+			var decorator *worker.EthereumWorkerDecorator
 
-				continue
+			// nil, nil for a skipped event
+			if fee != nil {
+				decorator = &worker.EthereumWorkerDecorator{
+					ApplicationFee: fee,
+				}
 			}
 
 			toAddress, fromAddress, err := applications.GetApplicationTransferParties(transfer)
@@ -109,10 +156,6 @@ func main() {
 				})
 			}
 
-			decorator := &worker.EthereumWorkerDecorator{
-				ApplicationFee: fee,
-			}
-
 			decoratedTransfer := worker.EthereumDecoratedTransfer{
 				SenderAddress:    fromAddress,
 				RecipientAddress: toAddress,
@@ -122,6 +165,9 @@ func main() {
 
 			decoratedTransfers[i] = decoratedTransfer
 		}
+
+		// add the non-app fluid transfers
+		decoratedTransfers = append(decoratedTransfers, fluidTransfers...)
 
 		serverWork := worker.EthereumServerWork{
 			EthereumHintedBlock: &worker.EthereumHintedBlock{
