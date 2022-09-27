@@ -2,19 +2,19 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { useChainContext } from "hooks/ChainContext";
+import useViewport from "hooks/useViewport";
 import {
   Display,
-  GeneralButton,
-  Heading,
+  Text,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
-import { useChainContext } from "hooks/ChainContext";
 import Video from "components/Video";
 import styles from "./Demo.module.scss";
-import useViewport from "hooks/useViewport";
 
 const Demo = () => {
   const { apiState } = useChainContext();
+
   const { width } = useViewport();
   const breakpoint = 620;
 
@@ -31,44 +31,45 @@ const Demo = () => {
       <div className={`${styles.container} bg-light`}>
         <Video
           src={
-            window.location.origin + "/assets/videos/FluidityOpportunityB.mp4"
+            "/assets/videos/FluidityOpportunityB.mp4"
           }
           type={"none"}
           loop={true}
         />
 
-        <div>
+        <div id="demo">
           <Display
             large={width > breakpoint && true}
             small={width < breakpoint && true}
           >
             {numberToMonetaryString(weekTotalRewards)}
           </Display>
-          <Heading
-            as={width > breakpoint ? "h2" : "h4"}
-            className={styles.gray}
+          <Display
+            extraSmall={width > breakpoint}
+            xxs={width <= breakpoint}
+            color={"gray"}
           >
             Fluid prizes claimed in the last week.
-          </Heading>
-          <Heading
-            as={width > breakpoint ? "h4" : "h5"}
-            className={styles.gray}
+          </Display>
+          <Text
+            size={width > breakpoint ? "xl" : "lg"}
           >
-            Connect your wallet to see what you could make
-          </Heading>
+            Connect your wallet to see what you could make.
+          </Text>
           <section>
             {/* <GeneralButton version={"primary"} buttonType={"text"} size={"medium"} handleClick={function (): void {       
             } }>
               SHOW ME A DEMO
             </GeneralButton> */}
-            <GeneralButton
-              version={"secondary"}
-              buttonType={"text"}
-              size={"medium"}
-              handleClick={function (): void {}}
-            >
-              LAUNCH FLUIDITY
-            </GeneralButton>
+            <Video
+              className={styles.comingSoonButton}
+              src={"/assets/videos/FluidityComingSoon.mp4"}
+              type={"reduce"}
+              loop={true}
+              scale={0.4}
+              width={"auto"}
+              height={80}
+            />
           </section>
         </div>
       </div>

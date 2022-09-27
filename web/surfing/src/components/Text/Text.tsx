@@ -1,4 +1,3 @@
-import React from "react"
 import styles from "./Text.module.scss"
 
 type TextProps = {
@@ -10,13 +9,14 @@ type TextProps = {
 }
 
 const Text = ({ children, size="sm", as="span", prominent=false, className, ...props }: TextProps) => {
+    const classNameProps = className || "";
+
     const sizeProps = `${styles[size]}`
     const prominentProps = `${prominent ? styles.prominent : ""}`
-    const classNameProps = `${className || ""}`
-
     const classProps = `${styles.text} ${sizeProps} ${prominentProps} ${classNameProps}`;
+
     const Component = as || "span";
-    return <Component {...props} className={classProps}>
+    return <Component className={classProps} {...props}>
         {children}
     </Component>
 }

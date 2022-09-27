@@ -11,51 +11,51 @@
   @include max-860px {
     padding-right: 4%;
   }
+  @media (max-width: 620px) {
+    min-height: 550px;
+  }
 }
 
 .carouselText {
-  // h2 {
-  //   margin-right: 20px;
-  //   opacity: 1;
-  // }
   background-color: $fluidBlack;
 }
 
 .docsCard {
-  // border: 1px solid white;
   height: 350px;
   min-width: 350px;
   margin-right: 20px;
   margin-bottom: 50px;
   background-color: $backgroundBlack;
-  padding: 20px;
+  padding: 30px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 500px) {
+    margin-bottom: 20px;
+    min-width: 300px;
+  }
 
   .imgContainer {
-    width: 100%;
-
+    width: 90%;
     display: flex;
-    justify-content: center;
-    img {
-      max-width: 100%;
-      display: block;
+    justify-content: flex-start;
+
+    span {
+      width: 45px;
+      height: 45px;
+      display: flex;
+      border: 1px solid gray;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
     }
   }
 
-  // h3 {
-  //   margin: 10px 0 10px 0;
-  //   padding: 10px;
-  // }
-
-  // p {
-  //   padding: 10px;
-  //   font-family: "Aeonik";
-  //   font-size: 20px;
-  //   color: $textGrey;
-  // }
-
   a {
     color: $textGrey;
-    padding: 10px;
+    padding-top: 10px;
     font-size: 11px;
   }
 }
@@ -63,10 +63,6 @@
 .desktopViewFormInput {
   padding: 20px;
   background-color: $fluidBlack;
-  // h4 {
-  //   padding-left: 10px;
-  //   margin-bottom: 24px;
-  // }
   label {
     padding: 10px;
     font-size: 13px;
@@ -76,10 +72,6 @@
     background-color: $fluidBlack;
     padding: 10px;
     justify-content: space-between;
-    // h4 {
-    //   margin-bottom: 30px;
-    //   padding-left: 10px;
-    // }
     input {
       width: 80%;
       padding: 12px 20px;
@@ -115,11 +107,6 @@
     padding: 30px 10px 10px 10px;
     width: 80%;
     background-color: rgb(17, 17, 17);
-    // p {
-    //   font-size: large;
-    //   margin-top: 10px;
-    //   color: $textGrey;
-    // }
     form {
       padding-bottom: 20px;
       div {
@@ -169,4 +156,20 @@
   &Hollow {
     margin-right: 10px;
   }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  height: 110px;
+  justify-content: space-between;
+}
+
+.allDocs {
+  width: 100%;
+  display: flex;
+  padding-left: 30px;
+  margin-top: 20px;
 }

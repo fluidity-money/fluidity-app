@@ -21,9 +21,11 @@ const HowItWorksTemplate = ({
   return (
     <div className={styles.content}>
       <Heading as="h2">{children}</Heading>
-      <Text as="p" size={"xl"} prominent={true}>{header}</Text>
+      <Text as="p" size={"xl"} prominent={true}>
+        {header}
+      </Text>
       {info.map((paragraph, i) => (
-        <Text as="p" key={`para-${i}`} size={"lg"}>
+        <Text as="p" key={`para-${i}`} size={"md"}>
           {paragraph}
         </Text>
       ))}

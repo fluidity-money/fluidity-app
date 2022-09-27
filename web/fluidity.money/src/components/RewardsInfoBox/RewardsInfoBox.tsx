@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
+import useViewport from "hooks/useViewport";
 import {
   LinkButton,
   BlockchainModal,
@@ -17,18 +18,14 @@ import styles from "./RewardsInfoBox.module.scss";
 interface IRewardBoxProps {
   rewardPool: number;
   totalTransactionValue: number;
-  setToggle: () => void;
-  toggle: boolean;
-  initalView: boolean;
-  switchAndAnimate: () => void;
+  changeScreen: () => void;
   type: "black" | "transparent";
 }
 
 const RewardsInfoBox = ({
   rewardPool,
   totalTransactionValue,
-  initalView,
-  switchAndAnimate,
+  changeScreen,
   type,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
@@ -40,6 +37,9 @@ const RewardsInfoBox = ({
 
   const [showModal, setShowModal] = useState(false);
 
+  const { width } = useViewport();
+  const mobileBreakpoint = 620;
+
   const options = Object.keys(SupportedChains).map((chain) => ({
     name: chain,
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
@@ -47,15 +47,11 @@ const RewardsInfoBox = ({
 
   return (
     <div
-      className={
-        initalView
-          ? `${styles.infoBoxContainer} ${
-              type === "black" ? styles.fadeIn : styles.fadeOut
-            }`
-          : `${styles.infoBoxContainer} ${
-              type === "black" ? styles.fadeOut : styles.fadeIn
-            }`
-      }
+      className={`${
+        type === "black"
+          ? styles.infoBoxContainer
+          : styles.infoBoxContainerStats
+      }`}
     >
       <div
         className={
@@ -69,15 +65,15 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={switchAndAnimate}>
+        <div onClick={changeScreen}>
           <Heading as="h1">
             {type === "black"
-              ? numberToMonetaryString(rewardPool)
-              : totalTransactionValue.toLocaleString("en-US")}
+              ? "$100,000"
+              : "5,000,000+"}
           </Heading>
         </div>
         <Heading as="h4">
-          {type === "black" ? "Reward pool" : "Total transactions"}
+          {type === "black" ? "Reward pool" : "Total transactions (on testing)"}
         </Heading>
         {showModal && (
           <BlockchainModal
@@ -86,8 +82,10 @@ const RewardsInfoBox = ({
               name: chain,
               icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
             }}
+            className={styles.overlap}
             options={options}
             setOption={setChain}
+            mobile={width <= mobileBreakpoint}
           />
         )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>

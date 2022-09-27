@@ -1,7 +1,7 @@
 @use 'common' as *;
 
 .button {
-  //   display: inline-block;
+  font-family: "Aeonik Mono";
   text-transform: uppercase;
   background-color: transparent;
   display: flex;
@@ -25,8 +25,8 @@
     display: inline-block;
     font-size: 14px;
   }
-  
-  &:hover:enabled  {
+
+  &:hover:enabled {
     background-color: map-get($bg, "alternate");
     .icon {
       stroke: $black;

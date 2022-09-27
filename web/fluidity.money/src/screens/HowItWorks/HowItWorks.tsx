@@ -2,8 +2,9 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import Video from "components/Video";
 import { useEffect, useState } from "react";
+import useViewport from "hooks/useViewport";
+import Video from "components/Video";
 import {
   ContinuousCarousel,
   Heading,
@@ -11,7 +12,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
-import useViewport from "hooks/useViewport";
 
 const HowItWorks = () => {
   /* 
@@ -36,7 +36,7 @@ const HowItWorks = () => {
     },
   ].map(({ bgImage, ...image }) => ({
     ...image,
-    bgImage: window.location.origin + bgImage,
+    bgImage: bgImage,
   }));
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -55,7 +55,7 @@ const HowItWorks = () => {
 
   const backgroundText = images[currentImageIndex].text;
 
-  const size = width > 1000 ? "h1" : width < 1000 && width > 520 ? "h4" : "h5";
+  const size = width > 1130 ? "h2" : width < 1130 && width > 520 ? "h4" : "h5";
 
   const callout = (
     <div className={styles.callout}>
@@ -90,24 +90,15 @@ const HowItWorks = () => {
 
       <div className={styles.grid}>
         <div className={styles.left}>
-          <Text
-            as={"p"}
-            className={currentImageIndex === 0 ? styles.bold : styles.normal}
-          >
+          <Text as={"p"} prominent={currentImageIndex === 0}>
             Fluid assets are a 1:1 wrapped asset with perpetual payout
             properties.
           </Text>
-          <Text
-            as={"p"}
-            className={currentImageIndex === 1 ? styles.bold : styles.normal}
-          >
-            They distribute yield when when used on any on-chain use-case. Yiled
+          <Text as={"p"} prominent={currentImageIndex === 1}>
+            They distribute yield when when used on any on-chain use-case. Yield
             is gained through utility.
           </Text>
-          <Text
-            as={"p"}
-            className={currentImageIndex === 2 ? styles.bold : styles.normal}
-          >
+          <Text as={"p"} prominent={currentImageIndex === 2}>
             The user is incentivised through governance.
           </Text>
           <a href="/howitworks">
@@ -126,8 +117,8 @@ const HowItWorks = () => {
             currentImageIndex === 0 ? (
               <img
                 className={styles.behind}
-                style={{ opacity: 1, position: "absolute", zIndex: 5 }}
-                src={window.location.origin + "/assets/text/FLUIDIFY.svg"}
+                style={{ opacity: 1, position: "absolute", zIndex: 1 }}
+                src={"/assets/text/FLUIDIFY.svg"}
                 alt={images[currentImageIndex].text}
               />
             ) : (
@@ -143,26 +134,30 @@ const HowItWorks = () => {
           <div className={styles.video}>
             {currentImageIndex === 0 ? (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityWrap.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"abc"}
-                scale={0.8}
+                scale={0.6}
               />
             ) : currentImageIndex === 1 ? (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityYield.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"xyz"}
+                scale={0.7}
               />
             ) : (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityHowItWorks.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"jfk"}
-                scale={0.8}
+                scale={0.7}
               />
             )}
           </div>

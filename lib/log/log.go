@@ -17,6 +17,9 @@ const (
 	// EnvSentryUrl to use for logging application logs and errors
 	EnvSentryUrl = `FLU_SENTRY_URL`
 
+	// EnvSilentMode to enable when no logging should happen (including Fatal)
+	EnvSilentMode = `FLU_SILENT`
+
 	// sentryExitTime to take when exiting while logging
 	SentryExitTime = 2 * time.Second
 )

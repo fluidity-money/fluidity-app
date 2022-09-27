@@ -7,27 +7,15 @@ import { useLocation } from "react-router-dom";
 import {
   ContinuousCarousel,
   ManualCarousel,
-  GeneralButton,
   Heading,
   Text,
+  LinkButton,
 } from "@fluidity-money/surfing";
 import styles from "./Docs.module.scss";
+import useViewport from "hooks/useViewport";
 
 const Docs = () => {
-  /* scrolls to location on pageload if it contains same ID or scrolls to the top
-   for ResourcesNavModal to work*/
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash) {
-      let elem = document.getElementById(location.hash.slice(1));
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }
-  }, [location]);
-
+  const { width } = useViewport();
   const callout = (
     <div className={styles.callout}>
       <Heading hollow={true} as="h4" className={styles.text}>
@@ -59,62 +47,46 @@ const Docs = () => {
         </ContinuousCarousel>
       </div>
       <div className={styles.container}>
-        <ManualCarousel>
+        <ManualCarousel scrollBar={width < 500 ? true : false}>
           {items.map((item, index) => (
-            <div key={index} className={styles.docsCard}>
-              <div className={styles.imgContainer}>
-                <img src={item.img} />
+            <a href={item.link} rel="noopener noreferrer" target="_blank">
+              <div key={index} className={styles.docsCard}>
+                <div className={styles.imgContainer}>
+                  {/* <img src={item.img} alt="carousel-object" /> */}
+                  <span
+                    role="img"
+                    title="crystal ball"
+                    aria-label="crystal ball"
+                  >
+                    {item.img}
+                  </span>
+                </div>
+                <div className={styles.content}>
+                  <Heading as="h3">{item.title}</Heading>
+                  <a href={item.link} rel="noopener noreferrer" target="_blank">
+                    <LinkButton
+                      size={"medium"}
+                      type={"external"}
+                      handleClick={() => {}}
+                    >
+                      DOCS
+                    </LinkButton>
+                  </a>
+                </div>
               </div>
-              <Heading as="h3">{item.title}</Heading>
-              <a href={item.link}>
-                DOCS <i>*</i>
-              </a>
-            </div>
+            </a>
           ))}
         </ManualCarousel>
-      </div>
-      <div className={styles.desktopViewFormInput}>
-        <Heading as="h4">Stay hydrated</Heading>
-        <Heading as="h6">EMAIL</Heading>
-        <div>
-          <input type="text" placeholder="elon@email.com" />
-          <GeneralButton
-            version={"secondary"}
-            buttonType={"text"}
-            size={"medium"}
-            handleClick={function (): void {
-              throw new Error("Function not implemented.");
-            }}
-          >
-            GIMME THE JUICE
-          </GeneralButton>
-        </div>
-      </div>
-      <div className={styles.mobileViewFormInput}>
-        <div>
-          <Heading as="h3">Stay hydrated</Heading>
-          <Text as="p">
-            Subscribe to our monthly newsletter to stay up to date with our
-            progress and roadmap.
-          </Text>
-          <form>
-            <div>
-              <label>Name</label>
-              <input type="text" placeholder="Elon" />
-              <label>Email</label>
-              <input type="text" placeholder="elon@email.com" />
-            </div>
-            <GeneralButton
-              version={"primary"}
-              buttonType={"text"}
+        <div className={styles.allDocs}>
+          <a href={"https://docs.fluidity.money/</div>"}>
+            <LinkButton
               size={"medium"}
-              handleClick={function (): void {
-                throw new Error("Function not implemented.");
-              }}
+              type={"external"}
+              handleClick={() => {}}
             >
-              GIMME THE JUICE
-            </GeneralButton>
-          </form>
+              ALL DOCS
+            </LinkButton>
+          </a>
         </div>
       </div>
     </div>
@@ -125,27 +97,27 @@ export default Docs;
 
 const items = [
   {
-    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    img: "🔮",
     title: "Why Fluidity?",
     link: "https://docs.fluidity.money/docs/learning-and-getting-started/why-fluidity",
   },
   {
-    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    img: "❓",
     title: "What are Fluid Assets?",
     link: "https://docs.fluidity.money/docs/learning-and-getting-started/what-are-fluid-assets",
   },
   {
-    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    img: "🌟",
     title: "How do you get a Fluid Asset?",
     link: "https://docs.fluidity.money/docs/learning-and-getting-started/how-do-you-get-a-fluid-asset",
   },
   {
-    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    img: "💰",
     title: "How are the rewards earned?",
     link: "https://docs.fluidity.money/docs/learning-and-getting-started/how-are-the-rewards-earned",
   },
   {
-    img: "https://www.gitbook.com/cdn-cgi/image/height=40,fit=contain,dpr=2,format=auto/https%3A%2F%2F3930547829-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252Fx4yhCpDhoCMNHh5hnFdg%252Flogo%252FdHNKzwEpKSmAvvwCKjPf%252FNEW%2520GRADIENT%2520WHITE%2520BACKGROUND%2520LOGO%2520FLUIDITY.png.png%3Falt%3Dmedia%26token%3D1d36671f-70f0-4059-8bfb-dfd1abbcac53",
+    img: "🗃",
     title: "The Economics of a Fluid Asset",
     link: "https://docs.fluidity.money/docs/learning-and-getting-started/the-economics-of-a-fluid-asset",
   },

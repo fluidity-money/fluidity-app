@@ -8,8 +8,8 @@
     gap: 10px;
 
     .imageContainer {
-      width: 12px;
-      height: 18px;
+      width: 11px;
+      height: 19px;
 
       img {
         max-width: 100%;
@@ -26,6 +26,8 @@
   gap: 5px;
 }
 
-.text {
-  font-size: 7px;
+.socialText {
+  // Important here because surfing keeps overriding styles
+  font-size: 8px !important;
+  font-family: "Aeonik Mono" !important;
 }

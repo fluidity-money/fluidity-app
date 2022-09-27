@@ -99,7 +99,7 @@ func printLoggingMessage(stream io.WriteCloser, time time.Time, workerId, level,
 	)
 }
 
-func startLoggingServer(debugEnabled, dieFast bool, processInvocation, workerId, sentryUrl, environment string) {
+func startLoggingServer(debugEnabled, dieFast, silentEnabled bool, processInvocation, workerId, sentryUrl, environment string) {
 	// shutdownCallbacks to shut down other registered services when a service
 	// exits fatally
 
@@ -152,15 +152,17 @@ func startLoggingServer(debugEnabled, dieFast bool, processInvocation, workerId,
 
 			now := time.Now()
 
-			printLoggingMessage(
-				loggingStream,
-				now,
-				workerId,
-				logString,
-				context,
-				message,
-				payload,
-			)
+			if !silentEnabled {
+				printLoggingMessage(
+					loggingStream,
+					now,
+					workerId,
+					logString,
+					context,
+					message,
+					payload,
+				)
+			}
 
 			if isSentryError {
 				sentryLogError(processInvocation, workerId, log)

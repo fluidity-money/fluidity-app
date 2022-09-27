@@ -1,0 +1,45 @@
+@use "../../styles/config.scss" as *;
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $fluidBlack;
+  
+  div {
+    padding: 40px 24px 40px 24px;
+    width: 80%;
+    border-radius: 12px;
+    background-color: rgb(255,255,255,0.05);
+
+    h3 {
+      margin-bottom: 12px;
+    }
+
+    form {
+      margin-top: 64px;
+
+      section {
+        padding-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        width: 100%;
+        input {
+          width: 100%;
+          padding: 12px 20px 10px 5px;
+          display: inline-block;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-top: 0px;
+          border-right: 0px;
+          border-left: 0px;
+          box-sizing: border-box;
+          background-color: transparent;
+          font-size: 20px;
+          color: $textGrey;
+          margin: 0 1% 10px 0;
+        }
+      }
+    }
+  }
+}

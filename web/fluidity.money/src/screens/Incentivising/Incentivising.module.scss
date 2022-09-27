@@ -5,8 +5,13 @@
   align-items: center;
   text-align: center;
   height: 100vh;
+  max-height: 960px;
   width: 100%;
-
+  background-image: url("../../../public/assets/images/bg-blur-desktop.png"),url("../../../public/assets/images/dot-graph.svg");
+  background-position: top, center 691px;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  
   div {
     position: absolute;
   }
@@ -29,7 +34,6 @@
 
 .backgroundText {
   position: relative;
-  font-weight: 1000;
 }
 
 .video {

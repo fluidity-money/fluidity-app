@@ -10,12 +10,12 @@
 
   div {
     display: flex;
+    text-align: center;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: absolute;
     width: 50%;
-    min-height: 400px;
     gap: 20px;
 
     h1 {
@@ -32,8 +32,13 @@
       color: $textGrey;
     }
 
+    section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @include max-860px {
-      text-align: center;
       width: 70%;
     }
   }
@@ -54,4 +59,13 @@
 .gray {
   color: #828381;
   font-weight: 100;
+}
+
+.comingSoonButton {
+    cursor: pointer;
+    position: relative;
+    width: 130px;
+    height: 60px;
+    border-radius: 50px;
+    border: 0.5px solid $fluidWhite;
 }

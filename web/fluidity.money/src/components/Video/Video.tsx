@@ -2,10 +2,11 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { isFirefox } from "react-device-detect";
 import styles from "./Video.module.scss";
 
 interface IPropsVideo {
-  src: string;
+  src: string | string[];
   type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
   loop: boolean;
   display?: "none" | "inline";
@@ -16,12 +17,25 @@ interface IPropsVideo {
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
   className?: string;
+  mimeType?: string | string[];
+  
+  // Width of container
+  //   dynamic - Change explicit scale
+  //   auto - Automatically scale container width
+  //   number - Fixed width
+  width?: "dynamic" | "auto" | string | number;
+  
+  // Height of container
+  //   auto - Automatically scale container height
+  //   number - Fixed height
+  height?: "auto" | number;
 }
 
 export const Video = ({
   key,
   src,
   type,
+  mimeType = "video/mp4",
   loop,
   display="inline",
   scale=1,
@@ -30,12 +44,29 @@ export const Video = ({
   onEnded=() => {},
   onLoad=() => {},
   className,
+  width="dynamic",
+  height=900,
   ...props
 }: IPropsVideo) => {
-  let ext = src.split(".").pop();
   
   const classProps = className || "";
 
+  const dynamicWidth = isFirefox
+    ? `${scale * 400}px`
+    : `${scale * 100}%`;
+  
+  let widthProp = width;
+  
+  if (widthProp === "dynamic") {
+    widthProp = dynamicWidth;
+  } else if (typeof widthProp === "number") {
+    widthProp = `${widthProp}px`;
+  }
+  
+  const heightProp = typeof height === "number"
+    ? `${height}px`
+    : height;
+  
   return (
     <video
       key={key}
@@ -46,15 +77,17 @@ export const Video = ({
       className={`${styles.videoContainer} ${styles[type]} ${classProps}`}
       style={{
         display: display,
-        width: `${scale * 100}%`,
         opacity: `${opacity}`,
-        margin: margin
+        margin: margin,
+        width: widthProp,
+        height: heightProp,
       }}
       onEnded={onEnded}
       onPlaying={onLoad}
       {...props}
     >
-      <source src={src} type={"video/" + ext} />
+      {Array.isArray(src) ?
+        src.map((v, i) => {return <source src={v} type={mimeType[i]} />}) :  <source src={src} type={mimeType as string} /> }
     </video>
   );
 };
