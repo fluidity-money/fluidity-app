@@ -5,6 +5,7 @@ import {Network, SupportedFluidToken, SupportedUnwrappedToken} from "../../compo
 import {FluidSolanaToken, SolanaTokenConfig, UnwrappedSolanaToken} from "../solana/token";
 import {Mapped} from "../types";
 import localforage from "localforage";
+import {removeOnUnload} from "../tokenCache";
 
 // defaults to devnet
 const importSolanaTokens = async(network: Network<"solana">): Promise<SolanaTokenConfig> => {
@@ -41,12 +42,7 @@ export const useSolanaTokens = () => {
 
   // clear cache on page reset, to avoid becoming stale
   useEffect(() => {
-      window.onbeforeunload = function() {
-        localforage.removeItem(tokenCacheKey);
-      };
-      return () => {
-          window.onbeforeunload = null;
-      };
+    return removeOnUnload();
   }, []);
 
   // fetch and set tokens from cache if exists
