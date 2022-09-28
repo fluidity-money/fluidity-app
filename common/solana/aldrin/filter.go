@@ -351,7 +351,20 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 
 	if instructionNumber < numBaseInstructions {
 		// get the second and third inner instructions originating from this instruction
-		innerInstruction := innerInstructions[instructionNumber]
+		var innerInstruction types.TransactionInnerInstruction
+
+		for _, inner := range(innerInstructions) {
+			if inner.Index == instructionNumber {
+				innerInstruction = inner
+			}
+		}
+
+		if len(innerInstruction.Instructions) == 0 {
+			return false, fmt.Errorf(
+				"could not find Aldrin swap inner instructions!",
+			)
+		}
+
 		feeMintInstruction = innerInstruction.Instructions[1]
 		destinationTransferInstruction = innerInstruction.Instructions[2]
 	} else {
@@ -364,7 +377,7 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 
 	var feeAmount int64
 
-	err := borsh.Deserialize(&feeAmount, feeMintInstructionData)
+	err := borsh.Deserialize(&feeAmount, feeMintInstructionData[1:])
 
 	if err != nil {
 		return false, fmt.Errorf(
@@ -408,7 +421,7 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 
 	var destinationTransferAmount int64
 
-	err = borsh.Deserialize(&destinationTransferAmount, destinationTransferInstructionData)
+	err = borsh.Deserialize(&destinationTransferAmount, destinationTransferInstructionData[1:])
 
 	if err != nil {
 		return false, fmt.Errorf(
