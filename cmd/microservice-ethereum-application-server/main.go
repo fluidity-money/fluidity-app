@@ -96,7 +96,6 @@ func main() {
 			})
 		}
 
-		// handle sending to application server
 		applicationTransfers, err := libEthereum.GetApplicationTransfers(
 			logs,
 			transactions,
@@ -123,7 +122,7 @@ func main() {
 		}
 
 		// loop over application events in the block, add payouts as decorator
-		for i, transfer := range applicationTransfers {
+		for _, transfer := range applicationTransfers {
 
 			fee, err := applications.GetApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
 
