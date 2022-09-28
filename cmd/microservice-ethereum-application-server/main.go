@@ -115,16 +115,12 @@ func main() {
 			})
 		}
 
-		var (
-			// the block in question
-			applicationBlock = blockLog
+		decoratedTransfers := make([]worker.EthereumDecoratedTransfer, len(fluidTransfers))
 
-			// worker server has already found application transfers using the contract in this block
-			fluidTransferCount = len(fluidTransfers)
-
-			// transfers that we're adding information to
-			decoratedTransfers = make([]worker.EthereumDecoratedTransfer, fluidTransferCount)
-		)
+		// add the non-app fluid transfers
+		for i, fluidTransfer := range fluidTransfers {
+			decoratedTransfers[i] = fluidTransfer
+		}
 
 		// loop over application events in the block, add payouts as decorator
 		for i, transfer := range applicationTransfers {
@@ -166,18 +162,12 @@ func main() {
 			decoratedTransfers[i] = decoratedTransfer
 		}
 
-		// add the non-app fluid transfers
-		decoratedTransfers = append(decoratedTransfers, fluidTransfers...)
-
-		serverWork := worker.EthereumServerWork{
-			EthereumHintedBlock: &worker.EthereumHintedBlock{
-				BlockHash:          applicationBlock.BlockHash,
-				BlockBaseFee:       applicationBlock.BlockBaseFee,
-				BlockTime:          applicationBlock.BlockTime,
-				BlockNumber:        applicationBlock.BlockNumber,
-				TransferCount:      fluidTransferCount,
-				DecoratedTransfers: decoratedTransfers,
-			},
+		serverWork := worker.EthereumHintedBlock{
+			BlockHash:          blockLog.BlockHash,
+			BlockBaseFee:       blockLog.BlockBaseFee,
+			BlockTime:          blockLog.BlockTime,
+			BlockNumber:        blockLog.BlockNumber,
+			DecoratedTransfers: decoratedTransfers,
 		}
 
 		// send to server

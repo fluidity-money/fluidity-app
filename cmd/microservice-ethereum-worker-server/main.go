@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -17,9 +16,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
@@ -28,7 +25,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -227,7 +223,7 @@ func main() {
 		})
 	}
 
-	worker.GetEthereumServerWork(func(serverWork worker.EthereumServerWork) {
+	worker.GetEthereumHintedBlocks(func(hintedBlock worker.EthereumHintedBlock) {
 		// set the configuration using what's in the database for the block
 		var (
 			workerConfig                 = worker_config.GetWorkerConfigEthereum(network.NetworkEthereum)
@@ -244,13 +240,11 @@ func main() {
 		)
 
 		var (
-			hintedBlock      = serverWork.EthereumHintedBlock
-
 			blockBaseFee     = hintedBlock.BlockBaseFee
 			blockNumber      = hintedBlock.BlockNumber
 			blockHash        = hintedBlock.BlockHash
-			transfersInBlock = hintedBlock.TransferCount
 			fluidTransfers   = hintedBlock.DecoratedTransfers
+			transfersInBlock = len(fluidTransfers)
 		)
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)

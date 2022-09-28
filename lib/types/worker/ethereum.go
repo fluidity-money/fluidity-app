@@ -86,15 +86,7 @@ type (
 		BlockBaseFee       misc.BigInt                 `json:"block_base_fee"`
 		BlockTime          uint64                      `json:"block_time"`
 		BlockNumber        misc.BigInt                 `json:"block_number"`
-		TransferCount      int                         `json:"transfer_count"`
 		DecoratedTransfers []EthereumDecoratedTransfer `json:"decorated_transfers"`
-	}
-
-	// Work that the worker server receives, containing either a block
-	// log (from upstream) or a hinted block (from application server)
-	EthereumServerWork struct {
-		EthereumBlockLog    *EthereumBlockLog    `json:"block_log"`
-		EthereumHintedBlock *EthereumHintedBlock `json:"hinted_block"`
 	}
 
 	// An event the worker server sends for processing when it finds a log of interest

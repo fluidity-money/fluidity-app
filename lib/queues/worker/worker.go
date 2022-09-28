@@ -26,7 +26,6 @@ const (
 type (
 	EthereumAnnouncement        = worker.EthereumAnnouncement
 	EthereumBlockLog            = worker.EthereumBlockLog
-	EthereumServerWork          = worker.EthereumServerWork
 	EthereumHintedBlock         = worker.EthereumHintedBlock
 	EthereumDecoratedTransfer   = worker.EthereumDecoratedTransfer
 	EthereumWorkerDecorator     = worker.EthereumWorkerDecorator
@@ -64,13 +63,13 @@ func GetEthereumBlockLogs(f func(EthereumBlockLog)) {
 	})
 }
 
-func GetEthereumServerWork(f func(EthereumServerWork)) {
+func GetEthereumHintedBlocks(f func(EthereumHintedBlock)) {
 	queue.GetMessages(TopicEthereumServerWork, func(message queue.Message) {
-		var serverWork EthereumServerWork
+		var hintedBlock EthereumHintedBlock
 
-		message.Decode(&serverWork)
+		message.Decode(&hintedBlock)
 
-		f(serverWork)
+		f(hintedBlock)
 	})
 }
 
