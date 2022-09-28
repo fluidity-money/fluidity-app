@@ -78,6 +78,8 @@ type (
 		SenderAddress    ethereum.Address         `json:"sender_address"`
 		RecipientAddress ethereum.Address         `json:"recipient_address"`
 		Decorator        *EthereumWorkerDecorator `json:"decorator"`
+
+		AppEmissions EthereumAppFees `json:"app_emissions"`
 	}
 
 	// Hinted block sent from the application server

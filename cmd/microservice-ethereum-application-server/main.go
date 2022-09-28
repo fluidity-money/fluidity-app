@@ -124,7 +124,7 @@ func main() {
 		// loop over application events in the block, add payouts as decorator
 		for _, transfer := range applicationTransfers {
 
-			fee, err := applications.GetApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
+			fee, emission, err := applications.GetApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -164,6 +164,7 @@ func main() {
 				RecipientAddress: toAddress,
 				Decorator:        decorator,
 				Transaction:      transfer.Transaction,
+				AppEmissions:     emission,
 			}
 
 			decoratedTransfers = append(decoratedTransfers, decoratedTransfer)

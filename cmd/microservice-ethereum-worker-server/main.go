@@ -472,6 +472,7 @@ func main() {
 				transferType      = transfer.Transaction.Type
 				gasTipCap         = transfer.Transaction.GasTipCap
 				applicationFeeUsd *big.Rat
+				appEmission       = transfer.AppEmissions
 			)
 
 			if transfer.Decorator != nil {
@@ -574,6 +575,8 @@ func main() {
 			emission.TransactionHash = transactionHash.String()
 			emission.RecipientAddress = recipientAddress.String()
 			emission.SenderAddress = senderAddress.String()
+
+			emission.EthereumAppFees = appEmission
 
 			blockAnnouncements = append(blockAnnouncements, announcement)
 

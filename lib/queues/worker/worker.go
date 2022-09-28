@@ -39,7 +39,9 @@ type (
 	SolanaWork                       = worker.SolanaWork
 	SolanaWinnerAnnouncement         = worker.SolanaWinnerAnnouncement
 
-	Emission = worker.Emission
+	Emission        = worker.Emission
+	EthereumAppFees = worker.EthereumAppFees
+	SolanaAppFees   = worker.SolanaAppFees
 )
 
 func EthereumAnnouncements(f func(EthereumAnnouncement)) {
