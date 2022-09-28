@@ -50,7 +50,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <ChainContextProvider>
             <div className="App">
               {loaded ?
-                <>{width < breakpoint ? (<MobileNavBar />) : (<NavBar />)};
+                <>{width < breakpoint ? (<MobileNavBar />) : (<NavBar />)}
                   <Component {...pageProps} />
                 </> 
                 : <LoadingScreen />
