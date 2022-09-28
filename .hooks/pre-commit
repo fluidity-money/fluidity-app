@@ -1,0 +1,29 @@
+#!/bin/sh
+
+IFS=''
+
+make_build() {
+	cd "$1"
+	make
+	[ $? -gt 0 ] && exit $?
+	cd -
+}
+
+landing_dir="web/fluidity.money"
+surfing_dir="web/surfing"
+
+files_changed="$(git diff --name-only HEAD)"
+
+surfing_changed="$(echo $files_changed \
+	| grep -E "^$surfing_dir" >/dev/null \
+	&& echo y)"
+
+landing_changed="$(echo $files_changed \
+	| grep -E "^$landing_dir" >/dev/null \
+	&& echo y)"
+
+[ "$surfing_changed" = "y" ] && make_build "$surfing_dir"
+
+[ "$landing_changed" = "y" ] && make_build "$landing_dir"
+
+exit 0

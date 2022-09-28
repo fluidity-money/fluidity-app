@@ -1,0 +1,126 @@
+name: Staging (Auto)
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+
+env:
+  ENVIRONMENT: dev
+
+jobs:
+ cut-lib-release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+          lfs: true
+          token: ${{ secrets.GH_SUPER_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Build changed dependencies
+        uses: technote-space/get-diff-action@v6
+        id: lib_diff
+        with:
+          PATTERNS: "web/surfing/**/*"
+      - name: Build & Bump Surfing
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/surfing
+        run: |
+          npm install
+          npm run build
+          npm version patch
+      - uses: actions/setup-node@v3
+        if: steps.lib_diff.outputs.diff
+      - name: Publish Surfing
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/surfing
+        run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          npm publish
+      - name: Update version (Fluidity Landing)
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/fluidity.money
+        run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          npm install
+          npm update surfing
+      - name: Commit changed
+        if: steps.lib_diff.outputs.diff
+        run: |
+          git add .
+          git config user.name "Bump Bot 🤖"
+          git config user.email "noreply@fluidity.money"
+          git commit -m "Bump Surfing version"
+          git push origin develop
+ build-and-deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [cut-lib-release]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+          lfs: true
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-southeast-2
+          role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
+          role-duration-seconds: 7200 #seconds
+      - name: Get Diff
+        id: diff
+        uses: ./scripts/actions
+        with:
+          command: |
+            flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+      - name: Build
+        id: build
+        uses: ./scripts/actions
+        with:
+          command: |
+            flu build-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+      - name: Deploy
+        id: deploy
+        uses: ./scripts/actions
+        with:
+          command: |
+            flu deploy-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+      - name: Discord notif (SUCCESS)
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
+        with:
+          severity: info
+          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Event:** ${{ github.event_name }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n**Approved by:** ${{ github.event.sender.login }}\n\n"
+          details: Deployment succeeded.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (CANCEL)
+        if: cancelled()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Event:** ${{ github.event_name }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n**Approved by:** ${{ github.event.sender.login }}\n\n"
+          details: Deployment cancelled.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (FAIL)
+        if: failure()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Event:** ${{ github.event_name }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n**Approved by:** ${{ github.event.sender.login }}\n\n"
+          details: Deployment failed.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+
+

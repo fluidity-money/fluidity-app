@@ -10,13 +10,14 @@
 
   div {
     display: flex;
+    text-align: center;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: absolute;
     width: 50%;
-    min-height: 400px;
-   
+    gap: 20px;
+
     h1 {
       margin-bottom: 16px;
     }
@@ -31,8 +32,14 @@
       color: $textGrey;
     }
 
-    @include max-860px{
-      text-align: center;
+    section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @include max-860px {
+      width: 70%;
     }
   }
 }
@@ -47,4 +54,18 @@
     width: 10px;
     height: 10px;
   }
+}
+
+.gray {
+  color: #828381;
+  font-weight: 100;
+}
+
+.comingSoonButton {
+    cursor: pointer;
+    position: relative;
+    width: 130px;
+    height: 60px;
+    border-radius: 50px;
+    border: 0.5px solid $fluidWhite;
 }

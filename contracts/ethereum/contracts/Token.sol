@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL
+
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
@@ -9,6 +11,8 @@ import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 
+import "./ITransferWithBeneficiary.sol";
+
 import "./LiquidityProvider.sol";
 import "./WorkerConfig.sol";
 
@@ -19,7 +23,7 @@ struct Winner {
 }
 
 /// @title The fluid token ERC20 contract
-contract Token is IERC20 {
+contract Token is IERC20, ITransferWithBeneficiary {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -52,16 +56,37 @@ contract Token is IERC20 {
     );
 
     /// @notice emitted when an underlying token is wrapped into a fluid asset
-    event MintFluid(address indexed addr, uint indexed amount);
+    event MintFluid(address indexed addr, uint amount);
 
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
-    event BurnFluid(address indexed addr, uint indexed amount);
+    event BurnFluid(address indexed addr, uint amount);
 
     /// @notice emitted when a new operator takes over the contract management
     event OperatorChanged(address indexed oldOperator, address indexed newOperator);
 
     /// @notice emitted when the contract enters emergency mode!
-    event Emergency();
+    event Emergency(bool indexed status);
+
+    /// @notice emitted when restrictions
+    event MaxUncheckedRewardLimitChanged(uint amount);
+
+    /// @notice global mint limit changed by setRestrictions
+    event GlobalMintLimitChanged(uint amount);
+
+    /// @notice user mint limits changed by setRestrictions
+    event UserMintLimitChanged(uint amount);
+
+    /// @notice worker config changed, either by disabling emergency
+    /// @notice mode or updateWorkerConfig
+    event WorkerConfigUpdated(address indexed newConfig);
+
+    /// @notice updating the reward quarantine before manual signoff
+    /// @notice by the multisig (with updateRewardQuarantineThreshold)
+    event RewardQuarantineThresholdUpdated(uint amount);
+
+    /// @notice emitted when the mint limits are enabled or disabled
+    /// @notice by enableMintLimits
+    event MintLimitsStateChanged(bool indexed status);
 
     // erc20 props
     mapping(address => uint256) private balances_;
@@ -88,7 +113,6 @@ contract Token is IERC20 {
     /// @dev account to use that created the contract (multisig account)
     address private operator_;
 
-
     /// @dev the block number of the last block that's been included in a batched reward
     uint private lastRewardedBlock_;
 
@@ -98,7 +122,6 @@ contract Token is IERC20 {
     /// @dev amount a user has manually rewarded, to be removed from their batched rewards
     /// @dev [address] => [amount manually rewarded]
     mapping (address => uint) private manualRewardDebt_;
-
 
     /// @dev the largest amount a reward can be to not get quarantined
     uint maxUncheckedReward_;
@@ -125,7 +148,6 @@ contract Token is IERC20 {
 
     /// @dev the block number in which user mint limits were last reset
     uint userMintResetBlock_;
-
 
     /**
      * @notice initialiser function - sets the contract's data
@@ -203,6 +225,11 @@ contract Token is IERC20 {
         remainingGlobalMint_ = _globalMint;
         userMintLimit_ = _userMint;
         userMintResetBlock_ = block.number;
+
+        emit MaxUncheckedRewardLimitChanged(_maxUncheckedReward);
+        emit MintLimitsStateChanged(_mintLimitsEnabled);
+        emit GlobalMintLimitChanged(_globalMint);
+        emit UserMintLimitChanged(_userMint);
     }
 
     /**
@@ -218,8 +245,8 @@ contract Token is IERC20 {
     }
 
     function noEmergencyMode() public view returns (bool) {
-        return workerConfig_.noGlobalEmergency()
-            && noEmergencyMode_;
+        return noEmergencyMode_
+            && workerConfig_.noGlobalEmergency();
     }
 
     /**
@@ -246,25 +273,41 @@ contract Token is IERC20 {
 
         workerConfig_ = WorkerConfig(address(0));
 
-        emit Emergency();
+        emit Emergency(true);
+    }
+
+    /**
+     * @notice disables emergency mode, following presumably a contract upgrade
+     * @notice (operator only)
+     */
+    function disableEmergencyMode(address _workerConfig) public {
+        require(msg.sender == operator_, "only the operator account can use this");
+
+        noEmergencyMode_ = true;
+
+        updateWorkerConfig(_workerConfig);
+
+        emit Emergency(false);
     }
 
     function updateWorkerConfig(address _workerConfig) public {
         require(msg.sender == operator_, "only the operator account can use this");
-        require(noEmergencyMode(), "emergency mode!");
 
         workerConfig_ = WorkerConfig(_workerConfig);
+
+        emit WorkerConfigUpdated(_workerConfig);
     }
 
     /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
-        require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == operator_, "only the operator account can use this");
 
         maxUncheckedReward_ = _maxUncheckedReward;
+
+        emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    /// @notice updates and resets mint limits if called by the operator
+    /// @notice updates and resets mint limits if called by the oracle
     function updateMintLimits(uint global, uint user) public {
         require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == oracle(), "only the oracle account can use this");
@@ -272,13 +315,18 @@ contract Token is IERC20 {
         remainingGlobalMint_ = global;
         userMintLimit_ = user;
         userMintResetBlock_ = block.number;
+
+        emit GlobalMintLimitChanged(global);
+        emit UserMintLimitChanged(userMintLimit_);
     }
 
     /// @notice enables or disables mint limits with the operator account
     function enableMintLimits(bool enable) public {
-        require(msg.sender == oracle(), "only the oracle account can use this");
+        require(msg.sender == operator_, "only the operator account can use this");
 
         mintLimitsEnabled_ = enable;
+
+        emit MintLimitsStateChanged(enable);
     }
 
     /**
@@ -300,14 +348,14 @@ contract Token is IERC20 {
 
             uint userMint;
 
-            bool userHasMinted = userLastMintedBlock_[msg.sender] < userMintResetBlock_;
+            bool userHasntMinted = userLastMintedBlock_[msg.sender] < userMintResetBlock_;
 
-            if (userHasMinted) {
+            if (userHasntMinted) {
                 // user hasn't minted since the reset, reset their count
-                userLastMintedBlock_[msg.sender] = amount;
+                userMint = amount;
             } else {
                 // user has, add the amount they're minting
-                userLastMintedBlock_[msg.sender] = userAmountMinted_[msg.sender] + amount;
+                userMint = userAmountMinted_[msg.sender] + amount;
             }
 
             require(userMint <= userMintLimit_, "mint amount exceeds user limit!");
@@ -588,6 +636,25 @@ contract Token is IERC20 {
         return true;
     }
 
+    /// @notice support for meson's crosschain swap for ERC20
+    /// @notice transfers deposited assets to the 3rd party dapp contract
+    /// @notice for the user - we don't do anything special :)
+    function transferWithBeneficiary(
+        address token,
+        uint256 amount,
+        address beneficiary,
+        uint64 data
+    ) external override returns (bool) {
+        bool rc;
+
+        rc = Token(token).transferFrom(msg.sender, address(this), amount);
+        if (!rc) return false;
+
+        rc = Token(token).transfer(beneficiary, amount);
+
+        return rc;
+    }
+
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
         _approve(msg.sender, spender, allowances_[msg.sender][spender] + addedValue);
         return true;
@@ -622,7 +689,6 @@ contract Token is IERC20 {
     }
 
     function _mint(address account, uint256 amount) internal virtual {
-
         require(account != address(0), "ERC20: mint to the zero address");
 
         totalSupply_ += amount;

@@ -15,6 +15,7 @@ func TestBigPowInt32(t *testing.T) {
 	// 5 ^ 3 = 125
 	expected := big.NewRat(125, 1)
 	result := bigPowInt32(big.NewRat(5, 1), 3)
+	assert.Equal(t, expected, result)
 
 	// 2 ^ 1 = 2
 	expected = big.NewRat(2, 1)

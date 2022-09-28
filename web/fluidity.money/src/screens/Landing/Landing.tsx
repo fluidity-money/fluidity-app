@@ -2,77 +2,125 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect, useRef, useState } from "react";
-import { ContinuousCarousel, ManualCarousel } from "@fluidity-money/surfing";
+import { useEffect, useState } from "react";
+import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
-import styles from "./Landing.module.scss";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
+import styles from "./Landing.module.scss";
+import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
 
 const Landing = () => {
-  /* 
-  1. BG blurs dissolve in and start slowly moving (example)
-  2. ‘Money designed to move’ ticker moves and fades in from bottom (off canvas), and immediately starts scrolling slowly on loop (right to left)
-  3. Video with 3D disolves in (1000ms)
-  --
-  4. 3D video autoplays
-  5. After a few seconds (tbc based on animation provided), page auto scrolls 
-  6. ‘Money dedigned to move’ text moves and fades out (top to bottom) off bottom of screen
-  --
-  5. 3D video scales down slightly on scroll to sit in final position between content list.
-  6. A new looping 3D video appears in place of previous (seemless) and continues subtle looping animation. 
-  7. Text items fade in with new looped video, perhaps staggered with slight delay, or with lines building out from left to righ ton left, and right  to left on right.
-    */
 
-  // const myRef = useRef<HTMLInputElement>(null);
+  let type = isSafari || isIOS ? "video/quicktime" : "video/webm";
+  let vidSources = (isSafari || isIOS ? [
+    "/assets/videos/FluidityHome.mov",
+    "/assets/videos/FluidityHomeloop.mov",
+  ] : [
+    "/assets/videos/FluidityHome.webm",
+    "/assets/videos/FluidityHomeloop.webm",
+  ]).map((link) => link);
 
-  // useEffect(() => {
-  //   console.log("my ref", myRef.current);
-  //   const observer = new IntersectionObserver((entries) => {
-  //     const entry = entries[0];
-  //     console.log("entry", entry);
-  //     console.log("bcr", entry.boundingClientRect);
-  //     console.log("isr", entry.intersectionRect);
-  //     console.log("rb", entry.rootBounds);
-  //     if (entry.boundingClientRect.top < 356) {
-  //       handleClick();
-  //     }
-  //   });
+  const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
+  const [homeVidEnded, setHomeVidEnded] = useState(false);
 
-  //   observer.observe(myRef.current as Element);
-  // }, [ ]);
+  const [state, setState] = useState({
+    src: vidSources[0],
+    mimeType: type,
+    key: "0",
+    loop: false,
+    scale: isFirefox ? 2 : 0.7,
+  });
+
+  useEffect(() => {
+    homeVidEnded &&
+    setState({
+      src: vidSources[1],
+      mimeType: type,
+      key: "1",
+      loop: true,
+      scale: isFirefox ? 1 : 0.5,
+    });
+  }, [homeVidEnded]);
 
   const { width } = useViewport();
   const breakpoint = 620;
 
+  const callout = (
+    <div className={styles.callout}>
+      <Heading hollow={true} as="h4" className={styles.text}>
+        MONEY DESIGNED TO MOVE MONEY DESIGNED TO MOVE
+      </Heading>
+      <Heading as="h4" className={styles.text}>
+        MONEY DESIGNED TO MOVE
+      </Heading>
+    </div>
+  );
+
   return (
     <div className={`${styles.containerLanding}`}>
-      {width > breakpoint && (
-          <Video src={window.location.origin + '/assets/videos/Fluidity_Home.mp4'} type={'reduce'} view={'normal'} loop={false}/>
-      )} 
-      {width < breakpoint && (
-          <Video src={window.location.origin + '/assets/videos/Fluidity_Homeloop.mp4'} type={'fit'} view={'normal'} loop={false}/>
-      )} 
+      <div className={`${styles.bgVid}`}>
+        {width > breakpoint ? (
+          <Video
+            src={state.src}
+            type={"reduce"}
+            mimeType={state.mimeType}
+            loop={state.loop}
+            key={state.key}
+            scale={state.scale}
+
+            margin = {"-60px 0 0 0"}
+            onLoad={!homeVidEnded 
+              ? () => setOnHomeVidLoaded(true)
+              : () => {}
+            }
+            onEnded={!homeVidEnded 
+              ? () => setHomeVidEnded(true)
+              : () => {}
+            }
+          />
+          
+        ) : ( isMobile ?
+          (
+            <Video
+            src={state.src}
+            type={"reduce"}
+            mimeType={state.mimeType}
+            loop={state.loop}
+            key={state.key}
+            scale={state.scale * 2}
+            margin={"-400px 0 0 0"}
+            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
+            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
+            />
+          ) : (<></>) 
+        )}
+      </div>
+      {/* Hero animation */}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 6, type: "tween" }}
           >
-            Fluidity is the <br /> blockchain incentive <br /> layer, rewarding{" "}
-            <br /> people for using <br /> their crypto.
-          </motion.h1>
+            <Heading className={styles.title} as="h3">
+              Fluidity is the <br /> blockchain incentive <br /> layer,
+              rewarding <br /> people for using <br /> their crypto.
+            </Heading>
+          </motion.div>
         ) : (
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 6, type: "tween" }}
           >
-            Fluidity is the blockchain incentive layer, <br />
-            rewarding people for using their crypto.
-          </motion.h1>
+            <Heading as="h3">
+              Fluidity is the blockchain incentive layer, <br />
+              rewarding people for using their crypto.
+            </Heading>
+          </motion.div>
         )}
         <div className={styles.tiles}>
           {width < breakpoint && (
@@ -85,9 +133,7 @@ const Landing = () => {
                 scale: [1, 1, 1, 0.8],
               }}
               transition={{ duration: 6, type: "tween" }}
-            >
-             
-            </motion.div>
+            ></motion.div>
           )}
 
           <motion.div
@@ -97,28 +143,27 @@ const Landing = () => {
             className={styles.left}
           >
             <IntroTile
-              img={"/assets/images/landingIcons/1to1.svg"}
+              img={"/assets/images/landingIcons/1to1.png"}
               side={"left"}
             >
               1 to 1 exchange rate <br />
               to base wrapped assets
             </IntroTile>
             <IntroTile
-              img={"/assets/images/useCaseIcons/sendReceive.svg"}
+              img={"/assets/images/landingIcons/sendReceive.png"}
               side={"left"}
             >
               Senders and receivers <br />
               both qualify
             </IntroTile>
             <IntroTile
-              img={"/assets/images/landingIcons/everyTransaction.svg"}
+              img={"/assets/images/landingIcons/everyTransaction.png"}
               side={"left"}
             >
               Every transaction <br />
               qualifies as a reward
             </IntroTile>
           </motion.div>
-         
 
           <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
@@ -127,21 +172,21 @@ const Landing = () => {
             className={width < breakpoint ? styles.left : styles.right}
           >
             <IntroTile
-              img={"/assets/images/landingIcons/expectedOutcome.svg"}
+              img={"/assets/images/landingIcons/expectedOutcome.png"}
               side={width < breakpoint ? "left" : "right"}
             >
               Fluidity improves your expected <br />
               outcome over time
             </IntroTile>
             <IntroTile
-              img={"/assets/images/useCaseIcons/forReceivers.svg"}
+              img={"/assets/images/landingIcons/forReceivers.png"}
               side={width < breakpoint ? "left" : "right"}
             >
               Rewards can range from cents
               <br /> to millions
             </IntroTile>
             <IntroTile
-              img={"/assets/images/landingIcons/scalingEcosystem.svg"}
+              img={"/assets/images/landingIcons/scalingEcosystem.png"}
               side={width < breakpoint ? "left" : "right"}
             >
               Scaling ecosystem
@@ -156,20 +201,23 @@ const Landing = () => {
         animate={{ opacity: [1, 1, 1, 0], y: [0, 0, 0, 100] }}
         transition={{ duration: 6, type: "tween" }}
       >
-        <ContinuousCarousel direction={"right"}>
-          <div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-            <div className={styles.text}>MONEY DESIGNED TO MOVE</div>
-          </div>
-        </ContinuousCarousel>
+        <div className={styles.carousel}>
+          <ContinuousCarousel direction={"right"}>
+            <div>
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+              {callout}
+            </div>
+          </ContinuousCarousel>
+        </div>
       </motion.div>
     </div>
   );

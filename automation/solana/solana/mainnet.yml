@@ -1,0 +1,12 @@
+SERVICES:
+  - PRIZE_POOL:
+      SERVICE_NAME: microservice-solana-prize-pool
+      DOCKERFILE_PATH: ./cmd/microservice-solana-prize-pool
+      ENV_FLU_WORKER_ID: solana-microservice-solana-prize-pool
+      ENV_FLU_SOLANA_PROGRAM_ID: HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR
+      SECRET_FLU_SOLANA_TOKENS_LIST: /fluidity/solana/token_list
+      ENV_FLU_SOLANA_PRIZE_POOL_UPDATE_TIME: 1m
+      ENV_FLU_SOLANA_TVL_DATA_PUBKEY: DnLbxC1EvFHZqZfjpHohHazeRN93f7kGcJxAbT3Q9NxX
+      ENV_FLU_SOLANA_SOLEND_PROGRAM_ID: So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo
+      SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
+      SECRET_FLU_SOLANA_TVL_PAYER_PRIKEY: /fluidity/solana/tvl_payer_prikey

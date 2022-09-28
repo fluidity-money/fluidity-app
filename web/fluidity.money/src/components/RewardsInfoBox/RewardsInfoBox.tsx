@@ -4,31 +4,41 @@
 
 import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
-import { LinkButton, BlockchainModal, ChainSelectorButton, numberToMonetaryString, SupportedChains } from "@fluidity-money/surfing";
+import useViewport from "hooks/useViewport";
+import {
+  LinkButton,
+  BlockchainModal,
+  ChainSelectorButton,
+  numberToMonetaryString,
+  SupportedChains,
+  Heading,
+} from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
   rewardPool: number;
   totalTransactionValue: number;
-  setToggle: () => void;
-  toggle: boolean;
-  initalView: boolean;
-  switchAndAnimate: () => void;
+  changeScreen: () => void;
   type: "black" | "transparent";
 }
 
 const RewardsInfoBox = ({
   rewardPool,
   totalTransactionValue,
-  initalView,
-  switchAndAnimate,
+  changeScreen,
   type,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
 
-  const imgLink = (opt: string) => opt === "ETH" ? "/assets/images/chainIcons/ethIcon.svg" : "/assets/images/chainIcons/solanaIcon.svg";
-  
+  const imgLink = (opt: string) =>
+    opt === "ETH"
+      ? "/assets/images/chainIcons/ethIcon.svg"
+      : "/assets/images/chainIcons/solanaIcon.svg";
+
   const [showModal, setShowModal] = useState(false);
+
+  const { width } = useViewport();
+  const mobileBreakpoint = 620;
 
   const options = Object.keys(SupportedChains).map((chain) => ({
     name: chain,
@@ -37,43 +47,47 @@ const RewardsInfoBox = ({
 
   return (
     <div
-      className={
-        initalView
-          ? `${styles.infoBoxContainer} ${
-              type === "black" ? styles.fadeIn : styles.fadeOut
-            }`
-          : `${styles.infoBoxContainer} ${
-              type === "black" ? styles.fadeOut : styles.fadeIn
-            }`
-      }
+      className={`${
+        type === "black"
+          ? styles.infoBoxContainer
+          : styles.infoBoxContainerStats
+      }`}
     >
       <div
         className={
           type === "black" ? styles.infoBox : styles.infoBoxTransparent
         }
       >
-        <ChainSelectorButton 
+        <ChainSelectorButton
           chain={{
             name: chain,
             icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
           }}
           onClick={() => setShowModal(true)}
         />
-        <h1 onClick={switchAndAnimate}>
-          {type === "black"
-            ? numberToMonetaryString(rewardPool)
-            : totalTransactionValue.toLocaleString("en-US")}
-        </h1>
-        <h3>{type === "black" ? "Reward pool" : "Total transactions"}</h3>
-        {showModal && <BlockchainModal 
-          handleModal={setShowModal}
-          option={{
-            name: chain,
-            icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
-          }}
-          options={options}
-          setOption={setChain}
-        />}
+        <div onClick={changeScreen}>
+          <Heading as="h1">
+            {type === "black"
+              ? "$100,000"
+              : "5,000,000+"}
+          </Heading>
+        </div>
+        <Heading as="h4">
+          {type === "black" ? "Reward pool" : "Total transactions (on testing)"}
+        </Heading>
+        {showModal && (
+          <BlockchainModal
+            handleModal={setShowModal}
+            option={{
+              name: chain,
+              icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
+            }}
+            className={styles.overlap}
+            options={options}
+            setOption={setChain}
+            mobile={width <= mobileBreakpoint}
+          />
+        )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
           FLUID STATS
         </LinkButton> */}

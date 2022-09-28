@@ -4,13 +4,5 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-gap: 20px;
-
-  h2 {
-    font-size: 22px;
-  }
-
-  p {
-    font-size: 14px;
-    color: $textGrey;
-  }
+  z-index: 1;
 }

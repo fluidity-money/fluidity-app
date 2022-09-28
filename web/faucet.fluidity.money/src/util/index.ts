@@ -64,9 +64,9 @@ type SupportedTokensEthereum = "fUSDT" | "fUSDC" | "fDAI";
 
 type SupportedTokensSolana = "fUSDC" | "fUSDT";
 
-export type SupportedNetworks = "ethereum" | "solana";
+export type SupportedNetworks = "ethereum";
 
-export type SupportedTokens<T extends SupportedNetworks | "all" = "all"> =
+export type SupportedTokens<T extends SupportedNetworks | "all" = "ethereum"> =
   T extends "ethereum" ?
     SupportedTokensEthereum :
   T extends "solana" ?

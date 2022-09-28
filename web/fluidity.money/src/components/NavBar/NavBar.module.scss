@@ -13,9 +13,8 @@
 
 .container {
   box-sizing: border-box;
-  position: absolute;
+  position: fixed;
   background-color: transparent;
-  display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -23,31 +22,34 @@
   display: grid;
   grid-template-columns: 1fr 4fr 1fr;
   max-width: 1500px;
+  z-index: 1000;
+
+  @media (max-width: 750px) {
+    grid-template-columns: 1fr 3fr 1fr;
+  }
+
   .navbar {
     box-sizing: border-box;
     justify-content: space-between;
     align-items: center;
-    // height: 100%;
     width: fit-content;
     padding: 10px;
     z-index: 99;
     justify-self: center;
-    position: fixed;
 
     .fade {
-      box-sizing: border-box;
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       ul {
         display: flex;
         li {
           margin: 20px;
           .active {
-            color: $fluidWhite;
-            text-underline-offset: 2px;
-            text-decoration: underline;
+            & > * {
+              font-weight: 700;
+              color: $fluidWhite;
+              text-decoration: underline;
+              text-underline-offset: 0.5em;
+            }
           }
           a {
             color: $textGrey;
@@ -55,8 +57,15 @@
           button {
             margin: 0px 8px 0px 8px;
           }
+
+          .modalButton {
+            fill: $textGrey;
+          }
         }
       }
+    }
+    @media (max-width: 750px) {
+      grid-template-columns: 1fr 2fr 1fr;
     }
   }
   .navbarFixed {
@@ -74,6 +83,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+
+      & > * {
+        z-index: 9;
+      }
     }
     @media (max-width: 700px) {
       padding: 10px 30px 10px 30px;
@@ -82,9 +95,22 @@
 }
 
 .fluidity {
-  z-index: 1;
-  margin-left: 50px;
-  font-size: 30.5px;
-  padding-bottom: 2px;
-  position: fixed;
+  z-index: 51;
+  cursor: pointer;
+  margin-left: 50.5px;
+}
+
+.imgContainer {
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  img {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+.transparent {
+  mix-blend-mode: difference;
 }

@@ -18,10 +18,10 @@ type GetTokenSupplyResult struct {
 		// Raw amount of tokens as a string, ignoring decimals.
 		Amount string `json:"amount"`
 
-		// TODO: <number> == int64 ???
 		// Number of decimals configured for token's mint.
 		Decimals uint8 `json:"decimals"`
 
+		// TODO: <number> == int64 ???
 		// DEPRECATED: Token amount as a float, accounting for decimals.
 		UiAmount *float64 `json:"uiAmount"`
 

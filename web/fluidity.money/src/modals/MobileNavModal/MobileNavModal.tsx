@@ -2,53 +2,76 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { GeneralButton } from "@fluidity-money/surfing";
+import { Heading } from "@fluidity-money/surfing";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   navLinks: string[];
 }
 
-const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
+const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
-    <a href={`/${link.replace(/\s+/g, "")}`}>
-      <GeneralButton
-        version={"secondary"}
-        type={"text"}
-        size={"large"}
-        handleClick={() => {}}
-      >
-        {link}
-      </GeneralButton>
+    <a
+      className={styles.button}
+      href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
+    >
+      <Heading as="h3">{link}</Heading>
     </a>
   ));
 
   return (
     <div className={styles.container}>
-      <img src="/assets/images/logoOutline.svg" alt="logo" />
-      {links}
-      <GeneralButton
-        version={"primary"}
-        type={"text"}
-        size={"large"}
-        handleClick={() => {}}
-      >
-        LAUNCH FLUIDITY
-      </GeneralButton>
-      <GeneralButton
-        version={"secondary"}
-        type={"text"}
-        size={"large"}
-        handleClick={() => {}}
-      >
-        LET'S CHAT
-      </GeneralButton>
-      <div className={styles.socials}>
-        <img src="/assets/images/socials/twitter.svg" alt="twitter" />
-        <img src="/assets/images/socials/discord.svg" alt="discord" />
-        <img src="/assets/images/socials/telegram.svg" alt="telegram" />
-        <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+      <div className={styles.imgContainer}>
+        <a href={"/"}>
+          <img src="/assets/images/logoMetallic.png" alt="logo" />
+        </a>
       </div>
+
+      {links}
+
+      <div className={styles.socials}>
+        <a
+          href="https://twitter.com/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <img src="/assets/images/socials/twitter.svg" alt="twitter" />
+        </a>
+        <a
+          href="https://discord.gg/CNvpJk4HpC"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <img src="/assets/images/socials/discord.svg" alt="discord" />
+        </a>
+        <a
+          href="https://t.me/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <img src="/assets/images/socials/telegram.svg" alt="telegram" />
+        </a>
+        <a
+          href="https://www.linkedin.com/company/74689228/"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+        </a>
+      </div>
+
+      <a className={`${styles.whiteButton} ${styles.smaller}`} href={`#demo`} onClick={() => setIsOpen(false)}>
+        <Heading className={styles.black} black={true} as="h3">
+          LAUNCH FLUIDITY
+        </Heading>
+      </a>
+      <a
+        className={`${styles.button} ${styles.smaller}`}
+        href="mailto:contact@fluidity.money"
+      >
+        <Heading as="h3">LET'S CHAT</Heading>
+      </a>
     </div>
   );
 };

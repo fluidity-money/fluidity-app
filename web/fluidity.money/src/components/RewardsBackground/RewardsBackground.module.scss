@@ -49,10 +49,33 @@
   gap: 5px;
   align-items: center;
 
+  a {
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    align-items: center;
+    gap: 5px;
+    &:hover {
+      color: $fluidWhite;
+      opacity: 0.8;
+    }
+  }
+
   img {
     width: 18px;
   }
   &:hover {
     color: $fluidWhite;
+  }
+}
+
+.hover {
+  // cursor: pointer;
+  // &:hover {
+  //   color: white;
+  // }
+
+  &Underline {
+    text-decoration: underline;
   }
 }

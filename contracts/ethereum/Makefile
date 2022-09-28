@@ -6,12 +6,19 @@ FILES := \
 	$(shell find contracts scripts) \
 	hardhat.config.ts
 
+TOKEN_OUT := artifacts/contracts/Token.sol/Token.json
+
 DOCKER := docker
 HARDHAT := npx hardhat
 
-.PHONY: clean run test
+.PHONY: clean build run test
 
-all: run
+all: build
+
+build: ${TOKEN_OUT}
+
+${TOKEN_OUT}: ${FILES}
+	@${HARDHAT} compile
 
 docker: ${FILES} hardhat.config.ts test-constants.ts
 	@${DOCKER} build \
@@ -54,7 +61,6 @@ analysis/docker-semgrep: ${FILES}
 
 run-semgrep: analysis/docker-semgrep ${FILES}
 	@${DOCKER} run ${TAG}/semgrep
-
 
 analysis/docker-mythril: ${FILES}
 	@${DOCKER} build \

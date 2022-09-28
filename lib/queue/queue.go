@@ -124,7 +124,7 @@ func GetMessages(topic string, f func(message Message)) {
 			"worker.%#v.retry.%#v.%#v",
 			workerId,
 			topic,
-			util.GetHash(body),
+			util.GetB16Hash(body),
 		)
 
 		if deadLetterEnabled {

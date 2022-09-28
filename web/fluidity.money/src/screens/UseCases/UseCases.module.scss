@@ -4,4 +4,21 @@
   align-items: center;
   min-height: 850px;
   width: 100%;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  section {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.backgroundText {
+  font-weight: 1000;
+  font-size: 134px;
+  opacity: 0.1;
+}
+
+.map {
+  gap: 20px;
 }

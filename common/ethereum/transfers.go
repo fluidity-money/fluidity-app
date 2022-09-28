@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -19,7 +20,7 @@ var TransferLogTopic = strings.ToLower(
 )
 
 // Get transfer receipts
-func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethereum.Address) ([]worker.EthereumDecoratedTransfer, error) {
+func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethCommon.Address) ([]worker.EthereumDecoratedTransfer, error) {
 	blockTransactions := make(map[ethereum.Hash]ethereum.Transaction)
 
 	for _, transaction := range transactions {
@@ -39,7 +40,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
 
-		if transferContractAddress != string(fluidContractAddress) {
+		if transferContractAddress != fluidContractAddress.String() {
 			log.Debugf(
 				"For transaction hash %#v, contract was %#v, not %#v!",
 				transactionHash,

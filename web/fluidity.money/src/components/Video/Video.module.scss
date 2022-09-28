@@ -1,6 +1,6 @@
 .videoContainer {
     position: relative;
-    min-height: 1080px;
+    mix-blend-mode: lighten;
 }
 
 .fill {
@@ -25,12 +25,4 @@
 
 .none {
     object-fit: none;
-}
-
-.normal {
-    width: 100%;
-}
-
-.scale-up {
-  width: 250%;
 }

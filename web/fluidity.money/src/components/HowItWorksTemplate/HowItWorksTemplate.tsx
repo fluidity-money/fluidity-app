@@ -2,6 +2,7 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { Heading, Text } from "@fluidity-money/surfing";
 import styles from "./HowItWorksTemplate.module.scss";
 
 interface ITemplateProps {
@@ -19,10 +20,14 @@ const HowItWorksTemplate = ({
 }: ITemplateProps) => {
   return (
     <div className={styles.content}>
-      <h1>{children}</h1>
-      <h2>{header}</h2>
+      <Heading as="h2">{children}</Heading>
+      <Text as="p" size={"xl"} prominent={true}>
+        {header}
+      </Text>
       {info.map((paragraph, i) => (
-        <p key={`para-${i}`}>{paragraph}</p>
+        <Text as="p" key={`para-${i}`} size={"md"}>
+          {paragraph}
+        </Text>
       ))}
       {button}
     </div>

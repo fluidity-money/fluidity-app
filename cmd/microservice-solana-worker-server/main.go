@@ -146,6 +146,7 @@ func main() {
 				userActionRecipientAddress = userAction.RecipientSplAddress
 				userActionSlotNumber       = int64(userAction.Transaction.Result.Slot)
 				tokenDetails               = userAction.Token
+				userActionAppEmission      = userAction.AppEmissions
 			)
 
 			if tokenDetails.TokenShortName != tokenName {
@@ -158,6 +159,8 @@ func main() {
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
+
+			emission.SolanaAppFees = userActionAppEmission
 
 			slotNumber_ := misc.BigIntFromInt64(userActionSlotNumber)
 			emission.SolanaSlotNumber = slotNumber_

@@ -1,13 +1,38 @@
 @import "../../styles/config.scss";
 
+.outerContainer {
+  width: 100%;
+  min-height: 850px;
+  background-color: $fluidBlack;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .container {
   display: flex;
   justify-content: center;
-  padding-top: 90px;
+  padding: 90px 20px 0px 20px;
   width: 100%;
   min-height: 850px;
   background-color: $fluidBlack;
   @include max-860px {
     flex-direction: column;
+  }
+}
+
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
+}
+
+.text {
+  margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
   }
 }

@@ -3,9 +3,10 @@
 .container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   width: 100%;
-  border-bottom: solid 0.5px map-get($text, "default");
+  border-bottom: solid 0.5px map-get($border, "default");
+  padding-bottom: 10px;
 
   h1 {
     font-size: 36px;
@@ -15,15 +16,17 @@
   }
   ul {
     display: flex;
+    padding-top: 80px;
 
     @media (max-width: 860px) {
       flex-direction: column;
-      min-width: 232px;
+      min-width: 156px;
+      padding-top: 20px;
     }
 
-    @media (max-width: 560px) {
-      min-width: 155px;
-    }
+    // @media (max-width: 405px) {
+    //   min-width: 155px;
+    // }
 
     li {
       margin-left: 20px;

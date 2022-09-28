@@ -49,9 +49,9 @@ type (
 	}
 )
 
-// DecodeSplInstruction tries to decode base58 encoded solana transaction
-// data into one of the SPL token instructions we care about
-func DecodeSplInstruction(data string) (SplInstruction, error) {
+// DecodeSplUserAction tries to decode base58 encoded solana transaction
+// data into one of the SPL token instructions we care about for user actions
+func DecodeSplUserAction(data string) (SplInstruction, error) {
 	var instruction SplInstruction
 
 	byteData := base58.Decode(data)
@@ -121,4 +121,21 @@ func DecodeSplInstruction(data string) (SplInstruction, error) {
 	}
 
 	return instruction, nil
+}
+
+// IsInitialiseAccount returns if an instruction is an InitialiseAccount
+func IsInitialiseAccount(data string) (bool, error) {
+	byteData := base58.Decode(data)
+
+	var discriminant struct {
+		Discriminant uint8
+	}
+
+	if err := borsh.Deserialize(&discriminant, byteData); err != nil {
+		return false, fmt.Errorf("Failed to decode instruction discriminant: %w", err)
+	}
+
+	isInitialiseAccount := discriminant.Discriminant == VariantInitialiseAccount
+
+	return isInitialiseAccount, nil
 }

@@ -1,0 +1,103 @@
+name: Staging (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Environment'
+        options:
+          - 'dev'
+      network:
+        type: choice
+        description: 'Network'
+        options: 
+          - 'devnet'
+          - 'ropsten'
+          - 'fluidity'
+      group:
+        description: 'Group'
+        required: true
+      service:
+        description: 'Service'
+        required: true
+      build_root_container:
+        type: boolean
+        description: 'Build root-container'
+        default: false
+      build_build_container:
+        type: boolean
+        description: 'Build build-container'
+        default: false
+      skip_build:
+        type: boolean
+        description: 'Skip docker build'
+        default: false
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-southeast-2
+          role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
+          role-duration-seconds: 7200 #seconds
+      - name: Build
+        if: ${{ github.event.inputs.skip_build == 'false' }}
+        id: build
+        uses: ./scripts/actions/staging
+        with:
+          command: |
+            flu build-docker \
+              --network ${{ github.event.inputs.network }} \
+              --group ${{ github.event.inputs.group }} \
+              --service ${{ github.event.inputs.service }} \
+              --environment ${{ github.event.inputs.environment }} \
+              --build-root-container ${{ github.event.inputs.build_root_container }} \
+              --build-build-container ${{ github.event.inputs.build_build_container }} \
+              --tag $GITHUB_SHA
+      - name: Deploy
+        id: deploy
+        uses: ./scripts/actions/staging
+        with:
+          command: |
+            flu deploy-service \
+              --network ${{ github.event.inputs.network }} \
+              --group ${{ github.event.inputs.group }} \
+              --service ${{ github.event.inputs.service }} \
+              --environment ${{ github.event.inputs.environment }} \
+              --debug false \
+              --tag $GITHUB_SHA
+      - name: Discord notif (SUCCESS)
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
+        with:
+          severity: info
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
+          details: Deployment succeeded.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (CANCEL)
+        if: cancelled()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
+          details: Deployment cancelled.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (FAIL)
+        if: failure()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
+          details: Deployment failed.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}

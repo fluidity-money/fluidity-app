@@ -219,20 +219,21 @@ func main() {
 		}
 
 		payoutArgs := payout.PayoutArgs{
-			DataAccountPubkey: fluidDataPubkey,
-			MetaSplPubkey:     spl_token.TokenProgramAddressPubkey,
-			TokenMintPubkey:   tokenMintPubkey,
-			FluidMintPubkey:   fluidMintPubkey,
-			PdaPubkey:         pdaPubkey,
-			ObligationPubkey:  obligationPubkey,
-			ReservePubkey:     reservePubkey,
-			AccountAPubkey:    aPubkey,
-			AccountBPubkey:    bPubkey,
-			PayerPubkey:       payer.PublicKey(),
-			WinningAmount:     winningAmount,
-			TokenName:         tokenName,
-			BumpSeed:          bumpSeed,
-			RecentBlockHash:   recentBlockHash,
+			FluidityProgramPubkey: fluidityPubkey,
+			DataAccountPubkey:     fluidDataPubkey,
+			MetaSplPubkey:         spl_token.TokenProgramAddressPubkey,
+			TokenMintPubkey:       tokenMintPubkey,
+			FluidMintPubkey:       fluidMintPubkey,
+			PdaPubkey:             pdaPubkey,
+			ObligationPubkey:      obligationPubkey,
+			ReservePubkey:         reservePubkey,
+			AccountAPubkey:        aPubkey,
+			AccountBPubkey:        bPubkey,
+			PayerPubkey:           payer.PublicKey(),
+			WinningAmount:         winningAmount,
+			TokenName:             tokenName,
+			BumpSeed:              bumpSeed,
+			RecentBlockHash:       recentBlockHash,
 		}
 
 		transaction, payoutInstruction, err := payout.CreatePayoutTransaction(payoutArgs)

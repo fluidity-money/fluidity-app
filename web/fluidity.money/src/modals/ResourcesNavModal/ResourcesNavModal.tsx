@@ -2,7 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { Link } from "react-router-dom";
 import { LinkButton } from "@fluidity-money/surfing";
 import styles from "./ResourcesNavModal.module.scss";
 
@@ -36,9 +35,18 @@ const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
         </h4>
       ))}
       <div className={styles.socials}>
-        <img src="/assets/images/socials/twitter.svg" />
-        <img src="/assets/images/socials/discord.svg" />
-        <img src="/assets/images/socials/telegram.svg" />
+        <a href="https://twitter.com/fluiditymoney">
+          <img src="/assets/images/socials/twitter.svg" alt="twitter" />
+        </a>
+        <a href="https://discord.gg/CNvpJk4HpC">
+          <img src="/assets/images/socials/discord.svg" alt="discord" />
+        </a>
+        <a href="https://t.me/fluiditymoney">
+          <img src="/assets/images/socials/telegram.svg" alt="telegram" />
+        </a>
+        <a href="https://www.linkedin.com/company/74689228/">
+          <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+        </a>
       </div>
     </div>
   );

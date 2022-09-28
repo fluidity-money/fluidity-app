@@ -16,6 +16,8 @@ DEV:
   TASK_MAX_COUNT: 50
   LAUNCH_TYPE: FARGATE
   BROKER_NAME: 'flu-dev-mq'
+  DB_MIGRATION_BUCKET: flu-staging-db-migration
+  DB_MIGRATION_LAMBDA: flu-run-db-migration-staging-dbmate
 
 STAGING:
   TASK_ROLE: flu.default.task.role
@@ -48,3 +50,5 @@ MAINNET:
   TASK_MAX_COUNT: 50
   LAUNCH_TYPE: FARGATE
   BROKER_NAME: 'flu-mainnet-mq'
+  DB_MIGRATION_BUCKET: flu-db-migration
+  DB_MIGRATION_LAMBDA: flu-run-db-migration-mainnet-dbmate

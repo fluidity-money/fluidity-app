@@ -2,18 +2,53 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
+import { Display, Heading } from "@fluidity-money/surfing";
 import Video from "components/Video";
+import useViewport from "hooks/useViewport";
+import { isFirefox } from "react-device-detect";
 import styles from "./Incentivising.module.scss";
 
 const Incentivising = () => {
+  const { width } = useViewport();
+  const breakpoint = 860;
+
   return (
     <div className={styles.container}>
-      <Video src={window.location.origin + '/assets/videos/Fluidity_HowItWorks.mp4'} type={'reduce'} view={'normal'} loop={true}/>
+      {width <= breakpoint ? (
+      <Video
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
+        type={"reduce"}
+        loop={true}
+        className={styles.video}
+      />): (
+      <Video
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
+        type={"reduce"}
+        loop={true}
+        scale={isFirefox ? 1.5 : .6}
+        className={styles.video}
+      />)}
       <div>
-        <h2>INCENTIVISING BLOCKCHAIN</h2>
-        <h2>UTILITY</h2>
+        <div className={styles.blur} />
+        <Heading as={"h6"} className={styles.backgroundText}>
+          HOW IT WORKS
+        </Heading>
+        <br />
+        <Display
+          className={styles.backgroundText}
+          large={width > breakpoint && true}
+          small={width < breakpoint && true}
+        >
+          Incentivising
+        </Display>
+        <Display
+          className={styles.backgroundText}
+          large={width > breakpoint && true}
+          small={width < breakpoint && true}
+        >
+          blockchain utility
+        </Display>
       </div>
-      
     </div>
   );
 };

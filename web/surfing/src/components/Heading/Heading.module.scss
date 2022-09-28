@@ -1,38 +1,56 @@
 @use 'common' as *;
 
-.h1, .h2, .h3, .h4, .h5, .h6 {
-    font-family: "Whyte Inktrap", sans-serif;
-    font-weight: 500;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-family: "Whyte Inktrap";
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 
-    color: map-get($text, "prominent")
+  color: map-get($text, "prominent");
 }
 
 .h1 {
-    font-size: $em-step * 12;
+  font-size: $em-step * 12;
 }
 
 .h2 {
-    font-size: $em-step * 10;
+  font-size: $em-step * 10;
 }
 
 .h3 {
-    font-size: $em-step * 8;
+  font-size: $em-step * 8;
 }
 
 .h4 {
-    font-size: $em-step * 7;
+  font-size: $em-step * 7;
 }
 
 .h5 {
-    font-size: $em-step * 5;
+  font-size: $em-step * 5;
 }
 
 .h6 {
-    font-size: $em-step * 3.5;
+  font-size: $em-step * 3.5;
+}
+
+strong {
+  font-weight: 1000;
 }
 
 .uppercase {
-  text-transform: uppercase
+  text-transform: uppercase;
+}
+
+.hollow {
+  color: transparent;
+  -webkit-text-stroke: 0.3px white;
+}
+
+.black {
+  color: black;
 }

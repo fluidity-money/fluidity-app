@@ -3,6 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { GeneralButton } from "../Button";
+import { Heading } from "../Heading";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
@@ -11,25 +12,42 @@ interface IMobileNavModalProps {
 
 const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
-    <a href={`/${link.replace(/\s+/g, "")}`}>
-      <GeneralButton
-        version={"secondary"}
-        type={"text"}
-        size={"large"}
-        handleClick={() => {}}
-      >
-        {link}
-      </GeneralButton>
+    <a
+      className={styles.button}
+      href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
+    >
+      <Heading as="h3">{link}</Heading>
     </a>
   ));
-
+  //./src/assets/images/triangleDown.svg
   return (
     <div className={styles.container}>
-      <img src="/assets/images/logos/logoOutline.svg" alt="logo" />
+      <div className={styles.imgContainer}>
+        <a href={"/"}>
+          <img src="./src/assets/images/logos/.png" alt="logo" />
+        </a>
+      </div>
+
       {links}
+
+      <div className={styles.socials}>
+        <a href="https://twitter.com/fluiditymoney">
+          <img src="/assets/images/socials/twitter.svg" alt="twitter" />
+        </a>
+        <a href="https://discord.gg/CNvpJk4HpC">
+          <img src="/assets/images/socials/discord.svg" alt="discord" />
+        </a>
+        <a href="https://t.me/fluiditymoney">
+          <img src="/assets/images/socials/telegram.svg" alt="telegram" />
+        </a>
+        <a href="https://www.linkedin.com/company/74689228/">
+          <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+        </a>
+      </div>
+
       <GeneralButton
         version={"primary"}
-        type={"text"}
+        buttonType={"text"}
         size={"large"}
         handleClick={() => {}}
       >
@@ -37,18 +55,12 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
       </GeneralButton>
       <GeneralButton
         version={"secondary"}
-        type={"text"}
+        buttonType={"text"}
         size={"large"}
         handleClick={() => {}}
       >
         LET'S CHAT
       </GeneralButton>
-      <div className={styles.socials}>
-        <img src="/assets/images/socials/twitter.svg" alt="twitter" />
-        <img src="/assets/images/socials/discord.svg" alt="discord" />
-        <img src="/assets/images/socials/telegram.svg" alt="telegram" />
-        <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
-      </div>
     </div>
   );
 };

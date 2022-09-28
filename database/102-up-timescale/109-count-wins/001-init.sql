@@ -35,6 +35,7 @@ SELECT add_job('count_wins', '1d', '{}', now() + interval '1 DAY');
 
 -- migrate:down
 
-SELECT delete_job(
-    SELECT job_id FROM timescaledb_information.jobs WHERE proc_name = 'count_wins'
-);
+-- https://dba.stackexchange.com/a/97967
+SELECT f.* 
+FROM timescaledb_information.jobs jobs, delete_job(jobs.job_id) f 
+WHERE jobs.proc_name = 'count_wins';

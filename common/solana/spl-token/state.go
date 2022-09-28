@@ -16,26 +16,30 @@ import (
 )
 
 type (
-	// SplAccountTruncated is a truncated version of the spl-token
-	// account struct, used to get the mint and decimals of a token account
-	SplAccountTruncated struct {
-		Mint     solana.PublicKey
-		Supply   uint64
-		Decimals uint8
+	// SplUserAccountTruncated is a truncated version of the spl-token user
+	// account struct, used to get the mint
+	SplUserAccountTruncated struct {
+		Mint solana.PublicKey
+	}
+
+	// SplMintAccountTruncated is a truncated version of the spl-token mint
+	// account struct, used to get the decimals
+	SplMintAccountTruncated struct {
+		MintAuthority   [36]byte
+		Supply          uint64
+		Decimals        uint8
+		Initialised     bool
+		FreezeAuthority [36]byte
 	}
 )
 
-// SplAccountTruncatedSize is the number of bytes required to encode the data
-// in SplAccountTruncated
-const SplAccountTruncatedSize = 41
-
-// GetMintAndDecimals by taking an spl-token account, getting it's data from the
-// chain, and deserialising to get the mint account and the number of decimals
-func GetMintAndDecimals(solanaClient *rpc.Provider, splAccount solana.PublicKey) (solana.PublicKey, uint8, error) {
+// GetMintFromPda by taking an spl-token user account, getting its data from the
+// chain, and deserialising to get the mint account
+func GetMintFromPda(solanaClient *rpc.Provider, splAccount solana.PublicKey) (solana.PublicKey, error) {
 	resp, err := solanaClient.GetAccountInfo(splAccount)
 
 	if err != nil {
-		return solana.PublicKey{}, 0, fmt.Errorf(
+		return solana.PublicKey{}, fmt.Errorf(
 			"failed to get spl-token account data for account %#v from the RPC! %v",
 			splAccount,
 			err,
@@ -45,28 +49,18 @@ func GetMintAndDecimals(solanaClient *rpc.Provider, splAccount solana.PublicKey)
 	data, err := resp.GetBinary()
 
 	if err != nil {
-		return solana.PublicKey{}, 0, fmt.Errorf(
+		return solana.PublicKey{}, fmt.Errorf(
 			"failed to decode the account info: %v",
 			err,
 		)
 	}
 
-	// if there is not enough data to contain the struct
-	if len(data) < SplAccountTruncatedSize {
-		return solana.PublicKey{}, 0, fmt.Errorf(
-			"spl-token account data for account %#v shorter than expected with length %v and data %#v!",
-			len(data),
-			data,
-			splAccount,
-		)
-	}
-
-	var splData SplAccountTruncated
+	var splData SplUserAccountTruncated
 
 	err = borsh.Deserialize(&splData, data)
 
 	if err != nil {
-		return solana.PublicKey{}, 0, fmt.Errorf(
+		return solana.PublicKey{}, fmt.Errorf(
 			"issue deserialising spl-token account data for account %#v with data %#v! %v",
 			splAccount,
 			data,
@@ -74,7 +68,60 @@ func GetMintAndDecimals(solanaClient *rpc.Provider, splAccount solana.PublicKey)
 		)
 	}
 
-	return splData.Mint, splData.Decimals, nil
+	return splData.Mint, nil
+}
+
+// GetDecimals by taking an spl-token mint account, getting its data from the
+// chain, and deserialising to get the decimals
+func GetDecimalsFromMint(solanaClient *rpc.Provider, splAccount solana.PublicKey) (uint8, error) {
+	resp, err := solanaClient.GetAccountInfo(splAccount)
+
+	if err != nil {
+		return 0, fmt.Errorf(
+			"failed to get spl-token account data for account %#v from the RPC! %v",
+			splAccount,
+			err,
+		)
+	}
+
+	data, err := resp.GetBinary()
+
+	if err != nil {
+		return 0, fmt.Errorf(
+			"failed to decode the account info: %v",
+			err,
+		)
+	}
+
+	var splData SplMintAccountTruncated
+
+	err = borsh.Deserialize(&splData, data)
+
+	if err != nil {
+		return 0, fmt.Errorf(
+			"issue deserialising spl-token account data for account %#v with data %#v! %v",
+			splAccount,
+			data,
+			err,
+		)
+	}
+
+	return splData.Decimals, nil
+}
+
+// GetDecimalsFromPda to get a token's decimals from a PDA of that token
+func GetDecimalsFromPda(solanaClient *rpc.Provider, account solana.PublicKey, commitment string) (uint8, error) {
+	resp, err := solanaClient.GetTokenAccountBalance(account, commitment)
+
+	if err != nil {
+	    return 0, fmt.Errorf(
+			"failed to get token balance for pda %s! %w",
+			account.String(),
+			err,
+		)
+	}
+
+	return resp.Value.Decimals, nil
 }
 
 // AdjustDecimals takens a rawAmount (int64) and an number of decimals and

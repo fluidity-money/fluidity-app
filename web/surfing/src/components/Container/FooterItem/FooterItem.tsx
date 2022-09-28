@@ -2,8 +2,8 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { LinkButton } from "components/Button";
 import useViewport from "~/util/hooks/useViewport";
+import { LinkButton, Heading } from "~/components";
 import styles from "./FooterItem.module.scss";
 
 interface IItem {
@@ -21,25 +21,40 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   const { width } = useViewport();
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
+  const heading = width < 405 ? "h5" : "h4";
+
+  const baseUrl = children.replace(/\s+/g, "").toLowerCase();
+
+  const linkUrls = items.map(item =>
+    item.type === "internal"
+      ? `/${baseUrl}#${item.title.toLowerCase()}`
+      : item.src
+  )
+
+  //  h1 {
+  //   font-size: 36px;
+  //   @media (max-width: 560px) {
+  //     font-size: 20px;
+  //   }
+  // }
 
   const itemList = (
     <ul>
-      {items.map((item) => (
+      {items.map((item, i) => (
         <li key={item.title}>
           <a
-            href={`/${children
-              .replace(/\s+/g, "")
-              .toLowerCase()}#${item.title.toLowerCase()}`}
+            href={linkUrls[i]}
           >
             <LinkButton
               handleClick={() => {}}
               size={
                 width > firstBreakpoint
-                  ? "large"
+                  ? "small"
                   : width > secondBreakpoint && width < firstBreakpoint
-                  ? "medium"
+                  ? "small"
                   : "small"
               }
+              color={"gray"}
               type={item.type}
             >
               {item.title}
@@ -52,8 +67,8 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
 
   return (
     <div className={styles.container}>
-      <a href={`/${children.replace(/\s+/g, "").toLowerCase()}`}>
-        <h1>{children}</h1>
+      <a href={`/${baseUrl}`}>
+        <Heading as={heading}>{children}</Heading>
       </a>
 
       {itemList}

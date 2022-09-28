@@ -1,9 +1,10 @@
-import React from "react";
-import { LinkButton } from "../Button";
+import { useRef } from "react";
+import { useClickOutside } from "../Modal/Modal";
+import { LinkButton } from "~/components/Button";
 import styles from "./NavBarModal.module.scss";
 
 interface INavBarModal {
-  handleModal: () => void;
+  handleModal: (_: boolean) => void;
   navLinks: ILinkButton[];
 }
 
@@ -16,11 +17,15 @@ interface ILinkButton {
 
 const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
+  const navBarModal = useRef(null);
+  
+  useClickOutside(navBarModal, () => handleModal(false));
+
   return (
-    <div className={styles.container}>
+    <div ref={navBarModal} className={styles.container}>
       {navLinks.map((link) => (
         <h4>
-          <a onClick={() => handleModal()} href={`/resources#${link.children}`}>
+          <a onClick={() => handleModal(false)} href={`/resources#${link.children}`}>
             <LinkButton
               size={link.size}
               type={link.type}
@@ -32,9 +37,18 @@ const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
         </h4>
       ))}
       <div className={styles.socials}>
-        <img src="/assets/images/socials/twitter.svg" />
-        <img src="/assets/images/socials/discord.svg" />
-        <img src="/assets/images/socials/telegram.svg" />
+        <a href="https://twitter.com/fluiditymoney">
+          <img src="/assets/images/socials/twitter.svg" />
+        </a>
+        <a href="https://discord.gg/CNvpJk4HpC">
+          <img src="/assets/images/socials/discord.svg" />
+        </a>
+        <a href="https://t.me/fluiditymoney">
+          <img src="/assets/images/socials/telegram.svg" />
+        </a>
+        <a href="https://www.linkedin.com/company/74689228/">
+          <img src="/assets/images/socials/linkedin.svg" />
+        </a>
       </div>
     </div>
   );

@@ -1104,6 +1104,8 @@ lime.app.Application.prototype = $extend(lime.app.Module.prototype,{
 	,exec: function() {
 		
 			var lastTime = 0;
+			this.timeStamps = [];
+
 			var vendors = ['ms', 'moz', 'webkit', 'o'];
 			for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
 				window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
@@ -1220,12 +1222,6 @@ Main.__super__ = lime.app.Application;
 Main.prototype = $extend(lime.app.Application.prototype,{
 	init: function(context) {
 		var _g = this;
-		/*var isIOSBrowser = new EReg("(iPad|iPhone|iPod)","g").match(window.navigator.userAgent);
-		if(isIOSBrowser) {
-			js.Lib.alert("iOS is not supported yet :(");
-			window.location.href = "mobile-app/index.html";
-			return;
-		}*/
 		switch(context[1]) {
 		case 0:
 			var gl = context[2];
@@ -1256,19 +1252,16 @@ Main.prototype = $extend(lime.app.Application.prototype,{
 			lime.ui.MouseEventManager.onMouseUp.add(function(x,y,button) {
 				clickCount++;
 			});
-			haxe.Timer.delay(function() {
-				var fps = _g.performanceMonitor.fpsSamgaple.average;
-			},6000);
 		}
 		this.lastTime = haxe.Timer.stamp();
 		const ref = this;
-		document.getElementById("root").addEventListener("mouseover",function(e) {
+		document.body.addEventListener("mouseover",function(e) {
 			ref.mouse.setTo(e.clientX, e.clientY)
 			ref.mouseClipSpace.setTo(e.clientX / ref.windows[0].width * 2 - 1,(ref.windows[0].height - e.clientY) / ref.windows[0].height * 2 - 1);
 			ref.mousePointKnown = true;
 			ref.isMouseDown = true;	
 		},false, ref);
-		document.getElementById("root").addEventListener("mouseleave",function(e) {
+		document.body.addEventListener("mouseleave",function(e) {
 			ref.mouse.setTo(0, 0)
 			ref.mouseClipSpace.setTo(e.clientX / ref.windows[0].width * 2 - 1,(ref.windows[0].height - e.clientY) / ref.windows[0].height * 2 - 1);
 			ref.mousePointKnown = false;
@@ -1279,7 +1272,51 @@ Main.prototype = $extend(lime.app.Application.prototype,{
 		this.time = haxe.Timer.stamp();
 		var dt = this.time - this.lastTime;
 		this.lastTime = this.time;
-		if(dt > 0) this.performanceMonitor.recordFPS(1 / dt);
+		this.timeStamps.push(dt);
+		
+		if(this.timeStamps.length >= 5) {
+			let avg = 0;
+			for(let i = 0; i < this.timeStamps.length; i++)
+			{
+	            avg += this.timeStamps[i];
+			}
+			avg /= this.timeStamps.length;
+			avg = 1 / avg;
+			this.timeStamps = [];
+            
+			if(avg <= 27) {
+		
+				if(this.particleCount > 20000) {
+				  this.set_simulationQuality(SimulationQuality.Low);
+				}
+				
+				this.particleCount -= 500;
+				this.fluidScale = 0.166666666666666657;
+				this.set_fluidIterations(4);
+				if(this.particleCount <= 0)
+				this.particleCount = 1;
+			}
+
+			else if(avg >= 31 && avg <= 60) {
+				this.set_simulationQuality(SimulationQuality.Low)
+				
+			}
+
+			else if(avg >= 61 && avg <= 100) {
+				this.set_simulationQuality(SimulationQuality.Medium)
+				
+			}
+
+			else if (avg >= 101 && avg <= 180) {
+				this.set_simulationQuality(SimulationQuality.High)
+				
+			}
+
+			else if (avg > 180) {
+				this.set_simulationQuality(SimulationQuality.UltraHigh)
+			}
+		}
+
 		if(this.lastMousePointKnown) {
 			this.updateDyeShader.isMouseDown.set(this.isMouseDown);
 			this.mouseForceShader.isMouseDown.set(this.isMouseDown);
@@ -2573,7 +2610,6 @@ js.Lib = function() { };
 $hxClasses["js.Lib"] = js.Lib;
 js.Lib.__name__ = true;
 js.Lib.alert = function(v) {
-	alert(js.Boot.__string_rec(v,""));
 };
 js.Web = function() { };
 $hxClasses["js.Web"] = js.Web;
@@ -8594,4 +8630,8 @@ lime.utils.ByteArray.lime_lzma_decode = lime.system.System.load("lime","lime_lzm
 lime.utils.ByteArray.lime_lzma_encode = lime.system.System.load("lime","lime_lzma_encode",1);
 shaderblox.uniforms.UTexture.lastActiveTexture = -1;
 ApplicationMain.main();
+console.warn = () => {};
+console.error = () => {};
 })(typeof window != "undefined" ? window : exports);
+
+window.lime.embed("fluid", 0, 0, "FFFFFF");

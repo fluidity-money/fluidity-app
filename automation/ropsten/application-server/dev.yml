@@ -1,6 +1,7 @@
 DOCKER_IMAGE: microservice-ethereum-application-server
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-application-server
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ropsten/http_url
+SECRET_FLU_ETHEREUM_APPLICATION_CONTRACTS: /fluidity/ropsten/application_contracts
 
 SERVICES:
   - APPSERVER_USDT:

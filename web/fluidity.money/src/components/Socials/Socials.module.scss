@@ -5,14 +5,11 @@
   .content {
     display: flex;
     align-items: center;
-    h3 {
-      font-size: 14px;
-      margin-left: 10px;
-      margin-right: 10px;
-    }
+    gap: 10px;
+
     .imageContainer {
-      width: 24px;
-      height: 20px;
+      width: 11px;
+      height: 19px;
 
       img {
         max-width: 100%;
@@ -21,4 +18,16 @@
       }
     }
   }
+}
+
+.social {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.socialText {
+  // Important here because surfing keeps overriding styles
+  font-size: 8px !important;
+  font-family: "Aeonik Mono" !important;
 }

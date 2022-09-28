@@ -4,14 +4,14 @@
 
 import type { ButtonHTMLAttributes } from "react";
 
-import { ReactComponent as ArrowRight } from "/src/assets/images/buttonIcons/arrowRightWhite.svg";
-import { ReactComponent as ArrowTopRight } from "/src/assets/images/buttonIcons/arrowTopRightWhite.svg";
+import { ArrowRight, ArrowTopRight } from "components";
 import styles from "./LinkButton.module.scss";
 
 interface ILinkButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: string;
   size: "small" | "medium" | "large";
   type: "internal" | "external";
+  color?: "white" | "gray";
   handleClick: () => void;
 }
 
@@ -20,18 +20,25 @@ const LinkButton = ({
   size,
   type,
   handleClick,
+  color = "white",
   className,
   ...props
 }: ILinkButtonProps) => {
   const classProps = className || "";
 
+  const buttonColorProps = styles[color];
+  const buttonClassProps = `${styles.button} ${buttonColorProps} ${classProps}`
+  
+  const textSizeProps = styles[size];
+  const textClassProps = `${styles.text} ${textSizeProps}`
+
   return (
     <button 
-      className={`${styles.button} ${classProps}`}
+      className={buttonClassProps}
       onClick={handleClick} 
       {...props}
     >
-      <div className={`${styles.text} ${styles[size]}`}>
+      <div className={textClassProps}>
         {children}
       </div>
       {

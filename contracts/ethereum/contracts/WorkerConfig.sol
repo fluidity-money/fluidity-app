@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL
+
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
@@ -16,10 +18,10 @@ contract WorkerConfig {
     }
 
     /// @notice emitted when the rng oracles are changed to a new address
-    event OracleChanged(address contractAddr, address oldOracle, address newOracle);
+    event OracleChanged(address indexed contractAddr, address indexed oldOracle, address indexed newOracle);
 
     /// @notice emitted when an emergency is declared!
-    event Emergency();
+    event Emergency(bool indexed enabled);
 
     /// @dev if false, emergency mode is active!
     bool private noGlobalEmergency_;
@@ -91,6 +93,18 @@ contract WorkerConfig {
         require(authorised, "only the operator or emergency council can use this");
 
         noGlobalEmergency_ = false;
-        emit Emergency();
+        emit Emergency(true);
+    }
+
+    /**
+     * @notice disables emergency mode, following presumably a contract upgrade
+     * @notice (operator only)
+     */
+    function disableEmergencyMode() public {
+        require(msg.sender == operator_, "only the operator account can use this");
+
+        noGlobalEmergency_ = true;
+
+        emit Emergency(false);
     }
 }

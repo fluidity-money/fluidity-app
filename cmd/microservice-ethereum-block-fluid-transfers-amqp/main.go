@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-block-fluid-transfers-amqp/lib"
 	ethConvert "github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-block-fluid-transfers-amqp/lib/ethereum"
@@ -27,6 +28,14 @@ import (
 const (
 	// EnvGethHttpUrl to use when performing RPC requests
 	EnvGethHttpUrl = `FLU_ETHEREUM_HTTP_URL`
+
+	// EnvRetries is the number of times to retry block fetching
+	// if a block doesn't exist yet
+	EnvRetries = `FLU_ETHEREUM_BLOCK_RETRIES`
+
+	// EnvRetryDelay is the number of seconds to wait before retrying
+	// fetching a block
+	EnvRetryDelay = `FLU_ETHEREUM_BLOCK_RETRY_DELAY`
 )
 
 func convertAddressToBytes(address string) ([]byte, error) {
@@ -41,8 +50,29 @@ func convertAddressToBytes(address string) ([]byte, error) {
 	return hex.DecodeString(hexValues)
 }
 
+// intFromEnvOrFatal reads an int that must exist from the environment
+func intFromEnvOrFatal(env string) int {
+	numString := util.GetEnvOrFatal(env)
+
+	num, err := strconv.Atoi(numString)
+
+	if err != nil {
+	    log.Fatal(func(k *log.Log) {
+	        k.Format("Failed to read an int from environment variable %s!", env)
+	        k.Payload = err
+	    })
+	}
+
+	return num
+}
+
 func main() {
-	var gethHttpApi = util.GetEnvOrFatal(EnvGethHttpUrl)
+	var (
+		gethHttpApi = util.GetEnvOrFatal(EnvGethHttpUrl)
+
+		retries = intFromEnvOrFatal(EnvRetries)
+		delay   = intFromEnvOrFatal(EnvRetryDelay)
+	)
 
 	transferLogTopic, err := convertAddressToBytes(common.TransferLogTopic)
 
@@ -75,12 +105,7 @@ func main() {
 				k.Format("Block %v did NOT contain transfer ABI topic", blockHash)
 			})
 
-			serverWork := worker.EthereumServerWork{
-				EthereumBlockLog:    &amqpBlock,
-				EthereumHintedBlock: nil,
-			}
-
-			queue.SendMessage(workerQueue.TopicEthereumServerWork, serverWork)
+			queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
 
 			return
 		}
@@ -92,7 +117,7 @@ func main() {
 			k.Format("Block %v contains transfer ABI topic", blockHash.String())
 		})
 
-		block, err := lib.GetBlockFromHash(gethHttpApi, blockHash.String())
+		block, err := lib.GetBlockFromHash(gethHttpApi, blockHash.String(), retries, delay)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -123,11 +148,6 @@ func main() {
 
 		amqpBlock.Logs = append(amqpBlock.Logs, newFluidLogs...)
 
-		serverWork := worker.EthereumServerWork{
-			EthereumBlockLog:    &amqpBlock,
-			EthereumHintedBlock: nil,
-		}
-
-		queue.SendMessage(workerQueue.TopicEthereumServerWork, serverWork)
+		queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
 	})
 }

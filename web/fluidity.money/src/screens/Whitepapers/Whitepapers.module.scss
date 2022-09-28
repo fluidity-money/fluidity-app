@@ -4,20 +4,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 850px;
-  width: 100%;
+  padding: 50px;
+  margin-top: 5%;
+  margin-bottom: 5%;
   background-color: $fluidBlack;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 
   div {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 90%;
-    min-height: 500px;
-    // border: 1px solid $fluidWhite;
+    gap: 10px;
     text-align: center;
-    background-color: $backgroundBlack;
     padding: 20px;
     &:hover {
       opacity: 0.8;
@@ -25,19 +25,25 @@
 
     img {
       margin-bottom: 25px;
-    }
-
-    P {
-      font-size: 10px;
-      margin-top: 10px;
+      @media (max-width: 500px) {
+        width: 310px;
+      }
     }
   }
 }
 
-.carouselText {
-  h2 {
-    margin-right: 20px;
-    opacity: 1;
+.carousel {
+  width: 100%;
+  align-self: flex-end;
+}
+
+.callout {
+  display: flex;
+}
+
+.text {
+  margin-right: 10px;
+  &Hollow {
+    margin-right: 10px;
   }
-  background-color: $fluidBlack;
 }

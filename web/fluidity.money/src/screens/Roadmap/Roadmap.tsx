@@ -2,63 +2,63 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { LinkButton, ReusableGrid } from "surfing";
-import Video from "components/Video";
-import styles from "./Roadmap.module.scss";
-import HowItWorksTemplate from "components/HowItWorksTemplate";
 import useViewport from "hooks/useViewport";
+import { ArrowTopRight, ReusableGrid, GeneralButton } from "@fluidity-money/surfing";
+import Video from "components/Video";
+import HowItWorksTemplate from "components/HowItWorksTemplate";
+import styles from "./Roadmap.module.scss";
 
 const Roadmap = () => {
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash) {
-      let elem = document.getElementById(location.hash.slice(1));
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }
-  }, [location]);
 
   const { width } = useViewport();
   const breakpoint = 860;
+  
+  const button = <GeneralButton
+    buttonType={"icon after"}
+    version={"secondary"}
+    size={"large"}
+    handleClick={() => {window.location.href = "https://docs.fluidity.money/docs/fundamentals/roadmap"}}
+    icon={<ArrowTopRight/>}
+  >
+    EXPLORE OUR FUTURE
+  </GeneralButton>;
 
-  const button = (
-    <LinkButton size={"medium"} type={"external"} handleClick={() => {}}>
-      EXPLORE OUR FUTURE
-    </LinkButton>
-  );
+const left =
+width < breakpoint ? (
+  <div className={styles.smallVid}>
+  <Video
+    src={"/assets/videos/FluidityRoadMap.mp4"}
+    type={"fit"}
+    loop={true}
+    margin={"-120px 0px 0px 0px"}
+    className={styles.video}
+  />
+  <div className={styles.smallClip} />
+  </div>
+) : (
+  <HowItWorksTemplate button={button} info={info}>
+    Roadmap
+  </HowItWorksTemplate>
+);
 
-  const left =
-    width < breakpoint ? (
-      <Video
-        src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
-        type={"fit"}
-        view={"normal"}
-        loop={true}
-      />
-    ) : (
-      <HowItWorksTemplate button={button} info={info}>
-        Roadmap
-      </HowItWorksTemplate>
-    );
-
-  const right =
-    width > breakpoint ? (
-      <Video
-        src={window.location.origin + "/assets/videos/Fluidity_RoadMap.mp4"}
-        type={"fit"}
-        view={"normal"}
-        loop={true}
-      />
-    ) : (
-      <HowItWorksTemplate info={info} button={button}>
-        Roadmap
-      </HowItWorksTemplate>
-    );
+const right =
+width > breakpoint ? (
+  <>
+  <Video
+    src={"/assets/videos/FluidityRoadMap.mp4"}
+    type={"fit"}
+    loop={true}
+    scale={2.0}
+    margin={"0px 400px 0px 0px"}
+    className={styles.video}
+  />
+  <div className={styles.clip} />
+  </>
+) : (
+  <HowItWorksTemplate info={info} button={button}>
+    Roadmap
+  </HowItWorksTemplate>
+);
 
   return (
     <div className={styles.container} id="roadmap">

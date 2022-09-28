@@ -6,12 +6,111 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   padding-top: 100px;
   z-index: 61;
+
+  h3 {
+    font-weight: 100;
+  }
 }
 
 .socials {
+  margin-top: 20px;
+  margin-bottom: 10px;
   display: flex;
-  gap: 10px;
+  gap: 25px;
+}
+
+.imgContainer {
+  width: 160px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  img {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+.button {
+  background-color: transparent;
+  border: 0.5px solid rgba(255, 255, 255, 0.8);
+  color: "orange";
+  max-width: 300px;
+  min-height: 60px;
+  width: 100%;
+  text-align: center;
+  height: fit-content;
+  border-radius: 30px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:focus:enabled {
+    box-shadow: 0px 0px 0px 2px rgba(255, 255, 255, 0.2);
+    // box-shadow: 0px 0px 0px 2px map-get($border, "focus");
+    color: #ffffff;
+  }
+
+  &:hover:enabled {
+    background-color: #ffffff;
+    // background-color: map-get($bg, "alternate");
+    // border: 0.5px solid map-get($border, "prominent");
+    background-color: #ffffff;
+    color: black;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: #4d4d4c;
+    background-color: transparent;
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.whiteButton {
+  background-color: #ffffff;
+  border: 0.5px solid #ffffff;
+  color: black;
+  width: fit-content;
+  height: fit-content;
+  text-transform: uppercase;
+  max-width: 300px;
+  min-height: 60px;
+  width: 100%;
+  text-align: center;
+  height: fit-content;
+  border-radius: 30px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:focus:enabled {
+    background-color: #ffffff;
+    box-shadow: 0px 0px 0px 2px rgba(255, 255, 255, 0.2);
+  }
+
+  &:hover:enabled {
+    background-color: transparent;
+    border: 0.5px solid #ffffff;
+    color: #ffffff;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.smaller {
+  font-size: 8px;
+}
+
+.black {
+  color: black;
 }

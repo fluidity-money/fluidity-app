@@ -8,9 +8,14 @@ import styles from "./ContinuousCarousel.module.scss";
 interface IContinuousCarousel {
   direction: "right" | "left" | "up";
   children: ReactNode;
+  background?: boolean;
 }
 
-const ContinuousCarousel = ({ direction, children }: IContinuousCarousel) => {
+const ContinuousCarousel = ({
+  direction,
+  children,
+  background,
+}: IContinuousCarousel) => {
   /* 
   Continuous carousel in right or left direction
   */
@@ -18,18 +23,20 @@ const ContinuousCarousel = ({ direction, children }: IContinuousCarousel) => {
     <div
       className={
         direction === "right"
-          ? `${styles.winnersRight}`
+          ? `${styles.winnersRight} ${background && styles.backgroundRight}`
           : direction === "left"
-          ? `${styles.winnersLeft}`
+          ? `${styles.winnersLeft} ${background && styles.backgroundLeft}`
           : `${styles.winnersTop}`
       }
     >
       <div
         className={
           direction === "right"
-            ? `${styles.winnersRightLine}`
+            ? `${styles.winnersRightLine} ${
+                background && styles.backgroundRight
+              }`
             : direction === "left"
-            ? `${styles.winnersLeftLine}`
+            ? `${styles.winnersLeftLine} ${background && styles.backgroundLeft}`
             : `${styles.winnersTopLine}`
         }
       >

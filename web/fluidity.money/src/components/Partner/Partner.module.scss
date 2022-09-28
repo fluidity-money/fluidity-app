@@ -2,30 +2,56 @@
 
 .container {
   cursor: pointer;
-  border: 1px solid $fluidWhite;
   border-radius: 10px;
-  padding: 50px 20px 20px 20px;
+  padding: 50px 33px 20px 20px;
   width: 300px;
-  height: fit-content;
+  height: 250px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px;
+  margin: 10px;
   background-color: $backgroundBlack;
+  transition: height 0.1s ease-out;
+  img {
+    width: 30%;
+    margin-bottom: 20px;
+  }
+
+  div {
+    display: flex;
+    h2 {
+      margin-bottom: 10px;
+    }
+    img {
+      margin-top: 10px;
+      margin-left: 10px;
+      width: 13px;
+      height:13px;
+    }
+  }
 
   p {
     max-height: 130px;
     padding: 0;
-    overflow-y: auto;
+    overflow-y: hidden;
     color: transparent;
     text-align: center;
+    display: hidden;
   }
 
   &:hover {
     background-color: $fluidWhite;
     color: $fluidBlack;
+    height: 350px;
+    transition: height 0.1s ease-in;
     p {
       color: $fluidBlack;
+      display:block
+    }
+    div {
+      img {
+        filter: invert(100%);
+      }
     }
   }
 }
