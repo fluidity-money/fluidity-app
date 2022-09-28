@@ -134,13 +134,21 @@ func main() {
 				})
 			}
 
-			var decorator *worker.EthereumWorkerDecorator
-
 			// nil, nil for a skipped event
-			if fee != nil {
-				decorator = &worker.EthereumWorkerDecorator{
-					ApplicationFee: fee,
-				}
+			if fee == nil {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Skipping an application transfer for transaction %#v and application %#v!",
+						transfer.Transaction.Hash.String(),
+						transfer.Application,
+					)
+				})
+
+				continue
+			}
+
+			decorator := &worker.EthereumWorkerDecorator{
+				ApplicationFee: fee,
 			}
 
 			toAddress, fromAddress, err := applications.GetApplicationTransferParties(transfer)
