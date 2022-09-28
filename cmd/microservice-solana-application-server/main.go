@@ -115,7 +115,7 @@ func main() {
 
 		if len(transfers) > 0 {
 			bufferedTransfers := worker.SolanaBufferedTransfers{
-				Transfers: transfers,
+				Transfers:       transfers,
 			}
 
 			queue.SendMessage(

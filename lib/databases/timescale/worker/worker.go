@@ -50,6 +50,8 @@ func InsertEmissions(emission Emission) {
 		transfersInBlock        = emission.TransfersInBlock
 		transfersPast           = emission.TransfersPast
 		secondsSinceLastBlock   = emission.SecondsSinceLastBlock
+		ethAppFees              = emission.EthereumAppFees
+		solAppFees              = emission.SolanaAppFees
 	)
 
 	var testingBallsString strings.Builder
@@ -136,7 +138,25 @@ func InsertEmissions(emission Emission) {
 			atx_buffer_size,
 			transfers_in_block,
 			transfers_past,
-			seconds_since_last_block
+			seconds_since_last_block,
+
+			uniswap_v2_fee,
+			balancer_v_fee,
+			oneinch_v2_fee,
+			oneinch_v1_fee,
+			mooniswap_fee,
+			oneinch_fixedrate_fee,
+			dodo_v2_fee,
+			curve_fee,
+			multichain_fee,
+			xyfinance_fee,
+
+			saber_fee,
+			orca_fee,
+			raydium_fee,
+			aldrin_v1_fee,
+			aldrin_v2_fee,
+			lifinity_fee
 		)
 
 		VALUES (
@@ -210,7 +230,25 @@ func InsertEmissions(emission Emission) {
 			$54,
 			$55,
 			$56,
-			$57
+			$57,
+
+			$58,
+			$59,
+			$60,
+			$61,
+			$62,
+			$63,
+			$64,
+			$65,
+			$66,
+			$67,
+
+			$68,
+			$69,
+			$70,
+			$71,
+			$72,
+			$73
 		);`,
 
 		TableEmissions,
@@ -290,6 +328,24 @@ func InsertEmissions(emission Emission) {
 		transfersInBlock,
 		transfersPast,
 		secondsSinceLastBlock,
+
+		ethAppFees.UniswapV2,
+		ethAppFees.BalancerV2,
+		ethAppFees.OneInchV2,
+		ethAppFees.OneInchV1,
+		ethAppFees.Mooniswap,
+		ethAppFees.OneInchFixedRate,
+		ethAppFees.DodoV2,
+		ethAppFees.Curve,
+		ethAppFees.Multichain,
+		ethAppFees.XyFinance,
+
+		solAppFees.Saber,
+		solAppFees.Orca,
+		solAppFees.Raydium,
+		solAppFees.AldrinV1,
+		solAppFees.AldrinV2,
+		solAppFees.Lifinity,
 	)
 
 	if err != nil {

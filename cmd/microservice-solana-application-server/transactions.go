@@ -17,6 +17,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/saber"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	types "github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId, lifinityProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
@@ -27,6 +28,8 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 		transactionResult       = transaction.Transaction.Result
 		transactionSignature    = transaction.Transaction.Signature
 		transactionApplications = transaction.Transaction.Applications
+
+		emission worker.SolanaAppFees
 	)
 
 	for _, app := range transactionApplications {
@@ -42,6 +45,8 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 		case applications.ApplicationSaber:
 			fee, _, err = saber.GetSaberFees(saberRpc, transactionResult, saberProgramId)
 
+			emission.Saber += util.MaybeRatToFloat(fee)
+
 		case applications.ApplicationOrca:
 			fee, err = orca.GetOrcaFees(
 				solanaClient,
@@ -49,6 +54,8 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 				orcaProgramId,
 				fluidTokens,
 			)
+
+			emission.Orca += util.MaybeRatToFloat(fee)
 
 		case applications.ApplicationRaydium:
 			fee, err = raydium.GetRaydiumFees(
@@ -58,6 +65,8 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 				fluidTokens,
 			)
 
+			emission.Raydium += util.MaybeRatToFloat(fee)
+
 		case applications.ApplicationAldrinV1:
 			fee, err = aldrin.GetAldrinFees(
 				solanaClient,
@@ -66,6 +75,8 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 				fluidTokens,
 			)
 
+			emission.AldrinV1 += util.MaybeRatToFloat(fee)
+
 		case applications.ApplicationAldrinV2:
 			fee, err = aldrin.GetAldrinFees(
 				solanaClient,
@@ -73,6 +84,9 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 				aldrinV2ProgramId,
 				fluidTokens,
 			)
+
+			emission.AldrinV2 += util.MaybeRatToFloat(fee)
+
 		case applications.ApplicationLifinity:
 			fee, err = lifinity.GetLifinityFees(
 				solanaClient,
@@ -80,6 +94,8 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 				lifinityProgramId,
 				fluidTokens,
 			)
+
+			emission.Lifinity += util.MaybeRatToFloat(fee)
 
 		default:
 			err = fmt.Errorf(
@@ -134,6 +150,7 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 			SenderOwnerAddress:    senderOwner,
 			RecipientOwnerAddress: recipientOwner,
 			Decorator:             decorator,
+			AppEmissions:          emission,
 		}
 
 		decorated[i] = decoratedTransfer

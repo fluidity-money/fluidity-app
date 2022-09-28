@@ -1,7 +1,6 @@
 DOCKER_IMAGE: microservice-ethereum-worker-server
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-server
 ENV_FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: "0x6D2299C48a8dD07a872FDd0F8233924872Ad1071"
-SECRET_FLU_ETHEREUM_APPLICATION_CONTRACTS: /fluidity/ethereum/application_contracts
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
 
 SERVICES:

@@ -70,9 +70,11 @@ type (
 			RewardPool      float64 `json:"reward_pool"`
 		} `json:"payout"`
 
-		Fees struct {
-			Saber float64 `json:"saber"`
-		} `json:"fees"`
+		// app fees for solana transactions
+		SolanaAppFees SolanaAppFees `json:"solana_fees"`
+
+		// app fees for eth transactions
+		EthereumAppFees EthereumAppFees `json:"ethereum_fees"`
 
 		// calculate n function
 		CalculateN struct {
@@ -128,6 +130,30 @@ type (
 			Probability4 float64 `json:"probability_4"`
 			Probability5 float64 `json:"probability_5"`
 		} `json:"winning_chances"`
+	}
+
+	// app fees for solana transactions
+	SolanaAppFees struct {
+		Saber    float64 `json:"saber"`
+		Orca     float64 `json:"orca"`
+		Raydium  float64 `json:"raydium"`
+		AldrinV1 float64 `json:"aldrin_v1"`
+		AldrinV2 float64 `json:"aldrin_v2"`
+		Lifinity float64 `json:"lifinity"`
+	}
+
+	// app fees for ethereum transactions
+	EthereumAppFees struct {
+		UniswapV2        float64 `json:"uniswap_v2"`
+		BalancerV2       float64 `json:"balancer_v2"`
+		OneInchV2        float64 `json:"oneinch_v2"`
+		OneInchV1        float64 `json:"oneinch_v1"`
+		Mooniswap        float64 `json:"mooniswap"`
+		OneInchFixedRate float64 `json:"oneinch_fixedrate"`
+		DodoV2           float64 `json:"dodo_v2"`
+		Curve            float64 `json:"curve"`
+		Multichain       float64 `json:"multichain"`
+		XyFinance        float64 `json:"xyfinance"`
 	}
 )
 
