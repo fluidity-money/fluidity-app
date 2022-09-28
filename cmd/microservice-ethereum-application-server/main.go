@@ -167,7 +167,7 @@ func main() {
 				Transaction:      transfer.Transaction,
 			}
 
-			decoratedTransfers[i] = decoratedTransfer
+			decoratedTransfers = append(decoratedTransfers, decoratedTransfer)
 		}
 
 		serverWork := worker.EthereumHintedBlock{
