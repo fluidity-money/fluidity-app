@@ -1,4 +1,4 @@
-name: DB Migration - Staging (Manual)
+name: DB Migration - Mainnet (Manual)
 
 on:
   workflow_dispatch:
@@ -7,12 +7,14 @@ on:
         type: choice
         description: 'Environment'
         options:
-          - 'dev'
+          - 'mainnet'
       network:
         type: choice
         description: 'Network'
         options: 
-          - 'ropsten'
+          - 'solana'
+          - 'ethereum'
+          - 'all'
 
 permissions:
   id-token: write
