@@ -25,6 +25,8 @@ SERVICES:
       ENV_FLU_ETHEREUM_TOKEN_BACKEND: compound
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
       ENV_FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.usdc.apy.moving-average
+      ENV_FLU_DEBUG: true
+      ENV_FLU_SILENT: false
 
   - WORKER_SERVER_DAI:
       SERVICE_NAME: microservice-ethereum-worker-server-dai
