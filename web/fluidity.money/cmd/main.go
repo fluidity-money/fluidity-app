@@ -4,6 +4,13 @@
 
 package main
 
-func main() {
+import (
+	"github.com/fluidity-money/fluidity-app/lib/web"
 
+	api_fluidity_money "github.com/fluidity-money/fluidity-app/web/fluidity.money/lib-backend"
+)
+
+func main() {
+	web.JsonEndpoint("/fluidity-tweets", api_fluidity_money.PullTweets)
+	web.Listen()
 }
