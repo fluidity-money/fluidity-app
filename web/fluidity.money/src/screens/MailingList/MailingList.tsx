@@ -48,6 +48,7 @@ const MailingList = () => {
             version={"primary"}
             buttonType={"text"}
             size={"medium"}
+            handleClick={()=>{}}
           >
             GIMME THE JUICE
           </GeneralButton>
