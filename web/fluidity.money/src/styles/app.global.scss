@@ -25,6 +25,14 @@ body {
   overflow-x: hidden;
   // hide scrollbar at the side of the website
   overflow-y: scroll;
+  &::-webkit-scrollbar {
+    width: 0px;
+  }
+  @media (max-width: 500px) {
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+  }
 }
 
 ul {
@@ -49,7 +57,7 @@ button {
 }
 
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -62,11 +70,11 @@ button {
   border-radius: 10px;
 }
 
-#fluid { 
+#fluid {
   background: #000000;
   z-index: 1;
   position: fixed;
-  top:0;
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
@@ -80,24 +88,24 @@ button {
 }
 
 #root {
-  position : absolute;
-  z-Index: 3;
+  position: absolute;
+  z-index: 3;
   top: 0;
   left: 0;
   right: 0;
-  bottom:5;	
+  bottom: 5;
   overflow-x: hidden;
 }
 
 #shade {
-  position : fixed;
+  position: fixed;
   width: 100%;
   height: 100%;
-  z-Index: 2;
+  z-index: 2;
   top: 0;
   left: 0;
   right: 0;
-  bottom:5;
+  bottom: 5;
   background-color: rgb(0, 0, 0);
   opacity: 0.6;
 }
