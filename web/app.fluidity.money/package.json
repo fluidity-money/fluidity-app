@@ -24,7 +24,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@fluidity-money/surfing": "^0.0.30",
+    "@fluidity-money/surfing": "file:../surfing-prebuilt",
     "@remix-run/dev": "^1.7.1",
     "@remix-run/node": "^1.7.1",
     "@sentry/react": "^7.12.1",

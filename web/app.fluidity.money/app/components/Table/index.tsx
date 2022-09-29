@@ -1,0 +1,137 @@
+import { Link, useTransition } from "@remix-run/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Text } from "@fluidity-money/surfing";
+
+type Filter<T> = {
+  filter: (item: T) => boolean,
+  name: string,
+}
+
+export type ColumnProps = {
+  name: string,
+  alignRight?: boolean,
+}
+
+export type PaginationProps = {
+  page: number;
+  rowsPerPage: number;
+  pageQuery?: string;
+}
+
+type ITable<T> = {
+  className?: string,
+  itemName?: string,
+  headings: ColumnProps[],
+  
+  pagination: PaginationProps,
+  
+  count: number,
+
+  // Used for filters
+  data: T[],
+
+  // Render data into row
+  renderRow: (data: T, index: number) => React.ReactNode,
+
+  // Filters based on elementData
+  filters?: Filter<T>[],
+}
+
+const Table = <T,>(props: ITable<T>) => {
+  const { itemName, pagination, data, renderRow, count, headings, filters } = props;
+  
+  const { rowsPerPage, page } = pagination;
+  
+  const pageCount = Math.ceil(count / rowsPerPage);
+  
+  const startIndex = (page - 1) * rowsPerPage + 1;
+  const endIndex = Math.min(page * rowsPerPage, count);
+
+  const isTransition = useTransition();
+  
+  return (
+    <div>
+      <div className="transactions-header row justify-between">
+
+        {/* Item Count */}
+        <Text>
+          {startIndex}-{endIndex} of {count} {itemName}
+        </Text>
+    
+        {/* Filters - SCOPED OUT */}
+        {/*filters && (
+          <div>
+            {filters.map(filter => (
+              <span>{filter.name}</span>
+            ))}
+          </div>
+        )*/}
+      </div>
+    
+      {/* Table */}
+      <table>
+        {/* Table Headings */}
+        <thead>
+          <tr>
+            {headings.map(heading => {
+              const alignProps = heading.alignRight ? "alignRight" : "alignLeft"
+              const classProps = `heading ${alignProps}`
+
+              return (
+                <th className={classProps}>
+                  <Text>
+                    {heading.name}
+                  </Text>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+    
+        {/* Table Body */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.tbody
+            key={`page-${page}`}
+            initial="enter"
+            animate={
+              isTransition.state === "idle" ? "enter" : "transitioning"
+            }
+            exit="exit"
+            variants={{
+              enter: {
+                opacity: 1,
+                transition: {
+                  when: "beforeChildren",
+                  staggerChildren: 0.05,
+                },
+              },
+              exit: {
+                opacity: 0,
+                transition: {
+                  when: "afterChildren",
+                  staggerChildren: 0.05,
+                },
+              },
+              transitioning: {},
+            }}
+          >
+            {data.map((transaction, i) => renderRow(transaction, i))}
+          </motion.tbody>
+        </AnimatePresence>
+      </table>
+    
+      {/* Pagination */}
+      <motion.div className="pagination" layout="position">
+        {Array.from(Array(pageCount).keys()).map((_, i) => {
+          return (
+            <Link key={i} to={`?${pagination.pageQuery || "page"}=${i + 1}`}>
+              {i + 1}
+            </Link>
+          );
+        })}
+      </motion.div>
+    </div>
+  );
+};
+
+export default Table;
