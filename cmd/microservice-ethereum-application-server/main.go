@@ -30,10 +30,14 @@ const (
 
 	// EnvApplicationContracts to list the application contracts to monitor
 	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
+
+	// EnvServerWorkQueue to send serverwork down
+	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
 
 func main() {
 	var (
+		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
 		gethHttpUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
@@ -179,6 +183,6 @@ func main() {
 		}
 
 		// send to server
-		queue.SendMessage(worker.TopicEthereumServerWork, serverWork)
+		queue.SendMessage(publishAmqpTopic, serverWork)
 	})
 }
