@@ -62,7 +62,7 @@ const ResourcesPage = () => {
               <Fluniversity />
               <Whitepapers />
               <Docs />
-              {/* <MailingList /> */}
+              <MailingList />
               <Demo />
               <Footer />
             </motion.div>

@@ -10,9 +10,9 @@ const MailingList = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    const endpoint = "https://landing-cdn.fluidity.money/submit-email";
+    const endpoint = "https://landing-api.fluidity.money:8081/api/submit-email";
     
-    const data = {email: e.target.email.value}
+    const data = {address: e.target.address.value}
     
     fetch(
       endpoint, {
@@ -38,14 +38,13 @@ const MailingList = () => {
           </section>
           <section>
             <Text size={"md"} prominent={true} >EMAIL</Text>
-            <input type="text" placeholder="elon@email.com" name={"email"} />
+            <input type="text" placeholder="elon@email.com" name={"address"} />
           </section>
           <GeneralButton
             type={'submit'}
             version={"primary"}
             buttonType={"text"}
             size={"medium"}
-            //handleClick={() => {(document.getElementById('mailform') as HTMLFormElement).submit()}}
           >
             GIMME THE JUICE
           </GeneralButton>
