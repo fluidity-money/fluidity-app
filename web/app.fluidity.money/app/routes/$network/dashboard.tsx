@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const routeMapper = (route: string) => {
     switch (route.toLowerCase()) {
       case "home":
-        return "dASHBOARD";
+        return "DASHBOARD";
       case "rewards":
         return "REWARDS";
       case "assets":
@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       case "dao":
         return "DAO";
       default:
-        return "Dashboard";
+        return "DASHBOARD";
     }
   }
   

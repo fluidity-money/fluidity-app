@@ -7,6 +7,13 @@ interface IProviderCard {
   avgPrize: number;
 }
 
+export type Provider = {
+  iconUrl: string;
+  name: string;
+  prize: number;
+  avgPrize: number;
+}
+
 const ProviderCard = ({iconUrl, name, prize, avgPrize}: IProviderCard) => {
   return (
     <Card

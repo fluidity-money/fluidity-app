@@ -3,11 +3,8 @@ import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
 import {
-  GeneralButton,
-  Display,
   Text,
   Heading,
-  Card,
   ManualCarousel,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
@@ -17,11 +14,9 @@ import { useLoaderData } from "@remix-run/react";
 import { UserTransaction } from "~/queries/useUserTransactions";
 import { ProviderCard, LabelledValue } from "~/components"
 
-import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
-
-import { motion } from "framer-motion";
-
-import { Table } from "~/components";
+import TransactionTable from "~/screens/TransactionTable";
+import UserRewards from "~/screens/UserRewards";
+import NoUserRewards from "~/screens/NoUserRewards";
 
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
@@ -73,8 +68,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (Math.ceil(count / 12) < page && count > 0) {
     return redirect(`./`, 301);
   }
+  
+  // Get Best Rewarders
+  
 
   return json({
+    rewarders: rewarders,
     transactions: sanitizedTransactions,
     count,
     page,
@@ -93,185 +92,22 @@ type Transaction = {
   currency: string;
 };
 
-type LoaderData = {
-  transactions: Transaction[];
-  count: number;
-  page: number;
-};
-
-type Provider = {
+type Rewarder = {
   iconUrl: string;
   name: string;
   prize: number;
   avgPrize: number;
 }
 
-const TransactionRow = (tx: Transaction, index: number) => {
-  const { sender, receiver, timestamp, value, currency } = tx;
-  
-  const isTransactionToday = isToday(timestamp * 1000);
-  const isTransactionYesterday = isYesterday(timestamp * 1000);
-
-  let timeLabel = "";
-
-  if (isTransactionToday) {
-    timeLabel = formatDistanceToNow(timestamp * 1000, {
-      addSuffix: true,
-    });
-  } else if (isTransactionYesterday) {
-    timeLabel = `Yesterday ${format(
-      timestamp * 1000,
-      "h:mmaaa"
-    )}`;
-  } else {
-    timeLabel = format(timestamp * 1000, "dd.MM.yy h:mmaaa");
-  }
-
-  return (
-    <motion.tr
-      key={`${timestamp}-${index}`}
-      variants={{
-        enter: { opacity: [0, 1] },
-        ready: { opacity: 1 },
-        exit: { opacity: 0 },
-        transitioning: {
-          opacity: [0.75, 1, 0.75],
-          transition: { duration: 1.5, repeat: Infinity },
-        },
-      }}
-    >
-      {/* Activity */}
-      <td>
-        <a>
-          <Text>
-            {currency} {ActivityLabel(tx, address)}
-          </Text>
-        </a>
-      </td>
-
-      {/* Value */}
-      <td>
-        <Text>
-        {value.toLocaleString("en-US", {
-          style: "currency",
-          currency: "USD",
-        })}
-        </Text>
-      </td>
-
-      {/* Reward */}
-      <td>
-        <Text prominent={true}>
-          -
-        </Text>
-      </td>
-
-      {/* Account */}
-      <td>
-        <a>
-          <Text>
-            {sender === address ? receiver : sender}
-          </Text>
-        </a>
-      </td>
-
-      {/* Time */}
-      <td>{timeLabel}</td>
-    </motion.tr>
-  );
-}
-
-const ActivityLabel = (activity: Transaction, address: string) => {
-  const { sender, currency } = activity;
-  return sender === address ? `Sent ${currency}` : `Received ${currency}`;
+type LoaderData = {
+  transactions: Transaction[];
+  count: number;
+  page: number;
+  rewarders: Rewarder[];
 };
 
-const UserRewards = () => (
-  <Card
-    component="div"
-    rounded={true}
-    type={"holobox"}
-  >
-    <img src="./tokens" alt="tokens" />
-
-    {/* Unclaimed fluid rewards */}
-    <section>
-      <Text size="md" >Unclaimed fluid rewards</Text>
-      <Display size="md" >{numberToMonetaryString(6745)}</Display>
-      <GeneralButton
-        size={"large"}
-        version={"primary"}
-        buttonType="text"
-        handleClick={() => {}}
-      >
-        View Breakdown
-      </GeneralButton>
-    </section>
-
-    {/* Auto-claims infobox */}
-    <section>
-      <Heading as="h5">
-        Auto-claims
-      </Heading>
-      <Text>
-        {autoClaimInfo}
-      </Text>
-      <hr />
-      <Heading as="h5">
-        Instant-claim fees
-      </Heading>
-      <section>
-        <Text>
-          Network fee
-        </Text>
-        <Text>
-          $0.002 FUSDC
-        </Text>
-      </section>
-      <hr />
-      <section>
-        <Text>
-          Gas fee
-        </Text>
-        <Text>
-          $0.002 FUSDC
-        </Text>
-      </section>
-      <hr />
-    </section>
-  </Card>
-);
-
-const NoUserRewards = ({rewarder} : {rewarder: Provider}) => (
-  <div>
-    <section>
-      <Heading as="h2">
-        Spend to earn
-      </Heading>
-      <Text prominent={true} size="lg">
-        Use, send and receive fluid assets
-        to generate yield.
-      </Text>
-    </section>
-    <section>
-      <Text size="md">
-        Highest reward distribution this week
-      </Text>
-
-      <ProviderCard
-        iconUrl={rewarder.iconUrl}
-        name={rewarder.name}
-        prize={rewarder.prize}
-        avgPrize={rewarder.avgPrize}
-      />
-    </section>
-  </div>
-);
-
-
-
 export default function Rewards() {
-  const { transactions, count, page } = useLoaderData<LoaderData>();
+  const { transactions, count, page, rewarders } = useLoaderData<LoaderData>();
   
   const [ timeFrameIndex, setTimeFrameIndex ] = useState(0);
   
@@ -282,25 +118,6 @@ export default function Rewards() {
     "This year",
   ]
   
-  const txTableColumns = [
-    {
-      name: "ACTIVITY",
-    },
-    {
-      name: "VALUE",
-    },
-    {
-      name: "REWARD",
-    },
-    {
-      name: "ACCOUNT",
-    },
-    {
-      name: "TIME",
-      alignRight: true,
-    },
-  ];
-  
   return (
     <>
       <section id="user-rewards">
@@ -309,7 +126,7 @@ export default function Rewards() {
       </section>
 
       {/* Reward Performance */}
-      <section id="graph">
+      <section id="performance">
         <Heading as={"h2"}>
           Reward Performance
         </Heading>
@@ -358,16 +175,10 @@ export default function Rewards() {
 
 
       <section id="table">
-        <Table 
-          itemName="transactions"
-          headings={txTableColumns}
-          pagination={{
-            page: page,
-            rowsPerPage: 12,
-          }}
+        <TransactionTable
+          page={page}
           count={count}
-          data={transactions}
-          renderRow={TransactionRow}
+          transactions={transactions}
         />
       </section>
     
@@ -419,6 +230,3 @@ const rewarders = [
   },
 ]
 
-const autoClaimInfo = "Rewards will be claimed automatically, without fees\n\
-                        when market volume is reached. Claiming before this\n\
-                        time will incur instant-claim fees stated below."
