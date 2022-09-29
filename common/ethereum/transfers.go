@@ -21,7 +21,11 @@ var TransferLogTopic = strings.ToLower(
 
 // Get transfer receipts
 func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethCommon.Address) ([]worker.EthereumDecoratedTransfer, error) {
-	blockTransactions := make(map[ethereum.Hash]ethereum.Transaction)
+	var (
+		blockTransactions = make(map[ethereum.Hash]ethereum.Transaction)
+		contractAddress = fluidContractAddress.String()
+		loweredContractAddress = strings.ToLower(contractAddress)
+	)
 
 	for _, transaction := range transactions {
 		blockTransactions[transaction.Hash] = transaction
@@ -40,7 +44,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
 
-		if transferContractAddress != fluidContractAddress.String() {
+		if transferContractAddress != loweredContractAddress {
 			log.Debugf(
 				"For transaction hash %#v, contract was %#v, not %#v!",
 				transactionHash,
