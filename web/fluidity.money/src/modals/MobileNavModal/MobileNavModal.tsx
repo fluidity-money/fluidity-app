@@ -3,6 +3,7 @@
 // LICENSE_TRF.md file.
 
 import { Heading } from "@fluidity-money/surfing";
+import Image from "next/image";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
@@ -22,11 +23,17 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.imgContainer}>
-        <a href={"/"}>
-          <img src="/assets/images/logoMetallic.png" alt="logo" />
-        </a>
-      </div>
+      <a href={"/"}>
+        <Image
+          src="/assets/images/logoMetallic.png"
+          alt="logo"
+          width="160"
+          height="68"
+          priority={true}
+          placeholder="blur"
+          loading="eager"
+        />
+      </a>
 
       {links}
 
@@ -36,32 +43,68 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          <img src="/assets/images/socials/twitter.svg" alt="twitter" />
+          <Image
+            src="/assets/images/socials/twitter.svg"
+            alt="twitter"
+            height={24}
+            width={24}
+            priority={true}
+            placeholder="blur"
+            loading="eager"
+          />
         </a>
         <a
           href="https://discord.gg/CNvpJk4HpC"
           rel="noopener noreferrer"
           target="_blank"
         >
-          <img src="/assets/images/socials/discord.svg" alt="discord" />
+          <Image
+            src="/assets/images/socials/discord.svg"
+            alt="discord"
+            height={24}
+            width={24}
+            priority={true}
+            placeholder="blur"
+            loading="eager"
+          />
         </a>
         <a
           href="https://t.me/fluiditymoney"
           rel="noopener noreferrer"
           target="_blank"
         >
-          <img src="/assets/images/socials/telegram.svg" alt="telegram" />
+          <Image
+            src="/assets/images/socials/telegram.svg"
+            alt="telegram"
+            height={24}
+            width={24}
+            priority={true}
+            placeholder="blur"
+            loading="eager"
+          />
         </a>
         <a
           href="https://www.linkedin.com/company/74689228/"
           rel="noopener noreferrer"
           target="_blank"
         >
-          <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+          <Image
+            src="/assets/images/socials/linkedin.svg"
+            alt="linkedin"
+            height={24}
+            width={24}
+            priority={true}
+            placeholder="blur"
+            loading="eager"
+          />
         </a>
       </div>
 
-      <a className={`${styles.whiteButton} ${styles.smaller}`} href={`#demo`} onClick={() => setIsOpen(false)}>
+      <a
+        className={`${styles.whiteButton} ${styles.smaller}`}
+        href={`#demo`}
+        onClick={() => setIsOpen(false)}
+      >
         <Heading className={styles.black} black={true} as="h3">
           LAUNCH FLUIDITY
         </Heading>
