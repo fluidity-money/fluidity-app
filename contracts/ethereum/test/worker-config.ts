@@ -1,7 +1,5 @@
 import * as hre from "hardhat";
-import * as ethers from 'ethers';
-import { tokenOracleSigner, fFeiAccount, fUsdtAccount, configOperator, configCouncil } from './setup';
-import { expectEq, expectGt } from "./test-utils";
+import { tokenOracleSigner, fFeiAccount, fUsdtAccount, configOperator } from './setup';
 import { expect } from "chai";
 
 describe("worker config", async function () {
