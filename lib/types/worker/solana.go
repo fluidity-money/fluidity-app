@@ -66,6 +66,8 @@ type (
 		RecipientOwnerAddress string `json:"recipient_owner_address"`
 
 		Decorator *SolanaWorkerDecorator `json:"decorator"`
+
+		AppEmissions SolanaAppFees `json:"app_emissions"`
 	}
 
 	// SolanaBufferedTransfers buffers decorated transfers by slot

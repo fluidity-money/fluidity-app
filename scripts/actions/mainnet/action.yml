@@ -8,6 +8,6 @@ inputs:
     required: true
 runs:
   using: 'docker'
-  image: 'docker.io/flualex/flu-cli:v1.0.0'
+  image: 'docker.io/flualex/flu-cli:v1.1.0'
   args:
     - ${{ inputs.command }}

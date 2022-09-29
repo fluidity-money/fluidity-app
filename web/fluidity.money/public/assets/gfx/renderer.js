@@ -1252,19 +1252,16 @@ Main.prototype = $extend(lime.app.Application.prototype,{
 			lime.ui.MouseEventManager.onMouseUp.add(function(x,y,button) {
 				clickCount++;
 			});
-			haxe.Timer.delay(function() {
-				var fps = _g.performanceMonitor.fpsSamgaple.average;
-			},6000);
 		}
 		this.lastTime = haxe.Timer.stamp();
 		const ref = this;
-		document.getElementById("root").addEventListener("mouseover",function(e) {
+		document.body.addEventListener("mouseover",function(e) {
 			ref.mouse.setTo(e.clientX, e.clientY)
 			ref.mouseClipSpace.setTo(e.clientX / ref.windows[0].width * 2 - 1,(ref.windows[0].height - e.clientY) / ref.windows[0].height * 2 - 1);
 			ref.mousePointKnown = true;
 			ref.isMouseDown = true;	
 		},false, ref);
-		document.getElementById("root").addEventListener("mouseleave",function(e) {
+		document.body.addEventListener("mouseleave",function(e) {
 			ref.mouse.setTo(0, 0)
 			ref.mouseClipSpace.setTo(e.clientX / ref.windows[0].width * 2 - 1,(ref.windows[0].height - e.clientY) / ref.windows[0].height * 2 - 1);
 			ref.mousePointKnown = false;
@@ -8636,3 +8633,5 @@ ApplicationMain.main();
 console.warn = () => {};
 console.error = () => {};
 })(typeof window != "undefined" ? window : exports);
+
+window.lime.embed("fluid", 0, 0, "FFFFFF");

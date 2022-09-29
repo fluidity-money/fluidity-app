@@ -1,5 +1,6 @@
 DOCKER_IMAGE: microservice-ethereum-application-server
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-application-server
+SECRET_FLU_ETHEREUM_APPLICATION_CONTRACTS: /fluidity/ethereum/application_contracts
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
 
 SERVICES:
@@ -20,7 +21,7 @@ SERVICES:
       ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-application-server-dai
       ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
       ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
-  
+
   - APPSERVER_TUSD:
       SERVICE_NAME: microservice-ethereum-application-server-tusd
       ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-application-server-tusd

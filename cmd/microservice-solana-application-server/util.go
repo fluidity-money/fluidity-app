@@ -40,3 +40,4 @@ func tokenListFromEnv(env string) map[string]string {
 
 	return tokensMap
 }
+

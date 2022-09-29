@@ -16,6 +16,8 @@ FRONTEND_BUILD_CSS := ${FRONTEND_BUILD_DIR}/index.css
 
 FRONTEND_BUILD := build-frontend
 
+WEBSITE_BUILD := npm run build
+
 BACKEND_SRC_GO := $(shell find ${BACKEND_SRC_DIR} -name '*.go')
 
 BACKEND_BUILD := ${REPO}.out
@@ -26,8 +28,12 @@ BACKEND_BUILD := ${REPO}.out
 	clean \
 	css \
 	js \
+	gengql \
+	relay \
+	nextjs \
 	build \
 	frontend \
+	website \
 	backend \
 	test \
 	watch-css \
@@ -42,6 +48,8 @@ ${REPO}.out: ${BACKEND_SRC_GO}
 backend: ${BACKEND_BUILD}
 
 frontend: ${FRONTEND_BUILD}
+
+website: ${WEBSITE_BUILD}
 
 docker-backend: ${BACKEND_SRC}
 	@${DOCKER_BUILD} \

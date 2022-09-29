@@ -146,7 +146,7 @@
       // }
 
       &:hover {
-        animation-play-state: paused;
+        animation: scrollUp 100s infinite linear;
       }
     }
   }
@@ -178,9 +178,9 @@
 }
 
 .winnersTop::-webkit-scrollbar-track {
-  display:none;
+  display: none;
 }
 
 .winnersTop::-webkit-scrollbar-thumb {
- display: none;
+  display: none;
 }

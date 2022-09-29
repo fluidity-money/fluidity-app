@@ -36,7 +36,7 @@ const HowItWorks = () => {
     },
   ].map(({ bgImage, ...image }) => ({
     ...image,
-    bgImage: window.location.origin + bgImage,
+    bgImage: bgImage,
   }));
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -118,7 +118,7 @@ const HowItWorks = () => {
               <img
                 className={styles.behind}
                 style={{ opacity: 1, position: "absolute", zIndex: 1 }}
-                src={window.location.origin + "/assets/text/FLUIDIFY.svg"}
+                src={"/assets/text/FLUIDIFY.svg"}
                 alt={images[currentImageIndex].text}
               />
             ) : (
@@ -134,26 +134,30 @@ const HowItWorks = () => {
           <div className={styles.video}>
             {currentImageIndex === 0 ? (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityWrap.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"abc"}
-                scale={0.8}
+                scale={0.6}
               />
             ) : currentImageIndex === 1 ? (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityYield.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"xyz"}
+                scale={0.7}
               />
             ) : (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityHowItWorks.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"jfk"}
-                scale={0.8}
+                scale={0.7}
               />
             )}
           </div>

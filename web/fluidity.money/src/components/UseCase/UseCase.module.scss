@@ -1,8 +1,8 @@
 .container {
-  height: 520px;
+  // height: 520px;
   min-width: 440px;
   margin: 24px;
-  gap: 96px;
+  gap: 50px;
   margin-bottom: 50px;
   display: flex;
   flex-direction: column;
@@ -10,27 +10,19 @@
   padding: 32px;
   justify-content: space-between;
 
+  img {
+    width: 185px;
+  }
+
   .text {
     display: flex;
     flex-direction: column;
     gap: 8px;
     max-width: 376px;
     height: 166px;
-    // h2 {
-    //   font-style: normal;
-    //   font-weight: 500;
-    //   font-size: 32px;
-    //   line-height: 120%;
-    // }
-  }
-  p {
-    font-size: 20px;
   }
 
   @media (max-width: 500px) {
     min-width: 300px;
-    p {
-      font-size: 18px;
-    }
   }
 }

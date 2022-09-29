@@ -2,14 +2,15 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { GeneralButton, Heading } from "@fluidity-money/surfing";
+import { Heading } from "@fluidity-money/surfing";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   navLinks: string[];
 }
 
-const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
+const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
     <a
       className={styles.button}
@@ -30,26 +31,45 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
       {links}
 
       <div className={styles.socials}>
-        <a href="https://twitter.com/fluiditymoney">
+        <a
+          href="https://twitter.com/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/twitter.svg" alt="twitter" />
         </a>
-        <a href="https://discord.gg/CNvpJk4HpC">
+        <a
+          href="https://discord.gg/CNvpJk4HpC"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/discord.svg" alt="discord" />
         </a>
-        <a href="https://t.me/fluiditymoney">
+        <a
+          href="https://t.me/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/telegram.svg" alt="telegram" />
         </a>
-        <a href="https://www.linkedin.com/company/74689228/">
+        <a
+          href="https://www.linkedin.com/company/74689228/"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
         </a>
       </div>
 
-      <a className={`${styles.whiteButton} ${styles.smaller}`} href={`#demo`}>
+      <a className={`${styles.whiteButton} ${styles.smaller}`} href={`#demo`} onClick={() => setIsOpen(false)}>
         <Heading className={styles.black} black={true} as="h3">
           LAUNCH FLUIDITY
         </Heading>
       </a>
-      <a className={`${styles.button} ${styles.smaller}`} href={``}>
+      <a
+        className={`${styles.button} ${styles.smaller}`}
+        href="mailto:contact@fluidity.money"
+      >
         <Heading as="h3">LET'S CHAT</Heading>
       </a>
     </div>
