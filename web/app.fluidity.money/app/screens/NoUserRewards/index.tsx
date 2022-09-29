@@ -1,10 +1,16 @@
 import type { Provider } from "~/components/ProviderCard";
+import type { LinksFunction } from "@remix-run/node";
 
 import {
   Heading,
   Text,
 } from "@fluidity-money/surfing";
 import { ProviderCard } from "~/components";
+import styles from "./styles.css";
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: styles }];
+};
 
 const NoUserRewards = ({rewarder} : {rewarder: Provider}) => (
   <div>
