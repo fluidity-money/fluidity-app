@@ -106,10 +106,13 @@ const (
 	// EnvMovingAverageRedisKey to track the APY moving average with
 	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
 
+	// EnvServerWorkQueue to receive serverwork from
+	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
 
 func main() {
 	var (
+		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddress_         = util.GetEnvOrFatal(EnvContractAddress)
 		tokenBackend             = util.GetEnvOrFatal(EnvTokenBackend)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
@@ -223,7 +226,11 @@ func main() {
 		})
 	}
 
-	worker.GetEthereumHintedBlocks(func(hintedBlock worker.EthereumHintedBlock) {
+	queue.GetMessages(serverWorkAmqpTopic, func(message queue.Message) {
+		var hintedBlock worker.EthereumHintedBlock
+
+		message.Decode(&hintedBlock)
+
 		// set the configuration using what's in the database for the block
 		var (
 			workerConfig                 = worker_config.GetWorkerConfigEthereum(network.NetworkEthereum)
