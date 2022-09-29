@@ -18,5 +18,8 @@
     color: $fluidWhite;
     font-size: 15vw;
     font-weight: 1000;
+    @media (max-width: 500px) {
+      margin-bottom: 25vh;
+    }
   }
 }
