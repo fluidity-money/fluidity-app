@@ -11,7 +11,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
-import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 
