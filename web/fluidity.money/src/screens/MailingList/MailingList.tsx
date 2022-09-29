@@ -12,12 +12,15 @@ const MailingList = () => {
 
     const endpoint = "https://landing-api.fluidity.money:8081/api/submit-email";
     
-    const data = {address: e.target.address.value}
-    
+    const data = `email=${e.target.email.value}`
+
     fetch(
       endpoint, {
         method: 'POST',
-        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: data,
         mode: 'no-cors',
       }
     );
@@ -38,7 +41,7 @@ const MailingList = () => {
           </section>
           <section>
             <Text size={"md"} prominent={true} >EMAIL</Text>
-            <input type="text" placeholder="elon@email.com" name={"address"} />
+            <input type="text" placeholder="elon@email.com" name={"email"} />
           </section>
           <GeneralButton
             type={'submit'}
