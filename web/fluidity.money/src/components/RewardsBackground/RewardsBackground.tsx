@@ -13,6 +13,7 @@ import {
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import useViewport from "hooks/useViewport";
 
 interface Reward {
   token: string;
@@ -25,6 +26,7 @@ interface Reward {
 const RewardsBackground = () => {
   const { apiState } = useChainContext();
   const { ref, inView } = useInView();
+  const { width } = useViewport();
 
   // const rewards: Reward[] = apiState.weekWinnings.map((winning) => ({
   //   token: winning.token_short_name,
@@ -83,7 +85,7 @@ const RewardsBackground = () => {
       <div className={styles.shade}></div>
       <div className={styles.rewardsBackground} ref={ref}>
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -94,7 +96,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: 1500 }}
+          initial={width < 500 ? { x: 500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -105,7 +107,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -116,7 +118,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: 1500 }}
+          initial={width < 500 ? { x: 500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -127,7 +129,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -138,7 +140,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: 1500 }}
+          initial={width < 500 ? { x: 500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -149,7 +151,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -160,7 +162,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: 1500 }}
+          initial={width < 500 ? { x: 500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -171,7 +173,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -182,7 +184,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: 1500 }}
+          initial={width < 500 ? { x: 500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -193,7 +195,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -204,7 +206,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: 1500 }}
+          initial={width < 500 ? { x: 500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -215,7 +217,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -226,7 +228,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: 1500 }}
+          initial={width < 500 ? { x: 500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -237,7 +239,7 @@ const RewardsBackground = () => {
         </motion.div>
 
         <motion.div
-          initial={{ x: -1500 }}
+          initial={width < 500 ? { x: -500 } : { x: 1500 }}
           variants={carouselVariants}
           animate={inView && "appear"}
           transition={{ type: "tween", duration: 5 }}
@@ -254,6 +256,76 @@ const RewardsBackground = () => {
 export default RewardsBackground;
 
 const rewards = [
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
+  {
+    token: "USDC",
+    amount: 234405,
+    address: "asdasa0093lsdn",
+    date: new Date(),
+    transaction: "0xflfjefnl88",
+  },
   {
     token: "USDC",
     amount: 234405,
