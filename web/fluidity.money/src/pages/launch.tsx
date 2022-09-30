@@ -2,6 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import LandingPage from "pageBody/LandingPage";
+import LaunchPage from "pageBody/Launch";
 
-export default LandingPage;
+export default LaunchPage;

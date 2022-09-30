@@ -13,7 +13,9 @@ const MailingList = () => {
     const endpoint = "https://landing-api.fluidity.money:8081/api/submit-email";
     
     const data = `email=${e.target.email.value}`
-
+    e.target.email.value = "";
+    e.target.name.value = "";
+    
     fetch(
       endpoint, {
         method: 'POST',

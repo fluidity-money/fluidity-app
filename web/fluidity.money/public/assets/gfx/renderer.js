@@ -1166,6 +1166,8 @@ lime.app.Application.prototype = $extend(lime.app.Module.prototype,{
 	,onWindowMove: function(x,y) {
 	}
 	,onWindowResize: function(width,height) {
+		this.reset();
+		this.updateSimulationTextures();
 	}
 	,render: function(context) {
 	}
