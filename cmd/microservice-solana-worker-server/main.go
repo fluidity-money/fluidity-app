@@ -137,9 +137,6 @@ func main() {
 		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
 
 		for _, userAction := range userActions {
-
-			// skip if it's not a send, or the wrong token
-
 			var (
 				userActionTransactionHash  = userAction.Transaction.Signature
 				userActionSenderAddress    = userAction.SenderSplAddress
@@ -149,8 +146,8 @@ func main() {
 				userActionAppEmission      = userAction.AppEmissions
 			)
 
+			// skip if it's not a send, or the wrong token
 			if tokenDetails.TokenShortName != tokenName {
-				sendEmission(emission)
 				continue
 			}
 

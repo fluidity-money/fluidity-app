@@ -44,8 +44,9 @@ func (s *Provider) SendTransaction(transaction *solana.Transaction) (sig solana.
 
 	if err != nil {
 		return solana.Signature{}, fmt.Errorf(
-			"failed to sendTransaction: %v",
+			"failed to sendTransaction: %v, %v",
 			err,
+			invocation,
 		)
 	}
 
