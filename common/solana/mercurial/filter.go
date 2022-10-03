@@ -16,9 +16,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 )
 
-const SplTransferDiscriminant = 3
-
-func GetMercurialFees(solanaClient *rpc.Provider, transaction types.TransactionResult, mercurialProgramId string, fluidTokens map[string]string) (feesPaid *big.Rat, err error){
+func GetMercurialFees(solanaClient *rpc.Provider, transaction types.TransactionResult, mercurialProgramId string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
 
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
@@ -89,14 +87,18 @@ func GetMercurialFees(solanaClient *rpc.Provider, transaction types.TransactionR
 
 		transferNumber := 0
 
-		for instructionNumber + transferNumber + 1 < len(allInstructions) {
+		// transferNumber is the offset of the fee token transfer currently
+		// being processed, so instructionNumber + 1 + transferNumber begins
+		// as the index one after the base instruction, and increases for each
+		// potential fee transfer
+		for instructionNumber+1+transferNumber < len(allInstructions) {
 
 			if instructionNumber < numberOfBaseInstructions {
 
 				// find the first inner instruction
 				var innerInstruction types.TransactionInnerInstruction
 
-				for _, inner := range(innerInstructions) {
+				for _, inner := range innerInstructions {
 					if inner.Index == instructionNumber {
 						innerInstruction = inner
 					}
@@ -104,7 +106,7 @@ func GetMercurialFees(solanaClient *rpc.Provider, transaction types.TransactionR
 
 				if len(innerInstruction.Instructions) == 0 {
 					return nil, fmt.Errorf(
-						"could not find Aldrin swap inner instructions!",
+						"could not find Mercurial swap inner instructions!",
 					)
 				}
 
@@ -130,7 +132,7 @@ func GetMercurialFees(solanaClient *rpc.Provider, transaction types.TransactionR
 
 			if err != nil {
 				return nil, fmt.Errorf(
-					"failed to get public key of tranfer instruction program ID! %v",
+					"failed to get public key of transfer instruction program ID! %v",
 					err,
 				)
 			}
@@ -139,7 +141,7 @@ func GetMercurialFees(solanaClient *rpc.Provider, transaction types.TransactionR
 				break
 			}
 
-			if feeTransferInstructionData[0] != SplTransferDiscriminant {
+			if feeTransferInstructionData[0] != spl_token.VariantTransfer {
 				break
 			}
 
