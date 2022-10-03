@@ -28,6 +28,7 @@ export const Template = ({name, filterData, displayedRowSize, pColumns, pData}) 
           accessor: 'img',
           Cell: (props) => (
             <><img
+              defer={true}
               src={props.row.original.img}
               width={20}
               alt='coin' /> <span>{props.row.original.action}</span>
