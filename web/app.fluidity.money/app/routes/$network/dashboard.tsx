@@ -1,5 +1,5 @@
 import { LinksFunction, LoaderFunction } from "@remix-run/node";
-import { Outlet, useLoaderData, Link } from "@remix-run/react";
+import { Outlet, useLoaderData, Link, useNavigate } from "@remix-run/react";
 
 import { GeneralButton, ArrowDown, ArrowUp, Text } from "@fluidity-money/surfing";
 
@@ -11,6 +11,7 @@ export const links: LinksFunction = () => {
 
 type LoaderData = {
   appName: string;
+  version: string;
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -31,16 +32,21 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   }
   
-  const pathname = url.pathname.split("/").pop() || "dashboard";
+  const urlPaths = url.pathname.split("/");
+  
+  const pathname = urlPaths[urlPaths.length - 1];
   
   return {
     appName: routeMapper(pathname),
+    version: "1.5",
   }
 
 }
 
 export default function Dashboard() {
-  const { appName } = useLoaderData<LoaderData>();
+  const { appName, version } = useLoaderData<LoaderData>();
+  
+  const navigate = useNavigate();
 
   return (
     <>
@@ -50,17 +56,17 @@ export default function Dashboard() {
       <nav>
         <ul>
           {/* Dashboard Home */}
-          <Link key={"send-money"} to={"/dashboard/home"}>
+          <Link key={"send-money"} to={"home"}>
             <li>Dashboard</li>
           </Link>
 
           {/* Rewards */}
-          <Link key={"send-money"} to={"/dashboard/rewards"}>
+          <Link key={"send-money"} to={"rewards"}>
             <li>Rewards</li>
           </Link>
 
           {/* Assets - SCOPED OUT */}
-          {/*<Link key={"send-money"} to={"/dashboard/assets"}>
+          {/*<Link key={"send-money"} to={"assets"}>
             <li>Assets</li>
           </Link>*/}
 
@@ -74,52 +80,106 @@ export default function Dashboard() {
         <nav>
           <Text>{appName}</Text>
           <div>
-            <Link key={"send-money"} to={"/send"}>
-              <GeneralButton
-                version={"secondary"}
-                buttonType="icon before"
-                size={"small"}
-                handleClick={() => {}}
-                icon={<ArrowUp />}
-              >
-                Send
-              </GeneralButton>
-            </Link>
-            <Link key={"receive-money"} to={"/receive"}>
-              <GeneralButton
-                version={"secondary"}
-                buttonType="icon before"
-                size={"small"}
-                handleClick={() => {}}
-                icon={<ArrowDown />}
-              >
-                Recieve
-              </GeneralButton>
-            </Link>
-            <Link key={"fluidify-money"} to={"/"}>
-              <GeneralButton
-                version={"primary"}
-                buttonType="text"
-                size={"small"}
-                handleClick={() => {}}
-              >
-                Fluidify Money
-              </GeneralButton>
-            </Link>
-            <Link key={"prize-money"} to={"/"}>
-              <GeneralButton
-                version={"secondary"}
-                buttonType="icon after"
-                size={"small"}
-                handleClick={() => {}}
-                icon={<ArrowDown />}
-              >
-                $1000.00
-              </GeneralButton>
-            </Link>
+            {/* Send */}
+            <GeneralButton
+              version={"secondary"}
+              buttonType="icon before"
+              size={"small"}
+              handleClick={() => navigate("/send")}
+              icon={<ArrowUp />}
+            >
+              Send
+            </GeneralButton>
+
+            {/* Receive */}
+            <GeneralButton
+              version={"secondary"}
+              buttonType="icon before"
+              size={"small"}
+              handleClick={() => navigate("/receive")}
+              icon={<ArrowDown />}
+            >
+              Recieve
+            </GeneralButton>
+
+            {/* Fluidify */}
+            <GeneralButton
+              version={"primary"}
+              buttonType="text"
+              size={"small"}
+              handleClick={() => navigate("/")}
+            >
+              Fluidify Money
+            </GeneralButton>
+
+            {/* Prize Money */}
+            <GeneralButton
+              version={"secondary"}
+              buttonType="icon after"
+              size={"small"}
+              handleClick={() => navigate("/")}
+              icon={<ArrowDown />}
+            >
+              $1000.00
+            </GeneralButton>
           </div>
         </nav>
+
         <Outlet />
+
+        <footer>
+          {/* Links */}
+          <section>
+            {/* Version */}
+            <Text>
+              Fluidity Money V{version}
+            </Text>
+
+            {/* Terms */}
+            <Link to={"/"}>
+              <Text>
+                Terms
+              </Text>
+            </Link>
+
+            {/* Privacy Policy */}
+            <Link to={"/"}>
+              <Text>
+                Privacy policy
+              </Text>
+            </Link>
+
+            {/* Roadmap */}
+            <Link to={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
+              <Text>
+                Roadmap
+              </Text>
+            </Link>
+          </section>
+
+          {/* Socials */}
+          <section>
+            {/* Twitter */}
+            <Link to={"https://twitter.com/fluiditymoney"}>
+              <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
+            </Link>
+
+            {/* Discord */}
+            <Link to={"https://discord.com/invite/CNvpJk4HpC"}>
+              <img src={"/images/socials/discord.svg"} alt={"Discord"} />
+            </Link>
+
+            {/* Telegram */}
+            <Link to={"https://t.me/fluiditymoney"}>
+              <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
+            </Link>
+    
+            {/* LinkedIn */}
+            <Link to={"https://www.linkedin.com/company/fluidity-money"}>
+              <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
+            </Link>
+          </section>
+        </footer>
       </main>
     </>
   );

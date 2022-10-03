@@ -1,3 +1,5 @@
+import type { Chain } from "~/util/chainUtils/chains";
+
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
 
@@ -32,7 +34,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       [network as string]: { transfers: transactions },
     },
   } = await (await useUserTransactions(address, page)).json();
-  console.log(transactions);
 
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
@@ -65,6 +66,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     transactions: sanitizedTransactions,
     count,
     page,
+    network,
   });
 };
 
@@ -84,10 +86,11 @@ type LoaderData = {
   transactions: Transaction[];
   count: number;
   page: number;
+  network: Chain;
 };
 
 export default function Home() {
-  const { transactions, count, page } = useLoaderData<LoaderData>();
+  const { transactions, count, page, network } = useLoaderData<LoaderData>();
 
   return (
     <>
@@ -131,6 +134,7 @@ export default function Home() {
           page={page}
           count={count}
           transactions={transactions}
+          chain={network}
         />
       </section>
     </>

@@ -1,13 +1,18 @@
+import type { Chain } from "~/util/chainUtils/chains";
+
 import {
   Text,
+  trimAddress,
 } from "@fluidity-money/surfing";
 
+import { getAddressExplorerLink } from "~/util"
 
 import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
 
 import { motion } from "framer-motion";
 
 import { Table } from "~/components";
+import { Link } from "@remix-run/react";
 
 type Transaction = {
   sender: string;
@@ -24,7 +29,7 @@ const ActivityLabel = (activity: Transaction, address: string) => {
   return sender === address ? `Sent ${currency}` : `Received ${currency}`;
 };
 
-const TransactionRow = (tx: Transaction, index: number) => {
+const TransactionRow = (chain: Chain) => (tx: Transaction, index: number) => {
   const { sender, receiver, timestamp, value, currency } = tx;
   
   const isTransactionToday = isToday(timestamp * 1000);
@@ -44,6 +49,8 @@ const TransactionRow = (tx: Transaction, index: number) => {
   } else {
     timeLabel = format(timestamp * 1000, "dd.MM.yy h:mmaaa");
   }
+  
+  const txAddress = sender === address ? receiver : sender
 
   return (
     <motion.tr
@@ -86,11 +93,11 @@ const TransactionRow = (tx: Transaction, index: number) => {
 
       {/* Account */}
       <td>
-        <a>
+        <Link to={getAddressExplorerLink(chain, txAddress)}>
           <Text>
-            {sender === address ? receiver : sender}
+            {trimAddress(txAddress)}
           </Text>
-        </a>
+        </Link>
       </td>
 
       {/* Time */}
@@ -103,10 +110,11 @@ type ITransactionTable = {
   page: number;
   count: number;
   transactions: Transaction[];
+  chain: Chain;
 }
 
 
-const TransactionTable = ({page, count, transactions}: ITransactionTable) => {
+const TransactionTable = ({page, count, transactions, chain}: ITransactionTable) => {
     const txTableColumns = [
     {
       name: "ACTIVITY",
@@ -136,7 +144,7 @@ const TransactionTable = ({page, count, transactions}: ITransactionTable) => {
       }}
       count={count}
       data={transactions}
-      renderRow={TransactionRow}
+      renderRow={TransactionRow(chain)}
     />
 
   )

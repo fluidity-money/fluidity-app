@@ -1,59 +1,9 @@
-main {
-  display: grid;
-  grid-template-areas:
-    "user-rewards"
-    "performance"
-    "table"
-    "rewarders";
-  grid-template-rows: 100px minmax(calc(80vh - 100px), auto) minmax(80vh, auto) 100px;
-  overflow-y: scroll;
-}
-
-main > user-rewards {
-  margin: 0 10px;
-}
-
-main > section#performance {
-  grid-area: graph;
-  min-height: 20vh;
-}
-
-section#table {
-  grid-area: table;
-  min-height: 80vh;
-  padding: 64px;
-}
-
-section#rewarders {
-  grid-area: table;
-  min-height: 80vh;
-  padding: 64px;
-}
-
-.statistics-set {
+#user-rewards {
   display: flex;
-  flex-direction: column;
-  margin-right: 64px;
+  height: 270px;
+  width: 100%;
 }
 
-.statistics-row {
-  display: flex;
-  flex-direction: row;
-}
-
-.graph-ceiling {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 0 64px;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-}
-
-.justify-between {
-  justify-content: space-between;
+#infobox {
+  margin-left: auto;
 }

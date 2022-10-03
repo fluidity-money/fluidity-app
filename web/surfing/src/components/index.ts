@@ -40,4 +40,4 @@ export {
   ArrowTopRight,
   TriangleDown,
 } from "./Images";
-
+export { default as Spinner } from "./Spinner";

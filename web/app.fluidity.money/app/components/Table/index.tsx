@@ -78,7 +78,7 @@ const Table = <T,>(props: ITable<T>) => {
               const classProps = `heading ${alignProps}`
 
               return (
-                <th className={classProps}>
+                <th className={classProps} key={heading.name}>
                   <Text>
                     {heading.name}
                   </Text>

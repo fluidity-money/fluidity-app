@@ -1,6 +1,10 @@
+import type { Chain } from "~/util/chainUtils/chains";
+import type { UserTransaction } from "~/queries/useUserTransactions";
+
 import { useState } from "react";
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
+import useViewport from "~/hooks/useViewport";
 
 import {
   Text,
@@ -11,7 +15,6 @@ import {
 
 import { useUserTransactionCount, useUserTransactions } from "~/queries";
 import { useLoaderData } from "@remix-run/react";
-import { UserTransaction } from "~/queries/useUserTransactions";
 import { ProviderCard, LabelledValue } from "~/components"
 
 import TransactionTable from "~/screens/TransactionTable";
@@ -27,7 +30,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-
+  
   const {
     data: {
       [network as string]: {
@@ -41,7 +44,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       [network as string]: { transfers: transactions },
     },
   } = await (await useUserTransactions(address, page)).json();
-
+  
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
     (transaction: UserTransaction) => {
@@ -77,6 +80,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     transactions: sanitizedTransactions,
     count,
     page,
+    network,
   });
 };
 
@@ -104,12 +108,17 @@ type LoaderData = {
   count: number;
   page: number;
   rewarders: Rewarder[];
+  network: Chain;
 };
 
 export default function Rewards() {
-  const { transactions, count, page, rewarders } = useLoaderData<LoaderData>();
+  const [ showBreakdown, setShowBreakdown ] = useState(false);
+  const { transactions, count, page, rewarders, network } = useLoaderData<LoaderData>();
   
   const [ timeFrameIndex, setTimeFrameIndex ] = useState(0);
+  
+  const { width } = useViewport();
+  const mobileView = width <= 375;
   
   const performanceTimeFrames = [
     "All time",
@@ -120,10 +129,8 @@ export default function Rewards() {
   
   return (
     <>
-      <section id="user-rewards">
-        <UserRewards />
-        <NoUserRewards rewarder={rewarders[2]} />
-      </section>
+      <UserRewards claimNow={mobileView || showBreakdown} callback={() => setShowBreakdown(true)} />
+      <NoUserRewards rewarder={rewarders[2]} />
 
       {/* Reward Performance */}
       <section id="performance">
@@ -179,6 +186,7 @@ export default function Rewards() {
           page={page}
           count={count}
           transactions={transactions}
+          chain={network}
         />
       </section>
     
