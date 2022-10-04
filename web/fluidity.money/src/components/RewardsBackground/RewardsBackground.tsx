@@ -84,170 +84,30 @@ const RewardsBackground = () => {
     <div className={styles.container}>
       <div className={styles.shade}></div>
       <div className={styles.rewardsBackground} ref={ref}>
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: 500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="left">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: 500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="left">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: 500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="left">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: 500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="left">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: 500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="left">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: 500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="left">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: 500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="left">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
-
-        <motion.div
-          initial={width < 500 ? { x: -500 } : { x: 1500 }}
-          variants={carouselVariants}
-          animate={inView && "appear"}
-          transition={{ type: "tween", duration: 5 }}
-        >
-          <ContinuousCarousel background={true} direction="right">
-            {carouselInfo}
-          </ContinuousCarousel>
-        </motion.div>
+        {Array(10).map(() => (
+          <>
+            <motion.div
+              initial={width < 500 ? { x: -500 } : { x: 1500 }}
+              variants={carouselVariants}
+              animate={inView && "appear"}
+              transition={{ type: "tween", duration: 5 }}
+            >
+              <ContinuousCarousel background={true} direction="right">
+                {carouselInfo}
+              </ContinuousCarousel>
+            </motion.div>
+            <motion.div
+              initial={width < 500 ? { x: 500 } : { x: 1500 }}
+              variants={carouselVariants}
+              animate={inView && "appear"}
+              transition={{ type: "tween", duration: 5 }}
+            >
+              <ContinuousCarousel background={true} direction="left">
+                {carouselInfo}
+              </ContinuousCarousel>
+            </motion.div>
+          </>
+        ))}
       </div>
     </div>
   );
