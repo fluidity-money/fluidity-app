@@ -21,21 +21,43 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
+  let userTransactionCount;
+  let userTransactions;
+
+  let error;
+
+  try {
+    userTransactionCount = await (
+      await useUserTransactionCount(network ?? "", address)
+    ).json();
+    userTransactions = await (
+      await useUserTransactions(network ?? "", address, page)
+    ).json();
+  } catch (err) {
+    error = "The transaction explorer is currently unavailable";
+  } // Fail silently - for now.
+
+  if (error) {
+    return redirect("/error", { status: 500, statusText: error });
+  }
+
+  if (userTransactionCount.errors || userTransactions.errors) {
+    return json({ transactions: [], count: 0, page: 1 });
+  }
+
   const {
     data: {
       [network as string]: {
         transfers: [{ count }],
       },
     },
-  } = await (await useUserTransactionCount(address)).json();
+  } = userTransactionCount;
 
   const {
     data: {
       [network as string]: { transfers: transactions },
     },
-  } = await (await useUserTransactions(address, page)).json();
-  console.log(transactions);
-
+  } = userTransactions;
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
     (transaction: UserTransaction) => {
@@ -95,12 +117,12 @@ const ActivityLabel = (activity: Transaction, address: string) => {
 
 export default function Home() {
   const { transactions, count, page } = useLoaderData<LoaderData>();
+  const isTransition = useTransition();
 
   const pageCount = Math.ceil(count / 12);
   const startTransaction = (page - 1) * 12 + 1;
   const endTransaction = page * 12 > count ? count : page * 12;
 
-  const isTransition = useTransition();
 
   return (
     <>
@@ -151,7 +173,8 @@ export default function Home() {
       <section id="transactions">
         <div className="transactions-header row justify-between">
           <Text>
-            {startTransaction}-{endTransaction} of {count} transactions
+            {count > 0 ? `${startTransaction} - ${endTransaction}` : 0} of{" "}
+            {count} transactions
           </Text>
           <div>
             <span>All</span>

@@ -5,7 +5,7 @@
     "**/*.tsx",
     "app/entry.server.js",
     "app/entry.client.js"
-  ],
+, "server/index.js"  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2019"],
     "isolatedModules": true,
