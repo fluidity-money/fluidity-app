@@ -45,11 +45,13 @@ func probability(m, n, b int64) *big.Rat {
 }
 
 // A / p(b)
+// Calculates the payouts for the different reward tiers, returns the probabilities and payouts
 func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b int64, blockTime uint64, emission *worker.Emission) (payout *big.Rat, probability_ *big.Rat) {
 	m := int64(winningClasses)
 
 	blockTimeRat := new(big.Rat).SetUint64(blockTime)
-
+	
+	// Pay out the reward pool as APY, divide between blocks
 	delta := new(big.Rat).Mul(blockTimeRat, rewardPool)
 
 	delta.Quo(delta, deltaWeight)
@@ -95,6 +97,7 @@ func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b i
 	return aDivP, p
 }
 
+// Calculate the N value (total number of balls to choose from the set)
 func calculateN(winningClasses int, atx, payoutFreq *big.Rat, emission *worker.Emission) int64 {
 	var (
 		m = int64(winningClasses)
@@ -115,7 +118,7 @@ func calculateN(winningClasses int, atx, payoutFreq *big.Rat, emission *worker.E
 	emission.CalculateN.Factorial, _ = atx.Float64()
 
 	// ATX * m! * (n-m)!
-	// payout frequency defaults to 1/4
+	// payout frequency defaults to 1/4, highest payout should occur at least 4 times a year
 
 	p := new(big.Rat).Mul(
 		payoutFreq,
