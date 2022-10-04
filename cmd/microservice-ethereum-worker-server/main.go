@@ -369,6 +369,7 @@ func main() {
 			transfersInBlock = len(fluidTransfers)
 		}
 
+		// Computes the average fluid transfers for every block
 		averageTransfersInBlock, atxBlocks, atxTxCounts := addAndComputeAverageAtx(
 			blockNumber.Uint64(),
 			tokenName,
@@ -402,6 +403,7 @@ func main() {
 			transfersInBlock,
 		)
 
+		// Sets the average transfers to a default number if the average is less than the default
 		if averageTransfersInBlock < defaultTransfersInBlock {
 			log.Debugf(
 				"Average transfers in block < default transfers in block (25)!",
@@ -428,7 +430,10 @@ func main() {
 			btx        int
 			currentAtx *big.Rat
 		)
-
+		
+		// Sets the ATX to transfers in block if current fluid transfers in block is larger than the average, set to average otherwise
+		// example: average BTX is 20, current BTX is 30, BTX that gets passed to worker is 30
+		// example 2: average BTX is 20, current BTX is 10, BTX that gets passed to worker is 20
 		if currentAtxTransactionMarginRatCmp.Cmp(averageTransfersInBlockRat) > 0 {
 
 			currentAtx = new(big.Rat).Mul(secondsInOneYearRat, transfersInBlockRat)
