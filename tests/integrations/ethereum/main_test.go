@@ -12,11 +12,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	test_utils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,8 +31,12 @@ type integrationTest struct {
 	// of a form parseable by big.Rat, e.g. 940/27
 	ExpectedFees string `json:"expected_fees"`
 
+	ExpectedEmission worker.EthereumAppFees `json:"expected_emission"`
+
 	FluidTokenDecimals   int            `json:"token_decimals"`
 	FluidContractAddress common.Address `json:"contract_address"`
+
+	Client *ethclient.Client
 }
 
 var (
@@ -51,6 +55,38 @@ func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 				err,
 			)
 		})
+	}
+
+	rpcMethods := make(map[string]interface{})
+	callMethods := make(map[string]interface{})
+	switch tests[0].Transfer.Application {
+	case applications.ApplicationBalancerV2:
+		const (
+			// response that can be parsed as a 0.05% fee
+			swapFeeResponse = "0x0000000000000000000000000000000000000000000000000001c6bf526340000000000000000000000000000000000000000000000000000000000000000000"
+
+			// balancer pool response
+			abc = "0x0000000000000000000000000b09dea16768f0799065c475be02919503cb2a350000000000000000000000000000000000000000000000000000000000000002"
+		)
+
+		rpcMethods["eth_getCode"] = "0x0"
+		callMethods["getPool(bytes32)"] = abc 
+		callMethods["getSwapFeePercentage()"] = swapFeeResponse
+	}
+
+	client, err  := test_utils.MockRpcClient(rpcMethods, callMethods)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to initialise mocked client! %v",
+				err,
+			)
+		})
+	}
+
+	for i := range tests {
+		tests[i].Client = client
 	}
 
 	return tests
@@ -72,9 +108,6 @@ func init() {
 }
 
 func TestIntegrations(t *testing.T) {
-	ethHttpUrl := util.GetEnvOrFatal(EnvEthereumHttpUrl)
-	client, err := ethclient.Dial(ethHttpUrl)
-	assert.NoError(t, err)
 
 	for i, event := range tests {
 		t.Logf("Event %d\n", i)
@@ -83,9 +116,10 @@ func TestIntegrations(t *testing.T) {
 			transfer      = event.Transfer
 			fluidAddress  = event.FluidContractAddress
 			tokenDecimals = event.FluidTokenDecimals
+			client        = event.Client
 		)
 
-		fees, err := applications.GetApplicationFee(transfer, client, fluidAddress, tokenDecimals)
+		fees, emission, err := applications.GetApplicationFee(transfer, client, fluidAddress, tokenDecimals)
 		assert.NoError(t, err)
 
 		sender, recipient, err := applications.GetApplicationTransferParties(event.Transfer)
@@ -99,5 +133,8 @@ func TestIntegrations(t *testing.T) {
 		expectedFeesRat, ok := new(big.Rat).SetString(event.ExpectedFees)
 		assert.True(t, ok)
 		assert.Equal(t, expectedFeesRat, fees)
+
+		// correct emission
+		assert.Equal(t, event.ExpectedEmission, emission)
 	}
 }

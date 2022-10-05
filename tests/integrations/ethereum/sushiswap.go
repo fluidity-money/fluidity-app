@@ -25,7 +25,7 @@ const integrationTestSushiswap = `
       "application": 1
     },
     "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
-    "expected_recipient": "0X397ff1542F962076D0bfe58Ea045fFa2D347acA0",
+    "expected_recipient": "0x397ff1542f962076d0bfe58ea045ffa2d347aca0",
     "expected_fees": "30000000/997000000",
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"

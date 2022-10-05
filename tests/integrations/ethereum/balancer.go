@@ -28,6 +28,9 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0x00000042d2d0aa64e0505a13eacdc9984a024322",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "1011539568884332906251/999500000000000000000",
+	"expected_emission": {
+		"balancer_v2": 1.012045591680173
+	},
     "token_decimals": 18,
     "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
   },
