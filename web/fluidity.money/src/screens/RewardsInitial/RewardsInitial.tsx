@@ -22,7 +22,7 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
       >
         <RewardsInfoBox
           rewardPool={rewardPool}
-          totalTransactionValue={txCount}
+          totalTransactions={txCount}
           changeScreen={changeScreen}
           type="black"
         />

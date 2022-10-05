@@ -62,6 +62,7 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
   )
   
   useLiveTvl(({ tvl }: TvlRes) => {
+    console.log("tvl");
     const latestNetworkPools = tvl
       .filter(({network}) => network === SupportedChains[chain].name)
       .reduce((pools, pool) => {
@@ -86,9 +87,9 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
   });
 
   useCountTransactions(
-    (txCount: TransactionCount) => setTxCount(
+    (txCount: TransactionCount) => {console.log(txCount); setTxCount(
       txCount.user_actions_aggregate.aggregate.count
-    ),
+    )},
     SupportedChains[chain].name,
   );
   
