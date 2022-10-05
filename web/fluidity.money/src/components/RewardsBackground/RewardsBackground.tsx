@@ -22,8 +22,9 @@ interface Reward {
 
 const RewardsBackground = () => {
   const { apiState } = useChainContext();
+  const { weekWinnings } = apiState;
 
-  const rewards: Reward[] = apiState.weekWinnings.map((winning) => ({
+  const rewards: Reward[] = weekWinnings.map((winning) => ({
     token: winning.token_short_name,
     amount: winning.winning_amount,
     address: winning.winning_address,
