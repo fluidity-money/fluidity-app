@@ -36,13 +36,13 @@ type integrationTest struct {
 	FluidTokenDecimals   int            `json:"token_decimals"`
 	FluidContractAddress common.Address `json:"contract_address"`
 
+	RpcMethods  map[string]interface{} `json:"rpc_methods"`
+	CallMethods map[string]interface{} `json:"call_methods"`
+
 	Client *ethclient.Client
 }
 
-var (
-	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
-	tests              []integrationTest
-)
+var tests []integrationTest
 
 func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 	var tests []integrationTest
@@ -57,35 +57,24 @@ func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 		})
 	}
 
-	rpcMethods := make(map[string]interface{})
-	callMethods := make(map[string]interface{})
-	switch tests[0].Transfer.Application {
-	case applications.ApplicationBalancerV2:
-		const (
-			// response that can be parsed as a 0.05% fee
-			swapFeeResponse = "0x0000000000000000000000000000000000000000000000000001c6bf526340000000000000000000000000000000000000000000000000000000000000000000"
-
-			// balancer pool response
-			abc = "0x0000000000000000000000000b09dea16768f0799065c475be02919503cb2a350000000000000000000000000000000000000000000000000000000000000002"
+	// initialise mocked client with responses
+	for i, test := range tests {
+		var (
+			rpcMethods = test.RpcMethods
+			callMethods = test.CallMethods
 		)
 
-		rpcMethods["eth_getCode"] = "0x0"
-		callMethods["getPool(bytes32)"] = abc 
-		callMethods["getSwapFeePercentage()"] = swapFeeResponse
-	}
+		client, err  := test_utils.MockRpcClient(rpcMethods, callMethods)
 
-	client, err  := test_utils.MockRpcClient(rpcMethods, callMethods)
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to initialise mocked client! %v",
+					err,
+				)
+			})
+		}
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Failed to initialise mocked client! %v",
-				err,
-			)
-		})
-	}
-
-	for i := range tests {
 		tests[i].Client = client
 	}
 
