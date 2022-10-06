@@ -4,11 +4,16 @@ use solana_program::program_error::ProgramError;
 
 /// Scale of precision
 pub const SCALE: usize = 18;
+
 /// Identity
 pub const WAD: u64 = 1_000_000_000_000_000_000;
+
 /// Half of identity
+#[allow(dead_code)]
 pub const HALF_WAD: u64 = 500_000_000_000_000_000;
+
 /// Scale for percentages
+#[allow(dead_code)]
 pub const PERCENT_SCALER: u64 = 10_000_000_000_000_000;
 
 /// Try to subtract, return an error on underflow

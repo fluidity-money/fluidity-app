@@ -37,11 +37,13 @@ pub struct Rate(pub U128);
 
 impl Rate {
     /// One
+    #[allow(dead_code)]
     pub fn one() -> Self {
         Self(Self::wad())
     }
 
     /// Zero
+    #[allow(dead_code)]
     pub fn zero() -> Self {
         Self(U128::from(0))
     }
@@ -52,6 +54,7 @@ impl Rate {
     }
 
     /// Create scaled decimal from percent value
+    #[allow(dead_code)]
     pub fn from_percent(percent: u8) -> Self {
         Self(U128::from(percent as u64 * PERCENT_SCALER))
     }
@@ -68,6 +71,7 @@ impl Rate {
     }
 
     /// Calculates base^exp
+    #[allow(dead_code)]
     pub fn try_pow(&self, mut exp: u64) -> Result<Rate, ProgramError> {
         let mut base = *self;
         let mut ret = if exp % 2 != 0 {

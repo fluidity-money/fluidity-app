@@ -711,6 +711,7 @@ impl ReserveFees {
 }
 
 /// Calculate fees exlusive or inclusive of an amount
+#[allow(dead_code)]
 pub enum FeeCalculation {
     /// Fee added to amount: fee = rate * amount
     Exclusive,
