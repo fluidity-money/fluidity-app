@@ -1,25 +1,19 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserTransaction } from "~/queries/useUserTransactions";
+import { Transaction, Rewarder } from "~/screens/RewardPerformance";
 
 import { useState } from "react";
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import useViewport from "~/hooks/useViewport";
 
-import {
-  Text,
-  Heading,
-  ManualCarousel,
-  numberToMonetaryString,
-} from "@fluidity-money/surfing";
-
 import { useUserTransactionCount, useUserTransactions } from "~/queries";
 import { useLoaderData } from "@remix-run/react";
-import { ProviderCard, LabelledValue } from "~/components"
 
-import TransactionTable from "~/screens/TransactionTable";
 import UserRewards from "~/screens/UserRewards";
 import NoUserRewards from "~/screens/NoUserRewards";
+import RewardPerformance from "~/screens/RewardPerformance";
+import UnclaimedWinnings from "~/screens/UnclaimedWinnings";
 
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
@@ -72,7 +66,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return redirect(`./`, 301);
   }
   
-  // Get Best Rewarders
+  // Get Best Rewarders - SCOPED OUT NO DATA
   
 
   return json({
@@ -88,21 +82,6 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
 };
 
-type Transaction = {
-  sender: string;
-  receiver: string;
-  timestamp: number;
-  value: number;
-  currency: string;
-};
-
-type Rewarder = {
-  iconUrl: string;
-  name: string;
-  prize: number;
-  avgPrize: number;
-}
-
 type LoaderData = {
   transactions: Transaction[];
   count: number;
@@ -115,98 +94,29 @@ export default function Rewards() {
   const [ showBreakdown, setShowBreakdown ] = useState(false);
   const { transactions, count, page, rewarders, network } = useLoaderData<LoaderData>();
   
-  const [ timeFrameIndex, setTimeFrameIndex ] = useState(0);
   
   const { width } = useViewport();
   const mobileView = width <= 375;
   
-  const performanceTimeFrames = [
-    "All time",
-    "Last week",
-    "Last month",
-    "This year",
-  ]
-  
   return (
     <>
-      <UserRewards claimNow={mobileView || showBreakdown} callback={() => setShowBreakdown(true)} />
+      <UserRewards claimNow={mobileView || showBreakdown} showBreakdown={setShowBreakdown} />
       <NoUserRewards rewarder={rewarders[2]} />
-
-      {/* Reward Performance */}
-      <section id="performance">
-        <Heading as={"h2"}>
-          Reward Performance
-        </Heading>
-       <div className="graph-ceiling">
-          <div className="overlay">
-            <div className="statistics-row">
-              <div className="statistics-set">
-                <LabelledValue label={"Total claimed yield"}>
-                  {numberToMonetaryString(29645)}
-                </LabelledValue>
-              </div>
-
-              <div className="statistics-set">
-                <LabelledValue label={"Highest performer"}>
-                  fAVAX
-                </LabelledValue>
-              </div>
-
-              <div className="statistics-set">
-                <LabelledValue label={"Total prize pool"}>
-                  {numberToMonetaryString(678120)}
-                </LabelledValue>
-              </div>
-
-              <div className="statistics-set">
-                <LabelledValue label={"Fluid Pairs"}>
-                  {0}
-                </LabelledValue>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div className="statistics-row">
-              {performanceTimeFrames.map((timeFrame, i) => {
-                const selectedProps = timeFrameIndex === i ? "selected" : ""
-                const classProps = `${selectedProps}`
-
-                return (
-                  <Text className={classProps}>{timeFrame}</Text>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      <section id="table">
-        <TransactionTable
-          page={page}
-          count={count}
-          transactions={transactions}
-          chain={network}
-        />
-      </section>
-    
-      {/* Highest Rewarders */}
-      <section id="rewarders">
-        <Heading as={"h2"}>
-          Highest Rewarders
-        </Heading>
-        <ManualCarousel scrollBar={true} >
-          {rewarders.map(rewarder => 
-            <ProviderCard 
-              iconUrl={rewarder.iconUrl}
-              name={rewarder.name}
-              prize={rewarder.prize}
-              avgPrize={rewarder.avgPrize}
-            /> 
-          )}
-        </ManualCarousel>
-        
-      </section>
+      { showBreakdown
+          ? <UnclaimedWinnings
+              transactions={transactions.filter(tx => tx.timestamp > (new Date).getTime() - 1000)}
+              count={count}
+              page={page}
+              network={network}
+            />
+          : <RewardPerformance
+              transactions={transactions}
+              count={count}
+              page={page}
+              network={network}
+              rewarders={rewarders}
+            />
+      }
     </>
   );
 }
