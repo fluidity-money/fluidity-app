@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -40,6 +41,22 @@ func responseErr(response serverResponse, err interface{}) serverResponse {
 	return response
 }
 
+// marshal then unescape json.Marshal's string encoding, so rpc responses aren't invalid
+func marshalResponse(response serverResponse, rw http.ResponseWriter) {
+	bytes, err := json.Marshal(response)
+	if err != nil {panic(err)}
+	resp_ := string(bytes)
+	resp := strings.ReplaceAll(resp_, "\\", "")
+	resp = strings.ReplaceAll(resp, "\"{", "{")
+	resp = strings.ReplaceAll(resp, "}\"", "}")
+	rw.Write([]byte(resp))
+}
+
+func marshalError(response serverResponse, rw http.ResponseWriter, err interface{}) {
+	response = responseErr(response, err)
+	marshalResponse(response, rw)
+}
+
 // MockRpcClient to return an eth client connected to an endpoint that mocks the given methods.
 // rpcMethods [methodName]response to provide a list of Ethereum RPC methods and how they should be mocked.
 // callMethods[methodName]response to provide a list of eth_call contract methods and how they should respond.
@@ -63,7 +80,7 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]i
 		rpcMethods[methodName] = response
 	}
 
-	web.JsonEndpoint(endpoint, func(rw http.ResponseWriter, r *http.Request) interface{} {
+	web.Endpoint(endpoint, func(rw http.ResponseWriter, r *http.Request) {
 		var (
 			request  serverRequest
 			response serverResponse
@@ -72,7 +89,8 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]i
 
 		// decode request
 		if err := d.Decode(&request); err != nil && err != io.EOF {
-			return responseErr(response, err)
+			marshalError(response, rw, err)
+			return
 		}
 
 		response.Id = request.Id
@@ -83,9 +101,11 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]i
 
 			if expectedResponse != nil {
 				response.Result = expectedResponse
-				return response
+				marshalResponse(response, rw)
+				return
 			} else {
-				return responseErr(response, "Unsupported method")
+				marshalError(response, rw, "Unsupported method")
+				return
 			}
 		}
 
@@ -94,18 +114,21 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]i
 		var params_ []interface{}
 
 		if err := json.Unmarshal(*request.Params, &params_); err != nil {
-			return responseErr(response, err)
+			marshalError(response, rw, err)
+			return
 		}
 
 		// convert to expected type
 		params, ok := params_[0].(map[string]interface{})
 		if !ok {
-			return responseErr(response, "Failed to cast params!")
+			marshalError(response, rw, "Failed to cast params!")
+			return
 		}
 
 		data, ok := params["data"].(string)
 		if !ok {
-			return responseErr(response, "Failed to cast data!")
+			marshalError(response, rw, "Failed to cast data!")
+			return
 		}
 
 		// return the mocked result, if it's valid
@@ -116,7 +139,9 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]i
 			}
 		}
 
-		return response
+		// return response
+		marshalResponse(response, rw)
+		return
 	})
 
 	server := httptest.NewServer(nil)
