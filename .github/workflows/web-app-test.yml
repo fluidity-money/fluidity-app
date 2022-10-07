@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: 16
       - name: Test
+        working-directory: web/app.fludifity.money
         run: |
           npm install
           npm test
