@@ -5,44 +5,34 @@
 import { Display, Heading } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import useViewport from "hooks/useViewport";
-import { useState } from "react";
+import { isFirefox } from "react-device-detect";
 import styles from "./Incentivising.module.scss";
 
 const Incentivising = () => {
-
-  const [ ready, setReady ] = useState(false);
-
   const { width } = useViewport();
   const breakpoint = 860;
 
   return (
     <div className={styles.container}>
-      <img src="assets/images/FluidityHowItWorks.png"
-        style={{
-         position: "absolute",
-         display: `${ready === true ? 'none' : 'block'}`,
-         width: `${width <= breakpoint ? '100%' : '60%'}`,
-       }}
-       />
       {width <= breakpoint ? (
       <Video
-        src={window.location.origin + "/assets/videos/FluidityHowItWorks.mp4"}
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
         type={"reduce"}
         loop={true}
-        onLoad={() => setReady(true)}
         className={styles.video}
       />): (
       <Video
-        src={window.location.origin + "/assets/videos/FluidityHowItWorks.mp4"}
+        src={"/assets/videos/FluidityHowItWorks.mp4"}
         type={"reduce"}
         loop={true}
-        scale={.6}
-        onLoad={() => setReady(true)}
+        scale={isFirefox ? 1.5 : .6}
         className={styles.video}
       />)}
       <div>
         <div className={styles.blur} />
-        <Heading as={"h6"} className={styles.backgroundText}>HOW IT WORKS</Heading>
+        <Heading as={"h6"} className={styles.backgroundText}>
+          HOW IT WORKS
+        </Heading>
         <br />
         <Display
           className={styles.backgroundText}

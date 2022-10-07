@@ -11,6 +11,8 @@ import "./openzeppelin/IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 import "./openzeppelin/Address.sol";
 
+import "./ITransferWithBeneficiary.sol";
+
 import "./LiquidityProvider.sol";
 import "./WorkerConfig.sol";
 
@@ -21,7 +23,7 @@ struct Winner {
 }
 
 /// @title The fluid token ERC20 contract
-contract Token is IERC20 {
+contract Token is IERC20, ITransferWithBeneficiary {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -54,16 +56,16 @@ contract Token is IERC20 {
     );
 
     /// @notice emitted when an underlying token is wrapped into a fluid asset
-    event MintFluid(address indexed addr, uint indexed amount);
+    event MintFluid(address indexed addr, uint amount);
 
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
-    event BurnFluid(address indexed addr, uint indexed amount);
+    event BurnFluid(address indexed addr, uint amount);
 
     /// @notice emitted when a new operator takes over the contract management
     event OperatorChanged(address indexed oldOperator, address indexed newOperator);
 
     /// @notice emitted when the contract enters emergency mode!
-    event Emergency(bool status);
+    event Emergency(bool indexed status);
 
     /// @notice emitted when restrictions
     event MaxUncheckedRewardLimitChanged(uint amount);
@@ -76,7 +78,7 @@ contract Token is IERC20 {
 
     /// @notice worker config changed, either by disabling emergency
     /// @notice mode or updateWorkerConfig
-    event WorkerConfigUpdated(address newConfig);
+    event WorkerConfigUpdated(address indexed newConfig);
 
     /// @notice updating the reward quarantine before manual signoff
     /// @notice by the multisig (with updateRewardQuarantineThreshold)
@@ -84,7 +86,7 @@ contract Token is IERC20 {
 
     /// @notice emitted when the mint limits are enabled or disabled
     /// @notice by enableMintLimits
-    event MintLimitsStateChanged(bool status);
+    event MintLimitsStateChanged(bool indexed status);
 
     // erc20 props
     mapping(address => uint256) private balances_;
@@ -305,7 +307,7 @@ contract Token is IERC20 {
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    /// @notice updates and resets mint limits if called by the operator
+    /// @notice updates and resets mint limits if called by the oracle
     function updateMintLimits(uint global, uint user) public {
         require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == oracle(), "only the oracle account can use this");
@@ -346,14 +348,14 @@ contract Token is IERC20 {
 
             uint userMint;
 
-            bool userHasMinted = userLastMintedBlock_[msg.sender] < userMintResetBlock_;
+            bool userHasntMinted = userLastMintedBlock_[msg.sender] < userMintResetBlock_;
 
-            if (userHasMinted) {
+            if (userHasntMinted) {
                 // user hasn't minted since the reset, reset their count
-                userAmountMinted_[msg.sender] = amount;
+                userMint = amount;
             } else {
                 // user has, add the amount they're minting
-                userAmountMinted_[msg.sender] = userAmountMinted_[msg.sender] + amount;
+                userMint = userAmountMinted_[msg.sender] + amount;
             }
 
             require(userMint <= userMintLimit_, "mint amount exceeds user limit!");
@@ -632,6 +634,25 @@ contract Token is IERC20 {
         _spendAllowance(from, msg.sender, amount);
         _transfer(from, to, amount);
         return true;
+    }
+
+    /// @notice support for meson's crosschain swap for ERC20
+    /// @notice transfers deposited assets to the 3rd party dapp contract
+    /// @notice for the user - we don't do anything special :)
+    function transferWithBeneficiary(
+        address token,
+        uint256 amount,
+        address beneficiary,
+        uint64 data
+    ) external override returns (bool) {
+        bool rc;
+
+        rc = Token(token).transferFrom(msg.sender, address(this), amount);
+        if (!rc) return false;
+
+        rc = Token(token).transfer(beneficiary, amount);
+
+        return rc;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {

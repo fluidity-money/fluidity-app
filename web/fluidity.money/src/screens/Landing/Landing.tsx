@@ -3,56 +3,45 @@
 // LICENSE_TRF.md file.
 
 import { useEffect, useState } from "react";
-import {
-  ContinuousCarousel,
-  Heading,
-} from "@fluidity-money/surfing";
+import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
-import { relative } from "path";
+import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
 
 const Landing = () => {
-  const fqVidSources = [
+
+  let type = isSafari || isIOS ? "video/quicktime" : "video/webm";
+  let vidSources = (isSafari || isIOS ? [
     "/assets/videos/FluidityHome.mov",
-    "/assets/videos/FluidityHome.webm",
     "/assets/videos/FluidityHomeloop.mov",
-    "/assets/videos/FluidityHomeloop.webm"
-  ].map(link =>
-    window.location.origin + link
-  )
+  ] : [
+    "/assets/videos/FluidityHome.webm",
+    "/assets/videos/FluidityHomeloop.webm",
+  ]).map((link) => link);
 
-  const vidSources = [
-    [
-      fqVidSources[0], fqVidSources[1]
-    ],
-    [
-      fqVidSources[2], fqVidSources[3]
-    ]
-  ]
-
-  const [ onHomeVidLoaded, setOnHomeVidLoaded ] = useState(false);
-  const [ homeVidEnded, setHomeVidEnded ] = useState(false);
+  const [onHomeVidLoaded, setOnHomeVidLoaded] = useState(false);
+  const [homeVidEnded, setHomeVidEnded] = useState(false);
 
   const [state, setState] = useState({
     src: vidSources[0],
-    mimeType: ["video/quicktime", "video/webm"],
+    mimeType: type,
     key: "0",
     loop: false,
-    scale: 0.7,
+    scale: isFirefox ? 2 : 0.7,
   });
 
   useEffect(() => {
     homeVidEnded &&
-      setState({
-        src: vidSources[1],
-        mimeType: ["video/quicktime", "video/webm"],
-        key: "1",
-        loop: true,
-        scale: 0.5,
-      });
+    setState({
+      src: vidSources[1],
+      mimeType: type,
+      key: "1",
+      loop: true,
+      scale: isFirefox ? 1 : 0.5,
+    });
   }, [homeVidEnded]);
 
   const { width } = useViewport();
@@ -71,15 +60,8 @@ const Landing = () => {
 
   return (
     <div className={`${styles.containerLanding}`}>
-      {/* Video Container */}
-      {width > breakpoint ? (
-        <div className={`${styles.bgVid}`}>
-          <img src="assets/images/load.webp"
-           style={{
-            position: "absolute",
-            display: `${onHomeVidLoaded === true ? 'none' : 'block'}`
-          }}
-          />
+      <div className={`${styles.bgVid}`}>
+        {width > breakpoint ? (
           <Video
             src={state.src}
             type={"reduce"}
@@ -87,7 +69,8 @@ const Landing = () => {
             loop={state.loop}
             key={state.key}
             scale={state.scale}
-            margin = {"200px 0 0 0"}
+
+            margin = {"-60px 0 0 0"}
             onLoad={!homeVidEnded 
               ? () => setOnHomeVidLoaded(true)
               : () => {}
@@ -97,39 +80,27 @@ const Landing = () => {
               : () => {}
             }
           />
-        </div>
-      ) : (
-        <div className={`${styles.bgVid}`}>
-          <img src="assets/images/loadanimation.gif"
-           style={{
-            position: "absolute",
-            display: `${onHomeVidLoaded === true ? 'none' : 'block'}`
-          }}
-          />
-          <Video
+          
+        ) : ( isMobile ?
+          (
+            <Video
             src={state.src}
             type={"reduce"}
             mimeType={state.mimeType}
             loop={state.loop}
             key={state.key}
             scale={state.scale * 2}
-            margin = {"-400px 0 0 0"}
-            onLoad={!homeVidEnded 
-              ? () => setOnHomeVidLoaded(true)
-              : () => {}
-            }
-            onEnded={!homeVidEnded 
-              ? () => setHomeVidEnded(true)
-              : () => {}
-            }
-          />
-        </div>
-      )}
-    
+            margin={"-400px 0 0 0"}
+            onLoad={!homeVidEnded ? () => setOnHomeVidLoaded(true) : () => {}}
+            onEnded={!homeVidEnded ? () => setHomeVidEnded(true) : () => {}}
+            />
+          ) : (<></>) 
+        )}
+      </div>
       {/* Hero animation */}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: "-100vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 6, type: "tween" }}
@@ -172,21 +143,21 @@ const Landing = () => {
             className={styles.left}
           >
             <IntroTile
-              img={"/assets/images/landingIcons/1to1.svg"}
+              img={"/assets/images/landingIcons/1to1.png"}
               side={"left"}
             >
               1 to 1 exchange rate <br />
               to base wrapped assets
             </IntroTile>
             <IntroTile
-              img={"/assets/images/useCaseIcons/sendReceive.svg"}
+              img={"/assets/images/landingIcons/sendReceive.png"}
               side={"left"}
             >
               Senders and receivers <br />
               both qualify
             </IntroTile>
             <IntroTile
-              img={"/assets/images/landingIcons/everyTransaction.svg"}
+              img={"/assets/images/landingIcons/everyTransaction.png"}
               side={"left"}
             >
               Every transaction <br />
@@ -201,21 +172,21 @@ const Landing = () => {
             className={width < breakpoint ? styles.left : styles.right}
           >
             <IntroTile
-              img={"/assets/images/landingIcons/expectedOutcome.svg"}
+              img={"/assets/images/landingIcons/expectedOutcome.png"}
               side={width < breakpoint ? "left" : "right"}
             >
               Fluidity improves your expected <br />
               outcome over time
             </IntroTile>
             <IntroTile
-              img={"/assets/images/useCaseIcons/forReceivers.svg"}
+              img={"/assets/images/landingIcons/forReceivers.png"}
               side={width < breakpoint ? "left" : "right"}
             >
               Rewards can range from cents
               <br /> to millions
             </IntroTile>
             <IntroTile
-              img={"/assets/images/landingIcons/scalingEcosystem.svg"}
+              img={"/assets/images/landingIcons/scalingEcosystem.png"}
               side={width < breakpoint ? "left" : "right"}
             >
               Scaling ecosystem

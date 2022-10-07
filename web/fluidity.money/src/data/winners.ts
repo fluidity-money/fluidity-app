@@ -3,8 +3,8 @@
 // LICENSE.md file.
 
 import { useMemo } from 'react';
-import { graphql } from 'babel-plugin-relay/macro';
-import { useSubscription } from 'react-relay';
+import { gql, useSubscription } from "@apollo/client";
+import { onData } from "./apolloClient";
 
 export interface Winner {
   awarded_time: string,
@@ -27,7 +27,7 @@ export interface WinnersRes {
 }
 
 
-const winningTransactionsByAddressSubscription = graphql`
+const winningTransactionsByAddressSubscription = gql`
 subscription winnersGetWinningTransactionsByAddressSubscription($network: network_blockchain!, $address: String!, $date: timestamp!) {
   winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, winning_address: {_eq: $address}, awarded_time: {_gte: $date}}) {
     awarded_time
@@ -40,7 +40,7 @@ subscription winnersGetWinningTransactionsByAddressSubscription($network: networ
 }
 `;
 
-const winningTransactionsAllSubscription = graphql`
+const winningTransactionsAllSubscription = gql`
 subscription winnersGetWinningTransactionsAllSubscription($network: network_blockchain!, $date: timestamp!) {
   winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, awarded_time: {_gte: $date}}) {
     awarded_time
@@ -54,27 +54,32 @@ subscription winnersGetWinningTransactionsAllSubscription($network: network_bloc
 `;
 
 export const useWinningTransactions = (onNext: (winnings: WinnersRes) => void, network: string, date: string, address?: string) => {
-  const winningTransactions = useMemo(() => (
+  const { subscription, options } = useMemo(() => (
     !!address
       ? {
         subscription: winningTransactionsByAddressSubscription,
-        variables: {
-          network,
-          address,
-          date,
+        options: {
+          variables: {
+            network,
+            address,
+            date,
+          },
+          onData: onData(onNext),
         },
-        onNext,
       }
       : {
         subscription: winningTransactionsAllSubscription,
-        variables: {
-          network,
-          date,
+        options: {
+          variables: {
+            network,
+            date,
+            address: null,
+          },
+          onData: onData(onNext),
         },
-        onNext,
       }
-  ), [onNext, network, address, date]);
+  ), [network, address, date]);
   
-  return useSubscription(winningTransactions as any);
+  return useSubscription(subscription, options);
 }
 

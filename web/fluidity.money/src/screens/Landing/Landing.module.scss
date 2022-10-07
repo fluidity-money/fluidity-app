@@ -10,6 +10,9 @@
   background-image: url("../../../public/assets/images/bg-blur-desktop.png");
   background-repeat: no-repeat;
   background-size: 100% 100%;
+  @include max-620px {
+    background-size: 0%;
+  }
   // display: grid;
   // grid-template-columns: repeat(1, 1fr);
   // position: relative;
@@ -84,7 +87,7 @@
 
 .content {
   width: 100%;
-  margin-top: -680px;
+  margin-top: -830px;
   display: flex;
   position: relative;
   flex-direction: column;
@@ -112,12 +115,12 @@
   }
   // display: grid;
   // grid-template-columns: 1fr 1fr 1fr;
-  
+
   &.notLoaded {
     & > .left {
       width: 50%;
     }
-    
+
     & > .right {
       width: 50%;
     }
@@ -152,4 +155,8 @@
 
 .callout {
   display: flex;
+}
+
+.title {
+  text-align: center;
 }

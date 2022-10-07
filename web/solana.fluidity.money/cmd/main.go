@@ -34,7 +34,7 @@ func main() {
 	websocket.Endpoint("/updates", updateNotificationsHandlerSolana)
 
 	go func() {
-		winners.WinnersSolana(func(winner winners.Winner) {
+		winners.BroadcastWinnersSolana(func(winner winners.Winner) {
 			winner.WinnerAddress = winner.SolanaWinnerOwnerAddress
 
 			updateMessagesSolana <- api_fluidity_money.Update{
@@ -44,7 +44,7 @@ func main() {
 	}()
 
 	go func() {
-		user_actions.BufferedUserActionsSolana(func(bufferedUserAction user_actions.BufferedUserAction) {
+		user_actions.BroadcastBufferedUserActionsSolana(func(bufferedUserAction user_actions.BufferedUserAction) {
 			for _, userAction := range bufferedUserAction.UserActions {
 
 				userAction.SenderAddress = userAction.SolanaSenderOwnerAddress
@@ -58,7 +58,7 @@ func main() {
 	}()
 
 	go func() {
-		prize_pool.PrizePoolUpdatesSolana(func(prizePool prize_pool.PrizePool) {
+		prize_pool.BroadcastPrizePoolUpdatesSolana(func(prizePool prize_pool.PrizePool) {
 			updateMessagesSolana <- api_fluidity_money.Update{
 				PrizePool: &prizePool,
 			}

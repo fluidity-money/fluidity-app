@@ -7,4 +7,4 @@ rm -rf ../surfing-prebuilt
 mkdir ../surfing-prebuilt
 cp package.json ../surfing-prebuilt
 tsc -w --outDir ../surfing-prebuilt/dist/types & \
-vite build --mode lib -w --outDir ../surfing-prebuilt/dist
+npx vite build --mode lib -w --outDir ../surfing-prebuilt/dist

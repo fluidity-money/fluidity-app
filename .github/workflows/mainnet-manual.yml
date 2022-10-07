@@ -14,6 +14,7 @@ on:
         options: 
           - 'ethereum'
           - 'solana'
+          - 'fluidity'
       group:
         description: 'Group'
         required: true

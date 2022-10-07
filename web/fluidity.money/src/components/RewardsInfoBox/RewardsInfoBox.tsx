@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
+import useViewport from "hooks/useViewport";
 import {
   LinkButton,
   BlockchainModal,
@@ -16,18 +17,20 @@ import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
   rewardPool: number;
-  totalTransactionValue: number;
+  totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
 }
 
 const RewardsInfoBox = ({
   rewardPool,
-  totalTransactionValue,
+  totalTransactions,
   changeScreen,
   type,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
+  
+  const showRewardPool = type === "black";
 
   const imgLink = (opt: string) =>
     opt === "ETH"
@@ -35,6 +38,9 @@ const RewardsInfoBox = ({
       : "/assets/images/chainIcons/solanaIcon.svg";
 
   const [showModal, setShowModal] = useState(false);
+
+  const { width } = useViewport();
+  const mobileBreakpoint = 620;
 
   const options = Object.keys(SupportedChains).map((chain) => ({
     name: chain,
@@ -63,13 +69,14 @@ const RewardsInfoBox = ({
         />
         <div onClick={changeScreen}>
           <Heading as="h1">
-            {type === "black"
+            {showRewardPool
               ? numberToMonetaryString(rewardPool)
-              : totalTransactionValue.toLocaleString("en-US")}
+              : totalTransactions
+            }
           </Heading>
         </div>
         <Heading as="h4">
-          {type === "black" ? "Reward pool" : "Total transactions"}
+          {showRewardPool ? "Reward pool" : "Total transactions (on testing)"}
         </Heading>
         {showModal && (
           <BlockchainModal
@@ -78,8 +85,10 @@ const RewardsInfoBox = ({
               name: chain,
               icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
             }}
+            className={styles.overlap}
             options={options}
             setOption={setChain}
+            mobile={width <= mobileBreakpoint}
           />
         )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>

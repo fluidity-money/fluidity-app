@@ -1,7 +1,6 @@
 DOCKER_IMAGE: microservice-ethereum-worker-server
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-server
 ENV_FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: "0x6D2299C48a8dD07a872FDd0F8233924872Ad1071"
-SECRET_FLU_ETHEREUM_APPLICATION_CONTRACTS: /fluidity/ethereum/application_contracts
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
 
 SERVICES:
@@ -14,6 +13,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_CTOKEN_ADDR: "0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9"
       ENV_FLU_ETHEREUM_TOKEN_BACKEND: compound
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdt
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.ethereum.server.work.usdt
       ENV_FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.usdt.apy.moving-average
 
   - WORKER_SERVER_USDC:
@@ -25,6 +25,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_CTOKEN_ADDR: "0x39AA39c021dfbaE8faC545936693aC917d5E7563"
       ENV_FLU_ETHEREUM_TOKEN_BACKEND: compound
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.usdc
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.ethereum.server.work.usdc
       ENV_FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.usdc.apy.moving-average
 
   - WORKER_SERVER_DAI:
@@ -40,6 +41,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR: "0xb53c1a33016b2dc2ff3653530bff1848a515c8c5"
       ENV_FLU_ETHEREUM_TOKEN_BACKEND: aave
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.dai
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.ethereum.server.work.dai
       ENV_FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.dai.apy.moving-average
 
   - WORKER_SERVER_TUSD:
@@ -51,6 +53,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_CTOKEN_ADDR: "0x12392f67bdf24fae0af363c24ac620a2f67dad86"
       ENV_FLU_ETHEREUM_TOKEN_BACKEND: compound
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.tusd
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.ethereum.server.work.tusd
       ENV_FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.tusd.apy.moving-average
 
   - WORKER_SERVER_FRAX:
@@ -66,4 +69,5 @@ SERVICES:
       ENV_FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR: "0xb53c1a33016b2dc2ff3653530bff1848a515c8c5"
       ENV_FLU_ETHEREUM_TOKEN_BACKEND: aave
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.frax
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.ethereum.server.work.frax
       ENV_FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY: ethereum.worker.frax.apy.moving-average

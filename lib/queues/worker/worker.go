@@ -13,8 +13,8 @@ import (
 
 const (
 	TopicEthereumAnnouncements     = "worker.ethereum.announcements"
-	TopicEthereumServerWork        = "worker.server.work"
-	TopicEthereumApplicationEvents = "worker.ethereum.application.events"
+	TopicEthereumBlockLogs         = "worker.ethereum.blocks" // into apps server
+	TopicEthereumServerWork        = "worker.server.work" // into worker
 
 	TopicSolanaParsedTransactions = "worker.solana.parsed_transactions"
 	TopicSolanaBufferedTransfers  = "worker.solana.buffered_transfers"
@@ -26,7 +26,6 @@ const (
 type (
 	EthereumAnnouncement        = worker.EthereumAnnouncement
 	EthereumBlockLog            = worker.EthereumBlockLog
-	EthereumServerWork          = worker.EthereumServerWork
 	EthereumHintedBlock         = worker.EthereumHintedBlock
 	EthereumDecoratedTransfer   = worker.EthereumDecoratedTransfer
 	EthereumWorkerDecorator     = worker.EthereumWorkerDecorator
@@ -40,7 +39,9 @@ type (
 	SolanaWork                       = worker.SolanaWork
 	SolanaWinnerAnnouncement         = worker.SolanaWinnerAnnouncement
 
-	Emission = worker.Emission
+	Emission        = worker.Emission
+	EthereumAppFees = worker.EthereumAppFees
+	SolanaAppFees   = worker.SolanaAppFees
 )
 
 func EthereumAnnouncements(f func(EthereumAnnouncement)) {
@@ -54,23 +55,23 @@ func EthereumAnnouncements(f func(EthereumAnnouncement)) {
 	})
 }
 
-func GetEthereumServerWork(f func(EthereumServerWork)) {
-	queue.GetMessages(TopicEthereumServerWork, func(message queue.Message) {
-		var serverWork EthereumServerWork
+func GetEthereumBlockLogs(f func(EthereumBlockLog)) {
+	queue.GetMessages(TopicEthereumBlockLogs, func(message queue.Message) {
+		var blockLog EthereumBlockLog
 
-		message.Decode(&serverWork)
+		message.Decode(&blockLog)
 
-		f(serverWork)
+		f(blockLog)
 	})
 }
 
-func EthereumApplicationEvents(f func(EthereumApplicationEvent)) {
-	queue.GetMessages(TopicEthereumApplicationEvents, func(message queue.Message) {
-		var ApplicationEvent EthereumApplicationEvent
+func GetEthereumHintedBlocks(f func(EthereumHintedBlock)) {
+	queue.GetMessages(TopicEthereumServerWork, func(message queue.Message) {
+		var hintedBlock EthereumHintedBlock
 
-		message.Decode(&ApplicationEvent)
+		message.Decode(&hintedBlock)
 
-		f(ApplicationEvent)
+		f(hintedBlock)
 	})
 }
 

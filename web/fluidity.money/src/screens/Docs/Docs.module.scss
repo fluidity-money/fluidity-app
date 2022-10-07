@@ -32,13 +32,24 @@
   justify-content: space-between;
   align-items: center;
 
+  @media (max-width: 500px) {
+    margin-bottom: 20px;
+    min-width: 300px;
+  }
+
   .imgContainer {
     width: 90%;
     display: flex;
-    justify-content: center;
-    img {
-      max-width: 100%;
-      display: block;
+    justify-content: flex-start;
+
+    span {
+      width: 45px;
+      height: 45px;
+      display: flex;
+      border: 1px solid gray;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
     }
   }
 
@@ -152,10 +163,13 @@
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+  height: 110px;
+  justify-content: space-between;
 }
 
 .allDocs {
   width: 100%;
   display: flex;
   padding-left: 30px;
+  margin-top: 20px;
 }

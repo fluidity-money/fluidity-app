@@ -1,26 +1,32 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
+// code is governed by a commercial license that can be found in the
+// LICENSE_TRF.md file.
+
 import type { ReactComponentElement } from "react";
 import type { SupportedChainsList } from "~/util/chainProviders/chains";
 
 import { useRef } from "react";
+import { SupportedChains } from "~/util";
 import { useClickOutside } from "../Modal";
 import { ReactComponent as Checkmark } from "~/assets/images/buttonIcons/Checkmark.svg";
 import { Card, Heading, Text } from "~/components";
-import { SupportedChains } from "~/util";
 import styles from "./BlockchainModal.module.scss";
 
-interface IOption {
+export interface IOption {
   name: SupportedChainsList;
   icon: ReactComponentElement<any>;
 }
 
-interface IBlockchainModal {
+export interface IBlockchainModal {
   option: IOption;
   setOption: React.SetStateAction<any>;
   options: IOption[];
   handleModal: React.SetStateAction<any>;
+  mobile: boolean;
+  className?: string;
 }
 
-const BlockchainModal = ({ handleModal, option: selected, options, setOption }: IBlockchainModal) => {
+const BlockchainModal = ({ handleModal, option: selected, options, setOption, mobile, className }: IBlockchainModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
   const handleOnClick = (i: number) => {
     setOption(options[i].name);
@@ -32,9 +38,13 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption }: 
   const blockchainModal = useRef(null);
   
   useClickOutside(blockchainModal, () => handleModal(false));
+  
+  const mobileProps = mobile && styles.mobile;
+  
+  const classProps = `${styles.container} ${mobileProps} ${className || ""}`
 
   return (
-    <div ref={blockchainModal} className={styles.container}>
+    <div ref={blockchainModal} className={classProps}>
       <div className={styles.heading}>
         <Heading
           as={"h4"}

@@ -2,14 +2,16 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { GeneralButton, Heading } from "@fluidity-money/surfing";
+import { Heading } from "@fluidity-money/surfing";
+import Image from "next/image";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   navLinks: string[];
 }
 
-const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
+const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
     <a
       className={styles.button}
@@ -21,35 +23,91 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.imgContainer}>
-        <a href={"/"}>
-          <img src="/assets/images/logoMetallic.png" alt="logo" />
-        </a>
-      </div>
+      <a href={"/"}>
+        <Image
+          src="/assets/images/logoMetallic.png"
+          alt="logo"
+          width="160"
+          height="68"
+          priority={true}
+          loading="eager"
+        />
+      </a>
 
       {links}
 
       <div className={styles.socials}>
-        <a href="https://twitter.com/fluiditymoney">
-          <img src="/assets/images/socials/twitter.svg" alt="twitter" />
+        <a
+          href="https://twitter.com/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <Image
+            src="/assets/images/socials/twitter.svg"
+            alt="twitter"
+            height={24}
+            width={24}
+            priority={true}
+            loading="eager"
+          />
         </a>
-        <a href="https://discord.gg/CNvpJk4HpC">
-          <img src="/assets/images/socials/discord.svg" alt="discord" />
+        <a
+          href="https://discord.gg/CNvpJk4HpC"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <Image
+            src="/assets/images/socials/discord.svg"
+            alt="discord"
+            height={24}
+            width={24}
+            priority={true}
+            loading="eager"
+          />
         </a>
-        <a href="https://t.me/fluiditymoney">
-          <img src="/assets/images/socials/telegram.svg" alt="telegram" />
+        <a
+          href="https://t.me/fluiditymoney"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <Image
+            src="/assets/images/socials/telegram.svg"
+            alt="telegram"
+            height={24}
+            width={24}
+            priority={true}
+            loading="eager"
+          />
         </a>
-        <a href="https://www.linkedin.com/company/74689228/">
-          <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+        <a
+          href="https://www.linkedin.com/company/74689228/"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <Image
+            src="/assets/images/socials/linkedin.svg"
+            alt="linkedin"
+            height={24}
+            width={24}
+            priority={true}
+            loading="eager"
+          />
         </a>
       </div>
 
-      <a className={`${styles.whiteButton} ${styles.smaller}`} href={``}>
+      <a
+        className={`${styles.whiteButton} ${styles.smaller}`}
+        href={`#demo`}
+        onClick={() => setIsOpen(false)}
+      >
         <Heading className={styles.black} black={true} as="h3">
           LAUNCH FLUIDITY
         </Heading>
       </a>
-      <a className={`${styles.button} ${styles.smaller}`} href={``}>
+      <a
+        className={`${styles.button} ${styles.smaller}`}
+        href="mailto:contact@fluidity.money"
+      >
         <Heading as="h3">LET'S CHAT</Heading>
       </a>
     </div>

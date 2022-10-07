@@ -6,8 +6,6 @@ import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
   Display,
-  GeneralButton,
-  Heading,
   Text,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
@@ -16,10 +14,12 @@ import styles from "./Demo.module.scss";
 
 const Demo = () => {
   const { apiState } = useChainContext();
+  const { weekWinnings } = apiState;
+
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const weekTotalRewards = apiState.weekWinnings.reduce(
+  const weekTotalRewards = weekWinnings.reduce(
     (weekSum, { winning_amount, token_decimals }) =>
       weekSum + winning_amount / 10 ** token_decimals,
     0
@@ -32,13 +32,13 @@ const Demo = () => {
       <div className={`${styles.container} bg-light`}>
         <Video
           src={
-            window.location.origin + "/assets/videos/FluidityOpportunityB.mp4"
+            "/assets/videos/FluidityOpportunityB.mp4"
           }
           type={"none"}
           loop={true}
         />
 
-        <div>
+        <div id="demo">
           <Display
             large={width > breakpoint && true}
             small={width < breakpoint && true}
@@ -62,14 +62,15 @@ const Demo = () => {
             } }>
               SHOW ME A DEMO
             </GeneralButton> */}
-            <GeneralButton
-              version={"secondary"}
-              buttonType={"text"}
-              size={"medium"}
-              handleClick={function (): void {}}
-            >
-              LAUNCH FLUIDITY
-            </GeneralButton>
+            <Video
+              className={styles.comingSoonButton}
+              src={"/assets/videos/FluidityComingSoon.mp4"}
+              type={"reduce"}
+              loop={true}
+              scale={0.4}
+              width={"auto"}
+              height={80}
+            />
           </section>
         </div>
       </div>

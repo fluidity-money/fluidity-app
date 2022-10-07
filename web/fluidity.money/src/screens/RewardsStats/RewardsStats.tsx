@@ -25,12 +25,12 @@ const RewardsStats = ({ changeScreen }: IProps) => {
     <div className={styles.info}>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <Heading as={width > breakpoint ? "h2" : "h3"}>1400+</Heading>
-        <Heading as={width > breakpoint ? "h5" : "h6"}>Unique wallets</Heading>
+        <Heading as={width > breakpoint ? "h2" : "h3"}>35,000+</Heading>
+        <Heading as={width > breakpoint ? "h5" : "h6"}>Unique wallets (on testing)</Heading>
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <Heading as={width > breakpoint ? "h2" : "h3"}>32,689</Heading>
+        <Heading as={width > breakpoint ? "h2" : "h3"}>12</Heading>
         <Heading as={width > breakpoint ? "h5" : "h6"}>
           Fluid asset pairs
         </Heading>
@@ -55,34 +55,11 @@ const RewardsStats = ({ changeScreen }: IProps) => {
           <InfoStats />
         </div>
         <div style={{ height: 254, width: "100%" }}>
-          <LineChart
-            data={[
-              { x: 10, y: 5 },
-              { x: 20, y: 15 },
-              { x: 30, y: 10 },
-              { x: 40, y: 15 },
-              { x: 50, y: 20 },
-              { x: 60, y: 22 },
-              { x: 70, y: 30 },
-              { x: 80, y: 25 },
-            ]}
-            xLabel={"Date"}
-            yLabel={"Prize Amount"}
-            lineLabel={"Transactions"}
-            accessors={{
-              xAccessor: (d: any) => {
-                return d.x as any;
-              },
-              yAccessor: (d: any) => {
-                return d.y as any;
-              },
-            }}
-          />
         </div>
 
         <RewardsInfoBox
           rewardPool={rewardPool}
-          totalTransactionValue={txCount}
+          totalTransactions={txCount}
           changeScreen={changeScreen}
           type="transparent"
         />

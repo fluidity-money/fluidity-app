@@ -3,8 +3,8 @@
 // LICENSE.md file.
 
 import { useMemo } from 'react';
-import { graphql } from 'babel-plugin-relay/macro';
-import { useSubscription } from 'react-relay';
+import { gql, useSubscription } from "@apollo/client";
+import { onData } from "./apolloClient";
 
 export interface TransactionCount {
   user_actions_aggregate: {
@@ -15,7 +15,7 @@ export interface TransactionCount {
 }
 
 
-const countTransactionsByNetworkSubscription = graphql`
+const countTransactionsByNetworkSubscription = gql`
 subscription userActionsGetCountTransactionsByNetworkSubscription($network: network_blockchain!) {
   user_actions_aggregate(where: {network: {_eq: $network}}) {
     aggregate {
@@ -26,14 +26,16 @@ subscription userActionsGetCountTransactionsByNetworkSubscription($network: netw
 `;
 
 export const useCountTransactions = (onNext: (txCount: TransactionCount) => void, network: string) => {
-  const countTransactions = useMemo(() => ({
+  const { subscription, options } = useMemo(() => ({
     subscription: countTransactionsByNetworkSubscription,
-    variables: {
-      network,
-    },
-    onNext,
-  }), [onNext, network]);
+    options: {
+      variables: {
+        network,
+      },
+      onData: onData(onNext),
+    }
+  }), [network]);
   
-  return useSubscription(countTransactions as any);
+  return useSubscription(subscription, options);
 }
 

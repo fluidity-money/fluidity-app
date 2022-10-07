@@ -2,8 +2,6 @@
 // code is governed by a commercial license that can be found in the
 // LICENSE_TRF.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import useViewport from "hooks/useViewport";
@@ -11,41 +9,42 @@ import styles from "./Wrap.module.scss";
 import Video from "components/Video";
 
 const Wrap = () => {
-  /* scrolls to location on pageload if it contains same ID or scrolls to the top
-   for ResourcesNavModal to work*/
-  const location = useLocation();
-  useEffect(() => {
-    if (location.hash) {
-      let elem = document.getElementById(location.hash.slice(1));
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }
-  }, [location]);
-
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
 
   const left =
-    width < breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/FluidityWrap.mp4'} type={'fit'} loop={true}/>
+  width <= breakpoint ? (
+    <>
+      <Video
+        src={"/assets/videos/FluidityWrap.mp4"}
+        type={"fit"}
+        loop={true}
+        scale={0.7}
+      />
+    </>
     ) : (
+
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens
       </HowItWorksTemplate>
     );
 
   const right =
-    width > breakpoint ? (
-      <Video src={window.location.origin + '/assets/videos/FluidityWrap.mp4'} type={'fit'} loop={true}/>
-    ) : (
-      <HowItWorksTemplate header={header} info={info}>
-        Wrapped tokens
-      </HowItWorksTemplate>
-    );
+  width > breakpoint ? (
+    <>
+      <Video
+        src={"/assets/videos/FluidityWrap.mp4"}
+        type={"fit"}
+        loop={true}
+        scale={0.7}
+      />
+    </>
+  ) : (
+    <HowItWorksTemplate header={header} info={info}>
+      Wrapped tokens
+    </HowItWorksTemplate>
+  );
 
   return (
     <div className={styles.container} id="wraptokens">
