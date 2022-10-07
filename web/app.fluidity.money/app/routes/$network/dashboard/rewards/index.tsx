@@ -173,6 +173,7 @@ export default function Rewards() {
                 name={bestPerformingRewarders[0].name}
                 prize={bestPerformingRewarders[0].prize}
                 avgPrize={bestPerformingRewarders[0].avgPrize}
+                size="lg"
               />
             )}
           </section>
@@ -251,15 +252,17 @@ export default function Rewards() {
       {hasRewarders && (
         <section id="rewarders">
           <Heading as={"h2"}>Highest Rewarders</Heading>
-          <ManualCarousel scrollBar={true}>
+          <ManualCarousel scrollBar={true} className="rewards-carousel">
             {bestPerformingRewarders.map((rewarder) => (
-              <ProviderCard
-                key={rewarder.name}
-                iconUrl={rewarder.iconUrl}
-                name={rewarder.name}
-                prize={rewarder.prize}
-                avgPrize={rewarder.avgPrize}
-              />
+              <div className="carousel-card-container" key={rewarder.name}>
+                <ProviderCard
+                  iconUrl={rewarder.iconUrl}
+                  name={rewarder.name}
+                  prize={rewarder.prize}
+                  avgPrize={rewarder.avgPrize}
+                  size="md"
+                />
+              </div>
             ))}
           </ManualCarousel>
         </section>

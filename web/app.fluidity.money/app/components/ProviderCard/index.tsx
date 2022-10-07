@@ -10,6 +10,7 @@ interface IProviderCard {
   name: string;
   prize: number;
   avgPrize: number;
+  size: "md" | "lg";
 }
 
 export type Provider = {
@@ -19,9 +20,17 @@ export type Provider = {
   avgPrize: number;
 };
 
-const ProviderCard = ({ iconUrl, name, prize, avgPrize }: IProviderCard) => {
+const ProviderCard = ({
+  iconUrl,
+  name,
+  prize,
+  avgPrize,
+  size,
+}: IProviderCard) => {
   return (
-    <Card className="provider-card">
+    <Card
+      className={size === "lg" ? "provider-card-large" : "provider-card-medium"}
+    >
       <section className="card-left">
         {/* Icon */}
         <img src={iconUrl} alt={`${name}-icon`} />
