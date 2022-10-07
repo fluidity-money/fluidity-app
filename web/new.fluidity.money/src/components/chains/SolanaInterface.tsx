@@ -155,6 +155,7 @@ const SolanaInterface = ({children, setChain, connected, setConnected}: Interfac
     setChain,
     connected,
     balances,
+    address: solana.publicKey?.toBase58(),
     wallets,
     network: network as Network,
     setNetwork: setNetworkChecked,

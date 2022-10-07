@@ -53,6 +53,7 @@ interface ChainContextNonNull {
     wrap: (token: string, amount: string | number) => void
     unwrap: (token: string, amount: string | number) => void
     send: (token: string, amount: string | number, recipient: string) => void
+    address?: string
     balances: {[K in SupportedToken]?: string}
     wallets: Record<string, unknown>
 }
@@ -66,8 +67,9 @@ type ChainContext = ChainContextBase &
     wrap?: never,
     unwrap?: never,
     send?: never,
-    balances?: never
-    wallets?: never
+    address?: never,
+    balances?: never,
+    wallets?: never,
   })
 
 export const ChainContext = createContext<ChainContext>({

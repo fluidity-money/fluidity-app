@@ -21,6 +21,7 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
   const wallet = useWallet();
   const signer = useSigner();
   const wallets = {metamask: "metamask"};
+  const address = wallet.account || undefined;
 
   useEffect(() => {
     if (!signer || !connected)
@@ -166,6 +167,7 @@ const EthereumInterface = ({children, setChain, connected, setConnected}: Interf
     setChain,
     connected,
     balances,
+    address,
     wallets,
     network: network as Network,
     setNetwork: setNetworkChecked,

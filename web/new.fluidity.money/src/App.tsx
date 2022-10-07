@@ -13,11 +13,11 @@ import memoryStorageDriver from "localforage-memoryStorageDriver";
 
 const Div = () => {
   const con = useContext(ChainContext)
-  const {wallets, connected, chain, network, setNetwork, connect, disconnect, wrap, unwrap, send, setChain} = con || {};
+  const {wallets, address, connected, chain, network, setNetwork, connect, disconnect, wrap, unwrap, send, setChain} = con || {};
 
   return <div style={{flexDirection: 'row', display: 'flex'}}>
     <div>
-      {`connected: ${connected}. chain: ${chain}, network: ${network}`}
+      {`connected: ${connected}. chain: ${chain}, network: ${network} account: ${address}`}
       <br/>
       <button onClick={disconnect}>disconnect</button>
       <br/>
