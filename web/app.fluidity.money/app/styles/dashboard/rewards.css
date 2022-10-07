@@ -1,11 +1,32 @@
 #user-rewards {
   display: flex;
-  height: 270px;
-  width: 100%;
+  /* height: 270px; */
+  width: auto;
+  padding: 2em;
+  align-items: top;
+  margin-bottom: 6em;
+  justify-content: space-between;
+}
+
+#performance {
+  margin-bottom: 6em;
 }
 
 #infobox {
-  margin-left: auto;
+  margin-left: 2em;
+  padding: 1.5em;
+  width: 35%;
+}
+
+#unclaimed {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5em;
+}
+
+#unclaimed-left {
+  display: flex;
 }
 
 .statistics-set {
@@ -16,8 +37,8 @@
 .statistics-row {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: flex-start;
+  gap: 4em;
 }
 
 .graph-ceiling {
@@ -36,4 +57,36 @@
 .row-value {
   padding: 0;
   margin: 0;
+}
+
+.unclaimed-total {
+  margin: 0;
+  font-size: 3em;
+}
+
+.claims-title {
+  margin: 0 0 5px 0;
+}
+
+.view-breakdown-button {
+  width: 100%;
+  text-align: center;
+}
+
+.fees {
+  display: flex;
+  justify-content: space-between;
+}
+
+.line {
+  border: none;
+  height: 0.025em;
+  background-color: white;
+  width: 99%;
+}
+
+.gradient-line {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, black, white, white, black);
 }

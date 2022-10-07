@@ -212,7 +212,8 @@ export default function Rewards() {
               </div>
             </div>
             <div>
-              <div className="statistics-row">
+              {/* scoped out */}
+              {/* <div className="statistics-row">
                 {performanceTimeFrames.map((timeFrame, i) => {
                   const selectedProps = timeFrameIndex === i ? "selected" : "";
                   const classProps = `${selectedProps}`;
@@ -228,7 +229,7 @@ export default function Rewards() {
                     </button>
                   );
                 })}
-              </div>
+              </div> */}
             </div>
           </div>
         </section>
