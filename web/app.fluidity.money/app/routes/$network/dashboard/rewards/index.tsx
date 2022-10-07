@@ -151,12 +151,14 @@ export default function Rewards() {
   return (
     <>
       {/* Info Cards */}
-      {userHasRewards ? (
+      {!userHasRewards ? (
         <UserRewards claimNow={mobileView} />
       ) : (
         <div className="noUserRewards">
-          <section>
-            <Heading as="h2">Spend to earn</Heading>
+          <section id="spend-to-earn">
+            <Heading className="spendToEarnHeading" as="h2">
+              Spend to earn
+            </Heading>
             <Text size="md">
               Use, send and receive fluid assets <br />
               to generate yield.

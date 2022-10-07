@@ -21,18 +21,22 @@ export type Provider = {
 
 const ProviderCard = ({ iconUrl, name, prize, avgPrize }: IProviderCard) => {
   return (
-    <Card>
-      {/* Icon */}
-      <img src={iconUrl} alt={`${name}-icon`} />
+    <Card className="provider-card">
+      <section className="card-left">
+        {/* Icon */}
+        <img src={iconUrl} alt={`${name}-icon`} />
 
-      {/* Provider Name */}
-      <section style={{ display: "flex", flexDirection: "column" }}>
-        <Heading as={"h5"}>{name}</Heading>
-        <Text>{numberToMonetaryString(avgPrize)} Avg prize/trans</Text>
+        {/* Provider Name */}
+        <section className="card-section">
+          <Heading className="card-token-name" as={"h5"}>
+            {name}
+          </Heading>
+          <Text>{numberToMonetaryString(avgPrize)} Avg prize/trans</Text>
+        </section>
       </section>
 
       {/* Provider Prize */}
-      <section style={{ display: "flex", flexDirection: "column" }}>
+      <section className="card-section">
         <Text prominent={true}>{numberToMonetaryString(prize)}</Text>
         <Text>Top prize</Text>
       </section>
