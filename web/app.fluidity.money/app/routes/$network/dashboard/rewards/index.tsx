@@ -151,7 +151,7 @@ export default function Rewards() {
   return (
     <>
       {/* Info Cards */}
-      {!userHasRewards ? (
+      {userHasRewards ? (
         <UserRewards claimNow={mobileView} />
       ) : (
         <div className="noUserRewards">
