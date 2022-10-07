@@ -1,7 +1,12 @@
 import { LinksFunction, LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData, Link, useNavigate } from "@remix-run/react";
 
-import { GeneralButton, ArrowDown, ArrowUp, Text } from "@fluidity-money/surfing";
+import {
+  GeneralButton,
+  ArrowDown,
+  ArrowUp,
+  Text,
+} from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
 
@@ -12,7 +17,7 @@ export const links: LinksFunction = () => {
 type LoaderData = {
   appName: string;
   version: string;
-}
+};
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
@@ -30,22 +35,21 @@ export const loader: LoaderFunction = async ({ request }) => {
       default:
         return "DASHBOARD";
     }
-  }
-  
+  };
+
   const urlPaths = url.pathname.split("/");
-  
+
   const pathname = urlPaths[urlPaths.length - 1];
-  
+
   return {
     appName: routeMapper(pathname),
     version: "1.5",
-  }
-
-}
+  };
+};
 
 export default function Dashboard() {
   const { appName, version } = useLoaderData<LoaderData>();
-  
+
   const navigate = useNavigate();
 
   return (
@@ -66,14 +70,18 @@ export default function Dashboard() {
           </Link>
 
           {/* Assets - SCOPED OUT */}
-          {/*<Link key={"send-money"} to={"assets"}>
+          {/*
+          <Link key={"send-money"} to={"assets"}>
             <li>Assets</li>
-          </Link>*/}
+          </Link>
+          */}
 
           {/* DAO - SCOPED OUT */}
-          {/*<Link key={"send-money"} to={"/send"}>
+          {/*
+          <Link key={"send-money"} to={"/send"}>
             <li>DAO</li>
-          </Link>*/}
+          </Link>
+          */}
         </ul>
       </nav>
       <main>
@@ -131,29 +139,21 @@ export default function Dashboard() {
           {/* Links */}
           <section>
             {/* Version */}
-            <Text>
-              Fluidity Money V{version}
-            </Text>
+            <Text>Fluidity Money V{version}</Text>
 
             {/* Terms */}
             <Link to={"/"}>
-              <Text>
-                Terms
-              </Text>
+              <Text>Terms</Text>
             </Link>
 
             {/* Privacy Policy */}
             <Link to={"/"}>
-              <Text>
-                Privacy policy
-              </Text>
+              <Text>Privacy policy</Text>
             </Link>
 
             {/* Roadmap */}
             <Link to={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
-              <Text>
-                Roadmap
-              </Text>
+              <Text>Roadmap</Text>
             </Link>
           </section>
 
@@ -173,7 +173,7 @@ export default function Dashboard() {
             <Link to={"https://t.me/fluiditymoney"}>
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
             </Link>
-    
+
             {/* LinkedIn */}
             <Link to={"https://www.linkedin.com/company/fluidity-money"}>
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />

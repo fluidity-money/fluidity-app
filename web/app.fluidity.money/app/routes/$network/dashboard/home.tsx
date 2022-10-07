@@ -9,7 +9,7 @@ import { useUserTransactionCount, useUserTransactions } from "~/queries";
 import { useLoaderData } from "@remix-run/react";
 import { UserTransaction } from "~/queries/useUserTransactions";
 
-import TransactionTable from "~/screens/TransactionTable";
+import TransactionTable from "~/components/TransactionTable";
 
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
@@ -129,12 +129,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       <section id="transactions">
         <TransactionTable
           page={page}
           count={count}
           transactions={transactions}
           chain={network}
+          address={address}
         />
       </section>
     </>

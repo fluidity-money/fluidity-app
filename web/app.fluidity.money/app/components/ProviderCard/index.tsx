@@ -21,13 +21,13 @@ export type Provider = {
 
 const ProviderCard = ({ iconUrl, name, prize, avgPrize }: IProviderCard) => {
   return (
-    <Card className="" style={{ display: "flex" }}>
+    <Card>
       {/* Icon */}
       <img src={iconUrl} alt={`${name}-icon`} />
 
       {/* Provider Name */}
       <section style={{ display: "flex", flexDirection: "column" }}>
-        <Heading as={"h5"}>Compound</Heading>
+        <Heading as={"h5"}>{name}</Heading>
         <Text>{numberToMonetaryString(avgPrize)} Avg prize/trans</Text>
       </section>
 

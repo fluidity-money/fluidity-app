@@ -1,2 +1,2 @@
-export { gql } from './api/graphql';
-export { getAddressExplorerLink } from './chainUtils/links';
+export { gql } from "./api/graphql";
+export { getAddressExplorerLink } from "./chainUtils/links";
