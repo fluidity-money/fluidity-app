@@ -12,17 +12,16 @@ import {
 
 export const loader: LoaderFunction = async ({ request }) => {
   // TODO: Get reward TX and fetch reward that way
-  
+
   const url = new URL(request.url);
-  const _reward = url.searchParams.get("reward")
+  const _reward = url.searchParams.get("reward");
   const reward = _reward ? parseInt(_reward) : 0;
 
-  const _networkFee = url.searchParams.get("networkFee")
+  const _networkFee = url.searchParams.get("networkFee");
   const networkFee = _networkFee ? parseInt(_networkFee) : 0;
 
-  const _gasFee = url.searchParams.get("gasFee")
+  const _gasFee = url.searchParams.get("gasFee");
   const gasFee = _gasFee ? parseInt(_gasFee) : 0;
-  
 
   return json({
     reward,
@@ -38,11 +37,7 @@ type LoaderData = {
 };
 
 const ClaimedRewards = () => {
-  const {
-    reward,
-    networkFee,
-    gasFee,
-  } = useLoaderData<LoaderData>();
+  const { reward, networkFee, gasFee } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -96,7 +91,9 @@ const ClaimedRewards = () => {
         buttonType={"icon before"}
         icon={"Twitter"}
         size={"large"}
-        handleClick={() => {console.log('Go To Share')}}
+        handleClick={() => {
+          console.log("Go To Share");
+        }}
       >
         Share
       </GeneralButton>

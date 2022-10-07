@@ -4,7 +4,7 @@ import config from "~/webapp.config.js";
 import { redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 
-export const loader: LoaderFunction = async ({params}) => {
+export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
 
@@ -13,9 +13,9 @@ export const loader: LoaderFunction = async ({params}) => {
   if (!network) return redirectTarget;
 
   if (network in config.drivers === false) return redirectTarget;
-  
+
   return true;
-}
+};
 
 export default function Network() {
   // TODO: Inject Chain Provider

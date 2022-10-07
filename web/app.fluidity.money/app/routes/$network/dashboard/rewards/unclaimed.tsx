@@ -31,7 +31,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-  
 
   const transactions: Transaction[] = [];
   const count = 0;
@@ -51,10 +50,7 @@ const UnclaimedWinnings = () => {
       <Heading as={"h2"}>Your Winnings</Heading>
 
       {/* Info Card */}
-      <UserRewards
-        claimNow={true}
-      />
-
+      <UserRewards claimNow={true} />
 
       {/* Unclaimed Transactions */}
       <section id="table">

@@ -7,7 +7,6 @@ export const links: LinksFunction = () => {
 };
 
 export default function Rewards() {
-
   return (
     <>
       <Outlet />

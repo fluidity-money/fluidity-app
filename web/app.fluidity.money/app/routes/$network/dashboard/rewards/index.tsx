@@ -15,7 +15,7 @@ import {
   Text,
   Heading,
   numberToMonetaryString,
-  ManualCarousel
+  ManualCarousel,
 } from "@fluidity-money/surfing";
 import { LabelledValue, ProviderCard } from "~/components";
 import TransactionTable from "~/components/TransactionTable";
@@ -103,7 +103,6 @@ export type Rewarder = {
   avgPrize: number;
 };
 
-
 type LoaderData = {
   transactions: Transaction[];
   count: number;
@@ -136,25 +135,24 @@ export default function Rewards() {
   const mobileView = width <= 375;
 
   const [timeFrameIndex, setTimeFrameIndex] = useState(0);
-  
+
   const hasRewarders = rewarders.length > 0;
-  
-  const bestPerformingRewarders = rewarders
-    .sort(({prize: prize_a}, {prize: prize_b}) => {
+
+  const bestPerformingRewarders = rewarders.sort(
+    ({ prize: prize_a }, { prize: prize_b }) => {
       if (prize_a > prize_b) return -1;
       if (prize_a === prize_b) return 0;
       return 1;
-    });
-  
+    }
+  );
+
   console.log(bestPerformingRewarders);
-  
+
   return (
     <>
       {/* Info Cards */}
       {userHasRewards ? (
-        <UserRewards
-          claimNow={mobileView}
-        />
+        <UserRewards claimNow={mobileView} />
       ) : (
         <div className="noUserRewards">
           <section>
@@ -167,14 +165,14 @@ export default function Rewards() {
           <section>
             <Text size="md">Highest reward distribution this week</Text>
 
-            {hasRewarders && 
+            {hasRewarders && (
               <ProviderCard
                 iconUrl={bestPerformingRewarders[0].iconUrl}
                 name={bestPerformingRewarders[0].name}
                 prize={bestPerformingRewarders[0].prize}
                 avgPrize={bestPerformingRewarders[0].avgPrize}
               />
-            }
+            )}
           </section>
         </div>
       )}
@@ -182,7 +180,7 @@ export default function Rewards() {
       <Heading as={"h2"}>Reward Performance</Heading>
 
       {/* Reward Performance */}
-      {hasRewarders && 
+      {hasRewarders && (
         <section id="performance">
           <div>
             <div>
@@ -207,7 +205,9 @@ export default function Rewards() {
                 </div>
 
                 <div className="statistics-set">
-                  <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
+                  <LabelledValue label={"Fluid Pairs"}>
+                    {fluidPairs}
+                  </LabelledValue>
                 </div>
               </div>
             </div>
@@ -218,7 +218,10 @@ export default function Rewards() {
                   const classProps = `${selectedProps}`;
 
                   return (
-                    <button key={timeFrame} onClick={() => setTimeFrameIndex(i)}>
+                    <button
+                      key={timeFrame}
+                      onClick={() => setTimeFrameIndex(i)}
+                    >
                       <Text key={timeFrame + i} className={classProps}>
                         {timeFrame}
                       </Text>
@@ -229,7 +232,7 @@ export default function Rewards() {
             </div>
           </div>
         </section>
-      }
+      )}
 
       <section id="table">
         <TransactionTable
@@ -242,24 +245,22 @@ export default function Rewards() {
       </section>
 
       {/* Highest Rewarders */}
-      {hasRewarders &&
+      {hasRewarders && (
         <section id="rewarders">
-          <Heading as={"h2"}>
-            Highest Rewarders
-          </Heading>
-          <ManualCarousel scrollBar={true} >
-            {bestPerformingRewarders.map(rewarder => 
-              <ProviderCard 
+          <Heading as={"h2"}>Highest Rewarders</Heading>
+          <ManualCarousel scrollBar={true}>
+            {bestPerformingRewarders.map((rewarder) => (
+              <ProviderCard
                 key={rewarder.name}
                 iconUrl={rewarder.iconUrl}
                 name={rewarder.name}
                 prize={rewarder.prize}
                 avgPrize={rewarder.avgPrize}
-              /> 
-            )}
+              />
+            ))}
           </ManualCarousel>
         </section>
-      }
+      )}
     </>
   );
 }

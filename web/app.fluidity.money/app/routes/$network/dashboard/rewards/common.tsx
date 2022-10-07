@@ -19,9 +19,7 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
   const buttonText = claimNow ? "Claim now with fees" : "View breakdown";
 
   const onClick = () => {
-    return claimNow
-      ? console.log("claim")
-      : navigate("../unclaimed");
+    return claimNow ? console.log("claim") : navigate("../unclaimed");
   };
 
   return (
@@ -65,7 +63,7 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
       </Card>
 
       {/* Total claimed, Reward History */}
-      { claimNow &&
+      {claimNow && (
         <section>
           <div>
             <Text>Total yield claimed to date </Text>
@@ -82,7 +80,7 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
             Reward History
           </LinkButton>
         </section>
-      }
+      )}
     </>
   );
 };
