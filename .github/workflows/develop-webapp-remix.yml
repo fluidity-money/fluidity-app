@@ -16,10 +16,73 @@ env:
   ENVIRONMENT: dev
 
 jobs:
+  cut-lib-release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+          lfs: true
+          token: ${{ secrets.GH_SUPER_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Build changed dependencies
+        uses: technote-space/get-diff-action@v6
+        id: lib_diff
+        with:
+          PATTERNS: "web/surfing/**/*"
+      - name: Build & Bump Surfing
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/surfing
+        run: |
+          npm install
+          npm run build
+          npm version patch
+      - uses: actions/setup-node@v3
+        if: steps.lib_diff.outputs.diff
+      - name: Publish Surfing
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/surfing
+        run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          npm publish
+      - name: Update version (Fluidity Landing)
+        if: steps.lib_diff.outputs.diff
+        working-directory: web/fluidity.money
+        run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          npm install
+          npm update surfing
+      - name: Commit changed
+        if: steps.lib_diff.outputs.diff
+        run: |
+          git add .
+          git config user.name "Bump Bot 🤖"
+          git config user.email "noreply@fluidity.money"
+          git commit -m "Bump Surfing version"
+          git push origin develop
+  npm-test:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Test
+        run: |
+          npm install
+          npm test
+
  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: dev
+    needs: [cut-lib-release,npm-test]
     steps:
       - uses: actions/checkout@v3
         with:
