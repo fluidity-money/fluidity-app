@@ -7,3 +7,33 @@
 #infobox {
   margin-left: auto;
 }
+
+.statistics-set {
+  display: flex;
+  flex-direction: column;
+}
+
+.statistics-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.graph-ceiling {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.noUserRewards {
+  display: flex;
+  justify-content: space-between;
+  border: solid red 1px;
+}
+
+.row-value {
+  padding: 0;
+  margin: 0;
+}

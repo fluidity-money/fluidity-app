@@ -1,4 +1,9 @@
-import { Card, numberToMonetaryString, Text, Heading } from "@fluidity-money/surfing";
+import {
+  Card,
+  numberToMonetaryString,
+  Text,
+  Heading,
+} from "@fluidity-money/surfing";
 
 interface IProviderCard {
   iconUrl: string;
@@ -12,29 +17,27 @@ export type Provider = {
   name: string;
   prize: number;
   avgPrize: number;
-}
+};
 
-const ProviderCard = ({iconUrl, name, prize, avgPrize}: IProviderCard) => {
+const ProviderCard = ({ iconUrl, name, prize, avgPrize }: IProviderCard) => {
   return (
-    <Card
-    >
+    <Card className="" style={{ display: "flex" }}>
       {/* Icon */}
       <img src={iconUrl} alt={`${name}-icon`} />
 
       {/* Provider Name */}
-      <section>
-        <Heading as={"h5"}>{numberToMonetaryString(prize)}</Heading>
+      <section style={{ display: "flex", flexDirection: "column" }}>
+        <Heading as={"h5"}>Compound</Heading>
         <Text>{numberToMonetaryString(avgPrize)} Avg prize/trans</Text>
       </section>
 
       {/* Provider Prize */}
-      <section>
+      <section style={{ display: "flex", flexDirection: "column" }}>
         <Text prominent={true}>{numberToMonetaryString(prize)}</Text>
         <Text>Top prize</Text>
       </section>
-  
     </Card>
-  )
-}
+  );
+};
 
 export default ProviderCard;

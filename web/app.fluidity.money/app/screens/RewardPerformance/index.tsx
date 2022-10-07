@@ -10,7 +10,13 @@ import {
   ManualCarousel,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
-import { ProviderCard, LabelledValue } from "~/components"
+import { ProviderCard, LabelledValue } from "~/components";
+
+import styles from "~/styles/dashboard/home.css";
+
+export function links() {
+  return [{ rel: "stylesheet", href: styles }];
+}
 
 export type Transaction = {
   sender: string;
@@ -25,8 +31,7 @@ export type Rewarder = {
   name: string;
   prize: number;
   avgPrize: number;
-}
-
+};
 
 type IRewardPerformance = {
   transactions: Transaction[];
@@ -34,28 +39,31 @@ type IRewardPerformance = {
   page: number;
   network: Chain;
   rewarders: Rewarder[];
-}
+};
 
 const performanceTimeFrames = [
   "All time",
   "Last week",
   "Last month",
   "This year",
-]
-  
+];
 
-const RewardPerformance = ({transactions, count, page, network, rewarders}: IRewardPerformance) => {
-  const [ timeFrameIndex, setTimeFrameIndex ] = useState(0);
+const RewardPerformance = ({
+  transactions,
+  count,
+  page,
+  network,
+  rewarders,
+}: IRewardPerformance) => {
+  const [timeFrameIndex, setTimeFrameIndex] = useState(0);
 
   return (
     <>
       {/* Reward Performance */}
       <section id="performance">
-        <Heading as={"h2"}>
-          Reward Performance
-        </Heading>
-        <div className="graph-ceiling">
-          <div className="overlay">
+        <Heading as={"h2"}>Reward Performance</Heading>
+        <div>
+          <div>
             <div className="statistics-row">
               <div className="statistics-set">
                 <LabelledValue label={"Total claimed yield"}>
@@ -64,9 +72,7 @@ const RewardPerformance = ({transactions, count, page, network, rewarders}: IRew
               </div>
 
               <div className="statistics-set">
-                <LabelledValue label={"Highest performer"}>
-                  fAVAX
-                </LabelledValue>
+                <LabelledValue label={"Highest performer"}>fAVAX</LabelledValue>
               </div>
 
               <div className="statistics-set">
@@ -76,29 +82,28 @@ const RewardPerformance = ({transactions, count, page, network, rewarders}: IRew
               </div>
 
               <div className="statistics-set">
-                <LabelledValue label={"Fluid Pairs"}>
-                  {0}
-                </LabelledValue>
+                <LabelledValue label={"Fluid Pairs"}>{0}</LabelledValue>
               </div>
             </div>
           </div>
           <div>
             <div className="statistics-row">
               {performanceTimeFrames.map((timeFrame, i) => {
-                const selectedProps = timeFrameIndex === i ? "selected" : ""
-                const classProps = `${selectedProps}`
+                const selectedProps = timeFrameIndex === i ? "selected" : "";
+                const classProps = `${selectedProps}`;
 
                 return (
                   <button onClick={() => setTimeFrameIndex(i)}>
-                    <Text className={classProps}>{timeFrame}</Text>
+                    <Text key={timeFrame + i} className={classProps}>
+                      {timeFrame}
+                    </Text>
                   </button>
-                )
+                );
               })}
             </div>
           </div>
         </div>
       </section>
-
 
       <section id="table">
         <TransactionTable
@@ -108,9 +113,9 @@ const RewardPerformance = ({transactions, count, page, network, rewarders}: IRew
           chain={network}
         />
       </section>
-    
+
       {/* Highest Rewarders - SCOPED OUT FOR NOW */}
-      { /*
+      {/*
       <section id="rewarders">
         <Heading as={"h2"}>
           Highest Rewarders
@@ -127,9 +132,9 @@ const RewardPerformance = ({transactions, count, page, network, rewarders}: IRew
         </ManualCarousel>
         
       </section>
-      */ }
+      */}
     </>
   );
-}
+};
 
 export default RewardPerformance;

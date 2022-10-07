@@ -24,7 +24,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-  
+
   const {
     data: {
       [network as string]: {
@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       [network as string]: { transfers: transactions },
     },
   } = await (await useUserTransactions(address, page)).json();
-  
+
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
     (transaction: UserTransaction) => {
@@ -65,9 +65,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (Math.ceil(count / 12) < page && count > 0) {
     return redirect(`./`, 301);
   }
-  
+
   // Get Best Rewarders - SCOPED OUT NO DATA
-  
 
   return json({
     rewarders: rewarders,
@@ -91,32 +90,42 @@ type LoaderData = {
 };
 
 export default function Rewards() {
-  const [ showBreakdown, setShowBreakdown ] = useState(false);
-  const { transactions, count, page, rewarders, network } = useLoaderData<LoaderData>();
-  
-  
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [rewards, setUserRewards] = useState(false);
+  const { transactions, count, page, rewarders, network } =
+    useLoaderData<LoaderData>();
+
   const { width } = useViewport();
   const mobileView = width <= 375;
-  
+
   return (
     <>
-      <UserRewards claimNow={mobileView || showBreakdown} showBreakdown={setShowBreakdown} />
-      <NoUserRewards rewarder={rewarders[2]} />
-      { showBreakdown
-          ? <UnclaimedWinnings
-              transactions={transactions.filter(tx => tx.timestamp > (new Date).getTime() - 1000)}
-              count={count}
-              page={page}
-              network={network}
-            />
-          : <RewardPerformance
-              transactions={transactions}
-              count={count}
-              page={page}
-              network={network}
-              rewarders={rewarders}
-            />
-      }
+      {rewards ? (
+        <UserRewards
+          claimNow={mobileView || showBreakdown}
+          showBreakdown={setShowBreakdown}
+        />
+      ) : (
+        <NoUserRewards rewarder={rewarders[2]} />
+      )}
+      {showBreakdown ? (
+        <UnclaimedWinnings
+          transactions={transactions.filter(
+            (tx) => tx.timestamp > new Date().getTime() - 1000
+          )}
+          count={count}
+          page={page}
+          network={network}
+        />
+      ) : (
+        <RewardPerformance
+          transactions={transactions}
+          count={count}
+          page={page}
+          network={network}
+          rewarders={rewarders}
+        />
+      )}
     </>
   );
 }
@@ -146,5 +155,4 @@ const rewarders = [
     prize: 351879,
     avgPrize: 1234,
   },
-]
-
+];
