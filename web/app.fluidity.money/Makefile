@@ -1,16 +1,5 @@
 REPO := fluidity.money
 
-FRONTEND_SRC_DIR := src
-BACKEND_SRC_DIR := cmd
-
-FRONTEND_SRC_TS_DIR := ${FRONTEND_SRC_DIR}
-FRONTEND_SRC_SASS_DIR := ${FRONTEND_SRC_DIR}/styles
-
-FRONTEND_SRC_TS := $(shell find ${FRONTEND_SRC_TS_DIR} -name '*ts*')
-FRONTEND_SRC_SASS := ${FRONTEND_SRC_SASS_DIR}/config.scss
-
-FRONTEND_SRC := ${FRONTEND_SRC_TS} ${FRONTEND_SRC_SASS}
-
 include ../../web.mk
 
 REMIX_BUILD := npm run prod
