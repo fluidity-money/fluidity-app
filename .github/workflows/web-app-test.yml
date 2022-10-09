@@ -25,5 +25,6 @@ jobs:
       - name: Test
         working-directory: web/app.fluidity.money
         run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
           npm install
           npm test
