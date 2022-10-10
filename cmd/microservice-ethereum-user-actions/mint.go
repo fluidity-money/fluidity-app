@@ -5,21 +5,23 @@
 package main
 
 import (
+	"encoding/hex"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-user-actions/lib"
 )
 
-func handleMint(transactionHash ethereum.Hash, topics []ethereum.Hash, time time.Time, tokenShortName string, tokenDecimals int) {
-	if lenTopics := len(topics); lenTopics != 2 {
+func HandleMint(transactionHash ethereum.Hash, topics []ethereum.Hash, data misc.Blob, time time.Time, tokenShortName string, tokenDecimals int) {
+	if lenTopics := len(topics); lenTopics != 1 {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
-				"Length of the topic for the transfer is not 2! Was %v!",
+				"Length of the topic for the mint is not 1! Was %v!",
 				lenTopics,
 			)
 		})
@@ -27,7 +29,7 @@ func handleMint(transactionHash ethereum.Hash, topics []ethereum.Hash, time time
 
 	var (
 		addressPadded = string(topics[0])
-		amountPadded  = string(topics[1])
+		amountPadded  = hex.EncodeToString(data)
 	)
 
 	address, amount, err := microservice_user_actions.DecodeTwoLog(
