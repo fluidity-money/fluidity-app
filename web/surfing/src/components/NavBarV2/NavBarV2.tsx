@@ -25,12 +25,7 @@ const NavBarV2 = ({
 	vertical,
 	children,
 }: NavBarV2Props) => {
-  const className = [
-		styles.navbar,
-		vertical && styles.vertical
-	]
-	.filter((className) => className)
-	.join(" ");
+  const className = `${styles.navbar} ${vertical ? styles.vertical : ""}`;
 
   return (
     <div className={className}>

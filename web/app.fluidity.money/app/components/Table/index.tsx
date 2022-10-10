@@ -121,7 +121,7 @@ const Table = <T,>(props: ITable<T>) => {
 
       {/* Pagination */}
       <motion.div className="pagination" layout="position">
-        {Array.from(Array(pageCount).keys()).map((_, i) => {
+        {Array(pageCount).fill().map((_, i) => {
           return (
             <Link key={i} to={`?${pagination.pageQuery || "page"}=${i + 1}`}>
               {i + 1}

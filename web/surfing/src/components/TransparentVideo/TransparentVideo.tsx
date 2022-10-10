@@ -9,7 +9,7 @@ type VideoSource = {
 
 type AdvancedVideoProps = {
     transparent?: boolean
-    playlist: [VideoSource]
+    playlist: VideoSource[]
     loop?: boolean // Always last video in playlist
     autoplay?: boolean
     muted?: boolean
@@ -17,21 +17,25 @@ type AdvancedVideoProps = {
     keyColor?: string // Only works with transparent videos
 }
 
-const AdvancedVideo = (props: AdvancedVideoProps) => {
+const AdvancedVideo = ({playlist, ...props}: AdvancedVideoProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [currentVideo, setCurrentVideo] = useState(0);
 
-    const currentVideoParam = props.playlist[currentVideo];
+    const currentVideoParam = playlist[currentVideo];
 
     const onEnded = () => {
-        if (currentVideo < props.playlist.length - 1) {
+        if (currentVideo < playlist.length - 1) {
             setCurrentVideo(currentVideo + 1);
         }
     }
+    
+    if (!playlist || !playlist.length) {
+        return <div />
+    }
 
-    const isLastVideo = currentVideo === props.playlist.length - 1;
+    const isLastVideo = currentVideo === playlist.length - 1;
 
     return <>
         <video autoPlay loop={props.loop && isLastVideo} muted style={{ display: "none" }} ref={videoRef} onEnded={onEnded}>
@@ -40,3 +44,5 @@ const AdvancedVideo = (props: AdvancedVideoProps) => {
         <canvas ref={canvasRef} width={currentVideoParam.width} height={currentVideoParam.height} />
     </>
 }
+
+export default AdvancedVideo;
