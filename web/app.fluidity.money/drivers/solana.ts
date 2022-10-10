@@ -26,7 +26,7 @@ export const solGetTransactionsObservable = (
         if (LastSignature === transactionLog.signature) return;
 
         SolanaConnection.getParsedTransaction(transactionLog.signature)
-          .then((event) => {  
+          .then((event) => {
             const SrcPostBalance: any =
               event?.meta?.postTokenBalances?.at(0)?.uiTokenAmount?.amount;
             const SrcPreBalance: any =
@@ -44,7 +44,7 @@ export const solGetTransactionsObservable = (
             const transaction: any = {
               source,
               destination,
-              amount: amount.toString(),
+              amount: amount,
               token,
             };
             // console.log("Updated account info: ", transactionLog.signature)
