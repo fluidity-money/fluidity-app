@@ -52,6 +52,10 @@ func InsertEmissions(emission Emission) {
 		secondsSinceLastBlock   = emission.SecondsSinceLastBlock
 		ethAppFees              = emission.EthereumAppFees
 		solAppFees              = emission.SolanaAppFees
+		gasLimit                = emission.GasLimit
+		gasTipCap               = emission.GasTipCap
+		gasLimitNormal          = emission.GasLimitNormal
+		transferFeeNormal       = emission.TransferFeeNormal
 	)
 
 	var testingBallsString strings.Builder
@@ -156,7 +160,13 @@ func InsertEmissions(emission Emission) {
 			raydium_fee,
 			aldrin_v1_fee,
 			aldrin_v2_fee,
-			lifinity_fee
+			lifinity_fee,
+
+			gas_limit,
+			gas_tip_cap,
+			gas_limit_normal,
+			gas_tip_cap_normal,
+			transfer_fee_normal
 		)
 
 		VALUES (
@@ -248,7 +258,13 @@ func InsertEmissions(emission Emission) {
 			$70,
 			$71,
 			$72,
-			$73
+			$73,
+
+			$74,
+			$75,
+			$76,
+			$77,
+			$78
 		);`,
 
 		TableEmissions,
@@ -346,6 +362,12 @@ func InsertEmissions(emission Emission) {
 		solAppFees.AldrinV1,
 		solAppFees.AldrinV2,
 		solAppFees.Lifinity,
+
+		gasLimit,
+		gasTipCap,
+		gasLimitNormal,
+		gasTipCapNormal,
+		transferFeeNormal,
 	)
 
 	if err != nil {
