@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import {getATAAddressSync, TokenAmount, TOKEN_PROGRAM_ID, u64, Uint64Layout} from '@saberhq/token-utils';
 import {useSolana} from '@saberhq/use-solana';
