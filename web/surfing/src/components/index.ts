@@ -33,5 +33,11 @@ export {
 export { BlockchainModal } from "./Modal";
 export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
-export { ArrowRight, ArrowTopRight, TriangleDown } from "./Images";
-
+export {
+  ArrowRight,
+  ArrowDown,
+  ArrowUp,
+  ArrowTopRight,
+  TriangleDown,
+} from "./Images";
+export { default as Spinner } from "./Spinner";

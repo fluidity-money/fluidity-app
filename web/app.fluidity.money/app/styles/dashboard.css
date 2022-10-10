@@ -20,4 +20,36 @@ main {
   grid-area: main;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   overflow-y: scroll;
+  padding: 0 64px;
+  overflow-y: scroll;
+}
+
+main > nav {
+  grid-area: header-bar;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+}
+
+main > nav > div {
+  display: flex;
+  gap: 1em;
+}
+
+main > nav a {
+  margin: 0 10px;
+}
+
+main > footer {
+  height: 100px;
+  grid-area: footer;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+main > footer > section {
+  display: inherit;
+  gap: 20px;
 }

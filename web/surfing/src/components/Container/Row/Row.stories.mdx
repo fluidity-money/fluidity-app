@@ -1,6 +1,7 @@
 import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import Row from "./Row";
+import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
 
 <Meta
     title="Container/Row"
@@ -20,7 +21,7 @@ export const Template = ({children, ...props}) => <Row {...props}>
         name="Default Container"
         args={{
             children: <>
-                <img src="/src/assets/react.svg"></img>
+                <ReactSvg />
                 <div>
                     <p>A Fluid Asset is a wrapped standard token that represents and is pegged to an underlying principal token. You are free from market volatility risk when exchanging your fluid assets to the base asset you have deposited at any point in time through our web application, and if its down, through the method call on the corresponding swap contract.</p>
                 </div>
@@ -35,7 +36,7 @@ export const Template = ({children, ...props}) => <Row {...props}>
         args={{
             reverse: true,
             children: <>
-                <img src="/src/assets/react.svg"></img>
+                <ReactSvg />
                 <div>
                     <p>A Fluid Asset is a wrapped standard token that represents and is pegged to an underlying principal token. You are free from market volatility risk when exchanging your fluid assets to the base asset you have deposited at any point in time through our web application, and if its down, through the method call on the corresponding swap contract.</p>
                 </div>
