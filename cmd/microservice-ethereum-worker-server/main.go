@@ -7,7 +7,6 @@ package main
 import (
 	"math/big"
 	"math/rand"
-	"os"
 	"strconv"
 	"time"
 
@@ -48,6 +47,9 @@ const (
 
 	// UsdtDecimals to normalise values to
 	UsdtDecimals = 1e6
+
+	// EthereumDecimals to normalise values to
+	EthereumDecimals = 1e18
 )
 
 const (
@@ -119,34 +121,9 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-
-		ethereumDecimalPlaces_ = os.Getenv(EnvEthereumDecimalPlaces)
-
-		// EthereumDecimalPlaces to use when normalising Eth to USDT
-		EthereumDecimalPlaces *big.Rat
 	)
 
 	rand.Seed(time.Now().Unix())
-
-	if ethereumDecimalPlaces_ == "" {
-		// default to 6 decimal places
-		EthereumDecimalPlaces = big.NewRat(1e6, 1)
-	} else {
-		// otherwise set to 10^decimals
-		decimals_, err := strconv.Atoi(ethereumDecimalPlaces_)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to parse %v as decimals!",
-					ethereumDecimalPlaces_,
-				)
-				k.Payload = err
-			})
-		}
-
-		EthereumDecimalPlaces = exponentiate(decimals_)
-	}
 
 	var (
 		ethContractAddress            ethCommon.Address
@@ -199,6 +176,7 @@ func main() {
 	}
 
 	contractAddress := ethereum.AddressFromString(contractAddress_)
+
 	ethContractAddress = hexToAddress(contractAddress)
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
@@ -216,6 +194,8 @@ func main() {
 	}
 
 	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
+
+	ethereumDecimalsRat := exponentiate(EthereumDecimals)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
@@ -243,7 +223,7 @@ func main() {
 		var (
 			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(currentAtxTransactionMargin)
 			secondsInOneYearRat            = new(big.Rat).SetUint64(SecondsInOneYear)
-			secondsSinceLastBlock              = defaultSecondsSinceLastBlock
+			secondsSinceLastBlock          = defaultSecondsSinceLastBlock
 		)
 
 		var (
@@ -301,6 +281,7 @@ func main() {
 			transfersInBlock,
 		)
 
+		// Sets the average transfers to a default number if the average is less than the default
 		if averageTransfersInBlock < defaultTransfersInBlock {
 			log.Debugf(
 				"Average transfers in block < default transfers in block (25)!",
@@ -327,7 +308,10 @@ func main() {
 			btx        int
 			currentAtx *big.Rat
 		)
-
+		
+		// Sets the ATX to transfers in block if current fluid transfers in block is larger than the average, set to average otherwise
+		// example: average BTX is 20, current BTX is 30, BTX that gets passed to worker is 30
+		// example 2: average BTX is 20, current BTX is 10, BTX that gets passed to worker is 20
 		if currentAtxTransactionMarginRatCmp.Cmp(averageTransfersInBlockRat) > 0 {
 
 			currentAtx = new(big.Rat).Mul(secondsInOneYearRat, transfersInBlockRat)
@@ -381,7 +365,7 @@ func main() {
 
 		// normalise the ethereum price!
 
-		ethPriceUsd.Quo(ethPriceUsd, EthereumDecimalPlaces)
+		ethPriceUsd.Quo(ethPriceUsd, ethereumDecimalsRat)
 
 		var tokenPriceInUsdt *big.Rat
 
@@ -404,6 +388,7 @@ func main() {
 					k.Payload = err
 				})
 			}
+
 		case BackendAave:
 			tokenPriceInUsdt, err = aave.GetPrice(
 				gethClient,
@@ -421,6 +406,7 @@ func main() {
 					k.Payload = err
 				})
 			}
+
 		case BackendAurora:
 			tokenPriceInUsdt, err = flux.GetPrice(
 				gethClient,
@@ -440,9 +426,10 @@ func main() {
 
 			// normalise the token price!
 			// tokenPrice / 10^(fluxDecimals-usdtDecimals)
+
 			UsdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
 
-			decimalDifference := new(big.Rat).Quo(EthereumDecimalPlaces, UsdtDecimalsRat)
+			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, UsdtDecimalsRat)
 
 			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
 		}
@@ -486,11 +473,6 @@ func main() {
 				applicationFeeUsd = transfer.Decorator.ApplicationFee
 			}
 
-			var (
-				gasTipCapRat = bigIntToRat(gasTipCap)
-				gasLimitRat  = uint64ToRat(gasLimit)
-			)
-
 			if transferType != 2 {
 				log.App(func(k *log.Log) {
 					k.Format(
@@ -502,13 +484,40 @@ func main() {
 				continue
 			}
 
-			transferFeeUsd := new(big.Rat).Add(blockBaseFeeRat, gasTipCapRat)
+			var (
+				gasTipCapRat = bigIntToRat(gasTipCap)
+				gasLimitRat  = uint64ToRat(gasLimit)
+			)
 
-			transferFeeUsd.Mul(transferFeeUsd, gasLimitRat)
+			// remember the gas limit and tip cap in the database for comparison later
 
-			transferFeeUsd.Mul(transferFeeUsd, ethPriceUsd)
+			emission.GasLimit = gasLimit
 
-			transferFeeUsd.Quo(transferFeeUsd, big.NewRat(1e18, 1))
+			emission.GasTipCap = gasTipCap
+
+			// normalise the gas limit to a rational number that's consistent with USDT
+
+			normalisedGasLimitRat := new(big.Rat).Quo(gasLimitRat, ethereumDecimalsRat)
+
+			normalisedGasLimitRat.Mul(normalisedGasLimitRat, ethPriceUsd)
+
+			emission.GasLimitNormal, _ = normalisedGasLimitRat.Float64()
+
+			// and normalise the gas tip cap
+
+			normalisedGasTipCapRat := new(big.Rat).Quo(gasTipCapRat, ethereumDecimalsRat)
+
+			normalisedGasTipCapRat.Mul(normalisedGasTipCapRat, ethPriceUsd)
+
+			emission.GasTipCapNormal, _ = normalisedGasTipCapRat.Float64()
+
+			// add the default block base fee that we track and multiply it by the gas tip cap and the gas limit
+
+			transferFeeUsd := new(big.Rat).Add(blockBaseFeeRat, normalisedGasTipCapRat)
+
+			transferFeeUsd.Mul(transferFeeUsd, normalisedGasLimitRat)
+
+			emission.TransferFeeNormal, _ = transferFeeUsd.Float64()
 
 			// if we have an application transfer, apply the fee
 

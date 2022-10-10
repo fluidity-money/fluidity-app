@@ -16,20 +16,10 @@ include ../../web.mk
 
 NEXTJS_BUILD := npm run build
 
-GRAPHQL_BUILD := npm run gen-gql
-
-RELAY := npm run relay
-
-graphql:
-	${GRAPHQL_BUILD}
-
-relay: 
-	${RELAY}
-
 nextjs:
 	${NEXTJS_BUILD}
 
-${FRONTEND_BUILD}: graphql relay nextjs
+${FRONTEND_BUILD}: nextjs
 	@touch ${FRONTEND_BUILD}
 
 docker-frontend: ${FRONTEND_SRC}

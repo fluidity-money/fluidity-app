@@ -1,0 +1,11 @@
+.navbar {
+    display: flex;
+}
+
+.navbar .vertical {
+    flex-direction: column;
+
+    .navbar-item {
+        margin: 0;
+    }
+}

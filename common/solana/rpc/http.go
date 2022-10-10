@@ -129,8 +129,9 @@ func (client Http) RawInvoke(method string, params interface{}) (json.RawMessage
 
 	if err := response.Err; err != nil {
 		return nil, fmt.Errorf(
-			"rpc response was not nil: %v",
+			"rpc error was not nil: %v, %+v",
 			err,
+			response,
 		)
 	}
 

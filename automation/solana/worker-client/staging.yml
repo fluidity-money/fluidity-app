@@ -4,7 +4,6 @@ ENV_FLU_SOLANA_PROGRAM_ID: HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR
 ENV_FLU_SOLANA_TVL_DATA_PUBKEY: 72TDnaeJdZXXLpmmj32kmwj3HZ31BRT2DKQEopXvfmc3
 ENV_FLU_SOLANA_SOLEND_PROGRAM_ID: So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo
 ENV_FLU_SOLANA_TOKEN_DECIMALS: 6
-SECRET_FLU_SOLANA_PAYER_PRIKEY: /fluidity/solana/payer_prikey
 SECRET_FLU_SOLANA_RPC_URL: /fluidity/solana/rpc_url
 
 SERVICES:
@@ -20,6 +19,7 @@ SERVICES:
       ENV_FLU_SOLANA_UNDERLYING_MINT_PUBKEY: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
       ENV_FLU_SOLANA_TOKEN_NAME: USDC
       ENV_FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdc.winners
+      SECRET_FLU_SOLANA_PAYER_PRIKEY: /fluidity/solana/usdc/private_key
 
   - CLIENT_USDT:
       SERVICE_NAME: microservice-solana-worker-client-usdt
@@ -33,7 +33,7 @@ SERVICES:
       ENV_FLU_SOLANA_UNDERLYING_MINT_PUBKEY: Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
       ENV_FLU_SOLANA_TOKEN_NAME: USDT
       ENV_FLU_SOLANA_WINNER_QUEUE_NAME: worker.solana.usdt.winners
-
+      SECRET_FLU_SOLANA_PAYER_PRIKEY: /fluidity/solana/usdt/private_key
   # - CLIENT_UXD:
   #     SERVICE_NAME: microservice-solana-worker-client-uxd
   #     ENV_FLU_WORKER_ID: solana-staging-microservice-solana-worker-client-uxd

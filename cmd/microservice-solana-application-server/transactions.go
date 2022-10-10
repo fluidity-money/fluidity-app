@@ -13,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/lifinity"
 	"github.com/fluidity-money/fluidity-app/common/solana/orca"
 	"github.com/fluidity-money/fluidity-app/common/solana/raydium"
+	"github.com/fluidity-money/fluidity-app/common/solana/mercurial"
 	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/saber"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -20,7 +21,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
-func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId, lifinityProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
+func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string, transaction worker.SolanaParsedTransaction, saberRpc, saberProgramId, orcaProgramId, raydiumProgramId, aldrinV1ProgramId, aldrinV2ProgramId, lifinityProgramId, mercurialProgramId string) ([]worker.SolanaDecoratedTransfer, error) {
 
 	var (
 		totalFee = big.NewRat(0, 1)
@@ -92,6 +93,13 @@ func parseTransaction(solanaClient *rpc.Provider, fluidTokens map[string]string,
 				solanaClient,
 				transactionResult,
 				lifinityProgramId,
+				fluidTokens,
+			)
+		case applications.ApplicationMercurial:
+			fee, err = mercurial.GetMercurialFees(
+				solanaClient,
+				transactionResult,
+				mercurialProgramId,
 				fluidTokens,
 			)
 
