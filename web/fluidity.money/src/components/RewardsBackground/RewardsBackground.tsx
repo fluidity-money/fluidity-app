@@ -28,13 +28,13 @@ const RewardsBackground = () => {
   const { ref, inView } = useInView();
   const { width } = useViewport();
 
-  // const rewards: Reward[] = apiState.weekWinnings.map((winning) => ({
-  //   token: winning.token_short_name,
-  //   amount: winning.winning_amount,
-  //   address: winning.winning_address,
-  //   date: new Date(winning.awarded_time),
-  //   transaction: winning.transaction_hash,
-  // }));
+  const rewards: Reward[] = apiState.weekWinnings.map((winning) => ({
+    token: winning.token_short_name,
+    amount: winning.winning_amount,
+    address: winning.winning_address,
+    date: new Date(winning.awarded_time),
+    transaction: winning.transaction_hash,
+  }));
 
   const carouselVariants = {
     appear: { x: 0 },
@@ -43,7 +43,7 @@ const RewardsBackground = () => {
   const carouselInfo = (
     <div>
       {rewards
-        // .slice(10)
+        .slice(10)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
             <a
@@ -115,7 +115,7 @@ const RewardsBackground = () => {
 
 export default RewardsBackground;
 
-const rewards = [
+const dummyRewards = [
   {
     token: "USDC",
     amount: 234405,
