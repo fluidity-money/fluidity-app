@@ -54,6 +54,7 @@ func InsertEmissions(emission Emission) {
 		solAppFees              = emission.SolanaAppFees
 		gasLimit                = emission.GasLimit
 		gasTipCap               = emission.GasTipCap
+		gasTipCapNormal = emission.GasTipCapNormal
 		gasLimitNormal          = emission.GasLimitNormal
 		transferFeeNormal       = emission.TransferFeeNormal
 	)
