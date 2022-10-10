@@ -155,8 +155,10 @@ export default function Rewards() {
         <UserRewards claimNow={mobileView} />
       ) : (
         <div className="noUserRewards">
-          <section>
-            <Heading as="h2">Spend to earn</Heading>
+          <section id="spend-to-earn">
+            <Heading className="spendToEarnHeading" as="h2">
+              Spend to earn
+            </Heading>
             <Text size="md">
               Use, send and receive fluid assets <br />
               to generate yield.
@@ -171,6 +173,7 @@ export default function Rewards() {
                 name={bestPerformingRewarders[0].name}
                 prize={bestPerformingRewarders[0].prize}
                 avgPrize={bestPerformingRewarders[0].avgPrize}
+                size="lg"
               />
             )}
           </section>
@@ -212,7 +215,8 @@ export default function Rewards() {
               </div>
             </div>
             <div>
-              <div className="statistics-row">
+              {/* scoped out */}
+              {/* <div className="statistics-row">
                 {performanceTimeFrames.map((timeFrame, i) => {
                   const selectedProps = timeFrameIndex === i ? "selected" : "";
                   const classProps = `${selectedProps}`;
@@ -228,7 +232,7 @@ export default function Rewards() {
                     </button>
                   );
                 })}
-              </div>
+              </div> */}
             </div>
           </div>
         </section>
@@ -248,15 +252,17 @@ export default function Rewards() {
       {hasRewarders && (
         <section id="rewarders">
           <Heading as={"h2"}>Highest Rewarders</Heading>
-          <ManualCarousel scrollBar={true}>
+          <ManualCarousel scrollBar={true} className="rewards-carousel">
             {bestPerformingRewarders.map((rewarder) => (
-              <ProviderCard
-                key={rewarder.name}
-                iconUrl={rewarder.iconUrl}
-                name={rewarder.name}
-                prize={rewarder.prize}
-                avgPrize={rewarder.avgPrize}
-              />
+              <div className="carousel-card-container" key={rewarder.name}>
+                <ProviderCard
+                  iconUrl={rewarder.iconUrl}
+                  name={rewarder.name}
+                  prize={rewarder.prize}
+                  avgPrize={rewarder.avgPrize}
+                  size="md"
+                />
+              </div>
             ))}
           </ManualCarousel>
         </section>

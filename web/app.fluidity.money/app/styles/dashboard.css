@@ -30,7 +30,11 @@ main > nav {
   justify-content: space-between;
   align-items: center;
   height: 100px;
-  padding: 0 20px 0 0;
+}
+
+main > nav > div {
+  display: flex;
+  gap: 1em;
 }
 
 main > nav a {
