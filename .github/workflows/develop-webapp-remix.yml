@@ -64,25 +64,12 @@ jobs:
           git config user.email "noreply@fluidity.money"
           git commit -m "Bump Surfing version"
           git push origin develop
-  npm-test:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    environment: dev
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Test
-        run: |
-          npm install
-          npm test
 
- build-and-deploy:
+  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: dev
-    needs: [cut-lib-release,npm-test]
+    needs: [cut-lib-release]
     steps:
       - uses: actions/checkout@v3
         with:
