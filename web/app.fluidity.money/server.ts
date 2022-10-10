@@ -4,11 +4,14 @@ import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 
-import { Server } from "socket.io"
+import { Server } from "socket.io";
 
 import { createServer } from "http";
 
-import { ethereum } from "./drivers";
+import {
+  getObservableForAddress,
+  getTransactionsObservableForIn,
+} from "./drivers";
 
 import config from "~/webapp.config.server";
 import { Subscription } from "rxjs";
@@ -52,34 +55,40 @@ const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "build");
 
 const ethereumTokens = config.config["ethereum"].tokens.map((entry) => ({
-    token: entry.symbol,
-    address: entry.address,
+  token: entry.symbol,
+  address: entry.address,
 }));
 
 // eslint-disable-next-line no-unused-vars
 const solanaTokens = config.config["solana"].tokens.map((entry) => ({
-    token: entry.symbol,
-    address: entry.address,
+  token: entry.symbol,
+  address: entry.address,
 }));
 
-const EthereumTransactions = ethereum.getTransactionsObservableForIn({}, ...ethereumTokens)
+const EthereumTransactions = getTransactionsObservableForIn(
+  `ethereum`,
+  {},
+  ...ethereumTokens
+);
 const registry = new Map<string, Subscription>();
 
 io.on("connection", (socket) => {
-    socket.on("subscribeTransaction", (network, address) => {
-        if (registry.has(socket.id))
-            registry.get(socket.id)?.unsubscribe();
+  socket.on("subscribeTransaction", (network, address) => {
+    if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-        const observable = ethereum.getObservableForAddress(EthereumTransactions, address)
-        registry.set(socket.id, observable.subscribe((transaction) => {
-            socket.to(socket.id).emit("transaction", transaction)
-        }))
-    
-        socket.on("disconnect", () => {
-            registry.get(socket.id)?.unsubscribe();
-            registry.delete(socket.id);
-        })
-    })
+    const observable = getObservableForAddress(EthereumTransactions, address);
+    registry.set(
+      socket.id,
+      observable.subscribe((transaction) => {
+        socket.to(socket.id).emit("transaction", transaction);
+      })
+    );
+
+    socket.on("disconnect", () => {
+      registry.get(socket.id)?.unsubscribe();
+      registry.delete(socket.id);
+    });
+  });
 });
 
 app.all(
