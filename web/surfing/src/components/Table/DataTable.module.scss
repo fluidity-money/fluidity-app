@@ -13,7 +13,7 @@
   margin-bottom: 10px;
   justify-content: space-between;
   ul {
-    display:flex;
+    display: flex;
     list-style: none;
     li {
       margin-right: 10px;
@@ -37,7 +37,7 @@
     }
   }
 }
-  
+
 .pagination {
   display: flex;
   color: $grey-60;
@@ -58,50 +58,49 @@
     }
   }
 }
-  
-table {
+
+.table {
   width: 100%;
   border-collapse: collapse;
   thead {
-      tr{
-        th{
-          padding: 0 20px 10px 20px;
-          text-align:start;
-          color: $grey-60
-        }
+    tr {
+      th {
+        padding: 0 20px 10px 20px;
+        text-align: start;
+        color: $grey-60;
       }
+    }
 
-      th:nth-child(6) {
-        display: none;
-      }
+    th:nth-child(6) {
+      display: none;
+    }
 
-      @include mobile {
-        @for $i from 1 through 5 {
-          @if $i == 2  {
-            th:nth-child(3n + #{$i}) {
-              display: none;
-            }
-          }@else if $i == 4 {
-            th:nth-child(3n + #{$i}) {
-              display: none;
-            }
-          }@else if $i == 5 {
-            th:nth-child(3n + #{$i}) {
-              display: none;
-            }
+    @include mobile {
+      @for $i from 1 through 5 {
+        @if $i == 2 {
+          th:nth-child(3n + #{$i}) {
+            display: none;
+          }
+        } @else if $i == 4 {
+          th:nth-child(3n + #{$i}) {
+            display: none;
+          }
+        } @else if $i == 5 {
+          th:nth-child(3n + #{$i}) {
+            display: none;
           }
         }
-        th:nth-child(3) {
-          text-align: right;
-        }   
       }
+      th:nth-child(3) {
+        text-align: right;
+      }
+    }
   }
-  
+
   tbody {
     background-color: rgb(36, 36, 36);
 
     tr {
-  
       td {
         padding: 15px 20px 15px 20px;
         border-bottom: 5px solid $black-a90;
@@ -121,15 +120,15 @@ table {
 
       @include mobile {
         @for $i from 1 through 5 {
-          @if $i == 2  {
+          @if $i == 2 {
             td:nth-child(3n + #{$i}) {
               display: none;
             }
-          }@else if $i == 4 {
+          } @else if $i == 4 {
             td:nth-child(3n + #{$i}) {
               display: none;
             }
-          }@else if $i == 5 {
+          } @else if $i == 5 {
             td:nth-child(3n + #{$i}) {
               display: none;
             }

@@ -84,7 +84,7 @@ const DataTable = ({name, filterData = [], columns, data, displayedRowSize}: any
           </ul>
         </div>
         <div>
-        <table {...getTableProps()}>
+        <table className={styles.table} {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup: { getHeaderGroupProps: () => JSX.IntrinsicAttributes & React.ClassAttributes<HTMLTableRowElement> & React.HTMLAttributes<HTMLTableRowElement>; headers: any[]; }) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
