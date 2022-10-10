@@ -16,20 +16,13 @@ export interface Winner {
 }
 
 export interface WinnersRes {
-  winners: {
-    awarded_time: string,
-    token_decimals: number,
-    token_short_name: string,
-    transaction_hash: string,
-    winning_amount: number,
-    winning_address: string,
-  }[],
+  winners_staging: Winner[],
 }
 
 
 const winningTransactionsByAddressSubscription = gql`
 subscription winnersGetWinningTransactionsByAddressSubscription($network: network_blockchain!, $address: String!, $date: timestamp!) {
-  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, winning_address: {_eq: $address}, awarded_time: {_gte: $date}}) {
+  winners_staging(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, winning_address: {_eq: $address}, awarded_time: {_gte: $date}}) {
     awarded_time
     transaction_hash
     token_short_name
@@ -42,7 +35,7 @@ subscription winnersGetWinningTransactionsByAddressSubscription($network: networ
 
 const winningTransactionsAllSubscription = gql`
 subscription winnersGetWinningTransactionsAllSubscription($network: network_blockchain!, $date: timestamp!) {
-  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, awarded_time: {_gte: $date}}) {
+  winners_staging(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, awarded_time: {_gte: $date}}) {
     awarded_time
     transaction_hash
     token_short_name
@@ -53,33 +46,59 @@ subscription winnersGetWinningTransactionsAllSubscription($network: network_bloc
 }
 `;
 
-export const useWinningTransactions = (onNext: (winnings: WinnersRes) => void, network: string, date: string, address?: string) => {
-  const { subscription, options } = useMemo(() => (
-    !!address
-      ? {
-        subscription: winningTransactionsByAddressSubscription,
+const winningTransactionsAnyTimeAllSubscription = gql`
+subscription winnersGetWinningTransactionsAnyTimeAllSubscription($network: network_blockchain!) {
+  winners_staging(order_by: {awarded_time: desc}, where: {network: {_eq: $network}}) {
+    awarded_time
+    transaction_hash
+    token_short_name
+    winning_amount
+    token_decimals
+    winning_address
+  }
+}
+`;
+
+export const useWinningTransactions = (onNext: (winnings: WinnersRes) => void, network: string, date?: string, address?: string) => {
+  const { subscription, options } = useMemo(() => {
+    if (!date) {
+      return ({
+        subscription: winningTransactionsAnyTimeAllSubscription,
         options: {
           variables: {
             network,
-            address,
-            date,
           },
           onData: onData(onNext),
-        },
-      }
-      : {
+        }
+      })
+    };
+    
+    if (!address) {
+      return {
         subscription: winningTransactionsAllSubscription,
         options: {
           variables: {
             network,
             date,
-            address: null,
           },
           onData: onData(onNext),
         },
       }
-  ), [network, address, date]);
+    };
+    
+    return {
+      subscription: winningTransactionsByAddressSubscription,
+      options: {
+        variables: {
+          network,
+          address,
+          date,
+        },
+        onData: onData(onNext),
+      },
+    }
+  }, [network, address, date]);
   
-  return useSubscription(subscription, options);
+  return useSubscription(subscription, options as any);
 }
 

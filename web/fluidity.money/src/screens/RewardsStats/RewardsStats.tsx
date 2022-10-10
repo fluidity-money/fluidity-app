@@ -16,7 +16,7 @@ interface IProps {
 
 const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState } = useChainContext();
-  const { txCount, rewardPool } = apiState;
+  const { txCount } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
 
@@ -37,12 +37,14 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       </div>
       {width > breakpoint && (
         <div className={styles.infoSingle}>
-          <Heading as="h2">{numberToMonetaryString(rewardPool)}</Heading>
+          {/* NOTE: Dummy data */}
+          <Heading as="h2">$100,000</Heading>
           <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
     </div>
   );
+
   return (
     <AnimatePresence>
       <motion.div
@@ -58,7 +60,8 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         </div>
 
         <RewardsInfoBox
-          rewardPool={rewardPool}
+          // NOTE: Dummy data
+          rewardPool={100000}
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="transparent"
