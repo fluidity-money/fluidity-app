@@ -228,15 +228,14 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 	swapLogTxIndex := sort.Search(len(txLogs), func(i int) bool {
 		// txLogs.Index sorted in ascending order, so use >= op
-		return swapLogBlockIndex >= txLogs[i].Index
+		return txLogs[i].Index >= swapLogBlockIndex
 	})
 
 	if swapLogTxIndex == len(txLogs) {
 		return nil, fmt.Errorf(
-			"failed to find matching log from txHash (%v) at Index (%v)! %v",
+			"failed to find matching log from txHash (%v) at Index (%v)!",
 			txHash.String(),
 			swapLogBlockIndex,
-			err,
 		)
 	}
 

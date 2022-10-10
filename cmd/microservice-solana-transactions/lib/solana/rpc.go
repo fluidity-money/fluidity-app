@@ -100,7 +100,11 @@ func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*Block, error) {
 				// slot isn't available yet - retry
 				if code == BlockNotAvailableCode {
 					log.Debug(func(k *log.Log) {
-						k.Format("Slot %d not available yet! sleeping for %d seconds before retrying")
+						k.Format(
+							"Slot %d not available yet! sleeping for %d seconds before retrying",
+							slot,
+							delay,
+						)
 					})
 					duration := time.Duration(delay) * time.Second
 					time.Sleep(duration)

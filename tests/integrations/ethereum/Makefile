@@ -1,3 +1,7 @@
 REPO := integration-test-runner-ethereum
 
-include ../../golang.mk
+GO_FILES := $(shell find . -type f -name '*.go')
+
+test: ${GO_FILES}
+	@./run.sh
+	@touch test

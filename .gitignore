@@ -31,6 +31,8 @@ web/*/.next/
 web/*/run
 web/*/npm
 
+tests/integrations/*/test
+
 contracts/ethereum/node_modules
 contracts/ethereum/.openzeppelin
 contracts/ethereum/docker*
