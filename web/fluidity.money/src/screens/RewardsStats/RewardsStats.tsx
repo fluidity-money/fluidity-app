@@ -37,7 +37,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       </div>
       {width > breakpoint && (
         <div className={styles.infoSingle}>
-          <Heading as="h2">$100,000</Heading>
+          <Heading as="h2">{numberToMonetaryString(rewardPool)}</Heading>
           <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
@@ -58,8 +58,8 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         </div>
 
         <RewardsInfoBox
-          rewardPool={100000}
-          totalTransactionValue={txCount}
+          rewardPool={rewardPool}
+          totalTransactions={txCount}
           changeScreen={changeScreen}
           type="transparent"
         />

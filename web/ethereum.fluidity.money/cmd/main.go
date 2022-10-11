@@ -73,7 +73,7 @@ func main() {
 	websocket.Endpoint("/updates", updateNotificationsHandlerEthereum)
 
 	go func() {
-		winners.WinnersEthereum(func(winner winners.Winner) {
+		winners.BroadcastWinnersEthereum(func(winner winners.Winner) {
 			updateMessagesEthereum <- Update{
 				Winner: &winner,
 			}
@@ -81,7 +81,7 @@ func main() {
 	}()
 
 	go func() {
-		user_actions.UserActionsEthereum(func(userAction user_actions.UserAction) {
+		user_actions.BroadcastUserActionsEthereum(func(userAction user_actions.UserAction) {
 			updateMessagesEthereum <- Update{
 				UserAction: &userAction,
 			}
@@ -89,7 +89,7 @@ func main() {
 	}()
 
 	go func() {
-		prize_pool.PrizePoolUpdatesEthereum(func(prizePool prize_pool.PrizePool) {
+		prize_pool.BroadcastPrizePoolUpdatesEthereum(func(prizePool prize_pool.PrizePool) {
 			updateMessagesEthereum <- Update{
 				PrizePool: &prizePool,
 			}

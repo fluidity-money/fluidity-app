@@ -14,11 +14,12 @@ import styles from "./Demo.module.scss";
 
 const Demo = () => {
   const { apiState } = useChainContext();
+  const { weekWinnings } = apiState;
 
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const weekTotalRewards = apiState.weekWinnings.reduce(
+  const weekTotalRewards = weekWinnings.reduce(
     (weekSum, { winning_amount, token_decimals }) =>
       weekSum + winning_amount / 10 ** token_decimals,
     0

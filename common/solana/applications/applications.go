@@ -18,6 +18,7 @@ const (
 	ApplicationAldrinV1
 	ApplicationAldrinV2
 	ApplicationLifinity
+	ApplicationMercurial
 )
 
 // applicationNames is used to map human readable names to their enum varients
@@ -29,6 +30,7 @@ var applicationNames = map[string]Application{
 	"aldrinv1": ApplicationAldrinV1,
 	"aldrinv2": ApplicationAldrinV2,
 	"lifinity": ApplicationLifinity,
+	"mercurial": ApplicationMercurial,
 }
 
 // ParseApplication based on the name given, looking it up in the internal

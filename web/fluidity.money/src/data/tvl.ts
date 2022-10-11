@@ -3,8 +3,8 @@
 // LICENSE_TRF.md file.
 
 import { useMemo } from 'react';
-import { graphql } from 'react-relay';
-import { useSubscription } from 'react-relay';
+import { gql, useSubscription } from '@apollo/client';
+import { onData } from "./apolloClient";
 
 export interface Tvl {
   tvl: number,
@@ -18,9 +18,9 @@ export interface TvlRes {
 }
 
 
-const liveTvlSubscription = graphql`
+const liveTvlSubscription = gql`
 subscription tvlLiveTvlSubscription {
-  tvl(order_by: {time: desc}, distinct_on: contract_address) {
+  tvl(order_by: {contract_address: desc}, distinct_on: contract_address) {
     tvl
     time
     contract_address
@@ -29,16 +29,17 @@ subscription tvlLiveTvlSubscription {
 } 
 `
 
-const useLiveTvl = (onNext: (prizePool: TvlRes) => void) => {
-  const liveTvl = useMemo(() => {
+const useLiveTvl = (onNext: (data: TvlRes) => void) => {
+  const { subscription, options } = useMemo(() => {
     return {
       subscription: liveTvlSubscription,
-      variables: {},
-      onNext,
+      options: {
+        onData: onData(onNext),
+      }
     }
-  }, [onNext]);
+  }, []);
 
-  return useSubscription(liveTvl as any)
+  return useSubscription(subscription, options)
 }
 
 export { useLiveTvl }

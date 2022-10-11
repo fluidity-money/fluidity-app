@@ -135,6 +135,7 @@ func main() {
 			handleMint(
 				transactionHash,
 				topicRemaining,
+				logData,
 				time,
 				tokenShortName,
 				tokenDecimals,
@@ -149,6 +150,7 @@ func main() {
 			handleBurn(
 				transactionHash,
 				topicRemaining,
+				logData,
 				time,
 				tokenShortName,
 				tokenDecimals,

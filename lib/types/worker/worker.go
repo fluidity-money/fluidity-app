@@ -48,11 +48,19 @@ type (
 
 		AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
 
-		AtxBufferSize      int    `json:"atx_buffer_size"`
-		TransfersInBlock   int    `json:"transfers_in_block"`
-		TransfersPast      string `json:"transfers_past"`
+		AtxBufferSize    int    `json:"atx_buffer_size"`
+		TransfersInBlock int    `json:"transfers_in_block"`
+		TransfersPast    string `json:"transfers_past"`
 
 		SecondsSinceLastBlock uint64 `json:"seconds_since_last_block"`
+
+		GasLimit  uint64      `json:"gas_limit"`
+		GasTipCap misc.BigInt `json:"gas_tip_cap"`
+
+		GasLimitNormal  float64 `json:"gas_limit_normal"`
+		GasTipCapNormal float64 `json:"gas_tip_cap_normal"`
+
+		TransferFeeNormal float64 `json:"transfer_fee_normal"`
 
 		Payout struct {
 			Winnings        float64 `json:"winnings"` // Winnings

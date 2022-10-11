@@ -71,8 +71,22 @@ func userActions(topic string, f func(UserAction)) {
 	})
 }
 
+func broadcastUserActions(topic string, f func(UserAction)) {
+	queue.GetBroadcastMessages(topic, func(message queue.Message) {
+		var userAction UserAction
+
+		message.Decode(&userAction)
+
+		f(userAction)
+	})
+}
+
 func UserActionsEthereum(f func(UserAction)) {
 	userActions(TopicUserActionsEthereum, f)
+}
+
+func BroadcastUserActionsEthereum(f func(UserAction)) {
+	broadcastUserActions(TopicUserActionsEthereum, f)
 }
 
 func UserActionsSolana(f func(UserAction)) {
@@ -93,12 +107,26 @@ func bufferedUserActions(topic string, f func(BufferedUserAction)) {
 	})
 }
 
+func broadcastBufferedUserActions(topic string, f func(BufferedUserAction)) {
+	queue.GetBroadcastMessages(topic, func(message queue.Message) {
+		var bufferedUserAction BufferedUserAction
+
+		message.Decode(&bufferedUserAction)
+
+		f(bufferedUserAction)
+	})
+}
+
 func BufferedUserActionsEthereum(f func(BufferedUserAction)) {
 	bufferedUserActions(TopicBufferedUserActionsEthereum, f)
 }
 
 func BufferedUserActionsSolana(f func(BufferedUserAction)) {
 	bufferedUserActions(TopicBufferedUserActionsSolana, f)
+}
+
+func BroadcastBufferedUserActionsSolana(f func(BufferedUserAction)) {
+	broadcastBufferedUserActions(TopicBufferedUserActionsSolana, f)
 }
 
 func BufferedUserActionsAll(f func(BufferedUserAction)) {

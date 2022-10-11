@@ -40,6 +40,9 @@ const (
 	//  EnvLifinityProgramId is the program ID of the Lifinity swap program
 	EnvLifinityProgramId = `FLU_SOLANA_LIFINITY_PROGRAM_ID`
 
+	//  EnvMercurialProgramId is the program ID of the Mercurial swap program
+	EnvMercurialProgramId = `FLU_SOLANA_MERCURIAL_PROGRAM_ID`
+
 )
 
 func main() {
@@ -53,6 +56,7 @@ func main() {
 		aldrinProgramIdV1   = util.GetEnvOrFatal(EnvAldrinV1ProgramId)
 		aldrinProgramIdV2   = util.GetEnvOrFatal(EnvAldrinV2ProgramId)
 		lifinityProgramId   = util.GetEnvOrFatal(EnvLifinityProgramId)
+		mercurialProgramId   = util.GetEnvOrFatal(EnvMercurialProgramId)
 
 		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)
@@ -86,6 +90,7 @@ func main() {
 				aldrinProgramIdV1,
 				aldrinProgramIdV2,
 				lifinityProgramId,
+				mercurialProgramId,
 			)
 
 			if err != nil {
