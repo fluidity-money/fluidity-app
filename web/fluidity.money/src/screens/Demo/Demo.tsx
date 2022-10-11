@@ -24,6 +24,7 @@ const Demo = () => {
       weekSum + winning_amount / 10 ** token_decimals,
     0
   );
+
   /*
   full screen demo
   */
