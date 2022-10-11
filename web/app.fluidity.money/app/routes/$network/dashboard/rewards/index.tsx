@@ -28,19 +28,50 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
+  let userTransactionCount;
+  let userTransactions;
+
+  let error;
+
+  try {
+    userTransactionCount = await (
+      await useUserTransactionCount(network ?? "", address)
+    ).json();
+    userTransactions = await (
+      await useUserTransactions(network ?? "", address, page)
+    ).json();
+  } catch (err) {
+    error = "The transaction explorer is currently unavailable";
+  } // Fail silently - for now.
+
+  if (error) {
+    return redirect("/error", { status: 500, statusText: error });
+  }
+  if (userTransactionCount.errors || userTransactions.errors) {
+    return json({
+      rewarders: rewarders,
+      transactions: [],
+      count: 0,
+      page,
+      network,
+      userUnclaimedRewards: 6745,
+      fluidPairs: 8,
+    });
+  }
+
   const {
     data: {
       [network as string]: {
         transfers: [{ count }],
       },
     },
-  } = await (await useUserTransactionCount(address)).json();
+  } = userTransactionCount;
 
   const {
     data: {
       [network as string]: { transfers: transactions },
     },
-  } = await (await useUserTransactions(address, page)).json();
+  } = userTransactions;
 
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
@@ -77,7 +108,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     count,
     page,
     network,
-    userHasRewards: true,
+    userUnclaimedRewards: 6745,
     fluidPairs: 8,
   });
 };
@@ -105,7 +136,7 @@ type LoaderData = {
   transactions: Transaction[];
   count: number;
   page: number;
-  userHasRewards: boolean;
+  userUnclaimedRewards: number;
   rewarders: Rewarder[];
   network: Chain;
   fluidPairs: number;
@@ -118,7 +149,7 @@ export default function Rewards() {
     page,
     rewarders,
     network,
-    userHasRewards,
+    userUnclaimedRewards,
     fluidPairs,
   } = useLoaderData<LoaderData>();
 
@@ -140,8 +171,11 @@ export default function Rewards() {
   return (
     <>
       {/* Info Cards */}
-      {userHasRewards ? (
-        <UserRewards claimNow={mobileView} />
+      {userUnclaimedRewards > 0 ? (
+        <UserRewards
+          claimNow={mobileView}
+          unclaimedRewards={userUnclaimedRewards}
+        />
       ) : (
         <div className="noUserRewards">
           <section id="spend-to-earn">

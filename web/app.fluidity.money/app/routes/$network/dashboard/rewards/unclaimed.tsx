@@ -15,13 +15,6 @@ export type Transaction = {
   currency: string;
 };
 
-type LoaderData = {
-  transactions: Transaction[];
-  count: number;
-  page: number;
-  network: Chain;
-};
-
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -40,17 +33,34 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     count,
     page,
     network,
+    userUnclaimedRewards: 6745,
   });
 };
 
+type LoaderData = {
+  transactions: Transaction[];
+  count: number;
+  page: number;
+  network: Chain;
+  userUnclaimedRewards: number;
+};
+
+
 const UnclaimedWinnings = () => {
-  const { transactions, count, page, network } = useLoaderData<LoaderData>();
+  const {
+    transactions,
+    count,
+    page,
+    network,
+    userUnclaimedRewards,
+  } = useLoaderData<LoaderData>();
+
   return (
     <>
-      <Heading as={"h2"}>Your Winnings</Heading>
-
       {/* Info Card */}
-      <UserRewards claimNow={true} />
+      <UserRewards claimNow={true} unclaimedRewards={userUnclaimedRewards} />
+
+      <Heading as={"h2"}>Your Winnings</Heading>
 
       {/* Unclaimed Transactions */}
       <section id="table">

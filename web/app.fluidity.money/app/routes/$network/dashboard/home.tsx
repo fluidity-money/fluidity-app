@@ -40,7 +40,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (error) {
     return redirect("/error", { status: 500, statusText: error });
   }
-
   if (userTransactionCount.errors || userTransactions.errors) {
     return json({ transactions: [], count: 0, page: 1 });
   }

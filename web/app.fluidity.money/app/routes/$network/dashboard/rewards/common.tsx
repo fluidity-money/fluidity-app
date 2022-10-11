@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "@remix-run/react";
 import {
   Card,
@@ -7,19 +8,25 @@ import {
   GeneralButton,
   LinkButton,
   Heading,
+  Spinner,
 } from "@fluidity-money/surfing";
 
 type IUserRewards = {
   claimNow: boolean;
+  unclaimedRewards: number;
 };
 
-const UserRewards = ({ claimNow }: IUserRewards) => {
+const UserRewards = ({ claimNow, unclaimedRewards }: IUserRewards) => {
   const navigate = useNavigate();
+  
+  const [ claiming, setClaiming ] = useState(false);
 
   const buttonText = claimNow ? "Claim now with fees" : "View breakdown";
 
   const onClick = () => {
-    return claimNow ? console.log("claim") : navigate("../unclaimed");
+    if (!claimNow) return navigate("../unclaimed");
+    
+    return setClaiming(true);
   };
 
   return (
@@ -46,17 +53,29 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
             <section id="unclaimed">
               <Text size="md">Unclaimed fluid rewards</Text>
               <Display className="unclaimed-total" size="sm">
-                {numberToMonetaryString(6745)}
+                {numberToMonetaryString(unclaimedRewards)}
               </Display>
-              <GeneralButton
-                size={"large"}
-                version={"primary"}
-                buttonType="text"
-                handleClick={onClick}
-                className="view-breakdown-button"
-              >
-                {buttonText}
-              </GeneralButton>
+              { claiming ? (
+                <GeneralButton
+                  size={"large"}
+                  version={"primary"}
+                  buttonType="icon only"
+                  icon={<Spinner />}
+                  handleClick={onClick}
+                  className="view-breakdown-button"
+                />
+              ) : (
+                <GeneralButton
+                  size={"large"}
+                  version={"primary"}
+                  buttonType="text"
+                  handleClick={onClick}
+                  className="view-breakdown-button"
+                >
+                  {buttonText}
+                </GeneralButton>
+              )
+            }
             </section>
           </section>
 
@@ -97,7 +116,7 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
           <LinkButton
             size={"small"}
             type={"internal"}
-            handleClick={() => navigate("../performance")}
+            handleClick={() => navigate("..")}
           >
             Reward History
           </LinkButton>
