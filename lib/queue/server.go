@@ -19,6 +19,7 @@ type amqpDetails struct {
 	workerId          string
 	deadLetterEnabled bool
 	messageRetries    int
+	goroutines        int
 }
 
 var chanAmqpDetails = make(chan amqpDetails)
@@ -51,11 +52,11 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 
 	_, err = channel.QueueDeclare(
 		queueName+".dead",
-		true,  // durable
+		true,       // durable
 		autoDelete, // autoDelete
-		false, // exclusive
-		false, // noWait,
-		nil,   // args
+		false,      // exclusive
+		false,      // noWait,
+		nil,        // args
 	)
 
 	if err != nil {
@@ -84,10 +85,10 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 
 	_, err = channel.QueueDeclare(
 		queueName,
-		true,  // durable
+		true,       // durable
 		autoDelete, // autoDelete
-		false, // exclusive
-		false, // noWait,
+		false,      // exclusive
+		false,      // noWait,
 		amqp.Table{
 			"x-dead-letter-exchange": "dead-exchange",
 		}, // args,
