@@ -71,8 +71,16 @@
       }
     }
 
+    th:nth-child(5) {
+      text-align: end;
+    }
+
     th:nth-child(6) {
       display: none;
+    }
+
+    th:last-child {
+      text-align: end;
     }
 
     @include mobile {
