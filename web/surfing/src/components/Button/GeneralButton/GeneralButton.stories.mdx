@@ -1,6 +1,7 @@
 import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import GeneralButton from "./GeneralButton";
+import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
 
 <Meta
     title="Button/GeneralButton"
@@ -109,6 +110,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             children: "default",
             version: "primary",
             buttonType: "icon before",
+            icon: <ReactSvg />,
             size: "large",
         }}
     >
@@ -120,6 +122,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             children: "default",
             version: "primary",
             buttonType: "icon after",
+            icon: <ReactSvg />,
             size: "large",
         }}
     >
@@ -131,6 +134,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             children: "default",
             version: "primary",
             buttonType: "icon only",
+            icon: <ReactSvg />,
             size: "large",
         }}
     >
