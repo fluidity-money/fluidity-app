@@ -21,7 +21,6 @@ use {
         system_instruction,
     },
     spl_token,
-    std::str::FromStr,
 };
 
 // the public key of the account that is allowed to initialise tokens
@@ -681,6 +680,10 @@ fn init_solend_obligation(
     // check init authority
     if !(payer.is_signer && *payer.key == INIT_AUTHORITY) {
         panic!("bad init authority!");
+    }
+
+    if *solend_program.key != SOLEND {
+        panic!("bad Solend contract!");
     }
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
