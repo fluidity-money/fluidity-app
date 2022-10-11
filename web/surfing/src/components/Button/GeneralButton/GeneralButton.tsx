@@ -79,7 +79,7 @@ const GeneralButton = ({
       ) : (
         <button
           onClick={handleClick}
-          className={`${styles.iconOnly} ${classProps}`}
+          className={`${styles[version]} ${styles[size]} ${styles.iconOnly} ${classProps}`}
           {...props}
         >
           <div className={styles.icon}>

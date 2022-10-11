@@ -16,6 +16,10 @@ button {
   font-weight: 700;
   font-size: 12px;
   line-height: 100%;
+
+  .icon > * {
+    height: 12px;
+  }
 }
 
 .medium {
@@ -26,6 +30,10 @@ button {
   font-weight: 700;
   font-size: 14px;
   line-height: 100%;
+
+  .icon > * {
+    height: 14px;
+  }
 }
 
 .large {
@@ -36,6 +44,10 @@ button {
   font-size: 16px;
   line-height: 100%;
   border-radius: 50px;
+
+  .icon > * {
+    height: 16px;
+  }
 }
 
 .primary {
@@ -124,3 +136,4 @@ button {
     }
   }
 }
+
