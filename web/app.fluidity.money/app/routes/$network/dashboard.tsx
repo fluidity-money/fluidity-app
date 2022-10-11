@@ -1,5 +1,13 @@
 import { LinksFunction, LoaderFunction } from "@remix-run/node";
-import { Outlet, useLoaderData, Link, useNavigate } from "@remix-run/react";
+import {
+  Outlet,
+  useLoaderData,
+  Link,
+  useNavigate,
+  useResolvedPath,
+  useMatches,
+  useTransition,
+} from "@remix-run/react";
 
 import {
   GeneralButton,
@@ -9,6 +17,8 @@ import {
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
+
+import { motion } from "framer-motion";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -52,36 +62,49 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
+  const navigationMap = [
+    { home: "Dashboard" },
+    { rewards: "Rewards" },
+    { assets: "Assets" },
+    { dao: "DAO" },
+  ];
+
+  const matches = useMatches();
+  const transitionPath = useTransition().location?.pathname;
+  const currentPath = transitionPath || matches[matches.length - 1].pathname;
+  const resolvedPaths = navigationMap.map((obj) =>
+    useResolvedPath(Object.keys(obj)[0])
+  );
+  const activeIndex = resolvedPaths.findIndex(
+    (path) => path.pathname === currentPath
+  );
+
   return (
     <>
       <header>
         <img src="/logo.svg" alt="Fluidity Logo" />
       </header>
-      <nav>
+
+      <nav className={"navbar-v2"}>
         <ul>
-          {/* Dashboard Home */}
-          <Link key={"send-money"} to={"home"}>
-            <li>Dashboard</li>
-          </Link>
+          {navigationMap.map((obj, index) => {
+            const key = Object.keys(obj)[0];
+            const value = Object.values(obj)[0];
+            const active = index === activeIndex;
 
-          {/* Rewards */}
-          <Link key={"send-money"} to={"rewards"}>
-            <li>Rewards</li>
-          </Link>
-
-          {/* Assets - SCOPED OUT */}
-          {/*
-          <Link key={"send-money"} to={"assets"}>
-            <li>Assets</li>
-          </Link>
-          */}
-
-          {/* DAO - SCOPED OUT */}
-          {/*
-          <Link key={"send-money"} to={"/send"}>
-            <li>DAO</li>
-          </Link>
-          */}
+            return (
+              <li key={key}>
+                {index === activeIndex ? (
+                  <motion.div className={"active"} layoutId="active" />
+                ) : (
+                  <div />
+                )}
+                <Text prominent={active}>
+                  <Link to={key}>{value}</Link>
+                </Text>
+              </li>
+            );
+          })}
         </ul>
       </nav>
       <main>
