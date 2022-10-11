@@ -173,6 +173,7 @@ export default function Rewards() {
         <UserRewards
           claimNow={mobileView}
           unclaimedRewards={userUnclaimedRewards}
+          network={network}
         />
       ) : (
         <div className="noUserRewards">
@@ -217,7 +218,10 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Highest performer"}>
-                    <img src={bestPerformingRewarders[0].iconUrl} alt="best performer" />
+                    <img
+                      src={bestPerformingRewarders[0].iconUrl}
+                      alt="best performer"
+                    />
                     {bestPerformingRewarders[0].name}
                   </LabelledValue>
                 </div>

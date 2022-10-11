@@ -17,10 +17,10 @@ export const loader: LoaderFunction = async ({ request }) => {
   const _reward = url.searchParams.get("reward");
   const reward = _reward ? parseInt(_reward) : 0;
 
-  const _networkFee = url.searchParams.get("networkFee");
+  const _networkFee = url.searchParams.get("networkfee");
   const networkFee = _networkFee ? parseInt(_networkFee) : 0;
 
-  const _gasFee = url.searchParams.get("gasFee");
+  const _gasFee = url.searchParams.get("gasfee");
   const gasFee = _gasFee ? parseInt(_gasFee) : 0;
 
   return json({
@@ -49,7 +49,7 @@ const ClaimedRewards = () => {
         <LinkButton
           size={"small"}
           type={"internal"}
-          handleClick={() => navigate("../reward")}
+          handleClick={() => navigate("..")}
         >
           Close
         </LinkButton>
@@ -100,7 +100,7 @@ const ClaimedRewards = () => {
       <LinkButton
         size={"small"}
         type={"internal"}
-        handleClick={() => navigate("../reward")}
+        handleClick={() => navigate("..")}
       >
         Reward History
       </LinkButton>

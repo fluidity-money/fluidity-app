@@ -6,7 +6,7 @@ import {
   useNavigate,
   useResolvedPath,
   useMatches,
-  useTransition
+  useTransition,
 } from "@remix-run/react";
 
 import {
@@ -63,17 +63,21 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const navigationMap = [
-    {home: "Dashboard"},
-    {rewards: "Rewards"},
+    { home: "Dashboard" },
+    { rewards: "Rewards" },
     // {assets: "Assets"},
     // {dao: "DAO"},
   ];
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
-   const currentPath = transitionPath || matches[matches.length - 1].pathname;
-   const resolvedPaths = navigationMap.map(obj => useResolvedPath(Object.keys(obj)[0]));
-   const activeIndex = resolvedPaths.findIndex((path) => path.pathname === currentPath);
+  const currentPath = transitionPath || matches[matches.length - 1].pathname;
+  const resolvedPaths = navigationMap.map((obj) =>
+    useResolvedPath(Object.keys(obj)[0])
+  );
+  const activeIndex = resolvedPaths.findIndex(
+    (path) => path.pathname === currentPath
+  );
 
   return (
     <>
@@ -86,11 +90,15 @@ export default function Dashboard() {
           {navigationMap.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const value = Object.values(obj)[0];
-            const active = index === activeIndex
+            const active = index === activeIndex;
 
             return (
               <li key={key}>
-                {index === activeIndex ? <motion.div className={"active"} layoutId="active" /> : <div />}
+                {index === activeIndex ? (
+                  <motion.div className={"active"} layoutId="active" />
+                ) : (
+                  <div />
+                )}
                 <Text prominent={active}>
                   <Link to={key}>{value}</Link>
                 </Text>

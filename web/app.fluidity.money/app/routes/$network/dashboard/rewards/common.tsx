@@ -16,65 +16,81 @@ type IUserRewards = {
   claimNow: boolean;
   unclaimedRewards: number;
   network: string;
+  networkFee: number;
+  gasFee: number;
 };
 
-type ManualRewardBody = {
-  address: string;
-  token_short_name: string;
-}
+const claimReward = async (network: string) => {
+  const tokens = getTokenForNetwork(network);
 
-const claimReward = async(reqs: ManualRewardBody[]) => {
-  const res = Promise.all(reqs.map(req => {
-    const url = 'https://mainnet.fluidity.money:8081/manual-reward';
-    
-    const res = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: req,
+  const url = "https://mainnet.fluidity.money:8081/manual-reward";
+
+  const abi = {};
+
+  const rewards = await Promise.all(
+    tokens.map(async (tokenAddr) => {
+      const tokenConfig = getTokenFromAddress(network, tokenAddr);
+
+      const manualRewardBody = {
+        address: tokenAddr,
+        token_short_name: tokenConfig.symbol,
+      };
+
+      const res = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(manualRewardBody),
+      });
+
+      const { error, payload } = await res.json();
+
+      if (error || !payload) return 0;
+
+      // Call eth contract
+      const tokenContract = new web3.eth.Contract(abi, tokenAddr);
+
+      const reward = await tokenContract.methods.manual_reward(payload).call();
+
+      return reward;
     })
-    
-    const {error, payload} = await res.json()
-    
-    
-    if (error || !payload) return false;
-    
-    // Call eth contract
-    
-  }))
-}
+  );
 
-const UserRewards = ({ claimNow, unclaimedRewards, network }: IUserRewards) => {
+  const rewardedSum = rewards.reduce((sum, reward) => sum + reward, 0);
+  const networkFee = 0.002;
+  const gasFee = 0.002;
+
   const navigate = useNavigate();
-  
-  const [ claiming, setClaiming ] = useState(false);
+
+  navigate(
+    `../claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
+  );
+
+  return rewardedSum;
+};
+
+const UserRewards = ({
+  claimNow,
+  unclaimedRewards,
+  network,
+  networkFee,
+  gasFee,
+}: IUserRewards) => {
+  const navigate = useNavigate();
+
+  const [claiming, setClaiming] = useState(false);
 
   const buttonText = claimNow ? "Claim now with fees" : "View breakdown";
-  
+
+  const networkNotEth = network !== "ethereum";
+
   const onClick = () => {
     if (!claimNow) return navigate("../unclaimed");
-    
-    setClaiming(true);
-    const tokens = getTokenForNetwork(network);
-    
-    const unclaimedTokenReqs: ManualRewardBody[] = tokens
-      .map(tokenAddr => {
-        const tokenConfig = getTokenFromAddress(network, tokenAddr);
-      
-        if (!tokenConfig) {
-          return null;
-        }
 
-        return {
-          address: tokenAddr,
-          token_short_name: tokenConfig.symbol,
-        }
-      }
-    )
-    .filter(body => !!body)
-    
-    claimReward(unclaimedTokenReqs);
-  }
+    setClaiming(true);
+
+    return claimReward(network);
+  };
 
   return (
     <>
@@ -102,7 +118,7 @@ const UserRewards = ({ claimNow, unclaimedRewards, network }: IUserRewards) => {
               <Display className="unclaimed-total" size="sm">
                 {numberToMonetaryString(unclaimedRewards)}
               </Display>
-              { claiming ? (
+              {claiming ? (
                 <GeneralButton
                   size={"large"}
                   version={"primary"}
@@ -119,10 +135,9 @@ const UserRewards = ({ claimNow, unclaimedRewards, network }: IUserRewards) => {
                   handleClick={onClick}
                   className="view-breakdown-button"
                 >
-                  {buttonText}
+                  {networkNotEth ? "Coming Soon!" : buttonText}
                 </GeneralButton>
-              )
-            }
+              )}
             </section>
           </section>
 
@@ -138,12 +153,12 @@ const UserRewards = ({ claimNow, unclaimedRewards, network }: IUserRewards) => {
             </Heading>
             <section className="fees">
               <Text size="xs">Network fee</Text>
-              <Text size="xs">$0.002 FUSDC</Text>
+              <Text size="xs">${networkFee} FUSDC</Text>
             </section>
             <hr className="line" />
             <section className="fees">
               <Text size="xs">Gas fee</Text>
-              <Text size="xs">$0.002 FUSDC</Text>
+              <Text size="xs">${gasFee} FUSDC</Text>
             </section>
             <hr className="line" />
           </section>
