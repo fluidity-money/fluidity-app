@@ -57,6 +57,10 @@ func InsertEmissions(emission Emission) {
 		gasTipCapNormal = emission.GasTipCapNormal
 		gasLimitNormal          = emission.GasLimitNormal
 		transferFeeNormal       = emission.TransferFeeNormal
+		gasUsed = emission.GasUsed
+		gasUsedNormal = emission.GasUsedNormal
+		blockBaseFee = emission.BlockBaseFee
+		blockBaseFeeNormal = emission.BlockBaseFeeNormal
 	)
 
 	var testingBallsString strings.Builder
@@ -167,7 +171,12 @@ func InsertEmissions(emission Emission) {
 			gas_tip_cap,
 			gas_limit_normal,
 			gas_tip_cap_normal,
-			transfer_fee_normal
+			transfer_fee_normal,
+
+			gas_used,
+			gas_used_normal,
+			block_base_fee,
+			block_base_fee_normal
 		)
 
 		VALUES (
@@ -265,7 +274,12 @@ func InsertEmissions(emission Emission) {
 			$75,
 			$76,
 			$77,
-			$78
+			$78,
+
+			$79,
+			$80,
+			$81,
+			$82
 		);`,
 
 		TableEmissions,
@@ -369,6 +383,11 @@ func InsertEmissions(emission Emission) {
 		gasLimitNormal,
 		gasTipCapNormal,
 		transferFeeNormal,
+
+		gasUsed,
+		gasUsedNormal,
+		blockBaseFee,
+		blockBaseFeeNormal,
 	)
 
 	if err != nil {

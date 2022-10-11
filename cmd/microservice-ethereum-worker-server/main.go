@@ -213,7 +213,10 @@ func main() {
 
 		// set the configuration using what's in the database for the block
 		var (
-			workerConfig                 = worker_config.GetWorkerConfigEthereum(network.NetworkEthereum)
+			workerConfig = worker_config.GetWorkerConfigEthereum(
+				network.NetworkEthereum,
+			)
+
 			defaultSecondsSinceLastBlock = workerConfig.DefaultSecondsSinceLastBlock
 			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
 			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
@@ -233,8 +236,6 @@ func main() {
 			fluidTransfers   = hintedBlock.DecoratedTransfers
 			transfersInBlock = len(fluidTransfers)
 		)
-
-		blockBaseFeeRat := bigIntToRat(blockBaseFee)
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
@@ -300,7 +301,9 @@ func main() {
 			currentAtxTransactionMarginRat,
 		)
 
-		averageTransfersInBlockRat := new(big.Rat).SetInt64(int64(averageTransfersInBlock))
+		averageTransfersInBlockRat := new(big.Rat).SetInt64(
+			int64(averageTransfersInBlock),
+		)
 
 		// btx should be set when the apy > averageTransfersInBlock
 
@@ -308,10 +311,14 @@ func main() {
 			btx        int
 			currentAtx *big.Rat
 		)
-		
-		// Sets the ATX to transfers in block if current fluid transfers in block is larger than the average, set to average otherwise
-		// example: average BTX is 20, current BTX is 30, BTX that gets passed to worker is 30
-		// example 2: average BTX is 20, current BTX is 10, BTX that gets passed to worker is 20
+
+		// Sets the ATX to transfers in block if current fluid
+		// transfers in block is larger than the average, set to
+		// average otherwise example: average BTX is 20, current
+		// BTX is 30, BTX that gets passed to worker is 30 example
+		// 2: average BTX is 20, current BTX is 10, BTX that gets
+		// passed to worker is 20
+
 		if currentAtxTransactionMarginRatCmp.Cmp(averageTransfersInBlockRat) > 0 {
 
 			currentAtx = new(big.Rat).Mul(secondsInOneYearRat, transfersInBlockRat)
@@ -450,6 +457,18 @@ func main() {
 			})
 		}
 
+		// normalise the block base fee, which we only record
+
+		blockBaseFeeRat := bigIntToRat(blockBaseFee)
+
+		blockBaseFeeNormalised := new(big.Rat).Quo(blockBaseFeeRat, ethereumDecimalsRat)
+
+		blockBaseFeeNormalised.Mul(blockBaseFeeNormalised, ethPriceUsd)
+
+		emission.BlockBaseFee = blockBaseFee
+
+		emission.BlockBaseFeeNormal, _ = blockBaseFeeRat.Float64()
+
 		// normalise the size of the pool and the balance of the underlying to a normal number!
 
 		sizeOfThePool.Quo(sizeOfThePool, underlyingTokenDecimalsRat)
@@ -459,14 +478,16 @@ func main() {
 		for _, transfer := range fluidTransfers {
 
 			var (
-				transactionHash   = transfer.Transaction.Hash
-				senderAddress     = transfer.SenderAddress
-				recipientAddress  = transfer.RecipientAddress
-				gasLimit          = transfer.Transaction.Gas
-				transferType      = transfer.Transaction.Type
-				gasTipCap         = transfer.Transaction.GasTipCap
+				transactionHash  = transfer.Transaction.Hash
+				senderAddress    = transfer.SenderAddress
+				recipientAddress = transfer.RecipientAddress
+				gasLimit         = transfer.Transaction.Gas
+				transferType     = transfer.Transaction.Type
+				gasTipCap        = transfer.Transaction.GasTipCap
+				appEmission      = transfer.AppEmissions
+				gasUsed          = transfer.GasUsed
+
 				applicationFeeUsd *big.Rat
-				appEmission       = transfer.AppEmissions
 			)
 
 			if transfer.Decorator != nil {
@@ -487,15 +508,23 @@ func main() {
 			var (
 				gasTipCapRat = bigIntToRat(gasTipCap)
 				gasLimitRat  = uint64ToRat(gasLimit)
+				gasUsedRat   = uint64ToRat(gasUsed)
 			)
 
-			// remember the gas limit and tip cap in the database for comparison later
+			// remember the gas limit and tip cap in the
+			// database for comparison later - NOTE that
+			// only the gas used is used
 
 			emission.GasLimit = gasLimit
 
 			emission.GasTipCap = gasTipCap
 
-			// normalise the gas limit to a rational number that's consistent with USDT
+			// remember the gas used
+
+			emission.GasUsed = gasUsed
+
+			// normalise the gas limit to a rational number
+			// that's consistent with USDT
 
 			normalisedGasLimitRat := new(big.Rat).Quo(gasLimitRat, ethereumDecimalsRat)
 
@@ -511,9 +540,17 @@ func main() {
 
 			emission.GasTipCapNormal, _ = normalisedGasTipCapRat.Float64()
 
-			// add the default block base fee that we track and multiply it by the gas tip cap and the gas limit
+			// normalise the gas used
 
-			transferFeeUsd := new(big.Rat).Add(blockBaseFeeRat, normalisedGasTipCapRat)
+			normalisedGasUsedRat := new(big.Rat).Quo(gasUsedRat, ethereumDecimalsRat)
+
+			normalisedGasUsedRat.Mul(normalisedGasUsedRat, ethPriceUsd)
+
+			emission.GasUsedNormal, _ = normalisedGasUsedRat.Float64()
+
+			// use the receipt's recorded gasUsed field after it's been normalised
+
+			transferFeeUsd := normalisedGasUsedRat
 
 			transferFeeUsd.Mul(transferFeeUsd, normalisedGasLimitRat)
 

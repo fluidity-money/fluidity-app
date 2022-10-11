@@ -60,7 +60,13 @@ type (
 		GasLimitNormal  float64 `json:"gas_limit_normal"`
 		GasTipCapNormal float64 `json:"gas_tip_cap_normal"`
 
+		GasUsed       uint64  `json:"gas_used"`
+		GasUsedNormal float64 `json:"gas_used_normal"`
+
 		TransferFeeNormal float64 `json:"transfer_fee_normal"`
+
+		BlockBaseFee       misc.BigInt `json:"block_base_fee"`
+		BlockBaseFeeNormal float64     `json:"block_base_fee_normal"`
 
 		Payout struct {
 			Winnings        float64 `json:"winnings"` // Winnings
