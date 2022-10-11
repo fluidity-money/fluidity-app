@@ -49,7 +49,7 @@ const ClaimedRewards = () => {
         <LinkButton
           size={"small"}
           type={"internal"}
-          handleClick={() => navigate("../performance")}
+          handleClick={() => navigate("../reward")}
         >
           Close
         </LinkButton>
@@ -100,7 +100,7 @@ const ClaimedRewards = () => {
       <LinkButton
         size={"small"}
         type={"internal"}
-        handleClick={() => navigate("../performance")}
+        handleClick={() => navigate("../reward")}
       >
         Reward History
       </LinkButton>

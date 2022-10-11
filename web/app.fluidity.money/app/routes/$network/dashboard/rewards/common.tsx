@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@remix-run/react";
+import { getTokenForNetwork, getTokenFromAddress } from "~/util/api/graphql";
 import {
   Card,
   Text,
@@ -14,20 +15,66 @@ import {
 type IUserRewards = {
   claimNow: boolean;
   unclaimedRewards: number;
+  network: string;
 };
 
-const UserRewards = ({ claimNow, unclaimedRewards }: IUserRewards) => {
+type ManualRewardBody = {
+  address: string;
+  token_short_name: string;
+}
+
+const claimReward = async(reqs: ManualRewardBody[]) => {
+  const res = Promise.all(reqs.map(req => {
+    const url = 'https://mainnet.fluidity.money:8081/manual-reward';
+    
+    const res = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: req,
+    })
+    
+    const {error, payload} = await res.json()
+    
+    
+    if (error || !payload) return false;
+    
+    // Call eth contract
+    
+  }))
+}
+
+const UserRewards = ({ claimNow, unclaimedRewards, network }: IUserRewards) => {
   const navigate = useNavigate();
   
   const [ claiming, setClaiming ] = useState(false);
 
   const buttonText = claimNow ? "Claim now with fees" : "View breakdown";
-
+  
   const onClick = () => {
     if (!claimNow) return navigate("../unclaimed");
     
-    return setClaiming(true);
-  };
+    setClaiming(true);
+    const tokens = getTokenForNetwork(network);
+    
+    const unclaimedTokenReqs: ManualRewardBody[] = tokens
+      .map(tokenAddr => {
+        const tokenConfig = getTokenFromAddress(network, tokenAddr);
+      
+        if (!tokenConfig) {
+          return null;
+        }
+
+        return {
+          address: tokenAddr,
+          token_short_name: tokenConfig.symbol,
+        }
+      }
+    )
+    .filter(body => !!body)
+    
+    claimReward(unclaimedTokenReqs);
+  }
 
   return (
     <>

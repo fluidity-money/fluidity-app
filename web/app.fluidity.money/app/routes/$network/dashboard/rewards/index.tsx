@@ -166,8 +166,6 @@ export default function Rewards() {
     }
   );
 
-  console.log(bestPerformingRewarders);
-
   return (
     <>
       {/* Info Cards */}
@@ -219,7 +217,7 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Highest performer"}>
-                    <img src={bestPerformingRewarders[0].iconUrl} alt="" />
+                    <img src={bestPerformingRewarders[0].iconUrl} alt="best performer" />
                     {bestPerformingRewarders[0].name}
                   </LabelledValue>
                 </div>
