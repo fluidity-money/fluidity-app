@@ -1,11 +1,7 @@
 #user-rewards {
-  display: flex;
-  /* height: 270px; */
   width: auto;
   padding: 2em;
-  align-items: top;
   margin-bottom: 6em;
-  justify-content: space-between;
 }
 
 #performance {
@@ -121,6 +117,56 @@
   height: 96px;
   justify-content: space-between;
   box-sizing: border-box;
+}
+
+.card-outer {
+  position: relative;
+  border-radius: 30px;
+}
+
+.card-outer::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+  border-radius: 12px;
+  background: conic-gradient(
+    from 209.59deg at 50% 50%,
+    #f3b8d8 0deg,
+    #b793e9 50.06deg,
+    #9fd4f3 85.94deg,
+    #ffd2c4 134.97deg,
+    #fbf3f3 172.05deg,
+    #d9abdf 200.75deg,
+    #af9ce3 224.67deg,
+    #aae4e1 259.36deg,
+    #c6ead0 298.82deg,
+    #ffffff 328.72deg,
+    #fdb5e4 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.card-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: top;
+  background: unset;
+  border-radius: 12px;
+  border-style: none;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-width: 2px;
+  outline: unset;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 .card-section {
