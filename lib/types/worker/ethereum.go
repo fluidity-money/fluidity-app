@@ -77,6 +77,12 @@ type (
 		// of a potential reward, and one party could be a smart contract
 		SenderAddress    ethereum.Address         `json:"sender_address"`
 		RecipientAddress ethereum.Address         `json:"recipient_address"`
+
+		// GasUsed by the transfer, should only be set by
+		// microservice-ethereum-application-server after fetching
+		// the receipt
+		GasUsed uint64 `json:"gas_used"`
+
 		Decorator        *EthereumWorkerDecorator `json:"decorator"`
 
 		AppEmissions EthereumAppFees `json:"app_emissions"`

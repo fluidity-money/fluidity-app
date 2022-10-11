@@ -7,15 +7,17 @@ package main
 import (
 	"strconv"
 	"strings"
+	"context"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
@@ -78,9 +80,9 @@ func main() {
 	worker.GetEthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
 
 		var (
-			logs = blockLog.Logs
+			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
-			blockHash = blockLog.BlockHash
+			blockHash    = blockLog.BlockHash
 		)
 
 		fluidTransfers, err := libEthereum.GetTransfers(
@@ -96,6 +98,7 @@ func main() {
 					"Failed to get a fluid transfer in block %#v!",
 					blockHash,
 				)
+
 				k.Payload = err
 			})
 		}
@@ -114,21 +117,76 @@ func main() {
 					"Failed to get application events in block %#v!",
 					blockHash,
 				)
+
 				k.Payload = err
 			})
 		}
 
 		decoratedTransfers := make([]worker.EthereumDecoratedTransfer, len(fluidTransfers))
 
-		// add the non-app fluid transfers
+		// add the non-app fluid transfers (and get their receipts)
+
 		for i, fluidTransfer := range fluidTransfers {
+
+			fluidTransferHash := ethCommon.HexToHash(
+				string(fluidTransfer.Transaction.Hash),
+			)
+
+			txReceipt, err := gethClient.TransactionReceipt(
+				context.Background(),
+				fluidTransferHash,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the transaction receipt for Fluid transfer %#v!",
+						fluidTransferHash,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			fluidTransfer.GasUsed = txReceipt.GasUsed
+
 			decoratedTransfers[i] = fluidTransfer
 		}
 
 		// loop over application events in the block, add payouts as decorator
 		for _, transfer := range applicationTransfers {
 
-			fee, emission, err := applications.GetApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
+			transactionHashHex := transfer.Transaction.Hash.String()
+
+			transactionHash := ethCommon.HexToHash(
+				transactionHashHex,
+			)
+
+			txReceipt, err := gethClient.TransactionReceipt(
+				context.Background(),
+				transactionHash,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the transaction receipt for Fluid transfer %#v!",
+						transactionHashHex,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			gasUsed := txReceipt.GasUsed
+
+			fee, emission, err := applications.GetApplicationFee(
+				transfer,
+				gethClient,
+				contractAddress,
+				tokenDecimals,
+				txReceipt,
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -142,7 +200,7 @@ func main() {
 				log.App(func(k *log.Log) {
 					k.Format(
 						"Skipping an application transfer for transaction %#v and application %#v!",
-						transfer.Transaction.Hash.String(),
+						transactionHashHex,
 						transfer.Application,
 					)
 				})
@@ -154,7 +212,9 @@ func main() {
 				ApplicationFee: fee,
 			}
 
-			toAddress, fromAddress, err := applications.GetApplicationTransferParties(transfer)
+			toAddress, fromAddress, err := applications.GetApplicationTransferParties(
+				transfer,
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -168,6 +228,7 @@ func main() {
 				RecipientAddress: toAddress,
 				Decorator:        decorator,
 				Transaction:      transfer.Transaction,
+				GasUsed:          gasUsed,
 				AppEmissions:     emission,
 			}
 

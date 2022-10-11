@@ -108,7 +108,14 @@ func TestIntegrations(t *testing.T) {
 			client        = event.Client
 		)
 
-		fees, emission, err := applications.GetApplicationFee(transfer, client, fluidAddress, tokenDecimals)
+		fees, emission, err := applications.GetApplicationFee(
+			transfer,
+			client,
+			fluidAddress,
+			tokenDecimals,
+			nil,
+		)
+
 		assert.NoError(t, err)
 
 		sender, recipient, err := applications.GetApplicationTransferParties(event.Transfer)
