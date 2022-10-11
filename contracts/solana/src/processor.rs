@@ -2,33 +2,33 @@
 
 use crate::{
     instruction::*,
-    math::*,
     state::{Obligation, Reserve},
     utils::*,
 };
 
 use {
-    borsh::{BorshDeserialize, BorshSerialize}, solana_program::{
+    borsh::{BorshDeserialize, BorshSerialize},
+    solana_program::{
         account_info::{next_account_info, AccountInfo},
         entrypoint::ProgramResult,
         instruction::{AccountMeta, Instruction},
-        log::sol_log_compute_units,
         msg,
         program::{invoke, invoke_signed},
         program_error::ProgramError,
-        program_pack::{IsInitialized, Pack},
+        program_pack::Pack,
         pubkey::Pubkey,
-        system_instruction, system_program,
+        pubkey,
+        system_instruction,
     },
     spl_token,
-    std::{convert::TryFrom, str::FromStr},
+    std::str::FromStr,
 };
 
 // the public key of the account that is allowed to initialise tokens
-const INIT_AUTHORITY: &str = "G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj";
+const INIT_AUTHORITY: Pubkey = pubkey!("G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj");
 
 // the public key of the solend program
-const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
+const SOLEND: Pubkey = pubkey!("ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx");
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]
@@ -85,7 +85,7 @@ fn wrap(
     }
 
     // check solend contract
-    if solend_program.key != &Pubkey::from_str(SOLEND).unwrap() {
+    if *solend_program.key != SOLEND {
         panic!("bad Solend contract!");
     }
 
@@ -301,7 +301,7 @@ fn unwrap(
     let clock_info = next_account_info(accounts_iter)?;
 
     // check solend contract
-    if solend_program.key != &Pubkey::from_str(SOLEND).unwrap() {
+    if *solend_program.key != SOLEND {
         panic!("bad Solend contract!");
     }
 
@@ -679,7 +679,7 @@ fn init_solend_obligation(
     let token_program = next_account_info(accounts_iter)?;
 
     // check init authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(INIT_AUTHORITY).unwrap()) {
+    if !(payer.is_signer && *payer.key == INIT_AUTHORITY) {
         panic!("bad init authority!");
     }
 
@@ -1012,7 +1012,7 @@ fn init_data(
     let emergency_council = next_account_info(accounts_iter)?;
 
     // check payout authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(INIT_AUTHORITY).unwrap()) {
+    if !(payer.is_signer && *payer.key == INIT_AUTHORITY) {
         panic!("bad init authority!");
     }
 
