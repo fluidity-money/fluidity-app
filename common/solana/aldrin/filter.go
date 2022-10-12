@@ -382,7 +382,7 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 	if err != nil {
 		return false, fmt.Errorf(
 			"failed to deserialise Aldrin fee mintTo instruction (%v) data %v! %v",
-
+			instructionNumber,
 			feeMintInstructionData,
 			err,
 		)
