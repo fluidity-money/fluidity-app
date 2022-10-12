@@ -18,6 +18,8 @@ use {
         program_pack::Pack,
         pubkey::Pubkey,
         pubkey,
+        rent::Rent,
+        sysvar::Sysvar,
         system_instruction,
     },
     spl_token,
@@ -1021,6 +1023,11 @@ fn init_data(
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
     let data_seed = format!("FLU:{}_DATA_1", seed);
+
+    let rent = Rent::get()?;
+    if !rent.is_exempt(lamports, space as usize) {
+        panic!("data account must be rent exempt!");
+    }
 
     // create the acccount
     invoke_signed(
