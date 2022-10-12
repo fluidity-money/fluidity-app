@@ -758,6 +758,10 @@ pub fn log_tvl(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
         panic!("bad data account");
     }
 
+    if *solend_program.key != SOLEND {
+        panic!("bad Solend contract!");
+    }
+
     // refresh solend accounts
 
     invoke(
