@@ -15,6 +15,7 @@ export \
 	REACT_APP_WEBSOCKET=ws://localhost:8080/updates \
 	FLU_API_URI=http://localhost:8080 \
 	FLU_WALLET_URL=http://localhost:3000 \
-	FLU_ETHEREUM_URL=http://localhost:8545
+	FLU_ETHEREUM_URL=http://localhost:8545 \
+	FLU_DISCORD_WEBHOOK=not_a_webhook
 
 export FLU_WORKER_ID="tests-$(date +%s)"
