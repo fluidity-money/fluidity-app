@@ -2,8 +2,8 @@
 export \
 	FLU_DEBUG_DIE_FAST=true \
 	FLU_AMQP_QUEUE_ADDR=amqp://localhost \
-	FLU_POSTGRES_URI=postgres://fluidity:fluidity@localhost?sslmode=disable \
-	FLU_TIMESCALE_URI=postgres://fluidity:fluidity@localhost:5433?sslmode=disable \
+	FLU_POSTGRES_URI='postgres://fluidity:fluidity@localhost?sslmode=disable' \
+	FLU_TIMESCALE_URI='postgres://fluidity:fluidity@localhost:5433?sslmode=disable' \
 	FLU_DEBUG=true \
 	FLU_REDIS_ADDR=localhost:6379 \
 	FLU_WEB_LISTEN_ADDR=localhost:8080 \
