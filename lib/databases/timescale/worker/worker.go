@@ -32,35 +32,40 @@ func InsertEmissions(emission Emission) {
 	timescaleClient := timescale.Client()
 
 	var (
-		network                 = emission.Network
-		tokenDetails            = emission.TokenDetails
-		transactionHash         = emission.TransactionHash
-		recipientAddress        = emission.RecipientAddress
-		senderAddress           = emission.SenderAddress
-		payout                  = emission.Payout
-		calculateN              = emission.CalculateN
-		naiveIsWinning          = emission.NaiveIsWinning
-		calculateBpy            = emission.CalculateBpy
-		aaveGetTokenApy         = emission.AaveGetTokenApy
-		compoundGetTokenApy     = emission.CompoundGetTokenApy
-		winningChances          = emission.WinningChances
-		lastUpdated             = emission.LastUpdated
-		averageTransfersInBlock = emission.AverageTransfersInBlock
-		atxBufferSize           = emission.AtxBufferSize
-		transfersInBlock        = emission.TransfersInBlock
-		transfersPast           = emission.TransfersPast
-		secondsSinceLastBlock   = emission.SecondsSinceLastBlock
-		ethAppFees              = emission.EthereumAppFees
-		solAppFees              = emission.SolanaAppFees
-		gasLimit                = emission.GasLimit
-		gasTipCap               = emission.GasTipCap
-		gasTipCapNormal = emission.GasTipCapNormal
-		gasLimitNormal          = emission.GasLimitNormal
-		transferFeeNormal       = emission.TransferFeeNormal
-		gasUsed = emission.GasUsed
-		gasUsedNormal = emission.GasUsedNormal
-		blockBaseFee = emission.BlockBaseFee
-		blockBaseFeeNormal = emission.BlockBaseFeeNormal
+		network                    = emission.Network
+		tokenDetails               = emission.TokenDetails
+		transactionHash            = emission.TransactionHash
+		recipientAddress           = emission.RecipientAddress
+		senderAddress              = emission.SenderAddress
+		payout                     = emission.Payout
+		calculateN                 = emission.CalculateN
+		naiveIsWinning             = emission.NaiveIsWinning
+		calculateBpy               = emission.CalculateBpy
+		aaveGetTokenApy            = emission.AaveGetTokenApy
+		compoundGetTokenApy        = emission.CompoundGetTokenApy
+		winningChances             = emission.WinningChances
+		lastUpdated                = emission.LastUpdated
+		averageTransfersInBlock    = emission.AverageTransfersInBlock
+		atxBufferSize              = emission.AtxBufferSize
+		transfersInBlock           = emission.TransfersInBlock
+		transfersPast              = emission.TransfersPast
+		secondsSinceLastBlock      = emission.SecondsSinceLastBlock
+		ethAppFees                 = emission.EthereumAppFees
+		solAppFees                 = emission.SolanaAppFees
+		gasLimit                   = emission.GasLimit
+		gasTipCap                  = emission.GasTipCap
+		gasTipCapNormal            = emission.GasTipCapNormal
+		gasLimitNormal             = emission.GasLimitNormal
+		transferFeeNormal          = emission.TransferFeeNormal
+		gasUsed                    = emission.GasUsed
+		gasUsedNormal              = emission.GasUsedNormal
+		blockBaseFee               = emission.BlockBaseFee
+		blockBaseFeeNormal         = emission.BlockBaseFeeNormal
+		maxPriorityFeePerGas       = emission.MaxPriorityFeePerGas
+		maxPriorityFeePerGasNormal = emission.MaxPriorityFeePerGasNormal
+		maxFeePerGas               = emission.MaxFeePerGas
+		maxFeePerGasNormal         = emission.MaxFeePerGasNormal
+		effectiveGasPriceNormal    = emission.EffectiveGasPriceNormal
 	)
 
 	var testingBallsString strings.Builder
@@ -176,7 +181,13 @@ func InsertEmissions(emission Emission) {
 			gas_used,
 			gas_used_normal,
 			block_base_fee,
-			block_base_fee_normal
+			block_base_fee_normal,
+
+			max_priority_fee_per_gas,
+			max_priority_fee_per_gas_normal,
+			max_fee_per_gas,
+			max_fee_per_gas_normal,
+			effective_gas_price_normal
 		)
 
 		VALUES (
@@ -279,7 +290,13 @@ func InsertEmissions(emission Emission) {
 			$79,
 			$80,
 			$81,
-			$82
+			$82,
+
+			$83,
+			$84,
+			$85,
+			$86,
+			$87
 		);`,
 
 		TableEmissions,
@@ -388,6 +405,12 @@ func InsertEmissions(emission Emission) {
 		gasUsedNormal,
 		blockBaseFee,
 		blockBaseFeeNormal,
+
+		maxPriorityFeePerGas,
+		maxPriorityFeePerGasNormal,
+		maxFeePerGas,
+		maxFeePerGasNormal,
+		effectiveGasPriceNormal,
 	)
 
 	if err != nil {

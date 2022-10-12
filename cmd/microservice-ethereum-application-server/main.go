@@ -5,9 +5,9 @@
 package main
 
 import (
+	"context"
 	"strconv"
 	"strings"
-	"context"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
@@ -156,7 +156,17 @@ func main() {
 		// loop over application events in the block, add payouts as decorator
 		for _, transfer := range applicationTransfers {
 
-			transactionHashHex := transfer.Transaction.Hash.String()
+			var (
+				tranasction   = transfer.Transaction
+				baseFeePerGas = transfer.BaseFee
+			)
+
+			var (
+				maxPriorityFeePerGas = transaction.GasTipCap
+				maxFeePerGas         = transaction.GasFeeCap
+			)
+
+			transactionHashHex := transaction.Hash.String()
 
 			transactionHash := ethCommon.HexToHash(
 				transactionHashHex,
@@ -224,12 +234,15 @@ func main() {
 			}
 
 			decoratedTransfer := worker.EthereumDecoratedTransfer{
-				SenderAddress:    fromAddress,
-				RecipientAddress: toAddress,
-				Decorator:        decorator,
-				Transaction:      transfer.Transaction,
-				GasUsed:          gasUsed,
-				AppEmissions:     emission,
+				SenderAddress:        fromAddress,
+				RecipientAddress:     toAddress,
+				Decorator:            decorator,
+				Transaction:          transfer.Transaction,
+				GasUsed:              gasUsed,
+				BaseFeePerGas:        baseFeePerGas,
+				MaxPriorityFeePerGas: maxPriorityFeePerGas,
+				MaxFeePerGas:         maxFeePerGas,
+				AppEmissions:         emission,
 			}
 
 			decoratedTransfers = append(decoratedTransfers, decoratedTransfer)

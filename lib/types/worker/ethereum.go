@@ -73,15 +73,31 @@ type (
 	EthereumDecoratedTransfer struct {
 		// Transaction containing the event
 		Transaction ethereum.Transaction `json:"transaction"`
+
 		// Parties involved in the swap, where sender recieves the majority
 		// of a potential reward, and one party could be a smart contract
 		SenderAddress    ethereum.Address         `json:"sender_address"`
+
 		RecipientAddress ethereum.Address         `json:"recipient_address"`
+
+		GasPrice uint64 `json:"gas_price"`
 
 		// GasUsed by the transfer, should only be set by
 		// microservice-ethereum-application-server after fetching
 		// the receipt
 		GasUsed uint64 `json:"gas_used"`
+
+		// BaseFeePerGas returned by the block, set by
+		// microservice-ethereum-application-server
+		BaseFeePerGas misc.BigInt `json:"base_fee"`
+
+		// MaxPriorityFeePerGas set by
+		// microservice-ethereum-application-server
+		MaxPriorityFeePerGas misc.BigInt `json:"max_priority_fee_per_gas"`
+
+		// MaxFeePerGas set by
+		// microservice-ethereum-application-server
+		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
 
 		Decorator        *EthereumWorkerDecorator `json:"decorator"`
 
