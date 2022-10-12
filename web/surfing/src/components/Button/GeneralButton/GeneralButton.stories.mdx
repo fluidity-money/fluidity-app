@@ -2,6 +2,7 @@ import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import GeneralButton from "./GeneralButton";
 import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
+import { ReactComponent as Trophy } from "/src/assets/images/buttonIcons/Trophy.svg";
 
 <Meta
     title="Button/GeneralButton"
@@ -134,7 +135,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             children: "default",
             version: "primary",
             buttonType: "icon only",
-            icon: <ReactSvg />,
+            icon: <Trophy />,
             size: "large",
         }}
     >
