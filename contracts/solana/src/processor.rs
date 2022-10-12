@@ -113,10 +113,6 @@ fn wrap(
         panic!("wrapping is disabled");
     }
 
-    if fluidity_data.global_mint_remaining < amount {
-        panic!("global mint limit reached");
-    }
-
     // write the remaining mint limit
     let remaining_global_mint = fluidity_data.global_mint_remaining.checked_sub(amount)
         .expect("global mint limit reached");
@@ -620,6 +616,10 @@ fn move_from_prize_pool(
         *fluidity_mint.key,
         *pda_account.key,
     );
+    if !fluidity_data.no_emergency {
+        panic!("emergency mode!");
+    }
+
     // check payout authority
     if !(payer.is_signer && *payer.key == fluidity_data.payout_authority) {
         panic!("bad payout authority!");
@@ -835,6 +835,10 @@ fn validate_authority<'a, 'b>(
     let pda_account = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
 
+    if *payer.key == Pubkey::default() {
+        panic!("zero address passed as payer!");
+    }
+
     let data_seed = format!("FLU:{}_DATA_1", seed);
     if fluidity_data_account.key
         != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
@@ -864,7 +868,7 @@ fn update_mint_limit(
     let (fluidity_data_account, mut fluidity_data, payer)
         = validate_authority(accounts, seed, program_id)?;
 
-    if !(payer.is_signer && *payer.key == fluidity_data.payout_authority) {
+    if *payer.key != fluidity_data.payout_authority {
         panic!("bad payout authority");
     }
 
