@@ -32,19 +32,19 @@ jobs:
           role-duration-seconds: 7200 #seconds
       - name: Get Diff
         id: diff
-        uses: ./scripts/actions/mainnet
+        uses: ./scripts/actions
         with:
           command: |
             flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Build
         id: build
-        uses: ./scripts/actions/mainnet
+        uses: ./scripts/actions
         with:
           command: |
             flu build-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
-        uses: ./scripts/actions/mainnet
+        uses: ./scripts/actions
         with:
           command: |
             flu deploy-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
