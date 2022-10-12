@@ -93,6 +93,42 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         {Template.bind({})}
     </Story>
     
+    <h2>Transparent Button</h2>
+    <Story
+        name="General Button Large Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttonType: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Medium Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttonType: "icon",
+            icon: <Trophy />,
+            size: "medium",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Small Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttonType: "text",
+            size: "small",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
     <h2>Button Types</h2>
     <Story
         name="General Button Text only"
