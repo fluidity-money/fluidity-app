@@ -108,9 +108,13 @@ docker-compose-build:
 semgrep:
 	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
-test: semgrep
+test-go: semgrep
 	@cd ${TESTS_DIR} && ./tests-golang.sh
+
+test-contracts: semgrep
 	@cd ${CONTRACTS_DIR} && ${MAKE} test
+
+test: semgrep test-go test-contracts
 
 lint: semgrep
 	@${GO_FMT} ./...
