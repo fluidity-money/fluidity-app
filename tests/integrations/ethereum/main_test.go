@@ -5,6 +5,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"math/big"
 	"testing"
@@ -108,12 +109,26 @@ func TestIntegrations(t *testing.T) {
 			client        = event.Client
 		)
 
+		txHash_ := string(transfer.Transaction.Hash)
+		txHash := common.HexToHash(txHash_)
+
+		// Get all logs in transaction
+		txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
+		// don't fail, since this doesn't always need to be set
+		if err != nil {
+			t.Logf(
+				"Couldn't fetch transaction receipt for %v! %v",
+				txHash_,
+				err,
+			)
+		}
+
 		fees, emission, err := applications.GetApplicationFee(
 			transfer,
 			client,
 			fluidAddress,
 			tokenDecimals,
-			nil,
+			txReceipt,
 		)
 
 		assert.NoError(t, err)
