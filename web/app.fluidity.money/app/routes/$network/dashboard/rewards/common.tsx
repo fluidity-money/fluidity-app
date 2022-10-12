@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "@remix-run/react";
-import { getTokenForNetwork, getTokenFromAddress } from "~/util/api/graphql";
 import {
   Card,
   Text,
@@ -12,61 +11,14 @@ import {
   Spinner,
 } from "@fluidity-money/surfing";
 
+const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
+
 type IUserRewards = {
   claimNow: boolean;
   unclaimedRewards: number;
   network: string;
   networkFee: number;
   gasFee: number;
-};
-
-const claimReward = async (network: string) => {
-  const tokens = getTokenForNetwork(network);
-
-  const url = "https://mainnet.fluidity.money:8081/manual-reward";
-
-  const abi = {};
-
-  const rewards = await Promise.all(
-    tokens.map(async (tokenAddr) => {
-      const tokenConfig = getTokenFromAddress(network, tokenAddr);
-
-      const manualRewardBody = {
-        address: tokenAddr,
-        token_short_name: tokenConfig.symbol,
-      };
-
-      const res = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(manualRewardBody),
-      });
-
-      const { error, payload } = await res.json();
-
-      if (error || !payload) return 0;
-
-      // Call eth contract
-      const tokenContract = new web3.eth.Contract(abi, tokenAddr);
-
-      const reward = await tokenContract.methods.manual_reward(payload).call();
-
-      return reward;
-    })
-  );
-
-  const rewardedSum = rewards.reduce((sum, reward) => sum + reward, 0);
-  const networkFee = 0.002;
-  const gasFee = 0.002;
-
-  const navigate = useNavigate();
-
-  navigate(
-    `../claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
-  );
-
-  return rewardedSum;
 };
 
 const UserRewards = ({
@@ -84,12 +36,29 @@ const UserRewards = ({
 
   const networkNotEth = network !== "ethereum";
 
-  const onClick = () => {
+  const onClick = async () => {
     if (!claimNow) return navigate("../unclaimed");
 
     setClaiming(true);
 
-    return claimReward(network);
+    const rewardsRes = await fetch(`claimreward?address=${address}`);
+
+    if (!rewardsRes.ok) {
+      // Toast Error
+      setClaiming(false);
+
+      return;
+    }
+    
+    const { rewards } = await rewardsRes.json();
+
+    const rewardedSum = rewards.reduce((sum: number, reward: number) => sum + reward, 0);
+    const networkFee = 0.002;
+    const gasFee = 0.002;
+
+    return navigate(
+      `../claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
+    );
   };
 
   return (

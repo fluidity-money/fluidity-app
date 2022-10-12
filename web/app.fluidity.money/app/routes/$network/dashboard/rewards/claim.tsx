@@ -57,7 +57,7 @@ const ClaimedRewards = () => {
 
       {/* Claimed Info */}
       <section>
-        <Text>Congrats! You&rsquove claimed</Text>
+        <Text>Congrats! You&rsquo;ve claimed</Text>
         <Heading as="h5">{numberToMonetaryString(reward)} USD</Heading>
         <Text>The funds have been added to your wallet.</Text>
 

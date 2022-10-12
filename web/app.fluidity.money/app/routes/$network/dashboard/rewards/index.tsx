@@ -1,12 +1,13 @@
 import type { Chain } from "~/util/chainUtils/chains";
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { UserTransaction } from "~/queries/useUserTransactions";
 
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
-import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import useViewport from "~/hooks/useViewport";
-
-import { useUserTransactionCount, useUserTransactions } from "~/queries";
+import { getTokenForNetwork, getTokenFromAddress } from "~/util";
+import { useUserTransactionCount, useUserTransactions, useUserUnclaimedRewards } from "~/queries";
 import { useLoaderData } from "@remix-run/react";
+import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
 import { UserRewards } from "./common";
 import {
@@ -21,17 +22,59 @@ import TransactionTable from "~/components/TransactionTable";
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { network } = params;
+  const network = params.network ?? "";
+
+  const networkFee= 0.002;
+  const gasFee= 0.002;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
+  const tokens = getTokenForNetwork(network);
+  const tokenNames = tokens
+    .map(token => getTokenFromAddress(network, token)?.symbol)
+    .filter(token => token !== undefined) as string[];
+
+  let unclaimedRewards;
+  let error;
+
+  try {
+    unclaimedRewards = await (
+      // Check address strips leading 0x
+      await useUserUnclaimedRewards(network, address, tokenNames)
+    ).json();
+  } catch (err) {
+    error = "Could not fetch User Unclaimed Rewards";
+  }
+  
+  if (error || unclaimedRewards.error) {
+    return redirect("/error", { status: 500, statusText: error });
+  }
+  
+  const {
+    data: {
+      ethereum_pending_winners: rewards
+    }
+  } = unclaimedRewards;
+  
+  const sanitisedRewards = rewards.filter(
+    (transaction: UserUnclaimedReward) => !transaction.reward_sent
+  )
+  
+  const userUnclaimedRewards = sanitisedRewards.reduce(
+    (sum: number, transaction: UserUnclaimedReward) => {
+      const { win_amount, token_decimals } = transaction;
+
+      const decimals = 10 ** token_decimals;
+      return sum + (win_amount / decimals);
+    }, 0
+  );
+
+
   let userTransactionCount;
   let userTransactions;
-
-  let error;
 
   try {
     userTransactionCount = await (
@@ -47,6 +90,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (error) {
     return redirect("/error", { status: 500, statusText: error });
   }
+
   if (userTransactionCount.errors || userTransactions.errors) {
     return json({
       rewarders: rewarders,
@@ -54,8 +98,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       count: 0,
       page,
       network,
-      userUnclaimedRewards: 6745,
+      userUnclaimedRewards,
       fluidPairs: 8,
+      networkFee,
+      gasFee,
     });
   }
 
@@ -101,7 +147,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   // Get Best Rewarders - SCOPED OUT NO DATA
-
+  
   return json({
     rewarders: rewarders,
     transactions: sanitizedTransactions,
@@ -110,6 +156,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     network,
     userUnclaimedRewards: 6745,
     fluidPairs: 8,
+    networkFee,
+    gasFee,
   });
 };
 
@@ -140,6 +188,8 @@ type LoaderData = {
   rewarders: Rewarder[];
   network: Chain;
   fluidPairs: number;
+  networkFee: number;
+  gasFee: number;
 };
 
 export default function Rewards() {
@@ -149,8 +199,10 @@ export default function Rewards() {
     page,
     rewarders,
     network,
-    userUnclaimedRewards,
     fluidPairs,
+    networkFee,
+    gasFee,
+    userUnclaimedRewards,
   } = useLoaderData<LoaderData>();
 
   const { width } = useViewport();
@@ -174,6 +226,8 @@ export default function Rewards() {
           claimNow={mobileView}
           unclaimedRewards={userUnclaimedRewards}
           network={network}
+          networkFee={networkFee}
+          gasFee={gasFee}
         />
       ) : (
         <div className="noUserRewards">

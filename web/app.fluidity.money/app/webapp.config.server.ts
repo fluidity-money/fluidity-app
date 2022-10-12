@@ -14,6 +14,7 @@ const OptionsSchema = z.object({
             http: z.string(),
             ws: z.string(),
           }),
+          server: z.string(),
         })
       )
       .min(1)
