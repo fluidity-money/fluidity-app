@@ -488,6 +488,7 @@ func main() {
 				recipientAddress     = transfer.RecipientAddress
 				gasLimit             = transfer.Transaction.Gas
 				transferType         = transfer.Transaction.Type
+				gasPrice             = transfer.Transaction.GasPrice
 				gasTipCap            = transfer.Transaction.GasTipCap
 				appEmission          = transfer.AppEmissions
 				gasUsed              = transfer.GasUsed
@@ -609,11 +610,7 @@ func main() {
 
 			// calculate the effective gas price (with all the values normal)
 
-			normalisedEffectiveGasPriceRat := calculateEffectiveGasPrice(
-				normalisedBlockBaseFeePerGasRat,
-				normalisedMaxFeePerGasRat,
-				normalisedMaxPriorityFeePerGasRat,
-			)
+			normalisedEffectiveGasPriceRat := new(big.Rat).SetInt(&gasPrice.Int)
 
 			emission.EffectiveGasPriceNormal, _ = normalisedEffectiveGasPriceRat.Float64()
 

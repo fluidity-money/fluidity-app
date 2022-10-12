@@ -218,15 +218,3 @@ func concatenatePastTransfers(blocks []uint64, transactionCounts []int) string {
 
 	return buf.String()
 }
-
-// calculateEffectiveGasPrice with baseFeePerGas + min(maxFeePerGas -
-// baseFeePerGas, maxPriorityFeePerGas)
-func calculateEffectiveGasPrice(baseFeePerGas, maxFeePerGas, maxPriorityFeePerGas *big.Rat) *big.Rat {
-	left := new(big.Rat).Sub(maxFeePerGas, baseFeePerGas)
-
-	if maxFeePerGas.Cmp(maxPriorityFeePerGas) > 0 {
-		return new(big.Rat).Add(left, baseFeePerGas)
-	}
-
-	return new(big.Rat).Add(maxPriorityFeePerGas, baseFeePerGas)
-}
