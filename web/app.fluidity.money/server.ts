@@ -59,35 +59,47 @@ const ethereumTokens = config.config["ethereum"].tokens.map((entry) => ({
   address: entry.address,
 }));
 
-// eslint-disable-next-line no-unused-vars
 const solanaTokens = config.config["solana"].tokens.map((entry) => ({
   token: entry.symbol,
   address: entry.address,
 }));
 
-const EthereumTransactions = getTransactionsObservableForIn(
-  `ethereum`,
-  {},
-  ...ethereumTokens
-);
 const registry = new Map<string, Subscription>();
 
 io.on("connection", (socket) => {
-  socket.on("subscribeTransaction", (network, address) => {
+  socket.on("subscribeTransactions", (req) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-    const observable = getObservableForAddress(EthereumTransactions, address);
+    let TransactionsObservable: any; // eslint-disable-line
+    if (req.protocol === `ethereum`) {
+      TransactionsObservable = getTransactionsObservableForIn(
+        req.address,
+        {},
+        ...ethereumTokens
+      );
+    } else if (req.protocol === `solana`) {
+      TransactionsObservable = getTransactionsObservableForIn(
+        req.address,
+        {},
+        ...solanaTokens
+      );
+    }
+
+    const transactionFilterObservable = getObservableForAddress(
+      TransactionsObservable,
+      req.address
+    );
     registry.set(
       socket.id,
-      observable.subscribe((transaction) => {
-        socket.to(socket.id).emit("transaction", transaction);
-      })
+      transactionFilterObservable.subscribe((transaction) =>
+        socket.emit("Transactions", transaction)
+      )
     );
+  });
 
-    socket.on("disconnect", () => {
-      registry.get(socket.id)?.unsubscribe();
-      registry.delete(socket.id);
-    });
+  socket.on("disconnect", () => {
+    registry.get(socket.id)?.unsubscribe();
+    registry.delete(socket.id);
   });
 });
 
@@ -105,7 +117,7 @@ app.all(
       }
 );
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3005;
 
 httpServer.listen(port, () => {
   // require the built app so we're ready when the first request comes in
