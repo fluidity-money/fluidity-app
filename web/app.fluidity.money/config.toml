@@ -2,7 +2,7 @@
 [[drivers.ethereum]]
 label = "Ethereum"
 testnet = false
-rpc = { http = "https://mainnet.infura.io/v3/your-api-key", ws = "ws://localhost:8546" }
+rpc = { http = "https://mainnet.infura.io/v3/ee5057a3e9024703ac0045d497d1da3b", ws = "ws://localhost:8546" }
 server = "https://backend.ethereum.fluidity.money"
 
 [[drivers.solana]]

@@ -2,12 +2,9 @@ import { gql, Queryable } from "~/util";
 
 const query: Queryable = {
   ethereum: gql`
-    query getPendingRewards($address: String!, $tokens: [String!]) {
+    query getPendingRewards($address: String!) {
       ethereum_pending_winners(
-        where: {
-          token_short_name: { _in: $tokens }
-          address: { _eq: $address }
-        }
+        where: { address: { _eq: $address } }
         order_by: { block_number: desc }
       ) {
         address
@@ -23,18 +20,13 @@ const query: Queryable = {
   solana: gql``,
 };
 
-const useUserUnclaimedRewards = async (
-  network: string,
-  address: string,
-  tokens: string[]
-) => {
+const useUserUnclaimedRewards = async (network: string, address: string) => {
   if (network !== "ethereum") {
     throw Error(`network ${network} not supported`);
   }
 
   const variables = {
     address,
-    tokens,
   };
 
   return fetch("https://fluidity.hasura.app/v1/graphql", {

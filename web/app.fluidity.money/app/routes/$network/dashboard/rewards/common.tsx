@@ -11,7 +11,7 @@ import {
   Spinner,
 } from "@fluidity-money/surfing";
 
-const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
+const address = "bb004de25a81cb4ed6b2abd68bcc2693615b9e04";
 
 type IUserRewards = {
   claimNow: boolean;
@@ -49,10 +49,13 @@ const UserRewards = ({
 
       return;
     }
-    
+
     const { rewards } = await rewardsRes.json();
 
-    const rewardedSum = rewards.reduce((sum: number, reward: number) => sum + reward, 0);
+    const rewardedSum = rewards.reduce(
+      (sum: number, reward: number) => sum + reward,
+      0
+    );
     const networkFee = 0.002;
     const gasFee = 0.002;
 
