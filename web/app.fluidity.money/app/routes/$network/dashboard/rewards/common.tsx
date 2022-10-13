@@ -96,7 +96,7 @@ const UserRewards = ({
                   version={"primary"}
                   buttonType="icon only"
                   icon={<Spinner />}
-                  handleClick={onClick}
+                  handleClick={() => {}}
                   className="view-breakdown-button"
                 />
               ) : (

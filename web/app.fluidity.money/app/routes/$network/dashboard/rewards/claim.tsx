@@ -43,6 +43,8 @@ const ClaimedRewards = () => {
 
   return (
     <div>
+      {/* Bg Video*/}
+      
       {/* Navigation Bar */}
       <header>
         <img src="FluidLogo" alt="FluidLogo" />
@@ -86,6 +88,20 @@ const ClaimedRewards = () => {
         Go to Assets
       </GeneralButton>
       */}
+
+      {/* Share on Twitter */}
+      <GeneralButton
+        version={"primary"}
+        buttonType={"text"}
+        size={"large"}
+        handleClick={() => {
+          navigate("../../../fluidify");
+        }}
+      >
+        Fluidify Your Money
+      </GeneralButton>
+
+      {/* Share on Twitter */}
       <GeneralButton
         version={"secondary"}
         buttonType={"icon before"}
