@@ -17,7 +17,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-user-actions/lib"
 )
 
-func HandleMint(transactionHash ethereum.Hash, topics []ethereum.Hash, data misc.Blob, time time.Time, tokenShortName string, tokenDecimals int) {
+func handleMint(transactionHash ethereum.Hash, topics []ethereum.Hash, data misc.Blob, time time.Time, tokenShortName string, tokenDecimals int) {
 	if lenTopics := len(topics); lenTopics != 1 {
 		log.Fatal(func(k *log.Log) {
 			k.Format(

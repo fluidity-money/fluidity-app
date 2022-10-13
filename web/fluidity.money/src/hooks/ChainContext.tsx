@@ -56,13 +56,15 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
   prevWeekDate.setDate(prevWeekDate.getDate() - 7);
 
   useWinningTransactions(
-    (winner: WinnersRes) => setWeekWinnings(winner.winners),
+    ({winners_staging}: WinnersRes) => setWeekWinnings(
+      winners_staging
+    ),
     SupportedChains[chain].name,
-    formatToGraphQLDate(prevWeekDate),
+    // formatToGraphQLDate(prevWeekDate),
   )
   
-  useLiveTvl(({ tvl }: TvlRes) => {
-    const latestNetworkPools = tvl
+  useLiveTvl(({ tvl_staging }: TvlRes) => {
+    const latestNetworkPools = tvl_staging
       .filter(({network}) => network === SupportedChains[chain].name)
       .reduce((pools, pool) => {
         const prevPool = pools[pool.contract_address];
@@ -87,7 +89,10 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
 
   useCountTransactions(
     (txCount: TransactionCount) => setTxCount(
-      txCount.user_actions_aggregate.aggregate.count
+      txCount
+        .user_actions_staging_aggregate
+        .aggregate
+        .count
     ),
     SupportedChains[chain].name,
   );

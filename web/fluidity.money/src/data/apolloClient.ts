@@ -40,7 +40,6 @@ const onData = <T>(
   onError: (e: Error) => void = () => {}
 ) => {
   return ( { data }: OnDataOptions) => {
-    console.log(data);
     data.error || data.data === null
       ? onError(data.error)
       : next(data.data)

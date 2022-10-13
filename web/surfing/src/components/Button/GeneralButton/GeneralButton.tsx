@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import type { ButtonHTMLAttributes } from "react";
 
@@ -79,7 +79,7 @@ const GeneralButton = ({
       ) : (
         <button
           onClick={handleClick}
-          className={`${styles.iconOnly} ${classProps}`}
+          className={`${styles[version]} ${styles[size]} ${styles.iconOnly} ${classProps}`}
           {...props}
         >
           <div className={styles.icon}>

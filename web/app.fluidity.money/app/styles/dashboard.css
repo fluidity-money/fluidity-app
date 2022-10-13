@@ -96,4 +96,8 @@ main > footer > section {
 .navbar-v2 ul {
   display: block;
   padding: 0;
+
+main > footer > section > a {
+  color: #828381;
+  text-underline-offset: 0.12em;
 }

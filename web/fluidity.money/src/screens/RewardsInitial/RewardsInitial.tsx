@@ -10,7 +10,7 @@ interface IProps {
 
 const RewardsInitial = ({ changeScreen }: IProps) => {
   const { apiState } = useChainContext();
-  const { txCount, rewardPool } = apiState;
+  const { txCount } = apiState;
 
   return (
     <AnimatePresence>
@@ -21,7 +21,8 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
         className={styles.container}
       >
         <RewardsInfoBox
-          rewardPool={rewardPool}
+          // NOTE: Dummy val
+          rewardPool={100000}
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="black"

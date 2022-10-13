@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import { useMemo } from 'react';
 import { gql, useSubscription } from '@apollo/client';
@@ -14,13 +14,13 @@ export interface Tvl {
 }
 
 export interface TvlRes {
-  tvl: Tvl[],
+  tvl_staging: Tvl[],
 }
 
 
 const liveTvlSubscription = gql`
 subscription tvlLiveTvlSubscription {
-  tvl(order_by: {contract_address: desc}, distinct_on: contract_address) {
+  tvl_staging(order_by: {contract_address: desc}, distinct_on: contract_address) {
     tvl
     time
     contract_address
