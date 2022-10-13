@@ -93,7 +93,7 @@ func getMessagesInternal(newTopic bool, topic string, f func(message Message)) {
 	)
 
 	if newTopic {
-		queueName = fmt.Sprintf("%v.%v", topic, consumerId)
+		queueName = fmt.Sprintf("%v.%v", queueName, consumerId)
 	}
 
 	messages, err := queueConsume(
