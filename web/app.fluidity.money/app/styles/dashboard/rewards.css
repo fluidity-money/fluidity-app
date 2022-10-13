@@ -11,7 +11,6 @@
 #infobox {
   margin-left: 2em;
   padding: 1.5em;
-  width: 35%;
 }
 
 #unclaimed {
@@ -155,8 +154,8 @@
 }
 
 .card-inner {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: top;
   background: unset;
   border-radius: 12px;
@@ -193,4 +192,23 @@
   width: 360px;
   margin-right: 20px;
   margin-bottom: 50px;
+}
+
+@media (max-width: 1200px) {
+  .card-inner {
+    grid-template-columns: 1fr;
+  }
+  #unclaimed-left {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 950px) {
+  #unclaimed-left {
+    flex-direction: column;
+    align-items: center;
+  }
+  #unclaimed {
+    align-items: center;
+  }
 }

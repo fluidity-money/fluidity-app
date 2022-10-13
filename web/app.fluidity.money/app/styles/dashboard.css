@@ -53,3 +53,8 @@ main > footer > section {
   display: inherit;
   gap: 20px;
 }
+
+main > footer > section > a {
+  color: #828381;
+  text-underline-offset: 0.12em;
+}
