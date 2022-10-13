@@ -1,8 +1,6 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserTransaction } from "~/queries/useUserTransactions";
 
-import { useState } from "react";
-
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import useViewport from "~/hooks/useViewport";
@@ -113,13 +111,6 @@ type LoaderData = {
   fluidPairs: number;
 };
 
-const performanceTimeFrames = [
-  "All time",
-  "Last week",
-  "Last month",
-  "This year",
-];
-
 export default function Rewards() {
   const {
     transactions,
@@ -133,8 +124,6 @@ export default function Rewards() {
 
   const { width } = useViewport();
   const mobileView = width <= 375;
-
-  const [timeFrameIndex, setTimeFrameIndex] = useState(0);
 
   const hasRewarders = rewarders.length > 0;
 

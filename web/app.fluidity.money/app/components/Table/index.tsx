@@ -121,13 +121,15 @@ const Table = <T,>(props: ITable<T>) => {
 
       {/* Pagination */}
       <motion.div className="pagination" layout="position">
-        {Array(pageCount).fill().map((_, i) => {
-          return (
-            <Link key={i} to={`?${pagination.pageQuery || "page"}=${i + 1}`}>
-              {i + 1}
-            </Link>
-          );
-        })}
+        {Array(pageCount)
+          .fill()
+          .map((_, i) => {
+            return (
+              <Link key={i} to={`?${pagination.pageQuery || "page"}=${i + 1}`}>
+                {i + 1}
+              </Link>
+            );
+          })}
       </motion.div>
     </div>
   );
