@@ -20,10 +20,12 @@ export const getTokenForNetwork = (network: string) => {
  * @param decimalPlaces number of decimals
  * @returns display string with decimal place
  */
-export const shorthandAmountFormatter = (uiAmount: string, decimalPlaces: number): string => {
-
-  let num: number = parseFloat(uiAmount);
-  if(num < 1) {
+export const shorthandAmountFormatter = (
+  uiAmount: string,
+  decimalPlaces: number
+): string => {
+  const num: number = parseFloat(uiAmount);
+  if (num < 1) {
     return uiAmount;
   }
   const lookup = [
@@ -34,10 +36,15 @@ export const shorthandAmountFormatter = (uiAmount: string, decimalPlaces: number
     { value: 1e12, symbol: "T" },
   ];
   const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  var item = lookup.slice().reverse().find(function(item) {
-    return num >= item.value;
-  });
-  return item ? (num / item.value).toFixed(decimalPlaces).replace(rx, "$1") + item.symbol : "0";
+  const item = lookup
+    .slice()
+    .reverse()
+    .find(function (item) {
+      return num >= item.value;
+    });
+  return item
+    ? (num / item.value).toFixed(decimalPlaces).replace(rx, "$1") + item.symbol
+    : "0";
 };
 
 /**
@@ -45,17 +52,15 @@ export const shorthandAmountFormatter = (uiAmount: string, decimalPlaces: number
  * @param decimals number of decimals
  * @returns display string with decimal place
  */
- export const amountToDecimalString = (amount: string, decimals: number) => {
+export const amountToDecimalString = (amount: string, decimals: number) => {
   const a = amount.slice(0, -decimals);
   const b = amount.slice(-decimals);
   let result = "";
-  if (amount.length > decimals)
-    result = a + '.' + b 
-  else
-    result = "0." + "0".repeat(decimals - amount.length).toString() + amount
+  if (amount.length > decimals) result = a + "." + b;
+  else result = "0." + "0".repeat(decimals - amount.length).toString() + amount;
 
   return clearTrailingZeros(result);
-}
+};
 
 /**
  * @param value decimal amount string
@@ -65,11 +70,13 @@ export const clearTrailingZeros = (value: string) => {
   // remove trailing zeros by finding a position to trim to
   let lastChar = value.length - 1;
   let decimalPos = value.indexOf(".");
-  if (decimalPos === -1)
-    decimalPos = 0;
+  if (decimalPos === -1) decimalPos = 0;
   if (value !== "0" && value !== "0.0") {
     // clear only trailing 0s or .s from the decimal part of the number
-    while (lastChar > decimalPos - 1 && (value[lastChar] === "0" || value[lastChar] === ".")) {
+    while (
+      lastChar > decimalPos - 1 &&
+      (value[lastChar] === "0" || value[lastChar] === ".")
+    ) {
       lastChar--;
     }
   }
@@ -78,8 +85,7 @@ export const clearTrailingZeros = (value: string) => {
   value = value.slice(0, lastChar + 1);
 
   // check for ending in .0
-  if (value.endsWith(".0"))
-    value = value.slice(0, value.length - 2);
+  if (value.endsWith(".0")) value = value.slice(0, value.length - 2);
 
   return value;
-}
+};
