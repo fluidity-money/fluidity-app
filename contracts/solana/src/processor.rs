@@ -2,33 +2,34 @@
 
 use crate::{
     instruction::*,
-    math::*,
     state::{Obligation, Reserve},
     utils::*,
 };
 
 use {
-    borsh::{BorshDeserialize, BorshSerialize}, solana_program::{
+    borsh::{BorshDeserialize, BorshSerialize},
+    solana_program::{
         account_info::{next_account_info, AccountInfo},
         entrypoint::ProgramResult,
         instruction::{AccountMeta, Instruction},
-        log::sol_log_compute_units,
         msg,
         program::{invoke, invoke_signed},
         program_error::ProgramError,
-        program_pack::{IsInitialized, Pack},
+        program_pack::Pack,
         pubkey::Pubkey,
-        system_instruction, system_program,
+        pubkey,
+        rent::Rent,
+        sysvar::Sysvar,
+        system_instruction,
     },
     spl_token,
-    std::{convert::TryFrom, str::FromStr},
 };
 
 // the public key of the account that is allowed to initialise tokens
-const INIT_AUTHORITY: &str = "G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj";
+const INIT_AUTHORITY: Pubkey = pubkey!("G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj");
 
 // the public key of the solend program
-const SOLEND: &str = "ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx";
+pub const SOLEND: Pubkey = pubkey!("ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx");
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]
@@ -85,7 +86,7 @@ fn wrap(
     }
 
     // check solend contract
-    if solend_program.key != &Pubkey::from_str(SOLEND).unwrap() {
+    if *solend_program.key != SOLEND {
         panic!("bad Solend contract!");
     }
 
@@ -110,10 +111,6 @@ fn wrap(
 
     if !fluidity_data.no_emergency {
         panic!("wrapping is disabled");
-    }
-
-    if fluidity_data.global_mint_remaining < amount {
-        panic!("global mint limit reached");
     }
 
     // write the remaining mint limit
@@ -301,7 +298,7 @@ fn unwrap(
     let clock_info = next_account_info(accounts_iter)?;
 
     // check solend contract
-    if solend_program.key != &Pubkey::from_str(SOLEND).unwrap() {
+    if *solend_program.key != SOLEND {
         panic!("bad Solend contract!");
     }
 
@@ -619,6 +616,10 @@ fn move_from_prize_pool(
         *fluidity_mint.key,
         *pda_account.key,
     );
+    if !fluidity_data.no_emergency {
+        panic!("emergency mode!");
+    }
+
     // check payout authority
     if !(payer.is_signer && *payer.key == fluidity_data.payout_authority) {
         panic!("bad payout authority!");
@@ -679,8 +680,12 @@ fn init_solend_obligation(
     let token_program = next_account_info(accounts_iter)?;
 
     // check init authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(INIT_AUTHORITY).unwrap()) {
+    if !(payer.is_signer && *payer.key == INIT_AUTHORITY) {
         panic!("bad init authority!");
+    }
+
+    if *solend_program.key != SOLEND {
+        panic!("bad Solend contract!");
     }
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
@@ -751,6 +756,10 @@ pub fn log_tvl(accounts: &[AccountInfo], program_id: &Pubkey) -> ProgramResult {
     if data_account.key != &Pubkey::create_with_seed(base.key, "FLU:TVL_DATA", program_id).unwrap()
     {
         panic!("bad data account");
+    }
+
+    if *solend_program.key != SOLEND {
+        panic!("bad Solend contract!");
     }
 
     // refresh solend accounts
@@ -826,6 +835,10 @@ fn validate_authority<'a, 'b>(
     let pda_account = next_account_info(accounts_iter)?;
     let payer = next_account_info(accounts_iter)?;
 
+    if *payer.key == Pubkey::default() {
+        panic!("zero address passed as payer!");
+    }
+
     let data_seed = format!("FLU:{}_DATA_1", seed);
     if fluidity_data_account.key
         != &Pubkey::create_with_seed(pda_account.key, &data_seed, program_id).unwrap()
@@ -855,7 +868,7 @@ fn update_mint_limit(
     let (fluidity_data_account, mut fluidity_data, payer)
         = validate_authority(accounts, seed, program_id)?;
 
-    if !(payer.is_signer && *payer.key == fluidity_data.payout_authority) {
+    if *payer.key != fluidity_data.payout_authority {
         panic!("bad payout authority");
     }
 
@@ -1012,12 +1025,17 @@ fn init_data(
     let emergency_council = next_account_info(accounts_iter)?;
 
     // check payout authority
-    if !(payer.is_signer && payer.key == &Pubkey::from_str(INIT_AUTHORITY).unwrap()) {
+    if !(payer.is_signer && *payer.key == INIT_AUTHORITY) {
         panic!("bad init authority!");
     }
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
     let data_seed = format!("FLU:{}_DATA_1", seed);
+
+    let rent = Rent::get()?;
+    if !rent.is_exempt(lamports, space as usize) {
+        panic!("data account must be rent exempt!");
+    }
 
     // create the acccount
     invoke_signed(
