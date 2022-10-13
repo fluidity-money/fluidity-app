@@ -103,7 +103,6 @@ func getMessagesInternal(newTopic bool, topic string, f func(message Message)) {
 		consumerId,
 		channel,
 		deadLetterEnabled,
-		newTopic,
 	)
 
 	if err != nil {
