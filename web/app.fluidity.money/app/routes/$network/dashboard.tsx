@@ -10,7 +10,9 @@ import {
   useMatches,
   useTransition,
 } from "@remix-run/react";
-import { useUserUnclaimedRewards } from "~/queries";
+import {
+  useUserUnclaimedRewards,
+} from "~/queries";
 
 import {
   GeneralButton,
@@ -54,15 +56,17 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   try {
     unclaimedRewards = await // Check address strips leading 0x
-    (await useUserUnclaimedRewards(network, address)).json();
-
+    (
+      await useUserUnclaimedRewards(network, address)
+    ).json();
+    
     if (unclaimedRewards.error) {
       error = "Could not fetch User Unclaimed Rewards";
     }
   } catch (err) {
     error = "Could not fetch User Unclaimed Rewards";
   }
-
+  
   if (error) {
     return {
       appName: routeMapper(pathname),
@@ -102,9 +106,9 @@ type LoaderData = {
   totalUnclaimedRewards: number;
 };
 
+
 export default function Dashboard() {
-  const { appName, version, totalUnclaimedRewards } =
-    useLoaderData<LoaderData>();
+  const { appName, version, totalUnclaimedRewards } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -184,7 +188,7 @@ export default function Dashboard() {
               version={"primary"}
               buttonType="text"
               size={"small"}
-              handleClick={() => navigate("/")}
+              handleClick={() => navigate("../fluidify")}
             >
               Fluidify Money
             </GeneralButton>
@@ -194,11 +198,7 @@ export default function Dashboard() {
               version={"secondary"}
               buttonType="icon after"
               size={"small"}
-              handleClick={() =>
-                totalUnclaimedRewards
-                  ? navigate("./rewards/unclaimed")
-                  : navigate("./rewards")
-              }
+              handleClick={() => totalUnclaimedRewards ? navigate("./rewards/unclaimed") : navigate("./rewards")}
               icon={<ArrowDown />}
             >
               ${totalUnclaimedRewards}
