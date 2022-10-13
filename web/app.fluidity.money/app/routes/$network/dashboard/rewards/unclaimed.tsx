@@ -30,9 +30,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   try {
     unclaimedRewards = await // Check address strips leading 0x
-    (
-      await useUserUnclaimedRewards(network, address)
-    ).json();
+    (await useUserUnclaimedRewards(network, address)).json();
   } catch (err) {
     error = "Could not fetch User Unclaimed Rewards";
   }

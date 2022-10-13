@@ -1,3 +1,5 @@
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
+
 import { LinksFunction, LoaderFunction } from "@remix-run/node";
 import {
   Outlet,
@@ -8,6 +10,7 @@ import {
   useMatches,
   useTransition,
 } from "@remix-run/react";
+import { useUserUnclaimedRewards } from "~/queries";
 
 import {
   GeneralButton,
@@ -22,11 +25,6 @@ import { motion } from "framer-motion";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
-};
-
-type LoaderData = {
-  appName: string;
-  version: string;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -51,14 +49,62 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const pathname = urlPaths[urlPaths.length - 1];
 
+  let unclaimedRewards;
+  let error;
+
+  try {
+    unclaimedRewards = await // Check address strips leading 0x
+    (await useUserUnclaimedRewards(network, address)).json();
+
+    if (unclaimedRewards.error) {
+      error = "Could not fetch User Unclaimed Rewards";
+    }
+  } catch (err) {
+    error = "Could not fetch User Unclaimed Rewards";
+  }
+
+  if (error) {
+    return {
+      appName: routeMapper(pathname),
+      version: "1.5",
+      totalUnclaimedRewards: 0,
+    };
+  }
+
+  const {
+    data: { ethereum_pending_winners: rewards },
+  } = unclaimedRewards;
+
+  const sanitisedRewards = rewards.filter(
+    (transaction: UserUnclaimedReward) => !transaction.reward_sent
+  );
+
+  const totalUnclaimedRewards = sanitisedRewards.reduce(
+    (sum: number, transaction: UserUnclaimedReward) => {
+      const { win_amount, token_decimals } = transaction;
+
+      const decimals = 10 ** token_decimals;
+      return sum + win_amount / decimals;
+    },
+    0
+  );
+
   return {
     appName: routeMapper(pathname),
     version: "1.5",
+    totalUnclaimedRewards,
   };
 };
 
+type LoaderData = {
+  appName: string;
+  version: string;
+  totalUnclaimedRewards: number;
+};
+
 export default function Dashboard() {
-  const { appName, version } = useLoaderData<LoaderData>();
+  const { appName, version, totalUnclaimedRewards } =
+    useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -148,10 +194,14 @@ export default function Dashboard() {
               version={"secondary"}
               buttonType="icon after"
               size={"small"}
-              handleClick={() => navigate("/")}
+              handleClick={() =>
+                totalUnclaimedRewards
+                  ? navigate("./rewards/unclaimed")
+                  : navigate("./rewards")
+              }
               icon={<ArrowDown />}
             >
-              $1000.00
+              ${totalUnclaimedRewards}
             </GeneralButton>
           </div>
         </nav>
