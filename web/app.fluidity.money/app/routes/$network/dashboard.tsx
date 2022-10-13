@@ -29,7 +29,9 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
+
+export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url);
 
   const routeMapper = (route: string) => {
@@ -50,6 +52,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const urlPaths = url.pathname.split("/");
 
   const pathname = urlPaths[urlPaths.length - 1];
+
+  const network = params.network ?? "";
 
   let unclaimedRewards;
   let error;
