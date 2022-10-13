@@ -8,7 +8,7 @@ const getTokenForNetwork = (network: string) => {
   return [];
 };
 
-type Token = {
+export type Token = {
   symbol: string;
   name: string;
   logo: string;

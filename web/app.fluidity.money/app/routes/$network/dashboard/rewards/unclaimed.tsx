@@ -5,7 +5,7 @@ import type { IRow } from "~/components/Table";
 import { LoaderFunction, json, redirect } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { UserRewards } from "./common";
-import { getAddressExplorerLink, getTokenForNetwork, getTokenFromAddress } from "~/util";
+import { getAddressExplorerLink } from "~/util";
 import { useUserUnclaimedRewards } from "~/queries";
 
 import { motion } from "framer-motion";
@@ -17,59 +17,52 @@ const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
 
-  const networkFee= 0.002;
-  const gasFee= 0.002;
+  const networkFee = 0.002;
+  const gasFee = 0.002;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-  
+
   let unclaimedRewards;
   let error;
 
-  const tokens = getTokenForNetwork(network);
-  const tokenNames = tokens
-    .map(token => getTokenFromAddress(network, token)?.symbol)
-    .filter(token => token !== undefined) as string[];
-
   try {
-    unclaimedRewards = await (
-      // Check address strips leading 0x
-      await useUserUnclaimedRewards(network, address, tokenNames)
+    unclaimedRewards = await // Check address strips leading 0x
+    (
+      await useUserUnclaimedRewards(network, address)
     ).json();
   } catch (err) {
     error = "Could not fetch User Unclaimed Rewards";
   }
-  
+
   if (error || unclaimedRewards.error) {
     return redirect("/error", { status: 500, statusText: error });
   }
-  
+
   const {
-    data: {
-      ethereum_pending_winners: rewards
-    }
+    data: { ethereum_pending_winners: rewards },
   } = unclaimedRewards;
-  
+
   const sanitisedRewards = rewards.filter(
     (transaction: UserUnclaimedReward) => !transaction.reward_sent
-  )
-  
+  );
+
   const unclaimedRewardsLength = sanitisedRewards.length;
 
   if (unclaimedRewardsLength === 0) {
     return redirect("..");
   }
-  
-  
+
   const totalUnclaimedRewards = sanitisedRewards.reduce(
     (sum: number, transaction: UserUnclaimedReward) => {
       const { win_amount, token_decimals } = transaction;
 
       const decimals = 10 ** token_decimals;
-      return sum + (win_amount / decimals);
-    }, 0
+      return sum + win_amount / decimals;
+    },
+    0
   );
 
   return json({
@@ -103,18 +96,13 @@ const unclaimedRewardColumns = [
   {
     name: "TRANSACTION",
     alignRight: true,
-  }
-]
-
+  },
+];
 
 const RewardRow = (chain: Chain): IRow<UserUnclaimedReward> =>
   function Row({ data, index }: { data: UserUnclaimedReward; index: number }) {
-    const {
-      token_decimals,
-      token_short_name,
-      transaction_hash,
-      win_amount,
-    } = data;
+    const { token_decimals, token_short_name, transaction_hash, win_amount } =
+      data;
 
     return (
       <motion.tr
@@ -132,9 +120,7 @@ const RewardRow = (chain: Chain): IRow<UserUnclaimedReward> =>
         {/* Token */}
         <td>
           <a>
-            <Text>
-              {token_short_name}
-            </Text>
+            <Text>{token_short_name}</Text>
           </a>
         </td>
 
@@ -168,7 +154,7 @@ const UnclaimedWinnings = () => {
     networkFee,
     gasFee,
   } = useLoaderData<LoaderData>();
-  
+
   return (
     <>
       {/* Info Card */}

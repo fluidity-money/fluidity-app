@@ -4,8 +4,11 @@ import type { UserTransaction } from "~/queries/useUserTransactions";
 
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
-import { getTokenForNetwork, getTokenFromAddress } from "~/util";
-import { useUserTransactionCount, useUserTransactions, useUserUnclaimedRewards } from "~/queries";
+import {
+  useUserTransactionCount,
+  useUserTransactions,
+  useUserUnclaimedRewards,
+} from "~/queries";
 import { useLoaderData } from "@remix-run/react";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
@@ -24,54 +27,47 @@ const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
 
-  const networkFee= 0.002;
-  const gasFee= 0.002;
+  const networkFee = 0.002;
+  const gasFee = 0.002;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const tokens = getTokenForNetwork(network);
-  const tokenNames = tokens
-    .map(token => getTokenFromAddress(network, token)?.symbol)
-    .filter(token => token !== undefined) as string[];
-
   let unclaimedRewards;
   let error;
 
   try {
-    unclaimedRewards = await (
-      // Check address strips leading 0x
-      await useUserUnclaimedRewards(network, address, tokenNames)
+    unclaimedRewards = await // Check address strips leading 0x
+    (
+      await useUserUnclaimedRewards(network, address)
     ).json();
   } catch (err) {
     error = "Could not fetch User Unclaimed Rewards";
   }
-  
+
   if (error || unclaimedRewards.error) {
     return redirect("/error", { status: 500, statusText: error });
   }
-  
+
   const {
-    data: {
-      ethereum_pending_winners: rewards
-    }
+    data: { ethereum_pending_winners: rewards },
   } = unclaimedRewards;
-  
+
   const sanitisedRewards = rewards.filter(
     (transaction: UserUnclaimedReward) => !transaction.reward_sent
-  )
-  
+  );
+
   const userUnclaimedRewards = sanitisedRewards.reduce(
     (sum: number, transaction: UserUnclaimedReward) => {
       const { win_amount, token_decimals } = transaction;
 
       const decimals = 10 ** token_decimals;
-      return sum + (win_amount / decimals);
-    }, 0
+      return sum + win_amount / decimals;
+    },
+    0
   );
-
 
   let userTransactionCount;
   let userTransactions;
@@ -147,7 +143,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   // Get Best Rewarders - SCOPED OUT NO DATA
-  
+
   return json({
     rewarders: rewarders,
     transactions: sanitizedTransactions,
@@ -272,10 +268,7 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Highest performer"}>
-                    <img
-                      src={bestPerformingRewarders[0].iconUrl}
-                      alt="best performer"
-                    />
+                    <img src={bestPerformingRewarders[0].iconUrl} alt="" />
                     {bestPerformingRewarders[0].name}
                   </LabelledValue>
                 </div>

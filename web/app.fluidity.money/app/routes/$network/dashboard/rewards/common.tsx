@@ -49,10 +49,13 @@ const UserRewards = ({
 
       return;
     }
-    
+
     const { rewards } = await rewardsRes.json();
 
-    const rewardedSum = rewards.reduce((sum: number, reward: number) => sum + reward, 0);
+    const rewardedSum = rewards.reduce(
+      (sum: number, reward: number) => sum + reward,
+      0
+    );
     const networkFee = 0.002;
     const gasFee = 0.002;
 

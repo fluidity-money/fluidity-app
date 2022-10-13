@@ -1,10 +1,15 @@
 import type { AbiItem } from "web3-utils";
+import type { Token } from "~/util/chainUtils/tokens";
 
 import tokenAbi from "./Token.json";
 
 import Web3 from "web3";
-import { toHex, hexToBytes } from "web3-utils";
-import { getTokenForNetwork, getTokenFromAddress } from "~/util";
+import { bytesToHex } from "web3-utils";
+import {
+  getTokenForNetwork,
+  getTokenFromAddress,
+  B64ToUint8Array,
+} from "~/util";
 import config from "~/webapp.config.server";
 
 const claimRewards = async (address: string, networkId = 0) => {
@@ -12,20 +17,42 @@ const claimRewards = async (address: string, networkId = 0) => {
 
   const network = "ethereum";
 
-  const tokens = getTokenForNetwork(network);
+  const fluidTokensContracts = getTokenForNetwork(network);
 
+  const fluidTokensConfig = fluidTokensContracts
+    .map((fToken) => getTokenFromAddress(network, fToken))
+    .filter((config): config is Token => !!config);
+
+  const unwrappedTokens = fluidTokensConfig
+    .filter(
+      (fTokenConfig): fTokenConfig is Token & { isFluidOf: string } =>
+        !!fTokenConfig.isFluidOf
+    )
+    .map((fTokenConfig) => {
+      const unwrappedTokenConfig = getTokenFromAddress(
+        network,
+        fTokenConfig.isFluidOf
+      );
+
+      if (!unwrappedTokenConfig) return undefined;
+
+      return {
+        symbol: unwrappedTokenConfig.symbol,
+        name: unwrappedTokenConfig.name,
+        logo: unwrappedTokenConfig.logo,
+        address: fTokenConfig.address,
+      };
+    })
+    .filter((unwrappedTokens): unwrappedTokens is Token => !!unwrappedTokens);
+
+  const rewardingTokens = fluidTokensConfig.concat(unwrappedTokens);
   const rewards = await Promise.all(
-    tokens.map(async (tokenAddr) => {
-      const tokenConfig = getTokenFromAddress(network, tokenAddr);
-
-      if (!tokenConfig) return 0;
-
+    rewardingTokens.map(async (tokenConfig) => {
       const manualRewardBody = {
         address,
         token_short_name: tokenConfig.symbol,
       };
-
-      const res = await fetch(ethServer, {
+      const res = await fetch(`${ethServer}/manual-reward`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -40,14 +67,20 @@ const claimRewards = async (address: string, networkId = 0) => {
       // Call eth contract
       const tokenContract = new new Web3(
         config.drivers["ethereum"][networkId].rpc.http ?? ""
-      ).eth.Contract(tokenAbi as unknown as AbiItem, tokenAddr);
+      ).eth.Contract(tokenAbi as unknown as AbiItem, tokenConfig.address);
 
       const { winner, win_amount, first_block, last_block } = payload.reward;
+
+      const { signature: b64Signature } = payload;
+
+      // convert B64 -> byte[] -> hex string
+      const uint8Signature = B64ToUint8Array(b64Signature);
+      const hexSignature = bytesToHex(Array.from(uint8Signature));
 
       await tokenContract.methods
         .manualReward(
           // contractAddress
-          tokenAddr,
+          tokenConfig.address,
           // chainid
           networkId,
           // winnerAddress
@@ -59,9 +92,9 @@ const claimRewards = async (address: string, networkId = 0) => {
           // lastBlock
           last_block,
           // sig
-          hexToBytes(toHex(payload.signature))
+          hexSignature
         )
-        .call();
+        .send({ from: address });
 
       return win_amount;
     })
