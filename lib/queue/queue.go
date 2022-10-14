@@ -61,21 +61,13 @@ func (message Message) Decode(decoded interface{}) {
 	log.Debugf("Successfully decoded a message from JSON!")
 }
 
-func GetMessages(topic string, f func(message Message)) {
-	getMessagesInternal(false, topic, f)
-}
-
-func GetBroadcastMessages(topic string, f func(message Message)) {
-	getMessagesInternal(true, topic, f)
-}
-
 // GetMessages from the AMQP server, calling the function each time a
 // message is received. If newTopic is set to true, a new queue name
 // will be generated that will make this useful for receiving messages
 // that would be received over broadcast that is unique to this worker.
 // If it is set to false, every message that would be received is
 // distributed across any worker sharing the same worker id.
-func getMessagesInternal(newTopic bool, topic string, f func(message Message)) {
+func GetMessages(topic string, f func(message Message)) {
 
 	amqpDetails := <-chanAmqpDetails
 
@@ -92,10 +84,6 @@ func getMessagesInternal(newTopic bool, topic string, f func(message Message)) {
 		queueName  = fmt.Sprintf("%v.%v", topic, workerId)
 	)
 
-	if newTopic {
-		queueName = fmt.Sprintf("%v.%v", topic, consumerId)
-	}
-
 	messages, err := queueConsume(
 		queueName,
 		topic,
@@ -103,7 +91,6 @@ func getMessagesInternal(newTopic bool, topic string, f func(message Message)) {
 		consumerId,
 		channel,
 		deadLetterEnabled,
-		newTopic,
 	)
 
 	if err != nil {
