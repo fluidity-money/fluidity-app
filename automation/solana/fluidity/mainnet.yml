@@ -7,6 +7,7 @@ SERVICES:
       ENV_FLU_WORKER_ID: solana-solana.fluidity.money-backend
       TARGET_GROUP: flu-mainnet-sol-be-tg
       TASK_MIN_COUNT: 1
+      TASK_MAX_COUNT: 1
   
   - FLUIDITY_FRONTEND:
       SERVICE_NAME: solana-fluidity-money-frontend
