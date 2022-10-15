@@ -10,10 +10,12 @@ import {
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
+import { ToolTipLinks } from "./components";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
   return [
+    ...ToolTipLinks(),
     { rel: "icon", href: "/favicon.ico" },
 
     { rel: "apple-touch-icon", sizes: "57x57", href: "/apple-icon-57x57.png" },
@@ -95,17 +97,17 @@ export const meta: MetaFunction = () => ({
 
 export default function App() {
   return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
+  <html lang="en">
+    <head>
+      <Meta />
+      <Links />
+    </head>
+    <body>   
+      <Outlet />
+      <ScrollRestoration />
+      <Scripts />
+      <LiveReload />
+    </body>
+  </html>
   );
 }
