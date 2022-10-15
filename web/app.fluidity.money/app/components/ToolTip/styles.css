@@ -1,0 +1,31 @@
+    .tooltip_container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+  
+  .tooltip {
+    border: 2px solid transparent;
+    background-color: #fafafa;
+    border-radius: 4px;
+    max-width: 480px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, .2);
+    margin-top: 16px;
+    display: flex;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .tooltip_content {
+    padding: 16px 24px;
+    line-height: 1.4;
+  }
+  
+  .tooltip_close_btn {
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+    margin-top: 15px;
+    margin-right: 8px;
+    cursor: pointer;
+  }
