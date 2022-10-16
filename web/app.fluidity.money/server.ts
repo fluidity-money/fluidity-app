@@ -14,7 +14,8 @@ import {
 } from "./drivers";
 
 import config from "~/webapp.config.server";
-import { Subscription } from "rxjs";
+import { Observable, Subscription, EMPTY } from "rxjs";
+import { PipedTransaction } from "drivers/types";
 
 const app = express();
 const httpServer = createServer(app);
@@ -70,7 +71,8 @@ io.on("connection", (socket) => {
   socket.on("subscribeTransactions", (req) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-    let TransactionsObservable: any; // eslint-disable-line
+    let TransactionsObservable: Observable<PipedTransaction> = EMPTY;
+
     if (req.protocol === `ethereum`) {
       TransactionsObservable = getTransactionsObservableForIn(
         req.address,
@@ -83,12 +85,17 @@ io.on("connection", (socket) => {
         {},
         ...solanaTokens
       );
+    } else {
+      console.error(
+        "Err:: Protocol not recognised or supported | supported protocols are `solana` & `ethereum` in that case order"
+      );
     }
 
     const transactionFilterObservable = getObservableForAddress(
       TransactionsObservable,
       req.address
     );
+    
     registry.set(
       socket.id,
       transactionFilterObservable.subscribe((transaction) =>
