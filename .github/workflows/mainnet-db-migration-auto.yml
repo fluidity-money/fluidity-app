@@ -1,18 +1,11 @@
-name: DB Migration - Staging (Manual)
+name: DB Migration - Mainnet (Auto)
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        type: choice
-        description: 'Environment'
-        options:
-          - 'dev'
-      network:
-        type: choice
-        description: 'Network'
-        options: 
-          - 'ropsten'
+  pull_request:
+    branches:
+      - production
+    types:
+      - closed
 
 permissions:
   id-token: write
@@ -20,6 +13,7 @@ permissions:
 
 jobs:
   dm-migration:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:

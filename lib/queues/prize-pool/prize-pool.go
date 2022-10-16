@@ -30,30 +30,12 @@ func prizePoolUpdates(topic string, f func(PrizePool)) {
 	})
 }
 
-func broadcastPrizePoolUpdates(topic string, f func(PrizePool)) {
-	queue.GetBroadcastMessages(topic, func(message queue.Message) {
-		var prizePool PrizePool
-
-		message.Decode(&prizePool)
-
-		f(prizePool)
-	})
-}
-
 func PrizePoolUpdatesEthereum(f func(PrizePool)) {
 	prizePoolUpdates(TopicPrizePoolEthereum, f)
 }
 
-func BroadcastPrizePoolUpdatesEthereum(f func(PrizePool)) {
-	broadcastPrizePoolUpdates(TopicPrizePoolEthereum, f)
-}
-
 func PrizePoolUpdatesSolana(f func(PrizePool)) {
 	prizePoolUpdates(TopicPrizePoolSolana, f)
-}
-
-func BroadcastPrizePoolUpdatesSolana(f func(PrizePool)) {
-	broadcastPrizePoolUpdates(TopicPrizePoolSolana, f)
 }
 
 func PrizePoolUpdatesAll(f func(PrizePool)) {

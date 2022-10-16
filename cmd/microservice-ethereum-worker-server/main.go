@@ -195,7 +195,8 @@ func main() {
 
 	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
 
-	ethereumDecimalsRat := exponentiate(EthereumDecimals)
+	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
+	usdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
@@ -308,7 +309,7 @@ func main() {
 			btx        int
 			currentAtx *big.Rat
 		)
-		
+
 		// Sets the ATX to transfers in block if current fluid transfers in block is larger than the average, set to average otherwise
 		// example: average BTX is 20, current BTX is 30, BTX that gets passed to worker is 30
 		// example 2: average BTX is 20, current BTX is 10, BTX that gets passed to worker is 20
@@ -427,9 +428,8 @@ func main() {
 			// normalise the token price!
 			// tokenPrice / 10^(fluxDecimals-usdtDecimals)
 
-			UsdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
 
-			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, UsdtDecimalsRat)
+			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, usdtDecimalsRat)
 
 			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
 		}
