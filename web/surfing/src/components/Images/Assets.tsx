@@ -1,3 +1,3 @@
-import { ReactComponent as AssetsIcon } from "~/assets/images/Assets.svg";
+import { ReactComponent as AssetsIcon } from "~/assets/images/buttonIcons/Assets.svg";
 
 export { AssetsIcon };

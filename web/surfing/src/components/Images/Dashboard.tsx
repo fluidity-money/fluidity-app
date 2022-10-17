@@ -1,3 +1,3 @@
-import { ReactComponent as DashboardIcon } from "~/assets/images/Dashboard.svg";
+import { ReactComponent as DashboardIcon } from "~/assets/images/buttonIcons/Dashboard.svg";
 
 export { DashboardIcon };
