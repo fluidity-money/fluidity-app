@@ -4,7 +4,7 @@ import { useToolTip } from "~/components";
 export default function IndexPage() {
   const toolTip = useToolTip();
   const showToast = () =>
-    toolTip.open(`Receive 10fusdc from 0x494..`);
+    toolTip.open(`Received from 0x49473..`);
 
   return (
     <div>
