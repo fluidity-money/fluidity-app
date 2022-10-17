@@ -196,7 +196,8 @@ func main() {
 
 	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
 
-	ethereumDecimalsRat := exponentiate(EthereumDecimals)
+	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
+	usdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
@@ -435,9 +436,8 @@ func main() {
 			// normalise the token price!
 			// tokenPrice / 10^(fluxDecimals-usdtDecimals)
 
-			UsdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
 
-			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, UsdtDecimalsRat)
+			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, usdtDecimalsRat)
 
 			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
 		}

@@ -27,12 +27,11 @@ const ProviderCard = ({
   avgPrize,
   size,
 }: IProviderCard) => {
-  const cardProps = size === "lg" ? "provider-card-large" : "provider-card-medium";
+  const cardProps =
+    size === "lg" ? "provider-card-large" : "provider-card-medium";
 
   return (
-    <Card
-      className={cardProps}
-    >
+    <Card className={cardProps}>
       <section className="card-left">
         {/* Icon */}
         <img src={iconUrl} alt={`${name}-icon`} />
