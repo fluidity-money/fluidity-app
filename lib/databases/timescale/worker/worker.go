@@ -397,6 +397,13 @@ func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, lim
 		TableAverageAtx,
 	)
 
+	log.Debugf(
+		"token short name: %#v, network: %#v, limit: %#v",
+		tokenShortName,
+		network,
+		limit,
+	)
+
 	rows, err := timescaleClient.Query(
 		statementText,
 		tokenShortName,
