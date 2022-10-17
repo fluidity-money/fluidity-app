@@ -87,10 +87,10 @@ const RewardsBackground = () => {
     <div className={styles.container}>
       <div className={styles.shade}></div>
       <div className={styles.rewardsBackground} ref={ref}>
-        {Array.from({length: rewardLimit}).map(() => (
+        {Array.from({ length: rewardLimit }).map(() => (
           <>
             <motion.div
-              initial={width < 500 ? { x: -500 } : { x: 1500 }}
+              initial={width < 500 && width > 0 ? { x: -500 } : { x: -1500 }}
               variants={carouselVariants}
               animate={inView && "appear"}
               transition={{ type: "tween", duration: 5 }}
@@ -100,7 +100,7 @@ const RewardsBackground = () => {
               </ContinuousCarousel>
             </motion.div>
             <motion.div
-              initial={width < 500 ? { x: 500 } : { x: 1500 }}
+              initial={width < 500 && width > 0 ? { x: 500 } : { x: 1500 }}
               variants={carouselVariants}
               animate={inView && "appear"}
               transition={{ type: "tween", duration: 5 }}
