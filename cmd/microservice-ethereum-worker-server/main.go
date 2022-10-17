@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
+	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
@@ -488,12 +489,12 @@ func main() {
 				recipientAddress     = transfer.RecipientAddress
 				gasLimit             = transfer.Transaction.Gas
 				transferType         = transfer.Transaction.Type
-				gasPrice             = transfer.Transaction.GasPrice
 				gasTipCap            = transfer.Transaction.GasTipCap
 				appEmission          = transfer.AppEmissions
 				gasUsed              = transfer.GasUsed
 				maxPriorityFeePerGas = transfer.MaxPriorityFeePerGas
 				maxFeePerGas         = transfer.MaxFeePerGas
+				baseFeePerGas = transfer.BaseFeePerGas
 
 				applicationFeeUsd *big.Rat
 			)
@@ -599,18 +600,19 @@ func main() {
 
 			normalisedMaxFeePerGasRat.Mul(normalisedMaxFeePerGasRat, ethPriceUsd)
 
-			// normalise the gas used by dividing it by the
-			// decimals and multiplying it by usd
-
-			normalisedGasUsedRat := new(big.Rat).Quo(gasUsedRat, ethereumDecimalsRat)
-
-			normalisedGasUsedRat.Mul(normalisedGasUsedRat, ethPriceUsd)
-
-			emission.GasUsedNormal, _ = normalisedGasUsedRat.Float64()
-
 			// calculate the effective gas price (with all the values normal)
 
-			normalisedEffectiveGasPriceRat := new(big.Rat).SetInt(&gasPrice.Int)
+			baseFeePerGasRat := new(big.Rat).SetInt(&baseFeePerGas.Int)
+
+			effectiveGasPrice := commonEth.CalculateEffectiveGasPrice(
+				baseFeePerGasRat,
+				maxFeePerGasRat,
+				maxPriorityFeePerGasRat,
+			)
+
+			normalisedEffectiveGasPriceRat := new(big.Rat).Quo(effectiveGasPrice, ethereumDecimalsRat)
+
+			normalisedEffectiveGasPriceRat.Mul(normalisedEffectiveGasPriceRat, ethPriceUsd)
 
 			emission.EffectiveGasPriceNormal, _ = normalisedEffectiveGasPriceRat.Float64()
 
@@ -618,7 +620,7 @@ func main() {
 			// the gas used by the effective gas price
 
 			transferFeeNormal := new(big.Rat).Mul(
-				normalisedGasUsedRat,
+				gasUsedRat,
 				normalisedEffectiveGasPriceRat,
 			)
 

@@ -199,3 +199,19 @@ func StaticCall(client *ethClient.Client, address ethCommon.Address, abi ethAbi.
 
 	return results, nil
 }
+
+// CalculateEffectiveGasPrice with baseFeePerGas + min(maxFeePerGas -
+// baseFeePerGas, maxPriorityFeePerGas)
+func CalculateEffectiveGasPrice(baseFeePerGas, maxFeePerGas, maxPriorityFeePerGas *big.Rat) *big.Rat {
+	maxFeePerGasMinBaseFeePerGas := new(big.Rat).Sub(maxFeePerGas, baseFeePerGas)
+
+	v := new(big.Rat)
+
+	if maxFeePerGas.Cmp(maxFeePerGasMinBaseFeePerGas) > 0 {
+		v.Add(maxPriorityFeePerGas, maxFeePerGas)
+	} else {
+		v.Add(maxPriorityFeePerGas, maxPriorityFeePerGas)
+	}
+
+	return v
+}

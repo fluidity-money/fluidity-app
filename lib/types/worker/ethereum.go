@@ -57,6 +57,7 @@ type (
 		BlockHash    ethereum.Hash          `json:"block_hash"`
 		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
 		BlockTime    uint64                 `json:"block_time"`
+		BaseFee      misc.BigInt            `json:"base_fee"`
 		Logs         []ethereum.Log         `json:"logs"`
 		Transactions []ethereum.Transaction `json:"transactions"`
 		BlockNumber  misc.BigInt            `json:"block_number"`
@@ -76,11 +77,13 @@ type (
 
 		// Parties involved in the swap, where sender recieves the majority
 		// of a potential reward, and one party could be a smart contract
-		SenderAddress    ethereum.Address         `json:"sender_address"`
+		SenderAddress ethereum.Address `json:"sender_address"`
 
-		RecipientAddress ethereum.Address         `json:"recipient_address"`
+		RecipientAddress ethereum.Address `json:"recipient_address"`
 
-		GasPrice uint64 `json:"gas_price"`
+		// ReceiptGasPrice is set by the gasPrice field in the
+		// receipt, which can differ
+		ReceiptGasPrice uint64 `json:"gas_price"`
 
 		// GasUsed by the transfer, should only be set by
 		// microservice-ethereum-application-server after fetching
@@ -99,7 +102,7 @@ type (
 		// microservice-ethereum-application-server
 		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
 
-		Decorator        *EthereumWorkerDecorator `json:"decorator"`
+		Decorator *EthereumWorkerDecorator `json:"decorator"`
 
 		AppEmissions EthereumAppFees `json:"app_emissions"`
 	}

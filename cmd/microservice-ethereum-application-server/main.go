@@ -78,11 +78,11 @@ func main() {
 	defer gethClient.Close()
 
 	worker.GetEthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
-
 		var (
 			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
 			blockHash    = blockLog.BlockHash
+			baseFee = blockLog.BaseFee
 		)
 
 		fluidTransfers, err := libEthereum.GetTransfers(
@@ -156,10 +156,7 @@ func main() {
 		// loop over application events in the block, add payouts as decorator
 		for _, transfer := range applicationTransfers {
 
-			var (
-				tranasction   = transfer.Transaction
-				baseFeePerGas = transfer.BaseFee
-			)
+			transaction := transfer.Transaction
 
 			var (
 				maxPriorityFeePerGas = transaction.GasTipCap
@@ -239,7 +236,7 @@ func main() {
 				Decorator:            decorator,
 				Transaction:          transfer.Transaction,
 				GasUsed:              gasUsed,
-				BaseFeePerGas:        baseFeePerGas,
+				BaseFeePerGas:        baseFee,
 				MaxPriorityFeePerGas: maxPriorityFeePerGas,
 				MaxFeePerGas:         maxFeePerGas,
 				AppEmissions:         emission,
