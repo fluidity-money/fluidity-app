@@ -19,7 +19,7 @@ export type IGeneralButtonProps =
 ButtonHTMLAttributes<HTMLButtonElement> &
 (GeneralButtonText | GeneralButtonLogo) & 
 {
-  version: "primary" | "secondary";
+  version: "primary" | "secondary" | "transparent";
   size: "small" | "medium" | "large";
   handleClick: () => void;
 }
