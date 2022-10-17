@@ -8,7 +8,7 @@ ALTER TABLE worker_emissions
 	ADD COLUMN gas_tip_cap_normal DOUBLE PRECISION,
 	ADD COLUMN transfer_fee_normal DOUBLE PRECISION;
 
--- migrate down
+-- migrate:down
 
 ALTER TABLE worker_emissions
 	DROP COLUMN gas_limit,

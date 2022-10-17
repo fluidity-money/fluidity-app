@@ -2,3 +2,4 @@
 lint
 docker
 test
+node_modules/
