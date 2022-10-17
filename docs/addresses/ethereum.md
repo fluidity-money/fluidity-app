@@ -26,7 +26,7 @@
 | WorkerConfig                | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
 | Compound liquidity provider | 0x372025203D25589eC3aDAd82652De78eC76fFabC |
 | cToken address              | 0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9 |
-| Current operator            | 0xe0ead43d9266154f777Cb831476be99f6c40B96d |
+| Current operator            | 0x6fc4061f63ad52be42b1d7075de9a0a9deb1ebbe |
 | Emergency council           | 0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd |
 | Decimals                    | 6                                          |
 | Short name                  | fUSDT                                      |
@@ -40,7 +40,7 @@
 | WorkerConfig                | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
 | Compound liquidity provider | 0xE87Adc9D382Eee54C1eDE017D6E5C1324D59F457 |
 | cToken address              | 0x39AA39c021dfbaE8faC545936693aC917d5E7563 |
-| Current operator            | 0xe0ead43d9266154f777Cb831476be99f6c40B96d |
+| Current operator            | 0xee39ca630adbe9f4492bfb524d5649dd95b75d28 |
 | Emergency council           | 0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd |
 | Decimals                    | 6                                          |
 | Short name                  | fUSDC                                      |
@@ -54,7 +54,7 @@
 | WorkerConfig            | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
 | AAVE liquidity provider | 0xFC66c25dbDb0606e7F9cA1d2754Eb0A0f8306dA9 |
 | aToken address          | 0x028171bCA77440897B824Ca71D1c56caC55b68A3 |
-| Current operator        | 0xe0ead43d9266154f777Cb831476be99f6c40B96d |
+| Current operator        | 0xaae4066827b7dcf213528354302ce33f1491283b |
 | Emergency council       | 0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd |
 | Decimals                | 18                                         |
 | Short name              | fDAI                                       |
@@ -68,7 +68,7 @@
 | WorkerConfig            | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
 | AAVE liquidity provider | 0x5E88f6dc0aa126FA28A137B24d0B4d7231352a0B |
 | aToken address          | 0x101cc05f4A51C0319f570d5E146a8C625198e636 |
-| Current operator        | 0xe0ead43d9266154f777Cb831476be99f6c40B96d |
+| Current operator        | 0x0b319db00d07c8fadfaaef13c910141a5da0aa8f |
 | Emergency council       | 0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd |
 | Decimals                | 18                                         |
 | Short name              | fTUSD                                      |
@@ -82,7 +82,7 @@
 | WorkerConfig            | 0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9 |
 | AAVE liquidity provider | 0xB7a2930e66D84Da74CdcFE4f97FaE9fC8f1114e8 |
 | aToken address          | 0xd4937682df3C8aEF4FE912A96A74121C0829E664 |
-| Current operator        | 0xe0ead43d9266154f777Cb831476be99f6c40B96d |
+| Current operator        | 0xc2d4dd737543c8cee7eb2ba2ffa8d74c7a9e9489 |
 | Emergency council       | 0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd |
 | Decimals                | 18                                         |
 | Short name              | fFRAX                                      |
