@@ -39,5 +39,7 @@ export {
   ArrowUp,
   ArrowTopRight,
   TriangleDown,
+  Trophy,
 } from "./Images";
 export { default as Spinner } from "./Spinner";
+export { default as TransparentVideo } from "./TransparentVideo";
