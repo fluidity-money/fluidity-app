@@ -40,6 +40,9 @@ export {
   ArrowTopRight,
   TriangleDown,
   Trophy,
+  DashboardIcon,
+  AssetsIcon,
+  DaoIcon,
 } from "./Images";
 export { default as Spinner } from "./Spinner";
 export { default as TransparentVideo } from "./TransparentVideo";
