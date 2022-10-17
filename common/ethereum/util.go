@@ -207,10 +207,10 @@ func CalculateEffectiveGasPrice(baseFeePerGas, maxFeePerGas, maxPriorityFeePerGa
 
 	v := new(big.Rat)
 
-	if maxFeePerGas.Cmp(maxFeePerGasMinBaseFeePerGas) > 0 {
-		v.Add(maxPriorityFeePerGas, maxFeePerGas)
+	if maxPriorityFeePerGas.Cmp(maxFeePerGasMinBaseFeePerGas) > 0 {
+		v.Add(baseFeePerGas, maxFeePerGasMinBaseFeePerGas)
 	} else {
-		v.Add(maxPriorityFeePerGas, maxPriorityFeePerGas)
+		v.Add(baseFeePerGas, maxPriorityFeePerGas)
 	}
 
 	return v
