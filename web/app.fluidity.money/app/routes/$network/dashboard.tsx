@@ -6,6 +6,8 @@ import {
   ArrowDown,
   ArrowUp,
   Text,
+  Trophy,
+  DashboardIcon,
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
@@ -61,12 +63,18 @@ export default function Dashboard() {
         <ul>
           {/* Dashboard Home */}
           <Link key={"send-money"} to={"home"}>
-            <li>Dashboard</li>
+            <li>
+              <DashboardIcon />
+              Dashboard
+            </li>
           </Link>
 
           {/* Rewards */}
           <Link key={"send-money"} to={"rewards"}>
-            <li>Rewards</li>
+            <li>
+              <Trophy />
+              Rewards
+            </li>
           </Link>
 
           {/* Assets - SCOPED OUT */}
@@ -90,7 +98,7 @@ export default function Dashboard() {
           <div>
             {/* Send */}
             <GeneralButton
-              version={"secondary"}
+              version={"transparent"}
               buttonType="icon before"
               size={"small"}
               handleClick={() => navigate("/send")}
@@ -101,7 +109,7 @@ export default function Dashboard() {
 
             {/* Receive */}
             <GeneralButton
-              version={"secondary"}
+              version={"transparent"}
               buttonType="icon before"
               size={"small"}
               handleClick={() => navigate("/receive")}
@@ -122,11 +130,11 @@ export default function Dashboard() {
 
             {/* Prize Money */}
             <GeneralButton
-              version={"secondary"}
+              version={"transparent"}
               buttonType="icon after"
               size={"small"}
               handleClick={() => navigate("/")}
-              icon={<ArrowDown />}
+              icon={<Trophy />}
             >
               $1000.00
             </GeneralButton>
