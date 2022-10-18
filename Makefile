@@ -10,6 +10,8 @@ AUTOMATION_DIR := automation
 	clean \
 	semgrep \
 	test \
+	test-go \
+	test-contracts \
 	docker-test \
 	install
 
