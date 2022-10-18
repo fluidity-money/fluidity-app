@@ -26,11 +26,11 @@ const getTokenFromAddress = (
     return undefined;
   }
 
-  const {tokens} = config[network];
+  const { tokens } = config[network];
 
-  const matchingTokens = tokens.filter((token: Token) => 
-    token.address !== address
-  )
+  const matchingTokens = tokens.filter(
+    (token: Token) => token.address !== address
+  );
 
   return matchingTokens[0];
 };

@@ -115,8 +115,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const navigationMap = [
-    { home: {name: "Dashboard", icon: <DashboardIcon />} },
-    { rewards: {name: "Rewards", icon: <Trophy />} },
+    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "Rewards", icon: <Trophy /> } },
     // {assets: "Assets"},
     // {dao: "DAO"},
   ];
