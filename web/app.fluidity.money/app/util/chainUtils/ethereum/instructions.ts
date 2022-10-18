@@ -9,6 +9,7 @@ import {
   getTokenForNetwork,
   getTokenFromAddress,
   B64ToUint8Array,
+<<<<<<< HEAD
   jsonPost,
 } from "~/util";
 import config from "~/webapp.config.server";
@@ -39,6 +40,11 @@ type ManualRewardRes = {
 }
 
 
+=======
+} from "~/util";
+import config from "~/webapp.config.server";
+
+>>>>>>> develop
 const claimRewards = async (address: string, networkId = 0) => {
   const ethServer = config.drivers["ethereum"][networkId].server;
 
@@ -47,6 +53,7 @@ const claimRewards = async (address: string, networkId = 0) => {
   const fluidTokensContracts = getTokenForNetwork(network);
 
   const fluidTokensConfig = fluidTokensContracts
+<<<<<<< HEAD
     // Get Token Configs from Fluid Token addresses
     .map((fToken) => getTokenFromAddress(network, fToken))
     // Assert list contains Token Configs
@@ -54,11 +61,20 @@ const claimRewards = async (address: string, networkId = 0) => {
 
   const unwrappedTokens = fluidTokensConfig
     // Assert list contains Fluid Token Configs
+=======
+    .map((fToken) => getTokenFromAddress(network, fToken))
+    .filter((config): config is Token => !!config);
+
+  const unwrappedTokens = fluidTokensConfig
+>>>>>>> develop
     .filter(
       (fTokenConfig): fTokenConfig is Token & { isFluidOf: string } =>
         !!fTokenConfig.isFluidOf
     )
+<<<<<<< HEAD
     // Get Token Configs from Fluid Token unwrapped counterpart addresses
+=======
+>>>>>>> develop
     .map((fTokenConfig) => {
       const unwrappedTokenConfig = getTokenFromAddress(
         network,
@@ -74,23 +90,41 @@ const claimRewards = async (address: string, networkId = 0) => {
         address: fTokenConfig.address,
       };
     })
+<<<<<<< HEAD
     // Assert list contains Token Configs
     .filter((unwrappedTokens): unwrappedTokens is Token => !!unwrappedTokens);
 
   const rewardingTokens = fluidTokensConfig.concat(unwrappedTokens);
   const manualRewardUrl = `${ethServer}/manual-reward`;
   
+=======
+    .filter((unwrappedTokens): unwrappedTokens is Token => !!unwrappedTokens);
+
+  const rewardingTokens = fluidTokensConfig.concat(unwrappedTokens);
+>>>>>>> develop
   const rewards = await Promise.all(
     rewardingTokens.map(async (tokenConfig) => {
       const manualRewardBody = {
         address,
         token_short_name: tokenConfig.symbol,
       };
+<<<<<<< HEAD
       
       const { error, payload } = await jsonPost<ManualRewardBody, ManualRewardRes>(
         manualRewardUrl,
         manualRewardBody
       );
+=======
+      const res = await fetch(`${ethServer}/manual-reward`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(manualRewardBody),
+      });
+
+      const { error, payload } = await res.json();
+>>>>>>> develop
 
       if (error || !payload) return 0;
 

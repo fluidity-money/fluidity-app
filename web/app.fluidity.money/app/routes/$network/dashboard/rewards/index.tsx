@@ -1,12 +1,16 @@
 import type { Chain } from "~/util/chainUtils/chains";
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { UserTransaction } from "~/queries/useUserTransactions";
 
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
-import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import useViewport from "~/hooks/useViewport";
-
-import { useUserTransactionCount, useUserTransactions } from "~/queries";
+import {
+  useUserTransactionCount,
+  useUserTransactions,
+  useUserUnclaimedRewards,
+} from "~/queries";
 import { useLoaderData } from "@remix-run/react";
+import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
 import { UserRewards } from "./common";
 import {
@@ -21,12 +25,79 @@ import TransactionTable from "~/components/TransactionTable";
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { network } = params;
+  const network = params.network ?? "";
+
+  const networkFee = 0.002;
+  const gasFee = 0.002;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
+
+  let unclaimedRewards;
+  let error;
+
+  try {
+    unclaimedRewards = await // Check address strips leading 0x
+    (await useUserUnclaimedRewards(network, address)).json();
+  } catch (err) {
+    error = "Could not fetch User Unclaimed Rewards";
+  }
+
+  if (error || unclaimedRewards.error) {
+    return redirect("/error", { status: 500, statusText: error });
+  }
+
+  const {
+    data: { ethereum_pending_winners: rewards },
+  } = unclaimedRewards;
+
+  const sanitisedRewards = rewards.filter(
+    (transaction: UserUnclaimedReward) => !transaction.reward_sent
+  );
+
+  const userUnclaimedRewards = sanitisedRewards.reduce(
+    (sum: number, transaction: UserUnclaimedReward) => {
+      const { win_amount, token_decimals } = transaction;
+
+      const decimals = 10 ** token_decimals;
+      return sum + win_amount / decimals;
+    },
+    0
+  );
+
+  let userTransactionCount;
+  let userTransactions;
+
+  try {
+    userTransactionCount = await (
+      await useUserTransactionCount(network ?? "", address)
+    ).json();
+    userTransactions = await (
+      await useUserTransactions(network ?? "", address, page)
+    ).json();
+  } catch (err) {
+    error = "The transaction explorer is currently unavailable";
+  } // Fail silently - for now.
+
+  if (error) {
+    return redirect("/error", { status: 500, statusText: error });
+  }
+
+  if (userTransactionCount.errors || userTransactions.errors) {
+    return json({
+      rewarders: rewarders,
+      transactions: [],
+      count: 0,
+      page,
+      network,
+      userUnclaimedRewards,
+      fluidPairs: 8,
+      networkFee,
+      gasFee,
+    });
+  }
 
   const {
     data: {
@@ -34,13 +105,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         transfers: [{ count }],
       },
     },
-  } = await (await useUserTransactionCount(address)).json();
+  } = userTransactionCount;
 
   const {
     data: {
       [network as string]: { transfers: transactions },
     },
-  } = await (await useUserTransactions(address, page)).json();
+  } = userTransactions;
 
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
@@ -77,8 +148,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     count,
     page,
     network,
-    userHasRewards: true,
+    userUnclaimedRewards: 6745,
     fluidPairs: 8,
+    networkFee,
+    gasFee,
   });
 };
 
@@ -105,10 +178,12 @@ type LoaderData = {
   transactions: Transaction[];
   count: number;
   page: number;
-  userHasRewards: boolean;
+  userUnclaimedRewards: number;
   rewarders: Rewarder[];
   network: Chain;
   fluidPairs: number;
+  networkFee: number;
+  gasFee: number;
 };
 
 export default function Rewards() {
@@ -118,8 +193,10 @@ export default function Rewards() {
     page,
     rewarders,
     network,
-    userHasRewards,
     fluidPairs,
+    networkFee,
+    gasFee,
+    userUnclaimedRewards,
   } = useLoaderData<LoaderData>();
 
   const { width } = useViewport();
@@ -135,13 +212,17 @@ export default function Rewards() {
     }
   );
 
-  console.log(bestPerformingRewarders);
-
   return (
     <>
       {/* Info Cards */}
-      {userHasRewards ? (
-        <UserRewards claimNow={mobileView} />
+      {userUnclaimedRewards > 0 ? (
+        <UserRewards
+          claimNow={mobileView}
+          unclaimedRewards={userUnclaimedRewards}
+          network={network}
+          networkFee={networkFee}
+          gasFee={gasFee}
+        />
       ) : (
         <div className="noUserRewards">
           <section id="spend-to-earn">

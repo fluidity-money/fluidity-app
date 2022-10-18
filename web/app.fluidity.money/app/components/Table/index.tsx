@@ -56,7 +56,7 @@ const Table = <T,>(props: ITable<T>) => {
       <div className="transactions-header row justify-between">
         {/* Item Count */}
         <Text>
-          {startIndex}-{endIndex} of {count} {itemName}
+          {count > 0 ? `${startIndex} - ${endIndex}` : 0} of {count} {itemName}
         </Text>
 
         {/* Filters - SCOPED OUT */}
@@ -123,7 +123,7 @@ const Table = <T,>(props: ITable<T>) => {
       <motion.div className="pagination" layout="position">
         <div className="pagination-numbers">
           {Array(pageCount)
-            .fill()
+            .fill(1)
             .map((_, i) => {
               return (
                 <Link

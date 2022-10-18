@@ -54,6 +54,50 @@ main > footer > section {
   gap: 20px;
 }
 
+/* .navbar-v2 {
+  
+} */
+
+.navbar-v2 li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  text-transform: uppercase;
+  font-family: "Aeonik Mono", monospace;
+
+  border-left: 0px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-v2 li {
+  text-emphasis: none;
+  text-decoration: none;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.navbar-v2 li > div {
+  width: 5px;
+  margin: 0 16px 0 0;
+  padding: 32px 0;
+  align-self: stretch;
+}
+
+.navbar-v2 li > div.active {
+  background-color: #fff;
+}
+
+.navbar-v2 li:hover {
+  border-left: 2px inset solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-v2 ul {
+  display: block;
+  padding: 0;
+}
+
 main > footer > section > a {
   color: #828381;
   text-underline-offset: 0.12em;
