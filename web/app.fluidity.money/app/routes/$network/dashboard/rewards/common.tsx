@@ -39,6 +39,8 @@ const UserRewards = ({
   const onClick = async () => {
     if (!claimNow) return navigate("../unclaimed");
 
+    if (claiming) return;
+
     setClaiming(true);
 
     const rewardsRes = await fetch(`claimreward?address=${address}`);
@@ -96,7 +98,7 @@ const UserRewards = ({
                   version={"primary"}
                   buttonType="icon only"
                   icon={<Spinner />}
-                  handleClick={() => {}}
+                  handleClick={onClick}
                   className="view-breakdown-button"
                 />
               ) : (
