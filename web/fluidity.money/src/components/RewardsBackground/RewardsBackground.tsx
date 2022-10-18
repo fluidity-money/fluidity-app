@@ -26,14 +26,14 @@ interface Reward {
 const rewardLimit = 10;
 
 const RewardsBackground = () => {
-  const { apiState } = useChainContext();
+  const { apiState, chain, network } = useChainContext();
   const { ref, inView } = useInView();
   const { width } = useViewport();
   const { weekWinnings } = apiState;
 
   const rewards: Reward[] = weekWinnings.map((winning) => ({
     token: winning.token_short_name,
-    amount: winning.winning_amount,
+    amount: winning.winning_amount / 10 ** winning.token_decimals,
     address: winning.winning_address,
     date: new Date(winning.awarded_time),
     transaction: winning.transaction_hash,
@@ -42,6 +42,19 @@ const RewardsBackground = () => {
   const carouselVariants = {
     appear: { x: 0 },
   };
+  
+  const txExplorerUrl = (txHash: string) => {
+    switch (true) {
+     case (chain === "ETH" && network === "STAGING"):
+        return `https://ropsten.etherscan.io/tx/${txHash}`
+     case (chain === "ETH" && network === "MAINNET"):
+        return `https://etherscan.io/tx/${txHash}`
+     case (chain === "SOL" && network === "STAGING"):
+        return `https://explorer.solana.com/tx/${txHash}?cluster=devnet`
+     case (chain === "SOL" && network === "MAINNET"):
+        return `https://explorer.solana.com/tx/${txHash}`
+  }
+  }
 
   const carouselInfo = (
     <div>
@@ -50,7 +63,7 @@ const RewardsBackground = () => {
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
             <a
-              href={`https://etherscan.io/tx/${transaction}`}
+              href={txExplorerUrl(transaction)}
               target="_blank"
               rel="noopener noreferrer"
             >
