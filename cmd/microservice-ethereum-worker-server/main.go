@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
+	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
@@ -195,7 +196,8 @@ func main() {
 
 	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
 
-	ethereumDecimalsRat := exponentiate(EthereumDecimals)
+	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
+	usdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
@@ -434,9 +436,8 @@ func main() {
 			// normalise the token price!
 			// tokenPrice / 10^(fluxDecimals-usdtDecimals)
 
-			UsdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
 
-			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, UsdtDecimalsRat)
+			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, usdtDecimalsRat)
 
 			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
 		}
@@ -457,19 +458,24 @@ func main() {
 			})
 		}
 
-		// normalise the block base fee, which we only record
+		// normalise the block base fee by dividing it by ethereum
+		// decimals then multiplying by price
 
 		blockBaseFeeRat := bigIntToRat(blockBaseFee)
 
-		blockBaseFeeNormalised := new(big.Rat).Quo(blockBaseFeeRat, ethereumDecimalsRat)
+		blockBaseFeeRatNormalised := new(big.Rat).Quo(
+			blockBaseFeeRat,
+			ethereumDecimalsRat,
+		)
 
-		blockBaseFeeNormalised.Mul(blockBaseFeeNormalised, ethPriceUsd)
+		blockBaseFeeRatNormalised.Mul(blockBaseFeeRatNormalised, ethPriceUsd)
 
 		emission.BlockBaseFee = blockBaseFee
 
 		emission.BlockBaseFeeNormal, _ = blockBaseFeeRat.Float64()
 
-		// normalise the size of the pool and the balance of the underlying to a normal number!
+		// normalise the size of the pool and the balance of
+		// the underlying to a normal number!
 
 		sizeOfThePool.Quo(sizeOfThePool, underlyingTokenDecimalsRat)
 
@@ -478,14 +484,17 @@ func main() {
 		for _, transfer := range fluidTransfers {
 
 			var (
-				transactionHash  = transfer.Transaction.Hash
-				senderAddress    = transfer.SenderAddress
-				recipientAddress = transfer.RecipientAddress
-				gasLimit         = transfer.Transaction.Gas
-				transferType     = transfer.Transaction.Type
-				gasTipCap        = transfer.Transaction.GasTipCap
-				appEmission      = transfer.AppEmissions
-				gasUsed          = transfer.GasUsed
+				transactionHash      = transfer.Transaction.Hash
+				senderAddress        = transfer.SenderAddress
+				recipientAddress     = transfer.RecipientAddress
+				gasLimit             = transfer.Transaction.Gas
+				transferType         = transfer.Transaction.Type
+				gasTipCap            = transfer.Transaction.GasTipCap
+				appEmission          = transfer.AppEmissions
+				gasUsed              = transfer.GasUsed
+				maxPriorityFeePerGas = transfer.MaxPriorityFeePerGas
+				maxFeePerGas         = transfer.MaxFeePerGas
+				baseFeePerGas = transfer.BaseFeePerGas
 
 				applicationFeeUsd *big.Rat
 			)
@@ -519,12 +528,17 @@ func main() {
 
 			emission.GasTipCap = gasTipCap
 
-			// remember the gas used
+			// remember the inputs to the gas actually used
+			// in usd calculation
 
 			emission.GasUsed = gasUsed
 
-			// normalise the gas limit to a rational number
-			// that's consistent with USDT
+			emission.BlockBaseFee = blockBaseFee
+
+			emission.MaxPriorityFeePerGas = maxPriorityFeePerGas
+
+			// normalise the gas limit by dividing it by
+			// ethereum decimals then multiplying it to usd
 
 			normalisedGasLimitRat := new(big.Rat).Quo(gasLimitRat, ethereumDecimalsRat)
 
@@ -532,7 +546,8 @@ func main() {
 
 			emission.GasLimitNormal, _ = normalisedGasLimitRat.Float64()
 
-			// and normalise the gas tip cap
+			// and normalise the gas tip cap by multiplying
+			// ethereum decimals then converting to USD
 
 			normalisedGasTipCapRat := new(big.Rat).Quo(gasTipCapRat, ethereumDecimalsRat)
 
@@ -540,26 +555,81 @@ func main() {
 
 			emission.GasTipCapNormal, _ = normalisedGasTipCapRat.Float64()
 
-			// normalise the gas used
+			// normalise the block base fee by dividing it
+			// by the decimals and then multiplying it by usd
 
-			normalisedGasUsedRat := new(big.Rat).Quo(gasUsedRat, ethereumDecimalsRat)
+			blockBaseFeeRat := new(big.Rat).SetInt(&blockBaseFee.Int)
 
-			normalisedGasUsedRat.Mul(normalisedGasUsedRat, ethPriceUsd)
+			normalisedBlockBaseFeePerGasRat := new(big.Rat).Quo(
+				blockBaseFeeRat,
+				ethereumDecimalsRat,
+			)
 
-			emission.GasUsedNormal, _ = normalisedGasUsedRat.Float64()
+			normalisedBlockBaseFeePerGasRat.Mul(
+				normalisedBlockBaseFeePerGasRat,
+				ethPriceUsd,
+			)
 
-			// use the receipt's recorded gasUsed field after it's been normalised
+			emission.BlockBaseFeeNormal, _ = normalisedBlockBaseFeePerGasRat.Float64()
 
-			transferFeeUsd := normalisedGasUsedRat
+			// normalise the max priority fee per gas (divide
+			// by ethereum decimals, multiply by usd price)
 
-			transferFeeUsd.Mul(transferFeeUsd, normalisedGasLimitRat)
+			maxPriorityFeePerGasRat := new(big.Rat).SetInt(&maxPriorityFeePerGas.Int)
 
-			emission.TransferFeeNormal, _ = transferFeeUsd.Float64()
+			normalisedMaxPriorityFeePerGasRat := new(big.Rat).Quo(
+				maxPriorityFeePerGasRat,
+				ethereumDecimalsRat,
+			)
+
+			normalisedMaxPriorityFeePerGasRat.Mul(
+				normalisedMaxPriorityFeePerGasRat,
+				ethPriceUsd,
+			)
+
+			// normalise the max fee per gas (divide by the
+			// number of ethereum decimals then multiply by
+			// the usd price of eth)
+
+			maxFeePerGasRat := new(big.Rat).SetInt(&maxFeePerGas.Int)
+
+			normalisedMaxFeePerGasRat := new(big.Rat).Quo(
+				maxFeePerGasRat,
+				ethereumDecimalsRat,
+			)
+
+			normalisedMaxFeePerGasRat.Mul(normalisedMaxFeePerGasRat, ethPriceUsd)
+
+			// calculate the effective gas price (with all the values normal)
+
+			baseFeePerGasRat := new(big.Rat).SetInt(&baseFeePerGas.Int)
+
+			effectiveGasPrice := commonEth.CalculateEffectiveGasPrice(
+				baseFeePerGasRat,
+				maxFeePerGasRat,
+				maxPriorityFeePerGasRat,
+			)
+
+			normalisedEffectiveGasPriceRat := new(big.Rat).Quo(effectiveGasPrice, ethereumDecimalsRat)
+
+			normalisedEffectiveGasPriceRat.Mul(normalisedEffectiveGasPriceRat, ethPriceUsd)
+
+			emission.EffectiveGasPriceNormal, _ = normalisedEffectiveGasPriceRat.Float64()
+
+			// calculate the transfer fee usd, by multiplying
+			// the gas used by the effective gas price
+
+			transferFeeNormal := new(big.Rat).Mul(
+				gasUsedRat,
+				normalisedEffectiveGasPriceRat,
+			)
+
+			emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
 
 			// if we have an application transfer, apply the fee
 
 			if applicationFeeUsd != nil {
-				transferFeeUsd.Add(transferFeeUsd, applicationFeeUsd)
+				transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
 			}
 
 			var (
@@ -576,7 +646,7 @@ func main() {
 			)
 
 			randomN, randomPayouts, _ := probability.WinningChances(
-				transferFeeUsd,
+				transferFeeNormal,
 				currentAtx,
 				sizeOfThePool,
 				underlyingTokenDecimalsRat,

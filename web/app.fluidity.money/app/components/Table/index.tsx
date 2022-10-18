@@ -70,7 +70,7 @@ const Table = <T,>(props: ITable<T>) => {
       </div>
 
       {/* Table */}
-      <table>
+      <table className="transaction-table">
         {/* Table Headings */}
         <thead>
           <tr>
@@ -121,13 +121,62 @@ const Table = <T,>(props: ITable<T>) => {
 
       {/* Pagination */}
       <motion.div className="pagination" layout="position">
-        {Array(pageCount).fill().map((_, i) => {
-          return (
-            <Link key={i} to={`?${pagination.pageQuery || "page"}=${i + 1}`}>
-              {i + 1}
-            </Link>
-          );
-        })}
+        <div className="pagination-numbers">
+          {Array(pageCount)
+            .fill()
+            .map((_, i) => {
+              return (
+                <Link
+                  className={
+                    page === i + 1 ? "current-pagination" : "pagination-number"
+                  }
+                  key={i}
+                  to={`?${pagination.pageQuery || "page"}=${i + 1}`}
+                >
+                  {i + 1}
+                </Link>
+              );
+            })}
+        </div>
+        <div className="pagination-arrows">
+          <Link
+            to={
+              page === 1 ? "" : `?${pagination.pageQuery || "page"}=${page - 1}`
+            }
+          >
+            <img
+              style={{ width: 16 }}
+              src={
+                page === 1
+                  ? "/images/icons/arrowLeftDark.svg"
+                  : "/images/icons/arrowLeftWhite.svg"
+              }
+              className={
+                page === 1 ? "pagination-arrow-off" : "pagination-arrow"
+              }
+            />
+          </Link>
+
+          <Link
+            to={
+              page === pageCount
+                ? ""
+                : `?${pagination.pageQuery || "page"}=${page + 1}`
+            }
+          >
+            <img
+              style={{ width: 16 }}
+              src={
+                page === pageCount
+                  ? "/images/icons/arrowRightDark.svg"
+                  : "/images/icons/arrowRightWhite.svg"
+              }
+              className={
+                page === pageCount ? "pagination-arrow-off" : "pagination-arrow"
+              }
+            />
+          </Link>
+        </div>
       </motion.div>
     </div>
   );

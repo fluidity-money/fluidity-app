@@ -5,9 +5,9 @@
 package main
 
 import (
+	"context"
 	"strconv"
 	"strings"
-	"context"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
@@ -78,11 +78,11 @@ func main() {
 	defer gethClient.Close()
 
 	worker.GetEthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
-
 		var (
 			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
 			blockHash    = blockLog.BlockHash
+			baseFee = blockLog.BaseFee
 		)
 
 		fluidTransfers, err := libEthereum.GetTransfers(
@@ -156,7 +156,14 @@ func main() {
 		// loop over application events in the block, add payouts as decorator
 		for _, transfer := range applicationTransfers {
 
-			transactionHashHex := transfer.Transaction.Hash.String()
+			transaction := transfer.Transaction
+
+			var (
+				maxPriorityFeePerGas = transaction.GasTipCap
+				maxFeePerGas         = transaction.GasFeeCap
+			)
+
+			transactionHashHex := transaction.Hash.String()
 
 			transactionHash := ethCommon.HexToHash(
 				transactionHashHex,
@@ -224,12 +231,15 @@ func main() {
 			}
 
 			decoratedTransfer := worker.EthereumDecoratedTransfer{
-				SenderAddress:    fromAddress,
-				RecipientAddress: toAddress,
-				Decorator:        decorator,
-				Transaction:      transfer.Transaction,
-				GasUsed:          gasUsed,
-				AppEmissions:     emission,
+				SenderAddress:        fromAddress,
+				RecipientAddress:     toAddress,
+				Decorator:            decorator,
+				Transaction:          transfer.Transaction,
+				GasUsed:              gasUsed,
+				BaseFeePerGas:        baseFee,
+				MaxPriorityFeePerGas: maxPriorityFeePerGas,
+				MaxFeePerGas:         maxFeePerGas,
+				AppEmissions:         emission,
 			}
 
 			decoratedTransfers = append(decoratedTransfers, decoratedTransfer)
