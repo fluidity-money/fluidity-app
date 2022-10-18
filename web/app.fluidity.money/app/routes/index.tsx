@@ -43,7 +43,9 @@ export default function IndexPage() {
         style={{ backgroundColor: "blue", marginLeft: "10px", padding: "20px" }}
         onClick={showNotification}
       >
-        Pop Notification Demo
+        <Text prominent size="xxl">
+          Pop Notification Demo | Test Button
+        </Text>
       </button>
     </div>
   );
