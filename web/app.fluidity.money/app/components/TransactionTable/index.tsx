@@ -20,12 +20,12 @@ type Transaction = {
   currency: string;
 };
 
-const ActivityLabel = (activity: Transaction, address: string) => {
+const activityLabel = (activity: Transaction, address: string) => {
   const { sender, currency } = activity;
   return sender === address ? `Sent ${currency}` : `Received ${currency}`;
 };
 
-const TimeLabel = (timestamp: number) => {
+const timeLabel = (timestamp: number) => {
   const isTransactionToday = isToday(timestamp * 1000);
   const isTransactionYesterday = isYesterday(timestamp * 1000);
 
@@ -69,7 +69,7 @@ const TransactionRow = (chain: Chain, address: string): IRow<Transaction> =>
                   : "/images/tokenIcons/usdtFluid.svg"
               }
             />
-            <Text>{ActivityLabel(data, address)}</Text>
+            <Text>{activityLabel(data, address)}</Text>
           </a>
         </td>
 
@@ -100,7 +100,7 @@ const TransactionRow = (chain: Chain, address: string): IRow<Transaction> =>
 
         {/* Time */}
         <td>
-          <Text>{TimeLabel(timestamp)}</Text>
+          <Text>{timeLabel(timestamp)}</Text>
         </td>
       </motion.tr>
     );

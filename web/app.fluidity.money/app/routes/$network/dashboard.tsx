@@ -1,5 +1,16 @@
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
+
 import { LinksFunction, LoaderFunction } from "@remix-run/node";
-import { Outlet, useLoaderData, Link, useNavigate } from "@remix-run/react";
+import {
+  Outlet,
+  useLoaderData,
+  Link,
+  useNavigate,
+  useResolvedPath,
+  useMatches,
+  useTransition,
+} from "@remix-run/react";
+import { useUserUnclaimedRewards } from "~/queries";
 
 import {
   GeneralButton,
@@ -10,16 +21,15 @@ import {
 
 import dashboardStyles from "~/styles/dashboard.css";
 
+import { motion } from "framer-motion";
+
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
 };
 
-type LoaderData = {
-  appName: string;
-  version: string;
-};
+const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url);
 
   const routeMapper = (route: string) => {
@@ -41,47 +51,110 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const pathname = urlPaths[urlPaths.length - 1];
 
+  const network = params.network ?? "";
+
+  let unclaimedRewards;
+  let error;
+
+  try {
+    unclaimedRewards = await // Check address strips leading 0x
+    (await useUserUnclaimedRewards(network, address)).json();
+
+    if (unclaimedRewards.error) {
+      error = "Could not fetch User Unclaimed Rewards";
+    }
+  } catch (err) {
+    error = "Could not fetch User Unclaimed Rewards";
+  }
+
+  if (error) {
+    return {
+      appName: routeMapper(pathname),
+      version: "1.5",
+      totalUnclaimedRewards: 0,
+    };
+  }
+
+  const {
+    data: { ethereum_pending_winners: rewards },
+  } = unclaimedRewards;
+
+  const sanitisedRewards = rewards.filter(
+    (transaction: UserUnclaimedReward) => !transaction.reward_sent
+  );
+
+  const totalUnclaimedRewards = sanitisedRewards.reduce(
+    (sum: number, transaction: UserUnclaimedReward) => {
+      const { win_amount, token_decimals } = transaction;
+
+      const decimals = 10 ** token_decimals;
+      return sum + win_amount / decimals;
+    },
+    0
+  );
+
   return {
     appName: routeMapper(pathname),
     version: "1.5",
+    totalUnclaimedRewards,
   };
 };
 
+type LoaderData = {
+  appName: string;
+  version: string;
+  totalUnclaimedRewards: number;
+};
+
 export default function Dashboard() {
-  const { appName, version } = useLoaderData<LoaderData>();
+  const { appName, version, totalUnclaimedRewards } =
+    useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
+
+  const navigationMap = [
+    { home: "Dashboard" },
+    { rewards: "Rewards" },
+    // {assets: "Assets"},
+    // {dao: "DAO"},
+  ];
+
+  const matches = useMatches();
+  const transitionPath = useTransition().location?.pathname;
+  const currentPath = transitionPath || matches[matches.length - 1].pathname;
+  const resolvedPaths = navigationMap.map((obj) =>
+    useResolvedPath(Object.keys(obj)[0])
+  );
+  const activeIndex = resolvedPaths.findIndex(
+    (path) => path.pathname === currentPath
+  );
 
   return (
     <>
       <header>
         <img src="/logo.svg" alt="Fluidity Logo" />
       </header>
-      <nav>
+
+      <nav className={"navbar-v2"}>
         <ul>
-          {/* Dashboard Home */}
-          <Link key={"send-money"} to={"home"}>
-            <li>Dashboard</li>
-          </Link>
+          {navigationMap.map((obj, index) => {
+            const key = Object.keys(obj)[0];
+            const value = Object.values(obj)[0];
+            const active = index === activeIndex;
 
-          {/* Rewards */}
-          <Link key={"send-money"} to={"rewards"}>
-            <li>Rewards</li>
-          </Link>
-
-          {/* Assets - SCOPED OUT */}
-          {/*
-          <Link key={"send-money"} to={"assets"}>
-            <li>Assets</li>
-          </Link>
-          */}
-
-          {/* DAO - SCOPED OUT */}
-          {/*
-          <Link key={"send-money"} to={"/send"}>
-            <li>DAO</li>
-          </Link>
-          */}
+            return (
+              <li key={key}>
+                {index === activeIndex ? (
+                  <motion.div className={"active"} layoutId="active" />
+                ) : (
+                  <div />
+                )}
+                <Text prominent={active}>
+                  <Link to={key}>{value}</Link>
+                </Text>
+              </li>
+            );
+          })}
         </ul>
       </nav>
       <main>
@@ -115,7 +188,7 @@ export default function Dashboard() {
               version={"primary"}
               buttonType="text"
               size={"small"}
-              handleClick={() => navigate("/")}
+              handleClick={() => navigate("../fluidify")}
             >
               Fluidify Money
             </GeneralButton>
@@ -125,10 +198,14 @@ export default function Dashboard() {
               version={"secondary"}
               buttonType="icon after"
               size={"small"}
-              handleClick={() => navigate("/")}
+              handleClick={() =>
+                totalUnclaimedRewards
+                  ? navigate("./rewards/unclaimed")
+                  : navigate("./rewards")
+              }
               icon={<ArrowDown />}
             >
-              $1000.00
+              ${totalUnclaimedRewards}
             </GeneralButton>
           </div>
         </nav>

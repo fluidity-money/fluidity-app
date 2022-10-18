@@ -34,7 +34,7 @@ const ProviderCard = ({
     <Card className={cardProps}>
       <section className="card-left">
         {/* Icon */}
-        <img src={iconUrl} alt={`${name}-icon`} />
+        <img src={iconUrl} alt={``} />
 
         {/* Provider Name */}
         <section className="card-section">
