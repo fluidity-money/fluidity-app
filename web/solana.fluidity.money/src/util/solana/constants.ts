@@ -67,16 +67,4 @@ export const tokenList: SolTokenList = [
     mintAddress: process.env.REACT_APP_FLU_MINT_UXD || "",
     decimals: 6,
   },
-  {
-    name: "TerraUSD",
-    symbol: "UST",
-    mintAddress: process.env.REACT_APP_BASE_MINT_UST || "",
-    decimals: 6,
-  },
-  {
-    name: "Fluid UST",
-    symbol: "fUST",
-    mintAddress: process.env.REACT_APP_FLU_MINT_UST || "",
-    decimals: 6,
-  }
 ]

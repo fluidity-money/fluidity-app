@@ -61,10 +61,15 @@ const TransactionRow = (chain: Chain, address: string): IRow<Transaction> =>
       >
         {/* Activity */}
         <td>
-          <a>
-            <Text>
-              {currency} {ActivityLabel(data, address)}
-            </Text>
+          <a className="table-activity">
+            <img
+              src={
+                currency === "USDC"
+                  ? "/images/tokenIcons/usdcFluid.svg"
+                  : "/images/tokenIcons/usdtFluid.svg"
+              }
+            />
+            <Text>{ActivityLabel(data, address)}</Text>
           </a>
         </td>
 
@@ -85,13 +90,18 @@ const TransactionRow = (chain: Chain, address: string): IRow<Transaction> =>
 
         {/* Account */}
         <td>
-          <Link to={getAddressExplorerLink(chain, txAddress)}>
+          <Link
+            className="table-address"
+            to={getAddressExplorerLink(chain, txAddress)}
+          >
             <Text>{trimAddress(txAddress)}</Text>
           </Link>
         </td>
 
         {/* Time */}
-        <td>{TimeLabel(timestamp)}</td>
+        <td>
+          <Text>{TimeLabel(timestamp)}</Text>
+        </td>
       </motion.tr>
     );
   };
