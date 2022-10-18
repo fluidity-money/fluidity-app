@@ -25,21 +25,13 @@ const getTokenFromAddress = (
     return undefined;
   }
 
-  const tokens = config[network].tokens;
+  const {tokens} = config[network];
 
-  let matchingToken;
+  const matchingTokens = tokens.filter((token: Token) => 
+    token.address !== address
+  )
 
-  // .every iterates until falsy value
-  tokens.every((token) => {
-    if (token.address !== address) {
-      return true;
-    }
-
-    matchingToken = token;
-    return false;
-  });
-
-  return matchingToken;
+  return matchingTokens[0];
 };
 
 export { getTokenForNetwork, getTokenFromAddress };
