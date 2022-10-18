@@ -26,7 +26,12 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
         <Heading as={width > breakpoint ? "h2" : "h3"}>35,000+</Heading>
-        <Heading as={width > breakpoint ? "h5" : "h6"}>Unique wallets (on testing)</Heading>
+        <Heading
+          className={styles.alignCenter}
+          as={width > breakpoint ? "h5" : "h6"}
+        >
+          Unique wallets (on testing)
+        </Heading>
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
@@ -56,8 +61,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         <div className={`${styles.stats} `}>
           <InfoStats />
         </div>
-        <div style={{ height: 254, width: "100%" }}>
-        </div>
+        <div style={{ height: 254, width: "100%" }}></div>
 
         <RewardsInfoBox
           // NOTE: Dummy data
