@@ -4,7 +4,7 @@ import { hydrateRoot } from "react-dom/client";
 import { ToolProvider } from "./components/ToolTip";
 
 hydrateRoot(
-  document,   
+  document,
   <StrictMode>
     <ToolProvider>
       <RemixBrowser />

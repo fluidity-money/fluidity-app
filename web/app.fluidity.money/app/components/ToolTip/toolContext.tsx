@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from "react";
 
-export const ToolContext = createContext<any>(null);
+export const ToolContext = createContext<any | void>(null);
 export const useToolTip = () => useContext(ToolContext);
