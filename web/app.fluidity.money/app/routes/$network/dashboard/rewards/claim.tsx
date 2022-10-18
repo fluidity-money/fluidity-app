@@ -44,7 +44,7 @@ const ClaimedRewards = () => {
   return (
     <div>
       {/* Bg Video*/}
-      
+
       {/* Navigation Bar */}
       <header>
         <img src="FluidLogo" alt="FluidLogo" />

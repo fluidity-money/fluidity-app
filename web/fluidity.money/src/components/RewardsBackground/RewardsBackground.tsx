@@ -23,6 +23,8 @@ interface Reward {
   transaction: string;
 }
 
+const rewardLimit = 10;
+
 const RewardsBackground = () => {
   const { apiState } = useChainContext();
   const { ref, inView } = useInView();
@@ -44,7 +46,7 @@ const RewardsBackground = () => {
   const carouselInfo = (
     <div>
       {rewards
-        .slice(10)
+        .slice(rewardLimit)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
             <a
@@ -85,10 +87,10 @@ const RewardsBackground = () => {
     <div className={styles.container}>
       <div className={styles.shade}></div>
       <div className={styles.rewardsBackground} ref={ref}>
-        {Array(10).map(() => (
+        {Array.from({ length: rewardLimit }).map(() => (
           <>
             <motion.div
-              initial={width < 500 ? { x: -500 } : { x: 1500 }}
+              initial={width < 500 && width > 0 ? { x: -500 } : { x: -1500 }}
               variants={carouselVariants}
               animate={inView && "appear"}
               transition={{ type: "tween", duration: 5 }}
@@ -98,7 +100,7 @@ const RewardsBackground = () => {
               </ContinuousCarousel>
             </motion.div>
             <motion.div
-              initial={width < 500 ? { x: 500 } : { x: 1500 }}
+              initial={width < 500 && width > 0 ? { x: 500 } : { x: 1500 }}
               variants={carouselVariants}
               animate={inView && "appear"}
               transition={{ type: "tween", duration: 5 }}

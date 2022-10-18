@@ -13,8 +13,8 @@ import (
 
 func TestTokenList(t *testing.T) {
 	const (
-		ExpectedTokensListEthereum = `:USDT:6,:USDC:6,:DAI:18,:TUSD:18,:FEI:18,:FRAX:18,:UST:6`
-		ExpectedTokensListSolana   = `:USDT:6,:USDC:6,:UXD:6,:UST:6`
+		ExpectedTokensListEthereum = `:USDT:6,:USDC:6,:DAI:18,:TUSD:18,:FEI:18,:FRAX:18`
+		ExpectedTokensListSolana   = `:USDT:6,:USDC:6,:UXD:6`
 	)
 
 	var (
@@ -51,10 +51,6 @@ func TestTokenList(t *testing.T) {
 			TokenName:     `FRAX`,
 			TokenDecimals: big.NewRat(1000000000000000000, 1),
 		},
-		{
-			TokenName:     `UST`,
-			TokenDecimals: big.NewRat(1000000, 1),
-		},
 	}
 
 	expectedSolanaTokensList = []TokenDetailsBase{
@@ -68,10 +64,6 @@ func TestTokenList(t *testing.T) {
 		},
 		{
 			TokenName:     `UXD`,
-			TokenDecimals: big.NewRat(1000000, 1),
-		},
-		{
-			TokenName:     `UST`,
 			TokenDecimals: big.NewRat(1000000, 1),
 		},
 	}
