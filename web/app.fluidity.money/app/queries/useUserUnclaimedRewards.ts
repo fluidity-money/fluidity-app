@@ -1,4 +1,4 @@
-import { gql, Queryable } from "~/util";
+import { gql, Queryable, jsonPost } from "~/util";
 
 const query: Queryable = {
   ethereum: gql`
@@ -20,25 +20,45 @@ const query: Queryable = {
   solana: gql``,
 };
 
+type UnclaimedRewardsReq = {
+  query: string;
+  variables: {
+    address: string;
+  };
+};
+
+type UnclaimedRewardsRes = {
+  data?: {
+    ethereum_pending_winners: {
+      address: string;
+      reward_sent: boolean;
+      token_decimals: number;
+      token_short_name: string;
+      transaction_hash: string;
+      win_amount: number;
+    }[];
+  };
+  error?: string;
+};
+
 const useUserUnclaimedRewards = async (network: string, address: string) => {
   if (network !== "ethereum") {
     throw Error(`network ${network} not supported`);
   }
 
-  const variables = {
-    address,
+  const body = {
+    query: query[network],
+    variables: {
+      address,
+    },
   };
 
-  return fetch("https://fluidity.hasura.app/v1/graphql", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query: query[network],
-      variables,
-    }),
-  });
+  const fluGqlEndpoint = "https://fluidity.hasura.app/v1/graphql";
+
+  return jsonPost<UnclaimedRewardsReq, UnclaimedRewardsRes>(
+    fluGqlEndpoint,
+    body
+  );
 };
 
 export type UserUnclaimedReward = {
