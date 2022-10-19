@@ -5,6 +5,7 @@
 export {
   numberToMonetaryString,
   numberToCommaSeparated,
+  toSignificantDecimals,
 } from "./numberConverters";
 export { trimAddress, trimAddressShort } from "./addressConverters";
 export { formatTo12HrDate, formatToGraphQLDate } from "./dateConverters";
