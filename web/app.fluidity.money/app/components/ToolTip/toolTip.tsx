@@ -33,7 +33,7 @@ export const ToolTip = (props: {
     }, delay);
 
     let width = 0;
-    let id = setInterval(() => {
+    const id = setInterval(() => {
       if (width < 100) setNewWidth((width += 0.2));
     }, 10);
 
