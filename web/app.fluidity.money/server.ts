@@ -55,33 +55,37 @@ app.use(morgan("tiny"));
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "build");
 
-const ethereumTokens = config.config["ethereum"].tokens.map((entry) => ({
-  token: entry.symbol,
-  address: entry.address,
-}));
+const ethereumTokens = config.config["ethereum"].tokens
+  .filter((entry) => entry.isFluidOf !== undefined)
+  .map((entry) => ({
+    token: entry.symbol,
+    address: entry.address,
+  }));
 
-const solanaTokens = config.config["solana"].tokens.map((entry) => ({
-  token: entry.symbol,
-  address: entry.address,
-}));
+const solanaTokens = config.config["solana"].tokens
+  .filter((entry) => entry.isFluidOf !== undefined)
+  .map((entry) => ({
+    token: entry.symbol,
+    address: entry.address,
+  }));
 
 const registry = new Map<string, Subscription>();
 
 io.on("connection", (socket) => {
-  socket.on("subscribeTransactions", (req) => {
+  socket.on("subscribeTransactions", ({ protocol, address }) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
     let TransactionsObservable: Observable<PipedTransaction> = EMPTY;
 
-    if (req.protocol === `ethereum`) {
+    if (protocol === `ethereum`) {
       TransactionsObservable = getTransactionsObservableForIn(
-        req.address,
+        protocol,
         {},
         ...ethereumTokens
       );
-    } else if (req.protocol === `solana`) {
+    } else if (protocol === `solana`) {
       TransactionsObservable = getTransactionsObservableForIn(
-        req.address,
+        protocol,
         {},
         ...solanaTokens
       );
@@ -93,9 +97,9 @@ io.on("connection", (socket) => {
 
     const transactionFilterObservable = getObservableForAddress(
       TransactionsObservable,
-      req.address
+      address
     );
-    
+
     registry.set(
       socket.id,
       transactionFilterObservable.subscribe((transaction) =>
