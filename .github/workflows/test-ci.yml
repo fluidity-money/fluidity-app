@@ -13,15 +13,12 @@ jobs:
   run-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
       - uses: actions/checkout@v3
         with:
           lfs: true
-      - name: Setup infrastructure
       - uses: isbang/compose-action@v1.3.2
         with:
           compose-file: "./tests/infrastructure/docker-compose.yml"
-      - name: Download dependencies
       - uses: cedrickring/golang-action@1.7.0
         with:
           args: go mod download -x
