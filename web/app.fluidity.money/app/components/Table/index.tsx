@@ -63,9 +63,9 @@ const Table = <T,>(props: ITable<T>) => {
         </Text>
 
         {/* Filters*/}
-        {(filters !== undefined) && (
+        {filters && (
           <div>
-            {filters!.map((filter, i) => (
+            {filters.map((filter, i) => (
               <button onClick={() => setActiveFilterIndex(i)}>
                 <Text prominent={activeFilterIndex === i}>
                   {filter.name}
