@@ -22,6 +22,7 @@ import {
 import dashboardStyles from "~/styles/dashboard.css";
 
 import { motion } from "framer-motion";
+import ProvideLiquidity from "~/components/ProvideLiquidity";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -211,6 +212,12 @@ export default function Dashboard() {
         </nav>
 
         <Outlet />
+
+        {/* Provide Luquidity*/}
+
+        <ProvideLiquidity />
+
+        {/* Footer */}
 
         <footer>
           {/* Links */}

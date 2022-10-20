@@ -187,3 +187,119 @@ main > footer > section > a {
 .pagination-arrows .pagination-arrow-off {
   cursor: auto;
 }
+
+#provide-liquidity {
+  width: auto;
+  padding: 2em;
+  margin-bottom: 6em;
+}
+
+.card-outer {
+  position: relative;
+  border-radius: 30px;
+}
+
+.card-outer::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+  border-radius: 12px;
+  background: conic-gradient(
+    from 209.59deg at 50% 50%,
+    #f3b8d8 0deg,
+    #b793e9 50.06deg,
+    #9fd4f3 85.94deg,
+    #ffd2c4 134.97deg,
+    #fbf3f3 172.05deg,
+    #d9abdf 200.75deg,
+    #af9ce3 224.67deg,
+    #aae4e1 259.36deg,
+    #c6ead0 298.82deg,
+    #ffffff 328.72deg,
+    #fdb5e4 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.card-inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  align-items: top;
+  background: unset;
+  border-radius: 12px;
+  border-style: none;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-width: 2px;
+  outline: unset;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.provide-liquidity-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.provide-liquidity-left > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-bottom: 2em;
+}
+
+.provide-liquidity-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.provide-heading {
+  margin: 0;
+}
+
+.liquidity-providers {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 0.75em;
+}
+
+.liquidity-providers > a {
+  cursor: pointer;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.liquidity-providers > a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.liquidity-providers > a > img {
+  width: 4.5em;
+}
+
+@media (max-width: 1220px) {
+  .card-inner {
+    grid-template-columns: 1fr;
+  }
+  .liquidity-providers {
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+  }
+  .provide-liquidity-left {
+    order: 1;
+    align-items: center;
+    text-align: center;
+  }
+}
