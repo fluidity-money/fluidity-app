@@ -2,8 +2,8 @@
 export \
 	FLU_DEBUG_DIE_FAST=true \
 	FLU_AMQP_QUEUE_ADDR=amqp://localhost \
-	FLU_POSTGRES_URI=postgres://fluidity:fluidity@localhost?sslmode=disable \
-	FLU_TIMESCALE_URI=postgres://fluidity:fluidity@localhost:5433?sslmode=disable \
+	FLU_POSTGRES_URI='postgres://fluidity:fluidity@localhost?sslmode=disable' \
+	FLU_TIMESCALE_URI='postgres://fluidity:fluidity@localhost:5433?sslmode=disable' \
 	FLU_DEBUG=true \
 	FLU_REDIS_ADDR=localhost:6379 \
 	FLU_WEB_LISTEN_ADDR=localhost:8080 \
@@ -15,6 +15,7 @@ export \
 	REACT_APP_WEBSOCKET=ws://localhost:8080/updates \
 	FLU_API_URI=http://localhost:8080 \
 	FLU_WALLET_URL=http://localhost:3000 \
-	FLU_ETHEREUM_URL=http://localhost:8545
+	FLU_ETHEREUM_URL=http://localhost:8545 \
+	FLU_DISCORD_WEBHOOK=not_a_webhook
 
 export FLU_WORKER_ID="tests-$(date +%s)"

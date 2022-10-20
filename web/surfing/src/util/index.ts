@@ -8,6 +8,7 @@ export type { SupportedChainsList } from "./chainProviders";
 
 export { SupportedChains } from "./chainProviders";
 export {
+  toSignificantDecimals,
   numberToMonetaryString,
   numberToCommaSeparated,
   trimAddress,
