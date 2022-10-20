@@ -7,8 +7,8 @@ WITH (timescaledb.continuous) AS
 SELECT 
     network,
     token_short_name,
-    count(*),
-    SUM(winning_amount / (10 ^ token_decimals)) / COUNT(*) as average_reward,
+    COUNT(*),
+    SUM(winning_amount / (10 ^ token_decimals)) / COUNT(*) AS average_reward,
     time_bucket(INTERVAL '1 month', awarded_time) AS awarded_month
 FROM winners
 GROUP BY awarded_month, network, token_short_name
