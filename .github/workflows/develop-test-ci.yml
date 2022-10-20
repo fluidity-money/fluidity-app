@@ -3,7 +3,7 @@ name: Run Tests (develop)
 on: 
   pull_request:
     branches:
-      - develop-contract-tests
+      - develop
 
 permissions:
   id-token: write
