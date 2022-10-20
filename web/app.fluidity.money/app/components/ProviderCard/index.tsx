@@ -21,12 +21,7 @@ export type Provider = {
   avgPrize: number;
 };
 
-const ProviderCard = ({
-  name,
-  prize,
-  avgPrize,
-  size,
-}: IProviderCard) => {
+const ProviderCard = ({ name, prize, avgPrize, size }: IProviderCard) => {
   const cardProps =
     size === "lg" ? "provider-card-large" : "provider-card-medium";
 

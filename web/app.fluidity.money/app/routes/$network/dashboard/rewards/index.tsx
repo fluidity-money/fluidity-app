@@ -37,15 +37,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
   // Check address strips leading 0x
-  const {data, error} = await useUserUnclaimedRewards(network, address);
+  const { data, error } = await useUserUnclaimedRewards(network, address);
 
   if (error || !data) {
     return redirect("/error", { status: 500, statusText: error });
   }
 
-  const {
-    ethereum_pending_winners: rewards,
-  } = data;
+  const { ethereum_pending_winners: rewards } = data;
 
   const sanitisedRewards = rewards.filter(
     (transaction: UserUnclaimedReward) => !transaction.reward_sent
@@ -60,7 +58,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     },
     0
   );
-  
+
   let userTransactionCount;
   let userTransactions;
   let errorMsg;

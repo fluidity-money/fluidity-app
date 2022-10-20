@@ -72,21 +72,21 @@ const ClaimedRewards = () => {
 
         {/* Fee Info*/}
         <section className="spread">
-        <section className="spread-text">
-          <Text>Network fee</Text>
-          <Text>${networkFee} FUSDC</Text>
-        </section>
-        <hr />
-        <section className="spread-text">
-          <Text>Gas fee</Text>
-          <Text>${gasFee} FUSDC</Text>
-        </section>
-        <hr />
+          <section className="spread-text">
+            <Text>Network fee</Text>
+            <Text>${networkFee} FUSDC</Text>
+          </section>
+          <hr />
+          <section className="spread-text">
+            <Text>Gas fee</Text>
+            <Text>${gasFee} FUSDC</Text>
+          </section>
+          <hr />
         </section>
 
-      {/* Navigation Buttons*/}
-      {/* Assets Button - SCOPED OUT */}
-      {/*
+        {/* Navigation Buttons*/}
+        {/* Assets Button - SCOPED OUT */}
+        {/*
       <GeneralButton
         version={"primary"}
         buttonType={"text"}
@@ -97,39 +97,39 @@ const ClaimedRewards = () => {
       </GeneralButton>
       */}
 
-      {/* Share on Twitter */}
-      <GeneralButton
-        className="spread"
-        version={"primary"}
-        buttonType={"text"}
-        size={"large"}
-        handleClick={() => {
-          navigate("../../../fluidify");
-        }}
-      >
-        Fluidify Your Money
-      </GeneralButton>
+        {/* Share on Twitter */}
+        <GeneralButton
+          className="spread"
+          version={"primary"}
+          buttonType={"text"}
+          size={"large"}
+          handleClick={() => {
+            navigate("../../../fluidify");
+          }}
+        >
+          Fluidify Your Money
+        </GeneralButton>
 
-      {/* Share on Twitter */}
-      <GeneralButton
-        className="spread"
-        version={"secondary"}
-        buttonType={"icon before"}
-        icon={"Twitter"}
-        size={"large"}
-        handleClick={() => {
-          console.log("Go To Share");
-        }}
-      >
-        Share
-      </GeneralButton>
-      <LinkButton
-        size={"small"}
-        type={"internal"}
-        handleClick={() => navigate("..")}
-      >
-        Reward History
-      </LinkButton>
+        {/* Share on Twitter */}
+        <GeneralButton
+          className="spread"
+          version={"secondary"}
+          buttonType={"icon before"}
+          icon={"Twitter"}
+          size={"large"}
+          handleClick={() => {
+            console.log("Go To Share");
+          }}
+        >
+          Share
+        </GeneralButton>
+        <LinkButton
+          size={"small"}
+          type={"internal"}
+          handleClick={() => navigate("..")}
+        >
+          Reward History
+        </LinkButton>
       </section>
     </div>
   );

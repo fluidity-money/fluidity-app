@@ -41,7 +41,8 @@ type ITable<T> = {
 };
 
 const Table = <T,>(props: ITable<T>) => {
-  const { itemName, pagination, data, renderRow, count, headings, filters } = props;
+  const { itemName, pagination, data, renderRow, count, headings, filters } =
+    props;
 
   const { rowsPerPage, page } = pagination;
 
@@ -51,7 +52,7 @@ const Table = <T,>(props: ITable<T>) => {
   const endIndex = Math.min(page * rowsPerPage, count);
 
   const isTransition = useTransition();
-  
+
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
 
   return (
@@ -66,10 +67,11 @@ const Table = <T,>(props: ITable<T>) => {
         {filters && (
           <div>
             {filters.map((filter, i) => (
-              <button onClick={() => setActiveFilterIndex(i)}>
-                <Text prominent={activeFilterIndex === i}>
-                  {filter.name}
-                </Text>
+              <button
+                key={`filter-${filter.name}`}
+                onClick={() => setActiveFilterIndex(i)}
+              >
+                <Text prominent={activeFilterIndex === i}>{filter.name}</Text>
               </button>
             ))}
           </div>
@@ -121,11 +123,11 @@ const Table = <T,>(props: ITable<T>) => {
               transitioning: {},
             }}
           >
-            {
-              data
-                .filter(data => filters ? filters[activeFilterIndex].filter(data) : true)
-                .map((row, i) => renderRow({ data: row, index: i }))
-            }
+            {data
+              .filter((data) =>
+                filters ? filters[activeFilterIndex].filter(data) : true
+              )
+              .map((row, i) => renderRow({ data: row, index: i }))}
           </motion.tbody>
         </AnimatePresence>
       </table>

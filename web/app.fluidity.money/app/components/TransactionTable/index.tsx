@@ -140,17 +140,18 @@ const TransactionTable = ({
       alignRight: true,
     },
   ];
-  
+
   const filters = [
     {
-      "filter": () => true,
+      filter: () => true,
       name: "ALL",
     },
     {
-      "filter": ({sender, receiver}: Transaction) => address in [sender, receiver],
+      filter: ({ sender, receiver }: Transaction) =>
+        address in [sender, receiver],
       name: "YOUR REWARDS",
-    }
-  ]
+    },
+  ];
 
   return (
     <Table
