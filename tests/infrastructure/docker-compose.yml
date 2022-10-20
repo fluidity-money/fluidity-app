@@ -1,0 +1,47 @@
+---
+version: "3"
+
+services:
+  redis:
+    image: redis:7.0-rc2
+    logging:
+      driver: none
+    ports:
+      - 0.0.0.0:6379:6379
+
+  postgres:
+    build:
+      context: ../../database
+      dockerfile: Dockerfile.postgres
+    environment:
+      POSTGRES_USER: fluidity
+      POSTGRES_PASSWORD: fluidity
+    ports:
+      - 0.0.0.0:5432:5432
+    volumes:
+      - postgres-var-lib:/var/lib/postgresql
+
+  timescale:
+    build:
+      context: ../../database
+      dockerfile: Dockerfile.timescale
+    environment:
+      POSTGRES_USER: fluidity
+      POSTGRES_PASSWORD: fluidity
+    ports:
+      - 0.0.0.0:5433:5432
+    volumes:
+      - timescale-var-lib:/var/lib/postgresql
+  rabbitmq:
+    image: rabbitmq:3.9.13-management
+    environment:
+      RABBITMQ_DEFAULT_USER: fluidity
+      RABBITMQ_DEFAULT_PASS: fluidity
+    logging:
+      driver: none
+    ports:
+      - 0.0.0.0:5672:5672
+      - 0.0.0.0:15672:15672
+volumes:
+  timescale-var-lib:
+  postgres-var-lib:
