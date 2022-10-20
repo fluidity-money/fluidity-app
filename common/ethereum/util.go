@@ -12,7 +12,9 @@ import (
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethClient "github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 func BigIntFromUint64(x uint64) (int *big.Int) {
@@ -21,6 +23,21 @@ func BigIntFromUint64(x uint64) (int *big.Int) {
 	int.SetUint64(x)
 
 	return
+}
+
+func BigIntFromHex(s string) (*misc.BigInt, error) {
+	int, err := hexutil.DecodeBig(s)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to decode a bigint from hex: %v",
+			err,
+		)
+	}
+
+	bigInt := misc.NewBigInt(*int)
+
+	return &bigInt, nil
 }
 
 func CoerceBoundContractResultsToRat(results []interface{}) (*big.Rat, error) {
