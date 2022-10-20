@@ -38,6 +38,10 @@ jobs:
         with:
           node-version: 16
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - run: |
+          pip install semgrep
           cargo install cargo-fuzz
           make test-contracts
