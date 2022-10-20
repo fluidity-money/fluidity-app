@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 jobs:
-  dm-migration:
+  db-migration:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:

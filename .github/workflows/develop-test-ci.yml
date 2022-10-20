@@ -10,7 +10,25 @@ permissions:
   contents: read
 
 jobs:
-  run-test:
+  test-go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - uses: isbang/compose-action@v1.3.2
+        with:
+          compose-file: "./tests/infrastructure/docker-compose.yml"
+      - uses: cedrickring/golang-action@1.7.0
+        with:
+          args: go mod download -x
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: |
+          pip install semgrep
+          make test-go
+  test-contracts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,21 +37,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - uses: isbang/compose-action@v1.3.2
-        with:
-          compose-file: "./tests/infrastructure/docker-compose.yml"
-      - uses: cedrickring/golang-action@1.7.0
-        with:
-          args: go mod download -x
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - run: |
-          pip install semgrep
           cargo install cargo-fuzz
-
-          cd contract/ethereum
-          npm install
-          cd ../..
-          make test
+          make test-contracts
