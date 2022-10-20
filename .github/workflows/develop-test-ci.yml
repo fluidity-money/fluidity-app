@@ -1,7 +1,7 @@
 name: Run Tests (develop)
 
 on: 
-  push:
+  pull_request:
     branches:
       - develop-contract-tests
 
