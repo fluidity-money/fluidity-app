@@ -10,12 +10,14 @@ import {
   useMatches,
   useTransition,
 } from "@remix-run/react";
+import { useState, useEffect, useContext } from "react";
+import { Web3Context } from "~/util/chainUtils/web3";
 import { useUserUnclaimedRewards } from "~/queries";
 
 import {
+  DashboardIcon,
   GeneralButton,
-  ArrowDown,
-  ArrowUp,
+  Trophy,
   Text,
 } from "@fluidity-money/surfing";
 
@@ -26,8 +28,6 @@ import { motion } from "framer-motion";
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
 };
-
-const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url);
@@ -53,70 +53,32 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const network = params.network ?? "";
 
-  let unclaimedRewards;
-  let error;
-
-  try {
-    unclaimedRewards = await // Check address strips leading 0x
-    (await useUserUnclaimedRewards(network, address)).json();
-
-    if (unclaimedRewards.error) {
-      error = "Could not fetch User Unclaimed Rewards";
-    }
-  } catch (err) {
-    error = "Could not fetch User Unclaimed Rewards";
-  }
-
-  if (error) {
-    return {
-      appName: routeMapper(pathname),
-      version: "1.5",
-      totalUnclaimedRewards: 0,
-    };
-  }
-
-  const {
-    data: { ethereum_pending_winners: rewards },
-  } = unclaimedRewards;
-
-  const sanitisedRewards = rewards.filter(
-    (transaction: UserUnclaimedReward) => !transaction.reward_sent
-  );
-
-  const totalUnclaimedRewards = sanitisedRewards.reduce(
-    (sum: number, transaction: UserUnclaimedReward) => {
-      const { win_amount, token_decimals } = transaction;
-
-      const decimals = 10 ** token_decimals;
-      return sum + win_amount / decimals;
-    },
-    0
-  );
-
   return {
     appName: routeMapper(pathname),
     version: "1.5",
-    totalUnclaimedRewards,
+    network,
   };
 };
 
 type LoaderData = {
   appName: string;
   version: string;
-  totalUnclaimedRewards: number;
+  network: string;
 };
 
 export default function Dashboard() {
-  const { appName, version, totalUnclaimedRewards } =
-    useLoaderData<LoaderData>();
+  const { appName, version, network } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
+  const { state } = useContext(Web3Context());
+  const account = state.account ?? "";
+
   const navigationMap = [
-    { home: "Dashboard" },
-    { rewards: "Rewards" },
-    // {assets: "Assets"},
-    // {dao: "DAO"},
+    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "Rewards", icon: <Trophy /> } },
+    // {assets: {name: "Assets", icon: <AssetsIcon />}},
+    // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
   const matches = useMatches();
@@ -129,6 +91,34 @@ export default function Dashboard() {
     (path) => path.pathname === currentPath
   );
 
+  const [unclaimedRewards, setUnclaimedRewards] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await useUserUnclaimedRewards(network, account);
+
+      if (error || !data) return;
+
+      const { ethereum_pending_winners: rewards } = data;
+
+      const sanitisedRewards = rewards.filter(
+        (transaction: UserUnclaimedReward) => !transaction.reward_sent
+      );
+
+      const totalUnclaimedRewards = sanitisedRewards.reduce(
+        (sum: number, transaction: UserUnclaimedReward) => {
+          const { win_amount, token_decimals } = transaction;
+
+          const decimals = 10 ** token_decimals;
+          return sum + win_amount / decimals;
+        },
+        0
+      );
+
+      setUnclaimedRewards(totalUnclaimedRewards);
+    })();
+  }, []);
+
   return (
     <>
       <header>
@@ -139,7 +129,7 @@ export default function Dashboard() {
         <ul>
           {navigationMap.map((obj, index) => {
             const key = Object.keys(obj)[0];
-            const value = Object.values(obj)[0];
+            const { name, icon } = Object.values(obj)[0];
             const active = index === activeIndex;
 
             return (
@@ -149,9 +139,12 @@ export default function Dashboard() {
                 ) : (
                   <div />
                 )}
-                <Text prominent={active}>
-                  <Link to={key}>{value}</Link>
-                </Text>
+                <Link to={key}>
+                  <Text prominent={active}>
+                    {icon}
+                    {name}
+                  </Text>
+                </Link>
               </li>
             );
           })}
@@ -162,6 +155,7 @@ export default function Dashboard() {
           <Text>{appName}</Text>
           <div>
             {/* Send */}
+            {/*
             <GeneralButton
               version={"secondary"}
               buttonType="icon before"
@@ -171,8 +165,10 @@ export default function Dashboard() {
             >
               Send
             </GeneralButton>
+            */}
 
             {/* Receive */}
+            {/*
             <GeneralButton
               version={"secondary"}
               buttonType="icon before"
@@ -182,6 +178,7 @@ export default function Dashboard() {
             >
               Recieve
             </GeneralButton>
+            */}
 
             {/* Fluidify */}
             <GeneralButton
@@ -199,13 +196,13 @@ export default function Dashboard() {
               buttonType="icon after"
               size={"small"}
               handleClick={() =>
-                totalUnclaimedRewards
+                unclaimedRewards
                   ? navigate("./rewards/unclaimed")
                   : navigate("./rewards")
               }
-              icon={<ArrowDown />}
+              icon={<Trophy />}
             >
-              ${totalUnclaimedRewards}
+              ${unclaimedRewards}
             </GeneralButton>
           </div>
         </nav>

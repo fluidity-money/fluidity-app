@@ -1,7 +1,8 @@
+import type { LinksFunction } from "@remix-run/node";
+
 import { LoaderFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useNavigate } from "@remix-run/react";
-
 import {
   Text,
   numberToMonetaryString,
@@ -9,6 +10,12 @@ import {
   LinkButton,
   Heading,
 } from "@fluidity-money/surfing";
+
+import claimStyles from "~/styles/dashboard/rewards/claim.css";
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: claimStyles }];
+};
 
 export const loader: LoaderFunction = async ({ request }) => {
   // TODO: Get reward TX and fetch reward that way
@@ -42,11 +49,11 @@ const ClaimedRewards = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div className="cover">
       {/* Bg Video*/}
 
       {/* Navigation Bar */}
-      <header>
+      <header id="claim-header">
         <img src="FluidLogo" alt="FluidLogo" />
         <LinkButton
           size={"small"}
@@ -58,27 +65,28 @@ const ClaimedRewards = () => {
       </header>
 
       {/* Claimed Info */}
-      <section>
+      <section id="claim-body">
         <Text>Congrats! You&rsquo;ve claimed</Text>
-        <Heading as="h5">{numberToMonetaryString(reward)} USD</Heading>
+        <Heading as="h1">{numberToMonetaryString(reward)} USD</Heading>
         <Text>The funds have been added to your wallet.</Text>
 
         {/* Fee Info*/}
-        <section>
-          <Text>Network fee</Text>
-          <Text>${networkFee} FUSDC</Text>
+        <section className="spread">
+          <section className="spread-text">
+            <Text>Network fee</Text>
+            <Text>${networkFee} FUSDC</Text>
+          </section>
+          <hr />
+          <section className="spread-text">
+            <Text>Gas fee</Text>
+            <Text>${gasFee} FUSDC</Text>
+          </section>
+          <hr />
         </section>
-        <hr />
-        <section>
-          <Text>Gas fee</Text>
-          <Text>${gasFee} FUSDC</Text>
-        </section>
-        <hr />
-      </section>
 
-      {/* Navigation Buttons*/}
-      {/* Assets Button - SCOPED OUT */}
-      {/*
+        {/* Navigation Buttons*/}
+        {/* Assets Button - SCOPED OUT */}
+        {/*
       <GeneralButton
         version={"primary"}
         buttonType={"text"}
@@ -89,37 +97,40 @@ const ClaimedRewards = () => {
       </GeneralButton>
       */}
 
-      {/* Share on Twitter */}
-      <GeneralButton
-        version={"primary"}
-        buttonType={"text"}
-        size={"large"}
-        handleClick={() => {
-          navigate("../../../fluidify");
-        }}
-      >
-        Fluidify Your Money
-      </GeneralButton>
+        {/* Share on Twitter */}
+        <GeneralButton
+          className="spread"
+          version={"primary"}
+          buttonType={"text"}
+          size={"large"}
+          handleClick={() => {
+            navigate("../../../fluidify");
+          }}
+        >
+          Fluidify Your Money
+        </GeneralButton>
 
-      {/* Share on Twitter */}
-      <GeneralButton
-        version={"secondary"}
-        buttonType={"icon before"}
-        icon={"Twitter"}
-        size={"large"}
-        handleClick={() => {
-          console.log("Go To Share");
-        }}
-      >
-        Share
-      </GeneralButton>
-      <LinkButton
-        size={"small"}
-        type={"internal"}
-        handleClick={() => navigate("..")}
-      >
-        Reward History
-      </LinkButton>
+        {/* Share on Twitter */}
+        <GeneralButton
+          className="spread"
+          version={"secondary"}
+          buttonType={"icon before"}
+          icon={"Twitter"}
+          size={"large"}
+          handleClick={() => {
+            console.log("Go To Share");
+          }}
+        >
+          Share
+        </GeneralButton>
+        <LinkButton
+          size={"small"}
+          type={"internal"}
+          handleClick={() => navigate("..")}
+        >
+          Reward History
+        </LinkButton>
+      </section>
     </div>
   );
 };
