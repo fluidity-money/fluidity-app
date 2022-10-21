@@ -1,4 +1,4 @@
-import { Observable, merge, filter } from "rxjs";
+import { Observable } from "rxjs";
 
 import IERC20 from "@openzeppelin/contracts/build/contracts/IERC20.json";
 
@@ -9,8 +9,9 @@ import BigNumber from "bn.js";
 import { PipedTransaction } from "./types";
 
 import config from "~/webapp.config.server";
+import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 
-const getTransactionsObservable = (
+export const ethGetTransactionsObservable = (
   token: string,
   address: string,
   network = 0
@@ -26,17 +27,20 @@ const getTransactionsObservable = (
       .on(
         "data",
         (event: {
-          returnValues: { src: string; dst: string; wad: BigNumber };
+          returnValues: { from: string; to: string; value: BigNumber };
         }) => {
           const {
-            src: source,
-            dst: destination,
-            wad: amount,
+            from: source,
+            to: destination,
+            value: amount,
           } = event.returnValues;
+
+          const uiTokenAmount = amountToDecimalString(amount.toString(), 6);
+
           const transaction = {
             source,
             destination,
-            amount: amount.toString(),
+            amount: shorthandAmountFormatter(uiTokenAmount, 3),
             token,
           };
           subscriber.next(transaction);
@@ -46,42 +50,3 @@ const getTransactionsObservable = (
         subscriber.error(error);
       });
   });
-
-type Options = {
-  network: number;
-};
-
-const OptionsDefault: Options = {
-  network: 0,
-};
-
-const getTransactionsObservableForIn = (
-  options: Partial<Options>,
-  ...tokens: {
-    token: string;
-    address: string;
-  }[]
-) => {
-  const { network } = { ...OptionsDefault, ...options };
-  return merge(
-    ...tokens.map(({ token, address }) =>
-      getTransactionsObservable(token, address, network)
-    )
-  );
-};
-
-const getObservableForAddress = (
-  observable: Observable<PipedTransaction>,
-  address: string
-) =>
-  observable.pipe(
-    filter(
-      ({ source, destination }) => source === address || destination === address
-    )
-  );
-
-export {
-  getTransactionsObservableForIn,
-  getTransactionsObservable,
-  getObservableForAddress,
-};
