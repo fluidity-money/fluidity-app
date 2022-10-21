@@ -9,7 +9,7 @@ export { B64ToUint8Array };
  * @param decimalPlaces number of decimals
  * @returns display string with decimal place
  */
- export const shorthandAmountFormatter = (
+export const shorthandAmountFormatter = (
   uiAmount: string,
   decimalPlaces: number
 ): string => {
