@@ -251,8 +251,12 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Highest performer"}>
-                    <ProviderIcon provider={bestPerformingRewarders[0].name} />
-                    {bestPerformingRewarders[0].name}
+                    <div className="highest-performer-child">
+                      <ProviderIcon
+                        provider={bestPerformingRewarders[0].name}
+                      />
+                      {bestPerformingRewarders[0].name}
+                    </div>
                   </LabelledValue>
                 </div>
 

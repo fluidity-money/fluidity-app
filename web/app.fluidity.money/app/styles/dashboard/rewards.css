@@ -34,9 +34,16 @@
   margin-top: 0;
 }
 
-.statistics-set {
+.statistics-set > div {
   display: flex;
   flex-direction: column;
+  gap: 0.25em;
+}
+
+.highest-performer-child {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
 }
 
 .statistics-row {
@@ -181,6 +188,10 @@
   display: flex;
   align-items: center;
   gap: 0.5em;
+}
+
+.card-left > img {
+  width: 2.5em;
 }
 
 .rewards-carousel {
