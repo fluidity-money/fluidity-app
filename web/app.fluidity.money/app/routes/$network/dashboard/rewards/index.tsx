@@ -1,3 +1,4 @@
+import type { Provider } from "~/components/ProviderCard";
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { UserTransaction } from "~/queries/useUserTransactions";
@@ -19,10 +20,10 @@ import {
   numberToMonetaryString,
   ManualCarousel,
 } from "@fluidity-money/surfing";
-import { LabelledValue, ProviderCard } from "~/components";
+import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import TransactionTable from "~/components/TransactionTable";
 
-const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
+const address = "bb004de25a81cb4ed6b2abd68bcc2693615b9e04";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
@@ -35,23 +36,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  let unclaimedRewards;
-  let error;
+  // Check address strips leading 0x
+  const { data, error } = await useUserUnclaimedRewards(network, address);
 
-  try {
-    unclaimedRewards = await // Check address strips leading 0x
-    (await useUserUnclaimedRewards(network, address)).json();
-  } catch (err) {
-    error = "Could not fetch User Unclaimed Rewards";
-  }
-
-  if (error || unclaimedRewards.error) {
+  if (error || !data) {
     return redirect("/error", { status: 500, statusText: error });
   }
 
-  const {
-    data: { ethereum_pending_winners: rewards },
-  } = unclaimedRewards;
+  const { ethereum_pending_winners: rewards } = data;
 
   const sanitisedRewards = rewards.filter(
     (transaction: UserUnclaimedReward) => !transaction.reward_sent
@@ -69,6 +61,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let userTransactionCount;
   let userTransactions;
+  let errorMsg;
 
   try {
     userTransactionCount = await (
@@ -78,11 +71,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       await useUserTransactions(network ?? "", address, page)
     ).json();
   } catch (err) {
-    error = "The transaction explorer is currently unavailable";
+    errorMsg = "The transaction explorer is currently unavailable";
   } // Fail silently - for now.
 
-  if (error) {
-    return redirect("/error", { status: 500, statusText: error });
+  if (errorMsg) {
+    return redirect("/error", { status: 500, statusText: errorMsg });
   }
 
   if (userTransactionCount.errors || userTransactions.errors) {
@@ -167,19 +160,12 @@ export type Transaction = {
   currency: string;
 };
 
-export type Rewarder = {
-  iconUrl: string;
-  name: string;
-  prize: number;
-  avgPrize: number;
-};
-
 type LoaderData = {
   transactions: Transaction[];
   count: number;
   page: number;
   userUnclaimedRewards: number;
-  rewarders: Rewarder[];
+  rewarders: Provider[];
   network: Chain;
   fluidPairs: number;
   networkFee: number;
@@ -239,7 +225,6 @@ export default function Rewards() {
 
             {hasRewarders && (
               <ProviderCard
-                iconUrl={bestPerformingRewarders[0].iconUrl}
                 name={bestPerformingRewarders[0].name}
                 prize={bestPerformingRewarders[0].prize}
                 avgPrize={bestPerformingRewarders[0].avgPrize}
@@ -266,7 +251,7 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Highest performer"}>
-                    <img src={bestPerformingRewarders[0].iconUrl} alt="" />
+                    <ProviderIcon provider={bestPerformingRewarders[0].name} />
                     {bestPerformingRewarders[0].name}
                   </LabelledValue>
                 </div>
@@ -326,7 +311,6 @@ export default function Rewards() {
             {bestPerformingRewarders.map((rewarder) => (
               <div className="carousel-card-container" key={rewarder.name}>
                 <ProviderCard
-                  iconUrl={rewarder.iconUrl}
                   name={rewarder.name}
                   prize={rewarder.prize}
                   avgPrize={rewarder.avgPrize}
@@ -341,27 +325,23 @@ export default function Rewards() {
   );
 }
 
-const rewarders = [
+const rewarders: Provider[] = [
   {
-    iconUrl: "./Solana.svg",
     name: "Solana",
     prize: 351879,
     avgPrize: 1234,
   },
   {
-    iconUrl: "./Solana.svg",
     name: "Polygon",
     prize: 361879,
     avgPrize: 1234,
   },
   {
-    iconUrl: "./Solana.svg",
     name: "Compound",
     prize: 351879,
     avgPrize: 1234,
   },
   {
-    iconUrl: "./Solana.svg",
     name: "Solana",
     prize: 351879,
     avgPrize: 1234,

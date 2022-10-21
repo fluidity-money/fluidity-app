@@ -10,6 +10,8 @@ body {
 
 body {
   background-image: url("/images/bg-blur-desktop.png");
+  background-size: auto;
+  background-repeat: no-repeat;
 }
 
 @media (max-width: 620px) {

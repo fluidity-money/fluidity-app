@@ -1,11 +1,12 @@
+import { useState } from "react";
 import { Link, useTransition } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Text } from "@fluidity-money/surfing";
 
-// type Filter<T> = {
-//   filter: (item: T) => boolean;
-//   name: string;
-// };
+type Filter<T> = {
+  filter: (item: T) => boolean;
+  name: string;
+};
 
 export type ColumnProps = {
   name: string;
@@ -36,11 +37,12 @@ type ITable<T> = {
   renderRow: IRow<T>;
 
   // Filters based on elementData
-  // filters?: Filter<T>[]; F
+  filters?: Filter<T>[];
 };
 
 const Table = <T,>(props: ITable<T>) => {
-  const { itemName, pagination, data, renderRow, count, headings } = props;
+  const { itemName, pagination, data, renderRow, count, headings, filters } =
+    props;
 
   const { rowsPerPage, page } = pagination;
 
@@ -51,6 +53,8 @@ const Table = <T,>(props: ITable<T>) => {
 
   const isTransition = useTransition();
 
+  const [activeFilterIndex, setActiveFilterIndex] = useState(0);
+
   return (
     <div>
       <div className="transactions-header row justify-between">
@@ -59,14 +63,19 @@ const Table = <T,>(props: ITable<T>) => {
           {count > 0 ? `${startIndex} - ${endIndex}` : 0} of {count} {itemName}
         </Text>
 
-        {/* Filters - SCOPED OUT */}
-        {/*filters && (
+        {/* Filters*/}
+        {filters && (
           <div>
-            {filters.map(filter => (
-              <span>{filter.name}</span>
+            {filters.map((filter, i) => (
+              <button
+                key={`filter-${filter.name}`}
+                onClick={() => setActiveFilterIndex(i)}
+              >
+                <Text prominent={activeFilterIndex === i}>{filter.name}</Text>
+              </button>
             ))}
           </div>
-        )*/}
+        )}
       </div>
 
       {/* Table */}
@@ -114,7 +123,11 @@ const Table = <T,>(props: ITable<T>) => {
               transitioning: {},
             }}
           >
-            {data.map((row, i) => renderRow({ data: row, index: i }))}
+            {data
+              .filter((data) =>
+                filters ? filters[activeFilterIndex].filter(data) : true
+              )
+              .map((row, i) => renderRow({ data: row, index: i }))}
           </motion.tbody>
         </AnimatePresence>
       </table>

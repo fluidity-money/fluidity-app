@@ -302,4 +302,13 @@ main > footer > section > a {
     align-items: center;
     text-align: center;
   }
+
+.cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 40px;
+  background: black;
+  height: 100%;
+  width: 100%;
 }
