@@ -3,8 +3,13 @@ import { gql, Queryable } from "~/util";
 import {jsonPost} from "~/util/api/rpc";
 
 const query: Queryable = {
+  // most recent month for each token
   ethereum: gql`query ExpectedRewards($network: network_blockchain!){
-    expected_rewards(where: {network: {_eq: $network}}) {
+    expected_rewards(
+      where: {network: {_eq: $network}}, 
+      order_by: {awarded_month: desc, token_short_name: desc}, 
+      distinct_on: token_short_name
+    ) {
       token_short_name
       network
       count
