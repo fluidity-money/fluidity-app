@@ -11,6 +11,8 @@ import {
   useTransition,
 } from "@remix-run/react";
 import { useUserUnclaimedRewards } from "~/queries";
+import { motion } from "framer-motion";
+import ProvideLiquidity from "~/components/ProvideLiquidity";
 
 import {
   GeneralButton,
@@ -20,9 +22,7 @@ import {
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
-
-import { motion } from "framer-motion";
-import ProvideLiquidity from "~/components/ProvideLiquidity";
+import { Chain } from "~/util/chainUtils/chains";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -73,6 +73,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       appName: routeMapper(pathname),
       version: "1.5",
       totalUnclaimedRewards: 0,
+      network: network,
     };
   }
 
@@ -98,6 +99,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     appName: routeMapper(pathname),
     version: "1.5",
     totalUnclaimedRewards,
+    network,
   };
 };
 
@@ -105,10 +107,11 @@ type LoaderData = {
   appName: string;
   version: string;
   totalUnclaimedRewards: number;
+  network: Chain;
 };
 
 export default function Dashboard() {
-  const { appName, version, totalUnclaimedRewards } =
+  const { appName, version, totalUnclaimedRewards, network } =
     useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
@@ -215,7 +218,7 @@ export default function Dashboard() {
 
         {/* Provide Luquidity*/}
 
-        <ProvideLiquidity />
+        <ProvideLiquidity network={network} />
 
         {/* Footer */}
 

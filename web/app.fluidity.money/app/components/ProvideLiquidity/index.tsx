@@ -1,38 +1,6 @@
 import { Card, Heading, Text } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
-
-const providers = [
-  {
-    name: "Orca",
-    img: "/images/providers/Orca.svg",
-    link: "https://www.orca.so/",
-  },
-  {
-    name: "Orca2",
-    img: "/images/providers/Orca.svg",
-    link: "https://www.orca.so/",
-  },
-  {
-    name: "Orca3",
-    img: "/images/providers/Orca.svg",
-    link: "https://www.orca.so/",
-  },
-  {
-    name: "Orca4",
-    img: "/images/providers/Orca.svg",
-    link: "https://www.orca.so/",
-  },
-  {
-    name: "Orca5",
-    img: "/images/providers/Orca.svg",
-    link: "https://www.orca.so/",
-  },
-  {
-    name: "Orca6",
-    img: "/images/providers/Orca.svg",
-    link: "https://www.orca.so/",
-  },
-];
+import { Chain } from "~/util/chainUtils/chains";
 
 const parent = {
   variantA: { scale: 1 },
@@ -44,7 +12,13 @@ const child = {
   variantB: { scale: 1.05 },
 };
 
-const ProvideLiquidity = () => {
+interface IProps {
+  network: Chain;
+}
+
+const ProvideLiquidity = ({ network }: IProps) => {
+  const providers = network === "ethereum" ? ethProviders : solProviders;
+
   const liqidityProviders = (
     <div className="liquidity-providers">
       {providers.map((provider) => (
@@ -93,3 +67,44 @@ const ProvideLiquidity = () => {
 };
 
 export default ProvideLiquidity;
+
+const ethProviders = [
+  {
+    name: "uniswap",
+    img: "/images/providers/Uniswap.svg",
+    link: "https://www.uniswap.org/",
+  },
+  {
+    name: "sushiswap",
+    img: "/images/providers/Sushiswap.svg",
+    link: "https://www.sushi.com/",
+  },
+  {
+    name: "dodo",
+    img: "/images/providers/DODO.png",
+    link: "https://www.dodoex.io/",
+  },
+];
+
+const solProviders = [
+  {
+    name: "solend",
+    img: "/images/providers/solend.png",
+    link: "https://www.solend.fi/",
+  },
+  {
+    name: "orca",
+    img: "/images/providers/Orca.svg",
+    link: "https://www.orca.so/",
+  },
+  {
+    name: "saber",
+    img: "/images/providers/saber.svg",
+    link: "https://www.saber.so/",
+  },
+  {
+    name: "jupiter",
+    img: "/images/providers/Jupiter.svg",
+    link: "https://www.jup.ag/",
+  },
+];
