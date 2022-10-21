@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  dm-migration:
+  db-migration:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: mainnet
