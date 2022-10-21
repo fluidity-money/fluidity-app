@@ -121,6 +121,7 @@ const TransactionTable = ({
   chain,
   address,
 }: ITransactionTable) => {
+  console.log(transactions);
   const txTableColumns = [
     {
       name: "ACTIVITY",
@@ -140,6 +141,18 @@ const TransactionTable = ({
     },
   ];
 
+  const filters = [
+    {
+      filter: () => true,
+      name: "ALL",
+    },
+    {
+      filter: ({ sender, receiver }: Transaction) =>
+        address in [sender, receiver],
+      name: "YOUR REWARDS",
+    },
+  ];
+
   return (
     <Table
       itemName="transactions"
@@ -151,6 +164,7 @@ const TransactionTable = ({
       count={count}
       data={transactions}
       renderRow={TransactionRow(chain, address)}
+      filters={filters}
     />
   );
 };

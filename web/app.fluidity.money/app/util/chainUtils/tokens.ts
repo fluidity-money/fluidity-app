@@ -21,15 +21,16 @@ const getTokenFromAddress = (
   address: string
 ): Token | undefined => {
   const { drivers, config } = webapp;
+
   if (!Object.keys(drivers).includes(network)) {
     return undefined;
   }
 
-  const {tokens} = config[network];
+  const { tokens } = config[network];
 
-  const matchingTokens = tokens.filter((token: Token) => 
-    token.address !== address
-  )
+  const matchingTokens = tokens.filter(
+    (token: Token) => token.address !== address
+  );
 
   return matchingTokens[0];
 };

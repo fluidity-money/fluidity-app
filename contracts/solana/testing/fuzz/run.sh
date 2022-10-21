@@ -13,6 +13,6 @@ fi
 
 fuzz_targets=$(echo $fuzz_targets | tr '\n' ' ' | tr ',' ' ')
 
-cargo +nightly fuzz run $fuzz_targets --fuzz-dir testing/fuzz -- -max_total_time=300
+cargo +nightly fuzz run $fuzz_targets --fuzz-dir testing/fuzz -- -max_total_time=10
 
 echo "All done - All fuzz targets exited normally"
