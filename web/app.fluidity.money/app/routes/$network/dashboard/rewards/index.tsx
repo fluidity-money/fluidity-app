@@ -21,6 +21,7 @@ import {
 } from "@fluidity-money/surfing";
 import { LabelledValue, ProviderCard } from "~/components";
 import TransactionTable from "~/components/TransactionTable";
+import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
 
 const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
@@ -69,6 +70,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let userTransactionCount;
   let userTransactions;
+  let expectedRewards;
 
   try {
     userTransactionCount = await (
@@ -77,6 +79,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     userTransactions = await (
       await useUserTransactions(network ?? "", address, page)
     ).json();
+    expectedRewards = await useGlobalRewardStatistics(network ?? "")
   } catch (err) {
     error = "The transaction explorer is currently unavailable";
   } // Fail silently - for now.
@@ -85,9 +88,16 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return redirect("/error", { status: 500, statusText: error });
   }
 
+  const rewarders = expectedRewards?.data.expected_rewards.map(reward => ({
+    iconUrl: "",
+    name: reward.token_short_name,
+    prize: reward.highest_reward,
+    avgPrize: reward.average_reward 
+  }))
+
   if (userTransactionCount.errors || userTransactions.errors) {
     return json({
-      rewarders: rewarders,
+      rewarders,
       transactions: [],
       count: 0,
       page,
@@ -143,7 +153,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // Get Best Rewarders - SCOPED OUT NO DATA
 
   return json({
-    rewarders: rewarders,
+    rewarders,
     transactions: sanitizedTransactions,
     count,
     page,
