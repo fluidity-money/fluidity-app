@@ -1,0 +1,5 @@
+web/app.fluidity.money/public/images/providers/Jupiter.svg filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/images/providers/saber.svg filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/images/providers/solend.png filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/images/providers/Sushiswap.svg filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/images/providers/Uniswap.svg filter=lfs diff=lfs merge=lfs -text
