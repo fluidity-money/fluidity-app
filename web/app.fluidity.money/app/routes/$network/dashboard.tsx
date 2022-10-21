@@ -24,7 +24,6 @@ import {
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
-import { Chain } from "~/util/chainUtils/chains";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -53,7 +52,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const pathname = urlPaths[urlPaths.length - 1];
 
   const network = params.network ?? "";
-
 
   return {
     appName: routeMapper(pathname),

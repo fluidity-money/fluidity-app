@@ -1,6 +1,5 @@
 import { Card, Heading, Text } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
-import { Chain } from "~/util/chainUtils/chains";
 
 const parent = {
   variantA: { scale: 1 },
@@ -13,7 +12,7 @@ const child = {
 };
 
 interface IProps {
-  network: Chain;
+  network: string;
 }
 
 const ProvideLiquidity = ({ network }: IProps) => {
