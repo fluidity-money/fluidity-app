@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
-  LinkButton,
   BlockchainModal,
   ChainSelectorButton,
   numberToMonetaryString,
