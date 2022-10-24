@@ -11,8 +11,11 @@ export {
   toSignificantDecimals,
   numberToMonetaryString,
   numberToCommaSeparated,
-  trimAddress,
-  trimAddressShort,
   formatTo12HrDate,
   formatToGraphQLDate,
+  normaliseAddress,
+  trimAddress,
+  trimAddressShort,
+  appendLeading0x,
+  trimLeading0x,
 } from "./formatters";
