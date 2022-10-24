@@ -10,6 +10,7 @@ import {
   formatTo12HrDate,
   Text,
 } from "@fluidity-money/surfing";
+import TextTransition, { presets } from "react-text-transition";
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
@@ -42,19 +43,19 @@ const RewardsBackground = () => {
   const carouselVariants = {
     appear: { x: 0 },
   };
-  
+
   const txExplorerUrl = (txHash: string) => {
     switch (true) {
-     case (chain === "ETH" && network === "STAGING"):
-        return `https://ropsten.etherscan.io/tx/${txHash}`
-     case (chain === "ETH" && network === "MAINNET"):
-        return `https://etherscan.io/tx/${txHash}`
-     case (chain === "SOL" && network === "STAGING"):
-        return `https://explorer.solana.com/tx/${txHash}?cluster=devnet`
-     case (chain === "SOL" && network === "MAINNET"):
-        return `https://explorer.solana.com/tx/${txHash}`
-  }
-  }
+      case chain === "ETH" && network === "STAGING":
+        return `https://ropsten.etherscan.io/tx/${txHash}`;
+      case chain === "ETH" && network === "MAINNET":
+        return `https://etherscan.io/tx/${txHash}`;
+      case chain === "SOL" && network === "STAGING":
+        return `https://explorer.solana.com/tx/${txHash}?cluster=devnet`;
+      case chain === "SOL" && network === "MAINNET":
+        return `https://explorer.solana.com/tx/${txHash}`;
+    }
+  };
 
   const carouselInfo = (
     <div>
@@ -77,7 +78,9 @@ const RewardsBackground = () => {
               />
 
               <Text as="p" prominent={true} className={styles.hover}>
-                {numberToMonetaryString(amount)}{" "}
+                <TextTransition springConfig={presets.stiff}>
+                  {numberToMonetaryString(amount)}{" "}
+                </TextTransition>
               </Text>
 
               <Text as="p" className={styles.hover}>
@@ -85,11 +88,15 @@ const RewardsBackground = () => {
               </Text>
 
               <Text as="p" className={styles.hoverUnderline}>
-                {`${trimAddressShort(address)}`}{" "}
+                <TextTransition springConfig={presets.stiff}>
+                  {`${trimAddressShort(address)}`}{" "}
+                </TextTransition>
               </Text>
 
               <Text as="p" className={styles.hover}>
-                {formatTo12HrDate(date)}
+                <TextTransition springConfig={presets.stiff}>
+                  {formatTo12HrDate(date)}
+                </TextTransition>
               </Text>
             </a>
           </div>
@@ -130,146 +137,3 @@ const RewardsBackground = () => {
 };
 
 export default RewardsBackground;
-
-const dummyRewards = [
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-];
