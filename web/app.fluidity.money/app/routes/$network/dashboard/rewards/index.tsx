@@ -263,7 +263,7 @@ export default function Rewards() {
         </div>
       )}
 
-      <Heading as={"h2"}>Reward Performance</Heading>
+      <Heading as={mobileView ? "h3" : "h2"}>Reward Performance</Heading>
 
       {/* Reward Performance */}
       {hasRewarders && (

@@ -1,5 +1,14 @@
+import type { LinksFunction } from "@remix-run/node";
+
 import { Display, Text } from "@fluidity-money/surfing";
 import { useToolTip } from "~/components";
+
+import opportunityStyles from "~/styles/opportunity.css";
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: opportunityStyles }];
+};
+
 
 export default function IndexPage() {
   const toolTip = useToolTip();
@@ -26,8 +35,8 @@ export default function IndexPage() {
     );
 
   return (
-    <div>
-      <Display>
+    <div >
+      <Display className="no-margin">
         <Text>
           <Text prominent>{"{address}"}</Text>
           {" claimed "}

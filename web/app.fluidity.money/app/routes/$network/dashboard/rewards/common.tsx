@@ -80,7 +80,7 @@ const UserRewards = ({
           <section id="unclaimed-left">
             {/* Icon */}
             <img
-              id="logo"
+              id="card-logo"
               src="/images/fluidTokensMetallicCropped.svg"
               alt="tokens"
               style={{ width: 200 }}
@@ -120,7 +120,11 @@ const UserRewards = ({
             <Heading className="claims-title" as="h5">
               Auto-claims
             </Heading>
-            <Text size="xs">{autoClaimInfo.join("\n")}</Text>
+            <Text size="xs">{
+              autoClaimInfo.map(
+                (text, i) => <>{text}<br/></>
+              )
+            }</Text>
             <hr className="gradient-line" />
             <Heading className="claims-title" as="h5">
               Instant-claim fees
