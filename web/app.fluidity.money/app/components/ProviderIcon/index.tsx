@@ -13,6 +13,7 @@ export type Providers =
   | "Saber"
   | "Solana";
 
+/* eslint-disable no-unused-vars */
 const providerIconUrlMap: { [P in Providers]: string } = {
   Aave: "/images/providers/aave-aave-logo.png",
   Aldrin: "/images/providers/Aldrin.svg",
