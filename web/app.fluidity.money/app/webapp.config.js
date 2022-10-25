@@ -29,6 +29,22 @@ const options = {
       "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     ],
   },
+  tokens: {
+    colours: {
+      fUSDC: "#2775ca",
+      fUSDT: "#12946c",
+      fDAI:  "#825902",
+      fTUSD: "#1da1f2",
+      fFRAX: "#e84142",
+    },
+    logos: {
+      fUSDC: "images/tokenIcons/usdcFluid.svg",
+      fUSDT: "images/tokenIcons/usdtFluid.svg",
+      fDAI:  "images/tokenIcons/daiFluid.svg",
+      fTUSD: "images/tokenIcons/tusdFluid.svg",
+      fFRAX: "images/tokenIcons/fraxFluid.svg",      
+    }
+  }
 };
 
 export default options;
