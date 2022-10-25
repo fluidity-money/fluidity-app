@@ -470,7 +470,6 @@ func main() {
 				gasUsed              = transfer.GasUsed
 				maxPriorityFeePerGas = transfer.MaxPriorityFeePerGas
 				maxFeePerGas         = transfer.MaxFeePerGas
-				baseFeePerGas        = transfer.BaseFeePerGas
 
 				applicationFeeUsd *big.Rat
 			)
