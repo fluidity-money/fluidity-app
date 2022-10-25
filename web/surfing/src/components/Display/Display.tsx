@@ -11,12 +11,13 @@ type DisplayProps = {
     small?: boolean
     medium?: boolean
     large?: boolean
+    size?: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg"
     color?: "white" | "gray";
 
     [key: string]: any
 };
 
-const Display = ({ children, large = true, color="white", ...props }: DisplayProps ) => {
+const Display = ({ children, large = true, size, color="white", ...props }: DisplayProps ) => {
     const sizeMap = {
         "xxs": "xxs",
         "extraSmall": "xs",
@@ -24,7 +25,7 @@ const Display = ({ children, large = true, color="white", ...props }: DisplayPro
         "medium": "md",
     };
 
-    const size = Object.entries(sizeMap).reduce((acc, [key, value]) => {
+    const dispSize = Object.entries(sizeMap).reduce((acc, [key, value]) => {
         if (props[key]) {
             return value;
         }
@@ -35,7 +36,7 @@ const Display = ({ children, large = true, color="white", ...props }: DisplayPro
 
     const { extraSmall, small, medium, large: _, ...rest } = props;
     
-    const sizeProps = styles[size];
+    const sizeProps = styles[size || dispSize];
     const colorProps = styles[color];
     const className = ` ${styles.display} ${sizeProps} ${colorProps} ${propClasses}`;
 
