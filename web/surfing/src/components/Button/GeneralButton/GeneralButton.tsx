@@ -7,12 +7,14 @@ import type { ButtonHTMLAttributes } from "react";
 import styles from "./GeneralButton.module.scss";
 
 type GeneralButtonText = {
-  buttonType: "text",
+  buttontype?: "text",
+  buttonType?: "text",
 }
 
 type GeneralButtonLogo = {
   icon: React.ReactNode,
-  buttonType: "icon before" | "icon after" | "icon only",
+  buttontype?: "icon before" | "icon after" | "icon only",
+  buttonType?: "icon before" | "icon after" | "icon only",
 }
 
 export type IGeneralButtonProps = 
