@@ -82,7 +82,7 @@ func main() {
 			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
 			blockHash    = blockLog.BlockHash
-			baseFee = blockLog.BaseFee
+			baseFee      = blockLog.BaseFee
 		)
 
 		fluidTransfers, err := libEthereum.GetTransfers(
@@ -148,7 +148,18 @@ func main() {
 				})
 			}
 
-			fluidTransfer.GasUsed = txReceipt.GasUsed
+			var (
+				transaction          = fluidTransfer.Transaction
+
+				gasUsed              = txReceipt.GasUsed
+				maxPriorityFeePerGas = transaction.GasTipCap
+				maxFeePerGas         = transaction.GasFeeCap
+			)
+
+			fluidTransfer.GasUsed = gasUsed
+			fluidTransfer.BaseFeePerGas = baseFee
+			fluidTransfer.MaxPriorityFeePerGas = maxPriorityFeePerGas
+			fluidTransfer.MaxFeePerGas = maxFeePerGas
 
 			decoratedTransfers[i] = fluidTransfer
 		}
