@@ -78,3 +78,19 @@ export const clearTrailingZeros = (value: string) => {
 
   return value;
 };
+
+/**
+ * @param address string
+ * @returns abbrevates long addresses e.g 0x1234567890 converted to 0x123...890
+ */
+export const trimAddress = (address: string): string => {
+  const addressSize = 12 / 2;
+  const leftSide = address.substring(0, addressSize);
+
+  const rightSide = address.substring(
+    address.length - addressSize,
+    addressSize
+  );
+
+  return leftSide + ".." + rightSide;
+};
