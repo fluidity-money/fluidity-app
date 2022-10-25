@@ -31,7 +31,7 @@ jobs:
         with:
           command: |
             flu migrate-db \
-              --network ${{ github.event.inputs.network }} \
-              --environment ${{ github.event.inputs.environment }} \
+              --network all \
+              --environment mainnet \
               --tag $GITHUB_SHA
 
