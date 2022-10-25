@@ -49,6 +49,9 @@ const (
 	// UsdtDecimals to normalise values to
 	UsdtDecimals = 1e6
 
+	// Uniswap's oracle returns numbers with 6 decimals
+	UniswapOracleDecimals = 1e6
+
 	// EthereumDecimals to normalise values to
 	EthereumDecimals = 1e18
 )
@@ -198,6 +201,7 @@ func main() {
 
 	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
 	usdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
+	uniswapOracleDecimalsRat := big.NewRat(UniswapOracleDecimals, 1)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
@@ -350,6 +354,13 @@ func main() {
 				"ETH",
 			)
 
+			// the uniswap oracle return usd price with 6 decimals!
+
+			ethPriceUsd.Quo(
+				ethPriceUsd,
+				uniswapOracleDecimalsRat,
+			)
+
 		case BackendAave:
 			ethPriceUsd, err = aave.GetPrice(
 				gethClient,
@@ -371,10 +382,6 @@ func main() {
 				k.Payload = err
 			})
 		}
-
-		// normalise the ethereum price!
-
-		ethPriceUsd.Quo(ethPriceUsd, ethereumDecimalsRat)
 
 		var tokenPriceInUsdt *big.Rat
 
