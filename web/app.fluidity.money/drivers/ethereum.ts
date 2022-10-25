@@ -9,7 +9,11 @@ import BigNumber from "bn.js";
 import { PipedTransaction } from "./types";
 
 import config from "~/webapp.config.server";
-import { amountToDecimalString, shorthandAmountFormatter, trimAddress } from "~/util";
+import {
+  amountToDecimalString,
+  shorthandAmountFormatter,
+  trimAddress,
+} from "~/util";
 
 export const ethGetTransactionsObservable = (
   token: string,

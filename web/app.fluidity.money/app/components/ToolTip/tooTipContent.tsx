@@ -4,7 +4,7 @@ import { Text } from "@fluidity-money/surfing";
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
 type IToolTipContentProps = {
-  tokenLogoSrc: string;
+  tokenLogoSrc?: string;
   boldTitle: string;
   details: string;
   linkLabel: `ASSETS` | `DETAILS`;

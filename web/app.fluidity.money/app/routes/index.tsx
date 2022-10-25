@@ -1,16 +1,65 @@
 import { Display, Text } from "@fluidity-money/surfing";
+import { useLoaderData } from "@remix-run/react";
 
-import config from "../webapp.config";
+import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
 
 import { useToolTip } from "~/components";
 import { ToolTipContent } from "~/components/ToolTip";
+import { LoaderFunction } from "@remix-run/node";
+
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const url = new URL(request.url);
+
+  const routeMapper = (route: string) => {
+    switch (route.toLowerCase()) {
+      case "home":
+        return "DASHBOARD";
+      case "rewards":
+        return "REWARDS";
+      case "assets":
+        return "ASSETS";
+      case "dao":
+        return "DAO";
+      default:
+        return "DASHBOARD";
+    }
+  };
+
+  const urlPaths = url.pathname.split("/");
+
+  const pathname = urlPaths[urlPaths.length - 1];
+
+  const network = params.network ?? "";
+
+  const token = config.config;
+
+  return {
+    appName: routeMapper(pathname),
+    version: "1.5",
+    network,
+    token,
+  };
+};
+
+type LoaderData = {
+  token: typeof config.config;
+  network: string;
+};
 
 export default function IndexPage() {
   const toolTip = useToolTip();
+
+  const { token, network } = useLoaderData<LoaderData>();
   const showNotification = () => {
-    // This just used to test ui
+    // This is here for testing purposes
+    const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
+      (entry) => entry.symbol === `fUSDC`
+    );
+
+    console.log(fToken);
+
     toolTip.open(
       `#0000ff`,
       <ToolTipContent
@@ -21,63 +70,39 @@ export default function IndexPage() {
         linkUrl={"#"}
       />
     );
-  }
-    
-    
+  };
+
+  // -> Temporary placement : later refactor these block to route/$network
   const socket = io();
-  
-  const connected_wallet = "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
-  
+  // Test for now, wallet address should be gotten when a wallet is connected
+  const connected_wallet = "AHxyQvWfG5adQAFgURHhWXp5QoD1rvyPhWTAaZVXjpJy";
+
   socket.emit("subscribeTransactions", {
     protocol: `solana`,
     address: connected_wallet,
   });
 
-  socket.on("Transactions", (log :PipedTransaction) => {
-
-    let tokenProps = config.tokens;
-
-    let bgColour :string;
-    let tokenLogo :string;
-
-    switch(log.token){
-      case `fUSDC`: 
-        bgColour = tokenProps.colours.fUSDC;
-        tokenLogo = tokenProps.logos.fUSDC;
-        break;
-      case `fUSDT`: 
-        bgColour = config.tokens.colours.fUSDT;
-        tokenLogo = tokenProps.logos.fUSDC;
-        break;
-      case `fTUSD`: 
-        bgColour = tokenProps.colours.fTUSD;
-        tokenLogo = tokenProps.logos.fTUSD;
-        break;
-      case `fDAI`: 
-        bgColour = tokenProps.colours.fDAI;
-        tokenLogo = tokenProps.logos.fDAI;
-        break;
-      case `fFRAX`: 
-        bgColour = tokenProps.colours.fFRAX;
-        tokenLogo = tokenProps.logos.fFRAX;
-        break;
-      default:
-        bgColour = `fffffff`
-        tokenLogo = ``;
-    }
+  socket.on("Transactions", (log: PipedTransaction) => {
+    const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
+      (entry) => entry.symbol === log.token
+    );
 
     toolTip.open(
-      bgColour
-      ,
+      fToken.at(0)?.colour,
       <ToolTipContent
-        tokenLogoSrc={tokenLogo}
+        tokenLogoSrc={fToken.at(0)?.logo}
         boldTitle={log.amount + ` ` + log.token}
-        details={log.source === connected_wallet ? `Sent to ` + log.destination : `Received from ` + log.source}
+        details={
+          log.source === connected_wallet
+            ? `Sent to ` + log.destination
+            : `Received from ` + log.source
+        }
         linkLabel={"ASSETS"}
         linkUrl={"#"}
       />
-    )
+    );
   });
+
   return (
     <div>
       <Display>
