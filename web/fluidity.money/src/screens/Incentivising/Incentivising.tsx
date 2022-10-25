@@ -36,15 +36,13 @@ const Incentivising = () => {
         <br />
         <Display
           className={styles.backgroundText}
-          large={width > breakpoint && true}
-          small={width < breakpoint && true}
+          size={width > breakpoint ? "lg" : "sm"}
         >
           Incentivising
         </Display>
         <Display
           className={styles.backgroundText}
-          large={width > breakpoint && true}
-          small={width < breakpoint && true}
+          size={width > breakpoint ? "lg" : "sm"}
         >
           blockchain utility
         </Display>

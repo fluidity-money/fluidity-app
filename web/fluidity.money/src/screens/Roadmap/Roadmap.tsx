@@ -14,7 +14,7 @@ const Roadmap = () => {
   const breakpoint = 860;
   
   const button = <GeneralButton
-    buttonType={"icon after"}
+    buttontype={"icon after"}
     version={"secondary"}
     size={"large"}
     handleClick={() => {window.location.href = "https://docs.fluidity.money/docs/fundamentals/roadmap"}}
