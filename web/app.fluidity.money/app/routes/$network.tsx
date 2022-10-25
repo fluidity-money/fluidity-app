@@ -1,6 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 
-import config from "~/webapp.config.js";
+import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 

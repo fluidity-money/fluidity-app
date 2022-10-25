@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "@remix-run/react";
 import {
   Card,
@@ -7,19 +8,62 @@ import {
   GeneralButton,
   LinkButton,
   Heading,
+  Spinner,
 } from "@fluidity-money/surfing";
+
+const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
 
 type IUserRewards = {
   claimNow: boolean;
+  unclaimedRewards: number;
+  network: string;
+  networkFee: number;
+  gasFee: number;
 };
 
-const UserRewards = ({ claimNow }: IUserRewards) => {
+const UserRewards = ({
+  claimNow,
+  unclaimedRewards,
+  network,
+  networkFee,
+  gasFee,
+}: IUserRewards) => {
   const navigate = useNavigate();
+
+  const [claiming, setClaiming] = useState(false);
 
   const buttonText = claimNow ? "Claim now with fees" : "View breakdown";
 
-  const onClick = () => {
-    return claimNow ? console.log("claim") : navigate("../unclaimed");
+  const networkNotEth = network !== "ethereum";
+
+  const onClick = async () => {
+    if (!claimNow) return navigate("../unclaimed");
+
+    if (claiming) return;
+
+    setClaiming(true);
+
+    const rewardsRes = await fetch(`claimreward?address=${address}`);
+
+    if (!rewardsRes.ok) {
+      // Toast Error
+      setClaiming(false);
+
+      return;
+    }
+
+    const { rewards } = await rewardsRes.json();
+
+    const rewardedSum = rewards.reduce(
+      (sum: number, reward: number) => sum + reward,
+      0
+    );
+    const networkFee = 0.002;
+    const gasFee = 0.002;
+
+    return navigate(
+      `../claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
+    );
   };
 
   return (
@@ -46,17 +90,28 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
             <section id="unclaimed">
               <Text size="md">Unclaimed fluid rewards</Text>
               <Display className="unclaimed-total" size="sm">
-                {numberToMonetaryString(6745)}
+                {numberToMonetaryString(unclaimedRewards)}
               </Display>
-              <GeneralButton
-                size={"large"}
-                version={"primary"}
-                buttonType="text"
-                handleClick={onClick}
-                className="view-breakdown-button"
-              >
-                {buttonText}
-              </GeneralButton>
+              {claiming ? (
+                <GeneralButton
+                  size={"large"}
+                  version={"primary"}
+                  buttonType="icon only"
+                  icon={<Spinner />}
+                  handleClick={onClick}
+                  className="view-breakdown-button"
+                />
+              ) : (
+                <GeneralButton
+                  size={"large"}
+                  version={"primary"}
+                  buttonType="text"
+                  handleClick={onClick}
+                  className="view-breakdown-button"
+                >
+                  {networkNotEth ? "Coming Soon!" : buttonText}
+                </GeneralButton>
+              )}
             </section>
           </section>
 
@@ -72,12 +127,12 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
             </Heading>
             <section className="fees">
               <Text size="xs">Network fee</Text>
-              <Text size="xs">$0.002 FUSDC</Text>
+              <Text size="xs">${networkFee} FUSDC</Text>
             </section>
             <hr className="line" />
             <section className="fees">
               <Text size="xs">Gas fee</Text>
-              <Text size="xs">$0.002 FUSDC</Text>
+              <Text size="xs">${gasFee} FUSDC</Text>
             </section>
             <hr className="line" />
           </section>
@@ -97,7 +152,7 @@ const UserRewards = ({ claimNow }: IUserRewards) => {
           <LinkButton
             size={"small"}
             type={"internal"}
-            handleClick={() => navigate("../performance")}
+            handleClick={() => navigate("..")}
           >
             Reward History
           </LinkButton>

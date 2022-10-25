@@ -2,6 +2,7 @@ import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import GeneralButton from "./GeneralButton";
 import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
+import { ReactComponent as Trophy } from "/src/assets/images/buttonIcons/Trophy.svg";
 
 <Meta
     title="Button/GeneralButton"
@@ -26,7 +27,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
     <Story
         name="General Button Large Primary"
         args={{
-            children: "default",
+            children: "defaultaftartartartarftartarfta",
             version: "primary",
             buttonType: "text",
             size: "large",
@@ -92,6 +93,42 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         {Template.bind({})}
     </Story>
     
+    <h2>Transparent Button</h2>
+    <Story
+        name="General Button Large Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttonType: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Medium Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttonType: "icon",
+            icon: <Trophy />,
+            size: "medium",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Small Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttonType: "text",
+            size: "small",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
     <h2>Button Types</h2>
     <Story
         name="General Button Text only"
@@ -134,7 +171,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             children: "default",
             version: "primary",
             buttonType: "icon only",
-            icon: <ReactSvg />,
+            icon: <Trophy />,
             size: "large",
         }}
     >

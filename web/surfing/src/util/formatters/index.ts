@@ -5,6 +5,13 @@
 export {
   numberToMonetaryString,
   numberToCommaSeparated,
+  toSignificantDecimals,
 } from "./numberConverters";
-export { trimAddress, trimAddressShort } from "./addressConverters";
+export {
+  normaliseAddress,
+  trimAddress,
+  trimAddressShort,
+  appendLeading0x,
+  trimLeading0x,
+} from "./addressConverters";
 export { formatTo12HrDate, formatToGraphQLDate } from "./dateConverters";

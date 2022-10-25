@@ -1,12 +1,17 @@
+import type { Provider } from "~/components/ProviderCard";
 import type { Chain } from "~/util/chainUtils/chains";
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { UserTransaction } from "~/queries/useUserTransactions";
 
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
-import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import useViewport from "~/hooks/useViewport";
-
-import { useUserTransactionCount, useUserTransactions } from "~/queries";
+import {
+  useUserTransactionCount,
+  useUserTransactions,
+  useUserUnclaimedRewards,
+} from "~/queries";
 import { useLoaderData } from "@remix-run/react";
+import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
 import { UserRewards } from "./common";
 import {
@@ -15,18 +20,105 @@ import {
   numberToMonetaryString,
   ManualCarousel,
 } from "@fluidity-money/surfing";
-import { LabelledValue, ProviderCard } from "~/components";
+import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import TransactionTable from "~/components/TransactionTable";
+import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
+import {Providers} from "~/components/ProviderIcon";
 
-const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
+const address = "bb004de25a81cb4ed6b2abd68bcc2693615b9e04";
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const { network } = params;
+export const loader: LoaderFunction = async ({request, params}) => {
+  const network = params.network ?? "";
+
+  const networkFee = 0.002;
+  const gasFee = 0.002;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
+
+  // Check address strips leading 0x
+  const {data, error} = await useUserUnclaimedRewards(network, address);
+
+  if (error || !data) {
+    return redirect("/error", {status: 500, statusText: error});
+  }
+
+  const {ethereum_pending_winners: rewards} = data;
+
+  const sanitisedRewards = rewards.filter(
+    (transaction: UserUnclaimedReward) => !transaction.reward_sent
+  );
+
+  const userUnclaimedRewards = sanitisedRewards.reduce(
+    (sum: number, transaction: UserUnclaimedReward) => {
+      const {win_amount, token_decimals} = transaction;
+
+      const decimals = 10 ** token_decimals;
+      return sum + win_amount / decimals;
+    },
+    0
+  );
+
+  let userTransactionCount;
+  let userTransactions;
+  let expectedRewards;
+  let errorMsg;
+
+  try {
+    userTransactionCount = await (
+      await useUserTransactionCount(network ?? "", address)
+    ).json();
+    userTransactions = await (
+      await useUserTransactions(network ?? "", address, page)
+    ).json();
+    expectedRewards = await useGlobalRewardStatistics(network ?? "")
+  } catch (err) {
+    errorMsg = "The transaction explorer is currently unavailable";
+  } // Fail silently - for now.
+
+  if (errorMsg) {
+    return redirect("/error", {status: 500, statusText: errorMsg});
+  }
+
+  // group rewards by backend
+  const aggregatedExpectedRewards = expectedRewards?.data.expected_rewards.reduce((previous, currentReward) => {
+      const {highest_reward: prize, average_reward: avgPrize, token_short_name} = currentReward;
+      const backend = backends[token_short_name];
+
+      // append to backend if it exists
+      if (previous[backend]) {
+        previous[backend].avgPrize += avgPrize;
+        // max prize
+        previous[backend].prize = Math.max(previous[backend].prize, prize);
+      // set backend if it doesn't exist
+      } else {
+        previous[backend] = {
+          name: backend,
+          prize,
+          avgPrize,
+        }
+      }
+      return previous;
+    }, {} as {[K in Providers]: Provider});
+
+  // convert to expected format
+  const rewarders = Object.values(aggregatedExpectedRewards || {});
+
+  if (userTransactionCount.errors || userTransactions.errors) {
+    return json({
+      rewarders,
+      transactions: [],
+      count: 0,
+      page,
+      network,
+      userUnclaimedRewards,
+      fluidPairs: 8,
+      networkFee,
+      gasFee,
+    });
+  }
 
   const {
     data: {
@@ -34,13 +126,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         transfers: [{ count }],
       },
     },
-  } = await (await useUserTransactionCount(address)).json();
+  } = userTransactionCount;
 
   const {
     data: {
       [network as string]: { transfers: transactions },
     },
-  } = await (await useUserTransactions(address, page)).json();
+  } = userTransactions;
 
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
@@ -72,13 +164,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // Get Best Rewarders - SCOPED OUT NO DATA
 
   return json({
-    rewarders: rewarders,
+    rewarders,
     transactions: sanitizedTransactions,
     count,
     page,
     network,
-    userHasRewards: true,
+    userUnclaimedRewards: 6745,
     fluidPairs: 8,
+    networkFee,
+    gasFee,
   });
 };
 
@@ -94,21 +188,16 @@ export type Transaction = {
   currency: string;
 };
 
-export type Rewarder = {
-  iconUrl: string;
-  name: string;
-  prize: number;
-  avgPrize: number;
-};
-
 type LoaderData = {
   transactions: Transaction[];
   count: number;
   page: number;
-  userHasRewards: boolean;
-  rewarders: Rewarder[];
+  userUnclaimedRewards: number;
+  rewarders: Provider[];
   network: Chain;
   fluidPairs: number;
+  networkFee: number;
+  gasFee: number;
 };
 
 export default function Rewards() {
@@ -118,8 +207,10 @@ export default function Rewards() {
     page,
     rewarders,
     network,
-    userHasRewards,
     fluidPairs,
+    networkFee,
+    gasFee,
+    userUnclaimedRewards,
   } = useLoaderData<LoaderData>();
 
   const { width } = useViewport();
@@ -135,13 +226,17 @@ export default function Rewards() {
     }
   );
 
-  console.log(bestPerformingRewarders);
-
   return (
     <>
       {/* Info Cards */}
-      {userHasRewards ? (
-        <UserRewards claimNow={mobileView} />
+      {userUnclaimedRewards > 0 ? (
+        <UserRewards
+          claimNow={mobileView}
+          unclaimedRewards={userUnclaimedRewards}
+          network={network}
+          networkFee={networkFee}
+          gasFee={gasFee}
+        />
       ) : (
         <div className="noUserRewards">
           <section id="spend-to-earn">
@@ -158,7 +253,6 @@ export default function Rewards() {
 
             {hasRewarders && (
               <ProviderCard
-                iconUrl={bestPerformingRewarders[0].iconUrl}
                 name={bestPerformingRewarders[0].name}
                 prize={bestPerformingRewarders[0].prize}
                 avgPrize={bestPerformingRewarders[0].avgPrize}
@@ -185,7 +279,7 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Highest performer"}>
-                    <img src={bestPerformingRewarders[0].iconUrl} alt="" />
+                    <ProviderIcon provider={bestPerformingRewarders[0].name} />
                     {bestPerformingRewarders[0].name}
                   </LabelledValue>
                 </div>
@@ -245,7 +339,6 @@ export default function Rewards() {
             {bestPerformingRewarders.map((rewarder) => (
               <div className="carousel-card-container" key={rewarder.name}>
                 <ProviderCard
-                  iconUrl={rewarder.iconUrl}
                   name={rewarder.name}
                   prize={rewarder.prize}
                   avgPrize={rewarder.avgPrize}
@@ -260,29 +353,32 @@ export default function Rewards() {
   );
 }
 
-const rewarders = [
-  {
-    iconUrl: "./Solana.svg",
-    name: "Solana",
-    prize: 351879,
-    avgPrize: 1234,
-  },
-  {
-    iconUrl: "./Solana.svg",
-    name: "Polygon",
-    prize: 361879,
-    avgPrize: 1234,
-  },
-  {
-    iconUrl: "./Solana.svg",
-    name: "Compound",
-    prize: 351879,
-    avgPrize: 1234,
-  },
-  {
-    iconUrl: "./Solana.svg",
-    name: "Solana",
-    prize: 351879,
-    avgPrize: 1234,
-  },
-];
+// const rewarders: Provider[] = [
+//   {
+//     name: "Solana",
+//     prize: 351879,
+//     avgPrize: 1234,
+//   },
+//   {
+//     name: "Polygon",
+//     prize: 361879,
+//     avgPrize: 1234,
+//   },
+//   {
+//     name: "Compound",
+//     prize: 351879,
+//     avgPrize: 1234,
+//   },
+//   {
+//     name: "Solana",
+//     prize: 351879,
+//     avgPrize: 1234,
+//   },
+//
+// ];
+
+const backends: {[Token: string]: Providers} = {
+  USDC: "Compound",
+  USDT: "Compound",
+  DAI: "Compound",
+};

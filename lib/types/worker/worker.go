@@ -60,7 +60,21 @@ type (
 		GasLimitNormal  float64 `json:"gas_limit_normal"`
 		GasTipCapNormal float64 `json:"gas_tip_cap_normal"`
 
+		GasUsed       uint64  `json:"gas_used"`
+		GasUsedNormal float64 `json:"gas_used_normal"`
+
 		TransferFeeNormal float64 `json:"transfer_fee_normal"`
+
+		BlockBaseFee       misc.BigInt `json:"block_base_fee"`
+		BlockBaseFeeNormal float64     `json:"block_base_fee_normal"`
+
+		MaxPriorityFeePerGas       misc.BigInt `json:"max_priority_fee_per_gas"`
+		MaxPriorityFeePerGasNormal float64     `json:"max_priority_fee_per_gas_normal"`
+
+		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
+		MaxFeePerGasNormal float64 `json:"max_fee_per_gas_normal"`
+
+		EffectiveGasPriceNormal float64 `json:"effective_gas_price_normal"`
 
 		Payout struct {
 			Winnings        float64 `json:"winnings"` // Winnings

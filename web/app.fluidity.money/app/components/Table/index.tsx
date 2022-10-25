@@ -1,11 +1,12 @@
+import { useState } from "react";
 import { Link, useTransition } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Text } from "@fluidity-money/surfing";
 
-// type Filter<T> = {
-//   filter: (item: T) => boolean;
-//   name: string;
-// };
+type Filter<T> = {
+  filter: (item: T) => boolean; // eslint-disable-line no-unused-vars
+  name: string;
+};
 
 export type ColumnProps = {
   name: string;
@@ -36,11 +37,12 @@ type ITable<T> = {
   renderRow: IRow<T>;
 
   // Filters based on elementData
-  // filters?: Filter<T>[]; F
+  filters?: Filter<T>[];
 };
 
 const Table = <T,>(props: ITable<T>) => {
-  const { itemName, pagination, data, renderRow, count, headings } = props;
+  const { itemName, pagination, data, renderRow, count, headings, filters } =
+    props;
 
   const { rowsPerPage, page } = pagination;
 
@@ -51,26 +53,33 @@ const Table = <T,>(props: ITable<T>) => {
 
   const isTransition = useTransition();
 
+  const [activeFilterIndex, setActiveFilterIndex] = useState(0);
+
   return (
     <div>
       <div className="transactions-header row justify-between">
         {/* Item Count */}
         <Text>
-          {startIndex}-{endIndex} of {count} {itemName}
+          {count > 0 ? `${startIndex} - ${endIndex}` : 0} of {count} {itemName}
         </Text>
 
-        {/* Filters - SCOPED OUT */}
-        {/*filters && (
+        {/* Filters*/}
+        {filters && (
           <div>
-            {filters.map(filter => (
-              <span>{filter.name}</span>
+            {filters.map((filter, i) => (
+              <button
+                key={`filter-${filter.name}`}
+                onClick={() => setActiveFilterIndex(i)}
+              >
+                <Text prominent={activeFilterIndex === i}>{filter.name}</Text>
+              </button>
             ))}
           </div>
-        )*/}
+        )}
       </div>
 
       {/* Table */}
-      <table>
+      <table className="transaction-table">
         {/* Table Headings */}
         <thead>
           <tr>
@@ -114,22 +123,73 @@ const Table = <T,>(props: ITable<T>) => {
               transitioning: {},
             }}
           >
-            {data.map((row, i) => renderRow({ data: row, index: i }))}
+            {data
+              .filter((data) =>
+                filters ? filters[activeFilterIndex].filter(data) : true
+              )
+              .map((row, i) => renderRow({ data: row, index: i }))}
           </motion.tbody>
         </AnimatePresence>
       </table>
 
       {/* Pagination */}
       <motion.div className="pagination" layout="position">
-        {Array(pageCount)
-          .fill()
-          .map((_, i) => {
-            return (
-              <Link key={i} to={`?${pagination.pageQuery || "page"}=${i + 1}`}>
-                {i + 1}
-              </Link>
-            );
-          })}
+        <div className="pagination-numbers">
+          {Array(pageCount)
+            .fill(1)
+            .map((_, i) => {
+              return (
+                <Link
+                  className={
+                    page === i + 1 ? "current-pagination" : "pagination-number"
+                  }
+                  key={i}
+                  to={`?${pagination.pageQuery || "page"}=${i + 1}`}
+                >
+                  {i + 1}
+                </Link>
+              );
+            })}
+        </div>
+        <div className="pagination-arrows">
+          <Link
+            to={
+              page === 1 ? "" : `?${pagination.pageQuery || "page"}=${page - 1}`
+            }
+          >
+            <img
+              style={{ width: 16 }}
+              src={
+                page === 1
+                  ? "/images/icons/arrowLeftDark.svg"
+                  : "/images/icons/arrowLeftWhite.svg"
+              }
+              className={
+                page === 1 ? "pagination-arrow-off" : "pagination-arrow"
+              }
+            />
+          </Link>
+
+          <Link
+            to={
+              page === pageCount
+                ? ""
+                : `?${pagination.pageQuery || "page"}=${page + 1}`
+            }
+          >
+            <img
+              style={{ width: 16 }}
+              src={
+                page === pageCount
+                  ? "/images/icons/arrowRightDark.svg"
+                  : "/images/icons/arrowRightWhite.svg"
+              }
+              className={
+                page === pageCount ? "pagination-arrow-off" : "pagination-arrow"
+              }
+            />
+          </Link>
+        </div>
       </motion.div>
     </div>
   );

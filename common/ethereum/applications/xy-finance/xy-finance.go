@@ -5,19 +5,20 @@
 package xy_finance
 
 import (
-	"context"
 	"fmt"
 	"math"
 	"math/big"
 	"sort"
 
-	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+
+	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const xyFinanceAbiString = `[
@@ -218,7 +219,7 @@ var xyFeeTable = map[int]xyFee{
 // FeeRates, MinFee and MaxFee are calculated on and depending on the target chain, and is
 // approximated via `xyFeeTable`
 // xyFeeTable is sourced here: https://docs.xy.finance/products/x-swap/fee-structure
-func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt *ethTypes.Receipt) (*big.Rat, error) {
 	unpacked, err := xyFinanceAbi.Unpack("SourceChainSwap", transfer.Log.Data)
 
 	if err != nil {
@@ -331,16 +332,6 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	// Get all logs in transaction
 	txHash_ := string(transfer.Transaction.Hash)
 	txHash := ethCommon.HexToHash(txHash_)
-
-	txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to fetch transaction receipts from txHash (%v)! %v",
-			txHash.String(),
-			err,
-		)
-	}
 
 	txLogs := txReceipt.Logs
 

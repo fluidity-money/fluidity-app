@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
-  LinkButton,
   BlockchainModal,
   ChainSelectorButton,
   numberToMonetaryString,
@@ -29,7 +28,7 @@ const RewardsInfoBox = ({
   type,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
-  
+
   const showRewardPool = type === "black";
 
   const imgLink = (opt: string) =>
@@ -71,11 +70,10 @@ const RewardsInfoBox = ({
           <Heading as="h1">
             {showRewardPool
               ? numberToMonetaryString(rewardPool)
-              : totalTransactions
-            }
+              : totalTransactions}
           </Heading>
         </div>
-        <Heading as="h4">
+        <Heading as="h4" className={styles.alignCenter}>
           {showRewardPool ? "Reward pool" : "Total transactions (on testing)"}
         </Heading>
         {showModal && (

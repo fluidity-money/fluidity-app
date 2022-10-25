@@ -54,7 +54,146 @@ main > footer > section {
   gap: 20px;
 }
 
+/* .navbar-v2 {
+  
+} */
+
+.navbar-v2 li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  text-transform: uppercase;
+  font-family: "Aeonik Mono", monospace;
+
+  border-left: 0px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-v2 li {
+  text-emphasis: none;
+  text-decoration: none;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.navbar-v2 li > div {
+  width: 5px;
+  margin: 0 16px 0 0;
+  padding: 32px 0;
+  align-self: stretch;
+}
+
+.navbar-v2 li > div.active {
+  background-color: #fff;
+}
+
+.navbar-v2 li:hover {
+  border-left: 2px inset solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-v2 ul {
+  display: block;
+  padding: 0;
+}
+
 main > footer > section > a {
   color: #828381;
   text-underline-offset: 0.12em;
+}
+
+.transactions-header {
+  margin-bottom: 1em;
+}
+
+.transaction-table {
+  width: 100%;
+  border-spacing: 0 0.25em;
+}
+
+.transaction-table > thead > tr > th {
+  text-align: left;
+  padding: 0.5em;
+}
+
+.table-activity {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.table-activity > span {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.table-activity > img {
+  width: 1.5em;
+}
+
+.transaction-table > thead > tr > th:last-child {
+  text-align: right;
+}
+
+.transaction-table > tbody > tr > td {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 1em 0.5em 1em 0.5em;
+}
+
+.transaction-table > tbody > tr > td:last-child {
+  text-align: right;
+}
+
+.table-address {
+  all: unset;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.pagination {
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.pagination-numbers {
+  display: flex;
+  gap: 0.5em;
+}
+
+.pagination-numbers .current-pagination {
+  all: unset;
+  cursor: pointer;
+  color: white;
+}
+
+.pagination-numbers .pagination-number {
+  all: unset;
+  cursor: pointer;
+}
+
+.pagination-arrows {
+  display: flex;
+  gap: 1em;
+}
+
+.pagination-arrows .pagination-arrow {
+  cursor: pointer;
+}
+
+.pagination-arrows .pagination-arrow-off {
+  cursor: auto;
+}
+
+.cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 40px;
+  background: black;
+  height: 100%;
+  width: 100%;
 }
