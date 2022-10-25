@@ -7,7 +7,7 @@ import { PipedTransaction } from "./types";
 
 import config from "~/webapp.config.server";
 
-import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
+import { amountToDecimalString, shorthandAmountFormatter, trimAddress } from "~/util";
 
 let LastSignature = ``;
 export const solGetTransactionsObservable = (
@@ -68,8 +68,8 @@ export const solGetTransactionsObservable = (
               tokenDecimal
             );
             const transaction: PipedTransaction = {
-              source,
-              destination,
+              source: trimAddress(source),
+              destination: trimAddress(destination),
               amount: shorthandAmountFormatter(uiTokenAmount, 3),
               token,
             };

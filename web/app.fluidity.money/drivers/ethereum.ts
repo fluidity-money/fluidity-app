@@ -9,7 +9,7 @@ import BigNumber from "bn.js";
 import { PipedTransaction } from "./types";
 
 import config from "~/webapp.config.server";
-import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
+import { amountToDecimalString, shorthandAmountFormatter, trimAddress } from "~/util";
 
 export const ethGetTransactionsObservable = (
   token: string,
@@ -38,8 +38,8 @@ export const ethGetTransactionsObservable = (
           const uiTokenAmount = amountToDecimalString(amount.toString(), 6);
 
           const transaction = {
-            source,
-            destination,
+            source: trimAddress(source),
+            destination: trimAddress(destination),
             amount: shorthandAmountFormatter(uiTokenAmount, 3),
             token,
           };
