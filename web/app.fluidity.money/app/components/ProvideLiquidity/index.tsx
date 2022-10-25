@@ -1,5 +1,7 @@
 import { Card, Heading, Text } from "@fluidity-money/surfing";
+import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
+import { useLoaderData } from "@remix-run/react";
 
 const parent = {
   variantA: { scale: 1 },
@@ -11,12 +13,18 @@ const child = {
   variantB: { scale: 1.05 },
 };
 
-interface IProps {
+type LoaderData = {
+  provider: typeof config.liquidity_providers;
   network: string;
-}
+};
 
-const ProvideLiquidity = ({ network }: IProps) => {
-  const providers = network === "ethereum" ? ethProviders : solProviders;
+const ProvideLiquidity = () => {
+  const { provider, network } = useLoaderData<LoaderData>();
+
+  const providers =
+    network === "ethereum"
+      ? provider["ethereum"].providers
+      : provider["solana"].providers;
 
   const liqidityProviders = (
     <div className="liquidity-providers">
@@ -66,44 +74,3 @@ const ProvideLiquidity = ({ network }: IProps) => {
 };
 
 export default ProvideLiquidity;
-
-const ethProviders = [
-  {
-    name: "uniswap",
-    img: "/images/providers/Uniswap.svg",
-    link: "https://www.uniswap.org/",
-  },
-  {
-    name: "sushiswap",
-    img: "/images/providers/Sushiswap.svg",
-    link: "https://www.sushi.com/",
-  },
-  {
-    name: "dodo",
-    img: "/images/providers/DODO.png",
-    link: "https://www.dodoex.io/",
-  },
-];
-
-const solProviders = [
-  {
-    name: "solend",
-    img: "/images/providers/solend.png",
-    link: "https://www.solend.fi/",
-  },
-  {
-    name: "orca",
-    img: "/images/providers/Orca.svg",
-    link: "https://www.orca.so/",
-  },
-  {
-    name: "saber",
-    img: "/images/providers/saber.svg",
-    link: "https://www.saber.so/",
-  },
-  {
-    name: "jupiter",
-    img: "/images/providers/Jupiter.svg",
-    link: "https://www.jup.ag/",
-  },
-];

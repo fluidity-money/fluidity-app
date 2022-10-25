@@ -11,7 +11,7 @@ testnet = false
 rpc = { http = "https://api.mainnet-beta.solana.com", ws = "wss://api.mainnet-beta.solana.com" }
 server = ""
 
-# Chain Configurations
+# Chain Configurations 
 [config.ethereum]
 explorer = "https://etherscan.io"
 fluidAssets = [
@@ -119,3 +119,43 @@ name = "Fluid USDT"
 logo = "/assets/tokens/usdt.svg"
 address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+
+# liquidity_providers Configurations 
+[liquidity_providers.ethereum]
+
+[[liquidity_providers.ethereum.providers]]
+name= "uniswap"
+img= "/images/providers/Uniswap.svg"
+link= "https://www.uniswap.org/"
+
+[[liquidity_providers.ethereum.providers]]
+name= "sushiswap"
+img= "/images/providers/Sushiswap.svg"
+link= "https://www.sushi.com/"
+
+[[liquidity_providers.ethereum.providers]]
+name= "dodo"
+img= "/images/providers/DODO.png"
+link= "https://www.dodoex.io/"
+
+[liquidity_providers.solana]
+
+[[liquidity_providers.solana.providers]]
+name= "solend"
+img= "/images/providers/solend.png"
+link= "https://www.solend.fi/"
+
+[[liquidity_providers.solana.providers]]
+name= "orca"
+img= "/images/providers/Orca.svg"
+link= "https://www.orca.so/"
+
+[[liquidity_providers.solana.providers]]
+name= "saber"
+img= "/images/providers/saber.svg"
+link= "https://www.saber.so/"
+
+[[liquidity_providers.solana.providers]]
+name= "jupiter"
+img= "/images/providers/Jupiter.svg"
+link= "https://www.jup.ag/"

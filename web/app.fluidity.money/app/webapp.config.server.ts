@@ -35,6 +35,19 @@ const OptionsSchema = z.object({
         .min(1),
     })
   ),
+  liquidity_providers: z.object({}).catchall(
+    z.object({
+      providers: z
+        .array(
+          z.object({
+            name: z.string(),
+            img: z.string(),
+            link: z.string(),
+          })
+        )
+        .min(1),
+    })
+  ),
 });
 
 export type Options = z.infer<typeof OptionsSchema>;
