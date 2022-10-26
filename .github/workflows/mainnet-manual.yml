@@ -22,7 +22,9 @@ on:
         description: 'Service'
         required: true
       commitId:
-        description: 'CommitId'
+        type: string
+        description: 'Commit Id'
+        default: latest
       build_root_container:
         type: boolean
         description: 'Build root-container'
@@ -59,8 +61,8 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            $SHA=${{ github.event.inputs.commitId }}
-            [ -z "$SHA" ] && SHA=$GITHUB_SHA
+            SHA=$GITHUB_SHA
+            [[ ! ${{ github.event.inputs.commitId }} == "latest" ]] && SHA=${{ github.event.inputs.commitId }}
 
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
@@ -75,8 +77,8 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            $SHA=${{ github.event.inputs.commitId }}
-            [ -z "$SHA" ] && SHA=$GITHUB_SHA
+            SHA=$GITHUB_SHA
+            [[ ! ${{ github.event.inputs.commitId }} == "latest" ]] && SHA=${{ github.event.inputs.commitId }}
 
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
