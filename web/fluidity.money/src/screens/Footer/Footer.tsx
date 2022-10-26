@@ -60,7 +60,7 @@ const Footer = () => {
           <div className={styles.buttons}>
             <GeneralButton
               version={"primary"}
-              buttonType={"text"}
+              buttontype={"text"}
               handleClick={goToDemoAnchor}
               size={
                 width > firstBreakpoint
@@ -75,7 +75,7 @@ const Footer = () => {
             <GeneralButton
               handleClick={() => {window.location.href = "mailto:contact@fluidity.money"}}
               version={"secondary"}
-              buttonType={"text"}
+              buttontype={"text"}
               size={
                 width > firstBreakpoint
                   ? "medium"

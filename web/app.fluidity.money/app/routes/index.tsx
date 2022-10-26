@@ -27,7 +27,7 @@ export default function IndexPage() {
 
   return (
     <div>
-      <Display>
+      <Display size={"lg"}>
         <Text>
           <Text prominent>{"{address}"}</Text>
           {" claimed "}

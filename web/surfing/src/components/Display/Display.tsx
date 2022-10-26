@@ -12,7 +12,7 @@ type DisplayProps = {
     [key: string]: any
 };
 
-const Display = ({ children, large = true, size = "lg", color="white", ...props }: DisplayProps ) => {
+const Display = ({ children, size="lg", color="white", ...props }: DisplayProps ) => {
     const propClasses = props.className || "";
 
     const { extraSmall, small, medium, large: _, ...rest } = props;
