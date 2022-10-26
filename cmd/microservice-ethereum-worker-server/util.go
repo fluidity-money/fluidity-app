@@ -206,7 +206,7 @@ func mustEthereumAddressFromEnv(env string) ethCommon.Address {
 		})
 	}
 
-	return ethCommon.HexToAddress(env)
+	return ethCommon.HexToAddress(addressString)
 }
 
 func sendEmission(emission *worker.Emission) {
