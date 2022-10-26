@@ -85,15 +85,13 @@ func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 		baseFee = *baseFee_
 	}
 
-	receiptHash := oldHeader.ReceiptHash.Hex()
-
 	return ethereum.BlockHeader{
-		BlockHash:       ethereum.HashFromString(oldHeader.Hash().Hex()),
-		ParentHash:      ethereum.HashFromString(oldHeader.ParentHash.Hex()),
-		UncleHash:       ethereum.HashFromString(oldHeader.UncleHash.Hex()),
-		Coinbase:        ethereum.AddressFromString(oldHeader.Coinbase.Hex()),
-		Root:            ethereum.HashFromString(oldHeader.Root.Hex()),
-		TransactionHash: ethereum.HashFromString(oldHeader.TxHash.Hex()),
+		BlockHash:       ConvertGethHash(oldHeader.Hash()),
+		ParentHash:      ConvertGethHash(oldHeader.ParentHash),
+		UncleHash:       ConvertGethHash(oldHeader.UncleHash),
+		Coinbase:        ConvertGethAddress(oldHeader.Coinbase),
+		Root:            ConvertGethHash(oldHeader.Root),
+		TransactionHash: ConvertGethHash(oldHeader.TxHash),
 		Bloom:           oldHeader.Bloom.Bytes(),
 		Difficulty:      misc.NewBigInt(difficulty),
 		Number:          misc.NewBigInt(number),
@@ -101,9 +99,9 @@ func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 		GasUsed:         misc.BigIntFromUint64(oldHeader.GasUsed),
 		Time:            oldHeader.Time,
 		Extra:           oldHeader.Extra,
-		MixDigest:       ethereum.HashFromString(oldHeader.MixDigest.Hex()),
+		MixDigest:       ConvertGethHash(oldHeader.MixDigest),
 		Nonce:           ethereum.BlockNonce(oldHeader.Nonce[:]),
-		ReceiptHash:     ethereum.HashFromString(receiptHash),
+		ReceiptHash:     ConvertGethHash(oldHeader.ReceiptHash),
 		BaseFee:         misc.NewBigInt(baseFee),
 	}
 }

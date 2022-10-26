@@ -165,7 +165,7 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 
 			testTopics := make([]ethTypes.Hash, 0)
 			for _, topic := range log.Topics {
-				testTopics = append(testTopics, ethTypes.HashFromString(topic.String()))
+				testTopics = append(testTopics, ethereum.ConvertGethHash(topic))
 			}
 			test.Transfer.Log.Topics = testTopics
 
