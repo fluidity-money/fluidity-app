@@ -2,7 +2,7 @@ import type { Provider } from "~/components/ProviderCard";
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { UserTransaction } from "~/queries/useUserTransactions";
-
+import config from "~/webapp.config.server";
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import {
@@ -27,6 +27,7 @@ const address = "bb004de25a81cb4ed6b2abd68bcc2693615b9e04";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
+  const icons = config.provider_icons;
 
   const networkFee = 0.002;
   const gasFee = 0.002;
@@ -89,6 +90,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       fluidPairs: 8,
       networkFee,
       gasFee,
+      icons,
     });
   }
 
