@@ -102,9 +102,9 @@ io.on("connection", (socket) => {
 
     registry.set(
       socket.id,
-      transactionFilterObservable.subscribe((transaction) =>
-        socket.emit("Transactions", transaction)
-      )
+      transactionFilterObservable.subscribe((transaction) => {
+        socket.emit("Transactions", transaction);
+      })
     );
   });
 
