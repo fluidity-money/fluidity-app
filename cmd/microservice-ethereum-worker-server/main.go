@@ -340,6 +340,13 @@ func main() {
 				"ETH",
 			)
 
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to get the gas price in USD!"
+					k.Payload = err
+				})
+			}
+
 			// the uniswap oracle return usd price with 6 decimals!
 
 			ethPriceUsd.Quo(
@@ -360,14 +367,15 @@ func main() {
 				gethClient,
 				auroraEthFluxAddress,
 			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to get the gas price in USD!"
+					k.Payload = err
+				})
+			}
 		}
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get the gas price in USD!"
-				k.Payload = err
-			})
-		}
 
 		var tokenPriceInUsdt *big.Rat
 
