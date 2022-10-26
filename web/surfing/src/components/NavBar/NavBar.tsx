@@ -83,7 +83,7 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
             {/* props */}
             <GeneralButton
               version={button.version}
-              buttonType={"text"}
+              buttontype={"text"}
               size={width < breakpoint ? "small" : "medium"}
               handleClick={button.handleClick}
             >

@@ -124,19 +124,19 @@ export default function Home() {
             <div className="statistics-row">
               <div className="statistics-set">
                 <Text>Total transactions</Text>
-                <Display medium style={{ margin: 0 }}>
+                <Display size={"md"} style={{ margin: 0 }}>
                   0
                 </Display>
               </div>
               <div className="statistics-set">
                 <Text>Total yield</Text>
-                <Display medium style={{ margin: 0 }}>
+                <Display size={"md"} style={{ margin: 0 }}>
                   0
                 </Display>
               </div>
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
-                <Display medium style={{ margin: 0 }}>
+                <Display size={"md"} style={{ margin: 0 }}>
                   0
                 </Display>
               </div>

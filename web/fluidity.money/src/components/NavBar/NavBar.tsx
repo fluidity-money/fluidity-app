@@ -59,7 +59,7 @@ const NavBar = () => {
             </motion.div>
             <GeneralButton
               version={"secondary"}
-              buttonType={"text"}
+              buttontype={"text"}
               size={width < breakpoint ? "small" : "medium"}
               handleClick={goToDemoAnchor}
             >

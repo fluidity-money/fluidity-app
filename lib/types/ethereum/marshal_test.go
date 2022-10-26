@@ -89,7 +89,6 @@ func (suite *MarshalTestSuite) SetupTest() {
 		From:      AddressFromString("fromaddr"),
 		Type:      1,
 		Value:     misc.BigIntFromInt64(1345),
-		Receipt:   &testReceipt,
 	}
 
 	suite.testHeader = testHeader

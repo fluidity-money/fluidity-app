@@ -10,7 +10,6 @@ import {
   formatTo12HrDate,
   Text,
 } from "@fluidity-money/surfing";
-import TextTransition, { presets } from "react-text-transition";
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
@@ -78,9 +77,7 @@ const RewardsBackground = () => {
               />
 
               <Text as="p" prominent={true} className={styles.hover}>
-                <TextTransition springConfig={presets.stiff}>
-                  {numberToMonetaryString(amount)}{" "}
-                </TextTransition>
+                {numberToMonetaryString(amount)}{" "}
               </Text>
 
               <Text as="p" className={styles.hover}>
@@ -88,15 +85,11 @@ const RewardsBackground = () => {
               </Text>
 
               <Text as="p" className={styles.hoverUnderline}>
-                <TextTransition springConfig={presets.stiff}>
-                  {`${trimAddressShort(address)}`}{" "}
-                </TextTransition>
+                {`${trimAddressShort(address)}`}{" "}
               </Text>
 
               <Text as="p" className={styles.hover}>
-                <TextTransition springConfig={presets.stiff}>
-                  {formatTo12HrDate(date)}
-                </TextTransition>
+                {formatTo12HrDate(date)}
               </Text>
             </a>
           </div>

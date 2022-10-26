@@ -25,7 +25,7 @@ const LabelledValue = ({
       <Text size={"md"}>{label}</Text>
       <div className={"value"}>
         {icon && <img src={icon} />}
-        <Display className="row-value" extraSmall={true}>
+        <Display className="row-value" size={"xs"}>
           {children}
         </Display>
       </div>

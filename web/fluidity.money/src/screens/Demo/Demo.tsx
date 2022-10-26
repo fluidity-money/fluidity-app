@@ -41,14 +41,12 @@ const Demo = () => {
 
         <div id="demo">
           <Display
-            large={width > breakpoint && true}
-            small={width < breakpoint && true}
+            size={width > breakpoint ? "lg" : "sm"}
           >
             {numberToMonetaryString(weekTotalRewards)}
           </Display>
           <Display
-            extraSmall={width > breakpoint}
-            xxs={width <= breakpoint}
+            size={width > breakpoint ? "xs" : "xxs"}
             color={"gray"}
           >
             Fluid prizes claimed in the last week.
@@ -59,7 +57,7 @@ const Demo = () => {
             Connect your wallet to see what you could make.
           </Text>
           <section>
-            {/* <GeneralButton version={"primary"} buttonType={"text"} size={"medium"} handleClick={function (): void {       
+            {/* <GeneralButton version={"primary"} buttontype={"text"} size={"medium"} handleClick={function (): void {       
             } }>
               SHOW ME A DEMO
             </GeneralButton> */}
