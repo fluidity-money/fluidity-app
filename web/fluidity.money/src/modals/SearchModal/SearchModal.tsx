@@ -73,7 +73,7 @@ const SearchModal = ({ closeModal }: ISearchModalProps) => {
             resetLists();
           }}
           version={"secondary"}
-          buttonType={"text"}
+          buttontype={"text"}
           size={"large"}
         >
           CLEAR

@@ -47,10 +47,13 @@ const (
 	SecondsInOneYear uint64 = 365 * 24 * 60 * 60
 
 	// UsdtDecimals to normalise values to
-	UsdtDecimals = 1e6
+	UsdtDecimals int64 = 1e6
+
+	// Uniswap's oracle returns numbers with 6 decimals
+	UniswapOracleDecimals int64 = 1e6
 
 	// EthereumDecimals to normalise values to
-	EthereumDecimals = 1e18
+	EthereumDecimals int64 = 1e18
 )
 
 const (
@@ -140,31 +143,17 @@ func main() {
 
 	switch tokenBackend {
 	case BackendCompound:
-		uniswapAnchoredViewAddress := mustEthereumAddressFromEnv(EnvUniswapAnchoredViewAddress)
-
-		ethUniswapAnchoredViewAddress = hexToAddress(uniswapAnchoredViewAddress)
+		ethUniswapAnchoredViewAddress = mustEthereumAddressFromEnv(EnvUniswapAnchoredViewAddress)
 
 	case BackendAave:
-		var (
-			aaveAddressProviderAddress = mustEthereumAddressFromEnv(EnvAaveAddressProviderAddress)
-			usdTokenAddress            = mustEthereumAddressFromEnv(EnvUsdTokenAddress)
-			ethTokenAddress            = mustEthereumAddressFromEnv(EnvEthTokenAddress)
-			underlyingTokenAddress     = mustEthereumAddressFromEnv(EnvUnderlyingTokenAddress)
-		)
-
-		ethAaveAddressProviderAddress = hexToAddress(aaveAddressProviderAddress)
-		ethUsdTokenAddress = hexToAddress(usdTokenAddress)
-		ethUnderlyingTokenAddress = hexToAddress(underlyingTokenAddress)
-		ethEthTokenAddress = hexToAddress(ethTokenAddress)
+		ethAaveAddressProviderAddress = mustEthereumAddressFromEnv(EnvAaveAddressProviderAddress)
+		ethUsdTokenAddress            = mustEthereumAddressFromEnv(EnvUsdTokenAddress)
+		ethEthTokenAddress            = mustEthereumAddressFromEnv(EnvEthTokenAddress)
+		ethUnderlyingTokenAddress     = mustEthereumAddressFromEnv(EnvUnderlyingTokenAddress)
 
 	case BackendAurora:
-		var (
-			ethFluxAddress   = mustEthereumAddressFromEnv(EnvAuroraEthFluxAddress)
-			tokenFluxAddress = mustEthereumAddressFromEnv(EnvAuroraTokenFluxAddress)
-		)
-
-		auroraEthFluxAddress = hexToAddress(ethFluxAddress)
-		auroraTokenFluxAddress = hexToAddress(tokenFluxAddress)
+		auroraEthFluxAddress   = mustEthereumAddressFromEnv(EnvAuroraEthFluxAddress)
+		auroraTokenFluxAddress = mustEthereumAddressFromEnv(EnvAuroraTokenFluxAddress)
 
 	default:
 		log.Fatal(func(k *log.Log) {
@@ -198,6 +187,7 @@ func main() {
 
 	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
 	usdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
+	uniswapOracleDecimalsRat := big.NewRat(UniswapOracleDecimals, 1)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
@@ -350,6 +340,20 @@ func main() {
 				"ETH",
 			)
 
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to get the gas price in USD!"
+					k.Payload = err
+				})
+			}
+
+			// the uniswap oracle return usd price with 6 decimals!
+
+			ethPriceUsd.Quo(
+				ethPriceUsd,
+				uniswapOracleDecimalsRat,
+			)
+
 		case BackendAave:
 			ethPriceUsd, err = aave.GetPrice(
 				gethClient,
@@ -363,18 +367,15 @@ func main() {
 				gethClient,
 				auroraEthFluxAddress,
 			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to get the gas price in USD!"
+					k.Payload = err
+				})
+			}
 		}
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get the gas price in USD!"
-				k.Payload = err
-			})
-		}
-
-		// normalise the ethereum price!
-
-		ethPriceUsd.Quo(ethPriceUsd, ethereumDecimalsRat)
 
 		var tokenPriceInUsdt *big.Rat
 
@@ -458,24 +459,7 @@ func main() {
 			})
 		}
 
-		// normalise the block base fee by dividing it by ethereum
-		// decimals then multiplying by price
-
-		blockBaseFeeRat := bigIntToRat(blockBaseFee)
-
-		blockBaseFeeRatNormalised := new(big.Rat).Quo(
-			blockBaseFeeRat,
-			ethereumDecimalsRat,
-		)
-
-		blockBaseFeeRatNormalised.Mul(blockBaseFeeRatNormalised, ethPriceUsd)
-
-		emission.BlockBaseFee = blockBaseFee
-
-		emission.BlockBaseFeeNormal, _ = blockBaseFeeRat.Float64()
-
-		// normalise the size of the pool and the balance of
-		// the underlying to a normal number!
+		// normalise the size of the pool to a normal number!
 
 		sizeOfThePool.Quo(sizeOfThePool, underlyingTokenDecimalsRat)
 
@@ -484,6 +468,9 @@ func main() {
 		for _, transfer := range fluidTransfers {
 
 			var (
+				receipt     = transfer.Receipt
+				transaction = transfer.Transaction
+
 				transactionHash      = transfer.Transaction.Hash
 				senderAddress        = transfer.SenderAddress
 				recipientAddress     = transfer.RecipientAddress
@@ -491,10 +478,9 @@ func main() {
 				transferType         = transfer.Transaction.Type
 				gasTipCap            = transfer.Transaction.GasTipCap
 				appEmission          = transfer.AppEmissions
-				gasUsed              = transfer.GasUsed
-				maxPriorityFeePerGas = transfer.MaxPriorityFeePerGas
-				maxFeePerGas         = transfer.MaxFeePerGas
-				baseFeePerGas = transfer.BaseFeePerGas
+				gasUsed              = receipt.GasUsed
+				maxPriorityFeePerGas = transaction.GasTipCap
+				maxFeePerGas         = transaction.GasFeeCap
 
 				applicationFeeUsd *big.Rat
 			)
@@ -517,7 +503,7 @@ func main() {
 			var (
 				gasTipCapRat = bigIntToRat(gasTipCap)
 				gasLimitRat  = uint64ToRat(gasLimit)
-				gasUsedRat   = uint64ToRat(gasUsed)
+				gasUsedRat   = bigIntToRat(gasUsed)
 			)
 
 			// remember the gas limit and tip cap in the
@@ -531,7 +517,7 @@ func main() {
 			// remember the inputs to the gas actually used
 			// in usd calculation
 
-			emission.GasUsed = gasUsed
+			emission.GasUsed = gasUsed.Uint64()
 
 			emission.BlockBaseFee = blockBaseFee
 
@@ -540,18 +526,14 @@ func main() {
 			// normalise the gas limit by dividing it by
 			// ethereum decimals then multiplying it to usd
 
-			normalisedGasLimitRat := new(big.Rat).Quo(gasLimitRat, ethereumDecimalsRat)
-
-			normalisedGasLimitRat.Mul(normalisedGasLimitRat, ethPriceUsd)
+			normalisedGasLimitRat := weiToUsd(gasLimitRat, ethPriceUsd, ethereumDecimalsRat)
 
 			emission.GasLimitNormal, _ = normalisedGasLimitRat.Float64()
 
 			// and normalise the gas tip cap by multiplying
 			// ethereum decimals then converting to USD
 
-			normalisedGasTipCapRat := new(big.Rat).Quo(gasTipCapRat, ethereumDecimalsRat)
-
-			normalisedGasTipCapRat.Mul(normalisedGasTipCapRat, ethPriceUsd)
+			normalisedGasTipCapRat := weiToUsd(gasTipCapRat, ethPriceUsd, ethereumDecimalsRat)
 
 			emission.GasTipCapNormal, _ = normalisedGasTipCapRat.Float64()
 
@@ -560,59 +542,23 @@ func main() {
 
 			blockBaseFeeRat := new(big.Rat).SetInt(&blockBaseFee.Int)
 
-			normalisedBlockBaseFeePerGasRat := new(big.Rat).Quo(
-				blockBaseFeeRat,
-				ethereumDecimalsRat,
-			)
-
-			normalisedBlockBaseFeePerGasRat.Mul(
-				normalisedBlockBaseFeePerGasRat,
-				ethPriceUsd,
-			)
+			normalisedBlockBaseFeePerGasRat := weiToUsd(blockBaseFeeRat, ethPriceUsd, ethereumDecimalsRat)
 
 			emission.BlockBaseFeeNormal, _ = normalisedBlockBaseFeePerGasRat.Float64()
 
-			// normalise the max priority fee per gas (divide
-			// by ethereum decimals, multiply by usd price)
-
 			maxPriorityFeePerGasRat := new(big.Rat).SetInt(&maxPriorityFeePerGas.Int)
-
-			normalisedMaxPriorityFeePerGasRat := new(big.Rat).Quo(
-				maxPriorityFeePerGasRat,
-				ethereumDecimalsRat,
-			)
-
-			normalisedMaxPriorityFeePerGasRat.Mul(
-				normalisedMaxPriorityFeePerGasRat,
-				ethPriceUsd,
-			)
-
-			// normalise the max fee per gas (divide by the
-			// number of ethereum decimals then multiply by
-			// the usd price of eth)
 
 			maxFeePerGasRat := new(big.Rat).SetInt(&maxFeePerGas.Int)
 
-			normalisedMaxFeePerGasRat := new(big.Rat).Quo(
-				maxFeePerGasRat,
-				ethereumDecimalsRat,
-			)
-
-			normalisedMaxFeePerGasRat.Mul(normalisedMaxFeePerGasRat, ethPriceUsd)
-
-			// calculate the effective gas price (with all the values normal)
-
-			baseFeePerGasRat := new(big.Rat).SetInt(&baseFeePerGas.Int)
+			// calculate the effective gas price (all values in wei)
 
 			effectiveGasPrice := commonEth.CalculateEffectiveGasPrice(
-				baseFeePerGasRat,
+				blockBaseFeeRat,
 				maxFeePerGasRat,
 				maxPriorityFeePerGasRat,
 			)
 
-			normalisedEffectiveGasPriceRat := new(big.Rat).Quo(effectiveGasPrice, ethereumDecimalsRat)
-
-			normalisedEffectiveGasPriceRat.Mul(normalisedEffectiveGasPriceRat, ethPriceUsd)
+			normalisedEffectiveGasPriceRat := weiToUsd(effectiveGasPrice, ethPriceUsd, ethereumDecimalsRat)
 
 			emission.EffectiveGasPriceNormal, _ = normalisedEffectiveGasPriceRat.Float64()
 

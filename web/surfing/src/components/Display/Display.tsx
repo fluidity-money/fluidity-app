@@ -6,31 +6,13 @@ import styles from "./Display.module.scss";
 
 type DisplayProps = {
     children: React.ReactNode
-    xxs?: boolean
-    extraSmall?: boolean
-    small?: boolean
-    medium?: boolean
-    large?: boolean
+    size?: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg"
     color?: "white" | "gray";
 
     [key: string]: any
 };
 
-const Display = ({ children, large = true, color="white", ...props }: DisplayProps ) => {
-    const sizeMap = {
-        "xxs": "xxs",
-        "extraSmall": "xs",
-        "small": "sm",
-        "medium": "md",
-    };
-
-    const size = Object.entries(sizeMap).reduce((acc, [key, value]) => {
-        if (props[key]) {
-            return value;
-        }
-        return acc;
-    }, "lg"); // Large is default if no size is specified.
-
+const Display = ({ children, size="lg", color="white", ...props }: DisplayProps ) => {
     const propClasses = props.className || "";
 
     const { extraSmall, small, medium, large: _, ...rest } = props;

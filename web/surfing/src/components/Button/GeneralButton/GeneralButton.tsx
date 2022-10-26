@@ -7,12 +7,12 @@ import type { ButtonHTMLAttributes } from "react";
 import styles from "./GeneralButton.module.scss";
 
 type GeneralButtonText = {
-  buttonType: "text",
+  buttontype: "text",
 }
 
 type GeneralButtonLogo = {
   icon: React.ReactNode,
-  buttonType: "icon before" | "icon after" | "icon only",
+  buttontype: "icon before" | "icon after" | "icon only",
 }
 
 export type IGeneralButtonProps = 
@@ -35,9 +35,9 @@ const GeneralButton = ({
 }: IGeneralButtonProps) => {
   const classProps = className || "";
   
-  const { buttonType } = props as GeneralButtonText | GeneralButtonLogo
+  const { buttontype } = props as GeneralButtonText | GeneralButtonLogo
   
-  if (buttonType == "text") {
+  if (buttontype == "text") {
     return (
       <button
         onClick={handleClick}
@@ -52,7 +52,7 @@ const GeneralButton = ({
 
   return (
     <>
-      {buttonType === "icon before" ? (
+      {buttontype === "icon before" ? (
         <button
           onClick={handleClick}
           className={`${styles[version]} ${styles[size]} ${classProps}`}
@@ -64,7 +64,7 @@ const GeneralButton = ({
           </div>
           {" "}{children}
         </button>
-      ) : buttonType === "icon after" ? (
+      ) : buttontype === "icon after" ? (
         <button
           onClick={handleClick}
           className={`${styles[version]} ${styles[size]} ${classProps}`}

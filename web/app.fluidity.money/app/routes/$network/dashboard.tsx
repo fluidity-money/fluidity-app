@@ -202,7 +202,7 @@ export default function Dashboard() {
             {/*
             <GeneralButton
               version={"secondary"}
-              buttonType="icon before"
+              buttontype="icon before"
               size={"small"}
               handleClick={() => navigate("/send")}
               icon={<ArrowUp />}
@@ -215,7 +215,7 @@ export default function Dashboard() {
             {/*
             <GeneralButton
               version={"secondary"}
-              buttonType="icon before"
+              buttontype="icon before"
               size={"small"}
               handleClick={() => navigate("/receive")}
               icon={<ArrowDown />}
@@ -227,7 +227,7 @@ export default function Dashboard() {
             {/* Fluidify */}
             <GeneralButton
               version={"primary"}
-              buttonType="text"
+              buttontype="text"
               size={"small"}
               handleClick={() => navigate("../fluidify")}
             >
@@ -237,7 +237,7 @@ export default function Dashboard() {
             {/* Prize Money */}
             <GeneralButton
               version={"secondary"}
-              buttonType="icon after"
+              buttontype="icon after"
               size={"small"}
               handleClick={() =>
                 unclaimedRewards

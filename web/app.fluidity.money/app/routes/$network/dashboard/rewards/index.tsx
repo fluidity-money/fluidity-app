@@ -106,7 +106,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         };
       }
       return previous;
-    }, {} as { [K in Providers]: Provider }); // eslint-disable-line no-unused-vars
+    }, {} as { [K in Providers]: Provider });
 
   // convert to expected format
   const rewarders = Object.values(aggregatedExpectedRewards || {});
