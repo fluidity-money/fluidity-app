@@ -127,7 +127,7 @@ func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	}
 
 	// convert the pair contract's address to the go ethereum address type
-	contractAddr := ethCommon.HexToAddress(transfer.Log.Address.String())
+	contractAddr := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
 	// figure out which token is which in the pair contract
 	token0addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token0")

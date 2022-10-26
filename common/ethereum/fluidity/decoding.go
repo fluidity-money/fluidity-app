@@ -9,6 +9,7 @@ import (
 	"math/big"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -68,11 +69,11 @@ func DecodeLegacyRewardData(log typesEth.Log, token token_details.TokenDetails) 
 	var (
 		logTopics = log.Topics
 
-		winnerString = logTopics[1].String()
-		amountString = logTopics[2].String()
+		winner_ = logTopics[1].String()
+		amount_ = logTopics[2]
 
-		winner    = ethCommon.HexToAddress(winnerString)
-		amountHex = ethCommon.HexToHash(amountString)
+		winner    = ethCommon.HexToAddress(winner_)
+		amountHex = ethereum.ConvertInternalHash(amount_)
 		amountBig = amountHex.Big()
 		amount    = misc.NewBigInt(*amountBig)
 

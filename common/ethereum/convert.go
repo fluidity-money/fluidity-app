@@ -30,6 +30,22 @@ func ConvertGethAddress(address ethCommon.Address) ethereum.Address {
 	return ethereum.AddressFromString(addressString)
 }
 
+// ConvertInternalHash from the internal definition into its geth type
+// equivalent
+func ConvertInternalHash(hash ethereum.Hash) ethCommon.Hash {
+	hashString := hash.String()
+
+	return ethCommon.HexToHash(hashString)
+}
+
+// ConvertInternalAddress from the internal definition into its geth type
+// equivalent
+func ConvertInternalAddress(address ethereum.Address) ethCommon.Address {
+	addressString := address.String()
+
+	return ethCommon.HexToAddress(addressString)
+}
+
 // ConvertGethLog from the ethereum definition into its internal type
 // equivalent
 func ConvertGethLog(log ethTypes.Log) ethereum.Log {
