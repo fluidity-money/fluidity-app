@@ -1,4 +1,4 @@
-@import "../../../../fluidity.money/src/styles/config.scss";
+@use 'common' as *;
 
 .outerContainer {
   box-sizing: border-box;
@@ -44,12 +44,12 @@
         li {
           margin: 20px;
           .active {
-            color: $fluidWhite;
+            color: map-get($text, "prominent");
             text-underline-offset: 2px;
             text-decoration: underline;
           }
           a {
-            color: $textGrey;
+            color: map-get($text, "default");
             text-decoration: none;
           }
           button {

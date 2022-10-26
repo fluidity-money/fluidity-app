@@ -8,7 +8,7 @@ import styles from "./ResourcesPageTitle.module.scss";
 const ResourcesPageTitle = () => {
   return (
     <div className={styles.container}>
-      <Display>RESOURCES</Display>
+      <Display size="lg">RESOURCES</Display>
     </div>
   );
 };

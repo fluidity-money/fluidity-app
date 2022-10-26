@@ -89,14 +89,14 @@ const UserRewards = ({
             {/* Unclaimed fluid rewards */}
             <section id="unclaimed">
               <Text size="md">Unclaimed fluid rewards</Text>
-              <Display className="unclaimed-total" size="sm">
+              <Display className="unclaimed-total" size={"sm"}>
                 {numberToMonetaryString(unclaimedRewards)}
               </Display>
               {claiming ? (
                 <GeneralButton
                   size={"large"}
                   version={"primary"}
-                  buttonType="icon only"
+                  buttontype="icon only"
                   icon={<Spinner />}
                   handleClick={onClick}
                   className="view-breakdown-button"
@@ -105,7 +105,7 @@ const UserRewards = ({
                 <GeneralButton
                   size={"large"}
                   version={"primary"}
-                  buttonType="text"
+                  buttontype="text"
                   handleClick={onClick}
                   className="view-breakdown-button"
                 >

@@ -3,7 +3,6 @@
 // LICENSE.md file.
 
 import {
-  GeneralButton,
   Heading,
   LinkButton,
   Text,

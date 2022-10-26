@@ -22,6 +22,8 @@ import {
 } from "@fluidity-money/surfing";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import TransactionTable from "~/components/TransactionTable";
+import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
+import { Providers } from "~/components/ProviderIcon";
 
 const address = "bb004de25a81cb4ed6b2abd68bcc2693615b9e04";
 
@@ -62,6 +64,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let userTransactionCount;
   let userTransactions;
+  let expectedRewards;
   let errorMsg;
 
   try {
@@ -71,6 +74,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     userTransactions = await (
       await useUserTransactions(network ?? "", address, page)
     ).json();
+    expectedRewards = await useGlobalRewardStatistics(network ?? "");
   } catch (err) {
     errorMsg = "The transaction explorer is currently unavailable";
   } // Fail silently - for now.
@@ -79,9 +83,38 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return redirect("/error", { status: 500, statusText: errorMsg });
   }
 
+  // group rewards by backend
+  const aggregatedExpectedRewards =
+    expectedRewards?.data.expected_rewards.reduce((previous, currentReward) => {
+      const {
+        highest_reward: prize,
+        average_reward: avgPrize,
+        token_short_name,
+      } = currentReward;
+      const backend = backends[token_short_name];
+
+      // append to backend if it exists
+      if (previous[backend]) {
+        previous[backend].avgPrize += avgPrize;
+        // max prize
+        previous[backend].prize = Math.max(previous[backend].prize, prize);
+        // set backend if it doesn't exist
+      } else {
+        previous[backend] = {
+          name: backend,
+          prize,
+          avgPrize,
+        };
+      }
+      return previous;
+    }, {} as { [K in Providers]: Provider });
+
+  // convert to expected format
+  const rewarders = Object.values(aggregatedExpectedRewards || {});
+
   if (userTransactionCount.errors || userTransactions.errors) {
     return json({
-      rewarders: rewarders,
+      rewarders,
       transactions: [],
       count: 0,
       page,
@@ -138,7 +171,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // Get Best Rewarders - SCOPED OUT NO DATA
 
   return json({
-    rewarders: rewarders,
+    rewarders,
     transactions: sanitizedTransactions,
     count,
     page,
@@ -331,25 +364,32 @@ export default function Rewards() {
   );
 }
 
-const rewarders: Provider[] = [
-  {
-    name: "Solana",
-    prize: 351879,
-    avgPrize: 1234,
-  },
-  {
-    name: "Polygon",
-    prize: 361879,
-    avgPrize: 1234,
-  },
-  {
-    name: "Compound",
-    prize: 351879,
-    avgPrize: 1234,
-  },
-  {
-    name: "Solana",
-    prize: 351879,
-    avgPrize: 1234,
-  },
-];
+// const rewarders: Provider[] = [
+//   {
+//     name: "Solana",
+//     prize: 351879,
+//     avgPrize: 1234,
+//   },
+//   {
+//     name: "Polygon",
+//     prize: 361879,
+//     avgPrize: 1234,
+//   },
+//   {
+//     name: "Compound",
+//     prize: 351879,
+//     avgPrize: 1234,
+//   },
+//   {
+//     name: "Solana",
+//     prize: 351879,
+//     avgPrize: 1234,
+//   },
+//
+// ];
+
+const backends: { [Token: string]: Providers } = {
+  USDC: "Compound",
+  USDT: "Compound",
+  DAI: "Compound",
+};

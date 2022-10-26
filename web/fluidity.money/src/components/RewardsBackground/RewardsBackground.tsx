@@ -42,19 +42,19 @@ const RewardsBackground = () => {
   const carouselVariants = {
     appear: { x: 0 },
   };
-  
+
   const txExplorerUrl = (txHash: string) => {
     switch (true) {
-     case (chain === "ETH" && network === "STAGING"):
-        return `https://ropsten.etherscan.io/tx/${txHash}`
-     case (chain === "ETH" && network === "MAINNET"):
-        return `https://etherscan.io/tx/${txHash}`
-     case (chain === "SOL" && network === "STAGING"):
-        return `https://explorer.solana.com/tx/${txHash}?cluster=devnet`
-     case (chain === "SOL" && network === "MAINNET"):
-        return `https://explorer.solana.com/tx/${txHash}`
-  }
-  }
+      case chain === "ETH" && network === "STAGING":
+        return `https://ropsten.etherscan.io/tx/${txHash}`;
+      case chain === "ETH" && network === "MAINNET":
+        return `https://etherscan.io/tx/${txHash}`;
+      case chain === "SOL" && network === "STAGING":
+        return `https://explorer.solana.com/tx/${txHash}?cluster=devnet`;
+      case chain === "SOL" && network === "MAINNET":
+        return `https://explorer.solana.com/tx/${txHash}`;
+    }
+  };
 
   const carouselInfo = (
     <div>
@@ -130,146 +130,3 @@ const RewardsBackground = () => {
 };
 
 export default RewardsBackground;
-
-const dummyRewards = [
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-  {
-    token: "USDC",
-    amount: 234405,
-    address: "asdasa0093lsdn",
-    date: new Date(),
-    transaction: "0xflfjefnl88",
-  },
-];
