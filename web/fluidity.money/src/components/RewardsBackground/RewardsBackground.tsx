@@ -10,7 +10,6 @@ import {
   formatTo12HrDate,
   Text,
 } from "@fluidity-money/surfing";
-import TextTransition, { presets } from "react-text-transition";
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
@@ -63,38 +62,36 @@ const RewardsBackground = () => {
         .slice(rewardLimit)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
-            <TextTransition springConfig={presets.stiff}>
-              <a
-                href={txExplorerUrl(transaction)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src={
-                    token === "USDT"
-                      ? "/assets/images/tokenIcons/usdt.svg"
-                      : "/assets/images/tokenIcons/usdc.svg"
-                  }
-                  alt="tokenIcon"
-                />
+            <a
+              href={txExplorerUrl(transaction)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src={
+                  token === "USDT"
+                    ? "/assets/images/tokenIcons/usdt.svg"
+                    : "/assets/images/tokenIcons/usdc.svg"
+                }
+                alt="tokenIcon"
+              />
 
-                <Text as="p" prominent={true} className={styles.hover}>
-                  {numberToMonetaryString(amount)}{" "}
-                </Text>
+              <Text as="p" prominent={true} className={styles.hover}>
+                {numberToMonetaryString(amount)}{" "}
+              </Text>
 
-                <Text as="p" className={styles.hover}>
-                  {`sent to`}{" "}
-                </Text>
+              <Text as="p" className={styles.hover}>
+                {`sent to`}{" "}
+              </Text>
 
-                <Text as="p" className={styles.hoverUnderline}>
-                  {`${trimAddressShort(address)}`}{" "}
-                </Text>
+              <Text as="p" className={styles.hoverUnderline}>
+                {`${trimAddressShort(address)}`}{" "}
+              </Text>
 
-                <Text as="p" className={styles.hover}>
-                  {formatTo12HrDate(date)}
-                </Text>
-              </a>
-            </TextTransition>
+              <Text as="p" className={styles.hover}>
+                {formatTo12HrDate(date)}
+              </Text>
+            </a>
           </div>
         ))}
     </div>
