@@ -63,42 +63,38 @@ const RewardsBackground = () => {
         .slice(rewardLimit)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
-            <a
-              href={txExplorerUrl(transaction)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={
-                  token === "USDT"
-                    ? "/assets/images/tokenIcons/usdt.svg"
-                    : "/assets/images/tokenIcons/usdc.svg"
-                }
-                alt="tokenIcon"
-              />
+            <TextTransition springConfig={presets.stiff}>
+              <a
+                href={txExplorerUrl(transaction)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={
+                    token === "USDT"
+                      ? "/assets/images/tokenIcons/usdt.svg"
+                      : "/assets/images/tokenIcons/usdc.svg"
+                  }
+                  alt="tokenIcon"
+                />
 
-              <Text as="p" prominent={true} className={styles.hover}>
-                <TextTransition springConfig={presets.stiff}>
+                <Text as="p" prominent={true} className={styles.hover}>
                   {numberToMonetaryString(amount)}{" "}
-                </TextTransition>
-              </Text>
+                </Text>
 
-              <Text as="p" className={styles.hover}>
-                {`sent to`}{" "}
-              </Text>
+                <Text as="p" className={styles.hover}>
+                  {`sent to`}{" "}
+                </Text>
 
-              <Text as="p" className={styles.hoverUnderline}>
-                <TextTransition springConfig={presets.stiff}>
+                <Text as="p" className={styles.hoverUnderline}>
                   {`${trimAddressShort(address)}`}{" "}
-                </TextTransition>
-              </Text>
+                </Text>
 
-              <Text as="p" className={styles.hover}>
-                <TextTransition springConfig={presets.stiff}>
+                <Text as="p" className={styles.hover}>
                   {formatTo12HrDate(date)}
-                </TextTransition>
-              </Text>
-            </a>
+                </Text>
+              </a>
+            </TextTransition>
           </div>
         ))}
     </div>
