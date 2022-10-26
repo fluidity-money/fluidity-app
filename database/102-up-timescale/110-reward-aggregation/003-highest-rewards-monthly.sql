@@ -7,7 +7,7 @@ CREATE OR REPLACE VIEW highest_rewards_monthly AS
         transaction_hash, 
         winning_address, 
         winning_amount, 
-        awarded_time, 
+        date_trunc('day', awarded_time) as awarded_day, 
         created, 
         token_short_name, 
         winning_amount / (10 ^ token_decimals) AS winning_amount_scaled,
