@@ -429,8 +429,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 // fromTokenIsSupported checks if fromToken is part of Day 1 supported Eth tokens
 func fromTokenIsSupported(token ethCommon.Address) bool {
-	tokenAddress_ := token.String()
-	tokenAddress := libEthereum.AddressFromString(tokenAddress_)
+	tokenAddress := ethereum.ConvertGethAddress(token)
 
 	_, found := supportedTokens[tokenAddress]
 

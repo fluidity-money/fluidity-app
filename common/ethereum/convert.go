@@ -40,13 +40,13 @@ func ConvertGethLog(log ethTypes.Log) ethereum.Log {
 	}
 
 	return ethereum.Log{
-		Address:     ethereum.AddressFromString(log.Address.Hex()),
+		Address:     ConvertGethAddress(log.Address),
 		Topics:      topics,
 		Data:        log.Data,
 		BlockNumber: misc.BigIntFromUint64(log.BlockNumber),
-		TxHash:      ethereum.HashFromString(log.TxHash.Hex()),
+		TxHash:      ConvertGethHash(log.TxHash),
 		TxIndex:     misc.BigIntFromUint64(uint64(log.TxIndex)),
-		BlockHash:   ethereum.HashFromString(log.BlockHash.Hex()),
+		BlockHash:   ConvertGethHash(log.BlockHash),
 		Index:       misc.BigIntFromUint64(uint64(log.Index)),
 	}
 }

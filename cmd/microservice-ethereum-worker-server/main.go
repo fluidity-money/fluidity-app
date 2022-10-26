@@ -119,7 +119,7 @@ const (
 func main() {
 	var (
 		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
-		contractAddress_         = util.GetEnvOrFatal(EnvContractAddress)
+		ethContractAddress       = mustEthereumAddressFromEnv(EnvContractAddress)
 		tokenBackend             = util.GetEnvOrFatal(EnvTokenBackend)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
@@ -130,7 +130,6 @@ func main() {
 	rand.Seed(time.Now().Unix())
 
 	var (
-		ethContractAddress            ethCommon.Address
 		ethUniswapAnchoredViewAddress ethCommon.Address
 		ethUsdTokenAddress            ethCommon.Address
 		ethEthTokenAddress            ethCommon.Address
@@ -164,10 +163,6 @@ func main() {
 			)
 		})
 	}
-
-	contractAddress := ethereum.AddressFromString(contractAddress_)
-
-	ethContractAddress = hexToAddress(contractAddress)
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
 
