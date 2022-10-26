@@ -48,6 +48,24 @@ const OptionsSchema = z.object({
         .min(1),
     })
   ),
+  provider_icons: z.object({
+    Aave: z.string(),
+    Aldrin: z.string(),
+    Circle: z.string(),
+    Compound: z.string(),
+    Dodo: z.string(),
+    Jupiter: z.string(),
+    Lemniscap: z.string(),
+    Maker: z.string(),
+    Multicoin: z.string(),
+    Orca: z.string(),
+    Polygon: z.string(),
+    Saber: z.string(),
+    Solana: z.string(),
+    Solend: z.string(),
+    Uniswap: z.string(),
+    Sushiswap: z.string(),
+  }),
 });
 
 export type Options = z.infer<typeof OptionsSchema>;

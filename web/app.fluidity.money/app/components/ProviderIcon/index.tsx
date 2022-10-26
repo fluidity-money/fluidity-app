@@ -1,3 +1,6 @@
+import { useLoaderData } from "@remix-run/react";
+import config from "~/webapp.config.server";
+
 export type Providers =
   | "Aave"
   | "Aldrin"
@@ -39,8 +42,16 @@ type IProviderIcon = {
   provider: Providers;
 };
 
-const ProviderIcon = ({ provider }: IProviderIcon) => (
-  <img className="provider-img" src={providerIconUrlMap[provider]} alt="" />
-);
+type LoaderData = {
+  icons: typeof config.provider_icons;
+};
+
+const ProviderIcon = ({ provider }: IProviderIcon) => {
+  const { icons } = useLoaderData<LoaderData>();
+  console.log(icons);
+  return (
+    <img className="provider-img" src={providerIconUrlMap[provider]} alt="" />
+  );
+};
 
 export default ProviderIcon;

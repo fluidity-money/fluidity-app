@@ -56,11 +56,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const provider = config.liquidity_providers;
 
+  const icons = config.provider_icons;
+
   return {
     appName: routeMapper(pathname),
     version: "1.5",
     network,
     provider,
+    icons,
   };
 };
 

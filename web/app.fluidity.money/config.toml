@@ -121,6 +121,7 @@ address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 
 # liquidity_providers Configurations 
+# eth providers
 [liquidity_providers.ethereum]
 
 [[liquidity_providers.ethereum.providers]]
@@ -138,6 +139,7 @@ name= "dodo"
 img= "/images/providers/DODO.png"
 link= "https://www.dodoex.io/"
 
+# sol providers
 [liquidity_providers.solana]
 
 [[liquidity_providers.solana.providers]]
@@ -159,3 +161,22 @@ link= "https://www.saber.so/"
 name= "jupiter"
 img= "/images/providers/Jupiter.svg"
 link= "https://www.jup.ag/"
+
+# provider icons
+[provider_icons]
+Aave= "/images/providers/aave-aave-logo.png"
+Aldrin= "/images/providers/Aldrin.svg"
+Circle= "/images/providers/circle-icon-inset-300.png"
+Compound= "/images/providers/Compound.svg"
+Dodo= "/images/providers/DODO.png"
+Jupiter= "/images/providers/Jupiter.svg"
+Lemniscap= "/images/providers/Lemniscap.png"
+Maker= "/images/providers/maker-mkr-logo.png"
+Multicoin= "/images/providers/Multicoin.png"
+Orca= "/images/providers/Orca.svg"
+Polygon= "/images/providers/Polygon.svg"
+Saber= "/images/providers/saber.svg"
+Solana= "/images/providers/Solana.svg"
+Solend= "/images/providers/solend.png"
+Uniswap= "/images/providers/Uniswap.svg"
+Sushiswap= "/images/providers/Sushiswap.svg"
