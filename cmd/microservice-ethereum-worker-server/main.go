@@ -460,6 +460,9 @@ func main() {
 		for _, transfer := range fluidTransfers {
 
 			var (
+				receipt     = transfer.Receipt
+				transaction = transfer.Transaction
+
 				transactionHash      = transfer.Transaction.Hash
 				senderAddress        = transfer.SenderAddress
 				recipientAddress     = transfer.RecipientAddress
@@ -467,9 +470,9 @@ func main() {
 				transferType         = transfer.Transaction.Type
 				gasTipCap            = transfer.Transaction.GasTipCap
 				appEmission          = transfer.AppEmissions
-				gasUsed              = transfer.GasUsed
-				maxPriorityFeePerGas = transfer.MaxPriorityFeePerGas
-				maxFeePerGas         = transfer.MaxFeePerGas
+				gasUsed              = receipt.GasUsed
+				maxPriorityFeePerGas = transaction.GasTipCap
+				maxFeePerGas         = transaction.GasFeeCap
 
 				applicationFeeUsd *big.Rat
 			)
@@ -492,7 +495,7 @@ func main() {
 			var (
 				gasTipCapRat = bigIntToRat(gasTipCap)
 				gasLimitRat  = uint64ToRat(gasLimit)
-				gasUsedRat   = uint64ToRat(gasUsed)
+				gasUsedRat   = bigIntToRat(gasUsed)
 			)
 
 			// remember the gas limit and tip cap in the
@@ -506,7 +509,7 @@ func main() {
 			// remember the inputs to the gas actually used
 			// in usd calculation
 
-			emission.GasUsed = gasUsed
+			emission.GasUsed = gasUsed.Uint64()
 
 			emission.BlockBaseFee = blockBaseFee
 

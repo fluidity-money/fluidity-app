@@ -59,9 +59,6 @@ type (
 		From      Address     `json:"from"`
 		Type      uint8       `json:"type"`
 		Value     misc.BigInt `json:"value"`
-
-		// Receipt is a transaction receipt collected optionally!
-		Receipt *Receipt `json:"receipt"`
 	}
 
 	// Log represents a contract event log that we have confirmed isn't removed

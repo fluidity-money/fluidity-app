@@ -60,7 +60,7 @@ func main() {
 			})
 
 		case header := <-headers:
-			newHeader := ethCommon.ConvertHeader(header)
+			newHeader := ethCommon.ConvertGethHeader(header)
 
 			log.Debug(func(k *log.Log) {
 				k.Format("Sending Block Header: %v", newHeader.BlockHash)
