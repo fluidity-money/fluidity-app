@@ -2,13 +2,13 @@
 [[drivers.ethereum]]
 label = "Ethereum"
 testnet = false
-rpc = { http = "https://mainnet.infura.io/v3/your-api-key", ws = "ws://localhost:8546" }
+rpc = { http = "FLU_ETH_RPC_HTTP", ws = "FLU_ETH_RPC_WS" }
 server = "https://backend.ethereum.fluidity.money"
 
 [[drivers.solana]]
 label = "Solana"
 testnet = false
-rpc = { http = "https://api.mainnet-beta.solana.com", ws = "wss://api.mainnet-beta.solana.com" }
+rpc = { http = "FLU_SOL_RPC_HTTP", ws = "FLU_SOL_RPC_WS" }
 server = ""
 
 # Chain Configurations
