@@ -1,4 +1,3 @@
-import { Rewarder } from "~/routes/$network/dashboard/rewards";
 import { gql, Queryable } from "~/util";
 import { jsonPost } from "~/util/api/rpc";
 

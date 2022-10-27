@@ -20,6 +20,7 @@ export const solGetTransactionsObservable = (
       config.drivers["solana"][network].rpc.http,
       { wsEndpoint: config.drivers["solana"][network].rpc.ws }
     );
+
     SolanaConnection.onLogs(
       new PublicKey(address),
       (transactionLog) => {
@@ -27,7 +28,6 @@ export const solGetTransactionsObservable = (
           .then((event) => {
             // Because solana logs token transaction twice :(
             if (LastSignature === transactionLog.signature) return;
-
             /*
              *  meta-data postbalances and prebalances retrives
              * {
@@ -60,20 +60,17 @@ export const solGetTransactionsObservable = (
             const amount = preTokenBalanceSource.sub(postTokenBalanceSource);
 
             //Spam transaction: not possible for an account signer to transfer more amount of token than it owns.
-            if (amount.isNeg()) return;
-            if (source == `undefined` || destination == `undefined`) return;
 
             const uiTokenAmount = amountToDecimalString(
               amount.toString(10),
               tokenDecimal
             );
             const transaction: PipedTransaction = {
-              source,
-              destination,
+              source: source,
+              destination: destination,
               amount: shorthandAmountFormatter(uiTokenAmount, 3),
               token,
             };
-
             LastSignature = transactionLog.signature;
             subscriber.next(transaction);
           })
