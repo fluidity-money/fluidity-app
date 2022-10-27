@@ -11,7 +11,6 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
 };
 
-
 export default function IndexPage() {
   const toolTip = useToolTip();
 
@@ -29,7 +28,7 @@ export default function IndexPage() {
   };
 
   return (
-    <div >
+    <div>
       <Display size="lg" className="no-margin">
         <Text>
           <Text prominent>{"{address}"}</Text>

@@ -84,7 +84,7 @@ export default function Dashboard() {
 
   const { state } = useContext(Web3Context());
   const account = state.account ?? "";
-  
+
   const { width } = useViewport();
   const isMobile = width <= 375;
 
@@ -201,11 +201,11 @@ export default function Dashboard() {
 
       <main id="dashboard-body">
         <nav id="top-navbar">
-          {
-            isMobile
-              ? <img src="/logo.svg" alt="Fluidity" />
-              : <Text>{appName}</Text>
-          }
+          {isMobile ? (
+            <img src="/logo.svg" alt="Fluidity" />
+          ) : (
+            <Text>{appName}</Text>
+          )}
           <div>
             {/* Send */}
             {/*

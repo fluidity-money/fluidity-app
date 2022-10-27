@@ -24,7 +24,6 @@ const LabelledValue = ({
   const { width } = useViewport();
   const mobileView = width <= 375;
 
-
   return (
     <div className={classProps}>
       <Text size={mobileView ? "sm" : "md"}>{label}</Text>

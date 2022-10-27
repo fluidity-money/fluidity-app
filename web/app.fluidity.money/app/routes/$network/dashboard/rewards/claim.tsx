@@ -47,20 +47,20 @@ const ClaimedRewards = () => {
   const { reward, networkFee, gasFee } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
-  
+
   const generateTweet = () => {
     const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
-    
+
     const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
-    
-    twitterUrl.searchParams.set('text', tweetMsg);
-    
-    const fluTwitterHandle = `fluiditymoney`
-    
-    twitterUrl.searchParams.set('via', fluTwitterHandle)
-    
+
+    twitterUrl.searchParams.set("text", tweetMsg);
+
+    const fluTwitterHandle = `fluiditymoney`;
+
+    twitterUrl.searchParams.set("via", fluTwitterHandle);
+
     return twitterUrl.href;
-  }
+  };
 
   return (
     <div id="claim-container" className="cover">
@@ -138,7 +138,7 @@ const ClaimedRewards = () => {
           icon={<img src="/images/socials/twitter.svg" />}
           size={"large"}
           handleClick={() => {
-            navigate(generateTweet())
+            navigate(generateTweet());
           }}
         >
           Share

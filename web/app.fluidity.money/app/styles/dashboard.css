@@ -36,7 +36,6 @@ main {
   }
 }
 
-
 main > nav {
   grid-area: header-bar;
   display: flex;

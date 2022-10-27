@@ -1,16 +1,16 @@
 import { parse } from "toml";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import z, {string} from "zod";
+import z, { string } from "zod";
 
 const envVar = () => {
   return {
     default: (key: string) =>
       string()
         .default(`${key}`)
-        .transform((key: string): string => process.env[key] ?? "")
-  }
-}
+        .transform((key: string): string => process.env[key] ?? ""),
+  };
+};
 
 const OptionsSchema = z.object({
   drivers: z.object({}).catchall(
