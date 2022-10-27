@@ -3,7 +3,7 @@ import type { Chain } from "~/util/chainUtils/chains";
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
 
-import { Display, Text } from "@fluidity-money/surfing";
+import { Display, LineChart, Text } from "@fluidity-money/surfing";
 
 import { useUserTransactionCount, useUserTransactions } from "~/queries";
 import { useLoaderData } from "@remix-run/react";
@@ -118,7 +118,19 @@ export default function Home() {
   return (
     <>
       <section id="graph">
-        <div className="graph"></div>
+        <div className="graph" style={{width: "100%", height: "400px"}}>
+          <LineChart
+            data={[{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 40, y: 20}]}
+            xLabel="Some X Label"
+            yLabel="Some Y Label"
+            lineLabel="Some Tooltip Label"
+
+            accessors={{
+                xAccessor: (d: any) => d.x,
+                yAccessor: (d: any) => d.y,
+            }}
+          />
+        </div>
         <div className="graph-ceiling">
           <div className="overlay">
             <div className="statistics-row">
