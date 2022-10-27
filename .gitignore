@@ -60,3 +60,6 @@ deployment_list.json
 # Vendor specific
 .vscode
 .DS_Store
+
+install/**
+**/node_modules

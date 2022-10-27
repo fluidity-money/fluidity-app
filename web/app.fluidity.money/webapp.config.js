@@ -6,8 +6,8 @@ const options = {
         label: "Ethereum",
         testnet: false,
         rpc: {
-          http: "https://mainnet.infura.io/v3/your-api-key",
-          ws: "wss://mainnet.infura.io/ws/v3/your-api-key",
+          http: process.env["FLU_ETH_RPC_HTTP"],
+          ws: process.env["FLU_ETH_RPC_WS"],
         },
       },
     ],
@@ -16,8 +16,8 @@ const options = {
         label: "Solana",
         testnet: false,
         rpc: {
-          http: "https://api.mainnet-beta.solana.com",
-          ws: "wss://api.mainnet-beta.solana.com",
+          http: process.env["FLU_SOL_RPC_HTTP"],
+          ws: process.env["FLU_SOL_RPC_WS"],
         },
       },
     ],
