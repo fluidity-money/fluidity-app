@@ -10,8 +10,25 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
+
+// ConvertGethHash from the ethereum definition into its internal type
+// equivalent
+func ConvertGethHash(hash ethCommon.Hash) ethereum.Hash {
+	hashString := hash.Hex()
+
+	return ethereum.HashFromString(hashString)
+}
+
+// ConvertGethAddress from the ethereum definition into its internal type
+// equivalent
+func ConvertGethAddress(address ethCommon.Address) ethereum.Address {
+	addressString := address.String()
+
+	return ethereum.AddressFromString(addressString)
+}
 
 // ConvertGethLog from the ethereum definition into its internal type
 // equivalent
@@ -34,9 +51,25 @@ func ConvertGethLog(log ethTypes.Log) ethereum.Log {
 	}
 }
 
-// ConvertHeader from the ethereum definition into its internal type
+// ConvertGethLogs converts an array of geth logs to its internal type
 // equivalent
-func ConvertHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
+func ConvertGethLogs(logs []*ethTypes.Log) []ethereum.Log {
+	var newLogs []ethereum.Log
+
+	for _, log := range logs {
+		if log == nil {
+			continue
+		}
+
+		newLogs = append(newLogs, ConvertGethLog(*log))
+	}
+
+	return newLogs
+}
+
+// ConvertGethHeader from the ethereum definition into its internal type
+// equivalent
+func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 
 	var difficulty, number, baseFee big.Int
 
@@ -72,5 +105,33 @@ func ConvertHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 		Nonce:           ethereum.BlockNonce(oldHeader.Nonce[:]),
 		ReceiptHash:     ethereum.HashFromString(receiptHash),
 		BaseFee:         misc.NewBigInt(baseFee),
+	}
+}
+
+func ConvertGethReceipt(receipt ethTypes.Receipt) ethereum.Receipt {
+	var (
+		postState_ = receipt.PostState
+		bloom_ = receipt.Bloom
+		logs_ = receipt.Logs
+		txHash_ = receipt.TxHash
+		contractAddress_ = receipt.ContractAddress
+		gasUsed_ = receipt.GasUsed
+		blockHash_ = receipt.BlockHash
+		blockNumber_ = receipt.BlockNumber
+	)
+
+	return ethereum.Receipt{
+		Type:              receipt.Type,
+		PostState:         misc.Blob(postState_),
+		Status:            receipt.Status,
+		CumulativeGasUsed: receipt.CumulativeGasUsed,
+		Bloom:             misc.Blob(bloom_.Bytes()),
+		Logs:              ConvertGethLogs(logs_),
+		TransactionHash:   ConvertGethHash(txHash_),
+		ContractAddress:   ConvertGethAddress(contractAddress_),
+		GasUsed:           misc.BigIntFromUint64(gasUsed_),
+		BlockHash:         ConvertGethHash(blockHash_),
+		BlockNumber:       misc.NewBigInt(*blockNumber_),
+		TransactionIndex:  receipt.TransactionIndex,
 	}
 }

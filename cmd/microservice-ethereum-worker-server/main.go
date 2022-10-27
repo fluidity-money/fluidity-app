@@ -10,47 +10,25 @@ import (
 	"strconv"
 	"time"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
 	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
-	// BackendCompound to use as the environment variable when the token
-	// is compound based
-	BackendCompound = "compound"
-
-	// BackendAave to use as the environment variable when the token
-	// is aave based
-	BackendAave = "aave"
-
-	// BackendAurora to use as the environment variable for Aurora
-	// to use Flux as a price oracle
-	BackendAurora = "aurora"
-
 	// SecondsInOneYear to use for ATX calculation
 	SecondsInOneYear uint64 = 365 * 24 * 60 * 60
-
-	// UsdtDecimals to normalise values to
-	UsdtDecimals int64 = 1e6
-
-	// Uniswap's oracle returns numbers with 6 decimals
-	UniswapOracleDecimals int64 = 1e6
 
 	// EthereumDecimals to normalise values to
 	EthereumDecimals int64 = 1e18
@@ -60,33 +38,11 @@ const (
 	// EnvContractAddress to use to find the Fluid contract to identify transfers
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
-	// EnvEthereumHttpUrl to use to get information on the apy and atx from Compound
+	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 
-	// EnvTokenBackend is `compound` if the token is compound based,
-	// or `aave` if aave based
-	EnvTokenBackend = `FLU_ETHEREUM_TOKEN_BACKEND`
-
-	// EnvCTokenAddress to use to get the CToken
-	EnvCTokenAddress = `FLU_ETHEREUM_CTOKEN_ADDR`
-
-	// EnvUniswapAnchoredViewAddress to look up to get the price for the asset and Compound
-	EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
-
-	// EnvAaveAddressProviderAddress to find aave related addresses
-	EnvAaveAddressProviderAddress = `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR`
-
-	// EnvATokenAddress to use to get the AToken
-	EnvATokenAddress = `FLU_ETHEREUM_ATOKEN_ADDR`
-
-	// EnvUsdTokenAddress to use to get the price of eth from aave
-	EnvUsdTokenAddress = `FLU_ETHEREUM_USD_TOKEN_ADDR`
-
-	// EnvEthTokenAddress to use to get the price of eth from aave
-	EnvEthTokenAddress = `FLU_ETHEREUM_ETH_TOKEN_ADDR`
-
-	// EnvUnderlyingTokenAddress to use to get the apy from aave
-	EnvUnderlyingTokenAddress = `FLU_ETHEREUM_UNDERLYING_TOKEN_ADDR`
+	// EnvChainlinkEthPriceFeed to get the price of eth in usd from
+	EnvChainlinkEthPriceFeed = `FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR`
 
 	// EnvUnderlyingTokenName to be mindful of when doing price conversions to USDT
 	EnvUnderlyingTokenName = `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`
@@ -95,22 +51,9 @@ const (
 	// when converting to USDT
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
-	// EnvEthereumDecimalPlaces to use when normalising Eth to USDT
-	EnvEthereumDecimalPlaces = `FLU_ETHEREUM_ETH_DECIMAL_PLACES`
-
-	// EnvAuroraEthFluxAddress for fetching the price of Eth from a Flux oracle
-	EnvAuroraEthFluxAddress = `FLU_AURORA_ETH_FLUX_ADDRESS`
-
-	// EnvAuroraTokenFluxAddress for fetching the price of the underlying token
-	// from a Flux oracle
-	EnvAuroraTokenFluxAddress = `FLU_AURORA_TOKEN_FLUX_ADDRESS`
-
 	// EnvPublishAmqpQueue name to use when sending server-tracked transfers
 	// to the client
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
-
-	// EnvMovingAverageRedisKey to track the APY moving average with
-	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
 
 	// EnvServerWorkQueue to receive serverwork from
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
@@ -119,8 +62,8 @@ const (
 func main() {
 	var (
 		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
-		contractAddress_         = util.GetEnvOrFatal(EnvContractAddress)
-		tokenBackend             = util.GetEnvOrFatal(EnvTokenBackend)
+		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
+		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
@@ -128,46 +71,6 @@ func main() {
 	)
 
 	rand.Seed(time.Now().Unix())
-
-	var (
-		ethContractAddress            ethCommon.Address
-		ethUniswapAnchoredViewAddress ethCommon.Address
-		ethUsdTokenAddress            ethCommon.Address
-		ethEthTokenAddress            ethCommon.Address
-		ethUnderlyingTokenAddress     ethCommon.Address
-		ethAaveAddressProviderAddress ethCommon.Address
-
-		auroraEthFluxAddress   ethCommon.Address
-		auroraTokenFluxAddress ethCommon.Address
-	)
-
-	switch tokenBackend {
-	case BackendCompound:
-		ethUniswapAnchoredViewAddress = mustEthereumAddressFromEnv(EnvUniswapAnchoredViewAddress)
-
-	case BackendAave:
-		ethAaveAddressProviderAddress = mustEthereumAddressFromEnv(EnvAaveAddressProviderAddress)
-		ethUsdTokenAddress            = mustEthereumAddressFromEnv(EnvUsdTokenAddress)
-		ethEthTokenAddress            = mustEthereumAddressFromEnv(EnvEthTokenAddress)
-		ethUnderlyingTokenAddress     = mustEthereumAddressFromEnv(EnvUnderlyingTokenAddress)
-
-	case BackendAurora:
-		auroraEthFluxAddress   = mustEthereumAddressFromEnv(EnvAuroraEthFluxAddress)
-		auroraTokenFluxAddress = mustEthereumAddressFromEnv(EnvAuroraTokenFluxAddress)
-
-	default:
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"%s should be `aave`, `compound`, or `aurora`, got %s",
-				EnvTokenBackend,
-				tokenBackend,
-			)
-		})
-	}
-
-	contractAddress := ethereum.AddressFromString(contractAddress_)
-
-	ethContractAddress = hexToAddress(contractAddress)
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
 
@@ -186,8 +89,6 @@ func main() {
 	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
 
 	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
-	usdtDecimalsRat := big.NewRat(UsdtDecimals, 1)
-	uniswapOracleDecimalsRat := big.NewRat(UniswapOracleDecimals, 1)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
 
@@ -330,121 +231,18 @@ func main() {
 
 		}
 
-		var ethPriceUsd *big.Rat
-
-		switch tokenBackend {
-		case BackendCompound:
-			ethPriceUsd, err = uniswap_anchored_view.GetPrice(
-				gethClient,
-				ethUniswapAnchoredViewAddress,
-				"ETH",
-			)
-
-			// the uniswap oracle return usd price with 6 decimals!
-
-			ethPriceUsd.Quo(
-				ethPriceUsd,
-				uniswapOracleDecimalsRat,
-			)
-
-		case BackendAave:
-			ethPriceUsd, err = aave.GetPrice(
-				gethClient,
-				ethAaveAddressProviderAddress,
-				ethEthTokenAddress,
-				ethUsdTokenAddress,
-			)
-
-		case BackendAurora:
-			ethPriceUsd, err = flux.GetPrice(
-				gethClient,
-				auroraEthFluxAddress,
-			)
-		}
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get the gas price in USD!"
-				k.Payload = err
-			})
-		}
-
-		var tokenPriceInUsdt *big.Rat
-
-		switch tokenBackend {
-		case BackendCompound:
-			tokenPriceInUsdt, err = uniswap_anchored_view.GetPrice(
-				gethClient,
-				ethUniswapAnchoredViewAddress,
-				tokenName,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get the token price in USDT! Uniswap anchored view address %#v, token name was %#v!",
-						ethUniswapAnchoredViewAddress,
-						tokenName,
-					)
-
-					k.Payload = err
-				})
-			}
-
-		case BackendAave:
-			tokenPriceInUsdt, err = aave.GetPrice(
-				gethClient,
-				ethAaveAddressProviderAddress,
-				ethUnderlyingTokenAddress,
-				ethUsdTokenAddress,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get the token price in USDT from aave! Underlying token address %v",
-						ethUnderlyingTokenAddress,
-					)
-					k.Payload = err
-				})
-			}
-
-		case BackendAurora:
-			tokenPriceInUsdt, err = flux.GetPrice(
-				gethClient,
-				auroraTokenFluxAddress,
-			)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get the token price in USDT! Flux Oracle Address address %#v",
-						auroraTokenFluxAddress,
-					)
-
-					k.Payload = err
-				})
-			}
-
-			// normalise the token price!
-			// tokenPrice / 10^(fluxDecimals-usdtDecimals)
-
-
-			decimalDifference := new(big.Rat).Quo(ethereumDecimalsRat, usdtDecimalsRat)
-
-			tokenPriceInUsdt.Quo(tokenPriceInUsdt, decimalDifference)
-		}
+		ethPriceUsd, err := chainlink.GetPrice(gethClient, chainlinkEthPriceFeed)
 
 		sizeOfThePool, err := fluidity.GetRewardPool(
 			gethClient,
-			ethContractAddress,
+			contractAddress,
 		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to get the prize pool in the Fluidity contract! Address %#v!",
-					contractAddress,
+					contractAddress.String(),
 				)
 
 				k.Payload = err
@@ -460,6 +258,9 @@ func main() {
 		for _, transfer := range fluidTransfers {
 
 			var (
+				receipt     = transfer.Receipt
+				transaction = transfer.Transaction
+
 				transactionHash      = transfer.Transaction.Hash
 				senderAddress        = transfer.SenderAddress
 				recipientAddress     = transfer.RecipientAddress
@@ -467,9 +268,9 @@ func main() {
 				transferType         = transfer.Transaction.Type
 				gasTipCap            = transfer.Transaction.GasTipCap
 				appEmission          = transfer.AppEmissions
-				gasUsed              = transfer.GasUsed
-				maxPriorityFeePerGas = transfer.MaxPriorityFeePerGas
-				maxFeePerGas         = transfer.MaxFeePerGas
+				gasUsed              = receipt.GasUsed
+				maxPriorityFeePerGas = transaction.GasTipCap
+				maxFeePerGas         = transaction.GasFeeCap
 
 				applicationFeeUsd *big.Rat
 			)
@@ -492,7 +293,7 @@ func main() {
 			var (
 				gasTipCapRat = bigIntToRat(gasTipCap)
 				gasLimitRat  = uint64ToRat(gasLimit)
-				gasUsedRat   = uint64ToRat(gasUsed)
+				gasUsedRat   = bigIntToRat(gasUsed)
 			)
 
 			// remember the gas limit and tip cap in the
@@ -506,7 +307,7 @@ func main() {
 			// remember the inputs to the gas actually used
 			// in usd calculation
 
-			emission.GasUsed = gasUsed
+			emission.GasUsed = gasUsed.Uint64()
 
 			emission.BlockBaseFee = blockBaseFee
 

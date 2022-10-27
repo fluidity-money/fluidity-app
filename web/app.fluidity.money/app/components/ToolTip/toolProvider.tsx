@@ -5,7 +5,7 @@ import { ToolContext } from "./toolContext";
 import { ToolTip } from "./toolTip";
 
 export const ToolProvider = (props: {
-  children: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+  children: React.ReactElement<string>;
 }) => {
   const [toolTips, setToolTips] = useState<
     { id: string; bgColor: string; content: React.ReactNode }[]

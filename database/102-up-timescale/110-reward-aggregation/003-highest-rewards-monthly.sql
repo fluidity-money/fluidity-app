@@ -7,7 +7,11 @@ CREATE OR REPLACE VIEW highest_rewards_monthly AS
         transaction_hash, 
         winning_address, 
         winning_amount, 
+<<<<<<< HEAD
         awarded_time,
+=======
+        awarded_time, 
+>>>>>>> develop
         created, 
         token_short_name, 
         winning_amount / (10 ^ token_decimals) AS winning_amount_scaled,
@@ -35,5 +39,10 @@ CREATE OR REPLACE VIEW highest_reward_winner_totals AS
 
 -- migrate:down
 
+<<<<<<< HEAD
 DROP VIEW IF EXISTS highest_reward_winner_totals;
 DROP VIEW IF EXISTS highest_rewards_monthly;
+=======
+DROP VIEW IF EXISTS highest_rewards_monthly;
+DROP VIEW IF EXISTS highest_reward_winner_totals;
+>>>>>>> develop

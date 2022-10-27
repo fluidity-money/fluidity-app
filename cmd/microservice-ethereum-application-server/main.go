@@ -82,7 +82,6 @@ func main() {
 			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
 			blockHash    = blockLog.BlockHash
-			baseFee      = blockLog.BaseFee
 		)
 
 		fluidTransfers, err := libEthereum.GetTransfers(
@@ -148,18 +147,14 @@ func main() {
 				})
 			}
 
-			var (
-				transaction          = fluidTransfer.Transaction
+			if txReceipt == nil {
+				log.Fatal(func(k *log.Log) {
+				    k.Format("Receipt for fluid transfer %v was nil!", fluidTransferHash)
+				})
+			}
 
-				gasUsed              = txReceipt.GasUsed
-				maxPriorityFeePerGas = transaction.GasTipCap
-				maxFeePerGas         = transaction.GasFeeCap
-			)
-
-			fluidTransfer.GasUsed = gasUsed
-			fluidTransfer.BaseFeePerGas = baseFee
-			fluidTransfer.MaxPriorityFeePerGas = maxPriorityFeePerGas
-			fluidTransfer.MaxFeePerGas = maxFeePerGas
+			convertedReceipt := libEthereum.ConvertGethReceipt(*txReceipt)
+			fluidTransfer.Receipt = convertedReceipt
 
 			decoratedTransfers[i] = fluidTransfer
 		}
@@ -168,11 +163,6 @@ func main() {
 		for _, transfer := range applicationTransfers {
 
 			transaction := transfer.Transaction
-
-			var (
-				maxPriorityFeePerGas = transaction.GasTipCap
-				maxFeePerGas         = transaction.GasFeeCap
-			)
 
 			transactionHashHex := transaction.Hash.String()
 
@@ -196,7 +186,16 @@ func main() {
 				})
 			}
 
-			gasUsed := txReceipt.GasUsed
+			if txReceipt == nil {
+				log.Fatal(func(k *log.Log) {
+				    k.Format(
+						"Receipt for fluid transfer %v was nil!",
+						transactionHashHex,
+					)
+				})
+			}
+
+			convertedReceipt := libEthereum.ConvertGethReceipt(*txReceipt)
 
 			fee, emission, err := applications.GetApplicationFee(
 				transfer,
@@ -246,10 +245,7 @@ func main() {
 				RecipientAddress:     toAddress,
 				Decorator:            decorator,
 				Transaction:          transfer.Transaction,
-				GasUsed:              gasUsed,
-				BaseFeePerGas:        baseFee,
-				MaxPriorityFeePerGas: maxPriorityFeePerGas,
-				MaxFeePerGas:         maxFeePerGas,
+				Receipt:              convertedReceipt,
 				AppEmissions:         emission,
 			}
 

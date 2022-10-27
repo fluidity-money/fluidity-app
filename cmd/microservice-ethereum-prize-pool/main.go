@@ -6,8 +6,6 @@ package main
 
 import (
 	"math"
-	"math/big"
-	"os"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -17,11 +15,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/fluidity-money/fluidity-app/common/aurora/flux"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/aave"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	uniswap_anchored_view "github.com/fluidity-money/fluidity-app/common/ethereum/uniswap-anchored-view"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 )
@@ -79,69 +74,15 @@ func main() {
 	var (
 		gethAddress  = util.GetEnvOrFatal(EnvEthereumHttpAddress)
 		tokensList_  = util.GetEnvOrFatal(EnvTokensList)
-		tokenBackend = os.Getenv(EnvTokenBackend)
-	)
-
-	var (
-		uniswapAnchoredViewAddressEth ethCommon.Address
-		aaveAddressProviderAddressEth ethCommon.Address
-		usdTokenAddressEth            ethCommon.Address
-
-		isCompound = false
-		isAave     = false
 	)
 
 	// getGethConnection, causing Fatal to trigger if we don't succeed.
 
 	gethClient := getGethClient(gethAddress)
 
-	switch tokenBackend {
-	case BackendCompound:
-		isCompound = true
-
-	case BackendAave:
-		isAave = true
-
-	case "":
-	}
-
 	// tokensList will Fatal if bad input
 
 	tokenDetails := ethereum.GetTokensListEthereum(tokensList_)
-
-	for i, token := range tokenDetails {
-
-		switch backend := token.Backend; backend {
-
-		case "":
-			// not set globally
-			if tokenBackend == "" {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Token backend for option %v at position %d was empty!",
-						backend,
-						i,
-					)
-				})
-			}
-			tokenDetails[i].Backend = tokenBackend
-
-		case BackendCompound:
-			isCompound = true
-
-		case BackendAave:
-			isAave = true
-		}
-	}
-
-	if isCompound {
-		uniswapAnchoredViewAddressEth = mustAddressFromEnv(EnvUniswapAnchoredViewAddress)
-	}
-
-	if isAave {
-		aaveAddressProviderAddressEth = mustAddressFromEnv(EnvAaveAddressProviderAddress)
-		usdTokenAddressEth            = mustAddressFromEnv(EnvUsdTokenAddress)
-	}
 
 	var (
 		workChan = make(chan ethereum.TokenDetailsEthereum, 0)
@@ -151,60 +92,16 @@ func main() {
 	for i := 0; i < WorkerPoolAmount; i++ {
 		go func() {
 			for work := range workChan {
-
 				var (
 					address       = work.Address
 					fluidAddress  = work.FluidAddress
 					tokenName     = work.TokenName
 					tokenDecimals = work.TokenDecimals
-					tokenBackend  = work.Backend
 
-					tokenPrice *big.Rat
 					err        error
 				)
 
-				switch tokenBackend {
-				case BackendCompound:
-					tokenPrice, err = uniswap_anchored_view.GetPrice(
-						gethClient,
-						uniswapAnchoredViewAddressEth,
-						tokenName,
-					)
-
-				case BackendAave:
-					tokenPrice, err = aave.GetPrice(
-						gethClient,
-						aaveAddressProviderAddressEth,
-						address,
-						usdTokenAddressEth,
-					)
-				case BackendAurora:
-					tokenPrice, err = flux.GetPrice(
-						gethClient,
-						address,
-					)
-
-					// flux has a different number of decimal places
-					tokenDecimals, err = flux.GetDecimals(
-						gethClient,
-						address,
-					)
-				}
-
-				if err != nil {
-					log.Fatal(func(k *log.Log) {
-						k.Format(
-							"Failed to get the current exchange rate for %#v with address %#v at %#v!",
-							tokenName,
-							uniswapAnchoredViewAddressEth,
-							aaveAddressProviderAddressEth,
-						)
-
-						k.Payload = err
-					})
-				}
-
-				tokenPrice.Quo(tokenPrice, tokenDecimals)
+				// we assume the token is always worth a dollar!
 
 				prizePool, err := fluidity.GetRewardPool(gethClient, fluidAddress)
 
@@ -221,17 +118,12 @@ func main() {
 
 				prizePoolAdjusted := prizePool.Quo(prizePool, tokenDecimals)
 
-				// multiply the token price with the exchange rate to get it in USD...
-
 				log.Debug(func(k *log.Log) {
 					k.Format(
-						"Prize pool: %v, token price: %v",
+						"Prize pool: %v",
 						prizePoolAdjusted.FloatString(10),
-						tokenPrice.FloatString(10),
 					)
 				})
-
-				prizePoolAdjusted.Mul(prizePoolAdjusted, tokenPrice)
 
 				prizePoolFloat, _ := prizePoolAdjusted.Float64()
 

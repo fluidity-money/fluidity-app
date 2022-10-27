@@ -163,7 +163,8 @@ func weiToUsd(wei, usdPrice, ethDecimals *big.Rat) *big.Rat {
 	res := new(big.Rat)
 
 	res.Quo(wei, ethDecimals)
-	res.Mul(wei, usdPrice)
+
+	res.Mul(res, usdPrice)
 
 	return res
 }
@@ -206,7 +207,7 @@ func mustEthereumAddressFromEnv(env string) ethCommon.Address {
 		})
 	}
 
-	return ethCommon.HexToAddress(env)
+	return ethCommon.HexToAddress(addressString)
 }
 
 func sendEmission(emission *worker.Emission) {
