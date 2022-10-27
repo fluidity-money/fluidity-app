@@ -18,6 +18,7 @@ DEV:
   BROKER_NAME: 'flu-dev-mq'
   DB_MIGRATION_BUCKET: flu-staging-db-migration
   DB_MIGRATION_LAMBDA: flu-run-db-migration-staging-dbmate
+  DB_ROLLBACK_LAMBDA: flu-run-db-rollback-staging-dbmate
 
 STAGING:
   TASK_ROLE: flu.default.task.role
@@ -52,3 +53,4 @@ MAINNET:
   BROKER_NAME: 'flu-mainnet-mq'
   DB_MIGRATION_BUCKET: flu-db-migration
   DB_MIGRATION_LAMBDA: flu-run-db-migration-mainnet-dbmate
+  DB_ROLLBACK_LAMBDA: flu-run-db-rollback-mainnet-dbmate
