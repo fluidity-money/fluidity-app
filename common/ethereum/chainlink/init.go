@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-package flux
+package chainlink
 
 import (
 	"strings"
@@ -11,11 +11,11 @@ import (
 )
 
 func init() {
-	reader := strings.NewReader(fluxContractAbiString)
+	priceFeedReader := strings.NewReader(chainlinkPriceFeedAbiString)
 
 	var err error
 
-	if fluxContractAbi, err = ethAbi.JSON(reader); err != nil {
+	if priceFeedAbi, err = ethAbi.JSON(priceFeedReader); err != nil {
 		panic(err)
 	}
 }
