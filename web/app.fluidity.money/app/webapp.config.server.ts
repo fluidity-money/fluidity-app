@@ -1,7 +1,16 @@
 import { parse } from "toml";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import z from "zod";
+import z, {string} from "zod";
+
+const envVar = () => {
+  return {
+    default: (key: string) =>
+      string()
+        .default(`${key}`)
+        .transform((key: string): string => process.env[key] ?? "")
+  }
+}
 
 const OptionsSchema = z.object({
   drivers: z.object({}).catchall(
@@ -11,8 +20,8 @@ const OptionsSchema = z.object({
           label: z.string(),
           testnet: z.boolean(),
           rpc: z.object({
-            http: z.string(),
-            ws: z.string(),
+            http: envVar().default("FLU_RPC_HTTP"),
+            ws: envVar().default("FLU_RPC_WS"),
           }),
           server: z.string(),
         })
@@ -29,6 +38,7 @@ const OptionsSchema = z.object({
             name: z.string(),
             logo: z.string(),
             address: z.string(),
+            colour: z.string(),
             isFluidOf: z.string().optional(),
           })
         )

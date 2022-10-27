@@ -10,12 +10,18 @@ import {
   useMatches,
   useTransition,
 } from "@remix-run/react";
+
 import { useState, useEffect, useContext } from "react";
 import { Web3Context } from "~/util/chainUtils/web3";
 import { useUserUnclaimedRewards } from "~/queries";
 import { motion } from "framer-motion";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
 import config from "~/webapp.config.server";
+import { io } from "socket.io-client";
+import { PipedTransaction } from "drivers/types";
+import { useToolTip } from "~/components";
+import { ToolTipContent } from "~/components/ToolTip";
+import { trimAddress } from "~/util";
 
 import {
   DashboardIcon,
@@ -24,6 +30,7 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 
+import config from "~/webapp.config.server";
 import dashboardStyles from "~/styles/dashboard.css";
 
 export const links: LinksFunction = () => {
@@ -56,11 +63,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const provider = config.liquidity_providers;
 
+  const token = config.config;
+
   return {
     appName: routeMapper(pathname),
     version: "1.5",
     network,
     provider,
+    token,
   };
 };
 
@@ -69,10 +79,11 @@ type LoaderData = {
   version: string;
   network: string;
   provider: typeof config.liquidity_providers;
+  token: typeof config.config;
 };
 
 export default function Dashboard() {
-  const { appName, version, network } = useLoaderData<LoaderData>();
+  const { appName, version, network, token } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -87,6 +98,7 @@ export default function Dashboard() {
   ];
 
   const matches = useMatches();
+  const toolTip = useToolTip();
   const transitionPath = useTransition().location?.pathname;
   const currentPath = transitionPath || matches[matches.length - 1].pathname;
   const resolvedPaths = navigationMap.map((obj) =>
@@ -122,6 +134,39 @@ export default function Dashboard() {
 
       setUnclaimedRewards(totalUnclaimedRewards);
     })();
+
+    // Test for now, wallet address should be gotten when a wallet is connected
+    const connected_wallet =
+      network === `ethereum`
+        ? `0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6`
+        : `JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi`;
+
+    const socket = io();
+    socket.emit("subscribeTransactions", {
+      protocol: network,
+      address: connected_wallet,
+    });
+
+    socket.on("Transactions", (log: PipedTransaction) => {
+      const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
+        (entry) => entry.symbol === log.token
+      );
+
+      toolTip.open(
+        fToken.at(0)?.colour,
+        <ToolTipContent
+          tokenLogoSrc={fToken.at(0)?.logo}
+          boldTitle={log.amount + ` ` + log.token}
+          details={
+            log.source === connected_wallet
+              ? `Sent to ` + trimAddress(log.destination)
+              : `Received from ` + trimAddress(log.source)
+          }
+          linkLabel={"ASSETS"}
+          linkUrl={"#"}
+        />
+      );
+    });
   }, []);
 
   return (
