@@ -1,8 +1,5 @@
-import { Display, LineChart, Text } from "@fluidity-money/surfing";
-import {json, LoaderFunction, redirect} from "@remix-run/node";
-import {useLoaderData} from "@remix-run/react";
+import { Display, Text } from "@fluidity-money/surfing";
 import { useToolTip, ToolTipContent } from "~/components";
-import useHighestRewardStatistics, {HighestRewardResponse} from "~/queries/useHighestRewardStatistics";
 
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
