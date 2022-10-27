@@ -19,27 +19,12 @@ import (
 const aaveLendingPoolAddressProviderAbiString = `[
     {
       "inputs": [],
-      "name": "getPriceOracle",
-      "outputs": [
-		  {
-			  "internalType": "address",
-			  "name": "",
-			  "type": "address"
-
-		  }
-	  ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "getLendingPool",
       "outputs": [
 		  {
 			  "internalType": "address",
 			  "name": "",
 			  "type": "address"
-
 		  }
 	  ],
       "stateMutability": "view",
@@ -146,28 +131,6 @@ const aaveATokenAbiString = `[
 	}
 ]`
 
-const aavePriceOracleAbiString = `[
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_asset",
-				"type": "address"
-			}
-		],
-		"name": "getAssetPrice",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]`
-
 // addressProviderAbi set by init.go to contain the aave address provider
 // ABI code that can be used with a bound contract
 var addressProviderAbi ethAbi.ABI
@@ -175,10 +138,6 @@ var addressProviderAbi ethAbi.ABI
 // aTokenAbi set by init.go to contain the aave address provider
 // ABI code that can be used with a bound contract
 var aTokenAbi ethAbi.ABI
-
-// priceOracleAbi set by init.go to contain the aave price oracle
-// ABI code that can be used with a bound contract
-var priceOracleAbi ethAbi.ABI
 
 // lendingPoolAbi set by init.go to contain the aave lending pool
 // ABI code that can be used with a bound contract
@@ -242,82 +201,6 @@ func getAaveAddress(client *ethclient.Client, addressProvider ethCommon.Address,
 	}
 
 	return address, nil
-}
-
-// GetPrice returns the price of an asset in USD
-func GetPrice(client *ethclient.Client, addressProvider ethCommon.Address, token, usdToken ethCommon.Address) (*big.Rat, error) {
-	priceOracle, err := getAaveAddress(client, addressProvider, "getPriceOracle")
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to look up the current aave price oracle! %w",
-			err,
-		)
-	}
-
-	// aave's oracles return the prices in eth, so we divide that by
-	// their price for USD to get the price of the asset in USD
-	usdPriceResult, err := ethereum.StaticCall(
-		client,
-		priceOracle,
-		priceOracleAbi,
-		"getAssetPrice",
-		usdToken,
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to fetch usd price from the aave price oracle! %w",
-			err,
-		)
-	}
-
-	usdPriceEth, err := ethereum.CoerceBoundContractResultsToRat(usdPriceResult)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to read a rat from the aave usd price oracle! %w",
-			err,
-		)
-	}
-
-	priceResults, err := ethereum.StaticCall(
-		client,
-		priceOracle,
-		priceOracleAbi,
-		"getAssetPrice",
-		token,
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to fetch asset price from the aave price oracle! %w",
-			err,
-		)
-	}
-
-	assetPriceEth, err := ethereum.CoerceBoundContractResultsToRat(priceResults)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to read a rat from the price oracle's results! %w",
-			err,
-		)
-	}
-
-	isAssetPriceZero := big.NewRat(0, 1).Cmp(assetPriceEth) == 0
-
-	if isAssetPriceZero {
-		return nil, fmt.Errorf(
-			"asset price at AddressProvider %v, token address %v is 0!",
-			addressProvider,
-			token,
-		)
-	}
-
-	assetPriceUsd := safeQuo(assetPriceEth, usdPriceEth)
-
-	return assetPriceUsd, nil
 }
 
 func GetTokenApy(client *ethclient.Client, addressProvider, underlying ethCommon.Address, emission *worker.Emission) (*big.Rat, error) {

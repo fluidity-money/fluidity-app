@@ -25,12 +25,6 @@ func init() {
 		panic(err)
 	}
 
-	priceOracleAbiReader := strings.NewReader(aavePriceOracleAbiString)
-
-	if priceOracleAbi, err = ethAbi.JSON(priceOracleAbiReader); err != nil {
-		panic(err)
-	}
-
 	lendingPoolAbiReader := strings.NewReader(aaveLendingPoolAbiString)
 
 	if lendingPoolAbi, err = ethAbi.JSON(lendingPoolAbiReader); err != nil {
