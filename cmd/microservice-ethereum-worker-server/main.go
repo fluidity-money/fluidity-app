@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
@@ -22,33 +21,14 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
-	// BackendCompound to use as the environment variable when the token
-	// is compound based
-	BackendCompound = "compound"
-
-	// BackendAave to use as the environment variable when the token
-	// is aave based
-	BackendAave = "aave"
-
-	// BackendAurora to use as the environment variable for Aurora
-	// to use Flux as a price oracle
-	BackendAurora = "aurora"
-
 	// SecondsInOneYear to use for ATX calculation
 	SecondsInOneYear uint64 = 365 * 24 * 60 * 60
-
-	// UsdtDecimals to normalise values to
-	UsdtDecimals int64 = 1e6
-
-	// Uniswap's oracle returns numbers with 6 decimals
-	UniswapOracleDecimals int64 = 1e6
 
 	// EthereumDecimals to normalise values to
 	EthereumDecimals int64 = 1e18
@@ -58,36 +38,11 @@ const (
 	// EnvContractAddress to use to find the Fluid contract to identify transfers
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
-	// EnvEthereumHttpUrl to use to get information on the apy and atx from Compound
+	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 
-	// EnvCompoundEthPriceFeed to get the price of eth in usd from
-	EnvCompoundEthPriceFeed = `FLU_ETHEREUM_COMPOUND_ETH_FEED_ADDR`
-
-	// EnvTokenBackend is `compound` if the token is compound based,
-	// or `aave` if aave based
-	EnvTokenBackend = `FLU_ETHEREUM_TOKEN_BACKEND`
-
-	// EnvCTokenAddress to use to get the CToken
-	EnvCTokenAddress = `FLU_ETHEREUM_CTOKEN_ADDR`
-
-	// EnvUniswapAnchoredViewAddress to look up to get the price for the asset and Compound
-	EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
-
-	// EnvAaveAddressProviderAddress to find aave related addresses
-	EnvAaveAddressProviderAddress = `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR`
-
-	// EnvATokenAddress to use to get the AToken
-	EnvATokenAddress = `FLU_ETHEREUM_ATOKEN_ADDR`
-
-	// EnvUsdTokenAddress to use to get the price of eth from aave
-	EnvUsdTokenAddress = `FLU_ETHEREUM_USD_TOKEN_ADDR`
-
-	// EnvEthTokenAddress to use to get the price of eth from aave
-	EnvEthTokenAddress = `FLU_ETHEREUM_ETH_TOKEN_ADDR`
-
-	// EnvUnderlyingTokenAddress to use to get the apy from aave
-	EnvUnderlyingTokenAddress = `FLU_ETHEREUM_UNDERLYING_TOKEN_ADDR`
+	// EnvChainlinkEthPriceFeed to get the price of eth in usd from
+	EnvChainlinkEthPriceFeed = `FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR`
 
 	// EnvUnderlyingTokenName to be mindful of when doing price conversions to USDT
 	EnvUnderlyingTokenName = `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`
@@ -96,22 +51,9 @@ const (
 	// when converting to USDT
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
-	// EnvEthereumDecimalPlaces to use when normalising Eth to USDT
-	EnvEthereumDecimalPlaces = `FLU_ETHEREUM_ETH_DECIMAL_PLACES`
-
-	// EnvAuroraEthFluxAddress for fetching the price of Eth from a Flux oracle
-	EnvAuroraEthFluxAddress = `FLU_AURORA_ETH_FLUX_ADDRESS`
-
-	// EnvAuroraTokenFluxAddress for fetching the price of the underlying token
-	// from a Flux oracle
-	EnvAuroraTokenFluxAddress = `FLU_AURORA_TOKEN_FLUX_ADDRESS`
-
 	// EnvPublishAmqpQueue name to use when sending server-tracked transfers
 	// to the client
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
-
-	// EnvMovingAverageRedisKey to track the APY moving average with
-	EnvMovingAverageRedisKey = `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY`
 
 	// EnvServerWorkQueue to receive serverwork from
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
@@ -120,8 +62,8 @@ const (
 func main() {
 	var (
 		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
-		contractAddress_         = util.GetEnvOrFatal(EnvContractAddress)
-		compoundEthPriceFeed     = mustEthereumAddressFromEnv("TODO")
+		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
+		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
@@ -129,14 +71,6 @@ func main() {
 	)
 
 	rand.Seed(time.Now().Unix())
-
-	var (
-		ethContractAddress            ethCommon.Address
-	)
-
-	contractAddress := ethereum.AddressFromString(contractAddress_)
-
-	ethContractAddress = hexToAddress(contractAddress)
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
 
@@ -297,18 +231,18 @@ func main() {
 
 		}
 
-		ethPriceUsd, err := chainlink.GetPrice(gethClient, compoundEthPriceFeed)
+		ethPriceUsd, err := chainlink.GetPrice(gethClient, chainlinkEthPriceFeed)
 
 		sizeOfThePool, err := fluidity.GetRewardPool(
 			gethClient,
-			ethContractAddress,
+			contractAddress,
 		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to get the prize pool in the Fluidity contract! Address %#v!",
-					contractAddress,
+					contractAddress.String(),
 				)
 
 				k.Payload = err
