@@ -1,13 +1,17 @@
 -- migrate:up
 
--- credit: Bill Karwin at https://stackoverflow.com/a/19120695
+-- truncate awarded_time to awarded_day, and add network to highest_reward_winner_totals
+
+DROP VIEW IF EXISTS highest_reward_winner_totals;
+DROP VIEW IF EXISTS highest_rewards_monthly;
+
 CREATE OR REPLACE VIEW highest_rewards_monthly AS
     SELECT 
         network,
         transaction_hash, 
         winning_address, 
         winning_amount, 
-        awarded_time,
+        date_trunc('day', awarded_time) AS awarded_day, 
         created, 
         token_short_name, 
         winning_amount / (10 ^ token_decimals) AS winning_amount_scaled,
@@ -25,13 +29,14 @@ CREATE OR REPLACE VIEW highest_rewards_monthly AS
 
 CREATE OR REPLACE VIEW highest_reward_winner_totals AS
     SELECT
+        network,
         COUNT(*) AS transaction_count, 
         winning_address, 
         SUM(winning_amount / (10 ^ token_decimals)) AS total_winnings 
     FROM winners 
     WHERE winning_address IN (
         SELECT winning_address FROM highest_rewards_monthly
-    ) GROUP BY winning_address;
+    ) GROUP BY winning_address, network;
 
 -- migrate:down
 
