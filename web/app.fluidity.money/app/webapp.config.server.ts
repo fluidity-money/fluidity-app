@@ -29,6 +29,7 @@ const OptionsSchema = z.object({
             name: z.string(),
             logo: z.string(),
             address: z.string(),
+            colour: z.string(),
             isFluidOf: z.string().optional(),
           })
         )

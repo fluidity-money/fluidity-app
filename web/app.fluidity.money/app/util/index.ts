@@ -8,4 +8,5 @@ export {
   B64ToUint8Array,
   shorthandAmountFormatter,
   amountToDecimalString,
+  trimAddress,
 } from "./converters";

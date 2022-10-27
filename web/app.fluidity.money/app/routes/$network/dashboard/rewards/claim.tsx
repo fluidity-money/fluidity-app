@@ -109,7 +109,7 @@ const ClaimedRewards = () => {
         {/*
       <GeneralButton
         version={"primary"}
-        buttonType={"text"}
+        buttontype={"text"}
         size={"large"}
         handleClick={() => navigate("assets")}
       >
@@ -121,7 +121,7 @@ const ClaimedRewards = () => {
         <GeneralButton
           className="spread"
           version={"primary"}
-          buttonType={"text"}
+          buttontype={"text"}
           size={"large"}
           handleClick={() => {
             navigate("../../../fluidify");
@@ -134,7 +134,7 @@ const ClaimedRewards = () => {
         <GeneralButton
           className="spread"
           version={"secondary"}
-          buttonType={"icon before"}
+          buttontype={"icon before"}
           icon={<img src="/images/socials/twitter.svg" />}
           size={"large"}
           handleClick={() => {
