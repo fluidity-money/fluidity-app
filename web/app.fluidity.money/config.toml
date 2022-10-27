@@ -117,3 +117,16 @@ name = "Fluid USDT"
 logo = "/assets/tokens/usdt.svg"
 address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+
+[[config.ethereum.wallets]]
+name = "Browser"
+id = "browser"
+description = "Browser based wallets like Metamask, Brave, Coinbase Wallet and Opera."
+logo = "/assets/wallets/eth_browser.svg"
+
+[[config.ethereum.wallets]]
+name = "WalletConnect"
+id = "walletconnect"
+description = "WalletConnect allows you to connect your wallet to any dApp using a QR code."
+logo = "/assets/wallets/walletconnect.svg"
+

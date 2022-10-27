@@ -1,9 +1,9 @@
 const Assets = () => {
-    return (
-        <>
-            <h1>Assets</h1>
-        </>
-    );
+  return (
+    <>
+      <h1>Assets</h1>
+    </>
+  );
 };
 
-export default Assets
+export default Assets;

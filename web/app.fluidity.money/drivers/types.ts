@@ -1,6 +1,6 @@
 export type PipedTransaction = {
-    source: string,
-    destination: string,
-    amount: string,
-    token: string,
-}
+  source: string;
+  destination: string;
+  amount: string;
+  token: string;
+};

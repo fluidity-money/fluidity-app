@@ -1,9 +1,9 @@
 const Rewards = () => {
-    return (
-        <>
-            <h1>Rewards</h1>
-        </>
-    );
+  return (
+    <>
+      <h1>Rewards</h1>
+    </>
+  );
 };
 
-export default Rewards
+export default Rewards;

@@ -27,21 +27,26 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   let error;
 
   try {
+    console.log("Fetching user transaction count");
     userTransactionCount = await (
       await useUserTransactionCount(network ?? "", address)
     ).json();
+
+    console.log("Fetching user transactions");
     userTransactions = await (
       await useUserTransactions(network ?? "", address, page)
     ).json();
+
+    console.log("userTransactions", userTransactions);
   } catch (err) {
     error = "The transaction explorer is currently unavailable";
   } // Fail silently - for now.
 
-  if (error) {
-    return redirect("/error", { status: 500, statusText: error });
-  }
-
-  if (userTransactionCount.errors || userTransactions.errors) {
+  if (
+    error !== undefined ||
+    userTransactionCount.errors ||
+    userTransactions.errors
+  ) {
     return json({ transactions: [], count: 0, page: 1 });
   }
 
@@ -58,6 +63,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       [network as string]: { transfers: transactions },
     },
   } = userTransactions;
+
   // Destructure GraphQL data
   const sanitizedTransactions = transactions.map(
     (transaction: UserTransaction) => {
@@ -96,6 +102,12 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
 };
 
+export const meta = () => {
+  return {
+    title: "Dashboard",
+  };
+};
+
 type Transaction = {
   sender: string;
   receiver: string;
@@ -122,7 +134,6 @@ export default function Home() {
   const pageCount = Math.ceil(count / 12);
   const startTransaction = (page - 1) * 12 + 1;
   const endTransaction = page * 12 > count ? count : page * 12;
-
 
   return (
     <>

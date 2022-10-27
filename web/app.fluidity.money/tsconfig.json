@@ -4,10 +4,12 @@
     "**/*.ts",
     "**/*.tsx",
     "app/entry.server.js",
-    "app/entry.client.js"
-, "server/index.js"  ],
+    "app/entry.client.js",
+    "server/index.js"
+  ],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2019"],
+    "module": "esnext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
@@ -21,6 +23,6 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "target": "ES2019"
+    "target": "ESNext"
   }
 }

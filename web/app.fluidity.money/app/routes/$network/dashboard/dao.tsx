@@ -1,9 +1,9 @@
 const DAO = () => {
-    return (
-        <>
-            <h1>DAO</h1>
-        </>
-    );
+  return (
+    <>
+      <h1>DAO</h1>
+    </>
+  );
 };
 
-export default DAO
+export default DAO;
