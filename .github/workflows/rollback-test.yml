@@ -87,7 +87,7 @@ jobs:
             echo $GITHUB_SHA
 
             flu rollback-db \
-              --network ${{ github.event.inputs.network }} \
+              --network ropsten \
               --environment ${{ github.event.inputs.environment }} \
               --rollback-timescaledb ${{ github.event.inputs.rollback_timescale }} \
               --rollback-postgresdb ${{ github.event.inputs.rollback_postgres }} \
