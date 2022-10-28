@@ -8,11 +8,6 @@ on:
         description: 'Environment'
         options:
           - 'dev'
-      network:
-        type: choice
-        description: 'Network'
-        options: 
-          - 'ropsten'
 
 permissions:
   id-token: write
@@ -37,7 +32,7 @@ jobs:
         with:
           command: |
             flu migrate-db \
-              --network ${{ github.event.inputs.network }} \
+              --network ropsten \
               --environment ${{ github.event.inputs.environment }} \
               --tag $GITHUB_SHA
 

@@ -1,7 +1,7 @@
 -- migrate:up
 
 -- credit: Bill Karwin at https://stackoverflow.com/a/19120695
-CREATE OR REPLACE VIEW highest_rewards_monthly AS
+CREATE VIEW highest_rewards_monthly AS
     SELECT 
         network,
         transaction_hash, 
@@ -23,7 +23,7 @@ CREATE OR REPLACE VIEW highest_rewards_monthly AS
     WHERE _rn = 1 AND awarded_time > now() - interval '1 month' 
     ORDER BY awarded_time;
 
-CREATE OR REPLACE VIEW highest_reward_winner_totals AS
+CREATE VIEW highest_reward_winner_totals AS
     SELECT
         COUNT(*) AS transaction_count, 
         winning_address, 
