@@ -22,7 +22,7 @@ const LabelledValue = ({
   const classProps = `container ${classNameProps}`;
 
   const { width } = useViewport();
-  const mobileView = width <= 375;
+  const mobileView = width <= 500;
 
   return (
     <div className={classProps}>

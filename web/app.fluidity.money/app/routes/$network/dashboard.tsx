@@ -86,7 +86,7 @@ export default function Dashboard() {
   const account = state.account ?? "";
 
   const { width } = useViewport();
-  const isMobile = width <= 375;
+  const isMobile = width <= 500;
 
   const navigationMap = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
