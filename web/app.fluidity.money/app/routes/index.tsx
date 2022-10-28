@@ -1,45 +1,8 @@
-import { Display, LineChart, Text } from "@fluidity-money/surfing";
-import {json, LoaderFunction, redirect} from "@remix-run/node";
-import {useLoaderData} from "@remix-run/react";
-import { useToolTip } from "~/components";
-import useHighestRewardStatistics, {HighestRewardResponse} from "~/queries/useHighestRewardStatistics";
-
-export const loader: LoaderFunction = async({request, params}) => {
-  const network = params.network ?? "";
-  const {data, error} = await useHighestRewardStatistics(network);
-
-  if (error || !data) {
-    return redirect("/error", { status: 500, statusText: error });
-  }
-
-  const winnerTotals = data.highest_reward_winner_totals.reduce((prev, current) => (
-    {
-      ...prev, 
-      [current.winning_address]: {
-        transactionCount: current.transaction_count, 
-        totalWinnings: current.total_winnings
-        }
-    }), {})
-
-  const highestRewards = data.highest_rewards_monthly;
-
-  return json({
-    highestRewards,
-    winnerTotals 
-  });
-}
-
-type LoaderData = {
-  winnerTotals: {[Address: string]: {
-    transactionCount: number, 
-    totalWinnings: number
-  }}
-  highestRewards: HighestRewardResponse["data"]["highest_rewards_monthly"]
-}
+import { Display, Text } from "@fluidity-money/surfing";
+import { useToolTip, ToolTipContent } from "~/components";
 
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
-  const {highestRewards, winnerTotals} = useLoaderData<LoaderData>();
   const toolTip = useToolTip();
 
   const showNotification = () => {
