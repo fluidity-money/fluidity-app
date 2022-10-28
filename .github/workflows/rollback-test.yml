@@ -12,17 +12,6 @@ on:
         description: 'Environment'
         options:
           - 'dev'
-      network:
-        type: choice
-        description: 'Network'
-        options: 
-          - 'ropsten'
-      group:
-        description: 'Group'
-        required: true
-      service:
-        description: 'Service'
-        required: true
       build_root_container:
         type: boolean
         description: 'Build root-container'
@@ -56,6 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          fetch-depth: 10
           lfs: true
           ref: ${{ github.event.inputs.rollbackTo }}
       - name: Configure AWS Credentials
@@ -71,52 +61,18 @@ jobs:
           command: |
             echo $GITHUB_SHA
 
-            flu build-docker \
-              --network ${{ github.event.inputs.network }} \
-              --group ${{ github.event.inputs.group }} \
-              --service ${{ github.event.inputs.service }} \
-              --environment ${{ github.event.inputs.environment }} \
-              --build-root-container ${{ github.event.inputs.build_root_container }} \
-              --build-build-container ${{ github.event.inputs.build_build_container }} \
-              --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
             echo $GITHUB_SHA
-      - name: Discord notif (SUCCESS)
-        uses: rjstone/discord-webhook-notify@v1
-        if: success()
-        with:
-          severity: info
-          details: Deployment succeeded.
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (CANCEL)
-        if: cancelled()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: warn
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          details: Deployment cancelled.
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (FAIL)
-        if: failure()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: error
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          details: Deployment failed.
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
 
   rollback-db:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          lfs: true
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -130,7 +86,11 @@ jobs:
           command: |
             echo $GITHUB_SHA
 
-            echo ${{ github.event.inputs.rollback_timescale }}
-            echo ${{ github.event.inputs.rollback_postgres }}
+            flu rollback-db \
+              --network ropsten \
+              --environment ${{ github.event.inputs.environment }} \
+              --rollback-timescaledb ${{ github.event.inputs.rollback_timescale }} \
+              --rollback-postgresdb ${{ github.event.inputs.rollback_postgres }} \
+              --tag $GITHUB_SHA
 
 
