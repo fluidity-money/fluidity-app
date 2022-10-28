@@ -1,8 +1,26 @@
 import type { LoaderFunction } from "@remix-run/node";
-
+import { Outlet, useParams } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
+import EthereumProvider from "contexts/EthereumProvider";
+import { Fragment } from "react";
+
+type ProviderMap = {
+  [key: string]: ((props: {children: React.ReactNode}) => JSX.Element) | undefined;
+}
+
+const Provider = ({ network, children }: { network?: string, children: React.ReactNode }) => {
+  const providers: ProviderMap = {
+    ethereum: EthereumProvider,
+    //solana: SolanaProvider,
+  }
+
+  const ProviderComponent = (network && providers[network]) || Fragment;
+
+  return <ProviderComponent>
+    {children}
+  </ProviderComponent>
+}
 
 export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
@@ -18,11 +36,10 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function Network() {
-  // TODO: Inject Chain Provider
-
+  const { network } = useParams();
   return (
-    <>
+    <Provider network={network}>
       <Outlet />
-    </>
+    </Provider>
   );
 }
