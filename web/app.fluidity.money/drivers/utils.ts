@@ -13,7 +13,7 @@ const OptionsDefault: Options = {
 };
 
 const getTransactionsObservableForIn = (
-  protocol: `ethereum` | `solana`,
+  protocol: "ethereum" | "solana",
   options: Partial<Options>,
   ...tokens: {
     token: string;

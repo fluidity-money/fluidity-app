@@ -38,8 +38,8 @@ export const ethGetTransactionsObservable = (
           const uiTokenAmount = amountToDecimalString(amount.toString(), 6);
 
           const transaction = {
-            source,
-            destination,
+            source: source,
+            destination: destination,
             amount: shorthandAmountFormatter(uiTokenAmount, 3),
             token,
           };
