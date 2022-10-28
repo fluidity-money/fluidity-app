@@ -19,6 +19,7 @@ import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
 import { useToolTip } from "~/components";
 import { ToolTipContent } from "~/components/ToolTip";
+import ErrorBoundary from "~/components/ErrorBoundary";
 import { trimAddress } from "~/util";
 
 import {
@@ -195,6 +196,7 @@ export default function Dashboard() {
         </ul>
       </nav>
       <main>
+        <ErrorBoundary />
         <nav>
           <Text>{appName}</Text>
           <div>
