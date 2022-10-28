@@ -7,8 +7,8 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
     "plugin:react/jsx-runtime",
+    "plugin:@typescript-eslint/recommended",
   ],
   overrides: [],
   parser: "@typescript-eslint/parser",
@@ -17,9 +17,9 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["react", "@typescript-eslint"],
-  rules: {
-    "no-unused-vars": ["error", { destructuredArrayIgnorePattern: "^_" }],
-  },
+  // rules: {
+  //   "no-unused-vars": ["error", { destructuredArrayIgnorePattern: "^_" }],
+  // },
   settings: {
     react: {
       version: "detect",

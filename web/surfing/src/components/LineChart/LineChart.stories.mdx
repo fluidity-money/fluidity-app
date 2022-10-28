@@ -21,6 +21,10 @@ export const Template = (args) => <div style={{height: "400px"}}>
         xLabel: 'Some X Label',
         yLabel: 'Some Y Label',
         lineLabel: 'Some Line Label',
+        accessors: {
+            xAccessor: (d) => d.x,
+            yAccessor: (d) => d.y,
+        }
         }}
     >
         {Template.bind({})}

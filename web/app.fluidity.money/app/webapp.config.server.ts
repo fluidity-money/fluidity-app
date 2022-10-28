@@ -1,16 +1,17 @@
 import { parse } from "toml";
 import { readFileSync } from "fs";
-import { resolve } from "path";
-import z, {string} from "zod";
+import { resolve, join } from "path";
+import sharp from "sharp";
+import z, { string } from "zod";
 
 const envVar = () => {
   return {
     default: (key: string) =>
       string()
         .default(`${key}`)
-        .transform((key: string): string => process.env[key] ?? "")
-  }
-}
+        .transform((key: string): string => process.env[key] ?? ""),
+  };
+};
 
 const OptionsSchema = z.object({
   drivers: z.object({}).catchall(
@@ -43,6 +44,16 @@ const OptionsSchema = z.object({
           })
         )
         .min(1),
+      wallets: z
+        .array(
+          z.object({
+            name: z.string(),
+            id: z.string(),
+            description: z.string().optional(),
+            logo: z.string(),
+          })
+        )
+        .optional(),
     })
   ),
 });
@@ -53,4 +64,46 @@ const options = OptionsSchema.parse(
   parse(readFileSync(resolve(__dirname, "../config.toml"), "utf8"))
 );
 
+type ColorMap = { [network: string]: { [symbol: string]: string } };
+
+const getColors = async () => {
+  console.log("🎨 Getting colors from icons... Just sit tight for a moment.");
+
+  const networks = [];
+  for (const network of Object.keys(options.config)) {
+    const tokenColors = [];
+    for (const { symbol, logo } of options.config[network].tokens) {
+      const colors = await sharp(join(__dirname, "../public", logo))
+        .resize(1, 1)
+        .raw()
+        .toBuffer();
+      tokenColors.push({
+        symbol,
+        color: `#${colors.toString("hex").substring(0, 6)}`,
+      });
+    }
+    const colorsMap = tokenColors.reduce(
+      (acc: { [i: string]: string }, { symbol, color }) => {
+        acc[symbol] = color;
+        return acc;
+      },
+      {}
+    );
+    networks.push({
+      network,
+      colorsMap,
+    });
+  }
+
+  console.log("🖍️ Done getting colors from icons!");
+  return networks.reduce<ColorMap>(
+    (acc: { [i: string]: { [i: string]: string } }, { network, colorsMap }) => {
+      acc[network] = colorsMap;
+      return acc;
+    },
+    {}
+  );
+};
+
+export const colors = getColors();
 export default options;

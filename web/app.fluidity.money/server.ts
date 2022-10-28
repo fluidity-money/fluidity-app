@@ -8,14 +8,10 @@ import { Server } from "socket.io";
 
 import { createServer } from "http";
 
-import {
-  getObservableForAddress,
-  getTransactionsObservableForIn,
-} from "./drivers";
-
 import config from "~/webapp.config.server";
 import { Observable, Subscription, EMPTY } from "rxjs";
 import { PipedTransaction } from "drivers/types";
+import {getObservableForAddress, getTransactionsObservableForIn} from "drivers/utils";
 
 const app = express();
 const httpServer = createServer(app);

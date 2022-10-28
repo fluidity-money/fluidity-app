@@ -54,6 +54,11 @@ type LoaderData = {
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
   const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
+import { Display, Text } from "@fluidity-money/surfing";
+import { useToolTip, ToolTipContent } from "~/components";
+
+export default function IndexPage() {
+  // on hover, use winnerTotals[hovered address]
   const toolTip = useToolTip();
   const [connected, setConnected] = useState(true);
   console.log("HR", highestRewards);
