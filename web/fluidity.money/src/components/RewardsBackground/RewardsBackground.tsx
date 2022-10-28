@@ -23,7 +23,7 @@ interface Reward {
   transaction: string;
 }
 
-const rewardLimit = 10;
+const rewardLimit = 20;
 
 const RewardsBackground = () => {
   const { apiState, chain, network } = useChainContext();

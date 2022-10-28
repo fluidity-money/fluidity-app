@@ -1,16 +1,14 @@
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
-
 import { LinksFunction, LoaderFunction } from "@remix-run/node";
 import {
+  Link,
   Outlet,
   useLoaderData,
-  Link,
   useNavigate,
   useResolvedPath,
   useMatches,
   useTransition,
 } from "@remix-run/react";
-
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import { useState, useEffect, useContext } from "react";
 import { Web3Context } from "~/util/chainUtils/web3";
 import { useUserUnclaimedRewards } from "~/queries";

@@ -1,0 +1,73 @@
+:root {
+  --f-progbar-height: 5px;
+}
+
+.fluidify-card.fluidify-card--dragging,
+.fluidify-card:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+  color: black;
+}
+
+.fluidify-card {
+  font-family: Aeonik, sans-serif;
+  border-radius: 4px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+
+  width: 310px;
+  height: 72px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-around;
+
+  transition: background 0.2s ease-in-out;
+  margin: 10px 0;
+}
+
+.fluidify-card img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.fluidify-card--container {
+  height: 100%;
+  margin: 0 10px;
+
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  justify-content: space-between;
+}
+
+.fluidify-card--progress-bar {
+  height: var(--f-progbar-height);
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0px 0px 4px 4px;
+
+  margin-top: auto;
+}
+
+.fluidify-card--progress {
+  width: 100%;
+  height: var(--f-progbar-height);
+
+  transform-origin: left center;
+  transform: scaleX(0);
+  border-radius: 0px 0px 4px 4px;
+}
+
+.fluidify-card--dragging .fluidify-card--progress-bar,
+.fluidify-card:hover .fluidify-card--progress-bar {
+  background: rgba(255, 255, 255, 0.1);
+}
