@@ -129,11 +129,6 @@ type LoaderData = {
 
 export default function Home() {
   const { transactions, count, page, network } = useLoaderData<LoaderData>();
-  const isTransition = useTransition();
-
-  const pageCount = Math.ceil(count / 12);
-  const startTransaction = (page - 1) * 12 + 1;
-  const endTransaction = page * 12 > count ? count : page * 12;
 
   return (
     <>
