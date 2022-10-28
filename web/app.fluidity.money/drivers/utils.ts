@@ -1,5 +1,5 @@
 import { Observable, merge, filter } from "rxjs";
-import { getTransactionsObservable } from "./ethereum";
+import { ethGetTransactionsObservable } from "./ethereum";
 import { solGetTransactionsObservable } from "./solana";
 
 import { PipedTransaction } from "./types";
@@ -24,7 +24,7 @@ const getTransactionsObservableForIn = (
   return merge(
     ...tokens.map(({ token, address }) =>
       protocol === `ethereum`
-        ? getTransactionsObservable(token, address, network)
+        ? ethGetTransactionsObservable(token, address, network)
         : solGetTransactionsObservable(token, address, network)
     )
   );

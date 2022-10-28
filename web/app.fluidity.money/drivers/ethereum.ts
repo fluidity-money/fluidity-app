@@ -10,7 +10,7 @@ import { PipedTransaction } from "./types";
 import config from "~/webapp.config.server";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 
-export const getTransactionsObservable = (
+export const ethGetTransactionsObservable = (
   token: string,
   address: string,
   network = 0
