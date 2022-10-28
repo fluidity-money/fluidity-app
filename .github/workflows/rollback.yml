@@ -5,7 +5,7 @@ on:
     inputs:
       rollbackTo:
         type: string
-        description: 'Commit Id'
+        description: 'The full SHA of the commit'
         required: true
       environment:
         type: choice
@@ -22,9 +22,11 @@ on:
       group:
         description: 'Group'
         required: true
+        default: 'all'
       service:
         description: 'Service'
         required: true
+        default: 'all'
       build_root_container:
         type: boolean
         description: 'Build root-container'
@@ -37,7 +39,7 @@ on:
         type: boolean
         description: 'Rollback Timescale DB'
         default: false
-      rollback_posgres:
+      rollback_postgres:
         type: boolean
         description: 'Rollback Postgres DB'
         default: false
@@ -58,6 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          fetch-depth: 10
           lfs: true
           ref: ${{ github.event.inputs.rollbackTo }}
       - name: Configure AWS Credentials
@@ -121,8 +124,6 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          lfs: true
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -140,4 +141,3 @@ jobs:
               --rollback-timescaledb ${{ github.event.inputs.rollback_timescale }} \
               --rollback-postgresdb ${{ github.event.inputs.rollback_postgres }} \
               --tag $GITHUB_SHA
-
