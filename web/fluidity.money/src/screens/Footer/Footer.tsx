@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import useViewport from "hooks/useViewport";
 import Socials from "../../components/Socials";
@@ -60,7 +60,7 @@ const Footer = () => {
           <div className={styles.buttons}>
             <GeneralButton
               version={"primary"}
-              buttonType={"text"}
+              buttontype={"text"}
               handleClick={goToDemoAnchor}
               size={
                 width > firstBreakpoint
@@ -75,7 +75,7 @@ const Footer = () => {
             <GeneralButton
               handleClick={() => {window.location.href = "mailto:contact@fluidity.money"}}
               version={"secondary"}
-              buttonType={"text"}
+              buttontype={"text"}
               size={
                 width > firstBreakpoint
                   ? "medium"

@@ -4,6 +4,7 @@ docker
 docker-*
 !docker-compose*
 semgrep
+*.map
 
 lib/build-lib
 
@@ -26,6 +27,11 @@ web/*/node_modules
 web/*/build*
 web/*/build-*
 web/*/*.o
+web/*/.next/
+web/*/run
+web/*/npm
+
+tests/integrations/*/test
 
 contracts/ethereum/node_modules
 contracts/ethereum/.openzeppelin
@@ -54,3 +60,6 @@ deployment_list.json
 # Vendor specific
 .vscode
 .DS_Store
+
+install/**
+**/node_modules

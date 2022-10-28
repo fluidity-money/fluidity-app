@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import {FluidSupportedTokens, SupportedTokens} from "components/types";
 
@@ -67,16 +67,4 @@ export const tokenList: SolTokenList = [
     mintAddress: process.env.REACT_APP_FLU_MINT_UXD || "",
     decimals: 6,
   },
-  {
-    name: "TerraUSD",
-    symbol: "UST",
-    mintAddress: process.env.REACT_APP_BASE_MINT_UST || "",
-    decimals: 6,
-  },
-  {
-    name: "Fluid UST",
-    symbol: "fUST",
-    mintAddress: process.env.REACT_APP_FLU_MINT_UST || "",
-    decimals: 6,
-  }
 ]

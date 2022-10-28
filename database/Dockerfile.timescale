@@ -1,5 +1,5 @@
 
-FROM timescale/timescaledb:latest-pg12
+FROM timescale/timescaledb:2.8.0-pg12
 
 ENV REPO /usr/src/fluidity-migrations-timescale
 

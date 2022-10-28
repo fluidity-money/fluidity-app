@@ -18,6 +18,8 @@ SERVICES:
       SERVICE_NAME: ethereum-fluidity-money-backend
       DOCKER_IMAGE: ethereum.fluidity.money-backend
       TARGET_GROUP: flu-mainnet-eth-be-tg
+      TASK_MIN_COUNT: 1
+      TASK_MAX_COUNT: 1
 
       ENV_FLU_WORKER_ID: ethereum-ethereum.fluidity.money-backend
       ENV_FLU_ETHEREUM_CHAIN_ID: 1

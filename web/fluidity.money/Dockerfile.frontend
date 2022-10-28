@@ -29,9 +29,8 @@ FROM fluidity/runtime-web-container:latest
 
 WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
-RUN rm -rf /var/www/html
-COPY --from=build /usr/local/src/fluidity/web/fluidity.money/build /var/www/html
+COPY --from=build /usr/local/src/fluidity/web/fluidity.money .
 
 EXPOSE 3000
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "start"]

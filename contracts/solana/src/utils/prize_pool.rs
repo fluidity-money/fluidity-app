@@ -1,5 +1,6 @@
 use crate::{
-    state::{Obligation, Reserve}
+    state::{Obligation, Reserve},
+    processor::SOLEND,
 };
 
 use {
@@ -20,8 +21,22 @@ pub fn get_available_prize_pool(
     let obligation = Obligation::unpack(&obligation_info.data.borrow()).unwrap();
     let reserve = Reserve::unpack(&reserve_info.data.borrow()).unwrap();
 
+    if obligation.lending_market != reserve.lending_market {
+        panic!("obligation and reserve are from different markets!");
+    }
+
+    if *obligation_info.owner != SOLEND || *reserve_info.owner != SOLEND {
+        panic!("obligation or reserve aren't owned by solend!");
+    }
+
     // get value of obligations
-    let deposited_amount = obligation.deposits[0].deposited_amount;
+    let deposit = &obligation.deposits[0];
+
+    if deposit.deposit_reserve != *reserve_info.key {
+        panic!("reserve doesn't belong to deposit!");
+    }
+
+    let deposited_amount = deposit.deposited_amount;
     let deposited_value = reserve
         .collateral_exchange_rate()
         .unwrap()

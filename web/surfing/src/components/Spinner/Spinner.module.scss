@@ -1,0 +1,15 @@
+@use 'common' as *;
+
+.loader {
+  width: $em-step * 3;
+  height: $em-step * 3;
+  border-radius: 50%;
+  border: 1px solid $black-a30;
+  border-top: 1px solid $black;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

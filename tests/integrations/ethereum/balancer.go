@@ -28,6 +28,16 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0x00000042d2d0aa64e0505a13eacdc9984a024322",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "1011539568884332906251/999500000000000000000",
+	"expected_emission": {
+		"balancer_v2": 1.012045591680173
+	},
+	"rpc_methods": {
+		"eth_getCode": "0x0"
+	},
+	"call_methods": {
+		"getSwapFeePercentage()": "0x0000000000000000000000000000000000000000000000000001c6bf526340000000000000000000000000000000000000000000000000000000000000000000",
+		"getPool(bytes32)": "0x0000000000000000000000000b09dea16768f0799065c475be02919503cb2a350000000000000000000000000000000000000000000000000000000000000002"
+	},
     "token_decimals": 18,
     "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
   },
@@ -53,6 +63,16 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0x054ba12713290ef5b9236e55944713c0edeb4cf4",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "75/4",
+    "expected_emission": {
+      "balancer_v2": 18.75
+    },
+    "rpc_methods": {
+      "eth_getCode": "0x0"
+    },
+    "call_methods": {
+      "getSwapFeePercentage()": "0x0000000000000000000000000000000000000000000000000002aa1efb94e0000000000000000000000000000000000000000000000000000000000000000000",
+      "getPool(bytes32)": "0x00000000000000000000000096646936b91d6b9d7d0c47c496afbf3d6ec7b6f80000000000000000000000000000000000000000000000000000000000000002"
+    },
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
   },
@@ -78,6 +98,16 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0x1ca484dbdafad7e940f5073f6fcc5e87cd24202b",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "222/25",
+    "expected_emission": {
+      "balancer_v2": 8.88
+    },
+    "rpc_methods": {
+      "eth_getCode": "0x0"
+    },
+    "call_methods": {
+      "getSwapFeePercentage()": "0x000000000000000000000000000000000000000000000000004edec84a0380000000000000000000000000000000000000000000000000000000000000000000",
+      "getPool(bytes32)": "0x00000000000000000000000096646936b91d6b9d7d0c47c496afbf3d6ec7b6f80000000000000000000000000000000000000000000000000000000000000002"
+    },
     "token_decimals": 18,
     "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
   },
@@ -103,6 +133,16 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0xdec08cb92a506b88411da9ba290f3694be223c26",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "25/2",
+    "expected_emission": {
+      "balancer_v2": 12.5
+    },
+    "rpc_methods": {
+      "eth_getCode": "0x0"
+    },
+    "call_methods": {
+      "getSwapFeePercentage()": "0x0000000000000000000000000000000000000000000000000058d15e176280000000000000000000000000000000000000000000000000000000000000000000",
+      "getPool(bytes32)": "0x000000000000000000000000ffa3209e32658e48fcdfc0c918e4678d61ee07c10000000000000000000000000000000000000000000000000000000000000002"
+    },
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
   },
@@ -128,6 +168,16 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0xd6b1fbcbe39e33a3d5d9014b024f511be3564ee5",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "197042747/4999000000",
+    "expected_emission": {
+      "balancer_v2": 0.03941643268653731
+    },
+    "rpc_methods": {
+      "eth_getCode": "0x0"
+    },
+    "call_methods": {
+      "getSwapFeePercentage()": "0x0000000000000000000000000000000000000000000000000000b5e620f480000000000000000000000000000000000000000000000000000000000000000000",
+      "getPool(bytes32)": "0x0000000000000000000000009210f1204b5a24742eba12f710636d76240df3d00000000000000000000000000000000000000000000000000000000000000000"
+    },
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
   }

@@ -1,31 +1,29 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
+import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 
 const Use = () => {
+  // to set order correct when in column layout
+  const { width } = useViewport();
+  const breakpoint = 860;
 
-  const right = (
-    <HowItWorksTemplate header={header} info={info}>
-      Fluid asset use-cases
-    </HowItWorksTemplate>
-  );
+  const right =
+  <HowItWorksTemplate header={header} info={info}>
+    Fluid asset use-cases
+  </HowItWorksTemplate>
 
-  const left = (
-    <Video
-      src={"/assets/videos/FluidityUse.mp4"}
-      type={"fit"}
-      loop={true}
-      scale={2.0}
-    />
-  );
-
+  const left =
+  <Video
+    src={"/assets/videos/FluidityUse.mp4"}
+    type={"fit"}
+    loop={true}
+  />
   return (
     <div className={styles.container} id="useassets">
       <ReusableGrid left={left} right={right} />

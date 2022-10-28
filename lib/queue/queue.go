@@ -15,6 +15,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/getsentry/sentry-go"
 )
 
 const (
@@ -68,6 +69,7 @@ func (message Message) Decode(decoded interface{}) {
 // If it is set to false, every message that would be received is
 // distributed across any worker sharing the same worker id.
 func GetMessages(topic string, f func(message Message)) {
+	defer sentry.Recover()
 
 	amqpDetails := <-chanAmqpDetails
 

@@ -1,9 +1,15 @@
-const Rewards = () => {
-  return (
-    <>
-      <h1>Rewards</h1>
-    </>
-  );
+import { LinksFunction } from "@remix-run/node";
+import { Outlet } from "@remix-run/react";
+import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
 };
 
-export default Rewards;
+export default function Rewards() {
+  return (
+    <>
+      <Outlet />
+    </>
+  );
+}

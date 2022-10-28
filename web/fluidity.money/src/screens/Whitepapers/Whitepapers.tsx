@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -40,9 +40,16 @@ const Whitepapers = () => {
         </ContinuousCarousel>
       </div>
       <div className={styles.container}>
-        <a href="https://whitepapers.fluidity.money/fluidity-economics-wp-v0.8.pdf">
+        <a
+          href="https://whitepapers.fluidity.money/fluidity-economics-wp-v0.8.pdf"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <div>
-            <img src="/assets/images/resources/flu-whitepaper.webp" />
+            <img
+              src="/assets/images/resources/flu-whitepaper.webp"
+              alt="whitepaper"
+            />
             <Heading as="h3">
               Fluidity Money: Economics and Monetary Policy
             </Heading>

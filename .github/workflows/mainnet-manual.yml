@@ -14,6 +14,7 @@ on:
         options: 
           - 'ethereum'
           - 'solana'
+          - 'fluidity'
       group:
         description: 'Group'
         required: true
@@ -53,7 +54,7 @@ jobs:
       - name: Build
         if: ${{ github.event.inputs.skip_build == 'false' }}
         id: build
-        uses: ./scripts/actions/mainnet
+        uses: ./scripts/actions
         with:
           command: |
             flu build-docker \
@@ -66,7 +67,7 @@ jobs:
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
-        uses: ./scripts/actions/mainnet
+        uses: ./scripts/actions
         with:
           command: |
             flu deploy-service \

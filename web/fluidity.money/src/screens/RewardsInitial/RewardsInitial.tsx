@@ -2,8 +2,6 @@ import RewardsBackground from "components/RewardsBackground";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
-import { useState } from "react";
 import styles from "./RewardsInitial.module.scss";
 
 interface IProps {
@@ -12,9 +10,7 @@ interface IProps {
 
 const RewardsInitial = ({ changeScreen }: IProps) => {
   const { apiState } = useChainContext();
-  const { txCount, rewardPool } = apiState;
-  const { width } = useViewport();
-  const breakpoint = 620;
+  const { txCount } = apiState;
 
   return (
     <AnimatePresence>
@@ -25,8 +21,9 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
         className={styles.container}
       >
         <RewardsInfoBox
-          rewardPool={rewardPool}
-          totalTransactionValue={txCount}
+          // NOTE: Dummy val
+          rewardPool={100000}
+          totalTransactions={txCount}
           changeScreen={changeScreen}
           type="black"
         />

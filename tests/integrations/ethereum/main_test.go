@@ -5,6 +5,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"math/big"
 	"testing"
@@ -12,11 +13,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	test_utils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,14 +32,18 @@ type integrationTest struct {
 	// of a form parseable by big.Rat, e.g. 940/27
 	ExpectedFees string `json:"expected_fees"`
 
+	ExpectedEmission worker.EthereumAppFees `json:"expected_emission"`
+
 	FluidTokenDecimals   int            `json:"token_decimals"`
 	FluidContractAddress common.Address `json:"contract_address"`
+
+	RpcMethods  map[string]interface{} `json:"rpc_methods"`
+	CallMethods map[string]interface{} `json:"call_methods"`
+
+	Client *ethclient.Client
 }
 
-var (
-	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
-	tests              []integrationTest
-)
+var tests []integrationTest
 
 func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 	var tests []integrationTest
@@ -51,6 +56,27 @@ func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 				err,
 			)
 		})
+	}
+
+	// initialise mocked client with responses
+	for i, test := range tests {
+		var (
+			rpcMethods = test.RpcMethods
+			callMethods = test.CallMethods
+		)
+
+		client, err  := test_utils.MockRpcClient(rpcMethods, callMethods)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to initialise mocked client! %v",
+					err,
+				)
+			})
+		}
+
+		tests[i].Client = client
 	}
 
 	return tests
@@ -72,9 +98,6 @@ func init() {
 }
 
 func TestIntegrations(t *testing.T) {
-	ethHttpUrl := util.GetEnvOrFatal(EnvEthereumHttpUrl)
-	client, err := ethclient.Dial(ethHttpUrl)
-	assert.NoError(t, err)
 
 	for i, event := range tests {
 		t.Logf("Event %d\n", i)
@@ -83,9 +106,31 @@ func TestIntegrations(t *testing.T) {
 			transfer      = event.Transfer
 			fluidAddress  = event.FluidContractAddress
 			tokenDecimals = event.FluidTokenDecimals
+			client        = event.Client
 		)
 
-		fees, err := applications.GetApplicationFee(transfer, client, fluidAddress, tokenDecimals)
+		txHash_ := string(transfer.Transaction.Hash)
+		txHash := common.HexToHash(txHash_)
+
+		// Get all logs in transaction
+		txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
+		// don't fail, since this doesn't always need to be set
+		if err != nil {
+			t.Logf(
+				"Couldn't fetch transaction receipt for %v! %v",
+				txHash_,
+				err,
+			)
+		}
+
+		fees, emission, err := applications.GetApplicationFee(
+			transfer,
+			client,
+			fluidAddress,
+			tokenDecimals,
+			txReceipt,
+		)
+
 		assert.NoError(t, err)
 
 		sender, recipient, err := applications.GetApplicationTransferParties(event.Transfer)
@@ -99,5 +144,8 @@ func TestIntegrations(t *testing.T) {
 		expectedFeesRat, ok := new(big.Rat).SetString(event.ExpectedFees)
 		assert.True(t, ok)
 		assert.Equal(t, expectedFeesRat, fees)
+
+		// correct emission
+		assert.Equal(t, event.ExpectedEmission, emission)
 	}
 }

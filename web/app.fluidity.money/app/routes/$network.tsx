@@ -1,4 +1,7 @@
+import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useParams } from "@remix-run/react";
+import config from "../../webapp.config.js";
+import { redirect } from "@remix-run/node";
 import EthereumProvider from "contexts/EthereumProvider";
 import { Fragment } from "react";
 
@@ -18,6 +21,20 @@ const Provider = ({ network, children }: { network?: string, children: React.Rea
     {children}
   </ProviderComponent>
 }
+
+export const loader: LoaderFunction = async ({ params }) => {
+  // Prevent unknown network params
+  const { network } = params;
+
+  const redirectTarget = redirect("/");
+
+  if (!network) return redirectTarget;
+
+  if (network in config.drivers === false) return redirectTarget;
+
+  return true;
+};
+
 export default function Network() {
   const { network } = useParams();
   return (

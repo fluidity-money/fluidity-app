@@ -3,7 +3,6 @@ import config from "~/webapp.config.server";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
-  console.log(network);
 
   let redirectTarget = redirect("/");
   Object.keys(config.drivers).forEach((driver) => {

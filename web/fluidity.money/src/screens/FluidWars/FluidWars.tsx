@@ -1,9 +1,7 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import { ReusableGrid } from "@fluidity-money/surfing";
 import Video from "components/Video";
@@ -13,9 +11,10 @@ import useViewport from "hooks/useViewport";
 const FluidWars = () => {
   const { width } = useViewport();
   const breakpoint = 860;
-
+  
   const left =
-    width > breakpoint ? (
+  width > breakpoint ? (
+    <>
       <Video
         src={'/assets/videos/FluidityFluidWars.mp4'}
         type={"fit"}
@@ -23,15 +22,19 @@ const FluidWars = () => {
         scale={2.0}
         margin={"0 0 0 270px"}
       />
-    ) : (
+    </>
+
+  ) : (
+    <>
       <Video
         src={'/assets/videos/FluidityFluidWars.mp4'}
         type={"fit"}
         loop={true}
       />
-    );
+    </>
+  );
 
-  const right = 
+  const right =
   <HowItWorksTemplate header={header} info={info}>
     Fluidity wars
   </HowItWorksTemplate>

@@ -5,18 +5,19 @@
 package dodo
 
 import (
-	"context"
 	"fmt"
 	"math"
 	"math/big"
 	"sort"
 
-	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+
+	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const DodoV2SwapAbiString = `[
@@ -107,7 +108,7 @@ var erc20Abi ethAbi.ABI
 
 // GetDodoV2Fees calculates fees from DODOSwap, consisting of LiquidityPool (lp) Fees taken from the
 // contract, and Maintenance Fees (mt) sent to the _MAINTAINER_, if any
-func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt *ethTypes.Receipt) (*big.Rat, error) {
 	unpacked, err := dodoV2SwapAbi.Unpack("DODOSwap", transfer.Log.Data)
 
 	if err != nil {
@@ -210,17 +211,6 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	txHash_ := string(transfer.Transaction.Hash)
 	txHash := ethCommon.HexToHash(txHash_)
 
-	// Get all logs in transaction
-	txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to fetch transaction receipts from txHash (%v)! %v",
-			txHash.String(),
-			err,
-		)
-	}
-
 	txLogs := txReceipt.Logs
 
 	// Binary search through logs until we find matching log
@@ -228,15 +218,14 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 	swapLogTxIndex := sort.Search(len(txLogs), func(i int) bool {
 		// txLogs.Index sorted in ascending order, so use >= op
-		return swapLogBlockIndex >= txLogs[i].Index
+		return txLogs[i].Index >= swapLogBlockIndex
 	})
 
 	if swapLogTxIndex == len(txLogs) {
 		return nil, fmt.Errorf(
-			"failed to find matching log from txHash (%v) at Index (%v)! %v",
+			"failed to find matching log from txHash (%v) at Index (%v)!",
 			txHash.String(),
 			swapLogBlockIndex,
-			err,
 		)
 	}
 

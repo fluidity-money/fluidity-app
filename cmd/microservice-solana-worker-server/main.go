@@ -137,19 +137,17 @@ func main() {
 		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
 
 		for _, userAction := range userActions {
-
-			// skip if it's not a send, or the wrong token
-
 			var (
 				userActionTransactionHash  = userAction.Transaction.Signature
 				userActionSenderAddress    = userAction.SenderSplAddress
 				userActionRecipientAddress = userAction.RecipientSplAddress
 				userActionSlotNumber       = int64(userAction.Transaction.Result.Slot)
 				tokenDetails               = userAction.Token
+				userActionAppEmission      = userAction.AppEmissions
 			)
 
+			// skip if it's not a send, or the wrong token
 			if tokenDetails.TokenShortName != tokenName {
-				sendEmission(emission)
 				continue
 			}
 
@@ -158,6 +156,8 @@ func main() {
 			emission.TransactionHash = userActionTransactionHash
 			emission.RecipientAddress = userActionRecipientAddress
 			emission.SenderAddress = userActionSenderAddress
+
+			emission.SolanaAppFees = userActionAppEmission
 
 			slotNumber_ := misc.BigIntFromInt64(userActionSlotNumber)
 			emission.SolanaSlotNumber = slotNumber_
