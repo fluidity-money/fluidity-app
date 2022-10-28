@@ -8,8 +8,7 @@ import {
 import { json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import { useToolTip } from "~/components";
-import { ToolTipContent } from "~/components/ToolTip";
+import { useToolTip, ToolTipContent } from "~/components";
 import useHighestRewardStatistics, {
   HighestRewardResponse,
 } from "~/queries/useHighestRewardStatistics";
@@ -53,14 +52,9 @@ type LoaderData = {
 
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
-  const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
-import { Display, Text } from "@fluidity-money/surfing";
-import { useToolTip, ToolTipContent } from "~/components";
-
-export default function IndexPage() {
-  // on hover, use winnerTotals[hovered address]
   const toolTip = useToolTip();
   const [connected, setConnected] = useState(true);
+  const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
   console.log("HR", highestRewards);
 
   const showNotification = () => {
