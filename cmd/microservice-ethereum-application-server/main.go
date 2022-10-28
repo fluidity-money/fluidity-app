@@ -63,7 +63,9 @@ func main() {
 	var applicationContracts []string
 
 	for _, address := range strings.Split(applicationContracts_, ",") {
-		applicationContracts = append(applicationContracts, address)
+		addressLower := strings.ToLower(address)
+
+		applicationContracts = append(applicationContracts, addressLower)
 	}
 
 	gethClient, err := ethclient.Dial(gethHttpUrl)
