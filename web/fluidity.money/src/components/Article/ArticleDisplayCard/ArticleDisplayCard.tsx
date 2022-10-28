@@ -1,9 +1,8 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import {
-  GeneralButton,
   Heading,
   LinkButton,
   Text,
@@ -28,7 +27,9 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
   return (
     <div className={styles.cardContainer}>
       <a href={article.link}>
-        <img src={article.img} />
+
+        <img src={article.img} alt="Article-Image"/>
+
         <Heading as="h4" className={styles.leftMargin10px}>
           {article.title}
         </Heading>
@@ -41,7 +42,11 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
       </a>
       <section>
         {article.isResourcesPage ? (
-          <a href="https://blog.fluidity.money/">
+          <a
+            href="https://blog.fluidity.money/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             <LinkButton
               type={"internal"}
               size={width < breakpoint ? "medium" : "large"}
@@ -51,7 +56,7 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
             </LinkButton>
           </a>
         ) : (
-          <a href="/resources">
+          <a href="/resources" rel="noopener noreferrer" target="_blank">
             <LinkButton
               type={"internal"}
               size={width < breakpoint ? "medium" : "large"}

@@ -1,0 +1,59 @@
+name: Run Tests (develop)
+
+on: 
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Install golang
+        uses: cedrickring/golang-action@1.7.0
+        with:
+          args: go mod download -x
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install semgrep
+        run: |
+          pip install semgrep
+      - name: Setup infrastructure
+        uses: isbang/compose-action@v1.3.2
+        with:
+          compose-file: "./tests/infrastructure/docker-compose.yml"
+      - name: make test-go
+        run: |
+          make test-go
+  test-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Install nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install semrep and cargo-fuzz
+        run: |
+          pip install semgrep
+          cargo install cargo-fuzz
+      - name: make test-contracts
+        run: |
+          make test-contracts

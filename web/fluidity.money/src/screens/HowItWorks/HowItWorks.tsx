@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import { useEffect, useState } from "react";
 import useViewport from "hooks/useViewport";
@@ -134,26 +134,30 @@ const HowItWorks = () => {
           <div className={styles.video}>
             {currentImageIndex === 0 ? (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityWrap.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"abc"}
-                scale={0.8}
+                scale={0.6}
               />
             ) : currentImageIndex === 1 ? (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityYield.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"xyz"}
+                scale={0.7}
               />
             ) : (
               <Video
-                src={images[currentImageIndex].bgImage}
+                height={width < 550 && 370}
+                src={"/assets/videos/FluidityHowItWorks.mp4"}
                 type={"fit"}
                 loop={true}
                 key={"jfk"}
-                scale={0.8}
+                scale={0.7}
               />
             )}
           </div>

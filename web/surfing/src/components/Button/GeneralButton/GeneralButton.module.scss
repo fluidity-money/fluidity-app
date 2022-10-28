@@ -6,6 +6,7 @@ button {
   font-size: 0.8rem;
   font-weight: bold;
   cursor: pointer;
+  text-align: center;
 }
 
 .small {
@@ -16,6 +17,10 @@ button {
   font-weight: 700;
   font-size: 12px;
   line-height: 100%;
+
+  .icon > * {
+    height: 12px;
+  }
 }
 
 .medium {
@@ -26,6 +31,10 @@ button {
   font-weight: 700;
   font-size: 14px;
   line-height: 100%;
+
+  .icon > * {
+    height: 14px;
+  }
 }
 
 .large {
@@ -36,6 +45,10 @@ button {
   font-size: 16px;
   line-height: 100%;
   border-radius: 50px;
+
+  .icon > * {
+    height: 16px;
+  }
 }
 
 .primary {
@@ -49,15 +62,12 @@ button {
   .icon {
     display: inline-block;
     stroke: map-get($text, "secondary");
+    fill: map-get($text, "secondary");
   }
 
   &:focus:enabled {
     background-color: map-get($bg, "alternate");
     box-shadow: 0px 0px 0px 2px map-get($border, "focus");
-    .icon {
-      display: inline-block;
-      stroke: map-get($text, "prominent");
-    }
   }
 
   &:hover:enabled {
@@ -65,8 +75,8 @@ button {
     border: 0.5px solid map-get($border, "prominent");
     color: map-get($text, "prominent");
     .icon {
-      display: inline-block;
-      stroke: map-get($text, "secondary");
+      stroke: map-get($text, "prominent");
+      fill: map-get($text, "prominent");
     }
   }
 
@@ -76,8 +86,8 @@ button {
     background-color: map-get($bg, "disabled");
     border: 0.5px solid map-get($bg, "disabled");
     .icon {
-      display: inline-block;
       stroke: map-get($text, "disabled");
+      fill: map-get($text, "disabled");
     }
   }
 }
@@ -92,15 +102,12 @@ button {
   .icon {
     display: inline-block;
     stroke: map-get($text, "prominent");
+    fill: map-get($text, "prominent");
   }
 
   &:focus:enabled {
     box-shadow: 0px 0px 0px 2px map-get($border, "focus");
     color: map-get($text, "prominent");
-    .icon {
-      display: inline-block;
-      stroke: map-get($text, "prominent");
-    }
   }
 
   &:hover:enabled {
@@ -108,8 +115,8 @@ button {
     border: 0.5px solid map-get($border, "prominent");
     color: map-get($text, "secondary");
     .icon {
-      display: inline-block;
       stroke: map-get($text, "secondary");
+      fill: map-get($text, "secondary");
     }
   }
 
@@ -119,8 +126,49 @@ button {
     background-color: map-get($bg, default);
     border: 0.5px solid map-get($border, "disabled");
     .icon {
-      display: inline-block;
       stroke: map-get($text, "disabled");
+      fill: map-get($text, "disabled");
     }
   }
 }
+
+.transparent {
+  background-color: none;
+  border: 0.5px solid $white-a80;
+  width: fit-content;
+  height: fit-content;
+  text-transform: uppercase;
+  color: map-get($text, "prominent");
+  .icon {
+    display: inline-block;
+    stroke: map-get($text, "prominent");
+    fill: map-get($text, "prominent");
+  }
+
+  &:focus:enabled {
+    box-shadow: 0px 0px 0px 2px map-get($border, "focus");
+    color: map-get($text, "prominent");
+  }
+
+  &:hover:enabled {
+    background-color: map-get($bg, "alternate");
+    border: 0.5px solid map-get($border, "prominent");
+    color: map-get($text, "secondary");
+    .icon {
+      stroke: map-get($text, "secondary");
+      fill: map-get($text, "secondary");
+    }
+  }
+
+  &:disabled {
+    cursor: default;
+    color: map-get($text, "disabled");
+    background-color: map-get($bg, default);
+    border: 0.5px solid map-get($border, "disabled");
+    .icon {
+      stroke: map-get($text, "disabled");
+      fill: map-get($text, "disabled");
+    }
+  }
+}
+

@@ -1,12 +1,11 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
-  LinkButton,
   BlockchainModal,
   ChainSelectorButton,
   numberToMonetaryString,
@@ -17,18 +16,20 @@ import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
   rewardPool: number;
-  totalTransactionValue: number;
+  totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
 }
 
 const RewardsInfoBox = ({
   rewardPool,
-  totalTransactionValue,
+  totalTransactions,
   changeScreen,
   type,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
+
+  const showRewardPool = type === "black";
 
   const imgLink = (opt: string) =>
     opt === "ETH"
@@ -67,13 +68,13 @@ const RewardsInfoBox = ({
         />
         <div onClick={changeScreen}>
           <Heading as="h1">
-            {type === "black"
-              ? "$100,000"
-              : "5,000,000+"}
+            {showRewardPool
+              ? numberToMonetaryString(rewardPool)
+              : totalTransactions}
           </Heading>
         </div>
-        <Heading as="h4">
-          {type === "black" ? "Reward pool" : "Total transactions (on testing)"}
+        <Heading as="h4" className={styles.alignCenter}>
+          {showRewardPool ? "Reward pool" : "Total transactions (on testing)"}
         </Heading>
         {showModal && (
           <BlockchainModal

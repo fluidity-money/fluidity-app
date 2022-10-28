@@ -1,0 +1,42 @@
+
+-- migrate:up
+
+ALTER TABLE worker_emissions
+	ADD COLUMN uniswap_v2_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN balancer_v_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN oneinch_v2_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN oneinch_v1_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN mooniswap_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN oneinch_fixedrate_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN dodo_v2_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN curve_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN multichain_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN xyfinance_fee DOUBLE PRECISION DEFAULT 0.0,
+
+	ADD COLUMN saber_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN orca_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN raydium_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN aldrin_v1_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN aldrin_v2_fee DOUBLE PRECISION DEFAULT 0.0,
+	ADD COLUMN lifinity_fee DOUBLE PRECISION DEFAULT 0.0;
+
+-- migrate:down
+
+ALTER TABLE worker_emissions
+	DROP COLUMN uniswap_v2_fee,
+	DROP COLUMN balancer_v_fee,
+	DROP COLUMN oneinch_v2_fee,
+	DROP COLUMN oneinch_v1_fee,
+	DROP COLUMN mooniswap_fee,
+	DROP COLUMN oneinch_fixedrate_fee,
+	DROP COLUMN dodo_v2_fee,
+	DROP COLUMN curve_fee,
+	DROP COLUMN multichain_fee,
+	DROP COLUMN xyfinance_fee,
+
+	DROP COLUMN saber_fee,
+	DROP COLUMN orca_fee,
+	DROP COLUMN raydium_fee,
+	DROP COLUMN aldrin_v1_fee,
+	DROP COLUMN aldrin_v2_fee,
+	DROP COLUMN lifinity_fee;

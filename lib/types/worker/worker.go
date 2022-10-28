@@ -48,11 +48,33 @@ type (
 
 		AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
 
-		AtxBufferSize      int    `json:"atx_buffer_size"`
-		TransfersInBlock   int    `json:"transfers_in_block"`
-		TransfersPast      string `json:"transfers_past"`
+		AtxBufferSize    int    `json:"atx_buffer_size"`
+		TransfersInBlock int    `json:"transfers_in_block"`
+		TransfersPast    string `json:"transfers_past"`
 
 		SecondsSinceLastBlock uint64 `json:"seconds_since_last_block"`
+
+		GasLimit  uint64      `json:"gas_limit"`
+		GasTipCap misc.BigInt `json:"gas_tip_cap"`
+
+		GasLimitNormal  float64 `json:"gas_limit_normal"`
+		GasTipCapNormal float64 `json:"gas_tip_cap_normal"`
+
+		GasUsed       uint64  `json:"gas_used"`
+		GasUsedNormal float64 `json:"gas_used_normal"`
+
+		TransferFeeNormal float64 `json:"transfer_fee_normal"`
+
+		BlockBaseFee       misc.BigInt `json:"block_base_fee"`
+		BlockBaseFeeNormal float64     `json:"block_base_fee_normal"`
+
+		MaxPriorityFeePerGas       misc.BigInt `json:"max_priority_fee_per_gas"`
+		MaxPriorityFeePerGasNormal float64     `json:"max_priority_fee_per_gas_normal"`
+
+		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
+		MaxFeePerGasNormal float64 `json:"max_fee_per_gas_normal"`
+
+		EffectiveGasPriceNormal float64 `json:"effective_gas_price_normal"`
 
 		Payout struct {
 			Winnings        float64 `json:"winnings"` // Winnings
@@ -70,9 +92,11 @@ type (
 			RewardPool      float64 `json:"reward_pool"`
 		} `json:"payout"`
 
-		Fees struct {
-			Saber float64 `json:"saber"`
-		} `json:"fees"`
+		// app fees for solana transactions
+		SolanaAppFees SolanaAppFees `json:"solana_fees"`
+
+		// app fees for eth transactions
+		EthereumAppFees EthereumAppFees `json:"ethereum_fees"`
 
 		// calculate n function
 		CalculateN struct {
@@ -128,6 +152,30 @@ type (
 			Probability4 float64 `json:"probability_4"`
 			Probability5 float64 `json:"probability_5"`
 		} `json:"winning_chances"`
+	}
+
+	// app fees for solana transactions
+	SolanaAppFees struct {
+		Saber    float64 `json:"saber"`
+		Orca     float64 `json:"orca"`
+		Raydium  float64 `json:"raydium"`
+		AldrinV1 float64 `json:"aldrin_v1"`
+		AldrinV2 float64 `json:"aldrin_v2"`
+		Lifinity float64 `json:"lifinity"`
+	}
+
+	// app fees for ethereum transactions
+	EthereumAppFees struct {
+		UniswapV2        float64 `json:"uniswap_v2"`
+		BalancerV2       float64 `json:"balancer_v2"`
+		OneInchV2        float64 `json:"oneinch_v2"`
+		OneInchV1        float64 `json:"oneinch_v1"`
+		Mooniswap        float64 `json:"mooniswap"`
+		OneInchFixedRate float64 `json:"oneinch_fixedrate"`
+		DodoV2           float64 `json:"dodo_v2"`
+		Curve            float64 `json:"curve"`
+		Multichain       float64 `json:"multichain"`
+		XyFinance        float64 `json:"xyfinance"`
 	}
 )
 

@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"math/big"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
@@ -20,6 +18,11 @@ import (
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
@@ -53,78 +56,116 @@ const (
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+// if a receipt is passed, will be passed to the application if it can use it
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt *ethTypes.Receipt) (*big.Rat, worker.EthereumAppFees, error) {
+	var (
+		fee      *big.Rat
+		emission worker.EthereumAppFees
+		err      error
+	)
+
 	switch transfer.Application {
 	case ApplicationUniswapV2:
-		return uniswap.GetUniswapFees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationBalancerV2:
-		return balancer.GetBalancerFees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationOneInchLPV2, ApplicationOneInchLPV1:
-		return oneinch.GetOneInchLPFees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationMooniswap:
-		return oneinch.GetMooniswapV1Fees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationOneInchFixedRateSwap:
-		return oneinch.GetFixedRateSwapFees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationDodoV2:
-		return dodo.GetDodoV2Fees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationCurve:
-		return curve.GetCurveSwapFees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationMultichain:
-		return multichain.GetMultichainAnySwapFees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-	case ApplicationXyFinance:
-		return xy_finance.GetXyFinanceSwapFees(
+		fee, err = uniswap.GetUniswapFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
+		emission.UniswapV2 += util.MaybeRatToFloat(fee)
+	case ApplicationBalancerV2:
+		fee, err = balancer.GetBalancerFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.BalancerV2 += util.MaybeRatToFloat(fee)
+	case ApplicationOneInchLPV2:
+		fee, err = oneinch.GetOneInchLPFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.OneInchV2 += util.MaybeRatToFloat(fee)
+	case ApplicationOneInchLPV1:
+		fee, err = oneinch.GetOneInchLPFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.OneInchV1 += util.MaybeRatToFloat(fee)
+	case ApplicationMooniswap:
+		fee, err = oneinch.GetMooniswapV1Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Mooniswap += util.MaybeRatToFloat(fee)
+	case ApplicationOneInchFixedRateSwap:
+		fee, err = oneinch.GetFixedRateSwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.OneInchFixedRate += util.MaybeRatToFloat(fee)
+	case ApplicationDodoV2:
+		fee, err = dodo.GetDodoV2Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+			txReceipt,
+		)
+
+		emission.DodoV2 += util.MaybeRatToFloat(fee)
+	case ApplicationCurve:
+		fee, err = curve.GetCurveSwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Curve += util.MaybeRatToFloat(fee)
+	case ApplicationMultichain:
+		fee, err = multichain.GetMultichainAnySwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Multichain += util.MaybeRatToFloat(fee)
+	case ApplicationXyFinance:
+		fee, err = xy_finance.GetXyFinanceSwapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+			txReceipt,
+		)
+
+		emission.XyFinance += util.MaybeRatToFloat(fee)
+
 	default:
-		return nil, fmt.Errorf(
+		err = fmt.Errorf(
 			"Transfer #%v did not contain an application",
 			transfer,
 		)
 	}
+
+	return fee, emission, err
 }
 
 // GetApplicationTransferParties to find the parties considered for payout from an application interaction.

@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 import React, { useEffect, useState } from "react";
 import { Navigation } from "@fluidity-money/surfing";
 import ResourcesPageTitle from "screens/ResourcesPageTitle";
@@ -35,7 +35,10 @@ const ResourcesPage = () => {
     <div className={styles.pageContainer}>
       <Head>
         <title>Resources - Fluidity</title>
-        <meta name="description" content="Fluidity's research and platform will supercharge the adoption of Web3 and Crypto. Read about the future of Crypto and Fluidity's vision." />
+        <meta
+          name="description"
+          content="Fluidity's research and platform will supercharge the adoption of Web3 and Crypto. Read about the future of Crypto and Fluidity's vision."
+        />
       </Head>
       <div className={styles.screensContainer}>
         <Navigation
@@ -62,11 +65,12 @@ const ResourcesPage = () => {
               animate={{ opacity: 1, transform: "translateY(0px)" }}
               transition={{ transform: { duration: 1 } }}
             >
-              <Articles isResourcesPage={true}/>
+              <Articles isResourcesPage={true} />
               {/* <Tweets /> */}
               <Fluniversity />
               <Whitepapers />
               <Docs />
+              <MailingList />
               <Demo />
               <Footer />
             </motion.div>

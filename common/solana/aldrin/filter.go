@@ -298,10 +298,10 @@ func GetAldrinFees(solanaClient *rpc.Provider, transaction types.TransactionResu
 
 		var swapInstruction SwapInstruction
 
-		// deserialise the transaction data minus the enum
-		// variant (the first byte)
+		// deserialise the transaction data (without removing the discriminant
+		// since it is factored into the struct)
 
-		err = borsh.Deserialize(&swapInstruction, instructionByteData[1:])
+		err = borsh.Deserialize(&swapInstruction, instructionByteData)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -340,7 +340,7 @@ func GetAldrinFees(solanaClient *rpc.Provider, transaction types.TransactionResu
 	return feesPaid, nil
 }
 
-func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.TransactionInstruction, innerInstructions []types.TransactionInnerInstruction, instruction types.TransactionInstruction, instructionNumber int, numBaseInstruction int, accountKeys []string) (bool, error) {
+func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.TransactionInstruction, innerInstructions []types.TransactionInnerInstruction, instruction types.TransactionInstruction, instructionNumber int, numBaseInstructions int, accountKeys []string) (bool, error) {
 
 	var (
 		// the inner instruction containing the Aldrin fee mintTo
@@ -349,26 +349,41 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 		destinationTransferInstruction types.TransactionInstruction
 	)
 
-	if instructionNumber <= numBaseInstruction {
+	if instructionNumber < numBaseInstructions {
 		// get the second and third inner instructions originating from this instruction
-		innerInstruction := innerInstructions[numBaseInstruction]
+		var innerInstruction types.TransactionInnerInstruction
+
+		for _, inner := range(innerInstructions) {
+			if inner.Index == instructionNumber {
+				innerInstruction = inner
+			}
+		}
+
+		if len(innerInstruction.Instructions) == 0 {
+			return false, fmt.Errorf(
+				"could not find Aldrin swap inner instructions!",
+			)
+		}
+
 		feeMintInstruction = innerInstruction.Instructions[1]
 		destinationTransferInstruction = innerInstruction.Instructions[2]
 	} else {
 		// get the two inner instructions one after next
-		feeMintInstruction = instructions[numBaseInstruction+2]
-		destinationTransferInstruction = instructions[numBaseInstruction+3]
+		feeMintInstruction = instructions[instructionNumber+2]
+		destinationTransferInstruction = instructions[instructionNumber+3]
 	}
 
 	feeMintInstructionData := base58.Decode(feeMintInstruction.Data)
 
 	var feeAmount int64
 
-	err := borsh.Deserialize(&feeAmount, feeMintInstructionData)
+	err := borsh.Deserialize(&feeAmount, feeMintInstructionData[1:])
 
 	if err != nil {
 		return false, fmt.Errorf(
-			"failed to deserialise Aldrin fee mintTo instruction data! %v",
+			"failed to deserialise Aldrin fee mintTo instruction (%v) data %v! %v",
+			instructionNumber,
+			feeMintInstructionData,
 			err,
 		)
 	}
@@ -406,7 +421,7 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 
 	var destinationTransferAmount int64
 
-	err = borsh.Deserialize(&feeAmount, destinationTransferInstructionData)
+	err = borsh.Deserialize(&destinationTransferAmount, destinationTransferInstructionData[1:])
 
 	if err != nil {
 		return false, fmt.Errorf(

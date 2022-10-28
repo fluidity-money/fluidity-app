@@ -1,12 +1,11 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import useViewport from "hooks/useViewport";
 import { ContinuousCarousel, Card, Heading } from "@fluidity-money/surfing";
 import Partner from "components/Partner";
 import styles from "./SponsorsPartners.module.scss";
-import { useEffect, useState } from "react";
 
 const SponsorsPartners = () => {
   /*
@@ -45,7 +44,7 @@ const SponsorsPartners = () => {
       title: "Aave",
       info: "Aave is a decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers",
     },
-  
+
     {
       img: "/assets/images/Partners/Compound.png",
       url: "https://compound.finance",
@@ -70,7 +69,7 @@ const SponsorsPartners = () => {
       title: "Aldrin",
       info: "Aldrin is a decentralized exchange whose mission is to simplify DeFi and create powerful tools to help all traders succeed, leading to more equality.",
     },
-  
+
     {
       img: "/assets/images/Partners/DODO.png",
       url: "https://dodoex.io",
@@ -89,12 +88,10 @@ const SponsorsPartners = () => {
       title: "Saber",
       info: "Saber is an automated market maker for trading assets on Solana.",
     },
- 
   ];
 
   const { width } = useViewport();
-  const breakpoint = 660;
-   //Note: every value rep is in pixel
+  //Note: every value rep is in pixel
   //Using collision detection to organise posiitons so cards don't overlap.
   // Used for desktop view only since cards appear linearly on mobile.
   /*
@@ -116,82 +113,99 @@ const SponsorsPartners = () => {
   const boxWidth = 300;
 
   const partnerCards = partners.map((partner, i) => {
-    let top = Math.floor(Math.random() * ((boxHeight - tolerance) - 1) + 1);
-    let left = Math.floor(Math.random() * ((width - (width - 1180)) - 1) + 1);
+    let top = Math.floor(Math.random() * (boxHeight - tolerance - 1) + 1);
+    let left = Math.floor(Math.random() * (width - (width - 1180) - 1) + 1);
 
-    if(prevTop > 0 && prevLeft > 0) {
-     
-      while(true) {
+    if (prevTop > 0 && prevLeft > 0) {
+      while (true) {
         // Check for Collision along X-axis
-        if( (left < (prevLeft + boxWidth + tolerance) && (left + boxWidth + tolerance) > prevLeft) == false ) {
+        if (
+          (left < prevLeft + boxWidth + tolerance &&
+            left + boxWidth + tolerance > prevLeft) == false
+        ) {
           break;
         }
 
         // Check for Collision along Y-axis
-        if ((top < (prevTop + boxHeight + tolerance) && (top + boxHeight + tolerance) > prevTop) == false) {
+        if (
+          (top < prevTop + boxHeight + tolerance &&
+            top + boxHeight + tolerance > prevTop) == false
+        ) {
           break;
         }
 
         //If it gets here - a collision occured generate another set of randoms. then loop again to check along every axis if this is valid.
-        top = Math.floor(Math.random() * ((boxHeight - tolerance) - 1) + 1);
-        left = Math.floor(Math.random() * ((width - (width - 1180)) - 1) + 1);
+        top = Math.floor(Math.random() * (boxHeight - tolerance - 1) + 1);
+        left = Math.floor(Math.random() * (width - (width - 1180) - 1) + 1);
       }
     }
-  
+
     prevTop = top;
     prevLeft = left;
-    
-    const filter = Math.floor(Math.random() * (21 - 1) + 1) >= 17 ? 'blur(3px)' : 'blur(0px)'
-    const opacity = filter === 'blur(3px)' ? '0.6' : '1.0';
-    return(
-          width > 960 ? (
-          <Card
-          rounded={true}
-          type={"transparent"}
-          key={`sponsor-${i}`}
-          className={styles.card}
-          style={{
-            position: "relative",
-            display: "block",
-            top: `${top}px`,
-            left: `${left}px`,
-            filter: filter,
-            opacity: opacity
-          }}
-          >
-            <Partner
-              img={partner.img}
-              title={partner.title}
-              info={partner.info}
-              url={partner.url}
-            />
-          </Card>) :
-          (
-            <Card
-            rounded={true}
-            type={"transparent"}
-            key={`sponsor-${i}`}
-            className={styles.card}
-            style={{
-              position: "relative",
-              display: "block",
-              top: `0px`,
-              left: `${(width * 0.5) - boxWidth * 0.5}px`, // places it at the centre;
-            }}
-          >
-            <Partner
-              img={partner.img}
-              title={partner.title}
-              info={partner.info}
-              url={partner.url}
-            />
-          </Card>)
-    );})
- 
+
+    const filter =
+      Math.floor(Math.random() * (21 - 1) + 1) >= 17
+        ? "blur(3px)"
+        : "blur(0px)";
+    const opacity = filter === "blur(3px)" ? "0.6" : "1.0";
+    return width > 960 ? (
+      <Card
+        rounded={true}
+        type={"transparent"}
+        key={`sponsor-${i}`}
+        className={styles.card}
+        style={{
+          position: "relative",
+          display: "block",
+          top: `${top}px`,
+          left: `${left}px`,
+          filter: filter,
+          opacity: opacity,
+        }}
+      >
+        <Partner
+          img={partner.img}
+          title={partner.title}
+          info={partner.info}
+          url={partner.url}
+        />
+      </Card>
+    ) : (
+      <Card
+        rounded={true}
+        type={"transparent"}
+        key={`sponsor-${i}`}
+        className={styles.card}
+        style={{
+          position: "relative",
+          display: "block",
+          top: `0px`,
+          left: `${width * 0.5 - boxWidth * 0.5}px`, // places it at the centre;
+        }}
+      >
+        <Partner
+          img={partner.img}
+          title={partner.title}
+          info={partner.info}
+          url={partner.url}
+        />
+      </Card>
+    );
+  });
+
   return (
     <div className={`${styles.container} bg-dark`}>
-      <Heading as="h1" className={styles.SPtext}>{"Partners & Investors"}</Heading>
-      <div style={{ display: "flex", width: "100%", justifyContent:"center", overflowY: "hidden" }}>
+      <Heading as="h1" className={styles.SPtext}>
+        {"Partners & Investors"}
+      </Heading>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          justifyContent: "center",
+          overflowY: "hidden",
+        }}
+      >
         <ContinuousCarousel direction="up">
           <div
             style={{
@@ -202,14 +216,12 @@ const SponsorsPartners = () => {
               // left: `${Math.floor((Math.random() - 0.6) * 900)}px`,
             }}
           >
-            {
-              partnerCards
-            }
+            {partnerCards}
           </div>
         </ContinuousCarousel>
       </div>
     </div>
   );
-}
+};
 
 export default SponsorsPartners;

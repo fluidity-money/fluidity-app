@@ -5,15 +5,19 @@
 package main
 
 import (
+	"context"
 	"strconv"
+	"strings"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
@@ -25,13 +29,21 @@ const (
 
 	// EnvUnderlyingTokenDecimals supported by the contract
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
+
+	// EnvApplicationContracts to list the application contracts to monitor
+	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
+
+	// EnvServerWorkQueue to send serverwork down
+	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
 
 func main() {
 	var (
+		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
 		gethHttpUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
+		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
 	)
 
 	contractAddress := ethCommon.HexToAddress(contractAddrString)
@@ -48,6 +60,12 @@ func main() {
 		})
 	}
 
+	var applicationContracts []string
+
+	for _, address := range strings.Split(applicationContracts_, ",") {
+		applicationContracts = append(applicationContracts, address)
+	}
+
 	gethClient, err := ethclient.Dial(gethHttpUrl)
 
 	if err != nil {
@@ -59,26 +77,133 @@ func main() {
 
 	defer gethClient.Close()
 
-	worker.EthereumApplicationEvents(func(applicationEvent worker.EthereumApplicationEvent) {
-
+	worker.GetEthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
 		var (
-			// transfers that generated application events
-			applicationTransfers = applicationEvent.ApplicationTransfers
-
-			// the block in question
-			applicationBlock = applicationEvent.BlockLog
-
-			// worker server has already found application transfers using the contract in this block
-			fluidTransferCount = len(applicationTransfers)
-
-			// transfers that we're adding information to
-			decoratedTransfers = make([]worker.EthereumDecoratedTransfer, fluidTransferCount)
+			logs         = blockLog.Logs
+			transactions = blockLog.Transactions
+			blockHash    = blockLog.BlockHash
 		)
 
-		// loop over application events in the block, add payouts as decorator
-		for i, transfer := range applicationTransfers {
+		fluidTransfers, err := libEthereum.GetTransfers(
+			logs,
+			transactions,
+			blockHash,
+			contractAddress,
+		)
 
-			fee, err := applications.GetApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get a fluid transfer in block %#v!",
+					blockHash,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		applicationTransfers, err := libEthereum.GetApplicationTransfers(
+			logs,
+			transactions,
+			blockHash,
+			applicationContracts,
+			applications.ClassifyApplicationLogTopic,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get application events in block %#v!",
+					blockHash,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		decoratedTransfers := make([]worker.EthereumDecoratedTransfer, len(fluidTransfers))
+
+		// add the non-app fluid transfers (and get their receipts)
+
+		for i, fluidTransfer := range fluidTransfers {
+
+			fluidTransferHash := ethCommon.HexToHash(
+				string(fluidTransfer.Transaction.Hash),
+			)
+
+			txReceipt, err := gethClient.TransactionReceipt(
+				context.Background(),
+				fluidTransferHash,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the transaction receipt for Fluid transfer %#v!",
+						fluidTransferHash,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			if txReceipt == nil {
+				log.Fatal(func(k *log.Log) {
+				    k.Format("Receipt for fluid transfer %v was nil!", fluidTransferHash)
+				})
+			}
+
+			convertedReceipt := libEthereum.ConvertGethReceipt(*txReceipt)
+			fluidTransfer.Receipt = convertedReceipt
+
+			decoratedTransfers[i] = fluidTransfer
+		}
+
+		// loop over application events in the block, add payouts as decorator
+		for _, transfer := range applicationTransfers {
+
+			transaction := transfer.Transaction
+
+			transactionHashHex := transaction.Hash.String()
+
+			transactionHash := ethCommon.HexToHash(
+				transactionHashHex,
+			)
+
+			txReceipt, err := gethClient.TransactionReceipt(
+				context.Background(),
+				transactionHash,
+			)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get the transaction receipt for Fluid transfer %#v!",
+						transactionHashHex,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			if txReceipt == nil {
+				log.Fatal(func(k *log.Log) {
+				    k.Format(
+						"Receipt for fluid transfer %v was nil!",
+						transactionHashHex,
+					)
+				})
+			}
+
+			convertedReceipt := libEthereum.ConvertGethReceipt(*txReceipt)
+
+			fee, emission, err := applications.GetApplicationFee(
+				transfer,
+				gethClient,
+				contractAddress,
+				tokenDecimals,
+				txReceipt,
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -92,7 +217,7 @@ func main() {
 				log.App(func(k *log.Log) {
 					k.Format(
 						"Skipping an application transfer for transaction %#v and application %#v!",
-						transfer.Transaction.Hash.String(),
+						transactionHashHex,
 						transfer.Application,
 					)
 				})
@@ -100,7 +225,13 @@ func main() {
 				continue
 			}
 
-			toAddress, fromAddress, err := applications.GetApplicationTransferParties(transfer)
+			decorator := &worker.EthereumWorkerDecorator{
+				ApplicationFee: fee,
+			}
+
+			toAddress, fromAddress, err := applications.GetApplicationTransferParties(
+				transfer,
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -109,32 +240,27 @@ func main() {
 				})
 			}
 
-			decorator := &worker.EthereumWorkerDecorator{
-				ApplicationFee: fee,
-			}
-
 			decoratedTransfer := worker.EthereumDecoratedTransfer{
-				SenderAddress:    fromAddress,
-				RecipientAddress: toAddress,
-				Decorator:        decorator,
-				Transaction:      transfer.Transaction,
+				SenderAddress:        fromAddress,
+				RecipientAddress:     toAddress,
+				Decorator:            decorator,
+				Transaction:          transfer.Transaction,
+				Receipt:              convertedReceipt,
+				AppEmissions:         emission,
 			}
 
-			decoratedTransfers[i] = decoratedTransfer
+			decoratedTransfers = append(decoratedTransfers, decoratedTransfer)
 		}
 
-		serverWork := worker.EthereumServerWork{
-			EthereumHintedBlock: &worker.EthereumHintedBlock{
-				BlockHash:          applicationBlock.BlockHash,
-				BlockBaseFee:       applicationBlock.BlockBaseFee,
-				BlockTime:          applicationBlock.BlockTime,
-				BlockNumber:        applicationBlock.BlockNumber,
-				TransferCount:      fluidTransferCount,
-				DecoratedTransfers: decoratedTransfers,
-			},
+		serverWork := worker.EthereumHintedBlock{
+			BlockHash:          blockLog.BlockHash,
+			BlockBaseFee:       blockLog.BlockBaseFee,
+			BlockTime:          blockLog.BlockTime,
+			BlockNumber:        blockLog.BlockNumber,
+			DecoratedTransfers: decoratedTransfers,
 		}
 
 		// send to server
-		queue.SendMessage(worker.TopicEthereumServerWork, serverWork)
+		queue.SendMessage(publishAmqpTopic, serverWork)
 	})
 }

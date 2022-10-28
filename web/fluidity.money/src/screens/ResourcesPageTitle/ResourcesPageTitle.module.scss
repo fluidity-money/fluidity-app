@@ -1,20 +1,25 @@
 @import "../../styles/config.scss";
 
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 850px;
-    max-height: 960px;
-    width: 100%;
-    opacity: 0.8;
-    background-image: url("../../../public/assets/images/bg-blur-desktop.png"), url("../../../public/assets/images/dot-graph.svg");
-    background-position: top, bottom;
-    background-repeat: no-repeat, no-repeat;
-    
-    h1 {
-      color: $fluidWhite;
-      font-size: 11vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  min-height: 850px;
+  max-height: 960px;
+  width: 100%;
+  opacity: 0.8;
+  background-image: url("../../../public/assets/images/bg-blur-desktop.png"),
+    url("../../../public/assets/images/dot-graph.svg");
+  background-position: top, bottom;
+  background-repeat: no-repeat, no-repeat;
+
+  h1 {
+    color: $fluidWhite;
+    font-size: 10vw;
+    font-weight: 1000;
+    @media (max-width: 500px) {
+      margin-bottom: 25vh;
     }
   }
-  
+}

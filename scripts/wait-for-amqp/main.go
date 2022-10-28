@@ -36,7 +36,7 @@ func testAmqp(address string) error {
 
 func main() {
 	var (
-		debugEnabled = os.Getenv("FLU_DEBUG") != "false"
+		debugEnabled = os.Getenv("FLU_DEBUG") == "true"
 		amqpAddress  = os.Getenv("FLU_AMQP_QUEUE_ADDR")
 		arguments    = os.Args[1:]
 	)
@@ -76,20 +76,24 @@ func main() {
 		)
 	}
 
-	if len(arguments) == 0 {
-		os.Exit(0)
-	}
-
 	var (
-		command     = arguments[0]
-		commandArgs []string
+		commandName      string
+		commandArguments []string
 	)
 
-	if len(arguments) > 1 {
-		commandArgs = arguments[1:]
+	switch len(arguments) {
+	case 0:
+		os.Exit(0)
+
+	default:
+		commandArguments = arguments[1:]
+		fallthrough
+
+	case 1:
+		commandName = arguments[0]
 	}
 
-	cmd := exec.Command(command, commandArgs...)
+	cmd := exec.Command(commandName, commandArguments...)
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

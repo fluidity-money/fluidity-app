@@ -16,7 +16,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const maxCount = 50
+const attemptCount = 50
 
 func testWs(address string) error {
 	client, _, err := websocket.DefaultDialer.Dial(
@@ -44,12 +44,20 @@ func main() {
 		wsAddress = os.Getenv("FLU_QUEUE_ADDR")
 	}
 
-	timer := time.Tick(time.Second)
+	if wsAddress == "" {
+		log.Fatal(
+			"FLU_ETHEREUM_WS_URL and FLU_QUEUE_ADDR both not set!",
+		)
+	}
 
-	var err error
+	var (
+		ticker = time.Tick(time.Second)
+		err error
+	)
 
-	for attempt := 0; attempt < maxCount; attempt++ {
-		_ = <-timer
+
+	for attempt := 0; attempt < attemptCount; attempt++ {
+		_ = <-ticker
 
 		if err = testWs(wsAddress); err == nil {
 			break
@@ -57,8 +65,10 @@ func main() {
 
 		if debugEnabled {
 			log.Printf(
-				"Failed to connect to %#v! %v",
+				"Failed to connect to %#v! Attempt %v of %v. %v",
 				wsAddress,
+				attempt,
+				attemptCount,
 				err,
 			)
 		}

@@ -1166,6 +1166,8 @@ lime.app.Application.prototype = $extend(lime.app.Module.prototype,{
 	,onWindowMove: function(x,y) {
 	}
 	,onWindowResize: function(width,height) {
+		this.reset();
+		this.updateSimulationTextures();
 	}
 	,render: function(context) {
 	}
@@ -1252,9 +1254,6 @@ Main.prototype = $extend(lime.app.Application.prototype,{
 			lime.ui.MouseEventManager.onMouseUp.add(function(x,y,button) {
 				clickCount++;
 			});
-			haxe.Timer.delay(function() {
-				var fps = _g.performanceMonitor.fpsSamgaple.average;
-			},6000);
 		}
 		this.lastTime = haxe.Timer.stamp();
 		const ref = this;

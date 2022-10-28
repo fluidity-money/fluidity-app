@@ -40,14 +40,17 @@ func (s *Provider) SendTransaction(transaction *solana.Transaction) (sig solana.
 		)
 	}
 
-	err = json.Unmarshal(invocation, &sig)
+	var sigString string
+
+	err = json.Unmarshal(invocation, &sigString)
 
 	if err != nil {
 		return solana.Signature{}, fmt.Errorf(
-			"failed to sendTransaction: %v",
+			"failed to sendTransaction: %v, %v",
 			err,
+			invocation,
 		)
 	}
 
-	return sig, nil
+	return solana.SignatureFromBase58(sigString)
 }

@@ -1,8 +1,8 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
-import { Display, ManualCarousel } from "@fluidity-money/surfing";
+import { ManualCarousel } from "@fluidity-money/surfing";
 import UseCase from "components/UseCase";
 import useViewport from "hooks/useViewport";
 import styles from "./UseCases.module.scss";
@@ -15,12 +15,10 @@ const UseCases = () => {
   const { width } = useViewport();
   const breakpoint = 665;
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column" }}
-      className={styles.container}
-    >
+    <div className={styles.container}>
       {/* Missing font WHYTE INK SUPER */}
       {/*<Display */}
+      {/*  size={width > breakpoint ? "lg" : "xs"}  */}
       {/*  large={width > breakpoint && true} */}
       {/*  extraSmall={width < breakpoint && true} */}
       {/*  className={styles.backgroundText} */}
@@ -41,7 +39,10 @@ const UseCases = () => {
         />
       )}
 
-      <ManualCarousel scrollBar={false} className={styles.map}>
+      <ManualCarousel
+        className={styles.map}
+        scrollBar={width < 500 ? true : false}
+      >
         {items.map((item, i) => (
           <UseCase key={`usecase-${i}`} useCase={item} />
         ))}
@@ -74,12 +75,12 @@ const items = [
     info: "Cashback programs/incentives have always been single-sided, pro-consumer. Fluidity rectifies that by rewarding the recipient/counterparty with a cut of the yield.",
   },
   {
-    img: "/assets/images/useCaseIcons/metaverseGaming.svg",
+    img: "/assets/images/useCaseIcons/metaverseGaming.png",
     title: "Metaverse & gaming",
     info: "Fluidity rewards all forms of use cases. Gaming and metaverses are high-velocity use cases that can massively benefit from the fluid ecosystem.",
   },
   {
-    img: "/assets/images/useCaseIcons/decentralizedExchanges.svg",
+    img: "/assets/images/useCaseIcons/decentralizedExchanges.png",
     title: "Decentralized exchanges",
     info: "Transacting, trading and asset movement are integral activities within decentralised programs and their applications. Value transfers can greatly benefit from adopting the fluid layer. ",
   },

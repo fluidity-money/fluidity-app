@@ -1,87 +1,135 @@
-import * as hre from "hardhat";
-import { oracle, operator, fusdt_addr, usdt_addr, fdai_addr, signer } from './setup';
+import {
+    fUsdtAccount,
+    fUsdtAccount2,
+    fUsdtOracle,
+    fUsdtOperator,
+    fUsdtCouncil,
+    accountAddr,
+    configAddr,
+} from './setup';
 import * as ethers from 'ethers';
 import { expect } from "chai";
 
 describe("Token", async function () {
-    let fusdt: ethers.Contract;
-    let fusdt_operator: ethers.Contract;
-    let usdt: ethers.Contract;
-    let fdai: ethers.Contract;
-    let signerAddress: string;
+    it("supports disabling wraps and rewards with emergency mode", async function () {
+        await fUsdtOperator.enableEmergencyMode();
 
-    before(async () => {
-        fusdt = await hre.ethers.getContractAt("Token", fusdt_addr, oracle);
-        fusdt_operator = await hre.ethers.getContractAt("Token", fusdt_addr, operator);
-        usdt = await hre.ethers.getContractAt("IERC20", usdt_addr, oracle);
+        await expect(fUsdtAccount.erc20In(1)).to.be.revertedWith("emergency mode!");
 
-        fdai = await hre.ethers.getContractAt("Token", fdai_addr, oracle);
-
-        signerAddress = await signer.getAddress();
-    });
-
-    it("Emergency mode functional", async function () {
-        await fdai.enableEmergencyMode();
-
-        expect(fdai.erc20In(1)).to.be.revertedWith("emergency mode!");
-
-        expect(fdai.batchReward([[signerAddress, 1001]], 100, 101))
+        await expect(fUsdtOracle.batchReward([[accountAddr, 1001]], 100, 101))
             .to.be.revertedWith("emergency mode!");
 
-        expect(fdai.unblockReward(signerAddress, 1, true, 100, 101))
+        await expect(fUsdtOperator.unblockReward(accountAddr, 1, true, 100, 101))
             .to.be.revertedWith("emergency mode!");
+
+        await fUsdtOperator.disableEmergencyMode(configAddr);
+
+        await expect(fUsdtAccount.erc20In(1))
+            .to.not.be.revertedWith("emergency mode!");
     });
 
-    it("Allows small rewards", async function () {
-        const initial = await fusdt.balanceOf(signerAddress);
+    it("still allows unwrapping during emergency mode", async function () {
+        await expect(fUsdtAccount.erc20In(1)).to.not.be.revertedWith("emergency mode!");
 
-        await fusdt.batchReward([[signerAddress, 100]], 100, 101);
-        const change = await fusdt.balanceOf(signerAddress) - initial;
+        await fUsdtOperator.enableEmergencyMode();
+
+        await expect(fUsdtAccount.erc20Out(1)).to.not.be.revertedWith("emergency mode!");
+
+        await fUsdtOperator.disableEmergencyMode(configAddr);
+    });
+
+    it("lets emergency mode be enabled by the three authorities", async function () {
+        await fUsdtOperator.enableEmergencyMode();
+        await fUsdtOperator.disableEmergencyMode(configAddr);
+
+        await fUsdtOracle.enableEmergencyMode();
+        await fUsdtOperator.disableEmergencyMode(configAddr);
+
+        await fUsdtCouncil.enableEmergencyMode();
+        await fUsdtOperator.disableEmergencyMode(configAddr);
+
+        await expect(fUsdtAccount.enableEmergencyMode())
+            .to.be.revertedWith("can't enable emergency mode!");
+    });
+
+    it("only lets the operator disable emergency mode", async function () {
+        await fUsdtOperator.enableEmergencyMode();
+
+        for (const user of [fUsdtOracle, fUsdtCouncil, fUsdtAccount]) {
+            await expect(user.disableEmergencyMode(configAddr))
+                .to.be.revertedWith("only the operator account can use this");
+        }
+
+        await fUsdtOperator.disableEmergencyMode(configAddr);
+    });
+
+    it("allows small rewards", async function () {
+        const initial = await fUsdtAccount.balanceOf(accountAddr);
+
+        await fUsdtOracle.batchReward([[accountAddr, 100]], 100, 101);
+        const change = await fUsdtAccount.balanceOf(accountAddr) - initial;
         expect(change).to.equal(100);
     });
 
-    it("Prevents absurd rewards", async function () {
-        const initial = await fusdt.balanceOf(signerAddress);
+    it("prevents absurd rewards", async function () {
+        const initial = await fUsdtAccount.balanceOf(accountAddr);
 
-        await fusdt.batchReward([[signerAddress, 1001]], 100, 101);
-        const change = await fusdt.balanceOf(signerAddress) - initial;
+        await fUsdtOracle.batchReward([[accountAddr, 1001]], 100, 101);
+        const change = await fUsdtAccount.balanceOf(accountAddr) - initial;
         expect(change).to.equal(0);
     });
 
-    it("Allows us to unblock quarantined tokens", async function () {
-        const initial = await fusdt.balanceOf(signerAddress);
+    it("allows us to unblock quarantined tokens", async function () {
+        const initial = await fUsdtAccount.balanceOf(accountAddr);
 
         // Because test order dependency is bad practice.
-        await fusdt.batchReward([[signerAddress, 1001]], 100, 101);
+        await fUsdtOracle.batchReward([[accountAddr, 1001]], 100, 101);
 
-        const blockedBalance = (await fusdt.queryFilter(fusdt.filters.BlockedReward(signerAddress))).reduce((acc, curr) => {
+        const blockedBalance = (await fUsdtAccount.queryFilter(fUsdtAccount.filters.BlockedReward(accountAddr))).reduce((acc, curr) => {
             const amount = curr.args?.amount ?? 0;
             return acc.add(amount);
         }, ethers.constants.Zero);
 
-        await fusdt_operator.unblockReward(signerAddress, blockedBalance, true, 100, 101);
-        const newChange = await fusdt.balanceOf(signerAddress) - initial;
+        await fUsdtOperator.unblockReward(accountAddr, blockedBalance, true, 100, 101);
+        const newChange = await fUsdtAccount.balanceOf(accountAddr) - initial;
         expect(newChange).to.equal(blockedBalance);
     });
 
-    it("Prevents minting over user cap", async function () {
-        await fusdt.enableMintLimits(true);
+    it("prevents minting over user cap", async function () {
+        await fUsdtOperator.enableMintLimits(true);
 
-        await fusdt.updateMintLimits(1000, 100);
+        await fUsdtOracle.updateMintLimits(1000, 100);
 
-        expect(fusdt.erc20In(101)).to.be.revertedWith("Mint limit exceeded");
+        await expect(fUsdtAccount.erc20In(101))
+            .to.be.revertedWith("mint amount exceeds user limit!");
 
         // Cleanup
-        await fusdt.enableMintLimits(false)
+        await fUsdtOperator.enableMintLimits(false)
     });
 
-    it("Prevents minting over global cap", async function () {
-        await fusdt.enableMintLimits(true);
-        await fusdt.updateMintLimits(100, 1000);
+    it("prevents minting over global cap", async function () {
+        await fUsdtOperator.enableMintLimits(true);
+        await fUsdtOracle.updateMintLimits(100, 1000);
 
-        expect(fusdt.erc20In(101)).to.be.revertedWith("Mint limit exceeded");
+        await expect(fUsdtAccount.erc20In(101))
+            .to.be.revertedWith("mint amount exceeds global limit!");
 
         // Cleanup
-        await fusdt.enableMintLimits(false);
+        await fUsdtOperator.enableMintLimits(false);
+    });
+
+    it("tracks global mint limits globally", async function () {
+        await fUsdtOperator.enableMintLimits(true);
+        await fUsdtOracle.updateMintLimits(1000, 600);
+
+        await expect(fUsdtAccount.erc20In(600))
+            .to.not.be.revertedWith("mint amount exceeds global limit!");
+        await expect(fUsdtAccount2.erc20In(600))
+            .to.be.revertedWith("mint amount exceeds global limit!");
+        await expect(fUsdtAccount2.erc20In(400))
+            .to.not.be.revertedWith("mint amount exceeds global limit!");
+
+        // Cleanup
+        await fUsdtOperator.enableMintLimits(false);
     });
 });
