@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "prod": "run-s prod:*",
+    "prod:build": "cross-env NODE_ENV=production npm run build:server",
+    "prod:remix": "cross-env NODE_ENV=production remix build",
+    "start": "cross-env NODE_ENV=production PORT=80 node ./build/server.js",
     "dev": "npm-run-all --parallel dev:*",
     "dev:build": "cross-env NODE_ENV=development npm run build:server -- --watch",
     "dev:remix": "cross-env NODE_ENV=development remix watch",
@@ -20,7 +24,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
-    "@fluidity-money/surfing": "^0.0.70",
+    "@fluidity-money/surfing": "^0.0.75",
     "@openzeppelin/contracts": "^4.7.3",
     "@remix-run/react": "^1.7.1",
     "@remix-run/serve": "^1.7.1",
@@ -35,6 +39,7 @@
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dom": "^18.2.0",
+    "relay-compiler": "^14.1.0",
     "rxjs": "^7.5.7",
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",

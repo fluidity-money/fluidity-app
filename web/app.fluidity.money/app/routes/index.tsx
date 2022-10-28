@@ -1,9 +1,8 @@
 import { Display, Text } from "@fluidity-money/surfing";
-
-import { useToolTip } from "~/components";
-import { ToolTipContent } from "~/components/ToolTip";
+import { useToolTip, ToolTipContent } from "~/components";
 
 export default function IndexPage() {
+  // on hover, use winnerTotals[hovered address]
   const toolTip = useToolTip();
 
   const showNotification = () => {
