@@ -6,6 +6,8 @@ REMIX_BUILD := npm run prod
 
 GRAPHQL_BUILD := npm run graphql
 
+.PHONY: remix graphql
+
 remix:
 	${REMIX_BUILD}
 
