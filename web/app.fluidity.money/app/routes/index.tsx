@@ -9,6 +9,7 @@ import { json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { useToolTip, ToolTipContent } from "~/components";
+import Video from "~/components/Video";
 import useHighestRewardStatistics, {
   HighestRewardResponse,
 } from "~/queries/useHighestRewardStatistics";
@@ -55,7 +56,6 @@ export default function IndexPage() {
   const toolTip = useToolTip();
   const [connected, setConnected] = useState(true);
   const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
-  console.log("HR", highestRewards);
 
   const showNotification = () => {
     toolTip.open(
@@ -71,115 +71,130 @@ export default function IndexPage() {
   };
 
   return (
-    <div className="index-page">
-      <div className="header-buttons">
-        <LinkButton
-          size={"small"}
-          type={"internal"}
-          handleClick={() => {
-            return;
-          }}
-        >
-          FLUIDITY WEBSITE
-        </LinkButton>
-        <LinkButton
-          size={"small"}
-          type={"internal"}
-          handleClick={() => {
-            return;
-          }}
-        >
-          FLUIDITY APP
-        </LinkButton>
-      </div>
-      {!connected ? (
-        <div className="connected">
-          <div className="connected-content">
-            <div className="connected-wallet">
-              <div>{"(icon)"}</div>
-              <Text>Wallet Address</Text>
-            </div>
-            <Display className="winnings-figure" size="md">
-              {"{$29,645.00}"}
-            </Display>
-            <Text size="xl">
-              Would have been your winnings, based on your last 50 transactions.
-            </Text>
-            <Text size="xl">Fluidify your assets to start earning.</Text>
-            <div className="connected-buttons">
-              <GeneralButton
-                size="large"
-                version="primary"
-                buttontype="text"
-                handleClick={() => {
-                  return;
-                }}
-              >
-                FLUIDIFY MONEY
-              </GeneralButton>
-              <GeneralButton
-                className="share-button"
-                size="large"
-                version="transparent"
-                buttontype="icon before"
-                icon={<img src="/images/socials/twitter.svg" />}
-                handleClick={() => {
-                  return;
-                }}
-              >
-                SHARE
-              </GeneralButton>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="disconnected">
-          <div className="opportunity">
-            <div className="opportunity-top"></div>
-            <div className="opportunity-bottom">
-              <div className="opportunity-text">
-                <Display className="opportunity-text-top" size={"xs"}>
-                  <Text>
-                    <Text prominent>{"{address}"}</Text>
-                    {" claimed "}
-                    <Text prominent>{"${amount}"}</Text>
-                    {" in fluid prizes over {transactionCount} transactions."}
-                  </Text>
-                </Display>
-
-                <Text size="xl">
-                  Connect your wallet to see what you could make.
-                </Text>
-              </div>
-
-              <GeneralButton
-                size="large"
-                buttontype="text"
-                version="primary"
-                handleClick={() => {
-                  return;
-                }}
-              >
-                MAKE IT RAIN
-              </GeneralButton>
-
-              {/* <button
-            style={{
-              backgroundColor: "blue",
-              marginLeft: "10px",
-              padding: "20px",
+    <>
+      <Video
+        className="video"
+        src={
+          !connected
+            ? "/videos/FluidityOpportunityA.mp4"
+            : "/videos/FluidityOpportunityB.mp4"
+        }
+        type={"none"}
+        loop={!connected ? false : true}
+      />
+      <div className="index-page">
+        <div className="header-buttons">
+          <a href="fluidity.money" rel="noopener noreferrer">
+            <LinkButton
+              size={"small"}
+              type={"internal"}
+              handleClick={() => {
+                return;
+              }}
+            >
+              FLUIDITY WEBSITE
+            </LinkButton>
+          </a>
+          <LinkButton
+            size={"small"}
+            type={"internal"}
+            handleClick={() => {
+              return;
             }}
-            onClick={showNotification}
           >
-            <Text prominent size="xxl">
-              Pop Notification Demo | Test Button
-            </Text>
-          </button> */}
+            FLUIDITY APP
+          </LinkButton>
+        </div>
+        {!connected ? (
+          <div className="connected">
+            <div className="connected-content">
+              <div className="connected-wallet">
+                <div>{"(icon)"}</div>
+                <Text>Wallet Address</Text>
+              </div>
+              <Display className="winnings-figure" size="md">
+                {"{$29,645.00}"}
+              </Display>
+              <Text size="xl">
+                Would have been your winnings, based on your last 50
+                transactions.
+              </Text>
+              <Text size="xl">Fluidify your assets to start earning.</Text>
+              <div className="connected-buttons">
+                <GeneralButton
+                  size="large"
+                  version="primary"
+                  buttontype="text"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  FLUIDIFY MONEY
+                </GeneralButton>
+                <GeneralButton
+                  className="share-button"
+                  size="large"
+                  version="transparent"
+                  buttontype="icon before"
+                  icon={<img src="/images/socials/twitter.svg" />}
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  SHARE
+                </GeneralButton>
+              </div>
             </div>
           </div>
-          <div className="opportunity-graph">GRAPH</div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="disconnected">
+            <div className="opportunity">
+              <div className="opportunity-top"></div>
+              <div className="opportunity-bottom">
+                <div className="opportunity-text">
+                  <Display className="opportunity-text-top" size={"xs"}>
+                    <Text>
+                      <Text prominent>{"{address}"}</Text>
+                      {" claimed "}
+                      <Text prominent>{"${amount}"}</Text>
+                      {" in fluid prizes over {transactionCount} transactions."}
+                    </Text>
+                  </Display>
+
+                  <Text size="xl">
+                    Connect your wallet to see what you could make.
+                  </Text>
+                </div>
+
+                <GeneralButton
+                  size="large"
+                  buttontype="text"
+                  version="primary"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  MAKE IT RAIN
+                </GeneralButton>
+              </div>
+            </div>
+            <div className="opportunity-graph">
+              <button
+                style={{
+                  backgroundColor: "blue",
+                  marginLeft: "10px",
+                  padding: "20px",
+                }}
+                onClick={showNotification}
+              >
+                <Text prominent size="xxl">
+                  Pop Notification Demo | Test Button
+                </Text>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

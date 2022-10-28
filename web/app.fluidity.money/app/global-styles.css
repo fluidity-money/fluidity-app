@@ -20,9 +20,14 @@ body {
   }
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .index-page {
   width: 100%;
-  /* height: 100%; */
+  mix-blend-mode: lighten;
 }
 
 .disconnected {
@@ -113,4 +118,34 @@ body {
 .share-button {
   display: flex;
   align-items: center;
+}
+
+.videoContainer {
+  position: relative;
+  mix-blend-mode: lighten;
+}
+
+.video-fit {
+  object-fit: fit;
+}
+
+.video-contain {
+  object-fit: contain;
+}
+
+.video-cover {
+  object-fit: cover;
+}
+
+.video-reduce {
+  object-fit: scale-down;
+}
+
+.video-none {
+  object-fit: none;
+}
+
+.video {
+  position: absolute;
+  height: 100%;
 }
