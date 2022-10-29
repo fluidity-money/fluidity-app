@@ -1,20 +1,20 @@
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
-
 import { LinksFunction, LoaderFunction } from "@remix-run/node";
 import {
+  Link,
   Outlet,
   useLoaderData,
-  Link,
   useNavigate,
   useResolvedPath,
   useMatches,
   useTransition,
 } from "@remix-run/react";
-
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import { useState, useEffect, useContext } from "react";
 import { Web3Context } from "~/util/chainUtils/web3";
 import { useUserUnclaimedRewards } from "~/queries";
 import { motion } from "framer-motion";
+import ProvideLiquidity from "~/components/ProvideLiquidity";
+import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
 import { useToolTip } from "~/components";
@@ -60,12 +60,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const network = params.network ?? "";
 
+  const provider = config.liquidity_providers;
+
   const token = config.config;
 
   return {
     appName: routeMapper(pathname),
     version: "1.5",
     network,
+    provider,
     token,
   };
 };
@@ -74,6 +77,7 @@ type LoaderData = {
   appName: string;
   version: string;
   network: string;
+  provider: typeof config.liquidity_providers;
   token: typeof config.config;
 };
 
@@ -254,6 +258,12 @@ export default function Dashboard() {
         </nav>
 
         <Outlet />
+
+        {/* Provide Luquidity*/}
+
+        <ProvideLiquidity />
+
+        {/* Footer */}
 
         <footer>
           {/* Links */}

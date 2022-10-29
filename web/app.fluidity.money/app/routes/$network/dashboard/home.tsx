@@ -27,18 +27,27 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   let error;
 
   try {
+    console.log("Fetching user transaction count");
     userTransactionCount = await (
       await useUserTransactionCount(network ?? "", address)
     ).json();
+
+    console.log("Fetching user transactions");
     userTransactions = await (
       await useUserTransactions(network ?? "", address, page)
     ).json();
+
+    console.log("userTransactions", userTransactions);
   } catch (err) {
     error = "The transaction explorer is currently unavailable";
   } // Fail silently - for now.
 
-  if (error) {
-    return redirect("/error", { status: 500, statusText: error });
+  if (
+    error !== undefined ||
+    userTransactionCount.errors ||
+    userTransactions.errors
+  ) {
+    return redirect("/error", {status: 500, statusText: error});
   }
   if (userTransactionCount.errors || userTransactions.errors) {
     return json({ transactions: [], count: 0, page: 1 });
@@ -95,6 +104,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
+};
+
+export const meta = () => {
+  return {
+    title: "Dashboard",
+  };
 };
 
 type Transaction = {
