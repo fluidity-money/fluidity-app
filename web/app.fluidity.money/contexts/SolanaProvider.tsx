@@ -16,10 +16,11 @@ export default function SolanaProvider({
   children: React.ReactNode;
 }) {
   const networkCluster = 0;
-  const endpoint = useMemo(
-    () => config.drivers[`solana`][networkCluster].rpc.http,
-    [networkCluster]
-  );
+  const rpc =
+    process.env.REACT_APP_FLU_SOL_RPC === undefined
+      ? ""
+      : process.env.REACT_APP_FLU_SOL_RPC;
+  const endpoint = useMemo(() => rpc, [networkCluster]);
 
   // include more wallet suppport later once done with full implementation
   const wallets = useMemo(

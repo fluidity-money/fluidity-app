@@ -4,7 +4,7 @@ import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
 
 import EthereumProvider from "contexts/EthereumProvider";
-import SolanaProvider from "contexts/SolanaProvider.js";
+import SolanaProvider from "contexts/SolanaProvider";
 
 import { Fragment } from "react";
 
