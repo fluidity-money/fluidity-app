@@ -245,7 +245,7 @@ export default function Rewards() {
           gasFee={gasFee}
         />
       ) : (
-        <div className="noUserRewards">
+        <div className="no-user-rewards">
           <section id="spend-to-earn">
             <Heading className="spendToEarnHeading" as="h2">
               Spend to earn
@@ -270,7 +270,9 @@ export default function Rewards() {
         </div>
       )}
 
-      <Heading as={"h2"}>Reward Performance</Heading>
+      <Heading className="reward-performance" as={"h2"}>
+        Reward Performance
+      </Heading>
       {/* Reward Performance */}
       {hasRewarders && (
         <section id="performance">
@@ -344,7 +346,9 @@ export default function Rewards() {
       {/* Highest Rewarders */}
       {hasRewarders && (
         <section id="rewarders">
-          <Heading as={"h2"}>Highest Rewarders</Heading>
+          <Heading className="highest-rewarders" as={"h2"}>
+            Highest Rewarders
+          </Heading>
           <ManualCarousel scrollBar={true} className="rewards-carousel">
             {bestPerformingRewarders.map((rewarder) => (
               <div className="carousel-card-container" key={rewarder.name}>
