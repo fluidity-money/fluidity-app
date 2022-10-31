@@ -20,7 +20,6 @@ import { PipedTransaction } from "drivers/types";
 import { useToolTip } from "~/components";
 import { ToolTipContent } from "~/components/ToolTip";
 import { trimAddress } from "~/util";
-
 import {
   DashboardIcon,
   GeneralButton,
@@ -28,7 +27,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 
-import config from "~/webapp.config.server";
 import dashboardStyles from "~/styles/dashboard.css";
 
 export const links: LinksFunction = () => {

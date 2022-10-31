@@ -271,7 +271,6 @@ export default function Rewards() {
       )}
 
       <Heading as={"h2"}>Reward Performance</Heading>
-
       {/* Reward Performance */}
       {hasRewarders && (
         <section id="performance">
