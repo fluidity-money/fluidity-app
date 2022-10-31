@@ -61,7 +61,8 @@
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
     "toml": "^3.0.0",
-    "web3": "^4.0.1-alpha.0",
+    "web3": "^1.8.0",
+    "web3-utils": "^1.8.0",
     "zod": "^3.19.1"
   },
   "devDependencies": {
