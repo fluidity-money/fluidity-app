@@ -12,15 +12,17 @@ import { createServer } from "http";
 import config from "~/webapp.config.server";
 import { Observable, Subscription, EMPTY } from "rxjs";
 import { PipedTransaction } from "drivers/types";
-import {getObservableForAddress, getTransactionsObservableForIn} from "drivers/utils";
+import {
+  getObservableForAddress,
+  getTransactionsObservableForIn,
+} from "drivers/utils";
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
-const createSentryRequestHandler = wrapExpressCreateRequestHandler(
-  createRequestHandler
-);
+const createSentryRequestHandler =
+  wrapExpressCreateRequestHandler(createRequestHandler);
 
 app.use((req, res, next) => {
   // helpful headers:

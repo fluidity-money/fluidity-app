@@ -1,4 +1,4 @@
-import { Observable, merge, filter } from "rxjs";
+import { Observable } from "rxjs";
 
 import IERC20 from "@openzeppelin/contracts/build/contracts/IERC20.json";
 

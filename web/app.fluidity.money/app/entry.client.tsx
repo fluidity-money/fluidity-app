@@ -6,7 +6,8 @@ import { init as initSentry } from "@sentry/remix";
 import { Integrations } from "@sentry/tracing";
 
 if (process.env.NODE_ENV === "production") {
-  const dsn = "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
+  const dsn =
+    "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
 
   if (!dsn) console.error("DSN not set!");
 
@@ -17,7 +18,6 @@ if (process.env.NODE_ENV === "production") {
   });
 } else console.log("Running in development, ignoring Sentry initialisation...");
 
-
 hydrateRoot(
   document,
   <StrictMode>
@@ -26,4 +26,3 @@ hydrateRoot(
     </ToolProvider>
   </StrictMode>
 );
-

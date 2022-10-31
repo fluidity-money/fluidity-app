@@ -4,7 +4,6 @@ import { renderToString } from "react-dom/server";
 import * as Sentry from "@sentry/remix";
 import { useEffect } from "react";
 
-
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -21,7 +20,6 @@ export default function handleRequest(
   });
 }
 
-
 if (process.env.NODE_ENV === "production") {
   const dsn = process.env.REACT_APP_SENTRY_DSN;
 
@@ -35,10 +33,9 @@ if (process.env.NODE_ENV === "production") {
         routingInstrumentation: Sentry.remixRouterInstrumentation(
           useEffect,
           useLocation,
-          useMatches,
-        )
-      })
+          useMatches
+        ),
+      }),
     ],
   });
 } else console.log("Running in development, ignoring Sentry initialisation...");
-

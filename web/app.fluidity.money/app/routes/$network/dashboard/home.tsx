@@ -146,8 +146,8 @@ export default function Home() {
             yLabel="Some Y Label"
             lineLabel="Some Tooltip Label"
             accessors={{
-              xAccessor: (d: any) => d.x,
-              yAccessor: (d: any) => d.y,
+              xAccessor: (d: { x: number; y: number }) => d.x,
+              yAccessor: (d: { x: number; y: number }) => d.y,
             }}
           />
         </div>
@@ -197,4 +197,3 @@ export default function Home() {
     </>
   );
 }
-

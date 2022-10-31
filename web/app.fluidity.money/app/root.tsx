@@ -103,10 +103,17 @@ function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-        <img src="/images/logoMetallic.png" alt="" style={{height: "40px"}} />
+      <body
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
         <h1>Something went wrong!</h1>
-        <br/>
+        <br />
         <h2>Our team has been notified, and are working on fixing it!</h2>
         <Scripts />
       </body>
@@ -131,7 +138,7 @@ function App() {
   );
 }
 
-export { ErrorBoundary }
+export { ErrorBoundary };
 
 export default withSentry(App, {
   wrapWithErrorBoundary: true,
