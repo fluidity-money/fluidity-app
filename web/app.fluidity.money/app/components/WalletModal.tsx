@@ -39,68 +39,68 @@ const WalletModal = ({ open }: WalletModalProps) => {
   return (
     <>
       {modalElement &&
-        (open &&
-          createPortal(
-            <>
-              {account === "" && (
-                <div className={"shade center"}>
-                  <div className="wallet-modal">
-                    <div className="wallet-modal--header">
-                      <Heading>Connect your wallet</Heading>
-                      <span className="chain-selector">
-                        <img
-                          className="chain-selector--icon"
-                          src={`/icons/${network}.svg`}
-                          alt={`Blockchain Icon (${network})`}
-                        />
-                        <span className="chain-selector--name">{network}</span>
-                      </span>
-                    </div>
-                    <div className="wallet-modal--body">
-                      {config.config[network ?? ""].wallets?.map((wallet) => (
-                        <div
-                          className="wallet-modal--body--wallets"
-                          key={wallet.id}
-                          onClick={() => {
-                            dispatch({
-                              type: "CONNECT",
-                              payload: {
-                                driver: wallet.id as never,
-                              },
-                            });
-                          }}
-                        >
-                          <img src={wallet.logo} alt={wallet.name} />
-                          <span>{wallet.name}</span>
-                        </div>
-                      ))}
-                    </div>
+        open &&
+        createPortal(
+          <>
+            {account === "" && (
+              <div className={"shade center"}>
+                <div className="wallet-modal">
+                  <div className="wallet-modal--header">
+                    <Heading>Connect your wallet</Heading>
+                    <span className="chain-selector">
+                      <img
+                        className="chain-selector--icon"
+                        src={`/icons/${network}.svg`}
+                        alt={`Blockchain Icon (${network})`}
+                      />
+                      <span className="chain-selector--name">{network}</span>
+                    </span>
+                  </div>
+                  <div className="wallet-modal--body">
+                    {config.config[network ?? ""].wallets?.map((wallet) => (
+                      <div
+                        className="wallet-modal--body--wallets"
+                        key={wallet.id}
+                        onClick={() => {
+                          dispatch({
+                            type: "CONNECT",
+                            payload: {
+                              driver: wallet.id as never,
+                            },
+                          });
+                        }}
+                      >
+                        <img src={wallet.logo} alt={wallet.name} />
+                        <span>{wallet.name}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
-              {qr && (
-                <div className={"shade center"}>
-                  <div className="wallet-modal">
-                    <div className="wallet-modal--header">
-                      <Heading>Scan QR code</Heading>
-                      <span className="chain-selector">
-                        <img
-                          className="chain-selector--icon"
-                          src={`/icons/${network}.svg`}
-                          alt={`Blockchain Icon (${network})`}
-                        />
-                        <span className="chain-selector--name">{network}</span>
-                      </span>
-                    </div>
-                    <div className="wallet-modal--body">
-                      <img src={qr} alt="QR Code" />
-                    </div>
+              </div>
+            )}
+            {qr && (
+              <div className={"shade center"}>
+                <div className="wallet-modal">
+                  <div className="wallet-modal--header">
+                    <Heading>Scan QR code</Heading>
+                    <span className="chain-selector">
+                      <img
+                        className="chain-selector--icon"
+                        src={`/icons/${network}.svg`}
+                        alt={`Blockchain Icon (${network})`}
+                      />
+                      <span className="chain-selector--name">{network}</span>
+                    </span>
+                  </div>
+                  <div className="wallet-modal--body">
+                    <img src={qr} alt="QR Code" />
                   </div>
                 </div>
-              )}
-            </>,
-            modalElement
-          ))}
+              </div>
+            )}
+          </>,
+          modalElement
+        )}
     </>
   );
 };

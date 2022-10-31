@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext } from "react";
 
 interface IFluidityFacade {
   swap: (amount: string, token: string) => Promise<void>;
@@ -13,4 +13,6 @@ interface IFluidityFacade {
 
 export default IFluidityFacade;
 
-export const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({} as IFluidityFacade);
+export const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>(
+  {} as IFluidityFacade
+);
