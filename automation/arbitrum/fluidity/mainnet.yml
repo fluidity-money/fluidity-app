@@ -1,0 +1,30 @@
+DOCKERFILE_PATH: ./web/arbitrum.fluidity.money
+
+SERVICES:
+  - FLUIDITY_FRONTEND:
+      SERVICE_NAME: arbitrum-fluidity-money-frontend
+      DOCKER_IMAGE: arbitrum.fluidity.money-frontend
+      TARGET_GROUP: flu-mainnet-arb-fe-tg
+      
+      DOCKER_ARGS:
+        REACT_APP_API_URL: https://backend.arbitrum.fluidity.money
+        REACT_APP_WALLET_CONNECT_GETH_URI: wss://backend.arbitrum.fluidity.money
+        REACT_APP_WEBSOCKET: wss://backend.arbitrum.fluidity.money/updates
+        REACT_APP_CHAIN_ID: 1
+        REACT_APP_TOKEN_CONFIG_FILE: mainnet-tokens.json
+        SECRET_REACT_APP_SENTRY_DSN: /fluidity/frontend/sentryURL
+
+  - FLUIDITY_BACKEND:
+      SERVICE_NAME: arbitrum-fluidity-money-backend
+      DOCKER_IMAGE: arbitrum.fluidity.money-backend
+      TARGET_GROUP: flu-mainnet-arb-be-tg
+      TASK_MIN_COUNT: 1
+      TASK_MAX_COUNT: 1
+
+      ENV_FLU_WORKER_ID: arbitrum-arbitrum.fluidity.money-backend
+      ENV_FLU_ETHEREUM_CHAIN_ID: 1
+      SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/arbitrum/token_list
+      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST: /fluidity/arbitrum/private_key_list
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
+
+

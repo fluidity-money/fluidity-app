@@ -1,0 +1,26 @@
+SERVICES:
+  - PRIZE_POOL:
+      SERVICE_NAME: microservice-arbitrum-prize-pool
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-prize-pool
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-prize-pool
+      ENV_FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR: "0x6D2299C48a8dD07a872FDd0F8233924872Ad1071"
+      ENV_FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR: "0xb53c1a33016b2dc2ff3653530bff1848a515c8c5"
+      ENV_FLU_ETHEREUM_USD_TOKEN_ADDR: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/arbitrum/token_list
+      SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/arbitrum/http_url
+
+  - ARB_BLOCK_FLUID_TRANSERS_AMQP:
+      SERVICE_NAME: microservice-arbitrum-block-fluid-transfers-amqp
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-block-fluid-transfers-amqp
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-block-fluid-transfers-amqp
+      ENV_FLU_ETHEREUM_BLOCK_RETRIES: 5
+      ENV_FLU_ETHEREUM_BLOCK_RETRY_DELAY: 5
+      SECRET_FLU_ETHEREUM_WS_URL: /fluidity/arbitrum/websocket_url
+      SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/arbitrum/http_url
+
+
+
+
+
+
+
