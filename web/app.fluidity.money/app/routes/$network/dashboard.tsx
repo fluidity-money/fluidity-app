@@ -19,9 +19,7 @@ import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
 import { useToolTip } from "~/components";
 import { ToolTipContent } from "~/components/ToolTip";
-import ErrorBoundary from "~/components/ErrorBoundary";
 import { trimAddress } from "~/util";
-
 import {
   DashboardIcon,
   GeneralButton,
@@ -29,7 +27,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 
-import config from "~/webapp.config.server";
 import dashboardStyles from "~/styles/dashboard.css";
 
 export const links: LinksFunction = () => {
@@ -200,7 +197,6 @@ export default function Dashboard() {
         </ul>
       </nav>
       <main>
-        <ErrorBoundary />
         <nav>
           <Text>{appName}</Text>
           <div>

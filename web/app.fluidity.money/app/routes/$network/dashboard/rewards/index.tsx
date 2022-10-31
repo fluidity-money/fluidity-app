@@ -271,6 +271,7 @@ export default function Rewards() {
       )}
 
       <Heading as={"h2"}>Reward Performance</Heading>
+      <button onClick={() => {throw new Error("rewards err")}}>error</button>
 
       {/* Reward Performance */}
       {hasRewarders && (
