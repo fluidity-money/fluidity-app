@@ -17,7 +17,7 @@ These multisigs protect the community and the protocol.
 | <ul><li>Can unblock large payouts</li></ul>                                                                          |                                                                                                                      |
 | <ul><li>Can change the worker operator key once a month</li></ul>                                                    |                                                                                                                      |
 
-### Ethereum multisig
+### Ethereum mainnet multisig
 
 #### Community
 
@@ -25,10 +25,12 @@ These multisigs protect the community and the protocol.
 Community multisig
 {% endembed %}
 
-| Owner name/pseudonym                         | Address/ENS                                |
-| -------------------------------------------- | ------------------------------------------ |
-| Shahmeer Chaudhry, Fluidity CEO (shahmeerch) | 0xF8bd8362eDFf4a9D4F11e1727eca40AfA6026901 |
-| Alexander Baigent, Fluidity CTO (bayge)      | bayge.eth                                  |
+| Owner name/pseudonym                     | Address/ENS                                |
+| ---------------------------------------- | ------------------------------------------ |
+| Shahmeer Chaudhry, Fluidity (shahmeerch) | 0xF8bd8362eDFf4a9D4F11e1727eca40AfA6026901 |
+| Bayge, Fluidity (bayge)                  | bayge.eth                                  |
+| Daniel T, Verilog CEO                    |                                            |
+| ZachXBT                                  |                                            |
 
 (in progress)
 
@@ -40,9 +42,39 @@ Emergency multisig
 
 
 
-| Owner name/pseudonym                         | Address/ENS                                |
-| -------------------------------------------- | ------------------------------------------ |
-| Shahmeer Chaudhry, Fluidity CEO (shahmeerch) | 0xd86f18bEB63574C2169f6fD8Aa0C6235A6FC4c8E |
-| Alexander Baigent, Fluidity CTO (bayge)      | 0xdcbcc6773aaf289a880037cbaffc316d4f1c96a4 |
+| Owner name/pseudonym                     | Address/ENS                                |
+| ---------------------------------------- | ------------------------------------------ |
+| Shahmeer Chaudhry, Fluidity (shahmeerch) | 0xd86f18bEB63574C2169f6fD8Aa0C6235A6FC4c8E |
+| Bayge, Fluidity (bayge)                  | 0xdcbcc6773aaf289a880037cbaffc316d4f1c96a4 |
+| Daniel T, Verilog CEO                    |                                            |
+| ZachXBT                                  |                                            |
 
 (in progress)
+
+### Arbitrum mainnet
+
+#### Community
+
+{% embed url="https://gnosis-safe.io/app/arb1:0x429Dc27be907e16EF40329503F501361879510e0" %}
+Arbitrum mainnet community multisig
+{% endembed %}
+
+| Owner name/pseudonym        | Address/ENS |
+| --------------------------- | ----------- |
+| Shahmeer Chaudhry, Fluidity |             |
+| Bayge, Fluidity             | bayge.eth   |
+| Daniel T, Verilog           |             |
+| ZachXBT                     |             |
+
+#### Emergency
+
+{% embed url="https://gnosis-safe.io/app/arb1:0x5bC5DB835Af82Ab2333b1a60f529038F6508c94C" %}
+Arbitrum mainnet emergency multisig
+{% endembed %}
+
+| Owner name/pseudonym        | Address/ENS |
+| --------------------------- | ----------- |
+| Shahmeer Chaudhry, Fluidity |             |
+| Bayge                       |             |
+| Daniel T, Verilog           |             |
+| ZachXBT                     |             |
