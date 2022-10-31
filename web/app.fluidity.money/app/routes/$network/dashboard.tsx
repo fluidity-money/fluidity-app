@@ -13,12 +13,13 @@ import { useState, useEffect, useContext } from "react";
 import { Web3Context } from "~/util/chainUtils/web3";
 import { useUserUnclaimedRewards } from "~/queries";
 import { motion } from "framer-motion";
+import ProvideLiquidity from "~/components/ProvideLiquidity";
+import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
 import { useToolTip } from "~/components";
 import { ToolTipContent } from "~/components/ToolTip";
 import { trimAddress } from "~/util";
-
 import {
   DashboardIcon,
   GeneralButton,
@@ -26,7 +27,6 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 
-import config from "~/webapp.config.server";
 import dashboardStyles from "~/styles/dashboard.css";
 
 export const links: LinksFunction = () => {
@@ -57,12 +57,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const network = params.network ?? "";
 
+  const provider = config.liquidity_providers;
+
   const token = config.config;
 
   return {
     appName: routeMapper(pathname),
     version: "1.5",
     network,
+    provider,
     token,
   };
 };
@@ -71,6 +74,7 @@ type LoaderData = {
   appName: string;
   version: string;
   network: string;
+  provider: typeof config.liquidity_providers;
   token: typeof config.config;
 };
 
@@ -250,6 +254,12 @@ export default function Dashboard() {
         </nav>
 
         <Outlet />
+
+        {/* Provide Luquidity*/}
+
+        <ProvideLiquidity />
+
+        {/* Footer */}
 
         <footer>
           {/* Links */}

@@ -4,6 +4,17 @@ SERVICES:
       DOCKER_IMAGE: app.fluidity.money-frontend
       DOCKERFILE_PATH: ./web/app.fluidity.money
       TARGET_GROUP: flu-dev-app-fluidity-fe-tg
+      SECRET_BITQUERY_TOKEN: /fluidity/bitquery_token
+
+      DOCKER_ARGS:
+        SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
+        SECRET_FLU_ETH_RPC_WS: /fluidity/ethereum/websocket_url
+        SECRET_FLU_SOL_RPC_HTTP: /fluidity/solana/http_url
+        SECRET_FLU_SOL_RPC_WS: /fluidity/solana/websocket_url
+        SECRET_REACT_APP_SENTRY_DSN: /fluidity/frontend/sentryURL
+        SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
+
+
 
 
 

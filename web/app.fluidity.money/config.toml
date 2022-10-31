@@ -11,7 +11,7 @@ testnet = false
 rpc = { http = "FLU_SOL_RPC_HTTP", ws = "FLU_SOL_RPC_WS" }
 server = ""
 
-# Chain Configurations
+# Chain Configurations 
 [config.ethereum]
 explorer = "https://etherscan.io"
 fluidAssets = [
@@ -133,6 +133,67 @@ logo = "/assets/tokens/usdt.svg"
 address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 colour = "#12946c"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+
+# liquidity_providers Configurations 
+# eth providers
+[liquidity_providers.ethereum]
+
+[[liquidity_providers.ethereum.providers]]
+name= "uniswap"
+img= "/images/providers/Uniswap.svg"
+link= "https://www.uniswap.org/"
+
+[[liquidity_providers.ethereum.providers]]
+name= "sushiswap"
+img= "/images/providers/Sushiswap.svg"
+link= "https://www.sushi.com/"
+
+[[liquidity_providers.ethereum.providers]]
+name= "dodo"
+img= "/images/providers/DODO.png"
+link= "https://www.dodoex.io/"
+
+# sol providers
+[liquidity_providers.solana]
+
+[[liquidity_providers.solana.providers]]
+name= "solend"
+img= "/images/providers/solend.png"
+link= "https://www.solend.fi/"
+
+[[liquidity_providers.solana.providers]]
+name= "orca"
+img= "/images/providers/Orca.svg"
+link= "https://www.orca.so/"
+
+[[liquidity_providers.solana.providers]]
+name= "saber"
+img= "/images/providers/saber.svg"
+link= "https://www.saber.so/"
+
+[[liquidity_providers.solana.providers]]
+name= "jupiter"
+img= "/images/providers/Jupiter.svg"
+link= "https://www.jup.ag/"
+
+# provider icons
+[provider_icons]
+Aave= "/images/providers/aave-aave-logo.png"
+Aldrin= "/images/providers/Aldrin.svg"
+Circle= "/images/providers/circle-icon-inset-300.png"
+Compound= "/images/providers/Compound.svg"
+Dodo= "/images/providers/DODO.png"
+Jupiter= "/images/providers/Jupiter.svg"
+Lemniscap= "/images/providers/Lemniscap.png"
+Maker= "/images/providers/maker-mkr-logo.png"
+Multicoin= "/images/providers/Multicoin.png"
+Orca= "/images/providers/Orca.svg"
+Polygon= "/images/providers/Polygon.svg"
+Saber= "/images/providers/saber.svg"
+Solana= "/images/providers/Solana.svg"
+Solend= "/images/providers/solend.png"
+Uniswap= "/images/providers/Uniswap.svg"
+Sushiswap= "/images/providers/Sushiswap.svg"
 
 [[config.ethereum.wallets]]
 name = "Browser"

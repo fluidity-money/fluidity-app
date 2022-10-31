@@ -56,6 +56,37 @@ const OptionsSchema = z.object({
         .optional(),
     })
   ),
+  liquidity_providers: z.object({}).catchall(
+    z.object({
+      providers: z
+        .array(
+          z.object({
+            name: z.string(),
+            img: z.string(),
+            link: z.string(),
+          })
+        )
+        .min(1),
+    })
+  ),
+  provider_icons: z.object({
+    Aave: z.string(),
+    Aldrin: z.string(),
+    Circle: z.string(),
+    Compound: z.string(),
+    Dodo: z.string(),
+    Jupiter: z.string(),
+    Lemniscap: z.string(),
+    Maker: z.string(),
+    Multicoin: z.string(),
+    Orca: z.string(),
+    Polygon: z.string(),
+    Saber: z.string(),
+    Solana: z.string(),
+    Solend: z.string(),
+    Uniswap: z.string(),
+    Sushiswap: z.string(),
+  }),
 });
 
 export type Options = z.infer<typeof OptionsSchema>;

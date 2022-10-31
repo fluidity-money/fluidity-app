@@ -5,6 +5,10 @@ WORKDIR /usr/local/src/fluidity/web/app.fluidity.money
 ENV PRODUCTION ${PRODUCTION}
 
 ARG GITHUB_TOKEN
+ARG FLU_ETH_RPC_HTTP
+ARG FLU_ETH_RPC_WS
+ARG FLU_SOL_RPC_HTTP
+ARG FLU_SOL_RPC_WS
 
 ENV PATH /app/node_modules.bin:$PATH
 
