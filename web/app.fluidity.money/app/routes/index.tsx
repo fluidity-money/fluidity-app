@@ -60,7 +60,7 @@ type LoaderData = {
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
   const toolTip = useToolTip();
-  const [connected, setConnected] = useState(true);
+  const [connected, setConnected] = useState(false);
   const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
   const { width } = useViewport();
   console.log(width);
@@ -82,7 +82,7 @@ export default function IndexPage() {
       <Video
         className="video"
         src={
-          !connected
+          connected
             ? "/videos/FluidityOpportunityA.mp4"
             : "/videos/FluidityOpportunityB.mp4"
         }
@@ -112,7 +112,7 @@ export default function IndexPage() {
             {width < 500 && width > 0 ? "APP" : "FLUIDITY APP"}
           </LinkButton>
         </div>
-        {!connected ? (
+        {connected ? (
           <div className="connected">
             <div className="connected-content">
               <div className="connected-wallet">
@@ -138,7 +138,7 @@ export default function IndexPage() {
                   version="primary"
                   buttontype="text"
                   handleClick={() => {
-                    return;
+                    setConnected(true);
                   }}
                 >
                   FLUIDIFY MONEY
@@ -186,7 +186,7 @@ export default function IndexPage() {
                   buttontype="text"
                   version="primary"
                   handleClick={() => {
-                    return;
+                    setConnected(true);
                   }}
                 >
                   MAKE IT RAIN
