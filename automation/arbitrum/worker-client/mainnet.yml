@@ -8,7 +8,7 @@ SERVICES:
   - WORKER_CLIENT_USDT:
       SERVICE_NAME: microservice-arbitrum-worker-client-usdt
       ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-client-usdt
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x3caa7e9e1355355a629f251ba3b499f3b069d483"
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9"
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.usdt
       ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: arbitrum.winners.usdt
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/arbitrum/usdt/private_key
@@ -16,7 +16,7 @@ SERVICES:
   - WORKER_CLIENT_USDC:
       SERVICE_NAME: microservice-arbitrum-worker-client-usdc
       ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-client-usdc
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x59277a3c6a483b49b101271263c226d1167f62bc"
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x386a41f5b8787003dd508521bf310c08632c6c4f"
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.usdc
       ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: arbitrum.winners.usdc
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/arbitrum/usdc/private_key
@@ -24,25 +24,10 @@ SERVICES:
   - WORKER_CLIENT_DAI:
       SERVICE_NAME: microservice-arbitrum-worker-client-dai
       ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-client-dai
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x8c104168f52e3c5286ac3d1820f62d18543f3be7"
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.dai
       ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: arbitrum.winners.dai
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/arbitrum/dai/private_key
 
-  - WORKER_CLIENT_TUSD:
-      SERVICE_NAME: microservice-arbitrum-worker-client-tusd
-      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-client-tusd
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x9c1f80bae56a311ce04d9010bb3ddb3729830d28"
-      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.tusd
-      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: arbitrum.winners.tusd
-      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/arbitrum/tusd/private_key
-  
-  - WORKER_CLIENT_FRAX:
-      SERVICE_NAME: microservice-arbitrum-worker-client-frax
-      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-client-frax
-      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0xcd47471e61cccc8f56c11bb4a2e4fe2be15a3833"
-      ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.frax
-      ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: arbitrum.winners.frax
-      SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/arbitrum/frax/private_key
 
 
