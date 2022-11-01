@@ -18,7 +18,7 @@ ${FRONTEND_BUILD}: graphql remix
 	@touch ${FRONTEND_BUILD}
 
 docker-frontend:
-	${DOCKER_BUILD} \
+	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		${DOCKER_BUILD_ARGS} \
 		-t "${ORG_ROOT}/app.${REPO}-frontend" \

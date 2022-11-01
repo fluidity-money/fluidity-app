@@ -6,21 +6,27 @@ import EthereumProvider from "contexts/EthereumProvider";
 import { Fragment } from "react";
 
 type ProviderMap = {
-  [key: string]: ((props: {children: React.ReactNode}) => JSX.Element) | undefined;
-}
+  [key: string]:
+    | ((props: { children: React.ReactNode }) => JSX.Element)
+    | undefined;
+};
 
-const Provider = ({ network, children }: { network?: string, children: React.ReactNode }) => {
+const Provider = ({
+  network,
+  children,
+}: {
+  network?: string;
+  children: React.ReactNode;
+}) => {
   const providers: ProviderMap = {
     ethereum: EthereumProvider,
     //solana: SolanaProvider,
-  }
+  };
 
   const ProviderComponent = (network && providers[network]) || Fragment;
 
-  return <ProviderComponent>
-    {children}
-  </ProviderComponent>
-}
+  return <ProviderComponent>{children}</ProviderComponent>;
+};
 
 export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params

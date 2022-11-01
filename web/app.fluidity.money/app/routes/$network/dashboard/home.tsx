@@ -31,6 +31,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     userTransactionCount = await (
       await useUserTransactionCount(network ?? "", address)
     ).json();
+    console.log("transactionCount ", userTransactionCount);
 
     console.log("Fetching user transactions");
     userTransactions = await (
@@ -39,7 +40,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     console.log("userTransactions", userTransactions);
   } catch (err) {
-    error = "The transaction explorer is currently unavailable";
+    throw new Error(`The transaction explorer is unavailable! ${err}`);
   } // Fail silently - for now.
 
   if (
@@ -47,10 +48,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     userTransactionCount.errors ||
     userTransactions.errors
   ) {
-    return redirect("/error", {status: 500, statusText: error});
+    throw new Error(`The transaction explorer is unavailable! ${error}`);
   }
   if (userTransactionCount.errors || userTransactions.errors) {
-    return json({ transactions: [], count: 0, page: 1 });
+    return json({ transactions: [], count: 0, page: 1, network });
   }
 
   const {
@@ -145,8 +146,8 @@ export default function Home() {
             yLabel="Some Y Label"
             lineLabel="Some Tooltip Label"
             accessors={{
-              xAccessor: (d: any) => d.x,
-              yAccessor: (d: any) => d.y,
+              xAccessor: (d: { x: number; y: number }) => d.x,
+              yAccessor: (d: { x: number; y: number }) => d.y,
             }}
           />
         </div>

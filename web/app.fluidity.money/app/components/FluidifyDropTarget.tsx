@@ -9,36 +9,32 @@ type FluidityDropProps = {
 };
 
 const FluidityDropTarget = () => {
+  const imageMap = {
+    idle: "/assets/fluidify/idle.png",
+    fluidify: "/assets/fluidify/fluidify.webp",
+  };
 
-    const imageMap = {
-        "idle": "/assets/fluidify/idle.png",
-        "fluidify": "/assets/fluidify/fluidify.webp",
-    }
+  const [active, setActive] = useState<FluidityDropProps>();
 
-    const [active, setActive] = useState<FluidityDropProps>()
-
-  const [{
-    isOver,
-    canDrop,
-    color,
-  }, drop] = useDrop(() => {
+  const [{ isOver, canDrop, color }, drop] = useDrop(() => {
     return {
       accept: [ItemTypes.FLUID_ASSET, ItemTypes.ASSET],
-        drop: (item: any) => {
-
-      collect: (monitor) => {
+      drop: (item: any) => item,
+      collect: (monitor) => ({
         isOver: !!monitor.isOver(),
         canDrop: !!monitor.canDrop(),
         color: monitor.getItem<FluidityDropProps>()?.color,
-    },
-
+      }),
     };
   });
 
   return (
     <>
       <div className="fluidify-drop-target">
-        <image className="fluidify-drop-target--animation" src={imageMap [idle ? "idle" : "fluidify"] }/>
+        <image
+          className="fluidify-drop-target--animation"
+          src={imageMap[idle ? "idle" : "fluidify"]}
+        />
         <div className="fluidify-drop-target--droppable" />
       </div>
     </>
