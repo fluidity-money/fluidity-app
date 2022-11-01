@@ -4,14 +4,16 @@
 
 import type { ButtonHTMLAttributes } from "react";
 
-import { ArrowRight, ArrowTopRight } from "components";
+import { ArrowLeft, ArrowRight, ArrowTopRight } from "components";
 import styles from "./LinkButton.module.scss";
 
-interface ILinkButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+interface ILinkButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
   children: string;
   size: "small" | "medium" | "large";
   type: "internal" | "external";
   color?: "white" | "gray";
+  left?: boolean;
   handleClick: () => void;
 }
 
@@ -21,31 +23,28 @@ const LinkButton = ({
   type,
   handleClick,
   color = "white",
+  left = false,
   className,
   ...props
 }: ILinkButtonProps) => {
   const classProps = className || "";
 
   const buttonColorProps = styles[color];
-  const buttonClassProps = `${styles.button} ${buttonColorProps} ${classProps}`
-  
+  const buttonClassProps = `${styles.button} ${buttonColorProps} ${classProps} ${left && styles.iconLeft}`;
+
   const textSizeProps = styles[size];
-  const textClassProps = `${styles.text} ${textSizeProps}`
+  const textClassProps = `${styles.text} ${textSizeProps}`;
 
   return (
-    <button 
-      className={buttonClassProps}
-      onClick={handleClick} 
-      {...props}
-    >
-      <div className={textClassProps}>
-        {children}
-      </div>
-      {
-        type === "internal"
-          ? <ArrowRight className={`${styles.icon} ${classProps}`} />
-          : <ArrowTopRight className={`${styles.icon} ${classProps}`} />
-      }
+    <button className={buttonClassProps} onClick={handleClick} {...props}>
+      <div className={textClassProps}>{children}</div>
+      {type === "internal" && left === false ? (
+        <ArrowRight className={`${styles.icon} ${classProps}`} />
+      ) : type === "internal" && left === true ? (
+        <ArrowLeft className={`${styles.icon} ${classProps}`} />
+      ) : (
+        <ArrowTopRight className={`${styles.icon} ${classProps}`} />
+      )}
     </button>
   );
 };
