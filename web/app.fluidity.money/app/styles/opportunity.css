@@ -1,0 +1,144 @@
+.index-page {
+  width: 100%;
+  mix-blend-mode: lighten;
+}
+
+.disconnected {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.opportunity {
+  padding: 2em;
+}
+
+.opportunity-top {
+  width: 100%;
+}
+
+.header-buttons {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 2em;
+}
+
+.opportunity-text-top {
+  text-align: center;
+  margin: 0;
+}
+
+.opportunity-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2em;
+  width: 36em;
+}
+
+.opportunity-bottom {
+  padding-top: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+}
+
+.opportunity-graph {
+  box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  border-top: solid 1px white;
+  padding: 2em;
+}
+
+.connected {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3em;
+}
+
+.connected-wallet {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.connected-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  width: 32em;
+  text-align: center;
+}
+
+.winnings-figure {
+  margin: 0;
+}
+
+.connected-buttons {
+  display: flex;
+  gap: 1em;
+}
+
+.share-button {
+  display: flex;
+  align-items: center;
+}
+
+.connect-text {
+  text-align: center;
+}
+
+.videoContainer {
+  position: relative;
+  mix-blend-mode: lighten;
+}
+
+.video-fit {
+  object-fit: fit;
+}
+
+.video-contain {
+  object-fit: contain;
+}
+
+.video-cover {
+  object-fit: cover;
+}
+
+.video-reduce {
+  object-fit: scale-down;
+}
+
+.video-none {
+  object-fit: none;
+}
+
+.video {
+  position: absolute;
+  height: 100%;
+}
+
+@media (max-width: 500px) {
+  .connected-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  .connected-content {
+    padding: 3em;
+  }
+  .opportunity {
+    padding: 0 3em 2em 3em;
+  }
+  .opportunity-text {
+    width: 100%;
+  }
+}

@@ -10,9 +10,15 @@ import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { useToolTip, ToolTipContent } from "~/components";
 import Video from "~/components/Video";
+import useViewport from "~/hooks/useViewport";
 import useHighestRewardStatistics, {
   HighestRewardResponse,
 } from "~/queries/useHighestRewardStatistics";
+import opportunityStyles from "~/styles/opportunity.css";
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: opportunityStyles }];
+};
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
@@ -56,7 +62,8 @@ export default function IndexPage() {
   const toolTip = useToolTip();
   const [connected, setConnected] = useState(true);
   const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
-
+  const { width } = useViewport();
+  console.log(width);
   const showNotification = () => {
     toolTip.open(
       `#0000ff`,
@@ -80,7 +87,7 @@ export default function IndexPage() {
             : "/videos/FluidityOpportunityB.mp4"
         }
         type={"none"}
-        loop={!connected ? false : true}
+        loop={true}
       />
       <div className="index-page">
         <div className="header-buttons">
@@ -92,7 +99,7 @@ export default function IndexPage() {
                 return;
               }}
             >
-              FLUIDITY WEBSITE
+              {width < 500 && width > 0 ? "WEBSITE " : "FLUIDITY WEBSITE"}
             </LinkButton>
           </a>
           <LinkButton
@@ -102,7 +109,7 @@ export default function IndexPage() {
               return;
             }}
           >
-            FLUIDITY APP
+            {width < 500 && width > 0 ? "APP" : "FLUIDITY APP"}
           </LinkButton>
         </div>
         {!connected ? (
@@ -112,14 +119,19 @@ export default function IndexPage() {
                 <div>{"(icon)"}</div>
                 <Text>Wallet Address</Text>
               </div>
-              <Display className="winnings-figure" size="md">
+              <Display
+                className="winnings-figure"
+                size={width < 500 && width > 0 ? "xs" : "md"}
+              >
                 {"{$29,645.00}"}
               </Display>
-              <Text size="xl">
+              <Text size={width < 500 && width > 0 ? "md" : "xl"}>
                 Would have been your winnings, based on your last 50
                 transactions.
               </Text>
-              <Text size="xl">Fluidify your assets to start earning.</Text>
+              <Text size={width < 500 && width > 0 ? "md" : "xl"}>
+                Fluidify your assets to start earning.
+              </Text>
               <div className="connected-buttons">
                 <GeneralButton
                   size="large"
@@ -161,7 +173,10 @@ export default function IndexPage() {
                     </Text>
                   </Display>
 
-                  <Text size="xl">
+                  <Text
+                    className="connect-text"
+                    size={width < 500 && width > 0 ? "lg" : "xl"}
+                  >
                     Connect your wallet to see what you could make.
                   </Text>
                 </div>
