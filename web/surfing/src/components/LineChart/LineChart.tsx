@@ -2,34 +2,36 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import type { TooltipDatum } from "@visx/xychart";
+import type { RenderTooltipParams } from "@visx/xychart/lib/components/Tooltip";
+
 import { ParentSizeModern } from "@visx/responsive";
 
 import { AnimatedAreaSeries, XYChart, Tooltip } from "@visx/xychart";
 
 import styles from "./LineChart.module.scss";
 
-type Props = {
-  data: any[];
+type Props<Datum extends object> = {
+  data: Datum[];
   xLabel: string;
   yLabel: string;
   lineLabel: string;
   accessors: {
-    xAccessor: (d: any) => any;
-    yAccessor: (d: any) => any;
+    xAccessor: (d: Datum) => number | Date;
+    yAccessor: (d: Datum) => number;
   };
-};
+  renderTooltip: ({datum}: {datum: Datum} & Element) => React.ReactNode
+} & any;
 
 //
-const ChartTooltip = ({ colorScale, nearestDatum, accessors }: any) => {
+const ChartTooltip = ({ datum }: { datum: any }) => {
   return (
-    <div className={styles.tooltip}>
       <span>
-        {accessors.yAccessor(nearestDatum.datum)}{" "}
+        {datum.y}{" "}
         <span style={{ color: "rgba(255,255,255, 50%)" }}>
-          {nearestDatum.key}
+          {datum.key}
         </span>
       </span>
-    </div>
   );
 };
 
@@ -49,9 +51,9 @@ const { baseColor, generatedGradient, gradientIds } = {
         y2="-200"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stop-color="#C0A9F0" stop-opacity="0" />
-        <stop offset="0.456382" stop-color="#C0A9F0" />
-        <stop offset="1" stop-color="#C0A9F0" stop-opacity="0" />
+        <stop stopColor="#C0A9F0" stopOpacity="0" />
+        <stop offset="0.456382" stopColor="#C0A9F0" />
+        <stop offset="1" stopColor="#C0A9F0" stopOpacity="0" />
       </linearGradient>
       <linearGradient
         id="paint1_linear_704_33887"
@@ -61,9 +63,9 @@ const { baseColor, generatedGradient, gradientIds } = {
         y2="-100"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stop-color="#9FD4F3" stop-opacity="0" />
-        <stop offset="0.461891" stop-color="#FFD2C4" />
-        <stop offset="1" stop-color="#FFD2C4" stop-opacity="0" />
+        <stop stopColor="#9FD4F3" stopOpacity="0" />
+        <stop offset="0.461891" stopColor="#FFD2C4" />
+        <stop offset="1" stopColor="#FFD2C4" stopOpacity="0" />
       </linearGradient>
     </>
   ),
@@ -71,14 +73,15 @@ const { baseColor, generatedGradient, gradientIds } = {
   baseColor: "transparent",
 };
 
-const _LineChart = ({
+const _LineChart = <Datum extends object,>({
   accessors,
   data,
   lineLabel,
   xLabel,
   yLabel,
+  renderTooltip,
   ...props
-}: Props & any) => {
+}: Props<Datum>) => {
   return (
     <XYChart
       xScale={{
@@ -106,6 +109,7 @@ const _LineChart = ({
       {gradientIds.map((id) => (
         <AnimatedAreaSeries
           id={`gradient-${id}`}
+          key={`gradient-${id}`}
           fill={`url(#${id})`}
           lineProps={{ stroke: "#fff" }}
           dataKey={lineLabel}
@@ -121,30 +125,30 @@ const _LineChart = ({
         style={{
           position: "absolute",
         }}
-        renderTooltip={({ tooltipData, colorScale }: any) => (
-          <ChartTooltip
-            nearestDatum={tooltipData.nearestDatum}
-            colorScale={colorScale}
-            accessors={accessors}
-          />
+        renderTooltip={({ tooltipData }: RenderTooltipParams<Datum>) => (
+          tooltipData?.nearestDatum &&
+            <div className={styles.tooltip}>
+              {renderTooltip({datum: tooltipData.nearestDatum.datum})}
+            </div>
         )}
       />
     </XYChart>
   );
 };
 
-const LineChart = (props: Props) => {
+const LineChart = <Data extends object,>(props: Props<Data>) => {
   const defaultAccessors = {
     xAccessor: (d: any) => d.x,
     yAccessor: (d: any) => d.y,
   };
 
-  const defaultProps: Props = {
+  const defaultProps: Props<Data> = {
     accessors: defaultAccessors,
     data: [],
     xLabel: "Unlabeled",
     yLabel: "Unlabeled",
     lineLabel: "Unlabeled",
+    renderTooltip: ChartTooltip,
   };
 
   const calculatedProps = {
