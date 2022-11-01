@@ -2,6 +2,5 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import LinkButton from "./LinkButton";
+export { default } from "./LinkButton";
 
-export default LinkButton;

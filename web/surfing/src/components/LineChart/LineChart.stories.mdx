@@ -17,14 +17,22 @@ export const Template = (args) => <div style={{height: "400px"}}>
     <Story
         name="Line Graph"
         args={{
-        data: [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 40, y: 20}],
+        data: [{x: 10, y: 10, name: "Alice"}, {x: 20, y: 20, name: "Bob"}, {x: 30, y: 30, name: "Connor"}, {x: 40, y: 20, name: "David"}],
         xLabel: 'Some X Label',
         yLabel: 'Some Y Label',
         lineLabel: 'Some Line Label',
         accessors: {
             xAccessor: (d) => d.x,
             yAccessor: (d) => d.y,
-        }
+        },
+        renderTooltip: ({datum}) => (
+            <span>
+              {datum.y}{" "}
+              <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                By {datum.name}
+              </span>
+            </span>
+        )
         }}
     >
         {Template.bind({})}
