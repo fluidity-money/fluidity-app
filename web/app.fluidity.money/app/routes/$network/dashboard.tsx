@@ -11,6 +11,7 @@ import {
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import { useState, useEffect, useContext } from "react";
 import { Web3Context } from "~/util/chainUtils/web3";
+import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
 import { motion } from "framer-motion";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
@@ -85,6 +86,9 @@ export default function Dashboard() {
 
   const { state } = useContext(Web3Context());
   const account = state.account ?? "";
+
+  const { width } = useViewport();
+  const isMobile = width <= 500;
 
   const navigationMap = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
@@ -167,11 +171,11 @@ export default function Dashboard() {
 
   return (
     <>
-      <header>
+      <header id="flu-logo" className="hide-on-mobile">
         <img src="/logo.svg" alt="Fluidity Logo" />
       </header>
 
-      <nav className={"navbar-v2"}>
+      <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
         <ul>
           {navigationMap.map((obj, index) => {
             const key = Object.keys(obj)[0];
@@ -196,9 +200,14 @@ export default function Dashboard() {
           })}
         </ul>
       </nav>
-      <main>
-        <nav>
-          <Text>{appName}</Text>
+
+      <main id="dashboard-body">
+        <nav id="top-navbar">
+          {isMobile ? (
+            <img src="/logo.svg" alt="Fluidity" />
+          ) : (
+            <Text>{appName}</Text>
+          )}
           <div>
             {/* Send */}
             {/*
@@ -255,13 +264,10 @@ export default function Dashboard() {
 
         <Outlet />
 
-        {/* Provide Luquidity*/}
+        <footer id="flu-socials" className="hide-on-mobile">
+          {/* Provide Luquidity*/}
+          <ProvideLiquidity />
 
-        <ProvideLiquidity />
-
-        {/* Footer */}
-
-        <footer>
           {/* Links */}
           <section>
             {/* Version */}

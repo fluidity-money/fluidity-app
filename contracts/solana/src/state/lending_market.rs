@@ -29,6 +29,7 @@ pub struct LendingMarket {
 
 impl LendingMarket {
     /// Create a new lending market
+    #[allow(unused)]
     pub fn new(params: InitLendingMarketParams) -> Self {
         let mut lending_market = Self::default();
         Self::init(&mut lending_market, params);
@@ -36,6 +37,7 @@ impl LendingMarket {
     }
 
     /// Initialize a lending market
+    #[allow(unused)]
     pub fn init(&mut self, params: InitLendingMarketParams) {
         self.version = PROGRAM_VERSION;
         self.bump_seed = params.bump_seed;
@@ -48,6 +50,7 @@ impl LendingMarket {
 }
 
 /// Initialize a lending market
+#[allow(unused)]
 pub struct InitLendingMarketParams {
     /// Bump seed for derived authority address
     pub bump_seed: u8,

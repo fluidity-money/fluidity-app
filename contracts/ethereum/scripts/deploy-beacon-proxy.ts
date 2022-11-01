@@ -37,7 +37,7 @@ const main = async () => {
     const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
     const aaveFactory = await hre.ethers.getContractFactory("AaveLiquidityProvider");
 
-    console.log(`deploying token with beacon proxy address ${tokenAddress}`);
+    console.log(`deploying token with beacon address ${tokenAddress}`);
 
     const token = await hre.upgrades.deployBeaconProxy(
         tokenAddress,
@@ -46,7 +46,7 @@ const main = async () => {
 
     await token.deployed();
 
-    console.log(`token deployed to address ${token.address}`);
+    console.log(`token beacon proxy deployed to address ${token.address}`);
 
     let pool: ethers.Contract;
 

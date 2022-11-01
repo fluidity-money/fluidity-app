@@ -293,8 +293,8 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 		return nil, nil
 	}
 
-	contractAddr_ := transfer.Log.Address.String()
-	contractAddr := ethCommon.HexToAddress(contractAddr_)
+	contractAddr_ := transfer.Log.Address
+	contractAddr := ethereum.ConvertInternalAddress(contractAddr_)
 
 	// if dex is a proxy, start crosschain swap
 	isCrosschainSwap_, err := ethereum.StaticCall(client, contractAddr, xyFinanceAbi, "proxies", dex)
@@ -330,8 +330,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	}
 
 	// Get all logs in transaction
-	txHash_ := string(transfer.Transaction.Hash)
-	txHash := ethCommon.HexToHash(txHash_)
+	txHash := ethereum.ConvertInternalHash(transfer.Transaction.Hash)
 
 	txLogs := txReceipt.Logs
 
@@ -429,8 +428,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 // fromTokenIsSupported checks if fromToken is part of Day 1 supported Eth tokens
 func fromTokenIsSupported(token ethCommon.Address) bool {
-	tokenAddress_ := token.String()
-	tokenAddress := libEthereum.AddressFromString(tokenAddress_)
+	tokenAddress := ethereum.ConvertGethAddress(token)
 
 	_, found := supportedTokens[tokenAddress]
 

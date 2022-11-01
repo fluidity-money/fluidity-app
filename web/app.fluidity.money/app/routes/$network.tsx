@@ -2,7 +2,10 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useParams } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
+
 import EthereumProvider from "contexts/EthereumProvider";
+import SolanaProvider from "contexts/SolanaProvider";
+
 import { Fragment } from "react";
 
 type ProviderMap = {
@@ -20,7 +23,7 @@ const Provider = ({
 }) => {
   const providers: ProviderMap = {
     ethereum: EthereumProvider,
-    //solana: SolanaProvider,
+    solana: SolanaProvider,
   };
 
   const ProviderComponent = (network && providers[network]) || Fragment;

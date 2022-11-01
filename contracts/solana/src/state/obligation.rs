@@ -47,6 +47,7 @@ pub struct Obligation {
 
 impl Obligation {
     /// Create a new obligation
+    #[allow(unused)]
     pub fn new(params: InitObligationParams) -> Self {
         let mut obligation = Self::default();
         Self::init(&mut obligation, params);
@@ -54,6 +55,7 @@ impl Obligation {
     }
 
     /// Initialize an obligation
+    #[allow(unused)]
     pub fn init(&mut self, params: InitObligationParams) {
         self.version = PROGRAM_VERSION;
         self.last_update = LastUpdate::new(params.current_slot);
@@ -64,11 +66,13 @@ impl Obligation {
     }
 
     /// Calculate the current ratio of borrowed value to deposited value
+    #[allow(unused)]
     pub fn loan_to_value(&self) -> Result<Decimal, ProgramError> {
         self.borrowed_value.try_div(self.deposited_value)
     }
 
     /// Repay liquidity and remove it from borrows if zeroed out
+    #[allow(unused)]
     pub fn repay(&mut self, settle_amount: Decimal, liquidity_index: usize) -> ProgramResult {
         let liquidity = &mut self.borrows[liquidity_index];
         if settle_amount == liquidity.borrowed_amount_wads {
@@ -80,6 +84,7 @@ impl Obligation {
     }
 
     /// Withdraw collateral and remove it from deposits if zeroed out
+    #[allow(unused)]
     pub fn withdraw(&mut self, withdraw_amount: u64, collateral_index: usize) -> ProgramResult {
         let collateral = &mut self.deposits[collateral_index];
         if withdraw_amount == collateral.deposited_amount {
@@ -91,6 +96,7 @@ impl Obligation {
     }
 
     /// Calculate the maximum collateral value that can be withdrawn
+    #[allow(unused)]
     pub fn max_withdraw_value(&self) -> Result<Decimal, ProgramError> {
         let required_deposit_value = self
             .borrowed_value
@@ -103,6 +109,7 @@ impl Obligation {
     }
 
     /// Calculate the maximum liquidity value that can be borrowed
+    #[allow(unused)]
     pub fn remaining_borrow_value(&self) -> Result<Decimal, ProgramError> {
         self.allowed_borrow_value.try_sub(self.borrowed_value)
     }
@@ -121,6 +128,7 @@ impl Obligation {
     }
 
     /// Find collateral by deposit reserve
+    #[allow(unused)]
     pub fn find_collateral_in_deposits(
         &self,
         deposit_reserve: Pubkey,
@@ -136,6 +144,7 @@ impl Obligation {
     }
 
     /// Find or add collateral by deposit reserve
+    #[allow(unused)]
     pub fn find_or_add_collateral_to_deposits(
         &mut self,
         deposit_reserve: Pubkey,
@@ -162,6 +171,7 @@ impl Obligation {
     }
 
     /// Find liquidity by borrow reserve
+    #[allow(unused)]
     pub fn find_liquidity_in_borrows(
         &self,
         borrow_reserve: Pubkey,
@@ -177,6 +187,7 @@ impl Obligation {
     }
 
     /// Find or add liquidity by borrow reserve
+    #[allow(unused)]
     pub fn find_or_add_liquidity_to_borrows(
         &mut self,
         borrow_reserve: Pubkey,
@@ -205,6 +216,7 @@ impl Obligation {
 }
 
 /// Initialize an obligation
+#[allow(unused)]
 pub struct InitObligationParams {
     /// Last update to collateral, liquidity, or their market values
     pub current_slot: Slot,
@@ -247,6 +259,7 @@ impl ObligationCollateral {
     }
 
     /// Increase deposited collateral
+    #[allow(unused)]
     pub fn deposit(&mut self, collateral_amount: u64) -> ProgramResult {
         self.deposited_amount = self
             .deposited_amount
@@ -280,6 +293,7 @@ pub struct ObligationLiquidity {
 
 impl ObligationLiquidity {
     /// Create new obligation liquidity
+    #[allow(unused)]
     pub fn new(borrow_reserve: Pubkey, cumulative_borrow_rate_wads: Decimal) -> Self {
         Self {
             borrow_reserve,
@@ -290,18 +304,21 @@ impl ObligationLiquidity {
     }
 
     /// Decrease borrowed liquidity
+    #[allow(unused)]
     pub fn repay(&mut self, settle_amount: Decimal) -> ProgramResult {
         self.borrowed_amount_wads = self.borrowed_amount_wads.try_sub(settle_amount)?;
         Ok(())
     }
 
     /// Increase borrowed liquidity
+    #[allow(unused)]
     pub fn borrow(&mut self, borrow_amount: Decimal) -> ProgramResult {
         self.borrowed_amount_wads = self.borrowed_amount_wads.try_add(borrow_amount)?;
         Ok(())
     }
 
     /// Accrue interest
+    #[allow(unused)]
     pub fn accrue_interest(&mut self, cumulative_borrow_rate_wads: Decimal) -> ProgramResult {
         match cumulative_borrow_rate_wads.cmp(&self.cumulative_borrow_rate_wads) {
             Ordering::Less => {

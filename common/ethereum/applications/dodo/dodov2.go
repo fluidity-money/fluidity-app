@@ -184,8 +184,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	}
 
 	// Find lpFeeRate via call to contract
-	contractAddress_ := transfer.Log.Address.String()
-	contractAddress := ethCommon.HexToAddress(contractAddress_)
+	contractAddress := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
 	lpFeeRate_, err := ethereum.StaticCall(client, contractAddress, dodoV2SwapAbi, "_LP_FEE_RATE_")
 
@@ -208,8 +207,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 	// Find mtBaseTokenFee by taking last log. If last log was a transfer to
 	// the sender, mtBaseTokenFee is 0
-	txHash_ := string(transfer.Transaction.Hash)
-	txHash := ethCommon.HexToHash(txHash_)
+	txHash := ethereum.ConvertInternalHash(transfer.Transaction.Hash)
 
 	txLogs := txReceipt.Logs
 

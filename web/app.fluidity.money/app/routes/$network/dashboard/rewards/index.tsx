@@ -269,10 +269,7 @@ export default function Rewards() {
           </section>
         </div>
       )}
-
-      <Heading className="reward-performance" as={"h2"}>
-        Reward Performance
-      </Heading>
+      <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>Reward Performance</Heading>
       {/* Reward Performance */}
       {hasRewarders && (
         <section id="performance">
