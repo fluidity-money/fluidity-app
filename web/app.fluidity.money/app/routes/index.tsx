@@ -138,7 +138,7 @@ export default function IndexPage() {
                   version="primary"
                   buttontype="text"
                   handleClick={() => {
-                    setConnected(true);
+                    setConnected(false);
                   }}
                 >
                   FLUIDIFY MONEY
