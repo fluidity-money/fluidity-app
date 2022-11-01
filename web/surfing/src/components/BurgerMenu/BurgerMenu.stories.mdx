@@ -1,0 +1,32 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import BurgerMenu from "./BurgerMenu";
+
+<Meta title="Menu/Burger Menu" component={BurgerMenu} />
+
+export const Template = (args) => <BurgerMenu {...args} />;
+
+<Canvas>
+  <Story
+    name="menu closed"
+    args={{
+      isOpen: false,
+      setIsOpen: () => {
+        return;
+      },
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+  <Story
+    name="menu open"
+    args={{
+      isOpen: true,
+      setIsOpen: () => {
+        return;
+      },
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
