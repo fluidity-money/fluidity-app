@@ -1,5 +1,12 @@
+import type { LinksFunction } from "@remix-run/node";
+
 import { Display, Text } from "@fluidity-money/surfing";
 import { useToolTip, ToolTipContent } from "~/components";
+import opportunityStyles from "~/styles/opportunity.css";
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: opportunityStyles }];
+};
 
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
@@ -20,7 +27,7 @@ export default function IndexPage() {
 
   return (
     <div>
-      <Display size={"lg"}>
+      <Display size="lg" className="no-margin">
         <Text>
           <Text prominent>{"{address}"}</Text>
           {" claimed "}

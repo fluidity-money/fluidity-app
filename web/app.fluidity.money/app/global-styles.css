@@ -11,12 +11,7 @@ body {
 
 body {
   background-image: url("/images/bg-blur-desktop.png");
-  background-size: auto;
+  background-size: cover;
   background-repeat: no-repeat;
-}
-
-@media (max-width: 620px) {
-  body {
-    background-size: 0%;
-  }
+  background-attachment: fixed;
 }
