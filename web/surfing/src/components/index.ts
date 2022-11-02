@@ -35,6 +35,7 @@ export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
 export {
   ArrowRight,
+  ArrowLeft,
   ArrowDown,
   ArrowUp,
   ArrowTopRight,
@@ -46,3 +47,4 @@ export {
 } from "./Images";
 export { default as Spinner } from "./Spinner";
 export { default as TransparentVideo } from "./TransparentVideo";
+export { default as BurgerMenu } from "./BurgerMenu";
