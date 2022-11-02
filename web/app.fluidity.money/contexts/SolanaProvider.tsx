@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import config from "~/webapp.config.server";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -10,17 +9,13 @@ import {
   SolletExtensionWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 
-export default function SolanaProvider({
+const SolanaProvider = (rpcUrl: string) => ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   const networkCluster = 0;
-  const rpc =
-    process.env.REACT_APP_FLU_SOL_RPC === undefined
-      ? ""
-      : process.env.REACT_APP_FLU_SOL_RPC;
-  const endpoint = useMemo(() => rpc, [networkCluster]);
+  const endpoint = useMemo(() => rpcUrl, [networkCluster]);
 
   // include more wallet suppport later once done with full implementation
   const wallets = useMemo(
@@ -36,3 +31,5 @@ export default function SolanaProvider({
     </ConnectionProvider>
   );
 }
+
+export default SolanaProvider;
