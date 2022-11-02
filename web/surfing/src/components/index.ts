@@ -35,6 +35,7 @@ export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
 export {
   ArrowRight,
+  ArrowLeft,
   ArrowDown,
   ArrowUp,
   ArrowTopRight,
