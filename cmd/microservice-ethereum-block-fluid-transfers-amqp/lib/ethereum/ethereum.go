@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -38,7 +40,7 @@ func ConvertTransaction(blockHash string, oldTransaction *ethTypes.Transaction) 
 		chainId   big.Int
 		cost      big.Int
 		gasPrice  big.Int
-		to        string
+		to        ethCommon.Address
 		gasFeeCap big.Int
 		gasTipCap big.Int
 		value     big.Int
@@ -57,9 +59,7 @@ func ConvertTransaction(blockHash string, oldTransaction *ethTypes.Transaction) 
 	}
 
 	if to_ := oldTransaction.To(); to_ != nil {
-		to = to_.Hex()
-	} else {
-		to = emptyAddress
+		to = *to_
 	}
 
 	if gasTipCap_ := oldTransaction.GasTipCap(); gasTipCap_ != nil {
@@ -83,10 +83,10 @@ func ConvertTransaction(blockHash string, oldTransaction *ethTypes.Transaction) 
 		GasFeeCap: misc.NewBigInt(gasFeeCap),
 		GasTipCap: misc.NewBigInt(gasTipCap),
 		GasPrice:  misc.NewBigInt(gasPrice),
-		Hash:      types.HashFromString(oldTransaction.Hash().Hex()),
+		Hash:      ethereum.ConvertGethHash(oldTransaction.Hash()),
 		Nonce:     oldTransaction.Nonce(),
-		To:        types.AddressFromString(to),
-		From:      types.AddressFromString(transactionMessage.From().Hex()),
+		To:        ethereum.ConvertGethAddress(to),
+		From:      ethereum.ConvertGethAddress(transactionMessage.From()),
 		Type:      oldTransaction.Type(),
 		Value:     misc.NewBigInt(value),
 	}

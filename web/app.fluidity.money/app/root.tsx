@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
@@ -95,7 +96,32 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export default function App() {
+function ErrorBoundary() {
+  return (
+    <html>
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+        <h1>Something went wrong!</h1>
+        <br />
+        <h2>Our team has been notified, and are working on fixing it!</h2>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+function App() {
   return (
     <html lang="en">
       <head>
@@ -111,3 +137,9 @@ export default function App() {
     </html>
   );
 }
+
+export { ErrorBoundary };
+
+export default withSentry(App, {
+  wrapWithErrorBoundary: true,
+});

@@ -41,7 +41,7 @@ func validArgInt64toUInt64Bigrat(args map[string]interface{}, key string) (*big.
 		return nil, false
 	}
 
-	val, ok := val_.(int)	
+	val, ok := val_.(int)
 	if !ok || val < 0 {
 		return nil, false
 	}
@@ -70,7 +70,7 @@ func validArgString(args map[string]interface{}, key string) (string, bool) {
 		return "", false
 	}
 
-	val, ok := val_.(string) 
+	val, ok := val_.(string)
 	if !ok {
 		return "", false
 	}

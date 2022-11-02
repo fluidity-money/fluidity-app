@@ -25,7 +25,7 @@ const main = async () => {
 
         const factory = await hre.ethers.getContractFactory(contract);
         const beacon = await hre.upgrades.deployBeacon(factory);
-        console.log(`deployed beacon proxy for ${name} to ${beacon.address}`);
+        console.log(`deployed beacon for ${name} to ${beacon.address}`);
     }
 };
 

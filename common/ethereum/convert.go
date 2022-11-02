@@ -30,6 +30,22 @@ func ConvertGethAddress(address ethCommon.Address) ethereum.Address {
 	return ethereum.AddressFromString(addressString)
 }
 
+// ConvertInternalHash from the internal definition into its geth type
+// equivalent
+func ConvertInternalHash(hash ethereum.Hash) ethCommon.Hash {
+	hashString := hash.String()
+
+	return ethCommon.HexToHash(hashString)
+}
+
+// ConvertInternalAddress from the internal definition into its geth type
+// equivalent
+func ConvertInternalAddress(address ethereum.Address) ethCommon.Address {
+	addressString := address.String()
+
+	return ethCommon.HexToAddress(addressString)
+}
+
 // ConvertGethLog from the ethereum definition into its internal type
 // equivalent
 func ConvertGethLog(log ethTypes.Log) ethereum.Log {
@@ -40,13 +56,13 @@ func ConvertGethLog(log ethTypes.Log) ethereum.Log {
 	}
 
 	return ethereum.Log{
-		Address:     ethereum.AddressFromString(log.Address.Hex()),
+		Address:     ConvertGethAddress(log.Address),
 		Topics:      topics,
 		Data:        log.Data,
 		BlockNumber: misc.BigIntFromUint64(log.BlockNumber),
-		TxHash:      ethereum.HashFromString(log.TxHash.Hex()),
+		TxHash:      ConvertGethHash(log.TxHash),
 		TxIndex:     misc.BigIntFromUint64(uint64(log.TxIndex)),
-		BlockHash:   ethereum.HashFromString(log.BlockHash.Hex()),
+		BlockHash:   ConvertGethHash(log.BlockHash),
 		Index:       misc.BigIntFromUint64(uint64(log.Index)),
 	}
 }
@@ -85,15 +101,13 @@ func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 		baseFee = *baseFee_
 	}
 
-	receiptHash := oldHeader.ReceiptHash.Hex()
-
 	return ethereum.BlockHeader{
-		BlockHash:       ethereum.HashFromString(oldHeader.Hash().Hex()),
-		ParentHash:      ethereum.HashFromString(oldHeader.ParentHash.Hex()),
-		UncleHash:       ethereum.HashFromString(oldHeader.UncleHash.Hex()),
-		Coinbase:        ethereum.AddressFromString(oldHeader.Coinbase.Hex()),
-		Root:            ethereum.HashFromString(oldHeader.Root.Hex()),
-		TransactionHash: ethereum.HashFromString(oldHeader.TxHash.Hex()),
+		BlockHash:       ConvertGethHash(oldHeader.Hash()),
+		ParentHash:      ConvertGethHash(oldHeader.ParentHash),
+		UncleHash:       ConvertGethHash(oldHeader.UncleHash),
+		Coinbase:        ConvertGethAddress(oldHeader.Coinbase),
+		Root:            ConvertGethHash(oldHeader.Root),
+		TransactionHash: ConvertGethHash(oldHeader.TxHash),
 		Bloom:           oldHeader.Bloom.Bytes(),
 		Difficulty:      misc.NewBigInt(difficulty),
 		Number:          misc.NewBigInt(number),
@@ -101,9 +115,9 @@ func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 		GasUsed:         misc.BigIntFromUint64(oldHeader.GasUsed),
 		Time:            oldHeader.Time,
 		Extra:           oldHeader.Extra,
-		MixDigest:       ethereum.HashFromString(oldHeader.MixDigest.Hex()),
+		MixDigest:       ConvertGethHash(oldHeader.MixDigest),
 		Nonce:           ethereum.BlockNonce(oldHeader.Nonce[:]),
-		ReceiptHash:     ethereum.HashFromString(receiptHash),
+		ReceiptHash:     ConvertGethHash(oldHeader.ReceiptHash),
 		BaseFee:         misc.NewBigInt(baseFee),
 	}
 }

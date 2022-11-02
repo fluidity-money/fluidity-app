@@ -25,23 +25,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  let unclaimedRewards;
-  let error;
+  const { data, error } = await useUserUnclaimedRewards(network, address);
 
-  try {
-    unclaimedRewards = await // Check address strips leading 0x
-    (await useUserUnclaimedRewards(network, address)).json();
-  } catch (err) {
-    error = "Could not fetch User Unclaimed Rewards";
-  }
-
-  if (error || unclaimedRewards.error) {
+  if (error || !data) {
     return redirect("/error", { status: 500, statusText: error });
   }
 
-  const {
-    data: { ethereum_pending_winners: rewards },
-  } = unclaimedRewards;
+  const { ethereum_pending_winners: rewards } = data;
 
   const sanitisedRewards = rewards.filter(
     (transaction: UserUnclaimedReward) => !transaction.reward_sent

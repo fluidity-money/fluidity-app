@@ -21,10 +21,6 @@ on:
       service:
         description: 'Service'
         required: true
-      commitId:
-        type: string
-        description: 'Commit Id'
-        default: latest
       build_root_container:
         type: boolean
         description: 'Build root-container'
@@ -50,7 +46,7 @@ jobs:
         with:
           lfs: true
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -61,9 +57,6 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            SHA=$GITHUB_SHA
-            [[ ! ${{ github.event.inputs.commitId }} == "latest" ]] && SHA=${{ github.event.inputs.commitId }}
-
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
@@ -71,22 +64,19 @@ jobs:
               --environment ${{ github.event.inputs.environment }} \
               --build-root-container ${{ github.event.inputs.build_root_container }} \
               --build-build-container ${{ github.event.inputs.build_build_container }} \
-              --tag $SHA
+              --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
-            SHA=$GITHUB_SHA
-            [[ ! ${{ github.event.inputs.commitId }} == "latest" ]] && SHA=${{ github.event.inputs.commitId }}
-
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
               --debug false \
-              --tag $SHA
+              --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
         uses: rjstone/discord-webhook-notify@v1
         if: success()

@@ -2,24 +2,27 @@ import path from "path";
 import express from "express";
 import compression from "compression";
 import morgan from "morgan";
+import { wrapExpressCreateRequestHandler } from "@sentry/remix";
 import { createRequestHandler } from "@remix-run/express";
 
 import { Server } from "socket.io";
 
 import { createServer } from "http";
 
-import {
-  getObservableForAddress,
-  getTransactionsObservableForIn,
-} from "./drivers";
-
 import config from "~/webapp.config.server";
 import { Observable, Subscription, EMPTY } from "rxjs";
 import { PipedTransaction } from "drivers/types";
+import {
+  getObservableForAddress,
+  getTransactionsObservableForIn,
+} from "drivers/utils";
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
+
+const createSentryRequestHandler =
+  wrapExpressCreateRequestHandler(createRequestHandler);
 
 app.use((req, res, next) => {
   // helpful headers:
@@ -117,7 +120,7 @@ io.on("connection", (socket) => {
 app.all(
   "*",
   MODE === "production"
-    ? createRequestHandler({ build: require(BUILD_DIR) })
+    ? createSentryRequestHandler({ build: require(BUILD_DIR) })
     : (...args) => {
         purgeRequireCache();
         const requestHandler = createRequestHandler({

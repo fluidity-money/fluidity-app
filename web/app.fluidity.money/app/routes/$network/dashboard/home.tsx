@@ -3,7 +3,7 @@ import type { Chain } from "~/util/chainUtils/chains";
 import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
 
-import { Display, Text } from "@fluidity-money/surfing";
+import { Display, LineChart, Text } from "@fluidity-money/surfing";
 
 import { useUserTransactionCount, useUserTransactions } from "~/queries";
 import { useLoaderData } from "@remix-run/react";
@@ -27,21 +27,31 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   let error;
 
   try {
+    console.log("Fetching user transaction count");
     userTransactionCount = await (
       await useUserTransactionCount(network ?? "", address)
     ).json();
+    console.log("transactionCount ", userTransactionCount);
+
+    console.log("Fetching user transactions");
     userTransactions = await (
       await useUserTransactions(network ?? "", address, page)
     ).json();
+
+    console.log("userTransactions", userTransactions);
   } catch (err) {
-    error = "The transaction explorer is currently unavailable";
+    throw new Error(`The transaction explorer is unavailable! ${err}`);
   } // Fail silently - for now.
 
-  if (error) {
-    return redirect("/error", { status: 500, statusText: error });
+  if (
+    error !== undefined ||
+    userTransactionCount.errors ||
+    userTransactions.errors
+  ) {
+    throw new Error(`The transaction explorer is unavailable! ${error}`);
   }
   if (userTransactionCount.errors || userTransactions.errors) {
-    return json({ transactions: [], count: 0, page: 1 });
+    return json({ transactions: [], count: 0, page: 1, network });
   }
 
   const {
@@ -97,6 +107,12 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
 };
 
+export const meta = () => {
+  return {
+    title: "Dashboard",
+  };
+};
+
 type Transaction = {
   sender: string;
   receiver: string;
@@ -118,7 +134,23 @@ export default function Home() {
   return (
     <>
       <section id="graph">
-        <div className="graph"></div>
+        <div className="graph" style={{ width: "100%", height: "400px" }}>
+          <LineChart
+            data={[
+              { x: 10, y: 10 },
+              { x: 20, y: 20 },
+              { x: 30, y: 30 },
+              { x: 40, y: 20 },
+            ]}
+            xLabel="Some X Label"
+            yLabel="Some Y Label"
+            lineLabel="Some Tooltip Label"
+            accessors={{
+              xAccessor: (d: { x: number; y: number }) => d.x,
+              yAccessor: (d: { x: number; y: number }) => d.y,
+            }}
+          />
+        </div>
         <div className="graph-ceiling">
           <div className="overlay">
             <div className="statistics-row">
