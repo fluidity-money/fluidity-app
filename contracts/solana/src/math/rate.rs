@@ -68,6 +68,7 @@ impl Rate {
     }
 
     /// Calculates base^exp
+    #[allow(unused)]
     pub fn try_pow(&self, mut exp: u64) -> Result<Rate, ProgramError> {
         let mut base = *self;
         let mut ret = if exp % 2 != 0 {

@@ -48,9 +48,29 @@ const ClaimedRewards = () => {
 
   const navigate = useNavigate();
 
+  const generateTweet = () => {
+    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
+
+    const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
+
+    twitterUrl.searchParams.set("text", tweetMsg);
+
+    const fluTwitterHandle = `fluiditymoney`;
+
+    twitterUrl.searchParams.set("via", fluTwitterHandle);
+
+    return twitterUrl.href;
+  };
+
   return (
-    <div className="cover">
+    <div id="claim-container" className="cover">
       {/* Bg Video*/}
+      <video
+        id="cover-vid"
+        src={"/images/FluidityOpportunityB.mp4"}
+        autoPlay={true}
+        loop={true}
+      />
 
       {/* Navigation Bar */}
       <header id="claim-header">
@@ -115,10 +135,10 @@ const ClaimedRewards = () => {
           className="spread"
           version={"secondary"}
           buttontype={"icon before"}
-          icon={"Twitter"}
+          icon={<img src="/images/socials/twitter.svg" />}
           size={"large"}
           handleClick={() => {
-            console.log("Go To Share");
+            navigate(generateTweet());
           }}
         >
           Share
@@ -128,7 +148,7 @@ const ClaimedRewards = () => {
           type={"internal"}
           handleClick={() => navigate("..")}
         >
-          Reward History
+          Rewards History
         </LinkButton>
       </section>
     </div>

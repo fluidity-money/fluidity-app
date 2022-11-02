@@ -127,8 +127,8 @@ func main() {
 
 		for i, fluidTransfer := range fluidTransfers {
 
-			fluidTransferHash := ethCommon.HexToHash(
-				string(fluidTransfer.Transaction.Hash),
+			fluidTransferHash := libEthereum.ConvertInternalHash(
+				fluidTransfer.Transaction.Hash,
 			)
 
 			txReceipt, err := gethClient.TransactionReceipt(
@@ -164,11 +164,11 @@ func main() {
 
 			transaction := transfer.Transaction
 
-			transactionHashHex := transaction.Hash.String()
-
-			transactionHash := ethCommon.HexToHash(
-				transactionHashHex,
+			transactionHash := libEthereum.ConvertInternalHash(
+				transaction.Hash,
 			)
+
+			transactionHashHex := transactionHash.Hex()
 
 			txReceipt, err := gethClient.TransactionReceipt(
 				context.Background(),
@@ -179,7 +179,7 @@ func main() {
 				log.Fatal(func(k *log.Log) {
 					k.Format(
 						"Failed to get the transaction receipt for Fluid transfer %#v!",
-						transactionHashHex,
+						transactionHash.Hex(),
 					)
 
 					k.Payload = err
@@ -190,7 +190,7 @@ func main() {
 				log.Fatal(func(k *log.Log) {
 				    k.Format(
 						"Receipt for fluid transfer %v was nil!",
-						transactionHashHex,
+						transactionHash.Hex(),
 					)
 				})
 			}

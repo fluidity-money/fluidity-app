@@ -272,12 +272,12 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 
 	for i, reward := range announcement {
 		var (
-			winnerString  = reward.Winner.String()
+			winner_       = reward.Winner
 			amountInt     = reward.WinAmount
 			firstBlockInt = reward.FirstBlock
 			lastBlockInt  = reward.LastBlock
 
-			winner     = ethCommon.HexToAddress(winnerString)
+			winner     = ethereum.ConvertInternalAddress(winner_)
 			amount     = &amountInt.Int
 			firstBlock = &firstBlockInt.Int
 			lastBlock  = &lastBlockInt.Int

@@ -25,9 +25,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const { data, error } = await useUserUnclaimedRewards(network, address)
+  const { data, error } = await useUserUnclaimedRewards(network, address);
 
-  if (error || !data ) {
+  if (error || !data) {
     return redirect("/error", { status: 500, statusText: error });
   }
 

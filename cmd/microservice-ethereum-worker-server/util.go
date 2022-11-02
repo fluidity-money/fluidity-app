@@ -134,10 +134,6 @@ func bigIntToRat(x misc.BigInt) *big.Rat {
 	return r.SetInt(&x.Int)
 }
 
-func hexToAddress(s ethereum.Address) ethCommon.Address {
-	return ethCommon.HexToAddress(s.String())
-}
-
 func bigPow(left *big.Rat, count int) *big.Rat {
 
 	leftCopy_ := *left

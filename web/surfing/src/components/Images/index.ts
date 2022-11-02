@@ -1,5 +1,6 @@
 import { ArrowTopRight } from './ArrowTopRight';
 import { ArrowRight } from './ArrowRight';
+import { ArrowLeft } from './ArrowLeft';
 import { TriangleDown } from './TriangleDown';
 import { ArrowDown } from './ArrowDown';
 import { ArrowUp } from './ArrowUp';
@@ -10,6 +11,7 @@ import { AssetsIcon } from './Assets';
 
 export {
   ArrowRight,
+  ArrowLeft,
   ArrowDown,
   ArrowUp,
   ArrowTopRight,

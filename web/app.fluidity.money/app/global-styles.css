@@ -6,16 +6,17 @@ body {
 
   background-color: black;
   color: #828381;
+  font-family: "Aeonik", sans-serif;
 }
 
 body {
   background-image: url("/images/bg-blur-desktop.png");
-  background-size: auto;
+  background-size: cover;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-@media (max-width: 620px) {
-  body {
-    background-size: 0%;
-  }
+a {
+  color: inherit;
+  text-decoration: none;
 }

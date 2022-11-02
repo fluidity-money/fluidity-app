@@ -32,11 +32,6 @@ query HighestRewards($network: network_blockchain!) {
 `;
 
 const useHighestRewardStatistics = (onNext: (winnings: LargestMonthlyWinnersRes) => void, network: string) => {
-  if (network !== "ethereum") {
-    console.error(`${network} not supported!`);
-    return;
-  }
-  
   const { query, options } = useMemo(() => ({
     query: largestDailyWinnersMonthlyQuery,
     options: {
@@ -48,6 +43,7 @@ const useHighestRewardStatistics = (onNext: (winnings: LargestMonthlyWinnersRes)
   }), [network]);
 
   return useQuery(query, options);
+
 };
 
 export { useHighestRewardStatistics };

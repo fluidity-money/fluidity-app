@@ -5,3 +5,7 @@ SERVICES:
       DOCKERFILE_PATH: ./web/fluidity.money
       TARGET_GROUP: flu-mainnet-fluidity-fe-tg
 
+      DOCKER_ARGS:
+        SECRET_REACT_APP_SENTRY_DSN: /fluidity/frontend/sentryURL
+        SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
+
