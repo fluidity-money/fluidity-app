@@ -13,8 +13,6 @@ const EthereumFacade = ({ children }: { children: ReactNode }) => {
 
   const [connector, setConnectorType] = useState("");
 
-  const hooks = connectorHooks[connector];
-
   return (
     <FluidityFacadeContext.Provider value={{}}>
       {children}
