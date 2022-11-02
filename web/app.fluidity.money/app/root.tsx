@@ -1,5 +1,6 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import {
+  useLoaderData,
   Links,
   LiveReload,
   Meta,
@@ -7,6 +8,8 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { init as initSentry } from "@sentry/remix";
+import { Integrations } from "@sentry/tracing";
 import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
@@ -96,6 +99,16 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
+export const loader: LoaderFunction = async (): Promise<LoaderData> => {
+  const nodeEnv = process.env.NODE_ENV;
+  const sentryDsn = process.env.SENTRY_ENV;
+  
+  return {
+    nodeEnv,
+    sentryDsn
+  }
+}
+
 function ErrorBoundary() {
   return (
     <html>
@@ -121,7 +134,27 @@ function ErrorBoundary() {
   );
 }
 
+type LoaderData = {
+  nodeEnv: string,
+  sentryDsn: string,
+}
+
 function App() {
+  const { nodeEnv, sentryDsn } = useLoaderData<LoaderData>();
+  
+  switch (true) {
+    case (nodeEnv !== "production"):
+      console.log("Running in development, ignoring Sentry initialisation...");
+    case (!sentryDsn):
+      console.error("DSN not set!");
+    default:
+      initSentry({
+        dsn: sentryDsn,
+        integrations: [new Integrations.BrowserTracing()],
+        tracesSampleRate: 1.0,
+      });
+  }
+
   return (
     <html lang="en">
       <head>

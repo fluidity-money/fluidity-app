@@ -1,5 +1,5 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { Outlet, useParams } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
 
@@ -16,14 +16,18 @@ type ProviderMap = {
 
 const Provider = ({
   network,
+  solRpc,
+  ethRpc,
   children,
 }: {
   network?: string;
+  solRpc: string;
+  ethRpc: string;
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
-    ethereum: EthereumProvider,
-    solana: SolanaProvider,
+    ethereum: EthereumProvider(ethRpc),
+    solana: SolanaProvider(solRpc),
   };
 
   const ProviderComponent = (network && providers[network]) || Fragment;
@@ -34,6 +38,9 @@ const Provider = ({
 export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
+  
+  const solanaRpcUrl = process.env.REACT_APP_FLU_SOL_RPC;
+  const ethereumRpcUrl = process.env.REACT_APP_FLU_SOL_RPC;
 
   const redirectTarget = redirect("/");
 
@@ -41,13 +48,27 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   if (network in config.drivers === false) return redirectTarget;
 
-  return true;
+  return {
+    network,
+    solanaRpcUrl,
+    ethereumRpcUrl,
+  };
 };
 
+type LoaderData = {
+  network: string;
+  solanaRpcUrl: string;
+  ethereumRpcUrl: string;
+}
+
 export default function Network() {
-  const { network } = useParams();
+  const { network, solanaRpcUrl, ethereumRpcUrl } = useLoaderData<LoaderData>();
   return (
-    <Provider network={network}>
+    <Provider
+      network={network}
+      solRpc={solanaRpcUrl}
+      ethRpc={ethereumRpcUrl}
+    >
       <Outlet />
     </Provider>
   );
