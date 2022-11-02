@@ -1,4 +1,4 @@
-DOCKERFILE_PATH: ./web/arbitrum.fluidity.money
+DOCKERFILE_PATH: ./web/ethereum.fluidity.money
 
 SERVICES:
   - FLUIDITY_FRONTEND:
