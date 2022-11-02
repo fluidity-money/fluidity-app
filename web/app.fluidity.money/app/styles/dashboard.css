@@ -301,6 +301,22 @@ main > footer > section > a {
   width: 4.5em;
 }
 
+.cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 40px;
+  background: black;
+  height: 100%;
+  width: 100%;
+}
+
+@media only screen and (max-width: 500px) {
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
 @media (max-width: 1220px) {
   .card-inner {
     grid-template-columns: 1fr;
@@ -316,17 +332,47 @@ main > footer > section > a {
   }
 }
 
-.cover {
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: black;
-  height: 100vh;
-  width: 100vw;
-}
+@media (max-width: 850px) {
+  body {
+    grid-template-columns: 0;
+  }
 
-@media only screen and (max-width: 500px) {
-  .hide-on-mobile {
+  header {
     display: none;
   }
+
+  nav {
+    display: none;
+  }
+
+  .reward-performance {
+    font-size: 2em;
+  }
+  .highest-rewarders {
+    font-size: 2em;
+  }
+
+  .provide-liquidity-left > div > h2 {
+    font-size: 2em;
+  }
 }
+
+@media (max-width: 900px) {
+  main > footer {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+  }
+}
+
+@media (max-width: 500px) {
+  main {
+    padding: 0 20px;
+  }
+  main > footer > section:first-child {
+    gap: 0.6em;
+  }
+
+  #provide-liquidity {
+    padding: 1em;}}
