@@ -50,24 +50,28 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   return {
     network,
-    solanaRpcUrl,
-    ethereumRpcUrl,
+    rpcUrls: {
+      solana: solanaRpcUrl,
+      ethereum: ethereumRpcUrl,
+    }
   };
 };
 
 type LoaderData = {
   network: string;
-  solanaRpcUrl: string;
-  ethereumRpcUrl: string;
+  rpcUrls: {
+    solana: string,
+    ethereum: string,
+  }
 }
 
 export default function Network() {
-  const { network, solanaRpcUrl, ethereumRpcUrl } = useLoaderData<LoaderData>();
+  const { network, rpcUrls } = useLoaderData<LoaderData>();
   return (
     <Provider
       network={network}
-      solRpc={solanaRpcUrl}
-      ethRpc={ethereumRpcUrl}
+      solRpc={rpcUrls.solana}
+      ethRpc={rpcUrls.ethereum}
     >
       <Outlet />
     </Provider>
