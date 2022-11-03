@@ -57,6 +57,7 @@ type (
 		BlockHash    ethereum.Hash          `json:"block_hash"`
 		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
 		BlockTime    uint64                 `json:"block_time"`
+		BaseFee      misc.BigInt            `json:"base_fee"`
 		Logs         []ethereum.Log         `json:"logs"`
 		Transactions []ethereum.Transaction `json:"transactions"`
 		BlockNumber  misc.BigInt            `json:"block_number"`
@@ -73,11 +74,16 @@ type (
 	EthereumDecoratedTransfer struct {
 		// Transaction containing the event
 		Transaction ethereum.Transaction `json:"transaction"`
+
+		Receipt ethereum.Receipt `json:"receipt"`
+
 		// Parties involved in the swap, where sender recieves the majority
 		// of a potential reward, and one party could be a smart contract
-		SenderAddress    ethereum.Address         `json:"sender_address"`
-		RecipientAddress ethereum.Address         `json:"recipient_address"`
-		Decorator        *EthereumWorkerDecorator `json:"decorator"`
+		SenderAddress ethereum.Address `json:"sender_address"`
+
+		RecipientAddress ethereum.Address `json:"recipient_address"`
+
+		Decorator *EthereumWorkerDecorator `json:"decorator"`
 
 		AppEmissions EthereumAppFees `json:"app_emissions"`
 	}

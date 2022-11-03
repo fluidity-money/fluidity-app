@@ -8,6 +8,7 @@ package solana
 // state
 
 import (
+	"encoding/json"
 	"math/big"
 
 	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
@@ -85,14 +86,13 @@ type (
 	// Transaction is part of the transaction info type
 	// returned from the Solana RPC call
 	Transaction struct {
-		// this property doesn't actually exist on the solana RPC type,
-		//  but we add it here for convenience
-		Signature   string            `json:"signature"`
 		Result      TransactionResult `json:"result"`
 		AdjustedFee *big.Rat          `json:"adjusted_fee"`
 	}
 
 	TransactionResult struct {
+		// "legacy" or 0 or sometimes unset
+		Version     json.RawMessage     `json:"version"`
 		Meta        TransactionMeta     `json:"meta"`
 		Slot        int                 `json:"slot"`
 		Transaction TransactionInnerTxn `json:"transaction"`
@@ -129,6 +129,14 @@ type (
 	TransactionMessage struct {
 		AccountKeys  []string                 `json:"accountKeys"`
 		Instructions []TransactionInstruction `json:"instructions"`
+		// only present in v0
+		AddressTableLookups []TransactionAddressTableLookups `json:"addressTableLookups"`
+	}
+
+	TransactionAddressTableLookups struct {
+		AccountKey string `json:"accountKey"`
+		ReadonlyIndexes []int `json:"readonlyIndexes"`
+		WritableIndexes []int `json:"writableIndexes"`
 	}
 
 	TransactionInnerInstruction struct {

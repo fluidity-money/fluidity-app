@@ -31,3 +31,7 @@ section#transactions {
 .justify-between {
   justify-content: space-between;
 }
+
+.transaction-table {
+  width: 100%;
+}

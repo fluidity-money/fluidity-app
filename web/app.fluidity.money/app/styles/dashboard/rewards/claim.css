@@ -1,0 +1,54 @@
+.navbar-v2 {
+  display: none;
+}
+
+#dashboard-navbar {
+  display: none;
+}
+
+#flu-logo {
+  display: none;
+}
+
+body {
+  display: flex;
+}
+
+#claim-header {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-top: 40px;
+  width: 80vw;
+  display: flex;
+  justify-content: space-between;
+}
+
+#claim-body {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.spread {
+  width: 100%;
+}
+
+.spread-text {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#cover-vid {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

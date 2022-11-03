@@ -1,32 +1,52 @@
+import type { LargestDailyWinner } from "data/monthlyLargestWinners";
+
 import {
   Heading,
   LineChart,
   numberToMonetaryString,
+  trimAddress,
 } from "@fluidity-money/surfing";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
-import { useState } from "react";
 import styles from "./RewardsStats.module.scss";
 
 interface IProps {
   changeScreen: () => void;
 }
 
+type DailyWinner = LargestDailyWinner & {
+  awarded_date: Date,
+}
+
 const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState } = useChainContext();
-  const { txCount } = apiState;
+  const { txCount, largestDailyWinnings } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
-
+  
+  // NOTE: Dummy data
+  const parsedDailyWinnings = largestDailyWinnings
+    .map(({awarded_day, ...reward}) => (
+      {
+        ...reward,
+        awarded_date: new Date(awarded_day),
+      }
+    ))
+  
   // information on top of second screen
   const InfoStats = () => (
     <div className={styles.info}>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
         <Heading as={width > breakpoint ? "h2" : "h3"}>35,000+</Heading>
-        <Heading as={width > breakpoint ? "h5" : "h6"}>Unique wallets (on testing)</Heading>
+        <Heading
+          className={styles.alignCenter}
+          as={width > breakpoint ? "h5" : "h6"}
+        >
+          Unique wallets (on testing)
+        </Heading>
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
@@ -56,8 +76,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         <div className={`${styles.stats} `}>
           <InfoStats />
         </div>
-        <div style={{ height: 254, width: "100%" }}>
-        </div>
+        <div style={{ height: 254, width: "100%" }}></div>
 
         <RewardsInfoBox
           // NOTE: Dummy data
@@ -66,9 +85,48 @@ const RewardsStats = ({ changeScreen }: IProps) => {
           changeScreen={changeScreen}
           type="transparent"
         />
+    
+        <div className={styles.rewardsChart}>
+          <LineChart 
+            data= {parsedDailyWinnings}
+            xLabel='Some X Label'
+            yLabel='Some Y Label'
+            lineLabel='Some Line Label'
+
+            accessors={{
+              xAccessor: (d: any) => d.awarded_date,
+              yAccessor: (d: any) => d.winning_amount_scaled,
+            }}
+            /*renderTooltip={({datum}: {datum: DailyWinner}) => {
+              return (
+                <div className={styles.tooltip}>
+                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                    {`${datum.awarded_date.getDate()}`.padStart(2,'0')}/
+                    {`${datum.awarded_date.getMonth() + 1}`.padStart(2,'0')}/
+                    {`${datum.awarded_date.getUTCFullYear() % 100}`.padStart(2,'0')}
+                  </span>
+                  <br/>
+                  <br />
+                  <span>
+                    <span>{trimAddress(datum.winning_address)}</span>
+                  </span>
+                  <br/>
+                  <br/>
+                  <span>
+                    <span>{numberToMonetaryString(datum.winning_amount_scaled)}{" "}</span>
+                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                      prize awarded
+                    </span>
+                  </span>
+                </div>
+              )
+            }}*/
+          />
+        </div>
       </motion.div>
     </AnimatePresence>
   );
 };
 
 export default RewardsStats;
+

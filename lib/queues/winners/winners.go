@@ -53,30 +53,12 @@ func winners(topic string, f func(Winner)) {
 	})
 }
 
-func broadcastWinners(topic string, f func(Winner)) {
-	queue.GetBroadcastMessages(topic, func(message queue.Message) {
-		var winner Winner
-
-		message.Decode(&winner)
-
-		f(winner)
-	})
-}
-
 func WinnersEthereum(f func(Winner)) {
 	winners(TopicWinnersEthereum, f)
 }
 
-func BroadcastWinnersEthereum(f func(Winner)) {
-	broadcastWinners(TopicWinnersEthereum, f)
-}
-
 func WinnersSolana(f func(Winner)) {
 	winners(TopicWinnersSolana, f)
-}
-
-func BroadcastWinnersSolana(f func(Winner)) {
-	broadcastWinners(TopicWinnersSolana, f)
 }
 
 func WinnersAll(f func(Winner)) {

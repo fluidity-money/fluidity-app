@@ -5,13 +5,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	test_utils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -34,7 +36,7 @@ type integrationTest struct {
 	ExpectedEmission worker.EthereumAppFees `json:"expected_emission"`
 
 	FluidTokenDecimals   int            `json:"token_decimals"`
-	FluidContractAddress common.Address `json:"contract_address"`
+	FluidContractAddress ethCommon.Address `json:"contract_address"`
 
 	RpcMethods  map[string]interface{} `json:"rpc_methods"`
 	CallMethods map[string]interface{} `json:"call_methods"`
@@ -108,7 +110,27 @@ func TestIntegrations(t *testing.T) {
 			client        = event.Client
 		)
 
-		fees, emission, err := applications.GetApplicationFee(transfer, client, fluidAddress, tokenDecimals)
+		txHash := common.ConvertInternalHash(transfer.Transaction.Hash)
+
+		// Get all logs in transaction
+		txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
+		// don't fail, since this doesn't always need to be set
+		if err != nil {
+			t.Logf(
+				"Couldn't fetch transaction receipt for %v! %v",
+				txHash.String(),
+				err,
+			)
+		}
+
+		fees, emission, err := applications.GetApplicationFee(
+			transfer,
+			client,
+			fluidAddress,
+			tokenDecimals,
+			txReceipt,
+		)
+
 		assert.NoError(t, err)
 
 		sender, recipient, err := applications.GetApplicationTransferParties(event.Transfer)

@@ -35,8 +35,8 @@ func TestEndpoint(t *testing.T) {
 		authEndpoint = "/restricted"
 
 		// Urls
-		url     = "http://localhost" + listenAddr + endpoint
-		authUrl = "http://localhost" + listenAddr + authEndpoint
+		url     = "http://" + listenAddr + endpoint
+		authUrl = "http://" + listenAddr + authEndpoint
 
 		// Responses
 		responseString              = "test http response string"

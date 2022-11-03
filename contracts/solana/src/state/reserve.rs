@@ -18,9 +18,11 @@ use std::{
 };
 
 /// Percentage of an obligation that can be repaid during each liquidation call
+#[allow(unused)]
 pub const LIQUIDATION_CLOSE_FACTOR: u8 = 50;
 
 /// Obligation borrow amount that is small enough to close out
+#[allow(unused)]
 pub const LIQUIDATION_CLOSE_AMOUNT: u64 = 2;
 
 /// Lending market reserve state
@@ -42,6 +44,7 @@ pub struct Reserve {
 
 impl Reserve {
     /// Create a new reserve
+    #[allow(unused)]
     pub fn new(params: InitReserveParams) -> Self {
         let mut reserve = Self::default();
         Self::init(&mut reserve, params);
@@ -49,6 +52,7 @@ impl Reserve {
     }
 
     /// Initialize a reserve
+    #[allow(unused)]
     pub fn init(&mut self, params: InitReserveParams) {
         self.version = PROGRAM_VERSION;
         self.last_update = LastUpdate::new(params.current_slot);
@@ -59,6 +63,7 @@ impl Reserve {
     }
 
     /// Record deposited liquidity and return amount of collateral tokens to mint
+    #[allow(unused)]
     pub fn deposit_liquidity(&mut self, liquidity_amount: u64) -> Result<u64, ProgramError> {
         let collateral_amount = self
             .collateral_exchange_rate()?
@@ -71,6 +76,7 @@ impl Reserve {
     }
 
     /// Record redeemed collateral and return amount of liquidity to withdraw
+    #[allow(unused)]
     pub fn redeem_collateral(&mut self, collateral_amount: u64) -> Result<u64, ProgramError> {
         let collateral_exchange_rate = self.collateral_exchange_rate()?;
         let liquidity_amount =
@@ -83,6 +89,7 @@ impl Reserve {
     }
 
     /// Calculate the current borrow rate
+    #[allow(unused)]
     pub fn current_borrow_rate(&self) -> Result<Rate, ProgramError> {
         let utilization_rate = self.liquidity.utilization_rate()?;
         let optimal_utilization_rate = Rate::from_percent(self.config.optimal_utilization_rate);
@@ -125,6 +132,7 @@ impl Reserve {
     }
 
     /// Update borrow rate and accrue interest
+    #[allow(unused)]
     pub fn accrue_interest(&mut self, current_slot: Slot) -> ProgramResult {
         let slots_elapsed = self.last_update.slots_elapsed(current_slot)?;
         if slots_elapsed > 0 {
@@ -136,6 +144,8 @@ impl Reserve {
     }
 
     /// Borrow liquidity up to a maximum market value
+    #[allow(unused)]
+
     pub fn calculate_borrow(
         &self,
         amount_to_borrow: u64,
@@ -194,6 +204,7 @@ impl Reserve {
     }
 
     /// Repay liquidity up to the borrowed amount
+    #[allow(unused)]
     pub fn calculate_repay(
         &self,
         amount_to_repay: u64,
@@ -213,6 +224,7 @@ impl Reserve {
     }
 
     /// Liquidate some or all of an unhealthy obligation
+    #[allow(unused)]
     pub fn calculate_liquidation(
         &self,
         amount_to_liquidate: u64,
@@ -299,6 +311,7 @@ impl Reserve {
 }
 
 /// Initialize a reserve
+#[allow(unused)]
 pub struct InitReserveParams {
     /// Last slot when supply and rates updated
     pub current_slot: Slot,
@@ -371,6 +384,7 @@ pub struct ReserveLiquidity {
 
 impl ReserveLiquidity {
     /// Create a new reserve liquidity
+    #[allow(unused)]
     pub fn new(params: NewReserveLiquidityParams) -> Self {
         Self {
             mint_pubkey: params.mint_pubkey,
@@ -391,6 +405,7 @@ impl ReserveLiquidity {
     }
 
     /// Add liquidity to available amount
+    #[allow(unused)]
     pub fn deposit(&mut self, liquidity_amount: u64) -> ProgramResult {
         self.available_amount = self
             .available_amount
@@ -400,6 +415,7 @@ impl ReserveLiquidity {
     }
 
     /// Remove liquidity from available amount
+    #[allow(unused)]
     pub fn withdraw(&mut self, liquidity_amount: u64) -> ProgramResult {
         if liquidity_amount > self.available_amount {
             msg!("Withdraw amount cannot exceed available amount");
@@ -413,6 +429,7 @@ impl ReserveLiquidity {
     }
 
     /// Subtract borrow amount from available liquidity and add to borrows
+    #[allow(unused)]
     pub fn borrow(&mut self, borrow_decimal: Decimal) -> ProgramResult {
         let borrow_amount = borrow_decimal.try_floor_u64()?;
         if borrow_amount > self.available_amount {
@@ -430,6 +447,7 @@ impl ReserveLiquidity {
     }
 
     /// Add repay amount to available liquidity and subtract settle amount from total borrows
+    #[allow(unused)]
     pub fn repay(&mut self, repay_amount: u64, settle_amount: Decimal) -> ProgramResult {
         self.available_amount = self
             .available_amount
@@ -442,6 +460,7 @@ impl ReserveLiquidity {
     }
 
     /// Calculate the liquidity utilization rate of the reserve
+    #[allow(unused)]
     pub fn utilization_rate(&self) -> Result<Rate, ProgramError> {
         let total_supply = self.total_supply()?;
         if total_supply == Decimal::zero() {
@@ -451,6 +470,7 @@ impl ReserveLiquidity {
     }
 
     /// Compound current borrow rate over elapsed slots
+    #[allow(unused)]
     fn compound_interest(
         &mut self,
         current_borrow_rate: Rate,
@@ -471,6 +491,7 @@ impl ReserveLiquidity {
 }
 
 /// Create a new reserve liquidity
+#[allow(unused)]
 pub struct NewReserveLiquidityParams {
     /// Reserve liquidity mint address
     pub mint_pubkey: Pubkey,
@@ -499,6 +520,7 @@ pub struct ReserveCollateral {
 
 impl ReserveCollateral {
     /// Create a new reserve collateral
+    #[allow(unused)]
     pub fn new(params: NewReserveCollateralParams) -> Self {
         Self {
             mint_pubkey: params.mint_pubkey,
@@ -508,6 +530,7 @@ impl ReserveCollateral {
     }
 
     /// Add collateral to total supply
+    #[allow(unused)]
     pub fn mint(&mut self, collateral_amount: u64) -> ProgramResult {
         self.mint_total_supply = self
             .mint_total_supply
@@ -517,6 +540,7 @@ impl ReserveCollateral {
     }
 
     /// Remove collateral from total supply
+    #[allow(unused)]
     pub fn burn(&mut self, collateral_amount: u64) -> ProgramResult {
         self.mint_total_supply = self
             .mint_total_supply
@@ -542,6 +566,7 @@ impl ReserveCollateral {
 }
 
 /// Create a new reserve collateral
+#[allow(unused)]
 pub struct NewReserveCollateralParams {
     /// Reserve collateral mint address
     pub mint_pubkey: Pubkey,
@@ -640,6 +665,7 @@ pub struct ReserveFees {
 
 impl ReserveFees {
     /// Calculate the owner and host fees on borrow
+    #[allow(unused)]
     pub fn calculate_borrow_fees(
         &self,
         borrow_amount: Decimal,
@@ -649,6 +675,7 @@ impl ReserveFees {
     }
 
     /// Calculate the owner and host fees on flash loan
+    #[allow(unused)]
     pub fn calculate_flash_loan_fees(
         &self,
         flash_loan_amount: Decimal,
@@ -713,8 +740,11 @@ impl ReserveFees {
 /// Calculate fees exlusive or inclusive of an amount
 pub enum FeeCalculation {
     /// Fee added to amount: fee = rate * amount
+    #[allow(unused)]
     Exclusive,
+
     /// Fee included in amount: fee = (rate / (1 + rate)) * amount
+    #[allow(unused)]
     Inclusive,
 }
 

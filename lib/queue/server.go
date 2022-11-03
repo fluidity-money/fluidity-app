@@ -24,7 +24,7 @@ type amqpDetails struct {
 
 var chanAmqpDetails = make(chan amqpDetails)
 
-func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel, deadLetterEnabled, autoDelete bool) (<-chan amqp.Delivery, error) {
+func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel, deadLetterEnabled bool) (<-chan amqp.Delivery, error) {
 
 	log.Debugf(
 		"Dead letter queue for %s enabled: %v",
@@ -52,11 +52,11 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 
 	_, err = channel.QueueDeclare(
 		queueName+".dead",
-		true,       // durable
-		autoDelete, // autoDelete
-		false,      // exclusive
-		false,      // noWait,
-		nil,        // args
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait,
+		nil,   // args
 	)
 
 	if err != nil {
@@ -85,10 +85,10 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 
 	_, err = channel.QueueDeclare(
 		queueName,
-		true,       // durable
-		autoDelete, // autoDelete
-		false,      // exclusive
-		false,      // noWait,
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait,
 		amqp.Table{
 			"x-dead-letter-exchange": "dead-exchange",
 		}, // args,

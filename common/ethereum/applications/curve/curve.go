@@ -128,8 +128,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		tokens_bought = tokenExchangeData[3]
 	)
 
-	contractAddress_ := transfer.Log.Address.String()
-	contractAddress := ethCommon.HexToAddress(contractAddress_)
+	contractAddress := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
 	// Get address of src token
 	soldCoinAddress_, err := ethereum.StaticCall(client, contractAddress, curveAbi, "coins", sold_id.Num())

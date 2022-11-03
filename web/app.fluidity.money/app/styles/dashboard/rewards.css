@@ -1,7 +1,7 @@
 #user-rewards {
   width: auto;
   padding: 2em;
-  margin-bottom: 6em;
+  margin-bottom: 2em;
 }
 
 #performance {
@@ -9,9 +9,7 @@
 }
 
 #infobox {
-  margin-left: 2em;
   padding: 1.5em;
-  width: 35%;
 }
 
 #unclaimed {
@@ -35,15 +33,21 @@
   margin-top: 0;
 }
 
-.statistics-set {
+.statistics-set > div {
   display: flex;
   flex-direction: column;
+  gap: 0.25em;
+}
+
+.highest-performer-child {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
 }
 
 .statistics-row {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 4em;
 }
 
@@ -54,7 +58,7 @@
   align-items: flex-end;
 }
 
-.noUserRewards {
+.no-user-rewards {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6em;
@@ -155,8 +159,8 @@
 }
 
 .card-inner {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: top;
   background: unset;
   border-radius: 12px;
@@ -184,6 +188,10 @@
   gap: 0.5em;
 }
 
+.card-left > img {
+  width: 2.5em;
+}
+
 .rewards-carousel {
   margin-left: -30px;
   margin-bottom: 50px;
@@ -193,4 +201,69 @@
   width: 360px;
   margin-right: 20px;
   margin-bottom: 50px;
+}
+
+@media (max-width: 1200px) {
+  .no-user-rewards {
+    flex-direction: column;
+    gap: 1em;
+  }
+
+  .card-inner {
+    grid-template-columns: 1fr;
+  }
+  #unclaimed-left {
+    justify-content: center;
+  }
+  #infobox {
+    margin-left: 0;
+  }
+  .statistics-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 3em;
+  }
+}
+
+@media (max-width: 950px) {
+  #unclaimed-left {
+    flex-direction: column;
+    align-items: center;
+  }
+  #unclaimed {
+    align-items: center;
+    gap: 0.5em;
+  }
+  .statistics-set .container .value > h1 {
+    font-size: 1.5em;
+  }
+
+  .highest-performer-child .provider-img {
+    width: 1.1em;
+  }
+
+  #spend-to-earn > h2 {
+    margin-bottom: 0.3em;
+  }
+}
+
+@media (max-width: 500px) {
+  .no-user-rewards {
+    align-items: center;
+    margin-bottom: 3em;
+  }
+
+  .no-user-rewards > section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .no-user-rewards > section > span {
+    text-align: center;
+  }
+
+  .provider-card-large {
+    width: 88vw;
+    min-width: 300px;
+  }
 }

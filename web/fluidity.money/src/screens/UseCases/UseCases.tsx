@@ -1,8 +1,8 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
-import { Display, ManualCarousel } from "@fluidity-money/surfing";
+import { ManualCarousel } from "@fluidity-money/surfing";
 import UseCase from "components/UseCase";
 import useViewport from "hooks/useViewport";
 import styles from "./UseCases.module.scss";
@@ -18,6 +18,7 @@ const UseCases = () => {
     <div className={styles.container}>
       {/* Missing font WHYTE INK SUPER */}
       {/*<Display */}
+      {/*  size={width > breakpoint ? "lg" : "xs"}  */}
       {/*  large={width > breakpoint && true} */}
       {/*  extraSmall={width < breakpoint && true} */}
       {/*  className={styles.backgroundText} */}

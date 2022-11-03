@@ -1,0 +1,37 @@
+name: DB Migration - Mainnet (Auto)
+
+on:
+  pull_request:
+    branches:
+      - production
+    types:
+      - closed
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  db-migration:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: mainnet
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ap-southeast-2
+          role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
+          role-duration-seconds: 7200 #seconds
+      - name: DB Migration
+        uses: ./scripts/actions
+        with:
+          command: |
+            flu migrate-db \
+              --network all \
+              --environment mainnet \
+              --tag $GITHUB_SHA
+

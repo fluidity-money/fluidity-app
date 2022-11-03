@@ -14,6 +14,7 @@ on:
         options: 
           - 'ethereum'
           - 'solana'
+          - 'arbitrum'
           - 'fluidity'
       group:
         description: 'Group'
@@ -46,7 +47,7 @@ jobs:
         with:
           lfs: true
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -54,7 +55,7 @@ jobs:
       - name: Build
         if: ${{ github.event.inputs.skip_build == 'false' }}
         id: build
-        uses: ./scripts/actions/mainnet
+        uses: ./scripts/actions
         with:
           command: |
             flu build-docker \
@@ -67,7 +68,7 @@ jobs:
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
-        uses: ./scripts/actions/mainnet
+        uses: ./scripts/actions
         with:
           command: |
             flu deploy-service \

@@ -14,6 +14,7 @@ on:
         options: 
           - 'solana'
           - 'ethereum'
+          - 'arbitrum'
           - 'all'
 
 permissions:
@@ -21,7 +22,7 @@ permissions:
   contents: read
 
 jobs:
-  build-and-deploy:
+  db-migration:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:
@@ -29,13 +30,13 @@ jobs:
         with:
           lfs: true
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
           role-duration-seconds: 7200 #seconds
       - name: DB Migration
-        uses: ./scripts/actions/staging
+        uses: ./scripts/actions
         with:
           command: |
             flu migrate-db \
