@@ -146,6 +146,7 @@ main > footer > section > a {
 .totals-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  gap: 2em;
 }
 
 .transaction-filters {
