@@ -116,3 +116,4 @@ web/app.fluidity.money/public/videos/FluidityOpportunityB.mp4 filter=lfs diff=lf
 web/app.fluidity.money/public/images/doubleDollarCoins.svg filter=lfs diff=lfs merge=lfs -text
 web/surfing/src/assets/images/buttonIcons/arrowLeftWhite.svg filter=lfs diff=lfs merge=lfs -text
 /public/images/logoOutline.png filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/images/logoOutline.png filter=lfs diff=lfs merge=lfs -text

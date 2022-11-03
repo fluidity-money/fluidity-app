@@ -211,12 +211,8 @@ export default function Dashboard() {
           {isMobile ? (
             <img src="/images/logoOutline.png" alt="Fluidity" />
           ) : isTablet ? (
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img
-                style={{ width: "5em" }}
-                src="/images/logoOutline.png"
-                alt="Fluidity"
-              />
+            <div className="top-navbar-left">
+              <img src="/images/logoOutline.png" alt="Fluidity" />
               <Text>{appName}</Text>
             </div>
           ) : (

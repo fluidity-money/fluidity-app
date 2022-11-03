@@ -85,6 +85,15 @@ main > footer > section {
   width: 5em;
 }
 
+.top-navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.top-navbar-left > img {
+  width: 5em;
+}
+
 /* .navbar-v2 {
   
 } */
