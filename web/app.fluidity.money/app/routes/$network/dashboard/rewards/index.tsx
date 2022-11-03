@@ -234,7 +234,7 @@ export default function Rewards() {
   );
 
   return (
-    <>
+    <div className="pad-main">
       {/* Info Cards */}
       {userUnclaimedRewards > 0 ? (
         <UserRewards
@@ -269,7 +269,9 @@ export default function Rewards() {
           </section>
         </div>
       )}
-      <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>Reward Performance</Heading>
+      <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
+        Reward Performance
+      </Heading>
       {/* Reward Performance */}
       {hasRewarders && (
         <section id="performance">
@@ -360,7 +362,7 @@ export default function Rewards() {
           </ManualCarousel>
         </section>
       )}
-    </>
+    </div>
   );
 }
 

@@ -20,45 +20,43 @@ const EthereumFacade = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const EthereumProvider = (rpcUrl: string) => ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-    (actions) => new MetaMask({ actions })
-  );
-
-  const [walletConnect, walletconnectHooks] =
-    initializeConnector<WalletConnect>(
-      (actions) =>
-        new WalletConnect({
-          actions,
-          options: {
-            rpc: {
-              1: rpcUrl,
-            },
-          },
-        })
+export const EthereumProvider =
+  (rpcUrl: string) =>
+  ({ children }: { children: React.ReactNode }) => {
+    const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+      (actions) => new MetaMask({ actions })
     );
 
-  const connectors: [Connector, Web3ReactHooks][] = [
-    [metaMask, metamaskHooks],
-    [walletConnect, walletconnectHooks],
-  ];
+    const [walletConnect, walletconnectHooks] =
+      initializeConnector<WalletConnect>(
+        (actions) =>
+          new WalletConnect({
+            actions,
+            options: {
+              rpc: {
+                1: rpcUrl,
+              },
+            },
+          })
+      );
 
-  const connectorHooks: { [key: string]: Web3ReactHooks } = {
-    metaMask: metamaskHooks,
-    walletConnect: walletconnectHooks,
+    const connectors: [Connector, Web3ReactHooks][] = [
+      [metaMask, metamaskHooks],
+      [walletConnect, walletconnectHooks],
+    ];
+
+    const connectorHooks: { [key: string]: Web3ReactHooks } = {
+      metaMask: metamaskHooks,
+      walletConnect: walletconnectHooks,
+    };
+
+    return (
+      <>
+        <Web3ReactProvider connectors={connectors}>
+          <EthereumFacade>{children}</EthereumFacade>
+        </Web3ReactProvider>
+      </>
+    );
   };
-
-  return (
-    <>
-      <Web3ReactProvider connectors={connectors}>
-        <EthereumFacade>{children}</EthereumFacade>
-      </Web3ReactProvider>
-    </>
-  )
-};
 
 export default EthereumProvider;

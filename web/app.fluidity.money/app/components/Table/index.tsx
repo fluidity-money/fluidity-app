@@ -65,13 +65,15 @@ const Table = <T,>(props: ITable<T>) => {
 
         {/* Filters*/}
         {filters && (
-          <div>
+          <div className={"transaction-filters"}>
             {filters.map((filter, i) => (
               <button
                 key={`filter-${filter.name}`}
                 onClick={() => setActiveFilterIndex(i)}
               >
-                <Text prominent={activeFilterIndex === i}>{filter.name}</Text>
+                <Text size="lg" prominent={activeFilterIndex === i}>
+                  {filter.name}
+                </Text>
               </button>
             ))}
           </div>

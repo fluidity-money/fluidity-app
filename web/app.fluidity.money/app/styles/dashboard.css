@@ -26,8 +26,11 @@ main {
   grid-area: main;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   overflow-y: scroll;
-  padding: 0 64px;
   overflow-y: scroll;
+}
+
+.pad-main {
+  padding: 0 64px;
 }
 
 @media only screen and (max-width: 500px) {
@@ -64,6 +67,19 @@ main > footer {
 main > footer > section {
   display: inherit;
   gap: 20px;
+}
+
+#flu-logo {
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  margin-left: 24px;
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
 }
 
 /* .navbar-v2 {
@@ -113,6 +129,12 @@ main > footer > section {
 main > footer > section > a {
   color: #828381;
   text-underline-offset: 0.12em;
+}
+
+.transaction-filters {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .transactions-header {
@@ -204,6 +226,8 @@ main > footer > section > a {
   width: auto;
   padding: 2em;
   margin-bottom: 6em;
+  margin-left: 64px;
+  margin-right: 64px;
 }
 
 .card-outer {
@@ -375,4 +399,6 @@ main > footer > section > a {
   }
 
   #provide-liquidity {
-    padding: 1em;}}
+    padding: 1em;
+  }
+}

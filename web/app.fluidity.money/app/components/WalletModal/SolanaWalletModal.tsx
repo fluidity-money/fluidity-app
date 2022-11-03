@@ -5,18 +5,15 @@ import { es } from "date-fns/locale";
 import { useCallback, useEffect, useState } from "react";
 import { ContextType } from "~/routes/$network";
 
-
 export const SolanaWalletModal = ({}) => {
- //const { wallets } = useOutletContext<ContextType>();
- //const { connection } = useConnection();
- const { wallets } = useWallet()
- //connection.getGenesisHash()
- 
+  //const { wallets } = useOutletContext<ContextType>();
+  //const { connection } = useConnection();
+  const { wallets } = useWallet();
+  //connection.getGenesisHash()
+
   return (
     <>
-      <div className="solana-wallet-modal-container">
-        {wallets.length}
-      </div>,
+      <div className="solana-wallet-modal-container">{wallets.length}</div>,
     </>
-  )
+  );
 };

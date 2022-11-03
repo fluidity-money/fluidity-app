@@ -144,7 +144,7 @@ const UnclaimedWinnings = () => {
   } = useLoaderData<LoaderData>();
 
   return (
-    <>
+    <div className="pad-main">
       {/* Info Card */}
       <UserRewards
         claimNow={true}
@@ -170,7 +170,7 @@ const UnclaimedWinnings = () => {
           renderRow={RewardRow(network)}
         />
       </section>
-    </>
+    </div>
   );
 };
 
