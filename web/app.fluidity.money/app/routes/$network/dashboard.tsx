@@ -93,6 +93,7 @@ export default function Dashboard() {
 
   const { width } = useViewport();
   const isMobile = width <= 500;
+  const isTablet = width <= 850 && width > 500;
 
   const navigationMap = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
@@ -176,7 +177,7 @@ export default function Dashboard() {
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <img src="/images/logoOutline.svg" alt="Fluidity" />
+        <img src="/images/logoOutline.png" alt="Fluidity" />
       </header>
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
@@ -208,7 +209,16 @@ export default function Dashboard() {
       <main id="dashboard-body">
         <nav id="top-navbar" className={"pad-main"}>
           {isMobile ? (
-            <img src="/logo.svg" alt="Fluidity" />
+            <img src="/images/logoOutline.png" alt="Fluidity" />
+          ) : isTablet ? (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                style={{ width: "5em" }}
+                src="/images/logoOutline.png"
+                alt="Fluidity"
+              />
+              <Text>{appName}</Text>
+            </div>
           ) : (
             <Text>{appName}</Text>
           )}
@@ -240,14 +250,16 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify */}
-            <GeneralButton
-              version={"primary"}
-              buttontype="text"
-              size={"small"}
-              handleClick={() => navigate("../fluidify")}
-            >
-              Fluidify Money
-            </GeneralButton>
+            {!isMobile && (
+              <GeneralButton
+                version={"primary"}
+                buttontype="text"
+                size={"small"}
+                handleClick={() => navigate("../fluidify")}
+              >
+                Fluidify Money
+              </GeneralButton>
+            )}
 
             {/* Prize Money */}
             <GeneralButton

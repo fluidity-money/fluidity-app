@@ -177,7 +177,7 @@ export default function Home() {
         <div className="graph-ceiling pad-main">
           {/* Statistics */}
           <div className="overlay">
-            <div className="statistics-row">
+            <div className="totals-row">
               <div className="statistics-set">
                 <Text>Total transactions</Text>
                 <Display size={"md"} style={{ margin: 0 }}>

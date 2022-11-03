@@ -171,6 +171,7 @@
   outline: unset;
   -webkit-appearance: none;
   -moz-appearance: none;
+  gap: 2em;
 }
 
 .card-section {
@@ -211,6 +212,7 @@
 
   .card-inner {
     grid-template-columns: 1fr;
+    gap: 0;
   }
   #unclaimed-left {
     justify-content: center;
