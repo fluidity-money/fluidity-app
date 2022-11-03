@@ -36,3 +36,11 @@ section#transactions {
 .transaction-table {
   width: 100%;
 }
+
+@media (max-width: 500px) {
+  .graph-ceiling {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2em;
+  }
+}
