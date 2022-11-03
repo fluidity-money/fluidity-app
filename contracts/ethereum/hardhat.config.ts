@@ -86,6 +86,8 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
 
 const networks: HardhatUserConfig['networks'] = {};
 
+const hardhat: HardhatUserConfig['networks']['hardhat'] = {};
+
 if (process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY)
   networks['ropsten'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY],
@@ -118,11 +120,9 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
   };
 
 if (process.env.FLU_ETHEREUM_FORKNET_URL)
-  networks['hardhat'] = {
-    'forking': {
-      url: process.env.FLU_ETHEREUM_FORKNET_URL,
-      blockNumber: 14098095,
-    }
+  hardhat['forking'] = {
+    url: process.env.FLU_ETHEREUM_FORKNET_URL,
+    blockNumber: 14098095,
   };
 
 /**
@@ -138,7 +138,8 @@ module.exports = {
     hardhat: {
       accounts: {
         mnemonic: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump",
-      }
+      },
+      ...hardhat,
     },
     ...networks,
   },
