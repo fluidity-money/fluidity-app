@@ -401,6 +401,7 @@ main > footer > section > a {
 }
 
 .solana-wallet-modal-container > ul > li > span > img {
+  width: 30%;
   margin-right: 10px;
 }
 
