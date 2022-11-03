@@ -70,12 +70,16 @@ type (
 		ApplicationFee *big.Rat `json:"application_fee"`
 	}
 
+	// EthereumDecoratedTransaction is a transaction, its receipt, and any
+	// associated transfers
+	EthereumDecoratedTransaction struct {
+		Transaction ethereum.Transaction `json:"transaction"`
+		Receipt ethereum.Receipt `json:"receipt"`
+		Transfers []EthereumDecoratedTransfer `json:"transfers"`
+	}
 	// Transfer with application information attached
 	EthereumDecoratedTransfer struct {
-		// Transaction containing the event
-		Transaction ethereum.Transaction `json:"transaction"`
-
-		Receipt ethereum.Receipt `json:"receipt"`
+		TransactionHash ethereum.Hash `json:"transaction_hash"`
 
 		// Parties involved in the swap, where sender recieves the majority
 		// of a potential reward, and one party could be a smart contract
@@ -90,11 +94,11 @@ type (
 
 	// Hinted block sent from the application server
 	EthereumHintedBlock struct {
-		BlockHash          ethereum.Hash               `json:"block_hash"`
-		BlockBaseFee       misc.BigInt                 `json:"block_base_fee"`
-		BlockTime          uint64                      `json:"block_time"`
-		BlockNumber        misc.BigInt                 `json:"block_number"`
-		DecoratedTransfers []EthereumDecoratedTransfer `json:"decorated_transfers"`
+		BlockHash             ethereum.Hash                                  `json:"block_hash"`
+		BlockBaseFee          misc.BigInt                                    `json:"block_base_fee"`
+		BlockTime             uint64                                         `json:"block_time"`
+		BlockNumber           misc.BigInt                                    `json:"block_number"`
+		DecoratedTransactions map[ethereum.Hash]EthereumDecoratedTransaction `json:"decorated_transfers"`
 	}
 
 	// An event the worker server sends for processing when it finds a log of interest
@@ -105,7 +109,7 @@ type (
 
 	// An individual log included in an application event
 	EthereumApplicationTransfer struct {
-		Transaction ethereum.Transaction `json:"transaction"`
+		TransactionHash ethereum.Hash `json:"transaction"`
 		// the log classified as an application transfer
 		// to be processed by the application server
 		Log ethereum.Log `json:"log"`

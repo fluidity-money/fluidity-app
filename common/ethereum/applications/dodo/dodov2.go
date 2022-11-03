@@ -16,7 +16,7 @@ import (
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -108,7 +108,7 @@ var erc20Abi ethAbi.ABI
 
 // GetDodoV2Fees calculates fees from DODOSwap, consisting of LiquidityPool (lp) Fees taken from the
 // contract, and Maintenance Fees (mt) sent to the _MAINTAINER_, if any
-func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt *ethTypes.Receipt) (*big.Rat, error) {
+func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
 	unpacked, err := dodoV2SwapAbi.Unpack("DODOSwap", transfer.Log.Data)
 
 	if err != nil {
@@ -176,7 +176,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		log.App(func(k *log.Log) {
 			k.Format(
 				"Received a Dodo swap in transaction %#v not involving the fluid token - skipping!",
-				transfer.Transaction.Hash.String(),
+				transfer.TransactionHash.String(),
 			)
 		})
 
@@ -207,7 +207,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 	// Find mtBaseTokenFee by taking last log. If last log was a transfer to
 	// the sender, mtBaseTokenFee is 0
-	txHash := ethereum.ConvertInternalHash(transfer.Transaction.Hash)
+	txHash := ethereum.ConvertInternalHash(transfer.TransactionHash)
 
 	txLogs := txReceipt.Logs
 
@@ -216,7 +216,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 	swapLogTxIndex := sort.Search(len(txLogs), func(i int) bool {
 		// txLogs.Index sorted in ascending order, so use >= op
-		return txLogs[i].Index >= swapLogBlockIndex
+		return uint(txLogs[i].Index.Uint64()) >= swapLogBlockIndex
 	})
 
 	if swapLogTxIndex == len(txLogs) {
