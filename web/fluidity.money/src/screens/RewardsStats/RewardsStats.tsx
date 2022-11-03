@@ -97,7 +97,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
               xAccessor: (d: any) => d.awarded_date,
               yAccessor: (d: any) => d.winning_amount_scaled,
             }}
-            renderTooltip={({datum}: {datum: DailyWinner}) => {
+            /*renderTooltip={({datum}: {datum: DailyWinner}) => {
               return (
                 <div className={styles.tooltip}>
                   <span style={{ color: "rgba(255,255,255, 50%)" }}>
@@ -120,7 +120,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
                   </span>
                 </div>
               )
-            }}
+            }}*/
           />
         </div>
       </motion.div>
