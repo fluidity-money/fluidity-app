@@ -1,4 +1,4 @@
-export { ToolProvider } from "./toolProvider";
-export { useToolTip } from "./toolContext";
-export { links as ToolTipLinks } from "./toolTip";
-export { ToolTipContent } from "./tooTipContent";
+export { ToolProvider } from "./ToolProvider";
+export { useToolTip } from "./ToolContext";
+export { links as ToolTipLinks } from "./ToolTip";
+export { ToolTipContent } from "./ToolTipContent";

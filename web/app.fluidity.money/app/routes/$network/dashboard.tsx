@@ -29,6 +29,7 @@ import {
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
+import IndexPage from "..";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -244,7 +245,7 @@ export default function Dashboard() {
             >
               Fluidify Money
             </GeneralButton>
-
+           
             {/* Prize Money */}
             <GeneralButton
               version={"secondary"}
@@ -263,11 +264,11 @@ export default function Dashboard() {
         </nav>
 
         <Outlet />
+        
+        {/* Provide Luquidity*/}
+        <ProvideLiquidity />
 
         <footer id="flu-socials" className="hide-on-mobile">
-          {/* Provide Luquidity*/}
-          <ProvideLiquidity />
-
           {/* Links */}
           <section>
             {/* Version */}

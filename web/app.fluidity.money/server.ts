@@ -79,7 +79,6 @@ io.on("connection", (socket) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
     let TransactionsObservable: Observable<PipedTransaction> = EMPTY;
-
     if (protocol === `ethereum`) {
       TransactionsObservable = getTransactionsObservableForIn(
         protocol,

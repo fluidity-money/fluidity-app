@@ -2,11 +2,11 @@ import { parse } from "toml";
 import { readFileSync } from "fs";
 import { resolve, join } from "path";
 import sharp from "sharp";
-import z, { string } from "zod";
+import z, { string, ZodString } from "zod";
 
 const envVar = () => {
   return {
-    default: (key: string) =>
+    default: (key: ZodString) =>
       string()
         .default(`${key}`)
         .transform((key: string): string => process.env[key] ?? ""),
@@ -21,8 +21,8 @@ const OptionsSchema = z.object({
           label: z.string(),
           testnet: z.boolean(),
           rpc: z.object({
-            http: envVar().default("FLU_RPC_HTTP"),
-            ws: envVar().default("FLU_RPC_WS"),
+            http: envVar().default(z.string()),
+            ws: envVar().default(z.string()),
           }),
           server: z.string(),
         })

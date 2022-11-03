@@ -8,7 +8,7 @@ server = "https://backend.ethereum.fluidity.money"
 [[drivers.solana]]
 label = "Solana"
 testnet = false
-rpc = { http = "FLU_SOL_RPC_HTTP", ws = "FLU_SOL_RPC_WS" }
+rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
 server = ""
 
 # Chain Configurations 
