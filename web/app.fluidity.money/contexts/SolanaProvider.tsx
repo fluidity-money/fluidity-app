@@ -6,7 +6,11 @@ import {
 
 import {
   PhantomWalletAdapter,
-  SolletExtensionWalletAdapter,
+  SolletWalletAdapter,
+  SolflareWalletAdapter,
+  CloverWalletAdapter,
+  Coin98WalletAdapter,
+  NightlyWalletAdapter
 } from "@solana/wallet-adapter-wallets";
 
 const SolanaProvider = (rpcUrl: string) => ({
@@ -19,7 +23,13 @@ const SolanaProvider = (rpcUrl: string) => ({
 
   // include more wallet suppport later once done with full implementation
   const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolletExtensionWalletAdapter()],
+    () => [new PhantomWalletAdapter(), 
+           new SolletWalletAdapter(),
+           new SolflareWalletAdapter(),
+           new NightlyWalletAdapter(),
+           new CloverWalletAdapter(),
+           new Coin98WalletAdapter(),
+          ],
     [networkCluster]
   );
 
