@@ -144,8 +144,8 @@ main > footer > section > a {
 }
 
 .totals-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 2em;
 }
 
@@ -419,12 +419,6 @@ main > footer > section > a {
   }
   main > footer > section:first-child {
     gap: 0.6em;
-  }
-
-  .totals-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2em;
   }
 
   #provide-liquidity {

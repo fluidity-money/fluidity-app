@@ -180,7 +180,7 @@ export default function Home() {
             <div className="totals-row">
               <div className="statistics-set">
                 <Text>Total transactions</Text>
-                <Display size={"md"} style={{ margin: 0 }}>
+                <Display size={"xs"} style={{ margin: 0 }}>
                   {count}
                 </Display>
                 <AnchorButton>
@@ -189,8 +189,8 @@ export default function Home() {
               </div>
               <div className="statistics-set">
                 <Text>Total yield</Text>
-                <Display size={"md"} style={{ margin: 0 }}>
-                  0
+                <Display size={"xs"} style={{ margin: 0 }}>
+                  $20,000.00
                 </Display>
                 <LinkButton
                   size="medium"
@@ -204,7 +204,7 @@ export default function Home() {
               </div>
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
-                <Display size={"md"} style={{ margin: 0 }}>
+                <Display size={"xs"} style={{ margin: 0 }}>
                   0
                 </Display>
               </div>
