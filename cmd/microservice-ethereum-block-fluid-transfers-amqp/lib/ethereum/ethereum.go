@@ -5,107 +5,74 @@
 package ethereum
 
 import (
-	"fmt"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-block-fluid-transfers-amqp/lib"
+
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 // emptyAddress to use when a transaction doesn't have a recipient
 const emptyAddress = `0x0000000000000000000000000000000000000000`
 
 // ConvertTransaction from Ethereum's definition to our internal one
-func ConvertTransaction(blockHash string, oldTransaction *ethTypes.Transaction) (*types.Transaction, error) {
-	chainId_ := oldTransaction.ChainId()
-
-	// convert to message to obtain sender address
-
-	signer := ethTypes.NewLondonSigner(chainId_)
-
-	transactionMessage, err := oldTransaction.AsMessage(signer, nil)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Failed to get a transaction signer! %v",
-			err,
-		)
-	}
-
+func ConvertTransaction(tx lib.Transaction) (*types.Transaction, error) {
 	var (
-		chainId   big.Int
-		cost      big.Int
-		gasPrice  big.Int
-		to        ethCommon.Address
-		gasFeeCap big.Int
-		gasTipCap big.Int
-		value     big.Int
+		_ = tx.BlockNumber
+
+		chainId              = big.Int(tx.ChainId)
+		gas                  = big.Int(tx.Gas)
+		gasPrice             = big.Int(tx.GasPrice)
+		maxFeePerGas         = big.Int(tx.MaxFeePerGas)
+		maxPriorityFeePerGas = big.Int(tx.MaxPriorityFeePerGas)
+		nonce                = big.Int(tx.Nonce)
+		value                = big.Int(tx.Value)
+		typ_                 = big.Int(tx.Type)
 	)
 
-	if chainId_ != nil {
-		chainId = *chainId_
+	gasPriceAddGas := new(big.Int).Mul(&gasPrice, &gas)
+
+	cost := new(big.Int).Add(gasPriceAddGas, &value)
+
+	typ := uint8(typ_.Int64())
+
+	data := ethCommon.FromHex(tx.Data)
+
+	transaction := types.Transaction{
+		BlockHash: tx.BlockHash,
+		ChainId:   misc.NewBigIntFromInt(chainId),
+		Cost:      misc.NewBigIntFromInt(*cost),
+		Data:      data,
+		Gas:       gas.Uint64(),
+		GasFeeCap: misc.NewBigIntFromInt(maxFeePerGas),
+		GasTipCap: misc.NewBigIntFromInt(maxPriorityFeePerGas),
+		GasPrice:  misc.NewBigIntFromInt(gasPrice),
+		Hash:      tx.Hash,
+		Nonce:     nonce.Uint64(),
+		To:        tx.To,
+		From:      tx.From,
+		Type:      typ,
+		Value:     misc.NewBigIntFromInt(value),
 	}
 
-	if cost_ := oldTransaction.Cost(); cost_ != nil {
-		cost = *cost_
-	}
-
-	if gasPrice_ := oldTransaction.GasPrice(); gasPrice_ != nil {
-		gasPrice = *gasPrice_
-	}
-
-	if to_ := oldTransaction.To(); to_ != nil {
-		to = *to_
-	}
-
-	if gasTipCap_ := oldTransaction.GasTipCap(); gasTipCap_ != nil {
-		gasTipCap = *gasTipCap_
-	}
-
-	if gasFeeCap_ := oldTransaction.GasFeeCap(); gasFeeCap_ != nil {
-		gasFeeCap = *gasFeeCap_
-	}
-
-	if value_ := oldTransaction.Value(); value_ != nil {
-		value = *value_
-	}
-
-	newTransaction := types.Transaction{
-		BlockHash: types.HashFromString(blockHash),
-		ChainId:   misc.NewBigInt(chainId),
-		Cost:      misc.NewBigInt(cost),
-		Data:      oldTransaction.Data(),
-		Gas:       oldTransaction.Gas(),
-		GasFeeCap: misc.NewBigInt(gasFeeCap),
-		GasTipCap: misc.NewBigInt(gasTipCap),
-		GasPrice:  misc.NewBigInt(gasPrice),
-		Hash:      ethereum.ConvertGethHash(oldTransaction.Hash()),
-		Nonce:     oldTransaction.Nonce(),
-		To:        ethereum.ConvertGethAddress(to),
-		From:      ethereum.ConvertGethAddress(transactionMessage.From()),
-		Type:      oldTransaction.Type(),
-		Value:     misc.NewBigInt(value),
-	}
-
-	return &newTransaction, nil
+	return &transaction, nil
 }
 
 // ConvertTransactions into their new type definition equivalent
-func ConvertTransactions(blockHash string, oldTransactions []*ethTypes.Transaction) ([]types.Transaction, error) {
+func ConvertTransactions(blockHash string, oldTransactions []lib.Transaction) ([]types.Transaction, error) {
 	newTransactions := make([]types.Transaction, len(oldTransactions))
 
 	for i, txn := range oldTransactions {
-		transaction, err := ConvertTransaction(blockHash, txn)
+		tx, err := ConvertTransaction(txn)
 
 		if err != nil {
 			return nil, err
 		}
 
-		newTransactions[i] = *transaction
+		newTransactions[i] = *tx
 	}
 
 	return newTransactions, nil

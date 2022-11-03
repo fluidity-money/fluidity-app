@@ -8,8 +8,6 @@ import (
 	"encoding/json"
 
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type (
@@ -45,29 +43,53 @@ type (
 		Result  []Log  `json:"result"`
 	}
 
+	// Transaction is eth_blockByHash return data
+	Transaction struct {
+		BlockHash   types.Hash    `json:"blockHash"`
+		BlockNumber hexInt        `json:"blockNumber"`
+		ChainId     hexInt        `json:"chainId"`
+		From        types.Address `json:"from"`
+		Gas         hexInt        `json:"gas"`
+		GasPrice    hexInt        `json:"gasPrice"`
+		Hash        types.Hash    `json:"hash"`
+
+		// Data encoded as a hex byte array received in the form of a string
+		Data string `json:"data"`
+
+		MaxFeePerGas         hexInt        `json:"maxFeePerGas"`
+		MaxPriorityFeePerGas hexInt        `json:"maxPriorityFeePerGas"`
+		Nonce                hexInt        `json:"nonce"`
+		To                   types.Address `json:"to"`
+
+		// Type encoded as a hex uint8
+		Type hexInt `json:"type"`
+
+		Value hexInt `json:"value"`
+	}
+
 	// Block is eth_getBlockByHash's result. Does not match
 	// ethereum's internal Block structure
 	Block struct {
-		Difficulty       string                `json:"difficulty"`
-		ExtraData        string                `json:"extraData"`
-		GasLimit         string                `json:"gasLimit"`
-		GasUsed          string                `json:"gasUsed"`
-		Hash             types.Address         `json:"hash"`
-		LogsBloom        string                `json:"logsBloom"`
-		Miner            string                `json:"miner"`
-		MixHash          string                `json:"mixHash"`
-		Nonce            string                `json:"nonce"`
-		Number           string                `json:"number"`
-		ParentHash       string                `json:"parentHash"`
-		ReceiptsRoot     string                `json:"receiptsRoot"`
-		Sha3Uncles       string                `json:"sha3Uncles"`
-		Size             string                `json:"size"`
-		StateRoot        string                `json:"stateRoot"`
-		Timestamp        string                `json:"timestamp"`
-		TotalDifficulty  string                `json:"totalDifficulty"`
-		Transactions     ethTypes.Transactions `json:"transactions"`
-		TransactionsRoot string                `json:"transactionsRoot"`
-		Uncles           []interface{}         `json:"uncles"`
+		Difficulty       string        `json:"difficulty"`
+		ExtraData        string        `json:"extraData"`
+		GasLimit         string        `json:"gasLimit"`
+		GasUsed          string        `json:"gasUsed"`
+		Hash             types.Address `json:"hash"`
+		LogsBloom        string        `json:"logsBloom"`
+		Miner            string        `json:"miner"`
+		MixHash          string        `json:"mixHash"`
+		Nonce            string        `json:"nonce"`
+		Number           string        `json:"number"`
+		ParentHash       string        `json:"parentHash"`
+		ReceiptsRoot     string        `json:"receiptsRoot"`
+		Sha3Uncles       string        `json:"sha3Uncles"`
+		Size             string        `json:"size"`
+		StateRoot        string        `json:"stateRoot"`
+		Timestamp        string        `json:"timestamp"`
+		TotalDifficulty  string        `json:"totalDifficulty"`
+		Transactions     []Transaction `json:"transactions"`
+		TransactionsRoot string        `json:"transactionsRoot"`
+		Uncles           []interface{} `json:"uncles"`
 	}
 
 	BlocksResponse struct {

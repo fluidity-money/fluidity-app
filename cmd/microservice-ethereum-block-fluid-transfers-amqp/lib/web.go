@@ -210,7 +210,8 @@ func GetBlockFromHash(gethHttpApi, blockHash string, retries int, delay int) (*B
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"could not unmarshal block resonse: %v",
+				"could not unmarshal block resonse, %#v: %v",
+				string(blockResponseResult),
 				err,
 			)
 		}

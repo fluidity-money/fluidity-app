@@ -50,8 +50,13 @@ type (
 		Cost      misc.BigInt `json:"cost"`
 		Data      misc.Blob   `json:"data"`
 		Gas       uint64      `json:"gas"`
+
+		// GasFeeCap is the maxFeePerGas
 		GasFeeCap misc.BigInt `json:"gas_fee_cap"`
+
+		// GasTipCap is the maxPriorityFeePerGas
 		GasTipCap misc.BigInt `json:"gas_tip_cap"`
+
 		GasPrice  misc.BigInt `json:"gas_price"`
 		Hash      Hash        `json:"hash"`
 		Nonce     uint64      `json:"nonce"`

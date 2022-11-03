@@ -49,9 +49,9 @@ func DecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Rewar
 
 	var (
 		winner     = ethCommon.HexToAddress(winnerString)
-		amount     = misc.NewBigInt(*amountInt)
-		startBlock = misc.NewBigInt(*startBlockInt)
-		endBlock   = misc.NewBigInt(*endBlockInt)
+		amount     = misc.NewBigIntFromInt(*amountInt)
+		startBlock = misc.NewBigIntFromInt(*startBlockInt)
+		endBlock   = misc.NewBigIntFromInt(*endBlockInt)
 	)
 
 	rewardData = RewardData{
@@ -75,7 +75,7 @@ func DecodeLegacyRewardData(log typesEth.Log, token token_details.TokenDetails) 
 		winner    = ethCommon.HexToAddress(winner_)
 		amountHex = ethereum.ConvertInternalHash(amount_)
 		amountBig = amountHex.Big()
-		amount    = misc.NewBigInt(*amountBig)
+		amount    = misc.NewBigIntFromInt(*amountBig)
 
 		blockNumber = log.BlockNumber
 		fakeStartBlock = new(misc.BigInt)
