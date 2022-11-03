@@ -49,6 +49,10 @@ type ITransactionTable = {
   address: string;
 };
 
+function ErrorBoundary() {
+  return <div />;
+}
+
 const TransactionTable = ({
   page,
   count,
@@ -181,5 +185,7 @@ const TransactionTable = ({
     />
   );
 };
+
+export { ErrorBoundary };
 
 export default TransactionTable;

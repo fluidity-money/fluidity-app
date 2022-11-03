@@ -1,4 +1,4 @@
-import { LinksFunction, LoaderFunction } from "@remix-run/node";
+import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -29,7 +29,6 @@ import {
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
-import IndexPage from "..";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -63,13 +62,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const token = config.config;
 
-  return {
+  return json({
     appName: routeMapper(pathname),
     version: "1.5",
     network,
     provider,
     token,
-  };
+  });
 };
 
 type LoaderData = {
@@ -79,6 +78,10 @@ type LoaderData = {
   provider: typeof config.liquidity_providers;
   token: typeof config.config;
 };
+
+function ErrorBoundary() {
+  return <div />;
+}
 
 export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
@@ -173,7 +176,7 @@ export default function Dashboard() {
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <img src="/logo.svg" alt="Fluidity Logo" />
+        <img src="/images/logoOutline.svg" alt="Fluidity" />
       </header>
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
@@ -203,7 +206,7 @@ export default function Dashboard() {
       </nav>
 
       <main id="dashboard-body">
-        <nav id="top-navbar">
+        <nav id="top-navbar" className={"pad-main"}>
           {isMobile ? (
             <img src="/logo.svg" alt="Fluidity" />
           ) : (
@@ -245,7 +248,7 @@ export default function Dashboard() {
             >
               Fluidify Money
             </GeneralButton>
-           
+
             {/* Prize Money */}
             <GeneralButton
               version={"secondary"}
@@ -264,11 +267,11 @@ export default function Dashboard() {
         </nav>
 
         <Outlet />
-        
+
         {/* Provide Luquidity*/}
         <ProvideLiquidity />
 
-        <footer id="flu-socials" className="hide-on-mobile">
+        <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>
             {/* Version */}
@@ -317,3 +320,5 @@ export default function Dashboard() {
     </>
   );
 }
+
+export { ErrorBoundary };

@@ -1,7 +1,6 @@
 import {
   Display,
   GeneralButton,
-  LineChart,
   LinkButton,
   Text,
 } from "@fluidity-money/surfing";
@@ -20,9 +19,10 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ params }) => {
   const network = params.network ?? "";
-  const { data, error } = await useHighestRewardStatistics("ethereum");
+
+  const { data, error } = await useHighestRewardStatistics(network);
 
   if (error || !data) {
     return redirect("/error", { status: 500, statusText: error });
