@@ -101,13 +101,13 @@ export const meta: MetaFunction = () => ({
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
-  const sentryDsn = process.env.SENTRY_ENV;
-  
+  const sentryDsn = process.env.SENTRY_DSN ?? "";
+
   return {
     nodeEnv,
-    sentryDsn
-  }
-}
+    sentryDsn,
+  };
+};
 
 function ErrorBoundary() {
   return (
@@ -135,18 +135,20 @@ function ErrorBoundary() {
 }
 
 type LoaderData = {
-  nodeEnv: string,
-  sentryDsn: string,
-}
+  nodeEnv: string;
+  sentryDsn: string;
+};
 
 function App() {
   const { nodeEnv, sentryDsn } = useLoaderData<LoaderData>();
-  
+
   switch (true) {
-    case (nodeEnv !== "production"):
+    case nodeEnv !== "production":
       console.log("Running in development, ignoring Sentry initialisation...");
-    case (!sentryDsn):
+      break;
+    case !sentryDsn:
       console.error("DSN not set!");
+      break;
     default:
       initSentry({
         dsn: sentryDsn,

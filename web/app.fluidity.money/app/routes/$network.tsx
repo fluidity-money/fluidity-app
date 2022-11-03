@@ -39,7 +39,7 @@ const Provider = ({
 export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
-  
+
   const solanaRpcUrl = process.env.FLU_ETH_RPC_HTTP;
   const ethereumRpcUrl = process.env.FLU_SOL_RPC_HTTP;
 
@@ -54,16 +54,20 @@ export const loader: LoaderFunction = async ({ params }) => {
     rpcUrls: {
       solana: solanaRpcUrl,
       ethereum: ethereumRpcUrl,
-    }
+    },
   };
 };
 
 type LoaderData = {
   network: string;
   rpcUrls: {
-    solana: string,
-    ethereum: string,
-  }
+    solana: string;
+    ethereum: string;
+  };
+};
+
+function ErrorBoundary() {
+  return <div />;
 }
 
 export default function Network() {
@@ -78,3 +82,5 @@ export default function Network() {
     </Provider>
   );
 }
+
+export { ErrorBoundary };

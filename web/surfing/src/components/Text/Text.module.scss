@@ -7,9 +7,13 @@
     letter-spacing: 0.01em;
 
     color: map-get($text, "default");
+    stroke: map-get($text, "default");
+    fill: map-get($text, "default");
     
     &.prominent {
-        color: map-get($text, "prominent")
+        color: map-get($text, "prominent");
+        stroke: map-get($text, "prominent");
+        fill: map-get($text, "prominent");
     }
 }
 

@@ -7,6 +7,8 @@ body {
   background-color: black;
   color: #828381;
   font-family: "Aeonik", sans-serif;
+
+  scroll-behavior: smooth;
 }
 
 body {
