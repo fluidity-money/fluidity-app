@@ -117,6 +117,14 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_MAINNET_URL,
   };
 
+if (process.env.FLU_ETHEREUM_FORKNET_URL)
+  networks['hardhat'] = {
+    'forking': {
+      url: process.env.FLU_ETHEREUM_FORKNET_URL,
+      blockNumber: 14098095,
+    }
+  };
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -130,11 +138,7 @@ module.exports = {
     hardhat: {
       accounts: {
         mnemonic: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump",
-      },
-      forking: {
-        url: "https://eth-mainnet.alchemyapi.io/v2/JfzgyHq6sTI5Zup6pgi13HSfc3vTlXbA",
-        blockNumber: 14098095,
-      },
+      }
     },
     ...networks,
   },
