@@ -29,7 +29,7 @@ Community multisig
 | ---------------------------------------- | ------------------------------------------ |
 | Shahmeer Chaudhry, Fluidity (shahmeerch) | 0xF8bd8362eDFf4a9D4F11e1727eca40AfA6026901 |
 | Bayge, Fluidity (bayge)                  | bayge.eth                                  |
-| Daniel T, Verilog CEO                    |                                            |
+| Daniel T, Verilog                        | 0x1763b71D0c12DD4Ad51cEf56C16Cd19C436C5c71 |
 | ZachXBT                                  |                                            |
 
 (in progress)
@@ -46,7 +46,7 @@ Emergency multisig
 | ---------------------------------------- | ------------------------------------------ |
 | Shahmeer Chaudhry, Fluidity (shahmeerch) | 0xd86f18bEB63574C2169f6fD8Aa0C6235A6FC4c8E |
 | Bayge, Fluidity (bayge)                  | 0xdcbcc6773aaf289a880037cbaffc316d4f1c96a4 |
-| Daniel T, Verilog CEO                    |                                            |
+| Daniel T, Verilog                        |                                            |
 | ZachXBT                                  |                                            |
 
 (in progress)
