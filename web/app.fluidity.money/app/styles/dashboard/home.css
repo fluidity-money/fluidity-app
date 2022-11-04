@@ -1,9 +1,9 @@
 main > section#graph {
-  min-height: 80vh;
+  min-height: 5vh;
 }
 
 section#transactions {
-  min-height: 80vh;
+  min-height: 5vh;
 }
 
 .statistics-set {

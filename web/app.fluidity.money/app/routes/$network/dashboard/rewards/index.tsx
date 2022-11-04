@@ -30,7 +30,7 @@ const address = "0xbb004de25a81cb4ed6b2abd68bcc2693615b9e04";
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
   const icons = config.provider_icons;
-  const {wallets} = config.config[network] || {};
+  const { wallets } = config.config[network] || {};
 
   const networkFee = 0.002;
   const gasFee = 0.002;
@@ -210,6 +210,26 @@ type LoaderData = {
   gasFee: number;
 };
 
+function ErrorBoundary() {
+  return (
+    <div
+      className="pad-main"
+      style={{
+        display: "flex",
+        textAlign: "center",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1>Could not load User Rewards!</h1>
+      <br />
+      <h2>Our team has been notified, and are working on fixing it!</h2>
+    </div>
+  );
+}
+
 export default function Rewards() {
   const {
     transactions,
@@ -368,6 +388,8 @@ export default function Rewards() {
     </div>
   );
 }
+
+export { ErrorBoundary };
 
 // const rewarders: Provider[] = [
 //   {

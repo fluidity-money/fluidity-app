@@ -4,7 +4,7 @@ import {
   LinkButton,
   Text,
 } from "@fluidity-money/surfing";
-import { json, LinksFunction, LoaderFunction, redirect } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { useToolTip, ToolTipContent } from "~/components";
@@ -19,13 +19,11 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
-  const network = params.network ?? "";
+export const loader: LoaderFunction = async () => {
+  const { data, errors } = await useHighestRewardStatistics("ethereum");
 
-  const { data, error } = await useHighestRewardStatistics(network);
-
-  if (error || !data) {
-    return redirect("/error", { status: 500, statusText: error });
+  if (errors || !data) {
+    throw Error(errors);
   }
 
   const winnerTotals = data.highest_reward_winner_totals.reduce(
@@ -57,13 +55,32 @@ type LoaderData = {
   highestRewards: HighestRewardResponse["data"]["highest_rewards_monthly"];
 };
 
+function ErrorBoundary() {
+  return (
+    <div
+      style={{
+        paddingTop: "40px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1>Could not load Highest Rewards</h1>
+      <br />
+      <h2>Our team has been notified, and are working on fixing it!</h2>
+    </div>
+  );
+}
+
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
   const toolTip = useToolTip();
   const [connected, setConnected] = useState(false);
   const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
   const { width } = useViewport();
-  console.log(width);
+
   const showNotification = () => {
     toolTip.open(
       `#0000ff`,
@@ -213,3 +230,5 @@ export default function IndexPage() {
     </>
   );
 }
+
+export { ErrorBoundary };

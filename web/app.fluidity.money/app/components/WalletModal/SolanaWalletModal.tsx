@@ -9,56 +9,72 @@ interface IPropsSolanaWalletModal {
   close: () => void;
 }
 
-export const SolanaWalletModal = ({ visible, close}: IPropsSolanaWalletModal) => {
+export const SolanaWalletModal = ({
+  visible,
+  close,
+}: IPropsSolanaWalletModal) => {
+  const { wallets, select } = useWallet();
+  const [modal, setModal] = useState<any>();
 
- const { wallets, select } = useWallet()
- const [modal, setModal] = useState<any>();
- 
- const selectWallet = useCallback(
-  (event: React.MouseEvent<HTMLLIElement, MouseEvent>, walletName: WalletName) => {
+  const selectWallet = useCallback(
+    (
+      event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+      walletName: WalletName
+    ) => {
       select(walletName);
-  },
-  [select]
-);
+    },
+    [select]
+  );
 
-useEffect(() => {
-  setModal(
-    createPortal(
-      <>
-        <div className={`solana-wallet-modal-container  ${visible === true ? 'show-modal' : 'hide-modal'}`}>
-          <Text prominent size="xxl" >Connect your wallet</Text>
-          <span onClick={close}><Text prominent size="xl" className="solana-modal-cancel-btn">X</Text></span>
-          <ul className="solana-modal-wallet-list">
-            {
-              wallets.map((wallet)=>
-                <><li onClick={(event)=> 
-                  selectWallet(event, wallet.adapter.name)
-                }>
-                   <span>
-                    <img src={wallet?.adapter.icon} />
-                      <Text size="xxl"
-                        className="solana-modal-wallet-names" 
-                        >
+  useEffect(() => {
+    setModal(
+      createPortal(
+        <>
+          <div
+            className={`solana-wallet-modal-container  ${
+              visible === true ? "show-modal" : "hide-modal"
+            }`}
+          >
+            <Text prominent size="xxl">
+              Connect your wallet
+            </Text>
+            <span onClick={close}>
+              <Text prominent size="xl" className="solana-modal-cancel-btn">
+                X
+              </Text>
+            </span>
+            <ul className="solana-modal-wallet-list">
+              {wallets.map((wallet) => (
+                <>
+                  <li
+                    onClick={(event) =>
+                      selectWallet(event, wallet.adapter.name)
+                    }
+                  >
+                    <span>
+                      <img src={wallet?.adapter.icon} />
+                      <Text size="xxl" className="solana-modal-wallet-names">
                         {wallet.adapter.name}
                       </Text>
-                   </span>
-                    <Text size="xs"
-                      className="solana-modal-wallet-status" 
-                    >
+                    </span>
+                    <Text size="xs" className="solana-modal-wallet-status">
                       <i>
-                        { wallet.readyState === WalletReadyState.Installed ?  'Installed' : 'Not Installed' }
+                        {wallet.readyState === WalletReadyState.Installed
+                          ? "Installed"
+                          : "Not Installed"}
                       </i>
                     </Text>
-                </li> <hr /></>
-              )
-            }
-          </ul>
-        </div>
-      </>, document.body)
-  );
-}, [visible]);
+                  </li>{" "}
+                  <hr />
+                </>
+              ))}
+            </ul>
+          </div>
+        </>,
+        document.body
+      )
+    );
+  }, [visible]);
 
-  return (
-    modal
-  )
+  return modal;
 };

@@ -4,7 +4,7 @@ body {
   grid-template-areas:
     "header main"
     "nav main";
-  grid-template-rows: 100px 1fr;
+  grid-template-rows: 150px 1fr;
   grid-template-columns: 250px 1fr;
 }
 
@@ -83,6 +83,10 @@ main > footer > section {
 
 #flu-logo > img {
   width: 5em;
+}
+
+#flu-logo > * {
+  margin-bottom: 1em;
 }
 
 #top-navbar > img {
@@ -431,13 +435,12 @@ main > footer > section > a {
   }
 }
 
-
 .solana-wallet-modal-container {
   position: absolute;
   width: 30%;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);  
+  transform: translate(-50%, -50%);
   background-color: rgb(29, 23, 23);
   padding: 30px;
 }
@@ -493,4 +496,24 @@ main > footer > section > a {
   position: absolute;
   margin: 0 0 0 40px;
   top: 90%;
+}
+
+.burger-btn {
+  height: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.burger-span {
+  height: 1px;
+  width: 12px;
+  background-color: white;
+  border-radius: 40%;
+}
+
+.burger-btn:hover > .burger-span {
+  background-color: black;
 }

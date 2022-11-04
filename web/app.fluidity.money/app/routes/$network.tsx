@@ -2,12 +2,12 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
 
 import { Fragment } from "react";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 
 type ProviderMap = {
   [key: string]:
@@ -67,11 +67,21 @@ type LoaderData = {
 };
 
 function ErrorBoundary() {
-  return <div />;
+  return (
+    <div>
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1>Could not connect to Provider!</h1>
+      <br />
+      <h2>Our team has been notified, and are working on fixing it!</h2>
+    </div>
+  );
 }
 
 export default function Network() {
   const { network, rpcUrls } = useLoaderData<LoaderData>();
+  const wallet = useWallet();
+  console.log(wallet);
+
   return (
     <Provider
       network={network}
