@@ -37,6 +37,9 @@ main {
   main {
     padding: 0 24px;
   }
+  .pad-main {
+    padding: 0;
+  }
 }
 
 main > nav {
@@ -70,16 +73,25 @@ main > footer > section {
 }
 
 #flu-logo {
-  width: 80px;
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-  margin-left: 24px;
+  margin-left: 2em;
+  margin-top: 2.25em;
+}
 
-  img {
-    max-width: 100%;
-    display: block;
-  }
+#flu-logo > img {
+  width: 5em;
+}
+
+#top-navbar > img {
+  width: 5em;
+}
+
+.top-navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.top-navbar-left > img {
+  width: 5em;
 }
 
 /* .navbar-v2 {
@@ -129,6 +141,12 @@ main > footer > section {
 main > footer > section > a {
   color: #828381;
   text-underline-offset: 0.12em;
+}
+
+.totals-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
 }
 
 .transaction-filters {
@@ -345,6 +363,11 @@ main > footer > section > a {
   .card-inner {
     grid-template-columns: 1fr;
   }
+
+  #provide-liquidity {
+    padding-top: 0;
+  }
+
   .liquidity-providers {
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
@@ -400,5 +423,6 @@ main > footer > section > a {
 
   #provide-liquidity {
     padding: 1em;
+    margin: 0 0 2em 0;
   }
 }

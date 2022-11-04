@@ -171,6 +171,7 @@
   outline: unset;
   -webkit-appearance: none;
   -moz-appearance: none;
+  gap: 2em;
 }
 
 .card-section {
@@ -211,6 +212,7 @@
 
   .card-inner {
     grid-template-columns: 1fr;
+    gap: 0;
   }
   #unclaimed-left {
     justify-content: center;
@@ -265,5 +267,16 @@
   .provider-card-large {
     width: 88vw;
     min-width: 300px;
+  }
+
+  #infobox {
+    padding: 0.5em;
+  }
+}
+
+@media (max-width: 500px) {
+  #user-rewards {
+    padding-left: 1em;
+    padding-right: 1em;
   }
 }
