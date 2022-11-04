@@ -25,11 +25,12 @@ import TransactionTable from "~/components/TransactionTable";
 import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
 import { Providers } from "~/components/ProviderIcon";
 
-const address = "bb004de25a81cb4ed6b2abd68bcc2693615b9e04";
+const address = "0xbb004de25a81cb4ed6b2abd68bcc2693615b9e04";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
   const icons = config.provider_icons;
+  const {wallets} = config.config[network] || {};
 
   const networkFee = 0.002;
   const gasFee = 0.002;
@@ -124,6 +125,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       networkFee,
       gasFee,
       icons,
+      wallets,
     });
   }
 
