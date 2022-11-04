@@ -1,8 +1,8 @@
 import { Heading } from "@fluidity-money/surfing";
-import { useParams } from "@remix-run/react";
-import { Web3Context } from "contexts/EthereumProvider";
+import { useLoaderData, useParams } from "@remix-run/react";
 import { useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import {Web3Context} from "~/util/chainUtils/web3";
 
 import config from "~/webapp.config.server";
 
@@ -10,11 +10,16 @@ type WalletModalProps = {
   open: boolean;
 };
 
+type LoaderData = {
+  wallets: typeof config.config[string]["wallets"]
+}
+
 const WalletModal = ({ open }: WalletModalProps) => {
   const {
     dispatch,
     state: { web3, account, provider, qr },
-  } = useContext(Web3Context);
+  } = useContext(Web3Context());
+  const {wallets} = useLoaderData<LoaderData>();
 
   const [modalElement, setModalElement] = useState<HTMLElement>();
 
@@ -57,7 +62,7 @@ const WalletModal = ({ open }: WalletModalProps) => {
                     </span>
                   </div>
                   <div className="wallet-modal--body">
-                    {config.config[network ?? ""].wallets?.map((wallet) => (
+                    {wallets?.map((wallet) => (
                       <div
                         className="wallet-modal--body--wallets"
                         key={wallet.id}
