@@ -90,12 +90,12 @@ func main() {
 		})
 	}
 
-	var applicationContracts []string
+	var applicationContracts []ethereum.Address
 
 	for _, address := range strings.Split(applicationContracts_, ",") {
-		addressLower := strings.ToLower(address)
+		address := ethereum.AddressFromString(address)
 
-		applicationContracts = append(applicationContracts, addressLower)
+		applicationContracts = append(applicationContracts, address)
 	}
 
 	gethClient, err := ethclient.Dial(gethHttpUrl)
