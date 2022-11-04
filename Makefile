@@ -114,7 +114,9 @@ test-go: semgrep
 	@cd ${TESTS_DIR} && ./tests-golang.sh
 
 test-contracts: semgrep
-	@cd ${CONTRACTS_DIR} && ${MAKE} test
+	@. ${TESTS_DIR}/tests-profile.sh && \
+		cd ${CONTRACTS_DIR} && \
+		${MAKE} test
 
 test: semgrep test-go test-contracts
 
