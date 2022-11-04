@@ -260,7 +260,7 @@ export default function Dashboard() {
             );
           })}
         </ul>
-    
+
         {/* Connect Wallet Button */}
         <GeneralButton
           version={connected ? "transparent" : "primary"}
@@ -277,7 +277,6 @@ export default function Dashboard() {
 
       <main id="dashboard-body">
         <nav id="top-navbar" className={"pad-main"}>
-
           {/* App Name */}
           {isMobile ? (
             <img src="/images/logoOutline.png" alt="Fluidity" />
@@ -344,12 +343,9 @@ export default function Dashboard() {
             >
               ${unclaimedRewards}
             </GeneralButton>
-    
-            {(isTablet || isMobile) && (
-              <BurgerButton />
-            )}
-          </div>
 
+            {(isTablet || isMobile) && <BurgerButton />}
+          </div>
         </nav>
 
         {/* Connect Wallet Modal */}

@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async () => {
   const { data, errors } = await useHighestRewardStatistics("ethereum");
 
   if (errors || !data) {
-    throw Error(errors)
+    throw Error(errors);
   }
 
   const winnerTotals = data.highest_reward_winner_totals.reduce(
@@ -73,7 +73,6 @@ function ErrorBoundary() {
     </div>
   );
 }
-
 
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
@@ -232,4 +231,4 @@ export default function IndexPage() {
   );
 }
 
-export { ErrorBoundary }
+export { ErrorBoundary };

@@ -1,7 +1,4 @@
-import {
-  useNavigate,
-  Link,
-} from "@remix-run/react";
+import { useNavigate, Link } from "@remix-run/react";
 import { useState } from "react";
 import { trimAddress } from "~/util";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -23,28 +20,34 @@ type IMobileModal = {
   chains: any;
   unclaimedFluid: number;
   network: string;
-}
+};
 
-export default function MobileModal({navigationMap, activeIndex, chains, network, unclaimedFluid}: IMobileModal) {
+export default function MobileModal({
+  navigationMap,
+  activeIndex,
+  chains,
+  network,
+  unclaimedFluid,
+}: IMobileModal) {
   const navigate = useNavigate();
 
-  const [walletModalVisibility, setWalletModalVisibility] = useState<boolean>(false);
+  const [walletModalVisibility, setWalletModalVisibility] =
+    useState<boolean>(false);
 
-  const [chainModalVisibility, setChainModalVisibility] = useState<boolean>(false);
+  const [chainModalVisibility, setChainModalVisibility] =
+    useState<boolean>(false);
 
   const { connected, publicKey } = useWallet();
 
   if (walletModalVisibility) {
-    return (
-      network === "solana" ? (
-        <SolanaWalletModal
-          visible={walletModalVisibility}
-          close={() => setWalletModalVisibility(false)}
-        />
-      ) : null
-    )
-  };
-  
+    return network === "solana" ? (
+      <SolanaWalletModal
+        visible={walletModalVisibility}
+        close={() => setWalletModalVisibility(false)}
+      />
+    ) : null;
+  }
+
   if (chainModalVisibility) {
     return (
       <ChainModal
@@ -53,7 +56,7 @@ export default function MobileModal({navigationMap, activeIndex, chains, network
         network={network}
         chains={chains}
       />
-    )
+    );
   }
 
   return (
@@ -72,7 +75,7 @@ export default function MobileModal({navigationMap, activeIndex, chains, network
             ? trimAddress(publicKey?.toString() as unknown as string)
             : `Connnect Wallet`}
         </GeneralButton>
-    
+
         {/* Chain Switcher */}
         <ChainSelectorButton
           chain={chains[network as "ethereum" | "solana"]}
@@ -83,30 +86,32 @@ export default function MobileModal({navigationMap, activeIndex, chains, network
       {/* Mobile Navbar */}
       <nav id="dashboard-navbar" className={"navbar-v2"}>
         <ul>
-          {navigationMap.map((obj: {name: string, icon: JSX.Element}, index: number) => {
-            const key = Object.keys(obj)[0];
-            const { name, icon } = Object.values(obj)[0];
-            const active = index === activeIndex;
+          {navigationMap.map(
+            (obj: { name: string; icon: JSX.Element }, index: number) => {
+              const key = Object.keys(obj)[0];
+              const { name, icon } = Object.values(obj)[0];
+              const active = index === activeIndex;
 
-            return (
-              <li key={key}>
-                {index === activeIndex ? (
-                  <motion.div className={"active"} layoutId="active" />
-                ) : (
-                  <div />
-                )}
-                <Link to={key}>
-                  <Text prominent={active}>
-                    {icon} {name}
-                  </Text>
-                </Link>
-              </li>
-            );
-          })}
+              return (
+                <li key={key}>
+                  {index === activeIndex ? (
+                    <motion.div className={"active"} layoutId="active" />
+                  ) : (
+                    <div />
+                  )}
+                  <Link to={key}>
+                    <Text prominent={active}>
+                      {icon} {name}
+                    </Text>
+                  </Link>
+                </li>
+              );
+            }
+          )}
         </ul>
       </nav>
-    
-      { /* Unclaimed Winnings */ }
+
+      {/* Unclaimed Winnings */}
       <GeneralButton
         version={"secondary"}
         buttontype="icon after"
@@ -121,7 +126,7 @@ export default function MobileModal({navigationMap, activeIndex, chains, network
         Unclaimed $FLUID <Heading>${unclaimedFluid}</Heading>
       </GeneralButton>
 
-      { /* Fluidify Money */ }
+      {/* Fluidify Money */}
       <GeneralButton
         version={"primary"}
         buttontype="text"
@@ -131,13 +136,16 @@ export default function MobileModal({navigationMap, activeIndex, chains, network
         Fluidify Money
       </GeneralButton>
 
-        <footer>
-          {/* Fluidity Website */}
-          <LinkButton size="small" type="external" handleClick={() => navigate("https://staging.fluidity.money")}>
-              Fluidity Money Website
-          </LinkButton>
-        </footer>
+      <footer>
+        {/* Fluidity Website */}
+        <LinkButton
+          size="small"
+          type="external"
+          handleClick={() => navigate("https://staging.fluidity.money")}
+        >
+          Fluidity Money Website
+        </LinkButton>
+      </footer>
     </div>
   );
 }
-
