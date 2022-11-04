@@ -1,46 +1,42 @@
 import useViewport from "~/hooks/useViewport";
-import { useNavigate, useParams, useLocation } from "@remix-run/react";
+import { useNavigate, useLocation } from "@remix-run/react";
 import { createPortal } from "react-dom";
 import { BlockchainModal } from "@fluidity-money/surfing";
 import { useState, useEffect } from "react";
 
+type ChainOption = {
+  [network: string]: {
+    name: string;
+    icon: JSX.Element;
+  };
+};
+
 type IChainModal = {
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  chains: ChainOption;
+  network: string;
 };
 
-const ChainModal = ({ visible, setVisible }: IChainModal) => {
+const ChainModal = ({ visible, setVisible, chains, network }: IChainModal) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { network } = useParams();
-
-  if (!network) {
-    throw Error(`no network provided!`);
-  }
-  
   const networkMapper = (network: string) => {
     switch (network) {
-    case "ETH": return "ethereum"
-    case "SOL": return "solana"
-    case "ethereum": return "ETH"
-    case "solana": return "SOL"
-  }
-  }
+      case "ETH":
+        return "ethereum";
+      case "SOL":
+        return "solana";
+      case "ethereum":
+        return "ETH";
+      case "solana":
+        return "SOL";
+    }
+  };
 
   const { width } = useViewport();
   const mobileBreakpoint = 500;
-
-  const options = {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  };
 
   const setChain = (network: string) => {
     const { pathname } = location;
@@ -66,8 +62,6 @@ const ChainModal = ({ visible, setVisible }: IChainModal) => {
       modalRoot.removeChild(el);
     };
   }, []);
-  
-  console.log(Object.values(options));
 
   return (
     <>
@@ -77,9 +71,9 @@ const ChainModal = ({ visible, setVisible }: IChainModal) => {
           <div className="cover">
             <BlockchainModal
               handleModal={setVisible}
-              option={options[network as "ethereum" | "solana"]}
+              option={chains[network]}
               className={"hello"}
-              options={Object.values(options)}
+              options={Object.values(chains)}
               setOption={setChain}
               mobile={width <= mobileBreakpoint}
             />

@@ -88,7 +88,10 @@ type LoaderData = {
 function ErrorBoundary() {
   return (
     <div>
-      Error!
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1>Could not load Dashboard!</h1>
+      <br />
+      <h2>Our team has been notified, and are working on fixing it!</h2>
     </div>
   );
 }
@@ -97,7 +100,6 @@ export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { state } = useContext(Web3Context());
   const account = state.account ?? "";
@@ -113,24 +115,16 @@ export default function Dashboard() {
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
-  const chainNameMap = (network: string) => {
-    switch (network) {
-      case "solana":
-        return {
-          name: "SOL",
-          icon: <img src="/assets/chains/solanaIcon.svg" />,
-        };
-
-      // Ethereum
-      default:
-        return {
-          name: "ETH",
-          icon: <img src="/assets/chains/ethIcon.svg" />,
-        };
-    }
+  const chainNameMap = {
+    ethereum: {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    solana: {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
   };
-
-  const chainOptions = chainNameMap(network);
 
   const matches = useMatches();
   const toolTip = useToolTip();
@@ -221,7 +215,7 @@ export default function Dashboard() {
         <br />
 
         <ChainSelectorButton
-          chain={chainNameMap(network)}
+          chain={chainNameMap[network as "ethereum" | "solana"]}
           onClick={() => setChainModalVisibility(true)}
         />
       </header>
@@ -229,6 +223,8 @@ export default function Dashboard() {
       <ChainModal
         visible={chainModalVisibility}
         setVisible={setWalletModalVisibility}
+        network={network}
+        chains={chainNameMap}
       />
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>

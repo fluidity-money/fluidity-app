@@ -63,7 +63,7 @@ export default function IndexPage() {
   const [connected, setConnected] = useState(false);
   const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
   const { width } = useViewport();
-  console.log(width);
+
   const showNotification = () => {
     toolTip.open(
       `#0000ff`,
