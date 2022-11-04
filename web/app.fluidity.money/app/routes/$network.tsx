@@ -39,8 +39,8 @@ export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
 
-  const solanaRpcUrl = process.env.FLU_ETH_RPC_HTTP;
-  const ethereumRpcUrl = process.env.FLU_SOL_RPC_HTTP;
+  const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
+  const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;
 
   const redirectTarget = redirect("/");
 
