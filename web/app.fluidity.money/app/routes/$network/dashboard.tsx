@@ -4,6 +4,7 @@ import {
   Outlet,
   useLoaderData,
   useNavigate,
+  useLocation,
   useResolvedPath,
   useMatches,
   useTransition,
@@ -26,10 +27,12 @@ import {
   GeneralButton,
   Trophy,
   Text,
+  ChainSelectorButton,
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ChainModal from "~/components/ChainModal";
 import { BlobOptions } from "buffer";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -83,13 +86,18 @@ type LoaderData = {
 };
 
 function ErrorBoundary() {
-  return <div />;
+  return (
+    <div>
+      Error!
+    </div>
+  );
 }
 
 export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { state } = useContext(Web3Context());
   const account = state.account ?? "";
@@ -105,6 +113,25 @@ export default function Dashboard() {
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
+  const chainNameMap = (network: string) => {
+    switch (network) {
+      case "solana":
+        return {
+          name: "SOL",
+          icon: <img src="/assets/chains/solanaIcon.svg" />,
+        };
+
+      // Ethereum
+      default:
+        return {
+          name: "ETH",
+          icon: <img src="/assets/chains/ethIcon.svg" />,
+        };
+    }
+  };
+
+  const chainOptions = chainNameMap(network);
+
   const matches = useMatches();
   const toolTip = useToolTip();
   const transitionPath = useTransition().location?.pathname;
@@ -117,10 +144,13 @@ export default function Dashboard() {
   );
 
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
-  const [walletModalVisibility, setWalletModalVisibility] = useState<boolean>(false);
+  const [walletModalVisibility, setWalletModalVisibility] =
+    useState<boolean>(false);
+  const [chainModalVisibility, setChainModalVisibility] =
+    useState<boolean>(false);
 
-  const { connected, publicKey } = useWallet()
-  
+  const { connected, publicKey } = useWallet();
+
   useEffect(() => {
     (async () => {
       const { data, error } = await useUserUnclaimedRewards(network, account);
@@ -151,7 +181,9 @@ export default function Dashboard() {
     const connected_wallet =
       network === `ethereum`
         ? `0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6`
-        : connected ? publicKey?.toString() : 'JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi';
+        : connected
+        ? publicKey?.toString()
+        : "JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi";
 
     const socket = io();
     socket.emit("subscribeTransactions", {
@@ -185,7 +217,19 @@ export default function Dashboard() {
     <>
       <header id="flu-logo" className="hide-on-mobile">
         <img src="/images/logoOutline.png" alt="Fluidity" />
+
+        <br />
+
+        <ChainSelectorButton
+          chain={chainNameMap(network)}
+          onClick={() => setChainModalVisibility(true)}
+        />
       </header>
+
+      <ChainModal
+        visible={chainModalVisibility}
+        setVisible={setWalletModalVisibility}
+      />
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
         <ul>
@@ -203,8 +247,7 @@ export default function Dashboard() {
                 )}
                 <Link to={key}>
                   <Text prominent={active}>
-                    {icon}
-                    {name}
+                    {icon} {name}
                   </Text>
                 </Link>
               </li>
@@ -218,7 +261,9 @@ export default function Dashboard() {
           handleClick={() => !connected && setWalletModalVisibility(true)}
           className="connect-wallet-btn"
         >
-          {connected ? trimAddress(publicKey?.toString() as unknown as string) : `Connnect Wallet`}
+          {connected
+            ? trimAddress(publicKey?.toString() as unknown as string)
+            : `Connnect Wallet`}
         </GeneralButton>
       </nav>
 
@@ -290,7 +335,12 @@ export default function Dashboard() {
           </div>
         </nav>
 
-        {network === `solana` ? <SolanaWalletModal visible={walletModalVisibility} close={()=> setWalletModalVisibility(false)}/> : null}
+        {network === `solana` ? (
+          <SolanaWalletModal
+            visible={walletModalVisibility}
+            close={() => setWalletModalVisibility(false)}
+          />
+        ) : null}
         <Outlet />
 
         {/* Provide Luquidity*/}

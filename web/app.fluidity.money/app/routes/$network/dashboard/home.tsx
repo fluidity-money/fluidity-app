@@ -139,7 +139,19 @@ type LoaderData = {
 };
 
 function ErrorBoundary() {
-  return <div />;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1>Could not fetch transactions!</h1>
+    </div>
+  );
 }
 
 export default function Home() {
