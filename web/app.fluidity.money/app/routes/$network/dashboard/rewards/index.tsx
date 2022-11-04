@@ -180,6 +180,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     fluidPairs: 8,
     networkFee,
     gasFee,
+    icons,
   });
 };
 
