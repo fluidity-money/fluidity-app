@@ -183,7 +183,11 @@ func main() {
 
 			if err != nil {
 			    log.Fatal(func(k *log.Log) {
-			        k.Message = "Failed to fetch receipt!"
+			        k.Format(
+						"Failed to fetch receipt for transaction %s!",
+						transactionHash.String(),
+					)
+
 			        k.Payload = err
 			    })
 			}
@@ -230,7 +234,11 @@ func main() {
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
-						k.Message = "Failed to get the sender and receiver for an application transfer!"
+						k.Format(
+							"Failed to get the sender and receiver for an application transfer with hash %s!",
+							transactionHash.String(),
+						)
+
 						k.Payload = err
 					})
 				}
@@ -280,7 +288,11 @@ func main() {
 
 				if err != nil {
 				    log.Fatal(func(k *log.Log) {
-				        k.Message = "Failed to fetch receipt!"
+				        k.Format(
+							"Failed to fetch receipt for transaction %s!",
+							transactionHash.String(),
+						)
+
 				        k.Payload = err
 				    })
 				}
