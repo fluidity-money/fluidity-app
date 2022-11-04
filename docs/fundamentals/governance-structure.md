@@ -46,7 +46,7 @@ Emergency multisig
 | ---------------------------------------- | ------------------------------------------ |
 | Shahmeer Chaudhry, Fluidity (shahmeerch) | 0xd86f18bEB63574C2169f6fD8Aa0C6235A6FC4c8E |
 | Bayge, Fluidity                          | 0xdcbcc6773aaf289a880037cbaffc316d4f1c96a4 |
-| Daniel T, Verilog                        |                                            |
+| Daniel T, Verilog                        | 0xddbd06a518627286a05822ef103ba57058650ae9 |
 | ZachXBT                                  |                                            |
 
 (in progress)
