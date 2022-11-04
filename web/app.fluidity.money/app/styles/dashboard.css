@@ -33,6 +33,10 @@ main {
   padding: 0 64px;
 }
 
+.pad-main {
+  padding: 0 64px;
+}
+
 @media only screen and (max-width: 500px) {
   main {
     padding: 0 24px;
@@ -425,4 +429,68 @@ main > footer > section > a {
     padding: 1em;
     margin: 0 0 2em 0;
   }
+}
+
+
+.solana-wallet-modal-container {
+  position: absolute;
+  width: 30%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  
+  background-color: rgb(29, 23, 23);
+  padding: 30px;
+}
+
+.solana-wallet-modal-container > ul > li {
+  width: 100%;
+  display: flex;
+  list-style: none;
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+.solana-wallet-modal-container > ul > li > span {
+  width: 100%;
+  display: flex;
+}
+
+.solana-wallet-modal-container > ul > li > span > img {
+  width: 30%;
+  margin-right: 10px;
+}
+
+.solana-modal-cancel-btn {
+  cursor: pointer;
+  float: right;
+  margin-top: -20px;
+}
+
+.solana-modal-wallet-list {
+  background-color: white;
+  padding: 30px;
+}
+
+.solana-modal-wallet-names {
+  margin-top: 20px;
+}
+
+.solana-modal-wallet-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.show-modal {
+  display: block;
+}
+
+.hide-modal {
+  display: none;
+}
+
+.connect-wallet-btn {
+  position: absolute;
+  margin: 0 0 0 40px;
+  top: 90%;
 }

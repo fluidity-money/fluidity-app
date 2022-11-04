@@ -7,6 +7,7 @@ import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
 
 import { Fragment } from "react";
+import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 
 type ProviderMap = {
   [key: string]:

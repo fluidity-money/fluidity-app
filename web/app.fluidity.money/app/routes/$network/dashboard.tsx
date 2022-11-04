@@ -29,6 +29,9 @@ import {
 } from "@fluidity-money/surfing";
 
 import dashboardStyles from "~/styles/dashboard.css";
+import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import { BlobOptions } from "buffer";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -114,7 +117,10 @@ export default function Dashboard() {
   );
 
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
+  const [walletModalVisibility, setWalletModalVisibility] = useState<boolean>(false);
 
+  const { connected, publicKey } = useWallet()
+  
   useEffect(() => {
     (async () => {
       const { data, error } = await useUserUnclaimedRewards(network, account);
@@ -141,10 +147,11 @@ export default function Dashboard() {
     })();
 
     // Test for now, wallet address should be gotten when a wallet is connected
+    // take out hard coded address later.
     const connected_wallet =
       network === `ethereum`
         ? `0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6`
-        : `JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi`;
+        : connected ? publicKey?.toString() : 'JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi';
 
     const socket = io();
     socket.emit("subscribeTransactions", {
@@ -204,6 +211,15 @@ export default function Dashboard() {
             );
           })}
         </ul>
+        <GeneralButton
+          version={connected ? "transparent" : "primary"}
+          buttontype="text"
+          size={"medium"}
+          handleClick={() => !connected && setWalletModalVisibility(true)}
+          className="connect-wallet-btn"
+        >
+          {connected ? trimAddress(publicKey?.toString() as unknown as string) : `Connnect Wallet`}
+        </GeneralButton>
       </nav>
 
       <main id="dashboard-body">
@@ -274,6 +290,7 @@ export default function Dashboard() {
           </div>
         </nav>
 
+        {network === `solana` ? <SolanaWalletModal visible={walletModalVisibility} close={()=> setWalletModalVisibility(false)}/> : null}
         <Outlet />
 
         {/* Provide Luquidity*/}
