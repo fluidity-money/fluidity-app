@@ -497,3 +497,23 @@ main > footer > section > a {
   margin: 0 0 0 40px;
   top: 90%;
 }
+
+.burger-btn {
+  height: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.burger-span {
+  height: 1px;
+  width: 12px;
+  background-color: white;
+  border-radius: 40%;
+}
+
+.burger-btn:hover > .burger-span {
+  background-color: black;
+}

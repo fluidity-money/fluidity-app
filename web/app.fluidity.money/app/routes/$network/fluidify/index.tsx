@@ -63,7 +63,15 @@ export const links = () => {
 
 function ErrorBoundary() {
   return (
-    <div>
+    <div
+      style={{
+        paddingTop: "40px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1>Could not load Fluidify!</h1>
       <br />

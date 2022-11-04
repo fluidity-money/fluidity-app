@@ -45,7 +45,7 @@ export type HighestRewardResponse = {
       total_winnings: number;
     }>;
   };
-  error?: string;
+  errors?: any;
 };
 
 const useHighestRewardStatistics = async (network: string) => {
@@ -59,7 +59,7 @@ const useHighestRewardStatistics = async (network: string) => {
     variables,
     query: query[network],
   };
-  const response = jsonPost<HighestRewardBody, HighestRewardResponse>(
+  const response = await jsonPost<HighestRewardBody, HighestRewardResponse>(
     url,
     body
   );

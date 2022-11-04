@@ -4,7 +4,6 @@ import {
   Outlet,
   useLoaderData,
   useNavigate,
-  useLocation,
   useResolvedPath,
   useMatches,
   useTransition,
@@ -15,6 +14,7 @@ import { Web3Context } from "~/util/chainUtils/web3";
 import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
 import { motion } from "framer-motion";
+import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
 import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
@@ -87,7 +87,16 @@ type LoaderData = {
 
 function ErrorBoundary() {
   return (
-    <div>
+    <div
+      className="pad-main"
+      style={{
+        paddingTop: "40px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1>Could not load Dashboard!</h1>
       <br />
@@ -222,12 +231,13 @@ export default function Dashboard() {
 
       <ChainModal
         visible={chainModalVisibility}
-        setVisible={setWalletModalVisibility}
+        setVisible={setChainModalVisibility}
         network={network}
         chains={chainNameMap}
       />
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
+        {/* Nav Bar */}
         <ul>
           {navigationMap.map((obj, index) => {
             const key = Object.keys(obj)[0];
@@ -250,6 +260,8 @@ export default function Dashboard() {
             );
           })}
         </ul>
+    
+        {/* Connect Wallet Button */}
         <GeneralButton
           version={connected ? "transparent" : "primary"}
           buttontype="text"
@@ -265,6 +277,8 @@ export default function Dashboard() {
 
       <main id="dashboard-body">
         <nav id="top-navbar" className={"pad-main"}>
+
+          {/* App Name */}
           {isMobile ? (
             <img src="/images/logoOutline.png" alt="Fluidity" />
           ) : isTablet ? (
@@ -275,6 +289,8 @@ export default function Dashboard() {
           ) : (
             <Text>{appName}</Text>
           )}
+
+          {/* Navigation Buttons */}
           <div>
             {/* Send */}
             {/*
@@ -328,9 +344,15 @@ export default function Dashboard() {
             >
               ${unclaimedRewards}
             </GeneralButton>
+    
+            {(isTablet || isMobile) && (
+              <BurgerButton />
+            )}
           </div>
+
         </nav>
 
+        {/* Connect Wallet Modal */}
         {network === `solana` ? (
           <SolanaWalletModal
             visible={walletModalVisibility}

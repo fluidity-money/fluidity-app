@@ -141,6 +141,7 @@ type LoaderData = {
 function ErrorBoundary() {
   return (
     <div
+      className="pad-main"
       style={{
         display: "flex",
         flexDirection: "column",
