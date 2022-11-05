@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { GeneralButton } from "@fluidity-money/surfing";
-import { useState } from "react";
 
-export const BurgerMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface IBurgerMenuProps {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
+export const BurgerMenu = ({ isOpen, setIsOpen }: IBurgerMenuProps) => {
   const diagonalVariants = {
     rotateD: { rotate: 45, y: 4 },
     rotateU: { rotate: -45, y: -4 },

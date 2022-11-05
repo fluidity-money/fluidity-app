@@ -35,6 +35,7 @@ import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import ChainModal from "~/components/ChainModal";
 import { BlobOptions } from "buffer";
 import { useWallet } from "@solana/wallet-adapter-react";
+import MobileModal from "~/components/MobileModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -108,6 +109,8 @@ function ErrorBoundary() {
 export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
 
+  const [openMobModal, setOpenMobModal] = useState(false);
+
   const navigate = useNavigate();
 
   const { state } = useContext(Web3Context());
@@ -143,7 +146,9 @@ export default function Dashboard() {
     useResolvedPath(Object.keys(obj)[0])
   );
   const activeIndex = resolvedPaths.findIndex(
-    (path) => path.pathname === currentPath
+    (path) =>
+      path.pathname === currentPath ||
+      path.pathname === currentPath.slice(0, -1)
   );
 
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
@@ -219,7 +224,7 @@ export default function Dashboard() {
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <img src="/images/logoOutline.png" alt="Fluidity" />
+        <img src="/images/outlinedLogo.svg" alt="Fluidity" />
 
         <br />
 
@@ -252,7 +257,14 @@ export default function Dashboard() {
                   <div />
                 )}
                 <Link to={key}>
-                  <Text prominent={active}>
+                  <Text
+                    prominent={active}
+                    className={
+                      active
+                        ? "dashboard-navbar-active"
+                        : "dashboard-navbar-default"
+                    }
+                  >
                     {icon} {name}
                   </Text>
                 </Link>
@@ -279,10 +291,10 @@ export default function Dashboard() {
         <nav id="top-navbar" className={"pad-main"}>
           {/* App Name */}
           {isMobile ? (
-            <img src="/images/logoOutline.png" alt="Fluidity" />
+            <img src="/images/outlinedLogo.svg" alt="Fluidity" />
           ) : isTablet ? (
             <div className="top-navbar-left">
-              <img src="/images/logoOutline.png" alt="Fluidity" />
+              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               <Text>{appName}</Text>
             </div>
           ) : (
@@ -318,7 +330,7 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify */}
-            {!isMobile && (
+            {width > 550 && (
               <GeneralButton
                 version={"primary"}
                 buttontype="text"
@@ -331,7 +343,7 @@ export default function Dashboard() {
 
             {/* Prize Money */}
             <GeneralButton
-              version={"secondary"}
+              version={"transparent"}
               buttontype="icon after"
               size={"small"}
               handleClick={() =>
@@ -344,7 +356,9 @@ export default function Dashboard() {
               ${unclaimedRewards}
             </GeneralButton>
 
-            {(isTablet || isMobile) && <BurgerButton />}
+            {(isTablet || isMobile) && (
+              <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
+            )}
           </div>
         </nav>
 
@@ -355,6 +369,7 @@ export default function Dashboard() {
             close={() => setWalletModalVisibility(false)}
           />
         ) : null}
+
         <Outlet />
 
         {/* Provide Luquidity*/}
