@@ -1,5 +1,6 @@
 import { Heading } from "@fluidity-money/surfing";
 import { useLoaderData, useParams } from "@remix-run/react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Web3Context } from "~/util/chainUtils/web3";
@@ -15,17 +16,31 @@ type LoaderData = {
 };
 
 const WalletModal = ({ open }: WalletModalProps) => {
+
+  const { network } = useParams();
+  
   const {
     dispatch,
     state: { web3, account, provider, qr },
   } = useContext(Web3Context());
-  const { wallets } = useLoaderData<LoaderData>();
 
+  const { select } = useWallet()
+
+  let wallets :any = null;
+  switch(network) {
+    case `ethereum`:
+      wallets = useLoaderData<LoaderData>();
+      break;
+    case `solana`:
+      wallets = useWallet()
+      break;
+    default:
+      throw 'invalid chain network selected';
+  }
+  
   const [modalElement, setModalElement] = useState<HTMLElement>();
 
   const [selected, setSelected] = useState<string | undefined>();
-
-  const { network } = useParams();
 
   useEffect(() => {
     const modalRoot = document.body;
@@ -62,23 +77,51 @@ const WalletModal = ({ open }: WalletModalProps) => {
                     </span>
                   </div>
                   <div className="wallet-modal--body">
-                    {wallets?.map((wallet) => (
-                      <div
-                        className="wallet-modal--body--wallets"
-                        key={wallet.id}
-                        onClick={() => {
-                          dispatch({
-                            type: "CONNECT",
-                            payload: {
-                              driver: wallet.id as never,
-                            },
-                          });
-                        }}
-                      >
-                        <img src={wallet.logo} alt={wallet.name} />
-                        <span>{wallet.name}</span>
-                      </div>
-                    ))}
+                    {wallets?.map((wallet: any, index: number) => {
+                      
+                      let typeKey :number = index;
+                      let walletName :string = ``;
+                      let walletIcon: string = ``;
+
+                      if(network === `ethereum`) {
+                        typeKey = wallet.id;
+                        walletName = wallet.name;
+                        walletIcon = wallet.logo;
+                      }else if( network === `solana`) {
+                        typeKey = index;
+                        walletName = wallet?.adapter.name;
+                        walletIcon = wallet?.adapter.icon;    
+                      }else {
+                        throw 'invalid chain network selected';
+                      }
+                      
+                      return (
+                        <div
+                          className="wallet-modal--body--wallets"
+                          key={typeKey}
+                          onClick={() => {
+                            switch(network) {
+                             case `ethereum`:
+                              dispatch({
+                                type: "CONNECT",
+                                payload: {
+                                  driver: wallet.id as never,
+                                },
+                              })
+                              break;
+                             case `solana`:
+                              select(wallet?.adapter.name)
+                              break;
+                             default:
+                              throw 'invalid chain network selected';
+                            }
+                          }}
+                        >
+                          <img src={walletIcon} alt={walletName} />
+                          <span>{walletName}</span>
+                        </div>
+                      )  
+                    })}
                   </div>
                 </div>
               </div>
