@@ -4,7 +4,6 @@ use bumpalo::Bump;
 use fluidity::instruction::FluidityInstruction;
 use libfuzzer_sys::fuzz_target;
 use solana_fluidity_fuzz::*;
-use std::str;
 
 fuzz_target!(|data: &[u8]| {
     let bump = Bump::new();
