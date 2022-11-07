@@ -157,7 +157,12 @@ export default function Dashboard() {
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, publicKey, disconnect } = useWallet();
+  const { connected, publicKey, disconnect, connecting } = useWallet();
+
+  useEffect(() => {
+     if(connected || connecting)
+	   setWalletModalVisibility(false);
+  }, [connected, connecting]);
 
   useEffect(() => {
     (async () => {
@@ -285,7 +290,7 @@ export default function Dashboard() {
         >
           {connected
             ? trimAddress(publicKey?.toString() as unknown as string)
-            : `Connnect Wallet`}
+            : connecting ? `Connecting...` : `Connect Wallet`}
         </GeneralButton>
       </nav>
 
