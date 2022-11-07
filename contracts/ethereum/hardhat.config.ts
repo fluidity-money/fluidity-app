@@ -87,6 +87,8 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
 
 const networks: HardhatUserConfig['networks'] = {};
 
+const hardhat: HardhatUserConfig['networks']['hardhat'] = {};
+
 if (process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY)
   networks['ropsten'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY],
