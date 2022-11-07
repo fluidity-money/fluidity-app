@@ -1,6 +1,5 @@
 #![deny(unaligned_references)]
 use std::mem::size_of;
-use std::str::FromStr;
 
 use bumpalo::Bump;
 use safe_transmute::to_bytes::{transmute_to_bytes, transmute_to_bytes_mut};
@@ -16,8 +15,6 @@ use solana_program::sysvar;
 use solana_program::sysvar::Sysvar;
 use spl_token::state::Account as SplAccount;
 use spl_token::state::Mint;
-
-use fluidity::processor::process;
 
 pub struct FluidityAccounts<'bump> {
     pub base: AccountInfo<'bump>,
@@ -113,13 +110,13 @@ pub fn create_token_acc<'bump, 'a, 'b>(
     account.amount = balance;
     SplAccount::pack(account, data).unwrap();
 
-    let initialLamports = rent.minimum_balance(data.len());
+    let initial_lamports = rent.minimum_balance(data.len());
 
     AccountInfo::new(
         random_pubkey(bump),         // Pubkey
         false,                       // Is signer
         true,                        // Is writable
-        bump.alloc(initialLamports), // Lamports
+        bump.alloc(initial_lamports), // Lamports
         data,                        // Data
         &spl_token::ID,              // Owner
         false,                       // Executable
@@ -133,13 +130,13 @@ pub fn create_token_mint(bump: &Bump, rent: Rent) -> AccountInfo {
     mint.is_initialized = true;
     Mint::pack(mint, data).unwrap();
 
-    let initialLamports = rent.minimum_balance(data.len());
+    let initial_lamports = rent.minimum_balance(data.len());
 
     AccountInfo::new(
         random_pubkey(bump),         // Pubkey
         false,                       // Is signer
         true,                        // Is writable
-        bump.alloc(initialLamports), // Lamports
+        bump.alloc(initial_lamports), // Lamports
         data,                        // Data
         &spl_token::ID,              // Owner
         false,                       // Executable
@@ -213,13 +210,13 @@ pub fn create_signer_acc<'bump>(pubkey: &'bump Pubkey, bump: &'bump Bump) -> Acc
 /// Create all required accounts
 pub fn setup_payout_keys(bump: &Bump) -> PayoutAccounts {
     let rent = Rent::default();
-    let rent_sysvar = create_rent_sysvar_acc(100_000, rent, bump);
+    let _rent_sysvar = create_rent_sysvar_acc(100_000, rent, bump);
     let contract_key = random_pubkey(bump);
 
     let token_program = create_spl_token_program(bump);
     let fluidity_mint = create_token_mint(bump, rent);
     let pda_account_seed = format!("FLU:{}_OBLIGATION", "USDC"); // TODO: Change this when we support more toks
-    let (pda_pubkey, _) =
+    let (_pda_pubkey, _) =
         Pubkey::find_program_address(&[pda_account_seed.as_bytes()], &contract_key);
 
     // let pda_account = Pubkey::create_with_seed(&pda_pubkey, &data_account_seed, &program_id).unwrap();
