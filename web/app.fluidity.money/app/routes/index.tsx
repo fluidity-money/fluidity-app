@@ -1,18 +1,28 @@
+import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics";
+
+import { useNavigate } from "@remix-run/react";
+import { useState, useEffect } from "react";
+import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
+import useViewport from "~/hooks/useViewport";
+import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
+import { format } from "date-fns";
+import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Display,
   GeneralButton,
   LinkButton,
   Text,
+  LineChart,
+  BlockchainModal,
+  normaliseAddress,
+  trimAddress,
+  trimAddressShort,
+  numberToMonetaryString,
+  appendLeading0x,
 } from "@fluidity-money/surfing";
-import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
-import { useToolTip, ToolTipContent } from "~/components";
 import Video from "~/components/Video";
-import useViewport from "~/hooks/useViewport";
-import useHighestRewardStatistics, {
-  HighestRewardResponse,
-} from "~/queries/useHighestRewardStatistics";
+import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 
 export const links: LinksFunction = () => {
@@ -20,13 +30,36 @@ export const links: LinksFunction = () => {
 };
 
 export const loader: LoaderFunction = async () => {
-  const { data, errors } = await useHighestRewardStatistics("ethereum");
+  const { data, errors } = await useHighestRewardStatisticsAll();
+  console.log(data, errors);
 
   if (errors || !data) {
-    throw Error(errors);
+    captureException(new Error("Could not fetch historical Rewards"), {
+      tags: {
+        section: "opportunity",
+      },
+    });
+
+    return json({
+      highestRewards: [],
+      winnerTotals: {},
+      highestWinner: {},
+    });
   }
 
-  const winnerTotals = data.highest_reward_winner_totals.reduce(
+  const highestRewards = data.highest_rewards_monthly.map((reward) => ({
+    ...reward,
+    awardedDate: new Date(reward.awarded_day),
+  }));
+
+  if (!Object.keys(data.highest_reward_winner_totals).length) {
+    return json({
+      highestRewards,
+      winnerTotals: {},
+      highestWinner: {},
+    });
+  }
+  const winnerTotals: WinnerWinnings = data.highest_reward_winner_totals.reduce(
     (prev, current) => ({
       ...prev,
       [current.winning_address]: {
@@ -37,22 +70,44 @@ export const loader: LoaderFunction = async () => {
     {}
   );
 
-  const highestRewards = data.highest_rewards_monthly;
+  const largestWinnerEntries = Object.entries(winnerTotals).reduce(
+    (largestWinner, winner) =>
+      largestWinner[1].totalWinnings >= winner[1].totalWinnings
+        ? largestWinner
+        : winner
+  );
 
   return json({
     highestRewards,
     winnerTotals,
+    highestWinner: {
+      address: largestWinnerEntries[0],
+      totalWinnings: largestWinnerEntries[1].totalWinnings,
+      transactionCount: largestWinnerEntries[1].transactionCount,
+    },
   });
 };
 
-type LoaderData = {
-  winnerTotals: {
-    [Address: string]: {
-      transactionCount: number;
-      totalWinnings: number;
-    };
+type WinnerWinnings = {
+  [Address: string]: {
+    transactionCount: number;
+    totalWinnings: number;
   };
-  highestRewards: HighestRewardResponse["data"]["highest_rewards_monthly"];
+};
+
+type HighestRewards =
+  HighestRewardResponse["data"]["highest_rewards_monthly"] & {
+    awardedDate: Date;
+  };
+
+type LoaderData = {
+  winnerTotals: WinnerWinnings;
+  highestRewards: HighestRewards;
+  highestWinner: {
+    address: string;
+    totalWinnings: number;
+    transactionCount: number;
+  };
 };
 
 function ErrorBoundary() {
@@ -76,23 +131,40 @@ function ErrorBoundary() {
 
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
-  const toolTip = useToolTip();
-  const [connected, setConnected] = useState(false);
-  const { highestRewards, winnerTotals } = useLoaderData<LoaderData>();
-  const { width } = useViewport();
+  const [showChainModal, setShowChainModal] = useState(false);
+  const [chain, setChain] = useState("");
+  const { connected, publicKey, disconnect } = useWallet();
+  const navigate = useNavigate();
 
-  const showNotification = () => {
-    toolTip.open(
-      `#0000ff`,
-      <ToolTipContent
-        tokenLogoSrc={"images/tokenIcons/usdcFluid.svg"}
-        boldTitle={"200 fUSDC"}
-        details={"Received from 0x0000"}
-        linkLabel={"ASSETS"}
-        linkUrl={"#"}
-      />
-    );
+  const networkMapper = (network: string) => {
+    switch (network) {
+      case "ETH":
+        return "ethereum";
+      case "SOL":
+        return "solana";
+      case "ethereum":
+        return "ETH";
+      default:
+        return "SOL";
+    }
   };
+
+  const { highestRewards, winnerTotals, highestWinner } =
+    useLoaderData<LoaderData>();
+
+  const { width } = useViewport();
+  const mobileBreakpoint = 500;
+
+  const chains = [
+    {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
+  ];
 
   return (
     <>
@@ -154,9 +226,9 @@ export default function IndexPage() {
                   size="large"
                   version="primary"
                   buttontype="text"
-                  handleClick={() => {
-                    setConnected(false);
-                  }}
+                  handleClick={() =>
+                    navigate(`${networkMapper(chain)}/fluidify`)
+                  }
                 >
                   FLUIDIFY MONEY
                 </GeneralButton>
@@ -181,15 +253,27 @@ export default function IndexPage() {
               <div className="opportunity-top"></div>
               <div className="opportunity-bottom">
                 <div className="opportunity-text">
-                  <Display className="opportunity-text-top" size={"xs"}>
-                    <Text>
-                      <Text prominent>{"{address}"}</Text>
-                      {" claimed "}
-                      <Text prominent>{"${amount}"}</Text>
-                      {" in fluid prizes over {transactionCount} transactions."}
-                    </Text>
-                  </Display>
+                  {/* Highest Winner */}
+                  {highestWinner.address && (
+                    <Display className="opportunity-text-top" size={"xs"}>
+                      <Text>
+                        <Text prominent>
+                          {appendLeading0x(
+                            trimAddressShort(
+                              normaliseAddress(highestWinner.address)
+                            )
+                          )}
+                        </Text>
+                        {" claimed "}
+                        <Text prominent>
+                          {numberToMonetaryString(highestWinner.totalWinnings)}
+                        </Text>
+                        {` in fluid prizes over ${highestWinner.transactionCount} transactions.`}
+                      </Text>
+                    </Display>
+                  )}
 
+                  {/* Connect Wallet */}
                   <Text
                     className="connect-text"
                     size={width < 500 && width > 0 ? "lg" : "xl"}
@@ -203,26 +287,55 @@ export default function IndexPage() {
                   buttontype="text"
                   version="primary"
                   handleClick={() => {
-                    setConnected(true);
+                    setShowChainModal(true);
                   }}
                 >
                   MAKE IT RAIN
                 </GeneralButton>
               </div>
             </div>
+
+            {showChainModal && (
+              <BlockchainModal
+                handleModal={showChainModal}
+                option={{ name: chain, icon: <div /> }}
+                options={chains}
+                setOption={setChain}
+                mobile={width <= mobileBreakpoint}
+              />
+            )}
+
             <div className="opportunity-graph">
-              <button
-                style={{
-                  backgroundColor: "blue",
-                  marginLeft: "10px",
-                  padding: "20px",
+              <LineChart
+                data={highestRewards}
+                lineLabel="transactions"
+                accessors={{
+                  xAccessor: (d: HighestRewards) => d.awardedDate,
+                  yAccessor: (d: HighestRewards) => d.winning_amount_scaled,
                 }}
-                onClick={showNotification}
-              >
-                <Text prominent size="xxl">
-                  Pop Notification Demo | Test Button
-                </Text>
-              </button>
+                renderTooltip={({ datum }: { datum: HighestRewards }) => (
+                  <div className={"tooltip"}>
+                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                      {format(datum.awardedDate, "dd/mm/yy")}
+                    </span>
+                    <br />
+                    <br />
+                    <span>
+                      <span>{trimAddress(datum.winning_address)}</span>
+                    </span>
+                    <br />
+                    <br />
+                    <span>
+                      <span>
+                        {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                      </span>
+                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                        prize awarded
+                      </span>
+                    </span>
+                  </div>
+                )}
+              />
             </div>
           </div>
         )}

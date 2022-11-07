@@ -101,7 +101,8 @@ export const meta: MetaFunction = () => ({
 
 export const loader: LoaderFunction = async (): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
-  const sentryDsn = "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
+  const sentryDsn =
+    "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
 
   return {
     nodeEnv,
