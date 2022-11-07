@@ -47,16 +47,6 @@ const (
 	// and their decimal places
 	EnvTokensList = `FLU_ETHEREUM_TOKENS_LIST`
 
-	// EnvUniswapAnchoredViewAddress to use to use the Uniswap price oracle to
-	// get the price the token when making the prize pool
-	EnvUniswapAnchoredViewAddress = `FLU_ETHEREUM_UNISWAP_ANCHORED_VIEW_ADDR`
-
-	// EnvAaveAddressProviderAddress to find aave related addresses
-	EnvAaveAddressProviderAddress = `FLU_ETHEREUM_AAVE_ADDRESS_PROVIDER_ADDR`
-
-	// EnvUsdTokenAddress to use to get the price of eth from aave
-	EnvUsdTokenAddress = `FLU_ETHEREUM_USD_TOKEN_ADDR`
-
 	// WorkerPoolAmount to have running as goroutines to send work to
 	WorkerPoolAmount = 30
 )
