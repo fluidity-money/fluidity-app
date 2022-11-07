@@ -5,7 +5,6 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { motion } from "framer-motion";
 import {
   GeneralButton,
-  Trophy,
   Text,
   ChainSelectorButton,
   LinkButton,
@@ -15,9 +14,9 @@ import ChainModal from "~/components/ChainModal";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 
 type IMobileModal = {
-  navigationMap: any;
+  navigationMap: Array<{ name: string; icon: JSX.Element }>;
   activeIndex: number;
-  chains: any;
+  chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
   network: string;
 };
@@ -45,7 +44,9 @@ export default function MobileModal({
         visible={walletModalVisibility}
         close={() => setWalletModalVisibility(false)}
       />
-    ) : null;
+    ) : (
+      <></>
+    );
   }
 
   if (chainModalVisibility) {

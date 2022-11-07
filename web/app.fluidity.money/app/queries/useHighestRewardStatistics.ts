@@ -53,7 +53,7 @@ export type HighestRewardResponse = {
       total_winnings: number;
     }>;
   };
-  errors?: any;
+  errors?: Record<string, unknown>;
 };
 
 type HighestRewardByNetworkBody = {

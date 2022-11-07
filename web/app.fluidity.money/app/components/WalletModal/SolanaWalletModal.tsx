@@ -18,7 +18,7 @@ export const SolanaWalletModal = ({
 
   const selectWallet = useCallback(
     (
-      event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+      _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
       walletName: WalletName
     ) => {
       select(walletName);

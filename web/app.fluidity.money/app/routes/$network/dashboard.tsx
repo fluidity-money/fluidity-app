@@ -1,4 +1,6 @@
-import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
+import type { LinksFunction } from "@remix-run/node";
+
+import { LoaderFunction, json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -29,13 +31,10 @@ import {
   Text,
   ChainSelectorButton,
 } from "@fluidity-money/surfing";
-
-import dashboardStyles from "~/styles/dashboard.css";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import ChainModal from "~/components/ChainModal";
-import { BlobOptions } from "buffer";
 import { useWallet } from "@solana/wallet-adapter-react";
-import MobileModal from "~/components/MobileModal";
+import dashboardStyles from "~/styles/dashboard.css";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];

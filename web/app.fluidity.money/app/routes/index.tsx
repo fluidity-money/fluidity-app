@@ -1,12 +1,11 @@
 import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
 import { format } from "date-fns";
-import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Display,
   GeneralButton,
@@ -132,8 +131,6 @@ function ErrorBoundary() {
 export default function IndexPage() {
   // on hover, use winnerTotals[hovered address]
   const [showChainModal, setShowChainModal] = useState(false);
-  const [chain, setChain] = useState("");
-  const { connected, publicKey, disconnect } = useWallet();
   const navigate = useNavigate();
 
   const networkMapper = (network: string) => {
@@ -149,8 +146,7 @@ export default function IndexPage() {
     }
   };
 
-  const { highestRewards, winnerTotals, highestWinner } =
-    useLoaderData<LoaderData>();
+  const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
 
   const { width } = useViewport();
   const mobileBreakpoint = 500;
@@ -170,11 +166,7 @@ export default function IndexPage() {
     <>
       <Video
         className="video"
-        src={
-          connected
-            ? "/videos/FluidityOpportunityA.mp4"
-            : "/videos/FluidityOpportunityB.mp4"
-        }
+        src={"/videos/FluidityOpportunityB.mp4"}
         type={"none"}
         loop={true}
       />
@@ -188,7 +180,7 @@ export default function IndexPage() {
                 return;
               }}
             >
-              {width < 500 && width > 0 ? "WEBSITE " : "FLUIDITY WEBSITE"}
+              {width < mobileBreakpoint ? "WEBSITE " : "FLUIDITY WEBSITE"}
             </LinkButton>
           </a>
           <LinkButton
@@ -198,147 +190,101 @@ export default function IndexPage() {
               return;
             }}
           >
-            {width < 500 && width > 0 ? "APP" : "FLUIDITY APP"}
+            {width < mobileBreakpoint ? "APP" : "FLUIDITY APP"}
           </LinkButton>
         </div>
-        {connected ? (
-          <div className="connected">
-            <div className="connected-content">
-              <div className="connected-wallet">
-                <div>{"(icon)"}</div>
-                <Text>Wallet Address</Text>
-              </div>
-              <Display
-                className="winnings-figure"
-                size={width < 500 && width > 0 ? "xs" : "md"}
-              >
-                {"{$29,645.00}"}
-              </Display>
-              <Text size={width < 500 && width > 0 ? "md" : "xl"}>
-                Would have been your winnings, based on your last 50
-                transactions.
-              </Text>
-              <Text size={width < 500 && width > 0 ? "md" : "xl"}>
-                Fluidify your assets to start earning.
-              </Text>
-              <div className="connected-buttons">
-                <GeneralButton
-                  size="large"
-                  version="primary"
-                  buttontype="text"
-                  handleClick={() =>
-                    navigate(`${networkMapper(chain)}/fluidify`)
-                  }
-                >
-                  FLUIDIFY MONEY
-                </GeneralButton>
-                <GeneralButton
-                  className="share-button"
-                  size="large"
-                  version="transparent"
-                  buttontype="icon before"
-                  icon={<img src="/images/socials/twitter.svg" />}
-                  handleClick={() => {
-                    return;
-                  }}
-                >
-                  SHARE
-                </GeneralButton>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="disconnected">
-            <div className="opportunity">
-              <div className="opportunity-top"></div>
-              <div className="opportunity-bottom">
-                <div className="opportunity-text">
-                  {/* Highest Winner */}
-                  {highestWinner.address && (
-                    <Display className="opportunity-text-top" size={"xs"}>
-                      <Text>
-                        <Text prominent>
-                          {appendLeading0x(
-                            trimAddressShort(
-                              normaliseAddress(highestWinner.address)
-                            )
-                          )}
-                        </Text>
-                        {" claimed "}
-                        <Text prominent>
-                          {numberToMonetaryString(highestWinner.totalWinnings)}
-                        </Text>
-                        {` in fluid prizes over ${highestWinner.transactionCount} transactions.`}
+        <div className="disconnected">
+          <div className="opportunity">
+            <div className="opportunity-top"></div>
+            <div className="opportunity-bottom">
+              <div className="opportunity-text">
+                {/* Highest Winner */}
+                {highestWinner.address && (
+                  <Display className="opportunity-text-top" size={"xs"}>
+                    <Text>
+                      <Text prominent>
+                        {appendLeading0x(
+                          trimAddressShort(
+                            normaliseAddress(highestWinner.address)
+                          )
+                        )}
                       </Text>
-                    </Display>
-                  )}
-
-                  {/* Connect Wallet */}
-                  <Text
-                    className="connect-text"
-                    size={width < 500 && width > 0 ? "lg" : "xl"}
-                  >
-                    Connect your wallet to see what you could make.
-                  </Text>
-                </div>
-
-                <GeneralButton
-                  size="large"
-                  buttontype="text"
-                  version="primary"
-                  handleClick={() => {
-                    setShowChainModal(true);
-                  }}
-                >
-                  MAKE IT RAIN
-                </GeneralButton>
-              </div>
-            </div>
-
-            {showChainModal && (
-              <BlockchainModal
-                handleModal={showChainModal}
-                option={{ name: chain, icon: <div /> }}
-                options={chains}
-                setOption={setChain}
-                mobile={width <= mobileBreakpoint}
-              />
-            )}
-
-            <div className="opportunity-graph">
-              <LineChart
-                data={highestRewards}
-                lineLabel="transactions"
-                accessors={{
-                  xAccessor: (d: HighestRewards) => d.awardedDate,
-                  yAccessor: (d: HighestRewards) => d.winning_amount_scaled,
-                }}
-                renderTooltip={({ datum }: { datum: HighestRewards }) => (
-                  <div className={"tooltip"}>
-                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {format(datum.awardedDate, "dd/mm/yy")}
-                    </span>
-                    <br />
-                    <br />
-                    <span>
-                      <span>{trimAddress(datum.winning_address)}</span>
-                    </span>
-                    <br />
-                    <br />
-                    <span>
-                      <span>
-                        {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
-                      </span>
-                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                        prize awarded
-                      </span>
-                    </span>
-                  </div>
+                      {" claimed "}
+                      <Text prominent>
+                        {numberToMonetaryString(highestWinner.totalWinnings)}
+                      </Text>
+                      {` in fluid prizes over ${highestWinner.transactionCount} transactions.`}
+                    </Text>
+                  </Display>
                 )}
-              />
+
+                {/* Connect Wallet */}
+                <Text
+                  className="connect-text"
+                  size={width < mobileBreakpoint ? "lg" : "xl"}
+                >
+                  Connect your wallet to see what you could make.
+                </Text>
+              </div>
+
+              <GeneralButton
+                size="large"
+                buttontype="text"
+                version="primary"
+                handleClick={() => {
+                  setShowChainModal(true);
+                }}
+              >
+                MAKE IT RAIN
+              </GeneralButton>
             </div>
           </div>
-        )}
+
+          {showChainModal && (
+            <BlockchainModal
+              handleModal={showChainModal}
+              option={{ name: "", icon: <div /> }}
+              options={chains}
+              setOption={(chain: string) =>
+                navigate(`/${networkMapper(chain)}`)
+              }
+              mobile={width <= mobileBreakpoint}
+            />
+          )}
+
+          <div className="opportunity-graph">
+            <LineChart
+              data={highestRewards}
+              lineLabel="transactions"
+              accessors={{
+                xAccessor: (d: HighestRewards) => d.awardedDate,
+                yAccessor: (d: HighestRewards) => d.winning_amount_scaled,
+              }}
+              renderTooltip={({ datum }: { datum: HighestRewards }) => (
+                <div className={"tooltip"}>
+                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                    {format(datum.awardedDate, "dd/mm/yy")}
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>{trimAddress(datum.winning_address)}</span>
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>
+                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                    </span>
+                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                      prize awarded
+                    </span>
+                  </span>
+                </div>
+              )}
+            />
+          </div>
+        </div>
       </div>
     </>
   );
