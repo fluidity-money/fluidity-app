@@ -1,9 +1,16 @@
 import * as hre from "hardhat";
-import { accountAddr, usdtAccount, fUsdtAccount } from './setup';
+import { usdtAccount, fUsdtAccount } from './setup-mainnet';
 import * as ethers from 'ethers';
 import { expectEq, expectGt } from './test-utils';
+import { accountAddr } from "./setup-common";
 
 describe("token compound integration", async function () {
+  before(async function () {
+    if (process.env.FLU_FORKNET_GOERLI === "true") {
+      return this.skip();
+    }
+  });
+
   it("should allow depositing erc20 tokens", async function () {
     const originalUSDtBalance = await usdtAccount.balanceOf(accountAddr);
 

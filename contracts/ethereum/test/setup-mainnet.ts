@@ -1,7 +1,9 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, deployWorkerConfig, forknetTakeFunds } from "../script-utils";
-import { AAVE_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
+import { deployTokens, forknetTakeFunds } from "../script-utils";
+import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
+
+import { configAddr, tokenOracleSigner, tokenOperatorSigner, tokenCouncilSigner, configOperatorSigner, configCouncilSigner, accountSigner, account2Signer } from './setup-common';
 
 export let usdtAddr: string;
 export let fUsdtAddr: string;
@@ -11,18 +13,6 @@ export let fFeiAddr: string;
 
 export let daiAddr: string;
 export let fDaiAddr: string;
-
-export let configAddr: string;
-
-export let accountAddr: string;
-export let accountSigner: ethers.Signer;
-export let account2Signer: ethers.Signer;
-export let deploySigner: ethers.Signer;
-export let tokenOracleSigner: ethers.Signer;
-export let tokenOperatorSigner: ethers.Signer;
-export let tokenCouncilSigner: ethers.Signer;
-export let configOperatorSigner: ethers.Signer;
-export let configCouncilSigner: ethers.Signer;
 
 export let usdtAccount: ethers.Contract
 export let fUsdtAccount: ethers.Contract;
@@ -41,18 +31,11 @@ export let fUsdtCouncil: ethers.Contract;
 export let configOperator: ethers.Contract;
 export let configCouncil: ethers.Contract;
 
-before(async () => {
-  [
-    accountSigner,
-    account2Signer,
-    deploySigner,
-    tokenOracleSigner,
-    tokenOperatorSigner,
-    tokenCouncilSigner,
-    configOperatorSigner,
-    configCouncilSigner,
-  ] = await hre.ethers.getSigners();
-  accountAddr = await accountSigner.getAddress()
+before(async function () {
+  if (process.env.FLU_FORKNET_GOERLI === "true") {
+    console.log("on goerli! only running aave v3 tests!");
+    return;
+  }
 
   const toDeploy = [TokenList["usdt"], TokenList["fei"], TokenList["dai"]];
 
@@ -62,16 +45,11 @@ before(async () => {
     toDeploy,
   );
 
-  configAddr = await deployWorkerConfig(
-    hre,
-    await configOperatorSigner.getAddress(),
-    await configCouncilSigner.getAddress(),
-  );
-
   const { tokens } = await deployTokens(
     hre,
     toDeploy,
-    AAVE_POOL_PROVIDER_ADDR,
+    AAVE_V2_POOL_PROVIDER_ADDR,
+    "no v3 tokens here",
     await tokenCouncilSigner.getAddress(),
     await tokenOperatorSigner.getAddress(),
     configAddr,
@@ -91,18 +69,18 @@ before(async () => {
   const tokenOracleAddress = await tokenOracleSigner.getAddress();
 
   const oracles = Object.values(tokens)
-    .map(t => [t[0].address, tokenOracleAddress]);
+    .map(t => [t.deployedToken.address, tokenOracleAddress]);
 
   await configOperator.updateOracles(oracles);
 
   usdtAddr = TokenList["usdt"].address;
-  fUsdtAddr = tokens.fUSDt[0].address;
+  fUsdtAddr = tokens.fUSDt.deployedToken.address;
 
   feiAddr = TokenList["fei"].address;
-  fFeiAddr = tokens.fFei[0].address;
+  fFeiAddr = tokens.fFei.deployedToken.address;
 
   daiAddr = TokenList["dai"].address;
-  fDaiAddr = tokens.fDAI[0].address;
+  fDaiAddr = tokens.fDAI.deployedToken.address;
 
   usdtAccount = await hre.ethers.getContractAt("IERC20", usdtAddr, accountSigner);
   fUsdtAccount = await hre.ethers.getContractAt("Token", fUsdtAddr, accountSigner);
