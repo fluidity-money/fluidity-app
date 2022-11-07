@@ -13,4 +13,4 @@ SOTERIA_CMD="soteria -analyzeAll ."
 
 RUN_COMMAND="$EXPORT_CMD && $BUILD_BPF_CMD && $SOTERIA_CMD"
 
-docker run -v $PWD/:/workspace -it $SOTERIA_IMG /bin/bash -c "$RUN_COMMAND"
+docker run -v $PWD/:/workspace $SOTERIA_IMG /bin/bash -c "$RUN_COMMAND"

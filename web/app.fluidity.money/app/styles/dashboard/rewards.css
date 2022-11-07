@@ -46,9 +46,8 @@
 }
 
 .statistics-row {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 4em;
 }
 
@@ -59,7 +58,7 @@
   align-items: flex-end;
 }
 
-.noUserRewards {
+.no-user-rewards {
   display: flex;
   justify-content: space-between;
   margin-bottom: 6em;
@@ -172,6 +171,7 @@
   outline: unset;
   -webkit-appearance: none;
   -moz-appearance: none;
+  gap: 2em;
 }
 
 .card-section {
@@ -205,11 +205,24 @@
 }
 
 @media (max-width: 1200px) {
+  .no-user-rewards {
+    flex-direction: column;
+    gap: 1em;
+  }
+
   .card-inner {
     grid-template-columns: 1fr;
+    gap: 0;
   }
   #unclaimed-left {
     justify-content: center;
+  }
+  #infobox {
+    margin-left: 0;
+  }
+  .statistics-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 3em;
   }
 }
 
@@ -220,5 +233,50 @@
   }
   #unclaimed {
     align-items: center;
+    gap: 0.5em;
+  }
+  .statistics-set .container .value > h1 {
+    font-size: 1.5em;
+  }
+
+  .highest-performer-child .provider-img {
+    width: 1.1em;
+  }
+
+  #spend-to-earn > h2 {
+    margin-bottom: 0.3em;
+  }
+}
+
+@media (max-width: 500px) {
+  .no-user-rewards {
+    align-items: center;
+    margin-bottom: 3em;
+  }
+
+  .no-user-rewards > section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .no-user-rewards > section > span {
+    text-align: center;
+  }
+
+  .provider-card-large {
+    width: 88vw;
+    min-width: 300px;
+  }
+
+  #infobox {
+    padding: 0.5em;
+  }
+}
+
+@media (max-width: 500px) {
+  #user-rewards {
+    padding-left: 1em;
+    padding-right: 1em;
   }
 }

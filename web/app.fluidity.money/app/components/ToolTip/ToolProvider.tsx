@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 
-import { ToolContext } from "./toolContext";
-import { ToolTip } from "./toolTip";
+import { ToolContext } from "./ToolContext";
+import { ToolTip } from "./ToolTip";
 
 export const ToolProvider = (props: {
   children: React.ReactElement<string>;

@@ -1,7 +1,8 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { Outlet, useParams } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
@@ -16,14 +17,18 @@ type ProviderMap = {
 
 const Provider = ({
   network,
+  solRpc,
+  ethRpc,
   children,
 }: {
   network?: string;
+  solRpc: string;
+  ethRpc: string;
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
-    ethereum: EthereumProvider,
-    solana: SolanaProvider,
+    ethereum: EthereumProvider(ethRpc),
+    solana: SolanaProvider(solRpc),
   };
 
   const ProviderComponent = (network && providers[network]) || Fragment;
@@ -35,20 +40,57 @@ export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
 
+  const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
+  const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;
+
   const redirectTarget = redirect("/");
 
   if (!network) return redirectTarget;
 
   if (network in config.drivers === false) return redirectTarget;
 
-  return true;
+  return {
+    network,
+    rpcUrls: {
+      solana: solanaRpcUrl,
+      ethereum: ethereumRpcUrl,
+    },
+  };
 };
 
-export default function Network() {
-  const { network } = useParams();
+type LoaderData = {
+  network: string;
+  rpcUrls: {
+    solana: string;
+    ethereum: string;
+  };
+};
+
+function ErrorBoundary() {
   return (
-    <Provider network={network}>
+    <div>
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1>Could not connect to Provider!</h1>
+      <br />
+      <h2>Our team has been notified, and are working on fixing it!</h2>
+    </div>
+  );
+}
+
+export default function Network() {
+  const { network, rpcUrls } = useLoaderData<LoaderData>();
+  const wallet = useWallet();
+  console.log(wallet);
+
+  return (
+    <Provider
+      network={network}
+      solRpc={rpcUrls.solana}
+      ethRpc={rpcUrls.ethereum}
+    >
       <Outlet />
     </Provider>
   );
 }
+
+export { ErrorBoundary };

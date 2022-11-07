@@ -2,7 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import type { TooltipDatum } from "@visx/xychart";
 import type { RenderTooltipParams } from "@visx/xychart/lib/components/Tooltip";
 
 import { ParentSizeModern } from "@visx/responsive";
@@ -26,12 +25,12 @@ type Props<Datum extends object> = {
 //
 const ChartTooltip = ({ datum }: { datum: any }) => {
   return (
-      <span>
-        {datum.y}{" "}
-        <span style={{ color: "rgba(255,255,255, 50%)" }}>
-          {datum.key}
-        </span>
+    <span>
+      {datum.y}{" "}
+      <span style={{ color: "rgba(255,255,255, 50%)" }}>
+        {datum.key}
       </span>
+    </span>
   );
 };
 
@@ -39,8 +38,8 @@ const { baseColor, generatedGradient, gradientIds } = {
   generatedGradient: (
     <>
       <linearGradient id="dim" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#000000" stopOpacity={0.3} />
-        <stop offset="70%" stopColor="#000000" />
+        <stop offset="0%" stopColor="#000000" stopOpacity={0} />
+        <stop offset="90%" stopColor="#000000" />
       </linearGradient>
 
       <linearGradient
@@ -92,8 +91,9 @@ const _LineChart = <Datum extends object,>({
         ],
         zero: false,
       }}
-      yScale={{ type: "linear" }}
-      margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+      yScale={{ type: "linear", zero: false }}
+      margin={{ top: 10, right: 0, bottom: 0, left: 0 }}
+      height={props.parentHeight * 9 / 10}
       {...props}
     >
       <defs>{generatedGradient}</defs>
@@ -118,7 +118,7 @@ const _LineChart = <Datum extends object,>({
         />
       ))}
 
-      <rect x="0" y="0" width="100%" height="100%" fill="url(#dim)" />
+      <rect x="0" y="0" width="100%" height={`${props.parentHeight}`} fill="url(#dim)" />
 
       <Tooltip
         showVerticalCrosshair

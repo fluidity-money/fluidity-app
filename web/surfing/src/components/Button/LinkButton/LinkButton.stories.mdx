@@ -56,6 +56,17 @@ export const Template = ({children, ...props}) => <LinkButton {...props}>
     
     <h2>LinkButton Types</h2>
     <Story
+        name="Link Button Left"
+        args={{
+            children: "Label",
+            size: "large",
+            type: "internal",
+            left: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
         name="Link Button External"
         args={{
             children: "Label",

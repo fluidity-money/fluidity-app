@@ -34,6 +34,30 @@ jobs:
       - name: make test-go
         run: |
           make test-go
+      - name: Discord notif (SUCCESS)
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
+        with:
+          severity: info
+          description: "**Test:** [test-go](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Deployment succeeded.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (CANCEL)
+        if: cancelled()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          description: "**Test:** [test-go](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Deployment cancelled.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (FAIL)
+        if: failure()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          description: "**Test:** [test-go](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Deployment failed.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
   test-contracts:
     runs-on: ubuntu-latest
     steps:
@@ -50,10 +74,35 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install semrep and cargo-fuzz
+      - name: Install semrep, cargo-fuzz & nightly
         run: |
+          rustup toolchain install nightly
           pip install semgrep
           cargo install cargo-fuzz
       - name: make test-contracts
         run: |
           make test-contracts
+      - name: Discord notif (SUCCESS)
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
+        with:
+          severity: info
+          description: "**Test:** [test-contracts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Tests succeeded.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (CANCEL)
+        if: cancelled()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: warn
+          description: "**Test:** [test-contracts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Tests cancelled.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord notif (FAIL)
+        if: failure()
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: error
+          description: "**Test:** [test-contracts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Tests failed.
+          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}

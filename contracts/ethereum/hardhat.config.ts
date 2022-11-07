@@ -6,7 +6,7 @@ import type { HardhatUserConfig } from "hardhat/types";
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
 import { deployTokens, deployWorkerConfig, forknetTakeFunds, mustEnv } from './script-utils';
 
-import { AAVE_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
+import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
@@ -62,7 +62,8 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   await deployTokens(
     hre,
     shouldDeploy.map(token => TokenList[token]),
-    AAVE_POOL_PROVIDER_ADDR,
+    AAVE_V2_POOL_PROVIDER_ADDR,
+    "no v3 tokens here",
     emergencyCouncilAddress,
     operatorAddress,
     workerConfigAddress,
@@ -119,11 +120,15 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_MAINNET_URL,
   };
 
-if (process.env.FLU_ETHEREUM_FORKNET_URL)
-  hardhat['forking'] = {
-    url: process.env.FLU_ETHEREUM_FORKNET_URL,
-    blockNumber: 14098095,
-  };
+let forkBlockNumber;
+let forkUrl;
+if (process.env.FLU_FORKNET_GOERLI === "true") {
+  forkBlockNumber = 7906700;
+  forkUrl = process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI;
+} else {
+  forkBlockNumber = 14098096;
+  forkUrl = process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET;
+}
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -139,7 +144,10 @@ module.exports = {
       accounts: {
         mnemonic: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump",
       },
-      ...hardhat,
+      forking: {
+        url: forkUrl,
+        blockNumber: forkBlockNumber,
+      },
     },
     ...networks,
   },

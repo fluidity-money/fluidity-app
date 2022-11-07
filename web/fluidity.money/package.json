@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
-    "@apollo/client": "^3.7.0",
+    "@apollo/client": "^3.7.1",
     "@fluidity-money/surfing": "^0.0",
     "@reduxjs/toolkit": "^1.8.3",
     "@visx/visx": "^2.12.2",
@@ -37,7 +37,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 80",
+    "start": "next start",
     "lint": "next lint"
   },
   "eslintConfig": {

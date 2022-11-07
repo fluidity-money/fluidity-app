@@ -168,6 +168,8 @@ func main() {
 				transaction.Hash,
 			)
 
+			transactionHashHex := transactionHash.Hex()
+
 			txReceipt, err := gethClient.TransactionReceipt(
 				context.Background(),
 				transactionHash,

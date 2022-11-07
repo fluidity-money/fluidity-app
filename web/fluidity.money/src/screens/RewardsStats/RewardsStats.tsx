@@ -4,6 +4,7 @@ import {
   Heading,
   LineChart,
   numberToMonetaryString,
+  trimAddress,
 } from "@fluidity-money/surfing";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,11 +16,24 @@ interface IProps {
   changeScreen: () => void;
 }
 
+type DailyWinner = LargestDailyWinner & {
+  awarded_date: Date,
+}
+
 const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState } = useChainContext();
   const { txCount, largestDailyWinnings } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
+  
+  // NOTE: Dummy data
+  const parsedDailyWinnings = largestDailyWinnings
+    .map(({awarded_day, ...reward}) => (
+      {
+        ...reward,
+        awarded_date: new Date(awarded_day),
+      }
+    ))
   
   // information on top of second screen
   const InfoStats = () => (
@@ -74,14 +88,35 @@ const RewardsStats = ({ changeScreen }: IProps) => {
     
         <div className={styles.rewardsChart}>
           <LineChart 
-            data= {dailyWinnersDummy}
-            xLabel='Some X Label'
-            yLabel='Some Y Label'
-            lineLabel='Some Line Label'
-
+            data= {parsedDailyWinnings}
+            lineLabel='dailyWinnings'
             accessors={{
-              xAccessor: (d: any) => d.awarded_time,
-              yAccessor: (d: any) => d.winning_amount_scaled,
+              xAccessor: (d: DailyWinner) => d.awarded_date,
+              yAccessor: (d: DailyWinner) => d.winning_amount_scaled,
+            }}
+            renderTooltip={({datum}: {datum: DailyWinner}) => {
+              return (
+                <div className={styles.tooltip}>
+                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                    {`${datum.awarded_date.getDate()}`.padStart(2,'0')}/
+                    {`${datum.awarded_date.getMonth() + 1}`.padStart(2,'0')}/
+                    {`${datum.awarded_date.getUTCFullYear() % 100}`.padStart(2,'0')}
+                  </span>
+                  <br/>
+                  <br />
+                  <span>
+                    <span>{trimAddress(datum.winning_address)}</span>
+                  </span>
+                  <br/>
+                  <br/>
+                  <span>
+                    <span>{numberToMonetaryString(datum.winning_amount_scaled)}{" "}</span>
+                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                      prize awarded
+                    </span>
+                  </span>
+                </div>
+              )
             }}
           />
         </div>
@@ -91,112 +126,4 @@ const RewardsStats = ({ changeScreen }: IProps) => {
 };
 
 export default RewardsStats;
-
-const dailyWinnersDummy = [
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-01"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 2,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-02"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 1,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-03"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 3,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-04"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 5,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-05"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 4,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-06"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 7,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-07"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 10,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-08"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 8,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-09"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 10,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-10"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 9,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouitnfroat",
-    awarded_time: Date.parse("2022-08-11"),
-    token_short_name: "fUSDC",
-    winning_amount_scaled: 13,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xheltlotfatarftartarftartar",
-    winning_address: "0xtftlefrahtoiarhouifnfroat",
-    awarded_time: Date.parse("2022-08-12"),
-    token_short_name: "tUSDC",
-    winning_amount_scaled: 12,
-  },
-  {
-    network: "ethereum",
-    transaction_hash: "0xhellotfattrftartarftartar",
-    winning_address: "0xtftlefrahtoiarhofitnfroat",
-    awarded_time: Date.parse("2022-08-13"),
-    token_short_name: "USDC",
-    winning_amount_scaled: 11,
-  },
-]
-
 

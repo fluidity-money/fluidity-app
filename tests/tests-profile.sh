@@ -19,3 +19,5 @@ export \
 	FLU_DISCORD_WEBHOOK=not_a_webhook
 
 export FLU_WORKER_ID="tests-$(date +%s)"
+
+export FLU_ETHEREUM_FORKNET_URL=$(aws ssm get-parameter --name /fluidity/ethereum/http_url --with-decryption | jq -r .Parameter.Value)
