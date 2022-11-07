@@ -4,7 +4,8 @@ import type { ethers } from 'ethers';
 
 const tasks: {[k: string]: {contract: string, name: string}} = {
     token: {contract: "Token", name: "token"},
-    aave: {contract: "AaveLiquidityProvider", name: "aave liquidity pool"},
+    aaveV2: {contract: "AaveV2LiquidityProvider", name: "aave v2 liquidity pool"},
+    aaveV3: {contract: "AaveV3LiquidityProvider", name: "aave v3 liquidity pool"},
     compound: {contract: "CompoundLiquidityProvider", name: "compound liquidity pool"},
     workerconfig: {contract: "WorkerConfig", name: "worker config storage"},
 };

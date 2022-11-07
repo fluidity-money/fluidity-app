@@ -1,8 +1,15 @@
 import * as hre from "hardhat";
-import { tokenOracleSigner, fFeiAccount, fUsdtAccount, configOperator } from './setup';
+import { configOperator, fFeiAccount, fUsdtAccount } from './setup-mainnet';
 import { expect } from "chai";
+import { tokenOracleSigner } from "./setup-common";
 
 describe("worker config", async function () {
+  before(async function () {
+    if (process.env.FLU_FORKNET_GOERLI === "true") {
+      return this.skip();
+    }
+  });
+
   it("should allow the oracle to be read", async function () {
     expect(await configOperator['getWorkerAddress(address)'](fUsdtAccount.address))
       .to.eq(await tokenOracleSigner.getAddress())

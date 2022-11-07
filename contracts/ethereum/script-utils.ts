@@ -14,12 +14,15 @@ export type Token = {
 } & (
     {
       backend: 'compound',
-      compoundAddress: string
+      compoundAddress: string,
     } | {
-      backend: 'aave',
-      aaveAddress: string
+      backend: 'aaveV2',
+      aaveAddress: string,
+    } | {
+      backend: 'aaveV3',
+      aaveAddress: string,
     }
-  );
+);
 
 
 export const mustEnv = (env: string): string => {
@@ -55,28 +58,38 @@ export const deployWorkerConfig = async (
   return workerConfig.address;
 }
 
+export type TokenAddresses = {
+  [symbol: string]: {
+    deployedToken: ethers.Contract,
+    deployedPool: ethers.Contract
+  }
+};
+
 export const deployTokens = async (
   hre: HardhatRuntimeEnvironment,
   tokens: Token[],
-  aavePoolProvider: string,
+  aaveV2PoolProvider: string,
+  aaveV3PoolProvider: string,
   emergencyCouncilAddress: string,
   operatorAddress: string,
   workerConfigAddress: string
 ): Promise<{
   tokenBeacon: ethers.Contract,
-  aaveBeacon: ethers.Contract,
+  aaveV2Beacon: ethers.Contract,
   compoundBeacon: ethers.Contract,
-  tokens: { [symbol: string]: [ethers.Contract, ethers.Contract] },
+  tokens: TokenAddresses,
 }> => {
   const tokenFactory = await hre.ethers.getContractFactory("Token");
   const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
-  const aaveFactory = await hre.ethers.getContractFactory("AaveLiquidityProvider");
+  const aaveV2Factory = await hre.ethers.getContractFactory("AaveV2LiquidityProvider");
+  const aaveV3Factory = await hre.ethers.getContractFactory("AaveV3LiquidityProvider");
 
   const tokenBeacon = await hre.upgrades.deployBeacon(tokenFactory);
   const compoundBeacon = await hre.upgrades.deployBeacon(compoundFactory);
-  const aaveBeacon = await hre.upgrades.deployBeacon(aaveFactory);
+  const aaveV2Beacon = await hre.upgrades.deployBeacon(aaveV2Factory);
+  const aaveV3Beacon = await hre.upgrades.deployBeacon(aaveV3Factory);
 
-  const tokenAddresses: { [symbol: string]: [ethers.Contract, ethers.Contract] } = {};
+  const tokenAddresses: TokenAddresses = {};
 
   for (const token of tokens) {
     console.log(`deploying ${token.name}`);
@@ -99,11 +112,21 @@ export const deployTokens = async (
 
         break;
 
-      case 'aave':
+      case 'aaveV2':
         deployedPool = await hre.upgrades.deployBeaconProxy(
-          aaveBeacon,
-          aaveFactory,
-          [aavePoolProvider, token.aaveAddress, deployedToken.address],
+          aaveV2Beacon,
+          aaveV2Factory,
+          [aaveV2PoolProvider, token.aaveAddress, deployedToken.address],
+          {initializer: "init(address, address, address)"},
+        );
+
+        break;
+
+      case 'aaveV3':
+        deployedPool = await hre.upgrades.deployBeaconProxy(
+          aaveV3Beacon,
+          aaveV3Factory,
+          [aaveV3PoolProvider, token.aaveAddress, deployedToken.address],
           {initializer: "init(address, address, address)"},
         );
 
@@ -128,15 +151,15 @@ export const deployTokens = async (
       workerConfigAddress,
     );
 
-    tokenAddresses[token.symbol] = [deployedToken, deployedPool];
+    tokenAddresses[token.symbol] = {deployedToken, deployedPool};
 
     console.log(`deployed ${token.name} to ${deployedToken.address}`);
   }
 
   return {
-    tokenBeacon: tokenBeacon,
-    aaveBeacon: aaveBeacon,
-    compoundBeacon: compoundBeacon,
+    tokenBeacon,
+    aaveV2Beacon,
+    compoundBeacon,
     tokens: tokenAddresses,
   };
 };
@@ -144,7 +167,7 @@ export const deployTokens = async (
 export const forknetTakeFunds = async (
   hre: HardhatRuntimeEnvironment,
   accounts: ethers.Signer[],
-  tokens: Token[],
+  tokens: {name: string, owner: string, address: string}[],
 ) => {
   for (const token of tokens) {
 

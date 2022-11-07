@@ -11,8 +11,11 @@ const ENV_TOKEN_BACKEND = `FLU_ETHEREUM_TOKEN_BACKEND`;
 const ENV_BEACON_POOL = `FLU_ETHEREUM_BEACON_POOL`;
 const ENV_BEACON_TOKEN = `FLU_ETHEREUM_BEACON_TOKEN`;
 
-const ENV_AAVE_ATOKEN = `FLU_ETHEREUM_AAVE_ATOKEN_ADDRESS`;
-const ENV_AAVE_ADDRESS_PROVIDER = `FLU_ETHEREUM_AAVE_PROVIDER_ADDRESS`;
+const ENV_AAVE_V2_ATOKEN = `FLU_ETHEREUM_AAVE_V2_ATOKEN_ADDRESS`;
+const ENV_AAVE_V2_ADDRESS_PROVIDER = `FLU_ETHEREUM_AAVE_V3_PROVIDER_ADDRESS`;
+
+const ENV_AAVE_V3_ATOKEN = `FLU_ETHEREUM_AAVE_V3_ATOKEN_ADDRESS`;
+const ENV_AAVE_V3_ADDRESS_PROVIDER = `FLU_ETHEREUM_AAVE_V3_PROVIDER_ADDRESS`;
 
 const ENV_COMPOUND_CTOKEN = `FLU_ETHEREUM_COMPOUND_CTOKEN_ADDRESS`;
 
@@ -35,7 +38,8 @@ const main = async () => {
 
     const tokenFactory = await hre.ethers.getContractFactory("Token");
     const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
-    const aaveFactory = await hre.ethers.getContractFactory("AaveLiquidityProvider");
+    const aaveV2Factory = await hre.ethers.getContractFactory("AaveV2LiquidityProvider");
+    const aaveV3Factory = await hre.ethers.getContractFactory("AaveV3LiquidityProvider");
 
     console.log(`deploying token with beacon address ${tokenAddress}`);
 
@@ -59,18 +63,28 @@ const main = async () => {
             [cToken, token.address],
             {initializer: "init(address, address)"},
         );
-    } else if (backend === "aave") {
-        const aToken = mustEnv(ENV_AAVE_ATOKEN);
-        const aavePool = mustEnv(ENV_AAVE_ADDRESS_PROVIDER);
-        console.log(`deploying aave pool with beacon ${poolAddress}, atoken ${aToken}, aave pool ${aavePool}`);
+    } else if (backend === "aaveV2") {
+        const aToken = mustEnv(ENV_AAVE_V2_ATOKEN);
+        const aavePool = mustEnv(ENV_AAVE_V2_ADDRESS_PROVIDER);
+        console.log(`deploying aave v2 pool with beacon ${poolAddress}, atoken ${aToken}, aave pool ${aavePool}`);
         pool = await hre.upgrades.deployBeaconProxy(
             poolAddress,
-            aaveFactory,
+            aaveV2Factory,
+            [aavePool, aToken, token.address],
+            {initializer: "init(address, address, address)"},
+        );
+    } else if (backend === "aaveV3") {
+        const aToken = mustEnv(ENV_AAVE_V3_ATOKEN);
+        const aavePool = mustEnv(ENV_AAVE_V3_ADDRESS_PROVIDER);
+        console.log(`deploying aave v3 pool with beacon ${poolAddress}, atoken ${aToken}, aave pool ${aavePool}`);
+        pool = await hre.upgrades.deployBeaconProxy(
+            poolAddress,
+            aaveV3Factory,
             [aavePool, aToken, token.address],
             {initializer: "init(address, address, address)"},
         );
     } else {
-        throw new Error(`Invalid token backend: ${backend} - should be 'compound' or 'aave'`);
+        throw new Error(`Invalid token backend: ${backend} - should be 'compound' or 'aaveV2' or 'aaveV3'`);
     }
 
     await pool.deployed();
