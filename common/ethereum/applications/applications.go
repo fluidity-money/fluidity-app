@@ -16,12 +16,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -57,7 +57,7 @@ const (
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt *ethTypes.Receipt) (*big.Rat, worker.EthereumAppFees, error) {
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt) (*big.Rat, worker.EthereumAppFees, error) {
 	var (
 		fee      *big.Rat
 		emission worker.EthereumAppFees
@@ -172,9 +172,8 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 // In the case of an AMM (such as Uniswap) the transaction sender receives the majority payout every time,
 // with the recipient tokens being effectively burnt (sent to the contract). In the case of a P2P swap,
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
-func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
+func GetApplicationTransferParties(transaction ethereum.Transaction, transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
-		transaction = transfer.Transaction
 		logAddress  = transfer.Log.Address
 		nilAddress  libEthereum.Address
 	)

@@ -258,7 +258,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		log.App(func(k *log.Log) {
 			k.Format(
 				"Received a balancer swap in transaction %#v not involving the fluid token - skipping!",
-				transfer.Transaction.Hash.String(),
+				transfer.TransactionHash.String(),
 			)
 		})
 
