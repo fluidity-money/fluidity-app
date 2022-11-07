@@ -157,7 +157,7 @@ export default function Dashboard() {
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, publicKey, disconnect, connecting } = useWallet();
+  const { connected, publicKey, disconnect, connecting,  } = useWallet();
 
   useEffect(() => {
      if(connected || connecting)
@@ -280,11 +280,11 @@ export default function Dashboard() {
 
         {/* Connect Wallet Button */}
         <GeneralButton
-          version={connected ? "transparent" : "primary"}
+          version={connected || connecting ? "transparent" : "primary"}
           buttontype="text"
           size={"medium"}
           handleClick={() =>
-            connected ? disconnect() : setWalletModalVisibility(true)
+            connected ? disconnect() : connecting ? null : setWalletModalVisibility(true)
           }
           className="connect-wallet-btn"
         >
