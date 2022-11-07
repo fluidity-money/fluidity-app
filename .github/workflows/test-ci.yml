@@ -39,7 +39,7 @@ jobs:
         if: success()
         with:
           severity: info
-          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n\n"
+          description: "**Test:** [test-go](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
           details: Deployment succeeded.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (CANCEL)
@@ -47,7 +47,7 @@ jobs:
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
-          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n\n"
+          description: "**Test:** [test-go](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
           details: Deployment cancelled.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (FAIL)
@@ -55,7 +55,7 @@ jobs:
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
-          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n\n"
+          description: "**Test:** [test-go](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
           details: Deployment failed.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
   test-contracts:
@@ -87,22 +87,22 @@ jobs:
         if: success()
         with:
           severity: info
-          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n\n"
-          details: Deployment succeeded.
+          description: "**Test:** [test-contracts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Tests succeeded.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (CANCEL)
         if: cancelled()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
-          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n\n"
-          details: Deployment cancelled.
+          description: "**Test:** [test-contracts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Tests cancelled.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (FAIL)
         if: failure()
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
-          description: "**Title:** [${{ github.event.pull_request.title }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Author:** ${{ github.event.pull_request.user.login }}\n**Repository:** ${{ github.event.repositoy.full_name }}\n**Environment:** ${{ env.ENVIRONMENT }}\n\n"
-          details: Deployment failed.
+          description: "**Test:** [test-contracts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n\n"
+          details: Tests failed.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
