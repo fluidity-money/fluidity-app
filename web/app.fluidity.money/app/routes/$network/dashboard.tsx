@@ -157,7 +157,7 @@ export default function Dashboard() {
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, publicKey, disconnect, connecting,  } = useWallet();
+  const { connected, publicKey, disconnect, connecting } = useWallet();
 
   useEffect(() => {
      if(connected || connecting)
