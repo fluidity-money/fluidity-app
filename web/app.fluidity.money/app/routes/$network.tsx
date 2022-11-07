@@ -3,6 +3,7 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useEffect, useMemo } from "react";
 
 import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
@@ -31,7 +32,8 @@ const Provider = ({
     solana: SolanaProvider(solRpc),
   };
 
-  const ProviderComponent = (network && providers[network]) || Fragment;
+  const ProviderComponent = useMemo(() => 
+    (network && providers[network]) || Fragment, [network] )
 
   return <ProviderComponent>{children}</ProviderComponent>;
 };
@@ -79,9 +81,7 @@ function ErrorBoundary() {
 
 export default function Network() {
   const { network, rpcUrls } = useLoaderData<LoaderData>();
-  const wallet = useWallet();
-  console.log(wallet);
-
+  
   return (
     <Provider
       network={network}

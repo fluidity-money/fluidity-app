@@ -157,7 +157,7 @@ export default function Dashboard() {
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, publicKey } = useWallet();
+  const { connected, publicKey, disconnect } = useWallet();
 
   useEffect(() => {
     (async () => {
@@ -278,7 +278,9 @@ export default function Dashboard() {
           version={connected ? "transparent" : "primary"}
           buttontype="text"
           size={"medium"}
-          handleClick={() => !connected && setWalletModalVisibility(true)}
+          handleClick={() =>
+            connected ? disconnect() : setWalletModalVisibility(true)
+          }
           className="connect-wallet-btn"
         >
           {connected
@@ -290,16 +292,12 @@ export default function Dashboard() {
       <main id="dashboard-body">
         <nav id="top-navbar" className={"pad-main"}>
           {/* App Name */}
-          {isMobile ? (
-            <img src="/images/outlinedLogo.svg" alt="Fluidity" />
-          ) : isTablet ? (
-            <div className="top-navbar-left">
-              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
-              <Text>{appName}</Text>
-            </div>
-          ) : (
-            <Text>{appName}</Text>
-          )}
+          <div className="top-navbar-left">
+            {(isMobile || isTablet) && (
+              <img src="/images/logoOutline.png" alt="Fluidity" />
+            )}
+            {!isMobile && <Text>{appName}</Text>}
+          </div>
 
           {/* Navigation Buttons */}
           <div>

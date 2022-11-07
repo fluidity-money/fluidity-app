@@ -72,7 +72,6 @@ const ChainModal = ({ visible, setVisible, chains, network }: IChainModal) => {
             <BlockchainModal
               handleModal={setVisible}
               option={chains[network]}
-              className={"hello"}
               options={Object.values(chains)}
               setOption={setChain}
               mobile={width <= mobileBreakpoint}
