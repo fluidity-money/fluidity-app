@@ -294,19 +294,21 @@ export default function Dashboard() {
         </ul>
 
         {/* Connect Wallet Button */}
-        <GeneralButton
-          version={connected || connecting ? "transparent" : "primary"}
-          buttontype="text"
-          size={"medium"}
-          handleClick={() =>
-            connected ? disconnect() : connecting ? null : setWalletModalVisibility(true)
-          }
-          className="connect-wallet-btn"
-        >
+		{ network === `solana` ?
+          <GeneralButton
+            version={connected || connecting ? "transparent" : "primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={() =>
+              connected ? disconnect() : connecting ? null : setWalletModalVisibility(true)
+            }
+            className="connect-wallet-btn"
+          >
           {connected
             ? trimAddress(publicKey?.toString() as unknown as string)
             : connecting ? `Connecting...` : `Connect Wallet`}
-        </GeneralButton>
+         </GeneralButton> : null
+		}
       </nav>
 
       <main id="dashboard-body">
