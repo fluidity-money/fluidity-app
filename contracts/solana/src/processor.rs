@@ -1022,7 +1022,9 @@ fn create_token_metadata(
     let pda_account = next_account_info(accounts_iter)?;
     let payer_account = next_account_info(accounts_iter)?;
     let system_account = next_account_info(accounts_iter)?;
+    let metaplex_program_account = next_account_info(accounts_iter)?;
     let metaplex_metadata_account = next_account_info(accounts_iter)?;
+    let rent_info = next_account_info(accounts_iter)?;
 
     let (fluidity_data_account, fluidity_data, payer) = validate_authority(
         &seed,
@@ -1038,26 +1040,33 @@ fn create_token_metadata(
         panic!("not authorised to use this");
     }
 
+    let pda_pubkey = pda_account.key;
+
+    let payer_pubkey = payer_account.key;
+
     let fluidity_token_mint_pubkey = fluidity_token_mint_account.key;
 
-    let metaplex_metadata_program_pubkey = metaplex_metadata_account.key;
+    let metaplex_metadata_program_pubkey = metaplex_program_account.key;
 
-    let metadata_program_pda_address = Pubkey::create_with_seed(
+    let (metadata_program_pda_address, _) = Pubkey::find_program_address(
+        &[
+            "metadata".as_bytes(),
+            metaplex_metadata_program_pubkey.as_ref(),
+            fluidity_token_mint_pubkey.as_ref(),
+        ],
         metaplex_metadata_program_pubkey,
-        "metadata",
-        fluidity_token_mint_pubkey,
-    )?;
+    );
 
-    let pda_seed = format!("FLU:{}_DATA_1", seed);
+    let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
     invoke_signed(
         &metaplex_token_metadata::instruction::create_metadata_accounts(
             *metaplex_metadata_program_pubkey, // program id
             metadata_program_pda_address,      // metadata account
             *fluidity_token_mint_pubkey,       // mint
-            *program_id,                       // mint authority
-            *program_id,                       // payer
-            *program_id,                       // update authority
+            *pda_pubkey,                       // mint authority
+            *payer_pubkey,                     // payer
+            *pda_pubkey,                       // update authority
             name,                              // name
             symbol,                            // symbol
             uri,                               // uri
@@ -1069,10 +1078,12 @@ fn create_token_metadata(
         &[
             metaplex_metadata_account.clone(),   // metaplex pda
             fluidity_token_mint_account.clone(), // mint of token asset
-            fluidity_data_account.clone(),       // mint authority
-            fluidity_data_account.clone(),       // signer payer
-            fluidity_data_account.clone(),       // update authority info
+            pda_account.clone(),                 // mint authority
+            payer_account.clone(),               // signer payer
+            pda_account.clone(),                 // update authority info
             system_account.clone(),              // system program
+            rent_info.clone(),                   // rent sysvar
+            metaplex_program_account.clone()     // metaplex program
         ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )
