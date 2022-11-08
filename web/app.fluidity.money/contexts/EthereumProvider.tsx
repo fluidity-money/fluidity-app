@@ -7,13 +7,14 @@ import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 
 import { FluidityFacadeContext } from "./IFluidityFacade";
-import { ReactNode, useState } from "react";
-import {usdBalanceOfERC20} from "~/util/chainUtils/ethereum/transaction";
+import { ReactNode, useEffect, useState } from "react";
+import makeContractSwap, {ContractToken, usdBalanceOfERC20} from "~/util/chainUtils/ethereum/transaction";
+import {Token} from "~/util/chainUtils/tokens";
 
-const EthereumFacade = ({ children }: { children: ReactNode }) => {
-  const { isActive, isActivating, provider, account} = useWeb3React();
+const EthereumFacade = ({ children,  tokens}: { children: ReactNode, tokens: Token[]}) => {
+  const { isActive, isActivating, provider, account, connector } = useWeb3React();
 
-  const [connector, setConnectorType] = useState("");
+  const [connectorType, setConnectorType] = useState("");
 
   const getBalance = async(contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
@@ -24,12 +25,63 @@ const EthereumFacade = ({ children }: { children: ReactNode }) => {
     return await usdBalanceOfERC20(signer, contractAddress, tokenAbi);
   }
 
+  useEffect(() => {
+    console.warn("useConnectorType unimpl")
+  }, [connectorType])
+
+  const deactivate = async(): Promise<void> => connector.deactivate?.();
+
+  // swap <symbol> to its counterpart, with amount in its own units
+  // e.g. swap $1.6 of USDC to fUSDC: swap("1600000", "USDC")
+  const swap = async(amount: string, symbol: string): Promise<void> => {
+    const signer = provider?.getSigner();
+    if (!signer) {
+      return;
+    }
+
+    const fromToken = tokens.find(t => t.symbol === symbol);
+
+    if (!fromToken) {
+      return;
+    }
+
+    // true if swapping from fluid -> non-fluid
+    const fromFluid = !!fromToken.isFluidOf;
+
+
+    // if swapping from fluid, to its non-fluid counterpart
+    // otherwise opposite 
+    const toToken = fromFluid ?
+      tokens.find(t => t.address === fromToken.isFluidOf) :
+      tokens.find(t => t.isFluidOf === fromToken.address);
+
+    if (!toToken) {
+      return;
+    }
+
+    const from: ContractToken = {
+      address: fromToken.address,
+      ABI: tokenAbi,
+      symbol: fromToken.symbol,
+      isFluidOf: fromFluid,
+    };
+
+    const to: ContractToken = {
+      address: toToken.address,
+      ABI: tokenAbi,
+      symbol: toToken.symbol,
+      isFluidOf: !fromFluid,
+    }
+
+    makeContractSwap(signer, from, to, amount);
+  }
+
   return (
     <FluidityFacadeContext.Provider value={{
-      swap: async(amount, token) => {},
+      swap,
       limit: async(token) => 0,
       balance: getBalance,
-      disconnect: async() => {},
+      disconnect: deactivate,
       useConnectorType: setConnectorType,
       address: account,
       connected: isActive,
@@ -40,7 +92,7 @@ const EthereumFacade = ({ children }: { children: ReactNode }) => {
 };
 
 export const EthereumProvider =
-  (rpcUrl: string) =>
+  (rpcUrl: string, tokens: Token[]) =>
   ({ children }: { children: React.ReactNode }) => {
     const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
       (actions) => new MetaMask({ actions })
@@ -72,7 +124,7 @@ export const EthereumProvider =
     return (
       <>
         <Web3ReactProvider connectors={connectors}>
-          <EthereumFacade>{children}</EthereumFacade>
+          <EthereumFacade tokens={tokens}>{children}</EthereumFacade>
         </Web3ReactProvider>
       </>
     );
