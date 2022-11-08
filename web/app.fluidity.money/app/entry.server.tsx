@@ -21,7 +21,8 @@ export default function handleRequest(
 }
 
 if (process.env.NODE_ENV === "production") {
-  const dsn = process.env.REACT_APP_SENTRY_DSN;
+  const dsn =
+    "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
 
   if (!dsn) console.error("DSN not set!");
 

@@ -118,7 +118,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		return nil, fmt.Errorf(
 			"topics contain the wrong number of values (Expected 4, got %v)! TxHash: %v",
 			len(transfer.Log.Topics),
-			transfer.Transaction.Hash,
+			transfer.TransactionHash,
 		)
 	}
 
@@ -137,7 +137,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		return nil, fmt.Errorf(
 			"unpacked the wrong number of values (Expected 6, got %v)! TxHash: %v",
 			len(unpacked),
-			transfer.Transaction.Hash,
+			transfer.TransactionHash,
 		)
 	}
 
