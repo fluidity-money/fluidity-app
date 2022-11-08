@@ -23,16 +23,17 @@ import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
 import { useToolTip } from "~/components";
 import { ToolTipContent } from "~/components/ToolTip";
-import { trimAddress } from "~/util";
+import { trimAddress, networkMapper } from "~/util";
 import {
   DashboardIcon,
   GeneralButton,
   Trophy,
   Text,
   ChainSelectorButton,
+  BlockchainModal,
 } from "@fluidity-money/surfing";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
-import ChainModal from "~/components/ChainModal";
+import Modal from "~/components/Modal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import dashboardStyles from "~/styles/dashboard.css";
 
@@ -158,6 +159,15 @@ export default function Dashboard() {
 
   const { connected, publicKey, disconnect } = useWallet();
 
+  const handleSetChain = (network: string) => {
+    const { pathname } = location;
+
+    // Get path components after $network
+    const pathComponents = pathname.split("/").slice(2);
+
+    navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
+  };
+
   useEffect(() => {
     (async () => {
       const { data, error } = await useUserUnclaimedRewards(network, account);
@@ -233,12 +243,18 @@ export default function Dashboard() {
         />
       </header>
 
-      <ChainModal
-        visible={chainModalVisibility}
-        setVisible={setChainModalVisibility}
-        network={network}
-        chains={chainNameMap}
-      />
+      {/* Switch Chain Modal */}
+      <Modal visible={chainModalVisibility}>
+        <div className="cover">
+          <BlockchainModal
+            handleModal={setChainModalVisibility}
+            option={chainNameMap[network as "ethereum" | "solana"]}
+            options={Object.values(chainNameMap)}
+            setOption={handleSetChain}
+            mobile={isMobile}
+          />
+        </div>
+      </Modal>
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
         {/* Nav Bar */}

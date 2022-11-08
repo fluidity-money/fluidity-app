@@ -2,10 +2,13 @@ import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
 import { useEffect, useState } from "react";
-import { useNavigate, useLoaderData, Link } from "@remix-run/react";
+import { useNavigate, useLoaderData } from "@remix-run/react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
+import { networkMapper } from "~/util";
+import { useHighestRewardStatisticsByNetwork } from "~/queries/useHighestRewardStatistics";
+import { captureException } from "@sentry/react";
 import {
   Display,
   GeneralButton,
@@ -15,8 +18,11 @@ import {
   BlockchainModal,
   normaliseAddress,
   trimAddress,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
+import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import Video from "~/components/Video";
+import Modal from "~/components/Modal";
 import opportunityStyles from "~/styles/opportunity.css";
 
 export const links: LinksFunction = () => {
@@ -47,7 +53,9 @@ const NetworkPage = () => {
   const { connected, publicKey, disconnect, connect } = useWallet();
   const navigate = useNavigate();
 
-  const [walletModalVisibility, setWalletModalVisibility] = useState(true);
+  const [walletModalVisibility, setWalletModalVisibility] = useState(
+    !connected
+  );
   const [chainModalVisibility, setChainModalVisibility] = useState(false);
   const [loading, setLoading] = useState(false);
   const [projectedWinnings, setProjectedWinnings] = useState(0);
@@ -66,24 +74,36 @@ const NetworkPage = () => {
     },
   };
 
-  const networkMapper = (network: string) => {
-    switch (network) {
-      case "ETH":
-        return "ethereum";
-      case "SOL":
-        return "solana";
-      case "ethereum":
-        return "ETH";
-      default:
-        return "SOL";
-    }
-  };
-
   useEffect(() => {
     if (publicKey) {
-      setProjectedWinnings(100);
+      (async () => {
+        const { data, errors } = await useHighestRewardStatisticsByNetwork(
+          network
+        );
+
+        console.log(data, errors);
+
+        if (errors || !data) {
+          captureException(new Error("Could not fetch historical Rewards"), {
+            tags: {
+              section: "opportunity",
+            },
+          });
+        }
+
+        const highestRewards =
+          data.highest_rewards_monthly.reduce(
+            (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
+            0
+          ) / data.highest_rewards_monthly.length;
+        return setProjectedWinnings(highestRewards);
+      })();
     }
   }, [publicKey]);
+
+  useEffect(() => {
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
 
   return (
     <>
@@ -96,7 +116,9 @@ const NetworkPage = () => {
         />
       )}
       <div className="index-page">
+        {/* Navigation Buttons */}
         <div className="header-buttons">
+          {/* Fluidity Website Button */}
           <a href="https://fluidity.money" rel="noopener noreferrer">
             <LinkButton
               size={"small"}
@@ -108,11 +130,13 @@ const NetworkPage = () => {
               {width < mobileBreakpoint ? "WEBSITE " : "FLUIDITY WEBSITE"}
             </LinkButton>
           </a>
+
+          {/* Dashboard */}
           <LinkButton
             size={"small"}
             type={"internal"}
             handleClick={() => {
-              navigate("dashboard");
+              navigate("dashboard/home");
             }}
           >
             {width < mobileBreakpoint ? "APP" : "FLUIDITY APP"}
@@ -120,12 +144,13 @@ const NetworkPage = () => {
         </div>
         <div className="connected">
           <div className="connected-content">
+            {/* Switch Chain Button */}
+            <ChainSelectorButton
+              chain={chainNameMap[network as "ethereum" | "solana"]}
+              onClick={() => setChainModalVisibility(true)}
+            />
+
             <div className="connected-wallet">
-              {/* Switch Chain Button */}
-              <ChainSelectorButton
-                chain={chainNameMap[network as "ethereum" | "solana"]}
-                onClick={() => setChainModalVisibility(true)}
-              />
               {/* Connected Wallet */}
               {publicKey && (
                 <>
@@ -137,17 +162,17 @@ const NetworkPage = () => {
               )}
 
               {/* Switch Chain Modal */}
-              {chainModalVisibility && (
+              <Modal visible={chainModalVisibility}>
                 <BlockchainModal
                   handleModal={setChainModalVisibility}
-                  option={{ name: "", icon: <div /> }}
+                  option={chainNameMap[network as "ethereum" | "solana"]}
                   options={Object.values(chainNameMap)}
                   setOption={(chain: string) =>
                     navigate(`/${networkMapper(chain)}`)
                   }
                   mobile={width <= mobileBreakpoint}
                 />
-              )}
+              </Modal>
 
               {/* Connect Wallet Button */}
               {!connected && (
@@ -161,6 +186,18 @@ const NetworkPage = () => {
                   Connnect Wallet
                 </GeneralButton>
               )}
+
+              {/* Connect Wallet Modal */}
+              {network === `solana` ? (
+                <Modal visible={walletModalVisibility}>
+                  <div className="cover">
+                    <SolanaWalletModal
+                      visible={walletModalVisibility}
+                      close={() => setWalletModalVisibility(false)}
+                    />
+                  </div>
+                </Modal>
+              ) : null}
             </div>
 
             {/* Expected Earnings */}
@@ -170,7 +207,7 @@ const NetworkPage = () => {
                   className="winnings-figure"
                   size={width < mobileBreakpoint ? "xs" : "md"}
                 >
-                  {"{$29,645.00}"}
+                  {numberToMonetaryString(projectedWinnings)}
                 </Display>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
                   Would have been your winnings, based on your last 50
@@ -194,6 +231,7 @@ const NetworkPage = () => {
               >
                 FLUIDIFY MONEY
               </GeneralButton>
+
               <GeneralButton
                 className="share-button"
                 size="large"

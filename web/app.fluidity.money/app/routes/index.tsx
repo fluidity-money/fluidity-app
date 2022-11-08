@@ -6,6 +6,7 @@ import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
 import { format } from "date-fns";
+import { networkMapper } from "~/util";
 import {
   Display,
   GeneralButton,
@@ -21,6 +22,7 @@ import {
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
 import Video from "~/components/Video";
+import Modal from "~/components/Modal";
 import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 
@@ -129,22 +131,11 @@ function ErrorBoundary() {
 }
 
 export default function IndexPage() {
-  // on hover, use winnerTotals[hovered address]
-  const [showChainModal, setShowChainModal] = useState(false);
-  const navigate = useNavigate();
+  const [showChainDashboardModal, setShowChainDashboardModal] = useState(false);
+  const [showChainOpportunityModal, setShowChainOpportunityModal] =
+    useState(false);
 
-  const networkMapper = (network: string) => {
-    switch (network) {
-      case "ETH":
-        return "ethereum";
-      case "SOL":
-        return "solana";
-      case "ethereum":
-        return "ETH";
-      default:
-        return "SOL";
-    }
-  };
+  const navigate = useNavigate();
 
   const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
 
@@ -171,7 +162,9 @@ export default function IndexPage() {
         loop={true}
       />
       <div className="index-page">
+        {/* Navigation Buttons */}
         <div className="header-buttons">
+          {/* Fluidity Website Button */}
           <a href="fluidity.money" rel="noopener noreferrer">
             <LinkButton
               size={"small"}
@@ -183,16 +176,30 @@ export default function IndexPage() {
               {width < mobileBreakpoint ? "WEBSITE " : "FLUIDITY WEBSITE"}
             </LinkButton>
           </a>
+
+          {/* Dashboard */}
           <LinkButton
             size={"small"}
             type={"internal"}
-            handleClick={() => {
-              return;
-            }}
+            handleClick={() => setShowChainDashboardModal(true)}
           >
             {width < mobileBreakpoint ? "APP" : "FLUIDITY APP"}
           </LinkButton>
+
+          {/* Switch Chain Modal - Dashboard */}
+          <Modal visible={showChainDashboardModal}>
+            <BlockchainModal
+              handleModal={setShowChainDashboardModal}
+              option={{ name: "", icon: <div /> }}
+              options={chains}
+              setOption={(chain: string) =>
+                navigate(`/${networkMapper(chain)}/dashboard/home`)
+              }
+              mobile={width <= mobileBreakpoint}
+            />
+          </Modal>
         </div>
+
         <div className="disconnected">
           <div className="opportunity">
             <div className="opportunity-top"></div>
@@ -232,7 +239,7 @@ export default function IndexPage() {
                 buttontype="text"
                 version="primary"
                 handleClick={() => {
-                  setShowChainModal(true);
+                  setShowChainOpportunityModal(true);
                 }}
               >
                 MAKE IT RAIN
@@ -240,9 +247,10 @@ export default function IndexPage() {
             </div>
           </div>
 
-          {showChainModal && (
+          {/* Switch Chain Modal - Opportunity */}
+          <Modal visible={showChainOpportunityModal}>
             <BlockchainModal
-              handleModal={showChainModal}
+              handleModal={setShowChainOpportunityModal}
               option={{ name: "", icon: <div /> }}
               options={chains}
               setOption={(chain: string) =>
@@ -250,7 +258,7 @@ export default function IndexPage() {
               }
               mobile={width <= mobileBreakpoint}
             />
-          )}
+          </Modal>
 
           <div className="opportunity-graph">
             <LineChart

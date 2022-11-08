@@ -1,6 +1,6 @@
 import { useNavigate, Link } from "@remix-run/react";
 import { useState } from "react";
-import { trimAddress } from "~/util";
+import { trimAddress, networkMapper } from "~/util";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { motion } from "framer-motion";
 import {
@@ -9,8 +9,8 @@ import {
   ChainSelectorButton,
   LinkButton,
   Heading,
+  BlockchainModal,
 } from "@fluidity-money/surfing";
-import ChainModal from "~/components/ChainModal";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 
 type IMobileModal = {
@@ -50,13 +50,25 @@ export default function MobileModal({
   }
 
   if (chainModalVisibility) {
+    const handleSetChain = (network: string) => {
+      const { pathname } = location;
+
+      // Get path components after $network
+      const pathComponents = pathname.split("/").slice(2);
+
+      navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
+    };
+
     return (
-      <ChainModal
-        visible={chainModalVisibility}
-        setVisible={setChainModalVisibility}
-        network={network}
-        chains={chains}
-      />
+      <div className="cover">
+        <BlockchainModal
+          handleModal={setChainModalVisibility}
+          option={chains[network as "ethereum" | "solana"]}
+          options={Object.values(chains)}
+          setOption={handleSetChain}
+          mobile={true}
+        />
+      </div>
     );
   }
 
