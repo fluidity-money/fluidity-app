@@ -6,7 +6,7 @@ import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 
 import { FluidityFacadeContext } from "./IFluidityFacade";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useMemo } from "react";
 
 const EthereumFacade = ({ children }: { children: ReactNode }) => {
   const { isActive, isActivating } = useWeb3React();
@@ -23,32 +23,37 @@ const EthereumFacade = ({ children }: { children: ReactNode }) => {
 export const EthereumProvider =
   (rpcUrl: string) =>
   ({ children }: { children: React.ReactNode }) => {
-    const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-      (actions) => new MetaMask({ actions })
-    );
-
-    const [walletConnect, walletconnectHooks] =
-      initializeConnector<WalletConnect>(
-        (actions) =>
-          new WalletConnect({
-            actions,
-            options: {
-              rpc: {
-                1: rpcUrl,
-              },
-            },
-          })
+    const connectors = useMemo(() => {
+      const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+        (actions) => new MetaMask({ actions })
       );
 
-    const connectors: [Connector, Web3ReactHooks][] = [
-      [metaMask, metamaskHooks],
-      [walletConnect, walletconnectHooks],
-    ];
+      const [walletConnect, walletconnectHooks] =
+        initializeConnector<WalletConnect>(
+          (actions) =>
+            new WalletConnect({
+              actions,
+              options: {
+                rpc: {
+                  1: rpcUrl,
+                },
+              },
+            })
+        );
 
-    const connectorHooks: { [key: string]: Web3ReactHooks } = {
-      metaMask: metamaskHooks,
-      walletConnect: walletconnectHooks,
-    };
+      const connectors: [Connector, Web3ReactHooks][] = [
+        [metaMask, metamaskHooks],
+        [walletConnect, walletconnectHooks],
+      ];
+
+      const connectorHooks: { [key: string]: Web3ReactHooks } = {
+        metaMask: metamaskHooks,
+        walletConnect: walletconnectHooks,
+      };
+    
+    return connectors;
+    
+    }, []);
 
     return (
       <>
