@@ -6,6 +6,7 @@ interface IFluidityFacade {
   balance: (token: string) => Promise<number>;
   disconnect: () => Promise<void>;
 
+  connected: boolean;
   useConnectorType: (use: string) => void;
 
   address: string;
