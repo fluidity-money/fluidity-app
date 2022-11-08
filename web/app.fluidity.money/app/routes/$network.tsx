@@ -32,8 +32,17 @@ const Provider = ({
     solana: SolanaProvider(solRpc),
   };
 
+  const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
+
+  useEffect(() => {
+    if (network && Object.keys(providers).includes(network)) {
+      setValidNetwork(network);
+    }
+  }, [network, providers]);
+
   const ProviderComponent = useMemo(() => 
-    (network && providers[network]) || Fragment, [network] )
+    (network && providers[validNetwork]) || Fragment, [validNetwork]
+  )
   
   return <ProviderComponent>{children}</ProviderComponent>;
 };
