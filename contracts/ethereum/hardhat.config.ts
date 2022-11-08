@@ -87,8 +87,6 @@ subtask("forknet:take-usdt", async (_taskArgs, hre) => {
 
 const networks: HardhatUserConfig['networks'] = {};
 
-const hardhat: HardhatUserConfig['networks']['hardhat'] = {};
-
 if (process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY)
   networks['ropsten'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_ROPSTEN_KEY],
@@ -120,14 +118,21 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_MAINNET_URL,
   };
 
-let forkBlockNumber;
-let forkUrl;
-if (process.env.FLU_FORKNET_GOERLI === "true") {
-  forkBlockNumber = 7906700;
-  forkUrl = process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI;
-} else {
-  forkBlockNumber = 14098096;
-  forkUrl = process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET;
+let forkOptions = {};
+if (process.env.FLU_FORKNET_GOERLI === "true" && process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI) {
+  forkOptions = {
+    forking: {
+      url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
+      blockNumber: 7906700,
+    },
+  };
+} else if (process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET) {
+  forkOptions = {
+    forking: {
+      url: process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET,
+      blockNumber: 14098096,
+    },
+  };
 }
 
 /**
@@ -144,10 +149,7 @@ module.exports = {
       accounts: {
         mnemonic: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump",
       },
-      forking: {
-        url: forkUrl,
-        blockNumber: forkBlockNumber,
-      },
+      ...forkOptions,
     },
     ...networks,
   },
