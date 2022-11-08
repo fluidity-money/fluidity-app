@@ -244,7 +244,7 @@ export default function Rewards() {
   } = useLoaderData<LoaderData>();
 
   const { width } = useViewport();
-  const mobileView = width <= 375;
+  const mobileView = width <= 500;
 
   const hasRewarders = rewarders.length > 0;
 

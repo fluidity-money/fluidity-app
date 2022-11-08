@@ -145,14 +145,16 @@ const UnclaimedWinnings = () => {
 
   return (
     <div className="pad-main">
-      {/* Info Card */}
-      <UserRewards
-        claimNow={true}
-        unclaimedRewards={totalUnclaimedRewards}
-        network={network}
-        networkFee={networkFee}
-        gasFee={gasFee}
-      />
+      {/* Info Card - Only accessible for Ethereum */}
+      {network === "ethereum" && (
+        <UserRewards
+          claimNow={true}
+          unclaimedRewards={totalUnclaimedRewards}
+          network={network}
+          networkFee={networkFee}
+          gasFee={gasFee}
+        />
+      )}
 
       <Heading as={"h2"}>Your Winnings</Heading>
 
