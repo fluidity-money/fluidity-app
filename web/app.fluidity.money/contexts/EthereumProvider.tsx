@@ -54,8 +54,6 @@ export const EthereumProvider =
     return connectors;
     
     }, []);
-  
-    console.log("hello");
 
     return (
       <>
