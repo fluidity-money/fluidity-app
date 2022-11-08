@@ -2,7 +2,8 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import { redirect } from "@remix-run/node";
-import { useMemo } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useEffect, useMemo, useState } from "react";
 
 import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
@@ -31,11 +32,9 @@ const Provider = ({
     solana: SolanaProvider(solRpc),
   };
 
-  const ProviderComponent = useMemo(
-    () => (network && providers[network]) || Fragment,
-    [network]
-  );
-
+  const ProviderComponent = useMemo(() => 
+    (network && providers[network]) || Fragment, [network] )
+  
   return <ProviderComponent>{children}</ProviderComponent>;
 };
 

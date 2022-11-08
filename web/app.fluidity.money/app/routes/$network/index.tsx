@@ -16,6 +16,7 @@ import {
   Text,
   ChainSelectorButton,
   BlockchainModal,
+  Twitter,
   normaliseAddress,
   trimAddress,
   numberToMonetaryString,
@@ -237,7 +238,7 @@ const NetworkPage = () => {
                 size="large"
                 version="transparent"
                 buttontype="icon before"
-                icon={<img src="/images/socials/twitter.svg" />}
+                icon={<Twitter />}
                 handleClick={() => {
                   return;
                 }}
