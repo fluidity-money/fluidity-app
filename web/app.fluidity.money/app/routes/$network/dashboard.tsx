@@ -258,7 +258,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     //prevents and allows scrolling depending if mobile modal is open
-    handleScroll();
+    if (openMobModal) {
+      //delay to hide layout shift when static
+      setTimeout(() => {
+        handleScroll();
+      }, 1000);
+    } else handleScroll();
   }, [openMobModal]);
 
   return (
@@ -422,6 +427,8 @@ export default function Dashboard() {
           />
         ) : null}
 
+        <Outlet />
+
         {/* Mobile Menu Modal */}
         {openMobModal && (
           <MobileModal
@@ -435,8 +442,6 @@ export default function Dashboard() {
             unclaimedRewards={unclaimedRewards}
           />
         )}
-
-        <Outlet />
 
         {/* Provide Luquidity*/}
         <ProvideLiquidity />
