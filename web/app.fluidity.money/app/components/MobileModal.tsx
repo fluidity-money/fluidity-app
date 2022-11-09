@@ -230,13 +230,17 @@ export default function MobileModal({
               </GeneralButton>
               <footer>
                 {/* Fluidity Website */}
-                <LinkButton
-                  size="medium"
-                  type="external"
-                  handleClick={() => navigate("https://staging.fluidity.money")}
-                >
-                  Fluidity Money Website
-                </LinkButton>
+                <a href="https://fluidity.money" rel="noopener noreferrer">
+                  <LinkButton
+                    size="medium"
+                    type="external"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Fluidity Money Website
+                  </LinkButton>
+                </a>
               </footer>
             </section>
           </div>
