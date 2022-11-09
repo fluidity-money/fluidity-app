@@ -25,6 +25,10 @@ import (
 type integrationTest struct {
 	// Transfer.Log.Data JSON must be base64
 	Transfer worker.EthereumApplicationTransfer `json:"transfer"`
+
+	// Transaction to store the transaction info
+	Transaction ethereum.Transaction `json:"transaction"`
+
 	// ExpectedSender to receive a majority payout
 	ExpectedSender ethereum.Address `json:"expected_sender"`
 	// ExpectedReceiver to receive a minority mayout
@@ -104,13 +108,14 @@ func TestIntegrations(t *testing.T) {
 		t.Logf("Event %d\n", i)
 
 		var (
+			transaction   = event.Transaction
 			transfer      = event.Transfer
 			fluidAddress  = event.FluidContractAddress
 			tokenDecimals = event.FluidTokenDecimals
 			client        = event.Client
 		)
 
-		txHash := common.ConvertInternalHash(transfer.Transaction.Hash)
+		txHash := common.ConvertInternalHash(transfer.TransactionHash)
 
 		// Get all logs in transaction
 		txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
@@ -123,17 +128,19 @@ func TestIntegrations(t *testing.T) {
 			)
 		}
 
+		convertedReceipt := common.ConvertGethReceipt(*txReceipt)
+
 		fees, emission, err := applications.GetApplicationFee(
 			transfer,
 			client,
 			fluidAddress,
 			tokenDecimals,
-			txReceipt,
+			convertedReceipt,
 		)
 
 		assert.NoError(t, err)
 
-		sender, recipient, err := applications.GetApplicationTransferParties(event.Transfer)
+		sender, recipient, err := applications.GetApplicationTransferParties(transaction, transfer)
 		assert.NoError(t, err)
 
 		// correct sender, recipient
