@@ -3,10 +3,10 @@ import { createContext } from "react";
 export interface IFluidityFacade {
   swap: (
     amount: string,
-    token: string,
+    tokenAddr: string,
   ) => Promise<void>;
   limit: () => Promise<number>;
-  balance: (token: string) => Promise<string>;
+  balance: (tokenAddr: string) => Promise<string>;
   disconnect: () => Promise<void>;
 
   connected: boolean;
