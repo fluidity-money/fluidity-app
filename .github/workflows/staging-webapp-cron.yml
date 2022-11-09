@@ -32,8 +32,8 @@ jobs:
               --group app \
               --service all \
               --environment dev \ 
-              --build-root-container false \
-              --build-build-container false \
+              --build-root-container 'false' \
+              --build-build-container 'false' \
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
@@ -45,7 +45,7 @@ jobs:
               --group app \
               --service all \
               --environment dev \
-              --debug false \
+              --debug 'false' \
               --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
         uses: rjstone/discord-webhook-notify@v1
