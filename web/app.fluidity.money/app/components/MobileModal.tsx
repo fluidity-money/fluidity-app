@@ -50,6 +50,7 @@ export default function MobileModal({
   const [animation, setAnimation] = useState(true);
 
   useEffect(() => {
+    // turns off animation when chain select modal is used and activates when it isn't
     if (isOpen) setAnimation(false);
     if (!isOpen) setAnimation(true);
   }, [isOpen]);
