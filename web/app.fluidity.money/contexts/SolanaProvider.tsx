@@ -20,7 +20,7 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
   const { connected, publicKey, disconnect } = useWallet();
 
   console.log("connected", connected, "addr:", publicKey?.toString());
-  
+
   return (
     <FluidityFacadeContext.Provider
       value={{
@@ -58,8 +58,8 @@ const SolanaProvider =
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
           <SolanaFacade>{children}</SolanaFacade>
-  </WalletProvider>
-  </ConnectionProvider>
+        </WalletProvider>
+      </ConnectionProvider>
     );
   };
 

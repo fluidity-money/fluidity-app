@@ -16,7 +16,12 @@ import { FluidityInstruction } from "./fluidityInstruction";
 // Reworked from SaberHQ/token-utils
 // https://github.com/saber-hq/saber-common/blob/master/packages/token-utils/src/instructions/ata.ts#L43
 // Retrieves ATA, and optionally creates instruction to create ATA
-export const getOrCreateATA = async (connection: Connection, mint: PublicKey, owner: PublicKey, payer: PublicKey) => {
+export const getOrCreateATA = async (
+  connection: Connection,
+  mint: PublicKey,
+  owner: PublicKey,
+  payer: PublicKey
+) => {
   const address = getATAAddressSync({ mint, owner });
   if (await connection.getAccountInfo(address)) {
     return { address, instruction: null };
@@ -31,7 +36,7 @@ export const getOrCreateATA = async (connection: Connection, mint: PublicKey, ow
       }),
     };
   }
-}
+};
 
 // return the array of keys required to either wrap or unwrap fluid tokens
 export const getFluidInstructionKeys = async (

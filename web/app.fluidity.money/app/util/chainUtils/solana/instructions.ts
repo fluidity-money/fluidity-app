@@ -5,10 +5,7 @@ import {
   SendTransactionError,
 } from "@solana/web3.js";
 import { getATAAddressSync } from "@saberhq/token-utils";
-import {
-  useWallet,
-  useConnection,
-} from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { jsonPost, getTokenFromAddress } from "~/util";
 import { BN } from "bn.js";
 import { FluidityInstruction } from "./fluidityInstruction";
@@ -114,9 +111,7 @@ const swap = async (
   const { publicKey, wallet, connection, connected } = solContext;
 
   if (!wallet.signTransaction)
-    throw new Error(
-      `Could not initiate Swap: Wallet cannot sign transactions`
-    );
+    throw new Error(`Could not initiate Swap: Wallet cannot sign transactions`);
 
   const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
 
@@ -174,19 +169,19 @@ const swap = async (
       TokenSymbol: baseTokenSymbol,
       bumpSeed,
     });
-    
+
     const ataResult = await getOrCreateATA(
       connection,
       new PublicKey(baseToken.address),
       publicKey,
-      publicKey,
+      publicKey
     );
 
     const fluidAtaResult = await getOrCreateATA(
       connection,
       new PublicKey(fluidToken.address),
       publicKey,
-      publicKey,
+      publicKey
     );
 
     //create the transaction
