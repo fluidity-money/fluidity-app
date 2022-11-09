@@ -250,6 +250,7 @@ main > footer > section > a {
 
 #provide-liquidity {
   width: auto;
+  max-width: 60em;
   padding: 2em;
   margin-bottom: 6em;
   margin-left: 64px;
