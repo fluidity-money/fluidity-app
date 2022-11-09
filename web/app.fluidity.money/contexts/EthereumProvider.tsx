@@ -9,7 +9,7 @@ import { WalletConnect } from "@web3-react/walletconnect";
 import { FluidityFacadeContext } from "./IFluidityFacade";
 import { ReactNode, useMemo } from "react";
 import makeContractSwap, {ContractToken, getUsdUserMintLimit, usdBalanceOfERC20} from "~/util/chainUtils/ethereum/transaction";
-import {Token} from "~/util/chainUtils/tokens";
+import {getTokenFromAddress, Token} from "~/util/chainUtils/tokens";
 
 const EthereumFacade = ({ children, tokens, connectors}: { children: ReactNode, tokens: Token[], connectors: [Connector, Web3ReactHooks][]}) => {
   const { isActive, provider, account, connector } = useWeb3React();
@@ -54,11 +54,13 @@ const EthereumFacade = ({ children, tokens, connectors}: { children: ReactNode, 
 
   // swap <symbol> to its counterpart, with amount in its own units
   // e.g. swap $1.6 of USDC to fUSDC: swap("1600000", "USDC")
-  const swap = async(amount: string, symbol: string): Promise<void> => {
+  const swap = async(amount: string, contractAddress: string): Promise<void> => {
     const signer = provider?.getSigner();
     if (!signer) {
       return;
     }
+
+    const {symbol} = getTokenFromAddress("ethereum", contractAddress) || {};
 
     const fromToken = tokens.find(t => t.symbol === symbol);
 
