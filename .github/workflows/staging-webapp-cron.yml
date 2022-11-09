@@ -11,7 +11,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: dev
     steps:
       - uses: actions/checkout@v3
         with:
