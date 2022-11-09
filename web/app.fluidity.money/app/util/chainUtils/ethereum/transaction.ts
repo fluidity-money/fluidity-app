@@ -15,7 +15,7 @@ export const getBalanceOfERC20 = async(signer: Signer, contractAddress: string, 
 }
 
 // get ERC20 balance for the given token, divided by its decimals
-export const usdBalanceOfERC20 = async (signer: Signer, contractAddress: string, ABI: ContractInterface): Promise<number> => {
+export const usdBalanceOfERC20 = async(signer: Signer, contractAddress: string, ABI: ContractInterface): Promise<number> => {
     const contract = getContract(signer, contractAddress, ABI);
     if (!contract) 
       return 0;
@@ -25,6 +25,38 @@ export const usdBalanceOfERC20 = async (signer: Signer, contractAddress: string,
     const decimals = (await contract.decimals()).toString();
 
     return Number(utils.formatUnits(balance, decimals));
+}
+
+// whether the per-user mint limit is enabled for the contract
+export const userMintLimitedEnabled = async(signer: Signer, contractAddress: string, ABI: ContractInterface): Promise<boolean> => {
+    const contract = getContract(signer, contractAddress, ABI);
+    if (!contract) return false;
+    return await contract.mintLimitsEnabled();
+}
+
+// the user mint limit for the contract, regardless of whether it's enabled
+export const getUserMintLimit = async(signer: Signer, contractAddress: string, ABI: ContractInterface, ): Promise<string> => {
+    const contract = getContract(signer, contractAddress, ABI);
+    if (!contract) return "0";
+    return (await contract.userMintLimit()).toString();
+}
+
+// the user mint limit for the contract scaled by decimals, regardless of whether it's enabled
+export const getUsdUserMintLimit = async(signer: Signer, contractAddress: string, ABI: ContractInterface, ): Promise<number> => {
+    const contract = getContract(signer, contractAddress, ABI);
+    if (!contract) return 0;
+
+    const limit = (await contract.userMintLimit()).toString();
+    const decimals = (await contract.decimals()).toString();
+
+    return Number(utils.formatUnits(limit, decimals));
+}
+
+// the amount towards the mint limit the given user has currently minted
+export const getAmountMinted = async(signer: Signer, contractAddress: string, ABI: ContractInterface, userAddress: string): Promise<string> => {
+    const contract = getContract(signer, contractAddress, ABI);
+    if (!contract) return "0";
+    return (await contract.userAmountMinted(userAddress)).toString();
 }
 
 export type ContractToken = {

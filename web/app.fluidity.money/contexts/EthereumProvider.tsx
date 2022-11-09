@@ -8,7 +8,7 @@ import { WalletConnect } from "@web3-react/walletconnect";
 
 import { FluidityFacadeContext } from "./IFluidityFacade";
 import { ReactNode, useEffect, useState } from "react";
-import makeContractSwap, {ContractToken, usdBalanceOfERC20} from "~/util/chainUtils/ethereum/transaction";
+import makeContractSwap, {ContractToken, getUsdUserMintLimit, usdBalanceOfERC20} from "~/util/chainUtils/ethereum/transaction";
 import {Token} from "~/util/chainUtils/tokens";
 
 const EthereumFacade = ({ children,  tokens}: { children: ReactNode, tokens: Token[]}) => {
@@ -30,6 +30,16 @@ const EthereumFacade = ({ children,  tokens}: { children: ReactNode, tokens: Tok
   }, [connectorType])
 
   const deactivate = async(): Promise<void> => connector.deactivate?.();
+
+  // the per-user mint limit for the given contract
+  const limit = async(contractAddress: string): Promise<number> => {
+    const signer = provider?.getSigner();
+    if (!signer) {
+      return 0;
+    }
+    
+    return await getUsdUserMintLimit(signer, contractAddress, tokenAbi);
+  }
 
   // swap <symbol> to its counterpart, with amount in its own units
   // e.g. swap $1.6 of USDC to fUSDC: swap("1600000", "USDC")
@@ -79,7 +89,7 @@ const EthereumFacade = ({ children,  tokens}: { children: ReactNode, tokens: Tok
   return (
     <FluidityFacadeContext.Provider value={{
       swap,
-      limit: async(token) => 0,
+      limit,
       balance: getBalance,
       disconnect: deactivate,
       useConnectorType: setConnectorType,
