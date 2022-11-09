@@ -257,14 +257,20 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    //prevents and allows scrolling depending if mobile modal is open
+    // Prevents and allows scrolling depending if mobile modal is open
     if (openMobModal) {
-      //delay to hide layout shift when static
+      // Delay to hide layout shift when static
       setTimeout(() => {
         handleScroll();
       }, 1000);
     } else handleScroll();
   }, [openMobModal]);
+
+  useEffect(() => {
+    // Resets background when navigating away
+    document.body.style.overflow = "unset";
+    document.body.style.position = "static";
+  }, [currentPath]);
 
   return (
     <>
