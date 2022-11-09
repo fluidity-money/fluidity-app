@@ -1,3 +1,5 @@
+import type { Token } from "~/util/chainUtils/tokens";
+
 import {
   Transaction as SolanaTxn,
   TransactionInstruction,
@@ -6,7 +8,7 @@ import {
 } from "@solana/web3.js";
 import { getATAAddressSync } from "@saberhq/token-utils";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { jsonPost, getTokenFromAddress } from "~/util";
+import { jsonPost, getTokenFromAddress, getTokenForNetwork } from "~/util";
 import { BN } from "bn.js";
 import { FluidityInstruction } from "./fluidityInstruction";
 import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
@@ -99,8 +101,7 @@ const limit = async (): Promise<number> => {
 
 const swap = async (
   amount: string,
-  fluidTokenAddr: string,
-  swapForFluid: boolean
+  fromTokenAddr: string,
 ) => {
   const solContext = getCheckedSolContext();
 
@@ -113,18 +114,45 @@ const swap = async (
   if (!wallet.signTransaction)
     throw new Error(`Could not initiate Swap: Wallet cannot sign transactions`);
 
-  const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
+  const fromToken = getTokenFromAddress("solana", fromTokenAddr);
+
+  if (!fromToken)
+    throw new Error(
+      `Could not initiate Swap: Could not find matching token ${fromTokenAddr} in solana`
+    );
+  
+  // true if swapping from fluid -> non-fluid
+  const fromFluid = !!fromToken.isFluidOf
+  
+  const fluidAssets = getTokenForNetwork("solana");
+  
+  if (!fluidAssets.length)
+    throw new Error(
+      `Could not initiate Swap: Could not get fluid tokens from solana`
+    );
+  
+  const toToken = fromFluid
+    ? getTokenFromAddress("solana", fromToken.isFluidOf!)
+    : fluidAssets.reduce((_: Token | null, fluidTokenAddr: string) => {
+    const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
 
   if (!fluidToken)
     throw new Error(
-      `Could not initiate Swap: Could not find matching token ${fluidToken} in solana`
+      `Could not find Fluid token ${fluidTokenAddr} in solana`
     );
-
-  const baseTokenAddr = fluidToken.isFluidOf;
-  if (!baseTokenAddr)
+    
+    return fluidToken.isFluidOf === fromTokenAddr ? fluidToken : null
+  }, null)
+  
+  if (!toToken) 
     throw new Error(
-      `Could not initiate Swap: Could not find fluid pair token from ${fluidToken} in solana`
+      `Could not initiate Swap: Could not find dest pair token from ${fromTokenAddr} in solana`
     );
+  
+  const [baseToken, fluidToken] = fromFluid
+    ? [toToken, fromToken]
+    : [fromToken, toToken]
+  
 
   const obligationAccount = fluidToken.obligationAccount;
 
@@ -140,23 +168,15 @@ const swap = async (
       `Could not initiate Swap: Fluid token ${fluidToken} missing dataAccount`
     );
 
-  const baseToken = getTokenFromAddress("solana", baseTokenAddr);
-  if (!baseToken)
-    throw new Error(
-      `Could not initiate Swap: Could not find matching base token ${baseTokenAddr} in solana`
-    );
+  const fromBalance_ = await balance(fromToken.address);
 
-  const srcToken = swapForFluid ? baseToken : fluidToken;
-
-  const srcBalance_ = await balance(srcToken.address);
-
-  const srcBalance = new BN(srcBalance_);
+  const fromBalance = new BN(fromBalance_);
 
   const amountBn = new BN(amount);
 
-  if (srcBalance.lt(amountBn)) {
+  if (fromBalance.lt(amountBn)) {
     throw new Error(
-      `Could not initiate Swap: Attempted to swap ${amount} ${srcToken.name}, but balance is ${srcBalance}`
+      `Could not initiate Swap: Attempted to swap ${amount} ${fromToken.name}, but balance is ${fromBalance}`
     );
   }
 
@@ -165,7 +185,7 @@ const swap = async (
     const bumpSeed = await FluidityInstruction.getBumpSeed(baseTokenSymbol);
 
     const fluidityInstruction = new FluidityInstruction({
-      ...(swapForFluid ? { Wrap: amountBn } : { Unwrap: amountBn }),
+      ...(fromFluid ? { Unwrap: amountBn } : { Wrap: amountBn }),
       TokenSymbol: baseTokenSymbol,
       bumpSeed,
     });
