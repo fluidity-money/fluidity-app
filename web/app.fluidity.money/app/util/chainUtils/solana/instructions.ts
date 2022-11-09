@@ -4,12 +4,15 @@ import {
   PublicKey,
   SendTransactionError,
 } from "@solana/web3.js";
-import { getATAAddressSync, getOrCreateATA } from "@saberhq/token-utils";
-import { useSolana } from "@saberhq/use-solana";
+import { getATAAddressSync } from "@saberhq/token-utils";
+import {
+  useWallet,
+  useConnection,
+} from "@solana/wallet-adapter-react";
 import { jsonPost, getTokenFromAddress } from "~/util";
 import { BN } from "bn.js";
 import { FluidityInstruction } from "./fluidityInstruction";
-import { getFluidInstructionKeys } from "./solanaAddresses";
+import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
 
 type MintLimitReq = {
   address: string;
@@ -18,22 +21,23 @@ type MintLimitReq = {
 type MintLimitRes = number;
 
 const getCheckedSolContext = () => {
-  const sol = useSolana();
+  const wallet = useWallet();
 
-  if (!sol.connected) return new Error("Not connected");
+  if (!wallet) return new Error("Not wallet found");
 
-  if (!sol.wallet) return new Error("No wallet found");
+  const { connected, publicKey } = wallet;
 
-  if (!sol.publicKey) return new Error("No public key found");
+  if (!connected) return new Error("Not connected");
 
-  if (!sol.providerMut) return new Error("No provider found");
+  if (!publicKey) return new Error("No public key found");
+
+  const { connection } = useConnection();
 
   return {
-    connected: sol.connected,
-    publicKey: sol.publicKey,
-    wallet: sol.wallet,
-    providerMut: sol.providerMut,
-    connection: sol.connection,
+    connected,
+    publicKey,
+    wallet,
+    connection,
   };
 };
 
@@ -107,7 +111,12 @@ const swap = async (
     throw new Error(`Could not fetch balance: ${solContext}`);
   }
 
-  const { publicKey, wallet, providerMut, connection } = solContext;
+  const { publicKey, wallet, connection, connected } = solContext;
+
+  if (!wallet.signTransaction)
+    throw new Error(
+      `Could not initiate Swap: Wallet cannot sign transactions`
+    );
 
   const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
 
@@ -165,15 +174,20 @@ const swap = async (
       TokenSymbol: baseTokenSymbol,
       bumpSeed,
     });
+    
+    const ataResult = await getOrCreateATA(
+      connection,
+      new PublicKey(baseToken.address),
+      publicKey,
+      publicKey,
+    );
 
-    const ataResult = await getOrCreateATA({
-      provider: providerMut,
-      mint: new PublicKey(baseToken.address),
-    });
-    const fluidAtaResult = await getOrCreateATA({
-      provider: providerMut,
-      mint: new PublicKey(fluidToken.address),
-    });
+    const fluidAtaResult = await getOrCreateATA(
+      connection,
+      new PublicKey(fluidToken.address),
+      publicKey,
+      publicKey,
+    );
 
     //create the transaction
     const transaction = new SolanaTxn({
@@ -209,7 +223,7 @@ const swap = async (
     //fetch blockhash
     const { blockhash, lastValidBlockHeight } =
       await connection.getLatestBlockhash();
-    if (!wallet.connected) await wallet.connect();
+    if (!connected) await wallet.connect();
 
     //add blockhash and main swap instruction
     transaction.recentBlockhash = blockhash;
@@ -237,10 +251,8 @@ const swap = async (
   }
 };
 
-export const solanaInstructions = () => {
-  return {
-    balance: balance,
-    swap: swap,
-    limit: limit,
-  };
+export const solanaInstructions = {
+  balance: balance,
+  swap: swap,
+  limit: limit,
 };

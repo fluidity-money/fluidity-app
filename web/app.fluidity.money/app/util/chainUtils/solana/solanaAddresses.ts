@@ -1,16 +1,37 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
+import type { Connection } from "@solana/web3.js";
 import type { Token } from "~/util/chainUtils/tokens";
 
 import { PublicKey } from "@solana/web3.js";
-import { getATAAddressSync } from "@saberhq/token-utils";
+import { getATAAddressSync, createATAInstruction } from "@saberhq/token-utils";
 import * as splToken from "@solana/spl-token";
 import { AccountMeta } from "@solana/web3.js";
 
 //https://github.com/solendprotocol/common/blob/master/src/devnet.json
 //provides the accounts required for Solend interaction
 import { FluidityInstruction } from "./fluidityInstruction";
+
+// Reworked from SaberHQ/token-utils
+// https://github.com/saber-hq/saber-common/blob/master/packages/token-utils/src/instructions/ata.ts#L43
+// Retrieves ATA, and optionally creates instruction to create ATA
+export const getOrCreateATA = async (connection: Connection, mint: PublicKey, owner: PublicKey, payer: PublicKey) => {
+  const address = getATAAddressSync({ mint, owner });
+  if (await connection.getAccountInfo(address)) {
+    return { address, instruction: null };
+  } else {
+    return {
+      address,
+      instruction: createATAInstruction({
+        mint,
+        address,
+        owner,
+        payer,
+      }),
+    };
+  }
+}
 
 // return the array of keys required to either wrap or unwrap fluid tokens
 export const getFluidInstructionKeys = async (
