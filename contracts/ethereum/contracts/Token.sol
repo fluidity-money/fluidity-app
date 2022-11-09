@@ -617,7 +617,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
      *
      * @param the account to check
      */
-    function userMintLimitUsed(address account) public view returns (uint) {
+    function userAmountMinted(address account) public view returns (uint) {
         bool userHasntMinted = userLastMintedBlock_[account] < userMintResetBlock_;
 
         if (userHasntMinted) {
