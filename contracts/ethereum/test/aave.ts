@@ -1,9 +1,15 @@
 import * as hre from "hardhat";
 import * as ethers from 'ethers';
-import { feiAccount, fFeiAccount, accountSigner, accountAddr } from './setup';
+import { feiAccount, fFeiAccount } from './setup-mainnet';
 import { expectEq, expectGt } from "./test-utils";
+import { accountAddr } from "./setup-common";
 
 describe("token aave integration", async function () {
+  before(async function () {
+    if (process.env.FLU_FORKNET_GOERLI === "true") {
+      return this.skip();
+    }
+  });
 
   it("should allow depositing erc20 tokens", async function () {
     const originalFeiBalance = (await feiAccount.balanceOf(accountAddr));

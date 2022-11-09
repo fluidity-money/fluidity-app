@@ -4,13 +4,18 @@ import {
     fUsdtOracle,
     fUsdtOperator,
     fUsdtCouncil,
-    accountAddr,
-    configAddr,
-} from './setup';
+} from './setup-mainnet';
+import { accountAddr, configAddr } from './setup-common'
 import * as ethers from 'ethers';
 import { expect } from "chai";
 
 describe("Token", async function () {
+    before(async function () {
+        if (process.env.FLU_FORKNET_GOERLI === "true") {
+            return this.skip();
+        }
+    });
+
     it("supports disabling wraps and rewards with emergency mode", async function () {
         await fUsdtOperator.enableEmergencyMode();
 

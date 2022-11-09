@@ -602,6 +602,33 @@ contract Token is IERC20, ITransferWithBeneficiary {
         return signer;
     }
 
+    /*
+     * @notice returns whether mint limits are enabled
+     */
+    function mintLimitsEnabled() public view returns (bool) { return mintLimitsEnabled_; }
+ 
+    /*
+     * @notice returns the mint limit per user
+     */
+    function userMintLimit() public view returns (uint) { return userMintLimit_; }
+
+    /*
+     * @notice returns how much `account` has minted
+     *
+     * @param the account to check
+     */
+    function userAmountMinted(address account) public view returns (uint) {
+        bool userHasntMinted = userLastMintedBlock_[account] < userMintResetBlock_;
+
+        if (userHasntMinted) {
+            // user hasn't minted since the reset
+            return 0;
+        } else {
+            // user has minted
+            return userAmountMinted_[account];
+        }
+    }
+
     // remaining functions are taken from OpenZeppelin's ERC20 implementation
 
     function name() public view returns (string memory) { return name_; }

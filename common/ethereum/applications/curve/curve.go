@@ -179,7 +179,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		log.App(func(k *log.Log) {
 			k.Format(
 				"Received a Curve swap in transaction %#v not involving the fluid token - skipping!",
-				transfer.Transaction.Hash.String(),
+				transfer.TransactionHash.String(),
 			)
 		})
 

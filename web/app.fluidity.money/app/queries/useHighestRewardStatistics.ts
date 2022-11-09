@@ -1,33 +1,41 @@
-import { gql, Queryable } from "~/util";
+import { gql } from "~/util";
 import { jsonPost } from "~/util/api/rpc";
 
-const query: Queryable = {
-  ethereum: gql`
-    query HighestRewards($network: network_blockchain!) {
-      highest_rewards_monthly(where: { network: { _eq: $network } }) {
-        network
-        transaction_hash
-        winning_address
-        awarded_time
-        token_short_name
-        winning_amount_scaled
-      }
-      highest_reward_winner_totals(where: { network: { _eq: $network } }) {
-        transaction_count
-        winning_address
-        total_winnings
-      }
+const queryByNetwork = gql`
+  query HighestRewardsByNetwork($network: network_blockchain!) {
+    highest_rewards_monthly(where: { network: { _eq: $network } }) {
+      network
+      transaction_hash
+      winning_address
+      awarded_day
+      token_short_name
+      winning_amount_scaled
     }
-  `,
-  solana: gql``,
-};
+    highest_reward_winner_totals(where: { network: { _eq: $network } }) {
+      transaction_count
+      winning_address
+      total_winnings
+    }
+  }
+`;
 
-type HighestRewardBody = {
-  variables: {
-    network: string;
-  };
-  query: string;
-};
+const queryAll = gql`
+  query HighestRewardsAllNetworks {
+    highest_rewards_monthly {
+      network
+      transaction_hash
+      winning_address
+      awarded_day
+      token_short_name
+      winning_amount_scaled
+    }
+    highest_reward_winner_totals {
+      transaction_count
+      winning_address
+      total_winnings
+    }
+  }
+`;
 
 export type HighestRewardResponse = {
   data: {
@@ -45,10 +53,17 @@ export type HighestRewardResponse = {
       total_winnings: number;
     }>;
   };
-  errors?: any;
+  errors?: Record<string, unknown>;
 };
 
-const useHighestRewardStatistics = async (network: string) => {
+type HighestRewardByNetworkBody = {
+  variables: {
+    network: string;
+  };
+  query: string;
+};
+
+const useHighestRewardStatisticsByNetwork = async (network: string) => {
   if (network !== "ethereum") {
     throw Error(`network ${network} not supported`);
   }
@@ -57,9 +72,27 @@ const useHighestRewardStatistics = async (network: string) => {
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
-    query: query[network],
+    query: queryByNetwork,
   };
-  const response = await jsonPost<HighestRewardBody, HighestRewardResponse>(
+  const response = await jsonPost<
+    HighestRewardByNetworkBody,
+    HighestRewardResponse
+  >(url, body);
+
+  return response;
+};
+
+type HighestRewardAllBody = {
+  query: string;
+};
+
+const useHighestRewardStatisticsAll = async () => {
+  const url = "https://fluidity.hasura.app/v1/graphql";
+  const body = {
+    query: queryAll,
+  };
+
+  const response = await jsonPost<HighestRewardAllBody, HighestRewardResponse>(
     url,
     body
   );
@@ -67,4 +100,4 @@ const useHighestRewardStatistics = async (network: string) => {
   return response;
 };
 
-export default useHighestRewardStatistics;
+export { useHighestRewardStatisticsAll, useHighestRewardStatisticsByNetwork };

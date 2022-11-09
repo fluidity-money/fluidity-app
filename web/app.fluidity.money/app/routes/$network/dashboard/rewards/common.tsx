@@ -90,7 +90,10 @@ const UserRewards = ({
             <section id="unclaimed">
               <Text size="md">Unclaimed fluid rewards</Text>
               <Display className="unclaimed-total" size={"sm"}>
-                {numberToMonetaryString(unclaimedRewards)}
+                {unclaimedRewards.toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                })}
               </Display>
               {claiming ? (
                 <GeneralButton

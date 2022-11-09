@@ -51,7 +51,9 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption, mo
         >
           Select a Blockchain
         </Heading>
-        <button onClick={() => handleModal(false)}>X</button>
+        <button onClick={() => handleModal(false)}>
+          <Text size={"xl"} prominent={true}>X</Text>
+        </button>
       </div>
       {options.map((option, i) => isSelected(option) 
         ? (

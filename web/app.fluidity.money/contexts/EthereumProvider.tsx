@@ -7,7 +7,7 @@ import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 
 import { FluidityFacadeContext } from "./IFluidityFacade";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import makeContractSwap, {ContractToken, getUsdUserMintLimit, usdBalanceOfERC20} from "~/util/chainUtils/ethereum/transaction";
 import {Token} from "~/util/chainUtils/tokens";
 
@@ -115,32 +115,37 @@ const EthereumFacade = ({ children, tokens, connectors}: { children: ReactNode, 
 export const EthereumProvider =
   (rpcUrl: string, tokens: Token[]) =>
   ({ children }: { children: React.ReactNode }) => {
-    const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-      (actions) => new MetaMask({ actions })
-    );
-
-    const [walletConnect, walletconnectHooks] =
-      initializeConnector<WalletConnect>(
-        (actions) =>
-          new WalletConnect({
-            actions,
-            options: {
-              rpc: {
-                1: rpcUrl,
-              },
-            },
-          })
+    const connectors = useMemo(() => {
+      const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+        (actions) => new MetaMask({ actions })
       );
 
-    const connectors: [Connector, Web3ReactHooks][] = [
-      [metaMask, metamaskHooks],
-      [walletConnect, walletconnectHooks],
-    ];
+      const [walletConnect, walletconnectHooks] =
+        initializeConnector<WalletConnect>(
+          (actions) =>
+            new WalletConnect({
+              actions,
+              options: {
+                rpc: {
+                  1: rpcUrl,
+                },
+              },
+            })
+        );
 
-    const connectorHooks: { [key: string]: Web3ReactHooks } = {
-      metaMask: metamaskHooks,
-      walletConnect: walletconnectHooks,
-    };
+      const connectors: [Connector, Web3ReactHooks][] = [
+        [metaMask, metamaskHooks],
+        [walletConnect, walletconnectHooks],
+      ];
+
+      const connectorHooks: { [key: string]: Web3ReactHooks } = {
+        metaMask: metamaskHooks,
+        walletConnect: walletconnectHooks,
+      };
+    
+    return connectors;
+    
+    }, []);
 
     return (
       <>

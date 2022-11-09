@@ -310,6 +310,7 @@ main > footer > section > a {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+  align-items: flex-start;
 }
 
 .provide-liquidity-left > div:first-child {
@@ -330,9 +331,10 @@ main > footer > section > a {
 }
 
 .liquidity-providers {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
   gap: 0.75em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .liquidity-providers > a {
@@ -361,6 +363,128 @@ main > footer > section > a {
   width: 100%;
 }
 
+.solana-wallet-modal-container {
+  position: absolute;
+  width: 30%;
+  min-width: 350px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(29, 23, 23);
+  padding: 30px;
+}
+
+.solana-wallet-modal-container > ul > li {
+  width: 100%;
+  display: flex;
+  list-style: none;
+  cursor: pointer;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0.5em;
+  padding: 0.25em;
+  box-sizing: border-box;
+}
+
+.solana-wallet-modal-container > ul > li:hover {
+  background-color: gainsboro;
+}
+
+.solana-wallet-modal-container > ul > li > span {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-right: 0.25em;
+}
+
+.solana-wallet-modal-container > ul > li > span > img {
+  width: 2.5em;
+}
+
+.solana-modal-cancel-btn {
+  cursor: pointer;
+  float: right;
+  margin-top: -0.5em;
+  opacity: 0.6;
+  padding: 6px;
+  border-radius: 0.2em;
+  width: 1em;
+}
+
+.solana-modal-cancel-btn:hover {
+  opacity: 1;
+  background-color: #0f2339;
+}
+
+.solana-modal-wallet-list {
+  background-color: white;
+  padding: 20px;
+}
+
+.solana-modal-wallet-names {
+  margin: 10px;
+}
+
+.solana-modal-wallet-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.show-modal {
+  display: block;
+}
+
+.hide-modal {
+  display: none;
+}
+
+.connect-wallet-btn {
+  position: absolute;
+  margin: 0 0 0 40px;
+  top: 90%;
+}
+
+.burger-btn {
+  height: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.burger-span {
+  height: 1px;
+  width: 12px;
+  background-color: white;
+  border-radius: 40%;
+}
+
+.burger-btn:hover > .burger-span {
+  background-color: black;
+}
+
+.dashboard-navbar-default {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.dashboard-navbar-active {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.dashboard-navbar-default > svg {
+  fill: #828381;
+}
+
+.dashboard-navbar-active svg {
+  fill: white;
+}
+
 @media only screen and (max-width: 500px) {
   .hide-on-mobile {
     display: none;
@@ -376,10 +500,6 @@ main > footer > section > a {
     padding-top: 0;
   }
 
-  .liquidity-providers {
-    grid-template-columns: 1fr 1fr 1fr;
-    align-items: center;
-  }
   .provide-liquidity-left {
     order: 1;
     align-items: center;
@@ -433,87 +553,8 @@ main > footer > section > a {
     padding: 1em;
     margin: 0 0 2em 0;
   }
-}
 
-.solana-wallet-modal-container {
-  position: absolute;
-  width: 30%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgb(29, 23, 23);
-  padding: 30px;
-}
-
-.solana-wallet-modal-container > ul > li {
-  width: 100%;
-  display: flex;
-  list-style: none;
-  cursor: pointer;
-  justify-content: space-between;
-}
-
-.solana-wallet-modal-container > ul > li > span {
-  width: 100%;
-  display: flex;
-}
-
-.solana-wallet-modal-container > ul > li > span > img {
-  width: 30%;
-  margin-right: 10px;
-}
-
-.solana-modal-cancel-btn {
-  cursor: pointer;
-  float: right;
-  margin-top: -20px;
-}
-
-.solana-modal-wallet-list {
-  background-color: white;
-  padding: 30px;
-}
-
-.solana-modal-wallet-names {
-  margin-top: 20px;
-}
-
-.solana-modal-wallet-status {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.show-modal {
-  display: block;
-}
-
-.hide-modal {
-  display: none;
-}
-
-.connect-wallet-btn {
-  position: absolute;
-  margin: 0 0 0 40px;
-  top: 90%;
-}
-
-.burger-btn {
-  height: 1em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-}
-
-.burger-span {
-  height: 1px;
-  width: 12px;
-  background-color: white;
-  border-radius: 40%;
-}
-
-.burger-btn:hover > .burger-span {
-  background-color: black;
+  .solana-wallet-modal-container {
+    min-width: 300px;
+  }
 }

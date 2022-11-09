@@ -4,6 +4,7 @@ import config from "../../webapp.config.js";
 import serverConfig from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useEffect, useMemo, useState } from "react";
 
 import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
@@ -35,8 +36,18 @@ const Provider = ({
     solana: SolanaProvider(solRpc),
   };
 
-  const ProviderComponent = (network && providers[network]) || Fragment;
+  const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
 
+  useEffect(() => {
+    if (network && Object.keys(providers).includes(network)) {
+      setValidNetwork(network);
+    }
+  }, [network, providers]);
+
+  const ProviderComponent = useMemo(() => 
+    (network && providers[validNetwork]) || Fragment, [validNetwork]
+  )
+  
   return <ProviderComponent>{children}</ProviderComponent>;
 };
 
@@ -87,7 +98,6 @@ function ErrorBoundary() {
 export default function Network() {
   const { network, tokens, rpcUrls } = useLoaderData<LoaderData>();
   const wallet = useWallet();
-  console.log(wallet);
 
   return (
     <Provider

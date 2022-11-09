@@ -1,0 +1,71 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+import { useState } from "react";
+
+import BlockchainModal from "./BlockchainModal";
+import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
+
+<Meta
+    title="Modal/BlockchainModal"
+    component={BlockchainModal}
+/>
+
+export const Template = (props) => {
+    const [showModal, setShowModal] = useState(false);
+    return (
+        <div>
+            <button onClick={() => setShowModal(true)}>Show Modal</button>
+            <BlockchainModal handleModal={setShowModal} {...props}/>
+        </div>
+    )
+};
+
+<Canvas columns={1} withSource="open" withToolbar >
+    <Title>Card</Title>
+    <Subtitle>General Card Component</Subtitle>
+    
+    <h2>Card Component</h2>
+    <Story
+        name="Desktop Card"
+        args={{
+            option: {name: "", icon: <div/>},
+            setOption: (opt) => {console.log(opt)},
+            options: [{name: "ETH", icon: <ReactSvg/>}, {name: "SOL", icon: <ReactSvg/>}],
+            mobile: false,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Selected Desktop Card"
+        args={{
+            option: {name: "ETH", icon: <div/>},
+            setOption: (opt) => {console.log(opt)},
+            options: [{name: "ETH", icon: <ReactSvg/>}, {name: "SOL", icon: <ReactSvg/>}],
+            mobile: false,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Mobile Card"
+        args={{
+            option: {name: "", icon: <div/>},
+            setOption: (opt) => {console.log(opt)},
+            options: [{name: "ETH", icon: <ReactSvg/>}, {name: "SOL", icon: <ReactSvg/>}],
+            mobile: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Selected Mobile Card"
+        args={{
+            option: {name: "SOL", icon: <div/>},
+            setOption: (opt) => {console.log(opt)},
+            options: [{name: "ETH", icon: <ReactSvg/>}, {name: "SOL", icon: <ReactSvg/>}],
+            mobile: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

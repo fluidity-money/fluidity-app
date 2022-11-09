@@ -18,7 +18,7 @@ export const SolanaWalletModal = ({
 
   const selectWallet = useCallback(
     (
-      event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+      _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
       walletName: WalletName
     ) => {
       select(walletName);
@@ -39,9 +39,10 @@ export const SolanaWalletModal = ({
               Connect your wallet
             </Text>
             <span onClick={close}>
-              <Text prominent size="xl" className="solana-modal-cancel-btn">
-                X
-              </Text>
+              <img
+                src="/images/icons/x.svg"
+                className="solana-modal-cancel-btn"
+              />
             </span>
             <ul className="solana-modal-wallet-list">
               {wallets.map((wallet) => (
