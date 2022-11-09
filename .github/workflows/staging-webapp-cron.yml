@@ -2,39 +2,8 @@ name: Staging WebApp (CRON)
 
 on:
   schedule:
-    - cron: '30 21 * * 1-5' # every day 8:00AM ACDT Monday-Friday
-  workflow_dispatch:
-    inputs:
-      environment:
-        type: choice
-        description: 'Environment'
-        options:
-          - 'dev'
-      network:
-        type: choice
-        description: 'Network'
-        options: 
-          - 'devnet'
-          - 'ropsten'
-          - 'fluidity'
-      group:
-        description: 'Group'
-        required: true
-      service:
-        description: 'Service'
-        required: true
-      build_root_container:
-        type: boolean
-        description: 'Build root-container'
-        default: false
-      build_build_container:
-        type: boolean
-        description: 'Build build-container'
-        default: false
-      skip_build:
-        type: boolean
-        description: 'Skip docker build'
-        default: false
+    - cron: '30 21 * * 1-5' # every day 9:30PM UTC Monday-Friday
+
 permissions:
   id-token: write
   contents: read
@@ -84,7 +53,7 @@ jobs:
         if: success()
         with:
           severity: info
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** dev\n**Network:** fluidity\n**Group:** app\n**Service:** all\n**Commit Id:** ${{ github.sha }}\n\n"
           details: Deployment succeeded.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (CANCEL)
@@ -92,7 +61,7 @@ jobs:
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: warn
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** dev\n**Network:** fluidity\n**Group:** app\n**Service:** all\n**Commit Id:** ${{ github.sha }}\n\n"
           details: Deployment cancelled.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
       - name: Discord notif (FAIL)
@@ -100,6 +69,6 @@ jobs:
         uses: rjstone/discord-webhook-notify@v1
         with:
           severity: error
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
+          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** dev\n**Network:** fluidity\n**Group:** app\n**Service:** all\n**Commit Id:** ${{ github.sha }}\n\n"
           details: Deployment failed.
           webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
