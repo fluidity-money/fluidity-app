@@ -7,14 +7,12 @@ import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 
 import { FluidityFacadeContext } from "./IFluidityFacade";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import makeContractSwap, {ContractToken, getUsdUserMintLimit, usdBalanceOfERC20} from "~/util/chainUtils/ethereum/transaction";
 import {Token} from "~/util/chainUtils/tokens";
 
-const EthereumFacade = ({ children,  tokens}: { children: ReactNode, tokens: Token[]}) => {
-  const { isActive, isActivating, provider, account, connector } = useWeb3React();
-
-  const [connectorType, setConnectorType] = useState("");
+const EthereumFacade = ({ children, tokens, connectors}: { children: ReactNode, tokens: Token[], connectors: [Connector, Web3ReactHooks][]}) => {
+  const { isActive, provider, account, connector } = useWeb3React();
 
   const getBalance = async(contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
@@ -25,9 +23,22 @@ const EthereumFacade = ({ children,  tokens}: { children: ReactNode, tokens: Tok
     return await usdBalanceOfERC20(signer, contractAddress, tokenAbi);
   }
 
-  useEffect(() => {
-    console.warn("useConnectorType unimpl")
-  }, [connectorType])
+  // find and activate corresponding connector
+  const useConnectorType = (type: "metamask" | "walletconnect" | string) => {
+    let connector: Connector | undefined;
+    switch (type) {
+      case "metamask":
+        connector = connectors.find(connector => connector[0] instanceof MetaMask)?.[0];
+        break;
+      case "walletconnect":
+        connector = connectors.find(connector => connector[0] instanceof WalletConnect)?.[0];
+        break;
+      default:
+        console.warn("Unsupported connector", type);
+        break;
+    }
+    connector?.activate();
+  }
 
   const deactivate = async(): Promise<void> => connector.deactivate?.();
 
@@ -92,7 +103,7 @@ const EthereumFacade = ({ children,  tokens}: { children: ReactNode, tokens: Tok
       limit,
       balance: getBalance,
       disconnect: deactivate,
-      useConnectorType: setConnectorType,
+      useConnectorType,
       address: account,
       connected: isActive,
     }}>
@@ -134,7 +145,7 @@ export const EthereumProvider =
     return (
       <>
         <Web3ReactProvider connectors={connectors}>
-          <EthereumFacade tokens={tokens}>{children}</EthereumFacade>
+          <EthereumFacade tokens={tokens} connectors={connectors}>{children}</EthereumFacade>
         </Web3ReactProvider>
       </>
     );
