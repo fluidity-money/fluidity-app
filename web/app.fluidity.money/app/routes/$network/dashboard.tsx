@@ -444,7 +444,7 @@ export default function Dashboard() {
         )}
 
         {/* Provide Luquidity*/}
-        <ProvideLiquidity />
+        {!openMobModal && <ProvideLiquidity />}
 
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
