@@ -571,7 +571,7 @@ main > footer > section > a {
   }
 }
 
-@media (max-width: 1220px) {
+@media (max-width: 1200px) {
   .card-inner {
     grid-template-columns: 1fr;
   }
