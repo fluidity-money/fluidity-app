@@ -24,6 +24,7 @@ import {
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import Video from "~/components/Video";
 import Modal from "~/components/Modal";
+import ConnectedWallet from "~/components/ConnectedWallet";
 import opportunityStyles from "~/styles/opportunity.css";
 
 export const links: LinksFunction = () => {
@@ -154,12 +155,12 @@ const NetworkPage = () => {
             <div className="connected-wallet">
               {/* Connected Wallet */}
               {publicKey && (
-                <>
-                  <div>{"(icon)"}</div>
-                  <Text>
-                    {trimAddress(normaliseAddress(publicKey.toString()))}
-                  </Text>
-                </>
+                <ConnectedWallet
+                  address={publicKey.toString()}
+                  callback={() => {
+                    console.log("click");
+                  }}
+                />
               )}
 
               {/* Switch Chain Modal */}

@@ -124,6 +124,9 @@
 .video {
   position: absolute;
   height: 100%;
+  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 @media (max-width: 500px) {
@@ -211,4 +214,20 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+.connected-wallet {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.holo {
+  background: conic-gradient(from 209.59deg at 50% 50%, #F3B8D8 0deg, #B793E9 50.06deg, #9FD4F3 85.94deg, #FFD2C4 134.97deg, #FBF3F3 172.05deg, #D9ABDF 200.75deg, #AF9CE3 224.67deg, #AAE4E1 259.36deg, #C6EAD0 298.82deg, #FFFFFF 328.72deg, #FDB5E4 360deg);
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -46,10 +46,8 @@ const SolanaProvider =
     return (
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
-	      <SolanaFacade>
-           {children}
-		  </SolanaFacade>
-		</WalletProvider>
+          <SolanaFacade>{children}</SolanaFacade>
+        </WalletProvider>
       </ConnectionProvider>
     );
   };

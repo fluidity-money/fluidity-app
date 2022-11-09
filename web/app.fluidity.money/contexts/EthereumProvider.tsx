@@ -50,9 +50,8 @@ export const EthereumProvider =
         metaMask: metamaskHooks,
         walletConnect: walletconnectHooks,
       };
-    
-    return connectors;
-    
+
+      return connectors;
     }, []);
 
     return (

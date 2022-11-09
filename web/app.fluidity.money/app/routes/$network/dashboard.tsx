@@ -31,8 +31,10 @@ import {
   Text,
   ChainSelectorButton,
   BlockchainModal,
+  trimAddressShort,
 } from "@fluidity-money/surfing";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectedWallet from "~/components/ConnectedWallet";
 import Modal from "~/components/Modal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import dashboardStyles from "~/styles/dashboard.css";
@@ -160,8 +162,7 @@ export default function Dashboard() {
   const { connected, publicKey, disconnect, connecting } = useWallet();
 
   useEffect(() => {
-     if(connected || connecting)
-	   setWalletModalVisibility(false);
+    if (connected || connecting) setWalletModalVisibility(false);
   }, [connected, connecting]);
 
   const handleSetChain = (network: string) => {
@@ -294,21 +295,27 @@ export default function Dashboard() {
         </ul>
 
         {/* Connect Wallet Button */}
-		{ network === `solana` ?
-          <GeneralButton
-            version={connected || connecting ? "transparent" : "primary"}
-            buttontype="text"
-            size={"medium"}
-            handleClick={() =>
-              connected ? disconnect() : connecting ? null : setWalletModalVisibility(true)
-            }
-            className="connect-wallet-btn"
-          >
-          {connected
-            ? trimAddress(publicKey?.toString() as unknown as string)
-            : connecting ? `Connecting...` : `Connect Wallet`}
-         </GeneralButton> : null
-		}
+        {network === `solana` ? (
+          connected ? (
+            <ConnectedWallet
+              address={trimAddressShort(publicKey!.toString())}
+              callback={() => disconnect()}
+              className="connect-wallet-btn"
+            />
+          ) : (
+            <GeneralButton
+              version={connected || connecting ? "transparent" : "primary"}
+              buttontype="text"
+              size={"medium"}
+              handleClick={() =>
+                connecting ? null : setWalletModalVisibility(true)
+              }
+              className="connect-wallet-btn"
+            >
+              {connecting ? `Connecting...` : `Connect Wallet`}
+            </GeneralButton>
+          )
+        ) : null}
       </nav>
 
       <main id="dashboard-body">
