@@ -36,6 +36,7 @@ import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import Modal from "~/components/Modal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import dashboardStyles from "~/styles/dashboard.css";
+import MobileModal from "~/components/MobileModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -109,16 +110,22 @@ function ErrorBoundary() {
 export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
 
-  const [openMobModal, setOpenMobModal] = useState(false);
+  const { state } = useContext(Web3Context());
+  const account = state.account ?? "";
 
   const navigate = useNavigate();
 
-  const { state } = useContext(Web3Context());
-  const account = state.account ?? "";
+  const [openMobModal, setOpenMobModal] = useState(false);
 
   const { width } = useViewport();
   const isMobile = width <= 500;
   const isTablet = width <= 850 && width > 500;
+  const closeMobileModal = width > 850 ? false : true;
+
+  useEffect(() => {
+    // closes modal if screen size becomes too large for mobile menu
+    !closeMobileModal && setOpenMobModal(false);
+  }, [closeMobileModal]);
 
   const navigationMap = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
@@ -160,8 +167,7 @@ export default function Dashboard() {
   const { connected, publicKey, disconnect, connecting } = useWallet();
 
   useEffect(() => {
-     if(connected || connecting)
-	   setWalletModalVisibility(false);
+    if (connected || connecting) setWalletModalVisibility(false);
   }, [connected, connecting]);
 
   const handleSetChain = (network: string) => {
@@ -235,6 +241,26 @@ export default function Dashboard() {
     });
   }, []);
 
+  const handleScroll = () => {
+    if (!openMobModal) {
+      // Unsets Background Scrolling to use when Modal is closed
+      document.body.style.overflow = "unset";
+      document.body.style.position = "static";
+    }
+    if (openMobModal) {
+      if (typeof window != "undefined" && window.document) {
+        // Disables Background Scrolling whilst the Modal is open
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+      }
+    }
+  };
+
+  useEffect(() => {
+    //prevents and allows scrolling depending if mobile modal is open
+    handleScroll();
+  }, [openMobModal]);
+
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
@@ -294,21 +320,27 @@ export default function Dashboard() {
         </ul>
 
         {/* Connect Wallet Button */}
-		{ network === `solana` ?
+        {network === `solana` ? (
           <GeneralButton
             version={connected || connecting ? "transparent" : "primary"}
             buttontype="text"
             size={"medium"}
             handleClick={() =>
-              connected ? disconnect() : connecting ? null : setWalletModalVisibility(true)
+              connected
+                ? disconnect()
+                : connecting
+                ? null
+                : setWalletModalVisibility(true)
             }
             className="connect-wallet-btn"
           >
-          {connected
-            ? trimAddress(publicKey?.toString() as unknown as string)
-            : connecting ? `Connecting...` : `Connect Wallet`}
-         </GeneralButton> : null
-		}
+            {connected
+              ? trimAddress(publicKey?.toString() as unknown as string)
+              : connecting
+              ? `Connecting...`
+              : `Connect Wallet`}
+          </GeneralButton>
+        ) : null}
       </nav>
 
       <main id="dashboard-body">
@@ -316,7 +348,7 @@ export default function Dashboard() {
           {/* App Name */}
           <div className="top-navbar-left">
             {(isMobile || isTablet) && (
-              <img src="/images/logoOutline.png" alt="Fluidity" />
+              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
             )}
             {!isMobile && <Text>{appName}</Text>}
           </div>
@@ -389,6 +421,20 @@ export default function Dashboard() {
             close={() => setWalletModalVisibility(false)}
           />
         ) : null}
+
+        {/* Mobile Menu Modal */}
+        {openMobModal && (
+          <MobileModal
+            navigationMap={navigationMap}
+            activeIndex={activeIndex}
+            chains={chainNameMap}
+            unclaimedFluid={unclaimedRewards}
+            network={network}
+            isOpen={openMobModal}
+            setIsOpen={setOpenMobModal}
+            unclaimedRewards={unclaimedRewards}
+          />
+        )}
 
         <Outlet />
 

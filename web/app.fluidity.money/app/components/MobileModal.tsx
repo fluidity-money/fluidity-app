@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "@remix-run/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { trimAddress, networkMapper } from "~/util";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { motion } from "framer-motion";
@@ -10,8 +10,11 @@ import {
   LinkButton,
   Heading,
   BlockchainModal,
+  Trophy,
 } from "@fluidity-money/surfing";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import { createPortal } from "react-dom";
+import BurgerButton from "./BurgerButton";
 
 type IMobileModal = {
   navigationMap: Array<{ name: string; icon: JSX.Element }>;
@@ -19,6 +22,9 @@ type IMobileModal = {
   chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
   network: string;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  unclaimedRewards: number;
 };
 
 export default function MobileModal({
@@ -27,6 +33,9 @@ export default function MobileModal({
   chains,
   network,
   unclaimedFluid,
+  isOpen,
+  setIsOpen,
+  unclaimedRewards,
 }: IMobileModal) {
   const navigate = useNavigate();
 
@@ -35,6 +44,8 @@ export default function MobileModal({
 
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
+
+  const [modal, setModal] = useState<any>();
 
   const { connected, publicKey } = useWallet();
 
@@ -72,93 +83,149 @@ export default function MobileModal({
     );
   }
 
-  return (
-    <div>
-      {/* Wallet / Chain */}
-      <section>
-        {/* Connect Wallet */}
-        <GeneralButton
-          version={connected ? "transparent" : "primary"}
-          buttontype="text"
-          size={"medium"}
-          handleClick={() => !connected && setWalletModalVisibility(true)}
-          className="connect-wallet-btn"
+  useEffect(() => {
+    setModal(
+      createPortal(
+        <div
+          className={`mobile-modal-container  ${
+            isOpen === true ? "show-modal" : "hide-modal"
+          }`}
         >
-          {connected
-            ? trimAddress(publicKey?.toString() as unknown as string)
-            : `Connnect Wallet`}
-        </GeneralButton>
+          {/* Navigation at top of modal */}
+          <nav id="mobile-top-navbar" className={"pad-main"}>
+            {/* Logo */}
+            <div className="top-navbar-left">
+              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+            </div>
 
-        {/* Chain Switcher */}
-        <ChainSelectorButton
-          chain={chains[network as "ethereum" | "solana"]}
-          onClick={() => setChainModalVisibility(true)}
-        />
-      </section>
+            {/* Navigation Buttons */}
+            <div className="mobile-navbar-right">
+              {/* Prize Money */}
+              <GeneralButton
+                version={"transparent"}
+                buttontype="icon after"
+                size={"small"}
+                handleClick={() =>
+                  unclaimedRewards
+                    ? navigate("./rewards/unclaimed")
+                    : navigate("./rewards")
+                }
+                icon={<Trophy />}
+              >
+                ${unclaimedRewards}
+              </GeneralButton>
 
-      {/* Mobile Navbar */}
-      <nav id="dashboard-navbar" className={"navbar-v2"}>
-        <ul>
-          {navigationMap.map(
-            (obj: { name: string; icon: JSX.Element }, index: number) => {
-              const key = Object.keys(obj)[0];
-              const { name, icon } = Object.values(obj)[0];
-              const active = index === activeIndex;
+              <BurgerButton isOpen={isOpen} setIsOpen={setIsOpen} />
+            </div>
+          </nav>
 
-              return (
-                <li key={key}>
-                  {index === activeIndex ? (
-                    <motion.div className={"active"} layoutId="active" />
-                  ) : (
-                    <div />
-                  )}
-                  <Link to={key}>
-                    <Text prominent={active}>
-                      {icon} {name}
-                    </Text>
-                  </Link>
-                </li>
-              );
-            }
-          )}
-        </ul>
-      </nav>
+          <div className="mobile-modal-content">
+            {/* Wallet / Chain */}
+            <section>
+              {/* Connect Wallet */}
+              <GeneralButton
+                version={connected ? "transparent" : "primary"}
+                buttontype="text"
+                size={"medium"}
+                handleClick={() => !connected && setWalletModalVisibility(true)}
+                // className="connect-wallet-btn"
+              >
+                {connected
+                  ? trimAddress(publicKey?.toString() as unknown as string)
+                  : `Connnect Wallet`}
+              </GeneralButton>
 
-      {/* Unclaimed Winnings */}
-      <GeneralButton
-        version={"secondary"}
-        buttontype="icon after"
-        size={"small"}
-        handleClick={() =>
-          unclaimedFluid
-            ? navigate("./rewards/unclaimed")
-            : navigate("./rewards")
-        }
-        icon={<img src="/images/icons/arrowRightWhite.svg" />}
-      >
-        Unclaimed $FLUID <Heading>${unclaimedFluid}</Heading>
-      </GeneralButton>
+              {/* Chain Switcher */}
+              <ChainSelectorButton
+                chain={chains[network as "ethereum" | "solana"]}
+                onClick={() => setChainModalVisibility(true)}
+              />
+            </section>
 
-      {/* Fluidify Money */}
-      <GeneralButton
-        version={"primary"}
-        buttontype="text"
-        size={"small"}
-        handleClick={() => navigate("../fluidify")}
-      >
-        Fluidify Money
-      </GeneralButton>
+            {/* Navigation between pages */}
+            <nav className={"navbar-v2 "}>
+              <ul>
+                {navigationMap.map(
+                  (obj: { name: string; icon: JSX.Element }, index: number) => {
+                    const key = Object.keys(obj)[0];
+                    const { name, icon } = Object.values(obj)[0];
+                    const active = index === activeIndex;
 
-      <footer>
-        {/* Fluidity Website */}
-        <LinkButton
-          size="small"
-          type="external"
-          handleClick={() => navigate("https://staging.fluidity.money")}
-        >
-          Fluidity Money Website
-        </LinkButton>
-      </footer>
-    </div>
-  );
+                    return (
+                      <li
+                        key={key}
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                      >
+                        {index === activeIndex ? (
+                          <motion.div className={"active"} layoutId="active" />
+                        ) : (
+                          <div />
+                        )}
+                        <Link to={key}>
+                          <Text prominent={active}>
+                            {icon} {name}
+                          </Text>
+                        </Link>
+                      </li>
+                    );
+                  }
+                )}
+              </ul>
+            </nav>
+
+            <section className="mobile-modal-bottom">
+              {/* Unclaimed Winnings */}
+              <GeneralButton
+                version={"secondary"}
+                buttontype="icon after"
+                size={"small"}
+                handleClick={() =>
+                  unclaimedFluid
+                    ? navigate("./rewards/unclaimed")
+                    : navigate("./rewards")
+                }
+                icon={<img src="/images/icons/arrowRightWhite.svg" />}
+                className="unclaimed-button"
+              >
+                <Text size="lg" prominent={true}>
+                  Unclaimed $FLUID{" "}
+                  <Heading as="h4" className="no-margin">
+                    $6,475.00
+                    {/* {unclaimedFluid} dummy data above for styling */}
+                  </Heading>
+                </Text>
+              </GeneralButton>
+
+              {/* Fluidify Money */}
+              <GeneralButton
+                version={"primary"}
+                buttontype="text"
+                size={"medium"}
+                handleClick={() => navigate("../fluidify")}
+                className="fluidify-money-button"
+              >
+                Fluidify Money
+              </GeneralButton>
+              <footer>
+                {/* Fluidity Website */}
+                <LinkButton
+                  size="medium"
+                  type="external"
+                  handleClick={() => navigate("https://staging.fluidity.money")}
+                >
+                  Fluidity Money Website
+                </LinkButton>
+              </footer>
+            </section>
+          </div>
+        </div>,
+        document.body
+      )
+    ),
+      [isOpen];
+  });
+
+  return modal;
 }
