@@ -1,7 +1,7 @@
 import { useNavigate, Link } from "@remix-run/react";
-import { useState } from "react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { useState, useContext } from "react";
 import { trimAddress, networkMapper } from "~/util";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { motion } from "framer-motion";
 import {
   GeneralButton,
@@ -36,7 +36,7 @@ export default function MobileModal({
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, publicKey } = useWallet();
+  const { connected, address } = useContext(FluidityFacadeContext);
 
   if (walletModalVisibility) {
     return network === "solana" ? (
@@ -85,7 +85,7 @@ export default function MobileModal({
           className="connect-wallet-btn"
         >
           {connected
-            ? trimAddress(publicKey?.toString() as unknown as string)
+            ? trimAddress(address?.toString() as unknown as string)
             : `Connnect Wallet`}
         </GeneralButton>
 

@@ -40,10 +40,11 @@ const Provider = ({
     }
   }, [network, providers]);
 
-  const ProviderComponent = useMemo(() => 
-    (network && providers[validNetwork]) || Fragment, [validNetwork]
-  )
-  
+  const ProviderComponent = useMemo(
+    () => (network && providers[validNetwork]) || Fragment,
+    [validNetwork]
+  );
+
   return <ProviderComponent>{children}</ProviderComponent>;
 };
 

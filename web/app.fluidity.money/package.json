@@ -32,6 +32,8 @@
     "@openzeppelin/contracts": "^4.7.3",
     "@remix-run/react": "^1.7.1",
     "@remix-run/serve": "^1.7.1",
+    "@saberhq/token-utils": "^1.14.9",
+    "@saberhq/use-solana": "^1.14.9",
     "@sentry/remix": "^7.17.2",
     "@solana/wallet-adapter-base": "^0.9.18",
     "@solana/wallet-adapter-react": "^0.15.23",

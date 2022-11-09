@@ -1,12 +1,13 @@
-import { useWeb3React, Web3ReactProvider } from "@web3-react/core";
+import type { ReactNode } from "react";
+import type { Web3ReactHooks } from "@web3-react/core";
+import type { Connector } from "@web3-react/types";
 
-import { initializeConnector, Web3ReactHooks } from "@web3-react/core";
-import { Connector } from "@web3-react/types";
+import { useState, useMemo } from "react";
+import { useWeb3React, Web3ReactProvider } from "@web3-react/core";
+import { initializeConnector } from "@web3-react/core";
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
-
-import { FluidityFacadeContext } from "./IFluidityFacade";
-import { ReactNode, useState, useMemo } from "react";
+import FluidityFacadeContext from "./FluidityFacade";
 
 const EthereumFacade = ({ children }: { children: ReactNode }) => {
   const { isActive, isActivating } = useWeb3React();
@@ -22,7 +23,7 @@ const EthereumFacade = ({ children }: { children: ReactNode }) => {
 
 export const EthereumProvider =
   (rpcUrl: string) =>
-  ({ children }: { children: React.ReactNode }) => {
+  ({ children }: { children: ReactNode }) => {
     const connectors = useMemo(() => {
       const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
         (actions) => new MetaMask({ actions })
@@ -50,9 +51,8 @@ export const EthereumProvider =
         metaMask: metamaskHooks,
         walletConnect: walletconnectHooks,
       };
-    
-    return connectors;
-    
+
+      return connectors;
     }, []);
 
     return (

@@ -1,6 +1,7 @@
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
-import { LoaderFunction, json } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -10,20 +11,16 @@ import {
   useMatches,
   useTransition,
 } from "@remix-run/react";
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import { useState, useEffect, useContext } from "react";
-import { Web3Context } from "~/util/chainUtils/web3";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { motion } from "framer-motion";
 import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
-import { motion } from "framer-motion";
-import BurgerButton from "~/components/BurgerButton";
-import ProvideLiquidity from "~/components/ProvideLiquidity";
 import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
-import { useToolTip } from "~/components";
-import { ToolTipContent } from "~/components/ToolTip";
 import { trimAddress, networkMapper } from "~/util";
+import { Web3Context } from "~/util/chainUtils/web3";
 import {
   DashboardIcon,
   GeneralButton,
@@ -32,9 +29,12 @@ import {
   ChainSelectorButton,
   BlockchainModal,
 } from "@fluidity-money/surfing";
+import { useToolTip } from "~/components";
+import BurgerButton from "~/components/BurgerButton";
+import ProvideLiquidity from "~/components/ProvideLiquidity";
+import { ToolTipContent } from "~/components/ToolTip";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import Modal from "~/components/Modal";
-import { useWallet } from "@solana/wallet-adapter-react";
 import dashboardStyles from "~/styles/dashboard.css";
 
 export const links: LinksFunction = () => {
@@ -157,11 +157,12 @@ export default function Dashboard() {
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, publicKey, disconnect, connecting } = useWallet();
+  const { connected, address, disconnect, connecting } = useContext(
+    FluidityFacadeContext
+  );
 
   useEffect(() => {
-     if(connected || connecting)
-	   setWalletModalVisibility(false);
+    if (connected || connecting) setWalletModalVisibility(false);
   }, [connected, connecting]);
 
   const handleSetChain = (network: string) => {
@@ -204,7 +205,7 @@ export default function Dashboard() {
       network === `ethereum`
         ? `0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6`
         : connected
-        ? publicKey?.toString()
+        ? address?.toString()
         : "JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi";
 
     const socket = io();
@@ -294,21 +295,27 @@ export default function Dashboard() {
         </ul>
 
         {/* Connect Wallet Button */}
-		{ network === `solana` ?
+        {network === `solana` ? (
           <GeneralButton
             version={connected || connecting ? "transparent" : "primary"}
             buttontype="text"
             size={"medium"}
             handleClick={() =>
-              connected ? disconnect() : connecting ? null : setWalletModalVisibility(true)
+              connected
+                ? disconnect && disconnect()
+                : connecting
+                ? null
+                : setWalletModalVisibility(true)
             }
             className="connect-wallet-btn"
           >
-          {connected
-            ? trimAddress(publicKey?.toString() as unknown as string)
-            : connecting ? `Connecting...` : `Connect Wallet`}
-         </GeneralButton> : null
-		}
+            {connected
+              ? trimAddress(address?.toString() as unknown as string)
+              : connecting
+              ? `Connecting...`
+              : `Connect Wallet`}
+          </GeneralButton>
+        ) : null}
       </nav>
 
       <main id="dashboard-body">
