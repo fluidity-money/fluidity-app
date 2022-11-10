@@ -54,7 +54,7 @@ jobs:
       - name: Build
         if: ${{ github.event.inputs.skip_build == 'false' }}
         id: build
-        uses: ./scripts/actions/staging
+        uses: ./scripts/actions
         with:
           command: |
             flu build-docker \
@@ -67,7 +67,7 @@ jobs:
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
-        uses: ./scripts/actions/staging
+        uses: ./scripts/actions
         with:
           command: |
             flu deploy-service \
@@ -77,27 +77,19 @@ jobs:
               --environment ${{ github.event.inputs.environment }} \
               --debug false \
               --tag $GITHUB_SHA
-      - name: Discord notif (SUCCESS)
-        uses: rjstone/discord-webhook-notify@v1
-        if: success()
-        with:
-          severity: info
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          details: Deployment succeeded.
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (CANCEL)
-        if: cancelled()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: warn
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          details: Deployment cancelled.
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (FAIL)
-        if: failure()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: error
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          details: Deployment failed.
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord
+        uses: ./scripts/actions
+        if: always()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          INPUTS_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          INPUTS_NETWORK: ${{ github.event.inputs.network }}
+          INPUTS_GROUP: ${{ github.event.inputs.group }}
+          INPUTS_SERVICE: ${{ github.event.inputs.service }}
+          INPUTS_ROOT_CONTAINER: ${{ github.event.inputs.build_root_container }}
+          INPUTS_BUILD_CONTAINER: ${{ github.event.inputs.build_build_container }}
+          INPUTS_SKIP_BUILD: ${{ github.event.inputs.skip_build }}
+        with: 
+          command: |
+            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} -status ${{ job.status }}
+
