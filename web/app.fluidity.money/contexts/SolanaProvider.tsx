@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
+  useWallet,
 } from "@solana/wallet-adapter-react";
 
 import {
@@ -12,13 +13,23 @@ import {
   Coin98WalletAdapter,
   NightlyWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
-
-import { FluidityFacadeContext } from "./IFluidityFacade";
+import { solanaInstructions } from "~/util/chainUtils/solana/instructions";
+import FluidityFacadeContext from "./FluidityFacade";
 
 const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
-  // wallet context here for signings and chain interactions.
+  const { connected, publicKey, disconnect } = useWallet();
+
+  console.log("connected", connected, "addr:", publicKey?.toString());
+
   return (
-    <FluidityFacadeContext.Provider value={{}}>
+    <FluidityFacadeContext.Provider
+      value={{
+        connected,
+        disconnect,
+        address: publicKey?.toString() ?? "",
+        ...solanaInstructions,
+      }}
+    >
       {children}
     </FluidityFacadeContext.Provider>
   );
@@ -46,10 +57,8 @@ const SolanaProvider =
     return (
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
-	      <SolanaFacade>
-           {children}
-		  </SolanaFacade>
-		</WalletProvider>
+          <SolanaFacade>{children}</SolanaFacade>
+        </WalletProvider>
       </ConnectionProvider>
     );
   };

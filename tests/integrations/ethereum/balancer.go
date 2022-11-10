@@ -18,12 +18,12 @@ const integrationTestBalancerV2 = `
           "0x6b175474e89094c44da98b954eedeac495271d0f"
         ]
       },
-      "transaction": {
-        "to": "0x00000000ae347930bd1e7b0f35588b92280f9e75",
-        "from": "0x00000042d2d0aa64e0505a13eacdc9984a024322",
-        "hash": "0xac495e8c4513c051df513c72808ed026c0147603ebc4be90e3772919e079dee0"
-      },
       "application": 2
+    },
+    "transaction": {
+      "to": "0x00000000ae347930bd1e7b0f35588b92280f9e75",
+      "from": "0x00000042d2d0aa64e0505a13eacdc9984a024322",
+      "hash": "0xac495e8c4513c051df513c72808ed026c0147603ebc4be90e3772919e079dee0"
     },
     "expected_sender": "0x00000042d2d0aa64e0505a13eacdc9984a024322",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -53,12 +53,12 @@ const integrationTestBalancerV2 = `
           "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
         ]
       },
-      "transaction": {
-        "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
-        "from": "0x054ba12713290ef5b9236e55944713c0edeb4cf4",
-        "hash": "0xc81559d58d826401d035aefd7843f778eba0bfe78bb2d93c16aeae2c9ed53562"
-      },
       "application": 2
+    },
+    "transaction": {
+      "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
+      "from": "0x054ba12713290ef5b9236e55944713c0edeb4cf4",
+      "hash": "0xc81559d58d826401d035aefd7843f778eba0bfe78bb2d93c16aeae2c9ed53562"
     },
     "expected_sender": "0x054ba12713290ef5b9236e55944713c0edeb4cf4",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -88,12 +88,12 @@ const integrationTestBalancerV2 = `
           "0x676495371d5107f870e0e7d5afb6fed91f236f21"
         ]
       },
-      "transaction": {
-        "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
-        "from": "0x1ca484dbdafad7e940f5073f6fcc5e87cd24202b",
-        "hash": "0x744c83b11300d8bfd6bd0dea0958fab802188effef6b2f96b0861e6746a9a977"
-      },
       "application": 2
+    },
+    "transaction": {
+      "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
+      "from": "0x1ca484dbdafad7e940f5073f6fcc5e87cd24202b",
+      "hash": "0x744c83b11300d8bfd6bd0dea0958fab802188effef6b2f96b0861e6746a9a977"
     },
     "expected_sender": "0x1ca484dbdafad7e940f5073f6fcc5e87cd24202b",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -123,12 +123,12 @@ const integrationTestBalancerV2 = `
           "0xbd72ae3bb5da3cb770c75d217b83f4d838306565"
         ]
       },
-      "transaction": {
-        "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
-        "from": "0xdec08cb92a506b88411da9ba290f3694be223c26",
-        "hash": "0xd4f746826f2221a66d370f6b3e8695124b894a349d8927cb107269d2c8a9dfa0"
-      },
       "application": 2
+    },
+    "transaction": {
+      "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
+      "from": "0xdec08cb92a506b88411da9ba290f3694be223c26",
+      "hash": "0xd4f746826f2221a66d370f6b3e8695124b894a349d8927cb107269d2c8a9dfa0"
     },
     "expected_sender": "0xdec08cb92a506b88411da9ba290f3694be223c26",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -158,12 +158,12 @@ const integrationTestBalancerV2 = `
           "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
         ]
       },
-      "transaction": {
-        "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
-        "from": "0xd6b1fbcbe39e33a3d5d9014b024f511be3564ee5",
-        "hash": "0x7573a3928fc1a42877d846d314789999560b5f3e4259d36bca5473b35beeb762"
-      },
       "application": 2
+    },
+    "transaction": {
+      "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
+      "from": "0xd6b1fbcbe39e33a3d5d9014b024f511be3564ee5",
+      "hash": "0x7573a3928fc1a42877d846d314789999560b5f3e4259d36bca5473b35beeb762"
     },
     "expected_sender": "0xd6b1fbcbe39e33a3d5d9014b024f511be3564ee5",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",

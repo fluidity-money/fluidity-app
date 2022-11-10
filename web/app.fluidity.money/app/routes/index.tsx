@@ -165,7 +165,7 @@ export default function IndexPage() {
         {/* Navigation Buttons */}
         <div className="header-buttons">
           {/* Fluidity Website Button */}
-          <a href="fluidity.money" rel="noopener noreferrer">
+          <a href="https://fluidity.money" rel="noopener noreferrer">
             <LinkButton
               size={"small"}
               type={"internal"}

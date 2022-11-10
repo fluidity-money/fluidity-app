@@ -1,9 +1,9 @@
 import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate, useLoaderData } from "@remix-run/react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
 import { networkMapper } from "~/util";
@@ -17,13 +17,12 @@ import {
   ChainSelectorButton,
   BlockchainModal,
   Twitter,
-  normaliseAddress,
-  trimAddress,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import Video from "~/components/Video";
 import Modal from "~/components/Modal";
+import ConnectedWallet from "~/components/ConnectedWallet";
 import opportunityStyles from "~/styles/opportunity.css";
 
 export const links: LinksFunction = () => {
@@ -51,7 +50,7 @@ type LoaderData = {
 const NetworkPage = () => {
   const { network } = useLoaderData<LoaderData>();
 
-  const { connected, publicKey, disconnect, connect } = useWallet();
+  const { connected, address } = useContext(FluidityFacadeContext);
   const navigate = useNavigate();
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(
@@ -76,7 +75,7 @@ const NetworkPage = () => {
   };
 
   useEffect(() => {
-    if (publicKey) {
+    if (address) {
       (async () => {
         const { data, errors } = await useHighestRewardStatisticsByNetwork(
           network
@@ -100,7 +99,7 @@ const NetworkPage = () => {
         return setProjectedWinnings(highestRewards);
       })();
     }
-  }, [publicKey]);
+  }, [address]);
 
   useEffect(() => {
     connected && setWalletModalVisibility(false);
@@ -124,6 +123,7 @@ const NetworkPage = () => {
             <LinkButton
               size={"small"}
               type={"internal"}
+              left={true}
               handleClick={() => {
                 return;
               }}
@@ -153,13 +153,13 @@ const NetworkPage = () => {
 
             <div className="connected-wallet">
               {/* Connected Wallet */}
-              {publicKey && (
-                <>
-                  <div>{"(icon)"}</div>
-                  <Text>
-                    {trimAddress(normaliseAddress(publicKey.toString()))}
-                  </Text>
-                </>
+              {address && (
+                <ConnectedWallet
+                  address={address.toString()}
+                  callback={() => {
+                    console.log("click");
+                  }}
+                />
               )}
 
               {/* Switch Chain Modal */}
