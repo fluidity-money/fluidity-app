@@ -8,6 +8,7 @@ const integrationTestBalancerV2 = `
 [
   {
     "transfer": {
+      "transaction": "0xac495e8c4513c051df513c72808ed026c0147603ebc4be90e3772919e079dee0",
       "log": {
         "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGKIjNCTLvQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG2r3O0RZOCOFg==",
         "address": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -43,6 +44,7 @@ const integrationTestBalancerV2 = `
   },
   {
     "transfer": {
+      "transaction": "0xc81559d58d826401d035aefd7843f778eba0bfe78bb2d93c16aeae2c9ed53562",
       "log": {
         "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABdIdugAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEW47YdXk4Qrg==",
         "address": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -78,6 +80,7 @@ const integrationTestBalancerV2 = `
   },
   {
     "transfer": {
+      "transaction": "0x744c83b11300d8bfd6bd0dea0958fab802188effef6b2f96b0861e6746a9a977",
       "log": {
         "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVrx14tYxAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMMfCUmAPnKQ==",
         "address": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -113,6 +116,7 @@ const integrationTestBalancerV2 = `
   },
   {
     "transfer": {
+      "transaction": "0xd4f746826f2221a66d370f6b3e8695124b894a349d8927cb107269d2c8a9dfa0",
       "log": {
         "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB3NZQAAAAAAAAAAAAAAAAAAAAAAAAAAbwNVyL7OufoNbDxvbg==",
         "address": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -148,6 +152,7 @@ const integrationTestBalancerV2 = `
   },
   {
     "transfer": {
+      "transaction": "0x7573a3928fc1a42877d846d314789999560b5f3e4259d36bca5473b35beeb762",
       "log": {
         "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKlCK8rM6U3kEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC76iOw==",
         "address": "0xba12222222228d8ba445958a75a0704d566bf2c8",
