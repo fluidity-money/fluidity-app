@@ -14,13 +14,13 @@ export interface Tvl {
 }
 
 export interface TvlRes {
-  tvl_staging: Tvl[],
+  tvl: Tvl[],
 }
 
 
 const liveTvlSubscription = gql`
 subscription tvlLiveTvlSubscription {
-  tvl_staging(order_by: {contract_address: desc}, distinct_on: contract_address) {
+  tvl(order_by: {contract_address: desc}, distinct_on: contract_address) {
     tvl
     time
     contract_address
