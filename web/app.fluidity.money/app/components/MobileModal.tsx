@@ -11,9 +11,11 @@ import {
   Heading,
   BlockchainModal,
   Trophy,
+  trimAddressShort,
 } from "@fluidity-money/surfing";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import BurgerButton from "./BurgerButton";
+import ConnectedWallet from "./ConnectedWallet";
 
 type IMobileModal = {
   navigationMap: Array<{ name: string; icon: JSX.Element }>;
@@ -44,7 +46,9 @@ export default function MobileModal({
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, address } = useContext(FluidityFacadeContext);
+  const { connected, address, connecting, disconnect } = useContext(
+    FluidityFacadeContext
+  );
   const [modal, setModal] = useState<any>();
 
   const [animation, setAnimation] = useState(true);
@@ -54,6 +58,12 @@ export default function MobileModal({
     if (isOpen) setAnimation(false);
     if (!isOpen) setAnimation(true);
   }, [isOpen]);
+
+  useEffect(() => {
+    walletModalVisibility
+      ? (document.body.style.position = "static")
+      : setTimeout(() => (document.body.style.position = "fixed"), 1000);
+  }, [walletModalVisibility]);
 
   if (walletModalVisibility) {
     return network === "solana" ? (
@@ -137,21 +147,29 @@ export default function MobileModal({
             {/* Wallet / Chain */}
             <section>
               {/* Connect Wallet */}
-              <GeneralButton
-                version={connected ? "transparent" : "primary"}
-                buttontype="text"
-                size={"medium"}
-                handleClick={() => {
-                  !connected && setWalletModalVisibility(true);
-
-                  setIsOpen(false);
-                }}
-                // className="connect-wallet-btn"
-              >
-                {connected
-                  ? trimAddress(address?.toString() as unknown as string)
-                  : `Connnect Wallet`}
-              </GeneralButton>
+              {network === `solana` ? (
+                connected ? (
+                  <ConnectedWallet
+                    address={trimAddressShort(address!.toString())}
+                    callback={() => disconnect?.()}
+                    className="connect-wallet-btn"
+                  />
+                ) : (
+                  <GeneralButton
+                    version={
+                      connected || connecting ? "transparent" : "primary"
+                    }
+                    buttontype="text"
+                    size={"medium"}
+                    handleClick={() =>
+                      connecting ? null : setWalletModalVisibility(true)
+                    }
+                    // className="connect-wallet-btn"
+                  >
+                    {connecting ? `Connecting...` : `Connect Wallet`}
+                  </GeneralButton>
+                )
+              ) : null}
 
               {/* Chain Switcher */}
               <ChainSelectorButton
