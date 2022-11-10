@@ -148,15 +148,25 @@
   margin: 0;
 }
 
+.wallet-outer-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .solana-wallet-modal-container {
   position: absolute;
   width: 30%;
-  min-width: 350px;
+  min-width: 300px;
+  max-width: 327px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgb(29, 23, 23);
-  padding: 30px;
+  padding: 3em;
 }
 
 .solana-wallet-modal-container > ul > li {
@@ -166,9 +176,9 @@
   cursor: pointer;
   justify-content: space-between;
   align-items: center;
-  border-radius: 0.5em;
-  padding: 0.25em;
+  padding: 1em;
   box-sizing: border-box;
+  border-bottom: 0.2px solid grey;
 }
 
 .solana-wallet-modal-container > ul > li:hover {
@@ -183,7 +193,7 @@
 }
 
 .solana-wallet-modal-container > ul > li > span > img {
-  width: 2.5em;
+  width: 2em;
 }
 
 .solana-modal-cancel-btn {
@@ -203,7 +213,8 @@
 
 .solana-modal-wallet-list {
   background-color: white;
-  padding: 20px;
+  padding: 0;
+  margin: 0 0 1em 0;
 }
 
 .solana-modal-wallet-names {
@@ -216,10 +227,19 @@
   justify-content: flex-end;
 }
 
-.connected-wallet {
+.solana-wallet-modal-header {
   display: flex;
-  gap: 10px;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2em;
+}
+
+.show-modal {
+  display: block;
+}
+
+.hide-modal {
+  display: none;
 }
 
 .holo {
