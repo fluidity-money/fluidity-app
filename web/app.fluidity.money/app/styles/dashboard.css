@@ -576,6 +576,10 @@ main > footer > section > a {
   box-sizing: border-box;
 }
 
+.select-blockchain-mobile > div > div {
+  padding-left: 0.8em;
+}
+
 @media only screen and (max-width: 500px) {
   .hide-on-mobile {
     display: none;
