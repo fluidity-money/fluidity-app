@@ -152,7 +152,7 @@ export default function MobileModal({
                   <ConnectedWallet
                     address={trimAddressShort(address!.toString())}
                     callback={() => disconnect?.()}
-                    className="connect-wallet-btn"
+                    // className="connect-wallet-btn"
                   />
                 ) : (
                   <GeneralButton
@@ -169,7 +169,27 @@ export default function MobileModal({
                     {connecting ? `Connecting...` : `Connect Wallet`}
                   </GeneralButton>
                 )
-              ) : null}
+              ) : connected ? (
+                <ConnectedWallet
+                  address={trimAddressShort(address!.toString())}
+                  callback={() => disconnect?.()}
+                  // className="connect-wallet-btn"
+                />
+              ) : (
+                <GeneralButton
+                  version={connected || connecting ? "transparent" : "primary"}
+                  buttontype="text"
+                  size={"medium"}
+                  handleClick={
+                    () => (connecting ? null : null)
+                    // deploy eth wallet connect modal in lieu of null
+                    // setWalletModalVisibility(true)
+                  }
+                  // className="connect-wallet-btn"
+                >
+                  {connecting ? `Connecting...` : `Connect Wallet`}
+                </GeneralButton>
+              )}
 
               {/* Chain Switcher */}
               <ChainSelectorButton
