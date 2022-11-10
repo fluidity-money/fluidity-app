@@ -35,17 +35,6 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-import { FluidityFacadeContext } from "./IFluidityFacade";
-
-const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
-  // wallet context here for signings and chain interactions.
-  return (
-    <FluidityFacadeContext.Provider value={{}}>
-      {children}
-    </FluidityFacadeContext.Provider>
-  );
-};
-
 const SolanaProvider =
   (rpcUrl: string) =>
   ({ children }: { children: React.ReactNode }) => {
