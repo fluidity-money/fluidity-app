@@ -1,6 +1,8 @@
 name: Staging (Manual)
 
 on:
+  schedule:
+    - cron: '45 22 * * 1-5' # every day 9:30PM UTC Monday-Friday
   workflow_dispatch:
     inputs:
       environment:
@@ -12,14 +14,14 @@ on:
         type: choice
         description: 'Network'
         options: 
-          - 'devnet'
-          - 'ropsten'
           - 'fluidity'
       group:
         description: 'Group'
+        default: 'app'
         required: true
       service:
         description: 'Service'
+        default: 'all'
         required: true
       build_root_container:
         type: boolean
