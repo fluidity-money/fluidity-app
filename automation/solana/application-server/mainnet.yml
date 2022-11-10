@@ -14,5 +14,4 @@ ENV_FLU_SOLANA_TOKEN_LOOKUPS: "fUSDT:USDT,fUSDC:USDC"
 SERVICES:
   - APPSERVER:
       SERVICE_NAME: microservice-solana-application-server
-      TASK_MIN_COUNT: 15
       ENV_FLU_WORKER_ID: solana-microservice-solana-application-server

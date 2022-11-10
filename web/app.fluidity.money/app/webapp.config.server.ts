@@ -41,6 +41,8 @@ const OptionsSchema = z.object({
             address: z.string(),
             colour: z.string(),
             isFluidOf: z.string().optional(),
+            obligationAccount: z.string().optional(),
+            dataAccount: z.string().optional(),
           })
         )
         .min(1),

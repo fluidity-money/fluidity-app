@@ -59,7 +59,7 @@ const RewardsBackground = () => {
   const carouselInfo = (
     <div>
       {rewards
-        .slice(rewardLimit)
+        .slice(0, rewardLimit)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
             <a
@@ -96,6 +96,7 @@ const RewardsBackground = () => {
         ))}
     </div>
   );
+
   return (
     <div className={styles.container}>
       <div className={styles.shade}></div>

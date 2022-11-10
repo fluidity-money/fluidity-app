@@ -8,4 +8,18 @@ SERVICES:
       DOCKER_ARGS:
         SECRET_REACT_APP_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
+  
+  - BACKEND:
+      SERVICE_NAME: fluidity-money-backend
+      DOCKER_IMAGE: fluidity.money-backend
+      DOCKERFILE_PATH: ./web/fluidity.money-old
+      TARGET_GROUP: flu-mainnet-fluidity-be-tg
+
+      ENV_FLU_WORKER_ID: fluidity.money
+      ENV_FLU_LANDING_SUCCESS_URL: https://fluidity.money
+      ENV_FLU_WEB_LISTEN_ADDR: :80
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
+      SECRET_FLU_TIMESCALE_URI: /fluidity/timescale/uri
+      SECRET_FLU_POSTGRES_URI: /fluidity/ethereum/data/postgres/uri
+
 

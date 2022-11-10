@@ -9,6 +9,7 @@
 | `FLU_ETH_RPC_WS`   | URI to subscribe to ETH transactions |
 | `FLU_SOL_RPC_HTTP` | URI to fetch SOL transactions        |
 | `FLU_SOL_RPC_WS`   | URI to subscribe to SOL transactions |
+| `SENTRY_DSN`       | Sentry reporting URI                 |
 
 ## Building
 

@@ -1,6 +1,7 @@
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
-import { LoaderFunction, json } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -10,20 +11,16 @@ import {
   useMatches,
   useTransition,
 } from "@remix-run/react";
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import { useState, useEffect, useContext } from "react";
-import { Web3Context } from "~/util/chainUtils/web3";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { motion } from "framer-motion";
 import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
-import { motion } from "framer-motion";
-import BurgerButton from "~/components/BurgerButton";
-import ProvideLiquidity from "~/components/ProvideLiquidity";
 import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
-import { useToolTip } from "~/components";
-import { ToolTipContent } from "~/components/ToolTip";
 import { trimAddress, networkMapper } from "~/util";
+import { Web3Context } from "~/util/chainUtils/web3";
 import {
   DashboardIcon,
   GeneralButton,
@@ -31,11 +28,17 @@ import {
   Text,
   ChainSelectorButton,
   BlockchainModal,
+  trimAddressShort,
 } from "@fluidity-money/surfing";
+import { useToolTip } from "~/components";
+import BurgerButton from "~/components/BurgerButton";
+import ProvideLiquidity from "~/components/ProvideLiquidity";
+import { ToolTipContent } from "~/components/ToolTip";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectedWallet from "~/components/ConnectedWallet";
 import Modal from "~/components/Modal";
-import { useWallet } from "@solana/wallet-adapter-react";
 import dashboardStyles from "~/styles/dashboard.css";
+import MobileModal from "~/components/MobileModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -109,16 +112,22 @@ function ErrorBoundary() {
 export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
 
-  const [openMobModal, setOpenMobModal] = useState(false);
+  const { state } = useContext(Web3Context());
+  const account = state.account ?? "";
 
   const navigate = useNavigate();
 
-  const { state } = useContext(Web3Context());
-  const account = state.account ?? "";
+  const [openMobModal, setOpenMobModal] = useState(false);
 
   const { width } = useViewport();
   const isMobile = width <= 500;
   const isTablet = width <= 850 && width > 500;
+  const closeMobileModal = width > 850 ? false : true;
+
+  useEffect(() => {
+    // closes modal if screen size becomes too large for mobile menu
+    !closeMobileModal && setOpenMobModal(false);
+  }, [closeMobileModal]);
 
   const navigationMap = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
@@ -157,11 +166,12 @@ export default function Dashboard() {
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, publicKey, disconnect, connecting } = useWallet();
+  const { connected, address, disconnect, connecting } = useContext(
+    FluidityFacadeContext
+  );
 
   useEffect(() => {
-     if(connected || connecting)
-	   setWalletModalVisibility(false);
+    if (connected || connecting) setWalletModalVisibility(false);
   }, [connected, connecting]);
 
   const handleSetChain = (network: string) => {
@@ -204,7 +214,7 @@ export default function Dashboard() {
       network === `ethereum`
         ? `0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6`
         : connected
-        ? publicKey?.toString()
+        ? address?.toString()
         : "JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi";
 
     const socket = io();
@@ -234,6 +244,37 @@ export default function Dashboard() {
       );
     });
   }, []);
+
+  const handleScroll = () => {
+    if (!openMobModal) {
+      // Unsets Background Scrolling to use when Modal is closed
+      document.body.style.overflow = "unset";
+      document.body.style.position = "static";
+    }
+    if (openMobModal) {
+      if (typeof window != "undefined" && window.document) {
+        // Disables Background Scrolling whilst the Modal is open
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Prevents and allows scrolling depending if mobile modal is open
+    if (openMobModal) {
+      // Delay to hide layout shift when static
+      setTimeout(() => {
+        handleScroll();
+      }, 1000);
+    } else handleScroll();
+  }, [openMobModal]);
+
+  useEffect(() => {
+    // Resets background when navigating away
+    document.body.style.overflow = "unset";
+    document.body.style.position = "static";
+  }, [currentPath]);
 
   return (
     <>
@@ -294,21 +335,27 @@ export default function Dashboard() {
         </ul>
 
         {/* Connect Wallet Button */}
-		{ network === `solana` ?
-          <GeneralButton
-            version={connected || connecting ? "transparent" : "primary"}
-            buttontype="text"
-            size={"medium"}
-            handleClick={() =>
-              connected ? disconnect() : connecting ? null : setWalletModalVisibility(true)
-            }
-            className="connect-wallet-btn"
-          >
-          {connected
-            ? trimAddress(publicKey?.toString() as unknown as string)
-            : connecting ? `Connecting...` : `Connect Wallet`}
-         </GeneralButton> : null
-		}
+        {network === `solana` ? (
+          connected ? (
+            <ConnectedWallet
+              address={trimAddressShort(address!.toString())}
+              callback={() => disconnect?.()}
+              className="connect-wallet-btn"
+            />
+          ) : (
+            <GeneralButton
+              version={connected || connecting ? "transparent" : "primary"}
+              buttontype="text"
+              size={"medium"}
+              handleClick={() =>
+                connecting ? null : setWalletModalVisibility(true)
+              }
+              className="connect-wallet-btn"
+            >
+              {connecting ? `Connecting...` : `Connect Wallet`}
+            </GeneralButton>
+          )
+        ) : null}
       </nav>
 
       <main id="dashboard-body">
@@ -316,7 +363,7 @@ export default function Dashboard() {
           {/* App Name */}
           <div className="top-navbar-left">
             {(isMobile || isTablet) && (
-              <img src="/images/logoOutline.png" alt="Fluidity" />
+              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
             )}
             {!isMobile && <Text>{appName}</Text>}
           </div>
@@ -392,8 +439,22 @@ export default function Dashboard() {
 
         <Outlet />
 
+        {/* Mobile Menu Modal */}
+        {openMobModal && (
+          <MobileModal
+            navigationMap={navigationMap}
+            activeIndex={activeIndex}
+            chains={chainNameMap}
+            unclaimedFluid={unclaimedRewards}
+            network={network}
+            isOpen={openMobModal}
+            setIsOpen={setOpenMobModal}
+            unclaimedRewards={unclaimedRewards}
+          />
+        )}
+
         {/* Provide Luquidity*/}
-        <ProvideLiquidity />
+        {!openMobModal && <ProvideLiquidity />}
 
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}

@@ -17,12 +17,12 @@ const integrationTestUniswapV2 = `
           "0x00000000000000000000000020e95253e54490d8d30ea41574b24f741ee70201"
         ]
       },
-      "transaction": {
-        "to": "0xd7c09e006a2891880331b0f6224071c1e890a98a",
-        "from": "0x79328db8694a643c569740233869f4f5b344d0cf",
-        "hash": "0x034f82fbb4c20783ee47a0251edeb8f44bda5fa6439dc15e19ee2e8a22862bb0"
-      },
       "application": 1
+    },
+    "transaction": {
+      "to": "0xd7c09e006a2891880331b0f6224071c1e890a98a",
+      "from": "0x79328db8694a643c569740233869f4f5b344d0cf",
+      "hash": "0x034f82fbb4c20783ee47a0251edeb8f44bda5fa6439dc15e19ee2e8a22862bb0"
     },
     "expected_sender": "0x79328db8694a643c569740233869f4f5b344d0cf",
     "expected_recipient": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",

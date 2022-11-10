@@ -16,13 +16,13 @@ export interface Winner {
 }
 
 export interface WinnersRes {
-  winners_staging: Winner[],
+  winners: Winner[],
 }
 
 
 const winningTransactionsByAddressSubscription = gql`
 subscription winnersGetWinningTransactionsByAddressSubscription($network: network_blockchain!, $address: String!, $date: timestamp!) {
-  winners_staging(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, winning_address: {_eq: $address}, awarded_time: {_gte: $date}}) {
+  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, winning_address: {_eq: $address}, awarded_time: {_gte: $date}}) {
     awarded_time
     transaction_hash
     token_short_name
@@ -35,7 +35,7 @@ subscription winnersGetWinningTransactionsByAddressSubscription($network: networ
 
 const winningTransactionsAllSubscription = gql`
 subscription winnersGetWinningTransactionsAllSubscription($network: network_blockchain!, $date: timestamp!) {
-  winners_staging(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, awarded_time: {_gte: $date}}) {
+  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, awarded_time: {_gte: $date}}) {
     awarded_time
     transaction_hash
     token_short_name
@@ -48,7 +48,7 @@ subscription winnersGetWinningTransactionsAllSubscription($network: network_bloc
 
 const winningTransactionsAnyTimeAllSubscription = gql`
 subscription winnersGetWinningTransactionsAnyTimeAllSubscription($network: network_blockchain!) {
-  winners_staging(order_by: {awarded_time: desc}, where: {network: {_eq: $network}}) {
+  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}}) {
     awarded_time
     transaction_hash
     token_short_name
