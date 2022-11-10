@@ -40,7 +40,7 @@ const getCheckedSolContext = () => {
   };
 };
 
-const balance = async (tokenAddr: string): Promise<string> => {
+const balance = async (tokenAddr: string): Promise<number> => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -62,7 +62,7 @@ const balance = async (tokenAddr: string): Promise<string> => {
     //balance of SOL represented as a TokenAmount
     if (token.name === "Solana") {
       const value = await connection.getBalance(publicKey);
-      return value.toString();
+      return value;
 
       //otherwise balance of an SPL token
     } else {
@@ -71,7 +71,7 @@ const balance = async (tokenAddr: string): Promise<string> => {
         owner: publicKey,
       });
       const { value } = await connection.getTokenAccountBalance(ata);
-      return value.amount;
+      return parseInt(value.toString());
     }
   } catch (e) {
     throw new Error(
@@ -99,10 +99,7 @@ const limit = async (): Promise<number> => {
   return response;
 };
 
-const swap = async (
-  amount: string,
-  fromTokenAddr: string,
-) => {
+const swap = async (amount: string, fromTokenAddr: string) => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -120,39 +117,38 @@ const swap = async (
     throw new Error(
       `Could not initiate Swap: Could not find matching token ${fromTokenAddr} in solana`
     );
-  
+
   // true if swapping from fluid -> non-fluid
-  const fromFluid = !!fromToken.isFluidOf
-  
+  const fromFluid = !!fromToken.isFluidOf;
+
   const fluidAssets = getTokenForNetwork("solana");
-  
+
   if (!fluidAssets.length)
     throw new Error(
       `Could not initiate Swap: Could not get fluid tokens from solana`
     );
-  
+
   const toToken = fromFluid
     ? getTokenFromAddress("solana", fromToken.isFluidOf!)
     : fluidAssets.reduce((_: Token | null, fluidTokenAddr: string) => {
-    const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
+        const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
 
-  if (!fluidToken)
-    throw new Error(
-      `Could not find Fluid token ${fluidTokenAddr} in solana`
-    );
-    
-    return fluidToken.isFluidOf === fromTokenAddr ? fluidToken : null
-  }, null)
-  
-  if (!toToken) 
+        if (!fluidToken)
+          throw new Error(
+            `Could not find Fluid token ${fluidTokenAddr} in solana`
+          );
+
+        return fluidToken.isFluidOf === fromTokenAddr ? fluidToken : null;
+      }, null);
+
+  if (!toToken)
     throw new Error(
       `Could not initiate Swap: Could not find dest pair token from ${fromTokenAddr} in solana`
     );
-  
+
   const [baseToken, fluidToken] = fromFluid
     ? [toToken, fromToken]
-    : [fromToken, toToken]
-  
+    : [fromToken, toToken];
 
   const obligationAccount = fluidToken.obligationAccount;
 

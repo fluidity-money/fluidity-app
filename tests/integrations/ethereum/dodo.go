@@ -16,12 +16,12 @@ const integrationTestDodoV2 = `
         ],
 	"log_index": "89"
       },
-      "transaction": {
-        "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
-        "from": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
-        "hash": "0x25b7270668070d0205efdf4408e1cd63d5defbd28158b6682b5a5915ba7b82e1"
-      },
       "application": 7
+    },
+    "transaction": {
+      "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
+      "from": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
+      "hash": "0x25b7270668070d0205efdf4408e1cd63d5defbd28158b6682b5a5915ba7b82e1"
     },
     "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
@@ -49,12 +49,12 @@ const integrationTestDodoV2 = `
         ],
 	"log_index": "112"
       },
-      "transaction": {
-        "to": "0x617dee16b86534a5d792a4d7a62fb491b544111e",
-        "from": "0xfd3f1d1f95481f91404f2042855686d42bd8a07e",
-        "hash": "0x5edb9c16eaef3a089825a92c1a19dd8d3953107f0c160068d0d35e521983745e"
-      },
       "application": 7
+    },
+    "transaction": {
+      "to": "0x617dee16b86534a5d792a4d7a62fb491b544111e",
+      "from": "0xfd3f1d1f95481f91404f2042855686d42bd8a07e",
+      "hash": "0x5edb9c16eaef3a089825a92c1a19dd8d3953107f0c160068d0d35e521983745e"
     },
     "expected_sender": "0xfd3f1d1f95481f91404f2042855686d42bd8a07e",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
@@ -82,12 +82,12 @@ const integrationTestDodoV2 = `
           ],
 	  "log_index": "100"
       },
-      "transaction": {
-          "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
-        "from": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
-        "hash": "0x399aa69329ee1c156bd7584eac2afba9bed70cf3b31a237705ddbee80dcd3b75"
-      },
       "application": 7
+    },
+    "transaction": {
+      "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
+      "from": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
+      "hash": "0x399aa69329ee1c156bd7584eac2afba9bed70cf3b31a237705ddbee80dcd3b75"
     },
     "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
@@ -116,12 +116,12 @@ const integrationTestDodoV2 = `
           ],
 	  "log_index": "463"
       },
-      "transaction": {
-          "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
-        "from": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
-        "hash": "0x181c74fa2b22faffce7ba7498719bf5d314682c536f138f4dfc6cae31e054b31"
-      },
       "application": 7
+    },
+    "transaction": {
+      "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
+      "from": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
+      "hash": "0x181c74fa2b22faffce7ba7498719bf5d314682c536f138f4dfc6cae31e054b31"
     },
     "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",

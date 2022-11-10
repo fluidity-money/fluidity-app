@@ -17,13 +17,12 @@ import {
   ChainSelectorButton,
   BlockchainModal,
   Twitter,
-  normaliseAddress,
-  trimAddress,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
 import Video from "~/components/Video";
 import Modal from "~/components/Modal";
+import ConnectedWallet from "~/components/ConnectedWallet";
 import opportunityStyles from "~/styles/opportunity.css";
 
 export const links: LinksFunction = () => {
@@ -124,6 +123,7 @@ const NetworkPage = () => {
             <LinkButton
               size={"small"}
               type={"internal"}
+              left={true}
               handleClick={() => {
                 return;
               }}
@@ -154,12 +154,12 @@ const NetworkPage = () => {
             <div className="connected-wallet">
               {/* Connected Wallet */}
               {address && (
-                <>
-                  <div>{"(icon)"}</div>
-                  <Text>
-                    {trimAddress(normaliseAddress(address.toString()))}
-                  </Text>
-                </>
+                <ConnectedWallet
+                  address={address.toString()}
+                  callback={() => {
+                    console.log("click");
+                  }}
+                />
               )}
 
               {/* Switch Chain Modal */}

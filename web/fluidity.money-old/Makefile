@@ -66,7 +66,7 @@ docker-frontend: ${SRC_SCRBL} ${SRC_SASS} ${SRC_JS} ${SRC_GO}
 docker-backend: ${SRC_GO}
 	${DOCKER_BUILD} \
 	${DOCKERFLAGS} \
-	-f Dockerfile.backend -t fluidity/${REPO}-backend .
+	-f Dockerfile.backend -t fluidity/${REPO}-old-backend .
 	@touch docker-backend
 
 run-docker-frontend: docker-frontend
