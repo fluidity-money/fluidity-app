@@ -1,4 +1,7 @@
-import { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
+
+import { json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -8,27 +11,34 @@ import {
   useMatches,
   useTransition,
 } from "@remix-run/react";
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import { useState, useEffect, useContext } from "react";
-import { Web3Context } from "~/util/chainUtils/web3";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { motion } from "framer-motion";
 import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
-import { motion } from "framer-motion";
-import ProvideLiquidity from "~/components/ProvideLiquidity";
 import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
-import { useToolTip } from "~/components";
-import { ToolTipContent } from "~/components/ToolTip";
-import { trimAddress } from "~/util";
+import { trimAddress, networkMapper } from "~/util";
+import { Web3Context } from "~/util/chainUtils/web3";
 import {
   DashboardIcon,
   GeneralButton,
   Trophy,
   Text,
+  ChainSelectorButton,
+  BlockchainModal,
+  trimAddressShort,
 } from "@fluidity-money/surfing";
-
+import { useToolTip } from "~/components";
+import BurgerButton from "~/components/BurgerButton";
+import ProvideLiquidity from "~/components/ProvideLiquidity";
+import { ToolTipContent } from "~/components/ToolTip";
+import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectedWallet from "~/components/ConnectedWallet";
+import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
+import MobileModal from "~/components/MobileModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -62,13 +72,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const token = config.config;
 
-  return {
+  return json({
     appName: routeMapper(pathname),
     version: "1.5",
     network,
     provider,
     token,
-  };
+  });
 };
 
 type LoaderData = {
@@ -79,16 +89,45 @@ type LoaderData = {
   token: typeof config.config;
 };
 
+function ErrorBoundary() {
+  return (
+    <div
+      className="pad-main"
+      style={{
+        paddingTop: "40px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1>Could not load Dashboard!</h1>
+      <br />
+      <h2>Our team has been notified, and are working on fixing it!</h2>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
-
-  const navigate = useNavigate();
 
   const { state } = useContext(Web3Context());
   const account = state.account ?? "";
 
+  const navigate = useNavigate();
+
+  const [openMobModal, setOpenMobModal] = useState(false);
+
   const { width } = useViewport();
   const isMobile = width <= 500;
+  const isTablet = width <= 850 && width > 500;
+  const closeMobileModal = width > 850 ? false : true;
+
+  useEffect(() => {
+    // closes modal if screen size becomes too large for mobile menu
+    !closeMobileModal && setOpenMobModal(false);
+  }, [closeMobileModal]);
 
   const navigationMap = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
@@ -96,6 +135,17 @@ export default function Dashboard() {
     // {assets: {name: "Assets", icon: <AssetsIcon />}},
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
+
+  const chainNameMap = {
+    ethereum: {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    solana: {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
+  };
 
   const matches = useMatches();
   const toolTip = useToolTip();
@@ -105,10 +155,33 @@ export default function Dashboard() {
     useResolvedPath(Object.keys(obj)[0])
   );
   const activeIndex = resolvedPaths.findIndex(
-    (path) => path.pathname === currentPath
+    (path) =>
+      path.pathname === currentPath ||
+      path.pathname === currentPath.slice(0, -1)
   );
 
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
+  const [walletModalVisibility, setWalletModalVisibility] =
+    useState<boolean>(false);
+  const [chainModalVisibility, setChainModalVisibility] =
+    useState<boolean>(false);
+
+  const { connected, address, disconnect, connecting } = useContext(
+    FluidityFacadeContext
+  );
+
+  useEffect(() => {
+    if (connected || connecting) setWalletModalVisibility(false);
+  }, [connected, connecting]);
+
+  const handleSetChain = (network: string) => {
+    const { pathname } = location;
+
+    // Get path components after $network
+    const pathComponents = pathname.split("/").slice(2);
+
+    navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
+  };
 
   useEffect(() => {
     (async () => {
@@ -136,10 +209,13 @@ export default function Dashboard() {
     })();
 
     // Test for now, wallet address should be gotten when a wallet is connected
+    // take out hard coded address later.
     const connected_wallet =
       network === `ethereum`
         ? `0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6`
-        : `JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi`;
+        : connected
+        ? address?.toString()
+        : "JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi";
 
     const socket = io();
     socket.emit("subscribeTransactions", {
@@ -169,13 +245,65 @@ export default function Dashboard() {
     });
   }, []);
 
+  const handleScroll = () => {
+    if (!openMobModal) {
+      // Unsets Background Scrolling to use when Modal is closed
+      document.body.style.overflow = "unset";
+      document.body.style.position = "static";
+    }
+    if (openMobModal) {
+      if (typeof window != "undefined" && window.document) {
+        // Disables Background Scrolling whilst the Modal is open
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Prevents and allows scrolling depending if mobile modal is open
+    if (openMobModal) {
+      // Delay to hide layout shift when static
+      setTimeout(() => {
+        handleScroll();
+      }, 1000);
+    } else handleScroll();
+  }, [openMobModal]);
+
+  useEffect(() => {
+    // Resets background when navigating away
+    document.body.style.overflow = "unset";
+    document.body.style.position = "static";
+  }, [currentPath]);
+
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <img src="/logo.svg" alt="Fluidity Logo" />
+        <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+
+        <br />
+
+        <ChainSelectorButton
+          chain={chainNameMap[network as "ethereum" | "solana"]}
+          onClick={() => setChainModalVisibility(true)}
+        />
       </header>
 
+      {/* Switch Chain Modal */}
+      <Modal visible={chainModalVisibility}>
+        <div className="cover">
+          <BlockchainModal
+            handleModal={setChainModalVisibility}
+            option={chainNameMap[network as "ethereum" | "solana"]}
+            options={Object.values(chainNameMap)}
+            setOption={handleSetChain}
+            mobile={isMobile}
+          />
+        </div>
+      </Modal>
+
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
+        {/* Nav Bar */}
         <ul>
           {navigationMap.map((obj, index) => {
             const key = Object.keys(obj)[0];
@@ -190,24 +318,57 @@ export default function Dashboard() {
                   <div />
                 )}
                 <Link to={key}>
-                  <Text prominent={active}>
-                    {icon}
-                    {name}
+                  <Text
+                    prominent={active}
+                    className={
+                      active
+                        ? "dashboard-navbar-active"
+                        : "dashboard-navbar-default"
+                    }
+                  >
+                    {icon} {name}
                   </Text>
                 </Link>
               </li>
             );
           })}
         </ul>
+
+        {/* Connect Wallet Button */}
+        {network === `solana` ? (
+          connected ? (
+            <ConnectedWallet
+              address={trimAddressShort(address!.toString())}
+              callback={() => disconnect?.()}
+              className="connect-wallet-btn"
+            />
+          ) : (
+            <GeneralButton
+              version={connected || connecting ? "transparent" : "primary"}
+              buttontype="text"
+              size={"medium"}
+              handleClick={() =>
+                connecting ? null : setWalletModalVisibility(true)
+              }
+              className="connect-wallet-btn"
+            >
+              {connecting ? `Connecting...` : `Connect Wallet`}
+            </GeneralButton>
+          )
+        ) : null}
       </nav>
 
       <main id="dashboard-body">
-        <nav id="top-navbar">
-          {isMobile ? (
-            <img src="/logo.svg" alt="Fluidity" />
-          ) : (
-            <Text>{appName}</Text>
-          )}
+        <nav id="top-navbar" className={"pad-main"}>
+          {/* App Name */}
+          <div className="top-navbar-left">
+            {(isMobile || isTablet) && (
+              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+            )}
+            {!isMobile && <Text>{appName}</Text>}
+          </div>
+
+          {/* Navigation Buttons */}
           <div>
             {/* Send */}
             {/*
@@ -236,18 +397,20 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify */}
-            <GeneralButton
-              version={"primary"}
-              buttontype="text"
-              size={"small"}
-              handleClick={() => navigate("../fluidify")}
-            >
-              Fluidify Money
-            </GeneralButton>
+            {width > 550 && (
+              <GeneralButton
+                version={"primary"}
+                buttontype="text"
+                size={"small"}
+                handleClick={() => navigate("../fluidify")}
+              >
+                Fluidify Money
+              </GeneralButton>
+            )}
 
             {/* Prize Money */}
             <GeneralButton
-              version={"secondary"}
+              version={"transparent"}
               buttontype="icon after"
               size={"small"}
               handleClick={() =>
@@ -259,15 +422,41 @@ export default function Dashboard() {
             >
               ${unclaimedRewards}
             </GeneralButton>
+
+            {(isTablet || isMobile) && (
+              <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
+            )}
           </div>
         </nav>
 
+        {/* Connect Wallet Modal */}
+        {network === `solana` ? (
+          <SolanaWalletModal
+            visible={walletModalVisibility}
+            close={() => setWalletModalVisibility(false)}
+          />
+        ) : null}
+
         <Outlet />
 
-        <footer id="flu-socials" className="hide-on-mobile">
-          {/* Provide Luquidity*/}
-          <ProvideLiquidity />
+        {/* Mobile Menu Modal */}
+        {openMobModal && (
+          <MobileModal
+            navigationMap={navigationMap}
+            activeIndex={activeIndex}
+            chains={chainNameMap}
+            unclaimedFluid={unclaimedRewards}
+            network={network}
+            isOpen={openMobModal}
+            setIsOpen={setOpenMobModal}
+            unclaimedRewards={unclaimedRewards}
+          />
+        )}
 
+        {/* Provide Luquidity*/}
+        {!openMobModal && <ProvideLiquidity />}
+
+        <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>
             {/* Version */}
@@ -316,3 +505,5 @@ export default function Dashboard() {
     </>
   );
 }
+
+export { ErrorBoundary };

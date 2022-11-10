@@ -1,38 +1,66 @@
-import React, { useMemo } from "react";
-import config from "~/webapp.config.server";
+import { useMemo } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
+  useWallet,
 } from "@solana/wallet-adapter-react";
 
 import {
   PhantomWalletAdapter,
-  SolletExtensionWalletAdapter,
+  SolletWalletAdapter,
+  SolflareWalletAdapter,
+  CloverWalletAdapter,
+  Coin98WalletAdapter,
+  NightlyWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
+import { solanaInstructions } from "~/util/chainUtils/solana/instructions";
+import FluidityFacadeContext from "./FluidityFacade";
 
-export default function SolanaProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const networkCluster = 0;
-  const rpc =
-    process.env.REACT_APP_FLU_SOL_RPC === undefined
-      ? ""
-      : process.env.REACT_APP_FLU_SOL_RPC;
-  const endpoint = useMemo(() => rpc, [networkCluster]);
+const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
+  const { connected, publicKey, disconnect } = useWallet();
 
-  // include more wallet suppport later once done with full implementation
-  const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolletExtensionWalletAdapter()],
-    [networkCluster]
-  );
+  console.log("connected", connected, "addr:", publicKey?.toString());
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        {children}
-      </WalletProvider>
-    </ConnectionProvider>
+    <FluidityFacadeContext.Provider
+      value={{
+        connected,
+        disconnect,
+        address: publicKey?.toString() ?? "",
+        ...solanaInstructions,
+      }}
+    >
+      {children}
+    </FluidityFacadeContext.Provider>
   );
-}
+};
+
+const SolanaProvider =
+  (rpcUrl: string) =>
+  ({ children }: { children: React.ReactNode }) => {
+    const networkCluster = 0;
+    const endpoint = useMemo(() => rpcUrl, [networkCluster]);
+
+    // include more wallet suppport later once done with full implementation
+    const wallets = useMemo(
+      () => [
+        new PhantomWalletAdapter(),
+        new SolletWalletAdapter(),
+        new SolflareWalletAdapter(),
+        new NightlyWalletAdapter(),
+        new CloverWalletAdapter(),
+        new Coin98WalletAdapter(),
+      ],
+      [networkCluster]
+    );
+
+    return (
+      <ConnectionProvider endpoint={endpoint}>
+        <WalletProvider wallets={wallets} autoConnect>
+          <SolanaFacade>{children}</SolanaFacade>
+        </WalletProvider>
+      </ConnectionProvider>
+    );
+  };
+
+export default SolanaProvider;

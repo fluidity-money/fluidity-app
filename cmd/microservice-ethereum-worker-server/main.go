@@ -123,12 +123,16 @@ func main() {
 		)
 
 		var (
-			blockBaseFee     = hintedBlock.BlockBaseFee
-			blockNumber      = hintedBlock.BlockNumber
-			blockHash        = hintedBlock.BlockHash
-			fluidTransfers   = hintedBlock.DecoratedTransfers
-			transfersInBlock = len(fluidTransfers)
+			blockBaseFee      = hintedBlock.BlockBaseFee
+			blockNumber       = hintedBlock.BlockNumber
+			blockHash         = hintedBlock.BlockHash
+			fluidTransactions = hintedBlock.DecoratedTransactions
+			transfersInBlock  int
 		)
+
+		for _, transfers := range fluidTransactions {
+			transfersInBlock += len(transfers.Transfers)
+		}
 
 		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
 
@@ -255,29 +259,18 @@ func main() {
 
 		var blockAnnouncements []worker.EthereumAnnouncement
 
-		for _, transfer := range fluidTransfers {
+		for _, transaction := range fluidTransactions {
 
 			var (
-				receipt     = transfer.Receipt
-				transaction = transfer.Transaction
+				receipt     = transaction.Receipt
 
-				transactionHash      = transfer.Transaction.Hash
-				senderAddress        = transfer.SenderAddress
-				recipientAddress     = transfer.RecipientAddress
-				gasLimit             = transfer.Transaction.Gas
-				transferType         = transfer.Transaction.Type
-				gasTipCap            = transfer.Transaction.GasTipCap
-				appEmission          = transfer.AppEmissions
+				transactionHash      = transaction.Transaction.Hash
+				gasLimit             = transaction.Transaction.Gas
+				transferType         = transaction.Transaction.Type
+				maxFeePerGas         = transaction.Transaction.GasFeeCap
+				maxPriorityFeePerGas = transaction.Transaction.GasTipCap
 				gasUsed              = receipt.GasUsed
-				maxPriorityFeePerGas = transaction.GasTipCap
-				maxFeePerGas         = transaction.GasFeeCap
-
-				applicationFeeUsd *big.Rat
 			)
-
-			if transfer.Decorator != nil {
-				applicationFeeUsd = transfer.Decorator.ApplicationFee
-			}
 
 			if transferType != 2 {
 				log.App(func(k *log.Log) {
@@ -291,7 +284,7 @@ func main() {
 			}
 
 			var (
-				gasTipCapRat = bigIntToRat(gasTipCap)
+				gasTipCapRat = bigIntToRat(maxPriorityFeePerGas)
 				gasLimitRat  = uint64ToRat(gasLimit)
 				gasUsedRat   = bigIntToRat(gasUsed)
 			)
@@ -302,7 +295,7 @@ func main() {
 
 			emission.GasLimit = gasLimit
 
-			emission.GasTipCap = gasTipCap
+			emission.GasTipCap = maxPriorityFeePerGas
 
 			// remember the inputs to the gas actually used
 			// in usd calculation
@@ -355,91 +348,110 @@ func main() {
 			// calculate the transfer fee usd, by multiplying
 			// the gas used by the effective gas price
 
-			transferFeeNormal := new(big.Rat).Mul(
+			transactionFeeNormal := new(big.Rat).Mul(
 				gasUsedRat,
 				normalisedEffectiveGasPriceRat,
 			)
 
-			emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
+			transferCount := len(transaction.Transfers)
 
-			// if we have an application transfer, apply the fee
+			transferCountRat := big.NewRat(int64(transferCount), 1)
 
-			if applicationFeeUsd != nil {
-				transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+			feePerTransfer := new(big.Rat).Quo(transactionFeeNormal, transferCountRat)
+			// for each fluid transfer, calculate the actual fee and chances
+
+			for _, transfer := range transaction.Transfers {
+				// if we have an application transfer, apply the fee
+
+				var (
+					transferFeeNormal = new(big.Rat).Set(feePerTransfer)
+
+					senderAddress    = transfer.SenderAddress
+					recipientAddress = transfer.RecipientAddress
+					appEmission      = transfer.AppEmissions
+				)
+
+				if transfer.Decorator != nil {
+					applicationFeeUsd := transfer.Decorator.ApplicationFee
+
+					transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+				}
+
+				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
+
+				var (
+					winningClasses   = fluidity.WinningClasses
+					deltaWeightNum   = fluidity.DeltaWeightNum
+					deltaWeightDenom = fluidity.DeltaWeightDenom
+					payoutFreqNum    = fluidity.PayoutFreqNum
+					payoutFreqDenom  = fluidity.PayoutFreqDenom
+				)
+
+				var (
+					deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
+					payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
+				)
+
+				randomN, randomPayouts, _ := probability.WinningChances(
+					transferFeeNormal,
+					currentAtx,
+					sizeOfThePool,
+					underlyingTokenDecimalsRat,
+					payoutFreq,
+					deltaWeight,
+					winningClasses,
+					btx,
+					secondsSinceLastBlock,
+					emission,
+				)
+
+				res := generateRandomIntegers(
+					fluidity.WinningClasses,
+					1,
+					int(randomN),
+				)
+
+				// create announcement and container
+
+				randomSource := make([]uint32, len(res))
+
+				for i, value := range res {
+					randomSource[i] = uint32(value)
+				}
+
+				tokenDetails := token_details.TokenDetails{
+					TokenShortName: tokenName,
+					TokenDecimals:  underlyingTokenDecimals,
+				}
+
+				announcement := worker.EthereumAnnouncement{
+					TransactionHash: transactionHash,
+					BlockNumber:     &blockNumber,
+					FromAddress:     senderAddress,
+					ToAddress:       recipientAddress,
+					SourceRandom:    randomSource,
+					SourcePayouts:   randomPayouts,
+					TokenDetails:    tokenDetails,
+				}
+
+				// Fill in emission.NaiveIsWinning
+
+				_ = probability.NaiveIsWinning(announcement.SourceRandom, emission)
+
+				log.Debug(func(k *log.Log) {
+					k.Format("Source payouts: %v", randomSource)
+				})
+
+				emission.TransactionHash = transactionHash.String()
+				emission.RecipientAddress = recipientAddress.String()
+				emission.SenderAddress = senderAddress.String()
+
+				emission.EthereumAppFees = appEmission
+
+				blockAnnouncements = append(blockAnnouncements, announcement)
+
+				sendEmission(emission)
 			}
-
-			var (
-				winningClasses   = fluidity.WinningClasses
-				deltaWeightNum   = fluidity.DeltaWeightNum
-				deltaWeightDenom = fluidity.DeltaWeightDenom
-				payoutFreqNum    = fluidity.PayoutFreqNum
-				payoutFreqDenom  = fluidity.PayoutFreqDenom
-			)
-
-			var (
-				deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
-				payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
-			)
-
-			randomN, randomPayouts, _ := probability.WinningChances(
-				transferFeeNormal,
-				currentAtx,
-				sizeOfThePool,
-				underlyingTokenDecimalsRat,
-				payoutFreq,
-				deltaWeight,
-				winningClasses,
-				btx,
-				secondsSinceLastBlock,
-				emission,
-			)
-
-			res := generateRandomIntegers(
-				fluidity.WinningClasses,
-				1,
-				int(randomN),
-			)
-
-			// create announcement and container
-
-			randomSource := make([]uint32, len(res))
-
-			for i, value := range res {
-				randomSource[i] = uint32(value)
-			}
-
-			tokenDetails := token_details.TokenDetails{
-				TokenShortName: tokenName,
-				TokenDecimals:  underlyingTokenDecimals,
-			}
-
-			announcement := worker.EthereumAnnouncement{
-				TransactionHash: transactionHash,
-				BlockNumber:     &blockNumber,
-				FromAddress:     senderAddress,
-				ToAddress:       recipientAddress,
-				SourceRandom:    randomSource,
-				SourcePayouts:   randomPayouts,
-				TokenDetails:    tokenDetails,
-			}
-
-			// Fill in emission.NaiveIsWinning
-
-			_ = probability.NaiveIsWinning(announcement.SourceRandom, emission)
-
-			log.Debug(func(k *log.Log) {
-				k.Format("Source payouts: %v", randomSource)
-			})
-
-			emission.TransactionHash = transactionHash.String()
-			emission.RecipientAddress = recipientAddress.String()
-			emission.SenderAddress = senderAddress.String()
-
-			emission.EthereumAppFees = appEmission
-
-			blockAnnouncements = append(blockAnnouncements, announcement)
-
-			sendEmission(emission)
 		}
 
 		queue.SendMessage(publishAmqpQueueName, blockAnnouncements)

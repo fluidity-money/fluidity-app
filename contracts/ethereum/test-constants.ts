@@ -3,7 +3,9 @@
 
 import { Token } from "./script-utils";
 
-export const AAVE_POOL_PROVIDER_ADDR = '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5';
+export const AAVE_V2_POOL_PROVIDER_ADDR = '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5';
+
+export const AAVE_V3_GOERLI_POOL_PROVIDER_ADDR = '0xc4dCB5126a3AfEd129BC3668Ea19285A9f56D15D';
 
 export const USDT_ADDR = '0xdac17f958d2ee523a2206206994597c13d831ec7';
 export const CUSDT_ADDR = '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9';
@@ -32,7 +34,7 @@ export const USUAL_FDAI_ADDR = '0xA5F816E2dE025A1bb419eD59652Fa03F249369A9';
 export const USUAL_FTUSD_ADDR = '0xD3a3C51BD460aCE0E83506CD1191Cf77F5eC3415';
 export const USUAL_FFEI_ADDR = '0xF24B32ec321e99053809f52aEbF680F70FE0dc53';
 
-export const TokenList: { [name: string]: Token } = {
+const tokens = {
   "usdt": {
     backend: 'compound',
     compoundAddress: CUSDT_ADDR,
@@ -70,7 +72,7 @@ export const TokenList: { [name: string]: Token } = {
     owner: TUSD_HOLDER
   },
   "fei": {
-    backend: 'aave',
+    backend: 'aaveV2',
     aaveAddress: AFEI_ADDR,
     decimals: 18,
     name: "Fluid Fei",
@@ -78,4 +80,20 @@ export const TokenList: { [name: string]: Token } = {
     address: FEI_ADDR,
     owner: FEI_HOLDER
   },
-};
+} as const;
+
+export const TokenList: {[k in keyof typeof tokens]: Token} = tokens;
+
+const goerliTokens = {
+  "usdc": {
+    backend: "aaveV3",
+    aaveAddress: "0x1Ee669290939f8a8864497Af3BC83728715265FF",
+    decimals: 6,
+    symbol: "fUsdc",
+    name: "udsc",
+    address: "0xa2025b15a1757311bfd68cb14eaefcc237af5b43",
+    owner: "0xeb2962b62c44138bbe094f2ff5a41e5c17152630",
+  },
+} as const;
+
+export const GoerliTokenList: {[k in keyof typeof goerliTokens]: Token} = goerliTokens;

@@ -1,9 +1,9 @@
 main > section#graph {
-  min-height: 80vh;
+  min-height: 5vh;
 }
 
 section#transactions {
-  min-height: 80vh;
+  min-height: 5vh;
 }
 
 .statistics-set {
@@ -14,6 +14,7 @@ section#transactions {
 .statistics-row {
   display: flex;
   flex-direction: row;
+  gap: 10px;
 }
 
 .graph-ceiling {
@@ -34,4 +35,12 @@ section#transactions {
 
 .transaction-table {
   width: 100%;
+}
+
+@media (max-width: 500px) {
+  .graph-ceiling {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2em;
+  }
 }

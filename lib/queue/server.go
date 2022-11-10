@@ -19,6 +19,7 @@ type amqpDetails struct {
 	workerId          string
 	deadLetterEnabled bool
 	messageRetries    int
+	goroutines        int
 }
 
 var chanAmqpDetails = make(chan amqpDetails)

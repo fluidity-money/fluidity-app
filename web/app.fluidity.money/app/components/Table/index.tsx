@@ -65,13 +65,15 @@ const Table = <T,>(props: ITable<T>) => {
 
         {/* Filters*/}
         {filters && (
-          <div>
+          <div className={"transaction-filters"}>
             {filters.map((filter, i) => (
               <button
                 key={`filter-${filter.name}`}
                 onClick={() => setActiveFilterIndex(i)}
               >
-                <Text prominent={activeFilterIndex === i}>{filter.name}</Text>
+                <Text size="lg" prominent={activeFilterIndex === i}>
+                  {filter.name}
+                </Text>
               </button>
             ))}
           </div>
@@ -151,45 +153,51 @@ const Table = <T,>(props: ITable<T>) => {
               );
             })}
         </div>
-        <div className="pagination-arrows">
-          <Link
-            to={
-              page === 1 ? "" : `?${pagination.pageQuery || "page"}=${page - 1}`
-            }
-          >
-            <img
-              style={{ width: 16 }}
-              src={
+        {pageCount > 0 && (
+          <div className="pagination-arrows">
+            <Link
+              to={
                 page === 1
-                  ? "/images/icons/arrowLeftDark.svg"
-                  : "/images/icons/arrowLeftWhite.svg"
+                  ? ""
+                  : `?${pagination.pageQuery || "page"}=${page - 1}`
               }
-              className={
-                page === 1 ? "pagination-arrow-off" : "pagination-arrow"
-              }
-            />
-          </Link>
+            >
+              <img
+                style={{ width: 16 }}
+                src={
+                  page === 1
+                    ? "/images/icons/arrowLeftDark.svg"
+                    : "/images/icons/arrowLeftWhite.svg"
+                }
+                className={
+                  page === 1 ? "pagination-arrow-off" : "pagination-arrow"
+                }
+              />
+            </Link>
 
-          <Link
-            to={
-              page === pageCount
-                ? ""
-                : `?${pagination.pageQuery || "page"}=${page + 1}`
-            }
-          >
-            <img
-              style={{ width: 16 }}
-              src={
+            <Link
+              to={
                 page === pageCount
-                  ? "/images/icons/arrowRightDark.svg"
-                  : "/images/icons/arrowRightWhite.svg"
+                  ? ""
+                  : `?${pagination.pageQuery || "page"}=${page + 1}`
               }
-              className={
-                page === pageCount ? "pagination-arrow-off" : "pagination-arrow"
-              }
-            />
-          </Link>
-        </div>
+            >
+              <img
+                style={{ width: 16 }}
+                src={
+                  page === pageCount
+                    ? "/images/icons/arrowRightDark.svg"
+                    : "/images/icons/arrowRightWhite.svg"
+                }
+                className={
+                  page === pageCount
+                    ? "pagination-arrow-off"
+                    : "pagination-arrow"
+                }
+              />
+            </Link>
+          </div>
+        )}
       </motion.div>
     </div>
   );

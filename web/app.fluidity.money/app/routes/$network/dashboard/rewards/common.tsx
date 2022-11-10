@@ -90,7 +90,10 @@ const UserRewards = ({
             <section id="unclaimed">
               <Text size="md">Unclaimed fluid rewards</Text>
               <Display className="unclaimed-total" size={"sm"}>
-                {numberToMonetaryString(unclaimedRewards)}
+                {unclaimedRewards.toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                })}
               </Display>
               {claiming ? (
                 <GeneralButton
@@ -120,14 +123,12 @@ const UserRewards = ({
             <Heading className="claims-title" as="h5">
               Auto-claims
             </Heading>
-            <Text size="xs">
-              {autoClaimInfo.map((text) => (
-                <>
-                  {text}
-                  <br />
-                </>
-              ))}
-            </Text>
+            {autoClaimInfo.map((text, i) => (
+              <Text size={"xs"} key={`text-${i}`}>
+                {text}
+                <br />
+              </Text>
+            ))}
             <hr className="gradient-line" />
             <Heading className="claims-title" as="h5">
               Instant-claim fees

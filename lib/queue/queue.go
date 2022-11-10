@@ -15,6 +15,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+
 	"github.com/getsentry/sentry-go"
 )
 
@@ -38,6 +41,10 @@ const (
 	// EnvMessageRetries to attempt until giving up - defaults to
 	// 5 if not set!
 	EnvMessageRetries = `FLU_AMQP_QUEUE_MESSAGE_RETRIES`
+
+	// EnvGoroutinesPerQueue for the number of goroutines to run
+	// per topic, defaults to 1
+	EnvGoroutinesPerQueue = `FLU_AMQP_GOROUTINES_PER_QUEUE`
 )
 
 type Message struct {
@@ -46,8 +53,6 @@ type Message struct {
 }
 
 func (message Message) Decode(decoded interface{}) {
-	// We decode everything that we receive as JSON.
-
 	content := message.Content
 
 	err := json.NewDecoder(content).Decode(decoded)
@@ -79,6 +84,7 @@ func GetMessages(topic string, f func(message Message)) {
 		workerId          = amqpDetails.workerId
 		deadLetterEnabled = amqpDetails.deadLetterEnabled
 		messageRetries    = amqpDetails.messageRetries
+		goroutines        = amqpDetails.goroutines
 	)
 
 	var (
@@ -111,74 +117,89 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 	}
 
-	for message := range messages {
-		var (
-			deliveryTag = message.DeliveryTag
-			body        = message.Body
-			routingKey  = message.RoutingKey
-		)
+	// have an internalQueue that processes messages to support
+	// incoming ones with the concurrency optionally enabled
 
-		bodyBuf := bytes.NewBuffer(body)
+	internalQueue := make(chan amqp.Delivery)
 
-		// Risk of a collision is near 0 enough to be ignored.
+	for i := 0; i < goroutines; i++ {
+		go func() {
+			for message := range internalQueue {
+				var (
+					deliveryTag = message.DeliveryTag
+					body        = message.Body
+					routingKey  = message.RoutingKey
+				)
 
-		retryKey := fmt.Sprintf(
-			"worker.%#v.retry.%#v.%#v",
-			workerId,
-			topic,
-			util.GetB16Hash(body),
-		)
+				bodyBuf := bytes.NewBuffer(body)
 
-		if deadLetterEnabled {
-			retryCount := state.Incr(retryKey)
+				// risk of a collision is near 0 enough to be ignored.
 
-			state.Expire(retryKey, 86400) // 24 hours
+				retryKey := fmt.Sprintf(
+					"worker.%#v.retry.%#v.%#v",
+					workerId,
+					topic,
+					util.GetB16Hash(body),
+				)
 
-			// the number of retries exceeds the max retry count! giving up!
+				if deadLetterEnabled {
+					retryCount := state.Incr(retryKey)
 
-			if int(retryCount) >= messageRetries {
+					state.Expire(retryKey, 86400) // 24 hours
 
-				queueNackDeliveryTag(channel, deliveryTag)
+					// the number of retries exceeds the max retry count! giving up!
 
-				state.Del(retryKey)
+					if int(retryCount) >= messageRetries {
 
-				continue
-			}
-		}
+						queueNackDeliveryTag(channel, deliveryTag)
 
-		f(Message{
-			Topic:   routingKey,
-			Content: bodyBuf,
-		})
+						state.Del(retryKey)
 
-		log.Debugf(
-			"Asking the server to ack the receipt of %v!",
-			deliveryTag,
-		)
+						continue
+					}
+				}
 
-		if err := queueAckDeliveryTag(channel, deliveryTag); err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
+				f(Message{
+					Topic:   routingKey,
+					Content: bodyBuf,
+				})
 
-				k.Format(
-					"Failed to ack a message with tag %#v!",
+				log.Debugf(
+					"Asking the server to ack the receipt of %v!",
 					deliveryTag,
 				)
 
-				k.Payload = err
-			})
-		}
+				if err := queueAckDeliveryTag(channel, deliveryTag); err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Context = Context
 
-		log.Debugf(
-			"Server acked the reply for %v!",
-			deliveryTag,
-		)
+						k.Format(
+							"Failed to ack a message with tag %#v!",
+							deliveryTag,
+						)
 
-		// clean up the retry key
+						k.Payload = err
+					})
+				}
 
-		if deadLetterEnabled {
-			state.Del(retryKey)
-		}
+				log.Debugf(
+					"Server acked the reply for %v!",
+					deliveryTag,
+				)
+
+				// clean up the retry key
+
+				if deadLetterEnabled {
+					state.Del(retryKey)
+				}
+			}
+		}()
+	}
+
+	// send all incoming messages to the internal queue
+
+	for message := range messages {
+		internalQueue <- message
 	}
 }
 

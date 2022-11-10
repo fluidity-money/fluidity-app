@@ -144,15 +144,17 @@ const UnclaimedWinnings = () => {
   } = useLoaderData<LoaderData>();
 
   return (
-    <>
-      {/* Info Card */}
-      <UserRewards
-        claimNow={true}
-        unclaimedRewards={totalUnclaimedRewards}
-        network={network}
-        networkFee={networkFee}
-        gasFee={gasFee}
-      />
+    <div className="pad-main">
+      {/* Info Card - Only accessible for Ethereum */}
+      {network === "ethereum" && (
+        <UserRewards
+          claimNow={true}
+          unclaimedRewards={totalUnclaimedRewards}
+          network={network}
+          networkFee={networkFee}
+          gasFee={gasFee}
+        />
+      )}
 
       <Heading as={"h2"}>Your Winnings</Heading>
 
@@ -170,7 +172,7 @@ const UnclaimedWinnings = () => {
           renderRow={RewardRow(network)}
         />
       </section>
-    </>
+    </div>
   );
 };
 

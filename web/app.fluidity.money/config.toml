@@ -8,8 +8,8 @@ server = "https://backend.ethereum.fluidity.money"
 [[drivers.solana]]
 label = "Solana"
 testnet = false
-rpc = { http = "FLU_SOL_RPC_HTTP", ws = "FLU_SOL_RPC_WS" }
-server = ""
+rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
+server = "https://backend.solana.fluidity.money"
 
 # Chain Configurations 
 [config.ethereum]
@@ -206,3 +206,8 @@ name = "WalletConnect"
 id = "walletconnect"
 description = "WalletConnect allows you to connect your wallet to any dApp using a QR code."
 logo = "/assets/wallets/walletconnect.svg"
+
+[[contract.solana]]
+name = "Mainnet"
+address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
+

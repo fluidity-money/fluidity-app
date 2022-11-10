@@ -41,6 +41,7 @@ export {
   ArrowTopRight,
   TriangleDown,
   Trophy,
+  Twitter,
   DashboardIcon,
   AssetsIcon,
   DaoIcon,

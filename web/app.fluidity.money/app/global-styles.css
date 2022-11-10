@@ -7,6 +7,8 @@ body {
   background-color: black;
   color: #828381;
   font-family: "Aeonik", sans-serif;
+
+  scroll-behavior: smooth;
 }
 
 body {
@@ -19,4 +21,18 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 40px;
+  background: black;
+  height: 100%;
+  width: 100%;
+}
+
+.no-margin {
+  margin: 0;
 }

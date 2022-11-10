@@ -89,13 +89,10 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         <div className={styles.rewardsChart}>
           <LineChart 
             data= {parsedDailyWinnings}
-            xLabel='Some X Label'
-            yLabel='Some Y Label'
-            lineLabel='Some Line Label'
-
+            lineLabel='dailyWinnings'
             accessors={{
-              xAccessor: (d: any) => d.awarded_date,
-              yAccessor: (d: any) => d.winning_amount_scaled,
+              xAccessor: (d: DailyWinner) => d.awarded_date,
+              yAccessor: (d: DailyWinner) => d.winning_amount_scaled,
             }}
             renderTooltip={({datum}: {datum: DailyWinner}) => {
               return (
