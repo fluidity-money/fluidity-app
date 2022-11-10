@@ -57,6 +57,7 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
+    "react-jazzicon": "^1.0.4",
     "relay-compiler": "^14.1.0",
     "rxjs": "^7.5.7",
     "sharp": "^0.31.1",

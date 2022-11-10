@@ -10,7 +10,7 @@ import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
 
 import { Fragment } from "react";
-import {Token} from "~/util/chainUtils/tokens.js";
+import { Token } from "~/util/chainUtils/tokens.js";
 
 type ProviderMap = {
   [key: string]:
@@ -44,17 +44,18 @@ const Provider = ({
     }
   }, [network, providers]);
 
-  const ProviderComponent = useMemo(() => 
-    (network && providers[validNetwork]) || Fragment, [validNetwork]
-  )
-  
+  const ProviderComponent = useMemo(
+    () => (network && providers[validNetwork]) || Fragment,
+    [validNetwork]
+  );
+
   return <ProviderComponent>{children}</ProviderComponent>;
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
-  const {tokens} = serverConfig.config["ethereum"];
+  const { tokens } = serverConfig.config["ethereum"];
 
   const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
   const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;
