@@ -677,3 +677,44 @@ main > footer > section > a {
   justify-content: center;
   align-items: center;
 }
+
+.connected-wallet-modal-container {
+  position: absolute;
+  width: 30%;
+  min-width: 350px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(29, 23, 23);
+  padding: 30px;
+}
+
+.connected-wallet-modal-body {
+	margin-top: 30px;
+}
+
+.address-copy-box {
+	width: 95%;
+	display: flex;
+	padding: 10px;
+	justify-content: space-between;
+	cursor: pointer;
+}
+
+.address-copy-box > div {
+	display: flex;
+}
+
+.address-copy-btn {
+	margin-top: 20px;
+}
+
+.address-text {
+  margin-left: 10px;
+}
+
+.disconnect-wallet-btn {
+	margin-top: 40px;
+	align-items: center;
+	width: 92%;
+}

@@ -428,8 +428,7 @@ export default function Dashboard() {
             )}
           </div>
         </nav>
-					<ConnectedWalletModal visible={true}  close={()=>{}} />
-
+					<ConnectedWalletModal visible={true} close={()=>{}} disconnect={()=> disconnect?.()}/>
         {/* Connect Wallet Modal */}
         {network === `solana` ? (
           <SolanaWalletModal
