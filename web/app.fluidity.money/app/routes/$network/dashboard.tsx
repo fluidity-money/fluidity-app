@@ -355,7 +355,27 @@ export default function Dashboard() {
               {connecting ? `Connecting...` : `Connect Wallet`}
             </GeneralButton>
           )
-        ) : null}
+        ) : connected ? (
+          <ConnectedWallet
+            address={trimAddressShort(address!.toString())}
+            callback={() => disconnect?.()}
+            className="connect-wallet-btn"
+          />
+        ) : (
+          <GeneralButton
+            version={connected || connecting ? "transparent" : "primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={
+              () => (connecting ? null : null)
+              // open eth connect wallet modal in lieu of null
+              // setWalletModalVisibility(true)
+            }
+            className="connect-wallet-btn"
+          >
+            {connecting ? `Connecting...` : `Connect Wallet`}
+          </GeneralButton>
+        )}
       </nav>
 
       <main id="dashboard-body">
