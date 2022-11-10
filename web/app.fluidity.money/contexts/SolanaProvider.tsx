@@ -26,7 +26,7 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
       value={{
         connected,
         disconnect,
-				connecting,
+        connecting,
         address: publicKey?.toString() ?? "",
         ...solanaInstructions,
       }}

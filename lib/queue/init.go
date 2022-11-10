@@ -22,6 +22,8 @@ func init() {
 
 		messageRetries_ = util.GetEnvOrDefault(EnvMessageRetries, "5")
 
+		goroutines_ = util.GetEnvOrDefault(EnvGoroutinesPerQueue, "1")
+
 		queueAddr = util.GetEnvOrFatal(EnvQueueAddr)
 	)
 
@@ -35,6 +37,22 @@ func init() {
 				"Failed to set %#v: Can't convert '%#v' to an integer!",
 				EnvMessageRetries,
 				messageRetries_,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	goroutines, err := strconv.Atoi(goroutines_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to parse the number of goroutines per queue %#v: Can't convert '%#v' to an integer!",
+				EnvGoroutinesPerQueue,
+				goroutines_,
 			)
 
 			k.Payload = err
@@ -116,6 +134,7 @@ func init() {
 				workerId:          workerId,
 				deadLetterEnabled: deadLetterEnabled,
 				messageRetries:    messageRetries,
+				goroutines:        goroutines,
 			}
 		}
 	}()

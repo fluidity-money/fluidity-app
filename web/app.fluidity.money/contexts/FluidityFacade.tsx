@@ -7,7 +7,7 @@ export interface IFluidityFacade {
   disconnect: () => Promise<void>;
 
   connected: boolean;
-	connecting: boolean;
+  connecting: boolean;
   useConnectorType: (use: string) => void;
 
   address: string;

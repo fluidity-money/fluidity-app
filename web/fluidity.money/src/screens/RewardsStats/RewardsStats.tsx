@@ -86,40 +86,42 @@ const RewardsStats = ({ changeScreen }: IProps) => {
           type="transparent"
         />
     
-        <div className={styles.rewardsChart}>
-          <LineChart 
-            data= {parsedDailyWinnings}
-            lineLabel='dailyWinnings'
-            accessors={{
-              xAccessor: (d: DailyWinner) => d.awarded_date,
-              yAccessor: (d: DailyWinner) => d.winning_amount_scaled,
-            }}
-            renderTooltip={({datum}: {datum: DailyWinner}) => {
-              return (
-                <div className={styles.tooltip}>
-                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                    {`${datum.awarded_date.getDate()}`.padStart(2,'0')}/
-                    {`${datum.awarded_date.getMonth() + 1}`.padStart(2,'0')}/
-                    {`${datum.awarded_date.getUTCFullYear() % 100}`.padStart(2,'0')}
-                  </span>
-                  <br/>
-                  <br />
-                  <span>
-                    <span>{trimAddress(datum.winning_address)}</span>
-                  </span>
-                  <br/>
-                  <br/>
-                  <span>
-                    <span>{numberToMonetaryString(datum.winning_amount_scaled)}{" "}</span>
-                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                      prize awarded
+        {!!parsedDailyWinnings.length && (
+          <div className={styles.rewardsChart}>
+            <LineChart 
+              data= {parsedDailyWinnings}
+              lineLabel='dailyWinnings'
+              accessors={{
+                xAccessor: (d: DailyWinner) => d.awarded_date,
+                yAccessor: (d: DailyWinner) => d.winning_amount_scaled,
+              }}
+              renderTooltip={({datum}: {datum: DailyWinner}) => {
+                return (
+                  <div className={styles.tooltip}>
+                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                      {`${datum.awarded_date.getDate()}`.padStart(2,'0')}/
+                      {`${datum.awarded_date.getMonth() + 1}`.padStart(2,'0')}/
+                      {`${datum.awarded_date.getUTCFullYear() % 100}`.padStart(2,'0')}
                     </span>
-                  </span>
-                </div>
-              )
-            }}
-          />
-        </div>
+                    <br/>
+                    <br />
+                    <span>
+                      <span>{trimAddress(datum.winning_address)}</span>
+                    </span>
+                    <br/>
+                    <br/>
+                    <span>
+                      <span>{numberToMonetaryString(datum.winning_amount_scaled)}{" "}</span>
+                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                        prize awarded
+                      </span>
+                    </span>
+                  </div>
+                )
+              }}
+            />
+          </div>
+        )}
       </motion.div>
     </AnimatePresence>
   );

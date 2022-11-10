@@ -34,7 +34,7 @@ export type Network = "STAGING" | "MAINNET";
 const initChainState = (): ChainState => {
   return {
     chain: "ETH",
-    network: "STAGING",
+    network: "MAINNET",
     setChain: () => {},
     apiState: {
       weekWinnings: [],
@@ -50,7 +50,7 @@ const ChainContext = createContext<ChainState>(initChainState());
 const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]}) => {
   const [chain, setChain] = useState<SupportedChainsList>("ETH");
   
-  const network: Network = "STAGING";
+  const network: Network = "MAINNET";
 
   const [weekWinnings, setWeekWinnings] = useState<Winner[]>([]);
   const [largestDailyWinnings, setLargestDailyWinnings] = useState<LargestDailyWinner[]>([]);
@@ -75,15 +75,15 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
   )
 
   useWinningTransactions(
-    ({winners_staging}: WinnersRes) => setWeekWinnings(
-      winners_staging
+    ({winners}: WinnersRes) => setWeekWinnings(
+      winners
     ),
     SupportedChains[chain].name,
     // formatToGraphQLDate(prevWeekDate),
   )
   
-  useLiveTvl(({ tvl_staging }: TvlRes) => {
-    const latestNetworkPools = tvl_staging
+  useLiveTvl(({ tvl }: TvlRes) => {
+    const latestNetworkPools = tvl
       .filter(({network}) => network === SupportedChains[chain].name)
       .reduce((pools, pool) => {
         const prevPool = pools[pool.contract_address];
@@ -109,7 +109,7 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
   useCountTransactions(
     (txCount: TransactionCount) => setTxCount(
       txCount
-        .user_actions_staging_aggregate
+        .user_actions_aggregate
         .aggregate
         .count
     ),

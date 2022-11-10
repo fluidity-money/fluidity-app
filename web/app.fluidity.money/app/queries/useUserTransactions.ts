@@ -1,4 +1,4 @@
-import { getTokenForNetwork, gql, Queryable } from "~/util";
+import { getTokenForNetwork, gql, Queryable, jsonPost } from "~/util";
 
 const query: Queryable = {
   ethereum: gql`
@@ -87,16 +87,14 @@ const useUserTransactions = async (
     offset: (page - 1) * 12,
     fluidCurrencies: getTokenForNetwork(network),
   };
-  return fetch("https://graphql.bitquery.io", {
-    method: "POST",
-    headers: {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query: query[network],
-      variables,
-    }),
+
+  const body = {
+    query: query[network],
+    variables,
+  };
+
+  return jsonPost("https://graphql.bitquery.io", body, {
+    "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
   });
 };
 
