@@ -123,14 +123,12 @@ const UserRewards = ({
             <Heading className="claims-title" as="h5">
               Auto-claims
             </Heading>
-            <Text size="xs">
-              {autoClaimInfo.map((text) => (
-                <>
-                  {text}
-                  <br />
-                </>
-              ))}
-            </Text>
+            {autoClaimInfo.map((text, i) => (
+              <Text size={"xs"} key={`text-${i}`}>
+                {text}
+                <br />
+              </Text>
+            ))}
             <hr className="gradient-line" />
             <Heading className="claims-title" as="h5">
               Instant-claim fees

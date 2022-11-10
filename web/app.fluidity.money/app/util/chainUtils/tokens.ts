@@ -14,6 +14,8 @@ export type Token = {
   logo: string;
   address: string;
   isFluidOf?: string;
+  obligationAccount?: string;
+  dataAccount?: string;
 };
 
 const getTokenFromAddress = (

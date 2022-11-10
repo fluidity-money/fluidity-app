@@ -1,13 +1,17 @@
-import { useWeb3React, Web3ReactProvider } from "@web3-react/core";
-import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
+import type { ReactNode } from "react";
+import type { Web3ReactHooks } from "@web3-react/core";
+import type { Connector } from "@web3-react/types";
 
-import { initializeConnector, Web3ReactHooks } from "@web3-react/core";
-import { Connector } from "@web3-react/types";
+import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
+import { useMemo } from "react";
+import {
+  useWeb3React,
+  Web3ReactProvider,
+  initializeConnector,
+} from "@web3-react/core";
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
-
-import { FluidityFacadeContext } from "./IFluidityFacade";
-import { ReactNode, useMemo } from "react";
+import FluidityFacadeContext from "./FluidityFacade";
 import makeContractSwap, {
   ContractToken,
   getUsdUserMintLimit,

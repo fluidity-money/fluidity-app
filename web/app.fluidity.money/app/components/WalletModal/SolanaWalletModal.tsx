@@ -48,6 +48,7 @@ export const SolanaWalletModal = ({
               {wallets.map((wallet) => (
                 <>
                   <li
+                    key={`wallet-${wallet.adapter.name}`}
                     onClick={(event) =>
                       selectWallet(event, wallet.adapter.name)
                     }
