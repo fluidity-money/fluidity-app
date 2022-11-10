@@ -364,6 +364,15 @@ main > footer > section > a {
   width: 100%;
 }
 
+.wallet-outer-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .solana-wallet-modal-container {
   position: absolute;
   width: 30%;
