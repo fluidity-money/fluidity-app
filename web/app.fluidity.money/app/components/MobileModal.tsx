@@ -77,7 +77,7 @@ export default function MobileModal({
     };
 
     return (
-      <div className="cover">
+      <div className="select-blockchain-mobile">
         <BlockchainModal
           handleModal={setChainModalVisibility}
           option={chains[network as "ethereum" | "solana"]}
@@ -116,11 +116,14 @@ export default function MobileModal({
                 version={"transparent"}
                 buttontype="icon after"
                 size={"small"}
-                handleClick={() =>
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
                   unclaimedRewards
                     ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards")
-                }
+                    : navigate("./rewards");
+                }}
                 icon={<Trophy />}
               >
                 ${unclaimedRewards}
