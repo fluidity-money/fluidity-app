@@ -12,7 +12,7 @@ export const ConnectedWalletModal = ({
   visible,
   close,
 }: IPropsConnectedWalletModal) => {
-   const [modal, setModal] = useState<any>();
+  const [modal, setModal] = useState<any>();
 
   useEffect(() => {
     setModal(
@@ -32,35 +32,42 @@ export const ConnectedWalletModal = ({
                 className="solana-modal-cancel-btn"
               />
             </span>
-						<div className="connected-wallet-modal-body">
-							<Card
-								className="card-outer address-copy-box"
-								component="div"
-								rounded={false}
-								type={"box"}
-							>
-								<div className="address-copy-box">
-								  <div>
-								    <div className="holo">
-									   <Jazzicon diameter={36} seed={jsNumberForAddress("0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6")} />
-									  </div>
-										 <Text prominent size="xl" className="address-text">0x737B79999...865f86</Text>
-									</div>
-									<span className="address-copy-btn">📋</span>
-								</div>
-							</Card>
-								<GeneralButton
-									version= "transparent"
-									buttontype="text"
-									size={"medium"}
-									handleClick={() => {}}
-									className="disconnect-wallet-btn"
-								>
-									<Text prominent size="xxl">
-										Disconnect Wallet
-									</Text>
-								</GeneralButton>
-						</div>
+            <div className="connected-wallet-modal-body">
+              <Card
+                className="card-outer address-copy-box"
+                component="div"
+                rounded={false}
+                type={"box"}
+              >
+                <div className="address-copy-box">
+                  <div>
+                    <div className="holo">
+                      <Jazzicon
+                        diameter={36}
+                        seed={jsNumberForAddress(
+                          "0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6"
+                        )}
+                      />
+                    </div>
+                    <Text prominent size="xl" className="address-text">
+                      0x737B79999...865f86
+                    </Text>
+                  </div>
+                  <span className="address-copy-btn">📋</span>
+                </div>
+              </Card>
+              <GeneralButton
+                version="transparent"
+                buttontype="text"
+                size={"medium"}
+                handleClick={() => {}}
+                className="disconnect-wallet-btn"
+              >
+                <Text prominent size="xxl">
+                  Disconnect Wallet
+                </Text>
+              </GeneralButton>
+            </div>
           </div>
         </>,
         document.body

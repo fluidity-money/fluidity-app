@@ -219,7 +219,7 @@ export default function Dashboard() {
         : "JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi";
 
     const socket = io();
-/*    socket.emit("subscribeTransactions", {
+    /*    socket.emit("subscribeTransactions", {
       protocol: network,
       address: connected_wallet,
     });*/
@@ -428,7 +428,11 @@ export default function Dashboard() {
             )}
           </div>
         </nav>
-					<ConnectedWalletModal visible={true} close={()=>{}} disconnect={()=> disconnect?.()}/>
+        <ConnectedWalletModal
+          visible={true}
+          close={() => {}}
+          disconnect={() => disconnect?.()}
+        />
         {/* Connect Wallet Modal */}
         {network === `solana` ? (
           <SolanaWalletModal

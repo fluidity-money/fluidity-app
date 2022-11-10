@@ -690,23 +690,23 @@ main > footer > section > a {
 }
 
 .connected-wallet-modal-body {
-	margin-top: 30px;
+  margin-top: 30px;
 }
 
 .address-copy-box {
-	width: 95%;
-	display: flex;
-	padding: 10px;
-	justify-content: space-between;
-	cursor: pointer;
+  width: 95%;
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  cursor: pointer;
 }
 
 .address-copy-box > div {
-	display: flex;
+  display: flex;
 }
 
 .address-copy-btn {
-	margin-top: 20px;
+  margin-top: 20px;
 }
 
 .address-text {
@@ -714,7 +714,7 @@ main > footer > section > a {
 }
 
 .disconnect-wallet-btn {
-	margin-top: 40px;
-	align-items: center;
-	width: 92%;
+  margin-top: 40px;
+  align-items: center;
+  width: 92%;
 }
