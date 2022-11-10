@@ -55,20 +55,9 @@ func InsertTransactions(transactions ...Transaction) {
 		TableTransactions,
 	)
 
-	statement, err := databaseClient.Prepare(statementText)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Failed to prepare a statement!"
-			k.Payload = err
-		})
-	}
-
-	defer statement.Close()
-
 	for transactionNumber, transaction := range transactions {
-		_, err := statement.Exec(
+		_, err := databaseClient.Exec(
+			statementText,
 			transaction.BlockHash,
 			transaction.ChainId,
 			transaction.Cost,
