@@ -223,7 +223,20 @@
 }
 
 .holo {
-  background: conic-gradient(from 209.59deg at 50% 50%, #F3B8D8 0deg, #B793E9 50.06deg, #9FD4F3 85.94deg, #FFD2C4 134.97deg, #FBF3F3 172.05deg, #D9ABDF 200.75deg, #AF9CE3 224.67deg, #AAE4E1 259.36deg, #C6EAD0 298.82deg, #FFFFFF 328.72deg, #FDB5E4 360deg);
+  background: conic-gradient(
+    from 209.59deg at 50% 50%,
+    #f3b8d8 0deg,
+    #b793e9 50.06deg,
+    #9fd4f3 85.94deg,
+    #ffd2c4 134.97deg,
+    #fbf3f3 172.05deg,
+    #d9abdf 200.75deg,
+    #af9ce3 224.67deg,
+    #aae4e1 259.36deg,
+    #c6ead0 298.82deg,
+    #ffffff 328.72deg,
+    #fdb5e4 360deg
+  );
   height: 40px;
   width: 40px;
   border-radius: 50%;

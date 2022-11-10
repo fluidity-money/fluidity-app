@@ -125,6 +125,7 @@ const NetworkPage = () => {
             <LinkButton
               size={"small"}
               type={"internal"}
+              left={true}
               handleClick={() => {
                 return;
               }}
