@@ -29,21 +29,37 @@ export const SolanaWalletModal = ({
   useEffect(() => {
     setModal(
       createPortal(
-        <>
+        <div
+          className={`wallet-outer-container ${
+            visible === true ? "show-modal" : "hide-modal"
+          }`}
+          style={{
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "black",
+            position: "absolute",
+            top: 0,
+            left: 0,
+          }}
+          onClick={() => close()}
+        >
           <div
             className={`solana-wallet-modal-container  ${
               visible === true ? "show-modal" : "hide-modal"
             }`}
           >
-            <Text prominent size="xxl">
-              Connect your wallet
-            </Text>
-            <span onClick={close}>
+            <div className="solana-wallet-modal-header">
+              <Text prominent size="xxl">
+                Connect your wallet
+              </Text>
+
               <img
+                onClick={close}
                 src="/images/icons/x.svg"
                 className="solana-modal-cancel-btn"
               />
-            </span>
+            </div>
+
             <ul className="solana-modal-wallet-list">
               {wallets.map((wallet) => (
                 <>
@@ -55,7 +71,7 @@ export const SolanaWalletModal = ({
                   >
                     <span>
                       <img src={wallet?.adapter.icon} />
-                      <Text size="xxl" className="solana-modal-wallet-names">
+                      <Text size="sm" className="solana-modal-wallet-names">
                         {wallet.adapter.name}
                       </Text>
                     </span>
@@ -66,13 +82,17 @@ export const SolanaWalletModal = ({
                           : "Not Installed"}
                       </i>
                     </Text>
-                  </li>{" "}
-                  <hr />
+                  </li>
                 </>
               ))}
             </ul>
+            <Text size="xs">
+              By connecting a wallet, you agree to Fluidity Money’s Terms of
+              Service and acknowledge that you have read and understand the
+              Disclaimer.
+            </Text>
           </div>
-        </>,
+        </div>,
         document.body
       )
     );
