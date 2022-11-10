@@ -164,6 +164,8 @@ export default function Dashboard() {
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
   const [walletModalVisibility, setWalletModalVisibility] =
     useState<boolean>(false);
+ const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
+    useState<boolean>(false);
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
@@ -340,7 +342,7 @@ export default function Dashboard() {
           connected ? (
             <ConnectedWallet
               address={trimAddressShort(address!.toString())}
-              callback={() => disconnect?.()}
+              callback={() => connected && setconnectedWalletModalVisibility(true)}
               className="connect-wallet-btn"
             />
           ) : (
@@ -429,9 +431,10 @@ export default function Dashboard() {
           </div>
         </nav>
         <ConnectedWalletModal
-          visible={true}
-          close={() => {}}
-          disconnect={() => disconnect?.()}
+          visible={connectedWalletModalVisibility}
+					address={address!.toString()}
+          close={() => {setconnectedWalletModalVisibility(false)}}
+          disconnect={() => {disconnect?.(); setconnectedWalletModalVisibility(false)}}
         />
         {/* Connect Wallet Modal */}
         {network === `solana` ? (
