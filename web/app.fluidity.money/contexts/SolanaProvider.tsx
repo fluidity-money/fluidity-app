@@ -17,7 +17,7 @@ import { solanaInstructions } from "~/util/chainUtils/solana/instructions";
 import FluidityFacadeContext from "./FluidityFacade";
 
 const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
-  const { connected, publicKey, disconnect } = useWallet();
+  const { connected, publicKey, disconnect, connecting } = useWallet();
 
   console.log("connected", connected, "addr:", publicKey?.toString());
 
@@ -26,6 +26,7 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
       value={{
         connected,
         disconnect,
+				connecting,
         address: publicKey?.toString() ?? "",
         ...solanaInstructions,
       }}
