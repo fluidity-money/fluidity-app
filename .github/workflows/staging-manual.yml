@@ -1,6 +1,8 @@
 name: Staging (Manual)
 
 on:
+  schedule:
+    - cron: '45 23 * * 1-5' # every day 9:30PM UTC Monday-Friday
   workflow_dispatch:
     inputs:
       environment:
@@ -12,14 +14,14 @@ on:
         type: choice
         description: 'Network'
         options: 
-          - 'devnet'
-          - 'ropsten'
           - 'fluidity'
       group:
         description: 'Group'
+        default: 'app'
         required: true
       service:
         description: 'Service'
+        default: 'all'
         required: true
       build_root_container:
         type: boolean
@@ -54,7 +56,7 @@ jobs:
       - name: Build
         if: ${{ github.event.inputs.skip_build == 'false' }}
         id: build
-        uses: ./scripts/actions/staging
+        uses: ./scripts/actions
         with:
           command: |
             flu build-docker \
@@ -67,7 +69,7 @@ jobs:
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
-        uses: ./scripts/actions/staging
+        uses: ./scripts/actions
         with:
           command: |
             flu deploy-service \
