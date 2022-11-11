@@ -14,7 +14,7 @@ import { WalletConnect } from "@web3-react/walletconnect";
 import FluidityFacadeContext from "./FluidityFacade";
 import makeContractSwap, {
   ContractToken,
-  getUsdUserMintLimit,
+  getUsdAmountMinted,
   usdBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
 import { getTokenFromAddress, Token } from "~/util/chainUtils/tokens";
@@ -62,14 +62,14 @@ const EthereumFacade = ({
 
   const deactivate = async (): Promise<void> => connector.deactivate?.();
 
-  // the per-user mint limit for the given contract
+  // the user's minted amount towards the per-user total
   const limit = async (contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
     if (!signer) {
       return 0;
     }
 
-    return await getUsdUserMintLimit(signer, contractAddress, tokenAbi);
+    return await getUsdAmountMinted(contractAddress, tokenAbi, await signer.getAddress());
   };
 
   // swap <symbol> to its counterpart, with amount in its own units

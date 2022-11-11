@@ -4,9 +4,10 @@ import { Display, Text } from "@fluidity-money/surfing";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { getTokenFromSymbol } from "~/util/chainUtils/tokens";
+import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import ItemTypes from "~/types/ItemTypes";
 import DragCard from "~/components/DragCard";
 import Video from "~/components/Video";
@@ -17,6 +18,8 @@ import styles from "~/styles/fluidify.css";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import config, { colors } from "~/webapp.config.server";
+import {getUsdAmountMinted, getUsdUserMintLimit, userMintLimitedEnabled} from "~/util/chainUtils/ethereum/transaction";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network, assetId } = params;
@@ -34,16 +37,32 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   if (!assetToken) throw new Error(`Asset ${assetId} not found`);
 
+  // find the fluid asset to get its mint limits
+  const fluidAssetAddress = assetToken.isFluidOf ?
+    assetToken.address :
+    tokens.find(({isFluidOf}) => isFluidOf === assetToken.address)?.address;
+
+  if (!fluidAssetAddress) throw new Error(`No matching fluid token for ${assetId}`);
+
+
+  const mintLimitEnabled = await userMintLimitedEnabled(fluidAssetAddress, tokenAbi)
+  const userMintLimit = mintLimitEnabled ?
+    await getUsdUserMintLimit(fluidAssetAddress, tokenAbi) :
+    undefined;
+
   return json({
     tokens,
-    assetToken,
+    assetToken: {
+      ...assetToken,
+      userMintLimit,
+    },
     colors: (await colors)[network as string],
   });
 };
 
 type LoaderData = {
   tokens: Token[];
-  assetToken: Token;
+  assetToken: Token & {userMintLimit?: number};
   colors: {
     [symbol: string]: string;
   };
@@ -105,10 +124,19 @@ const FluidityHotSpot = ({ activeToken }: { activeToken: Token }) => {
 
 export default function FluidifyToken() {
   const { tokens, colors, assetToken } = useLoaderData<LoaderData>();
+  const { address } = useContext(FluidityFacadeContext);
 
+  const [amountMinted, setAmountMinted] = useState<number | undefined>();
   const [search, setSearch] = useState("");
   const [swapping, setSwapping] = useState(false);
   const [finishing, setFinishing] = useState(false);
+
+  useEffect(() => {
+    if (assetToken.userMintLimit && address) {
+      getUsdAmountMinted(assetToken.address, tokenAbi, address)
+        .then(setAmountMinted);
+    }
+  }, [assetToken]);
 
   const [filteredTokens, setFilteredTokens] = useState<Token[]>(
     tokens as Token[]

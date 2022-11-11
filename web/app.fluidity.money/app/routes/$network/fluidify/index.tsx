@@ -1,12 +1,10 @@
-import type { Token } from "~/util/chainUtils/tokens";
-
 import { Display, Text } from "@fluidity-money/surfing";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
-import { useEffect, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
+import { useContext, useEffect, useState } from "react";
 import DragCard from "~/components/DragCard";
 
 import styles from "~/styles/fluidify.css";
@@ -15,6 +13,7 @@ import styles from "~/styles/fluidify.css";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import config, { colors } from "~/webapp.config.server";
+import {Token} from "~/util/chainUtils/tokens";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
