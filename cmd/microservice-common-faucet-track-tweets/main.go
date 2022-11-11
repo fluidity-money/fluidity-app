@@ -52,10 +52,10 @@ var (
 	DefaultAmountBigSolana = big.NewInt(1000)
 
 	// DefaultAmountEthereum to use to track uses of the faucet
-	DefaultAmountEthereum = misc.NewBigInt(*DefaultAmountBigEthereum)
+	DefaultAmountEthereum = misc.NewBigIntFromInt(*DefaultAmountBigEthereum)
 
 	// DefaultAmountSolana to give away to users of the faucet
-	DefaultAmountSolana = misc.NewBigInt(*DefaultAmountBigSolana)
+	DefaultAmountSolana = misc.NewBigIntFromInt(*DefaultAmountBigSolana)
 )
 
 func main() {
@@ -175,7 +175,7 @@ func main() {
 		)
 
 		multiplier := tenBig.Exp(tenBig, decimalsBig, nil)
-		amountSent = misc.NewBigInt(*amountSent.Mul(amountSent_, multiplier))
+		amountSent = misc.NewBigIntFromInt(*amountSent.Mul(amountSent_, multiplier))
 
 		lastUsed, address := faucetDatabase.GetFaucetLastUsedAndAddress(
 			uniqueAddress,
