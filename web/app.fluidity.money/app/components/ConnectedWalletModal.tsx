@@ -32,8 +32,12 @@ export const ConnectedWalletModal = ({
               visible === true ? "show-modal" : "hide-modal"
             }`}
           >
-            <Text prominent size="xxl">
-              Connected
+            <Text size="xxl">
+              {" "}
+              Fluidity:{" "}
+              <Text prominent size="md">
+                Connected
+              </Text>
             </Text>
             <span onClick={close}>
               <img
@@ -53,16 +57,23 @@ export const ConnectedWalletModal = ({
                   onClick={() => copyAddress(address)}
                 >
                   <ConnectedWallet
+                    className="connected-btn-in-modal"
                     address={address}
                     short={false}
                     callback={() => copyAddress(address)}
                   />
-                  <span>📋</span>
+                  <img src="/images/icons/copyIcon.svg" alt="copy" />
                 </button>
               </Card>
               <GeneralButton
                 version="transparent"
-                buttontype="text"
+                buttontype={"icon before"}
+                icon={
+                  <img
+                    src="/images/icons/disconnectIcon.svg"
+                    alt="disconnect"
+                  />
+                }
                 size={"medium"}
                 handleClick={() => {
                   disconnect();
@@ -71,11 +82,12 @@ export const ConnectedWalletModal = ({
               >
                 Disconnect Wallet
               </GeneralButton>
-              <h5>
+              <Text size="xs" className="legal">
                 By connecting a wallet, you agree to Fluidity Money&aposs{" "}
-                <a>Terms of Service</a> and acknowledge that you have read and
-                understand the <a>Disclaimer</a>
-              </h5>
+                <a className="link-text">Terms of Service</a> and acknowledge
+                that you have read and understand the{" "}
+                <a className="link-text">Disclaimer</a>
+              </Text>
             </div>
           </div>
         </>,

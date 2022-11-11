@@ -264,3 +264,126 @@
   justify-content: center;
   align-items: center;
 }
+
+.connected-wallet-modal-container {
+  position: absolute;
+  width: 30%;
+  min-width: 350px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(29, 23, 23);
+  padding: 30px;
+}
+
+.connected-wallet-modal-body {
+  margin-top: 30px;
+}
+
+.address-copy-box {
+  width: 95%;
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border: none !important;
+  border-radius: 12px !important;
+}
+
+.address-copy-box:hover {
+  background-color: black;
+}
+
+.address-copy-box > div {
+  display: flex;
+}
+
+.legal {
+  margin-top: 2em;
+}
+
+.address-text {
+  margin-left: 10px;
+}
+
+.connected-btn-in-modal:hover {
+  border: 0.5px solid transparent;
+}
+
+.disconnect-wallet-btn {
+  margin: 2em 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 92%;
+}
+
+.disconnect-wallet-btn:hover > div > img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.show-modal {
+  display: block;
+}
+
+.hide-modal {
+  display: none;
+}
+
+.solana-modal-cancel-btn {
+  cursor: pointer;
+  float: right;
+  margin-top: -0.5em;
+  opacity: 0.6;
+  padding: 6px;
+  border-radius: 0.2em;
+  width: 1em;
+}
+
+.solana-modal-cancel-btn:hover {
+  opacity: 1;
+  background-color: #0f2339;
+}
+
+.card-outer {
+  position: relative;
+  border-radius: 30px;
+}
+
+.card-outer::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+  border-radius: 12px;
+  background: conic-gradient(
+    from 209.59deg at 50% 50%,
+    #f3b8d8 0deg,
+    #b793e9 50.06deg,
+    #9fd4f3 85.94deg,
+    #ffd2c4 134.97deg,
+    #fbf3f3 172.05deg,
+    #d9abdf 200.75deg,
+    #af9ce3 224.67deg,
+    #aae4e1 259.36deg,
+    #c6ead0 298.82deg,
+    #ffffff 328.72deg,
+    #fdb5e4 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.link-text {
+  text-decoration: underline;
+  color: white;
+  cursor: pointer;
+}

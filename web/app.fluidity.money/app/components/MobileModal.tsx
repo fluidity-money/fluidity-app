@@ -16,6 +16,7 @@ import {
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
 import ConnectedWallet from "./ConnectedWallet";
+import { ConnectedWalletModal } from "./ConnectedWalletModal";
 
 type IMobileModal = {
   navigationMap: Array<{ name: string; icon: JSX.Element }>;
@@ -44,6 +45,9 @@ export default function MobileModal({
     useState<boolean>(false);
 
   const [chainModalVisibility, setChainModalVisibility] =
+    useState<boolean>(false);
+
+  const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
     useState<boolean>(false);
 
   const { connected, address, connecting, disconnect } = useContext(
@@ -83,6 +87,7 @@ export default function MobileModal({
       navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
     };
 
+    // select blockchain modal
     return (
       <div className="select-blockchain-mobile">
         <BlockchainModal
@@ -147,7 +152,7 @@ export default function MobileModal({
               {connected && address ? (
                 <ConnectedWallet
                   address={trimAddressShort(address.toString())}
-                  callback={() => disconnect?.()}
+                  callback={() => setconnectedWalletModalVisibility(true)}
                   // className="connect-wallet-btn"
                 />
               ) : (
@@ -256,6 +261,19 @@ export default function MobileModal({
               </footer>
             </section>
           </div>
+          {connectedWalletModalVisibility && (
+            <ConnectedWalletModal
+              visible={connectedWalletModalVisibility}
+              address={address ? address.toString() : ""}
+              close={() => {
+                setconnectedWalletModalVisibility(false);
+              }}
+              disconnect={() => {
+                disconnect?.();
+                setconnectedWalletModalVisibility(false);
+              }}
+            />
+          )}
         </motion.div>
       )}
     </AnimatePresence>
