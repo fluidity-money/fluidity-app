@@ -46,7 +46,7 @@ export default function MobileModal({
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, address, connecting, disc } = useContext(
+  const { connected, address, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
   const [modal, setModal] = useState<any>();
@@ -58,6 +58,12 @@ export default function MobileModal({
     if (isOpen) setAnimation(false);
     if (!isOpen) setAnimation(true);
   }, [isOpen]);
+
+  useEffect(() => {
+    walletModalVisibility
+      ? (document.body.style.position = "static")
+      : setTimeout(() => (document.body.style.position = "fixed"), 1000);
+  }, [walletModalVisibility]);
 
   if (walletModalVisibility) {
     return (
@@ -79,7 +85,7 @@ export default function MobileModal({
     };
 
     return (
-      <div className="cover">
+      <div className="select-blockchain-mobile">
         <BlockchainModal
           handleModal={setChainModalVisibility}
           option={chains[network as "ethereum" | "solana"]}
@@ -118,11 +124,14 @@ export default function MobileModal({
                 version={"transparent"}
                 buttontype="icon after"
                 size={"small"}
-                handleClick={() =>
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
                   unclaimedRewards
                     ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards")
-                }
+                    : navigate("./rewards");
+                }}
                 icon={<Trophy />}
               >
                 ${unclaimedRewards}
