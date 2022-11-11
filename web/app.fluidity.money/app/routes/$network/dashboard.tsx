@@ -34,7 +34,7 @@ import { useToolTip } from "~/components";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
 import { ToolTipContent } from "~/components/ToolTip";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
@@ -346,7 +346,7 @@ export default function Dashboard() {
             <ConnectedWallet
               address={trimAddressShort(address!.toString())}
               callback={() =>
-                connected && setconnectedWalletModalVisibility(true)
+                setconnectedWalletModalVisibility(true)
               }
               className="connect-wallet-btn"
             />
@@ -366,7 +366,7 @@ export default function Dashboard() {
         ) : connected ? (
           <ConnectedWallet
             address={trimAddressShort(address!.toString())}
-            callback={() => disconnect?.()}
+            callback={() => setconnectedWalletModalVisibility(true)}
             className="connect-wallet-btn"
           />
         ) : (
@@ -465,17 +465,10 @@ export default function Dashboard() {
           }}
         />
         {/* Connect Wallet Modal */}
-        {network === `solana` ? (
-          <SolanaWalletModal
-            visible={walletModalVisibility}
-            close={() => setWalletModalVisibility(false)}
-          />
-        ) : (
-          <SolanaWalletModal
-            visible={walletModalVisibility}
-            close={() => setWalletModalVisibility(false)}
-          />
-        )}
+        <ConnectWalletModal
+          visible={walletModalVisibility}
+          close={() => setWalletModalVisibility(false)}
+        />
 
         <Outlet />
 

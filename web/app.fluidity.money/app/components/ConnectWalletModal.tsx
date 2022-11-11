@@ -2,10 +2,11 @@ import { Text } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
 import { WalletName, WalletReadyState } from "@solana/wallet-adapter-base";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useContext } from "react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import { createPortal } from "react-dom";
 
-interface IPropsSolanaWalletModal {
+interface IConnectWalletModal {
   visible: boolean;
   close: () => void;
 }
@@ -17,15 +18,16 @@ type Wallet = {
   logo: string;
 };
 
-export const SolanaWalletModal = ({
+const ConnectWalletModal = ({
   visible,
   close,
-}: IPropsSolanaWalletModal) => {
+}: IConnectWalletModal) => {
   type LoaderData = {
     network: string;
     ethereumWallets: Wallet[];
   };
 
+  const { useConnectorType } = useContext(FluidityFacadeContext);
   const { network, ethereumWallets } = useLoaderData<LoaderData>();
 
   const { wallets, select } = useWallet();
@@ -59,9 +61,7 @@ export const SolanaWalletModal = ({
       <li
         key={`wallet-${wallet.name}`}
         onClick={() => {
-          // use hooks to trigger specific wallet to load
-          // activate(connectors[wallet.id]);
-          // setProvider(wallet.id)
+          useConnectorType?.(wallet.id)
         }}
       >
         <span>
@@ -130,3 +130,5 @@ export const SolanaWalletModal = ({
 
   return modal;
 };
+
+export default ConnectWalletModal;

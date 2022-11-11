@@ -13,7 +13,7 @@ import {
   Trophy,
   trimAddressShort,
 } from "@fluidity-money/surfing";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
 import ConnectedWallet from "./ConnectedWallet";
 
@@ -67,7 +67,7 @@ export default function MobileModal({
 
   if (walletModalVisibility) {
     return (
-      <SolanaWalletModal
+      <ConnectWalletModal
         visible={walletModalVisibility}
         close={() => setWalletModalVisibility(false)}
       />

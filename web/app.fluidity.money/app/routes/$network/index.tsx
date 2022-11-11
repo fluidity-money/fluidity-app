@@ -19,7 +19,7 @@ import {
   Twitter,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
@@ -194,7 +194,7 @@ const NetworkPage = () => {
               {/* Connect Wallet Modal */}
               <Modal visible={walletModalVisibility}>
                 <div className="cover">
-                  <SolanaWalletModal
+                  <ConnectWalletModal
                     visible={walletModalVisibility}
                     close={() => setWalletModalVisibility(false)}
                   />
