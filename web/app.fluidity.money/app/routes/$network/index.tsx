@@ -192,25 +192,14 @@ const NetworkPage = () => {
               )}
 
               {/* Connect Wallet Modal */}
-              {network === `solana` ? (
-                <Modal visible={walletModalVisibility}>
-                  <div className="cover">
-                    <SolanaWalletModal
-                      visible={walletModalVisibility}
-                      close={() => setWalletModalVisibility(false)}
-                    />
-                  </div>
-                </Modal>
-              ) : (
-                <Modal visible={walletModalVisibility}>
-                  <div className="cover">
-                    <SolanaWalletModal
-                      visible={walletModalVisibility}
-                      close={() => setWalletModalVisibility(false)}
-                    />
-                  </div>
-                </Modal>
-              )}
+              <Modal visible={walletModalVisibility}>
+                <div className="cover">
+                  <SolanaWalletModal
+                    visible={walletModalVisibility}
+                    close={() => setWalletModalVisibility(false)}
+                  />
+                </div>
+              </Modal>
             </div>
 
             {/* Expected Earnings */}
