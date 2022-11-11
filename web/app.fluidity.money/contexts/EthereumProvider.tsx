@@ -138,9 +138,8 @@ const EthereumFacade = ({
   );
 };
 
-export const EthereumProvider =
-  (rpcUrl: string, tokens: Token[]) =>
-  ({ children }: { children: React.ReactNode }) => {
+export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
+  const Provider = ({ children }: { children: React.ReactNode }) => {
     const connectors = useMemo(() => {
       const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
         (actions) => new MetaMask({ actions })
@@ -164,11 +163,6 @@ export const EthereumProvider =
         [walletConnect, walletconnectHooks],
       ];
 
-      const connectorHooks: { [key: string]: Web3ReactHooks } = {
-        metaMask: metamaskHooks,
-        walletConnect: walletconnectHooks,
-      };
-
       return connectors;
     }, []);
 
@@ -182,5 +176,8 @@ export const EthereumProvider =
       </>
     );
   };
+
+  return Provider;
+};
 
 export default EthereumProvider;

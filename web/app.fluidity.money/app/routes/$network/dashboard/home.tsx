@@ -1,8 +1,7 @@
 import type { Chain } from "~/util/chainUtils/chains";
 
-import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
-import dashboardHomeStyle from "~/styles/dashboard/home.css";
-import { format } from "date-fns";
+import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
+import { format, fromUnixTime } from "date-fns";
 import {
   Display,
   LineChart,
@@ -12,15 +11,12 @@ import {
   trimAddress,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
-
-import { useUserTransactionCount, useUserTransactions } from "~/queries";
-import { useState } from "react";
+import { captureException } from "@sentry/react";
+import { useState, useContext, useEffect } from "react";
 import { useLoaderData, useNavigate, Link } from "@remix-run/react";
-import { UserTransaction } from "~/queries/useUserTransactions";
-
 import TransactionTable from "~/components/TransactionTable";
-
-const address = "0xbb9cdbafba1137bdc28440f8f5fbed601a107bb6";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import dashboardHomeStyle from "~/styles/dashboard/home.css";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { network } = params;
@@ -30,82 +26,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  let userTransactionCount: any;
-  let userTransactions: any;
-
-  let error;
-
-  try {
-    console.log("Fetching user transaction count");
-    userTransactionCount = await useUserTransactionCount(
-      network ?? "",
-      address
-    );
-    console.log("transactionCount ", userTransactionCount);
-
-    console.log("Fetching user transactions");
-    userTransactions = await useUserTransactions(network ?? "", address, page);
-
-    console.log("userTransactions", userTransactions);
-  } catch (err) {
-    throw new Error(`The transaction explorer is unavailable! ${err}`);
-  } // Fail silently - for now.
-
-  if (
-    error !== undefined ||
-    userTransactionCount.errors ||
-    userTransactions.errors
-  ) {
-    throw new Error(`The transaction explorer is unavailable! ${error}`);
-  }
-  if (userTransactionCount.errors || userTransactions.errors) {
-    return json({ transactions: [], count: 0, page: 1, network });
-  }
-
-  const {
-    data: {
-      [network as string]: {
-        transfers: [{ count }],
-      },
-    },
-  } = userTransactionCount;
-
-  const {
-    data: {
-      [network as string]: { transfers: transactions },
-    },
-  } = userTransactions;
-
-  // Destructure GraphQL data
-  const sanitizedTransactions = transactions.map(
-    (transaction: UserTransaction) => {
-      const {
-        sender: { address: sender },
-        receiver: { address: receiver },
-        block: {
-          timestamp: { unixtime: timestamp },
-        },
-        amount: value,
-        currency: { symbol: currency },
-      } = transaction;
-
-      return {
-        sender,
-        receiver,
-        timestamp,
-        value,
-        currency,
-      };
-    }
-  );
-
-  if (Math.ceil(count / 12) < page && count > 0) {
-    return redirect(`./`, 301);
-  }
-
   return json({
-    transactions: sanitizedTransactions,
-    count,
     page,
     network,
   });
@@ -131,8 +52,6 @@ type Transaction = {
 };
 
 type LoaderData = {
-  transactions: Transaction[];
-  count: number;
   page: number;
   network: Chain;
 };
@@ -155,10 +74,17 @@ function ErrorBoundary() {
 }
 
 export default function Home() {
-  const { transactions, count, page, network } = useLoaderData<LoaderData>();
+  const { page, network } = useLoaderData<LoaderData>();
   const navigate = useNavigate();
 
+  const { connected, address } = useContext(FluidityFacadeContext);
+
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
+
+  const [{ transactions, count }, setTransactionsRes] = useState<{
+    count: number;
+    transactions: Transaction[];
+  }>({ count: 0, transactions: [] });
 
   const graphFilters = [
     {
@@ -182,6 +108,38 @@ export default function Home() {
         row.timestamp * 1000 >= Date.now() - 24 * 60 * 60 * 1000,
     },
   ];
+
+  useEffect(() => {
+    if (!connected || !address) return;
+
+    (async () => {
+      try {
+        const { transactions, count } = await (
+          await fetch(
+            `/${network}/query/userTransactions?network=${network}&address=${address}&page=${page}`
+          )
+        ).json();
+
+        setTransactionsRes({
+          transactions,
+          count,
+        });
+      } catch (err) {
+        console.log(err);
+        captureException(
+          new Error(
+            `Could not fetch Transactions count for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+        return;
+      } // Fail silently - for now.
+    })();
+  }, [connected]);
 
   return (
     <>
@@ -279,7 +237,7 @@ export default function Home() {
           count={count}
           transactions={transactions}
           chain={network}
-          address={address}
+          address={address ?? ""}
         />
       </section>
     </>

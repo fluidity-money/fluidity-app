@@ -23,6 +23,7 @@ import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
+import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 
 export const links: LinksFunction = () => {
@@ -53,14 +54,16 @@ type LoaderData = {
 const NetworkPage = () => {
   const { network } = useLoaderData<LoaderData>();
 
-  const { connected, address } = useContext(FluidityFacadeContext);
+  const { connected, address, disconnect } = useContext(FluidityFacadeContext);
   const navigate = useNavigate();
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected
   );
   const [chainModalVisibility, setChainModalVisibility] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
+    useState(false);
+  const [loading, setLoading] = useState(true);
   const [projectedWinnings, setProjectedWinnings] = useState(0);
 
   const { width } = useViewport();
@@ -84,14 +87,14 @@ const NetworkPage = () => {
           network
         );
 
-        console.log(data, errors);
-
         if (errors || !data) {
           captureException(new Error("Could not fetch historical Rewards"), {
             tags: {
               section: "opportunity",
             },
           });
+
+          return;
         }
 
         const highestRewards =
@@ -99,7 +102,9 @@ const NetworkPage = () => {
             (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
             0
           ) / data.highest_rewards_monthly.length;
-        return setProjectedWinnings(highestRewards);
+        setProjectedWinnings(highestRewards);
+
+        setLoading(false);
       })();
     }
   }, [address]);
@@ -160,10 +165,25 @@ const NetworkPage = () => {
                 <ConnectedWallet
                   address={address.toString()}
                   callback={() => {
-                    console.log("click");
+                    setConnectedWalletModalVisibility(true);
                   }}
                 />
               )}
+
+              {/* Switch Chain Modal */}
+              <Modal visible={connectedWalletModalVisibility}>
+                <ConnectedWalletModal
+                  visible={connectedWalletModalVisibility}
+                  address={address ? address.toString() : ""}
+                  close={() => {
+                    setConnectedWalletModalVisibility(false);
+                  }}
+                  disconnect={() => {
+                    disconnect?.();
+                    setConnectedWalletModalVisibility(false);
+                  }}
+                />
+              </Modal>
 
               {/* Switch Chain Modal */}
               <Modal visible={chainModalVisibility}>

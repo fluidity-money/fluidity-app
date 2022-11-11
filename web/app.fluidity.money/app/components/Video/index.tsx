@@ -19,7 +19,6 @@ interface IPropsVideo {
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
   className?: string;
-  mimeType?: string;
 
   // Width of container
   //   dynamic - Change explicit scale
@@ -37,7 +36,6 @@ export const Video = ({
   key,
   src,
   type,
-  mimeType = "video/mp4",
   loop,
   display = "inline",
   preload = "auto",
@@ -45,9 +43,6 @@ export const Video = ({
   opacity = 1,
   margin = `0px 0px 0px 0px`,
   onEnded = () => {
-    return;
-  },
-  onLoad = () => {
     return;
   },
   className,
@@ -69,9 +64,10 @@ export const Video = ({
 
   const heightProp = typeof height === "number" ? `${height}px` : "";
 
-  const vidRef = useRef(null);
+  const vidRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
-    vidRef.current.play();
+    vidRef.current?.play();
   });
 
   return (
@@ -93,7 +89,6 @@ export const Video = ({
           height: heightProp,
         }}
         onEnded={onEnded}
-        onLoad={onLoad}
         {...props}
       />
     </>

@@ -53,10 +53,12 @@ export class FluidityInstruction extends SolanaEnum {
     const seedString = `FLU:${TokenSymbol}_OBLIGATION`;
     const seedBuffer = Buffer.from(seedString, "utf8");
 
-    const [_, bump] = await PublicKey.findProgramAddress(
-      [seedBuffer],
-      new PublicKey("HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR")
-    );
+    const bump = (
+      await PublicKey.findProgramAddress(
+        [seedBuffer],
+        new PublicKey("HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR")
+      )
+    )[1];
 
     return bump;
   }

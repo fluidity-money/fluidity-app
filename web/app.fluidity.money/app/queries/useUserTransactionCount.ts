@@ -30,6 +30,25 @@ const query: Queryable = {
   `,
 };
 
+type UserTransactionCountBody = {
+  query: string;
+  variables: {
+    address: string;
+    fluidCurrencies: string[];
+  };
+};
+
+export type UserTransactionCountRes = {
+  data?: {
+    [network: string]: {
+      transfers: {
+        count: number;
+      }[];
+    };
+  };
+  errors?: unknown;
+};
+
 const useUserTransactionCount = (network: string, address: string) => {
   const variables = {
     address: address,
@@ -41,9 +60,13 @@ const useUserTransactionCount = (network: string, address: string) => {
     variables,
   };
 
-  return jsonPost("https://graphql.bitquery.io", body, {
-    "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
-  });
+  return jsonPost<UserTransactionCountBody, UserTransactionCountRes>(
+    "https://graphql.bitquery.io",
+    body,
+    {
+      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+    }
+  );
 };
 
 export default useUserTransactionCount;

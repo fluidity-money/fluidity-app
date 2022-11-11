@@ -36,9 +36,8 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SolanaProvider =
-  (rpcUrl: string) =>
-  ({ children }: { children: React.ReactNode }) => {
+const SolanaProvider = (rpcUrl: string) => {
+  const Provider = ({ children }: { children: React.ReactNode }) => {
     const networkCluster = 0;
     const endpoint = useMemo(() => rpcUrl, [networkCluster]);
 
@@ -64,4 +63,6 @@ const SolanaProvider =
     );
   };
 
+  return Provider;
+};
 export default SolanaProvider;

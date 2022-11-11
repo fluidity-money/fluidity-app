@@ -726,15 +726,12 @@ main > footer > section > a {
   display: flex;
   padding: 10px;
   justify-content: space-between;
+  align-items: center;
   cursor: pointer;
 }
 
 .address-copy-box > div {
   display: flex;
-}
-
-.address-copy-btn {
-  margin-top: 20px;
 }
 
 .address-text {
@@ -745,4 +742,13 @@ main > footer > section > a {
   margin-top: 40px;
   align-items: center;
   width: 92%;
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 160px;
+  gap: 0.4em;
 }
