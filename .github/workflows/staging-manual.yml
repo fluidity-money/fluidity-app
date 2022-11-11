@@ -2,7 +2,7 @@ name: Staging (Manual)
 
 on:
   schedule:
-    - cron: '25 1 * * 1-5'
+    - cron: '20 3 * * 1-5'
   workflow_dispatch:
     inputs:
       environment:
