@@ -1,9 +1,9 @@
-name: Staging (npm test)
+name: Webapp Test (staging)
 
 on:
   pull_request:
     branches:
-      - develop-webapp-remix
+      - develop
 
 permissions:
   id-token: write
