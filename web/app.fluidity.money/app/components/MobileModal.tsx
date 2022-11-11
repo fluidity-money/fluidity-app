@@ -1,7 +1,7 @@
 import { useNavigate, Link } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useState, useContext, useEffect } from "react";
-import { trimAddress, networkMapper } from "~/util";
+import { networkMapper } from "~/util";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   GeneralButton,
@@ -49,7 +49,6 @@ export default function MobileModal({
   const { connected, address, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
-  const [modal, setModal] = useState<any>();
 
   const [animation, setAnimation] = useState(true);
 
@@ -145,9 +144,9 @@ export default function MobileModal({
             {/* Wallet / Chain */}
             <section>
               {/* Connect Wallet */}
-              {connected ? (
+              {connected && address ? (
                 <ConnectedWallet
-                  address={trimAddressShort(address!.toString())}
+                  address={trimAddressShort(address.toString())}
                   callback={() => disconnect?.()}
                   // className="connect-wallet-btn"
                 />

@@ -18,71 +18,82 @@ type Wallet = {
   logo: string;
 };
 
+type LoaderData = {
+  network: string;
+  ethereumWallets: Wallet[];
+};
+
 const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
-  type LoaderData = {
-    network: string;
-    ethereumWallets: Wallet[];
+  const { network } = useLoaderData<LoaderData>();
+
+  const [modal, setModal] = useState<React.ReactPortal | null>(null);
+
+  const SolWalletsMap = () => {
+    const { wallets, select } = useWallet();
+
+    const selectWallet = useCallback(
+      (
+        _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+        walletName: WalletName
+      ) => {
+        select(walletName);
+      },
+      [select]
+    );
+
+    return (
+      <>
+        {wallets.map((wallet) => (
+          <li
+            key={`wallet-${wallet.adapter.name}`}
+            onClick={(event) => selectWallet(event, wallet.adapter.name)}
+          >
+            <span>
+              <img src={wallet?.adapter.icon} />
+              <Text size="sm" className="solana-modal-wallet-names">
+                {wallet.adapter.name}
+              </Text>
+            </span>
+            <Text size="xs" className="solana-modal-wallet-status">
+              <i>
+                {wallet.readyState === WalletReadyState.Installed
+                  ? "Installed"
+                  : "Not Installed"}
+              </i>
+            </Text>
+          </li>
+        ))}
+      </>
+    );
   };
 
-  const { useConnectorType } = useContext(FluidityFacadeContext);
-  const { network, ethereumWallets } = useLoaderData<LoaderData>();
+  const EthWalletsMap = () => {
+    const { useConnectorType } = useContext(FluidityFacadeContext);
+    const { ethereumWallets } = useLoaderData<LoaderData>();
 
-  const { wallets, select } = useWallet();
-  const [modal, setModal] = useState<any>();
-
-  const solWalletsMap = wallets.map((wallet) => (
-    <>
-      <li
-        key={`wallet-${wallet.adapter.name}`}
-        onClick={(event) => selectWallet(event, wallet.adapter.name)}
-      >
-        <span>
-          <img src={wallet?.adapter.icon} />
-          <Text size="sm" className="solana-modal-wallet-names">
-            {wallet.adapter.name}
-          </Text>
-        </span>
-        <Text size="xs" className="solana-modal-wallet-status">
-          <i>
-            {wallet.readyState === WalletReadyState.Installed
-              ? "Installed"
-              : "Not Installed"}
-          </i>
-        </Text>
-      </li>
-    </>
-  ));
-
-  const ethWalletsMap = ethereumWallets.map((wallet) => (
-    <>
-      <li
-        key={`wallet-${wallet.name}`}
-        onClick={() => {
-          useConnectorType?.(wallet.id);
-        }}
-      >
-        <span>
-          <img src={wallet.logo} />
-          <Text size="sm" className="solana-modal-wallet-names">
-            {wallet.name}
-          </Text>
-        </span>
-        <Text size="xs" className="solana-modal-wallet-status">
-          <i></i>
-        </Text>
-      </li>
-    </>
-  ));
-
-  const selectWallet = useCallback(
-    (
-      _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-      walletName: WalletName
-    ) => {
-      select(walletName);
-    },
-    [select]
-  );
+    return (
+      <>
+        {ethereumWallets.map((wallet) => (
+          <li
+            key={`wallet-${wallet.name}`}
+            onClick={() => {
+              useConnectorType?.(wallet.id);
+            }}
+          >
+            <span>
+              <img src={wallet.logo} />
+              <Text size="sm" className="solana-modal-wallet-names">
+                {wallet.name}
+              </Text>
+            </span>
+            <Text size="xs" className="solana-modal-wallet-status">
+              <i></i>
+            </Text>
+          </li>
+        ))}
+      </>
+    );
+  };
 
   useEffect(() => {
     setModal(
@@ -111,7 +122,8 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
             </div>
 
             <ul className="solana-modal-wallet-list">
-              {network === "ethereum" ? ethWalletsMap : solWalletsMap}
+              {network === "ethereum" && <EthWalletsMap />}
+              {network === "solana" && <SolWalletsMap />}
             </ul>
             <Text size="xs">
               By connecting a wallet, you agree to Fluidity Money’s Terms of

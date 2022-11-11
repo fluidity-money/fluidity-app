@@ -1,8 +1,7 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Text, Card, Heading, GeneralButton } from "@fluidity-money/surfing";
-import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { trimAddress } from "~/util";
+import { Text, Card, GeneralButton } from "@fluidity-money/surfing";
+import ConnectedWallet from "./ConnectedWallet";
 
 interface IPropsConnectedWalletModal {
   visible: boolean;
@@ -17,7 +16,12 @@ export const ConnectedWalletModal = ({
   close,
   disconnect,
 }: IPropsConnectedWalletModal) => {
-  const [modal, setModal] = useState<any>();
+  const [modal, setModal] = useState<React.ReactPortal | null>(null);
+
+  const copyAddress = (address: string) => {
+    // Copies to clipboard
+    navigator.clipboard.writeText(address);
+  };
 
   useEffect(() => {
     setModal(
@@ -44,33 +48,28 @@ export const ConnectedWalletModal = ({
                 rounded={false}
                 type={"box"}
               >
-                <div className="address-copy-box">
-                  <div>
-                    <div className="holo">
-                      <Jazzicon
-                        diameter={36}
-                        seed={jsNumberForAddress(address)}
-                      />
-                    </div>
-                    <Text prominent size="xl" className="address-text">
-                      {trimAddress(address)}
-                    </Text>
-                  </div>
-                  <span className="address-copy-btn">📋</span>
-                </div>
+                <button
+                  className={"address-copy-box"}
+                  onClick={() => copyAddress(address)}
+                >
+                  <ConnectedWallet
+                    address={address}
+                    short={false}
+                    callback={() => copyAddress(address)}
+                  />
+                  <span>📋</span>
+                </button>
               </Card>
               <GeneralButton
                 version="transparent"
                 buttontype="text"
                 size={"medium"}
                 handleClick={() => {
-                  disconnect?.();
+                  disconnect();
                 }}
                 className="disconnect-wallet-btn"
               >
-                <Text prominent size="xxl">
-                  Disconnect Wallet
-                </Text>
+                Disconnect Wallet
               </GeneralButton>
               <h5>
                 By connecting a wallet, you agree to Fluidity Money&aposs{" "}

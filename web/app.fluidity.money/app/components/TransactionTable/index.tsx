@@ -85,17 +85,24 @@ const TransactionTable = ({
           },
         ];
 
-  const filters = [
-    {
-      filter: () => true,
-      name: "ALL",
-    },
-    {
-      filter: ({ sender, receiver }: Transaction) =>
-        address in [sender, receiver],
-      name: "YOUR REWARDS",
-    },
-  ];
+  const filters = address
+    ? [
+        {
+          filter: () => true,
+          name: "ALL",
+        },
+        {
+          filter: ({ sender, receiver }: Transaction) =>
+            address in [sender, receiver],
+          name: "YOUR REWARDS",
+        },
+      ]
+    : [
+        {
+          filter: () => true,
+          name: "ALL",
+        },
+      ];
 
   const TransactionRow = (chain: Chain, address: string): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {

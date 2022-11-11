@@ -1,36 +1,31 @@
 import type { Provider } from "~/components/ProviderCard";
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
-import type { UserTransaction } from "~/queries/useUserTransactions";
-import config from "~/webapp.config.server";
-import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
-import useViewport from "~/hooks/useViewport";
-import {
-  useUserTransactionCount,
-  useUserTransactions,
-  useUserUnclaimedRewards,
-} from "~/queries";
-import { useLoaderData } from "@remix-run/react";
-import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
+import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
+import config from "~/webapp.config.server";
+import useViewport from "~/hooks/useViewport";
+import { captureException } from "@sentry/react";
+import { useUserUnclaimedRewards } from "~/queries";
+import { useLoaderData } from "@remix-run/react";
 import { UserRewards } from "./common";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   Text,
   Heading,
   numberToMonetaryString,
   ManualCarousel,
 } from "@fluidity-money/surfing";
+import { useContext, useEffect, useState } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import TransactionTable from "~/components/TransactionTable";
 import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
 import { Providers } from "~/components/ProviderIcon";
-
-const address = "0xbb004de25a81cb4ed6b2abd68bcc2693615b9e04";
+import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
   const icons = config.provider_icons;
-  const { wallets } = config.config[network] || {};
 
   const networkFee = 0.002;
   const gasFee = 0.002;
@@ -40,54 +35,26 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  // Check address strips leading 0x
-  const { data, error } = await useUserUnclaimedRewards(network, address);
-
-  if (error || !data) {
-    return redirect("/error", { status: 500, statusText: error });
-  }
-
-  const { ethereum_pending_winners: rewards } = data;
-
-  const sanitisedRewards = rewards.filter(
-    (transaction: UserUnclaimedReward) => !transaction.reward_sent
-  );
-
-  console.log("sanitised", sanitisedRewards);
-
-  const userUnclaimedRewards = sanitisedRewards.reduce(
-    (sum: number, transaction: UserUnclaimedReward) => {
-      const { win_amount, token_decimals } = transaction;
-
-      const decimals = 10 ** token_decimals;
-      return sum + win_amount / decimals;
-    },
-    0
-  );
-
-  console.log("total", userUnclaimedRewards);
-
-  let userTransactionCount;
-  let userTransactions;
   let expectedRewards;
   let errorMsg;
 
   try {
-    userTransactionCount = await useUserTransactionCount(
-      network ?? "",
-      address
-    );
-    userTransactions = await useUserTransactions(network ?? "", address, page);
     expectedRewards = await useGlobalRewardStatistics(network ?? "");
-    console.log(userTransactionCount);
-    console.log(userTransactions);
-    console.log(expectedRewards);
   } catch (err) {
     errorMsg = "The transaction explorer is currently unavailable";
   } // Fail silently - for now.
 
-  if (errorMsg) {
-    return redirect("/error", { status: 500, statusText: errorMsg });
+  if (errorMsg || !expectedRewards?.data) {
+    //return redirect("/error", { status: 500, statusText: errorMsg });
+    return json({
+      icons,
+      rewarders: [],
+      page,
+      network,
+      fluidPairs: 8,
+      networkFee,
+      gasFee,
+    });
   }
 
   // group rewards by backend
@@ -117,78 +84,16 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }, {} as { [K in Providers]: Provider });
 
   // convert to expected format
-  const rewarders = Object.values(aggregatedExpectedRewards || {});
-
-  if (userTransactionCount.errors || userTransactions.errors) {
-    return json({
-      rewarders,
-      transactions: [],
-      count: 0,
-      page,
-      network,
-      userUnclaimedRewards,
-      fluidPairs: 8,
-      networkFee,
-      gasFee,
-      icons,
-      wallets,
-    });
-  }
-
-  const {
-    data: {
-      [network as string]: {
-        transfers: [{ count }],
-      },
-    },
-  } = userTransactionCount;
-
-  const {
-    data: {
-      [network as string]: { transfers: transactions },
-    },
-  } = userTransactions;
-
-  // Destructure GraphQL data
-  const sanitizedTransactions = transactions.map(
-    (transaction: UserTransaction) => {
-      const {
-        sender: { address: sender },
-        receiver: { address: receiver },
-        block: {
-          timestamp: { unixtime: timestamp },
-        },
-        amount: value,
-        currency: { symbol: currency },
-      } = transaction;
-
-      return {
-        sender,
-        receiver,
-        timestamp,
-        value,
-        currency,
-      };
-    }
-  );
-
-  if (Math.ceil(count / 12) < page && count > 0) {
-    return redirect(`./`, 301);
-  }
-
-  // Get Best Rewarders - SCOPED OUT NO DATA
+  const rewarders = Object.values(aggregatedExpectedRewards);
 
   return json({
+    icons,
     rewarders,
-    transactions: sanitizedTransactions,
-    count,
     page,
     network,
-    userUnclaimedRewards: 6745,
     fluidPairs: 8,
     networkFee,
     gasFee,
-    icons,
   });
 };
 
@@ -205,11 +110,9 @@ export type Transaction = {
 };
 
 type LoaderData = {
-  transactions: Transaction[];
-  count: number;
-  page: number;
-  userUnclaimedRewards: number;
+  icons: { [provider: string]: string };
   rewarders: Provider[];
+  page: number;
   network: Chain;
   fluidPairs: number;
   networkFee: number;
@@ -237,17 +140,23 @@ function ErrorBoundary() {
 }
 
 export default function Rewards() {
-  const {
-    transactions,
-    count,
-    page,
-    rewarders,
-    network,
-    fluidPairs,
-    networkFee,
-    gasFee,
-    userUnclaimedRewards,
-  } = useLoaderData<LoaderData>();
+  const { page, fluidPairs, network, networkFee, gasFee, rewarders } =
+    useLoaderData<LoaderData>();
+
+  const { connected, address } = useContext(FluidityFacadeContext);
+
+  const [
+    { userUnclaimedRewards, transactions, count },
+    setUnclaimedRewardsRes,
+  ] = useState<{
+    transactions: Transaction[];
+    count: number;
+    userUnclaimedRewards: number;
+  }>({
+    transactions: [],
+    count: 0,
+    userUnclaimedRewards: 0,
+  });
 
   const { width } = useViewport();
   const mobileView = width <= 500;
@@ -261,6 +170,85 @@ export default function Rewards() {
       return 1;
     }
   );
+
+  useEffect(() => {
+    if (!connected || !address) return;
+
+    // Get Unclaimed Rewards - Expect to fail if Solana
+    (async () => {
+      try {
+        const { data, error } = await useUserUnclaimedRewards(
+          network,
+          address ?? ""
+        );
+
+        if (!data || error) return;
+
+        const { ethereum_pending_winners: rewards } = data;
+
+        const sanitisedRewards = rewards.filter(
+          (transaction: UserUnclaimedReward) => !transaction.reward_sent
+        );
+
+        const userUnclaimedRewards = sanitisedRewards.reduce(
+          (sum: number, transaction: UserUnclaimedReward) => {
+            const { win_amount, token_decimals } = transaction;
+
+            const decimals = 10 ** token_decimals;
+            return sum + win_amount / decimals;
+          },
+          0
+        );
+
+        setUnclaimedRewardsRes({
+          transactions,
+          count,
+          userUnclaimedRewards,
+        });
+      } catch (err) {
+        captureException(
+          new Error(
+            `Could not fetch Transactions count for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+        return;
+      }
+    })();
+
+    // Get Transaction History
+    (async () => {
+      try {
+        const { transactions, count } = await (
+          await fetch(
+            `/${network}/query/userTransactions?network=${network}&address=${address}&page=${page}`
+          )
+        ).json();
+
+        setUnclaimedRewardsRes({
+          userUnclaimedRewards,
+          transactions,
+          count,
+        });
+      } catch (err) {
+        captureException(
+          new Error(
+            `Could not fetch Transactions count for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+        return;
+      } // Fail silently - for now.
+    })();
+  }, [connected, address]);
 
   return (
     <div className="pad-main">
@@ -367,7 +355,7 @@ export default function Rewards() {
           count={count}
           transactions={transactions}
           chain={network}
-          address={address}
+          address={address ?? ""}
         />
       </section>
 
@@ -377,18 +365,20 @@ export default function Rewards() {
           <Heading className="highest-rewarders" as={"h2"}>
             Highest Rewarders
           </Heading>
-          <ManualCarousel scrollBar={true} className="rewards-carousel">
-            {bestPerformingRewarders.map((rewarder) => (
-              <div className="carousel-card-container" key={rewarder.name}>
-                <ProviderCard
-                  name={rewarder.name}
-                  prize={rewarder.prize}
-                  avgPrize={rewarder.avgPrize}
-                  size="md"
-                />
-              </div>
-            ))}
-          </ManualCarousel>
+          {
+            <ManualCarousel scrollBar={true} className="rewards-carousel">
+              {bestPerformingRewarders.map((rewarder) => (
+                <div className="carousel-card-container" key={rewarder.name}>
+                  <ProviderCard
+                    name={rewarder.name}
+                    prize={rewarder.prize}
+                    avgPrize={rewarder.avgPrize}
+                    size="md"
+                  />
+                </div>
+              ))}
+            </ManualCarousel>
+          }
         </section>
       )}
     </div>
