@@ -5,8 +5,8 @@
 
 arguments="$@"
 
-timescale="$FLU_TIMESCALE_URI"
-postgres="$FLU_POSTGRES_URI"
+timescale="$(echo $FLU_TIMESCALE_URI | sed 's/[?&]\?binary_parameters=\(true\|false\)//g'"
+postgres="$FLU_POSTGERS_URI"
 
 err() {
 	>&1 echo $@
