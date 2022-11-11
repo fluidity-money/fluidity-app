@@ -31,10 +31,29 @@ const getTokenFromAddress = (
   const { tokens } = config[network];
 
   const matchingTokens = tokens.filter(
-    (token: Token) => token.address !== address
+    (token: Token) => token.address === address
   );
 
   return matchingTokens[0];
 };
 
-export { getTokenForNetwork, getTokenFromAddress };
+const getTokenFromSymbol = (
+  network: string,
+  symbol: string
+): Token | undefined => {
+  const { drivers, config } = webapp;
+
+  if (!Object.keys(drivers).includes(network)) {
+    return undefined;
+  }
+
+  const { tokens } = config[network];
+
+  const matchingTokens = tokens.filter(
+    (token: Token) => token.symbol === symbol
+  );
+
+  return matchingTokens[0];
+};
+
+export { getTokenForNetwork, getTokenFromAddress, getTokenFromSymbol };
