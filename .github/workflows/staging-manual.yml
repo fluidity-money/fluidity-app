@@ -2,7 +2,7 @@ name: Staging (Manual)
 
 on:
   schedule:
-    - cron: '45 23 * * 1-5' # every day 9:30PM UTC Monday-Friday
+    - cron: '15 1 * * 1-5'
   workflow_dispatch:
     inputs:
       environment:
@@ -17,11 +17,9 @@ on:
           - 'fluidity'
       group:
         description: 'Group'
-        default: 'app'
         required: true
       service:
         description: 'Service'
-        default: 'all'
         required: true
       build_root_container:
         type: boolean
@@ -35,6 +33,7 @@ on:
         type: boolean
         description: 'Skip docker build'
         default: false
+
 permissions:
   id-token: write
   contents: read
@@ -42,7 +41,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.environment || 'dev'}}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -60,12 +59,12 @@ jobs:
         with:
           command: |
             flu build-docker \
-              --network ${{ github.event.inputs.network }} \
-              --group ${{ github.event.inputs.group }} \
-              --service ${{ github.event.inputs.service }} \
-              --environment ${{ github.event.inputs.environment }} \
-              --build-root-container ${{ github.event.inputs.build_root_container }} \
-              --build-build-container ${{ github.event.inputs.build_build_container }} \
+              --network ${{ github.event.inputs.network || 'fluidity'}} \
+              --group ${{ github.event.inputs.group || 'app' }} \
+              --service ${{ github.event.inputs.service || 'all' }} \
+              --environment ${{ github.event.inputs.environment || 'dev'}} \
+              --build-root-container ${{ github.event.inputs.build_root_container || false }} \
+              --build-build-container ${{ github.event.inputs.build_build_container || false }} \
               --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
@@ -73,10 +72,10 @@ jobs:
         with:
           command: |
             flu deploy-service \
-              --network ${{ github.event.inputs.network }} \
-              --group ${{ github.event.inputs.group }} \
-              --service ${{ github.event.inputs.service }} \
-              --environment ${{ github.event.inputs.environment }} \
+              --network ${{ github.event.inputs.network || 'fluidity' }} \
+              --group ${{ github.event.inputs.group || 'app'}} \
+              --service ${{ github.event.inputs.service || 'all' }} \
+              --environment ${{ github.event.inputs.environment || 'dev'}} \
               --debug false \
               --tag $GITHUB_SHA
       - name: Discord notif (SUCCESS)
