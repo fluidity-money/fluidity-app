@@ -13,7 +13,7 @@ import {
   Trophy,
   trimAddressShort,
 } from "@fluidity-money/surfing";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
 import ConnectedWallet from "./ConnectedWallet";
 
@@ -66,13 +66,11 @@ export default function MobileModal({
   }, [walletModalVisibility]);
 
   if (walletModalVisibility) {
-    return network === "solana" ? (
-      <SolanaWalletModal
+    return (
+      <ConnectWalletModal
         visible={walletModalVisibility}
         close={() => setWalletModalVisibility(false)}
       />
-    ) : (
-      <></>
     );
   }
 
@@ -147,29 +145,7 @@ export default function MobileModal({
             {/* Wallet / Chain */}
             <section>
               {/* Connect Wallet */}
-              {network === `solana` ? (
-                connected ? (
-                  <ConnectedWallet
-                    address={trimAddressShort(address!.toString())}
-                    callback={() => disconnect?.()}
-                    // className="connect-wallet-btn"
-                  />
-                ) : (
-                  <GeneralButton
-                    version={
-                      connected || connecting ? "transparent" : "primary"
-                    }
-                    buttontype="text"
-                    size={"medium"}
-                    handleClick={() =>
-                      connecting ? null : setWalletModalVisibility(true)
-                    }
-                    // className="connect-wallet-btn"
-                  >
-                    {connecting ? `Connecting...` : `Connect Wallet`}
-                  </GeneralButton>
-                )
-              ) : connected ? (
+              {connected ? (
                 <ConnectedWallet
                   address={trimAddressShort(address!.toString())}
                   callback={() => disconnect?.()}
@@ -180,10 +156,8 @@ export default function MobileModal({
                   version={connected || connecting ? "transparent" : "primary"}
                   buttontype="text"
                   size={"medium"}
-                  handleClick={
-                    () => (connecting ? null : null)
-                    // deploy eth wallet connect modal in lieu of null
-                    // setWalletModalVisibility(true)
+                  handleClick={() =>
+                    connecting ? null : setWalletModalVisibility(true)
                   }
                   // className="connect-wallet-btn"
                 >

@@ -34,7 +34,7 @@ import { useToolTip } from "~/components";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
 import { ToolTipContent } from "~/components/ToolTip";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
@@ -67,6 +67,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const pathname = urlPaths[urlPaths.length - 1];
 
+  const ethereumWallets = config.config["ethereum"].wallets;
+
   const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
@@ -79,6 +81,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     network,
     provider,
     token,
+    ethereumWallets,
   });
 };
 
@@ -343,7 +346,7 @@ export default function Dashboard() {
             <ConnectedWallet
               address={trimAddressShort(address!.toString())}
               callback={() =>
-                connected && setconnectedWalletModalVisibility(true)
+                setconnectedWalletModalVisibility(true)
               }
               className="connect-wallet-btn"
             />
@@ -363,7 +366,7 @@ export default function Dashboard() {
         ) : connected ? (
           <ConnectedWallet
             address={trimAddressShort(address!.toString())}
-            callback={() => disconnect?.()}
+            callback={() => setconnectedWalletModalVisibility(true)}
             className="connect-wallet-btn"
           />
         ) : (
@@ -371,10 +374,8 @@ export default function Dashboard() {
             version={connected || connecting ? "transparent" : "primary"}
             buttontype="text"
             size={"medium"}
-            handleClick={
-              () => (connecting ? null : null)
-              // open eth connect wallet modal in lieu of null
-              // setWalletModalVisibility(true)
+            handleClick={() =>
+              connecting ? null : setWalletModalVisibility(true)
             }
             className="connect-wallet-btn"
           >
@@ -464,12 +465,10 @@ export default function Dashboard() {
           }}
         />
         {/* Connect Wallet Modal */}
-        {network === `solana` ? (
-          <SolanaWalletModal
-            visible={walletModalVisibility}
-            close={() => setWalletModalVisibility(false)}
-          />
-        ) : null}
+        <ConnectWalletModal
+          visible={walletModalVisibility}
+          close={() => setWalletModalVisibility(false)}
+        />
 
         <Outlet />
 
