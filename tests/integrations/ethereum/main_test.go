@@ -128,7 +128,11 @@ func TestIntegrations(t *testing.T) {
 			)
 		}
 
-		convertedReceipt := common.ConvertGethReceipt(*txReceipt)
+		var convertedReceipt ethereum.Receipt
+
+		if txReceipt != nil {
+			convertedReceipt = common.ConvertGethReceipt(*txReceipt)
+		}
 
 		fees, emission, err := applications.GetApplicationFee(
 			transfer,
