@@ -152,7 +152,12 @@ export default function MobileModal({
               {connected && address ? (
                 <ConnectedWallet
                   address={trimAddressShort(address.toString())}
-                  callback={() => setconnectedWalletModalVisibility(true)}
+                  callback={() => {
+                    !connectedWalletModalVisibility &&
+                      setconnectedWalletModalVisibility(true);
+                    connectedWalletModalVisibility &&
+                      setconnectedWalletModalVisibility(false);
+                  }}
                   // className="connect-wallet-btn"
                 />
               ) : (
