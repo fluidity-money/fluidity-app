@@ -2,17 +2,19 @@ name: Staging (Manual)
 
 on:
   schedule:
-    - cron: '45 23 * * 1-5' # every day 9:30PM UTC Monday-Friday
+    - cron: '50 24 * * 1-5' # every day 9:30PM UTC Monday-Friday
   workflow_dispatch:
     inputs:
       environment:
         type: choice
         description: 'Environment'
+        default: 'dev'
         options:
           - 'dev'
       network:
         type: choice
         description: 'Network'
+        default: 'fluidity'
         options: 
           - 'fluidity'
       group:
@@ -35,6 +37,7 @@ on:
         type: boolean
         description: 'Skip docker build'
         default: false
+
 permissions:
   id-token: write
   contents: read
