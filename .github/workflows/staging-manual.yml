@@ -2,7 +2,7 @@ name: Staging (Manual)
 
 on:
   schedule:
-    - cron: '50 24 * * 1-5' # every day 9:30PM UTC Monday-Friday
+    - cron: '0 1 * * 1-5'
   workflow_dispatch:
     inputs:
       environment:
