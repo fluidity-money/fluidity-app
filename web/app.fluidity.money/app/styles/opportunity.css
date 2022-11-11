@@ -148,7 +148,7 @@
   margin: 0;
 }
 
-.wallet-outer-container {
+.connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
   background-color: black;
@@ -157,7 +157,7 @@
   left: 0;
 }
 
-.solana-wallet-modal-container {
+.connect-wallet-modal-container {
   position: absolute;
   width: 30%;
   min-width: 300px;
@@ -169,7 +169,7 @@
   padding: 3em;
 }
 
-.solana-wallet-modal-container > ul > li {
+.connect-wallet-modal-container > ul > li {
   width: 100%;
   display: flex;
   list-style: none;
@@ -181,22 +181,22 @@
   border-bottom: 0.2px solid grey;
 }
 
-.solana-wallet-modal-container > ul > li:hover {
+.connect-wallet-modal-container > ul > li:hover {
   background-color: gainsboro;
 }
 
-.solana-wallet-modal-container > ul > li > span {
+.connect-wallet-modal-container > ul > li > span {
   width: 100%;
   display: flex;
   align-items: center;
   margin-right: 0.25em;
 }
 
-.solana-wallet-modal-container > ul > li > span > img {
+.connect-wallet-modal-container > ul > li > span > img {
   width: 2em;
 }
 
-.solana-modal-cancel-btn {
+.modal-cancel-btn {
   cursor: pointer;
   float: right;
   margin-top: -0.5em;
@@ -206,28 +206,28 @@
   width: 1em;
 }
 
-.solana-modal-cancel-btn:hover {
+.modal-cancel-btn:hover {
   opacity: 1;
   background-color: #0f2339;
 }
 
-.solana-modal-wallet-list {
+.connect-wallet-modal-list {
   background-color: white;
   padding: 0;
   margin: 0 0 1em 0;
 }
 
-.solana-modal-wallet-names {
+.connect-wallet-modal-names {
   margin: 10px;
 }
 
-.solana-modal-wallet-status {
+.connect-wallet-modal-status {
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.solana-wallet-modal-header {
+.connect-wallet-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -336,7 +336,7 @@
   display: none;
 }
 
-.solana-modal-cancel-btn {
+.modal-cancel-btn {
   cursor: pointer;
   float: right;
   margin-top: -0.5em;
@@ -346,7 +346,7 @@
   width: 1em;
 }
 
-.solana-modal-cancel-btn:hover {
+.modal-cancel-btn:hover {
   opacity: 1;
   background-color: #0f2339;
 }

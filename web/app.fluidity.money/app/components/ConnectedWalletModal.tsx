@@ -40,10 +40,7 @@ export const ConnectedWalletModal = ({
               </Text>
             </Text>
             <span onClick={close}>
-              <img
-                src="/images/icons/x.svg"
-                className="solana-modal-cancel-btn"
-              />
+              <img src="/images/icons/x.svg" className="modal-cancel-btn" />
             </span>
             <div className="connected-wallet-modal-body">
               <Card
