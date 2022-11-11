@@ -345,9 +345,7 @@ export default function Dashboard() {
           connected ? (
             <ConnectedWallet
               address={trimAddressShort(address!.toString())}
-              callback={() =>
-                setconnectedWalletModalVisibility(true)
-              }
+              callback={() => setconnectedWalletModalVisibility(true)}
               className="connect-wallet-btn"
             />
           ) : (

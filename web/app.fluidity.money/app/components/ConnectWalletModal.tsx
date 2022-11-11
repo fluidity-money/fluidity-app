@@ -18,10 +18,7 @@ type Wallet = {
   logo: string;
 };
 
-const ConnectWalletModal = ({
-  visible,
-  close,
-}: IConnectWalletModal) => {
+const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
   type LoaderData = {
     network: string;
     ethereumWallets: Wallet[];
@@ -61,7 +58,7 @@ const ConnectWalletModal = ({
       <li
         key={`wallet-${wallet.name}`}
         onClick={() => {
-          useConnectorType?.(wallet.id)
+          useConnectorType?.(wallet.id);
         }}
       >
         <span>

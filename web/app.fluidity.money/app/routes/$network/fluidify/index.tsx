@@ -1,10 +1,12 @@
-import { Display } from "@fluidity-money/surfing";
+import type { Token } from "~/util/chainUtils/tokens";
+
+import { Display, Text } from "@fluidity-money/surfing";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useEffect, useState } from "react";
-import { DndProvider } from "react-dnd";
-
+import { DndProvider, useDrop } from "react-dnd";
+import ItemTypes from "~/types/ItemTypes";
 import DragCard from "~/components/DragCard";
 
 import styles from "~/styles/fluidify.css";
@@ -29,24 +31,8 @@ export const loader: LoaderFunction = async ({ params }) => {
   });
 };
 
-type Token = {
-  address: string;
-  name: string;
-  symbol: string;
-  logo: string;
-  isFluidOf?: string;
-};
-
 type LoaderData = {
-  tokens: [
-    {
-      address: string;
-      name: string;
-      symbol: string;
-      logo: string;
-      isFluidOf?: string;
-    }
-  ];
+  tokens: Token[];
   colors: {
     [symbol: string]: string;
   };
@@ -80,6 +66,52 @@ function ErrorBoundary() {
   );
 }
 
+const FluidityHotSpot = () => {
+  const navigate = useNavigate();
+  const [{ canDrop }, drop] = useDrop(() => ({
+    accept: [ItemTypes.ASSET, ItemTypes.FLUID_ASSET],
+    drop: ({ symbol }: Token) => navigate(`${symbol}`),
+    collect: (monitor) => ({
+      canDrop: monitor.canDrop(),
+    }),
+  }));
+
+  return (
+    <main>
+      <div ref={drop} className="fluidify-hot-spot">
+        <img
+          className="fluidify-circle"
+          src="/images/fluidify/fluidify-hotspot.png"
+        />
+        <span className={"dashed-circle"}>
+          {!canDrop && (
+            <>
+              <Text size={"xs"}>Drag and drop the asset</Text>
+              <br />
+              <Text size={"xs"}>you want to transform here.</Text>
+            </>
+          )}
+        </span>
+      </div>
+      {!canDrop && (
+        <span className={"center-text"}>
+          <Text size={"xs"}>
+            Fluidity employ daily limits on fluidifying assets for
+          </Text>
+          <br />
+          <Text size="xs">
+            maintained system stability. Limits reset at midnight EST.
+          </Text>
+          <br />
+          <Text size="xs">
+            Unlimited reversion of fluid to non-fluid assets per day.
+          </Text>
+        </span>
+      )}
+    </main>
+  );
+};
+
 export default function FluidityMaster() {
   const { tokens, colors } = useLoaderData<LoaderData>();
 
@@ -108,33 +140,37 @@ export default function FluidityMaster() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <aside>
-        <Display>Create or revert fluid assets</Display>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search your assets"
-        />
-        {filteredTokens
-          .filter(() => {
-            return true;
-          })
-          .map(({ address, name, symbol, logo, isFluidOf }) => {
-            return (
-              <DragCard
-                key={symbol}
-                fluid={isFluidOf !== undefined}
-                symbol={symbol}
-                name={name}
-                logo={logo}
-                address={address}
-                color={colors[symbol]}
-                amount={0}
-              />
-            );
-          })}
-      </aside>
-      <main className="fluidify-hot-spot"></main>
+      <div className={"fluidify-container"}>
+        <aside>
+          <Display style={{ margin: 0 }}>Create or revert fluid assets</Display>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search your assets"
+          />
+          {filteredTokens
+            .filter(() => {
+              return true;
+            })
+            .map(({ address, name, symbol, logo, isFluidOf }) => {
+              return (
+                <DragCard
+                  key={symbol}
+                  fluid={isFluidOf !== undefined}
+                  symbol={symbol}
+                  name={name}
+                  logo={logo}
+                  address={address}
+                  color={colors[symbol]}
+                  amount={0}
+                />
+              );
+            })}
+        </aside>
+
+        {/* Swap Circle */}
+        <FluidityHotSpot />
+      </div>
     </DndProvider>
   );
 }

@@ -73,7 +73,7 @@ export const ConnectedWalletModal = ({
                 </Text>
               </GeneralButton>
               <h5>
-                By connecting a wallet, you agree to Fluidity Money's{" "}
+                By connecting a wallet, you agree to Fluidity Money&aposs{" "}
                 <a>Terms of Service</a> and acknowledge that you have read and
                 understand the <a>Disclaimer</a>
               </h5>

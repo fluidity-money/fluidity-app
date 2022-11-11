@@ -42,7 +42,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   // Check address strips leading 0x
   const { data, error } = await useUserUnclaimedRewards(network, address);
-  
+
   if (error || !data) {
     return redirect("/error", { status: 500, statusText: error });
   }
@@ -73,8 +73,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   let errorMsg;
 
   try {
-    userTransactionCount = await useUserTransactionCount(network ?? "", address)
-    userTransactions = await useUserTransactions(network ?? "", address, page)
+    userTransactionCount = await useUserTransactionCount(
+      network ?? "",
+      address
+    );
+    userTransactions = await useUserTransactions(network ?? "", address, page);
     expectedRewards = await useGlobalRewardStatistics(network ?? "");
     console.log(userTransactionCount);
     console.log(userTransactions);

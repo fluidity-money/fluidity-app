@@ -37,11 +37,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   try {
     console.log("Fetching user transaction count");
-    userTransactionCount = await useUserTransactionCount(network ?? "", address);
+    userTransactionCount = await useUserTransactionCount(
+      network ?? "",
+      address
+    );
     console.log("transactionCount ", userTransactionCount);
 
     console.log("Fetching user transactions");
-    userTransactions = await useUserTransactions(network ?? "", address, page)
+    userTransactions = await useUserTransactions(network ?? "", address, page);
 
     console.log("userTransactions", userTransactions);
   } catch (err) {
