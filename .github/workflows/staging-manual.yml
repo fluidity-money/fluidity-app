@@ -2,7 +2,7 @@ name: Staging (Manual)
 
 on:
   schedule:
-    - cron: '15 1 * * 1-5'
+    - cron: '25 1 * * 1-5'
   workflow_dispatch:
     inputs:
       environment:
@@ -53,7 +53,7 @@ jobs:
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
           role-duration-seconds: 7200 #seconds
       - name: Build
-        if: ${{ github.event.inputs.skip_build == 'false' }}
+        if: ${{ github.event.inputs.skip_build || 'false' == 'false' }}
         id: build
         uses: ./scripts/actions
         with:
@@ -83,14 +83,7 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-          INPUTS_ENVIRONMENT: ${{ github.event.inputs.environment }}
-          INPUTS_NETWORK: ${{ github.event.inputs.network }}
-          INPUTS_GROUP: ${{ github.event.inputs.group }}
-          INPUTS_SERVICE: ${{ github.event.inputs.service }}
-          INPUTS_ROOT_CONTAINER: ${{ github.event.inputs.build_root_container }}
-          INPUTS_BUILD_CONTAINER: ${{ github.event.inputs.build_build_container }}
-          INPUTS_SKIP_BUILD: ${{ github.event.inputs.skip_build }}
         with: 
           command: |
-            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} -status ${{ job.status }}
+            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
