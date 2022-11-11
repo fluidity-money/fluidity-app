@@ -34,12 +34,15 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const redirectTarget = redirect("/");
 
+  const ethereumWallets = config.config["ethereum"].wallets;
+
   if (!network || !Object.keys(config.drivers).includes(network)) {
     return redirectTarget;
   }
 
   return {
     network,
+    ethereumWallets,
   };
 };
 
@@ -198,7 +201,16 @@ const NetworkPage = () => {
                     />
                   </div>
                 </Modal>
-              ) : null}
+              ) : (
+                <Modal visible={walletModalVisibility}>
+                  <div className="cover">
+                    <SolanaWalletModal
+                      visible={walletModalVisibility}
+                      close={() => setWalletModalVisibility(false)}
+                    />
+                  </div>
+                </Modal>
+              )}
             </div>
 
             {/* Expected Earnings */}

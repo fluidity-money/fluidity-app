@@ -66,6 +66,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const pathname = urlPaths[urlPaths.length - 1];
 
+  const ethereumWallets = config.config["ethereum"].wallets;
+
   const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
@@ -78,6 +80,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     network,
     provider,
     token,
+    ethereumWallets,
   });
 };
 
@@ -355,7 +358,25 @@ export default function Dashboard() {
               {connecting ? `Connecting...` : `Connect Wallet`}
             </GeneralButton>
           )
-        ) : null}
+        ) : connected ? (
+          <ConnectedWallet
+            address={trimAddressShort(address!.toString())}
+            callback={() => disconnect?.()}
+            className="connect-wallet-btn"
+          />
+        ) : (
+          <GeneralButton
+            version={connected || connecting ? "transparent" : "primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={() =>
+              connecting ? null : setWalletModalVisibility(true)
+            }
+            className="connect-wallet-btn"
+          >
+            {connecting ? `Connecting...` : `Connect Wallet`}
+          </GeneralButton>
+        )}
       </nav>
 
       <main id="dashboard-body">
@@ -435,7 +456,12 @@ export default function Dashboard() {
             visible={walletModalVisibility}
             close={() => setWalletModalVisibility(false)}
           />
-        ) : null}
+        ) : (
+          <SolanaWalletModal
+            visible={walletModalVisibility}
+            close={() => setWalletModalVisibility(false)}
+          />
+        )}
 
         <Outlet />
 

@@ -1,4 +1,5 @@
 import { Text } from "@fluidity-money/surfing";
+import { useLoaderData } from "@remix-run/react";
 import { WalletName, WalletReadyState } from "@solana/wallet-adapter-base";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState } from "react";
@@ -9,12 +10,72 @@ interface IPropsSolanaWalletModal {
   close: () => void;
 }
 
+type Wallet = {
+  name: string;
+  id: string;
+  description: string;
+  logo: string;
+};
+
 export const SolanaWalletModal = ({
   visible,
   close,
 }: IPropsSolanaWalletModal) => {
+  type LoaderData = {
+    network: string;
+    ethereumWallets: Wallet[];
+  };
+
+  const { network, ethereumWallets } = useLoaderData<LoaderData>();
+
   const { wallets, select } = useWallet();
   const [modal, setModal] = useState<any>();
+
+  const solWalletsMap = wallets.map((wallet) => (
+    <>
+      <li
+        key={`wallet-${wallet.adapter.name}`}
+        onClick={(event) => selectWallet(event, wallet.adapter.name)}
+      >
+        <span>
+          <img src={wallet?.adapter.icon} />
+          <Text size="sm" className="solana-modal-wallet-names">
+            {wallet.adapter.name}
+          </Text>
+        </span>
+        <Text size="xs" className="solana-modal-wallet-status">
+          <i>
+            {wallet.readyState === WalletReadyState.Installed
+              ? "Installed"
+              : "Not Installed"}
+          </i>
+        </Text>
+      </li>
+    </>
+  ));
+
+  const ethWalletsMap = ethereumWallets.map((wallet) => (
+    <>
+      <li
+        key={`wallet-${wallet.name}`}
+        onClick={() => {
+          // use hooks to trigger specific wallet to load
+          // activate(connectors[wallet.id]);
+          // setProvider(wallet.id)
+        }}
+      >
+        <span>
+          <img src={wallet.logo} />
+          <Text size="sm" className="solana-modal-wallet-names">
+            {wallet.name}
+          </Text>
+        </span>
+        <Text size="xs" className="solana-modal-wallet-status">
+          <i></i>
+        </Text>
+      </li>
+    </>
+  ));
 
   const selectWallet = useCallback(
     (
@@ -33,14 +94,6 @@ export const SolanaWalletModal = ({
           className={`wallet-outer-container ${
             visible === true ? "show-modal" : "hide-modal"
           }`}
-          style={{
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "black",
-            position: "absolute",
-            top: 0,
-            left: 0,
-          }}
           onClick={() => close()}
         >
           <div
@@ -61,30 +114,7 @@ export const SolanaWalletModal = ({
             </div>
 
             <ul className="solana-modal-wallet-list">
-              {wallets.map((wallet) => (
-                <>
-                  <li
-                    key={`wallet-${wallet.adapter.name}`}
-                    onClick={(event) =>
-                      selectWallet(event, wallet.adapter.name)
-                    }
-                  >
-                    <span>
-                      <img src={wallet?.adapter.icon} />
-                      <Text size="sm" className="solana-modal-wallet-names">
-                        {wallet.adapter.name}
-                      </Text>
-                    </span>
-                    <Text size="xs" className="solana-modal-wallet-status">
-                      <i>
-                        {wallet.readyState === WalletReadyState.Installed
-                          ? "Installed"
-                          : "Not Installed"}
-                      </i>
-                    </Text>
-                  </li>
-                </>
-              ))}
+              {network === "ethereum" ? ethWalletsMap : solWalletsMap}
             </ul>
             <Text size="xs">
               By connecting a wallet, you agree to Fluidity Money’s Terms of
