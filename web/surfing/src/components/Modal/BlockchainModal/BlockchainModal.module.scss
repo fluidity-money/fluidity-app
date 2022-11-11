@@ -13,25 +13,24 @@
   border-radius: 8px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-evenly;
   z-index: 5;
   
-  & > * {
-    width: 100%;
-  }
-  
   &.mobile {
     justify-content: center;
-    align-items: start;
+    align-items: center;
     height: 100vh;
     width: 100vw;
     background: map-get($bg, "default");
+    padding: 0 40px;
   }
   
   .heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 90%;
     margin-bottom: 24px;
     
     & > * {
@@ -47,9 +46,11 @@
     display: flex;
     align-items: center;
     text-transform: capitalize;
+    width: 90%;
     
     & > * {
       margin: 4px;
     }
+    
   }
 }

@@ -1,16 +1,4 @@
 SERVICES:
-  - CONNECTOR_COMMON_USER_ACTIONS_TIMESCALE:
-      SERVICE_NAME: connector-common-user-actions-timescale-arbitrum
-      DOCKERFILE_PATH: ./cmd/connector-common-user-actions-timescale
-      DOCKER_IMAGE: connector-common-user-actions-timescale
-      ENV_FLU_WORKER_ID: arbitrum-solana-connector-common-user-actions-timescale
-
-  - CONNECTOR_COMMON_PRIZE_POOL_POSTGRES:
-      SERVICE_NAME: connector-common-prize-pool-postgres-arbitrum
-      DOCKERFILE_PATH: ./cmd/connector-common-prize-pool-postgres
-      DOCKER_IMAGE: connector-common-prize-pool-postgres
-      ENV_FLU_WORKER_ID: arbitrum-solana-connector-common-prize-pool-postgres
-
   - CONNECTOR_COMMON_WINNERS_TIMESCALE:
       SERVICE_NAME: connector-common-winners-timescale-arbitrum
       DOCKERFILE_PATH: ./cmd/connector-common-winners-timescale

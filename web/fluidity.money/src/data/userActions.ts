@@ -7,7 +7,7 @@ import { gql, useSubscription } from "@apollo/client";
 import { onData } from "./apolloClient";
 
 export interface TransactionCount {
-  user_actions_staging_aggregate: {
+  user_actions_aggregate: {
     aggregate: {
       count: number,
     }
@@ -17,7 +17,7 @@ export interface TransactionCount {
 
 const countTransactionsByNetworkSubscription = gql`
 subscription userActionsGetCountTransactionsByNetworkSubscription($network: network_blockchain!) {
-  user_actions_staging_aggregate(where: {network: {_eq: $network}}) {
+  user_actions_aggregate(where: {network: {_eq: $network}}) {
     aggregate {
       count
     }

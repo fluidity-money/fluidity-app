@@ -47,7 +47,7 @@ func BigIntFromUint64(x uint64) BigInt {
 	return int
 }
 
-func NewBigInt(x big.Int) BigInt {
+func NewBigIntFromInt(x big.Int) BigInt {
 	return BigInt{x}
 }
 

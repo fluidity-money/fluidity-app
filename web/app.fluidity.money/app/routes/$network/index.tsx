@@ -19,7 +19,7 @@ import {
   Twitter,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
@@ -34,12 +34,15 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const redirectTarget = redirect("/");
 
+  const ethereumWallets = config.config["ethereum"].wallets;
+
   if (!network || !Object.keys(config.drivers).includes(network)) {
     return redirectTarget;
   }
 
   return {
     network,
+    ethereumWallets,
   };
 };
 
@@ -189,16 +192,14 @@ const NetworkPage = () => {
               )}
 
               {/* Connect Wallet Modal */}
-              {network === `solana` ? (
-                <Modal visible={walletModalVisibility}>
-                  <div className="cover">
-                    <SolanaWalletModal
-                      visible={walletModalVisibility}
-                      close={() => setWalletModalVisibility(false)}
-                    />
-                  </div>
-                </Modal>
-              ) : null}
+              <Modal visible={walletModalVisibility}>
+                <div className="cover">
+                  <ConnectWalletModal
+                    visible={walletModalVisibility}
+                    close={() => setWalletModalVisibility(false)}
+                  />
+                </div>
+              </Modal>
             </div>
 
             {/* Expected Earnings */}

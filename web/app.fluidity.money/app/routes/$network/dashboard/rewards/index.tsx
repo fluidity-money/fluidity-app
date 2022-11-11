@@ -53,6 +53,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     (transaction: UserUnclaimedReward) => !transaction.reward_sent
   );
 
+  console.log("sanitised", sanitisedRewards);
+
   const userUnclaimedRewards = sanitisedRewards.reduce(
     (sum: number, transaction: UserUnclaimedReward) => {
       const { win_amount, token_decimals } = transaction;
@@ -63,19 +65,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     0
   );
 
+  console.log("total", userUnclaimedRewards);
+
   let userTransactionCount;
   let userTransactions;
   let expectedRewards;
   let errorMsg;
 
   try {
-    userTransactionCount = await (
-      await useUserTransactionCount(network ?? "", address)
-    ).json();
-    userTransactions = await (
-      await useUserTransactions(network ?? "", address, page)
-    ).json();
+    userTransactionCount = await useUserTransactionCount(
+      network ?? "",
+      address
+    );
+    userTransactions = await useUserTransactions(network ?? "", address, page);
     expectedRewards = await useGlobalRewardStatistics(network ?? "");
+    console.log(userTransactionCount);
+    console.log(userTransactions);
+    console.log(expectedRewards);
   } catch (err) {
     errorMsg = "The transaction explorer is currently unavailable";
   } // Fail silently - for now.

@@ -30,22 +30,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  let userTransactionCount;
-  let userTransactions;
+  let userTransactionCount: any;
+  let userTransactions: any;
 
   let error;
 
   try {
     console.log("Fetching user transaction count");
-    userTransactionCount = await (
-      await useUserTransactionCount(network ?? "", address)
-    ).json();
+    userTransactionCount = await useUserTransactionCount(
+      network ?? "",
+      address
+    );
     console.log("transactionCount ", userTransactionCount);
 
     console.log("Fetching user transactions");
-    userTransactions = await (
-      await useUserTransactions(network ?? "", address, page)
-    ).json();
+    userTransactions = await useUserTransactions(network ?? "", address, page);
 
     console.log("userTransactions", userTransactions);
   } catch (err) {

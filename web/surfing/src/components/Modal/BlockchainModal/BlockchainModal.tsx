@@ -74,7 +74,7 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption, mo
         ) : (
           <Card
             component="button"
-            className={styles.card}
+            className={`${styles.card}`}
             type={"box"}
             rounded={true}
             onClick={() => handleOnClick(i)}

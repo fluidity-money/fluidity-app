@@ -50,7 +50,7 @@ func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b i
 	m := int64(winningClasses)
 
 	blockTimeRat := new(big.Rat).SetUint64(blockTime)
-	
+
 	// Pay out the reward pool as APY, divide between blocks
 	delta := new(big.Rat).Mul(blockTimeRat, rewardPool)
 
@@ -194,7 +194,7 @@ func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, delta
 
 		leftSide := new(big.Int).Quo(payout.Num(), payout.Denom())
 
-		payoutBigInt := misc.NewBigInt(*leftSide)
+		payoutBigInt := misc.NewBigIntFromInt(*leftSide)
 
 		payouts[i] = &payoutBigInt
 		probabilities[i] = probability

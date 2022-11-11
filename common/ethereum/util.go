@@ -35,7 +35,7 @@ func BigIntFromHex(s string) (*misc.BigInt, error) {
 		)
 	}
 
-	bigInt := misc.NewBigInt(*int)
+	bigInt := misc.NewBigIntFromInt(*int)
 
 	return &bigInt, nil
 }

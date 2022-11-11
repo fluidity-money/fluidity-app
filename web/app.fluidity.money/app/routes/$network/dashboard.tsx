@@ -34,11 +34,12 @@ import { useToolTip } from "~/components";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
 import { ToolTipContent } from "~/components/ToolTip";
-import { SolanaWalletModal } from "~/components/WalletModal/SolanaWalletModal";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
+import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -66,6 +67,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const pathname = urlPaths[urlPaths.length - 1];
 
+  const ethereumWallets = config.config["ethereum"].wallets;
+
   const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
@@ -78,6 +81,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     network,
     provider,
     token,
+    ethereumWallets,
   });
 };
 
@@ -163,6 +167,8 @@ export default function Dashboard() {
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
   const [walletModalVisibility, setWalletModalVisibility] =
     useState<boolean>(false);
+  const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
+    useState<boolean>(false);
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
@@ -218,10 +224,10 @@ export default function Dashboard() {
         : "JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi";
 
     const socket = io();
-    socket.emit("subscribeTransactions", {
+    /*    socket.emit("subscribeTransactions", {
       protocol: network,
       address: connected_wallet,
-    });
+    });*/
 
     socket.on("Transactions", (log: PipedTransaction) => {
       const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
@@ -339,7 +345,7 @@ export default function Dashboard() {
           connected ? (
             <ConnectedWallet
               address={trimAddressShort(address!.toString())}
-              callback={() => disconnect?.()}
+              callback={() => setconnectedWalletModalVisibility(true)}
               className="connect-wallet-btn"
             />
           ) : (
@@ -355,9 +361,26 @@ export default function Dashboard() {
               {connecting ? `Connecting...` : `Connect Wallet`}
             </GeneralButton>
           )
-        ) : null}
+        ) : connected ? (
+          <ConnectedWallet
+            address={trimAddressShort(address!.toString())}
+            callback={() => setconnectedWalletModalVisibility(true)}
+            className="connect-wallet-btn"
+          />
+        ) : (
+          <GeneralButton
+            version={connected || connecting ? "transparent" : "primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={() =>
+              connecting ? null : setWalletModalVisibility(true)
+            }
+            className="connect-wallet-btn"
+          >
+            {connecting ? `Connecting...` : `Connect Wallet`}
+          </GeneralButton>
+        )}
       </nav>
-
       <main id="dashboard-body">
         <nav id="top-navbar" className={"pad-main"}>
           {/* App Name */}
@@ -428,14 +451,22 @@ export default function Dashboard() {
             )}
           </div>
         </nav>
-
+        <ConnectedWalletModal
+          visible={connectedWalletModalVisibility}
+          address={address ? address.toString() : ""}
+          close={() => {
+            setconnectedWalletModalVisibility(false);
+          }}
+          disconnect={() => {
+            disconnect?.();
+            setconnectedWalletModalVisibility(false);
+          }}
+        />
         {/* Connect Wallet Modal */}
-        {network === `solana` ? (
-          <SolanaWalletModal
-            visible={walletModalVisibility}
-            close={() => setWalletModalVisibility(false)}
-          />
-        ) : null}
+        <ConnectWalletModal
+          visible={walletModalVisibility}
+          close={() => setWalletModalVisibility(false)}
+        />
 
         <Outlet />
 

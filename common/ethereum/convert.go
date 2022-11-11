@@ -109,8 +109,8 @@ func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 		Root:            ConvertGethHash(oldHeader.Root),
 		TransactionHash: ConvertGethHash(oldHeader.TxHash),
 		Bloom:           oldHeader.Bloom.Bytes(),
-		Difficulty:      misc.NewBigInt(difficulty),
-		Number:          misc.NewBigInt(number),
+		Difficulty:      misc.NewBigIntFromInt(difficulty),
+		Number:          misc.NewBigIntFromInt(number),
 		GasLimit:        misc.BigIntFromUint64(oldHeader.GasLimit),
 		GasUsed:         misc.BigIntFromUint64(oldHeader.GasUsed),
 		Time:            oldHeader.Time,
@@ -118,7 +118,7 @@ func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 		MixDigest:       ConvertGethHash(oldHeader.MixDigest),
 		Nonce:           ethereum.BlockNonce(oldHeader.Nonce[:]),
 		ReceiptHash:     ConvertGethHash(oldHeader.ReceiptHash),
-		BaseFee:         misc.NewBigInt(baseFee),
+		BaseFee:         misc.NewBigIntFromInt(baseFee),
 	}
 }
 
@@ -145,7 +145,7 @@ func ConvertGethReceipt(receipt ethTypes.Receipt) ethereum.Receipt {
 		ContractAddress:   ConvertGethAddress(contractAddress_),
 		GasUsed:           misc.BigIntFromUint64(gasUsed_),
 		BlockHash:         ConvertGethHash(blockHash_),
-		BlockNumber:       misc.NewBigInt(*blockNumber_),
+		BlockNumber:       misc.NewBigIntFromInt(*blockNumber_),
 		TransactionIndex:  receipt.TransactionIndex,
 	}
 }
