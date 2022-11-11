@@ -745,6 +745,10 @@ main > footer > section > a {
   background-color: black;
 }
 
+.address-copy-box:active {
+  background-color: transparent;
+}
+
 .address-copy-box > div {
   display: flex;
 }
