@@ -455,7 +455,7 @@ export default function Dashboard() {
         </nav>
         <ConnectedWalletModal
           visible={connectedWalletModalVisibility}
-          address={address!.toString()}
+          address={address ? address.toString() : ""}
           close={() => {
             setconnectedWalletModalVisibility(false);
           }}
