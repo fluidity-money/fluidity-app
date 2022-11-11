@@ -9,7 +9,9 @@ import (
 )
 
 // hexInt that contains a big.Int
-type hexInt big.Int
+type hexInt struct {
+	big.Int
+}
 
 func (hex *hexInt) UnmarshalJSON(b []byte) (err error) {
 	var str string
@@ -32,9 +34,7 @@ func (hex *hexInt) UnmarshalJSON(b []byte) (err error) {
 		)
 	}
 
-	h := hexInt(*hex_)
-
-	hex = &h
+	hex.Int = *hex_
 
 	return
 }

@@ -5,37 +5,55 @@
 package ethereum
 
 import (
-	"math/big"
+	"fmt"
 
 	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-block-fluid-transfers-amqp/lib"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 )
 
-// emptyAddress to use when a transaction doesn't have a recipient
-const emptyAddress = `0x0000000000000000000000000000000000000000`
+const (
+	// emptyAddress to use when a transaction doesn't have a recipient
+	emptyAddress = `0x0000000000000000000000000000000000000000`
+
+	// list of transaction types we understand
+	txLegacy             = 0
+	txAccessList         = 1
+	txDynamicFee         = 2
+	txArbDeposit         = 100 // deposit, ignore
+	txArbUnsigned        = 101 // bridge tx
+	txArbContract        = 102 // bridge tx
+	txArbRetry           = 104 // retryable tx execution
+	txArbSubmitRetryable = 105 // retryable tx submition, ignore
+	txArbInternal        = 106 // internal, ignore
+	txArbLegacy          = 120 // same as eth legacy
+)
+
+func shouldIgnoreTransaction(typ uint8) (bool, error) {
+	switch (typ) {
+	case txArbDeposit, txArbSubmitRetryable, txArbInternal:
+		return true, nil
+	case txLegacy, txAccessList, txDynamicFee, txArbUnsigned, txArbContract, txArbRetry, txArbLegacy:
+		return false, nil
+	default:
+		return true, fmt.Errorf("unknown transaction type %d", typ)
+	}
+}
 
 // ConvertTransaction from Ethereum's definition to our internal one
 func ConvertTransaction(tx lib.Transaction) (*types.Transaction, error) {
 	var (
 		_ = tx.BlockNumber
 
-		chainId              = big.Int(tx.ChainId)
-		gas                  = big.Int(tx.Gas)
-		gasPrice             = big.Int(tx.GasPrice)
-		maxFeePerGas         = big.Int(tx.MaxFeePerGas)
-		maxPriorityFeePerGas = big.Int(tx.MaxPriorityFeePerGas)
-		nonce                = big.Int(tx.Nonce)
-		value                = big.Int(tx.Value)
-		typ_                 = big.Int(tx.Type)
+		gasPrice             = tx.GasPrice.Int
+		maxFeePerGas         = tx.MaxFeePerGas.Int
+		maxPriorityFeePerGas = tx.MaxPriorityFeePerGas.Int
+		typ_                 = tx.Type.Int
 	)
-
-	gasPriceAddGas := new(big.Int).Mul(&gasPrice, &gas)
-
-	cost := new(big.Int).Add(gasPriceAddGas, &value)
 
 	typ := uint8(typ_.Int64())
 
@@ -43,19 +61,14 @@ func ConvertTransaction(tx lib.Transaction) (*types.Transaction, error) {
 
 	transaction := types.Transaction{
 		BlockHash: tx.BlockHash,
-		ChainId:   misc.NewBigIntFromInt(chainId),
-		Cost:      misc.NewBigIntFromInt(*cost),
 		Data:      data,
-		Gas:       gas.Uint64(),
 		GasFeeCap: misc.NewBigIntFromInt(maxFeePerGas),
 		GasTipCap: misc.NewBigIntFromInt(maxPriorityFeePerGas),
 		GasPrice:  misc.NewBigIntFromInt(gasPrice),
 		Hash:      tx.Hash,
-		Nonce:     nonce.Uint64(),
 		To:        tx.To,
 		From:      tx.From,
 		Type:      typ,
-		Value:     misc.NewBigIntFromInt(value),
 	}
 
 	return &transaction, nil
@@ -63,16 +76,36 @@ func ConvertTransaction(tx lib.Transaction) (*types.Transaction, error) {
 
 // ConvertTransactions into their new type definition equivalent
 func ConvertTransactions(blockHash string, oldTransactions []lib.Transaction) ([]types.Transaction, error) {
-	newTransactions := make([]types.Transaction, len(oldTransactions))
+	newTransactions := make([]types.Transaction, 0)
 
-	for i, txn := range oldTransactions {
+	for _, txn := range oldTransactions {
+		typ := uint8(txn.Type.Uint64())
+
+		ignore, err := shouldIgnoreTransaction(typ)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Error converting transactions for transaction hash %s: %w",
+				txn.Hash.String(),
+				err,
+			)
+		}
+
+		if ignore {
+			log.Debug(func(k *log.Log) {
+			    k.Format("Skipping transaction %s with irrelevant type %d", txn.Hash, typ)
+			})
+
+			continue
+		}
+
 		tx, err := ConvertTransaction(txn)
 
 		if err != nil {
 			return nil, err
 		}
 
-		newTransactions[i] = *tx
+		newTransactions = append(newTransactions, *tx)
 	}
 
 	return newTransactions, nil

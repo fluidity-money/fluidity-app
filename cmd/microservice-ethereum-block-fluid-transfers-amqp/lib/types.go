@@ -45,26 +45,24 @@ type (
 
 	// Transaction is eth_blockByHash return data
 	Transaction struct {
-		BlockHash   types.Hash    `json:"blockHash"`
-		BlockNumber hexInt        `json:"blockNumber"`
-		ChainId     hexInt        `json:"chainId"`
-		From        types.Address `json:"from"`
-		Gas         hexInt        `json:"gas"`
-		GasPrice    hexInt        `json:"gasPrice"`
-		Hash        types.Hash    `json:"hash"`
+		BlockHash   types.Hash `json:"blockHash"`
+		BlockNumber hexInt     `json:"blockNumber"`
+
+		From types.Address `json:"from"`
+
+		GasPrice             hexInt `json:"gasPrice"`
+		MaxFeePerGas         hexInt `json:"maxFeePerGas"`
+		MaxPriorityFeePerGas hexInt `json:"maxPriorityFeePerGas"`
+
+		Hash types.Hash `json:"hash"`
 
 		// Data encoded as a hex byte array received in the form of a string
-		Data string `json:"data"`
+		Data string `json:"input"`
 
-		MaxFeePerGas         hexInt        `json:"maxFeePerGas"`
-		MaxPriorityFeePerGas hexInt        `json:"maxPriorityFeePerGas"`
-		Nonce                hexInt        `json:"nonce"`
-		To                   types.Address `json:"to"`
+		To types.Address `json:"to"`
 
 		// Type encoded as a hex uint8
 		Type hexInt `json:"type"`
-
-		Value hexInt `json:"value"`
 	}
 
 	// Block is eth_getBlockByHash's result. Does not match
