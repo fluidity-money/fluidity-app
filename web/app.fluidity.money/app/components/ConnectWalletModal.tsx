@@ -102,7 +102,6 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
           className={`connect-wallet-outer-container ${
             visible === true ? "show-modal" : "hide-modal"
           }`}
-          onClick={() => close()}
         >
           <div
             className={`connect-wallet-modal-container  ${

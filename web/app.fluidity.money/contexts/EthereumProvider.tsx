@@ -18,6 +18,7 @@ import makeContractSwap, {
   usdBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
 import { getTokenFromAddress, Token } from "~/util/chainUtils/tokens";
+import { Buffer } from "buffer";
 
 const EthereumFacade = ({
   children,
@@ -52,6 +53,10 @@ const EthereumFacade = ({
         connector = connectors.find(
           (connector) => connector[0] instanceof WalletConnect
         )?.[0];
+        // Node Polyfills are no longer bundled with webpack
+        // We manually re-add Node.Buffer to client
+        // https://github.com/WalletConnect/web3modal/issues/455
+        window.Buffer = Buffer;
         break;
       default:
         console.warn("Unsupported connector", type);
