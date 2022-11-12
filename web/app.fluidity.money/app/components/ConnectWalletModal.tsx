@@ -50,11 +50,11 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
           >
             <span>
               <img src={wallet?.adapter.icon} />
-              <Text size="sm" className="solana-modal-wallet-names">
+              <Text size="sm" className="connect-wallet-modal-names">
                 {wallet.adapter.name}
               </Text>
             </span>
-            <Text size="xs" className="solana-modal-wallet-status">
+            <Text size="xs" className="connect-wallet-modal-status">
               <i>
                 {wallet.readyState === WalletReadyState.Installed
                   ? "Installed"
@@ -82,11 +82,11 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
           >
             <span>
               <img src={wallet.logo} />
-              <Text size="sm" className="solana-modal-wallet-names">
+              <Text size="sm" className="connect-wallet-modal-names">
                 {wallet.name}
               </Text>
             </span>
-            <Text size="xs" className="solana-modal-wallet-status">
+            <Text size="xs" className="connect-wallet-modal-status">
               <i></i>
             </Text>
           </li>
@@ -99,17 +99,17 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
     setModal(
       createPortal(
         <div
-          className={`wallet-outer-container ${
+          className={`connect-wallet-outer-container ${
             visible === true ? "show-modal" : "hide-modal"
           }`}
           onClick={() => close()}
         >
           <div
-            className={`solana-wallet-modal-container  ${
+            className={`connect-wallet-modal-container  ${
               visible === true ? "show-modal" : "hide-modal"
             }`}
           >
-            <div className="solana-wallet-modal-header">
+            <div className="connect-wallet-modal-header">
               <Text prominent size="xxl">
                 Connect your wallet
               </Text>
@@ -117,11 +117,11 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
               <img
                 onClick={close}
                 src="/images/icons/x.svg"
-                className="solana-modal-cancel-btn"
+                className="modal-cancel-btn"
               />
             </div>
 
-            <ul className="solana-modal-wallet-list">
+            <ul className="connect-wallet-modal-list">
               {network === "ethereum" && <EthWalletsMap />}
               {network === "solana" && <SolWalletsMap />}
             </ul>

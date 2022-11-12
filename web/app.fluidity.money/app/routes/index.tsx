@@ -168,6 +168,7 @@ export default function IndexPage() {
             <LinkButton
               size={"small"}
               type={"internal"}
+              left={true}
               handleClick={() => {
                 return;
               }}

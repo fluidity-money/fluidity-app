@@ -16,6 +16,7 @@ import {
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
 import ConnectedWallet from "./ConnectedWallet";
+import { ConnectedWalletModal } from "./ConnectedWalletModal";
 
 type IMobileModal = {
   navigationMap: Array<{ name: string; icon: JSX.Element }>;
@@ -46,6 +47,9 @@ export default function MobileModal({
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
+  const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
+    useState<boolean>(false);
+
   const { connected, address, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
@@ -53,7 +57,7 @@ export default function MobileModal({
   const [animation, setAnimation] = useState(true);
 
   useEffect(() => {
-    // turns off animation when chain select modal is used and activates when it isn't
+    // turns off animation when chain select modal is used and activates it when it isn't
     if (isOpen) setAnimation(false);
     if (!isOpen) setAnimation(true);
   }, [isOpen]);
@@ -83,6 +87,7 @@ export default function MobileModal({
       navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
     };
 
+    // select blockchain modal
     return (
       <div className="select-blockchain-mobile">
         <BlockchainModal
@@ -147,7 +152,12 @@ export default function MobileModal({
               {connected && address ? (
                 <ConnectedWallet
                   address={trimAddressShort(address.toString())}
-                  callback={() => disconnect?.()}
+                  callback={() => {
+                    !connectedWalletModalVisibility &&
+                      setconnectedWalletModalVisibility(true);
+                    connectedWalletModalVisibility &&
+                      setconnectedWalletModalVisibility(false);
+                  }}
                   // className="connect-wallet-btn"
                 />
               ) : (
@@ -256,6 +266,19 @@ export default function MobileModal({
               </footer>
             </section>
           </div>
+          {connectedWalletModalVisibility && (
+            <ConnectedWalletModal
+              visible={connectedWalletModalVisibility}
+              address={address ? address.toString() : ""}
+              close={() => {
+                setconnectedWalletModalVisibility(false);
+              }}
+              disconnect={() => {
+                disconnect?.();
+                setconnectedWalletModalVisibility(false);
+              }}
+            />
+          )}
         </motion.div>
       )}
     </AnimatePresence>

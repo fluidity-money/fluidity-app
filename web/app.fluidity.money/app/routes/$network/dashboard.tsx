@@ -349,7 +349,12 @@ export default function Dashboard() {
           connected && address ? (
             <ConnectedWallet
               address={trimAddressShort(address.toString())}
-              callback={() => setconnectedWalletModalVisibility(true)}
+              callback={() => {
+                !connectedWalletModalVisibility &&
+                  setconnectedWalletModalVisibility(true);
+                connectedWalletModalVisibility &&
+                  setconnectedWalletModalVisibility(false);
+              }}
               className="connect-wallet-btn"
             />
           ) : (
@@ -368,7 +373,12 @@ export default function Dashboard() {
         ) : connected && address ? (
           <ConnectedWallet
             address={trimAddressShort(address.toString())}
-            callback={() => setconnectedWalletModalVisibility(true)}
+            callback={() => {
+              !connectedWalletModalVisibility &&
+                setconnectedWalletModalVisibility(true);
+              connectedWalletModalVisibility &&
+                setconnectedWalletModalVisibility(false);
+            }}
             className="connect-wallet-btn"
           />
         ) : (
