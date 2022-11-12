@@ -65,7 +65,15 @@ const EthereumFacade = ({
     connector?.activate();
   };
 
-  const deactivate = async (): Promise<void> => connector.deactivate?.();
+  const deactivate = async (): Promise<void> => {
+    // Metamask does not directly disconnect, so instead reset State
+    // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/ConnectWithSelect.tsx#L139
+    if (connector?.deactivate) {
+      void connector.deactivate();
+    } else {
+      void connector.resetState();
+    }
+  };
 
   // the per-user mint limit for the given contract
   const limit = async (contractAddress: string): Promise<number> => {
