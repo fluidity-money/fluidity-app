@@ -20,7 +20,6 @@ import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
 import { PipedTransaction } from "drivers/types";
 import { trimAddress, networkMapper } from "~/util";
-import { Web3Context } from "~/util/chainUtils/web3";
 import {
   DashboardIcon,
   GeneralButton,
@@ -116,14 +115,34 @@ function ErrorBoundary() {
 export default function Dashboard() {
   const { appName, version, network, token } = useLoaderData<LoaderData>();
 
-  const { state } = useContext(Web3Context());
-  const account = state.account ?? "";
-
   const navigate = useNavigate();
 
+  const { connected, address, disconnect, connecting } = useContext(
+    FluidityFacadeContext
+  );
+
+  {
+    /* Toggle Mobile Modal */
+  }
   const [openMobModal, setOpenMobModal] = useState(false);
 
+  const [walletModalVisibility, setWalletModalVisibility] =
+    useState<boolean>(false);
+
+  // By default, prompt user to connect their wallet
+  const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
+    useState<boolean>(false);
+
+  // Toggle Select Chain Modal
+  const [chainModalVisibility, setChainModalVisibility] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    if (connected || connecting) setWalletModalVisibility(false);
+  }, [connected, connecting]);
+
   const { width } = useViewport();
+
   const isMobile = width <= 500;
   const isTablet = width <= 850 && width > 500;
   const closeMobileModal = width > 850 ? false : true;
@@ -164,22 +183,6 @@ export default function Dashboard() {
       path.pathname === currentPath.slice(0, -1)
   );
 
-  const [unclaimedRewards, setUnclaimedRewards] = useState(0);
-  const [walletModalVisibility, setWalletModalVisibility] =
-    useState<boolean>(false);
-  const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
-    useState<boolean>(false);
-  const [chainModalVisibility, setChainModalVisibility] =
-    useState<boolean>(false);
-
-  const { connected, address, disconnect, connecting } = useContext(
-    FluidityFacadeContext
-  );
-
-  useEffect(() => {
-    if (connected || connecting) setWalletModalVisibility(false);
-  }, [connected, connecting]);
-
   const handleSetChain = (network: string) => {
     const { pathname } = location;
 
@@ -189,9 +192,16 @@ export default function Dashboard() {
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
   };
 
+  // Rewards User has yet to claim - Ethereum feature
+  const [unclaimedRewards, setUnclaimedRewards] = useState(0);
+
   useEffect(() => {
     (async () => {
-      const { data, error } = await useUserUnclaimedRewards(network, account);
+      if (!address) return;
+
+      if (network !== "ethereum") return;
+
+      const { data, error } = await useUserUnclaimedRewards(network, address);
 
       if (error || !data) return;
 
@@ -216,18 +226,12 @@ export default function Dashboard() {
 
     // Test for now, wallet address should be gotten when a wallet is connected
     // take out hard coded address later.
-    const connected_wallet =
-      network === `ethereum`
-        ? `0x737B7865f84bDc86B5c8ca718a5B7a6d905776F6`
-        : connected
-        ? address?.toString()
-        : "JLxpt7UK4gjQaT8ZC9rvk7M4aK3P6pknzX9HdrzsRYi";
 
     const socket = io();
-    /*    socket.emit("subscribeTransactions", {
+        socket.emit("subscribeTransactions", {
       protocol: network,
-      address: connected_wallet,
-    });*/
+      address,
+    });
 
     socket.on("Transactions", (log: PipedTransaction) => {
       const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
@@ -240,7 +244,7 @@ export default function Dashboard() {
           tokenLogoSrc={fToken.at(0)?.logo}
           boldTitle={log.amount + ` ` + log.token}
           details={
-            log.source === connected_wallet
+            log.source === address
               ? `Sent to ` + trimAddress(log.destination)
               : `Received from ` + trimAddress(log.source)
           }
@@ -249,7 +253,7 @@ export default function Dashboard() {
         />
       );
     });
-  }, []);
+  }, [address]);
 
   const handleScroll = () => {
     if (!openMobModal) {
@@ -342,10 +346,15 @@ export default function Dashboard() {
 
         {/* Connect Wallet Button */}
         {network === `solana` ? (
-          connected ? (
+          connected && address ? (
             <ConnectedWallet
-              address={trimAddressShort(address!.toString())}
-              callback={() => setconnectedWalletModalVisibility(true)}
+              address={trimAddressShort(address.toString())}
+              callback={() => {
+                !connectedWalletModalVisibility &&
+                  setconnectedWalletModalVisibility(true);
+                connectedWalletModalVisibility &&
+                  setconnectedWalletModalVisibility(false);
+              }}
               className="connect-wallet-btn"
             />
           ) : (
@@ -361,10 +370,15 @@ export default function Dashboard() {
               {connecting ? `Connecting...` : `Connect Wallet`}
             </GeneralButton>
           )
-        ) : connected ? (
+        ) : connected && address ? (
           <ConnectedWallet
-            address={trimAddressShort(address!.toString())}
-            callback={() => setconnectedWalletModalVisibility(true)}
+            address={trimAddressShort(address.toString())}
+            callback={() => {
+              !connectedWalletModalVisibility &&
+                setconnectedWalletModalVisibility(true);
+              connectedWalletModalVisibility &&
+                setconnectedWalletModalVisibility(false);
+            }}
             className="connect-wallet-btn"
           />
         ) : (

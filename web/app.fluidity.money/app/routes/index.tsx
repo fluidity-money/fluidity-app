@@ -32,7 +32,6 @@ export const links: LinksFunction = () => {
 
 export const loader: LoaderFunction = async () => {
   const { data, errors } = await useHighestRewardStatisticsAll();
-  console.log(data, errors);
 
   if (errors || !data) {
     captureException(new Error("Could not fetch historical Rewards"), {
@@ -169,6 +168,7 @@ export default function IndexPage() {
             <LinkButton
               size={"small"}
               type={"internal"}
+              left={true}
               handleClick={() => {
                 return;
               }}
