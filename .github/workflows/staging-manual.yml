@@ -2,7 +2,7 @@ name: Staging (Manual/CRON)
 
 on:
   schedule:
-    - cron: '0 21 * * 7-4' #UTC
+    - cron: '0 21 * * 0-4' #UTC
   workflow_dispatch:
     inputs:
       environment:
