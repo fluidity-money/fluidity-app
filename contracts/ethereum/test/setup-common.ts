@@ -16,6 +16,11 @@ export let configOperatorSigner: ethers.Signer;
 export let configCouncilSigner: ethers.Signer;
 
 before(async function () {
+  if (!process.env.FLU_FORKNET_NETWORK) {
+    console.log(`no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`);
+    this.skip();
+  }
+
   [
     accountSigner,
     account2Signer,

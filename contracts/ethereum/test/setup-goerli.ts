@@ -8,8 +8,8 @@ export let usdcAccount: ethers.Contract;
 export let fAUsdcAccount: ethers.Contract;
 
 before(async function() {
-  if (process.env.FLU_FORKNET_GOERLI !== "true") {
-    console.log("not on goerli! skipping aave v3 tests!");
+  if (process.env.FLU_FORKNET_NETWORK !== "goerli") {
+    console.log("not on a goerli fork! skipping aave v3 tests!");
     return;
   }
 
