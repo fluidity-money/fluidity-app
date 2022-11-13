@@ -184,7 +184,6 @@ export const forknetTakeFunds = async (
       await hre.ethers.getSigner(token.owner),
     );
 
-    console.log(`about to get bal of ${token.owner}@${impersonatedToken.address}`)
     const initialUsdtBalance: ethers.BigNumber =
       await impersonatedToken.balanceOf(token.owner);
 
