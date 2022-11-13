@@ -3,7 +3,6 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import config from "../../webapp.config.js";
 import serverConfig from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useMemo, useState } from "react";
 
 import EthereumProvider from "contexts/EthereumProvider";
@@ -98,7 +97,6 @@ function ErrorBoundary() {
 
 export default function Network() {
   const { network, tokens, rpcUrls } = useLoaderData<LoaderData>();
-  const wallet = useWallet();
 
   return (
     <Provider

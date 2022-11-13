@@ -78,27 +78,12 @@ jobs:
               --environment ${{ github.event.inputs.environment }} \
               --debug false \
               --tag $GITHUB_SHA
-      - name: Discord notif (SUCCESS)
-        uses: rjstone/discord-webhook-notify@v1
-        if: success()
-        with:
-          severity: info
-          details: Deployment succeeded.
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (CANCEL)
-        if: cancelled()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: warn
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          details: Deployment cancelled.
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
-      - name: Discord notif (FAIL)
-        if: failure()
-        uses: rjstone/discord-webhook-notify@v1
-        with:
-          severity: error
-          description: "**Event:** [${{ github.event_name }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n**Repository:** ${{ github.event.repository.full_name }}\n**Triggered by:** ${{ github.event.sender.login }}\n**Environment:** ${{ github.event.inputs.environment }}\n**Network:** ${{ github.event.inputs.network }}\n**Group:** ${{ github.event.inputs.group }}\n**Service:** ${{ github.event.inputs.service }}\n**Commit Id:** ${{ github.sha }}\n\n"
-          details: Deployment failed.
-          webhookUrl: ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }}
+      - name: Discord
+        uses: ./scripts/actions
+        if: always()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        with: 
+          command: |
+            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
+

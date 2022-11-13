@@ -1,16 +1,18 @@
-import { Text, trimAddressShort } from "@fluidity-money/surfing";
+import { Text, trimAddressShort, trimAddress } from "@fluidity-money/surfing";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 
 type IConnectedWallet = {
   address: string;
   callback: () => void;
   className?: string;
+  short?: boolean;
 };
 
 const ConnectedWallet = ({
   address,
   callback,
   className,
+  short = true,
 }: IConnectedWallet) => {
   return (
     <button
@@ -22,7 +24,7 @@ const ConnectedWallet = ({
       </div>
       <Text size="lg" prominent={true}>
         {"   "}
-        {trimAddressShort(address)}
+        {short ? trimAddressShort(address) : trimAddress(address)}
       </Text>
     </button>
   );

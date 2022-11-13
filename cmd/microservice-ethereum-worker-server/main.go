@@ -265,7 +265,6 @@ func main() {
 				receipt     = transaction.Receipt
 
 				transactionHash      = transaction.Transaction.Hash
-				gasLimit             = transaction.Transaction.Gas
 				transferType         = transaction.Transaction.Type
 				maxFeePerGas         = transaction.Transaction.GasFeeCap
 				maxPriorityFeePerGas = transaction.Transaction.GasTipCap
@@ -285,15 +284,12 @@ func main() {
 
 			var (
 				gasTipCapRat = bigIntToRat(maxPriorityFeePerGas)
-				gasLimitRat  = uint64ToRat(gasLimit)
 				gasUsedRat   = bigIntToRat(gasUsed)
 			)
 
 			// remember the gas limit and tip cap in the
 			// database for comparison later - NOTE that
 			// only the gas used is used
-
-			emission.GasLimit = gasLimit
 
 			emission.GasTipCap = maxPriorityFeePerGas
 
@@ -305,13 +301,6 @@ func main() {
 			emission.BlockBaseFee = blockBaseFee
 
 			emission.MaxPriorityFeePerGas = maxPriorityFeePerGas
-
-			// normalise the gas limit by dividing it by
-			// ethereum decimals then multiplying it to usd
-
-			normalisedGasLimitRat := weiToUsd(gasLimitRat, ethPriceUsd, ethereumDecimalsRat)
-
-			emission.GasLimitNormal, _ = normalisedGasLimitRat.Float64()
 
 			// and normalise the gas tip cap by multiplying
 			// ethereum decimals then converting to USD

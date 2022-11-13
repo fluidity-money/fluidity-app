@@ -30,7 +30,7 @@ func TestBigIntFromHex(t *testing.T) {
 	result, err := BigIntFromHex(s)
 	assert.Equal(t, expected, result.Int)
 	assert.NoError(t, err)
-	
+
 	s = "1"
 
 	result, err = BigIntFromHex(s)
@@ -232,4 +232,14 @@ func TestCalculateEffectiveGasPrice(t *testing.T) {
 	testGasPrice := new(big.Rat).SetInt64(22_352_771_596)
 
 	assert.Equal(t, testGasPrice, gasPrice, "effectiveGasPrice calculation")
+
+	gasPriceArbitrum := CalculateEffectiveGasPrice(
+		new(big.Rat).SetInt64(1_000_000_000), // base fee per gas
+		new(big.Rat).SetInt64(1_350_000_000), // max fee per gas
+		new(big.Rat).SetInt64(0), // max priority fee per gas
+	)
+
+	testGasPriceArbitrum := new(big.Rat).SetInt64(1_000_000_000)
+
+	assert.Equal(t, gasPriceArbitrum, testGasPriceArbitrum, "effectiveGasPrice calculation gasCap and gasTipCap unset")
 }

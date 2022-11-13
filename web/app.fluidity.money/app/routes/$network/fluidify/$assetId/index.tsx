@@ -1,6 +1,6 @@
 import type { Token } from "~/util/chainUtils/tokens";
 
-import { Display, Text } from "@fluidity-money/surfing";
+import { Display } from "@fluidity-money/surfing";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
@@ -99,13 +99,13 @@ function ErrorBoundary() {
 const FluidityHotSpot = ({ activeToken }: { activeToken: Token }) => {
   const navigate = useNavigate();
 
-  const [{ canDrop }, drop] = useDrop(() => ({
+  const drop = useDrop(() => ({
     accept: [ItemTypes.ASSET, ItemTypes.FLUID_ASSET],
     drop: ({ symbol }: Token) => navigate(`./../${symbol}`),
     collect: (monitor) => ({
       canDrop: monitor.canDrop(),
     }),
-  }));
+  }))[1];
 
   return (
     <main>

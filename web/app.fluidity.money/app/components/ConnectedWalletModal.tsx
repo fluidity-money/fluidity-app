@@ -1,8 +1,7 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Text, Card, Heading, GeneralButton } from "@fluidity-money/surfing";
-import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { trimAddress } from "~/util";
+import { Text, Card, GeneralButton } from "@fluidity-money/surfing";
+import ConnectedWallet from "./ConnectedWallet";
 
 interface IPropsConnectedWalletModal {
   visible: boolean;
@@ -17,7 +16,12 @@ export const ConnectedWalletModal = ({
   close,
   disconnect,
 }: IPropsConnectedWalletModal) => {
-  const [modal, setModal] = useState<any>();
+  const [modal, setModal] = useState<React.ReactPortal | null>(null);
+
+  const copyAddress = (address: string) => {
+    // Copies to clipboard
+    navigator.clipboard.writeText(address);
+  };
 
   useEffect(() => {
     setModal(
@@ -28,14 +32,15 @@ export const ConnectedWalletModal = ({
               visible === true ? "show-modal" : "hide-modal"
             }`}
           >
-            <Text prominent size="xxl">
-              Connected
+            <Text size="xxl">
+              {" "}
+              Fluidity:{" "}
+              <Text prominent size="md">
+                Connected
+              </Text>
             </Text>
             <span onClick={close}>
-              <img
-                src="/images/icons/x.svg"
-                className="solana-modal-cancel-btn"
-              />
+              <img src="/images/icons/x.svg" className="modal-cancel-btn" />
             </span>
             <div className="connected-wallet-modal-body">
               <Card
@@ -44,39 +49,42 @@ export const ConnectedWalletModal = ({
                 rounded={false}
                 type={"box"}
               >
-                <div className="address-copy-box">
-                  <div>
-                    <div className="holo">
-                      <Jazzicon
-                        diameter={36}
-                        seed={jsNumberForAddress(address)}
-                      />
-                    </div>
-                    <Text prominent size="xl" className="address-text">
-                      {trimAddress(address)}
-                    </Text>
-                  </div>
-                  <span className="address-copy-btn">📋</span>
-                </div>
+                <button
+                  className={"address-copy-box"}
+                  onClick={() => copyAddress(address)}
+                >
+                  <ConnectedWallet
+                    className="connected-btn-in-modal"
+                    address={address}
+                    short={false}
+                    callback={() => copyAddress(address)}
+                  />
+                  <img src="/images/icons/copyIcon.svg" alt="copy" />
+                </button>
               </Card>
               <GeneralButton
                 version="transparent"
-                buttontype="text"
+                buttontype={"icon before"}
+                icon={
+                  <img
+                    src="/images/icons/disconnectIcon.svg"
+                    alt="disconnect"
+                  />
+                }
                 size={"medium"}
                 handleClick={() => {
-                  disconnect?.();
+                  disconnect();
                 }}
                 className="disconnect-wallet-btn"
               >
-                <Text prominent size="xxl">
-                  Disconnect Wallet
-                </Text>
+                Disconnect Wallet
               </GeneralButton>
-              <h5>
+              <Text size="xs" className="legal">
                 By connecting a wallet, you agree to Fluidity Money&aposs{" "}
-                <a>Terms of Service</a> and acknowledge that you have read and
-                understand the <a>Disclaimer</a>
-              </h5>
+                <a className="link-text">Terms of Service</a> and acknowledge
+                that you have read and understand the{" "}
+                <a className="link-text">Disclaimer</a>
+              </Text>
             </div>
           </div>
         </>,

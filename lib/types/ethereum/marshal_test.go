@@ -76,19 +76,14 @@ func (suite *MarshalTestSuite) SetupTest() {
 
 	testTx := Transaction{
 		BlockHash: HashFromString("0xblock"),
-		ChainId:   misc.BigIntFromInt64(3),
-		Cost:      misc.BigIntFromInt64(100),
 		Data:      misc.Blob{1, 2},
-		Gas:       1,
 		GasFeeCap: misc.BigIntFromInt64(100),
 		GasTipCap: misc.BigIntFromInt64(100),
 		GasPrice:  misc.BigIntFromInt64(100),
 		Hash:      HashFromString("hash"),
-		Nonce:     2,
 		To:        AddressFromString("toaddr"),
 		From:      AddressFromString("fromaddr"),
 		Type:      1,
-		Value:     misc.BigIntFromInt64(1345),
 	}
 
 	suite.testHeader = testHeader

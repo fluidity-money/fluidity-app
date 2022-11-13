@@ -54,7 +54,7 @@ func (suite *BigIntTestSuite) TestBigIntFromOther() {
 		var inner big.Int
 		inner.SetInt64(100)
 
-		result := NewBigInt(inner)
+		result := NewBigIntFromInt(inner)
 		assert.Equal(t, suite.Expected, result)
 	})
 

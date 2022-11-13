@@ -364,7 +364,7 @@ main > footer > section > a {
   width: 100%;
 }
 
-.wallet-outer-container {
+.connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
   background-color: black;
@@ -373,7 +373,7 @@ main > footer > section > a {
   left: 0;
 }
 
-.solana-wallet-modal-container {
+.connect-wallet-modal-container {
   position: absolute;
   width: 30%;
   min-width: 300px;
@@ -385,7 +385,7 @@ main > footer > section > a {
   padding: 3em;
 }
 
-.solana-wallet-modal-container > ul > li {
+.connect-wallet-modal-container > ul > li {
   width: 100%;
   display: flex;
   list-style: none;
@@ -397,22 +397,22 @@ main > footer > section > a {
   border-bottom: 0.2px solid grey;
 }
 
-.solana-wallet-modal-container > ul > li:hover {
+.connect-wallet-modal-container > ul > li:hover {
   background-color: gainsboro;
 }
 
-.solana-wallet-modal-container > ul > li > span {
+.connect-wallet-modal-container > ul > li > span {
   width: 100%;
   display: flex;
   align-items: center;
   margin-right: 0.25em;
 }
 
-.solana-wallet-modal-container > ul > li > span > img {
+.connect-wallet-modal-container > ul > li > span > img {
   width: 2em;
 }
 
-.solana-modal-cancel-btn {
+.modal-cancel-btn {
   cursor: pointer;
   float: right;
   margin-top: -0.5em;
@@ -422,28 +422,28 @@ main > footer > section > a {
   width: 1em;
 }
 
-.solana-modal-cancel-btn:hover {
+.modal-cancel-btn:hover {
   opacity: 1;
   background-color: #0f2339;
 }
 
-.solana-modal-wallet-list {
+.connect-wallet-modal-list {
   background-color: white;
   padding: 0;
   margin: 0 0 1em 0;
 }
 
-.solana-modal-wallet-names {
+.connect-wallet-modal-names {
   margin: 10px;
 }
 
-.solana-modal-wallet-status {
+.connect-wallet-modal-status {
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.solana-wallet-modal-header {
+.connect-wallet-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -667,7 +667,7 @@ main > footer > section > a {
     margin: 0 0 2em 0;
   }
 
-  .solana-wallet-modal-container {
+  .connect-wallet-modal-container {
     min-width: 300px;
     top: 45%;
   }
@@ -681,6 +681,15 @@ main > footer > section > a {
   display: flex;
   gap: 10px;
   align-items: center;
+  border: 0.5px solid transparent;
+  padding: 0.2em;
+  border-radius: 2em;
+}
+
+.connected-wallet:hover {
+  border: 0.5px solid white;
+  padding: 0.2em;
+  border-radius: 2em;
 }
 
 .holo {
@@ -726,23 +735,60 @@ main > footer > section > a {
   display: flex;
   padding: 10px;
   justify-content: space-between;
+  align-items: center;
   cursor: pointer;
+  border: none !important;
+  border-radius: 12px !important;
+}
+
+.address-copy-box:hover {
+  background-color: black;
+}
+
+.address-copy-box:active {
+  background-color: transparent;
 }
 
 .address-copy-box > div {
   display: flex;
 }
 
-.address-copy-btn {
-  margin-top: 20px;
+.legal {
+  margin-top: 2em;
 }
 
 .address-text {
   margin-left: 10px;
 }
 
+.connected-btn-in-modal:hover {
+  border: 0.5px solid transparent;
+}
+
 .disconnect-wallet-btn {
-  margin-top: 40px;
-  align-items: center;
+  margin: 2em 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   width: 92%;
+}
+
+.disconnect-wallet-btn:hover > div > img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.link-text {
+  text-decoration: underline;
+  color: white;
+  cursor: pointer;
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 160px;
+  gap: 0.4em;
 }

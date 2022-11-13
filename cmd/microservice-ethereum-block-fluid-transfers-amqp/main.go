@@ -128,7 +128,10 @@ func main() {
 			})
 		}
 
-		newTransactions, err := ethConvert.ConvertTransactions(blockHash.String(), block.Transactions)
+		newTransactions, err := ethConvert.ConvertTransactions(
+			blockHash.String(),
+			block.Transactions,
+		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

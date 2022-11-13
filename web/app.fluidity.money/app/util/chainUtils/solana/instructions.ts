@@ -128,8 +128,8 @@ const swap = async (amount: string, fromTokenAddr: string) => {
       `Could not initiate Swap: Could not get fluid tokens from solana`
     );
 
-  const toToken = fromFluid
-    ? getTokenFromAddress("solana", fromToken.isFluidOf!)
+  const toToken = fromToken.isFluidOf
+    ? getTokenFromAddress("solana", fromToken.isFluidOf)
     : fluidAssets.reduce((_: Token | null, fluidTokenAddr: string) => {
         const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
 

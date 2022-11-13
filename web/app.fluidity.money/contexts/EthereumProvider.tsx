@@ -18,6 +18,7 @@ import makeContractSwap, {
   usdBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
 import { getTokenFromAddress, Token } from "~/util/chainUtils/tokens";
+import { Buffer } from "buffer";
 
 const EthereumFacade = ({
   children,
@@ -52,6 +53,10 @@ const EthereumFacade = ({
         connector = connectors.find(
           (connector) => connector[0] instanceof WalletConnect
         )?.[0];
+        // Node Polyfills are no longer bundled with webpack
+        // We manually re-add Node.Buffer to client
+        // https://github.com/WalletConnect/web3modal/issues/455
+        window.Buffer = Buffer;
         break;
       default:
         console.warn("Unsupported connector", type);
@@ -60,7 +65,15 @@ const EthereumFacade = ({
     connector?.activate();
   };
 
-  const deactivate = async (): Promise<void> => connector.deactivate?.();
+  const deactivate = async (): Promise<void> => {
+    // Metamask does not directly disconnect, so instead reset State
+    // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/ConnectWithSelect.tsx#L139
+    if (connector?.deactivate) {
+      void connector.deactivate();
+    } else {
+      void connector.resetState();
+    }
+  };
 
   // the user's minted amount towards the per-user total
   const limit = async (contractAddress: string): Promise<number> => {
@@ -138,9 +151,8 @@ const EthereumFacade = ({
   );
 };
 
-export const EthereumProvider =
-  (rpcUrl: string, tokens: Token[]) =>
-  ({ children }: { children: React.ReactNode }) => {
+export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
+  const Provider = ({ children }: { children: React.ReactNode }) => {
     const connectors = useMemo(() => {
       const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
         (actions) => new MetaMask({ actions })
@@ -164,11 +176,6 @@ export const EthereumProvider =
         [walletConnect, walletconnectHooks],
       ];
 
-      const connectorHooks: { [key: string]: Web3ReactHooks } = {
-        metaMask: metamaskHooks,
-        walletConnect: walletconnectHooks,
-      };
-
       return connectors;
     }, []);
 
@@ -182,5 +189,8 @@ export const EthereumProvider =
       </>
     );
   };
+
+  return Provider;
+};
 
 export default EthereumProvider;

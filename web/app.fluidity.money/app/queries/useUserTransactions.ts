@@ -77,6 +77,34 @@ const query: Queryable = {
   `,
 };
 
+type UserTransactionsBody = {
+  query: string;
+  variables: {
+    address: string;
+    offset: number;
+    fluidCurrencies: string[];
+  };
+};
+
+export type UserTransactionsRes = {
+  data?: {
+    [network: string]: {
+      transfers: UserTransaction[];
+    };
+  };
+  errors?: unknown;
+};
+
+export type UserTransaction = {
+  sender: {
+    address: string;
+  };
+  receiver: { address: string };
+  block: { timestamp: { unixtime: number } };
+  amount: number;
+  currency: { symbol: string };
+};
+
 const useUserTransactions = async (
   network: string,
   address: string,
@@ -93,19 +121,13 @@ const useUserTransactions = async (
     variables,
   };
 
-  return jsonPost("https://graphql.bitquery.io", body, {
-    "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
-  });
-};
-
-export type UserTransaction = {
-  sender: {
-    address: string;
-  };
-  receiver: { address: string };
-  block: { timestamp: { unixtime: number } };
-  amount: number;
-  currency: { symbol: string };
+  return jsonPost<UserTransactionsBody, UserTransactionsRes>(
+    "https://graphql.bitquery.io",
+    body,
+    {
+      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+    }
+  );
 };
 
 export default useUserTransactions;

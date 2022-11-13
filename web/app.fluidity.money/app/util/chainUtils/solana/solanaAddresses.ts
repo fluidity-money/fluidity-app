@@ -8,6 +8,7 @@ import { PublicKey } from "@solana/web3.js";
 import { getATAAddressSync, createATAInstruction } from "@saberhq/token-utils";
 import * as splToken from "@solana/spl-token";
 import { AccountMeta } from "@solana/web3.js";
+import { default as solendAddresses } from "./mainnet-production-solend.json";
 
 //https://github.com/solendprotocol/common/blob/master/src/devnet.json
 //provides the accounts required for Solend interaction
@@ -49,25 +50,25 @@ export const getFluidInstructionKeys = async (
   dataAccount: PublicKey
 ): Promise<Array<AccountMeta> | null> => {
   // assigns solendAddress based on network
-  const solendAddress = require("./mainnet-production-solend.json");
-
   //pda token ata
   const pdaAccount = await FluidityInstruction.getProgramAddress(token.symbol);
 
   //find the solend asset and reserve
-  const market = [...solendAddress.markets].find(({ name }) => name === "main");
+  const market = [...solendAddresses.markets].find(
+    ({ name }) => name === "main"
+  );
   if (!market) return null;
 
   const reserve = market.reserves.find(
     ({ asset }: { asset: string }) => asset === token.symbol
   );
-  const solendAsset = solendAddress.oracles.assets.find(
+  const solendAsset = solendAddresses.oracles.assets.find(
     ({ asset }: { asset: string }) => asset === token.symbol
   );
   if (!solendAsset || !reserve) return null;
 
   // obtain the necessary accounts for both instructions
-  const solendProgram = solendAddress.programID;
+  const solendProgram = solendAddresses.programID;
   const reserveInfo = reserve.address;
   const reserveLiquiditySupplyInfo = reserve.liquidityAddress;
   const reserveCollateralMintInfo = reserve.collateralMintAddress;
