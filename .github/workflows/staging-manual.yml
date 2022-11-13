@@ -1,8 +1,8 @@
-name: Staging (Manual)
+name: Staging (Manual/CRON)
 
 on:
   schedule:
-    - cron: '0 21 * * 1-5'
+    - cron: '0 21 * * 7-4' #UTC
   workflow_dispatch:
     inputs:
       environment:
