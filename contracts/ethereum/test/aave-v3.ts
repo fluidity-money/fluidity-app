@@ -6,7 +6,7 @@ import { accountAddr } from "./setup-common";
 
 describe("token aave v3 integration", async function () {
   before(async function () {
-    if (process.env.FLU_FORKNET_GOERLI !== "true") {
+    if (process.env.FLU_FORKNET_NETWORK !== "goerli") {
       return this.skip();
     }
   });
