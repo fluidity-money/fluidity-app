@@ -1,4 +1,4 @@
-import { Provider } from "@ethersproject/providers";
+import { JsonRpcProvider, Provider } from "@ethersproject/providers";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
 
@@ -40,30 +40,37 @@ export const usdBalanceOfERC20 = async (
 
 // whether the per-user mint limit is enabled for the contract
 export const userMintLimitedEnabled = async (
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
 ): Promise<boolean> => {
-  const contract = getContract(ABI, contractAddress);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return false;
-  return await contract.mintLimitsEnabled();
+
+  try {
+    return await contract.mintLimitsEnabled();
+  }catch(e){console.error(e)}
+    return false
 };
 
 // the user mint limit for the contract, regardless of whether it's enabled
 export const getUserMintLimit = async (
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
 ): Promise<string> => {
-  const contract = getContract(ABI, contractAddress);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return "0";
   return (await contract.userMintLimit()).toString();
 };
 
 // the user mint limit for the contract scaled by decimals, regardless of whether it's enabled
 export const getUsdUserMintLimit = async (
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
 ): Promise<number> => {
-  const contract = getContract(ABI, contractAddress);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return 0;
 
   const limit = (await contract.userMintLimit()).toString();
@@ -74,25 +81,27 @@ export const getUsdUserMintLimit = async (
 
 // the amount towards the mint limit the given user has currently minted
 export const getAmountMinted = async (
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface,
   userAddress: string
 ): Promise<string> => {
-  const contract = getContract(ABI, contractAddress);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return "0";
   return (await contract.userAmountMinted(userAddress)).toString();
 };
 
 // the amount towards the mint limit the given user has currently minted scaled by decimals
 export const getUsdAmountMinted = async (
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface,
   userAddress: string
 ): Promise<number> => {
-  const contract = getContract(ABI, contractAddress);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return 0;
 
-  const amount = await contract.userAmountMinted(userAddress).toString();
+  const amount = (await contract.userAmountMinted(userAddress)).toString();
   const decimals = (await contract.decimals()).toString();
 
   return Number(utils.formatUnits(amount, decimals));

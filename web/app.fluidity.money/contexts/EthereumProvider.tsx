@@ -76,13 +76,14 @@ const EthereumFacade = ({
   };
 
   // the user's minted amount towards the per-user total
+  // call with a fluid token
   const limit = async (contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
     if (!signer) {
       return 0;
     }
 
-    return await getUsdAmountMinted(contractAddress, tokenAbi, await signer.getAddress());
+    return await getUsdAmountMinted(signer.provider, contractAddress, tokenAbi, await signer.getAddress());
   };
 
   // swap <symbol> to its counterpart, with amount in its own units
