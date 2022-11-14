@@ -11,7 +11,7 @@ import { expect } from "chai";
 
 describe("Token", async function () {
     before(async function () {
-        if (process.env.FLU_FORKNET_GOERLI === "true") {
+        if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
             return this.skip();
         }
     });

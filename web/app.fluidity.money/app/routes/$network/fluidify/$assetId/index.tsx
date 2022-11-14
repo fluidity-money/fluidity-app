@@ -1,12 +1,13 @@
-import type { Token } from "~/util/chainUtils/tokens";
+import { fluidAssetOf, Token } from "~/util/chainUtils/tokens";
 
 import { Display } from "@fluidity-money/surfing";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import { getTokenFromSymbol } from "~/util/chainUtils/tokens";
+import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import ItemTypes from "~/types/ItemTypes";
 import DragCard from "~/components/DragCard";
 import Video from "~/components/Video";
@@ -17,6 +18,10 @@ import styles from "~/styles/fluidify.css";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import config, { colors } from "~/webapp.config.server";
+import {getUsdAmountMinted, getUsdUserMintLimit, userMintLimitedEnabled} from "~/util/chainUtils/ethereum/transaction";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import {JsonRpcProvider} from "@ethersproject/providers";
+import {useWeb3React} from "@web3-react/core";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network, assetId } = params;
@@ -24,26 +29,51 @@ export const loader: LoaderFunction = async ({ params }) => {
   if (!network) throw new Error("Network not found");
   if (!assetId) throw new Error("Asset not found");
 
+  const networkIndex = 0;
+
   const {
     config: {
       [network as string]: { tokens },
     },
+    drivers: {
+      [network as string]: {
+        [networkIndex] : {
+          rpc: {
+            http: rpcUrl
+          }
+        }
+      }
+    }
   } = config;
 
   const assetToken = getTokenFromSymbol(network, assetId);
-
   if (!assetToken) throw new Error(`Asset ${assetId} not found`);
+
+  // find the fluid asset to get its mint limits
+  const fluidAssetAddress = fluidAssetOf(tokens, assetToken);
+  if (!fluidAssetAddress) throw new Error(`No matching fluid token for ${assetId}`);
+
+  const provider = new JsonRpcProvider(rpcUrl);
+
+  const mintLimitEnabled = await userMintLimitedEnabled(provider, fluidAssetAddress, tokenAbi)
+
+  const userMintLimit = mintLimitEnabled ?
+    await getUsdUserMintLimit(provider, fluidAssetAddress, tokenAbi) :
+    undefined;
 
   return json({
     tokens,
-    assetToken,
+    assetToken: {
+      ...assetToken,
+      userMintLimit,
+    },
     colors: (await colors)[network as string],
   });
 };
 
 type LoaderData = {
   tokens: Token[];
-  assetToken: Token;
+  assetToken: Token & {userMintLimit?: number};
   colors: {
     [symbol: string]: string;
   };
@@ -105,10 +135,31 @@ const FluidityHotSpot = ({ activeToken }: { activeToken: Token }) => {
 
 export default function FluidifyToken() {
   const { tokens, colors, assetToken } = useLoaderData<LoaderData>();
+  const { address } = useContext(FluidityFacadeContext);
+  const { provider } = useWeb3React();
 
+  const fluidTokenAddress = useMemo(() => (
+    fluidAssetOf(tokens, assetToken)
+  ), [assetToken])
+
+  const [amountMinted, setAmountMinted] = useState<number | undefined>();
   const [search, setSearch] = useState("");
   const [swapping, setSwapping] = useState(false);
   const [finishing, setFinishing] = useState(false);
+
+  useEffect(() => {
+    if (
+      assetToken.userMintLimit &&
+      address && 
+      fluidTokenAddress &&
+      provider
+    ) {
+      // get a provider with the correct type
+      const rpcProvider = provider.getSigner().provider;
+      getUsdAmountMinted(rpcProvider, assetToken.address, tokenAbi, address)
+        .then(setAmountMinted);
+    }
+  }, [fluidTokenAddress, address]);
 
   const [filteredTokens, setFilteredTokens] = useState<Token[]>(
     tokens as Token[]

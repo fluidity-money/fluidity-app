@@ -56,4 +56,11 @@ const getTokenFromSymbol = (
   return matchingTokens[0];
 };
 
-export { getTokenForNetwork, getTokenFromAddress, getTokenFromSymbol };
+// find the fluid counterpart of assetToken in tokens, or return
+// its own address if already fluid
+const fluidAssetOf = (tokens: Token[], assetToken: Token): string | undefined => 
+  assetToken.isFluidOf ?
+    assetToken.address :
+    tokens.find(({isFluidOf}) => isFluidOf === assetToken.address)?.address;
+
+export { getTokenForNetwork, getTokenFromAddress, getTokenFromSymbol, fluidAssetOf };

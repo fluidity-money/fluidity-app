@@ -105,6 +105,9 @@ func main() {
 		message.Decode(&hintedBlock)
 
 		// set the configuration using what's in the database for the block
+		log.Debug(func (k *log.Log) {
+			k.Message = "About to fetch worker config from postgres!"
+		})
 		var (
 			workerConfig = worker_config.GetWorkerConfigEthereum(
 				network.NetworkEthereum,

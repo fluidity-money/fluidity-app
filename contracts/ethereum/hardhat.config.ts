@@ -119,14 +119,14 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
   };
 
 let forkOptions = {};
-if (process.env.FLU_FORKNET_GOERLI === "true" && process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI) {
+if (process.env.FLU_FORKNET_NETWORK === "goerli" && process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI) {
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
       blockNumber: 7906700,
     },
   };
-} else if (process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET) {
+} else if (process.env.FLU_FORKNET_NETWORK == "mainnet" && process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET) {
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET,

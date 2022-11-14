@@ -32,8 +32,8 @@ export let configOperator: ethers.Contract;
 export let configCouncil: ethers.Contract;
 
 before(async function () {
-  if (process.env.FLU_FORKNET_GOERLI === "true") {
-    console.log("on goerli! only running aave v3 tests!");
+  if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
+    console.log("not on a mainnet fork! skipping most tests!");
     return;
   }
 
