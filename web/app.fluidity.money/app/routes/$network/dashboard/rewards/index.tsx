@@ -37,6 +37,7 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 export const unstable_shouldReload = () => false;
 
 export const loader: LoaderFunction = async ({ request, params }) => {
+  console.log(request);
   const network = params.network ?? "";
   const icons = config.provider_icons;
   const fluidPairs = config.config[network ?? ""].tokens.length;
@@ -55,7 +56,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       count,
     }: { transactions: UserTransaction[]; count: number } = await (
       await fetch(
-        `http://localhost:3000/${network}/query/userTransactions?network=${network}&page=${page}`
+        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
       )
     ).json();
 

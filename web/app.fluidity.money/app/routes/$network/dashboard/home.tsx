@@ -53,7 +53,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       count,
     }: { transactions: UserTransaction[]; count: number } = await (
       await fetch(
-        `http://localhost:3000/${network}/query/userTransactions?network=${network}&page=${page}`
+        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
       )
     ).json();
 
