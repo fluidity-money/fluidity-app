@@ -37,7 +37,6 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 export const unstable_shouldReload = () => false;
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  console.log(request);
   const network = params.network ?? "";
   const icons = config.provider_icons;
   const fluidPairs = config.config[network ?? ""].tokens.length;
