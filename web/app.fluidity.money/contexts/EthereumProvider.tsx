@@ -17,7 +17,7 @@ import makeContractSwap, {
   getUsdAmountMinted,
   usdBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
-import { getTokenFromAddress, Token } from "~/util/chainUtils/tokens";
+import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
 
 const EthereumFacade = ({
@@ -83,7 +83,12 @@ const EthereumFacade = ({
       return 0;
     }
 
-    return await getUsdAmountMinted(signer.provider, contractAddress, tokenAbi, await signer.getAddress());
+    return await getUsdAmountMinted(
+      signer.provider,
+      contractAddress,
+      tokenAbi,
+      await signer.getAddress()
+    );
   };
 
   // swap <symbol> to its counterpart, with amount in its own units
@@ -93,13 +98,12 @@ const EthereumFacade = ({
     contractAddress: string
   ): Promise<void> => {
     const signer = provider?.getSigner();
+
     if (!signer) {
       return;
     }
 
-    const { symbol } = getTokenFromAddress("ethereum", contractAddress) || {};
-
-    const fromToken = tokens.find((t) => t.symbol === symbol);
+    const fromToken = tokens.find((t) => t.address === contractAddress);
 
     if (!fromToken) {
       return;

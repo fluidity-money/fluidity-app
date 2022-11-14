@@ -94,7 +94,7 @@ const trimAddress = (address: string): string => {
 };
 
 const transactionActivityLabel = (
-  activity: { sender: string; currency: string; [key: string]: any },
+  activity: { sender: string; currency: string; [key: string]: unknown },
   address: string
 ) => {
   const { sender, currency } = activity;

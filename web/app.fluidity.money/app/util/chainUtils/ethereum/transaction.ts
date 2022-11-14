@@ -5,7 +5,7 @@ import { Signer, Contract, ContractInterface } from "ethers";
 export const getContract = (
   ABI: ContractInterface,
   address: string,
-  signer?: Signer,
+  signer?: Signer
 ) => {
   return new Contract(address, ABI, signer);
 };
@@ -49,8 +49,10 @@ export const userMintLimitedEnabled = async (
 
   try {
     return await contract.mintLimitsEnabled();
-  }catch(e){console.error(e)}
-    return false
+  } catch (e) {
+    console.error(e);
+  }
+  return false;
 };
 
 // the user mint limit for the contract, regardless of whether it's enabled
@@ -99,7 +101,8 @@ export const getUsdAmountMinted = async (
   userAddress: string
 ): Promise<number> => {
   const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return 0;
+  if (!contract)
+    throw new Error(`Could not instantiate contract ${contractAddress}`);
 
   const amount = (await contract.userAmountMinted(userAddress)).toString();
   const decimals = (await contract.decimals()).toString();

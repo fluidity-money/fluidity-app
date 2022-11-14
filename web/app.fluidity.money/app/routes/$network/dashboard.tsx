@@ -130,7 +130,7 @@ export default function Dashboard() {
     useState<boolean>(false);
 
   // By default, prompt user to connect their wallet
-  const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
+  const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState<boolean>(false);
 
   // Toggle Select Chain Modal
@@ -228,7 +228,7 @@ export default function Dashboard() {
     // take out hard coded address later.
 
     const socket = io();
-        socket.emit("subscribeTransactions", {
+    socket.emit("subscribeTransactions", {
       protocol: network,
       address,
     });
@@ -350,10 +350,9 @@ export default function Dashboard() {
             <ConnectedWallet
               address={trimAddressShort(address.toString())}
               callback={() => {
-                !connectedWalletModalVisibility &&
-                  setconnectedWalletModalVisibility(true);
-                connectedWalletModalVisibility &&
-                  setconnectedWalletModalVisibility(false);
+                setConnectedWalletModalVisibility(
+                  !connectedWalletModalVisibility
+                );
               }}
               className="connect-wallet-btn"
             />
@@ -375,9 +374,9 @@ export default function Dashboard() {
             address={trimAddressShort(address.toString())}
             callback={() => {
               !connectedWalletModalVisibility &&
-                setconnectedWalletModalVisibility(true);
+                setConnectedWalletModalVisibility(true);
               connectedWalletModalVisibility &&
-                setconnectedWalletModalVisibility(false);
+                setConnectedWalletModalVisibility(false);
             }}
             className="connect-wallet-btn"
           />
@@ -469,11 +468,11 @@ export default function Dashboard() {
           visible={connectedWalletModalVisibility}
           address={address ? address.toString() : ""}
           close={() => {
-            setconnectedWalletModalVisibility(false);
+            setConnectedWalletModalVisibility(false);
           }}
           disconnect={() => {
             disconnect?.();
-            setconnectedWalletModalVisibility(false);
+            setConnectedWalletModalVisibility(false);
           }}
         />
         {/* Connect Wallet Modal */}
