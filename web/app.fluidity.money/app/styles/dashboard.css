@@ -548,9 +548,15 @@ main > footer > section > a {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 80%;
+  justify-content: space-between;
 }
 
 .mobile-modal-content > section:first-child {
+  width: 100%;
+}
+
+.mobile-modal-content > section:first-child > section {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -559,7 +565,7 @@ main > footer > section > a {
   align-items: center;
 }
 
-.mobile-modal-content > nav {
+.mobile-modal-content > section:first-child > nav {
   align-self: flex-start;
 }
 

@@ -155,77 +155,86 @@ export default function MobileModal({
           </nav>
 
           <div className="mobile-modal-content">
-            {/* Wallet / Chain */}
             <section>
-              {/* Connect Wallet */}
-              {connected && address ? (
-                <ConnectedWallet
-                  address={trimAddressShort(address.toString())}
-                  callback={() => {
-                    !connectedWalletModalVisibility &&
-                      setconnectedWalletModalVisibility(true);
-                    connectedWalletModalVisibility &&
-                      setconnectedWalletModalVisibility(false);
-                  }}
-                  // className="connect-wallet-btn"
-                />
-              ) : (
-                <GeneralButton
-                  version={connected || connecting ? "transparent" : "primary"}
-                  buttontype="text"
-                  size={"medium"}
-                  handleClick={() =>
-                    connecting ? null : setWalletModalVisibility(true)
-                  }
-                  // className="connect-wallet-btn"
-                >
-                  {connecting ? `Connecting...` : `Connect Wallet`}
-                </GeneralButton>
-              )}
-
-              {/* Chain Switcher */}
-              <ChainSelectorButton
-                chain={chains[network as "ethereum" | "solana"]}
-                onClick={() => setChainModalVisibility(true)}
-              />
-            </section>
-
-            {/* Navigation between pages */}
-            <nav className={"navbar-v2 "}>
-              <ul>
-                {navigationMap.map(
-                  (obj: { name: string; icon: JSX.Element }, index: number) => {
-                    const key = Object.keys(obj)[0];
-                    const { name, icon } = Object.values(obj)[0];
-                    const active = index === activeIndex;
-
-                    return (
-                      <li
-                        key={key}
-                        onClick={() => {
-                          //delay to show page change and allow loading
-                          setTimeout(() => {
-                            setIsOpen(false);
-                          }, 800);
-                        }}
-                      >
-                        {index === activeIndex ? (
-                          <motion.div className={"active"} layoutId="active" />
-                        ) : (
-                          <div />
-                        )}
-                        <Link to={key}>
-                          <Text prominent={active}>
-                            {icon} {name}
-                          </Text>
-                        </Link>
-                      </li>
-                    );
-                  }
+              {/* Wallet / Chain */}
+              <section>
+                {/* Connect Wallet */}
+                {connected && address ? (
+                  <ConnectedWallet
+                    address={trimAddressShort(address.toString())}
+                    callback={() => {
+                      !connectedWalletModalVisibility &&
+                        setconnectedWalletModalVisibility(true);
+                      connectedWalletModalVisibility &&
+                        setconnectedWalletModalVisibility(false);
+                    }}
+                    // className="connect-wallet-btn"
+                  />
+                ) : (
+                  <GeneralButton
+                    version={
+                      connected || connecting ? "transparent" : "primary"
+                    }
+                    buttontype="text"
+                    size={"medium"}
+                    handleClick={() =>
+                      connecting ? null : setWalletModalVisibility(true)
+                    }
+                    // className="connect-wallet-btn"
+                  >
+                    {connecting ? `Connecting...` : `Connect Wallet`}
+                  </GeneralButton>
                 )}
-              </ul>
-            </nav>
 
+                {/* Chain Switcher */}
+                <ChainSelectorButton
+                  chain={chains[network as "ethereum" | "solana"]}
+                  onClick={() => setChainModalVisibility(true)}
+                />
+              </section>
+
+              {/* Navigation between pages */}
+              <nav className={"navbar-v2 "}>
+                <ul>
+                  {navigationMap.map(
+                    (
+                      obj: { name: string; icon: JSX.Element },
+                      index: number
+                    ) => {
+                      const key = Object.keys(obj)[0];
+                      const { name, icon } = Object.values(obj)[0];
+                      const active = index === activeIndex;
+
+                      return (
+                        <li
+                          key={key}
+                          onClick={() => {
+                            //delay to show page change and allow loading
+                            setTimeout(() => {
+                              setIsOpen(false);
+                            }, 800);
+                          }}
+                        >
+                          {index === activeIndex ? (
+                            <motion.div
+                              className={"active"}
+                              layoutId="active"
+                            />
+                          ) : (
+                            <div />
+                          )}
+                          <Link to={key}>
+                            <Text prominent={active}>
+                              {icon} {name}
+                            </Text>
+                          </Link>
+                        </li>
+                      );
+                    }
+                  )}
+                </ul>
+              </nav>
+            </section>
             <section className="mobile-modal-bottom">
               {/* Unclaimed Winnings */}
               <GeneralButton
@@ -242,9 +251,8 @@ export default function MobileModal({
               >
                 <Text size="lg" prominent={true}>
                   Unclaimed $FLUID{" "}
-                  <Heading as="h4" className="no-margin">
-                    $6,475.00
-                    {/* {unclaimedFluid} dummy data above for styling */}
+                  <Heading as="h5" className="no-margin">
+                    {unclaimedFluid}
                   </Heading>
                 </Text>
               </GeneralButton>
