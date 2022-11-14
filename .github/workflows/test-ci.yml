@@ -42,7 +42,6 @@ jobs:
         with: 
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
-
   test-contracts:
     runs-on: ubuntu-latest
     steps:
