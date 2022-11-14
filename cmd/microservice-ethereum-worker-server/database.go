@@ -6,10 +6,14 @@ package main
 
 import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
 func addAndComputeAverageAtx(blockNumber uint64, tokenShortName string, transfers, limit int) (int, []uint64, []int) {
+	log.Debug(func (k *log.Log) {
+		k.Message = "About to insert a transaction count into timescale!"
+	})
 
 	worker.InsertTransactionCount(
 		blockNumber,
@@ -17,6 +21,10 @@ func addAndComputeAverageAtx(blockNumber uint64, tokenShortName string, transfer
 		transfers,
 		network.NetworkEthereum,
 	)
+
+	log.Debug(func (k *log.Log) {
+		k.Message = "About to get average atx from timescale!"
+	})
 
 	return worker.GetAverageAtx(
 		tokenShortName,
