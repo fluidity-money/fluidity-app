@@ -43,6 +43,8 @@ const OptionsSchema = z.object({
             isFluidOf: z.string().optional(),
             obligationAccount: z.string().optional(),
             dataAccount: z.string().optional(),
+            decimals: z.number(),
+            userMintLimit: z.number().optional(),
           })
         )
         .min(1),
