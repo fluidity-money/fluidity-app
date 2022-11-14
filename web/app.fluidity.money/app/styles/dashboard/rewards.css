@@ -273,6 +273,10 @@
   #infobox {
     padding: 0.5em;
   }
+
+  #spend-to-earn {
+    align-items: center;
+  }
 }
 
 @media (max-width: 500px) {
