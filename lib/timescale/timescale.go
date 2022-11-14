@@ -37,7 +37,7 @@ func Client() *sql.DB {
 	if (!ok) {
 		log.Debug(func (k *log.Log) {
 			k.Context = Context
-			k.Message = "Postgres client being acquired by an unknown caller..."
+			k.Message = "Timescale client being acquired by an unknown caller..."
 		})
 	} else {
 		details := runtime.FuncForPC(pc)
@@ -45,7 +45,7 @@ func Client() *sql.DB {
 		log.Debug(func (k *log.Log) {
 			k.Context = Context
 			k.Format(
-				"Postgres client being acquired by %s, %s:%d",
+				"Timescale client being acquired by %s, %s:%d",
 				details.Name(),
 				file,
 				linenum,
