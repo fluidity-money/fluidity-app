@@ -1,11 +1,11 @@
-import { Provider } from "@ethersproject/providers";
+import { JsonRpcProvider, Provider } from "@ethersproject/providers";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
 
 export const getContract = (
-  signer: Signer,
+  ABI: ContractInterface,
   address: string,
-  ABI: ContractInterface
+  signer?: Signer,
 ) => {
   return new Contract(address, ABI, signer);
 };
@@ -16,7 +16,7 @@ export const getBalanceOfERC20 = async (
   contractAddress: string,
   ABI: ContractInterface
 ) => {
-  const contract = getContract(signer, contractAddress, ABI);
+  const contract = getContract(ABI, contractAddress, signer);
   if (!contract) return "0";
   const userAddress = await signer.getAddress();
   return (await contract.balanceOf(userAddress)).toString();
@@ -28,7 +28,7 @@ export const usdBalanceOfERC20 = async (
   contractAddress: string,
   ABI: ContractInterface
 ): Promise<number> => {
-  const contract = getContract(signer, contractAddress, ABI);
+  const contract = getContract(ABI, contractAddress, signer);
   if (!contract) return 0;
 
   const userAddress = await signer.getAddress();
@@ -40,33 +40,37 @@ export const usdBalanceOfERC20 = async (
 
 // whether the per-user mint limit is enabled for the contract
 export const userMintLimitedEnabled = async (
-  signer: Signer,
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
 ): Promise<boolean> => {
-  const contract = getContract(signer, contractAddress, ABI);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return false;
-  return await contract.mintLimitsEnabled();
+
+  try {
+    return await contract.mintLimitsEnabled();
+  }catch(e){console.error(e)}
+    return false
 };
 
 // the user mint limit for the contract, regardless of whether it's enabled
 export const getUserMintLimit = async (
-  signer: Signer,
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
 ): Promise<string> => {
-  const contract = getContract(signer, contractAddress, ABI);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return "0";
   return (await contract.userMintLimit()).toString();
 };
 
 // the user mint limit for the contract scaled by decimals, regardless of whether it's enabled
 export const getUsdUserMintLimit = async (
-  signer: Signer,
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
 ): Promise<number> => {
-  const contract = getContract(signer, contractAddress, ABI);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return 0;
 
   const limit = (await contract.userMintLimit()).toString();
@@ -77,14 +81,30 @@ export const getUsdUserMintLimit = async (
 
 // the amount towards the mint limit the given user has currently minted
 export const getAmountMinted = async (
-  signer: Signer,
+  provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface,
   userAddress: string
 ): Promise<string> => {
-  const contract = getContract(signer, contractAddress, ABI);
+  const contract = new Contract(contractAddress, ABI, provider);
   if (!contract) return "0";
   return (await contract.userAmountMinted(userAddress)).toString();
+};
+
+// the amount towards the mint limit the given user has currently minted scaled by decimals
+export const getUsdAmountMinted = async (
+  provider: JsonRpcProvider,
+  contractAddress: string,
+  ABI: ContractInterface,
+  userAddress: string
+): Promise<number> => {
+  const contract = new Contract(contractAddress, ABI, provider);
+  if (!contract) return 0;
+
+  const amount = (await contract.userAmountMinted(userAddress)).toString();
+  const decimals = (await contract.decimals()).toString();
+
+  return Number(utils.formatUnits(amount, decimals));
 };
 
 export type ContractToken = {
@@ -103,8 +123,8 @@ const makeContractSwap = async (
   const { address: fromAddress, ABI: fromABI, isFluidOf: fromIsFluidOf } = from;
   const { address: toAddress, ABI: toABI, isFluidOf: toIsFluidOf } = to;
 
-  const fromContract = getContract(signer, fromAddress, fromABI);
-  const toContract = getContract(signer, toAddress, toABI);
+  const fromContract = getContract(fromABI, fromAddress, signer);
+  const toContract = getContract(toABI, toAddress, signer);
   const amountBn = utils.parseUnits(String(amount));
 
   if (amountBn.eq(0)) {
