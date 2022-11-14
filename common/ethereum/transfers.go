@@ -71,10 +71,9 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			continue
 		}
 
-		// Remove padding 0x from addresses
 		var (
-			fromAddress_ = topics[1].String()[26:]
-			toAddress_   = topics[2].String()[26:]
+			fromAddress_ = topics[1].String()
+			toAddress_   = topics[2].String()
 		)
 
 		fromAddress := ethereum.AddressFromString(fromAddress_)

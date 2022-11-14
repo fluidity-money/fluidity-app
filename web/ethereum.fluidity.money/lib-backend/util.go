@@ -91,12 +91,3 @@ func graphQLErrorLogHandler(w http.ResponseWriter, r *http.Request, msg []gqlerr
 
 	w.WriteHeader(http.StatusBadRequest)
 }
-
-// addressRequestToEthereumAddress for addresses that are stored without the 0x prefix
-// (only pending rewards/manual rewards)
-func addressRequestToEthereumAddress(addressString string) typesEthereum.Address {
-	if strings.HasPrefix(addressString, "0x") {
-		addressString = addressString[2:]
-	}
-	return typesEthereum.AddressFromString(addressString)
-}
