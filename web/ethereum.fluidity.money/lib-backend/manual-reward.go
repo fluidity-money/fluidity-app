@@ -17,6 +17,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/web"
@@ -164,8 +165,8 @@ func GetManualRewardHandler(tokens map[string]ethCommon.Address, chainid *misc.B
 		}
 
 		var (
-			address       = addressRequestToEthereumAddress(request.Address)
-			addressString = address.String()
+			addressString = request.Address
+			address       = ethTypes.AddressFromString(addressString)
 
 			token = request.TokenShortName
 		)
