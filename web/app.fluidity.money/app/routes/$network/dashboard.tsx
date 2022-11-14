@@ -228,7 +228,7 @@ export default function Dashboard() {
     // take out hard coded address later.
 
     const socket = io();
-        socket.emit("subscribeTransactions", {
+    socket.emit("subscribeTransactions", {
       protocol: network,
       address,
     });

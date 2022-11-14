@@ -15,8 +15,8 @@ import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
   getTransactionsObservableForIn,
-	Query,
-	createSubscriptionObservable
+  Query,
+  createSubscriptionObservable,
 } from "./drivers";
 
 const app = express();
@@ -111,16 +111,14 @@ io.on("connection", (socket) => {
       })
     );
 
-		//subscribe to hasura events and send to client
-		const subscriptionClient = createSubscriptionObservable(
-			{}
-		)
-		subscriptionClient.subscribe(eventData => {
-			console.log(eventData);
-		}, (err) => {
-
-		});
-
+    //subscribe to hasura events and send to client
+    const subscriptionClient = createSubscriptionObservable({});
+    subscriptionClient.subscribe(
+      (eventData) => {
+        console.log(eventData);
+      },
+      (err) => {}
+    );
   });
 
   socket.on("disconnect", () => {
