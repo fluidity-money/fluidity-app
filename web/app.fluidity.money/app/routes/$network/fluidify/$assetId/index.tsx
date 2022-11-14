@@ -164,6 +164,8 @@ export default function FluidifyToken() {
 
   const { width } = useViewport();
 
+  const navigate = useNavigate();
+
   const isTablet = width < 1200;
 
   const fluidTokenAddress = useMemo(
@@ -268,8 +270,6 @@ export default function FluidifyToken() {
     const rawTokenAmount = `${Math.floor(
       swapAmount * 10 ** assetToken.decimals
     )}`;
-
-    const navigate = useNavigate();
 
     setSwapping(true);
 
