@@ -117,7 +117,9 @@ io.on("connection", (socket) => {
       (eventData) => {
         console.log(eventData);
       },
-      (err) => {}
+      (err) => {
+        console.log("Error: " + err);
+      }
     );
   });
 
