@@ -172,8 +172,7 @@ type LoaderData = {
   gasFee: number;
 };
 
-function ErrorBoundary(blah: any) {
-  console.log(blah)
+function ErrorBoundary() {
   return (
     <div
       className="pad-main"
@@ -410,7 +409,7 @@ export default function Rewards() {
         </motion.tr>
       );
     };
-  
+
   return (
     <div className="pad-main">
       {/* Info Cards */}

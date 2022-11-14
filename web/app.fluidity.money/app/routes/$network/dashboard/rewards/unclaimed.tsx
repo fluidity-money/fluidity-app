@@ -105,14 +105,10 @@ const RewardRow = (chain: Chain): IRow<UserUnclaimedReward> =>
   };
 
 const UnclaimedWinnings = () => {
-  const {
-    network,
-    networkFee,
-    gasFee,
-  } = useLoaderData<LoaderData>();
+  const { network, networkFee, gasFee } = useLoaderData<LoaderData>();
 
   const { connected, address } = useContext(FluidityFacadeContext);
-  
+
   const [
     { userUnclaimedRewards, unclaimedTxs, count },
     setUnclaimedRewardsRes,
@@ -133,7 +129,7 @@ const UnclaimedWinnings = () => {
   const _pageStr = _pageMatches?.length ? _pageMatches[0].split("=")[1] : "";
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
-  
+
   useEffect(() => {
     if (!connected || !address) return;
 
