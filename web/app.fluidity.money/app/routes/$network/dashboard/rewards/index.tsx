@@ -17,7 +17,7 @@ import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
 import { captureException } from "@sentry/react";
 import { useUserUnclaimedRewards, useUserRewards } from "~/queries";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useLocation } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
@@ -172,7 +172,8 @@ type LoaderData = {
   gasFee: number;
 };
 
-function ErrorBoundary() {
+function ErrorBoundary(blah: any) {
+  console.log(blah)
   return (
     <div
       className="pad-main"
@@ -204,6 +205,8 @@ export default function Rewards() {
   } = useLoaderData<LoaderData>();
 
   const { connected, address } = useContext(FluidityFacadeContext);
+
+  const location = useLocation();
 
   const pageRegex = /page=[0-9]+/gi;
   const _pageMatches = location.search.match(pageRegex);
@@ -407,7 +410,7 @@ export default function Rewards() {
         </motion.tr>
       );
     };
-
+  
   return (
     <div className="pad-main">
       {/* Info Cards */}

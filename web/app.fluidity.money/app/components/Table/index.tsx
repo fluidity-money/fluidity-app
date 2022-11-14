@@ -41,8 +41,7 @@ type ITable<T> = {
 };
 
 const Table = <T,>(props: ITable<T>) => {
-  const { itemName, pagination, data, renderRow, count, headings, filters } =
-    props;
+  const { itemName, pagination, data, renderRow, headings, filters } = props;
 
   const { rowsPerPage, page } = pagination;
 
@@ -185,7 +184,6 @@ const Table = <T,>(props: ITable<T>) => {
             </Link>
 
             <Link
-              reloadDocument={false}
               to={
                 page === pageCount
                   ? ""
