@@ -1,6 +1,7 @@
 DOCKER_IMAGE: microservice-ethereum-worker-server
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-server
 ENV_FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
 
 SERVICES:

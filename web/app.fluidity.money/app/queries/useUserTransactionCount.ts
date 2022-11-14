@@ -1,6 +1,6 @@
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
 
-const query: Queryable = {
+const queryByAddress: Queryable = {
   ethereum: gql`
     query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
       ethereum {
@@ -30,10 +30,38 @@ const query: Queryable = {
   `,
 };
 
-type UserTransactionCountBody = {
+const queryAll: Queryable = {
+  ethereum: gql`
+    query getTransactionCount($fluidCurrencies: [String!]) {
+      ethereum {
+        transfers(currency: { in: $fluidCurrencies }) {
+          count
+        }
+      }
+    }
+  `,
+  solana: gql`
+    query getTransactionCount($fluidCurrencies: [String!]) {
+      solana {
+        transfers(currency: { in: $fluidCurrencies }) {
+          count
+        }
+      }
+    }
+  `,
+};
+
+type UserTransactionCountByAddressBody = {
   query: string;
   variables: {
     address: string;
+    fluidCurrencies: string[];
+  };
+};
+
+type UserTransactionCountAllBody = {
+  query: string;
+  variables: {
     fluidCurrencies: string[];
   };
 };
@@ -49,18 +77,18 @@ export type UserTransactionCountRes = {
   errors?: unknown;
 };
 
-const useUserTransactionCount = (network: string, address: string) => {
+const useUserTransactionByAddressCount = (network: string, address: string) => {
   const variables = {
     address: address,
     fluidCurrencies: getTokenForNetwork(network),
   };
 
   const body = {
-    query: query[network],
+    query: queryByAddress[network],
     variables,
   };
 
-  return jsonPost<UserTransactionCountBody, UserTransactionCountRes>(
+  return jsonPost<UserTransactionCountByAddressBody, UserTransactionCountRes>(
     "https://graphql.bitquery.io",
     body,
     {
@@ -69,4 +97,23 @@ const useUserTransactionCount = (network: string, address: string) => {
   );
 };
 
-export default useUserTransactionCount;
+const useUserTransactionAllCount = (network: string) => {
+  const variables = {
+    fluidCurrencies: getTokenForNetwork(network),
+  };
+
+  const body = {
+    query: queryAll[network],
+    variables,
+  };
+
+  return jsonPost<UserTransactionCountAllBody, UserTransactionCountRes>(
+    "https://graphql.bitquery.io",
+    body,
+    {
+      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+    }
+  );
+};
+
+export { useUserTransactionAllCount, useUserTransactionByAddressCount };

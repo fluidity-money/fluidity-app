@@ -16,7 +16,7 @@ env:
   ENVIRONMENT: dev
 
 jobs:
- cut-lib-release:
+  cut-lib-release:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: dev
@@ -64,7 +64,8 @@ jobs:
           git config user.email "noreply@fluidity.money"
           git commit -m "Bump Surfing version"
           git push origin develop
- build-and-deploy:
+
+  get-diff:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: dev
@@ -86,18 +87,34 @@ jobs:
         with:
           command: |
             flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+
+  deploy-web:
+    runs-on: ubuntu-latest
+    environment: dev 
+    needs: [get-diff]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+          lfs: true
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ap-southeast-2
+          role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
+          role-duration-seconds: 7200 #seconds
       - name: Build
         id: build
         uses: ./scripts/actions
         with:
           command: |
-            flu build-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+            flu build-diff --network fluidity --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
-            flu deploy-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+            flu deploy-diff --network fluidity --environment $ENVIRONMENT --tag $GITHUB_SHA
       - name: Discord
         uses: ./scripts/actions
         if: always()

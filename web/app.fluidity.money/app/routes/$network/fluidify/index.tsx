@@ -1,13 +1,22 @@
-import type { Token } from "~/util/chainUtils/tokens";
-
-import { Display, Text } from "@fluidity-money/surfing";
+import {
+  Display,
+  Text,
+  ManualCarousel,
+  GeneralButton,
+  LinkButton,
+} from "@fluidity-money/surfing";
+import useViewport from "~/hooks/useViewport";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
-import { useEffect, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
+import { useContext, useEffect, useState } from "react";
 import DragCard from "~/components/DragCard";
+import ConnectedWallet from "~/components/ConnectedWallet";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
+import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 
 import styles from "~/styles/fluidify.css";
 
@@ -15,9 +24,12 @@ import styles from "~/styles/fluidify.css";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import config, { colors } from "~/webapp.config.server";
+import { Token } from "~/util/chainUtils/tokens";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
+
+  const ethereumWallets = config.config["ethereum"].wallets;
 
   const {
     config: {
@@ -26,6 +38,8 @@ export const loader: LoaderFunction = async ({ params }) => {
   } = config;
 
   return json({
+    network,
+    ethereumWallets,
     tokens,
     colors: (await colors)[network as string],
   });
@@ -68,6 +82,11 @@ function ErrorBoundary() {
 
 const FluidityHotSpot = () => {
   const navigate = useNavigate();
+
+  const { width } = useViewport();
+
+  const isTablet = width < 1200;
+
   const [{ canDrop }, drop] = useDrop(() => ({
     accept: [ItemTypes.ASSET, ItemTypes.FLUID_ASSET],
     drop: ({ symbol }: Token) => navigate(`${symbol}`),
@@ -93,7 +112,7 @@ const FluidityHotSpot = () => {
           )}
         </span>
       </div>
-      {!canDrop && (
+      {!canDrop && !isTablet && (
         <span className={"center-text"}>
           <Text size={"xs"}>
             Fluidity employ daily limits on fluidifying assets for
@@ -114,6 +133,22 @@ const FluidityHotSpot = () => {
 
 export default function FluidityMaster() {
   const { tokens, colors } = useLoaderData<LoaderData>();
+
+  const { address, connected, connecting, disconnect } = useContext(
+    FluidityFacadeContext
+  );
+
+  const { width } = useViewport();
+
+  const isTablet = width < 1200;
+
+  const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
+    useState(false);
+  const [walletModalVisibility, setWalletModalVisibility] = useState(false);
+
+  useEffect(() => {
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
 
   const [search, setSearch] = useState("");
 
@@ -140,32 +175,114 @@ export default function FluidityMaster() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <header className={"fluidify-heading"}>
+        <section>
+          <Display size="xs" style={{ margin: 0 }}>
+            Create or revert fluid assets
+          </Display>
+
+          {connected && address ? (
+            <ConnectedWallet
+              address={address.toString()}
+              callback={() => {
+                setConnectedWalletModalVisibility(
+                  !connectedWalletModalVisibility
+                );
+              }}
+              className="connect-wallet-btn"
+            />
+          ) : (
+            <GeneralButton
+              version={connected || connecting ? "transparent" : "primary"}
+              buttontype="text"
+              size={"medium"}
+              handleClick={() =>
+                connecting ? null : setWalletModalVisibility(true)
+              }
+              className="connect-wallet-btn"
+            >
+              {connecting ? `Connecting...` : `Connect Wallet`}
+            </GeneralButton>
+          )}
+
+          {/* Connected Wallet Modal */}
+          <ConnectedWalletModal
+            visible={connectedWalletModalVisibility}
+            address={address ? address.toString() : ""}
+            close={() => {
+              setConnectedWalletModalVisibility(false);
+            }}
+            disconnect={() => {
+              disconnect?.();
+              setConnectedWalletModalVisibility(false);
+            }}
+          />
+
+          {/* Connect Wallet Modal */}
+          <ConnectWalletModal
+            visible={walletModalVisibility}
+            close={() => setWalletModalVisibility(false)}
+          />
+        </section>
+        <Link to="../..">
+          <LinkButton handleClick={() => null} size="large" type="internal">
+            Close
+          </LinkButton>
+        </Link>
+      </header>
+
+      {/* Token List */}
       <div className={"fluidify-container"}>
-        <aside>
-          <Display style={{ margin: 0 }}>Create or revert fluid assets</Display>
+        <aside className={"fluidify-tokens-container"}>
           <input
+            className={"search-bar"}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search your assets"
           />
-          {filteredTokens
-            .filter(() => {
-              return true;
-            })
-            .map(({ address, name, symbol, logo, isFluidOf }) => {
-              return (
-                <DragCard
-                  key={symbol}
-                  fluid={isFluidOf !== undefined}
-                  symbol={symbol}
-                  name={name}
-                  logo={logo}
-                  address={address}
-                  color={colors[symbol]}
-                  amount={0}
-                />
-              );
-            })}
+          {isTablet ? (
+            <ManualCarousel>
+              {filteredTokens
+                .filter(() => {
+                  return true;
+                })
+                .map(({ address, name, symbol, logo, isFluidOf }) => {
+                  return (
+                    <DragCard
+                      key={symbol}
+                      fluid={isFluidOf !== undefined}
+                      symbol={symbol}
+                      name={name}
+                      logo={logo}
+                      address={address}
+                      color={colors[symbol]}
+                      amount={0}
+                    />
+                  );
+                })}
+            </ManualCarousel>
+          ) : (
+            <div className="fluidify-tokens">
+              {filteredTokens
+                .filter(() => {
+                  return true;
+                })
+                .map(({ address, name, symbol, logo, isFluidOf }) => {
+                  return (
+                    <DragCard
+                      key={symbol}
+                      fluid={isFluidOf !== undefined}
+                      symbol={symbol}
+                      name={name}
+                      logo={logo}
+                      address={address}
+                      color={colors[symbol]}
+                      amount={0}
+                    />
+                  );
+                })}
+            </div>
+          )}
         </aside>
 
         {/* Swap Circle */}

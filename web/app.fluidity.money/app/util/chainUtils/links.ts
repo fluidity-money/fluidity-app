@@ -5,6 +5,11 @@ const getAddressExplorerLink = (chain: Chain, address: string) =>
     ? `https://etherscan.io/address/${address}`
     : `https://explorer.solana.com/address/${address}`;
 
+const getTxExplorerLink = (chain: Chain, address: string) =>
+  chain === "ethereum"
+    ? `https://etherscan.io/tx/${address}`
+    : `https://explorer.solana.com/tx/${address}`;
+
 const networkMapper = (network: string) => {
   switch (network) {
     case "ETH":
@@ -18,4 +23,4 @@ const networkMapper = (network: string) => {
   }
 };
 
-export { getAddressExplorerLink, networkMapper };
+export { getAddressExplorerLink, getTxExplorerLink, networkMapper };
