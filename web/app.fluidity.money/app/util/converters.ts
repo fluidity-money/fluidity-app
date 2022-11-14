@@ -1,3 +1,5 @@
+import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
+
 const B64ToUint8Array = (b64string: string): Uint8Array =>
   Buffer.from(b64string, "base64");
 
@@ -9,7 +11,7 @@ export { B64ToUint8Array };
  * @param decimalPlaces number of decimals
  * @returns display string with decimal place
  */
-export const shorthandAmountFormatter = (
+const shorthandAmountFormatter = (
   uiAmount: string,
   decimalPlaces: number
 ): string => {
@@ -41,7 +43,7 @@ export const shorthandAmountFormatter = (
  * @param decimals number of decimals
  * @returns display string with decimal place
  */
-export const amountToDecimalString = (amount: string, decimals: number) => {
+const amountToDecimalString = (amount: string, decimals: number) => {
   const a = amount.slice(0, -decimals);
   const b = amount.slice(-decimals);
   let result = "";
@@ -55,7 +57,7 @@ export const amountToDecimalString = (amount: string, decimals: number) => {
  * @param value decimal amount string
  * @returns value without any trailing (i.e. unnecessary) zeros
  */
-export const clearTrailingZeros = (value: string) => {
+const clearTrailingZeros = (value: string) => {
   // remove trailing zeros by finding a position to trim to
   let lastChar = value.length - 1;
   let decimalPos = value.indexOf(".");
@@ -83,10 +85,42 @@ export const clearTrailingZeros = (value: string) => {
  * @param address string
  * @returns abbrevates long addresses e.g 0x1234567890 converted to 0x123...890
  */
-export const trimAddress = (address: string): string => {
+const trimAddress = (address: string): string => {
   const leftSide = address.slice(0, 4);
 
   const rightSide = address.slice(-4);
 
   return leftSide + "..." + rightSide;
+};
+
+const transactionActivityLabel = (
+  activity: { sender: string; currency: string; [key: string]: any },
+  address: string
+) => {
+  const { sender, currency } = activity;
+  return sender === address ? `Sent ${currency}` : `Received ${currency}`;
+};
+
+const transactionTimeLabel = (timestamp: number) => {
+  const isTransactionToday = isToday(timestamp * 1000);
+  const isTransactionYesterday = isYesterday(timestamp * 1000);
+
+  if (isTransactionToday)
+    return formatDistanceToNow(timestamp * 1000, {
+      addSuffix: true,
+    });
+
+  if (isTransactionYesterday)
+    return `Yesterday ${format(timestamp * 1000, "h:mmaaa")}`;
+
+  return format(timestamp * 1000, "dd.MM.yy h:mmaaa");
+};
+
+export {
+  shorthandAmountFormatter,
+  amountToDecimalString,
+  clearTrailingZeros,
+  trimAddress,
+  transactionActivityLabel,
+  transactionTimeLabel,
 };
