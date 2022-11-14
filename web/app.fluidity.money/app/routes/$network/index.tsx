@@ -113,6 +113,22 @@ const NetworkPage = () => {
     connected && setWalletModalVisibility(false);
   }, [connected]);
 
+  const generateTweet = () => {
+    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
+
+    // const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
+
+    const tweetMsg = `Fluidify your money with Fluidity`;
+
+    twitterUrl.searchParams.set("text", tweetMsg);
+
+    const fluTwitterHandle = `fluiditymoney`;
+
+    twitterUrl.searchParams.set("via", fluTwitterHandle);
+
+    return twitterUrl.href;
+  };
+
   return (
     <>
       {connected && !loading && (
@@ -254,18 +270,24 @@ const NetworkPage = () => {
                 FLUIDIFY MONEY
               </GeneralButton>
 
-              <GeneralButton
-                className="share-button"
-                size="large"
-                version="transparent"
-                buttontype="icon before"
-                icon={<Twitter />}
-                handleClick={() => {
-                  return;
-                }}
+              <a
+                href={generateTweet()}
+                rel="noopener noreferrer"
+                target="_blank"
               >
-                SHARE
-              </GeneralButton>
+                <GeneralButton
+                  className="share-button"
+                  size="large"
+                  version="transparent"
+                  buttontype="icon before"
+                  icon={<Twitter />}
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  SHARE
+                </GeneralButton>
+              </a>
             </div>
           </div>
         </div>
