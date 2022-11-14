@@ -7,9 +7,7 @@ package api_fluidity_money
 import (
 	"math/big"
 	"net/http"
-	"strings"
 
-	typesEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/graphql-go/graphql/gqlerrors"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
