@@ -81,16 +81,23 @@ main > footer > section {
   margin-top: 2.25em;
 }
 
-#flu-logo > img {
+#flu-logo > a > img {
   width: 5em;
-}
-
-#flu-logo > * {
   margin-bottom: 1em;
+  cursor: pointer;
 }
 
-#top-navbar > img {
+#flu-logo > a > img:hover {
+  opacity: 0.8;
+}
+
+#top-navbar > a > img {
   width: 5em;
+  cursor: pointer;
+}
+
+#top-navbar > a > img:hover {
+  opacity: 0.8;
 }
 
 .top-navbar-left {
@@ -98,8 +105,13 @@ main > footer > section {
   align-items: center;
 }
 
-.top-navbar-left > img {
+.top-navbar-left > a > img {
   width: 5em;
+  cursor: pointer;
+}
+
+.top-navbar-left > a > img:hover {
+  opacity: 0.8;
 }
 
 /* .navbar-v2 {

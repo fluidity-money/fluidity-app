@@ -118,7 +118,16 @@ export default function MobileModal({
           <nav id="mobile-top-navbar" className={"pad-main"}>
             {/* Logo */}
             <div className="top-navbar-left">
-              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+              <a
+                onClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
+                  navigate("./home");
+                }}
+              >
+                <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+              </a>
             </div>
 
             {/* Navigation Buttons */}
