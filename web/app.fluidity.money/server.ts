@@ -104,10 +104,9 @@ io.on("connection", (socket) => {
         socket.emit("Transactions", transaction);
       })
     );
-    console.log(hasuraUrl);
+
     DbTransactionsObservable.subscribe({
       next(data) {
-        console.log("got value from rewards" + data.transactionHash);
         socket.emit("Transactions", data);
       },
       error(err) {

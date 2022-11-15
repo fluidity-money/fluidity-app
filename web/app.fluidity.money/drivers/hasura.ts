@@ -11,7 +11,7 @@ import { amountToDecimalString } from "~/util";
 const hasuraUri = "https://fluidity.hasura.app/v1/graphql";
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
-    winners(where: { winning_address: { _eq: $address } }, limit: 10) {
+    winners(where: { winning_address: { _eq: $address } }, limit: 1, order_by: {created: desc}) {
       created
       transaction_hash
       network

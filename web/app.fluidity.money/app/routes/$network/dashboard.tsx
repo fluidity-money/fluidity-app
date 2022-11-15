@@ -242,7 +242,8 @@ export default function Dashboard() {
       address,
     });
 
-    socket.on("Transactions", (log: PipedTransaction) => {
+    setTimeout(() => {
+     socket.on("Transactions", (log: PipedTransaction) => {
       const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
         (entry) => entry.symbol === log.token
       );
@@ -253,15 +254,16 @@ export default function Dashboard() {
           tokenLogoSrc={fToken.at(0)?.logo}
           boldTitle={log.amount + ` ` + log.token}
           details={
-            log.source === address
-              ? `Sent to ` + trimAddress(log.destination)
-              : `Received from ` + trimAddress(log.source)
+            log.type === 'rewardDB'
+              ? `reward for sending`
+							: `received from ` + trimAddress(log.source)
           }
-          linkLabel={"ASSETS"}
+          linkLabel={"DETAILS"}
           linkUrl={"#"}
         />
       );
     });
+   }, 30000);
   }, [address]);
 
   const handleScroll = () => {
