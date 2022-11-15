@@ -5,13 +5,15 @@
 package main
 
 import (
+	"crypto/ecdsa"
 	_ "embed"
 	"math/big"
+	"strings"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
@@ -22,8 +24,8 @@ const (
 	// EnvEthereumHttpUrl to use to connect to Geth to send amounts
 	EnvEthereumHttpUrl = "FLU_ETHEREUM_HTTP_URL"
 
-	// EnvPrivateKey to use when signing requests to update the mint limits
-	EnvPrivateKey = `FLU_ETHEREUM_WORKER_PRIVATE_KEY`
+	// EnvPrivateKeys to use when signing requests to update the mint limits per contract
+	EnvPrivateKeys = `FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST`
 )
 
 var (
@@ -37,25 +39,38 @@ var (
 var (
 	// ScheduleGlobalMintLimit to use for relaxing the global mint limit based
 	// on the day (UTC)
-	ScheduleGlobalMintLimit map[string]map[string]string
+	ScheduleGlobalMintLimit = make(map[string]map[string]string)
 
 	// ScheduleUserMintLimit to use for relaxing the user mint limit
-	ScheduleUserMintLimit map[string]map[string]string
+	ScheduleUserMintLimit = make(map[string]map[string]string)
 )
 
 func main() {
 	var (
-		privateKey_     = util.GetEnvOrFatal(EnvPrivateKey)
+		privateKeys_    = util.GetEnvOrFatal(EnvPrivateKeys)
 		ethereumHttpUrl = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 	)
 
-	privateKey, err := ethCrypto.HexToECDSA(privateKey_)
+	privateKeys := make(map[string]*ecdsa.PrivateKey)
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to convert the private key passed to a private key!"
-			k.Payload = err
-		})
+	for _, split := range strings.Split(privateKeys_, ",") {
+		s := strings.Split(split, ":")
+
+		var (
+			contractAddress = s[0]
+			privateKey_     = s[1]
+		)
+
+		privateKey, err := ethCrypto.HexToECDSA(privateKey_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert the private key passed to a private key!"
+				k.Payload = err
+			})
+		}
+
+		privateKeys[contractAddress] = privateKey
 	}
 
 	ethClient, err := ethclient.Dial(ethereumHttpUrl)
@@ -91,11 +106,28 @@ func main() {
 		})
 	}
 
-	for contractAddress_, _ := range globalMintLimits {
-		var (
-			globalMintLimit_ = globalMintLimits[contractAddress_]
-			userMintLimit_   = userMintLimits[contractAddress_]
-		)
+	for contractAddress_, globalMintLimit_ := range globalMintLimits {
+		userMintLimit_, ok := userMintLimits[contractAddress_]
+
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get the user mint limit for contract %v!",
+					contractAddress_,
+				)
+			})
+		}
+
+		privateKey, ok := privateKeys[contractAddress_]
+
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get the private key for contract %v!",
+					contractAddress_,
+				)
+			})
+		}
 
 		contractAddress := ethCommon.HexToAddress(contractAddress_)
 
