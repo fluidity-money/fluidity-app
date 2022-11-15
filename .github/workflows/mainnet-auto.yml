@@ -40,6 +40,7 @@ jobs:
         with:
           name: diff-artifact
           path: ./deployment_list.json
+          if-no-files-found: error
 
 
   deploy-solana:
@@ -60,6 +61,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: diff-artifact
+          path: .
       - name: Build
         id: build
         uses: ./scripts/actions
@@ -99,6 +101,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: diff-artifact
+          path: .
       - name: Build
         id: build
         uses: ./scripts/actions
@@ -138,6 +141,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: diff-artifact
+          path: .
       - name: Build
         id: build
         uses: ./scripts/actions
@@ -177,6 +181,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: diff-artifact
+          path: .
       - name: Build
         id: build
         uses: ./scripts/actions
