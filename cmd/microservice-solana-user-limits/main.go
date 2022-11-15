@@ -19,19 +19,19 @@ func main() {
 
 type RequestMyMintLimit struct {
 	Address   string `json:"address"`
-    TokenName string `json:"token_short_name"`
+	TokenName string `json:"token_short_name"`
 }
 
 type ResponseMyMintLimit struct {
-    AmountMinted  float64 `json:"amount_minted"`
-    MintLimit     string  `json:"mint_limit"`
-    TokenName     string  `json:"token_short_name"`
+	AmountMinted float64 `json:"amount_minted"`
+	MintLimit    string  `json:"mint_limit"`
+	TokenName    string  `json:"token_short_name"`
 }
 
 func HandleMyMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 	var (
 		ipAddress = web.GetIpAddress(r)
-		request RequestMyMintLimit
+		request   RequestMyMintLimit
 	)
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -46,23 +46,23 @@ func HandleMyMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 			k.Payload = err
 		})
 
-        w.WriteHeader(http.StatusForbidden)
-        return nil
+		w.WriteHeader(http.StatusForbidden)
+		return nil
 	}
 
-    amountMinted := solana.GetUserAmountMinted(request.Address)
-    limit := solana.GetUserMintLimit(request.TokenName)
+	amountMinted := solana.GetUserAmountMinted(request.Address)
+	limit := solana.GetUserMintLimit(request.TokenName)
 
-    var (
-        mintLimit = limit.MintLimit.String()
-        tokenName = limit.TokenName
-    )
+	var (
+		mintLimit = limit.MintLimit.String()
+		tokenName = limit.TokenName
+	)
 
-    response := ResponseMyMintLimit{
-        AmountMinted: amountMinted,
-        TokenName: tokenName,
-        MintLimit: mintLimit,
-    } 
+	response := ResponseMyMintLimit{
+		AmountMinted: amountMinted,
+		TokenName:    tokenName,
+		MintLimit:    mintLimit,
+	}
 
-    return response
+	return response
 }
