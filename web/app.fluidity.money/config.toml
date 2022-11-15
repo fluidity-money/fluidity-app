@@ -11,6 +11,9 @@ testnet = false
 rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
 server = "https://backend.solana.fluidity.money"
 
+[database]
+hasura = "https://fluidity.hasura.app/v1/graphql"
+
 # Chain Configurations 
 [config.ethereum]
 explorer = "https://etherscan.io"

@@ -89,6 +89,9 @@ const OptionsSchema = z.object({
     Uniswap: z.string(),
     Sushiswap: z.string(),
   }),
+  database: z.object({
+    hasura: z.string(),
+  }),
 });
 
 export type Options = z.infer<typeof OptionsSchema>;
