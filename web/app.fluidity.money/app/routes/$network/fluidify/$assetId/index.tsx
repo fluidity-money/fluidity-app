@@ -123,9 +123,7 @@ function ErrorBoundary() {
       }}
     >
       <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
-      <h1>Could not load Fluidify!</h1>
-      <br />
-      <h2>Our team has been notified, and are working on fixing it!</h2>
+      <h1 style={{ textAlign: "center" }}>Could not find Token to Fluidify!</h1>
     </div>
   );
 }
@@ -219,6 +217,12 @@ export default function FluidifyToken() {
     }
   }, [fluidTokenAddress, address]);
 
+  useEffect(() => {
+    if (assetToken.userMintLimit && address && fluidTokenAddress && provider) {
+      balance?.(assetToken.address).then(setUserTokenAmount);
+    }
+  }, [assetToken, address]);
+
   const [filteredTokens, setFilteredTokens] = useState<Token[]>(
     tokens as Token[]
   );
@@ -273,11 +277,11 @@ export default function FluidifyToken() {
 
     setSwapping(true);
 
-    setFinishing(true);
-
     await swap(rawTokenAmount.toString(), assetToken.address);
 
-    navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
+    setFinishing(true);
+
+    // navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
   };
 
   return (
