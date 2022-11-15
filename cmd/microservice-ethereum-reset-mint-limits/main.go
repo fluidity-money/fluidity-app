@@ -32,7 +32,7 @@ const (
 	EnvGlobalMintLimit = `FLU_ETHEREUM_GLOBAL_MINT_LIMIT`
 
 	// EnvUserMintLimits to update the global user limit
-	EnvUserMintLimit = `FLU_ETHEREUM_USER_USER_LIMIT`
+	EnvUserMintLimit = `FLU_ETHEREUM_USER_LIMIT`
 )
 
 func main() {
