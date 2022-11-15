@@ -112,7 +112,13 @@ io.on("connection", (socket) => {
     );
 
     //subscribe to hasura events and send to client
-    const subscriptionClient = createSubscriptionObservable({});
+    const subscriptionClient = createSubscriptionObservable(
+      "https://fluidity.hasura.app/v1/graphql",
+      Query,
+      {}
+    );
+    console.log("Subscribed to event");
+
     subscriptionClient.subscribe(
       (eventData) => {
         console.log(eventData);
