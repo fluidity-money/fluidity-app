@@ -15,8 +15,7 @@ import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
   getTransactionsObservableForIn,
-  Query,
-  createSubscriptionObservable,
+	getHasuraTransactionObservable,
 } from "./drivers";
 
 const app = express();
@@ -110,24 +109,12 @@ io.on("connection", (socket) => {
         socket.emit("Transactions", transaction);
       })
     );
-
-    //subscribe to hasura events and send to client
-    const subscriptionClient = createSubscriptionObservable(
-      "https://fluidity.hasura.app/v1/graphql",
-      Query,
-      {}
-    );
-    console.log("Subscribed to event");
-
-    subscriptionClient.subscribe(
-      (eventData) => {
-        console.log(eventData);
-      },
-      (err) => {
-        console.log("Error: " + err);
-      }
-    );
   });
+
+	getHasuraTransactionObservable().subscribe({
+		 next(x) {
+			 console.log('got value ' + x.transactionHash);
+	},})
 
   socket.on("disconnect", () => {
     registry.get(socket.id)?.unsubscribe();

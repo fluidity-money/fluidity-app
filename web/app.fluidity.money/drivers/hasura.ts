@@ -27,7 +27,7 @@ const WinnerSubscriptionQuery = gql`
 const getWsClient = (wsurl: string) =>
   new SubscriptionClient(wsurl, { reconnect: true }, ws);
 
-export const createHasuraSubscriptionObservable = (
+const createHasuraSubscriptionObservable = (
   wsurl: string,
   query: any,
   variables: any
@@ -37,29 +37,25 @@ export const createHasuraSubscriptionObservable = (
     variables: variables,
   });
 
-export const getHasuraTransactionObservable = () =>
+export const getHasuraTransactionObservable = (
+) =>
   new Observable<PipedTransaction>((subscriber) => {
-    createHasuraSubscriptionObservable(
-      hasuraUri,
-      WinnerSubscriptionQuery,
-      {}
-    ).subscribe(
+		createHasuraSubscriptionObservable(hasuraUri, WinnerSubscriptionQuery, {}).subscribe(
       (eventData: any) => {
-        const transaction: PipedTransaction = {
-          type: "rewardDB",
-          source: "",
-          destination: eventData?.winning_address,
-          amount: amountToDecimalString(
-            eventData?.winning_amount,
-            eventData?.token_decimals
-          ),
-          token: eventData?.token_short_name,
-          transactionHash: eventData?.transaction_hash,
-        };
+				const itemObject = eventData?.data?.winners?.at(0);
+				const transaction :PipedTransaction = {
+					type: 'rewardDB',
+					source: '',
+					destination: itemObject.winning_address,
+					amount: itemObject.winning_amount,
+					token: itemObject.token_short_name,
+					transactionHash: itemObject.transaction_hash,
+				}
         subscriber.next(transaction);
       },
       (err) => {
         console.log("Error: " + err);
       }
     );
+ 
   });
