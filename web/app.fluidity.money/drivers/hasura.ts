@@ -10,8 +10,8 @@ import { amountToDecimalString } from "~/util";
 
 const hasuraUri = "https://fluidity.hasura.app/v1/graphql";
 const WinnerSubscriptionQuery = gql`
-  subscription MyQuery {
-    winners(limit: 1) {
+  subscription getWinnersByAddress($address: String!) {
+    winners(where: { winning_address: { _eq: $address } }, limit: 10) {
       created
       transaction_hash
       network
@@ -37,25 +37,29 @@ const createHasuraSubscriptionObservable = (
     variables: variables,
   });
 
-export const getHasuraTransactionObservable = (
-) =>
+export const getHasuraTransactionObservable = (url: string, address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
-		createHasuraSubscriptionObservable(hasuraUri, WinnerSubscriptionQuery, {}).subscribe(
+    createHasuraSubscriptionObservable(url, WinnerSubscriptionQuery, {
+      address: address,
+    }).subscribe(
       (eventData: any) => {
-				const itemObject = eventData?.data?.winners?.at(0);
-				const transaction :PipedTransaction = {
-					type: 'rewardDB',
-					source: '',
-					destination: itemObject.winning_address,
-					amount: itemObject.winning_amount,
-					token: itemObject.token_short_name,
-					transactionHash: itemObject.transaction_hash,
-				}
+        if (eventData?.data?.winners?.length === 0) return;
+        const itemObject = eventData?.data?.winners?.at(0);
+        const transaction: PipedTransaction = {
+          type: "rewardDB",
+          source: "",
+          destination: itemObject.winning_address,
+          amount: amountToDecimalString(
+            itemObject.winning_amount.toString(),
+            itemObject.token_decimals
+          ),
+          token: itemObject.token_short_name,
+          transactionHash: itemObject.transaction_hash,
+        };
         subscriber.next(transaction);
       },
       (err) => {
         console.log("Error: " + err);
       }
     );
- 
   });
