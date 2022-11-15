@@ -15,7 +15,8 @@ import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
   getTransactionsObservableForIn,
-} from "drivers/utils";
+  getHasuraTransactionObservable,
+} from "./drivers";
 
 const app = express();
 const httpServer = createServer(app);
@@ -72,42 +73,48 @@ const solanaTokens = config.config["solana"].tokens
     address: entry.address,
   }));
 
+const hasuraUrl = config.database.hasura;
 const registry = new Map<string, Subscription>();
 
 io.on("connection", (socket) => {
   socket.on("subscribeTransactions", ({ protocol, address }) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-    let TransactionsObservable: Observable<PipedTransaction> = EMPTY;
+    let Tokens: any = [];
     if (protocol === `ethereum`) {
-      TransactionsObservable = getTransactionsObservableForIn(
-        protocol,
-        {},
-        ...ethereumTokens
-      );
+      Tokens = ethereumTokens;
     } else if (protocol === `solana`) {
-      TransactionsObservable = getTransactionsObservableForIn(
-        protocol,
-        {},
-        ...solanaTokens
-      );
-    } else {
-      console.error(
-        "Err:: Protocol not recognised or supported | supported protocols are `solana` & `ethereum` in that case order"
-      );
+      Tokens = solanaTokens;
     }
 
-    const transactionFilterObservable = getObservableForAddress(
-      TransactionsObservable,
+    const OnChainTransactionsObservable: Observable<PipedTransaction> =
+      getTransactionsObservableForIn(protocol, {}, ...Tokens);
+
+    const DbTransactionsObservable: Observable<PipedTransaction> =
+      getHasuraTransactionObservable(hasuraUrl, address);
+
+    const OnChainTransactionFilterObservable = getObservableForAddress(
+      OnChainTransactionsObservable,
       address
     );
 
     registry.set(
       socket.id,
-      transactionFilterObservable.subscribe((transaction) => {
+      OnChainTransactionFilterObservable.subscribe((transaction) => {
         socket.emit("Transactions", transaction);
       })
     );
+    console.log(hasuraUrl);
+    DbTransactionsObservable.subscribe({
+      next(data) {
+        console.log("got value from rewards" + data.transactionHash);
+        socket.emit("Transactions", data);
+      },
+      error(err) {
+        console.error("something has gone wrong " + err);
+        //handle exception - later
+      },
+    });
   });
 
   socket.on("disconnect", () => {
