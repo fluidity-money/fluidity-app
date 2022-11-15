@@ -37,11 +37,13 @@ export const ethGetTransactionsObservable = (
 
           const uiTokenAmount = amountToDecimalString(amount.toString(), 6);
 
-          const transaction = {
+          const transaction: PipedTransaction = {
+            type: "onChain",
             source: source,
             destination: destination,
             amount: shorthandAmountFormatter(uiTokenAmount, 3),
             token,
+            transactionHash: "",
           };
           subscriber.next(transaction);
         }
