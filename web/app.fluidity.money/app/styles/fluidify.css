@@ -81,7 +81,6 @@ main {
   height: var(--f-progbar-height);
 
   transform-origin: left center;
-  transform: scaleX(0);
   border-radius: 0px 0px 4px 4px;
 }
 

@@ -17,18 +17,33 @@ type Props = {
   address: string;
 
   color?: string;
-  
+
   onClick: (symbol: string) => void;
 };
 
 const FluidifyCard = (props: Props) => {
-  const { fluid, logo, name, symbol, amount, onClick, mintCapPercentage, color } = props;
-
+  const {
+    fluid,
+    logo,
+    name,
+    symbol,
+    amount,
+    onClick,
+    mintCapPercentage,
+    color,
+  } = props;
 
   return (
-    <div key={symbol} className={`fluidify-card`} onClick={() => onClick(symbol)}>
+    <div
+      key={symbol}
+      className={`fluidify-card`}
+      onClick={() => onClick(symbol)}
+    >
       <div className="fluidify-card--container">
-        <img className={`fluidify-card-logo ${fluid ? "fluid-token-logo" : ""}`} src={logo} />
+        <img
+          className={`fluidify-card-logo ${fluid ? "fluid-token-logo" : ""}`}
+          src={logo}
+        />
         <div className={""}>
           <span>{symbol}</span> <br />
           {fluid && <span>{name}</span>}
@@ -43,7 +58,13 @@ const FluidifyCard = (props: Props) => {
         </div>
       </div>
       <div className="fluidify-card--progress-bar">
-        <div className="fluidify-card--progress" style={{background: color, width: mintCapPercentage}} />
+        <div
+          className="fluidify-card--progress"
+          style={{
+            background: `${color}`,
+            transform: `scaleX(${mintCapPercentage})`,
+          }}
+        />
       </div>
     </div>
   );

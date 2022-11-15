@@ -212,24 +212,24 @@ export default function FluidifyToken() {
   }, [connected]);
 
   const [userTokenAmount, setUserTokenAmount] = useState<number | undefined>();
-  
+
   const [search, setSearch] = useState("");
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
-  
+
   const searchFilters = [
     {
       name: "All assets",
-      filter: (_: AugmentedToken) => true
+      filter: (_: AugmentedToken) => true,
     },
     {
       name: "Fluid",
-      filter: (t: AugmentedToken) => t.isFluidOf
+      filter: (t: AugmentedToken) => t.isFluidOf,
     },
     {
       name: "Regular",
-      filter: (t: AugmentedToken) => !t.isFluidOf
+      filter: (t: AugmentedToken) => !t.isFluidOf,
     },
-  ]
+  ];
 
   const [swapAmount, setSwapAmount] = useState(0);
 
@@ -255,12 +255,10 @@ export default function FluidifyToken() {
               );
             })
           );
-          
+
           const userTokenBalance = await Promise.all(
-            tokens.map(async({address}) => (await balance?.(address)) || 0)
+            tokens.map(async ({ address }) => (await balance?.(address)) || 0)
           );
-          
-          
 
           for (let i = 0; i < userAmountMinted.length; i++) {
             tokens[i].userMintedAmt = userAmountMinted[i];
@@ -283,7 +281,9 @@ export default function FluidifyToken() {
     tokens as AugmentedToken[]
   );
 
-  const debouncedSearch: DebouncedFunc<(tokens: AugmentedToken[]) => AugmentedToken[]> = debounce((tokens: AugmentedToken[]) => {
+  const debouncedSearch: DebouncedFunc<
+    (tokens: AugmentedToken[]) => AugmentedToken[]
+  > = debounce((tokens: AugmentedToken[]) => {
     const filteredTokens = tokens.filter(
       (token) =>
         token.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -294,7 +294,9 @@ export default function FluidifyToken() {
   }, 500);
 
   useEffect(() => {
-    const typeFilteredTokens = tokens.filter(searchFilters[activeFilterIndex].filter);
+    const typeFilteredTokens = tokens.filter(
+      searchFilters[activeFilterIndex].filter
+    );
     debouncedSearch(typeFilteredTokens);
 
     return () => {
@@ -422,7 +424,11 @@ export default function FluidifyToken() {
                 key={`filter-${filter.name}`}
                 onClick={() => setActiveFilterIndex(i)}
               >
-                <Text size="lg" prominent={activeFilterIndex === i} className={activeFilterIndex === i ? "selected" : ""}>
+                <Text
+                  size="lg"
+                  prominent={activeFilterIndex === i}
+                  className={activeFilterIndex === i ? "selected" : ""}
+                >
                   {filter.name}
                 </Text>
               </button>
@@ -436,24 +442,39 @@ export default function FluidifyToken() {
                   .filter(() => {
                     return true;
                   })
-                  .map(({ address, name, symbol, logo, isFluidOf, userTokenBalance, userMintLimit, userMintedAmt }) => {
-                    return (
-                      <FluidifyCard
-                        key={symbol}
-                        onClick={(symbol: string) =>
-                          getTokenFromSymbol(network, symbol)
-                        }
-                        fluid={isFluidOf !== undefined}
-                        symbol={symbol}
-                        name={name}
-                        logo={logo}
-                        address={address}
-                        mintCapPercentage={!!userMintLimit && userMintedAmt !== undefined ? userMintedAmt / userMintLimit : undefined}
-                        color={colors[symbol]}
-                        amount={userTokenBalance}
-                      />
-                    );
-                  })}
+                  .map(
+                    ({
+                      address,
+                      name,
+                      symbol,
+                      logo,
+                      isFluidOf,
+                      userTokenBalance,
+                      userMintLimit,
+                      userMintedAmt,
+                    }) => {
+                      return (
+                        <FluidifyCard
+                          key={symbol}
+                          onClick={(symbol: string) =>
+                            getTokenFromSymbol(network, symbol)
+                          }
+                          fluid={isFluidOf !== undefined}
+                          symbol={symbol}
+                          name={name}
+                          logo={logo}
+                          address={address}
+                          mintCapPercentage={
+                            !!userMintLimit && userMintedAmt !== undefined
+                              ? userMintedAmt / userMintLimit
+                              : undefined
+                          }
+                          color={colors[symbol]}
+                          amount={userTokenBalance}
+                        />
+                      );
+                    }
+                  )}
               </>
             ) : (
               <>
@@ -461,21 +482,36 @@ export default function FluidifyToken() {
                   .filter(() => {
                     return true;
                   })
-                  .map(({ address, name, symbol, logo, isFluidOf, userTokenBalance, userMintLimit, userMintedAmt }) => {
-                    return (
-                      <DragCard
-                        key={symbol}
-                        fluid={isFluidOf !== undefined}
-                        symbol={symbol}
-                        name={name}
-                        logo={logo}
-                        address={address}
-                        mintCapPercentage={!!userMintLimit && userMintedAmt !== undefined ? userMintedAmt / userMintLimit : undefined}
-                        color={colors[symbol]}
-                        amount={userTokenBalance}
-                      />
-                    );
-                  })}
+                  .map(
+                    ({
+                      address,
+                      name,
+                      symbol,
+                      logo,
+                      isFluidOf,
+                      userTokenBalance,
+                      userMintLimit,
+                      userMintedAmt,
+                    }) => {
+                      return (
+                        <DragCard
+                          key={symbol}
+                          fluid={isFluidOf !== undefined}
+                          symbol={symbol}
+                          name={name}
+                          logo={logo}
+                          address={address}
+                          mintCapPercentage={
+                            !!userMintLimit && userMintedAmt !== undefined
+                              ? userMintedAmt / userMintLimit
+                              : undefined
+                          }
+                          color={colors[symbol]}
+                          amount={userTokenBalance}
+                        />
+                      );
+                    }
+                  )}
               </>
             )}
           </div>
@@ -507,7 +543,12 @@ export default function FluidifyToken() {
             </Text>
 
             <section className={"fluidify-form-el fluidify-input-container"}>
-              <img className={`fluidify-form-logo ${tokenIsFluid ? "fluid-token-form-logo" : ""}`} src={assetToken.logo} />
+              <img
+                className={`fluidify-form-logo ${
+                  tokenIsFluid ? "fluid-token-form-logo" : ""
+                }`}
+                src={assetToken.logo}
+              />
               {/* Swap Field */}
               <input
                 className={"fluidify-input"}
