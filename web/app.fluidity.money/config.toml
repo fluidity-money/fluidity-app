@@ -36,7 +36,7 @@ decimals = 6
 [[config.ethereum.tokens]]
 symbol = "fUSDT"
 name = "Fluid USDT"
-logo = "/assets/tokens/usdt.svg"
+logo = "/assets/tokens/fUSDT.png"
 address = "0xADc234a4e90E2045f353F5d4fCdE66144d23b458"
 colour = "#12946c"
 isFluidOf = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
@@ -53,7 +53,7 @@ decimals = 18
 [[config.ethereum.tokens]]
 symbol = "fTUSD"
 name = "Fluid TUSD"
-logo = "/assets/tokens/tusd.svg"
+logo = "/assets/tokens/fTUSD.png"
 address = "0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F"
 colour = "#1da1f2"
 isFluidOf = "0x0000000000085d4780B73119b644AE5ecd22b376"
@@ -70,7 +70,7 @@ decimals = 18
 [[config.ethereum.tokens]]
 symbol = "fFRAX"
 name = "Fluid FRAX"
-logo = "/assets/tokens/frax.svg"
+logo = "/assets/tokens/fFRAX.png"
 address = "0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C"
 colour = "#e84142"
 isFluidOf = "0x853d955aCEf822Db058eb8505911ED77F175b99e"
@@ -88,7 +88,7 @@ userMintLimit = 10000
 [[config.ethereum.tokens]]
 symbol = "fUSDC"
 name = "Fluid USDC"
-logo = "/assets/tokens/usdc.svg"
+logo = "/assets/tokens/fUSDC.png"
 address = "0x9d1089802eE608BA84C5c98211afE5f37F96B36C"
 colour = "#2775ca"
 isFluidOf = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -100,16 +100,16 @@ name = "Dai Stablecoin"
 logo = "/assets/tokens/dai.svg"
 address = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 colour = "#825902"
-decimals = 18
+decimals = 32
 
 [[config.ethereum.tokens]]
 symbol = "fDAI"
 name = "Fluid DAI"
-logo = "/assets/tokens/dai.svg"
+logo = "/assets/tokens/fDAI.png"
 address = "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
 colour = "#825902"
 isFluidOf = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
-decimals = 18
+decimals = 32
 
 [config.solana]
 explorer = "https://explorer.solana.com"
@@ -129,7 +129,7 @@ decimals = 6
 [[config.solana.tokens]]
 symbol = "fUSDC"
 name = "Fluid USDC"
-logo = "/assets/tokens/usdc.svg"
+logo = "/assets/tokens/fUSDC.png"
 address = "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
 colour = "#2775ca"
 isFluidOf = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
@@ -146,7 +146,7 @@ decimals = 6
 [[config.solana.tokens]]
 symbol = "fUSDT"
 name = "Fluid USDT"
-logo = "/assets/tokens/usdt.svg"
+logo = "/assets/tokens/fUSDT.png"
 address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 colour = "#12946c"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"

@@ -102,18 +102,18 @@ const transactionActivityLabel = (
 };
 
 const transactionTimeLabel = (timestamp: number) => {
-  const isTransactionToday = isToday(timestamp * 1000);
-  const isTransactionYesterday = isYesterday(timestamp * 1000);
+  const isTransactionToday = isToday(timestamp);
+  const isTransactionYesterday = isYesterday(timestamp);
 
   if (isTransactionToday)
-    return formatDistanceToNow(timestamp * 1000, {
+    return formatDistanceToNow(timestamp, {
       addSuffix: true,
     });
 
   if (isTransactionYesterday)
-    return `Yesterday ${format(timestamp * 1000, "h:mmaaa")}`;
+    return `Yesterday ${format(timestamp, "h:mmaaa")}`;
 
-  return format(timestamp * 1000, "dd.MM.yy h:mmaaa");
+  return format(timestamp, "dd.MM.yy h:mmaaa");
 };
 
 export {

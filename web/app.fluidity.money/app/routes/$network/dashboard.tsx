@@ -77,20 +77,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const token = config.config;
 
   const fromRedirectStr = url.searchParams.get("redirect");
-  
+
   const fromRedirect = fromRedirectStr === "true";
-  
-  return json(
-    {
-      appName: routeMapper(pathname),
-      fromRedirect,
-      version: "1.5",
-      network,
-      provider,
-      token,
-      ethereumWallets,
-    }
-  );
+
+  return json({
+    appName: routeMapper(pathname),
+    fromRedirect,
+    version: "1.5",
+    network,
+    provider,
+    token,
+    ethereumWallets,
+  });
 };
 
 type LoaderData = {
@@ -147,7 +145,7 @@ export default function Dashboard() {
   // Toggle Select Chain Modal
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(fromRedirect);
-  
+
   useEffect(() => {
     if (connected || connecting) setWalletModalVisibility(false);
   }, [connected, connecting]);
