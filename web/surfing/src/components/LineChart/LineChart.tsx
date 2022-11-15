@@ -127,9 +127,9 @@ const _LineChart = <Datum extends object,>({
         }}
         renderTooltip={({ tooltipData }: RenderTooltipParams<Datum>) => (
           tooltipData?.nearestDatum &&
-            <div className={styles.tooltip}>
+            <>
               {renderTooltip({datum: tooltipData.nearestDatum.datum})}
-            </div>
+            </>
         )}
       />
     </XYChart>
