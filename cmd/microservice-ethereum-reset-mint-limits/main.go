@@ -37,11 +37,11 @@ const (
 
 func main() {
 	var (
-		contractAddress_  = util.GetEnvOrFatal(EnvContractAddress)
-		privateKey_       = util.GetEnvOrFatal(EnvPrivateKey)
-		ethereumHttpUrl   = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		contractAddress_ = util.GetEnvOrFatal(EnvContractAddress)
+		privateKey_      = util.GetEnvOrFatal(EnvPrivateKey)
+		ethereumHttpUrl  = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		globalMintLimit_ = util.GetEnvOrFatal(EnvGlobalMintLimit)
-		userMintLimit_    = util.GetEnvOrFatal(EnvUserMintLimit)
+		userMintLimit_   = util.GetEnvOrFatal(EnvUserMintLimit)
 	)
 
 	userMintLimit, success := new(big.Int).SetString(userMintLimit_, 10)
