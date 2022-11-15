@@ -1,13 +1,23 @@
 import type { Provider } from "~/components/ProviderCard";
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
+import type { Winner } from "~/queries/useUserRewards";
+import type { UserTransaction } from "~/routes/$network/query/userTransactions";
+import type { IRow } from "~/components/Table";
 
-import { LinksFunction, LoaderFunction, json, redirect } from "@remix-run/node";
+import {
+  transactionActivityLabel,
+  transactionTimeLabel,
+  getAddressExplorerLink,
+  getTxExplorerLink,
+} from "~/util";
+import { motion } from "framer-motion";
+import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
 import { captureException } from "@sentry/react";
-import { useUserUnclaimedRewards } from "~/queries";
-import { useLoaderData } from "@remix-run/react";
+import { useUserUnclaimedRewards, useUserRewards } from "~/queries";
+import { useLoaderData, useLocation } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
@@ -15,17 +25,21 @@ import {
   Heading,
   numberToMonetaryString,
   ManualCarousel,
+  trimAddress,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
-import TransactionTable from "~/components/TransactionTable";
+import { Table } from "~/components";
 import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
 import { Providers } from "~/components/ProviderIcon";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 
+export const unstable_shouldReload = () => false;
+
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
   const icons = config.provider_icons;
+  const fluidPairs = config.config[network ?? ""].tokens.length;
 
   const networkFee = 0.002;
   const gasFee = 0.002;
@@ -35,75 +49,112 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  let expectedRewards;
-  let errorMsg;
-
   try {
-    expectedRewards = await useGlobalRewardStatistics(network ?? "");
-  } catch (err) {
-    errorMsg = "The transaction explorer is currently unavailable";
-  } // Fail silently - for now.
+    const {
+      transactions,
+      count,
+    }: { transactions: UserTransaction[]; count: number } = await (
+      await fetch(
+        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
+      )
+    ).json();
 
-  if (errorMsg || !expectedRewards?.data) {
-    //return redirect("/error", { status: 500, statusText: errorMsg });
+    const { data, errors } = await useUserRewards(network ?? "");
+
+    if (errors || !data) {
+      throw errors;
+    }
+
+    const winnersMap = data.winners.reduce(
+      (map, winner) => ({
+        ...map,
+        [winner.transaction_hash]: {
+          ...winner,
+        },
+      }),
+      {} as { [key: string]: Winner }
+    );
+
+    const mergedTransactions: Transaction[] = transactions
+      .filter((tx) => !!winnersMap[tx.hash])
+      .map((tx) => ({
+        sender: tx.sender,
+        receiver: tx.receiver,
+        reward: winnersMap[tx.hash]
+          ? winnersMap[tx.hash].winning_amount /
+            winnersMap[tx.hash].token_decimals
+          : 0,
+        hash: tx.hash,
+        currency: tx.currency,
+        value: tx.value,
+        timestamp: tx.timestamp,
+      }));
+
+    const { data: rewardData, errors: rewardErrors } =
+      await useGlobalRewardStatistics(network ?? "");
+
+    if (rewardErrors || !rewardData) {
+      throw errors;
+    }
+
+    // group rewards by backend
+    const aggregatedExpectedRewards = rewardData.expected_rewards.reduce(
+      (previous, currentReward) => {
+        const {
+          highest_reward: prize,
+          average_reward: avgPrize,
+          token_short_name,
+        } = currentReward;
+        const backend = backends[token_short_name];
+
+        // append to backend if it exists
+        if (previous[backend]) {
+          previous[backend].avgPrize += avgPrize;
+          // max prize
+          previous[backend].prize = Math.max(previous[backend].prize, prize);
+          // set backend if it doesn't exist
+        } else {
+          previous[backend] = {
+            name: backend,
+            prize,
+            avgPrize,
+          };
+        }
+        return previous;
+      },
+      {} as { [K in Providers]: Provider }
+    );
+
+    // convert to expected format
+    const rewarders = Object.values(aggregatedExpectedRewards);
+
     return json({
       icons,
-      rewarders: [],
+      rewarders,
       page,
       network,
-      fluidPairs: 8,
+      fluidPairs,
+      transactions: mergedTransactions,
+      count,
       networkFee,
       gasFee,
     });
-  }
-
-  // group rewards by backend
-  const aggregatedExpectedRewards =
-    expectedRewards?.data.expected_rewards.reduce((previous, currentReward) => {
-      const {
-        highest_reward: prize,
-        average_reward: avgPrize,
-        token_short_name,
-      } = currentReward;
-      const backend = backends[token_short_name];
-
-      // append to backend if it exists
-      if (previous[backend]) {
-        previous[backend].avgPrize += avgPrize;
-        // max prize
-        previous[backend].prize = Math.max(previous[backend].prize, prize);
-        // set backend if it doesn't exist
-      } else {
-        previous[backend] = {
-          name: backend,
-          prize,
-          avgPrize,
-        };
-      }
-      return previous;
-    }, {} as { [K in Providers]: Provider });
-
-  // convert to expected format
-  const rewarders = Object.values(aggregatedExpectedRewards);
-
-  return json({
-    icons,
-    rewarders,
-    page,
-    network,
-    fluidPairs: 8,
-    networkFee,
-    gasFee,
-  });
+  } catch (err) {
+    console.log(err);
+    throw new Error(`Could not fetch Rewards on ${network}: ${err}`);
+  } // Fail silently - for now.
 };
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
 };
 
-export type Transaction = {
+type Transaction = {
   sender: string;
   receiver: string;
+  reward: number;
+  hash: string;
+  // timestamp is the Unix time, in seconds
   timestamp: number;
   value: number;
   currency: string;
@@ -112,6 +163,8 @@ export type Transaction = {
 type LoaderData = {
   icons: { [provider: string]: string };
   rewarders: Provider[];
+  transactions: Transaction[];
+  count: number;
   page: number;
   network: Chain;
   fluidPairs: number;
@@ -140,10 +193,25 @@ function ErrorBoundary() {
 }
 
 export default function Rewards() {
-  const { page, fluidPairs, network, networkFee, gasFee, rewarders } =
-    useLoaderData<LoaderData>();
+  const {
+    fluidPairs,
+    network,
+    networkFee,
+    gasFee,
+    rewarders,
+    transactions: allTransactions,
+    count: allCount,
+  } = useLoaderData<LoaderData>();
 
   const { connected, address } = useContext(FluidityFacadeContext);
+
+  const location = useLocation();
+
+  const pageRegex = /page=[0-9]+/gi;
+  const _pageMatches = location.search.match(pageRegex);
+  const _pageStr = _pageMatches?.length ? _pageMatches[0].split("=")[1] : "";
+  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
+  const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
   const [
     { userUnclaimedRewards, transactions, count },
@@ -153,13 +221,56 @@ export default function Rewards() {
     count: number;
     userUnclaimedRewards: number;
   }>({
-    transactions: [],
-    count: 0,
+    transactions: allTransactions,
+    count: allCount,
     userUnclaimedRewards: 0,
   });
 
   const { width } = useViewport();
   const mobileView = width <= 500;
+
+  const tableBreakpoint = 850;
+
+  const txTableColumns =
+    width > 0 && width < tableBreakpoint
+      ? [{ name: "ACTIVITY" }, { name: "REWARD" }]
+      : [
+          {
+            name: "ACTIVITY",
+          },
+          {
+            name: "VALUE",
+          },
+          {
+            name: "REWARD",
+          },
+          {
+            name: "ACCOUNT",
+          },
+          {
+            name: "TIME",
+            alignRight: true,
+          },
+        ];
+
+  const txTableFilters = address
+    ? [
+        {
+          filter: () => true,
+          name: "ALL",
+        },
+        {
+          filter: ({ sender, receiver }: Transaction) =>
+            address in [sender, receiver],
+          name: "YOUR REWARDS",
+        },
+      ]
+    : [
+        {
+          filter: () => true,
+          name: "ALL",
+        },
+      ];
 
   const hasRewarders = rewarders.length > 0;
 
@@ -219,36 +330,85 @@ export default function Rewards() {
         return;
       }
     })();
-
-    // Get Transaction History
-    (async () => {
-      try {
-        const { transactions, count } = await (
-          await fetch(
-            `/${network}/query/userTransactions?network=${network}&address=${address}&page=${page}`
-          )
-        ).json();
-
-        setUnclaimedRewardsRes({
-          userUnclaimedRewards,
-          transactions,
-          count,
-        });
-      } catch (err) {
-        captureException(
-          new Error(
-            `Could not fetch Transactions count for ${address}, on ${network}`
-          ),
-          {
-            tags: {
-              section: "dashboard",
-            },
-          }
-        );
-        return;
-      } // Fail silently - for now.
-    })();
   }, [connected, address]);
+
+  const TransactionRow = (chain: Chain): IRow<Transaction> =>
+    function Row({ data, index }: { data: Transaction; index: number }) {
+      const { sender, receiver, timestamp, value, currency, reward, hash } =
+        data;
+
+      const txAddress = sender === address ? receiver : sender;
+
+      return (
+        <motion.tr
+          key={`${timestamp}-${index}`}
+          variants={{
+            enter: { opacity: [0, 1] },
+            ready: { opacity: 1 },
+            exit: { opacity: 0 },
+            transitioning: {
+              opacity: [0.75, 1, 0.75],
+              transition: { duration: 1.5, repeat: Infinity },
+            },
+          }}
+        >
+          {/* Activity */}
+          <td>
+            <a
+              className="table-activity"
+              href={getTxExplorerLink(network, hash)}
+            >
+              <img
+                src={
+                  currency === "USDC"
+                    ? "/images/tokenIcons/usdcFluid.svg"
+                    : "/images/tokenIcons/usdtFluid.svg"
+                }
+              />
+              <Text>{transactionActivityLabel(data, sender)}</Text>
+            </a>
+          </td>
+
+          {/* Value */}
+          {width > tableBreakpoint && (
+            <td>
+              <Text>
+                {value.toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                })}
+              </Text>
+            </td>
+          )}
+
+          {/* Reward */}
+          <td>
+            <Text prominent={true}>
+              {reward ? numberToMonetaryString(reward) : "-"}
+            </Text>
+          </td>
+
+          {/* Account */}
+          {width > tableBreakpoint && (
+            <td>
+              <a
+                className="table-address"
+                href={getAddressExplorerLink(chain, sender)}
+              >
+                <Text>{trimAddress(txAddress)}</Text>
+              </a>
+            </td>
+          )}
+
+          {/* Time */}
+          {width > tableBreakpoint && (
+            <td>
+              <Text>{transactionTimeLabel(timestamp)}</Text>
+            </td>
+          )}
+        </motion.tr>
+      );
+    };
 
   return (
     <div className="pad-main">
@@ -267,7 +427,7 @@ export default function Rewards() {
             <Heading className="spendToEarnHeading" as="h2">
               Spend to earn
             </Heading>
-            <Text size="md">
+            <Text size="lg">
               Use, send and receive fluid assets <br />
               to generate yield.
             </Text>
@@ -350,12 +510,17 @@ export default function Rewards() {
       )}
 
       <section id="table">
-        <TransactionTable
-          page={page}
+        <Table
+          itemName="rewards"
+          headings={txTableColumns}
+          pagination={{
+            page: txTablePage,
+            rowsPerPage: 12,
+          }}
           count={count}
-          transactions={transactions}
-          chain={network}
-          address={address ?? ""}
+          data={transactions}
+          renderRow={TransactionRow(network)}
+          filters={txTableFilters}
         />
       </section>
 

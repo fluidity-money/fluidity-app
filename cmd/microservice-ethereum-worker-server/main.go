@@ -57,6 +57,9 @@ const (
 
 	// EnvServerWorkQueue to receive serverwork from
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
+
+	// EnvNetwork to differentiate between eth, arbitrum, etc
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
 
 func main() {
@@ -68,9 +71,28 @@ func main() {
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		networkId                = util.GetEnvOrFatal(EnvNetwork)
+
+		dbNetwork network.BlockchainNetwork
 	)
 
 	rand.Seed(time.Now().Unix())
+
+
+	switch networkId {
+		case "ethereum":
+			dbNetwork = network.NetworkEthereum
+		case "arbitrum":
+			dbNetwork = network.NetworkArbitrum
+		default:
+			log.Fatal(func (k *log.Log) {
+				k.Format(
+					"Unknown %s %s - expected 'ethereum' or 'arbitrum'",
+					EnvNetwork,
+					networkId,
+				)
+			})
+	}
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
 
@@ -110,7 +132,7 @@ func main() {
 		})
 		var (
 			workerConfig = worker_config.GetWorkerConfigEthereum(
-				network.NetworkEthereum,
+				dbNetwork,
 			)
 
 			defaultSecondsSinceLastBlock = workerConfig.DefaultSecondsSinceLastBlock
@@ -141,7 +163,7 @@ func main() {
 
 		emission := worker.NewEthereumEmission()
 
-		emission.Network = "ethereum"
+		emission.Network = networkId
 
 		emission.TokenDetails = token_details.New(tokenName, underlyingTokenDecimals)
 
@@ -150,6 +172,7 @@ func main() {
 		emission.SecondsSinceLastBlock = secondsSinceLastBlock
 
 		averageTransfersInBlock, atxBlocks, atxTxCounts := addAndComputeAverageAtx(
+			dbNetwork,
 			blockNumber.Uint64(),
 			tokenName,
 			transfersInBlock,

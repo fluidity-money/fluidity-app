@@ -41,26 +41,33 @@ type ITable<T> = {
 };
 
 const Table = <T,>(props: ITable<T>) => {
-  const { itemName, pagination, data, renderRow, count, headings, filters } =
-    props;
+  const { itemName, pagination, data, renderRow, headings, filters } = props;
 
   const { rowsPerPage, page } = pagination;
-
-  const pageCount = Math.ceil(count / rowsPerPage);
-
-  const startIndex = (page - 1) * rowsPerPage + 1;
-  const endIndex = Math.min(page * rowsPerPage, count);
 
   const isTransition = useTransition();
 
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
+
+  const filteredData = data.filter((data) =>
+    filters ? filters[activeFilterIndex].filter(data) : true
+  );
+
+  const pageCount = Math.ceil(filteredData.length / rowsPerPage);
+
+  const startIndex = (page - 1) * rowsPerPage + 1;
+  const endIndex = Math.min(page * rowsPerPage, filteredData.length);
+
+  const rowStartIndex = (page - 1) * rowsPerPage;
+  const rowEndIndex = rowStartIndex + 12;
 
   return (
     <div>
       <div className="transactions-header row justify-between">
         {/* Item Count */}
         <Text>
-          {count > 0 ? `${startIndex} - ${endIndex}` : 0} of {count} {itemName}
+          {filteredData.length > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
+          {filteredData.length} {itemName}
         </Text>
 
         {/* Filters*/}
@@ -129,6 +136,7 @@ const Table = <T,>(props: ITable<T>) => {
               .filter((data) =>
                 filters ? filters[activeFilterIndex].filter(data) : true
               )
+              .slice(rowStartIndex, rowEndIndex)
               .map((row, i) => renderRow({ data: row, index: i }))}
           </motion.tbody>
         </AnimatePresence>

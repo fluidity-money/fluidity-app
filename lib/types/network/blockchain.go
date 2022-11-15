@@ -11,5 +11,6 @@ type BlockchainNetwork string
 
 const (
 	NetworkEthereum BlockchainNetwork = `ethereum`
+	NetworkArbitrum BlockchainNetwork = `arbitrum`
 	NetworkSolana   BlockchainNetwork = `solana`
 )

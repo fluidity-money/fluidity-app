@@ -50,7 +50,7 @@
 .statistics-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 4em;
+  gap: 2em;
 }
 
 .graph-ceiling {
@@ -209,7 +209,7 @@
 @media (max-width: 1200px) {
   .no-user-rewards {
     flex-direction: column;
-    gap: 1em;
+    gap: 2em;
   }
 
   .card-inner {
@@ -224,7 +224,6 @@
   }
   .statistics-row {
     grid-template-columns: 1fr 1fr;
-    gap: 3em;
   }
 }
 
@@ -273,6 +272,10 @@
 
   #infobox {
     padding: 0.5em;
+  }
+
+  #spend-to-earn {
+    align-items: center;
   }
 }
 
