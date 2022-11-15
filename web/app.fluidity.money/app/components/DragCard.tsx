@@ -40,13 +40,15 @@ const DragCard = (props: Props) => {
   return (
     <div ref={drag} key={symbol} className={`fluidify-card`}>
       <div className="fluidify-card--container">
-        <img
-          className={`fluidify-card-logo ${fluid ? "fluid-token-logo" : ""}`}
-          src={logo}
-        />
-        <div className={""}>
-          <span>{symbol}</span> <br />
-          {fluid && <span>{name}</span>}
+        <div className="fluidify-card-left">
+          <img
+            className={`fluidify-card-logo ${fluid ? "fluid-token-logo" : ""}`}
+            src={logo}
+          />
+          <div className={""}>
+            <span>{symbol}</span> <br />
+            {fluid && <span>{name}</span>}
+          </div>
         </div>
         <div className={""}>
           <span>

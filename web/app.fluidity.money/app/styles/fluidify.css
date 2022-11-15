@@ -28,7 +28,7 @@ main {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 
-  width: 310px;
+  min-width: 310px;
   height: 72px;
 
   display: flex;
@@ -38,6 +38,12 @@ main {
 
   transition: background 0.2s ease-in-out;
   margin: 10px 0;
+}
+
+.fluidify-card-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
 }
 
 .fluidify-card img {
@@ -50,7 +56,6 @@ main {
 .fluidify-card--container {
   height: 100%;
   margin: 0 10px;
-
   display: flex;
   align-items: center;
   padding: 2px;
@@ -92,16 +97,30 @@ main {
 .fluidify-heading {
   display: flex;
   justify-content: space-between;
-  padding: 70px 64px 0px 64px;
+  padding: 2.5em 2.5em 0;
+  box-sizing: border-box;
+}
+
+.fluidify-heading > section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1em;
+  margin-bottom: 0.5em;
 }
 
 .fluidify-container {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  padding: 0px 64px;
+  padding: 0px 2em;
   gap: 40px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.main-hotspot {
+  width: 35vw;
+  mix-blend-mode: difference;
 }
 
 .fluidify-tokens-container {
@@ -112,6 +131,7 @@ main {
 .fluidify-tokens {
   height: calc(100vh - 390px);
   overflow-y: auto;
+  margin-top: 0.5em;
 }
 
 .fluidify-form {
@@ -166,8 +186,11 @@ main {
 
 .fluidify-hot-spot {
   position: relative;
-  width: clamp(300px, min(0.5vh, 0.5vw), 730px);
-  height: clamp(300px, min(0.5vh, 0.5vw), 730px);
+  /* width: clamp(300px, min(0.5vh, 0.5vw), 730px);
+  height: clamp(300px, min(0.5vh, 0.5vw), 730px); */
+  width: 100%;
+  min-width: 300px;
+  min-height: 300px;
 }
 
 .fluidify-circle {
@@ -177,6 +200,7 @@ main {
   height: inherit;
   width: inherit;
   transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
 }
 
 .dashed-circle {
@@ -212,9 +236,34 @@ main {
   padding-bottom: 3em;
 }
 
+.video-container {
+  width: 35vw;
+  height: 20vw;
+  min-width: 300px;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mix-blend-mode: difference;
+}
+
+.video-container > video {
+  mix-blend-mode: difference;
+}
+
+.swapping-video {
+  width: 140% !important;
+}
+
+.video-container > img {
+  width: calc(clamp(100px, min(0.2vh, 0.2vw), 400px) - 50px);
+  height: calc(clamp(100px, min(0.2vh, 0.2vw), 400px) - 50px);
+  position: absolute;
+}
+
 .search-bar {
   max-width: 210px;
-  margin: 50px 0px;
+  margin-bottom: 1em;
   padding: 24px 50px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 64px;
@@ -366,8 +415,7 @@ main {
 }
 
 .connect-wallet-btn {
-  margin-top: 40px;
-  width: calc(310px - 2 * 24px);
+  width: 10em;
 }
 
 .burger-btn {
@@ -508,20 +556,70 @@ main {
   .hide-on-mobile {
     display: none;
   }
-}
-
-@media (max-width: 1200px) {
-  .card-inner {
-    grid-template-columns: 1fr;
+  main {
+    padding: 0 20px;
+  }
+  main > footer > section:first-child {
+    gap: 0.6em;
   }
 
   #provide-liquidity {
-    padding-top: 0;
+    padding: 1em;
+    margin: 0 0 2em 0;
   }
 
-  .provide-liquidity-left {
-    order: 1;
+  .connect-wallet-modal-container {
+    min-width: 300px;
+    top: 45%;
+  }
+
+  #mobile-top-navbar {
+    padding: 0 20px;
+  }
+
+  .fluidify-container {
+    padding: 0 0.5em;
+  }
+}
+
+@media (max-width: 700px) {
+  .fluidify-container {
+    flex-direction: column;
     align-items: center;
+  }
+  .fluidify-tokens-container {
+    max-width: none;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-hotspot {
+    width: auto;
+  }
+
+  .fluidify-tokens {
+    height: 6em;
+    overflow-x: auto;
+    margin-top: 0.5em;
+    display: flex;
+    gap: 1em;
+    width: 88vw;
+  }
+
+  .fluidify-heading {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .fluidify-heading > section {
+    order: 1;
+    justify-self: center;
+    align-items: center;
+    margin-top: 1.5em;
+  }
+
+  .fluidify-heading > section > * {
     text-align: center;
   }
 }
@@ -560,26 +658,19 @@ main {
   }
 }
 
-@media (max-width: 500px) {
-  main {
-    padding: 0 20px;
-  }
-  main > footer > section:first-child {
-    gap: 0.6em;
+@media (max-width: 1200px) {
+  .card-inner {
+    grid-template-columns: 1fr;
   }
 
   #provide-liquidity {
-    padding: 1em;
-    margin: 0 0 2em 0;
+    padding-top: 0;
   }
 
-  .connect-wallet-modal-container {
-    min-width: 300px;
-    top: 45%;
-  }
-
-  #mobile-top-navbar {
-    padding: 0 20px;
+  .provide-liquidity-left {
+    order: 1;
+    align-items: center;
+    text-align: center;
   }
 }
 
