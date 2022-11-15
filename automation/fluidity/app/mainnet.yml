@@ -3,7 +3,7 @@ SERVICES:
       SERVICE_NAME: fluidity-money-app
       DOCKER_IMAGE: app.fluidity.money-frontend
       DOCKERFILE_PATH: ./web/app.fluidity.money
-      TARGET_GROUP: flu-mainnet-app-fe-tg
+      TARGET_GROUP: flu-mainnet-app-fluidity-fe-tg
       SECRET_BITQUERY_TOKEN: /fluidity/bitquery_token
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
       SECRET_FLU_ETH_RPC_WS: /fluidity/ethereum/websocket_url
