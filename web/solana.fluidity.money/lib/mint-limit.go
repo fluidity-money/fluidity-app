@@ -44,5 +44,5 @@ func HandleMyMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 
 	address := request.Address
 
-	return solana.GetUserMintLimit(address)
+	return solana.GetUserAmountMinted(address)
 }
