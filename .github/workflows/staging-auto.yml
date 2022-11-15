@@ -87,6 +87,10 @@ jobs:
         with:
           command: |
             flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
+      - uses: actions/upload-artifact@v3
+        with:
+          name: diff-artifact
+          path: ./deployment_list.json
 
   deploy-web:
     runs-on: ubuntu-latest
@@ -103,6 +107,9 @@ jobs:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
           role-duration-seconds: 7200 #seconds
+      - uses: actions/download-artifact@v3
+        with:
+          name: diff-artifact
       - name: Build
         id: build
         uses: ./scripts/actions
