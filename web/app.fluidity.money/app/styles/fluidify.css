@@ -66,6 +66,16 @@ main {
   margin-top: auto;
 }
 
+.fluidify-card-logo {
+  height: 36px;
+  width: 36px;
+}
+
+.fluid-token-logo {
+  height: 46px;
+  width: 46px;
+}
+
 .fluidify-card--progress {
   width: 100%;
   height: var(--f-progbar-height);
@@ -116,6 +126,16 @@ main {
 
 .fluidify-form-el {
   width: inherit;
+}
+
+.fluidify-form-logo {
+  height: 24px;
+  width: 24px;
+}
+
+.fluid-token-form-logo {
+  height: 34px;
+  width: 34px;
 }
 
 .fluidify-form-submit {
@@ -671,11 +691,13 @@ main {
   cursor: pointer;
 }
 
-.tooltip {
+.fluidify-token-filters {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-width: 160px;
-  gap: 0.4em;
+  gap: 10px;
+  justify-content: space-around;
+}
+
+.selected {
+  text-decoration: underline;
+  text-underline-offset: 0.4em;
 }
