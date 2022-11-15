@@ -427,7 +427,7 @@ export default function Rewards() {
             <Heading className="spendToEarnHeading" as="h2">
               Spend to earn
             </Heading>
-            <Text size="md">
+            <Text size="lg">
               Use, send and receive fluid assets <br />
               to generate yield.
             </Text>

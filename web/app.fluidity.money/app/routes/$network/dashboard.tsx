@@ -289,7 +289,9 @@ export default function Dashboard() {
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+        <a onClick={() => navigate("./home")}>
+          <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+        </a>
 
         <br />
 
@@ -399,7 +401,9 @@ export default function Dashboard() {
           {/* App Name */}
           <div className="top-navbar-left">
             {(isMobile || isTablet) && (
-              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+              <a onClick={() => navigate("./home")}>
+                <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+              </a>
             )}
             {!isMobile && <Text>{appName}</Text>}
           </div>

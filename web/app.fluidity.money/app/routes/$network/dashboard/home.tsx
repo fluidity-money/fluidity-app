@@ -369,7 +369,13 @@ export default function Home() {
                   key={`filter-${filter.name}`}
                   onClick={() => setActiveFilterIndex(i)}
                 >
-                  <Text size="lg" prominent={activeFilterIndex === i}>
+                  <Text
+                    size="xxl"
+                    prominent={activeFilterIndex === i}
+                    className={
+                      activeFilterIndex === i ? "active-graph-filter" : ""
+                    }
+                  >
                     {filter.name}
                   </Text>
                 </button>
