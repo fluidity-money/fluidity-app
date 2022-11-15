@@ -177,6 +177,23 @@ type Message struct {
 
 type Signature [64]byte
 
+func SignatureFromBase58(b58 string) (Signature, error) {
+	sigBytes := base58.Decode(b58)
+
+	sig := Signature{}
+
+	if sigLen := len(sigBytes); sigLen != 64 {
+		return sig, fmt.Errorf(
+			"invalid format for signature, length was not 64, was %v",
+			sigLen,
+		)
+	}
+
+	copy(sig[0:64], sigBytes)
+
+	return sig, nil
+}
+
 type Transaction struct {
 	// A list of base-58 encoded signatures applied to the transaction.
 	// The list is always of length `message.header.numRequiredSignatures` and not empty.

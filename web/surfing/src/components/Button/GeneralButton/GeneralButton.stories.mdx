@@ -1,6 +1,8 @@
 import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import GeneralButton from "./GeneralButton";
+import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
+import { ReactComponent as Trophy } from "/src/assets/images/buttonIcons/Trophy.svg";
 
 <Meta
     title="Button/GeneralButton"
@@ -27,7 +29,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
         }}
     >
@@ -38,7 +40,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "text",
+            buttontype: "text",
             size: "medium",
         }}
     >
@@ -49,7 +51,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "text",
+            buttontype: "text",
             size: "small",
         }}
     >
@@ -62,7 +64,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "secondary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
         }}
     >
@@ -73,7 +75,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "secondary",
-            buttonType: "text",
+            buttontype: "text",
             size: "medium",
         }}
     >
@@ -84,7 +86,43 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "secondary",
-            buttonType: "text",
+            buttontype: "text",
+            size: "small",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Transparent Button</h2>
+    <Story
+        name="General Button Large Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttontype: "text",
+            size: "large",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Medium Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttontype: "icon",
+            icon: <Trophy />,
+            size: "medium",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="General Button Small Transparent"
+        args={{
+            children: "default",
+            version: "transparent",
+            buttontype: "text",
             size: "small",
         }}
     >
@@ -97,7 +135,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
         }}
     >
@@ -108,7 +146,8 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "icon before",
+            buttontype: "icon before",
+            icon: <ReactSvg />,
             size: "large",
         }}
     >
@@ -119,7 +158,8 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "icon after",
+            buttontype: "icon after",
+            icon: <ReactSvg />,
             size: "large",
         }}
     >
@@ -130,7 +170,8 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "icon only",
+            buttontype: "icon only",
+            icon: <Trophy />,
             size: "large",
         }}
     >
@@ -144,7 +185,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             className: "hover",
             children: "default",
             version: "primary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
         }}
     >
@@ -156,7 +197,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             className: "focus",
             children: "default",
             version: "primary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
         }}
     >
@@ -167,7 +208,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "primary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
             disabled: true,
         }}
@@ -181,7 +222,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             className: "hover",
             children: "default",
             version: "secondary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
         }}
     >
@@ -193,7 +234,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
             className: "focus",
             children: "default",
             version: "secondary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
         }}
     >
@@ -204,7 +245,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             children: "default",
             version: "secondary",
-            buttonType: "text",
+            buttontype: "text",
             size: "large",
             disabled: true,
         }}

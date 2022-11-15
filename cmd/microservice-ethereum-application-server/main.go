@@ -5,17 +5,22 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	"github.com/ethereum/go-ethereum/common"
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
@@ -34,6 +39,33 @@ const (
 	// EnvServerWorkQueue to send serverwork down
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
+
+func getReceipt(gethClient *ethclient.Client, transactionHash ethereum.Hash) (*ethereum.Receipt, error) {
+	txReceipt, err := gethClient.TransactionReceipt(
+		context.Background(),
+		common.HexToHash(transactionHash.String()),
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get the transaction receipt for Fluid transfer %#v! %w",
+			transactionHash.String(),
+			err,
+		)
+	}
+
+	if txReceipt == nil {
+		return nil, fmt.Errorf(
+			"Receipt for fluid transfer %v was nil! %w",
+			transactionHash,
+			err,
+		)
+	}
+
+	convertedReceipt := libEthereum.ConvertGethReceipt(*txReceipt)
+
+	return &convertedReceipt, nil
+}
 
 func main() {
 	var (
@@ -58,9 +90,11 @@ func main() {
 		})
 	}
 
-	var applicationContracts []string
+	var applicationContracts []ethereum.Address
 
 	for _, address := range strings.Split(applicationContracts_, ",") {
+		address := ethereum.AddressFromString(address)
+
 		applicationContracts = append(applicationContracts, address)
 	}
 
@@ -76,14 +110,13 @@ func main() {
 	defer gethClient.Close()
 
 	worker.GetEthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
-
 		var (
-			logs = blockLog.Logs
+			logs         = blockLog.Logs
 			transactions = blockLog.Transactions
-			blockHash = blockLog.BlockHash
+			blockHash    = blockLog.BlockHash
 		)
 
-		fluidTransfers, err := libEthereum.GetTransfers(
+		fluidTransfers := libEthereum.GetTransfers(
 			logs,
 			transactions,
 			blockHash,
@@ -96,11 +129,12 @@ func main() {
 					"Failed to get a fluid transfer in block %#v!",
 					blockHash,
 				)
+
 				k.Payload = err
 			})
 		}
 
-		applicationTransfers, err := libEthereum.GetApplicationTransfers(
+		applicationTransfers := libEthereum.GetApplicationTransfers(
 			logs,
 			transactions,
 			blockHash,
@@ -114,72 +148,182 @@ func main() {
 					"Failed to get application events in block %#v!",
 					blockHash,
 				)
+
 				k.Payload = err
 			})
 		}
 
-		decoratedTransfers := make([]worker.EthereumDecoratedTransfer, len(fluidTransfers))
+		// fetch receipts and calc app fees for each application transfer
+		// and group the transfers by transaction
 
-		// add the non-app fluid transfers
-		for i, fluidTransfer := range fluidTransfers {
-			decoratedTransfers[i] = fluidTransfer
+		var blockTransactions = make(map[ethereum.Hash]ethereum.Transaction)
+
+		for _, transaction := range blockLog.Transactions {
+			hash := transaction.Hash
+
+			blockTransactions[hash] = transaction
 		}
 
-		// loop over application events in the block, add payouts as decorator
-		for _, transfer := range applicationTransfers {
+		var decoratedTransactions = make(map[ethereum.Hash]worker.EthereumDecoratedTransaction)
 
-			fee, emission, err := applications.GetApplicationFee(transfer, gethClient, contractAddress, tokenDecimals)
+		for transactionHash, transfers := range applicationTransfers {
+			transaction, exists := blockTransactions[transactionHash]
 
-			if err != nil {
+			if !exists {
 				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to get the application fee for an application transfer!"
-					k.Payload = err
-				})
-			}
-
-			// nil, nil for a skipped event
-			if fee == nil {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"Skipping an application transfer for transaction %#v and application %#v!",
-						transfer.Transaction.Hash.String(),
-						transfer.Application,
+				    k.Format(
+						"Transaction %s in block %s is unreferenced!",
+						transactionHash.String(),
+						blockLog.BlockHash,
 					)
 				})
-
-				continue
 			}
 
-			decorator := &worker.EthereumWorkerDecorator{
-				ApplicationFee: fee,
-			}
-
-			toAddress, fromAddress, err := applications.GetApplicationTransferParties(transfer)
+			convertedReceipt, err := getReceipt(gethClient, transactionHash)
 
 			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to get the sender and receiver for an application transfer!"
-					k.Payload = err
-				})
+			    log.Fatal(func(k *log.Log) {
+			        k.Format(
+						"Failed to fetch receipt for transaction %s!",
+						transactionHash.String(),
+					)
+
+			        k.Payload = err
+			    })
 			}
 
-			decoratedTransfer := worker.EthereumDecoratedTransfer{
-				SenderAddress:    fromAddress,
-				RecipientAddress: toAddress,
-				Decorator:        decorator,
-				Transaction:      transfer.Transaction,
-				AppEmissions:     emission,
+			transfersWithFees := make([]worker.EthereumDecoratedTransfer, len(transfers))
+
+			for i, transfer := range transfers {
+				fee, emission, err := applications.GetApplicationFee(
+					transfer,
+					gethClient,
+					contractAddress,
+					tokenDecimals,
+					*convertedReceipt,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Message = "Failed to get the application fee for an application transfer!"
+						k.Payload = err
+					})
+				}
+
+				// nil, nil for a skipped event
+				if fee == nil {
+					log.App(func(k *log.Log) {
+						k.Format(
+							"Skipping an application transfer for transaction %#v and application %#v!",
+							transactionHash.String(),
+							transfer.Application,
+						)
+					})
+
+					continue
+				}
+
+				decorator := &worker.EthereumWorkerDecorator{
+					ApplicationFee: fee,
+				}
+
+				toAddress, fromAddress, err := applications.GetApplicationTransferParties(
+					transaction,
+					transfer,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to get the sender and receiver for an application transfer with hash %s!",
+							transactionHash.String(),
+						)
+
+						k.Payload = err
+					})
+				}
+
+				decoratedTransfer := worker.EthereumDecoratedTransfer{
+					TransactionHash:  transactionHash,
+					SenderAddress:    fromAddress,
+					RecipientAddress: toAddress,
+					Decorator:        decorator,
+					AppEmissions:     emission,
+				}
+
+				transfersWithFees[i] = decoratedTransfer
 			}
 
-			decoratedTransfers = append(decoratedTransfers, decoratedTransfer)
+			decoratedTransactions[transactionHash] = worker.EthereumDecoratedTransaction{
+				Transaction: transaction,
+				Receipt:     *convertedReceipt,
+				Transfers:   transfersWithFees,
+			}
+		}
+
+		// add the non-app fluid transfers (and get their receipts)
+
+		for _, fluidTransfer := range fluidTransfers {
+			transactionHash := fluidTransfer.TransactionHash
+
+			decoratedTransaction, exists := decoratedTransactions[transactionHash]
+
+			if !exists {
+				// find transaction, fetch receipt
+				transaction, txExists := blockTransactions[transactionHash]
+
+				if !txExists {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Transaction %s in block %s is unreferenced!",
+							transactionHash.String(),
+							blockLog.BlockHash,
+						)
+					})
+				}
+
+				decoratedTransaction.Transaction = transaction
+
+				receipt, err := getReceipt(gethClient, transactionHash)
+
+				if err != nil {
+				    log.Fatal(func(k *log.Log) {
+				        k.Format(
+							"Failed to fetch receipt for transaction %s!",
+							transactionHash.String(),
+						)
+
+				        k.Payload = err
+				    })
+				}
+
+				decoratedTransaction.Receipt = *receipt
+			}
+
+			var (
+				from = decoratedTransaction.Transaction.From
+				to = decoratedTransaction.Transaction.To
+			)
+
+			transfer := worker.EthereumDecoratedTransfer{
+				TransactionHash:  transactionHash,
+				SenderAddress:    from,
+				RecipientAddress: to,
+				Decorator:        nil,
+				AppEmissions:     worker.EthereumAppFees{},
+			}
+
+			decoratedTransaction.Transfers = append(decoratedTransaction.Transfers, transfer)
+
+			decoratedTransactions[transactionHash] = decoratedTransaction
 		}
 
 		serverWork := worker.EthereumHintedBlock{
-			BlockHash:          blockLog.BlockHash,
-			BlockBaseFee:       blockLog.BlockBaseFee,
-			BlockTime:          blockLog.BlockTime,
-			BlockNumber:        blockLog.BlockNumber,
-			DecoratedTransfers: decoratedTransfers,
+			BlockHash:             blockLog.BlockHash,
+			BlockBaseFee:          blockLog.BlockBaseFee,
+			BlockTime:             blockLog.BlockTime,
+			BlockNumber:           blockLog.BlockNumber,
+			DecoratedTransactions: decoratedTransactions,
 		}
 
 		// send to server

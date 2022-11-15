@@ -1,46 +1,25 @@
-main {
-  display: grid;
-  grid-template-areas:
-    "header"
-    "graph"
-    "table"
-    "footer";
-  grid-template-rows: 100px minmax(calc(80vh - 100px), auto) minmax(80vh, auto) 100px;
-  overflow-y: scroll;
-}
-
-main > nav {
-  grid-area: header;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px 0 64px;
-}
-
-main > nav a {
-  margin: 0 10px;
-}
-
 main > section#graph {
-  grid-area: graph;
-  min-height: 80vh;
+  min-height: 5vh;
 }
 
 section#transactions {
-  grid-area: table;
-  min-height: 80vh;
-  padding: 64px;
+  min-height: 5vh;
 }
 
 .statistics-set {
   display: flex;
   flex-direction: column;
-  margin-right: 64px;
 }
 
 .statistics-row {
   display: flex;
   flex-direction: row;
+  gap: 10px;
+}
+
+.active-graph-filter {
+  text-decoration: underline;
+  text-underline-offset: 0.4em;
 }
 
 .graph-ceiling {
@@ -48,7 +27,6 @@ section#transactions {
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 0 64px;
 }
 
 .row {
@@ -58,4 +36,16 @@ section#transactions {
 
 .justify-between {
   justify-content: space-between;
+}
+
+.transaction-table {
+  width: 100%;
+}
+
+@media (max-width: 500px) {
+  .graph-ceiling {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2em;
+  }
 }

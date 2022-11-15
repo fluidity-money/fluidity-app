@@ -4,11 +4,10 @@ use bumpalo::Bump;
 use fluidity::instruction::FluidityInstruction;
 use libfuzzer_sys::fuzz_target;
 use solana_fluidity_fuzz::*;
-use std::str;
 
 fuzz_target!(|data: &[u8]| {
     let bump = Bump::new();
     let fun = FluidityInstruction::LogTVL;
     let program_id = random_pubkey(&bump);
-    process_instruction(program_id, &[], &fun.try_to_vec().unwrap());
+    process_instruction(program_id, &[], &fun.try_to_vec().unwrap()).ok();
 });

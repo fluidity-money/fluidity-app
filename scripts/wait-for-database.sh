@@ -1,11 +1,11 @@
 #!/bin/sh -e
 
 # loops until the database at environment variable FLU_TIMESCALE_URI and
-# FLU_POSTGRES_URI connects or 20 attempts are made unsuccessfully
+# FLU_POSTGRES_URI connects or 50 attempts are made unsuccessfully
 
 arguments="$@"
 
-timescale="$FLU_TIMESCALE_URI"
+timescale="$(echo $FLU_TIMESCALE_URI | sed 's/[?&]\?binary_parameters=\(true\|false\|yes\)//g')"
 postgres="$FLU_POSTGRES_URI"
 
 err() {

@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import type { ReactComponentElement } from "react";
 import type { SupportedChainsList } from "~/util/chainProviders/chains";
@@ -51,7 +51,9 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption, mo
         >
           Select a Blockchain
         </Heading>
-        <button onClick={() => handleModal(false)}>X</button>
+        <button onClick={() => handleModal(false)}>
+          <Text size={"xl"} prominent={true}>X</Text>
+        </button>
       </div>
       {options.map((option, i) => isSelected(option) 
         ? (
@@ -72,7 +74,7 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption, mo
         ) : (
           <Card
             component="button"
-            className={styles.card}
+            className={`${styles.card}`}
             type={"box"}
             rounded={true}
             onClick={() => handleOnClick(i)}

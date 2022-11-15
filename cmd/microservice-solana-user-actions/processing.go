@@ -116,12 +116,12 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 		winner1_.WinnerAddress = accounts[winnerAIndex]
 		winner1_.SolanaWinnerOwnerAddress = fluidityOwners[winnerAIndex]
 
-		winner1_.WinningAmount = misc.NewBigInt(*winningAmount1)
+		winner1_.WinningAmount = misc.NewBigIntFromInt(*winningAmount1)
 
 		winner2_.WinnerAddress = accounts[winnerBIndex]
 		winner2_.SolanaWinnerOwnerAddress = fluidityOwners[winnerBIndex]
 
-		winner2_.WinningAmount = misc.NewBigInt(*winningAmount2)
+		winner2_.WinningAmount = misc.NewBigIntFromInt(*winningAmount2)
 
 		winner1 = &winner1_
 		winner2 = &winner2_

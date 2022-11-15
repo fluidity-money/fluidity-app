@@ -216,6 +216,66 @@ enum order_by {
 
 type query_root {
   """
+  fetch data from the table: "tvl"
+  """
+  tvl(
+    """
+    distinct select on columns
+    """
+    distinct_on: [tvl_select_column!]
+
+    """
+    limit the number of rows returned
+    """
+    limit: Int
+
+    """
+    skip the first n rows. Use only with order_by
+    """
+    offset: Int
+
+    """
+    sort the rows by one or more columns
+    """
+    order_by: [tvl_order_by!]
+
+    """
+    filter the rows returned
+    """
+    where: tvl_bool_exp
+  ): [tvl!]!
+
+  """
+  fetch aggregated fields from the table: "tvl"
+  """
+  tvl_aggregate(
+    """
+    distinct select on columns
+    """
+    distinct_on: [tvl_select_column!]
+
+    """
+    limit the number of rows returned
+    """
+    limit: Int
+
+    """
+    skip the first n rows. Use only with order_by
+    """
+    offset: Int
+
+    """
+    sort the rows by one or more columns
+    """
+    order_by: [tvl_order_by!]
+
+    """
+    filter the rows returned
+    """
+    where: tvl_bool_exp
+  ): tvl_aggregate!
+
+  """
   fetch data from the table: "user_actions"
   """
   user_actions(
@@ -304,9 +364,119 @@ type query_root {
     """
     where: winners_bool_exp
   ): [winners!]!
+
+  """
+  fetch aggregated fields from the table: "winners"
+  """
+  winners_aggregate(
+    """
+    distinct select on columns
+    """
+    distinct_on: [winners_select_column!]
+
+    """
+    limit the number of rows returned
+    """
+    limit: Int
+
+    """
+    skip the first n rows. Use only with order_by
+    """
+    offset: Int
+
+    """
+    sort the rows by one or more columns
+    """
+    order_by: [winners_order_by!]
+
+    """
+    filter the rows returned
+    """
+    where: winners_bool_exp
+  ): winners_aggregate!
 }
 
 type subscription_root {
+  """
+  fetch data from the table: "tvl"
+  """
+  tvl(
+    """
+    distinct select on columns
+    """
+    distinct_on: [tvl_select_column!]
+
+    """
+    limit the number of rows returned
+    """
+    limit: Int
+
+    """
+    skip the first n rows. Use only with order_by
+    """
+    offset: Int
+
+    """
+    sort the rows by one or more columns
+    """
+    order_by: [tvl_order_by!]
+
+    """
+    filter the rows returned
+    """
+    where: tvl_bool_exp
+  ): [tvl!]!
+
+  """
+  fetch aggregated fields from the table: "tvl"
+  """
+  tvl_aggregate(
+    """
+    distinct select on columns
+    """
+    distinct_on: [tvl_select_column!]
+
+    """
+    limit the number of rows returned
+    """
+    limit: Int
+
+    """
+    skip the first n rows. Use only with order_by
+    """
+    offset: Int
+
+    """
+    sort the rows by one or more columns
+    """
+    order_by: [tvl_order_by!]
+
+    """
+    filter the rows returned
+    """
+    where: tvl_bool_exp
+  ): tvl_aggregate!
+
+  """
+  fetch data from the table in a streaming manner : "tvl"
+  """
+  tvl_stream(
+    """
+    maximum number of rows returned in a single batch
+    """
+    batch_size: Int!
+
+    """
+    cursor to stream the results returned by the query
+    """
+    cursor: [tvl_stream_cursor_input]!
+
+    """
+    filter the rows returned
+    """
+    where: tvl_bool_exp
+  ): [tvl!]!
+
   """
   fetch data from the table: "user_actions"
   """
@@ -418,6 +588,36 @@ type subscription_root {
   ): [winners!]!
 
   """
+  fetch aggregated fields from the table: "winners"
+  """
+  winners_aggregate(
+    """
+    distinct select on columns
+    """
+    distinct_on: [winners_select_column!]
+
+    """
+    limit the number of rows returned
+    """
+    limit: Int
+
+    """
+    skip the first n rows. Use only with order_by
+    """
+    offset: Int
+
+    """
+    sort the rows by one or more columns
+    """
+    order_by: [winners_order_by!]
+
+    """
+    filter the rows returned
+    """
+    where: winners_bool_exp
+  ): winners_aggregate!
+
+  """
   fetch data from the table in a streaming manner : "winners"
   """
   winners_stream(
@@ -453,6 +653,190 @@ input timestamp_comparison_exp {
   _lte: timestamp
   _neq: timestamp
   _nin: [timestamp!]
+}
+
+"""
+columns and relationships of "tvl"
+"""
+type tvl {
+  contract_address: String!
+  network: network_blockchain!
+  time: timestamp
+  tvl: numeric!
+}
+
+"""
+aggregated selection of "tvl"
+"""
+type tvl_aggregate {
+  aggregate: tvl_aggregate_fields
+  nodes: [tvl!]!
+}
+
+"""
+aggregate fields of "tvl"
+"""
+type tvl_aggregate_fields {
+  avg: tvl_avg_fields
+  count(columns: [tvl_select_column!], distinct: Boolean): Int!
+  max: tvl_max_fields
+  min: tvl_min_fields
+  stddev: tvl_stddev_fields
+  stddev_pop: tvl_stddev_pop_fields
+  stddev_samp: tvl_stddev_samp_fields
+  sum: tvl_sum_fields
+  var_pop: tvl_var_pop_fields
+  var_samp: tvl_var_samp_fields
+  variance: tvl_variance_fields
+}
+
+"""
+aggregate avg on columns
+"""
+type tvl_avg_fields {
+  tvl: Float
+}
+
+"""
+Boolean expression to filter rows from the table "tvl". All fields are combined with a logical 'AND'.
+"""
+input tvl_bool_exp {
+  _and: [tvl_bool_exp!]
+  _not: tvl_bool_exp
+  _or: [tvl_bool_exp!]
+  contract_address: String_comparison_exp
+  network: network_blockchain_comparison_exp
+  time: timestamp_comparison_exp
+  tvl: numeric_comparison_exp
+}
+
+"""
+aggregate max on columns
+"""
+type tvl_max_fields {
+  contract_address: String
+  network: network_blockchain
+  time: timestamp
+  tvl: numeric
+}
+
+"""
+aggregate min on columns
+"""
+type tvl_min_fields {
+  contract_address: String
+  network: network_blockchain
+  time: timestamp
+  tvl: numeric
+}
+
+"""
+Ordering options when selecting data from "tvl".
+"""
+input tvl_order_by {
+  contract_address: order_by
+  network: order_by
+  time: order_by
+  tvl: order_by
+}
+
+"""
+select columns of table "tvl"
+"""
+enum tvl_select_column {
+  """
+  column name
+  """
+  contract_address
+
+  """
+  column name
+  """
+  network
+
+  """
+  column name
+  """
+  time
+
+  """
+  column name
+  """
+  tvl
+}
+
+"""
+aggregate stddev on columns
+"""
+type tvl_stddev_fields {
+  tvl: Float
+}
+
+"""
+aggregate stddev_pop on columns
+"""
+type tvl_stddev_pop_fields {
+  tvl: Float
+}
+
+"""
+aggregate stddev_samp on columns
+"""
+type tvl_stddev_samp_fields {
+  tvl: Float
+}
+
+"""
+Streaming cursor of the table "tvl"
+"""
+input tvl_stream_cursor_input {
+  """
+  Stream column input with initial value
+  """
+  initial_value: tvl_stream_cursor_value_input!
+
+  """
+  cursor ordering
+  """
+  ordering: cursor_ordering
+}
+
+"""
+Initial value of the column from where the streaming should start
+"""
+input tvl_stream_cursor_value_input {
+  contract_address: String
+  network: network_blockchain
+  time: timestamp
+  tvl: numeric
+}
+
+"""
+aggregate sum on columns
+"""
+type tvl_sum_fields {
+  tvl: numeric
+}
+
+"""
+aggregate var_pop on columns
+"""
+type tvl_var_pop_fields {
+  tvl: Float
+}
+
+"""
+aggregate var_samp on columns
+"""
+type tvl_var_samp_fields {
+  tvl: Float
+}
+
+"""
+aggregate variance on columns
+"""
+type tvl_variance_fields {
+  tvl: Float
 }
 
 scalar user_action
@@ -785,6 +1169,39 @@ type winners {
 }
 
 """
+aggregated selection of "winners"
+"""
+type winners_aggregate {
+  aggregate: winners_aggregate_fields
+  nodes: [winners!]!
+}
+
+"""
+aggregate fields of "winners"
+"""
+type winners_aggregate_fields {
+  avg: winners_avg_fields
+  count(columns: [winners_select_column!], distinct: Boolean): Int!
+  max: winners_max_fields
+  min: winners_min_fields
+  stddev: winners_stddev_fields
+  stddev_pop: winners_stddev_pop_fields
+  stddev_samp: winners_stddev_samp_fields
+  sum: winners_sum_fields
+  var_pop: winners_var_pop_fields
+  var_samp: winners_var_samp_fields
+  variance: winners_variance_fields
+}
+
+"""
+aggregate avg on columns
+"""
+type winners_avg_fields {
+  token_decimals: Float
+  winning_amount: Float
+}
+
+"""
 Boolean expression to filter rows from the table "winners". All fields are combined with a logical 'AND'.
 """
 input winners_bool_exp {
@@ -800,6 +1217,36 @@ input winners_bool_exp {
   transaction_hash: String_comparison_exp
   winning_address: String_comparison_exp
   winning_amount: numeric_comparison_exp
+}
+
+"""
+aggregate max on columns
+"""
+type winners_max_fields {
+  awarded_time: timestamp
+  created: timestamp
+  network: network_blockchain
+  solana_winning_owner_address: String
+  token_decimals: Int
+  token_short_name: String
+  transaction_hash: String
+  winning_address: String
+  winning_amount: numeric
+}
+
+"""
+aggregate min on columns
+"""
+type winners_min_fields {
+  awarded_time: timestamp
+  created: timestamp
+  network: network_blockchain
+  solana_winning_owner_address: String
+  token_decimals: Int
+  token_short_name: String
+  transaction_hash: String
+  winning_address: String
+  winning_amount: numeric
 }
 
 """
@@ -868,6 +1315,30 @@ enum winners_select_column {
 }
 
 """
+aggregate stddev on columns
+"""
+type winners_stddev_fields {
+  token_decimals: Float
+  winning_amount: Float
+}
+
+"""
+aggregate stddev_pop on columns
+"""
+type winners_stddev_pop_fields {
+  token_decimals: Float
+  winning_amount: Float
+}
+
+"""
+aggregate stddev_samp on columns
+"""
+type winners_stddev_samp_fields {
+  token_decimals: Float
+  winning_amount: Float
+}
+
+"""
 Streaming cursor of the table "winners"
 """
 input winners_stream_cursor_input {
@@ -895,4 +1366,36 @@ input winners_stream_cursor_value_input {
   transaction_hash: String
   winning_address: String
   winning_amount: numeric
+}
+
+"""
+aggregate sum on columns
+"""
+type winners_sum_fields {
+  token_decimals: Int
+  winning_amount: numeric
+}
+
+"""
+aggregate var_pop on columns
+"""
+type winners_var_pop_fields {
+  token_decimals: Float
+  winning_amount: Float
+}
+
+"""
+aggregate var_samp on columns
+"""
+type winners_var_samp_fields {
+  token_decimals: Float
+  winning_amount: Float
+}
+
+"""
+aggregate variance on columns
+"""
+type winners_variance_fields {
+  token_decimals: Float
+  winning_amount: Float
 }

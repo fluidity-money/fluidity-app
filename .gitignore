@@ -31,6 +31,8 @@ web/*/.next/
 web/*/run
 web/*/npm
 
+tests/integrations/*/test
+
 contracts/ethereum/node_modules
 contracts/ethereum/.openzeppelin
 contracts/ethereum/docker*
@@ -58,3 +60,6 @@ deployment_list.json
 # Vendor specific
 .vscode
 .DS_Store
+
+install/**
+**/node_modules

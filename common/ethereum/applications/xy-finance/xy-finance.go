@@ -5,19 +5,20 @@
 package xy_finance
 
 import (
-	"context"
 	"fmt"
 	"math"
 	"math/big"
 	"sort"
 
-	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+
+	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const xyFinanceAbiString = `[
@@ -218,7 +219,7 @@ var xyFeeTable = map[int]xyFee{
 // FeeRates, MinFee and MaxFee are calculated on and depending on the target chain, and is
 // approximated via `xyFeeTable`
 // xyFeeTable is sourced here: https://docs.xy.finance/products/x-swap/fee-structure
-func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
 	unpacked, err := xyFinanceAbi.Unpack("SourceChainSwap", transfer.Log.Data)
 
 	if err != nil {
@@ -285,15 +286,15 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 			k.Format(
 				"Received a XY swap %v in transaction %#v not involving the fluid token - skipping!",
 				swap_id,
-				transfer.Transaction.Hash.String(),
+				transfer.TransactionHash.String(),
 			)
 		})
 
 		return nil, nil
 	}
 
-	contractAddr_ := transfer.Log.Address.String()
-	contractAddr := ethCommon.HexToAddress(contractAddr_)
+	contractAddr_ := transfer.Log.Address
+	contractAddr := ethereum.ConvertInternalAddress(contractAddr_)
 
 	// if dex is a proxy, start crosschain swap
 	isCrosschainSwap_, err := ethereum.StaticCall(client, contractAddr, xyFinanceAbi, "proxies", dex)
@@ -321,7 +322,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 			k.Format(
 				"Received a XY swap %v in transaction %#v with no fees - skipping!",
 				swap_id,
-				transfer.Transaction.Hash.String(),
+				transfer.TransactionHash.String(),
 			)
 		})
 
@@ -329,18 +330,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	}
 
 	// Get all logs in transaction
-	txHash_ := string(transfer.Transaction.Hash)
-	txHash := ethCommon.HexToHash(txHash_)
-
-	txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to fetch transaction receipts from txHash (%v)! %v",
-			txHash.String(),
-			err,
-		)
-	}
+	txHash := ethereum.ConvertInternalHash(transfer.TransactionHash)
 
 	txLogs := txReceipt.Logs
 
@@ -349,7 +339,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 	sourceChainSwapLogTxIndex := sort.Search(len(txLogs), func(i int) bool {
 		// txLogs.Index sorted in ascending order, so use >= op
-		return sourceChainSwapLogBlockIndex >= txLogs[i].Index
+		return sourceChainSwapLogBlockIndex >= uint(txLogs[i].Index.Uint64())
 	})
 
 	// firstTargetChainSwap log should occur right after SourceChainSwap log
@@ -438,8 +428,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 // fromTokenIsSupported checks if fromToken is part of Day 1 supported Eth tokens
 func fromTokenIsSupported(token ethCommon.Address) bool {
-	tokenAddress_ := token.String()
-	tokenAddress := libEthereum.AddressFromString(tokenAddress_)
+	tokenAddress := ethereum.ConvertGethAddress(token)
 
 	_, found := supportedTokens[tokenAddress]
 

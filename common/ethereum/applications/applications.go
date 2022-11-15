@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"math/big"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
@@ -18,9 +16,13 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
@@ -54,11 +56,12 @@ const (
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, worker.EthereumAppFees, error) {
+// if a receipt is passed, will be passed to the application if it can use it
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt) (*big.Rat, worker.EthereumAppFees, error) {
 	var (
-		fee       *big.Rat
-		emission  worker.EthereumAppFees
-		err       error
+		fee      *big.Rat
+		emission worker.EthereumAppFees
+		err      error
 	)
 
 	switch transfer.Application {
@@ -122,6 +125,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			client,
 			fluidTokenContract,
 			tokenDecimals,
+			txReceipt,
 		)
 
 		emission.DodoV2 += util.MaybeRatToFloat(fee)
@@ -149,6 +153,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			client,
 			fluidTokenContract,
 			tokenDecimals,
+			txReceipt,
 		)
 
 		emission.XyFinance += util.MaybeRatToFloat(fee)
@@ -167,9 +172,8 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 // In the case of an AMM (such as Uniswap) the transaction sender receives the majority payout every time,
 // with the recipient tokens being effectively burnt (sent to the contract). In the case of a P2P swap,
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
-func GetApplicationTransferParties(transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
+func GetApplicationTransferParties(transaction ethereum.Transaction, transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
-		transaction = transfer.Transaction
 		logAddress  = transfer.Log.Address
 		nilAddress  libEthereum.Address
 	)

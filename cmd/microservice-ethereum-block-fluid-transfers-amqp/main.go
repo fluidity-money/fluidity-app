@@ -57,10 +57,10 @@ func intFromEnvOrFatal(env string) int {
 	num, err := strconv.Atoi(numString)
 
 	if err != nil {
-	    log.Fatal(func(k *log.Log) {
-	        k.Format("Failed to read an int from environment variable %s!", env)
-	        k.Payload = err
-	    })
+		log.Fatal(func(k *log.Log) {
+			k.Format("Failed to read an int from environment variable %s!", env)
+			k.Payload = err
+		})
 	}
 
 	return num
@@ -88,6 +88,7 @@ func main() {
 			blockHash   = header.BlockHash
 			blockNumber = header.Number
 			blockBloom  = ethTypes.BytesToBloom(header.Bloom)
+			baseFee     = header.BaseFee
 		)
 
 		amqpBlock := worker.EthereumBlockLog{
@@ -95,6 +96,7 @@ func main() {
 			BlockBaseFee: header.BaseFee,
 			BlockTime:    header.Time,
 			BlockNumber:  blockNumber,
+			BaseFee:      baseFee,
 			Logs:         make([]types.Log, 0),
 			Transactions: make([]types.Transaction, 0),
 		}
@@ -126,7 +128,10 @@ func main() {
 			})
 		}
 
-		newTransactions, err := ethConvert.ConvertTransactions(blockHash.String(), block.Transactions)
+		newTransactions, err := ethConvert.ConvertTransactions(
+			blockHash.String(),
+			block.Transactions,
+		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

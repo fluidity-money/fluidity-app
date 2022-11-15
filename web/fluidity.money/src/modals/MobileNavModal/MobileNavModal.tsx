@@ -1,6 +1,6 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import { Heading } from "@fluidity-money/surfing";
 import Image from "next/image";
@@ -30,7 +30,6 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
           width="160"
           height="68"
           priority={true}
-          placeholder="blur"
           loading="eager"
         />
       </a>
@@ -49,7 +48,6 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
             height={24}
             width={24}
             priority={true}
-            placeholder="blur"
             loading="eager"
           />
         </a>
@@ -64,7 +62,6 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
             height={24}
             width={24}
             priority={true}
-            placeholder="blur"
             loading="eager"
           />
         </a>
@@ -79,7 +76,6 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
             height={24}
             width={24}
             priority={true}
-            placeholder="blur"
             loading="eager"
           />
         </a>
@@ -94,7 +90,6 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
             height={24}
             width={24}
             priority={true}
-            placeholder="blur"
             loading="eager"
           />
         </a>

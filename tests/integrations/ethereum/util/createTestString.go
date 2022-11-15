@@ -15,6 +15,7 @@ import (
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -160,17 +161,17 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 		if logSignature == swapSignature {
 			var test TestStructure
 			test.Transfer.Log.Data = base64.RawStdEncoding.EncodeToString(log.Data)
-			test.Transfer.Log.Address = ethTypes.AddressFromString(log.Address.String())
+			test.Transfer.Log.Address = ethereum.ConvertGethAddress(log.Address)
 
 			testTopics := make([]ethTypes.Hash, 0)
 			for _, topic := range log.Topics {
-				testTopics = append(testTopics, ethTypes.HashFromString(topic.String()))
+				testTopics = append(testTopics, ethereum.ConvertGethHash(topic))
 			}
 			test.Transfer.Log.Topics = testTopics
 
-			test.Transfer.Transaction.To = ethTypes.AddressFromString(transaction.To().String())
-			test.Transfer.Transaction.From = ethTypes.AddressFromString(sender.String())
-			test.Transfer.Transaction.Hash = ethTypes.HashFromString(txHash.String())
+			test.Transfer.Transaction.To = ethereum.ConvertGethAddress(*transaction.To())
+			test.Transfer.Transaction.From = ethereum.ConvertGethAddress(sender)
+			test.Transfer.Transaction.Hash = ethereum.ConvertGethHash(txHash)
 
 			testChan <- test
 		}

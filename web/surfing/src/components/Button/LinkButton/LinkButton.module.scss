@@ -76,6 +76,10 @@
   }
 }
 
+.iconLeft {
+  flex-direction: row-reverse;
+}
+
 .small {
   font-style: normal;
   font-weight: 400;

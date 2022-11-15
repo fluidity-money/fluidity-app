@@ -19,92 +19,102 @@ func TestGetApplicationFee(t *testing.T) {
 	// so only test whether they return as expected
 	var (
 		transfer           worker.EthereumApplicationTransfer
+		receipt            ethereum.Receipt
 		client             *ethclient.Client
 		fluidTokenContract common.Address
 		tokenDecimals      int
 	)
 
-	fee, err := GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err := GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationUniswapV2
-	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationBalancerV2
-	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationOneInchLPV1
-	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationMooniswap
-	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationOneInchFixedRateSwap
-	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationCurve
-	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationMultichain
-	fee, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
 	assert.Nil(t, fee)
+	assert.Zero(t, emission)
 	assert.Error(t, err)
 }
 
 func TestGetApplicationTransferParties(t *testing.T) {
 	var (
 		transfer          worker.EthereumApplicationTransfer
+		transaction       ethereum.Transaction
 		transactionSender = ethereum.AddressFromString("0x77")
 		logAddress        = ethereum.AddressFromString("0x88")
 	)
 
-	sender, receiver, err := GetApplicationTransferParties(transfer)
+	sender, receiver, err := GetApplicationTransferParties(transaction, transfer)
 	assert.Error(t, err)
 	assert.Zero(t, sender)
 	assert.Zero(t, receiver)
 
-	transfer.Transaction.From = transactionSender
+	transaction.From = transactionSender
 	transfer.Log.Address = logAddress
 	transfer.Application = ApplicationMooniswap
 
-	sender, receiver, err = GetApplicationTransferParties(transfer)
+	sender, receiver, err = GetApplicationTransferParties(transaction, transfer)
 	assert.NoError(t, err)
 	assert.Equal(t, transactionSender, sender)
 	assert.Equal(t, logAddress, receiver)
 
 	transfer.Application = ApplicationUniswapV2
-	sender, receiver, err = GetApplicationTransferParties(transfer)
+	sender, receiver, err = GetApplicationTransferParties(transaction, transfer)
 	assert.NoError(t, err)
 	assert.Equal(t, transactionSender, sender)
 	assert.Equal(t, logAddress, receiver)
 
 	transfer.Application = ApplicationBalancerV2
-	sender, receiver, err = GetApplicationTransferParties(transfer)
+	sender, receiver, err = GetApplicationTransferParties(transaction, transfer)
 	assert.NoError(t, err)
 	assert.Equal(t, transactionSender, sender)
 	assert.Equal(t, logAddress, receiver)
 
 	transfer.Application = ApplicationCurve
-	sender, receiver, err = GetApplicationTransferParties(transfer)
+	sender, receiver, err = GetApplicationTransferParties(transaction, transfer)
 	assert.NoError(t, err)
 	assert.Equal(t, transactionSender, sender)
 	assert.Equal(t, logAddress, receiver)
 
 	transfer.Application = ApplicationMultichain
-	sender, receiver, err = GetApplicationTransferParties(transfer)
+	sender, receiver, err = GetApplicationTransferParties(transaction, transfer)
 	assert.NoError(t, err)
 	assert.Equal(t, transactionSender, sender)
 	assert.Equal(t, logAddress, receiver)

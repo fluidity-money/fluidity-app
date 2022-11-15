@@ -157,8 +157,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 
 	// get the pool ID from the log, so we can look up its contract
 	// and fetch the swap fee percentage
-	vaultAddr_ := transfer.Log.Address.String()
-	vaultAddr := ethCommon.HexToAddress(vaultAddr_)
+	vaultAddr := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
 	// convert pool id to fixed-length byte array to make the contract call
 	idBytes := hashTo32Bytes(poolId)
@@ -259,7 +258,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		log.App(func(k *log.Log) {
 			k.Format(
 				"Received a balancer swap in transaction %#v not involving the fluid token - skipping!",
-				transfer.Transaction.Hash.String(),
+				transfer.TransactionHash.String(),
 			)
 		})
 

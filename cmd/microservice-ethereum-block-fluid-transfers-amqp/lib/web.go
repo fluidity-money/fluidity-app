@@ -76,7 +76,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			txHash         = log.TxHash
 		)
 
-		blockNumber, err := bigIntFromPossiblyHex(logBlockNumber)
+		blockNumber, err := common.BigIntFromHex(logBlockNumber)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -86,7 +86,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			)
 		}
 
-		index, err := bigIntFromPossiblyHex(logIndex)
+		index, err := common.BigIntFromHex(logIndex)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -104,7 +104,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			topics[i] = types.Hash(topic)
 		}
 
-		txIndex, err := bigIntFromPossiblyHex(logTxIndex)
+		txIndex, err := common.BigIntFromHex(logTxIndex)
 
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -210,7 +210,8 @@ func GetBlockFromHash(gethHttpApi, blockHash string, retries int, delay int) (*B
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"could not unmarshal block resonse: %v",
+				"could not unmarshal block resonse, %#v: %v",
+				string(blockResponseResult),
 				err,
 			)
 		}

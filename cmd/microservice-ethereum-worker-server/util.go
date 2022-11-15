@@ -134,10 +134,6 @@ func bigIntToRat(x misc.BigInt) *big.Rat {
 	return r.SetInt(&x.Int)
 }
 
-func hexToAddress(s ethereum.Address) ethCommon.Address {
-	return ethCommon.HexToAddress(s.String())
-}
-
 func bigPow(left *big.Rat, count int) *big.Rat {
 
 	leftCopy_ := *left
@@ -157,6 +153,16 @@ func exponentiate(x int) *big.Rat {
 	ten := big.NewRat(10, 1)
 
 	return bigPow(ten, x)
+}
+
+func weiToUsd(wei, usdPrice, ethDecimals *big.Rat) *big.Rat {
+	res := new(big.Rat)
+
+	res.Quo(wei, ethDecimals)
+
+	res.Mul(res, usdPrice)
+
+	return res
 }
 
 func roundUp(x float64) uint64 {
@@ -185,11 +191,10 @@ func anyStringsEmpty(strings ...string) bool {
 
 // mustEthereumAddressFromEnv to convert an env to an ethereum address,
 // or fatal if it's invalid
-func mustEthereumAddressFromEnv(env string) ethereum.Address {
+func mustEthereumAddressFromEnv(env string) ethCommon.Address {
 	addressString := util.GetEnvOrFatal(env)
 
-	address := ethereum.AddressFromString(addressString)
-	if address == "" {
+	if !ethCommon.IsHexAddress(addressString) {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
 				"Failed to convert %v to an ethereum address!",
@@ -198,7 +203,7 @@ func mustEthereumAddressFromEnv(env string) ethereum.Address {
 		})
 	}
 
-	return address
+	return ethCommon.HexToAddress(addressString)
 }
 
 func sendEmission(emission *worker.Emission) {

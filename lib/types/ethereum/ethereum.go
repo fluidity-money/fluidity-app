@@ -46,22 +46,19 @@ type (
 	// Transaction made on Ethereum, may be forked
 	Transaction struct {
 		BlockHash Hash        `json:"block_hash"`
-		ChainId   misc.BigInt `json:"chain_id"`
-		Cost      misc.BigInt `json:"cost"`
 		Data      misc.Blob   `json:"data"`
-		Gas       uint64      `json:"gas"`
+
+		// GasFeeCap is the maxFeePerGas
 		GasFeeCap misc.BigInt `json:"gas_fee_cap"`
+
+		// GasTipCap is the maxPriorityFeePerGas
 		GasTipCap misc.BigInt `json:"gas_tip_cap"`
+
 		GasPrice  misc.BigInt `json:"gas_price"`
 		Hash      Hash        `json:"hash"`
-		Nonce     uint64      `json:"nonce"`
 		To        Address     `json:"to"`
 		From      Address     `json:"from"`
 		Type      uint8       `json:"type"`
-		Value     misc.BigInt `json:"value"`
-
-		// Receipt is a transaction receipt collected optionally!
-		Receipt *Receipt `json:"receipt"`
 	}
 
 	// Log represents a contract event log that we have confirmed isn't removed

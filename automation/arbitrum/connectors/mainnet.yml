@@ -1,0 +1,22 @@
+SECRET_FLU_ETHEREUM_WS_URL: /fluidity/arbitrum/websocket_url
+
+SERVICES:
+  - CONNECTORS_ETHEREUM_LOGS-AMQP:
+      SERVICE_NAME: connector-arbitrum-logs-amqp
+      DOCKERFILE_PATH: ./cmd/connector-ethereum-logs-amqp
+      ENV_FLU_WORKER_ID: arbitrum-connector-arbitrum-logs-amqp
+      ENV_FLU_ETHEREUM_START_BLOCK: latest
+      TASK_MIN_COUNT: 1
+
+  - CONNECTORS_ETHEREUM_BLOCK_HEADERS_AMQP:
+      SERVICE_NAME: connector-arbitrum-block-headers-amqp
+      DOCKERFILE_PATH: ./cmd/connector-ethereum-block-headers-amqp
+      ENV_FLU_WORKER_ID: arbitrum-connector-arbitrum-block-headers-amqp
+      TASK_MIN_COUNT: 1
+
+  - CONNECTORS_COMMON_BLOCKED_PAYOUTS_REPORTING_ARBITRUM:
+      SERVICE_NAME: connector-common-blocked-payouts-reporting-arbitrum
+      DOCKER_IMAGE: connector-common-blocked-payouts-reporting
+      DOCKERFILE_PATH: ./cmd/connector-common-blocked-payouts-reporting
+      ENV_FLU_WORKER_ID: arbitrum-connector-common-blocked-payouts-reporting
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/blocked_payouts/webhook

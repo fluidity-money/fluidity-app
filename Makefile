@@ -10,6 +10,8 @@ AUTOMATION_DIR := automation
 	clean \
 	semgrep \
 	test \
+	test-go \
+	test-contracts \
 	docker-test \
 	install
 
@@ -108,9 +110,15 @@ docker-compose-build:
 semgrep:
 	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
-test: semgrep
+test-go: semgrep
 	@cd ${TESTS_DIR} && ./tests-golang.sh
-	@cd ${CONTRACTS_DIR} && ${MAKE} test
+
+test-contracts: semgrep
+	@. ${TESTS_DIR}/tests-profile.sh && \
+		cd ${CONTRACTS_DIR} && \
+		${MAKE} test
+
+test: semgrep test-go test-contracts
 
 lint: semgrep
 	@${GO_FMT} ./...

@@ -1,0 +1,16 @@
+SERVICES:
+  - ARB_BLOCK_FLUID_TRANSERS_AMQP:
+      SERVICE_NAME: microservice-arbitrum-block-fluid-transfers-amqp
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-block-fluid-transfers-amqp
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-block-fluid-transfers-amqp
+      ENV_FLU_ETHEREUM_BLOCK_RETRIES: 5
+      ENV_FLU_ETHEREUM_BLOCK_RETRY_DELAY: 5
+      SECRET_FLU_ETHEREUM_WS_URL: /fluidity/arbitrum/websocket_url
+      SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/arbitrum/http_url
+
+
+
+
+
+
+

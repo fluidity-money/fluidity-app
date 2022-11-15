@@ -5,24 +5,30 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	common "github.com/fluidity-money/fluidity-app/common/ethereum"
+	test_utils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/stretchr/testify/assert"
 )
 
 type integrationTest struct {
 	// Transfer.Log.Data JSON must be base64
 	Transfer worker.EthereumApplicationTransfer `json:"transfer"`
+
+	// Transaction to store the transaction info
+	Transaction ethereum.Transaction `json:"transaction"`
+
 	// ExpectedSender to receive a majority payout
 	ExpectedSender ethereum.Address `json:"expected_sender"`
 	// ExpectedReceiver to receive a minority mayout
@@ -31,14 +37,18 @@ type integrationTest struct {
 	// of a form parseable by big.Rat, e.g. 940/27
 	ExpectedFees string `json:"expected_fees"`
 
+	ExpectedEmission worker.EthereumAppFees `json:"expected_emission"`
+
 	FluidTokenDecimals   int            `json:"token_decimals"`
-	FluidContractAddress common.Address `json:"contract_address"`
+	FluidContractAddress ethCommon.Address `json:"contract_address"`
+
+	RpcMethods  map[string]interface{} `json:"rpc_methods"`
+	CallMethods map[string]interface{} `json:"call_methods"`
+
+	Client *ethclient.Client
 }
 
-var (
-	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
-	tests              []integrationTest
-)
+var tests []integrationTest
 
 func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 	var tests []integrationTest
@@ -51,6 +61,27 @@ func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 				err,
 			)
 		})
+	}
+
+	// initialise mocked client with responses
+	for i, test := range tests {
+		var (
+			rpcMethods = test.RpcMethods
+			callMethods = test.CallMethods
+		)
+
+		client, err  := test_utils.MockRpcClient(rpcMethods, callMethods)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to initialise mocked client! %v",
+					err,
+				)
+			})
+		}
+
+		tests[i].Client = client
 	}
 
 	return tests
@@ -72,23 +103,48 @@ func init() {
 }
 
 func TestIntegrations(t *testing.T) {
-	ethHttpUrl := util.GetEnvOrFatal(EnvEthereumHttpUrl)
-	client, err := ethclient.Dial(ethHttpUrl)
-	assert.NoError(t, err)
 
 	for i, event := range tests {
 		t.Logf("Event %d\n", i)
 
 		var (
+			transaction   = event.Transaction
 			transfer      = event.Transfer
 			fluidAddress  = event.FluidContractAddress
 			tokenDecimals = event.FluidTokenDecimals
+			client        = event.Client
 		)
 
-		fees, err := applications.GetApplicationFee(transfer, client, fluidAddress, tokenDecimals)
+		txHash := common.ConvertInternalHash(transfer.TransactionHash)
+
+		// Get all logs in transaction
+		txReceipt, err := client.TransactionReceipt(context.Background(), txHash)
+		// don't fail, since this doesn't always need to be set
+		if err != nil {
+			t.Logf(
+				"Couldn't fetch transaction receipt for %v! %v",
+				txHash.String(),
+				err,
+			)
+		}
+
+		var convertedReceipt ethereum.Receipt
+
+		if txReceipt != nil {
+			convertedReceipt = common.ConvertGethReceipt(*txReceipt)
+		}
+
+		fees, emission, err := applications.GetApplicationFee(
+			transfer,
+			client,
+			fluidAddress,
+			tokenDecimals,
+			convertedReceipt,
+		)
+
 		assert.NoError(t, err)
 
-		sender, recipient, err := applications.GetApplicationTransferParties(event.Transfer)
+		sender, recipient, err := applications.GetApplicationTransferParties(transaction, transfer)
 		assert.NoError(t, err)
 
 		// correct sender, recipient
@@ -99,5 +155,8 @@ func TestIntegrations(t *testing.T) {
 		expectedFeesRat, ok := new(big.Rat).SetString(event.ExpectedFees)
 		assert.True(t, ok)
 		assert.Equal(t, expectedFeesRat, fees)
+
+		// correct emission
+		assert.Equal(t, event.ExpectedEmission, emission)
 	}
 }

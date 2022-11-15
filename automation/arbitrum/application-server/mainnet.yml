@@ -1,0 +1,30 @@
+DOCKER_IMAGE: microservice-arbitrum-application-server
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-application-server
+SECRET_FLU_ETHEREUM_APPLICATION_CONTRACTS: /fluidity/arbitrum/application_contracts
+SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/arbitrum/http_url
+
+SERVICES:
+  - APPSERVER_USDT:
+      SERVICE_NAME: microservice-arbitrum-application-server-usdt
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-application-server-usdt
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.arbitrum.server.work.usdt
+
+  - APPSERVER_USDC:
+      SERVICE_NAME: microservice-arbitrum-application-server-usdc
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-application-server-usdc
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x386a41f5b8787003dd508521bf310c08632c6c4f"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.arbitrum.server.work.usdc
+
+  - APPSERVER_DAI:
+      SERVICE_NAME: microservice-arbitrum-application-server-dai
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-application-server-dai
+      ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
+      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
+      ENV_FLU_ETHEREUM_WORK_QUEUE: worker.arbitrum.server.work.dai
+
+
+
+

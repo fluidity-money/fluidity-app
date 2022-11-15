@@ -150,7 +150,7 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 		log.App(func(k *log.Log) {
 			k.Format(
 				"Received a multichain swap in transaction %#v not involving the fluid token - skipping!",
-				transfer.Transaction.Hash.String(),
+				transfer.TransactionHash.String(),
 			)
 		})
 

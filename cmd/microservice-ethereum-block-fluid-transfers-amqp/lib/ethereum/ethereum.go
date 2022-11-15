@@ -6,106 +6,106 @@ package ethereum
 
 import (
 	"fmt"
-	"math/big"
 
+	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-block-fluid-transfers-amqp/lib"
+
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	ethCommon "github.com/ethereum/go-ethereum/common"
 )
 
-// emptyAddress to use when a transaction doesn't have a recipient
-const emptyAddress = `0x0000000000000000000000000000000000000000`
+const (
+	// emptyAddress to use when a transaction doesn't have a recipient
+	emptyAddress = `0x0000000000000000000000000000000000000000`
+
+	// list of transaction types we understand
+	txLegacy             = 0
+	txAccessList         = 1
+	txDynamicFee         = 2
+	txArbDeposit         = 100 // deposit, ignore
+	txArbUnsigned        = 101 // bridge tx
+	txArbContract        = 102 // bridge tx
+	txArbRetry           = 104 // retryable tx execution
+	txArbSubmitRetryable = 105 // retryable tx submition, ignore
+	txArbInternal        = 106 // internal, ignore
+	txArbLegacy          = 120 // same as eth legacy
+)
+
+func shouldIgnoreTransaction(typ uint8) (bool, error) {
+	switch (typ) {
+	case txArbDeposit, txArbSubmitRetryable, txArbInternal:
+		return true, nil
+	case txLegacy, txAccessList, txDynamicFee, txArbUnsigned, txArbContract, txArbRetry, txArbLegacy:
+		return false, nil
+	default:
+		return true, fmt.Errorf("unknown transaction type %d", typ)
+	}
+}
 
 // ConvertTransaction from Ethereum's definition to our internal one
-func ConvertTransaction(blockHash string, oldTransaction *ethTypes.Transaction) (*types.Transaction, error) {
-	chainId_ := oldTransaction.ChainId()
-
-	// convert to message to obtain sender address
-
-	signer := ethTypes.NewLondonSigner(chainId_)
-
-	transactionMessage, err := oldTransaction.AsMessage(signer, nil)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Failed to get a transaction signer! %v",
-			err,
-		)
-	}
-
+func ConvertTransaction(tx lib.Transaction) (*types.Transaction, error) {
 	var (
-		chainId   big.Int
-		cost      big.Int
-		gasPrice  big.Int
-		to        string
-		gasFeeCap big.Int
-		gasTipCap big.Int
-		value     big.Int
+		_ = tx.BlockNumber
+
+		gasPrice             = tx.GasPrice.Int
+		maxFeePerGas         = tx.MaxFeePerGas.Int
+		maxPriorityFeePerGas = tx.MaxPriorityFeePerGas.Int
+		typ_                 = tx.Type.Int
 	)
 
-	if chainId_ != nil {
-		chainId = *chainId_
+	typ := uint8(typ_.Int64())
+
+	data := ethCommon.FromHex(tx.Data)
+
+	transaction := types.Transaction{
+		BlockHash: tx.BlockHash,
+		Data:      data,
+		GasFeeCap: misc.NewBigIntFromInt(maxFeePerGas),
+		GasTipCap: misc.NewBigIntFromInt(maxPriorityFeePerGas),
+		GasPrice:  misc.NewBigIntFromInt(gasPrice),
+		Hash:      tx.Hash,
+		To:        tx.To,
+		From:      tx.From,
+		Type:      typ,
 	}
 
-	if cost_ := oldTransaction.Cost(); cost_ != nil {
-		cost = *cost_
-	}
-
-	if gasPrice_ := oldTransaction.GasPrice(); gasPrice_ != nil {
-		gasPrice = *gasPrice_
-	}
-
-	if to_ := oldTransaction.To(); to_ != nil {
-		to = to_.Hex()
-	} else {
-		to = emptyAddress
-	}
-
-	if gasTipCap_ := oldTransaction.GasTipCap(); gasTipCap_ != nil {
-		gasTipCap = *gasTipCap_
-	}
-
-	if gasFeeCap_ := oldTransaction.GasFeeCap(); gasFeeCap_ != nil {
-		gasFeeCap = *gasFeeCap_
-	}
-
-	if value_ := oldTransaction.Value(); value_ != nil {
-		value = *value_
-	}
-
-	newTransaction := types.Transaction{
-		BlockHash: types.HashFromString(blockHash),
-		ChainId:   misc.NewBigInt(chainId),
-		Cost:      misc.NewBigInt(cost),
-		Data:      oldTransaction.Data(),
-		Gas:       oldTransaction.Gas(),
-		GasFeeCap: misc.NewBigInt(gasFeeCap),
-		GasTipCap: misc.NewBigInt(gasTipCap),
-		GasPrice:  misc.NewBigInt(gasPrice),
-		Hash:      types.HashFromString(oldTransaction.Hash().Hex()),
-		Nonce:     oldTransaction.Nonce(),
-		To:        types.AddressFromString(to),
-		From:      types.AddressFromString(transactionMessage.From().Hex()),
-		Type:      oldTransaction.Type(),
-		Value:     misc.NewBigInt(value),
-	}
-
-	return &newTransaction, nil
+	return &transaction, nil
 }
 
 // ConvertTransactions into their new type definition equivalent
-func ConvertTransactions(blockHash string, oldTransactions []*ethTypes.Transaction) ([]types.Transaction, error) {
-	newTransactions := make([]types.Transaction, len(oldTransactions))
+func ConvertTransactions(blockHash string, oldTransactions []lib.Transaction) ([]types.Transaction, error) {
+	newTransactions := make([]types.Transaction, 0)
 
-	for i, txn := range oldTransactions {
-		transaction, err := ConvertTransaction(blockHash, txn)
+	for _, txn := range oldTransactions {
+		typ := uint8(txn.Type.Uint64())
+
+		ignore, err := shouldIgnoreTransaction(typ)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Error converting transactions for transaction hash %s: %w",
+				txn.Hash.String(),
+				err,
+			)
+		}
+
+		if ignore {
+			log.Debug(func(k *log.Log) {
+			    k.Format("Skipping transaction %s with irrelevant type %d", txn.Hash, typ)
+			})
+
+			continue
+		}
+
+		tx, err := ConvertTransaction(txn)
 
 		if err != nil {
 			return nil, err
 		}
 
-		newTransactions[i] = *transaction
+		newTransactions = append(newTransactions, *tx)
 	}
 
 	return newTransactions, nil

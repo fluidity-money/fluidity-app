@@ -14,7 +14,7 @@ func TestMaybeRatToFloat(t *testing.T) {
 		halfExpected = 0.5
 
 		none   *big.Rat = nil
-		noneExpected = 0
+		noneExpected = float64(0)
 	)
 
 	halfResult := MaybeRatToFloat(half)

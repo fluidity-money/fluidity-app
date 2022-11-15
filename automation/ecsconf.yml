@@ -18,22 +18,7 @@ DEV:
   BROKER_NAME: 'flu-dev-mq'
   DB_MIGRATION_BUCKET: flu-staging-db-migration
   DB_MIGRATION_LAMBDA: flu-run-db-migration-staging-dbmate
-
-STAGING:
-  TASK_ROLE: flu.default.task.role
-  TASK_EXECUTION_ROLE: flu.default.task.execution.role
-  CPU_LIMIT: 256
-  MEM_LIMIT: 512
-  SECURITY_GROUP: sg-0c20191013f4a3406
-  SUBNETA: subnet-0705a6ea8e22c1780
-  SUBNETB: subnet-086cdd512fbeee405
-  SUBNETC: subnet-0f9211bc8b3461013
-  DEPLOYMENT_TYPE: ECS #CODEDEPLOY
-  APPSPEC_CONTAINER_PORT: 80
-  TASK_MIN_COUNT: 1
-  TASK_MAX_COUNT: 50
-  LAUNCH_TYPE: FARGATE
-  BROKER_NAME: 'flu-staging-mq'
+  DB_ROLLBACK_LAMBDA: flu-run-db-rollback-staging-dbmate
 
 MAINNET:
   TASK_ROLE: flu.default.task.role
@@ -46,9 +31,10 @@ MAINNET:
   SUBNETC: subnet-0844751af2ede84a0
   DEPLOYMENT_TYPE: ECS #CODEDEPLOY
   APPSPEC_CONTAINER_PORT: 80
-  TASK_MIN_COUNT: 1
+  TASK_MIN_COUNT: 2
   TASK_MAX_COUNT: 50
   LAUNCH_TYPE: FARGATE
   BROKER_NAME: 'flu-mainnet-mq'
   DB_MIGRATION_BUCKET: flu-db-migration
   DB_MIGRATION_LAMBDA: flu-run-db-migration-mainnet-dbmate
+  DB_ROLLBACK_LAMBDA: flu-run-db-rollback-mainnet-dbmate

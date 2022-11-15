@@ -1,0 +1,10 @@
+.container {
+  @media only screen and (min-width: 375px) {
+    text-align: center;
+  }
+
+  .value {
+    display: flex;
+    gap: 10px;
+  }
+}

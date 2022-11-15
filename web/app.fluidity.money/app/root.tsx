@@ -1,5 +1,6 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import {
+  useLoaderData,
   Links,
   LiveReload,
   Meta,
@@ -7,13 +8,18 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { init as initSentry } from "@sentry/remix";
+import { Integrations } from "@sentry/tracing";
+import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
+import { ToolTipLinks } from "./components";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
   return [
+    ...ToolTipLinks(),
     { rel: "icon", href: "/favicon.ico" },
 
     { rel: "apple-touch-icon", sizes: "57x57", href: "/apple-icon-57x57.png" },
@@ -93,7 +99,65 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export default function App() {
+export const loader: LoaderFunction = async (): Promise<LoaderData> => {
+  const nodeEnv = process.env.NODE_ENV;
+  const sentryDsn =
+    "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
+
+  return {
+    nodeEnv,
+    sentryDsn,
+  };
+};
+
+function ErrorBoundary() {
+  return (
+    <html>
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+        <h1>Something went wrong!</h1>
+        <br />
+        <h2>Our team has been notified, and are working on fixing it!</h2>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+type LoaderData = {
+  nodeEnv: string;
+  sentryDsn: string;
+};
+
+function App() {
+  const { nodeEnv, sentryDsn } = useLoaderData<LoaderData>();
+
+  switch (true) {
+    case nodeEnv !== "production":
+      console.log("Running in development, ignoring Sentry initialisation...");
+      break;
+    case !sentryDsn:
+      console.error("DSN not set!");
+      break;
+    default:
+      initSentry({
+        dsn: sentryDsn,
+        integrations: [new Integrations.BrowserTracing()],
+        tracesSampleRate: 1.0,
+      });
+  }
+
   return (
     <html lang="en">
       <head>
@@ -109,3 +173,9 @@ export default function App() {
     </html>
   );
 }
+
+export { ErrorBoundary };
+
+export default withSentry(App, {
+  wrapWithErrorBoundary: true,
+});

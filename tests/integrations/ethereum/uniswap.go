@@ -8,6 +8,7 @@ const integrationTestUniswapV2 = `
 [
   {
     "transfer": {
+      "transaction": "0x034f82fbb4c20783ee47a0251edeb8f44bda5fa6439dc15e19ee2e8a22862bb0",
       "log": {
         "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACz19e45lkP0loAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMVgkbc=",
         "address": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",
@@ -17,16 +18,25 @@ const integrationTestUniswapV2 = `
           "0x00000000000000000000000020e95253e54490d8d30ea41574b24f741ee70201"
         ]
       },
-      "transaction": {
-        "to": "0xd7c09e006a2891880331b0f6224071c1e890a98a",
-        "from": "0x79328db8694a643c569740233869f4f5b344d0cf",
-        "hash": "0x034f82fbb4c20783ee47a0251edeb8f44bda5fa6439dc15e19ee2e8a22862bb0"
-      },
       "application": 1
+    },
+    "transaction": {
+      "to": "0xd7c09e006a2891880331b0f6224071c1e890a98a",
+      "from": "0x79328db8694a643c569740233869f4f5b344d0cf",
+      "hash": "0x034f82fbb4c20783ee47a0251edeb8f44bda5fa6439dc15e19ee2e8a22862bb0"
     },
     "expected_sender": "0x79328db8694a643c569740233869f4f5b344d0cf",
     "expected_recipient": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",
     "expected_fees": "9934320933/997000000",
+    "expected_emission": {
+	"uniswap_v2": 9.964213573721164
+    },
+    "rpc_methods": {
+	"eth_getCode": "0x0"
+    },
+    "call_methods": {
+    	"token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+    },
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
   }

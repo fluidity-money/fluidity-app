@@ -1,22 +1,22 @@
-// Copyright 2022 Fluidity Money. All rights reserved. Use of this source
-// code is governed by a commercial license that can be found in the
-// LICENSE_TRF.md file.
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 
 import { AppProps } from 'next/app';
 
 import Script from 'next/script';
 
 import { useEffect, useState } from 'react';
-
-import { RelayEnvironmentProvider } from "react-relay";
+import { ApolloProvider } from "@apollo/client";
 import useViewport from "hooks/useViewport";
 import { ChainContextProvider } from "hooks/ChainContext";
-import fluRelayEnvironment from "data/relayEnvironment";
+import apolloClient from "data/apolloClient";
+
+import LoadingScreen from 'screens/Loading/LoadingScreen';
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
 import "@fluidity-money/surfing/dist/style.css";
 import "styles/app.global.scss"
-import LoadingScreen from 'screens/Loading/LoadingScreen';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -46,7 +46,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <div id={"fluid"} />
     <div id="shade" />
     <div id="root">
-      <RelayEnvironmentProvider environment={fluRelayEnvironment}>
+      <ApolloProvider client={apolloClient}>
         <ChainContextProvider>
             <div className="App">
               {loaded ?
@@ -57,7 +57,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               }
             </div>
         </ChainContextProvider>
-      </RelayEnvironmentProvider>
+      </ApolloProvider>
     </div>
     <Script src='assets/gfx/renderer.js' strategy='lazyOnload' />
   </>
