@@ -5,18 +5,14 @@
 package main
 
 import (
-	"context"
 	_ "embed"
 	"math/big"
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
-	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -103,25 +99,7 @@ func main() {
 
 		contractAddress := ethCommon.HexToAddress(contractAddress_)
 
-		globalMintLimit, ok := new(big.Int).SetString(globalMintLimit_, 10)
-
-		if !ok {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to convert the global mint limit string to a bigint!"
-				k.Payload = contractAddress_
-			})
-		}
-
-		userMintLimit, ok := new(big.Int).SetString(userMintLimit_, 10)
-
-		if !ok {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to convert the user mint limit string to a bigint!"
-				k.Payload = contractAddress_
-			})
-		}
-
-		transactionOptions, err := ethereum.NewTransactionOptions(ethClient, privateKey)
+		transactOpts, err := ethereum.NewTransactionOptions(ethClient, privateKey)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -130,55 +108,30 @@ func main() {
 			})
 		}
 
-		transaction, err := fluidity.TransactUpdateMintLimits(
+		globalMintLimit, ok := new(big.Int).SetString(globalMintLimit_, 10)
+
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert the global mint limit string to a bigint!"
+				k.Payload = contractAddress
+			})
+		}
+
+		userMintLimit, ok := new(big.Int).SetString(userMintLimit_, 10)
+
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert the user mint limit string to a bigint!"
+				k.Payload = contractAddress
+			})
+		}
+
+		updateMintLimits(
 			ethClient,
+			transactOpts,
 			contractAddress,
 			globalMintLimit,
 			userMintLimit,
-			transactionOptions,
 		)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to update the mint limits!"
-				k.Payload = err
-			})
-		}
-
-		transactionHash := transaction.Hash().Hex()
-
-		discord.Notify(
-			discord.SeverityAlarm,
-			"Updated mint limits for %v transaction %v, waiting to be mined!",
-			contractAddress_,
-			transactionHash,
-		)
-
-		_, err = ethAbiBind.WaitMined(context.Background(), ethClient, transaction)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get transaction hash %v mined!",
-					transactionHash,
-				)
-
-				k.Payload = err
-			})
-		}
-
-		discord.Notify(
-			discord.SeverityAlarm,
-			"Contract %v transaction %v mined!",
-			contractAddress_,
-			transactionHash,
-		)
-
-		log.App(func(k *log.Log) {
-			k.Format(
-				"Updated mint limits, transaction %v",
-				transactionHash,
-			)
-		})
 	}
 }
