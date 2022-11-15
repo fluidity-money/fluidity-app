@@ -13,3 +13,17 @@ SERVICES:
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-common-rabbitmq-backlog-checker-ethereum-cron
       EVENT_SCHEDULE: rate(5 minutes) #every 5mins
+
+  - RESET_MINT_LIMITS:
+      SERVICE_NAME: microservice-ethereum-reset-mint-limits
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-reset-mint-limits
+      DEPLOYMENT_TYPE: CRON
+
+      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-reset-mint-limits
+      SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
+      SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
+      SECRET_FLU_ETHEREUM_LIMITS_PRIVATE_KEY_LIST: /fluidity/ethereum/limits_private_key_list
+
+      EVENT_ROLE: ecsEventsRole
+      EVENT_RULE: microservice-ethereum-reset-mint-limits-cron
+      EVENT_SCHEDULE: 'cron(30 22 * * ? *)' #runs everyday at 10:30PM UTC (9:00AM ACDT)
