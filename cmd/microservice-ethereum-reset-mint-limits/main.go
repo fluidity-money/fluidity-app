@@ -39,10 +39,10 @@ var (
 var (
 	// ScheduleGlobalMintLimit to use for relaxing the global mint limit based
 	// on the day (UTC)
-	ScheduleGlobalMintLimit map[string]map[string]string
+	ScheduleGlobalMintLimit = make(map[string]map[string]string)
 
 	// ScheduleUserMintLimit to use for relaxing the user mint limit
-	ScheduleUserMintLimit map[string]map[string]string
+	ScheduleUserMintLimit = make(map[string]map[string]string)
 )
 
 func main() {
