@@ -93,7 +93,8 @@ jobs:
         with:
           name: diff-artifact
           path: ./deployment_list.json
-      - id: deployment_list
+      - name: Check if deployment data exist
+        id: deployment_list
         run: |
           if [[ -f "./deployment_list.json" ]]; then
             echo "exist=true" >> $GITHUB_OUTPUT
