@@ -94,7 +94,10 @@ jobs:
           name: diff-artifact
           path: ./deployment_list.json
       - id: deployment_list
-        run: [ -f "./deployment_list.json" ] && echo "exist=true" >> $GITHUB_OUTPUT
+        run: |
+          if [[ -f "./deployment_list.json" ]]; then
+            echo "exist=true" >> $GITHUB_OUTPUT
+          fi
 
   deploy-web:
     if: needs.get-diff.outputs.file_exists == 'true'
