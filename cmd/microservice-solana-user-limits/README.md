@@ -8,6 +8,7 @@ Expose an API endpoint for webapp users to, for tokens on Solana, obtain the amo
 |             Name             |                                  Description
 |------------------------------|------------------------------------------------------------------------------|
 | `FLU_POSTGRES_URI` | Database URI to use when connecting to the Postgres database. |
+| `FLU_WEB_LISTEN_ADDR` | `:port` or `host:port` to listen on. |
 
 ## Building
 
