@@ -16,6 +16,8 @@ import (
 func main() {
 	web.JsonEndpoint("/user-mint-limit", HandleUserMintLimit)
 	web.JsonEndpoint("/user-amount-minted", HandleUserAmountMinted)
+
+	web.Listen()
 }
 
 type RequestUserMintLimit struct {
