@@ -19,7 +19,7 @@ type UserAmountMintedRes = {
 }
 
 const userMintLimit = async (tokenName: string): Promise<UserMintLimitRes> => {
-  const url = "https://backend.solana.fluidity.money";
+  const url = "https://api.solana.fluidity.money/user-mint-limit";
   const body = {
     token_short_name: tokenName,
   };
@@ -38,7 +38,7 @@ const userAmountMinted = async (tokenName: string): Promise<UserAmountMintedRes>
 
   const { publicKey } = solContext;
 
-  const url = "https://backend.solana.fluidity.money";
+  const url = "https://api.solana.fluidity.money/user-amount-minted";
   const body = {
     address: publicKey.toString(),
     token_short_name: tokenName,

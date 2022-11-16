@@ -30,7 +30,7 @@ const EthereumFacade = ({
   connectors: [Connector, Web3ReactHooks][];
 }) => {
   const { isActive, provider, account, connector } = useWeb3React();
-
+  
   const getBalance = async (contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
     if (!signer) {
@@ -90,6 +90,20 @@ const EthereumFacade = ({
       await signer.getAddress()
     );
   };
+  
+  const amountMinted = async (contractAddress: string): Promise<number> => {
+    const signer = provider?.getSigner();
+    if (!signer) {
+      return 0;
+    }
+
+    return await getUsdAmountMinted(
+      signer.provider,
+      contractAddress,
+      tokenAbi,
+      await signer.getAddress()
+    );
+  }
 
   // swap <symbol> to its counterpart, with amount in its own units
   // e.g. swap $1.6 of USDC to fUSDC: swap("1600000", "USDC")
@@ -144,6 +158,7 @@ const EthereumFacade = ({
       value={{
         swap,
         limit,
+        amountMinted,
         balance: getBalance,
         disconnect: deactivate,
         useConnectorType,

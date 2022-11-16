@@ -6,13 +6,12 @@ import {
   LinkButton,
   Text,
   numberToMonetaryString,
-  ManualCarousel,
 } from "@fluidity-money/surfing";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate, Link } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
@@ -20,7 +19,6 @@ import {
   getTokenFromSymbol,
   getTokenForNetwork,
 } from "~/util/chainUtils/tokens";
-import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import ItemTypes from "~/types/ItemTypes";
 import DragCard from "~/components/DragCard";
 import FluidifyCard from "~/components/FluidifyCard";
@@ -32,16 +30,10 @@ import styles from "~/styles/fluidify.css";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import config, { colors } from "~/webapp.config.server";
-import {
-  getUsdAmountMinted,
-  getUsdUserMintLimit,
-  userMintLimitedEnabled,
-} from "~/util/chainUtils/ethereum/transaction";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
 import { AnimatePresence, motion } from "framer-motion";
-import {userAmountMinted, userMintLimit} from "~/util/chainUtils/solana/mintLimits";
+import { userMintLimit } from "~/util/chainUtils/solana/mintLimits";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -67,28 +59,42 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const fluidTokenSet = new Set(getTokenForNetwork(network ?? ""));
 
-  const provider = new JsonRpcProvider(rpcUrl);
+  if (network === "ethereum") {
+    const provider = new JsonRpcProvider(rpcUrl);
 
-  let mintLimit: number | undefined;
-
-  const augmentedTokens = await Promise.all(
-    tokens.map(async (token) => {
-      switch (network) {
-        case "ethereum":
+    const augmentedTokens = await Promise.all(
+      tokens.map(async (token) => {
         const mintLimitEnabled = fluidTokenSet.has(token.address)
           ? //? await userMintLimitedEnabled(provider, token.address, tokenAbi)
             true
           : false;
 
-        mintLimit = mintLimitEnabled
-          ? await getUsdUserMintLimit(provider, token.address, tokenAbi)
+        const userMintLimit = mintLimitEnabled
+          //? await getUsdUserMintLimit(provider, token.address, tokenAbi)
+          ? undefined
           : undefined;
-        break;
+        
+        return {
+          ...token,
+          userMintLimit: userMintLimit,
+          userTokenBalance: 0,
+        };
+      })
+    );
 
-        case "solana":
-          mintLimit = (await userMintLimit(token.name)).mint_limit;
-          break;
-      }
+    return json({
+      network,
+      tokens: augmentedTokens,
+      ethereumWallets,
+      colors: (await colors)[network as string],
+    });
+  }
+
+  // Network === "solana"
+  const augmentedTokens = await Promise.all(
+    tokens.map(async (token) => {
+      const mintLimit = undefined;
+
       return {
         ...token,
         userMintLimit: mintLimit,
@@ -197,14 +203,22 @@ const FluidityHotSpot = ({
 };
 
 export default function FluidifyToken() {
-  const { tokens, colors, network } = useLoaderData<LoaderData>();
-  const { address, swap, connected, connecting, disconnect, balance } =
-    useContext(FluidityFacadeContext);
-  const { provider } = useWeb3React();
+  const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
+  const {
+    address,
+    swap,
+    amountMinted,
+    connected,
+    connecting,
+    disconnect,
+    balance,
+  } = useContext(FluidityFacadeContext);
 
   const { width } = useViewport();
 
   const isTablet = width < 1200;
+
+  const [tokens, setTokens] = useState(tokens_);
 
   const [assetToken, setAssetToken] = useState<AugmentedToken>();
 
@@ -224,7 +238,7 @@ export default function FluidifyToken() {
         : undefined,
     [assetToken]
   );
-
+  
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState(false);
   const [walletModalVisibility, setWalletModalVisibility] = useState(
@@ -261,60 +275,54 @@ export default function FluidifyToken() {
   const [finishing, setFinishing] = useState(false);
   
   useEffect(() => {
-    if (address && provider) {
+    if (address) {
       (async () => {
         switch (network) {
           case "ethereum":
-          // get a provider with the correct type
-          const rpcProvider = provider.getSigner().provider;
+            let tokensMinted = await Promise.all(
+              tokens.map(async (token) => {
+                if (!token.isFluidOf) return undefined;
 
-          let amountMinted = await Promise.all(
-            tokens.map(async (token) => {
-              if (!token.isFluidOf) return undefined;
-
-              return getUsdAmountMinted(
-                rpcProvider,
-                token.address,
-                tokenAbi,
-                address
+                  return amountMinted?.(token.address);
+                })
               );
-            })
-          );
 
-          let userTokenBalance = await Promise.all(
-            tokens.map(async ({ address }) => (await balance?.(address)) || 0)
-          );
+            let userTokenBalance = await Promise.all(
+              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+            );
 
-          for (let i = 0; i < amountMinted.length; i++) {
-            tokens[i].userMintedAmt = amountMinted[i];
-            tokens[i].userTokenBalance = userTokenBalance[i];
-          }
-          break;
+            setTokens(tokens.map((token, i) => ({
+              ...token,
+              userMintedAmt: tokensMinted[i],
+              userTokenBalance: userTokenBalance[i],
+            })))
+            break;
           
           case "solana":
-          amountMinted = await Promise.all(
-            tokens.map(async (token) => {
-              if (!token.isFluidOf) return undefined;
-              return (await userAmountMinted(token.name)).amount_minted;
-            })
-          );
+            tokensMinted = await Promise.all(
+              tokens.map(async (token) => {
+                if (!token.isFluidOf) return undefined;
+                return await amountMinted?.(token.name);
+              })
+            );
 
-          userTokenBalance = await Promise.all(
-            tokens.map(async ({ address }) => (await balance?.(address)) || 0)
-          );
+            userTokenBalance = await Promise.all(
+              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+            );
 
-          for (let i = 0; i < userAmountMinted.length; i++) {
-            tokens[i].userMintedAmt = amountMinted[i];
-            tokens[i].userTokenBalance = userTokenBalance[i];
-          }
-          break;
+            setTokens(tokens.map((token, i) => ({
+              ...token,
+              userMintedAmt: tokensMinted[i],
+              userTokenBalance: userTokenBalance[i],
+            })))
+            break;
         }
       })();
     }
   }, [address]);
 
   useEffect(() => {
-    if (assetToken && address && provider) {
+    if (assetToken && address) {
       balance?.(assetToken.address).then(setUserTokenAmount);
     } else {
       setUserTokenAmount(0);
@@ -324,7 +332,7 @@ export default function FluidifyToken() {
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
     tokens as AugmentedToken[]
   );
-
+  
   const debouncedSearch: DebouncedFunc<
     (tokens: AugmentedToken[]) => AugmentedToken[]
   > = debounce((tokens: AugmentedToken[]) => {
@@ -346,7 +354,7 @@ export default function FluidifyToken() {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [search, activeFilterIndex]);
+  }, [search, activeFilterIndex, tokens]);
 
   const handleSwap = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

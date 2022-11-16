@@ -11,7 +11,7 @@ const jsonPost = async <Req, Res>(
     method: "POST",
     body: JSON.stringify(body),
   });
-
+  
   const json = await res.json();
 
   return json;
