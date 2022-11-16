@@ -2,6 +2,7 @@ DOCKER_IMAGE: microservice-ethereum-worker-client
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-client
 ENV_FLU_ETHEREUM_GAS_LIMIT: 8000000
 ENV_FLU_ETHEREUM_HARDHAT_FIX: "false"
+ENV_FLU_ETHEREUM_NETWORK: "ethereum"
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
 
 SERVICES:
@@ -36,7 +37,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: ethereum.worker.tusd
       ENV_FLU_ETHEREUM_AMQP_PUBLISH_NAME: ethereum.winners.tusd
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY: /fluidity/ethereum/tusd/private_key
-  
+
   - WORKER_CLIENT_FRAX:
       SERVICE_NAME: microservice-ethereum-worker-client-frax
       ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-worker-client-frax
