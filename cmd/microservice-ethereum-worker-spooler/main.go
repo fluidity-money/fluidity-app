@@ -86,7 +86,7 @@ func main() {
 				)
 			})
 
-			totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
+			totalRewards := spooler.UnpaidWinningsForToken(dbNetwork, tokenDetails)
 
 			scaledBatchedRewards := new(big.Rat).SetFrac(totalRewards, tokenDecimalsScale)
 
@@ -127,7 +127,7 @@ func main() {
 					k.Format("Sending rewards for token %v", shortName)
 				})
 
-				sendRewards(batchedRewardsQueue, shortName)
+				sendRewards(batchedRewardsQueue, dbNetwork, shortName)
 			}
 		}
 	})

@@ -9,6 +9,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -20,6 +21,9 @@ const (
 	// EnvRewardsAmqpQueueName is the queue to post winners down
 	EnvRewardsAmqpQueueName = `FLU_ETHEREUM_AMQP_PUBLISH_NAME`
 
+	// EnvNetwork to differentiate between eth, arbitrum, etc
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
+
 	// ethereumNullAddress to filter for not including in either side of a
 	// transfer to prevent burning and minting
 	ethereumNullAddress = "0000000000000000000000000000000000000000"
@@ -29,20 +33,30 @@ func main() {
 	var (
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		rewardsAmqpQueueName = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
+		net_                 = util.GetEnvOrFatal(EnvNetwork)
 	)
+
+	network_, err := network.ParseEthereumNetwork(net_)
+
+	if err != nil {
+		log.Fatal(func (k *log.Log) {
+			k.Message = "Failed to read an ethereum network from env!"
+			k.Payload = err
+		})
+	}
 
 	queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
 
 		var announcements []worker.EthereumAnnouncement
 		message.Decode(&announcements)
 
-		processAnnouncements(announcements, rewardsAmqpQueueName)
+		processAnnouncements(announcements, rewardsAmqpQueueName, network_)
 	})
 }
 
 // processAnnouncements to handle fluid transfer or application-based win
 // announcements and determine their winning status
-func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAmqpQueueName string) {
+func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAmqpQueueName string, network_ network.BlockchainNetwork) {
 	var winAnnouncements []worker.EthereumWinnerAnnouncement
 
 	for _, announcement := range announcements {
@@ -115,6 +129,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		})
 
 		winAnnouncement := worker.EthereumWinnerAnnouncement{
+			Network:         network_,
 			TransactionHash: announcementTransactionHash,
 			BlockNumber:     blockNumber,
 			FromAddress:     fromAddress,
