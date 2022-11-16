@@ -224,6 +224,10 @@ main {
   pointer-events: none;
 }
 
+.circle-text {
+  position: abosolute;
+}
+
 .center-text {
   position: fixed;
   left: 50%;

@@ -166,6 +166,11 @@ const FluidityHotSpot = ({
             src="/images/fluidify/fluidify-hotspot.png"
           />
           <span className={"dashed-circle"}>
+            {!activeToken && (
+              <Text size="sm" className="circle-text">
+                Drag and drop the asset <br /> you want to fluidify here.{" "}
+              </Text>
+            )}
             {activeToken && (
               <img
                 className={`fluidify-token ${
