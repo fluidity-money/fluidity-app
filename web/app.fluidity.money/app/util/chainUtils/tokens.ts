@@ -62,7 +62,7 @@ const getTokenFromSymbol = (
 const fluidAssetOf = (tokens: Token[], assetToken: Token): Token | undefined =>
   assetToken.isFluidOf
     ? assetToken
-    : tokens.find(({ isFluidOf }) => isFluidOf === assetToken.address)
+    : tokens.find(({ isFluidOf }) => isFluidOf === assetToken.address);
 
 export {
   getTokenForNetwork,
