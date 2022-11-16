@@ -6,13 +6,12 @@ import {
   LinkButton,
   Text,
   numberToMonetaryString,
-  ManualCarousel,
 } from "@fluidity-money/surfing";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate, Link } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
@@ -35,7 +34,6 @@ import config, { colors } from "~/webapp.config.server";
 import {
   getUsdAmountMinted,
   getUsdUserMintLimit,
-  userMintLimitedEnabled,
 } from "~/util/chainUtils/ethereum/transaction";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
