@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-package api_fluidity_money
+package main
 
 import (
 	"encoding/json"
@@ -13,18 +13,25 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/web"
 )
 
-// maxMintLimit of normalised USD to restrict the amount of USDC/USDT
-// that can be cumulatively minted via the webapp
-const maxMintLimit = 1_000
+func main() {
+	web.JsonEndpoint("/my-mint-limit", HandleMyMintLimit)
+}
 
 type RequestMyMintLimit struct {
-	Address string `json:"address"`
+	Address   string `json:"address"`
+	TokenName string `json:"token_short_name"`
+}
+
+type ResponseMyMintLimit struct {
+	AmountMinted float64 `json:"amount_minted"`
+	MintLimit    string  `json:"mint_limit"`
+	TokenName    string  `json:"token_short_name"`
 }
 
 func HandleMyMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 	var (
 		ipAddress = web.GetIpAddress(r)
-		request   RequestMyHistory
+		request   RequestMyMintLimit
 	)
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -39,10 +46,23 @@ func HandleMyMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 			k.Payload = err
 		})
 
-		return returnForbidden(w)
+		w.WriteHeader(http.StatusForbidden)
+		return nil
 	}
 
-	address := request.Address
+	amountMinted := solana.GetUserAmountMinted(request.Address)
+	limit := solana.GetUserMintLimit(request.TokenName)
 
-	return solana.GetUserAmountMinted(address)
+	var (
+		mintLimit = limit.MintLimit.String()
+		tokenName = limit.TokenName
+	)
+
+	response := ResponseMyMintLimit{
+		AmountMinted: amountMinted,
+		TokenName:    tokenName,
+		MintLimit:    mintLimit,
+	}
+
+	return response
 }

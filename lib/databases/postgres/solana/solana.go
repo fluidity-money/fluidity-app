@@ -12,4 +12,7 @@ const (
 
 	// TableUsers is used to implement mint limits for individual users
 	TableUsers = `solana_users`
+
+	// TableMintLimits is used to store each token's per user mint limit
+	TableMintLimits = `solana_mint_limits`
 )
