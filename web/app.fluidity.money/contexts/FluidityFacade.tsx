@@ -1,6 +1,7 @@
 import { createContext } from "react";
 
 export interface IFluidityFacade {
+  swap: (amount: string, tokenAddr: string) => Promise<void>;
   limit: (tokenAddr: string) => Promise<number | undefined>;
   amountMinted: (tokenAddr: string) => Promise<number | undefined>;
   balance: (tokenAddr: string) => Promise<number>;
@@ -11,9 +12,6 @@ export interface IFluidityFacade {
   useConnectorType: (use: string) => void;
 
   address: string;
-
-  // Ethereum Only
-  ethSwap: (amount: string, tokenAddr: string) => Promise<void>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({
