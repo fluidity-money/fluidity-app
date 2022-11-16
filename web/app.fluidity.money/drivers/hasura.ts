@@ -10,7 +10,11 @@ import { amountToDecimalString } from "~/util";
 
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
-    winners(where: { winning_address: { _eq: $address } }, limit: 1, order_by: {created: desc}) {
+    winners(
+      where: { winning_address: { _eq: $address } }
+      limit: 1
+      order_by: { created: desc }
+    ) {
       created
       transaction_hash
       network

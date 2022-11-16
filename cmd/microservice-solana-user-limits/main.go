@@ -16,6 +16,7 @@ import (
 func main() {
 	web.JsonEndpoint("/user-mint-limit", HandleUserMintLimit)
 	web.JsonEndpoint("/user-amount-minted", HandleUserAmountMinted)
+	web.Endpoint("/healthcheck", HandleHealthCheck)
 
 	web.Listen()
 }
@@ -35,6 +36,10 @@ type RequestUserAmountMinted struct {
 
 type ResponseUserAmountMinted struct {
     AmountMinted float64 `json:"amount_minted"`
+}
+
+func HandleHealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK :)"))
 }
 
 // HandleUserAmountMinted for the amount a user has minted of the requested token

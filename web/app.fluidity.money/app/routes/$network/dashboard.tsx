@@ -243,27 +243,27 @@ export default function Dashboard() {
     });
 
     setTimeout(() => {
-     socket.on("Transactions", (log: PipedTransaction) => {
-      const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
-        (entry) => entry.symbol === log.token
-      );
+      socket.on("Transactions", (log: PipedTransaction) => {
+        const fToken = token[
+          network === `` ? `ethereum` : network
+        ].tokens.filter((entry) => entry.symbol === log.token);
 
-      toolTip.open(
-        fToken.at(0)?.colour,
-        <ToolTipContent
-          tokenLogoSrc={fToken.at(0)?.logo}
-          boldTitle={log.amount + ` ` + log.token}
-          details={
-            log.type === 'rewardDB'
-              ? `reward for sending`
-							: `received from ` + trimAddress(log.source)
-          }
-          linkLabel={"DETAILS"}
-          linkUrl={"#"}
-        />
-      );
-    });
-   }, 30000);
+        toolTip.open(
+          fToken.at(0)?.colour,
+          <ToolTipContent
+            tokenLogoSrc={fToken.at(0)?.logo}
+            boldTitle={log.amount + ` ` + log.token}
+            details={
+              log.type === "rewardDB"
+                ? `reward for sending`
+                : `received from ` + trimAddress(log.source)
+            }
+            linkLabel={"DETAILS"}
+            linkUrl={"#"}
+          />
+        );
+      });
+    }, 30000);
   }, [address]);
 
   const handleScroll = () => {
