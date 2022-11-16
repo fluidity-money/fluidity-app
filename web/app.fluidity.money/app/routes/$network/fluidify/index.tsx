@@ -566,6 +566,7 @@ export default function FluidifyToken() {
               size="large"
               type="internal"
               left={true}
+              className="cancel-btn"
             >
               Cancel
             </LinkButton>
