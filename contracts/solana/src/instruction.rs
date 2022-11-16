@@ -24,6 +24,19 @@ pub enum FluidityInstruction {
     UpdateOperator(String),
     ConfirmUpdatePayoutAuthority(String),
     Emergency(String),
+
+    /// Initialises the metaplex metadata for the token
+    ///
+    /// Accounts expected by this instruction:
+    ///
+    ///   0. `[]` Data account
+    ///   1. `[]` Token base mint account
+    ///   2. `[]` Fluid token mint account
+    ///   3. `[]` PDA account
+    ///   4. `[signer]` Payer account
+    ///   5. `[]` System program
+    ///   6. `[]` Metaplex metadata program
+    CreateTokenMetadata(String, u8, String, String, String, u16),
 }
 
 // solend instructions

@@ -28,7 +28,7 @@ pub const UNINITIALIZED_VERSION: u8 = 0;
 
 /// Number of slots per year
 // 2 (slots per second) * 60 * 60 * 24 * 365 = 63072000
-#[allow(unused)]
+#[allow(dead_code)]
 pub const SLOTS_PER_YEAR: u64 = 63072000;
 
 // Helpers

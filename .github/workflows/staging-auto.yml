@@ -70,6 +70,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     needs: [cut-lib-release]
+    outputs:
+      file_exists: ${{ steps.deployment_list.outputs.exist }} 
     steps:
       - uses: actions/checkout@v3
         with:
@@ -91,8 +93,15 @@ jobs:
         with:
           name: diff-artifact
           path: ./deployment_list.json
+      - name: Check if deployment data exist
+        id: deployment_list
+        run: |
+          if [[ -f "./deployment_list.json" ]]; then
+            echo "exist=true" >> $GITHUB_OUTPUT
+          fi
 
   deploy-web:
+    if: needs.get-diff.outputs.file_exists == 'true'
     runs-on: ubuntu-latest
     environment: dev 
     needs: [get-diff]
