@@ -36,6 +36,7 @@ import {
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
+import {userAmountMinted, userMintLimit} from "~/util/chainUtils/solana/mintLimits";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network, assetId } = params;
@@ -64,22 +65,34 @@ export const loader: LoaderFunction = async ({ params }) => {
   if (!assetToken) throw new Error(`Asset ${assetId} not found`);
 
   // find the fluid asset to get its mint limits
-  const fluidAssetAddress = fluidAssetOf(tokens, assetToken);
-  if (!fluidAssetAddress)
+  const fluidAsset = fluidAssetOf(tokens, assetToken);
+  if (!fluidAsset)
     throw new Error(`No matching fluid token for ${assetId}`);
 
-  const provider = new JsonRpcProvider(rpcUrl);
+  let mintLimit: number = 0;
 
-  const mintLimitEnabled = await userMintLimitedEnabled(
-    provider,
-    fluidAssetAddress,
-    tokenAbi
-  );
+  switch (network) {
+    case "ethereum":
+      const provider = new JsonRpcProvider(rpcUrl);
 
-  // NOTE: Should be undefined
-  const userMintLimit = mintLimitEnabled
-    ? await getUsdUserMintLimit(provider, fluidAssetAddress, tokenAbi)
-    : 10000;
+      const mintLimitEnabled = await userMintLimitedEnabled(
+        provider,
+        fluidAsset.address,
+        tokenAbi
+      );
+
+      // NOTE: Should be undefined
+      mintLimit = mintLimitEnabled
+        ? await getUsdUserMintLimit(provider, fluidAsset.address, tokenAbi)
+        : 10000;
+
+      break;
+    case "solana":
+      mintLimit = (await userMintLimit(fluidAsset.name)).mint_limit;
+      break;
+    default:
+      throw new Error(`Invalid network ${network}`);
+  }
 
   return json({
     network,
@@ -87,7 +100,7 @@ export const loader: LoaderFunction = async ({ params }) => {
     ethereumWallets,
     assetToken: {
       ...assetToken,
-      userMintLimit,
+      userMintLimit: mintLimit,
     },
     colors: (await colors)[network as string],
   });
@@ -166,7 +179,7 @@ export default function FluidifyToken() {
 
   const isTablet = width < 1200;
 
-  const fluidTokenAddress = useMemo(
+  const fluidToken = useMemo(
     () => fluidAssetOf(tokens, assetToken),
     [assetToken]
   );
@@ -198,14 +211,15 @@ export default function FluidifyToken() {
   if (!tokenPair) throw new Error("Could not find matching Token!");
 
   useEffect(() => {
-    if (assetToken.userMintLimit && address && fluidTokenAddress && provider) {
+    if (assetToken.userMintLimit && address && fluidToken && provider) {
       // get a provider with the correct type
       const rpcProvider = provider.getSigner().provider;
 
-      if (network === "ethereum") {
+      switch (network) {
+      case "ethereum":
         getUsdAmountMinted(
           rpcProvider,
-          fluidTokenAddress,
+          fluidToken.address,
           tokenAbi,
           address
         ).then((amount) => {
@@ -213,12 +227,19 @@ export default function FluidifyToken() {
         });
 
         balance?.(assetToken.address).then(setUserTokenAmount);
+        break;
+        
+      case "solana":
+        userAmountMinted(fluidToken.name).then(({amount_minted}) => {
+          setAmountMinted(amount_minted || 0);
+        })
+        break;
       }
     }
-  }, [fluidTokenAddress, address]);
+  }, [fluidToken, address]);
 
   useEffect(() => {
-    if (assetToken.userMintLimit && address && fluidTokenAddress && provider) {
+    if (assetToken.userMintLimit && address && fluidToken && provider) {
       balance?.(assetToken.address).then(setUserTokenAmount);
     }
   }, [assetToken, address]);
@@ -247,7 +268,7 @@ export default function FluidifyToken() {
   const handleSwap = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!fluidTokenAddress) return;
+    if (!fluidToken) return;
 
     if (!connected || !address) return;
 
