@@ -53,6 +53,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         return "DASHBOARD";
       case "rewards":
         return "REWARDS";
+      case "unclaimed":
+        return "CLAIM";
       case "assets":
         return "ASSETS";
       case "dao":
@@ -64,7 +66,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const urlPaths = url.pathname.split("/");
 
-  const pathname = urlPaths[urlPaths.length - 1];
+  const pathname = urlPaths.pop() ?? "";
 
   const ethereumWallets = config.config["ethereum"].wallets;
 
@@ -74,8 +76,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const token = config.config;
 
+  const fromRedirectStr = url.searchParams.get("redirect");
+
+  const fromRedirect = fromRedirectStr === "true";
+
   return json({
     appName: routeMapper(pathname),
+    fromRedirect,
     version: "1.5",
     network,
     provider,
@@ -86,6 +93,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 type LoaderData = {
   appName: string;
+  fromRedirect: boolean;
   version: string;
   network: string;
   provider: typeof config.liquidity_providers;
@@ -113,7 +121,8 @@ function ErrorBoundary() {
 }
 
 export default function Dashboard() {
-  const { appName, version, network, token } = useLoaderData<LoaderData>();
+  const { appName, version, network, token, fromRedirect } =
+    useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -135,7 +144,7 @@ export default function Dashboard() {
 
   // Toggle Select Chain Modal
   const [chainModalVisibility, setChainModalVisibility] =
-    useState<boolean>(false);
+    useState<boolean>(fromRedirect);
 
   useEffect(() => {
     if (connected || connecting) setWalletModalVisibility(false);
@@ -233,7 +242,8 @@ export default function Dashboard() {
       address,
     });
 
-    socket.on("Transactions", (log: PipedTransaction) => {
+    setTimeout(() => {
+     socket.on("Transactions", (log: PipedTransaction) => {
       const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
         (entry) => entry.symbol === log.token
       );
@@ -244,15 +254,16 @@ export default function Dashboard() {
           tokenLogoSrc={fToken.at(0)?.logo}
           boldTitle={log.amount + ` ` + log.token}
           details={
-            log.source === address
-              ? `Sent to ` + trimAddress(log.destination)
-              : `Received from ` + trimAddress(log.source)
+            log.type === 'rewardDB'
+              ? `reward for sending`
+							: `received from ` + trimAddress(log.source)
           }
-          linkLabel={"ASSETS"}
+          linkLabel={"DETAILS"}
           linkUrl={"#"}
         />
       );
     });
+   }, 30000);
   }, [address]);
 
   const handleScroll = () => {
@@ -289,7 +300,9 @@ export default function Dashboard() {
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+        <a onClick={() => navigate("./home")}>
+          <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+        </a>
 
         <br />
 
@@ -399,7 +412,9 @@ export default function Dashboard() {
           {/* App Name */}
           <div className="top-navbar-left">
             {(isMobile || isTablet) && (
-              <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+              <a onClick={() => navigate("./home")}>
+                <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+              </a>
             )}
             {!isMobile && <Text>{appName}</Text>}
           </div>

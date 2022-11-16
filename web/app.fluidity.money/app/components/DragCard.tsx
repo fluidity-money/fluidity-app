@@ -23,7 +23,7 @@ type Props = {
 };
 
 const DragCard = (props: Props) => {
-  const { fluid, logo, name, symbol, amount } = props;
+  const { fluid, logo, name, symbol, amount, mintCapPercentage, color } = props;
 
   const [{ isDragging }, drag] = useDrag(() => {
     return {
@@ -40,10 +40,15 @@ const DragCard = (props: Props) => {
   return (
     <div ref={drag} key={symbol} className={`fluidify-card`}>
       <div className="fluidify-card--container">
-        <img src={logo} />
-        <div className={""}>
-          <span>{symbol}</span> <br />
-          {fluid && <span>{name}</span>}
+        <div className="fluidify-card-left">
+          <img
+            className={`fluidify-card-logo ${fluid ? "fluid-token-logo" : ""}`}
+            src={logo}
+          />
+          <div className={""}>
+            <span>{symbol}</span> <br />
+            {fluid && <span>{name}</span>}
+          </div>
         </div>
         <div className={""}>
           <span>
@@ -55,7 +60,13 @@ const DragCard = (props: Props) => {
         </div>
       </div>
       <div className="fluidify-card--progress-bar">
-        <div className="fluidify-card--progress" />
+        <div
+          className="fluidify-card--progress"
+          style={{
+            background: `${color}`,
+            transform: `scaleX(${mintCapPercentage})`,
+          }}
+        />
       </div>
     </div>
   );

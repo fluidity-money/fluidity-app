@@ -81,16 +81,23 @@ main > footer > section {
   margin-top: 2.25em;
 }
 
-#flu-logo > img {
+#flu-logo > a > img {
   width: 5em;
-}
-
-#flu-logo > * {
   margin-bottom: 1em;
+  cursor: pointer;
 }
 
-#top-navbar > img {
+#flu-logo > a > img:hover {
+  opacity: 0.8;
+}
+
+#top-navbar > a > img {
   width: 5em;
+  cursor: pointer;
+}
+
+#top-navbar > a > img:hover {
+  opacity: 0.8;
 }
 
 .top-navbar-left {
@@ -98,8 +105,13 @@ main > footer > section {
   align-items: center;
 }
 
-.top-navbar-left > img {
+.top-navbar-left > a > img {
   width: 5em;
+  cursor: pointer;
+}
+
+.top-navbar-left > a > img:hover {
+  opacity: 0.8;
 }
 
 /* .navbar-v2 {
@@ -536,9 +548,15 @@ main > footer > section > a {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 80%;
+  justify-content: space-between;
 }
 
 .mobile-modal-content > section:first-child {
+  width: 100%;
+}
+
+.mobile-modal-content > section:first-child > section {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -547,7 +565,7 @@ main > footer > section > a {
   align-items: center;
 }
 
-.mobile-modal-content > nav {
+.mobile-modal-content > section:first-child > nav {
   align-self: flex-start;
 }
 
@@ -791,4 +809,23 @@ main > footer > section > a {
   align-items: center;
   min-width: 160px;
   gap: 0.4em;
+}
+
+.tooltip-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  width: min-content;
+  white-space: nowrap;
+  padding: 10px;
+  height: 100px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: Aeonik, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  text-align: center;
 }

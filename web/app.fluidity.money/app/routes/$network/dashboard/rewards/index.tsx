@@ -82,13 +82,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         receiver: tx.receiver,
         reward: winnersMap[tx.hash]
           ? winnersMap[tx.hash].winning_amount /
-            winnersMap[tx.hash].token_decimals
+            10 ** winnersMap[tx.hash].token_decimals
           : 0,
         hash: tx.hash,
         currency: tx.currency,
         value: tx.value,
         timestamp: tx.timestamp,
       }));
+
+    const totalYield = mergedTransactions.reduce(
+      (sum, { reward }) => sum + reward,
+      0
+    );
 
     const { data: rewardData, errors: rewardErrors } =
       await useGlobalRewardStatistics(network ?? "");
@@ -136,6 +141,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       fluidPairs,
       transactions: mergedTransactions,
       count,
+      totalYield,
       networkFee,
       gasFee,
     });
@@ -165,6 +171,7 @@ type LoaderData = {
   rewarders: Provider[];
   transactions: Transaction[];
   count: number;
+  totalYield: number;
   page: number;
   network: Chain;
   fluidPairs: number;
@@ -201,6 +208,7 @@ export default function Rewards() {
     rewarders,
     transactions: allTransactions,
     count: allCount,
+    totalYield,
   } = useLoaderData<LoaderData>();
 
   const { connected, address } = useContext(FluidityFacadeContext);
@@ -427,7 +435,7 @@ export default function Rewards() {
             <Heading className="spendToEarnHeading" as="h2">
               Spend to earn
             </Heading>
-            <Text size="md">
+            <Text size="lg">
               Use, send and receive fluid assets <br />
               to generate yield.
             </Text>
@@ -457,7 +465,7 @@ export default function Rewards() {
               <div className="statistics-row">
                 <div className="statistics-set">
                   <LabelledValue label={"Total claimed yield"}>
-                    {numberToMonetaryString(29645)}
+                    {numberToMonetaryString(totalYield)}
                   </LabelledValue>
                 </div>
 

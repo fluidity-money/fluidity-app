@@ -12,7 +12,58 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
 )
 
-func GetUserMintLimit(address string) float64 {
+// GetUserMintLimit for the per-user limit for the given token
+func GetUserMintLimit(tokenName string) float64 {
+	databaseClient := postgres.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT 
+			mint_limit / (10 / token_decimals)
+		FROM %s
+		WHERE token_short_name = $1`,
+
+		TableMintLimits,
+	)
+
+	row := databaseClient.QueryRow(statementText, tokenName)
+
+	if err := row.Err(); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to query the Solana token (%#v) mint limit!",
+				tokenName,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	var mintLimit float64
+
+	err := row.Scan(
+		&mintLimit,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to scan the mint limit for a token (%#v)",
+				tokenName,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	return mintLimit
+}
+
+// GetUserAmountMinted for the amount the given address has minted so far
+func GetUserAmountMinted(address string) float64 {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(

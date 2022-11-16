@@ -31,7 +31,7 @@ pub struct Decimal(pub U192);
 
 impl Decimal {
     /// One
-    #[allow(unused)]
+    #[allow(dead_code)]
     pub fn one() -> Self {
         Self(Self::wad())
     }
@@ -47,13 +47,13 @@ impl Decimal {
     }
 
     // OPTIMIZE: use const slice when fixed in BPF toolchain
-    #[allow(unused)]
+    #[allow(dead_code)]
     fn half_wad() -> U192 {
         U192::from(HALF_WAD)
     }
 
     /// Create scaled decimal from percent value
-    #[allow(unused)]
+    #[allow(dead_code)]
     pub fn from_percent(percent: u8) -> Self {
         Self(U192::from(percent as u64 * PERCENT_SCALER))
     }
@@ -70,6 +70,7 @@ impl Decimal {
     }
 
     /// Round scaled decimal to u64
+    #[allow(dead_code)]
     pub fn try_round_u64(&self) -> Result<u64, ProgramError> {
         let rounded_val = Self::half_wad()
             .checked_add(self.0)
@@ -80,7 +81,7 @@ impl Decimal {
     }
 
     /// Ceiling scaled decimal to u64
-    #[allow(unused)]
+    #[allow(dead_code)]
     pub fn try_ceil_u64(&self) -> Result<u64, ProgramError> {
         let ceil_val = Self::wad()
             .checked_sub(U192::from(1u64))

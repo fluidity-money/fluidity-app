@@ -1,1 +1,5 @@
-export * as ethereum from "./ethereum";
+export {
+  getTransactionsObservableForIn,
+  getObservableForAddress,
+} from "./utils";
+export { getHasuraTransactionObservable } from "./hasura";

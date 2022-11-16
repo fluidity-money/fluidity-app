@@ -1,0 +1,5 @@
+SERVICES:
+  - USER_MINT_LIMITS: 
+      SERVICE_NAME: microservice-solana-user-limits
+      DOCKERFILE_PATH: ./cmd/microservice-solana-user-limits
+       

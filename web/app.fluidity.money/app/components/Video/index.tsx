@@ -52,7 +52,7 @@ export const Video = ({
 }: IPropsVideo) => {
   const classProps = className || "";
 
-  const dynamicWidth = isFirefox ? `${scale * 400}px` : `${scale * 100}%`;
+  const dynamicWidth = `${scale * 100}%`;
 
   let widthProp = width;
 

@@ -5,12 +5,14 @@
 package main
 
 import (
+	"crypto/ecdsa"
+	_ "embed"
 	"math/big"
+	"strings"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -19,56 +21,56 @@ import (
 )
 
 const (
-	// EnvContractAddress is the contract to call to update the mint limits on
-	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
-
 	// EnvEthereumHttpUrl to use to connect to Geth to send amounts
 	EnvEthereumHttpUrl = "FLU_ETHEREUM_HTTP_URL"
 
-	// EnvPrivateKey to use when signing requests to update the mint limits
-	EnvPrivateKey = `FLU_ETHEREUM_WORKER_PRIVATE_KEY`
+	// EnvPrivateKeys to use when signing requests to update the mint limits per contract
+	EnvPrivateKeys = `FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST`
+)
 
-	// EnvGlobalMintLimits to update the restriction set to
-	EnvGlobalMintLimit = `FLU_ETHEREUM_GLOBAL_MINT_LIMIT`
+var (
+	//go:embed global-limit-schedule.json
+	ScheduleGlobalMintLimitString string
 
-	// EnvUserMintLimits to update the global user limit
-	EnvUserMintLimit = `FLU_ETHEREUM_USER_USER_LIMIT`
+	//go:embed user-mint-limit-schedule.json
+	ScheduleUserMintLimitString string
+)
+
+var (
+	// ScheduleGlobalMintLimit to use for relaxing the global mint limit based
+	// on the day (UTC)
+	ScheduleGlobalMintLimit = make(map[string]map[string]string)
+
+	// ScheduleUserMintLimit to use for relaxing the user mint limit
+	ScheduleUserMintLimit = make(map[string]map[string]string)
 )
 
 func main() {
 	var (
-		contractAddress_  = util.GetEnvOrFatal(EnvContractAddress)
-		privateKey_       = util.GetEnvOrFatal(EnvPrivateKey)
-		ethereumHttpUrl   = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		globalMintLimit_ = util.GetEnvOrFatal(EnvGlobalMintLimit)
-		userMintLimit_    = util.GetEnvOrFatal(EnvUserMintLimit)
+		privateKeys_    = util.GetEnvOrFatal(EnvPrivateKeys)
+		ethereumHttpUrl = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 	)
 
-	userMintLimit, success := new(big.Int).SetString(userMintLimit_, 10)
+	privateKeys := make(map[string]*ecdsa.PrivateKey)
 
-	if !success {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to convert the user mint limit string to a bigint!"
-		})
-	}
+	for _, split := range strings.Split(privateKeys_, ",") {
+		s := strings.Split(split, ":")
 
-	globalMintLimit, success := new(big.Int).SetString(globalMintLimit_, 10)
+		var (
+			contractAddress = s[0]
+			privateKey_     = s[1]
+		)
 
-	if !success {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to convert the global mint limit string to a bigint!"
-		})
-	}
+		privateKey, err := ethCrypto.HexToECDSA(privateKey_)
 
-	contractAddress := ethCommon.HexToAddress(contractAddress_)
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert the private key passed to a private key!"
+				k.Payload = err
+			})
+		}
 
-	privateKey, err := ethCrypto.HexToECDSA(privateKey_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to convert the private key passed to a private key!"
-			k.Payload = err
-		})
+		privateKeys[contractAddress] = privateKey
 	}
 
 	ethClient, err := ethclient.Dial(ethereumHttpUrl)
@@ -80,42 +82,88 @@ func main() {
 		})
 	}
 
-	transactionOptions, err := ethereum.NewTransactionOptions(ethClient, privateKey)
+	defer ethClient.Close()
 
-	if err != nil {
+	now := time.Now().UTC()
+
+	key := now.Format("06-01-2")
+
+	globalMintLimits, ok := ScheduleGlobalMintLimit[key]
+
+	if !ok {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to create the transaction options!"
-			k.Payload = err
+			k.Message = "Unable to find global mint limit!"
+			k.Payload = key
 		})
 	}
 
-	transaction, err := fluidity.TransactUpdateMintLimits(
-		ethClient,
-		contractAddress,
-		globalMintLimit,
-		userMintLimit,
-		transactionOptions,
-	)
+	userMintLimits, ok := ScheduleUserMintLimit[key]
 
-	if err != nil {
+	if !ok {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to update the mint limits!"
-			k.Payload = err
+			k.Message = "Unable to find user mint limit!"
+			k.Payload = key
 		})
 	}
 
-	transactionHash := transaction.Hash().Hex()
+	for contractAddress_, globalMintLimit_ := range globalMintLimits {
+		userMintLimit_, ok := userMintLimits[contractAddress_]
 
-	discord.Notify(
-		discord.SeverityAlarm,
-		"Updated mint limits, transaction %v",
-		transactionHash,
-	)
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get the user mint limit for contract %v!",
+					contractAddress_,
+				)
+			})
+		}
 
-	log.App(func(k *log.Log) {
-		k.Format(
-			"Updated mint limits, transaction %v",
-			transactionHash,
+		privateKey, ok := privateKeys[contractAddress_]
+
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get the private key for contract %v!",
+					contractAddress_,
+				)
+			})
+		}
+
+		contractAddress := ethCommon.HexToAddress(contractAddress_)
+
+		transactOpts, err := ethereum.NewTransactionOptions(ethClient, privateKey)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to create the transaction options!"
+				k.Payload = err
+			})
+		}
+
+		globalMintLimit, ok := new(big.Int).SetString(globalMintLimit_, 10)
+
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert the global mint limit string to a bigint!"
+				k.Payload = contractAddress
+			})
+		}
+
+		userMintLimit, ok := new(big.Int).SetString(userMintLimit_, 10)
+
+		if !ok {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert the user mint limit string to a bigint!"
+				k.Payload = contractAddress
+			})
+		}
+
+		updateMintLimits(
+			ethClient,
+			transactOpts,
+			contractAddress,
+			globalMintLimit,
+			userMintLimit,
 		)
-	})
+	}
 }

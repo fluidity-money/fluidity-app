@@ -17,7 +17,7 @@ import {
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
-import { useState, useContext } from "react";
+import { useState, useContext, useMemo } from "react";
 import { useUserRewards } from "~/queries";
 import {
   useLoaderData,
@@ -78,17 +78,26 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       receiver: tx.receiver,
       reward: winnersMap[tx.hash]
         ? winnersMap[tx.hash].winning_amount /
-          winnersMap[tx.hash].token_decimals
+          10 ** winnersMap[tx.hash].token_decimals
         : 0,
       hash: tx.hash,
       currency: tx.currency,
-      value: tx.value,
-      timestamp: tx.timestamp,
+      value:
+        tx.currency === "DAI" || tx.currency === "fDAI"
+          ? tx.value / 10 ** 12
+          : tx.value,
+      timestamp: tx.timestamp * 1000,
     }));
+
+    const totalYield = mergedTransactions.reduce(
+      (sum, { reward }) => sum + reward,
+      0
+    );
 
     return json({
       transactions: mergedTransactions,
       count,
+      totalYield,
       fluidPairs,
       page,
       network,
@@ -120,8 +129,19 @@ type Transaction = {
   currency: string;
 };
 
+const graphEmptyTransaction = (time: number, value = 0) => ({
+  sender: "",
+  receiver: "",
+  reward: 0,
+  hash: "",
+  timestamp: time,
+  value,
+  currency: "",
+});
+
 type LoaderData = {
   transactions: Transaction[];
+  totalYield: number;
   count: number;
   fluidPairs: number;
   page: number;
@@ -151,6 +171,7 @@ export default function Home() {
     transactions: allTransactions,
     count: allCount,
     fluidPairs,
+    totalYield,
   } = useLoaderData<LoaderData>();
 
   const location = useLocation();
@@ -165,35 +186,103 @@ export default function Home() {
 
   const { address } = useContext(FluidityFacadeContext);
 
-  const [activeFilterIndex, setActiveFilterIndex] = useState(2);
+  const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
 
-  const [{ count, transactions }] = useState<{
+  const [{ count, transactions }, setTransactionRes] = useState<{
     count: number;
     transactions: Transaction[];
   }>({ count: allCount, transactions: allTransactions });
 
-  const graphFilters = [
+  const binTransactions = (bins: Transaction[], txs: Transaction[]) => {
+    let mappedTxIndex = 0;
+
+    txs.every((tx) => {
+      while (tx.timestamp < bins[mappedTxIndex].timestamp) {
+        mappedTxIndex += 1;
+
+        if (mappedTxIndex >= bins.length) return false;
+      }
+
+      if (tx.value > bins[mappedTxIndex].value) {
+        bins[mappedTxIndex] = tx;
+      }
+
+      return true;
+    });
+
+    const startBinTimestamp = bins[0].timestamp;
+    const endBinTimestamp = bins[bins.length - 1].timestamp;
+
+    return [graphEmptyTransaction(startBinTimestamp - 1, -1)]
+      .concat(bins)
+      .concat([graphEmptyTransaction(endBinTimestamp + 1, -1)]);
+  };
+
+  const graphTransformers = [
     {
       name: "D",
-      filter: (row: Transaction) =>
-        row.timestamp * 1000 >= Date.now() - 24 * 60 * 60 * 1000,
+      transform: (txs: Transaction[]) => {
+        const entries = 24;
+        const unixHourInc = 60 * 60 * 1000;
+        const unixNow = Date.now();
+
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
+          graphEmptyTransaction(unixNow - (i + 1) * unixHourInc)
+        );
+
+        return binTransactions(mappedTxBins, txs);
+      },
     },
     {
       name: "W",
-      filter: (row: Transaction) =>
-        row.timestamp * 1000 >= Date.now() - 7 * 24 * 60 * 60 * 1000,
+      transform: (txs: Transaction[]) => {
+        //const entries = 21;
+        //const unixEightHourInc = 8 * 60 * 60 * 1000;
+        const entries = 7;
+        const unixEightHourInc = 24 * 60 * 60 * 1000;
+        const unixNow = Date.now();
+
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
+          graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc)
+        );
+
+        return binTransactions(mappedTxBins, txs);
+      },
     },
     {
       name: "M",
-      filter: (row: Transaction) =>
-        row.timestamp * 1000 >= Date.now() - 31 * 24 * 60 * 60 * 1000,
+      transform: (txs: Transaction[]) => {
+        const entries = 30;
+        const unixDayInc = 24 * 60 * 60 * 1000;
+        const unixNow = Date.now();
+
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
+          graphEmptyTransaction(unixNow - (i + 1) * unixDayInc)
+        );
+
+        return binTransactions(mappedTxBins, txs);
+      },
     },
     {
       name: "Y",
-      filter: (row: Transaction) =>
-        row.timestamp * 1000 >= Date.now() - 365 * 24 * 60 * 60 * 1000,
+      transform: (txs: Transaction[]) => {
+        const entries = 12;
+        const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
+        const unixNow = Date.now();
+
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
+          graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc)
+        );
+
+        return binTransactions(mappedTxBins, txs);
+      },
     },
   ];
+
+  const graphTransformedTransactions = useMemo(
+    () => graphTransformers[activeTransformerIndex].transform(transactions),
+    [transactions, activeTransformerIndex]
+  );
 
   const { width } = useViewport();
   const tableBreakpoint = 850;
@@ -241,10 +330,7 @@ export default function Home() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, receiver, timestamp, value, currency, reward, hash } =
-        data;
-
-      const txAddress = sender === address ? receiver : sender;
+      const { sender, timestamp, value, currency, reward, hash } = data;
 
       return (
         <motion.tr
@@ -302,7 +388,7 @@ export default function Home() {
                 className="table-address"
                 href={getAddressExplorerLink(chain, sender)}
               >
-                <Text>{trimAddress(txAddress)}</Text>
+                <Text>{trimAddress(sender)}</Text>
               </a>
             </td>
           )}
@@ -340,7 +426,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>Total yield</Text>
                 <Display size={"xs"} style={{ margin: 0 }}>
-                  $20,000.00
+                  {numberToMonetaryString(totalYield)}
                 </Display>
                 <LinkButton
                   size="medium"
@@ -364,12 +450,18 @@ export default function Home() {
           {/* Graph Filter Row */}
           <div>
             <div className="statistics-row">
-              {graphFilters.map((filter, i) => (
+              {graphTransformers.map((filter, i) => (
                 <button
                   key={`filter-${filter.name}`}
-                  onClick={() => setActiveFilterIndex(i)}
+                  onClick={() => setActiveTransformerIndex(i)}
                 >
-                  <Text size="lg" prominent={activeFilterIndex === i}>
+                  <Text
+                    size="xxl"
+                    prominent={activeTransformerIndex === i}
+                    className={
+                      activeTransformerIndex === i ? "active-graph-filter" : ""
+                    }
+                  >
                     {filter.name}
                   </Text>
                 </button>
@@ -379,34 +471,41 @@ export default function Home() {
         </div>
 
         {/* Graph */}
-        <div className="graph" style={{ width: "100%", height: "400px" }}>
+        <div className="graph" style={{ width: "100vw", height: "400px" }}>
           <LineChart
-            data={transactions.filter(graphFilters[activeFilterIndex].filter)}
+            data={graphTransformedTransactions}
             lineLabel="transactions"
             accessors={{
               xAccessor: (d: Transaction) => d.timestamp,
-              yAccessor: (d: Transaction) => d.value,
+              yAccessor: (d: Transaction) =>
+                Math.log((d.value || 0.001) * 1100),
             }}
-            renderTooltip={({ datum }: { datum: Transaction }) => (
-              <div className={"tooltip"}>
-                <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                  {format(datum.timestamp * 1000, "dd/mm/yy")}
-                </span>
-                <br />
-                <br />
-                <span>
-                  <span>{trimAddress(datum.sender)}</span>
-                </span>
-                <br />
-                <br />
-                <span>
-                  <span>{numberToMonetaryString(datum.value)} </span>
-                  <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                    prize awarded
-                  </span>
-                </span>
-              </div>
-            )}
+            renderTooltip={({ datum }: { datum: Transaction }) =>
+              datum.value > 0 ? (
+                <div className={"tooltip-container"}>
+                  <div className={"tooltip"}>
+                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                      {format(datum.timestamp, "dd/mm/yy")}
+                    </span>
+                    <br />
+                    <br />
+                    <span>
+                      <span>{trimAddress(datum.sender)}</span>
+                    </span>
+                    <br />
+                    <br />
+                    <span>
+                      <span>{numberToMonetaryString(datum.value)} </span>
+                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                        swapped
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )
+            }
           />
         </div>
       </section>
