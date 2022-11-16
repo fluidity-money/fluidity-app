@@ -88,7 +88,10 @@ const limit = async (tokenName: string): Promise<number> => {
     token_short_name: tokenName,
   };
 
-  const response = await jsonPost<UserMintLimitReq, UserMintLimitRes>(url, body);
+  const response = await jsonPost<UserMintLimitReq, UserMintLimitRes>(
+    url,
+    body
+  );
 
   return response.mint_limit;
 };
@@ -96,11 +99,11 @@ const limit = async (tokenName: string): Promise<number> => {
 type UserAmountMintedReq = {
   address: string;
   token_short_name: string;
-}
+};
 
 export type UserAmountMintedRes = {
   amount_minted: number;
-}
+};
 
 const amountMinted = async (tokenName: string): Promise<number> => {
   const solContext = getCheckedSolContext();
@@ -117,7 +120,10 @@ const amountMinted = async (tokenName: string): Promise<number> => {
     token_short_name: tokenName,
   };
 
-  const response = await jsonPost<UserAmountMintedReq, UserAmountMintedRes>(url, body);
+  const response = await jsonPost<UserAmountMintedReq, UserAmountMintedRes>(
+    url,
+    body
+  );
 
   return response.amount_minted;
 };
@@ -291,4 +297,4 @@ export const solanaInstructions = {
   amountMinted,
 };
 
-export { internalSwap }
+export { internalSwap };

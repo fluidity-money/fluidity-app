@@ -25,9 +25,9 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
     (async () => {
       fetch(`/solana/query/solanaSwap?amount=${amount}&tokenAddr=${tokenAddr}`);
     })();
-    
+
     return;
-  }
+  };
 
   return (
     <FluidityFacadeContext.Provider

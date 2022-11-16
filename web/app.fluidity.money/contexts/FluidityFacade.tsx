@@ -11,7 +11,7 @@ export interface IFluidityFacade {
   useConnectorType: (use: string) => void;
 
   address: string;
-  
+
   // Ethereum Only
   ethSwap: (amount: string, tokenAddr: string) => Promise<void>;
 }

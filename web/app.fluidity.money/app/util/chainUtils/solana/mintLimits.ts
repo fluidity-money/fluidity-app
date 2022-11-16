@@ -1,5 +1,5 @@
-import {jsonPost} from "~/util/api/rpc";
-import {getCheckedSolContext} from "./instructions";
+import { jsonPost } from "~/util/api/rpc";
+import { getCheckedSolContext } from "./instructions";
 
 type UserMintLimitReq = {
   token_short_name: string;
@@ -12,11 +12,11 @@ type UserMintLimitRes = {
 type UserAmountMintedReq = {
   address: string;
   token_short_name: string;
-}
+};
 
 type UserAmountMintedRes = {
   amount_minted: number;
-}
+};
 
 const userMintLimit = async (tokenName: string): Promise<UserMintLimitRes> => {
   const url = "https://api.solana.fluidity.money/user-mint-limit";
@@ -24,12 +24,17 @@ const userMintLimit = async (tokenName: string): Promise<UserMintLimitRes> => {
     token_short_name: tokenName,
   };
 
-  const response = await jsonPost<UserMintLimitReq, UserMintLimitRes>(url, body);
+  const response = await jsonPost<UserMintLimitReq, UserMintLimitRes>(
+    url,
+    body
+  );
 
   return response;
 };
 
-const userAmountMinted = async (tokenName: string): Promise<UserAmountMintedRes> => {
+const userAmountMinted = async (
+  tokenName: string
+): Promise<UserAmountMintedRes> => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -44,12 +49,12 @@ const userAmountMinted = async (tokenName: string): Promise<UserAmountMintedRes>
     token_short_name: tokenName,
   };
 
-  const response = await jsonPost<UserAmountMintedReq, UserAmountMintedRes>(url, body);
+  const response = await jsonPost<UserAmountMintedReq, UserAmountMintedRes>(
+    url,
+    body
+  );
 
   return response;
 };
 
-export {
-  userMintLimit,
-  userAmountMinted,
-};
+export { userMintLimit, userAmountMinted };

@@ -4,7 +4,7 @@ import { internalSwap } from "~/util/chainUtils/solana/instructions";
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
-  
+
   if (network !== "solana") return new Error("Invalid Request");
 
   const url = new URL(request.url);
@@ -14,6 +14,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!amount || !tokenAddr) return new Error("Invalid Request");
 
   return json({
-    swapRes: await internalSwap(amount, tokenAddr)
-  })
+    swapRes: await internalSwap(amount, tokenAddr),
+  });
 };
