@@ -80,7 +80,7 @@ func main() {
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Reward value is $%s, instant send threshhold is $%s.",
+					"Reward value is $%s, instant send threshhold is $%f.",
 					scaledWinAmount.FloatString(2),
 					instantRewardThreshold,
 				)
@@ -92,7 +92,7 @@ func main() {
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Total pending rewards are $%s, threshhold is $%s.",
+					"Total pending rewards are $%s, threshhold is $%f.",
 					scaledBatchedRewards.FloatString(2),
 					batchedRewardThreshold,
 				)
