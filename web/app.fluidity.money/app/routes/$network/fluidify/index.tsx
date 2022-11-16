@@ -40,6 +40,7 @@ import {
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -151,24 +152,37 @@ const FluidityHotSpot = ({
   }))[1];
 
   return (
-    <main>
-      <div ref={drop} className="fluidify-hot-spot">
-        <img
-          className="fluidify-circle"
-          src="/images/fluidify/fluidify-hotspot.png"
-        />
-        <span className={"dashed-circle"}>
-          {activeToken && (
-            <img
-              className={`fluidify-token ${
-                activeToken.isFluidOf ? "fluid-token" : ""
-              }`}
-              src={activeToken.logo}
-            />
-          )}
-        </span>
-      </div>
-    </main>
+    <AnimatePresence>
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
+        exit={{ opacity: 0 }}
+        className="main-hotspot"
+      >
+        <div ref={drop} className="fluidify-hot-spot">
+          <img
+            className="fluidify-circle"
+            src="/images/fluidify/fluidify-hotspot.png"
+          />
+          <span className={"dashed-circle"}>
+            {!activeToken && (
+              <Text size="sm" className="circle-text">
+                Drag and drop the asset <br /> you want to fluidify here.{" "}
+              </Text>
+            )}
+            {activeToken && (
+              <img
+                className={`fluidify-token ${
+                  activeToken.isFluidOf ? "fluid-token" : ""
+                }`}
+                src={activeToken.logo}
+              />
+            )}
+          </span>
+        </div>
+      </motion.main>
+    </AnimatePresence>
   );
 };
 
@@ -230,7 +244,7 @@ export default function FluidifyToken() {
       filter: (t: AugmentedToken) => !t.isFluidOf,
     },
   ];
-
+  // loop = false, once video over, on end reset.
   const [swapAmount, setSwapAmount] = useState(0);
 
   const [swapping, setSwapping] = useState(false);
@@ -353,7 +367,7 @@ export default function FluidifyToken() {
       <header className={"fluidify-heading"}>
         <section>
           <Display size="xs" style={{ margin: 0 }}>
-            Create or revert fluid assets
+            Create or revert <br /> fluid assets
           </Display>
 
           {connected && address ? (
@@ -400,8 +414,13 @@ export default function FluidifyToken() {
           />
         </section>
         <Link to="../..">
-          <LinkButton handleClick={() => null} size="large" type="internal">
-            Close
+          <LinkButton
+            handleClick={() => null}
+            size="large"
+            type="internal"
+            left={true}
+          >
+            Cancel
           </LinkButton>
         </Link>
       </header>
@@ -519,18 +538,27 @@ export default function FluidifyToken() {
 
         {/* Swap Circle */}
         {swapping ? (
-          <div>
-            <Video
-              src={"/videos/FLUIDITY_01.mp4"}
-              loop={!finishing}
-              type="none"
-              scale={2}
-              onEnded={() => {
-                setSwapping(false);
-              }}
-            />
-            <img src={assetToken!.logo} className={""} />
-          </div>
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.5 }}
+              exit={{ opacity: 0 }}
+              className="video-container"
+            >
+              <Video
+                className="swapping-video"
+                src={"/videos/FLUIDITY_01.mp4"}
+                loop={false}
+                type="none"
+                scale={2}
+                onEnded={() => {
+                  setSwapping(false);
+                }}
+              />
+              <img src={assetToken!.logo} />
+            </motion.div>
+          </AnimatePresence>
         ) : (
           <FluidityHotSpot activeToken={assetToken} callBack={setAssetToken} />
         )}
