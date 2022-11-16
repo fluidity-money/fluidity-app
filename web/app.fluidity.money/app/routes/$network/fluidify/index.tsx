@@ -41,6 +41,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { AnimatePresence, motion } from "framer-motion";
+import {userAmountMinted, userMintLimit} from "~/util/chainUtils/solana/mintLimits";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -68,20 +69,29 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = new JsonRpcProvider(rpcUrl);
 
+  let mintLimit: number | undefined;
+
   const augmentedTokens = await Promise.all(
     tokens.map(async (token) => {
-      const mintLimitEnabled = fluidTokenSet.has(token.address)
-        ? //? await userMintLimitedEnabled(provider, token.address, tokenAbi)
-          true
-        : false;
+      switch (network) {
+        case "ethereum":
+        const mintLimitEnabled = fluidTokenSet.has(token.address)
+          ? //? await userMintLimitedEnabled(provider, token.address, tokenAbi)
+            true
+          : false;
 
-      const userMintLimit = mintLimitEnabled
-        ? await getUsdUserMintLimit(provider, token.address, tokenAbi)
-        : undefined;
+        mintLimit = mintLimitEnabled
+          ? await getUsdUserMintLimit(provider, token.address, tokenAbi)
+          : undefined;
+        break;
 
+        case "solana":
+          mintLimit = (await userMintLimit(token.name)).mint_limit;
+          break;
+      }
       return {
         ...token,
-        userMintLimit: userMintLimit,
+        userMintLimit: mintLimit,
         userTokenBalance: 0,
       };
     })
@@ -118,7 +128,7 @@ export const links = () => {
   ];
 };
 
-function ErrorBoundary(error) {
+function ErrorBoundary(error: any) {
   console.log(error);
   return (
     <div
@@ -249,15 +259,16 @@ export default function FluidifyToken() {
 
   const [swapping, setSwapping] = useState(false);
   const [finishing, setFinishing] = useState(false);
-
+  
   useEffect(() => {
     if (address && provider) {
       (async () => {
-        if (network === "ethereum") {
+        switch (network) {
+          case "ethereum":
           // get a provider with the correct type
           const rpcProvider = provider.getSigner().provider;
 
-          const userAmountMinted = await Promise.all(
+          let amountMinted = await Promise.all(
             tokens.map(async (token) => {
               if (!token.isFluidOf) return undefined;
 
@@ -270,14 +281,33 @@ export default function FluidifyToken() {
             })
           );
 
-          const userTokenBalance = await Promise.all(
+          let userTokenBalance = await Promise.all(
+            tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+          );
+
+          for (let i = 0; i < amountMinted.length; i++) {
+            tokens[i].userMintedAmt = amountMinted[i];
+            tokens[i].userTokenBalance = userTokenBalance[i];
+          }
+          break;
+          
+          case "solana":
+          amountMinted = await Promise.all(
+            tokens.map(async (token) => {
+              if (!token.isFluidOf) return undefined;
+              return (await userAmountMinted(token.name)).amount_minted;
+            })
+          );
+
+          userTokenBalance = await Promise.all(
             tokens.map(async ({ address }) => (await balance?.(address)) || 0)
           );
 
           for (let i = 0; i < userAmountMinted.length; i++) {
-            tokens[i].userMintedAmt = userAmountMinted[i];
+            tokens[i].userMintedAmt = amountMinted[i];
             tokens[i].userTokenBalance = userTokenBalance[i];
           }
+          break;
         }
       })();
     }

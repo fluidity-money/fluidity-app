@@ -19,7 +19,7 @@ type MintLimitReq = {
 
 type MintLimitRes = number;
 
-const getCheckedSolContext = () => {
+export const getCheckedSolContext = () => {
   const wallet = useWallet();
 
   if (!wallet) return new Error("Not wallet found");
