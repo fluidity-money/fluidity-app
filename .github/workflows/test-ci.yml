@@ -87,7 +87,7 @@ jobs:
       - name: npm test
         working-directory: web/app.fluidity.money
         run: |
-          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GH_SUPER_TOKEN }}
           npm install
           npm test
       - name: Discord
