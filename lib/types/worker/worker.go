@@ -17,12 +17,14 @@ type (
 	// WorkerConfigEthereum to be used with any EVM chains to store config
 	// that was previously hardcoded
 	WorkerConfigEthereum struct {
-		Network                      network.BlockchainNetwork `json:"network"`
-		CompoundBlocksPerDay         int                       `json:"compound_blocks_per_day"`
-		DefaultSecondsSinceLastBlock uint64                    `json:"default_seconds_since_last_block"`
-		CurrentAtxTransactionMargin  int64                     `json:"current_atx_transaction_margin"`
-		DefaultTransfersInBlock      int                       `json:"default_transfers_in_block"`
-		AtxBufferSize                int                       `json:"atx_buffer_size"`
+		Network                       network.BlockchainNetwork `json:"network"`
+		CompoundBlocksPerDay          int                       `json:"compound_blocks_per_day"`
+		DefaultSecondsSinceLastBlock  uint64                    `json:"default_seconds_since_last_block"`
+		CurrentAtxTransactionMargin   int64                     `json:"current_atx_transaction_margin"`
+		DefaultTransfersInBlock       int                       `json:"default_transfers_in_block"`
+		AtxBufferSize                 int                       `json:"atx_buffer_size"`
+		SpoolerInstantRewardThreshold float64                   `json:"spooler_instant_reward_threshold"`
+		SpoolerBatchedRewardThreshold float64                   `json:"spooler_batched_reward_threshold"`
 	}
 
 	// WorkerConfigSolana that was previously hardcoded for Solana only
