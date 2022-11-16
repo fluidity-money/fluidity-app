@@ -70,10 +70,10 @@ export const loader: LoaderFunction = async ({ params }) => {
           : false;
 
         const userMintLimit = mintLimitEnabled
-          ? //? await getUsdUserMintLimit(provider, token.address, tokenAbi)
-            undefined
+          //? await getUsdUserMintLimit(provider, token.address, tokenAbi)
+          ? undefined
           : undefined;
-
+        
         return {
           ...token,
           userMintLimit: userMintLimit,
@@ -102,6 +102,7 @@ export const loader: LoaderFunction = async ({ params }) => {
       };
     })
   );
+  
 
   return json({
     network,
@@ -238,7 +239,7 @@ export default function FluidifyToken() {
         : undefined,
     [assetToken]
   );
-
+  
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState(false);
   const [walletModalVisibility, setWalletModalVisibility] = useState(
@@ -273,7 +274,7 @@ export default function FluidifyToken() {
 
   const [swapping, setSwapping] = useState(false);
   const [finishing, setFinishing] = useState(false);
-
+  
   useEffect(() => {
     if (address) {
       (async () => {
@@ -283,23 +284,21 @@ export default function FluidifyToken() {
               tokens.map(async (token) => {
                 if (!token.isFluidOf) return undefined;
 
-                return amountMinted?.(token.address);
-              })
-            );
+                  return amountMinted?.(token.address);
+                })
+              );
 
             let userTokenBalance = await Promise.all(
               tokens.map(async ({ address }) => (await balance?.(address)) || 0)
             );
 
-            setTokens(
-              tokens.map((token, i) => ({
-                ...token,
-                userMintedAmt: tokensMinted[i],
-                userTokenBalance: userTokenBalance[i],
-              }))
-            );
+            setTokens(tokens.map((token, i) => ({
+              ...token,
+              userMintedAmt: tokensMinted[i],
+              userTokenBalance: userTokenBalance[i],
+            })))
             break;
-
+          
           case "solana":
             tokensMinted = await Promise.all(
               tokens.map(async (token) => {
@@ -312,13 +311,11 @@ export default function FluidifyToken() {
               tokens.map(async ({ address }) => (await balance?.(address)) || 0)
             );
 
-            setTokens(
-              tokens.map((token, i) => ({
-                ...token,
-                userMintedAmt: tokensMinted[i],
-                userTokenBalance: userTokenBalance[i],
-              }))
-            );
+            setTokens(tokens.map((token, i) => ({
+              ...token,
+              userMintedAmt: tokensMinted[i],
+              userTokenBalance: userTokenBalance[i],
+            })))
             break;
         }
       })();
@@ -336,7 +333,7 @@ export default function FluidifyToken() {
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
     tokens as AugmentedToken[]
   );
-
+  
   const debouncedSearch: DebouncedFunc<
     (tokens: AugmentedToken[]) => AugmentedToken[]
   > = debounce((tokens: AugmentedToken[]) => {
@@ -359,7 +356,7 @@ export default function FluidifyToken() {
       debouncedSearch.cancel();
     };
   }, [search, activeFilterIndex, tokens]);
-
+  
   const handleSwap = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -553,6 +550,7 @@ export default function FluidifyToken() {
                       userTokenBalance,
                       userMintLimit,
                       userMintedAmt,
+                      ...props
                     }) => {
                       return (
                         <DragCard
@@ -569,6 +567,7 @@ export default function FluidifyToken() {
                           }
                           color={colors[symbol]}
                           amount={userTokenBalance}
+          token={}
                         />
                       );
                     }

@@ -20,17 +20,17 @@ type Props = {
   address: string;
 
   color?: string;
+  
+  token: any;
 };
 
 const DragCard = (props: Props) => {
-  const { fluid, logo, name, symbol, amount, mintCapPercentage, color } = props;
+  const { fluid, logo, name, symbol, amount, mintCapPercentage, color, token } = props;
 
   const [{ isDragging }, drag] = useDrag(() => {
     return {
       type: fluid ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET,
-      item: {
-        ...props,
-      },
+      item: {...props},
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
