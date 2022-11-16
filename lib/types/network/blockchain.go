@@ -4,6 +4,8 @@
 
 package network
 
+import "fmt"
+
 // blockchain networks that we currently support, hardcoded for the SQL constants
 
 // BlockchainNetwork backend that we currently support
@@ -14,3 +16,21 @@ const (
 	NetworkArbitrum BlockchainNetwork = `arbitrum`
 	NetworkSolana   BlockchainNetwork = `solana`
 )
+
+// ParseEthereumNetwork takes a network name as a string
+// and tries to convert it to an ethereum BlockchainNetwork
+func ParseEthereumNetwork(network_ string) (network BlockchainNetwork, err error) {
+	switch network_ {
+	case string(NetworkEthereum):
+		network = NetworkEthereum
+	case string(NetworkArbitrum):
+		network = NetworkArbitrum
+	default:
+		err = fmt.Errorf(
+			"Unknown network name '%s'",
+			network,
+		)
+	}
+
+	return
+}

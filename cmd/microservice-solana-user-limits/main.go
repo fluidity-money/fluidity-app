@@ -54,8 +54,8 @@ func HandleUserAmountMinted(w http.ResponseWriter, r *http.Request) interface{} 
 			k.Payload = err
 		})
 
-        w.WriteHeader(http.StatusForbidden)
-        return nil
+		w.WriteHeader(http.StatusForbidden)
+		return nil
 	}
 
     amountMinted := solana.GetUserAmountMinted(request.Address)

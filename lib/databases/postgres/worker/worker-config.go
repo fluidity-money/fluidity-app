@@ -22,7 +22,9 @@ func GetWorkerConfigEthereum(network_ network.BlockchainNetwork) (config WorkerC
 			default_seconds_since_last_block,
 			current_atx_transaction_margin,
 			default_transfers_in_block,
-			atx_buffer_size
+			atx_buffer_size,
+			spooler_instant_reward_threshold,
+			spooler_batched_reward_threshold
 		FROM %s
 		WHERE network = $1`,
 
@@ -47,6 +49,8 @@ func GetWorkerConfigEthereum(network_ network.BlockchainNetwork) (config WorkerC
 		&config.CurrentAtxTransactionMargin,
 		&config.DefaultTransfersInBlock,
 		&config.AtxBufferSize,
+		&config.SpoolerInstantRewardThreshold,
+		&config.SpoolerBatchedRewardThreshold,
 	)
 
 	if err != nil {

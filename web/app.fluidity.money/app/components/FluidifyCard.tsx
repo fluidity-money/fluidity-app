@@ -1,7 +1,3 @@
-import { useDrag } from "react-dnd";
-
-import ItemTypes from "~/types/ItemTypes";
-
 type Props = {
   fluid: boolean;
 
@@ -15,30 +11,34 @@ type Props = {
   mintCapPercentage?: number;
 
   amount: number;
+
   currentPrice?: string;
 
   address: string;
 
   color?: string;
+
+  onClick: (symbol: string) => void;
 };
 
-const DragCard = (props: Props) => {
-  const { fluid, logo, name, symbol, amount, mintCapPercentage, color } = props;
-
-  const [{ isDragging }, drag] = useDrag(() => {
-    return {
-      type: fluid ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET,
-      item: {
-        ...props,
-      },
-      collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
-      }),
-    };
-  });
+const FluidifyCard = (props: Props) => {
+  const {
+    fluid,
+    logo,
+    name,
+    symbol,
+    amount,
+    onClick,
+    mintCapPercentage,
+    color,
+  } = props;
 
   return (
-    <div ref={drag} key={symbol} className={`fluidify-card`}>
+    <div
+      key={symbol}
+      className={`fluidify-card`}
+      onClick={() => onClick(symbol)}
+    >
       <div className="fluidify-card--container">
         <div className="fluidify-card-left">
           <img
@@ -72,4 +72,4 @@ const DragCard = (props: Props) => {
   );
 };
 
-export default DragCard;
+export default FluidifyCard;

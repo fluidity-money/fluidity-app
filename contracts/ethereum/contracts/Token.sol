@@ -606,7 +606,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
      * @notice returns whether mint limits are enabled
      */
     function mintLimitsEnabled() public view returns (bool) { return mintLimitsEnabled_; }
- 
+
     /*
      * @notice returns the mint limit per user
      */
@@ -637,6 +637,11 @@ contract Token is IERC20, ITransferWithBeneficiary {
     function totalSupply() public view returns (uint256) { return totalSupply_; }
     function balanceOf(address account) public view returns (uint256) {
        return balances_[account];
+    }
+
+    function setDecimals(uint8 _decimals) public {
+      require(msg.sender == operator_, "only operator can use this function!");
+      decimals_ = _decimals;
     }
 
     function transfer(address to, uint256 amount) public returns (bool) {
