@@ -30,7 +30,7 @@ const DragCard = (props: Props) => {
   const [{ isDragging }, drag] = useDrag(() => {
     return {
       type: fluid ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET,
-      item: {...props},
+      item: token,
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),

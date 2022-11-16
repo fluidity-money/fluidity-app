@@ -541,33 +541,23 @@ export default function FluidifyToken() {
                     return true;
                   })
                   .map(
-                    ({
-                      address,
-                      name,
-                      symbol,
-                      logo,
-                      isFluidOf,
-                      userTokenBalance,
-                      userMintLimit,
-                      userMintedAmt,
-                      ...props
-                    }) => {
+                    (token) => {
                       return (
                         <DragCard
-                          key={symbol}
-                          fluid={isFluidOf !== undefined}
-                          symbol={symbol}
-                          name={name}
-                          logo={logo}
-                          address={address}
+                          key={token.symbol}
+                          fluid={token.isFluidOf !== undefined}
+                          symbol={token.symbol}
+                          name={token.name}
+                          logo={token.logo}
+                          address={token.address}
                           mintCapPercentage={
-                            !!userMintLimit && userMintedAmt !== undefined
-                              ? userMintedAmt / userMintLimit
+                            !!token.userMintLimit && token.userMintedAmt !== undefined
+                              ? token.userMintedAmt / token.userMintLimit
                               : undefined
                           }
-                          color={colors[symbol]}
-                          amount={userTokenBalance}
-          token={}
+                          color={colors[token.symbol]}
+                          amount={token.userTokenBalance}
+                          token={token}
                         />
                       );
                     }
