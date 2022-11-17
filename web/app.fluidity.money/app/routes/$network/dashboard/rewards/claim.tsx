@@ -2,7 +2,9 @@ import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { useContext } from "react";
 import { useNavigate } from "@remix-run/react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   Text,
   numberToMonetaryString,
@@ -45,8 +47,12 @@ type LoaderData = {
 
 const ClaimedRewards = () => {
   const { reward, networkFee, gasFee } = useLoaderData<LoaderData>();
-
+  
+  const { connected } = useContext(FluidityFacadeContext);
+  
   const navigate = useNavigate();
+
+  if (!connected) return navigate("../../home");
 
   const generateTweet = () => {
     const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");

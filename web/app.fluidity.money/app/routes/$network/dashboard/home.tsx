@@ -186,7 +186,7 @@ export default function Home() {
 
   const { address } = useContext(FluidityFacadeContext);
 
-  const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
+  const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
 
   const [{ count, transactions }] = useState<{
     count: number;
