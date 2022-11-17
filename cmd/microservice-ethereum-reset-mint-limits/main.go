@@ -80,11 +80,9 @@ func main() {
 		privateKeys[contractAddress] = privateKey
 	}
 
-	var mintLimitsPriorStart int
+	mintLimitsPriorStart := 0
 
-	if mintLimitsPriorStart_ == "" {
-		mintLimitsPriorStart = 0
-	} else {
+	if mintLimitsPriorStart_ != "" {
 		var err error
 
 		mintLimitsPriorStart, err = strconv.Atoi(mintLimitsPriorStart_)
