@@ -1,10 +1,10 @@
 import hre from 'hardhat'
 import { mustEnv } from '../script-utils';
 
-const ENV_TOKEN_BEACON_PROXY_ADDRESS = `FLU_ETHEREUM_TOKEN_BEACON_PROXY_ADDRESS`;
+const ENV_TOKEN_BEACON_ADDRESS = `FLU_ETHEREUM_TOKEN_BEACON_ADDRESS`;
 
 const main = async () => {
-    const backendAddress = mustEnv(ENV_TOKEN_BEACON_PROXY_ADDRESS);
+    const backendAddress = mustEnv(ENV_TOKEN_BEACON_ADDRESS);
 
     const tokenFactory = await hre.ethers.getContractFactory("Token");
 
@@ -37,7 +37,7 @@ const main = async () => {
         deployedUnderlyingAddress
     );
 
-    console.log(`data to upgrade the beacon proxy is: ${transaction.data}`);
+    console.log(`data to upgrade the beacon is: ${transaction.data}`);
 };
 
 main()
