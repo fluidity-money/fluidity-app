@@ -129,13 +129,19 @@ main {
 }
 
 .fluidify-tokens-container {
-  max-height: calc(100vh - 80px);
+  max-height: calc(100vh - 100px);
 }
 
 .fluidify-tokens {
-  height: calc(100vh - 320px);
+  max-height: calc(100vh - 340px);
   overflow-y: auto;
   margin-top: 0.5em;
+}
+
+@media (max-width: 1250px) {
+  .fluidify-tokens {
+    max-height: calc(100vh - 480px);
+  }
 }
 
 .fluidify-form {
@@ -579,7 +585,13 @@ main {
 }
 
 .footer-text {
+  position: fixed;
+  left: 50%;
+  bottom: 1%;
+  transform: translateX(-50%);
+  text-align: center;
   padding-bottom: 1em;
+  width: 100%;
 }
 
 .swap-footer-text {

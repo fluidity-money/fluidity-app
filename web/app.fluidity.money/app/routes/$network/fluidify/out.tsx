@@ -59,8 +59,9 @@ type LoaderData = {
   amount: number;
 };
 
-function ErrorBoundary(error: any) {
+function ErrorBoundary(error: Error) {
   console.log(error);
+
   return (
     <div
       style={{

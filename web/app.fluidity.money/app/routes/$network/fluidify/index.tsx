@@ -26,12 +26,8 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import config, { colors } from "~/webapp.config.server";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { JsonRpcProvider } from "@ethersproject/providers";
+// import { JsonRpcProvider } from "@ethersproject/providers";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  userMintLimit,
-  userAmountMinted,
-} from "~/util/chainUtils/solana/mintLimits";
 import ItemTypes from "~/types/ItemTypes";
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -41,27 +37,26 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const ethereumWallets = config.config["ethereum"].wallets;
 
-  const networkIndex = 0;
+  // const networkIndex = 0;
 
   const {
     config: {
       [network as string]: { tokens },
     },
-    drivers: {
-      [network as string]: {
-        [networkIndex]: {
-          rpc: { http: rpcUrl },
-        },
-      },
-    },
+    // drivers: {
+    //   [network as string]: {
+    //     [networkIndex]: {
+    //       rpc: { http: rpcUrl },
+    //     },
+    //   },
+    // },
   } = config;
 
   if (network === "ethereum") {
-    const provider = new JsonRpcProvider(rpcUrl);
-
     const augmentedTokens = await Promise.all(
       tokens.map(async (token) => {
-        const { address, isFluidOf } = token;
+        const { isFluidOf } = token;
+        // const { address } = token;
 
         const mintLimitEnabled = isFluidOf
           ? //? await userMintLimitedEnabled(provider, address, tokenAbi)
@@ -92,7 +87,8 @@ export const loader: LoaderFunction = async ({ params }) => {
   // Network === "solana"
   const augmentedTokens = await Promise.all(
     tokens.map(async (token) => {
-      const { isFluidOf, name } = token;
+      const { isFluidOf } = token;
+      // const { name } = token;
 
       const mintLimit = isFluidOf
         ? // ?await userMintLimit(name)
@@ -269,7 +265,7 @@ interface IFluidifyFormProps {
   swapAmount: number;
   setSwapAmount: React.Dispatch<React.SetStateAction<number>>;
   assetToken: AugmentedToken;
-  toToken: SerializeObject<UndefinedToOptional<AugmentedToken>>;
+  toToken: AugmentedToken;
   userTokenAmount?: number;
   swapping: boolean;
 }
@@ -356,16 +352,6 @@ export const FluidifyForm = ({
   );
 };
 
-const FooterText = () => {
-  return (
-    <Text size="sm" className="footer-text">
-      Fluidity employ daily limits on fluidifying assets for <br /> maintained
-      system stability. Limits reset at midnight EST. <br />
-      Unlimited reversion of fluid to non-fluid assets per day.
-    </Text>
-  );
-};
-
 export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
   const {
@@ -443,8 +429,6 @@ export default function FluidifyToken() {
 
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
-  // Finish swap animation
-  const [finishing, setFinishing] = useState(false);
 
   // get token data once user is connected
   useEffect(() => {
@@ -568,8 +552,6 @@ export default function FluidifyToken() {
     setSwapping(true);
 
     await swap(rawTokenAmount.toString(), assetToken.address);
-
-    setFinishing(true);
 
     // navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
   };
@@ -817,8 +799,14 @@ export default function FluidifyToken() {
               />
             )}
 
+            <Text size="sm" className="footer-text">
+              Fluidity employs daily limits on fluidifying assets for <br /> maintained
+              system stability. Limits reset at midnight EST. <br />
+              Unlimited reversion of fluid to non-fluid assets per day.
+            </Text>
+
             {/* Swap Token Form */}
-            {!!assetToken && !isTablet && (
+            {!!assetToken && !isTablet && !!toToken && (
               <FluidifyForm
                 handleSwap={handleSwap}
                 tokenIsFluid={tokenIsFluid}
