@@ -57,6 +57,7 @@
   * [🔮 Oracle Key Rotation](docs/security/oracle-key-rotation.md)
   * [📥 Dropboxes](docs/security/dropboxes.md)
   * [💰 Bounty program](docs/security/bounty-program.md)
+  * [📜 Audits completed](docs/security/audits-completed.md)
 * [💬 Partnerships](docs/partnerships.md)
 * [👐 Work with us](docs/work-with-us.md)
 * [Useful links](docs/relevant-links/README.md)
