@@ -10,6 +10,7 @@ import {
   useResolvedPath,
   useMatches,
   useTransition,
+  useLocation,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -45,29 +46,6 @@ export const links: LinksFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const url = new URL(request.url);
-
-  const routeMapper = (route: string) => {
-    switch (route.toLowerCase()) {
-      case "home":
-        return "DASHBOARD";
-      case "rewards":
-        return "REWARDS";
-      case "unclaimed":
-        return "CLAIM";
-      case "assets":
-        return "ASSETS";
-      case "dao":
-        return "DAO";
-      default:
-        return "DASHBOARD";
-    }
-  };
-
-  const urlPaths = url.pathname.split("/");
-
-  const pathname = urlPaths.pop() ?? "";
-
   const ethereumWallets = config.config["ethereum"].wallets;
 
   const network = params.network ?? "";
@@ -76,12 +54,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const token = config.config;
 
+  const url = new URL(request.url);
   const fromRedirectStr = url.searchParams.get("redirect");
 
   const fromRedirect = fromRedirectStr === "true";
 
   return json({
-    appName: routeMapper(pathname),
     fromRedirect,
     version: "1.5",
     network,
@@ -120,8 +98,25 @@ function ErrorBoundary() {
   );
 }
 
+const routeMapper = (route: string) => {
+  switch (route.toLowerCase()) {
+    case "home":
+      return "DASHBOARD";
+    case "rewards":
+      return "REWARDS";
+    case "unclaimed":
+      return "CLAIM";
+    case "assets":
+      return "ASSETS";
+    case "dao":
+      return "DAO";
+    default:
+      return "DASHBOARD";
+  }
+};
+
 export default function Dashboard() {
-  const { appName, version, network, token, fromRedirect } =
+  const { version, network, token, fromRedirect } =
     useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
@@ -130,9 +125,12 @@ export default function Dashboard() {
     FluidityFacadeContext
   );
 
-  {
-    /* Toggle Mobile Modal */
-  }
+  const url = useLocation();
+  const urlPaths = url.pathname.split("/");
+  const pathname = urlPaths.pop() ?? "";
+  const appName = routeMapper(pathname);
+
+  {/* Toggle Mobile Modal */}
   const [openMobModal, setOpenMobModal] = useState(false);
 
   const [walletModalVisibility, setWalletModalVisibility] =
