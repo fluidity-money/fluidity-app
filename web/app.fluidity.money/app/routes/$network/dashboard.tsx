@@ -249,7 +249,7 @@ export default function Dashboard() {
         ].tokens.filter((entry) => entry.symbol === log.token);
 
         toolTip.open(
-          fToken.at(0)?.colour,
+          fToken.at(0)?.colour || `#000`,
           <ToolTipContent
             tokenLogoSrc={fToken.at(0)?.logo}
             boldTitle={log.amount + ` ` + log.token}

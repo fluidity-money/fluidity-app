@@ -18,6 +18,7 @@
     "test:lint": "eslint --ext .js,.ts,.tsx --max-warnings=0 .",
     "test:style": "prettier -w .",
     "test:unit": "jest --config jest.config.ts --passWithNoTests",
+    "test:tsc": "tsc --noEmit",
     "graphql": "npm-run-all graphql:generate graphql:codegen",
     "graphql:generate": "gq --introspect https://fluidity.hasura.app/v1/graphql > schema.graphql",
     "graphql:codegen": "relay-compiler"
@@ -106,7 +107,7 @@
     "npm-run-all": "^4.1.5",
     "remix-esbuild-override": "^3.0.4",
     "ts-jest": "^29.0.1",
-    "typescript": "^4.6.4"
+    "typescript": "^4.9.3"
   },
   "engines": {
     "node": ">=16"
