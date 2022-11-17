@@ -82,7 +82,7 @@ jobs:
               --environment ${{ github.event.inputs.environment }} \
               --build-root-container ${{ github.event.inputs.build_root_container }} \
               --build-build-container ${{ github.event.inputs.build_build_container }} \
-              --tag $GITHUB_SHA
+              --tag ${{ github.event.inputs.rollbackTo }}
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
@@ -94,7 +94,7 @@ jobs:
               --service ${{ github.event.inputs.service }} \
               --environment ${{ github.event.inputs.environment }} \
               --debug false \
-              --tag $GITHUB_SHA
+              --tag ${{ github.event.inputs.rollbackTo }}
       - name: Discord
         uses: ./scripts/actions
         if: always()
