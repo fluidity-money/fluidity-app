@@ -22,16 +22,7 @@ type Props = {
 };
 
 const FluidifyCard = (props: Props) => {
-  const {
-    fluid,
-    logo,
-    name,
-    symbol,
-    amount,
-    onClick,
-    mintCapPercentage,
-    color,
-  } = props;
+  const { fluid, logo, name, symbol, amount, mintCapPercentage, color } = props;
 
   return (
     <div

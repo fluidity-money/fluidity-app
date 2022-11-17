@@ -59,18 +59,16 @@ export const solGetTransactionsObservable = (
 
             const amount = preTokenBalanceSource.sub(postTokenBalanceSource);
 
-            //Spam transaction: not possible for an account signer to transfer more amount of token than it owns.
-
             const uiTokenAmount = amountToDecimalString(
               amount.toString(10),
               tokenDecimal
             );
             const transaction: PipedTransaction = {
+              type: "onChain",
               source: source,
               destination: destination,
               amount: shorthandAmountFormatter(uiTokenAmount, 3),
               token,
-              type: "rewardDB",
               transactionHash: "",
             };
             LastSignature = transactionLog.signature;
