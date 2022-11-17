@@ -146,18 +146,6 @@ function ErrorBoundary(error: unknown) {
   );
 }
 
-// Use the component if you're going to add it!
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const FooterText = () => {
-  return (
-    <Text size="sm" className="footer-text">
-      Fluidity employ daily limits on fluidifying assets for <br /> maintained
-      system stability. Limits reset at midnight EST. <br />
-      Unlimited reversion of fluid to non-fluid assets per day.
-    </Text>
-  );
-};
-
 export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
   const {
@@ -174,23 +162,29 @@ export default function FluidifyToken() {
 
   const isTablet = width < 1250;
 
+  // Switch over to Form, on Mobile
   const [openMobModal, setOpenMobModal] = useState(false);
 
+  // If screen is Desktop, restore normal view
   useEffect(() => {
     if (!isTablet) return setOpenMobModal(false);
   }, [width]);
 
+  // Tokens return from loader
   const [tokens, setTokens] = useState<AugmentedToken[]>(tokens_);
 
+  // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken>();
 
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
+  // Fluid version of token for contract calls
   const fluidTokenAddress = useMemo(
     () => (assetToken ? fluidAssetOf(tokens, assetToken) : undefined),
     [assetToken]
   );
 
+  // Destination token
   const toToken = useMemo(
     () =>
       assetToken
@@ -207,11 +201,12 @@ export default function FluidifyToken() {
     !connected
   );
 
+  // If not connected, prompt user to connect
   useEffect(() => {
     connected && setWalletModalVisibility(false);
   }, [connected]);
 
-  const [userTokenAmount, setUserTokenAmount] = useState<number | undefined>();
+  const [swapAmount, setSwapAmount] = useState(0);
 
   const [search, setSearch] = useState("");
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
@@ -230,8 +225,6 @@ export default function FluidifyToken() {
       filter: (t: AugmentedToken) => !t.isFluidOf,
     },
   ];
-  // loop = false, once video over, on end reset.
-  const [swapAmount, setSwapAmount] = useState(0);
 
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
@@ -255,6 +248,8 @@ export default function FluidifyToken() {
             userTokenBalance = await Promise.all(
               tokens.map(async ({ address }) => (await balance?.(address)) || 0)
             );
+        
+        console.log(userTokenBalance);
 
             setTokens(
               tokens.map((token, i) => ({
@@ -283,14 +278,6 @@ export default function FluidifyToken() {
     })();
     }
   }, [address]);
-
-  useEffect(() => {
-    if (assetToken && address) {
-      balance?.(assetToken.address).then(setUserTokenAmount);
-    } else {
-      setUserTokenAmount(0);
-    }
-  }, [assetToken, address]);
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
     tokens as AugmentedToken[]
@@ -328,13 +315,13 @@ export default function FluidifyToken() {
 
     if (!swap) return;
 
-    if (!userTokenAmount) return;
+    if (!assetToken) return;
+
+    if (!assetToken.userTokenBalance) return;
 
     if (!swapAmount) return;
 
-    if (swapAmount > (userTokenAmount || 0)) return;
-
-    if (!assetToken) return;
+    if (swapAmount > (assetToken.userTokenBalance || 0)) return;
 
     if (
       assetToken.userMintLimit !== undefined &&
@@ -360,6 +347,8 @@ export default function FluidifyToken() {
 
     // navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
   };
+  
+  console.log(assetToken);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -385,7 +374,7 @@ export default function FluidifyToken() {
             setAssetToken={setAssetToken}
           />
 
-          {assetToken && (
+          {assetToken && toToken && (
             <FluidifyForm
               handleSwap={handleSwap}
               tokenIsFluid={tokenIsFluid}
@@ -393,14 +382,9 @@ export default function FluidifyToken() {
               setSwapAmount={setSwapAmount}
               assetToken={assetToken}
               toToken={toToken}
-              userTokenAmount={userTokenAmount}
               swapping={swapping}
             />
           )}
-
-          <Text size="sm" className="swap-footer-text">
-            By pressing the button you agree to our <a>terms of service</a>.
-          </Text>
         </div>
       )}
 
@@ -526,17 +510,6 @@ export default function FluidifyToken() {
                           >
                             <FluidifyCard
                               key={symbol}
-                              onClick={(symbol: string) => {
-                                if (width < 700) {
-                                  // if mobile view, set token on click and open modal
-                                  setOpenMobModal(true);
-                                  // strange error where symbol is a string but appears as a the token...
-                                  setAssetToken(
-                                    tokens.find((t) => t.symbol === symbol)
-                                  );
-                                }
-                                getTokenFromSymbol(network, symbol);
-                              }}
                               fluid={isFluidOf !== undefined}
                               symbol={symbol}
                               name={name}
@@ -594,7 +567,7 @@ export default function FluidifyToken() {
                                 : undefined}
                               color={colors[symbol]}
                               amount={userTokenBalance}
-                              onClick={() => { return }}                            />
+                            />
                           </Draggable>
                         );
                       })}
@@ -628,7 +601,6 @@ export default function FluidifyToken() {
                 setSwapAmount={setSwapAmount}
                 assetToken={assetToken}
                 toToken={toToken}
-                userTokenAmount={userTokenAmount}
                 swapping={swapping}
               />
             )}

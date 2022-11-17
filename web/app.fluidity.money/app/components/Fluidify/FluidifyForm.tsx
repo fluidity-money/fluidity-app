@@ -10,9 +10,8 @@ interface IFluidifyFormProps {
   tokenIsFluid: boolean;
   swapAmount: number;
   setSwapAmount: React.Dispatch<React.SetStateAction<number>>;
-  assetToken?: AugmentedToken;
-  toToken?: AugmentedToken;
-  userTokenAmount?: number;
+  assetToken: AugmentedToken;
+  toToken: AugmentedToken;
   swapping: boolean;
 }
 
@@ -23,9 +22,9 @@ export const FluidifyForm = ({
   setSwapAmount,
   assetToken,
   toToken,
-  userTokenAmount,
   swapping,
 }: IFluidifyFormProps) => {
+  console.log(assetToken);
   return (
     <form className={"fluidify-form"} onSubmit={handleSwap}>
       <Text size="lg" prominent>
@@ -47,7 +46,7 @@ export const FluidifyForm = ({
           value={swapAmount}
           onChange={(e) =>
             setSwapAmount(
-              Math.min(parseFloat(e.target.value) || 0, userTokenAmount || 0)
+              Math.min(parseFloat(e.target.value) || 0, assetToken.userTokenBalance || 0)
             )
           }
           placeholder=""
@@ -64,8 +63,8 @@ export const FluidifyForm = ({
       </Text>
       {/* Tokens User Holds */}
       <Text prominent>
-        {userTokenAmount} {assetToken?.symbol || ""} (
-        {numberToMonetaryString(userTokenAmount || 0)}) remaining in wallet.
+        {assetToken.userTokenBalance} {assetToken?.symbol || ""} (
+        {numberToMonetaryString(assetToken.userTokenBalance || 0)}) remaining in wallet.
       </Text>
 
       {/* Daily Limit */}
@@ -94,6 +93,10 @@ export const FluidifyForm = ({
           ? "Create Fluid Asset"
           : `Creating ${toToken?.symbol || ""}...`}
       </GeneralButton>
+
+      <Text size="sm" className="swap-footer-text">
+        By pressing the button you agree to our <a>terms of service</a>.
+      </Text>
     </form>
   );
 };
