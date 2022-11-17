@@ -43,4 +43,12 @@ jobs:
               --network ${{ github.event.inputs.network }} \
               --environment ${{ github.event.inputs.environment }} \
               --tag $GITHUB_SHA
+      - name: Discord
+        uses: ./scripts/actions
+        if: always()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        with: 
+          command: |
+            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 

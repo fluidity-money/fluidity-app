@@ -23,6 +23,7 @@ SERVICES:
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
       SECRET_FLU_DISCORD_WEBHOOK: /fluidity/discord/webhook
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST: /fluidity/ethereum/limits_private_key_list
+      ENV_FLU_ETHEREUM_MINT_LIMITS_PRIOR_START: 11
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-ethereum-reset-mint-limits-cron
