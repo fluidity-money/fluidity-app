@@ -14,9 +14,6 @@ import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
-import {
-  getTokenFromSymbol,
-} from "~/util/chainUtils/tokens";
 import FluidifyCard from "~/components/FluidifyCard";
 
 import styles from "~/styles/fluidify.css";
@@ -81,7 +78,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   const augmentedTokens = await Promise.all(
     tokens.map(async (token) => {
       const { isFluidOf } = token;
-      // const { name } = token;
+      // const { name, symbol } = token;
 
       const mintLimit = isFluidOf
         ? // ?await userMintLimit(name)
@@ -89,7 +86,7 @@ export const loader: LoaderFunction = async ({ params }) => {
         : undefined;
 
       const tokensMinted = mintLimit
-        ? // ?await userAmountMinted(name)
+        ? // ?await userAmountMinted(symbol)
           0
         : 0;
 
@@ -275,7 +272,7 @@ export default function FluidifyToken() {
             break;
           }
         }
-    })();
+      })();
     }
   }, [address]);
 
@@ -562,9 +559,11 @@ export default function FluidifyToken() {
                               name={name}
                               logo={logo}
                               address={address}
-                              mintCapPercentage={!!userMintLimit && userMintedAmt !== undefined
-                                ? userMintedAmt / userMintLimit
-                                : undefined}
+                              mintCapPercentage={
+                                !!userMintLimit && userMintedAmt !== undefined
+                                  ? userMintedAmt / userMintLimit
+                                  : undefined
+                              }
                               color={colors[symbol]}
                               amount={userTokenBalance}
                             />
