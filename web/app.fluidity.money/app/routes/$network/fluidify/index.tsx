@@ -79,7 +79,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   const augmentedTokens = await Promise.all(
     tokens.map(async (token) => {
       const { isFluidOf } = token;
-      // const { name } = token;
+      // const { name, symbol } = token;
 
       const mintLimit = isFluidOf
         ? // ?await userMintLimit(name)
@@ -87,7 +87,7 @@ export const loader: LoaderFunction = async ({ params }) => {
         : undefined;
 
       const tokensMinted = mintLimit
-        ? // ?await userAmountMinted(name)
+        ? // ?await userAmountMinted(symbol)
           0
         : 0;
 
