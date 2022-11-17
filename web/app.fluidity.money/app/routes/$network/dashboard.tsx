@@ -496,18 +496,7 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-
-        {/*<ViewRewardModal 
-					visible={true} 
-					close={() => {}} 
-					tokenSymbol={"fUSDC"} 
-					color={"blue"} 
-					winAmount={"23.04"} 
-					explorerUri={"https://"} 
-					balance={"150"} 
-					forSending={true} 
-				/>*/}
-
+       
         <Outlet />
 
         {/* Mobile Menu Modal */}

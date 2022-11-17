@@ -1,5 +1,3 @@
-import { useDrag } from "react-dnd";
-
 import ItemTypes from "~/types/ItemTypes";
 
 type Props = {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Text, Card, GeneralButton } from "@fluidity-money/surfing";
+import { Text, GeneralButton } from "@fluidity-money/surfing";
 
 interface IPropsConnectedWalletModal {
   visible: boolean;
@@ -8,7 +8,6 @@ interface IPropsConnectedWalletModal {
   tokenSymbol: string;
   color: string;
   winAmount: string;
-  explorerUri: string;
   balance: string;
   forSending: boolean;
 }
@@ -19,7 +18,6 @@ export const ViewRewardModal = ({
   tokenSymbol,
   color,
   winAmount,
-  explorerUri,
   balance,
   forSending,
 }: IPropsConnectedWalletModal) => {

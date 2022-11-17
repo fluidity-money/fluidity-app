@@ -35,6 +35,7 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
         connected,
         disconnect,
         connecting,
+				swap,
         address: publicKey?.toString() ?? "",
         ...solanaInstructions,
       }}
