@@ -321,18 +321,18 @@ export default function Home() {
     ? [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
             address in [sender, receiver],
-          name: "YOUR REWARDS",
+          name: "YOUR DASHBOARD",
         },
       ]
     : [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
       ];
 

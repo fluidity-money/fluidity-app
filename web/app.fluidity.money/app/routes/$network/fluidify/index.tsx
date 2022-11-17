@@ -16,8 +16,6 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
 import FluidifyCard from "~/components/FluidifyCard";
 
-import styles from "~/styles/fluidify.css";
-
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -113,15 +111,6 @@ type LoaderData = {
   colors: {
     [symbol: string]: string;
   };
-};
-
-export const links = () => {
-  return [
-    {
-      rel: "stylesheet",
-      href: styles,
-    },
-  ];
 };
 
 function ErrorBoundary(error: unknown) {
@@ -432,7 +421,7 @@ export default function FluidifyToken() {
                 close={() => setWalletModalVisibility(false)}
               />
             </section>
-            <Link to="../dashboard/home">
+            <Link to="../../dashboard/home">
               <LinkButton
                 handleClick={() => null}
                 size="large"
