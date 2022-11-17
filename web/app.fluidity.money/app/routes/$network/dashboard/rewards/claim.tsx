@@ -47,9 +47,9 @@ type LoaderData = {
 
 const ClaimedRewards = () => {
   const { reward, networkFee, gasFee } = useLoaderData<LoaderData>();
-  
+
   const { connected } = useContext(FluidityFacadeContext);
-  
+
   const navigate = useNavigate();
 
   if (!connected) return navigate("../../home");
