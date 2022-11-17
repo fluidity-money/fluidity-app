@@ -2,6 +2,7 @@ DOCKER_IMAGE: microservice-arbitrum-worker-client
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-client
 ENV_FLU_ETHEREUM_GAS_LIMIT: 8000000
 ENV_FLU_ETHEREUM_HARDHAT_FIX: "false"
+ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/arbitrum/http_url
 
 SERVICES:

@@ -6,13 +6,12 @@ import {
   LinkButton,
   Text,
   numberToMonetaryString,
-  ManualCarousel,
 } from "@fluidity-money/surfing";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate, Link } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider, useDrop } from "react-dnd";
@@ -20,7 +19,6 @@ import {
   getTokenFromSymbol,
   getTokenForNetwork,
 } from "~/util/chainUtils/tokens";
-import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import ItemTypes from "~/types/ItemTypes";
 import DragCard from "~/components/DragCard";
 import FluidifyCard from "~/components/FluidifyCard";
@@ -35,12 +33,11 @@ import config, { colors } from "~/webapp.config.server";
 import {
   getUsdAmountMinted,
   getUsdUserMintLimit,
-  userMintLimitedEnabled,
 } from "~/util/chainUtils/ethereum/transaction";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
 import { AnimatePresence, motion } from "framer-motion";
+import { userMintLimit } from "~/util/chainUtils/solana/mintLimits";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -66,22 +63,45 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const fluidTokenSet = new Set(getTokenForNetwork(network ?? ""));
 
-  const provider = new JsonRpcProvider(rpcUrl);
+  if (network === "ethereum") {
+    const provider = new JsonRpcProvider(rpcUrl);
 
+    const augmentedTokens = await Promise.all(
+      tokens.map(async (token) => {
+        const mintLimitEnabled = fluidTokenSet.has(token.address)
+          ? //? await userMintLimitedEnabled(provider, token.address, tokenAbi)
+            true
+          : false;
+
+        const userMintLimit = mintLimitEnabled
+          ? //? await getUsdUserMintLimit(provider, token.address, tokenAbi)
+            undefined
+          : undefined;
+
+        return {
+          ...token,
+          userMintLimit: userMintLimit,
+          userTokenBalance: 0,
+        };
+      })
+    );
+
+    return json({
+      network,
+      tokens: augmentedTokens,
+      ethereumWallets,
+      colors: (await colors)[network as string],
+    });
+  }
+
+  // Network === "solana"
   const augmentedTokens = await Promise.all(
     tokens.map(async (token) => {
-      const mintLimitEnabled = fluidTokenSet.has(token.address)
-        ? //? await userMintLimitedEnabled(provider, token.address, tokenAbi)
-          true
-        : false;
-
-      const userMintLimit = mintLimitEnabled
-        ? await getUsdUserMintLimit(provider, token.address, tokenAbi)
-        : undefined;
+      const mintLimit = undefined;
 
       return {
         ...token,
-        userMintLimit: userMintLimit,
+        userMintLimit: mintLimit,
         userTokenBalance: 0,
       };
     })
@@ -118,7 +138,7 @@ export const links = () => {
   ];
 };
 
-function ErrorBoundary(error) {
+function ErrorBoundary(error: any) {
   console.log(error);
   return (
     <div
@@ -186,15 +206,172 @@ const FluidityHotSpot = ({
   );
 };
 
+interface ISwapCircleProps {
+  swapping: boolean;
+  setSwapping: React.Dispatch<React.SetStateAction<boolean>>;
+  assetToken?: AugmentedToken;
+  setAssetToken: React.Dispatch<
+    React.SetStateAction<AugmentedToken | undefined>
+  >;
+}
+
+export const SwapCircle = ({
+  swapping,
+  setSwapping,
+  assetToken,
+  setAssetToken,
+}: ISwapCircleProps) => {
+  return (
+    <>
+      {swapping ? (
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5 }}
+            exit={{ opacity: 0 }}
+            className="video-container"
+          >
+            <Video
+              className="swapping-video"
+              src={"/videos/FLUIDITY_01.mp4"}
+              loop={false}
+              type="none"
+              scale={2}
+              onEnded={() => {
+                setSwapping(false);
+              }}
+            />
+            <img src={assetToken!.logo} />
+          </motion.div>
+        </AnimatePresence>
+      ) : (
+        <FluidityHotSpot activeToken={assetToken} callBack={setAssetToken} />
+      )}
+    </>
+  );
+};
+
+interface IFluidifyFormProps {
+  handleSwap: (e: React.FormEvent<HTMLFormElement>) => void;
+  tokenIsFluid: boolean;
+  swapAmount: number;
+  setSwapAmount: React.Dispatch<React.SetStateAction<number>>;
+  assetToken: AugmentedToken;
+  toToken: SerializeObject<UndefinedToOptional<AugmentedToken>>;
+  userTokenAmount?: number;
+  swapping: boolean;
+}
+
+export const FluidifyForm = ({
+  handleSwap,
+  tokenIsFluid,
+  swapAmount,
+  setSwapAmount,
+  assetToken,
+  toToken,
+  userTokenAmount,
+  swapping,
+}: IFluidifyFormProps) => {
+  return (
+    <form className={"fluidify-form"} onSubmit={handleSwap}>
+      <Text size="lg" prominent>
+        AMOUNT TO {tokenIsFluid ? "REVERT" : "FLUIDIFY"}
+      </Text>
+
+      <section className={"fluidify-form-el fluidify-input-container"}>
+        <img
+          className={`fluidify-form-logo ${
+            tokenIsFluid ? "fluid-token-form-logo" : ""
+          }`}
+          src={assetToken.logo}
+        />
+        {/* Swap Field */}
+        <input
+          className={"fluidify-input"}
+          type={"number"}
+          min={"0"}
+          value={swapAmount}
+          onChange={(e) =>
+            setSwapAmount(
+              Math.min(parseFloat(e.target.value) || 0, userTokenAmount || 0)
+            )
+          }
+          placeholder=""
+          step="any"
+        />
+        <Text size="lg">{assetToken.symbol}</Text>
+      </section>
+
+      <hr className={"fluidify-form-el"} />
+
+      {/* Creating / Remaining Tokens */}
+      <Text>
+        Creating ${swapAmount} {toToken?.symbol || ""}
+      </Text>
+      {/* Tokens User Holds */}
+      <Text prominent>
+        {userTokenAmount} {assetToken.symbol} (
+        {numberToMonetaryString(userTokenAmount || 0)}) remaining in wallet.
+      </Text>
+
+      {/* Daily Limit */}
+      {!!assetToken.userMintLimit && (
+        <Text>
+          Daily {assetToken.symbol} limit: {assetToken.userMintedAmt}/
+          {assetToken.userMintLimit}
+        </Text>
+      )}
+
+      {/* Submit Button */}
+      <GeneralButton
+        version={"primary"}
+        size="large"
+        buttontype="text"
+        type={"submit"}
+        handleClick={() => null}
+        disabled={swapping}
+        className={"fluidify-form-submit"}
+      >
+        {tokenIsFluid
+          ? !swapping
+            ? "Revert Fluid Asset"
+            : `Reverting ${assetToken.symbol}`
+          : !swapping
+          ? "Create Fluid Asset"
+          : `Creating ${toToken?.symbol || ""}...`}
+      </GeneralButton>
+    </form>
+  );
+};
+
+const FooterText = () => {
+  return (
+    <Text size="sm" className="footer-text">
+      Fluidity employ daily limits on fluidifying assets for <br /> maintained
+      system stability. Limits reset at midnight EST. <br />
+      Unlimited reversion of fluid to non-fluid assets per day.
+    </Text>
+  );
+};
+
 export default function FluidifyToken() {
-  const { tokens, colors, network } = useLoaderData<LoaderData>();
-  const { address, swap, connected, connecting, disconnect, balance } =
-    useContext(FluidityFacadeContext);
-  const { provider } = useWeb3React();
+  const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
+  const {
+    address,
+    swap,
+    amountMinted,
+    connected,
+    connecting,
+    disconnect,
+    balance,
+  } = useContext(FluidityFacadeContext);
 
   const { width } = useViewport();
 
   const isTablet = width < 1200;
+
+  const [tokens, setTokens] = useState(tokens_);
 
   const [assetToken, setAssetToken] = useState<AugmentedToken>();
 
@@ -251,40 +428,58 @@ export default function FluidifyToken() {
   const [finishing, setFinishing] = useState(false);
 
   useEffect(() => {
-    if (address && provider) {
+    if (address) {
       (async () => {
-        if (network === "ethereum") {
-          // get a provider with the correct type
-          const rpcProvider = provider.getSigner().provider;
+        switch (network) {
+          case "ethereum":
+            let tokensMinted = await Promise.all(
+              tokens.map(async (token) => {
+                if (!token.isFluidOf) return undefined;
 
-          const userAmountMinted = await Promise.all(
-            tokens.map(async (token) => {
-              if (!token.isFluidOf) return undefined;
+                return amountMinted?.(token.address);
+              })
+            );
 
-              return getUsdAmountMinted(
-                rpcProvider,
-                token.address,
-                tokenAbi,
-                address
-              );
-            })
-          );
+            let userTokenBalance = await Promise.all(
+              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+            );
 
-          const userTokenBalance = await Promise.all(
-            tokens.map(async ({ address }) => (await balance?.(address)) || 0)
-          );
+            setTokens(
+              tokens.map((token, i) => ({
+                ...token,
+                userMintedAmt: tokensMinted[i],
+                userTokenBalance: userTokenBalance[i],
+              }))
+            );
+            break;
 
-          for (let i = 0; i < userAmountMinted.length; i++) {
-            tokens[i].userMintedAmt = userAmountMinted[i];
-            tokens[i].userTokenBalance = userTokenBalance[i];
-          }
+          case "solana":
+            tokensMinted = await Promise.all(
+              tokens.map(async (token) => {
+                if (!token.isFluidOf) return undefined;
+                return await amountMinted?.(token.name);
+              })
+            );
+
+            userTokenBalance = await Promise.all(
+              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+            );
+
+            setTokens(
+              tokens.map((token, i) => ({
+                ...token,
+                userMintedAmt: tokensMinted[i],
+                userTokenBalance: userTokenBalance[i],
+              }))
+            );
+            break;
         }
       })();
     }
   }, [address]);
 
   useEffect(() => {
-    if (assetToken && address && provider) {
+    if (assetToken && address) {
       balance?.(assetToken.address).then(setUserTokenAmount);
     } else {
       setUserTokenAmount(0);
@@ -316,7 +511,7 @@ export default function FluidifyToken() {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [search, activeFilterIndex]);
+  }, [search, activeFilterIndex, tokens]);
 
   const handleSwap = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -362,283 +557,247 @@ export default function FluidifyToken() {
     // navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
   };
 
+  const [openMobModal, setOpenMobModal] = useState(false);
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <header className={"fluidify-heading"}>
-        <section>
-          <Display size="xs" style={{ margin: 0 }}>
-            Create or revert <br /> fluid assets
-          </Display>
-
-          {connected && address ? (
-            <ConnectedWallet
-              address={address.toString()}
-              callback={() => {
-                setConnectedWalletModalVisibility(
-                  !connectedWalletModalVisibility
-                );
-              }}
-              className="connect-wallet-btn"
-            />
-          ) : (
-            <GeneralButton
-              version={connected || connecting ? "transparent" : "primary"}
-              buttontype="text"
-              size={"medium"}
-              handleClick={() =>
-                connecting ? null : setWalletModalVisibility(true)
-              }
-              className="connect-wallet-btn"
+      {/* Mobile Swap Modal */}
+      {width < 700 && openMobModal && (
+        <div className="mob-swap-modal">
+          <div>
+            <LinkButton
+              handleClick={() => setOpenMobModal(false)}
+              size="large"
+              type="internal"
+              left={true}
+              className="cancel-btn"
             >
-              {connecting ? `Connecting...` : `Connect Wallet`}
-            </GeneralButton>
-          )}
+              Cancel
+            </LinkButton>
+          </div>
 
-          {/* Connected Wallet Modal */}
-          <ConnectedWalletModal
-            visible={connectedWalletModalVisibility}
-            address={address ? address.toString() : ""}
-            close={() => {
-              setConnectedWalletModalVisibility(false);
-            }}
-            disconnect={() => {
-              disconnect?.();
-              setConnectedWalletModalVisibility(false);
-            }}
+          <SwapCircle
+            swapping={swapping}
+            setSwapping={setSwapping}
+            assetToken={assetToken}
+            setAssetToken={setAssetToken}
           />
 
-          {/* Connect Wallet Modal */}
-          <ConnectWalletModal
-            visible={walletModalVisibility}
-            close={() => setWalletModalVisibility(false)}
-          />
-        </section>
-        <Link to="../..">
-          <LinkButton
-            handleClick={() => null}
-            size="large"
-            type="internal"
-            left={true}
-          >
-            Cancel
-          </LinkButton>
-        </Link>
-      </header>
-
-      {/* Token List */}
-      <div className={"fluidify-container"}>
-        <aside className={"fluidify-tokens-container"}>
-          {/* Search Bar */}
-          <input
-            className={"search-bar"}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search your assets"
+          <FluidifyForm
+            handleSwap={handleSwap}
+            tokenIsFluid={tokenIsFluid}
+            swapAmount={swapAmount}
+            setSwapAmount={setSwapAmount}
+            assetToken={assetToken}
+            toToken={toToken}
+            userTokenAmount={userTokenAmount}
+            swapping={swapping}
           />
 
-          {/* Filters*/}
-          <div className={"fluidify-token-filters"}>
-            {searchFilters.map((filter, i) => (
-              <button
-                key={`filter-${filter.name}`}
-                onClick={() => setActiveFilterIndex(i)}
-              >
-                <Text
-                  size="lg"
-                  prominent={activeFilterIndex === i}
-                  className={activeFilterIndex === i ? "selected" : ""}
+          <Text size="sm" className="swap-footer-text">
+            By pressing the button you agree to our <a>terms of service</a>.
+          </Text>
+        </div>
+      )}
+
+      {!openMobModal && (
+        <>
+          <header className={"fluidify-heading"}>
+            <section>
+              <Display size="xs" style={{ margin: 0 }}>
+                Create or revert <br /> fluid assets
+              </Display>
+
+              {connected && address ? (
+                <ConnectedWallet
+                  address={address.toString()}
+                  callback={() => {
+                    setConnectedWalletModalVisibility(
+                      !connectedWalletModalVisibility
+                    );
+                  }}
+                  className="connect-wallet-btn"
+                />
+              ) : (
+                <GeneralButton
+                  version={connected || connecting ? "transparent" : "primary"}
+                  buttontype="text"
+                  size={"medium"}
+                  handleClick={() =>
+                    connecting ? null : setWalletModalVisibility(true)
+                  }
+                  className="connect-wallet-btn"
                 >
-                  {filter.name}
-                </Text>
-              </button>
-            ))}
-          </div>
+                  {connecting ? `Connecting...` : `Connect Wallet`}
+                </GeneralButton>
+              )}
 
-          <div className="fluidify-tokens">
-            {isTablet ? (
-              <>
-                {filteredTokens
-                  .filter(() => {
-                    return true;
-                  })
-                  .map(
-                    ({
-                      address,
-                      name,
-                      symbol,
-                      logo,
-                      isFluidOf,
-                      userTokenBalance,
-                      userMintLimit,
-                      userMintedAmt,
-                    }) => {
-                      return (
-                        <FluidifyCard
-                          key={symbol}
-                          onClick={(symbol: string) =>
-                            getTokenFromSymbol(network, symbol)
-                          }
-                          fluid={isFluidOf !== undefined}
-                          symbol={symbol}
-                          name={name}
-                          logo={logo}
-                          address={address}
-                          mintCapPercentage={
-                            !!userMintLimit && userMintedAmt !== undefined
-                              ? userMintedAmt / userMintLimit
-                              : undefined
-                          }
-                          color={colors[symbol]}
-                          amount={userTokenBalance}
-                        />
-                      );
-                    }
-                  )}
-              </>
-            ) : (
-              <>
-                {filteredTokens
-                  .filter(() => {
-                    return true;
-                  })
-                  .map(
-                    ({
-                      address,
-                      name,
-                      symbol,
-                      logo,
-                      isFluidOf,
-                      userTokenBalance,
-                      userMintLimit,
-                      userMintedAmt,
-                    }) => {
-                      return (
-                        <DragCard
-                          key={symbol}
-                          fluid={isFluidOf !== undefined}
-                          symbol={symbol}
-                          name={name}
-                          logo={logo}
-                          address={address}
-                          mintCapPercentage={
-                            !!userMintLimit && userMintedAmt !== undefined
-                              ? userMintedAmt / userMintLimit
-                              : undefined
-                          }
-                          color={colors[symbol]}
-                          amount={userTokenBalance}
-                        />
-                      );
-                    }
-                  )}
-              </>
-            )}
-          </div>
-        </aside>
-
-        {/* Swap Circle */}
-        {swapping ? (
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.5 }}
-              exit={{ opacity: 0 }}
-              className="video-container"
-            >
-              <Video
-                className="swapping-video"
-                src={"/videos/FLUIDITY_01.mp4"}
-                loop={false}
-                type="none"
-                scale={2}
-                onEnded={() => {
-                  setSwapping(false);
+              {/* Connected Wallet Modal */}
+              <ConnectedWalletModal
+                visible={connectedWalletModalVisibility}
+                address={address ? address.toString() : ""}
+                close={() => {
+                  setConnectedWalletModalVisibility(false);
+                }}
+                disconnect={() => {
+                  disconnect?.();
+                  setConnectedWalletModalVisibility(false);
                 }}
               />
-              <img src={assetToken!.logo} />
-            </motion.div>
-          </AnimatePresence>
-        ) : (
-          <FluidityHotSpot activeToken={assetToken} callBack={setAssetToken} />
-        )}
 
-        {/* Swap Token Form */}
-        {!!assetToken && (
-          <form className={"fluidify-form"} onSubmit={handleSwap}>
-            <Text size="lg" prominent>
-              AMOUNT TO {tokenIsFluid ? "REVERT" : "FLUIDIFY"}
-            </Text>
-
-            <section className={"fluidify-form-el fluidify-input-container"}>
-              <img
-                className={`fluidify-form-logo ${
-                  tokenIsFluid ? "fluid-token-form-logo" : ""
-                }`}
-                src={assetToken.logo}
+              {/* Connect Wallet Modal */}
+              <ConnectWalletModal
+                visible={walletModalVisibility}
+                close={() => setWalletModalVisibility(false)}
               />
-              {/* Swap Field */}
-              <input
-                className={"fluidify-input"}
-                type={"number"}
-                min={"0"}
-                value={swapAmount}
-                onChange={(e) =>
-                  setSwapAmount(
-                    Math.min(
-                      parseFloat(e.target.value) || 0,
-                      userTokenAmount || 0
-                    )
-                  )
-                }
-                placeholder=""
-                step="any"
-              />
-              <Text size="lg">{assetToken.symbol}</Text>
             </section>
+            <Link to="../..">
+              <LinkButton
+                handleClick={() => null}
+                size="large"
+                type="internal"
+                left={true}
+                className="cancel-btn"
+              >
+                Cancel
+              </LinkButton>
+            </Link>
+          </header>
 
-            <hr className={"fluidify-form-el"} />
+          {/* Token List */}
+          <div className={"fluidify-container"}>
+            <aside className={"fluidify-tokens-container"}>
+              {/* Search Bar */}
+              <input
+                className={"search-bar"}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search your assets"
+              />
 
-            {/* Creating / Remaining Tokens */}
-            <Text>
-              Creating ${swapAmount} {toToken?.symbol || ""}
-            </Text>
-            {/* Tokens User Holds */}
-            <Text prominent>
-              {userTokenAmount} {assetToken.symbol} (
-              {numberToMonetaryString(userTokenAmount || 0)}) remaining in
-              wallet.
-            </Text>
+              {/* Filters*/}
+              <div className={"fluidify-token-filters"}>
+                {searchFilters.map((filter, i) => (
+                  <button
+                    key={`filter-${filter.name}`}
+                    onClick={() => setActiveFilterIndex(i)}
+                  >
+                    <Text
+                      size="lg"
+                      prominent={activeFilterIndex === i}
+                      className={activeFilterIndex === i ? "selected" : ""}
+                    >
+                      {filter.name}
+                    </Text>
+                  </button>
+                ))}
+              </div>
 
-            {/* Daily Limit */}
-            {!!assetToken.userMintLimit && (
-              <Text>
-                Daily {assetToken.symbol} limit: {assetToken.userMintedAmt}/
-                {assetToken.userMintLimit}
-              </Text>
+              <div className="fluidify-tokens">
+                {isTablet ? (
+                  <>
+                    {filteredTokens
+                      .filter(() => {
+                        return true;
+                      })
+                      .map(
+                        ({
+                          address,
+                          name,
+                          symbol,
+                          logo,
+                          isFluidOf,
+                          userTokenBalance,
+                          userMintLimit,
+                          userMintedAmt,
+                        }) => {
+                          return (
+                            <FluidifyCard
+                              key={symbol}
+                              onClick={(symbol: string) => {
+                                if (width < 700) {
+                                  // if mobile view, set token on click and open modal
+                                  setOpenMobModal(true);
+                                  // strange error where symbol is a string but appears as a the token...
+                                  setAssetToken(symbol);
+                                }
+                                getTokenFromSymbol(network, symbol);
+                              }}
+                              fluid={isFluidOf !== undefined}
+                              symbol={symbol}
+                              name={name}
+                              logo={logo}
+                              address={address}
+                              mintCapPercentage={
+                                !!userMintLimit && userMintedAmt !== undefined
+                                  ? userMintedAmt / userMintLimit
+                                  : undefined
+                              }
+                              color={colors[symbol]}
+                              amount={userTokenBalance}
+                            />
+                          );
+                        }
+                      )}
+                  </>
+                ) : (
+                  <>
+                    {filteredTokens
+                      .filter(() => {
+                        return true;
+                      })
+                      .map((token) => {
+                        return (
+                          <DragCard
+                            key={token.symbol}
+                            fluid={token.isFluidOf !== undefined}
+                            symbol={token.symbol}
+                            name={token.name}
+                            logo={token.logo}
+                            address={token.address}
+                            mintCapPercentage={
+                              !!token.userMintLimit &&
+                              token.userMintedAmt !== undefined
+                                ? token.userMintedAmt / token.userMintLimit
+                                : undefined
+                            }
+                            color={colors[token.symbol]}
+                            amount={token.userTokenBalance}
+                            token={token}
+                          />
+                        );
+                      })}
+                  </>
+                )}
+              </div>
+            </aside>
+
+            {/* Swap Circle */}
+            {width > 700 && (
+              <SwapCircle
+                swapping={swapping}
+                setSwapping={setSwapping}
+                assetToken={assetToken}
+                setAssetToken={setAssetToken}
+              />
             )}
 
-            {/* Submit Button */}
-            <GeneralButton
-              version={"primary"}
-              size="large"
-              buttontype="text"
-              type={"submit"}
-              handleClick={() => null}
-              disabled={swapping}
-              className={"fluidify-form-submit"}
-            >
-              {tokenIsFluid
-                ? !swapping
-                  ? "Revert Fluid Asset"
-                  : `Reverting ${assetToken.symbol}`
-                : !swapping
-                ? "Create Fluid Asset"
-                : `Creating ${toToken?.symbol || ""}...`}
-            </GeneralButton>
-          </form>
-        )}
-      </div>
+            {/* Swap Token Form */}
+            {!!assetToken && width > 700 && (
+              <FluidifyForm
+                handleSwap={handleSwap}
+                tokenIsFluid={tokenIsFluid}
+                swapAmount={swapAmount}
+                setSwapAmount={setSwapAmount}
+                assetToken={assetToken}
+                toToken={toToken}
+                userTokenAmount={userTokenAmount}
+                swapping={swapping}
+              />
+            )}
+          </div>
+        </>
+      )}
     </DndProvider>
   );
 }

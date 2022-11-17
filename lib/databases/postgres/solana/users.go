@@ -7,27 +7,18 @@ package solana
 import (
 	"database/sql"
 	"fmt"
-	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
 )
 
-type MintLimit struct {
-	TokenName string
-	TokenDecimals int
-	MintLimit *big.Int
-}
-
 // GetUserMintLimit for the per-user limit for the given token
-func GetUserMintLimit(tokenName string) MintLimit {
+func GetUserMintLimit(tokenName string) float64 {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
 		`SELECT 
-			token_short_name,
-			token_decimals,
-			mint_limit
+			mint_limit / (10 / token_decimals)
 		FROM %s
 		WHERE token_short_name = $1`,
 
@@ -49,12 +40,10 @@ func GetUserMintLimit(tokenName string) MintLimit {
 		})
 	}
 
-	var limit MintLimit
+	var mintLimit float64
 
 	err := row.Scan(
-		&limit.TokenName,
-		&limit.TokenDecimals,
-		&limit.MintLimit,
+		&mintLimit,
 	)
 
 	if err != nil {
@@ -70,7 +59,7 @@ func GetUserMintLimit(tokenName string) MintLimit {
 		})
 	}
 
-	return limit 
+	return mintLimit
 }
 
 // GetUserAmountMinted for the amount the given address has minted so far

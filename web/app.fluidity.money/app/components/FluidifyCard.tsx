@@ -18,7 +18,7 @@ type Props = {
 
   color?: string;
 
-  onClick: (symbol: string) => void;
+  onClick: (symbol: any) => void;
 };
 
 const FluidifyCard = (props: Props) => {
@@ -37,7 +37,7 @@ const FluidifyCard = (props: Props) => {
     <div
       key={symbol}
       className={`fluidify-card`}
-      onClick={() => onClick(symbol)}
+      onClick={() => onClick(props)}
     >
       <div className="fluidify-card--container">
         <div className="fluidify-card-left">

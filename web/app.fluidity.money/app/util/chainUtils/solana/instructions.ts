@@ -13,13 +13,7 @@ import { BN } from "bn.js";
 import { FluidityInstruction } from "./fluidityInstruction";
 import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
 
-type MintLimitReq = {
-  address: string;
-};
-
-type MintLimitRes = number;
-
-const getCheckedSolContext = () => {
+export const getCheckedSolContext = () => {
   const wallet = useWallet();
 
   if (!wallet) return new Error("Not wallet found");
@@ -80,26 +74,61 @@ const balance = async (tokenAddr: string): Promise<number> => {
   }
 };
 
-const limit = async (): Promise<number> => {
+type UserMintLimitReq = {
+  token_short_name: string;
+};
+
+type UserMintLimitRes = {
+  mint_limit: number;
+};
+
+const limit = async (tokenName: string): Promise<number> => {
+  const url = "https://api.solana.fluidity.money/user-mint-limit";
+  const body = {
+    token_short_name: tokenName,
+  };
+
+  const response = await jsonPost<UserMintLimitReq, UserMintLimitRes>(
+    url,
+    body
+  );
+
+  return response.mint_limit;
+};
+
+type UserAmountMintedReq = {
+  address: string;
+  token_short_name: string;
+};
+
+export type UserAmountMintedRes = {
+  amount_minted: number;
+};
+
+const amountMinted = async (tokenName: string): Promise<number> => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
-    throw new Error(`Could not fetch balance: ${solContext}`);
+    throw new Error(`Could not fetch limit: ${solContext}`);
   }
 
   const { publicKey } = solContext;
 
-  const url = "https://backend.solana.fluidity.money";
+  const url = "https://api.solana.fluidity.money/user-amount-minted";
   const body = {
     address: publicKey.toString(),
+    token_short_name: tokenName,
   };
 
-  const response = await jsonPost<MintLimitReq, MintLimitRes>(url, body);
+  const response = await jsonPost<UserAmountMintedReq, UserAmountMintedRes>(
+    url,
+    body
+  );
 
-  return response;
+  return response.amount_minted;
 };
 
-const swap = async (amount: string, fromTokenAddr: string) => {
+const internalSwap = async (amount: string, fromTokenAddr: string) => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -263,7 +292,9 @@ const swap = async (amount: string, fromTokenAddr: string) => {
 };
 
 export const solanaInstructions = {
-  balance: balance,
-  swap: swap,
-  limit: limit,
+  balance,
+  limit,
+  amountMinted,
 };
+
+export { internalSwap };
