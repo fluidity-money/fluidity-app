@@ -14,24 +14,39 @@ import (
 )
 
 func main() {
-	web.JsonEndpoint("/my-mint-limit", HandleMyMintLimit)
+	web.JsonEndpoint("/user-mint-limit", HandleUserMintLimit)
+	web.JsonEndpoint("/user-amount-minted", HandleUserAmountMinted)
+	web.Endpoint("/healthcheck", HandleHealthCheck)
+
+	web.Listen()
 }
 
-type RequestMyMintLimit struct {
-	Address   string `json:"address"`
-	TokenName string `json:"token_short_name"`
+type RequestUserMintLimit struct {
+    TokenName string `json:"token_short_name"`
 }
 
-type ResponseMyMintLimit struct {
-	AmountMinted float64 `json:"amount_minted"`
-	MintLimit    string  `json:"mint_limit"`
-	TokenName    string  `json:"token_short_name"`
+type ResponseUserMintLimit struct {
+    MintLimit float64 `json:"mint_limit"`
 }
 
-func HandleMyMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
+type RequestUserAmountMinted struct {
+    Address   string `json:"address"`
+    TokenName string `json:"token_short_name"`
+}
+
+type ResponseUserAmountMinted struct {
+    AmountMinted float64 `json:"amount_minted"`
+}
+
+func HandleHealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK :)"))
+}
+
+// HandleUserAmountMinted for the amount a user has minted of the requested token
+func HandleUserAmountMinted(w http.ResponseWriter, r *http.Request) interface{} {
 	var (
 		ipAddress = web.GetIpAddress(r)
-		request   RequestMyMintLimit
+		request RequestUserAmountMinted
 	)
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -50,19 +65,43 @@ func HandleMyMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 		return nil
 	}
 
-	amountMinted := solana.GetUserAmountMinted(request.Address)
-	limit := solana.GetUserMintLimit(request.TokenName)
+    amountMinted := solana.GetUserAmountMinted(request.Address)
 
+    response := ResponseUserAmountMinted{
+        AmountMinted: amountMinted,
+    } 
+
+    return response
+}
+
+// HandleUserMintLimit for the per-user mint limit for the token
+func HandleUserMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 	var (
-		mintLimit = limit.MintLimit.String()
-		tokenName = limit.TokenName
+		ipAddress = web.GetIpAddress(r)
+		request RequestUserMintLimit
 	)
 
-	response := ResponseMyMintLimit{
-		AmountMinted: amountMinted,
-		TokenName:    tokenName,
-		MintLimit:    mintLimit,
+	err := json.NewDecoder(r.Body).Decode(&request)
+
+	if err != nil {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Failed to decode a user's JSON request from ip %v for /my-mint-limit!",
+				ipAddress,
+			)
+
+			k.Payload = err
+		})
+
+        w.WriteHeader(http.StatusForbidden)
+        return nil
 	}
 
-	return response
+    mintLimit := solana.GetUserMintLimit(request.TokenName)
+
+    response := ResponseUserMintLimit{
+        MintLimit: mintLimit,
+    } 
+
+    return response
 }

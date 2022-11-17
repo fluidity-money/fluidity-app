@@ -78,20 +78,13 @@ func main() {
 
 	rand.Seed(time.Now().Unix())
 
+	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
-	switch networkId {
-		case "ethereum":
-			dbNetwork = network.NetworkEthereum
-		case "arbitrum":
-			dbNetwork = network.NetworkArbitrum
-		default:
-			log.Fatal(func (k *log.Log) {
-				k.Format(
-					"Unknown %s %s - expected 'ethereum' or 'arbitrum'",
-					EnvNetwork,
-					networkId,
-				)
-			})
+	if err != nil {
+		log.Fatal(func (k *log.Log) {
+			k.Message = "Failed to parse network from env"
+			k.Payload = err
+		})
 	}
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
