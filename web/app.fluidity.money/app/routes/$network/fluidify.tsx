@@ -12,10 +12,10 @@ export const links = () => {
   ];
 };
 
-export let meta: MetaFunction = ({data}) => ({
+export const meta: MetaFunction = ({ data }) => ({
   ...data,
   title: "Fluidify",
-})
+});
 
 export default function Fluidify() {
   return (

@@ -1,4 +1,8 @@
-import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
 import { json } from "@remix-run/node";
@@ -83,10 +87,10 @@ function ErrorBoundary() {
   );
 }
 
-export let meta: MetaFunction = ({data}) => ({
+export const meta: MetaFunction = ({ data }) => ({
   ...data,
   title: "Dashboard",
-})
+});
 
 const routeMapper = (route: string) => {
   switch (route.toLowerCase()) {
@@ -114,8 +118,7 @@ type LoaderData = {
 };
 
 export default function Dashboard() {
-  const { network, token } =
-    useLoaderData<LoaderData>();
+  const { network, token } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -128,7 +131,9 @@ export default function Dashboard() {
   const pathname = urlPaths.pop() ?? "";
   const appName = routeMapper(pathname);
 
-  {/* Toggle Mobile Modal */}
+  {
+    /* Toggle Mobile Modal */
+  }
   const [openMobModal, setOpenMobModal] = useState(false);
 
   const [walletModalVisibility, setWalletModalVisibility] =
@@ -416,7 +421,7 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Heading as="h6" >{appName}</Heading>}
+            {!isMobile && <Heading as="h6">{appName}</Heading>}
           </div>
 
           {/* Navigation Buttons */}
@@ -454,9 +459,7 @@ export default function Dashboard() {
               size={"small"}
               handleClick={() => navigate("../fluidify")}
             >
-              <b>
-                Fluidify
-              </b>
+              <b>Fluidify</b>
             </GeneralButton>
 
             {/* Prize Money */}

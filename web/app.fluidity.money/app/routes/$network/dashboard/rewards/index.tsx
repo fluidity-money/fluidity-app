@@ -91,7 +91,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     );
 
     const defaultLogo = "/assets/tokens/usdt.svg";
-    
+
     const mergedTransactions: Transaction[] = transactions
       .filter((tx) => !!winnersMap[tx.hash])
       .map((tx) => ({
