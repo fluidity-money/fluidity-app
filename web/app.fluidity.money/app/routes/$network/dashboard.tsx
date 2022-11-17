@@ -260,6 +260,10 @@ export default function Dashboard() {
             }
             linkLabel={"DETAILS"}
             linkUrl={"#"}
+            // I don't know what this is for but it's not optional.
+            linkLabelOnClickCallback={() => {
+              return;
+            }}
           />
         );
       });
