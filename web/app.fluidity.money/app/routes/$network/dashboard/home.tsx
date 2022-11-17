@@ -456,7 +456,7 @@ export default function Home() {
                   onClick={() => setActiveTransformerIndex(i)}
                 >
                   <Text
-                    size="xxl"
+                    size="xl"
                     prominent={activeTransformerIndex === i}
                     className={
                       activeTransformerIndex === i ? "active-graph-filter" : ""

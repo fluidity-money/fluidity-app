@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -33,6 +34,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 
 		tokenShortName     = tokenDetails.TokenShortName
 		tokenDecimals      = tokenDetails.TokenDecimals
+		network_           = winner.Network
 		hash               = winner.TransactionHash
 		blockNumber        = winner.BlockNumber
 		senderAddress      = winner.FromAddress
@@ -48,7 +50,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			transaction_hash,
 			address,
 			win_amount,
-			block_number
+			block_number,
+			network
 		)
 
 		VALUES (
@@ -57,7 +60,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			$3,
 			$4,
 			$5,
-			$6
+			$6,
+			$7
 		);`,
 
 		TablePendingWinners,
@@ -72,6 +76,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		senderAddress,
 		senderWinAmount,
 		blockNumber,
+		network_,
 	)
 
 	if err != nil {
@@ -112,7 +117,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 	}
 }
 
-func UnpaidWinningsForToken(token token_details.TokenDetails) *big.Int {
+func UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) *big.Int {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -121,7 +126,8 @@ func UnpaidWinningsForToken(token token_details.TokenDetails) *big.Int {
 
 		FROM %s
 		WHERE
-			token_short_name = $1
+			network = $1
+			AND token_short_name = $2
 			AND reward_sent = false
 		`,
 
@@ -130,6 +136,7 @@ func UnpaidWinningsForToken(token token_details.TokenDetails) *big.Int {
 
 	row := timescaleClient.QueryRow(
 		statementText,
+		network_,
 		token.TokenShortName,
 	)
 
@@ -157,7 +164,7 @@ func UnpaidWinningsForToken(token token_details.TokenDetails) *big.Int {
 	return &total.Int
 }
 
-func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.EthereumReward {
+func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) []worker.EthereumReward {
 	timescaleClient := timescale.Client()
 
 	shortName := token.TokenShortName
@@ -167,7 +174,8 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 			SET reward_sent = true
 		WHERE
 			reward_sent = false
-			AND token_short_name = $1
+			AND network = $1
+			AND token_short_name = $2
 		RETURNING
 			token_short_name,
 			token_decimals,
@@ -182,6 +190,7 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 
 	rows, err := timescaleClient.Query(
 		statementText,
+		network_,
 		shortName,
 	)
 
@@ -230,7 +239,7 @@ func GetAndRemoveRewardsForToken(token token_details.TokenDetails) []worker.Ethe
 	return winners
 }
 
-func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
+func GetPendingRewardsForAddress(network_ network.BlockchainNetwork, address string) []worker.EthereumReward {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -244,7 +253,8 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
 		FROM %s
 		WHERE
 			reward_sent = false
-			AND address = $1
+			AND network = $1
+			AND address = $2
 		;
 		`,
 
@@ -253,6 +263,7 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
 
 	rows, err := timescaleClient.Query(
 		statementText,
+		network_,
 		address,
 	)
 
@@ -301,7 +312,7 @@ func GetPendingRewardsForAddress(address string) []worker.EthereumReward {
 	return winners
 }
 
-func RemovePendingWinnings(token token_details.TokenDetails, address string, startBlock, endBlock *misc.BigInt) {
+func RemovePendingWinnings(network_ network.BlockchainNetwork, token token_details.TokenDetails, address string, startBlock, endBlock *misc.BigInt) {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -311,9 +322,10 @@ func RemovePendingWinnings(token token_details.TokenDetails, address string, sta
 			reward_sent = true
 		WHERE
 			winner = $1
-			AND token_short_name = $2
-			AND block_number >= $3
-			AND block_number <= $4
+			AND network_ = $2
+			AND token_short_name = $3
+			AND block_number >= $4
+			AND block_number <= $5
 		;`,
 
 		TablePendingWinners,
@@ -321,8 +333,8 @@ func RemovePendingWinnings(token token_details.TokenDetails, address string, sta
 
 	_, err := timescaleClient.Exec(
 		statementText,
-		token.TokenShortName,
 		address,
+		network_,
 		token.TokenShortName,
 		startBlock,
 		endBlock,
