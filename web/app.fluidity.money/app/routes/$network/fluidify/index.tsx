@@ -14,9 +14,7 @@ import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
-import {
-  getTokenFromSymbol,
-} from "~/util/chainUtils/tokens";
+import { getTokenFromSymbol } from "~/util/chainUtils/tokens";
 import FluidifyCard from "~/components/FluidifyCard";
 
 import styles from "~/styles/fluidify.css";
@@ -280,7 +278,7 @@ export default function FluidifyToken() {
             break;
           }
         }
-    })();
+      })();
     }
   }, [address]);
 
@@ -589,12 +587,17 @@ export default function FluidifyToken() {
                               name={name}
                               logo={logo}
                               address={address}
-                              mintCapPercentage={!!userMintLimit && userMintedAmt !== undefined
-                                ? userMintedAmt / userMintLimit
-                                : undefined}
+                              mintCapPercentage={
+                                !!userMintLimit && userMintedAmt !== undefined
+                                  ? userMintedAmt / userMintLimit
+                                  : undefined
+                              }
                               color={colors[symbol]}
                               amount={userTokenBalance}
-                              onClick={() => { return }}                            />
+                              onClick={() => {
+                                return;
+                              }}
+                            />
                           </Draggable>
                         );
                       })}
