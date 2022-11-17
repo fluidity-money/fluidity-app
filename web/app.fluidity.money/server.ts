@@ -122,7 +122,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    registry.get(socket.id)?.unsubscribe();
     registry.delete(socket.id);
   });
 });

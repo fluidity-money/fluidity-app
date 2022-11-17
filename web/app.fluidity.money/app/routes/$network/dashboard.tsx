@@ -75,6 +75,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const provider = config.liquidity_providers;
 
+  const tokens = config.config;
+
   const fromRedirectStr = url.searchParams.get("redirect");
 
   const fromRedirect = fromRedirectStr === "true";
@@ -85,7 +87,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     version: "1.5",
     network,
     provider,
-    token,
+    tokens,
     ethereumWallets,
   });
 };
@@ -96,7 +98,7 @@ type LoaderData = {
   version: string;
   network: string;
   provider: typeof config.liquidity_providers;
-  token: typeof config.config;
+  tokens: typeof config.config;
 };
 
 function ErrorBoundary() {
@@ -120,7 +122,7 @@ function ErrorBoundary() {
 }
 
 export default function Dashboard() {
-  const { appName, version, network, token, fromRedirect } =
+  const { appName, version, network, tokens, fromRedirect } =
     useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
@@ -266,9 +268,14 @@ export default function Dashboard() {
 
     setTimeout(() => {
       socket.on("Transactions", (log: PipedTransaction) => {
-        const fToken = token[
+        const fToken = tokens[
           network === `` ? `ethereum` : network
         ].tokens.filter((entry) => entry.symbol === log.token);
+
+        const imgUrl =
+          fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
+        const tokenColour =
+          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.logo : "";
 
         toolTip.open(
           fToken.at(0)?.colour || `#000`,
@@ -285,8 +292,8 @@ export default function Dashboard() {
               setDetailedRewardObject({
                 visible: true,
                 token: log.token,
-                img: fToken?.at(0)!.logo,
-                colour: fToken?.at(0)!.colour,
+                img: imgUrl as unknown as string,
+                colour: tokenColour as unknown as string,
                 winAmount: log.amount,
                 explorerUri: "",
                 balance: "150", //hard coded for now
