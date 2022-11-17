@@ -37,8 +37,17 @@
       align-items: center;
       justify-content: center;
 
-      button {
+      button:first-child {
         margin-right: 1em;
+      }
+
+      @include max-620px {
+        flex-direction: column;
+
+        button:first-child {
+          margin-right: 0;
+          margin-bottom: 0.8em;
+        }
       }
     }
 

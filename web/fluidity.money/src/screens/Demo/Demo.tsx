@@ -69,7 +69,7 @@ const Demo = () => {
             <GeneralButton 
               version={"secondary"} 
               buttontype={"text"} 
-              size={"large"} 
+              size={width > breakpoint ? "large" : "small"} 
               handleClick={handleLaunchFluidity}
             >
               Launch Fluidity
