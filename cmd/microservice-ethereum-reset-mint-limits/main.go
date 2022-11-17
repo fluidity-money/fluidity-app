@@ -8,6 +8,7 @@ import (
 	"crypto/ecdsa"
 	_ "embed"
 	"math/big"
+	"strconv"
 	"strings"
 	"time"
 
@@ -26,6 +27,9 @@ const (
 
 	// EnvPrivateKeys to use when signing requests to update the mint limits per contract
 	EnvPrivateKeys = `FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST`
+
+	// EnvMintLimitsPriorStart to add to the current date for the starting date
+	EnvMintLimitsPriorStart = `FLU_ETHEREUM_MINT_LIMITS_PRIOR_START`
 )
 
 var (
@@ -47,8 +51,9 @@ var (
 
 func main() {
 	var (
-		privateKeys_    = util.GetEnvOrFatal(EnvPrivateKeys)
-		ethereumHttpUrl = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		privateKeys_          = util.GetEnvOrFatal(EnvPrivateKeys)
+		ethereumHttpUrl       = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		mintLimitsPriorStart_ = util.GetEnvOrFatal(EnvMintLimitsPriorStart)
 	)
 
 	privateKeys := make(map[string]*ecdsa.PrivateKey)
@@ -73,6 +78,23 @@ func main() {
 		privateKeys[contractAddress] = privateKey
 	}
 
+	var mintLimitsPriorStart int
+
+	if mintLimitsPriorStart_ == "" {
+		mintLimitsPriorStart = 0
+	} else {
+		var err error
+
+		mintLimitsPriorStart, err = strconv.Atoi(mintLimitsPriorStart_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to convert the mint limits start date to int!"
+				k.Payload = err
+			})
+		}
+	}
+
 	ethClient, err := ethclient.Dial(ethereumHttpUrl)
 
 	if err != nil {
@@ -84,7 +106,11 @@ func main() {
 
 	defer ethClient.Close()
 
-	now := time.Now().UTC()
+	// add an extra day * mint limits prior start
+
+	extraDay := time.Duration(mintLimitsPriorStart) * 24 * time.Hour
+
+	now := time.Now().UTC().Add(extraDay)
 
 	key := now.Format("06-01-2")
 
