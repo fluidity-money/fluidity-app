@@ -457,7 +457,7 @@ export default function FluidifyToken() {
             tokensMinted = await Promise.all(
               tokens.map(async (token) => {
                 if (!token.isFluidOf) return undefined;
-                return await amountMinted?.(token.name);
+                return await amountMinted?.(token.symbol);
               })
             );
 
