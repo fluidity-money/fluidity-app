@@ -4,134 +4,281 @@ DROP TABLE solana_mint_limits;
 
 CREATE TABLE solana_mint_limits (
 	date TIMESTAMP NOT NULL,
-	usdc INT NOT NULL,
-	usdt INT NOT NULL
+	token_short_name VARCHAR NOT NULL,
+	mint_limit INT NOT NULL
 );
 
 INSERT INTO solana_mint_limits VALUES(
     '2022-12-06T00:00:00.000Z',
-    10000,
+    'fUSDC',
+    10000
+);
+
+INSERT INTO solana_mint_limits VALUES(
+    '2022-12-06T00:00:00.000Z',
+    'fUSDT',
+    10000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
+    '2022-12-07T00:00:00.000Z',
+    'fUSDC',
     10000
 );
 
 INSERT INTO solana_mint_limits VALUES(
     '2022-12-07T00:00:00.000Z',
-    10000,
+    'fUSDT',
+    10000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
+    '2022-12-08T00:00:00.000Z',
+    'fUSDC',
     10000
 );
 
 INSERT INTO solana_mint_limits VALUES(
     '2022-12-08T00:00:00.000Z',
-    10000,
+    'fUSDT',
     10000
+
 );
 
 INSERT INTO solana_mint_limits VALUES(
     '2022-12-09T00:00:00.000Z',
-    15000,
+    'fUSDC',
     15000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-09T00:00:00.000Z',
+    'fUSDT',
+    15000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-10T00:00:00.000Z',
-    20000,
+    'fUSDC',
     20000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-10T00:00:00.000Z',
+    'fUSDT',
+    20000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-11T00:00:00.000Z',
-    25000,
+    'fUSDC',
     25000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-11T00:00:00.000Z',
+    'fUSDT',
+    25000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-12T00:00:00.000Z',
-    30000,
+    'fUSDC',
     30000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-12T00:00:00.000Z',
+    'fUSDT',
+    30000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-13T00:00:00.000Z',
-    35000,
+    'fUSDC',
     35000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-13T00:00:00.000Z',
+    'fUSDT',
+    35000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-14T00:00:00.000Z',
-    40000,
+    'fUSDC',
     40000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-14T00:00:00.000Z',
+    'fUSDT',
+    40000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-15T00:00:00.000Z',
-    45000,
+    'fUSDC',
     45000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-15T00:00:00.000Z',
+    'fUSDT',
+    45000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-16T00:00:00.000Z',
-    50000,
+    'fUSDC',
     50000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-16T00:00:00.000Z',
+    'fUSDT',
+    50000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-17T00:00:00.000Z',
-    55000,
+    'fUSDC',
     55000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-17T00:00:00.000Z',
+    'fUSDT',
+    55000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-18T00:00:00.000Z',
-    60000,
+    'fUSDC',
     60000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-18T00:00:00.000Z',
+    'fUSDT',
+    60000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-19T00:00:00.000Z',
-    65000,
+    'fUSDC',
     65000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-19T00:00:00.000Z',
+    'fUSDT',
+    65000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-20T00:00:00.000Z',
-    70000,
+    'fUSDC',
     70000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-20T00:00:00.000Z',
+    'fUSDT',
+    70000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-21T00:00:00.000Z',
-    75000,
+    'fUSDC',
     75000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-21T00:00:00.000Z',
+    'fUSDT',
+    75000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-22T00:00:00.000Z',
-    80000,
+    'fUSDC',
     80000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-22T00:00:00.000Z',
+    'fUSDT',
+    80000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-23T00:00:00.000Z',
-    85000,
+    'fUSDC',
     85000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-23T00:00:00.000Z',
+    'fUSDT',
+    85000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-24T00:00:00.000Z',
-    90000,
+    'fUSDC',
     90000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-24T00:00:00.000Z',
+    'fUSDT',
+    90000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-25T00:00:00.000Z',
-    95000,
+    'fUSDC',
     95000
 );
 
 INSERT INTO solana_mint_limits VALUES(
+    '2022-12-25T00:00:00.000Z',
+    'fUSDT',
+    95000
+
+);
+
+INSERT INTO solana_mint_limits VALUES(
     '2022-12-26T00:00:00.000Z',
-    100000,
+    'fUSDC',
     100000
+);
+
+INSERT INTO solana_mint_limits VALUES(
+    '2022-12-26T00:00:00.000Z',
+    'fUSDT',
+    100000
+
 );
 
 -- migrate:down
