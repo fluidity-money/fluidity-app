@@ -136,6 +136,37 @@ main {
   max-height: calc(100vh - 340px);
   overflow-y: auto;
   margin-top: 0.5em;
+  padding-right: 0.5em;
+  width: fit-content;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.fluidify-tokens:hover {
+  overflow-y: auto;
+}
+
+/* width */
+.fluidify-tokens::-webkit-scrollbar {
+  width: 6px;
+  border-radius: 6px;
+}
+
+/* Track */
+.fluidify-tokens::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+/* Handle */
+.fluidify-tokens::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+/* Handle on hover */
+.fluidify-tokens::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 @media (max-width: 1250px) {
