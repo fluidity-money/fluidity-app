@@ -2,6 +2,7 @@ import type { Chain } from "~/util/chainUtils/chains";
 import type { UserTransaction } from "~/routes/$network/query/userTransactions";
 import type { Winner } from "~/queries/useUserRewards";
 import type { IRow } from "~/components/Table";
+import type Transaction from "~/types/Transaction";
 
 import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
@@ -135,19 +136,7 @@ export const meta = () => {
   };
 };
 
-type Transaction = {
-  sender: string;
-  receiver: string;
-  reward: number;
-  hash: string;
-  // timestamp is the Unix time, in seconds
-  timestamp: number;
-  value: number;
-  currency: string;
-  logo: string;
-};
-
-const graphEmptyTransaction = (time: number, value = 0) => ({
+const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   sender: "",
   receiver: "",
   reward: 0,
