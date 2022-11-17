@@ -471,7 +471,7 @@ export default function Home() {
         </div>
 
         {/* Graph */}
-        <div className="graph" style={{ width: "100vw", height: "400px" }}>
+        <div className="graph" style={{ width: "100%", height: "400px" }}>
           <LineChart
             data={graphTransformedTransactions}
             lineLabel="transactions"
