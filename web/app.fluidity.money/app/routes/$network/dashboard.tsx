@@ -1,4 +1,8 @@
-import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
 import { json } from "@remix-run/node";
@@ -10,6 +14,7 @@ import {
   useResolvedPath,
   useMatches,
   useTransition,
+  useLocation,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -25,6 +30,7 @@ import {
   GeneralButton,
   Trophy,
   Text,
+  Heading,
   ChainSelectorButton,
   BlockchainModal,
   trimAddressShort,
@@ -44,30 +50,7 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const url = new URL(request.url);
-
-  const routeMapper = (route: string) => {
-    switch (route.toLowerCase()) {
-      case "home":
-        return "DASHBOARD";
-      case "rewards":
-        return "REWARDS";
-      case "unclaimed":
-        return "CLAIM";
-      case "assets":
-        return "ASSETS";
-      case "dao":
-        return "DAO";
-      default:
-        return "DASHBOARD";
-    }
-  };
-
-  const urlPaths = url.pathname.split("/");
-
-  const pathname = urlPaths.pop() ?? "";
-
+export const loader: LoaderFunction = async ({ params }) => {
   const ethereumWallets = config.config["ethereum"].wallets;
 
   const network = params.network ?? "";
@@ -76,28 +59,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const token = config.config;
 
-  const fromRedirectStr = url.searchParams.get("redirect");
-
-  const fromRedirect = fromRedirectStr === "true";
-
   return json({
-    appName: routeMapper(pathname),
-    fromRedirect,
-    version: "1.5",
     network,
     provider,
     token,
     ethereumWallets,
   });
-};
-
-type LoaderData = {
-  appName: string;
-  fromRedirect: boolean;
-  version: string;
-  network: string;
-  provider: typeof config.liquidity_providers;
-  token: typeof config.config;
 };
 
 function ErrorBoundary() {
@@ -120,15 +87,49 @@ function ErrorBoundary() {
   );
 }
 
+export const meta: MetaFunction = ({ data }) => ({
+  ...data,
+  title: "Dashboard",
+});
+
+const routeMapper = (route: string) => {
+  switch (route.toLowerCase()) {
+    case "home":
+      return "DASHBOARD";
+    case "rewards":
+      return "REWARDS";
+    case "unclaimed":
+      return "CLAIM";
+    case "assets":
+      return "ASSETS";
+    case "dao":
+      return "DAO";
+    default:
+      return "DASHBOARD";
+  }
+};
+
+type LoaderData = {
+  appName: string;
+  fromRedirect: boolean;
+  network: string;
+  provider: typeof config.liquidity_providers;
+  token: typeof config.config;
+};
+
 export default function Dashboard() {
-  const { appName, version, network, token, fromRedirect } =
-    useLoaderData<LoaderData>();
+  const { network, token } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
   const { connected, address, disconnect, connecting } = useContext(
     FluidityFacadeContext
   );
+
+  const url = useLocation();
+  const urlPaths = url.pathname.split("/");
+  const pathname = urlPaths.pop() ?? "";
+  const appName = routeMapper(pathname);
 
   {
     /* Toggle Mobile Modal */
@@ -144,7 +145,7 @@ export default function Dashboard() {
 
   // Toggle Select Chain Modal
   const [chainModalVisibility, setChainModalVisibility] =
-    useState<boolean>(fromRedirect);
+    useState<boolean>(false);
 
   useEffect(() => {
     if (connected || connecting) setWalletModalVisibility(false);
@@ -420,7 +421,7 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Text>{appName}</Text>}
+            {!isMobile && <Heading as="h6">{appName}</Heading>}
           </div>
 
           {/* Navigation Buttons */}
@@ -452,16 +453,14 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify */}
-            {width > 550 && (
-              <GeneralButton
-                version={"primary"}
-                buttontype="text"
-                size={"small"}
-                handleClick={() => navigate("../fluidify")}
-              >
-                Fluidify Money
-              </GeneralButton>
-            )}
+            <GeneralButton
+              version={"primary"}
+              buttontype="text"
+              size={"small"}
+              handleClick={() => navigate("../fluidify")}
+            >
+              <b>Fluidify</b>
+            </GeneralButton>
 
             {/* Prize Money */}
             <GeneralButton
@@ -527,7 +526,7 @@ export default function Dashboard() {
           {/* Links */}
           <section>
             {/* Version */}
-            <Text>Fluidity Money V{version}</Text>
+            <Text>Fluidity Money</Text>
 
             {/* Terms */}
             <Link to={"/"}>
