@@ -5,11 +5,23 @@ import { Text, Card, GeneralButton } from "@fluidity-money/surfing";
 interface IPropsConnectedWalletModal {
   visible: boolean;
   close: () => void;
+	tokenSymbol: string
+	color: string;
+	winAmount: string;
+	explorerUri: string;
+	balance: string;
+	forSending: boolean;
 }
 
 export const ViewRewardModal = ({
   visible,
   close,
+	tokenSymbol,
+	color,
+	winAmount,
+	explorerUri,
+	balance,
+	forSending
 }: IPropsConnectedWalletModal) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
@@ -39,12 +51,12 @@ export const ViewRewardModal = ({
               <Text prominent size="xxl" className="view-reward-modal-title">
                 Get. That. Money.
               </Text>
-              <Text size="md">$23.536 USD in unclaimed prizes</Text>
+              <Text size="md">${winAmount} USD in unclaimed prizes</Text>
               <span
                 className="view-reward-modal-token"
                 style={{
-                  backgroundColor: `blue`,
-                  boxShadow: `0 0 100px 60px blue, 0 0 140px 90px blue`,
+                  backgroundColor: `${color}`,
+                  boxShadow: `0 0 100px 60px blue, 0 0 140px 90px ${color}`,
                 }}
               >
                 <img
@@ -57,19 +69,19 @@ export const ViewRewardModal = ({
                 size="xl"
                 className="view-reward-modal-token-title-size"
               >
-                $23.30343 fUSDC
+                ${winAmount} {tokenSymbol}
               </Text>
               <Text
                 size="xl"
                 className="view-reward-modal-usd-info"
-              >{`($23.3 USD)`}</Text>
+              >${winAmount} USD</Text>
               <span className="view-reward-modal-price-desc">
                 <Text size="xl">
-                  Won for <a className="view-reward-modal-link">sending</a>{" "}
+                  Won for <a className="view-reward-modal-link">{ forSending === true ? 'sending' : 'receiving' }</a>{" "}
                   fluid assets.
                 </Text>
                 <br />
-                <Text size="xl">{`153.54`} fUSDC total balance</Text>
+                <Text size="xl">{balance} {tokenSymbol} total balance</Text>
               </span>
               <GeneralButton
                 version={"primary"}
