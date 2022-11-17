@@ -8,6 +8,7 @@ import (
 	"crypto/ecdsa"
 	_ "embed"
 	"math/big"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -51,9 +52,10 @@ var (
 
 func main() {
 	var (
-		privateKeys_          = util.GetEnvOrFatal(EnvPrivateKeys)
-		ethereumHttpUrl       = util.GetEnvOrFatal(EnvEthereumHttpUrl)
-		mintLimitsPriorStart_ = util.GetEnvOrFatal(EnvMintLimitsPriorStart)
+		privateKeys_    = util.GetEnvOrFatal(EnvPrivateKeys)
+		ethereumHttpUrl = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+
+		mintLimitsPriorStart_ = os.Getenv(EnvMintLimitsPriorStart)
 	)
 
 	privateKeys := make(map[string]*ecdsa.PrivateKey)
