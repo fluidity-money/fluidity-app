@@ -501,7 +501,11 @@ export default function Dashboard() {
         {/* Mobile Menu Modal */}
         {openMobModal && (
           <MobileModal
-            navigationMap={navigationMap}
+            navigationMap={navigationMap.map((obj) => {
+              // I love type inconsistency
+              const { name, icon } = Object.values(obj)[0];
+              return { name, icon };
+            })}
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={unclaimedRewards}

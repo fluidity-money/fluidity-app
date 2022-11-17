@@ -70,6 +70,8 @@ export const solGetTransactionsObservable = (
               destination: destination,
               amount: shorthandAmountFormatter(uiTokenAmount, 3),
               token,
+              type: "rewardDB",
+              transactionHash: ""
             };
             LastSignature = transactionLog.signature;
             subscriber.next(transaction);

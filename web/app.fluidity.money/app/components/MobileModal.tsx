@@ -202,7 +202,7 @@ export default function MobileModal({
                       index: number
                     ) => {
                       const key = Object.keys(obj)[0];
-                      const { name, icon } = Object.values(obj)[0];
+                      const { name, icon } = obj;
                       const active = index === activeIndex;
 
                       return (
