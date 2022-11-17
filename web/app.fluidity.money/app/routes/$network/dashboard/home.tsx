@@ -93,7 +93,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     const defaultLogo = "/assets/tokens/fUSDT.png";
 
-    const mergedTransactions: Transaction[] = transactions.map((tx) => ({
+    const mergedTransactions: Transaction[] = transactions?.map((tx) => ({
       sender: tx.sender,
       receiver: tx.receiver,
       reward: winnersMap[tx.hash]
@@ -108,7 +108,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           : tx.value,
       timestamp: tx.timestamp * 1000,
       logo: tokenLogoMap[tx.currency] || defaultLogo,
-    }));
+    })) ?? [];
 
     const totalYield = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
