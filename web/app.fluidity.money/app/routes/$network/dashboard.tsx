@@ -39,6 +39,7 @@ import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
+import { ViewRewardModal } from "~/components/ViewRewardModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -73,8 +74,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
-
-  const token = config.config;
 
   const fromRedirectStr = url.searchParams.get("redirect");
 
@@ -137,6 +136,29 @@ export default function Dashboard() {
 
   const [walletModalVisibility, setWalletModalVisibility] =
     useState<boolean>(false);
+
+  type RewardDetails = {
+    visible: boolean;
+    token: string;
+    img: string;
+    colour: string;
+    winAmount: string;
+    explorerUri: string;
+    balance: string;
+    forSending: boolean;
+  };
+
+  const [detailedRewardObject, setDetailedRewardObject] =
+    useState<RewardDetails>({
+      visible: false,
+      token: "",
+      img: "",
+      colour: "",
+      winAmount: "",
+      explorerUri: "",
+      balance: "",
+      forSending: false,
+    });
 
   // By default, prompt user to connect their wallet
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
@@ -259,7 +281,18 @@ export default function Dashboard() {
                 : `received from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
-            linkUrl={"#"}
+            linkLabelOnClickCallback={() => {
+              setDetailedRewardObject({
+                visible: true,
+                token: log.token,
+                img: fToken?.at(0)!.logo,
+                colour: fToken?.at(0)!.colour,
+                winAmount: log.amount,
+                explorerUri: "",
+                balance: "150", //hard coded for now
+                forSending: false, // fetched from server - hauradb - not sorted yet from db
+              });
+            }}
           />
         );
       });
@@ -495,6 +528,32 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
+
+        {
+          <ViewRewardModal
+            visible={detailedRewardObject.visible}
+            close={() => {
+              setDetailedRewardObject({
+                // empty object on close
+                visible: false,
+                token: "",
+                img: "",
+                colour: "",
+                winAmount: "",
+                explorerUri: "",
+                balance: "",
+                forSending: false,
+              });
+            }}
+            tokenSymbol={detailedRewardObject.token}
+            img={detailedRewardObject.img}
+            colour={detailedRewardObject.colour}
+            winAmount={detailedRewardObject.winAmount}
+            explorerUri={detailedRewardObject.explorerUri}
+            balance={detailedRewardObject.balance}
+            forSending={detailedRewardObject.forSending}
+          />
+        }
 
         <Outlet />
 
