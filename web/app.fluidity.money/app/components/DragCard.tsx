@@ -1,4 +1,5 @@
 import { useDrag } from "react-dnd";
+import AugmentedToken from "~/types/AugmentedToken";
 
 import ItemTypes from "~/types/ItemTypes";
 
@@ -21,14 +22,14 @@ type Props = {
 
   color?: string;
 
-  token: any;
+  token: AugmentedToken;
 };
 
 const DragCard = (props: Props) => {
   const { fluid, logo, name, symbol, amount, mintCapPercentage, color, token } =
     props;
 
-  const [{ isDragging }, drag] = useDrag(() => {
+  const [, drag] = useDrag(() => {
     return {
       type: fluid ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET,
       item: token,

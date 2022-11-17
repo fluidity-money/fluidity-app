@@ -176,12 +176,16 @@ const makeContractSwap = async (
       return await (await fromContract.erc20Out(amount)).wait();
     } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
   } catch (error) {
-    return await handleContractErrors(error, signer.provider);
+    return await handleContractErrors(error as ErrorType, signer.provider);
   }
 };
 
+type ErrorType = {
+  data: { message: string };
+} & { message: string };
+
 export const handleContractErrors = async (
-  error: any,
+  error: ErrorType,
   provider: Provider | undefined
 ) => {
   const msg: string = error?.data?.message ?? error?.message;

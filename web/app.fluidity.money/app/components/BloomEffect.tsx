@@ -19,10 +19,7 @@ const BloomEffect = (props: BloomEffectProps) => {
 
   const [colorStart, colorEnd] = useMemo(() => {
     const _color = new color(colorStr);
-    return [
-      _color.toRgbString(),
-      _color.setAlpha(0).toRgbString()
-    ];
+    return [_color.toRgbString(), _color.setAlpha(0).toRgbString()];
   }, [colorStr]);
 
   const BloomEffectVariants: Variants = {

@@ -188,7 +188,7 @@ export default function Home() {
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
 
-  const [{ count, transactions }, setTransactionRes] = useState<{
+  const [{ count, transactions }] = useState<{
     count: number;
     transactions: Transaction[];
   }>({ count: allCount, transactions: allTransactions });

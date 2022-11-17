@@ -15,7 +15,7 @@
     "build:remix": "remix build",
     "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --external:sharp --bundle",
     "test": "npm-run-all --parallel test:*",
-    "test:lint": "eslint --ext .js,.ts,.tsx --fix .",
+    "test:lint": "eslint --ext .js,.ts,.tsx --max-warnings=0 .",
     "test:style": "prettier -w .",
     "test:unit": "jest --config jest.config.ts --passWithNoTests",
     "graphql": "npm-run-all graphql:generate graphql:codegen",
