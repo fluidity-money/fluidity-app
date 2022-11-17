@@ -41,6 +41,8 @@ export const unstable_shouldReload = () => false;
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { network } = params;
 
+  console.log("dashboard home loader");
+
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
@@ -58,12 +60,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       )
     ).json();
 
+    
     const { data, errors } = await useUserRewards(network ?? "");
-
+    
     if (errors || !data) {
       throw errors;
     }
-
+    
     const winnersMap = data.winners.reduce(
       (map, winner) => ({
         ...map,
@@ -95,11 +98,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       receiver: tx.receiver,
       reward: winnersMap[tx.hash]
         ? winnersMap[tx.hash].winning_amount /
-          10 ** winnersMap[tx.hash].token_decimals
+        10 ** winnersMap[tx.hash].token_decimals
         : 0,
-      hash: tx.hash,
-      currency: tx.currency,
-      value:
+        hash: tx.hash,
+        currency: tx.currency,
+        value:
         tx.currency === "DAI" || tx.currency === "fDAI"
           ? tx.value / 10 ** 12
           : tx.value,
@@ -478,7 +481,7 @@ export default function Home() {
             data={graphTransformedTransactions}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Transaction) => d.timestamp,
+              xAccessor: (d: Transaction) => d?.timestamp || 0,
               yAccessor: (d: Transaction) =>
                 Math.log((d.value || 0.001) * 1100),
             }}
