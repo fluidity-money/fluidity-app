@@ -21,7 +21,7 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
 
   console.log("connected", connected, "addr:", publicKey?.toString());
 
-  const swap = (amount: string, tokenAddr: string) => {
+  const swap = async (amount: string, tokenAddr: string) => {
     (async () => {
       fetch(`/solana/query/solanaSwap?amount=${amount}&tokenAddr=${tokenAddr}`);
     })();
@@ -35,8 +35,8 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
         connected,
         disconnect,
         connecting,
-        address: publicKey?.toString() ?? "",
         swap,
+        address: publicKey?.toString() ?? "",
         ...solanaInstructions,
       }}
     >

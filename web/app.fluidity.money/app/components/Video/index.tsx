@@ -3,7 +3,6 @@
 // LICENSE.md file.
 
 import { useEffect, useRef } from "react";
-import { isFirefox } from "react-device-detect";
 // import styles from "./Video.module.scss";
 
 interface IPropsVideo {

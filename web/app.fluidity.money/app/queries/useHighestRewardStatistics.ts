@@ -38,7 +38,7 @@ const queryAll = gql`
 `;
 
 export type HighestRewardResponse = {
-  data?: {
+  data: {
     highest_rewards_monthly: Array<{
       network: string;
       transaction_hash: string;

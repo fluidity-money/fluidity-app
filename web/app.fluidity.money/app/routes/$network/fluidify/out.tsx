@@ -13,10 +13,19 @@ import config from "~/webapp.config.server";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { network, assetId } = params;
+  const { network } = params;
 
   if (!network) throw new Error("Network not found");
+
+  const url = new URL(request.url);
+
+  const assetId = url.searchParams.get("assetId");
   if (!assetId) throw new Error("Asset not found");
+
+  const _amountStr = url.searchParams.get("amount");
+  if (!_amountStr) throw new Error("Amount not found");
+  const _amountUnsafe = _amountStr ? parseInt(_amountStr) : 1;
+  const amount = _amountUnsafe > 0 ? _amountUnsafe : 1;
 
   const {
     config: {
@@ -35,11 +44,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   if (!tokenPair) throw new Error(`Token Pair of ${assetId} not found`);
 
-  const url = new URL(request.url);
-  const _amountStr = url.searchParams.get("amount");
-  const _amountUnsafe = _amountStr ? parseInt(_amountStr) : 1;
-  const amount = _amountUnsafe > 0 ? _amountUnsafe : 1;
-
   return json({
     network,
     tokenPair,
@@ -54,6 +58,25 @@ type LoaderData = {
   token: Token;
   amount: number;
 };
+
+function ErrorBoundary(error: Error) {
+  console.log(error);
+
+  return (
+    <div
+      style={{
+        paddingTop: "40px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <h1 style={{ textAlign: "center" }}>Could not find Token to Fluidify!</h1>
+    </div>
+  );
+}
 
 const TokenOut = () => {
   const { tokenPair, token, amount, network } = useLoaderData<LoaderData>();
@@ -106,3 +129,5 @@ const TokenOut = () => {
 };
 
 export default TokenOut;
+
+export { ErrorBoundary };
