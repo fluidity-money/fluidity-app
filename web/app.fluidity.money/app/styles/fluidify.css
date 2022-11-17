@@ -139,6 +139,8 @@ main {
   margin-top: 0.5em;
   padding-right: 0.5em;
   width: fit-content;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
 }
 
 .fluidify-tokens:hover {
