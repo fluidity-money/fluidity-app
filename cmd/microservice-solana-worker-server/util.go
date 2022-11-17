@@ -5,8 +5,8 @@
 package main
 
 import (
+	"crypto/rand"
 	"math/big"
-	"math/rand"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -16,8 +16,18 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana"
 )
 
-func generateRandomIntegers(amount, min, max int) []int {
-	if amount > max-min+1 {
+// generateRandomIntegers gated between min and max, doing some coercion
+// internally to use crypto/rand and assuming that the uint32 requirement
+// in the arguments prevent any size-of-int issues
+func generateRandomIntegers(amount int, min, max uint32) (numbers []uint32) {
+	var (
+		maxBig = new(big.Int).SetInt64(int64(max))
+		minBig = new(big.Int).SetInt64(int64(min))
+	)
+
+	// heuristic check that isn't perfect
+
+	if int64(amount) > int64(max-min+1) {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
 				"Can't generate %d non-repeating integers between %d and %d!",
@@ -28,11 +38,24 @@ func generateRandomIntegers(amount, min, max int) []int {
 		})
 	}
 
-	numbers := make([]int, amount)
+	numbers = make([]uint32, amount)
 
 	for i := 0; i < amount; i++ {
+		no, err := rand.Int(nil, maxBig)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to source system randomness in the worker server!"
+				k.Payload = err
+			})
+		}
+
 		for {
-			numbers[i] = min + rand.Intn(max)
+			no.Add(no, minBig)
+
+			// we can assume that with the arguments this is okay
+
+			numbers[i] = uint32(no.Int64())
 
 			dup := false
 
