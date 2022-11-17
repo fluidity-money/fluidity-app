@@ -8,7 +8,7 @@ type IToolTipContentProps = {
   boldTitle: string;
   details: string;
   linkLabel: `ASSETS` | `DETAILS`;
-  linkUrl: string;
+  linkLabelOnClickCallback: () => void;
 };
 
 export const ToolTipContent = ({
@@ -16,7 +16,7 @@ export const ToolTipContent = ({
   boldTitle,
   details,
   linkLabel,
-  linkUrl,
+  linkLabelOnClickCallback,
 }: IToolTipContentProps) => {
   return (
     <>
@@ -26,7 +26,7 @@ export const ToolTipContent = ({
           {boldTitle}{" "}
         </Text>
         <Text size="lg">{details}</Text>
-        <a href={linkUrl} className="tool_content_link">
+        <a onClick={linkLabelOnClickCallback} className="tool_content_link">
           <Text prominent size="lg">
             {linkLabel}
           </Text>
