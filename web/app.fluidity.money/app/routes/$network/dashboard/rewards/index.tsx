@@ -4,6 +4,7 @@ import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { Winner } from "~/queries/useUserRewards";
 import type { UserTransaction } from "~/routes/$network/query/userTransactions";
 import type { IRow } from "~/components/Table";
+import type Transaction from "~/types/Transaction";
 
 import {
   transactionActivityLabel,
@@ -170,18 +171,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
-};
-
-type Transaction = {
-  sender: string;
-  receiver: string;
-  reward: number;
-  hash: string;
-  // timestamp is the Unix time, in seconds
-  timestamp: number;
-  value: number;
-  currency: string;
-  logo: string;
 };
 
 type LoaderData = {

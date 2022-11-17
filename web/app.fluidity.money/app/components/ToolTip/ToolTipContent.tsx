@@ -9,6 +9,7 @@ type IToolTipContentProps = {
   details: string;
   linkLabel: `ASSETS` | `DETAILS`;
   linkLabelOnClickCallback: () => void;
+  linkUrl: string;
 };
 
 export const ToolTipContent = ({

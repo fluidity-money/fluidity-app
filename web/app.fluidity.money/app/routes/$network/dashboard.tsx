@@ -249,7 +249,7 @@ export default function Dashboard() {
         ].tokens.filter((entry) => entry.symbol === log.token);
 
         toolTip.open(
-          fToken.at(0)?.colour,
+          fToken.at(0)?.colour || `#000`,
           <ToolTipContent
             tokenLogoSrc={fToken.at(0)?.logo}
             boldTitle={log.amount + ` ` + log.token}
@@ -260,6 +260,10 @@ export default function Dashboard() {
             }
             linkLabel={"DETAILS"}
             linkUrl={"#"}
+            // I don't know what this is for but it's not optional.
+            linkLabelOnClickCallback={() => {
+              return;
+            }}
           />
         );
       });
@@ -501,7 +505,11 @@ export default function Dashboard() {
         {/* Mobile Menu Modal */}
         {openMobModal && (
           <MobileModal
-            navigationMap={navigationMap}
+            navigationMap={navigationMap.map((obj) => {
+              // I love type inconsistency
+              const { name, icon } = Object.values(obj)[0];
+              return { name, icon };
+            })}
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={unclaimedRewards}

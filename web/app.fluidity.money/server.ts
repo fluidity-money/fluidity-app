@@ -76,15 +76,16 @@ const solanaTokens = config.config["solana"].tokens
 const hasuraUrl = config.database.hasura;
 const registry = new Map<string, Subscription>();
 
+type TokenList = {
+  token: string;
+  address: string;
+}[];
+
 io.on("connection", (socket) => {
   socket.on("subscribeTransactions", ({ protocol, address }) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-    let Tokens: {
-      token: string;
-      address: string;
-    }[] = [];
-
+    let Tokens: TokenList = [];
     if (protocol === `ethereum`) {
       Tokens = ethereumTokens;
     } else if (protocol === `solana`) {

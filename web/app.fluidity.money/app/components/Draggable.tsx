@@ -18,7 +18,7 @@ const Draggable = (props: Props) => {
         isDragging: !!monitor.isDragging(),
       }),
     };
-  })[1];
+  }, [dragItem])[1];
 
   return (
     <div ref={drag} key={key}>
