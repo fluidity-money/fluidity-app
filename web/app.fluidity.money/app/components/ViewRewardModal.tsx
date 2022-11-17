@@ -6,8 +6,10 @@ interface IPropsConnectedWalletModal {
   visible: boolean;
   close: () => void;
   tokenSymbol: string;
-  color: string;
+  img: string;
+  colour: string;
   winAmount: string;
+  explorerUri: string;
   balance: string;
   forSending: boolean;
 }
@@ -16,8 +18,10 @@ export const ViewRewardModal = ({
   visible,
   close,
   tokenSymbol,
-  color,
+  img,
+  colour,
   winAmount,
+  explorerUri,
   balance,
   forSending,
 }: IPropsConnectedWalletModal) => {
@@ -53,14 +57,11 @@ export const ViewRewardModal = ({
               <span
                 className="view-reward-modal-token"
                 style={{
-                  backgroundColor: `${color}`,
-                  boxShadow: `0 0 100px 60px blue, 0 0 140px 90px ${color}`,
+                  backgroundColor: `${colour}`,
+                  boxShadow: `0 0 100px 60px blue, 0 0 140px 90px ${colour}`,
                 }}
               >
-                <img
-                  src="/assets/tokens/usdc.svg"
-                  className="view-reward-modal-token-img"
-                />
+                <img src={img} className="view-reward-modal-token-img" />
               </span>
               <Text
                 prominent
@@ -90,7 +91,7 @@ export const ViewRewardModal = ({
                 buttontype="text"
                 size={"medium"}
                 handleClick={() => {
-                  console.log("view breakdown");
+                  console.log(explorerUri);
                 }}
                 className="view-reward-modal-breakdown-btn"
               >

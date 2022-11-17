@@ -45,6 +45,7 @@ import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
+import { ViewRewardModal } from "~/components/ViewRewardModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -57,12 +58,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = config.liquidity_providers;
 
-  const token = config.config;
+  const tokens = config.config;
 
   return json({
     network,
     provider,
-    token,
+    tokens,
     ethereumWallets,
   });
 };
@@ -114,11 +115,11 @@ type LoaderData = {
   fromRedirect: boolean;
   network: string;
   provider: typeof config.liquidity_providers;
-  token: typeof config.config;
+  tokens: typeof config.config;
 };
 
 export default function Dashboard() {
-  const { network, token } = useLoaderData<LoaderData>();
+  const { network, tokens } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -138,6 +139,29 @@ export default function Dashboard() {
 
   const [walletModalVisibility, setWalletModalVisibility] =
     useState<boolean>(false);
+
+  type RewardDetails = {
+    visible: boolean;
+    token: string;
+    img: string;
+    colour: string;
+    winAmount: string;
+    explorerUri: string;
+    balance: string;
+    forSending: boolean;
+  };
+
+  const [detailedRewardObject, setDetailedRewardObject] =
+    useState<RewardDetails>({
+      visible: false,
+      token: "",
+      img: "",
+      colour: "",
+      winAmount: "",
+      explorerUri: "",
+      balance: "",
+      forSending: false,
+    });
 
   // By default, prompt user to connect their wallet
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
@@ -245,9 +269,14 @@ export default function Dashboard() {
 
     setTimeout(() => {
       socket.on("Transactions", (log: PipedTransaction) => {
-        const fToken = token[
+        const fToken = tokens[
           network === `` ? `ethereum` : network
         ].tokens.filter((entry) => entry.symbol === log.token);
+
+        const imgUrl =
+          fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
+        const tokenColour =
+          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.logo : "";
 
         toolTip.open(
           fToken.at(0)?.colour || `#000`,
@@ -260,10 +289,17 @@ export default function Dashboard() {
                 : `received from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
-            linkUrl={"#"}
-            // I don't know what this is for but it's not optional.
             linkLabelOnClickCallback={() => {
-              return;
+              setDetailedRewardObject({
+                visible: true,
+                token: log.token,
+                img: imgUrl as unknown as string,
+                colour: tokenColour as unknown as string,
+                winAmount: log.amount,
+                explorerUri: "",
+                balance: "150", //hard coded for now
+                forSending: false, // fetched from server - hauradb - not sorted yet from db
+              });
             }}
           />
         );
@@ -498,6 +534,32 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
+
+        {
+          <ViewRewardModal
+            visible={detailedRewardObject.visible}
+            close={() => {
+              setDetailedRewardObject({
+                // empty object on close
+                visible: false,
+                token: "",
+                img: "",
+                colour: "",
+                winAmount: "",
+                explorerUri: "",
+                balance: "",
+                forSending: false,
+              });
+            }}
+            tokenSymbol={detailedRewardObject.token}
+            img={detailedRewardObject.img}
+            colour={detailedRewardObject.colour}
+            winAmount={detailedRewardObject.winAmount}
+            explorerUri={detailedRewardObject.explorerUri}
+            balance={detailedRewardObject.balance}
+            forSending={detailedRewardObject.forSending}
+          />
+        }
 
         <Outlet />
 
