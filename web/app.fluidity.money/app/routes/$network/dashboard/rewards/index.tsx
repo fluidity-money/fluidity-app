@@ -91,7 +91,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     );
 
     const defaultLogo = "/assets/tokens/usdt.svg";
-
+    
     const mergedTransactions: Transaction[] = transactions
       .filter((tx) => !!winnersMap[tx.hash])
       .map((tx) => ({
@@ -272,7 +272,7 @@ export default function Rewards() {
     ? [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
@@ -283,7 +283,7 @@ export default function Rewards() {
     : [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
       ];
 
@@ -559,30 +559,6 @@ export default function Rewards() {
 }
 
 export { ErrorBoundary };
-
-// const rewarders: Provider[] = [
-//   {
-//     name: "Solana",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Polygon",
-//     prize: 361879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Compound",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Solana",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//
-// ];
 
 const backends: { [Token: string]: Providers } = {
   USDC: "Compound",

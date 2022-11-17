@@ -33,16 +33,9 @@ main {
   padding: 0 64px;
 }
 
-.pad-main {
-  padding: 0 64px;
-}
-
-@media only screen and (max-width: 500px) {
-  main {
-    padding: 0 24px;
-  }
+@media only screen and (max-width: 550px) {
   .pad-main {
-    padding: 0;
+    padding: 0 24px;
   }
 }
 
@@ -73,6 +66,7 @@ main > footer {
 
 main > footer > section {
   display: inherit;
+  align-items: baseline;
   gap: 20px;
 }
 
@@ -673,9 +667,6 @@ main > footer > section > a {
 }
 
 @media (max-width: 500px) {
-  main {
-    padding: 0 20px;
-  }
   main > footer > section:first-child {
     gap: 0.6em;
   }

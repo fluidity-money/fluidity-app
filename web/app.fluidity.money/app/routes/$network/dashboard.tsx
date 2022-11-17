@@ -1,4 +1,4 @@
-import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
 import { json } from "@remix-run/node";
@@ -26,6 +26,7 @@ import {
   GeneralButton,
   Trophy,
   Text,
+  Heading,
   ChainSelectorButton,
   BlockchainModal,
   trimAddressShort,
@@ -45,7 +46,7 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ params }) => {
   const ethereumWallets = config.config["ethereum"].wallets;
 
   const network = params.network ?? "";
@@ -54,28 +55,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const token = config.config;
 
-  const url = new URL(request.url);
-  const fromRedirectStr = url.searchParams.get("redirect");
-
-  const fromRedirect = fromRedirectStr === "true";
-
   return json({
-    fromRedirect,
-    version: "1.5",
     network,
     provider,
     token,
     ethereumWallets,
   });
-};
-
-type LoaderData = {
-  appName: string;
-  fromRedirect: boolean;
-  version: string;
-  network: string;
-  provider: typeof config.liquidity_providers;
-  token: typeof config.config;
 };
 
 function ErrorBoundary() {
@@ -98,6 +83,11 @@ function ErrorBoundary() {
   );
 }
 
+export let meta: MetaFunction = ({data}) => ({
+  ...data,
+  title: "Dashboard",
+})
+
 const routeMapper = (route: string) => {
   switch (route.toLowerCase()) {
     case "home":
@@ -115,8 +105,16 @@ const routeMapper = (route: string) => {
   }
 };
 
+type LoaderData = {
+  appName: string;
+  fromRedirect: boolean;
+  network: string;
+  provider: typeof config.liquidity_providers;
+  token: typeof config.config;
+};
+
 export default function Dashboard() {
-  const { version, network, token, fromRedirect } =
+  const { network, token } =
     useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
@@ -142,7 +140,7 @@ export default function Dashboard() {
 
   // Toggle Select Chain Modal
   const [chainModalVisibility, setChainModalVisibility] =
-    useState<boolean>(fromRedirect);
+    useState<boolean>(false);
 
   useEffect(() => {
     if (connected || connecting) setWalletModalVisibility(false);
@@ -418,7 +416,7 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Text>{appName}</Text>}
+            {!isMobile && <Heading as="h6" >{appName}</Heading>}
           </div>
 
           {/* Navigation Buttons */}
@@ -450,16 +448,16 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify */}
-            {width > 550 && (
-              <GeneralButton
-                version={"primary"}
-                buttontype="text"
-                size={"small"}
-                handleClick={() => navigate("../fluidify")}
-              >
-                Fluidify Money
-              </GeneralButton>
-            )}
+            <GeneralButton
+              version={"primary"}
+              buttontype="text"
+              size={"small"}
+              handleClick={() => navigate("../fluidify")}
+            >
+              <b>
+                Fluidify
+              </b>
+            </GeneralButton>
 
             {/* Prize Money */}
             <GeneralButton
@@ -523,9 +521,9 @@ export default function Dashboard() {
 
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
-          <section>
+          <section className="">
             {/* Version */}
-            <Text>Fluidity Money V{version}</Text>
+            <Text>Fluidity Money</Text>
 
             {/* Terms */}
             <Link to={"/"}>
