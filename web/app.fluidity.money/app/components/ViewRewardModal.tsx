@@ -5,23 +5,23 @@ import { Text, Card, GeneralButton } from "@fluidity-money/surfing";
 interface IPropsConnectedWalletModal {
   visible: boolean;
   close: () => void;
-	tokenSymbol: string
-	color: string;
-	winAmount: string;
-	explorerUri: string;
-	balance: string;
-	forSending: boolean;
+  tokenSymbol: string;
+  color: string;
+  winAmount: string;
+  explorerUri: string;
+  balance: string;
+  forSending: boolean;
 }
 
 export const ViewRewardModal = ({
   visible,
   close,
-	tokenSymbol,
-	color,
-	winAmount,
-	explorerUri,
-	balance,
-	forSending
+  tokenSymbol,
+  color,
+  winAmount,
+  explorerUri,
+  balance,
+  forSending,
 }: IPropsConnectedWalletModal) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
@@ -71,17 +71,21 @@ export const ViewRewardModal = ({
               >
                 ${winAmount} {tokenSymbol}
               </Text>
-              <Text
-                size="xl"
-                className="view-reward-modal-usd-info"
-              >${winAmount} USD</Text>
+              <Text size="xl" className="view-reward-modal-usd-info">
+                ${winAmount} USD
+              </Text>
               <span className="view-reward-modal-price-desc">
                 <Text size="xl">
-                  Won for <a className="view-reward-modal-link">{ forSending === true ? 'sending' : 'receiving' }</a>{" "}
+                  Won for{" "}
+                  <a className="view-reward-modal-link">
+                    {forSending === true ? "sending" : "receiving"}
+                  </a>{" "}
                   fluid assets.
                 </Text>
                 <br />
-                <Text size="xl">{balance} {tokenSymbol} total balance</Text>
+                <Text size="xl">
+                  {balance} {tokenSymbol} total balance
+                </Text>
               </span>
               <GeneralButton
                 version={"primary"}

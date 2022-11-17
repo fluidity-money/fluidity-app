@@ -832,29 +832,29 @@ main > footer > section > a {
 
 .view-reward-modal-container {
   position: fixed;
-	width: 100vw;
-	height: 100vh;
-	background-color: #000;
-	opacity: 0.9;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0.9;
 }
 
 .view-reward-modal-cancel {
-	display: flex;
-	margin-right: 80px;
-	margin-top: 80px;
-	justify-content: flex-end;
+  display: flex;
+  margin-right: 80px;
+  margin-top: 80px;
+  justify-content: flex-end;
 }
 
 .view-reward-modal-close-text-desc {
-	margin-bottom: 5px;
-	margin-right: 10px;
-	cursor: pointer:
+  margin-bottom: 5px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .view-reward-main-modal {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: absolute;
   width: 30%;
   min-width: 350px;
@@ -866,38 +866,38 @@ main > footer > section > a {
 }
 
 .view-reward-modal-title {
-	font-size: 40px;
-	margin-bottom: 20px;
+  font-size: 40px;
+  margin-bottom: 20px;
 }
 
 .view-reward-modal-token-title-size {
-	margin-bottom: 20px;
-	font-size: 32px;
+  margin-bottom: 20px;
+  font-size: 32px;
 }
 
 .view-reward-modal-token {
-	width: 40%;
-	height: 80px;
-	margin-top: 150px;
-	margin-bottom: 150px;
-	background-color: blue;
+  width: 40%;
+  height: 80px;
+  margin-top: 150px;
+  margin-bottom: 150px;
+  background-color: blue;
   border-radius: 90%;
 }
 
 .view-reward-modal-token > img {
-	margin-top: -70px;
+  margin-top: -70px;
 }
 
 .view-reward-modal-usd-info {
- margin-bottom: 10px;
- margin-top: -14px;
+  margin-bottom: 10px;
+  margin-top: -14px;
 }
 
 .view-reward-modal-link {
-	text-decoration: underline;
-	color: #fff
+  text-decoration: underline;
+  color: #fff;
 }
 
 .view-reward-modal-price-desc {
-	margin-bottom: 70px;
+  margin-bottom: 70px;
 }
