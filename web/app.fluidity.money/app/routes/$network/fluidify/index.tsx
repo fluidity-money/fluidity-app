@@ -19,7 +19,6 @@ import {
   getTokenFromSymbol,
   getTokenForNetwork,
 } from "~/util/chainUtils/tokens";
-import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import ItemTypes from "~/types/ItemTypes";
 import DragCard from "~/components/DragCard";
 import FluidifyCard from "~/components/FluidifyCard";
@@ -37,8 +36,8 @@ import {
 } from "~/util/chainUtils/ethereum/transaction";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
 import { AnimatePresence, motion } from "framer-motion";
+import { userMintLimit } from "~/util/chainUtils/solana/mintLimits";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -64,26 +63,50 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const fluidTokenSet = new Set(getTokenForNetwork(network ?? ""));
 
-  const provider = new JsonRpcProvider(rpcUrl);
+  if (network === "ethereum") {
+    const provider = new JsonRpcProvider(rpcUrl);
 
+    const augmentedTokens = await Promise.all(
+      tokens.map(async (token) => {
+        const mintLimitEnabled = fluidTokenSet.has(token.address)
+          ? //? await userMintLimitedEnabled(provider, token.address, tokenAbi)
+            true
+          : false;
+
+        const userMintLimit = mintLimitEnabled
+          //? await getUsdUserMintLimit(provider, token.address, tokenAbi)
+          ? undefined
+          : undefined;
+        
+        return {
+          ...token,
+          userMintLimit: userMintLimit,
+          userTokenBalance: 0,
+        };
+      })
+    );
+
+    return json({
+      network,
+      tokens: augmentedTokens,
+      ethereumWallets,
+      colors: (await colors)[network as string],
+    });
+  }
+
+  // Network === "solana"
   const augmentedTokens = await Promise.all(
     tokens.map(async (token) => {
-      const mintLimitEnabled = fluidTokenSet.has(token.address)
-        ? //? await userMintLimitedEnabled(provider, token.address, tokenAbi)
-          true
-        : false;
-
-      const userMintLimit = mintLimitEnabled
-        ? await getUsdUserMintLimit(provider, token.address, tokenAbi)
-        : undefined;
+      const mintLimit = undefined;
 
       return {
         ...token,
-        userMintLimit: userMintLimit,
+        userMintLimit: mintLimit,
         userTokenBalance: 0,
       };
     })
   );
+  
 
   return json({
     network,
@@ -116,7 +139,7 @@ export const links = () => {
   ];
 };
 
-function ErrorBoundary(error) {
+function ErrorBoundary(error: any) {
   console.log(error);
   return (
     <div
@@ -185,14 +208,22 @@ const FluidityHotSpot = ({
 };
 
 export default function FluidifyToken() {
-  const { tokens, colors, network } = useLoaderData<LoaderData>();
-  const { address, swap, connected, connecting, disconnect, balance } =
-    useContext(FluidityFacadeContext);
-  const { provider } = useWeb3React();
+  const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
+  const {
+    address,
+    swap,
+    amountMinted,
+    connected,
+    connecting,
+    disconnect,
+    balance,
+  } = useContext(FluidityFacadeContext);
 
   const { width } = useViewport();
 
   const isTablet = width < 1200;
+
+  const [tokens, setTokens] = useState(tokens_);
 
   const [assetToken, setAssetToken] = useState<AugmentedToken>();
 
@@ -212,7 +243,7 @@ export default function FluidifyToken() {
         : undefined,
     [assetToken]
   );
-
+  
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState(false);
   const [walletModalVisibility, setWalletModalVisibility] = useState(
@@ -247,42 +278,56 @@ export default function FluidifyToken() {
 
   const [swapping, setSwapping] = useState(false);
   const [finishing, setFinishing] = useState(false);
-
+  
   useEffect(() => {
-    if (address && provider) {
+    if (address) {
       (async () => {
-        if (network === "ethereum") {
-          // get a provider with the correct type
-          const rpcProvider = provider.getSigner().provider;
+        switch (network) {
+          case "ethereum":
+            let tokensMinted = await Promise.all(
+              tokens.map(async (token) => {
+                if (!token.isFluidOf) return undefined;
 
-          const userAmountMinted = await Promise.all(
-            tokens.map(async (token) => {
-              if (!token.isFluidOf) return undefined;
-
-              return getUsdAmountMinted(
-                rpcProvider,
-                token.address,
-                tokenAbi,
-                address
+                  return amountMinted?.(token.address);
+                })
               );
-            })
-          );
 
-          const userTokenBalance = await Promise.all(
-            tokens.map(async ({ address }) => (await balance?.(address)) || 0)
-          );
+            let userTokenBalance = await Promise.all(
+              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+            );
 
-          for (let i = 0; i < userAmountMinted.length; i++) {
-            tokens[i].userMintedAmt = userAmountMinted[i];
-            tokens[i].userTokenBalance = userTokenBalance[i];
-          }
+            setTokens(tokens.map((token, i) => ({
+              ...token,
+              userMintedAmt: tokensMinted[i],
+              userTokenBalance: userTokenBalance[i],
+            })))
+            break;
+          
+          case "solana":
+            tokensMinted = await Promise.all(
+              tokens.map(async (token) => {
+                if (!token.isFluidOf) return undefined;
+                return await amountMinted?.(token.name);
+              })
+            );
+
+            userTokenBalance = await Promise.all(
+              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+            );
+
+            setTokens(tokens.map((token, i) => ({
+              ...token,
+              userMintedAmt: tokensMinted[i],
+              userTokenBalance: userTokenBalance[i],
+            })))
+            break;
         }
       })();
     }
   }, [address]);
 
   useEffect(() => {
-    if (assetToken && address && provider) {
+    if (assetToken && address) {
       balance?.(assetToken.address).then(setUserTokenAmount);
     } else {
       setUserTokenAmount(0);
@@ -292,7 +337,7 @@ export default function FluidifyToken() {
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
     tokens as AugmentedToken[]
   );
-
+  
   const debouncedSearch: DebouncedFunc<
     (tokens: AugmentedToken[]) => AugmentedToken[]
   > = debounce((tokens: AugmentedToken[]) => {
@@ -314,8 +359,8 @@ export default function FluidifyToken() {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [search, activeFilterIndex]);
-
+  }, [search, activeFilterIndex, tokens]);
+  
   const handleSwap = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -500,31 +545,23 @@ export default function FluidifyToken() {
                     return true;
                   })
                   .map(
-                    ({
-                      address,
-                      name,
-                      symbol,
-                      logo,
-                      isFluidOf,
-                      userTokenBalance,
-                      userMintLimit,
-                      userMintedAmt,
-                    }) => {
+                    (token) => {
                       return (
                         <DragCard
-                          key={symbol}
-                          fluid={isFluidOf !== undefined}
-                          symbol={symbol}
-                          name={name}
-                          logo={logo}
-                          address={address}
+                          key={token.symbol}
+                          fluid={token.isFluidOf !== undefined}
+                          symbol={token.symbol}
+                          name={token.name}
+                          logo={token.logo}
+                          address={token.address}
                           mintCapPercentage={
-                            !!userMintLimit && userMintedAmt !== undefined
-                              ? userMintedAmt / userMintLimit
+                            !!token.userMintLimit && token.userMintedAmt !== undefined
+                              ? token.userMintedAmt / token.userMintLimit
                               : undefined
                           }
-                          color={colors[symbol]}
-                          amount={userTokenBalance}
+                          color={colors[token.symbol]}
+                          amount={token.userTokenBalance}
+                          token={token}
                         />
                       );
                     }

@@ -7,9 +7,11 @@ package main
 import (
 	"math/big"
 
+	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -22,27 +24,37 @@ const (
 	// EnvPublishAmqpQueueName is the queue to post batched winners down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
-	// EnvInstantRewardThreshold is the amount (in dollars) above which a
-	// reward should be sent instantly
-	EnvInstantRewardThreshold = `FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD`
-
-	// EnvInstantRewardThreshold is the amount (in dollars) above which
-	// rewards should be sent if the total pending amount of rewards is greater
-	EnvTotalRewardThreshold = `FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD`
+	// EnvNetwork to differentiate between eth, arbitrum, etc
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
 
 func main() {
 	var (
-		rewardsQueue           = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
-		batchedRewardsQueue    = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-		instantRewardThreshold = ratFromEnvOrFatal(EnvInstantRewardThreshold)
-		totalRewardThreshold   = ratFromEnvOrFatal(EnvTotalRewardThreshold)
+		rewardsQueue        = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
+		batchedRewardsQueue = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
+		network_            = util.GetEnvOrFatal(EnvNetwork)
 	)
+
+	dbNetwork, err := network.ParseEthereumNetwork(network_)
+
+	if err != nil {
+		log.Fatal(func (k *log.Log) {
+			k.Message = "Failed to read the network from env!"
+			k.Payload = err
+		})
+	}
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
 		var announcements []worker.EthereumWinnerAnnouncement
 
 		message.Decode(&announcements)
+
+		var (
+			workerConfig = workerDb.GetWorkerConfigEthereum(dbNetwork)
+
+			instantRewardThreshold = workerConfig.SpoolerInstantRewardThreshold
+			batchedRewardThreshold = workerConfig.SpoolerBatchedRewardThreshold
+		)
 
 		toSend := make(map[token_details.TokenDetails]bool)
 
@@ -68,62 +80,55 @@ func main() {
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Reward value is $%s, instant send threshhold is $%s.",
+					"Reward value is $%s, instant send threshhold is $%f.",
 					scaledWinAmount.FloatString(2),
-					instantRewardThreshold.FloatString(2),
+					instantRewardThreshold,
 				)
 			})
 
-			totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
+			totalRewards := spooler.UnpaidWinningsForToken(dbNetwork, tokenDetails)
 
-			scaledTotalRewards := new(big.Rat).SetFrac(totalRewards, tokenDecimalsScale)
+			scaledBatchedRewards := new(big.Rat).SetFrac(totalRewards, tokenDecimalsScale)
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Total pending rewards are $%s, threshhold is $%s.",
-					scaledTotalRewards.FloatString(2),
-					totalRewardThreshold.FloatString(2),
+					"Total pending rewards are $%s, threshhold is $%f.",
+					scaledBatchedRewards.FloatString(2),
+					batchedRewardThreshold,
 				)
 			})
 
 			var (
-				largeSingleWin = scaledWinAmount.Cmp(instantRewardThreshold) > 0
-				largeTotalWins = scaledTotalRewards.Cmp(totalRewardThreshold) > 0
+				scaledWinAmountFloat, _ = scaledWinAmount.Float64()
+				scaledBatchedRewardsFloat, _ = scaledBatchedRewards.Float64()
 			)
 
-			switch true {
-
-			case largeSingleWin:
+			if scaledWinAmountFloat > instantRewardThreshold {
 				log.Debug(func(k *log.Log) {
 					k.Message = "Transaction won more than instant send threshold, sending instantly!"
 				})
 
 				toSend[tokenDetails] = true
-
-				continue
-
-			case largeTotalWins:
+			} else if scaledBatchedRewardsFloat > batchedRewardThreshold {
 				log.Debug(func(k *log.Log) {
 					k.Message = "Total pending rewards are greater than threshold, sending!"
 				})
 
 				toSend[tokenDetails] = true
-
-				continue
-			}
-		}
-
-		for shortName, send := range toSend {
-			if !send {
-				// should never happen
-				continue
 			}
 
-			log.Debug(func(k *log.Log) {
-				k.Format("Sending rewards for token %v", shortName)
-			})
+			for shortName, send := range toSend {
+				if !send {
+					// should never happen
+					continue
+				}
 
-			sendRewards(batchedRewardsQueue, shortName)
+				log.Debug(func(k *log.Log) {
+					k.Format("Sending rewards for token %v", shortName)
+				})
+
+				sendRewards(batchedRewardsQueue, dbNetwork, shortName)
+			}
 		}
 	})
 }

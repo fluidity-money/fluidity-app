@@ -42,6 +42,7 @@ jobs:
         with: 
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
+
   test-contracts:
     runs-on: ubuntu-latest
     steps:
@@ -75,3 +76,25 @@ jobs:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
+  test-npm:
+    runs-on: ubuntu-latest
+    # environment: dev
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: npm test
+        working-directory: web/app.fluidity.money
+        run: |
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GH_SUPER_TOKEN }}
+          npm install
+          npm test
+      - name: Discord
+        uses: ./scripts/actions
+        if: always()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        with: 
+          command: |
+            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}

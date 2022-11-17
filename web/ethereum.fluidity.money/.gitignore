@@ -1,9 +1,0 @@
-docker
-docker-dev
-.DS_Store
-node_modules
-publish/index.*
-build/*
-public/index.css*
-src/index.css*
-.env

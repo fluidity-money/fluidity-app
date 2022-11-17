@@ -14,7 +14,7 @@ converting to UTC.
 | `FLU_DEBUG`                            | Toggle debug messages produced by any application using the debug logger. |
 | `FLU_ETHEREUM_HTTP_URL`                | HTTP address to use to connect to Geth.                                   |
 | `FLU_DISCORD_WEBHOOK`                  | Discord webhook to use when the Discord Notify function is used.          |
-| `FLU_ETHEREUM_LIMITS_PRIVATE_KEY_LIST` | `<contract address>:<private key>,...` for access to the contracts        |
+| `FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST` | `<contract address>:<private key>,...` for access to the contracts        |
 
 ## Building
 
