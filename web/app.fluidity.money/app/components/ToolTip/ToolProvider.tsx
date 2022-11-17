@@ -1,15 +1,21 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 import { ToolContext } from "./ToolContext";
 import { ToolTip } from "./ToolTip";
 
 export const ToolProvider = (props: {
-  children: React.ReactElement<string>;
+  children: React.ReactNode;
 }) => {
   const [toolTips, setToolTips] = useState<
     { id: string; bgColor: string; content: React.ReactNode }[]
   >([]);
+
+  const [portalElement, setPortalElement] = useState<HTMLElement>();
+
+  useEffect(() => {
+    setPortalElement(document.body)
+  })
 
   const open = (bgColor: string, content: React.ReactNode) => {
     return setToolTips((currentTooltip) => [
@@ -29,7 +35,7 @@ export const ToolProvider = (props: {
     <ToolContext.Provider value={contextValue}>
       {props.children}
 
-      {createPortal(
+      {portalElement && createPortal(
         <div className="tooltip_container">
           {toolTips.map((item) => (
             <ToolTip
@@ -41,7 +47,7 @@ export const ToolProvider = (props: {
             </ToolTip>
           ))}
         </div>,
-        document.body
+        portalElement
       )}
     </ToolContext.Provider>
   );
