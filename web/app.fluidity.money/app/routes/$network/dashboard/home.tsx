@@ -73,6 +73,22 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {} as { [key: string]: Winner }
     );
 
+    const {
+      config: {
+        [network as string]: { tokens },
+      },
+    } = config;
+
+    const tokenLogoMap = tokens.reduce(
+      (map, token) => ({
+        ...map,
+        [token.symbol]: token.logo,
+      }),
+      {} as Record<string, string>
+    );
+
+    const defaultLogo = "/assets/tokens/fUSDT.png";
+
     const mergedTransactions: Transaction[] = transactions.map((tx) => ({
       sender: tx.sender,
       receiver: tx.receiver,
@@ -87,6 +103,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           ? tx.value / 10 ** 12
           : tx.value,
       timestamp: tx.timestamp * 1000,
+      logo: tokenLogoMap[tx.currency] || defaultLogo,
     }));
 
     const totalYield = mergedTransactions.reduce(
@@ -127,6 +144,7 @@ type Transaction = {
   timestamp: number;
   value: number;
   currency: string;
+  logo: string;
 };
 
 const graphEmptyTransaction = (time: number, value = 0) => ({
@@ -137,6 +155,7 @@ const graphEmptyTransaction = (time: number, value = 0) => ({
   timestamp: time,
   value,
   currency: "",
+  logo: "/assets/tokens/fUSDT.svg",
 });
 
 type LoaderData = {
@@ -330,7 +349,7 @@ export default function Home() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, timestamp, value, currency, reward, hash } = data;
+      const { sender, timestamp, value, reward, hash, logo } = data;
 
       return (
         <motion.tr
@@ -351,13 +370,7 @@ export default function Home() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img
-                src={
-                  currency === "USDC"
-                    ? "/images/tokenIcons/usdcFluid.svg"
-                    : "/images/tokenIcons/usdtFluid.svg"
-                }
-              />
+              <img src={logo} />
               <Text>{transactionActivityLabel(data, sender)}</Text>
             </a>
           </td>
