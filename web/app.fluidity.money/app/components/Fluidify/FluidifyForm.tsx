@@ -24,7 +24,6 @@ export const FluidifyForm = ({
   toToken,
   swapping,
 }: IFluidifyFormProps) => {
-  console.log(assetToken);
   return (
     <form className={"fluidify-form"} onSubmit={handleSwap}>
       <Text size="lg" prominent>
@@ -46,7 +45,10 @@ export const FluidifyForm = ({
           value={swapAmount}
           onChange={(e) =>
             setSwapAmount(
-              Math.min(parseFloat(e.target.value) || 0, assetToken.userTokenBalance || 0)
+              Math.min(
+                parseFloat(e.target.value) || 0,
+                assetToken.userTokenBalance || 0
+              )
             )
           }
           placeholder=""
@@ -64,7 +66,8 @@ export const FluidifyForm = ({
       {/* Tokens User Holds */}
       <Text prominent>
         {assetToken.userTokenBalance} {assetToken?.symbol || ""} (
-        {numberToMonetaryString(assetToken.userTokenBalance || 0)}) remaining in wallet.
+        {numberToMonetaryString(assetToken.userTokenBalance || 0)}) remaining in
+        wallet.
       </Text>
 
       {/* Daily Limit */}

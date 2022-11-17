@@ -245,8 +245,6 @@ export default function FluidifyToken() {
             userTokenBalance = await Promise.all(
               tokens.map(async ({ address }) => (await balance?.(address)) || 0)
             );
-        
-        console.log(userTokenBalance);
 
             setTokens(
               tokens.map((token, i) => ({
@@ -344,8 +342,6 @@ export default function FluidifyToken() {
 
     // navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
   };
-  
-  console.log(assetToken);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -479,99 +475,66 @@ export default function FluidifyToken() {
               </div>
 
               <div className="fluidify-tokens">
-                {isTablet ? (
-                  <>
-                    {filteredTokens
-                      .filter(() => {
-                        return true;
-                      })
-                      .map((token) => {
-                        const {
-                          symbol,
-                          name,
-                          logo,
-                          address,
-                          userMintLimit,
-                          userMintedAmt,
-                          userTokenBalance,
-                          isFluidOf,
-                        } = token;
+                {filteredTokens.map((token) => {
+                  const {
+                    symbol,
+                    name,
+                    logo,
+                    address,
+                    userMintLimit,
+                    userMintedAmt,
+                    userTokenBalance,
+                    isFluidOf,
+                  } = token;
 
-                        return (
-                          <div
-                            onClick={() => {
-                              setAssetToken(token);
-                              setOpenMobModal(true);
-                            }}
-                            key={`tok-${symbol}`}
-                          >
-                            <FluidifyCard
-                              key={symbol}
-                              fluid={isFluidOf !== undefined}
-                              symbol={symbol}
-                              name={name}
-                              logo={logo}
-                              address={address}
-                              mintCapPercentage={
-                                !!userMintLimit && userMintedAmt !== undefined
-                                  ? userMintedAmt / userMintLimit
-                                  : undefined
-                              }
-                              color={colors[symbol]}
-                              amount={userTokenBalance}
-                            />
-                          </div>
-                        );
-                      })}
-                  </>
-                ) : (
-                  <>
-                    {filteredTokens
-                      .filter(() => {
-                        return true;
-                      })
-                      .map((token) => {
-                        const {
-                          symbol,
-                          name,
-                          logo,
-                          address,
-                          userMintLimit,
-                          userMintedAmt,
-                          userTokenBalance,
-                          isFluidOf,
-                        } = token;
-
-                        return (
-                          <Draggable
-                            key={`tok-${symbol}`}
-                            type={
-                              isFluidOf
-                                ? ItemTypes.FLUID_ASSET
-                                : ItemTypes.ASSET
-                            }
-                            dragItem={token}
-                          >
-                            <FluidifyCard
-                              key={symbol}
-                              fluid={isFluidOf !== undefined}
-                              symbol={symbol}
-                              name={name}
-                              logo={logo}
-                              address={address}
-                              mintCapPercentage={
-                                !!userMintLimit && userMintedAmt !== undefined
-                                  ? userMintedAmt / userMintLimit
-                                  : undefined
-                              }
-                              color={colors[symbol]}
-                              amount={userTokenBalance}
-                            />
-                          </Draggable>
-                        );
-                      })}
-                  </>
-                )}
+                  return isTablet ? (
+                    <div
+                      onClick={() => {
+                        setAssetToken(token);
+                        setOpenMobModal(true);
+                      }}
+                      key={`tok-${symbol}`}
+                    >
+                      <FluidifyCard
+                        key={symbol}
+                        fluid={isFluidOf !== undefined}
+                        symbol={symbol}
+                        name={name}
+                        logo={logo}
+                        address={address}
+                        mintCapPercentage={
+                          !!userMintLimit && userMintedAmt !== undefined
+                            ? userMintedAmt / userMintLimit
+                            : undefined
+                        }
+                        color={colors[symbol]}
+                        amount={userTokenBalance}
+                      />
+                    </div>
+                  ) : (
+                    <Draggable
+                      key={`tok-${symbol}`}
+                      type={isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET}
+                      dragItem={token}
+                    >
+                      <FluidifyCard
+                        key={symbol}
+                        fluid={isFluidOf !== undefined}
+                        symbol={symbol}
+                        name={name}
+                        logo={logo}
+                        address={address}
+                        mintCapPercentage={
+                          !!userMintLimit && userMintedAmt !== undefined
+                            ? userMintedAmt / userMintLimit
+                            : undefined
+                        }
+                        color={colors[symbol]}
+                        amount={userTokenBalance}
+                      />
+                    </Draggable>
+                  );
+                })}
               </div>
             </aside>
 
