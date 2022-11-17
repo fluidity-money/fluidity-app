@@ -800,8 +800,8 @@ export default function FluidifyToken() {
             )}
 
             <Text size="sm" className="footer-text">
-              Fluidity employs daily limits on fluidifying assets for <br /> maintained
-              system stability. Limits reset at midnight EST. <br />
+              Fluidity employs daily limits on fluidifying assets for <br />{" "}
+              maintained system stability. Limits reset at midnight EST. <br />
               Unlimited reversion of fluid to non-fluid assets per day.
             </Text>
 
