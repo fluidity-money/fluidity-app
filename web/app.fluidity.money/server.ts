@@ -10,7 +10,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 
 import config from "~/webapp.config.server";
-import { Observable, Subscription, EMPTY } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
@@ -80,7 +80,11 @@ io.on("connection", (socket) => {
   socket.on("subscribeTransactions", ({ protocol, address }) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-    let Tokens: any = [];
+    let Tokens: {
+      token: string;
+      address: string;
+    }[] = [];
+
     if (protocol === `ethereum`) {
       Tokens = ethereumTokens;
     } else if (protocol === `solana`) {

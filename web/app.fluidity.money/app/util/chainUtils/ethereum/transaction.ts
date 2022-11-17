@@ -176,19 +176,30 @@ const makeContractSwap = async (
       return await (await fromContract.erc20Out(amount)).wait();
     } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
   } catch (error) {
-    return await handleContractErrors(error, signer.provider);
+    return await handleContractErrors(error as ContractError, signer.provider);
   }
 };
 
+type ContractError = {
+  data?: {
+    message: string;
+  };
+  message?: string;
+};
+
 export const handleContractErrors = async (
-  error: any,
+  error: ContractError,
   provider: Provider | undefined
 ) => {
-  const msg: string = error?.data?.message ?? error?.message;
+  const msg = error?.data?.message ?? error?.message;
+
+  if (!msg) throw new Error(`Unknown Error: ${error}`);
+
   // check for denial separately (these don't contain an error code for some reason)
   if (msg === "MetaMask Tx Signature: User denied transaction signature.") {
     throw new Error(`Transaction Denied`);
   }
+
   try {
     // check if we've got a different metamask error
     const metaMaskError = JSON.parse(msg.match(/{.*}/)?.[0] || "");
