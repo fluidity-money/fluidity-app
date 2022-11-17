@@ -524,7 +524,7 @@ export default function Dashboard() {
 
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
-          <section className="">
+          <section>
             {/* Version */}
             <Text>Fluidity Money</Text>
 
