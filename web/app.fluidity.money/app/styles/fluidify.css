@@ -116,12 +116,8 @@ main {
 }
 
 .fluidify-container {
-  /* display: flex;
-  flex-direction: row; */
   padding: 0px 2em;
   gap: 40px;
-  /* flex-wrap: wrap;
-  align-items: center; */
   display: grid;
   grid-template-columns: 1fr 1.5fr 1fr;
 }
