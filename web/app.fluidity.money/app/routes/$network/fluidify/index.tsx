@@ -19,7 +19,7 @@ import FluidifyCard from "~/components/FluidifyCard";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import config, { ColorMap, colors } from "~/webapp.config.server";
+import config, { colors } from "~/webapp.config.server";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";

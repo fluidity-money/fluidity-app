@@ -22,23 +22,27 @@ const SwapCircle = ({
   setAssetToken,
   colorMap,
 }: ISwapCircleProps) => {
-  
   return (
-    <div style={{ position: "relative", aspectRatio: "1 / 1", width: "inherit"}}>
+    <div
+      style={{ position: "relative", aspectRatio: "1 / 1", width: "inherit" }}
+    >
       {assetToken !== undefined && (
         <>
           <BloomEffect
             type={swapping ? "pulsing" : "static"}
             color={colorMap[assetToken.symbol] ?? "#fff"}
           />
-          <img src={assetToken?.logo} style={{
-            aspectRatio: "1 / 1",
-            height: "10%",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }} />
+          <img
+            src={assetToken?.logo}
+            style={{
+              aspectRatio: "1 / 1",
+              height: "10%",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          />
         </>
       )}
       {swapping && (
@@ -49,7 +53,7 @@ const SwapCircle = ({
             transition={{ duration: 1.5 }}
             exit={{ opacity: 0 }}
             className="video-container"
-            >
+          >
             <Video
               className="swapping-video"
               src={"/videos/LoadingOther.webm"}
@@ -58,7 +62,7 @@ const SwapCircle = ({
               onEnded={() => {
                 setSwapping(false);
               }}
-              />
+            />
           </motion.div>
         </AnimatePresence>
       )}
@@ -68,6 +72,5 @@ const SwapCircle = ({
     </div>
   );
 };
-
 
 export default SwapCircle;

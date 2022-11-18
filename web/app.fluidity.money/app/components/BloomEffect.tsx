@@ -11,15 +11,14 @@ type BloomEffectProps = {
 };
 
 const BloomEffect = (props: BloomEffectProps) => {
-  const {
-    color: colorStr = "#fff",
-    type = "static",
-    blendMode,
-  } = props;
+  const { color: colorStr = "#fff", type = "static", blendMode } = props;
 
   const [colorStart, colorEnd] = useMemo(() => {
     const _color = new color(colorStr);
-    return [_color.setAlpha(0.8).toRgbString(), _color.setAlpha(0).toRgbString()];
+    return [
+      _color.setAlpha(0.8).toRgbString(),
+      _color.setAlpha(0).toRgbString(),
+    ];
   }, [colorStr]);
 
   const BloomEffectVariants: Variants = {
@@ -48,6 +47,7 @@ const BloomEffect = (props: BloomEffectProps) => {
       style={{
         position: "absolute",
         inset: 0,
+        mixBlendMode: blendMode,
       }}
       variants={BloomEffectVariants}
       initial="initial"
