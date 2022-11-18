@@ -343,6 +343,7 @@ export default function FluidifyToken() {
             setSwapping={setSwapping}
             assetToken={assetToken}
             setAssetToken={setAssetToken}
+            colorMap={colors}
           />
 
           {assetToken && toToken && (
@@ -524,6 +525,7 @@ export default function FluidifyToken() {
                 setSwapping={setSwapping}
                 assetToken={assetToken}
                 setAssetToken={setAssetToken}
+                colorMap={colors}
               />
             )}
 
