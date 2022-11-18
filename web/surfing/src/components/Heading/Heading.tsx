@@ -8,22 +8,19 @@ type Props = {
   children: React.ReactNode;
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   className?: string;
-  hollow?: boolean;
-  black?: boolean;
+  color?: "white" | "gray" | "black" | "hollow";
 };
 
 const Heading = ({
   children,
   as = "h1",
   className,
-  hollow,
-  black,
+  color = "white",
   ...props
 }: Props & unknown) => {
   const Component = as || "h1";
-  const _className = `${styles[as]} ${className || ""} ${
-    hollow && styles.hollow
-  } ${black && styles.black}`;
+
+  const _className = `${styles[as]} ${styles[color]} ${className || ""}`;
 
   return (
     <Component {...props} className={_className}>
