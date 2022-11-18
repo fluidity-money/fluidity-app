@@ -27,6 +27,9 @@ const FluidityHotSpot = ({
         transition={{ duration: 1.5 }}
         exit={{ opacity: 0 }}
         className="main-hotspot"
+        style={{
+          mixBlendMode: activeToken !== undefined ? "color-dodge" : "normal",
+        }}
       >
         <div ref={drop} className="fluidify-hot-spot">
           <img
@@ -38,14 +41,6 @@ const FluidityHotSpot = ({
               <Text size="sm" className="circle-text">
                 Drag and drop the asset <br /> you want to fluidify here.{" "}
               </Text>
-            )}
-            {activeToken && (
-              <img
-                className={`fluidify-token ${
-                  activeToken.isFluidOf ? "fluid-token" : ""
-                }`}
-                src={activeToken.logo}
-              />
             )}
           </span>
         </div>

@@ -124,8 +124,9 @@ main {
 }
 
 .main-hotspot {
-  width: 35vw;
-  mix-blend-mode: difference;
+  min-height: 80vh;
+  aspect-ratio: 1 / 1;
+  mix-blend-mode: color-dodge;
 }
 
 .fluidify-tokens-container {
@@ -226,7 +227,7 @@ main {
 }
 
 .fluidify-hot-spot {
-  position: relative;
+  /*position: relative; */
   /* width: clamp(300px, min(0.5vh, 0.5vw), 730px);
   height: clamp(300px, min(0.5vh, 0.5vw), 730px); */
   width: 100%;
@@ -238,10 +239,9 @@ main {
   position: absolute;
   top: 50%;
   left: 50%;
-  height: inherit;
-  width: inherit;
+  object-fit: contain;
   transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
+  /* mix-blend-mode: color-dodge; */
 }
 
 .dashed-circle {
@@ -282,22 +282,23 @@ main {
 }
 
 .video-container {
-  width: 35vw;
-  height: 20vw;
+  width: inherit;
+  height: inherit;
   min-width: 300px;
   min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  mix-blend-mode: difference;
+  mix-blend-mode: color-dodge;
+  object-fit: contain;
 }
 
 .video-container > video {
-  mix-blend-mode: difference;
+  mix-blend-mode: color-dodge;
 }
 
 .swapping-video {
-  width: 140% !important;
+  width: 100% !important;
 }
 
 .video-container > img {

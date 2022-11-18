@@ -19,7 +19,7 @@ import FluidifyCard from "~/components/FluidifyCard";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import config, { colors } from "~/webapp.config.server";
+import config, { ColorMap, colors } from "~/webapp.config.server";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
@@ -134,6 +134,7 @@ function ErrorBoundary(error: unknown) {
 
 export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
+  console.log("Loader colors", colors);
   const {
     address,
     swap,
@@ -354,6 +355,7 @@ export default function FluidifyToken() {
             setSwapping={setSwapping}
             assetToken={assetToken}
             setAssetToken={setAssetToken}
+            colorMap={colors}
           />
 
           {assetToken && toToken && (
@@ -534,6 +536,7 @@ export default function FluidifyToken() {
                 setSwapping={setSwapping}
                 assetToken={assetToken}
                 setAssetToken={setAssetToken}
+                colorMap={colors}
               />
             )}
 
