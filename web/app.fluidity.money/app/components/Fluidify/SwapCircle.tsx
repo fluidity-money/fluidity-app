@@ -62,6 +62,7 @@ const SwapCircle = ({
               onEnded={() => {
                 setSwapping(false);
               }}
+              playbackRate={1.5}
             />
           </motion.div>
         </AnimatePresence>
