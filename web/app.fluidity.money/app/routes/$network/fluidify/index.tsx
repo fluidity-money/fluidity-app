@@ -134,7 +134,6 @@ function ErrorBoundary(error: unknown) {
 
 export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
-  console.log("Loader colors", colors);
   const {
     address,
     swap,

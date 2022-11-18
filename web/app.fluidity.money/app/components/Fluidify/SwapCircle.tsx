@@ -22,7 +22,6 @@ const SwapCircle = ({
   setAssetToken,
   colorMap,
 }: ISwapCircleProps) => {
-  console.log("SwapCircle", swapping, assetToken, colorMap);
   
   return (
     <div style={{ position: "relative", aspectRatio: "1 / 1", width: "inherit"}}>

@@ -41,8 +41,6 @@ export const unstable_shouldReload = () => false;
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { network } = params;
 
-  console.log("dashboard home loader");
-
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
