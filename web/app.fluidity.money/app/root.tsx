@@ -166,12 +166,12 @@ function App() {
         <Links />
       </head>
       <body>
-      <ToolProvider>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </ToolProvider>
+        <ToolProvider>
+          <Outlet />
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </ToolProvider>
       </body>
     </html>
   );
