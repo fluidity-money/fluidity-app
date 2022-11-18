@@ -102,7 +102,7 @@ const options = OptionsSchema.parse(
   parse(readFileSync(resolve(__dirname, "../config.toml"), "utf8"))
 );
 
-type ColorMap = { [network: string]: { [symbol: string]: string } };
+export type ColorMap = { [network: string]: { [symbol: string]: string } };
 
 const getColors = async () => {
   console.log("🎨 Getting colors from icons... Just sit tight for a moment.");
