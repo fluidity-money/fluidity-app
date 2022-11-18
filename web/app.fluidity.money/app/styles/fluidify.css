@@ -1,5 +1,6 @@
 body {
   display: block;
+  height: 100%;
 }
 
 main {
@@ -28,7 +29,7 @@ main {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 
-  min-width: 310px;
+  width: 310px;
   height: 72px;
 
   display: flex;
@@ -115,12 +116,10 @@ main {
 }
 
 .fluidify-container {
-  display: flex;
-  flex-direction: row;
   padding: 0px 2em;
   gap: 40px;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
 }
 
 .main-hotspot {
@@ -135,10 +134,10 @@ main {
 
 .fluidify-tokens {
   max-height: calc(100vh - 340px);
-  overflow-y: auto;
+  overflow-y: hidden;
   margin-top: 0.5em;
   padding-right: 0.5em;
-  width: fit-content;
+  width: 320px;
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
 }
@@ -151,6 +150,7 @@ main {
 .fluidify-tokens::-webkit-scrollbar {
   width: 6px;
   border-radius: 6px;
+  cursor: pointer;
 }
 
 /* Track */
@@ -163,16 +163,21 @@ main {
 .fluidify-tokens::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 6px;
+  cursor: pointer;
 }
 
 /* Handle on hover */
 .fluidify-tokens::-webkit-scrollbar-thumb:hover {
   background: #555;
+  cursor: pointer;
 }
 
 @media (max-width: 1250px) {
   .fluidify-tokens {
     max-height: calc(100vh - 480px);
+  }
+  .fluidify-tokens:hover {
+    overflow-y: unset;
   }
 }
 
@@ -668,6 +673,7 @@ main {
 
 @media (max-width: 1250px) {
   .fluidify-container {
+    display: flex;
     flex-direction: column;
     align-items: center;
   }
@@ -684,7 +690,7 @@ main {
 
   .fluidify-tokens {
     height: calc(100vh - 380px);
-    overflow-y: auto;
+    overflow-y: unset;
   }
 
   .fluidify-heading {
@@ -865,6 +871,7 @@ main {
   display: flex;
   gap: 10px;
   justify-content: space-around;
+  width: 320px;
 }
 
 .selected {
