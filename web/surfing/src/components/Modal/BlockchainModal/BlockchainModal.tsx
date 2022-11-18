@@ -62,6 +62,7 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption, mo
             className={`${styles.card}`}
             type={"holobox"}
             rounded={true}
+            onClick={() => handleOnClick(i)}
           >
             {option.icon}{"  "}
             <Text size={"xl"} prominent={true}>

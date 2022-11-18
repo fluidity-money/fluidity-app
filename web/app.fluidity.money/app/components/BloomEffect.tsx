@@ -11,15 +11,14 @@ type BloomEffectProps = {
 };
 
 const BloomEffect = (props: BloomEffectProps) => {
-  const {
-    color: colorStr = "#fff",
-    type = "static",
-    blendMode = "screen",
-  } = props;
+  const { color: colorStr = "#fff", type = "static", blendMode } = props;
 
   const [colorStart, colorEnd] = useMemo(() => {
     const _color = new color(colorStr);
-    return [_color.toRgbString(), _color.setAlpha(0).toRgbString()];
+    return [
+      _color.setAlpha(0.8).toRgbString(),
+      _color.setAlpha(0).toRgbString(),
+    ];
   }, [colorStr]);
 
   const BloomEffectVariants: Variants = {
@@ -27,17 +26,18 @@ const BloomEffect = (props: BloomEffectProps) => {
       background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 0%)`,
     },
     static: {
-      background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 100%)`,
+      background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`,
     },
     pulsing: {
       transition: {
         repeat: Infinity,
         ease: "easeInOut",
+        duration: 2,
       },
       background: [
-        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 100%)`,
-        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 80%)`,
-        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 100%)`,
+        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`,
+        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 60%)`,
+        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`,
       ],
     },
   };

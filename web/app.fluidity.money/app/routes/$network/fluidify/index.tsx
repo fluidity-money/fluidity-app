@@ -290,33 +290,22 @@ export default function FluidifyToken() {
     };
   }, [search, activeFilterIndex, tokens]);
 
-  const handleSwap = (e: React.FormEvent<HTMLFormElement>) => {
+  const assertCanSwap = () =>
+    connected &&
+    !!address &&
+    !!fluidTokenAddress &&
+    !!swap &&
+    !!assetToken?.userTokenBalance &&
+    !!swapAmount &&
+    swapAmount <= (assetToken?.userTokenBalance || 0) &&
+    (assetToken.userMintLimit === undefined ||
+      swapAmount + (assetToken.userMintedAmt || 0) <= assetToken.userMintLimit);
+
+  const swapAndRedirect = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!fluidTokenAddress) return;
+    if (!assertCanSwap()) return;
 
-    if (!connected || !address) return;
-
-    if (!swap) return;
-
-    if (!assetToken) return;
-
-    if (!assetToken.userTokenBalance) return;
-
-    if (!swapAmount) return;
-
-    if (swapAmount > (assetToken.userTokenBalance || 0)) return;
-
-    if (
-      assetToken.userMintLimit !== undefined &&
-      swapAmount + (assetToken.userMintedAmt || 0) > assetToken.userMintLimit
-    )
-      return;
-
-    swapAndRedirect();
-  };
-
-  const swapAndRedirect = async () => {
     if (!swap) return;
 
     if (!assetToken) return;
@@ -354,17 +343,19 @@ export default function FluidifyToken() {
             setSwapping={setSwapping}
             assetToken={assetToken}
             setAssetToken={setAssetToken}
+            colorMap={colors}
           />
 
           {assetToken && toToken && (
             <FluidifyForm
-              handleSwap={handleSwap}
+              handleSwap={swapAndRedirect}
               tokenIsFluid={tokenIsFluid}
               swapAmount={swapAmount}
               setSwapAmount={setSwapAmount}
               assetToken={assetToken}
               toToken={toToken}
               swapping={swapping}
+              formDisabled={() => swapping || !assertCanSwap()}
             />
           )}
         </div>
@@ -534,6 +525,7 @@ export default function FluidifyToken() {
                 setSwapping={setSwapping}
                 assetToken={assetToken}
                 setAssetToken={setAssetToken}
+                colorMap={colors}
               />
             )}
 
@@ -546,13 +538,14 @@ export default function FluidifyToken() {
             {/* Swap Token Form */}
             {!!assetToken && !isTablet && !!toToken && (
               <FluidifyForm
-                handleSwap={handleSwap}
+                handleSwap={swapAndRedirect}
                 tokenIsFluid={tokenIsFluid}
                 swapAmount={swapAmount}
                 setSwapAmount={setSwapAmount}
                 assetToken={assetToken}
                 toToken={toToken}
                 swapping={swapping}
+                formDisabled={() => swapping || !assertCanSwap()}
               />
             )}
           </div>
