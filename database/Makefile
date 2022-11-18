@@ -44,7 +44,7 @@ timescale: ${TIMESCALE_BUILD_OUT}
 ${TIMESCALE_BUILD_OUT}: ${TIMESCALE_SRC}
 	@mkdir -p "${TIMESCALE_BUILD_DIR}"
 
-	@sh create_migration_dir.sh \
+	@./build.sh \
 		-d "${SHARED_SQL_DIR}" \
 		-d "${TIMESCALE_DIR}" \
 		-o "${TIMESCALE_BUILD_DIR}"
@@ -56,7 +56,7 @@ postgres: ${POSTGRES_BUILD_OUT}
 ${POSTGRES_BUILD_OUT}: ${POSTGRES_SRC}
 	@mkdir -p "${POSTGRES_BUILD_DIR}"
 
-	@sh create_migration_dir.sh \
+	@./build.sh \
 		-d "${SHARED_SQL_DIR}" \
 		-d "${POSTGRES_DIR}" \
 		-o "${POSTGRES_BUILD_DIR}"
