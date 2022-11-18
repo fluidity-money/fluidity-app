@@ -150,7 +150,7 @@ const EthereumFacade = ({
       isFluidOf: !fromFluid,
     };
 
-    await makeContractSwap(signer, from, to, amount);
+    return makeContractSwap(signer, from, to, amount);
   };
 
   return (
