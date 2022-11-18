@@ -7,34 +7,29 @@ package solana
 import (
 	"database/sql"
 	"fmt"
-	"math/big"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
 )
 
-type MintLimit struct {
-	TokenName string
-	TokenDecimals int
-	MintLimit *big.Int
-}
-
 // GetUserMintLimit for the per-user limit for the given token
-func GetUserMintLimit(tokenName string) MintLimit {
+func GetUserMintLimit(tokenName string) float64 {
 	databaseClient := postgres.Client()
+
+	now := time.Now().UTC()
 
 	statementText := fmt.Sprintf(
 		`SELECT 
-			token_short_name,
-			token_decimals,
-			mint_limit
+			mint_limit	
 		FROM %s
-		WHERE token_short_name = $1`,
+		WHERE token_short_name = $1
+		AND $2 >= date AND $2 < date + interval '1 day';`,
 
 		TableMintLimits,
 	)
 
-	row := databaseClient.QueryRow(statementText, tokenName)
+	row := databaseClient.QueryRow(statementText, tokenName, now)
 
 	if err := row.Err(); err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -49,13 +44,16 @@ func GetUserMintLimit(tokenName string) MintLimit {
 		})
 	}
 
-	var limit MintLimit
+	var mintLimit float64
 
 	err := row.Scan(
-		&limit.TokenName,
-		&limit.TokenDecimals,
-		&limit.MintLimit,
+		&mintLimit,
 	)
+
+	// no mint limit for today, return 0
+	if err == sql.ErrNoRows {
+		return 0	
+	}
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -70,7 +68,7 @@ func GetUserMintLimit(tokenName string) MintLimit {
 		})
 	}
 
-	return limit 
+	return mintLimit
 }
 
 // GetUserAmountMinted for the amount the given address has minted so far
@@ -124,23 +122,25 @@ func GetUserAmountMinted(address string) float64 {
 	return amount
 }
 
-func ReduceMintUserLimit(address string, amount float64) {
+func ReduceMintUserLimit(address string, amount float64, tokenName string) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
 			address,
 			amount_minted,
-			last_updated
+			last_updated,
+			token_short_name
 		)
 
 		VALUES (
 			$1,
 			0,
-			NOW()
+			NOW(),
+			$3
 		)
 
-		ON CONFLICT (address)
+		ON CONFLICT (address, token_short_name)
 		DO UPDATE SET amount_minted = solana_users.amount_minted - $2;`,
 
 		TableUsers,
@@ -150,6 +150,7 @@ func ReduceMintUserLimit(address string, amount float64) {
 		statementText,
 		address,
 		amount,
+		tokenName,
 	)
 
 	if err != nil {
@@ -167,23 +168,25 @@ func ReduceMintUserLimit(address string, amount float64) {
 	}
 }
 
-func AddMintUserLimit(address string, amount float64) {
+func AddMintUserLimit(address string, amount float64, tokenName string) {
 	databaseClient := postgres.Client()
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
 			address,
 			amount_minted,
-			last_updated
+			last_updated,
+			token_short_name
 		)
 
 		VALUES (
 			$1,
 			$2,
-			NOW()
+			NOW(),
+			$3
 		)
 
-		ON CONFLICT (address)
+		ON CONFLICT (address, token_short_name)
 		DO UPDATE SET amount_minted = solana_users.amount_minted + $2;`,
 
 		TableUsers,
@@ -193,6 +196,7 @@ func AddMintUserLimit(address string, amount float64) {
 		statementText,
 		address,
 		amount,
+		tokenName,
 	)
 
 	if err != nil {

@@ -10,14 +10,15 @@
     "dev": "npm-run-all build:remix build:server --parallel dev:*",
     "dev:build": "cross-env NODE_ENV=development npm run build:server -- --watch",
     "dev:remix": "cross-env NODE_ENV=development remix watch",
-    "dev:server": "cross-env NODE_ENV=development node --inspect ./build/server.js",
+    "dev:server": "cross-env NODE_ENV=development node --inspect -r dotenv/config ./build/server.js",
     "build": "run-s build:*",
     "build:remix": "remix build",
     "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --external:sharp --bundle",
     "test": "npm-run-all --parallel test:*",
-    "test:lint": "eslint --ext .js,.ts,.tsx --fix .",
+    "test:lint": "eslint --ext .js,.ts,.tsx --max-warnings=0 .",
     "test:style": "prettier -w .",
     "test:unit": "jest --config jest.config.ts --passWithNoTests",
+    "test:tsc": "tsc --noEmit",
     "graphql": "npm-run-all graphql:generate graphql:codegen",
     "graphql:generate": "gq --introspect https://fluidity.hasura.app/v1/graphql > schema.graphql",
     "graphql:codegen": "relay-compiler"
@@ -69,6 +70,7 @@
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
     "subscriptions-transport-ws": "^0.9.19",
+    "tinycolor2": "^1.4.2",
     "toml": "^3.0.0",
     "web3": "^1.8.0",
     "web3-utils": "^1.8.0",
@@ -93,8 +95,10 @@
     "@types/react-helmet": "^6.1.5",
     "@types/relay-runtime": "^14.1.2",
     "@types/sharp": "^0.31.0",
+    "@types/tinycolor2": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
+    "dotenv": "^16.0.3",
     "esbuild": "^0.15.10",
     "eslint": "^8.23.1",
     "eslint-plugin-react": "^7.31.8",
@@ -103,7 +107,7 @@
     "npm-run-all": "^4.1.5",
     "remix-esbuild-override": "^3.0.4",
     "ts-jest": "^29.0.1",
-    "typescript": "^4.6.4"
+    "typescript": "^4.9.3"
   },
   "engines": {
     "node": ">=16"

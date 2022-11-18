@@ -49,7 +49,7 @@ export const ConnectedWalletModal = ({
                 rounded={false}
                 type={"box"}
               >
-                <button
+                <span
                   className={"address-copy-box"}
                   onClick={() => copyAddress(address)}
                 >
@@ -60,7 +60,7 @@ export const ConnectedWalletModal = ({
                     callback={() => copyAddress(address)}
                   />
                   <img src="/images/icons/copyIcon.svg" alt="copy" />
-                </button>
+                </span>
               </Card>
               <GeneralButton
                 version="transparent"

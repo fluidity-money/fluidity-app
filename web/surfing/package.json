@@ -17,8 +17,6 @@
     "watch-dev": "./watch-dev.sh"
   },
   "dependencies": {
-    "@visx/visx": "^2.12.2",
-    "@visx/xychart": "^2.12.2",
     "@web3-react/injected-connector": "^6.0.7",
     "graphql-ws": "^5.10.1",
     "react-helmet": "^6.1.0",
@@ -44,8 +42,8 @@
     "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "@types/react-table": "^7.7.12",
-    "@visx/visx": "^2.12.2",
-    "@visx/xychart": "^2.12.2",
+    "@visx/visx": "^2.16.0",
+    "@visx/xychart": "^2.16.0",
     "@vitejs/plugin-react": "^2.0.1",
     "babel-loader": "^8.2.5",
     "chromatic": "^6.7.4",

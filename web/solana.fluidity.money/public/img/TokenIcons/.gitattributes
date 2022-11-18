@@ -1,6 +1,0 @@
-usdcIcon.svg filter=lfs diff=lfs merge=lfs -text
-usdtIcon.svg filter=lfs diff=lfs merge=lfs -text
-compoundIcon.svg filter=lfs diff=lfs merge=lfs -text
-daiIcon.svg filter=lfs diff=lfs merge=lfs -text
-ethereumIcon.svg filter=lfs diff=lfs merge=lfs -text
-solanaIcon.svg filter=lfs diff=lfs merge=lfs -text

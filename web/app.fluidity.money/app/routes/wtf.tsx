@@ -96,7 +96,7 @@ type WinnerWinnings = {
 };
 
 type HighestRewards =
-  HighestRewardResponse["data"]["highest_rewards_monthly"] & {
+  HighestRewardResponse["data"]["highest_rewards_monthly"][0] & {
     awardedDate: Date;
   };
 

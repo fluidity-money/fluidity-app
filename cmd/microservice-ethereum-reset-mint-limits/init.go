@@ -12,7 +12,7 @@ import (
 func init() {
 	decoder := json.NewDecoder(strings.NewReader(ScheduleGlobalMintLimitString))
 
-	err := decoder.Decode(ScheduleGlobalMintLimit)
+	err := decoder.Decode(&ScheduleGlobalMintLimit)
 
 	if err != nil {
 		panic(err)
@@ -20,7 +20,7 @@ func init() {
 
 	decoder = json.NewDecoder(strings.NewReader(ScheduleUserMintLimitString))
 
-	err = decoder.Decode(ScheduleUserMintLimit)
+	err = decoder.Decode(&ScheduleUserMintLimit)
 
 	if err != nil {
 		panic(err)

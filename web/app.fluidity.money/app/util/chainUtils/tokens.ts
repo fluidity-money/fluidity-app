@@ -58,11 +58,11 @@ const getTokenFromSymbol = (
 };
 
 // find the fluid counterpart of assetToken in tokens, or return
-// its own address if already fluid
-const fluidAssetOf = (tokens: Token[], assetToken: Token): string | undefined =>
+// itself if already fluid
+const fluidAssetOf = (tokens: Token[], assetToken: Token): Token | undefined =>
   assetToken.isFluidOf
-    ? assetToken.address
-    : tokens.find(({ isFluidOf }) => isFluidOf === assetToken.address)?.address;
+    ? assetToken
+    : tokens.find(({ isFluidOf }) => isFluidOf === assetToken.address);
 
 export {
   getTokenForNetwork,

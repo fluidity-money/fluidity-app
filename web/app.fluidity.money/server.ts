@@ -10,7 +10,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 
 import config from "~/webapp.config.server";
-import { Observable, Subscription, EMPTY } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
@@ -76,11 +76,16 @@ const solanaTokens = config.config["solana"].tokens
 const hasuraUrl = config.database.hasura;
 const registry = new Map<string, Subscription>();
 
+type TokenList = {
+  token: string;
+  address: string;
+}[];
+
 io.on("connection", (socket) => {
   socket.on("subscribeTransactions", ({ protocol, address }) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-    let Tokens: any = [];
+    let Tokens: TokenList = [];
     if (protocol === `ethereum`) {
       Tokens = ethereumTokens;
     } else if (protocol === `solana`) {
@@ -117,7 +122,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    registry.get(socket.id)?.unsubscribe();
     registry.delete(socket.id);
   });
 });

@@ -11,6 +11,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -51,8 +52,8 @@ func bigExp10(val int64) *big.Int {
 }
 
 // flushes the reward queue and sends the batched reward
-func sendRewards(queueName string, token token_details.TokenDetails) {
-	transactions := spooler.GetAndRemoveRewardsForToken(token)
+func sendRewards(queueName string, dbNetwork network.BlockchainNetwork, token token_details.TokenDetails) {
+	transactions := spooler.GetAndRemoveRewardsForToken(dbNetwork, token)
 
 	spooledRewards, err := ethereum.BatchWinningsByUser(transactions, token)
 

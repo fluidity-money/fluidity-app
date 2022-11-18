@@ -46,6 +46,11 @@ main {
   gap: 0.5em;
 }
 
+.cancel-btn:hover > svg {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
 .fluidify-card img {
   width: 32px;
   height: 32px;
@@ -124,14 +129,50 @@ main {
 }
 
 .fluidify-tokens-container {
-  max-width: 310px;
-  max-height: calc(100vh - 70px);
+  max-height: calc(100vh - 100px);
 }
 
 .fluidify-tokens {
-  height: calc(100vh - 390px);
+  max-height: calc(100vh - 340px);
   overflow-y: auto;
   margin-top: 0.5em;
+  padding-right: 0.5em;
+  width: fit-content;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.fluidify-tokens:hover {
+  overflow-y: auto;
+}
+
+/* width */
+.fluidify-tokens::-webkit-scrollbar {
+  width: 6px;
+  border-radius: 6px;
+}
+
+/* Track */
+.fluidify-tokens::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+/* Handle */
+.fluidify-tokens::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+/* Handle on hover */
+.fluidify-tokens::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@media (max-width: 1250px) {
+  .fluidify-tokens {
+    max-height: calc(100vh - 480px);
+  }
 }
 
 .fluidify-form {
@@ -219,8 +260,8 @@ main {
 }
 
 .dashed-circle > img {
-  width: calc(clamp(100px, min(0.2vh, 0.2vw), 400px) - 50px);
-  height: calc(clamp(100px, min(0.2vh, 0.2vw), 400px) - 50px);
+  width: calc(clamp(150px, min(0.4vh, 0.4vw), 750px) - 50px);
+  height: calc(clamp(150px, min(0.4vh, 0.4vw), 750px) - 50px);
   pointer-events: none;
 }
 
@@ -556,7 +597,45 @@ main {
   padding-left: 0.8em;
 }
 
-@media only screen and (max-width: 500px) {
+.mob-swap-modal {
+  height: fit-content;
+  padding: 2.5em 2.5em 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 3em;
+  overflow-y: auto;
+}
+
+.mob-swap-modal > div:first-child {
+  width: 100%;
+  display: flex;
+}
+
+.footer-text {
+  position: fixed;
+  left: 50%;
+  bottom: 1%;
+  transform: translateX(-50%);
+  text-align: center;
+  padding-bottom: 1em;
+  width: 100%;
+}
+
+.swap-footer-text {
+  padding-bottom: 1em;
+}
+
+.swap-footer-text > a {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 1250px) {
   .hide-on-mobile {
     display: none;
   }
@@ -586,7 +665,7 @@ main {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1250px) {
   .fluidify-container {
     flex-direction: column;
     align-items: center;
@@ -603,12 +682,8 @@ main {
   }
 
   .fluidify-tokens {
-    height: 6em;
-    overflow-x: auto;
-    margin-top: 0.5em;
-    display: flex;
-    gap: 1em;
-    width: 88vw;
+    height: calc(100vh - 380px);
+    overflow-y: auto;
   }
 
   .fluidify-heading {

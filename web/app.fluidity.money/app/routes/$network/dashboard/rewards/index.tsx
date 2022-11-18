@@ -4,6 +4,7 @@ import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { Winner } from "~/queries/useUserRewards";
 import type { UserTransaction } from "~/routes/$network/query/userTransactions";
 import type { IRow } from "~/components/Table";
+import type Transaction from "~/types/Transaction";
 
 import {
   transactionActivityLabel,
@@ -75,8 +76,24 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {} as { [key: string]: Winner }
     );
 
+    const {
+      config: {
+        [network as string]: { tokens },
+      },
+    } = config;
+
+    const tokenLogoMap = tokens.reduce(
+      (map, token) => ({
+        ...map,
+        [token.symbol]: token.logo,
+      }),
+      {} as Record<string, string>
+    );
+
+    const defaultLogo = "/assets/tokens/usdt.svg";
+
     const mergedTransactions: Transaction[] = transactions
-      .filter((tx) => !!winnersMap[tx.hash])
+      ?.filter((tx) => !!winnersMap[tx.hash])
       .map((tx) => ({
         sender: tx.sender,
         receiver: tx.receiver,
@@ -88,7 +105,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         currency: tx.currency,
         value: tx.value,
         timestamp: tx.timestamp,
-      }));
+        logo: tokenLogoMap[tx.currency] || defaultLogo,
+      })) ?? [];
 
     const totalYield = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
@@ -153,17 +171,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
-};
-
-type Transaction = {
-  sender: string;
-  receiver: string;
-  reward: number;
-  hash: string;
-  // timestamp is the Unix time, in seconds
-  timestamp: number;
-  value: number;
-  currency: string;
 };
 
 type LoaderData = {
@@ -265,7 +272,7 @@ export default function Rewards() {
     ? [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
@@ -276,7 +283,7 @@ export default function Rewards() {
     : [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
       ];
 
@@ -342,8 +349,7 @@ export default function Rewards() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, receiver, timestamp, value, currency, reward, hash } =
-        data;
+      const { sender, receiver, timestamp, value, reward, hash, logo } = data;
 
       const txAddress = sender === address ? receiver : sender;
 
@@ -366,13 +372,7 @@ export default function Rewards() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img
-                src={
-                  currency === "USDC"
-                    ? "/images/tokenIcons/usdcFluid.svg"
-                    : "/images/tokenIcons/usdtFluid.svg"
-                }
-              />
+              <img src={logo} />
               <Text>{transactionActivityLabel(data, sender)}</Text>
             </a>
           </td>
@@ -559,30 +559,6 @@ export default function Rewards() {
 }
 
 export { ErrorBoundary };
-
-// const rewarders: Provider[] = [
-//   {
-//     name: "Solana",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Polygon",
-//     prize: 361879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Compound",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Solana",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//
-// ];
 
 const backends: { [Token: string]: Providers } = {
   USDC: "Compound",
