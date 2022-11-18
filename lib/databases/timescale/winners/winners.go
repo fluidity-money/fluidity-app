@@ -46,7 +46,8 @@ func InsertWinner(winner Winner) {
 			winning_amount,
 			awarded_time,
 			token_short_name,
-			token_decimals
+			token_decimals,
+			reward_type	
 		)
 
 		VALUES (
@@ -57,7 +58,8 @@ func InsertWinner(winner Winner) {
 			$5,
 			$6,
 			$7,
-			$8
+			$8,
+			$9
 		);`,
 
 		TableWinners,
@@ -73,6 +75,7 @@ func InsertWinner(winner Winner) {
 		winner.AwardedTime,
 		tokenShortName,
 		tokenDecimals,
+		winner.RewardType,
 	)
 
 	if err != nil {
@@ -97,7 +100,8 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 			awarded_time,
 			token_short_name,
 			token_decimals,
-			solana_winning_owner_address
+			solana_winning_owner_address,
+			reward_type
 
 		FROM %v
 		WHERE network = $1
@@ -145,6 +149,7 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 			&winner.TokenDetails.TokenShortName,
 			&winner.TokenDetails.TokenDecimals,
 			&solanaWinnerOwnerAddress,
+			&winner.RewardType,
 		)
 
 		if err != nil {

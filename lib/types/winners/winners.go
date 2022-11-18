@@ -19,6 +19,8 @@ type Winner struct {
 	SolanaWinnerOwnerAddress string                    `json:"solana_winner_owner_address"`
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
 	AwardedTime              time.Time                 `json:"awarded_time"`
+	// "send" || "receive"
+	RewardType				 string                    `json:"reward_type"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }
