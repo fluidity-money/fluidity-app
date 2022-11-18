@@ -377,7 +377,6 @@ export default function FluidifyToken() {
               <Display size="xs" style={{ margin: 0 }}>
                 Create or revert <br /> fluid assets
               </Display>
-
               {connected && address ? (
                 <ConnectedWallet
                   address={address.toString()}
@@ -401,7 +400,23 @@ export default function FluidifyToken() {
                   {connecting ? `Connecting...` : `Connect Wallet`}
                 </GeneralButton>
               )}
+            </section>
+            <Link to="../../dashboard/home">
+              <LinkButton
+                handleClick={() => null}
+                size="large"
+                type="internal"
+                left={true}
+                className="cancel-btn"
+              >
+                Cancel
+              </LinkButton>
+            </Link>
+          </header>
 
+          {/* Token List */}
+          <div className={"fluidify-container"}>
+            <aside className={"fluidify-tokens-container"}>
               {/* Connected Wallet Modal */}
               <ConnectedWalletModal
                 visible={connectedWalletModalVisibility}
@@ -420,23 +435,6 @@ export default function FluidifyToken() {
                 visible={walletModalVisibility}
                 close={() => setWalletModalVisibility(false)}
               />
-            </section>
-            <Link to="../../dashboard/home">
-              <LinkButton
-                handleClick={() => null}
-                size="large"
-                type="internal"
-                left={true}
-                className="cancel-btn"
-              >
-                Cancel
-              </LinkButton>
-            </Link>
-          </header>
-
-          {/* Token List */}
-          <div className={"fluidify-container"}>
-            <aside className={"fluidify-tokens-container"}>
               {/* Search Bar */}
               <input
                 className={"search-bar"}
@@ -537,11 +535,14 @@ export default function FluidifyToken() {
               />
             )}
 
-            <Text size="sm" className="footer-text">
-              Fluidity employs daily limits on fluidifying assets for <br />{" "}
-              maintained system stability. Limits reset at midnight EST. <br />
-              Unlimited reversion of fluid to non-fluid assets per day.
-            </Text>
+            {!isTablet && (
+              <Text size="xs" className="footer-text">
+                Fluidity employs daily limits on fluidifying assets for <br />{" "}
+                maintained system stability. Limits reset at midnight EST.{" "}
+                <br />
+                Unlimited reversion of fluid to non-fluid assets per day.
+              </Text>
+            )}
 
             {/* Swap Token Form */}
             {!!assetToken && !isTablet && !!toToken && (
