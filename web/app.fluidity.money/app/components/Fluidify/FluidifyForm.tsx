@@ -13,6 +13,7 @@ interface IFluidifyFormProps {
   assetToken: AugmentedToken;
   toToken: AugmentedToken;
   swapping: boolean;
+  formDisabled: () => boolean;
 }
 
 export const FluidifyForm = ({
@@ -23,6 +24,7 @@ export const FluidifyForm = ({
   assetToken,
   toToken,
   swapping,
+  formDisabled,
 }: IFluidifyFormProps) => {
   return (
     <form className={"fluidify-form"} onSubmit={handleSwap}>
@@ -85,7 +87,7 @@ export const FluidifyForm = ({
         buttontype="text"
         type={"submit"}
         handleClick={() => null}
-        disabled={swapping}
+        disabled={formDisabled()}
         className={"fluidify-form-submit"}
       >
         {tokenIsFluid
