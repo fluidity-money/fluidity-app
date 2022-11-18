@@ -205,7 +205,6 @@ func GetAndRemovePendingRewardType(transactionHash ethereum.Hash, address ethere
 			k.Format(
 				"Failed to fetch pending reward type with hash %v and address!",
 				transactionHash,
-				address,
 			)
 
 			k.Payload = err
