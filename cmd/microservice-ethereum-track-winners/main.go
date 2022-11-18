@@ -16,7 +16,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	logging "github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
+	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	timescaleWinners "github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -207,7 +209,14 @@ func main() {
 			})
 		}
 
-		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime)
+		var (
+			hash = typesEth.Hash(transactionHash)
+			winnerAddress = typesEth.Address(rewardData.Winner.String())
+		)
+
+		rewardType := timescaleWinners.GetAndRemovePendingRewardType(hash, winnerAddress)
+
+		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime, rewardType)
 
 		var publishTopic string
 
