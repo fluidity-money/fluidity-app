@@ -17,10 +17,20 @@ export const ConnectedWalletModal = ({
   disconnect,
 }: IPropsConnectedWalletModal) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
+  const [icon, setIcon] = useState<React.ReactNode>(
+    <img src="/images/icons/copyIcon.svg" alt="copy" />
+  );
 
   const copyAddress = (address: string) => {
     // Copies to clipboard
     navigator.clipboard.writeText(address);
+    setIcon(
+      <img height="26" width="26" src="/images/icons/checked.png" alt="copy" />
+    );
+
+    setTimeout(() => {
+      setIcon(<img src="/images/icons/copyIcon.svg" alt="copy" />);
+    }, 500);
   };
 
   useEffect(() => {
@@ -49,7 +59,7 @@ export const ConnectedWalletModal = ({
                 rounded={false}
                 type={"box"}
               >
-                <button
+                <span
                   className={"address-copy-box"}
                   onClick={() => copyAddress(address)}
                 >
@@ -59,8 +69,8 @@ export const ConnectedWalletModal = ({
                     short={false}
                     callback={() => copyAddress(address)}
                   />
-                  <img src="/images/icons/copyIcon.svg" alt="copy" />
-                </button>
+                  <span>{icon}</span>
+                </span>
               </Card>
               <GeneralButton
                 version="transparent"
@@ -91,7 +101,7 @@ export const ConnectedWalletModal = ({
         document.body
       )
     );
-  }, [visible, address]);
+  }, [visible, address, icon]);
 
   return modal;
 };

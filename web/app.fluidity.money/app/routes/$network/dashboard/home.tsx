@@ -90,22 +90,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     const defaultLogo = "/assets/tokens/fUSDT.png";
 
-    const mergedTransactions: Transaction[] = transactions.map((tx) => ({
-      sender: tx.sender,
-      receiver: tx.receiver,
-      reward: winnersMap[tx.hash]
-        ? winnersMap[tx.hash].winning_amount /
-          10 ** winnersMap[tx.hash].token_decimals
-        : 0,
-      hash: tx.hash,
-      currency: tx.currency,
-      value:
-        tx.currency === "DAI" || tx.currency === "fDAI"
-          ? tx.value / 10 ** 12
-          : tx.value,
-      timestamp: tx.timestamp * 1000,
-      logo: tokenLogoMap[tx.currency] || defaultLogo,
-    }));
+    const mergedTransactions: Transaction[] =
+      transactions?.map((tx) => ({
+        sender: tx.sender,
+        receiver: tx.receiver,
+        reward: winnersMap[tx.hash]
+          ? winnersMap[tx.hash].winning_amount /
+            10 ** winnersMap[tx.hash].token_decimals
+          : 0,
+        hash: tx.hash,
+        currency: tx.currency,
+        value:
+          tx.currency === "DAI" || tx.currency === "fDAI"
+            ? tx.value / 10 ** 12
+            : tx.value,
+        timestamp: tx.timestamp * 1000,
+        logo: tokenLogoMap[tx.currency] || defaultLogo,
+      })) ?? [];
 
     const totalYield = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
@@ -478,7 +479,7 @@ export default function Home() {
             data={graphTransformedTransactions}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Transaction) => d.timestamp,
+              xAccessor: (d: Transaction) => d?.timestamp || 0,
               yAccessor: (d: Transaction) =>
                 Math.log((d.value || 0.001) * 1100),
             }}

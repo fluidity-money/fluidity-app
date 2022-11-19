@@ -101,6 +101,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		recipientAddress,
 		recipientWinAmount,
 		blockNumber,
+		network_,
 	)
 
 	if err != nil {

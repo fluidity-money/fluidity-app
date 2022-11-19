@@ -20,7 +20,7 @@ import (
 const NetworkEthereum = `ethereum`
 
 // Convert, returning the internal definition for a winner
-func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, details token_details.TokenDetails, when time.Time) winners.Winner {
+func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, details token_details.TokenDetails, when time.Time, rewardType winners.RewardType) winners.Winner {
 	var (
 		address = rewardData.Winner.String()
 		amount  = *rewardData.Amount
@@ -33,6 +33,7 @@ func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, detai
 		WinningAmount:   amount,
 		AwardedTime:     when,
 		TokenDetails:    details,
+		RewardType:      rewardType,
 	}
 
 	return winner

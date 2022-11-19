@@ -49,7 +49,7 @@ const FluidifyCard = (props: Props) => {
           className="fluidify-card--progress"
           style={{
             background: `${color}`,
-            transform: `scaleX(${mintCapPercentage})`,
+            transform: `scaleX(${mintCapPercentage || 0})`,
           }}
         />
       </div>
