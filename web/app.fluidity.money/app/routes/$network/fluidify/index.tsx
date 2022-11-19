@@ -26,6 +26,7 @@ import FluidifyForm from "~/components/Fluidify/FluidifyForm";
 import AugmentedToken from "~/types/AugmentedToken";
 import Draggable from "~/components/Draggable";
 import ItemTypes from "~/types/ItemTypes";
+import SwapCompleteModal from "~/components/SwapCompleteModal";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -321,8 +322,18 @@ export default function FluidifyToken() {
     // navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
   };
 
+  const [swapCompleteModal, setSwapCompleteModal] = useState(false);
+
   return (
     <DndProvider backend={HTML5Backend}>
+      {swapCompleteModal && (
+        <SwapCompleteModal
+          visible={swapCompleteModal}
+          close={() => setSwapCompleteModal(false)}
+          colorMap={colors}
+          assetToken={tokens[0]}
+        />
+      )}
       {/* Mobile Swap Modal */}
       {isTablet && openMobModal && (
         <div className="mob-swap-modal">
