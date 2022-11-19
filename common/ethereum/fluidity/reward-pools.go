@@ -20,7 +20,7 @@ const rewardPoolAbiString = `[
   },
   {
     "inputs": [],
-    "name": "normalised",
+    "name": "getPools",
     "outputs": [
       {
         "components": [
