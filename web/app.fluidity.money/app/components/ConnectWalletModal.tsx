@@ -70,33 +70,33 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
   const EthWalletsMap = () => {
     const { useConnectorType } = useContext(FluidityFacadeContext);
     const { ethereumWallets } = useLoaderData<LoaderData>();
-    
+
     // Checks if "metamask" option should be made available
-    // Extra utility specific to Ethereum 
+    // Extra utility specific to Ethereum
     const hasEthereumContext = !!window.ethereum;
 
     return (
       <>
         {ethereumWallets
-        .filter(wallet => wallet.id !== "metamask" || hasEthereumContext)
-        .map((wallet) => (
-          <li
-            key={`wallet-${wallet.name}`}
-            onClick={() => {
-              useConnectorType?.(wallet.id);
-            }}
-          >
-            <span>
-              <img src={wallet.logo} />
-              <Text size="sm" className="connect-wallet-modal-names">
-                {wallet.name}
+          .filter((wallet) => wallet.id !== "metamask" || hasEthereumContext)
+          .map((wallet) => (
+            <li
+              key={`wallet-${wallet.name}`}
+              onClick={() => {
+                useConnectorType?.(wallet.id);
+              }}
+            >
+              <span>
+                <img src={wallet.logo} />
+                <Text size="sm" className="connect-wallet-modal-names">
+                  {wallet.name}
+                </Text>
+              </span>
+              <Text size="xs" className="connect-wallet-modal-status">
+                <i></i>
               </Text>
-            </span>
-            <Text size="xs" className="connect-wallet-modal-status">
-              <i></i>
-            </Text>
-          </li>
-        ))}
+            </li>
+          ))}
       </>
     );
   };
