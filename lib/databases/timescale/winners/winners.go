@@ -173,7 +173,8 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 }
 
 // GetAndRemovePendingRewardType to fetch and remove the type (send or receive) of an unsent win
-func GetAndRemovePendingRewardType(transactionHash ethereum.Hash, address ethereum.Address) winners.RewardType {
+// using the hash of the reward payout transaction
+func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address ethereum.Address) winners.RewardType {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -181,7 +182,7 @@ func GetAndRemovePendingRewardType(transactionHash ethereum.Hash, address ethere
 			is_sender 
 		DELETE FROM %s
 		WHERE 
-			transaction_hash = $1 
+			reward_transaction_hash = $1 
 			AND winner_address = $2
 		RETURNING is_sender;`,
 
@@ -190,7 +191,7 @@ func GetAndRemovePendingRewardType(transactionHash ethereum.Hash, address ethere
 
 	row := timescaleClient.QueryRow(
 		statementText,
-		transactionHash,
+		rewardTransactionHash,
 		address,
 	)
 
@@ -204,7 +205,7 @@ func GetAndRemovePendingRewardType(transactionHash ethereum.Hash, address ethere
 
 			k.Format(
 				"Failed to fetch pending reward type with hash %v and address!",
-				transactionHash,
+				rewardTransactionHash,
 			)
 
 			k.Payload = err
@@ -219,12 +220,13 @@ func GetAndRemovePendingRewardType(transactionHash ethereum.Hash, address ethere
 }
 
 // InsertPendingRewardType to store the reward type of a pending win
-func InsertPendingRewardType(transactionHash ethereum.Hash, senderAddress ethereum.Address, receipientAddress ethereum.Address) {
+// insert the hash of the send that is going to win
+func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, receipientAddress ethereum.Address) {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
-			transaction_hash,
+			send_transaction_hash,
 			winner_address,
 			is_sender	
 		)
@@ -241,7 +243,7 @@ func InsertPendingRewardType(transactionHash ethereum.Hash, senderAddress ethere
 	// insert the sender's value
 	_, err := timescaleClient.Exec(
 		statementText,
-		transactionHash,
+		sendTransactionHash,
 		senderAddress,
 		true,
 	)
@@ -252,7 +254,7 @@ func InsertPendingRewardType(transactionHash ethereum.Hash, senderAddress ethere
 
 			k.Format(
 				"Failed to insert pending reward type with hash %v!",
-				transactionHash,
+				sendTransactionHash,
 			)
 
 			k.Payload = err
@@ -262,7 +264,7 @@ func InsertPendingRewardType(transactionHash ethereum.Hash, senderAddress ethere
 	// insert the recipient's value
 	_, err = timescaleClient.Exec(
 		statementText,
-		transactionHash,
+		sendTransactionHash,
 		receipientAddress,
 		false,
 	)
@@ -273,7 +275,43 @@ func InsertPendingRewardType(transactionHash ethereum.Hash, senderAddress ethere
 
 			k.Format(
 				"Failed to insert pending reward type with hash %v!",
-				transactionHash,
+				sendTransactionHash,
+			)
+
+			k.Payload = err
+		})
+	}
+}
+
+// AddRewardHashToPendingRewardType to insert the hash of the reward transaction for a pending reward type entry
+func AddRewardHashToPendingRewardType(rewardTransactionHash ethereum.Hash, sendTransactionHash ethereum.Hash, winnerAddress ethereum.Address) {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`UPDATE %s 
+			SET reward_transaction_hash = $1
+			WHERE 
+				send_transaction_hash = $2
+				AND winner_address = $3
+		;`,
+
+		TablePendingRewardType,
+	)
+
+	_, err := timescaleClient.Exec(
+		statementText,
+		rewardTransactionHash,
+		sendTransactionHash,
+		winnerAddress,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to update pending reward type with reward hash %v!",
+				rewardTransactionHash,
 			)
 
 			k.Payload = err
