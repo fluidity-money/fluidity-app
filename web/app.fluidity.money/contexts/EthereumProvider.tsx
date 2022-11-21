@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector } from "@web3-react/types";
 
+import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import { useMemo } from "react";
 import {
@@ -39,6 +40,11 @@ const EthereumFacade = ({
 
     return await usdBalanceOfERC20(signer, contractAddress, tokenAbi);
   };
+  
+  const getPrizePool = async (abi: any) => {
+    if (!provider) return;
+    return await getTotalPrizePool(provider?.getSigner().provider, abi);
+  }
 
   // find and activate corresponding connector
   const useConnectorType = (type: "metamask" | "walletconnect" | string) => {
@@ -149,13 +155,14 @@ const EthereumFacade = ({
       symbol: toToken.symbol,
       isFluidOf: !fromFluid,
     };
-
+    
     return makeContractSwap(signer, from, to, amount);
   };
 
   return (
     <FluidityFacadeContext.Provider
       value={{
+        getPrizePool,
         swap,
         limit,
         amountMinted,
