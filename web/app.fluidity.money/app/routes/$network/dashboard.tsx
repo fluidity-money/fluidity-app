@@ -187,8 +187,8 @@ export default function Dashboard() {
   }, [closeMobileModal]);
 
   const navigationMap = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
+    { home: { name: "dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "rewards", icon: <Trophy /> } },
     // {assets: {name: "Assets", icon: <AssetsIcon />}},
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];

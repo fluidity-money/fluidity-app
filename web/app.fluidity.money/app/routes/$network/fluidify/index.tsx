@@ -214,8 +214,6 @@ export default function FluidifyToken() {
     connected && setWalletModalVisibility(false);
   }, [connected]);
 
-  const [swapAmount, setSwapAmount] = useState(0);
-
   const [search, setSearch] = useState("");
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
 
@@ -285,8 +283,8 @@ export default function FluidifyToken() {
     }
   }, [address]);
 
-  const handleRedirect = (amount: number) => {
-    return navigate(`out?toToken=${toToken?.symbol}&amount=${amount}`);
+  const handleRedirect = (token: AugmentedToken, amount: number) => {
+    navigate(`out?assetId=${token.symbol}&amount=${amount}`);
   };
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
@@ -306,7 +304,9 @@ export default function FluidifyToken() {
   }, 500);
 
   useEffect(() => {
-    const typeFilteredTokens = tokens.filter(
+    const yourTokens = tokens.filter(token => token.userTokenBalance);
+
+    const typeFilteredTokens = yourTokens.filter(
       searchFilters[activeFilterIndex].filter
     );
     debouncedSearch(typeFilteredTokens);
@@ -354,8 +354,6 @@ export default function FluidifyToken() {
           {assetToken && toToken && (
             <FluidifyForm
               handleSwap={handleRedirect}
-              swapAmount={swapAmount}
-              setSwapAmount={setSwapAmount}
               assetToken={assetToken}
               toToken={toToken}
               swapping={swapping}
@@ -516,6 +514,14 @@ export default function FluidifyToken() {
                     </Draggable>
                   );
                 })}
+              {isTablet && (
+                <Text size="xs" className="footer-text">
+                  Fluidity employs daily limits on fluidifying assets for <br />{" "}
+                  maintained system stability. Limits reset at midnight EST.{" "}
+                  <br />
+                  Unlimited reversion of fluid to non-fluid assets per day.
+                </Text>
+              )}
               </div>
             </aside>
 
@@ -543,8 +549,6 @@ export default function FluidifyToken() {
             {!!assetToken && !isTablet && !!toToken && (
               <FluidifyForm
                 handleSwap={handleRedirect}
-                swapAmount={swapAmount}
-                setSwapAmount={setSwapAmount}
                 assetToken={assetToken}
                 toToken={toToken}
                 swapping={swapping}

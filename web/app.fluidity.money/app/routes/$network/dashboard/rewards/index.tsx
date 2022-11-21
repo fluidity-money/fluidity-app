@@ -219,7 +219,7 @@ export default function Rewards() {
     totalYield,
   } = useLoaderData<LoaderData>();
 
-  const { connected, address } = useContext(FluidityFacadeContext);
+  const { connected, address, prizePool } = useContext(FluidityFacadeContext);
 
   const location = useLocation();
 
@@ -304,6 +304,10 @@ export default function Rewards() {
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
       try {
+        console.log("hello");
+        const blah = await prizePool?.();
+        console.log(blah);
+
         const { data, error } = await useUserUnclaimedRewards(
           network,
           address ?? ""

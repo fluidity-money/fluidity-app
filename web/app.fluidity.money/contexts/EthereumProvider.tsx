@@ -12,6 +12,9 @@ import {
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 import FluidityFacadeContext from "./FluidityFacade";
+
+import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
   getUsdAmountMinted,
@@ -152,6 +155,19 @@ const EthereumFacade = ({
 
     return makeContractSwap(signer, from, to, amount);
   };
+  
+  const getPrizePool = async () => {
+    const signer = provider?.getSigner();
+    console.log("signer", signer);
+    
+    if (!signer) {
+      return;
+    }
+    
+    const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
+
+    return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi)
+  }
 
   return (
     <FluidityFacadeContext.Provider
@@ -160,6 +176,7 @@ const EthereumFacade = ({
         limit,
         amountMinted,
         balance: getBalance,
+        prizePool: getPrizePool,
         disconnect: deactivate,
         useConnectorType,
         address: account,
