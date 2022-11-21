@@ -106,10 +106,10 @@ export default function MobileModal({
       {isOpen && (
         <motion.div
           key="modal"
-          initial={{ opacity: 0, y: "75%" }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "tween" }}
-          exit={{ opacity: 0, y: "75%" }}
+          initial={{ opacity: 0, x: "75%" }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, type: "tween" }}
+          exit={{ opacity: 0, x: "75%" }}
           className={`mobile-modal-container  ${
             isOpen === true ? "show-modal" : "hide-modal"
           }`}
@@ -137,6 +137,7 @@ export default function MobileModal({
                 version={"transparent"}
                 buttontype="icon after"
                 size={"small"}
+                className="trophy-button"
                 handleClick={() => {
                   setTimeout(() => {
                     setIsOpen(false);
