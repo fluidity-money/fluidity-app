@@ -21,9 +21,6 @@ import { useUserUnclaimedRewards, useUserRewards } from "~/queries";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
-import PrizePoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
-import { JsonRpcProvider } from "@ethersproject/providers";
 import {
   Text,
   Heading,
@@ -64,19 +61,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     ).json();
 
     const { data, errors } = await useUserRewards(network ?? "");
-    
-    const mainnetId = 0;
-
-    const {
-      drivers: {
-        ethereum: {
-          [mainnetId]: {rpc: {http: infuraUri}}
-        }
-      }
-    } = config;
-    
-    const provider = new JsonRpcProvider(infuraUri)
-    
 
     if (errors || !data) {
       throw errors;
@@ -235,7 +219,7 @@ export default function Rewards() {
     totalYield,
   } = useLoaderData<LoaderData>();
 
-  const { connected, address, getPrizePool } = useContext(FluidityFacadeContext);
+  const { connected, address } = useContext(FluidityFacadeContext);
 
   const location = useLocation();
 
@@ -319,11 +303,6 @@ export default function Rewards() {
 
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
-      const prizePool = network === "ethereum"
-        ? await getPrizePool(PrizePoolAbi)
-        : 0;
-    
-      console.log(prizePool);
       try {
         const { data, error } = await useUserUnclaimedRewards(
           network,

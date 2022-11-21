@@ -27,7 +27,10 @@ import Draggable from "~/components/Draggable";
 import ItemTypes from "~/types/ItemTypes";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { userMintLimitedEnabled, getUsdUserMintLimit } from "~/util/chainUtils/ethereum/transaction";
+import {
+  userMintLimitedEnabled,
+  getUsdUserMintLimit,
+} from "~/util/chainUtils/ethereum/transaction";
 import SwapCompleteModal from "~/components/SwapCompleteModal";
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -45,13 +48,15 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   if (network === "ethereum") {
     const mainnetId = 0;
-    
+
     const {
       drivers: {
         ethereum: {
-          [mainnetId]: {rpc: {http: infuraUri}}
-        }
-      }
+          [mainnetId]: {
+            rpc: { http: infuraUri },
+          },
+        },
+      },
     } = config;
 
     const provider = new JsonRpcProvider(infuraUri);
@@ -59,26 +64,31 @@ export const loader: LoaderFunction = async ({ params }) => {
     const augmentedTokens: AugmentedToken[] = await Promise.all(
       tokens.map(async (token) => {
         const { isFluidOf, address } = token;
-        
+
         // Reverting has no mint limits
         if (isFluidOf) {
           return {
             ...token,
             userMintLimit: undefined,
             userTokenBalance: 0,
-          }
+          };
         }
-        
-        const fluidPair = tokens.find(({isFluidOf}) => isFluidOf === address);
-        
-        if (!fluidPair) throw new Error(`Could not find fluid Pair of ${token.name}`);
-        
-        const mintLimitEnabled = await userMintLimitedEnabled(provider, fluidPair.address, tokenAbi);
+
+        const fluidPair = tokens.find(({ isFluidOf }) => isFluidOf === address);
+
+        if (!fluidPair)
+          throw new Error(`Could not find fluid Pair of ${token.name}`);
+
+        const mintLimitEnabled = await userMintLimitedEnabled(
+          provider,
+          fluidPair.address,
+          tokenAbi
+        );
 
         const userMintLimit = mintLimitEnabled
           ? await getUsdUserMintLimit(provider, fluidPair.address, tokenAbi)
           : undefined;
-        
+
         return {
           ...token,
           userMintLimit: userMintLimit,
@@ -157,15 +167,9 @@ function ErrorBoundary(error: unknown) {
 
 export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
-  const {
-    address,
-    amountMinted,
-    connected,
-    connecting,
-    disconnect,
-    balance,
-  } = useContext(FluidityFacadeContext);
-  
+  const { address, amountMinted, connected, connecting, disconnect, balance } =
+    useContext(FluidityFacadeContext);
+
   const navigate = useNavigate();
 
   const { width } = useViewport();
@@ -280,10 +284,10 @@ export default function FluidifyToken() {
       })();
     }
   }, [address]);
-  
+
   const handleRedirect = (amount: number) => {
-    return navigate(`out?toToken=${toToken?.symbol}&amount=${amount}`)
-  }
+    return navigate(`out?toToken=${toToken?.symbol}&amount=${amount}`);
+  };
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
     tokens as AugmentedToken[]

@@ -458,7 +458,11 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Heading as="h6" color={"gray"}>{appName}</Heading>}
+            {!isMobile && (
+              <Heading as="h6" color={"gray"}>
+                {appName}
+              </Heading>
+            )}
           </div>
 
           {/* Navigation Buttons */}

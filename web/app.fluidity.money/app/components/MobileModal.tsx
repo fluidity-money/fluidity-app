@@ -223,7 +223,9 @@ export default function MobileModal({
                           ) : (
                             <div />
                           )}
-                          <Link to={index === 0 ? './' : key as unknown as string}>
+                          <Link
+                            to={index === 0 ? "./" : (key as unknown as string)}
+                          >
                             <Text prominent={active}>
                               {icon} {name}
                             </Text>

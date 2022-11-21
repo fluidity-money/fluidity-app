@@ -181,19 +181,27 @@ const makeContractSwap = async (
 };
 
 // Returns total prize pool from aggregated contract
-export const getTotalPrizePool = async (provider: JsonRpcProvider, rewardPoolAbi: ContractInterface) => {
+export const getTotalPrizePool = async (
+  provider: JsonRpcProvider,
+  rewardPoolAbi: ContractInterface
+) => {
   const rewardPoolAddr = "0xa49D36F7423c6068665a0e4216463E9cE22ec38d";
 
   try {
-    const rewardPoolContract = new Contract(rewardPoolAddr, rewardPoolAbi, provider);
-    
-    if (!rewardPoolContract) throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
-    
+    const rewardPoolContract = new Contract(
+      rewardPoolAddr,
+      rewardPoolAbi,
+      provider
+    );
+
+    if (!rewardPoolContract)
+      throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
+
     return await rewardPoolContract.normalised();
   } catch (error) {
     return await handleContractErrors(error as ErrorType, provider);
   }
-}
+};
 
 type ErrorType = {
   data: { message: string };

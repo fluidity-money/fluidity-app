@@ -24,14 +24,10 @@ export const FluidifyForm = ({
   toToken,
   swapping,
 }: IFluidifyFormProps) => {
-  const {
-    address,
-    connected,
-    swap,
-  } = useContext(FluidityFacadeContext);
-  
+  const { address, connected, swap } = useContext(FluidityFacadeContext);
+
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
-  
+
   const assertCanSwap = () =>
     connected &&
     !!address &&
@@ -62,11 +58,11 @@ export const FluidifyForm = ({
       handleSwap(swapAmount);
     } catch (e) {
       // Expect error on fail
-      console.log(e)
+      console.log(e);
       return;
     }
-  }
-  
+  };
+
   const tokenIsFluid = !!assetToken.isFluidOf;
 
   return (
@@ -93,7 +89,8 @@ export const FluidifyForm = ({
               // Snap the smallest of token balance, remaining mint limit, or swap amt
               Math.min(
                 parseFloat(e.target.value) || 0,
-                (assetToken?.userMintLimit || 0) - (assetToken?.userMintedAmt || 0),
+                (assetToken?.userMintLimit || 0) -
+                  (assetToken?.userMintedAmt || 0),
                 assetToken.userTokenBalance || 0
               )
             )
