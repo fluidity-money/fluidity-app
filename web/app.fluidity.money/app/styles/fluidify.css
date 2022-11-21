@@ -252,8 +252,7 @@ main {
   left: 50%;
   object-fit: contain;
   transform: translate(-50%, -50%);
-  max-width: 95vw;
-  /* mix-blend-mode: color-dodge; */
+  width: 100%;
 }
 
 .dashed-circle {
