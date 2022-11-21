@@ -76,7 +76,12 @@ export const ViewRewardModal = ({
               <span className="view-reward-modal-price-desc">
                 <Text size="xl">
                   Won for{" "}
-                  <a className="view-reward-modal-link">
+                  <a
+                    className="view-reward-modal-link"
+                    onClick={() => {
+                      window.open(explorerUri, `_`);
+                    }}
+                  >
                     {forSending === true ? "sending" : "receiving"}
                   </a>{" "}
                   fluid assets.
@@ -91,7 +96,7 @@ export const ViewRewardModal = ({
                 buttontype="text"
                 size={"medium"}
                 handleClick={() => {
-                  console.log(explorerUri);
+                  // #href to table ? :/
                 }}
                 className="view-reward-modal-breakdown-btn"
               >

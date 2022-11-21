@@ -28,7 +28,8 @@ export const FluidifyForm = ({
 
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
 
-  const assertCanSwap = connected &&
+  const assertCanSwap =
+    connected &&
     !!address &&
     !!fluidTokenAddress &&
     !!swap &&
