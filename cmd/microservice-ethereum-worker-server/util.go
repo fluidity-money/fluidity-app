@@ -51,7 +51,7 @@ func generateRandomIntegers(amount int, min, max uint32) (numbers []uint32) {
 	numbers = make([]uint32, amount)
 
 	for i := 0; i < amount; i++ {
-		no, err := rand.Int(nil, maxBig)
+		no, err := rand.Int(rand.Reader, maxBig)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
