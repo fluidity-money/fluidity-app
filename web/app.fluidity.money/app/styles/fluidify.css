@@ -222,6 +222,7 @@ main {
 
 .fluidify-input-container > img {
   height: 24px;
+  width: 24px;
 }
 
 .fluidify-input {
