@@ -58,7 +58,7 @@ export const ViewRewardModal = ({
                 className="view-reward-modal-token"
                 style={{
                   backgroundColor: `${colour}`,
-                  boxShadow: `0 0 100px 60px blue, 0 0 140px 90px ${colour}`,
+                  boxShadow: `0 0 100px 60px ${colour}, 0 0 140px 90px ${colour}`,
                 }}
               >
                 <img src={img} className="view-reward-modal-token-img" />

@@ -302,7 +302,7 @@ export default function FluidifyToken() {
   }, 500);
 
   useEffect(() => {
-    const yourTokens = tokens.filter(token => token.userTokenBalance);
+    const yourTokens = tokens.filter((token) => token.userTokenBalance);
 
     const typeFilteredTokens = yourTokens.filter(
       searchFilters[activeFilterIndex].filter
@@ -502,14 +502,14 @@ export default function FluidifyToken() {
                     </Draggable>
                   );
                 })}
-              {isTablet && (
-                <Text size="xs" className="footer-text">
-                  Fluidity employs daily limits on fluidifying assets for <br />{" "}
-                  maintained system stability. Limits reset at midnight EST.{" "}
-                  <br />
-                  Unlimited reversion of fluid to non-fluid assets per day.
-                </Text>
-              )}
+                {isTablet && (
+                  <Text size="xs" className="footer-text">
+                    Fluidity employs daily limits on fluidifying assets for{" "}
+                    <br /> maintained system stability. Limits reset at midnight
+                    EST. <br />
+                    Unlimited reversion of fluid to non-fluid assets per day.
+                  </Text>
+                )}
               </div>
             </aside>
 

@@ -871,11 +871,11 @@ main > footer > section > a {
   height: 80px;
   margin-top: 150px;
   margin-bottom: 150px;
-  background-color: blue;
   border-radius: 90%;
 }
 
 .view-reward-modal-token > img {
+  width: 100%;
   margin-top: -70px;
 }
 
