@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 import { PublicKey, Connection } from "@solana/web3.js";
 
 import BigNumber from "bn.js";
-import { PipedTransaction } from "./types";
+import { PipedTransaction, NotificationType } from "./types";
 
 import config from "~/webapp.config.server";
 
@@ -64,12 +64,13 @@ export const solGetTransactionsObservable = (
               tokenDecimal
             );
             const transaction: PipedTransaction = {
-              type: "onChain",
+              type: NotificationType.ONCHAIN,
               source: source,
               destination: destination,
               amount: shorthandAmountFormatter(uiTokenAmount, 3),
               token,
               transactionHash: "",
+              rewardType: "",
             };
             LastSignature = transactionLog.signature;
             subscriber.next(transaction);
