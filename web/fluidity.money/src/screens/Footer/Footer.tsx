@@ -12,6 +12,7 @@ import {
   Heading,
 } from "@fluidity-money/surfing";
 import styles from "./Footer.module.scss";
+import { LaunchButton } from "components/Button";
 
 interface IItem {
   title: string;
@@ -23,12 +24,6 @@ const Footer = () => {
   const { width } = useViewport();
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
-
-  const goToDemoAnchor = () => {
-    const origin = document.location.toString().split('#')[0];
-    document.location = origin + '#demo';
-  }
-
 
   const callout = (
     <div className={styles.callout}>
@@ -58,10 +53,9 @@ const Footer = () => {
         </div>
         <div className={styles.communication}>
           <div className={styles.buttons}>
-            <GeneralButton
+            <LaunchButton
               version={"primary"}
-              buttontype={"text"}
-              handleClick={goToDemoAnchor}
+              type={"text"}
               size={
                 width > firstBreakpoint
                   ? "medium"
@@ -71,7 +65,7 @@ const Footer = () => {
               }
             >
               LAUNCH FLUIDITY
-            </GeneralButton>
+            </LaunchButton>
             <GeneralButton
               handleClick={() => {window.location.href = "mailto:contact@fluidity.money"}}
               version={"secondary"}
