@@ -40,7 +40,7 @@ export const unstable_shouldReload = () => false;
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
   const icons = config.provider_icons;
-  const fluidPairs = config.config[network ?? ""].tokens.length;
+  const fluidPairs = config.config[network ?? ""].fluidAssets.length;
 
   const networkFee = 0.002;
   const gasFee = 0.002;

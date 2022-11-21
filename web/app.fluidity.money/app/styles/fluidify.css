@@ -15,9 +15,15 @@ main {
 .fluidify-card:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   background: #fff;
-  cursor: grabbing;
-  cursor: -webkit-grabbing;
   color: black;
+  cursor: pointer;
+}
+
+@media (min-width: 1251px) {
+  .fluidify-card:hover {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+  }
 }
 
 .fluidify-card {
