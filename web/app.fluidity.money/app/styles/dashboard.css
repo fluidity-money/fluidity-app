@@ -169,6 +169,12 @@ main > footer > section > a {
   gap: 10px;
 }
 
+.active-filter {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.4em;
+}
+
 .transactions-header {
   margin-bottom: 1em;
 }

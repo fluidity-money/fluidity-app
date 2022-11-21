@@ -17,11 +17,6 @@ section#transactions {
   gap: 10px;
 }
 
-.active-graph-filter {
-  text-decoration: underline;
-  text-underline-offset: 0.4em;
-}
-
 .graph-ceiling {
   display: flex;
   flex-direction: row;

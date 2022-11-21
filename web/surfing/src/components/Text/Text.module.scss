@@ -15,6 +15,10 @@
         stroke: map-get($text, "prominent");
         fill: map-get($text, "prominent");
     }
+        
+    &.bold {
+        font-weight: 700;
+    }
 }
 
 .xxl {

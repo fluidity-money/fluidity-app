@@ -109,7 +109,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           logo: tokenLogoMap[tx.currency] || defaultLogo,
         })) ?? [];
 
-    const totalYield = mergedTransactions.reduce(
+    const totalRewards = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
     );
@@ -158,9 +158,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       page,
       network,
       fluidPairs,
-      transactions: mergedTransactions,
-      count,
-      totalYield,
+      totalTransactions: mergedTransactions,
+      totalCount: count,
+      totalRewards,
       networkFee,
       gasFee,
     });
@@ -177,9 +177,9 @@ export const links: LinksFunction = () => {
 type LoaderData = {
   icons: { [provider: string]: string };
   rewarders: Provider[];
-  transactions: Transaction[];
-  count: number;
-  totalYield: number;
+  totalTransactions: Transaction[];
+  totalCount: number;
+  totalRewards: number;
   page: number;
   network: Chain;
   fluidPairs: number;
@@ -214,9 +214,9 @@ export default function Rewards() {
     networkFee,
     gasFee,
     rewarders,
-    transactions: allTransactions,
-    count: allCount,
-    totalYield,
+    totalTransactions,
+    totalCount,
+    totalRewards,
   } = useLoaderData<LoaderData>();
 
   const { connected, address, prizePool } = useContext(FluidityFacadeContext);
@@ -229,18 +229,17 @@ export default function Rewards() {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const [
-    { userUnclaimedRewards, transactions, count },
-    setUnclaimedRewardsRes,
-  ] = useState<{
+  const [{ rewards, transactions, count }, setTransactions] = useState<{
     transactions: Transaction[];
     count: number;
-    userUnclaimedRewards: number;
+    rewards: number;
   }>({
-    transactions: allTransactions,
-    count: allCount,
-    userUnclaimedRewards: 0,
+    transactions: totalTransactions,
+    count: totalCount,
+    rewards: totalRewards,
   });
+
+  const [userUnclaimedRewards, setUserUnclaimedRewards] = useState(0);
 
   const [totalPrizePool, setTotalPrizePool] = useState(0);
 
@@ -270,6 +269,14 @@ export default function Rewards() {
             alignRight: true,
           },
         ];
+
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
+    connected ? 1 : 0
+  );
+
+  useEffect(() => {
+    setActiveTableFilterIndex(connected ? 1 : 0);
+  }, [connected]);
 
   const txTableFilters = address
     ? [
@@ -332,11 +339,7 @@ export default function Rewards() {
           0
         );
 
-        setUnclaimedRewardsRes({
-          transactions,
-          count,
-          userUnclaimedRewards,
-        });
+        setUserUnclaimedRewards(userUnclaimedRewards);
       } catch (err) {
         captureException(
           new Error(
@@ -352,6 +355,30 @@ export default function Rewards() {
       }
     })();
   }, [connected, address]);
+
+  useEffect(() => {
+    if (!activeTableFilterIndex) {
+      return setTransactions({
+        count: totalCount,
+        rewards: totalRewards,
+        transactions: totalTransactions,
+      });
+    }
+
+    const tableFilteredTransactions = totalTransactions.filter(
+      txTableFilters[activeTableFilterIndex].filter
+    );
+    const filteredRewards = tableFilteredTransactions.reduce(
+      (sum, { reward }) => sum + reward,
+      0
+    );
+
+    setTransactions({
+      count: tableFilteredTransactions.length,
+      rewards: filteredRewards,
+      transactions: tableFilteredTransactions,
+    });
+  }, [activeTableFilterIndex]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
@@ -470,8 +497,12 @@ export default function Rewards() {
             <div>
               <div className="statistics-row">
                 <div className="statistics-set">
-                  <LabelledValue label={"Total claimed yield"}>
-                    {numberToMonetaryString(totalYield)}
+                  <LabelledValue
+                    label={`${
+                      activeTableFilterIndex ? "Your" : "Total"
+                    } claimed yield`}
+                  >
+                    {numberToMonetaryString(rewards)}
                   </LabelledValue>
                 </div>
 
@@ -535,6 +566,8 @@ export default function Rewards() {
           data={transactions}
           renderRow={TransactionRow(network)}
           filters={txTableFilters}
+          onFilter={setActiveTableFilterIndex}
+          activeFilterIndex={activeTableFilterIndex}
         />
       </section>
 
@@ -570,4 +603,7 @@ const backends: { [Token: string]: Providers } = {
   USDC: "Compound",
   USDT: "Compound",
   DAI: "Compound",
+  fUSDC: "Compound",
+  fUSDT: "Compound",
+  fDAI: "Compound",
 };
