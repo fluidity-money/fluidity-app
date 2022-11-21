@@ -23,7 +23,7 @@ import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
 import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
-import { PipedTransaction } from "drivers/types";
+import { PipedTransaction, NotificationType } from "drivers/types";
 import { trimAddress, networkMapper } from "~/util";
 import {
   DashboardIcon,
@@ -284,27 +284,35 @@ export default function Dashboard() {
             tokenLogoSrc={fToken.at(0)?.logo}
             boldTitle={log.amount + ` ` + log.token}
             details={
-              log.type === "rewardDB"
-                ? `reward for sending`
+              log.type === NotificationType.REWARD_DATABASE
+                ? log.rewardType === `sending`
+                  ? `reward for sending`
+                  : `reward for receiving`
                 : `received from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
             linkLabelOnClickCallback={() => {
-              setDetailedRewardObject({
-                visible: true,
-                token: log.token,
-                img: imgUrl as unknown as string,
-                colour: tokenColour as unknown as string,
-                winAmount: log.amount,
-                explorerUri: "",
-                balance: "150", //hard coded for now
-                forSending: false, // fetched from server - hauradb - not sorted yet from db
-              });
+              log.type === NotificationType.REWARD_DATABASE
+                ? setDetailedRewardObject({
+                    visible: true,
+                    token: log.token,
+                    img: imgUrl as unknown as string,
+                    colour: tokenColour as unknown as string,
+                    winAmount: log.amount,
+                    explorerUri:
+                      network === `ethereum`
+                        ? "https://etherscan.io/tx/"
+                        : "https://explorer.solana.com/tx/" +
+                          log.transactionHash,
+                    balance: `150` /*balance !== undefined ? balance(fToken.at(0)?.address as unknown as string) as unknown as string : ""*/,
+                    forSending: log.rewardType === `send` ? true : false,
+                  })
+                : {};
             }}
           />
         );
       });
-    }, 30000);
+    }, 13000);
   }, [address]);
 
   const handleScroll = () => {

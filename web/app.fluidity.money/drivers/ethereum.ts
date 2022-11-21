@@ -6,7 +6,7 @@ import Web3 from "web3";
 
 import { AbiItem } from "web3-utils";
 import BigNumber from "bn.js";
-import { PipedTransaction } from "./types";
+import { PipedTransaction, NotificationType } from "./types";
 
 import config from "~/webapp.config.server";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
@@ -38,12 +38,13 @@ export const ethGetTransactionsObservable = (
           const uiTokenAmount = amountToDecimalString(amount.toString(), 6);
 
           const transaction: PipedTransaction = {
-            type: "onChain",
+            type: NotificationType.ONCHAIN,
             source: source,
             destination: destination,
             amount: shorthandAmountFormatter(uiTokenAmount, 3),
             token,
             transactionHash: "",
+            rewardType: "",
           };
           subscriber.next(transaction);
         }
