@@ -349,6 +349,7 @@ export default function Dashboard() {
         <br />
 
         <ChainSelectorButton
+          className="selector-button"
           chain={chainNameMap[network as "ethereum" | "solana"]}
           onClick={() => setChainModalVisibility(true)}
         />
@@ -505,6 +506,7 @@ export default function Dashboard() {
 
             {/* Prize Money */}
             <GeneralButton
+              className="trophy-button"
               version={"transparent"}
               buttontype="icon after"
               size={"small"}

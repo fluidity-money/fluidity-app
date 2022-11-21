@@ -208,8 +208,8 @@ main {
 }
 
 .fluidify-form-submit {
-  max-width: calc(310px - 24 * 2px);
-  width: calc(100% - 24 * 2px);
+  max-width: 260px;
+  width: 100%;
 }
 
 .fluidify-input-container {

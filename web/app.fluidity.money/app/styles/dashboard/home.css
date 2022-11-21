@@ -29,6 +29,10 @@ section#transactions {
   align-items: flex-end;
 }
 
+.graph-ceiling > div:last-child {
+  padding-bottom: 0.2em;
+}
+
 .row {
   display: flex;
   flex-direction: row;
