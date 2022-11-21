@@ -1,6 +1,7 @@
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
+import BN from "bn.js";
 
 export const getContract = (
   ABI: ContractInterface,
@@ -180,13 +181,17 @@ const makeContractSwap = async (
   }
 };
 
+type PrizePool = {
+  amount: BigNumber;
+  decimals: number;
+};
+
 // Returns total prize pool from aggregated contract
 export const getTotalPrizePool = async (
   provider: JsonRpcProvider,
+  rewardPoolAddr: string,
   rewardPoolAbi: ContractInterface
-) => {
-  const rewardPoolAddr = "0xa49D36F7423c6068665a0e4216463E9cE22ec38d";
-
+): Promise<number> => {
   try {
     const rewardPoolContract = new Contract(
       rewardPoolAddr,
@@ -197,9 +202,23 @@ export const getTotalPrizePool = async (
     if (!rewardPoolContract)
       throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
 
-    return await rewardPoolContract.normalised();
+    const pools: PrizePool[] = await rewardPoolContract.callStatic.getPools();
+
+    const totalPrizePool = pools.reduce((sum, { amount, decimals }) => {
+      // amount is uint256, convert to proper BN for float calculations
+      const amountBn = new BN(amount.toString());
+
+      const decimalsBn = new BN(10).pow(new BN(decimals));
+
+      const amountDiv = amountBn.div(decimalsBn);
+
+      return sum.add(amountDiv);
+    }, new BN(0));
+
+    return totalPrizePool.toNumber();
   } catch (error) {
-    return await handleContractErrors(error as ErrorType, provider);
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
   }
 };
 

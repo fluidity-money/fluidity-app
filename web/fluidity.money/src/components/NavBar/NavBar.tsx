@@ -6,8 +6,9 @@ import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { GeneralButton, NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
+import { NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
+import { LaunchButton } from "components/Button";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
@@ -15,11 +16,6 @@ const NavBar = () => {
   const handleModal = (show: boolean) => {
     setModal(show);
   };
-  
-  const goToDemoAnchor = () => {
-    const origin = document.location.toString().split('#')[0];
-    document.location = origin + '#demo';
-  }
 
   const { width } = useViewport();
   const breakpoint = 700;
@@ -57,14 +53,13 @@ const NavBar = () => {
                 </div>
               </a>
             </motion.div>
-            <GeneralButton
+            <LaunchButton
               version={"secondary"}
-              buttontype={"text"}
+              type={"text"}
               size={width < breakpoint ? "small" : "medium"}
-              handleClick={goToDemoAnchor}
             >
               LAUNCH FLUIDITY
-            </GeneralButton>
+            </LaunchButton>
           </div>
         </div>
         <motion.div

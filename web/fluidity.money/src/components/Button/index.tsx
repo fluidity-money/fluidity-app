@@ -5,7 +5,8 @@
 import TextButton from "./TextButton/TextButton";
 import FilterButton from "./FilterButton";
 import AnchorButton from "./AnchorButton";
-import GeneralButton from "./GeneralButton/GeneralButton";
+import GeneralButton from "./GeneralButton/";
 import LinkButton from "./LinkButton";
+import LaunchButton from "./GeneralButton/LaunchButton";
 
-export { TextButton, FilterButton, AnchorButton, GeneralButton, LinkButton };
+export { TextButton, FilterButton, AnchorButton, GeneralButton, LinkButton, LaunchButton };
