@@ -64,6 +64,11 @@ main {
   filter: invert(0%);
 }
 
+.cancel-btn:focus > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
 .fluidify-card img {
   width: 32px;
   height: 32px;
