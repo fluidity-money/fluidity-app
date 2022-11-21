@@ -19,11 +19,13 @@ func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpo
 		token       = reward.TokenDetails
 		amount      = reward.WinAmount
 		winner      = reward.Winner
+		hash        = reward.TransactionHash
 	)
 
 	if !exists {
 		spooledReward.Token = token
 		spooledReward.Winner = winner
+		spooledReward.TransactionHash = hash
 		spooledReward.WinAmount = new(misc.BigInt)
 		spooledReward.FirstBlock = new(misc.BigInt)
 		spooledReward.LastBlock = new(misc.BigInt)

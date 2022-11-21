@@ -346,6 +346,7 @@ export default function Dashboard() {
         </a>
 
         <br />
+        <br />
 
         <ChainSelectorButton
           chain={chainNameMap[network as "ethereum" | "solana"]}
@@ -457,7 +458,11 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Heading as="h6">{appName}</Heading>}
+            {!isMobile && (
+              <Heading as="h6" color={"gray"}>
+                {appName}
+              </Heading>
+            )}
           </div>
 
           {/* Navigation Buttons */}
@@ -591,42 +596,42 @@ export default function Dashboard() {
             <Text>Fluidity Money</Text>
 
             {/* Terms */}
-            <Link to={"/"}>
+            <a href={"/"}>
               <Text>Terms</Text>
-            </Link>
+            </a>
 
             {/* Privacy Policy */}
-            <Link to={"/"}>
+            <a href={"/"}>
               <Text>Privacy policy</Text>
-            </Link>
+            </a>
 
             {/* Roadmap */}
-            <Link to={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
+            <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
-            </Link>
+            </a>
           </section>
 
           {/* Socials */}
           <section>
             {/* Twitter */}
-            <Link to={"https://twitter.com/fluiditymoney"}>
+            <a href={"https://twitter.com/fluiditymoney"}>
               <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
-            </Link>
+            </a>
 
             {/* Discord */}
-            <Link to={"https://discord.com/invite/CNvpJk4HpC"}>
+            <a href={"https://discord.com/invite/CNvpJk4HpC"}>
               <img src={"/images/socials/discord.svg"} alt={"Discord"} />
-            </Link>
+            </a>
 
             {/* Telegram */}
-            <Link to={"https://t.me/fluiditymoney"}>
+            <a href={"https://t.me/fluiditymoney"}>
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
-            </Link>
+            </a>
 
             {/* LinkedIn */}
-            <Link to={"https://www.linkedin.com/company/fluidity-money"}>
+            <a href={"https://www.linkedin.com/company/fluidity-money"}>
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
-            </Link>
+            </a>
           </section>
         </footer>
       </main>

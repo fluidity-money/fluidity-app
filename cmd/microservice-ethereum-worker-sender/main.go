@@ -13,7 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-
+	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -44,6 +45,13 @@ const (
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
 )
+
+// details needed to update the reward type database
+type win = struct{
+	rewardTransactionHash typesEth.Hash
+	sendTransactionHash   typesEth.Hash
+	winnerAddress         typesEth.Address
+}
 
 func main() {
 	var (
@@ -126,6 +134,17 @@ func main() {
 			})
 		}
 
+		// get send transaction hash and winner address from announcement
+		wins := make([]win, len(announcement))
+
+		for i, reward := range announcement {
+			var (
+				winnerAddress 		= reward.Winner
+				sendTransactionHash = reward.TransactionHash
+			)
+			wins[i] = win{winnerAddress: winnerAddress, sendTransactionHash: sendTransactionHash}
+		}
+
 		rewardTransactionArguments := callRewardArguments{
 			containerAnnouncement: announcement,
 			transactionOptions:    transactionOptions,
@@ -151,6 +170,9 @@ func main() {
 
 			for i, transaction := range transactions {
 				hashes[i] = transaction.Hash().Hex()
+
+				// populate with reward transaction hashes
+				wins[i].rewardTransactionHash = typesEth.Hash(transaction.Hash().Hex())
 			}
 
 			log.App(func(k *log.Log) {
@@ -174,9 +196,25 @@ func main() {
 			})
 		}
 
+		// populate all with the same hash
+		for i := range wins {
+			wins[i].rewardTransactionHash = typesEth.HashFromString(transactionHash.Hash().Hex())
+		}
+
 		log.App(func(k *log.Log) {
 			k.Message = "Successfully called the reward function with hash"
 			k.Payload = transactionHash.Hash().Hex()
 		})
+
+		// update database so winners can be tracked by reward transaction hash
+		for _, win := range wins {
+			var (
+				rewardTransactionHash = win.rewardTransactionHash
+				sendTransactionHash   = win.sendTransactionHash
+				winnerAddress 		  = win.winnerAddress
+			)
+
+			winners.AddRewardHashToPendingRewardType(rewardTransactionHash, sendTransactionHash, winnerAddress)
+		}
 	})
 }

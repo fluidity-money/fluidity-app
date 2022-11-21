@@ -15,9 +15,15 @@ main {
 .fluidify-card:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   background: #fff;
-  cursor: grabbing;
-  cursor: -webkit-grabbing;
   color: black;
+  cursor: pointer;
+}
+
+@media (min-width: 1251px) {
+  .fluidify-card:hover {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+  }
 }
 
 .fluidify-card {
@@ -246,6 +252,7 @@ main {
   left: 50%;
   object-fit: contain;
   transform: translate(-50%, -50%);
+  max-width: 95vw;
   /* mix-blend-mode: color-dodge; */
 }
 
@@ -682,6 +689,7 @@ main {
     align-items: center;
     display: flex;
     flex-direction: column;
+    gap: 0.5em;
   }
 
   .main-hotspot {
@@ -877,4 +885,48 @@ main {
 .selected {
   text-decoration: underline;
   text-underline-offset: 0.4em;
+}
+
+.swap-complete-container {
+  background-color: black;
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 2em;
+}
+
+.swap-complete-container > div:first-child {
+  width: 100%;
+  display: flex;
+}
+
+.complete-fluidify-circle {
+  width: 80vw;
+  max-width: 500px;
+  mix-blend-mode: luminosity;
+}
+
+.swap-complete-modal-top {
+  width: "100%";
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swap-complete-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.swap-complete-modal-content > * {
+  margin: 0.5em 0 0;
+  text-align: center;
 }
