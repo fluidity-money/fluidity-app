@@ -241,6 +241,8 @@ export default function Rewards() {
     count: allCount,
     userUnclaimedRewards: 0,
   });
+  
+  const [ totalPrizePool, setTotalPrizePool ] = useState(0);
 
   const { width } = useViewport();
   const mobileView = width <= 500;
@@ -304,9 +306,8 @@ export default function Rewards() {
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
       try {
-        console.log("hello");
-        const blah = await prizePool?.();
-        console.log(blah);
+        const newPrizePool = await prizePool?.() || 0;
+        setTotalPrizePool(newPrizePool);
 
         const { data, error } = await useUserUnclaimedRewards(
           network,
@@ -336,6 +337,7 @@ export default function Rewards() {
           count,
           userUnclaimedRewards,
         });
+        
       } catch (err) {
         captureException(
           new Error(
@@ -487,7 +489,7 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Total prize pool"}>
-                    {numberToMonetaryString(678120)}
+                    {numberToMonetaryString(totalPrizePool)}
                   </LabelledValue>
                 </div>
 

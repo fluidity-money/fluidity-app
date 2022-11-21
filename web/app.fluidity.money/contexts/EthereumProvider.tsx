@@ -158,12 +158,10 @@ const EthereumFacade = ({
   
   const getPrizePool = async () => {
     const signer = provider?.getSigner();
-    console.log("signer", signer);
     
     if (!signer) {
       return;
     }
-    
     const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
 
     return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi)
