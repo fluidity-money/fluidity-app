@@ -250,8 +250,7 @@ export default function MobileModal({
                   unclaimedRewards
                     ? navigate("./rewards/unclaimed")
                     : navigate("./rewards");
-                  }
-                }
+                }}
                 icon={<img src="/images/icons/arrowRightWhite.svg" />}
                 className="unclaimed-button"
               >
@@ -275,8 +274,7 @@ export default function MobileModal({
                   unclaimedRewards
                     ? navigate("./rewards/unclaimed")
                     : navigate("./rewards");
-                  }
-                }
+                }}
                 className="fluidify-money-button"
               >
                 Fluidify Money

@@ -203,7 +203,10 @@ export default function Home() {
     rewards: totalRewards,
   });
 
-  const binTransactions = (bins: (Transaction & {x: number})[], txs: Transaction[]) => {
+  const binTransactions = (
+    bins: (Transaction & { x: number })[],
+    txs: Transaction[]
+  ) => {
     let mappedTxIndex = 0;
 
     txs.every((tx) => {
@@ -214,13 +217,13 @@ export default function Home() {
       }
 
       if (tx.value > bins[mappedTxIndex].value) {
-        bins[mappedTxIndex] = {...tx, x: mappedTxIndex};
+        bins[mappedTxIndex] = { ...tx, x: mappedTxIndex };
       }
 
       return true;
     });
 
-    return bins
+    return bins;
   };
 
   const graphTransformers = [
@@ -322,10 +325,10 @@ export default function Home() {
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
     connected ? 1 : 0
   );
-  
+
   useEffect(() => {
-    setActiveTableFilterIndex(connected ? 1 : 0)
-  }, [connected])
+    setActiveTableFilterIndex(connected ? 1 : 0);
+  }, [connected]);
 
   const txTableFilters = address
     ? [
@@ -438,7 +441,7 @@ export default function Home() {
         </motion.tr>
       );
     };
-  
+
   return (
     <>
       <section id="graph">
@@ -514,11 +517,10 @@ export default function Home() {
             data={graphTransformedTransactions}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Transaction) => d.x,
-              yAccessor: (d: Transaction) => d.value,
+              xAccessor: (d: Transaction & { x: number }) => d.x,
+              yAccessor: (d: Transaction & { x: number }) => d.value,
             }}
             renderTooltip={({ datum }: { datum: Transaction }) => {
-      
               return datum.value > 0 ? (
                 <div className={"tooltip-container"}>
                   <div className={"tooltip"}>
@@ -542,9 +544,8 @@ export default function Home() {
                 </div>
               ) : (
                 <></>
-              )
-    }
-            }
+              );
+            }}
           />
         </div>
       </section>

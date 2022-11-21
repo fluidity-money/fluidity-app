@@ -303,10 +303,9 @@ export default function FluidifyToken() {
 
   useEffect(() => {
     const typeFilteredTokens = tokens
-      .filter(
-        searchFilters[activeFilterIndex].filter
-      ).sort(token => token.userTokenBalance)
-      .reverse()
+      .filter(searchFilters[activeFilterIndex].filter)
+      .sort((token) => token.userTokenBalance)
+      .reverse();
 
     debouncedSearch(typeFilteredTokens);
 
