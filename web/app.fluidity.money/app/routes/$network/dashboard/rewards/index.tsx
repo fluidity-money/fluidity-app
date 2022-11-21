@@ -104,8 +104,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             : 0,
           hash: tx.hash,
           currency: tx.currency,
-          value: tx.value,
-          timestamp: tx.timestamp,
+          value:
+            tx.currency === "DAI" || tx.currency === "fDAI"
+              ? tx.value / 10 ** 12
+              : tx.value,
+          timestamp: tx.timestamp * 1000,
           logo: tokenLogoMap[tx.currency] || defaultLogo,
         })) ?? [];
 
@@ -296,7 +299,30 @@ export default function Rewards() {
           name: "GLOBAL",
         },
       ];
+  
+  const unixNow = Date.now();
 
+  const [activeRewardFilterIndex, setActiveRewardFilterIndex] = useState(0)
+  
+  const rewardFilters = [
+    {
+      name: "All time",
+      filter: () => true,
+    },
+    {
+      name: "Last week",
+      filter: ({timestamp}: Transaction) => timestamp > unixNow - 7 * 24 * 60 * 60 * 1000,
+    },
+    {
+      name: "Last month",
+      filter: ({timestamp}: Transaction) => timestamp > unixNow - 30 * 24 * 60 * 60 * 1000,
+    },
+    {
+      name: "This year",
+      filter: ({timestamp}: Transaction) => timestamp > unixNow - 365 * 24 * 60 * 60 * 1000,
+    },
+  ]
+  
   const hasRewarders = rewarders.length > 0;
 
   const bestPerformingRewarders = rewarders.sort(
@@ -307,8 +333,9 @@ export default function Rewards() {
     }
   );
 
+  // Get user's unclaimed rewards
   useEffect(() => {
-    if (!connected || !address) return;
+    if (!connected || !address) return setUserUnclaimedRewards(0);
 
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
@@ -356,18 +383,15 @@ export default function Rewards() {
     })();
   }, [connected, address]);
 
+  // Filter Transactions via rewards filter / tx type filters
   useEffect(() => {
-    if (!activeTableFilterIndex) {
-      return setTransactions({
-        count: totalCount,
-        rewards: totalRewards,
-        transactions: totalTransactions,
-      });
-    }
-
-    const tableFilteredTransactions = totalTransactions.filter(
-      txTableFilters[activeTableFilterIndex].filter
-    );
+    const tableFilteredTransactions = totalTransactions
+      .filter(
+        rewardFilters[activeRewardFilterIndex].filter
+      )
+      .filter(
+        txTableFilters[activeTableFilterIndex].filter
+      );
     const filteredRewards = tableFilteredTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
@@ -378,7 +402,7 @@ export default function Rewards() {
       rewards: filteredRewards,
       transactions: tableFilteredTransactions,
     });
-  }, [activeTableFilterIndex]);
+  }, [activeTableFilterIndex, activeRewardFilterIndex]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
@@ -487,68 +511,65 @@ export default function Rewards() {
           </section>
         </div>
       )}
-      <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
-        Reward Performance
-      </Heading>
+      <div className="reward-ceiling">
+        <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
+          Reward Performance
+        </Heading>
+
+        <div className="filter-row">
+          {rewardFilters.map((filter, i) => (
+            <button
+              key={`filter-${filter.name}`}
+              onClick={() => setActiveRewardFilterIndex(i)}
+            >
+              <Text
+                size="xl"
+                prominent={activeRewardFilterIndex === i}
+                className={
+                  activeRewardFilterIndex === i ? "active-filter" : ""
+                }
+              >
+                {filter.name}
+              </Text>
+            </button>
+          ))}
+        </div>
+      </div>
       {/* Reward Performance */}
       {hasRewarders && (
         <section id="performance">
-          <div>
-            <div>
-              <div className="statistics-row">
-                <div className="statistics-set">
-                  <LabelledValue
-                    label={`${
-                      activeTableFilterIndex ? "Your" : "Total"
-                    } claimed yield`}
-                  >
-                    {numberToMonetaryString(rewards)}
-                  </LabelledValue>
-                </div>
-
-                <div className="statistics-set">
-                  <LabelledValue label={"Highest performer"}>
-                    <div className="highest-performer-child">
-                      <ProviderIcon
-                        provider={bestPerformingRewarders[0].name}
-                      />
-                      {bestPerformingRewarders[0].name}
-                    </div>
-                  </LabelledValue>
-                </div>
-
-                <div className="statistics-set">
-                  <LabelledValue label={"Total prize pool"}>
-                    {numberToMonetaryString(totalPrizePool)}
-                  </LabelledValue>
-                </div>
-
-                <div className="statistics-set">
-                  <LabelledValue label={"Fluid Pairs"}>
-                    {fluidPairs}
-                  </LabelledValue>
-                </div>
-              </div>
+          <div className="statistics-row">
+            <div className="statistics-set">
+              <LabelledValue
+                label={`${
+                  activeTableFilterIndex ? "Your" : "Total"
+                } claimed yield`}
+              >
+                {numberToMonetaryString(rewards)}
+              </LabelledValue>
             </div>
-            <div>
-              {/* scoped out */}
-              {/* <div className="statistics-row">
-                {performanceTimeFrames.map((timeFrame, i) => {
-                  const selectedProps = timeFrameIndex === i ? "selected" : "";
-                  const classProps = `${selectedProps}`;
 
-                  return (
-                    <button
-                      key={timeFrame}
-                      onClick={() => setTimeFrameIndex(i)}
-                    >
-                      <Text key={timeFrame + i} className={classProps}>
-                        {timeFrame}
-                      </Text>
-                    </button>
-                  );
-                })}
-              </div> */}
+            <div className="statistics-set">
+              <LabelledValue label={"Highest performer"}>
+                <div className="highest-performer-child">
+                  <ProviderIcon
+                    provider={bestPerformingRewarders[0].name}
+                  />
+                  {bestPerformingRewarders[0].name}
+                </div>
+              </LabelledValue>
+            </div>
+
+            <div className="statistics-set">
+              <LabelledValue label={"Total prize pool"}>
+                {numberToMonetaryString(totalPrizePool)}
+              </LabelledValue>
+            </div>
+
+            <div className="statistics-set">
+              <LabelledValue label={"Fluid Pairs"}>
+                {fluidPairs}
+              </LabelledValue>
             </div>
           </div>
         </section>
