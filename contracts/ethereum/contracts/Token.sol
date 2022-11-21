@@ -613,6 +613,13 @@ contract Token is IERC20, ITransferWithBeneficiary {
     function userMintLimit() public view returns (uint) { return userMintLimit_; }
 
     /*
+     * @notice returns the remaining global mint limit
+     */
+    function remainingGlobalMintLimit() public view returns (uint) {
+        return remainingGlobalMint_;
+    }
+
+    /*
      * @notice returns how much `account` has minted
      *
      * @param the account to check
