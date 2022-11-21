@@ -18,7 +18,7 @@ import {
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
-import { useState, useContext, useMemo } from "react";
+import { useState, useContext, useMemo, useEffect } from "react";
 import { useUserRewards } from "~/queries";
 import {
   useLoaderData,
@@ -108,15 +108,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         logo: tokenLogoMap[tx.currency] || defaultLogo,
       })) ?? [];
 
-    const totalYield = mergedTransactions.reduce(
+    const totalRewards = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
     );
 
     return json({
-      transactions: mergedTransactions,
-      count,
-      totalYield,
+      totalTransactions: mergedTransactions,
+      totalCount: count,
+      totalRewards,
       fluidPairs,
       page,
       network,
@@ -149,15 +149,16 @@ const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
 });
 
 type LoaderData = {
-  transactions: Transaction[];
-  totalYield: number;
-  count: number;
+  totalTransactions: Transaction[];
+  totalRewards: number;
+  totalCount: number;
   fluidPairs: number;
   page: number;
   network: Chain;
 };
 
-function ErrorBoundary() {
+function ErrorBoundary(error: Error) {
+  console.log(error);
   return (
     <div
       className="pad-main"
@@ -175,13 +176,8 @@ function ErrorBoundary() {
 }
 
 export default function Home() {
-  const {
-    network,
-    transactions: allTransactions,
-    count: allCount,
-    fluidPairs,
-    totalYield,
-  } = useLoaderData<LoaderData>();
+  const { network, totalTransactions, totalCount, totalRewards, fluidPairs } =
+    useLoaderData<LoaderData>();
 
   const location = useLocation();
 
@@ -193,16 +189,21 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  const { address } = useContext(FluidityFacadeContext);
+  const { address, connected } = useContext(FluidityFacadeContext);
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
 
-  const [{ count, transactions }] = useState<{
+  const [{ count, transactions, rewards }, setTransactions] = useState<{
     count: number;
     transactions: Transaction[];
-  }>({ count: allCount, transactions: allTransactions });
+    rewards: number;
+  }>({
+    count: totalCount,
+    transactions: totalTransactions,
+    rewards: totalRewards,
+  });
 
-  const binTransactions = (bins: Transaction[], txs: Transaction[]) => {
+  const binTransactions = (bins: (Transaction & {x: number})[], txs: Transaction[]) => {
     let mappedTxIndex = 0;
 
     txs.every((tx) => {
@@ -213,18 +214,13 @@ export default function Home() {
       }
 
       if (tx.value > bins[mappedTxIndex].value) {
-        bins[mappedTxIndex] = tx;
+        bins[mappedTxIndex] = {...tx, x: mappedTxIndex};
       }
 
       return true;
     });
 
-    const startBinTimestamp = bins[0].timestamp;
-    const endBinTimestamp = bins[bins.length - 1].timestamp;
-
-    return [graphEmptyTransaction(startBinTimestamp - 1, -1)]
-      .concat(bins)
-      .concat([graphEmptyTransaction(endBinTimestamp + 1, -1)]);
+    return bins
   };
 
   const graphTransformers = [
@@ -235,9 +231,10 @@ export default function Home() {
         const unixHourInc = 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixHourInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -251,9 +248,10 @@ export default function Home() {
         const unixEightHourInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -265,9 +263,10 @@ export default function Home() {
         const unixDayInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixDayInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -279,9 +278,10 @@ export default function Home() {
         const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -289,8 +289,9 @@ export default function Home() {
   ];
 
   const graphTransformedTransactions = useMemo(
-    () => graphTransformers[activeTransformerIndex].transform(transactions),
-    [transactions, activeTransformerIndex]
+    () =>
+      graphTransformers[activeTransformerIndex].transform(totalTransactions),
+    [activeTransformerIndex]
   );
 
   const { width } = useViewport();
@@ -318,6 +319,14 @@ export default function Home() {
           },
         ];
 
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
+    connected ? 1 : 0
+  );
+  
+  useEffect(() => {
+    setActiveTableFilterIndex(connected ? 1 : 0)
+  }, [connected])
+
   const txTableFilters = address
     ? [
         {
@@ -336,6 +345,30 @@ export default function Home() {
           name: "GLOBAL",
         },
       ];
+
+  useEffect(() => {
+    if (!activeTableFilterIndex) {
+      return setTransactions({
+        count: totalCount,
+        rewards: totalRewards,
+        transactions: totalTransactions,
+      });
+    }
+
+    const tableFilteredTransactions = totalTransactions.filter(
+      txTableFilters[activeTableFilterIndex].filter
+    );
+    const filteredRewards = tableFilteredTransactions.reduce(
+      (sum, { reward }) => sum + reward,
+      0
+    );
+
+    setTransactions({
+      count: tableFilteredTransactions.length,
+      rewards: filteredRewards,
+      transactions: tableFilteredTransactions,
+    });
+  }, [activeTableFilterIndex]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
@@ -405,7 +438,7 @@ export default function Home() {
         </motion.tr>
       );
     };
-
+  
   return (
     <>
       <section id="graph">
@@ -414,7 +447,9 @@ export default function Home() {
           <div className="overlay">
             <div className="totals-row">
               <div className="statistics-set">
-                <Text>Total transactions</Text>
+                <Text>
+                  {activeTableFilterIndex ? "Your" : "Total"} transactions
+                </Text>
                 <Display size={"xs"} style={{ margin: 0 }}>
                   {count}
                 </Display>
@@ -427,9 +462,9 @@ export default function Home() {
                 </AnchorButton>
               </div>
               <div className="statistics-set">
-                <Text>Total yield</Text>
+                <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
                 <Display size={"xs"} style={{ margin: 0 }}>
-                  {numberToMonetaryString(totalYield)}
+                  {numberToMonetaryString(rewards)}
                 </Display>
                 <LinkButton
                   size="medium"
@@ -462,7 +497,7 @@ export default function Home() {
                     size="xl"
                     prominent={activeTransformerIndex === i}
                     className={
-                      activeTransformerIndex === i ? "active-graph-filter" : ""
+                      activeTransformerIndex === i ? "active-filter" : ""
                     }
                   >
                     {filter.name}
@@ -479,12 +514,12 @@ export default function Home() {
             data={graphTransformedTransactions}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Transaction) => d?.timestamp || 0,
-              yAccessor: (d: Transaction) =>
-                Math.log((d.value || 0.001) * 1100),
+              xAccessor: (d: Transaction) => d.x,
+              yAccessor: (d: Transaction) => d.value,
             }}
-            renderTooltip={({ datum }: { datum: Transaction }) =>
-              datum.value > 0 ? (
+            renderTooltip={({ datum }: { datum: Transaction }) => {
+      
+              return datum.value > 0 ? (
                 <div className={"tooltip-container"}>
                   <div className={"tooltip"}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
@@ -508,6 +543,7 @@ export default function Home() {
               ) : (
                 <></>
               )
+    }
             }
           />
         </div>
@@ -524,6 +560,8 @@ export default function Home() {
           count={count}
           data={transactions}
           renderRow={TransactionRow(network)}
+          onFilter={setActiveTableFilterIndex}
+          activeFilterIndex={activeTableFilterIndex}
           filters={txTableFilters}
         />
       </section>

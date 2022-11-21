@@ -243,10 +243,14 @@ export default function MobileModal({
                 version={"secondary"}
                 buttontype="icon after"
                 size={"small"}
-                handleClick={() =>
-                  unclaimedFluid
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
+                  unclaimedRewards
                     ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards")
+                    : navigate("./rewards");
+                  }
                 }
                 icon={<img src="/images/icons/arrowRightWhite.svg" />}
                 className="unclaimed-button"
@@ -264,7 +268,15 @@ export default function MobileModal({
                 version={"primary"}
                 buttontype="text"
                 size={"medium"}
-                handleClick={() => navigate("../fluidify")}
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
+                  unclaimedRewards
+                    ? navigate("./rewards/unclaimed")
+                    : navigate("./rewards");
+                  }
+                }
                 className="fluidify-money-button"
               >
                 Fluidify Money
