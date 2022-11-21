@@ -586,7 +586,7 @@ main > footer > section > a {
   color: black;
 }
 
-.unclaimed-button:hover > span > h4 {
+.unclaimed-button:hover > span > h5 {
   color: black;
 }
 

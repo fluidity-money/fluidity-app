@@ -203,7 +203,10 @@ export default function Home() {
     rewards: totalRewards,
   });
 
-  const binTransactions = (bins: Transaction[], txs: Transaction[]) => {
+  const binTransactions = (
+    bins: (Transaction & { x: number })[],
+    txs: Transaction[]
+  ) => {
     let mappedTxIndex = 0;
 
     txs.every((tx) => {
@@ -214,18 +217,13 @@ export default function Home() {
       }
 
       if (tx.value > bins[mappedTxIndex].value) {
-        bins[mappedTxIndex] = tx;
+        bins[mappedTxIndex] = { ...tx, x: mappedTxIndex };
       }
 
       return true;
     });
 
-    const startBinTimestamp = bins[0].timestamp;
-    const endBinTimestamp = bins[bins.length - 1].timestamp;
-
-    return [graphEmptyTransaction(startBinTimestamp - 1, -1)]
-      .concat(bins)
-      .concat([graphEmptyTransaction(endBinTimestamp + 1, -1)]);
+    return bins;
   };
 
   const graphTransformers = [
@@ -236,9 +234,10 @@ export default function Home() {
         const unixHourInc = 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixHourInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -252,9 +251,10 @@ export default function Home() {
         const unixEightHourInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -266,9 +266,10 @@ export default function Home() {
         const unixDayInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixDayInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -280,9 +281,10 @@ export default function Home() {
         const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc)
-        );
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc),
+          x: i,
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -515,12 +517,11 @@ export default function Home() {
             data={graphTransformedTransactions}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Transaction) => d?.timestamp || 0,
-              yAccessor: (d: Transaction) =>
-                Math.log((d.value || 0.001) * 1100),
+              xAccessor: (d: Transaction & { x: number }) => d.x,
+              yAccessor: (d: Transaction & { x: number }) => d.value,
             }}
-            renderTooltip={({ datum }: { datum: Transaction }) =>
-              datum.value > 0 ? (
+            renderTooltip={({ datum }: { datum: Transaction }) => {
+              return datum.value > 0 ? (
                 <div className={"tooltip-container"}>
                   <div className={"tooltip"}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
@@ -543,8 +544,8 @@ export default function Home() {
                 </div>
               ) : (
                 <></>
-              )
-            }
+              );
+            }}
           />
         </div>
       </section>
