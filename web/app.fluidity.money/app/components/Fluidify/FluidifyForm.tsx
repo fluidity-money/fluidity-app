@@ -26,6 +26,7 @@ export const FluidifyForm = ({
 
   const [swapInput, setSwapInput] = useState<string>("0");
 
+  // Snap the smallest of token balance, remaining mint limit, or swap amt
   const snapToValidValue = (input: string): number =>
     assetToken?.userMintLimit
       ? Math.min(
@@ -51,7 +52,6 @@ export const FluidifyForm = ({
   const handleChangeSwapInput: React.ChangeEventHandler<HTMLInputElement> = (
     e
   ) => {
-    // Snap the smallest of token balance, remaining mint limit, or swap amt
     const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
