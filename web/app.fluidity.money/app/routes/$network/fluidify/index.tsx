@@ -1,37 +1,35 @@
+import type AugmentedToken from "~/types/AugmentedToken";
+
+import config, { colors } from "~/webapp.config.server";
+import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
+import { json, LoaderFunction } from "@remix-run/node";
+import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+import { debounce, DebouncedFunc } from "lodash";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { DndProvider } from "react-dnd";
+import ItemTypes from "~/types/ItemTypes";
 import useViewport from "~/hooks/useViewport";
+import {
+  userMintLimitedEnabled,
+  getUsdUserMintLimit,
+} from "~/util/chainUtils/ethereum/transaction";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { JsonRpcProvider } from "@ethersproject/providers";
+// Use touch backend for mobile devices
+import { HTML5Backend } from "react-dnd-html5-backend";
 import {
   Display,
   GeneralButton,
   LinkButton,
   Text,
 } from "@fluidity-money/surfing";
+import Draggable from "~/components/Draggable";
+import FluidifyCard from "~/components/FluidifyCard";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
-import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, Link, useNavigate } from "@remix-run/react";
-import { debounce, DebouncedFunc } from "lodash";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { DndProvider } from "react-dnd";
-import FluidifyCard from "~/components/FluidifyCard";
-
-// Use touch backend for mobile devices
-import { HTML5Backend } from "react-dnd-html5-backend";
-
-import config, { colors } from "~/webapp.config.server";
-import FluidityFacadeContext from "contexts/FluidityFacade";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
-import AugmentedToken from "~/types/AugmentedToken";
-import Draggable from "~/components/Draggable";
-import ItemTypes from "~/types/ItemTypes";
-import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import {
-  userMintLimitedEnabled,
-  getUsdUserMintLimit,
-} from "~/util/chainUtils/ethereum/transaction";
-import SwapCompleteModal from "~/components/SwapCompleteModal";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -214,8 +212,6 @@ export default function FluidifyToken() {
     connected && setWalletModalVisibility(false);
   }, [connected]);
 
-  const [swapAmount, setSwapAmount] = useState(0);
-
   const [search, setSearch] = useState("");
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
 
@@ -285,8 +281,8 @@ export default function FluidifyToken() {
     }
   }, [address]);
 
-  const handleRedirect = (amount: number) => {
-    return navigate(`out?toToken=${toToken?.symbol}&amount=${amount}`);
+  const handleRedirect = (token: AugmentedToken, amount: number) => {
+    navigate(`out?assetId=${token.symbol}&amount=${amount}`);
   };
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
@@ -306,9 +302,11 @@ export default function FluidifyToken() {
   }, 500);
 
   useEffect(() => {
-    const typeFilteredTokens = tokens.filter(
-      searchFilters[activeFilterIndex].filter
-    );
+    const typeFilteredTokens = tokens
+      .filter(searchFilters[activeFilterIndex].filter)
+      .sort((token) => token.userTokenBalance)
+      .reverse();
+
     debouncedSearch(typeFilteredTokens);
 
     return () => {
@@ -316,18 +314,8 @@ export default function FluidifyToken() {
     };
   }, [search, activeFilterIndex, tokens]);
 
-  const [swapCompleteModal, setSwapCompleteModal] = useState(false);
-
   return (
     <DndProvider backend={HTML5Backend}>
-      {swapCompleteModal && (
-        <SwapCompleteModal
-          visible={swapCompleteModal}
-          close={() => setSwapCompleteModal(false)}
-          colorMap={colors}
-          assetToken={tokens[0]}
-        />
-      )}
       {/* Mobile Swap Modal */}
       {isTablet && openMobModal && (
         <div className="mob-swap-modal">
@@ -354,8 +342,6 @@ export default function FluidifyToken() {
           {assetToken && toToken && (
             <FluidifyForm
               handleSwap={handleRedirect}
-              swapAmount={swapAmount}
-              setSwapAmount={setSwapAmount}
               assetToken={assetToken}
               toToken={toToken}
               swapping={swapping}
@@ -516,6 +502,14 @@ export default function FluidifyToken() {
                     </Draggable>
                   );
                 })}
+                {isTablet && (
+                  <Text size="xs" className="footer-text">
+                    Fluidity employs daily limits on fluidifying assets for{" "}
+                    <br /> maintained system stability. Limits reset at midnight
+                    EST. <br />
+                    Unlimited reversion of fluid to non-fluid assets per day.
+                  </Text>
+                )}
               </div>
             </aside>
 
@@ -543,8 +537,6 @@ export default function FluidifyToken() {
             {!!assetToken && !isTablet && !!toToken && (
               <FluidifyForm
                 handleSwap={handleRedirect}
-                swapAmount={swapAmount}
-                setSwapAmount={setSwapAmount}
                 assetToken={assetToken}
                 toToken={toToken}
                 swapping={swapping}

@@ -35,7 +35,8 @@ main {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 
-  width: 310px;
+  width: 100%;
+  max-width: 310px;
   height: 72px;
 
   display: flex;
@@ -129,7 +130,7 @@ main {
 }
 
 .main-hotspot {
-  min-height: 80vh;
+  width: min(50vw, 50vh);
   aspect-ratio: 1 / 1;
   mix-blend-mode: color-dodge;
 }
@@ -140,15 +141,12 @@ main {
 
 .fluidify-tokens {
   max-height: calc(100vh - 340px);
-  overflow-y: hidden;
   margin-top: 0.5em;
   padding-right: 0.5em;
-  width: 320px;
+  width: 100%;
+  max-width: 320px;
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
-}
-
-.fluidify-tokens:hover {
   overflow-y: auto;
 }
 
@@ -182,22 +180,21 @@ main {
   .fluidify-tokens {
     max-height: calc(100vh - 480px);
   }
-  .fluidify-tokens:hover {
-    overflow-y: unset;
-  }
 }
 
 .fluidify-form {
-  width: 310px;
+  width: 80vw;
+  max-width: 310px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: start;
   gap: 15px;
+  overflow: auto;
 }
 
 .fluidify-form-el {
-  width: inherit;
+  width: 100%;
 }
 
 .fluidify-form-logo {
@@ -211,7 +208,8 @@ main {
 }
 
 .fluidify-form-submit {
-  width: calc(310px - 24 * 2px);
+  max-width: 260px;
+  width: 100%;
 }
 
 .fluidify-input-container {
@@ -224,9 +222,11 @@ main {
 
 .fluidify-input-container > img {
   height: 24px;
+  width: 24px;
 }
 
 .fluidify-input {
+  width: 80%;
   color: white;
   background: transparent;
   border: none;
@@ -306,6 +306,8 @@ main {
 }
 
 .video-container > video {
+  width: 80vw;
+  max-width: 500px;
   mix-blend-mode: color-dodge;
 }
 
@@ -620,6 +622,10 @@ main {
   align-items: center;
   box-sizing: border-box;
   gap: 3em;
+  overflow-y: hidden;
+}
+
+.scroll {
   overflow-y: auto;
 }
 
@@ -685,7 +691,8 @@ main {
     align-items: center;
   }
   .fluidify-tokens-container {
-    max-width: none;
+    width: 100%;
+    max-width: 320px;
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -698,7 +705,7 @@ main {
 
   .fluidify-tokens {
     height: calc(100vh - 380px);
-    overflow-y: unset;
+    overflow-y: auto;
   }
 
   .fluidify-heading {

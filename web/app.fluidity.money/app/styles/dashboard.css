@@ -76,7 +76,7 @@ main > footer > section {
 }
 
 #flu-logo > a > img {
-  width: 5em;
+  width: 5.5em;
   margin-bottom: 1em;
   cursor: pointer;
 }
@@ -100,7 +100,7 @@ main > footer > section {
 }
 
 .top-navbar-left > a > img {
-  width: 5em;
+  width: 5.5em;
   cursor: pointer;
 }
 
@@ -152,6 +152,14 @@ main > footer > section {
   padding: 0;
 }
 
+.selector-button {
+  padding: 1px 2px;
+}
+
+.trophy-button {
+  font-size: 1em;
+}
+
 main > footer > section > a {
   color: #828381;
   text-underline-offset: 0.12em;
@@ -167,6 +175,12 @@ main > footer > section > a {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.active-filter {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.4em;
 }
 
 .transactions-header {
@@ -580,7 +594,7 @@ main > footer > section > a {
   color: black;
 }
 
-.unclaimed-button:hover > span > h4 {
+.unclaimed-button:hover > span > h5 {
   color: black;
 }
 
@@ -871,11 +885,11 @@ main > footer > section > a {
   height: 80px;
   margin-top: 150px;
   margin-bottom: 150px;
-  background-color: blue;
   border-radius: 90%;
 }
 
 .view-reward-modal-token > img {
+  width: 100%;
   margin-top: -70px;
 }
 
