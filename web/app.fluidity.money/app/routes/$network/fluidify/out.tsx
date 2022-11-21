@@ -103,7 +103,7 @@ const TokenOut = () => {
 
   const [walletBalance, setWalletBalance] = useState<number | undefined>();
 
-  // if (!connected) return navigate(`/`);
+  if (!connected) return navigate(`/`);
 
   useEffect(() => {
     if (network === "ethereum") {
@@ -116,7 +116,9 @@ const TokenOut = () => {
       <div>
         <Link to={".."}>
           <LinkButton
-            handleClick={() => {return}}
+            handleClick={() => {
+              return;
+            }}
             size="large"
             type="internal"
             left={true}
@@ -177,7 +179,7 @@ const TokenOut = () => {
       {!swapping && (
         <div className="swap-complete-modal-content">
           {confirmed && (
-          <>
+            <>
               <Heading as="h5">
                 {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
                 created and added to your wallet.
@@ -210,7 +212,7 @@ const TokenOut = () => {
                   FLUIDIFY MORE ASSETS
                 </LinkButton>
               </Link>
-          </>
+            </>
           )}
 
           {!confirmed && (

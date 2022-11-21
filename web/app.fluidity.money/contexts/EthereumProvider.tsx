@@ -155,17 +155,17 @@ const EthereumFacade = ({
 
     return makeContractSwap(signer, from, to, amount);
   };
-  
-  const getPrizePool = async () => {
+
+  const getPrizePool = async (): Promise<number> => {
     const signer = provider?.getSigner();
-    
+
     if (!signer) {
-      return;
+      return 0;
     }
     const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
 
-    return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi)
-  }
+    return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi);
+  };
 
   return (
     <FluidityFacadeContext.Provider

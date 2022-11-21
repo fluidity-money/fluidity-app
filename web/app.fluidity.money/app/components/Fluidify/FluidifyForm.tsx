@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo } from "react";
+import { useContext, useState } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   Text,
@@ -24,21 +24,18 @@ export const FluidifyForm = ({
 
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
 
-  const [ swapInput, setSwapInput ] = useState<string>("0");
+  const [swapInput, setSwapInput] = useState<string>("0");
 
-  const snapToValidValue = (input: string): number => 
-    assetToken?.userMintLimit ? 
-      Math.min(
-        parseFloat(input) || 0,
-        (assetToken?.userMintLimit || 0) -
-          (assetToken?.userMintedAmt || 0),
-        assetToken.userTokenBalance || 0
-      ) : Math.min(
-        parseFloat(input) || 0,
-        assetToken.userTokenBalance || 0
-      )
+  const snapToValidValue = (input: string): number =>
+    assetToken?.userMintLimit
+      ? Math.min(
+          parseFloat(input) || 0,
+          (assetToken?.userMintLimit || 0) - (assetToken?.userMintedAmt || 0),
+          assetToken.userTokenBalance || 0
+        )
+      : Math.min(parseFloat(input) || 0, assetToken.userTokenBalance || 0);
 
-  const swapAmount: number = snapToValidValue(swapInput)
+  const swapAmount: number = snapToValidValue(swapInput);
 
   const assertCanSwap =
     connected &&
@@ -50,23 +47,28 @@ export const FluidifyForm = ({
     swapAmount <= (assetToken?.userTokenBalance || 0) &&
     (assetToken.userMintLimit === undefined ||
       swapAmount + (assetToken.userMintedAmt || 0) <= assetToken.userMintLimit);
-  
-  const handleChangeSwapInput: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    // Snap the smallest of token balance, remaining mint limit, or swap amt
-    const numericChars = e.target.value.replace(/[^0-9.]+/, '')
 
+  const handleChangeSwapInput: React.ChangeEventHandler<HTMLInputElement> = (
+    e
+  ) => {
+    // Snap the smallest of token balance, remaining mint limit, or swap amt
+    const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [whole, dec, _invalid] = numericChars.split(".");
 
     const unpaddedWhole = parseInt(whole) || 0;
-    
+
     if (dec === undefined) {
       return setSwapInput(`${unpaddedWhole}`);
     }
-    
+
     return setSwapInput([whole, dec].join("."));
-  }
-  
-  const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  };
+
+  const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
+    e
+  ) => {
     e.preventDefault();
 
     if (!assertCanSwap) return;

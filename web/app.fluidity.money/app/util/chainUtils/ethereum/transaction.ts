@@ -182,16 +182,16 @@ const makeContractSwap = async (
 };
 
 type PrizePool = {
-  amount: BigNumber,
-  decimals: number,
-}
+  amount: BigNumber;
+  decimals: number;
+};
 
 // Returns total prize pool from aggregated contract
 export const getTotalPrizePool = async (
   provider: JsonRpcProvider,
   rewardPoolAddr: string,
-  rewardPoolAbi: ContractInterface,
-) => {
+  rewardPoolAbi: ContractInterface
+): Promise<number> => {
   try {
     const rewardPoolContract = new Contract(
       rewardPoolAddr,
@@ -201,23 +201,24 @@ export const getTotalPrizePool = async (
 
     if (!rewardPoolContract)
       throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
-    
+
     const pools: PrizePool[] = await rewardPoolContract.callStatic.getPools();
-    
-    const totalPrizePool = pools.reduce((sum, {amount, decimals}) => {
+
+    const totalPrizePool = pools.reduce((sum, { amount, decimals }) => {
       // amount is uint256, convert to proper BN for float calculations
       const amountBn = new BN(amount.toString());
 
       const decimalsBn = new BN(10).pow(new BN(decimals));
-      
+
       const amountDiv = amountBn.div(decimalsBn);
-      
+
       return sum.add(amountDiv);
     }, new BN(0));
 
     return totalPrizePool.toNumber();
   } catch (error) {
-    return await handleContractErrors(error as ErrorType, provider);
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
   }
 };
 
