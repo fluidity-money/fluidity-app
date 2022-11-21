@@ -26,7 +26,7 @@
   * [⛓ Launch restrictions (mint limits)](docs/fundamentals/launch-restrictions-mint-limits.md)
   * [🔓 Governance structure](docs/fundamentals/governance-structure.md)
   * [🚂 Advisory team](docs/fundamentals/advisory-team.md)
-  * [👩🏫 👩🏫 Laws of Fluidity](docs/fundamentals/laws-of-fluidity.md)
+  * [👩🏫 👩🏫 👩🏫 Laws of Fluidity](docs/fundamentals/laws-of-fluidity.md)
   * [🛣 Roadmap](docs/fundamentals/roadmap/README.md)
     * [🚀 Product roadmap](docs/fundamentals/roadmap/product-roadmap.md)
     * [🌤 Decentralisation roadmap](docs/fundamentals/roadmap/decentralisation-roadmap.md)
