@@ -12,6 +12,9 @@ import {
   getAddressExplorerLink,
   getTxExplorerLink,
 } from "~/util";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import { motion } from "framer-motion";
 import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
@@ -34,10 +37,6 @@ import { Table } from "~/components";
 import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
 import { Providers } from "~/components/ProviderIcon";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
-import { Contract } from "ethers";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 
 export const unstable_shouldReload = () => false;
 
@@ -595,8 +594,6 @@ export default function Rewards() {
           data={transactions}
           renderRow={TransactionRow(network)}
           filters={txTableFilters}
-          onFilter={setActiveTableFilterIndex}
-          activeFilterIndex={activeTableFilterIndex}
         />
       </section>
 
