@@ -28,6 +28,7 @@ import ItemTypes from "~/types/ItemTypes";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { userMintLimitedEnabled, getUsdUserMintLimit } from "~/util/chainUtils/ethereum/transaction";
+import SwapCompleteModal from "~/components/SwapCompleteModal";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -311,8 +312,18 @@ export default function FluidifyToken() {
     };
   }, [search, activeFilterIndex, tokens]);
 
+  const [swapCompleteModal, setSwapCompleteModal] = useState(false);
+
   return (
     <DndProvider backend={HTML5Backend}>
+      {swapCompleteModal && (
+        <SwapCompleteModal
+          visible={swapCompleteModal}
+          close={() => setSwapCompleteModal(false)}
+          colorMap={colors}
+          assetToken={tokens[0]}
+        />
+      )}
       {/* Mobile Swap Modal */}
       {isTablet && openMobModal && (
         <div className="mob-swap-modal">
