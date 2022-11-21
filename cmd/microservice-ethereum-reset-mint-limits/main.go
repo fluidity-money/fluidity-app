@@ -112,7 +112,7 @@ func main() {
 
 	now := time.Now().UTC().Add(extraDay)
 
-	key := now.Format("2006-01-2")
+	key := now.Format("2006-01-02")
 
 	globalMintLimits, ok := ScheduleGlobalMintLimit[key]
 
