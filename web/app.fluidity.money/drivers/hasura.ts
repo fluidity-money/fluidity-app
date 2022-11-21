@@ -4,8 +4,8 @@ import { WebSocketLink } from "apollo-link-ws";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import ws from "ws";
 import { Observable } from "rxjs";
-import { PipedTransaction } from "./types";
-import { amountToDecimalString } from "~/util";
+import { PipedTransaction, NotificationType } from "./types";
+import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
@@ -22,6 +22,7 @@ const WinnerSubscriptionQuery = gql`
       solana_winning_owner_address
       token_decimals
       winning_amount
+      reward_type
     }
   }
 `;
@@ -45,6 +46,7 @@ type WinnerData = {
   token_short_name: string;
   token_decimals: number;
   transaction_hash: string;
+  reward_type: string;
 };
 
 type WinnerEvent = {
@@ -64,16 +66,21 @@ export const getHasuraTransactionObservable = (url: string, address: string) =>
         if (_eventData.data.winners.length === 0) return;
         // Will never fail because of the length check above
         const itemObject = _eventData.data.winners.at(0) as WinnerData | never;
+
         const transaction: PipedTransaction = {
-          type: "rewardDB",
+          type: NotificationType.REWARD_DATABASE,
           source: "",
           destination: itemObject.winning_address,
-          amount: amountToDecimalString(
-            itemObject.winning_amount.toString(),
-            itemObject.token_decimals
+          amount: shorthandAmountFormatter(
+            amountToDecimalString(
+              itemObject.winning_amount.toString(),
+              itemObject.token_decimals
+            ),
+            3
           ),
           token: itemObject.token_short_name,
           transactionHash: itemObject.transaction_hash,
+          rewardType: itemObject.reward_type,
         };
         subscriber.next(transaction);
       },
