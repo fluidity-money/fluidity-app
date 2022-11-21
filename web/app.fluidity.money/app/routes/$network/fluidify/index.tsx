@@ -302,11 +302,11 @@ export default function FluidifyToken() {
   }, 500);
 
   useEffect(() => {
-    const yourTokens = tokens.filter((token) => token.userTokenBalance);
+    const typeFilteredTokens = tokens
+      .filter(searchFilters[activeFilterIndex].filter)
+      .sort((token) => token.userTokenBalance)
+      .reverse();
 
-    const typeFilteredTokens = yourTokens.filter(
-      searchFilters[activeFilterIndex].filter
-    );
     debouncedSearch(typeFilteredTokens);
 
     return () => {
