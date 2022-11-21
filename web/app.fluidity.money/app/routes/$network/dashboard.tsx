@@ -123,7 +123,7 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  const { connected, address, disconnect, connecting } = useContext(
+  const { connected, address, disconnect, connecting, balance } = useContext(
     FluidityFacadeContext
   );
 
@@ -277,6 +277,10 @@ export default function Dashboard() {
           fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
         const tokenColour =
           fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.logo : "";
+        const transactionUrl =
+          network === `ethereum`
+            ? "https://etherscan.io/tx/" + log.transactionHash
+            : "https://explorer.solana.com/tx/" + log.transactionHash;
 
         toolTip.open(
           fToken.at(0)?.colour || `#000`,
@@ -285,13 +289,13 @@ export default function Dashboard() {
             boldTitle={log.amount + ` ` + log.token}
             details={
               log.type === NotificationType.REWARD_DATABASE
-                ? log.rewardType === `sending`
+                ? log.rewardType === `send`
                   ? `reward for sending`
                   : `reward for receiving`
                 : `received from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
-            linkLabelOnClickCallback={() => {
+            linkLabelOnClickCallback={async () => {
               log.type === NotificationType.REWARD_DATABASE
                 ? setDetailedRewardObject({
                     visible: true,
@@ -299,20 +303,20 @@ export default function Dashboard() {
                     img: imgUrl as unknown as string,
                     colour: tokenColour as unknown as string,
                     winAmount: log.amount,
-                    explorerUri:
-                      network === `ethereum`
-                        ? "https://etherscan.io/tx/"
-                        : "https://explorer.solana.com/tx/" +
-                          log.transactionHash,
-                    balance: `150` /*balance !== undefined ? balance(fToken.at(0)?.address as unknown as string) as unknown as string : ""*/,
+                    explorerUri: transactionUrl,
+                    balance: String(
+                      await balance?.(
+                        fToken.at(0)?.address as unknown as string
+                      )
+                    ),
                     forSending: log.rewardType === `send` ? true : false,
                   })
-                : {};
+                : window.open(transactionUrl, `_`);
             }}
           />
         );
       });
-    }, 13000);
+    }, 8000);
   }, [address]);
 
   const handleScroll = () => {
