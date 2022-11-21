@@ -70,10 +70,16 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
   const EthWalletsMap = () => {
     const { useConnectorType } = useContext(FluidityFacadeContext);
     const { ethereumWallets } = useLoaderData<LoaderData>();
+    
+    // Checks if "metamask" option should be made available
+    // Extra utility specific to Ethereum 
+    const hasEthereumContext = !!window.ethereum;
 
     return (
       <>
-        {ethereumWallets.map((wallet) => (
+        {ethereumWallets
+        .filter(wallet => wallet.id !== "metamask" || hasEthereumContext)
+        .map((wallet) => (
           <li
             key={`wallet-${wallet.name}`}
             onClick={() => {
