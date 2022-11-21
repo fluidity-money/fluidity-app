@@ -5,7 +5,7 @@ import { SubscriptionClient } from "subscriptions-transport-ws";
 import ws from "ws";
 import { Observable } from "rxjs";
 import { PipedTransaction, NotificationType } from "./types";
-import { amountToDecimalString } from "~/util";
+import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
@@ -71,9 +71,12 @@ export const getHasuraTransactionObservable = (url: string, address: string) =>
           type: NotificationType.REWARD_DATABASE,
           source: "",
           destination: itemObject.winning_address,
-          amount: amountToDecimalString(
-            itemObject.winning_amount.toString(),
-            itemObject.token_decimals
+          amount: shorthandAmountFormatter(
+            amountToDecimalString(
+              itemObject.winning_amount.toString(),
+              itemObject.token_decimals
+            ),
+            3
           ),
           token: itemObject.token_short_name,
           transactionHash: itemObject.transaction_hash,
