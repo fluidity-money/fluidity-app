@@ -1,16 +1,19 @@
 import gql from "graphql-tag";
-import { execute } from "apollo-link";
+import { DocumentNode, execute } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import ws from "ws";
 import { Observable } from "rxjs";
-import BigNumber from "bn.js";
 import { PipedTransaction } from "./types";
 import { amountToDecimalString } from "~/util";
 
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
-    winners(where: { winning_address: { _eq: $address } }, limit: 1, order_by: {created: desc}) {
+    winners(
+      where: { winning_address: { _eq: $address } }
+      limit: 1
+      order_by: { created: desc }
+    ) {
       created
       transaction_hash
       network
@@ -28,22 +31,39 @@ const getWsClient = (wsurl: string) =>
 
 const createHasuraSubscriptionObservable = (
   wsurl: string,
-  query: any,
-  variables: any
+  query: DocumentNode, // Explicitly when using apollo
+  variables: Record<string, unknown>
 ) =>
   execute(new WebSocketLink(getWsClient(wsurl)), {
     query: query,
     variables: variables,
   });
 
+type WinnerData = {
+  winning_address: string;
+  winning_amount: number;
+  token_short_name: string;
+  token_decimals: number;
+  transaction_hash: string;
+};
+
+type WinnerEvent = {
+  data: {
+    winners: WinnerData[];
+  };
+};
+
 export const getHasuraTransactionObservable = (url: string, address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
     createHasuraSubscriptionObservable(url, WinnerSubscriptionQuery, {
       address: address,
     }).subscribe(
-      (eventData: any) => {
-        if (eventData?.data?.winners?.length === 0) return;
-        const itemObject = eventData?.data?.winners?.at(0);
+      (eventData: unknown) => {
+        // Secretly a WinnerEvent
+        const _eventData = eventData as WinnerEvent;
+        if (_eventData.data.winners.length === 0) return;
+        // Will never fail because of the length check above
+        const itemObject = _eventData.data.winners.at(0) as WinnerData | never;
         const transaction: PipedTransaction = {
           type: "rewardDB",
           source: "",

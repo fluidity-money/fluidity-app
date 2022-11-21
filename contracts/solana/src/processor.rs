@@ -15,11 +15,13 @@ use {
         msg,
         program::{invoke, invoke_signed},
         program_pack::Pack,
+        pubkey,
         pubkey::Pubkey,
         system_instruction,
+        sysvar::rent::Rent,
+        sysvar::Sysvar,
     },
     spl_token,
-    std::str::FromStr,
 };
 
 // the public key of the account that is allowed to initialise tokens
@@ -1034,7 +1036,7 @@ fn create_token_metadata(
     let metaplex_metadata_account = next_account_info(accounts_iter)?;
     let rent_info = next_account_info(accounts_iter)?;
 
-    let (fluidity_data_account, fluidity_data, payer) = validate_authority(
+    let (_, fluidity_data, payer) = validate_authority(
         &seed,
         program_id,
         fluidity_data_account,       // fluidity data account
@@ -1091,7 +1093,7 @@ fn create_token_metadata(
             pda_account.clone(),                 // update authority info
             system_account.clone(),              // system program
             rent_info.clone(),                   // rent sysvar
-            metaplex_program_account.clone()     // metaplex program
+            metaplex_program_account.clone(),    // metaplex program
         ],
         &[&[&pda_seed.as_bytes(), &[bump]]],
     )

@@ -199,17 +199,11 @@ func main() {
 				emission,
 			)
 
-			randomIntegers := generateRandomIntegers(
+			randomSource := util.RandomIntegers(
 				winningClasses,
 				1,
-				int(randomN),
+				uint32(randomN),
 			)
-
-			randomSource := make([]uint32, len(randomIntegers))
-
-			for i, randomInteger := range randomIntegers {
-				randomSource[i] = uint32(randomInteger)
-			}
 
 			// then finally, you'd figure out if they won!
 

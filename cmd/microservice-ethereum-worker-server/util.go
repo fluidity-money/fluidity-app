@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -25,41 +24,6 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
-
-func generateRandomIntegers(amount, min, max int) []int {
-	if amount > max-min+1 {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Can't generate %d non-repeating integers between %d and %d!",
-				amount,
-				min,
-				max,
-			)
-		})
-	}
-
-	numbers := make([]int, amount)
-
-	for i := 0; i < amount; i++ {
-		for {
-			numbers[i] = min + rand.Intn(max)
-
-			dup := false
-
-			for j := 0; j < i; j++ {
-				if numbers[i] == numbers[j] {
-					dup = true
-				}
-			}
-
-			if !dup {
-				break
-			}
-		}
-	}
-
-	return numbers
-}
 
 func hexToPrivateKey(hex string) *ecdsa.PrivateKey {
 	privateKey, err := ethCrypto.HexToECDSA(hex)

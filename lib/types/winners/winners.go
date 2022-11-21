@@ -12,6 +12,10 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
+// whether a win is for the sender or recipient
+// "send" || "receive"
+type RewardType string
+
 type Winner struct {
 	Network                  network.BlockchainNetwork `json:"network"`
 	TransactionHash          string                    `json:"transaction_hash"`
@@ -19,6 +23,7 @@ type Winner struct {
 	SolanaWinnerOwnerAddress string                    `json:"solana_winner_owner_address"`
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
 	AwardedTime              time.Time                 `json:"awarded_time"`
+	RewardType				 RewardType                `json:"reward_type"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }

@@ -2,6 +2,7 @@ import type { Chain } from "~/util/chainUtils/chains";
 import type { UserTransaction } from "~/routes/$network/query/userTransactions";
 import type { Winner } from "~/queries/useUserRewards";
 import type { IRow } from "~/components/Table";
+import type Transaction from "~/types/Transaction";
 
 import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
@@ -45,7 +46,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const fluidPairs = config.config[network ?? ""].tokens.length;
+  const fluidPairs = config.config[network ?? ""].fluidAssets.length;
 
   try {
     const {
@@ -73,21 +74,39 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {} as { [key: string]: Winner }
     );
 
-    const mergedTransactions: Transaction[] = transactions.map((tx) => ({
-      sender: tx.sender,
-      receiver: tx.receiver,
-      reward: winnersMap[tx.hash]
-        ? winnersMap[tx.hash].winning_amount /
-          10 ** winnersMap[tx.hash].token_decimals
-        : 0,
-      hash: tx.hash,
-      currency: tx.currency,
-      value:
-        tx.currency === "DAI" || tx.currency === "fDAI"
-          ? tx.value / 10 ** 12
-          : tx.value,
-      timestamp: tx.timestamp * 1000,
-    }));
+    const {
+      config: {
+        [network as string]: { tokens },
+      },
+    } = config;
+
+    const tokenLogoMap = tokens.reduce(
+      (map, token) => ({
+        ...map,
+        [token.symbol]: token.logo,
+      }),
+      {} as Record<string, string>
+    );
+
+    const defaultLogo = "/assets/tokens/fUSDT.png";
+
+    const mergedTransactions: Transaction[] =
+      transactions?.map((tx) => ({
+        sender: tx.sender,
+        receiver: tx.receiver,
+        reward: winnersMap[tx.hash]
+          ? winnersMap[tx.hash].winning_amount /
+            10 ** winnersMap[tx.hash].token_decimals
+          : 0,
+        hash: tx.hash,
+        currency: tx.currency,
+        value:
+          tx.currency === "DAI" || tx.currency === "fDAI"
+            ? tx.value / 10 ** 12
+            : tx.value,
+        timestamp: tx.timestamp * 1000,
+        logo: tokenLogoMap[tx.currency] || defaultLogo,
+      })) ?? [];
 
     const totalYield = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
@@ -118,18 +137,7 @@ export const meta = () => {
   };
 };
 
-type Transaction = {
-  sender: string;
-  receiver: string;
-  reward: number;
-  hash: string;
-  // timestamp is the Unix time, in seconds
-  timestamp: number;
-  value: number;
-  currency: string;
-};
-
-const graphEmptyTransaction = (time: number, value = 0) => ({
+const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   sender: "",
   receiver: "",
   reward: 0,
@@ -137,6 +145,7 @@ const graphEmptyTransaction = (time: number, value = 0) => ({
   timestamp: time,
   value,
   currency: "",
+  logo: "/assets/tokens/fUSDT.svg",
 });
 
 type LoaderData = {
@@ -186,9 +195,9 @@ export default function Home() {
 
   const { address } = useContext(FluidityFacadeContext);
 
-  const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
+  const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
 
-  const [{ count, transactions }, setTransactionRes] = useState<{
+  const [{ count, transactions }] = useState<{
     count: number;
     transactions: Transaction[];
   }>({ count: allCount, transactions: allTransactions });
@@ -313,24 +322,24 @@ export default function Home() {
     ? [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
             address in [sender, receiver],
-          name: "YOUR REWARDS",
+          name: "YOUR DASHBOARD",
         },
       ]
     : [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
       ];
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, timestamp, value, currency, reward, hash } = data;
+      const { sender, timestamp, value, reward, hash, logo } = data;
 
       return (
         <motion.tr
@@ -351,13 +360,7 @@ export default function Home() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img
-                src={
-                  currency === "USDC"
-                    ? "/images/tokenIcons/usdcFluid.svg"
-                    : "/images/tokenIcons/usdtFluid.svg"
-                }
-              />
+              <img src={logo} />
               <Text>{transactionActivityLabel(data, sender)}</Text>
             </a>
           </td>
@@ -456,7 +459,7 @@ export default function Home() {
                   onClick={() => setActiveTransformerIndex(i)}
                 >
                   <Text
-                    size="xxl"
+                    size="xl"
                     prominent={activeTransformerIndex === i}
                     className={
                       activeTransformerIndex === i ? "active-graph-filter" : ""
@@ -471,12 +474,12 @@ export default function Home() {
         </div>
 
         {/* Graph */}
-        <div className="graph" style={{ width: "100vw", height: "400px" }}>
+        <div className="graph" style={{ width: "100%", height: "400px" }}>
           <LineChart
             data={graphTransformedTransactions}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Transaction) => d.timestamp,
+              xAccessor: (d: Transaction) => d?.timestamp || 0,
               yAccessor: (d: Transaction) =>
                 Math.log((d.value || 0.001) * 1100),
             }}

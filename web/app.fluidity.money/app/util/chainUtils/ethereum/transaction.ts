@@ -176,19 +176,50 @@ const makeContractSwap = async (
       return await (await fromContract.erc20Out(amount)).wait();
     } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
   } catch (error) {
-    return await handleContractErrors(error, signer.provider);
+    return await handleContractErrors(error as ErrorType, signer.provider);
   }
 };
 
+// Returns total prize pool from aggregated contract
+export const getTotalPrizePool = async (
+  provider: JsonRpcProvider,
+  rewardPoolAbi: ContractInterface
+) => {
+  const rewardPoolAddr = "0xa49D36F7423c6068665a0e4216463E9cE22ec38d";
+
+  try {
+    const rewardPoolContract = new Contract(
+      rewardPoolAddr,
+      rewardPoolAbi,
+      provider
+    );
+
+    if (!rewardPoolContract)
+      throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
+
+    return await rewardPoolContract.normalised();
+  } catch (error) {
+    return await handleContractErrors(error as ErrorType, provider);
+  }
+};
+
+type ErrorType = {
+  data: { message: string };
+} & { message: string };
+
 export const handleContractErrors = async (
-  error: any,
+  error: ErrorType,
   provider: Provider | undefined
 ) => {
-  const msg: string = error?.data?.message ?? error?.message;
+  const msg = error?.data?.message ?? error?.message;
+
+  if (!msg) throw new Error(`Unknown Error: ${error}`);
+
   // check for denial separately (these don't contain an error code for some reason)
   if (msg === "MetaMask Tx Signature: User denied transaction signature.") {
     throw new Error(`Transaction Denied`);
   }
+
   try {
     // check if we've got a different metamask error
     const metaMaskError = JSON.parse(msg.match(/{.*}/)?.[0] || "");

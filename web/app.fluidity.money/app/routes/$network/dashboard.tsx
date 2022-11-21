@@ -1,4 +1,8 @@
-import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
 import { json } from "@remix-run/node";
@@ -10,6 +14,7 @@ import {
   useResolvedPath,
   useMatches,
   useTransition,
+  useLocation,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -25,6 +30,7 @@ import {
   GeneralButton,
   Trophy,
   Text,
+  Heading,
   ChainSelectorButton,
   BlockchainModal,
   trimAddressShort,
@@ -39,65 +45,27 @@ import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
+import { ViewRewardModal } from "~/components/ViewRewardModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const url = new URL(request.url);
-
-  const routeMapper = (route: string) => {
-    switch (route.toLowerCase()) {
-      case "home":
-        return "DASHBOARD";
-      case "rewards":
-        return "REWARDS";
-      case "unclaimed":
-        return "CLAIM";
-      case "assets":
-        return "ASSETS";
-      case "dao":
-        return "DAO";
-      default:
-        return "DASHBOARD";
-    }
-  };
-
-  const urlPaths = url.pathname.split("/");
-
-  const pathname = urlPaths.pop() ?? "";
-
+export const loader: LoaderFunction = async ({ params }) => {
   const ethereumWallets = config.config["ethereum"].wallets;
 
   const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
 
-  const token = config.config;
-
-  const fromRedirectStr = url.searchParams.get("redirect");
-
-  const fromRedirect = fromRedirectStr === "true";
+  const tokens = config.config;
 
   return json({
-    appName: routeMapper(pathname),
-    fromRedirect,
-    version: "1.5",
     network,
     provider,
-    token,
+    tokens,
     ethereumWallets,
   });
-};
-
-type LoaderData = {
-  appName: string;
-  fromRedirect: boolean;
-  version: string;
-  network: string;
-  provider: typeof config.liquidity_providers;
-  token: typeof config.config;
 };
 
 function ErrorBoundary() {
@@ -120,15 +88,49 @@ function ErrorBoundary() {
   );
 }
 
+export const meta: MetaFunction = ({ data }) => ({
+  ...data,
+  title: "Dashboard",
+});
+
+const routeMapper = (route: string) => {
+  switch (route.toLowerCase()) {
+    case "home":
+      return "DASHBOARD";
+    case "rewards":
+      return "REWARDS";
+    case "unclaimed":
+      return "CLAIM";
+    case "assets":
+      return "ASSETS";
+    case "dao":
+      return "DAO";
+    default:
+      return "DASHBOARD";
+  }
+};
+
+type LoaderData = {
+  appName: string;
+  fromRedirect: boolean;
+  network: string;
+  provider: typeof config.liquidity_providers;
+  tokens: typeof config.config;
+};
+
 export default function Dashboard() {
-  const { appName, version, network, token, fromRedirect } =
-    useLoaderData<LoaderData>();
+  const { network, tokens } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
   const { connected, address, disconnect, connecting } = useContext(
     FluidityFacadeContext
   );
+
+  const url = useLocation();
+  const urlPaths = url.pathname.split("/");
+  const pathname = urlPaths.pop() ?? "";
+  const appName = routeMapper(pathname);
 
   {
     /* Toggle Mobile Modal */
@@ -138,13 +140,36 @@ export default function Dashboard() {
   const [walletModalVisibility, setWalletModalVisibility] =
     useState<boolean>(false);
 
+  type RewardDetails = {
+    visible: boolean;
+    token: string;
+    img: string;
+    colour: string;
+    winAmount: string;
+    explorerUri: string;
+    balance: string;
+    forSending: boolean;
+  };
+
+  const [detailedRewardObject, setDetailedRewardObject] =
+    useState<RewardDetails>({
+      visible: false,
+      token: "",
+      img: "",
+      colour: "",
+      winAmount: "",
+      explorerUri: "",
+      balance: "",
+      forSending: false,
+    });
+
   // By default, prompt user to connect their wallet
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState<boolean>(false);
 
   // Toggle Select Chain Modal
   const [chainModalVisibility, setChainModalVisibility] =
-    useState<boolean>(fromRedirect);
+    useState<boolean>(false);
 
   useEffect(() => {
     if (connected || connecting) setWalletModalVisibility(false);
@@ -243,27 +268,43 @@ export default function Dashboard() {
     });
 
     setTimeout(() => {
-     socket.on("Transactions", (log: PipedTransaction) => {
-      const fToken = token[network === `` ? `ethereum` : network].tokens.filter(
-        (entry) => entry.symbol === log.token
-      );
+      socket.on("Transactions", (log: PipedTransaction) => {
+        const fToken = tokens[
+          network === `` ? `ethereum` : network
+        ].tokens.filter((entry) => entry.symbol === log.token);
 
-      toolTip.open(
-        fToken.at(0)?.colour,
-        <ToolTipContent
-          tokenLogoSrc={fToken.at(0)?.logo}
-          boldTitle={log.amount + ` ` + log.token}
-          details={
-            log.type === 'rewardDB'
-              ? `reward for sending`
-							: `received from ` + trimAddress(log.source)
-          }
-          linkLabel={"DETAILS"}
-          linkUrl={"#"}
-        />
-      );
-    });
-   }, 30000);
+        const imgUrl =
+          fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
+        const tokenColour =
+          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.logo : "";
+
+        toolTip.open(
+          fToken.at(0)?.colour || `#000`,
+          <ToolTipContent
+            tokenLogoSrc={fToken.at(0)?.logo}
+            boldTitle={log.amount + ` ` + log.token}
+            details={
+              log.type === "rewardDB"
+                ? `reward for sending`
+                : `received from ` + trimAddress(log.source)
+            }
+            linkLabel={"DETAILS"}
+            linkLabelOnClickCallback={() => {
+              setDetailedRewardObject({
+                visible: true,
+                token: log.token,
+                img: imgUrl as unknown as string,
+                colour: tokenColour as unknown as string,
+                winAmount: log.amount,
+                explorerUri: "",
+                balance: "150", //hard coded for now
+                forSending: false, // fetched from server - hauradb - not sorted yet from db
+              });
+            }}
+          />
+        );
+      });
+    }, 30000);
   }, [address]);
 
   const handleScroll = () => {
@@ -304,6 +345,7 @@ export default function Dashboard() {
           <img src="/images/outlinedLogo.svg" alt="Fluidity" />
         </a>
 
+        <br />
         <br />
 
         <ChainSelectorButton
@@ -416,7 +458,11 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Text>{appName}</Text>}
+            {!isMobile && (
+              <Heading as="h6" color={"gray"}>
+                {appName}
+              </Heading>
+            )}
           </div>
 
           {/* Navigation Buttons */}
@@ -448,16 +494,14 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify */}
-            {width > 550 && (
-              <GeneralButton
-                version={"primary"}
-                buttontype="text"
-                size={"small"}
-                handleClick={() => navigate("../fluidify")}
-              >
-                Fluidify Money
-              </GeneralButton>
-            )}
+            <GeneralButton
+              version={"primary"}
+              buttontype="text"
+              size={"small"}
+              handleClick={() => navigate("../fluidify")}
+            >
+              <b>Fluidify</b>
+            </GeneralButton>
 
             {/* Prize Money */}
             <GeneralButton
@@ -496,12 +540,42 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
 
+        {
+          <ViewRewardModal
+            visible={detailedRewardObject.visible}
+            close={() => {
+              setDetailedRewardObject({
+                // empty object on close
+                visible: false,
+                token: "",
+                img: "",
+                colour: "",
+                winAmount: "",
+                explorerUri: "",
+                balance: "",
+                forSending: false,
+              });
+            }}
+            tokenSymbol={detailedRewardObject.token}
+            img={detailedRewardObject.img}
+            colour={detailedRewardObject.colour}
+            winAmount={detailedRewardObject.winAmount}
+            explorerUri={detailedRewardObject.explorerUri}
+            balance={detailedRewardObject.balance}
+            forSending={detailedRewardObject.forSending}
+          />
+        }
+
         <Outlet />
 
         {/* Mobile Menu Modal */}
         {openMobModal && (
           <MobileModal
-            navigationMap={navigationMap}
+            navigationMap={navigationMap.map((obj) => {
+              // I love type inconsistency
+              const { name, icon } = Object.values(obj)[0];
+              return { name, icon };
+            })}
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={unclaimedRewards}
@@ -519,45 +593,45 @@ export default function Dashboard() {
           {/* Links */}
           <section>
             {/* Version */}
-            <Text>Fluidity Money V{version}</Text>
+            <Text>Fluidity Money</Text>
 
             {/* Terms */}
-            <Link to={"/"}>
+            <a href={"/"}>
               <Text>Terms</Text>
-            </Link>
+            </a>
 
             {/* Privacy Policy */}
-            <Link to={"/"}>
+            <a href={"/"}>
               <Text>Privacy policy</Text>
-            </Link>
+            </a>
 
             {/* Roadmap */}
-            <Link to={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
+            <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
-            </Link>
+            </a>
           </section>
 
           {/* Socials */}
           <section>
             {/* Twitter */}
-            <Link to={"https://twitter.com/fluiditymoney"}>
+            <a href={"https://twitter.com/fluiditymoney"}>
               <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
-            </Link>
+            </a>
 
             {/* Discord */}
-            <Link to={"https://discord.com/invite/CNvpJk4HpC"}>
+            <a href={"https://discord.com/invite/CNvpJk4HpC"}>
               <img src={"/images/socials/discord.svg"} alt={"Discord"} />
-            </Link>
+            </a>
 
             {/* Telegram */}
-            <Link to={"https://t.me/fluiditymoney"}>
+            <a href={"https://t.me/fluiditymoney"}>
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
-            </Link>
+            </a>
 
             {/* LinkedIn */}
-            <Link to={"https://www.linkedin.com/company/fluidity-money"}>
+            <a href={"https://www.linkedin.com/company/fluidity-money"}>
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
-            </Link>
+            </a>
           </section>
         </footer>
       </main>

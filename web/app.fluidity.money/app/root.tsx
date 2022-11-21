@@ -15,6 +15,7 @@ import { withSentry } from "@sentry/remix";
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { ToolTipLinks } from "./components";
+import { ToolProvider } from "./components/ToolTip";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -165,10 +166,12 @@ function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+        <ToolProvider>
+          <Outlet />
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </ToolProvider>
       </body>
     </html>
   );

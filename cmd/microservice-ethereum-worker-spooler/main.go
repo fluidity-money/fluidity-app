@@ -9,6 +9,7 @@ import (
 
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -67,7 +68,14 @@ func main() {
 				fromWinAmount = announcement.FromWinAmount
 				tokenDetails  = announcement.TokenDetails
 				tokenDecimals = tokenDetails.TokenDecimals
+
+				transactionHash  = announcement.TransactionHash
+				senderAddress    = announcement.FromAddress
+				recipientAddress = announcement.ToAddress
 			)
+
+			// write the sender and receiver to be stored once the win is paid out
+			winners.InsertPendingRewardType(transactionHash, senderAddress, recipientAddress)
 
 			tokenDecimalsScale := bigExp10(int64(tokenDecimals))
 
@@ -86,7 +94,7 @@ func main() {
 				)
 			})
 
-			totalRewards := spooler.UnpaidWinningsForToken(tokenDetails)
+			totalRewards := spooler.UnpaidWinningsForToken(dbNetwork, tokenDetails)
 
 			scaledBatchedRewards := new(big.Rat).SetFrac(totalRewards, tokenDecimalsScale)
 
@@ -127,7 +135,7 @@ func main() {
 					k.Format("Sending rewards for token %v", shortName)
 				})
 
-				sendRewards(batchedRewardsQueue, shortName)
+				sendRewards(batchedRewardsQueue, dbNetwork, shortName)
 			}
 		}
 	})

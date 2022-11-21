@@ -201,13 +201,13 @@ export default function MobileModal({
                       obj: { name: string; icon: JSX.Element },
                       index: number
                     ) => {
-                      const key = Object.keys(obj)[0];
-                      const { name, icon } = Object.values(obj)[0];
+                      const key = Object.values(obj)[0];
+                      const { name, icon } = obj;
                       const active = index === activeIndex;
 
                       return (
                         <li
-                          key={key}
+                          key={key as unknown as string}
                           onClick={() => {
                             //delay to show page change and allow loading
                             setTimeout(() => {
@@ -223,7 +223,9 @@ export default function MobileModal({
                           ) : (
                             <div />
                           )}
-                          <Link to={key}>
+                          <Link
+                            to={index === 0 ? "./" : (key as unknown as string)}
+                          >
                             <Text prominent={active}>
                               {icon} {name}
                             </Text>

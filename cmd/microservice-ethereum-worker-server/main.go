@@ -6,9 +6,7 @@ package main
 
 import (
 	"math/big"
-	"math/rand"
 	"strconv"
-	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 
@@ -76,22 +74,14 @@ func main() {
 		dbNetwork network.BlockchainNetwork
 	)
 
-	rand.Seed(time.Now().Unix())
 
+	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
-	switch networkId {
-		case "ethereum":
-			dbNetwork = network.NetworkEthereum
-		case "arbitrum":
-			dbNetwork = network.NetworkArbitrum
-		default:
-			log.Fatal(func (k *log.Log) {
-				k.Format(
-					"Unknown %s %s - expected 'ethereum' or 'arbitrum'",
-					EnvNetwork,
-					networkId,
-				)
-			})
+	if err != nil {
+    log.Fatal(func (k *log.Log) {
+			k.Message = "Failed to parse network from env"
+			k.Payload = err
+		})
 	}
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
@@ -420,19 +410,13 @@ func main() {
 					emission,
 				)
 
-				res := generateRandomIntegers(
-					fluidity.WinningClasses,
-					1,
-					int(randomN),
-				)
-
 				// create announcement and container
 
-				randomSource := make([]uint32, len(res))
-
-				for i, value := range res {
-					randomSource[i] = uint32(value)
-				}
+				randomSource := util.RandomIntegers(
+					fluidity.WinningClasses,
+					1,
+					uint32(randomN),
+				)
 
 				tokenDetails := token_details.TokenDetails{
 					TokenShortName: tokenName,

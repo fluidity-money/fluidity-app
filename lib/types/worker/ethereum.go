@@ -10,6 +10,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
@@ -28,6 +29,7 @@ type (
 	}
 
 	EthereumWinnerAnnouncement struct {
+		Network         network.BlockchainNetwork  `json:"network"`
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
 		BlockNumber     *misc.BigInt               `json:"block_number"`
 		FromAddress     ethereum.Address           `json:"from_address"`
@@ -46,11 +48,12 @@ type (
 	}
 
 	EthereumSpooledRewards struct {
-		Token      token_details.TokenDetails `json:"token_details"`
-		Winner     ethereum.Address           `json:"winner"`
-		WinAmount  *misc.BigInt               `json:"amount"`
-		FirstBlock *misc.BigInt               `json:"first_block"`
-		LastBlock  *misc.BigInt               `json:"last_block"`
+		Token           token_details.TokenDetails `json:"token_details"`
+		Winner          ethereum.Address           `json:"winner"`
+		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		WinAmount       *misc.BigInt               `json:"amount"`
+		FirstBlock      *misc.BigInt               `json:"first_block"`
+		LastBlock       *misc.BigInt               `json:"last_block"`
 	}
 
 	EthereumBlockLog struct {
