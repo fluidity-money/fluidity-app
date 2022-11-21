@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   Text,
@@ -8,9 +8,7 @@ import {
 import AugmentedToken from "~/types/AugmentedToken";
 
 interface IFluidifyFormProps {
-  handleSwap: (amount: number) => void;
-  swapAmount: number;
-  setSwapAmount: React.Dispatch<React.SetStateAction<number>>;
+  handleSwap: (token: AugmentedToken, amount: number) => void;
   assetToken: AugmentedToken;
   toToken: AugmentedToken;
   swapping: boolean;
@@ -18,8 +16,6 @@ interface IFluidifyFormProps {
 
 export const FluidifyForm = ({
   handleSwap,
-  swapAmount,
-  setSwapAmount,
   assetToken,
   toToken,
   swapping,
@@ -28,7 +24,22 @@ export const FluidifyForm = ({
 
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
 
-  const assertCanSwap = connected &&
+  const [swapInput, setSwapInput] = useState<string>("0");
+
+  // Snap the smallest of token balance, remaining mint limit, or swap amt
+  const snapToValidValue = (input: string): number =>
+    assetToken?.userMintLimit
+      ? Math.min(
+          parseFloat(input) || 0,
+          (assetToken?.userMintLimit || 0) - (assetToken?.userMintedAmt || 0),
+          assetToken.userTokenBalance || 0
+        )
+      : Math.min(parseFloat(input) || 0, assetToken.userTokenBalance || 0);
+
+  const swapAmount: number = snapToValidValue(swapInput);
+
+  const assertCanSwap =
+    connected &&
     !!address &&
     !!fluidTokenAddress &&
     !!swap &&
@@ -38,7 +49,26 @@ export const FluidifyForm = ({
     (assetToken.userMintLimit === undefined ||
       swapAmount + (assetToken.userMintedAmt || 0) <= assetToken.userMintLimit);
 
-  const swapAndRedirect = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChangeSwapInput: React.ChangeEventHandler<HTMLInputElement> = (
+    e
+  ) => {
+    const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [whole, dec, _invalid] = numericChars.split(".");
+
+    const unpaddedWhole = parseInt(whole) || 0;
+
+    if (dec === undefined) {
+      return setSwapInput(`${unpaddedWhole}`);
+    }
+
+    return setSwapInput([whole, dec].join("."));
+  };
+
+  const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
+    e
+  ) => {
     e.preventDefault();
 
     if (!assertCanSwap) return;
@@ -54,7 +84,7 @@ export const FluidifyForm = ({
     try {
       await swap(rawTokenAmount.toString(), assetToken.address);
 
-      handleSwap(swapAmount);
+      handleSwap(assetToken, swapAmount);
     } catch (e) {
       // Expect error on fail
       console.log(e);
@@ -80,20 +110,10 @@ export const FluidifyForm = ({
         {/* Swap Field */}
         <input
           className={"fluidify-input"}
-          type={"number"}
           min={"0"}
-          value={swapAmount}
-          onChange={(e) =>
-            setSwapAmount(
-              // Snap the smallest of token balance, remaining mint limit, or swap amt
-              Math.min(
-                parseFloat(e.target.value) || 0,
-                (assetToken?.userMintLimit || 0) -
-                  (assetToken?.userMintedAmt || 0),
-                assetToken.userTokenBalance || 0
-              )
-            )
-          }
+          value={swapInput}
+          onBlur={(e) => setSwapInput(`${snapToValidValue(e.target.value)}`)}
+          onChange={handleChangeSwapInput}
           placeholder=""
           step="any"
         />

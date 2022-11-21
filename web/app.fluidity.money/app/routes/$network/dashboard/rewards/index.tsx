@@ -219,7 +219,7 @@ export default function Rewards() {
     totalYield,
   } = useLoaderData<LoaderData>();
 
-  const { connected, address } = useContext(FluidityFacadeContext);
+  const { connected, address, prizePool } = useContext(FluidityFacadeContext);
 
   const location = useLocation();
 
@@ -241,6 +241,8 @@ export default function Rewards() {
     count: allCount,
     userUnclaimedRewards: 0,
   });
+
+  const [totalPrizePool, setTotalPrizePool] = useState(0);
 
   const { width } = useViewport();
   const mobileView = width <= 500;
@@ -304,6 +306,9 @@ export default function Rewards() {
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
       try {
+        const newPrizePool = (await prizePool?.()) || 0;
+        setTotalPrizePool(newPrizePool);
+
         const { data, error } = await useUserUnclaimedRewards(
           network,
           address ?? ""
@@ -483,7 +488,7 @@ export default function Rewards() {
 
                 <div className="statistics-set">
                   <LabelledValue label={"Total prize pool"}>
-                    {numberToMonetaryString(678120)}
+                    {numberToMonetaryString(totalPrizePool)}
                   </LabelledValue>
                 </div>
 
