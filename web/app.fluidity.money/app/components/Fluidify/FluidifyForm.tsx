@@ -28,8 +28,7 @@ export const FluidifyForm = ({
 
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
 
-  const assertCanSwap = () =>
-    connected &&
+  const assertCanSwap = connected &&
     !!address &&
     !!fluidTokenAddress &&
     !!swap &&
@@ -42,7 +41,7 @@ export const FluidifyForm = ({
   const swapAndRedirect = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!assertCanSwap()) return;
+    if (!assertCanSwap) return;
 
     if (!swap) return;
 
@@ -129,7 +128,7 @@ export const FluidifyForm = ({
         buttontype="text"
         type={"submit"}
         handleClick={() => null}
-        disabled={assertCanSwap()}
+        disabled={!assertCanSwap}
         className={"fluidify-form-submit"}
       >
         {tokenIsFluid
