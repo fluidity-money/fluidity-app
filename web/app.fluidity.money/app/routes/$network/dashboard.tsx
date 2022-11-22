@@ -33,7 +33,6 @@ import {
   Heading,
   ChainSelectorButton,
   BlockchainModal,
-  trimAddressShort,
 } from "@fluidity-money/surfing";
 import { useToolTip } from "~/components";
 import BurgerButton from "~/components/BurgerButton";

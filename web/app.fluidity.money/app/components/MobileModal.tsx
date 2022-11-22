@@ -11,7 +11,6 @@ import {
   Heading,
   BlockchainModal,
   Trophy,
-  trimAddressShort,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
