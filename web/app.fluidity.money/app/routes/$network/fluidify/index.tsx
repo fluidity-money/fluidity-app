@@ -1,9 +1,10 @@
 import type AugmentedToken from "~/types/AugmentedToken";
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import config, { colors } from "~/webapp.config.server";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
@@ -30,6 +31,8 @@ import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
+import SwapCompleteModal from "~/components/SwapCompleteModal";
+import { captureException } from "@sentry/react";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -165,10 +168,15 @@ function ErrorBoundary(error: unknown) {
 
 export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
-  const { address, amountMinted, connected, connecting, disconnect, balance } =
-    useContext(FluidityFacadeContext);
-
-  const navigate = useNavigate();
+  const {
+    address,
+    rawAddress,
+    amountMinted,
+    connected,
+    connecting,
+    disconnect,
+    balance,
+  } = useContext(FluidityFacadeContext);
 
   const { width } = useViewport();
 
@@ -186,7 +194,7 @@ export default function FluidifyToken() {
   const [tokens, setTokens] = useState<AugmentedToken[]>(tokens_);
 
   // Currently selected token
-  const [assetToken, setAssetToken] = useState<AugmentedToken>();
+  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
 
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
@@ -232,6 +240,12 @@ export default function FluidifyToken() {
 
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
+  const [{ amount, txHash }, setSwapData] = useState({
+    amount: 0,
+    txHash: "",
+  });
+  const [swapError, setSwapError] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   let tokensMinted: (number | undefined)[], userTokenBalance: number[];
 
@@ -243,9 +257,14 @@ export default function FluidifyToken() {
           case "ethereum":
             tokensMinted = await Promise.all(
               tokens.map(async (token) => {
-                if (!token.isFluidOf) return undefined;
+                if (token.isFluidOf) return undefined;
+                const fluidToken = tokens.find(
+                  ({ isFluidOf }) => isFluidOf === token.address
+                );
 
-                return amountMinted?.(token.address);
+                if (!fluidToken) return undefined;
+
+                return amountMinted?.(fluidToken.address);
               })
             );
 
@@ -279,10 +298,26 @@ export default function FluidifyToken() {
         }
       })();
     }
-  }, [address]);
+  }, [address, swapping]);
 
-  const handleRedirect = (token: AugmentedToken, amount: number) => {
-    navigate(`out?assetId=${token.symbol}&amount=${amount}`);
+  const handleRedirect = async (
+    transaction: TransactionResponse,
+    amount: number
+  ) => {
+    setSwapData({
+      amount,
+      txHash: transaction.txHash,
+    });
+    setSwapping(true);
+
+    try {
+      const success = await transaction.confirmTx();
+      setSwapError(!success);
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setConfirmed(true);
+    }
   };
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
@@ -316,8 +351,31 @@ export default function FluidifyToken() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      {/* Swapping Modal */}
+      {swapping && assetToken && toToken && (
+        <SwapCompleteModal
+          visible={swapping}
+          confirmed={confirmed}
+          close={() => {
+            setSwapping(false);
+            setSwapData({
+              amount: 0,
+              txHash: "",
+            });
+            setSwapError(false);
+          }}
+          colorMap={colors}
+          assetToken={assetToken}
+          tokenPair={toToken}
+          amount={amount}
+          network={network}
+          txHash={txHash}
+          error={swapError}
+        />
+      )}
+
       {/* Mobile Swap Modal */}
-      {isTablet && openMobModal && (
+      {isTablet && openMobModal && !swapping && (
         <div className="mob-swap-modal">
           <div>
             <LinkButton
@@ -350,7 +408,7 @@ export default function FluidifyToken() {
         </div>
       )}
 
-      {!openMobModal && (
+      {!openMobModal && !swapping && (
         <>
           <header className={"fluidify-heading"}>
             <section>
@@ -376,7 +434,7 @@ export default function FluidifyToken() {
             <aside className={"fluidify-tokens-container"}>
               {connected && address ? (
                 <ConnectedWallet
-                  address={address.toString()}
+                  address={rawAddress ?? ""}
                   callback={() => {
                     setConnectedWalletModalVisibility(
                       !connectedWalletModalVisibility
@@ -400,7 +458,7 @@ export default function FluidifyToken() {
               {/* Connected Wallet Modal */}
               <ConnectedWalletModal
                 visible={connectedWalletModalVisibility}
-                address={address ? address.toString() : ""}
+                address={rawAddress ?? ""}
                 close={() => {
                   setConnectedWalletModalVisibility(false);
                 }}

@@ -59,6 +59,16 @@ main {
   filter: invert(100%);
 }
 
+.cancel-btn:active > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
+.cancel-btn:focus > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
 .fluidify-card img {
   width: 32px;
   height: 32px;
@@ -252,8 +262,7 @@ main {
   left: 50%;
   object-fit: contain;
   transform: translate(-50%, -50%);
-  max-width: 95vw;
-  /* mix-blend-mode: color-dodge; */
+  width: 100%;
 }
 
 .dashed-circle {
@@ -476,6 +485,7 @@ main {
 
 .connect-wallet-btn {
   width: 10em;
+  margin-bottom: 0.5em;
 }
 
 .burger-btn {
