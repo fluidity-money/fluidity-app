@@ -35,10 +35,6 @@ Follow our handy guides to get started on the basics as quickly as possible:
 [use-cases](docs/use-cases/)
 {% endcontent-ref %}
 
-{% content-ref url="broken-reference" %}
-[Broken link](broken-reference)
-{% endcontent-ref %}
-
 ### Fundamentals: Dive a little deeper
 
 Learn the fundamentals of Fluidity to get a deeper understanding of our main features:
