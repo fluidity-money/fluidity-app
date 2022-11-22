@@ -11,7 +11,6 @@ import {
   Heading,
   BlockchainModal,
   Trophy,
-  trimAddressShort,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
@@ -50,7 +49,7 @@ export default function MobileModal({
   const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, address, connecting, disconnect } = useContext(
+  const { connected, address, rawAddress, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
 
@@ -162,7 +161,7 @@ export default function MobileModal({
                 {/* Connect Wallet */}
                 {connected && address ? (
                   <ConnectedWallet
-                    address={trimAddressShort(address.toString())}
+                    address={rawAddress ?? ""}
                     callback={() => {
                       !connectedWalletModalVisibility &&
                         setconnectedWalletModalVisibility(true);
@@ -299,7 +298,7 @@ export default function MobileModal({
           {connectedWalletModalVisibility && (
             <ConnectedWalletModal
               visible={connectedWalletModalVisibility}
-              address={address ? address.toString() : ""}
+              address={rawAddress ?? ""}
               close={() => {
                 setconnectedWalletModalVisibility(false);
               }}
