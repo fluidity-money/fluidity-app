@@ -45,16 +45,6 @@ const fluidityContractAbiString = `[
             "internalType": "uint256",
             "name": "winAmount",
             "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startBlock",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "endBlock",
-            "type": "uint256"
           }
         ],
         "internalType": "struct Winner[]",
@@ -208,8 +198,6 @@ type OracleUpdate struct {
 type RewardArg struct {
 	Winner     ethCommon.Address `abi:"winner"`
 	WinAmount  *big.Int          `abi:"winAmount"`
-	StartBlock *big.Int          `abi:"startBlock"`
-	EndBlock   *big.Int          `abi:"endBlock"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -296,8 +284,6 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		rewardArg := RewardArg{
 			Winner:     winner,
 			WinAmount:  amount,
-			StartBlock: firstBlock,
-			EndBlock:   lastBlock,
 		}
 
 		rewards[i] = rewardArg
