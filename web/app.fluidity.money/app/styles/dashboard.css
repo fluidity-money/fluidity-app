@@ -822,7 +822,7 @@ main > footer > section > a {
 }
 
 .view-reward-modal-container {
-  position: fixed;
+  position: absolute;
   width: 100vw;
   height: 100vh;
   background-color: #000;
@@ -849,7 +849,7 @@ main > footer > section > a {
   position: absolute;
   width: 30%;
   min-width: 350px;
-  top: 50%;
+  top: 400px;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #000;
@@ -885,10 +885,12 @@ main > footer > section > a {
 }
 
 .view-reward-modal-link {
+  cursor: pointer;
   text-decoration: underline;
   color: #fff;
 }
 
 .view-reward-modal-price-desc {
+  text-align: center;
   margin-bottom: 70px;
 }
