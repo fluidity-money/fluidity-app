@@ -171,10 +171,12 @@ const makeContractSwap = async (
       }
       // `.wait()` these here to handle errors
       // call ERC20in
-      return await (await toContract.erc20In(amount)).wait();
+
+      // Sends tx through
+      return await toContract.erc20In(amount);
     } else if (fromIsFluidOf) {
       // fCoin -> Coin
-      return await (await fromContract.erc20Out(amount)).wait();
+      return await toContract.erc20Out(amount);
     } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
   } catch (error) {
     return await handleContractErrors(error as ErrorType, signer.provider);

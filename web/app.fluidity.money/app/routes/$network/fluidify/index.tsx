@@ -3,7 +3,7 @@ import type AugmentedToken from "~/types/AugmentedToken";
 import config, { colors } from "~/webapp.config.server";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
@@ -15,6 +15,7 @@ import {
 } from "~/util/chainUtils/ethereum/transaction";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import { ContractTransaction } from "@ethersproject/contracts";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
@@ -30,6 +31,8 @@ import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
+import SwapCompleteModal from "~/components/SwapCompleteModal";
+import { captureException } from "@sentry/react";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -168,8 +171,6 @@ export default function FluidifyToken() {
   const { address, amountMinted, connected, connecting, disconnect, balance } =
     useContext(FluidityFacadeContext);
 
-  const navigate = useNavigate();
-
   const { width } = useViewport();
 
   const isTablet = width < 1250;
@@ -186,7 +187,7 @@ export default function FluidifyToken() {
   const [tokens, setTokens] = useState<AugmentedToken[]>(tokens_);
 
   // Currently selected token
-  const [assetToken, setAssetToken] = useState<AugmentedToken>();
+  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
 
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
@@ -232,6 +233,9 @@ export default function FluidifyToken() {
 
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
+  const [swapAmount, setSwapAmount] = useState(0);
+  const [swapTxHash, setSwapTxHash] = useState("");
+  const [confirmed, setConfirmed] = useState(false)
 
   let tokensMinted: (number | undefined)[], userTokenBalance: number[];
 
@@ -279,10 +283,20 @@ export default function FluidifyToken() {
         }
       })();
     }
-  }, [address]);
+  }, [address, swapping]);
 
-  const handleRedirect = (token: AugmentedToken, amount: number) => {
-    navigate(`out?assetId=${token.symbol}&amount=${amount}`);
+  const handleRedirect = async (transaction: ContractTransaction, amount: number) => {
+    setSwapTxHash(transaction.hash);
+    setSwapping(true);
+
+    try {
+      await transaction.wait();
+      setSwapAmount(amount);
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setConfirmed(true);
+    }
   };
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
@@ -316,8 +330,23 @@ export default function FluidifyToken() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      {/* Swapping Modal */}
+      {swapping && assetToken && toToken && (
+        <SwapCompleteModal
+          visible={swapping}
+          confirmed={confirmed}
+          close={() => {setSwapping(false); setSwapAmount(0); setConfirmed(false);}}
+          colorMap={colors}
+          assetToken={assetToken}
+          tokenPair={toToken}
+          amount={swapAmount}
+          network={network}
+          txHash={swapTxHash}
+        />
+      )}
+
       {/* Mobile Swap Modal */}
-      {isTablet && openMobModal && (
+      {isTablet && openMobModal && !swapping && (
         <div className="mob-swap-modal">
           <div>
             <LinkButton
@@ -350,7 +379,7 @@ export default function FluidifyToken() {
         </div>
       )}
 
-      {!openMobModal && (
+      {!openMobModal && !swapping && (
         <>
           <header className={"fluidify-heading"}>
             <section>
