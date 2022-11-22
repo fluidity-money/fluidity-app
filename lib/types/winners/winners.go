@@ -7,6 +7,7 @@ package winners
 import (
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -24,6 +25,7 @@ type Winner struct {
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
 	AwardedTime              time.Time                 `json:"awarded_time"`
 	RewardType				 RewardType                `json:"reward_type"`
+	Application              applications.Application  `json:"application"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }
