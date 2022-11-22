@@ -1,7 +1,6 @@
 
 DOCKER_IMAGE: microservice-arbitrum-worker-sender
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-sender
-ENV_FLU_ETHEREUM_GAS_LIMIT: 8000000
 SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/arbitrum/http_url
 ENV_FLU_ETHEREUM_WS_URL: wss://staging-backend.arbitrum.fluidity.money/updates
 SECRET_FLU_DISCORD_WEBHOOK: /fluidity/win_notif/discord/webhook
