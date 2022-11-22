@@ -7,6 +7,7 @@ package util
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,5 +45,39 @@ func TestRandomString(t *testing.T) {
 			stringLength,
 			randomString,
 		),
+	)
+}
+
+func TestRandomIntegers(t *testing.T) {
+	var (
+		amount = 50
+		min    = uint32(1)
+		max    = uint32(min + uint32(amount) - 1)
+	)
+
+	res := RandomIntegers(amount, min, max)
+
+	assert.Len(
+		t,
+		res,
+		amount,
+		"RandomIntegers returned the wrong number of ints!",
+	)
+
+	sort.Slice(res, func(a, b int) bool {
+		return res[a] < res[b]
+	})
+
+	expectedRes := make([]uint32, amount)
+
+	for i := range expectedRes {
+		expectedRes[i] = min + uint32(i)
+	}
+
+	assert.EqualValues(
+		t,
+		expectedRes,
+		res,
+		"Random results unexpected!",
 	)
 }

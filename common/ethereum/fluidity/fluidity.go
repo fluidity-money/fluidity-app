@@ -43,17 +43,7 @@ const fluidityContractAbiString = `[
           },
           {
             "internalType": "uint256",
-            "name": "win_amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "first_block",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "last_block",
+            "name": "winAmount",
             "type": "uint256"
           }
         ],
@@ -206,8 +196,8 @@ type OracleUpdate struct {
 
 // the Reward struct from solidity, to be passed to batchReward
 type RewardArg struct {
-	Winner    ethCommon.Address `json:"from"`
-	WinAmount *big.Int          `json:"amount"`
+	Winner     ethCommon.Address `abi:"winner"`
+	WinAmount  *big.Int          `abi:"winAmount"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -292,8 +282,8 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		}
 
 		rewardArg := RewardArg{
-			Winner:    winner,
-			WinAmount: amount,
+			Winner:     winner,
+			WinAmount:  amount,
 		}
 
 		rewards[i] = rewardArg

@@ -6,6 +6,7 @@ export interface IFluidityFacade {
   amountMinted: (tokenAddr: string) => Promise<number | undefined>;
   balance: (tokenAddr: string) => Promise<number>;
   disconnect: () => Promise<void>;
+  prizePool: () => Promise<number>;
 
   connected: boolean;
   connecting: boolean;

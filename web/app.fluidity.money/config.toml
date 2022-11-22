@@ -159,17 +159,17 @@ decimals = 6
 [[liquidity_providers.ethereum.providers]]
 name= "uniswap"
 img= "/images/providers/Uniswap.svg"
-link= "https://www.uniswap.org/"
+link= "https://app.uniswap.org/#/pool/359573"
 
 [[liquidity_providers.ethereum.providers]]
 name= "sushiswap"
 img= "/images/providers/Sushiswap.svg"
-link= "https://www.sushi.com/"
+link= "https://www.sushi.com/earn/eth:0xc35466daaa5e61977ec4219d682eeb7beb431726"
 
 [[liquidity_providers.ethereum.providers]]
 name= "dodo"
 img= "/images/providers/DODO.png"
-link= "https://www.dodoex.io/"
+link= "https://app.dodoex.io/dev/pool/list/0x6abd7403878f3a010170a383b4f20285668fd979?network=mainnet"
 
 # sol providers
 [liquidity_providers.solana]

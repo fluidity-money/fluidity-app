@@ -98,6 +98,9 @@ function ErrorBoundary() {
 export default function Network() {
   const { network, tokens, rpcUrls } = useLoaderData<LoaderData>();
 
+  // Hardcode solana to redirect to ethereum
+  if (network === "solana") throw new Error("Solana not supported");
+
   return (
     <Provider
       network={network}

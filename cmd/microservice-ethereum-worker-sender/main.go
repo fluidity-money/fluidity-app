@@ -13,9 +13,12 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -44,6 +47,13 @@ const (
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
 )
+
+// details needed to update the reward type database
+type win = struct{
+	rewardTransactionHash typesEth.Hash
+	sendTransactionHash   typesEth.Hash
+	winnerAddress         typesEth.Address
+}
 
 func main() {
 	var (
@@ -126,6 +136,36 @@ func main() {
 			})
 		}
 
+		var (
+			token   string
+			network network.BlockchainNetwork
+		)
+
+		if len(announcement) > 0 {
+			// should always happen
+			token = announcement[0].Token.TokenShortName
+			network = announcement[0].Network
+		}
+
+		discord.Notify(
+			discord.SeverityNotice,
+			"About to reward %d users on %s %s!",
+			len(announcement),
+			network,
+			token,
+		)
+
+		// get send transaction hash and winner address from announcement
+		wins := make([]win, len(announcement))
+
+		for i, reward := range announcement {
+			var (
+				winnerAddress 		= reward.Winner
+				sendTransactionHash = reward.TransactionHash
+			)
+			wins[i] = win{winnerAddress: winnerAddress, sendTransactionHash: sendTransactionHash}
+		}
+
 		rewardTransactionArguments := callRewardArguments{
 			containerAnnouncement: announcement,
 			transactionOptions:    transactionOptions,
@@ -151,12 +191,23 @@ func main() {
 
 			for i, transaction := range transactions {
 				hashes[i] = transaction.Hash().Hex()
+
+				// populate with reward transaction hashes
+				wins[i].rewardTransactionHash = typesEth.Hash(transaction.Hash().Hex())
 			}
 
 			log.App(func(k *log.Log) {
 				k.Message = "Successfully called the legacy reward function with hashes"
 				k.Payload = hashes
 			})
+
+			discord.Notify(
+				discord.SeverityNotice,
+				"Just called the legacy reward function for %d wins on %s %s!",
+				len(announcement),
+				network,
+				token,
+			)
 
 			return
 		}
@@ -174,9 +225,34 @@ func main() {
 			})
 		}
 
+		// populate all with the same hash
+		for i := range wins {
+			wins[i].rewardTransactionHash = typesEth.HashFromString(transactionHash.Hash().Hex())
+		}
+
 		log.App(func(k *log.Log) {
 			k.Message = "Successfully called the reward function with hash"
 			k.Payload = transactionHash.Hash().Hex()
 		})
+
+		discord.Notify(
+			discord.SeverityNotice,
+			"Successfully called the reward function for %d winners with hash %s on %s %s!",
+			len(announcement),
+			transactionHash.Hash().Hex(),
+			network,
+			token,
+		)
+
+		// update database so winners can be tracked by reward transaction hash
+		for _, win := range wins {
+			var (
+				rewardTransactionHash = win.rewardTransactionHash
+				sendTransactionHash   = win.sendTransactionHash
+				winnerAddress 		  = win.winnerAddress
+			)
+
+			winners.AddRewardHashToPendingRewardType(rewardTransactionHash, sendTransactionHash, winnerAddress)
+		}
 	})
 }

@@ -23,7 +23,7 @@ import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
 import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
-import { PipedTransaction } from "drivers/types";
+import { PipedTransaction, NotificationType } from "drivers/types";
 import { trimAddress, networkMapper } from "~/util";
 import {
   DashboardIcon,
@@ -123,7 +123,7 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  const { connected, address, disconnect, connecting } = useContext(
+  const { connected, address, disconnect, connecting, balance } = useContext(
     FluidityFacadeContext
   );
 
@@ -187,8 +187,8 @@ export default function Dashboard() {
   }, [closeMobileModal]);
 
   const navigationMap = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
+    { home: { name: "dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "rewards", icon: <Trophy /> } },
     // {assets: {name: "Assets", icon: <AssetsIcon />}},
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
@@ -277,6 +277,10 @@ export default function Dashboard() {
           fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
         const tokenColour =
           fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.logo : "";
+        const transactionUrl =
+          network === `ethereum`
+            ? "https://etherscan.io/tx/" + log.transactionHash
+            : "https://explorer.solana.com/tx/" + log.transactionHash;
 
         toolTip.open(
           fToken.at(0)?.colour || `#000`,
@@ -284,27 +288,35 @@ export default function Dashboard() {
             tokenLogoSrc={fToken.at(0)?.logo}
             boldTitle={log.amount + ` ` + log.token}
             details={
-              log.type === "rewardDB"
-                ? `reward for sending`
+              log.type === NotificationType.REWARD_DATABASE
+                ? log.rewardType === `send`
+                  ? `reward for sending`
+                  : `reward for receiving`
                 : `received from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
-            linkLabelOnClickCallback={() => {
-              setDetailedRewardObject({
-                visible: true,
-                token: log.token,
-                img: imgUrl as unknown as string,
-                colour: tokenColour as unknown as string,
-                winAmount: log.amount,
-                explorerUri: "",
-                balance: "150", //hard coded for now
-                forSending: false, // fetched from server - hauradb - not sorted yet from db
-              });
+            linkLabelOnClickCallback={async () => {
+              log.type === NotificationType.REWARD_DATABASE
+                ? setDetailedRewardObject({
+                    visible: true,
+                    token: log.token,
+                    img: imgUrl as unknown as string,
+                    colour: tokenColour as unknown as string,
+                    winAmount: log.amount,
+                    explorerUri: transactionUrl,
+                    balance: String(
+                      await balance?.(
+                        fToken.at(0)?.address as unknown as string
+                      )
+                    ),
+                    forSending: log.rewardType === `send` ? true : false,
+                  })
+                : window.open(transactionUrl, `_`);
             }}
           />
         );
       });
-    }, 30000);
+    }, 8000);
   }, [address]);
 
   const handleScroll = () => {
@@ -346,8 +358,10 @@ export default function Dashboard() {
         </a>
 
         <br />
+        <br />
 
         <ChainSelectorButton
+          className="selector-button"
           chain={chainNameMap[network as "ethereum" | "solana"]}
           onClick={() => setChainModalVisibility(true)}
         />
@@ -457,7 +471,11 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Heading as="h6">{appName}</Heading>}
+            {!isMobile && (
+              <Heading as="h6" color={"gray"}>
+                {appName}
+              </Heading>
+            )}
           </div>
 
           {/* Navigation Buttons */}
@@ -500,6 +518,7 @@ export default function Dashboard() {
 
             {/* Prize Money */}
             <GeneralButton
+              className="trophy-button"
               version={"transparent"}
               buttontype="icon after"
               size={"small"}
@@ -591,42 +610,42 @@ export default function Dashboard() {
             <Text>Fluidity Money</Text>
 
             {/* Terms */}
-            <Link to={"/"}>
+            <a href={"/"}>
               <Text>Terms</Text>
-            </Link>
+            </a>
 
             {/* Privacy Policy */}
-            <Link to={"/"}>
+            <a href={"/"}>
               <Text>Privacy policy</Text>
-            </Link>
+            </a>
 
             {/* Roadmap */}
-            <Link to={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
+            <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
-            </Link>
+            </a>
           </section>
 
           {/* Socials */}
           <section>
             {/* Twitter */}
-            <Link to={"https://twitter.com/fluiditymoney"}>
+            <a href={"https://twitter.com/fluiditymoney"}>
               <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
-            </Link>
+            </a>
 
             {/* Discord */}
-            <Link to={"https://discord.com/invite/CNvpJk4HpC"}>
+            <a href={"https://discord.com/invite/CNvpJk4HpC"}>
               <img src={"/images/socials/discord.svg"} alt={"Discord"} />
-            </Link>
+            </a>
 
             {/* Telegram */}
-            <Link to={"https://t.me/fluiditymoney"}>
+            <a href={"https://t.me/fluiditymoney"}>
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
-            </Link>
+            </a>
 
             {/* LinkedIn */}
-            <Link to={"https://www.linkedin.com/company/fluidity-money"}>
+            <a href={"https://www.linkedin.com/company/fluidity-money"}>
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
-            </Link>
+            </a>
           </section>
         </footer>
       </main>

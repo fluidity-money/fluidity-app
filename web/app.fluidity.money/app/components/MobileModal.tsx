@@ -106,10 +106,10 @@ export default function MobileModal({
       {isOpen && (
         <motion.div
           key="modal"
-          initial={{ opacity: 0, y: "75%" }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "tween" }}
-          exit={{ opacity: 0, y: "75%" }}
+          initial={{ opacity: 0, x: "75%" }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, type: "tween" }}
+          exit={{ opacity: 0, x: "75%" }}
           className={`mobile-modal-container  ${
             isOpen === true ? "show-modal" : "hide-modal"
           }`}
@@ -137,6 +137,7 @@ export default function MobileModal({
                 version={"transparent"}
                 buttontype="icon after"
                 size={"small"}
+                className="trophy-button"
                 handleClick={() => {
                   setTimeout(() => {
                     setIsOpen(false);
@@ -201,13 +202,13 @@ export default function MobileModal({
                       obj: { name: string; icon: JSX.Element },
                       index: number
                     ) => {
-                      const key = Object.keys(obj)[0];
+                      const key = Object.values(obj)[0];
                       const { name, icon } = obj;
                       const active = index === activeIndex;
 
                       return (
                         <li
-                          key={key}
+                          key={key as unknown as string}
                           onClick={() => {
                             //delay to show page change and allow loading
                             setTimeout(() => {
@@ -223,7 +224,9 @@ export default function MobileModal({
                           ) : (
                             <div />
                           )}
-                          <Link to={key}>
+                          <Link
+                            to={index === 0 ? "./" : (key as unknown as string)}
+                          >
                             <Text prominent={active}>
                               {icon} {name}
                             </Text>
@@ -241,11 +244,14 @@ export default function MobileModal({
                 version={"secondary"}
                 buttontype="icon after"
                 size={"small"}
-                handleClick={() =>
-                  unclaimedFluid
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
+                  unclaimedRewards
                     ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards")
-                }
+                    : navigate("./rewards");
+                }}
                 icon={<img src="/images/icons/arrowRightWhite.svg" />}
                 className="unclaimed-button"
               >
@@ -262,7 +268,14 @@ export default function MobileModal({
                 version={"primary"}
                 buttontype="text"
                 size={"medium"}
-                handleClick={() => navigate("../fluidify")}
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
+                  unclaimedRewards
+                    ? navigate("./rewards/unclaimed")
+                    : navigate("./rewards");
+                }}
                 className="fluidify-money-button"
               >
                 Fluidify Money
