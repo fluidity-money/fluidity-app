@@ -70,6 +70,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			sourcePayouts               = announcement.SourcePayouts
 			emission                    = announcement.Emissions
 			tokenDetails                = announcement.TokenDetails
+			application                 = announcement.Application
 		)
 
 		if fromAddress == ethereumNullAddress {
@@ -137,6 +138,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			ToAddress:       toAddress,
 			ToWinAmount:     toWinAmount,
 			TokenDetails:    tokenDetails,
+			Application:     application,
 		}
 
 		winAnnouncements = append(winAnnouncements, winAnnouncement)
