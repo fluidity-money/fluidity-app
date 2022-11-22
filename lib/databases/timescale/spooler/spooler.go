@@ -178,6 +178,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			AND network = $1
 			AND token_short_name = $2
 		RETURNING
+			network,
 			token_short_name,
 			token_decimals,
 			transaction_hash,
@@ -218,6 +219,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 		)
 
 		err := rows.Scan(
+			&winner.Network,
 			&winner.TokenDetails.TokenShortName,
 			&winner.TokenDetails.TokenDecimals,
 			&winner.TransactionHash,
