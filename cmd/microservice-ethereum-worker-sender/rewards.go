@@ -131,7 +131,6 @@ func callLegacyRewardFunction(arguments callRewardArguments) ([]ethTypes.Transac
 			context.Background(),
 			client,
 			transactionOptions,
-			800_000,
 		)
 
 		if err != nil {
