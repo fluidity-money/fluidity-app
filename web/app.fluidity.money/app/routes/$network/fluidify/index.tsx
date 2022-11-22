@@ -434,7 +434,7 @@ export default function FluidifyToken() {
             <aside className={"fluidify-tokens-container"}>
               {connected && address ? (
                 <ConnectedWallet
-                  address={address.toString()}
+                  address={rawAddress ?? ""}
                   callback={() => {
                     setConnectedWalletModalVisibility(
                       !connectedWalletModalVisibility

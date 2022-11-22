@@ -181,7 +181,7 @@ const NetworkPage = () => {
               {/* Connected Wallet */}
               {address && (
                 <ConnectedWallet
-                  address={address.toString()}
+                  address={rawAddress ?? ""}
                   callback={() => {
                     setConnectedWalletModalVisibility(true);
                   }}

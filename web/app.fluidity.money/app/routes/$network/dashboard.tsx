@@ -415,7 +415,7 @@ export default function Dashboard() {
         {network === `solana` ? (
           connected && address ? (
             <ConnectedWallet
-              address={trimAddressShort(address.toString())}
+              address={rawAddress ?? ""}
               callback={() => {
                 setConnectedWalletModalVisibility(
                   !connectedWalletModalVisibility
@@ -438,7 +438,7 @@ export default function Dashboard() {
           )
         ) : connected && address ? (
           <ConnectedWallet
-            address={trimAddressShort(address.toString())}
+            address={rawAddress ?? ""}
             callback={() => {
               !connectedWalletModalVisibility &&
                 setConnectedWalletModalVisibility(true);
