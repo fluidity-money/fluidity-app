@@ -22,11 +22,16 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
   console.log("connected", connected, "addr:", publicKey?.toString());
 
   const swap = async (amount: string, tokenAddr: string) => {
-    (async () => {
-      fetch(`/solana/query/solanaSwap?amount=${amount}&tokenAddr=${tokenAddr}`);
-    })();
+    const { status } = await fetch(
+      `/solana/query/solanaSwap?amount=${amount}&tokenAddr=${tokenAddr}`
+    );
 
-    return;
+    return status === 200
+      ? {
+          confirmTx: () => Promise.resolve(true),
+          txHash: "",
+        }
+      : undefined;
   };
 
   return (

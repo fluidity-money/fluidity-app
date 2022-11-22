@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector } from "@web3-react/types";
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import { useMemo } from "react";
@@ -113,7 +114,7 @@ const EthereumFacade = ({
   const swap = async (
     amount: string,
     contractAddress: string
-  ): Promise<void> => {
+  ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -153,7 +154,14 @@ const EthereumFacade = ({
       isFluidOf: !fromFluid,
     };
 
-    return makeContractSwap(signer, from, to, amount);
+    const ethContractRes = await makeContractSwap(signer, from, to, amount);
+
+    return ethContractRes
+      ? {
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
+      : undefined;
   };
 
   const getPrizePool = async (): Promise<number> => {
