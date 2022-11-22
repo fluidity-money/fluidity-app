@@ -8,6 +8,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -140,6 +141,30 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		}
 
 		winAnnouncements = append(winAnnouncements, winAnnouncement)
+	}
+
+	for _, announcement := range winAnnouncements {
+		var (
+			fromAddress = announcement.FromAddress
+			fromAmount  = announcement.FromWinAmount.Int
+			toAddress   = announcement.ToAddress
+			toAmount    = announcement.ToWinAmount.Int
+			network     = announcement.Network
+			token       = announcement.TokenDetails.TokenShortName
+			hash        = announcement.TransactionHash
+		)
+
+		discord.Notify(
+			discord.SeverityInformational,
+			"Winner on %s %s with hash %s - %s won %s, %s won %s",
+			network,
+			token,
+			hash,
+			fromAddress.String(),
+			fromAmount.String(),
+			toAddress.String(),
+			toAmount.String(),
+		)
 	}
 
 	if len(winAnnouncements) > 0 {

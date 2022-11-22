@@ -12,6 +12,9 @@ import {
   getAddressExplorerLink,
   getTxExplorerLink,
 } from "~/util";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import { motion } from "framer-motion";
 import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
@@ -51,6 +54,19 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
   try {
+    const mainnetId = 0;
+    const infuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
+
+    const provider = new JsonRpcProvider(infuraRpc);
+
+    const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
+
+    const totalPrizePool = await getTotalPrizePool(
+      provider,
+      rewardPoolAddr,
+      RewardAbi
+    );
+
     const {
       transactions,
       count,
@@ -164,6 +180,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       totalTransactions: mergedTransactions,
       totalCount: count,
       totalRewards,
+      totalPrizePool,
       networkFee,
       gasFee,
     });
@@ -183,6 +200,7 @@ type LoaderData = {
   totalTransactions: Transaction[];
   totalCount: number;
   totalRewards: number;
+  totalPrizePool: number;
   page: number;
   network: Chain;
   fluidPairs: number;
@@ -220,9 +238,10 @@ export default function Rewards() {
     totalTransactions,
     totalCount,
     totalRewards,
+    totalPrizePool,
   } = useLoaderData<LoaderData>();
 
-  const { connected, address, prizePool } = useContext(FluidityFacadeContext);
+  const { connected, address } = useContext(FluidityFacadeContext);
 
   const location = useLocation();
 
@@ -243,8 +262,6 @@ export default function Rewards() {
   });
 
   const [userUnclaimedRewards, setUserUnclaimedRewards] = useState(0);
-
-  const [totalPrizePool, setTotalPrizePool] = useState(0);
 
   const { width } = useViewport();
   const mobileView = width <= 500;
@@ -299,11 +316,11 @@ export default function Rewards() {
           name: "GLOBAL",
         },
       ];
-  
+
   const unixNow = Date.now();
 
-  const [activeRewardFilterIndex, setActiveRewardFilterIndex] = useState(0)
-  
+  const [activeRewardFilterIndex, setActiveRewardFilterIndex] = useState(0);
+
   const rewardFilters = [
     {
       name: "All time",
@@ -311,18 +328,21 @@ export default function Rewards() {
     },
     {
       name: "Last week",
-      filter: ({timestamp}: Transaction) => timestamp > unixNow - 7 * 24 * 60 * 60 * 1000,
+      filter: ({ timestamp }: Transaction) =>
+        timestamp > unixNow - 7 * 24 * 60 * 60 * 1000,
     },
     {
       name: "Last month",
-      filter: ({timestamp}: Transaction) => timestamp > unixNow - 30 * 24 * 60 * 60 * 1000,
+      filter: ({ timestamp }: Transaction) =>
+        timestamp > unixNow - 30 * 24 * 60 * 60 * 1000,
     },
     {
       name: "This year",
-      filter: ({timestamp}: Transaction) => timestamp > unixNow - 365 * 24 * 60 * 60 * 1000,
+      filter: ({ timestamp }: Transaction) =>
+        timestamp > unixNow - 365 * 24 * 60 * 60 * 1000,
     },
-  ]
-  
+  ];
+
   const hasRewarders = rewarders.length > 0;
 
   const bestPerformingRewarders = rewarders.sort(
@@ -340,9 +360,6 @@ export default function Rewards() {
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
       try {
-        const newPrizePool = (await prizePool?.()) || 0;
-        setTotalPrizePool(newPrizePool);
-
         const { data, error } = await useUserUnclaimedRewards(
           network,
           address ?? ""
@@ -386,12 +403,8 @@ export default function Rewards() {
   // Filter Transactions via rewards filter / tx type filters
   useEffect(() => {
     const tableFilteredTransactions = totalTransactions
-      .filter(
-        rewardFilters[activeRewardFilterIndex].filter
-      )
-      .filter(
-        txTableFilters[activeTableFilterIndex].filter
-      );
+      .filter(rewardFilters[activeRewardFilterIndex].filter)
+      .filter(txTableFilters[activeTableFilterIndex].filter);
     const filteredRewards = tableFilteredTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
@@ -525,9 +538,7 @@ export default function Rewards() {
               <Text
                 size="xl"
                 prominent={activeRewardFilterIndex === i}
-                className={
-                  activeRewardFilterIndex === i ? "active-filter" : ""
-                }
+                className={activeRewardFilterIndex === i ? "active-filter" : ""}
               >
                 {filter.name}
               </Text>
@@ -552,9 +563,7 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <ProviderIcon
-                    provider={bestPerformingRewarders[0].name}
-                  />
+                  <ProviderIcon provider={bestPerformingRewarders[0].name} />
                   {bestPerformingRewarders[0].name}
                 </div>
               </LabelledValue>
@@ -567,9 +576,7 @@ export default function Rewards() {
             </div>
 
             <div className="statistics-set">
-              <LabelledValue label={"Fluid Pairs"}>
-                {fluidPairs}
-              </LabelledValue>
+              <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
             </div>
           </div>
         </section>

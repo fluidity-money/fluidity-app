@@ -13,8 +13,6 @@ func TestBatchReward(t *testing.T) {
 		{
 			Winner:     common.HexToAddress("0x6221A9c005F6e47EB398fD867784CacfDcFFF4E7"),
 			WinAmount:  big.NewInt(100),
-			StartBlock: big.NewInt(1),
-			EndBlock:   big.NewInt(10),
 		},
 	}
 
