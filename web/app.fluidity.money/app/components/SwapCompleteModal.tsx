@@ -55,6 +55,11 @@ const SwapCompleteModal = ({
     }
   }, [confirmed]);
 
+  const variants = {
+    visible: { opacity: 1, transition: { duration: 1.5 } },
+    hidden: { opacity: 0 },
+  };
+
   return (
     <Modal visible={visible}>
       <div className="swap-complete-container">
@@ -69,12 +74,22 @@ const SwapCompleteModal = ({
             Close
           </LinkButton>
         </div>
-        <div className="swap-complete-modal-top">
+        <motion.div
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          className="swap-complete-modal-top"
+        >
           <BloomEffect
             type={"static"}
             color={colorMap[tokenPair.symbol] ?? "#fff"}
           />
-          <img
+          <motion.img
+            variants={variants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
             src={tokenPair?.logo}
             style={{
               aspectRatio: "1 / 1",
@@ -86,13 +101,13 @@ const SwapCompleteModal = ({
             }}
           />
 
-          {playVideo && (
+          {
             <AnimatePresence>
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1.5 }}
-                exit={{ opacity: 0 }}
+                variants={variants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
                 className="video-container"
               >
                 <Video
@@ -107,18 +122,17 @@ const SwapCompleteModal = ({
                 />
               </motion.div>
             </AnimatePresence>
-          )}
-
-          {!playVideo && (
-            <img
-              className="complete-fluidify-circle"
-              src="/images/fluidify/fluidify-hotspot.png"
-            />
-          )}
-        </div>
+          }
+        </motion.div>
 
         {!playVideo && (
-          <div className="swap-complete-modal-content">
+          <motion.div
+            variants={variants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="swap-complete-modal-content"
+          >
             {/* Transaction confirmed */}
             {confirmed && !error && (
               <>
@@ -134,7 +148,7 @@ const SwapCompleteModal = ({
                 <Link to="../../dashboard/home">
                   <GeneralButton
                     buttontype="text"
-                    size="large"
+                    size="medium"
                     version="primary"
                     handleClick={() => {
                       return;
@@ -162,7 +176,7 @@ const SwapCompleteModal = ({
                 <Link to="../../dashboard/home">
                   <GeneralButton
                     buttontype="text"
-                    size="large"
+                    size="medium"
                     version="primary"
                     handleClick={() => {
                       return;
@@ -194,7 +208,7 @@ const SwapCompleteModal = ({
                 <Link to="../../dashboard/home">
                   <GeneralButton
                     buttontype="text"
-                    size="large"
+                    size="medium"
                     version="primary"
                     handleClick={() => {
                       return;
@@ -227,7 +241,7 @@ const SwapCompleteModal = ({
                 VIEW TRANSACTION
               </LinkButton>
             </a>
-          </div>
+          </motion.div>
         )}
       </div>
     </Modal>

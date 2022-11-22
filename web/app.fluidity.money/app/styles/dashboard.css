@@ -78,6 +78,7 @@ main > footer > section {
 
 #flu-logo > a > img {
   width: 5.5em;
+  height: 2.5em;
   margin-bottom: 1em;
   cursor: pointer;
 }
@@ -101,6 +102,7 @@ main > footer > section {
 }
 
 .top-navbar-left > a > img {
+  height: 2.5em;
   width: 5.5em;
   cursor: pointer;
 }

@@ -924,7 +924,7 @@ main {
 
 .complete-fluidify-circle {
   width: 80vw;
-  max-width: 500px;
+  max-width: 450px;
   mix-blend-mode: luminosity;
 }
 
@@ -940,7 +940,7 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5em;
+  margin-top: -3em;
 }
 
 .swap-complete-modal-content > * {
