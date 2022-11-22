@@ -263,8 +263,6 @@ export default function Rewards() {
 
   const [userUnclaimedRewards, setUserUnclaimedRewards] = useState(0);
 
-  const [totalPrizePool, setTotalPrizePool] = useState(0);
-
   const { width } = useViewport();
   const mobileView = width <= 500;
 
@@ -565,9 +563,7 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <ProviderIcon
-                    provider={bestPerformingRewarders[0].name}
-                  />
+                  <ProviderIcon provider={bestPerformingRewarders[0].name} />
                   {bestPerformingRewarders[0].name}
                 </div>
               </LabelledValue>
@@ -580,9 +576,7 @@ export default function Rewards() {
             </div>
 
             <div className="statistics-set">
-              <LabelledValue label={"Fluid Pairs"}>
-                {fluidPairs}
-              </LabelledValue>
+              <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
             </div>
           </div>
         </section>
