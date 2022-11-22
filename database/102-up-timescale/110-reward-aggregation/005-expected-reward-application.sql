@@ -1,18 +1,20 @@
 -- migrate:up
 
--- aggregate winnings per token to create expected reward
+DROP MATERIALIZED VIEW IF EXISTS expected_rewards;
 
+-- add application to view
 CREATE MATERIALIZED VIEW expected_rewards
 WITH (timescaledb.continuous) AS
 SELECT 
     network,
     token_short_name,
+    application,
     COUNT(*),
     SUM(winning_amount / (10 ^ token_decimals)) / COUNT(*) AS average_reward,
     MAX(winning_amount / (10 ^ token_decimals)) as highest_reward,
     time_bucket(INTERVAL '1 month', awarded_time) AS awarded_month
 FROM winners
-GROUP BY awarded_month, network, token_short_name
+GROUP BY awarded_month, network, token_short_name, application
 WITH NO DATA;
 
 SELECT add_continuous_aggregate_policy('expected_rewards',
@@ -22,4 +24,5 @@ SELECT add_continuous_aggregate_policy('expected_rewards',
 
 -- migrate:down
 
-DROP MATERIALIZED VIEW IF EXISTS expected_rewards;
+DROP MATERIALIZED VIEW expected_rewards;
+
