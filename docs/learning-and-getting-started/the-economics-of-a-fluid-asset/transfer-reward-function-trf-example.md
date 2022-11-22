@@ -33,22 +33,20 @@ If you pay a higher gas fee, you will have a higher expected outcome of winning 
 
 ### Low transaction fee chain and operating protocols on top:
 
-What if you were to use a chain that had low transaction fees?&#x20;
+What if you were to use a chain that had low transaction fees?
 
 Every event where you send a transaction and there is a difference between senders and receivers in the transaction run all counts in theory as a transaction fee. Let's use Solana as an example.
 
-Setting similar parameters as the previous example with some modifications:&#x20;
+Setting similar parameters as the previous example with some modifications:
 
-* $1B in TVL
-* 3.5% APY
-* 50K Daily TXs
-* Solana Gas Fee: $0.00025.\
-
+* $50M in the reward pool
+* 80K daily fluid TXs
+* Solana Gas Fee: $0.00025.\\
 * **Saber $1000 Swap**
-  * Solana Gas Fee: $0.00025 + 0.04% Saber fee = $0.4 fee.
+  * Solana Gas Fee: $0.00025 + 0.3% Saber fee = $3 fee.
 * **Solanart $100 NFT Purchase**
   * Solana Gas Fee: $0.00025 + 3% Solanart fee = $3 fee.
 
 If you were to do a transaction on top of these protocols will get a similar transaction probability reward metric as above.
 
-So in essence, by doing a Saber trade or a Solanart, a user has the **same probability of being rewarded millions through Fluid Assets as they do on high gas chains.**
+So in essence, by doing a Saber trade or purchasing an NFT on Solanart, a user has the **same probability of being rewarded millions through Fluid Assets as they do on high gas chains.**

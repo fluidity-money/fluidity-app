@@ -1,7 +1,7 @@
 ---
 description: >-
-  How does Fluidity protect it self from sybil attacks? How is the probability
-  of payouts and the associated sizes calculated?
+  How does Fluidity protect itself from sybil attacks? How is the probability of
+  payouts and the associated sizes calculated?
 ---
 
 # 🗃 The Economics of a Fluid Asset
@@ -36,17 +36,16 @@ Fluidity’s payout mechanism is determined by the Transfer Reward Function (TRF
 
 To be able to calculate how often and large the rewards are, we need a few pieces of information. \*\*\*\* Including:
 
-1. The Total Value Locked (TVL)
-2. The yield we are earning on the TVL (APY)
-3. The annual number of txs as moving average (ATX)
-4. The gas fee or fee paid to do a transaction (g)
-5. The number of reward tiers (m)
+1. The size of the reward pool (**Ξ**)
+2. The annual number of fluid txs as moving average (ATX)
+3. The gas fee or fee paid to do a transaction (g)
+4. The number of reward tiers (m)
 
 {% hint style="info" %}
 This information is required to be able to ensure that we can protect the protocol from attackers and that the protocol is not overtime paying out more in rewards than it is able to generate in yield\*\*.\*\*
 {% endhint %}
 
-We can input this information in the TRF to generate the associated payouts. We recompute the payouts every block to account for changes in TVL, APY, ATX. g. The size and frequency of payouts change every block based on how these variables change.
+We can input this information in the TRF to generate the associated payouts. We recompute the payouts every block to account for changes in **Ξ**, ATX and g. The size and frequency of payouts change every block based on how these variables change.
 
 **In the next section, we will explore an example.**
 
