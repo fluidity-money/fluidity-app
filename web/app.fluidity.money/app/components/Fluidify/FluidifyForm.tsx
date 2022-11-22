@@ -1,3 +1,5 @@
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
+
 import { useContext, useState } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
@@ -8,7 +10,7 @@ import {
 import AugmentedToken from "~/types/AugmentedToken";
 
 interface IFluidifyFormProps {
-  handleSwap: (token: AugmentedToken, amount: number) => void;
+  handleSwap: (receipt: TransactionResponse, amount: number) => void;
   assetToken: AugmentedToken;
   toToken: AugmentedToken;
   swapping: boolean;
@@ -82,9 +84,11 @@ export const FluidifyForm = ({
     )}`;
 
     try {
-      await swap(rawTokenAmount.toString(), assetToken.address);
+      const receipt = await swap(rawTokenAmount.toString(), assetToken.address);
 
-      handleSwap(assetToken, swapAmount);
+      if (receipt) {
+        handleSwap(receipt, swapAmount);
+      }
     } catch (e) {
       // Expect error on fail
       console.log(e);
