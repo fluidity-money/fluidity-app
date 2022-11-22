@@ -76,7 +76,7 @@ main > footer > section {
 }
 
 #flu-logo > a > img {
-  width: 5em;
+  width: 5.5em;
   margin-bottom: 1em;
   cursor: pointer;
 }
@@ -100,7 +100,7 @@ main > footer > section {
 }
 
 .top-navbar-left > a > img {
-  width: 5em;
+  width: 5.5em;
   cursor: pointer;
 }
 
@@ -150,6 +150,14 @@ main > footer > section {
 .navbar-v2 ul {
   display: block;
   padding: 0;
+}
+
+.selector-button {
+  padding: 1px 2px;
+}
+
+.trophy-button {
+  font-size: 1em;
 }
 
 main > footer > section > a {
