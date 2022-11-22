@@ -16,6 +16,7 @@ import (
 func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpooledRewards, exists bool) worker.EthereumSpooledRewards {
 	var (
 		blockNumber = reward.BlockNumber
+		network     = reward.Network
 		token       = reward.TokenDetails
 		amount      = reward.WinAmount
 		winner      = reward.Winner
@@ -23,6 +24,7 @@ func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpo
 	)
 
 	if !exists {
+		spooledReward.Network = network
 		spooledReward.Token = token
 		spooledReward.Winner = winner
 		spooledReward.TransactionHash = hash
