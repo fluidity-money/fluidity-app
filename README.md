@@ -1,6 +1,7 @@
 ---
 description: Money designed to be moved
-cover: https://fluidity.money/gitbook-content/background-2.png
+cover: >-
+  https://landing-cdn.s3.ap-southeast-2.amazonaws.com/gitbook-content/BANNER_FLUIDITY+(4).png
 coverY: 0
 ---
 
