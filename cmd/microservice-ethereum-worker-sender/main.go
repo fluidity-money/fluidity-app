@@ -203,7 +203,7 @@ func main() {
 
 			discord.Notify(
 				discord.SeverityNotice,
-				"Just called the legacy reward function on %s %s!",
+				"Just called the legacy reward function for %d wins on %s %s!",
 				len(announcement),
 				network,
 				token,
@@ -237,7 +237,8 @@ func main() {
 
 		discord.Notify(
 			discord.SeverityNotice,
-			"Successfully called the reward function with hash %s on %s %s!",
+			"Successfully called the reward function for %d winners with hash %s on %s %s!",
+			len(announcement),
 			transactionHash.Hash().Hex(),
 			network,
 			token,
