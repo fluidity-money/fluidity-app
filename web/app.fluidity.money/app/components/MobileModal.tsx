@@ -50,7 +50,7 @@ export default function MobileModal({
   const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, address, connecting, disconnect } = useContext(
+  const { connected, address, rawAddress, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
 
@@ -299,7 +299,7 @@ export default function MobileModal({
           {connectedWalletModalVisibility && (
             <ConnectedWalletModal
               visible={connectedWalletModalVisibility}
-              address={address ? address.toString() : ""}
+              address={rawAddress ?? ""}
               close={() => {
                 setconnectedWalletModalVisibility(false);
               }}

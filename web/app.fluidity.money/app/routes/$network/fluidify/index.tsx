@@ -168,8 +168,15 @@ function ErrorBoundary(error: unknown) {
 
 export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
-  const { address, amountMinted, connected, connecting, disconnect, balance } =
-    useContext(FluidityFacadeContext);
+  const {
+    address,
+    rawAddress,
+    amountMinted,
+    connected,
+    connecting,
+    disconnect,
+    balance,
+  } = useContext(FluidityFacadeContext);
 
   const { width } = useViewport();
 
@@ -233,10 +240,10 @@ export default function FluidifyToken() {
 
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
-  const [{amount, txHash}, setSwapData] = useState({
+  const [{ amount, txHash }, setSwapData] = useState({
     amount: 0,
-    txHash: ""
-  })
+    txHash: "",
+  });
   const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -251,8 +258,10 @@ export default function FluidifyToken() {
             tokensMinted = await Promise.all(
               tokens.map(async (token) => {
                 if (token.isFluidOf) return undefined;
-                const fluidToken = tokens.find(({isFluidOf}) => isFluidOf === token.address);
-            
+                const fluidToken = tokens.find(
+                  ({ isFluidOf }) => isFluidOf === token.address
+                );
+
                 if (!fluidToken) return undefined;
 
                 return amountMinted?.(fluidToken.address);
@@ -297,8 +306,8 @@ export default function FluidifyToken() {
   ) => {
     setSwapData({
       amount,
-      txHash: transaction.txHash
-    })
+      txHash: transaction.txHash,
+    });
     setSwapping(true);
 
     try {
@@ -449,7 +458,7 @@ export default function FluidifyToken() {
               {/* Connected Wallet Modal */}
               <ConnectedWalletModal
                 visible={connectedWalletModalVisibility}
-                address={address ? address.toString() : ""}
+                address={rawAddress ?? ""}
                 close={() => {
                   setConnectedWalletModalVisibility(false);
                 }}
