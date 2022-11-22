@@ -185,7 +185,8 @@ const EthereumFacade = ({
         prizePool: getPrizePool,
         disconnect: deactivate,
         useConnectorType,
-        address: account,
+        rawAddress: account ?? "",
+        address: account?.toLowerCase() ?? "",
         connected: isActive,
       }}
     >

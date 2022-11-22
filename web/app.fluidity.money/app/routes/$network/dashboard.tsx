@@ -123,9 +123,8 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  const { connected, address, disconnect, connecting, balance } = useContext(
-    FluidityFacadeContext
-  );
+  const { connected, address, rawAddress, disconnect, connecting, balance } =
+    useContext(FluidityFacadeContext);
 
   const url = useLocation();
   const urlPaths = url.pathname.split("/");
@@ -539,7 +538,7 @@ export default function Dashboard() {
         </nav>
         <ConnectedWalletModal
           visible={connectedWalletModalVisibility}
-          address={address ? address.toString() : ""}
+          address={rawAddress ?? ""}
           close={() => {
             setConnectedWalletModalVisibility(false);
           }}

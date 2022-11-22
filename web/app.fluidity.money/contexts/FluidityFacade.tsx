@@ -16,7 +16,11 @@ export interface IFluidityFacade {
   connecting: boolean;
   useConnectorType: (use: string) => void;
 
+  // Normalised address - For filtering, etc
   address: string;
+
+  // Raw address - For UI
+  rawAddress: string;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({
