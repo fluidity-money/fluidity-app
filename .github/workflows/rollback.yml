@@ -77,7 +77,8 @@ jobs:
           command: |
 
             echo ""
-            echo "Commit hash: " $(git rev-parse HEAD)
+            echo "CommitHash:" 
+            git rev-parse HEAD
             echo ""
 
             flu build-docker \
@@ -95,7 +96,8 @@ jobs:
           command: |
             
             echo ""
-            echo "Commit hash: " $(git rev-parse HEAD)
+            echo "CommitHash:" 
+            git rev-parse HEAD
             echo ""
             
             flu deploy-service \
