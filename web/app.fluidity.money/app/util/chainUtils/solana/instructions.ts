@@ -282,6 +282,8 @@ const internalSwap = async (amount: string, fromTokenAddr: string) => {
       blockhash,
       lastValidBlockHeight,
     });
+
+    return true;
   } catch (e: unknown) {
     const sendError = e as SendTransactionError;
     if (sendError.message?.search("0x1") !== -1)
