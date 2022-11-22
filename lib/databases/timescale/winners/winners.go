@@ -177,9 +177,7 @@ func GetAndRemovePendingRewardType(transactionHash ethereum.Hash, address ethere
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
-		`SELECT 
-			is_sender 
-		DELETE FROM %s
+		`DELETE FROM %s
 		WHERE 
 			transaction_hash = $1 
 			AND winner_address = $2
