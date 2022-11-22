@@ -28,6 +28,7 @@ interface ISwapCompleteModalProps {
   amount: number;
   network: string;
   txHash: string;
+  error: boolean;
 }
 
 const SwapCompleteModal = ({
@@ -40,6 +41,7 @@ const SwapCompleteModal = ({
   tokenPair,
   network,
   txHash,
+  error,
 }: ISwapCompleteModalProps) => {
   const { balance } = useContext(FluidityFacadeContext);
 
@@ -51,7 +53,7 @@ const SwapCompleteModal = ({
     if (network === "ethereum") {
       balance?.(assetToken.address).then(setWalletBalance);
     }
-  }, []);
+  }, [confirmed]);
 
   return (
     <Modal visible={visible}>
@@ -118,7 +120,7 @@ const SwapCompleteModal = ({
         {!playVideo && (
           <div className="swap-complete-modal-content">
             {/* Transaction confirmed */}
-            {confirmed && amount > 0 && (
+            {confirmed && !error && (
               <>
                 <Heading as="h5">
                   {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
@@ -152,7 +154,7 @@ const SwapCompleteModal = ({
             )}
 
             {/* Transaction errored */}
-            {confirmed && amount === 0 && (
+            {confirmed && error && (
               <>
                 <Heading as="h5">
                   Something went wrong during the swap..

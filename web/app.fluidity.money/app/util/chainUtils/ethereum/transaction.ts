@@ -178,7 +178,7 @@ const makeContractSwap = async (
       return await toContract.erc20In(amount);
     } else if (fromIsFluidOf) {
       // fCoin -> Coin
-      return await toContract.erc20Out(amount);
+      return await fromContract.erc20Out(amount);
     } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);

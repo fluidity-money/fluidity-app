@@ -158,7 +158,7 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-          confirmTx: ethContractRes.wait,
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
           txHash: ethContractRes.hash,
         }
       : undefined;

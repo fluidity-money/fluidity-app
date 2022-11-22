@@ -1,7 +1,7 @@
 import ethInstructions from "./ethereum/instructions";
 
 export type TransactionResponse = {
-  confirmTx: () => Promise<unknown>;
+  confirmTx: () => Promise<boolean>;
   txHash: string;
 };
 

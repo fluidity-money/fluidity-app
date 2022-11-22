@@ -233,8 +233,11 @@ export default function FluidifyToken() {
 
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
-  const [swapAmount, setSwapAmount] = useState(0);
-  const [swapTxHash, setSwapTxHash] = useState("");
+  const [{amount, txHash}, setSwapData] = useState({
+    amount: 0,
+    txHash: ""
+  })
+  const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
   let tokensMinted: (number | undefined)[], userTokenBalance: number[];
@@ -247,9 +250,12 @@ export default function FluidifyToken() {
           case "ethereum":
             tokensMinted = await Promise.all(
               tokens.map(async (token) => {
-                if (!token.isFluidOf) return undefined;
+                if (token.isFluidOf) return undefined;
+                const fluidToken = tokens.find(({isFluidOf}) => isFluidOf === token.address);
+            
+                if (!fluidToken) return undefined;
 
-                return amountMinted?.(token.address);
+                return amountMinted?.(fluidToken.address);
               })
             );
 
@@ -289,12 +295,15 @@ export default function FluidifyToken() {
     transaction: TransactionResponse,
     amount: number
   ) => {
-    setSwapTxHash(transaction.txHash);
+    setSwapData({
+      amount,
+      txHash: transaction.txHash
+    })
     setSwapping(true);
 
     try {
-      await transaction.confirmTx();
-      setSwapAmount(amount);
+      const success = await transaction.confirmTx();
+      setSwapError(!success);
     } catch (e) {
       captureException(e);
     } finally {
@@ -340,15 +349,19 @@ export default function FluidifyToken() {
           confirmed={confirmed}
           close={() => {
             setSwapping(false);
-            setSwapAmount(0);
-            setConfirmed(false);
+            setSwapData({
+              amount: 0,
+              txHash: "",
+            });
+            setSwapError(false);
           }}
           colorMap={colors}
           assetToken={assetToken}
           tokenPair={toToken}
-          amount={swapAmount}
+          amount={amount}
           network={network}
-          txHash={swapTxHash}
+          txHash={txHash}
+          error={swapError}
         />
       )}
 
