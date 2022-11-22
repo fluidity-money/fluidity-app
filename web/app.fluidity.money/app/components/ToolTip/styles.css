@@ -43,7 +43,6 @@
   width: 35px;
   height: 35px;
   margin-right: 7px;
-  margin-top: -4px;
 }
 
 .tool_cancel_btn {
@@ -55,4 +54,40 @@
 .toolkit_duration_bar {
   height: 2px;
   background-color: white;
+}
+
+@media only screen and (max-width: 620px) {
+  .tooltip {
+    width: 100vw;
+    margin-top: 10px;
+  }
+
+  .tooltip_container {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+  }
+
+  .tool_content_link {
+    font-size: 14px;
+    margin-left: 30px;
+    margin-right: 0;
+  }
+
+  .tooltip_content {
+    display: flex;
+    width: 100vw;
+    justify-content: space-between;
+    margin-top: -10px;
+  }
+
+  .tooltip_content_details {
+    font-size: 10px;
+    margin-top: -10px;
+  }
+
+  .tool_cancel_btn {
+    margin-right: 28px;
+    font-size: 13px;
+  }
 }
