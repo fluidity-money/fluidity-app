@@ -75,6 +75,12 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
+
+            echo ""
+            echo "CommitHash:" 
+            git rev-parse HEAD
+            echo ""
+
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
@@ -88,6 +94,12 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
+            
+            echo ""
+            echo "CommitHash:" 
+            git rev-parse HEAD
+            echo ""
+            
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \

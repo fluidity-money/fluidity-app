@@ -45,9 +45,11 @@ type (
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
 		BlockNumber     *misc.BigInt               `json:"block_number"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
+		Network         network.BlockchainNetwork  `json:"network"`
 	}
 
 	EthereumSpooledRewards struct {
+		Network         network.BlockchainNetwork  `json:"network"`
 		Token           token_details.TokenDetails `json:"token_details"`
 		Winner          ethereum.Address           `json:"winner"`
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`

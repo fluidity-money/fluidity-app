@@ -83,7 +83,7 @@ func GetGasPriceTipHardhat(ctx context.Context, client *ethclient.Client) (*big.
 
 // UpdateGasAmounts by suggesting the gas tip cap then setting the gas
 // limit to a fixed amount
-func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *ethAbiBind.TransactOpts, gasLimit uint64) error {
+func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *ethAbiBind.TransactOpts) error {
 	gasTipCap, err := client.SuggestGasTipCap(ctx)
 
 	if err != nil {
@@ -94,8 +94,6 @@ func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *et
 	}
 
 	options.GasTipCap = gasTipCap
-
-	options.GasLimit = gasLimit
 
 	return nil
 }

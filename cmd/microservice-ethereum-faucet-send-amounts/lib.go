@@ -43,7 +43,6 @@ func callTransferFunction(ethClient *ethclient.Client, tokenAddress, ethAddress 
 			context.Background(),
 			ethClient,
 			transferOpts,
-			800_000,
 		)
 
 		if err != nil {

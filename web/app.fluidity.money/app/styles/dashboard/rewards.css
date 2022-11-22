@@ -285,3 +285,16 @@
     padding-right: 1em;
   }
 }
+
+.reward-ceiling {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-bottom: 2rem;
+}
+
+.filter-row {
+  display: flex;
+  gap: 2em;
+}
