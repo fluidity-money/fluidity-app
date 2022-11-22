@@ -1,4 +1,5 @@
 import type AugmentedToken from "~/types/AugmentedToken";
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import config, { colors } from "~/webapp.config.server";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
@@ -15,7 +16,6 @@ import {
 } from "~/util/chainUtils/ethereum/transaction";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { ContractTransaction } from "@ethersproject/contracts";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
@@ -235,7 +235,7 @@ export default function FluidifyToken() {
   const [swapping, setSwapping] = useState(false);
   const [swapAmount, setSwapAmount] = useState(0);
   const [swapTxHash, setSwapTxHash] = useState("");
-  const [confirmed, setConfirmed] = useState(false)
+  const [confirmed, setConfirmed] = useState(false);
 
   let tokensMinted: (number | undefined)[], userTokenBalance: number[];
 
@@ -285,12 +285,15 @@ export default function FluidifyToken() {
     }
   }, [address, swapping]);
 
-  const handleRedirect = async (transaction: ContractTransaction, amount: number) => {
-    setSwapTxHash(transaction.hash);
+  const handleRedirect = async (
+    transaction: TransactionResponse,
+    amount: number
+  ) => {
+    setSwapTxHash(transaction.txHash);
     setSwapping(true);
 
     try {
-      await transaction.wait();
+      await transaction.confirmTx();
       setSwapAmount(amount);
     } catch (e) {
       captureException(e);
@@ -335,7 +338,11 @@ export default function FluidifyToken() {
         <SwapCompleteModal
           visible={swapping}
           confirmed={confirmed}
-          close={() => {setSwapping(false); setSwapAmount(0); setConfirmed(false);}}
+          close={() => {
+            setSwapping(false);
+            setSwapAmount(0);
+            setConfirmed(false);
+          }}
           colorMap={colors}
           assetToken={assetToken}
           tokenPair={toToken}

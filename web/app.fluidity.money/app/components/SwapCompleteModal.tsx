@@ -44,7 +44,7 @@ const SwapCompleteModal = ({
   const { balance } = useContext(FluidityFacadeContext);
 
   const [walletBalance, setWalletBalance] = useState<number | undefined>();
-  
+
   const [playVideo, setPlayVideo] = useState(true);
 
   useEffect(() => {
@@ -55,121 +55,92 @@ const SwapCompleteModal = ({
 
   return (
     <Modal visible={visible}>
-    <div className="swap-complete-container">
-      <div>
-        <LinkButton
-          handleClick={() => close()}
-          size="large"
-          type="internal"
-          left={true}
-          className="cancel-btn"
-        >
-          Close
-        </LinkButton>
-      </div>
-      <div className="swap-complete-modal-top">
-        <BloomEffect
-          type={"static"}
-          color={colorMap[tokenPair.symbol] ?? "#fff"}
-        />
-        <img
-          src={tokenPair?.logo}
-          style={{
-            aspectRatio: "1 / 1",
-            height: "20%",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        />
-
-        {playVideo && (
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.5 }}
-              exit={{ opacity: 0 }}
-              className="video-container"
-            >
-              <Video
-                className="swapping-video"
-                src={"/videos/LoadingOther.webm"}
-                loop={false}
-                type="none"
-                onEnded={() => {
-                  setPlayVideo(false);
-                }}
-                playbackRate={1.5}
-              />
-            </motion.div>
-          </AnimatePresence>
-        )}
-
-        {!playVideo && (
-          <img
-            className="complete-fluidify-circle"
-            src="/images/fluidify/fluidify-hotspot.png"
+      <div className="swap-complete-container">
+        <div>
+          <LinkButton
+            handleClick={() => close()}
+            size="large"
+            type="internal"
+            left={true}
+            className="cancel-btn"
+          >
+            Close
+          </LinkButton>
+        </div>
+        <div className="swap-complete-modal-top">
+          <BloomEffect
+            type={"static"}
+            color={colorMap[tokenPair.symbol] ?? "#fff"}
           />
-        )}
-      </div>
+          <img
+            src={tokenPair?.logo}
+            style={{
+              aspectRatio: "1 / 1",
+              height: "20%",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          />
 
-      {!playVideo && (
-        <div className="swap-complete-modal-content">
-          {/* Transaction confirmed */}
-          {confirmed && amount > 0 && (
-            <>
-              <Heading as="h5">
-                {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
-                created and added to your wallet.
-              </Heading>
-              <Text>
-                {walletBalance} {assetToken.symbol} (
-                {numberToMonetaryString(walletBalance || 0)}) remaining in
-                wallet..
-              </Text>
-              <Link to="../../dashboard/home">
-                <GeneralButton
-                  buttontype="text"
-                  size="large"
-                  version="primary"
-                  handleClick={() => {
-                    return;
-                  }}
-                >
-                  GO TO DASHBOARD
-                </GeneralButton>
-              </Link>
-              <LinkButton
-                type="internal"
-                size="medium"
-                handleClick={() => close()}
+          {playVideo && (
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5 }}
+                exit={{ opacity: 0 }}
+                className="video-container"
               >
-                FLUIDIFY MORE ASSETS
-              </LinkButton>
-            </>
+                <Video
+                  className="swapping-video"
+                  src={"/videos/LoadingOther.webm"}
+                  loop={false}
+                  type="none"
+                  onEnded={() => {
+                    setPlayVideo(false);
+                  }}
+                  playbackRate={1.5}
+                />
+              </motion.div>
+            </AnimatePresence>
           )}
 
-          {/* Transaction errored */}
-          {confirmed && amount === 0 && (
-            <>
-              <Heading as="h5">
-                Something went wrong during the swap..
-              </Heading>
-              <Link to="../../dashboard/home">
-                <GeneralButton
-                  buttontype="text"
-                  size="large"
-                  version="primary"
-                  handleClick={() => {
-                    return;
-                  }}
-                >
-                  GO TO DASHBOARD
-                </GeneralButton>
-              </Link>
-              <Link to="..">
+          {!playVideo && (
+            <img
+              className="complete-fluidify-circle"
+              src="/images/fluidify/fluidify-hotspot.png"
+            />
+          )}
+        </div>
+
+        {!playVideo && (
+          <div className="swap-complete-modal-content">
+            {/* Transaction confirmed */}
+            {confirmed && amount > 0 && (
+              <>
+                <Heading as="h5">
+                  {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
+                  created and added to your wallet.
+                </Heading>
+                <Text>
+                  {walletBalance} {assetToken.symbol} (
+                  {numberToMonetaryString(walletBalance || 0)}) remaining in
+                  wallet..
+                </Text>
+                <Link to="../../dashboard/home">
+                  <GeneralButton
+                    buttontype="text"
+                    size="large"
+                    version="primary"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    GO TO DASHBOARD
+                  </GeneralButton>
+                </Link>
                 <LinkButton
                   type="internal"
                   size="medium"
@@ -177,57 +148,86 @@ const SwapCompleteModal = ({
                 >
                   FLUIDIFY MORE ASSETS
                 </LinkButton>
-              </Link>
-            </>
-          )}
+              </>
+            )}
 
-          {/* Unconfirmed transaction */}
-          {!confirmed && (
-            <>
-              <Heading as="h5">
-                {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
-                swapping and awaiting confirmation...
-              </Heading>
-              <Text>We&apos;ll notify you when it&apos;s done!</Text>
-              <Link to="../../dashboard/home">
-                <GeneralButton
-                  buttontype="text"
-                  size="large"
-                  version="primary"
-                  handleClick={() => {
-                    return;
-                  }}
-                >
-                  GO TO DASHBOARD
-                </GeneralButton>
-              </Link>
-              <Link to="..">
-                <LinkButton
-                  type="internal"
-                  size="medium"
-                  handleClick={() => {
-                    return;
-                  }}
-                >
-                  FLUIDIFY MORE ASSETS
-                </LinkButton>
-              </Link>
-            </>
-          )}
-          <a href={getTxExplorerLink(network as Chain, txHash)}>
-            <LinkButton
-              type="internal"
-              size="medium"
-              handleClick={() => {
-                return;
-              }}
-            >
-              VIEW TRANSACTION
-            </LinkButton>
-          </a>
-        </div>
-      )}
-    </div>
+            {/* Transaction errored */}
+            {confirmed && amount === 0 && (
+              <>
+                <Heading as="h5">
+                  Something went wrong during the swap..
+                </Heading>
+                <Link to="../../dashboard/home">
+                  <GeneralButton
+                    buttontype="text"
+                    size="large"
+                    version="primary"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    GO TO DASHBOARD
+                  </GeneralButton>
+                </Link>
+                <Link to="..">
+                  <LinkButton
+                    type="internal"
+                    size="medium"
+                    handleClick={() => close()}
+                  >
+                    FLUIDIFY MORE ASSETS
+                  </LinkButton>
+                </Link>
+              </>
+            )}
+
+            {/* Unconfirmed transaction */}
+            {!confirmed && (
+              <>
+                <Heading as="h5">
+                  {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
+                  swapping and awaiting confirmation...
+                </Heading>
+                <Text>We&apos;ll notify you when it&apos;s done!</Text>
+                <Link to="../../dashboard/home">
+                  <GeneralButton
+                    buttontype="text"
+                    size="large"
+                    version="primary"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    GO TO DASHBOARD
+                  </GeneralButton>
+                </Link>
+                <Link to="..">
+                  <LinkButton
+                    type="internal"
+                    size="medium"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    FLUIDIFY MORE ASSETS
+                  </LinkButton>
+                </Link>
+              </>
+            )}
+            <a href={getTxExplorerLink(network as Chain, txHash)}>
+              <LinkButton
+                type="internal"
+                size="medium"
+                handleClick={() => {
+                  return;
+                }}
+              >
+                VIEW TRANSACTION
+              </LinkButton>
+            </a>
+          </div>
+        )}
+      </div>
     </Modal>
   );
 };
