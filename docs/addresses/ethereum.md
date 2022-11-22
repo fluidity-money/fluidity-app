@@ -14,9 +14,11 @@
 
 ### Extra
 
-| Text                  | Value                                      |
-| --------------------- | ------------------------------------------ |
-| fUSDT pool on Uniswap | 0x79c3878b18B94d91AD571255b51e011d5277CB39 |
+| Text                       | Value                                      |
+| -------------------------- | ------------------------------------------ |
+| fUSDC/USDC pool on Uniswap | 0x2e1634714a7fb4c7f6f6bfc472f0b2df98b01766 |
+| fUSDC/USDC pool on Sushi   | 0xc35466daAa5e61977ec4219d682Eeb7bEb431726 |
+| fUSDC/USDC pool on Dodo    | 0x6ABd7403878F3A010170a383b4f20285668fd979 |
 
 ### fUSDT
 

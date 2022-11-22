@@ -4,7 +4,7 @@ The following ABIs can be compiled in the repository (using `make`.)
 
 ### Token
 
-The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-out (`swapOut`) features. Tokens include fUSDT, FUSDC and fDAI.
+The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-out (`swapOut`) features. Tokens include fUSDT, fUSDC and fDAI.
 
 ```
 {
