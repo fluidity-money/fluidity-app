@@ -171,6 +171,16 @@ name= "dodo"
 img= "/images/providers/DODO.png"
 link= "https://app.dodoex.io/dev/pool/list/0x6abd7403878f3a010170a383b4f20285668fd979?network=mainnet"
 
+[[liquidity_providers.ethereum.providers]]
+name= "balancer"
+img= "/images/providers/balancer.svg"
+link= "https://app.balancer.fi/#/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393"
+
+[[liquidity_providers.ethereum.providers]]
+name= "1inch"
+img= "/images/providers/1inch.svg"
+link= "https://etherscan.io/address/0xe32e2cccd6bcaa371fcccd4170bb6e1b0137c67a"
+
 # sol providers
 [liquidity_providers.solana]
 

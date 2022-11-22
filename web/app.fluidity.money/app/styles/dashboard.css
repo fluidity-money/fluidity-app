@@ -50,6 +50,7 @@ main > nav {
 main > nav > div {
   display: flex;
   gap: 1em;
+  align-items: center;
 }
 
 main > nav a {

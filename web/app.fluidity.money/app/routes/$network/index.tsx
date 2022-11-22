@@ -54,7 +54,9 @@ type LoaderData = {
 const NetworkPage = () => {
   const { network } = useLoaderData<LoaderData>();
 
-  const { connected, address, disconnect } = useContext(FluidityFacadeContext);
+  const { connected, address, rawAddress, disconnect } = useContext(
+    FluidityFacadeContext
+  );
   const navigate = useNavigate();
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(
@@ -179,7 +181,7 @@ const NetworkPage = () => {
               {/* Connected Wallet */}
               {address && (
                 <ConnectedWallet
-                  address={address.toString()}
+                  address={rawAddress ?? ""}
                   callback={() => {
                     setConnectedWalletModalVisibility(true);
                   }}
@@ -190,7 +192,7 @@ const NetworkPage = () => {
               <Modal visible={connectedWalletModalVisibility}>
                 <ConnectedWalletModal
                   visible={connectedWalletModalVisibility}
-                  address={address ? address.toString() : ""}
+                  address={rawAddress ?? ""}
                   close={() => {
                     setConnectedWalletModalVisibility(false);
                   }}
