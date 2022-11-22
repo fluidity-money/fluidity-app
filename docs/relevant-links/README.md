@@ -4,10 +4,6 @@
 Website and whitepapers
 {% endembed %}
 
-{% embed url="https://faucet.fluidity.money" %}
-Testnet faucet
-{% endembed %}
-
 {% embed url="https://discord.gg/CNvpJk4HpC" %}
 
 {% embed url="https://blog.fluidity.money/" %}
