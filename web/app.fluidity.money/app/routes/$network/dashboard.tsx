@@ -33,7 +33,6 @@ import {
   Heading,
   ChainSelectorButton,
   BlockchainModal,
-  trimAddressShort,
 } from "@fluidity-money/surfing";
 import { useToolTip } from "~/components";
 import BurgerButton from "~/components/BurgerButton";
@@ -415,7 +414,7 @@ export default function Dashboard() {
         {network === `solana` ? (
           connected && address ? (
             <ConnectedWallet
-              address={trimAddressShort(address.toString())}
+              address={rawAddress ?? ""}
               callback={() => {
                 setConnectedWalletModalVisibility(
                   !connectedWalletModalVisibility
@@ -438,7 +437,7 @@ export default function Dashboard() {
           )
         ) : connected && address ? (
           <ConnectedWallet
-            address={trimAddressShort(address.toString())}
+            address={rawAddress ?? ""}
             callback={() => {
               !connectedWalletModalVisibility &&
                 setConnectedWalletModalVisibility(true);

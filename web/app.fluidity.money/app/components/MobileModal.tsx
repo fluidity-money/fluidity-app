@@ -11,7 +11,6 @@ import {
   Heading,
   BlockchainModal,
   Trophy,
-  trimAddressShort,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
@@ -162,7 +161,7 @@ export default function MobileModal({
                 {/* Connect Wallet */}
                 {connected && address ? (
                   <ConnectedWallet
-                    address={trimAddressShort(address.toString())}
+                    address={rawAddress ?? ""}
                     callback={() => {
                       !connectedWalletModalVisibility &&
                         setconnectedWalletModalVisibility(true);
