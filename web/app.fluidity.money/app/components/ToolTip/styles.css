@@ -39,6 +39,10 @@
   text-decoration-color: white;
 }
 
+.tooltip_content_details {
+  font-size: 14px;
+}
+
 .tool_icon {
   width: 35px;
   height: 35px;
@@ -62,6 +66,10 @@
     margin-top: 10px;
   }
 
+  .tooltip_title {
+    font-size: 3vw;
+  }
+
   .tooltip_container {
     position: fixed;
     top: 0px;
@@ -69,8 +77,8 @@
   }
 
   .tool_content_link {
-    font-size: 14px;
-    margin-left: 30px;
+    font-size: 2vw;
+    margin-left: 10px;
     margin-right: 0;
   }
 
@@ -78,16 +86,19 @@
     display: flex;
     width: 100vw;
     justify-content: space-between;
-    margin-top: -10px;
   }
 
   .tooltip_content_details {
-    font-size: 10px;
-    margin-top: -10px;
+    font-size: 2vw;
   }
 
   .tool_cancel_btn {
     margin-right: 28px;
     font-size: 13px;
+  }
+
+  .tool_icon {
+    width: 24px;
+    height: 24px;
   }
 }

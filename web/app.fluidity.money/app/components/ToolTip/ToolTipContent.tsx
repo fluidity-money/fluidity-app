@@ -21,12 +21,14 @@ export const ToolTipContent = ({
   return (
     <div>
       <img className="tool_icon" src={tokenLogoSrc} />
-      <Text prominent size="xl" className="tooltip_title">
-        {boldTitle}{" "}
-      </Text>
-      <Text size="lg" className="tooltip_content_details">
-        {details}
-      </Text>
+      <span className="tooltip_title">
+        <Text prominent size="xl">
+          {boldTitle}{" "}
+        </Text>
+      </span>
+      <span className="tooltip_content_details">
+        <Text size="lg">{details}</Text>
+      </span>
       <a onClick={linkLabelOnClickCallback} className="tool_content_link">
         <Text prominent size="lg">
           {linkLabel}
