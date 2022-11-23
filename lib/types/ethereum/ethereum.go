@@ -27,7 +27,7 @@ type (
 
 // MarshalJSON and UnmarshalJSON implement the json interface,
 // allowing us to pass this over rabbit and redis
-func (addr *Address) MarshalJSON() ([]byte, error) {
+func (addr Address) MarshalJSON() ([]byte, error) {
 	return json.Marshal(addr.address)
 }
 func (addr *Address) UnmarshalJSON(data []byte) error {
@@ -52,7 +52,7 @@ func (addr *Address) Scan(value interface{}) error {
 	}
 }
 
-func (hash *Hash) MarshalJSON() ([]byte, error) {
+func (hash Hash) MarshalJSON() ([]byte, error) {
 	return json.Marshal(hash.hash)
 }
 func (addr *Hash) UnmarshalJSON(data []byte) error {
@@ -167,7 +167,7 @@ type (
 func HashFromString(str string) Hash {
 	hash := strings.ToLower(str)
 
-	return Hash{ hash: hash }
+	return Hash{ hash }
 }
 
 // AddressFromString, taking the string and making it lowercase then
@@ -175,7 +175,7 @@ func HashFromString(str string) Hash {
 func AddressFromString(str string) Address {
 	address := strings.ToLower(str)
 
-	return Address{ address: address }
+	return Address{ address }
 }
 
 func (hash Hash) String() string {
