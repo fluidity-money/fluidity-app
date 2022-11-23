@@ -313,29 +313,39 @@ export default function Home() {
   );
 
   const { width } = useViewport();
-  const tableBreakpoint = 850;
+  const isTablet = width < 850;
+  const isMobile = width < 500;
+  const isSmallMobile = width < 375;
 
-  const txTableColumns =
-    width > 0 && width < tableBreakpoint
-      ? [{ name: "ACTIVITY" }, { name: "REWARD" }]
-      : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "ACCOUNT",
-          },
-          {
-            name: "TIME",
-            alignRight: true,
-          },
-        ];
+  const txTableColumns = isSmallMobile
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
+    : isMobile
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+    : isTablet
+    ? [
+        { name: "ACTIVITY" },
+        { name: "VALUE" },
+        { name: "REWARD" },
+        { name: "ACCOUNT" },
+      ]
+    : [
+        {
+          name: "ACTIVITY",
+        },
+        {
+          name: "VALUE",
+        },
+        {
+          name: "REWARD",
+        },
+        {
+          name: "ACCOUNT",
+        },
+        {
+          name: "TIME",
+          alignRight: true,
+        },
+      ];
 
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
     connected ? 1 : 0
@@ -425,26 +435,26 @@ export default function Home() {
           </td>
 
           {/* Value */}
-          {width > tableBreakpoint && (
+          <td>
+            <Text>
+              {value.toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+              })}
+            </Text>
+          </td>
+
+          {/* Reward */}
+          {!isMobile && (
             <td>
-              <Text>
-                {value.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                })}
+              <Text prominent={true}>
+                {reward ? numberToMonetaryString(reward) : "-"}
               </Text>
             </td>
           )}
 
-          {/* Reward */}
-          <td>
-            <Text prominent={true}>
-              {reward ? numberToMonetaryString(reward) : "-"}
-            </Text>
-          </td>
-
           {/* Account */}
-          {width > tableBreakpoint && (
+          {!isSmallMobile && (
             <td>
               <a
                 className="table-address"
@@ -460,7 +470,7 @@ export default function Home() {
           )}
 
           {/* Time */}
-          {width > tableBreakpoint && (
+          {!isTablet && (
             <td>
               <Text>{transactionTimeLabel(timestamp)}</Text>
             </td>
@@ -481,7 +491,10 @@ export default function Home() {
                 <Text>
                   {activeTableFilterIndex ? "Your" : "Total"} transactions
                 </Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 300 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
                   {count}
                 </Display>
                 <AnchorButton>
@@ -492,7 +505,10 @@ export default function Home() {
               {/* Volume */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} volume</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 300 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
                   {numberToMonetaryString(volume)}
                 </Display>
               </div>
@@ -500,7 +516,10 @@ export default function Home() {
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 300 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
                   {numberToMonetaryString(rewards)}
                 </Display>
                 <LinkButton
@@ -517,7 +536,10 @@ export default function Home() {
               {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 300 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
                   {fluidPairs}
                 </Display>
               </div>
