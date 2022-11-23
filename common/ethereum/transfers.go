@@ -74,11 +74,13 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 		var (
 			fromAddress_ = topics[1].String()
 			toAddress_   = topics[2].String()
+
+			fromTruncated = ethCommon.HexToAddress(fromAddress_)
+			toTruncated = ethCommon.HexToAddress(toAddress_)
+
+			fromAddress = ConvertGethAddress(fromTruncated)
+			toAddress = ConvertGethAddress(toTruncated)
 		)
-
-		fromAddress := ethereum.AddressFromString(fromAddress_)
-
-		toAddress := ethereum.AddressFromString(toAddress_)
 
 		transfer := worker.EthereumDecoratedTransfer{
 			SenderAddress:    fromAddress,
