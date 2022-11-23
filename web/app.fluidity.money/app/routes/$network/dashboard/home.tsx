@@ -142,6 +142,7 @@ export const meta = () => {
 const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   sender: "",
   receiver: "",
+  winner: "",
   reward: 0,
   hash: "",
   timestamp: time,
@@ -429,7 +430,11 @@ export default function Home() {
                 className="table-address"
                 href={getAddressExplorerLink(chain, sender)}
               >
-                <Text>{sender === MintAddress ? "Mint Address" : trimAddress(sender)}</Text>
+                <Text>
+                  {sender === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(sender)}
+                </Text>
               </a>
             </td>
           )}

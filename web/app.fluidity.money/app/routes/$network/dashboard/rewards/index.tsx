@@ -473,7 +473,11 @@ export default function Rewards() {
                 className="table-address"
                 href={getAddressExplorerLink(chain, winner)}
               >
-                <Text>{winner === MintAddress ? "Mint Address" : trimAddress(winner)}</Text>
+                <Text>
+                  {winner === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(winner)}
+                </Text>
               </a>
             </td>
           )}
