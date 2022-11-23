@@ -6,7 +6,7 @@
 CREATE FUNCTION application_performance(i INTERVAL DEFAULT now() - to_timestamp('0'))
 RETURNS TABLE (
     network network_blockchain,
-    application application,
+    application varchar,
     count BIGINT,
     average_reward DOUBLE PRECISION,
     highest_reward DOUBLE PRECISION
@@ -16,7 +16,10 @@ AS
 $$
     SELECT 
         network,
-        application,
+        CASE 
+            WHEN network = 'ethereum' THEN ethereum_application::varchar
+            WHEN network = 'solana' THEN solana_application::varchar
+        END AS application,         
         COUNT(*),
         SUM(winning_amount / (10 ^ token_decimals)) / COUNT(*) AS average_reward,
         MAX(winning_amount / (10 ^ token_decimals)) as highest_reward

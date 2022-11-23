@@ -1,7 +1,7 @@
 -- migrate:up
 
 -- must mirror the `String()` method of lib/types/applications/applications.go
-CREATE TYPE application AS ENUM (
+CREATE TYPE ethereum_application AS ENUM (
     'uniswap_v2',
     'balancer_v2',
     'oneinch_v2',
@@ -14,13 +14,28 @@ CREATE TYPE application AS ENUM (
     'xy_finance'
 );
 
+-- must mirror the `String()` method of common/solana/applications/applications.go
+CREATE TYPE solana_application AS ENUM (
+    'spl',
+    'saber',
+    'orca',
+    'raydium',
+    'aldrinv1',
+    'aldrinv2',
+    'lifinity',
+    'mercurial'
+);
+
 ALTER TABLE winners
-	ADD COLUMN application application;
+	ADD COLUMN ethereum_application ethereum_application,
+	ADD COLUMN solana_application solana_application;
 
 -- migrate:down
 
 ALTER TABLE winners
-	DROP COLUMN application;	
+	DROP COLUMN ethereum_application,
+	DROP COLUMN solana_application;	
 
-DROP TYPE application;
+DROP TYPE ethereum_application;
+DROP TYPE solana_application;
 

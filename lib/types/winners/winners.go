@@ -7,7 +7,6 @@ package winners
 import (
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -17,6 +16,11 @@ import (
 // "send" || "receive"
 type RewardType string
 
+// represents an enum containing applications for a network
+type Application interface {
+	String() string
+}
+
 type Winner struct {
 	Network                  network.BlockchainNetwork `json:"network"`
 	TransactionHash          string                    `json:"transaction_hash"`
@@ -25,7 +29,7 @@ type Winner struct {
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
 	AwardedTime              time.Time                 `json:"awarded_time"`
 	RewardType				 RewardType                `json:"reward_type"`
-	Application              applications.Application  `json:"application"`
+	Application              Application			   `json:"application"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }
