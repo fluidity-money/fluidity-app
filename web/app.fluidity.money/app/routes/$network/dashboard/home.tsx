@@ -313,7 +313,7 @@ export default function Home() {
   );
 
   const { width } = useViewport();
-  const isTablet = width < 850;
+  const isTablet = width < 850 && width > 0;
   const isMobile = width < 500 && width > 0;
   const isSmallMobile = width < 375;
 

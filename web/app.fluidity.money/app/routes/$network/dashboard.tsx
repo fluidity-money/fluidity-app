@@ -176,7 +176,7 @@ export default function Dashboard() {
   const { width } = useViewport();
 
   const isMobile = width <= 500 && width > 0;
-  const isTablet = width <= 850;
+  const isTablet = width <= 850 && width > 0;
   const closeMobileModal = width > 850 ? false : true;
 
   useEffect(() => {
