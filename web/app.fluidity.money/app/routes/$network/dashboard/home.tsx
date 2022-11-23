@@ -217,7 +217,7 @@ export default function Home() {
       }
 
       if (tx.value > bins[mappedTxIndex].value) {
-        bins[mappedTxIndex] = { ...tx, x: mappedTxIndex };
+        bins[mappedTxIndex] = { ...tx, x: bins.length - mappedTxIndex };
       }
 
       return true;
@@ -236,7 +236,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -253,7 +253,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -268,7 +268,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -283,7 +283,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -293,7 +293,9 @@ export default function Home() {
 
   const graphTransformedTransactions = useMemo(
     () =>
-      graphTransformers[activeTransformerIndex].transform(totalTransactions),
+      graphTransformers[activeTransformerIndex]
+        .transform(totalTransactions)
+        .reverse(),
     [activeTransformerIndex]
   );
 
@@ -523,7 +525,7 @@ export default function Home() {
                 <div className={"tooltip-container"}>
                   <div className={"tooltip"}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {format(datum.timestamp, "dd/mm/yy")}
+                      {format(datum.timestamp, "dd/MM/yy")}
                     </span>
                     <br />
                     <br />
