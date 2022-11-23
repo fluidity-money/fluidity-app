@@ -1,6 +1,7 @@
 type Transaction = {
   sender: string;
   receiver: string;
+  winner: string;
   reward: number;
   hash: string;
   // timestamp is the Unix time, in seconds

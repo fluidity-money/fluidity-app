@@ -8,6 +8,7 @@ import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
 import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import { format } from "date-fns";
+import { MintAddress } from "~/types/MintAddress";
 import {
   Display,
   LineChart,
@@ -20,12 +21,7 @@ import {
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useMemo, useEffect } from "react";
 import { useUserRewards } from "~/queries";
-import {
-  useLoaderData,
-  useNavigate,
-  Link,
-  useLocation,
-} from "@remix-run/react";
+import { useLoaderData, useNavigate, useLocation } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -94,6 +90,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       transactions?.map((tx) => ({
         sender: tx.sender,
         receiver: tx.receiver,
+        winner: winnersMap[tx.hash]?.winning_address ?? "",
         reward: winnersMap[tx.hash]
           ? winnersMap[tx.hash].winning_amount /
             10 ** winnersMap[tx.hash].token_decimals
@@ -113,10 +110,16 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       0
     );
 
+    const totalVolume = mergedTransactions.reduce(
+      (sum, { value }) => sum + value,
+      0
+    );
+
     return json({
       totalTransactions: mergedTransactions,
       totalCount: count,
       totalRewards,
+      totalVolume,
       fluidPairs,
       page,
       network,
@@ -140,6 +143,7 @@ export const meta = () => {
 const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   sender: "",
   receiver: "",
+  winner: "",
   reward: 0,
   hash: "",
   timestamp: time,
@@ -152,6 +156,7 @@ type LoaderData = {
   totalTransactions: Transaction[];
   totalRewards: number;
   totalCount: number;
+  totalVolume: number;
   fluidPairs: number;
   page: number;
   network: Chain;
@@ -176,8 +181,14 @@ function ErrorBoundary(error: Error) {
 }
 
 export default function Home() {
-  const { network, totalTransactions, totalCount, totalRewards, fluidPairs } =
-    useLoaderData<LoaderData>();
+  const {
+    network,
+    totalTransactions,
+    totalCount,
+    totalRewards,
+    totalVolume,
+    fluidPairs,
+  } = useLoaderData<LoaderData>();
 
   const location = useLocation();
 
@@ -193,14 +204,16 @@ export default function Home() {
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
 
-  const [{ count, transactions, rewards }, setTransactions] = useState<{
+  const [{ count, transactions, rewards, volume }, setTransactions] = useState<{
     count: number;
     transactions: Transaction[];
     rewards: number;
+    volume: number;
   }>({
     count: totalCount,
     transactions: totalTransactions,
     rewards: totalRewards,
+    volume: totalVolume,
   });
 
   const binTransactions = (
@@ -357,20 +370,28 @@ export default function Home() {
         count: totalCount,
         rewards: totalRewards,
         transactions: totalTransactions,
+        volume: totalVolume,
       });
     }
 
     const tableFilteredTransactions = totalTransactions.filter(
       txTableFilters[activeTableFilterIndex].filter
     );
+
     const filteredRewards = tableFilteredTransactions.reduce(
       (sum, { reward }) => sum + reward,
+      0
+    );
+
+    const filteredVolume = tableFilteredTransactions.reduce(
+      (sum, { value }) => sum + value,
       0
     );
 
     setTransactions({
       count: tableFilteredTransactions.length,
       rewards: filteredRewards,
+      volume: filteredVolume,
       transactions: tableFilteredTransactions,
     });
   }, [activeTableFilterIndex]);
@@ -429,7 +450,11 @@ export default function Home() {
                 className="table-address"
                 href={getAddressExplorerLink(chain, sender)}
               >
-                <Text>{trimAddress(sender)}</Text>
+                <Text>
+                  {sender === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(sender)}
+                </Text>
               </a>
             </td>
           )}
@@ -451,6 +476,7 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
+              {/* Transactions Count */}
               <div className="statistics-set">
                 <Text>
                   {activeTableFilterIndex ? "Your" : "Total"} transactions
@@ -459,13 +485,19 @@ export default function Home() {
                   {count}
                 </Display>
                 <AnchorButton>
-                  <Link
-                    to={{ pathname: "#transactions", search: location.search }}
-                  >
-                    Activity
-                  </Link>
+                  <a href="#transactions">Activity</a>
                 </AnchorButton>
               </div>
+
+              {/* Volume */}
+              <div className="statistics-set">
+                <Text>{activeTableFilterIndex ? "Your" : "Total"} volume</Text>
+                <Display size={"xs"} style={{ margin: 0 }}>
+                  {numberToMonetaryString(volume)}
+                </Display>
+              </div>
+
+              {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
                 <Display size={"xs"} style={{ margin: 0 }}>
@@ -481,6 +513,8 @@ export default function Home() {
                   Rewards
                 </LinkButton>
               </div>
+
+              {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display size={"xs"} style={{ margin: 0 }}>
