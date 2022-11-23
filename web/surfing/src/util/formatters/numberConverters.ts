@@ -17,7 +17,7 @@ const numberToCommaSeparated = (num: number): string => {
 }
 
 const numberToMonetaryString = (dollars: number): string => {
-  if (dollars < 0.001) return `$${dollars}`;
+  if (dollars < 0.001) return `$0`;
 
   const decimalValues = Math.floor(dollars * 100 % 100);
   const paddedDecimals = `${decimalValues}`.padStart(2, "0")
