@@ -544,7 +544,7 @@ export default function Dashboard() {
             {/* Prize Money */}
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
-              onMouseLeave={() => setTimeout(() => setHoverModal(false), 1000)}
+              onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
               className="trophy-button"
               version={"transparent"}
               buttontype="icon after"

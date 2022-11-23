@@ -13,7 +13,7 @@ const UnclaimedRewardsHoverModal = ({
     <div
       className="unclaimed-modal-container"
       onMouseEnter={() => setShowModal(true)}
-      onMouseLeave={() => setTimeout(() => setShowModal(false), 1000)}
+      onMouseLeave={() => setTimeout(() => setShowModal(false), 500)}
     >
       <img
         id="card-logo"
