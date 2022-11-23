@@ -313,14 +313,16 @@ export default function Home() {
   );
 
   const { width } = useViewport();
-  const tableBreakpoint = 850;
-  const mobileBreakpoint = 375;
+  const isTablet = width < 850;
+  const isMobile = width < 500
+  const isSmallMobile = width < 375;
 
-  const txTableColumns =
-    width > 0 && width < mobileBreakpoint
+  const txTableColumns = isSmallMobile
       ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
-      : width < tableBreakpoint
+      : isMobile
       ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+      : isTablet
+      ? [{ name: "ACTIVITY" }, { name: "VALUE" }, {name: "REWARD"}, { name: "ACCOUNT" }]
       : [
           {
             name: "ACTIVITY",
@@ -438,7 +440,7 @@ export default function Home() {
           </td>
 
           {/* Reward */}
-          {width >= tableBreakpoint && (
+          {!isMobile && (
             <td>
               <Text prominent={true}>
                 {reward ? numberToMonetaryString(reward) : "-"}
@@ -447,7 +449,7 @@ export default function Home() {
           )}
 
           {/* Account */}
-          {width >= mobileBreakpoint && (
+          {!isSmallMobile && (
             <td>
               <a
                 className="table-address"
@@ -463,7 +465,7 @@ export default function Home() {
           )}
 
           {/* Time */}
-          {width >= tableBreakpoint && (
+          {!isTablet && (
             <td>
               <Text>{transactionTimeLabel(timestamp)}</Text>
             </td>
