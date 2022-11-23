@@ -293,10 +293,12 @@ export default function Home() {
 
   const graphTransformedTransactions = useMemo(
     () =>
-      graphTransformers[activeTransformerIndex].transform(totalTransactions).reverse(),
+      graphTransformers[activeTransformerIndex]
+        .transform(totalTransactions)
+        .reverse(),
     [activeTransformerIndex]
   );
-  
+
   const { width } = useViewport();
   const tableBreakpoint = 850;
 
