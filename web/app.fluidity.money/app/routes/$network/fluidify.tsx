@@ -14,7 +14,7 @@ export const links = () => {
 
 export const meta: MetaFunction = ({ data }) => ({
   ...data,
-  title: "Fluidify",
+  title: "Fluidity - Fluidify",
 });
 
 export default function Fluidify() {
