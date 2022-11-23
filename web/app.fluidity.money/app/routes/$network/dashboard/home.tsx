@@ -21,12 +21,7 @@ import {
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useMemo, useEffect } from "react";
 import { useUserRewards } from "~/queries";
-import {
-  useLoaderData,
-  useNavigate,
-  Link,
-  useLocation,
-} from "@remix-run/react";
+import { useLoaderData, useNavigate, useLocation } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -358,7 +353,7 @@ export default function Home() {
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
-            address in [sender, receiver],
+            [sender, receiver].includes(address),
           name: "YOUR DASHBOARD",
         },
       ]
@@ -490,11 +485,7 @@ export default function Home() {
                   {count}
                 </Display>
                 <AnchorButton>
-                  <Link
-                    to={{ pathname: "#transactions", search: location.search }}
-                  >
-                    Activity
-                  </Link>
+                  <a href="#transactions">Activity</a>
                 </AnchorButton>
               </div>
 

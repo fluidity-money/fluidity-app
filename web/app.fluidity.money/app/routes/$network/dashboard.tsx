@@ -89,7 +89,7 @@ function ErrorBoundary() {
 
 export const meta: MetaFunction = ({ data }) => ({
   ...data,
-  title: "Dashboard",
+  title: "Fluidity - Dashboard",
 });
 
 const routeMapper = (route: string) => {

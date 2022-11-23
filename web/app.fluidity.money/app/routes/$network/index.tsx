@@ -210,7 +210,7 @@ const NetworkPage = () => {
                   option={chainNameMap[network as "ethereum" | "solana"]}
                   options={Object.values(chainNameMap)}
                   setOption={(chain: string) =>
-                    navigate(`/${networkMapper(chain)}`)
+                    navigate(`/${networkMapper(chain)}/dashboard/home`)
                   }
                   mobile={width <= mobileBreakpoint}
                 />
