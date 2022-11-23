@@ -51,7 +51,7 @@ func InsertWinner(winner Winner) {
 			awarded_time,
 			token_short_name,
 			token_decimals,
-			reward_type	
+			reward_type
 		)
 
 		VALUES (
@@ -179,8 +179,8 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 
 	statementText := fmt.Sprintf(
 		`DELETE FROM %s
-		WHERE 
-			reward_transaction_hash = $1 
+		WHERE
+			reward_transaction_hash = $1
 			AND winner_address = $2
 		RETURNING is_sender;`,
 
@@ -202,8 +202,9 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 			k.Context = Context
 
 			k.Format(
-				"Failed to fetch pending reward type with hash %v and address!",
+				"Failed to fetch pending reward type with hash %v and address %s!",
 				rewardTransactionHash,
+				address.String(),
 			)
 
 			k.Payload = err
@@ -226,7 +227,7 @@ func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress et
 		`INSERT INTO %s (
 			send_transaction_hash,
 			winner_address,
-			is_sender	
+			is_sender
 		)
 
 		VALUES (
@@ -286,9 +287,9 @@ func AddRewardHashToPendingRewardType(rewardTransactionHash ethereum.Hash, sendT
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
-		`UPDATE %s 
+		`UPDATE %s
 			SET reward_transaction_hash = $1
-			WHERE 
+			WHERE
 				send_transaction_hash = $2
 				AND winner_address = $3
 		;`,

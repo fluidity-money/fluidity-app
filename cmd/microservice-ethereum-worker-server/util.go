@@ -135,7 +135,7 @@ func roundUp(x float64) uint64 {
 
 func anyEthereumAddressesEmpty(addresses ...ethereum.Address) bool {
 	for _, s := range addresses {
-		if s == ethereum.Address("") {
+		if s == ethereum.AddressFromString("") {
 			return true
 		}
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -25,9 +26,12 @@ const (
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 
+)
+
+var (
 	// ethereumNullAddress to filter for not including in either side of a
 	// transfer to prevent burning and minting
-	ethereumNullAddress = "0000000000000000000000000000000000000000"
+	ethereumNullAddress = ethereum.AddressFromString("0000000000000000000000000000000000000000")
 )
 
 func main() {

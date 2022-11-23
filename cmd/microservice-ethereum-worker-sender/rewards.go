@@ -157,7 +157,7 @@ func callLegacyRewardFunction(arguments callRewardArguments) ([]ethTypes.Transac
 		hasher := sha3.NewLegacyKeccak256()
 
 		data := [][]byte{
-			[]byte(winner),
+			[]byte(winner.String()),
 			winAmount.Bytes(),
 			firstBlock.Bytes(),
 			lastBlock.Bytes(),
