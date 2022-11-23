@@ -565,26 +565,23 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-
-        {
-          <ViewRewardModal
-            visible={detailedRewardObject.visible}
-            close={() => {
-              handleCloseViewRewardDetailModal();
-            }}
-            callback={() => {
-              handleCloseViewRewardDetailModal();
-              navigate("./rewards/unclaimed");
-            }}
-            tokenSymbol={detailedRewardObject.token}
-            img={detailedRewardObject.img}
-            colour={detailedRewardObject.colour}
-            winAmount={detailedRewardObject.winAmount}
-            explorerUri={detailedRewardObject.explorerUri}
-            balance={detailedRewardObject.balance}
-            forSending={detailedRewardObject.forSending}
-          />
-        }
+        <ViewRewardModal
+          visible={detailedRewardObject.visible}
+          close={() => {
+            handleCloseViewRewardDetailModal();
+          }}
+          callback={() => {
+            handleCloseViewRewardDetailModal();
+            navigate("./rewards/unclaimed");
+          }}
+          tokenSymbol={detailedRewardObject.token}
+          img={detailedRewardObject.img}
+          colour={detailedRewardObject.colour}
+          winAmount={detailedRewardObject.winAmount}
+          explorerUri={detailedRewardObject.explorerUri}
+          balance={detailedRewardObject.balance}
+          forSending={detailedRewardObject.forSending}
+        />
 
         <Outlet />
 
