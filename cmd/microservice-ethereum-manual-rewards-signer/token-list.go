@@ -26,11 +26,11 @@ func mustParseKeyListFromEnv(env string) map[string]*ecdsa.PrivateKey {
 	for _, entry := range list {
 		details := strings.Split(entry, ":")
 
-		if len(details) != 2 {
+		if fields := len(details); fields != 2 {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
-					"Invalid token list %s - expected shortname:prikey!",
-					entry,
+					"Invalid token list - expected shortname:prikey, got %d fields!",
+					fields,
 				)
 			})
 		}
