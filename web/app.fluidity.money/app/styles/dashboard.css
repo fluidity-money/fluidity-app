@@ -858,6 +858,31 @@ main > footer > section > a {
   margin: -3.5em 0 -4em 0;
 }
 
+.unclaimed-modal-container {
+  cursor: default;
+  position: absolute;
+  box-sizing: border-box;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  right: 64px;
+  top: 80px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.unclaimed-modal-container > section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.unclaimed-modal-container > section > h1 {
+  margin: 0;
+}
+
 @media only screen and (max-width: 500px) {
   .hide-on-mobile {
     display: none;

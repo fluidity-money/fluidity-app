@@ -125,7 +125,11 @@ export default function MobileModal({
                   navigate("./home");
                 }}
               >
-                <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+                <img
+                  style={{ width: "5.5em", height: "2.5em" }}
+                  src="/images/outlinedLogo.svg"
+                  alt="Fluidity"
+                />
               </a>
             </div>
 
