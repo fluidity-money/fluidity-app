@@ -112,7 +112,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       (sum, { reward }) => sum + reward,
       0
     );
-
+    
     return json({
       totalTransactions: mergedTransactions,
       totalCount: count,
@@ -178,7 +178,7 @@ function ErrorBoundary(error: Error) {
 export default function Home() {
   const { network, totalTransactions, totalCount, totalRewards, fluidPairs } =
     useLoaderData<LoaderData>();
-
+  
   const location = useLocation();
 
   const pageRegex = /page=[0-9]+/gi;
@@ -338,7 +338,7 @@ export default function Home() {
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
-            address in [sender, receiver],
+            [sender, receiver].includes(address),
           name: "YOUR DASHBOARD",
         },
       ]
@@ -457,11 +457,9 @@ export default function Home() {
                   {count}
                 </Display>
                 <AnchorButton>
-                  <Link
-                    to={{ pathname: "#transactions", search: location.search }}
-                  >
+                  <a href="#transactions">
                     Activity
-                  </Link>
+                  </a>
                 </AnchorButton>
               </div>
               <div className="statistics-set">

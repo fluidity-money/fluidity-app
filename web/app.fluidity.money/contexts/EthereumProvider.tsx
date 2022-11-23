@@ -4,7 +4,7 @@ import type { Connector } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import {
   useWeb3React,
   Web3ReactProvider,
@@ -34,6 +34,17 @@ const EthereumFacade = ({
   connectors: [Connector, Web3ReactHooks][];
 }) => {
   const { isActive, provider, account, connector } = useWeb3React();
+
+  // attempt to connect eagerly on mount
+  // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
+  useEffect(() => {
+    connectors.forEach(([connector]) => {
+      console.log(connector);
+      connector?.connectEagerly?.()?.catch(() => {
+        return;
+      })
+    })
+  }, []);
 
   const getBalance = async (contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
