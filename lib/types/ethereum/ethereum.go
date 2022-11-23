@@ -34,7 +34,7 @@ func (addr *Address) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &addr.address)
 }
 func (addr Address) MarshalText() (text []byte, err error) {
-	return addr.MarshalJSON()
+	return []byte(addr.address), nil
 }
 func (addr *Address) UnmarshalText(text []byte) error {
 	return addr.UnmarshalJSON(text)
@@ -65,7 +65,7 @@ func (addr *Hash) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &addr.hash)
 }
 func (hash Hash) MarshalText() (text []byte, err error) {
-	return hash.MarshalJSON()
+	return []byte(hash.hash), nil
 }
 func (hash *Hash) UnmarshalText(text []byte) error {
 	return hash.UnmarshalJSON(text)
