@@ -21,12 +21,7 @@ import {
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useMemo, useEffect } from "react";
 import { useUserRewards } from "~/queries";
-import {
-  useLoaderData,
-  useNavigate,
-  Link,
-  useLocation,
-} from "@remix-run/react";
+import { useLoaderData, useNavigate, useLocation } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -114,7 +109,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       (sum, { reward }) => sum + reward,
       0
     );
-    
+
     return json({
       totalTransactions: mergedTransactions,
       totalCount: count,
@@ -181,7 +176,7 @@ function ErrorBoundary(error: Error) {
 export default function Home() {
   const { network, totalTransactions, totalCount, totalRewards, fluidPairs } =
     useLoaderData<LoaderData>();
-  
+
   const location = useLocation();
 
   const pageRegex = /page=[0-9]+/gi;
@@ -466,9 +461,7 @@ export default function Home() {
                   {count}
                 </Display>
                 <AnchorButton>
-                  <a href="#transactions">
-                    Activity
-                  </a>
+                  <a href="#transactions">Activity</a>
                 </AnchorButton>
               </div>
               <div className="statistics-set">

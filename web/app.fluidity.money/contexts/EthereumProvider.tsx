@@ -42,8 +42,8 @@ const EthereumFacade = ({
       console.log(connector);
       connector?.connectEagerly?.()?.catch(() => {
         return;
-      })
-    })
+      });
+    });
   }, []);
 
   const getBalance = async (contractAddress: string): Promise<number> => {

@@ -42,7 +42,7 @@ const Provider = ({
       setValidNetwork(network);
     }
   }, [network, providers]);
-  
+
   const ProviderComponent = useMemo(
     () => (network && providers[validNetwork]) || Fragment,
     [validNetwork]
@@ -100,7 +100,7 @@ export default function Network() {
 
   // Hardcode solana to redirect to ethereum
   if (network === "solana") throw new Error("Solana not supported");
-  
+
   return (
     <Provider
       network={network}
