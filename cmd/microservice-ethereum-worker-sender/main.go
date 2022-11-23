@@ -193,7 +193,7 @@ func main() {
 				hashes[i] = transaction.Hash().Hex()
 
 				// populate with reward transaction hashes
-				wins[i].rewardTransactionHash = typesEth.Hash(transaction.Hash().Hex())
+				wins[i].rewardTransactionHash = typesEth.HashFromString(transaction.Hash().Hex())
 			}
 
 			log.App(func(k *log.Log) {
