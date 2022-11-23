@@ -289,6 +289,26 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		rewards[i] = rewardArg
 	}
 
+	gas, err := ethereum.EstimateGas(
+		client,
+		&fluidityContractAbi,
+		transactionOptions,
+		&fluidityAddress,
+		"batchReward",
+		rewards,
+		globalFirstBlock,
+		globalLastBlock,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to estimate gas for calling batchreward! %w",
+			err,
+		)
+	}
+
+	transactionOptions.GasLimit = uint64(float64(gas) * 1.5)
+
 	transaction, err := ethereum.MakeTransaction(
 		boundContract,
 		transactionOptions,
