@@ -8,6 +8,7 @@ import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
 import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import { format } from "date-fns";
+import { MintAddress } from "~/types/MintAddress";
 import {
   Display,
   LineChart,
@@ -94,6 +95,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       transactions?.map((tx) => ({
         sender: tx.sender,
         receiver: tx.receiver,
+        winner: winnersMap[tx.hash]?.winning_address ?? "",
         reward: winnersMap[tx.hash]
           ? winnersMap[tx.hash].winning_amount /
             10 ** winnersMap[tx.hash].token_decimals
@@ -140,6 +142,7 @@ export const meta = () => {
 const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   sender: "",
   receiver: "",
+  winner: "",
   reward: 0,
   hash: "",
   timestamp: time,
@@ -429,7 +432,11 @@ export default function Home() {
                 className="table-address"
                 href={getAddressExplorerLink(chain, sender)}
               >
-                <Text>{trimAddress(sender)}</Text>
+                <Text>
+                  {sender === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(sender)}
+                </Text>
               </a>
             </td>
           )}
