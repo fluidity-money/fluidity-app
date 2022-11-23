@@ -20,7 +20,7 @@ import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
 import { captureException } from "@sentry/react";
-import { useUserUnclaimedRewards, useUserRewards } from "~/queries";
+import { useUserUnclaimedRewards, useUserRewardsAll } from "~/queries";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -32,7 +32,7 @@ import {
   ManualCarousel,
   trimAddress,
 } from "@fluidity-money/surfing";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import { Table } from "~/components";
 import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
@@ -73,11 +73,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       count,
     }: { transactions: UserTransaction[]; count: number } = await (
       await fetch(
-        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
+        `${url.origin}/${network}/query/userTransactions?page=${page}`
       )
     ).json();
 
-    const { data, errors } = await useUserRewards(network ?? "");
+    const { data, errors } = await useUserRewardsAll(network ?? "");
 
     if (errors || !data) {
       throw errors;
@@ -98,6 +98,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         [network as string]: { tokens },
       },
     } = config;
+
+    const fluidTokenMap = tokens.reduce(
+      (map, token) =>
+        token.isFluidOf
+          ? {
+              ...map,
+              [token.symbol]: token.address,
+              [token.symbol]: token.isFluidOf,
+            }
+          : map,
+      {}
+    );
 
     const tokenLogoMap = tokens.reduce(
       (map, token) => ({
@@ -175,6 +187,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     return json({
       icons,
+      fluidTokenMap,
       rewarders,
       page,
       network,
@@ -198,6 +211,7 @@ export const links: LinksFunction = () => {
 
 type LoaderData = {
   icons: { [provider: string]: string };
+  fluidTokenMap: { [tokenName: string]: string };
   rewarders: Provider[];
   totalTransactions: Transaction[];
   totalCount: number;
@@ -241,6 +255,7 @@ export default function Rewards() {
     totalCount,
     totalRewards,
     totalPrizePool,
+    fluidTokenMap,
   } = useLoaderData<LoaderData>();
 
   const { connected, address } = useContext(FluidityFacadeContext);
@@ -262,8 +277,6 @@ export default function Rewards() {
     count: totalCount,
     rewards: totalRewards,
   });
-
-  const [userUnclaimedRewards, setUserUnclaimedRewards] = useState(0);
 
   const { width } = useViewport();
   const mobileView = width <= 500;
@@ -296,10 +309,6 @@ export default function Rewards() {
     connected ? 1 : 0
   );
 
-  useEffect(() => {
-    setActiveTableFilterIndex(connected ? 1 : 0);
-  }, [connected]);
-
   const txTableFilters = address
     ? [
         {
@@ -318,6 +327,31 @@ export default function Rewards() {
           name: "GLOBAL",
         },
       ];
+
+  const [
+    { userUnclaimedRewards, unclaimedTokenAddrs },
+    setUserUnclaimedRewards,
+  ] = useState<{
+    userUnclaimedRewards: number;
+    unclaimedTokenAddrs: string[];
+  }>({
+    userUnclaimedRewards: 0,
+    unclaimedTokenAddrs: [],
+  });
+
+  useEffect(() => {
+    setActiveTableFilterIndex(connected ? 1 : 0);
+  }, [connected]);
+
+  const userTotalRewards = useMemo(
+    () =>
+      address
+        ? transactions
+            .filter(txTableFilters[1].filter)
+            .reduce((sum, { reward }) => sum + reward, 0)
+        : 0,
+    [address]
+  );
 
   const unixNow = Date.now();
 
@@ -357,7 +391,7 @@ export default function Rewards() {
 
   // Get user's unclaimed rewards
   useEffect(() => {
-    if (!connected || !address) return setUserUnclaimedRewards(0);
+    if (!connected || !address) return;
 
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
@@ -385,7 +419,13 @@ export default function Rewards() {
           0
         );
 
-        setUserUnclaimedRewards(userUnclaimedRewards);
+        const unclaimedTokenAddrs = Array.from(
+          new Set(
+            sanitisedRewards.map(({ token_short_name }) => token_short_name)
+          )
+        ).map((name) => fluidTokenMap[name] ?? "");
+
+        setUserUnclaimedRewards({ userUnclaimedRewards, unclaimedTokenAddrs });
       } catch (err) {
         captureException(
           new Error(
@@ -407,6 +447,7 @@ export default function Rewards() {
     const tableFilteredTransactions = totalTransactions
       .filter(rewardFilters[activeRewardFilterIndex].filter)
       .filter(txTableFilters[activeTableFilterIndex].filter);
+
     const filteredRewards = tableFilteredTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
@@ -499,9 +540,11 @@ export default function Rewards() {
         <UserRewards
           claimNow={mobileView}
           unclaimedRewards={userUnclaimedRewards}
+          claimedRewards={userTotalRewards}
           network={network}
           networkFee={networkFee}
           gasFee={gasFee}
+          tokenAddrs={unclaimedTokenAddrs}
         />
       ) : (
         <div className="no-user-rewards">
@@ -550,6 +593,7 @@ export default function Rewards() {
           ))}
         </div>
       </div>
+
       {/* Reward Performance */}
       {hasRewarders && (
         <section id="performance">

@@ -7,7 +7,7 @@ import {
   useUserTransactionsByAddress,
 } from "./useUserTransactions";
 import useUserUnclaimedRewards from "./useUserUnclaimedRewards";
-import useUserRewards from "./useUserRewards";
+import { useUserRewardsAll, useUserRewardsByAddress } from "./useUserRewards";
 
 export {
   useUserTransactionAllCount,
@@ -15,5 +15,6 @@ export {
   useUserTransactionsAll,
   useUserTransactionsByAddress,
   useUserUnclaimedRewards,
-  useUserRewards,
+  useUserRewardsAll,
+  useUserRewardsByAddress,
 };

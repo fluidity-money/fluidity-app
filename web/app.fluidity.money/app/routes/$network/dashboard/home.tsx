@@ -20,8 +20,8 @@ import {
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useMemo, useEffect } from "react";
-import { useUserRewards } from "~/queries";
 import { useLoaderData, useNavigate, useLocation } from "@remix-run/react";
+import { useUserRewardsAll } from "~/queries";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -54,7 +54,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       )
     ).json();
 
-    const { data, errors } = await useUserRewards(network ?? "");
+    const { data, errors } = await useUserRewardsAll(network ?? "");
 
     if (errors || !data) {
       throw errors;
