@@ -40,6 +40,24 @@ func DecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Rewar
 		)
 	}
 
+	// topic, address
+	if topicsLen := len(logTopics); topicsLen != 2 {
+		return rewardData, fmt.Errorf(
+			"Unexpected number of log topics! expected %d, got %d!",
+			2,
+			topicsLen,
+		)
+	}
+
+	// amount, firstBlock, lastBlock
+	if dataLen := len(decodedData); dataLen != 3 {
+		return rewardData, fmt.Errorf(
+			"Unexpected number of log data! expected %d, got %d!",
+			3,
+			dataLen,
+		)
+	}
+
 	var (
 		winnerString  = logTopics[1].String()
 		amountInt     = decodedData[0].(*big.Int)

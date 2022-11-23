@@ -102,6 +102,12 @@ const fluidityContractAbiString = `[
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "startBlock",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "endBlock",
         "type": "uint256"
       }
