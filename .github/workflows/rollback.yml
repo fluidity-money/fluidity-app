@@ -64,6 +64,7 @@ jobs:
           fetch-depth: 10
           lfs: true
           ref: ${{ github.event.inputs.rollbackTo }}
+          set-safe-directory: '/github/workspace'
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
@@ -117,6 +118,7 @@ jobs:
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
   rollback-db:
+    if: ${{ github.event.inputs.rollback_timescale == 'true' || github.event.inputs.rollback_postgres == 'true' }}
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:
