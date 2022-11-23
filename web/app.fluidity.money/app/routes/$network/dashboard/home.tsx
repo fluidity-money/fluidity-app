@@ -115,10 +115,16 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       0
     );
 
+    const totalVolume = mergedTransactions.reduce(
+      (sum, { value }) => sum + value,
+      0
+    );
+
     return json({
       totalTransactions: mergedTransactions,
       totalCount: count,
       totalRewards,
+      totalVolume,
       fluidPairs,
       page,
       network,
@@ -155,6 +161,7 @@ type LoaderData = {
   totalTransactions: Transaction[];
   totalRewards: number;
   totalCount: number;
+  totalVolume: number;
   fluidPairs: number;
   page: number;
   network: Chain;
@@ -179,8 +186,14 @@ function ErrorBoundary(error: Error) {
 }
 
 export default function Home() {
-  const { network, totalTransactions, totalCount, totalRewards, fluidPairs } =
-    useLoaderData<LoaderData>();
+  const {
+    network,
+    totalTransactions,
+    totalCount,
+    totalRewards,
+    totalVolume,
+    fluidPairs,
+  } = useLoaderData<LoaderData>();
 
   const location = useLocation();
 
@@ -196,14 +209,16 @@ export default function Home() {
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
 
-  const [{ count, transactions, rewards }, setTransactions] = useState<{
+  const [{ count, transactions, rewards, volume }, setTransactions] = useState<{
     count: number;
     transactions: Transaction[];
     rewards: number;
+    volume: number;
   }>({
     count: totalCount,
     transactions: totalTransactions,
     rewards: totalRewards,
+    volume: totalVolume,
   });
 
   const binTransactions = (
@@ -360,20 +375,28 @@ export default function Home() {
         count: totalCount,
         rewards: totalRewards,
         transactions: totalTransactions,
+        volume: totalVolume,
       });
     }
 
     const tableFilteredTransactions = totalTransactions.filter(
       txTableFilters[activeTableFilterIndex].filter
     );
+
     const filteredRewards = tableFilteredTransactions.reduce(
       (sum, { reward }) => sum + reward,
+      0
+    );
+
+    const filteredVolume = tableFilteredTransactions.reduce(
+      (sum, { value }) => sum + value,
       0
     );
 
     setTransactions({
       count: tableFilteredTransactions.length,
       rewards: filteredRewards,
+      volume: filteredVolume,
       transactions: tableFilteredTransactions,
     });
   }, [activeTableFilterIndex]);
@@ -458,6 +481,7 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
+              {/* Transactions Count */}
               <div className="statistics-set">
                 <Text>
                   {activeTableFilterIndex ? "Your" : "Total"} transactions
@@ -473,6 +497,16 @@ export default function Home() {
                   </Link>
                 </AnchorButton>
               </div>
+
+              {/* Volume */}
+              <div className="statistics-set">
+                <Text>{activeTableFilterIndex ? "Your" : "Total"} volume</Text>
+                <Display size={"xs"} style={{ margin: 0 }}>
+                  {numberToMonetaryString(volume)}
+                </Display>
+              </div>
+
+              {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
                 <Display size={"xs"} style={{ margin: 0 }}>
@@ -488,6 +522,8 @@ export default function Home() {
                   Rewards
                 </LinkButton>
               </div>
+
+              {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display size={"xs"} style={{ margin: 0 }}>
