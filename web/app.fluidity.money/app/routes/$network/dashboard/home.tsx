@@ -183,14 +183,8 @@ function ErrorBoundary(error: Error) {
 }
 
 export default function Home() {
-  const {
-    network,
-    totalTransactions,
-    totalCount,
-    totalRewards,
-    totalVolume,
-    fluidPairs,
-  } = useLoaderData<LoaderData>();
+  const { network, totalTransactions, totalCount, totalRewards, totalVolume, fluidPairs } =
+    useLoaderData<LoaderData>();
 
   const location = useLocation();
 
@@ -472,12 +466,13 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
+
               {/* Transactions Count */}
               <div className="statistics-set">
                 <Text>
                   {activeTableFilterIndex ? "Your" : "Total"} transactions
                 </Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display size={width < 300 ? "xxxs" : "xs"} style={{ margin: 0 }}>
                   {count}
                 </Display>
                 <AnchorButton>
@@ -492,7 +487,7 @@ export default function Home() {
               {/* Volume */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} volume</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display size={width < 300 ? "xxxs" : "xs"} style={{ margin: 0 }}>
                   {numberToMonetaryString(volume)}
                 </Display>
               </div>
@@ -500,7 +495,7 @@ export default function Home() {
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display size={width < 300 ? "xxxs" : "xs"} style={{ margin: 0 }}>
                   {numberToMonetaryString(rewards)}
                 </Display>
                 <LinkButton
@@ -517,7 +512,7 @@ export default function Home() {
               {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display size={width < 300 ? "xxxs" : "xs"} style={{ margin: 0 }}>
                   {fluidPairs}
                 </Display>
               </div>
