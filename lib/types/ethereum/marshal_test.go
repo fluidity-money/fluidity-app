@@ -14,11 +14,21 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+type StructTest struct {
+	HashKey Hash
+	AddressKey Address
+	HashMap map[Hash]Hash
+	AddressMap map[Address]Address
+	HashArr []Hash
+	AddressArr []Address
+}
+
 type MarshalTestSuite struct {
 	suite.Suite
 	testHeader  BlockHeader
 	testTx      Transaction
 	testReceipt Receipt
+	testStruct     StructTest
 }
 
 func (suite *MarshalTestSuite) SetupTest() {
@@ -86,9 +96,31 @@ func (suite *MarshalTestSuite) SetupTest() {
 		Type:      1,
 	}
 
+	testStruct := StructTest{
+		HashKey:    HashFromString("0xhash"),
+		AddressKey: AddressFromString("0xaddress"),
+		HashMap:    map[Hash]Hash{
+			HashFromString("0xhash1"): HashFromString("0xvalue1"),
+			HashFromString("0xhash2"): HashFromString("0xvalue2"),
+		},
+		AddressMap: map[Address]Address{
+			AddressFromString("0xaddress1"): AddressFromString("0xvalue1"),
+			AddressFromString("0xaddress2"): AddressFromString("0xvalue2"),
+		},
+		HashArr:    []Hash{
+			HashFromString("0xhash0"),
+			HashFromString("0xhash1"),
+		},
+		AddressArr: []Address{
+			AddressFromString("0xaddress0"),
+			AddressFromString("0xaddress1"),
+		},
+	}
+
 	suite.testHeader = testHeader
 	suite.testTx = testTx
 	suite.testReceipt = testReceipt
+	suite.testStruct = testStruct
 }
 
 func TestBlobTestSuite(t *testing.T) {
@@ -143,5 +175,17 @@ func (suite *MarshalTestSuite) TestMarshal() {
 		json.Unmarshal(bin, &newReceipt)
 
 		assert.Equal(t, receipt, newReceipt)
+	})
+
+	suite.T().Run("TestMarshalStruct", func(t *testing.T) {
+		testStruct := suite.testStruct
+
+		bin, err := json.Marshal(testStruct)
+		require.NoError(t, err)
+
+		var newStruct StructTest
+		json.Unmarshal(bin, &newStruct)
+
+		assert.Equal(t, testStruct, newStruct)
 	})
 }
