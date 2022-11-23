@@ -276,7 +276,7 @@ export default function Dashboard() {
     const socket = io();
     socket.emit("subscribeTransactions", {
       protocol: network,
-      address,
+      address: rawAddress,
     });
 
     setTimeout(() => {
