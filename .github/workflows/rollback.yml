@@ -64,7 +64,6 @@ jobs:
           fetch-depth: 10
           lfs: true
           ref: ${{ github.event.inputs.rollbackTo }}
-          set-safe-directory: '/github/workspace'
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
@@ -78,8 +77,8 @@ jobs:
           command: |
 
             echo ""
-            echo "CommitHash:" 
-            git rev-parse HEAD
+            echo "Commit Id: ${{ github.sha }}"
+            echo ${{ github.sha }}
             echo ""
 
             flu build-docker \
@@ -95,12 +94,12 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            
+
             echo ""
-            echo "CommitHash:" 
-            git rev-parse HEAD
+            echo "Commit Id: ${{ github.sha }}"
+            echo ${{ github.sha }}
             echo ""
-            
+
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
               --group ${{ github.event.inputs.group }} \
