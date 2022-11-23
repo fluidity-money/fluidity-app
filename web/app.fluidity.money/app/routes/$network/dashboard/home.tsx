@@ -183,8 +183,14 @@ function ErrorBoundary(error: Error) {
 }
 
 export default function Home() {
-  const { network, totalTransactions, totalCount, totalRewards, totalVolume, fluidPairs } =
-    useLoaderData<LoaderData>();
+  const {
+    network,
+    totalTransactions,
+    totalCount,
+    totalRewards,
+    totalVolume,
+    fluidPairs,
+  } = useLoaderData<LoaderData>();
 
   const location = useLocation();
 
@@ -466,7 +472,6 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
-
               {/* Transactions Count */}
               <div className="statistics-set">
                 <Text>
