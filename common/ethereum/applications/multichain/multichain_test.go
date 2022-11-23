@@ -54,10 +54,10 @@ func TestGetMultichainAnySwapFee(t *testing.T) {
 	assert.Nil(t, fees)
 
 	transfer.Log.Topics = []ethTypes.Hash{
-		"",
-		"",
-		"",
-		"",
+		ethTypes.HashFromString(""),
+		ethTypes.HashFromString(""),
+		ethTypes.HashFromString(""),
+		ethTypes.HashFromString(""),
 	}
 
 	// nil data fails

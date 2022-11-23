@@ -164,22 +164,22 @@ link= "https://app.uniswap.org/#/pool/359573"
 [[liquidity_providers.ethereum.providers]]
 name= "sushiswap"
 img= "/images/providers/Sushiswap.svg"
-link= "https://www.sushi.com/earn/eth:0xc35466daaa5e61977ec4219d682eeb7beb431726"
+link= "https://www.sushi.com/earn/eth:0xc35466daaa5e61977ec4219d682eeb7beb431726/add"
 
 [[liquidity_providers.ethereum.providers]]
 name= "dodo"
 img= "/images/providers/DODO.png"
-link= "https://app.dodoex.io/dev/pool/list/0x6abd7403878f3a010170a383b4f20285668fd979?network=mainnet"
+link= "https://app.dodoex.io/earn/add-liquidity?network=mainnet&poolAddress=0x6abd7403878f3a010170a383b4f20285668fd979"
 
 [[liquidity_providers.ethereum.providers]]
 name= "balancer"
 img= "/images/providers/balancer.svg"
-link= "https://app.balancer.fi/#/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393"
+link= "https://app.balancer.fi/#/ethereum/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393/invest"
 
 [[liquidity_providers.ethereum.providers]]
 name= "1inch"
 img= "/images/providers/1inch.svg"
-link= "https://etherscan.io/address/0xe32e2cccd6bcaa371fcccd4170bb6e1b0137c67a"
+link= "https://app.1inch.io/#/1/earn/pools?filter=fUSDC&token0=0x9d1089802ee608ba84c5c98211afe5f37f96b36c&token1=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 # sol providers
 [liquidity_providers.solana]
