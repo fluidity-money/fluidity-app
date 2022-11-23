@@ -23,14 +23,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const breakpoint = 620;
 
   const location = typeof window !== "undefined" ? window.location : null;
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
 
-    if(!loaded) {
-      setTimeout(() => {
-        setLoaded(true);
-      }, 3000)
-    }
+  useEffect(() => {
 
     if (location.hash) {
       let elem = document.getElementById(location.hash.slice(1));
@@ -49,12 +43,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <ApolloProvider client={apolloClient}>
         <ChainContextProvider>
             <div className="App">
-              {loaded ?
-                <>{width < breakpoint ? (<MobileNavBar />) : (<NavBar />)}
-                  <Component {...pageProps} />
-                </> 
-                : <LoadingScreen />
-              }
+              {width < breakpoint ? (<MobileNavBar />) : (<NavBar />)}
+              <Component {...pageProps} />
             </div>
         </ChainContextProvider>
       </ApolloProvider>
