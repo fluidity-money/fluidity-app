@@ -176,7 +176,7 @@ export default function Dashboard() {
   const { width } = useViewport();
 
   const isMobile = width <= 500 && width > 0;
-  const isTablet = width <= 850 && width > 500;
+  const isTablet = width <= 850;
   const closeMobileModal = width > 850 ? false : true;
 
   useEffect(() => {
@@ -478,7 +478,7 @@ export default function Dashboard() {
         <nav id="top-navbar" className={"pad-main"}>
           {/* App Name */}
           <div className="top-navbar-left">
-            {(isMobile || isTablet) && width > 0 && (
+            {(isMobile || isTablet) && (
               <a onClick={() => navigate("./home")}>
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
