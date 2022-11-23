@@ -23,11 +23,11 @@ type MarshalTestSuite struct {
 
 func (suite *MarshalTestSuite) SetupTest() {
 	testHeader := BlockHeader{
-		ParentHash:      Hash("0xparent"),
-		UncleHash:       Hash("0xuncle"),
+		ParentHash:      HashFromString("0xparent"),
+		UncleHash:       HashFromString("0xuncle"),
 		Coinbase:        AddressFromString("coin"),
-		Root:            Hash("root"),
-		TransactionHash: Hash("0xtxn"),
+		Root:            HashFromString("root"),
+		TransactionHash: HashFromString("0xtxn"),
 		Bloom:           misc.Blob{1, 2, 3},
 		Difficulty:      misc.BigIntFromInt64(100),
 		Number:          misc.BigIntFromInt64(100),
@@ -35,7 +35,7 @@ func (suite *MarshalTestSuite) SetupTest() {
 		GasUsed:         misc.BigIntFromInt64(100),
 		Time:            100,
 		Extra:           misc.Blob{4, 5, 6},
-		MixDigest:       Hash("mix"),
+		MixDigest:       HashFromString("mix"),
 		Nonce:           BlockNonce{1, 2, 3},
 		ReceiptHash:     HashFromString("receipt"),
 		BaseFee:         misc.BigIntFromInt64(20),
