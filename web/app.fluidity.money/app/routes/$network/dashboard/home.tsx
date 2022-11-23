@@ -314,33 +314,38 @@ export default function Home() {
 
   const { width } = useViewport();
   const isTablet = width < 850;
-  const isMobile = width < 500
+  const isMobile = width < 500;
   const isSmallMobile = width < 375;
 
   const txTableColumns = isSmallMobile
-      ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
-      : isMobile
-      ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
-      : isTablet
-      ? [{ name: "ACTIVITY" }, { name: "VALUE" }, {name: "REWARD"}, { name: "ACCOUNT" }]
-      : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "ACCOUNT",
-          },
-          {
-            name: "TIME",
-            alignRight: true,
-          },
-        ];
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
+    : isMobile
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+    : isTablet
+    ? [
+        { name: "ACTIVITY" },
+        { name: "VALUE" },
+        { name: "REWARD" },
+        { name: "ACCOUNT" },
+      ]
+    : [
+        {
+          name: "ACTIVITY",
+        },
+        {
+          name: "VALUE",
+        },
+        {
+          name: "REWARD",
+        },
+        {
+          name: "ACCOUNT",
+        },
+        {
+          name: "TIME",
+          alignRight: true,
+        },
+      ];
 
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
     connected ? 1 : 0
