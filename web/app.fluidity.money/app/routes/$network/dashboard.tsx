@@ -175,7 +175,7 @@ export default function Dashboard() {
 
   const { width } = useViewport();
 
-  const isMobile = width <= 500;
+  const isMobile = width <= 500 && width > 0;
   const isTablet = width <= 850 && width > 500;
   const closeMobileModal = width > 850 ? false : true;
 
@@ -478,7 +478,7 @@ export default function Dashboard() {
         <nav id="top-navbar" className={"pad-main"}>
           {/* App Name */}
           <div className="top-navbar-left">
-            {(isMobile || isTablet) && (
+            {(isMobile || isTablet) && width > 0 && (
               <a onClick={() => navigate("./home")}>
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
@@ -520,6 +520,7 @@ export default function Dashboard() {
 
             {/* Fluidify */}
             <GeneralButton
+              className="fluidify-button-dashboard"
               version={"primary"}
               buttontype="text"
               size={"small"}

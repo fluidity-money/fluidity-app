@@ -313,8 +313,8 @@ export default function Home() {
   );
 
   const { width } = useViewport();
-  const isTablet = width < 850;
-  const isMobile = width < 500;
+  const isTablet = width < 850 && width > 500;
+  const isMobile = width < 500 && width > 0;
   const isSmallMobile = width < 375;
 
   const txTableColumns = isSmallMobile

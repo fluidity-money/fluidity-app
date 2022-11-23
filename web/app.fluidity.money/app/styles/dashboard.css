@@ -62,12 +62,11 @@ main > footer {
   grid-area: footer;
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
 }
 
 main > footer > section {
   display: inherit;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 20px;
 }
 
@@ -153,6 +152,10 @@ main > footer > section {
 .navbar-v2 ul {
   display: block;
   padding: 0;
+}
+
+.fluidify-button-dashboard {
+  height: 16px;
 }
 
 .selector-button {
@@ -317,7 +320,7 @@ main > footer > section > a {
 
 .card-inner {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2.5fr 1fr;
   align-items: top;
   background: unset;
   border-radius: 12px;

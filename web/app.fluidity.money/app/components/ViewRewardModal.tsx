@@ -37,7 +37,7 @@ export const ViewRewardModal = ({
 }: IPropsConnectedWalletModal) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const { width } = useViewport();
-  const isMobile = width < 500;
+  const isMobile = width < 500 && width > 0;
 
   useEffect(() => {
     setModal(
