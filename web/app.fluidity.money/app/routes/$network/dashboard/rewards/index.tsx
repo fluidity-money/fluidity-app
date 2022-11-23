@@ -24,6 +24,7 @@ import { useUserUnclaimedRewards, useUserRewards } from "~/queries";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { MintAddress } from "~/types/MintAddress";
 import {
   Text,
   Heading,
@@ -114,6 +115,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         .map((tx) => ({
           sender: tx.sender,
           receiver: tx.receiver,
+          winner: winnersMap[tx.hash].winning_address ?? "",
           reward: winnersMap[tx.hash]
             ? winnersMap[tx.hash].winning_amount /
               10 ** winnersMap[tx.hash].token_decimals
@@ -282,7 +284,7 @@ export default function Rewards() {
             name: "REWARD",
           },
           {
-            name: "ACCOUNT",
+            name: "WINNER",
           },
           {
             name: "TIME",
@@ -419,9 +421,7 @@ export default function Rewards() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, receiver, timestamp, value, reward, hash, logo } = data;
-
-      const txAddress = sender === address ? receiver : sender;
+      const { sender, winner, timestamp, value, reward, hash, logo } = data;
 
       return (
         <motion.tr
@@ -466,14 +466,18 @@ export default function Rewards() {
             </Text>
           </td>
 
-          {/* Account */}
+          {/* Winner */}
           {width > tableBreakpoint && (
             <td>
               <a
                 className="table-address"
-                href={getAddressExplorerLink(chain, sender)}
+                href={getAddressExplorerLink(chain, winner)}
               >
-                <Text>{trimAddress(txAddress)}</Text>
+                <Text>
+                  {winner === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(winner)}
+                </Text>
               </a>
             </td>
           )}
