@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Text, GeneralButton } from "@fluidity-money/surfing";
+
+import { Text, GeneralButton, Heading } from "@fluidity-money/surfing";
 
 interface IPropsConnectedWalletModal {
   visible: boolean;
   close: () => void;
+  callback: () => void;
   tokenSymbol: string;
   img: string;
   colour: string;
@@ -17,6 +19,7 @@ interface IPropsConnectedWalletModal {
 export const ViewRewardModal = ({
   visible,
   close,
+  callback,
   tokenSymbol,
   img,
   colour,
@@ -50,10 +53,10 @@ export const ViewRewardModal = ({
               />
             </span>
             <div className="view-reward-main-modal">
-              <Text prominent size="xxl" className="view-reward-modal-title">
+              <Heading as="h2" className="view-reward-modal-title">
                 Get. That. Money.
-              </Text>
-              <Text size="md">${winAmount} USD in unclaimed prizes</Text>
+              </Heading>
+              <Text size="xl">${winAmount} USD in unclaimed prizes</Text>
               <span
                 className="view-reward-modal-token"
                 style={{
@@ -63,13 +66,9 @@ export const ViewRewardModal = ({
               >
                 <img src={img} className="view-reward-modal-token-img" />
               </span>
-              <Text
-                prominent
-                size="xl"
-                className="view-reward-modal-token-title-size"
-              >
+              <Heading as="h2" className="view-reward-modal-token-title-size">
                 ${winAmount} {tokenSymbol}
-              </Text>
+              </Heading>
               <Text size="xl" className="view-reward-modal-usd-info">
                 ${winAmount} USD
               </Text>
@@ -94,9 +93,9 @@ export const ViewRewardModal = ({
               <GeneralButton
                 version={"primary"}
                 buttontype="text"
-                size={"medium"}
+                size={"large"}
                 handleClick={() => {
-                  // #href to table ? :/
+                  callback();
                 }}
                 className="view-reward-modal-breakdown-btn"
               >

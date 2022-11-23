@@ -224,6 +224,20 @@ export default function Dashboard() {
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
   };
 
+  const handleCloseViewRewardDetailModal = () => {
+    setDetailedRewardObject({
+      // empty object on close
+      visible: false,
+      token: "",
+      img: "",
+      colour: "",
+      winAmount: "",
+      explorerUri: "",
+      balance: "",
+      forSending: false,
+    });
+  };
+
   // Rewards User has yet to claim - Ethereum feature
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
 
@@ -274,7 +288,7 @@ export default function Dashboard() {
         const imgUrl =
           fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
         const tokenColour =
-          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.logo : "";
+          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.colour : "";
         const transactionUrl =
           network === `ethereum`
             ? "https://etherscan.io/tx/" + log.transactionHash
@@ -556,17 +570,11 @@ export default function Dashboard() {
           <ViewRewardModal
             visible={detailedRewardObject.visible}
             close={() => {
-              setDetailedRewardObject({
-                // empty object on close
-                visible: false,
-                token: "",
-                img: "",
-                colour: "",
-                winAmount: "",
-                explorerUri: "",
-                balance: "",
-                forSending: false,
-              });
+              handleCloseViewRewardDetailModal();
+            }}
+            callback={() => {
+              handleCloseViewRewardDetailModal();
+              navigate("./rewards/unclaimed");
             }}
             tokenSymbol={detailedRewardObject.token}
             img={detailedRewardObject.img}
