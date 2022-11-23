@@ -19,7 +19,7 @@ export const ToolTipContent = ({
   linkLabelOnClickCallback,
 }: IToolTipContentProps) => {
   return (
-    <div>
+    <div className="tool_detail_section">
       <img className="tool_icon" src={tokenLogoSrc} />
       <span className="tooltip_title">
         <Text prominent size="xl">
