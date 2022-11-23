@@ -301,8 +301,8 @@ func main() {
 			}
 
 			var (
-				from = decoratedTransaction.Transaction.From
-				to = decoratedTransaction.Transaction.To
+				from = fluidTransfer.SenderAddress
+				to = fluidTransfer.RecipientAddress
 			)
 
 			transfer := worker.EthereumDecoratedTransfer{

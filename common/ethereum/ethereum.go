@@ -10,7 +10,10 @@ import (
 	"fmt"
 	"math/big"
 
+	geth "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
@@ -96,6 +99,39 @@ func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *et
 	options.GasTipCap = gasTipCap
 
 	return nil
+}
+
+func EstimateGas(client *ethclient.Client, contractAbi *abi.ABI, opts *ethAbiBind.TransactOpts, contractAddress *common.Address, method string, args ...interface{}) (uint64, error) {
+	var (
+		from = opts.From
+		gasPrice = opts.GasPrice
+		feeCap = opts.GasFeeCap
+		tipCap = opts.GasTipCap
+		value = opts.Value
+	)
+
+	data, err := contractAbi.Pack(method, args...)
+
+	if err != nil {
+		return 0, fmt.Errorf(
+			"Failed to construct a transaction to estimate gas with! %w",
+			err,
+		)
+	}
+
+	msg := geth.CallMsg{
+		From:       from,
+		To:         contractAddress,
+		Gas:        0,
+		GasPrice:   gasPrice,
+		GasFeeCap:  feeCap,
+		GasTipCap:  tipCap,
+		Value:      value,
+		Data:       data,
+		AccessList: []ethTypes.AccessTuple{},
+	}
+
+	return client.EstimateGas(opts.Context, msg)
 }
 
 // Calls a method on a bound contract, first simulating it to see if it reverts
