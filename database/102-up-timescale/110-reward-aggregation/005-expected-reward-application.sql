@@ -1,28 +1,30 @@
 -- migrate:up
 
-DROP MATERIALIZED VIEW IF EXISTS expected_rewards;
+-- aggregate highest and average reward per application 
 
--- add application to view
-CREATE MATERIALIZED VIEW expected_rewards
-WITH (timescaledb.continuous) AS
-SELECT 
-    network,
-    token_short_name,
-    application,
-    COUNT(*),
-    SUM(winning_amount / (10 ^ token_decimals)) / COUNT(*) AS average_reward,
-    MAX(winning_amount / (10 ^ token_decimals)) as highest_reward,
-    time_bucket(INTERVAL '1 month', awarded_time) AS awarded_month
-FROM winners
-GROUP BY awarded_month, network, token_short_name, application
-WITH NO DATA;
-
-SELECT add_continuous_aggregate_policy('expected_rewards',
-    start_offset => NULL,
-    end_offset => INTERVAL '1 month',
-    schedule_interval => INTERVAL '1 hour');
+CREATE FUNCTION application_performance(i INTERVAL)
+RETURNS TABLE (
+    network network_blockchain,
+    application application,
+    count BIGINT,
+    average_reward DOUBLE PRECISION,
+    highest_reward DOUBLE PRECISION
+)
+LANGUAGE sql 
+AS
+$$
+    SELECT 
+        network,
+        application,
+        COUNT(*),
+        SUM(winning_amount / (10 ^ token_decimals)) / COUNT(*) AS average_reward,
+        MAX(winning_amount / (10 ^ token_decimals)) as highest_reward
+    FROM winners
+    WHERE awarded_time > NOW() - i
+    GROUP BY network, application;
+$$;
 
 -- migrate:down
 
-DROP MATERIALIZED VIEW expected_rewards;
+DROP FUNCTION application_performance;
 

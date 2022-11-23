@@ -22,4 +22,4 @@ SELECT add_continuous_aggregate_policy('expected_rewards',
 
 -- migrate:down
 
-DROP MATERIALIZED VIEW IF EXISTS expected_rewards;
+DROP MATERIALIZED VIEW expected_rewards;
