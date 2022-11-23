@@ -302,9 +302,9 @@ export default function Dashboard() {
             details={
               log.type === NotificationType.REWARD_DATABASE
                 ? log.rewardType === `send`
-                  ? `reward for sending`
-                  : `reward for receiving`
-                : `received from ` + trimAddress(log.source)
+                  ? `reward for s͟e͟n͟d`
+                  : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
+                : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
             linkLabelOnClickCallback={async () => {
@@ -565,26 +565,23 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-
-        {
-          <ViewRewardModal
-            visible={detailedRewardObject.visible}
-            close={() => {
-              handleCloseViewRewardDetailModal();
-            }}
-            callback={() => {
-              handleCloseViewRewardDetailModal();
-              navigate("./rewards/unclaimed");
-            }}
-            tokenSymbol={detailedRewardObject.token}
-            img={detailedRewardObject.img}
-            colour={detailedRewardObject.colour}
-            winAmount={detailedRewardObject.winAmount}
-            explorerUri={detailedRewardObject.explorerUri}
-            balance={detailedRewardObject.balance}
-            forSending={detailedRewardObject.forSending}
-          />
-        }
+        <ViewRewardModal
+          visible={detailedRewardObject.visible}
+          close={() => {
+            handleCloseViewRewardDetailModal();
+          }}
+          callback={() => {
+            handleCloseViewRewardDetailModal();
+            navigate("./rewards/unclaimed");
+          }}
+          tokenSymbol={detailedRewardObject.token}
+          img={detailedRewardObject.img}
+          colour={detailedRewardObject.colour}
+          winAmount={detailedRewardObject.winAmount}
+          explorerUri={detailedRewardObject.explorerUri}
+          balance={detailedRewardObject.balance}
+          forSending={detailedRewardObject.forSending}
+        />
 
         <Outlet />
 
