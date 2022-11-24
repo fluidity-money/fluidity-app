@@ -91,6 +91,7 @@ const OptionsSchema = z.object({
     Solend: z.string(),
     Uniswap: z.string(),
     Sushiswap: z.string(),
+    Fluidity: z.string(),
   }),
   database: z.object({
     hasura: z.string(),

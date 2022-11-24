@@ -24,7 +24,7 @@ export interface IFluidityFacade {
 
   // Ethereum only
   manualReward: (
-    tokenAddrs: string[],
+    fluidTokenAddrs: string[],
     userAddr: string
   ) => Promise<
     | ({ gasFee: number; networkFee: number; amount: number } | undefined)[]

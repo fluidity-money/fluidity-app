@@ -12,6 +12,8 @@ const queryAll = gql`
       transaction_hash
       winning_amount
       token_decimals
+      ethereum_application
+      solana_application
     }
   }
 `;
@@ -28,6 +30,8 @@ const queryByAddress = gql`
       transaction_hash
       winning_amount
       token_decimals
+      ethereum_application
+      solana_application
     }
   }
 `;
@@ -76,6 +80,8 @@ export type Winner = {
   transaction_hash: string;
   winning_amount: number;
   token_decimals: number;
+  ethereum_application?: string;
+  solana_application?: string;
 };
 
 export { useUserRewardsAll, useUserRewardsByAddress };

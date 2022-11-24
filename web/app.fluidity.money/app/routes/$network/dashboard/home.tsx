@@ -87,23 +87,30 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const defaultLogo = "/assets/tokens/fUSDT.png";
 
     const mergedTransactions: Transaction[] =
-      transactions?.map((tx) => ({
-        sender: tx.sender,
-        receiver: tx.receiver,
-        winner: winnersMap[tx.hash]?.winning_address ?? "",
-        reward: winnersMap[tx.hash]
-          ? winnersMap[tx.hash].winning_amount /
-            10 ** winnersMap[tx.hash].token_decimals
-          : 0,
-        hash: tx.hash,
-        currency: tx.currency,
-        value:
-          tx.currency === "DAI" || tx.currency === "fDAI"
-            ? tx.value / 10 ** 12
-            : tx.value,
-        timestamp: tx.timestamp * 1000,
-        logo: tokenLogoMap[tx.currency] || defaultLogo,
-      })) ?? [];
+      transactions?.map((tx) => {
+        const winner = winnersMap[tx.hash];
+
+        return {
+          sender: tx.sender,
+          receiver: tx.receiver,
+          winner: winner?.winning_address ?? "",
+          reward: winner
+            ? winner.winning_amount / 10 ** winner.token_decimals
+            : 0,
+          hash: tx.hash,
+          currency: tx.currency,
+          value:
+            tx.currency === "DAI" || tx.currency === "fDAI"
+              ? tx.value / 10 ** 12
+              : tx.value,
+          timestamp: tx.timestamp * 1000,
+          logo: tokenLogoMap[tx.currency] || defaultLogo,
+          provider:
+            (network === "ethereum"
+              ? winner?.ethereum_application
+              : winner?.solana_application) ?? "",
+        };
+      }) ?? [];
 
     const totalRewards = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
@@ -150,6 +157,7 @@ const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   value,
   currency: "",
   logo: "/assets/tokens/fUSDT.svg",
+  provider: "",
 });
 
 type LoaderData = {
