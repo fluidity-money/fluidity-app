@@ -365,6 +365,7 @@ func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress et
 		sendTransactionHash,
 		receipientAddress,
 		false,
+		application.String(),
 	)
 
 	if err != nil {
