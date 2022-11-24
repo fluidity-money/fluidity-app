@@ -31,7 +31,7 @@ func DecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Rewar
 		logTopics = log.Topics
 	)
 
-	decodedData, err := fluidityContractAbi.Unpack("Reward", logData)
+	decodedData, err := FluidityContractAbi.Unpack("Reward", logData)
 
 	if err != nil {
 		return rewardData, fmt.Errorf(

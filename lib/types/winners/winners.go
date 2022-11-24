@@ -16,6 +16,11 @@ import (
 // "send" || "receive"
 type RewardType string
 
+// represents an enum containing applications for a network
+type Application interface {
+	String() string
+}
+
 type Winner struct {
 	Network                  network.BlockchainNetwork `json:"network"`
 	TransactionHash          string                    `json:"transaction_hash"`
@@ -24,6 +29,9 @@ type Winner struct {
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
 	AwardedTime              time.Time                 `json:"awarded_time"`
 	RewardType				 RewardType                `json:"reward_type"`
+	Application              Application			   `json:"application"`
+	BatchFirstBlock          misc.BigInt               `json:"first_block"`
+	BatchLastBlock           misc.BigInt               `json:"last_block"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }

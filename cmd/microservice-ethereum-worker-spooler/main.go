@@ -72,10 +72,11 @@ func main() {
 				transactionHash  = announcement.TransactionHash
 				senderAddress    = announcement.FromAddress
 				recipientAddress = announcement.ToAddress
+				application      = announcement.Application
 			)
 
 			// write the sender and receiver to be stored once the win is paid out
-			winners.InsertPendingRewardType(transactionHash, senderAddress, recipientAddress)
+			winners.InsertPendingRewardType(transactionHash, senderAddress, recipientAddress, application)
 
 			tokenDecimalsScale := bigExp10(int64(tokenDecimals))
 

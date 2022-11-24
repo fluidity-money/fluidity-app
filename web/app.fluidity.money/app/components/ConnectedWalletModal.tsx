@@ -18,7 +18,12 @@ export const ConnectedWalletModal = ({
 }: IPropsConnectedWalletModal) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const [icon, setIcon] = useState<React.ReactNode>(
-    <img src="/images/icons/copyIcon.svg" alt="copy" />
+    <img
+      height="26"
+      width="26"
+      src="/images/icons/copyIconCircle.svg"
+      alt="copy"
+    />
   );
 
   const copyAddress = (address: string) => {
@@ -29,7 +34,14 @@ export const ConnectedWalletModal = ({
     );
 
     setTimeout(() => {
-      setIcon(<img src="/images/icons/copyIcon.svg" alt="copy" />);
+      setIcon(
+        <img
+          height="26"
+          width="26"
+          src="/images/icons/copyIconCircle.svg"
+          alt="copy"
+        />
+      );
     }, 500);
   };
 

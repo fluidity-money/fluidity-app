@@ -13,6 +13,8 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	ethApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
+	solApps "github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -31,30 +33,60 @@ const (
 	TablePendingRewardType = "ethereum_pending_reward_type"
 )
 
-type Winner = winners.Winner
+type (
+	Winner		= winners.Winner
+	Application = winners.Application
+)
 
 func InsertWinner(winner Winner) {
 	timescaleClient := timescale.Client()
 
 	var (
-		tokenShortName = winner.TokenDetails.TokenShortName
-		tokenDecimals  = winner.TokenDetails.TokenDecimals
+		tokenShortName    = winner.TokenDetails.TokenShortName
+		tokenDecimals     = winner.TokenDetails.TokenDecimals
+		applicationString = winner.Application.String()
+
+		statementText string
 	)
 
-	statementText := fmt.Sprintf(
-		`INSERT INTO %s (
-			network,
-			transaction_hash,
-			winning_address,
-			solana_winning_owner_address,
-			winning_amount,
-			awarded_time,
-			token_short_name,
-			token_decimals,
-			reward_type
+	switch winner.Network {
+	case network.NetworkEthereum:
+		statementText = fmt.Sprintf(
+			`INSERT INTO %s (
+				network,
+				transaction_hash,
+				winning_address,
+				solana_winning_owner_address,
+				winning_amount,
+				awarded_time,
+				token_short_name,
+				token_decimals,
+				reward_type,
+				ethereum_application
+			)`,
+			TableWinners,
 		)
 
-		VALUES (
+	case network.NetworkSolana:
+		statementText = fmt.Sprintf(
+			`INSERT INTO %s (
+				network,
+				transaction_hash,
+				winning_address,
+				solana_winning_owner_address,
+				winning_amount,
+				awarded_time,
+				token_short_name,
+				token_decimals,
+				reward_type,
+				solana_application
+			)`,
+			TableWinners,
+		)
+	}
+
+	statementText +=
+		`VALUES (
 			$1,
 			$2,
 			$3,
@@ -63,11 +95,9 @@ func InsertWinner(winner Winner) {
 			$6,
 			$7,
 			$8,
-			$9
-		);`,
-
-		TableWinners,
-	)
+			$9,
+			$10
+		);`
 
 	_, err := timescaleClient.Exec(
 		statementText,
@@ -80,6 +110,7 @@ func InsertWinner(winner Winner) {
 		tokenShortName,
 		tokenDecimals,
 		winner.RewardType,
+		applicationString,
 	)
 
 	if err != nil {
@@ -92,7 +123,7 @@ func InsertWinner(winner Winner) {
 }
 
 // GetWinners in the past, limited by a number
-func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
+func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []Winner {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -105,7 +136,9 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 			token_short_name,
 			token_decimals,
 			solana_winning_owner_address,
-			reward_type
+			reward_type,
+			ethereum_application,
+			solana_application
 
 		FROM %v
 		WHERE network = $1
@@ -117,7 +150,7 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 	rows, err := timescaleClient.Query(
 		statementText,
-		network,
+		blockchainNetwork,
 		limit,
 	)
 
@@ -142,6 +175,8 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 		var (
 			winner                   Winner
 			solanaWinnerOwnerAddress sql.NullString
+			applicationSolana        string
+			applicationEthereum      string
 		)
 
 		err := rows.Scan(
@@ -154,6 +189,8 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 			&winner.TokenDetails.TokenDecimals,
 			&solanaWinnerOwnerAddress,
 			&winner.RewardType,
+			&applicationSolana,
+			&applicationEthereum,
 		)
 
 		if err != nil {
@@ -166,15 +203,47 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 		winner.SolanaWinnerOwnerAddress = solanaWinnerOwnerAddress.String
 
+		var application Application
+
+		switch winner.Network {
+		case network.NetworkEthereum:
+			application, err = ethApps.ParseApplicationName(applicationEthereum)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Failed to convert application name into application!"
+					k.Payload = err
+				})
+			}
+
+		case network.NetworkSolana:
+			application, err = solApps.ParseApplicationName(applicationSolana)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Failed to convert application name into application!"
+					k.Payload = err
+				})
+			}
+
+		}
+
+		winner.Application = application
+
 		winners = append(winners, winner)
 	}
 
 	return winners
 }
 
-// GetAndRemovePendingRewardType to fetch and remove the type (send or receive) of an unsent win
+// Ethereum Specific
+// GetAndRemovePendingRewardType to fetch and remove the type (send or receive)
+// of an unsent win as well as the application that was involved
 // using the hash of the reward payout transaction
-func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address ethereum.Address) winners.RewardType {
+func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address ethereum.Address) (winners.RewardType, ethApps.Application) {
+
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -182,7 +251,10 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 		WHERE
 			reward_transaction_hash = $1
 			AND winner_address = $2
-		RETURNING is_sender;`,
+		RETURNING
+			is_sender,
+			application
+		;`,
 
 		TablePendingRewardType,
 	)
@@ -193,9 +265,15 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 		address,
 	)
 
-	var isSender bool
+	var (
+		isSender bool
+		application_ string
+	)
 
-	err := row.Scan(&isSender)
+	err := row.Scan(
+		&isSender,
+		&application_,
+	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -211,29 +289,48 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 		})
 	}
 
+	application, err := ethApps.ParseApplicationName(application_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Fetched invalid application name %v!",
+				application_,
+			)
+
+			k.Payload = err
+		})
+	}
+
 	if isSender {
-		return "send"
+		return "send", application
 	} else {
-		return "receive"
+		return "receive", application
 	}
 }
 
-// InsertPendingRewardType to store the reward type of a pending win
-// insert the hash of the send that is going to win
-func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, receipientAddress ethereum.Address) {
+// Ethereum Specific
+// InsertPendingRewardType to store the reward type and application of a pending win
+func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, receipientAddress ethereum.Address, application Application) {
+
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
 			send_transaction_hash,
 			winner_address,
-			is_sender
+			is_sender,
+			application
+
 		)
 
 		VALUES (
 			$1,
 			$2,
-			$3
+			$3,
+			$4
 		);`,
 
 		TablePendingRewardType,
@@ -245,6 +342,7 @@ func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress et
 		sendTransactionHash,
 		senderAddress,
 		true,
+		application.String(),
 	)
 
 	if err != nil {
