@@ -12,6 +12,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 
@@ -376,8 +377,11 @@ func main() {
 					appEmission      = transfer.AppEmissions
 				)
 
+				application := applications.ApplicationNone 
+
 				if transfer.Decorator != nil {
 					applicationFeeUsd := transfer.Decorator.ApplicationFee
+					application = transfer.Decorator.Application
 
 					transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
 				}
@@ -431,6 +435,7 @@ func main() {
 					SourceRandom:    randomSource,
 					SourcePayouts:   randomPayouts,
 					TokenDetails:    tokenDetails,
+					Application:     application,
 				}
 
 				// Fill in emission.NaiveIsWinning

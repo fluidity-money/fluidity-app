@@ -8,6 +8,7 @@ import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
 import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import { format } from "date-fns";
+import { MintAddress } from "~/types/MintAddress";
 import {
   Display,
   LineChart,
@@ -20,12 +21,7 @@ import {
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useMemo, useEffect } from "react";
 import { useUserRewards } from "~/queries";
-import {
-  useLoaderData,
-  useNavigate,
-  Link,
-  useLocation,
-} from "@remix-run/react";
+import { useLoaderData, useNavigate, useLocation } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -94,6 +90,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       transactions?.map((tx) => ({
         sender: tx.sender,
         receiver: tx.receiver,
+        winner: winnersMap[tx.hash]?.winning_address ?? "",
         reward: winnersMap[tx.hash]
           ? winnersMap[tx.hash].winning_amount /
             10 ** winnersMap[tx.hash].token_decimals
@@ -113,10 +110,16 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       0
     );
 
+    const totalVolume = mergedTransactions.reduce(
+      (sum, { value }) => sum + value,
+      0
+    );
+
     return json({
       totalTransactions: mergedTransactions,
       totalCount: count,
       totalRewards,
+      totalVolume,
       fluidPairs,
       page,
       network,
@@ -140,6 +143,7 @@ export const meta = () => {
 const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   sender: "",
   receiver: "",
+  winner: "",
   reward: 0,
   hash: "",
   timestamp: time,
@@ -152,6 +156,7 @@ type LoaderData = {
   totalTransactions: Transaction[];
   totalRewards: number;
   totalCount: number;
+  totalVolume: number;
   fluidPairs: number;
   page: number;
   network: Chain;
@@ -176,8 +181,14 @@ function ErrorBoundary(error: Error) {
 }
 
 export default function Home() {
-  const { network, totalTransactions, totalCount, totalRewards, fluidPairs } =
-    useLoaderData<LoaderData>();
+  const {
+    network,
+    totalTransactions,
+    totalCount,
+    totalRewards,
+    totalVolume,
+    fluidPairs,
+  } = useLoaderData<LoaderData>();
 
   const location = useLocation();
 
@@ -193,14 +204,16 @@ export default function Home() {
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
 
-  const [{ count, transactions, rewards }, setTransactions] = useState<{
+  const [{ count, transactions, rewards, volume }, setTransactions] = useState<{
     count: number;
     transactions: Transaction[];
     rewards: number;
+    volume: number;
   }>({
     count: totalCount,
     transactions: totalTransactions,
     rewards: totalRewards,
+    volume: totalVolume,
   });
 
   const binTransactions = (
@@ -217,7 +230,7 @@ export default function Home() {
       }
 
       if (tx.value > bins[mappedTxIndex].value) {
-        bins[mappedTxIndex] = { ...tx, x: mappedTxIndex };
+        bins[mappedTxIndex] = { ...tx, x: bins.length - mappedTxIndex };
       }
 
       return true;
@@ -236,7 +249,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -253,7 +266,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -268,7 +281,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -283,7 +296,7 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
           ...graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc),
-          x: i,
+          x: entries - i,
         }));
 
         return binTransactions(mappedTxBins, txs);
@@ -293,34 +306,46 @@ export default function Home() {
 
   const graphTransformedTransactions = useMemo(
     () =>
-      graphTransformers[activeTransformerIndex].transform(totalTransactions),
+      graphTransformers[activeTransformerIndex]
+        .transform(totalTransactions)
+        .reverse(),
     [activeTransformerIndex]
   );
 
   const { width } = useViewport();
-  const tableBreakpoint = 850;
+  const isTablet = width < 850 && width > 0;
+  const isMobile = width < 500 && width > 0;
+  const isSmallMobile = width < 375;
 
-  const txTableColumns =
-    width > 0 && width < tableBreakpoint
-      ? [{ name: "ACTIVITY" }, { name: "REWARD" }]
-      : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "ACCOUNT",
-          },
-          {
-            name: "TIME",
-            alignRight: true,
-          },
-        ];
+  const txTableColumns = isSmallMobile
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
+    : isMobile
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+    : isTablet
+    ? [
+        { name: "ACTIVITY" },
+        { name: "VALUE" },
+        { name: "REWARD" },
+        { name: "ACCOUNT" },
+      ]
+    : [
+        {
+          name: "ACTIVITY",
+        },
+        {
+          name: "VALUE",
+        },
+        {
+          name: "REWARD",
+        },
+        {
+          name: "ACCOUNT",
+        },
+        {
+          name: "TIME",
+          alignRight: true,
+        },
+      ];
 
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
     connected ? 1 : 0
@@ -338,7 +363,7 @@ export default function Home() {
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
-            address in [sender, receiver],
+            [sender, receiver].includes(address),
           name: "YOUR DASHBOARD",
         },
       ]
@@ -355,20 +380,28 @@ export default function Home() {
         count: totalCount,
         rewards: totalRewards,
         transactions: totalTransactions,
+        volume: totalVolume,
       });
     }
 
     const tableFilteredTransactions = totalTransactions.filter(
       txTableFilters[activeTableFilterIndex].filter
     );
+
     const filteredRewards = tableFilteredTransactions.reduce(
       (sum, { reward }) => sum + reward,
+      0
+    );
+
+    const filteredVolume = tableFilteredTransactions.reduce(
+      (sum, { value }) => sum + value,
       0
     );
 
     setTransactions({
       count: tableFilteredTransactions.length,
       rewards: filteredRewards,
+      volume: filteredVolume,
       transactions: tableFilteredTransactions,
     });
   }, [activeTableFilterIndex]);
@@ -402,38 +435,42 @@ export default function Home() {
           </td>
 
           {/* Value */}
-          {width > tableBreakpoint && (
+          <td>
+            <Text>
+              {value.toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+              })}
+            </Text>
+          </td>
+
+          {/* Reward */}
+          {!isMobile && (
             <td>
-              <Text>
-                {value.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                })}
+              <Text prominent={true}>
+                {reward ? numberToMonetaryString(reward) : "-"}
               </Text>
             </td>
           )}
 
-          {/* Reward */}
-          <td>
-            <Text prominent={true}>
-              {reward ? numberToMonetaryString(reward) : "-"}
-            </Text>
-          </td>
-
           {/* Account */}
-          {width > tableBreakpoint && (
+          {!isSmallMobile && (
             <td>
               <a
                 className="table-address"
                 href={getAddressExplorerLink(chain, sender)}
               >
-                <Text>{trimAddress(sender)}</Text>
+                <Text>
+                  {sender === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(sender)}
+                </Text>
               </a>
             </td>
           )}
 
           {/* Time */}
-          {width > tableBreakpoint && (
+          {!isTablet && (
             <td>
               <Text>{transactionTimeLabel(timestamp)}</Text>
             </td>
@@ -449,24 +486,40 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
+              {/* Transactions Count */}
               <div className="statistics-set">
                 <Text>
                   {activeTableFilterIndex ? "Your" : "Total"} transactions
                 </Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
                   {count}
                 </Display>
                 <AnchorButton>
-                  <Link
-                    to={{ pathname: "#transactions", search: location.search }}
-                  >
-                    Activity
-                  </Link>
+                  <a href="#transactions">Activity</a>
                 </AnchorButton>
               </div>
+
+              {/* Volume */}
+              <div className="statistics-set">
+                <Text>{activeTableFilterIndex ? "Your" : "Total"} volume</Text>
+                <Display
+                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(volume)}
+                </Display>
+              </div>
+
+              {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
                   {numberToMonetaryString(rewards)}
                 </Display>
                 <LinkButton
@@ -479,9 +532,14 @@ export default function Home() {
                   Rewards
                 </LinkButton>
               </div>
+
+              {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
                   {fluidPairs}
                 </Display>
               </div>
@@ -525,7 +583,7 @@ export default function Home() {
                 <div className={"tooltip-container"}>
                   <div className={"tooltip"}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {format(datum.timestamp, "dd/mm/yy")}
+                      {format(datum.timestamp, "dd/MM/yy")}
                     </span>
                     <br />
                     <br />

@@ -45,6 +45,7 @@ import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import { ViewRewardModal } from "~/components/ViewRewardModal";
+import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -89,7 +90,7 @@ function ErrorBoundary() {
 
 export const meta: MetaFunction = ({ data }) => ({
   ...data,
-  title: "Dashboard",
+  title: "Fluidity - Dashboard",
 });
 
 const routeMapper = (route: string) => {
@@ -175,8 +176,8 @@ export default function Dashboard() {
 
   const { width } = useViewport();
 
-  const isMobile = width <= 500;
-  const isTablet = width <= 850 && width > 500;
+  const isMobile = width <= 500 && width > 0;
+  const isTablet = width <= 850 && width > 0;
   const closeMobileModal = width > 850 ? false : true;
 
   useEffect(() => {
@@ -302,9 +303,9 @@ export default function Dashboard() {
             details={
               log.type === NotificationType.REWARD_DATABASE
                 ? log.rewardType === `send`
-                  ? `reward for sending`
-                  : `reward for receiving`
-                : `received from ` + trimAddress(log.source)
+                  ? `reward for s͟e͟n͟d`
+                  : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
+                : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
             linkLabelOnClickCallback={async () => {
@@ -362,11 +363,18 @@ export default function Dashboard() {
     document.body.style.position = "static";
   }, [currentPath]);
 
+  const [hoverModal, setHoverModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
         <a onClick={() => navigate("./home")}>
-          <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+          <img
+            style={{ width: "5.5em", height: "2.5em" }}
+            src="/images/outlinedLogo.svg"
+            alt="Fluidity"
+          />
         </a>
 
         <br />
@@ -480,7 +488,11 @@ export default function Dashboard() {
           <div className="top-navbar-left">
             {(isMobile || isTablet) && (
               <a onClick={() => navigate("./home")}>
-                <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+                <img
+                  style={{ width: "5.5em", height: "2.5em" }}
+                  src="/images/outlinedLogo.svg"
+                  alt="Fluidity"
+                />
               </a>
             )}
             {!isMobile && (
@@ -520,6 +532,7 @@ export default function Dashboard() {
 
             {/* Fluidify */}
             <GeneralButton
+              className="fluidify-button-dashboard"
               version={"primary"}
               buttontype="text"
               size={"small"}
@@ -530,6 +543,8 @@ export default function Dashboard() {
 
             {/* Prize Money */}
             <GeneralButton
+              onMouseEnter={() => setHoverModal(true)}
+              onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
               className="trophy-button"
               version={"transparent"}
               buttontype="icon after"
@@ -543,6 +558,11 @@ export default function Dashboard() {
             >
               ${unclaimedRewards}
             </GeneralButton>
+
+            {/* Modal on hover */}
+            {(hoverModal || showModal) && (
+              <UnclaimedRewardsHoverModal setShowModal={setShowModal} />
+            )}
 
             {(isTablet || isMobile) && (
               <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
@@ -565,26 +585,23 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-
-        {
-          <ViewRewardModal
-            visible={detailedRewardObject.visible}
-            close={() => {
-              handleCloseViewRewardDetailModal();
-            }}
-            callback={() => {
-              handleCloseViewRewardDetailModal();
-              navigate("./rewards/unclaimed");
-            }}
-            tokenSymbol={detailedRewardObject.token}
-            img={detailedRewardObject.img}
-            colour={detailedRewardObject.colour}
-            winAmount={detailedRewardObject.winAmount}
-            explorerUri={detailedRewardObject.explorerUri}
-            balance={detailedRewardObject.balance}
-            forSending={detailedRewardObject.forSending}
-          />
-        }
+        <ViewRewardModal
+          visible={detailedRewardObject.visible}
+          close={() => {
+            handleCloseViewRewardDetailModal();
+          }}
+          callback={() => {
+            handleCloseViewRewardDetailModal();
+            navigate("./rewards/unclaimed");
+          }}
+          tokenSymbol={detailedRewardObject.token}
+          img={detailedRewardObject.img}
+          colour={detailedRewardObject.colour}
+          winAmount={detailedRewardObject.winAmount}
+          explorerUri={detailedRewardObject.explorerUri}
+          balance={detailedRewardObject.balance}
+          forSending={detailedRewardObject.forSending}
+        />
 
         <Outlet />
 

@@ -26,6 +26,7 @@ type (
 		SourcePayouts   []*misc.BigInt             `json:"random_payouts"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
 		Emissions       Emission                   `json:"emissions"`
+		Application     applications.Application   `json:"application"`
 	}
 
 	EthereumWinnerAnnouncement struct {
@@ -37,6 +38,7 @@ type (
 		FromWinAmount   *misc.BigInt               `json:"from_win_amount"`
 		ToWinAmount     *misc.BigInt               `json:"to_win_amount"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
+		Application     applications.Application   `json:"application"`
 	}
 
 	EthereumReward struct {
@@ -71,8 +73,10 @@ type (
 	// Decorator attached to a transfer, able to be expanded to
 	// include application data as needed
 	EthereumWorkerDecorator struct {
+		// Enum corresponding to the application
+		Application	   applications.Application `json:"application"`
 		// Application fee in USD
-		ApplicationFee *big.Rat `json:"application_fee"`
+		ApplicationFee *big.Rat                 `json:"application_fee"`
 	}
 
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any

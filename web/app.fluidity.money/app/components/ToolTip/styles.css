@@ -15,6 +15,7 @@
 .tooltip_content {
   border-radius: 5px;
   display: flex;
+  align-items: center;
   padding: 24px 13px 24px 24px;
 }
 
@@ -39,10 +40,15 @@
   text-decoration-color: white;
 }
 
+.tooltip_title {
+  margin-right: 10px;
+}
+
 .tool_icon {
   width: 35px;
   height: 35px;
   margin-right: 7px;
+  align-self: center;
 }
 
 .tool_cancel_btn {
@@ -52,14 +58,19 @@
 }
 
 .toolkit_duration_bar {
+  display: block;
   height: 2px;
   background-color: white;
 }
 
+.tool_detail_section {
+  display: flex;
+  align-items: center;
+}
+
 @media only screen and (max-width: 620px) {
   .tooltip {
-    width: 100vw;
-    margin-top: 10px;
+    width: 95vw;
   }
 
   .tooltip_title {
@@ -68,20 +79,27 @@
 
   .tooltip_container {
     position: fixed;
-    top: 0px;
-    right: 0px;
+    padding: 0;
+    margin: 0;
+    top: 91vh;
+    -webkit-transform: translateX(50%) rotateX(180deg);
+    transform: translateX(50%) rotateX(180deg);
+    right: 50%;
   }
 
   .tool_content_link {
     font-size: 2vw;
-    margin-left: 10px;
+    margin-left: 40px;
     margin-right: 0;
   }
 
   .tooltip_content {
     display: flex;
-    width: 100vw;
+    width: 87vw;
+    border-radius: 15px;
     justify-content: space-between;
+    -webkit-transform: rotateX(180deg);
+    transform: rotateX(180deg);
   }
 
   .tooltip_content_details {
@@ -89,12 +107,15 @@
   }
 
   .tool_cancel_btn {
-    margin-right: 28px;
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .tool_icon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .toolkit_duration_bar {
+    display: none;
   }
 }
