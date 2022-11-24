@@ -11,6 +11,7 @@ SERVICES:
   - ETH_MANUAL_REWARDS_SIGNER:
       SERVICE_NAME: microservice-ethereum-manual-rewards-signer
       DOCKERFILE_PATH: ./cmd/microservice-ethereum-manual-rewards-signer
+      TARGET_GROUP: flu-mainnet-eth-api-tg
       ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-manual-rewards-signer
       SECRET_FLU_ETHEREUM_WORKER_PRIVATE_KEY_LIST: /fluidity/ethereum/private_key_list
       SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ethereum/token_list
