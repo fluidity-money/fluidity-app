@@ -214,9 +214,9 @@ func main() {
 			winnerAddress = typesEth.AddressFromString(rewardData.Winner.String())
 		)
 
-		rewardType := timescaleWinners.GetAndRemovePendingRewardType(hash, winnerAddress)
+		rewardType, application := timescaleWinners.GetAndRemovePendingRewardType(hash, winnerAddress)
 
-		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime, rewardType)
+		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime, rewardType, application)
 
 		var publishTopic string
 

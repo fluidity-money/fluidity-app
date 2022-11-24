@@ -224,6 +224,7 @@ func main() {
 				}
 
 				decorator := &worker.EthereumWorkerDecorator{
+					Application: transfer.Application,
 					ApplicationFee: fee,
 				}
 
@@ -248,6 +249,7 @@ func main() {
 					SenderAddress:    fromAddress,
 					RecipientAddress: toAddress,
 					Decorator:        decorator,
+					
 					AppEmissions:     emission,
 				}
 
