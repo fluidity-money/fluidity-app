@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { TransactionResponse } from "~/util/chainUtils/instructions";
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 export interface IFluidityFacade {
   swap: (
@@ -21,6 +21,15 @@ export interface IFluidityFacade {
 
   // Raw address - For UI
   rawAddress: string;
+
+  // Ethereum only
+  manualReward: (
+    tokenAddrs: string[],
+    userAddr: string
+  ) => Promise<
+    | ({ gasFee: number; networkFee: number; amount: number } | undefined)[]
+    | undefined
+  >;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({
