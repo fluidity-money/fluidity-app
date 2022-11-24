@@ -451,12 +451,17 @@ export default function Dashboard() {
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.01 ? `$${unclaimedRewards}` : numberToMonetaryString(unclaimedRewards)}
+              {unclaimedRewards < 0.01
+                ? `$${unclaimedRewards}`
+                : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
             {/* Modal on hover */}
             {(hoverModal || showModal) && (
-              <UnclaimedRewardsHoverModal setShowModal={setShowModal} />
+              <UnclaimedRewardsHoverModal
+                unclaimedRewards={unclaimedRewards}
+                setShowModal={setShowModal}
+              />
             )}
 
             {(isTablet || isMobile) && (

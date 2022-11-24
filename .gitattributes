@@ -123,3 +123,4 @@ web/app.fluidity.money/public/images/icons/checked.png filter=lfs diff=lfs merge
 web/app.fluidity.money/public/images/providers/balancer.svg filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/providers/1inch.svg filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/icons/copyIconCircle.svg filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/images/icons/checked.svg filter=lfs diff=lfs merge=lfs -text
