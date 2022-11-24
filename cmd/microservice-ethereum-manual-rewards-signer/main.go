@@ -60,5 +60,7 @@ func main() {
 
 	web.JsonEndpoint("/manual-reward", manualRewardHandler)
 
+	web.Endpoint("/healthcheck", HandleHealthCheck)
+
 	web.Listen()
 }
