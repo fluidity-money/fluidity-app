@@ -211,16 +211,17 @@ type ManualRewardRes = {
 
 export const manualRewardToken = async (
   token: ContractToken,
+  baseTokenSymbol: string,
   address: string,
   signer: Signer
 ): Promise<
   { amount: number; gasFee: number; networkFee: number } | undefined
 > => {
-  const manualRewardUrl = "https://backend.ethereum.fluidity.money";
+  const manualRewardUrl = "https://api.ethereum.fluidity.money/manual-reward";
 
   const manualRewardBody = {
     address,
-    token_short_name: token.symbol,
+    token_short_name: baseTokenSymbol,
   };
 
   const { error, payload } = await jsonPost<ManualRewardBody, ManualRewardRes>(
@@ -261,7 +262,6 @@ export const manualRewardToken = async (
 
   const res = await contractTx.wait();
 
-  console.log(res);
   return {
     networkFee: res.gasUsed.toNumber(),
     gasFee: res.gasUsed.toNumber(),

@@ -9,6 +9,7 @@ type Transaction = {
   value: number;
   currency: string;
   logo: string;
+  provider: string;
 };
 
 export default Transaction;

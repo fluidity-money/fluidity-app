@@ -19,20 +19,21 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: claimStyles }];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-  // TODO: Get reward TX and fetch reward that way
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const { network } = params;
 
   const url = new URL(request.url);
   const _reward = url.searchParams.get("reward");
   const reward = _reward ? parseInt(_reward) : 0;
 
-  const _networkFee = url.searchParams.get("networkfee");
+  const _networkFee = url.searchParams.get("networkFee");
   const networkFee = _networkFee ? parseInt(_networkFee) : 0;
 
-  const _gasFee = url.searchParams.get("gasfee");
+  const _gasFee = url.searchParams.get("gasFee");
   const gasFee = _gasFee ? parseInt(_gasFee) : 0;
 
   return json({
+    network,
     reward,
     networkFee,
     gasFee,
@@ -40,13 +41,14 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 type LoaderData = {
+  network: string;
   reward: number;
   networkFee: number;
   gasFee: number;
 };
 
 const ClaimedRewards = () => {
-  const { reward, networkFee, gasFee } = useLoaderData<LoaderData>();
+  const { reward, networkFee, gasFee, network } = useLoaderData<LoaderData>();
 
   const { connected } = useContext(FluidityFacadeContext);
 
@@ -80,7 +82,7 @@ const ClaimedRewards = () => {
 
       {/* Navigation Bar */}
       <header id="claim-header">
-        <img src="FluidLogo" alt="FluidLogo" />
+        <img src="/images/logoOutline.svg" alt="FluidLogo" />
         <LinkButton
           size={"small"}
           type={"internal"}
@@ -100,12 +102,16 @@ const ClaimedRewards = () => {
         <section className="spread">
           <section className="spread-text">
             <Text>Network fee</Text>
-            <Text>${networkFee} FUSDC</Text>
+            <Text>
+              {networkFee} {network === "ethereum" ? "ETH" : "SOL"}
+            </Text>
           </section>
           <hr />
           <section className="spread-text">
             <Text>Gas fee</Text>
-            <Text>${gasFee} FUSDC</Text>
+            <Text>
+              {gasFee} {network === "ethereum" ? "ETH" : "SOL"}
+            </Text>
           </section>
           <hr />
         </section>

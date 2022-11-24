@@ -3,13 +3,13 @@
 label = "Ethereum"
 testnet = false
 rpc = { http = "FLU_ETH_RPC_HTTP", ws = "FLU_ETH_RPC_WS" }
-server = "https://backend.ethereum.fluidity.money"
+server = "https://api.ethereum.fluidity.money"
 
 [[drivers.solana]]
 label = "Solana"
 testnet = false
 rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
-server = "https://backend.solana.fluidity.money"
+server = "https://api.solana.fluidity.money"
 
 [database]
 hasura = "https://fluidity.hasura.app/v1/graphql"
@@ -222,6 +222,7 @@ Solana= "/images/providers/Solana.svg"
 Solend= "/images/providers/solend.png"
 Uniswap= "/images/providers/Uniswap.svg"
 Sushiswap= "/images/providers/Sushiswap.svg"
+Fluidity= "/images/logoMetallic.png"
 
 [[config.ethereum.wallets]]
 name = "Browser"
