@@ -165,6 +165,39 @@ const fluidityContractAbiString = `[
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "payout",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "firstBlock",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "unblockReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]
 `
@@ -190,8 +223,8 @@ const workerConfigAbiString = `[
 ]`
 
 var (
-	fluidityContractAbi ethAbi.ABI
-	workerConfigAbi     ethAbi.ABI
+	FluidityContractAbi ethAbi.ABI
+	WorkerConfigAbi     ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles
@@ -209,7 +242,7 @@ type RewardArg struct {
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
-		fluidityContractAbi,
+		FluidityContractAbi,
 		client,
 		client,
 		client,
@@ -251,7 +284,7 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
-		fluidityContractAbi,
+		FluidityContractAbi,
 		client,
 		client,
 		client,
@@ -297,7 +330,7 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 
 	gas, err := ethereum.EstimateGas(
 		client,
-		&fluidityContractAbi,
+		&FluidityContractAbi,
 		transactionOptions,
 		&fluidityAddress,
 		"batchReward",
@@ -340,7 +373,7 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityContractAddress,
-		fluidityContractAbi,
+		FluidityContractAbi,
 		client,
 		client,
 		client,
@@ -370,7 +403,7 @@ func TransactUpdateMintLimits(client *ethclient.Client, fluidityContractAddress 
 
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityContractAddress,
-		fluidityContractAbi,
+		FluidityContractAbi,
 		client,
 		client,
 		client,
@@ -398,7 +431,7 @@ func TransactUpdateMintLimits(client *ethclient.Client, fluidityContractAddress 
 func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, hash []byte, addressString string, amount *big.Int) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
-		fluidityContractAbi,
+		FluidityContractAbi,
 		client,
 		client,
 		client,

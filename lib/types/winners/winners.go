@@ -30,6 +30,8 @@ type Winner struct {
 	AwardedTime              time.Time                 `json:"awarded_time"`
 	RewardType				 RewardType                `json:"reward_type"`
 	Application              Application			   `json:"application"`
+	BatchFirstBlock          misc.BigInt               `json:"first_block"`
+	BatchLastBlock           misc.BigInt               `json:"last_block"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }

@@ -16,7 +16,7 @@ func TestBatchReward(t *testing.T) {
 		},
 	}
 
-	_, err := fluidityContractAbi.Pack(
+	_, err := FluidityContractAbi.Pack(
 		"batchReward",
 		testRewardBatch,
 		big.NewInt(1),
