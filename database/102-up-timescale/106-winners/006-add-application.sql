@@ -2,6 +2,7 @@
 
 -- must mirror the `String()` method of lib/types/applications/applications.go
 CREATE TYPE ethereum_application AS ENUM (
+    'none',
     'uniswap_v2',
     'balancer_v2',
     'oneinch_v2',
