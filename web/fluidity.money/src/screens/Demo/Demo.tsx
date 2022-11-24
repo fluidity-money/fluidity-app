@@ -8,6 +8,7 @@ import {
   Display,
   Text,
   numberToMonetaryString,
+  GeneralButton,
 } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./Demo.module.scss";
@@ -25,9 +26,9 @@ const Demo = () => {
     0
   );
 
-  /*
-  full screen demo
-  */
+  const handleConnectWallet = () => (window.location.href = "https://app.fluidity.money/wtf");
+  const handleLaunchFluidity = () => (window.location.href = "https://app.fluidity.money/");
+
   return (
     <>
       <div className={`${styles.container} bg-light`}>
@@ -57,19 +58,22 @@ const Demo = () => {
             Connect your wallet to see what you could make.
           </Text>
           <section>
-            {/* <GeneralButton version={"primary"} buttontype={"text"} size={"medium"} handleClick={function (): void {       
-            } }>
-              SHOW ME A DEMO
-            </GeneralButton> */}
-            <Video
-              className={styles.comingSoonButton}
-              src={"/assets/videos/FluidityComingSoon.mp4"}
-              type={"reduce"}
-              loop={true}
-              scale={0.4}
-              width={"auto"}
-              height={80}
-            />
+            <GeneralButton 
+              version={"primary"} 
+              buttontype={"text"} 
+              size={"large"} 
+              handleClick={handleConnectWallet}
+            >
+              Connect Wallet
+            </GeneralButton>
+            <GeneralButton 
+              version={"secondary"} 
+              buttontype={"text"} 
+              size={width > breakpoint ? "large" : "small"} 
+              handleClick={handleLaunchFluidity}
+            >
+              Launch Fluidity
+            </GeneralButton>
           </section>
         </div>
       </div>

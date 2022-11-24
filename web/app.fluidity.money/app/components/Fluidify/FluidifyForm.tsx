@@ -1,3 +1,7 @@
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
+
+import { useContext, useState } from "react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   Text,
   GeneralButton,
@@ -6,28 +10,96 @@ import {
 import AugmentedToken from "~/types/AugmentedToken";
 
 interface IFluidifyFormProps {
-  handleSwap: (e: React.FormEvent<HTMLFormElement>) => void;
-  tokenIsFluid: boolean;
-  swapAmount: number;
-  setSwapAmount: React.Dispatch<React.SetStateAction<number>>;
+  handleSwap: (receipt: TransactionResponse, amount: number) => void;
   assetToken: AugmentedToken;
   toToken: AugmentedToken;
   swapping: boolean;
-  formDisabled: () => boolean;
 }
 
 export const FluidifyForm = ({
   handleSwap,
-  tokenIsFluid,
-  swapAmount,
-  setSwapAmount,
   assetToken,
   toToken,
   swapping,
-  formDisabled,
 }: IFluidifyFormProps) => {
+  const { address, connected, swap } = useContext(FluidityFacadeContext);
+
+  const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
+
+  const [swapInput, setSwapInput] = useState<string>("0");
+
+  // Snap the smallest of token balance, remaining mint limit, or swap amt
+  const snapToValidValue = (input: string): number =>
+    assetToken?.userMintLimit
+      ? Math.min(
+          parseFloat(input) || 0,
+          (assetToken?.userMintLimit || 0) - (assetToken?.userMintedAmt || 0),
+          assetToken.userTokenBalance || 0
+        )
+      : Math.min(parseFloat(input) || 0, assetToken.userTokenBalance || 0);
+
+  const swapAmount: number = snapToValidValue(swapInput);
+
+  const assertCanSwap =
+    connected &&
+    !!address &&
+    !!fluidTokenAddress &&
+    !!swap &&
+    !!assetToken?.userTokenBalance &&
+    !!swapAmount &&
+    swapAmount <= (assetToken?.userTokenBalance || 0) &&
+    (assetToken.userMintLimit === undefined ||
+      swapAmount + (assetToken.userMintedAmt || 0) <= assetToken.userMintLimit);
+
+  const handleChangeSwapInput: React.ChangeEventHandler<HTMLInputElement> = (
+    e
+  ) => {
+    const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [whole, dec, _invalid] = numericChars.split(".");
+
+    const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+
+    if (dec === undefined) {
+      return setSwapInput(`${unpaddedWhole}`);
+    }
+
+    return setSwapInput([whole, dec].join("."));
+  };
+
+  const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
+    e
+  ) => {
+    e.preventDefault();
+
+    if (!assertCanSwap) return;
+
+    if (!swap) return;
+
+    if (!assetToken) return;
+
+    const rawTokenAmount = `${Math.floor(
+      swapAmount * 10 ** assetToken.decimals
+    )}`;
+
+    try {
+      const receipt = await swap(rawTokenAmount.toString(), assetToken.address);
+
+      if (receipt) {
+        handleSwap(receipt, swapAmount);
+      }
+    } catch (e) {
+      // Expect error on fail
+      console.log(e);
+      return;
+    }
+  };
+
+  const tokenIsFluid = !!assetToken.isFluidOf;
+
   return (
-    <form className={"fluidify-form"} onSubmit={handleSwap}>
+    <form className={"fluidify-form"} onSubmit={swapAndRedirect}>
       <Text size="lg" prominent>
         AMOUNT TO {tokenIsFluid ? "REVERT" : "FLUIDIFY"}
       </Text>
@@ -42,17 +114,10 @@ export const FluidifyForm = ({
         {/* Swap Field */}
         <input
           className={"fluidify-input"}
-          type={"number"}
           min={"0"}
-          value={swapAmount}
-          onChange={(e) =>
-            setSwapAmount(
-              Math.min(
-                parseFloat(e.target.value) || 0,
-                assetToken.userTokenBalance || 0
-              )
-            )
-          }
+          value={swapInput}
+          onBlur={(e) => setSwapInput(`${snapToValidValue(e.target.value)}`)}
+          onChange={handleChangeSwapInput}
           placeholder=""
           step="any"
         />
@@ -75,7 +140,7 @@ export const FluidifyForm = ({
       {/* Daily Limit */}
       {!!assetToken?.userMintLimit && (
         <Text>
-          Daily {assetToken.symbol} limit: {assetToken.userMintedAmt}/
+          Daily {assetToken.symbol} limit: {assetToken.userMintedAmt || 0}/
           {assetToken.userMintLimit}
         </Text>
       )}
@@ -87,7 +152,7 @@ export const FluidifyForm = ({
         buttontype="text"
         type={"submit"}
         handleClick={() => null}
-        disabled={formDisabled()}
+        disabled={!assertCanSwap}
         className={"fluidify-form-submit"}
       >
         {tokenIsFluid

@@ -69,9 +69,9 @@ export const ToolTip = (props: {
           }}
         >
           {props.children}
-          <span onClick={props.close}>
-            <Text prominent size="xl">
-              X
+          <span onClick={props.close} className="tool_cancel_btn">
+            <Text prominent size="lg">
+              x
             </Text>
           </span>
         </div>

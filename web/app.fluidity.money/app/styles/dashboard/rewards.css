@@ -277,11 +277,29 @@
   #spend-to-earn {
     align-items: center;
   }
-}
 
-@media (max-width: 500px) {
   #user-rewards {
     padding-left: 1em;
     padding-right: 1em;
   }
+}
+
+@media (max-width: 375px) {
+  .statistics-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reward-ceiling {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-bottom: 2rem;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
 }

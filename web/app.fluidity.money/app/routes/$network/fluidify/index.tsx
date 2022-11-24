@@ -1,32 +1,38 @@
-import { fluidAssetOf } from "~/util/chainUtils/tokens";
+import type AugmentedToken from "~/types/AugmentedToken";
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
+
+import config, { colors } from "~/webapp.config.server";
+import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
+import { json, LoaderFunction } from "@remix-run/node";
+import { useLoaderData, Link } from "@remix-run/react";
+import { debounce, DebouncedFunc } from "lodash";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { DndProvider } from "react-dnd";
+import ItemTypes from "~/types/ItemTypes";
 import useViewport from "~/hooks/useViewport";
+import {
+  userMintLimitedEnabled,
+  getUsdUserMintLimit,
+} from "~/util/chainUtils/ethereum/transaction";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { JsonRpcProvider } from "@ethersproject/providers";
+// Use touch backend for mobile devices
+import { HTML5Backend } from "react-dnd-html5-backend";
 import {
   Display,
   GeneralButton,
   LinkButton,
   Text,
 } from "@fluidity-money/surfing";
+import Draggable from "~/components/Draggable";
+import FluidifyCard from "~/components/FluidifyCard";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
-import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
-import { debounce, DebouncedFunc } from "lodash";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { DndProvider } from "react-dnd";
-import FluidifyCard from "~/components/FluidifyCard";
-
-// Use touch backend for mobile devices
-import { HTML5Backend } from "react-dnd-html5-backend";
-
-import config, { colors } from "~/webapp.config.server";
-import FluidityFacadeContext from "contexts/FluidityFacade";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
-import AugmentedToken from "~/types/AugmentedToken";
-import Draggable from "~/components/Draggable";
-import ItemTypes from "~/types/ItemTypes";
 import SwapCompleteModal from "~/components/SwapCompleteModal";
+import { captureException } from "@sentry/react";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -42,19 +48,46 @@ export const loader: LoaderFunction = async ({ params }) => {
   } = config;
 
   if (network === "ethereum") {
-    const augmentedTokens = await Promise.all(
-      tokens.map(async (token) => {
-        const { isFluidOf } = token;
-        // const { address } = token;
+    const mainnetId = 0;
 
-        const mintLimitEnabled = isFluidOf
-          ? //? await userMintLimitedEnabled(provider, address, tokenAbi)
-            true
-          : false;
+    const {
+      drivers: {
+        ethereum: {
+          [mainnetId]: {
+            rpc: { http: infuraUri },
+          },
+        },
+      },
+    } = config;
+
+    const provider = new JsonRpcProvider(infuraUri);
+
+    const augmentedTokens: AugmentedToken[] = await Promise.all(
+      tokens.map(async (token) => {
+        const { isFluidOf, address } = token;
+
+        // Reverting has no mint limits
+        if (isFluidOf) {
+          return {
+            ...token,
+            userMintLimit: undefined,
+            userTokenBalance: 0,
+          };
+        }
+
+        const fluidPair = tokens.find(({ isFluidOf }) => isFluidOf === address);
+
+        if (!fluidPair)
+          throw new Error(`Could not find fluid Pair of ${token.name}`);
+
+        const mintLimitEnabled = await userMintLimitedEnabled(
+          provider,
+          fluidPair.address,
+          tokenAbi
+        );
 
         const userMintLimit = mintLimitEnabled
-          ? //? await getUsdUserMintLimit(provider, address, tokenAbi)
-            undefined
+          ? await getUsdUserMintLimit(provider, fluidPair.address, tokenAbi)
           : undefined;
 
         return {
@@ -137,7 +170,7 @@ export default function FluidifyToken() {
   const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
   const {
     address,
-    swap,
+    rawAddress,
     amountMinted,
     connected,
     connecting,
@@ -161,15 +194,9 @@ export default function FluidifyToken() {
   const [tokens, setTokens] = useState<AugmentedToken[]>(tokens_);
 
   // Currently selected token
-  const [assetToken, setAssetToken] = useState<AugmentedToken>();
+  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
 
   const tokenIsFluid = !!assetToken?.isFluidOf;
-
-  // Fluid version of token for contract calls
-  const fluidTokenAddress = useMemo(
-    () => (assetToken ? fluidAssetOf(tokens, assetToken) : undefined),
-    [assetToken]
-  );
 
   // Destination token
   const toToken = useMemo(
@@ -193,8 +220,6 @@ export default function FluidifyToken() {
     connected && setWalletModalVisibility(false);
   }, [connected]);
 
-  const [swapAmount, setSwapAmount] = useState(0);
-
   const [search, setSearch] = useState("");
   const [activeFilterIndex, setActiveFilterIndex] = useState(0);
 
@@ -215,6 +240,12 @@ export default function FluidifyToken() {
 
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
+  const [{ amount, txHash }, setSwapData] = useState({
+    amount: 0,
+    txHash: "",
+  });
+  const [swapError, setSwapError] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   let tokensMinted: (number | undefined)[], userTokenBalance: number[];
 
@@ -226,9 +257,14 @@ export default function FluidifyToken() {
           case "ethereum":
             tokensMinted = await Promise.all(
               tokens.map(async (token) => {
-                if (!token.isFluidOf) return undefined;
+                if (token.isFluidOf) return undefined;
+                const fluidToken = tokens.find(
+                  ({ isFluidOf }) => isFluidOf === token.address
+                );
 
-                return amountMinted?.(token.address);
+                if (!fluidToken) return undefined;
+
+                return amountMinted?.(fluidToken.address);
               })
             );
 
@@ -262,7 +298,27 @@ export default function FluidifyToken() {
         }
       })();
     }
-  }, [address]);
+  }, [address, swapping]);
+
+  const handleRedirect = async (
+    transaction: TransactionResponse,
+    amount: number
+  ) => {
+    setSwapData({
+      amount,
+      txHash: transaction.txHash,
+    });
+    setSwapping(true);
+
+    try {
+      const success = await transaction.confirmTx();
+      setSwapError(!success);
+    } catch (e) {
+      captureException(e);
+    } finally {
+      setConfirmed(true);
+    }
+  };
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
     tokens as AugmentedToken[]
@@ -281,9 +337,11 @@ export default function FluidifyToken() {
   }, 500);
 
   useEffect(() => {
-    const typeFilteredTokens = tokens.filter(
-      searchFilters[activeFilterIndex].filter
-    );
+    const typeFilteredTokens = tokens
+      .filter(searchFilters[activeFilterIndex].filter)
+      .sort((token) => token.userTokenBalance)
+      .reverse();
+
     debouncedSearch(typeFilteredTokens);
 
     return () => {
@@ -291,51 +349,33 @@ export default function FluidifyToken() {
     };
   }, [search, activeFilterIndex, tokens]);
 
-  const assertCanSwap = () =>
-    connected &&
-    !!address &&
-    !!fluidTokenAddress &&
-    !!swap &&
-    !!assetToken?.userTokenBalance &&
-    !!swapAmount &&
-    swapAmount <= (assetToken?.userTokenBalance || 0) &&
-    (assetToken.userMintLimit === undefined ||
-      swapAmount + (assetToken.userMintedAmt || 0) <= assetToken.userMintLimit);
-
-  const swapAndRedirect = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!assertCanSwap()) return;
-
-    if (!swap) return;
-
-    if (!assetToken) return;
-
-    const rawTokenAmount = `${Math.floor(
-      swapAmount * 10 ** assetToken.decimals
-    )}`;
-
-    setSwapping(true);
-
-    await swap(rawTokenAmount.toString(), assetToken.address);
-
-    // navigate(`./out?token=${tokenPair.symbol}&amount=${swapAmount}`);
-  };
-
-  const [swapCompleteModal, setSwapCompleteModal] = useState(false);
-
   return (
     <DndProvider backend={HTML5Backend}>
-      {swapCompleteModal && (
+      {/* Swapping Modal */}
+      {swapping && assetToken && toToken && (
         <SwapCompleteModal
-          visible={swapCompleteModal}
-          close={() => setSwapCompleteModal(false)}
+          visible={swapping}
+          confirmed={confirmed}
+          close={() => {
+            setSwapping(false);
+            setSwapData({
+              amount: 0,
+              txHash: "",
+            });
+            setSwapError(false);
+          }}
           colorMap={colors}
-          assetToken={tokens[0]}
+          assetToken={assetToken}
+          tokenPair={toToken}
+          amount={amount}
+          network={network}
+          txHash={txHash}
+          error={swapError}
         />
       )}
+
       {/* Mobile Swap Modal */}
-      {isTablet && openMobModal && (
+      {isTablet && openMobModal && !swapping && (
         <div className="mob-swap-modal">
           <div>
             <LinkButton
@@ -359,20 +399,16 @@ export default function FluidifyToken() {
 
           {assetToken && toToken && (
             <FluidifyForm
-              handleSwap={swapAndRedirect}
-              tokenIsFluid={tokenIsFluid}
-              swapAmount={swapAmount}
-              setSwapAmount={setSwapAmount}
+              handleSwap={handleRedirect}
               assetToken={assetToken}
               toToken={toToken}
               swapping={swapping}
-              formDisabled={() => swapping || !assertCanSwap()}
             />
           )}
         </div>
       )}
 
-      {!openMobModal && (
+      {!openMobModal && !swapping && (
         <>
           <header className={"fluidify-heading"}>
             <section>
@@ -398,7 +434,7 @@ export default function FluidifyToken() {
             <aside className={"fluidify-tokens-container"}>
               {connected && address ? (
                 <ConnectedWallet
-                  address={address.toString()}
+                  address={rawAddress ?? ""}
                   callback={() => {
                     setConnectedWalletModalVisibility(
                       !connectedWalletModalVisibility
@@ -422,7 +458,7 @@ export default function FluidifyToken() {
               {/* Connected Wallet Modal */}
               <ConnectedWalletModal
                 visible={connectedWalletModalVisibility}
-                address={address ? address.toString() : ""}
+                address={rawAddress ?? ""}
                 close={() => {
                   setConnectedWalletModalVisibility(false);
                 }}
@@ -524,6 +560,14 @@ export default function FluidifyToken() {
                     </Draggable>
                   );
                 })}
+                {isTablet && (
+                  <Text size="xs" className="footer-text">
+                    Fluidity employs daily limits on fluidifying assets for{" "}
+                    <br /> maintained system stability. Limits reset at midnight
+                    EST. <br />
+                    Unlimited reversion of fluid to non-fluid assets per day.
+                  </Text>
+                )}
               </div>
             </aside>
 
@@ -550,14 +594,10 @@ export default function FluidifyToken() {
             {/* Swap Token Form */}
             {!!assetToken && !isTablet && !!toToken && (
               <FluidifyForm
-                handleSwap={swapAndRedirect}
-                tokenIsFluid={tokenIsFluid}
-                swapAmount={swapAmount}
-                setSwapAmount={setSwapAmount}
+                handleSwap={handleRedirect}
                 assetToken={assetToken}
                 toToken={toToken}
                 swapping={swapping}
-                formDisabled={() => swapping || !assertCanSwap()}
               />
             )}
           </div>

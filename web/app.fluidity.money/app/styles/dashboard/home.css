@@ -17,11 +17,6 @@ section#transactions {
   gap: 10px;
 }
 
-.active-graph-filter {
-  text-decoration: underline;
-  text-underline-offset: 0.4em;
-}
-
 .graph-ceiling {
   display: flex;
   flex-direction: row;
@@ -29,9 +24,14 @@ section#transactions {
   align-items: flex-end;
 }
 
+.graph-ceiling > div:last-child {
+  padding-bottom: 0.2em;
+}
+
 .row {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .justify-between {

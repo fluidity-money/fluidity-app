@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"crypto/rand"
 	"strings"
 	"time"
 
@@ -25,64 +24,6 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
-
-// generateRandomIntegers gated between min and max, doing some coercion
-// internally to use crypto/rand and assuming that the uint32 requirement
-// in the arguments prevent any size-of-int issues
-func generateRandomIntegers(amount int, min, max uint32) (numbers []uint32) {
-	var (
-		maxBig = new(big.Int).SetInt64(int64(max))
-		minBig = new(big.Int).SetInt64(int64(min))
-	)
-
-	// heuristic check that isn't perfect
-
-	if int64(amount) > int64(max-min+1) {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Can't generate %d non-repeating integers between %d and %d!",
-				amount,
-				min,
-				max,
-			)
-		})
-	}
-
-	numbers = make([]uint32, amount)
-
-	for i := 0; i < amount; i++ {
-		no, err := rand.Int(nil, maxBig)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to source system randomness in the worker server!"
-				k.Payload = err
-			})
-		}
-
-		for {
-			no.Add(no, minBig)
-
-			// we can assume that with the arguments this is okay
-
-			numbers[i] = uint32(no.Int64())
-
-			dup := false
-
-			for j := 0; j < i; j++ {
-				if numbers[i] == numbers[j] {
-					dup = true
-				}
-			}
-
-			if !dup {
-				break
-			}
-		}
-	}
-
-	return numbers
-}
 
 func hexToPrivateKey(hex string) *ecdsa.PrivateKey {
 	privateKey, err := ethCrypto.HexToECDSA(hex)
@@ -194,7 +135,7 @@ func roundUp(x float64) uint64 {
 
 func anyEthereumAddressesEmpty(addresses ...ethereum.Address) bool {
 	for _, s := range addresses {
-		if s == ethereum.Address("") {
+		if s == ethereum.AddressFromString("") {
 			return true
 		}
 	}

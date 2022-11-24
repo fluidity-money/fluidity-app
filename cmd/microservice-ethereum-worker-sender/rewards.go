@@ -62,7 +62,6 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 			context.Background(),
 			client,
 			transactionOptions,
-			800_000,
 		)
 
 		if err != nil {
@@ -132,7 +131,6 @@ func callLegacyRewardFunction(arguments callRewardArguments) ([]ethTypes.Transac
 			context.Background(),
 			client,
 			transactionOptions,
-			800_000,
 		)
 
 		if err != nil {
@@ -159,7 +157,7 @@ func callLegacyRewardFunction(arguments callRewardArguments) ([]ethTypes.Transac
 		hasher := sha3.NewLegacyKeccak256()
 
 		data := [][]byte{
-			[]byte(winner),
+			[]byte(winner.String()),
 			winAmount.Bytes(),
 			firstBlock.Bytes(),
 			lastBlock.Bytes(),

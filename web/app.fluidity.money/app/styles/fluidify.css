@@ -15,9 +15,15 @@ main {
 .fluidify-card:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   background: #fff;
-  cursor: grabbing;
-  cursor: -webkit-grabbing;
   color: black;
+  cursor: pointer;
+}
+
+@media (min-width: 1251px) {
+  .fluidify-card:hover {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+  }
 }
 
 .fluidify-card {
@@ -29,7 +35,8 @@ main {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 
-  width: 310px;
+  width: 100%;
+  max-width: 310px;
   height: 72px;
 
   display: flex;
@@ -50,6 +57,16 @@ main {
 .cancel-btn:hover > svg {
   -webkit-filter: invert(100%);
   filter: invert(100%);
+}
+
+.cancel-btn:active > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
+.cancel-btn:focus > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
 }
 
 .fluidify-card img {
@@ -123,7 +140,7 @@ main {
 }
 
 .main-hotspot {
-  min-height: 80vh;
+  width: min(50vw, 50vh);
   aspect-ratio: 1 / 1;
   mix-blend-mode: color-dodge;
 }
@@ -134,15 +151,12 @@ main {
 
 .fluidify-tokens {
   max-height: calc(100vh - 340px);
-  overflow-y: hidden;
   margin-top: 0.5em;
   padding-right: 0.5em;
-  width: 320px;
+  width: 100%;
+  max-width: 320px;
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
-}
-
-.fluidify-tokens:hover {
   overflow-y: auto;
 }
 
@@ -176,22 +190,21 @@ main {
   .fluidify-tokens {
     max-height: calc(100vh - 480px);
   }
-  .fluidify-tokens:hover {
-    overflow-y: unset;
-  }
 }
 
 .fluidify-form {
-  width: 310px;
+  width: 80vw;
+  max-width: 310px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: start;
   gap: 15px;
+  overflow: auto;
 }
 
 .fluidify-form-el {
-  width: inherit;
+  width: 100%;
 }
 
 .fluidify-form-logo {
@@ -205,7 +218,8 @@ main {
 }
 
 .fluidify-form-submit {
-  width: calc(310px - 24 * 2px);
+  max-width: 260px;
+  width: 100%;
 }
 
 .fluidify-input-container {
@@ -218,9 +232,11 @@ main {
 
 .fluidify-input-container > img {
   height: 24px;
+  width: 24px;
 }
 
 .fluidify-input {
+  width: 80%;
   color: white;
   background: transparent;
   border: none;
@@ -246,8 +262,7 @@ main {
   left: 50%;
   object-fit: contain;
   transform: translate(-50%, -50%);
-  max-width: 95vw;
-  /* mix-blend-mode: color-dodge; */
+  width: 100%;
 }
 
 .dashed-circle {
@@ -300,6 +315,8 @@ main {
 }
 
 .video-container > video {
+  width: 80vw;
+  max-width: 500px;
   mix-blend-mode: color-dodge;
 }
 
@@ -468,6 +485,7 @@ main {
 
 .connect-wallet-btn {
   width: 10em;
+  margin-bottom: 0.5em;
 }
 
 .burger-btn {
@@ -614,6 +632,10 @@ main {
   align-items: center;
   box-sizing: border-box;
   gap: 3em;
+  overflow-y: hidden;
+}
+
+.scroll {
   overflow-y: auto;
 }
 
@@ -640,126 +662,6 @@ main {
   color: white;
   text-decoration: underline;
   cursor: pointer;
-}
-
-@media only screen and (max-width: 1250px) {
-  .hide-on-mobile {
-    display: none;
-  }
-  main {
-    padding: 0 20px;
-  }
-  main > footer > section:first-child {
-    gap: 0.6em;
-  }
-
-  #provide-liquidity {
-    padding: 1em;
-    margin: 0 0 2em 0;
-  }
-
-  .connect-wallet-modal-container {
-    min-width: 300px;
-    top: 45%;
-  }
-
-  #mobile-top-navbar {
-    padding: 0 20px;
-  }
-
-  .fluidify-container {
-    padding: 0 0.5em;
-  }
-}
-
-@media (max-width: 1250px) {
-  .fluidify-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .fluidify-tokens-container {
-    max-width: none;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-  }
-
-  .main-hotspot {
-    width: auto;
-  }
-
-  .fluidify-tokens {
-    height: calc(100vh - 380px);
-    overflow-y: unset;
-  }
-
-  .fluidify-heading {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .fluidify-heading > section {
-    order: 1;
-    justify-self: center;
-    align-items: center;
-    margin-top: 1.5em;
-  }
-
-  .fluidify-heading > section > * {
-    text-align: center;
-  }
-}
-
-@media (max-width: 850px) {
-  body {
-    grid-template-columns: 0;
-  }
-
-  header {
-    display: none;
-  }
-
-  #dashboard-navbar {
-    display: none;
-  }
-
-  .reward-performance {
-    font-size: 2em;
-  }
-  .highest-rewarders {
-    font-size: 2em;
-  }
-
-  .provide-liquidity-left > div > h2 {
-    font-size: 2em;
-  }
-}
-
-@media (max-width: 900px) {
-  main > footer {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 2em;
-  }
-}
-
-@media (max-width: 1200px) {
-  .card-inner {
-    grid-template-columns: 1fr;
-  }
-
-  #provide-liquidity {
-    padding-top: 0;
-  }
-
-  .provide-liquidity-left {
-    order: 1;
-    align-items: center;
-    text-align: center;
-  }
 }
 
 .connected-wallet {
@@ -901,7 +803,7 @@ main {
 
 .complete-fluidify-circle {
   width: 80vw;
-  max-width: 500px;
+  max-width: 450px;
   mix-blend-mode: luminosity;
 }
 
@@ -917,10 +819,235 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5em;
+  margin-top: -3em;
 }
 
 .swap-complete-modal-content > * {
   margin: 0.5em 0 0;
   text-align: center;
+}
+
+.view-reward-modal-container {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  box-sizing: border-box;
+}
+
+.view-reward-modal-cancel {
+  display: flex;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  padding: 2em 2em 0;
+}
+
+.close-btn:hover > svg {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.close-btn:active > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
+.close-btn:focus > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
+.view-reward-modal-close-text-desc {
+  margin-bottom: 5px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.view-reward-main-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 350px;
+  background-color: #000;
+  padding: 30px;
+}
+
+.view-reward-modal-title {
+  font-size: 40px;
+  margin: 0;
+}
+
+.view-reward-modal-token-title-size {
+  margin-bottom: 20px;
+  font-size: 32px;
+}
+
+.view-reward-modal-token {
+  width: 40%;
+  height: 80px;
+  margin-top: 150px;
+  margin-bottom: 150px;
+  border-radius: 90%;
+}
+
+.view-reward-modal-token > img {
+  width: 100%;
+  margin-top: -70px;
+}
+
+.view-reward-modal-usd-info {
+  margin-bottom: 10px;
+  margin-top: -14px;
+}
+
+.view-reward-modal-link {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  color: #fff;
+}
+
+.view-reward-modal-price-desc {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.view-reward-image-content {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: -3.5em 0 -4em 0;
+}
+
+@media only screen and (max-width: 1250px) {
+  .hide-on-mobile {
+    display: none;
+  }
+  main {
+    padding: 0 20px;
+  }
+  main > footer > section:first-child {
+    gap: 0.6em;
+  }
+
+  #provide-liquidity {
+    padding: 1em;
+    margin: 0 0 2em 0;
+  }
+
+  .connect-wallet-modal-container {
+    min-width: 300px;
+    top: 45%;
+  }
+
+  #mobile-top-navbar {
+    padding: 0 20px;
+  }
+
+  .fluidify-container {
+    padding: 0 0.5em;
+  }
+}
+
+@media (max-width: 1250px) {
+  .fluidify-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .fluidify-tokens-container {
+    width: 100%;
+    max-width: 320px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
+  .main-hotspot {
+    width: auto;
+  }
+
+  .fluidify-tokens {
+    height: calc(100vh - 380px);
+    overflow-y: auto;
+  }
+
+  .fluidify-heading {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .fluidify-heading > section {
+    order: 1;
+    justify-self: center;
+    align-items: center;
+    margin-top: 1.5em;
+  }
+
+  .fluidify-heading > section > * {
+    text-align: center;
+  }
+}
+
+@media (max-width: 850px) {
+  body {
+    grid-template-columns: 0;
+  }
+
+  header {
+    display: none;
+  }
+
+  #dashboard-navbar {
+    display: none;
+  }
+
+  .reward-performance {
+    font-size: 2em;
+  }
+  .highest-rewarders {
+    font-size: 2em;
+  }
+
+  .provide-liquidity-left > div > h2 {
+    font-size: 2em;
+  }
+}
+
+@media (max-width: 900px) {
+  main > footer {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+  }
+}
+
+@media (max-width: 1200px) {
+  .card-inner {
+    grid-template-columns: 1fr;
+  }
+
+  #provide-liquidity {
+    padding-top: 0;
+  }
+
+  .provide-liquidity-left {
+    order: 1;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .view-reward-modal-cancel {
+    justify-content: flex-start;
+    padding: 2em 1em 0;
+  }
+
+  .view-reward-main-modal {
+    padding: 30px 0 0 0;
+  }
 }

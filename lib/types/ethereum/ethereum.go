@@ -8,6 +8,9 @@ package ethereum
 // state
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
@@ -16,10 +19,73 @@ import (
 // Some of the less complicated types that shadow the definition provided
 // by Go Ethereum.
 type (
-	Address    string
-	Hash       string
+	// these are unexported to force users to go through our normalisation methods
+	Address    struct { address string }
+	Hash       struct { hash string }
 	BlockNonce []byte
 )
+
+// MarshalJSON and UnmarshalJSON implement the json interface,
+// allowing us to pass this over rabbit and redis
+func (addr Address) MarshalJSON() ([]byte, error) {
+	return json.Marshal(addr.address)
+}
+func (addr *Address) UnmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &addr.address)
+}
+func (addr Address) MarshalText() (text []byte, err error) {
+	return []byte(addr.address), nil
+}
+func (addr *Address) UnmarshalText(text []byte) error {
+	return addr.UnmarshalJSON(text)
+}
+
+// Value and Scan implement the sql interfaces,
+// allowing us to use this in a database
+func (addr Address) Value() (driver.Value, error) {
+	return addr.address, nil
+}
+func (addr *Address) Scan(value interface{}) error {
+	switch val := value.(type) {
+	case string:
+		addr.address = val
+		return nil
+	default:
+		return fmt.Errorf(
+			"Unsupported type reading %T into Address",
+			value,
+		)
+	}
+}
+
+func (hash Hash) MarshalJSON() ([]byte, error) {
+	return json.Marshal(hash.hash)
+}
+func (addr *Hash) UnmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &addr.hash)
+}
+func (hash Hash) MarshalText() (text []byte, err error) {
+	return []byte(hash.hash), nil
+}
+func (hash *Hash) UnmarshalText(text []byte) error {
+	return hash.UnmarshalJSON(text)
+}
+
+func (hash Hash) Value() (driver.Value, error) {
+	return hash.hash, nil
+}
+func (hash *Hash) Scan(value interface{}) error {
+	switch val := value.(type) {
+	case string:
+		hash.hash = val
+		return nil
+	default:
+		return fmt.Errorf(
+			"Unsupported type reading %T into Hash",
+			value,
+		)
+	}
+}
 
 type (
 	// BlockHeader contained within a block on Ethereum, may be forked
@@ -113,7 +179,7 @@ type (
 func HashFromString(str string) Hash {
 	hash := strings.ToLower(str)
 
-	return Hash(hash)
+	return Hash{ hash }
 }
 
 // AddressFromString, taking the string and making it lowercase then
@@ -121,13 +187,13 @@ func HashFromString(str string) Hash {
 func AddressFromString(str string) Address {
 	address := strings.ToLower(str)
 
-	return Address(address)
+	return Address{ address }
 }
 
 func (hash Hash) String() string {
-	return string(hash)
+	return string(hash.hash)
 }
 
 func (address Address) String() string {
-	return string(address)
+	return string(address.address)
 }

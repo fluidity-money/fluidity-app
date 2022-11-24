@@ -43,17 +43,7 @@ const fluidityContractAbiString = `[
           },
           {
             "internalType": "uint256",
-            "name": "win_amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "first_block",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "last_block",
+            "name": "winAmount",
             "type": "uint256"
           }
         ],
@@ -107,6 +97,12 @@ const fluidityContractAbiString = `[
         "indexed": false,
         "internalType": "uint256",
         "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startBlock",
         "type": "uint256"
       },
       {
@@ -206,8 +202,8 @@ type OracleUpdate struct {
 
 // the Reward struct from solidity, to be passed to batchReward
 type RewardArg struct {
-	Winner    ethCommon.Address `json:"from"`
-	WinAmount *big.Int          `json:"amount"`
+	Winner     ethCommon.Address `abi:"winner"`
+	WinAmount  *big.Int          `abi:"winAmount"`
 }
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
@@ -292,12 +288,32 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		}
 
 		rewardArg := RewardArg{
-			Winner:    winner,
-			WinAmount: amount,
+			Winner:     winner,
+			WinAmount:  amount,
 		}
 
 		rewards[i] = rewardArg
 	}
+
+	gas, err := ethereum.EstimateGas(
+		client,
+		&fluidityContractAbi,
+		transactionOptions,
+		&fluidityAddress,
+		"batchReward",
+		rewards,
+		globalFirstBlock,
+		globalLastBlock,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to estimate gas for calling batchreward! %w",
+			err,
+		)
+	}
+
+	transactionOptions.GasLimit = uint64(float64(gas) * 1.5)
 
 	transaction, err := ethereum.MakeTransaction(
 		boundContract,

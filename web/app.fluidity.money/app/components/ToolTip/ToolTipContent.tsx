@@ -19,19 +19,21 @@ export const ToolTipContent = ({
   linkLabelOnClickCallback,
 }: IToolTipContentProps) => {
   return (
-    <>
+    <div className="tool_detail_section">
       <img className="tool_icon" src={tokenLogoSrc} />
-      <div>
+      <span className="tooltip_title">
         <Text prominent size="xl">
           {boldTitle}{" "}
         </Text>
+      </span>
+      <span className="tooltip_content_details">
         <Text size="lg">{details}</Text>
-        <a onClick={linkLabelOnClickCallback} className="tool_content_link">
-          <Text prominent size="lg">
-            {linkLabel}
-          </Text>
-        </a>
-      </div>
-    </>
+      </span>
+      <a onClick={linkLabelOnClickCallback} className="tool_content_link">
+        <Text prominent size="lg">
+          {linkLabel}
+        </Text>
+      </a>
+    </div>
   );
 };

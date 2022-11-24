@@ -23,7 +23,7 @@ import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
 import config from "~/webapp.config.server";
 import { io } from "socket.io-client";
-import { PipedTransaction } from "drivers/types";
+import { PipedTransaction, NotificationType } from "drivers/types";
 import { trimAddress, networkMapper } from "~/util";
 import {
   DashboardIcon,
@@ -33,7 +33,6 @@ import {
   Heading,
   ChainSelectorButton,
   BlockchainModal,
-  trimAddressShort,
 } from "@fluidity-money/surfing";
 import { useToolTip } from "~/components";
 import BurgerButton from "~/components/BurgerButton";
@@ -90,7 +89,7 @@ function ErrorBoundary() {
 
 export const meta: MetaFunction = ({ data }) => ({
   ...data,
-  title: "Dashboard",
+  title: "Fluidity - Dashboard",
 });
 
 const routeMapper = (route: string) => {
@@ -123,9 +122,8 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  const { connected, address, disconnect, connecting } = useContext(
-    FluidityFacadeContext
-  );
+  const { connected, address, rawAddress, disconnect, connecting, balance } =
+    useContext(FluidityFacadeContext);
 
   const url = useLocation();
   const urlPaths = url.pathname.split("/");
@@ -187,8 +185,8 @@ export default function Dashboard() {
   }, [closeMobileModal]);
 
   const navigationMap = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
+    { home: { name: "dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "rewards", icon: <Trophy /> } },
     // {assets: {name: "Assets", icon: <AssetsIcon />}},
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
@@ -224,6 +222,20 @@ export default function Dashboard() {
     const pathComponents = pathname.split("/").slice(2);
 
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
+  };
+
+  const handleCloseViewRewardDetailModal = () => {
+    setDetailedRewardObject({
+      // empty object on close
+      visible: false,
+      token: "",
+      img: "",
+      colour: "",
+      winAmount: "",
+      explorerUri: "",
+      balance: "",
+      forSending: false,
+    });
   };
 
   // Rewards User has yet to claim - Ethereum feature
@@ -264,7 +276,7 @@ export default function Dashboard() {
     const socket = io();
     socket.emit("subscribeTransactions", {
       protocol: network,
-      address,
+      address: rawAddress,
     });
 
     setTimeout(() => {
@@ -276,7 +288,11 @@ export default function Dashboard() {
         const imgUrl =
           fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
         const tokenColour =
-          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.logo : "";
+          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.colour : "";
+        const transactionUrl =
+          network === `ethereum`
+            ? "https://etherscan.io/tx/" + log.transactionHash
+            : "https://explorer.solana.com/tx/" + log.transactionHash;
 
         toolTip.open(
           fToken.at(0)?.colour || `#000`,
@@ -284,27 +300,35 @@ export default function Dashboard() {
             tokenLogoSrc={fToken.at(0)?.logo}
             boldTitle={log.amount + ` ` + log.token}
             details={
-              log.type === "rewardDB"
-                ? `reward for sending`
-                : `received from ` + trimAddress(log.source)
+              log.type === NotificationType.REWARD_DATABASE
+                ? log.rewardType === `send`
+                  ? `reward for s͟e͟n͟d`
+                  : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
+                : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(log.source)
             }
             linkLabel={"DETAILS"}
-            linkLabelOnClickCallback={() => {
-              setDetailedRewardObject({
-                visible: true,
-                token: log.token,
-                img: imgUrl as unknown as string,
-                colour: tokenColour as unknown as string,
-                winAmount: log.amount,
-                explorerUri: "",
-                balance: "150", //hard coded for now
-                forSending: false, // fetched from server - hauradb - not sorted yet from db
-              });
+            linkLabelOnClickCallback={async () => {
+              log.type === NotificationType.REWARD_DATABASE
+                ? setDetailedRewardObject({
+                    visible: true,
+                    token: log.token,
+                    img: imgUrl as unknown as string,
+                    colour: tokenColour as unknown as string,
+                    winAmount: log.amount,
+                    explorerUri: transactionUrl,
+                    balance: String(
+                      await balance?.(
+                        fToken.at(0)?.address as unknown as string
+                      )
+                    ),
+                    forSending: log.rewardType === `send` ? true : false,
+                  })
+                : window.open(transactionUrl, `_`);
             }}
           />
         );
       });
-    }, 30000);
+    }, 8000);
   }, [address]);
 
   const handleScroll = () => {
@@ -346,8 +370,10 @@ export default function Dashboard() {
         </a>
 
         <br />
+        <br />
 
         <ChainSelectorButton
+          className="selector-button"
           chain={chainNameMap[network as "ethereum" | "solana"]}
           onClick={() => setChainModalVisibility(true)}
         />
@@ -402,7 +428,7 @@ export default function Dashboard() {
         {network === `solana` ? (
           connected && address ? (
             <ConnectedWallet
-              address={trimAddressShort(address.toString())}
+              address={rawAddress ?? ""}
               callback={() => {
                 setConnectedWalletModalVisibility(
                   !connectedWalletModalVisibility
@@ -425,7 +451,7 @@ export default function Dashboard() {
           )
         ) : connected && address ? (
           <ConnectedWallet
-            address={trimAddressShort(address.toString())}
+            address={rawAddress ?? ""}
             callback={() => {
               !connectedWalletModalVisibility &&
                 setConnectedWalletModalVisibility(true);
@@ -457,7 +483,11 @@ export default function Dashboard() {
                 <img src="/images/outlinedLogo.svg" alt="Fluidity" />
               </a>
             )}
-            {!isMobile && <Heading as="h6">{appName}</Heading>}
+            {!isMobile && (
+              <Heading as="h6" color={"gray"}>
+                {appName}
+              </Heading>
+            )}
           </div>
 
           {/* Navigation Buttons */}
@@ -500,6 +530,7 @@ export default function Dashboard() {
 
             {/* Prize Money */}
             <GeneralButton
+              className="trophy-button"
               version={"transparent"}
               buttontype="icon after"
               size={"small"}
@@ -520,7 +551,7 @@ export default function Dashboard() {
         </nav>
         <ConnectedWalletModal
           visible={connectedWalletModalVisibility}
-          address={address ? address.toString() : ""}
+          address={rawAddress ?? ""}
           close={() => {
             setConnectedWalletModalVisibility(false);
           }}
@@ -534,32 +565,23 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-
-        {
-          <ViewRewardModal
-            visible={detailedRewardObject.visible}
-            close={() => {
-              setDetailedRewardObject({
-                // empty object on close
-                visible: false,
-                token: "",
-                img: "",
-                colour: "",
-                winAmount: "",
-                explorerUri: "",
-                balance: "",
-                forSending: false,
-              });
-            }}
-            tokenSymbol={detailedRewardObject.token}
-            img={detailedRewardObject.img}
-            colour={detailedRewardObject.colour}
-            winAmount={detailedRewardObject.winAmount}
-            explorerUri={detailedRewardObject.explorerUri}
-            balance={detailedRewardObject.balance}
-            forSending={detailedRewardObject.forSending}
-          />
-        }
+        <ViewRewardModal
+          visible={detailedRewardObject.visible}
+          close={() => {
+            handleCloseViewRewardDetailModal();
+          }}
+          callback={() => {
+            handleCloseViewRewardDetailModal();
+            navigate("./rewards/unclaimed");
+          }}
+          tokenSymbol={detailedRewardObject.token}
+          img={detailedRewardObject.img}
+          colour={detailedRewardObject.colour}
+          winAmount={detailedRewardObject.winAmount}
+          explorerUri={detailedRewardObject.explorerUri}
+          balance={detailedRewardObject.balance}
+          forSending={detailedRewardObject.forSending}
+        />
 
         <Outlet />
 

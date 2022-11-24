@@ -50,6 +50,7 @@ main > nav {
 main > nav > div {
   display: flex;
   gap: 1em;
+  align-items: center;
 }
 
 main > nav a {
@@ -71,12 +72,13 @@ main > footer > section {
 }
 
 #flu-logo {
-  margin-left: 2em;
+  margin-left: 1em;
   margin-top: 2.25em;
 }
 
 #flu-logo > a > img {
-  width: 5em;
+  width: 5.5em;
+  height: 2.5em;
   margin-bottom: 1em;
   cursor: pointer;
 }
@@ -100,7 +102,8 @@ main > footer > section {
 }
 
 .top-navbar-left > a > img {
-  width: 5em;
+  height: 2.5em;
+  width: 5.5em;
   cursor: pointer;
 }
 
@@ -152,6 +155,14 @@ main > footer > section {
   padding: 0;
 }
 
+.selector-button {
+  padding: 1px 2px;
+}
+
+.trophy-button {
+  font-size: 1em;
+}
+
 main > footer > section > a {
   color: #828381;
   text-underline-offset: 0.12em;
@@ -167,6 +178,12 @@ main > footer > section > a {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.active-filter {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.4em;
 }
 
 .transactions-header {
@@ -580,7 +597,7 @@ main > footer > section > a {
   color: black;
 }
 
-.unclaimed-button:hover > span > h4 {
+.unclaimed-button:hover > span > h5 {
   color: black;
 }
 
@@ -608,82 +625,6 @@ main > footer > section > a {
 
 .select-blockchain-mobile > div > div {
   padding-left: 0.8em;
-}
-
-@media only screen and (max-width: 500px) {
-  .hide-on-mobile {
-    display: none;
-  }
-}
-
-@media (max-width: 1200px) {
-  .card-inner {
-    grid-template-columns: 1fr;
-  }
-
-  #provide-liquidity {
-    padding-top: 0;
-  }
-
-  .provide-liquidity-left {
-    order: 1;
-    align-items: center;
-    text-align: center;
-  }
-}
-
-@media (max-width: 850px) {
-  body {
-    grid-template-columns: 0;
-  }
-
-  header {
-    display: none;
-  }
-
-  #dashboard-navbar {
-    display: none;
-  }
-
-  .reward-performance {
-    font-size: 2em;
-  }
-  .highest-rewarders {
-    font-size: 2em;
-  }
-
-  .provide-liquidity-left > div > h2 {
-    font-size: 2em;
-  }
-}
-
-@media (max-width: 900px) {
-  main > footer {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 2em;
-  }
-}
-
-@media (max-width: 500px) {
-  main > footer > section:first-child {
-    gap: 0.6em;
-  }
-
-  #provide-liquidity {
-    padding: 1em;
-    margin: 0 0 2em 0;
-  }
-
-  .connect-wallet-modal-container {
-    min-width: 300px;
-    top: 45%;
-  }
-
-  #mobile-top-navbar {
-    padding: 0 20px;
-  }
 }
 
 .connected-wallet {
@@ -823,17 +764,33 @@ main > footer > section > a {
 
 .view-reward-modal-container {
   position: fixed;
+  top: 0;
   width: 100vw;
   height: 100vh;
   background-color: #000;
-  opacity: 0.9;
+  box-sizing: border-box;
 }
 
 .view-reward-modal-cancel {
   display: flex;
-  margin-right: 80px;
-  margin-top: 80px;
   justify-content: flex-end;
+  box-sizing: border-box;
+  padding: 2em 2em 0;
+}
+
+.close-btn:hover > svg {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.close-btn:active > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
+.close-btn:focus > svg {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
 }
 
 .view-reward-modal-close-text-desc {
@@ -846,19 +803,14 @@ main > footer > section > a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: absolute;
-  width: 30%;
   min-width: 350px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   background-color: #000;
   padding: 30px;
 }
 
 .view-reward-modal-title {
   font-size: 40px;
-  margin-bottom: 20px;
+  margin: 0;
 }
 
 .view-reward-modal-token-title-size {
@@ -871,11 +823,11 @@ main > footer > section > a {
   height: 80px;
   margin-top: 150px;
   margin-bottom: 150px;
-  background-color: blue;
   border-radius: 90%;
 }
 
 .view-reward-modal-token > img {
+  width: 100%;
   margin-top: -70px;
 }
 
@@ -885,10 +837,105 @@ main > footer > section > a {
 }
 
 .view-reward-modal-link {
+  cursor: pointer;
   text-decoration: underline;
+  text-underline-offset: 0.25em;
   color: #fff;
 }
 
 .view-reward-modal-price-desc {
+  text-align: center;
   margin-bottom: 70px;
+}
+
+.view-reward-image-content {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: -3.5em 0 -4em 0;
+}
+
+@media only screen and (max-width: 500px) {
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 1200px) {
+  .card-inner {
+    grid-template-columns: 1fr;
+  }
+
+  #provide-liquidity {
+    padding-top: 0;
+  }
+
+  .provide-liquidity-left {
+    order: 1;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 850px) {
+  body {
+    grid-template-columns: 0;
+  }
+
+  header {
+    display: none;
+  }
+
+  #dashboard-navbar {
+    display: none;
+  }
+
+  .reward-performance {
+    font-size: 2em;
+  }
+  .highest-rewarders {
+    font-size: 2em;
+  }
+
+  .provide-liquidity-left > div > h2 {
+    font-size: 2em;
+  }
+}
+
+@media (max-width: 900px) {
+  main > footer {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+  }
+}
+
+@media (max-width: 500px) {
+  main > footer > section:first-child {
+    gap: 0.6em;
+  }
+
+  #provide-liquidity {
+    padding: 1em;
+    margin: 0 0 2em 0;
+  }
+
+  .connect-wallet-modal-container {
+    min-width: 300px;
+    top: 45%;
+  }
+
+  #mobile-top-navbar {
+    padding: 0 20px;
+  }
+
+  .view-reward-modal-cancel {
+    justify-content: flex-start;
+    padding: 2em 1em 0;
+  }
+
+  .view-reward-main-modal {
+    padding: 30px 0 0 0;
+  }
 }

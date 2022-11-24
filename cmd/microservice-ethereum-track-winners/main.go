@@ -115,8 +115,8 @@ func main() {
 
 		var (
 			logTopics       = log.Topics
-			transactionHash = string(log.TxHash)
-			logAddress      = string(log.Address)
+			transactionHash = log.TxHash.String()
+			logAddress      = log.Address.String()
 		)
 
 		// first, we're going to make the string lowercase
@@ -166,7 +166,7 @@ func main() {
 
 		var blockedReward bool
 
-		switch string(logTopics[0]) {
+		switch logTopics[0].String() {
 		case eventSignature:
 			blockedReward = false
 
@@ -210,8 +210,8 @@ func main() {
 		}
 
 		var (
-			hash = typesEth.Hash(transactionHash)
-			winnerAddress = typesEth.Address(rewardData.Winner.String())
+			hash = typesEth.HashFromString(transactionHash)
+			winnerAddress = typesEth.AddressFromString(rewardData.Winner.String())
 		)
 
 		rewardType, application := timescaleWinners.GetAndRemovePendingRewardType(hash, winnerAddress)

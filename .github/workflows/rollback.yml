@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 10
+          fetch-depth: 0
           lfs: true
           ref: ${{ github.event.inputs.rollbackTo }}
       - name: Configure AWS Credentials
@@ -70,6 +70,11 @@ jobs:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
           role-duration-seconds: 7200 #seconds
+      - name: Display Commit Hash
+        run: |
+          echo ""
+          echo "CommitHash: $(git log -1 --format='%H')"
+          echo ""
       - name: Build
         id: build
         uses: ./scripts/actions
@@ -105,6 +110,7 @@ jobs:
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
   rollback-db:
+    if: ${{ github.event.inputs.rollback_timescale == 'true' || github.event.inputs.rollback_postgres == 'true' }}
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:

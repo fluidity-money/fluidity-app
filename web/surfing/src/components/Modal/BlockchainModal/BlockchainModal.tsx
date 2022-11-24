@@ -29,6 +29,9 @@ export interface IBlockchainModal {
 const BlockchainModal = ({ handleModal, option: selected, options, setOption, mobile, className }: IBlockchainModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
   const handleOnClick = (i: number) => {
+    // Hardcode to disallow Solana chain
+    if (options[i].name === "SOL") return;
+
     setOption(options[i].name);
     handleModal(false);
   }
@@ -72,20 +75,35 @@ const BlockchainModal = ({ handleModal, option: selected, options, setOption, mo
             </Text>
             <Checkmark style={{marginLeft: "auto", marginRight: "24px"}}/>
           </Card>
-        ) : (
-          <Card
-            component="button"
-            className={`${styles.card}`}
-            type={"box"}
-            rounded={true}
-            onClick={() => handleOnClick(i)}
-          >
-            {option.icon}{"  "}
-            <Text size={"xl"}>
-              {SupportedChains[option.name].name}
-            </Text>
-          </Card>
-        )
+        ) : option.name === "SOL" ? (
+            // Hardcode to disallow Solana
+            <Card
+              component="button"
+              className={`${styles.card}`}
+              type={"box"}
+              rounded={true}
+              onClick={() => {return}}
+              disabled={true}
+            >
+              {option.icon}{"  "}
+              <Text size={"xl"} className={styles.disabled} >
+                {SupportedChains[option.name].name}
+              </Text>
+            </Card>
+          ) : (
+            <Card
+              component="button"
+              className={`${styles.card}`}
+              type={"box"}
+              rounded={true}
+              onClick={() => handleOnClick(i)}
+            >
+              {option.icon}{"  "}
+              <Text size={"xl"}>
+                {SupportedChains[option.name].name}
+              </Text>
+            </Card>
+          )
       )}
     </div>
   );

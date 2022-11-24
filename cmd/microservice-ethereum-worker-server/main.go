@@ -416,7 +416,7 @@ func main() {
 
 				// create announcement and container
 
-				randomSource := generateRandomIntegers(
+				randomSource := util.RandomIntegers(
 					fluidity.WinningClasses,
 					1,
 					uint32(randomN),

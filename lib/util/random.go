@@ -9,6 +9,8 @@ package util
 import (
 	"crypto/rand"
 	"fmt"
+	"math/big"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
@@ -26,4 +28,66 @@ func RandomString(length int) string {
 	}
 
 	return fmt.Sprintf("%x", buf)
+}
+
+// generateRandomIntegers gated between min and max, inclusive on both ends,
+// doing some coercion internally to use crypto/rand and assuming that the
+// uint32 requirement in the arguments prevent any size-of-int issues
+func RandomIntegers(amount int, min, max uint32) (numbers []uint32) {
+	var (
+		maxBig = new(big.Int).SetInt64(int64(max))
+		minBig = new(big.Int).SetInt64(int64(min))
+	)
+
+	if int64(amount) > int64(max-min+1) {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Can't generate %d non-repeating integers between %d and %d!",
+				amount,
+				min,
+				max,
+			)
+		})
+	}
+
+	numbers = make([]uint32, amount)
+
+	scaledMax := new(big.Int).Sub(maxBig, minBig)
+
+	// crypto/rand#Int generates from 0 (inclusive) to max (exclusive)
+	scaledMax.Add(scaledMax, big.NewInt(1))
+
+	for i := 0; i < amount; i++ {
+		for {
+			no, err := rand.Int(rand.Reader, scaledMax)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to source system randomness!"
+					k.Payload = err
+				})
+			}
+
+			no.Add(no, minBig)
+
+			// we can assume that with the arguments this is okay
+
+			numbers[i] = uint32(no.Int64())
+
+			dup := false
+
+			for j := 0; j < i; j++ {
+				if numbers[i] == numbers[j] {
+					dup = true
+					break
+				}
+			}
+
+			if !dup {
+				break
+			}
+		}
+	}
+
+	return numbers
 }
