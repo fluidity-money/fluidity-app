@@ -118,8 +118,8 @@ web/surfing/src/assets/images/buttonIcons/arrowLeftWhite.svg filter=lfs diff=lfs
 web/app.fluidity.money/public/images/logoOutline.png filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/icons/x.svg filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/outlinedLogo.svg filter=lfs diff=lfs merge=lfs -text
-web/app.fluidity.money/public/images/icons/copyIcon.svg filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/icons/disconnectIcon.svg filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/icons/checked.png filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/providers/balancer.svg filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/providers/1inch.svg filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/images/icons/copyIconCircle.svg filter=lfs diff=lfs merge=lfs -text
