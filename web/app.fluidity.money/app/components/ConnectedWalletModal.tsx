@@ -19,8 +19,8 @@ export const ConnectedWalletModal = ({
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const [icon, setIcon] = useState<React.ReactNode>(
     <img
-      height="26"
-      width="26"
+      height="32"
+      width="32"
       src="/images/icons/copyIconCircle.svg"
       alt="copy"
     />
@@ -30,14 +30,14 @@ export const ConnectedWalletModal = ({
     // Copies to clipboard
     navigator.clipboard.writeText(address);
     setIcon(
-      <img height="26" width="26" src="/images/icons/checked.png" alt="copy" />
+      <img height="32" width="32" src="/images/icons/checked.svg" alt="copy" />
     );
 
     setTimeout(() => {
       setIcon(
         <img
-          height="26"
-          width="26"
+          height="32"
+          width="32"
           src="/images/icons/copyIconCircle.svg"
           alt="copy"
         />

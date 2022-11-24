@@ -328,7 +328,7 @@ export default function Rewards() {
     });
 
   const { width } = useViewport();
-  const mobileView = width <= 500;
+  const mobileView = width <= 500 && width > 0;
 
   const tableBreakpoint = 850;
 
