@@ -31,6 +31,7 @@ import {
   Heading,
   ChainSelectorButton,
   BlockchainModal,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
@@ -450,7 +451,7 @@ export default function Dashboard() {
               }
               icon={<Trophy />}
             >
-              ${unclaimedRewards}
+              {unclaimedRewards < 0.01 ? `$${unclaimedRewards}` : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
             {/* Modal on hover */}
