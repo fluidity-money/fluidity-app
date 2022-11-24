@@ -85,7 +85,7 @@ func InsertWinner(winner Winner) {
 		)
 	}
 
-	statementText +=  
+	statementText +=
 		`VALUES (
 			$1,
 			$2,
@@ -207,7 +207,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 
 		switch winner.Network {
 		case network.NetworkEthereum:
-			application, err = ethApps.ParseApplicationName(applicationEthereum)	
+			application, err = ethApps.ParseApplicationName(applicationEthereum)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -218,7 +218,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 			}
 
 		case network.NetworkSolana:
-			application, err = solApps.ParseApplicationName(applicationSolana)	
+			application, err = solApps.ParseApplicationName(applicationSolana)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -251,10 +251,9 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 		WHERE
 			reward_transaction_hash = $1
 			AND winner_address = $2
-		RETURNING 
+		RETURNING
 			is_sender,
-			ethereum_application,
-			solana_application
+			application
 		;`,
 
 		TablePendingRewardType,
@@ -323,7 +322,7 @@ func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress et
 			send_transaction_hash,
 			winner_address,
 			is_sender,
-			ethereum_application
+			application
 
 		)
 
