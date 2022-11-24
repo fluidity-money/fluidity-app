@@ -4,7 +4,7 @@ const query: Queryable = {
   ethereum: gql`
     query getPendingRewards($address: String!) {
       ethereum_pending_winners(
-        where: { address: { _eq: $address } }
+        where: { reward_sent: { _eq: false }, address: { _eq: $address } }
         order_by: { block_number: desc }
       ) {
         address
@@ -49,7 +49,7 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
   const body = {
     query: query[network],
     variables: {
-      address,
+      address: address.toLowerCase(),
     },
   };
 

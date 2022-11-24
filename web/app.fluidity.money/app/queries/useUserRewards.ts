@@ -1,6 +1,6 @@
 import { gql, jsonPost } from "~/util";
 
-const query = gql`
+const queryAll = gql`
   query WinnersAll($network: network_blockchain!) {
     winners(
       where: { network: { _eq: $network } }
@@ -16,12 +16,39 @@ const query = gql`
   }
 `;
 
-const useUserRewards = async (network: string) => {
+const queryByAddress = gql`
+  query WinnersAll($network: network_blockchain!, $address: String!) {
+    winners(
+      where: { network: { _eq: $network }, winning_address: { _eq: $address } }
+      distinct_on: transaction_hash
+    ) {
+      network
+      solana_winning_owner_address
+      winning_address
+      transaction_hash
+      winning_amount
+      token_decimals
+    }
+  }
+`;
+
+const useUserRewardsAll = async (network: string) => {
   const variables = { network };
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
-    query: query,
+    query: queryAll,
+  };
+
+  return jsonPost<ExpectedWinnersBody, ExpectedWinnersResponse>(url, body);
+};
+
+const useUserRewardsByAddress = async (network: string, address: string) => {
+  const variables = { network, address };
+  const url = "https://fluidity.hasura.app/v1/graphql";
+  const body = {
+    variables,
+    query: queryByAddress,
   };
 
   return jsonPost<ExpectedWinnersBody, ExpectedWinnersResponse>(url, body);
@@ -51,4 +78,4 @@ export type Winner = {
   token_decimals: number;
 };
 
-export default useUserRewards;
+export { useUserRewardsAll, useUserRewardsByAddress };
