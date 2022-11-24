@@ -29,7 +29,8 @@ type Winner struct {
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
 	AwardedTime              time.Time                 `json:"awarded_time"`
 	RewardType				 RewardType                `json:"reward_type"`
-	Application              Application			   `json:"application"`
+	// this is the stringified result of either an ethereum.Application or solana.Application
+	Application              string                    `json:"application"`
 	BatchFirstBlock          misc.BigInt               `json:"first_block"`
 	BatchLastBlock           misc.BigInt               `json:"last_block"`
 
