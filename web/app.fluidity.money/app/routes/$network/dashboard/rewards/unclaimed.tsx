@@ -43,7 +43,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         ? {
             ...map,
             [token.symbol]: token.address,
-            [token.symbol]: token.isFluidOf,
+            [token.symbol.slice(1)]: token.address,
           }
         : map,
     {}

@@ -152,12 +152,16 @@ const UserRewards = ({
             </Heading>
             <section className="fees">
               <Text size="xs">Network fee</Text>
-              <Text size="xs">${networkFee} FUSDC</Text>
+              <Text size="xs">
+                ${networkFee} {network === "ethereum" ? "ETH" : "SOL"}
+              </Text>
             </section>
             <hr className="line" />
             <section className="fees">
               <Text size="xs">Gas fee</Text>
-              <Text size="xs">${gasFee} FUSDC</Text>
+              <Text size="xs">
+                ${gasFee} {network === "ethereum" ? "ETH" : "SOL"}
+              </Text>
             </section>
             <hr className="line" />
           </section>
