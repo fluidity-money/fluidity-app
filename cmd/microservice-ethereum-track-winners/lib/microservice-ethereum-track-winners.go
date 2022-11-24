@@ -30,6 +30,7 @@ func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, detai
 	)
 
 	winner := winners.Winner{
+		Application:              application,
 		Network:                  NetworkEthereum,
 		TransactionHash:          transactionHash,
 		WinnerAddress:            address,
