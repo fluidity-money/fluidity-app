@@ -30,13 +30,13 @@ func init() {
 
 	var err error
 
-	if fluidityContractAbi, err = ethAbi.JSON(reader); err != nil {
+	if FluidityContractAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 
 	reader = strings.NewReader(workerConfigAbiString)
 
-	if workerConfigAbi, err = ethAbi.JSON(reader); err != nil {
+	if WorkerConfigAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 }
