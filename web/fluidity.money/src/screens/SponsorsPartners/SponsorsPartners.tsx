@@ -82,12 +82,6 @@ const SponsorsPartners = () => {
       title: "Orca",
       info: "Orca is the easiest, fastest, and most user-friendly cryptocurrency exchange on the Solana blockchain.",
     },
-    {
-      img: "/assets/images/Partners/Saber.png",
-      url: "https://app.saber.so/swap",
-      title: "Saber",
-      info: "Saber is an automated market maker for trading assets on Solana.",
-    },
   ];
 
   const { width } = useViewport();
