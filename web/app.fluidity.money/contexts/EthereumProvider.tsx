@@ -41,10 +41,12 @@ const EthereumFacade = ({
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
   useEffect(() => {
-    connectors.forEach(([connector]) => {
+    connectors.every(([connector]) => {
       connector?.connectEagerly?.()?.catch(() => {
-        return;
+        return true;
       });
+
+      return false;
     });
   }, []);
 
