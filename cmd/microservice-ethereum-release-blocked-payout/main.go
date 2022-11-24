@@ -1,76 +1,35 @@
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package main
 
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
-	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
-    // EnvBlockedPayoutPayload to read blocked payout info from
+    // EnvBlockedPayoutPayload to read the payload sent in discord from
     EnvBlockedPayoutPayload = `FLU_ETHEREUM_BLOCKED_PAYOUT_PAYLOAD`
 
-    // EnvShouldPayout to determine if the reward should be paid out or just acknowledged
+    // EnvShouldPayout to be set to `true` to release the payout,
+    // `false` to just acknowledge it
     EnvShouldPayout = `FLU_ETHEREUM_PAYOUT`
 )
 
-const abiString = `
-[
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "payout",
-          "type": "bool"
-        },
-        {
-          "internalType": "uint256",
-          "name": "firstBlock",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "lastBlock",
-          "type": "uint256"
-        }
-      ],
-      "name": "unblockReward",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-]
-`
-
 func main() {
-    reader := strings.NewReader(abiString)
-
-    unblockRewardAbi, err := ethAbi.JSON(reader)
-
-    if err != nil {
-        panic(err)
-    }
-
     var (
         payload    = util.GetEnvOrFatal(EnvBlockedPayoutPayload)
         payout_    = util.GetEnvOrFatal(EnvShouldPayout)
+
         payout     bool
     )
 
@@ -91,7 +50,7 @@ func main() {
 
     var blockedReward winners.Winner
 
-    err = json.Unmarshal([]byte(payload), &blockedReward)
+    err := json.Unmarshal([]byte(payload), &blockedReward)
 
     if err != nil {
         log.Fatal(func (k *log.Log) {
@@ -101,18 +60,18 @@ func main() {
     }
 
     var (
-        user_ = blockedReward.WinnerAddress
-        amount_ = blockedReward.WinningAmount
+        user_       = blockedReward.WinnerAddress
+        amount_     = blockedReward.WinningAmount
         firstBlock_ = blockedReward.BatchFirstBlock
-        lastBlock_ = blockedReward.BatchLastBlock
+        lastBlock_  = blockedReward.BatchLastBlock
 
-        user = common.HexToAddress(user_)
-        amount = &amount_.Int
+        amount     = &amount_.Int
         firstBlock = &firstBlock_.Int
-        lastBlock = &lastBlock_.Int
+        lastBlock  = &lastBlock_.Int
     )
+    user := common.HexToAddress(user_)
 
-    unblockCall, err := unblockRewardAbi.Pack(
+    unblockCall, err := fluidity.FluidityContractAbi.Pack(
         "unblockReward",
         user,
         amount,

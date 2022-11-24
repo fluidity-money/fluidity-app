@@ -33,7 +33,6 @@ func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, detai
 		Network:                  NetworkEthereum,
 		TransactionHash:          transactionHash,
 		WinnerAddress:            address,
-		SolanaWinnerOwnerAddress: address,
 		WinningAmount:            amount,
 		AwardedTime:              when,
 		RewardType:               rewardType,
