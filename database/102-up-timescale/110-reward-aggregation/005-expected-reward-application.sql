@@ -3,7 +3,7 @@
 -- aggregate highest and average reward per application 
 
 -- use all values if no parameter passed
-CREATE OR REPLACE FUNCTION application_performance(i INTERVAL DEFAULT now() - to_timestamp('0'))
+CREATE FUNCTION application_performance(i INTERVAL DEFAULT now() - to_timestamp('0'))
 RETURNS TABLE (
     network network_blockchain,
     application varchar,
