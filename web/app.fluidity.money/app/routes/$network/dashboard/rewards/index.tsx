@@ -308,7 +308,7 @@ export default function Rewards() {
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
-            address in [sender, receiver],
+            [sender, receiver].includes(address),
           name: "YOUR REWARDS",
         },
       ]
