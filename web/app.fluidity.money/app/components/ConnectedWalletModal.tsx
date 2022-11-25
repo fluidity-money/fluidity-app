@@ -33,8 +33,6 @@ export const ConnectedWalletModal = ({
       <img height="32" width="32" src="/images/icons/checked.svg" alt="copy" />
     );
 
-    console.log(visible);
-
     setTimeout(() => {
       setIcon(
         <img
@@ -47,9 +45,12 @@ export const ConnectedWalletModal = ({
     }, 500);
   };
 
-  const closeWithEsc = (event: { key: string }) => {
-    event.key === "Escape" && visible === true && close();
-  };
+  const closeWithEsc = useCallback(
+    (event: { key: string }) => {
+      event.key === "Escape" && visible === true && close();
+    },
+    [visible]
+  );
 
   useEffect(() => {
     document.addEventListener("keydown", closeWithEsc);
