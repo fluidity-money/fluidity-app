@@ -19,7 +19,7 @@ import {
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
-import { useState, useContext, useMemo, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useLoaderData, useNavigate, useLocation } from "@remix-run/react";
 import { useUserRewardsAll } from "~/queries";
 import { Table } from "~/components";
@@ -212,12 +212,15 @@ export default function Home() {
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
 
-  const [{ count, transactions, rewards, volume, graphTransformedTransactions }, setTransactions] = useState<{
+  const [
+    { count, transactions, rewards, volume, graphTransformedTransactions },
+    setTransactions,
+  ] = useState<{
     count: number;
     transactions: Transaction[];
     rewards: number;
     volume: number;
-    graphTransformedTransactions: (Transaction & {x: number})[]
+    graphTransformedTransactions: (Transaction & { x: number })[];
   }>({
     count: totalCount,
     transactions: totalTransactions,
@@ -229,28 +232,37 @@ export default function Home() {
   const binTransactions = (
     bins: (Transaction & { x: number })[],
     txs: Transaction[]
-  ): (Transaction & {x: number})[] => {
-    const txMappedBins: (Transaction & {x: number})[][] = bins.map(bin => [bin]);
-    
+  ): (Transaction & { x: number })[] => {
+    const txMappedBins: (Transaction & { x: number })[][] = bins.map((bin) => [
+      bin,
+    ]);
+
     let binIndex = 0;
     for (let txIndex = 0; txIndex < txs.length; txIndex++) {
       const tx = txs[txIndex];
-      
+
       while (tx.timestamp < bins[binIndex].timestamp) {
         binIndex++;
 
         if (binIndex >= bins.length) break;
       }
       if (binIndex >= bins.length) break;
-      
-      txMappedBins[binIndex].push({...tx, x: bins[binIndex].x})
+
+      txMappedBins[binIndex].push({ ...tx, x: bins[binIndex].x });
     }
-    
-    const maxTxMappedBins = txMappedBins.map(txs => txs.find((tx) => tx.value === Math.max(...txs.map(({value}) => value)))!).reverse();
+
+    const maxTxMappedBins = txMappedBins
+      .map(
+        (txs, i) =>
+          txs.find(
+            (tx) => tx.value === Math.max(...txs.map(({ value }) => value))
+          ) || bins[i]
+      )
+      .reverse();
 
     return maxTxMappedBins;
   };
-  
+
   const graphTransformers = [
     {
       name: "D",
@@ -259,10 +271,12 @@ export default function Home() {
         const unixHourInc = 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-          ...graphEmptyTransaction(unixNow - (entries - i) * unixHourInc),
-          x: i + 1,
-        })).reverse();
+        const mappedTxBins = Array.from({ length: entries })
+          .map((_, i) => ({
+            ...graphEmptyTransaction(unixNow - (entries - i) * unixHourInc),
+            x: i + 1,
+          }))
+          .reverse();
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -276,11 +290,15 @@ export default function Home() {
         const unixEightHourInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-          ...graphEmptyTransaction(unixNow - (entries - i) * unixEightHourInc),
-          x: i + 1,
-        })).reverse();
-        
+        const mappedTxBins = Array.from({ length: entries })
+          .map((_, i) => ({
+            ...graphEmptyTransaction(
+              unixNow - (entries - i) * unixEightHourInc
+            ),
+            x: i + 1,
+          }))
+          .reverse();
+
         return binTransactions(mappedTxBins, txs);
       },
     },
@@ -291,10 +309,12 @@ export default function Home() {
         const unixDayInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-          ...graphEmptyTransaction(unixNow - (entries - i) * unixDayInc),
-          x: i + 1,
-        })).reverse();
+        const mappedTxBins = Array.from({ length: entries })
+          .map((_, i) => ({
+            ...graphEmptyTransaction(unixNow - (entries - i) * unixDayInc),
+            x: i + 1,
+          }))
+          .reverse();
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -306,10 +326,14 @@ export default function Home() {
         const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-          ...graphEmptyTransaction(unixNow - (entries - i) * unixBimonthlyInc),
-          x: i + 1,
-        })).reverse();
+        const mappedTxBins = Array.from({ length: entries })
+          .map((_, i) => ({
+            ...graphEmptyTransaction(
+              unixNow - (entries - i) * unixBimonthlyInc
+            ),
+            x: i + 1,
+          }))
+          .reverse();
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -385,7 +409,10 @@ export default function Home() {
         rewards: totalRewards,
         transactions: totalTransactions,
         volume: totalVolume,
-        graphTransformedTransactions: graphTransformers[activeTransformerIndex].transform(totalTransactions),
+        graphTransformedTransactions:
+          graphTransformers[activeTransformerIndex].transform(
+            totalTransactions
+          ),
       });
     }
 
@@ -403,8 +430,9 @@ export default function Home() {
       0
     );
 
-    const graphTransformedTransactions = graphTransformers[activeTransformerIndex].transform(tableFilteredTransactions)
-
+    const graphTransformedTransactions = graphTransformers[
+      activeTransformerIndex
+    ].transform(tableFilteredTransactions);
 
     setTransactions({
       count: tableFilteredTransactions.length,
@@ -597,9 +625,9 @@ export default function Home() {
                     <br />
                     <br />
                     <span>
-                  {datum.sender === MintAddress
-                    ? "Mint Address"
-                    : trimAddress(datum.sender)}
+                      {datum.sender === MintAddress
+                        ? "Mint Address"
+                        : trimAddress(datum.sender)}
                     </span>
                     <br />
                     <br />
