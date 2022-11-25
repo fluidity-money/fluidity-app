@@ -17,12 +17,21 @@ type Props = {
   address: string;
 
   color?: string;
-  
+
   addToken?: (symbol: string) => void;
 };
 
 const FluidifyCard = (props: Props) => {
-  const { fluid, logo, name, symbol, amount, mintCapPercentage, color, addToken } = props;
+  const {
+    fluid,
+    logo,
+    name,
+    symbol,
+    amount,
+    mintCapPercentage,
+    color,
+    addToken,
+  } = props;
 
   return (
     <div key={symbol} className={`fluidify-card`}>
@@ -47,10 +56,14 @@ const FluidifyCard = (props: Props) => {
             })}
           </span>
         </div>
-    <div />
-          <button onClick={() => addToken?.(symbol)} title={"Add Token to Wallet"} className={"fluidify-card-add"}>
-            +
-          </button>
+        <div />
+        <button
+          onClick={() => addToken?.(symbol)}
+          title={"Add Token to Wallet"}
+          className={"fluidify-card-add"}
+        >
+          +
+        </button>
       </div>
 
       {/* Progress Bar */}

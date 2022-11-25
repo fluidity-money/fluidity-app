@@ -217,10 +217,10 @@ const EthereumFacade = ({
         })
     );
   };
-  
+
   const addToken = async (symbol: string) => {
     const token = tokens.find((t) => t.symbol === symbol);
-    
+
     if (!token) return;
 
     const fromFluid = !!token.isFluidOf;
@@ -230,16 +230,16 @@ const EthereumFacade = ({
       : tokens.find((t) => t.isFluidOf === token.address);
 
     if (!toToken) return;
-    
+
     const watchToken = {
       address: toToken.address,
       symbol: toToken.symbol,
       decimals: toToken.decimals,
       image: toToken.logo,
-    }
+    };
 
     return connector?.watchAsset?.(watchToken);
-  }
+  };
 
   const getPrizePool = async (): Promise<number> => {
     const signer = provider?.getSigner();

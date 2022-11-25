@@ -30,8 +30,8 @@ export interface IFluidityFacade {
     | ({ gasFee: number; networkFee: number; amount: number } | undefined)[]
     | undefined
   >;
-  
-  addToken: (symbol: string) => Promise<boolean | undefined>
+
+  addToken: (symbol: string) => Promise<boolean | undefined>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

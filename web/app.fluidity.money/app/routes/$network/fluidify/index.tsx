@@ -209,12 +209,12 @@ export default function FluidifyToken() {
         : undefined,
     [assetToken]
   );
-  
+
   const handleAddToken = (symbol: string) => {
     if (!connected || !addToken) return;
-    
+
     addToken(symbol);
-  }
+  };
 
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState(false);
