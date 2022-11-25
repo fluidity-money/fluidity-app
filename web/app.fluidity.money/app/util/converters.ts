@@ -18,7 +18,8 @@ const shorthandAmountFormatter = (
 ): string => {
   const num: number = parseFloat(uiAmount);
   if (num < 1) {
-    return uiAmount;
+    console.log(decimalTrim(uiAmount, 3));
+    return decimalTrim(uiAmount, 3);
   }
   const lookup = [
     { value: 1, symbol: "" },
@@ -82,6 +83,17 @@ const clearTrailingZeros = (value: string) => {
   return value;
 };
 
+//trim a string to <limit> decimal places
+const decimalTrim = (amount: string, limit: number) => {
+  if (limit <= 0) {
+    return amount;
+  }
+
+  const trimIndex = amount.indexOf(".");
+  const trim = trimIndex > -1 ? amount.slice(0, trimIndex + limit + 1) : amount;
+  return trim;
+};
+
 /**
  * @param address string
  * @returns abbrevates long addresses e.g 0x1234567890 converted to 0x123...890
@@ -118,6 +130,7 @@ const transactionTimeLabel = (timestamp: number) => {
 };
 
 export {
+  decimalTrim,
   shorthandAmountFormatter,
   amountToDecimalString,
   clearTrailingZeros,
