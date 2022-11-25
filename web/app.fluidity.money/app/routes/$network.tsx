@@ -1,7 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import config from "../../webapp.config.js";
-import serverConfig from "~/webapp.config.server";
+import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
 import { useEffect, useMemo, useState } from "react";
 
@@ -10,6 +10,7 @@ import SolanaProvider from "contexts/SolanaProvider";
 
 import { Fragment } from "react";
 import { Token } from "~/util/chainUtils/tokens.js";
+import { NotificationSubscription } from "~/components/NotificationSubscription";
 
 type ProviderMap = {
   [key: string]:
@@ -54,7 +55,8 @@ const Provider = ({
 export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
-  const { tokens } = serverConfig.config["ethereum"];
+  const { tokens, explorer } =
+    serverConfig.config[network as unknown as string];
 
   const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
   const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;
@@ -67,20 +69,26 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   return {
     network,
+    explorer,
     tokens,
     rpcUrls: {
       solana: solanaRpcUrl,
       ethereum: ethereumRpcUrl,
     },
+    colors: (await colors)[network as string],
   };
 };
 
 type LoaderData = {
   network: string;
+  explorer: string;
   tokens: Token[];
   rpcUrls: {
     solana: string;
     ethereum: string;
+  };
+  colors: {
+    [symbol: string]: string;
   };
 };
 
@@ -96,7 +104,8 @@ function ErrorBoundary() {
 }
 
 export default function Network() {
-  const { network, tokens, rpcUrls } = useLoaderData<LoaderData>();
+  const { network, tokens, rpcUrls, colors, explorer } =
+    useLoaderData<LoaderData>();
 
   // Hardcode solana to redirect to ethereum
   if (network === "solana") throw new Error("Solana not supported");
@@ -108,6 +117,12 @@ export default function Network() {
       solRpc={rpcUrls.solana}
       ethRpc={rpcUrls.ethereum}
     >
+      <NotificationSubscription
+        network={network}
+        explorer={explorer}
+        tokens={tokens}
+        colorMap={colors}
+      />
       <Outlet />
     </Provider>
   );

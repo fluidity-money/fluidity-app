@@ -44,7 +44,7 @@ func InsertWinner(winner Winner) {
 	var (
 		tokenShortName    = winner.TokenDetails.TokenShortName
 		tokenDecimals     = winner.TokenDetails.TokenDecimals
-		applicationString = winner.Application.String()
+		applicationString = winner.Application
 
 		statementText string
 	)
@@ -230,7 +230,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 
 		}
 
-		winner.Application = application
+		winner.Application = application.String()
 
 		winners = append(winners, winner)
 	}
@@ -364,6 +364,7 @@ func InsertPendingRewardType(sendTransactionHash ethereum.Hash, senderAddress et
 		sendTransactionHash,
 		receipientAddress,
 		false,
+		application.String(),
 	)
 
 	if err != nil {

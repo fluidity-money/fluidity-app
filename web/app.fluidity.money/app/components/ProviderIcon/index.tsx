@@ -17,7 +17,8 @@ export type Providers =
   | "Solana"
   | "Solend"
   | "Uniswap"
-  | "Sushiswap";
+  | "Sushiswap"
+  | "Fluidity";
 
 type IProviderIcon = {
   provider: Providers;

@@ -41,11 +41,12 @@ const EthereumFacade = ({
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
   useEffect(() => {
-    connectors.forEach(([connector]) => {
-      console.log(connector);
+    connectors.every(([connector]) => {
       connector?.connectEagerly?.()?.catch(() => {
-        return;
+        return true;
       });
+
+      return false;
     });
   }, []);
 
@@ -179,7 +180,7 @@ const EthereumFacade = ({
   };
 
   const manualReward = async (
-    tokenAddrs: string[],
+    fluidTokenAddrs: string[],
     userAddr: string
   ): Promise<
     | ({ amount: number; gasFee: number; networkFee: number } | undefined)[]
@@ -192,10 +193,14 @@ const EthereumFacade = ({
     }
 
     return Promise.all(
-      tokenAddrs
+      fluidTokenAddrs
         .map((addr) => tokens.find((t) => t.address === addr))
         .filter((t) => !!t && !!t.isFluidOf)
         .map(async (token) => {
+          const baseToken = tokens.find((t) => t.address === token?.isFluidOf);
+
+          if (!baseToken) return;
+
           const contract: ContractToken = {
             address: token?.address ?? "",
             ABI: tokenAbi,
@@ -203,7 +208,12 @@ const EthereumFacade = ({
             isFluidOf: !!token?.isFluidOf,
           };
 
-          return await manualRewardToken(contract, userAddr, signer);
+          return await manualRewardToken(
+            contract,
+            baseToken.symbol,
+            userAddr,
+            signer
+          );
         })
     );
   };

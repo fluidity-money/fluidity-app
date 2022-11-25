@@ -1,4 +1,5 @@
 import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
+import { Buffer } from "buffer";
 
 const B64ToUint8Array = (b64string: string): Uint8Array =>
   Buffer.from(b64string, "base64");

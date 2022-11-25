@@ -31,6 +31,7 @@ const OptionsSchema = z.object({
   ),
   config: z.object({}).catchall(
     z.object({
+      explorer: z.string(),
       fluidAssets: z.array(z.string()),
       tokens: z
         .array(
@@ -90,6 +91,7 @@ const OptionsSchema = z.object({
     Solend: z.string(),
     Uniswap: z.string(),
     Sushiswap: z.string(),
+    Fluidity: z.string(),
   }),
   database: z.object({
     hasura: z.string(),

@@ -1,14 +1,16 @@
 import { Display, LinkButton, Text } from "@fluidity-money/surfing";
+import { useNavigate } from "@remix-run/react";
 
 interface IUnclaimedRewardsHoverModalProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  unclaimedRewards: number;
 }
 
 const UnclaimedRewardsHoverModal = ({
   setShowModal,
+  unclaimedRewards,
 }: IUnclaimedRewardsHoverModalProps) => {
-  // access unclaimed rewards figure once merged
-  const unclaimedRewards = 6745;
+  const navigate = useNavigate();
   return (
     <div
       className="unclaimed-modal-container"
@@ -34,7 +36,9 @@ const UnclaimedRewardsHoverModal = ({
           type={"internal"}
           handleClick={() => {
             //navigate user unclaimed rewards
-            return;
+            unclaimedRewards > 0
+              ? navigate("./rewards/unclaimed")
+              : navigate("./rewards");
           }}
         >
           DETAILS
