@@ -218,6 +218,29 @@ const EthereumFacade = ({
     );
   };
 
+  const addToken = async (symbol: string) => {
+    const token = tokens.find((t) => t.symbol === symbol);
+
+    if (!token) return;
+
+    const fromFluid = !!token.isFluidOf;
+
+    const toToken = fromFluid
+      ? tokens.find((t) => t.address === token.isFluidOf)
+      : tokens.find((t) => t.isFluidOf === token.address);
+
+    if (!toToken) return;
+
+    const watchToken = {
+      address: toToken.address,
+      symbol: toToken.symbol,
+      decimals: toToken.decimals,
+      image: toToken.logo,
+    };
+
+    return connector?.watchAsset?.(watchToken);
+  };
+
   const getPrizePool = async (): Promise<number> => {
     const signer = provider?.getSigner();
 
@@ -242,6 +265,7 @@ const EthereumFacade = ({
         rawAddress: account ?? "",
         address: account?.toLowerCase() ?? "",
         manualReward,
+        addToken,
         connected: isActive,
       }}
     >
