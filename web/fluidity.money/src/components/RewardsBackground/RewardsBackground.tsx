@@ -68,11 +68,7 @@ const RewardsBackground = () => {
               rel="noopener noreferrer"
             >
               <img
-                src={
-                  token === "USDT"
-                    ? "/assets/images/tokenIcons/usdt.svg"
-                    : "/assets/images/tokenIcons/usdc.svg"
-                }
+                src={"/assets/images/tokenIcons/" + token + ".png"}
                 alt="tokenIcon"
               />
 
