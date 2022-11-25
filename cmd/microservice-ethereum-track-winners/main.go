@@ -8,41 +8,31 @@ package main
 // without using abigen/etc
 
 import (
-	"os"
+	"errors"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	logging "github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
-	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	timescaleWinners "github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	"github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-track-winners/lib"
 )
 
 const (
 	// FilterEventSignature to use to filter for event signatures
 	FilterEventSignature = `Reward(address,uint256,uint256,uint256)`
 
+	FilterUnblockedEventSignature = `UnblockedReward(address,address,uint256,uint256,uint256)`
+
 	// FilterBlockedEventSignature to use to filter for blocked reward events
 	FilterBlockedEventSignature = `BlockedReward(address,uint256,uint256,uint256)`
 
-	// expectedTopicsLen to ensure logs received have the expected number of topics
+	// expectedRewardTopics to ensure logs received have the expected number of topics
 	// (sig, winner address)
-	expectedTopicsLen = 2
-
-	// FilterLegacyEventSignature to use to filter for event signatures
-	// on the legacy contract
-	FilterLegacyEventSignature = `Reward(address,uint256)`
-
-	// legacyExpectedTopicsLen to ensure legacy logs received have the expected
-	// number of topics (sig, winner, amount)
-	legacyExpectedTopicsLen = 3
+	expectedRewardTopics = 2
 
 	// EnvContractAddress to watch where the reward function was called
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
@@ -53,9 +43,8 @@ const (
 	// EnvUnderlyingTokenDecimals supported by the contract
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
-	// EnvUseLegacyContract to use the old event signature
-	// for legacy deployments
-	EnvUseLegacyContract = `FLU_ETHEREUM_LEGACY_CONTRACT`
+	// EnvNetwork to differentiate between eth, arb, etc
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 
 	winnersPublishTopic = winners.TopicWinnersEthereum
 
@@ -67,19 +56,16 @@ func main() {
 		filterAddress            = util.GetEnvOrFatal(EnvContractAddress)
 		underlyingTokenName      = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
-
-		useLegacyContract = os.Getenv(EnvUseLegacyContract) == "true"
-
-		eventSig string
-		expectedTopics int
+		net_                     = util.GetEnvOrFatal(EnvNetwork)
 	)
 
-	if !useLegacyContract {
-		eventSig = FilterEventSignature
-		expectedTopics = expectedTopicsLen
-	} else {
-		eventSig = FilterLegacyEventSignature
-		expectedTopics = legacyExpectedTopicsLen
+	network_, err := network.ParseEthereumNetwork(net_)
+
+	if err != nil {
+		logging.Fatal(func (k *logging.Log) {
+			k.Message = "Failed to read an ethereum network from env!"
+			k.Payload = err
+		})
 	}
 
 	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
@@ -95,33 +81,18 @@ func main() {
 		})
 	}
 
-	eventSignature := microservice_ethereum_track_winners.HashEventSignature(
-		eventSig,
-	)
-
-	blockedEventSignature := microservice_ethereum_track_winners.HashEventSignature(
-		FilterBlockedEventSignature,
-	)
-
-	logging.Debug(func(k *logging.Log) {
-		k.Format(
-			"Filtering for event signatures %s and %s",
-			eventSignature,
-			blockedEventSignature,
-		)
-	})
-
 	ethereum.Logs(func(log ethereum.Log) {
 
 		var (
-			logTopics       = log.Topics
-			transactionHash = log.TxHash.String()
-			logAddress      = log.Address.String()
+			logTopics        = log.Topics
+			transactionHash  = log.TxHash
+			logAddress       = log.Address
+			logAddressString = logAddress.String()
 		)
 
 		// first, we're going to make the string lowercase
 
-		logAddress = strings.ToLower(logAddress)
+		logAddressString = strings.ToLower(logAddressString)
 		filterAddress = strings.ToLower(filterAddress)
 
 		logging.Debug(func(k *logging.Log) {
@@ -134,52 +105,14 @@ func main() {
 
 		// address doesn't match our target contract!
 
-		if filterAddress != logAddress {
+		if filterAddress != logAddressString {
 			return
 		}
 
-		messageReceivedTime := time.Now()
-
-		if lenLogTopics := len(logTopics); lenLogTopics != expectedTopics {
+		if len(logTopics) == 0 {
 			logging.Debug(func(k *logging.Log) {
 				k.Format(
-					"The number of topics for log transaction %v was expected to be %v, is %v! %v",
-					transactionHash,
-					expectedTopics,
-					lenLogTopics,
-					logTopics,
-				)
-			})
-
-			return
-		}
-
-		logging.Debug(func(k *logging.Log) {
-			k.Format(
-				"The log transaction %v for topic 0 is %v, am expecting %v or %v!",
-				transactionHash,
-				logTopics[0],
-				eventSignature,
-				blockedEventSignature,
-			)
-		})
-
-		var blockedReward bool
-
-		switch logTopics[0].String() {
-		case eventSignature:
-			blockedReward = false
-
-		case blockedEventSignature:
-			blockedReward = true
-
-		default:
-			logging.Debug(func(k *logging.Log) {
-				k.Format(
-					"The log transaction %v for topic 0 is %v, was expecting %v!",
-					transactionHash,
-					logTopics[0],
-					eventSig,
+					"Log has no topics! Skipping...",
 				)
 			})
 
@@ -191,45 +124,66 @@ func main() {
 			underlyingTokenDecimals,
 		)
 
-		var (
-			rewardData fluidity.RewardData
-			err  error
-		)
+		rewardData, err := fluidity.TryDecodeRewardData(log, tokenDetails)
 
-		if !useLegacyContract {
-			rewardData, err = fluidity.DecodeRewardData(log, tokenDetails)
-		} else {
-			rewardData, err = fluidity.DecodeLegacyRewardData(log, tokenDetails)
-		}
+		// if we matched a reward event, process it and return
+		// otherwise continue on to try the unblockreward event,
+		// or die if there was an error
 
-		if err != nil {
+		switch err {
+		case nil:
+			processReward(
+				logAddress,
+				transactionHash,
+				rewardData,
+				tokenDetails,
+				network_,
+			)
+
+			return
+
+		case fluidity.ErrWrongEvent:
+			logging.Debug(func(k *logging.Log) {
+				k.Format(
+					"Log signature %s didn't decode as a reward or blockedReward!",
+					logTopics[0],
+				)
+			})
+
+		default:
 			logging.Fatal(func(k *logging.Log) {
-				k.Message = "Failed to decode reward data from events!"
+				k.Message = "Error decoding a reward or blockedReward!"
 				k.Payload = err
 			})
 		}
 
-		var (
-			hash = typesEth.HashFromString(transactionHash)
-			winnerAddress = typesEth.AddressFromString(rewardData.Winner.String())
+		unblockedRewardData, err := fluidity.TryDecodeUnblockedRewardData(
+			log,
+			tokenDetails,
 		)
 
-		rewardType, application := timescaleWinners.GetAndRemovePendingRewardType(hash, winnerAddress)
+		switch err {
+		case nil:
+			processUnblockedReward(
+				transactionHash,
+				unblockedRewardData,
+				tokenDetails,
+				network_,
+			)
 
-		convertedWinner := microservice_ethereum_track_winners.ConvertWinner(transactionHash, rewardData, tokenDetails, messageReceivedTime, rewardType, application)
+		case fluidity.ErrWrongEvent:
+			logging.Debug(func(k *logging.Log) {
+				k.Format(
+					"Log signature %s didn't decode as an unblockedReward!",
+					logTopics[0],
+				)
+			})
 
-		var publishTopic string
-
-		if blockedReward {
-			publishTopic = blockedWinnersPublishTopic
-		} else {
-			publishTopic = winnersPublishTopic
+		default:
+			logging.Fatal(func(k *logging.Log) {
+				k.Message = "Error decoding a reward or blockedReward!"
+				k.Payload = err
+			})
 		}
-
-		microservice_ethereum_track_winners.SendWinner(
-			useLegacyContract,
-			publishTopic,
-			convertedWinner,
-		)
 	})
 }
