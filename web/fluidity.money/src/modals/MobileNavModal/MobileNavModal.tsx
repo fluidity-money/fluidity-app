@@ -4,6 +4,7 @@
 
 import { Heading } from "@fluidity-money/surfing";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
@@ -13,26 +14,36 @@ interface IMobileNavModalProps {
 
 const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
-    <a
-      className={styles.button}
+    <Link
       href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
+      passHref
     >
-      <Heading as="h3">{link}</Heading>
-    </a>
+      <a
+        className={styles.button}
+        href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
+      >
+        <Heading as="h3">{link}</Heading>
+      </a>
+    </Link>
   ));
 
   return (
     <div className={styles.container}>
-      <a href={"/"}>
-        <Image
-          src="/assets/images/logoMetallic.png"
-          alt="logo"
-          width="160"
-          height="68"
-          priority={true}
-          loading="eager"
-        />
-      </a>
+      <Link
+        href={"/"}
+        passHref
+      >
+        <a href={"/"}>
+          <Image
+            src="/assets/images/logoMetallic.png"
+            alt="logo"
+            width="160"
+            height="68"
+            priority={true}
+            loading="eager"
+          />
+        </a>
+      </Link>
 
       {links}
 

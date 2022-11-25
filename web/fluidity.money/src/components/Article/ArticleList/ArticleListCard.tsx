@@ -3,28 +3,34 @@
 // LICENSE.md file.
 
 import { Heading, Text, LinkButton } from "@fluidity-money/surfing";
+import Link from "next/link";
 import { ArticleType } from "./ArticleList";
 import styles from "./ArticleList.module.scss";
 
 const ArticleListCard = (article: ArticleType) => {
   return (
     <div className={styles.listCardContainer}>
-      <a href={article.link} rel="noopener noreferrer" target="_blank">
-        <Heading as="h4">{article.title}</Heading>
-        <Text size="md" as="p">
-          {article.desc}
-        </Text>
-        <section>
-          {article.info}
-          <LinkButton
-            size={"small"}
-            type={"external"}
-            handleClick={() => (window.location.href = article.link)}
-          >
-            {article.linkTitle}
-          </LinkButton>
-        </section>
-      </a>
+      <Link 
+        href={article.link} 
+        passHref
+      >
+        <a href={article.link} rel="noopener noreferrer" target="_blank">
+          <Heading as="h4">{article.title}</Heading>
+          <Text size="md" as="p">
+            {article.desc}
+          </Text>
+          <section>
+            {article.info}
+            <LinkButton
+              size={"small"}
+              type={"external"}
+              handleClick={() => (window.location.href = article.link)}
+            >
+              {article.linkTitle}
+            </LinkButton>
+          </section>
+        </a>
+      </Link>
       <hr />
     </div>
   );
