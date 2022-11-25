@@ -100,7 +100,7 @@ name = "Dai Stablecoin"
 logo = "/assets/tokens/dai.svg"
 address = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 colour = "#825902"
-decimals = 32
+decimals = 18
 
 [[config.ethereum.tokens]]
 symbol = "fDAI"
@@ -109,7 +109,7 @@ logo = "/assets/tokens/fDAI.png"
 address = "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
 colour = "#825902"
 isFluidOf = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
-decimals = 32
+decimals = 18
 
 [config.solana]
 explorer = "https://explorer.solana.com"
