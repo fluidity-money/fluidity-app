@@ -18,6 +18,7 @@ SERVICES:
       SERVICE_NAME: microservice-ethereum-reset-mint-limits
       DOCKERFILE_PATH: ./cmd/microservice-ethereum-reset-mint-limits
       DEPLOYMENT_TYPE: CRON
+      ENABLE: false
 
       ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-reset-mint-limits
       SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
