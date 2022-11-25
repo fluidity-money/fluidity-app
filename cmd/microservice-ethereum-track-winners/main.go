@@ -8,7 +8,6 @@ package main
 // without using abigen/etc
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 
