@@ -6,6 +6,7 @@ import {
   GeneralButton,
   Heading,
   LinkButton,
+  Twitter,
 } from "@fluidity-money/surfing";
 import BloomEffect from "./BloomEffect";
 import useViewport from "~/hooks/useViewport";
@@ -119,6 +120,18 @@ export const ViewRewardModal = ({
                 className="view-reward-modal-breakdown-btn"
               >
                 WINNINGS BREAKDOWN
+              </GeneralButton>
+              <GeneralButton
+                className="share-button"
+                size="large"
+                version="transparent"
+                buttontype="icon before"
+                icon={<Twitter />}
+                handleClick={() => {
+                  return;
+                }}
+              >
+                SHARE
               </GeneralButton>
             </div>
           </div>

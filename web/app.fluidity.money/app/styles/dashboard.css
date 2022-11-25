@@ -821,6 +821,10 @@ main > footer > section > a {
   font-size: 32px;
 }
 
+.view-reward-modal-breakdown-btn {
+  margin-bottom: 17px;
+}
+
 .view-reward-modal-token {
   width: 40%;
   height: 80px;
