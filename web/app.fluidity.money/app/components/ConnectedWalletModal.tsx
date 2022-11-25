@@ -42,7 +42,7 @@ export const ConnectedWalletModal = ({
           alt="copy"
         />
       );
-    }, 500);
+    }, 1000);
   };
 
   const closeWithEsc = useCallback(
@@ -87,6 +87,7 @@ export const ConnectedWalletModal = ({
                 >
                   <span
                     className={"address-copy-box"}
+                    title={"Copy Wallet Address"}
                     onClick={() => copyAddress(address)}
                   >
                     <ConnectedWallet
@@ -99,6 +100,7 @@ export const ConnectedWalletModal = ({
                   </span>
                 </Card>
                 <GeneralButton
+                  title={"Add Token to Wallet"}
                   version="transparent"
                   buttontype={"icon before"}
                   icon={
