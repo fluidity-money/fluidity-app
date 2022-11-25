@@ -67,24 +67,6 @@ func getReceipt(gethClient *ethclient.Client, transactionHash ethereum.Hash) (*e
 	return &convertedReceipt, nil
 }
 
-// adjustFluidTransferParties gets the sender and receiver, removing the zero address
-func adjustFluidTransferParties(transfer worker.EthereumDecoratedTransfer) (ethereum.Address, ethereum.Address) {
-	var (
-		from = transfer.SenderAddress
-		to = transfer.RecipientAddress
-	)
-
-	if from == ethereum.ZeroAddress {
-		return to, to
-	}
-
-	if to == ethereum.ZeroAddress {
-		return from, from
-	}
-
-	return from, to
-}
-
 func main() {
 	var (
 		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
@@ -320,7 +302,10 @@ func main() {
 				decoratedTransaction.Receipt = *receipt
 			}
 
-			from, to := adjustFluidTransferParties(fluidTransfer)
+			var (
+				from = fluidTransfer.SenderAddress
+				to   = fluidTransfer.RecipientAddress
+			)
 
 			transfer := worker.EthereumDecoratedTransfer{
 				TransactionHash:  transactionHash,
