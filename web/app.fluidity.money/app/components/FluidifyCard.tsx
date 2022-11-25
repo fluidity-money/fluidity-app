@@ -17,14 +17,17 @@ type Props = {
   address: string;
 
   color?: string;
+  
+  addToken?: (symbol: string) => void;
 };
 
 const FluidifyCard = (props: Props) => {
-  const { fluid, logo, name, symbol, amount, mintCapPercentage, color } = props;
+  const { fluid, logo, name, symbol, amount, mintCapPercentage, color, addToken } = props;
 
   return (
     <div key={symbol} className={`fluidify-card`}>
       <div className="fluidify-card--container">
+        {/* Logo & Name */}
         <div className="fluidify-card-left">
           <img
             className={`fluidify-card-logo ${fluid ? "fluid-token-logo" : ""}`}
@@ -35,6 +38,7 @@ const FluidifyCard = (props: Props) => {
             {fluid && <span>{name}</span>}
           </div>
         </div>
+        {/* Amount */}
         <div className={""}>
           <span>
             {amount.toLocaleString("en-US", {
@@ -43,7 +47,13 @@ const FluidifyCard = (props: Props) => {
             })}
           </span>
         </div>
+    <div />
+          <button onClick={() => addToken?.(symbol)} title={"Add Token to Wallet"} className={"fluidify-card-add"}>
+            +
+          </button>
       </div>
+
+      {/* Progress Bar */}
       <div className="fluidify-card--progress-bar">
         <div
           className="fluidify-card--progress"
