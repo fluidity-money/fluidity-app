@@ -142,18 +142,18 @@ export const ViewRewardModal = ({
                 rel="noopener noreferrer"
                 target="_blank"
               >
-              <GeneralButton
-                className="share-button"
-                size="large"
-                version="transparent"
-                buttontype="icon before"
-                icon={<Twitter />}
-                handleClick={() => {
-                  return;
-                }}
-              >
-                SHARE
-              </GeneralButton>
+                <GeneralButton
+                  className="share-button"
+                  size="large"
+                  version="transparent"
+                  buttontype="icon before"
+                  icon={<Twitter />}
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  SHARE
+                </GeneralButton>
               </a>
             </div>
           </div>
