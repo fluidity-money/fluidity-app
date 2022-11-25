@@ -100,7 +100,7 @@ export const ConnectedWalletModal = ({
                   </span>
                 </Card>
                 <GeneralButton
-                  title={"Add Token to Wallet"}
+                  title={"Disconnect Wallet"}
                   version="transparent"
                   buttontype={"icon before"}
                   icon={
