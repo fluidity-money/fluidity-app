@@ -27,7 +27,7 @@ export const ToolTipContent = ({
         </Text>
       </span>
       <span className="tooltip_content_details">
-        <Text size="lg">{details}</Text>
+        <Text size="lg"><b>{details}</b></Text>
       </span>
       <a onClick={linkLabelOnClickCallback} className="tool_content_link">
         <Text prominent size="lg">
