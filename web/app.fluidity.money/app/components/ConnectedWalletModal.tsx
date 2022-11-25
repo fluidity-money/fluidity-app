@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Text, Card, GeneralButton } from "@fluidity-money/surfing";
 import ConnectedWallet from "./ConnectedWallet";
@@ -33,6 +33,8 @@ export const ConnectedWalletModal = ({
       <img height="32" width="32" src="/images/icons/checked.svg" alt="copy" />
     );
 
+    console.log(visible);
+
     setTimeout(() => {
       setIcon(
         <img
@@ -45,6 +47,15 @@ export const ConnectedWalletModal = ({
     }, 500);
   };
 
+  const closeWithEsc = (event: { key: string }) => {
+    event.key === "Escape" && visible === true && close();
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", closeWithEsc);
+    return () => document.removeEventListener("keydown", closeWithEsc);
+  }, [visible]);
+
   useEffect(() => {
     setModal(
       createPortal(
@@ -54,59 +65,62 @@ export const ConnectedWalletModal = ({
               visible === true ? "show-modal" : "hide-modal"
             }`}
           >
-            <Text size="xxl">
-              {" "}
-              Fluidity:{" "}
-              <Text prominent size="md">
-                Connected
+            <div onClick={close} className="connected-wallet-background"></div>
+            <div>
+              <Text size="xxl">
+                {" "}
+                Fluidity:{" "}
+                <Text prominent size="md">
+                  Connected
+                </Text>
               </Text>
-            </Text>
-            <span onClick={close}>
-              <img src="/images/icons/x.svg" className="modal-cancel-btn" />
-            </span>
-            <div className="connected-wallet-modal-body">
-              <Card
-                className="card-outer address-copy-box"
-                component="div"
-                rounded={false}
-                type={"box"}
-              >
-                <span
-                  className={"address-copy-box"}
-                  onClick={() => copyAddress(address)}
+              <span onClick={close}>
+                <img src="/images/icons/x.svg" className="modal-cancel-btn" />
+              </span>
+              <div className="connected-wallet-modal-body">
+                <Card
+                  className="card-outer address-copy-box"
+                  component="div"
+                  rounded={false}
+                  type={"box"}
                 >
-                  <ConnectedWallet
-                    className="connected-btn-in-modal"
-                    address={address}
-                    short={false}
-                    callback={() => copyAddress(address)}
-                  />
-                  <span>{icon}</span>
-                </span>
-              </Card>
-              <GeneralButton
-                version="transparent"
-                buttontype={"icon before"}
-                icon={
-                  <img
-                    src="/images/icons/disconnectIcon.svg"
-                    alt="disconnect"
-                  />
-                }
-                size={"medium"}
-                handleClick={() => {
-                  disconnect();
-                }}
-                className="disconnect-wallet-btn"
-              >
-                Disconnect Wallet
-              </GeneralButton>
-              <Text size="xs" className="legal">
-                By connecting a wallet, you agree to Fluidity Money&aposs{" "}
-                <a className="link-text">Terms of Service</a> and acknowledge
-                that you have read and understand the{" "}
-                <a className="link-text">Disclaimer</a>
-              </Text>
+                  <span
+                    className={"address-copy-box"}
+                    onClick={() => copyAddress(address)}
+                  >
+                    <ConnectedWallet
+                      className="connected-btn-in-modal"
+                      address={address}
+                      short={false}
+                      callback={() => copyAddress(address)}
+                    />
+                    <span>{icon}</span>
+                  </span>
+                </Card>
+                <GeneralButton
+                  version="transparent"
+                  buttontype={"icon before"}
+                  icon={
+                    <img
+                      src="/images/icons/disconnectIcon.svg"
+                      alt="disconnect"
+                    />
+                  }
+                  size={"medium"}
+                  handleClick={() => {
+                    disconnect();
+                  }}
+                  className="disconnect-wallet-btn"
+                >
+                  Disconnect Wallet
+                </GeneralButton>
+                <Text size="xs" className="legal">
+                  By connecting a wallet, you agree to Fluidity Money&aposs{" "}
+                  <a className="link-text">Terms of Service</a> and acknowledge
+                  that you have read and understand the{" "}
+                  <a className="link-text">Disclaimer</a>
+                </Text>
+              </div>
             </div>
           </div>
         </>,
