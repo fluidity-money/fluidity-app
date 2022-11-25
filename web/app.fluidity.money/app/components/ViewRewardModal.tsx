@@ -40,6 +40,22 @@ export const ViewRewardModal = ({
   const { width } = useViewport();
   const isMobile = width < 500 && width > 0;
 
+  const generateTweet = () => {
+    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
+
+    // const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
+
+    const tweetMsg = `Fluidify your money with Fluidity`;
+
+    twitterUrl.searchParams.set("text", tweetMsg);
+
+    const fluTwitterHandle = `fluiditymoney`;
+
+    twitterUrl.searchParams.set("via", fluTwitterHandle);
+
+    return twitterUrl.href;
+  };
+
   useEffect(() => {
     setModal(
       createPortal(
@@ -121,6 +137,11 @@ export const ViewRewardModal = ({
               >
                 WINNINGS BREAKDOWN
               </GeneralButton>
+              <a
+                href={generateTweet()}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
               <GeneralButton
                 className="share-button"
                 size="large"
@@ -133,6 +154,7 @@ export const ViewRewardModal = ({
               >
                 SHARE
               </GeneralButton>
+              </a>
             </div>
           </div>
         </>,
