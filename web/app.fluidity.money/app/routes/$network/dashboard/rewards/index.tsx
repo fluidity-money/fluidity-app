@@ -35,9 +35,9 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import { Table } from "~/components";
-import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
-import { Providers } from "~/components/ProviderIcon";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
+import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
+import {aggregateRewards, Rewarders} from "~/util/rewardAggregates";
 
 export const unstable_shouldReload = () => false;
 
@@ -135,43 +135,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       0
     );
 
-    const { data: rewardData, errors: rewardErrors } =
-      await useGlobalRewardStatistics(network ?? "");
+    const {data: rewardData, errors: rewardErrors} = await useApplicationRewardStatistics(network ?? ""); 
 
     if (rewardErrors || !rewardData) {
       throw errors;
     }
 
-    // group rewards by backend
-    const aggregatedExpectedRewards = rewardData.expected_rewards.reduce(
-      (previous, currentReward) => {
-        const {
-          highest_reward: prize,
-          average_reward: avgPrize,
-          token_short_name,
-        } = currentReward;
-        const backend = backends[token_short_name];
-
-        // append to backend if it exists
-        if (previous[backend]) {
-          previous[backend].avgPrize += avgPrize;
-          // max prize
-          previous[backend].prize = Math.max(previous[backend].prize, prize);
-          // set backend if it doesn't exist
-        } else {
-          previous[backend] = {
-            name: backend,
-            prize,
-            avgPrize,
-          };
-        }
-        return previous;
-      },
-      {} as { [K in Providers]: Provider }
-    );
-
-    // convert to expected format
-    const rewarders = Object.values(aggregatedExpectedRewards);
+    const rewarders = aggregateRewards(rewardData);
 
     return json({
       icons,
@@ -198,7 +168,7 @@ export const links: LinksFunction = () => {
 
 type LoaderData = {
   icons: { [provider: string]: string };
-  rewarders: Provider[];
+  rewarders: Rewarders;
   totalTransactions: Transaction[];
   totalCount: number;
   totalRewards: number;
@@ -243,6 +213,12 @@ export default function Rewards() {
     totalPrizePool,
   } = useLoaderData<LoaderData>();
 
+  const {
+    week: weeklyRewards,
+    month: monthlyRewards,
+    year: yearlyRewards,
+    all:  allRewards,
+  } = rewarders;
   const { connected, address } = useContext(FluidityFacadeContext);
 
   const location = useLocation();
@@ -345,15 +321,34 @@ export default function Rewards() {
     },
   ];
 
-  const hasRewarders = rewarders.length > 0;
+  const hasRewarders = allRewards.length > 0;
 
-  const bestPerformingRewarders = rewarders.sort(
-    ({ prize: prize_a }, { prize: prize_b }) => {
-      if (prize_a > prize_b) return -1;
-      if (prize_a === prize_b) return 0;
-      return 1;
+  // update bestPerformingRewarders based on the selected time interval
+  const [bestPerformingRewarders, setBestPerformingRewarders] = useState<Provider[]>(allRewards);
+
+  const activeRewards = (() => {
+    switch (activeRewardFilterIndex) {
+    case 0:
+    default:
+      return allRewards;
+    case 1:
+      return weeklyRewards;
+    case 2:
+      return monthlyRewards;
+    case 3: 
+      return yearlyRewards;
     }
-  );
+  })()
+
+  useEffect(() => {
+    setBestPerformingRewarders(activeRewards.sort(
+      ({ prize: prize_a }, { prize: prize_b }) => {
+        if (prize_a > prize_b) return -1;
+        if (prize_a === prize_b) return 0;
+        return 1;
+      })
+    );
+  }, [activeRewardFilterIndex])
 
   // Get user's unclaimed rewards
   useEffect(() => {
@@ -630,12 +625,3 @@ export default function Rewards() {
 }
 
 export { ErrorBoundary };
-
-const backends: { [Token: string]: Providers } = {
-  USDC: "Compound",
-  USDT: "Compound",
-  DAI: "Compound",
-  fUSDC: "Compound",
-  fUSDT: "Compound",
-  fDAI: "Compound",
-};
