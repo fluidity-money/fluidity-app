@@ -67,15 +67,17 @@ export const NotificationSubscription = ({
   };
 
   const handleClientListener = (payload: PipedTransaction) => {
-    const imgUrl = tokens?.at(0)?.logo !== undefined ? tokens?.at(0)?.logo : "";
-    const tokenColour = colorMap[tokens?.at(0)?.symbol as unknown as string];
+    const _token = tokens.find((token) => token.symbol === payload.token);
+
+    const imgUrl = _token?.logo;
+    const tokenColour = colorMap[payload.token as unknown as string];
 
     const transactionUrl = explorer + `/tx/` + payload.transactionHash;
 
     toolTip.open(
       tokenColour,
       <ToolTipContent
-        tokenLogoSrc={tokens.at(0)?.logo}
+        tokenLogoSrc={_token?.logo}
         boldTitle={payload.amount + ` ` + payload.token}
         details={
           payload.type === NotificationType.REWARD_DATABASE
@@ -95,7 +97,7 @@ export const NotificationSubscription = ({
                 winAmount: payload.amount,
                 explorerUri: transactionUrl,
                 balance: String(
-                  await balance?.(tokens.at(0)?.address as unknown as string)
+                  await balance?.(_token?.address as unknown as string)
                 ),
                 forSending: payload.rewardType === `send` ? true : false,
               })
