@@ -18,6 +18,19 @@ var TransferLogTopic = strings.ToLower(
 	"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
 )
 
+// shouldIgnoreTransfer to tell if we should ignore a transfer
+func shouldIgnoreTransfer(from ethereum.Address, to ethereum.Address) bool {
+	if from == ethereum.ZeroAddress {
+		return true
+	}
+
+	if to == ethereum.ZeroAddress {
+		return true
+	}
+
+	return false
+}
+
 // Get transfer receipts
 func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethCommon.Address) ([]worker.EthereumDecoratedTransfer) {
 	var (
@@ -81,6 +94,17 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			fromAddress = ConvertGethAddress(fromTruncated)
 			toAddress = ConvertGethAddress(toTruncated)
 		)
+
+		if shouldIgnoreTransfer(fromAddress, toAddress) {
+			log.Debugf(
+				"Ignoring transaction involving the zero address %s from %s to %s",
+				transactionHash,
+				fromAddress.String(),
+				toAddress.String(),
+			)
+
+			continue
+		}
 
 		transfer := worker.EthereumDecoratedTransfer{
 			SenderAddress:    fromAddress,

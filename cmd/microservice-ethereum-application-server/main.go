@@ -249,7 +249,7 @@ func main() {
 					SenderAddress:    fromAddress,
 					RecipientAddress: toAddress,
 					Decorator:        decorator,
-					
+
 					AppEmissions:     emission,
 				}
 
@@ -304,7 +304,7 @@ func main() {
 
 			var (
 				from = fluidTransfer.SenderAddress
-				to = fluidTransfer.RecipientAddress
+				to   = fluidTransfer.RecipientAddress
 			)
 
 			transfer := worker.EthereumDecoratedTransfer{

@@ -21,6 +21,7 @@ import {
   trimAddress,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
+import { getBlockExplorerLink } from "~/util/chainUtils/links";
 
 export const unstable_shouldReload = () => false;
 
@@ -215,6 +216,9 @@ const UnclaimedWinnings = () => {
         },
         {
           name: "TRANSACTION",
+        },
+        {
+          name: "BLOCK",
           alignRight: true,
         },
       ];
@@ -236,8 +240,13 @@ const UnclaimedWinnings = () => {
       data: UserUnclaimedReward;
       index: number;
     }) {
-      const { token_decimals, token_short_name, transaction_hash, win_amount } =
-        data;
+      const {
+        token_decimals,
+        token_short_name,
+        transaction_hash,
+        win_amount,
+        block_number,
+      } = data;
 
       const rewardUsd = win_amount / 10 ** token_decimals;
 
@@ -290,6 +299,18 @@ const UnclaimedWinnings = () => {
                 href={getTxExplorerLink(chain, transaction_hash)}
               >
                 <Text>{trimAddress(transaction_hash)}</Text>
+              </a>
+            </td>
+          )}
+
+          {/* Block Number */}
+          {!isSmallMobile && (
+            <td>
+              <a
+                className="table-activity"
+                href={getBlockExplorerLink(network, block_number)}
+              >
+                <Text>{block_number}</Text>
               </a>
             </td>
           )}
