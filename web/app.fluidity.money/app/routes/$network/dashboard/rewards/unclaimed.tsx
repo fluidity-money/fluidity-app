@@ -240,8 +240,13 @@ const UnclaimedWinnings = () => {
       data: UserUnclaimedReward;
       index: number;
     }) {
-      const { token_decimals, token_short_name, transaction_hash, win_amount, block_number } =
-        data;
+      const {
+        token_decimals,
+        token_short_name,
+        transaction_hash,
+        win_amount,
+        block_number,
+      } = data;
 
       const rewardUsd = win_amount / 10 ** token_decimals;
 
@@ -303,16 +308,12 @@ const UnclaimedWinnings = () => {
             <td>
               <a
                 className="table-activity"
-                href={getBlockExplorerLink(
-                  network,
-                  block_number,
-                )}
+                href={getBlockExplorerLink(network, block_number)}
               >
                 <Text>{block_number}</Text>
               </a>
             </td>
           )}
-
         </motion.tr>
       );
     };
