@@ -27,7 +27,7 @@ export const ethGetTransactionsObservable = (
       .on(
         "data",
         (event: {
-          transactionHash: string,
+          transactionHash: string;
           returnValues: { from: string; to: string; value: BigNumber };
         }) => {
           const {

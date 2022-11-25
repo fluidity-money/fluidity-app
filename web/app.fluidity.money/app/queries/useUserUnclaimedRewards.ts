@@ -33,7 +33,7 @@ type UnclaimedRewardsRes = {
       address: string;
       reward_sent: boolean;
       token_decimals: number;
-      
+
       token_short_name: string;
       transaction_hash: string;
       win_amount: number;

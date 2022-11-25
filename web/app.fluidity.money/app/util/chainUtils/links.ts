@@ -29,4 +29,9 @@ const networkMapper = (network: string) => {
   }
 };
 
-export { getAddressExplorerLink, getTxExplorerLink, getBlockExplorerLink, networkMapper };
+export {
+  getAddressExplorerLink,
+  getTxExplorerLink,
+  getBlockExplorerLink,
+  networkMapper,
+};
