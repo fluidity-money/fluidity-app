@@ -80,7 +80,7 @@ export const NotificationSubscription = ({
         details={
           payload.type === NotificationType.REWARD_DATABASE
             ? payload.rewardType === `send`
-              ? `reward for s͟e͟n͟d`
+              ? `reward for s͟e͟n͟d͟i͟n͟g`
               : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
             : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(payload.source)
         }
