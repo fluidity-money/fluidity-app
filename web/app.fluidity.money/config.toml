@@ -225,13 +225,13 @@ Sushiswap= "/images/providers/Sushiswap.svg"
 Fluidity= "/images/logoMetallic.png"
 Oneinch= "/images/providers/1inch.svg"
 Balancer= "/images/providers/balancer.svg"
-Mooniswap=
-Curve=
-Multichain=
-"XY Finance"=
-Raydium=
-Lifinity=
-Mercurial=
+Mooniswap="/images/providers/mooniswap.png"
+Curve="/images/providers/curve.png"
+Multichain="/images/providers/multichain.png"
+"XY Finance"="/images/providers/xy_finance.png"
+Raydium="/images/providers/raydium.png"
+Lifinity="/images/providers/lifinity.png"
+Mercurial="/images/providers/mercurial.png"
 
 [[config.ethereum.wallets]]
 name = "Browser"
