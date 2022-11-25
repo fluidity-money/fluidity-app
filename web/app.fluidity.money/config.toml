@@ -222,6 +222,16 @@ Solana= "/images/providers/Solana.svg"
 Solend= "/images/providers/solend.png"
 Uniswap= "/images/providers/Uniswap.svg"
 Sushiswap= "/images/providers/Sushiswap.svg"
+Fluidity= "/images/logoMetallic.png"
+Oneinch= "/images/providers/1inch.svg"
+Balancer= "/images/providers/balancer.svg"
+Mooniswap=
+Curve=
+Multichain=
+"XY Finance"=
+Raydium=
+Lifinity=
+Mercurial=
 
 [[config.ethereum.wallets]]
 name = "Browser"
