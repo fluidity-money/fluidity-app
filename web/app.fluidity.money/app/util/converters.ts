@@ -18,7 +18,6 @@ const shorthandAmountFormatter = (
 ): string => {
   const num: number = parseFloat(uiAmount);
   if (num < 1) {
-    console.log(decimalTrim(uiAmount, 3));
     return decimalTrim(uiAmount, 3);
   }
   const lookup = [
