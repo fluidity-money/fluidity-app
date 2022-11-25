@@ -15,7 +15,10 @@ import { WalletConnect } from "@web3-react/walletconnect";
 import FluidityFacadeContext from "./FluidityFacade";
 
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
+import {
+  getTotalPrizePool,
+  manualRewardToken,
+} from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
   getUsdAmountMinted,
@@ -38,11 +41,12 @@ const EthereumFacade = ({
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
   useEffect(() => {
-    connectors.forEach(([connector]) => {
-      console.log(connector);
+    connectors.every(([connector]) => {
       connector?.connectEagerly?.()?.catch(() => {
-        return;
+        return true;
       });
+
+      return false;
     });
   }, []);
 
@@ -175,6 +179,68 @@ const EthereumFacade = ({
       : undefined;
   };
 
+  const manualReward = async (
+    fluidTokenAddrs: string[],
+    userAddr: string
+  ): Promise<
+    | ({ amount: number; gasFee: number; networkFee: number } | undefined)[]
+    | undefined
+  > => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return;
+    }
+
+    return Promise.all(
+      fluidTokenAddrs
+        .map((addr) => tokens.find((t) => t.address === addr))
+        .filter((t) => !!t && !!t.isFluidOf)
+        .map(async (token) => {
+          const baseToken = tokens.find((t) => t.address === token?.isFluidOf);
+
+          if (!baseToken) return;
+
+          const contract: ContractToken = {
+            address: token?.address ?? "",
+            ABI: tokenAbi,
+            symbol: token?.symbol ?? "",
+            isFluidOf: !!token?.isFluidOf,
+          };
+
+          return await manualRewardToken(
+            contract,
+            baseToken.symbol,
+            userAddr,
+            signer
+          );
+        })
+    );
+  };
+
+  const addToken = async (symbol: string) => {
+    const token = tokens.find((t) => t.symbol === symbol);
+
+    if (!token) return;
+
+    const fromFluid = !!token.isFluidOf;
+
+    const toToken = fromFluid
+      ? tokens.find((t) => t.address === token.isFluidOf)
+      : tokens.find((t) => t.isFluidOf === token.address);
+
+    if (!toToken) return;
+
+    const watchToken = {
+      address: toToken.address,
+      symbol: toToken.symbol,
+      decimals: toToken.decimals,
+      image: toToken.logo,
+    };
+
+    return connector?.watchAsset?.(watchToken);
+  };
+
   const getPrizePool = async (): Promise<number> => {
     const signer = provider?.getSigner();
 
@@ -198,6 +264,8 @@ const EthereumFacade = ({
         useConnectorType,
         rawAddress: account ?? "",
         address: account?.toLowerCase() ?? "",
+        manualReward,
+        addToken,
         connected: isActive,
       }}
     >

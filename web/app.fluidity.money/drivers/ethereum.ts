@@ -27,6 +27,7 @@ export const ethGetTransactionsObservable = (
       .on(
         "data",
         (event: {
+          transactionHash: string;
           returnValues: { from: string; to: string; value: BigNumber };
         }) => {
           const {
@@ -43,7 +44,7 @@ export const ethGetTransactionsObservable = (
             destination: destination,
             amount: shorthandAmountFormatter(uiTokenAmount, 3),
             token,
-            transactionHash: "",
+            transactionHash: event.transactionHash,
             rewardType: "",
           };
           subscriber.next(transaction);

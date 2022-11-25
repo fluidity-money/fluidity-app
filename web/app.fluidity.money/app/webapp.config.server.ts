@@ -31,6 +31,7 @@ const OptionsSchema = z.object({
   ),
   config: z.object({}).catchall(
     z.object({
+      explorer: z.string(),
       fluidAssets: z.array(z.string()),
       tokens: z
         .array(

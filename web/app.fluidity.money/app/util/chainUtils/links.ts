@@ -5,6 +5,12 @@ const getAddressExplorerLink = (chain: Chain, address: string) =>
     ? `https://etherscan.io/address/${address}`
     : `https://explorer.solana.com/address/${address}`;
 
+// Ethereum only
+const getBlockExplorerLink = (chain: Chain, block: number) =>
+  chain === "ethereum"
+    ? `https://etherscan.io/address/${block}`
+    : `https://explorer.solana.com/block/${block}`;
+
 const getTxExplorerLink = (chain: Chain, address: string) =>
   chain === "ethereum"
     ? `https://etherscan.io/tx/${address}`
@@ -23,4 +29,9 @@ const networkMapper = (network: string) => {
   }
 };
 
-export { getAddressExplorerLink, getTxExplorerLink, networkMapper };
+export {
+  getAddressExplorerLink,
+  getTxExplorerLink,
+  getBlockExplorerLink,
+  networkMapper,
+};

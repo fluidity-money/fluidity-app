@@ -4,6 +4,7 @@
 
 import BurgerMenu from "components/BurgerMenu";
 import MobileNavModal from "modals/MobileNavModal";
+import Link from "next/link";
 import { useState } from "react";
 import styles from "./MobileNavBar.module.scss";
 
@@ -13,9 +14,14 @@ const MobileNavBar = () => {
   return (
     <div className={styles.container}>
       <div className={`${styles.nav} opacity-5x`}>
-        <a className={open ? styles.hidden : styles.fluidity} href={"/"}>
-          <img src="/assets/images/textLogo.svg" alt="home page" />
-        </a>
+        <Link
+          href={"/"}
+          passHref
+        >
+          <a className={open ? styles.hidden : styles.fluidity} href={"/"}>
+            <img src="/assets/images/textLogo.svg" alt="home page" />
+          </a>
+        </Link>
 
         <BurgerMenu isOpen={open} setIsOpen={setIsOpen} />
       </div>

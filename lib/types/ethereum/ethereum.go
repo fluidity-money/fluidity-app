@@ -25,6 +25,9 @@ type (
 	BlockNonce []byte
 )
 
+// ZeroAddress for minting or burning or nil values
+var ZeroAddress = AddressFromString("0x0000000000000000000000000000000000000000")
+
 // MarshalJSON and UnmarshalJSON implement the json interface,
 // allowing us to pass this over rabbit and redis
 func (addr Address) MarshalJSON() ([]byte, error) {

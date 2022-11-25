@@ -1,9 +1,10 @@
-import type { ContractTransaction } from "@ethersproject/contracts";
-
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
+import { ContractTransaction } from "@ethersproject/contracts";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
+import { bytesToHex } from "web3-utils";
+import { B64ToUint8Array, jsonPost } from "~/util";
 
 export const getContract = (
   ABI: ContractInterface,
@@ -125,7 +126,7 @@ const makeContractSwap = async (
   from: ContractToken,
   to: ContractToken,
   amount: string | number
-): Promise<ContractTransaction | undefined> => {
+) => {
   const { address: fromAddress, ABI: fromABI, isFluidOf: fromIsFluidOf } = from;
   const { address: toAddress, ABI: toABI, isFluidOf: toIsFluidOf } = to;
 
@@ -173,16 +174,99 @@ const makeContractSwap = async (
       }
       // `.wait()` these here to handle errors
       // call ERC20in
-
-      // Sends tx through
       return await toContract.erc20In(amount);
     } else if (fromIsFluidOf) {
       // fCoin -> Coin
       return await fromContract.erc20Out(amount);
     } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
   } catch (error) {
-    await handleContractErrors(error as ErrorType, signer.provider);
+    return await handleContractErrors(error as ErrorType, signer.provider);
   }
+};
+
+type ManualRewardBody = {
+  // Address of initiator
+  address: string;
+
+  // Name of Token being front-run
+  token_short_name: string;
+};
+
+type ManualRewardRes = {
+  // Error message on unsuccessful call
+  error?: string;
+
+  // Base64 encoded signature for calling
+  // manual-reward in Token.sol
+  payload?: {
+    reward: {
+      winner: string;
+      win_amount: number;
+      first_block: number;
+      last_block: number;
+    };
+    signature: string;
+  };
+};
+
+export const manualRewardToken = async (
+  token: ContractToken,
+  baseTokenSymbol: string,
+  address: string,
+  signer: Signer
+): Promise<
+  { amount: number; gasFee: number; networkFee: number } | undefined
+> => {
+  const manualRewardUrl = "https://api.ethereum.fluidity.money/manual-reward";
+
+  const manualRewardBody = {
+    address,
+    token_short_name: baseTokenSymbol,
+  };
+
+  const { error, payload } = await jsonPost<ManualRewardBody, ManualRewardRes>(
+    manualRewardUrl,
+    manualRewardBody
+  );
+
+  if (error || !payload) return;
+
+  // Call eth contract
+
+  const { winner, win_amount, first_block, last_block } = payload.reward;
+
+  const { signature: b64Signature } = payload;
+
+  // convert B64 -> byte[] -> hex string
+  const uint8Signature = B64ToUint8Array(b64Signature);
+  const hexSignature = bytesToHex(Array.from(uint8Signature));
+
+  const tokenContract = getContract(token.ABI, token.address, signer);
+
+  const contractTx: ContractTransaction = await tokenContract.manualReward(
+    // contractAddress
+    token.address,
+    // chainid
+    0,
+    // winnerAddress
+    winner,
+    // winAmount
+    win_amount,
+    // firstBlock
+    first_block,
+    // lastBlock
+    last_block,
+    // sig
+    hexSignature
+  );
+
+  const res = await contractTx.wait();
+
+  return {
+    networkFee: res.gasUsed.toNumber(),
+    gasFee: res.gasUsed.toNumber(),
+    amount: win_amount,
+  };
 };
 
 type PrizePool = {

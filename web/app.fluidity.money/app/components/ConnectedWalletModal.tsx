@@ -18,18 +18,30 @@ export const ConnectedWalletModal = ({
 }: IPropsConnectedWalletModal) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const [icon, setIcon] = useState<React.ReactNode>(
-    <img src="/images/icons/copyIcon.svg" alt="copy" />
+    <img
+      height="32"
+      width="32"
+      src="/images/icons/copyIconCircle.svg"
+      alt="copy"
+    />
   );
 
   const copyAddress = (address: string) => {
     // Copies to clipboard
     navigator.clipboard.writeText(address);
     setIcon(
-      <img height="26" width="26" src="/images/icons/checked.png" alt="copy" />
+      <img height="32" width="32" src="/images/icons/checked.svg" alt="copy" />
     );
 
     setTimeout(() => {
-      setIcon(<img src="/images/icons/copyIcon.svg" alt="copy" />);
+      setIcon(
+        <img
+          height="32"
+          width="32"
+          src="/images/icons/copyIconCircle.svg"
+          alt="copy"
+        />
+      );
     }, 500);
   };
 

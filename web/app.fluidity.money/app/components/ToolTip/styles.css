@@ -69,44 +69,44 @@
 }
 
 @media only screen and (max-width: 620px) {
-  .tooltip {
-    width: 95vw;
-  }
-
-  .tooltip_title {
-    font-size: 3vw;
-  }
-
   .tooltip_container {
     position: fixed;
-    padding: 0;
-    margin: 0;
     top: 91vh;
     -webkit-transform: translateX(50%) rotateX(180deg);
     transform: translateX(50%) rotateX(180deg);
     right: 50%;
   }
 
+  .tooltip {
+    width: 95vw;
+  }
+
+  .tooltip_title {
+    white-space: nowrap;
+    font-size: 3vw;
+  }
+
   .tool_content_link {
-    font-size: 2vw;
-    margin-left: 40px;
-    margin-right: 0;
+    font-size: 3vw;
+    margin-left: 9vw;
   }
 
   .tooltip_content {
     display: flex;
-    width: 87vw;
-    border-radius: 15px;
+    width: 95vw;
     justify-content: space-between;
+    padding: 17px 7px 17px 5px;
     -webkit-transform: rotateX(180deg);
     transform: rotateX(180deg);
   }
 
   .tooltip_content_details {
-    font-size: 2vw;
+    white-space: nowrap;
+    font-size: 3vw;
   }
 
   .tool_cancel_btn {
+    margin-left: -6vw;
     font-size: 15px;
   }
 

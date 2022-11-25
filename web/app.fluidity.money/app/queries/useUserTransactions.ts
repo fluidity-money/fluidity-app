@@ -92,7 +92,7 @@ const queryAll: Queryable = {
       ethereum {
         transfers(
           currency: { in: $fluidCurrencies }
-          options: { desc: "block.timestamp.unixtime" }
+          options: { desc: "block.timestamp.unixtime", limit: 240 }
         ) {
           sender {
             address
@@ -122,7 +122,7 @@ const queryAll: Queryable = {
       solana {
         transfers(
           currency: { in: $fluidCurrencies }
-          options: { desc: "block.timestamp.unixtime" }
+          options: { desc: "block.timestamp.unixtime", limit: 240 }
         ) {
           sender {
             address

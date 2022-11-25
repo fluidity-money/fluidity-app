@@ -23,19 +23,24 @@ const NetworkEthereum = `ethereum`
 // Convert, returning the internal definition for a winner
 func ConvertWinner(transactionHash string, rewardData fluidity.RewardData, details token_details.TokenDetails, when time.Time, rewardType winners.RewardType, application applications.Application) winners.Winner {
 	var (
-		address = rewardData.Winner.String()
-		amount  = *rewardData.Amount
+		appString  = application.String()
+		address    = rewardData.Winner.String()
+		amount     = *rewardData.Amount
+		startBlock = *rewardData.StartBlock
+		endBlock   = *rewardData.StartBlock
 	)
 
 	winner := winners.Winner{
-		Network:         NetworkEthereum,
-		TransactionHash: transactionHash,
-		WinnerAddress:   address,
-		WinningAmount:   amount,
-		AwardedTime:     when,
-		TokenDetails:    details,
-		RewardType:      rewardType,
-		Application:     application,
+		Application:              appString,
+		Network:                  NetworkEthereum,
+		TransactionHash:          transactionHash,
+		WinnerAddress:            address,
+		WinningAmount:            amount,
+		AwardedTime:              when,
+		RewardType:               rewardType,
+		BatchFirstBlock:          startBlock,
+		BatchLastBlock:           endBlock,
+		TokenDetails:             details,
 	}
 
 	return winner

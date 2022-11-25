@@ -3,6 +3,7 @@
 // LICENSE.md file.
 
 import { LinkButton } from "@fluidity-money/surfing";
+import Link from "next/link";
 import styles from "./ResourcesNavModal.module.scss";
 
 interface IResourcesNavModal {
@@ -23,15 +24,20 @@ const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
     <div className={styles.container}>
       {navLinks.map((link) => (
         <h4>
-          <a onClick={() => handleModal()} href={`/resources#${link.children}`}>
-            <LinkButton
-              size={link.size}
-              type={link.type}
-              handleClick={() => {}}
-            >
-              {link.children}
-            </LinkButton>
-          </a>
+          <Link
+            href={`/resources#${link.children}`}
+            passHref
+          >
+            <a onClick={() => handleModal()} href={`/resources#${link.children}`}>
+              <LinkButton
+                size={link.size}
+                type={link.type}
+                handleClick={() => {}}
+              >
+                {link.children}
+              </LinkButton>
+            </a>
+          </Link>
         </h4>
       ))}
       <div className={styles.socials}>

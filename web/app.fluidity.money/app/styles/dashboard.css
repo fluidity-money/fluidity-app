@@ -62,12 +62,11 @@ main > footer {
   grid-area: footer;
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
 }
 
 main > footer > section {
   display: inherit;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 20px;
 }
 
@@ -153,6 +152,10 @@ main > footer > section {
 .navbar-v2 ul {
   display: block;
   padding: 0;
+}
+
+.fluidify-button-dashboard {
+  height: 16px;
 }
 
 .selector-button {
@@ -317,7 +320,7 @@ main > footer > section > a {
 
 .card-inner {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2.5fr 1fr;
   align-items: top;
   background: unset;
   border-radius: 12px;
@@ -818,6 +821,10 @@ main > footer > section > a {
   font-size: 32px;
 }
 
+.view-reward-modal-breakdown-btn {
+  margin-bottom: 17px;
+}
+
 .view-reward-modal-token {
   width: 40%;
   height: 80px;
@@ -853,6 +860,31 @@ main > footer > section > a {
   width: 300px;
   height: 300px;
   margin: -3.5em 0 -4em 0;
+}
+
+.unclaimed-modal-container {
+  cursor: default;
+  position: absolute;
+  box-sizing: border-box;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  right: 64px;
+  top: 80px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.unclaimed-modal-container > section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.unclaimed-modal-container > section > h1 {
+  margin: 0;
 }
 
 @media only screen and (max-width: 500px) {

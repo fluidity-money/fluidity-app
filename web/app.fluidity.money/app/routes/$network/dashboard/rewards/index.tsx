@@ -20,7 +20,7 @@ import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
 import { captureException } from "@sentry/react";
-import { useUserUnclaimedRewards, useUserRewards } from "~/queries";
+import { useUserUnclaimedRewards, useUserRewardsAll } from "~/queries";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -32,7 +32,7 @@ import {
   ManualCarousel,
   trimAddress,
 } from "@fluidity-money/surfing";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
@@ -73,11 +73,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       count,
     }: { transactions: UserTransaction[]; count: number } = await (
       await fetch(
-        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
+        `${url.origin}/${network}/query/userTransactions?page=${page}`
       )
     ).json();
 
-    const { data, errors } = await useUserRewards(network ?? "");
+    const { data, errors } = await useUserRewardsAll(network ?? "");
 
     if (errors || !data) {
       throw errors;
@@ -99,6 +99,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       },
     } = config;
 
+    const fluidTokenMap = tokens.reduce(
+      (map, token) =>
+        token.isFluidOf
+          ? {
+              ...map,
+              [token.symbol]: token.address,
+              [token.symbol.slice(1)]: token.address,
+            }
+          : map,
+      {}
+    );
+
     const tokenLogoMap = tokens.reduce(
       (map, token) => ({
         ...map,
@@ -112,23 +124,30 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const mergedTransactions: Transaction[] =
       transactions
         ?.filter((tx) => !!winnersMap[tx.hash])
-        .map((tx) => ({
-          sender: tx.sender,
-          receiver: tx.receiver,
-          winner: winnersMap[tx.hash].winning_address ?? "",
-          reward: winnersMap[tx.hash]
-            ? winnersMap[tx.hash].winning_amount /
-              10 ** winnersMap[tx.hash].token_decimals
-            : 0,
-          hash: tx.hash,
-          currency: tx.currency,
-          value:
-            tx.currency === "DAI" || tx.currency === "fDAI"
-              ? tx.value / 10 ** 12
-              : tx.value,
-          timestamp: tx.timestamp * 1000,
-          logo: tokenLogoMap[tx.currency] || defaultLogo,
-        })) ?? [];
+        .map((tx) => {
+          const winner = winnersMap[tx.hash];
+
+          return {
+            sender: tx.sender,
+            receiver: tx.receiver,
+            winner: winner.winning_address ?? "",
+            reward: winner
+              ? winner.winning_amount / 10 ** winner.token_decimals
+              : 0,
+            hash: tx.hash,
+            currency: tx.currency,
+            value:
+              tx.currency === "DAI" || tx.currency === "fDAI"
+                ? tx.value / 10 ** 12
+                : tx.value,
+            timestamp: tx.timestamp * 1000,
+            logo: tokenLogoMap[tx.currency] || defaultLogo,
+            provider:
+              (network === "ethereum"
+                ? winner.ethereum_application
+                : winner.solana_application) ?? "Fluidity",
+          };
+        }) ?? [];
 
     const totalRewards = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
@@ -136,22 +155,53 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     );
 
     const {data: rewardData, errors: rewardErrors} = await useApplicationRewardStatistics(network ?? ""); 
-
     if (rewardErrors || !rewardData) {
       throw errors;
     }
 
     const rewarders = aggregateRewards(rewardData);
 
+    const totalRewarders = Object.values(
+      mergedTransactions.reduce((map, tx) => {
+        const provider = map[tx.provider];
+
+        return {
+          ...map,
+          [tx.provider]: provider
+            ? {
+                ...provider,
+                count: provider.count + 1,
+                prize: provider.prize + tx.reward,
+              }
+            : {
+                name: tx.provider,
+                count: 1,
+                prize: tx.reward,
+              },
+        };
+      }, {} as { [providerName: string]: { name: string; count: number; prize: number } })
+    )
+      .map(({ count, ...provider }) => ({
+        ...provider,
+        avgPrize: provider.prize / count,
+      }))
+      .sort(({ avgPrize: avgPrizeA }, { avgPrize: avgPrizeB }) =>
+        avgPrizeA > avgPrizeB ? 1 : avgPrizeA === avgPrizeB ? 0 : -1
+      ) as Provider[];
+
+
+
     return json({
       icons,
       rewarders,
+      fluidTokenMap,
       page,
       network,
       fluidPairs,
       totalTransactions: mergedTransactions,
       totalCount: count,
       totalRewards,
+      totalRewarders,
       totalPrizePool,
       networkFee,
       gasFee,
@@ -169,10 +219,12 @@ export const links: LinksFunction = () => {
 type LoaderData = {
   icons: { [provider: string]: string };
   rewarders: Rewarders;
+  fluidTokenMap: { [tokenName: string]: string };
   totalTransactions: Transaction[];
   totalCount: number;
   totalRewards: number;
   totalPrizePool: number;
+  totalRewarders: Provider[];
   page: number;
   network: Chain;
   fluidPairs: number;
@@ -203,14 +255,16 @@ function ErrorBoundary() {
 export default function Rewards() {
   const {
     fluidPairs,
+    rewarders,
     network,
     networkFee,
     gasFee,
-    rewarders,
     totalTransactions,
     totalCount,
     totalRewards,
     totalPrizePool,
+    totalRewarders,
+    fluidTokenMap,
   } = useLoaderData<LoaderData>();
 
   const {
@@ -229,20 +283,21 @@ export default function Rewards() {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const [{ rewards, transactions, count }, setTransactions] = useState<{
-    transactions: Transaction[];
-    count: number;
-    rewards: number;
-  }>({
-    transactions: totalTransactions,
-    count: totalCount,
-    rewards: totalRewards,
-  });
-
-  const [userUnclaimedRewards, setUserUnclaimedRewards] = useState(0);
+  const [{ rewards, transactions, count, }, setTransactions] =
+    useState<{
+      transactions: Transaction[];
+      count: number;
+      rewards: number;
+      rewarders: Provider[];
+    }>({
+      transactions: totalTransactions,
+      count: totalCount,
+      rewards: totalRewards,
+      rewarders: totalRewarders,
+    });
 
   const { width } = useViewport();
-  const mobileView = width <= 500;
+  const mobileView = width <= 500 && width > 0;
 
   const tableBreakpoint = 850;
 
@@ -272,10 +327,6 @@ export default function Rewards() {
     connected ? 1 : 0
   );
 
-  useEffect(() => {
-    setActiveTableFilterIndex(connected ? 1 : 0);
-  }, [connected]);
-
   const txTableFilters = address
     ? [
         {
@@ -284,7 +335,7 @@ export default function Rewards() {
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
-            address in [sender, receiver],
+            [sender, receiver].includes(address),
           name: "YOUR REWARDS",
         },
       ]
@@ -294,6 +345,31 @@ export default function Rewards() {
           name: "GLOBAL",
         },
       ];
+
+  const [
+    { userUnclaimedRewards, unclaimedTokenAddrs },
+    setUserUnclaimedRewards,
+  ] = useState<{
+    userUnclaimedRewards: number;
+    unclaimedTokenAddrs: string[];
+  }>({
+    userUnclaimedRewards: 0,
+    unclaimedTokenAddrs: [],
+  });
+
+  useEffect(() => {
+    setActiveTableFilterIndex(connected ? 1 : 0);
+  }, [connected]);
+
+  const userTotalRewards = useMemo(
+    () =>
+      address
+        ? transactions
+            .filter(txTableFilters[1].filter)
+            .reduce((sum, { reward }) => sum + reward, 0)
+        : 0,
+    [address]
+  );
 
   const unixNow = Date.now();
 
@@ -352,7 +428,7 @@ export default function Rewards() {
 
   // Get user's unclaimed rewards
   useEffect(() => {
-    if (!connected || !address) return setUserUnclaimedRewards(0);
+    if (!connected || !address) return;
 
     // Get Unclaimed Rewards - Expect to fail if Solana
     (async () => {
@@ -380,7 +456,13 @@ export default function Rewards() {
           0
         );
 
-        setUserUnclaimedRewards(userUnclaimedRewards);
+        const unclaimedTokenAddrs = Array.from(
+          new Set(
+            sanitisedRewards.map(({ token_short_name }) => token_short_name)
+          )
+        ).map((name) => fluidTokenMap[name] ?? "");
+
+        setUserUnclaimedRewards({ userUnclaimedRewards, unclaimedTokenAddrs });
       } catch (err) {
         captureException(
           new Error(
@@ -399,18 +481,52 @@ export default function Rewards() {
 
   // Filter Transactions via rewards filter / tx type filters
   useEffect(() => {
-    const tableFilteredTransactions = totalTransactions
-      .filter(rewardFilters[activeRewardFilterIndex].filter)
-      .filter(txTableFilters[activeTableFilterIndex].filter);
-    const filteredRewards = tableFilteredTransactions.reduce(
+    const timeFilteredTransactions = totalTransactions.filter(
+      rewardFilters[activeRewardFilterIndex].filter
+    );
+
+    const userFilteredTransactions = timeFilteredTransactions.filter(
+      txTableFilters[activeTableFilterIndex].filter
+    );
+
+    const filteredRewards = userFilteredTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
     );
 
+    const filteredRewarders = Object.values(
+      timeFilteredTransactions.reduce((map, tx) => {
+        const provider = map[tx.provider];
+
+        return {
+          ...map,
+          [tx.provider]: provider
+            ? {
+                ...provider,
+                count: provider.count + 1,
+                prize: provider.prize + tx.reward,
+              }
+            : {
+                name: tx.provider,
+                count: 1,
+                prize: tx.reward,
+              },
+        };
+      }, {} as { [providerName: string]: { name: string; count: number; prize: number } })
+    )
+      .map(({ count, ...provider }) => ({
+        ...provider,
+        avgPrize: provider.prize / count,
+      }))
+      .sort(({ avgPrize: avgPrizeA }, { avgPrize: avgPrizeB }) =>
+        avgPrizeA > avgPrizeB ? -1 : avgPrizeA === avgPrizeB ? 0 : 1
+      ) as Provider[];
+
     setTransactions({
-      count: tableFilteredTransactions.length,
+      count: userFilteredTransactions.length,
       rewards: filteredRewards,
-      transactions: tableFilteredTransactions,
+      rewarders: filteredRewarders,
+      transactions: userFilteredTransactions,
     });
   }, [activeTableFilterIndex, activeRewardFilterIndex]);
 
@@ -494,9 +610,11 @@ export default function Rewards() {
         <UserRewards
           claimNow={mobileView}
           unclaimedRewards={userUnclaimedRewards}
+          claimedRewards={userTotalRewards}
           network={network}
           networkFee={networkFee}
           gasFee={gasFee}
+          tokenAddrs={unclaimedTokenAddrs}
         />
       ) : (
         <div className="no-user-rewards">
@@ -510,15 +628,17 @@ export default function Rewards() {
             </Text>
           </section>
           <section>
-            <Text size="md">Highest reward distribution this week</Text>
+            {weeklyRewards?.length > 0 && (
+              <>
+                <Text size="md">Highest reward distribution this week</Text>
 
-            {hasRewarders && (
-              <ProviderCard
-                name={bestPerformingRewarders[0].name}
-                prize={bestPerformingRewarders[0].prize}
-                avgPrize={bestPerformingRewarders[0].avgPrize}
-                size="lg"
-              />
+                <ProviderCard
+                  name={weeklyRewards[0].name}
+                  prize={weeklyRewards[0].prize}
+                  avgPrize={weeklyRewards[0].avgPrize}
+                  size="lg"
+                />
+              </>
             )}
           </section>
         </div>
@@ -545,20 +665,21 @@ export default function Rewards() {
           ))}
         </div>
       </div>
-      {/* Reward Performance */}
-      {hasRewarders && (
-        <section id="performance">
-          <div className="statistics-row">
-            <div className="statistics-set">
-              <LabelledValue
-                label={`${
-                  activeTableFilterIndex ? "Your" : "Total"
-                } claimed yield`}
-              >
-                {numberToMonetaryString(rewards)}
-              </LabelledValue>
-            </div>
 
+      {/* Reward Performance */}
+      <section id="performance">
+        <div className="statistics-row">
+          <div className="statistics-set">
+            <LabelledValue
+              label={`${
+                activeTableFilterIndex ? "Your" : "Total"
+              } claimed yield`}
+            >
+              {numberToMonetaryString(rewards)}
+            </LabelledValue>
+          </div>
+
+          {hasRewarders && (
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
@@ -567,19 +688,19 @@ export default function Rewards() {
                 </div>
               </LabelledValue>
             </div>
+          )}
 
-            <div className="statistics-set">
-              <LabelledValue label={"Total prize pool"}>
-                {numberToMonetaryString(totalPrizePool)}
-              </LabelledValue>
-            </div>
-
-            <div className="statistics-set">
-              <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
-            </div>
+          <div className="statistics-set">
+            <LabelledValue label={"Total prize pool"}>
+              {numberToMonetaryString(totalPrizePool)}
+            </LabelledValue>
           </div>
-        </section>
-      )}
+
+          <div className="statistics-set">
+            <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
+          </div>
+        </div>
+      </section>
 
       <section id="table">
         <Table

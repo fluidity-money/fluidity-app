@@ -22,9 +22,7 @@ import { motion } from "framer-motion";
 import useViewport from "~/hooks/useViewport";
 import { useUserUnclaimedRewards } from "~/queries";
 import config from "~/webapp.config.server";
-import { io } from "socket.io-client";
-import { PipedTransaction, NotificationType } from "drivers/types";
-import { trimAddress, networkMapper } from "~/util";
+import { networkMapper } from "~/util";
 import {
   DashboardIcon,
   GeneralButton,
@@ -33,18 +31,17 @@ import {
   Heading,
   ChainSelectorButton,
   BlockchainModal,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
-import { useToolTip } from "~/components";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
-import { ToolTipContent } from "~/components/ToolTip";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
-import { ViewRewardModal } from "~/components/ViewRewardModal";
+import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -57,12 +54,9 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = config.liquidity_providers;
 
-  const tokens = config.config;
-
   return json({
     network,
     provider,
-    tokens,
     ethereumWallets,
   });
 };
@@ -114,16 +108,16 @@ type LoaderData = {
   fromRedirect: boolean;
   network: string;
   provider: typeof config.liquidity_providers;
-  tokens: typeof config.config;
 };
 
 export default function Dashboard() {
-  const { network, tokens } = useLoaderData<LoaderData>();
+  const { network } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
-  const { connected, address, rawAddress, disconnect, connecting, balance } =
-    useContext(FluidityFacadeContext);
+  const { connected, address, rawAddress, disconnect, connecting } = useContext(
+    FluidityFacadeContext
+  );
 
   const url = useLocation();
   const urlPaths = url.pathname.split("/");
@@ -137,29 +131,6 @@ export default function Dashboard() {
 
   const [walletModalVisibility, setWalletModalVisibility] =
     useState<boolean>(false);
-
-  type RewardDetails = {
-    visible: boolean;
-    token: string;
-    img: string;
-    colour: string;
-    winAmount: string;
-    explorerUri: string;
-    balance: string;
-    forSending: boolean;
-  };
-
-  const [detailedRewardObject, setDetailedRewardObject] =
-    useState<RewardDetails>({
-      visible: false,
-      token: "",
-      img: "",
-      colour: "",
-      winAmount: "",
-      explorerUri: "",
-      balance: "",
-      forSending: false,
-    });
 
   // By default, prompt user to connect their wallet
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
@@ -175,8 +146,8 @@ export default function Dashboard() {
 
   const { width } = useViewport();
 
-  const isMobile = width <= 500;
-  const isTablet = width <= 850 && width > 500;
+  const isMobile = width <= 500 && width > 0;
+  const isTablet = width <= 850 && width > 0;
   const closeMobileModal = width > 850 ? false : true;
 
   useEffect(() => {
@@ -203,7 +174,6 @@ export default function Dashboard() {
   };
 
   const matches = useMatches();
-  const toolTip = useToolTip();
   const transitionPath = useTransition().location?.pathname;
   const currentPath = transitionPath || matches[matches.length - 1].pathname;
   const resolvedPaths = navigationMap.map((obj) =>
@@ -222,20 +192,6 @@ export default function Dashboard() {
     const pathComponents = pathname.split("/").slice(2);
 
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
-  };
-
-  const handleCloseViewRewardDetailModal = () => {
-    setDetailedRewardObject({
-      // empty object on close
-      visible: false,
-      token: "",
-      img: "",
-      colour: "",
-      winAmount: "",
-      explorerUri: "",
-      balance: "",
-      forSending: false,
-    });
   };
 
   // Rewards User has yet to claim - Ethereum feature
@@ -269,66 +225,6 @@ export default function Dashboard() {
 
       setUnclaimedRewards(totalUnclaimedRewards);
     })();
-
-    // Test for now, wallet address should be gotten when a wallet is connected
-    // take out hard coded address later.
-
-    const socket = io();
-    socket.emit("subscribeTransactions", {
-      protocol: network,
-      address: rawAddress,
-    });
-
-    setTimeout(() => {
-      socket.on("Transactions", (log: PipedTransaction) => {
-        const fToken = tokens[
-          network === `` ? `ethereum` : network
-        ].tokens.filter((entry) => entry.symbol === log.token);
-
-        const imgUrl =
-          fToken?.at(0)?.logo !== undefined ? fToken?.at(0)?.logo : "";
-        const tokenColour =
-          fToken?.at(0)?.colour !== undefined ? fToken?.at(0)?.colour : "";
-        const transactionUrl =
-          network === `ethereum`
-            ? "https://etherscan.io/tx/" + log.transactionHash
-            : "https://explorer.solana.com/tx/" + log.transactionHash;
-
-        toolTip.open(
-          fToken.at(0)?.colour || `#000`,
-          <ToolTipContent
-            tokenLogoSrc={fToken.at(0)?.logo}
-            boldTitle={log.amount + ` ` + log.token}
-            details={
-              log.type === NotificationType.REWARD_DATABASE
-                ? log.rewardType === `send`
-                  ? `reward for s͟e͟n͟d`
-                  : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
-                : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(log.source)
-            }
-            linkLabel={"DETAILS"}
-            linkLabelOnClickCallback={async () => {
-              log.type === NotificationType.REWARD_DATABASE
-                ? setDetailedRewardObject({
-                    visible: true,
-                    token: log.token,
-                    img: imgUrl as unknown as string,
-                    colour: tokenColour as unknown as string,
-                    winAmount: log.amount,
-                    explorerUri: transactionUrl,
-                    balance: String(
-                      await balance?.(
-                        fToken.at(0)?.address as unknown as string
-                      )
-                    ),
-                    forSending: log.rewardType === `send` ? true : false,
-                  })
-                : window.open(transactionUrl, `_`);
-            }}
-          />
-        );
-      });
-    }, 8000);
   }, [address]);
 
   const handleScroll = () => {
@@ -362,11 +258,18 @@ export default function Dashboard() {
     document.body.style.position = "static";
   }, [currentPath]);
 
+  const [hoverModal, setHoverModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
         <a onClick={() => navigate("./home")}>
-          <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+          <img
+            style={{ width: "5.5em", height: "2.5em" }}
+            src="/images/outlinedLogo.svg"
+            alt="Fluidity"
+          />
         </a>
 
         <br />
@@ -480,7 +383,11 @@ export default function Dashboard() {
           <div className="top-navbar-left">
             {(isMobile || isTablet) && (
               <a onClick={() => navigate("./home")}>
-                <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+                <img
+                  style={{ width: "5.5em", height: "2.5em" }}
+                  src="/images/outlinedLogo.svg"
+                  alt="Fluidity"
+                />
               </a>
             )}
             {!isMobile && (
@@ -520,6 +427,7 @@ export default function Dashboard() {
 
             {/* Fluidify */}
             <GeneralButton
+              className="fluidify-button-dashboard"
               version={"primary"}
               buttontype="text"
               size={"small"}
@@ -530,6 +438,8 @@ export default function Dashboard() {
 
             {/* Prize Money */}
             <GeneralButton
+              onMouseEnter={() => setHoverModal(true)}
+              onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
               className="trophy-button"
               version={"transparent"}
               buttontype="icon after"
@@ -541,8 +451,18 @@ export default function Dashboard() {
               }
               icon={<Trophy />}
             >
-              ${unclaimedRewards}
+              {unclaimedRewards < 0.01
+                ? `$${unclaimedRewards}`
+                : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
+
+            {/* Modal on hover */}
+            {(hoverModal || showModal) && (
+              <UnclaimedRewardsHoverModal
+                unclaimedRewards={unclaimedRewards}
+                setShowModal={setShowModal}
+              />
+            )}
 
             {(isTablet || isMobile) && (
               <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
@@ -564,23 +484,6 @@ export default function Dashboard() {
         <ConnectWalletModal
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
-        />
-        <ViewRewardModal
-          visible={detailedRewardObject.visible}
-          close={() => {
-            handleCloseViewRewardDetailModal();
-          }}
-          callback={() => {
-            handleCloseViewRewardDetailModal();
-            navigate("./rewards/unclaimed");
-          }}
-          tokenSymbol={detailedRewardObject.token}
-          img={detailedRewardObject.img}
-          colour={detailedRewardObject.colour}
-          winAmount={detailedRewardObject.winAmount}
-          explorerUri={detailedRewardObject.explorerUri}
-          balance={detailedRewardObject.balance}
-          forSending={detailedRewardObject.forSending}
         />
 
         <Outlet />
