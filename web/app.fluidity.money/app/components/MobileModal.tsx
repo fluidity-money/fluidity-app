@@ -275,9 +275,7 @@ export default function MobileModal({
                   setTimeout(() => {
                     setIsOpen(false);
                   }, 800);
-                  unclaimedRewards
-                    ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards");
+                  navigate("../fluidify");
                 }}
                 className="fluidify-money-button"
               >
