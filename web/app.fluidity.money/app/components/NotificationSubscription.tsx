@@ -74,6 +74,10 @@ export const NotificationSubscription = ({
 
     const transactionUrl = explorer + `/tx/` + payload.transactionHash;
 
+    const parseTrimAddress =
+      payload.source === `0x0000000000000000000000000000000000000000`
+        ? "Mint"
+        : trimAddress(payload.source);
     toolTip.open(
       tokenColour,
       <ToolTipContent
@@ -84,7 +88,7 @@ export const NotificationSubscription = ({
             ? payload.rewardType === `send`
               ? `reward for s͟e͟n͟d͟i͟n͟g`
               : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
-            : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(payload.source)
+            : `r͟e͟c͟e͟i͟v͟e͟d from ` + parseTrimAddress
         }
         linkLabel={"DETAILS"}
         linkLabelOnClickCallback={async () => {
