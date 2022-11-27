@@ -604,8 +604,9 @@ main > footer > section > a {
   color: black;
 }
 
-.unclaimed-button:hover > span > div > img {
-  fill: black;
+.unclaimed-button:hover > div > img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
 }
 
 .unclaimed-button > span {
