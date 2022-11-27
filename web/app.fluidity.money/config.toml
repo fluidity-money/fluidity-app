@@ -159,7 +159,7 @@ decimals = 6
 [[liquidity_providers.ethereum.providers]]
 name= "uniswap"
 img= "/images/providers/Uniswap.svg"
-link= "https://app.uniswap.org/#/pool/359573"
+link= "https://app.uniswap.org/#/add/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/0x9d1089802eE608BA84C5c98211afE5f37F96B36C/"
 
 [[liquidity_providers.ethereum.providers]]
 name= "sushiswap"
