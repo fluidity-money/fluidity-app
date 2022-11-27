@@ -8,12 +8,21 @@ const main = async () => {
 
     const tokenFactory = await hre.ethers.getContractFactory("Token");
 
+    const impersonatedAddress = "0xe0ead43d9266154f777Cb831476be99f6c40B96d";
+    await hre.network.provider.request({
+        method: "hardhat_impersonateAccount",
+        params: [impersonatedAddress],
+    });
+
+    const signer = await hre.ethers.getSigner(impersonatedAddress);
+
     const tokenBeacon = await hre.ethers.getContractAt(
         [
             "function upgradeTo(address newImplementation) external",
             "function implementation() view returns (address)"
         ],
-        backendAddress
+        backendAddress,
+        signer,
     );
 
     let tokenImplementation = await tokenBeacon.implementation();
@@ -33,11 +42,11 @@ const main = async () => {
 
     console.log(`deployed the underlying contract to ${deployedUnderlyingAddress}`);
 
-    const transaction = await tokenBeacon.populateTransaction.upgradeTo(
+    const transaction = await tokenBeacon.upgradeTo(
         deployedUnderlyingAddress
     );
 
-    console.log(`data to upgrade the beacon is: ${transaction.data}`);
+    console.log(`data to upgrade the beacon is: ${transaction}`);
 };
 
 main()

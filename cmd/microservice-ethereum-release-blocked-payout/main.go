@@ -48,7 +48,7 @@ func main() {
             })
     }
 
-    var blockedReward winners.Winner
+    var blockedReward winners.BlockedWinner
 
     err := json.Unmarshal([]byte(payload), &blockedReward)
 
@@ -60,6 +60,7 @@ func main() {
     }
 
     var (
+        rewardHash_  = blockedReward.RewardTransactionHash
         user_       = blockedReward.WinnerAddress
         amount_     = blockedReward.WinningAmount
         firstBlock_ = blockedReward.BatchFirstBlock
@@ -69,10 +70,12 @@ func main() {
         firstBlock = &firstBlock_.Int
         lastBlock  = &lastBlock_.Int
     )
+    rewardHash := common.HexToHash(rewardHash_)
     user := common.HexToAddress(user_)
 
     unblockCall, err := fluidity.FluidityContractAbi.Pack(
         "unblockReward",
+        rewardHash,
         user,
         amount,
         payout,
