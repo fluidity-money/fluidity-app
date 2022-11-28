@@ -138,13 +138,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: dashboardHomeStyle }];
-};
-
-export const meta = () => {
-  return {
-    title: "Dashboard",
-  };
+  return [{ rel: "stylesheet", href: dashboardHomeStyle } ];
 };
 
 const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
@@ -617,8 +611,8 @@ export default function Home() {
             }}
             renderTooltip={({ datum }: { datum: Transaction }) => {
               return datum.value > 0 ? (
-                <div className={"tooltip-container"}>
-                  <div className={"tooltip"}>
+                <div className={"graph-tooltip-container"}>
+                  <div className={"graph-tooltip"}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
                       {format(datum.timestamp, "dd/MM/yy")}
                     </span>
