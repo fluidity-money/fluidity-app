@@ -55,6 +55,7 @@ func InsertWinner(winner Winner) {
 			`INSERT INTO %s (
 				network,
 				transaction_hash,
+				send_transaction_hash,
 				winning_address,
 				solana_winning_owner_address,
 				winning_amount,
@@ -72,6 +73,7 @@ func InsertWinner(winner Winner) {
 			`INSERT INTO %s (
 				network,
 				transaction_hash,
+				send_transaction_hash,
 				winning_address,
 				solana_winning_owner_address,
 				winning_amount,
@@ -96,13 +98,15 @@ func InsertWinner(winner Winner) {
 			$7,
 			$8,
 			$9,
-			$10
+			$10,
+			$11
 		);`
 
 	_, err := timescaleClient.Exec(
 		statementText,
 		winner.Network,
 		winner.TransactionHash,
+		winner.SendTransactionHash,
 		winner.WinnerAddress,
 		winner.SolanaWinnerOwnerAddress,
 		winner.WinningAmount,
@@ -239,10 +243,10 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 }
 
 // Ethereum Specific
-// GetAndRemovePendingRewardType to fetch and remove the type (send or receive)
+// GetAndRemovePendingRewardData to fetch and remove the type (send or receive)
 // of an unsent win as well as the application that was involved
 // using the hash of the reward payout transaction
-func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address ethereum.Address) (winners.RewardType, ethApps.Application) {
+func GetAndRemovePendingRewardData(rewardTransactionHash ethereum.Hash, address ethereum.Address) (ethereum.Hash, winners.RewardType, ethApps.Application) {
 
 	timescaleClient := timescale.Client()
 
@@ -253,7 +257,8 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 			AND winner_address = $2
 		RETURNING
 			is_sender,
-			application
+			application,
+			send_transaction_hash
 		;`,
 
 		TablePendingRewardType,
@@ -268,11 +273,13 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 	var (
 		isSender bool
 		application_ string
+		sendHash_ string
 	)
 
 	err := row.Scan(
 		&isSender,
 		&application_,
+		&sendHash_,
 	)
 
 	if err != nil {
@@ -304,10 +311,12 @@ func GetAndRemovePendingRewardType(rewardTransactionHash ethereum.Hash, address 
 		})
 	}
 
+	sendHash := ethereum.HashFromString(sendHash_)
+
 	if isSender {
-		return "send", application
+		return sendHash, "send", application
 	} else {
-		return "receive", application
+		return sendHash, "receive", application
 	}
 }
 
