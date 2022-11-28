@@ -148,8 +148,7 @@ export default function Home() {
     volume: totalVolume,
     graphTransformedTransactions: [],
   });
-
-  // WTF
+  
   useEffect(() => {
     setTransactions({
       count: totalCount,
