@@ -227,9 +227,7 @@ export default function Home() {
     bins: Transaction[],
     txs: Transaction[]
   ): Transaction[] => {
-    const txMappedBins: Transaction[][] = bins.map((bin) => [
-      bin,
-    ]);
+    const txMappedBins: Transaction[][] = bins.map((bin) => [bin]);
 
     let binIndex = 0;
     for (let txIndex = 0; txIndex < txs.length; txIndex++) {
@@ -253,15 +251,24 @@ export default function Home() {
           ) || bins[i]
       )
       .reverse();
-    
-    const [txMappedBinsStart, ...rest] = maxTxMappedBins
-      .filter((tx) => tx.value);
-    
+
+    const [txMappedBinsStart, ...rest] = maxTxMappedBins.filter(
+      (tx) => tx.value
+    );
+
     if (!txMappedBinsStart) return maxTxMappedBins;
-    
+
     const txMappedBinsEnd = rest.pop();
 
-    const maxTxs = maxTxMappedBins.filter((tx, i) => tx.value || i === 0 || i === maxTxMappedBins.length - 1 || (tx.timestamp < txMappedBinsStart.timestamp && txMappedBinsEnd && tx.timestamp > txMappedBinsEnd.timestamp))
+    const maxTxs = maxTxMappedBins.filter(
+      (tx, i) =>
+        tx.value ||
+        i === 0 ||
+        i === maxTxMappedBins.length - 1 ||
+        (tx.timestamp < txMappedBinsStart.timestamp &&
+          txMappedBinsEnd &&
+          tx.timestamp > txMappedBinsEnd.timestamp)
+    );
 
     return maxTxs;
   };
@@ -274,10 +281,9 @@ export default function Home() {
         const unixHourInc = 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
-          }))
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -291,12 +297,9 @@ export default function Home() {
         const unixEightHourInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(
-              unixNow - (i + 1) * unixEightHourInc
-            ),
-          }))
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -308,10 +311,9 @@ export default function Home() {
         const unixDayInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
-          }))
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -323,12 +325,9 @@ export default function Home() {
         const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(
-              unixNow - (i + 1) * unixBimonthlyInc
-            ),
-          }))
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -604,7 +603,10 @@ export default function Home() {
         {/* Graph */}
         <div className="graph" style={{ width: "100%", height: "400px" }}>
           <LineChart
-            data={graphTransformedTransactions.map((tx, i) => ({...tx, x: i}))}
+            data={graphTransformedTransactions.map((tx, i) => ({
+              ...tx,
+              x: i,
+            }))}
             lineLabel="transactions"
             accessors={{
               xAccessor: (d: Transaction & { x: number }) => d.x,
