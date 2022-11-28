@@ -15,29 +15,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const network = params.network ?? "";
     const icons = config.provider_icons;
     const fluidPairs = config.config[network ?? ""].fluidAssets.length;
- 
+  
     const networkFee = 0.002;
     const gasFee = 0.002;
- 
+  
     const url = new URL(request.url);
     const _pageStr = url.searchParams.get("page");
     const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
     const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
- 
+  
     try {
       const mainnetId = 0;
       const infuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
- 
+  
       const provider = new JsonRpcProvider(infuraRpc);
- 
+  
       const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
- 
+  
       const totalPrizePool = await getTotalPrizePool(
         provider,
         rewardPoolAddr,
         RewardAbi
       );
- 
+  
       const {
         transactions,
         count,
@@ -46,13 +46,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           `${url.origin}/${network}/query/userTransactions?page=${page}`
         )
       ).json();
- 
+  
       const { data, errors } = await useUserRewardsAll(network ?? "");
- 
+  
       if (errors || !data) {
         throw errors;
       }
- 
+  
       const winnersMap = data.winners.reduce(
         (map, winner) => ({
           ...map,
@@ -62,13 +62,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         }),
         {} as { [key: string]: Winner }
       );
- 
+  
       const {
         config: {
           [network as string]: { tokens },
         },
       } = config;
- 
+  
       const fluidTokenMap = tokens.reduce(
         (map, token) =>
           token.isFluidOf
@@ -80,7 +80,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             : map,
         {}
       );
- 
+  
       const tokenLogoMap = tokens.reduce(
         (map, token) => ({
           ...map,
@@ -88,15 +88,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         }),
         {} as Record<string, string>
       );
- 
+  
       const defaultLogo = "/assets/tokens/usdt.svg";
- 
+  
       const mergedTransactions: Transaction[] =
         transactions
           ?.filter((tx) => !!winnersMap[tx.hash])
           .map((tx) => {
             const winner = winnersMap[tx.hash];
- 
+  
             return {
               sender: tx.sender,
               receiver: tx.receiver,
@@ -106,11 +106,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
                 : 0,
               hash: tx.hash,
               currency: tx.currency,
-              value:
-                tx.currency === "DAI" || tx.currency === "fDAI"
-                  ? tx.value / 10 ** 12
-                  : tx.value,
-              timestamp: tx.timestamp * 1000,
+              value: tx.value,
+              timestamp: tx.timestamp,
               logo: tokenLogoMap[tx.currency] || defaultLogo,
               provider:
                 (network === "ethereum"
@@ -118,24 +115,24 @@ export const loader: LoaderFunction = async ({ request, params }) => {
                   : winner.solana_application) ?? "Fluidity",
             };
           }) ?? [];
- 
+  
       const totalRewards = mergedTransactions.reduce(
         (sum, { reward }) => sum + reward,
         0
       );
- 
+  
       const { data: rewardData, errors: rewardErrors } =
         await useApplicationRewardStatistics(network ?? "");
       if (rewardErrors || !rewardData) {
         throw errors;
       }
- 
+  
       const rewarders = aggregateRewards(rewardData);
- 
+  
       const totalRewarders = Object.values(
         mergedTransactions.reduce((map, tx) => {
           const provider = map[tx.provider];
- 
+  
           return {
             ...map,
             [tx.provider]: provider
@@ -159,7 +156,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         .sort(({ avgPrize: avgPrizeA }, { avgPrize: avgPrizeB }) =>
           avgPrizeA > avgPrizeB ? 1 : avgPrizeA === avgPrizeB ? 0 : -1
         ) as Provider[];
- 
+  
       return json({
         icons,
         rewarders,
