@@ -12,6 +12,7 @@ const queryByNetwork = gql`
       winning_amount_scaled
     }
     highest_reward_winner_totals(where: { network: { _eq: $network } }) {
+      network
       transaction_count
       winning_address
       total_winnings
@@ -30,6 +31,7 @@ const queryAll = gql`
       winning_amount_scaled
     }
     highest_reward_winner_totals {
+      network
       transaction_count
       winning_address
       total_winnings
@@ -48,6 +50,7 @@ export type HighestRewardResponse = {
       winning_amount_scaled: number;
     }>;
     highest_reward_winner_totals: Array<{
+      network: string;
       winning_address: string;
       transaction_count: number;
       total_winnings: number;
