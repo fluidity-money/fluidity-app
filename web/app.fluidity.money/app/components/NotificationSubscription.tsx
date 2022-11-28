@@ -76,9 +76,7 @@ export const NotificationSubscription = ({
     const transactionUrl = explorer + `/tx/` + payload.transactionHash;
 
     const parseTrimAddress =
-      payload.source === MintAddress
-        ? "Mint"
-        : trimAddress(payload.source);
+      payload.source === MintAddress ? "Mint" : trimAddress(payload.source);
     toolTip.open(
       tokenColour,
       <ToolTipContent

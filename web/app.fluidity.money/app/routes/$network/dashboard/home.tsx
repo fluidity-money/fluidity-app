@@ -138,7 +138,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: dashboardHomeStyle } ];
+  return [{ rel: "stylesheet", href: dashboardHomeStyle }];
 };
 
 const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
