@@ -24,6 +24,7 @@ type Application interface {
 type Winner struct {
 	Network                  network.BlockchainNetwork `json:"network"`
 	TransactionHash          string                    `json:"transaction_hash"`
+	SendTransactionHash      string                    `json:"send_transaction_hash"`
 	WinnerAddress            string                    `json:"winner_address"`
 	SolanaWinnerOwnerAddress string                    `json:"solana_winner_owner_address"`
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
