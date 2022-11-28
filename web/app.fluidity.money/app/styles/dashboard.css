@@ -35,7 +35,7 @@ main {
 
 @media only screen and (max-width: 550px) {
   .pad-main {
-    padding: 0 24px;
+    padding: 0 20px;
   }
 }
 
@@ -51,10 +51,6 @@ main > nav > div {
   display: flex;
   gap: 1em;
   align-items: center;
-}
-
-main > nav a {
-  margin: 0 10px;
 }
 
 main > footer {
@@ -575,6 +571,7 @@ main > footer > section > a {
 .mobile-navbar-right {
   display: flex;
   gap: 1em;
+  align-items: center;
 }
 
 .mobile-modal-content {
