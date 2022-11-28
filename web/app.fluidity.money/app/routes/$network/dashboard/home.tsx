@@ -108,7 +108,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
               : winner?.solana_application) ?? "",
         };
       }) ?? [];
-    
+
     const totalRewards = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
