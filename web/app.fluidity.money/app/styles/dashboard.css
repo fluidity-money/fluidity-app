@@ -181,6 +181,7 @@ main > footer > section > a {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  flex-direction: row-reverse;
 }
 
 .active-filter {
@@ -189,8 +190,19 @@ main > footer > section > a {
   text-underline-offset: 0.4em;
 }
 
+.inactive-filter-btn {
+  border: 0.5px solid #828381;
+  color: #828381;
+}
+
+.active-filter-btn {
+  border: 1px solid #e6c5e3;
+}
+
 .transactions-header {
   margin-bottom: 1em;
+  display: flex;
+  justify-content: space-between;
 }
 
 .transaction-table {

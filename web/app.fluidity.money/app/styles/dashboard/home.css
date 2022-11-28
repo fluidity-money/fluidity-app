@@ -15,6 +15,7 @@ section#transactions {
   display: flex;
   flex-direction: row;
   gap: 10px;
+  justify-content: flex-end;
 }
 
 .graph-ceiling {
@@ -36,6 +37,7 @@ section#transactions {
 
 .justify-between {
   justify-content: space-between;
+  align-items: baseline;
 }
 
 .transaction-table {
