@@ -44,32 +44,37 @@ const Landing = () => {
 
   return (
     <div className={`${styles.containerLanding}`}>
-      <div className={`${styles.bgVid}`}>
-        {width > breakpoint ? (
-          <Video
-            src={state.src}
-            type={"reduce"}
-            mimeType={state.mimeType}
-            loop={state.loop}
-            key={state.key}
-            scale={state.scale}
-            margin = {"-60px 0 0 0"}
-          />
-          
-        ) : ( isMobile ?
-          (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        <div className={`${styles.bgVid}`}>
+          {width > breakpoint ? (
             <Video
-            src={state.src}
-            type={"reduce"}
-            mimeType={state.mimeType}
-            loop={state.loop}
-            key={state.key}
-            scale={state.scale * 2}
-            margin={"-400px 0 0 0"}
+              src={state.src}
+              type={"reduce"}
+              mimeType={state.mimeType}
+              loop={state.loop}
+              key={state.key}
+              scale={state.scale}
+              margin={"-60px 0 0 0"}
             />
-          ) : (<></>) 
-        )}
-      </div>
+          ) : isMobile ? (
+            <Video
+              src={state.src}
+              type={"reduce"}
+              mimeType={state.mimeType}
+              loop={state.loop}
+              key={state.key}
+              scale={state.scale * 2}
+              margin={"-400px 0 0 0"}
+            />
+          ) : (
+            <></>
+          )}
+        </div>
+      </motion.div>
       {/* Hero animation */}
       <motion.div className={styles.content}>
         {width < breakpoint ? (
