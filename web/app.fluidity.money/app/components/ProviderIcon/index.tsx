@@ -1,5 +1,5 @@
 import { useLoaderData } from "@remix-run/react";
-import {Application} from "~/queries/useApplicationRewardStatistics";
+import { Application } from "~/queries/useApplicationRewardStatistics";
 import config from "~/webapp.config.server";
 
 export type Providers =
@@ -28,9 +28,9 @@ export type Providers =
   | "XY Finance"
   | "Raydium"
   | "Lifinity"
-  | "Mercurial"
+  | "Mercurial";
 
-const providerNames: {[K in Application]: Providers} = {
+const providerNames: { [K in Application]: Providers } = {
   none: "Fluidity",
   uniswap_v2: "Uniswap",
   balancer_v2: "Balancer",
@@ -51,11 +51,11 @@ const providerNames: {[K in Application]: Providers} = {
   aldrinv2: "Aldrin",
   lifinity: "Lifinity",
   mercurial: "Mercurial",
-}
+};
 
 export const providerToDisplayName = (name: Application) => {
   return providerNames[name];
-}
+};
 
 type IProviderIcon = {
   provider: Providers;

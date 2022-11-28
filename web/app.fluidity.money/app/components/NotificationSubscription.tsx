@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "@remix-run/react";
 
 import { NotificationType, PipedTransaction } from "drivers/types";
+import { MintAddress } from "~/types/MintAddress";
 
 import { Token } from "~/util/chainUtils/tokens.js";
 import { ColorMap } from "~/webapp.config.server";
@@ -74,6 +75,10 @@ export const NotificationSubscription = ({
 
     const transactionUrl = explorer + `/tx/` + payload.transactionHash;
 
+    const parseTrimAddress =
+      payload.source === MintAddress
+        ? "Mint"
+        : trimAddress(payload.source);
     toolTip.open(
       tokenColour,
       <ToolTipContent
@@ -84,7 +89,7 @@ export const NotificationSubscription = ({
             ? payload.rewardType === `send`
               ? `reward for s͟e͟n͟d͟i͟n͟g`
               : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
-            : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(payload.source)
+            : `r͟e͟c͟e͟i͟v͟e͟d from ` + parseTrimAddress
         }
         linkLabel={"DETAILS"}
         linkLabelOnClickCallback={async () => {
