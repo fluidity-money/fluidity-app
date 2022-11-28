@@ -70,6 +70,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             ? winner.winning_amount / 10 ** winner.token_decimals
             : 0,
           hash: tx.hash,
+          rewardHash: winner?.transaction_hash ?? "",
           currency: tx.currency,
           value: tx.value,
           timestamp: tx.timestamp,

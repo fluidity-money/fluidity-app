@@ -41,6 +41,7 @@ const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   winner: "",
   reward: 0,
   hash: "",
+  rewardHash: "",
   timestamp: time,
   value,
   currency: "",
@@ -375,7 +376,7 @@ export default function Home() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, timestamp, value, reward, hash, logo } = data;
+      const { sender, timestamp, value, reward, hash, rewardHash, logo } = data;
 
       return (
         <motion.tr
@@ -414,9 +415,20 @@ export default function Home() {
           {/* Reward */}
           {!isMobile && (
             <td>
-              <Text prominent={true}>
-                {reward ? numberToMonetaryString(reward) : "-"}
-              </Text>
+              {reward ? (
+                <a
+                  className="table-address"
+                  href={getTxExplorerLink(network, rewardHash)}
+                >
+                  <Text prominent={true}>
+                    {reward ? numberToMonetaryString(reward) : "-"}
+                  </Text>
+                </a>
+              ) : (
+                <Text>
+                  -
+                </Text>
+              )}
             </td>
           )}
 
