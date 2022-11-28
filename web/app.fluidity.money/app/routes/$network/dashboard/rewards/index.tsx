@@ -59,7 +59,6 @@ type LoaderData = {
 
 type ExLoaderData = {
   fluidTokenMap: { [tokenName: string]: string };
-  highestWeeklyRewarder?: Provider;
   totalTransactions: Transaction[];
   totalCount: number;
   totalRewards: number;
@@ -124,7 +123,6 @@ export default function Rewards() {
     fluidPairs,
     networkFee,
     gasFee,
-    highestWeeklyRewarder,
     totalTransactions,
     totalCount,
     totalRewards,
@@ -134,6 +132,12 @@ export default function Rewards() {
     timestamp,
   } = data;
 
+  const {
+    week: weeklyRewards,
+    month: monthlyRewards,
+    year: yearlyRewards,
+    all: allRewards,
+  } = rewarders;
   const { connected, address } = useContext(FluidityFacadeContext);
 
   const location = useLocation();
@@ -144,18 +148,17 @@ export default function Rewards() {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const [{ rewards, transactions, count, rewarders }, setTransactions] =
-    useState<{
-      transactions: Transaction[];
-      count: number;
-      rewards: number;
-      rewarders: Provider[];
-    }>({
-      transactions: totalTransactions,
-      count: totalCount,
-      rewards: totalRewards,
-      rewarders: totalRewarders,
-    });
+  const [{ rewards, transactions, count }, setTransactions] = useState<{
+    transactions: Transaction[];
+    count: number;
+    rewards: number;
+    rewarders: Provider[];
+  }>({
+    transactions: totalTransactions,
+    count: totalCount,
+    rewards: totalRewards,
+    rewarders: totalRewarders,
+  });
 
   const { width } = useViewport();
   const mobileView = width <= 500 && width > 0;
@@ -258,7 +261,35 @@ export default function Rewards() {
     },
   ];
 
-  const hasRewarders = rewarders.length > 0;
+  const hasRewarders = allRewards.length > 0;
+
+  // update bestPerformingRewarders based on the selected time interval
+  const [bestPerformingRewarders, setBestPerformingRewarders] =
+    useState<Provider[]>(allRewards);
+
+  const activeRewards = (() => {
+    switch (activeRewardFilterIndex) {
+      case 0:
+      default:
+        return allRewards;
+      case 1:
+        return weeklyRewards;
+      case 2:
+        return monthlyRewards;
+      case 3:
+        return yearlyRewards;
+    }
+  })();
+
+  useEffect(() => {
+    setBestPerformingRewarders(
+      activeRewards.sort(({ prize: prize_a }, { prize: prize_b }) => {
+        if (prize_a > prize_b) return -1;
+        if (prize_a === prize_b) return 0;
+        return 1;
+      })
+    );
+  }, [activeRewardFilterIndex]);
 
   // Get user's unclaimed rewards
   useEffect(() => {
@@ -464,14 +495,14 @@ export default function Rewards() {
             </Text>
           </section>
           <section>
-            {highestWeeklyRewarder && (
+            {weeklyRewards?.length > 0 && (
               <>
                 <Text size="md">Highest reward distribution this week</Text>
 
                 <ProviderCard
-                  name={rewarders[0].name}
-                  prize={rewarders[0].prize}
-                  avgPrize={rewarders[0].avgPrize}
+                  name={weeklyRewards[0].name}
+                  prize={weeklyRewards[0].prize}
+                  avgPrize={weeklyRewards[0].avgPrize}
                   size="lg"
                 />
               </>
@@ -526,8 +557,8 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <ProviderIcon provider={rewarders[0].name} />
-                  {rewarders[0].name}
+                  <ProviderIcon provider={bestPerformingRewarders[0].name} />
+                  {bestPerformingRewarders[0].name}
                 </div>
               </LabelledValue>
             </div>
@@ -570,7 +601,7 @@ export default function Rewards() {
           </Heading>
           {
             <ManualCarousel scrollBar={true} className="rewards-carousel">
-              {rewarders.map((rewarder) => (
+              {bestPerformingRewarders.map((rewarder) => (
                 <div className="carousel-card-container" key={rewarder.name}>
                   <ProviderCard
                     name={rewarder.name}

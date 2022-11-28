@@ -89,6 +89,7 @@ export default function FluidifyToken() {
     connecting,
     disconnect,
     balance,
+    addToken,
   } = useContext(FluidityFacadeContext);
 
   const { width } = useViewport();
@@ -121,6 +122,12 @@ export default function FluidifyToken() {
         : undefined,
     [assetToken]
   );
+
+  const handleAddToken = (symbol: string) => {
+    if (!connected || !addToken) return;
+
+    addToken(symbol);
+  };
 
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState(false);
@@ -447,6 +454,7 @@ export default function FluidifyToken() {
                         }
                         color={colors[symbol]}
                         amount={userTokenBalance}
+                        addToken={handleAddToken}
                       />
                     </div>
                   ) : (
@@ -469,6 +477,7 @@ export default function FluidifyToken() {
                         }
                         color={colors[symbol]}
                         amount={userTokenBalance}
+                        addToken={handleAddToken}
                       />
                     </Draggable>
                   );

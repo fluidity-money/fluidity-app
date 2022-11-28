@@ -139,7 +139,22 @@ if (process.env.FLU_FORKNET_NETWORK === "goerli" && process.env.FLU_ETHEREUM_FOR
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.11",
+  solidity: {
+    version: "0.8.11",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 10000000,
+        details: {
+          cse: true,
+          yul: true,
+        }
+      },
+      debug: {
+        revertStrings: "debug",
+      }
+    },
+  },
   networks: {
     localhost: {
       url: "http://localhost:8545",

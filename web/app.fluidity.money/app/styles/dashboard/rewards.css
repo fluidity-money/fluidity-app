@@ -206,6 +206,10 @@
   margin-bottom: 50px;
 }
 
+.highest-performer-child .provider-img {
+  width: 1.1em;
+}
+
 @media (max-width: 1200px) {
   .no-user-rewards {
     flex-direction: column;
@@ -238,10 +242,6 @@
   }
   .statistics-set .container .value > h1 {
     font-size: 1.5em;
-  }
-
-  .highest-performer-child .provider-img {
-    width: 1.1em;
   }
 
   #spend-to-earn > h2 {
