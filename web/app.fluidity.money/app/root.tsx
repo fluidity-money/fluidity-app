@@ -16,6 +16,7 @@ import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
+import CacheProvider from "contexts/CacheProvider";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -166,12 +167,14 @@ function App() {
         <Links />
       </head>
       <body>
-        <ToolProvider>
-          <Outlet />
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
-        </ToolProvider>
+        <CacheProvider>
+          <ToolProvider>
+            <Outlet />
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </ToolProvider>
+        </CacheProvider>
       </body>
     </html>
   );

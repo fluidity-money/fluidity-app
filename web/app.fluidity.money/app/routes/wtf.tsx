@@ -88,7 +88,6 @@ export const loader: LoaderFunction = async () => {
       transactionCount: largestWinnerEntries[1].transactionCount,
     },
   });
-  
 };
 
 type WinnerWinnings = {
@@ -213,20 +212,29 @@ export default function IndexPage() {
                 {highestWinner.address && (
                   <Display className="opportunity-text-top" size={"xs"}>
                     <Text>
-                      <a href={getAddressExplorerLink(highestWinner.network as Chain, highestWinner.address)}>
-                      <Text prominent>
-                        {appendLeading0x(
-                          trimAddressShort(
-                            normaliseAddress(highestWinner.address)
-                          )
+                      <a
+                        href={getAddressExplorerLink(
+                          highestWinner.network as Chain,
+                          highestWinner.address
                         )}
-                      </Text>
+                      >
+                        <Text prominent>
+                          {appendLeading0x(
+                            trimAddressShort(
+                              normaliseAddress(highestWinner.address)
+                            )
+                          )}
+                        </Text>
                       </a>
                       {" claimed "}
                       <Text prominent>
                         {numberToMonetaryString(highestWinner.totalWinnings)}
                       </Text>
-                      {` in fluid prizes over ${highestWinner.transactionCount} transaction${highestWinner.transactionCount > 1 ? "s" : ""}.`}
+                      {` in fluid prizes over ${
+                        highestWinner.transactionCount
+                      } transaction${
+                        highestWinner.transactionCount > 1 ? "s" : ""
+                      }.`}
                     </Text>
                   </Display>
                 )}
@@ -266,7 +274,10 @@ export default function IndexPage() {
             />
           </Modal>
 
-          <div className="opportunity-graph" style={{width: "100%", height: "400px"}}>
+          <div
+            className="opportunity-graph"
+            style={{ width: "100%", height: "400px" }}
+          >
             <LineChart
               data={highestRewards}
               lineLabel="transactions"

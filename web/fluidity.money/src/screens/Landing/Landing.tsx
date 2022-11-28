@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
