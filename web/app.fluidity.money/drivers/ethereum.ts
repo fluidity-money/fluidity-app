@@ -1,3 +1,4 @@
+import { setTimeout } from "timers/promises";
 import { Observable } from "rxjs";
 
 import IERC20 from "@openzeppelin/contracts/build/contracts/IERC20.json";
@@ -11,11 +12,7 @@ import { PipedTransaction, NotificationType } from "./types";
 import config from "~/webapp.config.server";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 
-export const ethGetTransactionsObservable = (
-  token: string,
-  address: string,
-  network = 0
-) =>
+const onListen = (token: string, address: string, network = 0) =>
   new Observable<PipedTransaction>((subscriber) => {
     new new Web3(config.drivers["ethereum"][network].rpc.ws ?? "").eth.Contract(
       IERC20.abi as unknown as AbiItem,
@@ -50,7 +47,18 @@ export const ethGetTransactionsObservable = (
           subscriber.next(transaction);
         }
       )
-      .on("error", (error: unknown) => {
-        subscriber.error(error);
+      .on("error", async () => {
+        // On websockets errors sleep for a while and do a manual instatiation of listening again
+        console.error(
+          "Error on ethereum driver listener ... failed to reconect. retrying in 5 seconds"
+        ); // Server logged message
+        await setTimeout(5000);
+        onListen(token, address, network);
       });
   });
+
+export const ethGetTransactionsObservable = (
+  token: string,
+  address: string,
+  network = 0
+) => onListen(token, address, network);
