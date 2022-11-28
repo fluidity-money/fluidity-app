@@ -150,9 +150,7 @@ const SwapCompleteModal = ({
 
             {/* Transaction errored */}
             {confirmed && error && (
-              <Heading as="h5">
-                Something went wrong during the swap..
-              </Heading>
+              <Heading as="h5">Something went wrong during the swap..</Heading>
             )}
 
             {/* Unconfirmed transaction */}
