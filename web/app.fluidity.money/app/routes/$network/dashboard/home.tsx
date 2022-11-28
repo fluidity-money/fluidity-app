@@ -63,7 +63,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const winnersMap = data.winners.reduce(
       (map, winner) => ({
         ...map,
-        [winner.transaction_hash]: {
+        [winner.send_transaction_hash]: {
           ...winner,
         },
       }),
