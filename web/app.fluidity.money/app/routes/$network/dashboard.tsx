@@ -502,7 +502,7 @@ export default function Dashboard() {
             size={"small"}
             handleClick={() => navigate("../fluidify")}
           >
-            <b>Fluidify</b>
+            <b>FLUIDIFY MONEY</b>
           </GeneralButton>
         )}
 
