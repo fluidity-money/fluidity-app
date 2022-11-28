@@ -30,7 +30,6 @@ import { useCache } from "~/hooks/useCache";
 import { Chain } from "~/util/chainUtils/chains";
 import config from "~/webapp.config.server";
 
-
 type LoaderData = {
   network: string;
   tokens: AugmentedToken[];
@@ -43,12 +42,12 @@ export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
 
   const ethereumWallets = config.config["ethereum"].wallets;
-  
+
   return json({
     ethereumWallets,
     network,
-  })
-}
+  });
+};
 
 function ErrorBoundary(error: unknown) {
   console.log(error);
@@ -70,14 +69,16 @@ function ErrorBoundary(error: unknown) {
 }
 
 export default function FluidifyToken() {
-  const { network } = useLoaderData<{network: Chain}>();
-  const { data: loaderData } = useCache<LoaderData>(`/${network}/query/fluidify`);
+  const { network } = useLoaderData<{ network: Chain }>();
+  const { data: loaderData } = useCache<LoaderData>(
+    `/${network}/query/fluidify`
+  );
 
   const defaultData: LoaderData = {
     tokens: [],
     colors: {},
     network: network,
-  }
+  };
 
   const { tokens: tokens_, colors } = loaderData || defaultData;
 

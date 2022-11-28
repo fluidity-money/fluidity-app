@@ -148,7 +148,7 @@ export default function Home() {
     volume: totalVolume,
     graphTransformedTransactions: [],
   });
-  
+
   useEffect(() => {
     setTransactions({
       count: totalCount,
@@ -554,7 +554,8 @@ export default function Home() {
             lineLabel="transactions"
             accessors={{
               xAccessor: (d: Transaction & { x: number }) => d.x,
-              yAccessor: (d: Transaction & { x: number }) => d.value ? Math.log(d.value + 1) : 0,
+              yAccessor: (d: Transaction & { x: number }) =>
+                d.value ? Math.log(d.value + 1) : 0,
             }}
             renderTooltip={({ datum }: { datum: Transaction }) => {
               return datum.value > 0 ? (
