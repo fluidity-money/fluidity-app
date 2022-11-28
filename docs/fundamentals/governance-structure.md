@@ -32,8 +32,6 @@ Community multisig
 | Daniel T, Verilog                        | 0x1763b71D0c12DD4Ad51cEf56C16Cd19C436C5c71 |
 | ZachXBT                                  |                                            |
 
-(in progress)
-
 #### Emergency
 
 {% embed url="https://gnosis-safe.io/app/eth:0xDb4a495b54Ee96B242c3af308b5c4Fb4BE0207cd" %}
@@ -42,12 +40,13 @@ Emergency multisig
 
 
 
-| Owner name/pseudonym                     | Address/ENS                                |
-| ---------------------------------------- | ------------------------------------------ |
-| Shahmeer Chaudhry, Fluidity (shahmeerch) | 0xd86f18bEB63574C2169f6fD8Aa0C6235A6FC4c8E |
-| Bayge, Fluidity                          | 0xdcbcc6773aaf289a880037cbaffc316d4f1c96a4 |
-| Daniel T, Verilog                        | 0xddbd06a518627286a05822ef103ba57058650ae9 |
-| ZachXBT                                  |                                            |
+| Owner name/pseudonym                     | Address/ENS                                                                                                                                                                                                                        |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shahmeer Chaudhry, Fluidity (shahmeerch) | 0xd86f18bEB63574C2169f6fD8Aa0C6235A6FC4c8E                                                                                                                                                                                         |
+| Bayge, Fluidity                          | 0xdcbcc6773aaf289a880037cbaffc316d4f1c96a4                                                                                                                                                                                         |
+| Daniel T, Verilog                        | 0xddbd06a518627286a05822ef103ba57058650ae9                                                                                                                                                                                         |
+| ZachXBT                                  |                                                                                                                                                                                                                                    |
+| Fluidity team                            | 0x3099705e1F53419A2233dFE78F3B04bDBD234dD9,0x3099705e1F53419A2233dFE78F3B04bDBD234dD9,0x63a5B6497F01BB876EA3a343Ec8991252aABAEaF,0x8Cb300ebb3028c15AB69c3E9CDFf1bE60aAa43a2,0x9735Ab34d1c822E81c56c904C99Dd473aaD7431F,imbrium.eth |
 
 (in progress)
 
