@@ -569,7 +569,9 @@ export default function Rewards() {
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
                   <ProviderIcon provider={bestPerformingRewarders[0].name} />
-                  {bestPerformingRewarders[0].name}
+                  {bestPerformingRewarders[0].name === "Fluidity"
+                    ? "Swapping fTokens"
+                    : bestPerformingRewarders[0].name}
                 </div>
               </LabelledValue>
             </div>

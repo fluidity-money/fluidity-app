@@ -34,7 +34,7 @@ const ProviderCard = ({ name, prize, avgPrize, size }: IProviderCard) => {
         {/* Provider Name */}
         <section className="card-section">
           <Heading className="card-token-name" as={"h5"}>
-            {name}
+            {name === "Fluidity" ? "Swapping fTokens" : name}
           </Heading>
           <Text>{numberToMonetaryString(avgPrize)} Avg prize/tx</Text>
         </section>

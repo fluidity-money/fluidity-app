@@ -35,12 +35,6 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
 };
 
-export const meta = () => {
-  return {
-    title: "Dashboard",
-  };
-};
-
 const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
   sender: "",
   receiver: "",
@@ -138,7 +132,7 @@ export default function Home() {
 
   const { address, connected } = useContext(FluidityFacadeContext);
 
-  const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
+  const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
 
   const [
     { count, transactions, rewards, volume, graphTransformedTransactions },
@@ -148,7 +142,7 @@ export default function Home() {
     transactions: Transaction[];
     rewards: number;
     volume: number;
-    graphTransformedTransactions: (Transaction & { x: number })[];
+    graphTransformedTransactions: Transaction[];
   }>({
     count: totalCount,
     transactions: totalTransactions,
@@ -169,12 +163,10 @@ export default function Home() {
   }, [totalCount, totalTransactions, totalRewards, totalVolume]);
 
   const binTransactions = (
-    bins: (Transaction & { x: number })[],
+    bins: Transaction[],
     txs: Transaction[]
-  ): (Transaction & { x: number })[] => {
-    const txMappedBins: (Transaction & { x: number })[][] = bins.map((bin) => [
-      bin,
-    ]);
+  ): Transaction[] => {
+    const txMappedBins: Transaction[][] = bins.map((bin) => [bin]);
 
     let binIndex = 0;
     for (let txIndex = 0; txIndex < txs.length; txIndex++) {
@@ -187,7 +179,7 @@ export default function Home() {
       }
       if (binIndex >= bins.length) break;
 
-      txMappedBins[binIndex].push({ ...tx, x: bins[binIndex].x });
+      txMappedBins[binIndex].push(tx);
     }
 
     const maxTxMappedBins = txMappedBins
@@ -199,7 +191,25 @@ export default function Home() {
       )
       .reverse();
 
-    return maxTxMappedBins;
+    const [txMappedBinsStart, ...rest] = maxTxMappedBins.filter(
+      (tx) => tx.value
+    );
+
+    if (!txMappedBinsStart) return maxTxMappedBins;
+
+    const txMappedBinsEnd = rest.pop();
+
+    const maxTxs = maxTxMappedBins.filter(
+      (tx, i) =>
+        tx.value ||
+        i === 0 ||
+        i === maxTxMappedBins.length - 1 ||
+        (tx.timestamp < txMappedBinsStart.timestamp &&
+          txMappedBinsEnd &&
+          tx.timestamp > txMappedBinsEnd.timestamp)
+    );
+
+    return maxTxs;
   };
 
   const graphTransformers = [
@@ -210,12 +220,9 @@ export default function Home() {
         const unixHourInc = 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(unixNow - (entries - i) * unixHourInc),
-            x: i + 1,
-          }))
-          .reverse();
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -229,14 +236,9 @@ export default function Home() {
         const unixEightHourInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(
-              unixNow - (entries - i) * unixEightHourInc
-            ),
-            x: i + 1,
-          }))
-          .reverse();
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -248,12 +250,9 @@ export default function Home() {
         const unixDayInc = 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(unixNow - (entries - i) * unixDayInc),
-            x: i + 1,
-          }))
-          .reverse();
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -265,14 +264,9 @@ export default function Home() {
         const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
         const unixNow = Date.now();
 
-        const mappedTxBins = Array.from({ length: entries })
-          .map((_, i) => ({
-            ...graphEmptyTransaction(
-              unixNow - (entries - i) * unixBimonthlyInc
-            ),
-            x: i + 1,
-          }))
-          .reverse();
+        const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+          ...graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc),
+        }));
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -469,31 +463,32 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
-              {/* Transactions Count */}
+              {/* Transactions Volume / Count */}
               <div className="statistics-set">
-                <Text>
-                  {activeTableFilterIndex ? "Your" : "Total"} transactions
-                </Text>
-                <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {count}
-                </Display>
+                {activeTableFilterIndex ? (
+                  <>
+                    <Text>Your transactions</Text>
+                    <Display
+                      size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                      style={{ margin: 0 }}
+                    >
+                      {count}
+                    </Display>
+                  </>
+                ) : (
+                  <>
+                    <Text>Total volume</Text>
+                    <Display
+                      size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                      style={{ margin: 0 }}
+                    >
+                      {numberToMonetaryString(volume)}
+                    </Display>
+                  </>
+                )}
                 <AnchorButton>
                   <a href="#transactions">Activity</a>
                 </AnchorButton>
-              </div>
-
-              {/* Volume */}
-              <div className="statistics-set">
-                <Text>{activeTableFilterIndex ? "Your" : "Total"} volume</Text>
-                <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {numberToMonetaryString(volume)}
-                </Display>
               </div>
 
               {/* Rewards */}
@@ -555,16 +550,19 @@ export default function Home() {
         {/* Graph */}
         <div className="graph" style={{ width: "100%", height: "400px" }}>
           <LineChart
-            data={graphTransformedTransactions}
+            data={graphTransformedTransactions.map((tx, i) => ({
+              ...tx,
+              x: i,
+            }))}
             lineLabel="transactions"
             accessors={{
               xAccessor: (d: Transaction & { x: number }) => d.x,
-              yAccessor: (d: Transaction & { x: number }) => d.value,
+              yAccessor: (d: Transaction & { x: number }) => d.value ? Math.log(d.value + 1) : 0,
             }}
             renderTooltip={({ datum }: { datum: Transaction }) => {
               return datum.value > 0 ? (
-                <div className={"tooltip-container"}>
-                  <div className={"tooltip"}>
+                <div className={"graph-tooltip-container"}>
+                  <div className={"graph-tooltip"}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
                       {format(datum.timestamp, "dd/MM/yy")}
                     </span>

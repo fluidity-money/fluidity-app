@@ -314,7 +314,6 @@ main {
 .video-container {
   width: inherit;
   height: inherit;
-  min-width: 300px;
   min-height: 300px;
   display: flex;
   align-items: center;
@@ -325,7 +324,7 @@ main {
 
 .video-container > video {
   width: 80vw;
-  max-width: 500px;
+  max-width: min(80vw, 80vh);
   mix-blend-mode: color-dodge;
 }
 
@@ -815,9 +814,7 @@ main {
 
 .swap-complete-container {
   background-color: black;
-  position: fixed;
   height: 100vh;
-  width: 100%;
   top: 0;
   display: flex;
   flex-direction: column;
@@ -849,7 +846,9 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -3em;
+  margin-top: -5em;
+  gap: 10px;
+  padding: 10px;
 }
 
 .swap-complete-modal-content > * {

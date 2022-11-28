@@ -6,7 +6,7 @@ import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
 import { format } from "date-fns";
-import { networkMapper } from "~/util";
+import { getAddressExplorerLink, networkMapper } from "~/util";
 import {
   Display,
   GeneralButton,
@@ -25,6 +25,7 @@ import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
+import { Chain } from "~/util/chainUtils/chains";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -63,6 +64,7 @@ export const loader: LoaderFunction = async () => {
     (prev, current) => ({
       ...prev,
       [current.winning_address]: {
+        network: current.network,
         transactionCount: current.transaction_count,
         totalWinnings: current.total_winnings,
       },
@@ -76,20 +78,22 @@ export const loader: LoaderFunction = async () => {
         ? largestWinner
         : winner
   );
-
   return json({
     highestRewards,
     winnerTotals,
     highestWinner: {
       address: largestWinnerEntries[0],
+      network: largestWinnerEntries[1].network,
       totalWinnings: largestWinnerEntries[1].totalWinnings,
       transactionCount: largestWinnerEntries[1].transactionCount,
     },
   });
+  
 };
 
 type WinnerWinnings = {
   [Address: string]: {
+    network: string;
     transactionCount: number;
     totalWinnings: number;
   };
@@ -105,6 +109,7 @@ type LoaderData = {
   highestRewards: HighestRewards;
   highestWinner: {
     address: string;
+    network: string;
     totalWinnings: number;
     transactionCount: number;
   };
@@ -202,13 +207,13 @@ export default function IndexPage() {
 
         <div className="disconnected">
           <div className="opportunity">
-            <div className="opportunity-top"></div>
             <div className="opportunity-bottom">
               <div className="opportunity-text">
                 {/* Highest Winner */}
                 {highestWinner.address && (
                   <Display className="opportunity-text-top" size={"xs"}>
                     <Text>
+                      <a href={getAddressExplorerLink(highestWinner.network as Chain, highestWinner.address)}>
                       <Text prominent>
                         {appendLeading0x(
                           trimAddressShort(
@@ -216,11 +221,12 @@ export default function IndexPage() {
                           )
                         )}
                       </Text>
+                      </a>
                       {" claimed "}
                       <Text prominent>
                         {numberToMonetaryString(highestWinner.totalWinnings)}
                       </Text>
-                      {` in fluid prizes over ${highestWinner.transactionCount} transactions.`}
+                      {` in fluid prizes over ${highestWinner.transactionCount} transaction${highestWinner.transactionCount > 1 ? "s" : ""}.`}
                     </Text>
                   </Display>
                 )}
@@ -260,7 +266,7 @@ export default function IndexPage() {
             />
           </Modal>
 
-          <div className="opportunity-graph">
+          <div className="opportunity-graph" style={{width: "100%", height: "400px"}}>
             <LineChart
               data={highestRewards}
               lineLabel="transactions"
