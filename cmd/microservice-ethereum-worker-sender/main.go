@@ -5,9 +5,11 @@
 package main
 
 import (
+	"context"
 	"os"
 	"strconv"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -254,5 +256,21 @@ func main() {
 
 			winners.AddRewardHashToPendingRewardType(rewardTransactionHash, sendTransactionHash, winnerAddress)
 		}
+
+		log.Debugf("Waiting for reward transaction to be mined...")
+
+		receipt, err := bind.WaitMined(context.Background(), ethClient, transactionHash)
+
+		if err != nil {
+			log.Fatal(func (k *log.Log) {
+				k.Message = "Error waiting for reward transaction to be mined!"
+				k.Payload = err
+			})
+		}
+
+		log.Debugf(
+			"Reward transaction mined in block %s!",
+			receipt.BlockNumber.String(),
+		)
 	})
 }
