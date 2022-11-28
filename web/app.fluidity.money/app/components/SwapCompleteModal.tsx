@@ -43,7 +43,7 @@ const SwapCompleteModal = ({
   txHash,
   error,
 }: ISwapCompleteModalProps) => {
-  const { balance } = useContext(FluidityFacadeContext);
+  const { balance, addToken } = useContext(FluidityFacadeContext);
 
   const [walletBalance, setWalletBalance] = useState<number | undefined>();
 
@@ -145,56 +145,14 @@ const SwapCompleteModal = ({
                   {numberToMonetaryString(walletBalance || 0)}) remaining in
                   wallet..
                 </Text>
-                <Link to="../../dashboard/home">
-                  <GeneralButton
-                    buttontype="text"
-                    size="medium"
-                    version="primary"
-                    handleClick={() => {
-                      return;
-                    }}
-                  >
-                    GO TO DASHBOARD
-                  </GeneralButton>
-                </Link>
-                <LinkButton
-                  type="internal"
-                  size="medium"
-                  handleClick={() => close()}
-                >
-                  FLUIDIFY MORE ASSETS
-                </LinkButton>
               </>
             )}
 
             {/* Transaction errored */}
             {confirmed && error && (
-              <>
-                <Heading as="h5">
-                  Something went wrong during the swap..
-                </Heading>
-                <Link to="../../dashboard/home">
-                  <GeneralButton
-                    buttontype="text"
-                    size="medium"
-                    version="primary"
-                    handleClick={() => {
-                      return;
-                    }}
-                  >
-                    GO TO DASHBOARD
-                  </GeneralButton>
-                </Link>
-                <Link to="..">
-                  <LinkButton
-                    type="internal"
-                    size="medium"
-                    handleClick={() => close()}
-                  >
-                    FLUIDIFY MORE ASSETS
-                  </LinkButton>
-                </Link>
-              </>
+              <Heading as="h5">
+                Something went wrong during the swap..
+              </Heading>
             )}
 
             {/* Unconfirmed transaction */}
@@ -205,31 +163,38 @@ const SwapCompleteModal = ({
                   swapping and awaiting confirmation...
                 </Heading>
                 <Text>We&apos;ll notify you when it&apos;s done!</Text>
-                <Link to="../../dashboard/home">
-                  <GeneralButton
-                    buttontype="text"
-                    size="medium"
-                    version="primary"
-                    handleClick={() => {
-                      return;
-                    }}
-                  >
-                    GO TO DASHBOARD
-                  </GeneralButton>
-                </Link>
-                <Link to="..">
-                  <LinkButton
-                    type="internal"
-                    size="medium"
-                    handleClick={() => {
-                      return;
-                    }}
-                  >
-                    FLUIDIFY MORE ASSETS
-                  </LinkButton>
-                </Link>
               </>
             )}
+            <LinkButton
+              type="internal"
+              size="medium"
+              handleClick={() => addToken?.(tokenPair.symbol)}
+            >
+              Add Token To Wallet
+            </LinkButton>
+            <Link to="../../dashboard/home">
+              <GeneralButton
+                buttontype="text"
+                size="medium"
+                version="primary"
+                handleClick={() => {
+                  return;
+                }}
+              >
+                GO TO DASHBOARD
+              </GeneralButton>
+            </Link>
+            <Link to="..">
+              <LinkButton
+                type="internal"
+                size="medium"
+                handleClick={() => {
+                  return;
+                }}
+              >
+                FLUIDIFY MORE ASSETS
+              </LinkButton>
+            </Link>
             <a href={getTxExplorerLink(network as Chain, txHash)}>
               <LinkButton
                 type="internal"

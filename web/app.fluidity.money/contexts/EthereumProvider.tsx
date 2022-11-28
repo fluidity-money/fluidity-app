@@ -223,19 +223,11 @@ const EthereumFacade = ({
 
     if (!token) return;
 
-    const fromFluid = !!token.isFluidOf;
-
-    const toToken = fromFluid
-      ? tokens.find((t) => t.address === token.isFluidOf)
-      : tokens.find((t) => t.isFluidOf === token.address);
-
-    if (!toToken) return;
-
     const watchToken = {
-      address: toToken.address,
-      symbol: toToken.symbol,
-      decimals: toToken.decimals,
-      image: toToken.logo,
+      address: token.address,
+      symbol: token.symbol,
+      decimals: token.decimals,
+      image: token.logo,
     };
 
     return connector?.watchAsset?.(watchToken);
