@@ -99,11 +99,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             : 0,
           hash: tx.hash,
           currency: tx.currency,
-          value:
-            tx.currency === "DAI" || tx.currency === "fDAI"
-              ? tx.value / 10 ** 12
-              : tx.value,
-          timestamp: tx.timestamp * 1000,
+          value: tx.value,
+          timestamp: tx.timestamp,
           logo: tokenLogoMap[tx.currency] || defaultLogo,
           provider:
             (network === "ethereum"
@@ -111,7 +108,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
               : winner?.solana_application) ?? "",
         };
       }) ?? [];
-
+    
     const totalRewards = mergedTransactions.reduce(
       (sum, { reward }) => sum + reward,
       0
