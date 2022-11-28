@@ -34,6 +34,7 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import config from "~/webapp.config.server";
 import { format } from "date-fns";
+import { Rewarders } from "~/util/rewardAggregates";
 
 export const unstable_shouldReload = () => false;
 
@@ -69,6 +70,7 @@ type ExLoaderData = {
   networkFee: number;
   gasFee: number;
   timestamp: number;
+  rewarders: Rewarders;
 };
 
 function ErrorBoundary() {
@@ -112,6 +114,12 @@ export default function Rewards() {
     networkFee: 0,
     gasFee: 0,
     timestamp: 0,
+    rewarders: {
+      week: [],
+      month: [],
+      year: [],
+      all: [],
+    },
   };
 
   const data: ExLoaderData = {
@@ -130,6 +138,7 @@ export default function Rewards() {
     totalRewarders,
     fluidTokenMap,
     timestamp,
+    rewarders,
   } = data;
 
   const {
