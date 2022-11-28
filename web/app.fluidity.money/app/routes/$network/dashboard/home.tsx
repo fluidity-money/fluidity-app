@@ -459,6 +459,11 @@ export default function Home() {
   return (
     <>
       <div className="pad-main" style={{ marginBottom: "12px" }}>
+        {isTablet && (
+          <Display size={"xs"} color="gray" className="dashboard-identifier">
+            {activeTableFilterIndex ? "My dashboard" : "Global dashboard"}
+          </Display>
+        )}
         <Text>
           {isFirstLoad
             ? "Loading data..."
@@ -533,9 +538,15 @@ export default function Home() {
 
           {/* Graph Filter Row */}
           <div>
-            <Display size="xs" color="gray">
-              {activeTableFilterIndex ? "My dashboard" : "Global dashboard"}
-            </Display>
+            {!isTablet && (
+              <Display
+                size={width < 1010 ? "xxs" : "xs"}
+                color="gray"
+                className="dashboard-identifier"
+              >
+                {activeTableFilterIndex ? "My dashboard" : "Global dashboard"}
+              </Display>
+            )}
             <div className="statistics-row">
               {graphTransformers.map((filter, i) => (
                 <button

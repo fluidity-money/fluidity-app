@@ -22,7 +22,13 @@ section#transactions {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
+  gap: 1em;
+}
+
+.dashboard-identifier {
+  margin-top: 0;
+  width: max-content;
 }
 
 .graph-ceiling > div:last-child {
@@ -42,6 +48,12 @@ section#transactions {
 
 .transaction-table {
   width: 100%;
+}
+
+@media (max-width: 850px) {
+  .graph-ceiling {
+    align-items: flex-end;
+  }
 }
 
 @media (max-width: 500px) {

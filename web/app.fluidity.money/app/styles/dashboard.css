@@ -158,6 +158,13 @@ main > footer > section {
   height: 16px;
 }
 
+.fluidify-button-dashboard-mobile {
+  position: fixed;
+  top: 92vh;
+  left: 50vw;
+  transform: translateX(-50%);
+}
+
 .selector-button {
   padding: 1px 2px;
 }
@@ -979,7 +986,7 @@ main > footer > section > a {
 
   #provide-liquidity {
     padding: 1em;
-    margin: 0 0 2em 0;
+    margin: 0 0.5em 2em;
   }
 
   .connect-wallet-modal-container {
@@ -998,5 +1005,9 @@ main > footer > section > a {
 
   .view-reward-main-modal {
     padding: 30px 0 0 0;
+  }
+
+  .transaction-filters {
+    margin-bottom: 1em;
   }
 }
