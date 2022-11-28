@@ -36,7 +36,7 @@ const ProviderCard = ({ name, prize, avgPrize, size }: IProviderCard) => {
           <Heading className="card-token-name" as={"h5"}>
             {name}
           </Heading>
-          <Text>{numberToMonetaryString(avgPrize)} Avg prize/trans</Text>
+          <Text>{numberToMonetaryString(avgPrize)} Avg prize/tx</Text>
         </section>
       </section>
 
