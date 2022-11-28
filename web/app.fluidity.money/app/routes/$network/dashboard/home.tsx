@@ -14,7 +14,6 @@ import {
   LinkButton,
   trimAddress,
   numberToMonetaryString,
-  Spinner,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useEffect } from "react";
@@ -66,6 +65,7 @@ type TransactionLoader = {
   totalVolume: number;
   fluidPairs: number;
   page: number;
+  timestamp: number;
 };
 
 function ErrorBoundary(error: Error) {
@@ -92,40 +92,39 @@ const SAFE_DEFAULT: TransactionLoader = {
   totalCount: 0,
   totalVolume: 0,
   fluidPairs: 0,
-  page: 0
-}
+  timestamp: 0,
+  page: 0,
+};
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
 
-  return json(
-    {
-      network
-    }
-    )
-  }
-  
-  export default function Home() {
-    const {
-      network,
-    } = useLoaderData<LoaderData>();
+  return json({
+    network,
+  });
+};
 
-    console.log(network)
+export default function Home() {
+  const { network } = useLoaderData<LoaderData>();
 
-    const { data: loaderData } = useCache<TransactionLoader>(`/${network}/query/dashboard/home`);
+  console.log(network);
 
-    const isFirstLoad = !loaderData;
+  const { data: loaderData } = useCache<TransactionLoader>(
+    `/${network}/query/dashboard/home`
+  );
 
-    const data = loaderData || SAFE_DEFAULT;
+  const isFirstLoad = !loaderData;
 
-    const {
-      totalTransactions,
-      totalCount,
-      totalRewards,
-      totalVolume,
-      fluidPairs,
-    } = data;
-  
+  const data = loaderData || SAFE_DEFAULT;
+
+  const {
+    totalTransactions,
+    totalCount,
+    totalRewards,
+    totalVolume,
+    fluidPairs,
+    timestamp,
+  } = data;
 
   const location = useLocation();
 
@@ -140,8 +139,6 @@ export const loader: LoaderFunction = async ({ params }) => {
   const { address, connected } = useContext(FluidityFacadeContext);
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
-
-
 
   const [
     { count, transactions, rewards, volume, graphTransformedTransactions },
@@ -168,13 +165,8 @@ export const loader: LoaderFunction = async ({ params }) => {
       rewards: totalRewards,
       volume: totalVolume,
       graphTransformedTransactions: [],
-    })
-  }, [
-    totalCount,
-    totalTransactions,
-    totalRewards,
-    totalVolume
-  ])
+    });
+  }, [totalCount, totalTransactions, totalRewards, totalVolume]);
 
   const binTransactions = (
     bins: (Transaction & { x: number })[],
@@ -465,11 +457,11 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   return (
     <>
-      <div className="pad-main" style={{ marginBottom: "12px"}}>
+      <div className="pad-main" style={{ marginBottom: "12px" }}>
         <Text>
-          { 
-            isFirstLoad ? "Loading data..." : `Last updated ${"TIMESTAMP"}`
-          }
+          {isFirstLoad
+            ? "Loading data..."
+            : `Last updated ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
         </Text>
       </div>
       <section id="graph">

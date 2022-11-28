@@ -33,6 +33,7 @@ import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import config from "~/webapp.config.server";
+import { format } from "date-fns";
 
 export const unstable_shouldReload = () => false;
 
@@ -45,14 +46,11 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const icons = config.provider_icons;
 
-  
-  return json(
-    {
-      network,
-      icons
-    }
-    )
-  }
+  return json({
+    network,
+    icons,
+  });
+};
 
 type LoaderData = {
   network: Chain;
@@ -71,6 +69,7 @@ type ExLoaderData = {
   fluidPairs: number;
   networkFee: number;
   gasFee: number;
+  timestamp: number;
 };
 
 function ErrorBoundary() {
@@ -96,9 +95,9 @@ function ErrorBoundary() {
 export default function Rewards() {
   const { network } = useLoaderData<LoaderData>();
 
-  const {
-    data: loaderData
-  } = useCache<ExLoaderData>(`/${network}/query/dashboard/home`);
+  const { data: loaderData } = useCache<ExLoaderData>(
+    `/${network}/query/dashboard/home`
+  );
 
   const defaultData = {
     icons: {},
@@ -113,12 +112,13 @@ export default function Rewards() {
     fluidPairs: 0,
     networkFee: 0,
     gasFee: 0,
-  }
+    timestamp: 0,
+  };
 
-  const data = {
+  const data: ExLoaderData = {
     ...defaultData,
-    ...loaderData
-  }
+    ...loaderData,
+  };
 
   const {
     fluidPairs,
@@ -131,6 +131,7 @@ export default function Rewards() {
     totalPrizePool,
     totalRewarders,
     fluidTokenMap,
+    timestamp,
   } = data;
 
   const { connected, address } = useContext(FluidityFacadeContext);
@@ -436,6 +437,8 @@ export default function Rewards() {
       );
     };
 
+  const isFirstLoad = !loaderData;
+
   return (
     <div className="pad-main">
       {/* Info Cards */}
@@ -501,6 +504,13 @@ export default function Rewards() {
 
       {/* Reward Performance */}
       <section id="performance">
+        <div style={{ marginBottom: "12px" }}>
+          <Text>
+            {isFirstLoad
+              ? "Loading data..."
+              : `Last updated ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+          </Text>
+        </div>
         <div className="statistics-row">
           <div className="statistics-set">
             <LabelledValue

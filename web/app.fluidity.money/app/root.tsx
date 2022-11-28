@@ -168,12 +168,12 @@ function App() {
       </head>
       <body>
         <CacheProvider>
-        <ToolProvider>
-          <Outlet />
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
-        </ToolProvider>
+          <ToolProvider>
+            <Outlet />
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </ToolProvider>
         </CacheProvider>
       </body>
     </html>
