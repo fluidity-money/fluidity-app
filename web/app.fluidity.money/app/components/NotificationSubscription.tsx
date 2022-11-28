@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "@remix-run/react";
 
 import { NotificationType, PipedTransaction } from "drivers/types";
+import { MintAddress } from "~/types/MintAddress";
 
 import { Token } from "~/util/chainUtils/tokens.js";
 import { ColorMap } from "~/webapp.config.server";
@@ -75,7 +76,7 @@ export const NotificationSubscription = ({
     const transactionUrl = explorer + `/tx/` + payload.transactionHash;
 
     const parseTrimAddress =
-      payload.source === `0x0000000000000000000000000000000000000000`
+      payload.source === MintAddress
         ? "Mint"
         : trimAddress(payload.source);
     toolTip.open(
