@@ -460,8 +460,12 @@ export default function Home() {
     <>
       <div className="pad-main" style={{ marginBottom: "12px" }}>
         {isTablet && (
-          <Display size={"xs"} color="gray" className="dashboard-identifier">
-            {activeTableFilterIndex ? "My dashboard" : "Global dashboard"}
+          <Display
+            size={isSmallMobile ? "xxs" : "xs"}
+            color="gray"
+            className="dashboard-identifier"
+          >
+            {`${activeTableFilterIndex ? "My" : "Global"} dashboard`}
           </Display>
         )}
         <Text>
@@ -544,7 +548,7 @@ export default function Home() {
                 color="gray"
                 className="dashboard-identifier"
               >
-                {activeTableFilterIndex ? "My dashboard" : "Global dashboard"}
+                {`${activeTableFilterIndex ? "My" : "Global"} dashboard`}
               </Display>
             )}
             <div className="statistics-row">
