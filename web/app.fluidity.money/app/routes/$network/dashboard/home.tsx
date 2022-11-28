@@ -542,9 +542,6 @@ export default function Home() {
                 </AnchorButton>
               </div>
 
-              {/* Volume */}
-              <div className="statistics-set"></div>
-
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
