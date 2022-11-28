@@ -157,8 +157,6 @@ export default function Rewards() {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  console.log("timestamp", timestamp);
-
   const [{ rewards, transactions, count }, setTransactions] = useState<{
     transactions: Transaction[];
     count: number;

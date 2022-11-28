@@ -101,8 +101,6 @@ export const loader: LoaderFunction = async ({ params }) => {
 export default function Home() {
   const { network } = useLoaderData<LoaderData>();
 
-  console.log(network);
-
   const { data: loaderData } = useCache<TransactionLoader>(
     `/${network}/query/dashboard/home`
   );
