@@ -406,7 +406,16 @@ export default function Rewards() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, winner, timestamp, value, reward, hash, rewardHash, logo } = data;
+      const {
+        sender,
+        winner,
+        timestamp,
+        value,
+        reward,
+        hash,
+        rewardHash,
+        logo,
+      } = data;
 
       return (
         <motion.tr
@@ -456,9 +465,7 @@ export default function Rewards() {
                 </Text>
               </a>
             ) : (
-              <Text>
-                -
-              </Text>
+              <Text>-</Text>
             )}
           </td>
 

@@ -425,9 +425,7 @@ export default function Home() {
                   </Text>
                 </a>
               ) : (
-                <Text>
-                  -
-                </Text>
+                <Text>-</Text>
               )}
             </td>
           )}
