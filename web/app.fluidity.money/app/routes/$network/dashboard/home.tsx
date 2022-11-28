@@ -1,12 +1,9 @@
 import type { Chain } from "~/util/chainUtils/chains";
-import type { UserTransaction } from "~/routes/$network/query/userTransactions";
-import type { Winner } from "~/queries/useUserRewards";
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
 
-import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
-import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { format } from "date-fns";
 import { MintAddress } from "~/types/MintAddress";
 import {
@@ -17,11 +14,11 @@ import {
   LinkButton,
   trimAddress,
   numberToMonetaryString,
+  Spinner,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useEffect } from "react";
 import { useLoaderData, useNavigate, useLocation } from "@remix-run/react";
-import { useUserRewardsAll } from "~/queries";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -31,111 +28,9 @@ import {
 } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
+import { useCache } from "~/hooks/useCache";
 
 export const unstable_shouldReload = () => false;
-
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const { network } = params;
-
-  const url = new URL(request.url);
-  const _pageStr = url.searchParams.get("page");
-  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
-  const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-
-  const fluidPairs = config.config[network ?? ""].fluidAssets.length;
-
-  try {
-    const {
-      transactions,
-      count,
-    }: { transactions: UserTransaction[]; count: number } = await (
-      await fetch(
-        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
-      )
-    ).json();
-
-    const { data, errors } = await useUserRewardsAll(network ?? "");
-
-    if (errors || !data) {
-      throw errors;
-    }
-
-    const winnersMap = data.winners.reduce(
-      (map, winner) => ({
-        ...map,
-        [winner.transaction_hash]: {
-          ...winner,
-        },
-      }),
-      {} as { [key: string]: Winner }
-    );
-
-    const {
-      config: {
-        [network as string]: { tokens },
-      },
-    } = config;
-
-    const tokenLogoMap = tokens.reduce(
-      (map, token) => ({
-        ...map,
-        [token.symbol]: token.logo,
-      }),
-      {} as Record<string, string>
-    );
-
-    const defaultLogo = "/assets/tokens/fUSDT.png";
-
-    const mergedTransactions: Transaction[] =
-      transactions?.map((tx) => {
-        const winner = winnersMap[tx.hash];
-
-        return {
-          sender: tx.sender,
-          receiver: tx.receiver,
-          winner: winner?.winning_address ?? "",
-          reward: winner
-            ? winner.winning_amount / 10 ** winner.token_decimals
-            : 0,
-          hash: tx.hash,
-          currency: tx.currency,
-          value:
-            tx.currency === "DAI" || tx.currency === "fDAI"
-              ? tx.value / 10 ** 12
-              : tx.value,
-          timestamp: tx.timestamp * 1000,
-          logo: tokenLogoMap[tx.currency] || defaultLogo,
-          provider:
-            (network === "ethereum"
-              ? winner?.ethereum_application
-              : winner?.solana_application) ?? "",
-        };
-      }) ?? [];
-
-    const totalRewards = mergedTransactions.reduce(
-      (sum, { reward }) => sum + reward,
-      0
-    );
-
-    const totalVolume = mergedTransactions.reduce(
-      (sum, { value }) => sum + value,
-      0
-    );
-
-    return json({
-      totalTransactions: mergedTransactions,
-      totalCount: count,
-      totalRewards,
-      totalVolume,
-      fluidPairs,
-      page,
-      network,
-    });
-  } catch (err) {
-    console.log(err);
-    throw new Error(`Could not fetch Transactions on ${network}: ${err}`);
-  } // Fail silently - for now.
-};
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
@@ -161,13 +56,16 @@ const graphEmptyTransaction = (time: number, value = 0): Transaction => ({
 });
 
 type LoaderData = {
+  network: Chain;
+};
+
+type TransactionLoader = {
   totalTransactions: Transaction[];
   totalRewards: number;
   totalCount: number;
   totalVolume: number;
   fluidPairs: number;
   page: number;
-  network: Chain;
 };
 
 function ErrorBoundary(error: Error) {
@@ -188,15 +86,46 @@ function ErrorBoundary(error: Error) {
   );
 }
 
-export default function Home() {
-  const {
-    network,
-    totalTransactions,
-    totalCount,
-    totalRewards,
-    totalVolume,
-    fluidPairs,
-  } = useLoaderData<LoaderData>();
+const SAFE_DEFAULT: TransactionLoader = {
+  totalTransactions: [],
+  totalRewards: 0,
+  totalCount: 0,
+  totalVolume: 0,
+  fluidPairs: 0,
+  page: 0
+}
+
+export const loader: LoaderFunction = async ({ params }) => {
+  const { network } = params;
+
+  return json(
+    {
+      network
+    }
+    )
+  }
+  
+  export default function Home() {
+    const {
+      network,
+    } = useLoaderData<LoaderData>();
+
+    console.log(network)
+
+    const { data: loaderData } = useCache<TransactionLoader>(`/${network}/query/dashboard/home`);
+
+    const isFirstLoad = !loaderData;
+
+    const data = loaderData || SAFE_DEFAULT;
+
+    const {
+      totalTransactions,
+      totalCount,
+      totalRewards,
+      totalVolume,
+      fluidPairs,
+    } = data;
+  
 
   const location = useLocation();
 
@@ -211,6 +140,8 @@ export default function Home() {
   const { address, connected } = useContext(FluidityFacadeContext);
 
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(1);
+
+
 
   const [
     { count, transactions, rewards, volume, graphTransformedTransactions },
@@ -228,6 +159,22 @@ export default function Home() {
     volume: totalVolume,
     graphTransformedTransactions: [],
   });
+
+  // WTF
+  useEffect(() => {
+    setTransactions({
+      count: totalCount,
+      transactions: totalTransactions,
+      rewards: totalRewards,
+      volume: totalVolume,
+      graphTransformedTransactions: [],
+    })
+  }, [
+    totalCount,
+    totalTransactions,
+    totalRewards,
+    totalVolume
+  ])
 
   const binTransactions = (
     bins: (Transaction & { x: number })[],
@@ -518,6 +465,13 @@ export default function Home() {
 
   return (
     <>
+      <div className="pad-main" style={{ marginBottom: "12px"}}>
+        <Text>
+          { 
+            isFirstLoad ? "Loading data..." : `Last updated ${"TIMESTAMP"}`
+          }
+        </Text>
+      </div>
       <section id="graph">
         <div className="graph-ceiling pad-main">
           {/* Statistics */}

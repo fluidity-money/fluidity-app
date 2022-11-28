@@ -1,8 +1,7 @@
 import type { Provider } from "~/components/ProviderCard";
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
-import type { Winner } from "~/queries/useUserRewards";
-import type { UserTransaction } from "~/routes/$network/query/userTransactions";
+
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
 
@@ -12,15 +11,11 @@ import {
   getAddressExplorerLink,
   getTxExplorerLink,
 } from "~/util";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import { motion } from "framer-motion";
-import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
-import config from "~/webapp.config.server";
+import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { captureException } from "@sentry/react";
-import { useUserUnclaimedRewards, useUserRewardsAll } from "~/queries";
+import { useUserUnclaimedRewards } from "~/queries";
 import { useLoaderData, useLocation } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -35,226 +30,36 @@ import {
 import { useContext, useEffect, useState, useMemo } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import { Table } from "~/components";
-import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
+import { useCache } from "~/hooks/useCache";
+import config from "~/webapp.config.server";
 
 export const unstable_shouldReload = () => false;
-
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const network = params.network ?? "";
-  const icons = config.provider_icons;
-  const fluidPairs = config.config[network ?? ""].fluidAssets.length;
-
-  const networkFee = 0.002;
-  const gasFee = 0.002;
-
-  const url = new URL(request.url);
-  const _pageStr = url.searchParams.get("page");
-  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
-  const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-
-  try {
-    const mainnetId = 0;
-    const infuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
-
-    const provider = new JsonRpcProvider(infuraRpc);
-
-    const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
-
-    const totalPrizePool = await getTotalPrizePool(
-      provider,
-      rewardPoolAddr,
-      RewardAbi
-    );
-
-    const {
-      transactions,
-      count,
-    }: { transactions: UserTransaction[]; count: number } = await (
-      await fetch(
-        `${url.origin}/${network}/query/userTransactions?page=${page}`
-      )
-    ).json();
-
-    const { data, errors } = await useUserRewardsAll(network ?? "");
-
-    if (errors || !data) {
-      throw errors;
-    }
-
-    const winnersMap = data.winners.reduce(
-      (map, winner) => ({
-        ...map,
-        [winner.transaction_hash]: {
-          ...winner,
-        },
-      }),
-      {} as { [key: string]: Winner }
-    );
-
-    const {
-      config: {
-        [network as string]: { tokens },
-      },
-    } = config;
-
-    const fluidTokenMap = tokens.reduce(
-      (map, token) =>
-        token.isFluidOf
-          ? {
-              ...map,
-              [token.symbol]: token.address,
-              [token.symbol.slice(1)]: token.address,
-            }
-          : map,
-      {}
-    );
-
-    const tokenLogoMap = tokens.reduce(
-      (map, token) => ({
-        ...map,
-        [token.symbol]: token.logo,
-      }),
-      {} as Record<string, string>
-    );
-
-    const defaultLogo = "/assets/tokens/usdt.svg";
-
-    const mergedTransactions: Transaction[] =
-      transactions
-        ?.filter((tx) => !!winnersMap[tx.hash])
-        .map((tx) => {
-          const winner = winnersMap[tx.hash];
-
-          return {
-            sender: tx.sender,
-            receiver: tx.receiver,
-            winner: winner.winning_address ?? "",
-            reward: winner
-              ? winner.winning_amount / 10 ** winner.token_decimals
-              : 0,
-            hash: tx.hash,
-            currency: tx.currency,
-            value:
-              tx.currency === "DAI" || tx.currency === "fDAI"
-                ? tx.value / 10 ** 12
-                : tx.value,
-            timestamp: tx.timestamp * 1000,
-            logo: tokenLogoMap[tx.currency] || defaultLogo,
-            provider:
-              (network === "ethereum"
-                ? winner.ethereum_application
-                : winner.solana_application) ?? "Fluidity",
-          };
-        }) ?? [];
-
-    const totalRewards = mergedTransactions.reduce(
-      (sum, { reward }) => sum + reward,
-      0
-    );
-
-    const { data: rewardData, errors: rewardErrors } =
-      await useGlobalRewardStatistics(network ?? "");
-
-    if (rewardErrors || !rewardData) {
-      throw errors;
-    }
-
-    // group rewaObject.values(totalTransactions
-    const totalRewarders = Object.values(
-      mergedTransactions.reduce((map, tx) => {
-        const provider = map[tx.provider];
-
-        return {
-          ...map,
-          [tx.provider]: provider
-            ? {
-                ...provider,
-                count: provider.count + 1,
-                prize: provider.prize + tx.reward,
-              }
-            : {
-                name: tx.provider,
-                count: 1,
-                prize: tx.reward,
-              },
-        };
-      }, {} as { [providerName: string]: { name: string; count: number; prize: number } })
-    )
-      .map(({ count, ...provider }) => ({
-        ...provider,
-        avgPrize: provider.prize / count,
-      }))
-      .sort(({ avgPrize: avgPrizeA }, { avgPrize: avgPrizeB }) =>
-        avgPrizeA > avgPrizeB ? 1 : avgPrizeA === avgPrizeB ? 0 : -1
-      ) as Provider[];
-
-    // Find highest Weekly Rewarder
-    const unixNow = Date.now();
-
-    const highestWeeklyRewarders = Object.values(
-      mergedTransactions
-        .filter(
-          ({ timestamp }) => timestamp >= unixNow - 7 * 24 * 60 * 60 * 1000
-        )
-        .reduce((map, tx) => {
-          const provider = map[tx.provider];
-
-          return {
-            ...map,
-            [tx.provider]: provider
-              ? {
-                  ...provider,
-                  count: provider.count + 1,
-                  prize: provider.prize + tx.reward,
-                }
-              : {
-                  name: tx.provider,
-                  count: 1,
-                  prize: tx.reward,
-                },
-          };
-        }, {} as { [providerName: string]: { name: string; count: number; prize: number } })
-    )
-      .map(({ count, ...provider }) => ({
-        ...provider,
-        avgPrize: provider.prize / count,
-      }))
-      .sort(({ avgPrize: avgPrizeA }, { avgPrize: avgPrizeB }) =>
-        avgPrizeA > avgPrizeB ? -1 : avgPrizeA === avgPrizeB ? 0 : 1
-      );
-
-    const highestWeeklyRewarder = highestWeeklyRewarders.length
-      ? highestWeeklyRewarders[0]
-      : undefined;
-
-    return json({
-      icons,
-      fluidTokenMap,
-      highestWeeklyRewarder,
-      page,
-      network,
-      fluidPairs,
-      totalTransactions: mergedTransactions,
-      totalCount: count,
-      totalRewards,
-      totalRewarders,
-      totalPrizePool,
-      networkFee,
-      gasFee,
-    });
-  } catch (err) {
-    console.log(err);
-    throw new Error(`Could not fetch Rewards on ${network}: ${err}`);
-  } // Fail silently - for now.
-};
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
 };
 
+export const loader: LoaderFunction = async ({ params }) => {
+  const { network } = params;
+
+  const icons = config.provider_icons;
+
+  
+  return json(
+    {
+      network,
+      icons
+    }
+    )
+  }
+
 type LoaderData = {
+  network: Chain;
   icons: { [provider: string]: string };
+};
+
+type ExLoaderData = {
   fluidTokenMap: { [tokenName: string]: string };
   highestWeeklyRewarder?: Provider;
   totalTransactions: Transaction[];
@@ -263,7 +68,6 @@ type LoaderData = {
   totalPrizePool: number;
   totalRewarders: Provider[];
   page: number;
-  network: Chain;
   fluidPairs: number;
   networkFee: number;
   gasFee: number;
@@ -290,9 +94,34 @@ function ErrorBoundary() {
 }
 
 export default function Rewards() {
+  const { network } = useLoaderData<LoaderData>();
+
+  const {
+    data: loaderData
+  } = useCache<ExLoaderData>(`/${network}/query/dashboard/home`);
+
+  const defaultData = {
+    icons: {},
+    fluidTokenMap: {},
+    highestWeeklyRewarder: undefined,
+    totalTransactions: [],
+    totalCount: 0,
+    totalRewards: 0,
+    totalPrizePool: 0,
+    totalRewarders: [],
+    page: 0,
+    fluidPairs: 0,
+    networkFee: 0,
+    gasFee: 0,
+  }
+
+  const data = {
+    ...defaultData,
+    ...loaderData
+  }
+
   const {
     fluidPairs,
-    network,
     networkFee,
     gasFee,
     highestWeeklyRewarder,
@@ -302,7 +131,7 @@ export default function Rewards() {
     totalPrizePool,
     totalRewarders,
     fluidTokenMap,
-  } = useLoaderData<LoaderData>();
+  } = data;
 
   const { connected, address } = useContext(FluidityFacadeContext);
 
@@ -399,7 +228,7 @@ export default function Rewards() {
             .filter(txTableFilters[1].filter)
             .reduce((sum, { reward }) => sum + reward, 0)
         : 0,
-    [address]
+    [address, loaderData]
   );
 
   const unixNow = Date.now();
@@ -481,7 +310,7 @@ export default function Rewards() {
         return;
       }
     })();
-  }, [connected, address]);
+  }, [connected, address, useLoaderData]);
 
   // Filter Transactions via rewards filter / tx type filters
   useEffect(() => {
@@ -532,7 +361,7 @@ export default function Rewards() {
       rewarders: filteredRewarders,
       transactions: userFilteredTransactions,
     });
-  }, [activeTableFilterIndex, activeRewardFilterIndex]);
+  }, [activeTableFilterIndex, activeRewardFilterIndex, loaderData]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
