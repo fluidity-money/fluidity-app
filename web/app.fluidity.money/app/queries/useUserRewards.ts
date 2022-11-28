@@ -10,6 +10,7 @@ const queryAll = gql`
       solana_winning_owner_address
       winning_address
       transaction_hash
+      send_transaction_hash
       winning_amount
       token_decimals
       ethereum_application
@@ -28,6 +29,7 @@ const queryByAddress = gql`
       solana_winning_owner_address
       winning_address
       transaction_hash
+      send_transaction_hash
       winning_amount
       token_decimals
       ethereum_application
@@ -78,6 +80,7 @@ export type Winner = {
   solana_winning_owner_address: string | null;
   winning_address: string | null;
   transaction_hash: string;
+  send_transaction_hash: string;
   winning_amount: number;
   token_decimals: number;
   ethereum_application?: string;
