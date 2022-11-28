@@ -136,11 +136,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
               : 0,
             hash: tx.hash,
             currency: tx.currency,
-            value:
-              tx.currency === "DAI" || tx.currency === "fDAI"
-                ? tx.value / 10 ** 12
-                : tx.value,
-            timestamp: tx.timestamp * 1000,
+            value: tx.value,
+            timestamp: tx.timestamp,
             logo: tokenLogoMap[tx.currency] || defaultLogo,
             provider:
               (network === "ethereum"
@@ -683,7 +680,9 @@ export default function Rewards() {
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
                   <ProviderIcon provider={bestPerformingRewarders[0].name} />
-                  {bestPerformingRewarders[0].name}
+                  {bestPerformingRewarders[0].name === "Fluidity"
+                    ? "Swapping fTokens"
+                    : bestPerformingRewarders[0].name}
                 </div>
               </LabelledValue>
             </div>
