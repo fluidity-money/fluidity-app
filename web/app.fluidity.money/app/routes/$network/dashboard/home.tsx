@@ -214,7 +214,7 @@ export default function Home() {
     transactions: Transaction[];
     rewards: number;
     volume: number;
-    graphTransformedTransactions: (Transaction & { x: number })[];
+    graphTransformedTransactions: Transaction[];
   }>({
     count: totalCount,
     transactions: totalTransactions,
@@ -224,10 +224,10 @@ export default function Home() {
   });
 
   const binTransactions = (
-    bins: (Transaction & { x: number })[],
+    bins: Transaction[],
     txs: Transaction[]
-  ): (Transaction & { x: number })[] => {
-    const txMappedBins: (Transaction & { x: number })[][] = bins.map((bin) => [
+  ): Transaction[] => {
+    const txMappedBins: Transaction[][] = bins.map((bin) => [
       bin,
     ]);
 
@@ -242,7 +242,7 @@ export default function Home() {
       }
       if (binIndex >= bins.length) break;
 
-      txMappedBins[binIndex].push({ ...tx, x: bins[binIndex].x });
+      txMappedBins[binIndex].push(tx);
     }
 
     const maxTxMappedBins = txMappedBins
@@ -253,8 +253,17 @@ export default function Home() {
           ) || bins[i]
       )
       .reverse();
+    
+    const [txMappedBinsStart, ...rest] = maxTxMappedBins
+      .filter((tx) => tx.value);
+    
+    if (!txMappedBinsStart) return maxTxMappedBins;
+    
+    const txMappedBinsEnd = rest.pop();
 
-    return maxTxMappedBins;
+    const maxTxs = maxTxMappedBins.filter((tx, i) => tx.value || i === 0 || i === maxTxMappedBins.length - 1 || (tx.timestamp < txMappedBinsStart.timestamp && txMappedBinsEnd && tx.timestamp > txMappedBinsEnd.timestamp))
+
+    return maxTxs;
   };
 
   const graphTransformers = [
@@ -267,10 +276,8 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries })
           .map((_, i) => ({
-            ...graphEmptyTransaction(unixNow - (entries - i) * unixHourInc),
-            x: i + 1,
+            ...graphEmptyTransaction(unixNow - (i + 1) * unixHourInc),
           }))
-          .reverse();
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -287,11 +294,9 @@ export default function Home() {
         const mappedTxBins = Array.from({ length: entries })
           .map((_, i) => ({
             ...graphEmptyTransaction(
-              unixNow - (entries - i) * unixEightHourInc
+              unixNow - (i + 1) * unixEightHourInc
             ),
-            x: i + 1,
           }))
-          .reverse();
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -305,10 +310,8 @@ export default function Home() {
 
         const mappedTxBins = Array.from({ length: entries })
           .map((_, i) => ({
-            ...graphEmptyTransaction(unixNow - (entries - i) * unixDayInc),
-            x: i + 1,
+            ...graphEmptyTransaction(unixNow - (i + 1) * unixDayInc),
           }))
-          .reverse();
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -323,11 +326,9 @@ export default function Home() {
         const mappedTxBins = Array.from({ length: entries })
           .map((_, i) => ({
             ...graphEmptyTransaction(
-              unixNow - (entries - i) * unixBimonthlyInc
+              unixNow - (i + 1) * unixBimonthlyInc
             ),
-            x: i + 1,
           }))
-          .reverse();
 
         return binTransactions(mappedTxBins, txs);
       },
@@ -603,7 +604,7 @@ export default function Home() {
         {/* Graph */}
         <div className="graph" style={{ width: "100%", height: "400px" }}>
           <LineChart
-            data={graphTransformedTransactions}
+            data={graphTransformedTransactions.map((tx, i) => ({...tx, x: i}))}
             lineLabel="transactions"
             accessors={{
               xAccessor: (d: Transaction & { x: number }) => d.x,
