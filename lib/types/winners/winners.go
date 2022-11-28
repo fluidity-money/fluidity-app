@@ -36,3 +36,14 @@ type Winner struct {
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }
+
+type BlockedWinner struct {
+	Network                 network.BlockchainNetwork  `json:"network"`
+	Token                   token_details.TokenDetails `json:"token"`
+	EthereumContractAddress string                     `json:"contract_address"`
+	RewardTransactionHash   string                     `json:"reward_transaction_hash"`
+	WinnerAddress           string                     `json:"winner_address"`
+	WinningAmount           misc.BigInt                `json:"winning_amount"`
+	BatchFirstBlock         misc.BigInt                `json:"first_block"`
+	BatchLastBlock          misc.BigInt                `json:"last_block"`
+}

@@ -6,6 +6,7 @@ import {
   GeneralButton,
   Heading,
   LinkButton,
+  Twitter,
 } from "@fluidity-money/surfing";
 import BloomEffect from "./BloomEffect";
 import useViewport from "~/hooks/useViewport";
@@ -38,6 +39,22 @@ export const ViewRewardModal = ({
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const { width } = useViewport();
   const isMobile = width < 500 && width > 0;
+
+  const generateTweet = () => {
+    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
+
+    // const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
+
+    const tweetMsg = `Fluidify your money with Fluidity`;
+
+    twitterUrl.searchParams.set("text", tweetMsg);
+
+    const fluTwitterHandle = `fluiditymoney`;
+
+    twitterUrl.searchParams.set("via", fluTwitterHandle);
+
+    return twitterUrl.href;
+  };
 
   useEffect(() => {
     setModal(
@@ -120,6 +137,24 @@ export const ViewRewardModal = ({
               >
                 WINNINGS BREAKDOWN
               </GeneralButton>
+              <a
+                href={generateTweet()}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <GeneralButton
+                  className="share-button"
+                  size="large"
+                  version="transparent"
+                  buttontype="icon before"
+                  icon={<Twitter />}
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  SHARE
+                </GeneralButton>
+              </a>
             </div>
           </div>
         </>,

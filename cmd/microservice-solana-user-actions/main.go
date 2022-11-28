@@ -187,7 +187,8 @@ func main() {
 					})
 
 					if payoutWasBlocked {
-						queue.SendMessage(winners.TopicBlockedWinnersSolana, winner1)
+						blockedPayout := convertBlockedPayout(winner1)
+						queue.SendMessage(winners.TopicBlockedWinnersSolana, blockedPayout)
 					} else {
 						queue.SendMessage(winners.TopicWinnersSolana, winner1)
 					}
@@ -199,7 +200,8 @@ func main() {
 					})
 
 					if payoutWasBlocked {
-						queue.SendMessage(winners.TopicBlockedWinnersSolana, winner2)
+						blockedPayout := convertBlockedPayout(winner2)
+						queue.SendMessage(winners.TopicBlockedWinnersSolana, blockedPayout)
 					} else {
 						queue.SendMessage(winners.TopicWinnersSolana, winner2)
 					}

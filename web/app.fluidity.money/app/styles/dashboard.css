@@ -604,8 +604,9 @@ main > footer > section > a {
   color: black;
 }
 
-.unclaimed-button:hover > span > div > img {
-  fill: black;
+.unclaimed-button:hover > div > img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
 }
 
 .unclaimed-button > span {
@@ -670,13 +671,33 @@ main > footer > section > a {
 
 .connected-wallet-modal-container {
   position: absolute;
-  width: 30%;
-  min-width: 350px;
+  width: 100%;
+  height: 100%;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  background-color: transparent;
+}
+
+.connected-wallet-modal-container > div:last-child {
+  width: 30%;
+  min-width: 350px;
   background-color: rgb(29, 23, 23);
   padding: 30px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.connected-wallet-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(3, 3, 3, 0.8);
 }
 
 .connected-wallet-modal-body {
@@ -819,6 +840,10 @@ main > footer > section > a {
 .view-reward-modal-token-title-size {
   margin-bottom: 20px;
   font-size: 32px;
+}
+
+.view-reward-modal-breakdown-btn {
+  margin-bottom: 17px;
 }
 
 .view-reward-modal-token {

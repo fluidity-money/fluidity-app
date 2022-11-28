@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "@remix-run/react";
 
 import { NotificationType, PipedTransaction } from "drivers/types";
+import { MintAddress } from "~/types/MintAddress";
 
 import { Token } from "~/util/chainUtils/tokens.js";
 import { ColorMap } from "~/webapp.config.server";
@@ -67,22 +68,28 @@ export const NotificationSubscription = ({
   };
 
   const handleClientListener = (payload: PipedTransaction) => {
-    const imgUrl = tokens?.at(0)?.logo !== undefined ? tokens?.at(0)?.logo : "";
-    const tokenColour = colorMap[tokens?.at(0)?.symbol as unknown as string];
+    const _token = tokens.find((token) => token.symbol === payload.token);
+
+    const imgUrl = _token?.logo;
+    const tokenColour = colorMap[payload.token as unknown as string];
 
     const transactionUrl = explorer + `/tx/` + payload.transactionHash;
 
+    const parseTrimAddress =
+      payload.source === MintAddress
+        ? "Mint"
+        : trimAddress(payload.source);
     toolTip.open(
       tokenColour,
       <ToolTipContent
-        tokenLogoSrc={tokens.at(0)?.logo}
+        tokenLogoSrc={_token?.logo}
         boldTitle={payload.amount + ` ` + payload.token}
         details={
           payload.type === NotificationType.REWARD_DATABASE
             ? payload.rewardType === `send`
               ? `reward for s͟e͟n͟d͟i͟n͟g`
               : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
-            : `r͟e͟c͟e͟i͟v͟e͟d from ` + trimAddress(payload.source)
+            : `r͟e͟c͟e͟i͟v͟e͟d from ` + parseTrimAddress
         }
         linkLabel={"DETAILS"}
         linkLabelOnClickCallback={async () => {
@@ -95,7 +102,7 @@ export const NotificationSubscription = ({
                 winAmount: payload.amount,
                 explorerUri: transactionUrl,
                 balance: String(
-                  await balance?.(tokens.at(0)?.address as unknown as string)
+                  await balance?.(_token?.address as unknown as string)
                 ),
                 forSending: payload.rewardType === `send` ? true : false,
               })
