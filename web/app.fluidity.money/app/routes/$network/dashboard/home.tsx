@@ -514,32 +514,36 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
-              {/* Transactions Count */}
+              {/* Transactions Volume / Count */}
               <div className="statistics-set">
-                <Text>
-                  {activeTableFilterIndex ? "Your" : "Total"} transactions
-                </Text>
-                <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {count}
-                </Display>
+                {activeTableFilterIndex ? (
+                  <>
+                    <Text>Your transactions</Text>
+                    <Display
+                      size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                      style={{ margin: 0 }}
+                    >
+                      {count}
+                    </Display>
+                  </>
+                ) : (
+                  <>
+                    <Text>Total volume</Text>
+                    <Display
+                      size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                      style={{ margin: 0 }}
+                    >
+                      {numberToMonetaryString(volume)}
+                    </Display>
+                  </>
+                )}
                 <AnchorButton>
                   <a href="#transactions">Activity</a>
                 </AnchorButton>
               </div>
 
               {/* Volume */}
-              <div className="statistics-set">
-                <Text>{activeTableFilterIndex ? "Your" : "Total"} volume</Text>
-                <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {numberToMonetaryString(volume)}
-                </Display>
-              </div>
+              <div className="statistics-set"></div>
 
               {/* Rewards */}
               <div className="statistics-set">
