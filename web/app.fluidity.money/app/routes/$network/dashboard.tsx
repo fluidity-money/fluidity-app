@@ -499,7 +499,7 @@ export default function Dashboard() {
             className="fluidify-button-dashboard-mobile"
             version={"primary"}
             buttontype="text"
-            size={"small"}
+            size={"medium"}
             handleClick={() => navigate("../fluidify")}
           >
             <b>FLUIDIFY MONEY</b>

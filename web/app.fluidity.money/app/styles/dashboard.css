@@ -156,9 +156,8 @@ main > footer > section {
 
 .fluidify-button-dashboard-mobile {
   position: fixed;
-  top: 92vh;
-  left: 50vw;
-  transform: translateX(-50%);
+  bottom: 2vh;
+  right: 5vw;
 }
 
 .selector-button {
