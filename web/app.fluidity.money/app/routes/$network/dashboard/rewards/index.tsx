@@ -539,7 +539,7 @@ export default function Rewards() {
       )}
       <div className="reward-ceiling">
         <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
-          Reward Performance
+          {activeTableFilterIndex ? "Your" : "Global"} Reward Performance
         </Heading>
 
         <div className="filter-row">

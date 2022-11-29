@@ -323,7 +323,7 @@ export default function Home() {
         {
           filter: ({ sender, receiver }: Transaction) =>
             [sender, receiver].includes(address),
-          name: "YOUR DASHBOARD",
+          name: "MY DASHBOARD",
         },
       ]
     : [
@@ -459,6 +459,15 @@ export default function Home() {
   return (
     <>
       <div className="pad-main" style={{ marginBottom: "12px" }}>
+        {isTablet && (
+          <Display
+            size={isSmallMobile ? "xxs" : "xs"}
+            color="gray"
+            className="dashboard-identifier"
+          >
+            {`${activeTableFilterIndex ? "My" : "Global"} dashboard`}
+          </Display>
+        )}
         <Text>
           {isFirstLoad
             ? "Loading data..."
@@ -474,7 +483,7 @@ export default function Home() {
               <div className="statistics-set">
                 {activeTableFilterIndex ? (
                   <>
-                    <Text>Your transactions</Text>
+                    <Text>My transactions</Text>
                     <Display
                       size={width < 300 && width > 0 ? "xxxs" : "xs"}
                       style={{ margin: 0 }}
@@ -500,7 +509,7 @@ export default function Home() {
 
               {/* Rewards */}
               <div className="statistics-set">
-                <Text>{activeTableFilterIndex ? "Your" : "Total"} yield</Text>
+                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
                   size={width < 300 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
@@ -533,6 +542,15 @@ export default function Home() {
 
           {/* Graph Filter Row */}
           <div>
+            {!isTablet && (
+              <Display
+                size={width < 1010 ? "xxs" : "xs"}
+                color="gray"
+                className="dashboard-identifier"
+              >
+                {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
+              </Display>
+            )}
             <div className="statistics-row">
               {graphTransformers.map((filter, i) => (
                 <button
@@ -540,7 +558,7 @@ export default function Home() {
                   onClick={() => setActiveTransformerIndex(i)}
                 >
                   <Text
-                    size="xl"
+                    size="lg"
                     prominent={activeTransformerIndex === i}
                     className={
                       activeTransformerIndex === i ? "active-filter" : ""
