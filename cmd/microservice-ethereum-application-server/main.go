@@ -112,9 +112,22 @@ func main() {
 	worker.GetEthereumBlockLogs(func(blockLog worker.EthereumBlockLog) {
 		var (
 			logs         = blockLog.Logs
-			transactions = blockLog.Transactions
+			transactions_ = blockLog.Transactions
 			blockHash    = blockLog.BlockHash
 		)
+
+		transactions, err := libEthereum.FilterTransactions(transactions_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to filter high risk transactions in block %#v!",
+					blockHash,
+				)
+
+				k.Payload = err
+			})
+		}
 
 		fluidTransfers := libEthereum.GetTransfers(
 			logs,
