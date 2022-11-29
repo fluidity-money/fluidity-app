@@ -1,4 +1,5 @@
 import { setTimeout } from "timers/promises";
+import { captureException } from "@sentry/remix";
 import { Observable } from "rxjs";
 
 import IERC20 from "@openzeppelin/contracts/build/contracts/IERC20.json";
@@ -47,11 +48,19 @@ const onListen = (token: string, address: string, network = 0) =>
           subscriber.next(transaction);
         }
       )
-      .on("error", async () => {
+      .on("error", async (error: unknown) => {
         // On websockets errors sleep for a while and do a manual instatiation of listening again
-        console.error(
-          "Error on ethereum driver listener ... failed to reconect. retrying in 5 seconds"
-        ); // Server logged message
+        captureException(
+          new Error(
+            `Error on ethereum driver listener ... failed to reconect. retrying in 5 seconds :: ${error}`
+          ),
+          {
+            tags: {
+              section: "drivers/ethereum",
+            },
+          }
+        );
+  
         await setTimeout(5000);
         onListen(token, address, network);
       });
