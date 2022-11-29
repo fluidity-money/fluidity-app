@@ -18,14 +18,16 @@ const getTransactionsObservableForIn = (
   ...tokens: {
     token: string;
     address: string;
+    decimals: number;
   }[]
 ) => {
   const { network } = { ...OptionsDefault, ...options };
   return merge(
-    ...tokens.map(({ token, address }) =>
-      protocol === `ethereum`
-        ? ethGetTransactionsObservable(token, address, network)
-        : solGetTransactionsObservable(token, address, network)
+    ...tokens.map(
+      ({ token, address, decimals }) =>
+        protocol === `ethereum`
+          ? ethGetTransactionsObservable(token, address, decimals, network)
+          : solGetTransactionsObservable(token, address, network) // solana doesn't really need decimals from app config. it can be deduced from onchain meta-data
     )
   );
 };
