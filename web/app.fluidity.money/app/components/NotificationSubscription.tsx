@@ -92,7 +92,6 @@ export const NotificationSubscription = ({
 
     const transactionUrl = explorer + `/tx/` + payload.transactionHash;
 
-    console.log("yasdjfka jfklsajfkls fREAL MONEY hehehhehe: " + rawAddress);
     toolTip.open(
       tokenColour,
       <ToolTipContent
