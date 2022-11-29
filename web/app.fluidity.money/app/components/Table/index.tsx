@@ -1,6 +1,6 @@
 import { Link, useTransition } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Text } from "@fluidity-money/surfing";
+import { GeneralButton, Text } from "@fluidity-money/surfing";
 
 type Filter<T> = {
   filter: (item: T) => boolean; // eslint-disable-line no-unused-vars
@@ -69,32 +69,46 @@ const Table = <T,>(props: ITable<T>) => {
 
   return (
     <div>
-      <div className="transactions-header row justify-between">
+      <div className="transactions-header">
+        {/* Filters*/}
+        {filters && (
+          <div className={"transaction-filters"}>
+            {filters.map((filter, i) => (
+              // <button
+              //   key={`filter-${filter.name}`}
+              //   onClick={() => onFilter?.(i)}
+              // >
+              //   <Text
+              //     size="lg"
+              //     prominent={activeFilterIndex === i}
+              //     className={activeFilterIndex === i ? "active-filter" : ""}
+              //   >
+              //     {filter.name}
+              //   </Text>
+              // </button>
+              <GeneralButton
+                key={`filter-${filter.name}`}
+                version={"secondary"}
+                buttontype="text"
+                size={"medium"}
+                handleClick={() => onFilter?.(i)}
+                className={
+                  activeFilterIndex === i
+                    ? "active-filter-btn"
+                    : "inactive-filter-btn"
+                }
+              >
+                {filter.name}
+              </GeneralButton>
+            ))}
+          </div>
+        )}
+
         {/* Item Count */}
         <Text>
           {data.length > 0 ? `${startIndex} - ${endIndex}` : 0} of {data.length}{" "}
           {itemName}
         </Text>
-
-        {/* Filters*/}
-        {filters && (
-          <div className={"transaction-filters"}>
-            {filters.map((filter, i) => (
-              <button
-                key={`filter-${filter.name}`}
-                onClick={() => onFilter?.(i)}
-              >
-                <Text
-                  size="lg"
-                  prominent={activeFilterIndex === i}
-                  className={activeFilterIndex === i ? "active-filter" : ""}
-                >
-                  {filter.name}
-                </Text>
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Table */}

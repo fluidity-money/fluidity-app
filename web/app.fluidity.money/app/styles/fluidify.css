@@ -250,6 +250,7 @@ main {
   background: transparent;
   border: none;
   font-size: 20px;
+  outline: none;
 }
 
 .fluidify-input-container:last-child {
@@ -348,6 +349,7 @@ main {
   color: white;
   font-size: 20px;
   line-height: 120%;
+  outline: none;
 }
 
 /* blah */
@@ -562,6 +564,7 @@ main {
 .mobile-navbar-right {
   display: flex;
   gap: 1em;
+  align-items: center;
 }
 
 .mobile-modal-content {

@@ -33,9 +33,9 @@ main {
   padding: 0 64px;
 }
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 850px) {
   .pad-main {
-    padding: 0 24px;
+    padding: 0 20px;
   }
 }
 
@@ -51,10 +51,6 @@ main > nav > div {
   display: flex;
   gap: 1em;
   align-items: center;
-}
-
-main > nav a {
-  margin: 0 10px;
 }
 
 main > footer {
@@ -158,6 +154,13 @@ main > footer > section {
   height: 16px;
 }
 
+.fluidify-button-dashboard-mobile {
+  position: fixed;
+  bottom: 2vh;
+  left: 50vw;
+  transform: translateX(-50%);
+}
+
 .selector-button {
   padding: 1px 2px;
 }
@@ -181,6 +184,7 @@ main > footer > section > a {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  flex-direction: row-reverse;
 }
 
 .active-filter {
@@ -189,8 +193,21 @@ main > footer > section > a {
   text-underline-offset: 0.4em;
 }
 
+.inactive-filter-btn {
+  border: 0.5px solid #828381;
+  color: #828381;
+}
+
+.active-filter-btn {
+  border: 1px solid #e6c5e3;
+}
+
 .transactions-header {
   margin-bottom: 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
 }
 
 .transaction-table {
@@ -556,6 +573,7 @@ main > footer > section > a {
 .mobile-navbar-right {
   display: flex;
   gap: 1em;
+  align-items: center;
 }
 
 .mobile-modal-content {
@@ -967,7 +985,7 @@ main > footer > section > a {
 
   #provide-liquidity {
     padding: 1em;
-    margin: 0 0 2em 0;
+    margin: 0 0.5em 2em;
   }
 
   .connect-wallet-modal-container {
@@ -986,5 +1004,9 @@ main > footer > section > a {
 
   .view-reward-main-modal {
     padding: 30px 0 0 0;
+  }
+
+  .transaction-filters {
+    margin-bottom: 1em;
   }
 }

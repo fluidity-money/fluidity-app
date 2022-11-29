@@ -539,7 +539,7 @@ export default function Rewards() {
       )}
       <div className="reward-ceiling">
         <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
-          Reward Performance
+          {activeTableFilterIndex ? "Your" : "Global"} Reward Performance
         </Heading>
 
         <div className="filter-row">
@@ -586,7 +586,7 @@ export default function Rewards() {
                 <div className="highest-performer-child">
                   <ProviderIcon provider={bestPerformingRewarders[0].name} />
                   {bestPerformingRewarders[0].name === "Fluidity"
-                    ? "Swapping fTokens"
+                    ? "Transacting fAssets"
                     : bestPerformingRewarders[0].name}
                 </div>
               </LabelledValue>
