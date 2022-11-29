@@ -97,7 +97,7 @@ export default function Rewards() {
   const { network } = useLoaderData<LoaderData>();
 
   const { data: loaderData } = useCache<ExLoaderData>(
-    `/${network}/query/dashboard/home`
+    `/${network}/query/dashboard/rewards`
   );
 
   const defaultData = {
@@ -406,7 +406,16 @@ export default function Rewards() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, winner, timestamp, value, reward, hash, logo } = data;
+      const {
+        sender,
+        winner,
+        timestamp,
+        value,
+        reward,
+        hash,
+        rewardHash,
+        logo,
+      } = data;
 
       return (
         <motion.tr
@@ -446,9 +455,18 @@ export default function Rewards() {
 
           {/* Reward */}
           <td>
-            <Text prominent={true}>
-              {reward ? numberToMonetaryString(reward) : "-"}
-            </Text>
+            {reward ? (
+              <a
+                className="table-address"
+                href={getTxExplorerLink(network, rewardHash)}
+              >
+                <Text prominent={true}>
+                  {reward ? numberToMonetaryString(reward) : "-"}
+                </Text>
+              </a>
+            ) : (
+              <Text>-</Text>
+            )}
           </td>
 
           {/* Winner */}
@@ -521,7 +539,7 @@ export default function Rewards() {
       )}
       <div className="reward-ceiling">
         <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
-          Reward Performance
+          {activeTableFilterIndex ? "Your" : "Global"} Reward Performance
         </Heading>
 
         <div className="filter-row">

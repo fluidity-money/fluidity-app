@@ -426,15 +426,17 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify */}
-            <GeneralButton
-              className="fluidify-button-dashboard"
-              version={"primary"}
-              buttontype="text"
-              size={"small"}
-              handleClick={() => navigate("../fluidify")}
-            >
-              <b>Fluidify</b>
-            </GeneralButton>
+            {!isMobile && (
+              <GeneralButton
+                className="fluidify-button-dashboard"
+                version={"primary"}
+                buttontype="text"
+                size={"small"}
+                handleClick={() => navigate("../fluidify")}
+              >
+                <b>Fluidify Money</b>
+              </GeneralButton>
+            )}
 
             {/* Prize Money */}
             <GeneralButton
@@ -457,7 +459,7 @@ export default function Dashboard() {
             </GeneralButton>
 
             {/* Modal on hover */}
-            {(hoverModal || showModal) && (
+            {(hoverModal || showModal) && !isMobile && (
               <UnclaimedRewardsHoverModal
                 unclaimedRewards={unclaimedRewards}
                 setShowModal={setShowModal}
@@ -488,11 +490,26 @@ export default function Dashboard() {
 
         <Outlet />
 
+        {/* Provide Luquidity*/}
+        {!openMobModal && <ProvideLiquidity />}
+
+        {/* Mobile fluidify button */}
+        {isMobile && (
+          <GeneralButton
+            className="fluidify-button-dashboard-mobile"
+            version={"primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={() => navigate("../fluidify")}
+          >
+            <b>FLUIDIFY MONEY</b>
+          </GeneralButton>
+        )}
+
         {/* Mobile Menu Modal */}
         {openMobModal && (
           <MobileModal
             navigationMap={navigationMap.map((obj) => {
-              // I love type inconsistency
               const { name, icon } = Object.values(obj)[0];
               return { name, icon };
             })}
@@ -505,9 +522,6 @@ export default function Dashboard() {
             unclaimedRewards={unclaimedRewards}
           />
         )}
-
-        {/* Provide Luquidity*/}
-        {!openMobModal && <ProvideLiquidity />}
 
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
