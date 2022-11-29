@@ -1,21 +1,13 @@
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
-import config, { colors } from "~/webapp.config.server";
-import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
-import { json, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
 import useViewport from "~/hooks/useViewport";
-import {
-  userMintLimitedEnabled,
-  getUsdUserMintLimit,
-} from "~/util/chainUtils/ethereum/transaction";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { JsonRpcProvider } from "@ethersproject/providers";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
@@ -33,111 +25,10 @@ import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
 import SwapCompleteModal from "~/components/SwapCompleteModal";
 import { captureException } from "@sentry/react";
-
-export const loader: LoaderFunction = async ({ params }) => {
-  const { network } = params;
-
-  if (!network) throw new Error("Network not found");
-
-  const ethereumWallets = config.config["ethereum"].wallets;
-
-  const {
-    config: {
-      [network as string]: { tokens },
-    },
-  } = config;
-
-  if (network === "ethereum") {
-    const mainnetId = 0;
-
-    const {
-      drivers: {
-        ethereum: {
-          [mainnetId]: {
-            rpc: { http: infuraUri },
-          },
-        },
-      },
-    } = config;
-
-    const provider = new JsonRpcProvider(infuraUri);
-
-    const augmentedTokens: AugmentedToken[] = await Promise.all(
-      tokens.map(async (token) => {
-        const { isFluidOf, address } = token;
-
-        // Reverting has no mint limits
-        if (isFluidOf) {
-          return {
-            ...token,
-            userMintLimit: undefined,
-            userTokenBalance: 0,
-          };
-        }
-
-        const fluidPair = tokens.find(({ isFluidOf }) => isFluidOf === address);
-
-        if (!fluidPair)
-          throw new Error(`Could not find fluid Pair of ${token.name}`);
-
-        const mintLimitEnabled = await userMintLimitedEnabled(
-          provider,
-          fluidPair.address,
-          tokenAbi
-        );
-
-        const userMintLimit = mintLimitEnabled
-          ? await getUsdUserMintLimit(provider, fluidPair.address, tokenAbi)
-          : undefined;
-
-        return {
-          ...token,
-          userMintLimit: userMintLimit,
-          userTokenBalance: 0,
-        };
-      })
-    );
-
-    return json({
-      network,
-      tokens: augmentedTokens,
-      ethereumWallets,
-      colors: (await colors)[network as string],
-    });
-  }
-
-  // Network === "solana"
-  const augmentedTokens = await Promise.all(
-    tokens.map(async (token) => {
-      const { isFluidOf } = token;
-      // const { name, symbol } = token;
-
-      const mintLimit = isFluidOf
-        ? // ?await userMintLimit(name)
-          undefined
-        : undefined;
-
-      const tokensMinted = mintLimit
-        ? // ?await userAmountMinted(symbol)
-          0
-        : 0;
-
-      return {
-        ...token,
-        userMintLimit: mintLimit,
-        userMintedAmt: tokensMinted,
-        userTokenBalance: 0,
-      };
-    })
-  );
-
-  return json({
-    network,
-    tokens: augmentedTokens,
-    ethereumWallets,
-    colors: (await colors)[network as string],
-  });
-};
+import { json, LoaderFunction } from "@remix-run/node";
+import { useCache } from "~/hooks/useCache";
+import { Chain } from "~/util/chainUtils/chains";
+import config from "~/webapp.config.server";
 
 type LoaderData = {
   network: string;
@@ -145,6 +36,17 @@ type LoaderData = {
   colors: {
     [symbol: string]: string;
   };
+};
+
+export const loader: LoaderFunction = async ({ params }) => {
+  const { network } = params;
+
+  const ethereumWallets = config.config["ethereum"].wallets;
+
+  return json({
+    ethereumWallets,
+    network,
+  });
 };
 
 function ErrorBoundary(error: unknown) {
@@ -167,7 +69,19 @@ function ErrorBoundary(error: unknown) {
 }
 
 export default function FluidifyToken() {
-  const { tokens: tokens_, colors, network } = useLoaderData<LoaderData>();
+  const { network } = useLoaderData<{ network: Chain }>();
+  const { data: loaderData } = useCache<LoaderData>(
+    `/${network}/query/fluidify`
+  );
+
+  const defaultData: LoaderData = {
+    tokens: [],
+    colors: {},
+    network: network,
+  };
+
+  const { tokens: tokens_, colors } = loaderData || defaultData;
+
   const {
     address,
     rawAddress,

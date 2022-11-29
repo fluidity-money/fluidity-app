@@ -4,6 +4,7 @@ type Transaction = {
   winner: string;
   reward: number;
   hash: string;
+  rewardHash: string;
   // timestamp is the Unix time, in seconds
   timestamp: number;
   value: number;

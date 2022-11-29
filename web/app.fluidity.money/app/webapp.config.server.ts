@@ -116,8 +116,6 @@ const options = OptionsSchema.parse(
 export type ColorMap = { [network: string]: { [symbol: string]: string } };
 
 const getColors = async () => {
-  console.log("🎨 Getting colors from icons... Just sit tight for a moment.");
-
   const networks = [];
   for (const network of Object.keys(options.config)) {
     const tokenColors = [];
@@ -144,7 +142,6 @@ const getColors = async () => {
     });
   }
 
-  console.log("🖍️ Done getting colors from icons!");
   return networks.reduce<ColorMap>(
     (acc: { [i: string]: { [i: string]: string } }, { network, colorsMap }) => {
       acc[network] = colorsMap;

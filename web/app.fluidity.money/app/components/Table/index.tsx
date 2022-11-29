@@ -152,22 +152,55 @@ const Table = <T,>(props: ITable<T>) => {
       {/* Pagination */}
       <motion.div className="pagination" layout="position">
         <div className="pagination-numbers">
-          {Array(pageCount)
+          {/* Pagination Numbers */}
+          <Link
+            className={page === 1 ? "current-pagination" : "pagination-number"}
+            key={`page-${1}`}
+            to={`?${pagination.pageQuery || "page"}=${1}`}
+          >
+            {1}
+          </Link>
+
+          {/* ... */}
+          {pageCount > 5 && page > 3 && <span>...</span>}
+
+          {Array(5)
             .fill(1)
-            .map((_, i) => {
+            // Start pagination from page - 1
+            .map((_, i) => i + page - 2)
+            // Keep values between 2 and pageCount - 1
+            .filter((pageNo) => pageNo > 1 && pageNo < pageCount)
+            .map((pageNo) => {
               return (
                 <Link
                   className={
-                    page === i + 1 ? "current-pagination" : "pagination-number"
+                    page === pageNo ? "current-pagination" : "pagination-number"
                   }
-                  key={i}
-                  to={`?${pagination.pageQuery || "page"}=${i + 1}`}
+                  key={`page-${pageNo}`}
+                  to={`?${pagination.pageQuery || "page"}=${pageNo}`}
                 >
-                  {i + 1}
+                  {pageNo}
                 </Link>
               );
             })}
+
+          {/* ... */}
+          {pageCount > 5 && page < pageCount - 2 && <span>...</span>}
+
+          {pageCount > 1 && (
+            <Link
+              className={
+                page === pageCount ? "current-pagination" : "pagination-number"
+              }
+              key={`page-${pageCount}`}
+              to={`?${pagination.pageQuery || "page"}=${pageCount}`}
+            >
+              {pageCount}
+            </Link>
+          )}
         </div>
+
+        {/* Pagination Arrows */}
         {pageCount > 0 && (
           <div className="pagination-arrows">
             <Link
