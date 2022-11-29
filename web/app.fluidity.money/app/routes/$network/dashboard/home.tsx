@@ -372,7 +372,7 @@ export default function Home() {
       transactions: tableFilteredTransactions,
       graphTransformedTransactions,
     });
-  }, [activeTableFilterIndex, activeTransformerIndex]);
+  }, [activeTableFilterIndex, activeTransformerIndex, data]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
@@ -454,7 +454,7 @@ export default function Home() {
           )}
         </motion.tr>
       );
-    };
+    }
 
   return (
     <>
@@ -465,7 +465,7 @@ export default function Home() {
             color="gray"
             className="dashboard-identifier"
           >
-            {`${activeTableFilterIndex ? "My" : "Global"} dashboard`}
+            {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
           </Display>
         )}
         <Text>
