@@ -177,7 +177,7 @@ export default function FluidifyToken() {
         switch (network) {
           case "ethereum":
             tokensMinted = await Promise.all(
-              tokens.map(async (token) => {
+              tokens_.map(async (token) => {
                 if (token.isFluidOf) return undefined;
                 const fluidToken = tokens.find(
                   ({ isFluidOf }) => isFluidOf === token.address
@@ -190,11 +190,13 @@ export default function FluidifyToken() {
             );
 
             userTokenBalance = await Promise.all(
-              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+              tokens_.map(
+                async ({ address }) => (await balance?.(address)) || 0
+              )
             );
 
             setTokens(
-              tokens.map((token, i) => ({
+              tokens_.map((token, i) => ({
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
@@ -219,7 +221,7 @@ export default function FluidifyToken() {
         }
       })();
     }
-  }, [address, swapping]);
+  }, [address, swapping, tokens_]);
 
   const handleRedirect = async (
     transaction: TransactionResponse,
@@ -421,6 +423,33 @@ export default function FluidifyToken() {
               </div>
 
               <div className="fluidify-tokens">
+                {tokens.length === 0 && (
+                  <div
+                    style={{
+                      padding: "1rem",
+                    }}
+                  >
+                    <Text prominent>
+                      <span
+                        role="img"
+                        aria-label="loading"
+                        style={{ padding: "10px" }}
+                      >
+                        🚀
+                      </span>
+                      Loading tokens for the first time...
+                    </Text>
+                  </div>
+                )}
+                {filteredTokens.length === 0 && search.length > 0 && (
+                  <div
+                    style={{
+                      padding: "1rem",
+                    }}
+                  >
+                    <Text prominent>{`No tokens found for "${search}"`}</Text>
+                  </div>
+                )}
                 {filteredTokens.map((token) => {
                   const {
                     symbol,
