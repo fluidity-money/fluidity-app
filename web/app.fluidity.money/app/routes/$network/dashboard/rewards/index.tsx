@@ -149,6 +149,10 @@ export default function Rewards() {
   } = rewarders;
   const { connected, address } = useContext(FluidityFacadeContext);
 
+  useEffect(() => {
+    setBestPerformingRewarders(allRewards);
+  }, [rewarders]);
+
   const location = useLocation();
 
   const pageRegex = /page=[0-9]+/gi;
@@ -584,10 +588,10 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <ProviderIcon provider={bestPerformingRewarders[0].name} />
-                  {bestPerformingRewarders[0].name === "Fluidity"
+                  <ProviderIcon provider={bestPerformingRewarders[0]?.name} />
+                  {bestPerformingRewarders[0]?.name === "Fluidity"
                     ? "Transacting fAssets"
-                    : bestPerformingRewarders[0].name}
+                    : bestPerformingRewarders[0]?.name}
                 </div>
               </LabelledValue>
             </div>
