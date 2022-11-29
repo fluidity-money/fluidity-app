@@ -67,6 +67,7 @@ const ethereumTokens = config.config["ethereum"].tokens
   .map((entry) => ({
     token: entry.symbol,
     address: entry.address,
+    decimals: entry.decimals,
   }));
 
 const solanaTokens = config.config["solana"].tokens
@@ -74,6 +75,7 @@ const solanaTokens = config.config["solana"].tokens
   .map((entry) => ({
     token: entry.symbol,
     address: entry.address,
+    decimals: entry.decimals,
   }));
 
 const hasuraUrl = config.database.hasura;
@@ -82,6 +84,7 @@ const registry = new Map<string, Subscription>();
 type TokenList = {
   token: string;
   address: string;
+  decimals: number;
 }[];
 
 io.on("connection", (socket) => {

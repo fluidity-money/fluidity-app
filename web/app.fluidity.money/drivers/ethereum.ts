@@ -13,7 +13,12 @@ import { PipedTransaction, NotificationType } from "./types";
 import config from "~/webapp.config.server";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 
-const onListen = (token: string, address: string, network = 0) =>
+const onListen = (
+  token: string,
+  address: string,
+  decimals: number,
+  network = 0
+) =>
   new Observable<PipedTransaction>((subscriber) => {
     new new Web3(config.drivers["ethereum"][network].rpc.ws ?? "").eth.Contract(
       IERC20.abi as unknown as AbiItem,
@@ -34,7 +39,10 @@ const onListen = (token: string, address: string, network = 0) =>
             value: amount,
           } = event.returnValues;
 
-          const uiTokenAmount = amountToDecimalString(amount.toString(), 6);
+          const uiTokenAmount = amountToDecimalString(
+            amount.toString(),
+            decimals
+          );
 
           const transaction: PipedTransaction = {
             type: NotificationType.ONCHAIN,
@@ -69,5 +77,6 @@ const onListen = (token: string, address: string, network = 0) =>
 export const ethGetTransactionsObservable = (
   token: string,
   address: string,
+  decimals: number,
   network = 0
-) => onListen(token, address, network);
+) => onListen(token, address, decimals, network);
