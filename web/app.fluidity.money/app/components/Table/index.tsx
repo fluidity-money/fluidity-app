@@ -69,7 +69,7 @@ const Table = <T,>(props: ITable<T>) => {
 
   return (
     <div>
-      <div className="transactions-header row justify-between">
+      <div className="transactions-header">
         {/* Filters*/}
         {filters && (
           <div className={"transaction-filters"}>

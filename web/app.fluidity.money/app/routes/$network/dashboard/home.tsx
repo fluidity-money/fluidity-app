@@ -548,7 +548,7 @@ export default function Home() {
                 color="gray"
                 className="dashboard-identifier"
               >
-                {`${activeTableFilterIndex ? "My" : "Global"} dashboard`}
+                {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
               </Display>
             )}
             <div className="statistics-row">

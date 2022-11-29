@@ -33,7 +33,7 @@ main {
   padding: 0 64px;
 }
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 850px) {
   .pad-main {
     padding: 0 20px;
   }
@@ -206,6 +206,8 @@ main > footer > section > a {
   margin-bottom: 1em;
   display: flex;
   justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
 }
 
 .transaction-table {
