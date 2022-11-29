@@ -249,7 +249,12 @@ func main() {
 		}
 	}()
 
-	var lastBlockSeen uint64 = 0
+	var (
+		lastBlockSeen uint64 = 0
+
+		logsSeen = make(map[uint]bool)
+		lastBlockEmitted uint64
+	)
 
 	for {
 		log.Debugf("Waiting for new messages from Geth!")
@@ -259,12 +264,14 @@ func main() {
 
 			var (
 				blockNumber = gethLog.BlockNumber
+				logIndex    = gethLog.Index
 				isRemoved   = gethLog.Removed
 			)
 
 			log.Debugf(
-				"Received a log at block number %v!",
+				"Received a log at block number %v log index %d!",
 				blockNumber,
+				logIndex,
 			)
 
 			if isRemoved {
@@ -275,6 +282,21 @@ func main() {
 
 				continue
 			}
+
+			if lastBlockEmitted != blockNumber {
+				lastBlockEmitted = blockNumber
+				logsSeen = make(map[uint]bool)
+			}
+
+			if _, exists := logsSeen[logIndex]; exists {
+				log.Debugf(
+					"Log in block %d with log index %d already seen! Skipping",
+					blockNumber,
+					logIndex,
+				)
+			}
+
+			logsSeen[logIndex] = true
 
 			convertedLog := commonEth.ConvertGethLog(gethLog)
 
