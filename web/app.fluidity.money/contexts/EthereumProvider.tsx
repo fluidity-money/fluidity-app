@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { ReactNode, useRef, useState } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -26,6 +26,9 @@ import makeContractSwap, {
 } from "~/util/chainUtils/ethereum/transaction";
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
+import {useCache} from "~/hooks/useCache";
+import {BannedLoader} from "~/routes/$network/query/banned";
+
 
 const EthereumFacade = ({
   children,
@@ -37,6 +40,11 @@ const EthereumFacade = ({
   connectors: [Connector, Web3ReactHooks][];
 }) => {
   const { isActive, provider, account, connector } = useWeb3React();
+  const {data, error} = useCache<BannedLoader>(`/ethereum/query/banned?address=${account || ""}`);
+  if (error)
+    throw error;
+
+  const {isBanned} = data || {isBanned: false};
 
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
@@ -49,6 +57,11 @@ const EthereumFacade = ({
       return false;
     });
   }, []);
+
+  useEffect(() => {
+    if (isBanned)
+      throw new Error(`Account is not allowed: ${account}`);
+  },[isBanned])
 
   const getBalance = async (contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();

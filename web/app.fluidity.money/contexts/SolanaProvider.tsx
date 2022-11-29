@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -15,11 +15,22 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import { solanaInstructions } from "~/util/chainUtils/solana/instructions";
 import FluidityFacadeContext from "./FluidityFacade";
+import {useCache} from "~/hooks/useCache";
+import {BannedLoader} from "~/routes/$network/query/banned";
 
 const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
   const { connected, publicKey, disconnect, connecting } = useWallet();
+  const {data, error} = useCache<BannedLoader>(`/ethereum/query/banned?address=${publicKey?.toString()|| ""}`);
+  if (error)
+    throw error;
 
-  console.log("connected", connected, "addr:", publicKey?.toString());
+  const {isBanned} = data || {isBanned: false};
+
+  useEffect(() => {
+    if (isBanned) {
+      throw new Error(`Account is not allowed: ${publicKey?.toString()}`)
+    }
+  }, [isBanned]);
 
   const swap = async (amount: string, tokenAddr: string) => {
     const { status } = await fetch(

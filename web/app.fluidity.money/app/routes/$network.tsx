@@ -92,7 +92,13 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary({error}: {error: Error}) {
+  if (error.message.startsWith("Account is not allowed")) {
+    return (
+      <div>
+      </div>
+    );
+  }
   return (
     <div>
       <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
