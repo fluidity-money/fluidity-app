@@ -222,8 +222,8 @@ const EthereumFacade = ({
     const token = tokens.find((t) => t.symbol === symbol);
 
     if (!token) return;
-    
-    const {protocol, host} = window.location;
+
+    const { protocol, host } = window.location;
 
     const watchToken = {
       address: token.address,
@@ -231,7 +231,7 @@ const EthereumFacade = ({
       decimals: token.decimals,
       image: `${protocol}//${host}${token.logo}`,
     };
-    
+
     return connector?.watchAsset?.(watchToken);
   };
 
