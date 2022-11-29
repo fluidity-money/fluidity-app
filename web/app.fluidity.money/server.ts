@@ -2,7 +2,10 @@ import path from "path";
 import express from "express";
 import compression from "compression";
 import morgan from "morgan";
-import { captureException, wrapExpressCreateRequestHandler } from "@sentry/remix";
+import {
+  captureException,
+  wrapExpressCreateRequestHandler,
+} from "@sentry/remix";
 import { createRequestHandler } from "@remix-run/express";
 
 import { Server } from "socket.io";
@@ -116,9 +119,7 @@ io.on("connection", (socket) => {
       },
       error(err) {
         captureException(
-          new Error(
-            `Failed to dispatch db transaction observable :: ${err}`
-          ),
+          new Error(`Failed to dispatch db transaction observable :: ${err}`),
           {
             tags: {
               section: "server",

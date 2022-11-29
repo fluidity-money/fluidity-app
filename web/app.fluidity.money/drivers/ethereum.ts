@@ -60,7 +60,7 @@ const onListen = (token: string, address: string, network = 0) =>
             },
           }
         );
-  
+
         await setTimeout(5000);
         onListen(token, address, network);
       });
