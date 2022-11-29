@@ -58,7 +58,7 @@ const FluidifyCard = (props: Props) => {
         </div>
         <div />
         <button
-          onClick={() => addToken?.(symbol)}
+          onClick={(e) => {e?.stopPropagation(); addToken?.(symbol)}}
           title={"Add Token to Wallet"}
           className={"fluidify-card-add"}
         >
