@@ -454,7 +454,7 @@ export default function Home() {
           )}
         </motion.tr>
       );
-    }
+    };
 
   return (
     <>
