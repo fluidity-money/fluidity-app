@@ -222,14 +222,16 @@ const EthereumFacade = ({
     const token = tokens.find((t) => t.symbol === symbol);
 
     if (!token) return;
+    
+    const {protocol, host} = window.location;
 
     const watchToken = {
       address: token.address,
       symbol: token.symbol,
       decimals: token.decimals,
-      image: token.logo,
+      image: `${protocol}//${host}${token.logo}`,
     };
-
+    
     return connector?.watchAsset?.(watchToken);
   };
 
