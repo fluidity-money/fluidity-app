@@ -11,6 +11,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import styles from "./RewardsStats.module.scss";
+import { getTotalPrizePool } from "data/ethereum/prizePool";
+import { useEffect, useState } from "react";
 
 interface IProps {
   changeScreen: () => void;
@@ -26,6 +28,14 @@ const RewardsStats = ({ changeScreen }: IProps) => {
   const { width } = useViewport();
   const breakpoint = 620;
   
+  const [prizePool, setPrizePool] = useState<number>(0);
+
+  useEffect(() => {
+   getTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP).then((value)=>{
+    setPrizePool(JSON.parse(value.toFixed(3)));
+   });
+  },[]);
+
   // NOTE: Dummy data
   const parsedDailyWinnings = largestDailyWinnings
     .map(({awarded_day, ...reward}) => (
@@ -34,7 +44,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         awarded_date: new Date(awarded_day),
       }
     ))
-  
+
   // information on top of second screen
   const InfoStats = () => (
     <div className={styles.info}>
@@ -50,7 +60,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <Heading as={width > breakpoint ? "h2" : "h3"}>12</Heading>
+        <Heading as={width > breakpoint ? "h2" : "h3"}>5</Heading>
         <Heading as={width > breakpoint ? "h5" : "h6"}>
           Fluid asset pairs
         </Heading>
@@ -58,7 +68,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       {width > breakpoint && (
         <div className={styles.infoSingle}>
           {/* NOTE: Dummy data */}
-          <Heading as="h2">$100,000</Heading>
+          <Heading as="h2">${prizePool}</Heading>
           <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
@@ -80,7 +90,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
 
         <RewardsInfoBox
           // NOTE: Dummy data
-          rewardPool={100000}
+          rewardPool={prizePool}
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="transparent"
@@ -128,4 +138,3 @@ const RewardsStats = ({ changeScreen }: IProps) => {
 };
 
 export default RewardsStats;
-

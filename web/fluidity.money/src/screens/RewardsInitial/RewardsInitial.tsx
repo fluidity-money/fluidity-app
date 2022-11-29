@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import RewardsBackground from "components/RewardsBackground";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import styles from "./RewardsInitial.module.scss";
+import { getTotalPrizePool } from "data/ethereum/prizePool";
 
 interface IProps {
   changeScreen: () => void;
@@ -12,6 +14,14 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
   const { apiState } = useChainContext();
   const { txCount } = apiState;
 
+  const [prizePool, setPrizePool] = useState<number>(0);
+
+  useEffect(() => {
+   getTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP).then((value)=>{
+    setPrizePool(JSON.parse(value.toFixed(3)));
+   });
+  },[]);
+  
   return (
     <AnimatePresence>
       <motion.div
@@ -21,8 +31,7 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
         className={styles.container}
       >
         <RewardsInfoBox
-          // NOTE: Dummy val
-          rewardPool={100000}
+          rewardPool={prizePool}
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="black"
