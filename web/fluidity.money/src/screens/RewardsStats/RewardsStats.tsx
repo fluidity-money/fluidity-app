@@ -1,4 +1,4 @@
-import type { LargestDailyWinner } from "data/monthlyLargestWinners";
+import { useEffect, useState } from "react";
 
 import {
   Heading,
@@ -6,13 +6,15 @@ import {
   numberToMonetaryString,
   trimAddress,
 } from "@fluidity-money/surfing";
+
+import type { LargestDailyWinner } from "data/monthlyLargestWinners";
+import { getEthTotalPrizePool } from "data/ethereum/prizePool";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
+
 import styles from "./RewardsStats.module.scss";
-import { getTotalPrizePool } from "data/ethereum/prizePool";
-import { useEffect, useState } from "react";
 
 interface IProps {
   changeScreen: () => void;
@@ -23,7 +25,7 @@ type DailyWinner = LargestDailyWinner & {
 }
 
 const RewardsStats = ({ changeScreen }: IProps) => {
-  const { apiState } = useChainContext();
+  const { apiState, chain } = useChainContext();
   const { txCount, largestDailyWinnings } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
@@ -31,10 +33,14 @@ const RewardsStats = ({ changeScreen }: IProps) => {
   const [prizePool, setPrizePool] = useState<number>(0);
 
   useEffect(() => {
-   getTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP).then((value)=>{
-    setPrizePool(JSON.parse(value.toFixed(3)));
-   });
-  },[]);
+    setPrizePool(0);
+    
+    chain === `ETH` && 
+    getEthTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP)
+      .then((value)=>{
+        setPrizePool(JSON.parse(value.toFixed(3)));
+      });
+  },[chain]);
 
   // NOTE: Dummy data
   const parsedDailyWinnings = largestDailyWinnings

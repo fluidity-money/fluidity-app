@@ -3,54 +3,13 @@ import { BigNumber } from "ethers";
 import { Contract, ContractInterface } from "ethers";
 import BN from "big.js";
 
-import PrizePoolABI from "./prizePool.json";
-
-type PrizePool = {
-  amount: BigNumber;
-  decimals: number;
-};
-
-// Returns total prize pool from aggregated contract
-export const getTotalPrizePool = async (
-  rpcUrl: string
-): Promise<number> => {
-  const provider = new JsonRpcProvider(rpcUrl);
-  const poolAddress: string = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
-  const poolABI: ContractInterface = PrizePoolABI;
-
-  try {
-    const rewardPoolContract = new Contract(
-      poolAddress,
-      poolABI,
-      provider
-    );
-
-    if (!rewardPoolContract)
-      throw new Error(`Could not instantiate Reward Pool at ${poolAddress}`);
-
-    const pools: PrizePool[] = await rewardPoolContract.callStatic.getPools();
-
-    const totalPrizePool = pools.reduce((sum, { amount, decimals }) => {
-      // amount is uint256, convert to proper BN for float calculations
-      const amountBn = new BN(amount.toString());
-      const decimalsBn = new BN(10).pow(decimals);
-      const amountDiv = amountBn.div(decimalsBn);
-
-      return sum.add(amountDiv);
-    }, new BN(0));
-
-    return totalPrizePool.toNumber();
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return 0;
-  }
-};
+import PrizePoolABI from "./prizePoolABI.json";
 
 type ErrorType = {
   data: { message: string };
 } & { message: string };
 
-export const handleContractErrors = async (
+const handleContractErrors = async (
   error: ErrorType,
   provider: Provider | undefined
 ) => {
@@ -87,5 +46,46 @@ export const handleContractErrors = async (
   } catch (e) {
     // otherwise, use a generic error
     throw new Error(`Failed to make swap. ${msg}`);
+  }
+};
+
+type PrizePool = {
+  amount: BigNumber;
+  decimals: number;
+};
+
+// Returns total prize pool from aggregated contract
+export const getEthTotalPrizePool = async (
+  rpcUrl: string
+): Promise<number> => {
+  const provider = new JsonRpcProvider(rpcUrl);
+  const poolAddress: string = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
+  const poolABI: ContractInterface = PrizePoolABI;
+
+  try {
+    const rewardPoolContract = new Contract(
+      poolAddress,
+      poolABI,
+      provider
+    );
+
+    if (!rewardPoolContract)
+      throw new Error(`Could not instantiate Reward Pool at ${poolAddress}`);
+
+    const pools: PrizePool[] = await rewardPoolContract.callStatic.getPools();
+
+    const totalPrizePool = pools.reduce((sum, { amount, decimals }) => {
+      // amount is uint256, convert to proper BN for float calculations
+      const amountBn = new BN(amount.toString());
+      const decimalsBn = new BN(10).pow(decimals);
+      const amountDiv = amountBn.div(decimalsBn);
+
+      return sum.add(amountDiv);
+    }, new BN(0));
+
+    return totalPrizePool.toNumber();
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
   }
 };
