@@ -459,7 +459,7 @@ export default function Dashboard() {
             </GeneralButton>
 
             {/* Modal on hover */}
-            {(hoverModal || showModal) && (
+            {(hoverModal || showModal) && !isMobile && (
               <UnclaimedRewardsHoverModal
                 unclaimedRewards={unclaimedRewards}
                 setShowModal={setShowModal}
@@ -510,7 +510,6 @@ export default function Dashboard() {
         {openMobModal && (
           <MobileModal
             navigationMap={navigationMap.map((obj) => {
-              // I love type inconsistency
               const { name, icon } = Object.values(obj)[0];
               return { name, icon };
             })}
