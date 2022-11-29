@@ -294,6 +294,8 @@ func main() {
 					blockNumber,
 					logIndex,
 				)
+
+				continue
 			}
 
 			logsSeen[logIndex] = true
