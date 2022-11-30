@@ -458,14 +458,6 @@ export default function Dashboard() {
                 : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
-            {/* Modal on hover */}
-            {(hoverModal || showModal) && !isMobile && (
-              <UnclaimedRewardsHoverModal
-                unclaimedRewards={unclaimedRewards}
-                setShowModal={setShowModal}
-              />
-            )}
-
             {(isTablet || isMobile) && (
               <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
             )}
@@ -492,6 +484,14 @@ export default function Dashboard() {
 
         {/* Provide Luquidity*/}
         {!openMobModal && <ProvideLiquidity />}
+
+        {/* Modal on hover */}
+        {(hoverModal || showModal) && !isMobile && (
+          <UnclaimedRewardsHoverModal
+            unclaimedRewards={unclaimedRewards}
+            setShowModal={setShowModal}
+          />
+        )}
 
         {/* Mobile fluidify button */}
         {isMobile && (
