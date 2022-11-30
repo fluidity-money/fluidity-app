@@ -27,6 +27,26 @@ const numberToMonetaryString = (dollars: number): string => {
   return `$${commaSepWholeValues}.${paddedDecimals}`
 }
 
+const stringifiedNumberToMonetaryString = (amount: string, decimals?: number): string => {
+  let [pre, post] = amount.split(".");
+
+  let newPre = "";
+  while (pre.length > 3) {
+    newPre = "," + pre.slice(pre.length - 3) + newPre;
+    pre = pre.slice(0, pre.length - 3);
+  }
+
+  newPre = pre + newPre;
+
+  if (decimals && post) {
+    post = post.slice(0, decimals);
+    if (post.length < decimals)
+      post += '0'.repeat(decimals - post.length)
+  }
+
+  return post ? newPre + "." + post : newPre;
+};
+
 const toSignificantDecimals = (num: number, decimals_?: number): string => {
   const decimals = (decimals_ == undefined || decimals_ < 0) ? 1 : decimals_;
 
@@ -48,5 +68,4 @@ const toSignificantDecimals = (num: number, decimals_?: number): string => {
 }
 
 
-export { numberToCommaSeparated, numberToMonetaryString, toSignificantDecimals };
-
+export { numberToCommaSeparated, numberToMonetaryString, stringifiedNumberToMonetaryString, toSignificantDecimals };

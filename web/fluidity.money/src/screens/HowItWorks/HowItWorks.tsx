@@ -60,7 +60,7 @@ const HowItWorks = () => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         HOW IT WORKS HOW IT WORKS HOW IT WORKS
       </Heading>
       <Heading as="h4" className={styles.text}>

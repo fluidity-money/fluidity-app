@@ -1,4 +1,4 @@
-import { LargestDailyWinner } from "data/monthlyLargestWinners";
+import { useEffect, useState } from "react";
 
 import {
   Heading,
@@ -6,10 +6,14 @@ import {
   numberToMonetaryString,
   trimAddress,
 } from "@fluidity-money/surfing";
+
+import type { LargestDailyWinner } from "data/monthlyLargestWinners";
+import { getEthTotalPrizePool } from "data/ethereum/prizePool";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
+
 import styles from "./RewardsStats.module.scss";
 
 interface IProps {
@@ -21,11 +25,23 @@ type DailyWinner = LargestDailyWinner & {
 }
 
 const RewardsStats = ({ changeScreen }: IProps) => {
-  const { apiState } = useChainContext();
+  const { apiState, chain } = useChainContext();
   const { txCount, largestDailyWinnings } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
   
+  const [prizePool, setPrizePool] = useState<string>("0");
+
+  useEffect(() => {
+    setPrizePool("0");
+    
+    chain === `ETH` && 
+    getEthTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP)
+      .then((value)=>{
+        setPrizePool(JSON.parse(value.toFixed(3)));
+      });
+  },[chain]);
+
   // NOTE: Dummy data
   const parsedDailyWinnings = largestDailyWinnings
     .map(({awarded_day, ...reward}) => (
@@ -34,7 +50,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         awarded_day: new Date(awarded_day),
       }
     ))
-  
+
   // information on top of second screen
   const InfoStats = () => (
     <div className={styles.info}>
@@ -50,7 +66,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <Heading as={width > breakpoint ? "h2" : "h3"}>12</Heading>
+        <Heading as={width > breakpoint ? "h2" : "h3"}>5</Heading>
         <Heading as={width > breakpoint ? "h5" : "h6"}>
           Fluid asset pairs
         </Heading>
@@ -58,7 +74,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       {width > breakpoint && (
         <div className={styles.infoSingle}>
           {/* NOTE: Dummy data */}
-          <Heading as="h2">$100,000</Heading>
+          <Heading as="h2">${prizePool}</Heading>
           <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
@@ -79,7 +95,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         <div style={{ height: 254, width: "100%" }}></div>
         <RewardsInfoBox
           // NOTE: Dummy data
-          rewardPool={100000}
+          rewardPool={prizePool}
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="transparent"
@@ -126,4 +142,3 @@ const RewardsStats = ({ changeScreen }: IProps) => {
 };
 
 export default RewardsStats;
-

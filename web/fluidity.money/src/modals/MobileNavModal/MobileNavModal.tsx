@@ -111,7 +111,7 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
         href={`https://app.fluidity.money`}
         onClick={() => setIsOpen(false)}
       >
-        <Heading className={styles.black} black={true} as="h3">
+        <Heading className={styles.black} as="h3">
           LAUNCH FLUIDITY
         </Heading>
       </a>
