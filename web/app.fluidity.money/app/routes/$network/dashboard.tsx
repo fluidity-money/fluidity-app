@@ -527,8 +527,9 @@ export default function Dashboard() {
           {/* Links */}
           <section>
             {/* Version */}
-            <Text>Fluidity Money</Text>
-
+            <a href={"/"}>
+              <Text>Fluidity Money</Text>
+            </a>
             {/* Terms */}
             <a href={"/"}>
               <Text>Terms</Text>
