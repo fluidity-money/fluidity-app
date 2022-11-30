@@ -18,7 +18,7 @@ const Docs = () => {
   const { width } = useViewport();
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         DOCUMENTATION DOCUMENTATION
       </Heading>
       <Heading as="h4" className={styles.text}>

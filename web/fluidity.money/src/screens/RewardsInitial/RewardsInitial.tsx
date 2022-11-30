@@ -15,15 +15,15 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
   const { txCount } = apiState;
 
-  const [prizePool, setPrizePool] = useState<number>(0);
+  const [prizePool, setPrizePool] = useState<string>("0");
 
   useEffect(() => {
-    setPrizePool(0);
+    setPrizePool("0");
     
     chain === `ETH` && 
     getEthTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP)
       .then((value)=>{
-        setPrizePool(JSON.parse(value.toFixed(3)));
+        setPrizePool(value.toFixed(3));
       });
   },[chain]);
   

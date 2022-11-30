@@ -30,10 +30,10 @@ const RewardsStats = ({ changeScreen }: IProps) => {
   const { width } = useViewport();
   const breakpoint = 620;
   
-  const [prizePool, setPrizePool] = useState<number>(0);
+  const [prizePool, setPrizePool] = useState<string>("0");
 
   useEffect(() => {
-    setPrizePool(0);
+    setPrizePool("0");
     
     chain === `ETH` && 
     getEthTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP)

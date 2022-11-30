@@ -21,7 +21,7 @@ const Articles = ({ isResourcesPage }: IArticleProps) => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         RESOURCES RESOURCES RESOURCES
       </Heading>
       <Heading as="h4" className={styles.text}>

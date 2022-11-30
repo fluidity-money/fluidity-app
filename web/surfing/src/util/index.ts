@@ -10,6 +10,7 @@ export { SupportedChains } from "./chainProviders";
 export {
   toSignificantDecimals,
   numberToMonetaryString,
+  stringifiedNumberToMonetaryString,
   numberToCommaSeparated,
   formatTo12HrDate,
   formatToGraphQLDate,
