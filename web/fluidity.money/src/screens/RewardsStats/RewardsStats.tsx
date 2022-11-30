@@ -21,7 +21,7 @@ interface IProps {
 }
 
 type DailyWinner = LargestDailyWinner & {
-  awarded_date: Date,
+  awarded_day: Date,
 }
 
 const RewardsStats = ({ changeScreen }: IProps) => {
@@ -47,7 +47,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
     .map(({awarded_day, ...reward}) => (
       {
         ...reward,
-        awarded_date: new Date(awarded_day),
+        awarded_day: new Date(awarded_day),
       }
     ))
 
@@ -93,7 +93,6 @@ const RewardsStats = ({ changeScreen }: IProps) => {
           <InfoStats />
         </div>
         <div style={{ height: 254, width: "100%" }}></div>
-
         <RewardsInfoBox
           // NOTE: Dummy data
           rewardPool={prizePool}
@@ -101,23 +100,22 @@ const RewardsStats = ({ changeScreen }: IProps) => {
           changeScreen={changeScreen}
           type="transparent"
         />
-    
         {!!parsedDailyWinnings.length && (
           <div className={styles.rewardsChart}>
             <LineChart 
               data= {parsedDailyWinnings}
               lineLabel='dailyWinnings'
               accessors={{
-                xAccessor: (d: DailyWinner) => d.awarded_date,
-                yAccessor: (d: DailyWinner) => d.winning_amount_scaled,
+                xAccessor: (w: LargestDailyWinner) => w.awarded_day,
+                yAccessor: (w: LargestDailyWinner) => w.winning_amount_scaled,
               }}
               renderTooltip={({datum}: {datum: DailyWinner}) => {
                 return (
                   <div className={styles.tooltip}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {`${datum.awarded_date.getDate()}`.padStart(2,'0')}/
-                      {`${datum.awarded_date.getMonth() + 1}`.padStart(2,'0')}/
-                      {`${datum.awarded_date.getUTCFullYear() % 100}`.padStart(2,'0')}
+                      {`${datum.awarded_day.getDate()}`.padStart(2,'0')}/
+                      {`${datum.awarded_day.getMonth() + 1}`.padStart(2,'0')}/
+                      {`${datum.awarded_day.getUTCFullYear() % 100}`.padStart(2,'0')}
                     </span>
                     <br/>
                     <br />

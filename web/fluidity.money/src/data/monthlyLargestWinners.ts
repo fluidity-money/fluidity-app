@@ -24,7 +24,7 @@ query HighestRewards($network: network_blockchain!) {
     network
     transaction_hash
     winning_address
-    awarded_time
+    awarded_day
     token_short_name
     winning_amount_scaled
   }
