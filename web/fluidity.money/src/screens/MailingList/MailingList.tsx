@@ -8,9 +8,7 @@ import useViewport from 'hooks/useViewport';
 import { useState } from 'react';
 import styles from './MailingList.module.scss';
 
-type FormState = {
-  _state: `success` | `loading` | `failed` | `idle`;
-};
+type FormState = `success` | `loading` | `failed` | `idle`;
 
 const MailingList = () => {
   
@@ -22,15 +20,15 @@ const MailingList = () => {
   };
 
   const control = useAnimation();
-  const [state, setState] = useState<FormState>({_state: `idle`});
+  const [state, setState] = useState<FormState>(`idle`);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     control.start("visible");
 
-    if(state._state === "loading") return;
+    if(state === `loading`) return;
 
-    setState({_state: `loading`});
+    setState(`loading`);
 
     control.start("visible");
 
@@ -51,7 +49,7 @@ const MailingList = () => {
     .then((response) => {
       control.set("hidden");
 
-      setState({_state: `success`});
+      setState(`success`);
 
       control.start("visible");
 
@@ -61,20 +59,20 @@ const MailingList = () => {
       setTimeout(
       ()=> {
         control.set("hidden");
-        setState({_state: `idle`});
+        setState(`idle`);
       }, 7000);
     })
     .catch(()=>{
       control.set("hidden");
 
-      setState({_state: `failed`});
+      setState(`failed`);
 
       control.start("visible");
 
       setTimeout(
       ()=> {
         control.set("hidden");
-        setState({_state: `idle`});
+        setState(`idle`);
       }, 7000);
     });
   }
@@ -94,19 +92,19 @@ const MailingList = () => {
         >
           <Text 
             size={"lg"}
-            className={`${styles.successText} ${state._state===`success` ? styles.show : styles.hide}`}
+            className={`${styles.successText} ${state === `success` ? styles.show : styles.hide}`}
           >
            We have received your info! 🎉
           </Text>
           <Text 
             size={"lg"}
-            className={`${styles.failedText} ${state._state===`failed` ? styles.show : styles.hide}`}
+            className={`${styles.failedText} ${state === `failed` ? styles.show : styles.hide}`}
           >
            Something went wrong 😢, try again!
           </Text>
           <Text 
             size={"lg"}
-            className={`${styles.loadingText} ${state._state===`loading` ? styles.show : styles.hide}`}
+            className={`${styles.loadingText} ${state === `loading` ? styles.show : styles.hide}`}
           >
            Processing you request ...
           </Text>
