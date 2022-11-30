@@ -5,7 +5,14 @@
 import { GeneralButton, Heading, Text } from '@fluidity-money/surfing';
 import { motion, useAnimation } from 'framer-motion';
 import useViewport from 'hooks/useViewport';
+import { useState } from 'react';
 import styles from './MailingList.module.scss';
+
+type FormState = {
+  success: boolean;
+  loading: boolean;
+  failed: boolean;
+};
 
 const MailingList = () => {
   
@@ -17,9 +24,26 @@ const MailingList = () => {
   };
 
   const control = useAnimation();
-  
+  const [state, setState] =
+  useState<FormState>({
+    success: false,
+    loading: false,
+    failed: false,
+  });
+
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    control.start("visible");
+
+    if(state.loading === true) return;
+
+    setState({
+      success: false,
+      loading: true,
+      failed: false,
+    });
+
+    control.start("visible");
 
     const endpoint = "https://landing-api.fluidity.money:8081/api/submit-email";
     
@@ -34,15 +58,39 @@ const MailingList = () => {
         body: data,
         mode: 'no-cors',
       }
-    ).then((response) => {
-        //clear input cache
-        e.target.email.value = "";
-        e.target.name.value = "";
-        control.start("visible");
-        setTimeout(
-        ()=> {
-          control.set("hidden");
-        }, 4000);
+    )
+    .then((response) => {
+      control.set("hidden");
+
+      setState({
+        success: true,
+        loading: false,
+        failed: false,
+      });
+
+      control.start("visible");
+
+      e.target.email.value = "";
+      e.target.name.value = "";
+
+      setTimeout(
+      ()=> {
+        control.set("hidden");
+      }, 7000);
+    })
+    .catch(()=>{
+      control.set("hidden");
+      setState({
+        success: false,
+        loading: false,
+        failed: true,
+      });
+      control.start("visible");
+
+      setTimeout(
+      ()=> {
+        control.set("hidden");
+      }, 7000);
     });
   }
 
@@ -54,15 +102,31 @@ const MailingList = () => {
           Subscribe to our monthly newsletter to stay up to date with our
           progress and roadmap.
         </Text>
-        
-        <motion.p className={styles.successText}
+        <motion.p className={styles.textPosition}
          animate={control}
          initial="hidden"
          variants={leftIn}
         >
-          We have received your info! 🎉
+          <Text 
+            size={"lg"}
+            className={`${styles.successText} ${state.success ? styles.show : styles.hide}`}
+          >
+           We have received your info! 🎉
+          </Text>
+          <Text 
+            size={"lg"}
+            className={`${styles.failedText} ${state.failed ? styles.show : styles.hide}`}
+          >
+           Something went wrong 😢, try again!
+          </Text>
+          <Text 
+            size={"lg"}
+            className={`${styles.loadingText} ${state.loading ? styles.show : styles.hide}`}
+          >
+           Processing you request ...
+          </Text>
         </motion.p>
-        
+ 
         <form id={"mailform"} onSubmit={handleSubmit}>
           <section>
             <Text size={"md"} prominent={true} >NAME</Text>
