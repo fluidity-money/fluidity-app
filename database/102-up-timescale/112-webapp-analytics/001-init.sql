@@ -5,7 +5,7 @@
 -- from user actions that the frontend can render (ie, total volume)
 
 CREATE TABLE analytics (
-	updated TIMESTAMP NOT NULL,
+	created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	total_volume DOUBLE PRECISION NOT NULL
 );
 
