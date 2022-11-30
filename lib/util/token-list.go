@@ -17,6 +17,7 @@ import (
 // microservice-common-count-wins. TokenDecimals is in its exponential
 // form (ie, 1e18)
 type TokenDetailsBase struct {
+	TokenAddress  string
 	TokenDecimals *big.Rat
 	TokenName     string
 }
@@ -27,19 +28,19 @@ func trimWhitespace(s string) string {
 
 // NewTokenDetailsBase with the name and number to turn into an
 // exponential number (ie if given 10, will go 1e10)
-func NewTokenDetailsBase(name string, decimals int) TokenDetailsBase {
+func NewTokenDetailsBase(address, name string, decimals int) TokenDetailsBase {
 	decimalsAdjusted := math.Pow10(decimals)
 
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	return TokenDetailsBase{
+		TokenAddress:  address,
 		TokenName:     name,
 		TokenDecimals: decimalsRat,
 	}
 }
 
 // GetTokensListBase starting with the address, token name and decimals
-// expects (but doesn't use) the first field to be the address
 func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 
 	tokensList := strings.Split(tokensList_, ",")
@@ -60,7 +61,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 		}
 
 		var (
-			_            = trimWhitespace(tokenDetails_[0])
+			tokenAddress = trimWhitespace(tokenDetails_[0])
 			tokenName    = trimWhitespace(tokenDetails_[1])
 			decimals_    = trimWhitespace(tokenDetails_[2])
 		)
@@ -78,7 +79,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 			})
 		}
 
-		tokenDetails[i] = NewTokenDetailsBase(tokenName, decimals)
+		tokenDetails[i] = NewTokenDetailsBase(tokenAddress, tokenName, decimals)
 	}
 
 	return tokenDetails
