@@ -8,7 +8,7 @@ Watches for `Reward`, `BlockedReward`, and `UnblockReward` events on the geth we
 |             Name             |                                  Description
 |------------------------------|------------------------------------------------------------------------------|
 | `FLU_ETHEREUM_WS_URL`                      | Geth websocket address to use to receive Ethereum logs from. |
-| `FLU_ETHEREUM_TOKEN_LIST`                      | List of tokens in address:shortname:decimals form to watch for events. |
+| `FLU_ETHEREUM_TOKENS_LIST`                      | List of tokens in address:shortname:decimals form to watch for events. |
 
 ### `FLU_ETHEREUM_START_BLOCK`
 

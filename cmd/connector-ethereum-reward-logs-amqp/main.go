@@ -37,7 +37,7 @@ const (
 	EnvStartingBlock = `FLU_ETHEREUM_START_BLOCK`
 
 	// EnvTokenList to get the list of tokens to watch events from
-	EnvTokenList = `FLU_ETHEREUM_TOKEN_LIST`
+	EnvTokenList = `FLU_ETHEREUM_TOKENS_LIST`
 
 	// TopicLogs to use when writing logs found with Ethereum
 	TopicLogs = queueEth.TopicLogs
