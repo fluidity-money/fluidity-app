@@ -60,7 +60,7 @@ jobs:
           command: |
             flu build-docker \
               --network ${{ github.event.inputs.network || 'fluidity'}} \
-              --group ${{ github.event.inputs.group || 'app' }} \
+              --group ${{ github.event.inputs.group || 'all' }} \
               --service ${{ github.event.inputs.service || 'all' }} \
               --environment ${{ github.event.inputs.environment || 'dev'}} \
               --build-root-container ${{ github.event.inputs.build_root_container || false }} \
@@ -73,12 +73,13 @@ jobs:
           command: |
             flu deploy-service \
               --network ${{ github.event.inputs.network || 'fluidity' }} \
-              --group ${{ github.event.inputs.group || 'app'}} \
+              --group ${{ github.event.inputs.group || 'all'}} \
               --service ${{ github.event.inputs.service || 'all' }} \
               --environment ${{ github.event.inputs.environment || 'dev'}} \
               --debug false \
               --tag $GITHUB_SHA
       - name: Save
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: ./scripts/actions
         if: success()
         env:
