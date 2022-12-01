@@ -11,14 +11,16 @@
 
 #infobox {
   padding: 1.5em;
-  max-width: fit-content;
+  width: 90%;
+  justify-self: flex-end;
 }
 
 #unclaimed {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 1.5em;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 2em 1.5em;
 }
 
 #unclaimed-left {
@@ -176,6 +178,10 @@
   gap: 2em;
 }
 
+.unclaimed-inner {
+  grid-template-columns: 1.5fr 1fr;
+}
+
 .card-section {
   display: flex;
   flex-direction: column;
@@ -225,6 +231,8 @@
   }
   #infobox {
     margin-left: 0;
+    max-width: 450px;
+    justify-self: center;
   }
   .statistics-row {
     grid-template-columns: 1fr 1fr;
@@ -239,9 +247,14 @@
   #unclaimed {
     align-items: center;
     gap: 0.5em;
+    padding: 0;
   }
   .statistics-set .container .value > h1 {
     font-size: 1.5em;
+  }
+
+  #infobox {
+    max-width: 300px;
   }
 
   #spend-to-earn > h2 {
