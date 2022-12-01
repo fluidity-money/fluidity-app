@@ -5,6 +5,7 @@ import type Transaction from "~/types/Transaction";
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import { useUserRewardsAll } from "~/queries";
+import {MintAddress} from "~/types/MintAddress";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { network } = params;
@@ -32,14 +33,26 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       throw errors;
     }
 
-    const winnersMap = data.winners.reduce(
+    // winners to look up if a transaction was the send that caused a win
+    // payouts to look up if a transaction was a payout transaction
+    type winnerMap = {[key: string]: Winner};
+    const {winners: winnersMap, payouts: payoutsMap} = data.winners.reduce(
       (map, winner) => ({
         ...map,
-        [winner.send_transaction_hash]: {
-          ...winner,
+        winners: {
+          ...map.winners,
+          [winner.send_transaction_hash]: {
+            ...winner,
+          },
         },
+        payouts: {
+          ...map.payouts,
+          [winner.transaction_hash]: {
+            ...winner,
+          },
+        }
       }),
-      {} as { [key: string]: Winner }
+      {} as {winners: winnerMap, payouts: winnerMap}
     );
 
     const {
@@ -59,11 +72,25 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const defaultLogo = "/assets/tokens/fUSDT.png";
 
     const mergedTransactions: Transaction[] =
-      transactions?.map((tx) => {
+      transactions?.flatMap((tx) => {
+        const payout = payoutsMap[tx.hash];
+
+        // transaction is a payout already included as a reward value, so skip it
+        if (payout) {
+          return [];
+        }
+
+        const swapType = tx.sender === MintAddress ? 
+          "in" :
+        tx.receiver === MintAddress ?
+          "out" :
+        undefined;
+          
         const winner = winnersMap[tx.hash];
 
         return {
-          sender: tx.sender,
+          // if a swap in, we want to display the swapper
+          sender: swapType === "in" ? tx.receiver : tx.sender,
           receiver: tx.receiver,
           winner: winner?.winning_address ?? "",
           reward: winner
@@ -79,6 +106,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             (network === "ethereum"
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "",
+          swapType, 
         };
       }) ?? [];
 
