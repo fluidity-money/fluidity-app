@@ -79,9 +79,8 @@ jobs:
               --debug false \
               --tag $GITHUB_SHA
       - name: Save
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: ${{ (github.event_name == 'workflow_dispatch') && (success()) }}
         uses: ./scripts/actions
-        if: success()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         with: 
