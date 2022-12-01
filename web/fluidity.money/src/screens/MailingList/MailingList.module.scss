@@ -46,7 +46,25 @@
 
 .successText {
   color: #167a25;
+}
+
+.failedText {
+  color: red;
+}
+
+.loadingText {
+  color: blueviolet;
+}
+
+.textPosition {
   text-align: center;
   margin-top: 10px;
-  font-size: 18px;
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
 }

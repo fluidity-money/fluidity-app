@@ -8,14 +8,14 @@ import useViewport from "hooks/useViewport";
 import {
   BlockchainModal,
   ChainSelectorButton,
-  numberToMonetaryString,
+  stringifiedNumberToMonetaryString,
   SupportedChains,
   Heading,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
-  rewardPool: number;
+  rewardPool: string;
   totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
@@ -69,7 +69,7 @@ const RewardsInfoBox = ({
         <div onClick={changeScreen}>
           <Heading as="h1">
             {showRewardPool
-              ? numberToMonetaryString(rewardPool)
+              ? `$${stringifiedNumberToMonetaryString(rewardPool)}`
               : totalTransactions}
           </Heading>
         </div>

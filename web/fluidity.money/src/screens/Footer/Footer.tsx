@@ -27,7 +27,7 @@ const Footer = () => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading  as="h4" className={styles.text}>
         USE YIELD WIN
       </Heading>
       <Heading as="h4" className={styles.text}>

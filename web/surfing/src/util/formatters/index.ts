@@ -5,6 +5,7 @@
 export {
   numberToMonetaryString,
   numberToCommaSeparated,
+  stringifiedNumberToMonetaryString,
   toSignificantDecimals,
 } from "./numberConverters";
 export {

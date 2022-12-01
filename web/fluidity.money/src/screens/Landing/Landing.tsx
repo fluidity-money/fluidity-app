@@ -33,7 +33,7 @@ const Landing = () => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         MONEY DESIGNED TO MOVE MONEY DESIGNED TO MOVE
       </Heading>
       <Heading as="h4" className={styles.text}>
