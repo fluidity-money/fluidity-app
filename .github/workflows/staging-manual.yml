@@ -78,6 +78,14 @@ jobs:
               --environment ${{ github.event.inputs.environment || 'dev'}} \
               --debug false \
               --tag $GITHUB_SHA
+      - name: Save
+        uses: ./scripts/actions
+        if: success()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        with: 
+          command: |
+            flu save-info
       - name: Discord
         uses: ./scripts/actions
         if: always()

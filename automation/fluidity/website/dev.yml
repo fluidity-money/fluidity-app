@@ -4,11 +4,9 @@ SERVICES:
       DOCKER_IMAGE: fluidity.money-frontend
       DOCKERFILE_PATH: ./web/fluidity.money
       TARGET_GROUP: flu-dev-fluidity-fe-tg
-      SECRET_NEXT_PUBLIC_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
 
       DOCKER_ARGS:
         SECRET_REACT_APP_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
-        SECRET_NEXT_PUBLIC_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
 
 
