@@ -3,15 +3,12 @@
 // LICENSE.md file.
 
 import { getEthTotalPrizePool } from "data/ethereum/prizePool";
-import { GetStaticProps } from "next";
 import LandingPage from "pageBody/LandingPage";
 
 export type IPropPools = {
     ethPool: number;
     solPool: number;
 }
-
-export default LandingPage;
 
 export const getStaticProps = async () => {
 
@@ -20,8 +17,10 @@ export const getStaticProps = async () => {
     const res :IPropPools = {ethPool, solPool};
     const pools = JSON.stringify(res);
     return {
-      props: {
+        props: {
         pools
-      },
+        },
     }
-  }
+}
+
+export default LandingPage;
