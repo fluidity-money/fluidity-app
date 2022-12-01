@@ -10,7 +10,7 @@ export type IPropPools = {
     solPool: number;
 }
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
 
     const ethPool: number = await getEthTotalPrizePool(process.env.FLU_ETH_RPC_HTTP);
     const solPool: number = 0;
