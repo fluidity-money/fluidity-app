@@ -5,11 +5,11 @@ testnet = false
 rpc = { http = "FLU_ETH_RPC_HTTP", ws = "FLU_ETH_RPC_WS" }
 server = "https://api.ethereum.fluidity.money"
 
-[[drivers.solana]]
-label = "Solana"
-testnet = false
-rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
-server = "https://api.solana.fluidity.money"
+# [[drivers.solana]]
+# label = "Solana"
+# testnet = false
+# rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
+# server = "https://api.solana.fluidity.money"
 
 [database]
 hasura = "https://fluidity.hasura.app/v1/graphql"
