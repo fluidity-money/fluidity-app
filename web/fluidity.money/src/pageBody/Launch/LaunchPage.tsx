@@ -12,7 +12,7 @@ const LaunchPage = () => {
   });
 
   return (
-    <LandingPage />
+   <></>
   );
 };
 

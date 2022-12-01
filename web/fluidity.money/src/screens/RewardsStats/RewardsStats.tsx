@@ -15,31 +15,32 @@ import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 
 import styles from "./RewardsStats.module.scss";
+import { IPropPools } from "pages";
 
 interface IProps {
   changeScreen: () => void;
+  rewardPools: IPropPools;
 }
 
 type DailyWinner = LargestDailyWinner & {
   awarded_day: Date,
 }
 
-const RewardsStats = ({ changeScreen }: IProps) => {
+const RewardsStats = ({ changeScreen, rewardPools}: IProps) => {
   const { apiState, chain } = useChainContext();
   const { txCount, largestDailyWinnings } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
-  
-  const [prizePool, setPrizePool] = useState<string>("0");
+
+  const [prizePool, setPrizePool] = useState<string>(rewardPools.ethPool.toFixed(3));
 
   useEffect(() => {
-    setPrizePool("0");
-    
     chain === `ETH` && 
-    getEthTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP)
-      .then((value)=>{
-        setPrizePool(JSON.parse(value.toFixed(3)));
-      });
+    setPrizePool(rewardPools.ethPool.toFixed(3));
+
+    chain === `SOL` && 
+    setPrizePool(rewardPools.solPool.toFixed(3));
+
   },[chain]);
 
   // NOTE: Dummy data
