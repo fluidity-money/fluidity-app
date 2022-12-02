@@ -221,9 +221,6 @@ img= "/images/providers/solend.png"
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.solend.fi/"
 fUSDT = "https://www.solend.fi/"
-fTUSD = "https://www.solend.fi/"
-fFRAX = "https://www.solend.fi/"
-fDAI = "https://www.solend.fi/"
 
 [[liquidity_providers.solana.providers]]
 name= "orca"
@@ -232,9 +229,6 @@ img= "/images/providers/Orca.svg"
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.orca.so/"
 fUSDT = "https://www.orca.so/"
-fTUSD = "https://www.orca.so/"
-fFRAX = "https://www.orca.so/"
-fDAI = "https://www.orca.so/"
 
 [[liquidity_providers.solana.providers]]
 name= "saber"
@@ -243,9 +237,6 @@ img= "/images/providers/saber.svg"
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.saber.so/"
 fUSDT = "https://www.saber.so/"
-fTUSD = "https://www.saber.so/"
-fFRAX = "https://www.saber.so/"
-fDAI = "https://www.saber.so/"
 
 [[liquidity_providers.solana.providers]]
 name= "jupiter"
@@ -254,9 +245,6 @@ img= "/images/providers/Jupiter.svg"
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.jup.ag/"
 fUSDT = "https://www.jup.ag/"
-fTUSD = "https://www.jup.ag/"
-fFRAX = "https://www.jup.ag/"
-fDAI = "https://www.jup.ag/"
 
 # provider icons
 [provider_icons]
