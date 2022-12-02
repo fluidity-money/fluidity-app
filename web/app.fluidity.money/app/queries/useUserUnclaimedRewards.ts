@@ -13,6 +13,7 @@ const query: Queryable = {
         token_short_name
         transaction_hash
         win_amount
+        block_number
       }
     }
   `,
