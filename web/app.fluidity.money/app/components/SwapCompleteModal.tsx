@@ -193,7 +193,11 @@ const SwapCompleteModal = ({
                 FLUIDIFY MORE ASSETS
               </LinkButton>
             </Link>
-            <a href={getTxExplorerLink(network as Chain, txHash)}>
+            <a
+              href={getTxExplorerLink(network as Chain, txHash)}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <LinkButton
                 type="internal"
                 size="medium"
