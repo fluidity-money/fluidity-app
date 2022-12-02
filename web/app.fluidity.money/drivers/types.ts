@@ -1,6 +1,7 @@
 export enum NotificationType {
   ONCHAIN = 1,
-  REWARD_DATABASE,
+  WINNING_REWARD_DATABASE,
+  PENDING_REWARD_DATABASE,
 }
 
 export type PipedTransaction = {

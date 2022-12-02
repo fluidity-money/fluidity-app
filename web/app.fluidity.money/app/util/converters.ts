@@ -106,12 +106,19 @@ const trimAddress = (address: string): string => {
 };
 
 const transactionActivityLabel = (
-  activity: { sender: string; currency: string; swapType?: "in" | "out"; [key: string]: unknown },
+  activity: {
+    sender: string;
+    currency: string;
+    swapType?: "in" | "out";
+    [key: string]: unknown;
+  },
   address: string
 ) => {
   const { sender, currency, swapType } = activity;
   if (swapType)
-    return swapType === "in" ? `Fluidified ${currency}` : `Reverted ${currency}`;
+    return swapType === "in"
+      ? `Fluidified ${currency}`
+      : `Reverted ${currency}`;
 
   return sender === address ? `Sent ${currency}` : `Received ${currency}`;
 };
