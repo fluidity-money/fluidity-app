@@ -26,10 +26,7 @@ const queryAll = gql`
     ) {
       ...rewardFields
     }
-    all: rewardFields(
-      where: { network: { _eq: $network } }
-      args: {}
-    ) {
+    all: rewardFields(where: { network: { _eq: $network } }, args: {}) {
       ...rewardFields
     }
   }
@@ -48,28 +45,28 @@ const queryByAddress = gql`
     total_reward
     count
   }
-  query TotalRewards($network: network_blockchain! $address: String!) {
+  query TotalRewards($network: network_blockchain!, $address: String!) {
     week: total_reward(
       where: { network: { _eq: $network } }
-      args: { i: "1 week" address: $address}
+      args: { i: "1 week", address: $address }
     ) {
       ...rewardFields
     }
     month: rewardFields(
       where: { network: { _eq: $network } }
-      args: { i: "1 month" address: $address}
+      args: { i: "1 month", address: $address }
     ) {
       ...rewardFields
     }
     year: rewardFields(
       where: { network: { _eq: $network } }
-      args: { i: "1 year" address: $address}
+      args: { i: "1 year", address: $address }
     ) {
       ...rewardFields
     }
     all: rewardFields(
       where: { network: { _eq: $network } }
-      args: {address: $address}
+      args: { address: $address }
     ) {
       ...rewardFields
     }
@@ -111,7 +108,6 @@ export type UserYield = {
   total_reward: number;
   count: number;
 };
-
 
 export type UserYieldResponse = {
   data?: {
