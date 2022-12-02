@@ -56,7 +56,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
   const { tokens, explorer } =
-  serverConfig.config[network as unknown as string] ?? {};
+    serverConfig.config[network as unknown as string] ?? {};
 
   const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
   const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;

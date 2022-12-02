@@ -11,7 +11,7 @@ type Transaction = {
   currency: string;
   logo: string;
   provider: string;
-  swapType?: "in" | "out"
+  swapType?: "in" | "out";
 };
 
 export default Transaction;

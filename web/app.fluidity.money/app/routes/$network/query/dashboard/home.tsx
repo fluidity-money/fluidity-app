@@ -5,7 +5,7 @@ import type Transaction from "~/types/Transaction";
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import { useUserRewardsAll } from "~/queries";
-import {MintAddress} from "~/types/MintAddress";
+import { MintAddress } from "~/types/MintAddress";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { network } = params;
@@ -35,8 +35,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     // winners to look up if a transaction was the send that caused a win
     // payouts to look up if a transaction was a payout transaction
-    type winnerMap = {[key: string]: Winner};
-    const {winners: winnersMap, payouts: payoutsMap} = data.winners.reduce(
+    type winnerMap = { [key: string]: Winner };
+    const { winners: winnersMap, payouts: payoutsMap } = data.winners.reduce(
       (map, winner) => ({
         ...map,
         winners: {
@@ -50,9 +50,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           [winner.transaction_hash]: {
             ...winner,
           },
-        }
+        },
       }),
-      {} as {winners: winnerMap, payouts: winnerMap}
+      {} as { winners: winnerMap; payouts: winnerMap }
     );
 
     const {
@@ -80,12 +80,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           return [];
         }
 
-        const swapType = tx.sender === MintAddress ? 
-          "in" :
-        tx.receiver === MintAddress ?
-          "out" :
-        undefined;
-          
+        const swapType =
+          tx.sender === MintAddress
+            ? "in"
+            : tx.receiver === MintAddress
+            ? "out"
+            : undefined;
+
         const winner = winnersMap[tx.hash];
 
         return {
@@ -106,7 +107,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             (network === "ethereum"
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "",
-          swapType, 
+          swapType,
         };
       }) ?? [];
 
