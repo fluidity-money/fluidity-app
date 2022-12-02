@@ -131,14 +131,6 @@ jobs:
         with:
           command: |
             flu deploy-diff --network fluidity --environment $ENVIRONMENT --tag $GITHUB_SHA
-      - name: Save
-        uses: ./scripts/actions
-        if: success()
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
-          command: |
-            flu save-info
       - name: Discord
         uses: ./scripts/actions
         if: always()
@@ -148,3 +140,16 @@ jobs:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
+  save-info:
+    if: needs.get-diff.outputs.file_exists == 'true'
+    runs-on: ubuntu-latest
+    environment: mainnet
+    needs: [get-diff]
+    steps:
+      - name: Save
+        uses: ./scripts/actions
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        with: 
+          command: |
+            flu save-info
