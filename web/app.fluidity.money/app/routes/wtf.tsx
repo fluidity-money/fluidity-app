@@ -2,7 +2,7 @@ import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics
 
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
-import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
+import { HeadersFunction, json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
 import { format } from "date-fns";
@@ -89,6 +89,10 @@ export const loader: LoaderFunction = async () => {
     },
   });
 };
+
+export const headers: HeadersFunction = () => ({
+  "Cache-Control": "public, s-maxage=60",
+})
 
 type WinnerWinnings = {
   [Address: string]: {
