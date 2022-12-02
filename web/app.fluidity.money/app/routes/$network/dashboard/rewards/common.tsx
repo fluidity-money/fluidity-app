@@ -50,37 +50,42 @@ const UserRewards = ({
 
     setClaiming(true);
 
-    const rewards = await manualReward?.(tokenAddrs, address ?? "");
+    try {
+      const rewards = await manualReward?.(tokenAddrs, address ?? "");
 
-    if (!rewards?.length) {
-      // Toast Error
+      if (!rewards?.length) {
+        // Toast Error
+
+        return;
+      }
+
+      const rewardedSum = rewards.reduce(
+        (sum, res) => sum + (res?.amount || 0),
+        0
+      );
+
+      if (!rewardedSum) {
+        // Toast Error
+        setClaiming(false);
+
+        return;
+      }
+
+      const networkFee = rewards.reduce(
+        (sum, res) => sum + (res?.networkFee || 0),
+        0
+      );
+
+      const gasFee = rewards.reduce((sum, res) => sum + (res?.gasFee || 0), 0);
+
+      return navigate(
+        `../claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
+      );
+    } catch (e) {
+      console.error(e);
+    } finally {
       setClaiming(false);
-
-      return;
     }
-
-    const rewardedSum = rewards.reduce(
-      (sum, res) => sum + (res?.amount || 0),
-      0
-    );
-
-    if (!rewardedSum) {
-      // Toast Error
-      setClaiming(false);
-
-      return;
-    }
-
-    const networkFee = rewards.reduce(
-      (sum, res) => sum + (res?.networkFee || 0),
-      0
-    );
-
-    const gasFee = rewards.reduce((sum, res) => sum + (res?.gasFee || 0), 0);
-
-    return navigate(
-      `../claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
-    );
   };
 
   return (

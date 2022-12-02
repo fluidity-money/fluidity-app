@@ -33,7 +33,7 @@ const Provider = ({
 }) => {
   const providers: ProviderMap = {
     ethereum: EthereumProvider(ethRpc, tokens),
-    solana: SolanaProvider(solRpc),
+    solana: SolanaProvider(solRpc, tokens),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
