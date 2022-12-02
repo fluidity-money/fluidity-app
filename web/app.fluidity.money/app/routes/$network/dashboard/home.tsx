@@ -150,16 +150,6 @@ export default function Home() {
     graphTransformedTransactions: [],
   });
 
-  useEffect(() => {
-    setTransactions({
-      count: totalCount,
-      transactions: totalTransactions,
-      rewards: totalRewards,
-      volume: totalVolume,
-      graphTransformedTransactions: [],
-    });
-  }, [totalCount, totalTransactions, totalRewards, totalVolume]);
-
   const binTransactions = (
     bins: Transaction[],
     txs: Transaction[]
