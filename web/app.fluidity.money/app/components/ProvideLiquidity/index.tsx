@@ -29,7 +29,7 @@ const ProvideLiquidity = () => {
     .filter((token) => token.isFluidOf);
 
   // token for liquidity provider pools
-  const [poolToken, setPoolToken] = useState(fluidTokens[3]);
+  const [poolToken, setPoolToken] = useState(fluidTokens[0]);
 
   const providers =
     network === "ethereum"
