@@ -1,5 +1,5 @@
 import { json, LoaderFunction } from "@remix-run/node";
-import BN, { BN } from "bn.js";
+import BN from "bn.js";
 import { useVolumeCalculation, VolumeCalculationResponse } from "~/queries/useVolumeCalculation";
 import config from "~/webapp.config.server";
 
