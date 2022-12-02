@@ -425,6 +425,49 @@ main > footer > section > a {
   text-underline-offset: 4px;
 }
 
+.open-provider-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  position: relative;
+}
+
+.open-provider-dropdown:hover {
+  opacity: 0.8;
+}
+
+.open-provider-dropdown > img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.dropdown-options {
+  background: rgba(50, 50, 50, 0.65);
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 12px;
+  position: absolute;
+  top: 66px;
+  left: -10px;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.token-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-radius: 12px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+}
+
+.token-option:hover {
+  background: rgba(99, 99, 99, 0.75);
+}
+
 .cover {
   position: fixed;
   top: 0;

@@ -28,6 +28,7 @@ const ProvideLiquidity = () => {
     .map((token) => token)
     .filter((token) => token.isFluidOf);
 
+  // token for liquidity provider pools
   const [poolToken, setPoolToken] = useState(fluidTokens[3]);
 
   const providers =
@@ -40,15 +41,40 @@ const ProvideLiquidity = () => {
       {providers.map((provider) => (
         <motion.a
           key={provider.name}
-          href={provider.link}
+          href={provider.link[poolToken.symbol]}
           rel="noopener noreferrer"
           target="_blank"
           variants={parent}
           initial="variantA"
           whileHover="variantB"
         >
-          <motion.img src={provider.img} variants={child} />
+          <motion.img
+            src={provider.img}
+            variants={child}
+            style={{ width: 72, height: 72 }}
+          />
         </motion.a>
+      ))}
+    </div>
+  );
+
+  const [openDropdown, setOpenDropdown] = useState(false);
+
+  const dropdownOptions = (
+    <div className="dropdown-options">
+      {fluidTokens.map((option) => (
+        <button
+          className="token-option"
+          onClick={() => {
+            setPoolToken(() => option);
+          }}
+          key={`${option.name} ${option.logo}`}
+        >
+          <Text size="xl" prominent={true}>
+            {option.symbol}
+          </Text>
+          <img style={{ width: 30, height: 30 }} src={option.logo} />
+        </button>
       ))}
     </div>
   );
@@ -65,9 +91,18 @@ const ProvideLiquidity = () => {
         <section className="provide-liquidity-left">
           <Heading as="h2" className="provide-heading">
             Provide Liquidity for{" "}
-            <Text className="fluid-liquidity-token" prominent={true}>
-              {poolToken.symbol}
-            </Text>
+            <button
+              className="open-provider-dropdown"
+              onClick={() => {
+                setOpenDropdown(() => !openDropdown);
+              }}
+            >
+              {openDropdown && dropdownOptions}
+              <Heading as="h2" className="fluid-liquidity-token">
+                {poolToken.symbol}
+              </Heading>
+              <img src="/images/icons/triangleDown.svg" />
+            </button>
           </Heading>
 
           {liqidityProviders}
