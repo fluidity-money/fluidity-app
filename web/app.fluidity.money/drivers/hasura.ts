@@ -21,6 +21,7 @@ const WinnerSubscriptionQuery = gql`
       token_decimals
       winning_amount
       reward_type
+      network
     }
   }
 `;
@@ -62,6 +63,7 @@ type WinnerData = {
   token_decimals: number;
   winning_amount: number;
   reward_type: string;
+  network: string;
 };
 
 type PendingWinnerData = {
@@ -98,7 +100,10 @@ export const winnersTransactionObservable = (url: string, address: string) =>
         const itemObject = _eventData.data.winners.at(0) as WinnerData | never;
 
         const transaction: PipedTransaction = {
-          type: NotificationType.WINNING_REWARD_DATABASE,
+          type:
+            itemObject.network === `ethereum`
+              ? NotificationType.CLAIMED_WINNING_REWARD
+              : NotificationType.WINNING_REWARD,
           source: "",
           destination: itemObject.winning_address,
           amount: shorthandAmountFormatter(
@@ -147,7 +152,7 @@ export const pendingWinnersTransactionObservables = (
           | never;
 
         const transaction: PipedTransaction = {
-          type: NotificationType.PENDING_REWARD_DATABASE,
+          type: NotificationType.PENDING_REWARD,
           source: "",
           destination: itemObject.address,
           amount: shorthandAmountFormatter(
