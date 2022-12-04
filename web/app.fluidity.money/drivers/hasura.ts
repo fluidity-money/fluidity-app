@@ -56,8 +56,7 @@ const createHasuraSubscriptionObservable = (
           reconnect: true,
           connectionParams: {
             headers: {
-              "x-hasura-admin-secret":
-              config.drivers["hasura"][0].secret,
+              "x-hasura-admin-secret": config.drivers["hasura"][0].secret,
             },
           },
         },
@@ -148,9 +147,7 @@ export const winnersTransactionObservable = (address: string) =>
     );
   });
 
-export const pendingWinnersTransactionObservables = (
-  address: string
-) =>
+export const pendingWinnersTransactionObservables = (address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
     createHasuraSubscriptionObservable(PendingWinnerSubscriptionQuery, {
       address: address,
