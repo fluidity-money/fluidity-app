@@ -4,7 +4,14 @@ import { WebSocketLink } from "apollo-link-ws";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import ws from "ws";
 import { Observable } from "rxjs";
-import { PipedTransaction, NotificationType } from "./types";
+import {
+  PipedTransaction,
+  NotificationType,
+  WinnerData,
+  PendingWinnerData,
+  WinnerEvent,
+  PendingWinnerEvent,
+} from "./types";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 import { captureException } from "@sentry/remix";
 import config from "~/webapp.config.server";
@@ -69,37 +76,6 @@ const createHasuraSubscriptionObservable = (
     }
   );
 
-type WinnerData = {
-  transaction_hash: string;
-  token_short_name: string;
-  winning_address: string;
-  token_decimals: number;
-  winning_amount: number;
-  reward_type: string;
-  network: string;
-};
-
-type PendingWinnerData = {
-  transaction_hash: string;
-  token_short_name: string;
-  address: string;
-  token_decimals: number;
-  win_amount: number;
-  reward_type: string;
-};
-
-type WinnerEvent = {
-  data: {
-    winners: WinnerData[];
-  };
-};
-
-type PendingWinnerEvent = {
-  data: {
-    ethereum_pending_winners: PendingWinnerData[];
-  };
-};
-
 export const winnersTransactionObservable = (address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
     createHasuraSubscriptionObservable(WinnerSubscriptionQuery, {
@@ -110,7 +86,7 @@ export const winnersTransactionObservable = (address: string) =>
         const _eventData = eventData as WinnerEvent;
         if (_eventData.data.winners.length === 0) return;
         // Will never fail because of the length check above
-        const itemObject = _eventData.data.winners.at(0) as WinnerData | never;
+        const itemObject = _eventData.data.winners?.at(0) as WinnerData | never;
 
         const transaction: PipedTransaction = {
           type:
