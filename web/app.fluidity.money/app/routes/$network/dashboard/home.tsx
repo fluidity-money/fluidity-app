@@ -19,11 +19,7 @@ import {
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useEffect } from "react";
-import {
-  useLoaderData,
-  useNavigate,
-  useFetcher,
-} from "@remix-run/react";
+import { useLoaderData, useNavigate, useFetcher } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -261,7 +257,7 @@ export default function Home() {
   const [userFluidPairs, setUserFluidPairs] = useState(
     SAFE_DEFAULT.totalFluidPairs
   );
-  
+
   const data: {
     global: CacheData;
     user: CacheData;

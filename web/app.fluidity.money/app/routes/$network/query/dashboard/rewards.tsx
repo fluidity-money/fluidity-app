@@ -35,11 +35,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       RewardAbi
     );
 
-    const { transactions } = await jsonGet<{page: number}, {transactions: Transaction[]}>(
-      `${url.origin}/${network}/query/userTransactions`,{
-        page,
-      }
-    )
+    const { transactions } = await jsonGet<
+      { page: number },
+      { transactions: Transaction[] }
+    >(`${url.origin}/${network}/query/userTransactions`, {
+      page,
+    });
 
     const {
       config: {
@@ -105,7 +106,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       .sort(({ avgPrize: avgPrizeA }, { avgPrize: avgPrizeB }) =>
         avgPrizeA > avgPrizeB ? 1 : avgPrizeA === avgPrizeB ? 0 : -1
       ) as Provider[];
-    
+
     return json({
       rewarders,
       fluidTokenMap,
