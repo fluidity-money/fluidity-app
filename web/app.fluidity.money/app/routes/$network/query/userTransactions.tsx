@@ -1,14 +1,18 @@
-import { LoaderFunction, json, redirect } from "@remix-run/node";
+import type Transaction from "~/types/Transaction";
+import type { Winner } from "~/queries/useUserRewards";
 
+import { LoaderFunction, json } from "@remix-run/node";
+import config from "~/webapp.config.server";
 import {
-  useUserTransactionAllCount,
-  useUserTransactionByAddressCount,
+  useUserRewardsAll,
+  useUserRewardsByAddress,
+  useUserTransactionsByTxHash,
   useUserTransactionsAll,
   useUserTransactionsByAddress,
 } from "~/queries";
 import { captureException } from "@sentry/react";
 
-export type UserTransaction = {
+type UserTransaction = {
   sender: string;
   receiver: string;
   hash: string;
@@ -17,10 +21,15 @@ export type UserTransaction = {
   currency: string;
 };
 
+export type TransactionsLoader = {
+  transactions: Transaction[];
+};
+
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
+  const winnersOnly = url.searchParams.get("winsOnly");
   const address = url.searchParams.get("address");
   const page_ = url.searchParams.get("page");
 
@@ -28,48 +37,41 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const page = parseInt(page_);
 
-  if (!page || page < 1) return new Error("Invalid Request");
+  if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const [
-      { data: userTransactionCountData, errors: userTransactionCountErr },
-      { data: userTransactionsData, errors: userTransactionsErr },
-    ] = await Promise.all(
-      address
-        ? [
-            useUserTransactionByAddressCount(network, address),
-            useUserTransactionsByAddress(network, address, page),
-          ]
-        : [
-            useUserTransactionAllCount(network),
-            useUserTransactionsAll(network, page),
-          ]
+    const { data: winnersData, errors: winnersErr } = address
+      ? await useUserRewardsByAddress(network ?? "", address)
+      : await useUserRewardsAll(network ?? "");
+
+    if (winnersErr || !winnersData) {
+      throw winnersErr;
+    }
+
+    const winnersMap = winnersData.winners.reduce(
+      (map, winner) => ({
+        ...map,
+        [winner.send_transaction_hash]: {
+          ...winner,
+        },
+      }),
+      {} as { [key: string]: Winner }
     );
 
-    if (!userTransactionCountData || userTransactionCountErr) {
-      captureException(
-        new Error(
-          `Could not fetch Transactions count for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
-          },
+    const { data: userTransactionsData, errors: userTransactionsErr } =
+      await (async () => {
+        switch (true) {
+          case !!winnersOnly:
+            return useUserTransactionsByTxHash(
+              network,
+              Object.keys(winnersMap)
+            );
+          case !!address:
+            return useUserTransactionsByAddress(network, address as string);
+          default:
+            return useUserTransactionsAll(network);
         }
-      );
-
-      return new Error("Server could not fulfill request");
-    }
-
-    const {
-      [network as string]: {
-        transfers: [{ count: txCount }],
-      },
-    } = userTransactionCountData;
-
-    if (Math.ceil(txCount / 12) < page && txCount > 0) {
-      return redirect(`./`, 301);
-    }
+      })();
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -120,10 +122,50 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }
     );
 
+    const {
+      config: {
+        [network as string]: { tokens },
+      },
+    } = config;
+
+    const tokenLogoMap = tokens.reduce(
+      (map, token) => ({
+        ...map,
+        [token.symbol]: token.logo,
+      }),
+      {} as Record<string, string>
+    );
+
+    const defaultLogo = "/assets/tokens/usdt.svg";
+
+    const mergedTransactions: Transaction[] = sanitizedTransactions.map(
+      (tx) => {
+        const winner = winnersMap[tx.hash];
+
+        return {
+          sender: tx.sender,
+          receiver: tx.receiver,
+          winner: winner?.winning_address ?? "",
+          reward: winner
+            ? winner.winning_amount / 10 ** winner.token_decimals
+            : 0,
+          hash: tx.hash,
+          rewardHash: winner?.transaction_hash ?? "",
+          currency: tx.currency,
+          value: tx.value,
+          timestamp: tx.timestamp,
+          logo: tokenLogoMap[tx.currency] || defaultLogo,
+          provider:
+            (network === "ethereum"
+              ? winner?.ethereum_application
+              : winner?.solana_application) ?? "Fluidity",
+        };
+      }
+    );
+
     return json({
-      transactions: sanitizedTransactions,
-      count: txCount,
-    });
+      transactions: mergedTransactions,
+    } as TransactionsLoader);
   } catch (err) {
     captureException(
       new Error(
