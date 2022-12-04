@@ -98,7 +98,7 @@ const UserRewards = ({
         rounded={true}
         type={"box"}
       >
-        <div className="card-inner">
+        <div className="card-inner unclaimed-inner">
           <section id="unclaimed-left">
             {/* Icon */}
             <img
@@ -145,12 +145,14 @@ const UserRewards = ({
             <Heading className="claims-title" as="h5">
               Auto-claims
             </Heading>
-            {autoClaimInfo.map((text, i) => (
-              <Text size={"xs"} key={`text-${i}`}>
-                {text}
-                <br />
-              </Text>
-            ))}
+
+            <Text size={"xs"}>
+              Rewards will be claimed automatically, without fees when market
+              volume is reached. Claiming before this, time will incur
+              instant-claim fees stated below.
+              <br />
+            </Text>
+
             <hr className="gradient-line" />
             <Heading className="claims-title" as="h5">
               Instant-claim fees
@@ -202,9 +204,3 @@ const UserRewards = ({
 };
 
 export { UserRewards };
-
-const autoClaimInfo = [
-  "Rewards will be claimed automatically, without fees",
-  "when market volume is reached. Claiming before this",
-  "time will incur instant-claim fees stated below.",
-];

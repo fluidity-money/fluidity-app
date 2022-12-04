@@ -2,9 +2,9 @@
 
 ## Environment variables
 
-| Name                           | Description                                  |
-| ------------------------------ | -------------------------------------------- |
-| `NEXT_PUBLIC_FLU_ETH_RPC_HTTP` | URI to fetch amount in prizepool for ethereum|
+| Name              | Description                                  |
+|-------------------|----------------------------------------------|
+| `FLU_ETH_RPC_HTTP`| URI to fetch amount in prizepool for ethereum|
 
 ## Building
 

@@ -3,19 +3,20 @@
 // LICENSE.md file.
 
 import Head from "next/head";
+import { IPropPools } from "pages";
 import Articles from "screens/Articles";
-import Ecosystem from "screens/Ecosystem";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
 import HowItWorks from "../../screens/HowItWorks";
 import Landing from "../../screens/Landing";
-import Resources from "../../screens/Resources";
 import Reward from "../../screens/Reward";
 import SponsorsPartners from "../../screens/SponsorsPartners";
 import UseCases from "../../screens/UseCases";
 import styles from "./LandingPage.module.scss";
 
-const LandingPage = () => {
+const LandingPage = (props) => {
+  const { ethPool, solPool } :IPropPools = JSON.parse(props.pools);
+
   return (
     <div className={styles.pageContainer}>
       <Head>
@@ -24,7 +25,7 @@ const LandingPage = () => {
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
-        <Reward />
+        <Reward ethPool={Number(ethPool)} solPool={Number(solPool)} />
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />

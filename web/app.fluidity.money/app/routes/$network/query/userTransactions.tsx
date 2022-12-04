@@ -11,6 +11,7 @@ import {
   useUserTransactionsByAddress,
 } from "~/queries";
 import { captureException } from "@sentry/react";
+import { MintAddress } from "~/types/MintAddress";
 
 type UserTransaction = {
   sender: string;
@@ -22,8 +23,8 @@ type UserTransaction = {
 };
 
 export type TransactionsLoader = {
-  transactions: Transaction[];
-};
+  transactions: Transaction[]
+}
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
@@ -40,14 +41,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const { data: winnersData, errors: winnersErr } = address
-      ? await useUserRewardsByAddress(network ?? "", address)
-      : await useUserRewardsAll(network ?? "");
+    const { data: winnersData, errors: winnersErr } = address ? await useUserRewardsByAddress(network ?? "", address) : await useUserRewardsAll(network ?? "") ;
 
     if (winnersErr || !winnersData) {
       throw winnersErr;
     }
 
+    // winnersMap looks up if a transaction was the send that caused a win
     const winnersMap = winnersData.winners.reduce(
       (map, winner) => ({
         ...map,
@@ -57,22 +57,30 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }),
       {} as { [key: string]: Winner }
     );
-
-    const { data: userTransactionsData, errors: userTransactionsErr } =
-      await (async () => {
+    
+    // payoutsMap looks up if a transaction was a payout transaction
+    const payoutsMap = winnersData.winners.reduce(
+      (map, winner) => ({
+          ...map,
+          [winner.transaction_hash]: {
+            ...winner,
+          },
+      }),
+      {} as { [key: string]: Winner }
+    )
+    
+    const { data: userTransactionsData, errors: userTransactionsErr } = await (
+      (async () => {
         switch (true) {
-          case !!winnersOnly:
-            return useUserTransactionsByTxHash(
-              network,
-              Object.keys(winnersMap)
-            );
-          case !!address:
-            return useUserTransactionsByAddress(network, address as string);
+          case (!!winnersOnly): 
+              return useUserTransactionsByTxHash(network, Object.keys(winnersMap))
+          case (!!address): 
+            return useUserTransactionsByAddress(network, address as string)
           default:
-            return useUserTransactionsAll(network);
-        }
-      })();
-
+            return useUserTransactionsAll(network)
+      }})()
+    );
+    
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
         new Error(
@@ -91,9 +99,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
-
+    
     // Destructure GraphQL data
-    const sanitizedTransactions: UserTransaction[] = transactions.map(
+    const userTransactions: UserTransaction[] = transactions.map(
       (transaction) => {
         const {
           sender: { address: sender },
@@ -121,6 +129,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         };
       }
     );
+    
+    // skip payout transactions
+    const sanitisedTransactions: UserTransaction[] = userTransactions.filter(({hash}) => !payoutsMap[hash])
 
     const {
       config: {
@@ -135,34 +146,40 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }),
       {} as Record<string, string>
     );
-
+    
     const defaultLogo = "/assets/tokens/usdt.svg";
+    
+    const mergedTransactions: Transaction[] = sanitisedTransactions.map(tx => {
+      const swapType =
+        tx.sender === MintAddress
+          ? "in"
+          : tx.receiver === MintAddress
+          ? "out"
+          : undefined;
 
-    const mergedTransactions: Transaction[] = sanitizedTransactions.map(
-      (tx) => {
-        const winner = winnersMap[tx.hash];
-
-        return {
-          sender: tx.sender,
-          receiver: tx.receiver,
-          winner: winner?.winning_address ?? "",
-          reward: winner
-            ? winner.winning_amount / 10 ** winner.token_decimals
-            : 0,
-          hash: tx.hash,
-          rewardHash: winner?.transaction_hash ?? "",
-          currency: tx.currency,
-          value: tx.value,
-          timestamp: tx.timestamp,
-          logo: tokenLogoMap[tx.currency] || defaultLogo,
-          provider:
-            (network === "ethereum"
-              ? winner?.ethereum_application
-              : winner?.solana_application) ?? "Fluidity",
-        };
-      }
-    );
-
+      const winner = winnersMap[tx.hash];
+      
+      return {
+        sender: tx.sender,
+        receiver: tx.receiver,
+        winner: winner?.winning_address ?? "",
+        reward: winner
+          ? winner.winning_amount / 10 ** winner.token_decimals
+          : 0,
+        hash: tx.hash,
+        rewardHash: winner?.transaction_hash ?? "",
+        currency: tx.currency,
+        value: tx.value,
+        timestamp: tx.timestamp,
+        logo: tokenLogoMap[tx.currency] || defaultLogo,
+        provider:
+          (network === "ethereum"
+            ? winner?.ethereum_application
+            : winner?.solana_application) ?? "Fluidity",
+        swapType,
+      };
+    })
+    
     return json({
       transactions: mergedTransactions,
     } as TransactionsLoader);

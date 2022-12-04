@@ -1,10 +1,10 @@
 import type { Chain } from "~/util/chainUtils/chains";
+import type { Volume } from "../volumeStats";
 import type { Winner } from "~/queries/useUserRewards";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import { useUserRewardsAll, useUserRewardsByAddress } from "~/queries";
-import { Volume } from "../volumeStats";
 import { jsonGet } from "~/util/api/rpc";
 
 export type HomeLoader = {

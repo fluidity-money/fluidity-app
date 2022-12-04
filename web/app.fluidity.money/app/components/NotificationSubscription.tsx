@@ -75,13 +75,21 @@ export const NotificationSubscription = ({
         ? "Mint"
         : trimAddress(payload.destination);
 
-    return payload.type === NotificationType.REWARD_DATABASE
-      ? payload.rewardType === `send`
-        ? `reward for s͟e͟n͟d͟i͟n͟g`
-        : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
-      : rawAddress !== payload.source
-      ? `r͟e͟c͟e͟i͟v͟e͟d from ` + sourceParseTrimAddress
-      : `s͟e͟n͟t to ` + destinationParseTrimAddress;
+    const rewardDetails =
+      payload.type === NotificationType.WINNING_REWARD_DATABASE
+        ? payload.rewardType === `send`
+          ? `reward for s͟e͟n͟d͟i͟n͟g`
+          : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
+        : "reward to c̲l̲a̲i̲m̲ 🎉";
+
+    const fluidTokenTransferDetails =
+      rawAddress !== payload.source
+        ? `r͟e͟c͟e͟i͟v͟e͟d from ` + sourceParseTrimAddress
+        : `s͟e͟n͟t to ` + destinationParseTrimAddress;
+
+    return payload.type === NotificationType.ONCHAIN
+      ? fluidTokenTransferDetails
+      : rewardDetails;
   };
 
   const handleClientListener = (payload: PipedTransaction) => {
@@ -100,7 +108,7 @@ export const NotificationSubscription = ({
         details={notifDetails(payload)}
         linkLabel={"DETAILS"}
         linkLabelOnClickCallback={async () => {
-          payload.type === NotificationType.REWARD_DATABASE
+          payload.type !== NotificationType.ONCHAIN
             ? setDetailedRewardObject({
                 visible: true,
                 token: payload.token,

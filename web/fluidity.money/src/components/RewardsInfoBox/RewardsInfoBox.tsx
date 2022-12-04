@@ -69,7 +69,7 @@ const RewardsInfoBox = ({
         <div onClick={changeScreen}>
           <Heading as="h1">
             {showRewardPool
-              ? stringifiedNumberToMonetaryString(rewardPool)
+              ? `$${stringifiedNumberToMonetaryString(rewardPool)}`
               : totalTransactions}
           </Heading>
         </div>

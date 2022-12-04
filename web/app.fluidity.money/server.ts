@@ -18,7 +18,8 @@ import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
   getTransactionsObservableForIn,
-  getHasuraTransactionObservable,
+  winnersTransactionObservable,
+  pendingWinnersTransactionObservables,
 } from "./drivers";
 
 const app = express();
@@ -101,8 +102,11 @@ io.on("connection", (socket) => {
     const OnChainTransactionsObservable: Observable<PipedTransaction> =
       getTransactionsObservableForIn(protocol, {}, ...Tokens);
 
-    const DbTransactionsObservable: Observable<PipedTransaction> =
-      getHasuraTransactionObservable(hasuraUrl, address);
+    const winnersObservable: Observable<PipedTransaction> =
+      winnersTransactionObservable(hasuraUrl, address);
+
+    const pendingwinnersObservable: Observable<PipedTransaction> =
+      pendingWinnersTransactionObservables(hasuraUrl, address);
 
     const OnChainTransactionFilterObservable = getObservableForAddress(
       OnChainTransactionsObservable,
@@ -116,13 +120,33 @@ io.on("connection", (socket) => {
       })
     );
 
-    DbTransactionsObservable.subscribe({
+    winnersObservable.subscribe({
       next(data) {
         socket.emit("Transactions", data);
       },
       error(err) {
         captureException(
-          new Error(`Failed to dispatch db transaction observable :: ${err}`),
+          new Error(
+            `Failed to dispatch db transaction observable on winners :: ${err}`
+          ),
+          {
+            tags: {
+              section: "server",
+            },
+          }
+        );
+      },
+    });
+
+    pendingwinnersObservable.subscribe({
+      next(data) {
+        socket.emit("Transactions", data);
+      },
+      error(err) {
+        captureException(
+          new Error(
+            `Failed to dispatch db transaction observable on pending winners :: ${err}`
+          ),
           {
             tags: {
               section: "server",
