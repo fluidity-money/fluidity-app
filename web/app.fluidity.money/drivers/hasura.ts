@@ -7,6 +7,7 @@ import { Observable } from "rxjs";
 import { PipedTransaction, NotificationType } from "./types";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 import { captureException } from "@sentry/remix";
+import config from "~/webapp.config.server";
 
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
@@ -43,18 +44,31 @@ const PendingWinnerSubscriptionQuery = gql`
   }
 `;
 
-const getWsClient = (wsurl: string) =>
-  new SubscriptionClient(wsurl, { reconnect: true }, ws);
-
 const createHasuraSubscriptionObservable = (
-  wsurl: string,
   query: DocumentNode, // Explicitly when using apollo
   variables: Record<string, unknown>
 ) =>
-  execute(new WebSocketLink(getWsClient(wsurl)), {
-    query: query,
-    variables: variables,
-  });
+  execute(
+    new WebSocketLink(
+      new SubscriptionClient(
+        config.drivers["hasura"][0].rpc.ws,
+        {
+          reconnect: true,
+          connectionParams: {
+            headers: {
+              "x-hasura-admin-secret":
+              config.drivers["hasura"][0].secret,
+            },
+          },
+        },
+        ws
+      )
+    ),
+    {
+      query: query,
+      variables: variables,
+    }
+  );
 
 type WinnerData = {
   transaction_hash: string;
@@ -87,9 +101,9 @@ type PendingWinnerEvent = {
   };
 };
 
-export const winnersTransactionObservable = (url: string, address: string) =>
+export const winnersTransactionObservable = (address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
-    createHasuraSubscriptionObservable(url, WinnerSubscriptionQuery, {
+    createHasuraSubscriptionObservable(WinnerSubscriptionQuery, {
       address: address,
     }).subscribe(
       (eventData: unknown) => {
@@ -135,11 +149,10 @@ export const winnersTransactionObservable = (url: string, address: string) =>
   });
 
 export const pendingWinnersTransactionObservables = (
-  url: string,
   address: string
 ) =>
   new Observable<PipedTransaction>((subscriber) => {
-    createHasuraSubscriptionObservable(url, PendingWinnerSubscriptionQuery, {
+    createHasuraSubscriptionObservable(PendingWinnerSubscriptionQuery, {
       address: address,
     }).subscribe(
       (eventData: unknown) => {

@@ -79,7 +79,6 @@ const solanaTokens = config.config["solana"].tokens
     decimals: entry.decimals,
   }));
 
-const hasuraUrl = config.database.hasura;
 const registry = new Map<string, Subscription>();
 
 type TokenList = {
@@ -103,10 +102,10 @@ io.on("connection", (socket) => {
       getTransactionsObservableForIn(protocol, {}, ...Tokens);
 
     const winnersObservable: Observable<PipedTransaction> =
-      winnersTransactionObservable(hasuraUrl, address);
+      winnersTransactionObservable(address);
 
     const pendingwinnersObservable: Observable<PipedTransaction> =
-      pendingWinnersTransactionObservables(hasuraUrl, address);
+      pendingWinnersTransactionObservables(address);
 
     const OnChainTransactionFilterObservable = getObservableForAddress(
       OnChainTransactionsObservable,

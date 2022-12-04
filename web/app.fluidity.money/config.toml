@@ -11,8 +11,11 @@ server = "https://api.ethereum.fluidity.money"
 # rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
 # server = "https://api.solana.fluidity.money"
 
-[database]
-hasura = "https://fluidity.hasura.app/v1/graphql"
+[[drivers.hasura]]
+label= "Hasura"
+testnet = false
+rpc = { http = "FLU_HASURA_RPC_HTTP", ws = "FLU_HASURA_RPC_WS" }
+secret = "FLU_HASURA_SECRET"
 
 # Chain Configurations 
 [config.ethereum]

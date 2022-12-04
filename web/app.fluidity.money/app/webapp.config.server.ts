@@ -24,7 +24,8 @@ const OptionsSchema = z.object({
             http: envVar().default(z.string()),
             ws: envVar().default(z.string()),
           }),
-          server: z.string(),
+          secret: envVar().default(z.string()).optional(),
+          server: z.string().optional(),
         })
       )
       .min(1)
@@ -101,9 +102,6 @@ const OptionsSchema = z.object({
     Raydium: z.string(),
     Lifinity: z.string(),
     Mercurial: z.string(),
-  }),
-  database: z.object({
-    hasura: z.string(),
   }),
 });
 
