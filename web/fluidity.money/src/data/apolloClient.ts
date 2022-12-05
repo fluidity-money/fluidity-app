@@ -16,19 +16,17 @@ const wsLink = typeof window !== "undefined"
   }))
   : null;
 
-const splitLink = typeof window !== "undefined" && wsLink != null
-  ? split(
-    ({ query }) => {
-      const definition = getMainDefinition(query);
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      );
-    },
-    wsLink,
-    httpLink,
-  )
-  : httpLink;
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  httpLink,
+)
 
 const client = new ApolloClient({
   link: splitLink,
