@@ -496,7 +496,11 @@ main > footer > section > a {
   position: relative;
 }
 
-.open-provider-dropdown:hover {
+.open-provider-dropdown:hover > h1 {
+  opacity: 0.8;
+}
+
+.open-provider-dropdown:hover > img {
   opacity: 0.8;
 }
 
