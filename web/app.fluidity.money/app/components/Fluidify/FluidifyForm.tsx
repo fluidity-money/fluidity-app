@@ -125,10 +125,18 @@ export const FluidifyForm = ({
           placeholder="0"
           step="any"
         />
+
         <Text size="lg">{assetToken?.symbol || ""}</Text>
-        <span className={"fluidify-input-max-btn"} onClick={inputMaxBalance}>
+
+        <GeneralButton
+          version={"transparent"}
+          size="small"
+          buttontype="text"
+          handleClick={inputMaxBalance}
+          disabled={assetToken.userTokenBalance.toString() === swapInput}
+        >
           max
-        </span>
+        </GeneralButton>
       </section>
 
       <hr className={"fluidify-form-el"} />
