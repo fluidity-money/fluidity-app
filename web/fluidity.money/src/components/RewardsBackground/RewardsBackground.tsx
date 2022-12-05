@@ -68,7 +68,7 @@ const RewardsBackground = () => {
               rel="noopener noreferrer"
             >
               <img
-                src={"/assets/images/tokenIcons/" + token + ".png"}
+                src={"/assets/images/tokenIcons/f" + token + ".png"}
                 alt="tokenIcon"
               />
 
