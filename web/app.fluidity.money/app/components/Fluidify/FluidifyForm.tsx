@@ -68,7 +68,7 @@ export const FluidifyForm = ({
     return setSwapInput([whole, dec].join("."));
   };
 
-  const inputMaxBalance = async () => {
+  const inputMaxBalance = () => {
     setSwapInput(assetToken.userTokenBalance.toString());
   };
 
