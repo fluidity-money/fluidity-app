@@ -55,15 +55,19 @@ func Client() *sql.DB {
 
 	<-readyChan
 
-	stats := client.Stats()
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
 
-	log.Debugf(
-		"postgres stats: max %d, open %d, inuse %d, idle %d",
-		stats.MaxOpenConnections,
-		stats.OpenConnections,
-		stats.InUse,
-		stats.Idle,
-	)
+		stats := client.Stats()
+
+		k.Format(
+			"Postgres connection pool stats: max %d, open %d, inuse %d, idle %d",
+			stats.MaxOpenConnections,
+			stats.OpenConnections,
+			stats.InUse,
+			stats.Idle,
+		)
+	})
 
 	return client
 }

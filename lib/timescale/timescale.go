@@ -55,15 +55,20 @@ func Client() *sql.DB {
 
 	<-readyChan
 
-	stats := client.Stats()
 
-	log.Debugf(
-		"timescale stats: max %d, open %d, inuse %d, idle %d",
-		stats.MaxOpenConnections,
-		stats.OpenConnections,
-		stats.InUse,
-		stats.Idle,
-	)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		stats := client.Stats()
+
+		k.Format(
+			"Timescale connection pool stats: max %d, open %d, inuse %d, idle %d",
+			stats.MaxOpenConnections,
+			stats.OpenConnections,
+			stats.InUse,
+			stats.Idle,
+		)
+	})
 
 	return client
 }
