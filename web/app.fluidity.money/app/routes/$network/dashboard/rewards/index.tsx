@@ -584,7 +584,7 @@ export default function Rewards() {
                 <div className="highest-performer-child">
                   <ProviderIcon provider={bestPerformingRewarders[0]?.name} />
                   {bestPerformingRewarders[0]?.name === "Fluidity"
-                    ? "Transacting fAssets"
+                    ? "Transacting ƒAssets"
                     : bestPerformingRewarders[0]?.name}
                 </div>
               </LabelledValue>
