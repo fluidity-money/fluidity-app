@@ -76,11 +76,12 @@ export const NotificationSubscription = ({
         : trimAddress(payload.destination);
 
     const rewardDetails =
-      payload.type === NotificationType.WINNING_REWARD_DATABASE
+      payload.type === NotificationType.WINNING_REWARD ||
+      NotificationType.PENDING_REWARD
         ? payload.rewardType === `send`
           ? `reward for s͟e͟n͟d͟i͟n͟g`
           : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
-        : "reward to c̲l̲a̲i̲m̲ 🎉";
+        : "reward has been c͟l͟a͟i͟m͟e͟d! 🎉";
 
     const fluidTokenTransferDetails =
       rawAddress !== payload.source

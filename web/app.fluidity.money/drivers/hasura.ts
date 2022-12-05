@@ -4,9 +4,17 @@ import { WebSocketLink } from "apollo-link-ws";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import ws from "ws";
 import { Observable } from "rxjs";
-import { PipedTransaction, NotificationType } from "./types";
+import {
+  PipedTransaction,
+  NotificationType,
+  WinnerData,
+  PendingWinnerData,
+  WinnerEvent,
+  PendingWinnerEvent,
+} from "./types";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 import { captureException } from "@sentry/remix";
+import config from "~/webapp.config.server";
 
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
@@ -21,6 +29,7 @@ const WinnerSubscriptionQuery = gql`
       token_decimals
       winning_amount
       reward_type
+      network
     }
   }
 `;
@@ -42,52 +51,34 @@ const PendingWinnerSubscriptionQuery = gql`
   }
 `;
 
-const getWsClient = (wsurl: string) =>
-  new SubscriptionClient(wsurl, { reconnect: true }, ws);
-
 const createHasuraSubscriptionObservable = (
-  wsurl: string,
   query: DocumentNode, // Explicitly when using apollo
   variables: Record<string, unknown>
 ) =>
-  execute(new WebSocketLink(getWsClient(wsurl)), {
-    query: query,
-    variables: variables,
-  });
+  execute(
+    new WebSocketLink(
+      new SubscriptionClient(
+        config.drivers["hasura"][0].rpc.ws,
+        {
+          reconnect: true,
+          connectionParams: {
+            headers: {
+              "x-hasura-admin-secret": config.drivers["hasura"][0].secret,
+            },
+          },
+        },
+        ws
+      )
+    ),
+    {
+      query: query,
+      variables: variables,
+    }
+  );
 
-type WinnerData = {
-  transaction_hash: string;
-  token_short_name: string;
-  winning_address: string;
-  token_decimals: number;
-  winning_amount: number;
-  reward_type: string;
-};
-
-type PendingWinnerData = {
-  transaction_hash: string;
-  token_short_name: string;
-  address: string;
-  token_decimals: number;
-  win_amount: number;
-  reward_type: string;
-};
-
-type WinnerEvent = {
-  data: {
-    winners: WinnerData[];
-  };
-};
-
-type PendingWinnerEvent = {
-  data: {
-    ethereum_pending_winners: PendingWinnerData[];
-  };
-};
-
-export const winnersTransactionObservable = (url: string, address: string) =>
+export const winnersTransactionObservable = (address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
-    createHasuraSubscriptionObservable(url, WinnerSubscriptionQuery, {
+    createHasuraSubscriptionObservable(WinnerSubscriptionQuery, {
       address: address,
     }).subscribe(
       (eventData: unknown) => {
@@ -95,10 +86,13 @@ export const winnersTransactionObservable = (url: string, address: string) =>
         const _eventData = eventData as WinnerEvent;
         if (_eventData.data.winners.length === 0) return;
         // Will never fail because of the length check above
-        const itemObject = _eventData.data.winners.at(0) as WinnerData | never;
+        const itemObject = _eventData.data.winners?.at(0) as WinnerData | never;
 
         const transaction: PipedTransaction = {
-          type: NotificationType.WINNING_REWARD_DATABASE,
+          type:
+            itemObject.network === `ethereum`
+              ? NotificationType.CLAIMED_WINNING_REWARD
+              : NotificationType.WINNING_REWARD,
           source: "",
           destination: itemObject.winning_address,
           amount: shorthandAmountFormatter(
@@ -129,12 +123,9 @@ export const winnersTransactionObservable = (url: string, address: string) =>
     );
   });
 
-export const pendingWinnersTransactionObservables = (
-  url: string,
-  address: string
-) =>
+export const pendingWinnersTransactionObservables = (address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
-    createHasuraSubscriptionObservable(url, PendingWinnerSubscriptionQuery, {
+    createHasuraSubscriptionObservable(PendingWinnerSubscriptionQuery, {
       address: address,
     }).subscribe(
       (eventData: unknown) => {
@@ -147,7 +138,7 @@ export const pendingWinnersTransactionObservables = (
           | never;
 
         const transaction: PipedTransaction = {
-          type: NotificationType.PENDING_REWARD_DATABASE,
+          type: NotificationType.PENDING_REWARD,
           source: "",
           destination: itemObject.address,
           amount: shorthandAmountFormatter(
