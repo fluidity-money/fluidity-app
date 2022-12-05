@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import { ApolloProvider } from "@apollo/client";
 import useViewport from "hooks/useViewport";
 import { ChainContextProvider } from "hooks/ChainContext";
-import apolloClient from "data/apolloClient";
+import { client } from "data/apolloClient";
 
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
@@ -55,7 +55,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <div id={"fluid"} />
     <div id="shade" />
     <div id="root">
-      <ApolloProvider client={apolloClient}>
+      <ApolloProvider client={client}>
         <ChainContextProvider>
             <div className="App">
               {width < breakpoint ? (<MobileNavBar />) : (<NavBar />)}
