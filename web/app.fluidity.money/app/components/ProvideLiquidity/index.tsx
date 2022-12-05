@@ -101,10 +101,13 @@ const ProvideLiquidity = () => {
               }}
             >
               {openDropdown && dropdownOptions}
-              <Heading as="h2" className="fluid-liquidity-token">
-                {poolToken.symbol}
+              <Heading as="h1" className="fluid-liquidity-token">
+                {`ƒ${poolToken.symbol.slice(1)}`}
               </Heading>
-              <img src="/images/icons/triangleDown.svg" />
+              <img
+                src="/images/icons/triangleDown.svg"
+                style={{ width: 18, height: 8 }}
+              />
             </button>
           </Heading>
 
