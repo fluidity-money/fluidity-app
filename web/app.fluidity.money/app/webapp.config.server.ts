@@ -69,7 +69,13 @@ const OptionsSchema = z.object({
           z.object({
             name: z.string(),
             img: z.string(),
-            link: z.string(),
+            link: z.object({
+              fUSDC: z.string(),
+              fUSDT: z.string(),
+              fTUSD: z.string().optional(),
+              fFRAX: z.string().optional(),
+              fDAI: z.string().optional(),
+            }),
           })
         )
         .min(1),

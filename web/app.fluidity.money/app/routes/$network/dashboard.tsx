@@ -54,9 +54,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = config.liquidity_providers;
 
+  const tokensConfig = config.config;
+
   return json({
     network,
     provider,
+    tokensConfig,
     ethereumWallets,
   });
 };
@@ -108,6 +111,7 @@ type LoaderData = {
   fromRedirect: boolean;
   network: string;
   provider: typeof config.liquidity_providers;
+  tokensConfig: typeof config.config;
 };
 
 export default function Dashboard() {
