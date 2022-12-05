@@ -289,6 +289,10 @@ main > footer > section > a {
   gap: 0.5em;
 }
 
+.table-activity:hover > span {
+  color: white;
+}
+
 .table-activity > span {
   text-decoration: underline;
   text-underline-offset: 0.25em;
@@ -316,6 +320,14 @@ main > footer > section > a {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.table-address:hover {
+  color: white;
+}
+
+.table-address > span:hover {
+  color: white;
 }
 
 .pagination {
