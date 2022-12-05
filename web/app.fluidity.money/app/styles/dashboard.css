@@ -512,8 +512,8 @@ main > footer > section > a {
   border-radius: 12px;
   position: absolute;
   top: 50px;
-  left: -10px;
-  width: 150px;
+  left: -15px;
+  width: 175px;
   display: flex;
   flex-direction: column;
 }
