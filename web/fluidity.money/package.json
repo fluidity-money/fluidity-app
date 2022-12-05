@@ -7,6 +7,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@fluidity-money/surfing": "^0.0.105",
     "@reduxjs/toolkit": "^1.8.3",
+    "@types/gtag.js": "^0.0.12",
     "@visx/visx": "^2.12.2",
     "big.js": "^6.2.1",
     "ethers": "^5.7.2",

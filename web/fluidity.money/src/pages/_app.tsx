@@ -6,17 +6,19 @@ import { AppProps } from 'next/app';
 
 import Script from 'next/script';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ApolloProvider } from "@apollo/client";
 import useViewport from "hooks/useViewport";
 import { ChainContextProvider } from "hooks/ChainContext";
 import apolloClient from "data/apolloClient";
 
-import LoadingScreen from 'screens/Loading/LoadingScreen';
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
 import "@fluidity-money/surfing/dist/style.css";
 import "styles/app.global.scss"
+import CookieConsent from 'components/CookieConsent/CookieConsent';
+import { useRouter } from 'next/router';
+import * as gtag from 'utils/gtag'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -25,7 +27,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const location = typeof window !== "undefined" ? window.location : null;
 
   useEffect(() => {
-
     if (location.hash) {
       let elem = document.getElementById(location.hash.slice(1));
       if (elem) {
@@ -35,6 +36,20 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     }
   }, [location]);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleRouteChange = (url: URL) => {
+      gtag.pageview(url)
+    }
+
+    router.events.on("routeChangeComplete", handleRouteChange)
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange)
+    }
+  }, [router.events])
 
   return <>
     <div id={"fluid"} />
@@ -48,6 +63,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </div>
         </ChainContextProvider>
       </ApolloProvider>
+      <CookieConsent />
     </div>
     <Script src='assets/gfx/renderer.js' strategy='lazyOnload' />
   </>
