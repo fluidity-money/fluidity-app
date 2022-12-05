@@ -432,8 +432,8 @@ export default function Dashboard() {
             {/* Fluidify */}
             {!isMobile && (
               <GeneralButton
-                className="fluidify-button-dashboard"
-                version={"primary"}
+                className="rainbow"
+                version={"transparent"}
                 buttontype="text"
                 size={"small"}
                 handleClick={() => navigate("../fluidify")}
@@ -500,8 +500,8 @@ export default function Dashboard() {
         {/* Mobile fluidify button */}
         {isMobile && (
           <GeneralButton
-            className="fluidify-button-dashboard-mobile"
-            version={"primary"}
+            className="fluidify-button-dashboard-mobile rainbow "
+            version={"transparent"}
             buttontype="text"
             size={"medium"}
             handleClick={() => navigate("../fluidify")}
