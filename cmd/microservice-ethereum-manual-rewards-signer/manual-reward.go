@@ -127,6 +127,19 @@ func generateManualRewardPayload(tokens map[string]ethCommon.Address, chainid *m
 		})
 	}
 
+	if len(sig) != 65 {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Unexpected signature length! Expected 65, got %d!",
+				len(sig),
+			)
+		})
+	}
+
+	// the signature is returned as [r || s || v], with v == 0 or 1
+	// ecrecover expects v == 27+0 or 1, so we add 27 to v
+	sig[64] += 27
+
 	rewardArgs := ManualRewardArg{
 		Token: tokenDetails,
 		Winner: winnerString,
