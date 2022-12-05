@@ -176,9 +176,9 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			token,
 			hash,
 			fromAddress.String(),
-			adjustedFromAmount.FloatString(2),
+			adjustedFromAmount.FloatString(5),
 			toAddress.String(),
-			adjustedToAmount.FloatString(2),
+			adjustedToAmount.FloatString(5),
 		)
 	}
 

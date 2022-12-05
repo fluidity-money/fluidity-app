@@ -241,32 +241,37 @@ export const manualRewardToken = async (
   const uint8Signature = B64ToUint8Array(b64Signature);
   const hexSignature = bytesToHex(Array.from(uint8Signature));
 
-  const tokenContract = getContract(token.ABI, token.address, signer);
+  try {
+    const tokenContract = getContract(token.ABI, token.address, signer);
 
-  const contractTx: ContractTransaction = await tokenContract.manualReward(
-    // contractAddress
-    token.address,
-    // chainid
-    0,
-    // winnerAddress
-    winner,
-    // winAmount
-    win_amount,
-    // firstBlock
-    first_block,
-    // lastBlock
-    last_block,
-    // sig
-    hexSignature
-  );
+    const contractTx: ContractTransaction = await tokenContract.manualReward(
+      // contractAddress
+      token.address,
+      // chainid
+      0,
+      // winnerAddress
+      winner,
+      // winAmount
+      win_amount,
+      // firstBlock
+      first_block,
+      // lastBlock
+      last_block,
+      // sig
+      hexSignature
+    );
 
-  const res = await contractTx.wait();
+    const res = await contractTx.wait();
 
-  return {
-    networkFee: res.gasUsed.toNumber(),
-    gasFee: res.gasUsed.toNumber(),
-    amount: win_amount,
-  };
+    return {
+      networkFee: res.gasUsed.toNumber(),
+      gasFee: res.gasUsed.toNumber(),
+      amount: win_amount,
+    };
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return { amount: 0, gasFee: 0, networkFee: 0 };
+  }
 };
 
 type PrizePool = {

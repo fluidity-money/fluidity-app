@@ -228,8 +228,8 @@ const UnclaimedWinnings = () => {
   const [winningTableViewIndex, setWinningTableViewIndex] = useState(0);
 
   const winningTableViews = [
-    { name: "Your Breakdown", filter: () => true },
-    { name: "Your Winnings", filter: () => true },
+    { name: "My Breakdown", filter: () => true },
+    { name: "My Winnings", filter: () => true },
   ];
 
   const RewardRow = (chain: Chain): IRow<UserUnclaimedReward> =>
@@ -284,7 +284,7 @@ const UnclaimedWinnings = () => {
 
           {/* Reward */}
           <td>
-            <Text>
+            <Text prominent>
               {rewardUsd >= 0.01
                 ? numberToMonetaryString(rewardUsd)
                 : `$${rewardUsd}`}
@@ -307,7 +307,7 @@ const UnclaimedWinnings = () => {
           {!isSmallMobile && (
             <td>
               <a
-                className="table-activity"
+                style={{ textDecoration: "underline" }}
                 href={getBlockExplorerLink(network, block_number)}
               >
                 <Text>{block_number}</Text>
@@ -359,7 +359,7 @@ const UnclaimedWinnings = () => {
 
           {/* Reward */}
           <td>
-            <Text>
+            <Text prominent>
               {reward >= 0.01 ? numberToMonetaryString(reward) : `$${reward}`}
             </Text>
           </td>

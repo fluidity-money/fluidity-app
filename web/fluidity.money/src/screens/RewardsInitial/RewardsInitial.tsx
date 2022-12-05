@@ -4,27 +4,28 @@ import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import { getEthTotalPrizePool } from "data/ethereum/prizePool";
+import { IPropPools } from "pages";
 
 import styles from "./RewardsInitial.module.scss";
 
 interface IProps {
   changeScreen: () => void;
+  rewardPools: IPropPools;
 }
 
-const RewardsInitial = ({ changeScreen }: IProps) => {
+const RewardsInitial = ({ changeScreen, rewardPools }: IProps) => {
   const { apiState, chain } = useChainContext();
   const { txCount } = apiState;
 
-  const [prizePool, setPrizePool] = useState<string>("0");
+  const [prizePool, setPrizePool] = useState<string>(rewardPools.ethPool.toFixed(3));
 
   useEffect(() => {
-    setPrizePool("0");
-    
     chain === `ETH` && 
-    getEthTotalPrizePool(process.env.NEXT_PUBLIC_FLU_ETH_RPC_HTTP)
-      .then((value)=>{
-        setPrizePool(value.toFixed(3));
-      });
+    setPrizePool(rewardPools.ethPool.toFixed(3));
+
+    chain === `SOL` && 
+    setPrizePool(rewardPools.solPool.toFixed(3));
+
   },[chain]);
   
   return (

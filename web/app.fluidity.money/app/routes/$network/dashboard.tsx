@@ -54,9 +54,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = config.liquidity_providers;
 
+  const tokensConfig = config.config;
+
   return json({
     network,
     provider,
+    tokensConfig,
     ethereumWallets,
   });
 };
@@ -108,6 +111,7 @@ type LoaderData = {
   fromRedirect: boolean;
   network: string;
   provider: typeof config.liquidity_providers;
+  tokensConfig: typeof config.config;
 };
 
 export default function Dashboard() {
@@ -458,14 +462,6 @@ export default function Dashboard() {
                 : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
-            {/* Modal on hover */}
-            {(hoverModal || showModal) && !isMobile && (
-              <UnclaimedRewardsHoverModal
-                unclaimedRewards={unclaimedRewards}
-                setShowModal={setShowModal}
-              />
-            )}
-
             {(isTablet || isMobile) && (
               <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
             )}
@@ -492,6 +488,14 @@ export default function Dashboard() {
 
         {/* Provide Luquidity*/}
         {!openMobModal && <ProvideLiquidity />}
+
+        {/* Modal on hover */}
+        {(hoverModal || showModal) && !isMobile && (
+          <UnclaimedRewardsHoverModal
+            unclaimedRewards={unclaimedRewards}
+            setShowModal={setShowModal}
+          />
+        )}
 
         {/* Mobile fluidify button */}
         {isMobile && (
@@ -527,8 +531,9 @@ export default function Dashboard() {
           {/* Links */}
           <section>
             {/* Version */}
-            <Text>Fluidity Money</Text>
-
+            <a href={"/"}>
+              <Text>Fluidity Money</Text>
+            </a>
             {/* Terms */}
             <a href={"/"}>
               <Text>Terms</Text>
