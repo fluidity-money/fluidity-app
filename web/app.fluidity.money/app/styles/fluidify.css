@@ -253,6 +253,14 @@ main {
   outline: none;
 }
 
+.fluidify-input-max-btn {
+  cursor: pointer;
+}
+
+.fluidify-input-max-btn:hover {
+  opacity: 0.6;
+}
+
 .fluidify-input-container:last-child {
   margin-left: auto;
 }
