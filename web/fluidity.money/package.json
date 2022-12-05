@@ -6,6 +6,7 @@
     "@apollo/client": "^3.7.1",
     "@fluidity-money/surfing": "^0.0.93",
     "@reduxjs/toolkit": "^1.8.3",
+    "@types/gtag.js": "^0.0.12",
     "@visx/visx": "^2.12.2",
     "framer-motion": "^7.2.1",
     "next": "^12.3.0",
