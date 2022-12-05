@@ -24,6 +24,9 @@ type LoaderData = {
 const ProvideLiquidity = () => {
   const { provider, network, tokensConfig } = useLoaderData<LoaderData>();
 
+  // type for TOML type
+  type FluidTokens = "fUSDC" | "fUSDT" | "fTUSD" | "fFRAX" | "fDAI";
+
   const fluidTokens = tokensConfig[network].tokens
     .map((token) => token)
     .filter((token) => token.isFluidOf);
@@ -41,7 +44,7 @@ const ProvideLiquidity = () => {
       {providers.map((provider) => (
         <motion.a
           key={provider.name}
-          href={provider.link[poolToken.symbol]}
+          href={provider.link[poolToken.symbol as FluidTokens]}
           rel="noopener noreferrer"
           target="_blank"
           variants={parent}
