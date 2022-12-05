@@ -131,11 +131,13 @@ export const NotificationSubscription = ({
   };
 
   useEffect(() => {
-    const { emitEvent } = DSSocketManager({
-      onCallback: handleClientListener,
-    });
+    if (rawAddress) {
+      const { emitEvent } = DSSocketManager({
+        onCallback: handleClientListener,
+      });
 
-    emitEvent(network, rawAddress as unknown as string);
+      emitEvent(network, rawAddress as unknown as string);
+    }
   }, [rawAddress]);
 
   return (

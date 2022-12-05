@@ -68,6 +68,10 @@ export const FluidifyForm = ({
     return setSwapInput([whole, dec].join("."));
   };
 
+  const inputMaxBalance = () => {
+    setSwapInput(assetToken.userTokenBalance.toString());
+  };
+
   const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
     e
   ) => {
@@ -122,6 +126,9 @@ export const FluidifyForm = ({
           step="any"
         />
         <Text size="lg">{assetToken?.symbol || ""}</Text>
+        <span className={"fluidify-input-max-btn"} onClick={inputMaxBalance}>
+          max
+        </span>
       </section>
 
       <hr className={"fluidify-form-el"} />
