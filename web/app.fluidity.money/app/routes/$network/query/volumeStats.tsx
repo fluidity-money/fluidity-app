@@ -1,52 +1,66 @@
 import { json, LoaderFunction } from "@remix-run/node";
 import BN from "bn.js";
-import { useVolumeCalculation, VolumeCalculationResponse } from "~/queries/useVolumeCalculation";
+import {
+  useVolumeTxByAddressTimestamp,
+  useVolumeTxByTimestamp,
+} from "~/queries/useVolumeTx";
 import config from "~/webapp.config.server";
 
-export const loader: LoaderFunction = async ({ params }) => {
-    const { network } = params;
+export type Volume = {
+  amount: number;
+  symbol: string;
+  timestamp: number;
+  sender: string;
+  receiver: string;
+};
 
-    // Postprocess res
-    const fdaiPostprocess = (value: VolumeCalculationResponse) => {
-        const bn = new BN(value.data.ethereum.transfers[0].amount);
-        const decimals = new BN(10).pow(new BN(12));
-        const amount = bn.div(decimals).toString()
+export const loader: LoaderFunction = async ({ params, request }) => {
+  const { network } = params;
 
-        console.log(amount)
+  const url = new URL(request.url);
+  const address = url.searchParams.get("address");
 
-        return {...value, 
-                data: {
-                    ethereum: {
-                        transfers: [{
-                            amount
-                        }]
-                    }
-                }
-        };
-    }
-    
-    const volumes = config.config[network ?? ""].tokens
-    .filter(({ isFluidOf }) => isFluidOf)
-    .map(
-        ({
-            symbol,
-            address,
-        }) => (symbol !== "fDAI" ? useVolumeCalculation(address) : useVolumeCalculation(address).then(fdaiPostprocess))
-    );
+  // Postprocess res
+  const fdaiPostprocess = (volume: Volume) => {
+    const bn = new BN(volume.amount);
+    const decimals = new BN(10).pow(new BN(12));
+    const amount = bn.div(decimals).toNumber();
 
+    return {
+      ...volume,
+      amount: amount,
+    };
+  };
 
+  const { fluidAssets } = config.config[network ?? ""];
 
-    console.log(config.config[network ?? ""].tokens
-    .filter(({ isFluidOf }) => isFluidOf))
-    const result = await Promise.all(volumes);
+  if (!fluidAssets) return;
 
-    const aggregateBn = result.reduce<BN>((acc, curr) => {
-        return acc.add(new BN(curr.data.ethereum.transfers[0].amount));
-    }, new BN(0));
+  const prevYear = new Date().getFullYear() - 1;
 
-    const aggregate = aggregateBn.toString();
+  const prevYearDate = new Date();
 
-    return json({
-        aggregate
-    });
-}
+  prevYearDate.setFullYear(prevYear);
+
+  const prevYearIso = prevYearDate.toISOString();
+
+  const volumesRes = address
+    ? await useVolumeTxByAddressTimestamp(fluidAssets, address, prevYearIso)
+    : await useVolumeTxByTimestamp(fluidAssets, prevYearIso);
+
+  const parsedVolume = volumesRes.data.ethereum.transfers.map((transfer) => ({
+    symbol: transfer.currency.symbol,
+    amount: parseFloat(transfer.amount) || 0,
+    timestamp: transfer.block.timestamp.unixtime * 1000,
+    sender: transfer.sender.address,
+    receiver: transfer.receiver.address,
+  }));
+
+  const daiSanitisedVolumes = parsedVolume.map((volume) =>
+    volume.symbol === "fDAI" ? fdaiPostprocess(volume) : volume
+  );
+
+  return json({
+    volume: daiSanitisedVolumes,
+  });
+};

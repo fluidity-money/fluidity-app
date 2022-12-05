@@ -59,10 +59,12 @@ const Table = <T,>(props: ITable<T>) => {
 
   const isTransition = useTransition();
 
-  const pageCount = Math.ceil(data.length / rowsPerPage);
+  const cappedPageCount = Math.min(240, data.length);
+
+  const pageCount = Math.ceil(cappedPageCount / rowsPerPage);
 
   const startIndex = (page - 1) * rowsPerPage + 1;
-  const endIndex = Math.min(page * rowsPerPage, data.length);
+  const endIndex = Math.min(page * rowsPerPage, cappedPageCount);
 
   const rowStartIndex = (page - 1) * rowsPerPage;
   const rowEndIndex = rowStartIndex + 12;
@@ -74,18 +76,6 @@ const Table = <T,>(props: ITable<T>) => {
         {filters && (
           <div className={"transaction-filters"}>
             {filters.map((filter, i) => (
-              // <button
-              //   key={`filter-${filter.name}`}
-              //   onClick={() => onFilter?.(i)}
-              // >
-              //   <Text
-              //     size="lg"
-              //     prominent={activeFilterIndex === i}
-              //     className={activeFilterIndex === i ? "active-filter" : ""}
-              //   >
-              //     {filter.name}
-              //   </Text>
-              // </button>
               <GeneralButton
                 key={`filter-${filter.name}`}
                 version={"secondary"}
@@ -106,8 +96,8 @@ const Table = <T,>(props: ITable<T>) => {
 
         {/* Item Count */}
         <Text>
-          {data.length > 0 ? `${startIndex} - ${endIndex}` : 0} of {data.length}{" "}
-          {itemName}
+          {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
+          {cappedPageCount} {itemName}
         </Text>
       </div>
 

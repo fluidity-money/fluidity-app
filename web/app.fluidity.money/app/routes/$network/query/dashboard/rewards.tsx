@@ -1,19 +1,16 @@
-import type { Winner } from "~/queries/useUserRewards";
-import type { UserTransaction } from "~/routes/$network/query/userTransactions";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import { LoaderFunction, json } from "@remix-run/node";
-import { useUserRewardsAll } from "~/queries";
 import config from "~/webapp.config.server";
 import Transaction from "~/types/Transaction";
 import { Provider } from "~/components/ProviderCard";
 import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
 import { aggregateRewards } from "~/util/rewardAggregates";
+import { jsonGet } from "~/util/api/rpc";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
-  const icons = config.provider_icons;
   const fluidPairs = config.config[network ?? ""].fluidAssets.length;
 
   const networkFee = 0.002;
@@ -38,30 +35,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       RewardAbi
     );
 
-    const {
-      transactions,
-      count,
-    }: { transactions: UserTransaction[]; count: number } = await (
-      await fetch(
-        `${url.origin}/${network}/query/userTransactions?page=${page}`
-      )
-    ).json();
-
-    const { data, errors } = await useUserRewardsAll(network ?? "");
-
-    if (errors || !data) {
-      throw errors;
-    }
-
-    const winnersMap = data.winners.reduce(
-      (map, winner) => ({
-        ...map,
-        [winner.send_transaction_hash]: {
-          ...winner,
-        },
-      }),
-      {} as { [key: string]: Winner }
-    );
+    const { transactions } = await jsonGet<
+      { page: number },
+      { transactions: Transaction[] }
+    >(`${url.origin}/${network}/query/userTransactions`, {
+      page,
+    });
 
     const {
       config: {
@@ -81,57 +60,27 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {}
     );
 
-    const tokenLogoMap = tokens.reduce(
-      (map, token) => ({
-        ...map,
-        [token.symbol]: token.logo,
-      }),
-      {} as Record<string, string>
-    );
-
-    const defaultLogo = "/assets/tokens/usdt.svg";
-
-    const mergedTransactions: Transaction[] =
-      transactions
-        ?.filter((tx) => !!winnersMap[tx.hash])
-        .map((tx) => {
-          const winner = winnersMap[tx.hash];
-
-          return {
-            sender: tx.sender,
-            receiver: tx.receiver,
-            winner: winner.winning_address ?? "",
-            reward: winner
-              ? winner.winning_amount / 10 ** winner.token_decimals
-              : 0,
-            hash: tx.hash,
-            rewardHash: winner?.transaction_hash ?? "",
-            currency: tx.currency,
-            value: tx.value,
-            timestamp: tx.timestamp,
-            logo: tokenLogoMap[tx.currency] || defaultLogo,
-            provider:
-              (network === "ethereum"
-                ? winner.ethereum_application
-                : winner.solana_application) ?? "Fluidity",
-          };
-        }) ?? [];
-
-    const totalRewards = mergedTransactions.reduce(
+    const totalRewards = transactions.reduce(
       (sum, { reward }) => sum + reward,
       0
     );
 
-    const { data: rewardData, errors: rewardErrors } =
+    // const { data: totalRewards, errors: totalRewardErr } = await useUserYieldAll(network ?? "");
+    //
+    // if (totalRewardErr || !totalRewards) {
+    //   throw totalRewardErr;
+    // }
+
+    const { data: appRewardData, errors: appRewardErrors } =
       await useApplicationRewardStatistics(network ?? "");
-    if (rewardErrors || !rewardData) {
-      throw errors;
+    if (appRewardErrors || !appRewardData) {
+      throw appRewardErrors;
     }
 
-    const rewarders = aggregateRewards(rewardData);
+    const rewarders = aggregateRewards(appRewardData);
 
     const totalRewarders = Object.values(
-      mergedTransactions.reduce((map, tx) => {
+      transactions.reduce((map, tx) => {
         const provider = map[tx.provider];
 
         return {
@@ -159,14 +108,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       ) as Provider[];
 
     return json({
-      icons,
       rewarders,
       fluidTokenMap,
       page,
       network,
       fluidPairs,
-      totalTransactions: mergedTransactions,
-      totalCount: count,
+      totalTransactions: transactions,
+      totalCount: transactions.length,
       totalRewards,
       totalRewarders,
       totalPrizePool,

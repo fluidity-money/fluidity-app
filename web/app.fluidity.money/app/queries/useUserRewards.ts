@@ -5,10 +5,12 @@ const queryAll = gql`
     winners(
       where: { network: { _eq: $network } }
       distinct_on: transaction_hash
+      limit: 240
     ) {
       network
       solana_winning_owner_address
       winning_address
+      created
       transaction_hash
       send_transaction_hash
       winning_amount
@@ -20,10 +22,11 @@ const queryAll = gql`
 `;
 
 const queryByAddress = gql`
-  query WinnersAll($network: network_blockchain!, $address: String!) {
+  query WinnersByAddress($network: network_blockchain!, $address: String!) {
     winners(
       where: { network: { _eq: $network }, winning_address: { _eq: $address } }
       distinct_on: transaction_hash
+      limit: 240
     ) {
       network
       solana_winning_owner_address
@@ -79,6 +82,7 @@ export type Winner = {
   network: string;
   solana_winning_owner_address: string | null;
   winning_address: string | null;
+  created: string;
   transaction_hash: string;
   send_transaction_hash: string;
   winning_amount: number;

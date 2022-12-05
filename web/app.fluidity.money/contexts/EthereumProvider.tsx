@@ -251,9 +251,11 @@ const EthereumFacade = ({
       .filter((t) => !!t.isFluidOf)
       .map((t) => t.address);
 
-    return Promise.all(
-      fluidTokenAddrs.filter(async (addr) => await getBalance(addr))
+    const fluidTokenBalances: [string, number][] = await Promise.all(
+      fluidTokenAddrs.map(async (addr) => [addr, await getBalance(addr)])
     );
+
+    return fluidTokenBalances.filter((token) => token[1]).map(([addr]) => addr);
   };
 
   return (

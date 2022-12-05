@@ -5,6 +5,7 @@ import {
 import {
   useUserTransactionsAll,
   useUserTransactionsByAddress,
+  useUserTransactionsByTxHash,
 } from "./useUserTransactions";
 import useUserUnclaimedRewards from "./useUserUnclaimedRewards";
 import { useUserRewardsAll, useUserRewardsByAddress } from "./useUserRewards";
@@ -14,6 +15,7 @@ export {
   useUserTransactionByAddressCount,
   useUserTransactionsAll,
   useUserTransactionsByAddress,
+  useUserTransactionsByTxHash,
   useUserUnclaimedRewards,
   useUserRewardsAll,
   useUserRewardsByAddress,

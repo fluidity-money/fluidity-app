@@ -36,8 +36,6 @@ import config from "~/webapp.config.server";
 import { format } from "date-fns";
 import { Rewarders } from "~/util/rewardAggregates";
 
-export const unstable_shouldReload = () => false;
-
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
 };
@@ -100,10 +98,8 @@ export default function Rewards() {
     `/${network}/query/dashboard/rewards`
   );
 
-  const defaultData = {
-    icons: {},
+  const defaultData: ExLoaderData = {
     fluidTokenMap: {},
-    highestWeeklyRewarder: undefined,
     totalTransactions: [],
     totalCount: 0,
     totalRewards: 0,
@@ -213,7 +209,7 @@ export default function Rewards() {
         {
           filter: ({ sender, receiver }: Transaction) =>
             [sender, receiver].includes(address),
-          name: "YOUR REWARDS",
+          name: "MY REWARDS",
         },
       ]
     : [
@@ -282,15 +278,15 @@ export default function Rewards() {
 
   const activeRewards = (() => {
     switch (activeRewardFilterIndex) {
-      case 0:
-      default:
-        return allRewards;
       case 1:
         return weeklyRewards;
       case 2:
         return monthlyRewards;
       case 3:
         return yearlyRewards;
+      case 0:
+      default:
+        return allRewards;
     }
   })();
 
@@ -355,7 +351,7 @@ export default function Rewards() {
         return;
       }
     })();
-  }, [connected, address, useLoaderData]);
+  }, [connected, address]);
 
   // Filter Transactions via rewards filter / tx type filters
   useEffect(() => {
@@ -543,7 +539,7 @@ export default function Rewards() {
       )}
       <div className="reward-ceiling">
         <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
-          {activeTableFilterIndex ? "Your" : "Global"} Reward Performance
+          {activeTableFilterIndex ? "My" : "Global"} Reward Performance
         </Heading>
 
         <div className="filter-row">
@@ -576,9 +572,7 @@ export default function Rewards() {
         <div className="statistics-row">
           <div className="statistics-set">
             <LabelledValue
-              label={`${
-                activeTableFilterIndex ? "Your" : "Total"
-              } claimed yield`}
+              label={`${activeTableFilterIndex ? "My" : "Total"} claimed yield`}
             >
               {numberToMonetaryString(rewards)}
             </LabelledValue>
