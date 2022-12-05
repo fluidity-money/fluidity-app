@@ -150,10 +150,6 @@ main > footer > section {
   padding: 0;
 }
 
-.fluidify-button-dashboard {
-  height: 16px;
-}
-
 .fluidify-button-dashboard-mobile {
   position: fixed !important;
   bottom: 2vh;
@@ -172,16 +168,17 @@ main > footer > section {
   position: relative;
   z-index: 0;
   overflow: hidden;
+  font-size: 15px;
 }
 
 .rainbow ::before {
   content: "";
   position: absolute;
   z-index: -2;
-  left: -50%;
-  top: -82%;
-  width: 200%;
-  height: 350%;
+  left: -25%;
+  top: -118%;
+  width: 150%;
+  height: 380%;
   background-color: #f3b8d8;
   background-repeat: no-repeat;
   background-size: 100%;
@@ -1162,5 +1159,9 @@ main > footer > section > a {
   }
   .rainbow::after {
     background: black;
+  }
+
+  main > nav > div {
+    gap: 0.5em;
   }
 }
