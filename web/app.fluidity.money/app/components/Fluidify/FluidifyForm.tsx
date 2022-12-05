@@ -22,9 +22,7 @@ export const FluidifyForm = ({
   toToken,
   swapping,
 }: IFluidifyFormProps) => {
-  const { address, connected, swap, balance } = useContext(
-    FluidityFacadeContext
-  );
+  const { address, connected, swap } = useContext(FluidityFacadeContext);
 
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
 
@@ -71,7 +69,7 @@ export const FluidifyForm = ({
   };
 
   const inputMaxBalance = async () => {
-    setSwapInput((await balance?.(toToken.address)) as unknown as string);
+    setSwapInput(assetToken.userTokenBalance.toString());
   };
 
   const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
