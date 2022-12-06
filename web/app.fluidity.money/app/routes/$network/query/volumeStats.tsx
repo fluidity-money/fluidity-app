@@ -1,5 +1,4 @@
 import { json, LoaderFunction } from "@remix-run/node";
-import BN from "bn.js";
 import {
   useVolumeTxByAddressTimestamp,
   useVolumeTxByTimestamp,

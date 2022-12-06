@@ -46,14 +46,14 @@ export type HighestRewardMonthly = {
   awarded_day: string;
   token_short_name: string;
   winning_amount_scaled: number;
-}
+};
 
 export type HighestRewardWinnerTotal = {
   network: string;
   winning_address: string;
   transaction_count: number;
   total_winnings: number;
-}
+};
 
 export type HighestRewardResponse = {
   data: {
