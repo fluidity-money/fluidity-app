@@ -1138,6 +1138,16 @@ main > footer > section > a {
   }
 }
 
+@media (max-width: 450px) {
+  .totals-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .reward-performance {
+    font-size: 1.5em;
+  }
+}
+
 @media (max-width: 500px) {
   main > footer > section:first-child {
     gap: 0.6em;

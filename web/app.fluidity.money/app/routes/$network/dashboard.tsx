@@ -262,6 +262,11 @@ export default function Dashboard() {
     document.body.style.position = "static";
   }, [currentPath]);
 
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
+
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
