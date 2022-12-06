@@ -3,7 +3,11 @@ import { gql, jsonPost } from "~/util";
 const queryAll = gql`
   query WinnersAll($network: network_blockchain!) {
     winners(
-      where: { network: { _eq: $network } }
+      where: {
+        network: { _eq: $network }
+        send_transaction_hash: { _neq: "" }
+        transaction_hash: { _neq: "" }
+      }
       distinct_on: transaction_hash
       limit: 240
     ) {

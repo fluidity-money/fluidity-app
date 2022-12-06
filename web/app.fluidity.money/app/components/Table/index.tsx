@@ -45,6 +45,7 @@ type ITable<T> = {
 
 const Table = <T,>(props: ITable<T>) => {
   const {
+    count,
     itemName,
     pagination,
     data,
@@ -59,15 +60,12 @@ const Table = <T,>(props: ITable<T>) => {
 
   const isTransition = useTransition();
 
-  const cappedPageCount = Math.min(240, data.length);
+  const cappedPageCount = Math.min(240, count);
 
   const pageCount = Math.ceil(cappedPageCount / rowsPerPage);
 
   const startIndex = (page - 1) * rowsPerPage + 1;
   const endIndex = Math.min(page * rowsPerPage, cappedPageCount);
-
-  const rowStartIndex = (page - 1) * rowsPerPage;
-  const rowEndIndex = rowStartIndex + 12;
 
   return (
     <div>
@@ -146,9 +144,7 @@ const Table = <T,>(props: ITable<T>) => {
               transitioning: {},
             }}
           >
-            {data
-              .slice(rowStartIndex, rowEndIndex)
-              .map((row, i) => renderRow({ data: row, index: i }))}
+            {data.map((row, i) => renderRow({ data: row, index: i }))}
           </motion.tbody>
         </AnimatePresence>
       </table>

@@ -1,8 +1,8 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
-import type { HomeLoader } from "../query/dashboard/home";
-import type { TransactionsLoader } from "../query/userTransactions";
+import type { HomeLoaderData } from "../query/dashboard/home";
+import type { TransactionsLoaderData } from "../query/userTransactions";
 
 import { motion } from "framer-motion";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
@@ -18,7 +18,7 @@ import {
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useNavigate, useFetcher } from "@remix-run/react";
 import { Table } from "~/components";
 import {
@@ -178,10 +178,7 @@ type LoaderData = {
   network: Chain;
 };
 
-type CacheData = HomeLoader & {
-  transactions: Transaction[];
-  page: number;
-};
+type CacheData = HomeLoaderData & TransactionsLoaderData;
 
 function ErrorBoundary(error: Error) {
   console.log(error);
@@ -202,6 +199,7 @@ function ErrorBoundary(error: Error) {
 }
 
 const SAFE_DEFAULT: CacheData = {
+  count: 0,
   network: "ethereum",
   transactions: [],
   rewards: [],
@@ -230,13 +228,13 @@ export default function Home() {
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);
 
-  const { data: homeData } = useCache<HomeLoader>(
+  const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
   );
 
   const isFirstLoad = !homeData;
 
-  const { data: globalTransactionsData } = useCache<TransactionsLoader>(
+  const { data: globalTransactionsData } = useCache<TransactionsLoaderData>(
     `/${network}/query/userTransactions?page=${page}`
   );
 
@@ -252,7 +250,7 @@ export default function Home() {
     userTransactionsData.load(
       `/${network}/query/userTransactions?page=${page}&address=${address}`
     );
-  }, [address]);
+  }, [address, page]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
     SAFE_DEFAULT.totalFluidPairs
@@ -287,48 +285,18 @@ export default function Home() {
 
   const navigate = useNavigate();
 
+  // Default to "Y" View
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
 
+  // Default to "Global" View
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
     connected ? 1 : 0
   );
 
+  // If connected, default to "My Dashboard" View
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
   }, [connected]);
-
-  const [
-    {
-      count,
-      transactions,
-      rewards,
-      volume,
-      graphTransformedTransactions,
-      fluidPairs,
-      timestamp,
-    },
-    setTransactions,
-  ] = useState<{
-    count: number;
-    transactions: Transaction[];
-    rewards: number;
-    volume: number;
-    graphTransformedTransactions: Volume[];
-    fluidPairs: number;
-    timestamp: number;
-  }>({
-    count: data.global.volume.length,
-    transactions: data.global.transactions,
-    rewards: data.global.rewards.reduce(
-      (sum, { token_decimals, winning_amount }) =>
-        sum + winning_amount / 10 ** token_decimals,
-      0
-    ),
-    volume: data.global.volume.reduce((sum, { amount }) => sum + amount, 0),
-    graphTransformedTransactions: [],
-    fluidPairs: data.global.totalFluidPairs,
-    timestamp: data.global.timestamp,
-  });
 
   const { width } = useViewport();
   const isTablet = width < 850 && width > 0;
@@ -389,7 +357,15 @@ export default function Home() {
         },
       ];
 
-  useEffect(() => {
+  const {
+    count,
+    rewards,
+    volume,
+    transactions,
+    graphTransformedTransactions,
+    fluidPairs,
+    timestamp,
+  } = useMemo(() => {
     const { transactions, volume, rewards, totalFluidPairs, timestamp } =
       activeTableFilterIndex ? data.user : data.global;
 
@@ -413,11 +389,10 @@ export default function Home() {
       (sum, { amount }) => sum + amount,
       0
     );
-
     const graphTransformedTransactions =
       graphTransformers[activeTransformerIndex].transform(filteredVolume);
 
-    setTransactions({
+    return {
       count: filteredVolume.length,
       rewards: filteredRewards,
       volume: totalVolume,
@@ -425,12 +400,14 @@ export default function Home() {
       graphTransformedTransactions,
       fluidPairs: totalFluidPairs,
       timestamp,
-    });
+    };
   }, [
     activeTableFilterIndex,
     activeTransformerIndex,
     userHomeData.state,
     userTransactionsData.state,
+    homeData?.timestamp,
+    globalTransactionsData?.transactions,
   ]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
@@ -517,6 +494,7 @@ export default function Home() {
 
   return (
     <>
+      {/* Timestamp */}
       <div className="pad-main" style={{ marginBottom: "12px" }}>
         {isTablet && (
           <Display
@@ -528,11 +506,12 @@ export default function Home() {
           </Display>
         )}
         <Text>
-          {isFirstLoad
+          {isFirstLoad || !timestamp
             ? "Loading data..."
-            : `Last updated ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+            : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
         </Text>
       </div>
+
       <section id="graph">
         <div className="graph-ceiling pad-main">
           {/* Statistics */}

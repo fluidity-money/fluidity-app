@@ -7,7 +7,7 @@ import config from "~/webapp.config.server";
 import { useUserRewardsAll, useUserRewardsByAddress } from "~/queries";
 import { jsonGet } from "~/util/api/rpc";
 
-export type HomeLoader = {
+export type HomeLoaderData = {
   rewards: Winner[];
   volume: Volume[];
   totalFluidPairs: number;
@@ -57,7 +57,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       totalFluidPairs: fluidPairs,
       network,
       timestamp,
-    } as HomeLoader);
+    } as HomeLoaderData);
   } catch (err) {
     console.log(err);
     throw new Error(`Could not fetch Transactions on ${network}: ${err}`);

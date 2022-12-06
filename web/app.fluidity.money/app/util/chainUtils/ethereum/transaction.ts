@@ -241,6 +241,8 @@ export const manualRewardToken = async (
   const uint8Signature = B64ToUint8Array(b64Signature);
   const hexSignature = bytesToHex(Array.from(uint8Signature));
 
+  const mainnetId = 1;
+
   try {
     const tokenContract = getContract(token.ABI, token.address, signer);
 
@@ -248,7 +250,7 @@ export const manualRewardToken = async (
       // contractAddress
       token.address,
       // chainid
-      0,
+      mainnetId,
       // winnerAddress
       winner,
       // winAmount
