@@ -47,7 +47,6 @@
   box-sizing: border-box;
   width: 100%;
   text-align: center;
-  padding: 2em;
 }
 
 .connected {
@@ -406,4 +405,28 @@
   text-decoration: underline;
   color: white;
   cursor: pointer;
+}
+
+.graph-tooltip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 160px;
+  gap: 0.4em;
+}
+
+.graph-tooltip-container {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.05);
+  width: min-content;
+  white-space: nowrap;
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: Aeonik, sans-serif;
+  color: white;
+  font-size: 14px;
+  text-align: center;
 }
