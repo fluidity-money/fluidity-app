@@ -150,10 +150,6 @@ main > footer > section {
   padding: 0;
 }
 
-.fluidify-button-dashboard {
-  height: 16px;
-}
-
 .fluidify-button-dashboard-mobile {
   position: fixed !important;
   bottom: 2vh;
@@ -172,16 +168,17 @@ main > footer > section {
   position: relative;
   z-index: 0;
   overflow: hidden;
+  font-size: 15px;
 }
 
 .rainbow ::before {
   content: "";
   position: absolute;
   z-index: -2;
-  left: -50%;
-  top: -82%;
-  width: 200%;
-  height: 350%;
+  left: -20%;
+  top: -150%;
+  width: 300px;
+  height: 300px;
   background-color: #f3b8d8;
   background-repeat: no-repeat;
   background-size: 100%;
@@ -292,6 +289,10 @@ main > footer > section > a {
   gap: 0.5em;
 }
 
+.table-activity:hover > span {
+  color: white;
+}
+
 .table-activity > span {
   text-decoration: underline;
   text-underline-offset: 0.25em;
@@ -319,6 +320,14 @@ main > footer > section > a {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.table-address:hover {
+  color: white;
+}
+
+.table-address > span:hover {
+  color: white;
 }
 
 .pagination {
@@ -499,7 +508,11 @@ main > footer > section > a {
   position: relative;
 }
 
-.open-provider-dropdown:hover {
+.open-provider-dropdown:hover > h1 {
+  opacity: 0.8;
+}
+
+.open-provider-dropdown:hover > img {
   opacity: 0.8;
 }
 
@@ -514,9 +527,9 @@ main > footer > section > a {
   padding: 5px;
   border-radius: 12px;
   position: absolute;
-  top: 66px;
-  left: -10px;
-  width: 150px;
+  top: 50px;
+  left: -15px;
+  width: 175px;
   display: flex;
   flex-direction: column;
 }
@@ -1147,13 +1160,6 @@ main > footer > section > a {
   .transaction-filters {
     margin-bottom: 1em;
   }
-
-  .rainbow ::before {
-    left: -20%;
-    top: -150%;
-    width: 300px;
-    height: 300px;
-  }
 }
 
 @media (max-width: 750px) {
@@ -1162,5 +1168,9 @@ main > footer > section > a {
   }
   .rainbow::after {
     background: black;
+  }
+
+  main > nav > div {
+    gap: 0.5em;
   }
 }
