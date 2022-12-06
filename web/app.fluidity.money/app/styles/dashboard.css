@@ -171,6 +171,11 @@ main > footer > section {
   font-size: 15px;
 }
 
+.rainbow > h6 {
+  margin: 0;
+  font-size: 15px;
+}
+
 .rainbow ::before {
   content: "";
   position: absolute;
@@ -212,7 +217,11 @@ main > footer > section {
   border-radius: inherit;
 }
 
-.rainbow:hover:focus {
+.rainbow:hover > h6 {
+  color: black;
+}
+
+.rainbow:hover:focus > h6 {
   color: white;
 }
 

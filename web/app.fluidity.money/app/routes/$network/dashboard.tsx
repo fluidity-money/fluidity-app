@@ -438,7 +438,9 @@ export default function Dashboard() {
                 size={"small"}
                 handleClick={() => navigate("../fluidify")}
               >
-                <b>Fluidify Money</b>
+                <Heading as="h6">
+                  <b>Fluidify Money</b>
+                </Heading>
               </GeneralButton>
             )}
 
@@ -506,7 +508,9 @@ export default function Dashboard() {
             size={"medium"}
             handleClick={() => navigate("../fluidify")}
           >
-            <b>FLUIDIFY MONEY</b>
+            <Heading as="h6">
+              <b>Fluidify Money</b>
+            </Heading>
           </GeneralButton>
         )}
 
