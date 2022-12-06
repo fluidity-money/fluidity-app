@@ -28,7 +28,7 @@ const queryByAddress: Queryable = {
           currency {
             symbol
           }
-          transaction(txHash: { notIn: $filterHashes }) {
+          transaction(txHash: {notIn: $filterHashes}) {
             hash
           }
           block {
@@ -76,7 +76,7 @@ const queryByAddress: Queryable = {
               unixtime
             }
           }
-          transaction(txHash: { notIn: $filterHashes }) {
+          transaction(txHash: {notIn: $filterHashes}) {
             hash: signature
           }
         }
@@ -87,49 +87,39 @@ const queryByAddress: Queryable = {
 
 const queryByTxHash: Queryable = {
   ethereum: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-    ) {
-      ethereum {
-        transfers(
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: 12
-            offset: $offset
-          }
-          txHash: { in: $transactions }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash
-          }
-          block {
-            timestamp {
-              unixtime
-            }
+  query getTransactionsByTxHash($transactions: [String!], $offset: Int = 0, $filterHashes: [String!] = []) {
+    ethereum {
+      transfers(
+        options: {
+          desc: "block.timestamp.unixtime"
+          limit: 12
+          offset: $offset
+        }
+        txHash: {in: $transactions}) {
+        sender {
+          address
+        }
+        receiver {
+          address
+        }
+        amount
+        currency {
+          symbol
+        }
+        transaction(txHash: {notIn: $filterHashes}) {
+          hash
+        }
+        block {
+          timestamp {
+            unixtime
           }
         }
       }
     }
-  `,
+  }`,
 
   solana: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-    ) {
+    query getTransactionsByTxHash($transactions: [String!], $offset: Int = 0, $filterHashes: [String!] = [] ) {
       solana {
         transfers(
           options: {
@@ -154,7 +144,7 @@ const queryByTxHash: Queryable = {
               unixtime
             }
           }
-          transaction(txHash: { notIn: $filterHashes }) {
+          transaction(txHash: {notIn: $filterHashes}) {
             hash: signature
           }
         }
@@ -165,11 +155,7 @@ const queryByTxHash: Queryable = {
 
 const queryAll: Queryable = {
   ethereum: gql`
-    query getTransactions(
-      $fluidCurrencies: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-    ) {
+    query getTransactions($fluidCurrencies: [String!], $offset: Int = 0, $filterHashes: [String!] = [] ) {
       ethereum {
         transfers(
           currency: { in: $fluidCurrencies }
@@ -189,7 +175,7 @@ const queryAll: Queryable = {
           currency {
             symbol
           }
-          transaction(txHash: { notIn: $filterHashes }) {
+          transaction(txHash: {notIn: $filterHashes}) {
             hash
           }
           block {
@@ -203,11 +189,7 @@ const queryAll: Queryable = {
   `,
 
   solana: gql`
-    query getTransactions(
-      $fluidCurrencies: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-    ) {
+    query getTransactions($fluidCurrencies: [String!], $offset: Int = 0, $filterHashes: [String!] = [] ) {
       solana {
         transfers(
           currency: { in: $fluidCurrencies }
@@ -232,7 +214,7 @@ const queryAll: Queryable = {
               unixtime
             }
           }
-          transaction(txHash: { notIn: $filterHashes }) {
+          transaction(txHash: {notIn: $filterHashes}) {
             hash: signature
           }
         }
@@ -290,7 +272,7 @@ const useUserTransactionsByAddress = async (
   network: string,
   page: number,
   address: string,
-  filterHashes: string[]
+  filterHashes: string[],
 ) => {
   const variables = {
     address: address,
@@ -317,14 +299,14 @@ const useUserTransactionsByTxHash = async (
   network: string,
   page: number,
   transactions: string[],
-  filterHashes: string[]
+  filterHashes: string[],
 ) => {
   const variables = {
     transactions,
     offset: (page - 1) * 12,
     filterHashes,
   };
-
+  
   const body = {
     query: queryByTxHash[network],
     variables,
@@ -339,17 +321,13 @@ const useUserTransactionsByTxHash = async (
   );
 };
 
-const useUserTransactionsAll = async (
-  network: string,
-  page: number,
-  filterHashes: string[]
-) => {
+const useUserTransactionsAll = async (network: string, page: number, filterHashes: string[]) => {
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
     offset: (page - 1) * 12,
     filterHashes,
   };
-
+  
   const body = {
     query: queryAll[network],
     variables,
