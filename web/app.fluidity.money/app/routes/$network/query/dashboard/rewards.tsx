@@ -1,13 +1,27 @@
+import type { Chain } from "~/util/chainUtils/chains";
+import type { LoaderFunction } from "@remix-run/node";
+import type { Rewarders } from "~/util/rewardAggregates";
+
 import { JsonRpcProvider } from "@ethersproject/providers";
-import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
-import { LoaderFunction, json } from "@remix-run/node";
-import config from "~/webapp.config.server";
-import Transaction from "~/types/Transaction";
-import { Provider } from "~/components/ProviderCard";
+import { json } from "@remix-run/node";
 import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
 import { aggregateRewards } from "~/util/rewardAggregates";
-import { jsonGet } from "~/util/api/rpc";
+import { useUserRewardsAll, useUserRewardsByAddress } from "~/queries";
+import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import config from "~/webapp.config.server";
+
+export type RewardsLoaderData = {
+  network: Chain;
+  rewarders: Rewarders;
+  fluidTokenMap: { [symbol: string]: string };
+  fluidPairs: number;
+  totalRewards: number;
+  totalPrizePool: number;
+  networkFee: number;
+  gasFee: number;
+  timestamp: number;
+};
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const network = params.network ?? "";
@@ -17,9 +31,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const gasFee = 0.002;
 
   const url = new URL(request.url);
-  const _pageStr = url.searchParams.get("page");
-  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
-  const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
+  const address = url.searchParams.get("address");
 
   try {
     const mainnetId = 0;
@@ -35,18 +47,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       RewardAbi
     );
 
-    const { transactions } = await jsonGet<
-      { page: number },
-      { transactions: Transaction[] }
-    >(`${url.origin}/${network}/query/userTransactions`, {
-      page,
-    });
-
-    const {
-      config: {
-        [network as string]: { tokens },
-      },
-    } = config;
+    const { tokens } = config.config[network];
 
     const fluidTokenMap = tokens.reduce(
       (map, token) =>
@@ -60,68 +61,36 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {}
     );
 
-    const totalRewards = transactions.reduce(
-      (sum, { reward }) => sum + reward,
+    const { data: winnersData } = await (address
+      ? useUserRewardsByAddress(network, address)
+      : useUserRewardsAll(network));
+
+    const totalRewards = winnersData?.winners.reduce(
+      (sum, { winning_amount, token_decimals }) =>
+        sum + winning_amount / 10 ** token_decimals,
       0
     );
 
-    // const { data: totalRewards, errors: totalRewardErr } = await useUserYieldAll(network ?? "");
-    //
-    // if (totalRewardErr || !totalRewards) {
-    //   throw totalRewardErr;
-    // }
-
     const { data: appRewardData, errors: appRewardErrors } =
       await useApplicationRewardStatistics(network ?? "");
+
     if (appRewardErrors || !appRewardData) {
       throw appRewardErrors;
     }
 
     const rewarders = aggregateRewards(appRewardData);
 
-    const totalRewarders = Object.values(
-      transactions.reduce((map, tx) => {
-        const provider = map[tx.provider];
-
-        return {
-          ...map,
-          [tx.provider]: provider
-            ? {
-                ...provider,
-                count: provider.count + 1,
-                prize: provider.prize + tx.reward,
-              }
-            : {
-                name: tx.provider,
-                count: 1,
-                prize: tx.reward,
-              },
-        };
-      }, {} as { [providerName: string]: { name: string; count: number; prize: number } })
-    )
-      .map(({ count, ...provider }) => ({
-        ...provider,
-        avgPrize: provider.prize / count,
-      }))
-      .sort(({ avgPrize: avgPrizeA }, { avgPrize: avgPrizeB }) =>
-        avgPrizeA > avgPrizeB ? 1 : avgPrizeA === avgPrizeB ? 0 : -1
-      ) as Provider[];
-
     return json({
+      network,
       rewarders,
       fluidTokenMap,
-      page,
-      network,
       fluidPairs,
-      totalTransactions: transactions,
-      totalCount: transactions.length,
       totalRewards,
-      totalRewarders,
       totalPrizePool,
       networkFee,
       gasFee,
       timestamp: new Date().getTime(),
-    });
+    } as RewardsLoaderData);
   } catch (err) {
     console.log(err);
     throw new Error(`Could not fetch Rewards on ${network}: ${err}`);

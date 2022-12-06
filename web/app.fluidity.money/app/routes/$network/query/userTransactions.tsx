@@ -22,8 +22,10 @@ type UserTransaction = {
   currency: string;
 };
 
-export type TransactionsLoader = {
+export type TransactionsLoaderData = {
   transactions: Transaction[];
+  page: number;
+  count: number;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -61,14 +63,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     );
 
     // payoutsMap looks up if a transaction was a payout transaction
-    const payoutsMap = winnersData.winners.reduce(
-      (map, winner) => ({
-        ...map,
-        [winner.transaction_hash]: {
-          ...winner,
-        },
-      }),
-      {} as { [key: string]: Winner }
+    const payoutAddrs = winnersData.winners.map(
+      ({ transaction_hash }) => transaction_hash
     );
 
     const { data: userTransactionsData, errors: userTransactionsErr } =
@@ -77,12 +73,19 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           case !!winnersOnly:
             return useUserTransactionsByTxHash(
               network,
-              Object.keys(winnersMap)
+              page,
+              Object.keys(winnersMap),
+              payoutAddrs
             );
           case !!address:
-            return useUserTransactionsByAddress(network, address as string);
+            return useUserTransactionsByAddress(
+              network,
+              page,
+              address as string,
+              payoutAddrs
+            );
           default:
-            return useUserTransactionsAll(network);
+            return useUserTransactionsAll(network, page, payoutAddrs);
         }
       })();
 
@@ -135,11 +138,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }
     );
 
-    // skip payout transactions
-    const sanitisedTransactions: UserTransaction[] = userTransactions.filter(
-      ({ hash }) => !payoutsMap[hash]
-    );
-
     const {
       config: {
         [network as string]: { tokens },
@@ -156,42 +154,42 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const defaultLogo = "/assets/tokens/usdt.svg";
 
-    const mergedTransactions: Transaction[] = sanitisedTransactions.map(
-      (tx) => {
-        const swapType =
-          tx.sender === MintAddress
-            ? "in"
-            : tx.receiver === MintAddress
-            ? "out"
-            : undefined;
+    const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
+      const swapType =
+        tx.sender === MintAddress
+          ? "in"
+          : tx.receiver === MintAddress
+          ? "out"
+          : undefined;
 
-        const winner = winnersMap[tx.hash];
+      const winner = winnersMap[tx.hash];
 
-        return {
-          sender: tx.sender,
-          receiver: tx.receiver,
-          winner: winner?.winning_address ?? "",
-          reward: winner
-            ? winner.winning_amount / 10 ** winner.token_decimals
-            : 0,
-          hash: tx.hash,
-          rewardHash: winner?.transaction_hash ?? "",
-          currency: tx.currency,
-          value: tx.value,
-          timestamp: tx.timestamp,
-          logo: tokenLogoMap[tx.currency] || defaultLogo,
-          provider:
-            (network === "ethereum"
-              ? winner?.ethereum_application
-              : winner?.solana_application) ?? "Fluidity",
-          swapType,
-        };
-      }
-    );
+      return {
+        sender: tx.sender,
+        receiver: tx.receiver,
+        winner: winner?.winning_address ?? "",
+        reward: winner
+          ? winner.winning_amount / 10 ** winner.token_decimals
+          : 0,
+        hash: tx.hash,
+        rewardHash: winner?.transaction_hash ?? "",
+        currency: tx.currency,
+        value: tx.value,
+        timestamp: tx.timestamp,
+        logo: tokenLogoMap[tx.currency] || defaultLogo,
+        provider:
+          (network === "ethereum"
+            ? winner?.ethereum_application
+            : winner?.solana_application) ?? "Fluidity",
+        swapType,
+      };
+    });
 
     return json({
+      page,
       transactions: mergedTransactions,
-    } as TransactionsLoader);
+      count: Object.keys(winnersMap).length,
+    } as TransactionsLoaderData);
   } catch (err) {
     captureException(
       new Error(

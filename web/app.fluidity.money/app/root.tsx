@@ -112,7 +112,8 @@ export const loader: LoaderFunction = async (): Promise<LoaderData> => {
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary(err: Error) {
+  console.error(err);
   return (
     <html>
       <head>
