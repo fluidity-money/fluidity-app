@@ -139,7 +139,7 @@ export default function Rewards() {
     );
 
     userUnclaimedRewardsData.load(
-      `/${network}/query/unclaimedRewards?address=${address}&page=${page}`
+      `/${network}/query/dashboard/unclaimedRewards?address=${address}&page=${page}`
     );
   }, [address, page]);
 
