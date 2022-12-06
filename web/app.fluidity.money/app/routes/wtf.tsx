@@ -1,11 +1,11 @@
-import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics";
+import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { getAddressExplorerLink, networkMapper } from "~/util";
 import {
   Display,
@@ -48,10 +48,7 @@ export const loader: LoaderFunction = async () => {
     });
   }
 
-  const highestRewards = data.highest_rewards_monthly.map((reward) => ({
-    ...reward,
-    awardedDate: new Date(reward.awarded_day),
-  }));
+  const highestRewards = data.highest_rewards_monthly;
 
   if (!Object.keys(data.highest_reward_winner_totals).length) {
     return json({
@@ -98,14 +95,9 @@ type WinnerWinnings = {
   };
 };
 
-type HighestRewards =
-  HighestRewardResponse["data"]["highest_rewards_monthly"][0] & {
-    awardedDate: Date;
-  };
-
 type LoaderData = {
   winnerTotals: WinnerWinnings;
-  highestRewards: HighestRewards;
+  highestRewards: HighestRewardMonthly[];
   highestWinner: {
     address: string;
     network: string;
@@ -141,7 +133,7 @@ export default function IndexPage() {
   const navigate = useNavigate();
 
   const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
-
+  
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
@@ -155,7 +147,7 @@ export default function IndexPage() {
       icon: <img src="/assets/chains/solanaIcon.svg" />,
     },
   ];
-
+  
   return (
     <>
       <Video
@@ -279,16 +271,19 @@ export default function IndexPage() {
             style={{ width: "100%", height: "400px" }}
           >
             <LineChart
-              data={highestRewards}
+              data={highestRewards.map((reward: HighestRewardMonthly, i: number) => ({...reward, x: i}))}
               lineLabel="transactions"
               accessors={{
-                xAccessor: (d: HighestRewards) => d.awardedDate,
-                yAccessor: (d: HighestRewards) => d.winning_amount_scaled,
+                xAccessor: (d: HighestRewardMonthly & {x: number}) => d.x,
+                yAccessor: (d: HighestRewardMonthly) => Math.log(d.winning_amount_scaled + 1),
               }}
-              renderTooltip={({ datum }: { datum: HighestRewards }) => (
-                <div className={"tooltip"}>
+              renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => {
+      
+    return (
+                <div className={"graph-tooltip-container"}>
+                  <div className={"graph-tooltip"}>
                   <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                    {format(datum.awardedDate, "dd/mm/yy")}
+                    {format(parseISO(datum.awarded_day), "dd/MM/yy")}
                   </span>
                   <br />
                   <br />
@@ -306,7 +301,10 @@ export default function IndexPage() {
                     </span>
                   </span>
                 </div>
+                </div>
               )}
+    
+  }
             />
           </div>
         </div>
