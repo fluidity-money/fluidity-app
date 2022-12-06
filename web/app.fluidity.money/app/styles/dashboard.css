@@ -274,6 +274,10 @@ main > footer > section > a {
   border: 1px solid #e6c5e3;
 }
 
+.active-filter-btn:hover {
+  border: 1px solid #ffffff !important;
+}
+
 .transactions-header {
   margin-bottom: 1em;
   display: flex;
