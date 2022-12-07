@@ -2,7 +2,7 @@ import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics
 
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
-import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
 import { format } from "date-fns";
@@ -314,5 +314,46 @@ export default function IndexPage() {
     </>
   );
 }
+
+export const meta: MetaFunction = ({
+  params: { action }
+}) => {
+  const basic = {
+    title: "Why Fluidify? - Fluidity Money",
+    description: "Fluidity is a protocol that rewards users for using their cryptocurrency.",
+
+    "twitter:card": "summary_large_image",
+    "twitter:site": "@fluiditymoney",
+    "twitter:title": "Why Fluidify? - Fluidity Money",
+    "twitter:description": "Fluidity is a protocol that rewards users for using their cryptocurrency.",
+    "twitter:image": "https://static.fluidity.money/img/FluidShare.png",
+
+    "og:title": "Why Fluidify?",
+    "og:description": "Fluidity is a protocol that rewards users for using their cryptocurrency.",
+    "og:url": "https://app.fluidity.money/wtf",
+    "og:type": "website"
+  };
+
+  switch (action) {
+    case "send":
+      return {
+        ...basic,
+        "twitter:image": "https://static.fluidity.money/img/FluidSend.png",
+        "og:image": "https://static.fluidity.money/img/FluidSend.png",
+        "og:url": "https://app.fluidity.money/wtf?action=send",
+      };
+
+    case "receive":
+      return {
+        ...basic,
+        "twitter:image": "https://static.fluidity.money/img/FluidRecv.png",
+        "og:image": "https://static.fluidity.money/img/FluidRecv.png",
+        "og:url": "https://app.fluidity.money/wtf?action=receive",
+      };
+
+    default:
+      return basic
+  }
+};
 
 export { ErrorBoundary };

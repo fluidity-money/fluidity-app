@@ -123,7 +123,6 @@ const NetworkPage = () => {
     const tweetMsg = `Fluidify your money with Fluidity`;
 
     twitterUrl.searchParams.set("text", tweetMsg);
-
     const fluTwitterHandle = `fluiditymoney`;
 
     twitterUrl.searchParams.set("via", fluTwitterHandle);
