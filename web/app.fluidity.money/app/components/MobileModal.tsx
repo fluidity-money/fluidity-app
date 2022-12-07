@@ -67,6 +67,11 @@ export default function MobileModal({
       : setTimeout(() => (document.body.style.position = "fixed"), 1000);
   }, [walletModalVisibility]);
 
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
+
   if (walletModalVisibility) {
     return (
       <ConnectWalletModal

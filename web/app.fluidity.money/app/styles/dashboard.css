@@ -275,6 +275,10 @@ main > footer > section > a {
   border: 1px solid #e6c5e3;
 }
 
+.active-filter-btn:hover {
+  border: 1px solid #ffffff !important;
+}
+
 .transactions-header {
   margin-bottom: 1em;
   display: flex;
@@ -1136,6 +1140,16 @@ main > footer > section > a {
     justify-content: center;
     align-items: center;
     gap: 2em;
+  }
+}
+
+@media (max-width: 450px) {
+  .totals-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .reward-performance {
+    font-size: 1.5em;
   }
 }
 

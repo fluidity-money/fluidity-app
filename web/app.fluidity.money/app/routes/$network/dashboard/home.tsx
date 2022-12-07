@@ -523,7 +523,7 @@ export default function Home() {
                   {activeTableFilterIndex ? "My" : "Total"} transactions
                 </Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
                 >
                   {count}
@@ -537,7 +537,7 @@ export default function Home() {
                 <div className="statistics-set">
                   <Text>Total volume</Text>
                   <Display
-                    size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                    size={width < 500 && width > 0 ? "xxxs" : "xs"}
                     style={{ margin: 0 }}
                   >
                     {numberToMonetaryString(volume)}
@@ -549,7 +549,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(rewards)}
@@ -569,7 +569,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
                 >
                   {fluidPairs}
