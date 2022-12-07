@@ -106,16 +106,23 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export const loader: LoaderFunction = async (): Promise<LoaderData> => {
+export const loader: LoaderFunction = async ({ request }): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
   const sentryDsn =
     "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
   const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
+  const host = request.headers.get("Host");
+
+  const isProduction = nodeEnv === "production" && host === "app.fluidity.money";
+  const isStaging = nodeEnv === "production" && host === "staging.app.fluidity.money";
+
   return {
     nodeEnv,
     sentryDsn,
     gaToken,
+    isProduction,
+    isStaging,
   };
 };
 
@@ -149,10 +156,12 @@ type LoaderData = {
   nodeEnv: string;
   sentryDsn: string;
   gaToken?: string;
+  isProduction: boolean;
+  isStaging: boolean;
 };
 
 function App() {
-  const { nodeEnv, sentryDsn, gaToken } = useLoaderData<LoaderData>();
+  const { nodeEnv, sentryDsn, gaToken, isProduction } = useLoaderData<LoaderData>();
 
   switch (true) {
     case nodeEnv !== "production":
@@ -192,7 +201,7 @@ function App() {
             <Outlet />
             <ScrollRestoration />
             <Scripts />
-            {gaToken && process.env.NODE_ENV === "production" && (
+            {gaToken && isProduction && (
               <>
                 <script
                   src={`https://www.googletagmanager.com/gtag/js?id=${gaToken}`}
