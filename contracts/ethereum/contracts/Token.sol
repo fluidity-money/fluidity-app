@@ -568,7 +568,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
     }
 
     /**
-     * @dev ECrecover with checks for signature mallmalleability
+     * @dev ECrecover with checks for signature malleability
      * @dev adapted from openzeppelin's ECDSA library
      */
     function recover(

@@ -150,15 +150,88 @@ main > footer > section {
   padding: 0;
 }
 
-.fluidify-button-dashboard {
-  height: 16px;
-}
-
 .fluidify-button-dashboard-mobile {
-  position: fixed;
+  position: fixed !important;
   bottom: 2vh;
   left: 50vw;
   transform: translateX(-50%);
+  width: 40vw;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.rainbow {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  font-size: 15px;
+  box-shadow: 0 0 8px 2px #f3b8d8;
+}
+
+.rainbow > h6 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.rainbow ::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  left: -20%;
+  top: -150%;
+  width: 300px;
+  height: 300px;
+  background-color: #f3b8d8;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  background-image: linear-gradient(
+    45deg,
+    #f3b8d8,
+    #b793e9,
+    #9fd4f3,
+    #ffd2c4,
+    #fbf3f3,
+    #d9abdf,
+    #af9ce3,
+    #aae4e1,
+    #c6ead0,
+    #ffffff,
+    #fdb5e4
+  );
+  animation: rotate 4s linear infinite;
+}
+
+.rainbow::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 3px;
+  top: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background: #300d0b;
+  border-radius: inherit;
+}
+
+.rainbow:hover > h6 {
+  color: black;
+}
+
+.rainbow:hover:focus > h6 {
+  color: white;
+}
+
+.rainbow:hover:focus::after {
+  background: #300d0b;
+}
+
+.rainbow:hover::after {
+  background: transparent;
 }
 
 .selector-button {
@@ -202,6 +275,10 @@ main > footer > section > a {
   border: 1px solid #e6c5e3;
 }
 
+.active-filter-btn:hover {
+  border: 1px solid #ffffff !important;
+}
+
 .transactions-header {
   margin-bottom: 1em;
   display: flex;
@@ -224,6 +301,10 @@ main > footer > section > a {
   display: flex;
   align-items: center;
   gap: 0.5em;
+}
+
+.table-activity:hover > span {
+  color: white;
 }
 
 .table-activity > span {
@@ -253,6 +334,14 @@ main > footer > section > a {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.table-address:hover {
+  color: white;
+}
+
+.table-address > span:hover {
+  color: white;
 }
 
 .pagination {
@@ -355,6 +444,7 @@ main > footer > section > a {
   flex-direction: column;
   justify-content: space-evenly;
   align-items: flex-start;
+  gap: 1em;
 }
 
 .provide-liquidity-left > div:first-child {
@@ -368,6 +458,27 @@ main > footer > section > a {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.provide-liquidity-right-images {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.dashed-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border: 1px dashed #fff;
+  border-radius: 50%;
 }
 
 .provide-heading {
@@ -395,6 +506,60 @@ main > footer > section > a {
 
 .liquidity-providers > a > img {
   width: 4.5em;
+}
+
+.fluid-liquidity-token {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  margin: 0;
+}
+
+.open-provider-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  position: relative;
+}
+
+.open-provider-dropdown:hover > h1 {
+  opacity: 0.8;
+}
+
+.open-provider-dropdown:hover > img {
+  opacity: 0.8;
+}
+
+.open-provider-dropdown > img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
+.dropdown-options {
+  background: rgba(50, 50, 50, 0.65);
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 12px;
+  position: absolute;
+  top: 50px;
+  left: -15px;
+  width: 175px;
+  display: flex;
+  flex-direction: column;
+}
+
+.token-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-radius: 12px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+}
+
+.token-option:hover {
+  background: rgba(99, 99, 99, 0.75);
 }
 
 .cover {
@@ -978,6 +1143,16 @@ main > footer > section > a {
   }
 }
 
+@media (max-width: 450px) {
+  .totals-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .reward-performance {
+    font-size: 1.5em;
+  }
+}
+
 @media (max-width: 500px) {
   main > footer > section:first-child {
     gap: 0.6em;
@@ -985,7 +1160,7 @@ main > footer > section > a {
 
   #provide-liquidity {
     padding: 1em;
-    margin: 0 0.5em 2em;
+    margin: 0 0.5em 3em;
   }
 
   .connect-wallet-modal-container {
@@ -1008,5 +1183,18 @@ main > footer > section > a {
 
   .transaction-filters {
     margin-bottom: 1em;
+  }
+}
+
+@media (max-width: 750px) {
+  .rainbow:hover:focus::after {
+    background: black;
+  }
+  .rainbow::after {
+    background: black;
+  }
+
+  main > nav > div {
+    gap: 0.5em;
   }
 }

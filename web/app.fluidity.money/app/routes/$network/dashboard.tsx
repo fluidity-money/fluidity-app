@@ -54,9 +54,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = config.liquidity_providers;
 
+  const tokensConfig = config.config;
+
   return json({
     network,
     provider,
+    tokensConfig,
     ethereumWallets,
   });
 };
@@ -108,6 +111,7 @@ type LoaderData = {
   fromRedirect: boolean;
   network: string;
   provider: typeof config.liquidity_providers;
+  tokensConfig: typeof config.config;
 };
 
 export default function Dashboard() {
@@ -257,6 +261,11 @@ export default function Dashboard() {
     document.body.style.overflow = "unset";
     document.body.style.position = "static";
   }, [currentPath]);
+
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
 
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -428,13 +437,15 @@ export default function Dashboard() {
             {/* Fluidify */}
             {!isMobile && (
               <GeneralButton
-                className="fluidify-button-dashboard"
-                version={"primary"}
+                className="rainbow"
+                version={"transparent"}
                 buttontype="text"
                 size={"small"}
                 handleClick={() => navigate("../fluidify")}
               >
-                <b>Fluidify Money</b>
+                <Heading as="h6">
+                  <b>Fluidify Money</b>
+                </Heading>
               </GeneralButton>
             )}
 
@@ -496,13 +507,15 @@ export default function Dashboard() {
         {/* Mobile fluidify button */}
         {isMobile && (
           <GeneralButton
-            className="fluidify-button-dashboard-mobile"
-            version={"primary"}
+            className="fluidify-button-dashboard-mobile rainbow "
+            version={"transparent"}
             buttontype="text"
             size={"medium"}
             handleClick={() => navigate("../fluidify")}
           >
-            <b>FLUIDIFY MONEY</b>
+            <Heading as="h6">
+              <b>Fluidify Money</b>
+            </Heading>
           </GeneralButton>
         )}
 

@@ -11,11 +11,13 @@ import (
 	"strconv"
 
 	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	ethRpc "github.com/ethereum/go-ethereum/rpc"
 
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	queueEth "github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
@@ -33,6 +35,9 @@ const (
 
 	// EnvStartingBlock to begin from if the Redis key is not set
 	EnvStartingBlock = `FLU_ETHEREUM_START_BLOCK`
+
+	// EnvTokenList to get the list of tokens to watch events from
+	EnvTokenList = `FLU_ETHEREUM_TOKENS_LIST`
 
 	// TopicLogs to use when writing logs found with Ethereum
 	TopicLogs = queueEth.TopicLogs
@@ -59,7 +64,7 @@ func getLatestBlockHeight(client *ethclient.Client) (uint64, error) {
 
 // paginateLogs by calling FilterLogs until the client is brought back up
 // to the latest log
-func paginateLogs(client *ethclient.Client, fromBlockHeight uint64, chanLogs chan ethTypes.Log) (uint64, error) {
+func paginateLogs(tokens []common.Address, topics [][]common.Hash, client *ethclient.Client, fromBlockHeight uint64, chanLogs chan ethTypes.Log) (uint64, error) {
 	currentBlockHeight, err := getLatestBlockHeight(client)
 
 	if err != nil {
@@ -71,6 +76,8 @@ func paginateLogs(client *ethclient.Client, fromBlockHeight uint64, chanLogs cha
 	filterQuery := ethereum.FilterQuery{
 		FromBlock: newBig(fromBlockHeight),
 		ToBlock:   newBig(nextBlockHeight),
+		Addresses: tokens,
+		Topics:    topics,
 	}
 
 	log.Debug(func(k *log.Log) {
@@ -115,6 +122,8 @@ func paginateLogs(client *ethclient.Client, fromBlockHeight uint64, chanLogs cha
 
 	if nextBlockHeight < currentBlockHeight {
 		return paginateLogs(
+			tokens,
+			topics,
 			client,
 			nextBlockHeight,
 			chanLogs,
@@ -125,7 +134,26 @@ func paginateLogs(client *ethclient.Client, fromBlockHeight uint64, chanLogs cha
 }
 
 func main() {
-	ethereumWsUrl := util.GetEnvOrFatal(EnvEthereumWsUrl)
+	var (
+		ethereumWsUrl = util.GetEnvOrFatal(EnvEthereumWsUrl)
+		tokenList_    = util.GetEnvOrFatal(EnvTokenList)
+	)
+
+	tokenList := util.GetTokensListBase(tokenList_)
+
+	tokens := make([]common.Address, len(tokenList))
+
+	for i, token := range tokenList {
+		tokens[i] = common.HexToAddress(token.TokenAddress)
+	}
+
+	topics := [][]common.Hash{
+		{
+			fluidity.FluidityContractAbi.Events["Reward"].ID,
+			fluidity.FluidityContractAbi.Events["BlockedReward"].ID,
+			fluidity.FluidityContractAbi.Events["UnblockReward"].ID,
+		},
+	}
 
 	rpcClient, err := ethRpc.Dial(ethereumWsUrl)
 
@@ -194,6 +222,8 @@ func main() {
 
 	go func() {
 		currentBlockHeight, err := paginateLogs(
+			tokens,
+			topics,
 			gethClient,
 			startingBlock,
 			chanGethLogs,
@@ -221,8 +251,8 @@ func main() {
 		})
 
 		logsFilter := map[string]interface{}{
-			"address": nil,
-			"topics":  nil,
+			"address": tokens,
+			"topics":  topics,
 		}
 
 		subscription, err := rpcClient.EthSubscribe(

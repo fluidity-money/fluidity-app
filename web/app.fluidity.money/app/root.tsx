@@ -7,6 +7,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "@remix-run/react";
 import { init as initSentry } from "@sentry/remix";
 import { Integrations } from "@sentry/tracing";
@@ -14,9 +15,12 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
+import cookieConsentUrl from "./components/CookieConsent/CookieConsent.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
+import { useEffect } from "react";
+import CookieConsent from "./components/CookieConsent/CookieConsent";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -90,6 +94,7 @@ export const links = () => {
 
     { rel: "stylesheet", href: globalStylesheetUrl },
     { rel: "stylesheet", href: surfingStylesheetUrl },
+    { rel: "stylesheet", href: cookieConsentUrl },
   ];
 };
 
@@ -101,18 +106,28 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export const loader: LoaderFunction = async (): Promise<LoaderData> => {
+export const loader: LoaderFunction = async ({ request }): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
   const sentryDsn =
     "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
+  const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
+
+  const host = request.headers.get("Host");
+
+  const isProduction = nodeEnv === "production" && host === "app.fluidity.money";
+  const isStaging = nodeEnv === "production" && host === "staging.app.fluidity.money";
 
   return {
     nodeEnv,
     sentryDsn,
+    gaToken,
+    isProduction,
+    isStaging,
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary(err: Error) {
+  console.error(err);
   return (
     <html>
       <head>
@@ -140,10 +155,13 @@ function ErrorBoundary() {
 type LoaderData = {
   nodeEnv: string;
   sentryDsn: string;
+  gaToken?: string;
+  isProduction: boolean;
+  isStaging: boolean;
 };
 
 function App() {
-  const { nodeEnv, sentryDsn } = useLoaderData<LoaderData>();
+  const { nodeEnv, sentryDsn, gaToken, isProduction } = useLoaderData<LoaderData>();
 
   switch (true) {
     case nodeEnv !== "production":
@@ -160,6 +178,16 @@ function App() {
       });
   }
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (gaToken && typeof window.gtag !== "undefined") {
+      window.gtag("config", gaToken, {
+        page_path: new URL(window.location.href),
+      });
+    }
+  }, [location, gaToken]);
+
   return (
     <html lang="en">
       <head>
@@ -167,11 +195,49 @@ function App() {
         <Links />
       </head>
       <body>
+        <CookieConsent />
         <CacheProvider>
           <ToolProvider>
             <Outlet />
             <ScrollRestoration />
             <Scripts />
+            {gaToken && isProduction && (
+              <>
+                <script
+                  src={`https://www.googletagmanager.com/gtag/js?id=${gaToken}`}
+                  async
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+                      gtag('config', '${gaToken}');
+                    `,
+                  }}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      (function (h, o, t, j, a, r) {
+                        h.hj =
+                          h.hj ||
+                          function () {
+                            (h.hj.q = h.hj.q || []).push(arguments);
+                          };
+                        h._hjSettings = { hjid: 3278724, hjsv: 6 };
+                        a = o.getElementsByTagName("head")[0];
+                        r = o.createElement("script");
+                        r.async = 1;
+                        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+                        a.appendChild(r);
+                      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+                    `,
+                  }}
+                />
+              </>
+            )}
             <LiveReload />
           </ToolProvider>
         </CacheProvider>

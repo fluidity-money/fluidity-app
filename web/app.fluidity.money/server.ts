@@ -18,7 +18,8 @@ import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
   getTransactionsObservableForIn,
-  getHasuraTransactionObservable,
+  winnersTransactionObservable,
+  pendingWinnersTransactionObservables,
 } from "./drivers";
 
 const app = express();
@@ -78,7 +79,6 @@ const solanaTokens = config.config["solana"].tokens
     decimals: entry.decimals,
   }));
 
-const hasuraUrl = config.database.hasura;
 const registry = new Map<string, Subscription>();
 
 type TokenList = {
@@ -101,8 +101,11 @@ io.on("connection", (socket) => {
     const OnChainTransactionsObservable: Observable<PipedTransaction> =
       getTransactionsObservableForIn(protocol, {}, ...Tokens);
 
-    const DbTransactionsObservable: Observable<PipedTransaction> =
-      getHasuraTransactionObservable(hasuraUrl, address);
+    const winnersObservable: Observable<PipedTransaction> =
+      winnersTransactionObservable(address);
+
+    const pendingwinnersObservable: Observable<PipedTransaction> =
+      pendingWinnersTransactionObservables(address);
 
     const OnChainTransactionFilterObservable = getObservableForAddress(
       OnChainTransactionsObservable,
@@ -116,13 +119,33 @@ io.on("connection", (socket) => {
       })
     );
 
-    DbTransactionsObservable.subscribe({
+    winnersObservable.subscribe({
       next(data) {
         socket.emit("Transactions", data);
       },
       error(err) {
         captureException(
-          new Error(`Failed to dispatch db transaction observable :: ${err}`),
+          new Error(
+            `Failed to dispatch db transaction observable on winners :: ${err}`
+          ),
+          {
+            tags: {
+              section: "server",
+            },
+          }
+        );
+      },
+    });
+
+    pendingwinnersObservable.subscribe({
+      next(data) {
+        socket.emit("Transactions", data);
+      },
+      error(err) {
+        captureException(
+          new Error(
+            `Failed to dispatch db transaction observable on pending winners :: ${err}`
+          ),
           {
             tags: {
               section: "server",
@@ -154,11 +177,14 @@ app.all(
 
 const port = process.env.PORT || 3000;
 
-httpServer.listen(port, () => {
+const server = httpServer.listen(port, () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
 });
+
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
 
 function purgeRequireCache() {
   // purge require cache on requests for "server side HMR" this won't let

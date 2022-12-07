@@ -52,6 +52,7 @@
 }
 
 .tool_cancel_btn {
+  display: block;
   margin-left: 28px;
   font-weight: 700;
   font-size: 21px;
@@ -78,7 +79,7 @@
   }
 
   .tooltip {
-    width: 95vw;
+    width: 93vw;
   }
 
   .tooltip_title {
@@ -93,9 +94,9 @@
 
   .tooltip_content {
     display: flex;
-    width: 95vw;
+    width: 93vw;
     justify-content: space-between;
-    padding: 17px 7px 17px 5px;
+    padding: 17px 0px 17px 5px;
     -webkit-transform: rotateX(180deg);
     transform: rotateX(180deg);
   }
@@ -116,6 +117,10 @@
   }
 
   .toolkit_duration_bar {
+    display: none;
+  }
+
+  .tool_cancel_btn {
     display: none;
   }
 }

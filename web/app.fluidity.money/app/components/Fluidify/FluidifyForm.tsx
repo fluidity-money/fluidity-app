@@ -26,7 +26,7 @@ export const FluidifyForm = ({
 
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
 
-  const [swapInput, setSwapInput] = useState<string>("0");
+  const [swapInput, setSwapInput] = useState<string>("");
 
   // Snap the smallest of token balance, remaining mint limit, or swap amt
   const snapToValidValue = (input: string): number =>
@@ -66,6 +66,10 @@ export const FluidifyForm = ({
     }
 
     return setSwapInput([whole, dec].join("."));
+  };
+
+  const inputMaxBalance = () => {
+    setSwapInput(assetToken.userTokenBalance.toString());
   };
 
   const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
@@ -114,14 +118,25 @@ export const FluidifyForm = ({
         {/* Swap Field */}
         <input
           className={"fluidify-input"}
-          min={"0"}
+          min={""}
           value={swapInput}
           onBlur={(e) => setSwapInput(`${snapToValidValue(e.target.value)}`)}
           onChange={handleChangeSwapInput}
-          placeholder=""
+          placeholder="0"
           step="any"
         />
+
         <Text size="lg">{assetToken?.symbol || ""}</Text>
+
+        <GeneralButton
+          version={"transparent"}
+          size="small"
+          buttontype="text"
+          handleClick={inputMaxBalance}
+          disabled={assetToken.userTokenBalance.toString() === swapInput}
+        >
+          max
+        </GeneralButton>
       </section>
 
       <hr className={"fluidify-form-el"} />

@@ -250,7 +250,7 @@
     padding: 0;
   }
   .statistics-set .container .value > h1 {
-    font-size: 1.5em;
+    font-size: 1.75em;
   }
 
   #infobox {
@@ -265,7 +265,8 @@
 @media (max-width: 500px) {
   .no-user-rewards {
     align-items: center;
-    margin-bottom: 3em;
+    margin-bottom: 2em;
+    margin-top: 2em;
   }
 
   .no-user-rewards > section {
@@ -297,7 +298,7 @@
   }
 }
 
-@media (max-width: 375px) {
+@media (max-width: 365px) {
   .statistics-row {
     grid-template-columns: 1fr;
   }

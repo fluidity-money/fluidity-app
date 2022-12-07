@@ -246,6 +246,18 @@ const EthereumFacade = ({
     return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi);
   };
 
+  const getFluidTokens = async (): Promise<string[]> => {
+    const fluidTokenAddrs = tokens
+      .filter((t) => !!t.isFluidOf)
+      .map((t) => t.address);
+
+    const fluidTokenBalances: [string, number][] = await Promise.all(
+      fluidTokenAddrs.map(async (addr) => [addr, await getBalance(addr)])
+    );
+
+    return fluidTokenBalances.filter((token) => token[1]).map(([addr]) => addr);
+  };
+
   return (
     <FluidityFacadeContext.Provider
       value={{
@@ -253,6 +265,7 @@ const EthereumFacade = ({
         limit,
         amountMinted,
         balance: getBalance,
+        tokens: getFluidTokens,
         prizePool: getPrizePool,
         disconnect: deactivate,
         useConnectorType,

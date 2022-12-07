@@ -1,11 +1,12 @@
 SECRET_FLU_ETHEREUM_WS_URL: /fluidity/arbitrum/websocket_url
 
 SERVICES:
-  - CONNECTORS_ETHEREUM_LOGS-AMQP:
-      SERVICE_NAME: connector-arbitrum-logs-amqp
-      DOCKERFILE_PATH: ./cmd/connector-ethereum-logs-amqp
-      ENV_FLU_WORKER_ID: arbitrum-connector-arbitrum-logs-amqp
+  - CONNECTORS_ETHEREUM_REWARD_LOGS_AMQP:
+      SERVICE_NAME: connector-arbitrum-reward-logs-amqp
+      DOCKERFILE_PATH: ./cmd/connector-ethereum-reward-logs-amqp
+      ENV_FLU_WORKER_ID: arbitrum-connector-arbitrum-reward-logs-amqp
       ENV_FLU_ETHEREUM_START_BLOCK: latest
+      SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/arbitrum/token_list
       TASK_MIN_COUNT: 1
 
   - CONNECTORS_ETHEREUM_BLOCK_HEADERS_AMQP:
