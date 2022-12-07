@@ -7,6 +7,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "@remix-run/react";
 import { init as initSentry } from "@sentry/remix";
 import { Integrations } from "@sentry/tracing";
@@ -17,6 +18,7 @@ import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
+import { useEffect } from "react";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -105,10 +107,12 @@ export const loader: LoaderFunction = async (): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
   const sentryDsn =
     "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
+  const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
   return {
     nodeEnv,
     sentryDsn,
+    gaToken,
   };
 };
 
@@ -141,10 +145,11 @@ function ErrorBoundary(err: Error) {
 type LoaderData = {
   nodeEnv: string;
   sentryDsn: string;
+  gaToken?: string;
 };
 
 function App() {
-  const { nodeEnv, sentryDsn } = useLoaderData<LoaderData>();
+  const { nodeEnv, sentryDsn, gaToken } = useLoaderData<LoaderData>();
 
   switch (true) {
     case nodeEnv !== "production":
@@ -161,6 +166,16 @@ function App() {
       });
   }
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (gaToken && typeof window.gtag !== "undefined") {
+      window.gtag("config", gaToken, {
+        page_path: new URL(window.location.href),
+      });
+    }
+  }, [location, gaToken]);
+
   return (
     <html lang="en">
       <head>
@@ -173,6 +188,43 @@ function App() {
             <Outlet />
             <ScrollRestoration />
             <Scripts />
+            {gaToken && process.env.NODE_ENV === "production" && (
+              <>
+                <script
+                  src={`https://www.googletagmanager.com/gtag/js?id=${gaToken}`}
+                  async
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+                      gtag('config', '${gaToken}');
+                    `,
+                  }}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      (function (h, o, t, j, a, r) {
+                        h.hj =
+                          h.hj ||
+                          function () {
+                            (h.hj.q = h.hj.q || []).push(arguments);
+                          };
+                        h._hjSettings = { hjid: 3278724, hjsv: 6 };
+                        a = o.getElementsByTagName("head")[0];
+                        r = o.createElement("script");
+                        r.async = 1;
+                        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+                        a.appendChild(r);
+                      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+                    `,
+                  }}
+                />
+              </>
+            )}
             <LiveReload />
           </ToolProvider>
         </CacheProvider>
