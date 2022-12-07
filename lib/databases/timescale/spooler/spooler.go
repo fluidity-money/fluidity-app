@@ -10,7 +10,6 @@ import (
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -26,8 +25,18 @@ const (
 	TablePendingWinners = "ethereum_pending_winners"
 )
 
-func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
-	timescaleClient := timescale.Client()
+// PendingWinnersHandler to wrap a timescale connection
+type PendingWinnersHandler struct {
+	client *sql.DB
+}
+
+// NewPendingWinnersHandler to use the given client to handle pending wins
+func NewPendingWinnersHandler(client *sql.DB) PendingWinnersHandler {
+	return PendingWinnersHandler{client}
+}
+
+func (handler *PendingWinnersHandler) InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
+	timescaleClient := handler.client
 
 	var (
 		tokenDetails = winner.TokenDetails
@@ -122,8 +131,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 	}
 }
 
-func UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) *big.Int {
-	timescaleClient := timescale.Client()
+func (handler *PendingWinnersHandler) UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) *big.Int {
+	timescaleClient := handler.client
 
 	statementText := fmt.Sprintf(
 		`SELECT
@@ -169,8 +178,8 @@ func UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_deta
 	return &total.Int
 }
 
-func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) []worker.EthereumReward {
-	timescaleClient := timescale.Client()
+func (handler *PendingWinnersHandler) GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) []worker.EthereumReward {
+	timescaleClient := handler.client
 
 	shortName := token.TokenShortName
 
@@ -246,8 +255,8 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 	return winners
 }
 
-func GetPendingRewardsForAddress(network_ network.BlockchainNetwork, address string) []worker.EthereumReward {
-	timescaleClient := timescale.Client()
+func (handler *PendingWinnersHandler) GetPendingRewardsForAddress(network_ network.BlockchainNetwork, address string) []worker.EthereumReward {
+	timescaleClient := handler.client
 
 	statementText := fmt.Sprintf(
 		`SELECT
@@ -319,8 +328,8 @@ func GetPendingRewardsForAddress(network_ network.BlockchainNetwork, address str
 	return winners
 }
 
-func RemovePendingWinnings(network_ network.BlockchainNetwork, token token_details.TokenDetails, address string, startBlock, endBlock *misc.BigInt) {
-	timescaleClient := timescale.Client()
+func (handler *PendingWinnersHandler) RemovePendingWinnings(network_ network.BlockchainNetwork, token token_details.TokenDetails, address string, startBlock, endBlock *misc.BigInt) {
+	timescaleClient := handler.client
 
 	statementText := fmt.Sprintf(
 		`UPDATE %s

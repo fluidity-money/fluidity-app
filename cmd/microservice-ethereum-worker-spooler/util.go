@@ -52,8 +52,8 @@ func bigExp10(val int64) *big.Int {
 }
 
 // flushes the reward queue and sends the batched reward
-func sendRewards(queueName string, dbNetwork network.BlockchainNetwork, token token_details.TokenDetails) {
-	transactions := spooler.GetAndRemoveRewardsForToken(dbNetwork, token)
+func sendRewards(handler spooler.PendingWinnersHandler, queueName string, dbNetwork network.BlockchainNetwork, token token_details.TokenDetails) {
+	transactions := handler.GetAndRemoveRewardsForToken(dbNetwork, token)
 
 	spooledRewards, err := ethereum.BatchWinningsByUser(transactions, token)
 
