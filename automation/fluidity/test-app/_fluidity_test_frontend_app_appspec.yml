@@ -1,0 +1,10 @@
+version: 0.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: arn:aws:ecs:ap-southeast-2:802019692967:task-definition/fluidity-money-app-test:3
+        LoadBalancerInfo:
+          ContainerName: fluidity-money-app-test
+          ContainerPort: 80
+        PlatformVersion: "LATEST"
