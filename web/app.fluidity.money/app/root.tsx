@@ -100,7 +100,7 @@ export const links = () => {
 };
 
 export const meta: MetaFunction<LoaderData> = ({
-  data: {gitSha, isProduction, isStaging}
+  data: {gitSha, isProduction, isStaging, host}
 }) => ({
   charset: "utf-8",
   title: "Fluidity",
@@ -109,6 +109,7 @@ export const meta: MetaFunction<LoaderData> = ({
   viewport: "width=device-width,initial-scale=1",
   "fluidity:version": gitSha,
   "fluidity:environment": isProduction ? "production" : isStaging ? "staging" : "development",
+  "fluidity:host": host,
 });
 
 export const loader: LoaderFunction = async ({
@@ -119,7 +120,7 @@ export const loader: LoaderFunction = async ({
     "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
   const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
-  const host = request.headers.get("Host");
+  const host = request.headers.get("Host") ?? "unknown-host";
 
   const isProduction =
     nodeEnv === "production" && host === "app.fluidity.money";
@@ -134,6 +135,7 @@ export const loader: LoaderFunction = async ({
     gaToken,
     isProduction,
     isStaging,
+    host,
     gitSha,
   };
 };
@@ -171,6 +173,7 @@ type LoaderData = {
   isProduction: boolean;
   isStaging: boolean;
   gitSha?: string;
+  host?: string;
 };
 
 function App() {
