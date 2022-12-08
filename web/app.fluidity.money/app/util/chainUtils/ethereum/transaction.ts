@@ -144,7 +144,7 @@ const makeContractSwap = async (
   try {
     const fromAddress = await signer.getAddress();
     const balance: BigNumber = await fromContract.balanceOf(fromAddress);
-    if (balance.lte(amount)) {
+    if (balance.lt(amount)) {
       throw new Error(`You don't have enough ${from.symbol}`);
     }
 
