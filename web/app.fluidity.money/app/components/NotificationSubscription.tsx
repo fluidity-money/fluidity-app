@@ -6,12 +6,13 @@ import { MintAddress } from "~/types/MintAddress";
 
 import { Token } from "~/util/chainUtils/tokens.js";
 import { ColorMap } from "~/webapp.config.server";
-import { trimAddress } from "~/util";
+import { getTxExplorerLink, trimAddress } from "~/util";
 import DSSocketManager from "~/util/client-connections";
 
 import { ToolTipContent, useToolTip } from "./ToolTip";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { ViewRewardModal } from "./ViewRewardModal";
+import { Chain } from "~/util/chainUtils/chains";
 
 type RewardDetails = {
   visible: boolean;
@@ -26,14 +27,12 @@ type RewardDetails = {
 
 interface INotificationSubscripitionProps {
   network: string;
-  explorer: string;
   tokens: Token[];
   colorMap: ColorMap[string];
 }
 
 export const NotificationSubscription = ({
   network,
-  explorer,
   tokens,
   colorMap,
 }: INotificationSubscripitionProps) => {
@@ -110,7 +109,10 @@ export const NotificationSubscription = ({
     const imgUrl = _token?.logo;
     const tokenColour = colorMap[payload.token as unknown as string];
 
-    const transactionUrl = explorer + `/tx/` + payload.transactionHash;
+    const transactionUrl = getTxExplorerLink(
+      network as Chain,
+      payload.transactionHash
+    );
 
     toolTip.open(
       tokenColour,
