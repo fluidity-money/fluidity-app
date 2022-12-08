@@ -83,10 +83,19 @@ export const NotificationSubscription = ({
           : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
         : "reward has been c͟l͟a͟i͟m͟e͟d! 🎉";
 
-    const fluidTokenTransferDetails =
+    let fluidTokenTransferDetails: string =
       rawAddress !== payload.source
         ? `r͟e͟c͟e͟i͟v͟e͟d from ` + sourceParseTrimAddress
         : `s͟e͟n͟t to ` + destinationParseTrimAddress;
+
+    if (
+      sourceParseTrimAddress === "Mint" ||
+      destinationParseTrimAddress === "Mint"
+    )
+      fluidTokenTransferDetails =
+        sourceParseTrimAddress === "Mint"
+          ? `successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d`
+          : `successfully r͟e͟v͟e͟r͟t͟e͟d`;
 
     return payload.type === NotificationType.ONCHAIN
       ? fluidTokenTransferDetails
