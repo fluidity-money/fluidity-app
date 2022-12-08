@@ -69,8 +69,8 @@ export const NotificationSubscription = ({
 
   const notifDetails = (payload: PipedTransaction) => {
     const { source, destination } = payload;
-  
-    const mintLabel = "Mint"
+
+    const mintLabel = "Mint";
 
     const sourceParseTrimAddress =
       source === MintAddress ? mintLabel : trimAddress(payload.source);
@@ -78,31 +78,30 @@ export const NotificationSubscription = ({
       destination === MintAddress
         ? mintLabel
         : trimAddress(payload.destination);
-    
+
     switch (payload.type) {
-    case NotificationType.PENDING_REWARD:
-    case NotificationType.WINNING_REWARD:
-      return payload.rewardType === "send"
-        ? "reward for s͟e͟n͟d͟i͟n͟g"
-        : "reward for r͟e͟c͟e͟i͟v͟i͟n͟g";
+      case NotificationType.PENDING_REWARD:
+      case NotificationType.WINNING_REWARD:
+        return payload.rewardType === "send"
+          ? "reward for s͟e͟n͟d͟i͟n͟g"
+          : "reward for r͟e͟c͟e͟i͟v͟i͟n͟g";
 
-    case NotificationType.CLAIMED_WINNING_REWARD:
-      return "reward has been c͟l͟a͟i͟m͟e͟d! 🎉";
+      case NotificationType.CLAIMED_WINNING_REWARD:
+        return "reward has been c͟l͟a͟i͟m͟e͟d! 🎉";
 
-    case NotificationType.ONCHAIN:
-    default:
-      if (sourceParseTrimAddress === mintLabel) {
-        return "successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d"
-      }
-      if (sourceParseTrimAddress === mintLabel) {
-        return "successfully r͟e͟v͟e͟r͟t͟e͟d";
-      }
-      if (source === rawAddress) {
-        return `r͟e͟c͟e͟i͟v͟e͟d from ${sourceParseTrimAddress}`
-      }
-      return `s͟e͟n͟t to ${destinationParseTrimAddress}`;
+      case NotificationType.ONCHAIN:
+      default:
+        if (sourceParseTrimAddress === mintLabel) {
+          return "successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d";
+        }
+        if (sourceParseTrimAddress === mintLabel) {
+          return "successfully r͟e͟v͟e͟r͟t͟e͟d";
+        }
+        if (source === rawAddress) {
+          return `r͟e͟c͟e͟i͟v͟e͟d from ${sourceParseTrimAddress}`;
+        }
+        return `s͟e͟n͟t to ${destinationParseTrimAddress}`;
     }
-
   };
 
   const handleClientListener = (payload: PipedTransaction) => {
