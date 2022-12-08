@@ -458,13 +458,13 @@ export default function Dashboard() {
               buttontype="icon after"
               size={"small"}
               handleClick={() =>
-                unclaimedRewards
+                unclaimedRewards < 0.000005
                   ? navigate("./rewards/unclaimed")
                   : navigate("./rewards")
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.01
+              {unclaimedRewards < 0.000005
                 ? `$${unclaimedRewards}`
                 : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>

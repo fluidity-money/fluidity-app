@@ -204,6 +204,10 @@ type ManualRewardRes = {
       win_amount: number;
       first_block: number;
       last_block: number;
+      token_details: {
+        token_decimals: number;
+        token_short_name: string;
+      };
     };
     signature: string;
   };
@@ -233,7 +237,13 @@ export const manualRewardToken = async (
 
   // Call eth contract
 
-  const { winner, win_amount, first_block, last_block } = payload.reward;
+  const { winner, win_amount, first_block, last_block, token_details } =
+    payload.reward;
+
+  const { token_decimals } = token_details;
+  const decimals = BigNumber.from(10).pow(token_decimals);
+
+  const winningAmount = BigNumber.from(`${win_amount}`);
 
   const { signature: b64Signature } = payload;
 
@@ -254,7 +264,7 @@ export const manualRewardToken = async (
       // winnerAddress
       winner,
       // winAmount
-      win_amount,
+      winningAmount,
       // firstBlock
       first_block,
       // lastBlock
@@ -268,7 +278,7 @@ export const manualRewardToken = async (
     return {
       networkFee: res.gasUsed.toNumber(),
       gasFee: res.gasUsed.toNumber(),
-      amount: win_amount,
+      amount: parseFloat(winningAmount.div(decimals).toString()),
     };
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);
