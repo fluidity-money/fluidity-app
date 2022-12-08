@@ -497,12 +497,14 @@ export default function Dashboard() {
         {!openMobModal && <ProvideLiquidity />}
 
         {/* Modal on hover */}
-        {unclaimedRewards >= 0.000005 && (hoverModal || showModal) && !isMobile && (
-          <UnclaimedRewardsHoverModal
-            unclaimedRewards={unclaimedRewards}
-            setShowModal={setShowModal}
-          />
-        )}
+        {unclaimedRewards >= 0.000005 &&
+          (hoverModal || showModal) &&
+          !isMobile && (
+            <UnclaimedRewardsHoverModal
+              unclaimedRewards={unclaimedRewards}
+              setShowModal={setShowModal}
+            />
+          )}
 
         {/* Mobile fluidify button */}
         {isMobile && (

@@ -1,4 +1,9 @@
-import { Display, LinkButton, numberToMonetaryString, Text } from "@fluidity-money/surfing";
+import {
+  Display,
+  LinkButton,
+  numberToMonetaryString,
+  Text,
+} from "@fluidity-money/surfing";
 import { useNavigate } from "@remix-run/react";
 
 interface IUnclaimedRewardsHoverModalProps {

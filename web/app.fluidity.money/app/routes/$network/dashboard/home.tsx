@@ -440,9 +440,7 @@ export default function Home() {
 
           {/* Value */}
           <td>
-            <Text>
-              {numberToMonetaryString(value)}
-            </Text>
+            <Text>{numberToMonetaryString(value)}</Text>
           </td>
 
           {/* Reward */}
