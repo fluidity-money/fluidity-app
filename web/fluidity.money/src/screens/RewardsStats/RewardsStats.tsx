@@ -15,18 +15,19 @@ import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 
 import styles from "./RewardsStats.module.scss";
-import { IPropPools } from "pages";
+import { Pools } from "pageBody/LandingPage/LandingPage";
 
 interface IProps {
   changeScreen: () => void;
-  rewardPools: IPropPools;
+  rewardPools: Pools;
+  loading: boolean
 }
 
 type DailyWinner = LargestDailyWinner & {
   awarded_day: Date,
 }
 
-const RewardsStats = ({ changeScreen, rewardPools}: IProps) => {
+const RewardsStats = ({ changeScreen, rewardPools, loading}: IProps) => {
   const { apiState, chain } = useChainContext();
   const { txCount, largestDailyWinnings } = apiState;
   const { width } = useViewport();
@@ -42,6 +43,19 @@ const RewardsStats = ({ changeScreen, rewardPools}: IProps) => {
     setPrizePool(rewardPools.solPool.toFixed(3));
 
   },[chain]);
+
+  useEffect(() => {
+    if (!loading) return
+
+    const interval = setInterval(() => {
+      setPrizePool((prizePool) => {
+        const random = Math.random() * 200000
+        return random.toFixed(3)
+      })
+    } , 100)
+
+    return () => clearInterval(interval)
+  }, [loading])
 
   // NOTE: Dummy data
   const parsedDailyWinnings = largestDailyWinnings

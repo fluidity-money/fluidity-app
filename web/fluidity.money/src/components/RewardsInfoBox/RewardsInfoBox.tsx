@@ -1,7 +1,7 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
-
+import AnimatedNumbers from "react-animated-numbers"
 import { useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
@@ -69,7 +69,7 @@ const RewardsInfoBox = ({
         <div onClick={changeScreen}>
           <Heading as="h1">
             {showRewardPool
-              ? `$${stringifiedNumberToMonetaryString(rewardPool)}`
+              ? rewardPool
               : totalTransactions}
           </Heading>
         </div>

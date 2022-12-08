@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import Head from "next/head";
-import { IPropPools } from "pages";
+import { useEffect, useState } from "react";
 import Articles from "screens/Articles";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
@@ -14,8 +14,28 @@ import SponsorsPartners from "../../screens/SponsorsPartners";
 import UseCases from "../../screens/UseCases";
 import styles from "./LandingPage.module.scss";
 
-const LandingPage = (props) => {
-  const { ethPool, solPool } :IPropPools = JSON.parse(props.pools);
+export type Pools = {
+  ethPool: number,
+  solPool: number
+}
+
+const LandingPage = () => {
+  const [data, setData] = useState({ethPool: 0, solPool: 0})
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    setIsLoading(true)
+
+    fetch('/api/reward_pool')
+    .then((res) => res.json())
+    .then((data: {ethPool: number, solPool: number}) => {
+      setData({
+        ethPool: Number(data.ethPool),
+        solPool: Number(data.solPool)
+      })
+      setIsLoading(false)
+    })
+  }, [])
 
   return (
     <div className={styles.pageContainer}>
@@ -25,7 +45,7 @@ const LandingPage = (props) => {
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
-        <Reward ethPool={Number(ethPool)} solPool={Number(solPool)} />
+        <Reward pools={data} loading={isLoading}/>
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />

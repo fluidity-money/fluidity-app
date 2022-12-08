@@ -2,13 +2,13 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import { Pools } from "pageBody/LandingPage/LandingPage";
 import { useState } from "react";
-import { IPropPools } from "pages";
 import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
 import styles from "./Reward.module.scss";
 
-const Reward = (pools: IPropPools) => {
+const Reward = (props: {pools: Pools, loading: boolean}) => {
   /* Background of transactions info moving left and right cotinuously,
   Reward pool total with sol and eth toggle,
   click on prize total and switch screens to total transactions sol and eth,
@@ -21,9 +21,9 @@ const Reward = (pools: IPropPools) => {
     <>
       <div className={styles.container}>
         {present ? (
-          <RewardsInitial changeScreen={() => setPresent(!present)} rewardPools={pools} />
+          <RewardsInitial loading={props.loading} changeScreen={() => setPresent(!present)} rewardPools={props.pools} />
         ) : (
-          <RewardStats changeScreen={() => setPresent(!present)} rewardPools={pools}/>
+          <RewardStats loading={props.loading} changeScreen={() => setPresent(!present)} rewardPools={props.pools}/>
         )}
       </div>
     </>

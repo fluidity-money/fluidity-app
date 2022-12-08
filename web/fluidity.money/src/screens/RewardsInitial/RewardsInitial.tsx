@@ -4,16 +4,17 @@ import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import { getEthTotalPrizePool } from "data/ethereum/prizePool";
-import { IPropPools } from "pages";
 
 import styles from "./RewardsInitial.module.scss";
+import { Pools } from "pageBody/LandingPage/LandingPage";
 
 interface IProps {
   changeScreen: () => void;
-  rewardPools: IPropPools;
+  rewardPools: Pools;
+  loading: boolean
 }
 
-const RewardsInitial = ({ changeScreen, rewardPools }: IProps) => {
+const RewardsInitial = ({ changeScreen, rewardPools, loading }: IProps) => {
   const { apiState, chain } = useChainContext();
   const { txCount } = apiState;
 
@@ -28,6 +29,19 @@ const RewardsInitial = ({ changeScreen, rewardPools }: IProps) => {
 
   },[chain]);
   
+  useEffect(() => {
+    if (!loading) return
+
+    const interval = setInterval(() => {
+      setPrizePool((prizePool) => {
+        const random = Math.random() * 200000
+        return random.toFixed(3)
+      })
+    } , 200)
+
+    return () => clearInterval(interval)
+  }, [loading])
+
   return (
     <AnimatePresence>
       <motion.div
