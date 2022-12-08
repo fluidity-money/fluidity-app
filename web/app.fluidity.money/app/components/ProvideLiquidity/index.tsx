@@ -99,7 +99,7 @@ const ProvideLiquidity = () => {
               onClick={() => {
                 setOpenDropdown(() => !openDropdown);
               }}
-              onBlur={() => setOpenDropdown(false)}
+              // onBlur={() => setOpenDropdown(false)}
             >
               {openDropdown && dropdownOptions}
               <Heading as="h1" className="fluid-liquidity-token">
