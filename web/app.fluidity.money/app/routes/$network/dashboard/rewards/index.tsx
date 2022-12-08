@@ -422,7 +422,7 @@ export default function Rewards() {
   return (
     <div className="pad-main">
       {/* Info Cards */}
-      {!!userUnclaimedRewards && userUnclaimedRewards > 0 ? (
+      {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
         <UserRewards
           claimNow={mobileView}
           unclaimedRewards={userUnclaimedRewards}
