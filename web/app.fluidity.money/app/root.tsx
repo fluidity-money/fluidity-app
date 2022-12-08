@@ -21,6 +21,7 @@ import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect } from "react";
 import CookieConsent from "./components/CookieConsent/CookieConsent";
+import { getSha } from "./webapp.config.server";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -98,12 +99,16 @@ export const links = () => {
   ];
 };
 
-export const meta: MetaFunction = () => ({
+export const meta: MetaFunction<LoaderData> = ({
+  data: {gitSha, isProduction, isStaging}
+}) => ({
   charset: "utf-8",
   title: "Fluidity",
   description:
     "Fluidity is a platform for getting more utility out of your crypto assets.",
   viewport: "width=device-width,initial-scale=1",
+  "fluidity:version": gitSha,
+  "fluidity:environment": isProduction ? "production" : isStaging ? "staging" : "development",
 });
 
 export const loader: LoaderFunction = async ({
@@ -121,12 +126,15 @@ export const loader: LoaderFunction = async ({
   const isStaging =
     nodeEnv === "production" && host === "staging.app.fluidity.money";
 
+  const gitSha = await getSha();
+
   return {
     nodeEnv,
     sentryDsn,
     gaToken,
     isProduction,
     isStaging,
+    gitSha,
   };
 };
 
@@ -162,11 +170,14 @@ type LoaderData = {
   gaToken?: string;
   isProduction: boolean;
   isStaging: boolean;
+  gitSha?: string;
 };
 
 function App() {
-  const { nodeEnv, sentryDsn, gaToken, isProduction } =
+  const { nodeEnv, sentryDsn, gaToken, isProduction, gitSha } =
     useLoaderData<LoaderData>();
+
+  
 
   switch (true) {
     case nodeEnv !== "production":
@@ -201,7 +212,7 @@ function App() {
       </head>
       <body>
         <CookieConsent />
-        <CacheProvider>
+        <CacheProvider sha={gitSha}>
           <ToolProvider>
             <Outlet />
             <ScrollRestoration />
