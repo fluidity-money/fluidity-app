@@ -7,7 +7,7 @@ CREATE TABLE total_reward_return (
 
 -- use all values if no time param
 CREATE FUNCTION total_reward(i INTERVAL DEFAULT now() - to_timestamp('0'), address TEXT DEFAULT null)
-RETURNS total_reward_return
+RETURNS SETOF total_reward_return
 LANGUAGE sql
 STABLE
 AS
