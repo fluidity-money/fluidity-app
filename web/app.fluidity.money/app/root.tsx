@@ -21,6 +21,7 @@ import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect } from "react";
 import CookieConsent from "./components/CookieConsent/CookieConsent";
+import { getSha } from "./webapp.config.server";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -98,12 +99,21 @@ export const links = () => {
   ];
 };
 
-export const meta: MetaFunction = () => ({
+export const meta: MetaFunction<LoaderData> = ({
+  data: { gitSha, isProduction, isStaging, host },
+}) => ({
   charset: "utf-8",
   title: "Fluidity",
   description:
     "Fluidity is a platform for getting more utility out of your crypto assets.",
   viewport: "width=device-width,initial-scale=1",
+  "fluidity:version": gitSha,
+  "fluidity:environment": isProduction
+    ? "production"
+    : isStaging
+    ? "staging"
+    : "development",
+  "fluidity:host": host,
 });
 
 export const loader: LoaderFunction = async ({
@@ -114,12 +124,14 @@ export const loader: LoaderFunction = async ({
     "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
   const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
-  const host = request.headers.get("Host");
+  const host = request.headers.get("Host") ?? "unknown-host";
 
   const isProduction =
     nodeEnv === "production" && host === "app.fluidity.money";
   const isStaging =
     nodeEnv === "production" && host === "staging.app.fluidity.money";
+
+  const gitSha = await getSha();
 
   return {
     nodeEnv,
@@ -127,6 +139,8 @@ export const loader: LoaderFunction = async ({
     gaToken,
     isProduction,
     isStaging,
+    host,
+    gitSha,
   };
 };
 
@@ -162,11 +176,18 @@ type LoaderData = {
   gaToken?: string;
   isProduction: boolean;
   isStaging: boolean;
+  gitSha?: string;
+  host?: string;
 };
 
 function App() {
-  const { nodeEnv, sentryDsn, gaToken, isProduction } =
-    useLoaderData<LoaderData>();
+  const {
+    nodeEnv,
+    sentryDsn,
+    gaToken,
+    isProduction,
+    gitSha = "unknown",
+  } = useLoaderData<LoaderData>();
 
   switch (true) {
     case nodeEnv !== "production":
@@ -201,7 +222,7 @@ function App() {
       </head>
       <body>
         <CookieConsent />
-        <CacheProvider>
+        <CacheProvider sha={gitSha}>
           <ToolProvider>
             <Outlet />
             <ScrollRestoration />
