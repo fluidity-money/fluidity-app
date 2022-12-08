@@ -3,7 +3,6 @@ import { readFileSync } from "fs";
 import { resolve, join } from "path";
 import sharp from "sharp";
 import z, { string, ZodString } from "zod";
-import { exec } from "child_process";
 
 const envVar = () => {
   return {
@@ -155,17 +154,6 @@ const getColors = async () => {
     {}
   );
 };
-
-export const getSha = async () =>
-  new Promise<string>((resolve, reject) => {
-    exec("git rev-parse HEAD", (err, stdout) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stdout.trim().slice(0, 7));
-      }
-    });
-  });
 
 export const colors = getColors();
 export default options;

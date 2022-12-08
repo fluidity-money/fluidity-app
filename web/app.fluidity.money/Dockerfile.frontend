@@ -6,6 +6,8 @@ ENV PRODUCTION ${PRODUCTION}
 
 ARG GITHUB_TOKEN
 
+ARG GIT_SHA 
+
 ENV PATH /app/node_modules.bin:$PATH
 
 COPY .npmrc package.json package-lock.json ./

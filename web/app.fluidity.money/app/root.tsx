@@ -21,7 +21,6 @@ import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect } from "react";
 import CookieConsent from "./components/CookieConsent/CookieConsent";
-import { getSha } from "./webapp.config.server";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -131,7 +130,7 @@ export const loader: LoaderFunction = async ({
   const isStaging =
     nodeEnv === "production" && host === "staging.app.fluidity.money";
 
-  const gitSha = await getSha();
+  const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
   return {
     nodeEnv,
