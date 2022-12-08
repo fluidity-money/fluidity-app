@@ -273,13 +273,13 @@ export default function Dashboard() {
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <a onClick={() => navigate("./home")}>
+        <Link to={"./home"}>
           <img
             style={{ width: "5.5em", height: "2.5em" }}
             src="/images/outlinedLogo.svg"
             alt="Fluidity"
           />
-        </a>
+        </Link>
 
         <br />
         <br />
@@ -458,13 +458,13 @@ export default function Dashboard() {
               buttontype="icon after"
               size={"small"}
               handleClick={() =>
-                unclaimedRewards
+                unclaimedRewards < 0.000005
                   ? navigate("./rewards/unclaimed")
                   : navigate("./rewards")
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.01
+              {unclaimedRewards < 0.000005
                 ? `$${unclaimedRewards}`
                 : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
