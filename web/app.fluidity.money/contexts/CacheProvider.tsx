@@ -23,7 +23,13 @@ function localStorageProvider(sha: string) {
   return map;
 }
 
-const CacheProvider = ({ children, sha }: { children: ReactNode, sha: string }) => {
+const CacheProvider = ({
+  children,
+  sha,
+}: {
+  children: ReactNode;
+  sha: string;
+}) => {
   const [useCacheProvider, setCacheProvider] = useState<Map<string, string>>();
 
   useEffect(() => {

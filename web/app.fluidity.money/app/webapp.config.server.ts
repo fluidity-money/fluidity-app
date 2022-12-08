@@ -156,15 +156,16 @@ const getColors = async () => {
   );
 };
 
-export const getSha = async () => new Promise<string>((resolve, reject) => {
-  exec("git rev-parse HEAD", (err, stdout) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(stdout.trim().slice(0, 7));
-    }
+export const getSha = async () =>
+  new Promise<string>((resolve, reject) => {
+    exec("git rev-parse HEAD", (err, stdout) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(stdout.trim().slice(0, 7));
+      }
+    });
   });
-});
 
 export const colors = getColors();
 export default options;

@@ -100,7 +100,7 @@ export const links = () => {
 };
 
 export const meta: MetaFunction<LoaderData> = ({
-  data: {gitSha, isProduction, isStaging, host}
+  data: { gitSha, isProduction, isStaging, host },
 }) => ({
   charset: "utf-8",
   title: "Fluidity",
@@ -108,7 +108,11 @@ export const meta: MetaFunction<LoaderData> = ({
     "Fluidity is a platform for getting more utility out of your crypto assets.",
   viewport: "width=device-width,initial-scale=1",
   "fluidity:version": gitSha,
-  "fluidity:environment": isProduction ? "production" : isStaging ? "staging" : "development",
+  "fluidity:environment": isProduction
+    ? "production"
+    : isStaging
+    ? "staging"
+    : "development",
   "fluidity:host": host,
 });
 
@@ -179,8 +183,6 @@ type LoaderData = {
 function App() {
   const { nodeEnv, sentryDsn, gaToken, isProduction, gitSha } =
     useLoaderData<LoaderData>();
-
-  
 
   switch (true) {
     case nodeEnv !== "production":
