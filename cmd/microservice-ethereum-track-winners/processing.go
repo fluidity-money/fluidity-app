@@ -15,12 +15,18 @@ import (
 )
 
 func processReward(contractAddress ethereum.Address, transactionHash ethereum.Hash, data fluidity.RewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
+	var (
+		winnerString  = data.Winner.String()
+		winnerAddress = ethereum.AddressFromString(winnerString)
+	)
+
 	blocked := data.Blocked
 
 	if blocked {
 		blockedWinner := convertBlockedWinner(
 			contractAddress,
 			transactionHash,
+			winnerAddress,	
 			data,
 			tokenDetails,
 			network,
@@ -31,16 +37,12 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 		return
 	}
 
-	var (
-		winnerString  = data.Winner.String()
-		winnerAddress = ethereum.AddressFromString(winnerString)
-	)
-
 	sendHash, rewardType, application := winnersDb.GetAndRemovePendingRewardData(transactionHash, winnerAddress)
 
 	convertedWinner := convertWinner(
 		transactionHash,
 		sendHash,
+		winnerAddress,
 		data,
 		network,
 		tokenDetails,
@@ -67,6 +69,7 @@ func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.Unblock
 	convertedWinner := convertWinner(
 		transactionHash,
 		sendHash,
+		winnerAddress,
 		rewardData,
 		network,
 		tokenDetails,
@@ -79,12 +82,12 @@ func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.Unblock
 }
 
 // Convert, returning the internal definition for a winner
-func convertWinner(transactionHash ethereum.Hash, sendHash ethereum.Hash, rewardData fluidity.RewardData, network network.BlockchainNetwork, details token_details.TokenDetails, when time.Time, rewardType winners.RewardType, application applications.Application) winnersDb.Winner {
+func convertWinner(transactionHash ethereum.Hash, sendHash ethereum.Hash, address ethereum.Address, rewardData fluidity.RewardData, network network.BlockchainNetwork, details token_details.TokenDetails, when time.Time, rewardType winners.RewardType, application applications.Application) winnersDb.Winner {
 	var (
 		appString      = application.String()
 		hashString     = transactionHash.String()
+		addressString  = address.String()
 		sendHashString = sendHash.String()
-		address        = rewardData.Winner.String()
 		amount         = *rewardData.Amount
 		startBlock     = *rewardData.StartBlock
 		endBlock       = *rewardData.StartBlock
@@ -95,7 +98,7 @@ func convertWinner(transactionHash ethereum.Hash, sendHash ethereum.Hash, reward
 		Network:             network,
 		TransactionHash:     hashString,
 		SendTransactionHash: sendHashString,
-		WinnerAddress:       address,
+		WinnerAddress:       addressString,
 		WinningAmount:       amount,
 		AwardedTime:         when,
 		RewardType:          rewardType,
@@ -108,12 +111,12 @@ func convertWinner(transactionHash ethereum.Hash, sendHash ethereum.Hash, reward
 }
 
 // Convert, returning the internal definition for a blocked winner
-func convertBlockedWinner(contractAddress ethereum.Address, transactionHash ethereum.Hash, data fluidity.RewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) winners.BlockedWinner {
+func convertBlockedWinner(contractAddress ethereum.Address, transactionHash ethereum.Hash, winnerAddress ethereum.Address, data fluidity.RewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) winners.BlockedWinner {
 	var (
 		contractAddressString = contractAddress.String()
 		transactionHashString = transactionHash.String()
 
-		winnerString  = data.Winner.String()
+		winnerString  = winnerAddress.String()
 		winningAmount = data.Amount
 		firstBlock    = data.StartBlock
 		lastBlock     = data.EndBlock

@@ -8,7 +8,7 @@ const getAddressExplorerLink = (chain: Chain, address: string) =>
 // Ethereum only
 const getBlockExplorerLink = (chain: Chain, block: number) =>
   chain === "ethereum"
-    ? `https://etherscan.io/address/${block}`
+    ? `https://etherscan.io/block/${block}`
     : `https://explorer.solana.com/block/${block}`;
 
 const getTxExplorerLink = (chain: Chain, address: string) =>
