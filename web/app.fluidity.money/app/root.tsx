@@ -181,8 +181,13 @@ type LoaderData = {
 };
 
 function App() {
-  const { nodeEnv, sentryDsn, gaToken, isProduction, gitSha } =
-    useLoaderData<LoaderData>();
+  const {
+    nodeEnv,
+    sentryDsn,
+    gaToken,
+    isProduction,
+    gitSha = "unknown",
+  } = useLoaderData<LoaderData>();
 
   switch (true) {
     case nodeEnv !== "production":
