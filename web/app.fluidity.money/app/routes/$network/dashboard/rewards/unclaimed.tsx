@@ -284,11 +284,7 @@ const UnclaimedWinnings = () => {
 
           {/* Reward */}
           <td>
-            <Text prominent>
-              {rewardUsd >= 0.01
-                ? numberToMonetaryString(rewardUsd)
-                : `$${rewardUsd}`}
-            </Text>
+            <Text prominent>{numberToMonetaryString(rewardUsd)}</Text>
           </td>
 
           {/* Transaction */}
@@ -359,9 +355,7 @@ const UnclaimedWinnings = () => {
 
           {/* Reward */}
           <td>
-            <Text prominent>
-              {reward >= 0.01 ? numberToMonetaryString(reward) : `$${reward}`}
-            </Text>
+            <Text prominent>{numberToMonetaryString(reward)}</Text>
           </td>
         </motion.tr>
       );

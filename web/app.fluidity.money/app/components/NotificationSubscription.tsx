@@ -6,12 +6,13 @@ import { MintAddress } from "~/types/MintAddress";
 
 import { Token } from "~/util/chainUtils/tokens.js";
 import { ColorMap } from "~/webapp.config.server";
-import { trimAddress } from "~/util";
+import { getTxExplorerLink, trimAddress } from "~/util";
 import DSSocketManager from "~/util/client-connections";
 
 import { ToolTipContent, useToolTip } from "./ToolTip";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { ViewRewardModal } from "./ViewRewardModal";
+import { Chain } from "~/util/chainUtils/chains";
 
 type RewardDetails = {
   visible: boolean;
@@ -26,14 +27,12 @@ type RewardDetails = {
 
 interface INotificationSubscripitionProps {
   network: string;
-  explorer: string;
   tokens: Token[];
   colorMap: ColorMap[string];
 }
 
 export const NotificationSubscription = ({
   network,
-  explorer,
   tokens,
   colorMap,
 }: INotificationSubscripitionProps) => {
@@ -68,29 +67,40 @@ export const NotificationSubscription = ({
   };
 
   const notifDetails = (payload: PipedTransaction) => {
+    const { source, destination } = payload;
+
+    const mintLabel = "Mint";
+
     const sourceParseTrimAddress =
-      payload.source === MintAddress ? "Mint" : trimAddress(payload.source);
+      source === MintAddress ? mintLabel : trimAddress(payload.source);
     const destinationParseTrimAddress =
-      payload.destination === MintAddress
-        ? "Mint"
+      destination === MintAddress
+        ? mintLabel
         : trimAddress(payload.destination);
 
-    const rewardDetails =
-      payload.type === NotificationType.WINNING_REWARD ||
-      NotificationType.PENDING_REWARD
-        ? payload.rewardType === `send`
-          ? `reward for s͟e͟n͟d͟i͟n͟g`
-          : `reward for r͟e͟c͟e͟i͟v͟i͟n͟g`
-        : "reward has been c͟l͟a͟i͟m͟e͟d! 🎉";
+    switch (payload.type) {
+      case NotificationType.PENDING_REWARD:
+      case NotificationType.WINNING_REWARD:
+        return payload.rewardType === "send"
+          ? "reward for s͟e͟n͟d͟i͟n͟g"
+          : "reward for r͟e͟c͟e͟i͟v͟i͟n͟g";
 
-    const fluidTokenTransferDetails =
-      rawAddress !== payload.source
-        ? `r͟e͟c͟e͟i͟v͟e͟d from ` + sourceParseTrimAddress
-        : `s͟e͟n͟t to ` + destinationParseTrimAddress;
+      case NotificationType.CLAIMED_WINNING_REWARD:
+        return "reward has been c͟l͟a͟i͟m͟e͟d! 🎉";
 
-    return payload.type === NotificationType.ONCHAIN
-      ? fluidTokenTransferDetails
-      : rewardDetails;
+      case NotificationType.ONCHAIN:
+      default:
+        if (sourceParseTrimAddress === mintLabel) {
+          return "successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d";
+        }
+        if (sourceParseTrimAddress === mintLabel) {
+          return "successfully r͟e͟v͟e͟r͟t͟e͟d";
+        }
+        if (source === rawAddress) {
+          return `r͟e͟c͟e͟i͟v͟e͟d from ${sourceParseTrimAddress}`;
+        }
+        return `s͟e͟n͟t to ${destinationParseTrimAddress}`;
+    }
   };
 
   const handleClientListener = (payload: PipedTransaction) => {
@@ -99,7 +109,10 @@ export const NotificationSubscription = ({
     const imgUrl = _token?.logo;
     const tokenColour = colorMap[payload.token as unknown as string];
 
-    const transactionUrl = explorer + `/tx/` + payload.transactionHash;
+    const transactionUrl = getTxExplorerLink(
+      network as Chain,
+      payload.transactionHash
+    );
 
     toolTip.open(
       tokenColour,
