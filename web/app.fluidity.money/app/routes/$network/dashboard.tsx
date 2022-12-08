@@ -273,13 +273,13 @@ export default function Dashboard() {
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <a onClick={() => navigate("./home")}>
+        <Link to={"./home"}>
           <img
             style={{ width: "5.5em", height: "2.5em" }}
             src="/images/outlinedLogo.svg"
             alt="Fluidity"
           />
-        </a>
+        </Link>
 
         <br />
         <br />
