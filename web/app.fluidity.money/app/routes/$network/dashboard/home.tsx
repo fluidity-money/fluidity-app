@@ -441,10 +441,7 @@ export default function Home() {
           {/* Value */}
           <td>
             <Text>
-              {value.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-              })}
+              {numberToMonetaryString(value)}
             </Text>
           </td>
 

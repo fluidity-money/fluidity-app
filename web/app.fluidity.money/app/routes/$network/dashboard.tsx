@@ -202,9 +202,9 @@ export default function Dashboard() {
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
 
   useEffect(() => {
-    (async () => {
-      if (!address) return;
+    if (!address) return setUnclaimedRewards(0);
 
+    (async () => {
       if (network !== "ethereum") return;
 
       const { data, error } = await useUserUnclaimedRewards(network, address);
@@ -465,7 +465,7 @@ export default function Dashboard() {
               icon={<Trophy />}
             >
               {unclaimedRewards < 0.000005
-                ? `$${unclaimedRewards}`
+                ? `$0`
                 : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
@@ -497,7 +497,7 @@ export default function Dashboard() {
         {!openMobModal && <ProvideLiquidity />}
 
         {/* Modal on hover */}
-        {(hoverModal || showModal) && !isMobile && (
+        {unclaimedRewards >= 0.000005 && (hoverModal || showModal) && !isMobile && (
           <UnclaimedRewardsHoverModal
             unclaimedRewards={unclaimedRewards}
             setShowModal={setShowModal}
