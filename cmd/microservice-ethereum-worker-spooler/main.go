@@ -135,19 +135,19 @@ func main() {
 
 				toSend[tokenDetails] = true
 			}
+		}
 
-			for shortName, send := range toSend {
-				if !send {
-					// should never happen
-					continue
-				}
-
-				log.Debug(func(k *log.Log) {
-					k.Format("Sending rewards for token %v", shortName)
-				})
-
-				sendRewards(batchedRewardsQueue, dbNetwork, shortName)
+		for shortName, send := range toSend {
+			if !send {
+				// should never happen
+				continue
 			}
+
+			log.Debug(func(k *log.Log) {
+				k.Format("Sending rewards for token %v", shortName)
+			})
+
+			sendRewards(batchedRewardsQueue, dbNetwork, shortName)
 		}
 	})
 }
