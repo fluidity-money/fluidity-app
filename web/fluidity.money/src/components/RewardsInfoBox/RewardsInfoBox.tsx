@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 import AnimatedNumbers from "react-animated-numbers"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
@@ -15,19 +15,17 @@ import {
 import styles from "./RewardsInfoBox.module.scss";
 
 interface IRewardBoxProps {
-  rewardPool: string;
   totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
 }
 
 const RewardsInfoBox = ({
-  rewardPool,
   totalTransactions,
   changeScreen,
   type,
 }: IRewardBoxProps) => {
-  const { chain, setChain } = useChainContext();
+  const { apiState, chain, setChain } = useChainContext();
 
   const showRewardPool = type === "black";
 
@@ -45,6 +43,30 @@ const RewardsInfoBox = ({
     name: chain,
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
+
+  const [prizePool, setPrizePool] = useState<string>(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
+
+  useEffect(() => {
+    chain === `ETH` && 
+    setPrizePool(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
+
+    chain === `SOL` && 
+    setPrizePool(apiState.rewardPool.pools?.solPool.toFixed(3) || `0`);
+
+  },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
+  
+  useEffect(() => {
+    if (!apiState.rewardPool.loading) return
+
+    const interval = setInterval(() => {
+      setPrizePool((prizePool) => {
+        const random = Math.random() * 200000
+        return random.toFixed(3)
+      })
+    } , 200)
+
+    return () => clearInterval(interval)
+  }, [apiState.rewardPool.loading])
 
   return (
     <div
@@ -69,7 +91,7 @@ const RewardsInfoBox = ({
         <div onClick={changeScreen}>
           <Heading as="h1">
             {showRewardPool
-              ? rewardPool
+              ? prizePool
               : totalTransactions}
           </Heading>
         </div>

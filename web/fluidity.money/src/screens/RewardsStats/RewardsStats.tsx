@@ -19,33 +19,31 @@ import { Pools } from "pageBody/LandingPage/LandingPage";
 
 interface IProps {
   changeScreen: () => void;
-  rewardPools: Pools;
-  loading: boolean
 }
 
 type DailyWinner = LargestDailyWinner & {
   awarded_day: Date,
 }
 
-const RewardsStats = ({ changeScreen, rewardPools, loading}: IProps) => {
+const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
   const { txCount, largestDailyWinnings } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const [prizePool, setPrizePool] = useState<string>(rewardPools.ethPool.toFixed(3));
+  const [prizePool, setPrizePool] = useState<string>(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(rewardPools.ethPool.toFixed(3));
+    setPrizePool(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
 
     chain === `SOL` && 
-    setPrizePool(rewardPools.solPool.toFixed(3));
+    setPrizePool(apiState.rewardPool.pools?.solPool.toFixed(3) || `0`);
 
-  },[chain]);
+  },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
 
   useEffect(() => {
-    if (!loading) return
+    if (!apiState.rewardPool.loading) return
 
     const interval = setInterval(() => {
       setPrizePool((prizePool) => {
@@ -55,7 +53,7 @@ const RewardsStats = ({ changeScreen, rewardPools, loading}: IProps) => {
     } , 100)
 
     return () => clearInterval(interval)
-  }, [loading])
+  }, [apiState.rewardPool.loading])
 
   // NOTE: Dummy data
   const parsedDailyWinnings = largestDailyWinnings
@@ -110,7 +108,6 @@ const RewardsStats = ({ changeScreen, rewardPools, loading}: IProps) => {
         <div style={{ height: 254, width: "100%" }}></div>
         <RewardsInfoBox
           // NOTE: Dummy data
-          rewardPool={prizePool}
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="transparent"

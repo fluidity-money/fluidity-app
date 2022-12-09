@@ -8,7 +8,7 @@ import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
 import styles from "./Reward.module.scss";
 
-const Reward = (props: {pools: Pools, loading: boolean}) => {
+const Reward = () => {
   /* Background of transactions info moving left and right cotinuously,
   Reward pool total with sol and eth toggle,
   click on prize total and switch screens to total transactions sol and eth,
@@ -21,9 +21,9 @@ const Reward = (props: {pools: Pools, loading: boolean}) => {
     <>
       <div className={styles.container}>
         {present ? (
-          <RewardsInitial loading={props.loading} changeScreen={() => setPresent(!present)} rewardPools={props.pools} />
+          <RewardsInitial changeScreen={() => setPresent(!present)} />
         ) : (
-          <RewardStats loading={props.loading} changeScreen={() => setPresent(!present)} rewardPools={props.pools}/>
+          <RewardStats changeScreen={() => setPresent(!present)} />
         )}
       </div>
     </>

@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import type { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import type { Winner, WinnersRes } from "data/winners";
 import type { LargestDailyWinner, LargestMonthlyWinnersRes } from "data/monthlyLargestWinners";
 import type { Tvl, TvlRes } from "data/tvl";
@@ -22,10 +22,18 @@ interface ChainState {
   apiState: ApiState,
 }
 
+type RewardPool = {
+  pools: {
+    ethPool: number
+    solPool: number
+  } | undefined
+  loading: boolean
+}
+
 interface ApiState {
   weekWinnings: Winner[],
   largestDailyWinnings: LargestDailyWinner[],
-  rewardPool: number,
+  rewardPool: RewardPool,
   txCount: number,
 }
 
@@ -39,7 +47,7 @@ const initChainState = (): ChainState => {
     apiState: {
       weekWinnings: [],
       largestDailyWinnings: [],
-      rewardPool: 0,
+      rewardPool: { pools: undefined, loading: false },
       txCount: 0,
     }
   }
@@ -54,7 +62,7 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
 
   const [weekWinnings, setWeekWinnings] = useState<Winner[]>([]);
   const [largestDailyWinnings, setLargestDailyWinnings] = useState<LargestDailyWinner[]>([]);
-  const [rewardPool, setRewardPool] = useState(0);
+  const [rewardPool, setRewardPool] = useState<RewardPool>({pools: undefined, loading: false});
   const [txCount, setTxCount] = useState(0);
 
   const apiState = {
@@ -81,30 +89,6 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
     SupportedChains[chain].name,
     // formatToGraphQLDate(prevWeekDate),
   )
-  
-  useLiveTvl(({ tvl }: TvlRes) => {
-    const latestNetworkPools = tvl
-      .filter(({network}) => network === SupportedChains[chain].name)
-      .reduce((pools, pool) => {
-        const prevPool = pools[pool.contract_address];
-        const poolFound = !!prevPool;
-
-        if (!poolFound) return {
-          ...pools,
-          [pool.contract_address]: pool
-        }
-
-        return ({
-          ...pools,
-          [pool.contract_address]: prevPool.time > pool.time ? prevPool : pool
-        })
-      }, {} as {[key: string]: Tvl});
-    
-    setRewardPool(
-      Object.values(latestNetworkPools)
-        .reduce((sum, pool) => sum + pool.tvl, 0)
-    )
-  });
 
   useCountTransactions(
     (txCount: TransactionCount) => setTxCount(
@@ -115,6 +99,22 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
     ),
     SupportedChains[chain].name,
   );
+
+  useEffect(() => {
+    setRewardPool({pools: undefined, loading: true})
+
+    fetch('/api/reward_pool')
+    .then((res) => res.json())
+    .then((data: {ethPool: number, solPool: number}) => {
+      setRewardPool({
+        pools: {
+          ethPool: Number(data.ethPool),
+          solPool: Number(data.solPool)
+        },
+        loading: false
+      })
+    })
+  }, [])
   
   return (
     <ChainContext.Provider value={{chain, network, setChain, apiState}}>

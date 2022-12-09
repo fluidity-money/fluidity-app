@@ -2,6 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import { useChainContext } from "hooks/ChainContext";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import Articles from "screens/Articles";
@@ -17,25 +18,9 @@ import styles from "./LandingPage.module.scss";
 export type Pools = {
   ethPool: number,
   solPool: number
-}
+} | undefined
 
 const LandingPage = () => {
-  const [data, setData] = useState({ethPool: 0, solPool: 0})
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    setIsLoading(true)
-
-    fetch('/api/reward_pool')
-    .then((res) => res.json())
-    .then((data: {ethPool: number, solPool: number}) => {
-      setData({
-        ethPool: Number(data.ethPool),
-        solPool: Number(data.solPool)
-      })
-      setIsLoading(false)
-    })
-  }, [])
 
   return (
     <div className={styles.pageContainer}>
@@ -45,7 +30,7 @@ const LandingPage = () => {
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
-        <Reward pools={data} loading={isLoading}/>
+        <Reward/>
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />
