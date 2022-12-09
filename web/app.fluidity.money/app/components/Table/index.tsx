@@ -165,7 +165,7 @@ const Table = <T,>(props: ITable<T>) => {
             </Link>
 
             {/* ... */}
-            {pageCount > 5 && page > 3 && <span>...</span>}
+            {pageCount > 4 && page > 4 && <span>...</span>}
 
             {Array(5)
               .fill(1)
@@ -190,7 +190,7 @@ const Table = <T,>(props: ITable<T>) => {
               })}
 
             {/* ... */}
-            {pageCount > 5 && page < pageCount - 2 && <span>...</span>}
+            {pageCount > 4 && page < pageCount - 3 && <span>...</span>}
 
             {pageCount > 1 && (
               <Link
