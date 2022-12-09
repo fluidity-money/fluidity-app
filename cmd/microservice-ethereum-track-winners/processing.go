@@ -18,6 +18,8 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 	var (
 		winnerString  = data.Winner.String()
 		winnerAddress = ethereum.AddressFromString(winnerString)
+		startBlock    = *data.StartBlock
+		endBlock      = *data.EndBlock
 	)
 
 	blocked := data.Blocked
@@ -26,7 +28,7 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 		blockedWinner := convertBlockedWinner(
 			contractAddress,
 			transactionHash,
-			winnerAddress,	
+			winnerAddress,
 			data,
 			tokenDetails,
 			network,
@@ -37,7 +39,13 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 		return
 	}
 
-	sendHash, rewardType, application := winnersDb.GetAndRemovePendingRewardData(transactionHash, winnerAddress)
+	sendHash, rewardType, application := winnersDb.GetAndRemovePendingRewardData(
+		network,
+		tokenDetails,
+		startBlock,
+		endBlock,
+		winnerAddress,
+	)
 
 	convertedWinner := convertWinner(
 		transactionHash,
@@ -57,14 +65,20 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
 	var (
 		rewardData               = data.RewardData
-		originalRewardHashString = data.OriginalRewardHash.String()
 		winnerString             = rewardData.Winner.String()
+		startBlock               = *rewardData.StartBlock
+		endBlock                 = *rewardData.EndBlock
 
 		winnerAddress      = ethereum.AddressFromString(winnerString)
-		originalRewardHash = ethereum.HashFromString(originalRewardHashString)
 	)
 
-	sendHash, rewardType, application := winnersDb.GetAndRemovePendingRewardData(originalRewardHash, winnerAddress)
+	sendHash, rewardType, application := winnersDb.GetAndRemovePendingRewardData(
+		network,
+		tokenDetails,
+		startBlock,
+		endBlock,
+		winnerAddress,
+	)
 
 	convertedWinner := convertWinner(
 		transactionHash,
