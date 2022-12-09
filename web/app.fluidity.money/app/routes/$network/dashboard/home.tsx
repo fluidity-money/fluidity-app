@@ -365,6 +365,7 @@ export default function Home() {
 
   const {
     count,
+    totalCount,
     rewards,
     volume,
     transactions,
@@ -409,6 +410,7 @@ export default function Home() {
 
     return {
       count: filteredVolume.length,
+      totalCount: volume.length,
       rewards: activeRewards,
       volume: totalVolume,
       transactions,
@@ -677,7 +679,7 @@ export default function Home() {
             page,
             rowsPerPage: 12,
           }}
-          count={count}
+          count={totalCount}
           data={transactions}
           renderRow={TransactionRow(network)}
           onFilter={setActiveTableFilterIndex}
