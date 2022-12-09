@@ -9,6 +9,7 @@ import {
 } from "./useUserTransactions";
 import useUserUnclaimedRewards from "./useUserUnclaimedRewards";
 import { useUserRewardsAll, useUserRewardsByAddress } from "./useUserRewards";
+import { useUserYieldAll, useUserYieldByAddress } from "./useUserYield";
 
 export {
   useUserTransactionAllCount,
@@ -19,4 +20,6 @@ export {
   useUserUnclaimedRewards,
   useUserRewardsAll,
   useUserRewardsByAddress,
+  useUserYieldAll,
+  useUserYieldByAddress,
 };

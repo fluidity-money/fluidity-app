@@ -1,13 +1,11 @@
 import type Transaction from "~/types/Transaction";
-import type { Winner } from "~/queries/useUserRewards";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import {
   useUserRewardsAll,
   useUserRewardsByAddress,
-  useUserTransactionsAll,
-  useUserTransactionsByAddress,
+  useUserTransactionsByTxHash,
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
@@ -50,17 +48,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     }
 
     // winnersMap looks up if a transaction was the send that caused a win
-    const winnersMap = winnersData.winners.reduce(
-      (map, winner) => ({
-        ...map,
-        [winner.send_transaction_hash]: {
-          ...winner,
-          winning_amount:
-            winner.winning_amount +
-            (map[winner.send_transaction_hash]?.winning_amount || 0),
-        },
-      }),
-      {} as { [key: string]: Winner }
+    const winners = winnersData.winners.slice((page - 1) * 12, page * 12);
+
+    const winnerAddrs = winners.map(
+      ({ send_transaction_hash }) => send_transaction_hash
     );
 
     // payoutsMap looks up if a transaction was a payout transaction
@@ -69,19 +60,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     );
 
     const { data: userTransactionsData, errors: userTransactionsErr } =
-      await (async () => {
-        switch (true) {
-          case !!address:
-            return useUserTransactionsByAddress(
-              network,
-              page,
-              address as string,
-              payoutAddrs
-            );
-          default:
-            return useUserTransactionsAll(network, page, payoutAddrs);
-        }
-      })();
+      await useUserTransactionsByTxHash(network, winnerAddrs, payoutAddrs);
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -148,41 +127,49 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const defaultLogo = "/assets/tokens/usdt.svg";
 
-    const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
-      const swapType =
-        tx.sender === MintAddress
-          ? "in"
-          : tx.receiver === MintAddress
-          ? "out"
-          : undefined;
+    const transactionMap = userTransactions.reduce(
+      (map, tx) => ({
+        ...map,
+        [tx.hash]: tx,
+      }),
+      {} as Record<string, UserTransaction>
+    );
 
-      const winner = winnersMap[tx.hash];
+    const mergedTransactions: Transaction[] = winners
+      .filter(({ send_transaction_hash: hash }) => !!transactionMap[hash])
+      .map((winner) => {
+        const tx = transactionMap[winner.send_transaction_hash];
 
-      return {
-        sender: tx.sender,
-        receiver: tx.receiver,
-        winner: winner?.winning_address ?? "",
-        reward: winner
-          ? winner.winning_amount / 10 ** winner.token_decimals
-          : 0,
-        hash: tx.hash,
-        rewardHash: winner?.transaction_hash ?? "",
-        currency: tx.currency,
-        value: tx.value,
-        timestamp: tx.timestamp,
-        logo: tokenLogoMap[tx.currency] || defaultLogo,
-        provider:
-          (network === "ethereum"
-            ? winner?.ethereum_application
-            : winner?.solana_application) ?? "Fluidity",
-        swapType,
-      };
-    });
+        const swapType =
+          tx.sender === MintAddress
+            ? "in"
+            : tx.receiver === MintAddress
+            ? "out"
+            : undefined;
+
+        return {
+          sender: tx.sender,
+          receiver: tx.receiver,
+          winner: winner.winning_address ?? "",
+          reward: winner.winning_amount / 10 ** winner.token_decimals,
+          hash: tx.hash,
+          rewardHash: winner?.transaction_hash ?? "",
+          currency: tx.currency,
+          value: tx.value,
+          timestamp: tx.timestamp,
+          logo: tokenLogoMap[tx.currency] || defaultLogo,
+          provider:
+            (network === "ethereum"
+              ? winner?.ethereum_application
+              : winner?.solana_application) ?? "Fluidity",
+          swapType,
+        };
+      });
 
     return json({
       page,
       transactions: mergedTransactions,
-      count: Object.keys(winnersMap).length,
+      count: winnersData.winners.length,
     } as TransactionsLoaderData);
   } catch (err) {
     captureException(
