@@ -66,7 +66,10 @@ const useUserRewardsByAddress = async (network: string, address: string) => {
     query: queryByAddress,
   };
 
-  return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(url, body);
+  return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(
+    url,
+    body
+  );
 };
 
 type ExpectedWinnersAllBody = {

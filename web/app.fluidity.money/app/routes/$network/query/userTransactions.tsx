@@ -6,7 +6,6 @@ import config from "~/webapp.config.server";
 import {
   useUserRewardsAll,
   useUserRewardsByAddress,
-  useUserTransactionsByTxHash,
   useUserTransactionsAll,
   useUserTransactionsByAddress,
 } from "~/queries";
@@ -56,7 +55,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         ...map,
         [winner.send_transaction_hash]: {
           ...winner,
-          winning_amount: winner.winning_amount + (map[winner.send_transaction_hash]?.winning_amount || 0)
+          winning_amount:
+            winner.winning_amount +
+            (map[winner.send_transaction_hash]?.winning_amount || 0),
         },
       }),
       {} as { [key: string]: Winner }
@@ -177,7 +178,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         swapType,
       };
     });
-    
+
     return json({
       page,
       transactions: mergedTransactions,

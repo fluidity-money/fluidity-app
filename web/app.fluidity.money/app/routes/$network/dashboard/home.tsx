@@ -374,26 +374,26 @@ export default function Home() {
   } = useMemo(() => {
     const { transactions, volume, rewards, totalFluidPairs, timestamp } =
       activeTableFilterIndex ? data.user : data.global;
-    
+
     const {
       day: dailyRewards,
       week: weeklyRewards,
       month: monthlyRewards,
       year: yearlyRewards,
-    } = rewards
+    } = rewards;
 
     const activeRewards = (() => {
       switch (activeTransformerIndex) {
-      case 0:
-        return dailyRewards;
-      case 1:
-        return weeklyRewards;
-      case 2:
-        return monthlyRewards;
-      case 3:
-      default:
-        return yearlyRewards;
-    }
+        case 0:
+          return dailyRewards;
+        case 1:
+          return weeklyRewards;
+        case 2:
+          return monthlyRewards;
+        case 3:
+        default:
+          return yearlyRewards;
+      }
     })();
 
     const filteredVolume = volume.filter(
@@ -562,7 +562,11 @@ export default function Home() {
                   size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
                 >
-                  {numberToMonetaryString(rewards.find(({network: rewardNetwork}) => rewardNetwork === network)?.total_reward || 0)}
+                  {numberToMonetaryString(
+                    rewards.find(
+                      ({ network: rewardNetwork }) => rewardNetwork === network
+                    )?.total_reward || 0
+                  )}
                 </Display>
                 <LinkButton
                   size="medium"

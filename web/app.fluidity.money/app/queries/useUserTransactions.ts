@@ -93,10 +93,7 @@ const queryByTxHash: Queryable = {
     ) {
       ethereum {
         transfers(
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: 12
-          }
+          options: { desc: "block.timestamp.unixtime", limit: 12 }
           txHash: { in: $transactions }
         ) {
           sender {
@@ -129,10 +126,7 @@ const queryByTxHash: Queryable = {
     ) {
       solana {
         transfers(
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: 12
-          }
+          options: { desc: "block.timestamp.unixtime", limit: 12 }
           signature: { in: $transactions }
         ) {
           sender {

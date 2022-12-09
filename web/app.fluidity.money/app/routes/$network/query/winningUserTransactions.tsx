@@ -1,5 +1,4 @@
 import type Transaction from "~/types/Transaction";
-import type { Winner } from "~/queries/useUserRewards";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
@@ -7,8 +6,6 @@ import {
   useUserRewardsAll,
   useUserRewardsByAddress,
   useUserTransactionsByTxHash,
-  useUserTransactionsAll,
-  useUserTransactionsByAddress,
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
@@ -54,7 +51,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const winners = winnersData.winners.slice((page - 1) * 12, page * 12);
 
     const winnerAddrs = winners.map(
-      ({send_transaction_hash}) => send_transaction_hash,
+      ({ send_transaction_hash }) => send_transaction_hash
     );
 
     // payoutsMap looks up if a transaction was a payout transaction
@@ -63,11 +60,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     );
 
     const { data: userTransactionsData, errors: userTransactionsErr } =
-      await useUserTransactionsByTxHash(
-              network,
-              winnerAddrs,
-              payoutAddrs,
-            );
+      await useUserTransactionsByTxHash(network, winnerAddrs, payoutAddrs);
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -87,7 +80,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
-    
+
     // Destructure GraphQL data
     const userTransactions: UserTransaction[] = transactions.map(
       (transaction) => {
@@ -140,13 +133,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         [tx.hash]: tx,
       }),
       {} as Record<string, UserTransaction>
-    )
-    
+    );
+
     const mergedTransactions: Transaction[] = winners
-      .filter(({send_transaction_hash: hash}) => !!transactionMap[hash])
+      .filter(({ send_transaction_hash: hash }) => !!transactionMap[hash])
       .map((winner) => {
         const tx = transactionMap[winner.send_transaction_hash];
-      
+
         const swapType =
           tx.sender === MintAddress
             ? "in"
@@ -172,7 +165,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           swapType,
         };
       });
-    
+
     return json({
       page,
       transactions: mergedTransactions,

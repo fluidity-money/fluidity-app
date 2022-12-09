@@ -315,7 +315,6 @@ export default function Rewards() {
 
     const hasRewarders = !!activeRewards.length;
 
-
     return {
       count: activeYield.length ? activeYield[0].count : 0,
       hasRewarders,
@@ -343,15 +342,7 @@ export default function Rewards() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const {
-        winner,
-        timestamp,
-        value,
-        reward,
-        hash,
-        rewardHash,
-        logo,
-      } = data;
+      const { winner, timestamp, value, reward, hash, rewardHash, logo } = data;
 
       return (
         <motion.tr
