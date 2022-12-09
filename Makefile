@@ -10,6 +10,8 @@ AUTOMATION_DIR := automation
 	clean \
 	semgrep \
 	test \
+	test-go-unit \
+	test-go-integration \
 	test-go \
 	test-contracts \
 	docker-test \
@@ -110,8 +112,13 @@ docker-compose-build:
 semgrep:
 	@${SEMGREP_ALL} -q --config .semgrep/golang.yml
 
-test-go: semgrep
-	@cd ${TESTS_DIR} && ./tests-golang.sh
+test-go-unit: semgrep
+	@cd ${TESTS_DIR} && FLU_RUN_INTEGRATION_TESTS=false ./tests-golang.sh
+
+test-go-all: semgrep
+	@cd ${TESTS_DIR} && FLU_RUN_INTEGRATION_TESTS=true ./tests-golang.sh
+
+test-go: test-go-all
 
 test-contracts: semgrep
 	@. ${TESTS_DIR}/tests-profile.sh && \
