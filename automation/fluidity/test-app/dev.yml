@@ -6,6 +6,7 @@ SERVICES:
       TARGET_GROUP_01: test-target-group-01
       TARGET_GROUP_02: test-target-group-02
       DEPLOYMENT_TYPE: CODEDEPLOY
+      LOAD_BALANCER: test-alb
 
       SECRET_BITQUERY_TOKEN: /fluidity/bitquery_token
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
