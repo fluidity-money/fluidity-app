@@ -6,9 +6,6 @@ ENV PRODUCTION ${PRODUCTION}
 
 ARG GITHUB_TOKEN
 
-ARG GIT_SHA=unsetver
-ENV GIT_SHA=$GIT_SHA
-
 ENV PATH /app/node_modules.bin:$PATH
 
 COPY .npmrc package.json package-lock.json ./
@@ -30,5 +27,8 @@ WORKDIR /usr/local/src/fluidity/web/app.fluidity.money
 COPY --from=build /usr/local/src/fluidity/web/app.fluidity.money .
 
 EXPOSE 3000
+
+ARG GIT_SHA=unsetver
+ENV GIT_SHA=$GIT_SHA
 
 CMD ["npm", "run", "start"]
