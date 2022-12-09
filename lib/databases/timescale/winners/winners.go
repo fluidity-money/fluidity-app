@@ -38,6 +38,12 @@ type (
 	Application = winners.Application
 )
 
+type PendingRewardData struct {
+	SendHash    ethereum.Hash
+	RewardType  winners.RewardType
+	Application ethApps.Application
+}
+
 func InsertWinner(winner Winner) {
 	timescaleClient := timescale.Client()
 
@@ -246,7 +252,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 // GetAndRemovePendingRewardData to fetch and remove the type (send or receive)
 // of an unsent win as well as the application that was involved
 // using the hash of the reward payout transaction
-func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_details.TokenDetails, firstBlock, lastBlock misc.BigInt, address ethereum.Address) (ethereum.Hash, winners.RewardType, ethApps.Application) {
+func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_details.TokenDetails, firstBlock, lastBlock misc.BigInt, address ethereum.Address) []PendingRewardData {
 
 	timescaleClient := timescale.Client()
 
@@ -273,25 +279,13 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 		TablePendingRewardType,
 	)
 
-	row := timescaleClient.QueryRow(
+	rows, err := timescaleClient.Query(
 		statementText,
 		net,
 		shortName,
 		first,
 		last,
 		address,
-	)
-
-	var (
-		isSender bool
-		application_ string
-		sendHash_ string
-	)
-
-	err := row.Scan(
-		&isSender,
-		&application_,
-		&sendHash_,
 	)
 
 	if err != nil {
@@ -307,28 +301,72 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 		})
 	}
 
-	application, err := ethApps.ParseApplicationName(application_)
+	defer rows.Close()
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
 
-			k.Format(
-				"Fetched invalid application name %v!",
-				application_,
-			)
+	var rewards []PendingRewardData
 
-			k.Payload = err
-		})
+	for rows.Next() {
+		var (
+			isSender bool
+			application_ string
+			sendHash_ string
+		)
+
+		err := rows.Scan(
+			&isSender,
+			&application_,
+			&sendHash_,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Failed to scan a row of pending reward data for address %s!",
+					address.String(),
+				)
+
+				k.Payload = err
+			})
+		}
+
+		application, err := ethApps.ParseApplicationName(application_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Fetched invalid application name %v!",
+					application_,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		sendHash := ethereum.HashFromString(sendHash_)
+
+		var rewardType winners.RewardType
+
+		if isSender {
+			rewardType = "send"
+		} else {
+			rewardType = "receive"
+		}
+
+		reward := PendingRewardData{
+			SendHash:    sendHash,
+			RewardType:  rewardType,
+			Application: application,
+		}
+
+		rewards = append(rewards, reward)
 	}
 
-	sendHash := ethereum.HashFromString(sendHash_)
-
-	if isSender {
-		return sendHash, "send", application
-	} else {
-		return sendHash, "receive", application
-	}
+	return rewards
 }
 
 // Ethereum Specific

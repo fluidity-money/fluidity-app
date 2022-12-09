@@ -39,7 +39,7 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 		return
 	}
 
-	sendHash, rewardType, application := winnersDb.GetAndRemovePendingRewardData(
+	winners := winnersDb.GetAndRemovePendingRewardData(
 		network,
 		tokenDetails,
 		startBlock,
@@ -47,19 +47,17 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 		winnerAddress,
 	)
 
-	convertedWinner := convertWinner(
+	convertedWinners := convertWinners(
+		winners,
 		transactionHash,
-		sendHash,
 		winnerAddress,
 		data,
 		network,
 		tokenDetails,
 		time.Now(),
-		rewardType,
-		application,
 	)
 
-	queue.SendMessage(winnersQueue.TopicWinnersEthereum, convertedWinner)
+	sendRewards(winnersQueue.TopicWinnersEthereum, convertedWinners)
 }
 
 func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
@@ -69,10 +67,10 @@ func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.Unblock
 		startBlock               = *rewardData.StartBlock
 		endBlock                 = *rewardData.EndBlock
 
-		winnerAddress      = ethereum.AddressFromString(winnerString)
+		winnerAddress = ethereum.AddressFromString(winnerString)
 	)
 
-	sendHash, rewardType, application := winnersDb.GetAndRemovePendingRewardData(
+	rewards := winnersDb.GetAndRemovePendingRewardData(
 		network,
 		tokenDetails,
 		startBlock,
@@ -80,48 +78,60 @@ func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.Unblock
 		winnerAddress,
 	)
 
-	convertedWinner := convertWinner(
+	convertedWinners := convertWinners(
+		rewards,
 		transactionHash,
-		sendHash,
 		winnerAddress,
 		rewardData,
 		network,
 		tokenDetails,
 		time.Now(),
-		rewardType,
-		application,
 	)
 
-	queue.SendMessage(winnersQueue.TopicWinnersEthereum, convertedWinner)
+	sendRewards(winnersQueue.TopicWinnersEthereum, convertedWinners)
+}
+
+func sendRewards(topic string, rewards []winnersDb.Winner) {
+	for _, reward := range rewards {
+		queue.SendMessage(winnersQueue.TopicWinnersEthereum, reward)
+	}
 }
 
 // Convert, returning the internal definition for a winner
-func convertWinner(transactionHash ethereum.Hash, sendHash ethereum.Hash, address ethereum.Address, rewardData fluidity.RewardData, network network.BlockchainNetwork, details token_details.TokenDetails, when time.Time, rewardType winners.RewardType, application applications.Application) winnersDb.Winner {
+func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHash ethereum.Hash, address ethereum.Address, rewardData fluidity.RewardData, network network.BlockchainNetwork, details token_details.TokenDetails, when time.Time) []winnersDb.Winner {
 	var (
-		appString      = application.String()
 		hashString     = transactionHash.String()
 		addressString  = address.String()
-		sendHashString = sendHash.String()
 		amount         = *rewardData.Amount
 		startBlock     = *rewardData.StartBlock
 		endBlock       = *rewardData.StartBlock
 	)
 
-	winner := winnersDb.Winner{
-		Application:         appString,
-		Network:             network,
-		TransactionHash:     hashString,
-		SendTransactionHash: sendHashString,
-		WinnerAddress:       addressString,
-		WinningAmount:       amount,
-		AwardedTime:         when,
-		RewardType:          rewardType,
-		BatchFirstBlock:     startBlock,
-		BatchLastBlock:      endBlock,
-		TokenDetails:        details,
+	winners := make([]winnersDb.Winner, len(pendingRewards))
+
+	for i, pendingReward := range pendingRewards {
+		var (
+			appString      = pendingReward.Application.String()
+			sendHashString = pendingReward.SendHash.String()
+			rewardType     = pendingReward.RewardType
+		)
+
+		winners[i] = winnersDb.Winner{
+			Application:         appString,
+			Network:             network,
+			TransactionHash:     hashString,
+			SendTransactionHash: sendHashString,
+			WinnerAddress:       addressString,
+			WinningAmount:       amount,
+			AwardedTime:         when,
+			RewardType:          rewardType,
+			BatchFirstBlock:     startBlock,
+			BatchLastBlock:      endBlock,
+			TokenDetails:        details,
+		}
 	}
 
-	return winner
+	return winners
 }
 
 // Convert, returning the internal definition for a blocked winner
