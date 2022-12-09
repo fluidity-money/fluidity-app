@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -186,7 +187,10 @@ func GetManualRewardHandler(net network.BlockchainNetwork, tokens map[string]eth
 			token = request.TokenShortName
 		)
 
-		winnings := spooler.GetPendingRewardsForAddress(net, addressString)
+		timescaleClient := timescale.Client()
+		pendingWinnersHandler := spooler.NewPendingWinnersHandler(timescaleClient)
+
+		winnings := pendingWinnersHandler.GetPendingRewardsForAddress(net, addressString)
 
 		spooledWinnings, err := ethereum.BatchWinningsByToken(winnings, address)
 
