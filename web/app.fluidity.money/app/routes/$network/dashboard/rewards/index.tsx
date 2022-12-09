@@ -91,7 +91,6 @@ const SAFE_DEFAULT: CacheData = {
   network: "ethereum",
   fluidTokenMap: {},
   transactions: [],
-  totalRewards: 0,
   totalPrizePool: 0,
   page: 0,
   fluidPairs: 0,
@@ -99,6 +98,13 @@ const SAFE_DEFAULT: CacheData = {
   gasFee: 0,
   timestamp: 0,
   rewarders: {
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
+  rewards: {
+    day: [],
     week: [],
     month: [],
     year: [],
@@ -116,7 +122,7 @@ export default function Rewards() {
   const isFirstLoad = !rewardsData;
 
   const { data: globalTransactionsData } = useCache<TransactionsLoaderData>(
-    `/${network}/query/userTransactions?page=${page}&winsOnly=true`
+    `/${network}/query/winningUserTransactions?page=${page}`
   );
 
   const { connected, address, tokens } = useContext(FluidityFacadeContext);
@@ -135,7 +141,7 @@ export default function Rewards() {
     );
 
     userTransactionsData.load(
-      `/${network}/query/userTransactions?page=${page}&address=${address}&winsOnly=true`
+      `/${network}/query/winningUserTransactions?page=${page}&address=${address}`
     );
 
     userUnclaimedRewardsData.load(
@@ -259,7 +265,7 @@ export default function Rewards() {
     gasFee,
     transactions,
     rewarders,
-    totalRewards,
+    activeYield,
     totalPrizePool,
     timestamp,
     userUnclaimedRewards,
@@ -267,18 +273,24 @@ export default function Rewards() {
     weeklyRewards,
   } = useMemo(() => {
     const {
-      count,
       fluidPairs,
       networkFee,
       gasFee,
       transactions,
-      totalRewards,
       totalPrizePool,
       timestamp,
       rewarders,
+      rewards,
       userUnclaimedRewards,
       unclaimedTokenAddrs,
     } = activeTableFilterIndex ? data.user : data.global;
+
+    const {
+      week: weeklyYield,
+      month: monthlyYield,
+      year: yearlyYield,
+      all: allYield,
+    } = rewards;
 
     const {
       week: weeklyRewards,
@@ -287,24 +299,25 @@ export default function Rewards() {
       all: allRewards,
     } = rewarders;
 
-    const activeRewards = (() => {
+    const [activeRewards, activeYield] = (() => {
       switch (activeRewardFilterIndex) {
         case 1:
-          return weeklyRewards;
+          return [weeklyRewards, weeklyYield];
         case 2:
-          return monthlyRewards;
+          return [monthlyRewards, monthlyYield];
         case 3:
-          return yearlyRewards;
+          return [yearlyRewards, yearlyYield];
         case 0:
         default:
-          return allRewards;
+          return [allRewards, allYield];
       }
     })();
 
     const hasRewarders = !!activeRewards.length;
 
+
     return {
-      count,
+      count: activeYield.length ? activeYield[0].count : 0,
       hasRewarders,
       fluidPairs,
       networkFee,
@@ -312,7 +325,7 @@ export default function Rewards() {
       transactions,
       rewarders: activeRewards,
       timestamp,
-      totalRewards,
+      activeYield: activeYield.length ? activeYield[0].total_reward : 0,
       totalPrizePool,
       userUnclaimedRewards,
       unclaimedTokenAddrs,
@@ -322,7 +335,7 @@ export default function Rewards() {
     activeTableFilterIndex,
     activeRewardFilterIndex,
     rewardsData?.timestamp,
-    globalTransactionsData?.transactions,
+    globalTransactionsData?.page,
     userRewardsData.state,
     userTransactionsData.state,
     userUnclaimedRewardsData.state,
@@ -331,7 +344,6 @@ export default function Rewards() {
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
       const {
-        sender,
         winner,
         timestamp,
         value,
@@ -361,7 +373,7 @@ export default function Rewards() {
               href={getTxExplorerLink(network, hash)}
             >
               <img src={logo} />
-              <Text>{transactionActivityLabel(data, sender)}</Text>
+              <Text>{transactionActivityLabel(data, winner)}</Text>
             </a>
           </td>
 
@@ -426,7 +438,7 @@ export default function Rewards() {
         <UserRewards
           claimNow={mobileView}
           unclaimedRewards={userUnclaimedRewards}
-          claimedRewards={totalRewards}
+          claimedRewards={activeYield}
           network={network}
           networkFee={networkFee}
           gasFee={gasFee}
@@ -496,7 +508,7 @@ export default function Rewards() {
             <LabelledValue
               label={`${activeTableFilterIndex ? "My" : "Total"} claimed yield`}
             >
-              {numberToMonetaryString(totalRewards)}
+              {numberToMonetaryString(activeYield)}
             </LabelledValue>
           </div>
 

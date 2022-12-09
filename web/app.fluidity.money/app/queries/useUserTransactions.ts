@@ -89,7 +89,6 @@ const queryByTxHash: Queryable = {
   ethereum: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
-      $offset: Int = 0
       $filterHashes: [String!] = []
     ) {
       ethereum {
@@ -97,7 +96,6 @@ const queryByTxHash: Queryable = {
           options: {
             desc: "block.timestamp.unixtime"
             limit: 12
-            offset: $offset
           }
           txHash: { in: $transactions }
         ) {
@@ -127,7 +125,6 @@ const queryByTxHash: Queryable = {
   solana: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
-      $offset: Int = 0
       $filterHashes: [String!] = []
     ) {
       solana {
@@ -135,7 +132,6 @@ const queryByTxHash: Queryable = {
           options: {
             desc: "block.timestamp.unixtime"
             limit: 12
-            offset: $offset
           }
           signature: { in: $transactions }
         ) {
@@ -245,6 +241,7 @@ type UserTransactionsByAddressBody = {
   query: string;
   variables: {
     address: string;
+    offset: number;
     fluidCurrencies: string[];
     filterHashes?: string[];
   };
@@ -261,6 +258,7 @@ type UserTransactionsByTxHashBody = {
 type UserTransactionsAllBody = {
   query: string;
   variables: {
+    offset: number;
     fluidCurrencies: string[];
     filterHashes?: string[];
   };
@@ -315,13 +313,11 @@ const useUserTransactionsByAddress = async (
 
 const useUserTransactionsByTxHash = async (
   network: string,
-  page: number,
   transactions: string[],
   filterHashes: string[]
 ) => {
   const variables = {
     transactions,
-    offset: (page - 1) * 12,
     filterHashes,
   };
 
