@@ -15,32 +15,34 @@ import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 
 import styles from "./RewardsStats.module.scss";
-import { IPropPools } from "pages";
+import { IPropOnChainData } from "pages";
 
 interface IProps {
   changeScreen: () => void;
-  rewardPools: IPropPools;
+  data: IPropOnChainData;
 }
 
 type DailyWinner = LargestDailyWinner & {
   awarded_day: Date,
 }
 
-const RewardsStats = ({ changeScreen, rewardPools}: IProps) => {
+const RewardsStats = ({ changeScreen, data}: IProps) => {
   const { apiState, chain } = useChainContext();
-  const { txCount, largestDailyWinnings } = apiState;
+  const { largestDailyWinnings } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const [prizePool, setPrizePool] = useState<string>(rewardPools.ethPool.toFixed(3));
+  const [prizePool, setPrizePool] = useState<string>(data.ethPool.toFixed(3));
+	const [totalTx, setTotalTx] = useState<number>(0);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(rewardPools.ethPool.toFixed(3));
+    setPrizePool(data.ethPool.toFixed(3));
 
     chain === `SOL` && 
-    setPrizePool(rewardPools.solPool.toFixed(3));
+    setPrizePool(data.solPool.toFixed(3));
 
+		setTotalTx(data.totalTransactions);
   },[chain]);
 
   // NOTE: Dummy data
@@ -97,7 +99,7 @@ const RewardsStats = ({ changeScreen, rewardPools}: IProps) => {
         <RewardsInfoBox
           // NOTE: Dummy data
           rewardPool={prizePool}
-          totalTransactions={txCount}
+          totalTransactions={totalTx}
           changeScreen={changeScreen}
           type="transparent"
         />

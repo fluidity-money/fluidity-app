@@ -4,28 +4,29 @@ import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import { getEthTotalPrizePool } from "data/ethereum/prizePool";
-import { IPropPools } from "pages";
+import { IPropOnChainData } from "pages";
 
 import styles from "./RewardsInitial.module.scss";
 
 interface IProps {
   changeScreen: () => void;
-  rewardPools: IPropPools;
+  data: IPropOnChainData;
 }
 
-const RewardsInitial = ({ changeScreen, rewardPools }: IProps) => {
+const RewardsInitial = ({ changeScreen, data }: IProps) => {
   const { apiState, chain } = useChainContext();
-  const { txCount } = apiState;
+	
 
-  const [prizePool, setPrizePool] = useState<string>(rewardPools.ethPool.toFixed(3));
-
+  const [prizePool, setPrizePool] = useState<string>(data.ethPool.toFixed(3));
+  const [totalTx, setTotalTx] = useState<number>(0);
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(rewardPools.ethPool.toFixed(3));
+    setPrizePool(data.ethPool.toFixed(3));
 
     chain === `SOL` && 
-    setPrizePool(rewardPools.solPool.toFixed(3));
+    setPrizePool(data.solPool.toFixed(3));
 
+		setTotalTx(data.totalTransactions);
   },[chain]);
   
   return (
@@ -38,7 +39,7 @@ const RewardsInitial = ({ changeScreen, rewardPools }: IProps) => {
       >
         <RewardsInfoBox
           rewardPool={prizePool}
-          totalTransactions={txCount}
+          totalTransactions={totalTx}
           changeScreen={changeScreen}
           type="black"
         />

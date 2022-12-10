@@ -74,7 +74,7 @@ const RewardsInfoBox = ({
           </Heading>
         </div>
         <Heading as="h4" className={styles.alignCenter}>
-          {showRewardPool ? "Reward pool" : "Total transactions (on testing)"}
+          {showRewardPool ? "Reward pool" : "Total transactions"}
         </Heading>
         {showModal && (
           <BlockchainModal

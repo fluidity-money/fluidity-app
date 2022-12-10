@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import Head from "next/head";
-import { IPropPools } from "pages";
+import { IPropOnChainData } from "pages";
 import Articles from "screens/Articles";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
@@ -15,7 +15,7 @@ import UseCases from "../../screens/UseCases";
 import styles from "./LandingPage.module.scss";
 
 const LandingPage = (props) => {
-  const { ethPool, solPool } :IPropPools = JSON.parse(props.pools);
+  const { ethPool, solPool, totalTransactions } :IPropOnChainData = JSON.parse(props.data);
 
   return (
     <div className={styles.pageContainer}>
@@ -25,7 +25,7 @@ const LandingPage = (props) => {
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
-        <Reward ethPool={Number(ethPool)} solPool={Number(solPool)} />
+        <Reward ethPool={Number(ethPool)} solPool={Number(solPool)} totalTransactions={Number(totalTransactions)} />
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />
