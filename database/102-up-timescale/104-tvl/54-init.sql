@@ -15,5 +15,5 @@ CREATE TABLE tvl (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS tvl;
+DROP TABLE  tvl;
 

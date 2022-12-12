@@ -26,8 +26,7 @@ ALTER TABLE ethereum_blocks
     DROP COLUMN IF EXISTS created_timestamp;
 
 ALTER TABLE ethereum_logs
-    DROP COLUMN IF EXISTS created_timestamp;
+    DROP COLUMN created_timestamp;
 
 ALTER TABLE ethereum_transactions
-    DROP COLUMN IF EXISTS created_timestamp;
-
+    DROP COLUMN created_timestamp;

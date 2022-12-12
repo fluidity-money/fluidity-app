@@ -16,5 +16,5 @@ CREATE TABLE website_subscriptions (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS website_subscriptions;
+DROP TABLE  website_subscriptions;
 

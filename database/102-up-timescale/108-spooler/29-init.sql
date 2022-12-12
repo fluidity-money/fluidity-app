@@ -13,4 +13,4 @@ CREATE TABLE ethereum_pending_winners (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS ethereum_pending_winners;
+DROP TABLE  ethereum_pending_winners;

@@ -6,7 +6,7 @@ error() {
 }
 
 print_usage() {
-	error "Usage: create-migration.sh -d (<SQL DIRECTORY>) -s <MIGRATION NAME>"
+	error "Usage: create-migration.sh -d <DATABASE NAME > -s <SECTION NAME> -n <MIGRATION NAME>"
 }
 
 main() {

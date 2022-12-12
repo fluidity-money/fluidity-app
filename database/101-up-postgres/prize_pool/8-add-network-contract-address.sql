@@ -11,8 +11,8 @@ ALTER TABLE prize_pool ADD
 -- migrate:down
 
 ALTER TABLE prize_pool
-    DROP COLUMN IF EXISTS network;
+    DROP COLUMN network;
 
 ALTER TABLE prize_pool
-    DROP COLUMN IF EXISTS contract_address;
+    DROP COLUMN contract_address;
 

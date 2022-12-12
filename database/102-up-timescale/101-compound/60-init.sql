@@ -23,9 +23,9 @@ CREATE TABLE compound_ctoken_accrue_interest (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS
+DROP TABLE 
     compound_comptroller_market_listed;
 
-DROP TABLE IF EXISTS
+DROP TABLE 
     compound_ctoken_accrue_interest;
 

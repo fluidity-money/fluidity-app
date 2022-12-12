@@ -20,5 +20,5 @@ CREATE TABLE website_questions (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS website_questions;
+DROP TABLE  website_questions;
 

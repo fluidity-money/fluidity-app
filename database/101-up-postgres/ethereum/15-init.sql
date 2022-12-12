@@ -75,9 +75,9 @@ CREATE TABLE ethereum_transactions (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS ethereum_block_headers;
+DROP TABLE  ethereum_block_headers;
 
-DROP TABLE IF EXISTS ethereum_blocks;
+DROP TABLE  ethereum_blocks;
 
-DROP TABLE IF EXISTS ethereum_transactions;
+DROP TABLE  ethereum_transactions;
 

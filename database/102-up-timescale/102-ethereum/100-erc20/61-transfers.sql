@@ -11,5 +11,5 @@ CREATE TABLE ethereum_erc20_transfers (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS ethereum_erc20_transfers;
+DROP TABLE ethereum_erc20_transfers;
 
