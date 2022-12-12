@@ -152,10 +152,11 @@ main > footer > section {
 
 .fluidify-button-dashboard-mobile {
   position: fixed !important;
-  bottom: 2vh;
-  left: 50vw;
-  transform: translateX(-50%);
-  width: 40vw;
+  bottom: 5vh;
+  right: 2vw;
+  transform: translateX(-10%);
+  max-width: 240px;
+  width: 60vw;
 }
 
 @keyframes rotate {
@@ -177,14 +178,14 @@ main > footer > section {
   font-size: 15px;
 }
 
-.rainbow ::before {
+.rainbow::before {
   content: "";
   position: absolute;
   z-index: -2;
   left: -20%;
   top: -150%;
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
   background-color: #f3b8d8;
   background-repeat: no-repeat;
   background-size: 100%;
@@ -214,7 +215,7 @@ main > footer > section {
   top: 3px;
   width: calc(100% - 6px);
   height: calc(100% - 6px);
-  background: #300d0b;
+  background: black;
   border-radius: inherit;
 }
 
@@ -384,7 +385,7 @@ main > footer > section > a {
   width: auto;
   max-width: 60em;
   padding: 2em;
-  margin-bottom: 6em;
+  margin-bottom: 2em;
   margin-left: 64px;
   margin-right: 64px;
 }
@@ -1087,6 +1088,16 @@ main > footer > section > a {
   margin: 0;
 }
 
+#flu-socials {
+  margin-bottom: 52px;
+}
+
+@media only screen and (max-width: 850px) {
+  #flu-socials {
+    margin-bottom: 100px;
+  }
+}
+
 @media only screen and (max-width: 500px) {
   .hide-on-mobile {
     display: none;
@@ -1160,7 +1171,7 @@ main > footer > section > a {
 
   #provide-liquidity {
     padding: 1em;
-    margin: 0 0.5em 3em;
+    margin: 0 0.5em 6.5em;
   }
 
   .connect-wallet-modal-container {

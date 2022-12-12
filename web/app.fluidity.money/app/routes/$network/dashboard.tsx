@@ -434,21 +434,6 @@ export default function Dashboard() {
             </GeneralButton>
             */}
 
-            {/* Fluidify */}
-            {!isMobile && (
-              <GeneralButton
-                className="rainbow"
-                version={"transparent"}
-                buttontype="text"
-                size={"small"}
-                handleClick={() => navigate("../fluidify")}
-              >
-                <Heading as="h6">
-                  <b>Fluidify Money</b>
-                </Heading>
-              </GeneralButton>
-            )}
-
             {/* Prize Money */}
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
@@ -506,20 +491,18 @@ export default function Dashboard() {
             />
           )}
 
-        {/* Mobile fluidify button */}
-        {isMobile && (
-          <GeneralButton
-            className="fluidify-button-dashboard-mobile rainbow "
-            version={"transparent"}
-            buttontype="text"
-            size={"medium"}
-            handleClick={() => navigate("../fluidify")}
-          >
-            <Heading as="h6">
-              <b>Fluidify Money</b>
-            </Heading>
-          </GeneralButton>
-        )}
+        {/* Fluidify button */}
+        <GeneralButton
+          className="fluidify-button-dashboard-mobile rainbow "
+          version={"primary"}
+          buttontype="text"
+          size={"medium"}
+          handleClick={() => navigate("../fluidify")}
+        >
+          <Heading as="h6">
+            <b>Fluidify Money</b>
+          </Heading>
+        </GeneralButton>
 
         {/* Mobile Menu Modal */}
         {openMobModal && (
