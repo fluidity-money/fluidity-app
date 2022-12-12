@@ -3,8 +3,7 @@
 .infoBoxContainer {
   position: absolute;
   height: 294px;
-  width: 496px;
-
+  min-width: 496px;
   z-index: 1;
   @include max-620px {
     width: 296px;
@@ -46,7 +45,8 @@
     font-size: 72px;
     line-height: 100%;
     text-align: center;
-    letter-spacing: -0.02em;
+    display: flex;
+    flex-direction: row;
 
     @include max-620px {
       font-size: 36px;

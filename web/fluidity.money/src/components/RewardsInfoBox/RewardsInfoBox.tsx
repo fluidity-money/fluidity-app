@@ -1,24 +1,28 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
-import AnimatedNumbers from "react-animated-numbers"
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
   BlockchainModal,
   ChainSelectorButton,
-  stringifiedNumberToMonetaryString,
   SupportedChains,
   Heading,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 
 interface IRewardBoxProps {
   totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
 }
+
+const AnimatedNumbers = dynamic(() => import("react-animated-numbers"), {
+  ssr: false,
+});
 
 const RewardsInfoBox = ({
   totalTransactions,
@@ -44,14 +48,14 @@ const RewardsInfoBox = ({
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
 
-  const [prizePool, setPrizePool] = useState<string>(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
+  const [prizePool, setPrizePool] = useState<number>(Number(apiState.rewardPool.pools?.ethPool.toFixed(3)) || 0);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
+    setPrizePool(Number(apiState.rewardPool.pools?.ethPool.toFixed(3)) || 0);
 
     chain === `SOL` && 
-    setPrizePool(apiState.rewardPool.pools?.solPool.toFixed(3) || `0`);
+    setPrizePool(Number(apiState.rewardPool.pools?.solPool.toFixed(3)) || 0);
 
   },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
   
@@ -60,8 +64,8 @@ const RewardsInfoBox = ({
 
     const interval = setInterval(() => {
       setPrizePool((prizePool) => {
-        const random = Math.random() * 200000
-        return random.toFixed(3)
+        const random = Math.random() * 999999
+        return Number(random.toFixed(3))
       })
     } , 200)
 
@@ -90,13 +94,29 @@ const RewardsInfoBox = ({
         />
         <div onClick={changeScreen}>
           <Heading as="h1">
-            {showRewardPool
-              ? prizePool
-              : totalTransactions}
+            {showRewardPool ? (
+              <Suspense>
+                <>
+                  $<AnimatedNumbers animateToNumber={prizePool} includeComma />
+                </>
+              </Suspense>
+            ) : (
+              totalTransactions
+            )}
           </Heading>
         </div>
         <Heading as="h4" className={styles.alignCenter}>
-          {showRewardPool ? "Reward pool" : "Total transactions (on testing)"}
+          {!apiState.rewardPool.loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {showRewardPool
+                ? !apiState.rewardPool.loading && "Reward pool"
+                : "Total transactions (on testing)"}
+            </motion.div>
+          )}
         </Heading>
         {showModal && (
           <BlockchainModal

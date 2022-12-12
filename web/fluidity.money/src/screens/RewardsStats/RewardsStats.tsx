@@ -8,14 +8,12 @@ import {
 } from "@fluidity-money/surfing";
 
 import type { LargestDailyWinner } from "data/monthlyLargestWinners";
-import { getEthTotalPrizePool } from "data/ethereum/prizePool";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 
 import styles from "./RewardsStats.module.scss";
-import { Pools } from "pageBody/LandingPage/LandingPage";
 
 interface IProps {
   changeScreen: () => void;
@@ -87,7 +85,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       {width > breakpoint && (
         <div className={styles.infoSingle}>
           {/* NOTE: Dummy data */}
-          <Heading as="h2">${prizePool}</Heading>
+          <Heading as="h2">{numberToMonetaryString(Number(prizePool))}</Heading>
           <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
