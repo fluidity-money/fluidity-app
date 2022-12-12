@@ -117,7 +117,7 @@ const transactionActivityLabel = (
   const { sender, currency, swapType } = activity;
   if (swapType)
     return swapType === "in"
-      ? `Fluidified ${currency}`
+      ? `Fluidified ${currency[0] === "f" ? currency.slice(1) : currency}`
       : `Reverted ${currency}`;
 
   return sender === address ? `Sent ${currency}` : `Received ${currency}`;

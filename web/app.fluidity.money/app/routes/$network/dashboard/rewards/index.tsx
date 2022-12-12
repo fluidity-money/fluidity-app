@@ -316,7 +316,7 @@ export default function Rewards() {
     const hasRewarders = !!activeRewards.length;
 
     return {
-      count: activeYield.length ? activeYield[0].count : 0,
+      count: allYield.length ? allYield[0].count : 0,
       hasRewarders,
       fluidPairs,
       networkFee,
