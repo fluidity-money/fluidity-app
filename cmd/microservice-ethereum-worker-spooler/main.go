@@ -65,18 +65,28 @@ func main() {
 
 			var (
 				// the sender's winnings will always be higher than the recipient's
-				fromWinAmount = announcement.FromWinAmount
-				tokenDetails  = announcement.TokenDetails
-				tokenDecimals = tokenDetails.TokenDecimals
-
+				fromWinAmount    = announcement.FromWinAmount
+				tokenDetails     = announcement.TokenDetails
+				blockNumberInt   = announcement.BlockNumber
 				transactionHash  = announcement.TransactionHash
 				senderAddress    = announcement.FromAddress
 				recipientAddress = announcement.ToAddress
 				application      = announcement.Application
+
+				tokenDecimals  = tokenDetails.TokenDecimals
+				blockNumber    = uint64(blockNumberInt.Int64())
 			)
 
 			// write the sender and receiver to be stored once the win is paid out
-			winners.InsertPendingRewardType(transactionHash, senderAddress, recipientAddress, application)
+			winners.InsertPendingRewardType(
+				dbNetwork,
+				tokenDetails,
+				blockNumber,
+				transactionHash,
+				senderAddress,
+				recipientAddress,
+				application,
+			)
 
 			tokenDecimalsScale := bigExp10(int64(tokenDecimals))
 
@@ -125,19 +135,19 @@ func main() {
 
 				toSend[tokenDetails] = true
 			}
+		}
 
-			for shortName, send := range toSend {
-				if !send {
-					// should never happen
-					continue
-				}
-
-				log.Debug(func(k *log.Log) {
-					k.Format("Sending rewards for token %v", shortName)
-				})
-
-				sendRewards(batchedRewardsQueue, dbNetwork, shortName)
+		for shortName, send := range toSend {
+			if !send {
+				// should never happen
+				continue
 			}
+
+			log.Debug(func(k *log.Log) {
+				k.Format("Sending rewards for token %v", shortName)
+			})
+
+			sendRewards(batchedRewardsQueue, dbNetwork, shortName)
 		}
 	})
 }
