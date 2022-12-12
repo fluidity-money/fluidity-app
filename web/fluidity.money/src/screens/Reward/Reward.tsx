@@ -2,13 +2,13 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import { onChainData } from "pageBody/LandingPage/LandingPage";
 import { useState } from "react";
-import { IPropOnChainData } from "pages";
 import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
 import styles from "./Reward.module.scss";
 
-const Reward = (data: IPropOnChainData) => {
+const Reward = () => {
   /* Background of transactions info moving left and right cotinuously,
   Reward pool total with sol and eth toggle,
   click on prize total and switch screens to total transactions sol and eth,
@@ -21,9 +21,9 @@ const Reward = (data: IPropOnChainData) => {
     <>
       <div className={styles.container}>
         {present ? (
-          <RewardsInitial changeScreen={() => setPresent(!present)} data={data} />
+          <RewardsInitial changeScreen={() => setPresent(!present)} />
         ) : (
-          <RewardStats changeScreen={() => setPresent(!present)} data={data}/>
+          <RewardStats changeScreen={() => setPresent(!present)} />
         )}
       </div>
     </>

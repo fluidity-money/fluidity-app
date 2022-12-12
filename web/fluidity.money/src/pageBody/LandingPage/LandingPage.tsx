@@ -3,7 +3,6 @@
 // LICENSE.md file.
 
 import Head from "next/head";
-import { IPropOnChainData } from "pages";
 import Articles from "screens/Articles";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
@@ -14,8 +13,13 @@ import SponsorsPartners from "../../screens/SponsorsPartners";
 import UseCases from "../../screens/UseCases";
 import styles from "./LandingPage.module.scss";
 
-const LandingPage = (props) => {
-  const { ethPool, solPool, totalTransactions } :IPropOnChainData = JSON.parse(props.data);
+export type onChainData = {
+  ethPool: number,
+  solPool: number,
+	totalTransactions: number
+} | undefined
+
+const LandingPage = () => {
 
   return (
     <div className={styles.pageContainer}>
@@ -25,7 +29,7 @@ const LandingPage = (props) => {
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
-        <Reward ethPool={Number(ethPool)} solPool={Number(solPool)} totalTransactions={Number(totalTransactions)} />
+        <Reward/>
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />

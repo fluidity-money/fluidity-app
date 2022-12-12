@@ -1,33 +1,34 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
-
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 import {
   BlockchainModal,
   ChainSelectorButton,
-  stringifiedNumberToMonetaryString,
   SupportedChains,
   Heading,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 
 interface IRewardBoxProps {
-  rewardPool: string;
-  totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
 }
 
+const AnimatedNumbers = dynamic(() => import("react-animated-numbers"), {
+  ssr: false,
+});
+
 const RewardsInfoBox = ({
-  rewardPool,
-  totalTransactions,
   changeScreen,
   type,
 }: IRewardBoxProps) => {
-  const { chain, setChain } = useChainContext();
+  const { apiState, chain, setChain } = useChainContext();
+	const { onChainData } = apiState;
 
   const showRewardPool = type === "black";
 
@@ -45,6 +46,30 @@ const RewardsInfoBox = ({
     name: chain,
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
+
+  const [prizePool, setPrizePool] = useState<number>(Number(onChainData.data?.ethPool.toFixed(3)) || 0);
+
+  useEffect(() => {
+    chain === `ETH` && 
+    setPrizePool(Number(onChainData.data?.ethPool.toFixed(3)) || 0);
+
+    chain === `SOL` && 
+    setPrizePool(Number(onChainData.data?.solPool.toFixed(3)) || 0);
+
+  },[onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
+  
+  useEffect(() => {
+    if (!onChainData.loading) return
+
+    const interval = setInterval(() => {
+      setPrizePool((prizePool) => {
+        const random = Math.random() * 999999
+        return Number(random.toFixed(3))
+      })
+    } , 200)
+
+    return () => clearInterval(interval)
+  }, [onChainData.loading])
 
   return (
     <div
@@ -68,13 +93,29 @@ const RewardsInfoBox = ({
         />
         <div onClick={changeScreen}>
           <Heading as="h1">
-            {showRewardPool
-              ? `$${stringifiedNumberToMonetaryString(rewardPool)}`
-              : totalTransactions}
+            {showRewardPool ? (
+              <Suspense>
+                <>
+                  $<AnimatedNumbers animateToNumber={prizePool} includeComma />
+                </>
+              </Suspense>
+            ) : (
+              onChainData.data.totalTransactions
+            )}
           </Heading>
         </div>
         <Heading as="h4" className={styles.alignCenter}>
-          {showRewardPool ? "Reward pool" : "Total transactions"}
+          {!onChainData.loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {showRewardPool
+                ? !onChainData.loading && "Reward pool"
+                : "Total transactions"}
+            </motion.div>
+          )}
         </Heading>
         {showModal && (
           <BlockchainModal

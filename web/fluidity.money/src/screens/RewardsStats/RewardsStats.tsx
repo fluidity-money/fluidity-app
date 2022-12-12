@@ -8,44 +8,51 @@ import {
 } from "@fluidity-money/surfing";
 
 import type { LargestDailyWinner } from "data/monthlyLargestWinners";
-import { getEthTotalPrizePool } from "data/ethereum/prizePool";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
 import useViewport from "hooks/useViewport";
 
 import styles from "./RewardsStats.module.scss";
-import { IPropOnChainData } from "pages";
 
 interface IProps {
   changeScreen: () => void;
-  data: IPropOnChainData;
 }
 
 type DailyWinner = LargestDailyWinner & {
   awarded_day: Date,
 }
 
-const RewardsStats = ({ changeScreen, data}: IProps) => {
+const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
-  const { largestDailyWinnings } = apiState;
+  const { largestDailyWinnings, onChainData } = apiState;
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const [prizePool, setPrizePool] = useState<string>(data.ethPool.toFixed(3));
-	const [totalTx, setTotalTx] = useState<number>(0);
+  const [prizePool, setPrizePool] = useState<string>(onChainData.data?.ethPool.toFixed(3) || `0`);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(data.ethPool.toFixed(3));
+    setPrizePool(onChainData.data?.ethPool.toFixed(3) || `0`);
 
     chain === `SOL` && 
-    setPrizePool(data.solPool.toFixed(3));
+    setPrizePool(onChainData.data?.solPool.toFixed(3) || `0`);
 
-		setTotalTx(data.totalTransactions);
-  },[chain]);
+  },[onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
 
-  // NOTE: Dummy data
+  useEffect(() => {
+    if (!onChainData.loading) return
+
+    const interval = setInterval(() => {
+      setPrizePool((prizePool) => {
+        const random = Math.random() * 200000
+        return random.toFixed(3)
+      })
+    } , 100)
+
+    return () => clearInterval(interval)
+  }, [onChainData.loading])
+
   const parsedDailyWinnings = largestDailyWinnings
     .map(({awarded_day, ...reward}) => (
       {
@@ -77,7 +84,7 @@ const RewardsStats = ({ changeScreen, data}: IProps) => {
       {width > breakpoint && (
         <div className={styles.infoSingle}>
           {/* NOTE: Dummy data */}
-          <Heading as="h2">${prizePool}</Heading>
+          <Heading as="h2">{numberToMonetaryString(Number(prizePool))}</Heading>
           <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
@@ -98,8 +105,6 @@ const RewardsStats = ({ changeScreen, data}: IProps) => {
         <div style={{ height: 254, width: "100%" }}></div>
         <RewardsInfoBox
           // NOTE: Dummy data
-          rewardPool={prizePool}
-          totalTransactions={totalTx}
           changeScreen={changeScreen}
           type="transparent"
         />
