@@ -4,6 +4,7 @@ SERVICES:
       DOCKER_IMAGE: app.fluidity.money-frontend
       DOCKERFILE_PATH: ./web/app.fluidity.money
       DEPLOYMENT_TYPE: CODEDEPLOY
+      CODEDEPLOY_WAIT_TIME: 30 #minutes
       LOAD_BALANCER: flu-dev-app-fluidity-alb
       TARGET_GROUP_01: flu-dev-app-fluidity-fe-tg-01
       TARGET_GROUP_02: flu-dev-app-fluidity-fe-tg-02
