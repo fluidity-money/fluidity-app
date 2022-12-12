@@ -15,7 +15,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -245,17 +244,6 @@ func main() {
 			network,
 			token,
 		)
-
-		// update database so winners can be tracked by reward transaction hash
-		for _, win := range wins {
-			var (
-				rewardTransactionHash = win.rewardTransactionHash
-				sendTransactionHash   = win.sendTransactionHash
-				winnerAddress 		  = win.winnerAddress
-			)
-
-			winners.AddRewardHashToPendingRewardType(rewardTransactionHash, sendTransactionHash, winnerAddress)
-		}
 
 		log.Debugf("Waiting for reward transaction to be mined...")
 

@@ -459,8 +459,8 @@ export default function Dashboard() {
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
-                  ? navigate("./rewards/unclaimed")
-                  : navigate("./rewards")
+                  ? navigate("./rewards")
+                  : navigate("./rewards/unclaimed")
               }
               icon={<Trophy />}
             >
