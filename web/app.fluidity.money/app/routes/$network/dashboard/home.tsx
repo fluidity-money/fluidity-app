@@ -572,7 +572,9 @@ export default function Home() {
                   <LinkButton
                     size="medium"
                     type="internal"
-                    handleClick={() => {return}}
+                    handleClick={() => {
+                      return;
+                    }}
                   >
                     Rewards
                   </LinkButton>
@@ -593,7 +595,7 @@ export default function Home() {
                     size="medium"
                     type="internal"
                     handleClick={() => {
-                      return
+                      return;
                     }}
                   >
                     Create Assets

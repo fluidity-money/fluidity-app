@@ -8,7 +8,7 @@ const queryAll = gql`
         send_transaction_hash: { _neq: "" }
         transaction_hash: { _neq: "" }
       }
-      order_by: {created: desc}
+      order_by: { created: desc }
       limit: 240
     ) {
       network
@@ -30,7 +30,7 @@ const queryByAddress = gql`
   query WinnersByAddress($network: network_blockchain!, $address: String!) {
     winners(
       where: { network: { _eq: $network }, winning_address: { _eq: $address } }
-      order_by: {created: desc}
+      order_by: { created: desc }
       limit: 240
     ) {
       network

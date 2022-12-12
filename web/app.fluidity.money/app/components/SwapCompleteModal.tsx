@@ -59,11 +59,11 @@ const SwapCompleteModal = ({
     visible: { opacity: 1, transition: { duration: 1.5 } },
     hidden: { opacity: 0 },
   };
-  
+
   // Set Timeout in case Video does not load
   useEffect(() => {
     setTimeout(() => setPlayVideo(false), 15 * 1000);
-  }, [])
+  }, []);
 
   return (
     <Modal visible={visible}>

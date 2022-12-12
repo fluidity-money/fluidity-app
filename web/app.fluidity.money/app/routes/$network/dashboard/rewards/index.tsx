@@ -115,7 +115,7 @@ const SAFE_DEFAULT: CacheData = {
 
 export default function Rewards() {
   const { network, page } = useLoaderData<LoaderData>();
-  
+
   const { data: rewardsData } = useCache<RewardsLoaderData>(
     `/${network}/query/dashboard/rewards`
   );
@@ -528,7 +528,7 @@ export default function Rewards() {
                 size="medium"
                 type="internal"
                 handleClick={() => {
-                  return
+                  return;
                 }}
               >
                 Create Assets
