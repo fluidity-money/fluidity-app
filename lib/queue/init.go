@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/fluidity-money/fluidity-app/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -25,6 +26,16 @@ func init() {
 		goroutines_ = util.GetEnvOrDefault(EnvGoroutinesPerQueue, "1")
 
 		queueAddr = util.GetEnvOrFatal(EnvQueueAddr)
+
+		// testingEnabled to check if the environment is
+		// currently in a state of testing
+		testingEnabled = microservice_lib.IsTesting()
+
+		// testMessages should be set if the user has elected to
+		// enable testing with FLU_TESTING, otherwise if
+		// FLU_TESTING is set the queue is not enabled in the
+		// first place if it's accidentally loaded somewhere
+		testMessages = os.Getenv(EnvTestMessages)
 	)
 
 	messageRetries, err := strconv.Atoi(messageRetries_)
@@ -59,6 +70,49 @@ func init() {
 		})
 	}
 
+	// if testing is enabled, send (some) phony information that's not set
+	// (the handler will check for testing enabled and handle
+	// properly) and if the file is given that includes fake messages to send
+	// then read each message from the file and send it out
+
+	// will die if it fails to get any fake messages from the env
+
+	if testingEnabled {
+
+		testMessagesEnabled := testMessages != ""
+
+		testMessagesOutgoing := make(chan Message, 0)
+
+		if testMessagesEnabled {
+			fakeMessages := getFakeMessages(testMessages)
+
+			go func() {
+				for _, fakeMessage := range fakeMessages {
+					testMessagesOutgoing <- fakeMessage
+				}
+			}()
+		}
+
+		go func() {
+			for {
+				chanAmqpDetails <- amqpDetails{
+					exchangeName:   ExchangeName,
+					workerId:       workerId,
+					messageRetries: messageRetries,
+					goroutines:     goroutines,
+					isTesting:      testingEnabled,
+					testMessages:   testMessagesOutgoing,
+				}
+			}
+		}()
+
+		return
+	}
+
+	// if testing is not enabled, set up the connection to the queue
+	// and an error handler for unexpected closes, then the exchange
+	// and a handler for any program shutdowns
+
 	client, err := amqp.Dial(queueAddr)
 
 	if err != nil {
@@ -78,25 +132,6 @@ func init() {
 			k.Payload = err
 		})
 	}
-
-	go func() {
-		errors := make(chan *amqp.Error)
-
-		err, closed := <-channel.NotifyClose(errors)
-
-		if closed && err == nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "AMQP closed on its own without an error!!!"
-			})
-		}
-
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Channel to AMQP closed prematurely with error!"
-			k.Payload = err
-		})
-	}()
 
 	err = channel.ExchangeDeclare(
 		ExchangeName,
@@ -127,6 +162,25 @@ func init() {
 	})
 
 	go func() {
+		errors := make(chan *amqp.Error)
+
+		err, closed := <-channel.NotifyClose(errors)
+
+		if closed && err == nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+				k.Message = "AMQP closed on its own without an error!!!"
+			})
+		}
+
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Channel to AMQP closed prematurely with error!"
+			k.Payload = err
+		})
+	}()
+
+	go func() {
 		for {
 			chanAmqpDetails <- amqpDetails{
 				channel:           channel,
@@ -135,6 +189,8 @@ func init() {
 				deadLetterEnabled: deadLetterEnabled,
 				messageRetries:    messageRetries,
 				goroutines:        goroutines,
+
+				isTesting:         testingEnabled,
 			}
 		}
 	}()

@@ -45,6 +45,12 @@ const (
 	// EnvGoroutinesPerQueue for the number of goroutines to run
 	// per topic, defaults to 1
 	EnvGoroutinesPerQueue = `FLU_AMQP_GOROUTINES_PER_QUEUE`
+
+	// EnvTestMessages is a file to read from, separated by \r\n to
+	// read from to run an end to end test, then to die after
+	// receiving, should be set if the user is using the testing
+	// environment (`FLU_ENVIRONMENT` being set to "testing")
+	EnvTestMessages = `FLU_QUEUE_MESSAGES_FILE`
 )
 
 type Message struct {
@@ -85,12 +91,39 @@ func GetMessages(topic string, f func(message Message)) {
 		deadLetterEnabled = amqpDetails.deadLetterEnabled
 		messageRetries    = amqpDetails.messageRetries
 		goroutines        = amqpDetails.goroutines
+
+		isTesting    = amqpDetails.isTesting
+		testMessages = amqpDetails.testMessages
 	)
 
 	var (
 		consumerId = generateRandomConsumerId(workerId)
 		queueName  = fmt.Sprintf("%v.%v", topic, workerId)
 	)
+
+	// we don't consume from the queue if we're in testing mode
+
+	if isTesting {
+		for {
+			select {
+			case message := <-testMessages:
+				handleFakeMessage(workerId, topic, message, f)
+
+			default:
+				// assume we're done (no more messages) and return
+				break
+			}
+		}
+
+		// exit if we're done handling fake messages
+
+		return
+	}
+
+	// have an internalQueue that processes messages to support
+	// incoming messages with the concurrency optionally enabled
+
+	internalQueue := make(chan amqp.Delivery)
 
 	messages, err := queueConsume(
 		queueName,
@@ -117,90 +150,104 @@ func GetMessages(topic string, f func(message Message)) {
 		})
 	}
 
-	// have an internalQueue that processes messages to support
-	// incoming ones with the concurrency optionally enabled
-
-	internalQueue := make(chan amqp.Delivery)
-
 	for i := 0; i < goroutines; i++ {
 		go func() {
 			for message := range internalQueue {
-				var (
-					deliveryTag = message.DeliveryTag
-					body        = message.Body
-					routingKey  = message.RoutingKey
-				)
-
-				bodyBuf := bytes.NewBuffer(body)
-
-				// risk of a collision is near 0 enough to be ignored.
-
-				retryKey := fmt.Sprintf(
-					"worker.%#v.retry.%#v.%#v",
+				handleRealMessage(
 					workerId,
-					topic,
-					util.GetB16Hash(body),
+					message,
+					messageRetries,
+					deadLetterEnabled,
+					channel,
+					f,
 				)
-
-				if deadLetterEnabled {
-					retryCount := state.Incr(retryKey)
-
-					state.Expire(retryKey, 86400) // 24 hours
-
-					// the number of retries exceeds the max retry count! giving up!
-
-					if int(retryCount) >= messageRetries {
-
-						queueNackDeliveryTag(channel, deliveryTag)
-
-						state.Del(retryKey)
-
-						continue
-					}
-				}
-
-				f(Message{
-					Topic:   routingKey,
-					Content: bodyBuf,
-				})
-
-				log.Debugf(
-					"Asking the server to ack the receipt of %v!",
-					deliveryTag,
-				)
-
-				if err := queueAckDeliveryTag(channel, deliveryTag); err != nil {
-					log.Fatal(func(k *log.Log) {
-						k.Context = Context
-
-						k.Format(
-							"Failed to ack a message with tag %#v!",
-							deliveryTag,
-						)
-
-						k.Payload = err
-					})
-				}
-
-				log.Debugf(
-					"Server acked the reply for %v!",
-					deliveryTag,
-				)
-
-				// clean up the retry key
-
-				if deadLetterEnabled {
-					state.Del(retryKey)
-				}
 			}
 		}()
 	}
 
-	// send all incoming messages to the internal queue
-
 	for message := range messages {
 		internalQueue <- message
 	}
+}
+
+func handleRealMessage(workerId string, message amqp.Delivery, messageRetries int, deadLetterEnabled bool, channel *amqp.Channel, f func(message Message)) {
+	var (
+		deliveryTag = message.DeliveryTag
+		body        = message.Body
+		routingKey  = message.RoutingKey
+	)
+
+	bodyBuf := bytes.NewBuffer(body)
+
+	// risk of a collision is near 0 enough to be ignored.
+
+	// use the routing key here instead of
+	// the topic that was passed to start
+	// receiving
+
+	retryKey := fmt.Sprintf(
+		"worker.%#v.retry.%#v.%#v",
+		workerId,
+		routingKey,
+		util.GetB16Hash(body),
+	)
+
+	if deadLetterEnabled {
+		retryCount := state.Incr(retryKey)
+
+		state.Expire(retryKey, 86400) // 24 hours
+
+		// the number of retries exceeds the max retry count! giving up!
+
+		if int(retryCount) >= messageRetries {
+
+			queueNackDeliveryTag(channel, deliveryTag)
+
+			state.Del(retryKey)
+
+			return
+		}
+	}
+
+	f(Message{
+		Topic:   routingKey,
+		Content: bodyBuf,
+	})
+
+	log.Debugf(
+		"Asking the server to ack the receipt of %v for topic %#v!",
+		deliveryTag,
+		routingKey,
+	)
+
+	if err := queueAckDeliveryTag(channel, deliveryTag); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to ack a message with tag %#v!",
+				deliveryTag,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	log.Debugf(
+		"Server acked the reply for %v for topic %#v!",
+		deliveryTag,
+		routingKey,
+	)
+
+	// clean up the retry key
+
+	if deadLetterEnabled {
+		state.Del(retryKey)
+	}
+}
+
+func handleFakeMessage(workerId, topic string, message Message, f func(Message)) {
+
 }
 
 // SendMessage down a topic, with the JSON form of the content.

@@ -20,6 +20,12 @@ type amqpDetails struct {
 	deadLetterEnabled bool
 	messageRetries    int
 	goroutines        int
+
+	// isTesting, when set, if queueMessages is empty will just close
+	isTesting bool
+
+	// testMessages should only be written from when isTesting is set
+	testMessages chan Message
 }
 
 var chanAmqpDetails = make(chan amqpDetails)

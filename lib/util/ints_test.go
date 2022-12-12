@@ -5,7 +5,6 @@
 package util
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,23 +20,25 @@ func TestUintMin(t *testing.T) {
 	result1 := UintMin(left, right)
 	result2 := UintMin(right, left)
 
-	assert.Equal(t, want, result1,
-		fmt.Sprintf(
-			"UintMin(%v, %v) = %v, want match for %#v!",
-			left,
-			right,
-			result1,
-			want,
-		),
+	assert.Equalf(
+		t,
+		want,
+		result1,
+		"UintMin(%v, %v) = %v, want match for %#v!",
+		left,
+		right,
+		result1,
+		want,
 	)
 
-	assert.Equal(t, want, result2,
-		fmt.Sprintf(
-			"UintMin(%v, %v) = %v, want match for %#v!",
-			left,
-			right,
-			result2,
-			want,
-		),
+	assert.Equalf(
+		t,
+		want,
+		result2,
+		"UintMin(%v, %v) = %v, want match for %#v!",
+		left,
+		right,
+		result2,
+		want,
 	)
 }
