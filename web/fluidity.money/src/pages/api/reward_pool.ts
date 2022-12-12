@@ -1,15 +1,17 @@
-import { getEthTotalPrizePool } from "data/ethereum/prizePool";
+import { getEthTotalPrizePool, getTotalTransactions } from "data/ethereum";
 
 export type IPropPools = {
+	totalTransactions: number;
   ethPool: number;
   solPool: number;
 }
 
 const handler = async (req, res) =>  {
-  const ethPool: number = await getEthTotalPrizePool(process.env.FLU_ETH_RPC_HTTP)
+	const totalTransactions = await getTotalTransactions();
+  const ethPool: number = await getEthTotalPrizePool()
   const solPool: number = 0
 
-  res.status(200).json({ethPool, solPool})
+  res.status(200).json({totalTransactions, ethPool, solPool})
 }
 
 export default handler
