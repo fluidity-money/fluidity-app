@@ -251,6 +251,7 @@ main > footer > section > a {
   display: flex;
   flex-wrap: wrap;
   gap: 2em;
+  margin: 1em;
 }
 
 .transaction-filters {
@@ -1143,7 +1144,7 @@ main > footer > section > a {
   }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 1000px) {
   .totals-row {
     display: grid;
     grid-template-columns: 1fr 1fr;

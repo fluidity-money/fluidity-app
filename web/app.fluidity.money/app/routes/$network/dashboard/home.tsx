@@ -199,6 +199,7 @@ function ErrorBoundary(error: Error) {
 }
 
 const SAFE_DEFAULT: CacheData = {
+  totalPrizePool: 0,
   count: 0,
   network: "ethereum",
   transactions: [],
@@ -364,6 +365,7 @@ export default function Home() {
       ];
 
   const {
+    totalPrizePool,
     count,
     totalCount,
     rewards,
@@ -373,7 +375,7 @@ export default function Home() {
     fluidPairs,
     timestamp,
   } = useMemo(() => {
-    const { transactions, volume, rewards, totalFluidPairs, timestamp } =
+    const { transactions, volume, rewards, totalFluidPairs, timestamp, totalPrizePool } =
       activeTableFilterIndex ? data.user : data.global;
 
     const {
@@ -417,6 +419,7 @@ export default function Home() {
       graphTransformedTransactions,
       fluidPairs: totalFluidPairs,
       timestamp,
+      totalPrizePool,
     };
   }, [
     activeTableFilterIndex,
@@ -529,6 +532,61 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
+
+    {/* Prize Pool */}
+              <div className="statistics-set">
+                <Text>
+                  Prize Pool
+                </Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(totalPrizePool)}
+                </Display>
+              </div>
+
+              {/* Rewards */}
+              <div className="statistics-set">
+                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(
+                    rewards.find(
+                      ({ network: rewardNetwork }) => rewardNetwork === network
+                    )?.total_reward || 0
+                  )}
+                </Display>
+                <LinkButton
+                  size="medium"
+                  type="internal"
+                  handleClick={() => {
+                    navigate("../rewards");
+                  }}
+                >
+                  Rewards
+                </LinkButton>
+              </div>
+
+    </div>
+            <div className="totals-row">
+
+              <div className="statistics-set">
+                <Text>
+                  {activeTableFilterIndex ? "My" : "Total"} transactions
+                </Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {count}
+                </Display>
+                <AnchorButton>
+                  <a href="#transactions">Activity</a>
+                </AnchorButton>
+              </div>
               {/* Transactions Volume / Count */}
               <div className="statistics-set">
                 <Text>
@@ -556,30 +614,6 @@ export default function Home() {
                   </Display>
                 </div>
               )}
-
-              {/* Rewards */}
-              <div className="statistics-set">
-                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
-                <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {numberToMonetaryString(
-                    rewards.find(
-                      ({ network: rewardNetwork }) => rewardNetwork === network
-                    )?.total_reward || 0
-                  )}
-                </Display>
-                <LinkButton
-                  size="medium"
-                  type="internal"
-                  handleClick={() => {
-                    navigate("../rewards");
-                  }}
-                >
-                  Rewards
-                </LinkButton>
-              </div>
 
               {/* Fluid Pairs */}
               <div className="statistics-set">
