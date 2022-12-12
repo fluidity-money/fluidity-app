@@ -277,7 +277,7 @@ function App() {
                       })(window,document,"https://diffuser-cdn.app-us1.com/diffuser/diffuser.js","vgo");
                       vgo('setAccount', '612285146');
                       vgo('setTrackByDefault', true);
-                      vgo('process');`
+                      vgo('process');`,
                   }}
                 />
               </>

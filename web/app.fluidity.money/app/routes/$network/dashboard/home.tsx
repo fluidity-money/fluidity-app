@@ -375,8 +375,14 @@ export default function Home() {
     fluidPairs,
     timestamp,
   } = useMemo(() => {
-    const { transactions, volume, rewards, totalFluidPairs, timestamp, totalPrizePool } =
-      activeTableFilterIndex ? data.user : data.global;
+    const {
+      transactions,
+      volume,
+      rewards,
+      totalFluidPairs,
+      timestamp,
+      totalPrizePool,
+    } = activeTableFilterIndex ? data.user : data.global;
 
     const {
       day: dailyRewards,
@@ -532,12 +538,9 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
-
-    {/* Prize Pool */}
+              {/* Prize Pool */}
               <div className="statistics-set">
-                <Text>
-                  Prize Pool
-                </Text>
+                <Text>Prize Pool</Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
@@ -569,10 +572,8 @@ export default function Home() {
                   Rewards
                 </LinkButton>
               </div>
-
-    </div>
+            </div>
             <div className="totals-row">
-
               <div className="statistics-set">
                 <Text>
                   {activeTableFilterIndex ? "My" : "Total"} transactions

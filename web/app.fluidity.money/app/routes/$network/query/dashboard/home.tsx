@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const fluidPairs = config.config[network ?? ""].fluidAssets.length;
 
   const timestamp = new Date().getTime();
-  
+
   const mainnetId = 0;
   const infuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
 
@@ -40,24 +40,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const [
       totalPrizePool,
       { volume },
-      { data: rewardsData, errors: rewardsErr }
-    ] =
-      await Promise.all([
-        getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
-        address
-          ? jsonGet<{ address: string }, { volume: Volume[] }>(
-              `${url.origin}/${network}/query/volumeStats`,
-              {
-                address,
-              }
-            )
-          : jsonGet<Record<string, string>, { volume: Volume[] }>(
-              `${url.origin}/${network}/query/volumeStats`
-            ),
-        address
-          ? useUserYieldByAddress(network ?? "", address)
-          : useUserYieldAll(network ?? ""),
-      ]);
+      { data: rewardsData, errors: rewardsErr },
+    ] = await Promise.all([
+      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      address
+        ? jsonGet<{ address: string }, { volume: Volume[] }>(
+            `${url.origin}/${network}/query/volumeStats`,
+            {
+              address,
+            }
+          )
+        : jsonGet<Record<string, string>, { volume: Volume[] }>(
+            `${url.origin}/${network}/query/volumeStats`
+          ),
+      address
+        ? useUserYieldByAddress(network ?? "", address)
+        : useUserYieldAll(network ?? ""),
+    ]);
 
     if (!volume) {
       throw new Error("Could not fetch volume data");
