@@ -158,6 +158,8 @@ main {
 
 .fluidify-tokens-container {
   max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
 }
 
 .fluidify-tokens {

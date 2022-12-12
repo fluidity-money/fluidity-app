@@ -257,7 +257,7 @@ const EthereumFacade = ({
 
     return fluidTokenBalances.filter((token) => token[1]).map(([addr]) => addr);
   };
-
+  
   return (
     <FluidityFacadeContext.Provider
       value={{

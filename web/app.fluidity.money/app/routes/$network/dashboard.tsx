@@ -407,7 +407,7 @@ export default function Dashboard() {
           </div>
 
           {/* Navigation Buttons */}
-          <div>
+          <div id="top-navbar-right">
             {/* Send */}
             {/*
             <GeneralButton
@@ -438,7 +438,7 @@ export default function Dashboard() {
             {!isMobile && (
               <GeneralButton
                 className="rainbow"
-                version={"transparent"}
+                version={"secondary"}
                 buttontype="text"
                 size={"small"}
                 handleClick={() => navigate("../fluidify")}

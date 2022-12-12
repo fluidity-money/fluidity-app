@@ -59,6 +59,11 @@ const SwapCompleteModal = ({
     visible: { opacity: 1, transition: { duration: 1.5 } },
     hidden: { opacity: 0 },
   };
+  
+  // Set Timeout in case Video does not load
+  useEffect(() => {
+    setTimeout(() => setPlayVideo(false), 15 * 1000);
+  }, [])
 
   return (
     <Modal visible={visible}>
@@ -182,17 +187,13 @@ const SwapCompleteModal = ({
                 GO TO DASHBOARD
               </GeneralButton>
             </Link>
-            <Link to="..">
-              <LinkButton
-                type="internal"
-                size="medium"
-                handleClick={() => {
-                  return;
-                }}
-              >
-                FLUIDIFY MORE ASSETS
-              </LinkButton>
-            </Link>
+            <LinkButton
+              type="internal"
+              size="medium"
+              handleClick={() => close()}
+            >
+              FLUIDIFY MORE ASSETS
+            </LinkButton>
             <a
               href={getTxExplorerLink(network as Chain, txHash)}
               rel="noopener noreferrer"
