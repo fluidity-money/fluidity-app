@@ -63,9 +63,10 @@ const (
 
 func main() {
 	var (
+		contractAddress       = mustEthereumAddressFromEnv(EnvContractAddress)
+		chainlinkEthPriceFeed = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
+
 		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
-		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
-		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
@@ -75,11 +76,10 @@ func main() {
 		dbNetwork network.BlockchainNetwork
 	)
 
-
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
 	if err != nil {
-    log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to parse network from env"
 			k.Payload = err
 		})
@@ -118,9 +118,11 @@ func main() {
 		message.Decode(&hintedBlock)
 
 		// set the configuration using what's in the database for the block
-		log.Debug(func (k *log.Log) {
+
+		log.Debug(func(k *log.Log) {
 			k.Message = "About to fetch worker config from postgres!"
 		})
+
 		var (
 			workerConfig = worker_config.GetWorkerConfigEthereum(
 				dbNetwork,
@@ -279,7 +281,7 @@ func main() {
 		for _, transaction := range fluidTransactions {
 
 			var (
-				receipt     = transaction.Receipt
+				receipt = transaction.Receipt
 
 				transactionHash      = transaction.Transaction.Hash
 				transferType         = transaction.Transaction.Type
@@ -377,7 +379,7 @@ func main() {
 					appEmission      = transfer.AppEmissions
 				)
 
-				application := applications.ApplicationNone 
+				application := applications.ApplicationNone
 
 				if transfer.Decorator != nil {
 					applicationFeeUsd := transfer.Decorator.ApplicationFee

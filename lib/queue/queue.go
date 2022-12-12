@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
@@ -54,8 +53,9 @@ const (
 )
 
 type Message struct {
-	Topic   string    `json:"topic"`
-	Content io.Reader `json:"content"`
+	Topic       string
+	Content     *bytes.Buffer
+	deliveryTag uint64
 }
 
 func (message Message) Decode(decoded interface{}) {
@@ -92,7 +92,7 @@ func GetMessages(topic string, f func(message Message)) {
 		messageRetries    = amqpDetails.messageRetries
 		goroutines        = amqpDetails.goroutines
 
-		isTesting    = amqpDetails.isTesting
+		isTesting        = amqpDetails.isTesting
 		testMessages = amqpDetails.testMessages
 	)
 
@@ -101,59 +101,59 @@ func GetMessages(topic string, f func(message Message)) {
 		queueName  = fmt.Sprintf("%v.%v", topic, workerId)
 	)
 
-	// we don't consume from the queue if we're in testing mode
+	// sent all messages received to connected workers
+
+	var messages chan Message
+
+	// if we're in testing, we consume from a local file instead of the queue
 
 	if isTesting {
-		for {
-			select {
-			case message := <-testMessages:
-				handleFakeMessage(workerId, topic, message, f)
+		messages = testMessages
+	} else {
+		internalMessages, err := queueConsume(
+			queueName,
+			topic,
+			exchangeName,
+			consumerId,
+			channel,
+			deadLetterEnabled,
+		)
 
-			default:
-				// assume we're done (no more messages) and return
-				break
-			}
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Failed to start to consume queue %#v topic %#v, consumer id %#v, exchange %#v!",
+					queueName,
+					topic,
+					consumerId,
+					exchangeName,
+				)
+
+				k.Payload = err
+			})
 		}
 
-		// exit if we're done handling fake messages
+		messages = make(chan Message)
 
-		return
-	}
+		go func() {
+			for internalMessage := range internalMessages {
+				content := bytes.NewBuffer(internalMessage.Body)
 
-	// have an internalQueue that processes messages to support
-	// incoming messages with the concurrency optionally enabled
-
-	internalQueue := make(chan amqp.Delivery)
-
-	messages, err := queueConsume(
-		queueName,
-		topic,
-		exchangeName,
-		consumerId,
-		channel,
-		deadLetterEnabled,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to start to consume queue %#v topic %#v, consumer id %#v, exchange %#v!",
-				queueName,
-				topic,
-				consumerId,
-				exchangeName,
-			)
-
-			k.Payload = err
-		})
+				messages <- Message{
+					Topic:       internalMessage.RoutingKey,
+					Content:     content,
+					deliveryTag: internalMessage.DeliveryTag,
+				}
+			}
+		}()
 	}
 
 	for i := 0; i < goroutines; i++ {
 		go func() {
-			for message := range internalQueue {
-				handleRealMessage(
+			for message := range messages {
+				handleMessage(
 					workerId,
 					message,
 					messageRetries,
@@ -165,31 +165,35 @@ func GetMessages(topic string, f func(message Message)) {
 		}()
 	}
 
-	for message := range messages {
-		internalQueue <- message
+	// don't ever return here
+
+	dead := make(chan bool)
+
+	for range dead {
 	}
 }
 
-func handleRealMessage(workerId string, message amqp.Delivery, messageRetries int, deadLetterEnabled bool, channel *amqp.Channel, f func(message Message)) {
-	var (
-		deliveryTag = message.DeliveryTag
-		body        = message.Body
-		routingKey  = message.RoutingKey
-	)
-
-	bodyBuf := bytes.NewBuffer(body)
-
-	// risk of a collision is near 0 enough to be ignored.
+func handleMessage(workerId string, message Message, messageRetries int, deadLetterEnabled bool, channel *amqp.Channel, f func(message Message)) {
 
 	// use the routing key here instead of
 	// the topic that was passed to start
 	// receiving
 
+	// risk of a collision is near 0 enough to be ignored
+
+	var (
+		topic       = message.Topic
+		content     = message.Content
+		deliveryTag = message.deliveryTag
+	)
+
+	contentBytes := content.Bytes()
+
 	retryKey := fmt.Sprintf(
 		"worker.%#v.retry.%#v.%#v",
 		workerId,
-		routingKey,
-		util.GetB16Hash(body),
+		topic,
+		util.GetB16Hash(contentBytes),
 	)
 
 	if deadLetterEnabled {
@@ -209,15 +213,12 @@ func handleRealMessage(workerId string, message amqp.Delivery, messageRetries in
 		}
 	}
 
-	f(Message{
-		Topic:   routingKey,
-		Content: bodyBuf,
-	})
+	f(message)
 
 	log.Debugf(
 		"Asking the server to ack the receipt of %v for topic %#v!",
 		deliveryTag,
-		routingKey,
+		topic,
 	)
 
 	if err := queueAckDeliveryTag(channel, deliveryTag); err != nil {
@@ -236,7 +237,7 @@ func handleRealMessage(workerId string, message amqp.Delivery, messageRetries in
 	log.Debugf(
 		"Server acked the reply for %v for topic %#v!",
 		deliveryTag,
-		routingKey,
+		topic,
 	)
 
 	// clean up the retry key
@@ -244,10 +245,6 @@ func handleRealMessage(workerId string, message amqp.Delivery, messageRetries in
 	if deadLetterEnabled {
 		state.Del(retryKey)
 	}
-}
-
-func handleFakeMessage(workerId, topic string, message Message, f func(Message)) {
-
 }
 
 // SendMessage down a topic, with the JSON form of the content.
