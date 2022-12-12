@@ -15,7 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { json } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { MintAddress } from "~/types/MintAddress";
@@ -25,6 +25,7 @@ import {
   numberToMonetaryString,
   ManualCarousel,
   trimAddress,
+  LinkButton,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
@@ -198,14 +199,12 @@ export default function Rewards() {
             name: "WINNER",
           },
           {
-            name: "TIME",
+            name: "REWARDED TIME",
             alignRight: true,
           },
         ];
 
-  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
-    connected ? 1 : 0
-  );
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
   const txTableFilters = address
     ? [
@@ -524,6 +523,17 @@ export default function Rewards() {
 
           <div className="statistics-set">
             <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
+            <Link to={`/${network}/fluidify`}>
+              <LinkButton
+                size="medium"
+                type="internal"
+                handleClick={() => {
+                  return;
+                }}
+              >
+                Create Assets
+              </LinkButton>
+            </Link>
           </div>
         </div>
       </section>

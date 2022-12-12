@@ -19,7 +19,7 @@ import {
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useEffect, useMemo } from "react";
-import { useLoaderData, useNavigate, useFetcher } from "@remix-run/react";
+import { useLoaderData, useFetcher, Link } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -289,15 +289,11 @@ export default function Home() {
     })();
   }, [connected]);
 
-  const navigate = useNavigate();
-
   // Default to "Y" View
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
 
   // Default to "Global" View
-  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
-    connected ? 1 : 0
-  );
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
   // If connected, default to "My Dashboard" View
   useEffect(() => {
@@ -540,9 +536,11 @@ export default function Home() {
                 >
                   {count}
                 </Display>
-                <AnchorButton>
-                  <a href="#transactions">Activity</a>
-                </AnchorButton>
+                {!!count && (
+                  <AnchorButton>
+                    <a href="#transactions">Activity</a>
+                  </AnchorButton>
+                )}
               </div>
 
               {activeTableFilterIndex === 0 && (
@@ -570,15 +568,17 @@ export default function Home() {
                     )?.total_reward || 0
                   )}
                 </Display>
-                <LinkButton
-                  size="medium"
-                  type="internal"
-                  handleClick={() => {
-                    navigate("../rewards");
-                  }}
-                >
-                  Rewards
-                </LinkButton>
+                <Link to={`../rewards`}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Rewards
+                  </LinkButton>
+                </Link>
               </div>
 
               {/* Fluid Pairs */}
@@ -590,6 +590,17 @@ export default function Home() {
                 >
                   {fluidPairs}
                 </Display>
+                <Link to={`/${network}/fluidify`}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Create Assets
+                  </LinkButton>
+                </Link>
               </div>
             </div>
           </div>

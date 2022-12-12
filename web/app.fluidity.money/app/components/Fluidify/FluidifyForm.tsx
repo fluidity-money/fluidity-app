@@ -69,7 +69,9 @@ export const FluidifyForm = ({
   };
 
   const inputMaxBalance = () => {
-    setSwapInput(assetToken.userTokenBalance.toString());
+    return setSwapInput(
+      `${snapToValidValue(assetToken.userTokenBalance.toString())}`
+    );
   };
 
   const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
@@ -132,8 +134,12 @@ export const FluidifyForm = ({
           version={"transparent"}
           size="small"
           buttontype="text"
+          type={"button"}
           handleClick={inputMaxBalance}
-          disabled={assetToken.userTokenBalance.toString() === swapInput}
+          disabled={
+            !assetToken.userTokenBalance ||
+            assetToken.userTokenBalance.toString() === swapInput
+          }
         >
           max
         </GeneralButton>
