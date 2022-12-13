@@ -159,6 +159,13 @@ main > footer > section {
   width: 60vw;
 }
 
+@media only screen and (max-width: 850px) {
+  .fluidify-button-dashboard-mobile {
+    left: 50vw;
+    transform: translateX(-50%);
+  }
+}
+
 @keyframes rotate {
   100% {
     transform: rotate(1turn);
@@ -228,7 +235,7 @@ main > footer > section {
 }
 
 .rainbow:hover:focus::after {
-  background: #300d0b;
+  background: black;
 }
 
 .rainbow:hover::after {
@@ -252,6 +259,7 @@ main > footer > section > a {
   display: flex;
   flex-wrap: wrap;
   gap: 2em;
+  margin-bottom: 1em;
 }
 
 .transaction-filters {
@@ -1153,7 +1161,7 @@ main > footer > section > a {
   }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 1000px) {
   .totals-row {
     display: grid;
     grid-template-columns: 1fr 1fr;

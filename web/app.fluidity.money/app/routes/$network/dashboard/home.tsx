@@ -199,6 +199,7 @@ function ErrorBoundary(error: Error) {
 }
 
 const SAFE_DEFAULT: CacheData = {
+  totalPrizePool: 0,
   count: 0,
   network: "ethereum",
   transactions: [],
@@ -360,6 +361,7 @@ export default function Home() {
       ];
 
   const {
+    totalPrizePool,
     count,
     totalCount,
     rewards,
@@ -369,8 +371,14 @@ export default function Home() {
     fluidPairs,
     timestamp,
   } = useMemo(() => {
-    const { transactions, volume, rewards, totalFluidPairs, timestamp } =
-      activeTableFilterIndex ? data.user : data.global;
+    const {
+      transactions,
+      volume,
+      rewards,
+      totalFluidPairs,
+      timestamp,
+      totalPrizePool,
+    } = activeTableFilterIndex ? data.user : data.global;
 
     const {
       day: dailyRewards,
@@ -413,6 +421,7 @@ export default function Home() {
       graphTransformedTransactions,
       fluidPairs: totalFluidPairs,
       timestamp,
+      totalPrizePool,
     };
   }, [
     activeTableFilterIndex,
@@ -525,6 +534,42 @@ export default function Home() {
           {/* Statistics */}
           <div className="overlay">
             <div className="totals-row">
+              {/* Prize Pool */}
+              <div className="statistics-set">
+                <Text>Prize Pool</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(totalPrizePool)}
+                </Display>
+              </div>
+
+              {/* Rewards */}
+              <div className="statistics-set">
+                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(
+                    rewards.find(
+                      ({ network: rewardNetwork }) => rewardNetwork === network
+                    )?.total_reward || 0
+                  )}
+                </Display>
+                <Link to={"../rewards"}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {return}}
+                  >
+                    Rewards
+                  </LinkButton>
+                </Link>
+              </div>
+            </div>
+            <div className="totals-row">
               {/* Transactions Volume / Count */}
               <div className="statistics-set">
                 <Text>
@@ -555,32 +600,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Rewards */}
-              <div className="statistics-set">
-                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
-                <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {numberToMonetaryString(
-                    rewards.find(
-                      ({ network: rewardNetwork }) => rewardNetwork === network
-                    )?.total_reward || 0
-                  )}
-                </Display>
-                <Link to={`../rewards`}>
-                  <LinkButton
-                    size="medium"
-                    type="internal"
-                    handleClick={() => {
-                      return;
-                    }}
-                  >
-                    Rewards
-                  </LinkButton>
-                </Link>
-              </div>
-
               {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
@@ -606,17 +625,22 @@ export default function Home() {
           </div>
 
           {/* Graph Filter Row */}
-          <div>
-            {!isTablet && (
-              <Display
-                size={width < 1010 ? "xxs" : "xs"}
-                color="gray"
-                className="dashboard-identifier"
-              >
-                {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
-              </Display>
-            )}
-            <div className="statistics-row">
+          {!isTablet && (
+            <Display
+              size={width < 1010 ? "xxs" : "xs"}
+              color="gray"
+              className="dashboard-identifier"
+            >
+              {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
+            </Display>
+          )}
+
+
+        </div>
+
+        {/* Graph */}
+        <div className="graph" style={{ width: "100%", height: "400px" }}>
+            <div className="statistics-row pad-main">
               {graphTransformers.map((filter, i) => (
                 <button
                   key={`filter-${filter.name}`}
@@ -634,11 +658,6 @@ export default function Home() {
                 </button>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Graph */}
-        <div className="graph" style={{ width: "100%", height: "400px" }}>
           <LineChart
             data={graphTransformedTransactions.map((tx, i) => ({
               ...tx,
