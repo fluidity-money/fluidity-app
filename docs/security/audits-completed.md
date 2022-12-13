@@ -1,8 +1,6 @@
 # 📜 Audits completed
 
-{% embed url="https://docs.google.com/document/d/1iGwhnripHI8ZKrIX140fCQYcaquqitSH" %}
-Bramah Systems audit
-{% endembed %}
+Fluidity has been audited by multiple parties in order to secure our contracts and our systems.
 
 Verilog Solutions (audit completed, link coming soon)embedem
 
@@ -13,3 +11,9 @@ Hashlock audit
 {% embed url="https://www.verilog.solutions/audits/fluidity/" %}
 Verilog Solutions audit
 {% endembed %}
+
+{% embed url="https://docs.google.com/document/d/1iGwhnripHI8ZKrIX140fCQYcaquqitSH" %}
+Bramah Systems audit
+{% endembed %}
+
+
