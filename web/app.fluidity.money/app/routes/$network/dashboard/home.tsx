@@ -574,20 +574,6 @@ export default function Home() {
               </div>
             </div>
             <div className="totals-row">
-              <div className="statistics-set">
-                <Text>
-                  {activeTableFilterIndex ? "My" : "Total"} transactions
-                </Text>
-                <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {count}
-                </Display>
-                <AnchorButton>
-                  <a href="#transactions">Activity</a>
-                </AnchorButton>
-              </div>
               {/* Transactions Volume / Count */}
               <div className="statistics-set">
                 <Text>
@@ -630,17 +616,22 @@ export default function Home() {
           </div>
 
           {/* Graph Filter Row */}
-          <div>
-            {!isTablet && (
-              <Display
-                size={width < 1010 ? "xxs" : "xs"}
-                color="gray"
-                className="dashboard-identifier"
-              >
-                {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
-              </Display>
-            )}
-            <div className="statistics-row">
+          {!isTablet && (
+            <Display
+              size={width < 1010 ? "xxs" : "xs"}
+              color="gray"
+              className="dashboard-identifier"
+            >
+              {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
+            </Display>
+          )}
+
+
+        </div>
+
+        {/* Graph */}
+        <div className="graph" style={{ width: "100%", height: "400px" }}>
+            <div className="statistics-row pad-main">
               {graphTransformers.map((filter, i) => (
                 <button
                   key={`filter-${filter.name}`}
@@ -658,11 +649,6 @@ export default function Home() {
                 </button>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Graph */}
-        <div className="graph" style={{ width: "100%", height: "400px" }}>
           <LineChart
             data={graphTransformedTransactions.map((tx, i) => ({
               ...tx,

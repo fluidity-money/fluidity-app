@@ -251,7 +251,7 @@ main > footer > section > a {
   display: flex;
   flex-wrap: wrap;
   gap: 2em;
-  margin: 1em;
+  margin-bottom: 1em;
 }
 
 .transaction-filters {
