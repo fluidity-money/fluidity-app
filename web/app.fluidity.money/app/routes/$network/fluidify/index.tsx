@@ -114,7 +114,7 @@ export default function FluidifyToken() {
 
   // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
-
+  
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
   // Destination token
@@ -500,28 +500,34 @@ export default function FluidifyToken() {
                       />
                     </div>
                   ) : (
-                    <Draggable
+                    <div
+                      onClick={() => {
+                        setAssetToken(token);
+                      }}
                       key={`tok-${symbol}`}
-                      type={isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET}
-                      dragItem={token}
                     >
-                      <FluidifyCard
-                        key={symbol}
-                        fluid={isFluidOf !== undefined}
-                        symbol={symbol}
-                        name={name}
-                        logo={logo}
-                        address={address}
-                        mintCapPercentage={
-                          !!userMintLimit && userMintedAmt !== undefined
-                            ? userMintedAmt / userMintLimit
-                            : undefined
-                        }
-                        color={colors[symbol]}
-                        amount={userTokenBalance}
-                        addToken={handleAddToken}
-                      />
-                    </Draggable>
+                      <Draggable
+                        type={isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET}
+                        dragItem={token}
+                      >
+                        <FluidifyCard
+                          key={symbol}
+                          fluid={isFluidOf !== undefined}
+                          symbol={symbol}
+                          name={name}
+                          logo={logo}
+                          address={address}
+                          mintCapPercentage={
+                            !!userMintLimit && userMintedAmt !== undefined
+                              ? userMintedAmt / userMintLimit
+                              : undefined
+                          }
+                          color={colors[symbol]}
+                          amount={userTokenBalance}
+                          addToken={handleAddToken}
+                        />
+                      </Draggable>
+                    </div>
                   );
                 })}
                 {isTablet && (
