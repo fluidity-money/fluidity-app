@@ -533,7 +533,6 @@ export default function Home() {
         <div className="graph-ceiling pad-main">
           {/* Statistics */}
           <div className="overlay">
-
             {/* Row 1 */}
             <div className="totals-row">
               {/* Rewards */}
@@ -553,7 +552,9 @@ export default function Home() {
                   <LinkButton
                     size="medium"
                     type="internal"
-                    handleClick={() => {return}}
+                    handleClick={() => {
+                      return;
+                    }}
                   >
                     Rewards
                   </LinkButton>
@@ -638,30 +639,28 @@ export default function Home() {
               {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
             </Display>
           )}
-
-
         </div>
 
         {/* Graph */}
         <div className="graph" style={{ width: "100%", height: "400px" }}>
-            <div className="statistics-row pad-main">
-              {graphTransformers.map((filter, i) => (
-                <button
-                  key={`filter-${filter.name}`}
-                  onClick={() => setActiveTransformerIndex(i)}
+          <div className="statistics-row pad-main">
+            {graphTransformers.map((filter, i) => (
+              <button
+                key={`filter-${filter.name}`}
+                onClick={() => setActiveTransformerIndex(i)}
+              >
+                <Text
+                  size="lg"
+                  prominent={activeTransformerIndex === i}
+                  className={
+                    activeTransformerIndex === i ? "active-filter" : ""
+                  }
                 >
-                  <Text
-                    size="lg"
-                    prominent={activeTransformerIndex === i}
-                    className={
-                      activeTransformerIndex === i ? "active-filter" : ""
-                    }
-                  >
-                    {filter.name}
-                  </Text>
-                </button>
-              ))}
-            </div>
+                  {filter.name}
+                </Text>
+              </button>
+            ))}
+          </div>
           <LineChart
             data={graphTransformedTransactions.map((tx, i) => ({
               ...tx,

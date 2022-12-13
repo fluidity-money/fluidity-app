@@ -80,11 +80,13 @@ export default function FluidifyToken() {
     network: network,
   };
 
-
-  const { tokens: tokens_, colors } = useMemo(() => ({
-    ...defaultData,
-    ...loaderData,
-  }), [loaderData]);
+  const { tokens: tokens_, colors } = useMemo(
+    () => ({
+      ...defaultData,
+      ...loaderData,
+    }),
+    [loaderData]
+  );
 
   const {
     address,
