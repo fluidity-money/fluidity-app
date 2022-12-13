@@ -8,3 +8,6 @@ Resources:
           ContainerName: {{ CONFIG.SERVICE_NAME }}
           ContainerPort: 80
         PlatformVersion: "LATEST"
+
+Hooks:
+  - AfterAllowTraffic: "arn:aws:lambda:ap-southeast-2:802019692967:function:ecs-cloudflare-purge-cache-staging-purge-cache"  
