@@ -235,7 +235,7 @@ main > footer > section {
 }
 
 .rainbow:hover:focus::after {
-  background: #300d0b;
+  background: black;
 }
 
 .rainbow:hover::after {
