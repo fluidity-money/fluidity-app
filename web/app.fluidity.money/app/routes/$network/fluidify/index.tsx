@@ -80,7 +80,10 @@ export default function FluidifyToken() {
     network: network,
   };
 
-  const { tokens: tokens_, colors } = loaderData || defaultData;
+  const { tokens: tokens_, colors } = {
+    ...defaultData,
+    ...loaderData,
+  };
 
   const {
     address,
@@ -195,8 +198,7 @@ export default function FluidifyToken() {
               )
             );
 
-            return setTokens(_ =>
-              tokens_.map((token, i) => ({
+            return setTokens(tokens_.map((token, i) => ({
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
@@ -209,8 +211,7 @@ export default function FluidifyToken() {
               tokens.map(async ({ address }) => (await balance?.(address)) || 0)
             );
 
-            return setTokens(_ =>
-              tokens.map((token, i) => ({
+            return setTokens(tokens.map((token, i) => ({
                 ...token,
                 userTokenBalance: userTokenBalance[i],
               }))
@@ -222,8 +223,7 @@ export default function FluidifyToken() {
       return;
     }
 
-    return setTokens(_ =>
-      tokens_.map((token) => ({
+    return setTokens(tokens_.map((token) => ({
         ...token,
         userTokenBalance: 0,
       }))
