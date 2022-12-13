@@ -75,6 +75,9 @@ func init() {
 	// properly) and if the file is given that includes fake messages to send
 	// then read each message from the file and send it out
 
+	// also buffer any outgoing messages to allow them to be requested
+	// by any testing users, only recording them if they're not empty
+
 	// will die if it fails to get any fake messages from the env
 
 	if testingEnabled {
@@ -94,14 +97,37 @@ func init() {
 		}
 
 		go func() {
+			// sentMessages to buffer in a queue to send to
+			// any clients that want them
+
+			sentMessages := make([]string, 0)
+
 			for {
-				chanAmqpDetails <- amqpDetails{
-					exchangeName:   ExchangeName,
-					workerId:       workerId,
-					messageRetries: messageRetries,
-					goroutines:     goroutines,
-					isTesting:      testingEnabled,
-					testMessages:   testMessagesOutgoing,
+				select {
+				case message := <-chanDebugSentMessages:
+					var (
+						outgoing              = message.outgoing
+						chanSentMessages = message.chanSentMessages
+					)
+
+					if outgoing != "" {
+						sentMessages = append(sentMessages, outgoing)
+					}
+
+					if sentMessages != nil {
+						chanSentMessages <- sentMessages
+						sentMessages = make([]string, 0)
+					}
+
+				default:
+					chanAmqpDetails <- amqpDetails{
+						exchangeName:   ExchangeName,
+						workerId:       workerId,
+						messageRetries: messageRetries,
+						goroutines:     goroutines,
+						isTesting:      testingEnabled,
+						testMessages:   testMessagesOutgoing,
+					}
 				}
 			}
 		}()
@@ -190,7 +216,7 @@ func init() {
 				messageRetries:    messageRetries,
 				goroutines:        goroutines,
 
-				isTesting:         testingEnabled,
+				isTesting: testingEnabled,
 			}
 		}
 	}()

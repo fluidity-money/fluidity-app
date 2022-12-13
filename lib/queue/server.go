@@ -13,22 +13,41 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type amqpDetails struct {
-	channel           *amqp.Channel
-	exchangeName      string
-	workerId          string
-	deadLetterEnabled bool
-	messageRetries    int
-	goroutines        int
+type (
+	// amqpDetails to send every time a client requests it from the
+	// server
+	amqpDetails struct {
+		channel           *amqp.Channel
+		exchangeName      string
+		workerId          string
+		deadLetterEnabled bool
+		messageRetries    int
+		goroutines        int
 
-	// isTesting, when set, if queueMessages is empty will just close
-	isTesting bool
+		// isTesting, when set, if queueMessages is empty will just close
+		isTesting bool
 
-	// testMessages should only be written from when isTesting is set
-	testMessages chan Message
-}
+		// testMessages should only be written from when isTesting is set
+		testMessages chan Message
+	}
 
-var chanAmqpDetails = make(chan amqpDetails)
+	// debugMessage clients can send to either send messages to be
+	// sent themselves or to request the buildup
+	debugSentMessage struct {
+		outgoing         string
+		chanSentMessages chan []string
+	}
+)
+
+var (
+	// chanAmqpDetails to use to reply to clients asking about the
+	// state of the connection
+	chanAmqpDetails = make(chan amqpDetails)
+
+	// chanDebugSentMessages to use to request the sent messages that
+	// were saved if we're in debug mode
+	chanDebugSentMessages = make(chan debugSentMessage)
+)
 
 func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel, deadLetterEnabled bool) (<-chan amqp.Delivery, error) {
 

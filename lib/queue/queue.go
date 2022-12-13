@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/fluidity-money/fluidity-app/lib"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -92,7 +93,7 @@ func GetMessages(topic string, f func(message Message)) {
 		messageRetries    = amqpDetails.messageRetries
 		goroutines        = amqpDetails.goroutines
 
-		isTesting        = amqpDetails.isTesting
+		isTesting    = amqpDetails.isTesting
 		testMessages = amqpDetails.testMessages
 	)
 
@@ -174,10 +175,6 @@ func GetMessages(topic string, f func(message Message)) {
 }
 
 func handleMessage(workerId string, message Message, messageRetries int, deadLetterEnabled bool, channel *amqp.Channel, f func(message Message)) {
-
-	// use the routing key here instead of
-	// the topic that was passed to start
-	// receiving
 
 	// risk of a collision is near 0 enough to be ignored
 
@@ -261,6 +258,13 @@ func SendMessage(topic string, content interface{}) {
 	SendMessageBytes(topic, contentBytes)
 }
 
+// bufferSentMessage to be consumed later by a testing user
+func bufferSentMessage(content []byte) {
+	chanDebugSentMessages <- debugSentMessage{
+		outgoing: string(content),
+	}
+}
+
 // SendMessageBytes down a topic, with bytes as content
 func SendMessageBytes(topic string, content []byte) {
 	log.Debugf("Starting to send a publish request to the sending goroutine.")
@@ -270,7 +274,16 @@ func SendMessageBytes(topic string, content []byte) {
 	var (
 		channel      = amqpDetails.channel
 		exchangeName = amqpDetails.exchangeName
+		isTesting    = amqpDetails.isTesting
 	)
+
+	// buffer messages in an internal buffer that clients can drain
+	// from when they're in testing mode
+
+	if isTesting {
+		bufferSentMessage(content)
+		return
+	}
 
 	err := queuePublish(topic, exchangeName, content, channel)
 
@@ -290,6 +303,21 @@ func SendMessageBytes(topic string, content []byte) {
 	}
 
 	log.Debugf("Sending goroutine has received the request!")
+}
+
+// DebugGetBufferedMessages by asking the server for what's been collected so far
+func DebugGetBufferedMessages() []string {
+	if !microservice_lib.IsTesting() {
+		panic("Not in testing mode!")
+	}
+
+	chanSentMessages := make(chan []string)
+
+	chanDebugSentMessages <- debugSentMessage{
+		chanSentMessages: chanSentMessages,
+	}
+
+	return <-chanSentMessages
 }
 
 // Finish up, by clearing the buffer
