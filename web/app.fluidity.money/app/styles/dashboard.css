@@ -258,7 +258,6 @@ main > footer > section > a {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  flex-direction: row-reverse;
 }
 
 .active-filter {
