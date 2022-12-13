@@ -1,6 +1,6 @@
 # 📜 Audits completed
 
-Fluidity has been audited by multiple parties in order to ensure the security our contracts and our systems.
+Fluidity has been audited by multiple parties in order to ensure the security of our contracts and our systems.
 
 {% embed url="https://www.verilog.solutions/audits/fluidity/" %}
 Verilog Solutions audit
