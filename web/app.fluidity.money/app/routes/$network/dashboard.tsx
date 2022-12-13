@@ -433,7 +433,7 @@ export default function Dashboard() {
               Recieve
             </GeneralButton>
             */}
-            
+
             {/* Prize Money */}
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
