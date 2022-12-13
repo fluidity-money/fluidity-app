@@ -533,23 +533,14 @@ export default function Home() {
         <div className="graph-ceiling pad-main">
           {/* Statistics */}
           <div className="overlay">
-            <div className="totals-row">
-              {/* Prize Pool */}
-              <div className="statistics-set">
-                <Text>Prize Pool</Text>
-                <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {numberToMonetaryString(totalPrizePool)}
-                </Display>
-              </div>
 
+            {/* Row 1 */}
+            <div className="totals-row">
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(
@@ -568,7 +559,20 @@ export default function Home() {
                   </LinkButton>
                 </Link>
               </div>
+
+              {/* Prize Pool */}
+              <div className="statistics-set">
+                <Text>Prize Pool</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(totalPrizePool)}
+                </Display>
+              </div>
             </div>
+
+            {/* Row 2 */}
             <div className="totals-row">
               {/* Transactions Volume / Count */}
               <div className="statistics-set">
@@ -576,7 +580,7 @@ export default function Home() {
                   {activeTableFilterIndex ? "My" : "Total"} transactions
                 </Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {count}
@@ -592,7 +596,7 @@ export default function Home() {
                 <div className="statistics-set">
                   <Text>Total volume</Text>
                   <Display
-                    size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                    size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                     style={{ margin: 0 }}
                   >
                     {numberToMonetaryString(volume)}
@@ -604,7 +608,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {fluidPairs}
