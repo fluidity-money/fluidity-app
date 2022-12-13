@@ -14,6 +14,7 @@ import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
+import { useMemo } from "react";
 
 interface Reward {
   token: string;
@@ -56,10 +57,11 @@ const RewardsBackground = () => {
     }
   };
 
-  const carouselInfo = (
-    <div>
+  const CarouselInfo = () => {
+    return <div>
       {rewards
         .slice(0, rewardLimit)
+        .sort(() => Math.random() - 0.5)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
             <a
@@ -91,7 +93,7 @@ const RewardsBackground = () => {
           </div>
         ))}
     </div>
-  );
+  }
 
   return (
     <div className={styles.container}>
@@ -106,7 +108,7 @@ const RewardsBackground = () => {
               transition={{ type: "tween", duration: 5 }}
             >
               <ContinuousCarousel background={true} direction="right">
-                {carouselInfo}
+                <CarouselInfo />
               </ContinuousCarousel>
             </motion.div>
             <motion.div
@@ -116,7 +118,7 @@ const RewardsBackground = () => {
               transition={{ type: "tween", duration: 5 }}
             >
               <ContinuousCarousel background={true} direction="left">
-                {carouselInfo}
+                <CarouselInfo />
               </ContinuousCarousel>
             </motion.div>
           </>
