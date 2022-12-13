@@ -80,11 +80,13 @@ export default function FluidifyToken() {
     network: network,
   };
 
-
-  const { tokens: tokens_, colors } = useMemo(() => ({
-    ...defaultData,
-    ...loaderData,
-  }), [loaderData]);
+  const { tokens: tokens_, colors } = useMemo(
+    () => ({
+      ...defaultData,
+      ...loaderData,
+    }),
+    [loaderData]
+  );
 
   const {
     address,
@@ -114,7 +116,7 @@ export default function FluidifyToken() {
 
   // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
-  
+
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
   // Destination token
@@ -507,7 +509,9 @@ export default function FluidifyToken() {
                       key={`tok-${symbol}`}
                     >
                       <Draggable
-                        type={isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET}
+                        type={
+                          isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET
+                        }
                         dragItem={token}
                       >
                         <FluidifyCard

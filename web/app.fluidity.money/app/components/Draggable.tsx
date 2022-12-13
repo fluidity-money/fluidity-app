@@ -19,11 +19,7 @@ const Draggable = (props: Props) => {
     };
   }, [dragItem])[1];
 
-  return (
-    <div ref={drag}>
-      {children}
-    </div>
-  );
+  return <div ref={drag}>{children}</div>;
 };
 
 export default Draggable;
