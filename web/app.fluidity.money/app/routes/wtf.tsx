@@ -2,7 +2,12 @@ import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics
 
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
-import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import {
+  json,
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
 import { format } from "date-fns";
@@ -91,16 +96,14 @@ export const loader: LoaderFunction = async () => {
   });
 };
 
-export const meta: MetaFunction = ({
-  location,
-}) => {
-  const reActionQuery = /action=[\w]*/
+export const meta: MetaFunction = ({ location }) => {
+  const reActionQuery = /action=[\w]*/;
   const queryString = location.search;
   const actionString = queryString.match(reActionQuery)?.[0];
   const action = actionString?.split("=")[1];
 
-  return generateMeta(action ?? "")};
-
+  return generateMeta(action ?? "");
+};
 
 type WinnerWinnings = {
   [Address: string]: {
