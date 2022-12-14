@@ -12,7 +12,6 @@ export type LargestDailyWinner = {
     awarded_day: string;
     token_short_name: string;
     winning_amount_scaled: number;
-    winning_amount: number;
 }
 
 export type LargestMonthlyWinnersRes = {
@@ -28,7 +27,6 @@ query HighestRewards($network: network_blockchain!) {
     awarded_day
     token_short_name
     winning_amount_scaled
-    winning_amount
   }
 }
 `;

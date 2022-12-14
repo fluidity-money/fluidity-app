@@ -108,7 +108,7 @@ const RewardsStats = ({ changeScreen, rewardPools}: IProps) => {
               lineLabel='dailyWinnings'
               accessors={{
                 xAccessor: (w: LargestDailyWinner) => w.awarded_day,
-                yAccessor: (w: LargestDailyWinner) => w.winning_amount,
+                yAccessor: (w: LargestDailyWinner) => w.winning_amount_scaled * 1000000 + 1,
               }}
               renderTooltip={({datum}: {datum: DailyWinner}) => {
                 return (

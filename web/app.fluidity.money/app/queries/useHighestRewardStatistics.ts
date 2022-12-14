@@ -29,7 +29,6 @@ const queryAll = gql`
       awarded_day
       token_short_name
       winning_amount_scaled
-      winning_amount
     }
     highest_reward_winner_totals {
       network
@@ -47,7 +46,6 @@ export type HighestRewardMonthly = {
   awarded_day: string;
   token_short_name: string;
   winning_amount_scaled: number;
-  winning_amount: number
 };
 
 export type HighestRewardWinnerTotal = {
