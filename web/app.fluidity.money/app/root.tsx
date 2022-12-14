@@ -106,6 +106,9 @@ export const meta: MetaFunction<LoaderData> = ({
   description:
     "Fluidity is a platform for getting more utility out of your crypto assets.",
   viewport: "width=device-width,initial-scale=1",
+  "og:image": "https://static.fluidity.money/img/FluidShare.png",
+  "og:site_name": "Fluidity Money",
+
   "fluidity:version": gitSha,
   "fluidity:environment": isProduction
     ? "production"
