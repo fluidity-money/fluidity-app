@@ -433,7 +433,7 @@ export default function Dashboard() {
               Recieve
             </GeneralButton>
             */}
-            
+
             {/* Prize Money */}
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
@@ -499,7 +499,7 @@ export default function Dashboard() {
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
         >
-          <Heading as="h6">
+          <Heading as="h5">
             <b>Fluidify Money</b>
           </Heading>
         </GeneralButton>

@@ -159,6 +159,22 @@ main > footer > section {
   width: 60vw;
 }
 
+.fluidify-button-dashboard-mobile > h5 {
+  margin: 0;
+}
+
+.fluidify-button-dashboard-mobile:hover > h5 {
+  color: black;
+}
+
+@media only screen and (max-width: 850px) {
+  .fluidify-button-dashboard-mobile {
+    bottom: 3vh;
+    left: 50vw;
+    transform: translateX(-50%);
+  }
+}
+
 @keyframes rotate {
   100% {
     transform: rotate(1turn);
@@ -171,11 +187,6 @@ main > footer > section {
   overflow: hidden;
   font-size: 15px;
   box-shadow: 0 0 8px 2px #f3b8d8;
-}
-
-.rainbow > h6 {
-  margin: 0;
-  font-size: 15px;
 }
 
 .rainbow::before {
@@ -228,7 +239,7 @@ main > footer > section {
 }
 
 .rainbow:hover:focus::after {
-  background: #300d0b;
+  background: black;
 }
 
 .rainbow:hover::after {
@@ -252,6 +263,7 @@ main > footer > section > a {
   display: flex;
   flex-wrap: wrap;
   gap: 2em;
+  margin-bottom: 1em;
 }
 
 .transaction-filters {
@@ -1153,7 +1165,7 @@ main > footer > section > a {
   }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 1000px) {
   .totals-row {
     display: grid;
     grid-template-columns: 1fr 1fr;

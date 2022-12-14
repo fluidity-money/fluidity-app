@@ -3,6 +3,8 @@ SERVICES:
       SERVICE_NAME: fluidity-money-app
       DOCKER_IMAGE: app.fluidity.money-frontend
       DOCKERFILE_PATH: ./web/app.fluidity.money
+      CPU_LIMIT: 512
+      MEM_LIMIT: 1024
       DEPLOYMENT_TYPE: CODEDEPLOY
       CODEDEPLOY_WAIT_TIME: 30 #minutes
       LOAD_BALANCER: flu-dev-app-fluidity-alb
