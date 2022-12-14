@@ -4,8 +4,6 @@ SERVICES:
       DOCKER_IMAGE: fluidity.money-frontend
       DOCKERFILE_PATH: ./web/fluidity.money
       TARGET_GROUP: flu-dev-fluidity-fe-tg
-      CPU_LIMIT: 1024
-      MEM_LIMIT: 2048
       SECRET_FLU_HASURA_KEY: /fluidity/hasura/key
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
 
