@@ -25,6 +25,7 @@ import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
+import { generateTweet } from "~/util/tweeter";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -115,21 +116,6 @@ const NetworkPage = () => {
     // stop modal pop-up if connected
     connected && setWalletModalVisibility(false);
   }, [connected]);
-
-  const generateTweet = () => {
-    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
-
-    // const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
-
-    const tweetMsg = `Fluidify your money with Fluidity`;
-
-    twitterUrl.searchParams.set("text", tweetMsg);
-    const fluTwitterHandle = `fluiditymoney`;
-
-    twitterUrl.searchParams.set("via", fluTwitterHandle);
-
-    return twitterUrl.href;
-  };
 
   return (
     <>
@@ -273,7 +259,7 @@ const NetworkPage = () => {
               </GeneralButton>
 
               <a
-                href={generateTweet()}
+                href={generateTweet(projectedWinnings)}
                 rel="noopener noreferrer"
                 target="_blank"
               >

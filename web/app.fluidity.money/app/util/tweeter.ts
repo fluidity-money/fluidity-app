@@ -1,8 +1,47 @@
 import { numberToMonetaryString } from "@fluidity-money/surfing";
 
+export const generateMeta = (action: string) => {
+  const basic = {
+    title: "Why Fluidify? - Fluidity Money",
+    description: "Fluidity is a protocol that rewards users for using their cryptocurrency.",
+
+    "twitter:card": "summary_large_image",
+    "twitter:site": "@fluiditymoney",
+    "twitter:title": "Why Fluidify? - Fluidity Money",
+    "twitter:description": "Fluidity is a protocol that rewards users for using their cryptocurrency.",
+    "twitter:image": "https://static.fluidity.money/img/FluidShare.png",
+
+    "og:title": "Why Fluidify?",
+    "og:description": "Fluidity is a protocol that rewards users for using their cryptocurrency.",
+    "og:url": "https://app.fluidity.money/wtf",
+    "og:type": "website"
+  };
+
+  switch (action) {
+    case "send":
+      return {
+        ...basic,
+        "twitter:image": "https://static.fluidity.money/img/FluidSend.png",
+        "og:image": "https://static.fluidity.money/img/FluidSend.png",
+        "og:url": "https://app.fluidity.money/wtf?action=send",
+      };
+
+    case "receive":
+      return {
+        ...basic,
+        "twitter:image": "https://static.fluidity.money/img/FluidRecv.png",
+        "og:image": "https://static.fluidity.money/img/FluidRecv.png",
+        "og:url": "https://app.fluidity.money/wtf?action=receive",
+      };
+
+    default:
+      return basic
+  }
+}
+
 export const generateTweet = (
-    reward: number,
-    action: "send" | "receive" | undefined,
+    reward: number | string,
+    action?: "send" | "receive" | "claim",
     extraHashtags: string[] = [],
 ) => {
     const inboundQueries: Record<string, string> = {
@@ -26,9 +65,29 @@ export const generateTweet = (
 
     const twitterUrl = new URL("https://twitter.com/intent/tweet");
 
-    tweetQueries["text"] = action ? 
-        `I just won ${numberToMonetaryString(reward)} for ${ action === "send" ? "sending" : "recieving" } crypto with Fluidity Money!` :
-        `I could have won ${numberToMonetaryString(reward)} for sending and recieving crypto with Fluidity Money!`;
+    if (!reward) return "";
+    
+    const formattedReward = typeof reward === "number"
+        ? numberToMonetaryString(reward)
+        : reward[0] === "$"
+        ? reward
+        : `$${reward}`
+
+    tweetQueries["text"] = (() => {
+        switch (action) {
+            case "claim":
+                return `I just redeemed ${formattedReward} for using crypto with Fluidity Money!`
+        
+            case "send":
+                return `I just won ${formattedReward} for sending crypto with Fluidity Money!`
+
+            case "receive":
+                return `I just won ${formattedReward} for recieving crypto with Fluidity Money!`
+
+            default:
+                return `I could have won ${formattedReward} for sending and recieving crypto with Fluidity Money!`;
+          }
+      })()
     
     tweetQueries["hashtags"] = [
         "fluiditymoney",
@@ -43,3 +102,4 @@ export const generateTweet = (
 
     return twitterUrl.href;
 };
+

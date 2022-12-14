@@ -1,11 +1,11 @@
-import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
+import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
 import { json, LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { getAddressExplorerLink, networkMapper } from "~/util";
 import {
   Display,
@@ -26,6 +26,7 @@ import Modal from "~/components/Modal";
 import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
+import { generateMeta } from "~/util/tweeter";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -48,7 +49,10 @@ export const loader: LoaderFunction = async () => {
     });
   }
 
-  const highestRewards = data.highest_rewards_monthly;
+  const highestRewards = data.highest_rewards_monthly.map((reward) => ({
+    ...reward,
+    awardedDate: new Date(reward.awarded_day),
+  }));
 
   if (!Object.keys(data.highest_reward_winner_totals).length) {
     return json({
@@ -87,6 +91,17 @@ export const loader: LoaderFunction = async () => {
   });
 };
 
+export const meta: MetaFunction = ({
+  location,
+}) => {
+  const reActionQuery = /action=[\w]*/
+  const queryString = location.search;
+  const actionString = queryString.match(reActionQuery)?.[0];
+  const action = actionString?.split("=")[1];
+
+  return generateMeta(action ?? "")};
+
+
 type WinnerWinnings = {
   [Address: string]: {
     network: string;
@@ -95,9 +110,14 @@ type WinnerWinnings = {
   };
 };
 
+type HighestRewards =
+  HighestRewardResponse["data"]["highest_rewards_monthly"][0] & {
+    awardedDate: Date;
+  };
+
 type LoaderData = {
   winnerTotals: WinnerWinnings;
-  highestRewards: HighestRewardMonthly[];
+  highestRewards: HighestRewards;
   highestWinner: {
     address: string;
     network: string;
@@ -271,44 +291,34 @@ export default function IndexPage() {
             style={{ width: "100%", height: "400px" }}
           >
             <LineChart
-              data={highestRewards.map(
-                (reward: HighestRewardMonthly, i: number) => ({
-                  ...reward,
-                  x: i,
-                })
-              )}
+              data={highestRewards}
               lineLabel="transactions"
               accessors={{
-                xAccessor: (d: HighestRewardMonthly & { x: number }) => d.x,
-                yAccessor: (d: HighestRewardMonthly) =>
-                  Math.log(d.winning_amount_scaled + 1),
+                xAccessor: (d: HighestRewards) => d.awardedDate,
+                yAccessor: (d: HighestRewards) => d.winning_amount_scaled,
               }}
-              renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => {
-                return (
-                  <div className={"graph-tooltip-container"}>
-                    <div className={"graph-tooltip"}>
-                      <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                        {format(parseISO(datum.awarded_day), "dd/MM/yy")}
-                      </span>
-                      <br />
-                      <br />
-                      <span>
-                        <span>{trimAddress(datum.winning_address)}</span>
-                      </span>
-                      <br />
-                      <br />
-                      <span>
-                        <span>
-                          {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
-                        </span>
-                        <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                          prize awarded
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                );
-              }}
+              renderTooltip={({ datum }: { datum: HighestRewards }) => (
+                <div className={"tooltip"}>
+                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                    {format(datum.awardedDate, "dd/mm/yy")}
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>{trimAddress(datum.winning_address)}</span>
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>
+                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                    </span>
+                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                      prize awarded
+                    </span>
+                  </span>
+                </div>
+              )}
             />
           </div>
         </div>
@@ -316,46 +326,5 @@ export default function IndexPage() {
     </>
   );
 }
-
-export const meta: MetaFunction = ({
-  params: { action }
-}) => {
-  const basic = {
-    title: "Why Fluidify? - Fluidity Money",
-    description: "Fluidity is a protocol that rewards users for using their cryptocurrency.",
-
-    "twitter:card": "summary_large_image",
-    "twitter:site": "@fluiditymoney",
-    "twitter:title": "Why Fluidify? - Fluidity Money",
-    "twitter:description": "Fluidity is a protocol that rewards users for using their cryptocurrency.",
-    "twitter:image": "https://static.fluidity.money/img/FluidShare.png",
-
-    "og:title": "Why Fluidify?",
-    "og:description": "Fluidity is a protocol that rewards users for using their cryptocurrency.",
-    "og:url": "https://app.fluidity.money/wtf",
-    "og:type": "website"
-  };
-
-  switch (action) {
-    case "send":
-      return {
-        ...basic,
-        "twitter:image": "https://static.fluidity.money/img/FluidSend.png",
-        "og:image": "https://static.fluidity.money/img/FluidSend.png",
-        "og:url": "https://app.fluidity.money/wtf?action=send",
-      };
-
-    case "receive":
-      return {
-        ...basic,
-        "twitter:image": "https://static.fluidity.money/img/FluidRecv.png",
-        "og:image": "https://static.fluidity.money/img/FluidRecv.png",
-        "og:url": "https://app.fluidity.money/wtf?action=receive",
-      };
-
-    default:
-      return basic
-  }
-};
 
 export { ErrorBoundary };
