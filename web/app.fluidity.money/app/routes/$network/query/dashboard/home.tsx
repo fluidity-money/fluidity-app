@@ -1,14 +1,18 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { Volume } from "../volumeStats";
-import type { Winner } from "~/queries/useUserRewards";
+import type { TimeSepUserYield } from "~/queries/useUserYield";
 
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { LoaderFunction, json } from "@remix-run/node";
+import { jsonGet } from "~/util";
+import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
+import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
+import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import config from "~/webapp.config.server";
-import { useUserRewardsAll, useUserRewardsByAddress } from "~/queries";
-import { jsonGet } from "~/util/api/rpc";
 
-export type HomeLoader = {
-  rewards: Winner[];
+export type HomeLoaderData = {
+  totalPrizePool: number;
+  rewards: TimeSepUserYield;
   volume: Volume[];
   totalFluidPairs: number;
   network: Chain;
@@ -25,23 +29,34 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const timestamp = new Date().getTime();
 
+  const mainnetId = 0;
+  const infuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
+
+  const provider = new JsonRpcProvider(infuraRpc);
+
+  const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
+
   try {
-    const [{ volume }, { data: rewardsData, errors: rewardsErr }] =
-      await Promise.all([
-        address
-          ? jsonGet<{ address: string }, { volume: Volume[] }>(
-              `${url.origin}/${network}/query/volumeStats`,
-              {
-                address,
-              }
-            )
-          : jsonGet<Record<string, string>, { volume: Volume[] }>(
-              `${url.origin}/${network}/query/volumeStats`
-            ),
-        address
-          ? useUserRewardsByAddress(network ?? "", address)
-          : useUserRewardsAll(network ?? ""),
-      ]);
+    const [
+      totalPrizePool,
+      { volume },
+      { data: rewardsData, errors: rewardsErr },
+    ] = await Promise.all([
+      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      address
+        ? jsonGet<{ address: string }, { volume: Volume[] }>(
+            `${url.origin}/${network}/query/volumeStats`,
+            {
+              address,
+            }
+          )
+        : jsonGet<Record<string, string>, { volume: Volume[] }>(
+            `${url.origin}/${network}/query/volumeStats`
+          ),
+      address
+        ? useUserYieldByAddress(network ?? "", address)
+        : useUserYieldAll(network ?? ""),
+    ]);
 
     if (!volume) {
       throw new Error("Could not fetch volume data");
@@ -52,12 +67,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     return json({
-      rewards: rewardsData.winners,
+      totalPrizePool,
+      rewards: rewardsData,
       volume: volume,
       totalFluidPairs: fluidPairs,
       network,
       timestamp,
-    } as HomeLoader);
+    } as HomeLoaderData);
   } catch (err) {
     console.log(err);
     throw new Error(`Could not fetch Transactions on ${network}: ${err}`);

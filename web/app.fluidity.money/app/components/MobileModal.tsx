@@ -11,6 +11,7 @@ import {
   Heading,
   BlockchainModal,
   Trophy,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
@@ -66,6 +67,11 @@ export default function MobileModal({
       ? (document.body.style.position = "static")
       : setTimeout(() => (document.body.style.position = "fixed"), 1000);
   }, [walletModalVisibility]);
+
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
 
   if (walletModalVisibility) {
     return (
@@ -151,7 +157,7 @@ export default function MobileModal({
                 }}
                 icon={<Trophy />}
               >
-                ${unclaimedRewards}
+                {numberToMonetaryString(unclaimedRewards)}
               </GeneralButton>
 
               <BurgerButton isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -261,7 +267,7 @@ export default function MobileModal({
                 <Text size="lg" prominent={true}>
                   Unclaimed $FLUID{" "}
                   <Heading as="h5" className="no-margin">
-                    {unclaimedFluid}
+                    {numberToMonetaryString(unclaimedFluid)}
                   </Heading>
                 </Text>
               </GeneralButton>

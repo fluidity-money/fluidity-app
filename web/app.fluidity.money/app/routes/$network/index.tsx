@@ -112,6 +112,7 @@ const NetworkPage = () => {
   }, [address]);
 
   useEffect(() => {
+    // stop modal pop-up if connected
     connected && setWalletModalVisibility(false);
   }, [connected]);
 

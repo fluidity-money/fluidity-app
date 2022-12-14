@@ -1,8 +1,8 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
-import type { HomeLoader } from "../query/dashboard/home";
-import type { TransactionsLoader } from "../query/userTransactions";
+import type { HomeLoaderData } from "../query/dashboard/home";
+import type { TransactionsLoaderData } from "../query/userTransactions";
 
 import { motion } from "framer-motion";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
@@ -18,8 +18,8 @@ import {
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
-import { useState, useContext, useEffect } from "react";
-import { useLoaderData, useNavigate, useFetcher } from "@remix-run/react";
+import { useState, useContext, useEffect, useMemo } from "react";
+import { useLoaderData, useFetcher, Link } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -178,10 +178,7 @@ type LoaderData = {
   network: Chain;
 };
 
-type CacheData = HomeLoader & {
-  transactions: Transaction[];
-  page: number;
-};
+type CacheData = HomeLoaderData & TransactionsLoaderData;
 
 function ErrorBoundary(error: Error) {
   console.log(error);
@@ -202,9 +199,17 @@ function ErrorBoundary(error: Error) {
 }
 
 const SAFE_DEFAULT: CacheData = {
+  totalPrizePool: 0,
+  count: 0,
   network: "ethereum",
   transactions: [],
-  rewards: [],
+  rewards: {
+    day: [],
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
   volume: [],
   totalFluidPairs: 0,
   timestamp: 0,
@@ -230,13 +235,13 @@ export default function Home() {
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);
 
-  const { data: homeData } = useCache<HomeLoader>(
+  const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
   );
 
   const isFirstLoad = !homeData;
 
-  const { data: globalTransactionsData } = useCache<TransactionsLoader>(
+  const { data: globalTransactionsData } = useCache<TransactionsLoaderData>(
     `/${network}/query/userTransactions?page=${page}`
   );
 
@@ -252,7 +257,7 @@ export default function Home() {
     userTransactionsData.load(
       `/${network}/query/userTransactions?page=${page}&address=${address}`
     );
-  }, [address]);
+  }, [address, page]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
     SAFE_DEFAULT.totalFluidPairs
@@ -285,50 +290,16 @@ export default function Home() {
     })();
   }, [connected]);
 
-  const navigate = useNavigate();
-
+  // Default to "Y" View
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
 
-  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
-    connected ? 1 : 0
-  );
+  // Default to "Global" View
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
+  // If connected, default to "My Dashboard" View
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
   }, [connected]);
-
-  const [
-    {
-      count,
-      transactions,
-      rewards,
-      volume,
-      graphTransformedTransactions,
-      fluidPairs,
-      timestamp,
-    },
-    setTransactions,
-  ] = useState<{
-    count: number;
-    transactions: Transaction[];
-    rewards: number;
-    volume: number;
-    graphTransformedTransactions: Volume[];
-    fluidPairs: number;
-    timestamp: number;
-  }>({
-    count: data.global.volume.length,
-    transactions: data.global.transactions,
-    rewards: data.global.rewards.reduce(
-      (sum, { token_decimals, winning_amount }) =>
-        sum + winning_amount / 10 ** token_decimals,
-      0
-    ),
-    volume: data.global.volume.reduce((sum, { amount }) => sum + amount, 0),
-    graphTransformedTransactions: [],
-    fluidPairs: data.global.totalFluidPairs,
-    timestamp: data.global.timestamp,
-  });
 
   const { width } = useViewport();
   const isTablet = width < 850 && width > 0;
@@ -389,21 +360,46 @@ export default function Home() {
         },
       ];
 
-  useEffect(() => {
-    const { transactions, volume, rewards, totalFluidPairs, timestamp } =
-      activeTableFilterIndex ? data.user : data.global;
+  const {
+    totalPrizePool,
+    count,
+    totalCount,
+    rewards,
+    volume,
+    transactions,
+    graphTransformedTransactions,
+    fluidPairs,
+    timestamp,
+  } = useMemo(() => {
+    const {
+      transactions,
+      volume,
+      rewards,
+      totalFluidPairs,
+      timestamp,
+      totalPrizePool,
+    } = activeTableFilterIndex ? data.user : data.global;
 
-    const filteredRewards = rewards
-      .map((reward) => ({
-        ...reward,
-        timestamp: new Date(reward.created).getTime(),
-      }))
-      .filter(timeFilters[activeTransformerIndex].filter)
-      .reduce(
-        (sum, { winning_amount, token_decimals }) =>
-          sum + winning_amount / 10 ** token_decimals,
-        0
-      );
+    const {
+      day: dailyRewards,
+      week: weeklyRewards,
+      month: monthlyRewards,
+      year: yearlyRewards,
+    } = rewards;
+
+    const activeRewards = (() => {
+      switch (activeTransformerIndex) {
+        case 0:
+          return dailyRewards;
+        case 1:
+          return weeklyRewards;
+        case 2:
+          return monthlyRewards;
+        case 3:
+        default:
+          return yearlyRewards;
+      }
+    })();
 
     const filteredVolume = volume.filter(
       timeFilters[activeTransformerIndex].filter
@@ -413,24 +409,27 @@ export default function Home() {
       (sum, { amount }) => sum + amount,
       0
     );
-
     const graphTransformedTransactions =
       graphTransformers[activeTransformerIndex].transform(filteredVolume);
 
-    setTransactions({
+    return {
       count: filteredVolume.length,
-      rewards: filteredRewards,
+      totalCount: volume.length,
+      rewards: activeRewards,
       volume: totalVolume,
       transactions,
       graphTransformedTransactions,
       fluidPairs: totalFluidPairs,
       timestamp,
-    });
+      totalPrizePool,
+    };
   }, [
     activeTableFilterIndex,
     activeTransformerIndex,
     userHomeData.state,
     userTransactionsData.state,
+    homeData?.timestamp,
+    globalTransactionsData?.page,
   ]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
@@ -463,12 +462,7 @@ export default function Home() {
 
           {/* Value */}
           <td>
-            <Text>
-              {value.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-              })}
-            </Text>
+            <Text>{numberToMonetaryString(value)}</Text>
           </td>
 
           {/* Reward */}
@@ -517,6 +511,7 @@ export default function Home() {
 
   return (
     <>
+      {/* Timestamp */}
       <div className="pad-main" style={{ marginBottom: "12px" }}>
         {isTablet && (
           <Display
@@ -528,15 +523,57 @@ export default function Home() {
           </Display>
         )}
         <Text>
-          {isFirstLoad
+          {isFirstLoad || !timestamp
             ? "Loading data..."
-            : `Last updated ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+            : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
         </Text>
       </div>
+
       <section id="graph">
         <div className="graph-ceiling pad-main">
           {/* Statistics */}
           <div className="overlay">
+            {/* Row 1 */}
+            <div className="totals-row">
+              {/* Rewards */}
+              <div className="statistics-set">
+                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(
+                    rewards.find(
+                      ({ network: rewardNetwork }) => rewardNetwork === network
+                    )?.total_reward || 0
+                  )}
+                </Display>
+                <Link to={"../rewards"}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Rewards
+                  </LinkButton>
+                </Link>
+              </div>
+
+              {/* Prize Pool */}
+              <div className="statistics-set">
+                <Text>Prize Pool</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(totalPrizePool)}
+                </Display>
+              </div>
+            </div>
+
+            {/* Row 2 */}
             <div className="totals-row">
               {/* Transactions Volume / Count */}
               <div className="statistics-set">
@@ -544,21 +581,23 @@ export default function Home() {
                   {activeTableFilterIndex ? "My" : "Total"} transactions
                 </Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {count}
                 </Display>
-                <AnchorButton>
-                  <a href="#transactions">Activity</a>
-                </AnchorButton>
+                {!!count && (
+                  <AnchorButton>
+                    <a href="#transactions">Activity</a>
+                  </AnchorButton>
+                )}
               </div>
 
               {activeTableFilterIndex === 0 && (
                 <div className="statistics-set">
                   <Text>Total volume</Text>
                   <Display
-                    size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                    size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                     style={{ margin: 0 }}
                   >
                     {numberToMonetaryString(volume)}
@@ -566,73 +605,62 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Rewards */}
-              <div className="statistics-set">
-                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
-                <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {numberToMonetaryString(rewards)}
-                </Display>
-                <LinkButton
-                  size="medium"
-                  type="internal"
-                  handleClick={() => {
-                    navigate("../rewards");
-                  }}
-                >
-                  Rewards
-                </LinkButton>
-              </div>
-
               {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {fluidPairs}
                 </Display>
+                <Link to={`/${network}/fluidify`}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Create Assets
+                  </LinkButton>
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Graph Filter Row */}
-          <div>
-            {!isTablet && (
-              <Display
-                size={width < 1010 ? "xxs" : "xs"}
-                color="gray"
-                className="dashboard-identifier"
-              >
-                {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
-              </Display>
-            )}
-            <div className="statistics-row">
-              {graphTransformers.map((filter, i) => (
-                <button
-                  key={`filter-${filter.name}`}
-                  onClick={() => setActiveTransformerIndex(i)}
-                >
-                  <Text
-                    size="lg"
-                    prominent={activeTransformerIndex === i}
-                    className={
-                      activeTransformerIndex === i ? "active-filter" : ""
-                    }
-                  >
-                    {filter.name}
-                  </Text>
-                </button>
-              ))}
-            </div>
-          </div>
+          {!isTablet && (
+            <Display
+              size={width < 1010 ? "xxs" : "xs"}
+              color="gray"
+              className="dashboard-identifier"
+            >
+              {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
+            </Display>
+          )}
         </div>
 
         {/* Graph */}
         <div className="graph" style={{ width: "100%", height: "400px" }}>
+          <div className="statistics-row pad-main">
+            {graphTransformers.map((filter, i) => (
+              <button
+                key={`filter-${filter.name}`}
+                onClick={() => setActiveTransformerIndex(i)}
+              >
+                <Text
+                  size="lg"
+                  prominent={activeTransformerIndex === i}
+                  className={
+                    activeTransformerIndex === i ? "active-filter" : ""
+                  }
+                >
+                  {filter.name}
+                </Text>
+              </button>
+            ))}
+          </div>
           <LineChart
             data={graphTransformedTransactions.map((tx, i) => ({
               ...tx,
@@ -684,7 +712,7 @@ export default function Home() {
             page,
             rowsPerPage: 12,
           }}
-          count={count}
+          count={totalCount}
           data={transactions}
           renderRow={TransactionRow(network)}
           onFilter={setActiveTableFilterIndex}

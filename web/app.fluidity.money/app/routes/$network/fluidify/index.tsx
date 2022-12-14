@@ -80,7 +80,13 @@ export default function FluidifyToken() {
     network: network,
   };
 
-  const { tokens: tokens_, colors } = loaderData || defaultData;
+  const { tokens: tokens_, colors } = useMemo(
+    () => ({
+      ...defaultData,
+      ...loaderData,
+    }),
+    [loaderData]
+  );
 
   const {
     address,
@@ -195,14 +201,13 @@ export default function FluidifyToken() {
               )
             );
 
-            setTokens(
+            return setTokens(
               tokens_.map((token, i) => ({
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
               }))
             );
-            break;
 
           case "solana": {
             // get user token balances
@@ -210,17 +215,25 @@ export default function FluidifyToken() {
               tokens.map(async ({ address }) => (await balance?.(address)) || 0)
             );
 
-            setTokens(
+            return setTokens(
               tokens.map((token, i) => ({
                 ...token,
                 userTokenBalance: userTokenBalance[i],
               }))
             );
-            break;
           }
         }
       })();
+
+      return;
     }
+
+    return setTokens(
+      tokens_.map((token) => ({
+        ...token,
+        userTokenBalance: 0,
+      }))
+    );
   }, [address, swapping, tokens_]);
 
   const handleRedirect = async (
@@ -489,28 +502,36 @@ export default function FluidifyToken() {
                       />
                     </div>
                   ) : (
-                    <Draggable
+                    <div
+                      onClick={() => {
+                        setAssetToken(token);
+                      }}
                       key={`tok-${symbol}`}
-                      type={isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET}
-                      dragItem={token}
                     >
-                      <FluidifyCard
-                        key={symbol}
-                        fluid={isFluidOf !== undefined}
-                        symbol={symbol}
-                        name={name}
-                        logo={logo}
-                        address={address}
-                        mintCapPercentage={
-                          !!userMintLimit && userMintedAmt !== undefined
-                            ? userMintedAmt / userMintLimit
-                            : undefined
+                      <Draggable
+                        type={
+                          isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET
                         }
-                        color={colors[symbol]}
-                        amount={userTokenBalance}
-                        addToken={handleAddToken}
-                      />
-                    </Draggable>
+                        dragItem={token}
+                      >
+                        <FluidifyCard
+                          key={symbol}
+                          fluid={isFluidOf !== undefined}
+                          symbol={symbol}
+                          name={name}
+                          logo={logo}
+                          address={address}
+                          mintCapPercentage={
+                            !!userMintLimit && userMintedAmt !== undefined
+                              ? userMintedAmt / userMintLimit
+                              : undefined
+                          }
+                          color={colors[symbol]}
+                          amount={userTokenBalance}
+                          addToken={handleAddToken}
+                        />
+                      </Draggable>
+                    </div>
                   );
                 })}
                 {isTablet && (
