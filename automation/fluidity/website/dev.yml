@@ -3,9 +3,13 @@ SERVICES:
       SERVICE_NAME: fluidity-money
       DOCKER_IMAGE: fluidity.money-frontend
       DOCKERFILE_PATH: ./web/fluidity.money
-      TARGET_GROUP: flu-dev-fluidity-fe-tg
       SECRET_FLU_HASURA_KEY: /fluidity/hasura/key
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
+      DEPLOYMENT_TYPE: CODEDEPLOY
+      CODEDEPLOY_WAIT_TIME: 30 #minutes
+      LOAD_BALANCER: flu-dev-fluidity-alb
+      TARGET_GROUP_01: flu-dev-fluidity-fe-tg
+      TARGET_GROUP_02: flu-dev-fluidity-fe-tg-1
       CPU_LIMIT: 512
       MEM_LIMIT: 1024
 
