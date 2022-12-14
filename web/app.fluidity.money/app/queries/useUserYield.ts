@@ -101,7 +101,9 @@ const useUserYieldAll = async (network: string) => {
     query: queryAll,
   };
 
-  return jsonPost<UserYieldAllBody, UserYieldResponse>(url, body);
+  return jsonPost<UserYieldAllBody, UserYieldResponse>(url, body, process.env.HASURA_TOKEN ? {
+    "x-hasura-admin-secret": process.env.HASURA_TOKEN,
+  } : {});
 };
 
 const useUserYieldByAddress = async (network: string, address: string) => {
@@ -112,7 +114,9 @@ const useUserYieldByAddress = async (network: string, address: string) => {
     query: queryByAddress,
   };
 
-  return jsonPost<UserYieldByAddressBody, UserYieldResponse>(url, body);
+  return jsonPost<UserYieldByAddressBody, UserYieldResponse>(url, body, process.env.HASURA_TOKEN ? {
+    "x-hasura-admin-secret": process.env.HASURA_TOKEN,
+  } : {});
 };
 
 export type UserYield = {

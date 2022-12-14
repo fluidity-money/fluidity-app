@@ -1,7 +1,7 @@
 import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { useNavigate, useLoaderData } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
@@ -25,6 +25,8 @@ import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
+import { useCache } from "~/hooks/useCache";
+import { HighestRewardsData } from "./query/projectedWinnings";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -59,14 +61,26 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
+  const { data: projectWinningsData } = useCache<HighestRewardsData>(
+    `/${network}/query/projectedWinnings`
+  );
+
+  const loaded = !!projectWinningsData?.highestRewards;
+  
+  const projectedWinnings = useMemo(() => loaded 
+    ? projectWinningsData?.highestRewards.reduce(
+      (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
+      0
+    ) / projectWinningsData.highestRewards.length
+    : undefined, [loaded])
+
+
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected
   );
   const [chainModalVisibility, setChainModalVisibility] = useState(false);
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState(false);
-  const [loading, setLoading] = useState(true);
-  const [projectedWinnings, setProjectedWinnings] = useState(0);
 
   const { width } = useViewport();
   const mobileBreakpoint = 500;
@@ -81,35 +95,6 @@ const NetworkPage = () => {
       icon: <img src="/assets/chains/solanaIcon.svg" />,
     },
   };
-
-  useEffect(() => {
-    if (address) {
-      (async () => {
-        const { data, errors } = await useHighestRewardStatisticsByNetwork(
-          network
-        );
-
-        if (errors || !data) {
-          captureException(new Error("Could not fetch historical Rewards"), {
-            tags: {
-              section: "opportunity",
-            },
-          });
-
-          return;
-        }
-
-        const highestRewards =
-          data.highest_rewards_monthly.reduce(
-            (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
-            0
-          ) / data.highest_rewards_monthly.length;
-        setProjectedWinnings(highestRewards);
-
-        setLoading(false);
-      })();
-    }
-  }, [address]);
 
   useEffect(() => {
     // stop modal pop-up if connected
@@ -134,7 +119,7 @@ const NetworkPage = () => {
 
   return (
     <>
-      {connected && !loading && (
+      {connected && connected && loaded && (
         <Video
           className="video"
           src={"/videos/FluidityOpportunityA.mp4"}
@@ -242,7 +227,7 @@ const NetworkPage = () => {
             </div>
 
             {/* Expected Earnings */}
-            {!!projectedWinnings && (
+            {!!projectedWinnings && connected && (
               <>
                 <Display
                   className="winnings-figure"

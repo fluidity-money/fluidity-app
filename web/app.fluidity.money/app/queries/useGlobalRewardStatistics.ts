@@ -25,7 +25,10 @@ const useGlobalRewardStatistics = async (network: string) => {
     query: query,
   };
 
-  return jsonPost<ExpectedRewardBody, ExpectedRewardResponse>(url, body);
+  return jsonPost<ExpectedRewardBody, ExpectedRewardResponse>(url, body, process.env.HASURA_TOKEN ? {
+    "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
+    
+  } : {} );
 };
 
 type ExpectedRewardBody = {
