@@ -87,9 +87,9 @@ const useHighestRewardStatisticsByNetwork = async (network: string) => {
   >(
     url,
     body,
-    process.env.HASURA_TOKEN
+    process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.HASURA_TOKEN,
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
         }
       : {}
   );
@@ -110,9 +110,9 @@ const useHighestRewardStatisticsAll = async () => {
   const response = await jsonPost<HighestRewardAllBody, HighestRewardResponse>(
     url,
     body,
-    process.env.HASURA_TOKEN
+    process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.HASURA_TOKEN,
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
         }
       : {}
   );
