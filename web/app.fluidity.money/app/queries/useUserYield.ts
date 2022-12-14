@@ -104,9 +104,9 @@ const useUserYieldAll = async (network: string) => {
   return jsonPost<UserYieldAllBody, UserYieldResponse>(
     url,
     body,
-    process.env.FLU_HASURA_TOKEN
+    process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_TOKEN,
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
         }
       : {}
   );
@@ -123,9 +123,9 @@ const useUserYieldByAddress = async (network: string, address: string) => {
   return jsonPost<UserYieldByAddressBody, UserYieldResponse>(
     url,
     body,
-    process.env.FLU_HASURA_TOKEN
+    process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_TOKEN,
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
         }
       : {}
   );

@@ -61,9 +61,9 @@ const useUserRewardsAll = async (network: string) => {
   return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(
     url,
     body,
-    process.env.FLU_HASURA_TOKEN
+    process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_TOKEN ?? "",
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET ?? "",
         }
       : {}
   );
@@ -80,9 +80,10 @@ const useUserRewardsByAddress = async (network: string, address: string) => {
   return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(
     url,
     body,
-    process.env.FLU_HASURA_TOKEN
+    process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_TOKEN ?? "",
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET
+   ?? "",
         }
       : {}
   );
