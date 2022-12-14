@@ -8,6 +8,14 @@ import {
 } from "~/util/chainUtils/ethereum/transaction";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 
+export type FluidifyData = {
+  network: string;
+  tokens: AugmentedToken[];
+  colors: {
+    [symbol: string]: string;
+  };
+};
+
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
 
@@ -110,5 +118,5 @@ export const loader: LoaderFunction = async ({ params }) => {
     tokens: augmentedTokens,
     ethereumWallets,
     colors: (await colors)[network as string],
-  });
+  } as FluidifyData);
 };

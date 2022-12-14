@@ -230,11 +230,11 @@ main > footer > section {
   border-radius: inherit;
 }
 
-.rainbow:hover > h6 {
+.rainbow:hover > h5 {
   color: black;
 }
 
-.rainbow:hover:focus > h6 {
+.rainbow:hover:focus > h5 {
   color: white;
 }
 

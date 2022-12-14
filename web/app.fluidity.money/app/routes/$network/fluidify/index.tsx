@@ -1,5 +1,6 @@
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
+import type { FluidifyData } from "../query/fluidify";
 
 import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
@@ -31,11 +32,14 @@ import { Chain } from "~/util/chainUtils/chains";
 import config from "~/webapp.config.server";
 
 type LoaderData = {
-  network: string;
   tokens: AugmentedToken[];
-  colors: {
-    [symbol: string]: string;
-  };
+  ethereumWallets: {
+    name: string;
+    id: string;
+    description: string;
+    logo: string;
+  }[];
+  network: Chain;
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -43,10 +47,22 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const ethereumWallets = config.config["ethereum"].wallets;
 
+  const {
+    config: {
+      [network as string]: { tokens },
+    },
+  } = config;
+
+  const augTokens = tokens.map((tok) => ({
+    ...tok,
+    userTokenBalance: 0,
+  }));
+
   return json({
+    tokens: augTokens,
     ethereumWallets,
     network,
-  });
+  } as LoaderData);
 };
 
 function ErrorBoundary(error: unknown) {
@@ -68,14 +84,16 @@ function ErrorBoundary(error: unknown) {
   );
 }
 
+type CacheData = FluidifyData;
+
 export default function FluidifyToken() {
-  const { network } = useLoaderData<{ network: Chain }>();
-  const { data: loaderData } = useCache<LoaderData>(
+  const { network, tokens: defaultTokens } = useLoaderData<LoaderData>();
+  const { data: loaderData } = useCache<CacheData>(
     `/${network}/query/fluidify`
   );
 
-  const defaultData: LoaderData = {
-    tokens: [],
+  const defaultData: CacheData = {
+    tokens: defaultTokens,
     colors: {},
     network: network,
   };
