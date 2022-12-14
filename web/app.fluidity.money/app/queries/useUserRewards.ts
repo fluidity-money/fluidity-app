@@ -58,10 +58,15 @@ const useUserRewardsAll = async (network: string) => {
     query: queryAll,
   };
 
-  return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(url, body, process.env.HASURA_TOKEN ? {
-    "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
-    
-  } : {} );
+  return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(
+    url,
+    body,
+    process.env.HASURA_TOKEN
+      ? {
+          "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
+        }
+      : {}
+  );
 };
 
 const useUserRewardsByAddress = async (network: string, address: string) => {
@@ -74,10 +79,12 @@ const useUserRewardsByAddress = async (network: string, address: string) => {
 
   return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(
     url,
-    body, process.env.HASURA_TOKEN ? {
-    "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
-    
-  } : {} 
+    body,
+    process.env.HASURA_TOKEN
+      ? {
+          "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
+        }
+      : {}
   );
 };
 

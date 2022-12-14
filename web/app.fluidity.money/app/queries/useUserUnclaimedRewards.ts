@@ -60,10 +60,12 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
 
   return jsonPost<UnclaimedRewardsReq, UnclaimedRewardsRes>(
     fluGqlEndpoint,
-    body, process.env.HASURA_TOKEN ? {
-    "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
-    
-  } : {} 
+    body,
+    process.env.HASURA_TOKEN
+      ? {
+          "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
+        }
+      : {}
   );
 };
 

@@ -7,8 +7,6 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
 import { networkMapper } from "~/util";
-import { useHighestRewardStatisticsByNetwork } from "~/queries/useHighestRewardStatistics";
-import { captureException } from "@sentry/react";
 import {
   Display,
   GeneralButton,
@@ -66,14 +64,17 @@ const NetworkPage = () => {
   );
 
   const loaded = !!projectWinningsData?.highestRewards;
-  
-  const projectedWinnings = useMemo(() => loaded 
-    ? projectWinningsData?.highestRewards.reduce(
-      (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
-      0
-    ) / projectWinningsData.highestRewards.length
-    : undefined, [loaded])
 
+  const projectedWinnings = useMemo(
+    () =>
+      loaded
+        ? projectWinningsData?.highestRewards.reduce(
+            (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
+            0
+          ) / projectWinningsData.highestRewards.length
+        : undefined,
+    [loaded]
+  );
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected

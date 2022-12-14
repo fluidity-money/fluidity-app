@@ -49,10 +49,12 @@ const useApplicationRewardStatistics = async <T extends Chain>(
 
   return jsonPost<ApplicationRewardBody, ApplicationRewardResponse<T>>(
     url,
-    body, process.env.HASURA_TOKEN ? {
-    "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
-    
-  } : {} 
+    body,
+    process.env.HASURA_TOKEN
+      ? {
+          "x-hasura-admin-secret": process.env.HASURA_TOKEN ?? "",
+        }
+      : {}
   );
 };
 
