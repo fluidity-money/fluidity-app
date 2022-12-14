@@ -14,6 +14,17 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
   const { txCount } = apiState;
 
+  const [prizePool, setPrizePool] = useState<number>(apiState.rewardPool.pools?.ethPool || 0);
+
+  useEffect(() => {
+    chain === `ETH` && 
+    setPrizePool(apiState.rewardPool.pools?.ethPool || 0);
+
+    chain === `SOL` && 
+    setPrizePool(apiState.rewardPool.pools?.solPool || 0);
+
+  },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
+
   return (
     <AnimatePresence>
       <motion.div
@@ -26,6 +37,9 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="black"
+          loading={apiState.rewardPool.loading}
+          rewardPool={prizePool}
+          key={`${apiState.rewardPool.loading}-${prizePool}`}
         />
         <div className={styles.rewardsBackground}>
           <RewardsBackground />

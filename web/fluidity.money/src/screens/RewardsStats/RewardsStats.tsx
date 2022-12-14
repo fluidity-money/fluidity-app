@@ -29,29 +29,16 @@ const RewardsStats = ({ changeScreen }: IProps) => {
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const [prizePool, setPrizePool] = useState<string>(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
+  const [prizePool, setPrizePool] = useState<number>(apiState.rewardPool.pools?.ethPool || 0);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(apiState.rewardPool.pools?.ethPool.toFixed(3) || `0`);
+    setPrizePool(apiState.rewardPool.pools?.ethPool || 0);
 
     chain === `SOL` && 
-    setPrizePool(apiState.rewardPool.pools?.solPool.toFixed(3) || `0`);
+    setPrizePool(apiState.rewardPool.pools?.solPool || 0);
 
   },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
-
-  useEffect(() => {
-    if (!apiState.rewardPool.loading) return
-
-    const interval = setInterval(() => {
-      setPrizePool((prizePool) => {
-        const random = Math.random() * 200000
-        return random.toFixed(3)
-      })
-    } , 100)
-
-    return () => clearInterval(interval)
-  }, [apiState.rewardPool.loading])
 
   // NOTE: Dummy data
   const parsedDailyWinnings = largestDailyWinnings
@@ -105,10 +92,12 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         </div>
         <div style={{ height: 254, width: "100%" }}></div>
         <RewardsInfoBox
-          // NOTE: Dummy data
           totalTransactions={txCount}
           changeScreen={changeScreen}
           type="transparent"
+          rewardPool={prizePool}
+          loading={apiState.rewardPool.loading}
+          key={`${apiState.rewardPool.loading}-${prizePool}`}
         />
         {!!parsedDailyWinnings.length && (
           <div className={styles.rewardsChart}>

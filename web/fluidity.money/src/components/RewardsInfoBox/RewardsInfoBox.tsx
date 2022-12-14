@@ -18,6 +18,8 @@ interface IRewardBoxProps {
   totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
+  rewardPool?: number;
+  loading: boolean;
 }
 
 const AnimatedNumbers = dynamic(() => import("react-animated-numbers"), {
@@ -28,8 +30,11 @@ const RewardsInfoBox = ({
   totalTransactions,
   changeScreen,
   type,
+  rewardPool,
+  loading,
 }: IRewardBoxProps) => {
-  const { apiState, chain, setChain } = useChainContext();
+
+  const { chain, setChain } = useChainContext()
 
   const showRewardPool = type === "black";
 
@@ -48,29 +53,20 @@ const RewardsInfoBox = ({
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
 
-  const [prizePool, setPrizePool] = useState<number>(Number(apiState.rewardPool.pools?.ethPool.toFixed(3)) || 0);
+  const [prizePool, setPrizePool] = useState<number>(Number(rewardPool.toFixed(3)));
 
   useEffect(() => {
-    chain === `ETH` && 
-    setPrizePool(Number(apiState.rewardPool.pools?.ethPool.toFixed(3)) || 0);
-
-    chain === `SOL` && 
-    setPrizePool(Number(apiState.rewardPool.pools?.solPool.toFixed(3)) || 0);
-
-  },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
-  
-  useEffect(() => {
-    if (!apiState.rewardPool.loading) return
+    if (!loading) return
 
     const interval = setInterval(() => {
       setPrizePool((prizePool) => {
-        const random = Math.random() * 999999
+        const random = (100000 + Math.random() * 900000)
         return Number(random.toFixed(3))
       })
     } , 200)
 
     return () => clearInterval(interval)
-  }, [apiState.rewardPool.loading])
+  }, [loading])
 
   return (
     <div
@@ -92,7 +88,7 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={changeScreen}>
+        <div onClick={!loading ? changeScreen : () => {}}>
           <Heading as="h1">
             {showRewardPool ? (
               <Suspense>
@@ -106,14 +102,14 @@ const RewardsInfoBox = ({
           </Heading>
         </div>
         <Heading as="h4" className={styles.alignCenter}>
-          {!apiState.rewardPool.loading && (
+          {!loading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 1 }}
             >
               {showRewardPool
-                ? !apiState.rewardPool.loading && "Reward pool"
+                ? !loading && "Reward pool"
                 : "Total transactions (on testing)"}
             </motion.div>
           )}
