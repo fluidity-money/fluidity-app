@@ -15,6 +15,7 @@ import {
   useMatches,
   useTransition,
   useLocation,
+  useFetcher,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -42,6 +43,7 @@ import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
+import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -199,36 +201,17 @@ export default function Dashboard() {
   };
 
   // Rewards User has yet to claim - Ethereum feature
-  const [unclaimedRewards, setUnclaimedRewards] = useState(0);
+
+  const userUnclaimedData = useFetcher<UnclaimedRewardsLoaderData>();
+
+  const unclaimedRewards = userUnclaimedData.data ? userUnclaimedData.data.userUnclaimedRewards : 0;
 
   useEffect(() => {
-    if (!address) return setUnclaimedRewards(0);
+    if (!address) return;
 
-    (async () => {
-      if (network !== "ethereum") return;
-
-      const { data, error } = await useUserUnclaimedRewards(network, address);
-
-      if (error || !data) return;
-
-      const { ethereum_pending_winners: rewards } = data;
-
-      const sanitisedRewards = rewards.filter(
-        (transaction: UserUnclaimedReward) => !transaction.reward_sent
-      );
-
-      const totalUnclaimedRewards = sanitisedRewards.reduce(
-        (sum: number, transaction: UserUnclaimedReward) => {
-          const { win_amount, token_decimals } = transaction;
-
-          const decimals = 10 ** token_decimals;
-          return sum + win_amount / decimals;
-        },
-        0
-      );
-
-      setUnclaimedRewards(totalUnclaimedRewards);
-    })();
+    userUnclaimedData.load(
+      `/${network}/query/dashboard/unclaimedRewards?address=${address}`
+    )
   }, [address]);
 
   const handleScroll = () => {
