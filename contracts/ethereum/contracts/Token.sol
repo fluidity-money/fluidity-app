@@ -702,6 +702,26 @@ contract Token is IERC20, ITransferWithBeneficiary {
         return rc;
     }
 
+    /// @notice upgrade the underlying LiquidityProvider to a new source
+    function upgradeLiquidityProvider(LiquidityProvider newPool) public returns (bool) {
+      require(noEmergencyMode(), "emergency mode");
+      require(msg.sender == operator_, "only operator can use this function");
+
+      uint totalPoolAmount = pool_.totalPoolAmount();
+
+      pool_.takeFromPool(totalPoolAmount);
+
+      pool_ = newPool;
+
+      pool_.addToPool(totalPoolAmount);
+
+      if (pool_.totalPoolAmount() != totalPoolAmount) {
+        revert("total pool amount not equal to new amount!");
+      }
+
+      return true;
+    }
+
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
         _approve(msg.sender, spender, allowances_[msg.sender][spender] + addedValue);
         return true;
