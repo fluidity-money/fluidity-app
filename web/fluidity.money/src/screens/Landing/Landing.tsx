@@ -79,9 +79,9 @@ const Landing = () => {
       <motion.div className={styles.content}>
         {width < breakpoint ? (
           <motion.div
-            initial={{ opacity: 0, y: "-100vh" }}
+            initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 2, type: "tween" }}
+            transition={{ duration: 1, type: "tween" }}
           >
             <Heading className={styles.title} as="h3">
               Fluidity is the <br /> blockchain incentive <br /> layer,
@@ -90,9 +90,9 @@ const Landing = () => {
           </motion.div>
         ) : (
           <motion.div
-            initial={{ opacity: 0, y: "-100vh" }}
+            initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 2, type: "tween" }}
+            transition={{ duration: 1, type: "tween" }}
           >
             <Heading as="h3">
               Fluidity is the blockchain incentive layer, <br />
@@ -110,14 +110,14 @@ const Landing = () => {
                 y: [-150, -150, -150, 0],
                 scale: [1, 1, 1, 0.8],
               }}
-              transition={{ duration: 2, type: "tween" }}
+              transition={{ duration: 1, type: "tween" }}
             ></motion.div>
           )}
 
           <motion.div
-            initial={{ opacity: 0, y: "-100vh" }}
+            initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 2, type: "tween" }}
+            transition={{ duration: 1, type: "tween" }}
             className={styles.left}
           >
             <IntroTile
@@ -144,9 +144,9 @@ const Landing = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: "-100vh" }}
+            initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 2, type: "tween" }}
+            transition={{ duration: 1, type: "tween" }}
             className={width < breakpoint ? styles.left : styles.right}
           >
             <IntroTile
