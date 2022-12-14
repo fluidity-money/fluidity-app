@@ -2,7 +2,7 @@
 
 ### Road to Mainnet and Current state of the product:&#x20;
 
-Given the successful testnet and devnet deployments as well as the massive community support, feedback and engagement, Fluidity has been able to collect sufficient data and experience in order to be able to confidently strive forwards towards mainnet in late September/Early October. The mainnet launch will comprise both Ethereum and Solana a week after in order to allow for testing and contingency plans to be enacted upon given any emergency situation is to occur.
+Given the successful testnet and devnet deployments as well as the massive community support, feedback, and engagement, Fluidity has been able to collect sufficient data and experience in order to be able to confidently strive forwards towards mainnet. Fluidity's mainnet will launch on Ethereum, with other chains followed right after in order to allow for testing and contingency plans to be enacted upon given any emergency situation that occurs.
 
 ## Where We Are Going
 
