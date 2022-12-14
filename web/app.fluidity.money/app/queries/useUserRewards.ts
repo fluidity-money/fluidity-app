@@ -58,7 +58,15 @@ const useUserRewardsAll = async (network: string) => {
     query: queryAll,
   };
 
-  return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(url, body);
+  return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(
+    url,
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
+  );
 };
 
 const useUserRewardsByAddress = async (network: string, address: string) => {
@@ -71,7 +79,12 @@ const useUserRewardsByAddress = async (network: string, address: string) => {
 
   return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(
     url,
-    body
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
   );
 };
 
