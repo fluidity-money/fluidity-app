@@ -10,6 +10,10 @@
   display: none;
 }
 
+.fluidify-button-dashboard-mobile {
+  display: none;
+}
+
 body {
   display: flex;
   text-align: center;

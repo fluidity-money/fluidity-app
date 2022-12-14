@@ -5,8 +5,10 @@ import { useEffect, useState, useContext, useMemo } from "react";
 import { useNavigate, useLoaderData } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
+import { useCache } from "~/hooks/useCache";
 import useViewport from "~/hooks/useViewport";
 import { networkMapper } from "~/util";
+import { generateTweet } from "~/util/tweeter";
 import {
   Display,
   GeneralButton,
@@ -23,7 +25,6 @@ import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
-import { useCache } from "~/hooks/useCache";
 import { HighestRewardsData } from "./query/projectedWinnings";
 
 export const links: LinksFunction = () => {
@@ -72,7 +73,7 @@ const NetworkPage = () => {
             (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
             0
           ) / projectWinningsData.highestRewards.length
-        : undefined,
+        : 0,
     [loaded]
   );
 
@@ -101,22 +102,6 @@ const NetworkPage = () => {
     // stop modal pop-up if connected
     connected && setWalletModalVisibility(false);
   }, [connected]);
-
-  const generateTweet = () => {
-    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
-
-    // const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
-
-    const tweetMsg = `Fluidify your money with Fluidity`;
-
-    twitterUrl.searchParams.set("text", tweetMsg);
-
-    const fluTwitterHandle = `fluiditymoney`;
-
-    twitterUrl.searchParams.set("via", fluTwitterHandle);
-
-    return twitterUrl.href;
-  };
 
   return (
     <>
@@ -260,7 +245,7 @@ const NetworkPage = () => {
               </GeneralButton>
 
               <a
-                href={generateTweet()}
+                href={generateTweet(projectedWinnings)}
                 rel="noopener noreferrer"
                 target="_blank"
               >
