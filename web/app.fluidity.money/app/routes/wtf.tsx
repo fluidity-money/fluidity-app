@@ -54,10 +54,7 @@ export const loader: LoaderFunction = async () => {
     });
   }
 
-  const highestRewards = data.highest_rewards_monthly.map((reward) => ({
-    ...reward,
-    awardedDate: new Date(reward.awarded_day),
-  }));
+  const highestRewards = data.highest_rewards_monthly;
 
   if (!Object.keys(data.highest_reward_winner_totals).length) {
     return json({
@@ -112,7 +109,6 @@ type WinnerWinnings = {
     totalWinnings: number;
   };
 };
-
 
 type LoaderData = {
   winnerTotals: WinnerWinnings;
@@ -290,7 +286,7 @@ export default function IndexPage() {
             style={{ width: "100%", height: "400px" }}
           >
             <LineChart
-               data={highestRewards.map(
+              data={highestRewards.map(
                 (reward: HighestRewardMonthly, i: number) => ({
                   ...reward,
                   x: i,
@@ -298,29 +294,32 @@ export default function IndexPage() {
               )}
               lineLabel="transactions"
               accessors={{
-                xAccessor: (d: HighestRewardMonthly & {x: number}) => d.x,
-                yAccessor: (d: HighestRewardMonthly) => d.winning_amount_scaled,
+                xAccessor: (d: HighestRewardMonthly & { x: number }) => d.x,
+                yAccessor: (d: HighestRewardMonthly) =>
+                  Math.log(d.winning_amount_scaled + 1),
               }}
               renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => (
-                <div className={"tooltip"}>
-                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                    {format(parseISO(datum.awarded_day), "dd/MM/yy")}
-                  </span>
-                  <br />
-                  <br />
-                  <span>
-                    <span>{trimAddress(datum.winning_address)}</span>
-                  </span>
-                  <br />
-                  <br />
-                  <span>
+                <div className={"graph-tooltip-container"}>
+                  <div className={"graph-tooltip"}>
+                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                      {format(parseISO(datum.awarded_day), "dd/MM/yy")}
+                    </span>
+                    <br />
+                    <br />
                     <span>
-                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                      <span>{trimAddress(datum.winning_address)}</span>
                     </span>
-                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                      prize awarded
+                    <br />
+                    <br />
+                    <span>
+                      <span>
+                        {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                      </span>
+                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                        prize awarded
+                      </span>
                     </span>
-                  </span>
+                  </div>
                 </div>
               )}
             />
