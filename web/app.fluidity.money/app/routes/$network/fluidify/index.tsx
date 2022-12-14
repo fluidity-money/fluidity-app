@@ -4,7 +4,7 @@ import type { FluidifyData } from "../query/fluidify";
 
 import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
 import useViewport from "~/hooks/useViewport";
@@ -29,7 +29,7 @@ import { captureException } from "@sentry/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useCache } from "~/hooks/useCache";
 import { Chain } from "~/util/chainUtils/chains";
-import config from "~/webapp.config.server";
+import config, { colors } from "~/webapp.config.server";
 
 type LoaderData = {
   tokens: AugmentedToken[];
@@ -40,6 +40,9 @@ type LoaderData = {
     logo: string;
   }[];
   network: Chain;
+  colors: {
+    [symbol: string]: string;
+  };
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -62,6 +65,7 @@ export const loader: LoaderFunction = async ({ params }) => {
     tokens: augTokens,
     ethereumWallets,
     network,
+    colors: (await colors)[network as string],
   } as LoaderData);
 };
 
@@ -87,23 +91,13 @@ function ErrorBoundary(error: unknown) {
 type CacheData = FluidifyData;
 
 export default function FluidifyToken() {
-  const { network, tokens: defaultTokens } = useLoaderData<LoaderData>();
+  const {
+    network,
+    tokens: defaultTokens,
+    colors,
+  } = useLoaderData<LoaderData>();
   const { data: loaderData } = useCache<CacheData>(
     `/${network}/query/fluidify`
-  );
-
-  const defaultData: CacheData = {
-    tokens: defaultTokens,
-    colors: {},
-    network: network,
-  };
-
-  const { tokens: tokens_, colors } = useMemo(
-    () => ({
-      ...defaultData,
-      ...loaderData,
-    }),
-    [loaderData]
   );
 
   const {
@@ -130,7 +124,18 @@ export default function FluidifyToken() {
   }, [width]);
 
   // Tokens return from loader
-  const [tokens, setTokens] = useState<AugmentedToken[]>(tokens_);
+  const [tokens, setTokens] = useState<AugmentedToken[]>(defaultTokens);
+
+  useEffect(() => {
+    if (!loaderData) return;
+
+    setTokens(
+      tokens.map((tok) => ({
+        ...tok,
+        ...loaderData,
+      }))
+    );
+  }, [loaderData]);
 
   // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
@@ -138,15 +143,11 @@ export default function FluidifyToken() {
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
   // Destination token
-  const toToken = useMemo(
-    () =>
-      assetToken
-        ? tokenIsFluid
-          ? tokens.find((t) => t.address === assetToken.isFluidOf)
-          : tokens.find((t) => t.isFluidOf === assetToken.address)
-        : undefined,
-    [assetToken]
-  );
+  const toToken = assetToken
+    ? tokenIsFluid
+      ? tokens.find((t) => t.address === assetToken.isFluidOf)
+      : tokens.find((t) => t.isFluidOf === assetToken.address)
+    : undefined;
 
   const handleAddToken = (symbol: string) => {
     if (!connected || !addToken) return;
@@ -192,41 +193,41 @@ export default function FluidifyToken() {
   const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
-  let tokensMinted: (number | undefined)[], userTokenBalance: number[];
-
   // get token data once user is connected
   useEffect(() => {
-    if (address) {
+    if (address && !swapping) {
       (async () => {
         switch (network) {
-          case "ethereum":
-            tokensMinted = await Promise.all(
-              tokens_.map(async (token) => {
-                if (token.isFluidOf) return undefined;
-                const fluidToken = tokens.find(
-                  ({ isFluidOf }) => isFluidOf === token.address
-                );
+          case "ethereum": {
+            const [tokensMinted, userTokenBalance] = await Promise.all([
+              Promise.all(
+                tokens.map(async (token) => {
+                  if (token.isFluidOf) return undefined;
 
-                if (!fluidToken) return undefined;
+                  const fluidToken = tokens.find(
+                    ({ isFluidOf }) => isFluidOf === token.address
+                  );
 
-                return amountMinted?.(fluidToken.address);
-              })
-            );
+                  if (!fluidToken) return undefined;
 
-            userTokenBalance = await Promise.all(
-              tokens_.map(
-                async ({ address }) => (await balance?.(address)) || 0
-              )
-            );
+                  return amountMinted?.(fluidToken.address);
+                })
+              ),
+              Promise.all(
+                tokens.map(
+                  async ({ address }) => (await balance?.(address)) || 0
+                )
+              ),
+            ]);
 
             return setTokens(
-              tokens_.map((token, i) => ({
+              tokens.map((token, i) => ({
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
               }))
             );
-
+          }
           case "solana": {
             // get user token balances
             const userTokenBalance = await Promise.all(
@@ -247,12 +248,12 @@ export default function FluidifyToken() {
     }
 
     return setTokens(
-      tokens_.map((token) => ({
+      tokens.map((token) => ({
         ...token,
         userTokenBalance: 0,
       }))
     );
-  }, [address, swapping, tokens_]);
+  }, [address, swapping]);
 
   const handleRedirect = async (
     transaction: TransactionResponse,

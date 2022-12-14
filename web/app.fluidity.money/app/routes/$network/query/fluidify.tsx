@@ -1,7 +1,6 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
-import config, { colors } from "~/webapp.config.server";
+import config from "~/webapp.config.server";
 import { json, LoaderFunction } from "@remix-run/node";
-import AugmentedToken from "~/types/AugmentedToken";
 import {
   getUsdUserMintLimit,
   userMintLimitedEnabled,
@@ -10,18 +9,17 @@ import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 
 export type FluidifyData = {
   network: string;
-  tokens: AugmentedToken[];
-  colors: {
-    [symbol: string]: string;
-  };
+  mintLimits: {
+    symbol: string;
+    userMintLimit?: number;
+    userMintedAmt?: number;
+  }[];
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
 
   if (!network) throw new Error("Network not found");
-
-  const ethereumWallets = config.config["ethereum"].wallets;
 
   const {
     config: {
@@ -44,7 +42,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
     const provider = new JsonRpcProvider(infuraUri);
 
-    const augmentedTokens: AugmentedToken[] = await Promise.all(
+    const mintLimits = await Promise.all(
       tokens.map(async (token) => {
         const { isFluidOf, address } = token;
 
@@ -73,23 +71,20 @@ export const loader: LoaderFunction = async ({ params }) => {
           : undefined;
 
         return {
-          ...token,
+          symbol: token.symbol,
           userMintLimit: userMintLimit,
-          userTokenBalance: 0,
         };
       })
     );
 
     return json({
       network,
-      tokens: augmentedTokens,
-      ethereumWallets,
-      colors: (await colors)[network as string],
+      mintLimits,
     });
   }
 
   // Network === "solana"
-  const augmentedTokens = await Promise.all(
+  const mintLimits = await Promise.all(
     tokens.map(async (token) => {
       const { isFluidOf } = token;
       // const { name, symbol } = token;
@@ -105,18 +100,15 @@ export const loader: LoaderFunction = async ({ params }) => {
         : 0;
 
       return {
-        ...token,
+        symbol: token.symbol,
         userMintLimit: mintLimit,
         userMintedAmt: tokensMinted,
-        userTokenBalance: 0,
       };
     })
   );
 
   return json({
     network,
-    tokens: augmentedTokens,
-    ethereumWallets,
-    colors: (await colors)[network as string],
+    mintLimits,
   } as FluidifyData);
 };
