@@ -5,15 +5,21 @@ import {
 import {
   useUserTransactionsAll,
   useUserTransactionsByAddress,
+  useUserTransactionsByTxHash,
 } from "./useUserTransactions";
 import useUserUnclaimedRewards from "./useUserUnclaimedRewards";
-import useUserRewards from "./useUserRewards";
+import { useUserRewardsAll, useUserRewardsByAddress } from "./useUserRewards";
+import { useUserYieldAll, useUserYieldByAddress } from "./useUserYield";
 
 export {
   useUserTransactionAllCount,
   useUserTransactionByAddressCount,
   useUserTransactionsAll,
   useUserTransactionsByAddress,
+  useUserTransactionsByTxHash,
   useUserUnclaimedRewards,
-  useUserRewards,
+  useUserRewardsAll,
+  useUserRewardsByAddress,
+  useUserYieldAll,
+  useUserYieldByAddress,
 };

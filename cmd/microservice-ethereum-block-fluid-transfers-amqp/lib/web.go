@@ -101,7 +101,7 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 		topics := make([]types.Hash, len(logTopics))
 
 		for i, topic := range logTopics {
-			topics[i] = types.Hash(topic)
+			topics[i] = types.HashFromString(topic)
 		}
 
 		txIndex, err := common.BigIntFromHex(logTxIndex)
@@ -117,13 +117,13 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 		data := misc.Blob([]byte(logData))
 
 		logs[i] = types.Log{
-			Address:     types.Address(address),
+			Address:     types.AddressFromString(address),
 			Topics:      topics,
 			Data:        data,
 			BlockNumber: *blockNumber,
-			TxHash:      types.Hash(txHash),
+			TxHash:      types.HashFromString(txHash),
 			TxIndex:     *txIndex,
-			BlockHash:   types.Hash(blockHash),
+			BlockHash:   types.HashFromString(blockHash),
 			Index:       *index,
 			Removed:     log.Removed,
 		}

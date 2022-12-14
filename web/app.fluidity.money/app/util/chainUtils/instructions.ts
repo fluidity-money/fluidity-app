@@ -1,12 +1,4 @@
-import ethInstructions from "./ethereum/instructions";
-
-const claimRewards = async (address: string, network: string) => {
-  switch (network) {
-    case "ethereum":
-      return ethInstructions.claimRewards(address);
-    default:
-      return [];
-  }
+export type TransactionResponse = {
+  confirmTx: () => Promise<boolean>;
+  txHash: string;
 };
-
-export { claimRewards };

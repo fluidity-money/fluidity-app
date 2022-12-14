@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector } from "@web3-react/types";
+import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import {
   useWeb3React,
   Web3ReactProvider,
@@ -12,6 +13,12 @@ import {
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 import FluidityFacadeContext from "./FluidityFacade";
+
+import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import {
+  getTotalPrizePool,
+  manualRewardToken,
+} from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
   getUsdAmountMinted,
@@ -30,6 +37,18 @@ const EthereumFacade = ({
   connectors: [Connector, Web3ReactHooks][];
 }) => {
   const { isActive, provider, account, connector } = useWeb3React();
+
+  // attempt to connect eagerly on mount
+  // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
+  useEffect(() => {
+    connectors.every(([connector]) => {
+      connector?.connectEagerly?.()?.catch(() => {
+        return true;
+      });
+
+      return false;
+    });
+  }, []);
 
   const getBalance = async (contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
@@ -110,7 +129,7 @@ const EthereumFacade = ({
   const swap = async (
     amount: string,
     contractAddress: string
-  ): Promise<void> => {
+  ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -150,7 +169,93 @@ const EthereumFacade = ({
       isFluidOf: !fromFluid,
     };
 
-    await makeContractSwap(signer, from, to, amount);
+    const ethContractRes = await makeContractSwap(signer, from, to, amount);
+
+    return ethContractRes
+      ? {
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
+      : undefined;
+  };
+
+  const manualReward = async (
+    fluidTokenAddrs: string[],
+    userAddr: string
+  ): Promise<
+    | ({ amount: number; gasFee: number; networkFee: number } | undefined)[]
+    | undefined
+  > => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return;
+    }
+
+    return Promise.all(
+      fluidTokenAddrs
+        .map((addr) => tokens.find((t) => t.address === addr))
+        .filter((t) => !!t && !!t.isFluidOf)
+        .map(async (token) => {
+          const baseToken = tokens.find((t) => t.address === token?.isFluidOf);
+
+          if (!baseToken) return;
+
+          const contract: ContractToken = {
+            address: token?.address ?? "",
+            ABI: tokenAbi,
+            symbol: token?.symbol ?? "",
+            isFluidOf: !!token?.isFluidOf,
+          };
+
+          return await manualRewardToken(
+            contract,
+            baseToken.symbol,
+            userAddr,
+            signer
+          );
+        })
+    );
+  };
+
+  const addToken = async (symbol: string) => {
+    const token = tokens.find((t) => t.symbol === symbol);
+
+    if (!token) return;
+
+    const { protocol, host } = window.location;
+
+    const watchToken = {
+      address: token.address,
+      symbol: token.symbol,
+      decimals: token.decimals,
+      image: `${protocol}//${host}${token.logo}`,
+    };
+
+    return connector?.watchAsset?.(watchToken);
+  };
+
+  const getPrizePool = async (): Promise<number> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return 0;
+    }
+    const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
+
+    return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi);
+  };
+
+  const getFluidTokens = async (): Promise<string[]> => {
+    const fluidTokenAddrs = tokens
+      .filter((t) => !!t.isFluidOf)
+      .map((t) => t.address);
+
+    const fluidTokenBalances: [string, number][] = await Promise.all(
+      fluidTokenAddrs.map(async (addr) => [addr, await getBalance(addr)])
+    );
+
+    return fluidTokenBalances.filter((token) => token[1]).map(([addr]) => addr);
   };
 
   return (
@@ -160,9 +265,14 @@ const EthereumFacade = ({
         limit,
         amountMinted,
         balance: getBalance,
+        tokens: getFluidTokens,
+        prizePool: getPrizePool,
         disconnect: deactivate,
         useConnectorType,
-        address: account,
+        rawAddress: account ?? "",
+        address: account?.toLowerCase() ?? "",
+        manualReward,
+        addToken,
         connected: isActive,
       }}
     >

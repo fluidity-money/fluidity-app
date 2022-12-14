@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 import { PublicKey, Connection } from "@solana/web3.js";
 
 import BigNumber from "bn.js";
-import { PipedTransaction } from "./types";
+import { PipedTransaction, NotificationType } from "./types";
 
 import config from "~/webapp.config.server";
 
@@ -59,17 +59,18 @@ export const solGetTransactionsObservable = (
 
             const amount = preTokenBalanceSource.sub(postTokenBalanceSource);
 
-            //Spam transaction: not possible for an account signer to transfer more amount of token than it owns.
-
             const uiTokenAmount = amountToDecimalString(
               amount.toString(10),
               tokenDecimal
             );
             const transaction: PipedTransaction = {
+              type: NotificationType.ONCHAIN,
               source: source,
               destination: destination,
               amount: shorthandAmountFormatter(uiTokenAmount, 3),
               token,
+              transactionHash: "",
+              rewardType: "",
             };
             LastSignature = transactionLog.signature;
             subscriber.next(transaction);

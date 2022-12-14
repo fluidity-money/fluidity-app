@@ -24,13 +24,15 @@ const OptionsSchema = z.object({
             http: envVar().default(z.string()),
             ws: envVar().default(z.string()),
           }),
-          server: z.string(),
+          secret: envVar().default(z.string()).optional(),
+          server: z.string().optional(),
         })
       )
       .min(1)
   ),
   config: z.object({}).catchall(
     z.object({
+      explorer: z.string(),
       fluidAssets: z.array(z.string()),
       tokens: z
         .array(
@@ -67,7 +69,13 @@ const OptionsSchema = z.object({
           z.object({
             name: z.string(),
             img: z.string(),
-            link: z.string(),
+            link: z.object({
+              fUSDC: z.string(),
+              fUSDT: z.string(),
+              fTUSD: z.string().optional(),
+              fFRAX: z.string().optional(),
+              fDAI: z.string().optional(),
+            }),
           })
         )
         .min(1),
@@ -90,9 +98,16 @@ const OptionsSchema = z.object({
     Solend: z.string(),
     Uniswap: z.string(),
     Sushiswap: z.string(),
-  }),
-  database: z.object({
-    hasura: z.string(),
+    Fluidity: z.string(),
+    Balancer: z.string(),
+    Oneinch: z.string(),
+    Mooniswap: z.string(),
+    Curve: z.string(),
+    Multichain: z.string(),
+    "XY Finance": z.string(),
+    Raydium: z.string(),
+    Lifinity: z.string(),
+    Mercurial: z.string(),
   }),
 });
 
@@ -102,11 +117,9 @@ const options = OptionsSchema.parse(
   parse(readFileSync(resolve(__dirname, "../config.toml"), "utf8"))
 );
 
-type ColorMap = { [network: string]: { [symbol: string]: string } };
+export type ColorMap = { [network: string]: { [symbol: string]: string } };
 
 const getColors = async () => {
-  console.log("🎨 Getting colors from icons... Just sit tight for a moment.");
-
   const networks = [];
   for (const network of Object.keys(options.config)) {
     const tokenColors = [];
@@ -133,7 +146,6 @@ const getColors = async () => {
     });
   }
 
-  console.log("🖍️ Done getting colors from icons!");
   return networks.reduce<ColorMap>(
     (acc: { [i: string]: { [i: string]: string } }, { network, colorsMap }) => {
       acc[network] = colorsMap;

@@ -10,8 +10,6 @@
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: -0.02em;
-
-  color: map-get($text, "prominent");
 }
 
 .h1 {
@@ -44,6 +42,14 @@ strong {
 
 .uppercase {
   text-transform: uppercase;
+}
+
+.white {
+  color: map-get($text, "prominent");
+}
+
+.gray {
+  color: map-get($text, "default");
 }
 
 .hollow {

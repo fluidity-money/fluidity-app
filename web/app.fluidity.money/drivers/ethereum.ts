@@ -1,3 +1,5 @@
+import { setTimeout } from "timers/promises";
+import { captureException } from "@sentry/remix";
 import { Observable } from "rxjs";
 
 import IERC20 from "@openzeppelin/contracts/build/contracts/IERC20.json";
@@ -6,14 +8,15 @@ import Web3 from "web3";
 
 import { AbiItem } from "web3-utils";
 import BigNumber from "bn.js";
-import { PipedTransaction } from "./types";
+import { PipedTransaction, NotificationType } from "./types";
 
 import config from "~/webapp.config.server";
 import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
 
-export const ethGetTransactionsObservable = (
+const onListen = (
   token: string,
   address: string,
+  decimals: number,
   network = 0
 ) =>
   new Observable<PipedTransaction>((subscriber) => {
@@ -27,6 +30,7 @@ export const ethGetTransactionsObservable = (
       .on(
         "data",
         (event: {
+          transactionHash: string;
           returnValues: { from: string; to: string; value: BigNumber };
         }) => {
           const {
@@ -35,20 +39,44 @@ export const ethGetTransactionsObservable = (
             value: amount,
           } = event.returnValues;
 
-          const uiTokenAmount = amountToDecimalString(amount.toString(), 6);
+          const uiTokenAmount = amountToDecimalString(
+            amount.toString(),
+            decimals
+          );
 
           const transaction: PipedTransaction = {
-            type: "onChain",
+            type: NotificationType.ONCHAIN,
             source: source,
             destination: destination,
             amount: shorthandAmountFormatter(uiTokenAmount, 3),
             token,
-            transactionHash: "",
+            transactionHash: event.transactionHash,
+            rewardType: "",
           };
           subscriber.next(transaction);
         }
       )
-      .on("error", (error: unknown) => {
-        subscriber.error(error);
+      .on("error", async (error: unknown) => {
+        // On websockets errors sleep for a while and do a manual instatiation of listening again
+        captureException(
+          new Error(
+            `Error on ethereum driver listener ... failed to reconect. retrying in 5 seconds :: ${error}`
+          ),
+          {
+            tags: {
+              section: "drivers/ethereum",
+            },
+          }
+        );
+
+        await setTimeout(5000);
+        onListen(token, address, network);
       });
   });
+
+export const ethGetTransactionsObservable = (
+  token: string,
+  address: string,
+  decimals: number,
+  network = 0
+) => onListen(token, address, decimals, network);

@@ -199,7 +199,7 @@ func main() {
 				emission,
 			)
 
-			randomSource := generateRandomIntegers(
+			randomSource := util.RandomIntegers(
 				winningClasses,
 				1,
 				uint32(randomN),

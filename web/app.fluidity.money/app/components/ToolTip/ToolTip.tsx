@@ -20,7 +20,7 @@ export const ToolTip = (props: {
   bgColor: string;
   children: React.ReactNode;
 }) => {
-  const delay = 5000;
+  const delay = 7500;
   const [width, setNewWidth] = useState(0);
 
   const savedCallback = useRef(props.close);
@@ -34,7 +34,7 @@ export const ToolTip = (props: {
 
     let width = 0;
     const id = setInterval(() => {
-      if (width < 100) setNewWidth((width += 0.2));
+      if (width < 100) setNewWidth((width += 0.13333333)); // longer decimal for precision )
     }, 10);
 
     setTimeout(() => {
@@ -69,9 +69,9 @@ export const ToolTip = (props: {
           }}
         >
           {props.children}
-          <span onClick={props.close}>
-            <Text prominent size="xl">
-              X
+          <span onClick={props.close} className="tool_cancel_btn">
+            <Text prominent size="lg">
+              x
             </Text>
           </span>
         </div>

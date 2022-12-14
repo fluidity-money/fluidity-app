@@ -1,6 +1,10 @@
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
+import { ContractTransaction } from "@ethersproject/contracts";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
+import BN from "bn.js";
+import { bytesToHex } from "web3-utils";
+import { B64ToUint8Array, jsonPost } from "~/util";
 
 export const getContract = (
   ABI: ContractInterface,
@@ -170,25 +174,176 @@ const makeContractSwap = async (
       }
       // `.wait()` these here to handle errors
       // call ERC20in
-      return await (await toContract.erc20In(amount)).wait();
+      return await toContract.erc20In(amount);
     } else if (fromIsFluidOf) {
       // fCoin -> Coin
-      return await (await fromContract.erc20Out(amount)).wait();
+      return await fromContract.erc20Out(amount);
     } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
   } catch (error) {
-    return await handleContractErrors(error, signer.provider);
+    return await handleContractErrors(error as ErrorType, signer.provider);
   }
 };
 
+type ManualRewardBody = {
+  // Address of initiator
+  address: string;
+
+  // Name of Token being front-run
+  token_short_name: string;
+};
+
+type ManualRewardRes = {
+  // Error message on unsuccessful call
+  error?: string;
+
+  // Base64 encoded signature for calling
+  // manual-reward in Token.sol
+  payload?: {
+    reward: {
+      winner: string;
+      win_amount: number;
+      first_block: number;
+      last_block: number;
+      token_details: {
+        token_decimals: number;
+        token_short_name: string;
+      };
+    };
+    signature: string;
+  };
+};
+
+export const manualRewardToken = async (
+  token: ContractToken,
+  baseTokenSymbol: string,
+  address: string,
+  signer: Signer
+): Promise<
+  { amount: number; gasFee: number; networkFee: number } | undefined
+> => {
+  const manualRewardUrl = "https://api.ethereum.fluidity.money/manual-reward";
+
+  const manualRewardBody = {
+    address,
+    token_short_name: baseTokenSymbol,
+  };
+
+  const { error, payload } = await jsonPost<ManualRewardBody, ManualRewardRes>(
+    manualRewardUrl,
+    manualRewardBody
+  );
+
+  if (error || !payload) return;
+
+  // Call eth contract
+
+  const { winner, win_amount, first_block, last_block, token_details } =
+    payload.reward;
+
+  const { token_decimals } = token_details;
+  const decimals = BigNumber.from(10).pow(token_decimals);
+
+  const winningAmount = BigNumber.from(`${win_amount}`);
+
+  const { signature: b64Signature } = payload;
+
+  // convert B64 -> byte[] -> hex string
+  const uint8Signature = B64ToUint8Array(b64Signature);
+  const hexSignature = bytesToHex(Array.from(uint8Signature));
+
+  const mainnetId = 1;
+
+  try {
+    const tokenContract = getContract(token.ABI, token.address, signer);
+
+    const contractTx: ContractTransaction = await tokenContract.manualReward(
+      // contractAddress
+      token.address,
+      // chainid
+      mainnetId,
+      // winnerAddress
+      winner,
+      // winAmount
+      winningAmount,
+      // firstBlock
+      first_block,
+      // lastBlock
+      last_block,
+      // sig
+      hexSignature
+    );
+
+    const res = await contractTx.wait();
+
+    return {
+      networkFee: res.gasUsed.toNumber(),
+      gasFee: res.gasUsed.toNumber(),
+      amount: parseFloat(winningAmount.div(decimals).toString()),
+    };
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return { amount: 0, gasFee: 0, networkFee: 0 };
+  }
+};
+
+type PrizePool = {
+  amount: BigNumber;
+  decimals: number;
+};
+
+// Returns total prize pool from aggregated contract
+export const getTotalPrizePool = async (
+  provider: JsonRpcProvider,
+  rewardPoolAddr: string,
+  rewardPoolAbi: ContractInterface
+): Promise<number> => {
+  try {
+    const rewardPoolContract = new Contract(
+      rewardPoolAddr,
+      rewardPoolAbi,
+      provider
+    );
+
+    if (!rewardPoolContract)
+      throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
+
+    const pools: PrizePool[] = await rewardPoolContract.callStatic.getPools();
+
+    const totalPrizePool = pools.reduce((sum, { amount, decimals }) => {
+      // amount is uint256, convert to proper BN for float calculations
+      const amountBn = new BN(amount.toString());
+
+      const decimalsBn = new BN(10).pow(new BN(decimals));
+
+      const amountDiv = amountBn.div(decimalsBn);
+
+      return sum.add(amountDiv);
+    }, new BN(0));
+
+    return totalPrizePool.toNumber();
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
+  }
+};
+
+type ErrorType = {
+  data: { message: string };
+} & { message: string };
+
 export const handleContractErrors = async (
-  error: any,
+  error: ErrorType,
   provider: Provider | undefined
 ) => {
-  const msg: string = error?.data?.message ?? error?.message;
+  const msg = error?.data?.message ?? error?.message;
+
+  if (!msg) throw new Error(`Unknown Error: ${error}`);
+
   // check for denial separately (these don't contain an error code for some reason)
   if (msg === "MetaMask Tx Signature: User denied transaction signature.") {
     throw new Error(`Transaction Denied`);
   }
+
   try {
     // check if we've got a different metamask error
     const metaMaskError = JSON.parse(msg.match(/{.*}/)?.[0] || "");

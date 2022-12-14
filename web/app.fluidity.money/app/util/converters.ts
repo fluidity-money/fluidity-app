@@ -1,4 +1,5 @@
 import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
+import { Buffer } from "buffer";
 
 const B64ToUint8Array = (b64string: string): Uint8Array =>
   Buffer.from(b64string, "base64");
@@ -17,7 +18,7 @@ const shorthandAmountFormatter = (
 ): string => {
   const num: number = parseFloat(uiAmount);
   if (num < 1) {
-    return uiAmount;
+    return decimalTrim(uiAmount, 3);
   }
   const lookup = [
     { value: 1, symbol: "" },
@@ -81,6 +82,17 @@ const clearTrailingZeros = (value: string) => {
   return value;
 };
 
+//trim a string to <limit> decimal places
+const decimalTrim = (amount: string, limit: number) => {
+  if (limit <= 0) {
+    return amount;
+  }
+
+  const trimIndex = amount.indexOf(".");
+  const trim = trimIndex > -1 ? amount.slice(0, trimIndex + limit + 1) : amount;
+  return trim;
+};
+
 /**
  * @param address string
  * @returns abbrevates long addresses e.g 0x1234567890 converted to 0x123...890
@@ -94,10 +106,20 @@ const trimAddress = (address: string): string => {
 };
 
 const transactionActivityLabel = (
-  activity: { sender: string; currency: string; [key: string]: unknown },
+  activity: {
+    sender: string;
+    currency: string;
+    swapType?: "in" | "out";
+    [key: string]: unknown;
+  },
   address: string
 ) => {
-  const { sender, currency } = activity;
+  const { sender, currency, swapType } = activity;
+  if (swapType)
+    return swapType === "in"
+      ? `Fluidified ${currency[0] === "f" ? currency.slice(1) : currency}`
+      : `Reverted ${currency}`;
+
   return sender === address ? `Sent ${currency}` : `Received ${currency}`;
 };
 
@@ -117,6 +139,7 @@ const transactionTimeLabel = (timestamp: number) => {
 };
 
 export {
+  decimalTrim,
   shorthandAmountFormatter,
   amountToDecimalString,
   clearTrailingZeros,

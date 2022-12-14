@@ -11,12 +11,15 @@ import (
 	"fmt"
 	"time"
 
+	solApps "github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	ethApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -25,31 +28,73 @@ const (
 
 	// TableWinners to use to record winners based on the contract calls
 	TableWinners = `winners`
+
+	// TablePendingRewardType to store whether a winner is a sender or receiver
+	TablePendingRewardType = "ethereum_pending_reward_type"
 )
 
-type Winner = winners.Winner
+type (
+	Winner		= winners.Winner
+	Application = winners.Application
+)
+
+type PendingRewardData struct {
+	SendHash    ethereum.Hash
+	RewardType  winners.RewardType
+	Application ethApps.Application
+}
 
 func InsertWinner(winner Winner) {
 	timescaleClient := timescale.Client()
 
 	var (
-		tokenShortName = winner.TokenDetails.TokenShortName
-		tokenDecimals  = winner.TokenDetails.TokenDecimals
+		tokenShortName    = winner.TokenDetails.TokenShortName
+		tokenDecimals     = winner.TokenDetails.TokenDecimals
+		applicationString = winner.Application
+
+		statementText string
 	)
 
-	statementText := fmt.Sprintf(
-		`INSERT INTO %s (
-			network,
-			transaction_hash,
-			winning_address,
-			solana_winning_owner_address,
-			winning_amount,
-			awarded_time,
-			token_short_name,
-			token_decimals
+	switch winner.Network {
+	case network.NetworkEthereum:
+		statementText = fmt.Sprintf(
+			`INSERT INTO %s (
+				network,
+				transaction_hash,
+				send_transaction_hash,
+				winning_address,
+				solana_winning_owner_address,
+				winning_amount,
+				awarded_time,
+				token_short_name,
+				token_decimals,
+				reward_type,
+				ethereum_application
+			)`,
+			TableWinners,
 		)
 
-		VALUES (
+	case network.NetworkSolana:
+		statementText = fmt.Sprintf(
+			`INSERT INTO %s (
+				network,
+				transaction_hash,
+				send_transaction_hash,
+				winning_address,
+				solana_winning_owner_address,
+				winning_amount,
+				awarded_time,
+				token_short_name,
+				token_decimals,
+				reward_type,
+				solana_application
+			)`,
+			TableWinners,
+		)
+	}
+
+	statementText +=
+		`VALUES (
 			$1,
 			$2,
 			$3,
@@ -57,22 +102,25 @@ func InsertWinner(winner Winner) {
 			$5,
 			$6,
 			$7,
-			$8
-		);`,
-
-		TableWinners,
-	)
+			$8,
+			$9,
+			$10,
+			$11
+		);`
 
 	_, err := timescaleClient.Exec(
 		statementText,
 		winner.Network,
 		winner.TransactionHash,
+		winner.SendTransactionHash,
 		winner.WinnerAddress,
 		winner.SolanaWinnerOwnerAddress,
 		winner.WinningAmount,
 		winner.AwardedTime,
 		tokenShortName,
 		tokenDecimals,
+		winner.RewardType,
+		applicationString,
 	)
 
 	if err != nil {
@@ -85,7 +133,7 @@ func InsertWinner(winner Winner) {
 }
 
 // GetWinners in the past, limited by a number
-func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
+func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []Winner {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -97,7 +145,10 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 			awarded_time,
 			token_short_name,
 			token_decimals,
-			solana_winning_owner_address
+			solana_winning_owner_address,
+			reward_type,
+			ethereum_application,
+			solana_application
 
 		FROM %v
 		WHERE network = $1
@@ -109,7 +160,7 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 	rows, err := timescaleClient.Query(
 		statementText,
-		network,
+		blockchainNetwork,
 		limit,
 	)
 
@@ -134,6 +185,8 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 		var (
 			winner                   Winner
 			solanaWinnerOwnerAddress sql.NullString
+			applicationSolana        string
+			applicationEthereum      string
 		)
 
 		err := rows.Scan(
@@ -145,6 +198,9 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 			&winner.TokenDetails.TokenShortName,
 			&winner.TokenDetails.TokenDecimals,
 			&solanaWinnerOwnerAddress,
+			&winner.RewardType,
+			&applicationSolana,
+			&applicationEthereum,
 		)
 
 		if err != nil {
@@ -157,10 +213,241 @@ func GetLatestWinners(network network.BlockchainNetwork, limit int) []Winner {
 
 		winner.SolanaWinnerOwnerAddress = solanaWinnerOwnerAddress.String
 
+		var application Application
+
+		switch winner.Network {
+		case network.NetworkEthereum:
+			application, err = ethApps.ParseApplicationName(applicationEthereum)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Failed to convert application name into application!"
+					k.Payload = err
+				})
+			}
+
+		case network.NetworkSolana:
+			application, err = solApps.ParseApplicationName(applicationSolana)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Failed to convert application name into application!"
+					k.Payload = err
+				})
+			}
+
+		}
+
+		winner.Application = application.String()
+
 		winners = append(winners, winner)
 	}
 
 	return winners
+}
+
+// Ethereum Specific
+// GetAndRemovePendingRewardData to fetch and remove the type (send or receive)
+// of an unsent win as well as the application that was involved
+// using the hash of the reward payout transaction
+func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_details.TokenDetails, firstBlock, lastBlock misc.BigInt, address ethereum.Address) []PendingRewardData {
+
+	timescaleClient := timescale.Client()
+
+	var (
+		shortName = token.TokenShortName
+		first = firstBlock.Int64()
+		last = lastBlock.Int64()
+	)
+
+	statementText := fmt.Sprintf(
+		`DELETE FROM %s
+		WHERE
+			network = $1
+			AND token_short_name = $2
+			AND block_number >= $3
+			AND block_number <= $4
+			AND winner_address = $5
+		RETURNING
+			is_sender,
+			application,
+			send_transaction_hash
+		;`,
+
+		TablePendingRewardType,
+	)
+
+	rows, err := timescaleClient.Query(
+		statementText,
+		net,
+		shortName,
+		first,
+		last,
+		address,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to fetch pending reward type with address %s!",
+				address.String(),
+			)
+
+			k.Payload = err
+		})
+	}
+
+	defer rows.Close()
+
+
+	var rewards []PendingRewardData
+
+	for rows.Next() {
+		var (
+			isSender bool
+			application_ string
+			sendHash_ string
+		)
+
+		err := rows.Scan(
+			&isSender,
+			&application_,
+			&sendHash_,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Failed to scan a row of pending reward data for address %s!",
+					address.String(),
+				)
+
+				k.Payload = err
+			})
+		}
+
+		application, err := ethApps.ParseApplicationName(application_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Fetched invalid application name %v!",
+					application_,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		sendHash := ethereum.HashFromString(sendHash_)
+
+		var rewardType winners.RewardType
+
+		if isSender {
+			rewardType = "send"
+		} else {
+			rewardType = "receive"
+		}
+
+		reward := PendingRewardData{
+			SendHash:    sendHash,
+			RewardType:  rewardType,
+			Application: application,
+		}
+
+		rewards = append(rewards, reward)
+	}
+
+	return rewards
+}
+
+// Ethereum Specific
+// InsertPendingRewardType to store the reward type and application of a pending win
+func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, receipientAddress ethereum.Address, application Application) {
+
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`INSERT INTO %s (
+			network,
+			token_short_name,
+			send_transaction_hash,
+			winner_address,
+			is_sender,
+			application,
+			block_number
+		)
+
+		VALUES (
+			$1,
+			$2,
+			$3,
+			$4,
+			$5,
+			$6,
+			$7
+		);`,
+
+		TablePendingRewardType,
+	)
+
+	// insert the sender's value
+	_, err := timescaleClient.Exec(
+		statementText,
+		net,
+		token.TokenShortName,
+		sendTransactionHash,
+		senderAddress,
+		true,
+		application.String(),
+		blockNumber,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to insert pending reward type with hash %v!",
+				sendTransactionHash,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	// insert the recipient's value
+	_, err = timescaleClient.Exec(
+		statementText,
+		net,
+		token.TokenShortName,
+		sendTransactionHash,
+		receipientAddress,
+		false,
+		application.String(),
+		blockNumber,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to insert pending reward type with hash %v!",
+				sendTransactionHash,
+			)
+
+			k.Payload = err
+		})
+	}
 }
 
 // CountWinnersForDateAndWinningAmount given, just the date given (any wins
@@ -224,67 +511,3 @@ func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, toke
 	return winnersCount, awardedAmount
 }
 
-// GetUniqueTokens gets TokenDetails for each unique tokens in the winners
-func GetUniqueTokens(network network.BlockchainNetwork) []util.TokenDetailsBase {
-
-	timescaleClient := timescale.Client()
-
-	statementText := fmt.Sprintf(
-		`SELECT DISTINCT token_short_name, token_decimals
-		FROM %s
-		WHERE network = $1
-		`,
-
-		TableWinners,
-	)
-
-	rows, err := timescaleClient.Query(
-		statementText,
-		network,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to query all unique winners for network %#v!",
-				network,
-			)
-
-			k.Payload = err
-		})
-	}
-
-	defer rows.Close()
-
-	tokenDetailsCollected := make([]util.TokenDetailsBase, 0)
-
-	for rows.Next() {
-		var (
-			tokenName     string
-			tokenDecimals int
-		)
-
-		err := rows.Scan(&tokenName, &tokenDecimals)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-
-				k.Format(
-					"Failed to scan the token name and decimals for network %#v!",
-					network,
-				)
-
-				k.Payload = err
-			})
-		}
-
-		tokenDetails := util.NewTokenDetailsBase(tokenName, tokenDecimals)
-
-		tokenDetailsCollected = append(tokenDetailsCollected, tokenDetails)
-	}
-
-	return tokenDetailsCollected
-}

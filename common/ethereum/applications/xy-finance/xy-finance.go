@@ -17,8 +17,8 @@ import (
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
-	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/ethereum/go-ethereum/ethclient"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 const xyFinanceAbiString = `[
@@ -187,11 +187,11 @@ var erc20Abi ethAbi.ABI
 
 // List of Day 1 supported stable tokens
 var supportedTokens = map[libEthereum.Address]bool{
-	"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": true, // USDC
-	"0x853d955acef822db058eb8505911ed77f175b99e": true, // Frax
-	"0xdac17f958d2ee523a2206206994597c13d831ec7": true, // USDT
-	"0x0000000000085d4780b73119b644ae5ecd22b376": true, // TUSD
-	"0x6b175474e89094c44da98b954eedeac495271d0f": true, // DAI
+	ethTypes.AddressFromString("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"): true, // USDC
+	ethTypes.AddressFromString("0x853d955acef822db058eb8505911ed77f175b99e"): true, // Frax
+	ethTypes.AddressFromString("0xdac17f958d2ee523a2206206994597c13d831ec7"): true, // USDT
+	ethTypes.AddressFromString("0x0000000000085d4780b73119b644ae5ecd22b376"): true, // TUSD
+	ethTypes.AddressFromString("0x6b175474e89094c44da98b954eedeac495271d0f"): true, // DAI
 }
 
 type xyFee = struct {

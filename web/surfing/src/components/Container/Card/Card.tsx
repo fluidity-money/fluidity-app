@@ -7,18 +7,21 @@ import styles from './Card.module.scss';
 interface ICard {
   component?: "div" | "button" | "tr";
   rounded?: boolean;
+  disabled?: boolean;
   type?: "gray" | "box" | "holobox" | "transparent";
   [_: string]: any;
 }
 
-const Card = ({component, rounded, className, children, type, ...props}: ICard) => {
+const Card = ({component, rounded, className, disabled, children, type, ...props}: ICard) => {
   const classProps = className || "";
   const Component = component || "div";
 
   const typeClass = styles[type || "gray"];
-  
+
+  const allClasses = `${styles.card} ${typeClass} ${rounded && styles.rounded} ${disabled && styles.disabled} ${classProps}`  
+
   return (
-    <Component className={`${styles.card} ${typeClass} ${rounded && styles.rounded} ${classProps}`} {...props}>
+    <Component className={allClasses} disabled={disabled} {...props}>
       {children}
     </Component>
   )

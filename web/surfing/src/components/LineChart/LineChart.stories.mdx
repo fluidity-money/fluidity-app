@@ -37,4 +37,27 @@ export const Template = (args) => <div style={{height: "400px"}}>
     >
         {Template.bind({})}
     </Story>
+    <Story
+        name="0d Line Graph"
+        args={{
+        data: [{x: 10, y: 0, name: "Alice"}, {x: 20, y: 0, name: "Bob"}, {x: 30, y: 0, name: "Connor"}, {x: 40, y: 0, name: "David"}],
+        xLabel: 'Some X Label',
+        yLabel: 'Some Y Label',
+        lineLabel: 'Some Line Label',
+        accessors: {
+            xAccessor: (d) => d.x,
+            yAccessor: (d) => d.y,
+        },
+        renderTooltip: ({datum}) => (
+            <span>
+              {datum.y}{" "}
+              <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                By {datum.name}
+              </span>
+            </span>
+        )
+        }}
+    >
+        {Template.bind({})}
+    </Story>
 </Canvas>

@@ -55,6 +55,15 @@ contract Token is IERC20, ITransferWithBeneficiary {
         uint endBlock
     );
 
+    /// @notice emitted when a blocked reward is released
+    event UnblockReward(
+        bytes32 indexed originalRewardTx,
+        address indexed winner,
+        uint amount,
+        uint startBlock,
+        uint endBlock
+    );
+
     /// @notice emitted when an underlying token is wrapped into a fluid asset
     event MintFluid(address indexed addr, uint amount);
 
@@ -433,14 +442,14 @@ contract Token is IERC20, ITransferWithBeneficiary {
             return;
         }
 
-        rewardInternal(firstBlock, lastBlock, winner, amount);
+        rewardInternal(winner, amount);
+        emit Reward(winner, amount, firstBlock, lastBlock);
     }
 
-    function rewardInternal(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
+    function rewardInternal(address winner, uint256 amount) internal {
         require(noEmergencyMode(), "emergency mode!");
 
         // mint some fluid tokens from the interest we've accrued
-        emit Reward(winner, amount, firstBlock, lastBlock);
 
         _mint(winner, amount);
     }
@@ -484,7 +493,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
      * @param firstBlock the first block the rewards include (should be from the BlockedReward event)
      * @param lastBlock the last block the rewards include
      */
-    function unblockReward(address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
+    function unblockReward(bytes32 rewardTx, address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
         require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == operator_, "only the operator account can use this");
 
@@ -494,7 +503,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
         blockedRewards_[user] -= amount;
 
         if (payout) {
-            rewardInternal(firstBlock, lastBlock, user, amount);
+            rewardInternal(user, amount);
+            emit UnblockReward(rewardTx, user, amount, firstBlock, lastBlock);
         }
     }
 
@@ -558,7 +568,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
     }
 
     /**
-     * @dev ECrecover with checks for signature mallmalleability
+     * @dev ECrecover with checks for signature malleability
      * @dev adapted from openzeppelin's ECDSA library
      */
     function recover(
@@ -618,6 +628,10 @@ contract Token is IERC20, ITransferWithBeneficiary {
     function remainingGlobalMintLimit() public view returns (uint) {
         return remainingGlobalMint_;
     }
+    
+     * @notice return the max unchecked reward that's currently set
+     */
+    function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }
 
     /*
      * @notice returns how much `account` has minted

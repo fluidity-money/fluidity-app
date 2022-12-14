@@ -10,8 +10,13 @@
   display: none;
 }
 
+.fluidify-button-dashboard-mobile {
+  display: none;
+}
+
 body {
   display: flex;
+  text-align: center;
 }
 
 #claim-header {
@@ -51,4 +56,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+#provide-liquidity {
+  display: none;
 }

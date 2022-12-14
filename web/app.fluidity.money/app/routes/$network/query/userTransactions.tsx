@@ -1,20 +1,30 @@
-import { LoaderFunction, json, redirect } from "@remix-run/node";
+import type Transaction from "~/types/Transaction";
+import type { Winner } from "~/queries/useUserRewards";
 
+import { LoaderFunction, json } from "@remix-run/node";
+import config from "~/webapp.config.server";
 import {
-  useUserTransactionAllCount,
-  useUserTransactionByAddressCount,
+  useUserRewardsAll,
+  useUserRewardsByAddress,
   useUserTransactionsAll,
   useUserTransactionsByAddress,
 } from "~/queries";
 import { captureException } from "@sentry/react";
+import { MintAddress } from "~/types/MintAddress";
 
-export type UserTransaction = {
+type UserTransaction = {
   sender: string;
   receiver: string;
   hash: string;
   timestamp: number;
   value: number;
   currency: string;
+};
+
+export type TransactionsLoaderData = {
+  transactions: Transaction[];
+  page: number;
+  count: number;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -28,48 +38,50 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const page = parseInt(page_);
 
-  if (!page || page < 1) return new Error("Invalid Request");
+  if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const [
-      { data: userTransactionCountData, errors: userTransactionCountErr },
-      { data: userTransactionsData, errors: userTransactionsErr },
-    ] = await Promise.all(
-      address
-        ? [
-            useUserTransactionByAddressCount(network, address),
-            useUserTransactionsByAddress(network, address, page),
-          ]
-        : [
-            useUserTransactionAllCount(network),
-            useUserTransactionsAll(network, page),
-          ]
+    const { data: winnersData, errors: winnersErr } = address
+      ? await useUserRewardsByAddress(network ?? "", address)
+      : await useUserRewardsAll(network ?? "");
+
+    if (winnersErr || !winnersData) {
+      throw winnersErr;
+    }
+
+    // winnersMap looks up if a transaction was the send that caused a win
+    const winnersMap = winnersData.winners.reduce(
+      (map, winner) => ({
+        ...map,
+        [winner.send_transaction_hash]: {
+          ...winner,
+          winning_amount:
+            winner.winning_amount +
+            (map[winner.send_transaction_hash]?.winning_amount || 0),
+        },
+      }),
+      {} as { [key: string]: Winner }
     );
 
-    if (!userTransactionCountData || userTransactionCountErr) {
-      captureException(
-        new Error(
-          `Could not fetch Transactions count for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
-          },
+    // payoutsMap looks up if a transaction was a payout transaction
+    const payoutAddrs = winnersData.winners.map(
+      ({ transaction_hash }) => transaction_hash
+    );
+
+    const { data: userTransactionsData, errors: userTransactionsErr } =
+      await (async () => {
+        switch (true) {
+          case !!address:
+            return useUserTransactionsByAddress(
+              network,
+              page,
+              address as string,
+              payoutAddrs
+            );
+          default:
+            return useUserTransactionsAll(network, page, payoutAddrs);
         }
-      );
-
-      return new Error("Server could not fulfill request");
-    }
-
-    const {
-      [network as string]: {
-        transfers: [{ count: txCount }],
-      },
-    } = userTransactionCountData;
-
-    if (Math.ceil(txCount / 12) < page && txCount > 0) {
-      return redirect(`./`, 301);
-    }
+      })();
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -91,7 +103,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     } = userTransactionsData;
 
     // Destructure GraphQL data
-    const sanitizedTransactions: UserTransaction[] = transactions.map(
+    const userTransactions: UserTransaction[] = transactions.map(
       (transaction) => {
         const {
           sender: { address: sender },
@@ -108,17 +120,70 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           sender,
           receiver,
           hash,
-          timestamp,
-          value,
+          // Normalise timestamp to ms
+          timestamp: timestamp * 1000,
+          // Bitquery stores DAI decimals (6) incorrectly (should be 18)
+          value:
+            currency === "DAI" || currency === "fDAI"
+              ? value / 10 ** 12
+              : value,
           currency,
         };
       }
     );
 
-    return json({
-      transactions: sanitizedTransactions,
-      count: txCount,
+    const {
+      config: {
+        [network as string]: { tokens },
+      },
+    } = config;
+
+    const tokenLogoMap = tokens.reduce(
+      (map, token) => ({
+        ...map,
+        [token.symbol]: token.logo,
+      }),
+      {} as Record<string, string>
+    );
+
+    const defaultLogo = "/assets/tokens/usdt.svg";
+
+    const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
+      const swapType =
+        tx.sender === MintAddress
+          ? "in"
+          : tx.receiver === MintAddress
+          ? "out"
+          : undefined;
+
+      const winner = winnersMap[tx.hash];
+
+      return {
+        sender: tx.sender,
+        receiver: tx.receiver,
+        winner: winner?.winning_address ?? "",
+        reward: winner
+          ? winner.winning_amount / 10 ** winner.token_decimals
+          : 0,
+        hash: tx.hash,
+        rewardHash: winner?.transaction_hash ?? "",
+        currency: tx.currency,
+        value: tx.value,
+        timestamp: tx.timestamp,
+        logo: tokenLogoMap[tx.currency] || defaultLogo,
+        provider:
+          (network === "ethereum"
+            ? winner?.ethereum_application
+            : winner?.solana_application) ?? "Fluidity",
+        swapType,
+      };
     });
+
+    return json({
+      page,
+      transactions: mergedTransactions,
+      count: Object.keys(winnersMap).length,
+    } as TransactionsLoaderData);
   } catch (err) {
     captureException(
       new Error(

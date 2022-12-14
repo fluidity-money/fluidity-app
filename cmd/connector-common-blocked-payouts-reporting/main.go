@@ -5,22 +5,33 @@
 package main
 
 import (
+	"encoding/json"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 )
 
 func main() {
-    winners.BlockedWinnersAll(func (blockedWinner winners.Winner) {
+    winners.BlockedWinnersAll(func (blockedWinner winners.BlockedWinner) {
         log.App(func(k *log.Log) {
             k.Message = "Received a blocked winner message!"
             k.Payload = blockedWinner
         })
 
+        jsonBlockedWinner, err := json.Marshal(blockedWinner)
+
+        if err != nil {
+            log.Fatal(func(k *log.Log) {
+                k.Message = "Failed to marshal a blocked winner to json!"
+                k.Payload = err
+            })
+        }
+
         discord.Notify(
             discord.SeverityNotice,
-            "Saw a blocked payout! %+v",
-            blockedWinner,
+            "Saw a blocked payout! %s",
+            jsonBlockedWinner,
         )
     })
 }

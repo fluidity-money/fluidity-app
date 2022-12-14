@@ -6,8 +6,10 @@ import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
 import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { GeneralButton, NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
+import { NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
+import { LaunchButton } from "components/Button";
+import Link from "next/link";
 
 const NavBar = () => {
   const [modal, setModal] = useState(false);
@@ -15,11 +17,6 @@ const NavBar = () => {
   const handleModal = (show: boolean) => {
     setModal(show);
   };
-  
-  const goToDemoAnchor = () => {
-    const origin = document.location.toString().split('#')[0];
-    document.location = origin + '#demo';
-  }
 
   const { width } = useViewport();
   const breakpoint = 700;
@@ -39,9 +36,14 @@ const NavBar = () => {
           animate={scrollDir === "up" ? "appear" : "disappear"}
           transition={{ type: "tween" }}
         >
-          <a href={"/"}>
-            <img src="/assets/images/textLogo.svg" alt="home page" />
-          </a>
+          <Link 
+            href={"/"}
+            passHref
+          >
+            <a href={"/"}>
+              <img src="/assets/images/textLogo.svg" alt="home page" />
+            </a>
+          </Link>
         </motion.div>
         <div className={styles.navbarFixed}>
           <div className={styles.fixed}>
@@ -51,20 +53,24 @@ const NavBar = () => {
               animate={scrollDir === "up" ? "disappear" : "appear"}
               transition={{ type: "tween" }}
             >
-              <a href={"/"}>
-                <div className={styles.imgContainer}>
-                  <img src="/assets/images/logoOutline.png" alt="home page" />
-                </div>
-              </a>
+              <Link
+                href={"/"}
+                passHref
+              >
+                <a href={"/"}>
+                  <div className={styles.imgContainer}>
+                    <img src="/assets/images/logoOutline.png" alt="home page" />
+                  </div>
+                </a>
+              </Link>
             </motion.div>
-            <GeneralButton
+            <LaunchButton
               version={"secondary"}
-              buttontype={"text"}
+              type={"text"}
               size={width < breakpoint ? "small" : "medium"}
-              handleClick={goToDemoAnchor}
             >
               LAUNCH FLUIDITY
-            </GeneralButton>
+            </LaunchButton>
           </div>
         </div>
         <motion.div
@@ -77,16 +83,21 @@ const NavBar = () => {
             <nav>
               <ul>
                 <li>
-                  <a
+                  <Link
                     href={"/howitworks"}
-                    className={
-                      window.location.pathname.toString() === "/howitworks"
-                        ? styles.active
-                        : ""
-                    }
+                    passHref
                   >
-                    <Text size="md" className={styles.transparent}>HOW IT WORKS</Text>
-                  </a>
+                    <a
+                      className={
+                        window.location.pathname.toString() === "/howitworks"
+                          ? styles.active
+                          : ""
+                      }
+                      href={"/howitworks"}
+                    >
+                      <Text size="md" className={styles.transparent}>HOW IT WORKS</Text>
+                    </a>
+                  </Link>
                 </li>
                 {/* <li>
                   <a
@@ -113,16 +124,21 @@ const NavBar = () => {
                   </a>
                 </li> */}
                 <li>
-                  <a
+                  <Link
                     href={"/resources"}
-                    className={
-                      window.location.pathname.toString() === "/resources"
-                        ? styles.active
-                        : ""
-                    }
+                    passHref
                   >
-                    <Text size="md" className={styles.transparent}>RESOURCES</Text>
-                  </a>
+                    <a
+                      href={"/resources"}
+                      className={
+                        window.location.pathname.toString() === "/resources"
+                          ? styles.active
+                          : ""
+                      }
+                    >
+                      <Text size="md" className={styles.transparent}>RESOURCES</Text>
+                    </a>
+                  </Link>
 
                   <button className={`${styles.modalButton} ${styles.transparent}`} onClick={() => handleModal(!modal)}>
                     <TriangleDown />

@@ -11,7 +11,7 @@ import {
   Heading,
   BlockchainModal,
   Trophy,
-  trimAddressShort,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
@@ -50,7 +50,7 @@ export default function MobileModal({
   const [connectedWalletModalVisibility, setconnectedWalletModalVisibility] =
     useState<boolean>(false);
 
-  const { connected, address, connecting, disconnect } = useContext(
+  const { connected, address, rawAddress, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
 
@@ -67,6 +67,11 @@ export default function MobileModal({
       ? (document.body.style.position = "static")
       : setTimeout(() => (document.body.style.position = "fixed"), 1000);
   }, [walletModalVisibility]);
+
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
 
   if (walletModalVisibility) {
     return (
@@ -106,10 +111,10 @@ export default function MobileModal({
       {isOpen && (
         <motion.div
           key="modal"
-          initial={{ opacity: 0, y: "75%" }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "tween" }}
-          exit={{ opacity: 0, y: "75%" }}
+          initial={{ opacity: 0, x: "75%" }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, type: "tween" }}
+          exit={{ opacity: 0, x: "75%" }}
           className={`mobile-modal-container  ${
             isOpen === true ? "show-modal" : "hide-modal"
           }`}
@@ -126,7 +131,11 @@ export default function MobileModal({
                   navigate("./home");
                 }}
               >
-                <img src="/images/outlinedLogo.svg" alt="Fluidity" />
+                <img
+                  style={{ width: "5.5em", height: "2.5em" }}
+                  src="/images/outlinedLogo.svg"
+                  alt="Fluidity"
+                />
               </a>
             </div>
 
@@ -137,6 +146,7 @@ export default function MobileModal({
                 version={"transparent"}
                 buttontype="icon after"
                 size={"small"}
+                className="trophy-button"
                 handleClick={() => {
                   setTimeout(() => {
                     setIsOpen(false);
@@ -147,7 +157,7 @@ export default function MobileModal({
                 }}
                 icon={<Trophy />}
               >
-                ${unclaimedRewards}
+                {numberToMonetaryString(unclaimedRewards)}
               </GeneralButton>
 
               <BurgerButton isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -161,7 +171,7 @@ export default function MobileModal({
                 {/* Connect Wallet */}
                 {connected && address ? (
                   <ConnectedWallet
-                    address={trimAddressShort(address.toString())}
+                    address={rawAddress ?? ""}
                     callback={() => {
                       !connectedWalletModalVisibility &&
                         setconnectedWalletModalVisibility(true);
@@ -201,13 +211,13 @@ export default function MobileModal({
                       obj: { name: string; icon: JSX.Element },
                       index: number
                     ) => {
-                      const key = Object.keys(obj)[0];
-                      const { name, icon } = Object.values(obj)[0];
+                      const key = Object.values(obj)[0];
+                      const { name, icon } = obj;
                       const active = index === activeIndex;
 
                       return (
                         <li
-                          key={key}
+                          key={key as unknown as string}
                           onClick={() => {
                             //delay to show page change and allow loading
                             setTimeout(() => {
@@ -223,7 +233,9 @@ export default function MobileModal({
                           ) : (
                             <div />
                           )}
-                          <Link to={key}>
+                          <Link
+                            to={index === 0 ? "./" : (key as unknown as string)}
+                          >
                             <Text prominent={active}>
                               {icon} {name}
                             </Text>
@@ -241,18 +253,21 @@ export default function MobileModal({
                 version={"secondary"}
                 buttontype="icon after"
                 size={"small"}
-                handleClick={() =>
-                  unclaimedFluid
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
+                  unclaimedRewards
                     ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards")
-                }
+                    : navigate("./rewards");
+                }}
                 icon={<img src="/images/icons/arrowRightWhite.svg" />}
                 className="unclaimed-button"
               >
                 <Text size="lg" prominent={true}>
                   Unclaimed $FLUID{" "}
                   <Heading as="h5" className="no-margin">
-                    {unclaimedFluid}
+                    {numberToMonetaryString(unclaimedFluid)}
                   </Heading>
                 </Text>
               </GeneralButton>
@@ -262,7 +277,12 @@ export default function MobileModal({
                 version={"primary"}
                 buttontype="text"
                 size={"medium"}
-                handleClick={() => navigate("../fluidify")}
+                handleClick={() => {
+                  setTimeout(() => {
+                    setIsOpen(false);
+                  }, 800);
+                  navigate("../fluidify");
+                }}
                 className="fluidify-money-button"
               >
                 Fluidify Money
@@ -286,7 +306,7 @@ export default function MobileModal({
           {connectedWalletModalVisibility && (
             <ConnectedWalletModal
               visible={connectedWalletModalVisibility}
-              address={address ? address.toString() : ""}
+              address={rawAddress ?? ""}
               close={() => {
                 setconnectedWalletModalVisibility(false);
               }}

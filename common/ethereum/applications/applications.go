@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	// ApplicationNone is the nil value representing an invalid application.
+	// ApplicationNone is the nil value representing a transfer.
 	ApplicationNone libApps.Application = iota
 	ApplicationUniswapV2
 	ApplicationBalancerV2

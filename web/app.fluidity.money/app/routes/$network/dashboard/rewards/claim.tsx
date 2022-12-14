@@ -2,35 +2,40 @@ import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { useContext } from "react";
 import { useNavigate } from "@remix-run/react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   Text,
   numberToMonetaryString,
   GeneralButton,
   LinkButton,
   Heading,
+  Twitter,
 } from "@fluidity-money/surfing";
 
 import claimStyles from "~/styles/dashboard/rewards/claim.css";
+import { generateTweet } from "~/util/tweeter";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: claimStyles }];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-  // TODO: Get reward TX and fetch reward that way
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const { network } = params;
 
   const url = new URL(request.url);
   const _reward = url.searchParams.get("reward");
   const reward = _reward ? parseInt(_reward) : 0;
 
-  const _networkFee = url.searchParams.get("networkfee");
+  const _networkFee = url.searchParams.get("networkFee");
   const networkFee = _networkFee ? parseInt(_networkFee) : 0;
 
-  const _gasFee = url.searchParams.get("gasfee");
+  const _gasFee = url.searchParams.get("gasFee");
   const gasFee = _gasFee ? parseInt(_gasFee) : 0;
 
   return json({
+    network,
     reward,
     networkFee,
     gasFee,
@@ -38,29 +43,20 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 type LoaderData = {
+  network: string;
   reward: number;
   networkFee: number;
   gasFee: number;
 };
 
 const ClaimedRewards = () => {
-  const { reward, networkFee, gasFee } = useLoaderData<LoaderData>();
+  const { reward, networkFee, gasFee, network } = useLoaderData<LoaderData>();
+
+  const { connected } = useContext(FluidityFacadeContext);
 
   const navigate = useNavigate();
 
-  const generateTweet = () => {
-    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
-
-    const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
-
-    twitterUrl.searchParams.set("text", tweetMsg);
-
-    const fluTwitterHandle = `fluiditymoney`;
-
-    twitterUrl.searchParams.set("via", fluTwitterHandle);
-
-    return twitterUrl.href;
-  };
+  if (!connected) return navigate("../../home");
 
   return (
     <div id="claim-container" className="cover">
@@ -74,7 +70,7 @@ const ClaimedRewards = () => {
 
       {/* Navigation Bar */}
       <header id="claim-header">
-        <img src="FluidLogo" alt="FluidLogo" />
+        <img src="/images/logoOutline.svg" alt="FluidLogo" />
         <LinkButton
           size={"small"}
           type={"internal"}
@@ -94,12 +90,16 @@ const ClaimedRewards = () => {
         <section className="spread">
           <section className="spread-text">
             <Text>Network fee</Text>
-            <Text>${networkFee} FUSDC</Text>
+            <Text>
+              {networkFee} {network === "ethereum" ? "ETH" : "SOL"}
+            </Text>
           </section>
           <hr />
           <section className="spread-text">
             <Text>Gas fee</Text>
-            <Text>${gasFee} FUSDC</Text>
+            <Text>
+              {gasFee} {network === "ethereum" ? "ETH" : "SOL"}
+            </Text>
           </section>
           <hr />
         </section>
@@ -117,7 +117,7 @@ const ClaimedRewards = () => {
       </GeneralButton>
       */}
 
-        {/* Share on Twitter */}
+        {/* Fluidify Button */}
         <GeneralButton
           className="spread"
           version={"primary"}
@@ -133,16 +133,18 @@ const ClaimedRewards = () => {
         {/* Share on Twitter */}
         <GeneralButton
           className="spread"
-          version={"secondary"}
-          buttontype={"icon before"}
-          icon={<img src="/images/socials/twitter.svg" />}
-          size={"large"}
+          size="large"
+          version="transparent"
+          buttontype="icon before"
+          icon={<Twitter />}
           handleClick={() => {
-            navigate(generateTweet());
+            window.open(generateTweet(reward, "claim"));
           }}
         >
-          Share
+          SHARE
         </GeneralButton>
+
+        {/* Rewards History */}
         <LinkButton
           size={"small"}
           type={"internal"}

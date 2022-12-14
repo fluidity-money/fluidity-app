@@ -1,12 +1,13 @@
 import type { Chain } from "~/util/chainUtils/chains";
-import type { UserTransaction } from "~/routes/$network/query/userTransactions";
-import type { Winner } from "~/queries/useUserRewards";
 import type { IRow } from "~/components/Table";
+import type Transaction from "~/types/Transaction";
+import type { HomeLoaderData } from "../query/dashboard/home";
+import type { TransactionsLoaderData } from "../query/userTransactions";
 
-import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
-import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
+import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { format } from "date-fns";
+import { MintAddress } from "~/types/MintAddress";
 import {
   Display,
   LineChart,
@@ -17,14 +18,8 @@ import {
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
-import { useState, useContext, useMemo } from "react";
-import { useUserRewards } from "~/queries";
-import {
-  useLoaderData,
-  useNavigate,
-  Link,
-  useLocation,
-} from "@remix-run/react";
+import { useState, useContext, useEffect, useMemo } from "react";
+import { useLoaderData, useFetcher, Link } from "@remix-run/react";
 import { Table } from "~/components";
 import {
   transactionActivityLabel,
@@ -34,121 +29,159 @@ import {
 } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
-
-export const unstable_shouldReload = () => false;
-
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const { network } = params;
-
-  const url = new URL(request.url);
-  const _pageStr = url.searchParams.get("page");
-  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
-  const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-
-  const fluidPairs = config.config[network ?? ""].tokens.length;
-
-  try {
-    const {
-      transactions,
-      count,
-    }: { transactions: UserTransaction[]; count: number } = await (
-      await fetch(
-        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
-      )
-    ).json();
-
-    const { data, errors } = await useUserRewards(network ?? "");
-
-    if (errors || !data) {
-      throw errors;
-    }
-
-    const winnersMap = data.winners.reduce(
-      (map, winner) => ({
-        ...map,
-        [winner.transaction_hash]: {
-          ...winner,
-        },
-      }),
-      {} as { [key: string]: Winner }
-    );
-
-    const mergedTransactions: Transaction[] = transactions.map((tx) => ({
-      sender: tx.sender,
-      receiver: tx.receiver,
-      reward: winnersMap[tx.hash]
-        ? winnersMap[tx.hash].winning_amount /
-          10 ** winnersMap[tx.hash].token_decimals
-        : 0,
-      hash: tx.hash,
-      currency: tx.currency,
-      value:
-        tx.currency === "DAI" || tx.currency === "fDAI"
-          ? tx.value / 10 ** 12
-          : tx.value,
-      timestamp: tx.timestamp * 1000,
-    }));
-
-    const totalYield = mergedTransactions.reduce(
-      (sum, { reward }) => sum + reward,
-      0
-    );
-
-    return json({
-      transactions: mergedTransactions,
-      count,
-      totalYield,
-      fluidPairs,
-      page,
-      network,
-    });
-  } catch (err) {
-    console.log(err);
-    throw new Error(`Could not fetch Transactions on ${network}: ${err}`);
-  } // Fail silently - for now.
-};
+import { useCache } from "~/hooks/useCache";
+import { Volume } from "../query/volumeStats";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
 };
 
-export const meta = () => {
-  return {
-    title: "Dashboard",
-  };
-};
-
-type Transaction = {
-  sender: string;
-  receiver: string;
-  reward: number;
-  hash: string;
-  // timestamp is the Unix time, in seconds
-  timestamp: number;
-  value: number;
-  currency: string;
-};
-
-const graphEmptyTransaction = (time: number, value = 0) => ({
+const graphEmptyVolume = (time: number, amount = 0): Volume => ({
   sender: "",
   receiver: "",
-  reward: 0,
-  hash: "",
   timestamp: time,
-  value,
-  currency: "",
+  amount,
+  symbol: "",
 });
 
+const binTransactions = (bins: Volume[], txs: Volume[]): Volume[] => {
+  const txMappedBins: Volume[][] = bins.map((bin) => [bin]);
+
+  let binIndex = 0;
+  txs.every((tx) => {
+    while (tx.timestamp < bins[binIndex].timestamp) {
+      binIndex++;
+
+      if (binIndex >= bins.length) return false;
+    }
+
+    txMappedBins[binIndex].push(tx);
+    return true;
+  });
+
+  const maxTxMappedBins = txMappedBins
+    .map(
+      (txs, i) =>
+        txs.find(
+          (tx) => tx.amount === Math.max(...txs.map(({ amount }) => amount))
+        ) || bins[i]
+    )
+    .reverse();
+
+  const [txMappedBinsStart, ...rest] = maxTxMappedBins.filter(
+    (tx) => tx.amount
+  );
+
+  if (!txMappedBinsStart) return maxTxMappedBins;
+
+  const txMappedBinsEnd = rest.pop();
+
+  const maxTxs = maxTxMappedBins.filter(
+    (tx, i) =>
+      tx.amount ||
+      i === 0 ||
+      i === maxTxMappedBins.length - 1 ||
+      (tx.timestamp < txMappedBinsStart.timestamp &&
+        txMappedBinsEnd &&
+        tx.timestamp > txMappedBinsEnd.timestamp)
+  );
+
+  return maxTxs;
+};
+
+const graphTransformers = [
+  {
+    name: "D",
+    transform: (vols: Volume[]) => {
+      const entries = 24;
+      const unixHourInc = 60 * 60 * 1000;
+      const unixNow = Date.now();
+
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+        ...graphEmptyVolume(unixNow - (i + 1) * unixHourInc),
+      }));
+
+      return binTransactions(mappedTxBins, vols);
+    },
+  },
+  {
+    name: "W",
+    transform: (vols: Volume[]) => {
+      //const entries = 21;
+      //const unixEightHourInc = 8 * 60 * 60 * 1000;
+      const entries = 7;
+      const unixEightHourInc = 24 * 60 * 60 * 1000;
+      const unixNow = Date.now();
+
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+        ...graphEmptyVolume(unixNow - (i + 1) * unixEightHourInc),
+      }));
+
+      return binTransactions(mappedTxBins, vols);
+    },
+  },
+  {
+    name: "M",
+    transform: (vols: Volume[]) => {
+      const entries = 30;
+      const unixDayInc = 24 * 60 * 60 * 1000;
+      const unixNow = Date.now();
+
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+        ...graphEmptyVolume(unixNow - (i + 1) * unixDayInc),
+      }));
+
+      return binTransactions(mappedTxBins, vols);
+    },
+  },
+  {
+    name: "Y",
+    transform: (vols: Volume[]) => {
+      const entries = 12;
+      const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
+      const unixNow = Date.now();
+
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
+        ...graphEmptyVolume(unixNow - (i + 1) * unixBimonthlyInc),
+      }));
+
+      return binTransactions(mappedTxBins, vols);
+    },
+  },
+];
+
+const timeFilters = [
+  {
+    name: "D",
+    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
+      timestamp > Date.now() - 24 * 60 * 60 * 1000,
+  },
+  {
+    name: "W",
+    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
+      timestamp > Date.now() - 7 * 24 * 60 * 60 * 1000,
+  },
+  {
+    name: "M",
+    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
+      timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000,
+  },
+  {
+    name: "Y",
+    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
+      timestamp > Date.now() - 365 * 24 * 60 * 60 * 1000,
+  },
+];
+
 type LoaderData = {
-  transactions: Transaction[];
-  totalYield: number;
-  count: number;
-  fluidPairs: number;
   page: number;
   network: Chain;
 };
 
-function ErrorBoundary() {
+type CacheData = HomeLoaderData & TransactionsLoaderData;
+
+function ErrorBoundary(error: Error) {
+  console.log(error);
   return (
     <div
       className="pad-main"
@@ -165,172 +198,243 @@ function ErrorBoundary() {
   );
 }
 
-export default function Home() {
-  const {
-    network,
-    transactions: allTransactions,
-    count: allCount,
-    fluidPairs,
-    totalYield,
-  } = useLoaderData<LoaderData>();
+const SAFE_DEFAULT: CacheData = {
+  totalPrizePool: 0,
+  count: 0,
+  network: "ethereum",
+  transactions: [],
+  rewards: {
+    day: [],
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
+  volume: [],
+  totalFluidPairs: 0,
+  timestamp: 0,
+  page: 0,
+};
 
-  const location = useLocation();
+export const loader: LoaderFunction = async ({ params, request }) => {
+  const { network } = params;
 
-  const pageRegex = /page=[0-9]+/gi;
-  const _pageMatches = location.search.match(pageRegex);
-  const _pageStr = _pageMatches?.length ? _pageMatches[0].split("=")[1] : "";
+  const url = new URL(request.url);
+  const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  const navigate = useNavigate();
+  return json({
+    network,
+    page: txTablePage,
+  });
+};
 
-  const { address } = useContext(FluidityFacadeContext);
+export default function Home() {
+  const { network, page } = useLoaderData<LoaderData>();
 
-  const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
+  const { address, connected, tokens } = useContext(FluidityFacadeContext);
 
-  const [{ count, transactions }, setTransactionRes] = useState<{
-    count: number;
-    transactions: Transaction[];
-  }>({ count: allCount, transactions: allTransactions });
-
-  const binTransactions = (bins: Transaction[], txs: Transaction[]) => {
-    let mappedTxIndex = 0;
-
-    txs.every((tx) => {
-      while (tx.timestamp < bins[mappedTxIndex].timestamp) {
-        mappedTxIndex += 1;
-
-        if (mappedTxIndex >= bins.length) return false;
-      }
-
-      if (tx.value > bins[mappedTxIndex].value) {
-        bins[mappedTxIndex] = tx;
-      }
-
-      return true;
-    });
-
-    const startBinTimestamp = bins[0].timestamp;
-    const endBinTimestamp = bins[bins.length - 1].timestamp;
-
-    return [graphEmptyTransaction(startBinTimestamp - 1, -1)]
-      .concat(bins)
-      .concat([graphEmptyTransaction(endBinTimestamp + 1, -1)]);
-  };
-
-  const graphTransformers = [
-    {
-      name: "D",
-      transform: (txs: Transaction[]) => {
-        const entries = 24;
-        const unixHourInc = 60 * 60 * 1000;
-        const unixNow = Date.now();
-
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixHourInc)
-        );
-
-        return binTransactions(mappedTxBins, txs);
-      },
-    },
-    {
-      name: "W",
-      transform: (txs: Transaction[]) => {
-        //const entries = 21;
-        //const unixEightHourInc = 8 * 60 * 60 * 1000;
-        const entries = 7;
-        const unixEightHourInc = 24 * 60 * 60 * 1000;
-        const unixNow = Date.now();
-
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixEightHourInc)
-        );
-
-        return binTransactions(mappedTxBins, txs);
-      },
-    },
-    {
-      name: "M",
-      transform: (txs: Transaction[]) => {
-        const entries = 30;
-        const unixDayInc = 24 * 60 * 60 * 1000;
-        const unixNow = Date.now();
-
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixDayInc)
-        );
-
-        return binTransactions(mappedTxBins, txs);
-      },
-    },
-    {
-      name: "Y",
-      transform: (txs: Transaction[]) => {
-        const entries = 12;
-        const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
-        const unixNow = Date.now();
-
-        const mappedTxBins = Array.from({ length: entries }).map((_, i) =>
-          graphEmptyTransaction(unixNow - (i + 1) * unixBimonthlyInc)
-        );
-
-        return binTransactions(mappedTxBins, txs);
-      },
-    },
-  ];
-
-  const graphTransformedTransactions = useMemo(
-    () => graphTransformers[activeTransformerIndex].transform(transactions),
-    [transactions, activeTransformerIndex]
+  const { data: homeData } = useCache<HomeLoaderData>(
+    `/${network}/query/dashboard/home`
   );
 
-  const { width } = useViewport();
-  const tableBreakpoint = 850;
+  const isFirstLoad = !homeData;
 
-  const txTableColumns =
-    width > 0 && width < tableBreakpoint
-      ? [{ name: "ACTIVITY" }, { name: "REWARD" }]
-      : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "ACCOUNT",
-          },
-          {
-            name: "TIME",
-            alignRight: true,
-          },
-        ];
+  const { data: globalTransactionsData } = useCache<TransactionsLoaderData>(
+    `/${network}/query/userTransactions?page=${page}`
+  );
+
+  const userHomeData = useFetcher();
+
+  const userTransactionsData = useFetcher();
+
+  useEffect(() => {
+    if (!address) return;
+
+    userHomeData.load(`/${network}/query/dashboard/home?address=${address}`);
+
+    userTransactionsData.load(
+      `/${network}/query/userTransactions?page=${page}&address=${address}`
+    );
+  }, [address, page]);
+
+  const [userFluidPairs, setUserFluidPairs] = useState(
+    SAFE_DEFAULT.totalFluidPairs
+  );
+
+  const data: {
+    global: CacheData;
+    user: CacheData;
+  } = {
+    global: {
+      ...SAFE_DEFAULT,
+      ...homeData,
+      ...globalTransactionsData,
+    },
+    user: {
+      ...SAFE_DEFAULT,
+      ...userHomeData.data,
+      ...userTransactionsData.data,
+      totalFluidPairs: userFluidPairs,
+    },
+  };
+
+  useEffect(() => {
+    if (!connected) return;
+
+    (async () => {
+      const fluidTokens = await tokens?.();
+
+      setUserFluidPairs(fluidTokens?.length || 0);
+    })();
+  }, [connected]);
+
+  // Default to "Y" View
+  const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
+
+  // Default to "Global" View
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
+
+  // If connected, default to "My Dashboard" View
+  useEffect(() => {
+    setActiveTableFilterIndex(connected ? 1 : 0);
+  }, [connected]);
+
+  const { width } = useViewport();
+  const isTablet = width < 850 && width > 0;
+  const isMobile = width < 500 && width > 0;
+  const isSmallMobile = width < 375;
+
+  const txTableColumns = isSmallMobile
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
+    : isMobile
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+    : isTablet
+    ? [
+        { name: "ACTIVITY" },
+        { name: "VALUE" },
+        { name: "REWARD" },
+        { name: "ACCOUNT" },
+      ]
+    : [
+        {
+          name: "ACTIVITY",
+        },
+        {
+          name: "VALUE",
+        },
+        {
+          name: "REWARD",
+        },
+        {
+          name: "ACCOUNT",
+        },
+        {
+          name: "TIME",
+          alignRight: true,
+        },
+      ];
 
   const txTableFilters = address
     ? [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
         {
-          filter: ({ sender, receiver }: Transaction) =>
-            address in [sender, receiver],
-          name: "YOUR REWARDS",
+          filter: ({
+            sender,
+            receiver,
+          }: {
+            sender: string;
+            receiver: string;
+          }) => [sender, receiver].includes(address),
+          name: "MY DASHBOARD",
         },
       ]
     : [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
       ];
 
+  const {
+    totalPrizePool,
+    count,
+    totalCount,
+    rewards,
+    volume,
+    transactions,
+    graphTransformedTransactions,
+    fluidPairs,
+    timestamp,
+  } = useMemo(() => {
+    const {
+      transactions,
+      volume,
+      rewards,
+      totalFluidPairs,
+      timestamp,
+      totalPrizePool,
+    } = activeTableFilterIndex ? data.user : data.global;
+
+    const {
+      day: dailyRewards,
+      week: weeklyRewards,
+      month: monthlyRewards,
+      year: yearlyRewards,
+    } = rewards;
+
+    const activeRewards = (() => {
+      switch (activeTransformerIndex) {
+        case 0:
+          return dailyRewards;
+        case 1:
+          return weeklyRewards;
+        case 2:
+          return monthlyRewards;
+        case 3:
+        default:
+          return yearlyRewards;
+      }
+    })();
+
+    const filteredVolume = volume.filter(
+      timeFilters[activeTransformerIndex].filter
+    );
+
+    const totalVolume = filteredVolume.reduce(
+      (sum, { amount }) => sum + amount,
+      0
+    );
+    const graphTransformedTransactions =
+      graphTransformers[activeTransformerIndex].transform(filteredVolume);
+
+    return {
+      count: filteredVolume.length,
+      totalCount: volume.length,
+      rewards: activeRewards,
+      volume: totalVolume,
+      transactions,
+      graphTransformedTransactions,
+      fluidPairs: totalFluidPairs,
+      timestamp,
+      totalPrizePool,
+    };
+  }, [
+    activeTableFilterIndex,
+    activeTransformerIndex,
+    userHomeData.state,
+    userTransactionsData.state,
+    homeData?.timestamp,
+    globalTransactionsData?.page,
+  ]);
+
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, timestamp, value, currency, reward, hash } = data;
+      const { sender, timestamp, value, reward, hash, rewardHash, logo } = data;
 
       return (
         <motion.tr
@@ -351,50 +455,52 @@ export default function Home() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img
-                src={
-                  currency === "USDC"
-                    ? "/images/tokenIcons/usdcFluid.svg"
-                    : "/images/tokenIcons/usdtFluid.svg"
-                }
-              />
+              <img src={logo} />
               <Text>{transactionActivityLabel(data, sender)}</Text>
             </a>
           </td>
 
           {/* Value */}
-          {width > tableBreakpoint && (
+          <td>
+            <Text>{numberToMonetaryString(value)}</Text>
+          </td>
+
+          {/* Reward */}
+          {!isMobile && (
             <td>
-              <Text>
-                {value.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                })}
-              </Text>
+              {reward ? (
+                <a
+                  className="table-address"
+                  href={getTxExplorerLink(network, rewardHash)}
+                >
+                  <Text prominent={true}>
+                    {reward ? numberToMonetaryString(reward) : "-"}
+                  </Text>
+                </a>
+              ) : (
+                <Text>-</Text>
+              )}
             </td>
           )}
 
-          {/* Reward */}
-          <td>
-            <Text prominent={true}>
-              {reward ? numberToMonetaryString(reward) : "-"}
-            </Text>
-          </td>
-
           {/* Account */}
-          {width > tableBreakpoint && (
+          {!isSmallMobile && (
             <td>
               <a
                 className="table-address"
                 href={getAddressExplorerLink(chain, sender)}
               >
-                <Text>{trimAddress(sender)}</Text>
+                <Text>
+                  {sender === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(sender)}
+                </Text>
               </a>
             </td>
           )}
 
           {/* Time */}
-          {width > tableBreakpoint && (
+          {!isTablet && (
             <td>
               <Text>{transactionTimeLabel(timestamp)}</Text>
             </td>
@@ -405,97 +511,185 @@ export default function Home() {
 
   return (
     <>
+      {/* Timestamp */}
+      <div className="pad-main" style={{ marginBottom: "12px" }}>
+        {isTablet && (
+          <Display
+            size={isSmallMobile ? "xxs" : "xs"}
+            color="gray"
+            className="dashboard-identifier"
+          >
+            {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
+          </Display>
+        )}
+        <Text>
+          {isFirstLoad || !timestamp
+            ? "Loading data..."
+            : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+        </Text>
+      </div>
+
       <section id="graph">
         <div className="graph-ceiling pad-main">
           {/* Statistics */}
           <div className="overlay">
+            {/* Row 1 */}
             <div className="totals-row">
+              {/* Rewards */}
               <div className="statistics-set">
-                <Text>Total transactions</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(
+                    rewards.find(
+                      ({ network: rewardNetwork }) => rewardNetwork === network
+                    )?.total_reward || 0
+                  )}
+                </Display>
+                <Link to={"../rewards"}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Rewards
+                  </LinkButton>
+                </Link>
+              </div>
+
+              {/* Prize Pool */}
+              <div className="statistics-set">
+                <Text>Prize Pool</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(totalPrizePool)}
+                </Display>
+              </div>
+            </div>
+
+            {/* Row 2 */}
+            <div className="totals-row">
+              {/* Transactions Volume / Count */}
+              <div className="statistics-set">
+                <Text>
+                  {activeTableFilterIndex ? "My" : "Total"} transactions
+                </Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
+                  style={{ margin: 0 }}
+                >
                   {count}
                 </Display>
-                <AnchorButton>
-                  <Link
-                    to={{ pathname: "#transactions", search: location.search }}
+                {!!count && (
+                  <AnchorButton>
+                    <a href="#transactions">Activity</a>
+                  </AnchorButton>
+                )}
+              </div>
+
+              {activeTableFilterIndex === 0 && (
+                <div className="statistics-set">
+                  <Text>Total volume</Text>
+                  <Display
+                    size={width < 500 && width > 0 ? "xxxs" : "xxs"}
+                    style={{ margin: 0 }}
                   >
-                    Activity
-                  </Link>
-                </AnchorButton>
-              </div>
-              <div className="statistics-set">
-                <Text>Total yield</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
-                  {numberToMonetaryString(totalYield)}
-                </Display>
-                <LinkButton
-                  size="medium"
-                  type="internal"
-                  handleClick={() => {
-                    navigate("../rewards");
-                  }}
-                >
-                  Rewards
-                </LinkButton>
-              </div>
+                    {numberToMonetaryString(volume)}
+                  </Display>
+                </div>
+              )}
+
+              {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
-                <Display size={"xs"} style={{ margin: 0 }}>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
+                  style={{ margin: 0 }}
+                >
                   {fluidPairs}
                 </Display>
+                <Link to={`/${network}/fluidify`}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Create Assets
+                  </LinkButton>
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Graph Filter Row */}
-          <div>
-            <div className="statistics-row">
-              {graphTransformers.map((filter, i) => (
-                <button
-                  key={`filter-${filter.name}`}
-                  onClick={() => setActiveTransformerIndex(i)}
-                >
-                  <Text
-                    size="xl"
-                    prominent={activeTransformerIndex === i}
-                    className={
-                      activeTransformerIndex === i ? "active-graph-filter" : ""
-                    }
-                  >
-                    {filter.name}
-                  </Text>
-                </button>
-              ))}
-            </div>
-          </div>
+          {!isTablet && (
+            <Display
+              size={width < 1010 ? "xxs" : "xs"}
+              color="gray"
+              className="dashboard-identifier"
+            >
+              {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
+            </Display>
+          )}
         </div>
 
         {/* Graph */}
-        <div className="graph" style={{ width: "100vw", height: "400px" }}>
+        <div className="graph" style={{ width: "100%", height: "400px" }}>
+          <div className="statistics-row pad-main">
+            {graphTransformers.map((filter, i) => (
+              <button
+                key={`filter-${filter.name}`}
+                onClick={() => setActiveTransformerIndex(i)}
+              >
+                <Text
+                  size="lg"
+                  prominent={activeTransformerIndex === i}
+                  className={
+                    activeTransformerIndex === i ? "active-filter" : ""
+                  }
+                >
+                  {filter.name}
+                </Text>
+              </button>
+            ))}
+          </div>
           <LineChart
-            data={graphTransformedTransactions}
+            data={graphTransformedTransactions.map((tx, i) => ({
+              ...tx,
+              x: i,
+            }))}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Transaction) => d.timestamp,
-              yAccessor: (d: Transaction) =>
-                Math.log((d.value || 0.001) * 1100),
+              xAccessor: (d: Volume & { x: number }) => d.x,
+              yAccessor: (d: Volume & { x: number }) =>
+                d.amount ? Math.log(d.amount + 1) : 0,
             }}
-            renderTooltip={({ datum }: { datum: Transaction }) =>
-              datum.value > 0 ? (
-                <div className={"tooltip-container"}>
-                  <div className={"tooltip"}>
+            renderTooltip={({ datum }: { datum: Volume }) => {
+              return datum.amount > 0 ? (
+                <div className={"graph-tooltip-container"}>
+                  <div className={"graph-tooltip"}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {format(datum.timestamp, "dd/mm/yy")}
+                      {format(datum.timestamp, "dd/MM/yy")}
                     </span>
                     <br />
                     <br />
                     <span>
-                      <span>{trimAddress(datum.sender)}</span>
+                      {datum.sender === MintAddress
+                        ? "Mint Address"
+                        : trimAddress(datum.sender)}
                     </span>
                     <br />
                     <br />
                     <span>
-                      <span>{numberToMonetaryString(datum.value)} </span>
+                      <span>{numberToMonetaryString(datum.amount)} </span>
                       <span style={{ color: "rgba(2555,255,255, 50%)" }}>
                         swapped
                       </span>
@@ -504,8 +698,8 @@ export default function Home() {
                 </div>
               ) : (
                 <></>
-              )
-            }
+              );
+            }}
           />
         </div>
       </section>
@@ -515,12 +709,14 @@ export default function Home() {
           itemName="transactions"
           headings={txTableColumns}
           pagination={{
-            page: txTablePage,
+            page,
             rowsPerPage: 12,
           }}
-          count={count}
+          count={totalCount}
           data={transactions}
           renderRow={TransactionRow(network)}
+          onFilter={setActiveTableFilterIndex}
+          activeFilterIndex={activeTableFilterIndex}
           filters={txTableFilters}
         />
       </section>

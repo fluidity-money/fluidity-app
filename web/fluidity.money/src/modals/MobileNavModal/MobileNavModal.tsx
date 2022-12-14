@@ -4,6 +4,7 @@
 
 import { Heading } from "@fluidity-money/surfing";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./MobileNavModal.module.scss";
 
 interface IMobileNavModalProps {
@@ -13,26 +14,37 @@ interface IMobileNavModalProps {
 
 const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
-    <a
-      className={styles.button}
+    <Link
       href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
+      passHref
     >
-      <Heading as="h3">{link}</Heading>
-    </a>
+      <a
+        className={styles.button}
+        href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
+        onClick={() => setIsOpen(false)}
+      >
+        <Heading as="h5">{link}</Heading>
+      </a>
+    </Link>
   ));
 
   return (
     <div className={styles.container}>
-      <a href={"/"}>
-        <Image
-          src="/assets/images/logoMetallic.png"
-          alt="logo"
-          width="160"
-          height="68"
-          priority={true}
-          loading="eager"
-        />
-      </a>
+      <Link
+        href={"/"}
+        passHref
+      >
+        <a href={"/"} className={styles.logo} onClick={() => setIsOpen(false)}>
+          <Image
+            src="/assets/images/logoMetallic.png"
+            alt="logo"
+            width="160"
+            height="68"
+            priority={true}
+            loading="eager"
+          />
+        </a>
+      </Link>
 
       {links}
 
@@ -97,10 +109,10 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
 
       <a
         className={`${styles.whiteButton} ${styles.smaller}`}
-        href={`#demo`}
+        href={`https://app.fluidity.money`}
         onClick={() => setIsOpen(false)}
       >
-        <Heading className={styles.black} black={true} as="h3">
+        <Heading color="black" as="h3">
           LAUNCH FLUIDITY
         </Heading>
       </a>

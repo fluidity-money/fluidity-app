@@ -1,4 +1,10 @@
 import { createContext, useContext } from "react";
 
-export const ToolContext = createContext({});
+type ToolContextType =
+  | {
+      open: (bgColor: string, content: React.ReactNode) => void;
+    }
+  | Record<string, never>;
+
+export const ToolContext = createContext<ToolContextType>({});
 export const useToolTip = () => useContext(ToolContext);

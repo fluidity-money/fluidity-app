@@ -12,6 +12,7 @@ import {
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
+import Link from "next/link";
 
 const HowItWorks = () => {
   /* 
@@ -59,7 +60,7 @@ const HowItWorks = () => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         HOW IT WORKS HOW IT WORKS HOW IT WORKS
       </Heading>
       <Heading as="h4" className={styles.text}>
@@ -101,15 +102,20 @@ const HowItWorks = () => {
           <Text as={"p"} prominent={currentImageIndex === 2}>
             The user is incentivised through governance.
           </Text>
-          <a href="/howitworks">
-            <LinkButton
-              type={"internal"}
-              size={"medium"}
-              handleClick={() => {}}
-            >
-              HOW IT WORKS
-            </LinkButton>
-          </a>
+          <Link
+            href="/howitworks"
+            passHref
+          >
+            <a href="/howitworks">
+              <LinkButton
+                type={"internal"}
+                size={"medium"}
+                handleClick={() => {}}
+              >
+                HOW IT WORKS
+              </LinkButton>
+            </a>
+          </Link>
         </div>
         <div className={styles.right}>
           {

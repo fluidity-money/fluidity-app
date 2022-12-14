@@ -8,10 +8,11 @@ import {
 } from "@solana/web3.js";
 import { getATAAddressSync } from "@saberhq/token-utils";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { jsonPost, getTokenFromAddress, getTokenForNetwork } from "~/util";
+import { jsonPost } from "~/util";
 import { BN } from "bn.js";
 import { FluidityInstruction } from "./fluidityInstruction";
 import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
+import { TransactionResponse } from "../instructions";
 
 export const getCheckedSolContext = () => {
   const wallet = useWallet();
@@ -34,7 +35,7 @@ export const getCheckedSolContext = () => {
   };
 };
 
-const balance = async (tokenAddr: string): Promise<number> => {
+const getBalance = async (token: Token): Promise<number> => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -45,12 +46,6 @@ const balance = async (tokenAddr: string): Promise<number> => {
 
   if (!publicKey)
     throw new Error(`Could not fetch balance: No public key found`);
-
-  const token = getTokenFromAddress("solana", tokenAddr);
-  if (!token)
-    throw new Error(
-      `Could not fetch balance: Could not find matching token ${tokenAddr} in solana`
-    );
 
   try {
     //balance of SOL represented as a TokenAmount
@@ -128,7 +123,11 @@ const amountMinted = async (tokenName: string): Promise<number> => {
   return response.amount_minted;
 };
 
-const internalSwap = async (amount: string, fromTokenAddr: string) => {
+const internalSwap = async (
+  amount: string,
+  fromToken: Token,
+  toToken: Token
+): Promise<TransactionResponse | undefined> => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -140,40 +139,7 @@ const internalSwap = async (amount: string, fromTokenAddr: string) => {
   if (!wallet.signTransaction)
     throw new Error(`Could not initiate Swap: Wallet cannot sign transactions`);
 
-  const fromToken = getTokenFromAddress("solana", fromTokenAddr);
-
-  if (!fromToken)
-    throw new Error(
-      `Could not initiate Swap: Could not find matching token ${fromTokenAddr} in solana`
-    );
-
-  // true if swapping from fluid -> non-fluid
   const fromFluid = !!fromToken.isFluidOf;
-
-  const fluidAssets = getTokenForNetwork("solana");
-
-  if (!fluidAssets.length)
-    throw new Error(
-      `Could not initiate Swap: Could not get fluid tokens from solana`
-    );
-
-  const toToken = fromToken.isFluidOf
-    ? getTokenFromAddress("solana", fromToken.isFluidOf)
-    : fluidAssets.reduce((_: Token | null, fluidTokenAddr: string) => {
-        const fluidToken = getTokenFromAddress("solana", fluidTokenAddr);
-
-        if (!fluidToken)
-          throw new Error(
-            `Could not find Fluid token ${fluidTokenAddr} in solana`
-          );
-
-        return fluidToken.isFluidOf === fromTokenAddr ? fluidToken : null;
-      }, null);
-
-  if (!toToken)
-    throw new Error(
-      `Could not initiate Swap: Could not find dest pair token from ${fromTokenAddr} in solana`
-    );
 
   const [baseToken, fluidToken] = fromFluid
     ? [toToken, fromToken]
@@ -193,7 +159,7 @@ const internalSwap = async (amount: string, fromTokenAddr: string) => {
       `Could not initiate Swap: Fluid token ${fluidToken} missing dataAccount`
     );
 
-  const fromBalance_ = await balance(fromToken.address);
+  const fromBalance_ = await getBalance(fromToken);
 
   const fromBalance = new BN(fromBalance_);
 
@@ -276,12 +242,20 @@ const internalSwap = async (amount: string, fromTokenAddr: string) => {
     const signature = await connection.sendRawTransaction(
       signedTxn.serialize()
     );
+
     // await confirmation
-    await connection.confirmTransaction({
-      signature,
-      blockhash,
-      lastValidBlockHeight,
-    });
+    return {
+      confirmTx: async () =>
+        connection
+          .confirmTransaction({
+            signature,
+            blockhash,
+            lastValidBlockHeight,
+          })
+          .then((res) => !!res.value),
+
+      txHash: signature,
+    };
   } catch (e: unknown) {
     const sendError = e as SendTransactionError;
     if (sendError.message?.search("0x1") !== -1)
@@ -291,10 +265,4 @@ const internalSwap = async (amount: string, fromTokenAddr: string) => {
   }
 };
 
-export const solanaInstructions = {
-  balance,
-  limit,
-  amountMinted,
-};
-
-export { internalSwap };
+export { internalSwap, getBalance, limit, amountMinted };

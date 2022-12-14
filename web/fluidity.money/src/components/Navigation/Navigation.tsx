@@ -3,6 +3,7 @@
 // LICENSE.md file.
 
 import { AnchorButton } from "components/Button";
+import Link from "next/link";
 import styles from "./Navigation.module.scss";
 
 interface INavigation {
@@ -17,9 +18,14 @@ const Navigation = ({ pageLocations, page }: INavigation) => {
     <div className={styles.container}>
       {pageLocations.map((location) => (
         <h4>
-          <a href={`/${page}#${location.replace(/\s/g, "")}`}>
-            {<AnchorButton>{location.toUpperCase()}</AnchorButton>}
-          </a>
+          <Link
+            href={`/${page}#${location.replace(/\s/g, "")}`}
+            passHref
+          >  
+            <a href={`/${page}#${location.replace(/\s/g, "")}`}>
+              {<AnchorButton>{location.toUpperCase()}</AnchorButton>}
+            </a>
+          </Link>
         </h4>
       ))}
     </div>

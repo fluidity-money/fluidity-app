@@ -4,6 +4,7 @@
 
 import { LinkButton } from "components/Button";
 import useViewport from "hooks/useViewport";
+import Link from "next/link";
 import React from "react";
 import styles from "./FooterItem.module.scss";
 
@@ -23,39 +24,55 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
 
+  const baseUrl = `/${children.replace(/\s+/g, "").toLowerCase()}`
+
   const itemList = (
     <ul>
       {items.map((item) => (
         <li key={item.title}>
-          <a
-            href={`/${children.replace(/\s+/g, "").toLowerCase()}}#${item.title
+          <Link
+            href={`/${baseUrl}}#${item.title
               .replace(/\s+/g, "")
               .toLowerCase()}}`}
+            passHref
           >
-            <LinkButton
-              handleClick={() => {}}
-              size={
-                width > firstBreakpoint
-                  ? "large"
-                  : width > secondBreakpoint && width < firstBreakpoint
-                  ? "medium"
-                  : "small"
-              }
-              type={item.type}
+            <a
+              href={`/${baseUrl}}#${item.title
+                .replace(/\s+/g, "")
+                .toLowerCase()}}`}
             >
-              {item.title}
-            </LinkButton>
-          </a>
+              <LinkButton
+                handleClick={() => {}}
+                size={
+                  width > firstBreakpoint
+                    ? "large"
+                    : width > secondBreakpoint && width < firstBreakpoint
+                    ? "medium"
+                    : "small"
+                }
+                type={item.type}
+              >
+                {item.title}
+              </LinkButton>
+            </a>
+          </Link>
         </li>
       ))}
     </ul>
   );
 
+  
+
   return (
     <div className={styles.container}>
-      <a href={`/${children.replace(/\s+/g, "").toLowerCase()}`}>
-        <h1>{children}</h1>
-      </a>
+      <Link 
+        href={baseUrl} 
+        passHref
+      >
+        <a href={baseUrl}>
+          <h1>{children}</h1>
+        </a>
+      </Link>
 
       {itemList}
     </div>

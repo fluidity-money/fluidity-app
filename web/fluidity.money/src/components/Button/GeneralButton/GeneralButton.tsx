@@ -5,7 +5,7 @@
 import React from "react";
 import styles from "./GeneralButton.module.scss";
 
-interface IGeneralButtonProps {
+export interface IGeneralButtonProps {
   children: string;
   version: "primary" | "secondary";
   type: "text" | "icon before" | "icon after" | "icon only";
@@ -25,26 +25,26 @@ const GeneralButton = ({
       {version === "primary" && type === "text" ? (
         <button
           onClick={handleClick}
-          className={`${styles.primary} ${styles[size]}`}
+          className={`${styles.GeneralButton} ${styles.primary} ${styles[size]}`}
         >
           {children.toLocaleUpperCase()}
         </button>
       ) : version === "primary" && type === "icon before" ? (
-        <button onClick={handleClick} className={styles.primary}>
+        <button onClick={handleClick} className={`${styles.GeneralButton} ${styles.primary}`}>
           {children.toLocaleUpperCase()}
         </button>
       ) : version === "primary" && type === "icon after" ? (
-        <button onClick={handleClick} className={styles.primary}>
+        <button onClick={handleClick} className={`${styles.GeneralButton} ${styles.primary}`}>
           {children.toLocaleUpperCase()}
         </button>
       ) : type === "icon only" ? (
-        <button onClick={handleClick} className={styles.iconOnly}>
+        <button onClick={handleClick} className={`${styles.GeneralButton} ${styles.iconOnly}`}>
           {children}
         </button>
       ) : (
         <button
           onClick={handleClick}
-          className={`${styles.secondary} ${styles[size]}`}
+          className={`${styles.GeneralButton} ${styles.secondary} ${styles[size]}`}
         >
           {children.toLocaleUpperCase()}
         </button>

@@ -2,7 +2,10 @@ import path from "path";
 import express from "express";
 import compression from "compression";
 import morgan from "morgan";
-import { wrapExpressCreateRequestHandler } from "@sentry/remix";
+import {
+  captureException,
+  wrapExpressCreateRequestHandler,
+} from "@sentry/remix";
 import { createRequestHandler } from "@remix-run/express";
 
 import { Server } from "socket.io";
@@ -10,12 +13,13 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 
 import config from "~/webapp.config.server";
-import { Observable, Subscription, EMPTY } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { PipedTransaction } from "drivers/types";
 import {
   getObservableForAddress,
   getTransactionsObservableForIn,
-  getHasuraTransactionObservable,
+  winnersTransactionObservable,
+  pendingWinnersTransactionObservables,
 } from "./drivers";
 
 const app = express();
@@ -64,6 +68,7 @@ const ethereumTokens = config.config["ethereum"].tokens
   .map((entry) => ({
     token: entry.symbol,
     address: entry.address,
+    decimals: entry.decimals,
   }));
 
 const solanaTokens = config.config["solana"].tokens
@@ -71,16 +76,22 @@ const solanaTokens = config.config["solana"].tokens
   .map((entry) => ({
     token: entry.symbol,
     address: entry.address,
+    decimals: entry.decimals,
   }));
 
-const hasuraUrl = config.database.hasura;
 const registry = new Map<string, Subscription>();
+
+type TokenList = {
+  token: string;
+  address: string;
+  decimals: number;
+}[];
 
 io.on("connection", (socket) => {
   socket.on("subscribeTransactions", ({ protocol, address }) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
-    let Tokens: any = [];
+    let Tokens: TokenList = [];
     if (protocol === `ethereum`) {
       Tokens = ethereumTokens;
     } else if (protocol === `solana`) {
@@ -90,8 +101,11 @@ io.on("connection", (socket) => {
     const OnChainTransactionsObservable: Observable<PipedTransaction> =
       getTransactionsObservableForIn(protocol, {}, ...Tokens);
 
-    const DbTransactionsObservable: Observable<PipedTransaction> =
-      getHasuraTransactionObservable(hasuraUrl, address);
+    const winnersObservable: Observable<PipedTransaction> =
+      winnersTransactionObservable(address);
+
+    const pendingwinnersObservable: Observable<PipedTransaction> =
+      pendingWinnersTransactionObservables(address);
 
     const OnChainTransactionFilterObservable = getObservableForAddress(
       OnChainTransactionsObservable,
@@ -105,19 +119,44 @@ io.on("connection", (socket) => {
       })
     );
 
-    DbTransactionsObservable.subscribe({
+    winnersObservable.subscribe({
       next(data) {
         socket.emit("Transactions", data);
       },
       error(err) {
-        console.error("something has gone wrong " + err);
-        //handle exception - later
+        captureException(
+          new Error(
+            `Failed to dispatch db transaction observable on winners :: ${err}`
+          ),
+          {
+            tags: {
+              section: "server",
+            },
+          }
+        );
+      },
+    });
+
+    pendingwinnersObservable.subscribe({
+      next(data) {
+        socket.emit("Transactions", data);
+      },
+      error(err) {
+        captureException(
+          new Error(
+            `Failed to dispatch db transaction observable on pending winners :: ${err}`
+          ),
+          {
+            tags: {
+              section: "server",
+            },
+          }
+        );
       },
     });
   });
 
   socket.on("disconnect", () => {
-    registry.get(socket.id)?.unsubscribe();
     registry.delete(socket.id);
   });
 });
@@ -138,11 +177,14 @@ app.all(
 
 const port = process.env.PORT || 3000;
 
-httpServer.listen(port, () => {
+const server = httpServer.listen(port, () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
 });
+
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
 
 function purgeRequireCache() {
   // purge require cache on requests for "server side HMR" this won't let

@@ -4,9 +4,13 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.7.1",
-    "@fluidity-money/surfing": "^0.0.93",
+    "@ethersproject/providers": "^5.7.2",
+    "@fluidity-money/surfing": "^0.0.105",
     "@reduxjs/toolkit": "^1.8.3",
+    "@types/gtag.js": "^0.0.12",
     "@visx/visx": "^2.12.2",
+    "big.js": "^6.2.1",
+    "ethers": "^5.7.2",
     "framer-motion": "^7.2.1",
     "next": "^12.3.0",
     "react": "^18.2.0",
@@ -37,7 +41,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 80",
+    "start": "next start -p 80 --keepAliveTimeout 65000",
     "lint": "next lint"
   },
   "eslintConfig": {

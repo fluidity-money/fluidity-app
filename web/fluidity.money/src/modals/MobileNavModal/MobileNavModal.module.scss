@@ -10,7 +10,11 @@
   padding-top: 100px;
   z-index: 61;
 
-  h3 {
+  .logo {
+    margin-bottom: 20px;
+  }
+
+  h5 {
     font-weight: 100;
   }
 }
@@ -26,7 +30,6 @@
   width: 160px;
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
 }
 
 .button {

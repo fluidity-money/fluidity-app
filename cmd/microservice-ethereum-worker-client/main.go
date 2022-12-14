@@ -5,10 +5,15 @@
 package main
 
 import (
+	"math/big"
+
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -24,9 +29,12 @@ const (
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 
+)
+
+var (
 	// ethereumNullAddress to filter for not including in either side of a
 	// transfer to prevent burning and minting
-	ethereumNullAddress = "0000000000000000000000000000000000000000"
+	ethereumNullAddress = ethereum.AddressFromString("0000000000000000000000000000000000000000")
 )
 
 func main() {
@@ -70,6 +78,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			sourcePayouts               = announcement.SourcePayouts
 			emission                    = announcement.Emissions
 			tokenDetails                = announcement.TokenDetails
+			application                 = announcement.Application
 		)
 
 		if fromAddress == ethereumNullAddress {
@@ -137,9 +146,40 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			ToAddress:       toAddress,
 			ToWinAmount:     toWinAmount,
 			TokenDetails:    tokenDetails,
+			Application:     application,
 		}
 
 		winAnnouncements = append(winAnnouncements, winAnnouncement)
+	}
+
+	for _, announcement := range winAnnouncements {
+		var (
+			fromAddress      = announcement.FromAddress
+			fromAmount       = announcement.FromWinAmount.Int
+			toAddress        = announcement.ToAddress
+			toAmount         = announcement.ToWinAmount.Int
+			network          = announcement.Network
+			token            = announcement.TokenDetails.TokenShortName
+			tokenDecimals    = announcement.TokenDetails.TokenDecimals
+			hash             = announcement.TransactionHash
+		)
+
+		var (
+			scaledDecimals = math.BigPow(10, int64(tokenDecimals))
+			adjustedFromAmount = new(big.Rat).SetFrac(&fromAmount, scaledDecimals)
+			adjustedToAmount = new(big.Rat).SetFrac(&toAmount, scaledDecimals)
+		)
+		discord.Notify(
+			discord.SeverityInformational,
+			"Winner on %s %s with hash %s - %s won $%s, %s won $%s",
+			network,
+			token,
+			hash,
+			fromAddress.String(),
+			adjustedFromAmount.FloatString(5),
+			toAddress.String(),
+			adjustedToAmount.FloatString(5),
+		)
 	}
 
 	if len(winAnnouncements) > 0 {

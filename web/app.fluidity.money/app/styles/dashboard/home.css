@@ -15,31 +15,45 @@ section#transactions {
   display: flex;
   flex-direction: row;
   gap: 10px;
-}
-
-.active-graph-filter {
-  text-decoration: underline;
-  text-underline-offset: 0.4em;
+  justify-content: flex-end;
 }
 
 .graph-ceiling {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
+  gap: 1em;
+}
+
+.dashboard-identifier {
+  margin-top: 0;
+  width: max-content;
+}
+
+.graph-ceiling > div:last-child {
+  padding-bottom: 0.2em;
 }
 
 .row {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .justify-between {
   justify-content: space-between;
+  align-items: baseline;
 }
 
 .transaction-table {
   width: 100%;
+}
+
+@media (max-width: 850px) {
+  .graph-ceiling {
+    align-items: flex-end;
+  }
 }
 
 @media (max-width: 500px) {

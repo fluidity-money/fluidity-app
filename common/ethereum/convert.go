@@ -52,7 +52,7 @@ func ConvertGethLog(log ethTypes.Log) ethereum.Log {
 	topics := make([]ethereum.Hash, len(log.Topics))
 
 	for i, topic := range log.Topics {
-		topics[i] = ethereum.Hash(topic.Hex())
+		topics[i] = ethereum.HashFromString(topic.Hex())
 	}
 
 	return ethereum.Log{

@@ -1,9 +1,10 @@
-import type { Provider } from "~/components/ProviderCard";
 import type { Chain } from "~/util/chainUtils/chains";
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
-import type { Winner } from "~/queries/useUserRewards";
-import type { UserTransaction } from "~/routes/$network/query/userTransactions";
 import type { IRow } from "~/components/Table";
+import type Transaction from "~/types/Transaction";
+import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { TransactionsLoaderData } from "../../query/userTransactions";
+import type { RewardsLoaderData } from "../../query/dashboard/rewards";
+import type { UnclaimedRewardsLoaderData } from "../../query/dashboard/unclaimedRewards";
 
 import {
   transactionActivityLabel,
@@ -12,171 +13,53 @@ import {
   getTxExplorerLink,
 } from "~/util";
 import { motion } from "framer-motion";
-import { LinksFunction, LoaderFunction, json } from "@remix-run/node";
-import config from "~/webapp.config.server";
+import { json } from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
-import { captureException } from "@sentry/react";
-import { useUserUnclaimedRewards, useUserRewards } from "~/queries";
-import { useLoaderData, useLocation } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { MintAddress } from "~/types/MintAddress";
 import {
   Text,
   Heading,
   numberToMonetaryString,
   ManualCarousel,
   trimAddress,
+  LinkButton,
 } from "@fluidity-money/surfing";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
 import { Table } from "~/components";
-import useGlobalRewardStatistics from "~/queries/useGlobalRewardStatistics";
-import { Providers } from "~/components/ProviderIcon";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
-
-export const unstable_shouldReload = () => false;
-
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const network = params.network ?? "";
-  const icons = config.provider_icons;
-  const fluidPairs = config.config[network ?? ""].tokens.length;
-
-  const networkFee = 0.002;
-  const gasFee = 0.002;
-
-  const url = new URL(request.url);
-  const _pageStr = url.searchParams.get("page");
-  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
-  const page = _pageUnsafe > 0 ? _pageUnsafe : 1;
-
-  try {
-    const {
-      transactions,
-      count,
-    }: { transactions: UserTransaction[]; count: number } = await (
-      await fetch(
-        `${url.origin}/${network}/query/userTransactions?network=${network}&page=${page}`
-      )
-    ).json();
-
-    const { data, errors } = await useUserRewards(network ?? "");
-
-    if (errors || !data) {
-      throw errors;
-    }
-
-    const winnersMap = data.winners.reduce(
-      (map, winner) => ({
-        ...map,
-        [winner.transaction_hash]: {
-          ...winner,
-        },
-      }),
-      {} as { [key: string]: Winner }
-    );
-
-    const mergedTransactions: Transaction[] = transactions
-      .filter((tx) => !!winnersMap[tx.hash])
-      .map((tx) => ({
-        sender: tx.sender,
-        receiver: tx.receiver,
-        reward: winnersMap[tx.hash]
-          ? winnersMap[tx.hash].winning_amount /
-            10 ** winnersMap[tx.hash].token_decimals
-          : 0,
-        hash: tx.hash,
-        currency: tx.currency,
-        value: tx.value,
-        timestamp: tx.timestamp,
-      }));
-
-    const totalYield = mergedTransactions.reduce(
-      (sum, { reward }) => sum + reward,
-      0
-    );
-
-    const { data: rewardData, errors: rewardErrors } =
-      await useGlobalRewardStatistics(network ?? "");
-
-    if (rewardErrors || !rewardData) {
-      throw errors;
-    }
-
-    // group rewards by backend
-    const aggregatedExpectedRewards = rewardData.expected_rewards.reduce(
-      (previous, currentReward) => {
-        const {
-          highest_reward: prize,
-          average_reward: avgPrize,
-          token_short_name,
-        } = currentReward;
-        const backend = backends[token_short_name];
-
-        // append to backend if it exists
-        if (previous[backend]) {
-          previous[backend].avgPrize += avgPrize;
-          // max prize
-          previous[backend].prize = Math.max(previous[backend].prize, prize);
-          // set backend if it doesn't exist
-        } else {
-          previous[backend] = {
-            name: backend,
-            prize,
-            avgPrize,
-          };
-        }
-        return previous;
-      },
-      {} as { [K in Providers]: Provider }
-    );
-
-    // convert to expected format
-    const rewarders = Object.values(aggregatedExpectedRewards);
-
-    return json({
-      icons,
-      rewarders,
-      page,
-      network,
-      fluidPairs,
-      transactions: mergedTransactions,
-      count,
-      totalYield,
-      networkFee,
-      gasFee,
-    });
-  } catch (err) {
-    console.log(err);
-    throw new Error(`Could not fetch Rewards on ${network}: ${err}`);
-  } // Fail silently - for now.
-};
+import { useCache } from "~/hooks/useCache";
+import config from "~/webapp.config.server";
+import { format } from "date-fns";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
 };
 
-type Transaction = {
-  sender: string;
-  receiver: string;
-  reward: number;
-  hash: string;
-  // timestamp is the Unix time, in seconds
-  timestamp: number;
-  value: number;
-  currency: string;
+export const loader: LoaderFunction = async ({ params, request }) => {
+  const { network } = params;
+
+  const icons = config.provider_icons;
+
+  const url = new URL(request.url);
+  const _pageStr = url.searchParams.get("page");
+  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
+  const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
+
+  return json({
+    network,
+    icons,
+    page: txTablePage,
+  });
 };
 
 type LoaderData = {
-  icons: { [provider: string]: string };
-  rewarders: Provider[];
-  transactions: Transaction[];
-  count: number;
-  totalYield: number;
-  page: number;
   network: Chain;
-  fluidPairs: number;
-  networkFee: number;
-  gasFee: number;
+  icons: { [provider: string]: string };
+  page: number;
 };
 
 function ErrorBoundary() {
@@ -199,43 +82,103 @@ function ErrorBoundary() {
   );
 }
 
+type CacheData = RewardsLoaderData &
+  TransactionsLoaderData &
+  Partial<UnclaimedRewardsLoaderData>;
+
+const SAFE_DEFAULT: CacheData = {
+  // Only used in Rewards
+  count: 0,
+  network: "ethereum",
+  fluidTokenMap: {},
+  transactions: [],
+  totalPrizePool: 0,
+  page: 0,
+  fluidPairs: 0,
+  networkFee: 0,
+  gasFee: 0,
+  timestamp: 0,
+  rewarders: {
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
+  rewards: {
+    day: [],
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
+};
+
 export default function Rewards() {
-  const {
-    fluidPairs,
-    network,
-    networkFee,
-    gasFee,
-    rewarders,
-    transactions: allTransactions,
-    count: allCount,
-    totalYield,
-  } = useLoaderData<LoaderData>();
+  const { network, page } = useLoaderData<LoaderData>();
 
-  const { connected, address } = useContext(FluidityFacadeContext);
+  const { data: rewardsData } = useCache<RewardsLoaderData>(
+    `/${network}/query/dashboard/rewards`
+  );
 
-  const location = useLocation();
+  const isFirstLoad = !rewardsData;
 
-  const pageRegex = /page=[0-9]+/gi;
-  const _pageMatches = location.search.match(pageRegex);
-  const _pageStr = _pageMatches?.length ? _pageMatches[0].split("=")[1] : "";
-  const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
-  const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
+  const { data: globalTransactionsData } = useCache<TransactionsLoaderData>(
+    `/${network}/query/winningUserTransactions?page=${page}`
+  );
 
-  const [
-    { userUnclaimedRewards, transactions, count },
-    setUnclaimedRewardsRes,
-  ] = useState<{
-    transactions: Transaction[];
-    count: number;
-    userUnclaimedRewards: number;
-  }>({
-    transactions: allTransactions,
-    count: allCount,
-    userUnclaimedRewards: 0,
-  });
+  const { connected, address, tokens } = useContext(FluidityFacadeContext);
+
+  const userRewardsData = useFetcher<RewardsLoaderData>();
+
+  const userTransactionsData = useFetcher<TransactionsLoaderData>();
+
+  const userUnclaimedRewardsData = useFetcher<UnclaimedRewardsLoaderData>();
+
+  useEffect(() => {
+    if (!address) return;
+
+    userRewardsData.load(
+      `/${network}/query/dashboard/rewards?address=${address}`
+    );
+
+    userTransactionsData.load(
+      `/${network}/query/winningUserTransactions?page=${page}&address=${address}`
+    );
+
+    userUnclaimedRewardsData.load(
+      `/${network}/query/dashboard/unclaimedRewards?address=${address}&page=${page}`
+    );
+  }, [address, page]);
+
+  const [userFluidPairs, setUserFluidPairs] = useState(SAFE_DEFAULT.fluidPairs);
+
+  const data: { user: CacheData; global: CacheData } = {
+    global: {
+      ...SAFE_DEFAULT,
+      ...rewardsData,
+      ...globalTransactionsData,
+    },
+    user: {
+      ...SAFE_DEFAULT,
+      ...userRewardsData.data,
+      ...userTransactionsData.data,
+      ...userUnclaimedRewardsData.data,
+      fluidPairs: userFluidPairs,
+    },
+  };
+
+  useEffect(() => {
+    if (!connected) return;
+
+    (async () => {
+      const fluidTokens = await tokens?.();
+
+      setUserFluidPairs(fluidTokens?.length || 0);
+    })();
+  }, [connected]);
 
   const { width } = useViewport();
-  const mobileView = width <= 500;
+  const mobileView = width <= 500 && width > 0;
 
   const tableBreakpoint = 850;
 
@@ -253,99 +196,152 @@ export default function Rewards() {
             name: "REWARD",
           },
           {
-            name: "ACCOUNT",
+            name: "WINNER",
           },
           {
-            name: "TIME",
+            name: "REWARDED TIME",
             alignRight: true,
           },
         ];
+
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
   const txTableFilters = address
     ? [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
         {
           filter: ({ sender, receiver }: Transaction) =>
-            address in [sender, receiver],
-          name: "YOUR REWARDS",
+            [sender, receiver].includes(address),
+          name: "MY REWARDS",
         },
       ]
     : [
         {
           filter: () => true,
-          name: "ALL",
+          name: "GLOBAL",
         },
       ];
 
-  const hasRewarders = rewarders.length > 0;
-
-  const bestPerformingRewarders = rewarders.sort(
-    ({ prize: prize_a }, { prize: prize_b }) => {
-      if (prize_a > prize_b) return -1;
-      if (prize_a === prize_b) return 0;
-      return 1;
-    }
-  );
-
   useEffect(() => {
-    if (!connected || !address) return;
+    setActiveTableFilterIndex(connected ? 1 : 0);
+  }, [connected]);
 
-    // Get Unclaimed Rewards - Expect to fail if Solana
-    (async () => {
-      try {
-        const { data, error } = await useUserUnclaimedRewards(
-          network,
-          address ?? ""
-        );
+  const unixNow = Date.now();
 
-        if (!data || error) return;
+  const [activeRewardFilterIndex, setActiveRewardFilterIndex] = useState(0);
 
-        const { ethereum_pending_winners: rewards } = data;
+  const rewardFilters = [
+    {
+      name: "All time",
+      filter: () => true,
+    },
+    {
+      name: "Last week",
+      filter: ({ timestamp }: Transaction) =>
+        timestamp > unixNow - 7 * 24 * 60 * 60 * 1000,
+    },
+    {
+      name: "Last month",
+      filter: ({ timestamp }: Transaction) =>
+        timestamp > unixNow - 30 * 24 * 60 * 60 * 1000,
+    },
+    {
+      name: "This year",
+      filter: ({ timestamp }: Transaction) =>
+        timestamp > unixNow - 365 * 24 * 60 * 60 * 1000,
+    },
+  ];
 
-        const sanitisedRewards = rewards.filter(
-          (transaction: UserUnclaimedReward) => !transaction.reward_sent
-        );
+  // Filter Transactions via rewards filter / tx type filters
+  const {
+    count,
+    hasRewarders,
+    fluidPairs,
+    networkFee,
+    gasFee,
+    transactions,
+    rewarders,
+    activeYield,
+    totalPrizePool,
+    timestamp,
+    userUnclaimedRewards,
+    unclaimedTokenAddrs,
+    weeklyRewards,
+  } = useMemo(() => {
+    const {
+      fluidPairs,
+      networkFee,
+      gasFee,
+      transactions,
+      totalPrizePool,
+      timestamp,
+      rewarders,
+      rewards,
+      userUnclaimedRewards,
+      unclaimedTokenAddrs,
+    } = activeTableFilterIndex ? data.user : data.global;
 
-        const userUnclaimedRewards = sanitisedRewards.reduce(
-          (sum: number, transaction: UserUnclaimedReward) => {
-            const { win_amount, token_decimals } = transaction;
+    const {
+      week: weeklyYield,
+      month: monthlyYield,
+      year: yearlyYield,
+      all: allYield,
+    } = rewards;
 
-            const decimals = 10 ** token_decimals;
-            return sum + win_amount / decimals;
-          },
-          0
-        );
+    const {
+      week: weeklyRewards,
+      month: monthlyRewards,
+      year: yearlyRewards,
+      all: allRewards,
+    } = rewarders;
 
-        setUnclaimedRewardsRes({
-          transactions,
-          count,
-          userUnclaimedRewards,
-        });
-      } catch (err) {
-        captureException(
-          new Error(
-            `Could not fetch Transactions count for ${address}, on ${network}`
-          ),
-          {
-            tags: {
-              section: "dashboard",
-            },
-          }
-        );
-        return;
+    const [activeRewards, activeYield] = (() => {
+      switch (activeRewardFilterIndex) {
+        case 1:
+          return [weeklyRewards, weeklyYield];
+        case 2:
+          return [monthlyRewards, monthlyYield];
+        case 3:
+          return [yearlyRewards, yearlyYield];
+        case 0:
+        default:
+          return [allRewards, allYield];
       }
     })();
-  }, [connected, address]);
+
+    const hasRewarders = !!activeRewards.length;
+
+    return {
+      count: allYield.length ? allYield[0].count : 0,
+      hasRewarders,
+      fluidPairs,
+      networkFee,
+      gasFee,
+      transactions,
+      rewarders: activeRewards,
+      timestamp,
+      activeYield: activeYield.length ? activeYield[0].total_reward : 0,
+      totalPrizePool,
+      userUnclaimedRewards,
+      unclaimedTokenAddrs,
+      weeklyRewards,
+    };
+  }, [
+    activeTableFilterIndex,
+    activeRewardFilterIndex,
+    rewardsData?.timestamp,
+    globalTransactionsData?.page,
+    userRewardsData.state,
+    userTransactionsData.state,
+    userUnclaimedRewardsData.state,
+  ]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, receiver, timestamp, value, currency, reward, hash } =
-        data;
-
-      const txAddress = sender === address ? receiver : sender;
+      const { winner, timestamp, value, reward, hash, rewardHash, logo } = data;
 
       return (
         <motion.tr
@@ -366,14 +362,8 @@ export default function Rewards() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img
-                src={
-                  currency === "USDC"
-                    ? "/images/tokenIcons/usdcFluid.svg"
-                    : "/images/tokenIcons/usdtFluid.svg"
-                }
-              />
-              <Text>{transactionActivityLabel(data, sender)}</Text>
+              <img src={logo} />
+              <Text>{transactionActivityLabel(data, winner)}</Text>
             </a>
           </td>
 
@@ -391,19 +381,32 @@ export default function Rewards() {
 
           {/* Reward */}
           <td>
-            <Text prominent={true}>
-              {reward ? numberToMonetaryString(reward) : "-"}
-            </Text>
+            {reward ? (
+              <a
+                className="table-address"
+                href={getTxExplorerLink(network, rewardHash)}
+              >
+                <Text prominent={true}>
+                  {reward ? numberToMonetaryString(reward) : "-"}
+                </Text>
+              </a>
+            ) : (
+              <Text>-</Text>
+            )}
           </td>
 
-          {/* Account */}
+          {/* Winner */}
           {width > tableBreakpoint && (
             <td>
               <a
                 className="table-address"
-                href={getAddressExplorerLink(chain, sender)}
+                href={getAddressExplorerLink(chain, winner)}
               >
-                <Text>{trimAddress(txAddress)}</Text>
+                <Text>
+                  {winner === MintAddress
+                    ? "Mint Address"
+                    : trimAddress(winner)}
+                </Text>
               </a>
             </td>
           )}
@@ -421,13 +424,15 @@ export default function Rewards() {
   return (
     <div className="pad-main">
       {/* Info Cards */}
-      {userUnclaimedRewards > 0 ? (
+      {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
         <UserRewards
           claimNow={mobileView}
           unclaimedRewards={userUnclaimedRewards}
+          claimedRewards={activeYield}
           network={network}
           networkFee={networkFee}
           gasFee={gasFee}
+          tokenAddrs={unclaimedTokenAddrs}
         />
       ) : (
         <div className="no-user-rewards">
@@ -441,94 +446,112 @@ export default function Rewards() {
             </Text>
           </section>
           <section>
-            <Text size="md">Highest reward distribution this week</Text>
+            {weeklyRewards?.length > 0 && (
+              <>
+                <Text size="md">Highest reward distribution this week</Text>
 
-            {hasRewarders && (
-              <ProviderCard
-                name={bestPerformingRewarders[0].name}
-                prize={bestPerformingRewarders[0].prize}
-                avgPrize={bestPerformingRewarders[0].avgPrize}
-                size="lg"
-              />
+                <ProviderCard
+                  name={weeklyRewards[0].name}
+                  prize={weeklyRewards[0].prize}
+                  avgPrize={weeklyRewards[0].avgPrize}
+                  size="lg"
+                />
+              </>
             )}
           </section>
         </div>
       )}
-      <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
-        Reward Performance
-      </Heading>
+      <div className="reward-ceiling">
+        <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
+          {activeTableFilterIndex ? "My" : "Global"} Reward Performance
+        </Heading>
+
+        <div className="filter-row">
+          {rewardFilters.map((filter, i) => (
+            <button
+              key={`filter-${filter.name}`}
+              onClick={() => setActiveRewardFilterIndex(i)}
+            >
+              <Text
+                size="xl"
+                prominent={activeRewardFilterIndex === i}
+                className={activeRewardFilterIndex === i ? "active-filter" : ""}
+              >
+                {filter.name}
+              </Text>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Reward Performance */}
-      {hasRewarders && (
-        <section id="performance">
-          <div>
-            <div>
-              <div className="statistics-row">
-                <div className="statistics-set">
-                  <LabelledValue label={"Total claimed yield"}>
-                    {numberToMonetaryString(totalYield)}
-                  </LabelledValue>
-                </div>
-
-                <div className="statistics-set">
-                  <LabelledValue label={"Highest performer"}>
-                    <div className="highest-performer-child">
-                      <ProviderIcon
-                        provider={bestPerformingRewarders[0].name}
-                      />
-                      {bestPerformingRewarders[0].name}
-                    </div>
-                  </LabelledValue>
-                </div>
-
-                <div className="statistics-set">
-                  <LabelledValue label={"Total prize pool"}>
-                    {numberToMonetaryString(678120)}
-                  </LabelledValue>
-                </div>
-
-                <div className="statistics-set">
-                  <LabelledValue label={"Fluid Pairs"}>
-                    {fluidPairs}
-                  </LabelledValue>
-                </div>
-              </div>
-            </div>
-            <div>
-              {/* scoped out */}
-              {/* <div className="statistics-row">
-                {performanceTimeFrames.map((timeFrame, i) => {
-                  const selectedProps = timeFrameIndex === i ? "selected" : "";
-                  const classProps = `${selectedProps}`;
-
-                  return (
-                    <button
-                      key={timeFrame}
-                      onClick={() => setTimeFrameIndex(i)}
-                    >
-                      <Text key={timeFrame + i} className={classProps}>
-                        {timeFrame}
-                      </Text>
-                    </button>
-                  );
-                })}
-              </div> */}
-            </div>
+      <section id="performance">
+        <div style={{ marginBottom: "12px" }}>
+          <Text>
+            {isFirstLoad || !timestamp
+              ? "Loading data..."
+              : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+          </Text>
+        </div>
+        <div className="statistics-row">
+          <div className="statistics-set">
+            <LabelledValue
+              label={`${activeTableFilterIndex ? "My" : "Total"} claimed yield`}
+            >
+              {numberToMonetaryString(activeYield)}
+            </LabelledValue>
           </div>
-        </section>
-      )}
+
+          {hasRewarders && (
+            <div className="statistics-set">
+              <LabelledValue label={"Highest performer"}>
+                <div className="highest-performer-child">
+                  <ProviderIcon provider={rewarders[0]?.name} />
+                  {rewarders[0]?.name === "Fluidity"
+                    ? "Transacting ƒAssets"
+                    : rewarders[0]?.name}
+                </div>
+              </LabelledValue>
+            </div>
+          )}
+
+          <div className="statistics-set">
+            <LabelledValue label={"Total prize pool"}>
+              {numberToMonetaryString(totalPrizePool)}
+            </LabelledValue>
+          </div>
+
+          <div className="statistics-set">
+            <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
+            <Link to={`/${network}/fluidify`}>
+              <LinkButton
+                size="medium"
+                type="internal"
+                handleClick={() => {
+                  return;
+                }}
+              >
+                Create Assets
+              </LinkButton>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <section id="table">
         <Table
           itemName="rewards"
           headings={txTableColumns}
           pagination={{
-            page: txTablePage,
+            page,
             rowsPerPage: 12,
           }}
           count={count}
           data={transactions}
           renderRow={TransactionRow(network)}
           filters={txTableFilters}
+          onFilter={setActiveTableFilterIndex}
+          activeFilterIndex={activeTableFilterIndex}
         />
       </section>
 
@@ -540,7 +563,7 @@ export default function Rewards() {
           </Heading>
           {
             <ManualCarousel scrollBar={true} className="rewards-carousel">
-              {bestPerformingRewarders.map((rewarder) => (
+              {rewarders.map((rewarder) => (
                 <div className="carousel-card-container" key={rewarder.name}>
                   <ProviderCard
                     name={rewarder.name}
@@ -559,33 +582,3 @@ export default function Rewards() {
 }
 
 export { ErrorBoundary };
-
-// const rewarders: Provider[] = [
-//   {
-//     name: "Solana",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Polygon",
-//     prize: 361879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Compound",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//   {
-//     name: "Solana",
-//     prize: 351879,
-//     avgPrize: 1234,
-//   },
-//
-// ];
-
-const backends: { [Token: string]: Providers } = {
-  USDC: "Compound",
-  USDT: "Compound",
-  DAI: "Compound",
-};

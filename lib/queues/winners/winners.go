@@ -39,8 +39,9 @@ const (
 )
 
 type (
-	Winner     = types.Winner
-	RewardData = fluidity.RewardData
+	Winner        = types.Winner
+	BlockedWinner = types.BlockedWinner
+	RewardData    = fluidity.RewardData
 )
 
 func winners(topic string, f func(Winner)) {
@@ -65,12 +66,12 @@ func WinnersAll(f func(Winner)) {
 	winners(subWinnersAll, f)
 }
 
-func BlockedWinnersAll(f func(Winner)) {
+func BlockedWinnersAll(f func(BlockedWinner)) {
 	queue.GetMessages(subBlockedWinnersAll, func(message queue.Message) {
-		var winner Winner
+		var blockedWinner BlockedWinner
 
-		message.Decode(&winner)
+		message.Decode(&blockedWinner)
 
-		f(winner)
+		f(blockedWinner)
 	})
 }

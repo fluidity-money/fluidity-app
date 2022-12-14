@@ -22,30 +22,32 @@ const (
 )
 
 // applicationNames is used to map human readable names to their enum varients
-var applicationNames = map[string]Application{
-	"spl":      ApplicationSpl,
-	"saber":    ApplicationSaber,
-	"orca":     ApplicationOrca,
-	"raydium":  ApplicationRaydium,
-	"aldrinv1": ApplicationAldrinV1,
-	"aldrinv2": ApplicationAldrinV2,
-	"lifinity": ApplicationLifinity,
-	"mercurial": ApplicationMercurial,
+var applicationNames = []string{
+	"spl",
+	"saber",
+	"orca",
+	"raydium",
+	"aldrinv1",
+	"aldrinv2",
+	"lifinity",
+	"mercurial",
 }
 
-// ParseApplication based on the name given, looking it up in the internal
-// map with the internal definition
+func (app Application) String() string {
+	return applicationNames[app]
+}
+
+// ParseApplication based on the name given
 func ParseApplicationName(name string) (*Application, error) {
-	app_, exists := applicationNames[name]
+    for i, app := range applicationNames {
+        if app == name {
+			application_ := Application(i)
+			return &application_, nil
+        }
+    }
 
-	if !exists {
-		return nil, fmt.Errorf(
-			"unknown app name %s",
-			name,
-		)
-	}
-
-	app := app_
-
-	return &app, nil
+    return nil, fmt.Errorf(
+        "unknown app name %s",
+        name,
+    )
 }

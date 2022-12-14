@@ -8,7 +8,7 @@ type IToolTipContentProps = {
   boldTitle: string;
   details: string;
   linkLabel: `ASSETS` | `DETAILS`;
-  linkUrl: string;
+  linkLabelOnClickCallback: () => void;
 };
 
 export const ToolTipContent = ({
@@ -16,22 +16,26 @@ export const ToolTipContent = ({
   boldTitle,
   details,
   linkLabel,
-  linkUrl,
+  linkLabelOnClickCallback,
 }: IToolTipContentProps) => {
   return (
-    <>
+    <div className="tool_detail_section">
       <img className="tool_icon" src={tokenLogoSrc} />
-      <div>
+      <span className="tooltip_title">
         <Text prominent size="xl">
           {boldTitle}{" "}
         </Text>
-        <Text size="lg">{details}</Text>
-        <a href={linkUrl} className="tool_content_link">
-          <Text prominent size="lg">
-            {linkLabel}
-          </Text>
-        </a>
-      </div>
-    </>
+      </span>
+      <span className="tooltip_content_details">
+        <Text size="lg">
+          <b>{details}</b>
+        </Text>
+      </span>
+      <a onClick={linkLabelOnClickCallback} className="tool_content_link">
+        <Text prominent size="lg">
+          {linkLabel}
+        </Text>
+      </a>
+    </div>
   );
 };

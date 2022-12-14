@@ -224,6 +224,7 @@ func main() {
 				}
 
 				decorator := &worker.EthereumWorkerDecorator{
+					Application: transfer.Application,
 					ApplicationFee: fee,
 				}
 
@@ -248,6 +249,7 @@ func main() {
 					SenderAddress:    fromAddress,
 					RecipientAddress: toAddress,
 					Decorator:        decorator,
+
 					AppEmissions:     emission,
 				}
 
@@ -301,8 +303,8 @@ func main() {
 			}
 
 			var (
-				from = decoratedTransaction.Transaction.From
-				to = decoratedTransaction.Transaction.To
+				from = fluidTransfer.SenderAddress
+				to   = fluidTransfer.RecipientAddress
 			)
 
 			transfer := worker.EthereumDecoratedTransfer{

@@ -13,20 +13,66 @@ import {
   Coin98WalletAdapter,
   NightlyWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
-import { solanaInstructions } from "~/util/chainUtils/solana/instructions";
+import {
+  getBalance,
+  internalSwap,
+  limit,
+  amountMinted,
+} from "~/util/chainUtils/solana/instructions";
 import FluidityFacadeContext from "./FluidityFacade";
+import { Token } from "~/util/chainUtils/tokens";
 
-const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
+const SolanaFacade = ({
+  children,
+  tokens,
+}: {
+  children: React.ReactNode;
+  tokens: Token[];
+}) => {
   const { connected, publicKey, disconnect, connecting } = useWallet();
 
-  console.log("connected", connected, "addr:", publicKey?.toString());
+  const swap = async (amount: string, tokenAddr: string) => {
+    const fromToken = tokens.find((t) => t.address === tokenAddr);
 
-  const swap = (amount: string, tokenAddr: string) => {
-    (async () => {
-      fetch(`/solana/query/solanaSwap?amount=${amount}&tokenAddr=${tokenAddr}`);
-    })();
+    if (!fromToken)
+      throw new Error(
+        `Could not initiate Swap: Could not find matching token ${tokenAddr} in solana`
+      );
 
-    return;
+    // true if swapping from fluid -> non-fluid
+    const fromFluid = !!fromToken.isFluidOf;
+
+    const toToken = fromFluid
+      ? tokens.find((t) => t.address === fromToken.isFluidOf)
+      : tokens.find((t) => t.isFluidOf === fromToken.address);
+
+    if (!toToken)
+      throw new Error(
+        `Could not initiate Swap: Could not find dest pair token from ${tokenAddr} in solana`
+      );
+
+    return internalSwap(amount, fromToken, toToken);
+  };
+
+  const balance = async (tokenAddr: string): Promise<number> => {
+    const token = tokens.find((t) => t.address === tokenAddr);
+
+    if (!token)
+      throw new Error(
+        `Could not fetch balance: Could not find matching token ${tokenAddr} in solana`
+      );
+
+    return getBalance(token);
+  };
+
+  const getFluidTokens = async (): Promise<string[]> => {
+    const fluidTokens = tokens.filter((t) => t.isFluidOf);
+
+    const fluidTokensPosBalance = await Promise.all(
+      fluidTokens.filter(async (t) => getBalance(t))
+    );
+
+    return fluidTokensPosBalance.map((t) => t.address);
   };
 
   return (
@@ -35,9 +81,13 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
         connected,
         disconnect,
         connecting,
-        address: publicKey?.toString() ?? "",
         swap,
-        ...solanaInstructions,
+        balance,
+        limit,
+        tokens: getFluidTokens,
+        amountMinted,
+        rawAddress: publicKey?.toString() ?? "",
+        address: publicKey?.toString().toLowerCase() ?? "",
       }}
     >
       {children}
@@ -45,7 +95,7 @@ const SolanaFacade = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SolanaProvider = (rpcUrl: string) => {
+const SolanaProvider = (rpcUrl: string, tokens: Token[]) => {
   const Provider = ({ children }: { children: React.ReactNode }) => {
     const networkCluster = 0;
     const endpoint = useMemo(() => rpcUrl, [networkCluster]);
@@ -66,7 +116,7 @@ const SolanaProvider = (rpcUrl: string) => {
     return (
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
-          <SolanaFacade>{children}</SolanaFacade>
+          <SolanaFacade tokens={tokens}>{children}</SolanaFacade>
         </WalletProvider>
       </ConnectionProvider>
     );

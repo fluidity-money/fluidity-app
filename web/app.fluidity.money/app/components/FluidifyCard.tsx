@@ -18,7 +18,7 @@ type Props = {
 
   color?: string;
 
-  onClick: (symbol: any) => void;
+  addToken?: (symbol: string) => void;
 };
 
 const FluidifyCard = (props: Props) => {
@@ -28,18 +28,15 @@ const FluidifyCard = (props: Props) => {
     name,
     symbol,
     amount,
-    onClick,
     mintCapPercentage,
     color,
+    addToken,
   } = props;
 
   return (
-    <div
-      key={symbol}
-      className={`fluidify-card`}
-      onClick={() => onClick(props)}
-    >
+    <div key={symbol} className={`fluidify-card`}>
       <div className="fluidify-card--container">
+        {/* Logo & Name */}
         <div className="fluidify-card-left">
           <img
             className={`fluidify-card-logo ${fluid ? "fluid-token-logo" : ""}`}
@@ -50,6 +47,7 @@ const FluidifyCard = (props: Props) => {
             {fluid && <span>{name}</span>}
           </div>
         </div>
+        {/* Amount */}
         <div className={""}>
           <span>
             {amount.toLocaleString("en-US", {
@@ -58,13 +56,26 @@ const FluidifyCard = (props: Props) => {
             })}
           </span>
         </div>
+        <div />
+        <button
+          onClick={(e) => {
+            e?.stopPropagation();
+            addToken?.(symbol);
+          }}
+          title={"Add Token to Wallet"}
+          className={"fluidify-card-add"}
+        >
+          +
+        </button>
       </div>
+
+      {/* Progress Bar */}
       <div className="fluidify-card--progress-bar">
         <div
           className="fluidify-card--progress"
           style={{
             background: `${color}`,
-            transform: `scaleX(${mintCapPercentage})`,
+            transform: `scaleX(${mintCapPercentage || 0})`,
           }}
         />
       </div>

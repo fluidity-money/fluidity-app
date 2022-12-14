@@ -3,7 +3,6 @@
 // LICENSE.md file.
 
 import { useEffect, useRef } from "react";
-import { isFirefox } from "react-device-detect";
 // import styles from "./Video.module.scss";
 
 interface IPropsVideo {
@@ -19,6 +18,7 @@ interface IPropsVideo {
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
   className?: string;
+  playbackRate?: number;
 
   // Width of container
   //   dynamic - Change explicit scale
@@ -48,6 +48,7 @@ export const Video = ({
   className,
   width = "dynamic",
   height,
+  playbackRate = 1,
   ...props
 }: IPropsVideo) => {
   const classProps = className || "";
@@ -68,7 +69,13 @@ export const Video = ({
 
   useEffect(() => {
     vidRef.current?.play();
-  });
+  }, []);
+
+  useEffect(() => {
+    if (vidRef.current) {
+      vidRef.current.playbackRate = playbackRate;
+    }
+  }, [playbackRate, vidRef.current]);
 
   return (
     <>

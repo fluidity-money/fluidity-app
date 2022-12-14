@@ -7,6 +7,7 @@
     "app/entry.client.js",
     "server/index.js"
   ],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "module": "esnext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -15,6 +16,7 @@
     "jsx": "react-jsx",
     "resolveJsonModule": true,
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "baseUrl": ".",
     "noEmit": true,
     "paths": {

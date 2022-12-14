@@ -1,12 +1,20 @@
 import gql from "graphql-tag";
-import { execute } from "apollo-link";
+import { DocumentNode, execute } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import ws from "ws";
 import { Observable } from "rxjs";
-import BigNumber from "bn.js";
-import { PipedTransaction } from "./types";
-import { amountToDecimalString } from "~/util";
+import {
+  PipedTransaction,
+  NotificationType,
+  WinnerData,
+  PendingWinnerData,
+  WinnerEvent,
+  PendingWinnerEvent,
+} from "./types";
+import { amountToDecimalString, shorthandAmountFormatter } from "~/util";
+import { captureException } from "@sentry/remix";
+import config from "~/webapp.config.server";
 
 const WinnerSubscriptionQuery = gql`
   subscription getWinnersByAddress($address: String!) {
@@ -15,54 +23,148 @@ const WinnerSubscriptionQuery = gql`
       limit: 1
       order_by: { created: desc }
     ) {
-      created
       transaction_hash
-      network
       token_short_name
       winning_address
-      solana_winning_owner_address
       token_decimals
       winning_amount
+      reward_type
+      network
     }
   }
 `;
 
-const getWsClient = (wsurl: string) =>
-  new SubscriptionClient(wsurl, { reconnect: true }, ws);
+const PendingWinnerSubscriptionQuery = gql`
+  subscription getPendingWinnersByAddress($address: String!) {
+    ethereum_pending_winners(
+      where: { address: { _eq: $address } }
+      limit: 1
+      order_by: { inserted_date: desc }
+    ) {
+      transaction_hash
+      token_short_name
+      address
+      token_decimals
+      win_amount
+      reward_type
+    }
+  }
+`;
 
 const createHasuraSubscriptionObservable = (
-  wsurl: string,
-  query: any,
-  variables: any
+  query: DocumentNode, // Explicitly when using apollo
+  variables: Record<string, unknown>
 ) =>
-  execute(new WebSocketLink(getWsClient(wsurl)), {
-    query: query,
-    variables: variables,
-  });
+  execute(
+    new WebSocketLink(
+      new SubscriptionClient(
+        config.drivers["hasura"][0].rpc.ws,
+        {
+          reconnect: true,
+          connectionParams: {
+            headers: {
+              "x-hasura-admin-secret": config.drivers["hasura"][0].secret,
+            },
+          },
+        },
+        ws
+      )
+    ),
+    {
+      query: query,
+      variables: variables,
+    }
+  );
 
-export const getHasuraTransactionObservable = (url: string, address: string) =>
+export const winnersTransactionObservable = (address: string) =>
   new Observable<PipedTransaction>((subscriber) => {
-    createHasuraSubscriptionObservable(url, WinnerSubscriptionQuery, {
+    createHasuraSubscriptionObservable(WinnerSubscriptionQuery, {
       address: address,
     }).subscribe(
-      (eventData: any) => {
-        if (eventData?.data?.winners?.length === 0) return;
-        const itemObject = eventData?.data?.winners?.at(0);
+      (eventData: unknown) => {
+        // Secretly a WinnerEvent
+        const _eventData = eventData as WinnerEvent;
+        if (_eventData.data.winners.length === 0) return;
+        // Will never fail because of the length check above
+        const itemObject = _eventData.data.winners?.at(0) as WinnerData | never;
+
         const transaction: PipedTransaction = {
-          type: "rewardDB",
+          type:
+            itemObject.network === `ethereum`
+              ? NotificationType.CLAIMED_WINNING_REWARD
+              : NotificationType.WINNING_REWARD,
           source: "",
           destination: itemObject.winning_address,
-          amount: amountToDecimalString(
-            itemObject.winning_amount.toString(),
-            itemObject.token_decimals
+          amount: shorthandAmountFormatter(
+            amountToDecimalString(
+              itemObject.winning_amount.toString(),
+              itemObject.token_decimals
+            ),
+            3
           ),
-          token: itemObject.token_short_name,
+          token: `f${itemObject.token_short_name}`,
           transactionHash: itemObject.transaction_hash,
+          rewardType: itemObject.reward_type,
         };
         subscriber.next(transaction);
       },
       (err) => {
-        console.log("Error: " + err);
+        captureException(
+          new Error(
+            `Error on hasura driver listener while listening on 'winners' :: ${err}`
+          ),
+          {
+            tags: {
+              section: "drivers/hasura/winners",
+            },
+          }
+        );
+      }
+    );
+  });
+
+export const pendingWinnersTransactionObservables = (address: string) =>
+  new Observable<PipedTransaction>((subscriber) => {
+    createHasuraSubscriptionObservable(PendingWinnerSubscriptionQuery, {
+      address: address,
+    }).subscribe(
+      (eventData: unknown) => {
+        const _eventData = eventData as PendingWinnerEvent;
+
+        if (_eventData.data.ethereum_pending_winners.length === 0) return;
+
+        const itemObject = _eventData.data.ethereum_pending_winners.at(0) as
+          | PendingWinnerData
+          | never;
+
+        const transaction: PipedTransaction = {
+          type: NotificationType.PENDING_REWARD,
+          source: "",
+          destination: itemObject.address,
+          amount: shorthandAmountFormatter(
+            amountToDecimalString(
+              itemObject.win_amount.toString(),
+              itemObject.token_decimals
+            ),
+            3
+          ),
+          token: `f${itemObject.token_short_name}`,
+          transactionHash: itemObject.transaction_hash,
+          rewardType: itemObject.reward_type,
+        };
+        subscriber.next(transaction);
+      },
+      (err) => {
+        captureException(
+          new Error(
+            `Error on hasura driver listener while listening on 'ethereum_pending_winners' :: ${err}`
+          ),
+          {
+            tags: {
+              section: "drivers/hasura/ethereum_pending_winners",
+            },
+          }
+        );
       }
     );
   });

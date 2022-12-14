@@ -76,9 +76,9 @@ func main() {
 			})
 
 			if swapIn {
-				solana.AddMintUserLimit(senderAddress, normalisedFloat)
+				solana.AddMintUserLimit(senderAddress, normalisedFloat, tokenName)
 			} else {
-				solana.ReduceMintUserLimit(senderAddress, normalisedFloat)
+				solana.ReduceMintUserLimit(senderAddress, normalisedFloat, tokenName)
 			}
 		}
 	})

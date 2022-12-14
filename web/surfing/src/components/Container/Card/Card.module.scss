@@ -40,4 +40,10 @@ button {
   &.rounded {
     border-radius: 12px;
   }
+  
+  &.disabled {
+    cursor: disabled;
+    border-color: map-get($border, "disabled");
+    filter: grayscale(100%);
+  }
 }

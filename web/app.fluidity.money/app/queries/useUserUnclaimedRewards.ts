@@ -4,7 +4,7 @@ const query: Queryable = {
   ethereum: gql`
     query getPendingRewards($address: String!) {
       ethereum_pending_winners(
-        where: { address: { _eq: $address } }
+        where: { reward_sent: { _eq: false }, address: { _eq: $address } }
         order_by: { block_number: desc }
       ) {
         address
@@ -13,6 +13,7 @@ const query: Queryable = {
         token_short_name
         transaction_hash
         win_amount
+        block_number
       }
     }
   `,
@@ -33,9 +34,11 @@ type UnclaimedRewardsRes = {
       address: string;
       reward_sent: boolean;
       token_decimals: number;
+
       token_short_name: string;
       transaction_hash: string;
       win_amount: number;
+      block_number: number;
     }[];
   };
   error?: string;
@@ -49,7 +52,7 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
   const body = {
     query: query[network],
     variables: {
-      address,
+      address: address.toLowerCase(),
     },
   };
 
@@ -57,7 +60,12 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
 
   return jsonPost<UnclaimedRewardsReq, UnclaimedRewardsRes>(
     fluGqlEndpoint,
-    body
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
   );
 };
 
@@ -68,6 +76,7 @@ export type UserUnclaimedReward = {
   token_short_name: string;
   transaction_hash: string;
   win_amount: number;
+  block_number: number;
 };
 
 export default useUserUnclaimedRewards;

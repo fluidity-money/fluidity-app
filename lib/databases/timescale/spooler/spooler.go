@@ -51,7 +51,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			address,
 			win_amount,
 			block_number,
-			network
+			network,
+			reward_type
 		)
 
 		VALUES (
@@ -61,7 +62,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			$4,
 			$5,
 			$6,
-			$7
+			$7,
+			$8
 		);`,
 
 		TablePendingWinners,
@@ -77,6 +79,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		senderWinAmount,
 		blockNumber,
 		network_,
+		"send",
 	)
 
 	if err != nil {
@@ -101,6 +104,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		recipientAddress,
 		recipientWinAmount,
 		blockNumber,
+		network_,
+		"receive",
 	)
 
 	if err != nil {
@@ -177,6 +182,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			AND network = $1
 			AND token_short_name = $2
 		RETURNING
+			network,
 			token_short_name,
 			token_decimals,
 			transaction_hash,
@@ -217,6 +223,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 		)
 
 		err := rows.Scan(
+			&winner.Network,
 			&winner.TokenDetails.TokenShortName,
 			&winner.TokenDetails.TokenDecimals,
 			&winner.TransactionHash,

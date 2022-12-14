@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { Link, useTransition } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Text } from "@fluidity-money/surfing";
+import { GeneralButton, Text } from "@fluidity-money/surfing";
 
 type Filter<T> = {
   filter: (item: T) => boolean; // eslint-disable-line no-unused-vars
@@ -38,53 +37,66 @@ type ITable<T> = {
 
   // Filters based on elementData
   filters?: Filter<T>[];
+
+  onFilter?: React.Dispatch<React.SetStateAction<number>>;
+
+  activeFilterIndex?: number;
 };
 
 const Table = <T,>(props: ITable<T>) => {
-  const { itemName, pagination, data, renderRow, headings, filters } = props;
+  const {
+    count,
+    itemName,
+    pagination,
+    data,
+    renderRow,
+    headings,
+    filters,
+    onFilter,
+    activeFilterIndex,
+  } = props;
 
   const { rowsPerPage, page } = pagination;
 
   const isTransition = useTransition();
 
-  const [activeFilterIndex, setActiveFilterIndex] = useState(0);
+  const cappedPageCount = Math.min(240, count);
 
-  const filteredData = data.filter((data) =>
-    filters ? filters[activeFilterIndex].filter(data) : true
-  );
-
-  const pageCount = Math.ceil(filteredData.length / rowsPerPage);
+  const pageCount = Math.ceil(cappedPageCount / rowsPerPage);
 
   const startIndex = (page - 1) * rowsPerPage + 1;
-  const endIndex = Math.min(page * rowsPerPage, filteredData.length);
-
-  const rowStartIndex = (page - 1) * rowsPerPage;
-  const rowEndIndex = rowStartIndex + 12;
+  const endIndex = Math.min(page * rowsPerPage, cappedPageCount);
 
   return (
     <div>
-      <div className="transactions-header row justify-between">
-        {/* Item Count */}
-        <Text>
-          {filteredData.length > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
-          {filteredData.length} {itemName}
-        </Text>
-
+      <div className="transactions-header">
         {/* Filters*/}
         {filters && (
           <div className={"transaction-filters"}>
             {filters.map((filter, i) => (
-              <button
+              <GeneralButton
                 key={`filter-${filter.name}`}
-                onClick={() => setActiveFilterIndex(i)}
+                version={"secondary"}
+                buttontype="text"
+                size={"medium"}
+                handleClick={() => onFilter?.(i)}
+                className={
+                  activeFilterIndex === i
+                    ? "active-filter-btn"
+                    : "inactive-filter-btn"
+                }
               >
-                <Text size="lg" prominent={activeFilterIndex === i}>
-                  {filter.name}
-                </Text>
-              </button>
+                {filter.name}
+              </GeneralButton>
             ))}
           </div>
         )}
+
+        {/* Item Count */}
+        <Text>
+          {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
+          {cappedPageCount} {itemName}
+        </Text>
       </div>
 
       {/* Table */}
@@ -132,36 +144,71 @@ const Table = <T,>(props: ITable<T>) => {
               transitioning: {},
             }}
           >
-            {data
-              .filter((data) =>
-                filters ? filters[activeFilterIndex].filter(data) : true
-              )
-              .slice(rowStartIndex, rowEndIndex)
-              .map((row, i) => renderRow({ data: row, index: i }))}
+            {data.map((row, i) => renderRow({ data: row, index: i }))}
           </motion.tbody>
         </AnimatePresence>
       </table>
 
       {/* Pagination */}
-      <motion.div className="pagination" layout="position">
-        <div className="pagination-numbers">
-          {Array(pageCount)
-            .fill(1)
-            .map((_, i) => {
-              return (
-                <Link
-                  className={
-                    page === i + 1 ? "current-pagination" : "pagination-number"
-                  }
-                  key={i}
-                  to={`?${pagination.pageQuery || "page"}=${i + 1}`}
-                >
-                  {i + 1}
-                </Link>
-              );
-            })}
-        </div>
-        {pageCount > 0 && (
+      {pageCount > 0 && (
+        <motion.div className="pagination" layout="position">
+          <div className="pagination-numbers">
+            {/* Pagination Numbers */}
+            <Link
+              className={
+                page === 1 ? "current-pagination" : "pagination-number"
+              }
+              key={`page-${1}`}
+              to={`?${pagination.pageQuery || "page"}=${1}`}
+            >
+              {1}
+            </Link>
+
+            {/* ... */}
+            {pageCount > 4 && page > 4 && <span>...</span>}
+
+            {Array(5)
+              .fill(1)
+              // Start pagination from page - 1
+              .map((_, i) => i + page - 2)
+              // Keep values between 2 and pageCount - 1
+              .filter((pageNo) => pageNo > 1 && pageNo < pageCount)
+              .map((pageNo) => {
+                return (
+                  <Link
+                    className={
+                      page === pageNo
+                        ? "current-pagination"
+                        : "pagination-number"
+                    }
+                    key={`page-${pageNo}`}
+                    to={`?${pagination.pageQuery || "page"}=${pageNo}`}
+                  >
+                    {pageNo}
+                  </Link>
+                );
+              })}
+
+            {/* ... */}
+            {pageCount > 4 && page < pageCount - 3 && <span>...</span>}
+
+            {pageCount > 1 && (
+              <Link
+                className={
+                  page === pageCount
+                    ? "current-pagination"
+                    : "pagination-number"
+                }
+                key={`page-${pageCount}`}
+                to={`?${pagination.pageQuery || "page"}=${pageCount}`}
+              >
+                {pageCount}
+              </Link>
+            )}
+          </div>
+
+          {/* Pagination Arrows */}
+
           <div className="pagination-arrows">
             <Link
               to={
@@ -205,8 +252,8 @@ const Table = <T,>(props: ITable<T>) => {
               />
             </Link>
           </div>
-        )}
-      </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 };

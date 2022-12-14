@@ -17,24 +17,24 @@ import (
 )
 
 func TestHashTo32Bytes(t *testing.T) {
-	var hash ethTypes.Hash = "000"
+	var hash ethTypes.Hash = ethTypes.HashFromString("000")
 	// 0
 	assert.Equal(t, [32]byte{}, hashTo32Bytes(hash))
 
 	// non-hex chars ignored
-	hash = "ghxn"
+	hash = ethTypes.HashFromString("ghxn")
 	assert.Equal(t, [32]byte{}, hashTo32Bytes(hash))
 
 	// valid hex
-	hash = "0x101f66"
+	hash = ethTypes.HashFromString("0x101f66")
 	assert.Equal(t, [32]byte{16, 31, 102}, hashTo32Bytes(hash))
 
 	// 0x prefix optional
-	hash = "101f66"
+	hash = ethTypes.HashFromString("101f66")
 	assert.Equal(t, [32]byte{16, 31, 102}, hashTo32Bytes(hash))
 
 	// truncation if over 32 bytes
-	hash = "101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010"
+	hash = ethTypes.HashFromString("101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010")
 	assert.Equal(t, [32]byte{
 		16, 16, 16, 16, 16, 16, 16, 16,
 		16, 16, 16, 16, 16, 16, 16, 16,
@@ -83,10 +83,10 @@ func TestGetBalancerFees(t *testing.T) {
 	assert.Nil(t, fees)
 
 	transfer.Log.Topics = []ethTypes.Hash{
-		"",
-		"",
-		"",
-		"",
+		ethTypes.HashFromString(""),
+		ethTypes.HashFromString(""),
+		ethTypes.HashFromString(""),
+		ethTypes.HashFromString(""),
 	}
 
 	// nil data fails
@@ -101,13 +101,13 @@ func TestGetBalancerFees(t *testing.T) {
 	assert.Equal(t, big.NewRat(25, 1), fees)
 
 	// other -> fluid successful
-	transfer.Log.Topics[2] = "0x2"
+	transfer.Log.Topics[2] = ethTypes.HashFromString("0x2")
 	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
 	assert.Equal(t, big.NewRat(7340032, 309375), fees)
 
 	// other -> other successful
-	transfer.Log.Topics[3] = "0x3"
+	transfer.Log.Topics[3] = ethTypes.HashFromString("0x3")
 	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Nil(t, err)
 	assert.Nil(t, fees)

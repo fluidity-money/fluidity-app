@@ -128,7 +128,7 @@ func HandleUniquePhrase(w http.ResponseWriter, r *http.Request) interface{} {
 	switch networkUsed {
 
 	case network.NetworkEthereum:
-		adjustedAddress = string(ethereum.AddressFromString(address))
+		adjustedAddress = ethereum.AddressFromString(address).String()
 
 	case network.NetworkSolana:
 		adjustedAddress = address

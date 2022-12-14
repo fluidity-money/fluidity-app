@@ -91,7 +91,7 @@ const _LineChart = <Datum extends object,>({
         ],
         zero: false,
       }}
-      yScale={{ type: "linear", zero: false }}
+      yScale={{ type: "linear", zero: false, domain: [Math.min(...data.map(accessors.yAccessor)) - 0.1, Math.max(...data.map(accessors.yAccessor)) + 0.1] }}
       margin={{ top: 10, right: 0, bottom: 0, left: 0 }}
       height={props.parentHeight * 9 / 10}
       {...props}

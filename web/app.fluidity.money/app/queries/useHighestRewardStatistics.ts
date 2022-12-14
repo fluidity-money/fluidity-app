@@ -12,6 +12,7 @@ const queryByNetwork = gql`
       winning_amount_scaled
     }
     highest_reward_winner_totals(where: { network: { _eq: $network } }) {
+      network
       transaction_count
       winning_address
       total_winnings
@@ -30,6 +31,7 @@ const queryAll = gql`
       winning_amount_scaled
     }
     highest_reward_winner_totals {
+      network
       transaction_count
       winning_address
       total_winnings
@@ -37,21 +39,26 @@ const queryAll = gql`
   }
 `;
 
+export type HighestRewardMonthly = {
+  network: string;
+  transaction_hash: string;
+  winning_address: string;
+  awarded_day: string;
+  token_short_name: string;
+  winning_amount_scaled: number;
+};
+
+export type HighestRewardWinnerTotal = {
+  network: string;
+  winning_address: string;
+  transaction_count: number;
+  total_winnings: number;
+};
+
 export type HighestRewardResponse = {
-  data?: {
-    highest_rewards_monthly: Array<{
-      network: string;
-      transaction_hash: string;
-      winning_address: string;
-      awarded_day: string;
-      token_short_name: string;
-      winning_amount_scaled: number;
-    }>;
-    highest_reward_winner_totals: Array<{
-      winning_address: string;
-      transaction_count: number;
-      total_winnings: number;
-    }>;
+  data: {
+    highest_rewards_monthly: HighestRewardMonthly[];
+    highest_reward_winner_totals: HighestRewardWinnerTotal[];
   };
   errors?: Record<string, unknown>;
 };
@@ -77,7 +84,15 @@ const useHighestRewardStatisticsByNetwork = async (network: string) => {
   const response = await jsonPost<
     HighestRewardByNetworkBody,
     HighestRewardResponse
-  >(url, body);
+  >(
+    url,
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
+  );
 
   return response;
 };
@@ -94,7 +109,12 @@ const useHighestRewardStatisticsAll = async () => {
 
   const response = await jsonPost<HighestRewardAllBody, HighestRewardResponse>(
     url,
-    body
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
   );
 
   return response;

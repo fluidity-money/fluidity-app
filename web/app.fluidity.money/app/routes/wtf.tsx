@@ -1,12 +1,17 @@
-import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics";
+import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
-import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
+import {
+  json,
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
-import { format } from "date-fns";
-import { networkMapper } from "~/util";
+import { format, parseISO } from "date-fns";
+import { getAddressExplorerLink, networkMapper } from "~/util";
 import {
   Display,
   GeneralButton,
@@ -25,6 +30,8 @@ import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
+import { Chain } from "~/util/chainUtils/chains";
+import { generateMeta } from "~/util/tweeter";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -47,10 +54,7 @@ export const loader: LoaderFunction = async () => {
     });
   }
 
-  const highestRewards = data.highest_rewards_monthly.map((reward) => ({
-    ...reward,
-    awardedDate: new Date(reward.awarded_day),
-  }));
+  const highestRewards = data.highest_rewards_monthly;
 
   if (!Object.keys(data.highest_reward_winner_totals).length) {
     return json({
@@ -63,6 +67,7 @@ export const loader: LoaderFunction = async () => {
     (prev, current) => ({
       ...prev,
       [current.winning_address]: {
+        network: current.network,
         transactionCount: current.transaction_count,
         totalWinnings: current.total_winnings,
       },
@@ -76,35 +81,41 @@ export const loader: LoaderFunction = async () => {
         ? largestWinner
         : winner
   );
-
   return json({
     highestRewards,
     winnerTotals,
     highestWinner: {
       address: largestWinnerEntries[0],
+      network: largestWinnerEntries[1].network,
       totalWinnings: largestWinnerEntries[1].totalWinnings,
       transactionCount: largestWinnerEntries[1].transactionCount,
     },
   });
 };
 
+export const meta: MetaFunction = ({ location }) => {
+  const reActionQuery = /action=[\w]*/;
+  const queryString = location.search;
+  const actionString = queryString.match(reActionQuery)?.[0];
+  const action = actionString?.split("=")[1];
+
+  return generateMeta(action ?? "");
+};
+
 type WinnerWinnings = {
   [Address: string]: {
+    network: string;
     transactionCount: number;
     totalWinnings: number;
   };
 };
 
-type HighestRewards =
-  HighestRewardResponse["data"]["highest_rewards_monthly"] & {
-    awardedDate: Date;
-  };
-
 type LoaderData = {
   winnerTotals: WinnerWinnings;
-  highestRewards: HighestRewards;
+  highestRewards: HighestRewardMonthly[];
   highestWinner: {
     address: string;
+    network: string;
     totalWinnings: number;
     transactionCount: number;
   };
@@ -202,25 +213,35 @@ export default function IndexPage() {
 
         <div className="disconnected">
           <div className="opportunity">
-            <div className="opportunity-top"></div>
             <div className="opportunity-bottom">
               <div className="opportunity-text">
                 {/* Highest Winner */}
                 {highestWinner.address && (
                   <Display className="opportunity-text-top" size={"xs"}>
                     <Text>
-                      <Text prominent>
-                        {appendLeading0x(
-                          trimAddressShort(
-                            normaliseAddress(highestWinner.address)
-                          )
+                      <a
+                        href={getAddressExplorerLink(
+                          highestWinner.network as Chain,
+                          highestWinner.address
                         )}
-                      </Text>
+                      >
+                        <Text prominent>
+                          {appendLeading0x(
+                            trimAddressShort(
+                              normaliseAddress(highestWinner.address)
+                            )
+                          )}
+                        </Text>
+                      </a>
                       {" claimed "}
                       <Text prominent>
                         {numberToMonetaryString(highestWinner.totalWinnings)}
                       </Text>
-                      {` in fluid prizes over ${highestWinner.transactionCount} transactions.`}
+                      {` in fluid prizes over ${
+                        highestWinner.transactionCount
+                      } transaction${
+                        highestWinner.transactionCount > 1 ? "s" : ""
+                      }.`}
                     </Text>
                   </Display>
                 )}
@@ -260,34 +281,45 @@ export default function IndexPage() {
             />
           </Modal>
 
-          <div className="opportunity-graph">
+          <div
+            className="opportunity-graph"
+            style={{ width: "100%", height: "400px" }}
+          >
             <LineChart
-              data={highestRewards}
+              data={highestRewards.map(
+                (reward: HighestRewardMonthly, i: number) => ({
+                  ...reward,
+                  x: i,
+                })
+              )}
               lineLabel="transactions"
               accessors={{
-                xAccessor: (d: HighestRewards) => d.awardedDate,
-                yAccessor: (d: HighestRewards) => d.winning_amount_scaled,
+                xAccessor: (d: HighestRewardMonthly & { x: number }) => d.x,
+                yAccessor: (d: HighestRewardMonthly) =>
+                  Math.log(d.winning_amount_scaled + 1),
               }}
-              renderTooltip={({ datum }: { datum: HighestRewards }) => (
-                <div className={"tooltip"}>
-                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                    {format(datum.awardedDate, "dd/mm/yy")}
-                  </span>
-                  <br />
-                  <br />
-                  <span>
-                    <span>{trimAddress(datum.winning_address)}</span>
-                  </span>
-                  <br />
-                  <br />
-                  <span>
+              renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => (
+                <div className={"graph-tooltip-container"}>
+                  <div className={"graph-tooltip"}>
+                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                      {format(parseISO(datum.awarded_day), "dd/MM/yy")}
+                    </span>
+                    <br />
+                    <br />
                     <span>
-                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                      <span>{trimAddress(datum.winning_address)}</span>
                     </span>
-                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                      prize awarded
+                    <br />
+                    <br />
+                    <span>
+                      <span>
+                        {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                      </span>
+                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                        prize awarded
+                      </span>
                     </span>
-                  </span>
+                  </div>
                 </div>
               )}
             />
