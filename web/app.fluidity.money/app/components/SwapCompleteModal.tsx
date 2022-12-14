@@ -168,6 +168,8 @@ const SwapCompleteModal = ({
                 <Text>We&apos;ll notify you when it&apos;s done!</Text>
               </>
             )}
+
+            {/* Add Token */}
             <LinkButton
               type="internal"
               size="medium"
@@ -175,6 +177,8 @@ const SwapCompleteModal = ({
             >
               Add Token To Wallet
             </LinkButton>
+
+            {/* Dashboard Button */}
             <Link to="../../dashboard/home">
               <GeneralButton
                 buttontype="text"
@@ -187,6 +191,8 @@ const SwapCompleteModal = ({
                 GO TO DASHBOARD
               </GeneralButton>
             </Link>
+
+            {/* Fluidify Button */}
             <LinkButton
               type="internal"
               size="medium"
@@ -194,6 +200,8 @@ const SwapCompleteModal = ({
             >
               FLUIDIFY MORE ASSETS
             </LinkButton>
+
+            {/* View Transaction Button */}
             <a
               href={getTxExplorerLink(network as Chain, txHash)}
               rel="noopener noreferrer"
