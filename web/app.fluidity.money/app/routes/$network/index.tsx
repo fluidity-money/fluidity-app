@@ -237,7 +237,7 @@ const NetworkPage = () => {
                   {numberToMonetaryString(projectedWinnings)}
                 </Display>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Would have been your winnings, based on your last 50
+                  Would have been your winnings, based on the last 50
                   transactions.
                 </Text>
                 <br />
