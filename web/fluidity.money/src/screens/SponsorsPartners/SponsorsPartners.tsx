@@ -173,7 +173,7 @@ const SponsorsPartners = () => {
         key={`sponsor-${i}`}
         className={styles.card}
         style={{
-          // position: "relative",
+          position: "relative",
           display: "block",
         }}
       >

@@ -14,7 +14,6 @@ import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
-import { useMemo } from "react";
 
 interface Reward {
   token: string;
