@@ -3,7 +3,6 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
 import { json } from "@remix-run/node";
 import {
@@ -21,7 +20,6 @@ import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
 import useViewport from "~/hooks/useViewport";
-import { useUserUnclaimedRewards } from "~/queries";
 import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
 import {
@@ -204,14 +202,16 @@ export default function Dashboard() {
 
   const userUnclaimedData = useFetcher<UnclaimedRewardsLoaderData>();
 
-  const unclaimedRewards = userUnclaimedData.data ? userUnclaimedData.data.userUnclaimedRewards : 0;
+  const unclaimedRewards = userUnclaimedData.data
+    ? userUnclaimedData.data.userUnclaimedRewards
+    : 0;
 
   useEffect(() => {
     if (!address) return;
 
     userUnclaimedData.load(
       `/${network}/query/dashboard/unclaimedRewards?address=${address}`
-    )
+    );
   }, [address]);
 
   const handleScroll = () => {
