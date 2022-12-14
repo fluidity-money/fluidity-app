@@ -159,8 +159,17 @@ main > footer > section {
   width: 60vw;
 }
 
+.fluidify-button-dashboard-mobile > h5 {
+  margin: 0;
+}
+
+.fluidify-button-dashboard-mobile:hover > h5 {
+  color: black;
+}
+
 @media only screen and (max-width: 850px) {
   .fluidify-button-dashboard-mobile {
+    bottom: 3vh;
     left: 50vw;
     transform: translateX(-50%);
   }
@@ -178,11 +187,6 @@ main > footer > section {
   overflow: hidden;
   font-size: 15px;
   box-shadow: 0 0 8px 2px #f3b8d8;
-}
-
-.rainbow > h6 {
-  margin: 0;
-  font-size: 15px;
 }
 
 .rainbow::before {
