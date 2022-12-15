@@ -3,7 +3,6 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
 import { json } from "@remix-run/node";
 import {
@@ -15,12 +14,12 @@ import {
   useMatches,
   useTransition,
   useLocation,
+  useFetcher,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
 import useViewport from "~/hooks/useViewport";
-import { useUserUnclaimedRewards } from "~/queries";
 import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
 import {
@@ -42,6 +41,7 @@ import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
+import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -199,36 +199,19 @@ export default function Dashboard() {
   };
 
   // Rewards User has yet to claim - Ethereum feature
-  const [unclaimedRewards, setUnclaimedRewards] = useState(0);
+
+  const userUnclaimedData = useFetcher<UnclaimedRewardsLoaderData>();
+
+  const unclaimedRewards = userUnclaimedData.data
+    ? userUnclaimedData.data.userUnclaimedRewards
+    : 0;
 
   useEffect(() => {
-    if (!address) return setUnclaimedRewards(0);
+    if (!address) return;
 
-    (async () => {
-      if (network !== "ethereum") return;
-
-      const { data, error } = await useUserUnclaimedRewards(network, address);
-
-      if (error || !data) return;
-
-      const { ethereum_pending_winners: rewards } = data;
-
-      const sanitisedRewards = rewards.filter(
-        (transaction: UserUnclaimedReward) => !transaction.reward_sent
-      );
-
-      const totalUnclaimedRewards = sanitisedRewards.reduce(
-        (sum: number, transaction: UserUnclaimedReward) => {
-          const { win_amount, token_decimals } = transaction;
-
-          const decimals = 10 ** token_decimals;
-          return sum + win_amount / decimals;
-        },
-        0
-      );
-
-      setUnclaimedRewards(totalUnclaimedRewards);
-    })();
+    userUnclaimedData.load(
+      `/${network}/query/dashboard/unclaimedRewards?address=${address}`
+    );
   }, [address]);
 
   const handleScroll = () => {
@@ -407,7 +390,7 @@ export default function Dashboard() {
           </div>
 
           {/* Navigation Buttons */}
-          <div>
+          <div id="top-navbar-right">
             {/* Send */}
             {/*
             <GeneralButton
@@ -434,21 +417,6 @@ export default function Dashboard() {
             </GeneralButton>
             */}
 
-            {/* Fluidify */}
-            {!isMobile && (
-              <GeneralButton
-                className="rainbow"
-                version={"transparent"}
-                buttontype="text"
-                size={"small"}
-                handleClick={() => navigate("../fluidify")}
-              >
-                <Heading as="h6">
-                  <b>Fluidify Money</b>
-                </Heading>
-              </GeneralButton>
-            )}
-
             {/* Prize Money */}
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
@@ -459,8 +427,8 @@ export default function Dashboard() {
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
-                  ? navigate("./rewards/unclaimed")
-                  : navigate("./rewards")
+                  ? navigate("./rewards")
+                  : navigate("./rewards/unclaimed")
               }
               icon={<Trophy />}
             >
@@ -506,20 +474,18 @@ export default function Dashboard() {
             />
           )}
 
-        {/* Mobile fluidify button */}
-        {isMobile && (
-          <GeneralButton
-            className="fluidify-button-dashboard-mobile rainbow "
-            version={"transparent"}
-            buttontype="text"
-            size={"medium"}
-            handleClick={() => navigate("../fluidify")}
-          >
-            <Heading as="h6">
-              <b>Fluidify Money</b>
-            </Heading>
-          </GeneralButton>
-        )}
+        {/* Fluidify button */}
+        <GeneralButton
+          className="fluidify-button-dashboard-mobile rainbow "
+          version={"primary"}
+          buttontype="text"
+          size={"medium"}
+          handleClick={() => navigate("../fluidify")}
+        >
+          <Heading as="h5">
+            <b>Fluidify Money</b>
+          </Heading>
+        </GeneralButton>
 
         {/* Mobile Menu Modal */}
         {openMobModal && (

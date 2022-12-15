@@ -4,6 +4,8 @@ SERVICES:
       DOCKER_IMAGE: app.fluidity.money-frontend
       DOCKERFILE_PATH: ./web/app.fluidity.money
       TARGET_GROUP: flu-mainnet-app-fluidity-fe-tg
+      CPU_LIMIT: 512
+      MEM_LIMIT: 1024
       
       ENV_GA_WEBAPP_ANALYTICS_ID: G-MNXGX2P9KJ
       SECRET_BITQUERY_TOKEN: /fluidity/bitquery_token

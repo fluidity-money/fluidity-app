@@ -156,7 +156,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           rewardHash: winner?.transaction_hash ?? "",
           currency: tx.currency,
           value: tx.value,
-          timestamp: tx.timestamp,
+          timestamp: new Date(winner.created).getTime(),
           logo: tokenLogoMap[tx.currency] || defaultLogo,
           provider:
             (network === "ethereum"

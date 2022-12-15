@@ -1,9 +1,10 @@
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
+import type { FluidifyData } from "../query/fluidify";
 
 import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
 import useViewport from "~/hooks/useViewport";
@@ -28,11 +29,17 @@ import { captureException } from "@sentry/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { useCache } from "~/hooks/useCache";
 import { Chain } from "~/util/chainUtils/chains";
-import config from "~/webapp.config.server";
+import config, { colors } from "~/webapp.config.server";
 
 type LoaderData = {
-  network: string;
   tokens: AugmentedToken[];
+  ethereumWallets: {
+    name: string;
+    id: string;
+    description: string;
+    logo: string;
+  }[];
+  network: Chain;
   colors: {
     [symbol: string]: string;
   };
@@ -43,10 +50,23 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const ethereumWallets = config.config["ethereum"].wallets;
 
+  const {
+    config: {
+      [network as string]: { tokens },
+    },
+  } = config;
+
+  const augTokens = tokens.map((tok) => ({
+    ...tok,
+    userTokenBalance: 0,
+  }));
+
   return json({
+    tokens: augTokens,
     ethereumWallets,
     network,
-  });
+    colors: (await colors)[network as string],
+  } as LoaderData);
 };
 
 function ErrorBoundary(error: unknown) {
@@ -68,19 +88,17 @@ function ErrorBoundary(error: unknown) {
   );
 }
 
+type CacheData = FluidifyData;
+
 export default function FluidifyToken() {
-  const { network } = useLoaderData<{ network: Chain }>();
-  const { data: loaderData } = useCache<LoaderData>(
+  const {
+    network,
+    tokens: defaultTokens,
+    colors,
+  } = useLoaderData<LoaderData>();
+  const { data: loaderData } = useCache<CacheData>(
     `/${network}/query/fluidify`
   );
-
-  const defaultData: LoaderData = {
-    tokens: [],
-    colors: {},
-    network: network,
-  };
-
-  const { tokens: tokens_, colors } = loaderData || defaultData;
 
   const {
     address,
@@ -106,7 +124,18 @@ export default function FluidifyToken() {
   }, [width]);
 
   // Tokens return from loader
-  const [tokens, setTokens] = useState<AugmentedToken[]>(tokens_);
+  const [tokens, setTokens] = useState<AugmentedToken[]>(defaultTokens);
+
+  useEffect(() => {
+    if (!loaderData) return;
+
+    setTokens(
+      tokens.map((tok) => ({
+        ...tok,
+        ...loaderData,
+      }))
+    );
+  }, [loaderData]);
 
   // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
@@ -114,15 +143,11 @@ export default function FluidifyToken() {
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
   // Destination token
-  const toToken = useMemo(
-    () =>
-      assetToken
-        ? tokenIsFluid
-          ? tokens.find((t) => t.address === assetToken.isFluidOf)
-          : tokens.find((t) => t.isFluidOf === assetToken.address)
-        : undefined,
-    [assetToken]
-  );
+  const toToken = assetToken
+    ? tokenIsFluid
+      ? tokens.find((t) => t.address === assetToken.isFluidOf)
+      : tokens.find((t) => t.isFluidOf === assetToken.address)
+    : undefined;
 
   const handleAddToken = (symbol: string) => {
     if (!connected || !addToken) return;
@@ -168,41 +193,41 @@ export default function FluidifyToken() {
   const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
-  let tokensMinted: (number | undefined)[], userTokenBalance: number[];
-
   // get token data once user is connected
   useEffect(() => {
-    if (address) {
+    if (address && !swapping) {
       (async () => {
         switch (network) {
-          case "ethereum":
-            tokensMinted = await Promise.all(
-              tokens_.map(async (token) => {
-                if (token.isFluidOf) return undefined;
-                const fluidToken = tokens.find(
-                  ({ isFluidOf }) => isFluidOf === token.address
-                );
+          case "ethereum": {
+            const [tokensMinted, userTokenBalance] = await Promise.all([
+              Promise.all(
+                tokens.map(async (token) => {
+                  if (token.isFluidOf) return undefined;
 
-                if (!fluidToken) return undefined;
+                  const fluidToken = tokens.find(
+                    ({ isFluidOf }) => isFluidOf === token.address
+                  );
 
-                return amountMinted?.(fluidToken.address);
-              })
-            );
+                  if (!fluidToken) return undefined;
 
-            userTokenBalance = await Promise.all(
-              tokens_.map(
-                async ({ address }) => (await balance?.(address)) || 0
-              )
-            );
+                  return amountMinted?.(fluidToken.address);
+                })
+              ),
+              Promise.all(
+                tokens.map(
+                  async ({ address }) => (await balance?.(address)) || 0
+                )
+              ),
+            ]);
 
             return setTokens(
-              tokens_.map((token, i) => ({
+              tokens.map((token, i) => ({
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
               }))
             );
-
+          }
           case "solana": {
             // get user token balances
             const userTokenBalance = await Promise.all(
@@ -223,12 +248,12 @@ export default function FluidifyToken() {
     }
 
     return setTokens(
-      tokens_.map((token) => ({
+      tokens.map((token) => ({
         ...token,
         userTokenBalance: 0,
       }))
     );
-  }, [address, swapping, tokens_]);
+  }, [address, swapping]);
 
   const handleRedirect = async (
     transaction: TransactionResponse,
@@ -496,28 +521,36 @@ export default function FluidifyToken() {
                       />
                     </div>
                   ) : (
-                    <Draggable
+                    <div
+                      onClick={() => {
+                        setAssetToken(token);
+                      }}
                       key={`tok-${symbol}`}
-                      type={isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET}
-                      dragItem={token}
                     >
-                      <FluidifyCard
-                        key={symbol}
-                        fluid={isFluidOf !== undefined}
-                        symbol={symbol}
-                        name={name}
-                        logo={logo}
-                        address={address}
-                        mintCapPercentage={
-                          !!userMintLimit && userMintedAmt !== undefined
-                            ? userMintedAmt / userMintLimit
-                            : undefined
+                      <Draggable
+                        type={
+                          isFluidOf ? ItemTypes.FLUID_ASSET : ItemTypes.ASSET
                         }
-                        color={colors[symbol]}
-                        amount={userTokenBalance}
-                        addToken={handleAddToken}
-                      />
-                    </Draggable>
+                        dragItem={token}
+                      >
+                        <FluidifyCard
+                          key={symbol}
+                          fluid={isFluidOf !== undefined}
+                          symbol={symbol}
+                          name={name}
+                          logo={logo}
+                          address={address}
+                          mintCapPercentage={
+                            !!userMintLimit && userMintedAmt !== undefined
+                              ? userMintedAmt / userMintLimit
+                              : undefined
+                          }
+                          color={colors[symbol]}
+                          amount={userTokenBalance}
+                          addToken={handleAddToken}
+                        />
+                      </Draggable>
+                    </div>
                   );
                 })}
                 {isTablet && (

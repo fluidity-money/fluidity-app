@@ -93,13 +93,13 @@ export const NotificationSubscription = ({
         if (sourceParseTrimAddress === mintLabel) {
           return "successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d";
         }
-        if (sourceParseTrimAddress === mintLabel) {
+        if (destinationParseTrimAddress === mintLabel) {
           return "successfully r͟e͟v͟e͟r͟t͟e͟d";
         }
         if (source === rawAddress) {
-          return `r͟e͟c͟e͟i͟v͟e͟d from ${sourceParseTrimAddress}`;
+          return `s͟e͟n͟t to ${destinationParseTrimAddress}`;
         }
-        return `s͟e͟n͟t to ${destinationParseTrimAddress}`;
+        return `r͟e͟c͟e͟i͟v͟e͟d from ${sourceParseTrimAddress}`;
     }
   };
 

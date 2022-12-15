@@ -60,6 +60,11 @@ const SwapCompleteModal = ({
     hidden: { opacity: 0 },
   };
 
+  // Set Timeout in case Video does not load
+  useEffect(() => {
+    setTimeout(() => setPlayVideo(false), 15 * 1000);
+  }, []);
+
   return (
     <Modal visible={visible}>
       <div className="swap-complete-container">
@@ -163,6 +168,8 @@ const SwapCompleteModal = ({
                 <Text>We&apos;ll notify you when it&apos;s done!</Text>
               </>
             )}
+
+            {/* Add Token */}
             <LinkButton
               type="internal"
               size="medium"
@@ -170,6 +177,8 @@ const SwapCompleteModal = ({
             >
               Add Token To Wallet
             </LinkButton>
+
+            {/* Dashboard Button */}
             <Link to="../../dashboard/home">
               <GeneralButton
                 buttontype="text"
@@ -182,17 +191,17 @@ const SwapCompleteModal = ({
                 GO TO DASHBOARD
               </GeneralButton>
             </Link>
-            <Link to="..">
-              <LinkButton
-                type="internal"
-                size="medium"
-                handleClick={() => {
-                  return;
-                }}
-              >
-                FLUIDIFY MORE ASSETS
-              </LinkButton>
-            </Link>
+
+            {/* Fluidify Button */}
+            <LinkButton
+              type="internal"
+              size="medium"
+              handleClick={() => close()}
+            >
+              FLUIDIFY MORE ASSETS
+            </LinkButton>
+
+            {/* View Transaction Button */}
             <a
               href={getTxExplorerLink(network as Chain, txHash)}
               rel="noopener noreferrer"

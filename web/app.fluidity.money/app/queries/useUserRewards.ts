@@ -8,6 +8,7 @@ const queryAll = gql`
         send_transaction_hash: { _neq: "" }
         transaction_hash: { _neq: "" }
       }
+      order_by: { created: desc }
       limit: 240
     ) {
       network
@@ -29,11 +30,13 @@ const queryByAddress = gql`
   query WinnersByAddress($network: network_blockchain!, $address: String!) {
     winners(
       where: { network: { _eq: $network }, winning_address: { _eq: $address } }
+      order_by: { created: desc }
       limit: 240
     ) {
       network
       solana_winning_owner_address
       winning_address
+      created
       transaction_hash
       send_transaction_hash
       winning_amount
@@ -55,7 +58,15 @@ const useUserRewardsAll = async (network: string) => {
     query: queryAll,
   };
 
-  return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(url, body);
+  return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(
+    url,
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
+  );
 };
 
 const useUserRewardsByAddress = async (network: string, address: string) => {
@@ -68,7 +79,12 @@ const useUserRewardsByAddress = async (network: string, address: string) => {
 
   return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(
     url,
-    body
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
   );
 };
 

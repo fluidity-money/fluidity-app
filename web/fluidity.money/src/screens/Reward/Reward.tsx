@@ -3,12 +3,11 @@
 // LICENSE.md file.
 
 import { useState } from "react";
-import { IPropPools } from "pages";
 import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
 import styles from "./Reward.module.scss";
 
-const Reward = (pools: IPropPools) => {
+const Reward = () => {
   /* Background of transactions info moving left and right cotinuously,
   Reward pool total with sol and eth toggle,
   click on prize total and switch screens to total transactions sol and eth,
@@ -21,9 +20,9 @@ const Reward = (pools: IPropPools) => {
     <>
       <div className={styles.container}>
         {present ? (
-          <RewardsInitial changeScreen={() => setPresent(!present)} rewardPools={pools} />
+          <RewardsInitial changeScreen={() => setPresent(!present)} />
         ) : (
-          <RewardStats changeScreen={() => setPresent(!present)} rewardPools={pools}/>
+          <RewardStats changeScreen={() => setPresent(!present)} />
         )}
       </div>
     </>
