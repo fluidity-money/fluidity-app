@@ -463,6 +463,7 @@ main > footer > section > a {
   display: flex;
   flex-direction: column-reverse;
   gap: 0.5em;
+  align-items: center;
 }
 
 .provide-liquidity-right {
