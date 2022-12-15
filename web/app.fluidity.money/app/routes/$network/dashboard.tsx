@@ -202,9 +202,9 @@ export default function Dashboard() {
   const [unclaimedRewards, setUnclaimedRewards] = useState(0);
 
   useEffect(() => {
-    (async () => {
-      if (!address) return;
+    if (!address) return setUnclaimedRewards(0);
 
+    (async () => {
       if (network !== "ethereum") return;
 
       const { data, error } = await useUserUnclaimedRewards(network, address);
@@ -262,19 +262,24 @@ export default function Dashboard() {
     document.body.style.position = "static";
   }, [currentPath]);
 
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
+
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <a onClick={() => navigate("./home")}>
+        <Link to={"./home"}>
           <img
             style={{ width: "5.5em", height: "2.5em" }}
             src="/images/outlinedLogo.svg"
             alt="Fluidity"
           />
-        </a>
+        </Link>
 
         <br />
         <br />
@@ -453,14 +458,14 @@ export default function Dashboard() {
               buttontype="icon after"
               size={"small"}
               handleClick={() =>
-                unclaimedRewards
-                  ? navigate("./rewards/unclaimed")
-                  : navigate("./rewards")
+                unclaimedRewards < 0.000005
+                  ? navigate("./rewards")
+                  : navigate("./rewards/unclaimed")
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.01
-                ? `$${unclaimedRewards}`
+              {unclaimedRewards < 0.000005
+                ? `$0`
                 : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
@@ -492,12 +497,14 @@ export default function Dashboard() {
         {!openMobModal && <ProvideLiquidity />}
 
         {/* Modal on hover */}
-        {(hoverModal || showModal) && !isMobile && (
-          <UnclaimedRewardsHoverModal
-            unclaimedRewards={unclaimedRewards}
-            setShowModal={setShowModal}
-          />
-        )}
+        {unclaimedRewards >= 0.000005 &&
+          (hoverModal || showModal) &&
+          !isMobile && (
+            <UnclaimedRewardsHoverModal
+              unclaimedRewards={unclaimedRewards}
+              setShowModal={setShowModal}
+            />
+          )}
 
         {/* Mobile fluidify button */}
         {isMobile && (

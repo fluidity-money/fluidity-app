@@ -8,25 +8,31 @@ const queryAll = gql`
     count
   }
   query TotalRewards($network: network_blockchain!) {
+    day: total_reward(
+      where: { network: { _eq: $network } }
+      args: { i: "1 day" }
+    ) {
+      ...rewardFields
+    }
     week: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 week" }
     ) {
       ...rewardFields
     }
-    month: rewardFields(
+    month: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 month" }
     ) {
       ...rewardFields
     }
-    year: rewardFields(
+    year: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 year" }
     ) {
       ...rewardFields
     }
-    all: rewardFields(where: { network: { _eq: $network } }, args: {}) {
+    all: total_reward(where: { network: { _eq: $network } }, args: {}) {
       ...rewardFields
     }
   }
@@ -46,25 +52,31 @@ const queryByAddress = gql`
     count
   }
   query TotalRewards($network: network_blockchain!, $address: String!) {
+    day: total_reward(
+      where: { network: { _eq: $network } }
+      args: { i: "1 day", address: $address }
+    ) {
+      ...rewardFields
+    }
     week: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 week", address: $address }
     ) {
       ...rewardFields
     }
-    month: rewardFields(
+    month: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 month", address: $address }
     ) {
       ...rewardFields
     }
-    year: rewardFields(
+    year: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 year", address: $address }
     ) {
       ...rewardFields
     }
-    all: rewardFields(
+    all: total_reward(
       where: { network: { _eq: $network } }
       args: { address: $address }
     ) {
@@ -109,13 +121,16 @@ export type UserYield = {
   count: number;
 };
 
+export type TimeSepUserYield = {
+  day: UserYield[];
+  week: UserYield[];
+  month: UserYield[];
+  year: UserYield[];
+  all: UserYield[];
+};
+
 export type UserYieldResponse = {
-  data?: {
-    week: Array<UserYield>;
-    month: Array<UserYield>;
-    year: Array<UserYield>;
-    all: Array<UserYield>;
-  };
+  data?: TimeSepUserYield;
 
   errors?: unknown;
 };

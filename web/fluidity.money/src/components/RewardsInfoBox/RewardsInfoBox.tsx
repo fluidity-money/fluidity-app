@@ -110,7 +110,7 @@ const RewardsInfoBox = ({
             >
               {showRewardPool
                 ? !loading && "Reward pool"
-                : "Total transactions (on testing)"}
+                : "Total transactions"}
             </motion.div>
           )}
         </Heading>

@@ -1,4 +1,9 @@
-import { Display, LinkButton, Text } from "@fluidity-money/surfing";
+import {
+  Display,
+  LinkButton,
+  numberToMonetaryString,
+  Text,
+} from "@fluidity-money/surfing";
 import { useNavigate } from "@remix-run/react";
 
 interface IUnclaimedRewardsHoverModalProps {
@@ -26,10 +31,7 @@ const UnclaimedRewardsHoverModal = ({
       <section>
         <Text size="sm">Unclaimed rewards</Text>
         <Display className="unclaimed-total" size={"xs"}>
-          {unclaimedRewards.toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-          })}
+          {numberToMonetaryString(unclaimedRewards)}
         </Display>
         <LinkButton
           size={"small"}

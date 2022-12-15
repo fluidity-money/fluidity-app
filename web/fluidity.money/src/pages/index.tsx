@@ -2,6 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import LandingPage from "pageBody/LandingPage";
+import LandingPage from "../pageBody/LandingPage";
 
 export default LandingPage;

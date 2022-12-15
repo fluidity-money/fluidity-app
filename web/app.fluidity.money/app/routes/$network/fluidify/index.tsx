@@ -195,14 +195,13 @@ export default function FluidifyToken() {
               )
             );
 
-            setTokens(
+            return setTokens(
               tokens_.map((token, i) => ({
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
               }))
             );
-            break;
 
           case "solana": {
             // get user token balances
@@ -210,17 +209,25 @@ export default function FluidifyToken() {
               tokens.map(async ({ address }) => (await balance?.(address)) || 0)
             );
 
-            setTokens(
+            return setTokens(
               tokens.map((token, i) => ({
                 ...token,
                 userTokenBalance: userTokenBalance[i],
               }))
             );
-            break;
           }
         }
       })();
+
+      return;
     }
+
+    return setTokens(
+      tokens_.map((token) => ({
+        ...token,
+        userTokenBalance: 0,
+      }))
+    );
   }, [address, swapping, tokens_]);
 
   const handleRedirect = async (

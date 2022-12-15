@@ -22,10 +22,11 @@ interface ChainState {
   apiState: ApiState,
 }
 
-type RewardPool = {
-  pools: {
+type onChainData = {
+  data: {
     ethPool: number
     solPool: number
+		totalTransactions: number
   } | undefined
   loading: boolean
 }
@@ -33,8 +34,7 @@ type RewardPool = {
 interface ApiState {
   weekWinnings: Winner[],
   largestDailyWinnings: LargestDailyWinner[],
-  rewardPool: RewardPool,
-  txCount: number,
+  onChainData: onChainData,
 }
 
 export type Network = "STAGING" | "MAINNET";
@@ -47,8 +47,7 @@ const initChainState = (): ChainState => {
     apiState: {
       weekWinnings: [],
       largestDailyWinnings: [],
-      rewardPool: { pools: undefined, loading: false },
-      txCount: 0,
+      onChainData: { data: undefined, loading: false },
     }
   }
 }
@@ -62,13 +61,13 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
 
   const [weekWinnings, setWeekWinnings] = useState<Winner[]>([]);
   const [largestDailyWinnings, setLargestDailyWinnings] = useState<LargestDailyWinner[]>([]);
-  const [rewardPool, setRewardPool] = useState<RewardPool>({pools: undefined, loading: false});
+  const [onChainData, setOnChainData] = useState<onChainData>({data: undefined, loading: false});
   const [txCount, setTxCount] = useState(0);
 
   const apiState = {
     weekWinnings,
     largestDailyWinnings,
-    rewardPool,
+    onChainData,
     txCount,
   }
 
@@ -101,15 +100,16 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
   );
 
   useEffect(() => {
-    setRewardPool({pools: undefined, loading: true})
+    setOnChainData({data: undefined, loading: true})
 
     fetch('/api/reward_pool')
     .then((res) => res.json())
-    .then((data: {ethPool: number, solPool: number}) => {
-      setRewardPool({
-        pools: {
+    .then((data: {ethPool: number, solPool: number, totalTransactions: number}) => {
+      setOnChainData({
+        data: {
           ethPool: Number(data.ethPool),
-          solPool: Number(data.solPool)
+          solPool: Number(data.solPool),
+					totalTransactions: Number(data.totalTransactions),
         },
         loading: false
       })

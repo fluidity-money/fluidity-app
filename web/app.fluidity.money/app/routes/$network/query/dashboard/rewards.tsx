@@ -7,16 +7,20 @@ import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import { json } from "@remix-run/node";
 import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
 import { aggregateRewards } from "~/util/rewardAggregates";
-import { useUserRewardsAll, useUserRewardsByAddress } from "~/queries";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import config from "~/webapp.config.server";
+import {
+  TimeSepUserYield,
+  useUserYieldAll,
+  useUserYieldByAddress,
+} from "~/queries/useUserYield";
 
 export type RewardsLoaderData = {
   network: Chain;
   rewarders: Rewarders;
+  rewards: TimeSepUserYield;
   fluidTokenMap: { [symbol: string]: string };
   fluidPairs: number;
-  totalRewards: number;
   totalPrizePool: number;
   networkFee: number;
   gasFee: number;
@@ -41,12 +45,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
 
-    const totalPrizePool = await getTotalPrizePool(
-      provider,
-      rewardPoolAddr,
-      RewardAbi
-    );
-
     const { tokens } = config.config[network];
 
     const fluidTokenMap = tokens.reduce(
@@ -61,18 +59,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {}
     );
 
-    const { data: winnersData } = await (address
-      ? useUserRewardsByAddress(network, address)
-      : useUserRewardsAll(network));
+    const [
+      totalPrizePool,
+      { data: rewardsData, errors: rewardsErr },
+      { data: appRewardData, errors: appRewardErrors },
+    ] = await Promise.all([
+      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      address
+        ? useUserYieldByAddress(network, address)
+        : useUserYieldAll(network),
+      useApplicationRewardStatistics(network ?? ""),
+    ]);
 
-    const totalRewards = winnersData?.winners.reduce(
-      (sum, { winning_amount, token_decimals }) =>
-        sum + winning_amount / 10 ** token_decimals,
-      0
-    );
-
-    const { data: appRewardData, errors: appRewardErrors } =
-      await useApplicationRewardStatistics(network ?? "");
+    if (rewardsErr || !rewardsData) {
+      throw rewardsErr;
+    }
 
     if (appRewardErrors || !appRewardData) {
       throw appRewardErrors;
@@ -83,9 +84,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return json({
       network,
       rewarders,
+      rewards: rewardsData,
       fluidTokenMap,
       fluidPairs,
-      totalRewards,
       totalPrizePool,
       networkFee,
       gasFee,

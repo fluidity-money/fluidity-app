@@ -28,4 +28,7 @@ COPY --from=build /usr/local/src/fluidity/web/app.fluidity.money .
 
 EXPOSE 3000
 
+ARG GIT_SHA=unsetver
+ENV GIT_SHA=$GIT_SHA
+
 CMD ["npm", "run", "start"]

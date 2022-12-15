@@ -177,11 +177,14 @@ app.all(
 
 const port = process.env.PORT || 3000;
 
-httpServer.listen(port, () => {
+const server = httpServer.listen(port, () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
 });
+
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
 
 function purgeRequireCache() {
   // purge require cache on requests for "server side HMR" this won't let

@@ -1,14 +1,14 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { Volume } from "../volumeStats";
-import type { Winner } from "~/queries/useUserRewards";
+import type { TimeSepUserYield } from "~/queries/useUserYield";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
-import { useUserRewardsAll, useUserRewardsByAddress } from "~/queries";
-import { jsonGet } from "~/util/api/rpc";
+import { jsonGet } from "~/util";
+import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 
 export type HomeLoaderData = {
-  rewards: Winner[];
+  rewards: TimeSepUserYield;
   volume: Volume[];
   totalFluidPairs: number;
   network: Chain;
@@ -39,8 +39,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
               `${url.origin}/${network}/query/volumeStats`
             ),
         address
-          ? useUserRewardsByAddress(network ?? "", address)
-          : useUserRewardsAll(network ?? ""),
+          ? useUserYieldByAddress(network ?? "", address)
+          : useUserYieldAll(network ?? ""),
       ]);
 
     if (!volume) {
@@ -52,7 +52,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     return json({
-      rewards: rewardsData.winners,
+      rewards: rewardsData,
       volume: volume,
       totalFluidPairs: fluidPairs,
       network,

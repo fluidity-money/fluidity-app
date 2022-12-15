@@ -2,9 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useChainContext } from "hooks/ChainContext";
 import Head from "next/head";
-import { useEffect, useState } from "react";
 import Articles from "screens/Articles";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
@@ -15,9 +13,10 @@ import SponsorsPartners from "../../screens/SponsorsPartners";
 import UseCases from "../../screens/UseCases";
 import styles from "./LandingPage.module.scss";
 
-export type Pools = {
+export type onChainData = {
   ethPool: number,
-  solPool: number
+  solPool: number,
+	totalTransactions: number
 } | undefined
 
 const LandingPage = () => {

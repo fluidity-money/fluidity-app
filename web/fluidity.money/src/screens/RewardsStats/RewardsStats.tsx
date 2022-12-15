@@ -25,22 +25,22 @@ type DailyWinner = LargestDailyWinner & {
 
 const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
-  const { txCount, largestDailyWinnings } = apiState;
+  const { largestDailyWinnings, onChainData } = apiState;
+
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const [prizePool, setPrizePool] = useState<number>(apiState.rewardPool.pools?.ethPool || 0);
+  const [prizePool, setPrizePool] = useState<number>(onChainData.data?.ethPool || 0);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(apiState.rewardPool.pools?.ethPool || 0);
+    setPrizePool(onChainData.data?.ethPool || 0);
 
     chain === `SOL` && 
-    setPrizePool(apiState.rewardPool.pools?.solPool || 0);
+    setPrizePool(onChainData.data?.solPool || 0);
 
-  },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
+  },[onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
 
-  // NOTE: Dummy data
   const parsedDailyWinnings = largestDailyWinnings
     .map(({awarded_day, ...reward}) => (
       {
@@ -92,12 +92,12 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         </div>
         <div style={{ height: 254, width: "100%" }}></div>
         <RewardsInfoBox
-          totalTransactions={txCount}
+          totalTransactions={onChainData.data?.totalTransactions}
           changeScreen={changeScreen}
           type="transparent"
           rewardPool={prizePool}
-          loading={apiState.rewardPool.loading}
-          key={`${apiState.rewardPool.loading}-${prizePool}`}
+          loading={onChainData.loading}
+          key={`${onChainData.loading}-${prizePool}`}
         />
         {!!parsedDailyWinnings.length && (
           <div className={styles.rewardsChart}>

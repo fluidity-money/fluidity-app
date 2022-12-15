@@ -202,7 +202,13 @@ const SAFE_DEFAULT: CacheData = {
   count: 0,
   network: "ethereum",
   transactions: [],
-  rewards: [],
+  rewards: {
+    day: [],
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
   volume: [],
   totalFluidPairs: 0,
   timestamp: 0,
@@ -359,6 +365,7 @@ export default function Home() {
 
   const {
     count,
+    totalCount,
     rewards,
     volume,
     transactions,
@@ -369,17 +376,26 @@ export default function Home() {
     const { transactions, volume, rewards, totalFluidPairs, timestamp } =
       activeTableFilterIndex ? data.user : data.global;
 
-    const filteredRewards = rewards
-      .map((reward) => ({
-        ...reward,
-        timestamp: new Date(reward.created).getTime(),
-      }))
-      .filter(timeFilters[activeTransformerIndex].filter)
-      .reduce(
-        (sum, { winning_amount, token_decimals }) =>
-          sum + winning_amount / 10 ** token_decimals,
-        0
-      );
+    const {
+      day: dailyRewards,
+      week: weeklyRewards,
+      month: monthlyRewards,
+      year: yearlyRewards,
+    } = rewards;
+
+    const activeRewards = (() => {
+      switch (activeTransformerIndex) {
+        case 0:
+          return dailyRewards;
+        case 1:
+          return weeklyRewards;
+        case 2:
+          return monthlyRewards;
+        case 3:
+        default:
+          return yearlyRewards;
+      }
+    })();
 
     const filteredVolume = volume.filter(
       timeFilters[activeTransformerIndex].filter
@@ -394,7 +410,8 @@ export default function Home() {
 
     return {
       count: filteredVolume.length,
-      rewards: filteredRewards,
+      totalCount: volume.length,
+      rewards: activeRewards,
       volume: totalVolume,
       transactions,
       graphTransformedTransactions,
@@ -407,7 +424,7 @@ export default function Home() {
     userHomeData.state,
     userTransactionsData.state,
     homeData?.timestamp,
-    globalTransactionsData?.transactions,
+    globalTransactionsData?.page,
   ]);
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
@@ -440,12 +457,7 @@ export default function Home() {
 
           {/* Value */}
           <td>
-            <Text>
-              {value.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-              })}
-            </Text>
+            <Text>{numberToMonetaryString(value)}</Text>
           </td>
 
           {/* Reward */}
@@ -523,7 +535,7 @@ export default function Home() {
                   {activeTableFilterIndex ? "My" : "Total"} transactions
                 </Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
                 >
                   {count}
@@ -537,7 +549,7 @@ export default function Home() {
                 <div className="statistics-set">
                   <Text>Total volume</Text>
                   <Display
-                    size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                    size={width < 500 && width > 0 ? "xxxs" : "xs"}
                     style={{ margin: 0 }}
                   >
                     {numberToMonetaryString(volume)}
@@ -549,10 +561,14 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
                 >
-                  {numberToMonetaryString(rewards)}
+                  {numberToMonetaryString(
+                    rewards.find(
+                      ({ network: rewardNetwork }) => rewardNetwork === network
+                    )?.total_reward || 0
+                  )}
                 </Display>
                 <LinkButton
                   size="medium"
@@ -569,7 +585,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display
-                  size={width < 300 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
                   style={{ margin: 0 }}
                 >
                   {fluidPairs}
@@ -663,7 +679,7 @@ export default function Home() {
             page,
             rowsPerPage: 12,
           }}
-          count={count}
+          count={totalCount}
           data={transactions}
           renderRow={TransactionRow(network)}
           onFilter={setActiveTableFilterIndex}

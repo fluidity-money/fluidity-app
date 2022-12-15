@@ -14,10 +14,7 @@ import SponsorsPartners from "../../screens/SponsorsPartners";
 import UseCases from "../../screens/UseCases";
 import styles from "./LaunchPage.module.scss";
 
-import { IPropPools } from "pages";
-
 const LaunchPage = (props) => {
-  const { ethPool, solPool } :IPropPools = JSON.parse(props.pools);
 
   useEffect(() => {
     window.location.hash = "demo";
@@ -31,7 +28,7 @@ const LaunchPage = (props) => {
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
-        <Reward ethPool={Number(ethPool)} solPool={Number(solPool)} />
+        <Reward />
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />

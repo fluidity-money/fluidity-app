@@ -12,18 +12,18 @@ interface IProps {
 
 const RewardsInitial = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
-  const { txCount } = apiState;
+	const { onChainData } = apiState;
 
-  const [prizePool, setPrizePool] = useState<number>(apiState.rewardPool.pools?.ethPool || 0);
+  const [prizePool, setPrizePool] = useState<number>(onChainData.data?.ethPool || 0);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(apiState.rewardPool.pools?.ethPool || 0);
+    setPrizePool(onChainData.data?.ethPool || 0);
 
     chain === `SOL` && 
-    setPrizePool(apiState.rewardPool.pools?.solPool || 0);
+    setPrizePool(onChainData.data?.solPool || 0);
 
-  },[apiState.rewardPool.pools?.ethPool, apiState.rewardPool.pools?.solPool, chain]);
+  },[onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
 
   return (
     <AnimatePresence>
@@ -34,12 +34,12 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
         className={styles.container}
       >
         <RewardsInfoBox
-          totalTransactions={txCount}
+          totalTransactions={onChainData.data?.totalTransactions}
           changeScreen={changeScreen}
           type="black"
-          loading={apiState.rewardPool.loading}
+          loading={apiState.onChainData.loading}
           rewardPool={prizePool}
-          key={`${apiState.rewardPool.loading}-${prizePool}`}
+          key={`${apiState.onChainData.loading}-${prizePool}`}
         />
         <div className={styles.rewardsBackground}>
           <RewardsBackground />
