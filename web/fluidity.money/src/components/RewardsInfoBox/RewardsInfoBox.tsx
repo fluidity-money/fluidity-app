@@ -54,13 +54,17 @@ const RewardsInfoBox = ({
   }));
 
   const [prizePool, setPrizePool] = useState<number>(Number(rewardPool.toFixed(3)));
+	const lookupTableValue =  [134290.503, 403681.583, 930205.987];
+	let Count = 0;
 
   useEffect(() => {
     if (!loading) return
 
     const interval = setInterval(() => {
       setPrizePool((prizePool) => {
-        return Number(prizePool + 10000000)
+			  Count++;
+				if(Count > 2) Count = 0;
+        return Number(lookupTableValue[Count])
       })
     } , 400)
 
