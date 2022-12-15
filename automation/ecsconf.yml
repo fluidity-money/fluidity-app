@@ -43,7 +43,6 @@ MAINNET:
   DB_ROLLBACK_LAMBDA: flu-run-db-rollback-mainnet-dbmate
   APPSPEC_BUCKET: flu-appspec-files
   APPSPEC_CONTAINER_PORT: 80
-  ENABLE_BLUE_GREEN: false
   CODEDEPLOY_CONFIG_NAME: CodeDeployDefault.ECSAllAtOnce
   CODEDEPLOY_WAIT_TIME: 0
   CODEDEPLOY_CACHE_PURGE_LAMBDA: ecs-cloudflare-purge-cache-mainnet-purge-cache
