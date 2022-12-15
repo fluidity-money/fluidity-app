@@ -296,7 +296,7 @@ export default function IndexPage() {
               accessors={{
                 xAccessor: (d: HighestRewardMonthly & { x: number }) => d.x,
                 yAccessor: (d: HighestRewardMonthly) =>
-                  Math.log(d.winning_amount_scaled + 1),
+                  (d.winning_amount_scaled * 1000000 + 1),
               }}
               renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => (
                 <div className={"graph-tooltip-container"}>
