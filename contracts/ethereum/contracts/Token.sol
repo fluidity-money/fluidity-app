@@ -628,6 +628,11 @@ contract Token is IERC20, ITransferWithBeneficiary {
     function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }
 
     /*
+     * @notice return the current operator
+     */
+    function operator() public view returns (address) { return operator_; }
+
+    /*
      * @notice returns how much `account` has minted
      *
      * @param the account to check
@@ -707,16 +712,20 @@ contract Token is IERC20, ITransferWithBeneficiary {
       require(noEmergencyMode(), "emergency mode");
       require(msg.sender == operator_, "only operator can use this function");
 
-      uint totalPoolAmount = pool_.totalPoolAmount();
+      uint oldPoolAmount = pool_.totalPoolAmount();
 
-      pool_.takeFromPool(totalPoolAmount);
+      pool_.takeFromPool(oldPoolAmount);
 
       pool_ = newPool;
 
-      pool_.addToPool(totalPoolAmount);
+      pool_.underlying_().safeTransfer(address(pool_), oldPoolAmount);
 
-      if (pool_.totalPoolAmount() != totalPoolAmount) {
-        revert("total pool amount not equal to new amount!");
+      pool_.addToPool(oldPoolAmount);
+
+      uint newPoolAmount = pool_.totalPoolAmount();
+
+      if (newPoolAmount != oldPoolAmount) {
+	revert("total pool amount not equal to new amount!");
       }
 
       return true;

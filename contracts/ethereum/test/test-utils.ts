@@ -1,4 +1,5 @@
 import * as ethers from 'ethers';
+import * as hre from 'hardhat';
 import { assert } from 'chai';
 
 export const expectEq = (a: ethers.BigNumberish, b: ethers.BigNumberish) => {
