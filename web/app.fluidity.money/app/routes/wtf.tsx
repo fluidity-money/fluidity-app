@@ -171,7 +171,58 @@ export default function IndexPage() {
         type={"none"}
         loop={true}
       />
+
       <div className="index-page">
+        {/* Bg Line Chart */}
+        <div
+          className="opportunity-graph"
+          style={{
+            width: "100%",
+            height: "400px",
+            bottom: "-50px",
+            position: "fixed",
+          }}
+        >
+          <LineChart
+            data={highestRewards.map(
+              (reward: HighestRewardMonthly, i: number) => ({
+                ...reward,
+                x: i,
+              })
+            )}
+            lineLabel="transactions"
+            accessors={{
+              xAccessor: (d: HighestRewardMonthly & { x: number }) => d.x,
+              yAccessor: (d: HighestRewardMonthly) =>
+                d.winning_amount_scaled * 1000000 + 1,
+            }}
+            renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => (
+              <div className={"graph-tooltip-container"}>
+                <div className={"graph-tooltip"}>
+                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                    {format(parseISO(datum.awarded_day), "dd/MM/yy")}
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>{trimAddress(datum.winning_address)}</span>
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>
+                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                    </span>
+                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                      prize awarded
+                    </span>
+                  </span>
+                </div>
+              </div>
+            )}
+          />
+        </div>
+
         {/* Navigation Buttons */}
         <div className="header-buttons">
           {/* Fluidity Website Button */}
@@ -280,50 +331,6 @@ export default function IndexPage() {
               mobile={width <= mobileBreakpoint}
             />
           </Modal>
-
-          <div
-            className="opportunity-graph"
-            style={{ width: "100%", height: "400px" }}
-          >
-            <LineChart
-              data={highestRewards.map(
-                (reward: HighestRewardMonthly, i: number) => ({
-                  ...reward,
-                  x: i,
-                })
-              )}
-              lineLabel="transactions"
-              accessors={{
-                xAccessor: (d: HighestRewardMonthly & { x: number }) => d.x,
-                yAccessor: (d: HighestRewardMonthly) =>
-                  Math.log(d.winning_amount_scaled + 1),
-              }}
-              renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => (
-                <div className={"graph-tooltip-container"}>
-                  <div className={"graph-tooltip"}>
-                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {format(parseISO(datum.awarded_day), "dd/MM/yy")}
-                    </span>
-                    <br />
-                    <br />
-                    <span>
-                      <span>{trimAddress(datum.winning_address)}</span>
-                    </span>
-                    <br />
-                    <br />
-                    <span>
-                      <span>
-                        {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
-                      </span>
-                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                        prize awarded
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              )}
-            />
-          </div>
         </div>
       </div>
     </>

@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import useViewport from "hooks/useViewport";
-import { ContinuousCarousel, Card, Heading } from "@fluidity-money/surfing";
+import { ContinuousCarousel, Card, Heading, ManualCarousel } from "@fluidity-money/surfing";
 import Partner from "components/Partner";
 import styles from "./SponsorsPartners.module.scss";
 
@@ -84,7 +84,6 @@ const SponsorsPartners = () => {
     },
   ];
 
-  const { width } = useViewport();
   //Note: every value rep is in pixel
   //Using collision detection to organise posiitons so cards don't overlap.
   // Used for desktop view only since cards appear linearly on mobile.
@@ -106,6 +105,9 @@ const SponsorsPartners = () => {
   const boxHeight = 250;
   const boxWidth = 300;
 
+  const { width } = useViewport();
+  const mobileBreakpoint = 960
+
   const partnerCards = partners.map((partner, i) => {
     let top = Math.floor(Math.random() * (boxHeight - tolerance - 1) + 1);
     let left = Math.floor(Math.random() * (width - (width - 1180) - 1) + 1);
@@ -115,7 +117,7 @@ const SponsorsPartners = () => {
         // Check for Collision along X-axis
         if (
           (left < prevLeft + boxWidth + tolerance &&
-            left + boxWidth + tolerance > prevLeft) == false
+            left + boxWidth + tolerance > prevLeft) === false
         ) {
           break;
         }
@@ -123,7 +125,7 @@ const SponsorsPartners = () => {
         // Check for Collision along Y-axis
         if (
           (top < prevTop + boxHeight + tolerance &&
-            top + boxHeight + tolerance > prevTop) == false
+            top + boxHeight + tolerance > prevTop) === false
         ) {
           break;
         }
@@ -142,7 +144,7 @@ const SponsorsPartners = () => {
         ? "blur(3px)"
         : "blur(0px)";
     const opacity = filter === "blur(3px)" ? "0.6" : "1.0";
-    return width > 960 ? (
+    return width > mobileBreakpoint ? (
       <Card
         rounded={true}
         type={"transparent"}
@@ -173,8 +175,6 @@ const SponsorsPartners = () => {
         style={{
           position: "relative",
           display: "block",
-          top: `0px`,
-          left: `${width * 0.5 - boxWidth * 0.5}px`, // places it at the centre;
         }}
       >
         <Partner
@@ -189,33 +189,35 @@ const SponsorsPartners = () => {
 
   return (
     <div className={`${styles.container} bg-dark`}>
-      <Heading as="h1" className={styles.SPtext}>
+      <Heading
+        as="h1"
+        className={`${styles.SPtext} ${
+          width <= mobileBreakpoint ? styles.mobile : ""
+        }`}
+      >
         {"Partners & Investors"}
       </Heading>
-      <div
-        style={{
-          display: "flex",
-          width: "100%",
-          justifyContent: "center",
-          overflowY: "hidden",
-        }}
-      >
-        <ContinuousCarousel direction="up">
-          <div
-            style={{
-              width: "100%",
-              // position: "relative",
-              // display: "block",
-              // top: `${Math.floor((Math.random() - 0.5) * 500)}px`,
-              // left: `${Math.floor((Math.random() - 0.6) * 900)}px`,
-            }}
-          >
+      {width > mobileBreakpoint ? (
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "center",
+            overflowY: "hidden",
+            height: "100%",
+          }}
+        >
+          <ContinuousCarousel direction={"up"}>
             {partnerCards}
-          </div>
-        </ContinuousCarousel>
-      </div>
+          </ContinuousCarousel>
+        </div>
+      ) : (
+          <ManualCarousel scrollBar>
+            <div className={styles.deck}>{partnerCards}</div>
+          </ManualCarousel>
+      )}
     </div>
-  );
-};
+  )
+}
 
 export default SponsorsPartners;

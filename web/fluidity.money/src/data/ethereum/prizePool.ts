@@ -55,10 +55,8 @@ type PrizePool = {
 };
 
 // Returns total prize pool from aggregated contract
-export const getEthTotalPrizePool = async (
-  rpcUrl: string
-): Promise<number> => {
-  const provider = new JsonRpcProvider(rpcUrl);
+export const getEthTotalPrizePool = async (): Promise<number> => {
+  const provider = new JsonRpcProvider(process.env.FLU_ETH_RPC_HTTP);
   const poolAddress: string = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
   const poolABI: ContractInterface = PrizePoolABI;
 

@@ -24,8 +24,14 @@ describe("Token", async function () {
         await expect(fUsdtOracle.batchReward([[accountAddr, 1001]], 100, 101))
             .to.be.revertedWith("emergency mode!");
 
-        await expect(fUsdtOperator.unblockReward(accountAddr, 1, true, 100, 101))
-            .to.be.revertedWith("emergency mode!");
+        await expect(fUsdtOperator.unblockReward(
+            "0x394edbc3d36b5dcc6871768b6662c97ab24bf1a1ee48ef38e87a48636e1c2873",
+            accountAddr,
+            1,
+            true,
+            100,
+            101,
+        )).to.be.revertedWith("emergency mode!");
 
         await fUsdtOperator.disableEmergencyMode(configAddr);
 
@@ -95,7 +101,14 @@ describe("Token", async function () {
             return acc.add(amount);
         }, ethers.constants.Zero);
 
-        await fUsdtOperator.unblockReward(accountAddr, blockedBalance, true, 100, 101);
+        await fUsdtOperator.unblockReward(
+            "0x394edbc3d36b5dcc6871768b6662c97ab24bf1a1ee48ef38e87a48636e1c2873",
+            accountAddr,
+            blockedBalance,
+            true,
+            100,
+            101,
+        );
         const newChange = await fUsdtAccount.balanceOf(accountAddr) - initial;
         expect(newChange).to.equal(blockedBalance);
     });

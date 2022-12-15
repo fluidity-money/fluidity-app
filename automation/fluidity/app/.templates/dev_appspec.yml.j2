@@ -1,0 +1,11 @@
+version: 0.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: {{ CONFIG.TASKDEFARN }}
+        LoadBalancerInfo:
+          ContainerName: {{ CONFIG.SERVICE_NAME }}
+          ContainerPort: 80
+        PlatformVersion: "LATEST"
+

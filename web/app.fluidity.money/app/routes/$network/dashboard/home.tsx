@@ -238,7 +238,6 @@ export default function Home() {
   const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
   );
-
   const isFirstLoad = !homeData;
 
   const { data: globalTransactionsData } = useCache<TransactionsLoaderData>(

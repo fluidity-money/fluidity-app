@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .index-page {
   width: 100%;
   mix-blend-mode: lighten;

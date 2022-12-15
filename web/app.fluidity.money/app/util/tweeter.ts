@@ -85,10 +85,10 @@ export const generateTweet = (
         return `I just won ${formattedReward} for sending crypto with Fluidity Money!`;
 
       case "receive":
-        return `I just won ${formattedReward} for recieving crypto with Fluidity Money!`;
+        return `I just won ${formattedReward} for receiving crypto with Fluidity Money!`;
 
       default:
-        return `I could have won ${formattedReward} for sending and recieving crypto with Fluidity Money!`;
+        return `I could have won ${formattedReward} for sending and receiving crypto with Fluidity Money!`;
     }
   })();
 
