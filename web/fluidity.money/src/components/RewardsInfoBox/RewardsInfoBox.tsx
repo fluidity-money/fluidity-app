@@ -33,8 +33,7 @@ const RewardsInfoBox = ({
   rewardPool,
   loading,
 }: IRewardBoxProps) => {
-
-  const { chain, setChain } = useChainContext()
+  const { chain, setChain } = useChainContext();
 
   const showRewardPool = type === "black";
 
@@ -53,20 +52,25 @@ const RewardsInfoBox = ({
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
 
-  const [prizePool, setPrizePool] = useState<number>(Number(rewardPool.toFixed(3)));
+  const [prizePool, setPrizePool] = useState<number>(
+    Number(rewardPool.toFixed(3))
+  );
+  const lookupTableValue = [134290.503, 403681.583, 930205.987];
+  let Count = 0;
 
   useEffect(() => {
-    if (!loading) return
+    if (!loading) return;
 
     const interval = setInterval(() => {
       setPrizePool((prizePool) => {
-        const random = (100000 + Math.random() * 900000)
-        return Number(random.toFixed(3))
-      })
-    } , 200)
+        Count++;
+        if (Count > 2) Count = 0;
+        return Number(lookupTableValue[Count]);
+      });
+    }, 400);
 
-    return () => clearInterval(interval)
-  }, [loading])
+    return () => clearInterval(interval);
+  }, [loading]);
 
   return (
     <div
