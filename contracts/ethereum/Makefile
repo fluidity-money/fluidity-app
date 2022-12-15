@@ -33,7 +33,8 @@ run: docker ${FILES}
 		-e FLU_ETHEREUM_ORACLE_ADDRESS=0x50Ab74ed0dac2f82924D6E748Ce22eBeE339184c \
 		-i ${TAG}
 test:
-	${HARDHAT} test
+	FLU_FORKNET_NETWORK=goerli ${HARDHAT} test
+	FLU_FORKNET_NETWORK=mainnet ${HARDHAT} test
 
 clean:
 	@rm -rf docker artifacts
