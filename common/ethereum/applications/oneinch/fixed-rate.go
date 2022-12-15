@@ -16,6 +16,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const oneInchFixedRateSwapLogTopic = "0x803540962ed9acbf87226c32486d71e1c86c2bdb208e771bab2fd8a626f61e89"
+
 const fixedRateSwapAbiString = `[
 {
 	"anonymous": false,
@@ -49,6 +51,16 @@ var fixedRateSwapAbi ethAbi.ABI
 // Because TokenA and TokenB are required to have the same decimals, the fee is the value that
 // balances x TokenA + y TokenB + fee = const
 func GetFixedRateSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 2 {
+		return nil, fmt.Errorf("Not enough log topics passed!")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != oneInchFixedRateSwapLogTopic {
+		return nil, nil
+	}
+
 	unpacked, err := fixedRateSwapAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {

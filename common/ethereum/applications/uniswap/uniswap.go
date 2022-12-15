@@ -16,6 +16,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const uniswapSwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
+
 const uniswapV2PairAbiString = `[
     {
       "anonymous": false,
@@ -101,6 +103,16 @@ var uniswapV2PairAbi ethAbi.ABI
 func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed!")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != uniswapSwapLogTopic {
+		return nil, nil
+	}
+
 	unpacked, err := uniswapV2PairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
