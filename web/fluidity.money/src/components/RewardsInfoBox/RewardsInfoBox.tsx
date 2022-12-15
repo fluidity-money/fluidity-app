@@ -60,10 +60,9 @@ const RewardsInfoBox = ({
 
     const interval = setInterval(() => {
       setPrizePool((prizePool) => {
-        const random = (100000 + Math.random() * 900000)
-        return Number(random.toFixed(3))
+        return Number(prizePool + 10000000)
       })
-    } , 200)
+    } , 400)
 
     return () => clearInterval(interval)
   }, [loading])
