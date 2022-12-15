@@ -3,31 +3,28 @@ import RewardsBackground from "components/RewardsBackground";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
-import { getEthTotalPrizePool } from "data/ethereum/prizePool";
-import { IPropPools } from "pages";
 
 import styles from "./RewardsInitial.module.scss";
 
 interface IProps {
   changeScreen: () => void;
-  rewardPools: IPropPools;
 }
 
-const RewardsInitial = ({ changeScreen, rewardPools }: IProps) => {
+const RewardsInitial = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
-  const { txCount } = apiState;
+	const { onChainData } = apiState;
 
-  const [prizePool, setPrizePool] = useState<string>(rewardPools.ethPool.toFixed(3));
+  const [prizePool, setPrizePool] = useState<number>(onChainData.data?.ethPool || 0);
 
   useEffect(() => {
     chain === `ETH` && 
-    setPrizePool(rewardPools.ethPool.toFixed(3));
+    setPrizePool(onChainData.data?.ethPool || 0);
 
     chain === `SOL` && 
-    setPrizePool(rewardPools.solPool.toFixed(3));
+    setPrizePool(onChainData.data?.solPool || 0);
 
-  },[chain]);
-  
+  },[onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
+
   return (
     <AnimatePresence>
       <motion.div
@@ -37,10 +34,12 @@ const RewardsInitial = ({ changeScreen, rewardPools }: IProps) => {
         className={styles.container}
       >
         <RewardsInfoBox
-          rewardPool={prizePool}
-          totalTransactions={txCount}
+          totalTransactions={onChainData.data?.totalTransactions}
           changeScreen={changeScreen}
           type="black"
+          loading={apiState.onChainData.loading}
+          rewardPool={prizePool}
+          key={`${apiState.onChainData.loading}-${prizePool}`}
         />
         <div className={styles.rewardsBackground}>
           <RewardsBackground />

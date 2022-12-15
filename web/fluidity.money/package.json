@@ -6,6 +6,7 @@
     "@apollo/client": "^3.7.1",
     "@ethersproject/providers": "^5.7.2",
     "@fluidity-money/surfing": "^0.0.105",
+    "@openzeppelin/contracts": "^4.8.0",
     "@reduxjs/toolkit": "^1.8.3",
     "@types/gtag.js": "^0.0.12",
     "@visx/visx": "^2.12.2",
@@ -14,6 +15,7 @@
     "framer-motion": "^7.2.1",
     "next": "^12.3.0",
     "react": "^18.2.0",
+    "react-animated-numbers": "^0.14.0",
     "react-device-detect": "^2.2.2",
     "react-dom": "^18.2.0",
     "react-intersection-observer": "^9.4.0",
@@ -22,7 +24,8 @@
     "react-table": "^7.8.0",
     "sharp": "^0.31.0",
     "typescript": "^4.8.3",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "web3": "^1.8.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.4",
