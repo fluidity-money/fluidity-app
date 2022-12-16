@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { GeneralButton, Text } from "@fluidity-money/surfing";
 
 type Filter<T> = {
-  filter: (item: T) => boolean; // eslint-disable-line no-unused-vars
+  filter: (item: T) => boolean;
   name: string;
 };
 
