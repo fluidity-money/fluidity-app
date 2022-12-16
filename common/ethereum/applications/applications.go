@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/apeswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
@@ -38,6 +39,7 @@ const (
 	ApplicationCurve
 	ApplicationMultichain
 	ApplicationXyFinance
+	ApplicationApeswap
 )
 
 const (
@@ -51,6 +53,7 @@ const (
 	CurveTokenExchangeLogTopic   = "0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140"
 	MultichainLogAnySwapOut      = "0x97116cf6cd4f6412bb47914d6db18da9e16ab2142f543b86e207c24fbd16b23a"
 	XyFinanceSourceChainSwap     = "0xe1e8548aad4bfb08650f3a6c68acd84675a69fb72d77b1f744b8a643c406b608"
+	ApeswapLogTopic              = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -157,6 +160,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.XyFinance += util.MaybeRatToFloat(fee)
+	case ApplicationApeswap:
+		fee, err = apeswap.GetApeswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Apeswap += util.MaybeRatToFloat(fee)
 
 	default:
 		err = fmt.Errorf(
@@ -209,6 +221,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
+	case ApplicationApeswap:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
@@ -242,6 +258,8 @@ func ClassifyApplicationLogTopic(topic string) libApps.Application {
 		return ApplicationMultichain
 	case XyFinanceSourceChainSwap:
 		return ApplicationXyFinance
+	case ApeswapLogTopic:
+		return ApplicationApeswap
 	default:
 		return ApplicationNone
 	}
