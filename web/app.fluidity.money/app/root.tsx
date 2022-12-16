@@ -15,7 +15,6 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
-import cookieConsentUrl from "./components/CookieConsent/CookieConsent.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
@@ -94,7 +93,6 @@ export const links = () => {
 
     { rel: "stylesheet", href: globalStylesheetUrl },
     { rel: "stylesheet", href: surfingStylesheetUrl },
-    { rel: "stylesheet", href: cookieConsentUrl },
   ];
 };
 
