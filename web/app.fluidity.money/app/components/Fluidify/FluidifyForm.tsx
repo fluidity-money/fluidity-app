@@ -56,8 +56,7 @@ export const FluidifyForm = ({
   ) => {
     const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [whole, dec, _invalid] = numericChars.split(".");
+    const [whole, dec] = numericChars.split(".");
 
     const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
