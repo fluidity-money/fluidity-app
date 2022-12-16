@@ -186,7 +186,11 @@ export const FluidifyForm = ({
       </GeneralButton>
 
       <Text size="sm" className="swap-footer-text">
-        By pressing the button you agree to our <a href="https://static.fluidity.money/assets/fluidity-website-tc.pdf">terms of service</a>.
+        By pressing the button you agree to our{" "}
+        <a href="https://static.fluidity.money/assets/fluidity-website-tc.pdf">
+          terms of service
+        </a>
+        .
       </Text>
     </form>
   );

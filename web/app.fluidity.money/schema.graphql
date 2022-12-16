@@ -3,12 +3,18 @@ schema {
   subscription: subscription_root
 }
 
-"""whether this query should be cached (Hasura Cloud only)"""
+"""
+whether this query should be cached (Hasura Cloud only)
+"""
 directive @cached(
-  """measured in seconds"""
+  """
+  measured in seconds
+  """
   ttl: Int! = 60
 
-  """refresh the cache entry"""
+  """
+  refresh the cache entry
+  """
   refresh: Boolean! = false
 ) on QUERY
 
@@ -50,7 +56,9 @@ input String_comparison_exp {
   _gt: String
   _gte: String
 
-  """does the column match the given case-insensitive pattern"""
+  """
+  does the column match the given case-insensitive pattern
+  """
   _ilike: String
   _in: [String!]
 
@@ -60,13 +68,17 @@ input String_comparison_exp {
   _iregex: String
   _is_null: Boolean
 
-  """does the column match the given pattern"""
+  """
+  does the column match the given pattern
+  """
   _like: String
   _lt: String
   _lte: String
   _neq: String
 
-  """does the column NOT match the given case-insensitive pattern"""
+  """
+  does the column NOT match the given case-insensitive pattern
+  """
   _nilike: String
   _nin: [String!]
 
@@ -75,7 +87,9 @@ input String_comparison_exp {
   """
   _niregex: String
 
-  """does the column NOT match the given pattern"""
+  """
+  does the column NOT match the given pattern
+  """
   _nlike: String
 
   """
@@ -83,7 +97,9 @@ input String_comparison_exp {
   """
   _nregex: String
 
-  """does the column NOT match the given SQL regular expression"""
+  """
+  does the column NOT match the given SQL regular expression
+  """
   _nsimilar: String
 
   """
@@ -91,7 +107,9 @@ input String_comparison_exp {
   """
   _regex: String
 
-  """does the column match the given SQL regular expression"""
+  """
+  does the column match the given SQL regular expression
+  """
   _similar: String
 }
 
@@ -120,7 +138,9 @@ input app_performance_return_bool_exp {
   network: network_blockchain_comparison_exp
 }
 
-"""Ordering options when selecting data from "app_performance_return"."""
+"""
+Ordering options when selecting data from "app_performance_return".
+"""
 input app_performance_return_order_by {
   application: order_by
   average_reward: order_by
@@ -133,19 +153,29 @@ input app_performance_return_order_by {
 select columns of table "app_performance_return"
 """
 enum app_performance_return_select_column {
-  """column name"""
+  """
+  column name
+  """
   application
 
-  """column name"""
+  """
+  column name
+  """
   average_reward
 
-  """column name"""
+  """
+  column name
+  """
   count
 
-  """column name"""
+  """
+  column name
+  """
   highest_reward
 
-  """column name"""
+  """
+  column name
+  """
   network
 }
 
@@ -153,14 +183,20 @@ enum app_performance_return_select_column {
 Streaming cursor of the table "app_performance_return"
 """
 input app_performance_return_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: app_performance_return_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input app_performance_return_stream_cursor_value_input {
   application: String
   average_reward: float8
@@ -190,12 +226,18 @@ input bigint_comparison_exp {
   _nin: [bigint!]
 }
 
-"""ordering argument of a cursor"""
+"""
+ordering argument of a cursor
+"""
 enum cursor_ordering {
-  """ascending ordering of the cursor"""
+  """
+  ascending ordering of the cursor
+  """
   ASC
 
-  """descending ordering of the cursor"""
+  """
+  descending ordering of the cursor
+  """
   DESC
 }
 
@@ -251,7 +293,9 @@ input ethereum_pending_winners_bool_exp {
   win_amount: numeric_comparison_exp
 }
 
-"""Ordering options when selecting data from "ethereum_pending_winners"."""
+"""
+Ordering options when selecting data from "ethereum_pending_winners".
+"""
 input ethereum_pending_winners_order_by {
   address: order_by
   block_number: order_by
@@ -269,34 +313,54 @@ input ethereum_pending_winners_order_by {
 select columns of table "ethereum_pending_winners"
 """
 enum ethereum_pending_winners_select_column {
-  """column name"""
+  """
+  column name
+  """
   address
 
-  """column name"""
+  """
+  column name
+  """
   block_number
 
-  """column name"""
+  """
+  column name
+  """
   inserted_date
 
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   reward_sent
 
-  """column name"""
+  """
+  column name
+  """
   reward_type
 
-  """column name"""
+  """
+  column name
+  """
   token_decimals
 
-  """column name"""
+  """
+  column name
+  """
   token_short_name
 
-  """column name"""
+  """
+  column name
+  """
   transaction_hash
 
-  """column name"""
+  """
+  column name
+  """
   win_amount
 }
 
@@ -304,14 +368,20 @@ enum ethereum_pending_winners_select_column {
 Streaming cursor of the table "ethereum_pending_winners"
 """
 input ethereum_pending_winners_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: ethereum_pending_winners_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input ethereum_pending_winners_stream_cursor_value_input {
   address: String
   block_number: numeric
@@ -352,7 +422,9 @@ input expected_rewards_bool_exp {
   token_short_name: String_comparison_exp
 }
 
-"""Ordering options when selecting data from "expected_rewards"."""
+"""
+Ordering options when selecting data from "expected_rewards".
+"""
 input expected_rewards_order_by {
   average_reward: order_by
   awarded_month: order_by
@@ -366,22 +438,34 @@ input expected_rewards_order_by {
 select columns of table "expected_rewards"
 """
 enum expected_rewards_select_column {
-  """column name"""
+  """
+  column name
+  """
   average_reward
 
-  """column name"""
+  """
+  column name
+  """
   awarded_month
 
-  """column name"""
+  """
+  column name
+  """
   count
 
-  """column name"""
+  """
+  column name
+  """
   highest_reward
 
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   token_short_name
 }
 
@@ -389,14 +473,20 @@ enum expected_rewards_select_column {
 Streaming cursor of the table "expected_rewards"
 """
 input expected_rewards_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: expected_rewards_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input expected_rewards_stream_cursor_value_input {
   average_reward: float8
   awarded_month: timestamp
@@ -460,16 +550,24 @@ input highest_reward_winner_totals_order_by {
 select columns of table "highest_reward_winner_totals"
 """
 enum highest_reward_winner_totals_select_column {
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   total_winnings
 
-  """column name"""
+  """
+  column name
+  """
   transaction_count
 
-  """column name"""
+  """
+  column name
+  """
   winning_address
 }
 
@@ -477,14 +575,20 @@ enum highest_reward_winner_totals_select_column {
 Streaming cursor of the table "highest_reward_winner_totals"
 """
 input highest_reward_winner_totals_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: highest_reward_winner_totals_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input highest_reward_winner_totals_stream_cursor_value_input {
   network: network_blockchain
   total_winnings: float8
@@ -525,7 +629,9 @@ input highest_rewards_monthly_bool_exp {
   winning_amount_scaled: float8_comparison_exp
 }
 
-"""Ordering options when selecting data from "highest_rewards_monthly"."""
+"""
+Ordering options when selecting data from "highest_rewards_monthly".
+"""
 input highest_rewards_monthly_order_by {
   awarded_day: order_by
   created: order_by
@@ -542,31 +648,49 @@ input highest_rewards_monthly_order_by {
 select columns of table "highest_rewards_monthly"
 """
 enum highest_rewards_monthly_select_column {
-  """column name"""
+  """
+  column name
+  """
   awarded_day
 
-  """column name"""
+  """
+  column name
+  """
   created
 
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   token_decimals
 
-  """column name"""
+  """
+  column name
+  """
   token_short_name
 
-  """column name"""
+  """
+  column name
+  """
   transaction_hash
 
-  """column name"""
+  """
+  column name
+  """
   winning_address
 
-  """column name"""
+  """
+  column name
+  """
   winning_amount
 
-  """column name"""
+  """
+  column name
+  """
   winning_amount_scaled
 }
 
@@ -574,14 +698,20 @@ enum highest_rewards_monthly_select_column {
 Streaming cursor of the table "highest_rewards_monthly"
 """
 input highest_rewards_monthly_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: highest_rewards_monthly_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input highest_rewards_monthly_stream_cursor_value_input {
   awarded_day: timestamp
   created: timestamp
@@ -630,24 +760,38 @@ input numeric_comparison_exp {
   _nin: [numeric!]
 }
 
-"""column ordering options"""
+"""
+column ordering options
+"""
 enum order_by {
-  """in ascending order, nulls last"""
+  """
+  in ascending order, nulls last
+  """
   asc
 
-  """in ascending order, nulls first"""
+  """
+  in ascending order, nulls first
+  """
   asc_nulls_first
 
-  """in ascending order, nulls last"""
+  """
+  in ascending order, nulls last
+  """
   asc_nulls_last
 
-  """in descending order, nulls first"""
+  """
+  in descending order, nulls first
+  """
   desc
 
-  """in descending order, nulls first"""
+  """
+  in descending order, nulls first
+  """
   desc_nulls_first
 
-  """in descending order, nulls last"""
+  """
+  in descending order, nulls last
+  """
   desc_nulls_last
 }
 
@@ -656,19 +800,29 @@ type query_root {
   fetch data from the table: "app_performance_return"
   """
   app_performance_return(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [app_performance_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [app_performance_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: app_performance_return_bool_exp
   ): [app_performance_return!]!
 
@@ -681,19 +835,29 @@ type query_root {
     """
     args: application_performance_args!
 
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [app_performance_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [app_performance_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: app_performance_return_bool_exp
   ): [app_performance_return!]!
 
@@ -701,19 +865,29 @@ type query_root {
   fetch data from the table: "ethereum_pending_winners"
   """
   ethereum_pending_winners(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [ethereum_pending_winners_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [ethereum_pending_winners_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: ethereum_pending_winners_bool_exp
   ): [ethereum_pending_winners!]!
 
@@ -721,19 +895,29 @@ type query_root {
   fetch data from the table: "expected_rewards"
   """
   expected_rewards(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [expected_rewards_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [expected_rewards_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: expected_rewards_bool_exp
   ): [expected_rewards!]!
 
@@ -741,19 +925,29 @@ type query_root {
   fetch data from the table: "highest_reward_winner_totals"
   """
   highest_reward_winner_totals(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [highest_reward_winner_totals_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [highest_reward_winner_totals_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: highest_reward_winner_totals_bool_exp
   ): [highest_reward_winner_totals!]!
 
@@ -761,19 +955,29 @@ type query_root {
   fetch data from the table: "highest_rewards_monthly"
   """
   highest_rewards_monthly(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [highest_rewards_monthly_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [highest_rewards_monthly_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: highest_rewards_monthly_bool_exp
   ): [highest_rewards_monthly!]!
 
@@ -786,19 +990,29 @@ type query_root {
     """
     args: total_reward_args!
 
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [total_reward_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [total_reward_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: total_reward_return_bool_exp
   ): total_reward_return
 
@@ -806,19 +1020,29 @@ type query_root {
   fetch data from the table: "total_reward_return"
   """
   total_reward_return(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [total_reward_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [total_reward_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: total_reward_return_bool_exp
   ): [total_reward_return!]!
 
@@ -826,19 +1050,29 @@ type query_root {
   fetch data from the table: "tvl"
   """
   tvl(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [tvl_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [tvl_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: tvl_bool_exp
   ): [tvl!]!
 
@@ -846,19 +1080,29 @@ type query_root {
   fetch aggregated fields from the table: "tvl"
   """
   tvl_aggregate(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [tvl_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [tvl_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: tvl_bool_exp
   ): tvl_aggregate!
 
@@ -866,19 +1110,29 @@ type query_root {
   fetch data from the table: "user_actions"
   """
   user_actions(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [user_actions_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [user_actions_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: user_actions_bool_exp
   ): [user_actions!]!
 
@@ -886,19 +1140,29 @@ type query_root {
   fetch aggregated fields from the table: "user_actions"
   """
   user_actions_aggregate(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [user_actions_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [user_actions_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: user_actions_bool_exp
   ): user_actions_aggregate!
 
@@ -906,19 +1170,29 @@ type query_root {
   fetch data from the table: "winners"
   """
   winners(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [winners_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [winners_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: winners_bool_exp
   ): [winners!]!
 
@@ -926,19 +1200,29 @@ type query_root {
   fetch aggregated fields from the table: "winners"
   """
   winners_aggregate(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [winners_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [winners_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: winners_bool_exp
   ): winners_aggregate!
 }
@@ -982,19 +1266,29 @@ type subscription_root {
   fetch data from the table: "app_performance_return"
   """
   app_performance_return(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [app_performance_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [app_performance_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: app_performance_return_bool_exp
   ): [app_performance_return!]!
 
@@ -1002,13 +1296,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "app_performance_return"
   """
   app_performance_return_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [app_performance_return_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: app_performance_return_bool_exp
   ): [app_performance_return!]!
 
@@ -1021,19 +1321,29 @@ type subscription_root {
     """
     args: application_performance_args!
 
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [app_performance_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [app_performance_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: app_performance_return_bool_exp
   ): [app_performance_return!]!
 
@@ -1041,19 +1351,29 @@ type subscription_root {
   fetch data from the table: "ethereum_pending_winners"
   """
   ethereum_pending_winners(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [ethereum_pending_winners_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [ethereum_pending_winners_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: ethereum_pending_winners_bool_exp
   ): [ethereum_pending_winners!]!
 
@@ -1061,13 +1381,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "ethereum_pending_winners"
   """
   ethereum_pending_winners_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [ethereum_pending_winners_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: ethereum_pending_winners_bool_exp
   ): [ethereum_pending_winners!]!
 
@@ -1075,19 +1401,29 @@ type subscription_root {
   fetch data from the table: "expected_rewards"
   """
   expected_rewards(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [expected_rewards_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [expected_rewards_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: expected_rewards_bool_exp
   ): [expected_rewards!]!
 
@@ -1095,13 +1431,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "expected_rewards"
   """
   expected_rewards_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [expected_rewards_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: expected_rewards_bool_exp
   ): [expected_rewards!]!
 
@@ -1109,19 +1451,29 @@ type subscription_root {
   fetch data from the table: "highest_reward_winner_totals"
   """
   highest_reward_winner_totals(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [highest_reward_winner_totals_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [highest_reward_winner_totals_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: highest_reward_winner_totals_bool_exp
   ): [highest_reward_winner_totals!]!
 
@@ -1129,13 +1481,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "highest_reward_winner_totals"
   """
   highest_reward_winner_totals_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [highest_reward_winner_totals_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: highest_reward_winner_totals_bool_exp
   ): [highest_reward_winner_totals!]!
 
@@ -1143,19 +1501,29 @@ type subscription_root {
   fetch data from the table: "highest_rewards_monthly"
   """
   highest_rewards_monthly(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [highest_rewards_monthly_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [highest_rewards_monthly_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: highest_rewards_monthly_bool_exp
   ): [highest_rewards_monthly!]!
 
@@ -1163,13 +1531,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "highest_rewards_monthly"
   """
   highest_rewards_monthly_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [highest_rewards_monthly_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: highest_rewards_monthly_bool_exp
   ): [highest_rewards_monthly!]!
 
@@ -1182,19 +1556,29 @@ type subscription_root {
     """
     args: total_reward_args!
 
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [total_reward_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [total_reward_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: total_reward_return_bool_exp
   ): total_reward_return
 
@@ -1202,19 +1586,29 @@ type subscription_root {
   fetch data from the table: "total_reward_return"
   """
   total_reward_return(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [total_reward_return_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [total_reward_return_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: total_reward_return_bool_exp
   ): [total_reward_return!]!
 
@@ -1222,13 +1616,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "total_reward_return"
   """
   total_reward_return_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [total_reward_return_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: total_reward_return_bool_exp
   ): [total_reward_return!]!
 
@@ -1236,19 +1636,29 @@ type subscription_root {
   fetch data from the table: "tvl"
   """
   tvl(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [tvl_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [tvl_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: tvl_bool_exp
   ): [tvl!]!
 
@@ -1256,19 +1666,29 @@ type subscription_root {
   fetch aggregated fields from the table: "tvl"
   """
   tvl_aggregate(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [tvl_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [tvl_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: tvl_bool_exp
   ): tvl_aggregate!
 
@@ -1276,13 +1696,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "tvl"
   """
   tvl_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [tvl_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: tvl_bool_exp
   ): [tvl!]!
 
@@ -1290,19 +1716,29 @@ type subscription_root {
   fetch data from the table: "user_actions"
   """
   user_actions(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [user_actions_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [user_actions_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: user_actions_bool_exp
   ): [user_actions!]!
 
@@ -1310,19 +1746,29 @@ type subscription_root {
   fetch aggregated fields from the table: "user_actions"
   """
   user_actions_aggregate(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [user_actions_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [user_actions_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: user_actions_bool_exp
   ): user_actions_aggregate!
 
@@ -1330,13 +1776,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "user_actions"
   """
   user_actions_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [user_actions_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: user_actions_bool_exp
   ): [user_actions!]!
 
@@ -1344,19 +1796,29 @@ type subscription_root {
   fetch data from the table: "winners"
   """
   winners(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [winners_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [winners_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: winners_bool_exp
   ): [winners!]!
 
@@ -1364,19 +1826,29 @@ type subscription_root {
   fetch aggregated fields from the table: "winners"
   """
   winners_aggregate(
-    """distinct select on columns"""
+    """
+    distinct select on columns
+    """
     distinct_on: [winners_select_column!]
 
-    """limit the number of rows returned"""
+    """
+    limit the number of rows returned
+    """
     limit: Int
 
-    """skip the first n rows. Use only with order_by"""
+    """
+    skip the first n rows. Use only with order_by
+    """
     offset: Int
 
-    """sort the rows by one or more columns"""
+    """
+    sort the rows by one or more columns
+    """
     order_by: [winners_order_by!]
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: winners_bool_exp
   ): winners_aggregate!
 
@@ -1384,13 +1856,19 @@ type subscription_root {
   fetch data from the table in a streaming manner: "winners"
   """
   winners_stream(
-    """maximum number of rows returned in a single batch"""
+    """
+    maximum number of rows returned in a single batch
+    """
     batch_size: Int!
 
-    """cursor to stream the results returned by the query"""
+    """
+    cursor to stream the results returned by the query
+    """
     cursor: [winners_stream_cursor_input]!
 
-    """filter the rows returned"""
+    """
+    filter the rows returned
+    """
     where: winners_bool_exp
   ): [winners!]!
 }
@@ -1438,7 +1916,9 @@ input total_reward_return_bool_exp {
   total_reward: float8_comparison_exp
 }
 
-"""Ordering options when selecting data from "total_reward_return"."""
+"""
+Ordering options when selecting data from "total_reward_return".
+"""
 input total_reward_return_order_by {
   count: order_by
   network: order_by
@@ -1449,13 +1929,19 @@ input total_reward_return_order_by {
 select columns of table "total_reward_return"
 """
 enum total_reward_return_select_column {
-  """column name"""
+  """
+  column name
+  """
   count
 
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   total_reward
 }
 
@@ -1463,14 +1949,20 @@ enum total_reward_return_select_column {
 Streaming cursor of the table "total_reward_return"
 """
 input total_reward_return_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: total_reward_return_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input total_reward_return_stream_cursor_value_input {
   count: bigint
   network: network_blockchain
@@ -1512,7 +2004,9 @@ type tvl_aggregate_fields {
   variance: tvl_variance_fields
 }
 
-"""aggregate avg on columns"""
+"""
+aggregate avg on columns
+"""
 type tvl_avg_fields {
   tvl: Float
 }
@@ -1530,7 +2024,9 @@ input tvl_bool_exp {
   tvl: numeric_comparison_exp
 }
 
-"""aggregate max on columns"""
+"""
+aggregate max on columns
+"""
 type tvl_max_fields {
   contract_address: String
   network: network_blockchain
@@ -1538,7 +2034,9 @@ type tvl_max_fields {
   tvl: numeric
 }
 
-"""aggregate min on columns"""
+"""
+aggregate min on columns
+"""
 type tvl_min_fields {
   contract_address: String
   network: network_blockchain
@@ -1546,7 +2044,9 @@ type tvl_min_fields {
   tvl: numeric
 }
 
-"""Ordering options when selecting data from "tvl"."""
+"""
+Ordering options when selecting data from "tvl".
+"""
 input tvl_order_by {
   contract_address: order_by
   network: order_by
@@ -1558,30 +2058,44 @@ input tvl_order_by {
 select columns of table "tvl"
 """
 enum tvl_select_column {
-  """column name"""
+  """
+  column name
+  """
   contract_address
 
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   time
 
-  """column name"""
+  """
+  column name
+  """
   tvl
 }
 
-"""aggregate stddev on columns"""
+"""
+aggregate stddev on columns
+"""
 type tvl_stddev_fields {
   tvl: Float
 }
 
-"""aggregate stddev_pop on columns"""
+"""
+aggregate stddev_pop on columns
+"""
 type tvl_stddev_pop_fields {
   tvl: Float
 }
 
-"""aggregate stddev_samp on columns"""
+"""
+aggregate stddev_samp on columns
+"""
 type tvl_stddev_samp_fields {
   tvl: Float
 }
@@ -1590,14 +2104,20 @@ type tvl_stddev_samp_fields {
 Streaming cursor of the table "tvl"
 """
 input tvl_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: tvl_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input tvl_stream_cursor_value_input {
   contract_address: String
   network: network_blockchain
@@ -1605,22 +2125,30 @@ input tvl_stream_cursor_value_input {
   tvl: numeric
 }
 
-"""aggregate sum on columns"""
+"""
+aggregate sum on columns
+"""
 type tvl_sum_fields {
   tvl: numeric
 }
 
-"""aggregate var_pop on columns"""
+"""
+aggregate var_pop on columns
+"""
 type tvl_var_pop_fields {
   tvl: Float
 }
 
-"""aggregate var_samp on columns"""
+"""
+aggregate var_samp on columns
+"""
 type tvl_var_samp_fields {
   tvl: Float
 }
 
-"""aggregate variance on columns"""
+"""
+aggregate variance on columns
+"""
 type tvl_variance_fields {
   tvl: Float
 }
@@ -1686,7 +2214,9 @@ type user_actions_aggregate_fields {
   variance: user_actions_variance_fields
 }
 
-"""aggregate avg on columns"""
+"""
+aggregate avg on columns
+"""
 type user_actions_avg_fields {
   amount: Float
   event_number: Float
@@ -1715,7 +2245,9 @@ input user_actions_bool_exp {
   type: user_action_comparison_exp
 }
 
-"""aggregate max on columns"""
+"""
+aggregate max on columns
+"""
 type user_actions_max_fields {
   amount: numeric
   event_number: bigint
@@ -1731,7 +2263,9 @@ type user_actions_max_fields {
   type: user_action
 }
 
-"""aggregate min on columns"""
+"""
+aggregate min on columns
+"""
 type user_actions_min_fields {
   amount: numeric
   event_number: bigint
@@ -1747,7 +2281,9 @@ type user_actions_min_fields {
   type: user_action
 }
 
-"""Ordering options when selecting data from "user_actions"."""
+"""
+Ordering options when selecting data from "user_actions".
+"""
 input user_actions_order_by {
   amount: order_by
   event_number: order_by
@@ -1768,61 +2304,93 @@ input user_actions_order_by {
 select columns of table "user_actions"
 """
 enum user_actions_select_column {
-  """column name"""
+  """
+  column name
+  """
   amount
 
-  """column name"""
+  """
+  column name
+  """
   event_number
 
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   recipient_address
 
-  """column name"""
+  """
+  column name
+  """
   sender_address
 
-  """column name"""
+  """
+  column name
+  """
   solana_recipient_owner_address
 
-  """column name"""
+  """
+  column name
+  """
   solana_sender_owner_address
 
-  """column name"""
+  """
+  column name
+  """
   swap_in
 
-  """column name"""
+  """
+  column name
+  """
   time
 
-  """column name"""
+  """
+  column name
+  """
   token_decimals
 
-  """column name"""
+  """
+  column name
+  """
   token_short_name
 
-  """column name"""
+  """
+  column name
+  """
   transaction_hash
 
-  """column name"""
+  """
+  column name
+  """
   type
 }
 
-"""aggregate stddev on columns"""
+"""
+aggregate stddev on columns
+"""
 type user_actions_stddev_fields {
   amount: Float
   event_number: Float
   token_decimals: Float
 }
 
-"""aggregate stddev_pop on columns"""
+"""
+aggregate stddev_pop on columns
+"""
 type user_actions_stddev_pop_fields {
   amount: Float
   event_number: Float
   token_decimals: Float
 }
 
-"""aggregate stddev_samp on columns"""
+"""
+aggregate stddev_samp on columns
+"""
 type user_actions_stddev_samp_fields {
   amount: Float
   event_number: Float
@@ -1833,14 +2401,20 @@ type user_actions_stddev_samp_fields {
 Streaming cursor of the table "user_actions"
 """
 input user_actions_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: user_actions_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input user_actions_stream_cursor_value_input {
   amount: numeric
   event_number: bigint
@@ -1857,28 +2431,36 @@ input user_actions_stream_cursor_value_input {
   type: user_action
 }
 
-"""aggregate sum on columns"""
+"""
+aggregate sum on columns
+"""
 type user_actions_sum_fields {
   amount: numeric
   event_number: bigint
   token_decimals: Int
 }
 
-"""aggregate var_pop on columns"""
+"""
+aggregate var_pop on columns
+"""
 type user_actions_var_pop_fields {
   amount: Float
   event_number: Float
   token_decimals: Float
 }
 
-"""aggregate var_samp on columns"""
+"""
+aggregate var_samp on columns
+"""
 type user_actions_var_samp_fields {
   amount: Float
   event_number: Float
   token_decimals: Float
 }
 
-"""aggregate variance on columns"""
+"""
+aggregate variance on columns
+"""
 type user_actions_variance_fields {
   amount: Float
   event_number: Float
@@ -1929,7 +2511,9 @@ type winners_aggregate_fields {
   variance: winners_variance_fields
 }
 
-"""aggregate avg on columns"""
+"""
+aggregate avg on columns
+"""
 type winners_avg_fields {
   token_decimals: Float
   winning_amount: Float
@@ -1957,7 +2541,9 @@ input winners_bool_exp {
   winning_amount: numeric_comparison_exp
 }
 
-"""aggregate max on columns"""
+"""
+aggregate max on columns
+"""
 type winners_max_fields {
   awarded_time: timestamp
   created: timestamp
@@ -1974,7 +2560,9 @@ type winners_max_fields {
   winning_amount: numeric
 }
 
-"""aggregate min on columns"""
+"""
+aggregate min on columns
+"""
 type winners_min_fields {
   awarded_time: timestamp
   created: timestamp
@@ -1991,7 +2579,9 @@ type winners_min_fields {
   winning_amount: numeric
 }
 
-"""Ordering options when selecting data from "winners"."""
+"""
+Ordering options when selecting data from "winners".
+"""
 input winners_order_by {
   awarded_time: order_by
   created: order_by
@@ -2012,59 +2602,91 @@ input winners_order_by {
 select columns of table "winners"
 """
 enum winners_select_column {
-  """column name"""
+  """
+  column name
+  """
   awarded_time
 
-  """column name"""
+  """
+  column name
+  """
   created
 
-  """column name"""
+  """
+  column name
+  """
   ethereum_application
 
-  """column name"""
+  """
+  column name
+  """
   network
 
-  """column name"""
+  """
+  column name
+  """
   reward_type
 
-  """column name"""
+  """
+  column name
+  """
   send_transaction_hash
 
-  """column name"""
+  """
+  column name
+  """
   solana_application
 
-  """column name"""
+  """
+  column name
+  """
   solana_winning_owner_address
 
-  """column name"""
+  """
+  column name
+  """
   token_decimals
 
-  """column name"""
+  """
+  column name
+  """
   token_short_name
 
-  """column name"""
+  """
+  column name
+  """
   transaction_hash
 
-  """column name"""
+  """
+  column name
+  """
   winning_address
 
-  """column name"""
+  """
+  column name
+  """
   winning_amount
 }
 
-"""aggregate stddev on columns"""
+"""
+aggregate stddev on columns
+"""
 type winners_stddev_fields {
   token_decimals: Float
   winning_amount: Float
 }
 
-"""aggregate stddev_pop on columns"""
+"""
+aggregate stddev_pop on columns
+"""
 type winners_stddev_pop_fields {
   token_decimals: Float
   winning_amount: Float
 }
 
-"""aggregate stddev_samp on columns"""
+"""
+aggregate stddev_samp on columns
+"""
 type winners_stddev_samp_fields {
   token_decimals: Float
   winning_amount: Float
@@ -2074,14 +2696,20 @@ type winners_stddev_samp_fields {
 Streaming cursor of the table "winners"
 """
 input winners_stream_cursor_input {
-  """Stream column input with initial value"""
+  """
+  Stream column input with initial value
+  """
   initial_value: winners_stream_cursor_value_input!
 
-  """cursor ordering"""
+  """
+  cursor ordering
+  """
   ordering: cursor_ordering
 }
 
-"""Initial value of the column from where the streaming should start"""
+"""
+Initial value of the column from where the streaming should start
+"""
 input winners_stream_cursor_value_input {
   awarded_time: timestamp
   created: timestamp
@@ -2098,27 +2726,34 @@ input winners_stream_cursor_value_input {
   winning_amount: numeric
 }
 
-"""aggregate sum on columns"""
+"""
+aggregate sum on columns
+"""
 type winners_sum_fields {
   token_decimals: Int
   winning_amount: numeric
 }
 
-"""aggregate var_pop on columns"""
+"""
+aggregate var_pop on columns
+"""
 type winners_var_pop_fields {
   token_decimals: Float
   winning_amount: Float
 }
 
-"""aggregate var_samp on columns"""
+"""
+aggregate var_samp on columns
+"""
 type winners_var_samp_fields {
   token_decimals: Float
   winning_amount: Float
 }
 
-"""aggregate variance on columns"""
+"""
+aggregate variance on columns
+"""
 type winners_variance_fields {
   token_decimals: Float
   winning_amount: Float
 }
-
