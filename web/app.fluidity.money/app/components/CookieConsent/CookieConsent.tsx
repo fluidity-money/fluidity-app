@@ -17,7 +17,10 @@ const CookieConsent = () => {
         our website. These are mostly for analytics and security purposes.
         <br />
         If you are curious about what we use cookies for, please read our{" "}
-        <a href="https://fluidity.money/privacy" className={"cc-link"}>
+        <a
+          href="https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+          className={"cc-link"}
+        >
           Privacy Policy
         </a>
         .<br />
