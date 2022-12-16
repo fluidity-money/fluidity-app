@@ -60,13 +60,14 @@ func TestGetMultichainAnySwapFee(t *testing.T) {
 		ethTypes.HashFromString(""),
 	}
 
-	// nil data fails
+	// nil data fails with no error (wrong topic)
 	fees, err = GetMultichainAnySwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
-	assert.Error(t, err)
+	assert.Nil(t, err)
 	assert.Nil(t, fees)
 
 	// fluid -> other successful
 	transfer.Log.Data = *dataBlob
+	transfer.Log.Topics[0] = ethTypes.HashFromString(multichainLogAnySwapOut)
 	fees, err = GetMultichainAnySwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
 	assert.Equal(t, big.NewRat(40, 1), fees)

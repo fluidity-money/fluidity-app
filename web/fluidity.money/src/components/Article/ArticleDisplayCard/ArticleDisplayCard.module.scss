@@ -8,9 +8,10 @@
 
   img {
     width: 97%;
-    max-width: 700px;
-    max-height: 350px;
     margin: 10px 10px 10px 10px;
+    aspect-ratio: 2/1;
+    max-height: 500px;
+    max-width: 1000px;
   }
 
   h4 {

@@ -17,6 +17,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const multichainLogAnySwapOut = "0x97116cf6cd4f6412bb47914d6db18da9e16ab2142f543b86e207c24fbd16b23a"
+
 const multichainAbiString = `[
 {
 	"anonymous": false,
@@ -85,6 +87,16 @@ var anyswapERC20Abi ethAbi.ABI
 // track the receiving pool
 // Fees are calculated as 0.1% for stablecoin swaps, clamped between $40 and $1000 USD
 func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 2 {
+		return nil, fmt.Errorf("Not enough log topics passed!")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != multichainLogAnySwapOut {
+		return nil, nil
+	}
+
 	unpacked, err := multichainAbi.Unpack("LogAnySwap", transfer.Log.Data)
 
 	if err != nil {

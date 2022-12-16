@@ -12,6 +12,7 @@ import (
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -67,13 +68,53 @@ func getReceipt(gethClient *ethclient.Client, transactionHash ethereum.Hash) (*e
 	return &convertedReceipt, nil
 }
 
+// appsListFromEnvOrFatal parses a list of `app:address:address,app:address:address` into a map of {address => app}
+func appsListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.Application {
+	applicationContracts_ := util.GetEnvOrFatal(EnvApplicationContracts)
+
+	apps := make(map[ethereum.Address]appTypes.Application)
+
+	for _, appAddresses_ := range strings.Split(applicationContracts_, ",") {
+		appAddresses := strings.Split(appAddresses_, ":")
+
+		if len(appAddresses) < 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Malformed app address line '%s'!",
+					appAddresses_,
+				)
+			})
+		}
+
+		app, err := appTypes.ParseApplicationName(appAddresses[0])
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to parse an etherem application from name '%s'! %v",
+					appAddresses[0],
+					err,
+				)
+			})
+		}
+
+		for _, address_ := range appAddresses[1:] {
+			address := ethereum.AddressFromString(address_)
+
+			apps[address] = app
+		}
+	}
+
+	return apps
+}
+
 func main() {
 	var (
 		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
 		gethHttpUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
-		applicationContracts_    = util.GetEnvOrFatal(EnvApplicationContracts)
+		applicationContracts     = appsListFromEnvOrFatal(EnvApplicationContracts)
 	)
 
 	contractAddress := ethCommon.HexToAddress(contractAddrString)
@@ -88,14 +129,6 @@ func main() {
 
 			k.Payload = err
 		})
-	}
-
-	var applicationContracts []ethereum.Address
-
-	for _, address := range strings.Split(applicationContracts_, ",") {
-		address := ethereum.AddressFromString(address)
-
-		applicationContracts = append(applicationContracts, address)
 	}
 
 	gethClient, err := ethclient.Dial(gethHttpUrl)
@@ -139,7 +172,6 @@ func main() {
 			transactions,
 			blockHash,
 			applicationContracts,
-			applications.ClassifyApplicationLogTopic,
 		)
 
 		if err != nil {
@@ -228,7 +260,7 @@ func main() {
 					ApplicationFee: fee,
 				}
 
-				toAddress, fromAddress, err := applications.GetApplicationTransferParties(
+				sender, recipient, err := applications.GetApplicationTransferParties(
 					transaction,
 					transfer,
 				)
@@ -246,10 +278,9 @@ func main() {
 
 				decoratedTransfer := worker.EthereumDecoratedTransfer{
 					TransactionHash:  transactionHash,
-					SenderAddress:    fromAddress,
-					RecipientAddress: toAddress,
+					SenderAddress:    sender,
+					RecipientAddress: recipient,
 					Decorator:        decorator,
-
 					AppEmissions:     emission,
 				}
 

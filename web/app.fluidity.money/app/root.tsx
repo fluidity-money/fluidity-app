@@ -231,7 +231,7 @@ function App() {
         <Links />
       </head>
       <body>
-        <CookieConsent  activated={cookieConsent} url= {'/privacy'} callBack={()=>{setCookieConsent(true)}}/>
+        <CookieConsent  activated={cookieConsent} url= {'https://static.fluidity.money/assets/fluidity-privacy-policy.pdf'} callBack={()=>{setCookieConsent(true)}}/>
         <CacheProvider sha={gitSha}>
           <ToolProvider>
             <Outlet />

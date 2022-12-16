@@ -71,7 +71,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </div>
         </ChainContextProvider>
       </ApolloProvider>
-      <CookieConsent  activated={cookieConsent} url= {'/privacy'} callBack={()=>{setCookieConsent(true)}}/>
+      <CookieConsent  activated={cookieConsent} url= {'https://static.fluidity.money/assets/fluidity-privacy-policy.pdf'} callBack={()=>{setCookieConsent(true)}}/>
     </div>
     <Script src='assets/gfx/renderer.js' strategy='lazyOnload' />
   </>
