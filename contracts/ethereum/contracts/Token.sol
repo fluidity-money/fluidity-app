@@ -215,6 +215,9 @@ contract Token is IERC20, ITransferWithBeneficiary {
         userMintResetBlock_ = block.number;
     }
 
+    function op() public view returns (address) {
+        return operator_;
+    }
     /*
      * @param _maxUncheckedReward that can be paid out before a quarantine happens
      * @param _mintLimitsEnabled to prevent users from minting a large amount
