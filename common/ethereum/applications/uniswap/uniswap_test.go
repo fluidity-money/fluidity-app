@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	testUtils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
@@ -48,6 +49,9 @@ func TestGetUniswapFees(t *testing.T) {
 
 	// fails without proper rpc responses
 	transfer.Log.Data = *dataBlob
+	transfer.Log.Topics = []ethereum.Hash{
+		ethereum.HashFromString(uniswapSwapLogTopic),
+	}
 	fees, err = GetUniswapFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
 	assert.Nil(t, fees)
