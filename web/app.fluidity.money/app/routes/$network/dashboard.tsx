@@ -512,12 +512,12 @@ export default function Dashboard() {
               <Text>Fluidity Money</Text>
             </a>
             {/* Terms */}
-            <a href={"/"}>
+            <a href={"https://static.fluidity.money/assets/fluidity-website-tc.pdf"}>
               <Text>Terms</Text>
             </a>
 
             {/* Privacy Policy */}
-            <a href={"/"}>
+            <a href={"https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"}>
               <Text>Privacy policy</Text>
             </a>
 
