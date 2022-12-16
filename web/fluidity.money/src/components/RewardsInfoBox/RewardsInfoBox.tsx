@@ -89,8 +89,8 @@ const RewardsInfoBox = ({
                   </>
                 ) : (
                   <img
-                    height="100"
-                    width="100"
+                    height="70"
+                    width="70"
                     src="assets/images/LoopAnim.webp"
                   />
                 )}
