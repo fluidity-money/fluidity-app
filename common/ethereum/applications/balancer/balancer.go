@@ -114,6 +114,15 @@ var balancerV2PoolAbi ethAbi.ABI
 // output token is the fluid token. This method generalises for Balancer's different pools
 // (stable, weighted, etc.)
 func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed")
+	}
+
+	topic := transfer.Log.Topics[0]
+
+	if topic.String() != balancerSwapLogTopic {
+		return nil, nil
+	}
 
 	if len(transfer.Log.Topics) != 4 {
 		return nil, fmt.Errorf(
@@ -123,7 +132,6 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	}
 
 	var (
-		topic     = transfer.Log.Topics[0]
 		poolId    = transfer.Log.Topics[1]
 		tokenIn_  = transfer.Log.Topics[2]
 		tokenOut_ = transfer.Log.Topics[3]
@@ -131,10 +139,6 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		tokenIn  = ethCommon.HexToAddress(tokenIn_.String())
 		tokenOut = ethCommon.HexToAddress(tokenOut_.String())
 	)
-
-	if topic.String() != balancerSwapLogTopic {
-		return nil, nil
-	}
 
 	// decode the amount of each token in the log
 	unpacked, err := balancerV2PoolAbi.Unpack("Swap", transfer.Log.Data)
