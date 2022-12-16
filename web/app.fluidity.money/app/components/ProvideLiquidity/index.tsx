@@ -92,27 +92,29 @@ const ProvideLiquidity = () => {
     >
       <div className="card-inner">
         <section className="provide-liquidity-left">
-          <Heading as="h2" className="provide-heading">
-            Provide Liquidity for{" "}
-            <button
-              className="open-provider-dropdown"
-              onClick={() => {
-                setOpenDropdown(() => !openDropdown);
-              }}
-              // onBlur={() => setOpenDropdown(false)}
-            >
-              {openDropdown && dropdownOptions}
-              <Heading as="h1" className="fluid-liquidity-token">
-                {`ƒ${poolToken.symbol.slice(1)}`}
-              </Heading>
-              <img
-                src="/images/icons/triangleDown.svg"
-                style={{ width: 18, height: 8 }}
-              />
-            </button>
-          </Heading>
+          <div>
+            {liqidityProviders}
+            <Heading as="h2" className="provide-heading">
+              Provide Liquidity for{" "}
+              <button
+                className="open-provider-dropdown"
+                onClick={() => {
+                  setOpenDropdown(() => !openDropdown);
+                }}
+                // onBlur={() => setOpenDropdown(false)}
+              >
+                {openDropdown && dropdownOptions}
+                <Heading as="h1" className="fluid-liquidity-token">
+                  {`ƒ${poolToken.symbol.slice(1)}`}
+                </Heading>
+                <img
+                  src="/images/icons/triangleDown.svg"
+                  style={{ width: 18, height: 8 }}
+                />
+              </button>
+            </Heading>
+          </div>
 
-          {liqidityProviders}
           <Text size="lg">
             Make your assets work harder for your rewards. Get involved.
           </Text>

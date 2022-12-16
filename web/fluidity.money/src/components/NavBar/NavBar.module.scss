@@ -21,7 +21,7 @@
   height: 100px;
   display: grid;
   grid-template-columns: 1fr 4fr 1fr;
-  max-width: 2000px;
+  max-width: 3000px;
   z-index: 1000;
 
   @media (max-width: 750px) {
@@ -73,7 +73,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 2000px;
+    max-width: 3000px;
     padding: 10px 50px 10px 50px;
     position: fixed;
     z-index: 50;

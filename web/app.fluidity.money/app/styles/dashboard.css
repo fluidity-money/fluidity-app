@@ -461,9 +461,9 @@ main > footer > section > a {
 
 .provide-liquidity-left > div:first-child {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 0.5em;
-  margin-bottom: 2em;
+  align-items: center;
 }
 
 .provide-liquidity-right {
@@ -1148,10 +1148,6 @@ main > footer > section > a {
     font-size: 2em;
   }
   .highest-rewarders {
-    font-size: 2em;
-  }
-
-  .provide-liquidity-left > div > h2 {
     font-size: 2em;
   }
 }
