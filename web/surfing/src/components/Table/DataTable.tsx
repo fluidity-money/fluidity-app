@@ -97,7 +97,7 @@ const DataTable = ({
         </ul>
       </div>
       <div>
-        <table className={styles.table} {...getTableProps()}>
+        <table className={styles.dataTable} {...getTableProps()}>
           <thead>
             {headerGroups.map(
               (headerGroup: {

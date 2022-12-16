@@ -69,10 +69,10 @@ const Table = <T,>(props: ITable<T>) => {
 
   return (
     <div>
-      <div className="transactions-header">
+      <div className="table-header">
         {/* Filters*/}
         {filters && (
-          <div className={"transaction-filters"}>
+          <div className={"table-filters"}>
             {filters.map((filter, i) => (
               <GeneralButton
                 key={`filter-${filter.name}`}
@@ -100,7 +100,7 @@ const Table = <T,>(props: ITable<T>) => {
       </div>
 
       {/* Table */}
-      <table className="transaction-table">
+      <table className="table">
         {/* Table Headings */}
         <thead>
           <tr>
