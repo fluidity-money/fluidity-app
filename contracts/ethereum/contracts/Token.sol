@@ -628,7 +628,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
     function remainingGlobalMintLimit() public view returns (uint) {
         return remainingGlobalMint_;
     }
-    
+
+    /**
      * @notice return the max unchecked reward that's currently set
      */
     function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }

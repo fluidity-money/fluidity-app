@@ -164,6 +164,18 @@ export const deployTokens = async (
   };
 };
 
+export const deployRewardPools = async (
+  hre: HardhatRuntimeEnvironment,
+  operatorAddress: string,
+  tokens: Token[]
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("RewardPools");
+  const beacon = await hre.upgrades.deployProxy(factory);
+  await beacon.deployed();
+  await beacon.init(operatorAddress, tokens);
+  return beacon;
+};
+
 export const forknetTakeFunds = async (
   hre: HardhatRuntimeEnvironment,
   accounts: ethers.Signer[],
