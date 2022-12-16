@@ -2,7 +2,7 @@ import { Card, Heading, Text } from "@fluidity-money/surfing";
 import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
 import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import BloomEffect from "../BloomEffect";
 
 const parent = {
@@ -19,6 +19,29 @@ type LoaderData = {
   provider: typeof config.liquidity_providers;
   network: string;
   tokensConfig: typeof config.config;
+};
+
+const useClickOutside = (
+  ref: MutableRefObject<any>,
+  handleClick: VoidFunction
+) => {
+  useEffect(() => {
+    /**
+     * Run callback if clicked on outside of element
+     */
+    const handleClickOutside = (event: any) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        handleClick();
+      }
+    };
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref]);
 };
 
 const ProvideLiquidity = () => {
@@ -63,8 +86,11 @@ const ProvideLiquidity = () => {
 
   const [openDropdown, setOpenDropdown] = useState(false);
 
+  const dropdownRef = useRef(null);
+  useClickOutside(dropdownRef, () => setOpenDropdown(false));
+
   const dropdownOptions = (
-    <div className="dropdown-options">
+    <div className="dropdown-options" ref={dropdownRef}>
       {fluidTokens.map((option) => (
         <button
           className="token-option"
@@ -101,7 +127,6 @@ const ProvideLiquidity = () => {
                 onClick={() => {
                   setOpenDropdown(() => !openDropdown);
                 }}
-                // onBlur={() => setOpenDropdown(false)}
               >
                 {openDropdown && dropdownOptions}
                 <Heading as="h1" className="fluid-liquidity-token">
