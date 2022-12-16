@@ -6,7 +6,7 @@ import { AppProps } from 'next/app';
 
 import Script from 'next/script';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ApolloProvider } from "@apollo/client";
 import useViewport from "hooks/useViewport";
 import { ChainContextProvider } from "hooks/ChainContext";
@@ -16,7 +16,7 @@ import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
 import "@fluidity-money/surfing/dist/style.css";
 import "styles/app.global.scss"
-import CookieConsent from 'components/CookieConsent/CookieConsent';
+import { CookieConsent } from "@fluidity-money/surfing";
 import { useRouter } from 'next/router';
 import * as gtag from 'utils/gtag'
 
@@ -51,6 +51,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [router.events])
 
+  const [cookieConsent, setCookieConsent] = useState(true);
+  useEffect(() => {
+    const _cookieConsent = localStorage.getItem("cookieConsent");
+    if (!_cookieConsent) {
+      setCookieConsent(false);
+    }
+  }, []);
+  
   return <>
     <div id={"fluid"} />
     <div id="shade" />
@@ -63,7 +71,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </div>
         </ChainContextProvider>
       </ApolloProvider>
-      <CookieConsent />
+      <CookieConsent  activated={cookieConsent} url= {'/privacy'} callBack={()=>{setCookieConsent(true)}}/>
     </div>
     <Script src='assets/gfx/renderer.js' strategy='lazyOnload' />
   </>

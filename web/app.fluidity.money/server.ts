@@ -24,7 +24,6 @@ import {
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
 
 const createSentryRequestHandler =
   wrapExpressCreateRequestHandler(createRequestHandler);
@@ -63,103 +62,6 @@ app.use(morgan("tiny"));
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "build");
 
-const ethereumTokens = config.config["ethereum"].tokens
-  .filter((entry) => entry.isFluidOf !== undefined)
-  .map((entry) => ({
-    token: entry.symbol,
-    address: entry.address,
-    decimals: entry.decimals,
-  }));
-
-const solanaTokens = config.config["solana"].tokens
-  .filter((entry) => entry.isFluidOf !== undefined)
-  .map((entry) => ({
-    token: entry.symbol,
-    address: entry.address,
-    decimals: entry.decimals,
-  }));
-
-const registry = new Map<string, Subscription>();
-
-type TokenList = {
-  token: string;
-  address: string;
-  decimals: number;
-}[];
-
-io.on("connection", (socket) => {
-  socket.on("subscribeTransactions", ({ protocol, address }) => {
-    if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
-
-    let Tokens: TokenList = [];
-    if (protocol === `ethereum`) {
-      Tokens = ethereumTokens;
-    } else if (protocol === `solana`) {
-      Tokens = solanaTokens;
-    }
-
-    const OnChainTransactionsObservable: Observable<PipedTransaction> =
-      getTransactionsObservableForIn(protocol, {}, ...Tokens);
-
-    const winnersObservable: Observable<PipedTransaction> =
-      winnersTransactionObservable(address);
-
-    const pendingwinnersObservable: Observable<PipedTransaction> =
-      pendingWinnersTransactionObservables(address);
-
-    const OnChainTransactionFilterObservable = getObservableForAddress(
-      OnChainTransactionsObservable,
-      address
-    );
-
-    registry.set(
-      socket.id,
-      OnChainTransactionFilterObservable.subscribe((transaction) => {
-        socket.emit("Transactions", transaction);
-      })
-    );
-
-    winnersObservable.subscribe({
-      next(data) {
-        socket.emit("Transactions", data);
-      },
-      error(err) {
-        captureException(
-          new Error(
-            `Failed to dispatch db transaction observable on winners :: ${err}`
-          ),
-          {
-            tags: {
-              section: "server",
-            },
-          }
-        );
-      },
-    });
-
-    pendingwinnersObservable.subscribe({
-      next(data) {
-        socket.emit("Transactions", data);
-      },
-      error(err) {
-        captureException(
-          new Error(
-            `Failed to dispatch db transaction observable on pending winners :: ${err}`
-          ),
-          {
-            tags: {
-              section: "server",
-            },
-          }
-        );
-      },
-    });
-  });
-
-  socket.on("disconnect", () => {
-    registry.delete(socket.id);
-  });
-});
 
 app.all(
   "*",
