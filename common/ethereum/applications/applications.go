@@ -40,19 +40,6 @@ const (
 	ApplicationXyFinance
 )
 
-const (
-	UniswapSwapLogTopic          = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
-	BalancerSwapLogTopic         = "0x2170c741c41531aec20e7c107c24eecfdd15e69c9bb0a8dd37b1840b9e0b207b"
-	OneInchLPV2SwapLogTopic      = "0xbd99c6719f088aa0abd9e7b7a4a635d1f931601e9f304b538dc42be25d8c65c6"
-	OneInchLPV1SwapLogTopic      = "0x2a368c7f33bb86e2d999940a3989d849031aff29b750f67947e6b8e8c3d2ffd6"
-	MooniswapSwapLogTopic        = "0x86c49b5d8577da08444947f1427d23ef191cfabf2c0788f93324d79e926a9302"
-	OneInchFixedRateSwapLogTopic = "0x803540962ed9acbf87226c32486d71e1c86c2bdb208e771bab2fd8a626f61e89"
-	DodoV2DODOSwapLogTopic       = "0xc2c0245e056d5fb095f04cd6373bc770802ebd1e6c918eb78fdef843cdb37b0f"
-	CurveTokenExchangeLogTopic   = "0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140"
-	MultichainLogAnySwapOut      = "0x97116cf6cd4f6412bb47914d6db18da9e16ab2142f543b86e207c24fbd16b23a"
-	XyFinanceSourceChainSwap     = "0xe1e8548aad4bfb08650f3a6c68acd84675a69fb72d77b1f744b8a643c406b608"
-)
-
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
@@ -215,34 +202,5 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 			"Transfer #%v did not contain an application",
 			transfer,
 		)
-	}
-}
-
-// ClassifyApplicationLogTopic returns a classification of which supported application
-// a given topic corresponds to, if any
-func ClassifyApplicationLogTopic(topic string) libApps.Application {
-	switch topic {
-	case UniswapSwapLogTopic:
-		return ApplicationUniswapV2
-	case OneInchLPV2SwapLogTopic:
-		return ApplicationOneInchLPV2
-	case OneInchLPV1SwapLogTopic:
-		return ApplicationOneInchLPV1
-	case MooniswapSwapLogTopic:
-		return ApplicationMooniswap
-	case OneInchFixedRateSwapLogTopic:
-		return ApplicationOneInchFixedRateSwap
-	case BalancerSwapLogTopic:
-		return ApplicationBalancerV2
-	case DodoV2DODOSwapLogTopic:
-		return ApplicationDodoV2
-	case CurveTokenExchangeLogTopic:
-		return ApplicationCurve
-	case MultichainLogAnySwapOut:
-		return ApplicationMultichain
-	case XyFinanceSourceChainSwap:
-		return ApplicationXyFinance
-	default:
-		return ApplicationNone
 	}
 }

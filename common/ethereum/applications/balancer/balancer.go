@@ -19,6 +19,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const balancerSwapLogTopic = "0x2170c741c41531aec20e7c107c24eecfdd15e69c9bb0a8dd37b1840b9e0b207b"
+
 const balancerV2VaultAbiString = `[
 	 {
 	   "inputs": [
@@ -121,6 +123,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	}
 
 	var (
+		topic     = transfer.Log.Topics[0]
 		poolId    = transfer.Log.Topics[1]
 		tokenIn_  = transfer.Log.Topics[2]
 		tokenOut_ = transfer.Log.Topics[3]
@@ -128,6 +131,10 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		tokenIn  = ethCommon.HexToAddress(tokenIn_.String())
 		tokenOut = ethCommon.HexToAddress(tokenOut_.String())
 	)
+
+	if topic.String() != balancerSwapLogTopic {
+		return nil, nil
+	}
 
 	// decode the amount of each token in the log
 	unpacked, err := balancerV2PoolAbi.Unpack("Swap", transfer.Log.Data)

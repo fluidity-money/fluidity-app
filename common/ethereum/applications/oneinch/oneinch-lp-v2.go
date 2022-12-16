@@ -16,6 +16,11 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const (
+	oneInchLPV2SwapLogTopic = "0xbd99c6719f088aa0abd9e7b7a4a635d1f931601e9f304b538dc42be25d8c65c6"
+	oneInchLPV1SwapLogTopic = "0x2a368c7f33bb86e2d999940a3989d849031aff29b750f67947e6b8e8c3d2ffd6"
+)
+
 const oneInchLiquidityPoolV2AbiString = `[
 {
 	"inputs": [],
@@ -120,6 +125,12 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			len(transfer.Log.Topics),
 			transfer.TransactionHash,
 		)
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != oneInchLPV2SwapLogTopic && logTopic != oneInchLPV1SwapLogTopic {
+		return nil, nil
 	}
 
 	// decode the amount of each token in the log
