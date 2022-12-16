@@ -3,5 +3,7 @@
 // LICENSE.md file.
 
 import DataTable from "./DataTable";
+import Table from "./Table"
 
+export {Table};
 export default DataTable;

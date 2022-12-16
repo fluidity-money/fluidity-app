@@ -5,7 +5,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.1",
     "@ethersproject/providers": "^5.7.2",
-    "@fluidity-money/surfing": "^0.0.105",
+    "@fluidity-money/surfing": "^0.1.28",
     "@openzeppelin/contracts": "^4.8.0",
     "@reduxjs/toolkit": "^1.8.3",
     "@types/gtag.js": "^0.0.12",

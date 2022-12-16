@@ -1,6 +1,6 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
-import type { IRow } from "~/components/Table";
+import type {IRow} from "@fluidity-money/surfing";
 
 import config from "~/webapp.config.server";
 import { LoaderFunction, json } from "@remix-run/node";
@@ -13,7 +13,7 @@ import { getTxExplorerLink, getAddressExplorerLink } from "~/util";
 import { useUserUnclaimedRewards, useUserRewardsByAddress } from "~/queries";
 
 import { motion } from "framer-motion";
-import { Table } from "~/components";
+import { Table } from "@fluidity-money/surfing";
 import {
   Heading,
   numberToMonetaryString,

@@ -1,5 +1,5 @@
 import type { Chain } from "~/util/chainUtils/chains";
-import type { IRow } from "~/components/Table";
+import type { IRow } from "@fluidity-money/surfing";
 import type Transaction from "~/types/Transaction";
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
 import type { TransactionsLoaderData } from "../../query/userTransactions";
@@ -29,7 +29,7 @@ import {
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
-import { Table } from "~/components";
+import { Table } from "@fluidity-money/surfing";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import config from "~/webapp.config.server";
