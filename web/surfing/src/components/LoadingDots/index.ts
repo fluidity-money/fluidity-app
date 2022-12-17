@@ -1,3 +1,3 @@
-import Spinner from './Spinner';
+import LoadingDots from './LoadingDots';
 
-export default Spinner;
+export default LoadingDots;

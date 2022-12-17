@@ -5,7 +5,6 @@ import { useEffect, useState, useContext, useMemo } from "react";
 import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
-import { useCache } from "~/hooks/useCache";
 import useViewport from "~/hooks/useViewport";
 import { networkMapper } from "~/util";
 import { generateTweet } from "~/util/tweeter";
@@ -18,6 +17,7 @@ import {
   BlockchainModal,
   Twitter,
   numberToMonetaryString,
+  LoadingDots
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
@@ -25,7 +25,7 @@ import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
-import { HighestRewardsData, ProjectedWinData } from "./query/projectedWinnings";
+import { ProjectedWinData } from "./query/projectedWinnings";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -208,27 +208,10 @@ const NetworkPage = () => {
             </div>
 
             {/* Expected Earnings */}
-            {(projectedWinningsData.state === "loading" && connected) || true && (
+            {(projectedWinningsData.state === "loading" && connected) && (
               <>
                 <div className="loader-dots">
-                <Display
-                  className="winnings-figure"
-                  size={width < mobileBreakpoint ? "xs" : "md"}
-                >
-                  .
-                </Display>
-                <Display
-                  className="winnings-figure"
-                  size={width < mobileBreakpoint ? "xs" : "md"}
-                >
-                  .
-                </Display>
-                <Display
-                  className="winnings-figure"
-                  size={width < mobileBreakpoint ? "xs" : "md"}
-                >
-                  .
-                </Display>
+                  <LoadingDots />
                 </div>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
                   Loading your last 50 transactions...
