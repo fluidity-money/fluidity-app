@@ -81,8 +81,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               payoutAddrs
             );
           default:
-            return useUserTransactionsAll(network,getTokenForNetwork(network),
-            page, payoutAddrs);
+            return useUserTransactionsAll(
+              network,
+              getTokenForNetwork(network),
+              page,
+              payoutAddrs
+            );
         }
       })();
 

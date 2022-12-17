@@ -1,7 +1,7 @@
 import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
-import { useEffect, useState, useContext, useMemo } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
@@ -17,7 +17,7 @@ import {
   BlockchainModal,
   Twitter,
   numberToMonetaryString,
-  LoadingDots
+  LoadingDots,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
@@ -59,15 +59,17 @@ const NetworkPage = () => {
     FluidityFacadeContext
   );
   const navigate = useNavigate();
-  
+
   const projectedWinningsData = useFetcher<ProjectedWinData>();
-  
+
   useEffect(() => {
     if (!address) return;
-    
-    projectedWinningsData.load(`/${network}/query/projectedWinnings?address=${address}`);
-  }, [connected])
-  
+
+    projectedWinningsData.load(
+      `/${network}/query/projectedWinnings?address=${address}`
+    );
+  }, [connected]);
+
   const projectedWin = projectedWinningsData.data?.projectedWin || 0;
 
   const loaded = !!projectedWinningsData?.data;
@@ -208,7 +210,7 @@ const NetworkPage = () => {
             </div>
 
             {/* Expected Earnings */}
-            {(projectedWinningsData.state === "loading" && connected) && (
+            {projectedWinningsData.state === "loading" && connected && (
               <>
                 <div className="loader-dots">
                   <LoadingDots />
@@ -253,25 +255,24 @@ const NetworkPage = () => {
               </GeneralButton>
 
               {!!projectedWinningsData.data && (
-              <a
-                href={generateTweet(projectedWin)}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <GeneralButton
-                  className="share-button"
-                  size="large"
-                  version="transparent"
-                  buttontype="icon before"
-                  icon={<Twitter />}
-                  handleClick={() => {
-                    return;
-                  }}
+                <a
+                  href={generateTweet(projectedWin)}
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
-                  SHARE
-                </GeneralButton>
-              </a>
-                
+                  <GeneralButton
+                    className="share-button"
+                    size="large"
+                    version="transparent"
+                    buttontype="icon before"
+                    icon={<Twitter />}
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    SHARE
+                  </GeneralButton>
+                </a>
               )}
             </div>
           </div>

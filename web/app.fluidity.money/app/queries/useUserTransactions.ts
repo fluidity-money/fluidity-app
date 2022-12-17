@@ -290,7 +290,7 @@ const useUserTransactionsByAddress = async (
   page: number,
   address: string,
   filterHashes: string[],
-  limit: number = 12
+  limit = 12
 ) => {
   const variables = {
     address: address,
@@ -318,7 +318,7 @@ const useUserTransactionsByTxHash = async (
   network: string,
   transactions: string[],
   filterHashes: string[],
-  limit: number = 12
+  limit = 12
 ) => {
   const variables = {
     transactions,
@@ -345,7 +345,7 @@ const useUserTransactionsAll = async (
   tokens: string[],
   page: number,
   filterHashes: string[],
-  limit: number = 12
+  limit = 12
 ) => {
   const variables = {
     tokens,
