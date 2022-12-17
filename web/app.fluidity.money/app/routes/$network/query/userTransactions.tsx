@@ -11,6 +11,7 @@ import {
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
+import { getTokenForNetwork } from "~/util";
 
 type UserTransaction = {
   sender: string;
@@ -74,12 +75,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           case !!address:
             return useUserTransactionsByAddress(
               network,
+              getTokenForNetwork(network),
               page,
               address as string,
               payoutAddrs
             );
           default:
-            return useUserTransactionsAll(network, page, payoutAddrs);
+            return useUserTransactionsAll(network,getTokenForNetwork(network),
+            page, payoutAddrs);
         }
       })();
 

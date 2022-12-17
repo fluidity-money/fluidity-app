@@ -2,7 +2,7 @@ import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
 import { useEffect, useState, useContext, useMemo } from "react";
-import { useNavigate, useLoaderData } from "@remix-run/react";
+import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
 import { useCache } from "~/hooks/useCache";
@@ -25,7 +25,7 @@ import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
-import { HighestRewardsData } from "./query/projectedWinnings";
+import { HighestRewardsData, ProjectedWinData } from "./query/projectedWinnings";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -59,23 +59,18 @@ const NetworkPage = () => {
     FluidityFacadeContext
   );
   const navigate = useNavigate();
+  
+  const projectedWinningsData = useFetcher<ProjectedWinData>();
+  
+  useEffect(() => {
+    if (!address) return;
+    
+    projectedWinningsData.load(`/${network}/query/projectedWinnings?address=${address}`);
+  }, [connected])
+  
+  const projectedWin = projectedWinningsData.data?.projectedWin || 0;
 
-  const { data: projectWinningsData } = useCache<HighestRewardsData>(
-    `/${network}/query/projectedWinnings`
-  );
-
-  const loaded = !!projectWinningsData?.highestRewards;
-
-  const projectedWinnings = useMemo(
-    () =>
-      loaded
-        ? projectWinningsData?.highestRewards.reduce(
-            (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
-            0
-          ) / projectWinningsData.highestRewards.length
-        : 0,
-    [loaded]
-  );
+  const loaded = !!projectedWinningsData?.data;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected
@@ -213,16 +208,46 @@ const NetworkPage = () => {
             </div>
 
             {/* Expected Earnings */}
-            {!!projectedWinnings && connected && (
+            {(projectedWinningsData.state === "loading" && connected) || true && (
+              <>
+                <div className="loader-dots">
+                <Display
+                  className="winnings-figure"
+                  size={width < mobileBreakpoint ? "xs" : "md"}
+                >
+                  .
+                </Display>
+                <Display
+                  className="winnings-figure"
+                  size={width < mobileBreakpoint ? "xs" : "md"}
+                >
+                  .
+                </Display>
+                <Display
+                  className="winnings-figure"
+                  size={width < mobileBreakpoint ? "xs" : "md"}
+                >
+                  .
+                </Display>
+                </div>
+                <Text size={width < mobileBreakpoint ? "md" : "xl"}>
+                  Loading your last 50 transactions...
+                </Text>
+                <br />
+              </>
+            )}
+
+            {/* Expected Earnings */}
+            {!!projectedWinningsData.data && connected && (
               <>
                 <Display
                   className="winnings-figure"
                   size={width < mobileBreakpoint ? "xs" : "md"}
                 >
-                  {numberToMonetaryString(projectedWinnings)}
+                  {numberToMonetaryString(projectedWin)}
                 </Display>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Would have been your winnings, based on the last 50
+                  Would have been your winnings, based on your last 50
                   transactions.
                 </Text>
                 <br />
@@ -244,8 +269,9 @@ const NetworkPage = () => {
                 FLUIDIFY MONEY
               </GeneralButton>
 
+              {!!projectedWinningsData.data && (
               <a
-                href={generateTweet(projectedWinnings)}
+                href={generateTweet(projectedWin)}
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -262,6 +288,8 @@ const NetworkPage = () => {
                   SHARE
                 </GeneralButton>
               </a>
+                
+              )}
             </div>
           </div>
         </div>

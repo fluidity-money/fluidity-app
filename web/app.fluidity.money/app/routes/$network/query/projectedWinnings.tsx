@@ -1,27 +1,69 @@
-import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
-
 import { LoaderFunction, json } from "@remix-run/node";
-import { useHighestRewardStatisticsByNetwork } from "~/queries/useHighestRewardStatistics";
 import { captureException } from "@sentry/react";
+import config from "~/webapp.config.server";
+import { useUserTransactionsByAddress } from "~/queries";
 
-export type HighestRewardsData = {
-  highestRewards: HighestRewardMonthly[];
+export type ProjectedWinData = {
+  projectedWin: number;
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
+  
+  const url = new URL(request.url);
+  const address = url.searchParams.get("address");
 
+  const {tokens} = config.config[network ?? ""];
+
+  if (!address || !tokens) throw new Error("Invalid Request")
+  
+  const tokenAddrs = tokens.filter(t => !t.isFluidOf).map(({address}) => address)
+  
   try {
-    const { data: highestRewardsData, errors: highestRewardsErr } =
-      await useHighestRewardStatisticsByNetwork(network ?? "");
+    const { data: userTransactionsData, errors: userTransactionsErr } = await useUserTransactionsByAddress(network ?? "", tokenAddrs, 1, address, [], 50)
+    
+    if (userTransactionsErr || !userTransactionsData) {
+      captureException(
+        userTransactionsErr,
+        {
+          tags: {
+            section: "opportunity",
+          },
+        }
+      );
 
-    if (highestRewardsErr || !highestRewardsData) {
-      throw highestRewardsErr;
-    }
+      return new Error("Server could not fulfill request");
+      
+    };
+    
+    const {
+      [network as string]: { transfers: transactions },
+    } = userTransactionsData;
+
+    // Destructure GraphQL data
+    const totalUserTransferValue = transactions.reduce(
+      (sum, transaction) => {
+        const {
+          amount: value,
+          currency: { symbol: currency },
+        } = transaction;
+        
+          // Bitquery stores DAI decimals (6) incorrectly (should be 18)
+        const normalisedValue = currency === "DAI" || currency === "fDAI"
+              ? value / 10 ** 12
+              : value;
+
+        return sum + normalisedValue;
+      }, 0
+    );
+    
+    const estimated1MPoolWeight = 0.076;
+    
+    const projectedWin = totalUserTransferValue * estimated1MPoolWeight;
 
     return json({
-      highestRewards: highestRewardsData.highest_rewards_monthly,
-    } as HighestRewardsData);
+      projectedWin,
+    } as ProjectedWinData);
   } catch (err) {
     captureException(new Error(`Could not fetch historical rewards: ${err}`), {
       tags: {
