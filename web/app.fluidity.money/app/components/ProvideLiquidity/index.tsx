@@ -1,3 +1,5 @@
+import type { Token } from "~/util/chainUtils/tokens";
+
 import { Card, Heading, Text } from "@fluidity-money/surfing";
 import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
@@ -22,15 +24,15 @@ type LoaderData = {
 };
 
 const useClickOutside = (
-  ref: MutableRefObject<any>,
+  ref: MutableRefObject<HTMLElement | null>,
   handleClick: VoidFunction
 ) => {
   useEffect(() => {
     /**
      * Run callback if clicked on outside of element
      */
-    const handleClickOutside = (event: any) => {
-      if (ref.current && !ref.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
         handleClick();
       }
     };
@@ -44,15 +46,21 @@ const useClickOutside = (
   }, [ref]);
 };
 
+type Provider = {
+  name: string;
+  link: { [symbol: string]: string };
+  img: string;
+};
+
 const ProvideLiquidity = () => {
   const { provider, network, tokensConfig } = useLoaderData<LoaderData>();
 
   // type for TOML type
   type FluidTokens = "fUSDC" | "fUSDT" | "fTUSD" | "fFRAX" | "fDAI";
 
-  const fluidTokens = tokensConfig[network].tokens
-    .map((token) => token)
-    .filter((token) => token.isFluidOf);
+  const fluidTokens = tokensConfig[network].tokens.filter(
+    (token: Token) => token.isFluidOf
+  );
 
   // token for liquidity provider pools
   const [poolToken, setPoolToken] = useState(fluidTokens[0]);
@@ -64,7 +72,7 @@ const ProvideLiquidity = () => {
 
   const liqidityProviders = (
     <div className="liquidity-providers">
-      {providers.map((provider) => (
+      {providers.map((provider: Provider) => (
         <motion.a
           key={provider.name}
           href={provider.link[poolToken.symbol as FluidTokens]}
@@ -91,11 +99,11 @@ const ProvideLiquidity = () => {
 
   const dropdownOptions = (
     <div className="dropdown-options" ref={dropdownRef}>
-      {fluidTokens.map((option) => (
+      {fluidTokens.map((option: Token) => (
         <button
           className="token-option"
           onClick={() => {
-            setPoolToken(() => option);
+            setPoolToken(option);
           }}
           key={`${option.name} ${option.logo}`}
         >
@@ -125,7 +133,7 @@ const ProvideLiquidity = () => {
               <button
                 className="open-provider-dropdown"
                 onClick={() => {
-                  setOpenDropdown(() => !openDropdown);
+                  setOpenDropdown(!openDropdown);
                 }}
               >
                 {openDropdown && dropdownOptions}
