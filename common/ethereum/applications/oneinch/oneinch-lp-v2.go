@@ -118,6 +118,15 @@ var oneInchLiquidityPoolV2Abi ethAbi.ABI
 // GetOneInchLPFees implements 1InchLPv1.0/1.1 fee structure.
 // Fees are split into static fees and slippage fees, controlled by 1Inch governance
 func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != oneInchLPV2SwapLogTopic && logTopic != oneInchLPV1SwapLogTopic {
+		return nil, nil
+	}
 
 	if len(transfer.Log.Topics) != 4 {
 		return nil, fmt.Errorf(
@@ -127,11 +136,6 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	logTopic := transfer.Log.Topics[0].String()
-
-	if logTopic != oneInchLPV2SwapLogTopic && logTopic != oneInchLPV1SwapLogTopic {
-		return nil, nil
-	}
 
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed

@@ -1,11 +1,10 @@
 import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
-import { useEffect, useState, useContext, useMemo } from "react";
-import { useNavigate, useLoaderData } from "@remix-run/react";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
-import { useCache } from "~/hooks/useCache";
 import useViewport from "~/hooks/useViewport";
 import { networkMapper } from "~/util";
 import { generateTweet } from "~/util/tweeter";
@@ -18,6 +17,7 @@ import {
   BlockchainModal,
   Twitter,
   numberToMonetaryString,
+  LoadingDots,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
@@ -25,7 +25,7 @@ import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
-import { HighestRewardsData } from "./query/projectedWinnings";
+import { ProjectedWinData } from "./query/projectedWinnings";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -60,22 +60,19 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
-  const { data: projectWinningsData } = useCache<HighestRewardsData>(
-    `/${network}/query/projectedWinnings`
-  );
+  const projectedWinningsData = useFetcher<ProjectedWinData>();
 
-  const loaded = !!projectWinningsData?.highestRewards;
+  useEffect(() => {
+    if (!address) return;
 
-  const projectedWinnings = useMemo(
-    () =>
-      loaded
-        ? projectWinningsData?.highestRewards.reduce(
-            (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
-            0
-          ) / projectWinningsData.highestRewards.length
-        : 0,
-    [loaded]
-  );
+    projectedWinningsData.load(
+      `/${network}/query/projectedWinnings?address=${address}`
+    );
+  }, [connected]);
+
+  const projectedWin = projectedWinningsData.data?.projectedWin || 0;
+
+  const loaded = !!projectedWinningsData?.data;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected
@@ -213,16 +210,29 @@ const NetworkPage = () => {
             </div>
 
             {/* Expected Earnings */}
-            {!!projectedWinnings && connected && (
+            {projectedWinningsData.state === "loading" && connected && (
+              <>
+                <div className="loader-dots">
+                  <LoadingDots />
+                </div>
+                <Text size={width < mobileBreakpoint ? "md" : "xl"}>
+                  Loading your last 50 transactions...
+                </Text>
+                <br />
+              </>
+            )}
+
+            {/* Expected Earnings */}
+            {!!projectedWinningsData.data && connected && (
               <>
                 <Display
                   className="winnings-figure"
                   size={width < mobileBreakpoint ? "xs" : "md"}
                 >
-                  {numberToMonetaryString(projectedWinnings)}
+                  {numberToMonetaryString(projectedWin)}
                 </Display>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Would have been your winnings, based on the last 50
+                  Would have been your winnings, based on your last 50
                   transactions.
                 </Text>
                 <br />
@@ -244,24 +254,26 @@ const NetworkPage = () => {
                 FLUIDIFY MONEY
               </GeneralButton>
 
-              <a
-                href={generateTweet(projectedWinnings)}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <GeneralButton
-                  className="share-button"
-                  size="large"
-                  version="transparent"
-                  buttontype="icon before"
-                  icon={<Twitter />}
-                  handleClick={() => {
-                    return;
-                  }}
+              {!!projectedWinningsData.data && (
+                <a
+                  href={generateTweet(projectedWin)}
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
-                  SHARE
-                </GeneralButton>
-              </a>
+                  <GeneralButton
+                    className="share-button"
+                    size="large"
+                    version="transparent"
+                    buttontype="icon before"
+                    icon={<Twitter />}
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    SHARE
+                  </GeneralButton>
+                </a>
+              )}
             </div>
           </div>
         </div>
