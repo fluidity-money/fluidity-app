@@ -39,12 +39,16 @@ body {
 }
 
 .opportunity-bottom {
+  position: relative;
   padding-top: 1em;
+  margin-bottom: 2em;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 1em;
+  z-index: 1;
+  overflow-y: auto;
 }
 
 .opportunity-graph {
