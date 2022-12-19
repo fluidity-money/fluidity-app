@@ -5,13 +5,9 @@
 package main
 
 import (
-	"math/big"
-
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -150,36 +146,6 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		}
 
 		winAnnouncements = append(winAnnouncements, winAnnouncement)
-	}
-
-	for _, announcement := range winAnnouncements {
-		var (
-			fromAddress      = announcement.FromAddress
-			fromAmount       = announcement.FromWinAmount.Int
-			toAddress        = announcement.ToAddress
-			toAmount         = announcement.ToWinAmount.Int
-			network          = announcement.Network
-			token            = announcement.TokenDetails.TokenShortName
-			tokenDecimals    = announcement.TokenDetails.TokenDecimals
-			hash             = announcement.TransactionHash
-		)
-
-		var (
-			scaledDecimals = math.BigPow(10, int64(tokenDecimals))
-			adjustedFromAmount = new(big.Rat).SetFrac(&fromAmount, scaledDecimals)
-			adjustedToAmount = new(big.Rat).SetFrac(&toAmount, scaledDecimals)
-		)
-		discord.Notify(
-			discord.SeverityInformational,
-			"Winner on %s %s with hash %s - %s won $%s, %s won $%s",
-			network,
-			token,
-			hash,
-			fromAddress.String(),
-			adjustedFromAmount.FloatString(5),
-			toAddress.String(),
-			adjustedToAmount.FloatString(5),
-		)
 	}
 
 	if len(winAnnouncements) > 0 {
