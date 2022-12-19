@@ -124,6 +124,11 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	logTopic := transfer.Log.Topics[0].String()
 
+	// ignore v1 swaps
+	if logTopic == oneInchLPV1SwapLogTopic {
+		return nil, nil
+	}
+
 	if logTopic != oneInchLPV2SwapLogTopic && logTopic != oneInchLPV1SwapLogTopic {
 		return nil, nil
 	}
