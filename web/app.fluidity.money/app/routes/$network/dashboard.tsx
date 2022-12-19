@@ -535,7 +535,7 @@ export default function Dashboard() {
                 "https://docs.fluidity.money/docs/security/audits-completed"
               }
             >
-              <Text>Completed Audits</Text>
+              <Text>Audits Completed</Text>
             </a>
 
             {/* Roadmap */}

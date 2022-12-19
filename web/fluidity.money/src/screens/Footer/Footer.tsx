@@ -99,7 +99,7 @@ const Footer = () => {
               size="small"
               type="external"
               handleClick={() => {window.location.href = "https://docs.fluidity.money/docs/security/audits-completed"}} >
-              COMPLETED AUDITS
+              AUDITS COMPLETED
             </LinkButton>
             <Text as="p" size="xs">
               © 2022 Fluidity Money. All Rights Reserved.
