@@ -8,7 +8,12 @@ import {
   useUserTransactionsByTxHash,
 } from "./useUserTransactions";
 import useUserUnclaimedRewards from "./useUserUnclaimedRewards";
-import { useUserRewardsAll, useUserRewardsByAddress } from "./useUserRewards";
+import {
+  useUserRewardsAll,
+  useUserRewardsByAddress,
+  useUserPendingRewardsAll,
+  useUserPendingRewardsByAddress,
+} from "./useUserRewards";
 import { useUserYieldAll, useUserYieldByAddress } from "./useUserYield";
 
 export {
@@ -20,6 +25,8 @@ export {
   useUserUnclaimedRewards,
   useUserRewardsAll,
   useUserRewardsByAddress,
+  useUserPendingRewardsAll,
+  useUserPendingRewardsByAddress,
   useUserYieldAll,
   useUserYieldByAddress,
 };
