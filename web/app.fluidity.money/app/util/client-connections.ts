@@ -1,11 +1,11 @@
 import { PipedTransaction } from "drivers/types";
-import io from "socket.io-client";
+import io, { ManagerOptions, SocketOptions } from "socket.io-client";
 
 const DSSocketManager = (
   { onCallback = (payload: PipedTransaction) => payload },
-  url: string
+  opts?: Partial<ManagerOptions & SocketOptions> | undefined
 ) => {
-  const socket = io(url);
+  const socket = io(opts);
 
   const emitEvent = (protocol: string, address: string) => {
     socket.emit("subscribeTransactions", {

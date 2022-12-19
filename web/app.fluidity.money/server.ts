@@ -26,13 +26,7 @@ const MODE = process.env.NODE_ENV;
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: `${
-      MODE === "production" ? "https:/app.fluidity.money:" : "localhost:"
-    }${process.env.PORT || 3000}`,
-  },
-});
+const io = new Server(httpServer);
 
 const createSentryRequestHandler =
   wrapExpressCreateRequestHandler(createRequestHandler);
