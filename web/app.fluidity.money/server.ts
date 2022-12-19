@@ -22,9 +22,17 @@ import {
   pendingWinnersTransactionObservables,
 } from "./drivers";
 
+const MODE = process.env.NODE_ENV;
+
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: `${
+      MODE === "production" ? "https:/app.fluidity.money:" : "localhost:"
+    }${process.env.PORT || 3000}`,
+  },
+});
 
 const createSentryRequestHandler =
   wrapExpressCreateRequestHandler(createRequestHandler);
@@ -60,7 +68,6 @@ app.use(express.static("public", { maxAge: "1h" }));
 
 app.use(morgan("tiny"));
 
-const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "build");
 
 const ethereumTokens = config.config["ethereum"].tokens
