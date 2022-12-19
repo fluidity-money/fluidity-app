@@ -224,9 +224,9 @@ func main() {
 			    })
 			}
 
-			transfersWithFees := make([]worker.EthereumDecoratedTransfer, len(transfers))
+			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
 
-			for i, transfer := range transfers {
+			for _, transfer := range transfers {
 				fee, emission, err := applications.GetApplicationFee(
 					transfer,
 					gethClient,
@@ -284,7 +284,7 @@ func main() {
 					AppEmissions:     emission,
 				}
 
-				transfersWithFees[i] = decoratedTransfer
+				transfersWithFees = append(transfersWithFees, decoratedTransfer)
 			}
 
 			decoratedTransactions[transactionHash] = worker.EthereumDecoratedTransaction{
