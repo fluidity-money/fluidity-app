@@ -256,7 +256,7 @@ export default function Home() {
   ) => {
     hash && window.open(getTxExplorerLink(network, hash), "_blank");
 
-    !hash;
+    !hash &&
     toolTip.open(
       "#808080",
       <ToolTipContent
