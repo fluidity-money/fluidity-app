@@ -147,7 +147,8 @@ const UnclaimedWinnings = () => {
             };
           }, {} as { [tokenName: string]: number })
         ).map(([symbol, reward]) => ({ symbol, reward }));
-
+        
+        console.table(rewards);
         setUnclaimedRewardsRes({
           unclaimedTxs: rewards,
           unclaimedTokens: unclaimedTokens,

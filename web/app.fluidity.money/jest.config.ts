@@ -7,6 +7,7 @@ const config: Config = {
   moduleNameMapper: {
     "^~/(.*)$": "<rootDir>/app/$1",
   },
+  modulePaths: ["."],
 };
 
 export default config;
