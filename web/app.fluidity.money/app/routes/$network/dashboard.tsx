@@ -529,6 +529,15 @@ export default function Dashboard() {
               <Text>Privacy policy</Text>
             </a>
 
+            {/* Audits Completed */}
+            <a
+              href={
+                "https://docs.fluidity.money/docs/security/audits-completed"
+              }
+            >
+              <Text>Completed Audits</Text>
+            </a>
+
             {/* Roadmap */}
             <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
