@@ -95,6 +95,12 @@ const Footer = () => {
               handleClick={() => {window.location.href = "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"}} >
               Privacy Policy
             </LinkButton>
+            <LinkButton 
+              size="small"
+              type="external"
+              handleClick={() => {window.location.href = "https://docs.fluidity.money/docs/security/audits-completed"}} >
+              COMPLETED AUDITS
+            </LinkButton>
             <Text as="p" size="xs">
               © 2022 Fluidity Money. All Rights Reserved.
             </Text>
