@@ -20,7 +20,7 @@ import {
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
-import { Table } from "~/components";
+import { Table, ToolTipContent, useToolTip } from "~/components";
 import {
   transactionActivityLabel,
   transactionTimeLabel,
@@ -247,6 +247,25 @@ export default function Home() {
   const userHomeData = useFetcher();
 
   const userTransactionsData = useFetcher();
+  const toolTip = useToolTip();
+
+  const handleRewardTransactionClick = (
+    network: Chain,
+    logo: string,
+    hash: string
+  ) => {
+    hash && window.open(getTxExplorerLink(network, hash), "_blank");
+
+    !hash &&
+    toolTip.open(
+      "#808080",
+      <ToolTipContent
+        tokenLogoSrc={logo}
+        boldTitle={``}
+        details={"🚫 This reward claim is still pending! 🚫"}
+      />
+    );
+  };
 
   useEffect(() => {
     if (!address) return;
@@ -470,7 +489,9 @@ export default function Home() {
               {reward ? (
                 <a
                   className="table-address"
-                  href={getTxExplorerLink(network, rewardHash)}
+                  onClick={() =>
+                    handleRewardTransactionClick(network, logo, rewardHash)
+                  }
                 >
                   <Text prominent={true}>
                     {reward ? numberToMonetaryString(reward) : "-"}

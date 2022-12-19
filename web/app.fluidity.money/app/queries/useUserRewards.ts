@@ -1,6 +1,6 @@
 import { gql, jsonPost } from "~/util";
 
-const queryAll = gql`
+const queryWinnersAll = gql`
   query WinnersAll($network: network_blockchain!) {
     winners(
       where: {
@@ -26,7 +26,7 @@ const queryAll = gql`
   }
 `;
 
-const queryByAddress = gql`
+const queryWinnersByAddress = gql`
   query WinnersByAddress($network: network_blockchain!, $address: String!) {
     winners(
       where: { network: { _eq: $network }, winning_address: { _eq: $address } }
@@ -48,6 +48,53 @@ const queryByAddress = gql`
   }
 `;
 
+const queryPendingWinnersAll = gql`
+  query PendingWinnersAll($network: network_blockchain!) {
+    ethereum_pending_winners(
+      where: {
+        network: { _eq: $network }
+        transaction_hash: { _neq: "" }
+        reward_sent: { _eq: false }
+      }
+      order_by: { inserted_date: desc }
+      limit: 240
+    ) {
+      network
+      address
+      inserted_date
+      transaction_hash
+      win_amount
+      token_decimals
+      reward_type
+    }
+  }
+`;
+
+const queryPendingWinnersByAddress = gql`
+  query PendingWinnersByAddress(
+    $network: network_blockchain!
+    $address: String!
+  ) {
+    ethereum_pending_winners(
+      where: {
+        network: { _eq: $network }
+        address: { _eq: $address }
+        reward_sent: { _eq: false }
+      }
+      order_by: { inserted_date: desc }
+      limit: 240
+    ) {
+      network
+      address
+      inserted_date
+      transaction_hash
+      win_amount
+      token_decimals
+      reward_type
+    }
+  }
+`;
+
 const useUserRewardsAll = async (network: string) => {
   const variables = {
     network,
@@ -55,7 +102,7 @@ const useUserRewardsAll = async (network: string) => {
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
-    query: queryAll,
+    query: queryWinnersAll,
   };
 
   return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(
@@ -74,10 +121,53 @@ const useUserRewardsByAddress = async (network: string, address: string) => {
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
-    query: queryByAddress,
+    query: queryWinnersByAddress,
   };
 
   return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(
+    url,
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
+  );
+};
+
+const useUserPendingRewardsAll = async (network: string) => {
+  const variables = {
+    network,
+  };
+  const url = "https://fluidity.hasura.app/v1/graphql";
+  const body = {
+    variables,
+    query: queryPendingWinnersAll,
+  };
+
+  return jsonPost<ExpectedWinnersAllBody, ExpectedPendingWinnersResponse>(
+    url,
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
+  );
+};
+
+const useUserPendingRewardsByAddress = async (
+  network: string,
+  address: string
+) => {
+  const variables = { network, address };
+  const url = "https://fluidity.hasura.app/v1/graphql";
+  const body = {
+    variables,
+    query: queryPendingWinnersByAddress,
+  };
+
+  return jsonPost<ExpectedWinnersByAddressBody, ExpectedPendingWinnersResponse>(
     url,
     body,
     process.env.FLU_HASURA_SECRET
@@ -111,6 +201,14 @@ type ExpectedWinnersResponse = {
   errors?: unknown;
 };
 
+type ExpectedPendingWinnersResponse = {
+  data?: {
+    ethereum_pending_winners: Array<PendingWinner>;
+  };
+
+  errors?: unknown;
+};
+
 export type Winner = {
   network: string;
   solana_winning_owner_address: string | null;
@@ -125,4 +223,19 @@ export type Winner = {
   reward_type: "send" | "receive";
 };
 
-export { useUserRewardsAll, useUserRewardsByAddress };
+export type PendingWinner = {
+  network: string;
+  address: string | null;
+  inserted_date: string;
+  transaction_hash: string;
+  token_decimals: number;
+  win_amount: number;
+  reward_type: "send" | "receive";
+};
+
+export {
+  useUserRewardsAll,
+  useUserRewardsByAddress,
+  useUserPendingRewardsAll,
+  useUserPendingRewardsByAddress,
+};
