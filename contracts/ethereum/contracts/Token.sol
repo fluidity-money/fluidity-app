@@ -724,9 +724,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
       uint newPoolAmount = pool_.totalPoolAmount();
 
-      if (newPoolAmount != oldPoolAmount) {
-	revert("total pool amount not equal to new amount!");
-      }
+      require(newPoolAmount == oldPoolAmount, "total pool amount not equal to new amount!");
 
       return true;
     }
