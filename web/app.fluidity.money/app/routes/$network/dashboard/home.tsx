@@ -257,14 +257,14 @@ export default function Home() {
     hash && window.open(getTxExplorerLink(network, hash), "_blank");
 
     !hash &&
-    toolTip.open(
-      "#808080",
-      <ToolTipContent
-        tokenLogoSrc={logo}
-        boldTitle={``}
-        details={"🚫 This reward claim is still pending! 🚫"}
-      />
-    );
+      toolTip.open(
+        "#808080",
+        <ToolTipContent
+          tokenLogoSrc={logo}
+          boldTitle={``}
+          details={"⏳ This reward claim is still pending! ⏳"}
+        />
+      );
   };
 
   useEffect(() => {
