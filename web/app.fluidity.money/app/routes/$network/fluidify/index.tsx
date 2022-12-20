@@ -1,6 +1,5 @@
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
-import type { FluidifyData } from "../query/fluidify";
 
 import { useLoaderData, Link } from "@remix-run/react";
 import { debounce, DebouncedFunc } from "lodash";
@@ -27,7 +26,6 @@ import FluidifyForm from "~/components/Fluidify/FluidifyForm";
 import SwapCompleteModal from "~/components/SwapCompleteModal";
 import { captureException } from "@sentry/react";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useCache } from "~/hooks/useCache";
 import { Chain } from "~/util/chainUtils/chains";
 import config, { colors } from "~/webapp.config.server";
 
@@ -88,17 +86,12 @@ function ErrorBoundary(error: unknown) {
   );
 }
 
-type CacheData = FluidifyData;
-
 export default function FluidifyToken() {
   const {
     network,
     tokens: defaultTokens,
     colors,
   } = useLoaderData<LoaderData>();
-  const { data: loaderData } = useCache<CacheData>(
-    `/${network}/query/fluidify`
-  );
 
   const {
     address,
@@ -108,6 +101,7 @@ export default function FluidifyToken() {
     connecting,
     disconnect,
     balance,
+    limit,
     addToken,
   } = useContext(FluidityFacadeContext);
 
@@ -125,17 +119,6 @@ export default function FluidifyToken() {
 
   // Tokens return from loader
   const [tokens, setTokens] = useState<AugmentedToken[]>(defaultTokens);
-
-  useEffect(() => {
-    if (!loaderData) return;
-
-    setTokens(
-      tokens.map((tok) => ({
-        ...tok,
-        ...loaderData,
-      }))
-    );
-  }, [loaderData]);
 
   // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
@@ -199,7 +182,7 @@ export default function FluidifyToken() {
       (async () => {
         switch (network) {
           case "ethereum": {
-            const [tokensMinted, userTokenBalance] = await Promise.all([
+            const [tokensMinted, userTokenBalance, mintLimit] = await Promise.all([
               Promise.all(
                 tokens.map(async (token) => {
                   if (token.isFluidOf) return undefined;
@@ -218,6 +201,23 @@ export default function FluidifyToken() {
                   async ({ address }) => (await balance?.(address)) || 0
                 )
               ),
+              Promise.all(
+                tokens.map(async (token) => {
+                  const { isFluidOf, address } = token;
+
+                  // Reverting has no mint limits
+                  if (isFluidOf) {
+                    return;
+                 }
+
+                  const fluidPair = tokens.find(({ isFluidOf }) => isFluidOf === address);
+
+                  if (!fluidPair)
+                    throw new Error(`Could not find fluid Pair of ${token.name}`);
+
+                  return await limit?.(fluidPair.address);
+                })
+              )
             ]);
 
             return setTokens(
@@ -225,6 +225,7 @@ export default function FluidifyToken() {
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
+                userMintLimit: mintLimit[i],
               }))
             );
           }
@@ -254,6 +255,12 @@ export default function FluidifyToken() {
       }))
     );
   }, [address, swapping]);
+
+  // keep asset token up to date once token data is fetched
+  useEffect(() => { 
+    if (assetToken && !assetToken.userMintLimit)
+      setAssetToken(tokens.find(t => t.address === assetToken.address))
+  }, [tokens])
 
   const handleRedirect = async (
     transaction: TransactionResponse,
