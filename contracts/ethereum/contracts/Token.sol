@@ -708,7 +708,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
     }
 
     /// @notice upgrade the underlying LiquidityProvider to a new source
-    function upgradeLiquidityProvider(LiquidityProvider newPool) public returns (bool) {
+    function upgradeLiquidityProvider(LiquidityProvider newPool) public {
       require(noEmergencyMode(), "emergency mode");
       require(msg.sender == operator_, "only operator can use this function");
 
@@ -725,8 +725,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
       uint newPoolAmount = pool_.totalPoolAmount();
 
       require(newPoolAmount == oldPoolAmount, "total pool amount not equal to new amount!");
-
-      return true;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
