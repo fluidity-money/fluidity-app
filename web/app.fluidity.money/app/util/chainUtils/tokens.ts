@@ -17,6 +17,7 @@ export type Token = {
   obligationAccount?: string;
   dataAccount?: string;
   decimals: number;
+  colour: string;
 };
 
 const getTokenFromAddress = (

@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .index-page {
   width: 100%;
   mix-blend-mode: lighten;
@@ -35,12 +39,16 @@
 }
 
 .opportunity-bottom {
+  position: relative;
   padding-top: 1em;
+  margin-bottom: 2em;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 1em;
+  z-index: 1;
+  overflow-y: auto;
 }
 
 .opportunity-graph {
@@ -429,4 +437,8 @@
   color: white;
   font-size: 14px;
   text-align: center;
+}
+
+.loader-dots {
+  padding: 32px;
 }

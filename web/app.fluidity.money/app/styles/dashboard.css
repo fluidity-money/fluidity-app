@@ -152,10 +152,27 @@ main > footer > section {
 
 .fluidify-button-dashboard-mobile {
   position: fixed !important;
-  bottom: 2vh;
-  left: 50vw;
-  transform: translateX(-50%);
-  width: 40vw;
+  bottom: 5vh;
+  right: 2vw;
+  transform: translateX(-10%);
+  max-width: 240px;
+  width: 60vw;
+}
+
+.fluidify-button-dashboard-mobile > h5 {
+  margin: 0;
+}
+
+.fluidify-button-dashboard-mobile:hover > h5 {
+  color: black;
+}
+
+@media only screen and (max-width: 850px) {
+  .fluidify-button-dashboard-mobile {
+    bottom: 3vh;
+    left: 50vw;
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes rotate {
@@ -172,19 +189,14 @@ main > footer > section {
   box-shadow: 0 0 8px 2px #f3b8d8;
 }
 
-.rainbow > h6 {
-  margin: 0;
-  font-size: 15px;
-}
-
-.rainbow ::before {
+.rainbow::before {
   content: "";
   position: absolute;
   z-index: -2;
   left: -20%;
   top: -150%;
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
   background-color: #f3b8d8;
   background-repeat: no-repeat;
   background-size: 100%;
@@ -214,20 +226,20 @@ main > footer > section {
   top: 3px;
   width: calc(100% - 6px);
   height: calc(100% - 6px);
-  background: #300d0b;
+  background: black;
   border-radius: inherit;
 }
 
-.rainbow:hover > h6 {
+.rainbow:hover > h5 {
   color: black;
 }
 
-.rainbow:hover:focus > h6 {
+.rainbow:hover:focus > h5 {
   color: white;
 }
 
 .rainbow:hover:focus::after {
-  background: #300d0b;
+  background: black;
 }
 
 .rainbow:hover::after {
@@ -251,13 +263,13 @@ main > footer > section > a {
   display: flex;
   flex-wrap: wrap;
   gap: 2em;
+  margin-bottom: 1em;
 }
 
 .transaction-filters {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  flex-direction: row-reverse;
 }
 
 .active-filter {
@@ -384,7 +396,7 @@ main > footer > section > a {
   width: auto;
   max-width: 60em;
   padding: 2em;
-  margin-bottom: 6em;
+  margin-bottom: 2em;
   margin-left: 64px;
   margin-right: 64px;
 }
@@ -449,9 +461,9 @@ main > footer > section > a {
 
 .provide-liquidity-left > div:first-child {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 0.5em;
-  margin-bottom: 2em;
+  align-items: flex-start;
 }
 
 .provide-liquidity-right {
@@ -1087,6 +1099,16 @@ main > footer > section > a {
   margin: 0;
 }
 
+#flu-socials {
+  margin-bottom: 52px;
+}
+
+@media only screen and (max-width: 850px) {
+  #flu-socials {
+    margin-bottom: 100px;
+  }
+}
+
 @media only screen and (max-width: 500px) {
   .hide-on-mobile {
     display: none;
@@ -1106,6 +1128,10 @@ main > footer > section > a {
     order: 1;
     align-items: center;
     text-align: center;
+  }
+
+  .provide-liquidity-left > div:first-child {
+    align-items: center;
   }
 }
 
@@ -1128,10 +1154,6 @@ main > footer > section > a {
   .highest-rewarders {
     font-size: 2em;
   }
-
-  .provide-liquidity-left > div > h2 {
-    font-size: 2em;
-  }
 }
 
 @media (max-width: 900px) {
@@ -1143,7 +1165,7 @@ main > footer > section > a {
   }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 1000px) {
   .totals-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1160,7 +1182,7 @@ main > footer > section > a {
 
   #provide-liquidity {
     padding: 1em;
-    margin: 0 0.5em 3em;
+    margin: 0 0.5em 6.5em;
   }
 
   .connect-wallet-modal-container {

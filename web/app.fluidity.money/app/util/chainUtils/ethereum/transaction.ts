@@ -43,7 +43,7 @@ export const usdBalanceOfERC20 = async (
 };
 
 // whether the per-user mint limit is enabled for the contract
-export const userMintLimitedEnabled = async (
+export const userMintLimitEnabled = async (
   provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface

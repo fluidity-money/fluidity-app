@@ -10,6 +10,7 @@ import {
 } from "@fluidity-money/surfing";
 import BloomEffect from "./BloomEffect";
 import useViewport from "~/hooks/useViewport";
+import { generateTweet } from "~/util/tweeter";
 
 interface IPropsConnectedWalletModal {
   visible: boolean;
@@ -39,22 +40,6 @@ export const ViewRewardModal = ({
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const { width } = useViewport();
   const isMobile = width < 500 && width > 0;
-
-  const generateTweet = () => {
-    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
-
-    // const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
-
-    const tweetMsg = `Fluidify your money with Fluidity`;
-
-    twitterUrl.searchParams.set("text", tweetMsg);
-
-    const fluTwitterHandle = `fluiditymoney`;
-
-    twitterUrl.searchParams.set("via", fluTwitterHandle);
-
-    return twitterUrl.href;
-  };
 
   useEffect(() => {
     setModal(
@@ -113,9 +98,9 @@ export const ViewRewardModal = ({
                   Won for{" "}
                   <a
                     className="view-reward-modal-link"
-                    onClick={() => {
-                      window.open(explorerUri, `_`);
-                    }}
+                    href={explorerUri}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     {forSending === true ? "sending" : "receiving"}
                   </a>{" "}
@@ -138,7 +123,7 @@ export const ViewRewardModal = ({
                 WINNINGS BREAKDOWN
               </GeneralButton>
               <a
-                href={generateTweet()}
+                href={generateTweet(winAmount, forSending ? "send" : "receive")}
                 rel="noopener noreferrer"
                 target="_blank"
               >

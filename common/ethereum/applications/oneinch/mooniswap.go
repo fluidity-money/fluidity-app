@@ -16,6 +16,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const mooniswapSwapLogTopic = "0x86c49b5d8577da08444947f1427d23ef191cfabf2c0788f93324d79e926a9302"
+
 const mooniswapPoolV1AbiString = `[
 {
 	"anonymous": false,
@@ -85,8 +87,24 @@ var mooniswapPoolV1Abi ethAbi.ABI
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
 func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != mooniswapSwapLogTopic {
+		return nil, nil
+	}
+
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
+	if topics := len(transfer.Log.Topics); topics != 4 {
+		return nil, fmt.Errorf(
+			"unexpected mooniswap swap log topic length! Expected 4, got %v",
+			topics,
+		)
+	}
 
 	unpacked, err := mooniswapPoolV1Abi.Unpack("Swapped", transfer.Log.Data)
 
@@ -112,13 +130,6 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 	if err != nil {
 		return nil, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
-			err,
-		)
-	}
-
-	if len(transfer.Log.Topics) != 4 {
-		return nil, fmt.Errorf(
-			"unexpected mooniswap swap log topic length! Expected 4, got %v",
 			err,
 		)
 	}

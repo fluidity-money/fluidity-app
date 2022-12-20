@@ -106,6 +106,9 @@ export const meta: MetaFunction<LoaderData> = ({
   description:
     "Fluidity is a platform for getting more utility out of your crypto assets.",
   viewport: "width=device-width,initial-scale=1",
+  "og:image": "https://static.fluidity.money/img/FluidShare.png",
+  "og:site_name": "Fluidity Money",
+
   "fluidity:version": gitSha,
   "fluidity:environment": isProduction
     ? "production"
@@ -259,6 +262,25 @@ function App() {
                         a.appendChild(r);
                       })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
                     `,
+                  }}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `(function(e,t,o,n,p,r,i) {
+                        e.visitorGlobalObjectAlias=n;
+                        e[e.visitorGlobalObjectAlias]=e[e.visitorGlobalObjectAlias]||function(){
+                          (e[e.visitorGlobalObjectAlias].q=e[e.visitorGlobalObjectAlias].q||[]).push(arguments)
+                        };
+                        e[e.visitorGlobalObjectAlias].l=(new Date).getTime();
+                        r=t.createElement("script");
+                        r.src=o;
+                        r.async=true;
+                        i=t.getElementsByTagName("script")[0];
+                        i.parentNode.insertBefore(r,i)
+                      })(window,document,"https://diffuser-cdn.app-us1.com/diffuser/diffuser.js","vgo");
+                      vgo('setAccount', '612285146');
+                      vgo('setTrackByDefault', true);
+                      vgo('process');`,
                   }}
                 />
               </>

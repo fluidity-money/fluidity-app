@@ -19,8 +19,8 @@ import {
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useEffect, useMemo } from "react";
-import { useLoaderData, useNavigate, useFetcher } from "@remix-run/react";
-import { Table } from "~/components";
+import { useLoaderData, useFetcher, Link } from "@remix-run/react";
+import { Table, ToolTipContent, useToolTip } from "~/components";
 import {
   transactionActivityLabel,
   transactionTimeLabel,
@@ -199,6 +199,7 @@ function ErrorBoundary(error: Error) {
 }
 
 const SAFE_DEFAULT: CacheData = {
+  totalPrizePool: 0,
   count: 0,
   network: "ethereum",
   transactions: [],
@@ -237,7 +238,6 @@ export default function Home() {
   const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
   );
-
   const isFirstLoad = !homeData;
 
   const { data: globalTransactionsData } = useCache<TransactionsLoaderData>(
@@ -247,6 +247,25 @@ export default function Home() {
   const userHomeData = useFetcher();
 
   const userTransactionsData = useFetcher();
+  const toolTip = useToolTip();
+
+  const handleRewardTransactionClick = (
+    network: Chain,
+    logo: string,
+    hash: string
+  ) => {
+    hash && window.open(getTxExplorerLink(network, hash), "_blank");
+
+    !hash &&
+    toolTip.open(
+      "#808080",
+      <ToolTipContent
+        tokenLogoSrc={logo}
+        boldTitle={``}
+        details={"🚫 This reward claim is still pending! 🚫"}
+      />
+    );
+  };
 
   useEffect(() => {
     if (!address) return;
@@ -289,15 +308,11 @@ export default function Home() {
     })();
   }, [connected]);
 
-  const navigate = useNavigate();
-
   // Default to "Y" View
   const [activeTransformerIndex, setActiveTransformerIndex] = useState(3);
 
   // Default to "Global" View
-  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(
-    connected ? 1 : 0
-  );
+  const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
   // If connected, default to "My Dashboard" View
   useEffect(() => {
@@ -364,6 +379,7 @@ export default function Home() {
       ];
 
   const {
+    totalPrizePool,
     count,
     totalCount,
     rewards,
@@ -373,8 +389,14 @@ export default function Home() {
     fluidPairs,
     timestamp,
   } = useMemo(() => {
-    const { transactions, volume, rewards, totalFluidPairs, timestamp } =
-      activeTableFilterIndex ? data.user : data.global;
+    const {
+      transactions,
+      volume,
+      rewards,
+      totalFluidPairs,
+      timestamp,
+      totalPrizePool,
+    } = activeTableFilterIndex ? data.user : data.global;
 
     const {
       day: dailyRewards,
@@ -417,6 +439,7 @@ export default function Home() {
       graphTransformedTransactions,
       fluidPairs: totalFluidPairs,
       timestamp,
+      totalPrizePool,
     };
   }, [
     activeTableFilterIndex,
@@ -466,7 +489,9 @@ export default function Home() {
               {reward ? (
                 <a
                   className="table-address"
-                  href={getTxExplorerLink(network, rewardHash)}
+                  onClick={() =>
+                    handleRewardTransactionClick(network, logo, rewardHash)
+                  }
                 >
                   <Text prominent={true}>
                     {reward ? numberToMonetaryString(reward) : "-"}
@@ -528,40 +553,13 @@ export default function Home() {
         <div className="graph-ceiling pad-main">
           {/* Statistics */}
           <div className="overlay">
+            {/* Row 1 */}
             <div className="totals-row">
-              {/* Transactions Volume / Count */}
-              <div className="statistics-set">
-                <Text>
-                  {activeTableFilterIndex ? "My" : "Total"} transactions
-                </Text>
-                <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {count}
-                </Display>
-                <AnchorButton>
-                  <a href="#transactions">Activity</a>
-                </AnchorButton>
-              </div>
-
-              {activeTableFilterIndex === 0 && (
-                <div className="statistics-set">
-                  <Text>Total volume</Text>
-                  <Display
-                    size={width < 500 && width > 0 ? "xxxs" : "xs"}
-                    style={{ margin: 0 }}
-                  >
-                    {numberToMonetaryString(volume)}
-                  </Display>
-                </div>
-              )}
-
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(
@@ -570,64 +568,119 @@ export default function Home() {
                     )?.total_reward || 0
                   )}
                 </Display>
-                <LinkButton
-                  size="medium"
-                  type="internal"
-                  handleClick={() => {
-                    navigate("../rewards");
-                  }}
-                >
-                  Rewards
-                </LinkButton>
+                <Link to={"../rewards"}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Rewards
+                  </LinkButton>
+                </Link>
               </div>
+
+              {/* Prize Pool */}
+              <div className="statistics-set">
+                <Text>Prize Pool</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(totalPrizePool)}
+                </Display>
+              </div>
+            </div>
+
+            {/* Row 2 */}
+            <div className="totals-row">
+              {/* Transactions Volume / Count */}
+              <div className="statistics-set">
+                <Text>
+                  {activeTableFilterIndex ? "My" : "Total"} transactions
+                </Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
+                  style={{ margin: 0 }}
+                >
+                  {count}
+                </Display>
+                {!!count && (
+                  <AnchorButton>
+                    <a href="#transactions">Activity</a>
+                  </AnchorButton>
+                )}
+              </div>
+
+              {activeTableFilterIndex === 0 && (
+                <div className="statistics-set">
+                  <Text>Total volume</Text>
+                  <Display
+                    size={width < 500 && width > 0 ? "xxxs" : "xxs"}
+                    style={{ margin: 0 }}
+                  >
+                    {numberToMonetaryString(volume)}
+                  </Display>
+                </div>
+              )}
 
               {/* Fluid Pairs */}
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {fluidPairs}
                 </Display>
+                <Link to={`/${network}/fluidify`}>
+                  <LinkButton
+                    size="medium"
+                    type="internal"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Create Assets
+                  </LinkButton>
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Graph Filter Row */}
-          <div>
-            {!isTablet && (
-              <Display
-                size={width < 1010 ? "xxs" : "xs"}
-                color="gray"
-                className="dashboard-identifier"
-              >
-                {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
-              </Display>
-            )}
-            <div className="statistics-row">
-              {graphTransformers.map((filter, i) => (
-                <button
-                  key={`filter-${filter.name}`}
-                  onClick={() => setActiveTransformerIndex(i)}
-                >
-                  <Text
-                    size="lg"
-                    prominent={activeTransformerIndex === i}
-                    className={
-                      activeTransformerIndex === i ? "active-filter" : ""
-                    }
-                  >
-                    {filter.name}
-                  </Text>
-                </button>
-              ))}
-            </div>
-          </div>
+          {!isTablet && (
+            <Display
+              size={width < 1010 ? "xxs" : "xs"}
+              color="gray"
+              className="dashboard-identifier"
+            >
+              {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
+            </Display>
+          )}
         </div>
 
         {/* Graph */}
         <div className="graph" style={{ width: "100%", height: "400px" }}>
+          <div className="statistics-row pad-main">
+            {graphTransformers.map((filter, i) => (
+              <button
+                key={`filter-${filter.name}`}
+                onClick={() => setActiveTransformerIndex(i)}
+              >
+                <Text
+                  size="lg"
+                  prominent={activeTransformerIndex === i}
+                  className={
+                    activeTransformerIndex === i ? "active-filter" : ""
+                  }
+                >
+                  {filter.name}
+                </Text>
+              </button>
+            ))}
+          </div>
           <LineChart
             data={graphTransformedTransactions.map((tx, i) => ({
               ...tx,

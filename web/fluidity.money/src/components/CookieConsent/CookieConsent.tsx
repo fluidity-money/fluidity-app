@@ -20,7 +20,7 @@ const CookieConsent = () => {
         Fluidity uses cookies to ensure that we give you the best experience on
         our website. These are mostly for analytics and security purposes.<br/>
         If you are curious about what we use cookies for, please read our{" "}
-        <a href="/privacy" className={styles.link}>Privacy Policy</a>.<br />
+        <a href="https://static.fluidity.money/assets/fluidity-privacy-policy.pdf" className={styles.link}>Privacy Policy</a>.<br />
         We're open source, so our data usage is fully transparent.
       </div>
       <button

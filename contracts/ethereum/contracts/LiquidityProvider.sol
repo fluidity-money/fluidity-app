@@ -23,7 +23,7 @@ interface LiquidityProvider {
     function underlying_() external returns (IERC20);
 
     /**
-     * @notice adds `amount` of tokens to the pool
+     * @notice adds `amount` of tokens to the pool from the amount in the LiquidityProvider
      * @notice requires that the user approve them first
      * @param amount number of tokens to add, in the units of the underlying token
      */
@@ -40,4 +40,3 @@ interface LiquidityProvider {
      */
     function totalPoolAmount() external returns (uint);
 }
-

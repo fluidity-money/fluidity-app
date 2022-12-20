@@ -3,7 +3,13 @@ SERVICES:
       SERVICE_NAME: fluidity-money-app
       DOCKER_IMAGE: app.fluidity.money-frontend
       DOCKERFILE_PATH: ./web/app.fluidity.money
-      TARGET_GROUP: flu-mainnet-app-fluidity-fe-tg
+      CPU_LIMIT: 512
+      MEM_LIMIT: 1024
+      DEPLOYMENT_TYPE: CODEDEPLOY
+      CODEDEPLOY_WAIT_TIME: 30 #minutes
+      LOAD_BALANCER: flu-mainnet-app-fluidity-alb
+      TARGET_GROUP_01: flu-mainnet-app-fluidity-fe-tg 
+      TARGET_GROUP_02: flu-mainnet-app-fluidity-fe-tg-1
       
       ENV_GA_WEBAPP_ANALYTICS_ID: G-MNXGX2P9KJ
       SECRET_BITQUERY_TOKEN: /fluidity/bitquery_token

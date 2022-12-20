@@ -35,7 +35,6 @@ logo = "/assets/tokens/usdc.svg"
 address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 colour = "#2775ca"
 decimals = 6
-userMintLimit = 10000
 
 [[config.ethereum.tokens]]
 symbol = "fUSDC"

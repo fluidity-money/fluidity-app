@@ -1,8 +1,10 @@
+import type { Token } from "~/util/chainUtils/tokens";
+
 import { Card, Heading, Text } from "@fluidity-money/surfing";
 import config from "~/webapp.config.server";
 import { motion } from "framer-motion";
 import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import BloomEffect from "../BloomEffect";
 
 const parent = {
@@ -21,15 +23,44 @@ type LoaderData = {
   tokensConfig: typeof config.config;
 };
 
+const useClickOutside = (
+  ref: MutableRefObject<HTMLElement | null>,
+  handleClick: VoidFunction
+) => {
+  useEffect(() => {
+    /**
+     * Run callback if clicked on outside of element
+     */
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        handleClick();
+      }
+    };
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref]);
+};
+
+type Provider = {
+  name: string;
+  link: { [symbol: string]: string };
+  img: string;
+};
+
 const ProvideLiquidity = () => {
   const { provider, network, tokensConfig } = useLoaderData<LoaderData>();
 
   // type for TOML type
   type FluidTokens = "fUSDC" | "fUSDT" | "fTUSD" | "fFRAX" | "fDAI";
 
-  const fluidTokens = tokensConfig[network].tokens
-    .map((token) => token)
-    .filter((token) => token.isFluidOf);
+  const fluidTokens = tokensConfig[network].tokens.filter(
+    (token: Token) => token.isFluidOf
+  );
 
   // token for liquidity provider pools
   const [poolToken, setPoolToken] = useState(fluidTokens[0]);
@@ -41,7 +72,7 @@ const ProvideLiquidity = () => {
 
   const liqidityProviders = (
     <div className="liquidity-providers">
-      {providers.map((provider) => (
+      {providers.map((provider: Provider) => (
         <motion.a
           key={provider.name}
           href={provider.link[poolToken.symbol as FluidTokens]}
@@ -63,13 +94,16 @@ const ProvideLiquidity = () => {
 
   const [openDropdown, setOpenDropdown] = useState(false);
 
+  const dropdownRef = useRef(null);
+  useClickOutside(dropdownRef, () => setOpenDropdown(false));
+
   const dropdownOptions = (
-    <div className="dropdown-options">
-      {fluidTokens.map((option) => (
+    <div className="dropdown-options" ref={dropdownRef}>
+      {fluidTokens.map((option: Token) => (
         <button
           className="token-option"
           onClick={() => {
-            setPoolToken(() => option);
+            setPoolToken(option);
           }}
           key={`${option.name} ${option.logo}`}
         >
@@ -92,27 +126,28 @@ const ProvideLiquidity = () => {
     >
       <div className="card-inner">
         <section className="provide-liquidity-left">
-          <Heading as="h2" className="provide-heading">
-            Provide Liquidity for{" "}
-            <button
-              className="open-provider-dropdown"
-              onClick={() => {
-                setOpenDropdown(() => !openDropdown);
-              }}
-              // onBlur={() => setOpenDropdown(false)}
-            >
-              {openDropdown && dropdownOptions}
-              <Heading as="h1" className="fluid-liquidity-token">
-                {`ƒ${poolToken.symbol.slice(1)}`}
-              </Heading>
-              <img
-                src="/images/icons/triangleDown.svg"
-                style={{ width: 18, height: 8 }}
-              />
-            </button>
-          </Heading>
+          <div>
+            {liqidityProviders}
+            <Heading as="h2" className="provide-heading">
+              Provide Liquidity for{" "}
+              <button
+                className="open-provider-dropdown"
+                onClick={() => {
+                  setOpenDropdown(!openDropdown);
+                }}
+              >
+                {openDropdown && dropdownOptions}
+                <Heading as="h1" className="fluid-liquidity-token">
+                  {`ƒ${poolToken.symbol.slice(1)}`}
+                </Heading>
+                <img
+                  src="/images/icons/triangleDown.svg"
+                  style={{ width: 18, height: 8 }}
+                />
+              </button>
+            </Heading>
+          </div>
 
-          {liqidityProviders}
           <Text size="lg">
             Make your assets work harder for your rewards. Get involved.
           </Text>

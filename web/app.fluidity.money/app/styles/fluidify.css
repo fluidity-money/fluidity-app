@@ -158,6 +158,8 @@ main {
 
 .fluidify-tokens-container {
   max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
 }
 
 .fluidify-tokens {
@@ -1040,10 +1042,6 @@ main {
   .highest-rewarders {
     font-size: 2em;
   }
-
-  .provide-liquidity-left > div > h2 {
-    font-size: 2em;
-  }
 }
 
 @media (max-width: 900px) {
@@ -1062,12 +1060,6 @@ main {
 
   #provide-liquidity {
     padding-top: 0;
-  }
-
-  .provide-liquidity-left {
-    order: 1;
-    align-items: center;
-    text-align: center;
   }
 }
 

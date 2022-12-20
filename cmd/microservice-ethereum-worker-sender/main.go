@@ -15,12 +15,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/log/discord"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -138,25 +135,6 @@ func main() {
 			})
 		}
 
-		var (
-			token   string
-			network network.BlockchainNetwork
-		)
-
-		if len(announcement) > 0 {
-			// should always happen
-			token = announcement[0].Token.TokenShortName
-			network = announcement[0].Network
-		}
-
-		discord.Notify(
-			discord.SeverityNotice,
-			"About to reward %d users on %s %s!",
-			len(announcement),
-			network,
-			token,
-		)
-
 		// get send transaction hash and winner address from announcement
 		wins := make([]win, len(announcement))
 
@@ -203,14 +181,6 @@ func main() {
 				k.Payload = hashes
 			})
 
-			discord.Notify(
-				discord.SeverityNotice,
-				"Just called the legacy reward function for %d wins on %s %s!",
-				len(announcement),
-				network,
-				token,
-			)
-
 			return
 		}
 
@@ -236,26 +206,6 @@ func main() {
 			k.Message = "Successfully called the reward function with hash"
 			k.Payload = transactionHash.Hash().Hex()
 		})
-
-		discord.Notify(
-			discord.SeverityNotice,
-			"Successfully called the reward function for %d winners with hash %s on %s %s!",
-			len(announcement),
-			transactionHash.Hash().Hex(),
-			network,
-			token,
-		)
-
-		// update database so winners can be tracked by reward transaction hash
-		for _, win := range wins {
-			var (
-				rewardTransactionHash = win.rewardTransactionHash
-				sendTransactionHash   = win.sendTransactionHash
-				winnerAddress 		  = win.winnerAddress
-			)
-
-			winners.AddRewardHashToPendingRewardType(rewardTransactionHash, sendTransactionHash, winnerAddress)
-		}
 
 		log.Debugf("Waiting for reward transaction to be mined...")
 

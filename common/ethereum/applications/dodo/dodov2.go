@@ -20,6 +20,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+const dodoV2DODOSwapLogTopic = "0xc2c0245e056d5fb095f04cd6373bc770802ebd1e6c918eb78fdef843cdb37b0f"
+
 const DodoV2SwapAbiString = `[
 {
 	"inputs": [],
@@ -109,6 +111,16 @@ var erc20Abi ethAbi.ABI
 // GetDodoV2Fees calculates fees from DODOSwap, consisting of LiquidityPool (lp) Fees taken from the
 // contract, and Maintenance Fees (mt) sent to the _MAINTAINER_, if any
 func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("Not enough log topics passed!")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != dodoV2DODOSwapLogTopic {
+		return nil, nil
+	}
+
 	unpacked, err := dodoV2SwapAbi.Unpack("DODOSwap", transfer.Log.Data)
 
 	if err != nil {

@@ -10,6 +10,7 @@ import {
   FooterItem,
   Text,
   Heading,
+  LinkButton,
 } from "@fluidity-money/surfing";
 import styles from "./Footer.module.scss";
 import { LaunchButton } from "components/Button";
@@ -82,6 +83,24 @@ const Footer = () => {
             </GeneralButton>
           </div>
           <div className={styles.legal}>
+            <LinkButton 
+              size="small"
+              type="external"
+              handleClick={() => {window.location.href = "https://static.fluidity.money/assets/fluidity-website-tc.pdf"}} >
+              Terms of Service
+            </LinkButton>
+            <LinkButton 
+              size="small"
+              type="external"
+              handleClick={() => {window.location.href = "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"}} >
+              Privacy Policy
+            </LinkButton>
+            <LinkButton 
+              size="small"
+              type="external"
+              handleClick={() => {window.location.href = "https://docs.fluidity.money/docs/security/audits-completed"}} >
+              AUDITS COMPLETED
+            </LinkButton>
             <Text as="p" size="xs">
               © 2022 Fluidity Money. All Rights Reserved.
             </Text>

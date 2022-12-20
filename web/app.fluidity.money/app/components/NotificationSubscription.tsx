@@ -145,9 +145,18 @@ export const NotificationSubscription = ({
 
   useEffect(() => {
     if (rawAddress) {
-      const { emitEvent } = DSSocketManager({
-        onCallback: handleClientListener,
-      });
+      const { emitEvent } = DSSocketManager(
+        {
+          onCallback: handleClientListener,
+        },
+        window.location.protocol === "https:"
+          ? {
+              path: "/socket.io",
+              transports: ["websocket"],
+              secure: true,
+            }
+          : undefined
+      );
 
       emitEvent(network, rawAddress as unknown as string);
     }

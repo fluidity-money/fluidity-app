@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .container {
@@ -14,6 +15,7 @@
   justify-content: center;
   padding: 90px 20px 0px 20px;
   width: 100%;
+  max-width: 2500px;
   min-height: 850px;
   background-color: $fluidBlack;
   @include max-860px {

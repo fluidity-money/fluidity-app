@@ -2,13 +2,12 @@ import type { LinksFunction } from "@remix-run/node";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
 import { useEffect, useState, useContext } from "react";
-import { useNavigate, useLoaderData } from "@remix-run/react";
+import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
 import useViewport from "~/hooks/useViewport";
 import { networkMapper } from "~/util";
-import { useHighestRewardStatisticsByNetwork } from "~/queries/useHighestRewardStatistics";
-import { captureException } from "@sentry/react";
+import { generateTweet } from "~/util/tweeter";
 import {
   Display,
   GeneralButton,
@@ -18,6 +17,7 @@ import {
   BlockchainModal,
   Twitter,
   numberToMonetaryString,
+  LoadingDots,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
@@ -25,6 +25,7 @@ import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
+import { ProjectedWinData } from "./query/projectedWinnings";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -59,14 +60,26 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
+  const projectedWinningsData = useFetcher<ProjectedWinData>();
+
+  useEffect(() => {
+    if (!address) return;
+
+    projectedWinningsData.load(
+      `/${network}/query/projectedWinnings?address=${address}`
+    );
+  }, [connected]);
+
+  const projectedWin = projectedWinningsData.data?.projectedWin || 0;
+
+  const loaded = !!projectedWinningsData?.data;
+
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected
   );
   const [chainModalVisibility, setChainModalVisibility] = useState(false);
   const [connectedWalletModalVisibility, setConnectedWalletModalVisibility] =
     useState(false);
-  const [loading, setLoading] = useState(true);
-  const [projectedWinnings, setProjectedWinnings] = useState(0);
 
   const { width } = useViewport();
   const mobileBreakpoint = 500;
@@ -83,58 +96,13 @@ const NetworkPage = () => {
   };
 
   useEffect(() => {
-    if (address) {
-      (async () => {
-        const { data, errors } = await useHighestRewardStatisticsByNetwork(
-          network
-        );
-
-        if (errors || !data) {
-          captureException(new Error("Could not fetch historical Rewards"), {
-            tags: {
-              section: "opportunity",
-            },
-          });
-
-          return;
-        }
-
-        const highestRewards =
-          data.highest_rewards_monthly.reduce(
-            (sum, { winning_amount_scaled }) => sum + winning_amount_scaled,
-            0
-          ) / data.highest_rewards_monthly.length;
-        setProjectedWinnings(highestRewards);
-
-        setLoading(false);
-      })();
-    }
-  }, [address]);
-
-  useEffect(() => {
     // stop modal pop-up if connected
     connected && setWalletModalVisibility(false);
   }, [connected]);
 
-  const generateTweet = () => {
-    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
-
-    // const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
-
-    const tweetMsg = `Fluidify your money with Fluidity`;
-
-    twitterUrl.searchParams.set("text", tweetMsg);
-
-    const fluTwitterHandle = `fluiditymoney`;
-
-    twitterUrl.searchParams.set("via", fluTwitterHandle);
-
-    return twitterUrl.href;
-  };
-
   return (
     <>
-      {connected && !loading && (
+      {connected && connected && loaded && (
         <Video
           className="video"
           src={"/videos/FluidityOpportunityA.mp4"}
@@ -242,13 +210,26 @@ const NetworkPage = () => {
             </div>
 
             {/* Expected Earnings */}
-            {!!projectedWinnings && (
+            {projectedWinningsData.state === "loading" && connected && (
+              <>
+                <div className="loader-dots">
+                  <LoadingDots />
+                </div>
+                <Text size={width < mobileBreakpoint ? "md" : "xl"}>
+                  Loading your last 50 transactions...
+                </Text>
+                <br />
+              </>
+            )}
+
+            {/* Expected Earnings */}
+            {!!projectedWinningsData.data && connected && (
               <>
                 <Display
                   className="winnings-figure"
                   size={width < mobileBreakpoint ? "xs" : "md"}
                 >
-                  {numberToMonetaryString(projectedWinnings)}
+                  {numberToMonetaryString(projectedWin)}
                 </Display>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
                   Would have been your winnings, based on your last 50
@@ -273,24 +254,26 @@ const NetworkPage = () => {
                 FLUIDIFY MONEY
               </GeneralButton>
 
-              <a
-                href={generateTweet()}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <GeneralButton
-                  className="share-button"
-                  size="large"
-                  version="transparent"
-                  buttontype="icon before"
-                  icon={<Twitter />}
-                  handleClick={() => {
-                    return;
-                  }}
+              {!!projectedWinningsData.data && (
+                <a
+                  href={generateTweet(projectedWin)}
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
-                  SHARE
-                </GeneralButton>
-              </a>
+                  <GeneralButton
+                    className="share-button"
+                    size="large"
+                    version="transparent"
+                    buttontype="icon before"
+                    icon={<Twitter />}
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    SHARE
+                  </GeneralButton>
+                </a>
+              )}
             </div>
           </div>
         </div>

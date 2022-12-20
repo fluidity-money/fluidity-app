@@ -121,4 +121,9 @@ const items = [
     title: "The Economics of a Fluid Asset",
     link: "https://docs.fluidity.money/docs/learning-and-getting-started/the-economics-of-a-fluid-asset",
   },
+  {
+    img: "📜",
+    title: "Audits Completed",
+    link: "https://docs.fluidity.money/docs/security/audits-completed",
+  },
 ];
