@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import { LinkButton } from "components/Button";
-import useViewport from "hooks/useViewport";
+import {useViewport} from "@fluidity-money/surfing";
 import Link from "next/link";
 import React from "react";
 import styles from "./FooterItem.module.scss";

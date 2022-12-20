@@ -7,13 +7,13 @@ import {
   ContinuousCarousel,
   numberToMonetaryString,
   trimAddressShort,
+  useViewport,
   formatTo12HrDate,
   Text,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import useViewport from "hooks/useViewport";
 
 interface Reward {
   token: string;

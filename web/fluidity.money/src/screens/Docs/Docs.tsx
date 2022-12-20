@@ -10,9 +10,9 @@ import {
   Heading,
   Text,
   LinkButton,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./Docs.module.scss";
-import useViewport from "hooks/useViewport";
 
 const Docs = () => {
   const { width } = useViewport();

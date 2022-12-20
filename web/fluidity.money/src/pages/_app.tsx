@@ -8,7 +8,7 @@ import Script from 'next/script';
 
 import { useEffect } from 'react';
 import { ApolloProvider } from "@apollo/client";
-import useViewport from "hooks/useViewport";
+import {useViewport} from '@fluidity-money/surfing';
 import { ChainContextProvider } from "hooks/ChainContext";
 import { client } from "data/apolloClient";
 

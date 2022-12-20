@@ -6,8 +6,8 @@ import {
   Heading,
   LinkButton,
   Text,
+  useViewport,
 } from "@fluidity-money/surfing";
-import useViewport from "hooks/useViewport";
 import Link from "next/link";
 import styles from "./ArticleDisplayCard.module.scss";
 

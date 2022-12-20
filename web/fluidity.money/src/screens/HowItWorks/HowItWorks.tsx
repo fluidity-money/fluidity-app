@@ -3,13 +3,13 @@
 // LICENSE.md file.
 
 import { useEffect, useState } from "react";
-import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import {
   ContinuousCarousel,
   Heading,
   LinkButton,
   Text,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
 import Link from "next/link";
