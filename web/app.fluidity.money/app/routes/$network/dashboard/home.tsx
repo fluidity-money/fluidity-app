@@ -16,8 +16,8 @@ import {
   LinkButton,
   trimAddress,
   numberToMonetaryString,
+  useViewport,
 } from "@fluidity-money/surfing";
-import useViewport from "~/hooks/useViewport";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
 import { Table, ToolTipContent, useToolTip } from "~/components";

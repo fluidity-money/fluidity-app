@@ -6,7 +6,6 @@ import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
-import useViewport from "~/hooks/useViewport";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -15,6 +14,7 @@ import {
   GeneralButton,
   LinkButton,
   Text,
+  useViewport,
 } from "@fluidity-money/surfing";
 import Draggable from "~/components/Draggable";
 import FluidifyCard from "~/components/FluidifyCard";
