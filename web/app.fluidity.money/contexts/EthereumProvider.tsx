@@ -17,6 +17,8 @@ import FluidityFacadeContext from "./FluidityFacade";
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import {
   getTotalPrizePool,
+  getUsdUserMintLimit,
+  userMintLimitEnabled,
   manualRewardToken,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
@@ -94,22 +96,31 @@ const EthereumFacade = ({
     }
   };
 
-  // the user's minted amount towards the per-user total
-  // call with a fluid token
-  const limit = async (contractAddress: string): Promise<number> => {
+  // the per-user mint limit for the contract
+  const limit = async (contractAddress: string): Promise<number | undefined> => {
     const signer = provider?.getSigner();
     if (!signer) {
-      return 0;
+      return;
     }
 
-    return await getUsdAmountMinted(
+    const isEnabled = await userMintLimitEnabled(
       signer.provider,
       contractAddress,
       tokenAbi,
-      await signer.getAddress()
+    );
+
+    if (!isEnabled)
+      return;
+
+    return await getUsdUserMintLimit(
+      signer.provider,
+      contractAddress,
+      tokenAbi,
     );
   };
 
+  // the user's minted amount towards the per-user total
+  // call with a fluid token
   const amountMinted = async (contractAddress: string): Promise<number> => {
     const signer = provider?.getSigner();
     if (!signer) {

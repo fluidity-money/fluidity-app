@@ -3,12 +3,15 @@ import type Transaction from "~/types/Transaction";
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import {
+  useUserPendingRewardsAll,
+  useUserPendingRewardsByAddress,
   useUserRewardsAll,
   useUserRewardsByAddress,
   useUserTransactionsByTxHash,
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
+import { Winner } from "~/queries/useUserRewards";
 
 type UserTransaction = {
   sender: string;
@@ -43,24 +46,54 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ? await useUserRewardsByAddress(network ?? "", address)
       : await useUserRewardsAll(network ?? "");
 
-    if (winnersErr || !winnersData) {
+    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
+      ? await useUserPendingRewardsByAddress(network ?? "", address)
+      : await useUserPendingRewardsAll(network ?? "");
+
+    if (
+      winnersErr ||
+      !winnersData ||
+      !pendingWinnersData ||
+      pendingWinnersErr
+    ) {
       throw winnersErr;
     }
+
+    const castPending: Winner[] =
+      pendingWinnersData.ethereum_pending_winners.map((pending_winner) => {
+        return {
+          network: pending_winner.network,
+          solana_winning_owner_address: null,
+          winning_address: pending_winner.address,
+          created: pending_winner.inserted_date,
+          transaction_hash: pending_winner.transaction_hash,
+          send_transaction_hash: "",
+          winning_amount: pending_winner.win_amount,
+          token_decimals: pending_winner.token_decimals,
+          ethereum_application: "none",
+          solana_application: undefined,
+          reward_type: pending_winner.reward_type,
+        };
+      });
+
+    winnersData.winners = castPending.concat(winnersData.winners);
 
     // winnersMap looks up if a transaction was the send that caused a win
     const winners = winnersData.winners.slice((page - 1) * 12, page * 12);
 
-    const winnerAddrs = winners.map(
-      ({ send_transaction_hash }) => send_transaction_hash
-    );
+    const winnerAddrs = winners.map(({ transaction_hash }) => transaction_hash);
 
-    // payoutsMap looks up if a transaction was a payout transaction
-    const payoutAddrs = winnersData.winners.map(
-      ({ transaction_hash }) => transaction_hash
-    );
+    const ethereumTokens = config.config["ethereum"].tokens
+      .filter((entry) => entry.isFluidOf !== undefined)
+      .map((entry) => entry.symbol);
 
     const { data: userTransactionsData, errors: userTransactionsErr } =
-      await useUserTransactionsByTxHash(network, winnerAddrs, payoutAddrs);
+      await useUserTransactionsByTxHash(
+        network,
+        winnerAddrs,
+        [],
+        ethereumTokens
+      );
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -136,9 +169,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     );
 
     const mergedTransactions: Transaction[] = winners
-      .filter(({ send_transaction_hash: hash }) => !!transactionMap[hash])
+      .filter(({ transaction_hash: hash }) => !!transactionMap[hash])
       .map((winner) => {
-        const tx = transactionMap[winner.send_transaction_hash];
+        const tx = transactionMap[winner.transaction_hash];
 
         const swapType =
           tx.sender === MintAddress
@@ -153,7 +186,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           winner: winner.winning_address ?? "",
           reward: winner.winning_amount / 10 ** winner.token_decimals,
           hash: tx.hash,
-          rewardHash: winner?.transaction_hash ?? "",
+          rewardHash: winner?.send_transaction_hash ?? "",
           currency: tx.currency,
           value: tx.value,
           timestamp: new Date(winner.created).getTime(),
