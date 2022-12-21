@@ -8,6 +8,9 @@ const config: Config = {
     "^~/(.*)$": "<rootDir>/app/$1",
   },
   modulePaths: ["."],
+  globals: {
+    "fetch": require("cross-fetch"),
+  }
 };
 
 export default config;
