@@ -75,6 +75,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			emission                    = announcement.Emissions
 			tokenDetails                = announcement.TokenDetails
 			application                 = announcement.Application
+			utility                     = announcement.Utility
 		)
 
 		if fromAddress == ethereumNullAddress {
@@ -136,10 +137,11 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		winAnnouncement := worker.EthereumWinnerAnnouncement{
 			Network:         network_,
 			TransactionHash: announcementTransactionHash,
+			Utility:         utility,
 			BlockNumber:     blockNumber,
 			FromAddress:     fromAddress,
-			FromWinAmount:   fromWinAmount,
 			ToAddress:       toAddress,
+			FromWinAmount:   fromWinAmount,
 			ToWinAmount:     toWinAmount,
 			TokenDetails:    tokenDetails,
 			Application:     application,

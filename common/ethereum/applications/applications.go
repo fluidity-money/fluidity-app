@@ -44,11 +44,12 @@ const (
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt) (*big.Rat, worker.EthereumAppFees, error) {
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt) (*big.Rat, ethereum.Address, worker.EthereumAppFees, error) {
 	var (
 		fee      *big.Rat
 		emission worker.EthereumAppFees
 		err      error
+		utility  ethereum.Address
 	)
 
 	switch transfer.Application {
@@ -60,6 +61,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 
+		utility = ethereum.AddressFromString("uniswap")
 		emission.UniswapV2 += util.MaybeRatToFloat(fee)
 	case ApplicationBalancerV2:
 		fee, err = balancer.GetBalancerFees(
@@ -152,7 +154,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 	}
 
-	return fee, emission, err
+	return fee, utility, emission, err
 }
 
 // GetApplicationTransferParties to find the parties considered for payout from an application interaction.

@@ -41,6 +41,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		senderWinAmount    = winner.FromWinAmount
 		recipientAddress   = winner.ToAddress
 		recipientWinAmount = winner.ToWinAmount
+		utility            = winner.Utility
 	)
 
 	statementText := fmt.Sprintf(
@@ -50,6 +51,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			transaction_hash,
 			address,
 			win_amount,
+			utility,
 			block_number,
 			network,
 			reward_type
@@ -77,6 +79,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		hash,
 		senderAddress,
 		senderWinAmount,
+		utility,
 		blockNumber,
 		network_,
 		"send",
@@ -103,6 +106,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		hash,
 		recipientAddress,
 		recipientWinAmount,
+		utility,
 		blockNumber,
 		network_,
 		"receive",
@@ -188,6 +192,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			transaction_hash,
 			address,
 			win_amount,
+			utility,
 			block_number
 		;`,
 
@@ -229,6 +234,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			&winner.TransactionHash,
 			&winner.Winner,
 			&winner.WinAmount,
+			&winner.Utility,
 			&winner.BlockNumber,
 		)
 

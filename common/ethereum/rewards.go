@@ -21,6 +21,7 @@ func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpo
 		amount      = reward.WinAmount
 		winner      = reward.Winner
 		hash        = reward.TransactionHash
+		utilityName     = reward.Utility
 	)
 
 	if !exists {
@@ -28,6 +29,7 @@ func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpo
 		spooledReward.Token = token
 		spooledReward.Winner = winner
 		spooledReward.TransactionHash = hash
+		spooledReward.Utilities = make([]worker.EthereumRewardUtility, 0)
 		spooledReward.WinAmount = new(misc.BigInt)
 		spooledReward.FirstBlock = new(misc.BigInt)
 		spooledReward.LastBlock = new(misc.BigInt)
@@ -37,6 +39,12 @@ func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpo
 	}
 
 	spooledReward.WinAmount.Add(&spooledReward.WinAmount.Int, &amount.Int)
+
+	utility := worker.EthereumRewardUtility {
+		Name:   utilityName,
+		Amount: *amount,
+	}
+	spooledReward.Utilities = append(spooledReward.Utilities, utility)
 
 	var (
 		blockNumBeforeFirstBlock = blockNumber.Cmp(&spooledReward.FirstBlock.Int) < 0
@@ -83,6 +91,7 @@ func BatchWinningsByUser(winnings []worker.EthereumReward, expectedToken token_d
 	return spooledWinnings, nil
 }
 
+// todo utility spooling (???)
 // BatchWinningsByToken batches winnings that have the same winner together, returning the
 // set of tokens and their winnings for each
 func BatchWinningsByToken(winnings []worker.EthereumReward, address ethereum.Address) (map[string]worker.EthereumSpooledRewards, error) {

@@ -34,6 +34,12 @@ func init() {
 		panic(err)
 	}
 
+	reader = strings.NewReader(fluidityOperatorAbiString)
+
+	if FluidityOperatorAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
+
 	reader = strings.NewReader(workerConfigAbiString)
 
 	if WorkerConfigAbi, err = ethAbi.JSON(reader); err != nil {

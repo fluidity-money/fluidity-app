@@ -35,40 +35,6 @@ const fluidityContractAbiString = `[
   {
     "inputs": [
       {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "winner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "winAmount",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Winner[]",
-        "name": "rewards",
-        "type": "tuple[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "firstBlock",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "lastBlock",
-        "type": "uint256"
-      }
-    ],
-    "name": "batchReward",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "to",
         "type": "address"
@@ -275,6 +241,83 @@ const fluidityContractAbiString = `[
 ]
 `
 
+const fluidityOperatorAbiString = `[
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "winner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "utility",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct Winner[]",
+          "name": "rewards",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "utility",
+              "type": "address"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "winner",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "utility",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct Winner[]",
+              "name": "winners",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct UtilityWinner[]",
+          "name": "utilityRewards",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "firstBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "lastBlock",
+          "type": "uint256"
+        }
+      ],
+      "name": "batchReward",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+]`
+
 const workerConfigAbiString = `[
   {
       "inputs": [
@@ -297,6 +340,7 @@ const workerConfigAbiString = `[
 
 var (
 	FluidityContractAbi ethAbi.ABI
+	FluidityOperatorAbi ethAbi.ABI
 	WorkerConfigAbi     ethAbi.ABI
 )
 
@@ -306,11 +350,19 @@ type OracleUpdate struct {
 	NewOracle       ethCommon.Address `abi:"newOracle"`
 }
 
-// the Reward struct from solidity, to be passed to batchReward
-type RewardArg struct {
-	Winner     ethCommon.Address `abi:"winner"`
-	WinAmount  *big.Int          `abi:"winAmount"`
-}
+type (
+	// the Reward struct from solidity, to be passed to batchReward
+	RewardArg struct {
+		Winner     ethCommon.Address `abi:"winner"`
+		WinAmount  *big.Int          `abi:"winAmount"`
+	}
+
+	// the UtilityWinner struct from solidity, to be passed to batchReward
+	UtilityArg struct {
+		Utility ethCommon.Address `abi:"utility"`
+		Winners []RewardArg       `abi:"winners"`
+	}
+)
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
 	boundContract := ethAbiBind.NewBoundContract(
@@ -354,30 +406,25 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
-	boundContract := ethAbiBind.NewBoundContract(
-		fluidityAddress,
-		FluidityContractAbi,
-		client,
-		client,
-		client,
-	)
-
+func computeBatchProperties(batch []typesWorker.EthereumSpooledRewards) ([]RewardArg, []UtilityArg, *big.Int, *big.Int) {
 	var (
-		rewards          = make([]RewardArg, len(announcement))
+		rewards          = make([]RewardArg, len(batch))
+		// name => user => amount
+		utilities        = make(map[ethCommon.Address]map[ethCommon.Address]*big.Int)
 		globalFirstBlock = new(big.Int)
 		globalLastBlock  = new(big.Int)
 	)
 
 	// set a default for the min block
-	globalFirstBlock.Set(&announcement[0].FirstBlock.Int)
+	globalFirstBlock.Set(&batch[0].FirstBlock.Int)
 
-	for i, reward := range announcement {
+	for i, reward := range batch {
 		var (
-			winner_       = reward.Winner
-			amountInt     = reward.WinAmount
-			firstBlockInt = reward.FirstBlock
-			lastBlockInt  = reward.LastBlock
+			winner_        = reward.Winner
+			amountInt      = reward.WinAmount
+			firstBlockInt  = reward.FirstBlock
+			lastBlockInt   = reward.LastBlock
+			batchUtilities = reward.Utilities
 
 			winner     = ethereum.ConvertInternalAddress(winner_)
 			amount     = &amountInt.Int
@@ -399,7 +446,67 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		}
 
 		rewards[i] = rewardArg
+
+		for _, utility := range batchUtilities {
+			var (
+				name_ = utility.Name
+				amount = utility.Amount
+
+				name = ethereum.ConvertInternalAddress(name_)
+			)
+
+			utilityByName, exists := utilities[name]
+
+			if !exists {
+				utilityByName = make(map[ethCommon.Address]*big.Int)
+			}
+
+			utilityByAddress, exists := utilityByName[winner]
+
+			if !exists {
+				utilityByAddress = new(big.Int)
+			}
+
+			utilityByAddress.Add(utilityByAddress, &amount.Int)
+
+			utilityByName[winner] = utilityByAddress
+			utilities[name] = utilityByName
+		}
 	}
+
+	utilityRewards := make([]UtilityArg, 0)
+
+	for name, rewards := range utilities {
+		utilityReward := UtilityArg{
+			Utility: name,
+			Winners: []RewardArg{},
+		}
+
+		for winner, amount := range rewards {
+			utilityWinner := RewardArg{
+				Winner:    winner,
+				WinAmount: amount,
+			}
+
+			utilityReward.Winners = append(utilityReward.Winners, utilityWinner)
+		}
+
+		utilityRewards = append(utilityRewards, utilityReward)
+	}
+
+	return rewards, utilityRewards, globalFirstBlock, globalLastBlock
+}
+
+func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
+	boundContract := ethAbiBind.NewBoundContract(
+		fluidityAddress,
+		FluidityContractAbi,
+		client,
+		client,
+		client,
+	)
+
+	rewards, utilityRewards, globalFirstBlock, globalLastBlock := computeBatchProperties(announcement)
 
 	gas, err := ethereum.EstimateGas(
 		client,
@@ -408,6 +515,7 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		&fluidityAddress,
 		"batchReward",
 		rewards,
+		utilityRewards,
 		globalFirstBlock,
 		globalLastBlock,
 	)
@@ -426,6 +534,7 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 		transactionOptions,
 		"batchReward",
 		rewards,
+		utilityRewards,
 		globalFirstBlock,
 		globalLastBlock,
 	)

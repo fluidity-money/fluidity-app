@@ -20,6 +20,7 @@ import "./WorkerConfig.sol";
 struct Winner {
     address winner;
     uint256 amount;
+    address utility;
 }
 
 /// @title The fluid token ERC20 contract

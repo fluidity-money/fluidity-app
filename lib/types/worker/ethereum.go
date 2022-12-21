@@ -27,11 +27,13 @@ type (
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
 		Emissions       Emission                   `json:"emissions"`
 		Application     applications.Application   `json:"application"`
+		Utility         ethereum.Address           `json:"utility"`
 	}
 
 	EthereumWinnerAnnouncement struct {
 		Network         network.BlockchainNetwork  `json:"network"`
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		Utility         ethereum.Address           `json:"utility"`
 		BlockNumber     *misc.BigInt               `json:"block_number"`
 		FromAddress     ethereum.Address           `json:"from_address"`
 		ToAddress       ethereum.Address           `json:"to_address"`
@@ -45,9 +47,15 @@ type (
 		Winner          ethereum.Address           `json:"winner"`
 		WinAmount       *misc.BigInt               `json:"amount"`
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
+		Utility         ethereum.Address           `json:"utility"`
 		BlockNumber     *misc.BigInt               `json:"block_number"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
 		Network         network.BlockchainNetwork  `json:"network"`
+	}
+
+	EthereumRewardUtility struct {
+		Name   ethereum.Address `json:"name"`
+		Amount misc.BigInt      `json:"amount"`
 	}
 
 	EthereumSpooledRewards struct {
@@ -58,6 +66,7 @@ type (
 		WinAmount       *misc.BigInt               `json:"amount"`
 		FirstBlock      *misc.BigInt               `json:"first_block"`
 		LastBlock       *misc.BigInt               `json:"last_block"`
+		Utilities       []EthereumRewardUtility    `json:"utilities"`
 	}
 
 	EthereumBlockLog struct {
@@ -77,6 +86,7 @@ type (
 		Application	   applications.Application `json:"application"`
 		// Application fee in USD
 		ApplicationFee *big.Rat                 `json:"application_fee"`
+		Utility        ethereum.Address         `json:"utility"`
 	}
 
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any
