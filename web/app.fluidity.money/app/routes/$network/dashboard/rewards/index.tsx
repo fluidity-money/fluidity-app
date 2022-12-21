@@ -28,7 +28,13 @@ import {
   LinkButton,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
-import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
+import {
+  LabelledValue,
+  ProviderCard,
+  ProviderIcon,
+  ToolTipContent,
+  useToolTip,
+} from "~/components";
 import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
@@ -343,6 +349,26 @@ export default function Rewards() {
     function Row({ data, index }: { data: Transaction; index: number }) {
       const { winner, timestamp, value, reward, hash, rewardHash, logo } = data;
 
+      const toolTip = useToolTip();
+
+      const handleRewardTransactionClick = (
+        network: Chain,
+        logo: string,
+        hash: string
+      ) => {
+        hash && window.open(getTxExplorerLink(network, hash), "_blank");
+
+        !hash &&
+          toolTip.open(
+            "#808080",
+            <ToolTipContent
+              tokenLogoSrc={logo}
+              boldTitle={``}
+              details={"⏳ This reward claim is still pending! ⏳"}
+            />
+          );
+      };
+
       return (
         <motion.tr
           key={`${timestamp}-${index}`}
@@ -384,7 +410,9 @@ export default function Rewards() {
             {reward ? (
               <a
                 className="table-address"
-                href={getTxExplorerLink(network, rewardHash)}
+                onClick={() =>
+                  handleRewardTransactionClick(network, logo, rewardHash)
+                }
               >
                 <Text prominent={true}>
                   {reward ? numberToMonetaryString(reward) : "-"}
