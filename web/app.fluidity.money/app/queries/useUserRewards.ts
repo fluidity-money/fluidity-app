@@ -8,7 +8,7 @@ const queryWinnersAll = gql`
         send_transaction_hash: { _neq: "" }
         transaction_hash: { _neq: "" }
       }
-      order_by: { created: desc }
+      order_by: { awarded_time: desc }
       limit: 240
     ) {
       network
@@ -22,6 +22,7 @@ const queryWinnersAll = gql`
       ethereum_application
       solana_application
       reward_type
+      awarded_time
     }
   }
 `;
@@ -30,7 +31,7 @@ const queryWinnersByAddress = gql`
   query WinnersByAddress($network: network_blockchain!, $address: String!) {
     winners(
       where: { network: { _eq: $network }, winning_address: { _eq: $address } }
-      order_by: { created: desc }
+      order_by: { awarded_time: desc }
       limit: 240
     ) {
       network
@@ -44,6 +45,7 @@ const queryWinnersByAddress = gql`
       ethereum_application
       solana_application
       reward_type
+      awarded_time
     }
   }
 `;
@@ -221,6 +223,7 @@ export type Winner = {
   ethereum_application?: string;
   solana_application?: string;
   reward_type: "send" | "receive";
+  awarded_time: string;
 };
 
 export type PendingWinner = {
