@@ -9,8 +9,8 @@ const config: Config = {
   },
   modulePaths: ["."],
   globals: {
-    "fetch": require("cross-fetch"),
-  }
+    fetch: require("cross-fetch"),
+  },
 };
 
 export default config;

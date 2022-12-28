@@ -1,11 +1,15 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { IRow } from "~/components/Table";
+import type {
+  UnclaimedLoaderData,
+  TokenUnclaimedReward,
+} from "../../query/dashboard/unclaimed";
 
 import config from "~/webapp.config.server";
 import { LoaderFunction, json } from "@remix-run/node";
-import { useLoaderData, useLocation } from "@remix-run/react";
-import { useState, useContext } from "react";
+import { useFetcher, useLoaderData, useLocation } from "@remix-run/react";
+import { useState, useContext, useEffect } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { UserRewards } from "./common";
 import { getTxExplorerLink, getAddressExplorerLink } from "~/util";
@@ -20,11 +24,6 @@ import {
 } from "@fluidity-money/surfing";
 import useViewport from "~/hooks/useViewport";
 import { getBlockExplorerLink } from "~/util/chainUtils/links";
-import {
-  getUnclaimedRewards,
-  TokenUnclaimedReward,
-} from "~/repositories/getUnclaimedRewards";
-import { getClaimedRewards } from "~/repositories/getClaimedRewards";
 
 export const unstable_shouldReload = () => false;
 
@@ -73,15 +72,38 @@ type LoaderData = {
   network: Chain;
 };
 
+const SAFE_DEFAULT = {
+  unclaimedTxs: [],
+  unclaimedTokens: [],
+  userUnclaimedRewards: 0,
+  userClaimedRewards: 0,
+};
+
 const UnclaimedWinnings = () => {
   const { network, fluidTokenMap, tokenDetailsMap } =
     useLoaderData<LoaderData>();
 
   const { address } = useContext(FluidityFacadeContext);
 
-  const { userUnclaimedRewards, unclaimedTxs, unclaimedTokens } =
-    getUnclaimedRewards(address ?? "", network);
-  const userTotalRewards = getClaimedRewards(address ?? "", network);
+  const unclaimedData = useFetcher<UnclaimedLoaderData>();
+
+  useEffect(() => {
+    if (!address) return;
+
+    unclaimedData.load(
+      `/${network}/query/dashboard/unclaimed?address=${address}`
+    );
+  }, [address]);
+
+  const {
+    unclaimedTxs,
+    unclaimedTokens,
+    userUnclaimedRewards,
+    userClaimedRewards,
+  } = {
+    ...SAFE_DEFAULT,
+    ...unclaimedData.data,
+  };
 
   const [{ networkFee, gasFee }] = useState({
     networkFee: 0,
@@ -100,7 +122,6 @@ const UnclaimedWinnings = () => {
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
   // Get claimed Rewards
-
   const unclaimedRewardColumns = isSmallMobile
     ? [{ name: "TOKEN" }, { name: "REWARD" }]
     : [
@@ -264,7 +285,7 @@ const UnclaimedWinnings = () => {
         <UserRewards
           claimNow={true}
           unclaimedRewards={userUnclaimedRewards}
-          claimedRewards={userTotalRewards}
+          claimedRewards={userClaimedRewards}
           network={network}
           networkFee={networkFee}
           gasFee={gasFee}
@@ -272,6 +293,12 @@ const UnclaimedWinnings = () => {
             ({ symbol }) => fluidTokenMap[symbol]
           )}
         />
+      )}
+
+      {!!address && unclaimedData.state === "loading" && (
+        <div style={{ marginBottom: "12px" }}>
+          <Text>Loading data...</Text>
+        </div>
       )}
 
       <Heading as={"h2"}>
@@ -302,7 +329,7 @@ const UnclaimedWinnings = () => {
               page: txTablePage,
               rowsPerPage: 12,
             }}
-            itemName={"unclaimed columns"}
+            itemName={"unclaimed wins"}
             headings={unclaimedRewardColumns}
             count={unclaimedTxs.length}
             data={unclaimedTxs}
