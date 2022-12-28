@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"strconv"
 
-	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
