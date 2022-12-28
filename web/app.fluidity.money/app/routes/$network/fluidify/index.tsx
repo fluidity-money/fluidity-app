@@ -182,43 +182,48 @@ export default function FluidifyToken() {
       (async () => {
         switch (network) {
           case "ethereum": {
-            const [tokensMinted, userTokenBalance, mintLimit] = await Promise.all([
-              Promise.all(
-                tokens.map(async (token) => {
-                  if (token.isFluidOf) return undefined;
+            const [tokensMinted, userTokenBalance, mintLimit] =
+              await Promise.all([
+                Promise.all(
+                  tokens.map(async (token) => {
+                    if (token.isFluidOf) return undefined;
 
-                  const fluidToken = tokens.find(
-                    ({ isFluidOf }) => isFluidOf === token.address
-                  );
+                    const fluidToken = tokens.find(
+                      ({ isFluidOf }) => isFluidOf === token.address
+                    );
 
-                  if (!fluidToken) return undefined;
+                    if (!fluidToken) return undefined;
 
-                  return amountMinted?.(fluidToken.address);
-                })
-              ),
-              Promise.all(
-                tokens.map(
-                  async ({ address }) => (await balance?.(address)) || 0
-                )
-              ),
-              Promise.all(
-                tokens.map(async (token) => {
-                  const { isFluidOf, address } = token;
+                    return amountMinted?.(fluidToken.address);
+                  })
+                ),
+                Promise.all(
+                  tokens.map(
+                    async ({ address }) => (await balance?.(address)) || 0
+                  )
+                ),
+                Promise.all(
+                  tokens.map(async (token) => {
+                    const { isFluidOf, address } = token;
 
-                  // Reverting has no mint limits
-                  if (isFluidOf) {
-                    return;
-                 }
+                    // Reverting has no mint limits
+                    if (isFluidOf) {
+                      return;
+                    }
 
-                  const fluidPair = tokens.find(({ isFluidOf }) => isFluidOf === address);
+                    const fluidPair = tokens.find(
+                      ({ isFluidOf }) => isFluidOf === address
+                    );
 
-                  if (!fluidPair)
-                    throw new Error(`Could not find fluid Pair of ${token.name}`);
+                    if (!fluidPair)
+                      throw new Error(
+                        `Could not find fluid Pair of ${token.name}`
+                      );
 
-                  return await limit?.(fluidPair.address);
-                })
-              )
-            ]);
+                    return await limit?.(fluidPair.address);
+                  })
+                ),
+              ]);
 
             return setTokens(
               tokens.map((token, i) => ({
@@ -257,10 +262,10 @@ export default function FluidifyToken() {
   }, [address, swapping]);
 
   // keep asset token up to date once token data is fetched
-  useEffect(() => { 
+  useEffect(() => {
     if (assetToken && !assetToken.userMintLimit)
-      setAssetToken(tokens.find(t => t.address === assetToken.address))
-  }, [tokens])
+      setAssetToken(tokens.find((t) => t.address === assetToken.address));
+  }, [tokens]);
 
   const handleRedirect = async (
     transaction: TransactionResponse,
