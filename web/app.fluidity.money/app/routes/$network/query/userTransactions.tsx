@@ -117,6 +117,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       },
     };
 
+    // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
+    // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
     for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
       const { data: transactionsData, errors: transactionsErr } =
         await (async () => {
@@ -127,7 +129,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
                 getTokenForNetwork(network),
                 page,
                 address as string,
-                JointPayoutAddrs.slice(i, i + 99)
+                JointPayoutAddrs.slice(i, i + 99),
+                12 / Math.ceil(JointPayoutAddrs.length / 100)
               );
             }
             default:
@@ -135,7 +138,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
                 network,
                 getTokenForNetwork(network),
                 page,
-                JointPayoutAddrs.slice(i, i + 99)
+                JointPayoutAddrs.slice(i, i + 99),
+                12 / Math.ceil(JointPayoutAddrs.length / 100)
               );
           }
         })();
@@ -248,14 +252,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       };
     });
 
-    const splitMergedTransactions = mergedTransactions.slice(
-      (page - 1) * 12,
-      page * 12
-    );
-
     return json({
       page,
-      transactions: splitMergedTransactions,
+      transactions: mergedTransactions,
       count: Object.keys(winnersMap).length,
     } as TransactionsLoaderData);
   } catch (err) {
