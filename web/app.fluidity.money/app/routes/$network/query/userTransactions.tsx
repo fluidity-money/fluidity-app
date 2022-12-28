@@ -111,42 +111,54 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       pendingWinnersPayoutAddrs
     );
 
-    const { data: userTransactionsData, errors: userTransactionsErr } =
-      await (async () => {
-        switch (true) {
-          case !!address:
-            return useUserTransactionsByAddress(
-              network,
-              getTokenForNetwork(network),
-              page,
-              address as string,
-              JointPayoutAddrs
-            );
-          default:
-            return useUserTransactionsAll(
-              network,
-              getTokenForNetwork(network),
-              page,
-              JointPayoutAddrs
-            );
-        }
-      })();
+    const userTransactionsData = {
+      [network as string]: {
+        transfers: [],
+      },
+    };
 
-    if (!userTransactionsData || userTransactionsErr) {
-      captureException(
-        new Error(
-          `Could not fetch User Transactions for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
-          },
-        }
+    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+      const { data: transactionsData, errors: transactionsErr } =
+        await (async () => {
+          switch (true) {
+            case !!address: {
+              return useUserTransactionsByAddress(
+                network,
+                getTokenForNetwork(network),
+                page,
+                address as string,
+                JointPayoutAddrs.slice(i, i + 99)
+              );
+            }
+            default:
+              return useUserTransactionsAll(
+                network,
+                getTokenForNetwork(network),
+                page,
+                JointPayoutAddrs.slice(i, i + 99)
+              );
+          }
+        })();
+
+      if (!transactionsData || transactionsErr) {
+        captureException(
+          new Error(
+            `Could not fetch User Transactions for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+
+        return new Error("Server could not fulfill request");
+      }
+      Array.prototype.push.apply(
+        userTransactionsData[network as string].transfers,
+        transactionsData[network as string].transfers
       );
-
-      return new Error("Server could not fulfill request");
     }
-
     const {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
@@ -236,9 +248,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       };
     });
 
+    const splitMergedTransactions = mergedTransactions.slice(
+      (page - 1) * 12,
+      page * 12
+    );
+
     return json({
       page,
-      transactions: mergedTransactions,
+      transactions: splitMergedTransactions,
       count: Object.keys(winnersMap).length,
     } as TransactionsLoaderData);
   } catch (err) {
