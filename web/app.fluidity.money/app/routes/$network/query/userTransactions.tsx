@@ -162,6 +162,24 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         userTransactionsData[network as string].transfers,
         transactionsData[network as string].transfers
       );
+      if (!transactionsData || transactionsErr) {
+        captureException(
+          new Error(
+            `Could not fetch User Transactions for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+
+        return new Error("Server could not fulfill request");
+      }
+      Array.prototype.push.apply(
+        userTransactionsData[network as string].transfers,
+        transactionsData[network as string].transfers
+      );
     }
     const {
       [network as string]: { transfers: transactions },
