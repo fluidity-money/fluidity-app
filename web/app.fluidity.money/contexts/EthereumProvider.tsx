@@ -97,7 +97,9 @@ const EthereumFacade = ({
   };
 
   // the per-user mint limit for the contract
-  const limit = async (contractAddress: string): Promise<number | undefined> => {
+  const limit = async (
+    contractAddress: string
+  ): Promise<number | undefined> => {
     const signer = provider?.getSigner();
     if (!signer) {
       return;
@@ -106,16 +108,15 @@ const EthereumFacade = ({
     const isEnabled = await userMintLimitEnabled(
       signer.provider,
       contractAddress,
-      tokenAbi,
+      tokenAbi
     );
 
-    if (!isEnabled)
-      return;
+    if (!isEnabled) return;
 
     return await getUsdUserMintLimit(
       signer.provider,
       contractAddress,
-      tokenAbi,
+      tokenAbi
     );
   };
 

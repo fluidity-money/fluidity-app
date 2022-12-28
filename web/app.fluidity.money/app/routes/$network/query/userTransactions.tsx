@@ -63,7 +63,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ) {
       throw winnersErr;
     }
-   
+
     // winnersMap looks up if a transaction was the send that caused a win
     const winnersMap = winnersData.winners.reduce(
       (map, winner) => ({
@@ -77,7 +77,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }),
       {} as { [key: string]: Winner }
     );
-    
+
     // winnersMap looks up if a transaction was the send that caused a win
     const pendingWinnersMap =
       pendingWinnersData.ethereum_pending_winners.reduce(
@@ -111,55 +111,58 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       pendingWinnersPayoutAddrs
     );
 
-    let userTransactionsData  = {
-      [network as string] : {
-        transfers: []
-      }
+    const userTransactionsData = {
+      [network as string]: {
+        transfers: [],
+      },
     };
 
-    for (let i = 0; i <= JointPayoutAddrs.length; i+=100 ) {
-    const { data: transactionsData, errors: transactionsErr } =
-      await (async () => {
-        switch (true) {
-          case !!address: {
-            return useUserTransactionsByAddress(
-              network,
-              getTokenForNetwork(network),
-              page,
-              address as string,
-              JointPayoutAddrs.slice(i,i+99)
-            ); 
+    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+      const { data: transactionsData, errors: transactionsErr } =
+        await (async () => {
+          switch (true) {
+            case !!address: {
+              return useUserTransactionsByAddress(
+                network,
+                getTokenForNetwork(network),
+                page,
+                address as string,
+                JointPayoutAddrs.slice(i, i + 99)
+              );
+            }
+            default:
+              return useUserTransactionsAll(
+                network,
+                getTokenForNetwork(network),
+                page,
+                JointPayoutAddrs.slice(i, i + 99)
+              );
           }
-          default:
-            return useUserTransactionsAll(
-              network,
-              getTokenForNetwork(network),
-              page,
-              JointPayoutAddrs.slice(i,i+99)
-            );
-        }
-      })();
-    
-    if (!transactionsData || transactionsErr) {
-      captureException(
-        new Error(
-          `Could not fetch User Transactions for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
-          },
-        }
-      );
+        })();
 
-      return new Error("Server could not fulfill request");
+      if (!transactionsData || transactionsErr) {
+        captureException(
+          new Error(
+            `Could not fetch User Transactions for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+
+        return new Error("Server could not fulfill request");
+      }
+      Array.prototype.push.apply(
+        userTransactionsData[network as string].transfers,
+        transactionsData[network as string].transfers
+      );
     }
-    Array.prototype.push.apply(userTransactionsData[network as string].transfers, transactionsData[network as string].transfers); 
-   }
     const {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
-    
+
     // Destructure GraphQL data
     const userTransactions: UserTransaction[] = transactions.map(
       (transaction) => {
@@ -189,7 +192,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         };
       }
     );
-   
+
     const {
       config: {
         [network as string]: { tokens },
@@ -205,7 +208,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     );
 
     const defaultLogo = "/assets/tokens/usdt.svg";
-   
+
     const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
       const swapType =
         tx.sender === MintAddress
@@ -245,7 +248,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       };
     });
 
-    const splitMergedTransactions = mergedTransactions.slice((page - 1) * 12, page * 12);
+    const splitMergedTransactions = mergedTransactions.slice(
+      (page - 1) * 12,
+      page * 12
+    );
 
     return json({
       page,
