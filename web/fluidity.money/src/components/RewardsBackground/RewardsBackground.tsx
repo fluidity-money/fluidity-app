@@ -23,13 +23,26 @@ interface Reward {
   transaction: string;
 }
 
-const rewardLimit = 50
+interface CarouselInfo {
+  startIndex: number;
+  endIndex: number;
+}
 
 const RewardsBackground = () => {
   const { apiState, chain, network } = useChainContext();
   const { ref, inView } = useInView();
   const { width } = useViewport();
   const { weekWinnings } = apiState;
+
+  let iteratorCounter = 0;
+  let trackSlicedIndex =
+  [ 0, 29, 30, 59, 
+    60, 89, 90, 119, 
+    120, 149, 150, 179, 
+    180, 209, 210, 239, 
+    240, 269, 270, 299, 
+    300, 329, 330, 359
+  ];
 
   const rewards: Reward[] = weekWinnings.map((winning) => ({
     token: winning.token_short_name,
@@ -56,11 +69,10 @@ const RewardsBackground = () => {
     }
   };
 
-  const CarouselInfo = () => {
+  const CarouselInfo = ({startIndex, endIndex} :CarouselInfo) => {
     return <div>
       {rewards
-        .slice(0, rewardLimit)
-        .sort(() => Math.random() - 0.5)
+        .slice(startIndex, endIndex)
         .map(({ token, amount, address, date, transaction }, i) => (
           <div key={`winner-${i}`} className={styles.winner}>
             <a
@@ -98,7 +110,11 @@ const RewardsBackground = () => {
     <div className={styles.container}>
       <div className={styles.shade}></div>
       <div className={styles.rewardsBackground} ref={ref}>
-        {Array.from({ length: rewardLimit }).map(() => (
+        {Array.from({ length: 6 }).map(() => {
+
+          if(trackSlicedIndex[iteratorCounter] >= rewards.length) iteratorCounter = 0;
+
+          return (
           <>
             <motion.div
               initial={width < 500 && width > 0 ? { x: -500 } : { x: -1500 }}
@@ -107,7 +123,7 @@ const RewardsBackground = () => {
               transition={{ type: "tween", duration: 5 }}
             >
               <ContinuousCarousel background={true} direction="right">
-                <CarouselInfo />
+                <CarouselInfo startIndex={trackSlicedIndex[iteratorCounter++]} endIndex={trackSlicedIndex[iteratorCounter++]}/>
               </ContinuousCarousel>
             </motion.div>
             <motion.div
@@ -117,11 +133,11 @@ const RewardsBackground = () => {
               transition={{ type: "tween", duration: 5 }}
             >
               <ContinuousCarousel background={true} direction="left">
-                <CarouselInfo />
+              <CarouselInfo startIndex={trackSlicedIndex[iteratorCounter++]} endIndex={trackSlicedIndex[iteratorCounter++]}/>
               </ContinuousCarousel>
             </motion.div>
           </>
-        ))}
+        )})}
       </div>
     </div>
   );

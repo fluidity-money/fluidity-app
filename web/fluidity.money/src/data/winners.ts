@@ -48,7 +48,7 @@ subscription winnersGetWinningTransactionsAllSubscription($network: network_bloc
 
 const winningTransactionsAnyTimeAllSubscription = gql`
 subscription winnersGetWinningTransactionsAnyTimeAllSubscription($network: network_blockchain!) {
-  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}}) {
+  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}}, limit: 360) {
     awarded_time
     transaction_hash
     token_short_name
