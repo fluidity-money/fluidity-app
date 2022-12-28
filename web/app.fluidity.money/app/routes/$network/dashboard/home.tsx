@@ -257,14 +257,14 @@ export default function Home() {
     hash && window.open(getTxExplorerLink(network, hash), "_blank");
 
     !hash &&
-    toolTip.open(
-      "#808080",
-      <ToolTipContent
-        tokenLogoSrc={logo}
-        boldTitle={``}
-        details={"🚫 This reward claim is still pending! 🚫"}
-      />
-    );
+      toolTip.open(
+        "#808080",
+        <ToolTipContent
+          tokenLogoSrc={logo}
+          boldTitle={``}
+          details={"🚫 This reward claim is still pending! 🚫"}
+        />
+      );
   };
 
   useEffect(() => {
@@ -532,8 +532,13 @@ export default function Home() {
   return (
     <>
       {/* Timestamp */}
-      <div className="pad-main" style={{ marginBottom: "12px" }}>
-        {isTablet && (
+      <div className="pad-main top-text">
+        <Text>
+          {isFirstLoad || !timestamp
+            ? "Loading data..."
+            : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+        </Text>
+        {width < 1200 && (
           <Display
             size={isSmallMobile ? "xxs" : "xs"}
             color="gray"
@@ -542,19 +547,14 @@ export default function Home() {
             {`${activeTableFilterIndex ? "My" : "Global"} Dashboard`}
           </Display>
         )}
-        <Text>
-          {isFirstLoad || !timestamp
-            ? "Loading data..."
-            : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
-        </Text>
       </div>
 
       <section id="graph">
         <div className="graph-ceiling pad-main">
           {/* Statistics */}
           <div className="overlay">
-            {/* Row 1 */}
-            <div className="totals-row">
+            {/* Column 1 */}
+            <div className="totals-column">
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
@@ -581,20 +581,6 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Prize Pool */}
-              <div className="statistics-set">
-                <Text>Prize Pool</Text>
-                <Display
-                  size={width < 500 && width > 0 ? "xxs" : "xs"}
-                  style={{ margin: 0 }}
-                >
-                  {numberToMonetaryString(totalPrizePool)}
-                </Display>
-              </div>
-            </div>
-
-            {/* Row 2 */}
-            <div className="totals-row">
               {/* Transactions Volume / Count */}
               <div className="statistics-set">
                 <Text>
@@ -612,7 +598,20 @@ export default function Home() {
                   </AnchorButton>
                 )}
               </div>
+            </div>
 
+            {/* Column 2 */}
+            <div className="totals-column">
+              {/* Prize Pool */}
+              <div className="statistics-set">
+                <Text>Prize Pool</Text>
+                <Display
+                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  style={{ margin: 0 }}
+                >
+                  {numberToMonetaryString(totalPrizePool)}
+                </Display>
+              </div>
               {activeTableFilterIndex === 0 && (
                 <div className="statistics-set">
                   <Text>Total volume</Text>
@@ -624,8 +623,10 @@ export default function Home() {
                   </Display>
                 </div>
               )}
+            </div>
 
-              {/* Fluid Pairs */}
+            {/* Column 3 */}
+            <div className="totals-column">
               <div className="statistics-set">
                 <Text>Fluid assets</Text>
                 <Display
@@ -647,10 +648,11 @@ export default function Home() {
                 </Link>
               </div>
             </div>
+            {/* Fluid Pairs */}
           </div>
 
           {/* Graph Filter Row */}
-          {!isTablet && (
+          {width > 1200 && (
             <Display
               size={width < 1010 ? "xxs" : "xs"}
               color="gray"
