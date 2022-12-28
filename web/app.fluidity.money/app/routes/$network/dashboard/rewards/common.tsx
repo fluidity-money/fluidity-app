@@ -144,7 +144,7 @@ const UserRewards = ({
             </Heading>
 
             <Text size={"xs"}>
-              Rewards will be claimed automatically, without fees when market
+              Rewards will be claimed automatically without fees when market
               volume is reached. Claiming before this, time will incur
               instant-claim fees stated below.
               <br />
