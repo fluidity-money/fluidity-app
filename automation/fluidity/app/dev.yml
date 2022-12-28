@@ -10,7 +10,6 @@ SERVICES:
       LOAD_BALANCER: flu-dev-app-fluidity-alb
       TARGET_GROUP_01: flu-dev-app-fluidity-fe-tg-01
       TARGET_GROUP_02: flu-dev-app-fluidity-fe-tg-02
-      
       SECRET_BITQUERY_TOKEN: /fluidity/bitquery_token
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
       SECRET_FLU_ETH_RPC_WS: /fluidity/ethereum/websocket_url
