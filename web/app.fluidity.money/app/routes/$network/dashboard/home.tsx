@@ -31,6 +31,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
 import { useCache } from "~/hooks/useCache";
 import { Volume } from "../query/volumeStats";
+import { colors } from "~/webapp.config.server";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
@@ -176,6 +177,9 @@ const timeFilters = [
 type LoaderData = {
   page: number;
   network: Chain;
+  colors: {
+    [symbol: string]: string;
+  };
 };
 
 type CacheData = HomeLoaderData & TransactionsLoaderData;
@@ -227,11 +231,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   return json({
     network,
     page: txTablePage,
+    colors: (await colors)[network as string],
   });
 };
 
 export default function Home() {
-  const { network, page } = useLoaderData<LoaderData>();
+  const { network, page, colors } = useLoaderData<LoaderData>();
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);
 
@@ -251,6 +256,7 @@ export default function Home() {
 
   const handleRewardTransactionClick = (
     network: Chain,
+    currency: string,
     logo: string,
     hash: string
   ) => {
@@ -258,7 +264,7 @@ export default function Home() {
 
     !hash &&
       toolTip.open(
-        "#808080",
+        colors[currency as unknown as string],
         <ToolTipContent
           tokenLogoSrc={logo}
           boldTitle={``}
@@ -452,7 +458,16 @@ export default function Home() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { sender, timestamp, value, reward, hash, rewardHash, logo } = data;
+      const {
+        sender,
+        timestamp,
+        value,
+        reward,
+        hash,
+        rewardHash,
+        currency,
+        logo,
+      } = data;
 
       return (
         <motion.tr
@@ -490,7 +505,12 @@ export default function Home() {
                 <a
                   className="table-address"
                   onClick={() =>
-                    handleRewardTransactionClick(network, logo, rewardHash)
+                    handleRewardTransactionClick(
+                      network,
+                      currency,
+                      logo,
+                      rewardHash
+                    )
                   }
                 >
                   <Text prominent={true}>
