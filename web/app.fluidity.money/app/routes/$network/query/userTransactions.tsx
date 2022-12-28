@@ -270,9 +270,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       };
     });
 
+    const splitMergedTransactions = mergedTransactions.slice(
+      (page - 1) * 12,
+      page * 12
+    );
+
     return json({
       page,
-      transactions: mergedTransactions,
+      transactions: splitMergedTransactions,
       count: Object.keys(winnersMap).length,
     } as TransactionsLoaderData);
   } catch (err) {
