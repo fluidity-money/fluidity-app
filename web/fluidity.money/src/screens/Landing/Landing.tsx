@@ -23,7 +23,7 @@ const Landing = () => {
   const [state, setState] = useState({
     src: vidSources[0],
     mimeType: type,
-    key: "0",
+    key: "video-0",
     loop: true,
     scale: isFirefox ? 1 : 0.5,
   });
@@ -56,7 +56,7 @@ const Landing = () => {
               type={"reduce"}
               mimeType={state.mimeType}
               loop={state.loop}
-              key={state.key}
+              videoKey={state.key}
               scale={state.scale}
               margin={"-60px 0 0 0"}
               width={'65%'}
@@ -67,7 +67,7 @@ const Landing = () => {
               type={"reduce"}
               mimeType={state.mimeType}
               loop={state.loop}
-              key={state.key}
+              videoKey={state.key}
               scale={state.scale * 2}
               margin={"-400px 0 0 0"}
             />
