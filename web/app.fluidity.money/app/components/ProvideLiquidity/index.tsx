@@ -95,24 +95,29 @@ const ProvideLiquidity = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
 
   const dropdownRef = useRef(null);
-  useClickOutside(dropdownRef, () => setOpenDropdown(false));
+  useClickOutside(dropdownRef, () =>
+    setTimeout(() => setOpenDropdown(false), 200)
+  );
 
   const dropdownOptions = (
-    <div className="dropdown-options" ref={dropdownRef}>
-      {fluidTokens.map((option: Token) => (
-        <button
-          className="token-option"
-          onClick={() => {
-            setPoolToken(option);
-          }}
-          key={`${option.name} ${option.logo}`}
-        >
-          <Text size="xl" prominent={true}>
-            {option.symbol}
-          </Text>
-          <img style={{ width: 30, height: 30 }} src={option.logo} />
-        </button>
-      ))}
+    <div className="dropdown-options">
+      <ul>
+        {fluidTokens.map((option: Token) => (
+          <li key={`${option.name} ${option.logo}`}>
+            <button
+              className="token-option"
+              onClick={() => {
+                setPoolToken(() => option);
+              }}
+            >
+              <Text size="xl" prominent={true}>
+                {option.symbol}
+              </Text>
+              <img style={{ width: 30, height: 30 }} src={option.logo} />
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 
@@ -131,12 +136,12 @@ const ProvideLiquidity = () => {
             <Heading as="h2" className="provide-heading">
               Provide Liquidity for{" "}
               <button
+                ref={dropdownRef}
                 className="open-provider-dropdown"
                 onClick={() => {
                   setOpenDropdown(!openDropdown);
                 }}
               >
-                {openDropdown && dropdownOptions}
                 <Heading as="h1" className="fluid-liquidity-token">
                   {`ƒ${poolToken.symbol.slice(1)}`}
                 </Heading>
@@ -144,6 +149,7 @@ const ProvideLiquidity = () => {
                   src="/images/icons/triangleDown.svg"
                   style={{ width: 18, height: 8 }}
                 />
+                {openDropdown && dropdownOptions}
               </button>
             </Heading>
           </div>
