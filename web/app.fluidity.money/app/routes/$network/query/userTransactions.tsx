@@ -109,9 +109,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     // Because every ethereum_pending_winners is present in winner
     // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
-    const JointPayoutAddrs = [... new Set(winnersPayoutAddrs.concat(
-      pendingWinnersPayoutAddrs
-    ))];
+    const JointPayoutAddrs = [
+      ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
+    ];
 
     const userTransactionsData = {
       [network as string]: {
@@ -126,27 +126,31 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         await (async () => {
           switch (true) {
             case !!address: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsByAddress(
                 network,
                 getTokenForNetwork(network),
                 page,
                 address as string,
                 JointPayoutAddrs.slice(i, i + 99),
-                12 / Math.ceil(JointPayoutAddrs.length / 100)
+                limit < 1 ? 12 : limit
               );
             }
-            default:
+            default: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsAll(
                 network,
                 getTokenForNetwork(network),
                 page,
                 JointPayoutAddrs.slice(i, i + 99),
-                12 / Math.ceil(JointPayoutAddrs.length / 100)
+                limit < 1 ? 12 : limit
               );
+            }
           }
         })();
 
       if (!transactionsData || transactionsErr) {
+        console.log(transactionsErr);
         captureException(
           new Error(
             `Could not fetch User Transactions for ${address}, on ${network}`
@@ -165,6 +169,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         transactionsData[network as string].transfers
       );
     }
+    console.log("after......fjsjfkjfjskj");
     const {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
