@@ -1,0 +1,12 @@
+{
+    "name": "@fluidity-money/fluidity-monorepo",
+    "version": "1.0.0",
+    "workspaces": [
+        "app.fluidity.money",
+        "fluidity.money",
+        "surfing"
+    ],
+    "dependencies": {
+        "turbo": "^1.6.3"
+    }
+}
