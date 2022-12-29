@@ -94,8 +94,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       );
 
     const jointWinnersMap = {
-      ...winnersMap,
       ...pendingWinnersMap,
+      ...winnersMap,
     };
 
     // payoutsMap looks up if a transaction was a payout transaction
@@ -107,9 +107,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ({ transaction_hash }) => transaction_hash
     );
 
-    const JointPayoutAddrs = winnersPayoutAddrs.concat(
+    // Because every ethereum_pending_winners is present in winner
+    // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
+    const JointPayoutAddrs = [... new Set(winnersPayoutAddrs.concat(
       pendingWinnersPayoutAddrs
-    );
+    ))];
 
     const userTransactionsData = {
       [network as string]: {
