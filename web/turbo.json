@@ -24,6 +24,9 @@
             "server.ts",
             "config.toml"
         ]
+      },
+      "dev": {
+          "cache": false
       }
     }
 }

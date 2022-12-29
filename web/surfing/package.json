@@ -8,7 +8,7 @@
     "directory": "web/surfing"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite build --mode lib -w",
     "build": "npm run clean && tsc && vite build",
     "preview": "vite preview",
     "storybook": "start-storybook -p 6006",
