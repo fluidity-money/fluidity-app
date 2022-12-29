@@ -179,7 +179,6 @@ main > footer > section {
 
 .rainbow {
   position: relative;
-  z-index: 1;
   overflow: hidden;
   font-size: 15px;
   box-shadow: 0 0 8px 2px #f3b8d8;
