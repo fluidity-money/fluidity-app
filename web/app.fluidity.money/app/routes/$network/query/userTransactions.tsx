@@ -133,7 +133,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
                 page,
                 address as string,
                 JointPayoutAddrs.slice(i, i + 99),
-                limit < 1 ? 12 : limit
+                limit === Infinity ? 12 : limit
               );
             }
             default: {
@@ -143,14 +143,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
                 getTokenForNetwork(network),
                 page,
                 JointPayoutAddrs.slice(i, i + 99),
-                limit < 1 ? 12 : limit
+                limit === Infinity ? 12 : limit
               );
             }
           }
         })();
 
       if (!transactionsData || transactionsErr) {
-        console.log(transactionsErr);
         captureException(
           new Error(
             `Could not fetch User Transactions for ${address}, on ${network}`
@@ -169,7 +168,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         transactionsData[network as string].transfers
       );
     }
-    console.log("after......fjsjfkjfjskj");
+
     const {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
