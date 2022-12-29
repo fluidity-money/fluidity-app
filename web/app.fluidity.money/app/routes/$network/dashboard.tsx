@@ -476,7 +476,9 @@ export default function Dashboard() {
 
         {/* Fluidify button */}
         <GeneralButton
-          className="fluidify-button-dashboard-mobile rainbow "
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            openMobModal && "z-0"
+          }`}
           version={"primary"}
           buttontype="text"
           size={"medium"}
