@@ -579,7 +579,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(
@@ -626,7 +626,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>Prize Pool</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(totalPrizePool)}
