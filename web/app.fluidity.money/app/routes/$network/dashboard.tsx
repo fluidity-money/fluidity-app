@@ -477,11 +477,12 @@ export default function Dashboard() {
         {/* Fluidify button */}
         <GeneralButton
           className={`fluidify-button-dashboard-mobile rainbow ${
-            openMobModal ? "z-0" :
-            walletModalVisibility ? "z-0" :
-            connectedWalletModalVisibility ? "z-0" :
-            chainModalVisibility ? "z-0"
-             : ''
+            // moves Fluidify button behind modal when a modal is opened
+            (openMobModal ||
+              walletModalVisibility ||
+              connectedWalletModalVisibility ||
+              chainModalVisibility) &&
+            "z-0"
           }`}
           version={"primary"}
           buttontype="text"
