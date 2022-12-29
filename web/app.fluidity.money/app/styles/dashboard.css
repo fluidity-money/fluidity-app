@@ -278,6 +278,10 @@ main > footer > section > a {
   min-width: 340px;
 }
 
+.overlay > div:nth-child(3) {
+  justify-content: flex-end;
+}
+
 .transaction-filters {
   display: flex;
   justify-content: flex-end;
@@ -570,6 +574,15 @@ main > footer > section > a {
   width: 175px;
   display: flex;
   flex-direction: column;
+}
+
+.dropdown-options > ul {
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-options > ul > li {
+  list-style: none;
 }
 
 .token-option {
