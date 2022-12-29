@@ -273,6 +273,10 @@ main > footer > section > a {
   min-width: 340px;
 }
 
+.overlay > div:nth-child(3) {
+  justify-content: flex-end;
+}
+
 .transaction-filters {
   display: flex;
   justify-content: flex-end;
