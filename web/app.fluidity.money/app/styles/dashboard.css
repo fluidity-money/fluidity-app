@@ -567,6 +567,15 @@ main > footer > section > a {
   flex-direction: column;
 }
 
+.dropdown-options > ul {
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-options > ul > li {
+  list-style: none;
+}
+
 .token-option {
   display: flex;
   justify-content: space-between;
