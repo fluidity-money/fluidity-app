@@ -607,7 +607,7 @@ main > footer > section > a {
 .connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background-color: transparent;
   position: absolute;
   top: 0;
   left: 0;
