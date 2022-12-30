@@ -105,6 +105,7 @@ const SAFE_DEFAULT: CacheData = {
   transactions: [],
   totalPrizePool: 0,
   page: 0,
+  loaded: false,
   fluidPairs: 0,
   networkFee: 0,
   gasFee: 0,
@@ -239,7 +240,7 @@ export default function Rewards() {
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
   }, [connected]);
-
+  
   const unixNow = Date.now();
 
   const [activeRewardFilterIndex, setActiveRewardFilterIndex] = useState(0);
@@ -588,10 +589,16 @@ export default function Rewards() {
 
       <section id="table">
         {transactions.length === 0 ? (
+          globalTransactionsData?.loaded !== true ?
           <>
             Fetching table data...
             <div className="center-table-loading-anim loader-dots">
               <LoadingDots />
+            </div>
+          </>:
+          <>
+            <div className="center-table-loading-anim loader-dots">
+              <Text size="lg">No reward record found!</Text>
             </div>
           </>
         ) : (
