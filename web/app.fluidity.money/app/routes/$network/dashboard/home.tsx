@@ -207,6 +207,7 @@ const SAFE_DEFAULT: CacheData = {
   count: 0,
   network: "ethereum",
   transactions: [],
+  loaded: false,
   rewards: {
     day: [],
     week: [],
