@@ -240,7 +240,7 @@ export default function Rewards() {
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
   }, [connected]);
-  
+
   const unixNow = Date.now();
 
   const [activeRewardFilterIndex, setActiveRewardFilterIndex] = useState(0);
@@ -589,18 +589,20 @@ export default function Rewards() {
 
       <section id="table">
         {transactions.length === 0 ? (
-          globalTransactionsData?.loaded !== true ?
-          <>
-            Fetching table data...
-            <div className="center-table-loading-anim loader-dots">
-              <LoadingDots />
-            </div>
-          </>:
-          <>
-            <div className="center-table-loading-anim loader-dots">
-              <Text size="lg">No reward record found!</Text>
-            </div>
-          </>
+          globalTransactionsData?.loaded !== true ? (
+            <>
+              Fetching table data...
+              <div className="center-table-loading-anim loader-dots">
+                <LoadingDots />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="center-table-loading-anim loader-dots">
+                <Text size="lg">No reward record found!</Text>
+              </div>
+            </>
+          )
         ) : (
           <Table
             itemName="rewards"
