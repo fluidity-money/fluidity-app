@@ -214,6 +214,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       page,
       transactions: mergedTransactions,
       count: winnersData.winners.length,
+      loaded: true,
     } as TransactionsLoaderData);
   } catch (err) {
     captureException(
