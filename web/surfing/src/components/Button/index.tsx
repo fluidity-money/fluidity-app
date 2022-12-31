@@ -8,6 +8,7 @@ import FilterButton from "./FilterButton";
 import GeneralButton from "./GeneralButton/GeneralButton";
 import LinkButton from "./LinkButton";
 import TabButton from "./TabButton";
+import AttentionButton from "./AttentionButton";
 
 export {
   AnchorButton,
@@ -16,4 +17,5 @@ export {
   GeneralButton,
   LinkButton,
   TabButton,
+  AttentionButton
 };
