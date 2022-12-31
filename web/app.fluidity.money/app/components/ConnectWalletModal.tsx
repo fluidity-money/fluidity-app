@@ -101,6 +101,18 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
     );
   };
 
+  const closeWithEsc = useCallback(
+    (event: { key: string }) => {
+      event.key === "Escape" && visible === true && close();
+    },
+    [visible]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", closeWithEsc);
+    return () => document.removeEventListener("keydown", closeWithEsc);
+  }, [visible]);
+
   useEffect(() => {
     setModal(
       createPortal(
@@ -109,6 +121,7 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
             visible === true ? "show-modal" : "hide-modal"
           }`}
         >
+          <div onClick={close} className="connected-wallet-background"></div>
           <div
             className={`connect-wallet-modal-container  ${
               visible === true ? "show-modal" : "hide-modal"
