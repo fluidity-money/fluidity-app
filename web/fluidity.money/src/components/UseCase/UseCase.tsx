@@ -3,9 +3,7 @@
 // LICENSE.md file.
 
 import { Heading, Text } from "@fluidity-money/surfing";
-import { motion } from "framer-motion";
 import useViewport from "hooks/useViewport";
-import React from "react";
 import styles from "./UseCase.module.scss";
 
 interface UseCaseProps {
