@@ -58,7 +58,7 @@ const createHasuraSubscriptionObservable = (
   execute(
     new WebSocketLink(
       new SubscriptionClient(
-        config.drivers["hasura"][0].rpc.ws,
+        config.drivers["hasura"][0].rpc.http,
         {
           reconnect: true,
           connectionParams: {

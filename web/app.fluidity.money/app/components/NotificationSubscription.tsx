@@ -39,7 +39,7 @@ export const NotificationSubscription = ({
   const navigate = useNavigate();
   const toolTip = useToolTip();
 
-  const { rawAddress, balance } = useContext(FluidityFacadeContext);
+  const { rawAddress, address, balance } = useContext(FluidityFacadeContext);
 
   const [detailedRewardObject, setDetailedRewardObject] =
     useState<RewardDetails>({
@@ -91,7 +91,7 @@ export const NotificationSubscription = ({
       case NotificationType.ONCHAIN:
       default:
         if (sourceParseTrimAddress === mintLabel) {
-          return "successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d";
+          return "successfully m͟i͟n͟t͟e͟d";
         }
         if (destinationParseTrimAddress === mintLabel) {
           return "successfully r͟e͟v͟e͟r͟t͟e͟d";
@@ -144,7 +144,7 @@ export const NotificationSubscription = ({
   };
 
   useEffect(() => {
-    if (rawAddress) {
+    if (address) {
       const { emitEvent } = DSSocketManager(
         {
           onCallback: handleClientListener,
@@ -158,9 +158,9 @@ export const NotificationSubscription = ({
           : undefined
       );
 
-      emitEvent(network, rawAddress as unknown as string);
+      emitEvent(network, address as unknown as string);
     }
-  }, [rawAddress]);
+  }, [address]);
 
   return (
     <ViewRewardModal
