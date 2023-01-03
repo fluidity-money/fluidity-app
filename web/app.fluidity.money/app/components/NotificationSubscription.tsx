@@ -91,7 +91,7 @@ export const NotificationSubscription = ({
       case NotificationType.ONCHAIN:
       default:
         if (sourceParseTrimAddress === mintLabel) {
-          return "successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d";
+          return "successfully m͟i͟n͟t͟e͟d";
         }
         if (destinationParseTrimAddress === mintLabel) {
           return "successfully r͟e͟v͟e͟r͟t͟e͟d";
@@ -158,7 +158,7 @@ export const NotificationSubscription = ({
           : undefined
       );
 
-      emitEvent(network, rawAddress as unknown as string);
+      emitEvent(network, rawAddress.toLowerCase() as unknown as string);
     }
   }, [rawAddress]);
 
