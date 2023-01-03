@@ -25,6 +25,7 @@ var applicationNames = []string{
     "curve",
     "multichain",
     "xy_finance",
+	"apeswap",
 }
 
 func (app Application) String() string {

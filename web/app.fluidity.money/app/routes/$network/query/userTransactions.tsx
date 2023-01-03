@@ -31,6 +31,7 @@ export type TransactionsLoaderData = {
   transactions: Transaction[];
   page: number;
   count: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
