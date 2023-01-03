@@ -26,7 +26,6 @@ import {
   ManualCarousel,
   trimAddress,
   LinkButton,
-  LoadingDots,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
@@ -588,37 +587,20 @@ export default function Rewards() {
       </section>
 
       <section id="table">
-        {transactions.length === 0 ? (
-          globalTransactionsData?.loaded !== true ? (
-            <>
-              Fetching table data...
-              <div className="center-table-loading-anim loader-dots">
-                <LoadingDots />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="center-table-loading-anim loader-dots">
-                <Text size="lg">No reward record found!</Text>
-              </div>
-            </>
-          )
-        ) : (
-          <Table
-            itemName="rewards"
-            headings={txTableColumns}
-            pagination={{
-              page,
-              rowsPerPage: 12,
-            }}
-            count={count}
-            data={transactions}
-            renderRow={TransactionRow(network)}
-            filters={txTableFilters}
-            onFilter={setActiveTableFilterIndex}
-            activeFilterIndex={activeTableFilterIndex}
-          />
-        )}
+        <Table
+          itemName="rewards"
+          headings={txTableColumns}
+          pagination={{
+            page,
+            rowsPerPage: 12,
+          }}
+          count={count}
+          data={transactions}
+          renderRow={TransactionRow(network)}
+          filters={txTableFilters}
+          onFilter={setActiveTableFilterIndex}
+          activeFilterIndex={activeTableFilterIndex}
+        />
       </section>
 
       {/* Highest Rewarders */}
