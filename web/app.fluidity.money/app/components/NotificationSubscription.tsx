@@ -39,7 +39,7 @@ export const NotificationSubscription = ({
   const navigate = useNavigate();
   const toolTip = useToolTip();
 
-  const { rawAddress, address, balance } = useContext(FluidityFacadeContext);
+  const { rawAddress, balance } = useContext(FluidityFacadeContext);
 
   const [detailedRewardObject, setDetailedRewardObject] =
     useState<RewardDetails>({
@@ -144,7 +144,7 @@ export const NotificationSubscription = ({
   };
 
   useEffect(() => {
-    if (address) {
+    if (rawAddress) {
       const { emitEvent } = DSSocketManager(
         {
           onCallback: handleClientListener,
@@ -158,9 +158,9 @@ export const NotificationSubscription = ({
           : undefined
       );
 
-      emitEvent(network, address as unknown as string);
+      emitEvent(network, rawAddress.toLowerCase() as unknown as string);
     }
-  }, [address]);
+  }, [rawAddress]);
 
   return (
     <ViewRewardModal
