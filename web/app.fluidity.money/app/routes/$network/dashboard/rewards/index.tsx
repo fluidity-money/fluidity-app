@@ -26,7 +26,6 @@ import {
   ManualCarousel,
   trimAddress,
   LinkButton,
-  LoadingDots,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
