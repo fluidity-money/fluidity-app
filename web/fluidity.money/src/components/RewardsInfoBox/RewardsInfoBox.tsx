@@ -124,7 +124,7 @@ const RewardsInfoBox = ({
             className={styles.overlap}
             options={options}
             setOption={setChain}
-            mobile={width <= mobileBreakpoint}
+            mobile={width <= mobileBreakpoint && width > 0}
           />
         )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
