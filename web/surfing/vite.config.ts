@@ -7,10 +7,18 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import tsconfigPaths from "vite-tsconfig-paths";
+import injectCSS from 'vite-plugin-css-injected-by-js'
+import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svgr(), react(), tsconfigPaths()],
+  plugins: [
+    svgr(),
+    dts(),
+    react(),
+    tsconfigPaths(),
+    injectCSS(),
+  ],
   css: {
     preprocessorOptions: {
       scss: {
@@ -24,6 +32,7 @@ export default defineConfig({
       name: "Surfing",
       // the proper extensions will be added
       fileName: "surfing",
+      formats: ["es"], // UMD/CJS isn't the way forward, so no we support only ES modules.
     },
     emptyOutDir: false,
     rollupOptions: {
