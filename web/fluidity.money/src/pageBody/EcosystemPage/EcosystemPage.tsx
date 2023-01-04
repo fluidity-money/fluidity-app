@@ -4,8 +4,8 @@
 
 import Demo from "../../screens/Demo";
 import FeaturedProjects from "../../screens/FeaturedProjects";
-import Filter from "../../screens/AllProjects";
-import FluidProjects from "../../screens/FluidProjects";
+// import Filter from "../../screens/AllProjects";
+// import FluidProjects from "../../screens/FluidProjects";
 import Footer from "../../screens/Footer";
 import Search from "../../screens/Search";
 import AllProjects from "../../screens/AllProjects";
