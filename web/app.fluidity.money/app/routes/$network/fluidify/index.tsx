@@ -1,7 +1,10 @@
+import type { Token } from "~/util/chainUtils/tokens";
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import { useLoaderData, Link } from "@remix-run/react";
+import BN from "bn.js";
+import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
@@ -30,7 +33,7 @@ import { Chain } from "~/util/chainUtils/chains";
 import config, { colors } from "~/webapp.config.server";
 
 type LoaderData = {
-  tokens: AugmentedToken[];
+  tokens: Token[];
   ethereumWallets: {
     name: string;
     id: string;
@@ -54,13 +57,8 @@ export const loader: LoaderFunction = async ({ params }) => {
     },
   } = config;
 
-  const augTokens = tokens.map((tok) => ({
-    ...tok,
-    userTokenBalance: 0,
-  }));
-
   return json({
-    tokens: augTokens,
+    tokens,
     ethereumWallets,
     network,
     colors: (await colors)[network as string],
@@ -118,7 +116,9 @@ export default function FluidifyToken() {
   }, [width]);
 
   // Tokens return from loader
-  const [tokens, setTokens] = useState<AugmentedToken[]>(defaultTokens);
+  const [tokens, setTokens] = useState<AugmentedToken[]>(
+    defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
+  );
 
   // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
@@ -170,7 +170,7 @@ export default function FluidifyToken() {
   // Start swap animation
   const [swapping, setSwapping] = useState(false);
   const [{ amount, txHash }, setSwapData] = useState({
-    amount: 0,
+    amount: "",
     txHash: "",
   });
   const [swapError, setSwapError] = useState(false);
@@ -199,7 +199,8 @@ export default function FluidifyToken() {
                 ),
                 Promise.all(
                   tokens.map(
-                    async ({ address }) => (await balance?.(address)) || 0
+                    async ({ address }) =>
+                      (await balance?.(address)) || new BN(0)
                   )
                 ),
                 Promise.all(
@@ -237,7 +238,9 @@ export default function FluidifyToken() {
           case "solana": {
             // get user token balances
             const userTokenBalance = await Promise.all(
-              tokens.map(async ({ address }) => (await balance?.(address)) || 0)
+              tokens.map(
+                async ({ address }) => (await balance?.(address)) || new BN(0)
+              )
             );
 
             return setTokens(
@@ -256,7 +259,7 @@ export default function FluidifyToken() {
     return setTokens(
       tokens.map((token) => ({
         ...token,
-        userTokenBalance: 0,
+        userTokenBalance: new BN(0),
       }))
     );
   }, [address, swapping]);
@@ -269,10 +272,10 @@ export default function FluidifyToken() {
 
   const handleRedirect = async (
     transaction: TransactionResponse,
-    amount: number
+    amount: string
   ) => {
     setSwapData({
-      amount,
+      amount: amount,
       txHash: transaction.txHash,
     });
     setSwapping(true);
@@ -307,7 +310,9 @@ export default function FluidifyToken() {
     const typeFilteredTokens = tokens
       .filter(searchFilters[activeFilterIndex].filter)
       .sort(
-        (first, second) => second.userTokenBalance - first.userTokenBalance
+        (first, second) =>
+          getUsdFromTokenAmount(second.userTokenBalance, second) -
+          getUsdFromTokenAmount(first.userTokenBalance, first)
       );
 
     debouncedSearch(typeFilteredTokens);
@@ -327,7 +332,7 @@ export default function FluidifyToken() {
           close={() => {
             setSwapping(false);
             setSwapData({
-              amount: 0,
+              amount: "",
               txHash: "",
             });
             setSwapError(false);
@@ -524,11 +529,11 @@ export default function FluidifyToken() {
                         address={address}
                         mintCapPercentage={
                           !!userMintLimit && userMintedAmt !== undefined
-                            ? userMintedAmt / userMintLimit
+                            ? userMintedAmt.div(userMintLimit).toNumber()
                             : undefined
                         }
                         color={colors[symbol]}
-                        amount={userTokenBalance}
+                        amount={getUsdFromTokenAmount(userTokenBalance, token)}
                         addToken={handleAddToken}
                       />
                     </div>
@@ -554,11 +559,14 @@ export default function FluidifyToken() {
                           address={address}
                           mintCapPercentage={
                             !!userMintLimit && userMintedAmt !== undefined
-                              ? userMintedAmt / userMintLimit
+                              ? userMintedAmt.div(userMintLimit).toNumber()
                               : undefined
                           }
                           color={colors[symbol]}
-                          amount={userTokenBalance}
+                          amount={getUsdFromTokenAmount(
+                            userTokenBalance,
+                            token
+                          )}
                           addToken={handleAddToken}
                         />
                       </Draggable>
