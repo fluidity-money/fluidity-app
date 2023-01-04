@@ -15,5 +15,4 @@ CREATE TABLE faucet_users (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS faucet_users;
-
+DROP TABLE faucet_users;

@@ -5,6 +5,4 @@ ALTER TABLE user_actions
 
 -- migrate:down
 
-ALTER TABLE user_actions
-    DROP COLUMN IF EXISTS transaction_hash;
-
+ALTER TABLE user_actions DROP COLUMN transaction_hash;

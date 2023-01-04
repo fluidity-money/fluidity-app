@@ -7,6 +7,5 @@ ALTER TABLE faucet_users ADD PRIMARY KEY(address, network, token_name);
 
 -- migrate:down
 
-ALTER TABLE faucet_users 
-    DROP COLUMN IF EXISTS token_name;
-
+ALTER TABLE faucet_users
+	DROP COLUMN token_name;

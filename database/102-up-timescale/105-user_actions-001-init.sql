@@ -35,5 +35,4 @@ CREATE TABLE user_actions (
 
 -- migrate:down
 
-DROP TABLE IF EXISTS user_actions;
-
+DROP TABLE user_actions;

@@ -6,5 +6,4 @@ ALTER TABLE worker_buffered_atx
 -- migrate:down
 
 ALTER TABLE worker_buffered_atx
-	DROP COLUMN IF EXISTS token_short_name;
-
+	DROP COLUMN token_short_name;

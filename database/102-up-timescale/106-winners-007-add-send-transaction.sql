@@ -1,4 +1,3 @@
-
 -- migrate:up
 
 ALTER TABLE winners
